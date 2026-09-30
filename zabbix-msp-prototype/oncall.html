@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>值班看板 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('oncall', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const incs = DATA.incidents.filter(App.inScope);
+  const open = incs.filter(i => i.sourceState === 'PROBLEM' && i.handlingState !== 'CLOSED');
+  const unack = open.filter(i => i.handlingState === 'NEW' && !i.suppressed);
+  const inprog = open.filter(i => ['ACKNOWLEDGED', 'IN_PROGRESS'].includes(i.handlingState));
+  const review = incs.filter(i => i.sourceState === 'RECOVERED' && i.handlingState !== 'CLOSED');
+  const recovered24 = incs.filter(i => i.recoveredAt && i.recoveredAt > DATA.now - DATA.D).length;
+  const tierOf = (tid) => (DATA.escalations.find(e => e.tenants.includes(tid)) || DATA.escalations[2]);
+  const escMin = (i) => { const tier = tierOf(i.tenant); const m = tier.tier === '金牌' ? 15 : tier.tier === '银牌' ? 30 : 240; return ['disaster', 'high'].includes(i.severity) ? m : m * 2; };
+  const ackd = incs.filter(i => i.ackAt && i.sourceTime > DATA.now - DATA.D); const mtta = ackd.length ? ackd.reduce((s, i) => s + (i.ackAt - i.sourceTime), 0) / ackd.length / 1000 : null;
+  const critical = open.filter(i => ['disaster', 'high'].includes(i.severity) && !i.suppressed);
+  const oc = DATA.oncall;
+
+  root.innerHTML = `
+  <div class="page-head"><div><h1>值班看板 <span class="badge primary">${esc(ctx.tenant.name)}</span></h1><div class="sub">值班视角 · 优先级与处置效率。未确认告警按严重级别与 SLA 升级倒计时排序；关键异常保留独立入口。</div></div>
+    <div class="page-actions"><span class="badge ok"><span class="dot ok pulse"></span>自动刷新 30s</span><button class="btn" id="handover">${icon('users')} 交接班</button><a class="btn primary" href="incidents.html">${icon('alert-triangle')} 事件中心</a></div></div>
+
+  <div class="grid g6 mb">
+    ${App.kpi({ label: '未确认告警', value: unack.length, sub: unack.filter(i => (DATA.now - i.sourceTime) / DATA.MIN > escMin(i)).length ? `<span class="delta bad">${unack.filter(i => (DATA.now - i.sourceTime) / DATA.MIN > escMin(i)).length} 个已超升级时限</span>` : '<span class="delta good">均在时限内</span>', cls: unack.length ? 'danger' : 'ok' })}
+    ${App.kpi({ label: '关键异常（灾难 / 严重）', value: critical.length, sub: '绕过聚合等待 · 独立升级通道', cls: critical.length ? 'danger' : '' })}
+    ${App.kpi({ label: '处理中', value: inprog.length, sub: `${inprog.filter(i => i.ticketId).length} 个已建单 · ${inprog.filter(i => i.runbookRunId).length} 个执行了 Runbook` })}
+    ${App.kpi({ label: '待复核（已恢复未结单）', value: review.length, sub: '恢复不等于结单', cls: review.length ? 'warn' : '' })}
+    ${App.kpi({ label: '今日已恢复', value: recovered24, sub: '监控 RECOVERED', cls: 'ok' })}
+    ${App.kpi({ label: 'MTTA（24h）', value: mtta != null ? fmt.dur(mtta) : '—', sub: '目标 ≤ 5m', cls: mtta != null && mtta > 300 ? 'warn' : 'ok' })}
+  </div>
+
+  <div class="split">
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>未确认告警队列 <span class="sub">按严重级别 → 升级倒计时排序</span></h3><div class="tools"><button class="btn sm" id="ackAll">${icon('check')} 批量确认所选</button></div></div><div id="queue"></div></div>
+      <div class="card"><div class="card-head"><h3>处理中 <span class="sub">责任人 · 工单 · Runbook</span></h3></div><div id="progress"></div></div>
+      <div class="card"><div class="card-head"><h3>待复核 <span class="sub">监控已恢复，需人工复核后结单</span></h3></div><div id="review"></div></div>
+    </div>
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>当前值班</h3><span class="xs muted">交接 ${oc.today.handover}</span></div><div class="card-body">
+        <div class="row" style="gap:12px;margin-bottom:10px">${App.avatar(oc.today.l1, '#2563eb')}<div class="grow"><div class="strong">${oc.today.l1} <span class="tag blue">L1</span></div><div class="xs muted">首响 · 确认 · 只读诊断</div></div><span class="badge ok"><span class="dot ok"></span>在线</span></div>
+        <div class="row" style="gap:12px;margin-bottom:10px">${App.avatar(oc.today.l2, '#7c3aed')}<div class="grow"><div class="strong">${oc.today.l2} <span class="tag blue">L2</span></div><div class="xs muted">处置 · 升级 · 复核 · L2 Runbook</div></div><span class="badge ok"><span class="dot ok"></span>在线</span></div>
+        <div class="row" style="gap:12px">${App.avatar(oc.today.manager, '#0891b2')}<div class="grow"><div class="strong">${oc.today.manager} <span class="tag">服务经理</span></div><div class="xs muted">60 分钟未解决升级</div></div><span class="badge neutral">待命</span></div>
+        <div class="mt12 xs muted">值班租户范围：${ctx.tenant.id === 'all' ? DATA.tenants.filter(t => t.status === 'active').map(t => `<span class="tag">${t.short}</span>`).join(' ') : `<span class="tag">${ctx.tenant.short}</span>`}</div>
+      </div></div>
+      <div class="card"><div class="card-head"><h3>关键异常独立入口</h3><span class="badge danger">${critical.length}</span></div><div class="card-body tight">${critical.length ? critical.map(i => `<div class="row" style="padding:8px 18px;border-bottom:1px dashed var(--line);gap:10px;cursor:pointer" onclick="location.href='incident-detail.html?id=${i.id}'"><span class="sevbar ${i.severity}"></span><div class="grow"><div class="strong small ellipsis">${esc(i.name)}</div><div class="xs muted">${esc(i.assetName)} · ${App.tenantName(i.tenant)} · ${fmt.ago(i.sourceTime)}</div></div>${App.statePill(i.handlingState)}</div>`).join('') : '<div class="empty small">无灾难 / 严重级活动问题</div>'}</div></div>
+      <div class="card"><div class="card-head"><h3>拓扑影响</h3></div><div class="card-body">
+        <div class="small strong mb8">Proxy「门店专线」失联 → 下游 86 台主机进入未知</div>
+        <div class="timeline">${[['px-store-01', 'Proxy 失联 14m · 灾难', 'danger'], ['sw-store-hz-01 … 04', 'SNMP 不可达 · 依赖抑制（4 台）', 'unknown'], ['fw-hz-01', '门店 VPN 会话下降 62% · 信息', 'info'], ['POS 交易 服务', '门店侧数据缺失 · 记为未知区间', 'warn']].map(x => `<div class="tl-item ${x[2]}"><span class="tl-dot"></span><div class="tl-title small">${x[0]}</div><div class="tl-desc xs">${x[1]}</div></div>`).join('')}</div>
+        <div class="xs faint mt8">相关性基于 CMDB 服务依赖；拓扑过期时仅提示候选原因。</div>
+      </div></div>
+      <div class="card"><div class="card-head"><h3>本周值班表</h3><a class="small" href="alert-rules.html?tab=oncall">编辑</a></div><div class="card-body flush"><table class="table dense"><thead><tr><th>日期</th><th>L1</th><th>L2</th></tr></thead><tbody>${oc.week.map((d, i) => `<tr ${i === 3 ? 'style="background:var(--primary-50)"' : ''}><td>${d.day}${i === 3 ? ' <span class="tag blue">今天</span>' : ''}</td><td>${d.l1}</td><td>${d.l2}</td></tr>`).join('')}</tbody></table></div></div>
+    </div>
+  </div>`;
+
+  const escCell = (i) => { const limit = escMin(i); const elapsed = (DATA.now - i.sourceTime) / DATA.MIN; const p = Math.min(100, elapsed / limit * 100); const left = limit - elapsed; return `<div style="min-width:150px"><div class="row between xs" style="margin-bottom:3px"><span class="${left < 0 ? 'delta bad' : 'muted'}">${left < 0 ? `已超时 ${fmt.dur(-left * 60)}` : `${fmt.dur(left * 60)} 后升级 L2`}</span><span class="faint">${tierOf(i.tenant).tier}</span></div>${App.meter(p, p >= 100 ? 'danger' : p >= 70 ? 'warn' : 'ok')}</div>`; };
+  const qt = App.table('#queue', { rows: unack.sort((a, b) => App.SEV[b.severity].rank - App.SEV[a.severity].rank || a.sourceTime - b.sourceTime), paginate: false, selectable: true, onRow: r => location.href = 'incident-detail.html?id=' + r.id, columns: [
+    { key: 'severity', label: '级别', width: '70px', render: r => App.sevBadge(r.severity), sortVal: r => App.SEV[r.severity].rank },
+    { key: 'name', label: '问题 / 资产', render: r => `<div class="primary-text ellipsis" style="max-width:340px">${esc(r.name)}</div><span class="sub-text">${esc(r.assetName)} · ${esc(r.site)} · ${App.tenantName(r.tenant)}${r.dupCount > 1 ? ` · 归并 ×${r.dupCount}` : ''}</span>` },
+    { key: 'service', label: '影响服务', render: r => `<span class="tag">${esc(r.service)}</span>` },
+    { key: 'sourceTime', label: '升级倒计时', render: escCell, sortVal: r => r.sourceTime },
+    { key: 'rb', label: '建议 Runbook', sortable: false, render: r => { const rb = DATA.runbooks.find(x => x.types.includes((DATA.assets.find(a => a.id === r.assetId) || {}).type) && x.level === 1); return rb ? `<a href="automation.html?rb=${rb.id}" data-stop class="small">${esc(rb.name)}</a> ${App.levelBadge(1)}` : '<span class="faint">—</span>'; } },
+    { key: 'act', label: '', sortable: false, render: r => `<button class="btn sm primary" data-ack="${r.id}" data-stop>确认</button>` }
+  ] });
+  root.addEventListener('click', async (e) => { const b = e.target.closest('[data-ack]'); if (!b) return; const i = DATA.incidents.find(x => x.id === b.dataset.ack); if (await App.confirm({ title: '确认事件', text: `确认「${esc(i.name)}」？将在本地审计后通过 event.acknowledge 幂等回写 Zabbix。` })) { i.handlingState = 'ACKNOWLEDGED'; i.ackBy = App.USERS[ctx.role].name; i.ackAt = DATA.now; App.toast('已确认，已记录审计并回写 Zabbix', 'ok'); App.rerender(); } });
+  document.getElementById('ackAll').onclick = async () => { const ids = qt.selected(); if (!ids.length) return App.toast('请先勾选要确认的告警', 'warn'); if (await App.confirm({ title: '批量确认', text: `确认所选 ${ids.length} 条告警？每条逐项授权并幂等回写。` })) { ids.forEach(id => { const i = DATA.incidents.find(x => x.id === id); i.handlingState = 'ACKNOWLEDGED'; i.ackBy = App.USERS[ctx.role].name; i.ackAt = DATA.now; }); App.toast(`已确认 ${ids.length} 条`, 'ok'); App.rerender(); } };
+  App.table('#progress', { rows: inprog.sort((a, b) => App.SEV[b.severity].rank - App.SEV[a.severity].rank), paginate: false, dense: true, onRow: r => location.href = 'incident-detail.html?id=' + r.id, columns: [
+    { key: 'severity', label: '级别', width: '70px', render: r => App.sevBadge(r.severity), sortVal: r => App.SEV[r.severity].rank },
+    { key: 'name', label: '问题', render: r => `<div class="primary-text ellipsis" style="max-width:300px">${esc(r.name)}</div><span class="sub-text">${esc(r.assetName)} · ${fmt.ago(r.sourceTime)}</span>` },
+    { key: 'ackBy', label: '责任人', render: r => `${App.avatar(r.ackBy, '#2563eb')} <span class="small">${esc(r.ackBy || '—')}</span>` },
+    { key: 'handlingState', label: '处置', render: r => App.statePill(r.handlingState) },
+    { key: 'ticketId', label: '工单', render: r => r.ticketId ? `<a href="tickets.html?id=${r.ticketId}" class="mono small" data-stop>${r.ticketId}</a>` : '<span class="faint">—</span>' },
+    { key: 'runbookRunId', label: 'Runbook', render: r => { const run = DATA.runs.find(x => x.id === r.runbookRunId); return run ? `<span class="small">${esc(run.runbookName)}</span> ${App.badge(run.status === 'success' ? 'ok' : run.status === 'awaiting_approval' ? 'warn' : run.status === 'running' ? 'sync' : 'danger', { success: '成功', awaiting_approval: '待审批', running: '执行中', failed: '失败', rejected: '已拒绝' }[run.status])}` : '<span class="faint">—</span>'; } }
+  ] });
+  App.table('#review', { rows: review, paginate: false, dense: true, onRow: r => location.href = 'incident-detail.html?id=' + r.id, columns: [
+    { key: 'severity', label: '级别', width: '70px', render: r => App.sevBadge(r.severity), sortVal: r => App.SEV[r.severity].rank },
+    { key: 'name', label: '问题', render: r => `<div class="primary-text ellipsis" style="max-width:300px">${esc(r.name)}</div><span class="sub-text">${esc(r.assetName)}</span>` },
+    { key: 'recoveredAt', label: '恢复于', render: r => `<span class="small">${fmt.time(r.recoveredAt)} · ${fmt.ago(r.recoveredAt)}</span>` },
+    { key: 'handlingState', label: '处置', render: r => App.statePill(r.handlingState) },
+    { key: 'act', label: '', sortable: false, render: r => `<a class="btn sm" href="incident-detail.html?id=${r.id}" data-stop>复核结单</a>` }
+  ] });
+  document.getElementById('handover').onclick = () => App.modal({ title: '交接班记录', body: `<div class="stack" style="gap:12px"><div class="callout info">${icon('info')}<div>交接班将生成一条审计记录并通知接班人；未确认告警与待复核事件自动附在交接摘要中。</div></div><div class="field"><label>接班人（L1）</label><select class="select"><option>王强</option><option>孙磊</option></select></div><div class="field"><label>接班人（L2）</label><select class="select"><option>赵敏</option><option>李娜</option></select></div><div class="field"><label>交接备注</label><textarea class="input" placeholder="例如：pos-gw-01 等待客户审批 Runbook；门店 Proxy 失联持续跟进…"></textarea></div><div class="kv"><dt>未确认</dt><dd>${unack.length} 条</dd><dt>处理中</dt><dd>${inprog.length} 条</dd><dt>待复核</dt><dd>${review.length} 条</dd></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('交接完成，已通知接班人并写入审计','ok');App.closeLayer()">确认交接</button>` });
+});
+</script>
+</body>
+</html>

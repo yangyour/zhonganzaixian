@@ -1,0 +1,256 @@
+{
+  "date": "2026-09-30",
+  "purpose": "开发设计依据校验值；不包含生产账号或秘密",
+  "sources": [
+    {
+      "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_换章版.docx",
+      "bytes": 851537,
+      "sha256": "12b649cfea0d33f5ef56f94e8ae44ea87cb1ca8d01692d7cc029d3c5b01237c3"
+    },
+    {
+      "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+      "bytes": 391351,
+      "sha256": "156cbc1f8d84ddbd9a41942ef7d8b954a459ea5d49757833804454cfc1740649"
+    },
+    {
+      "path": "zabbix-msp-prototype/alert-rules.html",
+      "bytes": 15874,
+      "sha256": "70287d3c9057ab21486f68cd35b9764c1cba181312eb88dae6e007a9ea86d776"
+    },
+    {
+      "path": "zabbix-msp-prototype/asset-detail.html",
+      "bytes": 44307,
+      "sha256": "c246334444b5b19e8b73ba8c226f5add2fb685cbfed1b603aeb431085944f86b"
+    },
+    {
+      "path": "zabbix-msp-prototype/assets.html",
+      "bytes": 14934,
+      "sha256": "307c0abfe042b4af751ee484affff53c87b57dd8a655f26e9ec17cf95200d454"
+    },
+    {
+      "path": "zabbix-msp-prototype/audit.html",
+      "bytes": 7588,
+      "sha256": "beaa0058bbbf4182d3c620917a6d006088373711046d674641de78c590ddde2f"
+    },
+    {
+      "path": "zabbix-msp-prototype/automation.html",
+      "bytes": 23455,
+      "sha256": "ece69ae32a8b0e8e5d4116cb1d23416929f7e5ada694f3b057a14d5b71ebe6c9"
+    },
+    {
+      "path": "zabbix-msp-prototype/backups.html",
+      "bytes": 682,
+      "sha256": "fc051ea2a6a98d4eb956c800dd93e534c714e92a794c1defce97c2d5a8647d27"
+    },
+    {
+      "path": "zabbix-msp-prototype/capacity.html",
+      "bytes": 8476,
+      "sha256": "9a8a15f6216d57bd40e89b15709bbd215e8071e6396e65e553b76ab41d6e571d"
+    },
+    {
+      "path": "zabbix-msp-prototype/dashboard.html",
+      "bytes": 15734,
+      "sha256": "9bee8379d0f233b0c066edae1b6c70697a3cf7b431274e518a188847829e96cf"
+    },
+    {
+      "path": "zabbix-msp-prototype/incident-detail.html",
+      "bytes": 23570,
+      "sha256": "d5aaabdbdf5483e3fc249f8928ac31cc592923a1ff3aea164ac2c6ce0f4ff913"
+    },
+    {
+      "path": "zabbix-msp-prototype/incidents.html",
+      "bytes": 15986,
+      "sha256": "5f31720fe5647eb16aa673c8b3397c78ee66d54a1db876230eab161ab9d4e110"
+    },
+    {
+      "path": "zabbix-msp-prototype/index.html",
+      "bytes": 684,
+      "sha256": "7c87b3e70b3cedb68faa0a8dbe36a52568e7d140f1f989d504bb5addffafbec2"
+    },
+    {
+      "path": "zabbix-msp-prototype/instances.html",
+      "bytes": 14360,
+      "sha256": "9a46e78b755b728ca9d717a1657a727f0f6e8abd2e501bf052e673e3d5b8ffd0"
+    },
+    {
+      "path": "zabbix-msp-prototype/knowledge-ai.html",
+      "bytes": 781,
+      "sha256": "46e1f3ea411234de75ceb71bc00e89c1dac3e1655a1f8a39bc152c04aa8edc9b"
+    },
+    {
+      "path": "zabbix-msp-prototype/knowledge.html",
+      "bytes": 781,
+      "sha256": "2b21f73a01c49788826340cbbe59e4e5a1a67b6363b20a478c12bf18351ec77d"
+    },
+    {
+      "path": "zabbix-msp-prototype/login.html",
+      "bytes": 5628,
+      "sha256": "c7a7c0e498dba5cd7a2a490785f45d94412ca9d6df3b854277be2ffca3ee93ad"
+    },
+    {
+      "path": "zabbix-msp-prototype/members.html",
+      "bytes": 10435,
+      "sha256": "23767b3bf4b3e8e8123c7e4108f3a86b0dd61f392a798bd50e5e691c2369655a"
+    },
+    {
+      "path": "zabbix-msp-prototype/network-topology.html",
+      "bytes": 777,
+      "sha256": "0f7b71a9287daee1ce5fd0ff39b3f5d48b3f795c73f6e802dbbc63876eb6fcdd"
+    },
+    {
+      "path": "zabbix-msp-prototype/notifications.html",
+      "bytes": 13716,
+      "sha256": "6644cc3b356c8bd312b00eea21ecc3659d9bc02b489ac74bc98d1ed4cc92b696"
+    },
+    {
+      "path": "zabbix-msp-prototype/onboarding.html",
+      "bytes": 23459,
+      "sha256": "a133cbd172ea8f4e2da05750710915a33b211e1ef9d25236d36b85fcfe035f03"
+    },
+    {
+      "path": "zabbix-msp-prototype/oncall.html",
+      "bytes": 14279,
+      "sha256": "4f21acd585fe42dcd252f2c8caea3c59137eb73a42857b0a586adab199149ea8"
+    },
+    {
+      "path": "zabbix-msp-prototype/operations.html",
+      "bytes": 8867,
+      "sha256": "801cc8810c00a36076875133be39a4762789a3be63e508ae0f66c1094dd21bea"
+    },
+    {
+      "path": "zabbix-msp-prototype/platform-health.html",
+      "bytes": 9924,
+      "sha256": "3cc8943400a221834f17286291c6c66e6bd5195a115760a4543910198d7121e3"
+    },
+    {
+      "path": "zabbix-msp-prototype/portal.html",
+      "bytes": 681,
+      "sha256": "54171eceb66a8a5486cf9e9b394a2395e0b0b237ded8030b69127e1e46c6c8aa"
+    },
+    {
+      "path": "zabbix-msp-prototype/prototype-map.html",
+      "bytes": 1268,
+      "sha256": "4b459100231d0a86e8a05201918dce2884457a45dc022acff462b5db151c4d09"
+    },
+    {
+      "path": "zabbix-msp-prototype/proxies.html",
+      "bytes": 14681,
+      "sha256": "2c03ea9b9b1cf2ec718ee7d72fbb198fc7b1a4df518c94d971b4b1303cde79f4"
+    },
+    {
+      "path": "zabbix-msp-prototype/remote.html",
+      "bytes": 681,
+      "sha256": "6bf4107f6d7a72e2229f32755bfb680e6022a90bb22e7b8974ac0be03a2b186c"
+    },
+    {
+      "path": "zabbix-msp-prototype/reports.html",
+      "bytes": 682,
+      "sha256": "0a31552e710033b13e140bc89cf9875bc192f2bcd824830e7474dbc04e42bb60"
+    },
+    {
+      "path": "zabbix-msp-prototype/sla.html",
+      "bytes": 13703,
+      "sha256": "988ba6d785745d4476bd35168fcd946045a4240a96364b5c9fa92f093221ab20"
+    },
+    {
+      "path": "zabbix-msp-prototype/templates.html",
+      "bytes": 13069,
+      "sha256": "e848b42b9d064afe82417c7b91d6d5679cb38dbadb7f3bd39566665327a4b58a"
+    },
+    {
+      "path": "zabbix-msp-prototype/tenants.html",
+      "bytes": 14735,
+      "sha256": "8e23d08ff53b139e4ccf2d7719590b4ba0d1eb7555802a4fbd0b33908822addc"
+    },
+    {
+      "path": "zabbix-msp-prototype/tickets.html",
+      "bytes": 676,
+      "sha256": "e86888d91e1847ba89d522ccd569153c80d7a788da0da0c2a6288fbfc0201084"
+    },
+    {
+      "path": "zabbix-msp-prototype/assets/js/charts.js",
+      "bytes": 24146,
+      "sha256": "770decdae71f0fc5d53716e6614906608935093c9a1519e9aee3edbeb4c8818b"
+    },
+    {
+      "path": "zabbix-msp-prototype/assets/js/contract-model.js",
+      "bytes": 11217,
+      "sha256": "b413f78ad3c1c2c298dd219bf76fa16cfa9ca0fd4135badc7e51fbf0d2fe25da"
+    },
+    {
+      "path": "zabbix-msp-prototype/assets/js/contract-pages.js",
+      "bytes": 27191,
+      "sha256": "7e552e07baa6bb1d73405c20c6dd0039c7c726f469a2fc5f53677a5231dbd1e2"
+    },
+    {
+      "path": "zabbix-msp-prototype/assets/js/data.js",
+      "bytes": 165756,
+      "sha256": "3c1ef2bc859c9d7e13df72f33885f92a6edf0cf9c92911da8fb76793cc0e8880"
+    },
+    {
+      "path": "zabbix-msp-prototype/assets/js/knowledge-data.js",
+      "bytes": 11216,
+      "sha256": "4754d6624359080e0ada51c01fe8a06ff7289ad3fe30ba49416cbf4f50aab6d3"
+    },
+    {
+      "path": "zabbix-msp-prototype/assets/js/knowledge-model.js",
+      "bytes": 3617,
+      "sha256": "654dd5d3b0689519a2e4e123cce402b07580cc87c8812ba0a3dd79ee1c616a9b"
+    },
+    {
+      "path": "zabbix-msp-prototype/assets/js/knowledge.js",
+      "bytes": 31729,
+      "sha256": "59d846a3add9c308480236d629e63c6d765f0da0df002fe5fc311366709f7cad"
+    },
+    {
+      "path": "zabbix-msp-prototype/assets/js/network-topology-model.js",
+      "bytes": 6754,
+      "sha256": "0d0a8f8486507c42a18d7c62ac580b0787734df2d0b2a5eaefef922000eab28e"
+    },
+    {
+      "path": "zabbix-msp-prototype/assets/js/network-topology.js",
+      "bytes": 26380,
+      "sha256": "97fd433c18ba8895186d5101a9bed2b6e030f092da33a6fe6653eefd64d3e4f8"
+    },
+    {
+      "path": "zabbix-msp-prototype/assets/js/shell.js",
+      "bytes": 56525,
+      "sha256": "2ce139d04e4a52fedba670c6210fb8bb3d6fd277e8813e11609a87a61c7eee4c"
+    },
+    {
+      "path": "zabbix-msp-prototype/原型更新说明.md",
+      "bytes": 2072,
+      "sha256": "d2cce7fa87e0eed4bb2b48c98205d0f8ddc0767d2b51e58bb04e25eacb43a3e8"
+    },
+    {
+      "path": "zabbix-msp-prototype/知识库与导航功能说明.md",
+      "bytes": 4581,
+      "sha256": "3cfdf4ed8b144c00f025768103b11b09b0e1c001d43e4a9bf5f5140f8de211fc"
+    },
+    {
+      "path": "zabbix-msp-prototype/网络拓扑功能说明.md",
+      "bytes": 2300,
+      "sha256": "10a001a89b89d504c6043f354a33ab56c848f2a0adcc8093434932aa1c167352"
+    },
+    {
+      "path": "tmp/project_docs/formal/design_content.md",
+      "bytes": 59972,
+      "sha256": "450e978a59596645ed3417d58b84bef02bd140ad0617e568104bedde1f8c0a0d"
+    },
+    {
+      "path": "tmp/project_docs/formal/plan_content.md",
+      "bytes": 23509,
+      "sha256": "6f95eb1816deee76ec354b05d87661900c571b80e5d229736b8ef631d05cd29a"
+    },
+    {
+      "path": "output/documents/MOP基础网络代维平台_客户开发资料提供与业务规则确认清单 (2).docx",
+      "bytes": 45983,
+      "sha256": "9ab00785385e45f2b8d09ce53e91651a154464f6075cd1829d0c921063dd25a3"
+    },
+    {
+      "path": "output/documents/MOP基础网络代维平台_客户开发资料提供与业务规则确认清单.docx",
+      "bytes": 46342,
+      "sha256": "3bea98cde832d7fee8efecdd6410bcbbca988e0e829b2441daf9ba2a151fba35"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>总览看板 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('dashboard', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const assets = DATA.assets.filter(App.inScope);
+  const incs = DATA.incidents.filter(App.inScope);
+  const open = incs.filter(i => i.sourceState === 'PROBLEM' && i.handlingState !== 'CLOSED');
+  const svcs = DATA.slaServices.filter(App.inScope);
+  const tickets = DATA.tickets.filter(App.inScope);
+  const cnt = (f) => assets.filter(f).length;
+  const total = cnt(a => a.status !== 'disabled'); const unknown = cnt(a => a.status === 'unknown'); const online = total - unknown;
+  const sevCount = {}; ['disaster', 'high', 'average', 'warning', 'info'].forEach(s => sevCount[s] = open.filter(i => i.severity === s && !i.suppressed).length);
+  const openTickets = tickets.filter(t => !['closed', 'resolved'].includes(t.status)); const overdue = openTickets.filter(t => t.slaDue < DATA.now).length;
+  const ackd = incs.filter(i => i.ackAt && i.sourceTime > DATA.now - DATA.D); const mtta = ackd.length ? ackd.reduce((s, i) => s + (i.ackAt - i.sourceTime), 0) / ackd.length / 1000 : null;
+  const measured = svcs.filter(s => s.availability != null); const avgAv = measured.length ? measured.reduce((s, x) => s + x.availability, 0) / measured.length : null; const breaches = svcs.filter(s => s.status === 'breach').length;
+  const dl = DATA.deliveries.filter(App.inScope).filter(d => d.at > DATA.now - DATA.D); const dlRate = dl.length ? dl.filter(d => d.state === 'delivered').length / dl.length * 100 : null;
+  const t = ctx.tenant;
+
+  root.innerHTML = `
+  <div class="page-head"><div><h1>总览看板 <span class="badge primary">${esc(t.name)}</span></h1><div class="sub">客户视角 · 服务健康与履约。数据缺失显示为「未知」，与服务正常区分；可用率按服务树与事件区间核算。</div></div>
+    <div class="page-actions"><div class="seg" id="rangeSeg"><button data-v="24h" class="active">24 小时</button><button data-v="7d">7 天</button><button data-v="30d">30 天</button></div><button class="btn" id="refreshBtn">${icon('refresh')} 刷新</button><a class="btn" href="sla.html">${icon('bar-chart')} SLA 报表</a></div></div>
+
+  <div class="grid g6 mb" id="kpis">
+    ${App.kpi({ label: '资产在线率', value: fmt.pct(total ? online / total * 100 : null, 1), sub: `<span>${online} / ${total} 在线</span>${unknown ? `<span class="badge unknown" style="height:18px">未知 ${unknown}</span>` : ''}`, cls: unknown ? 'warn' : 'ok', spark: DATA.spark(1, { base: 98.5, amp: .6, noise: .3, min: 90, max: 100 }), sparkColor: 'var(--ok)' })}
+    ${App.kpi({ label: '当前问题', value: open.filter(i => !i.suppressed).length, sub: ['disaster', 'high', 'average', 'warning'].filter(s => sevCount[s]).map(s => `<span class="sev ${s}" style="height:18px;font-size:10.5px">${App.sevName(s)} ${sevCount[s]}</span>`).join('') || '<span class="muted">无未恢复问题</span>', cls: sevCount.disaster ? 'danger' : sevCount.high ? 'warn' : '' })}
+    ${App.kpi({ label: '本月服务可用率', value: avgAv != null ? fmt.pct(avgAv, 2) : '未知', sub: `目标 ${fmt.pct(t.id === 'all' ? 99.9 : t.slaTarget, 2)}${avgAv == null ? ' · 样本不足' : breaches ? ` · <span class="delta bad">${breaches} 项未达标</span>` : ' · <span class="delta good">全部达标</span>'}`, cls: breaches ? 'warn' : 'ok', help: '按服务树与事件区间计算；无数据区间单列为未知' })}
+    ${App.kpi({ label: '待处理工单', value: openTickets.length, sub: overdue ? `<span class="delta bad">${overdue} 个已超 SLA</span>` : '<span class="delta good">无超时</span>', cls: overdue ? 'danger' : '' })}
+    ${App.kpi({ label: 'MTTA（24h）', value: mtta != null ? fmt.dur(mtta) : '—', sub: '首次有效人工确认 − 问题发生', help: 'MTTA = 首次有效人工确认时间 − 问题发生时间', spark: DATA.spark(2, { base: 4.2, amp: 1.2, noise: .8, min: 1 }), sparkColor: 'var(--c4)' })}
+    ${App.kpi({ label: '通知送达率（24h）', value: fmt.pct(dlRate, 1), sub: `${dl.length} 条 · 区分受理与送达`, cls: dlRate != null && dlRate < 95 ? 'warn' : '', spark: DATA.spark(3, { base: 98, amp: 1, noise: .8, max: 100 }), sparkColor: 'var(--c5)' })}
+  </div>
+
+  <div class="grid g-2-1 mb">
+    <div class="card"><div class="card-head"><h3>告警趋势 <span class="sub">原始事件 vs 归并后 · 按小时</span></h3><div class="tools"><span class="badge ok">降噪 ${fmt.pct(100 - DATA.noiseStats.final / DATA.noiseStats.raw24h * 100, 1)}</span></div></div><div class="card-body"><div id="trendChart"></div></div></div>
+    <div class="card"><div class="card-head"><h3>当前问题按严重级别</h3><a class="small" href="incidents.html">查看事件中心</a></div><div class="card-body" id="sevDonut"></div></div>
+  </div>
+
+  <div class="card mb"><div class="card-head"><h3>服务健康矩阵 <span class="sub">${svcs.length} 个服务 · 可用率为本月至今</span></h3><div class="legend"><span><i style="background:var(--ok)"></i>达标</span><span><i style="background:var(--danger)"></i>未达标</span><span><i style="background:var(--unknown)"></i>未知 / 样本不足</span></div></div>
+    <div class="card-body"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">${svcs.map(s => { const act = open.filter(i => i.service === s.name && i.tenant === s.tenant && !i.suppressed); const cls = s.status === 'breach' ? 'danger' : s.status === 'unknown' ? 'unknown' : act.some(i => ['disaster', 'high'].includes(i.severity)) ? 'warn' : 'ok'; return `<div class="svc-card ${cls}" style="cursor:pointer" onclick="location.href='sla.html?svc=${s.id}'"><div class="svc-name"><span>${esc(s.name)}</span>${ctx.tenant.id === 'all' ? `<span class="tag">${App.tenantName(s.tenant).slice(0, 2)}</span>` : ''}</div><div class="svc-av" style="color:${s.status === 'breach' ? 'var(--danger)' : s.status === 'unknown' ? 'var(--text-4)' : 'var(--text)'}">${s.availability != null ? fmt.pct(s.availability, 2) : '未知'}</div><div class="svc-row"><span>目标 ${fmt.pct(s.target, 2)}</span><span>${s.availability != null ? '不可用 ' + fmt.dur(s.unavailSec) : '接入中'}</span></div><div class="svc-row"><span>${act.length ? `<span class="dot danger pulse"></span> ${act.length} 个活动问题` : '<span class="dot ok"></span> 无活动问题'}</span><span>${s.assets.length} 资产</span></div></div>`; }).join('')}</div></div></div>
+
+  <div class="grid g-2-1 mb">
+    <div class="card"><div class="card-head"><h3>故障时间线 <span class="sub">最近 24 小时 · 按服务</span></h3><div class="legend"><span><i style="background:var(--sev-disaster)"></i>灾难</span><span><i style="background:var(--sev-high)"></i>严重</span><span><i style="background:var(--sev-average)"></i>一般</span><span><i style="background:var(--sev-warning)"></i>警告</span><span><i style="background:repeating-linear-gradient(45deg,#cbd5e1,#cbd5e1 3px,#e2e8f0 3px,#e2e8f0 6px)"></i>未知区间</span><span><i style="background:var(--maint);opacity:.6"></i>维护</span></div></div>
+      <div class="card-body" id="timeline"></div></div>
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>资源占用 Top 5 <span class="sub">CPU</span></h3><div class="seg" id="topSeg"><button data-v="cpu" class="active">CPU</button><button data-v="mem">内存</button><button data-v="disk">磁盘</button></div></div><div class="card-body" id="topHosts"></div></div>
+      <div class="card"><div class="card-head"><h3>资产状态分布</h3></div><div class="card-body" id="assetDonut"></div></div>
+    </div>
+  </div>
+
+  <div class="grid g-3-2">
+    <div class="card"><div class="card-head"><h3>最近事件</h3><a class="small" href="incidents.html">全部事件</a></div><div id="recentInc"></div></div>
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>待处理工单</h3><a class="small" href="tickets.html">全部工单</a></div><div id="ticketTbl"></div></div>
+      <div class="card"><div class="card-head"><h3>维护窗口</h3><a class="small" href="alert-rules.html?tab=maint">管理</a></div><div class="card-body tight">${DATA.maintenances.filter(App.inScope).filter(m => m.status !== 'done').slice(0, 3).map(m => `<div class="row between" style="padding:8px 18px;border-bottom:1px dashed var(--line)"><div class="grow"><div class="strong small ellipsis">${esc(m.name)}</div><div class="xs muted">${fmt.dt(m.start)} → ${fmt.hm(m.end)} · ${m.targets.join(', ')}</div></div>${m.status === 'active' ? App.badge('maint', '进行中', true) : App.badge('neutral', '已计划')}</div>`).join('') || '<div class="empty small">无计划维护</div>'}</div></div>
+    </div>
+  </div>
+  <div class="callout neutral mt">${icon('info')}<div>看板口径：<b>资产在线率</b>不含已停用资产，「未知」单独计数；<b>服务可用率</b>=1 − 不可用时间并集 / 有效服务时间，经批准的维护时间已排除；<b>MTTR</b>以监控恢复时间计，工单解决时长在工单页单独统计。</div></div>`;
+
+  // 趋势图
+  let range = '24h';
+  function drawTrend() {
+    const R = DATA.RANGE[range]; const raw = DATA.ts(41, { hours: R.hours, points: Math.min(R.points, 72), base: 52, amp: 26, noise: 12, min: 0, int: true, spikes: [{ at: .55, h: 90, w: .05 }] }); const merged = raw.y.map((v, i) => Math.round(v * (0.14 + 0.03 * Math.sin(i))));
+    Charts.line(document.getElementById('trendChart'), { height: 220, x: raw.x, series: [{ name: '原始事件', data: raw.y, color: '#cbd5e1', area: true }, { name: '归并后', data: merged, color: 'var(--primary)', area: true }], smooth: true, dots: false, markers: range === '24h' ? [{ t: DATA.now - 14 * DATA.MIN, label: 'Proxy 失联', color: 'var(--danger)' }] : [] });
+  }
+  drawTrend();
+  App.seg('#rangeSeg', v => { range = v; drawTrend(); App.toast(`时间范围切换为 ${v}`, 'info', 1200); });
+  document.getElementById('refreshBtn').onclick = () => { App.toast('已刷新（数据新鲜度 2 秒）', 'ok', 1500); drawTrend(); };
+
+  Charts.donut(document.getElementById('sevDonut'), { size: 150, thickness: 22, center: { value: open.filter(i => !i.suppressed).length, label: '活动问题' }, data: ['disaster', 'high', 'average', 'warning', 'info'].filter(s => sevCount[s]).map(s => ({ name: App.sevName(s), value: sevCount[s], color: App.sevColor(s), key: s })), onClick: d => location.href = 'incidents.html?sev=' + d.key });
+
+  // 时间线
+  const tl = document.getElementById('timeline'); const T0 = DATA.now - DATA.D;
+  const rows = svcs.map(s => ({ s, items: incs.filter(i => i.service === s.name && i.tenant === s.tenant && (i.recoveredAt || DATA.now) > T0 && i.sourceTime < DATA.now) })).filter(r => r.items.length || r.s.unknownSec).slice(0, 8);
+  tl.innerHTML = (rows.length ? rows.map(r => `<div class="row" style="gap:12px;margin-bottom:8px"><span class="small ellipsis" style="width:130px;color:var(--text-2)">${esc(r.s.name)}${ctx.tenant.id === 'all' ? `<span class="xs faint"> · ${App.tenantName(r.s.tenant).slice(0, 2)}</span>` : ''}</span><div class="gantt grow">${r.items.map(i => { const a = Math.max(0, (i.sourceTime - T0) / DATA.D * 100), b = Math.min(100, ((i.recoveredAt || DATA.now) - T0) / DATA.D * 100); return `<i class="${i.maintenance ? 'maint' : i.severity}" style="left:${a}%;width:${Math.max(.6, b - a)}%" title="${esc(i.name)} · ${fmt.time(i.sourceTime)} → ${i.recoveredAt ? fmt.time(i.recoveredAt) : '进行中'}" onclick="location.href='incident-detail.html?id=${i.id}'"></i>`; }).join('')}${r.s.unknownSec ? `<i class="unknown" style="left:${100 - r.s.unknownSec / 864}%;width:${r.s.unknownSec / 864}%" title="数据缺失（Proxy 离线）· 记为未知"></i>` : ''}</div></div>`).join('') + `<div class="row" style="gap:12px"><span style="width:130px"></span><div class="axis grow"><span>${fmt.hm(T0)}</span><span>${fmt.hm(T0 + 6 * DATA.H)}</span><span>${fmt.hm(T0 + 12 * DATA.H)}</span><span>${fmt.hm(T0 + 18 * DATA.H)}</span><span>现在</span></div></div>` : '<div class="empty">最近 24 小时无故障记录</div>');
+
+  // Top hosts
+  function drawTop(k) { const list = assets.filter(a => a[k] != null).sort((a, b) => b[k] - a[k]).slice(0, 5); Charts.hbars(document.getElementById('topHosts'), { items: list.map(a => ({ label: a.name, value: a[k], text: fmt.pct(a[k], 0), href: 'asset-detail.html?id=' + a.id })), max: 100, labelWidth: 150 }); }
+  drawTop('cpu'); App.seg('#topSeg', drawTop);
+
+  // 资产分布
+  const st = { ok: cnt(a => a.status === 'ok'), problem: cnt(a => a.status === 'problem'), maintenance: cnt(a => a.status === 'maintenance'), unknown, disabled: cnt(a => a.status === 'disabled') };
+  Charts.donut(document.getElementById('assetDonut'), { size: 120, thickness: 18, center: { value: assets.length, label: '资产' }, data: [{ name: '正常', value: st.ok, color: 'var(--ok)' }, { name: '有问题', value: st.problem, color: 'var(--danger)' }, { name: '维护中', value: st.maintenance, color: 'var(--maint)' }, { name: '未知', value: st.unknown, color: 'var(--unknown)' }, { name: '已停用', value: st.disabled, color: '#e2e8f0' }].filter(d => d.value) });
+
+  // 最近事件
+  App.table('#recentInc', { rows: incs.slice().sort((a, b) => b.sourceTime - a.sourceTime).slice(0, 7), paginate: false, dense: true, onRow: r => location.href = 'incident-detail.html?id=' + r.id, columns: [
+    { key: 'severity', label: '级别', width: '70px', render: r => App.sevBadge(r.severity), sortVal: r => App.SEV[r.severity].rank },
+    { key: 'name', label: '问题', render: r => `<span class="primary-text ellipsis" style="max-width:320px;display:inline-block;vertical-align:middle">${esc(r.name)}</span>${r.suppressed ? ' <span class="badge unknown" style="height:18px">已抑制</span>' : ''}${r.dupCount > 1 ? ` <span class="tag">×${r.dupCount}</span>` : ''}` },
+    { key: 'assetName', label: '资产', render: r => `<a href="asset-detail.html?id=${r.assetId}" data-stop>${esc(r.assetName)}</a>` },
+    { key: 'sourceState', label: '状态', render: r => App.srcBadge(r.sourceState) + ' ' + App.statePill(r.handlingState) },
+    { key: 'sourceTime', label: '发生', render: r => `<span class="nowrap">${fmt.ago(r.sourceTime)}</span>`, num: true }
+  ] });
+  App.table('#ticketTbl', { rows: openTickets.slice(0, 5), paginate: false, dense: true, onRow: r => location.href = 'tickets.html?id=' + r.id, columns: [
+    { key: 'id', label: '工单', render: r => `<span class="mono">${r.id}</span>` }, { key: 'title', label: '标题', render: r => `<span class="ellipsis" style="max-width:220px;display:inline-block;vertical-align:middle">${esc(r.title)}</span>` }, { key: 'status', label: '状态', render: r => App.badge(DATA.TSTATUS[r.status][1], DATA.TSTATUS[r.status][0]) }, { key: 'slaDue', label: 'SLA', num: true, render: r => r.slaDue < DATA.now ? `<span class="delta bad">超时 ${fmt.dur((DATA.now - r.slaDue) / 1000)}</span>` : `<span class="muted">剩余 ${fmt.dur((r.slaDue - DATA.now) / 1000)}</span>` }
+  ] });
+});
+</script>
+</body>
+</html>

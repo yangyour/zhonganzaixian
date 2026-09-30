@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>成员与权限 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('members', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const isAdmin = App.can('padmin');
+  const list = DATA.members.filter(m => ctx.tenant.id === 'all' ? true : (m.tenants.includes(ctx.tenant.id) && m.role !== 'padmin' && (isAdmin || m.role !== 'msp')));
+  const ST = { active: ['ok', '活跃'], invited: ['sync', '已邀请'], suspended: ['neutral', '已停用'] };
+  root.innerHTML = `
+  <div class="page-head"><div><h1>成员与权限 <span class="badge primary">${esc(ctx.tenant.name)}</span></h1><div class="sub">成员表 tenant_membership 保存用户、租户、角色与资源范围。每次切换校验成员关系，短期会话缓存授权版本，撤权后立即失效。平台不把外部身份组直接当成全权限。</div></div>
+    <div class="page-actions"><button class="btn" id="matrix">${icon('shield')} 角色矩阵</button><button class="btn primary" id="invite">${icon('plus')} 邀请成员</button></div></div>
+  <div class="grid g5 mb">
+    ${App.kpi({ label: '成员', value: list.length, sub: `${list.filter(m => m.status === 'active').length} 活跃 · ${list.filter(m => m.status === 'invited').length} 待激活 · ${list.filter(m => m.status === 'suspended').length} 停用` })}
+    ${App.kpi({ label: 'MFA 覆盖', value: fmt.pct(list.filter(m => m.mfa).length / Math.max(1, list.length) * 100, 0), cls: list.some(m => !m.mfa && m.status === 'active') ? 'warn' : 'ok', sub: `${list.filter(m => !m.mfa).length} 人未启用` })}
+    ${App.kpi({ label: '客户管理员', value: list.filter(m => m.role === 'tadmin').length, sub: '可审批 L2 Runbook、管理通知策略' })}
+    ${App.kpi({ label: '授权版本', value: 'perm-v184', sub: `最近变更 ${fmt.ago(DATA.now - 3 * DATA.H)} · 撤权即时失效` })}
+    ${App.kpi({ label: '身份提供方', value: 'OIDC', sub: '企业 IdP 联邦 · PKCE · 会话 8 小时' })}
+  </div>
+  <div class="card"><div class="toolbar"><div class="search-box">${icon('search')}<input class="input" id="q" placeholder="搜索姓名 / 邮箱"></div><div class="chips" id="roleChips"><span class="chip active" data-v="all">全部</span>${Object.entries(App.ROLES).filter(([k]) => isAdmin || k !== 'padmin').map(([k, v]) => `<span class="chip" data-v="${k}">${v.name} <span class="n">${list.filter(m => m.role === k).length}</span></span>`).join('')}</div></div><div id="tbl"></div></div>
+  <div class="card mt" id="matrixCard"><div class="card-head"><h3>角色矩阵</h3><span class="xs muted">平台鉴权 + 对象归属 + Zabbix 受限身份</span></div><div class="card-body flush"><table class="table"><thead><tr><th>角色</th><th>资产 / 指标</th><th>告警 / 工单</th><th>模板与自动化</th><th>平台</th></tr></thead><tbody>
+    <tr><td>${App.badge('neutral', '客户观察者')}</td><td class="small">授权范围只读</td><td class="small">只读 / 评论按合同开启</td><td class="small">不可改模板，不可执行</td><td class="small muted">—</td></tr>
+    <tr><td>${App.badge('primary', '客户管理员')}</td><td class="small">本租户资产、接入配置</td><td class="small">本租户确认、派单、通知策略</td><td class="small">选择已批准模板；申请执行；审批 L2</td><td class="small muted">成员管理（本租户）</td></tr>
+    <tr><td>${App.badge('info', 'MSP 值班工程师')}</td><td class="small">被指派租户范围</td><td class="small">确认、处置、升级、复核</td><td class="small">执行被授权 Runbook（L1 / L2）</td><td class="small muted">受审计的租户切换</td></tr>
+    <tr><td>${App.badge('warn', '平台管理员')}</td><td class="small">全局管理需独立授权</td><td class="small">平台故障与全局审计</td><td class="small">版本发布、路由、配额；高风险执行审批职责分开</td><td class="small muted">租户 / 资源池 / 容量 / 平台健康</td></tr>
+  </tbody></table></div></div>`;
+  const tbl = App.table('#tbl', { rows: list, paginate: false, onRow: openMember, columns: [
+    { key: 'name', label: '成员', render: r => `<div class="row" style="gap:8px">${App.avatar(r.name, { padmin: '#ea580c', msp: '#2563eb', tadmin: '#7c3aed', viewer: '#64748b' }[r.role])}<div><div class="primary-text">${esc(r.name)}</div><span class="sub-text">${esc(r.email)}</span></div></div>` },
+    { key: 'role', label: '角色', render: r => App.badge({ padmin: 'warn', msp: 'info', tadmin: 'primary', viewer: 'neutral' }[r.role], App.ROLES[r.role].name), sortVal: r => Object.keys(App.ROLES).indexOf(r.role) },
+    { key: 'tenants', label: '租户范围', render: r => r.tenants[0] === '*' ? App.badge('warn', '全局（独立授权）') : r.tenants.map(t => `<span class="tag">${App.tenantName(t).slice(0, 2)}</span>`).join(' '), sortVal: r => r.tenants.length },
+    { key: 'scopes', label: '资源范围', render: r => `<span class="xs muted">${r.scopes.join(' · ')}</span>`, sortable: false },
+    { key: 'mfa', label: 'MFA', render: r => r.mfa ? App.badge('ok', '已启用') : App.badge('warn', '未启用'), sortVal: r => r.mfa ? 0 : 1 },
+    { key: 'status', label: '状态', render: r => App.badge(ST[r.status][0], ST[r.status][1], true) },
+    { key: 'lastLogin', label: '最近登录', num: true, render: r => r.lastLogin ? `<span class="small muted">${fmt.ago(r.lastLogin)}</span>` : '<span class="faint">从未</span>', sortVal: r => r.lastLogin || 0 },
+    { key: 'act', label: '', sortable: false, render: r => `<span class="actions"><button class="btn xs" data-stop onclick="App.toast('已发送重置 MFA 链接','info')">重置 MFA</button> ${r.status === 'active' ? `<button class="btn xs danger" data-stop onclick="App.toast('已撤权：授权版本递增，会话即时失效','warn')">撤权</button>` : `<button class="btn xs" data-stop onclick="App.toast('已重新发送邀请','info')">重邀</button>`}</span>` }
+  ] });
+  const f = { q: '', role: 'all' }; const rr = () => tbl.update(list.filter(m => (f.role === 'all' || m.role === f.role) && (!f.q || (m.name + m.email).toLowerCase().includes(f.q))));
+  document.getElementById('q').oninput = e => { f.q = e.target.value.toLowerCase(); rr(); }; App.chips('#roleChips', v => { f.role = v; rr(); });
+  function openMember(m) { App.drawer({ title: m.name, sub: `${esc(m.email)} · ${App.ROLES[m.role].name}`, body: `<div class="row wrap mb" style="gap:8px">${App.badge(ST[m.status][0], ST[m.status][1], true)}${m.mfa ? App.badge('ok', 'MFA 已启用') : App.badge('warn', 'MFA 未启用')}<span class="badge neutral">最近登录 ${m.lastLogin ? fmt.ago(m.lastLogin) : '从未'}</span></div><div class="form-grid"><div class="field"><label>角色</label><select class="select">${Object.entries(App.ROLES).map(([k, v]) => `<option value="${k}" ${k === m.role ? 'selected' : ''}>${v.name}</option>`).join('')}</select></div><div class="field"><label>租户成员关系</label><select class="select" multiple style="height:96px">${DATA.tenants.map(t => `<option ${m.tenants.includes(t.id) || m.tenants[0] === '*' ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select></div><div class="field full"><label>资源范围（站点 / 服务限定）</label><input class="input" value="${esc(m.scopes.join(' · '))}"></div><div class="field full"><label class="check"><input type="checkbox" ${m.role === 'tadmin' ? 'checked' : ''}> 允许审批低风险修复（L2）</label></div><div class="field full"><label class="check"><input type="checkbox" ${m.role === 'padmin' ? 'checked' : ''} ${m.role !== 'padmin' ? 'disabled' : ''}> 跨租户能力（独立授权，平台管理员）</label></div></div><div class="callout info mt">${icon('info')}<div>保存后授权版本递增（perm-v185），该用户现有会话在下一次请求即失效并重新加载授权；所有变更写入审计。</div></div><h3 style="font-size:13px;margin:16px 0 8px">最近活动</h3><div class="timeline">${DATA.audit.filter(a => a.actor === m.name).slice(0, 4).map(a => `<div class="tl-item ${a.result === 'denied' ? 'warn' : a.result === 'failed' ? 'danger' : ''}"><span class="tl-dot"></span><div class="tl-time">${fmt.dt(a.ts)}</div><div class="tl-title small">${a.action}</div><div class="tl-desc xs">${esc(a.desc)}</div></div>`).join('') || '<div class="muted small">无</div>'}</div>`, foot: `<button class="btn danger" onclick="App.toast('已撤权并终止会话','warn');App.closeLayer()">撤权</button><button class="btn primary" onclick="App.toast('已保存：授权版本 perm-v185，会话即时刷新','ok');App.closeLayer()">保存</button>` }); }
+  document.getElementById('matrix').onclick = () => document.getElementById('matrixCard').scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('invite').onclick = () => App.modal({ title: '邀请成员', body: `<div class="form-grid"><div class="field full"><label>邮箱</label><input class="input" placeholder="name@company.com"></div><div class="field"><label>角色</label><select class="select">${Object.entries(App.ROLES).filter(([k]) => isAdmin || k === 'viewer' || k === 'tadmin').map(([k, v]) => `<option value="${k}">${v.name}</option>`).join('')}</select></div><div class="field"><label>租户</label><input class="input" readonly value="${esc(ctx.tenant.name)}"></div><div class="field full"><label>资源范围</label><select class="select"><option>全租户</option><option>指定站点</option><option>指定服务</option></select></div><div class="field full"><label class="check"><input type="checkbox" checked> 要求启用 MFA 后方可访问</label></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('邀请已发送（通过 OIDC 首次登录后激活）','ok');App.closeLayer()">发送邀请</button>` });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>租户管理 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('tenants', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const ts = DATA.tenants; const ISO = { shared: ['neutral', '共享监控实例'], dedicated: ['primary', '独享监控实例'], onprem: ['maint', '独立部署'] };
+  root.innerHTML = `
+  <div class="page-head"><div><h1>租户管理 <span class="muted small">${ts.length} 个租户</span></h1><div class="sub">租户身份、对象归属、资源配额和审计由平台建立；主机组负责监控对象授权，标签仅用于路由与检索。标准客户共享受控实例，需要更强故障边界的客户使用独享实例。</div></div>
+    <div class="page-actions"><button class="btn" id="regress">${icon('shield')} 运行双租户回归</button><button class="btn primary" id="newT">${icon('plus')} 新建租户</button></div></div>
+  <div class="grid g5 mb">
+    ${App.kpi({ label: '活跃租户', value: ts.filter(t => t.status === 'active').length, sub: `${ts.filter(t => t.status === 'onboarding').length} 接入中` })}
+    ${App.kpi({ label: '共享 / 独享 / 独立部署', value: `${ts.filter(t => t.isolation === 'shared').length} / ${ts.filter(t => t.isolation === 'dedicated').length} / 0`, sub: '按故障边界与数据留存需求选择' })}
+    ${App.kpi({ label: '资产 / 配额', value: fmt.n(ts.reduce((s, t) => s + t.assets, 0)), sub: `配额 ${fmt.n(ts.reduce((s, t) => s + t.quota.assets, 0))}` })}
+    ${App.kpi({ label: '成员', value: ts.reduce((s, t) => s + t.members, 0), sub: '含客户管理员与观察者' })}
+    ${App.kpi({ label: '双租户回归', value: '通过', cls: 'ok', sub: `最近 ${fmt.ago(DATA.now - 6 * DATA.H)} · 0 越权返回` })}
+  </div>
+  <div class="card"><div id="tTbl"></div></div>
+  <div class="grid g3 mt">
+    <div class="card"><div class="card-head"><h3>隔离模式</h3></div><div class="card-body flush"><table class="table dense"><thead><tr><th>模式</th><th>边界</th><th>触发条件</th></tr></thead><tbody><tr><td>${App.badge('neutral', '共享监控实例')}</td><td class="xs">独立主机组、受限身份、平台对象授权；共享 Server 与监控 DB</td><td class="xs">标准客户、配置与保留政策相近</td></tr><tr><td>${App.badge('primary', '独享监控实例')}</td><td class="xs">独立 Server、DB、Proxy 路由和凭据；统一控制门户</td><td class="xs">较高负载、独立数据留存 / 地域 / 变更窗口</td></tr><tr><td>${App.badge('maint', '独立部署')}</td><td class="xs">控制层及监控层均在客户环境</td><td class="xs">客户要求自主管理，或网络无法接入共享控制层</td></tr></tbody></table></div></div>
+    <div class="card"><div class="card-head"><h3>六层约束</h3></div><div class="card-body small" style="color:var(--text-2)"><ol class="stack" style="gap:5px;padding-left:16px;list-style:decimal"><li>身份层：tenant_membership 保存用户、租户、角色与资源范围</li><li>对象层：所有入口先验证 (tenant_id, object_id)</li><li>Zabbix 层：主机组 tenant/{uuid}/{site}，受限身份，无任意 API 透传</li><li>数据库层：非空 tenant_id + RLS（非 owner / superuser / BYPASSRLS）</li><li>缓存与任务层：缓存键含租户、实例、权限版本</li><li>网络与执行层：Proxy、连接器、执行器按客户网络分配凭据</li></ol></div></div>
+    <div class="card"><div class="card-head"><h3>租户删除与保留</h3></div><div class="card-body small" style="color:var(--text-2)">客户删除在共享监控库中并不等同于立即清除备份及全部历史；产品规则中明确保留与清理流程：先停止采集与告警 → 保留事件与报表映射 → 合同到期后按约定清理 → 备份周期自然过期。<div class="mt8">${App.badge('neutral', '当前无待清理租户')}</div></div></div>
+  </div>`;
+  App.table('#tTbl', { rows: ts, paginate: false, onRow: openTenant, columns: [
+    { key: 'name', label: '租户', render: r => `<div class="row" style="gap:10px"><span class="tenant-avatar tenant-color-${r.color}" style="width:30px;height:30px;font-size:12px">${r.short.slice(0, 1)}</span><div><div class="primary-text">${esc(r.name)}</div><span class="sub-text">${r.id} · ${r.industry} · ${r.plan} · ${r.tier}</span></div></div>` },
+    { key: 'isolation', label: '隔离 / 资源池', render: r => `${App.badge(ISO[r.isolation][0], ISO[r.isolation][1])}<span class="sub-text mono">${r.pool}</span>` },
+    { key: 'status', label: '状态', render: r => r.status === 'active' ? App.badge('ok', '活跃', true) : App.badge('sync', '接入中', true) },
+    { key: 'assets', label: '资产 / 配额', num: true, render: r => `${fmt.n(r.assets)} / ${fmt.n(r.quota.assets)}${App.meter(r.assets / r.quota.assets * 100)}` },
+    { key: 'items', label: 'Item / 配额', num: true, render: r => `${fmt.compact(r.items)} / ${fmt.compact(r.quota.items)}${App.meter(r.items / r.quota.items * 100)}` },
+    { key: 'nvps', label: 'NVPS / 配额', num: true, render: r => `${fmt.n(r.nvps)} / ${fmt.n(r.quota.nvps)}${App.meter(r.nvps / r.quota.nvps * 100)}` },
+    { key: 'sites', label: '站点', render: r => r.sites.map(s => `<span class="tag">${esc(s)}</span>`).join(' '), sortVal: r => r.sites.length },
+    { key: 'retention', label: '保留', render: r => `<span class="small">${r.retention.history}d / ${r.retention.trends}d</span>`, sortable: false },
+    { key: 'members', label: '成员', num: true }, { key: 'itsm', label: 'ITSM', render: r => `<span class="small">${esc(r.itsm)}</span>` },
+    { key: 'created', label: '创建', num: true, render: r => `<span class="small muted">${fmt.date(r.created)}</span>` },
+    { label: '网络拓扑', sortable: false, render: r => `<a class="btn sm" href="network-topology.html?tenant=${encodeURIComponent(r.id)}&role=${App.state.role}">${icon('network')} 查看拓扑</a>` }
+  ] });
+  function openTenant(t) {
+    const routes = DATA.sites.filter(s => s.tenant === t.id); const mem = DATA.members.filter(m => m.tenants.includes(t.id));
+    App.drawer({ title: t.name, sub: `${t.id} · ${ISO[t.isolation][1]} · ${t.pool}`, width: 720, body: `
+      <div class="row wrap mb" style="gap:8px">${App.badge(ISO[t.isolation][0], ISO[t.isolation][1])}${t.status === 'active' ? App.badge('ok', '活跃', true) : App.badge('sync', '接入中', true)}<span class="badge neutral">${t.plan} · ${t.tier}</span><span class="badge neutral">SLA 目标 ${t.slaTarget}%</span><span class="badge neutral">联系人 ${esc(t.contact)}</span></div>
+      <div class="tabs plain mb" data-group="d" style="border-bottom:1px solid var(--line)"><button data-tab="quota" class="active">配额</button><button data-tab="route">路由（租户 + 站点 → 实例）</button><button data-tab="members">成员 (${mem.length})</button><button data-tab="retention">保留与隔离</button><button data-tab="isolation">隔离验证</button></div>
+      <div class="tab-panel active" data-group="d" data-panel="quota"><div class="form-grid">${[['资产', 'assets', t.assets], ['有效 Item', 'items', t.items], ['NVPS', 'nvps', t.nvps]].map(q => `<div class="field"><label>${q[0]}配额 <span class="muted" style="font-weight:400">· 当前 ${fmt.n(q[2])}</span></label><input class="input" type="number" value="${t.quota[q[1]]}">${App.meter(q[2] / t.quota[q[1]] * 100)}</div>`).join('')}<div class="field"><label>Worker 并发上限</label><input class="input" type="number" value="2"></div><div class="field"><label>单图曲线 / 点数上限</label><input class="input" value="20 / 1,000"></div><div class="field"><label>列表每页 / 最大</label><input class="input" value="100 / 500"></div></div><div class="callout info mt">${icon('info')}<div>池负载告警线：单租户持续占共享池负载 20% 触发评审，评估迁往独享池。当前占比 ${t.isolation === 'shared' ? fmt.pct(t.nvps / DATA.pools.find(p => p.id === t.pool).nvps * 100, 0) : '独享'}。</div></div></div>
+      <div class="tab-panel" data-group="d" data-panel="route"><table class="table dense"><thead><tr><th>站点</th><th>Proxy / Group</th><th>→ 监控实例</th><th>主机组</th><th>凭据</th></tr></thead><tbody>${routes.map(s => `<tr><td>${esc(s.name)}</td><td class="mono xs">${DATA.proxies.filter(p => p.tenant === t.id && p.site === s.name).map(p => p.id).join(', ') || '—'}${s.group ? ` <span class="tag">${s.group}</span>` : ''}</td><td class="mono">${t.pool}</td><td class="mono xs">tenant/${t.id.replace('t-', '')}/${esc(s.name)}</td><td class="xs">站点级 ${t.isolation === 'dedicated' ? '证书' : 'PSK'}</td></tr>`).join('')}</tbody></table><div class="xs muted mt8">迁移实例时新增带生效区间的 binding，保留业务资产 ID；旧历史只读路由到原池直至到期。</div><button class="btn sm mt8" onclick="App.toast('迁池向导：创建新池资源 → 保留资产 ID → 校验新绑定与凭据 → 双采抑制重复通知 → 逐站切换','info',5000)">${icon('database')} 迁移到独享池…</button></div>
+      <div class="tab-panel" data-group="d" data-panel="members"><table class="table dense"><thead><tr><th>成员</th><th>角色</th><th>资源范围</th><th>MFA</th><th>最近登录</th></tr></thead><tbody>${mem.map(m => `<tr><td><div class="small strong">${esc(m.name)}</div><span class="sub-text">${esc(m.email)}</span></td><td>${App.badge('neutral', App.ROLES[m.role].name)}</td><td class="xs">${m.scopes.join(' · ')}</td><td>${m.mfa ? App.badge('ok', '已启用') : App.badge('warn', '未启用')}</td><td class="small muted">${m.lastLogin ? fmt.ago(m.lastLogin) : '—'}</td></tr>`).join('')}</tbody></table></div>
+      <div class="tab-panel" data-group="d" data-panel="retention"><dl class="kv cols2"><dt>历史保留</dt><dd>${t.retention.history} 天（池级策略）</dd><dt>趋势保留</dt><dd>${t.retention.trends} 天</dd><dt>事件 / 审计</dt><dd>按合同 · 3 年</dd><dt>月报快照</dt><dd>永久（合同期内）</dd><dt>数据放置</dt><dd>${DATA.pools.find(p => p.id === t.pool).region}</dd><dt>变更窗口</dt><dd>${DATA.pools.find(p => p.id === t.pool).upgradeWindow}</dd></dl><div class="callout warn mt">${icon('alert-triangle')}<div>不同保留政策应拆池：TimescaleDB 相关配置存在全局历史 / 趋势保留覆盖。需要更长原始数据的客户使用独享池或受控离线导出。</div></div></div>
+      <div class="tab-panel" data-group="d" data-panel="isolation"><table class="table dense"><thead><tr><th>检查项</th><th>方法</th><th>结果</th></tr></thead><tbody>${[['跨租户 hostid 读取', 'A / B 互换 hostid 调用 GET /v1/assets/{id}', '拒绝（统一 404）'], ['跨租户 itemid 指标', 'GET /v1/assets/{id}/metrics?item=… 越权 itemid', '拒绝'], ['跨租户 eventid 确认', 'POST /v1/incidents/{id}/ack 越权', '拒绝'], ['报告下载地址', '猜测路径 / 过期签名', '拒绝'], ['缓存键泄漏', '切换租户后读取缓存', '未命中（键含租户 + 权限版本）'], ['异步消费', 'Outbox 消息伪造 tenant_id', '消费时再次校验，拒绝'], ['Zabbix 受限身份', '用租户身份查询其他主机组', '空结果']].map(r => `<tr><td class="small">${r[0]}</td><td class="xs muted">${r[1]}</td><td>${App.badge('ok', r[2])}</td></tr>`).join('')}</tbody></table><div class="xs muted mt8">最近运行 ${fmt.ago(DATA.now - 6 * DATA.H)} · 新增主机组、成员变化和模板发布均触发。</div></div>`, foot: `<button class="btn" onclick="App.toast('已运行双租户回归：7 项全部通过','ok')">${icon('shield')} 运行隔离验证</button><button class="btn primary" onclick="App.toast('配额已更新（写入审计，Worker 限流即时生效）','ok');App.closeLayer()">保存</button>`, onOpen: (el) => App.tabs(el, 'd') });
+  }
+  if (App.qs('id')) { const t = ts.find(x => x.id === App.qs('id')); if (t) openTenant(t); }
+  document.getElementById('regress').onclick = () => { App.toast('双租户回归运行中…', 'info', 1500); setTimeout(() => App.toast('通过：全部越权请求被拒绝，零跨租户数据返回或执行', 'ok', 4000), 1800); };
+  document.getElementById('newT').onclick = () => App.modal({ title: '新建租户', size: 'lg', body: `<div class="form-grid"><div class="field"><label>名称</label><input class="input" placeholder="客户全称"></div><div class="field"><label>套餐 / 等级</label><select class="select"><option>标准版 · 银牌</option><option>专业版 · 金牌</option><option>基础版 · 标准</option></select></div><div class="field"><label>隔离模式</label><select class="select"><option>共享监控实例（pool-east-01）</option><option>共享监控实例（pool-south-01 预留）</option><option>独享监控实例（新建池）</option><option>独立部署</option></select></div><div class="field"><label>数据保留</label><select class="select"><option>历史 30 天 / 趋势 365 天（标准池）</option><option>历史 90 天 / 趋势 730 天（需独享池）</option></select></div><div class="field"><label>资产 / Item / NVPS 配额</label><input class="input" value="200 / 30,000 / 500"></div><div class="field"><label>身份提供方</label><select class="select"><option>OIDC · 客户 IdP（联邦）</option><option>平台本地账号（临时）</option></select></div><div class="field"><label>ITSM</label><select class="select"><option>ServiceNow</option><option>Jira Service Management</option><option>BMC Remedy</option><option>暂不接入</option></select></div><div class="field"><label>首个客户管理员</label><input class="input" placeholder="邮箱"></div><div class="field full"><div class="callout info">${icon('info')}<div>创建将生成 tenant_id、主机组前缀 tenant/{uuid}/*、Zabbix 受限身份与站点级密钥；完成后自动运行双租户回归。</div></div></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('租户已创建（202），Provisioner 正在准备主机组与受限身份','ok');App.closeLayer()">创建</button>` });
+});
+</script>
+</body>
+</html>

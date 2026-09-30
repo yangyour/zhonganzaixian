@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>平台健康 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('platform-health', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const P = DATA.platform; const pools = DATA.pools.filter(p => p.status !== 'standby');
+  const totalFail = pools.reduce((s, p) => s + p.webhookFail24h, 0);
+  root.innerHTML = `
+  <div class="page-head"><div><h1>平台健康 <span class="badge neutral">平台视角</span></h1><div class="sub">监控系统本身的健康：Proxy 延迟、Server 队列、DB 写入、API 延迟、Webhook 落库失败、补偿水位、死信与备份恢复状态。平台自身拥有独立于被监控 Zabbix 的最小健康探测与告警渠道。</div></div>
+    <div class="page-actions"><span class="badge ok"><span class="dot ok pulse"></span>独立探针正常 · 20 秒前</span><button class="btn" id="drill">${icon('shield')} 发起恢复演练</button><a class="btn" href="instances.html">${icon('database')} 监控资源池</a></div></div>
+  <div class="grid g6 mb">
+    ${App.kpi({ label: '控制层可用性（30 天）', value: fmt.pct(P.slo.availability, 2), cls: 'ok', sub: `目标 ${P.slo.target}% · 预算 ${P.slo.budgetMin} 分钟，已用 ${P.slo.usedMin}` })}
+    ${App.kpi({ label: 'API P95', value: '412', unit: 'ms', sub: '授权列表 API 目标 ≤ 1 s · 仪表盘聚合 ≤ 3 s', cls: 'ok', spark: DATA.spark(31, { base: 400, amp: 80, noise: 40, min: 200 }) })}
+    ${App.kpi({ label: 'Webhook 落库失败（24h）', value: totalFail, cls: totalFail ? 'warn' : 'ok', sub: '持久化失败返回失败，让发送端重试' })}
+    ${App.kpi({ label: '补偿水位延迟', value: Math.max(...pools.map(p => p.watermark.lagSec)), unit: 's', sub: 'event.get 增量拉取 · 边界重读去重', cls: 'ok' })}
+    ${App.kpi({ label: '死信', value: DATA.deadLetters.count, cls: 'warn', sub: `最老 ${fmt.dur(DATA.deadLetters.oldestAge / 1000)} · Outbox 积压 12` })}
+    ${App.kpi({ label: '备份 / 恢复演练', value: `${P.backups.filter(b => b.ok).length} / ${P.backups.length}`, cls: P.backups.some(b => !b.ok) ? 'warn' : 'ok', sub: `RPO ≤ ${P.slo.rpo} min · RTO ≤ ${P.slo.rto} min` })}
+  </div>
+  <div class="card mb"><div class="card-head"><h3>分层高可用状态</h3><span class="xs muted">高可用分别覆盖入口、业务库、消息链路、监控 Server、监控数据库和客户采集网络</span></div><div class="card-body"><div class="status-grid">${P.layers.map(l => `<div class="status-cell ${l.status}"><div class="sc-head"><span>${esc(l.name)}</span>${l.status === 'ok' ? App.badge('ok', '正常', true) : l.status === 'warn' ? App.badge('warn', '注意', true) : App.badge('danger', '故障', true)}</div><div class="xs muted">${esc(l.detail)}</div><div class="sc-metric"><span>${esc(l.metric)}</span><b>${esc(l.value)}</b></div></div>`).join('')}</div></div></div>
+  <div class="grid g2 mb">
+    <div class="card"><div class="card-head"><h3>Zabbix Server 队列 <span class="sub">按池 · 延迟 > 10 s 的值</span></h3></div><div class="card-body" id="queueChart"></div></div>
+    <div class="card"><div class="card-head"><h3>监控库写入延迟 <span class="sub">ms · P95</span></h3></div><div class="card-body" id="dbChart"></div></div>
+    <div class="card"><div class="card-head"><h3>API 延迟 <span class="sub">P50 / P95 · ms</span></h3></div><div class="card-body" id="apiChart"></div></div>
+    <div class="card"><div class="card-head"><h3>Proxy 延迟排行 <span class="sub">ms</span></h3></div><div class="card-body" id="pxBars"></div></div>
+  </div>
+  <div class="grid g-2-1" style="align-items:start">
+    <div class="card"><div class="card-head"><h3>按监控实例</h3></div><div class="card-body flush"><table class="table"><thead><tr><th>实例</th><th>HA</th><th>NVPS / 上限</th><th>队列 5s / 10s / 5m / 10m+</th><th>DB 写延迟 / 复制</th><th>API P95</th><th>Webhook 失败</th><th>补偿水位</th></tr></thead><tbody>${pools.map(p => `<tr><td><div class="primary-text mono">${p.id}</div><span class="sub-text">${esc(p.name)} · ${p.version}</span></td><td><span class="small">活动 <b class="mono">${p.ha.active}</b></span><span class="sub-text">备用 ${p.ha.standby}${p.ha.lastFailover ? ' · 上次切换 ' + fmt.ago(p.ha.lastFailover) : ''}</span></td><td class="num">${fmt.n(p.nvps)} / ${fmt.n(p.nvpsCap)}<div class="meter mt8" style="width:90px"><i style="width:${p.nvps / p.nvpsCap * 100}%"></i></div></td><td class="num mono small">${p.queue['5s']} / ${p.queue['10s']} / ${p.queue['5m']} / ${p.queue['10m+']}</td><td class="num">${p.db.writeLat} ms<span class="sub-text ${p.db.replicaLag > 10 ? 'delta bad' : ''}">复制延迟 ${p.db.replicaLag} s</span></td><td class="num">${p.apiP95} ms</td><td class="num ${p.webhookFail24h ? 'delta bad' : ''}">${p.webhookFail24h}</td><td><span class="mono xs">${p.watermark.eventid}</span><span class="sub-text">${p.watermark.lagSec} s · ${fmt.ago(p.watermark.lastRun)}</span></td></tr>`).join('')}</tbody></table></div></div>
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>备份与恢复演练</h3></div><div class="card-body flush"><table class="table dense"><thead><tr><th>对象</th><th>最近备份</th><th>RPO</th><th>恢复演练</th></tr></thead><tbody>${P.backups.map(b => `<tr><td class="small">${esc(b.target)}</td><td class="small">${fmt.ago(b.last)}</td><td class="small">${b.rpo}</td><td>${b.ok ? App.badge('ok', fmt.ago(b.lastRestoreTest)) : `${App.badge('danger', fmt.ago(b.lastRestoreTest))}<span class="sub-text">${esc(b.note || '')}</span>`}</td></tr>`).join('')}</tbody></table><div class="xs muted" style="padding:8px 18px">每季度恢复演练覆盖业务库、Zabbix 配置、事件、证书与执行模板，不只检查备份文件存在。</div></div></div>
+      <div class="card"><div class="card-head"><h3>消息与任务</h3></div><div class="card-body"><table class="mini-table"><tr><td>Outbox 待发布</td><td>12</td></tr><tr><td>Worker 消费速率</td><td>184 / s</td></tr><tr><td>重试中</td><td>6</td></tr><tr><td>死信（最老）</td><td>3（42 分）</td></tr><tr><td>幂等冲突（24h）</td><td>2</td></tr><tr><td>配置对账漂移</td><td>1（srv-wms-app-04）</td></tr></table></div></div>
+      <div class="card"><div class="card-head"><h3>验收目标（试点）</h3></div><div class="card-body small" style="color:var(--text-2)"><ul class="stack" style="gap:6px"><li>· 控制层可用性 99.9%（30 天 43.2 分钟预算）</li><li>· 核心数据 RPO ≤ 15 分钟 · RTO ≤ 60 分钟</li><li>· 12,500 NVPS 稳定 24 小时，无持续积压</li><li>· 事件生成到渠道受理 P95 ≤ 30 秒</li><li>· 2 倍峰值 30 分钟，恢复后 15 分钟内排空</li></ul></div></div>
+    </div>
+  </div>`;
+  const x = DATA.ts(1, { hours: 24, points: 96 }).x;
+  Charts.line(document.getElementById('queueChart'), { height: 200, x, series: pools.map((p, i) => ({ name: p.id, data: DATA.ts(801 + i, { hours: 24, points: 96, base: p.queue['10s'] + 2, amp: 3, noise: 2, min: 0, int: true, spikes: i === 0 ? [{ at: .55, h: 40, w: .05 }] : [] }).y })), smooth: true, dots: false, thresholds: [{ value: 100, label: '告警', color: '#f59e0b' }], yMax: 120 });
+  Charts.line(document.getElementById('dbChart'), { height: 200, x, series: pools.map((p, i) => ({ name: p.id, data: DATA.ts(811 + i, { hours: 24, points: 96, base: p.db.writeLat, amp: p.db.writeLat * .4, noise: p.db.writeLat * .2, min: .3 }).y })), smooth: true, dots: false, unit: ' ms' });
+  Charts.line(document.getElementById('apiChart'), { height: 200, x, series: [{ name: 'P50', data: DATA.ts(821, { hours: 24, points: 96, base: 180, amp: 40, noise: 20, min: 80 }).y }, { name: 'P95', data: DATA.ts(822, { hours: 24, points: 96, base: 420, amp: 120, noise: 60, min: 200, spikes: [{ at: .55, h: 900, w: .04 }] }).y }], smooth: true, dots: false, unit: ' ms', thresholds: [{ value: 1000, label: '列表 API ≤ 1 s', color: '#dc2626' }], yMax: 1500 });
+  Charts.hbars(document.getElementById('pxBars'), { items: DATA.proxies.filter(p => p.latency).sort((a, b) => b.latency - a.latency).slice(0, 8).map(p => ({ label: p.id, value: p.latency, text: p.latency + ' ms', color: p.latency > 150 ? 'var(--danger)' : p.latency > 80 ? 'var(--warn)' : 'var(--primary)' })), max: 250, labelWidth: 110 });
+  document.getElementById('drill').onclick = () => App.modal({ title: '发起恢复演练', body: `<div class="form-grid"><div class="field"><label>对象</label><select class="select"><option>pool-fin-01 监控库（超过 90 天）</option><option>平台业务库</option><option>Zabbix 配置 / 模板仓库</option></select></div><div class="field"><label>目标环境</label><select class="select"><option>隔离恢复环境 dr-sandbox</option></select></div><div class="field full"><div class="callout warn">${icon('alert-triangle')}<div>演练从备份恢复到独立环境并验证数据缺口、补传量与时间；禁止用进程启动代替恢复验证。数据库 schema 升级后不能假设回滚容器镜像即可恢复。</div></div></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('恢复演练任务已创建（预计 45 分钟），结果将记录 RPO / RTO 实测值','ok');App.closeLayer()">开始演练</button>` });
+});
+</script>
+</body>
+</html>

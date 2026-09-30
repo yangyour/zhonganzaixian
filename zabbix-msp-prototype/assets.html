@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>资产管理 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('assets', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const all = DATA.assets.filter(App.inScope);
+  const filt = { q: '', status: App.qs('status', 'all'), site: 'all', type: App.qs('type', 'all'), sync: 'all', service: 'all', view: App.store.get('assetView', 'list') };
+  const cnt = (s) => all.filter(a => a.status === s).length;
+  const sitesIn = [...new Set(all.map(a => a.site))]; const typesIn = [...new Set(all.map(a => a.type))]; const svcIn = [...new Set(all.map(a => a.service))].filter(s => s !== '—');
+  const canOps = App.can('tadmin', 'msp', 'padmin');
+
+  root.innerHTML = `
+  <div class="page-head"><div><h1>资产管理 <span class="badge primary">${esc(ctx.tenant.name)}</span> <span class="muted small">${all.length} 个资产</span></h1><div class="sub">资产由 CMDB 提供生命周期与归属，平台绑定到 Zabbix Host（唯一键 instance_id + hostid）。IP 可能重复，不作为跨客户唯一键。</div></div>
+    <div class="page-actions"><div class="seg" id="viewSeg"><button data-v="list" class="${filt.view === 'list' ? 'active' : ''}">${icon('list')} 列表</button><button data-v="grid" class="${filt.view === 'grid' ? 'active' : ''}">${icon('grid')} 蜂巢</button></div><button class="btn" id="exportBtn">${icon('download')} 导出</button>${canOps ? `<a class="btn primary" href="onboarding.html">${icon('plus')} 接入资产</a>` : ''}</div></div>
+  <div class="grid g6 mb">
+    ${App.kpi({ label: '全部资产', value: all.length, sub: `${typesIn.length} 种类型 · ${sitesIn.length} 个站点` })}
+    ${App.kpi({ label: '正常', value: cnt('ok'), cls: 'ok', sub: '采集正常且无活动问题' })}
+    ${App.kpi({ label: '有问题', value: cnt('problem'), cls: cnt('problem') ? 'danger' : '', sub: '存在未恢复触发器' })}
+    ${App.kpi({ label: '未知', value: cnt('unknown'), cls: cnt('unknown') ? 'warn' : '', sub: '数据缺失 ≠ 正常' })}
+    ${App.kpi({ label: '维护中', value: cnt('maintenance'), sub: '通知已抑制 · SLA 排除' })}
+    ${App.kpi({ label: '同步异常', value: all.filter(a => ['syncing', 'failed', 'drift', 'pending'].includes(a.sync)).length, sub: `${all.filter(a => a.sync === 'syncing').length} 同步中 · ${all.filter(a => a.sync === 'failed').length} 失败 · ${all.filter(a => a.sync === 'drift').length} 漂移`, cls: all.filter(a => a.sync === 'failed').length ? 'warn' : '' })}
+  </div>
+  <div class="card">
+    <div class="toolbar">
+      <div class="search-box">${icon('search')}<input class="input" id="q" placeholder="搜索名称 / IP / 标签"></div>
+      <div class="chips" id="statusChips">${[['all', '全部', all.length], ['ok', '正常', cnt('ok')], ['problem', '有问题', cnt('problem')], ['unknown', '未知', cnt('unknown')], ['maintenance', '维护中', cnt('maintenance')], ['disabled', '已停用', cnt('disabled')]].map(c => `<span class="chip ${filt.status === c[0] ? 'active' : ''}" data-v="${c[0]}">${c[1]} <span class="n">${c[2]}</span></span>`).join('')}</div>
+      <span class="spacer"></span>
+      <select class="select sm" id="fSite" style="width:140px"><option value="all">全部站点</option>${sitesIn.map(s => `<option>${esc(s)}</option>`).join('')}</select>
+      <select class="select sm" id="fType" style="width:140px"><option value="all">全部类型</option>${typesIn.map(t => `<option value="${t}" ${filt.type === t ? 'selected' : ''}>${App.typeName(t)}</option>`).join('')}</select>
+      <select class="select sm" id="fSvc" style="width:140px"><option value="all">全部业务</option>${svcIn.map(s => `<option>${esc(s)}</option>`).join('')}</select>
+      <select class="select sm" id="fSync" style="width:120px"><option value="all">同步状态</option><option value="active">生效</option><option value="syncing">同步中</option><option value="failed">同步失败</option><option value="drift">配置漂移</option><option value="pending">待接入</option></select>
+    </div>
+    <div id="tableWrap"></div>
+    <div id="gridWrap" class="card-body" style="display:none"></div>
+  </div>`;
+
+  function rows() { const q = filt.q.toLowerCase(); return all.filter(a => (filt.status === 'all' || a.status === filt.status) && (filt.site === 'all' || a.site === filt.site) && (filt.type === 'all' || a.type === filt.type) && (filt.sync === 'all' || a.sync === filt.sync) && (filt.service === 'all' || a.service === filt.service) && (!q || (a.name + ' ' + a.ip + ' ' + a.tags.join(' ') + ' ' + a.service).toLowerCase().includes(q))); }
+  const sevChips = (p) => ['disaster', 'high', 'average', 'warning', 'info'].filter(s => p[s]).map(s => `<span class="sev ${s}" style="height:18px;font-size:10.5px;padding:0 6px">${App.sevName(s)} ${p[s]}</span>`).join(' ') || '<span class="faint">—</span>';
+  const bulk = canOps ? `<button class="btn sm" data-bulk="maint">${icon('wrench')} 进入维护</button><button class="btn sm" data-bulk="tpl">${icon('layers')} 套用模板</button><button class="btn sm" data-bulk="tag">${icon('tag')} 添加标签</button><button class="btn sm danger" data-bulk="disable">${icon('pause')} 停用采集</button>` : '';
+  const tbl = App.table('#tableWrap', { rows: rows(), pageSize: 15, selectable: canOps, bulkActions: bulk, onRow: r => location.href = 'asset-detail.html?id=' + r.id, sortKey: 'status', footNote: '仅显示当前租户上下文授权范围内的对象', columns: [
+    { key: 'name', label: '资产', render: r => `<div class="row" style="gap:10px">${App.typeIcon(r.type)}<div><div class="primary-text nowrap">${esc(r.name)}</div><span class="sub-text mono nowrap">${esc(r.ip)}</span></div></div>` },
+    { key: 'type', label: '类型', render: r => `<span class="small">${App.typeName(r.type)}</span><span class="sub-text ellipsis" style="max-width:160px">${esc(r.os || r.template)}</span>`, sortVal: r => App.typeName(r.type) },
+    { key: 'site', label: '站点 / Proxy', render: r => `<span class="small">${esc(r.site)}</span><span class="sub-text mono">${esc(r.proxy)}</span>${ctx.tenant.id === 'all' ? `<span class="sub-text">${App.tenantName(r.tenant)}</span>` : ''}` },
+    { key: 'service', label: '业务系统', render: r => `<span class="tag">${esc(r.service)}</span>` },
+    { key: 'cpu', label: 'CPU', width: '130px', render: r => r.cpu == null ? '<span class="faint">—</span>' : `<div class="row" style="gap:8px">${Charts.sparkHtml(DATA.spark(r.seed + 11, { base: r.cpu, amp: 8, noise: 3, min: 0, max: 100 }), { color: r.cpu >= 85 ? 'var(--danger)' : r.cpu >= 70 ? 'var(--warn)' : 'var(--primary)', w: 64, h: 20 })}<span class="num small ${r.cpu >= 85 ? 'delta bad' : ''}">${fmt.pct(r.cpu, 0)}</span></div>`, sortVal: r => r.cpu ?? -1 },
+    { key: 'mem', label: '内存', width: '120px', render: r => r.mem == null ? '<span class="faint">—</span>' : `<div class="row" style="gap:8px"><div class="meter grow" style="min-width:50px"><i style="width:${r.mem}%;background:${r.mem >= 90 ? 'var(--danger)' : r.mem >= 80 ? 'var(--warn)' : 'var(--c5)'}"></i></div><span class="num small">${fmt.pct(r.mem, 0)}</span></div>`, sortVal: r => r.mem ?? -1 },
+    { key: 'status', label: '可用性', render: r => App.availBadge(r.status), sortVal: r => ({ problem: 0, unknown: 1, maintenance: 2, ok: 3, disabled: 4 })[r.status] },
+    { key: 'problems', label: '当前问题', render: r => sevChips(r.problems), sortVal: r => -(App.SEV[DATA.worstSeverity(r.problems) || 'none'].rank) },
+    { key: 'sync', label: '配置同步', render: r => App.syncBadge(r.sync) + (r.syncError ? `<span class="sub-text" style="max-width:180px" title="${esc(r.syncError)}">${esc(r.syncError)}</span>` : '') },
+    { key: 'owner', label: '负责人', render: r => `<span class="small">${esc(r.owner)}</span>` },
+    { key: 'lastData', label: '最近数据', num: true, render: r => `<span class="small ${DATA.now - r.lastData > 5 * DATA.MIN ? 'delta bad' : 'muted'}">${r.status === 'disabled' ? '—' : fmt.ago(r.lastData)}</span>` },
+    { key: 'act', label: '', sortable: false, render: r => `<span class="actions"><a class="btn xs" href="asset-detail.html?id=${r.id}" data-stop>详情</a>${canOps ? ` <button class="btn xs" data-maint="${r.id}" data-stop>维护</button>` : ''}</span>` }
+  ] });
+  function drawGrid() { const rs = rows(); const g = document.getElementById('gridWrap'); g.innerHTML = `<div class="row between mb8"><span class="small muted">${rs.length} 个资产 · 颜色表示最高严重级别 / 可用性状态（参考 Zabbix 7.0 蜂巢部件）</span><div class="legend"><span><i style="background:var(--ok)"></i>正常</span><span><i style="background:var(--sev-high)"></i>严重</span><span><i style="background:var(--danger)"></i>灾难</span><span><i style="background:var(--warn)"></i>一般 / 警告</span><span><i style="background:var(--unknown)"></i>未知</span><span><i style="background:var(--maint)"></i>维护</span></div></div><div class="tiles">${rs.map(a => { const w = DATA.worstSeverity(a.problems); const cls = a.status === 'maintenance' ? 'maint' : a.status === 'unknown' ? 'unknown' : a.status === 'disabled' ? '' : w === 'disaster' ? 'danger' : w === 'high' ? 'high' : w ? 'warn' : 'ok'; return `<div class="tile ${cls}" onclick="location.href='asset-detail.html?id=${a.id}'" title="${esc(a.name)} · ${App.typeName(a.type)}"><div><div class="t-name">${esc(a.name)}</div><div class="t-sub">${esc(a.site)} · ${App.typeName(a.type)}</div></div><div class="row between"><span class="t-val">${a.cpu != null ? fmt.pct(a.cpu, 0) : a.status === 'unknown' ? '未知' : '—'}</span><span class="xs muted">${a.cpu != null ? 'CPU' : ''}</span></div></div>`; }).join('')}</div>`; }
+  function refresh() { tbl.update(rows()); if (filt.view === 'grid') drawGrid(); }
+  function setView(v) { filt.view = v; App.store.set('assetView', v); document.getElementById('tableWrap').style.display = v === 'list' ? '' : 'none'; document.getElementById('gridWrap').style.display = v === 'grid' ? '' : 'none'; if (v === 'grid') drawGrid(); }
+  setView(filt.view); App.seg('#viewSeg', setView);
+  App.chips('#statusChips', v => { filt.status = v; refresh(); });
+  document.getElementById('q').oninput = e => { filt.q = e.target.value; refresh(); };
+  document.getElementById('fSite').onchange = e => { filt.site = e.target.value; refresh(); };
+  document.getElementById('fType').onchange = e => { filt.type = e.target.value; refresh(); };
+  document.getElementById('fSvc').onchange = e => { filt.service = e.target.value; refresh(); };
+  document.getElementById('fSync').onchange = e => { filt.sync = e.target.value; refresh(); };
+  document.getElementById('exportBtn').onclick = () => App.toast('已生成导出任务：assets-' + fmt.date(DATA.now) + '.csv（短时签名地址将通过站内信下发）', 'info');
+  root.addEventListener('click', (e) => {
+    const m = e.target.closest('[data-maint]'); if (m) { const a = DATA.assets.find(x => x.id === m.dataset.maint); return maintModal([a]); }
+    const b = e.target.closest('[data-bulk]'); if (b) { const sel = tbl.selected().map(id => DATA.assets.find(a => a.id === id)); if (b.dataset.bulk === 'maint') return maintModal(sel); if (b.dataset.bulk === 'disable') return App.confirm({ title: '停用采集', text: `停用 ${sel.length} 个资产的采集与告警？退役先停止采集和告警，保留事件及报表映射，再按约定清理。`, danger: true, okText: '停用' }).then(ok => { if (ok) { sel.forEach(a => { a.status = 'disabled'; }); App.toast(`已提交停用（202 · operation_id op-${App.uid()}），前端状态将显示「同步中」直至回读确认`, 'info'); refresh(); } }); if (b.dataset.bulk === 'tpl') return App.modal({ title: '套用模板（分批发布）', body: `<div class="stack" style="gap:12px"><div class="field"><label>模板</label><select class="select">${DATA.templates.filter(t => t.status !== 'draft').map(t => `<option>${esc(t.name)} · v${t.version}</option>`).join('')}</select></div><div class="field"><label>发布策略</label><select class="select"><option>灰度：先 20% 主机，观察 30 分钟后全量</option><option>全量（仅低风险模板）</option></select></div><div class="callout info">${icon('info')}<div>将记录配置版本并分批调用 host.update / template.get 回读；前端显示「同步中 / 生效 / 失败」，不会提前宣布成功。</div></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('已创建配置版本并进入 Outbox，Worker 按对象串行应用','ok');App.closeLayer()">应用到 ${sel.length} 个资产</button>` }); if (b.dataset.bulk === 'tag') return App.modal({ title: '添加标签', body: `<div class="field"><label>标签（key:value）</label><input class="input" placeholder="例如 env:prod"></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('标签已添加（仅用于路由与检索，不作为授权依据）','ok');App.closeLayer()">添加</button>` }); }
+  });
+  function maintModal(list) { App.modal({ title: '创建维护窗口', body: `<div class="stack" style="gap:12px"><div class="kv"><dt>目标</dt><dd>${list.map(a => `<span class="tag">${esc(a.name)}</span>`).join(' ')}</dd></div><div class="form-grid"><div class="field"><label>开始</label><input class="input" type="datetime-local" value="${new Date(DATA.now + 60e3).toISOString().slice(0, 16)}"></div><div class="field"><label>时长</label><select class="select"><option>1 小时</option><option>2 小时</option><option>4 小时</option><option>自定义</option></select></div><div class="field full"><label>模式</label><select class="select"><option>采集继续 · 抑制通知（推荐）</option><option>暂停采集</option></select></div><div class="field full"><label class="check"><input type="checkbox" checked> 申请 SLA 排除（需服务经理确认）</label></div><div class="field full"><label>原因</label><input class="input" placeholder="变更单号 / 说明"></div></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('维护窗口已创建，期间通知抑制、事件仍记录','ok');App.closeLayer()">创建</button>` }); }
+});
+</script>
+</body>
+</html>

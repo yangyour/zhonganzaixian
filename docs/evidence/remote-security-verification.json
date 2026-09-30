@@ -1,0 +1,12 @@
+{
+  "runtime_permissions": {
+    "audit_insert": true,
+    "audit_update": false,
+    "audit_delete": false,
+    "registry_update": false,
+    "flyway_select": false
+  },
+  "revoked_old_cookie_and_committed_replay_rejected": true,
+  "downgraded_role_cannot_replay_write_or_read_admin_config": true,
+  "membership_restored_permission_version_monotonically_increased": true
+}

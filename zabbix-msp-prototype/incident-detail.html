@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>事件详情 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('incident-detail', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const id = App.qs('id', 'inc-1001');
+  const i = DATA.incidents.find(x => x.id === id) || DATA.incidents[0];
+  if (!App.inScope(i)) { root.innerHTML = `<div class="denied card"><div class="card-body" style="padding:36px"><div class="lock">${icon('lock')}</div><h2>对象不存在或无权限</h2><p>对象不存在与无权限统一响应。当前租户上下文：${esc(ctx.tenant.name)}。</p><a class="btn primary" href="incidents.html">返回事件中心</a></div></div>`; return; }
+  App.setTitle(i.name);
+  const asset = DATA.assets.find(a => a.id === i.assetId); const ticket = DATA.tickets.find(t => t.id === i.ticketId); const run = DATA.runs.find(r => r.id === i.runbookRunId);
+  const canOps = App.can('tadmin', 'msp', 'padmin'); const canComment = true;
+  const similar = DATA.incidents.filter(x => x.id !== i.id && (x.assetId === i.assetId || x.name.split(' ')[0] === i.name.split(' ')[0]) && App.inScope(x)).slice(0, 4);
+  const parent = i.suppressedBy ? DATA.incidents.find(x => x.id === i.suppressedBy) : null;
+  const rbSuggest = asset ? DATA.runbooks.filter(r => r.types.includes(asset.type) && !r.disabled).slice(0, 3) : [];
+  const idx = App.HFLOW.indexOf(i.handlingState);
+
+  function actions() {
+    if (!canOps) return `<span class="xs muted">当前角色只读，可评论</span>`;
+    const b = [];
+    if (i.handlingState === 'NEW') b.push(`<button class="btn primary" data-act="ack">${icon('check')} 确认</button>`);
+    if (i.handlingState === 'ACKNOWLEDGED') b.push(`<button class="btn primary" data-act="progress">${icon('play')} 开始处理</button>`);
+    if (['ACKNOWLEDGED', 'IN_PROGRESS'].includes(i.handlingState)) b.push(`<button class="btn ${i.sourceState === 'RECOVERED' ? 'primary' : ''}" data-act="resolve" ${i.sourceState !== 'RECOVERED' ? 'title="监控仍为 PROBLEM：可标记已解决但不能结单"' : ''}>${icon('check-circle')} 标记已解决</button>`);
+    if (i.handlingState === 'RESOLVED') b.push(`<button class="btn primary" data-act="close" ${i.sourceState !== 'RECOVERED' ? 'disabled title="监控状态仍为 PROBLEM，恢复不等于结单：需 Zabbix RECOVERED 后复核关闭"' : ''}>${icon('lock')} 复核关闭</button>`);
+    if (i.handlingState !== 'CLOSED') { if (!i.ticketId) b.push(`<button class="btn" data-act="ticket">${icon('ticket')} 创建工单</button>`); b.push(`<button class="btn" data-act="runbook">${icon('zap')} 执行 Runbook</button>`); b.push(`<button class="btn" data-act="escalate">${icon('arrow-up-right')} 升级</button>`); b.push(`<button class="btn ghost" data-act="suppress">${icon('pause')} 静默</button>`); }
+    if (i.handlingState === 'CLOSED') b.push(`<button class="btn" data-act="reopen">${icon('refresh')} 重新打开</button>`);
+    return b.join('');
+  }
+  root.innerHTML = `
+  <div class="card mb"><div class="card-body" style="padding:18px 20px">
+    <div class="row between wrap" style="gap:12px;align-items:flex-start">
+      <div class="grow" style="min-width:0"><div class="row wrap" style="gap:8px">${App.sevBadge(i.severity)}${App.srcBadge(i.sourceState)}${i.suppressed ? App.badge('unknown', '已抑制（依赖）') : ''}${i.maintenance ? App.badge('maint', '维护窗口内') : ''}${i.dupCount > 1 ? `<span class="tag">归并 ×${i.dupCount}</span>` : ''}<span class="mono xs muted">${i.id} · eventid ${i.eventid}</span></div>
+        <h1 style="font-size:19px;margin-top:8px">${esc(i.name)}</h1>
+        <div class="row wrap small muted mt8" style="gap:6px"><a href="asset-detail.html?id=${i.assetId}" class="strong">${esc(i.assetName)}</a><span>·</span><span>${App.tenantName(i.tenant)} / ${esc(i.site)}</span><span>·</span><span>服务 ${esc(i.service)}</span><span>·</span><span>发生 ${fmt.dt(i.sourceTime)}（${fmt.ago(i.sourceTime)}）</span>${i.recoveredAt ? `<span>·</span><span class="delta good">恢复 ${fmt.dt(i.recoveredAt)} · 持续 ${fmt.dur((i.recoveredAt - i.sourceTime) / 1000)}</span>` : `<span>·</span><span class="delta bad">已持续 ${fmt.dur((DATA.now - i.sourceTime) / 1000)}</span>`}</div>
+      </div>
+      <div class="row wrap" style="gap:8px;justify-content:flex-end" id="actions">${actions()}</div>
+    </div>
+    <div class="row between wrap mt" style="gap:12px"><div class="state-flow">${App.HFLOW.map((s, k) => `<span class="sf ${k < idx ? 'done' : k === idx ? 'cur' : ''}">${k < idx ? icon('check') : ''}${App.HSTATE[s].name}</span>${k < App.HFLOW.length - 1 ? '<span class="arr">›</span>' : ''}`).join('')}</div><span class="xs muted">处置状态由平台管理；监控状态 PROBLEM → RECOVERED 由 Zabbix 产生。执行脚本成功、有人确认或工单关闭，都不能伪造监控恢复。</span></div>
+    ${parent ? `<div class="callout warn mt">${icon('alert-triangle')}<div>本事件由依赖抑制：上游 <a href="incident-detail.html?id=${parent.id}">${esc(parent.name)}</a> 处于 PROBLEM，通知已抑制，事件仍记录并计入 SLA 未知区间判定。</div></div>` : ''}
+    ${i.sourceState === 'RECOVERED' && i.handlingState !== 'CLOSED' ? `<div class="callout info mt">${icon('info')}<div><b>恢复不等于结单</b>：监控已 RECOVERED，进入待复核。请确认根因、执行结果与工单状态后再关闭；重放历史消息不会把已恢复事件倒退为新问题。</div></div>` : ''}
+  </div></div>
+
+  <div class="split">
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>事件详情</h3><span class="xs muted">规范化事件由 Adapter 生成，不是原生 API 对象</span></div><div class="card-body"><dl class="kv cols2" style="row-gap:10px">
+        <dt>监控实例</dt><dd class="mono">${i.instance}</dd><dt>租户解析</dt><dd>由资产绑定推导（Webhook 标签仅作线索）</dd>
+        <dt>problem_event_id</dt><dd class="mono">${i.problemEventId}</dd><dt>recovery_event_id</dt><dd class="mono">${i.recoveryEventId || 'null'}</dd>
+        <dt>source_time</dt><dd class="mono">${new Date(i.sourceTime).toISOString()}</dd><dt>received_at</dt><dd class="mono">${new Date(i.receivedAt).toISOString()} <span class="faint">(+${((i.receivedAt - i.sourceTime) / 1000).toFixed(1)}s)</span></dd>
+        <dt>触发器表达式</dt><dd class="mono" style="grid-column:2/-1">${esc(i.expression)}</dd>
+        <dt>当前值 / 阈值</dt><dd><b class="${i.sourceState === 'PROBLEM' ? 'delta bad' : ''}">${esc(i.value)}</b> <span class="muted">/ ${esc(i.threshold)}</span></dd><dt>监控项</dt><dd class="mono">${esc(i.itemKey)}</dd>
+        <dt>标签</dt><dd style="grid-column:2/-1"><div class="tags">${i.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('') || '<span class="faint">—</span>'}</div></dd>
+      </dl></div></div>
+      <div class="card"><div class="card-head"><h3>相关指标 <span class="sub">${esc(i.itemKey)}</span></h3><div class="seg" id="rSeg"><button data-v="6h" class="active">6h</button><button data-v="24h">24h</button><button data-v="7d">7d</button></div></div><div class="card-body"><div id="metric"></div><div class="xs muted mt8">指标查询先校验资产与 Item 所属，再按需读取历史或趋势；标记为问题发生 / 恢复 / 确认时间点。</div></div></div>
+      <div class="card"><div class="card-head"><h3>处置时间线</h3></div><div class="card-body"><div class="timeline" id="tl"></div></div></div>
+      <div class="card"><div class="card-head"><h3>处置记录与评论 <span class="badge neutral">${i.comments.length}</span></h3></div><div class="card-body">
+        <div class="stack" id="comments" style="gap:12px">${i.comments.map(c => `<div class="row" style="align-items:flex-start;gap:10px">${App.avatar(c.by, '#2563eb')}<div class="grow"><div class="row between"><span class="small strong">${esc(c.by)}</span><span class="xs muted">${fmt.dt(c.at)}</span></div><div class="small" style="margin-top:2px;color:var(--text-2)">${esc(c.text)}</div></div></div>`).join('') || '<div class="muted small">暂无记录</div>'}</div>
+        ${canComment ? `<div class="row mt" style="align-items:flex-start;gap:10px">${App.avatar(App.USERS[ctx.role].name, '#0891b2')}<div class="grow"><textarea class="input" id="cmt" placeholder="添加处置记录 / 评论（写入审计，附带 trace_id）"></textarea><div class="row mt8" style="justify-content:flex-end;gap:8px"><label class="check xs muted"><input type="checkbox"> 同步到 ITSM 工单</label><button class="btn primary sm" id="addCmt">${icon('send')} 提交</button></div></div></div>` : ''}
+      </div></div>
+    </div>
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>通知送达</h3><a class="small" href="notifications.html">渠道</a></div><div class="card-body tight">${i.notifications.length ? i.notifications.map(n => `<div style="padding:8px 18px;border-bottom:1px dashed var(--line)"><div class="row between"><span class="small strong">${n.channel} <span class="muted" style="font-weight:400">→ ${esc(n.target)}</span></span>${n.state === 'delivered' ? App.badge('ok', '已送达') : n.state === 'accepted' ? App.badge('info', '已受理') : n.state === 'retrying' ? App.badge('warn', `重试 ${n.attempts}/5`) : App.badge('danger', '失败')}</div><div class="xs muted mt8" style="margin-top:3px">${fmt.time(n.at)} · 耗时 ${fmt.ms(n.latency)}${n.error ? ` · <span class="delta bad">${esc(n.error)}</span>` : ''}</div></div>`).join('') : `<div class="empty small">${i.suppressed ? '依赖抑制：未发送通知' : i.maintenance ? '维护窗口：通知已抑制' : '无通知记录（信息级默认不通知）'}</div>`}<div class="xs muted" style="padding:8px 18px">去重键 = (instance, eventid, 渠道, 接收对象, 事件阶段)；「受理」≠「送达」。</div></div></div>
+      <div class="card"><div class="card-head"><h3>工单绑定</h3></div><div class="card-body">${ticket ? `<dl class="kv"><dt>外部工单</dt><dd><a href="tickets.html?id=${ticket.id}" class="mono">${ticket.id}</a></dd><dt>系统</dt><dd>${esc(ticket.external)}</dd><dt>状态</dt><dd>${App.badge(DATA.TSTATUS[ticket.status][1], DATA.TSTATUS[ticket.status][0])} ${App.badge(DATA.TSYNC[ticket.sync][1], DATA.TSYNC[ticket.sync][0])}</dd><dt>优先级 / SLA</dt><dd>${ticket.priority} · ${ticket.slaDue < DATA.now ? '<span class="delta bad">已超时</span>' : '剩余 ' + fmt.dur((ticket.slaDue - DATA.now) / 1000)}</dd><dt>负责人</dt><dd>${esc(ticket.owner)}</dd></dl>` : `<div class="muted small">未绑定工单。以 tenant + incident 唯一绑定外部工单；创建超时先查询幂等标识。</div>${canOps && i.handlingState !== 'CLOSED' ? `<button class="btn sm mt8" data-act="ticket">${icon('ticket')} 创建工单</button>` : ''}`}</div></div>
+      <div class="card"><div class="card-head"><h3>Runbook</h3><a class="small" href="automation.html">全部</a></div><div class="card-body">${run ? `<div class="row between mb8"><span class="small strong">${esc(run.runbookName)} <span class="tag">v${run.version}</span></span>${App.badge(run.status === 'success' ? 'ok' : run.status === 'awaiting_approval' ? 'warn' : run.status === 'running' ? 'sync' : 'danger', { success: '成功', awaiting_approval: '待审批', running: '执行中', failed: '失败', rejected: '已拒绝' }[run.status])}</div><div class="stack" style="gap:4px">${DATA.STEPS.map((s, k) => `<div class="runstep ${['wait', 'done', 'run', 'fail'][run.steps[k]]}" style="padding:5px 8px"><span class="rs-i" style="width:18px;height:18px;font-size:10px">${run.steps[k] === 1 ? icon('check') : run.steps[k] === 3 ? '!' : k + 1}</span><span class="xs">${s}</span></div>`).join('')}</div><a class="small mt8" style="display:inline-block" href="automation.html?run=${run.id}">查看输出（脱敏）</a>` : `<div class="small muted mb8">建议（按资产类型匹配，执行前再次解析归属与凭据）：</div>${rbSuggest.map(r => `<div class="row between" style="padding:6px 0;border-bottom:1px dashed var(--line)"><div><div class="small strong">${esc(r.name)}</div><div class="xs muted">${r.preauth ? '预授权 · 自动执行' : '需审批'}</div></div>${App.levelBadge(r.level)}</div>`).join('') || '<div class="muted small">无匹配 Runbook</div>'}`}</div></div>
+      <div class="card"><div class="card-head"><h3>影响与相似事件</h3></div><div class="card-body"><dl class="kv mb8"><dt>影响服务</dt><dd><span class="tag">${esc(i.service)}</span></dd><dt>SLA 计入</dt><dd>${i.maintenance ? '维护窗口，已排除' : i.suppressed ? '上游故障，按未知区间' : '计入不可用时间并集'}</dd><dt>升级策略</dt><dd>${(DATA.escalations.find(e => e.tenants.includes(i.tenant)) || {}).tier || '标准'}</dd></dl><div class="small strong mb8">相似事件（7 天）</div>${similar.map(s => `<div class="row" style="padding:6px 0;border-bottom:1px dashed var(--line);gap:8px;cursor:pointer" onclick="location.href='incident-detail.html?id=${s.id}'"><span class="sevbar ${s.severity}" style="height:16px"></span><div class="grow xs ellipsis">${esc(s.name)}</div><span class="xs muted nowrap">${fmt.ago(s.sourceTime)}</span></div>`).join('') || '<div class="muted xs">无</div>'}</div></div>
+    </div>
+  </div>`;
+
+  // 指标图
+  function drawMetric(rk) {
+    const R = DATA.RANGE[rk]; const numeric = parseFloat(String(i.value).replace(/,/g, '')) || 50; const thrV = parseFloat(String(i.threshold).replace(/[^\d.]/g, '')) || null; const inv = /</.test(i.threshold);
+    const t = DATA.ts(i.id.length * 17 + i.eventid.length, { hours: R.hours, points: R.points, base: thrV ? (inv ? thrV * 1.4 : thrV * 0.75) : numeric, amp: thrV ? thrV * .15 : numeric * .2, noise: (thrV || numeric) * .06, min: 0 });
+    const n = t.y.length; const startIdx = Math.max(0, Math.round((i.sourceTime - t.x[0]) / (t.x[n - 1] - t.x[0]) * (n - 1))); const endIdx = i.recoveredAt ? Math.round((i.recoveredAt - t.x[0]) / (t.x[n - 1] - t.x[0]) * (n - 1)) : n - 1;
+    if (thrV) for (let k = startIdx; k <= endIdx && k < n; k++) t.y[k] = inv ? thrV * (0.85 - 0.05 * Math.sin(k)) : thrV * (1.08 + 0.06 * Math.sin(k));
+    const markers = [{ t: i.sourceTime, label: 'PROBLEM', color: 'var(--danger)' }]; if (i.ackAt) markers.push({ t: i.ackAt, label: '确认', color: 'var(--c4)' }); if (i.recoveredAt) markers.push({ t: i.recoveredAt, label: 'RECOVERED', color: 'var(--ok)' });
+    Charts.line(document.getElementById('metric'), { height: 220, x: t.x, series: [{ name: i.itemKey.split('[')[0], data: t.y, area: true, color: i.sourceState === 'PROBLEM' ? '#dc2626' : '#2563eb' }], smooth: true, dots: false, legend: false, thresholds: thrV ? [{ value: thrV, label: `阈值 ${i.threshold}`, color: '#f59e0b' }] : [], markers: markers.filter(m => m.t > t.x[0]) });
+  }
+  drawMetric('6h'); App.seg('#rSeg', drawMetric);
+  // 时间线
+  function timeline() {
+    const ev = [{ t: i.sourceTime, cls: 'danger', title: 'PROBLEM 事件产生', desc: `Zabbix ${i.instance} · eventid ${i.eventid} · ${esc(i.value)}` }, { t: i.receivedAt, cls: 'info', title: 'Webhook 接收并持久化', desc: `校验凭据 → 实例 → 主机归属 → 落库 + Outbox 同事务提交（+${((i.receivedAt - i.sourceTime) / 1000).toFixed(1)}s）` }];
+    if (i.dupCount > 1) ev.push({ t: i.receivedAt + 60e3, cls: '', title: `指纹归并 ×${i.dupCount}`, desc: '同租户 / 资产 / 规则 5 分钟窗口内重复事件已归并，保留原始事件' });
+    if (i.suppressed) ev.push({ t: i.receivedAt + 2000, cls: 'warn', title: '依赖抑制', desc: `上游 ${parent ? esc(parent.assetName) : ''} 处于 PROBLEM，通知抑制` });
+    i.notifications.forEach(n => ev.push({ t: n.at, cls: n.state === 'delivered' ? 'ok' : n.state === 'retrying' ? 'warn' : 'info', title: `通知 · ${n.channel} → ${esc(n.target)}`, desc: `${n.state === 'delivered' ? '已送达' : n.state === 'accepted' ? '已受理（等待回执）' : n.state === 'retrying' ? '重试中 ' + n.attempts + '/5 · ' + esc(n.error || '') : '失败'} · ${fmt.ms(n.latency)}` }));
+    if (i.ackAt) ev.push({ t: i.ackAt, cls: 'info', title: `确认 · ${esc(i.ackBy)}`, desc: '本地审计后 event.acknowledge 幂等回写 Zabbix' });
+    if (ticket) ev.push({ t: ticket.created, cls: 'info', title: `创建工单 ${ticket.id}`, desc: `${esc(ticket.external)} · ${DATA.TSYNC[ticket.sync][0]}` });
+    if (run) ev.push({ t: run.at, cls: run.status === 'success' ? 'ok' : run.status === 'failed' ? 'danger' : 'warn', title: `Runbook · ${esc(run.runbookName)} v${run.version}`, desc: { success: `执行成功 · ${run.duration}s · 输出已脱敏归档`, failed: '前置检查失败，未执行任何命令', awaiting_approval: `等待审批 · ${esc(run.approver)}`, running: '执行中', rejected: '审批拒绝' }[run.status] });
+    if (i.recoveredAt) ev.push({ t: i.recoveredAt, cls: 'ok', title: 'RECOVERED 监控恢复', desc: `r_eventid ${i.recoveryEventId} · 进入待复核；恢复对账周期刷新未关闭事件` });
+    if (i.closedAt) ev.push({ t: i.closedAt, cls: 'ok', title: '复核关闭', desc: '人工复核后结单，写入 SLA 月报快照' });
+    ev.sort((a, b) => a.t - b.t);
+    document.getElementById('tl').innerHTML = ev.map(e => `<div class="tl-item ${e.cls}"><span class="tl-dot"></span><div class="tl-time">${fmt.dt(e.t)}</div><div class="tl-title small">${e.title}</div><div class="tl-desc xs">${e.desc}</div></div>`).join('');
+  }
+  timeline();
+  // 操作
+  root.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-act]'); if (!b) return; const act = b.dataset.act; const me = App.USERS[ctx.role].name;
+    const set = (s, msg) => { i.handlingState = s; App.toast(msg, 'ok'); App.rerender(); };
+    if (act === 'ack') { i.ackBy = me; i.ackAt = DATA.now; i.comments.push({ by: me, at: DATA.now, text: '已确认，开始排查。' }); return set('ACKNOWLEDGED', '已确认：本地审计 → event.acknowledge 幂等回写'); }
+    if (act === 'progress') return set('IN_PROGRESS', '已进入处理中');
+    if (act === 'resolve') { if (i.sourceState === 'PROBLEM' && !(await App.confirm({ title: '监控仍为 PROBLEM', text: '标记「已解决」不会改变监控状态；在 Zabbix RECOVERED 之前无法复核关闭。是否继续？' }))) return; return set('RESOLVED', '已标记为已解决' + (i.sourceState === 'PROBLEM' ? '（等待监控恢复后方可关闭）' : '，等待复核关闭')); }
+    if (act === 'close') { if (await App.confirm({ title: '复核关闭', text: '确认根因已消除、执行结果与工单状态一致？关闭后写入 SLA 月报快照。' })) { i.closedAt = DATA.now; return set('CLOSED', '已复核关闭'); } return; }
+    if (act === 'reopen') return set('IN_PROGRESS', '已重新打开');
+    if (act === 'ticket') return App.modal({ title: '创建 ITSM 工单', body: `<div class="stack" style="gap:12px"><div class="field"><label>标题</label><input class="input" value="${esc(i.assetName)} · ${esc(i.name)}"></div><div class="form-grid"><div class="field"><label>优先级</label><select class="select"><option>${{ disaster: 'P1', high: 'P2', average: 'P3', warning: 'P3', info: 'P4' }[i.severity]}</option><option>P1</option><option>P2</option><option>P3</option><option>P4</option></select></div><div class="field"><label>外部系统</label><input class="input" readonly value="${esc(App.tenantObj(i.tenant).itsm)}"></div></div><div class="callout info">${icon('info')}<div>传入资产、优先级、时间线与证据链接；幂等键 ${i.tenant}:${i.id}。</div></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" id="mkTicket">创建</button>`, onOpen: (el) => { el.querySelector('#mkTicket').onclick = () => { const tid = 'ITSM-2026-09' + (150 + Math.floor(Math.random() * 40)); DATA.tickets.unshift({ id: tid, tenant: i.tenant, incidentId: i.id, title: `${i.assetName} · ${i.name}`, priority: 'P3', status: 'new', sync: 'syncing', created: DATA.now, slaDue: DATA.now + 4 * DATA.H, owner: me, external: App.tenantObj(i.tenant).itsm, updated: DATA.now, assetName: i.assetName }); i.ticketId = tid; App.closeLayer(); App.toast('工单创建中（等待 ITSM 受理回执）', 'info'); App.rerender(); }; } });
+    if (act === 'runbook') return App.modal({ title: '执行 Runbook', sub: esc(i.assetName), body: `<div class="stack" style="gap:8px">${rbSuggest.map((r, k) => `<label class="runstep" style="cursor:pointer"><input type="radio" name="rb" ${k === 0 ? 'checked' : ''}><div class="grow"><div class="row" style="gap:8px"><b class="small">${esc(r.name)}</b> <span class="tag">v${r.version}</span> ${App.levelBadge(r.level)}</div><div class="xs muted">${esc(r.desc)}</div></div><span class="xs muted">${r.preauth ? '预授权' : '需审批'}</span></label>`).join('') || '<div class="empty small">无匹配 Runbook</div>'}</div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('已发起：资产核验 → 前置检查 → 审批 / 预授权 → 锁定 → 执行 → 观察 → 留证','ok',3500);App.closeLayer();setTimeout(()=>location.href='automation.html?tab=runs',1000)">发起</button>` });
+    if (act === 'escalate') return App.modal({ title: '手动升级', body: `<div class="field"><label>升级到</label><select class="select"><option>MSP L2 值班（李娜）</option><option>客户管理员（${esc(App.tenantObj(i.tenant).contact.split(' ')[0])}）</option><option>MSP 服务经理</option></select></div><div class="field mt12"><label>说明</label><textarea class="input"></textarea></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('已升级并通过电话 + 短信通知','ok');App.closeLayer()">升级</button>` });
+    if (act === 'suppress') return App.modal({ title: '静默 / 抑制', body: `<div class="form-grid"><div class="field"><label>时长</label><select class="select"><option>1 小时</option><option>4 小时</option><option>至维护窗口结束</option></select></div><div class="field"><label>范围</label><select class="select"><option>仅本事件</option><option>同资产同规则</option></select></div><div class="field full"><label>原因（写入审计）</label><input class="input"></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('已静默：原始事件仍记录，灾难级不受静默影响','ok');App.closeLayer()">确定</button>` });
+  });
+  const ac = document.getElementById('addCmt'); if (ac) ac.onclick = () => { const v = document.getElementById('cmt').value.trim(); if (!v) return App.toast('请输入内容', 'warn'); i.comments.push({ by: App.USERS[ctx.role].name, at: DATA.now, text: v }); App.toast('已记录（trace ' + App.uid() + '）', 'ok'); App.rerender(); };
+});
+</script>
+</body>
+</html>

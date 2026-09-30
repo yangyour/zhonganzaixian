@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>运营看板 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('operations', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const ts = DATA.tenants.filter(t => ctx.tenant.id === 'all' || t.id === ctx.tenant.id);
+  const sum = (k) => ts.reduce((s, t) => s + (t[k] || 0), 0);
+  const poolOf = (t) => DATA.pools.find(p => p.id === t.pool);
+  root.innerHTML = `
+  <div class="page-head"><div><h1>运营看板 <span class="badge primary">${esc(ctx.tenant.name)}</span></h1><div class="sub">运营视角 · 租户成本与交付：资产 / Item 数、实际写入量、数据保留量、工单响应、告警降噪和服务覆盖率。<b>用于计量，不直接等同收费。</b></div></div>
+    <div class="page-actions"><select class="select sm" style="width:140px"><option>2026-09（至今）</option><option>2026-08</option></select><button class="btn" id="exportBtn">${icon('download')} 导出计量明细</button></div></div>
+  <div class="grid g6 mb">
+    ${App.kpi({ label: '活跃租户', value: ts.filter(t => t.status === 'active').length, sub: `${ts.filter(t => t.status === 'onboarding').length} 接入中 · ${ts.filter(t => t.isolation === 'dedicated').length} 独享池` })}
+    ${App.kpi({ label: '资产 / Item', value: fmt.n(sum('assets')), sub: `${fmt.compact(sum('items'))} 有效 Item`, help: '按有效 Item、更新频率、写入值数和查询负载测算，不能仅按主机数采购' })}
+    ${App.kpi({ label: '实际写入', value: fmt.n(sum('nvps')), unit: 'NVPS', sub: `≈ ${fmt.n(sum('writeGBDay'), 1)} GB / 天（未压缩）`, spark: DATA.spark(21, { base: sum('nvps'), amp: sum('nvps') * .15, noise: sum('nvps') * .05 }) })}
+    ${App.kpi({ label: '数据保留量', value: fmt.n(sum('storeGB')), unit: 'GB', sub: '历史 + 趋势，按池策略' })}
+    ${App.kpi({ label: '工单首响（均）', value: (ts.filter(t => t.ticketResp).reduce((s, t) => s + t.ticketResp, 0) / Math.max(1, ts.filter(t => t.ticketResp).length)).toFixed(1), unit: 'min', sub: '按合同等级分别统计', cls: 'ok' })}
+    ${App.kpi({ label: '服务覆盖率', value: fmt.pct(ts.reduce((s, t) => s + t.coverage, 0) / ts.length, 1), sub: 'CMDB 资产中已监控比例' })}
+  </div>
+  <div class="grid g-2-1 mb" style="align-items:start">
+    <div class="card"><div class="card-head"><h3>租户计量</h3><span class="xs muted">配额与池负载告警线：单租户持续占池负载 20% 触发评审</span></div><div id="tTbl"></div></div>
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>NVPS 按租户 <span class="sub">7 天</span></h3></div><div class="card-body" id="nvpsChart"></div></div>
+      <div class="card"><div class="card-head"><h3>共享池负载占比 <span class="sub">${esc(DATA.pools[0].name)}</span></h3></div><div class="card-body" id="poolDonut"></div></div>
+    </div>
+  </div>
+  <div class="grid g3">
+    <div class="card"><div class="card-head"><h3>工单响应趋势 <span class="sub">分钟 · 按等级</span></h3></div><div class="card-body" id="respChart"></div></div>
+    <div class="card"><div class="card-head"><h3>告警降噪率 <span class="sub">按租户</span></h3></div><div class="card-body" id="noiseBars"></div></div>
+    <div class="card"><div class="card-head"><h3>成本构成（月运行成本模型）</h3></div><div class="card-body"><div class="code" style="font-size:11.5px">月运行成本 ≈ 各资源池计算 + 存储 / IOPS
+            + 副本 / 备份 + 控制层 + 带宽
+            + 通知 + 值班与维护</div><div class="xs muted mt8">资源报价按最终地域、供应商、压测规格和备份策略询价；开源组件不意味着零成本，商业支持、通知套餐、数据源权限如被选择需单列。</div><table class="mini-table mt8"><tr><td>计算（4 池）</td><td>—</td></tr><tr><td>存储 ${fmt.n(DATA.pools.reduce((s, p) => s + p.db.size, 0) / 1e12, 2)} TB</td><td>—</td></tr><tr><td>通知（短信 ${fmt.n(DATA.channels[1].quota.used)} 条）</td><td>—</td></tr></table></div></div>
+  </div>`;
+  App.table('#tTbl', { rows: ts, paginate: false, onRow: t => location.href = App.can('padmin') ? 'tenants.html?id=' + t.id : 'dashboard.html', columns: [
+    { key: 'name', label: '租户', render: r => `<div class="row" style="gap:8px"><span class="tenant-avatar tenant-color-${r.color}" style="width:26px;height:26px;font-size:11px;border-radius:7px">${r.short.slice(0, 1)}</span><div><div class="primary-text">${esc(r.name)}</div><span class="sub-text">${r.plan} · ${r.tier} · ${r.isolation === 'dedicated' ? '独享池' : '共享池'} ${r.pool}</span></div></div>` },
+    { key: 'assets', label: '资产 / 配额', num: true, render: r => `<div>${fmt.n(r.assets)} <span class="muted">/ ${fmt.n(r.quota.assets)}</span></div>${App.meter(r.assets / r.quota.assets * 100)}` },
+    { key: 'items', label: 'Item / 配额', num: true, render: r => `<div>${fmt.compact(r.items)} <span class="muted">/ ${fmt.compact(r.quota.items)}</span></div>${App.meter(r.items / r.quota.items * 100)}` },
+    { key: 'nvps', label: 'NVPS / 配额', num: true, render: r => `<div>${fmt.n(r.nvps)} <span class="muted">/ ${fmt.n(r.quota.nvps)}</span></div>${App.meter(r.nvps / r.quota.nvps * 100)}` },
+    { key: 'writeGBDay', label: '写入 / 日', num: true, render: r => `${fmt.n(r.writeGBDay, 2)} GB` },
+    { key: 'storeGB', label: '保留量', num: true, render: r => `${fmt.n(r.storeGB)} GB<span class="sub-text">${r.retention.history}d / ${r.retention.trends}d</span>` },
+    { key: 'pool', label: '池负载占比', num: true, render: r => { const p = poolOf(r); const share = p.type === 'dedicated' ? 100 : r.nvps / p.nvps * 100; return p.type === 'dedicated' ? '<span class="muted small">独享</span>' : `<span class="${share > 20 ? 'delta bad' : ''}">${fmt.pct(share, 0)}</span>${share > 20 ? '<span class="sub-text">超 20% 告警线 · 评审迁池</span>' : ''}`; }, sortVal: r => { const p = poolOf(r); return p.type === 'dedicated' ? 0 : r.nvps / p.nvps; } },
+    { key: 'ticketResp', label: '工单首响', num: true, render: r => r.ticketResp ? `${r.ticketResp} min` : '<span class="faint">—</span>' },
+    { key: 'noise', label: '降噪率', num: true, render: r => r.noise ? fmt.pct(r.noise, 1) : '<span class="faint">—</span>' },
+    { key: 'coverage', label: '覆盖率', num: true, render: r => `<span class="${r.coverage < 60 ? 'delta bad' : ''}">${fmt.pct(r.coverage, 1)}</span>` }
+  ] });
+  const x = DATA.ts(1, { hours: 168, points: 84 }).x;
+  Charts.line(document.getElementById('nvpsChart'), { height: 210, x, series: ts.map((t, i) => ({ name: t.short, data: DATA.ts(600 + i, { hours: 168, points: 84, base: t.nvps, amp: t.nvps * .12, noise: t.nvps * .04, min: 0 }).y })), stacked: true, smooth: true, dots: false, yFormat: v => fmt.compact(v) });
+  const pool = DATA.pools[0]; const pt = DATA.tenants.filter(t => pool.tenants.includes(t.id));
+  Charts.donut(document.getElementById('poolDonut'), { size: 130, thickness: 18, center: { value: fmt.pct(pool.nvps / pool.nvpsCap * 100, 0), label: '池负载' }, data: pt.map((t, i) => ({ name: t.name, value: t.nvps, color: Charts.PALETTE[i] })).concat([{ name: '空闲容量', value: pool.nvpsCap - pool.nvps, color: '#e2e8f0' }]), format: v => fmt.n(v) + ' NVPS' });
+  Charts.line(document.getElementById('respChart'), { height: 200, x: DATA.ts(1, { hours: 720, points: 30 }).x, series: [{ name: '金牌', data: DATA.ts(701, { hours: 720, points: 30, base: 5, amp: 1.5, noise: 1, min: 2 }).y }, { name: '银牌', data: DATA.ts(702, { hours: 720, points: 30, base: 9.5, amp: 2, noise: 1.5, min: 4 }).y }, { name: '标准', data: DATA.ts(703, { hours: 720, points: 30, base: 22, amp: 5, noise: 4, min: 8 }).y }], smooth: true, dots: false, unit: ' min', thresholds: [{ value: 15, label: '金牌 SLA', color: '#f59e0b' }] });
+  Charts.hbars(document.getElementById('noiseBars'), { items: ts.filter(t => t.noise).map(t => ({ label: t.name, value: t.noise, text: fmt.pct(t.noise, 1), color: 'var(--ok)' })), max: 100, labelWidth: 110 });
+  document.getElementById('exportBtn').onclick = () => App.toast('计量明细导出中（含 Item 数、写入量、保留量、工单与降噪统计；口径注明不等同收费）', 'info');
+});
+</script>
+</body>
+</html>

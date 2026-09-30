@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>告警策略 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('alert-rules', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const canOps = App.can('tadmin', 'msp', 'padmin'); const isAdmin = App.can('padmin');
+  const N = DATA.noiseStats; const mws = DATA.maintenances.filter(App.inScope);
+  const tier = ctx.tenant.id === 'all' ? null : DATA.escalations.find(e => e.tenants.includes(ctx.tenant.id));
+  root.innerHTML = `
+  <div class="page-head"><div><h1>告警策略 <span class="badge primary">${esc(ctx.tenant.name)}</span></h1><div class="sub">触发规则继承自模板并以受控宏表达租户差异；降噪先用规则（持续时间、恢复滞回、依赖、维护窗口、指纹归并），智能能力分阶段接入。</div></div>
+    <div class="page-actions">${canOps ? `<button class="btn" id="newMw">${icon('calendar')} 新建维护窗口</button><button class="btn primary" id="newRule">${icon('plus')} 阈值覆盖申请</button>` : ''}</div></div>
+  <div class="card">
+    <div class="tabs" data-group="t"><button data-tab="rules" class="active">触发规则 <span class="n">${DATA.triggerRules.length}</span></button><button data-tab="noise">降噪与归并</button><button data-tab="esc">升级策略</button><button data-tab="maint">维护窗口 <span class="n">${mws.filter(m => m.status !== 'done').length}</span></button><button data-tab="oncall">值班表</button><button data-tab="ai">智能分析（第二阶段）</button></div>
+    <div class="tab-panel active" data-group="t" data-panel="rules">
+      <div class="toolbar"><div class="search-box">${icon('search')}<input class="input" id="rq" placeholder="搜索规则 / 模板"></div><select class="select sm" id="rSev" style="width:130px"><option value="all">全部级别</option>${Object.entries(App.SEV).map(([k, v]) => `<option value="${k}">${v.name}</option>`).join('')}</select><span class="spacer"></span><span class="xs muted">${DATA.triggerRules.filter(r => r.overrides).length} 条规则存在租户覆盖 · 高等级绕过聚合等待</span></div>
+      <div id="rulesTbl"></div>
+    </div>
+    <div class="tab-panel" data-group="t" data-panel="noise"><div class="card-body"><div class="grid g-3-2">
+      <div><h3 style="font-size:14px;margin-bottom:12px">第一阶段规则</h3><table class="table"><thead><tr><th>规则</th><th>窗口 / 参数</th><th class="num">24h 归并 / 抑制</th><th>状态</th></tr></thead><tbody>${N.rules.map((r, k) => `<tr><td><div class="primary-text">${esc(r.name)}</div><span class="sub-text">${['按 (租户, 资产, 规则指纹) 归并，保留原始事件', 'Proxy / 上游设备 PROBLEM 时抑制下游通知', '维护窗口内仅记录不通知；SLA 可排除', '10 分钟内 ≥ 3 次翻转进入静默', '灾难 / 严重级别不等待聚合窗口'][k]}</span></td><td class="small">${esc(r.window)}</td><td class="num">${fmt.n(r.saved)}</td><td>${canOps ? `<button class="switch on" onclick="this.classList.toggle('on');App.toast('规则已' + (this.classList.contains('on') ? '启用' : '禁用'),'info',1500)"></button>` : App.badge('ok', '启用')}</td></tr>`).join('')}</tbody></table>
+        <div class="callout neutral mt">${icon('info')}<div>事件相关性建议从 CMDB 服务依赖开始；拓扑过期时只提示候选原因。告警风暴中限制重复通知，但保留原始事件与关键告警的独立升级通道。</div></div></div>
+      <div><h3 style="font-size:14px;margin-bottom:12px">降噪效果 · 7 天</h3><div id="noiseChart"></div><div class="grid g3 mt" style="gap:10px"><div class="kv-card"><div class="l">原始 / 日均</div><div class="v">${fmt.n(N.raw24h)}</div></div><div class="kv-card"><div class="l">通知 / 日均</div><div class="v">${N.final}</div></div><div class="kv-card"><div class="l">降噪率</div><div class="v delta good">${fmt.pct(100 - N.final / N.raw24h * 100, 1)}</div></div></div></div>
+    </div></div></div>
+    <div class="tab-panel" data-group="t" data-panel="esc"><div class="card-body"><div class="grid g3">${DATA.escalations.filter(e => !tier || e === tier).map(e => `<div class="card" style="box-shadow:none;${tier === e ? 'border-color:var(--primary-200)' : ''}"><div class="card-head"><h3>${e.tier} <span class="sub">${e.tenants.map(t => App.tenantName(t).slice(0, 2)).join('、')}</span></h3>${tier === e ? App.badge('primary', '当前租户') : ''}</div><div class="card-body"><div class="timeline">${e.steps.map((s, k) => `<div class="tl-item ${k === 0 ? 'info' : ''}"><span class="tl-dot"></span><div class="tl-time">${esc(s.after)}</div><div class="tl-title small">${esc(s.who)}</div><div class="tl-desc xs">${s.channels.map(c => `<span class="tag">${c}</span>`).join(' ')}</div></div>`).join('')}</div></div>${isAdmin ? `<div class="card-foot"><span>按合同等级维护</span><button class="btn xs" onclick="App.toast('升级策略编辑：原型演示','info')">编辑</button></div>` : ''}</div>`).join('')}</div>
+      <h3 style="font-size:14px;margin:18px 0 10px">渠道 × 级别矩阵</h3><table class="table dense"><thead><tr><th>级别</th><th>钉钉 / 企微</th><th>邮件</th><th>短信</th><th>电话</th><th>ITSM 自动建单</th><th>聚合等待</th></tr></thead><tbody>${[['disaster', 1, 1, 1, 1, 1, '绕过'], ['high', 1, 1, 1, 0, 1, '绕过'], ['average', 1, 1, 0, 0, 0, '5 分钟'], ['warning', 1, 0, 0, 0, 0, '5 分钟'], ['info', 0, 0, 0, 0, 0, '仅记录']].map(r => `<tr><td>${App.sevBadge(r[0])}</td>${r.slice(1, 6).map(v => `<td>${v ? icon('check', '') : '<span class="faint">—</span>'}</td>`).join('')}<td class="small">${r[6]}</td></tr>`).join('')}</tbody></table></div></div>
+    <div class="tab-panel" data-group="t" data-panel="maint"><div id="mwTbl"></div><div class="pager"><span>维护窗口内：采集可继续、通知抑制、事件仍记录；经批准的维护时间从 SLA 有效服务时间中排除</span></div></div>
+    <div class="tab-panel" data-group="t" data-panel="oncall"><div class="card-body"><div class="grid g-2-1"><div><table class="table"><thead><tr><th>日期</th><th>L1（首响 / 确认）</th><th>L2（处置 / 升级 / 复核）</th><th>服务经理</th><th></th></tr></thead><tbody>${DATA.oncall.week.map((d, k) => `<tr ${k === 3 ? 'style="background:var(--primary-50)"' : ''}><td>${d.day}${k === 3 ? ' <span class="tag blue">今天</span>' : ''}</td><td>${App.avatar(d.l1, '#2563eb')} ${d.l1}</td><td>${App.avatar(d.l2, '#7c3aed')} ${d.l2}</td><td>周涛</td><td>${canOps ? `<button class="btn xs" onclick="App.toast('已发起换班申请','info')">换班</button>` : ''}</td></tr>`).join('')}</tbody></table></div><div class="stack"><div class="card" style="box-shadow:none"><div class="card-head"><h3>值班规则</h3></div><div class="card-body small" style="color:var(--text-2)"><ul class="stack" style="gap:6px"><li>· 交接 ${DATA.oncall.today.handover}，交接摘要自动附未确认 / 待复核事件</li><li>· L1 15 分钟（金牌）/ 30 分钟（银牌）未确认自动升级 L2</li><li>· 电话未接听 2 次 → 升级下一级并短信告知</li><li>· 值班范围 = 被指派租户集合；跨租户切换全程审计</li></ul></div></div></div></div></div></div>
+    <div class="tab-panel" data-group="t" data-panel="ai"><div class="card-body"><div class="callout warn mb">${icon('alert-triangle')}<div><b>第二阶段 · 可选扩展</b>，不作为首期关键告警链路依赖。统计日 / 周基线与异常变化，先离线回放测量误报、漏报及降噪率；大模型可总结证据、检索 Runbook、草拟工单，输入脱敏、输出关联证据，默认不获得执行凭据。</div></div><div class="grid g3"><div class="card" style="box-shadow:none"><div class="card-head"><h3>动态基线</h3>${App.badge('neutral', '离线回放中')}</div><div class="card-body small muted">对 CPU / 响应时间等指标建立日 / 周基线，偏离 3σ 生成「候选异常」，不直接通知。<div class="mt8 kv-cards" style="grid-template-columns:1fr 1fr"><div class="kv-card"><div class="l">回放误报率</div><div class="v">6.2%</div></div><div class="kv-card"><div class="l">回放漏报率</div><div class="v">1.1%</div></div></div></div></div><div class="card" style="box-shadow:none"><div class="card-head"><h3>事件摘要草拟</h3>${App.badge('neutral', '试点')}</div><div class="card-body small muted">汇总时间线、相关指标与 Runbook 输出，草拟工单描述；输出附证据链接，由值班人员确认后提交。</div></div><div class="card" style="box-shadow:none"><div class="card-head"><h3>Runbook 检索</h3>${App.badge('neutral', '试点')}</div><div class="card-body small muted">按事件指纹与历史处置检索相似案例与 Runbook；只推荐不执行，不获得执行凭据。</div></div></div></div></div>
+  </div>`;
+  const rt = App.table('#rulesTbl', { rows: DATA.triggerRules, paginate: false, sortKey: 'severity', sortDir: 'desc', columns: [
+    { key: 'severity', label: '级别', width: '76px', render: r => App.sevBadge(r.severity), sortVal: r => App.SEV[r.severity].rank },
+    { key: 'name', label: '规则', render: r => `<div class="primary-text">${esc(r.name)}</div><code style="font-size:11px;background:transparent;padding:0;color:var(--text-3)">${esc(r.expr)}</code>` },
+    { key: 'template', label: '模板', render: r => `<span class="small">${esc(r.template)}</span>` },
+    { key: 'duration', label: '持续', render: r => `<span class="small">${r.duration}</span>` },
+    { key: 'hysteresis', label: '恢复滞回', render: r => `<span class="small">${r.hysteresis}</span>` },
+    { key: 'depends', label: '依赖 / 抖动', render: r => (r.depends ? `<span class="tag">依赖 ${r.depends}</span>` : '') + (r.flap ? ` <span class="tag">抖动控制</span>` : '') || '<span class="faint">—</span>', sortable: false },
+    { key: 'overrides', label: '租户覆盖', num: true, render: r => r.overrides ? `<span class="badge primary">${r.overrides}</span>` : '<span class="faint">—</span>' },
+    { key: 'enabled', label: '启用', sortable: false, render: r => canOps ? `<button class="switch ${r.enabled ? 'on' : ''}" onclick="this.classList.toggle('on');App.toast('已' + (this.classList.contains('on') ? '启用' : '禁用') + '（记录审计，分批发布）','info',1500)"></button>` : (r.enabled ? App.badge('ok', '启用') : App.badge('neutral', '禁用')) }
+  ] });
+  const rf = { q: '', sev: 'all' }; const rr = () => rt.update(DATA.triggerRules.filter(r => (rf.sev === 'all' || r.severity === rf.sev) && (!rf.q || (r.name + r.template + r.expr).toLowerCase().includes(rf.q))));
+  document.getElementById('rq').oninput = e => { rf.q = e.target.value.toLowerCase(); rr(); }; document.getElementById('rSev').onchange = e => { rf.sev = e.target.value; rr(); };
+  App.table('#mwTbl', { rows: mws, paginate: false, sortKey: 'start', columns: [
+    { key: 'name', label: '维护窗口', render: r => `<div class="primary-text">${esc(r.name)}</div><span class="sub-text">${r.targets.map(t => `<span class="tag">${esc(t)}</span>`).join(' ')}${ctx.tenant.id === 'all' ? ' · ' + App.tenantName(r.tenant) : ''}</span>` },
+    { key: 'start', label: '时间', render: r => `<span class="small">${fmt.dt(r.start)} → ${fmt.hm(r.end)}</span><span class="sub-text">${fmt.dur((r.end - r.start) / 1000)}</span>` },
+    { key: 'status', label: '状态', render: r => r.status === 'active' ? App.badge('maint', '进行中', true) : r.status === 'scheduled' ? App.badge('neutral', '已计划') : App.badge('unknown', '已结束'), sortVal: r => ({ active: 0, scheduled: 1, done: 2 })[r.status] },
+    { key: 'mode', label: '模式', render: r => `<span class="small">${r.mode}</span>` },
+    { key: 'slaExcluded', label: 'SLA 排除', render: r => r.slaExcluded ? App.badge('ok', '已批准') : `${App.badge('warn', '未申请')}${r.note ? `<span class="sub-text">${esc(r.note)}</span>` : ''}` },
+    { key: 'by', label: '创建人', render: r => `<span class="small">${r.by}</span>` },
+    { key: 'act', label: '', sortable: false, render: r => canOps && r.status !== 'done' ? `<span class="actions"><button class="btn xs" onclick="App.toast('已延长 1 小时','info')">延长</button> <button class="btn xs danger" onclick="App.toast('维护窗口已提前结束','warn')">结束</button></span>` : '' }
+  ] });
+  const t7 = DATA.ts(61, { hours: 168, points: 7, base: 1300, amp: 200, noise: 250, min: 800, int: true }); const cats = t7.x.map(x => fmt.date(x).slice(5));
+  Charts.bar(document.getElementById('noiseChart'), { height: 220, categories: cats, series: [{ name: '原始', data: t7.y, color: '#cbd5e1' }, { name: '归并后', data: t7.y.map(v => Math.round(v * .32)), color: '#93c5fd' }, { name: '最终通知', data: t7.y.map(v => Math.round(v * .145)), color: '#2563eb' }] });
+  const tabs = App.tabs(root, 't'); if (App.qs('tab')) tabs.activate(App.qs('tab'));
+  const nm = document.getElementById('newMw'); if (nm) nm.onclick = () => App.modal({ title: '新建维护窗口', body: `<div class="form-grid"><div class="field full"><label>名称</label><input class="input" placeholder="变更单号 · 说明"></div><div class="field full"><label>目标</label><input class="input" placeholder="资产 / 主机组 / 标签（仅本租户对象）"></div><div class="field"><label>开始</label><input class="input" type="datetime-local"></div><div class="field"><label>时长</label><select class="select"><option>1 小时</option><option>2 小时</option><option>4 小时</option></select></div><div class="field"><label>模式</label><select class="select"><option>采集继续 · 抑制通知</option><option>暂停采集</option></select></div><div class="field"><label>SLA 排除</label><select class="select"><option>申请排除（需服务经理确认）</option><option>不排除</option></select></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('维护窗口已创建','ok');App.closeLayer()">创建</button>` });
+  const nr = document.getElementById('newRule'); if (nr) nr.onclick = () => App.modal({ title: '阈值覆盖申请', body: `<div class="callout info mb">${icon('info')}<div>租户差异通过受控宏表达，不直接修改共享模板；覆盖需平台审核并跑双租户回归。</div></div><div class="form-grid"><div class="field"><label>模板</label><select class="select">${DATA.templates.filter(t => t.macros.length).map(t => `<option>${esc(t.name)}</option>`).join('')}</select></div><div class="field"><label>宏</label><select class="select"><option>{$CPU.UTIL.CRIT}</option><option>{$VFS.FS.PUSED.MAX.WARN}</option><option>{$MEMORY.AVAILABLE.MIN}</option></select></div><div class="field"><label>新值</label><input class="input" value="80"></div><div class="field"><label>作用范围</label><select class="select"><option>本租户全部主机</option><option>指定主机组</option><option>指定资产</option></select></div><div class="field full"><label>理由</label><textarea class="input"></textarea></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('已提交覆盖申请，等待平台审核','ok');App.closeLayer()">提交</button>` });
+});
+</script>
+</body>
+</html>

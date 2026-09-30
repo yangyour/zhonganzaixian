@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SLA 报表 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('sla', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const svcs = DATA.slaServices.filter(App.inScope); const measured = svcs.filter(s => s.availability != null);
+  const avg = measured.length ? measured.reduce((s, x) => s + x.availability, 0) / measured.length : null;
+  const unavail = measured.reduce((s, x) => s + x.unavailSec, 0), excluded = measured.reduce((s, x) => s + x.excludedSec, 0), unknown = measured.reduce((s, x) => s + x.unknownSec, 0);
+  const mttas = measured.filter(s => s.mtta).map(s => s.mtta).sort((a, b) => a - b), mttrs = measured.filter(s => s.mttr).map(s => s.mttr).sort((a, b) => a - b);
+  const p = (arr, q) => arr.length ? arr[Math.min(arr.length - 1, Math.floor(arr.length * q))] : null;
+  const target = ctx.tenant.id === 'all' ? 99.9 : ctx.tenant.slaTarget;
+  const period = App.qs('period', '2026-08');
+  root.innerHTML = `
+  <div class="page-head"><div><h1>SLA 报表 <span class="badge primary">${esc(ctx.tenant.name)}</span></h1><div class="sub">可用率 = 1 − 不可用时间并集 / 有效服务时间；有效服务时间 = 约定服务时段 − 经批准排除的时间区间。无数据区间单列为「未知」，不默认视为可用。</div></div>
+    <div class="page-actions"><select class="select sm" id="period" style="width:150px">${['2026-09（至今）', '2026-08', '2026-07', '2026-06'].map((m, i) => `<option value="${m.slice(0, 7)}" ${m.startsWith(period) ? 'selected' : ''}>${m}</option>`).join('')}</select><button class="btn" id="snapshot">${icon('history')} 生成月报快照</button><button class="btn" id="exportPdf">${icon('download')} 导出 PDF</button><button class="btn" id="exportCsv">${icon('download')} CSV</button></div></div>
+  <div class="callout neutral mb">${icon('info')}<div>报表口径 <b>v2.1</b> · 时区 Asia/Shanghai · 服务时段 7×24 · 合同版本 ${ctx.tenant.id === 'all' ? '按租户' : esc(ctx.tenant.plan) + ' · ' + esc(ctx.tenant.tier)} · 数据快照 ${fmt.dt(DATA.now - 35 * DATA.MIN)}（重叠故障取并集，跨月事件裁剪到报表周期）</div></div>
+  <div class="grid g6 mb">
+    ${App.kpi({ label: '服务可用率（均值）', value: avg != null ? fmt.pct(avg, 3) : '未知', sub: `目标 ${fmt.pct(target, 2)} · ${svcs.filter(s => s.status === 'breach').length} 项未达标`, cls: svcs.some(s => s.status === 'breach') ? 'warn' : 'ok' })}
+    ${App.kpi({ label: '不可用时间并集', value: fmt.dur(unavail), sub: `排除维护 ${fmt.dur(excluded)}` })}
+    ${App.kpi({ label: 'MTTA P50 / P95', value: mttas.length ? fmt.dur(p(mttas, .5)) : '—', sub: `P95 ${mttas.length ? fmt.dur(p(mttas, .95)) : '—'} · 样本 ${measured.reduce((s, x) => s + x.events, 0)}`, help: 'MTTA = 首次有效人工确认时间 − 问题发生时间' })}
+    ${App.kpi({ label: 'MTTR P50 / P95', value: mttrs.length ? fmt.dur(p(mttrs, .5)) : '—', sub: `P95 ${mttrs.length ? fmt.dur(p(mttrs, .95)) : '—'}`, help: 'MTTR（本报告口径）= 监控恢复时间 − 问题发生时间；工单解决时长单独统计' })}
+    ${App.kpi({ label: '未恢复事件', value: measured.reduce((s, x) => s + x.unresolved, 0), sub: '截至快照时间仍为 PROBLEM', cls: measured.reduce((s, x) => s + x.unresolved, 0) ? 'warn' : '' })}
+    ${App.kpi({ label: '未知区间', value: fmt.dur(unknown), sub: unknown ? '数据缺失（Proxy 离线）· 单列' : '无', cls: unknown ? 'warn' : '' })}
+  </div>
+  <div class="grid g-2-1 mb" style="align-items:start">
+    <div class="card"><div class="card-head"><h3>服务树 <span class="sub">${svcs.length} 个服务</span></h3><span class="xs muted">点击查看事件区间与计算明细</span></div><div id="svcTbl"></div></div>
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>每日可用率 <span class="sub">本周期</span></h3></div><div class="card-body" id="dailyChart"></div></div>
+      <div class="card"><div class="card-head"><h3>口径说明</h3></div><div class="card-body"><div class="code" style="font-size:11.5px">可用率 = 1 - 不可用时间并集 / 有效服务时间
+有效服务时间 = 约定服务时段 - 经批准排除的时间区间
+MTTA = 首次有效人工确认时间 - 问题发生时间
+MTTR = 监控恢复时间 - 问题发生时间
+<span class="c">工单解决时长单独统计；无数据区间单列，不默认视为可用</span></div><div class="xs muted mt8">小时趋势用于容量展示，事件时间线用于可用性核算，不能用小时均值推断短时故障。同时报告均值、P95、样本量与未恢复数量。</div></div></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-head"><h3>故障时间线 <span class="sub">本周期 · 按服务 · 含维护排除与未知区间</span></h3><div class="legend"><span><i style="background:var(--sev-disaster)"></i>灾难</span><span><i style="background:var(--sev-high)"></i>严重</span><span><i style="background:var(--sev-average)"></i>一般</span><span><i style="background:var(--sev-warning)"></i>警告</span><span><i style="background:var(--maint);opacity:.6"></i>维护排除</span><span><i style="background:repeating-linear-gradient(45deg,#cbd5e1,#cbd5e1 3px,#e2e8f0 3px,#e2e8f0 6px)"></i>未知</span></div></div><div class="card-body" id="gantt"></div></div>`;
+  App.table('#svcTbl', { rows: svcs, paginate: false, sortKey: 'status', onRow: openSvc, columns: [
+    { key: 'name', label: '服务', render: r => `<div class="primary-text">${esc(r.name)}</div><span class="sub-text">${r.assets.length} 资产${ctx.tenant.id === 'all' ? ' · ' + App.tenantName(r.tenant) : ''}</span>` },
+    { key: 'target', label: '目标', num: true, render: r => fmt.pct(r.target, 2) },
+    { key: 'availability', label: '可用率', num: true, render: r => r.availability == null ? App.badge('unknown', '未知') : `<b class="${r.status === 'breach' ? 'delta bad' : ''}">${fmt.pct(r.availability, 3)}</b>`, sortVal: r => r.availability ?? -1 },
+    { key: 'unavailSec', label: '不可用并集', num: true, render: r => r.availability == null ? '—' : fmt.dur(r.unavailSec) },
+    { key: 'excludedSec', label: '排除', num: true, render: r => r.excludedSec ? fmt.dur(r.excludedSec) : '<span class="faint">—</span>' },
+    { key: 'unknownSec', label: '未知', num: true, render: r => r.unknownSec ? `<span class="delta bad">${fmt.dur(r.unknownSec)}</span>` : '<span class="faint">—</span>' },
+    { key: 'events', label: '事件', num: true }, { key: 'mtta', label: 'MTTA', num: true, render: r => r.mtta ? fmt.dur(r.mtta) : '—' }, { key: 'mttr', label: 'MTTR', num: true, render: r => r.mttr ? fmt.dur(r.mttr) : '—' },
+    { key: 'unresolved', label: '未恢复', num: true, render: r => r.unresolved ? `<span class="delta bad">${r.unresolved}</span>` : '0' },
+    { key: 'status', label: '状态', render: r => r.status === 'ok' ? App.badge('ok', '达标') : r.status === 'breach' ? App.badge('danger', '未达标') : App.badge('unknown', '样本不足'), sortVal: r => ({ breach: 0, unknown: 1, ok: 2 })[r.status] }
+  ] });
+  const days = 30; const cats = Array.from({ length: days }, (_, i) => String(i + 1)); const dr = DATA.rng(88);
+  const daily = cats.map((_, i) => { const dip = [3, 11, 19, 27].includes(i) ? 0.3 + dr() * .5 : dr() * .04; return +(100 - dip).toFixed(3); });
+  Charts.bar(document.getElementById('dailyChart'), { height: 200, categories: cats, series: [{ name: '可用率 %', data: daily.map(v => v - 99), colors: daily.map(v => v < 99.9 ? '#dc2626' : '#16a34a') }], yFormat: v => (99 + v).toFixed(2) + '%', yMax: 1, thresholds: [{ value: target - 99, label: `目标 ${target}%`, color: '#f59e0b' }], unit: '', barRatio: .7, legend: false });
+  const g = document.getElementById('gantt'); const T0 = DATA.now - 30 * DATA.D; const span = 30 * DATA.D;
+  g.innerHTML = svcs.map(s => { const r = DATA.rng(s.id.length * 3 + s.events); const bars = Array.from({ length: s.events }, (_, k) => { const st = r() * .95; const w = Math.max(.25, (s.unavailSec / Math.max(1, s.events)) / span * 100 * 8); const sev = ['disaster', 'high', 'average', 'warning'][Math.floor(r() * 4)]; return `<i class="${sev}" style="left:${st * 100}%;width:${w}%" title="${esc(s.name)} · ${App.sevName(sev)} · 持续 ${fmt.dur(s.unavailSec / Math.max(1, s.events))}"></i>`; }).join(''); const maint = s.excludedSec ? `<i class="maint" style="left:${62 + (s.id.length % 5) * 4}%;width:${Math.max(.6, s.excludedSec / span * 100 * 8)}%" title="维护窗口 · 已排除 ${fmt.dur(s.excludedSec)}"></i>` : ''; const unk = s.unknownSec ? `<i class="unknown" style="left:97%;width:2.5%" title="数据缺失 · 未知 ${fmt.dur(s.unknownSec)}"></i>` : ''; return `<div class="row" style="gap:12px;margin-bottom:8px"><span class="small ellipsis" style="width:150px;color:var(--text-2)">${esc(s.name)}${ctx.tenant.id === 'all' ? `<span class="xs faint"> · ${App.tenantName(s.tenant).slice(0, 2)}</span>` : ''}</span><div class="gantt grow">${bars}${maint}${unk}</div><span class="xs num right" style="width:70px;color:${s.status === 'breach' ? 'var(--danger)' : 'var(--text-2)'}">${s.availability != null ? fmt.pct(s.availability, 2) : '未知'}</span></div>`; }).join('') + `<div class="row" style="gap:12px"><span style="width:150px"></span><div class="axis grow"><span>${fmt.date(T0)}</span><span>${fmt.date(T0 + 10 * DATA.D)}</span><span>${fmt.date(T0 + 20 * DATA.D)}</span><span>${fmt.date(DATA.now)}</span></div><span style="width:70px"></span></div>`;
+  function openSvc(s) {
+    const incs = DATA.incidents.filter(i => i.service === s.name && i.tenant === s.tenant);
+    App.drawer({ title: s.name, sub: `${App.tenantName(s.tenant)} · 目标 ${s.target}% · ${s.assets.length} 资产`, width: 680, body: `<div class="kv-cards mb" style="grid-template-columns:repeat(4,1fr)"><div class="kv-card"><div class="l">可用率</div><div class="v ${s.status === 'breach' ? 'delta bad' : ''}">${s.availability != null ? fmt.pct(s.availability, 3) : '未知'}</div></div><div class="kv-card"><div class="l">不可用并集</div><div class="v">${fmt.dur(s.unavailSec)}</div></div><div class="kv-card"><div class="l">排除 / 未知</div><div class="v">${fmt.dur(s.excludedSec)} / ${fmt.dur(s.unknownSec)}</div></div><div class="kv-card"><div class="l">MTTA / MTTR</div><div class="v small">${s.mtta ? fmt.dur(s.mtta) : '—'} / ${s.mttr ? fmt.dur(s.mttr) : '—'}</div></div></div>${s.note ? `<div class="callout neutral mb">${icon('info')}<div>${esc(s.note)}</div></div>` : ''}<h3 style="font-size:13px;margin-bottom:8px">计算明细</h3><div class="code" style="font-size:11.5px">有效服务时间 = 30d × 86,400 − ${fmt.n(s.excludedSec)} s（维护排除）= ${fmt.n(30 * 86400 - s.excludedSec)} s
+不可用并集   = ${fmt.n(s.unavailSec)} s（${s.events} 个事件，重叠区间取并集）
+未知区间     = ${fmt.n(s.unknownSec)} s（单列，不计入可用）
+可用率       = 1 − ${fmt.n(s.unavailSec)} / ${fmt.n(30 * 86400 - s.excludedSec)} = ${s.availability != null ? fmt.pct(s.availability, 3) : '未知'}</div><h3 style="font-size:13px;margin:16px 0 8px">服务资产</h3><div class="tags mb">${s.assets.map(a => { const x = DATA.assetByName(a); return x ? `<a class="tag" href="asset-detail.html?id=${x.id}">${esc(a)}</a>` : `<span class="tag">${esc(a)}</span>`; }).join('')}</div><h3 style="font-size:13px;margin:16px 0 8px">计入事件（示例）</h3>${incs.length ? `<table class="table dense">${incs.map(i => `<tr><td>${App.sevBadge(i.severity)}</td><td><a href="incident-detail.html?id=${i.id}" class="small">${esc(i.name)}</a></td><td class="small muted nowrap">${fmt.time(i.sourceTime)}</td><td class="small nowrap">${i.recoveredAt ? fmt.dur((i.recoveredAt - i.sourceTime) / 1000) : '<span class="delta bad">未恢复</span>'}</td><td class="xs muted">${i.maintenance ? '维护排除' : i.suppressed ? '未知区间' : '计入'}</td></tr>`).join('')}</table>` : '<div class="muted small">本周期无事件</div>'}`, foot: `<button class="btn" onclick="App.toast('已导出服务级明细（含口径版本与数据快照）','info')">${icon('download')} 导出明细</button><button class="btn primary" data-close>关闭</button>` });
+  }
+  if (App.qs('svc')) { const s = svcs.find(x => x.id === App.qs('svc')); if (s) openSvc(s); }
+  document.getElementById('period').onchange = e => { App.toast(`已切换报表周期 ${e.target.value}（历史月份为冻结快照）`, 'info'); };
+  document.getElementById('snapshot').onclick = () => App.confirm({ title: '生成月报快照', text: '快照将冻结本周期的口径版本、数据与计算结果，用于合同对账；生成后不可修改。' }).then(ok => ok && App.toast('快照 sla-2026-09-draft 已生成（口径 v2.1）', 'ok'));
+  document.getElementById('exportPdf').onclick = () => App.toast('PDF 生成中，完成后通过短时签名地址下发', 'info');
+  document.getElementById('exportCsv').onclick = () => App.toast('CSV 已导出（含每个事件区间与排除记录）', 'info');
+});
+</script>
+</body>
+</html>

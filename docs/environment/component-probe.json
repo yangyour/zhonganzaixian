@@ -1,0 +1,113 @@
+{
+  "shared-postgres": {
+    "status": "found",
+    "environment_keys": [
+      "BACKUPROOT",
+      "LANG",
+      "LC_ALL",
+      "PAGER",
+      "PATH",
+      "PGBACKREST_CONFIG",
+      "PGBACKREST_STANZA",
+      "PGDATA",
+      "PGLOG",
+      "PGROOT",
+      "PGSOCKET",
+      "POSTGRES_DB",
+      "POSTGRES_PASSWORD",
+      "POSTGRES_USER",
+      "TZ"
+    ]
+  },
+  "shared-redis": {
+    "status": "found",
+    "environment_keys": [
+      "PATH",
+      "REDIS_VERSION"
+    ]
+  },
+  "zhsx-rabbitmq": {
+    "status": "found",
+    "environment_keys": [
+      "ERLANG_INSTALL_PATH_PREFIX",
+      "HOME",
+      "LANG",
+      "LANGUAGE",
+      "LC_ALL",
+      "OPENSSL_INSTALL_PATH_PREFIX",
+      "PATH",
+      "RABBITMQ_CONFIG_FILE",
+      "RABBITMQ_DATA_DIR",
+      "RABBITMQ_DEFAULT_PASS",
+      "RABBITMQ_DEFAULT_USER",
+      "RABBITMQ_DEFAULT_VHOST",
+      "RABBITMQ_HOME",
+      "RABBITMQ_PGP_KEY_ID",
+      "RABBITMQ_VERSION",
+      "RUNNING_UNDER_SYSTEMD"
+    ]
+  },
+  "hltk-keycloak": {
+    "status": "found",
+    "environment_keys": [
+      "KC_BOOTSTRAP_ADMIN_PASSWORD",
+      "KC_BOOTSTRAP_ADMIN_USERNAME",
+      "KC_DB",
+      "KC_DB_PASSWORD",
+      "KC_DB_URL",
+      "KC_DB_USERNAME",
+      "KC_HEALTH_ENABLED",
+      "KC_HOSTNAME_STRICT",
+      "KC_HTTP_ENABLED",
+      "KC_RUN_IN_CONTAINER",
+      "LANG",
+      "PATH"
+    ]
+  },
+  "shared-minio": {
+    "status": "found",
+    "environment_keys": [
+      "MC_CONFIG_DIR",
+      "MINIO_ACCESS_KEY_FILE",
+      "MINIO_CONFIG_ENV_FILE",
+      "MINIO_KMS_SECRET_KEY_FILE",
+      "MINIO_ROOT_PASSWORD",
+      "MINIO_ROOT_PASSWORD_FILE",
+      "MINIO_ROOT_USER",
+      "MINIO_ROOT_USER_FILE",
+      "MINIO_SECRET_KEY_FILE",
+      "MINIO_UPDATE_MINISIGN_PUBKEY",
+      "PATH"
+    ]
+  },
+  "postgres_version": {
+    "exit_code": 0,
+    "stdout": "PostgreSQL 17.9 (Ubuntu 17.9-1.pgdg22.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0, 64-bit\n",
+    "stderr": ""
+  },
+  "postgres_databases": {
+    "exit_code": 0,
+    "stdout": "postgres\nzhsl\ninternalai\npresenton\nlobechat\ngeopilot\nhltk\nkeycloak\nsub2api\nzhsx\nzhsx_test\naikk_test\naikk\nprint_ops\nyinjuxiangli\nyjl_recording_stage_20260912\n",
+    "stderr": ""
+  },
+  "redis_version": {
+    "exit_code": 0,
+    "stdout": "Redis server v=7.4.9 sha=00000000:0 malloc=jemalloc-5.3.0 bits=64 build=b4acab9aea09546d\n",
+    "stderr": ""
+  },
+  "rabbitmq_version": {
+    "exit_code": 0,
+    "stdout": "4.3.2\n",
+    "stderr": ""
+  },
+  "keycloak_discovery": {
+    "exit_code": 0,
+    "stdout": "{\"issuer\":\"http://127.0.0.1:12110/realms/master\",\"authorization_endpoint\":\"http://127.0.0.1:12110/realms/master/protocol/openid-connect/auth\",\"token_endpoint\":\"http://127.0.0.1:12110/realms/master/protocol/openid-connect/token\",\"introspection_endpoint\":\"http://127.0.0.1:12110/realms/master/protocol/openid-connect/token/introspect\",\"userinfo_endpoint\":\"http://127.0.0.1:12110/realms/master/protocol/openid-connect/userinfo\",\"end_session_endpoint\":\"http://127.0.0.1:12110/realms/master/protocol/openid-connect/logout\",\"frontchannel_logout_session_supported\":true,\"frontchannel_logout_supported\":true,\"jwks_uri\":\"http://127.0.0.1:12110/realms/master/protocol/openid-connect/certs\",\"check_session_iframe\":\"http://127.0.0.1:12110/realms/master/protocol/openid-connect/login-status-iframe.html\",\"grant_types_supported\":[\"authorization_code\",\"client_credentials\",\"implicit\",\"password\",\"refresh_token\",\"urn:ietf:params:oauth:grant-type:device_code\",\"urn:ietf:params:oauth:grant-type:token-exchange\",\"urn:ietf:params:oauth:grant-type:uma-ticket\",\"urn:openid:params:grant-type:ciba\"],\"acr_values_supported\":[\"0\",\"1\"],\"response_types_supported\":[\"code\",\"none\",\"id_token\",\"token\",\"id_token token\",\"code id_token\",\"code token\",\"code id_token token\"],\"subject_types_supported\":[\"public\",\"pairwise\"],\"prompt_values_supported\":[\"none\",\"login\",\"consent\"],\"id_token_signing_alg_values_supported\":[\"PS384\",\"RS384\",\"EdDSA\",\"ES384\",\"HS256\",\"HS512\",\"ES256\",\"RS256\",\"HS384\",\"ES512\",\"PS256\",\"PS512\",\"RS512\"],\"id_token_encryption_alg_values_supported\":[\"ECDH-ES+A256KW\",\"ECDH-ES+A192KW\",\"ECDH-ES+A128KW\",\"RSA-OAEP\",\"RSA-OAEP-256\",\"RSA1_5\",\"ECDH-ES\"],\"id_token_encryption_enc_values_supported\":[\"A256GCM\",\"A192GCM\",\"A128GCM\",\"A128CBC-HS256\",\"A192CBC-HS384\",\"A256CBC-HS512\"],\"userinfo_signing_alg_values_supported\":[\"PS384\",\"RS384\",\"EdDSA\",\"ES384\",\"HS256\",\"HS512\",\"ES256\",\"RS256\",\"HS384\",\"ES512\",\"PS256\",\"PS512\",\"RS512\",\"none\"],\"userinfo_encryption_alg_values_supported\":[\"ECDH-ES+A256KW\",\"ECDH-ES+A192KW\",\"ECDH-ES+A128KW\",\"RSA-OAEP\",\"RSA-OAEP-256\",\"RSA1_5\",\"ECDH-ES\"],\"userinfo_encryption_enc_values_supported\":[\"A256GCM\",\"A192GCM\",\"A128GCM\",\"A128CBC-HS256\",\"A192CBC-HS384\",\"A256CBC-HS512\"],\"request_object_signing_alg_values_supported\":[\"PS384\",\"RS384\",\"EdDSA\",\"ES384\",\"HS256\",\"HS512\",\"ES256\",\"RS256\",\"HS384\",\"ES512\",\"PS256\",\"PS512\",\"RS512\",\"none\"],\"request_object_encryption_alg_values_supported\":[\"ECDH-ES+A256KW\",\"ECDH-ES+A192KW\",\"ECDH-ES+A128KW\",\"RSA-OAEP\",\"RSA-OAEP-256\",\"RSA1_5\",\"ECDH-ES\"],\"request_object_encryption_enc_values_supported\":[\"A256GCM\",\"A192GCM\",\"A128GCM\",\"A128CBC-HS256\",\"A192CBC-HS384\",\"A256CBC-HS512\"],\"response_modes_supported\":[\"query\",\"fragment\",\"form_post\",\"query.jwt\",\"fragment.jwt\",\"form_post.jwt\",\"jwt\"],\"registration_endpoint\":\"http://127.0.0.1:12110/realms/master/clients-registrations/openid-connect\",\"token_endpoint_auth_methods_supported\":[\"private_key_jwt\",\"client_secret_basic\",\"client_secret_post\",\"tls_client_auth\",\"client_secret_jwt\"],\"token_endpoint_auth_signing_alg_values_supported\":[\"PS384\",\"RS384\",\"EdDSA\",\"ES384\",\"HS256\",\"HS512\",\"ES256\",\"RS256\",\"HS384\",\"ES512\",\"PS256\",\"PS512\",\"RS512\"],\"introspection_endpoint_auth_methods_supported\":[\"private_key_jwt\",\"client_secret_basic\",\"client_secret_post\",\"tls_client_auth\",\"client_secret_jwt\"],\"introspection_endpoint_auth_signing_alg_values_supported\":[\"PS384\",\"RS384\",\"EdDSA\",\"ES384\",\"HS256\",\"HS512\",\"ES256\",\"RS256\",\"HS384\",\"ES512\",\"PS256\",\"PS512\",\"RS512\"],\"authorization_signing_alg_values_supported\":[\"PS384\",\"RS384\",\"EdDSA\",\"ES384\",\"HS256\",\"HS512\",\"ES256\",\"RS256\",\"HS384\",\"ES512\",\"PS256\",\"PS512\",\"RS512\"],\"authorization_encryption_alg_values_supported\":[\"ECDH-ES+A256KW\",\"ECDH-ES+A192KW\",\"ECDH-ES+A128KW\",\"RSA-OAEP\",\"RSA-OAEP-256\",\"RSA1_5\",\"ECDH-ES\"],\"authorization_encryption_enc_values_supported\":[\"A256GCM\",\"A192GCM\",\"A128GCM\",\"A128CBC-HS256\",\"A192CBC-HS384\",\"A256CBC-HS512\"],\"claims_supported\":[\"aud\",\"sub\",\"iss\",\"auth_time\",\"name\",\"given_name\",\"family_name\",\"preferred_username\",\"email\",\"acr\"],\"claim_types_supported\":[\"normal\"],\"claims_parameter_supported\":true,\"scopes_supported\":[\"openid\",\"email\",\"address\",\"profile\",\"microprofile-jwt\",\"service_account\",\"basic\",\"phone\",\"organization\",\"roles\",\"web-origins\",\"offline_access\",\"acr\"],\"request_parameter_supported\":true,\"request_uri_parameter_supported\":true,\"require_request_uri_registration\":true,\"code_challenge_methods_supported\":[\"plain\",\"S256\"],\"tls_client_certificate_bound_access_tokens\":true,\"revocation_endpoint\":\"http://127.0.0.1:12110/realms/master/protocol/openid-connect/revoke\",\"revocation_endpoint_auth_methods_supported\":[\"private_key_jwt\",\"client_secret_basic\",\"client_secret_post\",\"tls_client_auth\",\"client_secret_jwt\"],\"revocation_endpoint_auth_signing_alg_values_supported\":[\"PS384\",\"RS384\",\"EdDSA\",\"ES384\",\"HS256\",\"HS512\",\"ES256\",\"RS256\",\"HS384\",\"ES512\",\"PS256\",\"PS512\",\"RS512\"],\"backchannel_logout_supported\":true,\"backchannel_logout_session_supported\":true,\"device_authorization_endpoint\":\"http://127.0.0.1:12110/realms/master/protocol/openid-connect/au",
+    "stderr": ""
+  },
+  "minio_version": {
+    "exit_code": 0,
+    "stdout": "minio version RELEASE.2025-09-07T16-13-09Z (commit-id=07c3a429bfed433e49018cb0f78a52145d4bedeb)\nRuntime: go1.24.6 linux/amd64\nLicense: GNU AGPLv3 - https://www.gnu.org/licenses/agpl-3.0.html\nCopyright: 2015-2025 MinIO, Inc.\n",
+    "stderr": ""
+  }
+}

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>站点与 Proxy · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('proxies', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const sites = DATA.sites.filter(App.inScope); const px = DATA.proxies.filter(App.inScope);
+  const stat = (p) => p.status === 'ok' ? App.badge('ok', '正常', true) : p.status === 'warn' ? App.badge('warn', '告警', true) : p.status === 'danger' ? App.badge('danger', '失联', true) : App.badge('unknown', '待部署', true);
+  const canOps = App.can('tadmin', 'msp', 'padmin');
+  root.innerHTML = `
+  <div class="page-head"><div><h1>站点与 Proxy <span class="badge primary">${esc(ctx.tenant.name)}</span></h1><div class="sub">客户侧 Proxy / Proxy Group 按客户、站点及网络可达范围部署；主动模式经 TLS 连接监控端点。Proxy Group 按主机重分配实现采集故障转移，不消除单 Server 瓶颈，且不支持 SNMP Trap。</div></div>
+    <div class="page-actions"><button class="btn" id="bufferCalc">${icon('calculator')} 缓冲容量测算</button>${canOps ? `<button class="btn primary" id="addProxy">${icon('plus')} 注册 Proxy</button>` : ''}</div></div>
+  <div class="grid g6 mb">
+    ${App.kpi({ label: '站点', value: sites.length, sub: `${[...new Set(sites.filter(s => s.group).map(s => s.group))].length} 个 Proxy Group` })}
+    ${App.kpi({ label: 'Proxy', value: px.length, sub: `${px.filter(p => p.status === 'ok').length} 正常 · ${px.filter(p => p.status === 'warn').length} 告警 · ${px.filter(p => p.status === 'danger').length} 失联`, cls: px.some(p => p.status === 'danger') ? 'danger' : '' })}
+    ${App.kpi({ label: '采集主机', value: fmt.n(px.reduce((s, p) => s + p.hosts, 0)), sub: `≈ ${fmt.n(px.reduce((s, p) => s + p.nvps, 0))} NVPS` })}
+    ${App.kpi({ label: '平均延迟', value: Math.round(px.filter(p => p.latency).reduce((s, p) => s + p.latency, 0) / Math.max(1, px.filter(p => p.latency).length)), unit: 'ms', sub: 'Proxy ↔ Server 往返' })}
+    ${App.kpi({ label: '队列积压', value: px.reduce((s, p) => s + (p.queue || 0), 0), sub: '> 10 s 待上送值', cls: px.reduce((s, p) => s + (p.queue || 0), 0) > 20 ? 'warn' : '' })}
+    ${App.kpi({ label: '版本不兼容', value: px.filter(p => p.compat !== 'ok').length, sub: 'Proxy / Server 组合需验证', cls: px.some(p => p.compat !== 'ok') ? 'warn' : '' })}
+  </div>
+  ${px.some(p => p.status === 'danger') ? `<div class="callout danger mb">${icon('alert-triangle')}<div><b>px-store-01（星辰零售 · 门店专线）与 Server 失联 14 分钟</b> · 本地缓冲已用 1,460 / 2,048 MB（按当前 NVPS 还可缓冲约 4.1 小时）· 下游 86 台主机进入「未知」并已触发依赖抑制。<a href="incident-detail.html?id=inc-1011">查看事件</a></div></div>` : ''}
+  <div class="grid g-2-1 mb" style="align-items:start">
+    <div class="card"><div class="card-head"><h3>Proxy 列表</h3><div class="tools"><span class="xs muted">主动模式 · TLS · 按站点密钥隔离</span></div></div><div id="pxTable"></div></div>
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>延迟 · 24h <span class="sub">ms</span></h3></div><div class="card-body" id="latChart"></div></div>
+      <div class="card"><div class="card-head"><h3>本地缓冲使用</h3></div><div class="card-body" id="bufBars"></div></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-head"><h3>站点</h3></div><div id="siteTable"></div></div>`;
+  App.table('#pxTable', { rows: px, paginate: false, sortKey: 'status', onRow: r => openProxy(r), columns: [
+    { key: 'id', label: 'Proxy', render: r => `<div class="primary-text mono">${r.id}</div><span class="sub-text">${esc(r.site)}${ctx.tenant.id === 'all' ? ' · ' + App.tenantName(r.tenant) : ''}${r.group ? ` · <span class="tag">${r.group}</span>` : ''}</span>` },
+    { key: 'status', label: '状态', render: r => stat(r) + (r.note ? `<span class="sub-text" style="max-width:200px">${esc(r.note)}</span>` : ''), sortVal: r => ({ danger: 0, warn: 1, pending: 2, ok: 3 })[r.status] },
+    { key: 'version', label: '版本', render: r => `<span class="mono small">${r.version}</span> ${r.compat !== 'ok' ? App.badge('warn', '不兼容') : ''}` },
+    { key: 'latency', label: '延迟', num: true, render: r => r.latency == null ? '<span class="faint">—</span>' : `<span class="num ${r.latency > 150 ? 'delta bad' : ''}">${r.latency} ms</span>`, sortVal: r => r.latency ?? 9999 },
+    { key: 'queue', label: '队列', num: true, render: r => r.queue == null ? '<span class="faint">—</span>' : `<span class="num ${r.queue > 20 ? 'delta bad' : ''}">${r.queue}</span>`, sortVal: r => r.queue ?? 9999 },
+    { key: 'hosts', label: '主机 / NVPS', num: true, render: r => `${r.hosts} / ${fmt.n(r.nvps)}` },
+    { key: 'buffer', label: '缓冲', render: r => { const p = r.buffer.usedMB / r.buffer.capMB * 100; return `<div class="row" style="gap:6px"><div class="meter grow" style="min-width:60px"><i style="width:${p}%;background:${p > 75 ? 'var(--danger)' : p > 50 ? 'var(--warn)' : 'var(--primary)'}"></i></div><span class="xs num">${p.toFixed(0)}%</span></div><span class="sub-text">${r.buffer.usedMB} / ${r.buffer.capMB} MB · 可缓冲 ${r.buffer.offlineH}h</span>`; }, sortVal: r => r.buffer.usedMB / r.buffer.capMB },
+    { key: 'tls', label: 'TLS', render: r => `<span class="tag">${r.tls}</span>` },
+    { key: 'lastSeen', label: '最近上送', num: true, render: r => r.lastSeen ? `<span class="small ${DATA.now - r.lastSeen > 60e3 ? 'delta bad' : 'muted'}">${fmt.ago(r.lastSeen)}</span>` : '<span class="faint">—</span>', sortVal: r => r.lastSeen || 0 }
+  ] });
+  App.table('#siteTable', { rows: sites, paginate: false, columns: [
+    { key: 'name', label: '站点', render: r => `<div class="primary-text">${esc(r.name)}</div><span class="sub-text">${esc(r.region)}${ctx.tenant.id === 'all' ? ' · ' + App.tenantName(r.tenant) : ''}</span>` },
+    { key: 'group', label: '采集拓扑', render: r => r.group ? `${App.badge('primary', 'Proxy Group ' + r.group)} <span class="xs muted">双 Proxy 可互相接管</span>` : `${App.badge('neutral', '单 Proxy')} <span class="xs muted">可缓冲，无接管</span>` },
+    { key: 'proxies', label: 'Proxy', sortable: false, render: r => px.filter(p => p.tenant === r.tenant && p.site === r.name).map(p => `<span class="tag" title="${p.status}">${p.id}</span>`).join(' ') || '<span class="faint">待部署</span>' },
+    { key: 'hosts', label: '主机', num: true }, { key: 'nvps', label: 'NVPS', num: true, render: r => fmt.n(r.nvps) },
+    { key: 'net', label: '网络放通', sortable: false, render: r => `<span class="xs muted">出向 TCP 10051 · SNMP UDP 161/162 · ${r.name.includes('云') ? '云内 VPC 对等' : '专线 / VPN'}</span>` },
+    { key: 'act', label: '', sortable: false, render: r => `<span class="actions"><a class="btn xs" href="assets.html" data-stop>资产</a></span>` }
+  ] });
+  const lat = px.filter(p => p.latency).slice(0, 5); const x = DATA.ts(1, { hours: 24, points: 96 }).x;
+  Charts.line(document.getElementById('latChart'), { height: 200, x, series: lat.map((p, i) => ({ name: p.id, data: DATA.ts(300 + i, { hours: 24, points: 96, base: p.latency, amp: p.latency * .3, noise: p.latency * .15, min: 5, spikes: p.status === 'warn' ? [{ at: .8, h: 200, w: .08 }] : [] }).y })), unit: ' ms', smooth: true, dots: false, thresholds: [{ value: 150, label: '告警线', color: '#f59e0b' }] });
+  Charts.hbars(document.getElementById('bufBars'), { items: px.filter(p => p.buffer.capMB).sort((a, b) => b.buffer.usedMB / b.buffer.capMB - a.buffer.usedMB / a.buffer.capMB).slice(0, 7).map(p => ({ label: p.id, value: p.buffer.usedMB / p.buffer.capMB * 100, text: `${(p.buffer.usedMB / p.buffer.capMB * 100).toFixed(0)}%` })), max: 100, labelWidth: 110 });
+  function openProxy(p) { App.drawer({ title: p.id, sub: `${esc(p.site)} · ${App.tenantName(p.tenant)} · ${p.ip}`, width: 620, body: `<div class="row wrap mb" style="gap:8px">${stat(p)}<span class="badge neutral">Zabbix proxy ${p.version}</span><span class="badge neutral">${p.mode}模式</span><span class="badge neutral">TLS ${p.tls}</span>${p.group ? `<span class="badge primary">Group ${p.group}</span>` : ''}</div>${p.note ? `<div class="callout ${p.status === 'danger' ? 'danger' : 'warn'} mb">${icon('alert-triangle')}<div>${esc(p.note)}</div></div>` : ''}<div class="kv-cards mb" style="grid-template-columns:repeat(3,1fr)"><div class="kv-card"><div class="l">延迟</div><div class="v">${p.latency == null ? '—' : p.latency + ' ms'}</div></div><div class="kv-card"><div class="l">队列 (> 10s)</div><div class="v">${p.queue ?? '—'}</div></div><div class="kv-card"><div class="l">主机 / NVPS</div><div class="v">${p.hosts} / ${fmt.n(p.nvps)}</div></div><div class="kv-card"><div class="l">缓冲</div><div class="v">${p.buffer.usedMB} / ${p.buffer.capMB} MB</div></div><div class="kv-card"><div class="l">可缓冲时长</div><div class="v">${p.buffer.offlineH} h</div></div><div class="kv-card"><div class="l">最近上送</div><div class="v">${p.lastSeen ? fmt.ago(p.lastSeen) : '—'}</div></div><div class="kv-card"><div class="l">CPU / 内存 / 磁盘</div><div class="v">${p.cpu == null ? '—' : `${p.cpu}% / ${p.mem}% / ${p.disk}%`}</div></div><div class="kv-card"><div class="l">兼容矩阵</div><div class="v">${p.compat === 'ok' ? '<span class="delta good">已验证</span>' : '<span class="delta bad">未验证</span>'}</div></div><div class="kv-card"><div class="l">配置同步</div><div class="v">${p.status === 'danger' ? '—' : '12 秒前'}</div></div></div><h3 style="font-size:13px;margin-bottom:8px">队列与缓冲 · 24h</h3><div id="pxChart"></div><h3 style="font-size:13px;margin:16px 0 8px">缓冲容量测算</h3><div class="code">缓冲需求 = 站点 NVPS × 最长断网秒数 × 实测每值空间 × 余量
+= ${p.nvps} × ${Math.round(p.buffer.offlineH * 3600)} s × 80 B × 1.4 ≈ ${fmt.bytes(p.nvps * p.buffer.offlineH * 3600 * 80 * 1.4)}
+<span class="c">// Proxy Group 不代表本地待上送缓冲有同步副本；磁盘损坏后的数据损失边界需实测</span></div>`, foot: `${canOps ? `<button class="btn" onclick="App.toast('已下发配置刷新（config cache reload）','info')">${icon('refresh')} 刷新配置</button><button class="btn" onclick="App.toast('已创建升级任务并加入维护窗口','ok')">${icon('upload')} 升级版本</button>` : ''}<button class="btn primary" data-close>关闭</button>`, onOpen: (el) => { const t1 = DATA.ts(400 + p.hosts, { hours: 24, points: 96, base: p.queue || 2, amp: 4, noise: 3, min: 0, int: true, spikes: p.status === 'warn' ? [{ at: .85, h: 60, w: .1 }] : [] }); const t2 = DATA.ts(500 + p.hosts, { hours: 24, points: 96, base: p.buffer.usedMB / p.buffer.capMB * 100, amp: 5, noise: 3, min: 0, max: 100, trend: p.status === 'danger' ? 40 : 0 }); Charts.line(App.$('#pxChart', el), { height: 200, x: t1.x, series: [{ name: '队列', data: t1.y }, { name: '缓冲使用 %', data: t2.y, area: true }], smooth: true, dots: false }); } }); }
+  if (App.qs('id')) { const p = px.find(x => x.id === App.qs('id')); if (p) openProxy(p); }
+  document.getElementById('bufferCalc').onclick = () => { const m = App.modal({ title: '缓冲容量测算', body: `<div class="form-grid"><div class="field"><label>站点 NVPS</label><input class="input" id="c-nvps" type="number" value="250"></div><div class="field"><label>最长断网（小时）</label><input class="input" id="c-h" type="number" value="8"></div><div class="field"><label>每值空间（字节，实测）</label><input class="input" id="c-b" type="number" value="80"></div><div class="field"><label>余量（%）</label><input class="input" id="c-m" type="number" value="40"></div></div><div class="calc-result mt" style="background:var(--primary-50);padding:16px;border-radius:8px;display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div class="xs muted">本地缓冲磁盘需求</div><div class="strong" style="font-size:22px" id="c-out">—</div></div><div><div class="xs muted">建议 ProxyBufferMode / 磁盘</div><div class="small" id="c-tip">—</div></div></div>`, foot: `<button class="btn primary" data-close>关闭</button>`, onOpen: (el) => { const calc = () => { const v = +el.querySelector('#c-nvps').value * el.querySelector('#c-h').value * 3600 * el.querySelector('#c-b').value * (1 + el.querySelector('#c-m').value / 100); el.querySelector('#c-out').textContent = fmt.bytes(v); el.querySelector('#c-tip').textContent = `hybrid 模式 · 磁盘 ≥ ${fmt.bytes(v * 2)}（含 SQLite 开销与日志）`; }; el.querySelectorAll('input').forEach(i => i.oninput = calc); calc(); } }); };
+  const ap = document.getElementById('addProxy'); if (ap) ap.onclick = () => App.modal({ title: '注册 Proxy', body: `<div class="form-grid"><div class="field"><label>Proxy 名称</label><input class="input" value="px-sz-02"></div><div class="field"><label>站点</label><select class="select">${sites.map(s => `<option>${esc(s.name)}</option>`).join('')}</select></div><div class="field"><label>模式</label><select class="select"><option>主动（推荐，客户侧出向连接）</option><option>被动</option></select></div><div class="field"><label>加入 Proxy Group</label><select class="select"><option>不加入（单 Proxy）</option><option>pg-sh</option><option>新建 Group…</option></select></div><div class="field full"><label>TLS</label><select class="select"><option>PSK · 自动签发站点级密钥</option><option>证书 · 租户 CA</option></select></div><div class="field full"><div class="callout info">${icon('info')}<div>注册后生成一次性引导脚本（含 PSK 身份与监控端点），凭据只从服务端密钥库读取；Proxy 首次连接后进入「待验证」，版本组合按兼容矩阵校验。</div></div></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('已注册并生成引导脚本（有效期 24 小时）','ok');App.closeLayer()">注册</button>` });
+});
+</script>
+</body>
+</html>

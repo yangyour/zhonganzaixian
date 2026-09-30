@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>资产详情 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('asset-detail', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const id = App.qs('id', 'a-001');
+  let a = DATA.assets.find(x => x.id === id) || DATA.assets[0];
+  if (!App.inScope(a)) { root.innerHTML = `<div class="denied card"><div class="card-body" style="padding:36px"><div class="lock">${icon('lock')}</div><h2>对象不存在或无权限</h2><p>对象不存在与无权限统一响应，避免暴露其他客户资源。当前租户上下文：${esc(ctx.tenant.name)}。</p><a class="btn primary" href="assets.html">返回资产列表</a></div></div>`; return; }
+  App.setTitle(a.name);
+  const P = DATA.profile(a);
+  const incs = DATA.incidents.filter(i => i.assetId === a.id).sort((x, y) => y.sourceTime - x.sourceTime);
+  const active = incs.filter(i => i.sourceState === 'PROBLEM' && i.handlingState !== 'CLOSED');
+  const tickets = DATA.tickets.filter(t => t.assetName === a.name); const runs = DATA.runs.filter(r => r.asset === a.name);
+  const totalItems = P.groups.reduce((s, g) => s + g.items.length, 0);
+  const canOps = App.can('tadmin', 'msp', 'padmin');
+  let range = '24h';
+  const isNet = ['switch', 'firewall'].includes(a.type);
+
+  const headerFacts = (() => {
+    const h = P.header; const base = [['主机 ID', `<span class="mono">${a.hostid}</span> <span class="faint">@ ${a.pool}</span>`], ['监控 Proxy', `<span class="mono">${esc(a.proxy)}</span>`], ['主机组', `<span class="mono">${esc(P.config.hostgroup)}</span>`], ['采集间隔', P.config.interval], ['最近数据', a.status === 'disabled' ? '—' : `<span class="${DATA.now - a.lastData > 5 * DATA.MIN ? 'delta bad' : ''}">${fmt.ago(a.lastData)}</span>`], ['负责人', esc(a.owner)], ['业务系统', esc(a.service)], ['CMDB', `<span class="mono">${a.cmdbId}</span>`]];
+    if (a.type === 'linux' || a.type === 'windows' || a.type === 'middleware') base.splice(4, 0, ['操作系统 / 内核', `${esc(h.os)}<span class="faint"> · ${esc(h.kernel)}</span>`], ['CPU / 内存', `${esc(h.cpuModel)} · ${esc(h.memTotal)}`], ['Agent', esc(h.agent)], ['运行时长', fmt.dur(h.uptime)]);
+    if (isNet) base.splice(4, 0, ['型号 / 固件', esc(a.os)], ['序列号', `<span class="mono">${h.serial}</span>`], ['端口 Up', h.portsUp], ['运行时长', fmt.dur(h.uptime)], ['配置最后变更', fmt.dt(h.configChanged)]);
+    if (a.type === 'mysql' || a.type === 'pgsql') base.splice(4, 0, ['引擎 / 角色', `${esc(h.engine)} · ${esc(h.role)}`], ['端口 / 数据目录', `${h.port} · <span class="mono">${h.dataDir}</span>`], ['字符集', esc(h.charset)], ['运行时长', fmt.dur(h.uptime)]);
+    if (a.type === 'web') base.splice(4, 0, ['场景', esc(h.scenario)], ['探测点', h.probes.join('、')], ['步骤 / 间隔 / 重试', `${h.steps} / ${h.interval} / ${h.retries}`], ['证书', `剩余 <b class="${h.cert.days < 30 ? 'delta bad' : ''}">${h.cert.days} 天</b> · ${h.cert.tls}`]);
+    if (a.type === 'custom') base.splice(4, 0, ['类型', esc(h.kind)], ['注册规范', esc(h.registry)], ['上报方式', esc(h.sender)], ['上报频率', esc(h.freq)]);
+    return base;
+  })();
+
+  root.innerHTML = `
+  <div class="card mb"><div class="card-body" style="padding:18px 20px">
+    <div class="row between wrap" style="gap:14px;align-items:flex-start">
+      <div class="row" style="gap:14px;align-items:flex-start">
+        <span class="type-icon ${a.type}" style="width:48px;height:48px;border-radius:12px">${icon(App.TYPES[a.type].icon)}</span>
+        <div>
+          <div class="row wrap" style="gap:8px"><h1 style="font-size:20px">${esc(a.name)}</h1>${App.availBadge(a.status)}${App.syncBadge(a.sync)}${a.status === 'maintenance' ? App.badge('maint', '维护窗口至 ' + fmt.hm(P.config.maintenance ? P.config.maintenance.end : DATA.now + 80 * DATA.MIN), true) : ''}</div>
+          <div class="row wrap muted small mt8" style="gap:6px"><span class="mono">${esc(a.ip)}</span><span>·</span><span>${App.typeName(a.type)}</span><span>·</span><span>${App.tenantName(a.tenant)} / ${esc(a.site)}</span><span>·</span><span>${esc(a.template)}</span></div>
+          <div class="tags mt8">${a.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+        </div>
+      </div>
+      <div class="row wrap" style="gap:8px">
+        <select class="select sm" id="jump" style="width:220px" title="切换到同租户范围内其他资产">${DATA.assets.filter(App.inScope).map(x => `<option value="${x.id}" ${x.id === a.id ? 'selected' : ''}>${esc(x.name)} · ${App.typeName(x.type)}</option>`).join('')}</select>
+        ${canOps ? `<button class="btn" id="btnTicket">${icon('ticket')} 创建工单</button><button class="btn" id="btnRunbook">${icon('zap')} 执行 Runbook</button><button class="btn" id="btnMaint">${icon('wrench')} 进入维护</button>` : ''}
+        <button class="btn ghost" id="btnMore">${icon('more')}</button>
+      </div>
+    </div>
+    <div class="kv-cards mt" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))">${headerFacts.map(f => `<div class="kv-card"><div class="l">${f[0]}</div><div class="v small" style="font-size:12.5px">${f[1]}</div></div>`).join('')}</div>
+    ${a.sync === 'failed' ? `<div class="callout danger mt">${icon('alert-triangle')}<div><b>配置同步失败</b> · ${esc(a.syncError || '')} · 期望版本 3.2.1 / 已应用 — · Worker 将按指数退避重试，超过次数后进入需人工介入状态。<a href="#" onclick="App.toast('已触发对账：比较期望版本、已应用版本与实际配置摘要','info');return false"> 立即对账</a></div></div>` : ''}
+    ${a.sync === 'drift' ? `<div class="callout warn mt">${icon('alert-triangle')}<div><b>检测到配置漂移</b> · 模板期望 v3.2.1，实际应用 v3.1.4（有人在 Zabbix 原生界面手工修改）。<a href="#" onclick="App.toast('已加入下一批发布：重新应用期望版本并回读','info');return false"> 重新应用期望配置</a></div></div>` : ''}
+  </div></div>
+
+  <div class="card">
+    <div class="tabs" data-group="main">
+      <button data-tab="overview" class="active">概览</button><button data-tab="items">监控项 <span class="n">${totalItems}</span></button><button data-tab="triggers">触发器 <span class="n">${P.triggers.length}</span></button><button data-tab="problems">问题与事件 <span class="n">${incs.length}</span></button><button data-tab="graphs">图表 <span class="n">${P.graphs.length}</span></button>${isNet ? `<button data-tab="ports">端口 <span class="n">${P.ports.length}</span></button>` : ''}${a.type === 'web' ? `<button data-tab="steps">场景步骤 <span class="n">${P.steps.length}</span></button>` : ''}<button data-tab="inventory">资产清单</button><button data-tab="config">监控配置</button><button data-tab="related">关联 <span class="n">${tickets.length + runs.length}</span></button>
+    </div>
+    <div class="tab-panel active" data-group="main" data-panel="overview"><div class="card-body">
+      <div class="row between mb"><h3 style="font-size:14px">关键指标 <span class="muted small" style="font-weight:400">最新值 · 阈值来自模板宏与租户覆盖</span></h3><div class="seg" id="rangeSeg">${Object.keys(DATA.RANGE).slice(0, 4).map(k => `<button data-v="${k}" class="${k === range ? 'active' : ''}">${k}</button>`).join('')}</div></div>
+      <div class="grid g4 mb" id="kpiGrid"></div>
+      <div class="grid g-2-1">
+        <div class="grid g2" id="mainGraphs"></div>
+        <div class="stack">
+          <div class="card" style="box-shadow:none"><div class="card-head"><h3>活动问题 <span class="badge ${active.length ? 'danger' : 'ok'}">${active.length}</span></h3><a class="small" href="incidents.html">事件中心</a></div><div class="card-body tight">${active.length ? active.map(i => `<div class="row" style="padding:8px 16px;border-bottom:1px dashed var(--line);gap:10px;cursor:pointer" onclick="location.href='incident-detail.html?id=${i.id}'"><span class="sevbar ${i.severity}"></span><div class="grow"><div class="small strong">${esc(i.name)}</div><div class="xs muted">${fmt.ago(i.sourceTime)} · 当前值 ${esc(i.value)}${i.dupCount > 1 ? ` · ×${i.dupCount}` : ''}${i.suppressed ? ' · 已抑制' : ''}</div></div>${App.statePill(i.handlingState)}</div>`).join('') : `<div class="empty small">${icon('check-circle')}<div>无活动问题</div></div>`}</div></div>
+          ${a.type === 'web' ? `<div class="card" style="box-shadow:none"><div class="card-head"><h3>步骤瀑布 <span class="sub">最近一次探测</span></h3></div><div class="card-body">${(() => { let acc = 0; const tot = P.steps.reduce((s, x) => s + x.time, 0); return P.steps.map(s => { const l = acc / tot * 100, w = s.time / tot * 100; acc += s.time; return `<div class="wf-row"><span class="ellipsis" title="${esc(s.name)}">${s.idx}. ${esc(s.name)}</span><div class="wf-bar"><i style="left:${l}%;width:${Math.max(1, w)}%;background:${s.code === s.expect ? 'var(--primary)' : 'var(--danger)'}"></i></div><span class="num right">${s.time} ms</span></div>`; }).join('') + `<div class="row between xs muted mt8"><span>总计 ${tot} ms · 状态码全部 200</span><span>断言全部通过</span></div>`; })()}</div></div>` : ''}
+          ${isNet ? `<div class="card" style="box-shadow:none"><div class="card-head"><h3>端口面板</h3><a class="small" href="#" id="gotoPorts">端口明细</a></div><div class="card-body">${portPanel(P.ports, 'mini')}</div></div>` : ''}
+          <div class="card" style="box-shadow:none"><div class="card-head"><h3>最近事件</h3></div><div class="card-body tight">${incs.slice(0, 5).map(i => `<div class="row" style="padding:7px 16px;border-bottom:1px dashed var(--line);gap:10px;cursor:pointer" onclick="location.href='incident-detail.html?id=${i.id}'"><span class="dot ${i.sourceState === 'PROBLEM' ? 'danger' : 'ok'}"></span><div class="grow small ellipsis">${esc(i.name)}</div><span class="xs muted nowrap">${fmt.time(i.sourceTime)}</span></div>`).join('') || '<div class="empty small">近 7 天无事件</div>'}</div></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="tab-panel" data-group="main" data-panel="items">
+      <div class="toolbar"><div class="search-box">${icon('search')}<input class="input" id="itemQ" placeholder="搜索监控项名称 / 键值"></div><div class="chips" id="groupChips"><span class="chip active" data-v="all">全部 <span class="n">${totalItems}</span></span>${P.groups.map(g => `<span class="chip" data-v="${esc(g.name)}">${esc(g.name)} <span class="n">${g.items.length}</span></span>`).join('')}</div><span class="spacer"></span><label class="check small"><input type="checkbox" id="onlyChanged"> 仅显示有变化</label><button class="btn sm" id="collapseAll">${icon('chevron-up')} 折叠全部</button></div>
+      <div id="itemsTable" class="table-wrap"></div>
+      <div class="pager"><span>共 <b>${totalItems}</b> 个监控项 · ${P.groups.filter(g => g.items.some(i => /LLD/.test(i.type))).length} 个发现规则（LLD 上限见模板）· 点击行查看历史与趋势</span><span class="xs">列表接口默认每页 100、最大 500；查询先校验 (tenant_id, itemid) 归属</span></div>
+    </div>
+    <div class="tab-panel" data-group="main" data-panel="triggers"><div id="triggersTable"></div><div class="pager"><span>触发器由模板继承，阈值通过受控宏表达租户差异；依赖关系用于抑制下游告警</span></div></div>
+    <div class="tab-panel" data-group="main" data-panel="problems"><div class="card-body"><div class="grid g-2-1"><div id="probTable"></div><div><h3 style="font-size:13px;margin-bottom:10px">事件时间线（7 天）</h3><div class="timeline">${incs.flatMap(i => [i.recoveredAt ? { t: i.recoveredAt, cls: 'ok', title: 'RECOVERED · ' + i.name, desc: `恢复事件 r_eventid ${i.recoveryEventId}` } : null, { t: i.sourceTime, cls: i.severity === 'disaster' || i.severity === 'high' ? 'danger' : 'warn', title: 'PROBLEM · ' + i.name, desc: `eventid ${i.eventid} · 接收延迟 ${((i.receivedAt - i.sourceTime) / 1000).toFixed(1)}s · ${App.sevName(i.severity)}` }]).filter(Boolean).sort((x, y) => y.t - x.t).slice(0, 10).map(e => `<div class="tl-item ${e.cls}"><span class="tl-dot"></span><div class="tl-time">${fmt.dt(e.t)}</div><div class="tl-title small">${esc(e.title)}</div><div class="tl-desc xs">${e.desc}</div></div>`).join('') || '<div class="empty small">无事件</div>'}</div></div></div></div></div>
+    <div class="tab-panel" data-group="main" data-panel="graphs"><div class="card-body"><div class="row between mb"><span class="small muted">单图最多 20 条曲线、每条 1,000 个点；超出范围转异步报表或缩小时间窗。悬浮查看数值，点击标题放大。</span><div class="seg" id="rangeSeg2">${Object.keys(DATA.RANGE).map(k => `<button data-v="${k}" class="${k === range ? 'active' : ''}">${k}</button>`).join('')}</div></div><div class="grid g2" id="allGraphs"></div></div></div>
+    ${isNet ? `<div class="tab-panel" data-group="main" data-panel="ports"><div class="card-body"><div class="grid g-1-2" style="align-items:start"><div><h3 style="font-size:13px;margin-bottom:10px">面板视图 <span class="muted" style="font-weight:400">点击端口查看</span></h3>${portPanel(P.ports, 'full')}<div class="port-legend"><span><i style="background:#22c55e"></i>Up</span><span><i style="background:#0ea5e9"></i>Up · 利用率 &gt; 50%</span><span><i style="background:#f59e0b"></i>Up · 有错误包</span><span><i style="background:#334155"></i>Down</span><span><i style="background:#64748b"></i>Admin down</span></div><div id="portDetail" class="mt"></div></div><div id="portTable"></div></div></div></div>` : ''}
+    ${a.type === 'web' ? `<div class="tab-panel" data-group="main" data-panel="steps"><div id="stepsTable"></div><div class="card-body"><div class="grid g2"><div class="card" style="box-shadow:none"><div class="card-head"><h3>证书</h3></div><div class="card-body"><dl class="kv"><dt>剩余天数</dt><dd class="${P.header.cert.days < 30 ? 'delta bad' : ''}">${P.header.cert.days} 天</dd><dt>有效期至</dt><dd>${P.header.cert.notAfter}</dd><dt>颁发者</dt><dd>${P.header.cert.issuer}</dd><dt>SAN</dt><dd>${P.header.cert.san} 个</dd><dt>协议</dt><dd>${P.header.cert.tls}</dd><dt>证书链</dt><dd>${P.header.cert.chain}</dd></dl></div></div><div class="card" style="box-shadow:none"><div class="card-head"><h3>探测点一致性</h3></div><div class="card-body">${P.header.probes.map((p, i) => `<div class="meter-row" style="margin-bottom:8px"><span class="lbl" style="width:160px">${esc(p)}</span><div class="meter grow ok"><i style="width:${(99.9 + i * .03)}%"></i></div><span class="val">${(99.9 + i * .03).toFixed(2)}%</span></div>`).join('')}<div class="xs muted mt8">采集点决定观测视角：客户侧 Proxy 反映内网体验，云上 Proxy 反映公网体验。</div></div></div></div></div></div>` : ''}
+    <div class="tab-panel" data-group="main" data-panel="inventory"><div class="card-body"><div class="grid g-2-1"><div><dl class="kv cols2" style="row-gap:12px">${Object.entries(P.inventory).map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl></div><div class="callout info">${icon('info')}<div><b>资产流：CMDB → 平台映射 → Zabbix Host</b><br>CMDB 管理生命周期、负责人和服务关系；Zabbix 反馈监控状态与采集发现。业务资产 ID 保持稳定，迁移实例时新增带生效区间的 binding。</div></div></div></div></div>
+    <div class="tab-panel" data-group="main" data-panel="config"><div class="card-body"><div class="grid g2">
+      <div class="card" style="box-shadow:none"><div class="card-head"><h3>模板与版本</h3>${canOps ? `<button class="btn sm" onclick="App.toast('已触发对账：期望版本 / 已应用版本 / 实际配置摘要','info')">${icon('refresh')} 对账</button>` : ''}</div><table class="table dense"><thead><tr><th>模板</th><th>期望版本</th><th>已应用</th><th>状态</th></tr></thead><tbody>${P.config.templates.map(t => `<tr><td>${esc(t.name)}</td><td class="mono">v${t.desired}</td><td class="mono">v${t.applied}</td><td>${App.syncBadge(t.status)}</td></tr>`).join('')}</tbody></table></div>
+      <div class="card" style="box-shadow:none"><div class="card-head"><h3>宏与阈值覆盖</h3>${canOps ? `<button class="btn sm" onclick="App.toast('宏覆盖将生成新的配置版本，经 Worker 应用后回读','info')">${icon('edit')} 编辑</button>` : ''}</div><table class="table dense"><thead><tr><th>宏</th><th>值</th><th>来源</th></tr></thead><tbody>${P.config.macros.map(m => `<tr><td class="mono">${esc(m.m)}</td><td class="mono">${esc(m.v)}</td><td>${m.src === '租户覆盖' ? App.badge('primary', m.src) : App.badge('neutral', m.src)}</td></tr>`).join('')}</tbody></table></div>
+      <div class="card" style="box-shadow:none"><div class="card-head"><h3>接口与采集</h3></div><div class="card-body"><dl class="kv"><dt>接口类型</dt><dd>${esc(P.config.interface.type)}</dd><dt>地址</dt><dd class="mono">${esc(P.config.interface.addr)}</dd><dt>加密</dt><dd>${esc(P.config.interface.tls)}</dd><dt>Proxy</dt><dd class="mono">${esc(P.config.proxy)}</dd><dt>技术主机名</dt><dd class="mono">${esc(P.config.techname)}</dd><dt>主机组</dt><dd class="mono">${esc(P.config.hostgroup)}</dd><dt>监控实例 / hostid</dt><dd class="mono">${esc(P.config.instance)} / ${P.config.hostid}</dd><dt>采集间隔</dt><dd>${P.config.interval}</dd></dl></div></div>
+      <div class="card" style="box-shadow:none"><div class="card-head"><h3>维护与保留</h3></div><div class="card-body"><dl class="kv"><dt>维护窗口</dt><dd>${P.config.maintenance ? `${esc(P.config.maintenance.name)} · 至 ${fmt.dt(P.config.maintenance.end)}` : '无'}</dd><dt>历史保留</dt><dd>${App.tenantObj(a.tenant).retention.history} 天（池级策略）</dd><dt>趋势保留</dt><dd>${App.tenantObj(a.tenant).retention.trends} 天</dd><dt>退役策略</dt><dd>先停止采集与告警，保留事件与报表映射，再按约定清理</dd></dl></div></div>
+    </div></div></div>
+    <div class="tab-panel" data-group="main" data-panel="related"><div class="card-body"><div class="grid g2">
+      <div class="card" style="box-shadow:none"><div class="card-head"><h3>工单 <span class="badge neutral">${tickets.length}</span></h3></div><div class="card-body tight">${tickets.map(t => `<div class="row" style="padding:8px 16px;border-bottom:1px dashed var(--line);gap:10px;cursor:pointer" onclick="location.href='tickets.html?id=${t.id}'"><span class="mono small">${t.id}</span><div class="grow small ellipsis">${esc(t.title)}</div>${App.badge(DATA.TSTATUS[t.status][1], DATA.TSTATUS[t.status][0])}</div>`).join('') || '<div class="empty small">无关联工单</div>'}</div></div>
+      <div class="card" style="box-shadow:none"><div class="card-head"><h3>Runbook 执行记录 <span class="badge neutral">${runs.length}</span></h3></div><div class="card-body tight">${runs.map(r => `<div class="row" style="padding:8px 16px;border-bottom:1px dashed var(--line);gap:10px;cursor:pointer" onclick="location.href='automation.html?run=${r.id}'"><span class="mono small">${r.id}</span><div class="grow small ellipsis">${esc(r.runbookName)} v${r.version}</div><span class="xs muted">${fmt.ago(r.at)}</span>${App.badge(r.status === 'success' ? 'ok' : r.status === 'failed' || r.status === 'rejected' ? 'danger' : 'warn', { success: '成功', failed: '失败', rejected: '已拒绝', awaiting_approval: '待审批', running: '执行中' }[r.status])}</div>`).join('') || '<div class="empty small">无执行记录</div>'}</div></div>
+      <div class="card span2" style="box-shadow:none"><div class="card-head"><h3>变更与审计</h3></div><div class="card-body tight">${[['template.apply', '套用模板 v3.2.1（灰度批次 2/5）', '陈立', 12 * DATA.D], ['macro.override', '{$CPU.UTIL.CRIT} 85 → 80（租户覆盖）', '陈立', 30 * DATA.D], ['asset.bind', '绑定 Zabbix Host（' + a.pool + ' / ' + a.hostid + '）', '系统 Worker', 200 * DATA.D], ['cmdb.sync', 'CMDB 负责人变更 → ' + a.owner, '系统 Worker', 45 * DATA.D]].map(x => `<div class="row" style="padding:8px 16px;border-bottom:1px dashed var(--line);gap:10px"><span class="tag">${x[0]}</span><div class="grow small">${esc(x[1])}</div><span class="xs muted">${esc(x[2])} · ${fmt.date(DATA.now - x[3])}</span></div>`).join('')}</div></div>
+    </div></div></div>
+  </div>`;
+
+  /* ---- 端口面板 ---- */
+  function portPanel(ports, mode) { const cols = mode === 'mini' ? 24 : 24; return `<div class="portpanel" style="grid-template-columns:repeat(${cols},1fr);${mode === 'mini' ? 'padding:8px;gap:3px' : ''}">${ports.map(p => `<div class="port ${p.status === 'up' ? (p.inErr ? 'err' : p.util > 50 ? 'busy' : 'up') : p.status}" data-port="${p.idx}" title="${p.name} · ${p.status} · ${p.util}% · ${esc(p.desc)}"></div>`).join('')}</div>`; }
+
+  /* ---- KPI 仪表 ---- */
+  const kpiGrid = document.getElementById('kpiGrid');
+  kpiGrid.innerHTML = P.kpis.map((k, i) => `<div class="card" style="box-shadow:none"><div class="card-body" style="padding:12px 14px" id="kpi${i}"></div></div>`).join('');
+  P.kpis.forEach((k, i) => {
+    const el = document.getElementById('kpi' + i);
+    if (k.nogauge) { el.innerHTML = `<div class="k-label small muted">${esc(k.label)}</div><div class="row between" style="align-items:flex-end;margin-top:6px"><div class="strong ${k.bad ? 'delta bad' : k.ok ? 'delta good' : ''}" style="font-size:${String(k.value).length > 14 ? 14 : 20}px;letter-spacing:-.3px;line-height:1.2">${esc(k.value)}${k.unit ? `<span class="muted small" style="font-weight:500"> ${k.unit}</span>` : ''}</div>${k.seed ? `<span class="spark" id="ksp${i}" style="width:90px;height:30px"></span>` : ''}</div>`; if (k.seed) setTimeout(() => Charts.spark(document.getElementById('ksp' + i), DATA.spark(k.seed, { base: k.base, amp: k.amp || 1, noise: (k.amp || 1) * .4, min: 0 }), { color: k.bad ? 'var(--danger)' : 'var(--primary)', area: true }), 0); return; }
+    const max = k.max ?? 100, min = k.min ?? 0; const thr = k.invert ? [{ to: k.thr[0], color: '#dc2626' }, { to: k.thr[1], color: '#f59e0b' }, { to: max, color: '#16a34a' }] : [{ to: k.thr[0], color: '#16a34a' }, { to: k.thr[1], color: '#f59e0b' }, { to: max, color: '#dc2626' }];
+    el.innerHTML = `<div class="row between"><span class="small muted">${esc(k.label)}</span><span class="spark" id="ksp${i}" style="width:70px;height:22px"></span></div><div id="kg${i}" class="mt8"></div>`;
+    Charts.gauge(document.getElementById('kg' + i), { value: +k.value, min, max, unit: k.unit, thresholds: thr, size: 170, thickness: 12, format: (v) => k.unit === '%' || k.unit === '' ? (Math.round(v * 10) / 10) : Math.round(v), sub: `阈值 ${k.invert ? '<' : '>'} ${k.thr[0]}${k.unit} / ${k.thr[1]}${k.unit}` });
+    setTimeout(() => Charts.spark(document.getElementById('ksp' + i), DATA.spark(k.seed, { base: k.base, amp: k.amp || 1, noise: (k.amp || 1) * .4, min, max }), { color: '#94a3b8' }), 0);
+  });
+
+  /* ---- 图表 ---- */
+  function drawGraph(el, g, idx, h) {
+    const R = DATA.RANGE[range]; const x = DATA.ts(1, { hours: R.hours, points: R.points }).x;
+    const series = g.series.map(([name, base, amp], i) => ({ name, data: DATA.ts(a.seed * 100 + idx * 7 + i * 3, { hours: R.hours, points: R.points, base, amp, noise: amp * .35, min: g.min ?? (g.yMin ?? 0), max: g.yMax ?? Infinity, trend: g.trend || 0, int: g.int }).y }));
+    const markers = incs.filter(i => i.sourceTime > DATA.now - R.hours * DATA.H).slice(0, 3).map(i => ({ t: i.sourceTime, label: App.sevName(i.severity), color: App.sevColor(i.severity) }));
+    el.innerHTML = `<div class="chart-title" style="cursor:pointer" data-zoom="${idx}"><span>${esc(g.title)}</span><small>${range} · ${g.series.length} 条曲线</small></div><div id="${el.id}c"></div>`;
+    Charts.line(document.getElementById(el.id + 'c'), { height: h || 190, x, series, stacked: g.stacked, unit: g.unit, yMax: g.yMax, yMin: g.yMin, smooth: true, dots: false, thresholds: (g.thr || []).map(t => ({ value: t.value, label: t.label })), markers, legend: true });
+  }
+  function drawAll() {
+    const mg = document.getElementById('mainGraphs'); mg.innerHTML = P.graphs.slice(0, 4).map((g, i) => `<div class="card" style="box-shadow:none"><div class="card-body" style="padding:12px 14px" id="mg${i}"></div></div>`).join(''); P.graphs.slice(0, 4).forEach((g, i) => drawGraph(document.getElementById('mg' + i), g, i));
+    const ag = document.getElementById('allGraphs'); ag.innerHTML = P.graphs.map((g, i) => `<div class="card" style="box-shadow:none"><div class="card-body" style="padding:12px 14px" id="ag${i}"></div></div>`).join(''); P.graphs.forEach((g, i) => drawGraph(document.getElementById('ag' + i), g, i, 220));
+  }
+  drawAll();
+  const setRange = (v) => { range = v; ['#rangeSeg', '#rangeSeg2'].forEach(s => App.$$(`${s} button`).forEach(b => b.classList.toggle('active', b.dataset.v === v))); drawAll(); };
+  App.seg('#rangeSeg', setRange); App.seg('#rangeSeg2', setRange);
+  root.addEventListener('click', (e) => { const z = e.target.closest('[data-zoom]'); if (!z) return; const g = P.graphs[+z.dataset.zoom]; const m = App.modal({ title: g.title, sub: `${esc(a.name)} · ${range}`, size: 'lg', body: `<div id="zoomChart"></div>` }); setTimeout(() => drawGraph(App.$('#zoomChart', m.el), g, +z.dataset.zoom, 360), 30); });
+
+  /* ---- 监控项表 ---- */
+  const collapsed = new Set(); let itemQ = '', groupF = 'all', onlyChanged = false;
+  function itemsHtml() {
+    const q = itemQ.toLowerCase(); let h = `<table class="table dense"><thead><tr><th style="width:26%">监控项</th><th>键值</th><th class="num">最新值</th><th style="width:100px">趋势 (24h)</th><th>变化</th><th>采集</th><th>历史 / 趋势</th><th>类型</th><th>状态</th></tr></thead><tbody>`;
+    for (const g of P.groups) {
+      if (groupF !== 'all' && g.name !== groupF) continue;
+      const items = g.items.filter(it => (!q || (it.name + it.key).toLowerCase().includes(q)) && (!onlyChanged || it.delta != null));
+      if (!items.length) continue;
+      const col = collapsed.has(g.name);
+      h += `<tr class="group-row ${col ? 'collapsed' : ''}" data-group="${esc(g.name)}"><td colspan="9"><span class="caret">▾</span>${icon(g.icon)} ${esc(g.name)} <span class="faint" style="font-weight:400">· ${items.length} 项</span></td></tr>`;
+      if (col) continue;
+      for (const it of items) {
+        const numeric = parseFloat(String(it.value).replace(/,/g, ''));
+        const sp = !isNaN(numeric) && it.trends !== '—' ? Charts.sparkHtml(DATA.spark(a.seed * 1000 + it.seed, { base: numeric, amp: Math.max(Math.abs(numeric) * .12, .5), noise: Math.abs(numeric) * .05, min: it.unit === '%' ? 0 : -Infinity, max: it.unit === '%' ? 100 : Infinity }), { color: it.bad ? 'var(--danger)' : '#64748b', w: 90, h: 20 }) : '<span class="faint">—</span>';
+        h += `<tr class="clickable" data-item="${esc(it.key)}"><td><span class="primary-text">${esc(it.name)}</span></td><td><code style="font-size:11px;background:transparent;padding:0;color:var(--text-3)">${esc(it.key)}</code></td><td class="num"><b class="${it.bad ? 'delta bad' : ''}">${esc(it.value)}</b> <span class="muted xs">${esc(it.unit)}</span></td><td>${sp}</td><td>${it.delta == null ? '<span class="faint">—</span>' : `<span class="delta ${it.delta > 0 ? 'bad' : 'good'}">${it.delta > 0 ? '↑' : '↓'} ${Math.abs(it.delta)}${it.unit}</span>`}</td><td class="small">${it.interval}</td><td class="small">${it.history} / ${it.trends}</td><td class="xs muted">${esc(it.type)}</td><td>${it.status === 'enabled' ? App.badge('ok', '启用') : it.status === 'disabled' ? App.badge('neutral', '禁用') : App.badge('warn', '不支持')}</td></tr>`;
+      }
+    }
+    return h + '</tbody></table>';
+  }
+  const itemsEl = document.getElementById('itemsTable'); const renderItems = () => { itemsEl.innerHTML = itemsHtml(); };
+  renderItems();
+  itemsEl.addEventListener('click', (e) => {
+    const gr = e.target.closest('.group-row'); if (gr) { const n = gr.dataset.group; collapsed.has(n) ? collapsed.delete(n) : collapsed.add(n); renderItems(); return; }
+    const tr = e.target.closest('[data-item]'); if (!tr) return; const it = P.groups.flatMap(g => g.items).find(x => x.key === tr.dataset.item); if (!it) return;
+    const numeric = parseFloat(String(it.value).replace(/,/g, '')); const trig = P.triggers.filter(t => t.expr.includes(it.key.split('[')[0]));
+    const d = App.drawer({ title: it.name, sub: `<code>${esc(it.key)}</code> · ${esc(a.name)}`, width: 640, body: `<div class="kv-cards mb" style="grid-template-columns:repeat(4,1fr)"><div class="kv-card"><div class="l">最新值</div><div class="v ${it.bad ? 'delta bad' : ''}">${esc(it.value)} <span class="muted small">${esc(it.unit)}</span></div></div><div class="kv-card"><div class="l">采集间隔</div><div class="v">${it.interval}</div></div><div class="kv-card"><div class="l">历史 / 趋势</div><div class="v">${it.history} / ${it.trends}</div></div><div class="kv-card"><div class="l">类型</div><div class="v small" style="font-size:12px">${esc(it.type)}</div></div></div>${!isNaN(numeric) && it.trends !== '—' ? `<div class="row between mb8"><span class="small strong">历史（24h）</span><div class="seg" id="iRange"><button data-v="1h">1h</button><button data-v="24h" class="active">24h</button><button data-v="7d">7d</button></div></div><div id="itemChart"></div>` : `<div class="callout neutral">${icon('info')}<div>文本 / 状态型监控项不生成趋势；历史保留 ${it.history}。</div></div>`}<h3 style="font-size:13px;margin:16px 0 8px">关联触发器 (${trig.length})</h3>${trig.length ? `<table class="table dense">${trig.map(t => `<tr><td>${App.sevBadge(t.severity)}</td><td><div class="small strong">${esc(t.name)}</div><code style="font-size:11px">${esc(t.expr)}</code></td><td>${t.state === 'problem' ? App.badge('danger', '问题', true) : App.badge('ok', '正常', true)}</td></tr>`).join('')}</table>` : '<div class="muted small">无</div>'}<h3 style="font-size:13px;margin:16px 0 8px">数据访问</h3><div class="code">GET /v1/assets/${a.id}/metrics?item=${encodeURIComponent(it.key)}&from=-24h&points=288
+<span class="c">// 平台先校验 (tenant_id, asset_id, itemid) 归属，再调用 history.get / trend.get；单条曲线 ≤ 1,000 点</span></div>`, foot: `<button class="btn" onclick="App.toast('已加入自定义图表','ok')">${icon('plus')} 加入图表</button>${canOps ? `<button class="btn" onclick="App.toast('已创建阈值覆盖草稿','info')">${icon('sliders')} 设置阈值</button>` : ''}<button class="btn primary" data-close>关闭</button>`, onOpen: (el) => { if (isNaN(numeric) || it.trends === '—') return; const draw = (rk) => { const R = DATA.RANGE[rk]; const t = DATA.ts(a.seed * 1000 + it.seed, { hours: R.hours, points: R.points, base: numeric, amp: Math.max(Math.abs(numeric) * .12, .5), noise: Math.abs(numeric) * .05, min: it.unit === '%' ? 0 : -Infinity, max: it.unit === '%' ? 100 : Infinity }); const thr = trig.map(x => { const m = x.expr.match(/[<>]\s*(-?[\d.]+)\s*$/); return m ? { value: +m[1], label: App.sevName(x.severity), color: App.sevColor(x.severity) } : null; }).filter(Boolean); Charts.line(App.$('#itemChart', el), { height: 220, x: t.x, series: [{ name: it.name, data: t.y, area: true }], unit: it.unit === '%' ? '%' : '', smooth: true, dots: false, legend: false, thresholds: thr }); }; draw('24h'); App.seg(App.$('#iRange', el), draw); } });
+  });
+  document.getElementById('itemQ').oninput = e => { itemQ = e.target.value; renderItems(); };
+  document.getElementById('onlyChanged').onchange = e => { onlyChanged = e.target.checked; renderItems(); };
+  document.getElementById('collapseAll').onclick = () => { if (collapsed.size) collapsed.clear(); else P.groups.forEach(g => collapsed.add(g.name)); renderItems(); };
+  App.chips('#groupChips', v => { groupF = v; renderItems(); });
+
+  /* ---- 触发器 ---- */
+  App.table('#triggersTable', { rows: P.triggers.map((t, i) => Object.assign({ id: i }, t)), paginate: false, sortKey: 'state', columns: [
+    { key: 'severity', label: '级别', width: '70px', render: r => App.sevBadge(r.severity), sortVal: r => App.SEV[r.severity].rank },
+    { key: 'name', label: '触发器', render: r => `<div class="primary-text">${esc(r.name)}</div><code style="font-size:11px;background:transparent;padding:0;color:var(--text-3)">${esc(r.expr)}</code>` },
+    { key: 'state', label: '状态', render: r => r.state === 'problem' ? `${App.badge('danger', '问题', true)}<span class="sub-text">持续 ${fmt.dur((DATA.now - r.since) / 1000)}</span>` : App.badge('ok', '正常', true), sortVal: r => r.state === 'problem' ? 0 : 1 },
+    { key: 'value', label: '当前值', num: true, render: r => `<span class="num ${r.state === 'problem' ? 'delta bad' : ''}">${esc(r.value)}</span>` },
+    { key: 'depends', label: '依赖', render: r => r.depends ? `<span class="tag">${esc(r.depends)}</span>` : '<span class="faint">—</span>' },
+    { key: 'en', label: '启用', sortable: false, render: r => `<button class="switch on" data-stop onclick="this.classList.toggle('on');App.toast(this.classList.contains('on')?'触发器已启用':'触发器已禁用（记录审计）','info',1500)"></button>` }
+  ] });
+
+  /* ---- 问题表 ---- */
+  App.table('#probTable', { rows: incs, paginate: false, dense: true, onRow: r => location.href = 'incident-detail.html?id=' + r.id, columns: [
+    { key: 'severity', label: '级别', width: '70px', render: r => App.sevBadge(r.severity), sortVal: r => App.SEV[r.severity].rank },
+    { key: 'name', label: '问题', render: r => `<div class="primary-text ellipsis" style="max-width:260px">${esc(r.name)}</div><span class="sub-text">eventid ${r.eventid}${r.dupCount > 1 ? ` · 归并 ×${r.dupCount}` : ''}</span>` },
+    { key: 'sourceState', label: '监控 / 处置', render: r => App.srcBadge(r.sourceState) + '<br>' + App.statePill(r.handlingState) },
+    { key: 'sourceTime', label: '发生 → 恢复', render: r => `<span class="small">${fmt.time(r.sourceTime)}</span><span class="sub-text">${r.recoveredAt ? '恢复 ' + fmt.time(r.recoveredAt) + ' · 持续 ' + fmt.dur((r.recoveredAt - r.sourceTime) / 1000) : '持续 ' + fmt.dur((DATA.now - r.sourceTime) / 1000)}</span>`, sortVal: r => r.sourceTime },
+    { key: 'ackBy', label: '确认人', render: r => r.ackBy ? `<span class="small">${esc(r.ackBy)}</span>` : '<span class="faint">未确认</span>' }
+  ] });
+
+  /* ---- 端口表 ---- */
+  if (isNet) {
+    const ptbl = App.table('#portTable', { rows: P.ports, rowKey: 'idx', pageSize: 15, sortKey: 'util', sortDir: 'desc', dense: true, onRow: r => selPort(r.idx), columns: [
+      { key: 'name', label: '端口', render: r => `<span class="mono strong">${r.name}</span>` },
+      { key: 'status', label: '状态', render: r => r.status === 'up' ? App.badge('ok', 'up', true) : r.status === 'down' ? App.badge('danger', 'down', true) : App.badge('neutral', 'admin down') },
+      { key: 'speed', label: '速率 / 双工', render: r => `<span class="small">${fmt.bps(r.speed).replace('.0', '')} · ${r.duplex}</span>` },
+      { key: 'util', label: '利用率', render: r => `<div class="row" style="gap:6px"><div class="meter grow" style="min-width:50px"><i style="width:${r.util}%;background:${r.util > 80 ? 'var(--danger)' : r.util > 50 ? 'var(--warn)' : 'var(--primary)'}"></i></div><span class="num small">${r.util}%</span></div>` },
+      { key: 'inBps', label: '入 / 出', render: r => `<span class="small num">${fmt.bps(r.inBps)} / ${fmt.bps(r.outBps)}</span>` },
+      { key: 'inErr', label: '错误 / 丢弃', num: true, render: r => `<span class="num small ${r.inErr ? 'delta bad' : 'muted'}">${r.inErr} / ${r.inDisc}</span>` },
+      { key: 'vlan', label: 'VLAN', render: r => `<span class="tag">${r.vlan}</span>` },
+      { key: 'desc', label: '描述 / 对端', render: r => `<span class="small muted">${esc(r.desc || '—')}</span>` }
+    ] });
+    function selPort(idx) { const p = P.ports.find(x => x.idx === idx); App.$$('.port').forEach(el => el.classList.toggle('sel', +el.dataset.port === idx)); const d = document.getElementById('portDetail'); if (!d) return; d.innerHTML = `<div class="card" style="box-shadow:none"><div class="card-head"><h3>${p.name} <span class="sub">${esc(p.desc || '无描述')}</span></h3>${p.status === 'up' ? App.badge('ok', 'up', true) : App.badge('danger', p.status, true)}</div><div class="card-body"><div class="kv-cards" style="grid-template-columns:repeat(3,1fr)"><div class="kv-card"><div class="l">入 / 出流量</div><div class="v small">${fmt.bps(p.inBps)} / ${fmt.bps(p.outBps)}</div></div><div class="kv-card"><div class="l">利用率</div><div class="v">${p.util}%</div></div><div class="kv-card"><div class="l">错误 / 丢弃</div><div class="v ${p.inErr ? 'delta bad' : ''}">${p.inErr} / ${p.inDisc} pps</div></div><div class="kv-card"><div class="l">速率 / 双工</div><div class="v small">${fmt.bps(p.speed)} · ${p.duplex}</div></div><div class="kv-card"><div class="l">VLAN</div><div class="v">${p.vlan}</div></div><div class="kv-card"><div class="l">ifIndex</div><div class="v">${p.idx}</div></div></div><div id="portChart" class="mt"></div></div></div>`; const t1 = DATA.ts(a.seed * 50 + idx, { hours: 24, points: 96, base: p.inBps / 1e6, amp: p.inBps / 3e6, noise: p.inBps / 8e6, min: 0 }), t2 = DATA.ts(a.seed * 50 + idx + 1, { hours: 24, points: 96, base: p.outBps / 1e6, amp: p.outBps / 3e6, noise: p.outBps / 8e6, min: 0 }); Charts.line(document.getElementById('portChart'), { height: 160, x: t1.x, series: [{ name: '入', data: t1.y, area: true }, { name: '出', data: t2.y, area: true }], unit: ' Mbps', smooth: true, dots: false }); }
+    root.addEventListener('click', (e) => { const pe = e.target.closest('.port[data-port]'); if (pe) { if (pe.closest('[data-panel="overview"]')) { tabs.activate('ports'); } selPort(+pe.dataset.port); } });
+    const gp = document.getElementById('gotoPorts'); if (gp) gp.onclick = (e) => { e.preventDefault(); tabs.activate('ports'); };
+  }
+  /* ---- 场景步骤 ---- */
+  if (a.type === 'web') App.table('#stepsTable', { rows: P.steps, rowKey: 'idx', paginate: false, columns: [
+    { key: 'idx', label: '#', width: '40px' }, { key: 'name', label: '步骤', render: r => `<div class="primary-text">${esc(r.name)}</div><span class="sub-text mono">${r.method} ${esc(r.url)}</span>` },
+    { key: 'code', label: '状态码', render: r => r.code === r.expect ? App.badge('ok', `${r.code}`) : App.badge('danger', `${r.code} ≠ ${r.expect}`) }, { key: 'time', label: '响应时间', num: true, render: r => `<span class="num">${r.time} ms</span>` }, { key: 'speed', label: '下载速度', num: true, render: r => `${r.speed} MB/s` }, { key: 'size', label: '大小', num: true, render: r => `${r.size} KB` }, { key: 'assert', label: '断言', render: r => `<span class="small">${esc(r.assert)}</span> ${App.badge('ok', '通过')}` }
+  ] });
+
+  const tabs = App.tabs(root, 'main');
+  if (App.qs('tab')) tabs.activate(App.qs('tab'));
+
+  /* ---- 操作 ---- */
+  document.getElementById('jump').onchange = e => location.href = 'asset-detail.html?id=' + e.target.value;
+  const bt = document.getElementById('btnTicket'); if (bt) bt.onclick = () => App.modal({ title: '创建 ITSM 工单', body: `<div class="stack" style="gap:12px"><div class="field"><label>标题</label><input class="input" value="${esc(a.name)} · ${active[0] ? esc(active[0].name) : '巡检 / 变更申请'}"></div><div class="form-grid"><div class="field"><label>优先级</label><select class="select"><option>P3</option><option>P2</option><option>P1</option><option>P4</option></select></div><div class="field"><label>外部系统</label><input class="input" readonly value="${esc(App.tenantObj(a.tenant).itsm)}"></div></div><div class="field"><label>关联事件</label><select class="select"><option value="">不关联</option>${active.map(i => `<option>${esc(i.name)}</option>`).join('')}</select></div><div class="callout info">${icon('info')}<div>以 tenant + incident 唯一绑定外部工单（幂等键）；传入资产、优先级、时间线与证据链接。创建超时先查询幂等标识。</div></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('工单创建中（Outbox 已入队，等待 ITSM 受理回执）','info');App.closeLayer()">创建</button>` });
+  const br = document.getElementById('btnRunbook'); if (br) br.onclick = () => { const list = DATA.runbooks.filter(r => r.types.includes(a.type) && !r.disabled); App.modal({ title: '执行 Runbook', sub: esc(a.name), body: `<div class="stack" style="gap:8px">${list.length ? list.map(r => `<label class="runstep" style="cursor:pointer"><input type="radio" name="rb" value="${r.id}" ${r.level === 1 ? 'checked' : ''}><div class="grow"><div class="row" style="gap:8px"><b class="small">${esc(r.name)}</b> <span class="tag">v${r.version}</span> ${App.levelBadge(r.level)}</div><div class="xs muted">${esc(r.desc)}</div></div><span class="xs muted">${r.preauth ? '预授权 · 自动执行' : '需审批'}</span></label>`).join('') : '<div class="empty small">当前资产类型无可用 Runbook</div>'}<div class="callout warn">${icon('alert-triangle')}<div>执行前再次解析资产归属与凭据；只读诊断预授权自动执行，低风险修复满足健康门槛且有预授权时自动，否则进入审批。</div></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('已发起执行：资产核验 → 前置检查 → 审批 / 预授权判定 → 锁定目标 → 执行 → 观察恢复 → 留证','ok',4000);App.closeLayer();setTimeout(()=>location.href='automation.html?tab=runs',1200)">发起执行</button>` }); };
+  const bm = document.getElementById('btnMaint'); if (bm) bm.onclick = () => App.modal({ title: '进入维护窗口', body: `<div class="form-grid"><div class="field"><label>开始</label><input class="input" type="datetime-local" value="${new Date(DATA.now + 60e3).toISOString().slice(0, 16)}"></div><div class="field"><label>时长</label><select class="select"><option>1 小时</option><option>2 小时</option><option>4 小时</option></select></div><div class="field full"><label>模式</label><select class="select"><option>采集继续 · 抑制通知（推荐）</option><option>暂停采集</option></select></div><div class="field full"><label class="check"><input type="checkbox" checked> 申请 SLA 排除（需服务经理确认）</label></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('维护窗口已创建：期间抑制通知，事件仍记录','ok');App.closeLayer()">创建</button>` });
+  document.getElementById('btnMore').onclick = () => App.modal({ title: '更多操作', body: `<div class="stack" style="gap:6px">${[['复制主机 ID', 'copy'], ['查看 Zabbix 原生主机（内部运维入口，需平台管理员）', 'external-link'], ['克隆接入配置', 'copy'], ['迁移到独享资源池…', 'database'], ['停用采集与告警（退役第一步）', 'pause']].map(x => `<button class="btn ghost" style="justify-content:flex-start" onclick="App.toast('${x[0]}：原型演示','info');App.closeLayer()">${icon(x[1])} ${x[0]}</button>`).join('')}</div>` });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,3290 @@
+{
+  "schema_version": "1.0",
+  "status": "design_registry_not_runtime_config",
+  "timezone": "Asia/Shanghai",
+  "source_registry": "doc/development/04_客户待确认事项与全局设置.md",
+  "generated_date": "2026-09-30",
+  "generation_note": "由04第4/5节的登记表逐行派生，斜线分组拆为独立键。修改须先改04，再同步此文件；禁止直接作为生产配置导入。",
+  "settings": [
+    {
+      "key": "business.timezone",
+      "description": "IANA时区枚举",
+      "type": "string",
+      "scope": "平台",
+      "unit": null,
+      "value": "Asia/Shanghai",
+      "decision_status": "contract_fixed",
+      "source": "M5-9/M10-12",
+      "question_ids": [],
+      "activation_gate": "是；不读取浏览器时区替代业务统计时区",
+      "notes": "合同固定约束",
+      "allowed_range": "IANA时区枚举",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "service.default_calendar",
+      "description": "日历模式",
+      "type": "string",
+      "scope": "服务",
+      "unit": null,
+      "value": "7x24",
+      "decision_status": "contract_fixed",
+      "source": "M5-9/M10-12",
+      "question_ids": [
+        "Q08"
+      ],
+      "activation_gate": "是；基础档工单计时另按Q08",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "日历模式",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "monitor.page_refresh_sec",
+      "description": "正整数/秒",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "秒",
+      "value": 30,
+      "decision_status": "contract_fixed",
+      "source": "M1-9/M5-12",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正整数/秒",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "dashboard.freshness_max_sec",
+      "description": "正整数/秒，≤300",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "秒",
+      "value": 300,
+      "decision_status": "contract_fixed",
+      "source": "M1-1",
+      "question_ids": [],
+      "activation_gate": "是；最晚时效上限",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/秒，≤300",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "asset.unknown_detect_max_sec",
+      "description": "正整数/秒，≤60",
+      "type": "integer",
+      "scope": "设备",
+      "unit": "秒",
+      "value": 60,
+      "decision_status": "contract_fixed",
+      "source": "M1-1",
+      "question_ids": [
+        "Q06"
+      ],
+      "activation_gate": "接口可做；健康心跳落实依Q06",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/秒，≤60",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "monitor.sample_interval_sec",
+      "description": "枚举/秒",
+      "type": "integer",
+      "scope": "模板/设备",
+      "unit": "秒",
+      "value": null,
+      "decision_status": "pending",
+      "source": "M3-4",
+      "question_ids": [
+        "Q20"
+      ],
+      "activation_gate": "待客户确认后启用；选项可做；租户选值依Q20",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "枚举/秒",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "tenant.worker_concurrency",
+      "description": "正整数/任务数",
+      "type": "integer",
+      "scope": "租户",
+      "unit": null,
+      "value": 2,
+      "decision_status": "contract_fixed",
+      "source": "M2-3",
+      "question_ids": [],
+      "activation_gate": "是；调高范围需容量验证",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正整数/任务数",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "quota.warning_ratio",
+      "description": "小数比例，[0,1]",
+      "type": "number",
+      "scope": "租户",
+      "unit": "ratio_0_to_1",
+      "value": 0.75,
+      "decision_status": "contract_fixed",
+      "source": "M2-1",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "小数比例，[0,1]",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "quota.critical_ratio",
+      "description": "小数比例，[0,1]",
+      "type": "number",
+      "scope": "租户",
+      "unit": "ratio_0_to_1",
+      "value": 0.9,
+      "decision_status": "contract_fixed",
+      "source": "M2-1",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "小数比例，[0,1]",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "pool.review_share_ratio",
+      "description": "小数比例，[0,1]",
+      "type": "number",
+      "scope": "资源池",
+      "unit": "ratio_0_to_1",
+      "value": 0.2,
+      "decision_status": "contract_fixed",
+      "source": "M2-3",
+      "question_ids": [
+        "Q16"
+      ],
+      "activation_gate": "阈值可做；持续时间依Q16",
+      "notes": "合同固定约束",
+      "allowed_range": "小数比例，[0,1]",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "tenant.name_unique",
+      "description": "布尔",
+      "type": "boolean",
+      "scope": "平台",
+      "unit": null,
+      "value": true,
+      "decision_status": "contract_fixed",
+      "source": "M2-2",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "布尔",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "asset.name_unique_in_tenant",
+      "description": "布尔",
+      "type": "boolean",
+      "scope": "租户",
+      "unit": null,
+      "value": true,
+      "decision_status": "contract_fixed",
+      "source": "M3-4",
+      "question_ids": [
+        "Q31"
+      ],
+      "activation_gate": "是；IP冲突域依Q31",
+      "notes": "合同固定约束",
+      "allowed_range": "布尔",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "tenant.decision_contact_min",
+      "description": "整数/人，≥1",
+      "type": "integer",
+      "scope": "租户",
+      "unit": "分钟",
+      "value": 1,
+      "decision_status": "contract_fixed",
+      "source": "M2-9",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "整数/人，≥1",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "sla.tier_availability_target",
+      "description": "百分数，0—100",
+      "type": "object",
+      "scope": "档位",
+      "unit": "%",
+      "value": {
+        "基础": 99.5,
+        "标准": 99.9,
+        "进阶": 99.99
+      },
+      "decision_status": "contract_fixed",
+      "source": "M2-10",
+      "question_ids": [
+        "Q16"
+      ],
+      "activation_gate": "是；实际租户档位依Q16",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "百分数，0—100",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "import.max_rows",
+      "description": "整数/行，≤500",
+      "type": "integer",
+      "scope": "文件",
+      "unit": null,
+      "value": 500,
+      "decision_status": "contract_fixed",
+      "source": "M3-6",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "整数/行，≤500",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "import.formats",
+      "description": "格式枚举",
+      "type": "array",
+      "scope": "文件",
+      "unit": null,
+      "value": [
+        "xlsx",
+        "csv"
+      ],
+      "decision_status": "contract_fixed",
+      "source": "M3-6",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "格式枚举",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "import.note_required",
+      "description": "布尔",
+      "type": "boolean",
+      "scope": "文件",
+      "unit": null,
+      "value": true,
+      "decision_status": "contract_fixed",
+      "source": "M3-6",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "布尔",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "import.max_elapsed_sec",
+      "description": "秒，≤60",
+      "type": "integer",
+      "scope": "任务",
+      "unit": "秒",
+      "value": 60,
+      "decision_status": "contract_fixed",
+      "source": "M3-6",
+      "question_ids": [
+        "Q13"
+      ],
+      "activation_gate": "目标可做，实测依Q13",
+      "notes": "合同固定约束",
+      "allowed_range": "秒，≤60",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "export.signed_url_ttl_sec",
+      "description": "整数/秒",
+      "type": "integer",
+      "scope": "导出",
+      "unit": "秒",
+      "value": 900,
+      "decision_status": "contract_fixed",
+      "source": "M2-12/M3-7",
+      "question_ids": [],
+      "activation_gate": "是；每次访问仍鉴权",
+      "notes": "合同固定约束",
+      "allowed_range": "整数/秒",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "credential.old_key_grace_hours",
+      "description": "整数/小时",
+      "type": "integer",
+      "scope": "站点",
+      "unit": "小时",
+      "value": 24,
+      "decision_status": "contract_fixed",
+      "source": "M3-8",
+      "question_ids": [
+        "Q28"
+      ],
+      "activation_gate": "是；KMS/CA依Q28",
+      "notes": "合同固定约束",
+      "allowed_range": "整数/小时",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "audit.min_retention_years",
+      "description": "整数/年，≥3",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "年",
+      "value": 3,
+      "decision_status": "contract_fixed",
+      "source": "M2-12/M7-5",
+      "question_ids": [],
+      "activation_gate": "是；禁止低于下限",
+      "notes": "合同固定约束",
+      "allowed_range": "整数/年，≥3",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "events.default_retention_years",
+      "description": "整数/年",
+      "type": "integer",
+      "scope": "租户",
+      "unit": "年",
+      "value": 3,
+      "decision_status": "contract_fixed",
+      "source": "M2-13",
+      "question_ids": [
+        "Q10"
+      ],
+      "activation_gate": "数据模型可做；生产覆盖/清理依Q10",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "整数/年",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "report.contract_retention",
+      "description": "生命周期枚举",
+      "type": "string",
+      "scope": "合同",
+      "unit": null,
+      "value": "contract_duration_permanent",
+      "decision_status": "contract_fixed",
+      "source": "M9-2",
+      "question_ids": [
+        "Q10"
+      ],
+      "activation_gate": "是；合同终止处置依Q10",
+      "notes": "合同固定约束",
+      "allowed_range": "生命周期枚举",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "event.merge_window_sec",
+      "description": "正整数/秒",
+      "type": "integer",
+      "scope": "规则",
+      "unit": "秒",
+      "value": 300,
+      "decision_status": "contract_fixed",
+      "source": "M4-8",
+      "question_ids": [],
+      "activation_gate": "是；灾难/严重立即",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正整数/秒",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "event.flap_window_sec",
+      "description": "正整数/秒",
+      "type": "integer",
+      "scope": "规则",
+      "unit": "秒",
+      "value": 600,
+      "decision_status": "contract_fixed",
+      "source": "M4-7",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正整数/秒",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "event.flap_flip_count",
+      "description": "正整数/次",
+      "type": "integer",
+      "scope": "规则",
+      "unit": null,
+      "value": 3,
+      "decision_status": "contract_fixed",
+      "source": "M4-7",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正整数/次",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "event.flap_silence_sec",
+      "description": "正整数/秒",
+      "type": "integer",
+      "scope": "规则",
+      "unit": "秒",
+      "value": 300,
+      "decision_status": "contract_fixed",
+      "source": "M4-7",
+      "question_ids": [
+        "Q06"
+      ],
+      "activation_gate": "是；恢复方向依Q06",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正整数/秒",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "event.compensation_interval_sec",
+      "description": "正整数/秒",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "秒",
+      "value": 300,
+      "decision_status": "contract_fixed",
+      "source": "M4-14",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/秒",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "event.compensation_lookback_sec",
+      "description": "正整数/秒",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "秒",
+      "value": 900,
+      "decision_status": "contract_fixed",
+      "source": "M4-14",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/秒",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "event.failed_payload_retention_hours",
+      "description": "整数/小时，≥24",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "小时",
+      "value": 24,
+      "decision_status": "contract_fixed",
+      "source": "M4-14",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "整数/小时，≥24",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "template.canary_tenant_ratio",
+      "description": "小数比例，[0,1]",
+      "type": "number",
+      "scope": "平台",
+      "unit": "ratio_0_to_1",
+      "value": 0.2,
+      "decision_status": "contract_fixed",
+      "source": "M4-12",
+      "question_ids": [
+        "Q16"
+      ],
+      "activation_gate": "比例可做；小租户池取整/选取依Q16",
+      "notes": "合同固定约束",
+      "allowed_range": "小数比例，[0,1]",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "template.canary_observe_hours",
+      "description": "正整数/小时",
+      "type": "integer",
+      "scope": "模板",
+      "unit": "小时",
+      "value": 72,
+      "decision_status": "contract_fixed",
+      "source": "M4-12",
+      "question_ids": [],
+      "activation_gate": "是；误报/延迟不得上升",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/小时",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "probe.wan_interval_sec",
+      "description": "正整数/秒",
+      "type": "integer",
+      "scope": "探针",
+      "unit": "秒",
+      "value": 30,
+      "decision_status": "contract_fixed",
+      "source": "M4-18",
+      "question_ids": [
+        "Q20",
+        "Q21"
+      ],
+      "activation_gate": "逻辑是；网络部署依Q20/Q21",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/秒",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "probe.lan_interval_sec",
+      "description": "正整数/秒",
+      "type": "integer",
+      "scope": "探针",
+      "unit": "秒",
+      "value": 60,
+      "decision_status": "contract_fixed",
+      "source": "M4-18",
+      "question_ids": [
+        "Q20",
+        "Q21"
+      ],
+      "activation_gate": "逻辑是；网络部署依Q20/Q21",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/秒",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "config.diff_interval_hours",
+      "description": "正整数/小时",
+      "type": "integer",
+      "scope": "设备",
+      "unit": "小时",
+      "value": 6,
+      "decision_status": "contract_fixed",
+      "source": "M4-17/M6-2",
+      "question_ids": [],
+      "activation_gate": "是；采集与备份共用",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/小时",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "ticket.default_dedupe_window_sec",
+      "description": "正整数/秒",
+      "type": "integer",
+      "scope": "规则",
+      "unit": "秒",
+      "value": 1800,
+      "decision_status": "contract_fixed",
+      "source": "M5-4",
+      "question_ids": [],
+      "activation_gate": "是；tenant+asset+rule",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正整数/秒",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "ticket.autocreate_retry_max",
+      "description": "整数/次",
+      "type": "integer",
+      "scope": "适配器",
+      "unit": null,
+      "value": 5,
+      "decision_status": "contract_fixed",
+      "source": "M5-4",
+      "question_ids": [
+        "Q07"
+      ],
+      "activation_gate": "是；后两次退避依Q07",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "整数/次",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "ticket.fallback_sla_hours",
+      "description": "正数/小时",
+      "type": "integer",
+      "scope": "档位",
+      "unit": "小时",
+      "value": 4,
+      "decision_status": "contract_fixed",
+      "source": "M5-8",
+      "question_ids": [],
+      "activation_gate": "保留合同字段；不得覆盖M5-20或填补未定次日",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正数/小时",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "ticket.photo_max_count",
+      "description": "整数/张，≤3",
+      "type": "integer",
+      "scope": "报障",
+      "unit": null,
+      "value": 3,
+      "decision_status": "contract_fixed",
+      "source": "M5-5",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "整数/张，≤3",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "ticket.photo_max_size_mb",
+      "description": "正数/MB，≤5",
+      "type": "integer",
+      "scope": "附件",
+      "unit": "MB",
+      "value": 5,
+      "decision_status": "contract_fixed",
+      "source": "M5-5",
+      "question_ids": [],
+      "activation_gate": "是；服务端与前端同限制",
+      "notes": "合同固定约束",
+      "allowed_range": "正数/MB，≤5",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "ticket.report_duplicate_sec",
+      "description": "正整数/秒",
+      "type": "integer",
+      "scope": "报障",
+      "unit": "秒",
+      "value": 30,
+      "decision_status": "contract_fixed",
+      "source": "M5-5",
+      "question_ids": [],
+      "activation_gate": "是；同租户/设备/分类",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/秒",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "ticket.report_create_max_sec",
+      "description": "秒，≤10",
+      "type": "integer",
+      "scope": "报障",
+      "unit": "秒",
+      "value": 10,
+      "decision_status": "contract_fixed",
+      "source": "M5-5",
+      "question_ids": [
+        "Q07"
+      ],
+      "activation_gate": "是；外部故障语义依Q07",
+      "notes": "合同固定约束",
+      "allowed_range": "秒，≤10",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "ticket.solution_min_chars",
+      "description": "整数/字，≥20",
+      "type": "integer",
+      "scope": "解决",
+      "unit": null,
+      "value": 20,
+      "decision_status": "contract_fixed",
+      "source": "M5-15",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "整数/字，≥20",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "ticket.customer_confirm_timeout_hours",
+      "description": "正整数/小时",
+      "type": "object",
+      "scope": "档位",
+      "unit": "小时",
+      "value": {
+        "基础": 48,
+        "标准": 48,
+        "进阶": 24
+      },
+      "decision_status": "contract_fixed",
+      "source": "M5-15/M5-16",
+      "question_ids": [],
+      "activation_gate": "是；开单/本轮计时快照",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正整数/小时",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "ticket.autoclose_remind_before_hours",
+      "description": "正整数/小时",
+      "type": "integer",
+      "scope": "工单",
+      "unit": "小时",
+      "value": 12,
+      "decision_status": "contract_fixed",
+      "source": "M5-16",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/小时",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "ticket.reopen_window_hours",
+      "description": "正整数/小时",
+      "type": "integer",
+      "scope": "工单",
+      "unit": "小时",
+      "value": 72,
+      "decision_status": "contract_fixed",
+      "source": "M5-17",
+      "question_ids": [
+        "Q27"
+      ],
+      "activation_gate": "是；统计口径依Q27",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/小时",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "ticket.reopen_manager_threshold",
+      "description": "正整数/次",
+      "type": "integer",
+      "scope": "工单",
+      "unit": null,
+      "value": 2,
+      "decision_status": "contract_fixed",
+      "source": "M5-17",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/次",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "sla.tick_interval_sec",
+      "description": "正整数/秒",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "秒",
+      "value": 30,
+      "decision_status": "contract_fixed",
+      "source": "M5-20",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/秒",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "sla.reminder_progress",
+      "description": "小数比例数组，[0,1]",
+      "type": "array",
+      "scope": "工单",
+      "unit": "ratio_0_to_1",
+      "value": [
+        0.5,
+        0.8,
+        1.0
+      ],
+      "decision_status": "contract_fixed",
+      "source": "M5-18",
+      "question_ids": [
+        "Q15"
+      ],
+      "activation_gate": "是；接收人链依Q15",
+      "notes": "合同固定约束",
+      "allowed_range": "小数比例数组，[0,1]",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "sla.p1_response_min",
+      "description": "正数/分钟",
+      "type": "object",
+      "scope": "档位",
+      "unit": "分钟",
+      "value": {
+        "基础": 30,
+        "标准": 10,
+        "进阶": 10
+      },
+      "decision_status": "contract_fixed",
+      "source": "M5-20",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正数/分钟",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "sla.p1_recover_min",
+      "description": "正数/分钟",
+      "type": "object",
+      "scope": "档位",
+      "unit": "分钟",
+      "value": {
+        "基础": 240,
+        "标准": 120,
+        "进阶": 90
+      },
+      "decision_status": "contract_fixed",
+      "source": "M5-20",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正数/分钟",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "sla.p2_response_min",
+      "description": "正数/分钟",
+      "type": "object",
+      "scope": "档位",
+      "unit": "分钟",
+      "value": {
+        "基础": 60,
+        "标准": 30,
+        "进阶": 20
+      },
+      "decision_status": "contract_fixed",
+      "source": "M5-20",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正数/分钟",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "sla.p2_recover_min",
+      "description": "正数/分钟",
+      "type": "object",
+      "scope": "档位",
+      "unit": "分钟",
+      "value": {
+        "基础": 480,
+        "标准": 240,
+        "进阶": 180
+      },
+      "decision_status": "contract_fixed",
+      "source": "M5-20",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正数/分钟",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "sla.p3_response_min",
+      "description": "正数/分钟",
+      "type": "object",
+      "scope": "档位",
+      "unit": "分钟",
+      "value": {
+        "基础": 240,
+        "标准": 120,
+        "进阶": 60
+      },
+      "decision_status": "contract_fixed",
+      "source": "M5-20",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正数/分钟",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "sla.advanced_p3_recover_min",
+      "description": "正数/分钟",
+      "type": "integer",
+      "scope": "进阶档",
+      "unit": "分钟",
+      "value": 240,
+      "decision_status": "contract_fixed",
+      "source": "M5-20",
+      "question_ids": [
+        "Q08"
+      ],
+      "activation_gate": "是；基础/标准见Q08",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正数/分钟",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "sla.compensation_ratio",
+      "description": "小数比例，[0,1]",
+      "type": "object",
+      "scope": "档位",
+      "unit": "ratio_0_to_1",
+      "value": {
+        "基础": 0.1,
+        "标准": 0.2,
+        "进阶": 0.3
+      },
+      "decision_status": "contract_fixed",
+      "source": "M5-19",
+      "question_ids": [
+        "Q26"
+      ],
+      "activation_gate": "比例可做；公式依Q26",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "小数比例，[0,1]",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "oncall.handoff_local_time",
+      "description": "HH:mm",
+      "type": "string",
+      "scope": "平台",
+      "unit": "HH:mm Asia/Shanghai",
+      "value": "18:00",
+      "decision_status": "contract_fixed",
+      "source": "M5-13",
+      "question_ids": [],
+      "activation_gate": "是；Asia/Shanghai",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "HH:mm",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "oncall.unanswered_escalate_count",
+      "description": "正整数/次",
+      "type": "integer",
+      "scope": "链节点",
+      "unit": null,
+      "value": 2,
+      "decision_status": "contract_fixed",
+      "source": "M5-13",
+      "question_ids": [
+        "Q15",
+        "Q18"
+      ],
+      "activation_gate": "计数可做；间隔/回执依Q15/Q18",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正整数/次",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "backup.default_local_time",
+      "description": "HH:mm",
+      "type": "string",
+      "scope": "计划",
+      "unit": "HH:mm Asia/Shanghai",
+      "value": "02:00",
+      "decision_status": "contract_fixed",
+      "source": "M6-1",
+      "question_ids": [],
+      "activation_gate": "是；Asia/Shanghai",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "HH:mm",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "backup.retry_count",
+      "description": "整数/次",
+      "type": "integer",
+      "scope": "计划",
+      "unit": null,
+      "value": 2,
+      "decision_status": "contract_fixed",
+      "source": "M6-1",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "整数/次",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "backup.retry_interval_min",
+      "description": "正整数/分钟",
+      "type": "integer",
+      "scope": "计划",
+      "unit": "分钟",
+      "value": 10,
+      "decision_status": "contract_fixed",
+      "source": "M6-1",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正整数/分钟",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "backup.recent_version_count",
+      "description": "正整数/版本",
+      "type": "integer",
+      "scope": "设备",
+      "unit": null,
+      "value": 30,
+      "decision_status": "contract_fixed",
+      "source": "M6-3",
+      "question_ids": [],
+      "activation_gate": "展示可做；不能违反12个月保留",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正整数/版本",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "backup.min_retention_months",
+      "description": "整数/月，≥12",
+      "type": "integer",
+      "scope": "设备",
+      "unit": "月",
+      "value": 12,
+      "decision_status": "contract_fixed",
+      "source": "M6-3",
+      "question_ids": [
+        "Q10"
+      ],
+      "activation_gate": "是；归档策略依Q10",
+      "notes": "合同固定约束",
+      "allowed_range": "整数/月，≥12",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "backup.failure_ticket_count",
+      "description": "正整数/次",
+      "type": "integer",
+      "scope": "设备",
+      "unit": null,
+      "value": 2,
+      "decision_status": "contract_fixed",
+      "source": "M6-4",
+      "question_ids": [
+        "Q22"
+      ],
+      "activation_gate": "阈值可做；“次”定义依Q22",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/次",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "backup.drill_warning_days",
+      "description": "正整数/天",
+      "type": "integer",
+      "scope": "设备",
+      "unit": "天",
+      "value": 90,
+      "decision_status": "contract_fixed",
+      "source": "M6-5",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/天",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "remote.approval_expiry_min",
+      "description": "正整数/分钟",
+      "type": "integer",
+      "scope": "申请",
+      "unit": "分钟",
+      "value": 30,
+      "decision_status": "contract_fixed",
+      "source": "M7-6",
+      "question_ids": [
+        "Q01"
+      ],
+      "activation_gate": "仅设计，Q01确认后排期",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/分钟",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "remote.default_session_min",
+      "description": "正整数/分钟",
+      "type": "integer",
+      "scope": "会话",
+      "unit": "分钟",
+      "value": 60,
+      "decision_status": "contract_fixed",
+      "source": "M7-6",
+      "question_ids": [
+        "Q01"
+      ],
+      "activation_gate": "仅设计，Q01确认后排期",
+      "notes": "合同明确可配置默认值；contract_fixed仅表示该默认值有合同依据，不表示不可通过已确认流程调整。",
+      "allowed_range": "正整数/分钟",
+      "contract_value_kind": "configurable_default",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "remote.engineer_concurrency",
+      "description": "正整数/会话，≤2",
+      "type": "integer",
+      "scope": "工程师",
+      "unit": null,
+      "value": 2,
+      "decision_status": "contract_fixed",
+      "source": "M7-6",
+      "question_ids": [
+        "Q01"
+      ],
+      "activation_gate": "仅设计，Q01确认后排期",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/会话，≤2",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "remote.authorization_remind_days",
+      "description": "正整数/天",
+      "type": "integer",
+      "scope": "授权",
+      "unit": "天",
+      "value": 7,
+      "decision_status": "contract_fixed",
+      "source": "M7-7",
+      "question_ids": [
+        "Q01"
+      ],
+      "activation_gate": "仅设计，Q01确认后排期",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/天",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "recording.hot_retention_months",
+      "description": "正整数/月",
+      "type": "integer",
+      "scope": "录屏",
+      "unit": "月",
+      "value": 6,
+      "decision_status": "contract_fixed",
+      "source": "M7-8",
+      "question_ids": [
+        "Q10"
+      ],
+      "activation_gate": "仅设计；总期依Q10",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/月",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "portal.session_ttl_hours",
+      "description": "正整数/小时",
+      "type": "integer",
+      "scope": "门户",
+      "unit": "小时",
+      "value": 8,
+      "decision_status": "contract_fixed",
+      "source": "M8-4",
+      "question_ids": [],
+      "activation_gate": "是；后台会话不自动沿用",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/小时",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "portal.text_contrast_min",
+      "description": "对比度比值，≥4.5",
+      "type": "number",
+      "scope": "门户",
+      "unit": "分钟",
+      "value": 4.5,
+      "decision_status": "contract_fixed",
+      "source": "M8-12",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "对比度比值，≥4.5",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "portal.touch_target_min_px",
+      "description": "整数/px，≥44",
+      "type": "object",
+      "scope": "门户",
+      "unit": "px",
+      "value": {
+        "width": 44,
+        "height": 44
+      },
+      "decision_status": "contract_fixed",
+      "source": "M8-12",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "整数/px，≥44",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "report.monthly_generate_day",
+      "description": "整数/月中日期",
+      "type": "integer",
+      "scope": "平台",
+      "unit": null,
+      "value": 1,
+      "decision_status": "contract_fixed",
+      "source": "M9-5",
+      "question_ids": [
+        "Q24"
+      ],
+      "activation_gate": "日期可做；具体时刻/水位依Q24",
+      "notes": "合同固定约束",
+      "allowed_range": "整数/月中日期",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "report.unread_remind_days",
+      "description": "正整数/天",
+      "type": "integer",
+      "scope": "报告",
+      "unit": "天",
+      "value": 7,
+      "decision_status": "contract_fixed",
+      "source": "M9-5",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "正整数/天",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "report.advice_max_count",
+      "description": "整数/条，≤3",
+      "type": "integer",
+      "scope": "报告",
+      "unit": null,
+      "value": 3,
+      "decision_status": "contract_fixed",
+      "source": "M9-3",
+      "question_ids": [],
+      "activation_gate": "是",
+      "notes": "合同固定约束",
+      "allowed_range": "整数/条，≤3",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "operations.remote_rate_target",
+      "description": "百分数，严格>",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "ratio_0_to_1",
+      "value": 70,
+      "decision_status": "contract_fixed",
+      "source": "M10-3",
+      "question_ids": [
+        "Q01"
+      ],
+      "activation_gate": "定义可做；数据依Q01",
+      "notes": "合同固定约束",
+      "allowed_range": "百分数，严格>",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "operations.tenants_per_fte_reference",
+      "description": "正数/户，≥",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "ratio_0_to_1",
+      "value": 12,
+      "decision_status": "contract_fixed",
+      "source": "M10-10",
+      "question_ids": [
+        "Q23"
+      ],
+      "activation_gate": "公式可做；FTE参数依Q23",
+      "notes": "合同固定约束",
+      "allowed_range": "正数/户，≥",
+      "contract_value_kind": "fixed_constraint",
+      "source_registry_section": "4"
+    },
+    {
+      "key": "platform.database_product",
+      "description": "枚举+版本；候选及验收方案须成套",
+      "type": "string",
+      "scope": "平台",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q02所列合同/资料依据",
+      "question_ids": [
+        "Q02"
+      ],
+      "activation_gate": "待客户确认后启用；仓储契约；暂停物理基线",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：platform.database_product/version/isolation_mode",
+      "allowed_range": "枚举+版本；候选及验收方案须成套",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "platform.version",
+      "description": "枚举+版本；候选及验收方案须成套",
+      "type": "string",
+      "scope": "平台",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q02所列合同/资料依据",
+      "question_ids": [
+        "Q02"
+      ],
+      "activation_gate": "待客户确认后启用；仓储契约；暂停物理基线",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：platform.database_product/version/isolation_mode",
+      "allowed_range": "枚举+版本；候选及验收方案须成套",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "platform.isolation_mode",
+      "description": "枚举+版本；候选及验收方案须成套",
+      "type": "string",
+      "scope": "平台",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q02所列合同/资料依据",
+      "question_ids": [
+        "Q02"
+      ],
+      "activation_gate": "待客户确认后启用；仓储契约；暂停物理基线",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：platform.database_product/version/isolation_mode",
+      "allowed_range": "枚举+版本；候选及验收方案须成套",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "component.approved_baseline",
+      "description": "产品、版本、许可、批准证据集合",
+      "type": "object",
+      "scope": "平台/组件",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q03所列合同/资料依据",
+      "question_ids": [
+        "Q03"
+      ],
+      "activation_gate": "待客户确认后启用；披露清单；暂停正式集成",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：component.approved_baseline",
+      "allowed_range": "产品、版本、许可、批准证据集合",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "reliability.target_scope",
+      "description": "对象/阶段/窗口/排除规则结构",
+      "type": "object",
+      "scope": "部署环境",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q04所列合同/资料依据",
+      "question_ids": [
+        "Q04"
+      ],
+      "activation_gate": "待客户确认后启用；分项采集；暂停最终判定",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：reliability.target_scope",
+      "allowed_range": "对象/阶段/窗口/排除规则结构",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "reliability.committed_write_rpo",
+      "description": "整数/秒，允许值由Q04确定",
+      "type": "integer",
+      "scope": "数据层",
+      "unit": "秒",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q04所列合同/资料依据",
+      "question_ids": [
+        "Q04"
+      ],
+      "activation_gate": "待客户确认后启用；演练接口；暂停架构冻结",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：reliability.committed_write_rpo",
+      "allowed_range": "整数/秒，允许值由Q04确定",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "availability.unknown_policy",
+      "description": "枚举/公式，不得未知自动可用",
+      "type": "object",
+      "scope": "口径版本",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q05所列合同/资料依据",
+      "question_ids": [
+        "Q05"
+      ],
+      "activation_gate": "待客户确认后启用；区间与未知；暂停结算",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：availability.unknown_policy",
+      "allowed_range": "枚举/公式，不得未知自动可用",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "availability.min_samples",
+      "description": "非负整数/样本，阈值待定",
+      "type": "integer",
+      "scope": "口径版本",
+      "unit": "样本",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q05所列合同/资料依据",
+      "question_ids": [
+        "Q05"
+      ],
+      "activation_gate": "待客户确认后启用；样本计数；暂停达标判定",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：availability.min_samples",
+      "allowed_range": "非负整数/样本，阈值待定",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "availability.min_coverage_ratio",
+      "description": "小数比例，[0,1]",
+      "type": "number",
+      "scope": "口径版本",
+      "unit": "ratio_0_to_1",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q05所列合同/资料依据",
+      "question_ids": [
+        "Q05"
+      ],
+      "activation_gate": "待客户确认后启用；覆盖率；暂停判定",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：availability.min_coverage_ratio",
+      "allowed_range": "小数比例，[0,1]",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "availability.probe_consensus",
+      "description": "各探测组合→状态映射",
+      "type": "object",
+      "scope": "服务",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q05所列合同/资料依据",
+      "question_ids": [
+        "Q05"
+      ],
+      "activation_gate": "待客户确认后启用；明细存储；暂停合成状态",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：availability.probe_consensus",
+      "allowed_range": "各探测组合→状态映射",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "availability.service_tree_aggregation",
+      "description": "父子权重/并集/缺值规则",
+      "type": "object",
+      "scope": "服务树",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q05所列合同/资料依据",
+      "question_ids": [
+        "Q05"
+      ],
+      "activation_gate": "待客户确认后启用；树模型；暂停父级指标",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：availability.service_tree_aggregation",
+      "allowed_range": "父子权重/并集/缺值规则",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "monitor.threshold_matrix",
+      "description": "warn/critical/窗口/持续/恢复，单位按指标",
+      "type": "object",
+      "scope": "类型/规则/租户覆盖",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q06所列合同/资料依据",
+      "question_ids": [
+        "Q06"
+      ],
+      "activation_gate": "待客户确认后启用；编辑与校验；暂停冲突规则启用",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：monitor.threshold_matrix",
+      "allowed_range": "warn/critical/窗口/持续/恢复，单位按指标",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "monitor.health_heartbeat_sec",
+      "description": "正整数/秒，必须满足60秒未知上限",
+      "type": "integer",
+      "scope": "资源池/设备",
+      "unit": "秒",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q06所列合同/资料依据",
+      "question_ids": [
+        "Q06"
+      ],
+      "activation_gate": "待客户确认后启用；心跳接口；暂停实机策略",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：monitor.health_heartbeat_sec",
+      "allowed_range": "正整数/秒，必须满足60秒未知上限",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "itsm.provider_and_mapping",
+      "description": "产品版本+字段/状态/队列映射",
+      "type": "object",
+      "scope": "租户/接口实例",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q07所列合同/资料依据",
+      "question_ids": [
+        "Q07"
+      ],
+      "activation_gate": "待客户确认后启用；适配器；暂停真实写入",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：itsm.provider_and_mapping",
+      "allowed_range": "产品版本+字段/状态/队列映射",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "itsm.local_authority_mode",
+      "description": "本地权威/外部权威枚举",
+      "type": "string",
+      "scope": "租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q07所列合同/资料依据",
+      "question_ids": [
+        "Q07"
+      ],
+      "activation_gate": "待客户确认后启用；投影模型；暂停状态迁移",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：itsm.local_authority_mode",
+      "allowed_range": "本地权威/外部权威枚举",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "itsm.retry_backoff_sec",
+      "description": "5个正整数/秒，已有候选30/120/600",
+      "type": "array",
+      "scope": "接口实例",
+      "unit": "秒",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q07所列合同/资料依据",
+      "question_ids": [
+        "Q07"
+      ],
+      "activation_gate": "待客户确认后启用；重试器；暂停真实发送",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：itsm.retry_backoff_sec",
+      "allowed_range": "5个正整数/秒，已有候选30/120/600",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "sla.tenant_work_calendar",
+      "description": "工作区间/节假日/补班，Asia/Shanghai",
+      "type": "object",
+      "scope": "租户/版本",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q08所列合同/资料依据",
+      "question_ids": [
+        "Q08"
+      ],
+      "activation_gate": "待客户确认后启用；算法；暂停基础档承诺",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：sla.tenant_work_calendar",
+      "allowed_range": "工作区间/节假日/补班，Asia/Shanghai",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "sla.basic_standard_p3_next_day",
+      "description": "自然/工作日+当地截止HH:mm",
+      "type": "object",
+      "scope": "档位/版本",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q08所列合同/资料依据",
+      "question_ids": [
+        "Q08"
+      ],
+      "activation_gate": "待客户确认后启用；类型化期限；暂停P3恢复截止",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：sla.basic_standard_p3_next_day",
+      "allowed_range": "自然/工作日+当地截止HH:mm",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "auth.role_matrix_and_assignments",
+      "description": "动作集合/租户设备集合；默认拒绝",
+      "type": "object",
+      "scope": "平台/租户/用户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q09所列合同/资料依据",
+      "question_ids": [
+        "Q09"
+      ],
+      "activation_gate": "待客户确认后启用；权限目录；暂停实际授权",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：auth.role_matrix_and_assignments",
+      "allowed_range": "动作集合/租户设备集合；默认拒绝",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "retention.history_days",
+      "description": "正整数/天，范围待容量及客户确认",
+      "type": "integer",
+      "scope": "资源池",
+      "unit": "天",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q10所列合同/资料依据",
+      "question_ids": [
+        "Q10"
+      ],
+      "activation_gate": "待客户确认后启用；归档接口；暂停删除",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：retention.history_days",
+      "allowed_range": "正整数/天，范围待容量及客户确认",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "retention.trend_days",
+      "description": "正整数/天，范围待确认",
+      "type": "integer",
+      "scope": "资源池",
+      "unit": "天",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q10所列合同/资料依据",
+      "question_ids": [
+        "Q10"
+      ],
+      "activation_gate": "待客户确认后启用；分区模型；暂停删除",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：retention.trend_days",
+      "allowed_range": "正整数/天，范围待确认",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "retention.recording_total_months",
+      "description": "正整数/月，至少覆盖热6个月；总期待定",
+      "type": "integer",
+      "scope": "租户",
+      "unit": "月",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q10所列合同/资料依据",
+      "question_ids": [
+        "Q10"
+      ],
+      "activation_gate": "待客户确认后启用；生命周期模型；暂停过期删除",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：retention.recording_total_months",
+      "allowed_range": "正整数/月，至少覆盖热6个月；总期待定",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "retention.backup_archive_policy",
+      "description": "热/冷/基线版本规则，≥12个月",
+      "type": "object",
+      "scope": "资源池/租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q10所列合同/资料依据",
+      "question_ids": [
+        "Q10"
+      ],
+      "activation_gate": "待客户确认后启用；双层索引；暂停删减版本",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：retention.backup_archive_policy",
+      "allowed_range": "热/冷/基线版本规则，≥12个月",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "retention.contract_end_policy",
+      "description": "导出、审批、清理和备份过期规则",
+      "type": "object",
+      "scope": "数据类别/合同",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q10所列合同/资料依据",
+      "question_ids": [
+        "Q10"
+      ],
+      "activation_gate": "待客户确认后启用；离场清单；暂停清理",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：retention.contract_end_policy",
+      "allowed_range": "导出、审批、清理和备份过期规则",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "scope.feishu",
+      "description": "范围及交付阶段枚举",
+      "type": "object",
+      "scope": "项目",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q11所列合同/资料依据",
+      "question_ids": [
+        "Q11"
+      ],
+      "activation_gate": "待客户确认后启用；隔离入口；暂停扩展排期",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：scope.feishu/annual_review/extensions",
+      "allowed_range": "范围及交付阶段枚举",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "scope.annual_review",
+      "description": "范围及交付阶段枚举",
+      "type": "object",
+      "scope": "项目",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q11所列合同/资料依据",
+      "question_ids": [
+        "Q11"
+      ],
+      "activation_gate": "待客户确认后启用；隔离入口；暂停扩展排期",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：scope.feishu/annual_review/extensions",
+      "allowed_range": "范围及交付阶段枚举",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "scope.extensions",
+      "description": "范围及交付阶段枚举",
+      "type": "object",
+      "scope": "项目",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q11所列合同/资料依据",
+      "question_ids": [
+        "Q11"
+      ],
+      "activation_gate": "待客户确认后启用；隔离入口；暂停扩展排期",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：scope.feishu/annual_review/extensions",
+      "allowed_range": "范围及交付阶段枚举",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "delivery.milestone_dates_and_acceptance",
+      "description": "日期/起算事件/签署人",
+      "type": "object",
+      "scope": "项目",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q12所列合同/资料依据",
+      "question_ids": [
+        "Q12"
+      ],
+      "activation_gate": "待客户确认后启用；依赖计划；暂停绝对日期承诺",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：delivery.milestone_dates_and_acceptance",
+      "allowed_range": "日期/起算事件/签署人",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "acceptance.requirement_priority",
+      "description": "P0/P1等，与工单优先级分开",
+      "type": "object",
+      "scope": "需求ID",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q13所列合同/资料依据",
+      "question_ids": [
+        "Q13"
+      ],
+      "activation_gate": "待客户确认后启用；128项映射；暂停通过率汇总",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：acceptance.requirement_priority",
+      "allowed_range": "P0/P1等，与工单优先级分开",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "acceptance.workload_and_environment",
+      "description": "CPU/内存/磁盘/并发/数据量/混合比例/null不可执行",
+      "type": "object",
+      "scope": "测试环境",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q13所列合同/资料依据",
+      "question_ids": [
+        "Q13"
+      ],
+      "activation_gate": "待客户确认后启用；压测模板；暂停达标结论",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：acceptance.workload_and_environment",
+      "allowed_range": "CPU/内存/磁盘/并发/数据量/混合比例/null不可执行",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "notification.severity_priority_mapping",
+      "description": "6严重级→P1—P4及未分类策略",
+      "type": "object",
+      "scope": "租户/规则",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q14所列合同/资料依据",
+      "question_ids": [
+        "Q14"
+      ],
+      "activation_gate": "待客户确认后启用；映射编辑；暂停自动派发",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：notification.severity_priority_mapping",
+      "allowed_range": "6严重级→P1—P4及未分类策略",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "notification.matrix_precedence",
+      "description": "事件矩阵/P级/静音/决策人冲突规则",
+      "type": "object",
+      "scope": "租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q14所列合同/资料依据",
+      "question_ids": [
+        "Q14"
+      ],
+      "activation_gate": "待客户确认后启用；路由模拟；暂停真实发送",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：notification.matrix_precedence",
+      "allowed_range": "事件矩阵/P级/静音/决策人冲突规则",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "oncall.roster_and_escalation_chain",
+      "description": "岗位、步骤、触发条件与时间，秒/null不可执行",
+      "type": "object",
+      "scope": "租户/档位",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q15所列合同/资料依据",
+      "question_ids": [
+        "Q15"
+      ],
+      "activation_gate": "待客户确认后启用；链模型；暂停升级",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：oncall.roster_and_escalation_chain",
+      "allowed_range": "岗位、步骤、触发条件与时间，秒/null不可执行",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "oncall.unanswered_retry_interval_sec",
+      "description": "正整数/秒，范围待定",
+      "type": "integer",
+      "scope": "通道/链节点",
+      "unit": "秒",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q15所列合同/资料依据",
+      "question_ids": [
+        "Q15"
+      ],
+      "activation_gate": "待客户确认后启用；计时器；暂停自动外呼",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：oncall.unanswered_retry_interval_sec",
+      "allowed_range": "正整数/秒，范围待定",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "tenant.contract_device_quota",
+      "description": "非负整数/台，业务上限客户提供",
+      "type": "integer",
+      "scope": "租户",
+      "unit": "台",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q16所列合同/资料依据",
+      "question_ids": [
+        "Q16"
+      ],
+      "activation_gate": "待客户确认后启用；硬校验；暂停纳管",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：tenant.contract_device_quota",
+      "allowed_range": "非负整数/台，业务上限客户提供",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "tenant.item_quota",
+      "description": "非负整数/项；非负数/值每秒",
+      "type": "integer",
+      "scope": "租户",
+      "unit": "项",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q16所列合同/资料依据",
+      "question_ids": [
+        "Q16"
+      ],
+      "activation_gate": "待客户确认后启用；预留与计量；暂停真实接入",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：tenant.item_quota/nvps_quota",
+      "allowed_range": "非负整数/项；非负数/值每秒",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "tenant.nvps_quota",
+      "description": "非负整数/项；非负数/值每秒",
+      "type": "number",
+      "scope": "租户",
+      "unit": "值/秒",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q16所列合同/资料依据",
+      "question_ids": [
+        "Q16"
+      ],
+      "activation_gate": "待客户确认后启用；预留与计量；暂停真实接入",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：tenant.item_quota/nvps_quota",
+      "allowed_range": "非负整数/项；非负数/值每秒",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "tenant.plan",
+      "description": "合同3档/3模式/已确认资源池",
+      "type": "string",
+      "scope": "租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q16所列合同/资料依据",
+      "question_ids": [
+        "Q16"
+      ],
+      "activation_gate": "待客户确认后启用；异步模型；暂停真实租户创建",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：tenant.plan/isolation/pool",
+      "allowed_range": "合同3档/3模式/已确认资源池",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "tenant.isolation",
+      "description": "合同3档/3模式/已确认资源池",
+      "type": "string",
+      "scope": "租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q16所列合同/资料依据",
+      "question_ids": [
+        "Q16"
+      ],
+      "activation_gate": "待客户确认后启用；异步模型；暂停真实租户创建",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：tenant.plan/isolation/pool",
+      "allowed_range": "合同3档/3模式/已确认资源池",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "tenant.pool",
+      "description": "合同3档/3模式/已确认资源池",
+      "type": "string",
+      "scope": "租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q16所列合同/资料依据",
+      "question_ids": [
+        "Q16"
+      ],
+      "activation_gate": "待客户确认后启用；异步模型；暂停真实租户创建",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：tenant.plan/isolation/pool",
+      "allowed_range": "合同3档/3模式/已确认资源池",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "pool.review_share_duration_sec",
+      "description": "正整数/秒",
+      "type": "integer",
+      "scope": "资源池",
+      "unit": "秒",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q16所列合同/资料依据",
+      "question_ids": [
+        "Q16"
+      ],
+      "activation_gate": "待客户确认后启用；持续窗口；暂停20%迁池提示",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：pool.review_share_duration_sec",
+      "allowed_range": "正整数/秒",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "charts.point_limit_policy",
+      "description": "枚举20或1000及时间范围映射",
+      "type": "object",
+      "scope": "档位/资源池",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q16/Q30所列合同/资料依据",
+      "question_ids": [
+        "Q16",
+        "Q30"
+      ],
+      "activation_gate": "待客户确认后启用；取点接口；暂停默认映射",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：charts.point_limit_policy",
+      "allowed_range": "枚举20或1000及时间范围映射",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "lists.page_max_policy",
+      "description": "枚举100或500",
+      "type": "object",
+      "scope": "档位/资源池",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q16所列合同/资料依据",
+      "question_ids": [
+        "Q16"
+      ],
+      "activation_gate": "待客户确认后启用；分页限制；暂停产品默认映射",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：lists.page_max_policy",
+      "allowed_range": "枚举100或500",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "auth.oidc_config",
+      "description": "issuer/client_ref/claim与账号绑定",
+      "type": "object",
+      "scope": "身份实例/租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q17所列合同/资料依据",
+      "question_ids": [
+        "Q17"
+      ],
+      "activation_gate": "待客户确认后启用；协议适配；暂停真实登录",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：auth.oidc_config/wecom_binding",
+      "allowed_range": "issuer/client_ref/claim与账号绑定",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "auth.wecom_binding",
+      "description": "issuer/client_ref/claim与账号绑定",
+      "type": "object",
+      "scope": "身份实例/租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q17所列合同/资料依据",
+      "question_ids": [
+        "Q17"
+      ],
+      "activation_gate": "待客户确认后启用；协议适配；暂停真实登录",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：auth.oidc_config/wecom_binding",
+      "allowed_range": "issuer/client_ref/claim与账号绑定",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "auth.password_min_length",
+      "description": "正整数/字符，最小/最大待确认",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "字符",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q17所列合同/资料依据",
+      "question_ids": [
+        "Q17"
+      ],
+      "activation_gate": "待客户确认后启用；校验器；暂停本地账号启用",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：auth.password_min_length",
+      "allowed_range": "正整数/字符，最小/最大待确认",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "auth.password_complexity",
+      "description": "字符类别/禁止项规则",
+      "type": "object",
+      "scope": "平台",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q17所列合同/资料依据",
+      "question_ids": [
+        "Q17"
+      ],
+      "activation_gate": "待客户确认后启用；规则引擎；暂停策略发布",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：auth.password_complexity",
+      "allowed_range": "字符类别/禁止项规则",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "auth.password_expiry_days",
+      "description": "正整数/天、非负整数/次，是否允许无到期待确认",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "天",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q17所列合同/资料依据",
+      "question_ids": [
+        "Q17"
+      ],
+      "activation_gate": "待客户确认后启用；历史/过期检查；暂停默认策略",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：auth.password_expiry_days/history_count",
+      "allowed_range": "正整数/天、非负整数/次，是否允许无到期待确认",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "auth.history_count",
+      "description": "正整数/天、非负整数/次，是否允许无到期待确认",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "次",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q17所列合同/资料依据",
+      "question_ids": [
+        "Q17"
+      ],
+      "activation_gate": "待客户确认后启用；历史/过期检查；暂停默认策略",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：auth.password_expiry_days/history_count",
+      "allowed_range": "正整数/天、非负整数/次，是否允许无到期待确认",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "auth.failed_attempt_limit",
+      "description": "正整数/次及秒，取值待确认",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "次",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q17所列合同/资料依据",
+      "question_ids": [
+        "Q17"
+      ],
+      "activation_gate": "待客户确认后启用；计数；暂停默认策略",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：auth.failed_attempt_limit/lock_seconds",
+      "allowed_range": "正整数/次及秒，取值待确认",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "auth.lock_seconds",
+      "description": "正整数/次及秒，取值待确认",
+      "type": "integer",
+      "scope": "平台",
+      "unit": "秒",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q17所列合同/资料依据",
+      "question_ids": [
+        "Q17"
+      ],
+      "activation_gate": "待客户确认后启用；计数；暂停默认策略",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：auth.failed_attempt_limit/lock_seconds",
+      "allowed_range": "正整数/次及秒，取值待确认",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "auth.mfa_policy",
+      "description": "方式、强制角色、恢复、TTL/idle秒",
+      "type": "object",
+      "scope": "平台/角色",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q17所列合同/资料依据",
+      "question_ids": [
+        "Q17"
+      ],
+      "activation_gate": "待客户确认后启用；会话撤权；暂停生产认证基线",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：auth.mfa_policy/admin_session_policy",
+      "allowed_range": "方式、强制角色、恢复、TTL/idle秒",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "auth.admin_session_policy",
+      "description": "方式、强制角色、恢复、TTL/idle秒",
+      "type": "object",
+      "scope": "平台/角色",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q17所列合同/资料依据",
+      "question_ids": [
+        "Q17"
+      ],
+      "activation_gate": "待客户确认后启用；会话撤权；暂停生产认证基线",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：auth.mfa_policy/admin_session_policy",
+      "allowed_range": "方式、强制角色、恢复、TTL/idle秒",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "notification.provider_credentials",
+      "description": "端点、secret_ref、签名、回执、白名单",
+      "type": "object",
+      "scope": "租户/渠道",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q18所列合同/资料依据",
+      "question_ids": [
+        "Q18"
+      ],
+      "activation_gate": "待客户确认后启用；掩码配置；暂停发送",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：notification.provider_credentials",
+      "allowed_range": "端点、secret_ref、签名、回执、白名单",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "notification.sms_month_quota",
+      "description": "非负整数/条；0为拒发，不表示无限",
+      "type": "integer",
+      "scope": "租户/渠道",
+      "unit": "条/月",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q18所列合同/资料依据",
+      "question_ids": [
+        "Q18"
+      ],
+      "activation_gate": "待客户确认后启用；额度计数；暂停发送",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：notification.sms_month_quota",
+      "allowed_range": "非负整数/条；0为拒发，不表示无限",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "notification.voice_concurrency",
+      "description": "正整数/并发；非负金额/分钟等计费单位",
+      "type": "integer",
+      "scope": "通道",
+      "unit": "并发呼叫",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q18所列合同/资料依据",
+      "question_ids": [
+        "Q18"
+      ],
+      "activation_gate": "待客户确认后启用；计量字段；暂停采购/外呼",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：notification.voice_concurrency/price",
+      "allowed_range": "正整数/并发；非负金额/分钟等计费单位",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "notification.price",
+      "description": "正整数/并发；非负金额/分钟等计费单位",
+      "type": "object",
+      "scope": "通道",
+      "unit": "金额/计费单位，币种与单位待定",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q18所列合同/资料依据",
+      "question_ids": [
+        "Q18"
+      ],
+      "activation_gate": "待客户确认后启用；计量字段；暂停采购/外呼",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：notification.voice_concurrency/price",
+      "allowed_range": "正整数/并发；非负金额/分钟等计费单位",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "cmdb.mapping_and_sync_policy",
+      "description": "字段、唯一键、游标、频率秒、删除行为",
+      "type": "object",
+      "scope": "租户/实例",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q19所列合同/资料依据",
+      "question_ids": [
+        "Q19"
+      ],
+      "activation_gate": "待客户确认后启用；差异预览；暂停覆盖资产",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：cmdb.mapping_and_sync_policy",
+      "allowed_range": "字段、唯一键、游标、频率秒、删除行为",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "device.enum",
+      "description": "9类字典；YAML、OID、单位换算和版本",
+      "type": "array",
+      "scope": "厂商/型号",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q20所列合同/资料依据",
+      "question_ids": [
+        "Q20"
+      ],
+      "activation_gate": "待客户确认后启用；Schema；暂停全适配承诺",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：device.enum/oid_mapping/firmware",
+      "allowed_range": "9类字典；YAML、OID、单位换算和版本",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "device.oid_mapping",
+      "description": "9类字典；YAML、OID、单位换算和版本",
+      "type": "object",
+      "scope": "厂商/型号",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q20所列合同/资料依据",
+      "question_ids": [
+        "Q20"
+      ],
+      "activation_gate": "待客户确认后启用；Schema；暂停全适配承诺",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：device.enum/oid_mapping/firmware",
+      "allowed_range": "9类字典；YAML、OID、单位换算和版本",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "device.firmware",
+      "description": "9类字典；YAML、OID、单位换算和版本",
+      "type": "object",
+      "scope": "厂商/型号",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q20所列合同/资料依据",
+      "question_ids": [
+        "Q20"
+      ],
+      "activation_gate": "待客户确认后启用；Schema；暂停全适配承诺",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：device.enum/oid_mapping/firmware",
+      "allowed_range": "9类字典；YAML、OID、单位换算和版本",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "device.core_ports",
+      "description": "对象集合/无环关系/终端数量",
+      "type": "array",
+      "scope": "租户/站点",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q20所列合同/资料依据",
+      "question_ids": [
+        "Q20"
+      ],
+      "activation_gate": "待客户确认后启用；防环；暂停真实影响范围推断",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：device.core_ports/dependencies",
+      "allowed_range": "对象集合/无环关系/终端数量",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "device.dependencies",
+      "description": "对象集合/无环关系/终端数量",
+      "type": "array",
+      "scope": "租户/站点",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q20所列合同/资料依据",
+      "question_ids": [
+        "Q20"
+      ],
+      "activation_gate": "待客户确认后启用；防环；暂停真实影响范围推断",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：device.core_ports/dependencies",
+      "allowed_range": "对象集合/无环关系/终端数量",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "deployment.resources",
+      "description": "资源数值、域名、地址/端口、权限引用",
+      "type": "object",
+      "scope": "环境/站点",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q21所列合同/资料依据",
+      "question_ids": [
+        "Q21"
+      ],
+      "activation_gate": "待客户确认后启用；部署模板；暂停生产执行",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：deployment.resources/network/endpoints",
+      "allowed_range": "资源数值、域名、地址/端口、权限引用",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "deployment.network",
+      "description": "资源数值、域名、地址/端口、权限引用",
+      "type": "object",
+      "scope": "环境/站点",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q21所列合同/资料依据",
+      "question_ids": [
+        "Q21"
+      ],
+      "activation_gate": "待客户确认后启用；部署模板；暂停生产执行",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：deployment.resources/network/endpoints",
+      "allowed_range": "资源数值、域名、地址/端口、权限引用",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "deployment.endpoints",
+      "description": "资源数值、域名、地址/端口、权限引用",
+      "type": "object",
+      "scope": "环境/站点",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q21所列合同/资料依据",
+      "question_ids": [
+        "Q21"
+      ],
+      "activation_gate": "待客户确认后启用；部署模板；暂停生产执行",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：deployment.resources/network/endpoints",
+      "allowed_range": "资源数值、域名、地址/端口、权限引用",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "backup.failure_count_semantics",
+      "description": "尝试失败/任务失败及重置条件",
+      "type": "object",
+      "scope": "租户/计划",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q22所列合同/资料依据",
+      "question_ids": [
+        "Q22"
+      ],
+      "activation_gate": "待客户确认后启用；两类计数；暂停自动P3",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：backup.failure_count_semantics",
+      "allowed_range": "尝试失败/任务失败及重置条件",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "backup.commands",
+      "description": "授权命令、忽略规则、报备窗口/容差秒",
+      "type": "array",
+      "scope": "型号/设备",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q22所列合同/资料依据",
+      "question_ids": [
+        "Q22"
+      ],
+      "activation_gate": "待客户确认后启用；模拟diff；暂停实际采集",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：backup.commands/noise_filter/change_window",
+      "allowed_range": "授权命令、忽略规则、报备窗口/容差秒",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "backup.noise_filter",
+      "description": "授权命令、忽略规则、报备窗口/容差秒",
+      "type": "array",
+      "scope": "型号/设备",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q22所列合同/资料依据",
+      "question_ids": [
+        "Q22"
+      ],
+      "activation_gate": "待客户确认后启用；模拟diff；暂停实际采集",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：backup.commands/noise_filter/change_window",
+      "allowed_range": "授权命令、忽略规则、报备窗口/容差秒",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "backup.change_window",
+      "description": "授权命令、忽略规则、报备窗口/容差秒",
+      "type": "object",
+      "scope": "型号/设备",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q22所列合同/资料依据",
+      "question_ids": [
+        "Q22"
+      ],
+      "activation_gate": "待客户确认后启用；模拟diff；暂停实际采集",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：backup.commands/noise_filter/change_window",
+      "allowed_range": "授权命令、忽略规则、报备窗口/容差秒",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "finance.labor_rate",
+      "description": "非负金额/小时、货币及税口径",
+      "type": "object",
+      "scope": "成本版本",
+      "unit": "金额/小时，币种及税口径待定",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q23所列合同/资料依据",
+      "question_ids": [
+        "Q23"
+      ],
+      "activation_gate": "待客户确认后启用；字段/版本；暂停毛利输出",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：finance.labor_rate",
+      "allowed_range": "非负金额/小时、货币及税口径",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "finance.system_allocation",
+      "description": "分摊公式及分母；非负金额",
+      "type": "object",
+      "scope": "租户/月",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q23所列合同/资料依据",
+      "question_ids": [
+        "Q23"
+      ],
+      "activation_gate": "待客户确认后启用；公式接口；暂停毛利输出",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：finance.system_allocation/traffic_cost",
+      "allowed_range": "分摊公式及分母；非负金额",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "finance.traffic_cost",
+      "description": "分摊公式及分母；非负金额",
+      "type": "object",
+      "scope": "租户/月",
+      "unit": "金额/月，币种待定",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q23所列合同/资料依据",
+      "question_ids": [
+        "Q23"
+      ],
+      "activation_gate": "待客户确认后启用；公式接口；暂停毛利输出",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：finance.system_allocation/traffic_cost",
+      "allowed_range": "分摊公式及分母；非负金额",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "worklog.missing_default_minutes",
+      "description": "非负分钟，具体值需客户提供，不得自动0",
+      "type": "integer",
+      "scope": "工单类型/版本",
+      "unit": "分钟",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q23所列合同/资料依据",
+      "question_ids": [
+        "Q23"
+      ],
+      "activation_gate": "待客户确认后启用；缺省来源标志；暂停缺工时成本",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：worklog.missing_default_minutes",
+      "allowed_range": "非负分钟，具体值需客户提供，不得自动0",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "finance.fte_rule",
+      "description": "出勤折算；金额区间与出处",
+      "type": "object",
+      "scope": "月/岗位",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q23所列合同/资料依据",
+      "question_ids": [
+        "Q23"
+      ],
+      "activation_gate": "待客户确认后启用；来源字段；暂停经营/价值结论",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：finance.fte_rule/salary_reference",
+      "allowed_range": "出勤折算；金额区间与出处",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "finance.salary_reference",
+      "description": "出勤折算；金额区间与出处",
+      "type": "object",
+      "scope": "月/岗位",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q23所列合同/资料依据",
+      "question_ids": [
+        "Q23"
+      ],
+      "activation_gate": "待客户确认后启用；来源字段；暂停经营/价值结论",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：finance.fte_rule/salary_reference",
+      "allowed_range": "出勤折算；金额区间与出处",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "healthcheck.weights_and_scoring",
+      "description": "5维权重0—1且合计1；评分0—100",
+      "type": "object",
+      "scope": "模板版本",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q23所列合同/资料依据",
+      "question_ids": [
+        "Q23"
+      ],
+      "activation_gate": "待客户确认后启用；评分插件；暂停体检评分",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：healthcheck.weights_and_scoring",
+      "allowed_range": "5维权重0—1且合计1；评分0—100",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "reports.version_policy",
+      "description": "冻结/退回流程、版式、文案批准引用",
+      "type": "object",
+      "scope": "模板/门户版本",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q24所列合同/资料依据",
+      "question_ids": [
+        "Q24"
+      ],
+      "activation_gate": "待客户确认后启用；模板预览；暂停发布",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：reports.version_policy/template/copy",
+      "allowed_range": "冻结/退回流程、版式、文案批准引用",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "reports.template",
+      "description": "冻结/退回流程、版式、文案批准引用",
+      "type": "object",
+      "scope": "模板/门户版本",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q24所列合同/资料依据",
+      "question_ids": [
+        "Q24"
+      ],
+      "activation_gate": "待客户确认后启用；模板预览；暂停发布",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：reports.version_policy/template/copy",
+      "allowed_range": "冻结/退回流程、版式、文案批准引用",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "reports.copy",
+      "description": "冻结/退回流程、版式、文案批准引用",
+      "type": "object",
+      "scope": "模板/门户版本",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q24所列合同/资料依据",
+      "question_ids": [
+        "Q24"
+      ],
+      "activation_gate": "待客户确认后启用；模板预览；暂停发布",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：reports.version_policy/template/copy",
+      "allowed_range": "冻结/退回流程、版式、文案批准引用",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "reports.generate_local_time",
+      "description": "HH:mm及数据截止/迟到策略",
+      "type": "string",
+      "scope": "平台",
+      "unit": "HH:mm Asia/Shanghai",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q24所列合同/资料依据",
+      "question_ids": [
+        "Q24"
+      ],
+      "activation_gate": "待客户确认后启用；调度接口；暂停自动正式快照",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：reports.generate_local_time/cutoff",
+      "allowed_range": "HH:mm及数据截止/迟到策略",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "reports.cutoff",
+      "description": "HH:mm及数据截止/迟到策略",
+      "type": "object",
+      "scope": "平台",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q24所列合同/资料依据",
+      "question_ids": [
+        "Q24"
+      ],
+      "activation_gate": "待客户确认后启用；调度接口；暂停自动正式快照",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：reports.generate_local_time/cutoff",
+      "allowed_range": "HH:mm及数据截止/迟到策略",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "prototype.extra_validation_rules",
+      "description": "如描述长度、单条工时范围；来源标记",
+      "type": "object",
+      "scope": "字段/页面",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q25所列合同/资料依据",
+      "question_ids": [
+        "Q25"
+      ],
+      "activation_gate": "待客户确认后启用；差异清单；暂停以演示为合同规则",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：prototype.extra_validation_rules",
+      "allowed_range": "如描述长度、单条工时范围；来源标记",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "sla.compensation_formula",
+      "description": "枚举公式、币种、精度、舍入与上限",
+      "type": "object",
+      "scope": "合同/版本",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q26所列合同/资料依据",
+      "question_ids": [
+        "Q26"
+      ],
+      "activation_gate": "待客户确认后启用；对照计算；暂停金额导出",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：sla.compensation_formula/rounding",
+      "allowed_range": "枚举公式、币种、精度、舍入与上限",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "sla.rounding",
+      "description": "枚举公式、币种、精度、舍入与上限",
+      "type": "object",
+      "scope": "合同/版本",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q26所列合同/资料依据",
+      "question_ids": [
+        "Q26"
+      ],
+      "activation_gate": "待客户确认后启用；对照计算；暂停金额导出",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：sla.compensation_formula/rounding",
+      "allowed_range": "枚举公式、币种、精度、舍入与上限",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "sla.reopen_and_mttr_policy",
+      "description": "时钟恢复、客户等待、指标归属",
+      "type": "object",
+      "scope": "口径版本",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q27所列合同/资料依据",
+      "question_ids": [
+        "Q27"
+      ],
+      "activation_gate": "待客户确认后启用；节点记录；暂停正式重开统计",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：sla.reopen_and_mttr_policy",
+      "allowed_range": "时钟恢复、客户等待、指标归属",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "security.kms_ca",
+      "description": "secret_ref、算法/轮换；MIME/MB/扫描策略",
+      "type": "object",
+      "scope": "环境/租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q28所列合同/资料依据",
+      "question_ids": [
+        "Q28"
+      ],
+      "activation_gate": "待客户确认后启用；引用及隔离；暂停生产密钥与附件",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：security.kms_ca/attachment_policy",
+      "allowed_range": "secret_ref、算法/轮换；MIME/MB/扫描策略",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "security.attachment_policy",
+      "description": "secret_ref、算法/轮换；MIME/MB/扫描策略",
+      "type": "object",
+      "scope": "环境/租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q28所列合同/资料依据",
+      "question_ids": [
+        "Q28"
+      ],
+      "activation_gate": "待客户确认后启用；引用及隔离；暂停生产密钥与附件",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：security.kms_ca/attachment_policy",
+      "allowed_range": "secret_ref、算法/轮换；MIME/MB/扫描策略",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "event.review_transition_policy",
+      "description": "5态×监控态×复核动作映射",
+      "type": "object",
+      "scope": "事件状态版本",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q29所列合同/资料依据",
+      "question_ids": [
+        "Q29"
+      ],
+      "activation_gate": "待客户确认后启用；独立字段；暂停未定自动迁移",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：event.review_transition_policy",
+      "allowed_range": "5态×监控态×复核动作映射",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "metering.coverage",
+      "description": "分子/分母/统计时点",
+      "type": "object",
+      "scope": "口径版本",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q30所列合同/资料依据",
+      "question_ids": [
+        "Q30"
+      ],
+      "activation_gate": "待客户确认后启用；明细存储；暂停指标值",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：metering.coverage/active_tenant_definition",
+      "allowed_range": "分子/分母/统计时点",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "metering.active_tenant_definition",
+      "description": "分子/分母/统计时点",
+      "type": "object",
+      "scope": "口径版本",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q30所列合同/资料依据",
+      "question_ids": [
+        "Q30"
+      ],
+      "activation_gate": "待客户确认后启用；明细存储；暂停指标值",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：metering.coverage/active_tenant_definition",
+      "allowed_range": "分子/分母/统计时点",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "capacity.bytes_per_value",
+      "description": "正数/字节，比例[0,1]，系数≥1",
+      "type": "number",
+      "scope": "资源池",
+      "unit": "字节/值",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q30所列合同/资料依据",
+      "question_ids": [
+        "Q30"
+      ],
+      "activation_gate": "待客户确认后启用；输入单位检查；暂停容量承诺",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：capacity.bytes_per_value/trend_ratio/headroom",
+      "allowed_range": "正数/字节，比例[0,1]，系数≥1",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "capacity.trend_ratio",
+      "description": "正数/字节，比例[0,1]，系数≥1",
+      "type": "number",
+      "scope": "资源池",
+      "unit": "ratio_0_to_1",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q30所列合同/资料依据",
+      "question_ids": [
+        "Q30"
+      ],
+      "activation_gate": "待客户确认后启用；输入单位检查；暂停容量承诺",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：capacity.bytes_per_value/trend_ratio/headroom",
+      "allowed_range": "正数/字节，比例[0,1]，系数≥1",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "capacity.headroom",
+      "description": "正数/字节，比例[0,1]，系数≥1",
+      "type": "number",
+      "scope": "资源池",
+      "unit": "倍",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q30所列合同/资料依据",
+      "question_ids": [
+        "Q30"
+      ],
+      "activation_gate": "待客户确认后启用；输入单位检查；暂停容量承诺",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：capacity.bytes_per_value/trend_ratio/headroom",
+      "allowed_range": "正数/字节，比例[0,1]，系数≥1",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "capacity.node_limit",
+      "description": "正数/容量单位，正整数/断网秒",
+      "type": "object",
+      "scope": "资源池/站点",
+      "unit": "容量及量纲待测算确认",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q30所列合同/资料依据",
+      "question_ids": [
+        "Q30"
+      ],
+      "activation_gate": "待客户确认后启用；测量模板；暂停资源采购建议",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：capacity.node_limit/proxy_outage_sec",
+      "allowed_range": "正数/容量单位，正整数/断网秒",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "capacity.proxy_outage_sec",
+      "description": "正数/容量单位，正整数/断网秒",
+      "type": "integer",
+      "scope": "资源池/站点",
+      "unit": "秒",
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q30所列合同/资料依据",
+      "question_ids": [
+        "Q30"
+      ],
+      "activation_gate": "待客户确认后启用；测量模板；暂停资源采购建议",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：capacity.node_limit/proxy_outage_sec",
+      "allowed_range": "正数/容量单位，正整数/断网秒",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "asset.columns",
+      "description": "列定义/流程/IP冲突域枚举",
+      "type": "array",
+      "scope": "界面/租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q31所列合同/资料依据",
+      "question_ids": [
+        "Q31"
+      ],
+      "activation_gate": "待客户确认后启用；合同字段注册；暂停歧义实现冻结",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：asset.columns/import_steps/export_columns/ip_scope",
+      "allowed_range": "列定义/流程/IP冲突域枚举",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "asset.import_steps",
+      "description": "列定义/流程/IP冲突域枚举",
+      "type": "object",
+      "scope": "界面/租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q31所列合同/资料依据",
+      "question_ids": [
+        "Q31"
+      ],
+      "activation_gate": "待客户确认后启用；合同字段注册；暂停歧义实现冻结",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：asset.columns/import_steps/export_columns/ip_scope",
+      "allowed_range": "列定义/流程/IP冲突域枚举",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "asset.export_columns",
+      "description": "列定义/流程/IP冲突域枚举",
+      "type": "array",
+      "scope": "界面/租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q31所列合同/资料依据",
+      "question_ids": [
+        "Q31"
+      ],
+      "activation_gate": "待客户确认后启用；合同字段注册；暂停歧义实现冻结",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：asset.columns/import_steps/export_columns/ip_scope",
+      "allowed_range": "列定义/流程/IP冲突域枚举",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "asset.ip_scope",
+      "description": "列定义/流程/IP冲突域枚举",
+      "type": "string",
+      "scope": "界面/租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "04第5节；详见Q31所列合同/资料依据",
+      "question_ids": [
+        "Q31"
+      ],
+      "activation_gate": "待客户确认后启用；合同字段注册；暂停歧义实现冻结",
+      "notes": "未经客户确认保持null，不得作为运行时可用配置。原登记组：asset.columns/import_steps/export_columns/ip_scope",
+      "allowed_range": "列定义/流程/IP冲突域枚举",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "remote.bastion_baseline",
+      "description": "堡垒机产品/版本/API/许可",
+      "type": "object",
+      "scope": "租户/堡垒机实例",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "M7-0/M7-6/M7-8/M7-9；04第5节末段",
+      "question_ids": [
+        "Q01",
+        "Q03"
+      ],
+      "activation_gate": "待客户确认后启用；Q01书面确认后才可M7排期，子参数确认后才允许真实执行",
+      "notes": "尚未确认；不能以null或false推定客户放弃功能。",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "remote.approver_policy",
+      "description": "读写双人审批岗位、替补与readonly例外",
+      "type": "object",
+      "scope": "租户/堡垒机实例",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "M7-0/M7-6/M7-8/M7-9；04第5节末段",
+      "question_ids": [
+        "Q01",
+        "Q09"
+      ],
+      "activation_gate": "待客户确认后启用；Q01书面确认后才可M7排期，子参数确认后才允许真实执行",
+      "notes": "尚未确认；不能以null或false推定客户放弃功能。",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "remote.idle_timeout_sec",
+      "description": "空闲自动断开时长",
+      "type": "integer",
+      "scope": "租户/堡垒机实例",
+      "unit": "秒",
+      "value": null,
+      "decision_status": "pending",
+      "source": "M7-0/M7-6/M7-8/M7-9；04第5节末段",
+      "question_ids": [
+        "Q01"
+      ],
+      "activation_gate": "待客户确认后启用；Q01书面确认后才可M7排期，子参数确认后才允许真实执行",
+      "notes": "尚未确认；不能以null或false推定客户放弃功能。",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "remote.extension_policy",
+      "description": "会话延期条件、审批及最长时长",
+      "type": "object",
+      "scope": "租户/堡垒机实例",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "M7-0/M7-6/M7-8/M7-9；04第5节末段",
+      "question_ids": [
+        "Q01"
+      ],
+      "activation_gate": "待客户确认后启用；Q01书面确认后才可M7排期，子参数确认后才允许真实执行",
+      "notes": "尚未确认；不能以null或false推定客户放弃功能。",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "remote.high_risk_confirmation_policy",
+      "description": "高危命令二次确认权限与命令清单",
+      "type": "object",
+      "scope": "租户/堡垒机实例",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "M7-0/M7-6/M7-8/M7-9；04第5节末段",
+      "question_ids": [
+        "Q01",
+        "Q09"
+      ],
+      "activation_gate": "待客户确认后启用；Q01书面确认后才可M7排期，子参数确认后才允许真实执行",
+      "notes": "尚未确认；不能以null或false推定客户放弃功能。",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "recording.readonly_enabled",
+      "description": "只读会话是否录屏",
+      "type": "boolean",
+      "scope": "租户/堡垒机实例",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "M7-0/M7-6/M7-8/M7-9；04第5节末段",
+      "question_ids": [
+        "Q01",
+        "Q10"
+      ],
+      "activation_gate": "待客户确认后启用；Q01书面确认后才可M7排期，子参数确认后才允许真实执行",
+      "notes": "尚未确认；不能以null或false推定客户放弃功能。",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    },
+    {
+      "key": "recording.customer_access_approval",
+      "description": "客户申请调阅录屏的审批策略",
+      "type": "object",
+      "scope": "租户/堡垒机实例",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "M7-0/M7-6/M7-8/M7-9；04第5节末段",
+      "question_ids": [
+        "Q01",
+        "Q09"
+      ],
+      "activation_gate": "待客户确认后启用；Q01书面确认后才可M7排期，子参数确认后才允许真实执行",
+      "notes": "尚未确认；不能以null或false推定客户放弃功能。",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
+    }
+  ]
+}

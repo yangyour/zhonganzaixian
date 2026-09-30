@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>审计日志 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('audit', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const all = DATA.audit.filter(a => ctx.tenant.id === 'all' || a.tenant === ctx.tenant.id || (a.tenant === 'platform' && App.can('padmin')));
+  const f = { q: '', action: 'all', result: 'all', actor: 'all' };
+  const RES = { success: ['ok', '成功'], failed: ['danger', '失败'], denied: ['warn', '拒绝'] };
+  const actions = [...new Set(all.map(a => a.action))].sort(); const actors = [...new Set(all.map(a => a.actor))];
+  root.innerHTML = `
+  <div class="page-head"><div><h1>审计日志 <span class="badge primary">${esc(ctx.tenant.name)}</span></h1><div class="sub">追加式审计：actor、租户、操作、对象、结果、trace_id、payload_hash。租户切换、越权拒绝、配置同步失败与审批决定均记录；保留期按合同（默认 3 年）。</div></div>
+    <div class="page-actions"><button class="btn" id="exportBtn">${icon('download')} 导出（签名地址）</button><button class="btn" id="verifyBtn">${icon('shield')} 校验链完整性</button></div></div>
+  <div class="grid g5 mb">
+    ${App.kpi({ label: '24h 记录', value: all.filter(a => a.ts > DATA.now - DATA.D).length, sub: `${all.length} 条（近 3 天示例）` })}
+    ${App.kpi({ label: '越权拒绝', value: all.filter(a => a.result === 'denied').length, cls: 'warn', sub: '对象不存在与无权限统一响应' })}
+    ${App.kpi({ label: '租户切换', value: all.filter(a => a.action === 'tenant_switch').length, sub: '跨租户值班需受审计切换' })}
+    ${App.kpi({ label: '失败操作', value: all.filter(a => a.result === 'failed').length, cls: 'danger', sub: '配置同步 / 外部调用' })}
+    ${App.kpi({ label: '链完整性', value: '已校验', cls: 'ok', sub: `最近 ${fmt.ago(DATA.now - 15 * DATA.MIN)} · hash 链连续` })}
+  </div>
+  <div class="card">
+    <div class="toolbar"><div class="search-box">${icon('search')}<input class="input" id="q" placeholder="搜索对象 / trace_id / 描述"></div><select class="select sm" id="fAct" style="width:170px"><option value="all">全部操作</option>${actions.map(a => `<option>${a}</option>`).join('')}</select><select class="select sm" id="fRes" style="width:120px"><option value="all">全部结果</option><option value="success">成功</option><option value="failed">失败</option><option value="denied">拒绝</option></select><select class="select sm" id="fActor" style="width:140px"><option value="all">全部操作者</option>${actors.map(a => `<option>${a}</option>`).join('')}</select><span class="spacer"></span><span class="xs muted">只读 · 不可修改或删除</span></div>
+    <div id="tbl"></div>
+  </div>`;
+  const tbl = App.table('#tbl', { rows: all, pageSize: 20, sortKey: 'ts', sortDir: 'desc', onRow: r => App.drawer({ title: r.action, sub: `${r.id} · ${fmt.dt(r.ts)}`, body: `<div class="row wrap mb" style="gap:8px">${App.badge(RES[r.result][0], RES[r.result][1], true)}<span class="badge neutral">${esc(r.actor)} · ${App.ROLES[r.role] ? App.ROLES[r.role].name : '系统'}</span><span class="badge neutral">${r.tenant === 'platform' ? '平台' : App.tenantName(r.tenant)}</span></div><dl class="kv"><dt>描述</dt><dd>${esc(r.desc)}</dd><dt>对象</dt><dd class="mono">${esc(r.object)}</dd><dt>trace_id</dt><dd class="mono">${r.trace}</dd><dt>payload_hash</dt><dd class="mono xs">${r.payloadHash}</dd><dt>来源 IP</dt><dd class="mono">${r.ip}</dd><dt>occurred_at</dt><dd class="mono">${new Date(r.ts).toISOString()}</dd><dt>aggregate</dt><dd class="mono xs">${r.tenant}:${esc(r.object)}</dd></dl>${r.result === 'denied' ? `<div class="callout warn mt">${icon('alert-triangle')}<div>越权访问：请求携带的对象不属于当前租户上下文。响应与「对象不存在」一致，不暴露客户资源。连续越权将触发安全告警。</div></div>` : ''}${r.result === 'failed' ? `<div class="callout danger mt">${icon('alert-triangle')}<div>调用超时视为「结果未知」：先按稳定技术名称回读，再决定重试；避免重复创建。</div></div>` : ''}<h3 style="font-size:13px;margin:16px 0 8px">关联记录</h3><div class="timeline">${all.filter(x => x.trace !== r.trace && x.object === r.object).slice(0, 3).map(x => `<div class="tl-item"><span class="tl-dot"></span><div class="tl-time">${fmt.dt(x.ts)}</div><div class="tl-title small">${x.action} · ${esc(x.actor)}</div><div class="tl-desc xs">${esc(x.desc)}</div></div>`).join('') || '<div class="muted small">无</div>'}</div>`, foot: `<button class="btn" onclick="App.copy('${r.trace}')">${icon('copy')} 复制 trace_id</button><button class="btn primary" data-close>关闭</button>` }), columns: [
+    { key: 'ts', label: '时间', num: true, render: r => `<span class="small nowrap">${fmt.time(r.ts)}</span>` },
+    { key: 'actor', label: '操作者', render: r => `<div class="row" style="gap:6px">${App.avatar(r.actor, r.role === 'system' ? '#64748b' : '#2563eb')}<div><div class="small strong">${esc(r.actor)}</div><span class="sub-text">${App.ROLES[r.role] ? App.ROLES[r.role].short : '系统'}</span></div></div>` },
+    { key: 'tenant', label: '租户', render: r => r.tenant === 'platform' ? App.badge('neutral', '平台') : `<span class="small">${App.tenantName(r.tenant)}</span>` },
+    { key: 'action', label: '操作', render: r => `<span class="tag ${r.action === 'tenant_switch' ? 'blue' : ''}">${r.action}</span>` },
+    { key: 'desc', label: '描述 / 对象', render: r => `<div class="small">${esc(r.desc)}</div><span class="sub-text mono">${esc(r.object)}</span>` },
+    { key: 'result', label: '结果', render: r => App.badge(RES[r.result][0], RES[r.result][1], true), sortVal: r => Object.keys(RES).indexOf(r.result) },
+    { key: 'trace', label: 'trace_id', render: r => `<span class="mono xs muted">${r.trace}</span>` },
+    { key: 'ip', label: 'IP', render: r => `<span class="mono xs muted">${r.ip}</span>` }
+  ] });
+  const rr = () => tbl.update(all.filter(a => (f.action === 'all' || a.action === f.action) && (f.result === 'all' || a.result === f.result) && (f.actor === 'all' || a.actor === f.actor) && (!f.q || (a.desc + a.object + a.trace).toLowerCase().includes(f.q))));
+  document.getElementById('q').oninput = e => { f.q = e.target.value.toLowerCase(); rr(); }; document.getElementById('fAct').onchange = e => { f.action = e.target.value; rr(); }; document.getElementById('fRes').onchange = e => { f.result = e.target.value; rr(); }; document.getElementById('fActor').onchange = e => { f.actor = e.target.value; rr(); };
+  document.getElementById('exportBtn').onclick = () => App.toast('导出已生成，短时签名地址 15 分钟有效（不依赖路径不可猜测）', 'info');
+  document.getElementById('verifyBtn').onclick = () => { App.toast('校验中…', 'info', 1000); setTimeout(() => App.toast('审计链完整：' + all.length + ' 条记录 hash 连续，无篡改', 'ok'), 1200); };
+});
+</script>
+</body>
+</html>

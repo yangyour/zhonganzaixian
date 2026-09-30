@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>通知渠道 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('notifications', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const canOps = App.can('tadmin', 'msp', 'padmin');
+  const dl = DATA.deliveries.filter(App.inScope);
+  const st = { delivered: ['ok', '已送达'], accepted: ['info', '已受理'], retrying: ['warn', '重试中'], failed: ['danger', '失败'], dead: ['danger', '死信'] };
+  const rate = dl.length ? dl.filter(d => d.state === 'delivered').length / dl.length * 100 : 0;
+  root.innerHTML = `
+  <div class="page-head"><div><h1>通知渠道 <span class="badge primary">${esc(ctx.tenant.name)}</span></h1><div class="sub">通知采用「至少一次」尝试，通过幂等键约束业务副作用；保存请求号与回执，区分「受理」和「送达」。按租户保存连接器配置、密钥与目标范围。</div></div>
+    <div class="page-actions">${canOps ? `<button class="btn" id="testAll">${icon('send')} 测试全部渠道</button><button class="btn primary" id="addCh">${icon('plus')} 添加连接器</button>` : ''}</div></div>
+  <div class="grid g6 mb">
+    ${App.kpi({ label: '今日发送', value: fmt.n(DATA.channels.reduce((s, c) => s + c.today, 0)), sub: `${DATA.channels.length} 个渠道` })}
+    ${App.kpi({ label: '送达率', value: fmt.pct(rate, 1), cls: rate < 95 ? 'warn' : 'ok', sub: '送达 / 全部（受理不计送达）' })}
+    ${App.kpi({ label: '失败 / 重试中', value: DATA.channels.reduce((s, c) => s + c.failed, 0), cls: 'warn', sub: 'Webhook 桥接超时为主' })}
+    ${App.kpi({ label: '死信', value: DATA.deadLetters.count, cls: DATA.deadLetters.count ? 'danger' : 'ok', sub: `最老 ${fmt.dur(DATA.deadLetters.oldestAge / 1000)} · 纳入平台自监控` })}
+    ${App.kpi({ label: '受理 → 送达 P95', value: '3.8', unit: 's', sub: '目标：事件生成到渠道受理 P95 ≤ 30 s' })}
+    ${App.kpi({ label: '短信配额', value: fmt.pct(DATA.channels[1].quota.used / DATA.channels[1].quota.cap * 100, 0), sub: `${fmt.n(DATA.channels[1].quota.used)} / ${fmt.n(DATA.channels[1].quota.cap)} 条 / 月` })}
+  </div>
+  <div class="grid g3 mb">${DATA.channels.map(c => `<div class="card"><div class="card-head"><h3>${icon(c.icon)} ${c.name}</h3>${c.status === 'ok' ? App.badge('ok', '正常', true) : App.badge('warn', '告警', true)}</div><div class="card-body"><dl class="kv small" style="row-gap:6px"><dt>配置</dt><dd class="xs">${esc(c.config)}</dd><dt>目标范围</dt><dd class="xs">${esc(c.scope)}</dd><dt>签名</dt><dd class="xs">${esc(c.sign)}</dd><dt>重试预算</dt><dd class="xs">${c.retryBudget} 次 · 退避 ${c.backoff}</dd></dl><div class="row between mt12"><div><div class="xs muted">今日发送 / 失败</div><div class="strong">${fmt.n(c.today)} <span class="muted small">/ <span class="${c.failed ? 'delta bad' : ''}">${c.failed}</span></span></div></div>${c.quota ? `<div style="width:120px"><div class="xs muted mb8">月配额 ${fmt.pct(c.quota.used / c.quota.cap * 100, 0)}</div>${App.meter(c.quota.used / c.quota.cap * 100)}</div>` : ''}</div>${c.note ? `<div class="xs muted mt8">${esc(c.note)}</div>` : ''}</div>${canOps ? `<div class="card-foot"><button class="btn xs" data-cfg="${c.id}">${icon('settings')} 配置</button><button class="btn xs" data-test="${c.id}">${icon('send')} 测试发送</button></div>` : ''}</div>`).join('')}</div>
+  <div class="grid g-2-1" style="align-items:start">
+    <div class="card"><div class="card-head"><h3>送达记录 <span class="sub">请求号 · 回执 · 尝试次数</span></h3><div class="tools"><select class="select sm" id="fState" style="width:120px"><option value="all">全部状态</option>${Object.entries(st).map(([k, v]) => `<option value="${k}">${v[1]}</option>`).join('')}</select><select class="select sm" id="fCh" style="width:120px"><option value="all">全部渠道</option>${[...new Set(dl.map(d => d.channel))].map(c => `<option>${c}</option>`).join('')}</select></div></div><div id="dlTbl"></div></div>
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>死信队列 <span class="badge danger">${DATA.deadLetters.count}</span></h3>${canOps ? `<button class="btn sm" id="replay">${icon('refresh')} 重放全部</button>` : ''}</div><div class="card-body tight">${DATA.deadLetters.items.map(d => `<div style="padding:8px 18px;border-bottom:1px dashed var(--line)"><div class="row between"><span class="small strong">${d.channel} → ${esc(d.target)}</span><span class="xs muted">${fmt.ago(d.at)}</span></div><div class="xs muted ellipsis">${esc(d.incidentName)}</div><div class="xs delta bad">${esc(d.error || '重试预算耗尽')}</div></div>`).join('') || '<div class="empty small">无死信</div>'}<div class="xs muted" style="padding:8px 18px">消费失败指数退避，超过次数入死信；死信数量与最老年龄纳入平台自身监控。</div></div></div>
+      <div class="card"><div class="card-head"><h3>按渠道送达耗时 <span class="sub">P50 / P95 · ms</span></h3></div><div class="card-body" id="latBar"></div></div>
+      <div class="card"><div class="card-head"><h3>安全约束</h3></div><div class="card-body small" style="color:var(--text-2)"><ul class="stack" style="gap:6px"><li>· 自定义 Webhook 限制允许的目标域名与重定向，拒绝私网地址</li><li>· 密钥仅存服务端密钥库，不进入浏览器、日志、报告</li><li>· 回调签名 + 来源标识 + 版本 / 摘要去重，防止双方更新无限循环</li><li>· 供应商限流时重试并切换备用渠道；保存请求号与回执</li></ul></div></div>
+    </div>
+  </div>`;
+  const tbl = App.table('#dlTbl', { rows: dl, pageSize: 12, sortKey: 'at', sortDir: 'desc', onRow: r => App.drawer({ title: `${r.channel} → ${esc(r.target)}`, sub: `${r.id} · ${fmt.dt(r.at)}`, body: `<div class="row wrap mb" style="gap:8px">${App.badge(st[r.state][0], st[r.state][1], true)}<span class="badge neutral">尝试 ${r.attempts} 次</span><span class="badge neutral">耗时 ${fmt.ms(r.latency)}</span></div><dl class="kv"><dt>事件</dt><dd><a href="incident-detail.html?id=${r.incidentId}">${esc(r.incidentName)}</a></dd><dt>请求号</dt><dd class="mono">${r.requestId}</dd><dt>回执</dt><dd class="mono">${r.receipt || '—（未回执 = 受理但未确认送达）'}</dd><dt>去重键</dt><dd class="mono xs">(${DATA.incidents.find(i => i.id === r.incidentId)?.instance || 'pool'}, ${DATA.incidents.find(i => i.id === r.incidentId)?.eventid || '—'}, ${r.channel}, ${esc(r.target)}, PROBLEM)</dd><dt>错误</dt><dd>${r.error ? `<span class="delta bad">${esc(r.error)}</span>` : '—'}</dd></dl><h3 style="font-size:13px;margin:16px 0 8px">尝试记录</h3><div class="timeline">${Array.from({ length: r.attempts }, (_, k) => `<div class="tl-item ${k === r.attempts - 1 && r.state === 'delivered' ? 'ok' : k === r.attempts - 1 && (r.state === 'failed' || r.state === 'dead') ? 'danger' : 'warn'}"><span class="tl-dot"></span><div class="tl-time">${fmt.dt(r.at + k * 60e3)}</div><div class="tl-title small">第 ${k + 1} 次 · ${k === r.attempts - 1 ? st[r.state][1] : '失败（' + (r.error || '429') + '）'}</div></div>`).join('')}</div>`, foot: `${canOps && r.state !== 'delivered' ? `<button class="btn" onclick="App.toast('已重放（新的请求号，保持相同去重键）','ok');App.closeLayer()">${icon('refresh')} 重放</button>` : ''}<button class="btn primary" data-close>关闭</button>` }), columns: [
+    { key: 'at', label: '时间', num: true, render: r => `<span class="small nowrap">${fmt.time(r.at)}</span>` },
+    { key: 'incidentName', label: '事件', render: r => `<span class="small ellipsis" style="max-width:240px;display:inline-block;vertical-align:middle">${esc(r.incidentName)}</span>${ctx.tenant.id === 'all' ? `<span class="sub-text">${App.tenantName(r.tenant)}</span>` : ''}` },
+    { key: 'channel', label: '渠道', render: r => `<span class="tag">${r.channel}</span>` },
+    { key: 'target', label: '接收对象', render: r => `<span class="small">${esc(r.target)}</span>` },
+    { key: 'state', label: '状态', render: r => App.badge(st[r.state][0], st[r.state][1], true), sortVal: r => Object.keys(st).indexOf(r.state) },
+    { key: 'attempts', label: '尝试', num: true }, { key: 'latency', label: '耗时', num: true, render: r => fmt.ms(r.latency) },
+    { key: 'requestId', label: '请求 / 回执', render: r => `<span class="mono xs">${r.requestId}</span><span class="sub-text mono">${r.receipt || '—'}</span>`, sortable: false }
+  ] });
+  const f = { state: 'all', ch: 'all' }; const rr = () => tbl.update(dl.filter(d => (f.state === 'all' || d.state === f.state) && (f.ch === 'all' || d.channel === f.ch)));
+  document.getElementById('fState').onchange = e => { f.state = e.target.value; rr(); }; document.getElementById('fCh').onchange = e => { f.ch = e.target.value; rr(); };
+  Charts.bar(document.getElementById('latBar'), { height: 200, categories: ['钉钉', '企微', '邮件', '短信', 'Webhook', '电话'], series: [{ name: 'P50', data: [620, 560, 1900, 1100, 2400, 8000], color: '#93c5fd' }, { name: 'P95', data: [1400, 1200, 3800, 2600, 28000, 15000], color: '#2563eb' }], yFormat: v => v >= 1000 ? (v / 1000).toFixed(0) + 's' : v + 'ms' });
+  root.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-test]'); if (t) { const c = DATA.channels.find(x => x.id === t.dataset.test); App.toast(`测试消息已提交 ${c.name}（请求号 req-${App.uid()}）`, 'info'); setTimeout(() => { dl.unshift({ id: 'dl-t' + App.uid(), tenant: ctx.tenant.id === 'all' ? 't-huadong' : ctx.tenant.id, incidentId: 'inc-1001', incidentName: '[测试消息] 渠道连通性验证', channel: c.name, target: '测试接收人', state: c.status === 'ok' ? 'delivered' : 'retrying', at: DATA.now, attempts: 1, latency: 640, requestId: 'req-' + App.uid(), receipt: c.status === 'ok' ? 'rcpt-' + App.uid() : null, error: c.status === 'ok' ? null : '504 Gateway Timeout' }); rr(); App.toast(c.status === 'ok' ? `${c.name}：已送达（回执已收到）` : `${c.name}：受理超时，进入重试`, c.status === 'ok' ? 'ok' : 'warn'); }, 1200); return; }
+    const cf = e.target.closest('[data-cfg]'); if (cf) { const c = DATA.channels.find(x => x.id === cf.dataset.cfg); App.drawer({ title: `${c.name} · 连接器配置`, sub: '按租户保存；密钥字段只写不读', body: `<div class="form-grid"><div class="field full"><label>端点 / 配置</label><input class="input" value="${esc(c.config)}"></div><div class="field"><label>密钥 / Token</label><input class="input" type="password" value="••••••••••••••" readonly><div class="hint">仅可轮换，不可读取</div></div><div class="field"><label>签名方式</label><input class="input" value="${esc(c.sign)}"></div><div class="field"><label>重试预算</label><select class="select"><option>${c.retryBudget} 次</option><option>3 次</option><option>5 次</option></select></div><div class="field"><label>退避策略</label><input class="input" value="${c.backoff}"></div><div class="field full"><label>目标范围（租户 / 级别）</label><input class="input" value="${esc(c.scope)}"></div>${c.type === 'webhook' ? `<div class="field full"><label>允许的目标域名白名单</label><textarea class="input">jsm.xc-retail.com
+itsm-bridge.xc-retail.com</textarea><div class="hint">禁止重定向；私网地址与任意 URL 不作为通用输入</div></div>` : ''}<div class="field full"><label class="check"><input type="checkbox" checked> 保存请求号与回执，区分受理 / 送达</label></div></div>`, foot: `<button class="btn" onclick="App.toast('已轮换密钥（旧密钥 24 小时后失效）','ok')">${icon('key')} 轮换密钥</button><button class="btn primary" onclick="App.toast('配置已保存并写入审计','ok');App.closeLayer()">保存</button>` }); }
+  });
+  const ta = document.getElementById('testAll'); if (ta) ta.onclick = () => App.toast('已向 6 个渠道提交测试消息', 'info');
+  const rp = document.getElementById('replay'); if (rp) rp.onclick = () => App.toast('已重放 3 条死信（相同去重键，新请求号）', 'ok');
+  const ad = document.getElementById('addCh'); if (ad) ad.onclick = () => App.modal({ title: '添加连接器', body: `<div class="form-grid"><div class="field"><label>类型</label><select class="select"><option>钉钉机器人</option><option>企业微信应用</option><option>飞书</option><option>自定义 Webhook</option><option>Slack</option></select></div><div class="field"><label>租户</label><input class="input" readonly value="${esc(ctx.tenant.name)}"></div><div class="field full"><label>Webhook 地址</label><input class="input" placeholder="https://oapi.dingtalk.com/robot/send?access_token=…"></div><div class="field full"><label>加签密钥</label><input class="input" type="password"></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('连接器已创建，请发送测试消息验证','ok');App.closeLayer()">创建</button>` });
+});
+</script>
+</body>
+</html>

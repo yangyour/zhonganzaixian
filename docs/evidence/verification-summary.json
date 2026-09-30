@@ -1,0 +1,152 @@
+{
+  "date": "2026-09-30",
+  "mode": "remote_test",
+  "environment": {
+    "application_host": "Windows 11",
+    "connection": "loopback_only_ssh_tunnel_to_designated_test_server",
+    "database": {
+      "product": "PostgreSQL",
+      "version": "17.9",
+      "namespace": "mop_test",
+      "runtime_role": "mop_test_runtime"
+    },
+    "identity": {
+      "product": "Keycloak",
+      "version": "26.2.4",
+      "realm": "mop-test",
+      "mapping": "verified_issuer_and_immutable_sub"
+    },
+    "virtual_test_data": true
+  },
+  "backend_remote_integration_tests": 5,
+  "backend_isolated_unit_tests": 13,
+  "backend_historical_fixture_skipped": 13,
+  "backend_suites": [
+    {
+      "suite": "cn.mop.api.FixtureSecurityAndWorkflowTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 13,
+      "kind": "historical_fixture"
+    },
+    {
+      "suite": "cn.mop.api.ProfilePolicyTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "isolated_unit"
+    },
+    {
+      "suite": "cn.mop.api.SessionServiceSecurityTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "isolated_unit"
+    },
+    {
+      "suite": "cn.mop.api.TestOidcConfigurationTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "isolated_unit"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresRepositoryIntegrationTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "remote_postgresql_integration"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresSafetyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "isolated_unit"
+    }
+  ],
+  "frontend_tests": 10,
+  "frontend_typecheck": "passed",
+  "frontend_build": "passed",
+  "contract_tests": 3,
+  "http_openapi_responses": 28,
+  "api_restart_persistence": {
+    "http_checks": 5,
+    "status": "passed",
+    "real_oidc_login_after_restart": true,
+    "asset_preserved": true,
+    "idempotency_result_preserved": true,
+    "configuration_draft_and_version_preserved": true,
+    "process_pid_start_time_assertion": "passed",
+    "api_restart_verified": true,
+    "execution_exit_code": 0
+  },
+  "oidc": {
+    "real_authorization_code_login": "passed",
+    "pkce_method": "S256",
+    "state_present": true,
+    "nonce_present": true,
+    "standard_signature_and_issuer_validation_success": true,
+    "identity_mapping": "issuer|sub",
+    "rp_logout_clears_sso": true,
+    "relogin_as_viewer": true,
+    "unprompted_get_logout_preserves_session": true,
+    "invalid_state_callback_preserves_existing_session": true
+  },
+  "runtime_permissions": {
+    "audit_insert": true,
+    "audit_update": false,
+    "audit_delete": false,
+    "registry_json_update": false,
+    "flyway_history_select": false
+  },
+  "authorization": {
+    "revoked_old_cookie_and_committed_replay_status": 401,
+    "downgraded_active_member_write_replay_status": 403,
+    "viewer_write_and_configuration_status": 403,
+    "membership_restored": true,
+    "permission_version_monotonically_increased": true
+  },
+  "dependency_failure": {
+    "stopped_only_local_ssh_tunnel": true,
+    "ready_status": 503,
+    "write_status": 503,
+    "fixture_fallback": false,
+    "recovered_mode": "remote_test",
+    "recovered_durable": true,
+    "remote_services_stopped": false
+  },
+  "browser_page_errors": 0,
+  "browser_viewports": [
+    "1440x900",
+    "390x844"
+  ],
+  "mobile_horizontal_overflow": false,
+  "mobile_real_role": "tadmin",
+  "production_database_and_integrations_verified": false,
+  "production_ready": false,
+  "limitations": [
+    "production_Q02_Q03_Q17_and_formal_role_approval",
+    "tenant_physical_isolation_and_six_layer_acceptance",
+    "redis_rabbitmq_minio_business_integration",
+    "missing_zabbix_itsm_bastion_and_notification_inputs",
+    "durable_worker_outbox_leases",
+    "protected_external_audit_chain_head_and_retention",
+    "adversarial_oidc_signature_rotation_expiry_cases",
+    "second_machine_and_cloud_reproduction",
+    "capacity_performance_disaster_recovery_and_128_contract_acceptance"
+  ],
+  "evidence_sources": [
+    "server/api/target/surefire-reports/",
+    "server/persistence/target/surefire-reports/",
+    "docs/evidence/remote-security-verification.json"
+  ],
+  "evidence_policy": "No passwords, cookies, CSRF/OIDC tokens, secret connection strings, or complete protocol redirect URLs.",
+  "historical_fixture_summary": "docs/history/2026-09-30-local-fixture-verification-summary.json"
+}

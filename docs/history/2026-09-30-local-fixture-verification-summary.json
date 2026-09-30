@@ -1,0 +1,29 @@
+{
+  "browser_page_errors": 0,
+  "browser_viewports": [
+    "1440x900",
+    "390x844"
+  ],
+  "date": "2026-09-30",
+  "frontend_tests": 10,
+  "http_openapi_responses": 33,
+  "mode": "local_fixture",
+  "production_database_and_integrations_verified": false,
+  "backend_suites": [
+    {
+      "suite": "cn.mop.api.FixtureSecurityAndWorkflowTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.api.ProfilePolicyTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "contract_tests": 3
+}

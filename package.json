@@ -1,0 +1,19 @@
+{
+  "name": "mop-development-checks",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0 <23"
+  },
+  "scripts": {
+    "test": "node --test tests/contracts.test.mjs",
+    "test:api": "node tools/capture-test-session.mjs && node tests/api-smoke.mjs",
+    "contract:check": "node tools/build-api-contract.mjs --check"
+  },
+  "devDependencies": {
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1",
+    "playwright": "1.62.1"
+  }
+}

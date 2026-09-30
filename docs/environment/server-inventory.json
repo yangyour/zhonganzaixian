@@ -1,0 +1,50 @@
+{
+  "inventory_date": "2026-09-30",
+  "host_key": {
+    "type": "ssh-ed25519",
+    "sha256_hex": "035dfac609e7ebe94ab9bef0cc2543001596fedee197bcfba42137f439a5307a",
+    "enrollment": "first_use_pinned_private_known_hosts"
+  },
+  "raw_inventory": "ignored_local_file",
+  "selected_containers": [
+    {
+      "name": "zabbix-msp-prototype",
+      "ports": "0.0.0.0:10000->80/tcp, :::10000->80/tcp",
+      "status": "Up 8 days",
+      "image": "nginx:alpine"
+    },
+    {
+      "name": "shared-postgres",
+      "ports": "8008/tcp, 8081/tcp, 0.0.0.0:12060->5432/tcp, :::12060->5432/tcp",
+      "status": "Up 8 days (healthy)",
+      "image": "timescale/timescaledb-ha:pg17-pgvector086"
+    },
+    {
+      "name": "zhsx-rabbitmq",
+      "ports": "4369/tcp, 5671/tcp, 15671/tcp, 15691-15692/tcp, 25672/tcp, 127.0.0.1:5673->5672/tcp, 127.0.0.1:15673->15672/tcp",
+      "status": "Up 8 days (healthy)",
+      "image": "rabbitmq:4.3.2-management"
+    },
+    {
+      "name": "hltk-keycloak",
+      "ports": "8443/tcp, 9000/tcp, 0.0.0.0:12110->8080/tcp, :::12110->8080/tcp",
+      "status": "Up 8 days",
+      "image": "keycloak/keycloak:26.2.4"
+    },
+    {
+      "name": "shared-minio",
+      "ports": "0.0.0.0:12080->9000/tcp, :::12080->9000/tcp, 0.0.0.0:12081->9001/tcp, :::12081->9001/tcp",
+      "status": "Up 8 days (healthy)",
+      "image": "minio/minio:latest"
+    },
+    {
+      "name": "shared-redis",
+      "ports": "0.0.0.0:12070->6379/tcp, :::12070->6379/tcp",
+      "status": "Up 8 days (healthy)",
+      "image": "487efc061638"
+    }
+  ],
+  "os": "NAME=\"CentOS Linux\"\nVERSION=\"7 (Core)\"\nID=\"centos\"\nID_LIKE=\"rhel fedora\"\nVERSION_ID=\"7\"\nPRETTY_NAME=\"CentOS Linux 7 (Core)\"\nANSI_COLOR=\"0;31\"\nCPE_NAME=\"cpe:/o:centos:centos:7\"\nHOME_URL=\"https://www.centos.org/\"\nBUG_REPORT_URL=\"https://bugs.centos.org/\"\n\nCENTOS_MANTISBT_PROJECT=\"CentOS-7\"\nCENTOS_MANTISBT_PROJECT_VERSION=\"7\"\nREDHAT_SUPPORT_PRODUCT=\"centos\"\nREDHAT_SUPPORT_PRODUCT_VERSION=\"7\"\n\n",
+  "docker_version": "26.1.4",
+  "read_only": true
+}

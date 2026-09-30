@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>事件中心 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('incidents', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const all = DATA.incidents.filter(App.inScope).sort((a, b) => b.sourceTime - a.sourceTime);
+  const f = { sev: App.qs('sev', 'all'), src: App.qs('src', 'all'), hs: App.qs('state', 'all'), q: '', range: '7d', site: 'all', showSuppressed: true, view: App.qs('view', 'active') };
+  const canOps = App.can('tadmin', 'msp', 'padmin');
+  const open = all.filter(i => i.sourceState === 'PROBLEM' && i.handlingState !== 'CLOSED');
+  const cnt = (s) => open.filter(i => i.severity === s && !i.suppressed).length;
+  const N = DATA.noiseStats;
+  root.innerHTML = `
+  <div class="page-head"><div><h1>事件中心 <span class="badge primary">${esc(ctx.tenant.name)}</span></h1><div class="sub">Webhook 快速推送 + API 增量补偿 + 未闭合事件定期对账。监控状态由 Zabbix 负责（PROBLEM / RECOVERED），处置状态由平台负责（NEW → ACKNOWLEDGED → IN_PROGRESS → RESOLVED → CLOSED）。</div></div>
+    <div class="page-actions"><a class="btn" href="alert-rules.html">${icon('sliders')} 告警策略</a><button class="btn" id="exportBtn">${icon('download')} 导出</button>${canOps ? `<button class="btn primary" id="manualBtn">${icon('plus')} 手工登记事件</button>` : ''}</div></div>
+
+  <div class="grid g6 mb" id="sevStrip">
+    ${['disaster', 'high', 'average', 'warning', 'info'].map(s => `<div class="kpi ${f.sev === s ? 'accent' : ''}" style="cursor:pointer;border-left:3px solid ${App.sevColor(s)}" data-sev="${s}"><div class="k-label"><span>${App.sevName(s)}</span><span class="sev ${s}" style="height:16px;font-size:10px">活动</span></div><div class="k-value">${cnt(s)}</div><div class="k-sub">${all.filter(i => i.severity === s && i.sourceTime > DATA.now - DATA.D).length} 条 / 24h</div></div>`).join('')}
+    <div class="kpi"><div class="k-label"><span>降噪 (24h)</span><span class="badge ok" style="height:16px;font-size:10px">${fmt.pct(100 - N.final / N.raw24h * 100, 1)}</span></div><div class="k-value">${fmt.n(N.raw24h)} <small>→ ${N.final}</small></div><div class="k-sub">归并 ${N.rules[0].saved} · 依赖抑制 ${N.rules[1].saved} · 维护 ${N.rules[2].saved}</div></div>
+  </div>
+
+  <div class="card">
+    <div class="tabs" data-group="v"><button data-tab="active" class="${f.view === 'active' ? 'active' : ''}">活动问题 <span class="n">${open.length}</span></button><button data-tab="review" class="${f.view === 'review' ? 'active' : ''}">待复核 <span class="n">${all.filter(i => i.sourceState === 'RECOVERED' && i.handlingState !== 'CLOSED').length}</span></button><button data-tab="all" class="${f.view === 'all' ? 'active' : ''}">全部事件 <span class="n">${all.length}</span></button><button data-tab="quarantine">隔离队列 <span class="n">1</span></button></div>
+    <div class="toolbar">
+      <div class="search-box">${icon('search')}<input class="input" id="q" placeholder="搜索问题 / 资产 / eventid / 标签"></div>
+      <select class="select sm" id="fSrc" style="width:130px"><option value="all">监控状态</option><option value="PROBLEM" ${f.src === 'PROBLEM' ? 'selected' : ''}>PROBLEM</option><option value="RECOVERED" ${f.src === 'RECOVERED' ? 'selected' : ''}>RECOVERED</option></select>
+      <select class="select sm" id="fHs" style="width:130px"><option value="all">处置状态</option>${App.HFLOW.map(s => `<option value="${s}" ${f.hs === s ? 'selected' : ''}>${App.HSTATE[s].name}</option>`).join('')}</select>
+      <select class="select sm" id="fSite" style="width:130px"><option value="all">全部站点</option>${[...new Set(all.map(i => i.site))].map(s => `<option>${esc(s)}</option>`).join('')}</select>
+      <select class="select sm" id="fRange" style="width:120px"><option value="24h">最近 24 小时</option><option value="7d" selected>最近 7 天</option><option value="30d">最近 30 天</option></select>
+      <span class="spacer"></span>
+      <label class="check small"><input type="checkbox" id="showSup" checked> 显示已抑制</label>
+      ${f.sev !== 'all' ? `<span class="chip active" id="clearSev">${App.sevName(f.sev)} ✕</span>` : ''}
+    </div>
+    <div id="tbl"></div>
+    <div id="quarantine" style="display:none"><div class="card-body"><div class="callout warn mb">${icon('alert-triangle')}<div><b>隔离队列</b>：Webhook 的租户标签只作线索。接收端根据已认证的 instance 与资产绑定推导租户；未知或跨租户事件进入隔离队列，禁止自动派发，需人工核验。</div></div><table class="table dense"><thead><tr><th>接收时间</th><th>来源实例</th><th>eventid</th><th>主机（Webhook 声明）</th><th>原因</th><th>操作</th></tr></thead><tbody><tr><td>${fmt.time(DATA.now - 26 * DATA.MIN)}</td><td class="mono">pool-east-01</td><td class="mono">9384751190</td><td class="mono">srv-tmp-migrate-01</td><td class="small">主机未在平台绑定（可能为迁移中的临时主机）；标签 tenant=huadong 与实例绑定不一致</td><td><button class="btn xs" onclick="App.toast('已绑定到资产并放行事件','ok')">绑定资产</button> <button class="btn xs danger" onclick="App.toast('已丢弃并记录审计','warn')">丢弃</button></td></tr></tbody></table></div></div>
+  </div>
+  <div class="grid g-2-1 mt">
+    <div class="card"><div class="card-head"><h3>可靠性补偿 <span class="sub">每实例 eventid 水位 · event.get 增量拉取 · 未关闭事件周期刷新</span></h3></div><div class="card-body flush"><table class="table dense"><thead><tr><th>监控实例</th><th>eventid 水位</th><th>补偿延迟</th><th>最近运行</th><th>Webhook 落库失败 (24h)</th><th>重叠窗口复扫</th></tr></thead><tbody>${DATA.pools.filter(p => ctx.tenant.id === 'all' || p.tenants.includes(ctx.tenant.id)).filter(p => p.status !== 'standby').map(p => `<tr><td class="mono">${p.id}</td><td class="mono">${p.watermark.eventid}</td><td>${p.watermark.lagSec} s ${App.badge('ok', '正常')}</td><td class="small muted">${fmt.ago(p.watermark.lastRun)}</td><td class="num ${p.webhookFail24h ? 'delta bad' : ''}">${p.webhookFail24h}</td><td class="small muted">每 5 分钟 · 回看 15 分钟</td></tr>`).join('')}</tbody></table></div></div>
+    <div class="card"><div class="card-head"><h3>降噪链路 (24h)</h3><a class="small" href="alert-rules.html?tab=noise">规则</a></div><div class="card-body">${[['原始事件', N.raw24h], ['指纹归并后', N.afterDedup], ['依赖抑制后', N.afterDependency], ['维护窗口后', N.afterMaintenance], ['最终通知', N.final]].map((x, i) => `<div class="meter-row" style="margin-bottom:8px"><span class="lbl" style="width:100px">${x[0]}</span><div class="meter grow"><i style="width:${x[1] / N.raw24h * 100}%;background:${i === 4 ? 'var(--ok)' : 'var(--primary)'};opacity:${1 - i * .12}"></i></div><span class="val">${fmt.n(x[1])}</span></div>`).join('')}<div class="xs muted mt8">高等级事件（灾难 / 严重）绕过聚合等待；告警风暴中限制重复通知但保留原始事件。</div></div></div>
+  </div>`;
+
+  function rows() {
+    const q = f.q.toLowerCase(); const R = { '24h': DATA.D, '7d': 7 * DATA.D, '30d': 30 * DATA.D }[f.range];
+    return all.filter(i => (f.view !== 'active' || (i.sourceState === 'PROBLEM' && i.handlingState !== 'CLOSED')) && (f.view !== 'review' || (i.sourceState === 'RECOVERED' && i.handlingState !== 'CLOSED')) && (f.sev === 'all' || i.severity === f.sev) && (f.src === 'all' || i.sourceState === f.src) && (f.hs === 'all' || i.handlingState === f.hs) && (f.site === 'all' || i.site === f.site) && (f.showSuppressed || !i.suppressed) && i.sourceTime > DATA.now - R && (!q || (i.name + i.assetName + i.eventid + i.tags.join(' ')).toLowerCase().includes(q)));
+  }
+  const bulk = canOps ? `<button class="btn sm" data-bulk="ack">${icon('check')} 批量确认</button><button class="btn sm" data-bulk="ticket">${icon('ticket')} 批量建单</button><button class="btn sm" data-bulk="suppress">${icon('pause')} 加入抑制</button>` : '';
+  const tbl = App.table('#tbl', { rows: rows(), pageSize: 15, selectable: canOps, bulkActions: bulk, onRow: r => location.href = 'incident-detail.html?id=' + r.id, footNote: '原始事件主键 (instance_id, eventid)；同一 eventid 上的确认 / 更新消息以 update 标识区分', rowClass: r => r.suppressed ? 'muted' : '', columns: [
+    { key: 'severity', label: '级别', width: '76px', render: r => App.sevBadge(r.severity) + (r.suppressed ? `<span class="sub-text">已抑制</span>` : ''), sortVal: r => App.SEV[r.severity].rank },
+    { key: 'sourceState', label: '监控', width: '120px', render: r => App.srcBadge(r.sourceState) + (r.maintenance ? `<span class="sub-text">维护窗口内</span>` : ''), sortVal: r => r.sourceState === 'PROBLEM' ? 0 : 1 },
+    { key: 'name', label: '问题', render: r => `<div class="primary-text ellipsis" style="max-width:360px" title="${esc(r.name)}">${esc(r.name)}</div><div class="row xs muted" style="gap:6px;margin-top:2px"><span class="mono">${r.eventid}</span>${r.dupCount > 1 ? `<span class="tag" title="指纹归并">×${r.dupCount}</span>` : ''}${r.tags.slice(0, 2).map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>` },
+    { key: 'assetName', label: '资产 / 服务', render: r => `<a href="asset-detail.html?id=${r.assetId}" data-stop class="small strong">${esc(r.assetName)}</a><span class="sub-text">${esc(r.service)} · ${esc(r.site)}${ctx.tenant.id === 'all' ? ' · ' + App.tenantName(r.tenant) : ''}</span>` },
+    { key: 'handlingState', label: '处置', render: r => App.statePill(r.handlingState) + (r.ackBy ? `<span class="sub-text">${esc(r.ackBy)}</span>` : ''), sortVal: r => App.HFLOW.indexOf(r.handlingState) },
+    { key: 'sourceTime', label: '发生 / 持续', num: true, render: r => `<span class="small nowrap">${fmt.time(r.sourceTime)}</span><span class="sub-text">${r.recoveredAt ? '持续 ' + fmt.dur((r.recoveredAt - r.sourceTime) / 1000) : '已 ' + fmt.dur((DATA.now - r.sourceTime) / 1000)}</span>` },
+    { key: 'ticketId', label: '工单', render: r => r.ticketId ? `<a href="tickets.html?id=${r.ticketId}" data-stop class="mono small">${r.ticketId.replace('ITSM-2026-', '#')}</a>` : '<span class="faint">—</span>' },
+    { key: 'notifications', label: '通知', sortable: false, render: r => r.notifications.length ? r.notifications.map(n => `<span class="dot ${n.state === 'delivered' ? 'ok' : n.state === 'accepted' ? 'info' : n.state === 'retrying' ? 'warn' : 'danger'}" title="${n.channel} · ${n.target} · ${n.state}" style="margin-right:3px"></span>`).join('') + `<span class="xs muted"> ${r.notifications.length}</span>` : (r.suppressed ? '<span class="xs muted">已抑制</span>' : '<span class="faint">—</span>') },
+    { key: 'act', label: '', sortable: false, render: r => canOps && r.handlingState === 'NEW' && r.sourceState === 'PROBLEM' ? `<button class="btn xs primary" data-ack="${r.id}" data-stop>确认</button>` : '' }
+  ] });
+  const refresh = () => tbl.update(rows());
+  App.tabs(root, 'v', (id) => { f.view = id; document.getElementById('quarantine').style.display = id === 'quarantine' ? '' : 'none'; document.getElementById('tbl').style.display = id === 'quarantine' ? 'none' : ''; refresh(); });
+  document.getElementById('q').oninput = e => { f.q = e.target.value; refresh(); };
+  document.getElementById('fSrc').onchange = e => { f.src = e.target.value; refresh(); };
+  document.getElementById('fHs').onchange = e => { f.hs = e.target.value; refresh(); };
+  document.getElementById('fSite').onchange = e => { f.site = e.target.value; refresh(); };
+  document.getElementById('fRange').onchange = e => { f.range = e.target.value; refresh(); };
+  document.getElementById('showSup').onchange = e => { f.showSuppressed = e.target.checked; refresh(); };
+  root.addEventListener('click', async (e) => {
+    const s = e.target.closest('[data-sev]'); if (s) { f.sev = f.sev === s.dataset.sev ? 'all' : s.dataset.sev; App.$$('[data-sev]').forEach(k => k.classList.toggle('accent', k.dataset.sev === f.sev)); const c = document.getElementById('clearSev'); if (c) c.remove(); refresh(); return; }
+    if (e.target.closest('#clearSev')) { f.sev = 'all'; App.$$('[data-sev]').forEach(k => k.classList.remove('accent')); e.target.closest('#clearSev').remove(); refresh(); return; }
+    const a = e.target.closest('[data-ack]'); if (a) { const i = DATA.incidents.find(x => x.id === a.dataset.ack); if (await App.confirm({ title: '确认事件', text: `确认「${esc(i.name)}」？本地审计后通过 event.acknowledge 幂等回写。` })) { i.handlingState = 'ACKNOWLEDGED'; i.ackBy = App.USERS[ctx.role].name; i.ackAt = DATA.now; App.toast('已确认', 'ok'); refresh(); } return; }
+    const b = e.target.closest('[data-bulk]'); if (b) { const ids = tbl.selected(); if (b.dataset.bulk === 'ack') { ids.forEach(id => { const i = DATA.incidents.find(x => x.id === id); if (i.handlingState === 'NEW') { i.handlingState = 'ACKNOWLEDGED'; i.ackBy = App.USERS[ctx.role].name; i.ackAt = DATA.now; } }); App.toast(`已确认 ${ids.length} 条（逐项授权，幂等回写）`, 'ok'); tbl.clearSelection(); refresh(); } if (b.dataset.bulk === 'ticket') App.toast(`已为 ${ids.length} 条事件创建工单（tenant + incident 幂等绑定）`, 'ok'); if (b.dataset.bulk === 'suppress') App.modal({ title: '加入抑制', body: `<div class="form-grid"><div class="field"><label>抑制方式</label><select class="select"><option>按规则指纹归并（同租户 / 资产 / 规则）</option><option>临时静默 1 小时</option><option>依赖抑制（指定上游）</option></select></div><div class="field"><label>时长</label><select class="select"><option>1 小时</option><option>4 小时</option><option>至维护窗口结束</option></select></div><div class="field full"><label>原因</label><input class="input" placeholder="必填，写入审计"></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('已加入抑制；原始事件仍记录，关键告警保留独立升级通道','ok');App.closeLayer()">确定</button>` }); }
+  });
+  document.getElementById('exportBtn').onclick = () => App.toast('导出任务已创建：incidents-' + fmt.date(DATA.now) + '.csv', 'info');
+  const mb = document.getElementById('manualBtn'); if (mb) mb.onclick = () => App.modal({ title: '手工登记事件', body: `<div class="callout info mb">${icon('info')}<div>用于客户报障或外部来源的问题；手工事件不伪造监控状态，source_state 标记为 MANUAL，恢复需人工确认。</div></div><div class="form-grid"><div class="field full"><label>标题</label><input class="input" placeholder="例如：客户反馈 ERP 登录缓慢"></div><div class="field"><label>严重级别</label><select class="select">${Object.entries(App.SEV).map(([k, v]) => `<option value="${k}">${v.name}</option>`).join('')}</select></div><div class="field"><label>资产</label><select class="select">${DATA.assets.filter(App.inScope).slice(0, 20).map(a => `<option>${esc(a.name)}</option>`).join('')}</select></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('事件已登记','ok');App.closeLayer()">登记</button>` });
+});
+</script>
+</body>
+</html>

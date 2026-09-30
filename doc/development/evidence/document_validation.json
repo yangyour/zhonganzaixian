@@ -1,0 +1,3370 @@
+{
+  "date": "2026-09-30",
+  "scope": "文档静态一致性与设计契约结构检查；非产品测试/非完整OpenAPI规范验证器",
+  "requirements": 128,
+  "prototype_pages": 31,
+  "questions": 31,
+  "settings": 185,
+  "pending_settings": 108,
+  "api_operations": 15,
+  "checks": 671,
+  "passed": true,
+  "errors": [],
+  "details": [
+    {
+      "check": "contract_unique_128",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "source_hash:MOP基础网络代维平台开发项目技术开发合同_换章版.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "source_hash:MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "question_ids_31",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "blank_customer_decisions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique_setting_keys",
+      "passed": true,
+      "detail": "185"
+    },
+    {
+      "check": "known_value:business.timezone",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:business.timezone",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:service.default_calendar",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:service.default_calendar",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:monitor.page_refresh_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:monitor.page_refresh_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:dashboard.freshness_max_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:dashboard.freshness_max_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:asset.unknown_detect_max_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:asset.unknown_detect_max_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:monitor.sample_interval_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:monitor.sample_interval_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:tenant.worker_concurrency",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:tenant.worker_concurrency",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:quota.warning_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:quota.warning_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:quota.critical_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:quota.critical_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:pool.review_share_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:pool.review_share_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:tenant.name_unique",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:tenant.name_unique",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:asset.name_unique_in_tenant",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:asset.name_unique_in_tenant",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:tenant.decision_contact_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:tenant.decision_contact_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:sla.tier_availability_target",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.tier_availability_target",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:import.max_rows",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:import.max_rows",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:import.formats",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:import.formats",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:import.note_required",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:import.note_required",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:import.max_elapsed_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:import.max_elapsed_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:export.signed_url_ttl_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:export.signed_url_ttl_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:credential.old_key_grace_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:credential.old_key_grace_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:audit.min_retention_years",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:audit.min_retention_years",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:events.default_retention_years",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:events.default_retention_years",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:report.contract_retention",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:report.contract_retention",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:event.merge_window_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:event.merge_window_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:event.flap_window_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:event.flap_window_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:event.flap_flip_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:event.flap_flip_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:event.flap_silence_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:event.flap_silence_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:event.compensation_interval_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:event.compensation_interval_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:event.compensation_lookback_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:event.compensation_lookback_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:event.failed_payload_retention_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:event.failed_payload_retention_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:template.canary_tenant_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:template.canary_tenant_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:template.canary_observe_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:template.canary_observe_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:probe.wan_interval_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:probe.wan_interval_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:probe.lan_interval_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:probe.lan_interval_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:config.diff_interval_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:config.diff_interval_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:ticket.default_dedupe_window_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:ticket.default_dedupe_window_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:ticket.autocreate_retry_max",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:ticket.autocreate_retry_max",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:ticket.fallback_sla_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:ticket.fallback_sla_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:ticket.photo_max_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:ticket.photo_max_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:ticket.photo_max_size_mb",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:ticket.photo_max_size_mb",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:ticket.report_duplicate_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:ticket.report_duplicate_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:ticket.report_create_max_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:ticket.report_create_max_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:ticket.solution_min_chars",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:ticket.solution_min_chars",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:ticket.customer_confirm_timeout_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:ticket.customer_confirm_timeout_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:ticket.autoclose_remind_before_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:ticket.autoclose_remind_before_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:ticket.reopen_window_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:ticket.reopen_window_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:ticket.reopen_manager_threshold",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:ticket.reopen_manager_threshold",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:sla.tick_interval_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.tick_interval_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:sla.reminder_progress",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.reminder_progress",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:sla.p1_response_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.p1_response_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:sla.p1_recover_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.p1_recover_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:sla.p2_response_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.p2_response_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:sla.p2_recover_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.p2_recover_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:sla.p3_response_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.p3_response_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:sla.advanced_p3_recover_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.advanced_p3_recover_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:sla.compensation_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.compensation_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:oncall.handoff_local_time",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:oncall.handoff_local_time",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:oncall.unanswered_escalate_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:oncall.unanswered_escalate_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:backup.default_local_time",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:backup.default_local_time",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:backup.retry_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:backup.retry_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:backup.retry_interval_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:backup.retry_interval_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:backup.recent_version_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:backup.recent_version_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:backup.min_retention_months",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:backup.min_retention_months",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:backup.failure_ticket_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:backup.failure_ticket_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:backup.drill_warning_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:backup.drill_warning_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:remote.approval_expiry_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:remote.approval_expiry_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:remote.default_session_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:remote.default_session_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:remote.engineer_concurrency",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:remote.engineer_concurrency",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:remote.authorization_remind_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:remote.authorization_remind_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:recording.hot_retention_months",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:recording.hot_retention_months",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:portal.session_ttl_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:portal.session_ttl_hours",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:portal.text_contrast_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:portal.text_contrast_min",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:portal.touch_target_min_px",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:portal.touch_target_min_px",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:report.monthly_generate_day",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:report.monthly_generate_day",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:report.unread_remind_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:report.unread_remind_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:report.advice_max_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:report.advice_max_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:operations.remote_rate_target",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:operations.remote_rate_target",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "known_value:operations.tenants_per_fte_reference",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:operations.tenants_per_fte_reference",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:platform.database_product",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:platform.database_product",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:platform.version",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:platform.version",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:platform.isolation_mode",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:platform.isolation_mode",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:component.approved_baseline",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:component.approved_baseline",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:reliability.target_scope",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:reliability.target_scope",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:reliability.committed_write_rpo",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:reliability.committed_write_rpo",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:availability.unknown_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:availability.unknown_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:availability.min_samples",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:availability.min_samples",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:availability.min_coverage_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:availability.min_coverage_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:availability.probe_consensus",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:availability.probe_consensus",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:availability.service_tree_aggregation",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:availability.service_tree_aggregation",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:monitor.threshold_matrix",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:monitor.threshold_matrix",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:monitor.health_heartbeat_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:monitor.health_heartbeat_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:itsm.provider_and_mapping",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:itsm.provider_and_mapping",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:itsm.local_authority_mode",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:itsm.local_authority_mode",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:itsm.retry_backoff_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:itsm.retry_backoff_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:sla.tenant_work_calendar",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.tenant_work_calendar",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:sla.basic_standard_p3_next_day",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.basic_standard_p3_next_day",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:auth.role_matrix_and_assignments",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:auth.role_matrix_and_assignments",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:retention.history_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:retention.history_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:retention.trend_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:retention.trend_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:retention.recording_total_months",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:retention.recording_total_months",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:retention.backup_archive_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:retention.backup_archive_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:retention.contract_end_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:retention.contract_end_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:scope.feishu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:scope.feishu",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:scope.annual_review",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:scope.annual_review",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:scope.extensions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:scope.extensions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:delivery.milestone_dates_and_acceptance",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:delivery.milestone_dates_and_acceptance",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:acceptance.requirement_priority",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:acceptance.requirement_priority",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:acceptance.workload_and_environment",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:acceptance.workload_and_environment",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:notification.severity_priority_mapping",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:notification.severity_priority_mapping",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:notification.matrix_precedence",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:notification.matrix_precedence",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:oncall.roster_and_escalation_chain",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:oncall.roster_and_escalation_chain",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:oncall.unanswered_retry_interval_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:oncall.unanswered_retry_interval_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:tenant.contract_device_quota",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:tenant.contract_device_quota",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:tenant.item_quota",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:tenant.item_quota",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:tenant.nvps_quota",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:tenant.nvps_quota",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:tenant.plan",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:tenant.plan",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:tenant.isolation",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:tenant.isolation",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:tenant.pool",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:tenant.pool",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:pool.review_share_duration_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:pool.review_share_duration_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:charts.point_limit_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:charts.point_limit_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:lists.page_max_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:lists.page_max_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:auth.oidc_config",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:auth.oidc_config",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:auth.wecom_binding",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:auth.wecom_binding",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:auth.password_min_length",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:auth.password_min_length",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:auth.password_complexity",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:auth.password_complexity",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:auth.password_expiry_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:auth.password_expiry_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:auth.history_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:auth.history_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:auth.failed_attempt_limit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:auth.failed_attempt_limit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:auth.lock_seconds",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:auth.lock_seconds",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:auth.mfa_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:auth.mfa_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:auth.admin_session_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:auth.admin_session_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:notification.provider_credentials",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:notification.provider_credentials",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:notification.sms_month_quota",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:notification.sms_month_quota",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:notification.voice_concurrency",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:notification.voice_concurrency",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:notification.price",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:notification.price",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:cmdb.mapping_and_sync_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:cmdb.mapping_and_sync_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:device.enum",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:device.enum",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:device.oid_mapping",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:device.oid_mapping",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:device.firmware",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:device.firmware",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:device.core_ports",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:device.core_ports",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:device.dependencies",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:device.dependencies",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:deployment.resources",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:deployment.resources",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:deployment.network",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:deployment.network",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:deployment.endpoints",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:deployment.endpoints",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:backup.failure_count_semantics",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:backup.failure_count_semantics",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:backup.commands",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:backup.commands",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:backup.noise_filter",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:backup.noise_filter",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:backup.change_window",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:backup.change_window",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:finance.labor_rate",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:finance.labor_rate",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:finance.system_allocation",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:finance.system_allocation",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:finance.traffic_cost",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:finance.traffic_cost",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:worklog.missing_default_minutes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:worklog.missing_default_minutes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:finance.fte_rule",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:finance.fte_rule",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:finance.salary_reference",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:finance.salary_reference",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:healthcheck.weights_and_scoring",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:healthcheck.weights_and_scoring",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:reports.version_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:reports.version_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:reports.template",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:reports.template",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:reports.copy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:reports.copy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:reports.generate_local_time",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:reports.generate_local_time",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:reports.cutoff",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:reports.cutoff",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:prototype.extra_validation_rules",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:prototype.extra_validation_rules",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:sla.compensation_formula",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.compensation_formula",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:sla.rounding",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.rounding",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:sla.reopen_and_mttr_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:sla.reopen_and_mttr_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:security.kms_ca",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:security.kms_ca",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:security.attachment_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:security.attachment_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:event.review_transition_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:event.review_transition_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:metering.coverage",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:metering.coverage",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:metering.active_tenant_definition",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:metering.active_tenant_definition",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:capacity.bytes_per_value",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:capacity.bytes_per_value",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:capacity.trend_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:capacity.trend_ratio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:capacity.headroom",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:capacity.headroom",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:capacity.node_limit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:capacity.node_limit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:capacity.proxy_outage_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:capacity.proxy_outage_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:asset.columns",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:asset.columns",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:asset.import_steps",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:asset.import_steps",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:asset.export_columns",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:asset.export_columns",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:asset.ip_scope",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:asset.ip_scope",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:remote.bastion_baseline",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:remote.bastion_baseline",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:remote.approver_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:remote.approver_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:remote.idle_timeout_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:remote.idle_timeout_sec",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:remote.extension_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:remote.extension_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:remote.high_risk_confirmation_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:remote.high_risk_confirmation_policy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:recording.readonly_enabled",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:recording.readonly_enabled",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "pending_null:recording.customer_access_approval",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "setting_questions:recording.customer_access_approval",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "business_timezone",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "prototype_pages_31",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:alert-rules.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:asset-detail.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:assets.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:audit.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:automation.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:backups.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:capacity.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:dashboard.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:incident-detail.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:incidents.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:index.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:instances.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:knowledge-ai.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:knowledge.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:login.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:members.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:network-topology.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:notifications.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:onboarding.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:oncall.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:operations.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:platform-health.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:portal.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:prototype-map.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:proxies.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:remote.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:reports.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:sla.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:templates.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:tenants.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "page_covered:tickets.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "openapi_version",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:getSession",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:createTenant",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "write_headers:createTenant",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:listAssets",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:listIncidents",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:importAssets",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "write_headers:importAssets",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:ackIncident",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "write_headers:ackIncident",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:getTicket",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:createTicket",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "write_headers:createTicket",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:ticketAccept",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "write_headers:ticketAccept",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:ticketTransfer",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "write_headers:ticketTransfer",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:ticketResolve",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "write_headers:ticketResolve",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:ticketConfirm",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "write_headers:ticketConfirm",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:ticketReopen",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "write_headers:ticketReopen",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:ticketWorklogs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "write_headers:ticketWorklogs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "path_parameters:getOperation",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique_operation_ids",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/ResourceResult",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Accepted",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/TenantCreate",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/ListResult",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/ListResult",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Accepted",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/AssetImport",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/ResourceResult",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/IncidentAck",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/ResourceResult",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Accepted",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/TicketCreate",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/ResourceResult",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Accepted",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/VersionAction",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/ResourceResult",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Accepted",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/TicketTransfer",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/ResourceResult",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Accepted",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/TicketResolve",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/ResourceResult",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Accepted",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/TicketConfirm",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/ResourceResult",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Accepted",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/TicketReopen",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/ResourceResult",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Accepted",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/WorklogCreate",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/OperationResult",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "ref:#/components/schemas/Error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "tenant_three_modes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "partial_area_not_department",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "valid_question_refs:01_开发顺序与任务拆解.md",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "consistent_config_error:01_开发顺序与任务拆解.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:02_模块开发步骤与页面交互.md:contracts/core-api.openapi.json",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:02_模块开发步骤与页面交互.md:05_成熟组件复用与技术选型.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "valid_question_refs:02_模块开发步骤与页面交互.md",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "consistent_config_error:02_模块开发步骤与页面交互.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "valid_question_refs:03_数据模型与接口实施约定.md",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "consistent_config_error:03_数据模型与接口实施约定.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:04_客户待确认事项与全局设置.md:evidence/contract_requirements.json",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:04_客户待确认事项与全局设置.md:contracts/config-baseline.json",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "valid_question_refs:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "consistent_config_error:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:evidence/contract_requirements.json",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:05_成熟组件复用与技术选型.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "valid_question_refs:05_成熟组件复用与技术选型.md",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "consistent_config_error:05_成熟组件复用与技术选型.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "valid_question_refs:06_测试验收与交付步骤.md",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "consistent_config_error:06_测试验收与交付步骤.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:07_合同逐项开发追踪.md:evidence/contract_requirements.json",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:07_合同逐项开发追踪.md:02_模块开发步骤与页面交互.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:07_合同逐项开发追踪.md:01_开发顺序与任务拆解.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:07_合同逐项开发追踪.md:06_测试验收与交付步骤.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "valid_question_refs:07_合同逐项开发追踪.md",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "consistent_config_error:07_合同逐项开发追踪.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:README.md:../../output/documents/MOP平台开发文档.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:README.md:01_开发顺序与任务拆解.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:README.md:02_模块开发步骤与页面交互.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:README.md:03_数据模型与接口实施约定.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:README.md:04_客户待确认事项与全局设置.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:README.md:05_成熟组件复用与技术选型.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:README.md:06_测试验收与交付步骤.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "link:README.md:07_合同逐项开发追踪.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "valid_question_refs:README.md",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "consistent_config_error:README.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "inventory_exists",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "inventory_count",
+      "passed": true,
+      "detail": ""
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Runbook 自动化 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('automation', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const canExec = App.can('msp', 'padmin'); const canReq = App.can('tadmin', 'msp', 'padmin'); const canApprove = App.can('tadmin', 'padmin');
+  const runs = DATA.runs.filter(App.inScope).sort((a, b) => b.at - a.at); const appr = DATA.approvals.filter(App.inScope).sort((a, b) => b.at - a.at);
+  const RS = { success: ['ok', '成功'], failed: ['danger', '失败'], running: ['sync', '执行中'], awaiting_approval: ['warn', '待审批'], rejected: ['danger', '已拒绝'] };
+  const tab0 = App.qs('tab', App.qs('run') ? 'runs' : App.qs('ap') ? 'appr' : 'lib');
+  root.innerHTML = `
+  <div class="page-head"><div><h1>Runbook 自动化 <span class="badge primary">${esc(ctx.tenant.name)}</span></h1><div class="sub">受控 Runbook：版本、适用资产类型、参数 Schema、允许目标范围、权限级别、预检查、成功判据、超时与补偿步骤。审批与执行分离；执行前再次解析资产归属与凭据。</div></div>
+    <div class="page-actions">${App.can('padmin') ? `<button class="btn" id="policyBtn">${icon('shield')} 执行策略</button><button class="btn primary" id="newRb">${icon('plus')} 新建 Runbook</button>` : ''}</div></div>
+  <div class="grid g5 mb">
+    ${App.kpi({ label: '待审批', value: appr.filter(a => a.status === 'pending').length, cls: appr.some(a => a.status === 'pending') ? 'warn' : '', sub: '审批人 ≠ 申请人 · 高风险需双人' })}
+    ${App.kpi({ label: '执行中', value: runs.filter(r => r.status === 'running').length, sub: '同一事件与 Runbook 版本限制并发' })}
+    ${App.kpi({ label: '24h 执行', value: runs.filter(r => r.at > DATA.now - DATA.D).length, sub: `${runs.filter(r => r.at > DATA.now - DATA.D && r.status === 'success').length} 成功 · ${runs.filter(r => r.at > DATA.now - DATA.D && r.status === 'failed').length} 失败（前置检查）` })}
+    ${App.kpi({ label: '只读诊断自动化率', value: '76', unit: '%', cls: 'ok', sub: '预授权后自动执行，限定频率与输出大小' })}
+    ${App.kpi({ label: '每租户并发上限', value: '2', sub: '最大目标数 10 · 冷却期按 Runbook' })}
+  </div>
+  <div class="card">
+    <div class="tabs" data-group="t"><button data-tab="lib" class="${tab0 === 'lib' ? 'active' : ''}">Runbook 库 <span class="n">${DATA.runbooks.length}</span></button><button data-tab="runs" class="${tab0 === 'runs' ? 'active' : ''}">执行记录 <span class="n">${runs.length}</span></button><button data-tab="appr" class="${tab0 === 'appr' ? 'active' : ''}">审批 <span class="n">${appr.filter(a => a.status === 'pending').length}</span></button><button data-tab="policy">操作等级策略</button></div>
+    <div class="tab-panel ${tab0 === 'lib' ? 'active' : ''}" data-group="t" data-panel="lib"><div id="rbTbl"></div></div>
+    <div class="tab-panel ${tab0 === 'runs' ? 'active' : ''}" data-group="t" data-panel="runs"><div class="toolbar"><div class="chips" id="runChips">${[['all', '全部'], ['running', '执行中'], ['awaiting_approval', '待审批'], ['success', '成功'], ['failed', '失败'], ['rejected', '已拒绝']].map(c => `<span class="chip ${c[0] === 'all' ? 'active' : ''}" data-v="${c[0]}">${c[1]}</span>`).join('')}</div><span class="spacer"></span><span class="xs muted">执行流程：资产核验 → 前置检查 → 审批 / 预授权 → 锁定目标 → 执行 → 观察恢复 → 留证 / 补偿</span></div><div id="runTbl"></div></div>
+    <div class="tab-panel ${tab0 === 'appr' ? 'active' : ''}" data-group="t" data-panel="appr"><div id="apprTbl"></div><div class="pager"><span>AWX 工作流 Approval 节点可作为编排引擎；平台仍需验证审批人范围与职责分离</span></div></div>
+    <div class="tab-panel" data-group="t" data-panel="policy"><div class="card-body"><table class="table"><thead><tr><th>操作等级</th><th>示例</th><th>执行策略</th><th>约束</th></tr></thead><tbody>
+      <tr><td>${App.levelBadge(1)}</td><td>采集进程、连接数、磁盘、最近错误</td><td>预先授权后自动执行</td><td class="small">限定频率（冷却期）和输出大小（≤ 256 KB）；输出脱敏后归档</td></tr>
+      <tr><td>${App.levelBadge(2)}</td><td>重启单个非关键无状态服务、清理白名单路径</td><td>满足健康门槛、限单主机并有明确预授权时自动；否则审批</td><td class="small">审批人 ≠ 申请人；客户管理员可审批本租户；补偿步骤必填</td></tr>
+      <tr><td>${App.levelBadge(3)}</td><td>批量重启、网络配置、数据库修改</td><td>明确审批、维护窗口、灰度和回退；首期以人工操作为主</td><td class="small">双人审批（客户管理员 + 平台）；仅维护窗口内；目标 ≤ 10；24 小时冷却</td></tr>
+    </tbody></table><div class="callout warn mt">${icon('alert-triangle')}<div>命令执行中断后先检查目标真实状态；Ansible 任务是否幂等取决于具体模块与 Playbook，不能依靠工具名称保证回滚成功。任意 URL、任意脚本和任意主机清单均不作为面向客户的通用输入。</div></div></div></div>
+  </div>`;
+  App.table('#rbTbl', { rows: DATA.runbooks, paginate: false, sortKey: 'level', onRow: openRb, columns: [
+    { key: 'name', label: 'Runbook', render: r => `<div class="primary-text">${esc(r.name)} <span class="tag">v${r.version}</span>${r.disabled ? ' ' + App.badge('neutral', '内部演练') : ''}</div><span class="sub-text ellipsis" style="max-width:380px">${esc(r.desc)}</span>` },
+    { key: 'level', label: '等级', render: r => App.levelBadge(r.level) },
+    { key: 'types', label: '适用类型', render: r => r.types.map(t => `<span class="tag">${App.typeName(t)}</span>`).join(' '), sortable: false },
+    { key: 'params', label: '参数', render: r => `<span class="mono xs">${r.params.map(p => p.name + ':' + p.type).join(', ')}</span>`, sortable: false },
+    { key: 'preauth', label: '授权', render: r => r.preauth ? App.badge('ok', '预授权') : App.badge('warn', '需审批') },
+    { key: 'scope', label: '范围 / 超时 / 冷却', render: r => `<span class="small">${r.scope} · ${r.timeout}s · ${r.cooldown}</span>`, sortable: false },
+    { key: 'runs', label: '执行', num: true, render: r => `${r.runs}<span class="sub-text">${r.lastRun ? fmt.ago(r.lastRun) : '—'}</span>` },
+    { key: 'act', label: '', sortable: false, render: r => canReq && !r.disabled ? `<button class="btn xs primary" data-run="${r.id}" data-stop>${canExec ? '执行' : '申请执行'}</button>` : '' }
+  ] });
+  const runTbl = App.table('#runTbl', { rows: runs, pageSize: 12, onRow: openRun, columns: [
+    { key: 'id', label: '执行', render: r => `<span class="mono strong">${r.id}</span><span class="sub-text">${fmt.time(r.at)}</span>` },
+    { key: 'runbookName', label: 'Runbook', render: r => `<div class="primary-text">${esc(r.runbookName)} <span class="tag">v${r.version}</span></div><span class="sub-text mono">${esc(JSON.stringify(r.params))}</span>` },
+    { key: 'asset', label: '目标', render: r => `<a href="asset-detail.html?id=${(DATA.assetByName(r.asset) || {}).id}" data-stop class="small strong">${esc(r.asset)}</a>${r.incidentId ? `<span class="sub-text"><a href="incident-detail.html?id=${r.incidentId}" data-stop>${r.incidentId}</a></span>` : ''}${ctx.tenant.id === 'all' ? `<span class="sub-text">${App.tenantName(r.tenant)}</span>` : ''}` },
+    { key: 'steps', label: '步骤', sortable: false, render: r => `<div class="row" style="gap:3px">${DATA.STEPS.map((s, k) => `<span title="${s}" style="width:14px;height:8px;border-radius:2px;background:${['#e2e8f0', '#16a34a', '#2563eb', '#dc2626'][r.steps[k]]}"></span>`).join('')}</div>` },
+    { key: 'status', label: '状态', render: r => App.badge(RS[r.status][0], RS[r.status][1], true) + (r.duration ? `<span class="sub-text">${r.duration}s</span>` : ''), sortVal: r => Object.keys(RS).indexOf(r.status) },
+    { key: 'requestedBy', label: '申请 / 审批', render: r => `<span class="small">${esc(r.requestedBy)}</span><span class="sub-text">${esc(r.approver)}</span>` }
+  ] });
+  App.chips('#runChips', v => runTbl.update(v === 'all' ? runs : runs.filter(r => r.status === v)));
+  App.table('#apprTbl', { rows: appr, paginate: false, onRow: openAppr, columns: [
+    { key: 'status', label: '状态', render: r => r.status === 'pending' ? App.badge('warn', '待审批', true) : r.status === 'approved' ? App.badge('ok', '已通过') : App.badge('danger', '已拒绝'), sortVal: r => ({ pending: 0, approved: 1, rejected: 2 })[r.status] },
+    { key: 'runbook', label: 'Runbook', render: r => `<div class="primary-text">${esc(r.runbook)}</div><span class="sub-text">${App.levelBadge(r.level)} · ${esc(r.asset)}${r.incidentId ? ` · <a href="incident-detail.html?id=${r.incidentId}" data-stop>${r.incidentId}</a>` : ''}</span>` },
+    { key: 'reason', label: '申请理由', render: r => `<span class="small" style="display:inline-block;max-width:320px">${esc(r.reason)}</span>` },
+    { key: 'requestedBy', label: '申请人 → 审批人', render: r => `<span class="small">${esc(r.requestedBy)}</span><span class="sub-text">→ ${esc(r.approver)}</span>` },
+    { key: 'at', label: '时间', num: true, render: r => `<span class="small nowrap">${fmt.ago(r.at)}</span>${r.status === 'pending' && r.expires ? `<span class="sub-text">${fmt.dur((r.expires - DATA.now) / 1000)} 后过期</span>` : ''}` },
+    { key: 'act', label: '', sortable: false, render: r => r.status === 'pending' && canApprove ? `<span class="nowrap"><button class="btn xs ok" data-approve="${r.id}" data-stop>通过</button> <button class="btn xs danger" data-reject="${r.id}" data-stop>拒绝</button></span>` : (r.decision ? `<span class="xs muted">${esc(r.decision)}</span>` : '') }
+  ] });
+  function openRb(r) { App.drawer({ title: r.name, sub: `v${r.version} · ${App.levelBadge(r.level)} · 负责：${r.owner}`, width: 640, body: `<p class="small" style="color:var(--text-2);margin-bottom:14px">${esc(r.desc)}</p><div class="grid g2 mb" style="gap:10px"><div class="kv-card"><div class="l">适用资产类型</div><div class="v small">${r.types.map(App.typeName).join('、')}</div></div><div class="kv-card"><div class="l">允许目标范围</div><div class="v small">${r.scope}</div></div><div class="kv-card"><div class="l">超时 / 冷却</div><div class="v small">${r.timeout}s / ${r.cooldown}</div></div><div class="kv-card"><div class="l">授权</div><div class="v small">${r.preauth ? '预授权自动执行' : '需审批（审批人 ≠ 申请人）'}</div></div></div><h3 style="font-size:13px;margin-bottom:8px">参数 Schema</h3><table class="table dense mb"><thead><tr><th>参数</th><th>类型</th><th>默认</th><th>说明</th></tr></thead><tbody>${r.params.map(p => `<tr><td class="mono">${p.name}</td><td>${p.type}${p.options ? ` <span class="xs muted">(${p.options.join(' | ')})</span>` : ''}</td><td class="mono">${esc(String(p.default))}</td><td class="small muted">${esc(p.desc)}</td></tr>`).join('')}</tbody></table><h3 style="font-size:13px;margin-bottom:8px">前置检查</h3><ul class="stack small mb" style="gap:4px">${r.precheck.map(p => `<li class="row" style="gap:6px">${icon('check-circle')} ${esc(p)}</li>`).join('')}</ul><dl class="kv"><dt>成功判据</dt><dd>${esc(r.success)}</dd><dt>补偿步骤</dt><dd>${esc(r.compensation || '无副作用（只读）')}</dd><dt>执行统计</dt><dd>${r.runs} 次 · 最近 ${r.lastRun ? fmt.ago(r.lastRun) : '—'} · ${r.lastResult === 'success' ? '<span class="delta good">成功</span>' : '—'}</dd></dl>`, foot: `${canReq && !r.disabled ? `<button class="btn primary" data-run="${r.id}">${icon('play')} ${canExec ? '执行' : '申请执行'}</button>` : ''}<button class="btn" data-close>关闭</button>` }); }
+  function openRun(r) {
+    App.drawer({ title: `${r.runbookName} v${r.version}`, sub: `${r.id} · ${esc(r.asset)} · ${fmt.dt(r.at)}`, width: 680, body: `<div class="row wrap mb" style="gap:8px">${App.badge(RS[r.status][0], RS[r.status][1], true)}<span class="badge neutral">申请 ${esc(r.requestedBy)}</span><span class="badge neutral">审批 ${esc(r.approver)}</span>${r.duration ? `<span class="badge neutral">${r.duration}s</span>` : ''}</div><div class="stack mb" style="gap:6px" id="steps">${DATA.STEPS.map((s, k) => `<div class="runstep ${['wait', 'done', 'run', 'fail'][r.steps[k]]}"><span class="rs-i">${r.steps[k] === 1 ? icon('check') : r.steps[k] === 3 ? '!' : k + 1}</span><span class="small">${s}</span><span class="rs-t">${['等待', '完成', '进行中', '失败'][r.steps[k]]}${r.steps[k] === 2 && r.status === 'awaiting_approval' ? ' · ' + esc(r.approver) : ''}</span></div>`).join('')}</div><dl class="kv mb"><dt>参数</dt><dd class="mono xs">${esc(JSON.stringify(r.params))}</dd><dt>目标锁定</dt><dd>${r.steps[3] ? `lock:${r.tenant}:${r.asset}:${r.runbook}（同一事件与版本限制并发）` : '未锁定'}</dd><dt>凭据</dt><dd>执行前再次解析资产归属与站点凭据（服务端密钥库）</dd></dl><h3 style="font-size:13px;margin-bottom:8px">输出（脱敏归档）</h3><div class="code">${esc(r.output || (r.status === 'running' ? '执行中…' : '（无输出）'))}</div>`, foot: `${r.status === 'failed' && canExec ? `<button class="btn" onclick="App.toast('已重新发起（先检查目标真实状态）','info')">${icon('refresh')} 重试</button>` : ''}${r.status === 'success' ? `<button class="btn" onclick="App.toast('已生成证据链接（15 分钟有效）','info')">${icon('link')} 复制证据链接</button>` : ''}<button class="btn primary" data-close>关闭</button>` });
+  }
+  function openAppr(a) { App.drawer({ title: '审批请求 ' + a.id, sub: `${esc(a.runbook)} · ${esc(a.asset)}`, body: `<div class="row wrap mb" style="gap:8px">${a.status === 'pending' ? App.badge('warn', '待审批', true) : a.status === 'approved' ? App.badge('ok', '已通过') : App.badge('danger', '已拒绝')}${App.levelBadge(a.level)}</div><dl class="kv mb"><dt>申请人</dt><dd>${esc(a.requestedBy)}</dd><dt>审批人</dt><dd>${esc(a.approver)}</dd><dt>关联事件</dt><dd>${a.incidentId ? `<a href="incident-detail.html?id=${a.incidentId}">${a.incidentId}</a>` : '—'}</dd><dt>理由</dt><dd>${esc(a.reason)}</dd><dt>申请时间</dt><dd>${fmt.dt(a.at)}</dd>${a.decidedAt ? `<dt>决定</dt><dd>${fmt.dt(a.decidedAt)} · ${esc(a.decision)}</dd>` : ''}</dl><div class="callout info">${icon('info')}<div>审批与执行分离；审批通过后执行前仍会再次进行资产核验与前置检查。审批人不得为申请人本人；高风险变更需客户管理员与平台双人审批。</div></div>`, foot: a.status === 'pending' && canApprove ? `<button class="btn danger" data-reject="${a.id}">拒绝</button><button class="btn ok" data-approve="${a.id}">通过并执行</button>` : `<button class="btn primary" data-close>关闭</button>` }); }
+  if (App.qs('rb')) { const r = DATA.runbooks.find(x => x.id === App.qs('rb')); if (r) openRb(r); }
+  if (App.qs('run')) { const r = runs.find(x => x.id === App.qs('run')); if (r) openRun(r); }
+  App.tabs(root, 't');
+  if (window._autoClick) document.removeEventListener('click', window._autoClick);
+  window._autoClick = async (e) => {
+    const rb = e.target.closest('[data-run]'); if (rb) { const r = DATA.runbooks.find(x => x.id === rb.dataset.run); App.closeLayer(); return execModal(r); }
+    const ap = e.target.closest('[data-approve]'); if (ap) { const a = DATA.approvals.find(x => x.id === ap.dataset.approve); if (a.requestedBy.startsWith(App.USERS[ctx.role].name)) return App.toast('审批人不得为申请人本人', 'danger'); a.status = 'approved'; a.decidedAt = DATA.now; a.decision = '同意'; const run = DATA.runs.find(x => x.id === a.runId); if (run) { run.status = 'running'; run.steps = [1, 1, 1, 1, 2, 0, 0]; } App.closeLayer(); App.toast('已通过：进入锁定目标 → 执行', 'ok'); App.rerender(); return; }
+    const rj = e.target.closest('[data-reject]'); if (rj) { const a = DATA.approvals.find(x => x.id === rj.dataset.reject); const m = App.modal({ title: '拒绝审批', body: `<div class="field"><label>拒绝原因（必填，写入审计）</label><textarea class="input" id="rjReason"></textarea></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn danger solid" id="rjOk">拒绝</button>`, onOpen: (el) => { el.querySelector('#rjOk').onclick = () => { const v = el.querySelector('#rjReason').value.trim(); if (!v) return App.toast('请填写原因', 'warn'); a.status = 'rejected'; a.decidedAt = DATA.now; a.decision = v; const run = DATA.runs.find(x => x.id === a.runId); if (run) { run.status = 'rejected'; run.steps = [1, 1, 3, 0, 0, 0, 0]; run.output = '审批拒绝：' + v; } m.close(); App.closeLayer(); App.toast('已拒绝', 'warn'); App.rerender(); }; } }); }
+  };
+  document.addEventListener('click', window._autoClick);
+  function execModal(r) {
+    const targets = DATA.assets.filter(App.inScope).filter(a => r.types.includes(a.type));
+    const m = App.modal({ title: `${canExec ? '执行' : '申请执行'} · ${r.name} v${r.version}`, size: 'lg', body: `<div class="form-grid"><div class="field"><label>目标资产（单主机）</label><select class="select" id="x-target">${targets.map(a => `<option value="${a.id}">${esc(a.name)} · ${esc(a.site)}</option>`).join('')}</select></div><div class="field"><label>关联事件</label><select class="select"><option value="">不关联</option>${DATA.incidents.filter(App.inScope).filter(i => i.sourceState === 'PROBLEM').map(i => `<option>${esc(i.name)}</option>`).join('')}</select></div>${r.params.map(p => `<div class="field"><label>${p.name} <span class="muted" style="font-weight:400">· ${esc(p.desc)}</span></label>${p.options ? `<select class="select">${p.options.map(o => `<option ${o === p.default ? 'selected' : ''}>${o}</option>`).join('')}</select>` : `<input class="input" value="${esc(String(p.default))}">`}</div>`).join('')}<div class="field full"><label>前置检查</label><div class="stack" style="gap:4px">${r.precheck.map(p => `<div class="row small" style="gap:6px">${icon('check-circle')} ${esc(p)}</div>`).join('')}</div></div><div class="field full"><div class="callout ${r.preauth ? 'ok' : 'warn'}">${icon(r.preauth ? 'check-circle' : 'alert-triangle')}<div>${r.preauth ? '该 Runbook 已预授权：通过前置检查后自动执行，限定冷却期 ' + r.cooldown + '。' : `需审批：将通知 ${ctx.tenant.id === 'all' ? '客户管理员' : esc(App.tenantObj(ctx.tenant.id).contact.split(' ')[0]) + '（客户管理员）'}${r.level === 3 ? ' 与平台管理员（双人）' : ''}；审批通过后再执行。`}</div></div></div></div><div id="x-progress" class="mt hidden"></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" id="x-go">${icon('play')} ${r.preauth && canExec ? '执行' : '提交'}</button>`, onOpen: (el) => {
+      el.querySelector('#x-go').onclick = () => {
+        const aid = el.querySelector('#x-target').value; const asset = DATA.assets.find(a => a.id === aid);
+        const run = { id: 'run-' + (2045 + DATA.runs.length), tenant: asset.tenant, runbook: r.id, runbookName: r.name, version: r.version, asset: asset.name, incidentId: null, params: Object.fromEntries(r.params.map(p => [p.name, p.default])), status: r.preauth ? 'running' : 'awaiting_approval', requestedBy: App.USERS[ctx.role].name, approver: r.preauth ? '预授权' : (App.tenantObj(asset.tenant).contact.split(' ')[0] + '（客户管理员）'), at: DATA.now, steps: [2, 0, 0, 0, 0, 0, 0], output: '' };
+        DATA.runs.unshift(run);
+        if (!r.preauth) { DATA.approvals.unshift({ id: 'ap-' + (503 + DATA.approvals.length), tenant: asset.tenant, runId: run.id, runbook: `${r.name} v${r.version}`, asset: asset.name, incidentId: null, requestedBy: run.requestedBy + '（' + App.ROLES[ctx.role].short + '）', approver: run.approver, reason: '值班处置需要。', status: 'pending', at: DATA.now, level: r.level, expires: DATA.now + DATA.H }); run.steps = [1, 1, 2, 0, 0, 0, 0]; m.close(); App.toast('已提交审批，等待 ' + run.approver, 'info'); App.rerender(); return; }
+        el.querySelector('#x-go').disabled = true; const pg = el.querySelector('#x-progress'); pg.classList.remove('hidden');
+        const draw = () => { pg.innerHTML = `<div class="stack" style="gap:6px">${DATA.STEPS.map((s, k) => `<div class="runstep ${['wait', 'done', 'run', 'fail'][run.steps[k]]}"><span class="rs-i">${run.steps[k] === 1 ? icon('check') : k + 1}</span><span class="small">${s}</span><span class="rs-t">${run.steps[k] === 2 ? '<span class="spin"></span>' : ['', '完成', '', '失败'][run.steps[k]]}</span></div>`).join('')}</div>`; };
+        let k = 0; draw(); const tick = () => { run.steps[k] = 1; k++; if (k >= DATA.STEPS.length) { run.status = 'success'; run.duration = 18 + Math.round(Math.random() * 20); run.output = '# 执行完成（输出已脱敏）\n' + (r.id === 'rb-01' ? '/dev/mapper/vg-data  2.0T  1.6T  358G  82% /data\n312G  /data/logs/erp/archive' : 'exit code 0'); draw(); App.toast('执行成功，输出已归档；留证链接已生成', 'ok'); setTimeout(() => { m.close(); App.rerender(); }, 900); return; } run.steps[k] = 2; draw(); setTimeout(tick, k === 4 ? 1600 : 700); }; setTimeout(tick, 600);
+      };
+    } });
+  }
+  const pb = document.getElementById('policyBtn'); if (pb) pb.onclick = () => App.tabs(root, 't').activate('policy');
+  const nr = document.getElementById('newRb'); if (nr) nr.onclick = () => App.modal({ title: '新建 Runbook', body: `<div class="form-grid"><div class="field"><label>名称</label><input class="input"></div><div class="field"><label>等级</label><select class="select"><option>只读诊断</option><option>低风险修复</option><option>高风险变更</option></select></div><div class="field"><label>适用类型</label><select class="select">${Object.entries(App.TYPES).map(([k, v]) => `<option>${v.name}</option>`).join('')}</select></div><div class="field"><label>执行引擎</label><select class="select"><option>AWX 工作流（Approval 节点）</option><option>受控 Ansible Runner</option></select></div><div class="field full"><label>参数 Schema（JSON）</label><textarea class="input">{ "mount": { "type": "string", "default": "/" } }</textarea></div><div class="field full"><label>成功判据 / 补偿步骤</label><textarea class="input"></textarea></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('已创建草稿 v0.1.0，需通过安全评审后发布','ok');App.closeLayer()">创建草稿</button>` });
+});
+</script>
+</body>
+</html>

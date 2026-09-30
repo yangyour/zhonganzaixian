@@ -1,0 +1,24 @@
+server:
+  address: 127.0.0.1
+  port: 8080
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        name: MOP_SESSION
+        http-only: true
+        same-site: strict
+        secure: false
+spring:
+  profiles:
+    default: remote_test
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    deserialization:
+      fail-on-unknown-properties: true
+      fail-on-trailing-tokens: true
+  main:
+    banner-mode: "off"
+logging:
+  level:
+    org.springframework.security: WARN

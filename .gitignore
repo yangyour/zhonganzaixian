@@ -1,0 +1,14 @@
+**/node_modules/
+**/target/
+**/dist/
+.local/
+*.log
+.idea/
+.vscode/
+.env
+!.env.example
+tests/artifacts/
+deploy/private/
+**/__pycache__/
+*.pyc
+zabbix-msp-prototype/tests/.knowledge-qa/

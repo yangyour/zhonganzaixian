@@ -1,0 +1,2966 @@
+{
+  "schema_version": "1.0",
+  "generated_date": "2026-09-30",
+  "status": "合同原文提取，非客户确认或验收通过记录",
+  "extraction_method": "直接读取两份实际DOCX的段落和全部表格；表格编号及段落编号均从0起；未以tmp/contract_full.txt作为提取来源",
+  "sources": [
+    {
+      "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_换章版.docx",
+      "file_sha256": "12b649cfea0d33f5ef56f94e8ae44ea87cb1ca8d01692d7cc029d3c5b01237c3",
+      "text_sha256": "79d9875cf84923f50b17377c6d0aa05b098410d5e34da52bef60a89c86ca8589",
+      "paragraph_count": 400,
+      "table_count": 8
+    },
+    {
+      "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+      "file_sha256": "156cbc1f8d84ddbd9a41942ef7d8b954a459ea5d49757833804454cfc1740649",
+      "text_sha256": "79d9875cf84923f50b17377c6d0aa05b098410d5e34da52bef60a89c86ca8589",
+      "paragraph_count": 400,
+      "table_count": 8
+    }
+  ],
+  "document_texts_equal": true,
+  "image_signature_note": "这里只比较文字与表格，未鉴定签章图像、签名或法律生效状态",
+  "requirement_count": 128,
+  "module_counts": {
+    "M1": 11,
+    "M2": 14,
+    "M3": 12,
+    "M4": 19,
+    "M5": 21,
+    "M6": 7,
+    "M7": 10,
+    "M8": 12,
+    "M9": 9,
+    "M10": 13
+  },
+  "requirements": [
+    {
+      "id": "M1-1",
+      "title": "运营总览首页",
+      "module": "M1首页门户",
+      "contract_sequence": 1,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 1,
+        "locator": "T00R001"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M1-1运营总览首页\n路径：首页→运营总览\n1、6张KPI卡：①资产在线率—\"未知\"单独计数，与\"正常\"严格区分，不得合并；②当前问题—排除已抑制事件后，按灾难/严重/一般/警告/信息5级分别计数；③本月服务可用率—统计本月1日至当前时刻，无样本时显示\"未知\"而非100%；④待处理工单—含\"已超SLA\"数量副标；⑤MTTA（近24小时）；⑥通知送达率（近24小时，区分受理与送达，低于95%转黄色告警态）。\n2、指标数据实时性≤5分钟；顶栏常驻\"数据N秒前\"新鲜度提示。\n3、每张卡片可下钻到对应列表页（事件中心/工单/SLA报表），下钻时继承当前租户上下文。\n验收：①断开一台设备的采集，1分钟内\"未知\"计数+1且\"正常\"计数-1；②6张卡片的数字与对应列表页统计结果一致；③卡片下钻后列表筛选条件正确。",
+      "acceptance_text": "①断开一台设备的采集，1分钟内\"未知\"计数+1且\"正常\"计数-1；②6张卡片的数字与对应列表页统计结果一致；③卡片下钻后列表筛选条件正确。"
+    },
+    {
+      "id": "M1-2",
+      "title": "告警趋势图",
+      "module": "M1首页门户",
+      "contract_sequence": 2,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 2,
+        "locator": "T00R002"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M1-2告警趋势图\n1、双序列折线图：原始事件数（灰）与归并后事件数（主色）叠加显示；右上角\"降噪xx%\"徽标。\n2、时间范围可切换24小时/7天/30天；24小时视图叠加事件标记（如\"Proxy失联\"）。\n3、漏斗口径：降噪率=（原始事件数−最终通知数）÷原始事件数；降噪链含指纹归并、依赖抑制、维护静默三层，每一层的数量均可查看。\n4、原始事件必须始终保留可查，不得因归并或抑制而删除。\n验收：①切换三个时间范围数据刷新正确；②降噪率与事件中心各层计数一致；③任意时间点可查看被归并的原始事件明细。",
+      "acceptance_text": "①切换三个时间范围数据刷新正确；②降噪率与事件中心各层计数一致；③任意时间点可查看被归并的原始事件明细。"
+    },
+    {
+      "id": "M1-3",
+      "title": "服务健康概览",
+      "module": "M1首页门户",
+      "contract_sequence": 3,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 3,
+        "locator": "T00R003"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M1-3服务健康概览\n1、服务卡字段：服务名称/可用率/目标X%/不可用时长（无数据显示\"接入中\"）/N个活动问题/N个关联资产。\n2、配色规则：未达目标→红；无数据→灰（不得显示为达标）；存在灾难或严重活动问题→黄；其余→绿。\n3、图例固定三态：达标/未达标/未知。\n验收：①构造无数据服务，卡片显示灰色\"接入中\"而非绿色达标；②目标值改为100%后，99.99%的服务显示红色未达标。",
+      "acceptance_text": "①构造无数据服务，卡片显示灰色\"接入中\"而非绿色达标；②目标值改为100%后，99.99%的服务显示红色未达标。"
+    },
+    {
+      "id": "M1-4",
+      "title": "故障时间线（近24小时）",
+      "module": "M1首页门户",
+      "contract_sequence": 4,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 4,
+        "locator": "T00R004"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M1-4故障时间线（近24小时）\n1、按服务分行展示故障区间，事件条按严重级着色。\n2、\"未知区间\"用斜纹条单列展示，悬停提示\"数据缺失·记为未知\"。\n3、支持\"维护\"样式的区间展示（区别于故障）。\n4、最多展示8行；时间轴刻度间隔6小时。\n验收：①制造30分钟采集中断，时间线出现斜纹未知区间；②未知区间不参与可用率分子的可用时长计算。",
+      "acceptance_text": "①制造30分钟采集中断，时间线出现斜纹未知区间；②未知区间不参与可用率分子的可用时长计算。"
+    },
+    {
+      "id": "M1-5",
+      "title": "最近事件列表",
+      "module": "M1首页门户",
+      "contract_sequence": 5,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 5,
+        "locator": "T00R005"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M1-5最近事件列表\n1、取最近7条事件；列：级别/问题/资产/状态/发生时间。\n2、已抑制事件挂\"已抑制\"徽标；归并事件挂\"×N\"计数徽标。\n3、点击进入事件详情页。\n验收：①触发一条被抑制的事件，列表中出现且挂\"已抑制\"徽标；②归并后显示\"×N\"且点击可见全部原始事件。",
+      "acceptance_text": "①触发一条被抑制的事件，列表中出现且挂\"已抑制\"徽标；②归并后显示\"×N\"且点击可见全部原始事件。"
+    },
+    {
+      "id": "M1-6",
+      "title": "待处理工单列表",
+      "module": "M1首页门户",
+      "contract_sequence": 6,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 6,
+        "locator": "T00R006"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M1-6待处理工单列表\n1、取未关闭且未解决的前5条工单。\n2、列：工单号/标题/状态/SLA（超时显示红字，剩余显示灰字）。\n验收：①造一条已超SLA工单，列表SLA列显示红色超时；②列表与工单列表页数据一致。",
+      "acceptance_text": "①造一条已超SLA工单，列表SLA列显示红色超时；②列表与工单列表页数据一致。"
+    },
+    {
+      "id": "M1-7",
+      "title": "租户视图切换",
+      "module": "M1首页门户",
+      "contract_sequence": 7,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 7,
+        "locator": "T00R007"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M1-7租户视图切换\n1、顶栏提供租户下拉切换；每次切换写入审计日志（action=tenant_switch）。\n2、仅MSP值班工程师与平台管理员可选择\"全部租户\"；客户观察者与客户管理员强制归一化到本租户，不提供切换入口。\n验收：①客户管理员账号登录后无租户切换控件；②切换租户后，后续所有请求只返回该租户数据，且审计日志有记录。",
+      "acceptance_text": "①客户管理员账号登录后无租户切换控件；②切换租户后，后续所有请求只返回该租户数据，且审计日志有记录。"
+    },
+    {
+      "id": "M1-8",
+      "title": "全局搜索与通知铃铛",
+      "module": "M1首页门户",
+      "contract_sequence": 8,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 8,
+        "locator": "T00R008"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M1-8全局搜索与通知铃铛\n1、搜索：按\"/\"键聚焦输入框；结果分组且每组上限为资产5条/事件4条/工单3条/自动化脚本3条；仅搜索当前租户范围内的数据。\n2、铃铛：展示未确认告警的前5条（条件为监控状态PROBLEM且处置状态为\"新建\"），点击跳转事件详情。\n验收：①跨租户关键词搜索返回\"不存在或无权限\"，不泄露其他租户对象；②铃铛数量与事件中心\"新建\"状态过滤结果一致。",
+      "acceptance_text": "①跨租户关键词搜索返回\"不存在或无权限\"，不泄露其他租户对象；②铃铛数量与事件中心\"新建\"状态过滤结果一致。"
+    },
+    {
+      "id": "M1-9",
+      "title": "刷新与时间范围控件",
+      "module": "M1首页门户",
+      "contract_sequence": 9,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 9,
+        "locator": "T00R009"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M1-9刷新与时间范围控件\n1、提供时间范围分段器与手动刷新按钮。\n2、顶栏常驻数据新鲜度指示。\n3、各监控类页面默认自动刷新周期30秒（值班看板必须自动刷新）。\n验收：①手动刷新后新鲜度指示重置为0秒；②值班看板30秒内自动刷新无需人工干预。",
+      "acceptance_text": "①手动刷新后新鲜度指示重置为0秒；②值班看板30秒内自动刷新无需人工干预。"
+    },
+    {
+      "id": "M1-10",
+      "title": "资源占用Top5",
+      "module": "M1首页门户",
+      "contract_sequence": 10,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 10,
+        "locator": "T00R010"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M1-10资源占用Top5\n1、分段器切换CPU/内存/磁盘三类资源。\n2、横向条形图按占用率降序取前5名，坐标轴上限固定100%。\n验收：①三类切换数据正确；②条形图排序与资产管理列表的CPU列排序一致。",
+      "acceptance_text": "①三类切换数据正确；②条形图排序与资产管理列表的CPU列排序一致。"
+    },
+    {
+      "id": "M1-11",
+      "title": "首页版面管理",
+      "module": "M1首页门户",
+      "contract_sequence": 11,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 11,
+        "locator": "T00R011"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M1-11首页版面管理\n1、一期首页为固定版式：6张KPI卡+告警趋势+服务健康+故障时间线+最近事件+待处理工单+资源占用Top5，顺序与位置固定。\n2、本期不提供卡片拖拽、显隐配置、自定义布局与个性化保存。\n3、如需自定义版面，一律走变更单另行报价。\n验收：①不同角色登录后版面一致；②界面无拖拽与自定义入口。",
+      "acceptance_text": "①不同角色登录后版面一致；②界面无拖拽与自定义入口。"
+    },
+    {
+      "id": "M2-1",
+      "title": "租户列表",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 12,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 12,
+        "locator": "T00R012"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-1租户列表\n路径：管理→租户管理\n1、12列：租户名称/隔离模式·资源池/状态/资产数·配额/监控项Item数·配额/NVPS·配额/站点数/数据保留期/成员数/ITSM对接方式/创建时间/是否开通网络拓扑。\n2、配额列带进度条：使用率≥90%显示红色、≥75%显示黄色。\n3、状态取值：活跃/接入中。\n验收：①配额达到80%时进度条转黄、95%时转红；②列表字段与租户详情页字段一一对应。",
+      "acceptance_text": "①配额达到80%时进度条转黄、95%时转红；②列表字段与租户详情页字段一一对应。"
+    },
+    {
+      "id": "M2-2",
+      "title": "新建租户",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 13,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 13,
+        "locator": "T00R013"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-2新建租户\n1、字段：租户名称/套餐·等级/隔离模式/数据保留期/资产配额/监控项Item配额/NVPS配额/身份提供方（OIDC联邦或平台本地账号）/ITSM对接（ServiceNow、JSM、BMCRemedy、暂不接入）/首个客户管理员邮箱。\n2、提交返回202异步响应与operation_id；后端异步准备监控主机组与受限身份，前端显示\"接入中\"直至回读确认为\"活跃\"。\n3、同一租户名称在平台内不得重复。\n验收：①提交后前端显示\"接入中\"而非\"成功\"；②回读失败时展示错误原因与重试入口；③重复名称提交被拦截。",
+      "acceptance_text": "①提交后前端显示\"接入中\"而非\"成功\"；②回读失败时展示错误原因与重试入口；③重复名称提交被拦截。"
+    },
+    {
+      "id": "M2-3",
+      "title": "配额管理",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 14,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 14,
+        "locator": "T00R014"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-3配额管理\n1、可编辑项：资产配额/有效监控项配额/NVPS配额/Worker并发上限（默认2）。\n2、只读项：单图曲线点数上限（取值20或1000）、列表每页最大条数（取值100或500）。\n3、池负载告警线：单个租户持续占用共享资源池20%时触发迁池评审提示。\n验收：①修改配额后可保存并在列表进度条生效；②只读项界面不可编辑。",
+      "acceptance_text": "①修改配额后可保存并在列表进度条生效；②只读项界面不可编辑。"
+    },
+    {
+      "id": "M2-4",
+      "title": "隔离模式三档",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 15,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 15,
+        "locator": "T00R015"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-4隔离模式三档\n1、共享监控实例：独立主机组+受限身份+平台对象授权。\n2、独享监控实例：独立监控Server、独立数据库、独立Proxy路由与凭据。\n3、独立部署：控制层与监控层均部署在客户自有环境。\n4、选择依据为故障边界要求与数据留存要求；模式变更须走迁移流程，不支持在线直接切换。\n验收：①三种模式均可完成创建与纳管；②变更前引导迁移流程，无直接切换入口。",
+      "acceptance_text": "①三种模式均可完成创建与纳管；②变更前引导迁移流程，无直接切换入口。"
+    },
+    {
+      "id": "M2-5",
+      "title": "六层隔离约束与验证",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 16,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 16,
+        "locator": "T00R016"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-5六层隔离约束与验证\n1、六层隔离：身份层（tenant_membership表约束）/对象层（(tenant_id,object_id)联合校验）/监控层（主机组命名tenant/{uuid}/{site}）/数据库层（非空tenant_id+行级安全策略RLS）/缓存与任务层（缓存键含租户与权限版本）/网络执行层（按客户分配独立凭据）。\n2、隔离验证检查表7项：跨租户hostid访问、跨租户itemid访问、跨租户eventid访问、报告下载地址泄漏、缓存键泄漏、伪造tenant_id的消息投递、受限身份越权查询——全部要求返回\"拒绝\"或\"空结果\"。\n验收：①7项检查全部通过；②任意接口携带他租户ID均返回统一提示\"对象不存在或无权限\"。",
+      "acceptance_text": "①7项检查全部通过；②任意接口携带他租户ID均返回统一提示\"对象不存在或无权限\"。"
+    },
+    {
+      "id": "M2-6",
+      "title": "角色定义与权限矩阵",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 17,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 17,
+        "locator": "T00R017"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-6角色定义与权限矩阵\n1、4类角色：客户观察者（viewer）/客户管理员（tadmin）/MSP值班工程师（msp）/平台管理员（padmin）。\n2、权限矩阵5个维度：资产与指标/告警与工单/模板与自动化/平台管理/成员管理。\n3、矩阵以配置项维护，新增角色不修改代码（仅限上述5维内的增删组合）。\n验收：①提供可打印的完整权限矩阵并双方签字确认；②修改矩阵后无需发版即生效。",
+      "acceptance_text": "①提供可打印的完整权限矩阵并双方签字确认；②修改矩阵后无需发版即生效。"
+    },
+    {
+      "id": "M2-7",
+      "title": "菜单与操作权限",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 18,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 18,
+        "locator": "T00R018"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-7菜单与操作权限\n1、权限粒度=菜单可见性+按钮级操作权限。\n2、导航按角色渲染，未授权内容与中间态不得闪现（先鉴权后渲染）。\n3、越权访问统一返回\"对象不存在或无权限\"，不泄露对象是否存在。\n4、菜单角标：事件中心显示未关闭问题数，自动化页显示待审批数。\n验收：①低权限账号登录，页面源码中不出现未授权菜单的DOM；②越权接口返回统一文案。",
+      "acceptance_text": "①低权限账号登录，页面源码中不出现未授权菜单的DOM；②越权接口返回统一文案。"
+    },
+    {
+      "id": "M2-8",
+      "title": "成员管理",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 19,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 19,
+        "locator": "T00R019"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-8成员管理\n1、8列：成员/角色/租户范围/资源范围/MFA状态（含未启用告警标记）/状态/最近登录时间/操作。\n2、动作：邀请（非平台管理员仅可邀请客户观察者与客户管理员）/重置MFA/撤权（授权版本递增，相关会话即时失效）/重新邀请。\n3、MFA覆盖率作为KPI展示。\n验收：①撤权后该成员已登录会话立即失效（下一步操作被拒）；②非平台管理员邀请MSP工程师角色被拦截。",
+      "acceptance_text": "①撤权后该成员已登录会话立即失效（下一步操作被拒）；②非平台管理员邀请MSP工程师角色被拦截。"
+    },
+    {
+      "id": "M2-9",
+      "title": "客户联系人管理",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 20,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 20,
+        "locator": "T00R020"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-9客户联系人管理\n1、字段：姓名/角色（报障人·决策人·技术对接人）/手机号/邮箱/企业微信userid/通知偏好（接收级别P1-P4多选、静音时段）/启用状态。\n2、功能：增删改查、停用（停用后不再接收通知）、批量导入联系人。\n3、规则：每个租户必须存在至少1名\"决策人\"，删除最后一名决策人时系统拦截并提示；决策人为升级通知的必达对象。\n验收：①删除最后一名决策人被拦截且有明确提示；②升级通知准确送达全部决策人渠道。",
+      "acceptance_text": "①删除最后一名决策人被拦截且有明确提示；②升级通知准确送达全部决策人渠道。"
+    },
+    {
+      "id": "M2-10",
+      "title": "服务档位管理与变更留痕",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 21,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 21,
+        "locator": "T00R021"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-10服务档位管理与变更留痕\n1、档位字段：租户/档位名称（基础/标准/进阶）/SLA目标（99.5%/99.9%/99.99%）/契约设备数/计费周期/月费金额。\n2、档位变更记录字段：租户/原档位/新档位/生效时间（立即或次月1日）/变更原因/审批人/变更时间；变更动作写入审计日志并生成档位变更记录供查询。\n3、升级链路按档位差异化配置（详见M5-13）。\n4、在途工单按开单时写入的sla_tier_snapshot继续计时，档位变更不追溯影响。\n验收：①变更档位后随机抽3张在途工单，SLA截止时间保持不变；②变更记录可查询且不可修改。",
+      "acceptance_text": "①变更档位后随机抽3张在途工单，SLA截止时间保持不变；②变更记录可查询且不可修改。"
+    },
+    {
+      "id": "M2-11",
+      "title": "设备数量上限控制",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 22,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 22,
+        "locator": "T00R022"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-11设备数量上限控制\n1、契约设备数按租户配置；接入或导入设备时执行硬校验。\n2、规则：若现有设备数+本次新增数＞契约设备数，弹窗拦截并提示\"已达契约设备数上限（N台），请先扩容或联系服务经理\"，提交按钮同步置灰。\n3、扩容由服务经理执行，动作留痕。\n验收：①构造超限场景，提交被拦截且提示文案与实际配额一致；②未超限场景不受影响。",
+      "acceptance_text": "①构造超限场景，提交被拦截且提示文案与实际配额一致；②未超限场景不受影响。"
+    },
+    {
+      "id": "M2-12",
+      "title": "审计日志",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 23,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 23,
+        "locator": "T00R023"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-12审计日志\n路径：管理→审计日志\n1、8列：时间/操作者/租户/操作类型/描述·对象/结果/trace_id/来源IP。\n2、操作码至少覆盖18类，含登录、租户切换、权限变更、凭据轮换、配置变更、远程会话、审批、数据导出等。\n3、筛选：操作类型/结果/操作者+关键词。\n4、约束：追加式写入、不可修改不可删除、hash链可校验完整性、保留期≥3年；导出走短时签名地址（有效期15分钟）；失败与拒绝（denied/failed）同样记录并附口径文案。\n验收：①尝试修改或删除审计记录均无入口且接口返回拒绝；②hash链校验工具可验证任意区间未被篡改；③越权操作有denied记录。",
+      "acceptance_text": "①尝试修改或删除审计记录均无入口且接口返回拒绝；②hash链校验工具可验证任意区间未被篡改；③越权操作有denied记录。"
+    },
+    {
+      "id": "M2-13",
+      "title": "数据保留与删除",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 24,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 24,
+        "locator": "T00R024"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-13数据保留与删除\n1、保留策略项：历史明细N天（资源池级策略）/趋势数据/事件与审计（按合同约定，默认3年）/月报快照（合同期内永久保留）。\n2、删除流程：先停止采集与告警→保留事件与报表映射关系（避免报表口径断裂）→合同到期按约定清理→备份周期自然过期。\n验收：①执行删除流程后，历史月报仍可打开且数据完整；②保留天数到期后数据自动清理并有执行记录。",
+      "acceptance_text": "①执行删除流程后，历史月报仍可打开且数据完整；②保留天数到期后数据自动清理并有执行记录。"
+    },
+    {
+      "id": "M2-14",
+      "title": "身份认证与组织",
+      "module": "M2租户与权限管理",
+      "contract_sequence": 25,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 25,
+        "locator": "T00R025"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M2-14身份认证与组织\n1、本期支持：OIDC联邦身份与平台本地账号两种身份提供方。\n2、本期不做：钉钉/AD/LDAP对接、多级组织架构、计费账单引擎。\n3、客户门户按企业微信形态实现（详见M8），不得按钉钉形态设计与报价。\n验收：①OIDC与本地账号均可登录；②系统无AD/LDAP配置项。",
+      "acceptance_text": "①OIDC与本地账号均可登录；②系统无AD/LDAP配置项。"
+    },
+    {
+      "id": "M3-1",
+      "title": "资产列表",
+      "module": "M3设备台账",
+      "contract_sequence": 26,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 26,
+        "locator": "T00R026"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M3-1资产列表\n路径：资产→资产管理\n1、6张KPI卡：全部资产/正常/有问题/未知（数据缺失≠正常，单独计数）/维护中（通知已抑制、SLA排除）/采集同步异常。\n2、筛选：关键词搜索（名称·IP·标签）+状态chips+站点/设备类型/所属业务/同步状态下拉。\n3、两种视图：列表视图与蜂巢视图（蜂巢块颜色取该设备当前最高严重级）。\n4、分页每页15条。\n验收：①\"未知\"数量与\"正常\"数量相互独立，任一台设备不同时计入两者；②切换蜂巢视图后颜色与列表中的最高严重级一致。",
+      "acceptance_text": "①\"未知\"数量与\"正常\"数量相互独立，任一台设备不同时计入两者；②切换蜂巢视图后颜色与列表中的最高严重级一致。"
+    },
+    {
+      "id": "M3-2",
+      "title": "资产列表字段",
+      "module": "M3设备台账",
+      "contract_sequence": 27,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 27,
+        "locator": "T00R027"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M3-2资产列表字段\n1、12列：资产名称/设备类型/站点·Proxy/所属业务系统/CPU/内存/可用性/当前问题数/配置同步状态/负责人/最近采集时间/操作。\n2、列的新增、删除、改名统一走变更单，不得由开发方自行调整。\n验收：①逐列核对列名与顺序；②空值列显示占位符而非乱码或空白格错位。",
+      "acceptance_text": "①逐列核对列名与顺序；②空值列显示占位符而非乱码或空白格错位。"
+    },
+    {
+      "id": "M3-3",
+      "title": "资产详情",
+      "module": "M3设备台账",
+      "contract_sequence": 28,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 28,
+        "locator": "T00R028"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M3-3资产详情\n1、Tab结构：概览/监控项（N）/触发器（N）/问题与事件（N）/图表（N）/端口（N，仅网络设备显示）/场景步骤（N，仅Web类显示）/资产清单/监控配置/关联关系（N）。\n2、头部事实卡按资产类型动态生成：Linux·Windows/交换机·防火墙/数据库/Web/自定义指标各自不同的字段组合。\n3、资产详情为一期以下能力的挂载点：设备依赖关系（M3-9）、维保到期信息（M3-10）、配置备份（M6）。\n验收：①五种类型资产的事实卡字段各不相同且无空壳字段；②三个挂载Tab均可打开并完成对应操作。",
+      "acceptance_text": "①五种类型资产的事实卡字段各不相同且无空壳字段；②三个挂载Tab均可打开并完成对应操作。"
+    },
+    {
+      "id": "M3-4",
+      "title": "资产接入向导（5步）",
+      "module": "M3设备台账",
+      "contract_sequence": 29,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 29,
+        "locator": "T00R029"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M3-4资产接入向导（5步）\n1、①登记信息：CMDB配置项（带查找弹窗）、设备类型（9类枚举）、设备名称（租户内唯一）、IP或域名（正则校验）、站点、负责人、关联服务、标签（标签仅用于路由与检索，不作为授权依据）。\n2、②分配采集：网络连通性检查、Proxy绑定、采集方式（Agent2主动/被动、SNMPv3、HTTP、Sender）、凭据选择、端口确认。\n3、③套用模板：模板分组选择、采样周期（30/60/120/300秒）、LLD上限（只读展示）、宏与阈值覆盖表。\n4、④验证首值：5项检查——Agent可达/首个采集周期完成/监控项有效性/触发器状态正常/依赖与阈值设置正确。\n5、⑤进入服务：告警分派规则、SLA服务映射、通知渠道勾选；侧栏实时显示预估监控项数与配额占用进度。\n验收：①5步全通过后方可进入服务，任一步未通过禁止下一步并显示原因；②接入完成后设备出现在资产列表且开始产生数据。",
+      "acceptance_text": "①5步全通过后方可进入服务，任一步未通过禁止下一步并显示原因；②接入完成后设备出现在资产列表且开始产生数据。"
+    },
+    {
+      "id": "M3-5",
+      "title": "设备信息维护",
+      "module": "M3设备台账",
+      "contract_sequence": 30,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 30,
+        "locator": "T00R030"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M3-5设备信息维护\n1、字段：资产编号（CMDBID）/型号/序列号/负责人/所属业务/机房机柜位置/采购日期/维保起始日/维保到期日/超期服役日期/维保供应商/标签/CMDB同步状态。\n2、功能：支持在资产详情与列表中编辑保存；上述字段全部支持列表列展示与筛选（维保到期筛选详见M3-10）。\n3、CMDB同步冲突时以CMDB为准并提示冲突字段，变更写入审计。\n验收：①编辑后保存成功且列表即时回显；②新增字段可参与筛选；③CMDB冲突时有明确提示。",
+      "acceptance_text": "①编辑后保存成功且列表即时回显；②新增字段可参与筛选；③CMDB冲突时有明确提示。"
+    },
+    {
+      "id": "M3-6",
+      "title": "Excel批量导入",
+      "module": "M3设备台账",
+      "contract_sequence": 31,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 31,
+        "locator": "T00R031"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M3-6Excel批量导入\n路径：资产列表→批量导入（三步式弹窗）\n1、①下载模板：标准.xlsx模板，15列——设备名称/设备类型（9类枚举）/IP或域名/品牌/型号/序列号/站点/位置/负责人/所属业务/采购日期/维保到期日/超期服役日期/采集方式（下拉）/备注（为必填）。\n2、②上传与列映射：单批上限500行，支持.xlsx与.csv；系统按列名自动匹配，未匹配的列提供手工映射下拉。\n3、③预览与校验：逐行标注✅通过/⚠️警告（可继续导入）/❌错误（阻止该行导入）。\n4、④导入结果：显示成功N条/失败M条；失败行支持下载错误回执.xlsx（含行号/原值/错误原因/修正建议）。\n5、校验规则——错误级：必填字段缺失、IP或域名格式非法、租户内设备名重复（提示\"与第N行重复\"）、IP与库内已有设备冲突、设备类型不在枚举范围内；警告级：日期格式非法（置空并提示）、负责人非本租户成员（置空并提示）、品牌无OID映射（提示仅提供可用性监控）。\n6、幂等：按租户+设备名+IP去重，重复导入不产生重复设备。\n7、全过程写入审计日志（含文件hash、导入行数、成功与失败统计）。\n验收：①含3类错误的50行台账，错误行100%被拦截且回执原因准确；②500行导入耗时≤60秒；③同一文件重复导入不产生重复设备。",
+      "acceptance_text": "①含3类错误的50行台账，错误行100%被拦截且回执原因准确；②500行导入耗时≤60秒；③同一文件重复导入不产生重复设备。"
+    },
+    {
+      "id": "M3-7",
+      "title": "台账导出",
+      "module": "M3设备台账",
+      "contract_sequence": 32,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 32,
+        "locator": "T00R032"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M3-7台账导出\n1、导出为异步任务：提交后生成短时签名下载链接，通过站内信下发，不直接触发浏览器下载。\n2、导出范围=当前筛选结果，且不含任何越权数据。\n3、导出列与导入模板列保持一致，并包含\"维保状态\"\"维保到期日\"两列。\n4、导出动作写入审计日志。\n验收：①导出结果与当前筛选条件完全一致；②跨租户数据不出现在导出文件中；③链接15分钟后失效。",
+      "acceptance_text": "①导出结果与当前筛选条件完全一致；②跨租户数据不出现在导出文件中；③链接15分钟后失效。"
+    },
+    {
+      "id": "M3-8",
+      "title": "凭据加密托管",
+      "module": "M3设备台账",
+      "contract_sequence": 33,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 33,
+        "locator": "T00R033"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M3-8凭据加密托管\n1、三类凭据：TLSPSK（站点级密钥，系统自动签发）/TLS证书（租户CA签发）/SNMPv3authPriv（租户凭据库）。\n2、存储：按租户·站点存于服务端密钥库（AES-256加密），不进入浏览器、日志、报告与导出文件。\n3、使用：界面只可触发轮换，不可查看明文；轮换后旧密钥24小时后失效。\n4、轮换动作写入审计日志。\n验收：①数据库与接口返回中无凭据明文；②界面与导出文件中均无凭据字段；③轮换后旧凭据在24小时内可用、超时后被拒并有记录。",
+      "acceptance_text": "①数据库与接口返回中无凭据明文；②界面与导出文件中均无凭据字段；③轮换后旧凭据在24小时内可用、超时后被拒并有记录。"
+    },
+    {
+      "id": "M3-9",
+      "title": "设备依赖关系配置",
+      "module": "M3设备台账",
+      "contract_sequence": 34,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 34,
+        "locator": "T00R034"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M3-9设备依赖关系配置\n路径：资产详情→依赖关系Tab\n1、依赖记录字段：上游设备（父）/下游设备（子）/依赖类型（网络级联·供电·服务依赖）/生效范围（抑制通知·抑制自动建单）/启用状态/创建人与时间。\n2、界面：分\"上游依赖\"与\"下游依赖\"两个列表，支持新增/删除/停用；每条依赖显示\"该依赖上次触发抑制的时间与条数\"。\n3、抑制行为：上游设备处于PROBLEM期间，下游级联告警记录但不推送通知、不自动建工单；上游恢复后若下游仍处于PROBLEM，补发通知并补建工单。\n4、防环：新增依赖时检测环路（如A→B→A），检测到环路拒绝保存并提示。\n5、依赖数据同时用于告警影响范围推算（M4-18）。\n验收：①构造核心交换机down场景，下联20台设备不产生级联通知，但事件中心可查询到20条被抑制记录；②构造环形依赖被拒绝保存。",
+      "acceptance_text": "①构造核心交换机down场景，下联20台设备不产生级联通知，但事件中心可查询到20条被抑制记录；②构造环形依赖被拒绝保存。"
+    },
+    {
+      "id": "M3-10",
+      "title": "维保到期管理",
+      "module": "M3设备台账",
+      "contract_sequence": 35,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 35,
+        "locator": "T00R035"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M3-10维保到期管理\n1、字段：维保起始日/维保到期日（maint_expire）/维保供应商/超期服役日期（eol_date）/提醒接收人。\n2、列表与筛选：新增列\"维保状态\"（在保/30天内到期/已过期/未知）；筛选器新增\"维保到期：30天内/90天内/已过期\"。\n3、预警规则：到期前90天生成P4隐患项进入隐患清单；到期前30天与7天推送企业微信通知给服务经理与租户决策人；已过期设备在列表中红色标记，且进入体检报告风险清单。\n4、工单联动：P4隐患项支持一键转为商机工单（标记source=inspection），跟进结果回填隐患项。\n5、导出：支持导出\"本季度到期设备清单\"。\n验收：①将某设备维保到期日设为T+29天，次日08:00前生成P4隐患项且通知送达；②改为T+91天则当期不推送。",
+      "acceptance_text": "①将某设备维保到期日设为T+29天，次日08:00前生成P4隐患项且通知送达；②改为T+91天则当期不推送。"
+    },
+    {
+      "id": "M3-11",
+      "title": "资产退役与迁移",
+      "module": "M3设备台账",
+      "contract_sequence": 36,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 36,
+        "locator": "T00R036"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M3-11资产退役与迁移\n1、退役流程：停止采集与告警（返回202+operation_id，前端显示\"同步中\"直至回读确认）→保留历史事件与报表映射→按约定清理数据。\n2、迁移流程：迁池向导——确认新资源池资源→保留原资产ID→校验Proxy绑定与凭据→双采抑制（避免重复告警）→逐站点切换。\n验收：①退役后设备不再产生新告警但历史事件可查；②迁移过程中不产生重复告警。",
+      "acceptance_text": "①退役后设备不再产生新告警但历史事件可查；②迁移过程中不产生重复告警。"
+    },
+    {
+      "id": "M3-12",
+      "title": "设备来源与发现方式",
+      "module": "M3设备台账",
+      "contract_sequence": 37,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 37,
+        "locator": "T00R037"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M3-12设备来源与发现方式\n1、本期设备来源限定为三种：手工登记录入、Excel批量导入、CMDB同步。\n2、本期不做：网络扫描自动发现纳管、未知Agent自动注册认领。\n验收：①系统无网络扫描任务配置入口；②三种来源的设备均可正常完成M3-4接入流程。",
+      "acceptance_text": "①系统无网络扫描任务配置入口；②三种来源的设备均可正常完成M3-4接入流程。"
+    },
+    {
+      "id": "M4-1",
+      "title": "设备状态监控",
+      "module": "M4监控与告警",
+      "contract_sequence": 38,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 38,
+        "locator": "T00R038"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-1设备状态监控\n1、可用性5态：正常/有问题/未知/维护中/已停用；采集同步5态：已生效/同步中/同步失败/待接入/配置漂移。\n2、关键可用性监控项：agent.ping、agent或snmpavailable、icmpping、icmppingloss、icmppingsec、items_unsupported、proxylastaccess。\n3、\"未知\"与\"正常\"必须严格区分，任何统计口径不得合并。\n验收：①停掉一台设备的采集，\"未知\"计数增加且\"正常\"计数下降；②同步失败与配置漂移两种状态可分别构造并正确显示。",
+      "acceptance_text": "①停掉一台设备的采集，\"未知\"计数增加且\"正常\"计数下降；②同步失败与配置漂移两种状态可分别构造并正确显示。"
+    },
+    {
+      "id": "M4-2",
+      "title": "资源监控（按设备类型）",
+      "module": "M4监控与告警",
+      "contract_sequence": 39,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 39,
+        "locator": "T00R039"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-2资源监控（按设备类型）\n1、Linux服务器：CPU（警告70/严重85）、内存（80/90）、根分区（80/90）、系统负载、网络流量、磁盘IOPS、关键进程、TCP连接数。\n2、Windows服务器：在Linux项基础上增加页面文件使用率、处理器队列长度、磁盘延迟、关键服务状态。\n3、交换机/防火墙：CPU（70/85）、内存（75/90）、入口温度（50/55）、端口Up状态、总吞吐量、错误包计数、电源与风扇状态、ICMPRTT与丢包率。\n4、数据库：QPS、TPS、连接使用率（70/80）、缓存命中率（95/99，反向阈值）、慢查询数、主从复制延迟（10/30秒）、锁等待。\n5、Web服务：可用性（99.5/99.9，反向阈值）、响应时间（1500/2000毫秒）、P95响应时间、证书剩余天数（30/60，反向阈值）。\n6、自定义指标：上报延迟（60/120秒）、网关温度、Trapper最近接收时间。\n7、上述阈值全部写入配置表作为默认值。\n验收：①每类设备均可查到上述指标并有历史曲线；②修改配置表阈值后告警触发点随之变化，无需改代码。",
+      "acceptance_text": "①每类设备均可查到上述指标并有历史曲线；②修改配置表阈值后告警触发点随之变化，无需改代码。"
+    },
+    {
+      "id": "M4-3",
+      "title": "流量监控",
+      "module": "M4监控与告警",
+      "contract_sequence": 40,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 40,
+        "locator": "T00R040"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-3流量监控\n1、端口表8列：端口/状态/速率·双工/带宽利用率/入向·出向流量/错误包·丢包/VLAN/描述·对端设备。\n2、利用率配色：>80%红色、>50%黄色。\n3、端口面板展示近24小时入向与出向流量图。\n4、汇总监控项：net.if.util.max（最大带宽利用率）、errors.total、discards.total。\n验收：①端口Up/Down状态与实际一致；②利用率超阈值的端口使用正确配色。",
+      "acceptance_text": "①端口Up/Down状态与实际一致；②利用率超阈值的端口使用正确配色。"
+    },
+    {
+      "id": "M4-4",
+      "title": "线路质量监控",
+      "module": "M4监控与告警",
+      "contract_sequence": 41,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 41,
+        "locator": "T00R041"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-4线路质量监控\n1、Proxy健康：延迟>150ms红色、队列长度>20红色、缓冲区占用>75%红色、>50%黄色。\n2、ICMP质量：丢包率>20%（5分钟窗口）触发告警；RTT阈值0.15秒。\n3、Web探测：多探测点一致性判定——全部探测点结果一致方可判定为可用；同时监控SSL证书剩余天数。\n4、站点网络放通要求（须写入交付文档）：出向TCP10051、按需TCP10050、SNMPUDP161/162。\n验收：①单探测点失败但其他正常时不判定为服务不可用；②Proxy延迟超阈值时列表预警色正确。",
+      "acceptance_text": "①单探测点失败但其他正常时不判定为服务不可用；②Proxy延迟超阈值时列表预警色正确。"
+    },
+    {
+      "id": "M4-5",
+      "title": "告警阈值分级与受控宏",
+      "module": "M4监控与告警",
+      "contract_sequence": 42,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 42,
+        "locator": "T00R042"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-5告警阈值分级与受控宏\n1、严重级6档：灾难／严重／一般／警告／信息／未分类（rank由5递减至0）。\n2、指标仪表三档配色：绿→黄（阈值thr[0]）→红（阈值thr[1]），支持反向阈值（越小越糟的指标）。\n3、受控宏体系（约25个）：例如CPU.UTIL.CRIT=85、IF.ERRORS.WARN=50、CERT.DAYS.MIN=30、PROXY.BUFFER.PUSED.MAX=75。\n4、租户差异通过受控宏表达，不得直接修改共享模板；宏覆盖须经平台审核并跑双租户回归。\n5、阈值数值按本清单M4-18「监控对象与阈值基线」给出的双阈值写入配置表作为默认值，禁止硬编码；新增或调整阈值只改配置表，不改代码。\n验收：\n①随机抽10个指标修改受控宏后告警触发符合新值；\n②直接修改共享模板无从前端入口；\n③修改配置表阈值后无需发版即生效。",
+      "acceptance_text": "\n①随机抽10个指标修改受控宏后告警触发符合新值；\n②直接修改共享模板无从前端入口；\n③修改配置表阈值后无需发版即生效。"
+    },
+    {
+      "id": "M4-6",
+      "title": "触发规则管理",
+      "module": "M4监控与告警",
+      "contract_sequence": 43,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 43,
+        "locator": "T00R043"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-6触发规则管理\n1、规则列表列：严重级别/规则表达式/所属模板/持续时间/恢复滞回/依赖关系·抖动控制/租户覆盖标记/启用开关。\n2、规则示例：CPU高（5分钟均值>宏值，持续5分钟，恢复条件<75%）；Agent不可达（无数据3分钟，灾难级）；端口错误包（警告级，启用抖动控制）；Proxy失联（无数据10分钟，灾难级）。\n3、规则支持按租户覆盖，并记录覆盖人与覆盖原因。\n验收：①10条示例规则逐一实机触发，结果与表达式一致；②停用规则后不再产生告警。",
+      "acceptance_text": "①10条示例规则逐一实机触发，结果与表达式一致；②停用规则后不再产生告警。"
+    },
+    {
+      "id": "M4-7",
+      "title": "告警防抖",
+      "module": "M4监控与告警",
+      "contract_sequence": 44,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 44,
+        "locator": "T00R044"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-7告警防抖\n1、抖动控制规则：10分钟内≥3次状态翻转→静默5分钟。\n2、规则级支持\"持续时长\"与\"恢复滞回\"配置（如CPU恢复条件<75%、丢包恢复条件>15%反向判定）。\n3、防抖动作须记录到事件明细中，可查询某事件因抖动被静默的次数。\n验收：①构造10分钟内3次翻转的事件，第3次后静默5分钟不再产生通知；②事件详情页可看到抖动静默记录。",
+      "acceptance_text": "①构造10分钟内3次翻转的事件，第3次后静默5分钟不再产生通知；②事件详情页可看到抖动静默记录。"
+    },
+    {
+      "id": "M4-8",
+      "title": "重复告警合并",
+      "module": "M4监控与告警",
+      "contract_sequence": 45,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 45,
+        "locator": "T00R045"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-8重复告警合并\n1、合并指纹=（租户,资产,规则），合并窗口5分钟。\n2、灾难级与严重级绕过聚合等待，立即触发；其余级别聚合等待5分钟后发出。\n3、合并后列表显示\"×N\"计数，但原始事件全部保留可查。\n验收：①同一指纹5分钟内5条同类告警合并为1条并显示\"×5\"；②可展开查看5条原始事件明细。",
+      "acceptance_text": "①同一指纹5分钟内5条同类告警合并为1条并显示\"×5\"；②可展开查看5条原始事件明细。"
+    },
+    {
+      "id": "M4-9",
+      "title": "告警抑制（依赖）",
+      "module": "M4监控与告警",
+      "contract_sequence": 46,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 46,
+        "locator": "T00R046"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-9告警抑制（依赖）\n1、上游（Proxy或核心设备）处于PROBLEM时，抑制下游设备的告警通知；事件仍然完整记录，并计入SLA\"未知区间\"判定。\n2、降噪链路：归并→依赖抑制→维护窗口静默，各层数量可分别查询。\n3、依赖关系由M3-9维护。\n验收：①上游故障期间下游级联告警不推送通知但事件可查；②级联告警计入SLA未知区间而非可用时间。",
+      "acceptance_text": "①上游故障期间下游级联告警不推送通知但事件可查；②级联告警计入SLA未知区间而非可用时间。"
+    },
+    {
+      "id": "M4-10",
+      "title": "维护窗口静默",
+      "module": "M4监控与告警",
+      "contract_sequence": 47,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 47,
+        "locator": "T00R047"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-10维护窗口静默\n1、窗口列表7列：窗口名称（含目标范围标签）/起止时间/状态（进行中·已计划·已结束）/静默模式/是否SLA排除/创建人/操作（延长·结束）。\n2、静默模式二选一：采集继续、抑制通知（推荐）或暂停采集。\n3、SLA排除须经服务经理确认后方可生效。\n4、窗口内通知被抑制，事件仍然记录。\n验收：①窗口内触发告警，通知中心无推送但事件列表有记录；②未确认的SLA排除不生效。",
+      "acceptance_text": "①窗口内触发告警，通知中心无推送但事件列表有记录；②未确认的SLA排除不生效。"
+    },
+    {
+      "id": "M4-11",
+      "title": "恢复通知与复核",
+      "module": "M4监控与告警",
+      "contract_sequence": 48,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 48,
+        "locator": "T00R048"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-11恢复通知与复核\n1、监控层面的PROBLEM/RECOVERED状态由监控引擎负责；告警恢复后事件进入待复核状态。\n2、通知送达空态三种提示文案：\"依赖抑制：未发送通知\"/\"维护窗口：通知已抑制\"/\"无通知记录（信息级默认不通知）\"。\n3、恢复不等于结单：须人工确认根因与工单状态后方可关闭事件与工单。\n验收：①告警恢复后事件状态为\"待复核\"而非\"已关闭\"；②未经人工确认的事件不进入已解决状态。",
+      "acceptance_text": "①告警恢复后事件状态为\"待复核\"而非\"已关闭\"；②未经人工确认的事件不进入已解决状态。"
+    },
+    {
+      "id": "M4-12",
+      "title": "监控模板与灰度治理",
+      "module": "M4监控与告警",
+      "contract_sequence": 49,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 49,
+        "locator": "T00R049"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-12监控模板与灰度治理\n1、模板列表10列：模板名称/版本/状态/关联主机数/监控项·触发器数/LLD上限/受控宏数/使用租户数/最近更新时间/checksum。\n2、模板分三层：基础设施层→中间件层→业务服务层。\n3、灰度发布流程：20%租户→观察72小时→全量；退出门槛为\"误报数不增加且采集延迟不上升\"。\n4、治理规则：版本与checksum锁定；LLD资源上限强制；租户自定义模板需平台审核；每次主机组变更、成员变化、模板发布均须跑双租户回归。\n验收：①灰度流程可完整走完且中途可回滚；②退出门槛指标不达标时不自动进入全量。",
+      "acceptance_text": "①灰度流程可完整走完且中途可回滚；②退出门槛指标不达标时不自动进入全量。"
+    },
+    {
+      "id": "M4-13",
+      "title": "通知渠道管理",
+      "module": "M4监控与告警",
+      "contract_sequence": 50,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 50,
+        "locator": "T00R050"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-13通知渠道管理\n1、6类渠道：邮件/短信/钉钉机器人/企业微信应用/自定义Webhook/电话语音。\n2、每渠道配置项：端点地址/密钥（只读展示、仅可轮换）/签名方式/重试预算与退避策略（如Webhook5次：30秒/2分钟/10分钟/30分钟/2小时）/目标范围/域名白名单。\n3、去重键=（实例,事件ID,渠道,接收对象,事件阶段）；\"受理\"不等于\"送达\"；失败消息进死信队列支持重放。\n4、安全约束4条：域名白名单校验、拒绝私网地址与重定向、密钥仅存服务端、回调签名（防循环调用）。\n验收：①配置私网Webhook地址被拒绝保存；②同一去重键5分钟内重复事件只发送一次；③死信消息可重放且生成新请求号。",
+      "acceptance_text": "①配置私网Webhook地址被拒绝保存；②同一去重键5分钟内重复事件只发送一次；③死信消息可重放且生成新请求号。"
+    },
+    {
+      "id": "M4-14",
+      "title": "事件中心与事件详情",
+      "module": "M4监控与告警",
+      "contract_sequence": 51,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 51,
+        "locator": "T00R051"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-14事件中心与事件详情\n路径：告警→事件中心\n1、处置状态机5态：新建→已确认→处理中→已解决→已关闭；支持批量动作：批量确认/批量建单/加入抑制。\n2、隔离队列：来源未知或跨租户的事件禁止自动派发，须人工核验后可\"绑定资产\"或\"丢弃\"。\n3、可靠性补偿机制：eventid水位记录、延迟补偿、Webhook落库失败保留24小时、重叠窗口每5分钟回看15分钟复扫。\n验收：①未知来源事件进入隔离队列且不自动推送；②模拟落库失败后24小时内补扫成功。",
+      "acceptance_text": "①未知来源事件进入隔离队列且不自动推送；②模拟落库失败后24小时内补扫成功。"
+    },
+    {
+      "id": "M4-15",
+      "title": "Proxy与站点管理",
+      "module": "M4监控与告警",
+      "contract_sequence": 52,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 52,
+        "locator": "T00R052"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-15Proxy与站点管理\n1、Proxy列表9列：运行状态/版本号/延迟/队列长度/纳管主机数·NVPS/缓冲区占用/TLS加密状态/最近上送时间/操作。\n2、站点列表7列：采集拓扑（ProxyGroup双活可接管或单Proxy可缓冲但不可接管）/网络放通说明等。\n3、缓冲容量测算公式：缓冲需求=站点NVPS×最长断网秒数×实测每值空间×余量系数。\n4、已知限制须写入交付文档：ProxyGroup不支持SNMPTrap。\n验收：①Proxy失联时按无数据规则产生灾难级告警；②交付文档中包含上述限制说明。",
+      "acceptance_text": "①Proxy失联时按无数据规则产生灾难级告警；②交付文档中包含上述限制说明。"
+    },
+    {
+      "id": "M4-16",
+      "title": "监控资源池管理（平台管理员）",
+      "module": "M4监控与告警",
+      "contract_sequence": 53,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 53,
+        "locator": "T00R053"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-16监控资源池管理（平台管理员）\n1、5张KPI卡+4个Tab：拓扑与高可用/数据库/租户分布/升级·迁移·回退。\n2、版本基线锁定：监控引擎与数据库版本写入基线清单，升级须走评估与审批流程，禁止在线随意升级。\n3、高可用口径：监控原生HA共享同一数据库，不承诺\"无损秒级切换\"；回退原则为\"schema升级后不能假设回滚镜像即可恢复\"，须有独立回退方案。\n验收：①交付文档明确写出HA不承诺无损秒切；②提供升级回退演练记录。",
+      "acceptance_text": "①交付文档明确写出HA不承诺无损秒切；②提供升级回退演练记录。"
+    },
+    {
+      "id": "M4-17",
+      "title": "设备配置变更监控",
+      "module": "M4监控与告警",
+      "contract_sequence": 54,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 54,
+        "locator": "T00R054"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-17设备配置变更监控\n1、监控方式：SSH定时拉取设备running-config并与上一版本做差异比对，频率每6小时一次（与M6配置备份共用同一条diff链路，不重复建设）。\n2、检测到配置变更生成info级事件；若该时段无变更报备单，升级为P3工单（详见M6-7）。\n验收：①人为修改设备配置后6小时内产生diff记录；②差异行定位准确。",
+      "acceptance_text": "①人为修改设备配置后6小时内产生diff记录；②差异行定位准确。"
+    },
+    {
+      "id": "M4-18",
+      "title": "监控对象与阈值基线（必须补齐项）",
+      "module": "M4监控与告警",
+      "contract_sequence": 55,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 55,
+        "locator": "T00R055"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-18监控对象与阈值基线（必须补齐项）\n1、监控对象补齐三类：外网线路质量（部署独立探针做ICMP/HTTP拨测，30秒粒度，不依赖被管设备本身，设备宕机时仍能发现断网）、内网关键服务（DNS解析拨测/TCP端口探针，60秒粒度）、设备配置变更（每6小时diff，见M4-17）。\n2、监控指标补齐：防火墙并发会话数（>80%警告、>95%严重，会话耗尽等同于断网，直接判P1）、光模块收发光功率、VPN隧道状态、DHCP地址池利用率（>85%警告、>95%一般）、证书到期（每日检查，到期前30天生成P4）、接口错包率（>0.1%警告、>1%需优化）、PPPoE拨号状态。\n3、阈值基线（写入配置表作为默认值）：设备在线——丢1包警告/连续3次不通严重；端口up→down——核心端口P1、接入端口P2；丢包率>2%持续60秒警告/>10%严重；延迟>100ms持续300秒/>300ms持续60秒；CPU>80%/>90%各持续300秒；内存>85%/>95%；温度>55℃/>65℃；上联带宽利用率>70%/>85%。\n4、安全合规类检查项及频率：弱口令（季度）、固件版本（月度）、证书到期（每日）、配置变更（每6小时）、超期服役（每日）、备份失败（每次）。\n5、告警字段必须齐全：rule_code、告警对象、当前值vs阈值、已持续时间、影响范围（按拓扑推算直连终端数、是否核心节点）、建议动作（规则库内置的一句话处置提示）。\n验收：①随机抽取10条告警，上述6类字段齐全且无空值；②影响范围推算结果与CMDB拓扑一致；③外网线路探针、DNS拨测、防火墙会话数、光功率、VPN、DHCP、证书七类监控全部有数据并能触发告警。",
+      "acceptance_text": "①随机抽取10条告警，上述6类字段齐全且无空值；②影响范围推算结果与CMDB拓扑一致；③外网线路探针、DNS拨测、防火墙会话数、光功率、VPN、DHCP、证书七类监控全部有数据并能触发告警。"
+    },
+    {
+      "id": "M4-19",
+      "title": "多品牌OID映射机制",
+      "module": "M4监控与告警",
+      "contract_sequence": 56,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 56,
+        "locator": "T00R056"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M4-19多品牌OID映射机制\n1、按厂商维护适配文件（YAML格式），覆盖华为/华三/TP-Link/深信服/锐捷等；每份文件定义该厂商CPU、内存、温度、会话数、光功率的OID与单位换算规则。\n2、新增品牌=新增映射文件，不修改代码、不重新发版。\n3、适配优先级按试点客户实际设备品牌清单确定（需甲方提供）。\n验收：①新增一个厂商映射文件后，无需重新发版即可纳管该品牌设备并采集到CPU/内存指标；②映射缺失时在资产接入向导中给出\"该品牌暂无适配，仅提供可用性监控\"提示。",
+      "acceptance_text": "①新增一个厂商映射文件后，无需重新发版即可纳管该品牌设备并采集到CPU/内存指标；②映射缺失时在资产接入向导中给出\"该品牌暂无适配，仅提供可用性监控\"提示。"
+    },
+    {
+      "id": "M5-1",
+      "title": "工单列表",
+      "module": "M5工单与SLA",
+      "contract_sequence": 57,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 57,
+        "locator": "T00R057"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-1工单列表\n路径：服务台→工单\n1、8列：工单号（含外部ITSM编号）/标题/优先级/工单状态/同步状态/SLA倒计时/当前负责人/创建·更新时间。\n2、5张KPI卡：待处理（新建+处理中+等待数量）/已超SLA数量/同步异常数量/平均首次响应时长（按工单受理时间计算）/本月已解决·已关闭数（含平均解决时长）。\n3、筛选：关键词搜索+状态chips+同步状态下拉。\n验收：①各KPI卡数字与列表筛选结果一致；②SLA列超时的工单进入\"已超SLA\"计数。",
+      "acceptance_text": "①各KPI卡数字与列表筛选结果一致；②SLA列超时的工单进入\"已超SLA\"计数。"
+    },
+    {
+      "id": "M5-2",
+      "title": "三方状态职责分离",
+      "module": "M5工单与SLA",
+      "contract_sequence": 58,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 58,
+        "locator": "T00R058"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-2三方状态职责分离\n1、监控状态（PROBLEM/RECOVERED）由监控引擎负责；处置状态（5态）由本平台负责；工单状态（6态）由ITSM负责。\n2、任一方不得伪造或自动改写另一方的状态。\n3、工单以租户+事件（tenant+incident）唯一绑定外部ITSM工单；状态冲突时，抽屉面板提供\"采用ITSM状态\"或\"重新打开工单\"两个显式选项，由人工决断。\n验收：①手工修改监控状态不影响处置与工单状态；②制造状态冲突后弹出冲突处理选项，无自动覆盖行为。",
+      "acceptance_text": "①手工修改监控状态不影响处置与工单状态；②制造状态冲突后弹出冲突处理选项，无自动覆盖行为。"
+    },
+    {
+      "id": "M5-3",
+      "title": "工单状态与同步状态",
+      "module": "M5工单与SLA",
+      "contract_sequence": 59,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 59,
+        "locator": "T00R059"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-3工单状态与同步状态\n1、工单6态：新建/处理中/待厂商/待客户确认/已解决/已关闭。\n2、同步4态：已同步/创建中/回调待处理/状态冲突；提供手动对账入口。\n3、状态机扩展：按M5-14至M5-17的转派、确认关单、自动关单、重开机制扩展；扩展后的完整状态迁移图须由开发方提交设计说明并经甲方书面确认。\n验收：①6态流转与实际一致；②同步异常工单可手动对账成功。",
+      "acceptance_text": "①6态流转与实际一致；②同步异常工单可手动对账成功。"
+    },
+    {
+      "id": "M5-4",
+      "title": "告警自动建单与规则配置",
+      "module": "M5工单与SLA",
+      "contract_sequence": 60,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 60,
+        "locator": "T00R060"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-4告警自动建单与规则配置\n1、默认建单矩阵：灾难级与严重级自动建单；一般、警告、信息级不自动建单。\n2、可配置界面项：触发条件（事件等级+排除规则：按rule_code/资产标签/维护窗口排除）/聚合等待时长/去重窗口（同租户+同资产+同规则30分钟内合并为同一张工单，参数可配）/字段映射表（标题模板、优先级映射、关联资产、描述模板、默认队列、默认负责人）/目标队列路由（按租户·站点·业务路由到对应值班组）/失败重试策略（退避30秒/2分钟/10分钟，最多5次，仍失败进入隔离队列支持人工补建）/幂等键（tenant+incident唯一绑定）。\n3、灾难级与严重级绕过聚合等待立即建单，其余级别聚合5分钟后建单。\n验收：①录入10条规则逐一实机触发，结果与规则一致；②模拟建单失败重试5次后进入隔离队列，可人工补建成功。",
+      "acceptance_text": "①录入10条规则逐一实机触发，结果与规则一致；②模拟建单失败重试5次后进入隔离队列，可人工补建成功。"
+    },
+    {
+      "id": "M5-5",
+      "title": "客户自助报障表单",
+      "module": "M5工单与SLA",
+      "contract_sequence": 61,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 61,
+        "locator": "T00R061"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-5客户自助报障表单\n路径：客户门户→报障（企业微信消息菜单为同一入口）\n1、字段：故障现象分类（服务目录：网络不通/网速慢/WiFi问题/设备异常/其他）/关联设备（下拉，仅显示本租户可见设备，可选\"不确定\"）/影响范围（全公司/部分区域/单人）/故障描述/图片附件（≤3张，单张≤5MB，支持手机拍照直传）/联系人与回拨电话（默认带出当前用户可修改）/紧急程度（客户可选\"很急\"，仅供参考，最终等级由值守工程师判定）。\n2、提交行为：生成工单（标记source=customer_report）→门户即时显示工单号与按档位计算的预计响应时限→企业微信推送给值守。\n3、时限：从提交到工单生成≤10秒；图片异步上传不阻塞表单提交。\n4、防重复：30秒内对同一设备同一分类的重复提交，提示\"您已提交过相同报障\"并引导查看已有工单。\n验收：①手机拍照填表提交，10秒内网门户显示工单号；②值守端30秒内收到企业微信推送；③附件可查看原图。",
+      "acceptance_text": "①手机拍照填表提交，10秒内网门户显示工单号；②值守端30秒内收到企业微信推送；③附件可查看原图。"
+    },
+    {
+      "id": "M5-6",
+      "title": "手工登记事件",
+      "module": "M5工单与SLA",
+      "contract_sequence": 62,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 62,
+        "locator": "T00R062"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-6手工登记事件\n1、用于客户电话报障、现场发现等平台外来源建单。\n2、不伪造监控状态：来源标记source_state=MANUAL，其\"恢复\"须由人工确认，不得由监控数据自动判定。\n3、字段：标题/严重级别/关联资产。\n验收：①手工事件在事件列表中有明确\"手工来源\"标记；②手工事件不会因监控数据正常而自动恢复。",
+      "acceptance_text": "①手工事件在事件列表中有明确\"手工来源\"标记；②手工事件不会因监控数据正常而自动恢复。"
+    },
+    {
+      "id": "M5-7",
+      "title": "处置记录与评论",
+      "module": "M5工单与SLA",
+      "contract_sequence": 63,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 63,
+        "locator": "T00R063"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-7处置记录与评论\n1、支持在工单与事件中填写处置记录与评论，写入审计日志并附trace_id。\n2、可选择\"同步到ITSM工单\"，同步结果回写并对失败项给出重试。\n3、工单侧动作：添加评论、在ITSM中打开。\n验收：①每条处置记录在审计日志中可查且带trace_id；②同步失败有明确提示与重试入口。",
+      "acceptance_text": "①每条处置记录在审计日志中可查且带trace_id；②同步失败有明确提示与重试入口。"
+    },
+    {
+      "id": "M5-8",
+      "title": "SLA计时口径",
+      "module": "M5工单与SLA",
+      "contract_sequence": 64,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 64,
+        "locator": "T00R064"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-8SLA计时口径\n1、计时依据：按合同约定的响应时限与恢复时限。\n2、默认SLA截止时间：工单创建时间+4小时（可被档位配置覆盖）。\n3、一期按M2-10的档位配置表计算，并采用开单时写入的sla_tier_snapshot快照值，避免使用计算时刻的最新档位。\n4、具体时限参数见M5-20配置表。\n验收：①同一优先级下不同档位租户的截止时间不同；②修改档位不影响历史工单。",
+      "acceptance_text": "①同一优先级下不同档位租户的截止时间不同；②修改档位不影响历史工单。"
+    },
+    {
+      "id": "M5-9",
+      "title": "SLA报表",
+      "module": "M5工单与SLA",
+      "contract_sequence": 65,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 65,
+        "locator": "T00R065"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-9SLA报表\n路径：运营分析→SLA报表\n1、6张KPI卡：服务可用率均值/不可用时间并集/MTTAP50·P95/MTTRP50·P95/未恢复事件数/未知区间数量。\n2、服务树11列：服务/目标/可用率/不可用并集/经批准排除时长/未知区间/事件数/MTTA/MTTR/未恢复数/状态（达标·未达标·样本不足）。\n3、计算口径：\n·可用率=1−不可用时间并集÷有效服务时间；\n·有效服务时间=约定服务时段−经批准排除的区间；\n·MTTA=首次有效人工确认时间−问题发生时间；\n·MTTR=监控恢复时间−问题发生时间；\n·无数据区间单列，不默认视为可用。\n4、同时给出均值、P95、样本量与未恢复数量；时区统一Asia/Shanghai，服务时段默认7×24。\n5、计算明细支持逐级下钻；口径版本化并在页脚标注版本号。\n验收：①构造含未知区间的场景，可用率计算不把未知区间计入可用；②下钻到计算明细的时间区间解释可读。",
+      "acceptance_text": "①构造含未知区间的场景，可用率计算不把未知区间计入可用；②下钻到计算明细的时间区间解释可读。"
+    },
+    {
+      "id": "M5-10",
+      "title": "月报快照与合同对账",
+      "module": "M5工单与SLA",
+      "contract_sequence": 66,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 66,
+        "locator": "T00R066"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-10月报快照与合同对账\n1、\"生成月报快照\"操作冻结口径版本、原始数据与计算结果，生成后不可修改。\n2、命名规则示例：sla-2026-09-draft；保留策略为合同期内永久。\n3、事件复核关闭时写入对应月份的SLA月报快照。\n验收：①快照生成后尝试修改源数据，快照数值不变；②快照可追溯到参与计算的每一张工单。",
+      "acceptance_text": "①快照生成后尝试修改源数据，快照数值不变；②快照可追溯到参与计算的每一张工单。"
+    },
+    {
+      "id": "M5-11",
+      "title": "SLA报表导出",
+      "module": "M5工单与SLA",
+      "contract_sequence": 67,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 67,
+        "locator": "T00R067"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-11SLA报表导出\n1、导出格式：PDF与CSV，服务级明细均可导出，统一走短时签名地址。\n2、必须提供：统一导出模板（模板版本管理）、导出任务中心（可查进度、支持失败重试）、PDF排版规范（字体、页边距、页眉页脚、页码）。\n验收：①导出任务可实时查看进度百分比；②失败任务可一键重试；③PDF排版与给定模板逐项比对一致。",
+      "acceptance_text": "①导出任务可实时查看进度百分比；②失败任务可一键重试；③PDF排版与给定模板逐项比对一致。"
+    },
+    {
+      "id": "M5-12",
+      "title": "值班看板",
+      "module": "M5工单与SLA",
+      "contract_sequence": 68,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 68,
+        "locator": "T00R068"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-12值班看板\n路径：服务台→值班看板\n1、KPI：未确认告警数/关键异常（灾难·严重）/处理中（已建单或已执行处置脚本）/待复核（恢复不等于结单）/今日已恢复数/MTTA（目标≤5分钟）。\n2、队列项显示\"升级倒计时\"进度条。\n3、自动刷新周期30秒。\n4、交接班弹窗：填写接班人、交接备注，并自动汇总当前\"未确认/处理中/待复核\"三项计数。\n验收：①倒计时归零时自动触发下一级升级；②交接班记录可查且计数与实际队列一致。",
+      "acceptance_text": "①倒计时归零时自动触发下一级升级；②交接班记录可查且计数与实际队列一致。"
+    },
+    {
+      "id": "M5-13",
+      "title": "升级策略与值班规则",
+      "module": "M5工单与SLA",
+      "contract_sequence": 69,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 69,
+        "locator": "T00R069"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-13升级策略与值班规则\n1、三档升级链（configurable）：标准档2步——立即（工作时间）/4小时未解决；进阶档3步——30分钟未确认/2小时未解决；结构性兜底链路——L1立即→L215分钟未确认→客户管理员30分钟未确认→服务经理60分钟未解决（共4步）。\n2、值班规则：每日18:00交接；电话未接听2次自动升级到下一级并以短信告知；值班范围限定为被指派的租户，跨租户切换全程审计。\n验收：①修改升级链配置后行为随之变化；②电话2次未接听触发升级且有短信记录。",
+      "acceptance_text": "①修改升级链配置后行为随之变化；②电话2次未接听触发升级且有短信记录。"
+    },
+    {
+      "id": "M5-14",
+      "title": "工单转派与改派",
+      "module": "M5工单与SLA",
+      "contract_sequence": 70,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 70,
+        "locator": "T00R070"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-14工单转派与改派\n1、入口：工单详情页\"转派\"按钮；工单列表支持批量转派（仅服务经理及以上角色可用）。\n2、字段：目标负责人/转派原因（必填，枚举选择+补充文字）/是否保留原负责人为协办人。\n3、SLA规则：转派不重置SLA时钟，resp_due_at与recover_due_at保持不变（防止通过转派洗SLA）；转派造成的延误归属原责任人。\n4、通知：通知新负责人、原负责人、服务经理；P1/P2工单同时通知客户联系人中的决策人。\n5、留痕：转派动作写入工单时间线与审计日志，含操作人、时间、原因、转派前后负责人。\n6、可见范围：客户门户不显示内部负责人姓名，统一显示\"工程师\"。\n验收：①转派一张P1工单，SLA截止时间前后完全一致；②时间线可完整重放转派链；③客户门户不出现工程师真实姓名。",
+      "acceptance_text": "①转派一张P1工单，SLA截止时间前后完全一致；②时间线可完整重放转派链；③客户门户不出现工程师真实姓名。"
+    },
+    {
+      "id": "M5-15",
+      "title": "客户确认关单（一期核心信任机制）",
+      "module": "M5工单与SLA",
+      "contract_sequence": 71,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 71,
+        "locator": "T00R071"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-15客户确认关单（一期核心信任机制）\n1、触发：工程师点击\"已解决\"后，工单状态进入\"待客户确认\"（PENDING_CUSTOMER），SLA恢复时钟在此刻停止，recover_at记为标记时刻。\n2、客户侧呈现：企业微信卡片消息，含故障摘要+处置说明（工程师填写，≥20字）+解决时间+两个按钮【确认解决】【未解决】。\n3、确认路径：点击【确认解决】→状态变为已关闭（CLOSED），close_mode=customer_confirm，生成确认凭证（含客户账号、确认时间、工单快照hash），支持导出。\n4、未解决路径：点击【未解决】→强制填写一句说明（不可为空）→状态回退为重新处理中（REOPENED），reopen_count+1，并通知值守。\n5、无响应路径：到达档位确认超时（基础档与标准档48小时、进阶档24小时）→自动关闭，close_mode=timeout_auto，并在月报\"关单质量\"章节单列统计。\n6、性能与权限：客户点击到状态变更响应时间<5秒；仅客户角色（报障人、决策人）可确认，工程师不具备代替客户确认的权限（防止自说自话关单）。\n验收：①客户点击确认后5秒内状态变为已关闭且close_mode正确；②点击【未解决】不填写说明无法提交；③工程师账号界面无\"确认解决\"按钮；④超时自动关单在月报中单列统计，不与正常确认混计。",
+      "acceptance_text": "①客户点击确认后5秒内状态变为已关闭且close_mode正确；②点击【未解决】不填写说明无法提交；③工程师账号界面无\"确认解决\"按钮；④超时自动关单在月报中单列统计，不与正常确认混计。"
+    },
+    {
+      "id": "M5-16",
+      "title": "超时自动关单",
+      "module": "M5工单与SLA",
+      "contract_sequence": 72,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 72,
+        "locator": "T00R072"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-16超时自动关单\n1、超时计时器与档位配置联动：基础档与标准档48小时、进阶档24小时。\n2、自动关单前12小时推送一次提醒：\"您的工单将在12小时后自动关闭，如问题仍未解决请点击此消息\"。\n3、自动关单动作写入审计日志（action=auto_close）。\n4、关单后72小时内客户仍可重开（见M5-17）。\n5、月报\"关单质量\"章节单列统计超时自动关单的数量与占比。\n验收：①构造超时场景，提醒消息准时送达且关单动作有审计记录；②月报中该工单计入\"超时自动关单\"而非\"客户确认\"。",
+      "acceptance_text": "①构造超时场景，提醒消息准时送达且关单动作有审计记录；②月报中该工单计入\"超时自动关单\"而非\"客户确认\"。"
+    },
+    {
+      "id": "M5-17",
+      "title": "工单重开",
+      "module": "M5工单与SLA",
+      "contract_sequence": 73,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 73,
+        "locator": "T00R073"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-17工单重开\n1、触发条件：客户在工单关闭后72小时内点击\"重开\"；超过72小时只能新建工单。\n2、行为：reopen_count+1，状态回到处理中，并计入原工单的SLA统计（防止强制关单美化MTTR）。\n3、字段：重开原因（必填）+可选附件。\n4、告警规则：同一工单reopen_count≥2时自动通知服务经理，并在月报\"反复故障\"章节出现（对应\"治标不治本\"痛点）。\n5、统计：MTTR采用中位数；重开工单不重新计时，其总时长计入原工单。\n验收：①重开后MTTR统计包含重开后的时长（与手算一致）；②reopen_count达到2时服务经理收到通知。",
+      "acceptance_text": "①重开后MTTR统计包含重开后的时长（与手算一致）；②reopen_count达到2时服务经理收到通知。"
+    },
+    {
+      "id": "M5-18",
+      "title": "超时提醒与催办",
+      "module": "M5工单与SLA",
+      "contract_sequence": 74,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 74,
+        "locator": "T00R074"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-18超时提醒与催办\n1、提醒节点：响应时限消耗达50%/80%/100%三级，恢复时限同理三级。\n2、通知对象：50%→当前负责人；80%→当前负责人+值班长；100%→触发升级链（按档位步数执行）。\n3、呈现：工单列表SLA列显示倒计时进度条，超时显示红字。\n4、记录：每次提醒写入工单时间线与通知记录（对象/时间/渠道/送达状态）。\n5、抑制规则：同一工单同一节点只提醒一次；已进入\"待客户确认\"状态的工单不再提醒响应时限。\n验收：①构造工单静置至50%与80%，提醒按对象准确送达；②同一节点不重复提醒。",
+      "acceptance_text": "①构造工单静置至50%与80%，提醒按对象准确送达；②同一节点不重复提醒。"
+    },
+    {
+      "id": "M5-19",
+      "title": "SLA未达标与补偿计算",
+      "module": "M5工单与SLA",
+      "contract_sequence": 75,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 75,
+        "locator": "T00R075"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-19SLA未达标与补偿计算\n1、达标判定：响应实际时间≤响应截止时间且恢复实际时间≤恢复截止时间；适用范围为P1-P3且未被SLA排除的工单（维护窗口排除须经服务经理确认才生效）。\n2、月度达成率=达标工单数÷适用工单数。\n3、补偿比例（配置表项）：基础档月费10%/标准档20%/进阶档30%；具体补偿金额计算口径（按月费固定比例或月费×比例×（1−达成率））须在合同中写明，系统按配置实现。\n4、输出：补偿结果进入月报\"SLA达成\"区块与月报快照，并生成月度对账记录（可导出）。\n5、留痕：每一笔未达标工单可下钻查看判定依据（响应与恢复的实际时间与截止时间）。\n验收：①构造10张工单（含3张超时），达成率与手工计算一致；②补偿金额与合同约定口径一致；③可逐单下钻查看判定依据。",
+      "acceptance_text": "①构造10张工单（含3张超时），达成率与手工计算一致；②补偿金额与合同约定口径一致；③可逐单下钻查看判定依据。"
+    },
+    {
+      "id": "M5-20",
+      "title": "SLA时钟引擎（底座能力）",
+      "module": "M5工单与SLA",
+      "contract_sequence": 76,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 76,
+        "locator": "T00R076"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-20SLA时钟引擎（底座能力）\n1、服务端计算，不依赖前端；每30秒刷新到期状态。\n2、时间基准：支持按租户配置工作时间日历（工作日/工作时段/节假日）；基础档按\"仅工作时间\"计时，标准档与进阶档按7×24计时。\n3、档位快照：工单创建时写入sla_tier_snapshot，后续档位变更不影响在途工单。\n4、超时动作：响应超时→自动升级+通知决策人+标记违规；恢复超时→同上处理并计入SLA未达标。\n5、参数（全部配置表项，禁止硬编码）：P1响应——基础30分钟/标准10分钟/进阶10分钟；P1恢复——4小时/2小时/1.5小时；P2响应·恢复——60分钟·8小时/30分钟·4小时/20分钟·3小时；P3——4小时·次日/2小时·次日/1小时·4小时。\n验收：①跨工作日、跨节假日、跨夜间抽样20个用例全部正确（含边界：23:50开单、节假日开单、跨月开单）；②修改档位后在途工单的SLA截止时间保持不变。",
+      "acceptance_text": "①跨工作日、跨节假日、跨夜间抽样20个用例全部正确（含边界：23:50开单、节假日开单、跨月开单）；②修改档位后在途工单的SLA截止时间保持不变。"
+    },
+    {
+      "id": "M5-21",
+      "title": "工时记录",
+      "module": "M5工单与SLA",
+      "contract_sequence": 77,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 77,
+        "locator": "T00R077"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M5-21工时记录\n1、字段：开始时间/结束时间/工时类型（远程处置/现场处置/巡检/通勤）/关联工单/执行人。\n2、规则：工程师在工单内可填写与修改本人填报的工时；服务经理可查看本团队全部工时。\n3、未填写工时的工单在毛利计算中按配置默认值处理并做标记，不得静默按0计算。\n验收：①工程师可正常填报工时；②毛利计算结果能区分\"实填工时\"与\"默认值\"两类来源。",
+      "acceptance_text": "①工程师可正常填报工时；②毛利计算结果能区分\"实填工时\"与\"默认值\"两类来源。"
+    },
+    {
+      "id": "M6-1",
+      "title": "定时备份计划",
+      "module": "M6配置备份",
+      "contract_sequence": 78,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 78,
+        "locator": "T00R078"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M6-1定时备份计划\n路径：资产→配置备份→备份计划\n1、计划字段：计划名称/目标设备（多选，限定本租户）/备份方式（SSH拉取running-config）/执行频率（默认每日02:00，可配置）/失败重试次数（2次，间隔10分钟）/启用状态。\n2、支持按设备类型套用默认计划模板；新接入设备自动纳入默认备份计划（可退出）。\n3、异步范式：创建与管理操作返回202+operation_id，前端显示\"同步中\"直至回读确认。\n验收：①新建计划后到达设定时间点自动执行并记录结果；②手动\"立即执行\"可用，且界面正确显示执行中状态。",
+      "acceptance_text": "①新建计划后到达设定时间点自动执行并记录结果；②手动\"立即执行\"可用，且界面正确显示执行中状态。"
+    },
+    {
+      "id": "M6-2",
+      "title": "备份结果查询与差异比对",
+      "module": "M6配置备份",
+      "contract_sequence": 79,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 79,
+        "locator": "T00R079"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M6-2备份结果查询与差异比对\n1、列表字段：设备/备份时间/执行结果（成功·失败·部分成功）/文件大小/与上一版本的差异行数/执行耗时。\n2、筛选：设备/时间范围/执行结果。\n3、差异查看：左右分栏diff视图，变更行高亮；比对任务每6小时执行一次（与M4-17共用链路）。\n验收：①人为修改设备配置后，6小时内产生diff记录且差异行精确定位；②无变更时不产生diff记录。",
+      "acceptance_text": "①人为修改设备配置后，6小时内产生diff记录且差异行精确定位；②无变更时不产生diff记录。"
+    },
+    {
+      "id": "M6-3",
+      "title": "版本历史与回滚参考",
+      "module": "M6配置备份",
+      "contract_sequence": 80,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 80,
+        "locator": "T00R080"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M6-3版本历史与回滚参考\n1、每设备保留最近30个版本（数量可配置）；支持按日期检索、下载Backup文件（权限受控）、标记基线版本。\n2、本期不实现自动下发回滚，仅提供历史版本参考文本与人工回滚指引。\n3、存储：备份文件AES-256加密存储，保留期≥12个月；备份内容不得出现在日志、月报与导出文件中。\n4、所有查看与下载动作写入审计日志。\n验收：①检索3个月前的历史版本可正常打开且内容与当时一致；②系统无\"自动回滚\"按钮；③全部下载动作在审计日志可查。",
+      "acceptance_text": "①检索3个月前的历史版本可正常打开且内容与当时一致；②系统无\"自动回滚\"按钮；③全部下载动作在审计日志可查。"
+    },
+    {
+      "id": "M6-4",
+      "title": "备份失败自动建单",
+      "module": "M6配置备份",
+      "contract_sequence": 81,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 81,
+        "locator": "T00R081"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M6-4备份失败自动建单\n1、规则：同一设备连续2次备份失败→自动生成P3工单（标记source=backup_failure）。\n2、工单内容须包含：设备名称、失败原因（认证失败/连接超时/权限不足）、最近一次成功时间。\n3、建单机制复用M5-4的规则引擎与幂等键（tenant+incident唯一绑定）。\n验收：①模拟认证失败2次，第2次后10分钟内生成P3工单；②第1次失败不建单（仅记录）。",
+      "acceptance_text": "①模拟认证失败2次，第2次后10分钟内生成P3工单；②第1次失败不建单（仅记录）。"
+    },
+    {
+      "id": "M6-5",
+      "title": "恢复演练记录",
+      "module": "M6配置备份",
+      "contract_sequence": 82,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 82,
+        "locator": "T00R082"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M6-5恢复演练记录\n1、字段：演练时间/演练设备/使用的备份版本/执行人/结论（成功·失败·部分成功）/备注/附件。\n2、列表显示\"距上次演练天数\"，超过90天标红提示。\n3、本期仅提供演练记录管理，不做自动恢复功能。\n验收：①新增演练记录后列表天数与标红态正确；②界面无自动恢复入口。",
+      "acceptance_text": "①新增演练记录后列表天数与标红态正确；②界面无自动恢复入口。"
+    },
+    {
+      "id": "M6-6",
+      "title": "客户侧只读查看",
+      "module": "M6配置备份",
+      "contract_sequence": 83,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 83,
+        "locator": "T00R083"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M6-6客户侧只读查看\n1、客户门户与租户角色可见内容：设备列表+「最近备份时间」「备份是否正常」两列。\n2、禁止下载配置文件内容（防泄密）、禁止查看diff详情。\n验收：①客户账号登录后页面无下载按钮、无diff入口；②直接调用下载接口返回403。",
+      "acceptance_text": "①客户账号登录后页面无下载按钮、无diff入口；②直接调用下载接口返回403。"
+    },
+    {
+      "id": "M6-7",
+      "title": "变更检测与报备联动",
+      "module": "M6配置备份",
+      "contract_sequence": 84,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 84,
+        "locator": "T00R084"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M6-7变更检测与报备联动\n1、每6小时执行一次diff；检测到配置变更时生成info级事件。\n2、若该时段不存在对应的变更报备单→升级为P3工单（\"未报备配置变更\"）；存在报备单则仅记录事件不建单。\n3、变更报备单字段：报备设备/变更内容摘要/计划执行时间/申请人/审批状态。\n验收：①无报备情况下修改设备配置→生成P3工单；②先建变更报备单再改配置→仅记录事件不建单。",
+      "acceptance_text": "①无报备情况下修改设备配置→生成P3工单；②先建变更报备单再改配置→仅记录事件不建单。"
+    },
+    {
+      "id": "M7-0",
+      "title": "远程处置总纲与技术约束",
+      "module": "M7远程处置与审计",
+      "contract_sequence": 85,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 85,
+        "locator": "T00R085"
+      },
+      "scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M7-0远程处置总纲与技术约束\n1、本期按需求原文实现交互式远程会话：工程师经申请审批后登录设备进行交互式操作，全程录屏、记录命令、事后可审计。\n2、可选增强能力为受控自动化脚本执行（预定义剧本、脱敏输出归档、按风险分级授权），对应M7-1至M7-4；是否纳入本期交付需甲方书面确认后报价。\n3、两条路线不是同一件事：交互式会话需要对接堡垒机+录屏存储+审批流，受控自动化不需要录屏但需剧本维护体系；两者工作量相差一个量级，须分别评估。\n4、此事项未确认前，M7模块不得进入排期。\n验收：①开发方提交《远程处置技术路线确认书》并经甲方书面确认；②确认书中明确本期包含项与报价依据。",
+      "acceptance_text": "①开发方提交《远程处置技术路线确认书》并经甲方书面确认；②确认书中明确本期包含项与报价依据。"
+    },
+    {
+      "id": "M7-1",
+      "title": "受控自动化执行流程（可选增强）",
+      "module": "M7远程处置与审计",
+      "contract_sequence": 86,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 86,
+        "locator": "T00R086"
+      },
+      "scope": "可选增强，须书面确认后报价",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M7-1受控自动化执行流程（可选增强）\n路径：自动化→处置脚本\n1、7步执行流程：资产核验→前置检查→审批或预授权→锁定目标→执行→观察恢复→留证与失败补偿。\n2、执行弹窗字段：目标资产/关联事件/参数（按Schema动态渲染）/前置检查结果（只读展示）/授权说明。\n验收：①7步流程可完整走通；②资产核验不通过时无法进入后续步骤。",
+      "acceptance_text": "①7步流程可完整走通；②资产核验不通过时无法进入后续步骤。"
+    },
+    {
+      "id": "M7-2",
+      "title": "操作风险分级策略",
+      "module": "M7远程处置与审计",
+      "contract_sequence": 87,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 87,
+        "locator": "T00R087"
+      },
+      "scope": "可选增强，须书面确认后报价",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M7-2操作风险分级策略\n1、L1只读诊断：预授权后自动执行，限定执行频率（冷却期）与输出大小（≤256KB），输出脱敏后归档。\n2、L2低风险修复：满足健康门槛且限定单主机、存在预授权时自动执行，否则需审批。\n3、L3高风险变更：双人审批（客户管理员+平台管理员），仅允许在维护窗口内执行，单次目标数≤10，执行后24小时冷却期。\n验收：①三个等级的执行策略与限制逐一实机验证；②L3在维护窗口外申请被拦截。",
+      "acceptance_text": "①三个等级的执行策略与限制逐一实机验证；②L3在维护窗口外申请被拦截。"
+    },
+    {
+      "id": "M7-3",
+      "title": "读写操作审批",
+      "module": "M7远程处置与审计",
+      "contract_sequence": 88,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 88,
+        "locator": "T00R088"
+      },
+      "scope": "可选增强，须书面确认后报价",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M7-3读写操作审批\n1、审批列表字段：状态/处置对象（会话或脚本）/申请理由/申请人→审批人/申请时间（含过期倒计时）。\n2、硬性约束：审批人不得为申请人本人（自审请求被拦截并提示）。\n3、拒绝必须填写原因，并写入审计日志。\n4、审批通过后、执行之前仍需再次校验资产状态、授权有效期与设备可达性。\n验收：①申请人自选本人为审批人被拦截；②审批通过后人为使设备不可达，执行被中止并记录原因。",
+      "acceptance_text": "①申请人自选本人为审批人被拦截；②审批通过后人为使设备不可达，执行被中止并记录原因。"
+    },
+    {
+      "id": "M7-4",
+      "title": "执行记录与输出归档",
+      "module": "M7远程处置与审计",
+      "contract_sequence": 89,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 89,
+        "locator": "T00R089"
+      },
+      "scope": "可选增强，须书面确认后报价",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M7-4执行记录与输出归档\n1、执行记录字段：执行ID/处置对象/目标设备/步骤状态（等待·完成·进行中·失败，7色块标识）/整体状态/申请人与审批人。\n2、输出内容脱敏后归档（敏感参数替换为占位符）。\n3、并发控制：并发目标锁定键lock:{tenant}:{asset}:{runbook}；每租户并发上限2，单次最大目标数10。\n4、工程原则须写入设计说明：\"命令执行中断后必须先检查目标真实状态，不能依赖工具名称保证回滚成功\"。\n验收：①并发超限时排队或拒绝并有明确提示；②输出归档中不含密码、密钥等敏感信息。",
+      "acceptance_text": "①并发超限时排队或拒绝并有明确提示；②输出归档中不含密码、密钥等敏感信息。"
+    },
+    {
+      "id": "M7-5",
+      "title": "审计要求（通用）",
+      "module": "M7远程处置与审计",
+      "contract_sequence": 90,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 90,
+        "locator": "T00R090"
+      },
+      "scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M7-5审计要求（通用）\n1、审计属性：追加式写入、不可修改不可删除、hash链完整可校验、保留期≥3年、支持按租户导出。\n2、远程相关操作码至少覆盖：remote_session_request（申请）/remote_session_approve（审批）/remote_session_start（会话开始）/command_blocked（高危命令拦截）/remote_session_end（会话结束）/recording_access（录屏调阅）。\n验收：①上述6类操作在审计日志中均可检索到；②hash链校验通过。",
+      "acceptance_text": "①上述6类操作在审计日志中均可检索到；②hash链校验通过。"
+    },
+    {
+      "id": "M7-6",
+      "title": "交互式远程连接（本期主线）",
+      "module": "M7远程处置与审计",
+      "contract_sequence": 91,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 91,
+        "locator": "T00R091"
+      },
+      "scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M7-6交互式远程连接（本期主线）\n1、申请：工单详情页\"发起远程会话\"→选择目标设备（仅限本租户已授权设备）+访问级别（只读readonly/读写readwrite）+预计时长+申请事由（必填，自动关联工单）。\n2、审批：readwrite强制双人审批（二线互批，审批人≠申请人，自审被拦截）；readonly免审批但全程留痕；审批超时30分钟自动作废；审批通过后执行前再次校验资产状态与授权有效性。\n3、建连：通过堡垒机建立会话；无有效审批记录则无法建立连接（硬控制，而非事后提醒）；会话开始写入remote_session记录，并按合同约定推送通知给租户决策人（可按租户开关）。\n4、时长与并发：单会话默认时长60分钟，支持申请延长；单工程师并发会话上限2。\n5、结束：自动生成处置记录回填工单时间线（含会话时长/命令条数/录屏引用）；超时无操作自动断开。\n验收：①未审批直接调用建连接口被拒绝且写入审计；②审批人等于申请人时被拦截；③会话结束后工单时间线出现完整处置记录；④录屏可按工单检索回放。",
+      "acceptance_text": "①未审批直接调用建连接口被拒绝且写入审计；②审批人等于申请人时被拦截；③会话结束后工单时间线出现完整处置记录；④录屏可按工单检索回放。"
+    },
+    {
+      "id": "M7-7",
+      "title": "设备授权清单",
+      "module": "M7远程处置与审计",
+      "contract_sequence": 92,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 92,
+        "locator": "T00R092"
+      },
+      "scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M7-7设备授权清单\n1、字段：工程师/授权设备或设备组/授权级别（readonly·readwrite）/生效时间/到期时间/授权人/状态。\n2、管理功能：按工程师批量授权、按设备组批量授权；到期自动失效，提前7天提醒；支持临时授权（单次工单有效期）。\n3、校验规则：建立会话时校验发起人在授权清单内、级别匹配、且在有效期内，任一不满足即拒绝建连。\n4、客户可见性：租户管理员可只读查看\"当前哪些设备已授权给服务商\"，增强客户信任（对应\"怕被服务商绑定\"痛点）。\n验收：①授权过期后发起会话被拒绝；②授权级别为readonly的工程师无法申请readwrite会话；③客户侧可见授权清单且不可修改。",
+      "acceptance_text": "①授权过期后发起会话被拒绝；②授权级别为readonly的工程师无法申请readwrite会话；③客户侧可见授权清单且不可修改。"
+    },
+    {
+      "id": "M7-8",
+      "title": "会话录屏",
+      "module": "M7远程处置与审计",
+      "contract_sequence": 93,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 93,
+        "locator": "T00R093"
+      },
+      "scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M7-8会话录屏\n1、录制范围：所有readwrite会话强制录屏；readonly会话按租户配置开关决定是否录制。\n2、存储：视频文件+时间戳索引；热存储6个月后转冷备，总保留期按合同约定（建议3年）。\n3、检索：按工单/设备/工程师/时间范围检索，支持定位到具体命令的执行时间点。\n4、容量：设计说明中必须给出容量测算（会话数×平均时长×码率）与扩容方案。\n5、权限：仅服务经理、平台管理员、审计角色可查看；客户可按申请查看本租户录屏（需审批）。\n验收：①readwrite会话100%有录屏文件；②按工单检索可回放且能定位到指定命令时间点；③无权限角色无法播放。",
+      "acceptance_text": "①readwrite会话100%有录屏文件；②按工单检索可回放且能定位到指定命令时间点；③无权限角色无法播放。"
+    },
+    {
+      "id": "M7-9",
+      "title": "命令日志与高危命令拦截",
+      "module": "M7远程处置与审计",
+      "contract_sequence": 94,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 94,
+        "locator": "T00R094"
+      },
+      "scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M7-9命令日志与高危命令拦截\n1、记录字段：会话ID/命令序号/时间戳/命令原文/执行结果摘要/退出码/执行耗时。\n2、高危命令拦截：内置高危命令清单（reboot/erase/delete/format/writeerase等），默认拦截并要求二次确认；清单支持配置维护；拦截动作写入审计日志。\n3、检索与导出：按执行人/设备/时间/命令关键词检索；导出走短时签名地址。\n4、脱敏：命令中的密码、密钥参数自动替换为`?`。\n验收：①执行高危命令被拦截并需二次确认；②日志中密码以`?`显示；③按关键词检索可在3秒内返回结果。",
+      "acceptance_text": "①执行高危命令被拦截并需二次确认；②日志中密码以`?`显示；③按关键词检索可在3秒内返回结果。"
+    },
+    {
+      "id": "M8-1",
+      "title": "通知渠道对接",
+      "module": "M8客户门户与通知",
+      "contract_sequence": 95,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 95,
+        "locator": "T00R095"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M8-1通知渠道对接\n1、本期支持的6类渠道：邮件/短信/钉钉机器人/企业微信应用/自定义Webhook/电话语音。\n2、企业微信渠道按租户配置corpid/agentid，并对回调做签名校验。\n3、渠道配置抽屉：端点地址/密钥（只读展示、仅可轮换）/签名方式/重试预算/退避策略/目标范围/域名白名单。\n验收：①6类渠道均可完成配置与测试发送；②密钥字段界面不可明文查看。",
+      "acceptance_text": "①6类渠道均可完成配置与测试发送；②密钥字段界面不可明文查看。"
+    },
+    {
+      "id": "M8-2",
+      "title": "渠道×级别矩阵",
+      "module": "M8客户门户与通知",
+      "contract_sequence": 96,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 96,
+        "locator": "T00R096"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M8-2渠道×级别矩阵\n1、灾难级：企业微信或钉钉+邮件+短信+电话语音+自动建单（绕过聚合等待）。\n2、严重级：企业微信或钉钉+邮件+短信（不含电话）。\n3、一般级：企业微信或钉钉+邮件（聚合5分钟发送）。\n4、警告级：仅企业微信或钉钉。信息级：仅记录不通知。\n5、矩阵为配置项，可按租户覆盖。\n验收：①构造5个级别的告警，实际派发渠道与矩阵逐项一致。",
+      "acceptance_text": "①构造5个级别的告警，实际派发渠道与矩阵逐项一致。"
+    },
+    {
+      "id": "M8-3",
+      "title": "送达记录与死信管理",
+      "module": "M8客户门户与通知",
+      "contract_sequence": 97,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 97,
+        "locator": "T00R097"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M8-3送达记录与死信管理\n1、送达记录8列：时间/事件/渠道/接收对象/状态/尝试次数/耗时/请求·回执内容。\n2、性能指标：受理到送达P95≤30秒。\n3、死信队列支持重放（使用相同去重键、生成新请求号）；短信渠道按月限额控制。\n4、\"受理\"不等于\"送达\"，送达率仅统计delivered状态的消息。\n验收：①P95送达耗时≤30秒（以100条消息抽样统计）；②死信消息重放后送达且不重复计数。",
+      "acceptance_text": "①P95送达耗时≤30秒（以100条消息抽样统计）；②死信消息重放后送达且不重复计数。"
+    },
+    {
+      "id": "M8-4",
+      "title": "企业微信门户与免密登录",
+      "module": "M8客户门户与通知",
+      "contract_sequence": 98,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 98,
+        "locator": "T00R098"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M8-4企业微信门户与免密登录\n路径：企业微信工作台/侧边栏→客户门户H5\n1、以企业微信内嵌H5形式提供；企业微信身份免密登录（userid与平台账号的绑定关系由服务经理在后台维护），会话有效期8小时。\n2、仅可见本租户数据；跨租户访问返回统一响应\"不存在或无权限\"并写入审计日志。\n3、移动端优先设计，页面加载时间<2秒。\n验收：①用A租户账号访问B租户工单ID，返回统一提示且写入审计；②首次进入无需输入账号密码。",
+      "acceptance_text": "①用A租户账号访问B租户工单ID，返回统一提示且写入审计；②首次进入无需输入账号密码。"
+    },
+    {
+      "id": "M8-5",
+      "title": "设备概况（客户视角）",
+      "module": "M8客户门户与通知",
+      "contract_sequence": 99,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 99,
+        "locator": "T00R099"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M8-5设备概况（客户视角）\n1、顶部4张卡：在管设备数/当前正常数/异常数/本月可用率。\n2、设备列表列：设备名称/安装位置/状态（正常·异常·维护中）/最近异常时间。\n3、文案客户友好化：不得出现IP地址、OID、触发器、Proxy、模板等运维术语；监控\"未知\"状态对客户显示为\"正在接入\"。\n验收：①客户视角逐屏核查无内部术语；②字段数量与顺序与上述定义一致。",
+      "acceptance_text": "①客户视角逐屏核查无内部术语；②字段数量与顺序与上述定义一致。"
+    },
+    {
+      "id": "M8-6",
+      "title": "拍照报障",
+      "module": "M8客户门户与通知",
+      "contract_sequence": 100,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 100,
+        "locator": "T00R100"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M8-6拍照报障\n1、入口：客户门户\"报障\"页+企业微信消息菜单（与M5-5共用同一套接口与状态机）。\n2、字段与规则详见M5-5：故障分类/关联设备/影响范围/描述/图片≤3张/联系人/紧急程度（仅供参考）。\n3、提交到工单生成≤10秒；30秒内重复提交同设备同分类时提示已提交。\n验收：①移动端拍照到提交完成全流程≤30秒；②提交后门户即时显示工单号与预计响应时限。",
+      "acceptance_text": "①移动端拍照到提交完成全流程≤30秒；②提交后门户即时显示工单号与预计响应时限。"
+    },
+    {
+      "id": "M8-7",
+      "title": "工单进度查询",
+      "module": "M8客户门户与通知",
+      "contract_sequence": 101,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 101,
+        "locator": "T00R101"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M8-7工单进度查询\n1、列表列：工单号/标题/状态（客户友好文案：已受理·处理中·待您确认·已完成）/提交时间/处理时长。\n2、详情页：进度时间线（提交→受理→处理中→待确认→完成）+处置说明+客户评论框。\n3、工程师姓名统一显示为\"工程师\"，不展示内部负责人姓名，不展示内部升级动作与转派记录。\n验收：①客户详情页无工程师真实姓名；②状态文案为客户友好版且与M5内部状态一一对应。",
+      "acceptance_text": "①客户详情页无工程师真实姓名；②状态文案为客户友好版且与M5内部状态一一对应。"
+    },
+    {
+      "id": "M8-8",
+      "title": "确认关单与重开（移动端）",
+      "module": "M8客户门户与通知",
+      "contract_sequence": 102,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 102,
+        "locator": "T00R102"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M8-8确认关单与重开（移动端）\n1、门户首页对\"待您确认\"的工单置顶展示提示卡。\n2、确认解决/标记未解决/重开三个动作与M5-15、M5-17共用同一套状态机与接口，不得另建一套。\n验收：①门户确认与工程师后台查到的close_mode一致；②重开动作在两侧状态同步。",
+      "acceptance_text": "①门户确认与工程师后台查到的close_mode一致；②重开动作在两侧状态同步。"
+    },
+    {
+      "id": "M8-9",
+      "title": "报告中心",
+      "module": "M8客户门户与通知",
+      "contract_sequence": 103,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 103,
+        "locator": "T00R103"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M8-9报告中心\n1、列表列：报告名称/报告类型（月报·体检报告·巡检报告）/期次/发布时间/是否已读。\n2、支持在线查看（H5）与PDF下载。\n3、客户首次打开即记录read_at_first，该值不可被后续打开覆盖。\n验收：①客户首次打开月报后后台read_at_first有值；②再次打开不覆盖原值。",
+      "acceptance_text": "①客户首次打开月报后后台read_at_first有值；②再次打开不覆盖原值。"
+    },
+    {
+      "id": "M8-10",
+      "title": "通知偏好设置",
+      "module": "M8客户门户与通知",
+      "contract_sequence": 104,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 104,
+        "locator": "T00R104"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M8-10通知偏好设置\n1、客户可自助设置：接收级别（仅P1/P1+P2/全部）/静音时段（如22:00-08:00仅接收P1）/接收渠道（企业微信/短信/电话，按合同可选）。\n验收：①设置静音时段后，P3事件在该时段内不推送但完整记录；②P1事件在静音时段内仍正常推送。",
+      "acceptance_text": "①设置静音时段后，P3事件在该时段内不推送但完整记录；②P1事件在静音时段内仍正常推送。"
+    },
+    {
+      "id": "M8-11",
+      "title": "分级推送落地",
+      "module": "M8客户门户与通知",
+      "contract_sequence": 105,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 105,
+        "locator": "T00R105"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M8-11分级推送落地\n1、P1=电话外呼+企业微信（30秒内发起）；P2=企业微信+短信；P3/P4=企业微信。\n2、电话外呼需采购第三方语音通道，并发规格与单价须在采购前确认（通道资源费用由甲方承担，乙方负责技术对接）。\n验收：①P1告警触发后30秒内电话外呼发起；②通道调用失败进入死信队列且可重放。",
+      "acceptance_text": "①P1告警触发后30秒内电话外呼发起；②通道调用失败进入死信队列且可重放。"
+    },
+    {
+      "id": "M8-12",
+      "title": "门户通用要求",
+      "module": "M8客户门户与通知",
+      "contract_sequence": 106,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 106,
+        "locator": "T00R106"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M8-12门户通用要求\n1、页面加载<2秒（4G网络下首屏）；移动端优先设计（客户主要在手机上使用）。\n2、所有面向客户的文案需做友好化改造，开发方须提交《客户门户文案对照表》（内部术语→客户文案）经甲方书面确认后方可发布。\n3、无障碍要求：遵循WCAG2.1AA级，文字对比度≥4.5:1，点击区域≥44×44px，支持系统级字体缩放。\n验收：①首屏加载<2秒；②文案对照表经甲方签字确认；③对比度与点击区域抽检通过。",
+      "acceptance_text": "①首屏加载<2秒；②文案对照表经甲方签字确认；③对比度与点击区域抽检通过。"
+    },
+    {
+      "id": "M9-1",
+      "title": "报表计算口径（所有报告的统一数据源）",
+      "module": "M9月报与体检报告",
+      "contract_sequence": 107,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 107,
+        "locator": "T00R107"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M9-1报表计算口径（所有报告的统一数据源）\n1、口径定义：\n·可用率=1−不可用时间并集÷有效服务时间；\n·有效服务时间=约定服务时段−经批准排除的区间；\n·MTTA=首次有效人工确认时间−问题发生时间；\n·MTTR=监控恢复时间−问题发生时间。\n2、工单解决时长与MTTR分别统计，不得混用。\n3、无数据区间单列，不默认视为可用。\n4、小时趋势图仅用于容量展示，不得用于推断短时故障。\n5、报表同时给出均值、P95、样本量与未恢复数量。\n验收：①同一组数据下，月报与SLA报表口径完全一致；②构造无数据区间，月报不将其计入可用时长。",
+      "acceptance_text": "①同一组数据下，月报与SLA报表口径完全一致；②构造无数据区间，月报不将其计入可用时长。"
+    },
+    {
+      "id": "M9-2",
+      "title": "月报快照与冻结",
+      "module": "M9月报与体检报告",
+      "contract_sequence": 108,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 108,
+        "locator": "T00R108"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M9-2月报快照与冻结\n1、快照生成后冻结口径版本、原始数据与计算结果，不可修改，用于合同对账。\n2、快照保留策略：合同期内永久。\n验收：①快照生成后源数据变更不影响快照数值；②快照带口径版本号且可查询。",
+      "acceptance_text": "①快照生成后源数据变更不影响快照数值；②快照带口径版本号且可查询。"
+    },
+    {
+      "id": "M9-3",
+      "title": "老板版月报（1页，核心交付物）",
+      "module": "M9月报与体检报告",
+      "contract_sequence": 109,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 109,
+        "locator": "T00R109"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M9-3老板版月报（1页，核心交付物）\n1、形态：H5+PDF双输出（服务端无头浏览器同源渲染，两套模板不得分离）；企业微信推送给决策人；记录read_at_first。\n2、版面5个区块：\n·①网络可用率——本月可用率+环比，大数字+30天日历热力条（每天一格：绿/黄/红）；\n·②本月做了什么——工单总数/P1次数/MTTR（中位数）/SLA达成率，4张数字卡；\n·③帮您拦住了什么——隐患处置数（P4闭环数量）+典型案例1例（一句话描述+日期）；\n·④您的花费值不值——本月服务费vs参照值（同规模专职工程师月薪区间）对比条；\n·⑤下月建议——≤3条（取自隐患清单Top+容量预测）。\n3、页脚：完整版月报入口+服务经理联系方式+口径版本号。\n验收：①系统无任何手工填数入口；②任意数字可点击下钻到详版对应章节；③生成耗时≤10秒；④PDF与H5内容逐字一致。",
+      "acceptance_text": "①系统无任何手工填数入口；②任意数字可点击下钻到详版对应章节；③生成耗时≤10秒；④PDF与H5内容逐字一致。"
+    },
+    {
+      "id": "M9-4",
+      "title": "完整版月报（6章）",
+      "module": "M9月报与体检报告",
+      "contract_sequence": 110,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 110,
+        "locator": "T00R110"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M9-4完整版月报（6章）\n1、①服务总览：可用率/工单数/MTTR/SLA达成率+环比箭头。\n2、②事件明细表：工单号/时间/等级/设备/根因摘要/恢复时长/是否客户确认/是否超时（超时标红）。\n3、③告警统计：Top10规则频次+告警确认及时率。\n4、④容量趋势：上联带宽/并发会话数/DHCP池的月度曲线，超过70%处标注预警线。\n5、⑤隐患清单：开放的P4项（项/风险说明/建议/预计影响），已闭环项灰显。\n6、⑥关单质量：超时自动关单的数量与占比，透明化呈现。\n验收：①表格每行可下钻到工单或告警原始记录；②数据与老板版同源且可逐项核对一致。",
+      "acceptance_text": "①表格每行可下钻到工单或告警原始记录；②数据与老板版同源且可逐项核对一致。"
+    },
+    {
+      "id": "M9-5",
+      "title": "报告推送与阅读记录",
+      "module": "M9月报与体检报告",
+      "contract_sequence": 111,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 111,
+        "locator": "T00R111"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M9-5报告推送与阅读记录\n1、推送流程：每月1日自动生成上月月报→服务经理审核（一键发布或退回重生成）→企业微信推送给决策人与报障人；推送记录含时间/接收人/渠道/送达状态（区分受理与送达）。\n2、阅读记录：客户首次打开记录read_at_first；未读超过7天向服务经理提示\"客户未读，建议电话跟进\"。\n3、补发：支持手动补发与重新推送，同一期次不重复生成数据（口径版本已冻结）。\n验收：①月报在每月1日自动生成；②审核退回后可修改重生成且留有版本记录；③未读超7天提示准时产生。",
+      "acceptance_text": "①月报在每月1日自动生成；②审核退回后可修改重生成且留有版本记录；③未读超7天提示准时产生。"
+    },
+    {
+      "id": "M9-6",
+      "title": "网络健康体检报告（售前转化工具）",
+      "module": "M9月报与体检报告",
+      "contract_sequence": 112,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 112,
+        "locator": "T00R112"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M9-6网络健康体检报告（售前转化工具）\n1、①总体评分0-100分，按可用性/冗余/安全/寿命/备份5个维度加权，以雷达图呈现。\n2、②风险清单（按P0/P1/P2排序）：超期服役设备数/无冗余单点数/无备份设备数/弱口令数，每项附\"潜在影响\"一句话说明。\n3、③断网代价测算：估算每小时停业损失区间，数据来源为客户填报时必须标注\"客户口径\"字样。\n4、④建议方案：映射到三档套餐并给出建议档位与首年费用区间。\n5、数据来源：手工录入或Excel导入的设备清单；本期不做自动发现与自动风险扫描（字段须预留以便二期扩展）。\n验收：①同一份清单两次生成结果完全一致；②\"断网代价测算\"区块含\"客户口径\"标注。",
+      "acceptance_text": "①同一份清单两次生成结果完全一致；②\"断网代价测算\"区块含\"客户口径\"标注。"
+    },
+    {
+      "id": "M9-7",
+      "title": "季度巡检报告",
+      "module": "M9月报与体检报告",
+      "contract_sequence": 113,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 113,
+        "locator": "T00R113"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M9-7季度巡检报告\n1、结构：由巡检执行单自动汇总，每台设备一行。\n2、检查项：安全合规类（弱口令/固件版本/证书到期/配置变更/超期服役/备份状态）+配置备份验证+线路质量+遗留隐患闭环情况。\n3、每项三种结果：✅正常/⚠️建议关注/❌需处理，并支持工程师填写备注。\n4、巡检项清单按设备类型模板化（路由器/交换机/防火墙/AP各一套模板），模板可由甲方维护。\n验收：①按模板生成的巡检单可正常填写并汇总成报告；②新增一套设备类型模板无需改代码。",
+      "acceptance_text": "①按模板生成的巡检单可正常填写并汇总成报告；②新增一套设备类型模板无需改代码。"
+    },
+    {
+      "id": "M9-8",
+      "title": "年度复盘报告（标注优先级，可二期交付）",
+      "module": "M9月报与体检报告",
+      "contract_sequence": 114,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 114,
+        "locator": "T00R114"
+      },
+      "scope": "合同列项，可二期交付；阶段待Q11确认",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M9-8年度复盘报告（标注优先级，可二期交付）\n1、内容：月度指标的12点连线图+年度同比+年度SLA达成率+续费建议。\n2、数据完全复用月报payload，不另建统计链路。\n验收：①年度数据与12份月报汇总结果一致。",
+      "acceptance_text": "①年度数据与12份月报汇总结果一致。"
+    },
+    {
+      "id": "M9-9",
+      "title": "报告通用规则（验收硬约束）",
+      "module": "M9月报与体检报告",
+      "contract_sequence": 115,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 115,
+        "locator": "T00R115"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M9-9报告通用规则（验收硬约束）\n1、所有报表数据仅来自系统自动统计，禁止提供手工填数入口（体检报告中客户访谈信息除外，且必须标注\"客户口径\"）。\n2、数字必须可逐级下钻：老板版→完整版→工单/告警原始记录。\n3、PDF与H5同源渲染（服务端无头浏览器），避免两套模板产生内容差异。\n4、报表模板版本化：口径变更后历史报表不重算，页脚标注口径版本号。\n验收：①全系统无报表类手工填数输入框；②修改口径后重新打开历史月报，数值保持发布时原值。",
+      "acceptance_text": "①全系统无报表类手工填数输入框；②修改口径后重新打开历史月报，数值保持发布时原值。"
+    },
+    {
+      "id": "M10-1",
+      "title": "SLA达成率",
+      "module": "M10经营数据看板",
+      "contract_sequence": 116,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 116,
+        "locator": "T00R116"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M10-1SLA达成率\n1、服务级三态判定：达标/未达标/样本不足。\n2、均值口径与排除规则同M9-1；报表周期可切换，历史月份展示冻结快照值。\n验收：①样本量低于阈值的服务显示\"样本不足\"而非达标；②历史月份数值与快照一致。",
+      "acceptance_text": "①样本量低于阈值的服务显示\"样本不足\"而非达标；②历史月份数值与快照一致。"
+    },
+    {
+      "id": "M10-2",
+      "title": "告警确认及时率",
+      "module": "M10经营数据看板",
+      "contract_sequence": 117,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 117,
+        "locator": "T00R117"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M10-2告警确认及时率\n1、MTTA（近24小时）=首次有效人工确认时间−问题发生时间，取均值。\n2、值班看板目标值≤5分钟。\n3、事件级样本量与所属服务同列展示。\n验收：①MTTA计算结果与事件明细中原时间差一致；②样本量为0时显示\"—\"而非0。",
+      "acceptance_text": "①MTTA计算结果与事件明细中原时间差一致；②样本量为0时显示\"—\"而非0。"
+    },
+    {
+      "id": "M10-3",
+      "title": "远程处置率",
+      "module": "M10经营数据看板",
+      "contract_sequence": 118,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 118,
+        "locator": "T00R118"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M10-3远程处置率\n1、定义：远程处置率=远程解决工单数÷已处置工单数×100%。\n2、\"远程解决\"判定：工单包含≥1次成功的远程会话或受控执行，且未升级到现场处置。\n3、目标值>70%。\n4、取值随M7技术路线确定后实现（采用受控自动化路线时按脚本执行成功计数）。\n验收：①与人工抽样核对20张工单的计算结果一致。",
+      "acceptance_text": "①与人工抽样核对20张工单的计算结果一致。"
+    },
+    {
+      "id": "M10-4",
+      "title": "客户毛利统计",
+      "module": "M10经营数据看板",
+      "contract_sequence": 119,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 119,
+        "locator": "T00R119"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M10-4客户毛利统计\n1、计算公式：每客户月毛利=月费−（处置工时×人力单价+系统分摊+交通成本）。\n2、处置工时取M5-21的工时记录求和。\n3、人力单价与系统分摊规则为配置表项，必须提供维护界面（不得写死在代码中）。\n验收：①与按公式手算的历史月份结果一致；②修改人力单价后历史月份数据不重算。",
+      "acceptance_text": "①与按公式手算的历史月份结果一致；②修改人力单价后历史月份数据不重算。"
+    },
+    {
+      "id": "M10-5",
+      "title": "人员服务能力",
+      "module": "M10经营数据看板",
+      "contract_sequence": 120,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 120,
+        "locator": "T00R120"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M10-5人员服务能力\n1、按工程师统计：在办工单数/已办工单数/处置时长中位数（口径与MTTR一致）/远程处置占比/超时工单数。\n2、支持导出。\n验收：①中位数计算结果与按工单明细手工排序结果一致；②导出数据与页面一致。",
+      "acceptance_text": "①中位数计算结果与按工单明细手工排序结果一致；②导出数据与页面一致。"
+    },
+    {
+      "id": "M10-6",
+      "title": "运营计量看板",
+      "module": "M10经营数据看板",
+      "contract_sequence": 121,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 121,
+        "locator": "T00R121"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M10-6运营计量看板\n1、6张KPI卡：活跃租户数/资产数与监控项数/实际写入NVPS/数据保留量/工单首次响应时长（按合同等级分别统计）/服务覆盖率。\n2、图表：NVPS按租户分布、共享资源池负载占比环图、工单响应趋势（含SLA阈值参考线）、告警降噪率。\n3、租户计量表10列。\n4、计量≠收费：本页数据用于资源计量，不直接作为账单依据。\n验收：①页面明确标注\"计量不等于收费\"提示；②6张KPI与明细表数据一致。",
+      "acceptance_text": "①页面明确标注\"计量不等于收费\"提示；②6张KPI与明细表数据一致。"
+    },
+    {
+      "id": "M10-7",
+      "title": "容量估算模型（平台管理员）",
+      "module": "M10经营数据看板",
+      "contract_sequence": 122,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 122,
+        "locator": "T00R122"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M10-7容量估算模型（平台管理员）\n1、8项输入：主机数/每台有效监控项数/采样间隔/历史保留天数/每值字节数/启用趋势比例/趋势保留天数/余量系数。\n2、9项输出：平均NVPS/日写入量/历史总量/趋势数据量/单节点容量/主备两份容量/2倍峰值目标/有效监控项总数/建议资源池数量。\n3、核心公式：NVPS=主机数×每主机监控项数÷采样间隔；含Proxy缓冲测算与PoC目标（验收标准：12,500NVPS持续回放24小时稳定）。\n验收：①输入固定参数后输出与手算一致；②PoC目标可在测试环境复现。",
+      "acceptance_text": "①输入固定参数后输出与手算一致；②PoC目标可在测试环境复现。"
+    },
+    {
+      "id": "M10-8",
+      "title": "平台健康与SLO（平台管理员）",
+      "module": "M10经营数据看板",
+      "contract_sequence": 123,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 123,
+        "locator": "T00R123"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M10-8平台健康与SLO（平台管理员）\n1、6张KPI卡：控制层可用性（目标99.9%）/APIP95响应时间/Webhook落库失败数/补偿水位延迟/死信队列积压/备份与恢复演练状态。\n2、8层分层高可用状态+4张时序图+3张明细表。\n3、试点验收目标：控制层可用性99.9%、RPO≤15分钟/RTO≤60分钟、12,500NVPS稳定24小时、事件到通知渠道受理P95≤30秒、2倍峰值持续30分钟。\n验收：①各项SLO有可查询的历史曲线；②演练记录可追溯。",
+      "acceptance_text": "①各项SLO有可查询的历史曲线；②演练记录可追溯。"
+    },
+    {
+      "id": "M10-9",
+      "title": "时间维度与导出",
+      "module": "M10经营数据看板",
+      "contract_sequence": 124,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 124,
+        "locator": "T00R124"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M10-9时间维度与导出\n1、时间范围预设（1小时/6小时/24小时/7天/30天，各自对应不同的取点数）。\n2、表格支持排序与分页（每页10/15/25/50/100可选）。\n3、导出统一走短时签名地址。\n4、时间显示统一采用相对格式（N秒前/N分钟前/N小时前/N天前）与绝对时间并存。\n验收：①各时间范围切换后取点数与配置一致；②导出文件包含当前时间范围标注。",
+      "acceptance_text": "①各时间范围切换后取点数与配置一致；②导出文件包含当前时间范围标注。"
+    },
+    {
+      "id": "M10-10",
+      "title": "单人可管客户数",
+      "module": "M10经营数据看板",
+      "contract_sequence": 125,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 125,
+        "locator": "T00R125"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M10-10单人可管客户数\n1、计算公式：单人可管客户数=活跃租户数÷（值守人力+二线人力折算FTE）。\n2、FTE按月折算（满勤计1.0）。\n3、扩张判定参考值≥12（低于该值说明人力模型不成立）。\n验收：①输入已知人力与租户数，计算结果与手算一致；②该指标可导出用于经营复盘。",
+      "acceptance_text": "①输入已知人力与租户数，计算结果与手算一致；②该指标可导出用于经营复盘。"
+    },
+    {
+      "id": "M10-11",
+      "title": "跳档触发提示",
+      "module": "M10经营数据看板",
+      "contract_sequence": 126,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 126,
+        "locator": "T00R126"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M10-11跳档触发提示\n1、规则：月度设备清点后，若实际设备数＞契约设备数，自动生成服务经理待办任务（扩容跟进或跳档跟进）。\n验收：①构造超限租户，T+1日生成待办任务且通知到服务经理。",
+      "acceptance_text": "①构造超限租户，T+1日生成待办任务且通知到服务经理。"
+    },
+    {
+      "id": "M10-12",
+      "title": "八项经营指标口径定义",
+      "module": "M10经营数据看板",
+      "contract_sequence": 127,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 127,
+        "locator": "T00R127"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M10-12八项经营指标口径定义\n1、本条列出的8个指标定义是平台全部统计口径的唯一来源，任何页面、报表、导出文件均不得另立口径。8个指标为：\n①月可用率=1−不可用时间并集÷有效服务时间；有效服务时间=约定服务时段−经批准排除的区间；无数据区间单列，不默认视为可用；\n②MTTA（告警确认及时率）=首次有效人工确认时间−问题发生时间，取均值，同时给出P50／P95与样本量，值班看板目标值≤5分钟；\n③MTTR（监控恢复时长）=监控恢复时间−问题发生时间，取中位数，同时给出均值、P95与未恢复数量；\n④工单解决时长=工单关闭时间−工单创建时间，取中位数；与MTTR分别统计，不得混用或相互替代；\n⑤SLA达成率=达标工单数÷适用工单数；达标=响应实际时间≤响应截止时间且恢复实际时间≤恢复截止时间；适用工单为P1-P3且未被SLA排除的工单；\n⑥远程处置率=远程解决工单数÷已处置工单数×100%；\"远程解决\"判定为工单含≥1次成功远程会话或受控执行且未升级到现场；目标值>70%；\n⑦客户月毛利=月费−（处置工时×人力单价+系统分摊+交通成本）；处置工时取自M5-21工时记录；人力单价与系统分摊为配置表项并提供维护界面；\n⑧单人可管客户数=活跃租户数÷（值守人力+二线人力折算FTE）；FTE按月折算（满勤计1.0）；扩张判定参考值≥12。\n2、上述指标在经营看板、月报（老板版与完整版）、SLA报表、运营驾驶舱四处必须调用同一套指标计算服务，禁止各页面自行编写统计SQL，防止口径漂移。\n3、所有时长类指标一律同时给出中位数、均值、P95与样本量；样本量为0时显示\"—\"而非0；时区统一Asia/Shanghai，服务时段默认7×24。\n验收：①同一指标在四个位置取值完全一致；②修改计算服务后四处同步生效；③随机抽3个历史月份，8个指标与按上述公式手工核算的结果一致。",
+      "acceptance_text": "①同一指标在四个位置取值完全一致；②修改计算服务后四处同步生效；③随机抽3个历史月份，8个指标与按上述公式手工核算的结果一致。"
+    },
+    {
+      "id": "M10-13",
+      "title": "前置依赖：工时字段",
+      "module": "M10经营数据看板",
+      "contract_sequence": 128,
+      "source": {
+        "path": "output/contracts/MOP基础网络代维平台开发项目技术开发合同_签章版.docx",
+        "table_index_zero_based": 0,
+        "row_index_zero_based": 128,
+        "locator": "T00R128"
+      },
+      "scope": "合同内一期",
+      "requirement_priority": null,
+      "customer_confirmation": null,
+      "text": "M10-13前置依赖：工时字段\n1、客户毛利（M10-4）与人员服务能力（M10-5）均依赖工单工时记录（M5-21）。\n2、工时字段必须与M5工单模块同期建设，不得后置，否则上述两项无法验收。\n验收：①工单详情页存在工时填报区域且数据可写入；②毛利报表能读取到工时数据。",
+      "acceptance_text": "①工单详情页存在工时填报区域且数据可写入；②毛利报表能读取到工时数据。"
+    }
+  ],
+  "additional_evidence": {
+    "paragraphs": [
+      {
+        "locator": "P082",
+        "text": "项目自合同签订之日起2个月内完成软件开发及上线，并由甲方自软件上线试运行结束后1个月内进行验收（如因软件质量原因导致验收延期的情况除外），具体验收时间以甲乙双方签署《项目验收报告》时间为准。"
+      },
+      {
+        "locator": "P088",
+        "text": "从软件全部功能上线之日起，双方约定试运行期为30天。软件在试运行期间出现故障或问题的，乙方应及时排除。如有需要，甲方有权根据具体情况通知乙方延长试运行期，直至软件完全符合甲方要求。试运行完成后，甲方应及时按约定对该软件进行系统验收。"
+      },
+      {
+        "locator": "P159",
+        "text": "乙方将任何开源代码、开源组件集成至本项目交付成果前，应当向甲方提交《第三方组件与开源许可证披露清单》。未经甲方书面同意，乙方不得在项目交付成果中引入GPL、AGPL、LGPL等具有许可证传染性义务，可能导致甲方项目成果开源、无法闭源商业化使用的开源许可组件。"
+      },
+      {
+        "locator": "P250",
+        "text": "平台系统集成"
+      },
+      {
+        "locator": "P251",
+        "text": "通过参数化配置，对接邮件通知、钉钉、飞书等第三方消息推送通道。"
+      },
+      {
+        "locator": "P252",
+        "text": "通过白名单策略，接收日志采集端的注册、连接、数据上报等操作。"
+      },
+      {
+        "locator": "P253",
+        "text": "日志采集端功能"
+      },
+      {
+        "locator": "P254",
+        "text": "通过参数配置实现与服务端平台系统对接，实现采集端状态上报，实现采集的数据上传。"
+      },
+      {
+        "locator": "P255",
+        "text": "通过参数配置实现对特定网络终端设备的日志采集，包括但不限于终端设备的CPU、内存、存储空间、网络状态、运行情况等日志的采集。"
+      },
+      {
+        "locator": "P256",
+        "text": "技术要求"
+      },
+      {
+        "locator": "P257",
+        "text": "系统基础能力要求"
+      },
+      {
+        "locator": "P258",
+        "text": "系统采用B/S架构并支持前后端分离模式，即前后端程序可分别部署，降低前后端应用程序的耦合程度；"
+      },
+      {
+        "locator": "P259",
+        "text": "系统需具备操作日志记录及审计能力，操作日志记录须简洁明了且便于用户理解，记录每项操作详情，包含但不限于操作参数、操作时间、操作人、操作模块、操作前及操作后的信息及变化等数据，用于回溯系统数据变更历史记录，及进行相关的操作审计；"
+      },
+      {
+        "locator": "P260",
+        "text": "系统运行参数等设置可以动态进行配置及调整；"
+      },
+      {
+        "locator": "P261",
+        "text": "系统具备对展示的表格数据进行排序、筛选、精确/模糊检索、批量导出等功能；"
+      },
+      {
+        "locator": "P262",
+        "text": "系统具备对所有表单上传附件，对附件进行在线查看、批量下载、归档等功能；"
+      },
+      {
+        "locator": "P263",
+        "text": "可靠性要求"
+      },
+      {
+        "locator": "P264",
+        "text": "系统需具备良好的安全机制和可靠性保障。系统开发应针对于各种数据的管理和操作，具备完善的分级权限机制，保证数据的安全和合理使用。"
+      },
+      {
+        "locator": "P265",
+        "text": "针对数据库的存储容量扩充、数据备份、数据安全、数据库操作管理等提出安全可靠的软硬件建设及改造方案，针对所有可能出现的安全隐患进行设计开发；"
+      },
+      {
+        "locator": "P266",
+        "text": "系统设计应提供完整的容灾方案，包含系统备份、恢复和部署方案，支持两地三中心部署模式；"
+      },
+      {
+        "locator": "P267",
+        "text": "系统服务中断时间（对单次故障系统恢复的最长容忍时间）<1小时，SLA指标不低于99.99%有效工作时间；"
+      },
+      {
+        "locator": "P268",
+        "text": "不允许存在系统数据丢失情况；"
+      },
+      {
+        "locator": "P269",
+        "text": "安全性要求"
+      },
+      {
+        "locator": "P270",
+        "text": "需保障数据访问的安全性，仅允许授权用户访问系统，授权用户仅能访问权限范围内的功能及数据；"
+      },
+      {
+        "locator": "P271",
+        "text": "系统不得与操作系统的用户名/密码相关，应采用参数的模式记录所连接数据库的IP地址、数据库实例名、用户名/密码等信息，以支持定期修改操作系统、数据库的用户密码；密码不能以明文形式存储；"
+      },
+      {
+        "locator": "P272",
+        "text": "系统个人账户的密码应具备安全控制,包括但不限于：限定密码的复杂程度；限制最小长度；密码设定有效期；强制密码历史；密码无效尝试次数；上述控制应作为配置项以便进行调整;"
+      },
+      {
+        "locator": "P273",
+        "text": "性能要求"
+      },
+      {
+        "locator": "P274",
+        "text": "在基础软硬件环境资源充足的情况下，应用软件应可支持以下性能要求："
+      },
+      {
+        "locator": "P275",
+        "text": "系统支持最高1000个并发用户，正常100个并发用户的性能请求；"
+      },
+      {
+        "locator": "P276",
+        "text": "系统服务响应P99指标不超过2秒；"
+      },
+      {
+        "locator": "P277",
+        "text": "支持节点动态加入和退出，实现系统的高可用性，保证业务不间断运行；"
+      },
+      {
+        "locator": "P278",
+        "text": "平台运行时峰值服务CPU所占比不超过60%，内存所占比不超过80%；"
+      },
+      {
+        "locator": "P279",
+        "text": "系统整体吞吐量设计能满足未来五年的高峰量；"
+      },
+      {
+        "locator": "P280",
+        "text": "运行环境要求"
+      },
+      {
+        "locator": "P281",
+        "text": "应用系统所部署的操作系统、数据库、中间件等系统环境应使用甲方购买过的软件产品；使用开源软件须征得甲方同意；不得使用盗版的系统及软件；软件的版本应在原厂的支持范围内，避免使用已经或即将停止维护的软件及补丁版本；"
+      },
+      {
+        "locator": "P282",
+        "text": "浏览器应支持Edge、Chrome、火狐、360等主流浏览器及主流版本；"
+      },
+      {
+        "locator": "P283",
+        "text": "数据存储要求"
+      },
+      {
+        "locator": "P284",
+        "text": "数据库存储支持MySQL；"
+      },
+      {
+        "locator": "P285",
+        "text": "应用数据库具有可伸缩性、可管理性、安全性及容错性；"
+      },
+      {
+        "locator": "P286",
+        "text": "数据权限要求"
+      },
+      {
+        "locator": "P287",
+        "text": "系统支持数据权限控制，可根据行政组织或者业务管理组织要求，对数据依照组织结构及角色进行隔离和管控；"
+      },
+      {
+        "locator": "P288",
+        "text": "业务单据权限可根据业务、审计、风控等不同部门的岗位要求，对单据的新增、修改、删除、查看等权限进行精细化管理；"
+      },
+      {
+        "locator": "P295",
+        "text": "项目计划"
+      },
+      {
+        "locator": "P296",
+        "text": "本次项目建设周期2个月，依照项目实施进度要求，项目建设分阶段进行实施及上线，并最终完成整体项目交付，具体实施进度安排如下："
+      },
+      {
+        "locator": "P297",
+        "text": "项目实施整体进度安排"
+      },
+      {
+        "locator": "P298",
+        "text": "本计划可能受外部系统时间安排影响，由此造成的计划变更或延迟，由甲乙双方依照实际情况进行协商解决。"
+      },
+      {
+        "locator": "P334",
+        "text": "附件三《交付物及培训》"
+      },
+      {
+        "locator": "P335",
+        "text": "交付物清单"
+      },
+      {
+        "locator": "P336",
+        "text": "项目各阶段主要的交付物如下："
+      },
+      {
+        "locator": "P337",
+        "text": "《项目计划》：完成里程碑所需的任务、日程和资源详细计划"
+      },
+      {
+        "locator": "P338",
+        "text": "《项目周报》：乙方项目经理每周发出的阶段性成果进度报告"
+      },
+      {
+        "locator": "P339",
+        "text": "《项目会议纪要》：每次甲乙双方召开的项目沟通会议纪要"
+      },
+      {
+        "locator": "P340",
+        "text": "《需求说明书》业务需求说明书、原型设计等"
+      },
+      {
+        "locator": "P341",
+        "text": "《详细设计说明书》系统功能设计及业务流程设计"
+      },
+      {
+        "locator": "P342",
+        "text": "《数据库设计说明书》系统数据库结构、字段设计"
+      },
+      {
+        "locator": "P343",
+        "text": "《API接口设计说明书》系统内外部API接口设计"
+      },
+      {
+        "locator": "P344",
+        "text": "《测试用例及计划》：系统功能测试、集成测试等用例和计划"
+      },
+      {
+        "locator": "P345",
+        "text": "《上线方案》：系统上线方案，包括计划、软硬件资源、上线流程等"
+      },
+      {
+        "locator": "P346",
+        "text": "《项目验收报告》"
+      },
+      {
+        "locator": "P347",
+        "text": "《运维手册》系统运维操作手册"
+      },
+      {
+        "locator": "P348",
+        "text": "《交接计划及清单》"
+      },
+      {
+        "locator": "P349",
+        "text": "项目全部源代码、打包编译脚本、运维部署等相关脚本"
+      },
+      {
+        "locator": "P350",
+        "text": "《源代码交付说明》：软件涉及的全部源代码说明，包括但不限于代码整体结构说明，各功能模块用途及关系，系统配置文件及各配置项说明，数据库配置说明，第三方服务配置说明，外部系统对接配置说明，源代码编译、打包及运行命令及参数等。"
+      },
+      {
+        "locator": "P351",
+        "text": "交付物质量要求"
+      },
+      {
+        "locator": "P352",
+        "text": "乙方在项目各阶段提交的文档必须满足以下质量要求："
+      },
+      {
+        "locator": "P353",
+        "text": "文档有双方认可的模板的，必须按规定的文档模板编写；没有双方确定的模板的按照甲方的要求进行编写，经甲方验收确认后视作乙方合格交付；"
+      },
+      {
+        "locator": "P354",
+        "text": "文档必须具有详细的修改记录；"
+      },
+      {
+        "locator": "P355",
+        "text": "文档必须符合甲方文档规范，尽可能做到文字通顺，条理清楚，无二义性；"
+      },
+      {
+        "locator": "P356",
+        "text": "应对各个阶段完成的文档进行汇总，依照文档体系的描述，形成相应完整的文档。如各阶段需求分析完成后，应汇总为一份完整的需求分析说明书；"
+      },
+      {
+        "locator": "P357",
+        "text": "所有文档须严格按双方商定的时间点提交；"
+      },
+      {
+        "locator": "P358",
+        "text": "乙方提交的文档须通过甲方相关质量管理部门组织的评审，评审后乙方须根据评审意见进行文档修正并提交反馈或评审；"
+      },
+      {
+        "locator": "P359",
+        "text": "文档统一纳入配置管理系统进行管理；"
+      },
+      {
+        "locator": "P360",
+        "text": "项目各阶段需要甲方评审和确认的文档必须同时提交电子和纸质文档，其他实施期间产生的过程文档可以只提供电子文档，但经确认后需在配置管理系统设置独立目录存放；"
+      },
+      {
+        "locator": "P361",
+        "text": "所有重检交付物需在十个工作日内提交修正。"
+      },
+      {
+        "locator": "P363",
+        "text": "乙方交付的源代码及数据库设计必须满足以下质量要求："
+      },
+      {
+        "locator": "P364",
+        "text": "代码遵循与甲方约定的编码规范，常量需先定义后使用，避免常量混用，避免使用可变参数编程；"
+      },
+      {
+        "locator": "P365",
+        "text": "代码简洁，避免存在大量冗余、重复的无用代码，应包含适当的注释，对代码逻辑进行明确描述；"
+      },
+      {
+        "locator": "P366",
+        "text": "代码应经过性能调优，避免内存泄漏、冗余运算等，以便高效运行；"
+      },
+      {
+        "locator": "P367",
+        "text": "代码应遵循安全编程规范，防范SQL注入、XSS攻击、CSRF攻击等安全漏洞。使用加密技术保护敏感数据，禁止使用字符串拼接SQL；"
+      },
+      {
+        "locator": "P368",
+        "text": "数据库合理设计索引以提高查询效率，同时考虑索引对插入、更新操作的影响，保持性能平衡；"
+      },
+      {
+        "locator": "P369",
+        "text": "数据库设计遵循物理主键、逻辑外键、逻辑唯一性约束等规则，确保数据的完整性和准确性；"
+      },
+      {
+        "locator": "P370",
+        "text": "数据库设计避免表结构及字段过度冗余，避免存在大量未使用的表及字段；"
+      },
+      {
+        "locator": "P371",
+        "text": "数据库设计应提供包括ER图、数据字典、表关系说明在内的文档；"
+      },
+      {
+        "locator": "P372",
+        "text": "培训"
+      },
+      {
+        "locator": "P373",
+        "text": "培训目的：通过知识转移使甲方不同层次的人员能够理解并掌握系统，以便于项目实施和系统上线后顺利使用和维护。"
+      },
+      {
+        "locator": "P374",
+        "text": "培训要求："
+      },
+      {
+        "locator": "P375",
+        "text": "乙方保证培训师具备所需传授的知识，熟悉项目所涉及的软、硬件系统；"
+      },
+      {
+        "locator": "P376",
+        "text": "乙方向甲方提供全套培训材料电子版或纸质版留存；"
+      },
+      {
+        "locator": "P377",
+        "text": "乙方可依据甲方要求开展针对不同对象的培训，培训内容切实、有针对性。"
+      },
+      {
+        "locator": "P378",
+        "text": "附件四《项目阶段确认和验收》"
+      },
+      {
+        "locator": "P379",
+        "text": "阶段确认"
+      },
+      {
+        "locator": "P380",
+        "text": "项目阶段确认，是指在项目实施期间双方对项目各阶段实施目标，工作计划和提交的阶段工作完成报告做出结论。甲方应及时书面签署确认乙方要求确认的有关文档，或者提出不予确认的结论和原因。"
+      },
+      {
+        "locator": "P381",
+        "text": "阶段交付物提交前，乙方应组织相关人员对交付物进行内部评审，并做好评审记录，确保交付物的质量能够满足项目质量要求。内部评审通过后，由乙方提交给甲方。"
+      },
+      {
+        "locator": "P382",
+        "text": "试运行"
+      },
+      {
+        "locator": "P383",
+        "text": "按照合同正文条款约定的试运行期，如因乙方原因，软件在试运行期间出现故障或问题，乙方应及时排除该方面的故障或问题，所产生的费用由乙方承担。"
+      },
+      {
+        "locator": "P384",
+        "text": "乙方应在合理的期限内排除故障或处理问题。如以上故障或问题影响软件基本功能和目标的实现，且排除故障或处理问题的时间超过5个工作日，则视为乙方交付违约，除非上述故障和问题是由甲方引起的。"
+      },
+      {
+        "locator": "P385",
+        "text": "验收程序"
+      },
+      {
+        "locator": "P386",
+        "text": "在规定的投产后或试运行期结束后，乙方应做好项目验收的必要准备（乙方应向甲方提交要求的验收内容，包含但不限于附件三中的交付物清单等）并向甲方提交验收方案及验收申请书，甲方应当在收到验收申请书后1个月内进行验收。"
+      },
+      {
+        "locator": "P387",
+        "text": "乙方应协助甲方根据《工作说明书》的内容对项目进行系统测试，测试验收成立验收小组,由甲方、乙方及专家等人员组成，对项目建设进行验收。验收时,由乙方拟定验收方案，编制测试手册，经验收小组一致确认后，由验收小组负责验收。验收方案包括测试目的、环境、过程、结果及分析等方面内容。在测试验收过程中，出现严重缺陷或质量问题时，验收小组可以决定暂停所有测试，直至缺陷和问题得到纠正。"
+      },
+      {
+        "locator": "P388",
+        "text": "在验收通过后的10个工作日内，由双方签署验收报告并加盖公章。如果甲方无法在收到乙方提交的验收申请书后10个工作日内组织验收或甲方认为项目达不到验收条件，则必须书面向乙方提交无法按期验收的原因，验收时间可以顺延，但顺延时间不超过15个工作日。"
+      },
+      {
+        "locator": "P389",
+        "text": "验收标准"
+      },
+      {
+        "locator": "P390",
+        "text": "系统功能及性能验收标准"
+      },
+      {
+        "locator": "P391",
+        "text": "项目正式验收前，乙方应当对本合同项下所有硬件设备、材料、软件系统等进行检验和测试，做这些工作需保证有甲方代表参与或批准。甲方依照《工作说明书》中的内容进行功能验收。甲方可根据需要，另行委托具有相应检测资质和测评能力的第三方对乙方交付的软件系统进行软件测评或安全测评。如有缺陷，乙方应当及时整改并承担相应的费用。"
+      },
+      {
+        "locator": "P393",
+        "text": "项目管理验收标准"
+      },
+      {
+        "locator": "P394",
+        "text": "项目实施过程严格按照本工作说明书的架构、计划、标准及流程进行，交付物均已交付甲方并得到确认，对交付文档以抽样方式进行检查。如果在最终验收的文档中发现文档与最新系统版本不一致时，由双方对文档进行整理，补充相关文档资料。"
+      },
+      {
+        "locator": "P395",
+        "text": "验收标准：附件三《交付物及培训》中的所有交付物及文档提交完整、内容准确，符合规定的提交程序。在验收的文档中，关键处出现错误的描述，或描述每一独立完整的功能/章节错误，则视为验收未通过。"
+      }
+    ],
+    "milestones": [
+      {
+        "locator": "T02R000",
+        "cells": [
+          "节点",
+          "里程碑",
+          "时限",
+          "周期"
+        ]
+      },
+      {
+        "locator": "T02R001",
+        "cells": [
+          "项目启动",
+          "启动会、开发环境、人员到位、《详细设计说明书》",
+          "第1周内",
+          "T+0周"
+        ]
+      },
+      {
+        "locator": "T02R002",
+        "cells": [
+          "完成开发",
+          "完成功能开发",
+          "第4周末",
+          "T+4周"
+        ]
+      },
+      {
+        "locator": "T02R003",
+        "cells": [
+          "完成上线",
+          "全部功能完成开发，通过联调测试，系统部署上线，通过功能测试",
+          "第8周末",
+          "T+8周"
+        ]
+      },
+      {
+        "locator": "T02R004",
+        "cells": [
+          "完成验收",
+          "试运行结束、交付物全部移交并验收合格、完成培训",
+          "交付验收合格日起30日完成试运行，试运行完成后组织验收",
+          "交付验收合格日"
+        ]
+      }
+    ],
+    "acceptance_thresholds": [
+      {
+        "locator": "T05R000",
+        "cells": [
+          "判定项",
+          "合格标准"
+        ]
+      },
+      {
+        "locator": "T05R001",
+        "cells": [
+          "P0级需求项",
+          "通过率100%，任一项不通过即判定为不合格"
+        ]
+      },
+      {
+        "locator": "T05R002",
+        "cells": [
+          "P1级需求项",
+          "通过率≥95%，且未通过项无功能性缺失"
+        ]
+      },
+      {
+        "locator": "T05R003",
+        "cells": [
+          "致命缺陷（A级）",
+          "零遗留，存在任一致命缺陷即判定为不合格"
+        ]
+      },
+      {
+        "locator": "T05R004",
+        "cells": [
+          "严重缺陷（B级）",
+          "零遗留，或经甲方书面同意转为限期整改"
+        ]
+      },
+      {
+        "locator": "T05R005",
+        "cells": [
+          "安全指标",
+          "多租户越权访问测试用例100%拦截；凭据加密存储不可明文查看；无高危漏洞"
+        ]
+      }
+    ],
+    "acceptance_matrix": [
+      {
+        "locator": "T06R000",
+        "cells": [
+          "模块",
+          "验收项",
+          "验收方法",
+          "判定标准与阈值",
+          "证据"
+        ]
+      },
+      {
+        "locator": "T06R001",
+        "cells": [
+          "01租户与权限",
+          "多客户数据隔离",
+          "越权访问测试",
+          "跨租户ID枚举全部被阻断，100%拦截",
+          "测试报告"
+        ]
+      },
+      {
+        "locator": "T06R002",
+        "cells": [
+          "01租户与权限",
+          "角色与操作权限",
+          "权限矩阵逐项验证",
+          "账号角色、菜单与操作权限判定全部正确",
+          "截图"
+        ]
+      },
+      {
+        "locator": "T06R003",
+        "cells": [
+          "01租户与权限",
+          "客户/档位/配额管理",
+          "功能演示",
+          "客户联系人、服务档位、设备数量配额可配置且生效",
+          "录屏"
+        ]
+      },
+      {
+        "locator": "T06R004",
+        "cells": [
+          "02设备台账",
+          "Excel导入导出",
+          "导入含错误行的文件",
+          "正确行导入成功并输出错误行报告；台账可导出",
+          "测试报告"
+        ]
+      },
+      {
+        "locator": "T06R005",
+        "cells": [
+          "02设备台账",
+          "凭据加密托管",
+          "数据库与界面核查",
+          "设备凭据加密存储，任何界面不可明文查看",
+          "核查记录"
+        ]
+      },
+      {
+        "locator": "T06R006",
+        "cells": [
+          "02设备台账",
+          "维保到期与依赖配置",
+          "功能演示",
+          "维保到期可查询提醒；设备依赖关系可配置并用于告警抑制",
+          "录屏"
+        ]
+      },
+      {
+        "locator": "T06R007",
+        "cells": [
+          "03监控与告警",
+          "四类监控指标",
+          "实机接入设备",
+          "设备状态、资源、流量、线路质量指标采集正常",
+          "监控截图"
+        ]
+      },
+      {
+        "locator": "T06R008",
+        "cells": [
+          "03监控与告警",
+          "告警处理链路",
+          "实机触发告警",
+          "阈值分级、防抖、重复合并、告警抑制、维护静默、恢复通知全部生效",
+          "录屏"
+        ]
+      },
+      {
+        "locator": "T06R009",
+        "cells": [
+          "04工单与SLA",
+          "告警自动建单",
+          "实机触发告警",
+          "告警自动生成工单，无需人工创建",
+          "录屏"
+        ]
+      },
+      {
+        "locator": "T06R010",
+        "cells": [
+          "04工单与SLA",
+          "工单流转",
+          "全流程演练",
+          "报障、接单、转派、升级、处置记录流转完整；超时提醒触发",
+          "录屏"
+        ]
+      },
+      {
+        "locator": "T06R011",
+        "cells": [
+          "04工单与SLA",
+          "按档位计时与关单闭环",
+          "用例测试",
+          "按服务档位计时准确（含档位变更快照）；客户确认关单与重开闭环可用",
+          "测试记录"
+        ]
+      },
+      {
+        "locator": "T06R012",
+        "cells": [
+          "05配置备份",
+          "备份与查看",
+          "功能演示",
+          "定时备份执行、结果可查询、客户只读查看生效",
+          "截图"
+        ]
+      },
+      {
+        "locator": "T06R013",
+        "cells": [
+          "05配置备份",
+          "失败建单与演练记录",
+          "模拟备份失败",
+          "失败自动建单；恢复演练记录可留存查询",
+          "测试记录"
+        ]
+      },
+      {
+        "locator": "T06R014",
+        "cells": [
+          "06远程处置与审计",
+          "审批硬控制",
+          "穿透测试",
+          "设备授权、读写操作审批生效，无审批无法建立连接",
+          "测试报告"
+        ]
+      },
+      {
+        "locator": "T06R015",
+        "cells": [
+          "06远程处置与审计",
+          "审计留痕",
+          "操作抽样核查",
+          "会话录屏、命令日志完整，操作审计可导出",
+          "导出文件"
+        ]
+      },
+      {
+        "locator": "T06R016",
+        "cells": [
+          "07客户门户与通知",
+          "企业微信内嵌五项功能",
+          "实机演示",
+          "设备概况、拍照报障、工单进度、确认关单、报告查阅全部可用",
+          "录屏"
+        ]
+      },
+      {
+        "locator": "T06R017",
+        "cells": [
+          "07客户门户与通知",
+          "通知对接",
+          "实机触发",
+          "企业微信、电话、短信三类通知按事件规则触达",
+          "通知记录"
+        ]
+      },
+      {
+        "locator": "T06R018",
+        "cells": [
+          "08月报与体检报告",
+          "老板版月报生成",
+          "性能测试",
+          "H5/PDF自动生成≤10秒，无手工填数入口，含阅读记录",
+          "计时录屏"
+        ]
+      },
+      {
+        "locator": "T06R019",
+        "cells": [
+          "08月报与体检报告",
+          "基础体检报告",
+          "功能演示",
+          "根据录入或导入资料自动生成，指标明细完整",
+          "样例报告"
+        ]
+      },
+      {
+        "locator": "T06R020",
+        "cells": [
+          "09经营数据看板",
+          "指标口径",
+          "与手工核算比对",
+          "SLA达成率、远程处置率、告警确认及时率、客户毛利、人员服务能力口径正确",
+          "比对记录"
+        ]
+      },
+      {
+        "locator": "T06R021",
+        "cells": [
+          "10部署与交付",
+          "部署与试运行",
+          "甲方环境实测",
+          "部署脚本可一键部署；试运行期可用率≥99.5%、误报率≤5%",
+          "试运行记录"
+        ]
+      },
+      {
+        "locator": "T06R022",
+        "cells": [
+          "10部署与交付",
+          "交付物齐备",
+          "清单核对",
+          "定制源码、数据库结构、部署说明、操作文档全部移交且可复现构建",
+          "移交确认书"
+        ]
+      }
+    ]
+  }
+}

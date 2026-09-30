@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>监控模板 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('templates', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const isAdmin = App.can('padmin'); const canOps = App.can('tadmin', 'msp', 'padmin');
+  const list = DATA.templates.filter(t => ctx.tenant.id === 'all' || t.tenants.includes(ctx.tenant.id) || t.owner === '平台');
+  let layer = App.qs('layer', 'all');
+  const stBadge = (t) => t.status === 'released' ? App.badge('ok', '已发布', true) : t.status === 'canary' ? App.badge('warn', `灰度 ${t.canary}%`, true) : t.status === 'draft' ? App.badge('neutral', '草稿') : App.badge('unknown', '已弃用');
+  root.innerHTML = `
+  <div class="page-head"><div><h1>监控模板 <span class="muted small">${list.length} 个</span></h1><div class="sub">模板按「基础设施 → 中间件 → 业务服务」分层，进入版本库并走灰度发布。共享基础模板仅平台发布；租户差异通过受控宏与覆盖参数表达。</div></div>
+    <div class="page-actions">${isAdmin ? `<button class="btn" id="importBtn">${icon('upload')} 从 Git 仓库同步</button><button class="btn primary" id="newBtn">${icon('plus')} 新建模板版本</button>` : canOps ? `<button class="btn primary" id="reqBtn">${icon('plus')} 申请租户模板</button>` : ''}</div></div>
+  <div class="grid g5 mb">
+    ${App.kpi({ label: '已发布', value: list.filter(t => t.status === 'released').length, cls: 'ok', sub: '全量生效' })}
+    ${App.kpi({ label: '灰度中', value: list.filter(t => t.status === 'canary').length, cls: 'warn', sub: list.filter(t => t.status === 'canary').map(t => t.name.split(' ')[0]).join('、') || '—' })}
+    ${App.kpi({ label: '草稿 / 待审核', value: list.filter(t => t.status === 'draft' || t.draft).length, sub: '含租户提交的自定义模板' })}
+    ${App.kpi({ label: '应用主机', value: fmt.n(list.reduce((s, t) => s + t.hosts, 0)), sub: '按模板绑定计数（可重复）' })}
+    ${App.kpi({ label: '受控宏', value: list.reduce((s, t) => s + t.macros.length, 0), sub: '租户覆盖需审批' })}
+  </div>
+  <div class="card">
+    <div class="tabs" data-group="layer"><button data-tab="all" class="${layer === 'all' ? 'active' : ''}">全部 <span class="n">${list.length}</span></button>${Object.entries(DATA.LAYERS).map(([k, v]) => `<button data-tab="${k}" class="${layer === k ? 'active' : ''}">${v} <span class="n">${list.filter(t => t.layer === k).length}</span></button>`).join('')}</div>
+    <div id="tpl"></div>
+  </div>
+  <div class="grid g2 mt">
+    <div class="card"><div class="card-head"><h3>灰度发布进度 <span class="sub">通用交换机 SNMPv3 (MSP) v2.4.0</span></h3>${isAdmin ? `<div class="tools"><button class="btn sm" onclick="App.toast('已推进到 60%：新增 蓝海 22 台','ok')">推进到 60%</button><button class="btn sm danger" onclick="App.toast('已回滚灰度批次到 v2.3.2（保留事件与报表映射）','warn')">回滚</button></div>` : ''}</div><div class="card-body">
+      <div class="row between small mb8"><span>已应用 45 / 112 台</span><span class="muted">40% · 观察 72 小时</span></div>${App.meter(40, 'warn', true)}
+      <div class="grid g3 mt" style="gap:10px"><div class="kv-card"><div class="l">错误包触发数</div><div class="v delta good">−18%</div></div><div class="kv-card"><div class="l">新增误报</div><div class="v">0</div></div><div class="kv-card"><div class="l">不支持 Item</div><div class="v">2（LLD 过滤）</div></div></div>
+      <div class="xs muted mt8">对比口径：灰度批次 vs 未升级批次，同期 72 小时；退出门槛为误报不增加且采集延迟不上升。</div>
+    </div></div>
+    <div class="card"><div class="card-head"><h3>治理规则</h3></div><div class="card-body"><ul class="stack" style="gap:8px;font-size:12.5px;color:var(--text-2)">
+      <li class="row" style="align-items:flex-start;gap:8px">${icon('check-circle')}<span>发布前锁定版本与 checksum，产出变更说明；先小型资源池 / 20% 主机灰度，再全量。</span></li>
+      <li class="row" style="align-items:flex-start;gap:8px">${icon('check-circle')}<span>发现规则（LLD）设置资源上限，避免一次生成大量 Item / Trigger；退役先停止采集和告警。</span></li>
+      <li class="row" style="align-items:flex-start;gap:8px">${icon('check-circle')}<span>租户模板由租户提交、平台审核；不得引用其他租户对象；标准租户不获得任意 API 透传。</span></li>
+      <li class="row" style="align-items:flex-start;gap:8px">${icon('check-circle')}<span>每次新增主机组、成员变化和模板发布都要跑双租户回归（A / B 互换 hostid、itemid 均被拒绝）。</span></li>
+    </ul></div></div>
+  </div>`;
+  const tbl = App.table('#tpl', { rows: list, paginate: false, sortKey: 'layer', onRow: r => openDrawer(r), columns: [
+    { key: 'name', label: '模板', render: r => `<div class="primary-text">${esc(r.name)}</div><span class="sub-text">${DATA.LAYERS[r.layer]} · 负责：${esc(r.owner)}</span>` },
+    { key: 'version', label: '版本', render: r => `<span class="mono strong">v${r.version}</span>${r.draft ? `<span class="sub-text">草稿 v${r.draft.version}</span>` : ''}` },
+    { key: 'status', label: '状态', render: r => stBadge(r) + (r.status === 'canary' ? `<div class="meter warn mt8" style="width:90px"><i style="width:${r.canary}%"></i></div>` : ''), sortVal: r => ({ canary: 0, draft: 1, released: 2 })[r.status] },
+    { key: 'hosts', label: '主机', num: true, render: r => fmt.n(r.hosts) },
+    { key: 'items', label: 'Item / 触发器', num: true, render: r => `${r.items} / ${r.triggers}` },
+    { key: 'lld', label: 'LLD（上限）', num: true, render: r => r.lld ? `${r.lld}（${r.lldLimit}）` : '—' },
+    { key: 'macros', label: '受控宏', num: true, render: r => r.macros.length, sortVal: r => r.macros.length },
+    { key: 'tenants', label: '使用租户', render: r => r.tenants.map(t => `<span class="tag">${App.tenantName(t).slice(0, 2)}</span>`).join(' '), sortVal: r => r.tenants.length },
+    { key: 'updated', label: '更新', num: true, render: r => `<span class="small muted">${fmt.ago(r.updated)}</span>` },
+    { key: 'checksum', label: 'Checksum', render: r => `<span class="mono xs muted">${r.checksum}</span>`, sortable: false }
+  ] });
+  App.tabs(root, 'layer', (id) => { layer = id; tbl.update(id === 'all' ? list : list.filter(t => t.layer === id)); });
+  function openDrawer(t) {
+    App.drawer({ title: t.name, sub: `${DATA.LAYERS[t.layer]} · v${t.version} · ${t.checksum}`, width: 680, body: `
+      <div class="row wrap mb" style="gap:8px">${stBadge(t)}<span class="badge neutral">${t.hosts} 台主机</span><span class="badge neutral">${t.items} Item · ${t.triggers} 触发器</span>${t.lld ? `<span class="badge neutral">LLD ${t.lld} · 上限 ${t.lldLimit}</span>` : ''}</div>
+      ${t.canaryNote ? `<div class="callout warn mb">${icon('alert-triangle')}<div>${esc(t.canaryNote)}</div></div>` : ''}${t.draftNote ? `<div class="callout neutral mb">${icon('info')}<div>${esc(t.draftNote)}</div></div>` : ''}
+      <div class="tabs plain mb" data-group="d" style="border-bottom:1px solid var(--line)"><button data-tab="macros" class="active">受控宏 (${t.macros.length})</button><button data-tab="hist">版本历史</button><button data-tab="tenants">租户使用</button><button data-tab="diff">变更摘要</button></div>
+      <div class="tab-panel active" data-group="d" data-panel="macros">${t.macros.length ? `<table class="table dense"><thead><tr><th>宏</th><th>默认值</th><th>说明</th><th>租户覆盖</th></tr></thead><tbody>${t.macros.map(m => `<tr><td class="mono">${esc(m.m)}</td><td class="mono">${esc(m.v)}</td><td class="small muted">${esc(m.d)}</td><td>${m.m === '{$CPU.UTIL.CRIT}' ? '<span class="tag blue">华东 = 80</span>' : '<span class="faint">—</span>'}</td></tr>`).join('')}</tbody></table>` : '<div class="empty small">无受控宏</div>'}</div>
+      <div class="tab-panel" data-group="d" data-panel="hist"><div class="timeline">${(t.history.length ? t.history : [{ v: t.version, at: t.updated, note: '当前版本' }]).map((h, i) => `<div class="tl-item ${i === 0 ? 'ok' : ''}"><span class="tl-dot"></span><div class="tl-time">${fmt.dt(h.at)}</div><div class="tl-title small">v${h.v}${i === 0 ? ' <span class="tag blue">当前</span>' : ''}</div><div class="tl-desc xs">${esc(h.note)}</div></div>`).join('')}</div></div>
+      <div class="tab-panel" data-group="d" data-panel="tenants"><table class="table dense"><thead><tr><th>租户</th><th>主机</th><th>宏覆盖</th><th>版本</th></tr></thead><tbody>${t.tenants.map((tid, i) => `<tr><td>${App.tenantName(tid)}</td><td class="num">${Math.max(1, Math.round(t.hosts / t.tenants.length * (0.6 + i * .2)))}</td><td>${i === 0 && t.macros.length ? '1 项' : '—'}</td><td class="mono">v${t.status === 'canary' && i > 0 ? t.history[1] ? t.history[1].v : t.version : t.version}</td></tr>`).join('')}</tbody></table></div>
+      <div class="tab-panel" data-group="d" data-panel="diff"><div class="code"><span class="c"># v${t.version} vs 上一版本（模板 YAML 摘要）</span>
++ items: ${t.items} (+3)   triggers: ${t.triggers} (+1)   lld_limit: ${t.lldLimit}
++ macro {$AGENT.NODATA_TIMEOUT}: "3m"
+- trigger "boot partition low" (误报，移除)
+~ trigger "CPU high" duration 5m → avg(5m)
+<span class="c"># checksum ${t.checksum}</span></div></div>`, foot: isAdmin ? `<button class="btn" onclick="App.toast('已导出模板 YAML（含版本与 checksum）','info')">${icon('download')} 导出</button>${t.status === 'canary' ? `<button class="btn" onclick="App.toast('已推进灰度批次','ok')">推进灰度</button>` : t.status === 'released' ? `<button class="btn" onclick="App.toast('已创建新版本草稿 v' + '${t.version}'.replace(/\\d+$/, m => +m + 1),'ok')">新建版本</button>` : `<button class="btn primary" onclick="App.toast('已提交审核（双租户回归将自动运行）','ok');App.closeLayer()">提交审核</button>`}<button class="btn primary" data-close>关闭</button>` : `<button class="btn" onclick="App.toast('已提交宏覆盖申请，等待平台审核','ok')">申请宏覆盖</button><button class="btn primary" data-close>关闭</button>`, onOpen: (el) => App.tabs(el, 'd') });
+  }
+  if (App.qs('id')) { const t = list.find(x => x.id === App.qs('id')); if (t) openDrawer(t); }
+  const nb = document.getElementById('newBtn'); if (nb) nb.onclick = () => App.modal({ title: '新建模板版本', body: `<div class="form-grid"><div class="field"><label>基于模板</label><select class="select">${list.map(t => `<option>${esc(t.name)} v${t.version}</option>`).join('')}</select></div><div class="field"><label>新版本号</label><input class="input" value="3.3.0"></div><div class="field full"><label>变更说明</label><textarea class="input"></textarea></div><div class="field full"><label>发布策略</label><select class="select"><option>灰度 20% → 观察 72h → 全量</option><option>仅小型资源池 (pool-south-01)</option></select></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('已创建草稿并触发双租户回归','ok');App.closeLayer()">创建草稿</button>` });
+  const ib = document.getElementById('importBtn'); if (ib) ib.onclick = () => App.toast('已从模板仓库拉取 main@a91f2c：3 个模板有新版本待发布', 'info');
+  const rb = document.getElementById('reqBtn'); if (rb) rb.onclick = () => App.modal({ title: '申请租户模板', body: `<div class="callout info mb">${icon('info')}<div>租户可提交业务服务层模板（Web 场景 / HTTP API / 自定义指标）。平台审核命名规范、单位与 LLD 上限后发布，仅对本租户可见。</div></div><div class="form-grid"><div class="field"><label>模板名称</label><input class="input" placeholder="例如 Web 场景 · 会员中心"></div><div class="field"><label>层级</label><select class="select"><option>业务服务</option></select></div><div class="field full"><label>YAML / 说明</label><textarea class="input" placeholder="粘贴模板 YAML 或描述监控项…"></textarea></div></div>`, foot: `<button class="btn" data-close>取消</button><button class="btn primary" onclick="App.toast('已提交，等待平台审核','ok');App.closeLayer()">提交</button>` });
+});
+</script>
+</body>
+</html>

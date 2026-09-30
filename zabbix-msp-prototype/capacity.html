@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>容量估算 · MSP 托管运维平台</title>
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/enterprise.css?v=20260929-layout-3">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/contract-model.js?v=20260929-reference-2"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shell.js?v=20260929-reference-2"></script>
+<script>
+App.page('capacity', (root, ctx) => {
+  const { fmt, esc, icon } = App;
+  const D0 = DATA.capacityDefaults;
+  const F = [['hosts', '主机数（台）', 1, 1000000], ['items', '每台有效 Item（个）', 1, 100000], ['interval', '平均采样间隔（秒）', 1, 86400], ['days', '历史保留（天）', 1, 3650], ['bytes', '有效历史存储（字节 / 值）', 16, 100000], ['numeric', '启用趋势的数值项（%）', 0, 100], ['trenddays', '趋势保留（天）', 1, 3650], ['margin', '运行空间余量（%）', 0, 500]];
+  root.innerHTML = `
+  <div class="page-head"><div><h1>容量估算 <span class="badge neutral">平台视角</span></h1><div class="sub">按有效 Item、更新频率、写入值数和查询负载测算，不能仅按主机数采购。以下模型假设均匀周期采集，结果均为<b>未压缩粗估</b>，不是已测吞吐。</div></div>
+    <div class="page-actions"><button class="btn" id="reset">${icon('refresh')} 恢复默认参数</button><button class="btn" id="saveScn">${icon('download')} 保存为压测场景</button></div></div>
+  <div class="grid g-2-1" style="align-items:start">
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>可调整的容量模型 <span class="badge warn">估算假设 · 默认 5,000 台主机</span></h3></div><div class="card-body"><div class="form-grid" style="grid-template-columns:repeat(4,1fr)">${F.map(f => `<div class="field"><label>${f[1]}</label><input class="input num" type="number" id="${f[0]}" min="${f[2]}" max="${f[3]}" step="1" value="${D0[f[0]]}"></div>`).join('')}</div><div class="xs delta bad mt8" id="err" style="min-height:16px"></div>
+        <div class="grid g3 mt" style="gap:12px" id="out"></div>
+        <div class="xs muted mt">使用十进制单位：1 GB = 10⁹ 字节，1 TB = 10¹² 字节。80 字节 / 值与 128 字节 / 趋势行是包含索引等摊销的测算参数，需实测校准；不计压缩收益。运行余量不替代 WAL 峰值、数据库副本、备份、业务库、事件及日志的单独预算。</div></div></div>
+      <div class="card"><div class="card-head"><h3>容量随主机数增长 <span class="sub">单节点 · TB（含余量）</span></h3></div><div class="card-body" id="growth"></div></div>
+    </div>
+    <div class="stack">
+      <div class="card"><div class="card-head"><h3>计算依据</h3></div><div class="card-body"><div class="code" style="font-size:11.5px">NVPS       = 主机数 × 每台有效 Item ÷ 采样间隔
+历史字节   = NVPS × 86,400 × 历史天数 × 每值字节
+趋势字节   = 主机数 × Item × 数值项比例 × 24 × 趋势天数 × 128
+单节点容量 = (历史字节 + 趋势字节) × (1 + 余量比例)</div></div></div>
+      <div class="card"><div class="card-head"><h3>当前池实际 vs 模型</h3></div><div class="card-body flush"><table class="table dense"><thead><tr><th>池</th><th class="num">NVPS</th><th class="num">模型日写入</th><th class="num">实际库大小</th></tr></thead><tbody>${DATA.pools.filter(p => p.nvps).map(p => `<tr><td class="mono small">${p.id}</td><td class="num">${fmt.n(p.nvps)}</td><td class="num">${fmt.n(p.nvps * 86400 * 80 / 1e9, 1)} GB</td><td class="num">${fmt.n(p.db.size / 1e12, 2)} TB</td></tr>`).join('')}</tbody></table><div class="xs muted" style="padding:8px 18px">实际库大小含压缩收益与索引；用真实模板逐步放量校准字节系数。</div></div></div>
+      <div class="card"><div class="card-head"><h3>PoC 与验证目标</h3></div><div class="card-body small" style="color:var(--text-2)"><ul class="stack" style="gap:6px"><li>· PoC：200 主机 × 100 Item × 60 s ≈ 333 NVPS</li><li>· 起步资源：API / Worker 4C8G · Server 4C8G · 监控 PG 8C16G · Proxy 2C4G（实验起点，非 5,000 台规格保证）</li><li>· 验收：12,500 NVPS 回放稳定 24 小时；2 倍峰值 30 分钟不静默丢弃</li><li>· 存储分层：标准池历史 30 天、趋势 365 天；更长原始数据用独享池或受控离线导出</li></ul></div></div>
+      <div class="card"><div class="card-head"><h3>Proxy 缓冲测算</h3></div><div class="card-body"><div class="form-grid"><div class="field"><label>站点 NVPS</label><input class="input" id="p-nvps" type="number" value="250"></div><div class="field"><label>最长断网（小时）</label><input class="input" id="p-h" type="number" value="8"></div></div><div class="row between mt12"><span class="small muted">本地缓冲磁盘需求（×1.4 余量）</span><b id="p-out" class="num"></b></div><div class="xs muted mt8">按站点 NVPS × 最长断网秒数 × 实测每值空间 × 余量测量本地磁盘，并核查缓冲参数。</div></div></div>
+    </div>
+  </div>`;
+  const inputs = F.map(f => document.getElementById(f[0]));
+  function calc() {
+    const bad = inputs.find(el => el.value === '' || !el.validity.valid || !Number.isFinite(el.valueAsNumber)); const err = document.getElementById('err');
+    inputs.forEach(el => el.classList.remove('invalid'));
+    if (bad) { bad.classList.add('invalid'); err.textContent = '请填写范围内的有效整数；暂不显示估算结果。'; document.getElementById('out').innerHTML = ''; return; }
+    err.textContent = '';
+    const v = Object.fromEntries(inputs.map(el => [el.id, el.valueAsNumber]));
+    const nv = v.hosts * v.items / v.interval, daily = nv * 86400 * v.bytes, history = daily * v.days, trends = v.hosts * v.items * v.numeric / 100 * 24 * v.trenddays * 128, prov = (history + trends) * (1 + v.margin / 100);
+    const cells = [['平均 NVPS', fmt.n(nv, nv < 10 ? 2 : 0), '值 / 秒'], ['每天历史数据', fmt.n(daily / 1e9, 2) + ' GB', '未压缩'], ['历史数据总量', fmt.n(history / 1e12, 2) + ' TB', `${v.days} 天 · 未压缩`], ['趋势数据', fmt.n(trends / 1e9, 2) + ' GB', `${v.trenddays} 天 · 128 字节 / 行`], ['单节点估算', fmt.n(prov / 1e12, 2) + ' TB', '历史 + 趋势 + 余量'], ['主备两份', fmt.n(prov * 2 / 1e12, 2) + ' TB', '另加 WAL / 备份'], ['2 倍峰值验证目标', fmt.n(nv * 2, nv < 10 ? 2 : 0), '值 / 秒 · 持续 30 分钟'], ['有效 Item 总数', fmt.compact(v.hosts * v.items), `日均 ${fmt.compact(nv * 86400)} 个值`], ['建议资源池数', Math.max(1, Math.ceil(nv / 5000)), '按单池 5,000 NVPS 压测上限']];
+    document.getElementById('out').innerHTML = cells.map(c => `<div class="kv-card" style="background:var(--primary-50);border-color:var(--primary-100)"><div class="l">${c[0]}</div><div class="v" style="font-size:20px;color:var(--primary-700)">${c[1]}</div><div class="xs muted">${c[2]}</div></div>`).join('');
+    const hs = [500, 1000, 2000, 3000, 5000, 8000, 10000, 15000, 20000];
+    Charts.bar(document.getElementById('growth'), { height: 220, categories: hs.map(h => fmt.compact(h)), series: [{ name: '历史 TB', data: hs.map(h => h * v.items / v.interval * 86400 * v.bytes * v.days / 1e12), color: '#2563eb' }, { name: '趋势 TB', data: hs.map(h => h * v.items * v.numeric / 100 * 24 * v.trenddays * 128 / 1e12), color: '#93c5fd' }], stacked: true, yFormat: x => x.toFixed(1), unit: ' TB' });
+  }
+  inputs.forEach(el => el.addEventListener('input', calc)); calc();
+  document.getElementById('reset').onclick = () => { inputs.forEach(el => el.value = D0[el.id]); calc(); App.toast('已恢复默认参数', 'info', 1200); };
+  document.getElementById('saveScn').onclick = () => App.toast('已保存压测场景 scn-' + App.uid() + '（含参数与版本基线），可用于容量回放', 'ok');
+  const pcalc = () => { const v = +document.getElementById('p-nvps').value * +document.getElementById('p-h').value * 3600 * 80 * 1.4; document.getElementById('p-out').textContent = fmt.bytes(v); }; ['p-nvps', 'p-h'].forEach(id => document.getElementById(id).oninput = pcalc); pcalc();
+});
+</script>
+</body>
+</html>

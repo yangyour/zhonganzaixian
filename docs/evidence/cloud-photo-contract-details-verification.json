@@ -1,0 +1,23 @@
+{
+  "recorded_at": "2026-10-01T05:38:07.592455+00:00",
+  "scope": "Photo contract descriptions: unspecified MIME and grant/session error distinction",
+  "status": "PASSED_PURE_CONTRACT_ONLY",
+  "commands": [
+    "node tools/build-api-contract.mjs",
+    "node tests/contracts.test.mjs",
+    "npm run contract:check"
+  ],
+  "tests": 7,
+  "new_test_cases": 0,
+  "failed": 0,
+  "skipped": 0,
+  "limitations": [
+    "Description-only correction; unchanged schema and existing seven cases.",
+    "No real HTTP/framework or component verification."
+  ],
+  "source_sha256": {
+    "tools/build-api-contract.mjs": "bc388bcc34d608e9dd65aea93a2970cae1eb395b18354b16b0ee52ae356229b3",
+    "contracts/local-api.openapi.json": "b8a69ef40a8f7ee08bfdb9bc052d5d34e529ab202c80e2bbb626206460a0d1d4",
+    "tests/contracts.test.mjs": "003c5a6ebf96791a573f51c5699f83f4182cea3da28824d1f27b1ec12fc4ec9d"
+  }
+}

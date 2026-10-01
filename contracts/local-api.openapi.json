@@ -4365,7 +4365,7 @@
     "/files/{id}/content": {
       "get": {
         "operationId": "readReportPhotoContent",
-        "summary": "通过当前会话及持久grant回读原图；读前后复核授权，过期/撤权/其他主体404",
+        "summary": "通过当前会话及持久grant回读原图；读前后复核授权。grant过期、权限版本失配或其他主体404；会话失效401，当前动作权限不足403",
         "parameters": [
           {
             "name": "id",
@@ -6272,7 +6272,7 @@
             "type": "string",
             "format": "binary",
             "x-mop-max-bytes": 5000000,
-            "description": "原图不重编码；仅jpg/jpeg/png文件名，声明MIME与扩展及真实解码内容须一致。每张1..5_000_000 bytes；尺寸<=16_384且像素<=25_000_000为技术解码防护。未知/重复part及超大multipart均400。"
+            "description": "原图不重编码；仅jpg/jpeg/png文件名，扩展名须匹配真实解码内容。未声明MIME或application/octet-stream视为未指定声明；其余声明MIME须匹配实际类型。每张1..5_000_000 bytes；尺寸<=16_384且像素<=25_000_000为技术解码防护。未知/重复part及超大multipart均400。"
           },
           "purpose": {
             "const": "customer_report_photo"

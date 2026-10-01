@@ -1,0 +1,74 @@
+{
+  "recorded_at": "2026-10-01T04:36:37.240933+00:00",
+  "branch": "handoff/cloud-20261001-photos",
+  "handoff_base": "caff027d7e1fb2e65f0babf8b6de0369b46fe48e",
+  "scope": "PhotoUpload and PhotoRules standalone guards; real complete domain-source compilation",
+  "status": "PASSED_PURE_GUARDS_ONLY",
+  "compiler": "JDK 17 javac",
+  "compile_scope": [
+    "server/domain/src/main/java/cn/mop/domain/ConfigurationRevisionWorkflow.java",
+    "server/domain/src/main/java/cn/mop/domain/Asset.java",
+    "server/domain/src/main/java/cn/mop/domain/PhotoUpload.java",
+    "server/domain/src/main/java/cn/mop/domain/PhotoObjectStore.java",
+    "server/domain/src/main/java/cn/mop/domain/FixtureUser.java",
+    "server/domain/src/main/java/cn/mop/domain/AssetRepository.java",
+    "server/domain/src/main/java/cn/mop/domain/PlatformRepository.java",
+    "server/domain/src/main/java/cn/mop/domain/Membership.java",
+    "server/domain/src/main/java/cn/mop/domain/CustomerReport.java",
+    "server/domain/src/main/java/cn/mop/domain/Capabilities.java",
+    "server/domain/src/main/java/cn/mop/domain/Tenant.java",
+    "server/domain/src/main/java/cn/mop/domain/RepositoryMetadata.java",
+    "server/domain/src/main/java/cn/mop/domain/DomainException.java",
+    "server/domain/src/main/java/cn/mop/domain/CustomerReportRegistration.java",
+    "server/domain/src/main/java/cn/mop/domain/PhotoRules.java",
+    "server/domain/src/main/java/cn/mop/domain/ProfilePolicy.java"
+  ],
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/ConfigurationRevisionWorkflow.java": "501945a8d1b0ac99bbc843e6b04ccbd0bca8b15b38d0d41c9946043f1f5d0baf",
+    "server/domain/src/main/java/cn/mop/domain/Asset.java": "43b129a2062884e38b4bd09775cd54cf802c64f72d0dc7144bfcbd5acba6ad3d",
+    "server/domain/src/main/java/cn/mop/domain/PhotoUpload.java": "10f4945f1830342d5dcdb8a48a71eaf63ef99ef45863975f2e00ffa486354679",
+    "server/domain/src/main/java/cn/mop/domain/PhotoObjectStore.java": "4ac2f132216f739129f50ceaf7e31b317a868f1812449351533b593c5dc612a0",
+    "server/domain/src/main/java/cn/mop/domain/FixtureUser.java": "9728d0bd9c79685ed47d25a3bedc90fc5633195eec46a2c2a1c20a350ac1ec29",
+    "server/domain/src/main/java/cn/mop/domain/AssetRepository.java": "7b6eb9057234c45bdccb8726793ffe05e9824b38c4d5c749c1e5c7dd03fd33fa",
+    "server/domain/src/main/java/cn/mop/domain/PlatformRepository.java": "11096658772fac7fc7f5646d51f17ece61b49b48abb0884606747c1bb554e2e8",
+    "server/domain/src/main/java/cn/mop/domain/Membership.java": "84c1088eef7666bcae39addf15983094115e0940c4f10712e18252b7914ac6f2",
+    "server/domain/src/main/java/cn/mop/domain/CustomerReport.java": "88cc8b7e33564410420c9a010e94c0a7b174809c261bcbae9e7ec855b0802e42",
+    "server/domain/src/main/java/cn/mop/domain/Capabilities.java": "673e0f7930343ff2a76b17c8bf1a3ab9fc162fa7440b6d2d69f021a5bd3eb1d2",
+    "server/domain/src/main/java/cn/mop/domain/Tenant.java": "70abfa601e301e4720cdfc8068f83ca195b66a8658f3c502e0b2b02b00a4510b",
+    "server/domain/src/main/java/cn/mop/domain/RepositoryMetadata.java": "f10164f2015ecafd6c37a7c2b00e679d6df77e47f4b5baab557113c30348afa7",
+    "server/domain/src/main/java/cn/mop/domain/DomainException.java": "fbd8389e27ea7cbe9821bcd1bfb68c37b30b9a760161b96780700a8e04fa4861",
+    "server/domain/src/main/java/cn/mop/domain/CustomerReportRegistration.java": "29d43c1fca25f393f546ef4a0b5e3cf03e48727a5133997aa4e53c2596b03b7e",
+    "server/domain/src/main/java/cn/mop/domain/PhotoRules.java": "66a69a239ee2c8fc3f9b35531df304e1169854cc2c6144729cf3f135c57b70bd",
+    "server/domain/src/main/java/cn/mop/domain/ProfilePolicy.java": "7327ec8964dc1790ccfd3219128d9b677dad5ec7ed954f43ab1351b8c7087da3"
+  },
+  "guard_program": {
+    "assertion_count": 8,
+    "assertions": [
+      "original_byte_array_isolation",
+      "accepted_hash_and_size_guard",
+      "changed_hash_rejected",
+      "unsafe_filename_rejected",
+      "oversize_rejected",
+      "stable_unique_attachment_order",
+      "three_reference_limit",
+      "bounded_retry_delay"
+    ]
+  },
+  "execution_record": ".local/cloud-validation/photo-pure-jdk-verification.json",
+  "runner": "bash .local/cloud-validation/verify-photo-pure-jdk.sh",
+  "harness_delivery": "Local ignored harness; runner and harness are not included in Git delivery",
+  "not_run": [
+    "JUnit PhotoRulesTest (5)",
+    "Maven module/reactor build",
+    "PostgreSQL integration",
+    "MinIO integration",
+    "HTTP/OIDC integration",
+    "V5 migration"
+  ],
+  "limitations": [
+    "8 standalone assertions are not the 5 JUnit tests",
+    "No framework stubs; real domain sources compiled",
+    "Does not validate worker settings, lease/fencing SQL, storage or controllers",
+    "All 128 contract TC remain NOT_RUN; this guard scope does not complete photo business or M5-5/M8-6"
+  ]
+}

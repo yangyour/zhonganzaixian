@@ -1,0 +1,58 @@
+{
+  "recorded_at": "2026-10-01T04:51:36.103843+00:00",
+  "branch": "handoff/cloud-20261001-photos",
+  "handoff_base": "caff027d7e1fb2e65f0babf8b6de0369b46fe48e",
+  "scope": "photo frontend original requests, durable-state queries, CAS append and authorized content flows",
+  "status": "PASSED_ISOLATED_FRONTEND_ONLY",
+  "checks": {
+    "status": "PASSED_PURE_TEST_TYPECHECK_BUILD_ONLY",
+    "commands": [
+      "npm test (cwd: apps/web)",
+      "npm run build (cwd: apps/web)"
+    ],
+    "files": 7,
+    "tests": 49,
+    "historical_cases": 21,
+    "new_cases": 28,
+    "case_breakdown": {
+      "client": 12,
+      "photo": 6,
+      "photoQueue": 11,
+      "photoAttachments": 6,
+      "ticket": 6,
+      "configurationRevision": 5,
+      "configuration": 3
+    },
+    "vue_tsc": "PASSED",
+    "vite_build": "PASSED",
+    "new_dependencies": 0,
+    "bundle_kB": {
+      "main": 464.07,
+      "main_gzip": 164.36,
+      "TicketsPage": 47.41,
+      "TicketsPage_gzip": 15.61
+    },
+    "bundle_warning": false,
+    "limitations": "No real HTTP, component browser, mobile capture or enterprise-WeChat evidence"
+  },
+  "source_sha256": {
+    "apps/web/src/api/client.ts": "129ac67764cd40e788c0895c88d185fc60a80db2b8d1d2f2775562dff00514d1",
+    "apps/web/src/components/TicketReportForm.vue": "179590c368485899a4c9436a1fddc9c803c2421fadd1d763f37e2d3a3a159f2a",
+    "apps/web/src/pages/TicketsPage.vue": "7f7e99cf1ae5621878cecacfe895d7be6ae4f28c9d5c9e768dbd874f6548c026",
+    "apps/web/src/utils/photo.ts": "216b60c01e0dce7416f83a4af53d461b31e357a384b27ec8622a3ad54988b2a7",
+    "apps/web/src/utils/photoQueue.ts": "c536503172b1b24fbb79e77d2a1b703b8415c9b863c8cc5594971d4363843c47",
+    "apps/web/tests/client.test.ts": "4a6ee2a4595b4fe7862c026b19cefba8c629083970a96174bef546bd9a09e3f9",
+    "apps/web/src/components/ReportPhotoPanel.vue": "9d4121e5fb644b66fa4c725294c168ec4c6bf4d9caf96a753d15d1fef54f8c3d",
+    "apps/web/src/utils/photoAttachments.ts": "0dd0150228b23110935b90f96deb7555623f144d70e328e585a1d5cbe37aee67",
+    "apps/web/tests/photo.test.ts": "c5cfd5fe687303435e8f0e18b36bd48fb3d708e1a4c399a33c02a8c72ad8c183",
+    "apps/web/tests/photoAttachments.test.ts": "c715f281b7d2fc750e72ea900424806d3bd1d37eab222186ec382872174a9d84",
+    "apps/web/tests/photoQueue.test.ts": "0d723f77c932054b8c45fb0aa61b3dc342710640e6cf6e0be412b0202aef4609"
+  },
+  "not_run": [
+    "designated PostgreSQL/MinIO/OIDC",
+    "actual photo HTTP contract",
+    "1440/390px browser acceptance",
+    "mobile camera and WeChat acceptance"
+  ],
+  "business_status": "PARTIAL; full photo business and all 128 contract TCs not completed"
+}

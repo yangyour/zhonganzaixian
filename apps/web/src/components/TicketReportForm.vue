@@ -2,11 +2,14 @@
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import { ElRadio, ElRadioGroup } from 'element-plus'
 import { api, ApiError, isCancelled } from '../api/client'
-import type { Asset, AssetPage, CustomerReportAcceptance, CustomerReportOperation } from '../api/types'
+import type { Asset, AssetPage, CustomerReportAcceptance, CustomerReportOperation, RegisteredTicket } from '../api/types'
 import { can, contextGeneration, session } from '../stores/session'
 import { displayTime } from '../utils/display'
 import { emptyReportForm, impactScopeLabel, isTicketUuid, parseCustomerReport, prepareReportAttempt, ReportValidationError, ticketCategories, ticketIdFromResultRef, urgencyLabel, type ReportSubmissionAttempt } from '../utils/ticket'
 import ApiErrorNotice from './ApiErrorNotice.vue'
+import ReportPhotoPanel from './ReportPhotoPanel.vue'
+import { createPhotoQueue } from '../utils/photoQueue'
+import { createPhotoAppender } from '../utils/photoAttachments'
 
 const props = defineProps<{ modelValue: boolean }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean]; accepted: [operationId: string]; registered: [ticketId: string] }>()
@@ -32,24 +35,31 @@ let operationController: AbortController | undefined
 let writeGeneration = 0
 let operationGeneration = 0
 const complete = ref(false)
+const photos = createPhotoQueue()
+const registeredTicket = ref<RegisteredTicket | null>(null)
+const appender = createPhotoAppender(registeredTicket, photos)
 const uncertain = computed(() => attempt.value?.state === 'uncertain')
 const locked = computed(() => submitting.value || uncertain.value || Boolean(acceptedOperationId.value))
-const busy = computed(() => submitting.value || operationLoading.value)
+const busy = computed(() => submitting.value || operationLoading.value || appender.busy.value)
+const unresolvedPhotos = computed(() => photos.rows.value.some(row => !registeredTicket.value?.attachments.some(photo => photo.id === row.record?.id)))
 
 function reset() {
   assetsController?.abort(); reportController?.abort(); operationController?.abort()
   ++assetsGeneration; ++writeGeneration; ++operationGeneration
   Object.assign(form, emptyReportForm()); fieldErrors.value = {}; assets.value = []; assetsLoading.value = false; assetsError.value = null; assetsHasMore.value = false
   attempt.value = null; submitting.value = false; submitError.value = null; acceptedOperationId.value = ''; operation.value = null; operationLoading.value = false; operationError.value = null; complete.value = false
+  photos.clear(); registeredTicket.value = null; appender.reset()
 }
 watch(() => props.modelValue, value => {
   if (value) {
-    if (!attempt.value || complete.value) reset()
+    if (complete.value && !unresolvedPhotos.value) reset()
     if (!locked.value) void loadAssets()
+    if (!photos.policy.value) void photos.loadPolicy()
   } else { assetsController?.abort(); ++assetsGeneration; assetsLoading.value = false }
 })
-watch(contextGeneration, () => { reset(); open.value = false }, { flush: 'sync' })
-onUnmounted(reset)
+watch(() => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version], () => { reset(); open.value = false }, { flush: 'sync' })
+onUnmounted(() => { reset(); photos.dispose(); appender.dispose() })
+watch(appender.comparison, value => { if (value && registeredTicket.value) emit('registered', registeredTicket.value.id) })
 async function loadAssets() {
   if (!can('assets:read')) { assets.value = []; return }
   assetsController?.abort(); const controller = new AbortController(); assetsController = controller
@@ -71,12 +81,17 @@ async function readRegistration() {
   try {
     const result = await api.request<CustomerReportOperation>(`/operations/${encodeURIComponent(acceptedOperationId.value)}`, { signal: controller.signal })
     if (generation !== operationGeneration || writeContext !== writeGeneration) return
-    if (!isTicketUuid(result.id) || result.id.toLowerCase() !== acceptedOperationId.value || result.kind !== 'CUSTOMER_REPORT_REGISTRATION'
+    if (!result || !isTicketUuid(result.id) || result.id.toLowerCase() !== acceptedOperationId.value || result.kind !== 'CUSTOMER_REPORT_REGISTRATION'
       || result.status !== 'PENDING' || result.step !== 'AWAITING_TICKET_CONFIGURATION' || result.progress !== null) throw new ApiError(200, 'INVALID_RESPONSE', '登记结果返回异常，请重新查询；本次报障不会再次提交', '—')
     operation.value = result
     const ticketId = ticketIdFromResultRef(result.result_ref)
     if (!ticketId) throw new ApiError(200, 'INVALID_RESULT_REFERENCE', '登记结果引用不符合本应用路径，请重新查询；不会打开外部地址或再次提交', '—')
-    complete.value = true; open.value = false
+    const detail = await api.request<RegisteredTicket>(`/tickets/${ticketId}`, { signal: controller.signal })
+    if (generation !== operationGeneration || writeContext !== writeGeneration) return
+    if (!detail || detail.id !== ticketId || detail.tenant_id !== session.value?.tenant.id || detail.reporter_id !== session.value?.user.id || !Array.isArray(detail.attachments)) throw new ApiError(200, 'INVALID_RESPONSE', '登记详情与当前报障主体不一致，请重查；不会重新提交报障', '—')
+    registeredTicket.value = detail; photos.reconcile(detail.attachments)
+    complete.value = true
+    if (!photos.rows.value.length) open.value = false
     emit('registered', ticketId)
   } catch (cause) { if (!isCancelled(cause) && generation === operationGeneration && writeContext === writeGeneration) operationError.value = cause }
   finally { if (generation === operationGeneration && writeContext === writeGeneration) operationLoading.value = false }
@@ -84,7 +99,7 @@ async function readRegistration() {
 async function submitReport() {
   if (!permitted.value || submitting.value || acceptedOperationId.value) return
   try {
-    const body = uncertain.value && attempt.value ? attempt.value.body : parseCustomerReport(form, assets.value.map(item => item.id))
+    const body = uncertain.value && attempt.value ? attempt.value.body : { ...parseCustomerReport(form, assets.value.map(item => item.id)), attachment_ids: photos.readyIds() }
     attempt.value = prepareReportAttempt(attempt.value, body); fieldErrors.value = {}
   } catch (cause) {
     if (cause instanceof ReportValidationError) fieldErrors.value = cause.fields
@@ -99,7 +114,7 @@ async function submitReport() {
   try {
     const result = await api.request<CustomerReportAcceptance>('/tickets', { method: 'POST', body: currentAttempt.body, idempotencyKey: currentAttempt.key, signal: controller.signal })
     if (generation !== writeGeneration) return
-    if (result.status !== 'PENDING' || !isTicketUuid(result.operation_id)) throw new ApiError(200, 'INVALID_RESPONSE', '提交响应无法确认，请保留原填写内容并使用原请求重试', '—')
+    if (!result || result.status !== 'PENDING' || !isTicketUuid(result.operation_id)) throw new ApiError(200, 'INVALID_RESPONSE', '提交响应无法确认，请保留原填写内容并使用原请求重试', '—')
     currentAttempt.state = 'accepted'; acceptedOperationId.value = result.operation_id.toLowerCase()
     emit('accepted', acceptedOperationId.value)
     await readRegistration()
@@ -131,9 +146,11 @@ async function submitReport() {
       <div class="ticket-contact-fields"><el-form-item label="联系人" :error="fieldErrors.contact_name"><el-input v-model="form.contact_name" placeholder="本次报障联系人" aria-label="报障联系人" /></el-form-item><el-form-item label="联系电话" :error="fieldErrors.contact_phone"><el-input v-model="form.contact_phone" type="tel" placeholder="例如：+86 138 0000 0000" aria-label="报障联系电话" /></el-form-item></div>
       <p class="field-help">联系方式仅作为填报信息，尚未核验与账号的绑定关系。</p>
       <el-form-item label="紧急程度（仅供参考）" :error="fieldErrors.urgency"><el-radio-group v-model="form.urgency" class="ticket-choice-group" aria-label="紧急程度"><el-radio v-for="(label, value) in urgencyLabel" :key="value" :value="value">{{ label }}</el-radio></el-radio-group></el-form-item>
-      <el-alert type="info" :closable="false" show-icon title="可以先不带图片登记。图片上传及补传尚未实现；图片能力未接入不会取消已经登记的报障。" />
       <p class="field-help">同一设备、同分类的短时间重复提交可能返回已有记录。请核对回读详情；已有描述与联系信息不会被覆盖。</p>
     </el-form>
+    <el-alert v-if="registeredTicket" type="info" :closable="false" :title="`已回读登记 ${registeredTicket.receipt_no} · v${registeredTicket.version}。正文和联系方式以详情为准，重复报障不会覆盖已有内容。`" />
+    <ReportPhotoPanel :queue="photos" :existing="registeredTicket?.attachments || []" :disabled="submitting || uncertain" :appender="registeredTicket ? appender : undefined" />
+    <p v-if="acceptedOperationId && !registeredTicket" class="field-help">报障已受理。请查询登记结果后追加照片，图片处理失败不会取消报障。</p>
     <template #footer><el-button :disabled="busy" @click="open = false">{{ uncertain || acceptedOperationId ? '关闭并保留本次填写' : '取消' }}</el-button><el-button v-if="acceptedOperationId" type="primary" :loading="operationLoading" :disabled="submitting" @click="readRegistration">重新查询登记结果</el-button><el-button v-else type="primary" :loading="submitting" :disabled="!permitted" @click="submitReport">{{ uncertain ? '使用原请求重试' : '提交报障登记' }}</el-button></template>
   </el-dialog>
 </template>

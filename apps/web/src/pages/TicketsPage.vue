@@ -10,6 +10,9 @@ import { impactScopeLabel, ticketCategories, urgencyLabel } from '../utils/ticke
 import AppTable from '../components/AppTable.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import TicketReportForm from '../components/TicketReportForm.vue'
+import ReportPhotoPanel from '../components/ReportPhotoPanel.vue'
+import { createPhotoQueue } from '../utils/photoQueue'
+import { createPhotoAppender } from '../utils/photoAttachments'
 
 const route = useRoute(), router = useRouter()
 const queryString = (key: string) => typeof route.query[key] === 'string' ? route.query[key] as string : ''
@@ -59,18 +62,32 @@ const detailOpen = computed({ get: () => Boolean(queryString('ticket_id')), set:
 const ticket = ref<RegisteredTicket | null>(null)
 const detailError = ref<unknown>(null)
 const detailLoading = ref(false)
+const detailPhotos = createPhotoQueue()
+const photoTargetId = ref('')
+const appendTicket = ref<RegisteredTicket | null>(null)
+const detailAppender = createPhotoAppender(appendTicket, detailPhotos)
+const unresolvedPhotos = computed(() => detailAppender.uncertain.value || detailPhotos.rows.value.some(row => row.record?.ticket_id !== photoTargetId.value))
+const matchingPhotoTarget = computed(() => ticket.value?.id === photoTargetId.value)
+watch(appendTicket, result => { if (result && result.id === queryString('ticket_id')) { ticket.value = result; void loadTickets() } })
 let detailController: AbortController | undefined
 let detailGeneration = 0
 watch(() => queryString('ticket_id'), id => { void loadDetail(id) }, { immediate: true })
 async function loadDetail(id = queryString('ticket_id')) {
   detailController?.abort(); const controller = new AbortController(); detailController = controller
   const generation = ++detailGeneration
+  if (id !== photoTargetId.value) {
+    detailPhotos.releaseContent()
+    if (!unresolvedPhotos.value) { detailPhotos.clear(); detailAppender.reset(); appendTicket.value = null; photoTargetId.value = id }
+  }
   ticket.value = null; detailError.value = null
   if (!id) { detailLoading.value = false; return }
   detailLoading.value = true
   try {
     const result = await api.request<RegisteredTicket>(`/tickets/${encodeURIComponent(id)}`, { signal: controller.signal })
-    if (generation === detailGeneration) ticket.value = result
+    if (generation === detailGeneration) {
+      ticket.value = result
+      if (id === photoTargetId.value) { appendTicket.value = result; detailPhotos.reconcile(result.attachments); if (mayReport.value && !detailPhotos.policy.value) void detailPhotos.loadPolicy() }
+    }
   } catch (cause) { if (!isCancelled(cause) && generation === detailGeneration) detailError.value = cause }
   finally { if (generation === detailGeneration) detailLoading.value = false }
 }
@@ -91,9 +108,10 @@ function resetContext() {
   listController?.abort(); detailController?.abort(); ++listGeneration; ++detailGeneration
   rows.value = []; nextCursor.value = null; hasMore.value = false; cursorHistory.value = []; loading.value = false; error.value = null
   ticket.value = null; detailError.value = null; detailLoading.value = false; createOpen.value = false; acceptedOperationId.value = ''
+  detailPhotos.clear(); detailAppender.reset(); appendTicket.value = null; photoTargetId.value = ''
 }
-watch(contextGeneration, resetContext, { flush: 'sync' })
-onUnmounted(resetContext)
+watch(() => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version], resetContext, { flush: 'sync' })
+onUnmounted(() => { resetContext(); detailPhotos.dispose(); detailAppender.dispose() })
 </script>
 
 <template>
@@ -102,6 +120,7 @@ onUnmounted(resetContext)
     <div class="scope-card"><div><span class="small-label">当前租户</span><strong>{{ session?.tenant.name }}</strong></div><div><span class="small-label">本页登记</span><strong>{{ loading ? '—' : rows.length }} <small>项</small></strong></div><div class="scope-explanation">{{ customerView ? '客户仅查看本人记录。联系方式尚未核验，紧急程度仅供参考。' : '内部人员只读查看当前租户记录；本页不提供接单或解决动作。' }}</div></div>
     <el-alert class="page-note" type="warning" :closable="false" show-icon title="一期已选择本平台为工单权威。当前报障可登记与查询；正式状态、SLA 时限和处理资格规则仍待落实。" />
     <el-alert v-if="acceptedOperationId" class="page-note" type="info" :closable="false" show-icon title="报障已耐久登记，正式工单规则待确认。登记结果以详情回读为准，不重复提交或推断为外部建单成功。" />
+    <div v-if="unresolvedPhotos && photoTargetId && queryString('ticket_id') !== photoTargetId" class="panel photo-retained-note"><p>另一个登记的照片选择和原请求仍保留在本页。</p><el-button @click="openDetail(photoTargetId)">返回原登记继续处理照片</el-button></div>
     <div class="panel">
       <el-form :inline="true" class="filter-form ticket-filter-form" @submit.prevent="applyFilters"><el-form-item label="搜索"><el-input v-model="filters.q" clearable placeholder="登记号 / 标题 / 描述" aria-label="搜索报障登记" /></el-form-item><el-form-item label="故障分类"><el-select v-model="filters.category" clearable placeholder="全部分类" aria-label="报障分类筛选"><el-option v-for="category in ticketCategories" :key="category" :label="category" :value="category" /></el-select></el-form-item><el-form-item label="紧急程度"><el-select v-model="filters.urgency" clearable placeholder="全部程度" aria-label="报障紧急程度筛选"><el-option label="一般" value="normal" /><el-option label="很急（参考）" value="urgent" /></el-select></el-form-item><el-form-item class="filter-actions"><el-button type="primary" native-type="submit">查询</el-button><el-button @click="resetFilters">重置</el-button><el-button :loading="loading" @click="loadTickets">刷新</el-button></el-form-item></el-form>
       <ApiErrorNotice :error="error"><el-button size="small" @click="loadTickets">重试</el-button></ApiErrorNotice>
@@ -123,11 +142,12 @@ onUnmounted(resetContext)
         <div class="detail-title"><span class="eyebrow">报障登记</span><h2>{{ ticket.title }}</h2><el-tag type="info">已登记 · 正式工单规则待确认</el-tag><p class="ticket-receipt mono">{{ ticket.receipt_no }}</p></div>
         <el-alert type="warning" :closable="false" show-icon title="本平台为一期工单权威；正式处理状态与时限尚未设定，不能据登记时间推断响应或恢复承诺。" />
         <el-descriptions :column="1" border class="asset-descriptions"><el-descriptions-item label="故障分类">{{ ticket.category }}</el-descriptions-item><el-descriptions-item label="关联设备">{{ ticket.asset_name || '不确定' }}</el-descriptions-item><el-descriptions-item label="影响范围">{{ impactScopeLabel[ticket.impact_scope] }}</el-descriptions-item><el-descriptions-item label="紧急程度">{{ urgencyLabel[ticket.urgency] }}</el-descriptions-item><el-descriptions-item label="故障描述"><span class="ticket-description">{{ ticket.description }}</span></el-descriptions-item><el-descriptions-item label="联系人">{{ ticket.contact_name }}</el-descriptions-item><el-descriptions-item label="联系电话">{{ ticket.contact_phone }}</el-descriptions-item><el-descriptions-item label="联系信息核验">尚未核验账号绑定关系</el-descriptions-item><el-descriptions-item label="正式工单状态">{{ ticket.state === null ? '— · 未设' : ticket.state }}</el-descriptions-item><el-descriptions-item label="优先级">{{ ticket.priority === null ? '— · 未设' : ticket.priority }}</el-descriptions-item><el-descriptions-item label="响应截止">{{ ticket.response_due_at === null ? '— · 未设' : displayTime(ticket.response_due_at) }}</el-descriptions-item><el-descriptions-item label="恢复截止">{{ ticket.recovery_due_at === null ? '— · 未设' : displayTime(ticket.recovery_due_at) }}</el-descriptions-item><el-descriptions-item label="登记来源">客户报障</el-descriptions-item><el-descriptions-item label="工单权威">本平台 · 正式规则待确认</el-descriptions-item><el-descriptions-item label="提交时间">{{ displayTime(ticket.created_at) }}</el-descriptions-item><el-descriptions-item label="更新时间">{{ displayTime(ticket.updated_at) }}</el-descriptions-item></el-descriptions>
-        <div class="detail-section"><h3>登记记录</h3><el-timeline class="ticket-history"><el-timeline-item v-for="(item, index) in ticket.history" :key="`${item.occurred_at}:${index}`" :timestamp="displayTime(item.occurred_at)" placement="top"><strong>报障已登记</strong><p>正式工单规则待确认，尚无处理阶段记录。</p><p v-if="!customerView" class="mono">登记主体：{{ item.actor_id }} · v{{ item.version }}</p></el-timeline-item></el-timeline></div>
-        <div class="detail-section"><h3>图片与后续处理</h3><p class="muted">图片上传及补传尚未实现，已登记的报障继续保留。接单、处置与客户确认将在后续功能按实际规则落实。</p></div>
+        <div class="detail-section"><h3>登记记录</h3><el-timeline class="ticket-history"><el-timeline-item v-for="(item, index) in ticket.history" :key="`${item.occurred_at}:${index}`" :timestamp="displayTime(item.occurred_at)" placement="top"><strong>{{ item.action === 'ADD_ATTACHMENTS' ? '报障照片已追加' : '报障已登记' }}</strong><p>{{ item.action === 'ADD_ATTACHMENTS' ? '仅追加附件引用；原报障正文与联系信息保留。' : '正式工单规则待确认，尚无处理阶段记录。' }}</p><p v-if="!customerView" class="mono">操作主体：{{ item.actor_id }} · v{{ item.version }}</p></el-timeline-item></el-timeline></div>
+        <ReportPhotoPanel :queue="detailPhotos" :existing="ticket.attachments" :selectable="matchingPhotoTarget && detailAppender.permitted.value" :show-selections="matchingPhotoTarget" :disabled="detailLoading" :appender="matchingPhotoTarget ? detailAppender : undefined" />
+        <div class="detail-section"><h3>后续处理</h3><p class="muted">接单、处置与客户确认将在后续功能按实际规则落实。</p></div>
         <el-descriptions v-if="!customerView" :column="1" border class="asset-descriptions"><el-descriptions-item label="记录 ID"><span class="mono">{{ ticket.id }}</span></el-descriptions-item><el-descriptions-item label="租户 ID"><span class="mono">{{ ticket.tenant_id }}</span></el-descriptions-item><el-descriptions-item label="报障人 ID"><span class="mono">{{ ticket.reporter_id }}</span></el-descriptions-item><el-descriptions-item label="登记操作 ID"><span class="mono">{{ ticket.operation_id }}</span></el-descriptions-item><el-descriptions-item label="版本">v{{ ticket.version }}</el-descriptions-item><el-descriptions-item label="外部同步">不适用 · 未创建外部工单</el-descriptions-item></el-descriptions>
       </template>
-      <template #footer><el-button :loading="detailLoading" @click="loadDetail()">刷新详情</el-button><el-button @click="detailOpen = false">关闭</el-button></template>
+      <template #footer><el-button :loading="detailLoading" :disabled="detailAppender.busy.value || detailAppender.reading.value" @click="loadDetail()">刷新详情</el-button><el-button @click="detailOpen = false">关闭</el-button></template>
     </el-drawer>
   </section>
 </template>

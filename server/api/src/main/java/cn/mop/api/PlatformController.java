@@ -85,7 +85,7 @@ public class PlatformController {
     @PostMapping("/configurations/{key}/draft") Object configDraft(@PathVariable String key,@RequestBody JsonNode body,HttpServletRequest request){
         Access access=access(request,"configurations:write");fields(body,Set.of("proposed_value","expected_version"));long expected=version(body);
         Map<String,Object> entry=repository.configuration(key);JsonNode proposed=body.get("proposed_value");if(proposed==null||proposed.isNull())throw validation("proposed_value 必须非null且符合登记类型");
-        validateConfigValue(entry,proposed);
+        ConfigurationValueValidator.validate(entry,proposed);
         Object data=write(access,body,request,()->{Map<String,Object> result=repository.draftConfiguration(key,mapper.convertValue(proposed,Object.class),expected);repository.audit(access.user.id(),access.tenant.id(),"configuration.save_draft","configuration",key,"SUCCEEDED","DRAFT_NOT_EFFECTIVE",trace(request));return result;});return success(data,request);
     }
     @PostMapping("/configurations/{key}/publish") Object publish(@PathVariable String key,@RequestBody JsonNode body,HttpServletRequest request){
@@ -118,13 +118,6 @@ public class PlatformController {
         if(ip.contains(":")){if(!ip.matches("[0-9a-fA-F:.]+"))return false;try{InetAddress.getByName(ip);return true;}catch(Exception e){return false;}}
         if(!ip.matches("[0-9]{1,3}(\\.[0-9]{1,3}){3}"))return false;for(String octet:ip.split("\\.")){if(Integer.parseInt(octet)>255||octet.length()>1&&octet.startsWith("0"))return false;}return true;
     }
-    private static void validateConfigValue(Map<String,Object> entry,JsonNode value){
-        boolean valid=switch(entry.get("type").toString()){case "integer"->value.isIntegralNumber()&&value.canConvertToLong();case "number"->value.isNumber();case "boolean"->value.isBoolean();case "object"->value.isObject();case "array"->value.isArray();case "string"->value.isTextual()&&value.asText().length()<=2000;default->false;};
-        if(!valid||value.toString().length()>16000)throw validation("proposed_value 与配置登记类型不符或过长");
-        // Secret bodies never enter this design registry. Only external references belong in future adapters.
-        rejectSecrets(value);
-    }
-    private static void rejectSecrets(JsonNode value){if(value.isObject()){value.fields().forEachRemaining(field->{String key=field.getKey().toLowerCase(Locale.ROOT);if(Set.of("password","secret","token","private_key","credential","actor_id","tenant_id").contains(key))throw validation("草稿不得保存秘密、主体或租户字段");rejectSecrets(field.getValue());});}else if(value.isArray())value.forEach(PlatformController::rejectSecrets);}
     private String hash(JsonNode value){try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(mapper.writeValueAsBytes(canonical(value))));}catch(Exception e){throw new IllegalStateException(e);}}
     private JsonNode canonical(JsonNode value){if(value.isObject()){ObjectNode node=mapper.createObjectNode();TreeSet<String> fields=new TreeSet<>();value.fieldNames().forEachRemaining(fields::add);fields.forEach(k->node.set(k,canonical(value.get(k))));return node;}if(value.isArray()){var array=mapper.createArrayNode();value.forEach(v->array.add(canonical(v)));return array;}return value;}
     private String cursor(Access access,String filter,Asset last){try{String payload=Base64.getUrlEncoder().withoutPadding().encodeToString(mapper.writeValueAsBytes(map("tenant",access.tenant.id(),"actor",access.user.id(),"permission_version",access.membership.permissionVersion(),"filter",filter,"created_at",last.createdAt().toString(),"id",last.id())));return payload+"."+signature(payload);}catch(Exception e){throw new IllegalStateException(e);}}

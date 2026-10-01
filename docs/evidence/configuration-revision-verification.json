@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-01",
+  "feature": "tenant_configuration_revision_internal_review",
+  "mode": "remote_test",
+  "java_suites": [
+    {
+      "name": "cn.mop.api.ConfigurationRevisionValidationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.api.ConfigurationRevisionWorkflowTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.api.FixtureSecurityAndWorkflowTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 13
+    },
+    {
+      "name": "cn.mop.api.ProfilePolicyTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.api.SessionServiceSecurityTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.api.TestOidcConfigurationTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.persistence.PostgresConfigurationRevisionIntegrationTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.persistence.PostgresRepositoryIntegrationTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "cn.mop.persistence.PostgresSafetyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "java_passed": 29,
+  "java_failures": 0,
+  "frontend_tests_passed": 15,
+  "contract_tests_passed": 3,
+  "http_response_checks": 40,
+  "browser_desktop": "1440x900 creator submit and independent approver approve",
+  "browser_mobile": "390x844 create and withdraw; document width390, dialog width366",
+  "customer_confirmation_verified": false,
+  "effective_configuration_changed": false,
+  "all_contract_requirements_complete": false
+}

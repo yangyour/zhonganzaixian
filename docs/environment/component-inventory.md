@@ -6,8 +6,8 @@
 
 |能力|服务器已有组件/版本|本机SSH转发|本轮复用/验证状态|
 |---|---|---|---|
-|关系数据库|shared-postgres：PostgreSQL 17.9；原镜像timescale/timescaledb-ha:pg17-pgvector086|127.0.0.1:15432 → 服务器127.0.0.1:12060|已建独立mop_test数据库；独立migrator/runtime角色；Flyway建表；资产/成员/配置/幂等/审计持久化|
-|身份|hltk-keycloak：Keycloak 26.2.4|127.0.0.1:18110 → 服务器127.0.0.1:12110|已建本项目mop-test realm、mop-web client、5个虚构测试身份；真实OIDC登录、PKCE、退出、重新登录及客户权限已验证|
+|关系数据库|shared-postgres：PostgreSQL 17.9；原镜像timescale/timescaledb-ha:pg17-pgvector086|127.0.0.1:15432 → 服务器127.0.0.1:12060|独立mop_test、migrator/runtime角色；资产/成员/配置/修订/不可变历史/幂等/审计持久化；V1/V2/V3迁移与真实权限测试通过|
+|身份|hltk-keycloak：Keycloak 26.2.4|127.0.0.1:18110 → 服务器127.0.0.1:12110|已建本项目mop-test realm、mop-web client、6个虚构测试身份（含2026-10-01新增配置复核padmin）；真实OIDC及双主体内部审核已验证，不代表正式岗位批准|
 |缓存|shared-redis：Redis 7.4.9|127.0.0.1:16379 → 服务器127.0.0.1:12070|发现运行组件；本批没有依赖缓存的业务，不另建缓存、不声明已集成|
 |消息|zhsx-rabbitmq：RabbitMQ 4.3.2|本机AMQP15673 → 服务器5673；管理16673 → 15673|发现运行组件；待outbox/Worker开发时建项目vhost与受限账号，不使用其他项目队列|
 |对象存储|shared-minio：RELEASE.2025-09-07T16-13-09Z|127.0.0.1:19000 → 服务器127.0.0.1:12080|发现运行组件；待附件/报告开发时建项目bucket与受限身份，当前无S3业务调用|

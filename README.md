@@ -82,6 +82,8 @@ node tests/api-smoke.mjs http://127.0.0.1:8080/api/v1 --verify-persistence
 |`contracts`|原设计副本、原配置登记及当前实际API契约|
 |`deploy` / `tools`|私有配置引用、本机SSH隧道、项目命名空间准备与检查|
 
-当前实际契约为 `contracts/local-api.openapi.json`（命名沿用首批，内容已更新为remote_test V0.2）；生成源为 `tools/build-api-contract.mjs`。`design-core.openapi.json` 仍是设计原件，未实现路径不可视为可调用。
+当前实际契约为 `contracts/local-api.openapi.json`（命名沿用首批，内容已更新为remote_test V0.3）；生成源为 `tools/build-api-contract.mjs`。`design-core.openapi.json` 仍是设计原件，未实现路径不可视为可调用。
+
+配置登记页现支持“修订与审批”：提案保存外部资料引用及hash，创建者提交后由另一平台管理员内部复核，所有动作与历史持久化。内部通过仍为证据未核验、配置未生效，不替客户确认或正式发布。接口、运行账号权限和真实验证记录见[配置修订说明](docs/configuration-revisions.md)，实际契约已更新到V0.3。
 
 V1迁移已在测试库执行，禁止修改；结构修订必须追加迁移。测试数据库选择不替代客户正式Q02物理隔离批准，Keycloak测试域不替代正式身份/岗位确认。Redis、RabbitMQ、MinIO仅已盘点，待对应业务接入；Zabbix、ITSM、堡垒机缺失保持清单状态。下一批继续配置审批/证据与工单领域闭环，再实施耐久outbox/Worker。

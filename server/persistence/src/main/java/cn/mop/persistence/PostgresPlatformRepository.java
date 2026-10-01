@@ -87,6 +87,74 @@ public final class PostgresPlatformRepository implements PlatformRepository {
             try(PreparedStatement statement=connection.prepareStatement("UPDATE public.mop_configuration SET draft_json=?::jsonb,version=version+1,lifecycle_status='DRAFT',updated_at=clock_timestamp() WHERE key=? AND version=? RETURNING *")){statement.setString(1,mapper.valueToTree(proposed).toString());statement.setString(2,key);statement.setLong(3,expected);try(ResultSet rows=statement.executeQuery()){if(!rows.next())throw new DomainException(409,"VERSION_CONFLICT","配置草稿版本已变化");return config(rows);}}
         });
     }
+    private static final String REVISION_SELECT="SELECT r.*,c.registry_json FROM public.mop_configuration_revision r JOIN public.mop_configuration c ON c.key=r.configuration_key";
+    private Map<String,Object> revision(Connection connection,ResultSet rows)throws SQLException{
+        JsonNode proposal=json(rows.getString("proposal")),registry=json(rows.getString("registry_json"));
+        Map<String,Object> result=new LinkedHashMap<>();String tenant=rows.getString("tenant_id"),id=rows.getString("id");
+        result.put("id",id);result.put("tenant_id",tenant);result.put("configuration_key",rows.getString("configuration_key"));
+        result.put("proposed_value",mapper.convertValue(proposal.get("proposed_value"),Object.class));result.put("reason",proposal.path("reason").asText());
+        result.put("evidence_refs",mapper.convertValue(proposal.get("evidence_refs"),List.class));result.put("workflow_status",rows.getString("workflow_status"));result.put("version",rows.getLong("version"));
+        result.put("created_by",rows.getString("created_by"));result.put("created_at",instant(rows,"created_at").toString());result.put("updated_at",instant(rows,"updated_at").toString());
+        result.put("reviewed_by",rows.getString("reviewed_by"));Instant reviewed=instant(rows,"reviewed_at");result.put("reviewed_at",reviewed==null?null:reviewed.toString());result.put("review_comment",rows.getString("review_comment"));
+        result.put("decision_status",registry.path("decision_status").asText());result.put("effective_value",null);result.put("confirmation_status","UNVERIFIED");result.put("source","postgresql");
+        result.put("history",revisionHistory(connection,tenant,id,rows.getLong("version")));return result;
+    }
+    private List<Map<String,Object>> revisionHistory(Connection connection,String tenant,String id,long version)throws SQLException{
+        List<Map<String,Object>> result=new ArrayList<>();
+        try(PreparedStatement statement=connection.prepareStatement("SELECT payload FROM public.mop_configuration_revision_history WHERE tenant_id::text=? AND revision_id::text=? AND revision_version<=? ORDER BY revision_version")){
+            statement.setString(1,tenant);statement.setString(2,id);statement.setLong(3,version);try(ResultSet rows=statement.executeQuery()){while(rows.next())result.add(mapper.convertValue(json(rows.getString(1)),LinkedHashMap.class));}
+        }return result;
+    }
+    @Override public List<Map<String,Object>> configurationRevisions(String tenant,String key){
+        configuration(key);
+        return connection(connection->{List<Map<String,Object>> result=new ArrayList<>();
+            try(PreparedStatement statement=connection.prepareStatement(REVISION_SELECT+" WHERE r.tenant_id::text=? AND r.configuration_key=? ORDER BY r.created_at DESC,r.id DESC")){
+                statement.setString(1,tenant);statement.setString(2,key);try(ResultSet rows=statement.executeQuery()){while(rows.next())result.add(revision(connection,rows));}
+            }return result;
+        });
+    }
+    @Override public Optional<Map<String,Object>> configurationRevision(String tenant,String id){return connection(connection->{
+        try(PreparedStatement statement=connection.prepareStatement(REVISION_SELECT+" WHERE r.tenant_id::text=? AND r.id::text=?")){
+            statement.setString(1,tenant);statement.setString(2,id);try(ResultSet rows=statement.executeQuery()){return rows.next()?Optional.of(revision(connection,rows)):Optional.empty();}
+        }
+    });}
+    private void revisionAdministrator(String tenant,String actor){
+        if(transaction.get()==null)throw new IllegalStateException("Configuration revision writes require idempotent transaction");
+        Membership current=membership(actor,tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效"));
+        if(!"padmin".equals(current.role()))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无配置修订或审批权限");
+    }
+    @Override public Map<String,Object> createConfigurationRevision(String tenant,String actor,String key,Object proposed,String reason,List<Map<String,String>> evidenceRefs){
+        revisionAdministrator(tenant,actor);Map<String,Object> registry=configuration(key);
+        if("fixed_constraint".equals(registry.get("contract_value_kind")))throw new DomainException(422,"STATE_NOT_ALLOWED","合同固定约束不能修改");
+        String id=UUID.randomUUID().toString();Map<String,Object> proposal=new LinkedHashMap<>();proposal.put("proposed_value",proposed);proposal.put("reason",reason);proposal.put("evidence_refs",evidenceRefs);
+        Instant created=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_configuration_revision(id,tenant_id,configuration_key,proposal,created_by) VALUES (?::uuid,?::uuid,?,?::jsonb,?::uuid) RETURNING created_at")){
+            statement.setString(1,id);statement.setString(2,tenant);statement.setString(3,key);statement.setString(4,mapper.valueToTree(proposal).toString());statement.setString(5,actor);
+            try(ResultSet rows=statement.executeQuery()){rows.next();return instant(rows,"created_at");}
+        }});
+        appendRevisionHistory(tenant,id,1,"CREATE",actor,created,null,"DRAFT",reason);
+        return configurationRevision(tenant,id).orElseThrow(PostgresPlatformRepository::missing);
+    }
+    @Override public Map<String,Object> transitionConfigurationRevision(String tenant,String actor,String id,long expected,String action,String comment){
+        revisionAdministrator(tenant,actor);
+        Map<String,Object> current=connection(connection->{try(PreparedStatement statement=connection.prepareStatement(REVISION_SELECT+" WHERE r.tenant_id::text=? AND r.id::text=? FOR UPDATE OF r")){
+            statement.setString(1,tenant);statement.setString(2,id);try(ResultSet rows=statement.executeQuery()){if(!rows.next())throw missing();return revision(connection,rows);}
+        }});
+        if(((Number)current.get("version")).longValue()!=expected)throw new DomainException(409,"VERSION_CONFLICT","配置修订版本已变化，请刷新");
+        String previous=current.get("workflow_status").toString();String next=ConfigurationRevisionWorkflow.nextStatus(previous,current.get("created_by").toString(),actor,action);
+        boolean reviewed=Set.of("APPROVE","REJECT").contains(action);
+        Instant updated=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("UPDATE public.mop_configuration_revision SET workflow_status=?,version=version+1,updated_at=clock_timestamp(),reviewed_by=?::uuid,reviewed_at=CASE WHEN ? THEN clock_timestamp() ELSE NULL END,review_comment=? WHERE tenant_id::text=? AND id::text=? AND version=? RETURNING updated_at")){
+            statement.setString(1,next);statement.setString(2,reviewed?actor:null);statement.setBoolean(3,reviewed);statement.setString(4,reviewed?comment:null);statement.setString(5,tenant);statement.setString(6,id);statement.setLong(7,expected);
+            try(ResultSet rows=statement.executeQuery()){if(!rows.next())throw new DomainException(409,"VERSION_CONFLICT","配置修订版本已变化，请刷新");return instant(rows,"updated_at");}
+        }});
+        appendRevisionHistory(tenant,id,expected+1,action,actor,updated,previous,next,comment);
+        return configurationRevision(tenant,id).orElseThrow(PostgresPlatformRepository::missing);
+    }
+    private void appendRevisionHistory(String tenant,String id,long version,String action,String actor,Instant occurred,String from,String to,String comment){
+        Map<String,Object> event=new LinkedHashMap<>();event.put("action",action);event.put("actor_id",actor);event.put("occurred_at",occurred.toString());event.put("from_status",from);event.put("to_status",to);event.put("comment",comment);
+        connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_configuration_revision_history(tenant_id,revision_id,revision_version,payload) VALUES (?::uuid,?::uuid,?,?::jsonb)")){
+            statement.setString(1,tenant);statement.setString(2,id);statement.setLong(3,version);statement.setString(4,mapper.valueToTree(event).toString());statement.executeUpdate();return null;
+        }});
+    }
     @Override public void audit(String actor,String tenant,String action,String resourceType,String resourceId,String result,String reason,String trace){inTransaction(()->{
         String namespace=tenant==null?"platform":tenant;lock("audit|"+namespace);
         Map<String,Object> row=new LinkedHashMap<>();row.put("id",UUID.randomUUID().toString());row.put("occurred_at",Instant.now().truncatedTo(ChronoUnit.MILLIS).toString());row.put("actor_id",actor);row.put("actor_name",actor==null?"未认证主体":user(actor).map(FixtureUser::displayName).orElse("未认证主体"));row.put("tenant_id",tenant);row.put("action",action);row.put("resource_type",resourceType);row.put("resource_id",resourceId);row.put("result",result);row.put("reason",reason);row.put("trace_id",trace);row.put("source","postgresql");

@@ -32,7 +32,7 @@ class MinioPhotoStoreRemoteTest {
     @Test void designatedServerEnforcesConditionalPutRatherThanOnlyAdapterPreflight()throws Exception{
         MinioPhotoStore store=store();String key=key();byte[] original=fakePhoto(0x123456),different=fakePhoto(0xabcdef);String hash=sha(original);store.storeImmutable(key,original,"image/png",hash);
         MinioClient client=MinioClient.builder().endpoint(setting("MOP_S3_ENDPOINT")).credentials(setting("MOP_S3_ACCESS_KEY"),setting("MOP_S3_SECRET_KEY")).build();boolean denied=false;
-        try{client.putObject(PutObjectArgs.builder().bucket(setting("MOP_S3_BUCKET")).object(key).stream(new ByteArrayInputStream(different),different.length,-1).contentType("image/png").extraHeaders(Map.of("If-None-Match","*")).build());}
+        try{client.putObject(PutObjectArgs.builder().bucket(setting("MOP_S3_BUCKET")).object(key).stream(new ByteArrayInputStream(different),(long)different.length,-1L).contentType("image/png").extraHeaders(Map.of("If-None-Match","*")).build());}
         catch(ErrorResponseException error){denied="PreconditionFailed".equals(error.errorResponse().code());}
         catch(Exception error){throw new IllegalStateException("Conditional create check failed exception_type="+error.getClass().getName());}
         assertTrue(denied,"Designated server must refuse replacement under If-None-Match");assertArrayEquals(original,store.read(key,original.length,hash));

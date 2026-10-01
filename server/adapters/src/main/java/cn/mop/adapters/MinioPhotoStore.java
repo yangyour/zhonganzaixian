@@ -37,7 +37,7 @@ public final class MinioPhotoStore implements PhotoObjectStore {
             catch(ErrorResponseException absent){if(!Set.of("NoSuchKey","NoSuchObject","NotFound").contains(absent.errorResponse().code()))throw absent;}
             // The 5,000,000-byte cap is below S3's 5 MiB multipart threshold: this is one
             // conditional PUT. Existing objects are read and verified, never overwritten.
-            try{client.putObject(PutObjectArgs.builder().bucket(bucket).object(key).stream(new ByteArrayInputStream(original),original.length,-1).contentType(media).userMetadata(Map.of("sha256",sha)).extraHeaders(Map.of("If-None-Match","*")).build());}
+            try{client.putObject(PutObjectArgs.builder().bucket(bucket).object(key).stream(new ByteArrayInputStream(original),(long)original.length,-1L).contentType(media).userMetadata(Map.of("sha256",sha)).extraHeaders(Map.of("If-None-Match","*")).build());}
             catch(ErrorResponseException race){if(!"PreconditionFailed".equals(race.errorResponse().code()))throw race;}
             verify(key,original.length,sha);
         }catch(DomainException|IllegalArgumentException safe){throw safe;}catch(Exception error){safeLog(error);throw unavailable();}

@@ -41,7 +41,7 @@ class FileControllerTest {
     }
     @Test void unavailableStoreRejectsNewUploadAndRecordedReplayRemainsReadable()throws Exception{
         when(store.ready()).thenReturn(false);var request=upload("a.png",PhotoPolicyTest.image("png"));assertEquals(503,assertThrows(DomainException.class,()->controller.upload(request)).status);verify(repository,never()).acceptPhoto(anyString(),anyString(),any());
-        reset(store);when(repository.idempotent(anyString(),anyString(),anyString(),anyString(),anyString(),anyLong(),any())).thenReturn(Map.of("operation_id",OPERATION,"status","PENDING"));assertEquals(202,controller.upload(request).getStatusCode().value());verifyNoInteractions(store);
+        reset(store);doReturn(Map.of("operation_id",OPERATION,"status","PENDING")).when(repository).idempotent(anyString(),anyString(),anyString(),anyString(),anyString(),anyLong(),any());assertEquals(202,controller.upload(request).getStatusCode().value());verifyNoInteractions(store);
     }
     @Test void currentSessionScopeAndCustomerUploadCapabilitiesAreRequired()throws Exception{
         var absent=request("GET","/files/policy");absent.setUserPrincipal(null);assertEquals(401,assertThrows(DomainException.class,()->controller.policy(absent)).status);

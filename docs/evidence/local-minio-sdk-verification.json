@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-01",
+  "scope": "minio_jvm_compatibility_and_storage_adapter_not_full_photo_application",
+  "execution_environment": "Windows_local_shared_test_components",
+  "sdk": {"minio": "9.0.3", "okhttp_jvm": "5.3.2", "kotlin_stdlib": "2.2.21"},
+  "component": {"product": "existing_shared_MinIO", "version": "RELEASE.2025-09-07T16-13-09Z", "namespace": "mop-test-photos", "access": "existing_project_restricted_account_via_loopback_SSH"},
+  "test_suites": [
+    {"suite": "cn.mop.adapters.MinioPhotoStoreSafetyTest", "tests": 5, "failures": 0, "errors": 0, "skipped": 0, "kind": "isolated_unit"},
+    {"suite": "cn.mop.api.FileControllerTest", "tests": 8, "failures": 0, "errors": 0, "skipped": 0, "kind": "isolated_controller"},
+    {"suite": "cn.mop.adapters.MinioPhotoStoreRemoteTest", "tests": 3, "failures": 0, "errors": 0, "skipped": 0, "kind": "designated_MinIO_integration"}
+  ],
+  "test_command_exit_code": 0,
+  "conditional_storage_write_and_original_hash_verified": true,
+  "workspace_reactor_install": "passed_with_other_uncommitted_work_included",
+  "photos_database_schema": "V5_NOT_APPLIED",
+  "full_photo_application_acceptance": false,
+  "production_ready": false,
+  "credential_output": "none"
+}

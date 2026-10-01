@@ -1,0 +1,53 @@
+{
+  "run_at": "2026-10-01T05:44:45.948181+00:00",
+  "baseline_commit": "ddfe09cf64288d3c837a14fa9642ed49684bfec0",
+  "jdk": [
+    "openjdk version \"17.0.19\" 2026-04-21",
+    "OpenJDK Runtime Environment (build 17.0.19+10-1-deb12u2-Debian)",
+    "OpenJDK 64-Bit Server VM (build 17.0.19+10-1-deb12u2-Debian, mixed mode, sharing)"
+  ],
+  "compile": {
+    "status": "PASS",
+    "release": 17,
+    "lint": "all,-serial",
+    "warnings_as_errors": true,
+    "compiled_sources": [
+      "server/domain/src/main/java/cn/mop/domain/DomainException.java",
+      "server/domain/src/main/java/cn/mop/domain/assetdependency/AssetDependencyValidator.java",
+      "server/domain/src/test/java/cn/mop/domain/assetdependency/AssetDependencyChecks.java"
+    ]
+  },
+  "checks": {
+    "status": "PASS",
+    "groups": 12,
+    "assertions": 14987,
+    "exhaustive_graphs": 4096,
+    "exhaustive_dags": 543,
+    "exhaustive_cycles": 3553,
+    "deep_chain_edges": 25000
+  },
+  "stack_size": "256k",
+  "oracle": "Independent Floyd-Warshall transitive closure over all 4096 loop-free four-node directed graphs",
+  "test_data": "Synthetic tenant-qualified input facts only; no repository, component fixture or integration",
+  "junit": {
+    "status": "NOT_RUN",
+    "reason": "Pure executable JDK harness was run; Maven artifact access is blocked and this module has no JUnit dependency. No framework stubs were used"
+  },
+  "integration": {
+    "status": "NOT_RUN",
+    "reason": "No API, database writer, transaction locking, actual asset authorization or monitor suppression integration was created or executed"
+  },
+  "contract_acceptance": {
+    "TC-M3-9": "NOT_RUN",
+    "reason": "Pure structure checks do not prove server persistence, concurrent saving, or suppression of 20 downstream notifications with retained events"
+  },
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/DomainException.java": "fbd8389e27ea7cbe9821bcd1bfb68c37b30b9a760161b96780700a8e04fa4861",
+    "server/domain/src/main/java/cn/mop/domain/assetdependency/AssetDependencyValidator.java": "acf2f20eeb1c9013c9b5e3f9c7bb47d2d7c196d6aec2dc5bb820b97121618a02",
+    "server/domain/src/test/java/cn/mop/domain/assetdependency/AssetDependencyChecks.java": "1ed3b71542935b309732713504a70e1fbfc0b8ad2e86e3308fabe434d3acaf49",
+    "tools/verify-asset-dependencies-pure.sh": "5d0d1970e6c35b19a1f65c65f7df8b69d92e53637e21ba16ff77755e1edd65c6"
+  },
+  "customer_decisions": "Nullable type, suppression scope and enabled metadata are preserved; no rule dictionary, policy, permission or production approval is inferred",
+  "runner": "bash tools/verify-asset-dependencies-pure.sh",
+  "replay_tools_delivery": "Real JDK executable assertions and portable shell runner are Git-delivered"
+}

@@ -29,7 +29,9 @@ class PostgresRepositoryIntegrationTest {
         Flyway.configure().dataSource(url,required("MOP_MIGRATION_USERNAME"),required("MOP_MIGRATION_PASSWORD")).locations("classpath:db/migration").schemas("public").createSchemas(false).cleanDisabled(true).target("4").load().migrate();
         HikariConfig config=new HikariConfig();config.setJdbcUrl(url);config.setUsername(required("SPRING_DATASOURCE_USERNAME"));config.setPassword(required("SPRING_DATASOURCE_PASSWORD"));config.setMaximumPoolSize(5);config.setConnectionTimeout(5000);pool=new HikariDataSource(config);
         mapper=new ObjectMapper().registerModule(new JavaTimeModule()).setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        repository=new PostgresPlatformRepository(pool,mapper);actor=repository.users().stream().filter(user->user.role().equals("padmin")).findFirst().orElseThrow().id();assertTrue(repository.dependencyReady());
+        repository=new PostgresPlatformRepository(pool,mapper);actor=repository.users().stream()
+            .filter(user->repository.membership(user.id(),TENANT).filter(member->member.active()&&member.role().equals("padmin")).isPresent())
+            .findFirst().orElseThrow().id();assertTrue(repository.dependencyReady());
     }
     static String required(String key){String value=System.getenv(key);if(value==null||value.isBlank())throw new IllegalStateException("Missing private remote setting "+key);return value;}
     @AfterAll static void close(){if(pool!=null)pool.close();}

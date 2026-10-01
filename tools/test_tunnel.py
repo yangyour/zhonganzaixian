@@ -5,6 +5,7 @@ import os
 import select
 import socketserver
 import threading
+import uuid
 from pathlib import Path
 from inspect_test_server import connect, ROOT
 
@@ -18,13 +19,30 @@ FORWARDS = {
 }
 
 MINIO_DISABLED_MARKER = ROOT / '.local/minio-forward-disabled'
+POSTGRES_DISABLED_MARKER = ROOT / '.local/postgres-forward-disabled'
 
 
 def minio_disabled():
     """Only an exact project-owned marker can disable this project's MinIO forward."""
+    return component_disabled('minio')
+
+
+def component_disabled(name):
+    markers = {'minio': MINIO_DISABLED_MARKER, 'postgresql': POSTGRES_DISABLED_MARKER}
+    if name not in markers:
+        return False
     try:
-        marker = json.loads(MINIO_DISABLED_MARKER.read_text(encoding='utf-8'))
-        return (marker.get('version') == 1 and marker.get('component') == 'minio'
+        marker = json.loads(markers[name].read_text(encoding='utf-8'))
+        if not isinstance(marker, dict):
+            return False
+        if name == 'postgresql':
+            run_id = marker.get('run_id')
+            if not isinstance(run_id, str) or str(uuid.UUID(run_id)) != run_id:
+                return False
+            request = json.loads((ROOT / '.local/configuration-diagnostic-http-request.json').read_text(encoding='utf-8'))
+            if not isinstance(request, dict) or request.get('run_id') != run_id:
+                return False
+        return (marker.get('version') == 1 and marker.get('component') == name
                 and marker.get('scope') == 'owned-loopback-only'
                 and Path(marker.get('project_root', '')).resolve() == ROOT.resolve())
     except (OSError, ValueError, TypeError):
@@ -34,23 +52,21 @@ def minio_disabled():
 class ForwardControl:
     def __init__(self):
         self.lock = threading.Lock()
-        self.minio_connections = set()
+        self.connections = {'minio': set(), 'postgresql': set()}
 
-    def register(self, request, channel):
+    def register(self, name, request, channel):
         with self.lock:
-            self.minio_connections.add((request, channel))
+            self.connections[name].add((request, channel))
 
-    def remove(self, request, channel):
+    def remove(self, name, request, channel):
         with self.lock:
-            self.minio_connections.discard((request, channel))
+            self.connections[name].discard((request, channel))
 
     def enforce(self):
-        if not minio_disabled():
-            return
         with self.lock:
-            active = list(self.minio_connections)
+            active = [pair for name, connections in self.connections.items() if component_disabled(name) for pair in connections]
         for request, channel in active:
-            # Close existing keepalive channels as well as refusing future MinIO connections.
+            # Close existing keepalive channels as well as refusing future selected-component connections.
             try:
                 request.shutdown(2)
             except OSError:
@@ -69,15 +85,15 @@ def handler_for(transport, target_port, name, control):
         def handle(self):
             channel = None
             try:
-                if name == 'minio' and minio_disabled():
+                if component_disabled(name):
                     return
                 channel = transport.open_channel('direct-tcpip', ('127.0.0.1', target_port), self.request.getpeername(), timeout=10)
                 if channel is None:
                     return
-                if name == 'minio':
-                    control.register(self.request, channel)
+                if name in control.connections:
+                    control.register(name, self.request, channel)
                 while transport.is_active():
-                    if name == 'minio' and minio_disabled():
+                    if component_disabled(name):
                         break
                     readable, _, _ = select.select([self.request, channel], [], [], 2)
                     if self.request in readable:
@@ -94,8 +110,8 @@ def handler_for(transport, target_port, name, control):
                 pass
             finally:
                 if channel is not None:
-                    if name == 'minio':
-                        control.remove(self.request, channel)
+                    if name in control.connections:
+                        control.remove(name, self.request, channel)
                     channel.close()
                 self.request.close()
     return ForwardHandler

@@ -38,6 +38,20 @@ ticketCreate.properties.attachment_ids.description = '可省略或为空；仅�
 const uuid = { type: 'string', format: 'uuid' };
 const dateTime = { type: 'string', format: 'date-time' };
 const positiveVersion = { type: 'integer', minimum: 1, description: '服务端64位正整数版本；客户端使用所见版本，冲突409，不自动覆盖。' };
+const configurationKey = { type: 'string', minLength: 1, maxLength: 128, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$' };
+const diagnosticQuestions = { type: ['array', 'null'], items: { type: 'string', pattern: '^Q[0-9]{2}$' }, description: '保留登记中的原Q编号；null表示来源缺失，空数组表示来源明确没有关联Q，不补造结论。' };
+const configurationDiagnostic = object({
+  key: configurationKey, status: { const: 'CONFIG_PENDING' }, effective_value: { type: 'null' },
+  context: object({ tenant_id: uuid, environment: { const: 'remote_test' } }), observed_at: dateTime,
+  registry: object({ origin: { const: 'DESIGN_REGISTRY' }, version: positiveVersion, type_label: nullableString, unit_label: nullableString, scope_label: nullableString, source_ref: nullableString, decision_status_label: nullableString, classification_label: nullableString, question_ids: diagnosticQuestions }),
+  recent_proposals: object({ items: { type: 'array', maxItems: 5, items: object({ id: uuid, version: positiveVersion, workflow_status: { type: 'string', enum: ['DRAFT', 'IN_REVIEW', 'APPROVED', 'REJECTED', 'WITHDRAWN'] }, origin: { const: 'INTERNAL_REVISION' }, confirmation_status: { const: 'UNVERIFIED' }, evidence_input_status: { const: 'REFERENCE_ONLY' }, evidence_reference_count: { type: ['integer', 'null'], minimum: 0 } }) }, truncated: { type: 'boolean' } }),
+  runtime_definition: object({ availability: { const: 'NOT_IMPLEMENTED' }, schema_version: { type: 'null' }, allowed_layers: { type: 'null' }, precedence: { type: 'null' }, resolved_scope: { type: 'null' } }),
+  publication: object({ availability: { const: 'NOT_IMPLEMENTED' }, record_ref: { type: 'null' }, revision_id: { type: 'null' }, revision_version: { type: 'null' }, effective_at: { type: 'null' }, authorization_verified: { type: 'null' }, production_approval_verified: { type: 'null' } }),
+  customer_verification: object({ availability: { const: 'NOT_IMPLEMENTED' }, required: { type: 'null' }, decision_ref: { type: 'null' }, authority_verified: { type: 'null' }, authenticity_verified: { type: 'null' } }),
+  reasons: { type: 'array', minItems: 1, items: object({ code: { type: 'string', enum: ['DESIGN_REGISTRY_NOT_RUNTIME_CONFIG', 'RUNTIME_DEFINITION_SOURCE_UNAVAILABLE', 'PUBLICATION_SOURCE_UNAVAILABLE', 'CUSTOMER_VERIFICATION_SOURCE_UNAVAILABLE', 'INTERNAL_REVISION_NOT_RUNTIME_PUBLICATION', 'PROPOSAL_EVIDENCE_REFERENCES_UNAVAILABLE', 'REGISTRY_QUESTIONS_UNAVAILABLE'] }, source_kind: { type: 'string', enum: ['DESIGN_REGISTRY', 'INTERNAL_REVISION', 'RUNTIME_DEFINITION', 'RUNTIME_PUBLICATION', 'CUSTOMER_VERIFICATION'] }, source_id: nullableString, source_version: { type: ['integer', 'null'], minimum: 1 } }) },
+  question_ids: diagnosticQuestions,
+});
+configurationDiagnostic.properties.recent_proposals.allOf = [{ if: { properties: { truncated: { const: true } } }, then: { properties: { items: { minItems: 5 } } } }];
 const photoFacts = { purpose: { const: 'customer_report_photo' }, scan_status: { const: 'UNSCANNED' }, retention_until: { type: 'null' }, production_approval: { const: 'UNVERIFIED' }, policy_source: { const: 'USER_DEVELOPMENT_DIRECTION' } };
 const photoPolicy = object({ ...photoFacts, allowed_media_types: { type: ['array', 'null'], minItems: 1, maxItems: 2, uniqueItems: true, items: { type: 'string', enum: ['image/jpeg', 'image/png'] }, description: 'null表示白名单未配置或无效，上传返回CONFIG_PENDING；解码不等于病毒扫描或客户生产批准。' }, max_size_bytes: { const: 5000000 }, max_attachments: { const: 3 } });
 const reportPhoto = object({
@@ -88,7 +102,7 @@ photosReady.oneOf = [
 const readiness = envelope(object({ status: { const: 'READY_REMOTE_TEST' }, ready: { const: true }, mode: { const: 'remote_test' }, source: { const: 'postgresql' }, durable: { const: true }, production_ready: { const: false }, photos: photosReady }));
 const contract = {
   openapi: '3.1.0',
-  info: { title: 'MOP 共享测试环境 API', version: '0.6.0', description: '本地接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。fixture身份入口在remote_test不可调用。' },
+  info: { title: 'MOP 共享测试环境 API', version: '0.7.0', description: '本地接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。fixture身份入口在remote_test不可调用。' },
   servers: [{ url: '/api/v1' }],
   security: [{ SessionCookie: [] }],
   paths: {
@@ -104,6 +118,7 @@ const contract = {
     '/assets/{id}': { get: action('getAsset', '读取本租户资产详情；不存在及无权均404', ref('AssetResult'), { parameters: [pathId] }) },
     '/assets/{id}/onboarding': { post: blocked('requestOnboarding', '接入门禁：Q02/Q03/Q06待确认，拒绝执行', pathId) },
     '/configurations': { get: action('listConfigurations', '仅平台管理员读取设计登记和测试环境持久草稿', ref('ResourceResult'), { parameters: [parameter('decision_status', 'query', { type: 'string', enum: ['pending', 'contract_fixed'] }, false)] }) },
+    '/settings/effective': { get: action('readConfigurationDiagnostic', '当前padmin读取单key配置来源诊断；200只表示PG元数据读取成功，CONFIG_PENDING/null不代表生效', ref('ConfigurationDiagnosticResult'), { parameters: [parameter('key', 'query', configurationKey)], 'x-mop-allowed-query-keys': ['key'], 'x-mop-reject-duplicate-query-keys': true, description: '拒绝额外或重复query，客户端不能提供tenant、对象scope、precedence或核验事实。未知key404、无权403、失效会话401、PG不可用503。授权、登记版本及本租户最多5条近期提案来自一个只读REPEATABLE READ快照；后续提交在下一请求可见。近期提案不是选中的有效版本，APPROVED也未发布。运行定义、发布及客户核验能力明确NOT_IMPLEMENTED/null，不以空集合冒充已接入；不返回原值、旧草稿、提案、意见或资料正文。' }) },
     '/configurations/{key}/draft': { post: mutation('saveConfigurationDraft', '保存独立草稿；不改变value或客户确认状态，动态校验登记类型', object({ proposed_value: { not: { type: 'null' } }, expected_version: { type: 'integer', minimum: 1 } }), ref('ResourceResult'), { parameters: [pathKey, ...headers] }) },
     '/configurations/{key}/publish': { post: blocked('publishConfiguration', '发布门禁；管理员保存不代表客户书面确认', pathKey) },
     '/configurations/{key}/revisions': {
@@ -140,6 +155,8 @@ const contract = {
       AssetListResult: list(ref('Asset')),
       ConfigurationRevision: revision,
       ConfigurationRevisionResult: envelope(ref('ConfigurationRevision')),
+      ConfigurationDiagnostic: configurationDiagnostic,
+      ConfigurationDiagnosticResult: envelope(ref('ConfigurationDiagnostic')),
       TicketCreate: ticketCreate,
       TicketRegistration: ticketRegistration,
       TicketRegistrationResult: envelope(ref('TicketRegistration')),

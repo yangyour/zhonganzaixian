@@ -2,6 +2,28 @@
 
 更新：2026-10-01。云端最后交接`1db3976`已接回本地并停止云端业务写入；本批使用指定服务器组件和虚构项目数据，不以fixture或本机新服务替代。当前本地结果与以下云端/历史记录分开，不跨批次重复累加。
 
+## 本批D04配置诊断（独立记录）
+
+[配置有效性诊断](configuration-diagnostics.md)只读取当前租户的一致PG元数据，CONFIG_PENDING/null和NOT_IMPLEMENTED来源明确保留。第三轮完整检查退出0；下列结果不改写后续照片f56ad1b及SDK/CI历史，也不重复累计旧测试。
+
+|检查|实际结果|证据与边界|
+|---|---|---|
+|最终Maven编译/打包/检查|29套190报告项，13fixture跳过，177实际执行全部通过，0failure/error|[安全XML根属性摘要](evidence/local-configuration-diagnostic-build.json)；123纯/隔离、51指定PG、3指定MinIO；只读name/counters/time，不解析环境属性、用例正文或日志|
+|新增D04源与API|JDBC隔离13、Controller8、MVC6全部通过|包含于123项；MVC使用隔离依赖，不充当真实OIDC或PG|
+|指定PG诊断|新增8项通过，既有43项回归通过；合计51|新MOP-FAKE租户/主体/登记/提案、一致快照与撤权CAS恢复、metadata形状/脱敏/5条限制；旧43项不作为新增|
+|前端/类型/构建基线|初始11文件147项=旧113+新34，vue-tsc/Vite build通过；1665 modules/8.81s，无warning|main464.09kB、Configurations64.51kB、Tickets52.05kB、共享ticket9.68kB；保留初始完整check结果，59项定向不累加|
+|UI安全修复后最终Web|12文件154项=初始147+新metadata7，全量/类型/构建通过；10.26s，无warning|main464.09kB、Configurations66.27kB、Tickets52.05kB；66项定向包含于154，不加为220|
+|实际契约V0.7|generator check与10项契约测试通过|新只读单key诊断契约；Schema不替代真实接口或客户确认|
+|6身份真实OIDC/HTTP|50项记录检查PASS：49项对应V0.7 Schema，另1项直接Keycloak well-known|[HTTP证据](evidence/local-configuration-diagnostic-http.json)；实际APPROVED仍pending/null、A7/B1近期5/截断与租户隔离、正文标记不返回|
+|项目PG转发故障/恢复|diagnostic503/ready503、live200/Keycloak200；恢复同context/key200；finally恢复|只本run项目标记；旧registry/draft count及服务器内SHA256前后相同；没有DDL、成员或原值变更，6份会话/padminA/ready恢复|
+|1440px/390px诊断页面|26项PASS，0pageerror，Root逐图复核|[UI证据](evidence/local-configuration-diagnostic-ui.json)：真实Edge154.0.4258.48持续Playwright无头，1440×900/390×844仿真；长key/行标识/入口/footer可达，document无横向溢出，表格内部水平滚动|
+
+前两轮测试复现问题保留：新增独立fake账号暴露旧全局role picker不稳定，改成目标tenant内active且岗位匹配主体；新MVC嵌套配置误入正常MopApp扫描导致ProfilePolicy3/5失败，最终用@TestConfiguration及专用隔离test profile，原产品守卫和断言保留。MVC6+ProfilePolicy5定向11项及第三轮完整检查通过；没有通过放宽产品规则或修改原成员/185登记促成成功。
+
+真实页面通过来源缺口/pending/null、APPROVED非active、近期5条/truncated、租户A/B/A、旧GET关闭后延迟不能替换新key、GET网络错误重试、只读面板往返及编辑modal保护。真实提案POST提交后丢响应，原表单重试回读同server ID；发布422且值仍null；异常Q记录保留并能查503，缺失Q显示unknown，viewer无入口。旧Q.join空表及非文本metadata标签投影已修，新增7项metadata回归；没有删改negative rows。141秒混合探索含截图；延迟辅助gate曾超时重启QA kernel，最终持续会话重跑并关闭浏览器，按最终26项证据记录。
+
+D04运行定义/作用域优先次序、正式发布、客户真实性/资格、生效消费和业务快照仍未接入；本批完成诊断读取切片，不标完整D04/128项合同DONE。HTTP50、UI26、JVM177及最终前端154各有不同统计单位，初始147与最终154有包含关系，不合并或重复累计。
+
 ## 本批本地照片接续
 
 |检查|实际结果|证据与边界|

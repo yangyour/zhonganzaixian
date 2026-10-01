@@ -35,7 +35,8 @@ class PostgresConfigurationRevisionIntegrationTest {
         repository=new PostgresPlatformRepository(pool,mapper);assertTrue(repository.dependencyReady());
         creator=repository.users().stream().filter(user->user.displayName().equals("平台管理员（测试身份）")&&user.role().equals("padmin")).findFirst().orElseThrow().id();
         reviewer=repository.users().stream().filter(user->user.displayName().equals("配置复核管理员（测试身份）")&&user.role().equals("padmin")).findFirst().orElseThrow().id();
-        engineer=repository.users().stream().filter(user->user.role().equals("msp")).findFirst().orElseThrow().id();assertNotEquals(creator,reviewer);
+        engineer=repository.users().stream().filter(user->repository.membership(user.id(),TENANT)
+            .filter(member->member.active()&&member.role().equals("msp")).isPresent()).findFirst().orElseThrow().id();assertNotEquals(creator,reviewer);
     }
     private static HikariDataSource pool(int maximum){
         HikariConfig config=new HikariConfig();config.setJdbcUrl(required("SPRING_DATASOURCE_URL"));config.setUsername(required("SPRING_DATASOURCE_USERNAME"));config.setPassword(required("SPRING_DATASOURCE_PASSWORD"));config.setMaximumPoolSize(maximum);config.setConnectionTimeout(5000);return new HikariDataSource(config);

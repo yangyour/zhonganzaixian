@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.6.0",
-    "description": "本地接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。fixture身份入口在remote_test不可调用。"
+    "version": "0.7.0",
+    "description": "本地接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
     {
@@ -1583,6 +1583,152 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ResourceResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/effective": {
+      "get": {
+        "operationId": "readConfigurationDiagnostic",
+        "summary": "当前padmin读取单key配置来源诊断；200只表示PG元数据读取成功，CONFIG_PENDING/null不代表生效",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+            }
+          }
+        ],
+        "x-mop-allowed-query-keys": [
+          "key"
+        ],
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "拒绝额外或重复query，客户端不能提供tenant、对象scope、precedence或核验事实。未知key404、无权403、失效会话401、PG不可用503。授权、登记版本及本租户最多5条近期提案来自一个只读REPEATABLE READ快照；后续提交在下一请求可见。近期提案不是选中的有效版本，APPROVED也未发布。运行定义、发布及客户核验能力明确NOT_IMPLEMENTED/null，不以空集合冒充已接入；不返回原值、旧草稿、提案、意见或资料正文。",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigurationDiagnosticResult"
                 }
               }
             }
@@ -5483,6 +5629,386 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/ConfigurationRevision"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ConfigurationDiagnostic": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+          },
+          "status": {
+            "const": "CONFIG_PENDING"
+          },
+          "effective_value": {
+            "type": "null"
+          },
+          "context": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "environment": {
+                "const": "remote_test"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "environment"
+            ],
+            "additionalProperties": false
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "registry": {
+            "type": "object",
+            "properties": {
+              "origin": {
+                "const": "DESIGN_REGISTRY"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "服务端64位正整数版本；客户端使用所见版本，冲突409，不自动覆盖。"
+              },
+              "type_label": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "unit_label": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "scope_label": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "decision_status_label": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "classification_label": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "question_ids": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string",
+                  "pattern": "^Q[0-9]{2}$"
+                },
+                "description": "保留登记中的原Q编号；null表示来源缺失，空数组表示来源明确没有关联Q，不补造结论。"
+              }
+            },
+            "required": [
+              "origin",
+              "version",
+              "type_label",
+              "unit_label",
+              "scope_label",
+              "source_ref",
+              "decision_status_label",
+              "classification_label",
+              "question_ids"
+            ],
+            "additionalProperties": false
+          },
+          "recent_proposals": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "maxItems": 5,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "description": "服务端64位正整数版本；客户端使用所见版本，冲突409，不自动覆盖。"
+                    },
+                    "workflow_status": {
+                      "type": "string",
+                      "enum": [
+                        "DRAFT",
+                        "IN_REVIEW",
+                        "APPROVED",
+                        "REJECTED",
+                        "WITHDRAWN"
+                      ]
+                    },
+                    "origin": {
+                      "const": "INTERNAL_REVISION"
+                    },
+                    "confirmation_status": {
+                      "const": "UNVERIFIED"
+                    },
+                    "evidence_input_status": {
+                      "const": "REFERENCE_ONLY"
+                    },
+                    "evidence_reference_count": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "version",
+                    "workflow_status",
+                    "origin",
+                    "confirmation_status",
+                    "evidence_input_status",
+                    "evidence_reference_count"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "truncated": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "items",
+              "truncated"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "truncated": {
+                      "const": true
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "items": {
+                      "minItems": 5
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "runtime_definition": {
+            "type": "object",
+            "properties": {
+              "availability": {
+                "const": "NOT_IMPLEMENTED"
+              },
+              "schema_version": {
+                "type": "null"
+              },
+              "allowed_layers": {
+                "type": "null"
+              },
+              "precedence": {
+                "type": "null"
+              },
+              "resolved_scope": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "availability",
+              "schema_version",
+              "allowed_layers",
+              "precedence",
+              "resolved_scope"
+            ],
+            "additionalProperties": false
+          },
+          "publication": {
+            "type": "object",
+            "properties": {
+              "availability": {
+                "const": "NOT_IMPLEMENTED"
+              },
+              "record_ref": {
+                "type": "null"
+              },
+              "revision_id": {
+                "type": "null"
+              },
+              "revision_version": {
+                "type": "null"
+              },
+              "effective_at": {
+                "type": "null"
+              },
+              "authorization_verified": {
+                "type": "null"
+              },
+              "production_approval_verified": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "availability",
+              "record_ref",
+              "revision_id",
+              "revision_version",
+              "effective_at",
+              "authorization_verified",
+              "production_approval_verified"
+            ],
+            "additionalProperties": false
+          },
+          "customer_verification": {
+            "type": "object",
+            "properties": {
+              "availability": {
+                "const": "NOT_IMPLEMENTED"
+              },
+              "required": {
+                "type": "null"
+              },
+              "decision_ref": {
+                "type": "null"
+              },
+              "authority_verified": {
+                "type": "null"
+              },
+              "authenticity_verified": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "availability",
+              "required",
+              "decision_ref",
+              "authority_verified",
+              "authenticity_verified"
+            ],
+            "additionalProperties": false
+          },
+          "reasons": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "DESIGN_REGISTRY_NOT_RUNTIME_CONFIG",
+                    "RUNTIME_DEFINITION_SOURCE_UNAVAILABLE",
+                    "PUBLICATION_SOURCE_UNAVAILABLE",
+                    "CUSTOMER_VERIFICATION_SOURCE_UNAVAILABLE",
+                    "INTERNAL_REVISION_NOT_RUNTIME_PUBLICATION",
+                    "PROPOSAL_EVIDENCE_REFERENCES_UNAVAILABLE",
+                    "REGISTRY_QUESTIONS_UNAVAILABLE"
+                  ]
+                },
+                "source_kind": {
+                  "type": "string",
+                  "enum": [
+                    "DESIGN_REGISTRY",
+                    "INTERNAL_REVISION",
+                    "RUNTIME_DEFINITION",
+                    "RUNTIME_PUBLICATION",
+                    "CUSTOMER_VERIFICATION"
+                  ]
+                },
+                "source_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_version": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "minimum": 1
+                }
+              },
+              "required": [
+                "code",
+                "source_kind",
+                "source_id",
+                "source_version"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "question_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string",
+              "pattern": "^Q[0-9]{2}$"
+            },
+            "description": "保留登记中的原Q编号；null表示来源缺失，空数组表示来源明确没有关联Q，不补造结论。"
+          }
+        },
+        "required": [
+          "key",
+          "status",
+          "effective_value",
+          "context",
+          "observed_at",
+          "registry",
+          "recent_proposals",
+          "runtime_definition",
+          "publication",
+          "customer_verification",
+          "reasons",
+          "question_ids"
+        ],
+        "additionalProperties": false
+      },
+      "ConfigurationDiagnosticResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ConfigurationDiagnostic"
           },
           "trace_id": {
             "type": "string"

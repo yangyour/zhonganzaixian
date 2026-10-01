@@ -42,6 +42,30 @@ export interface ConfigurationRevision {
 export interface ConfigurationRevisionDraft {
   proposed_value: unknown; reason: string; evidence_refs: ConfigurationEvidenceReference[]
 }
+export type ConfigurationDiagnosticSource = 'DESIGN_REGISTRY' | 'INTERNAL_REVISION' | 'RUNTIME_DEFINITION' | 'RUNTIME_PUBLICATION' | 'CUSTOMER_VERIFICATION'
+export type ConfigurationDiagnosticReasonCode = 'DESIGN_REGISTRY_NOT_RUNTIME_CONFIG' | 'RUNTIME_DEFINITION_SOURCE_UNAVAILABLE'
+  | 'PUBLICATION_SOURCE_UNAVAILABLE' | 'CUSTOMER_VERIFICATION_SOURCE_UNAVAILABLE' | 'INTERNAL_REVISION_NOT_RUNTIME_PUBLICATION'
+  | 'PROPOSAL_EVIDENCE_REFERENCES_UNAVAILABLE' | 'REGISTRY_QUESTIONS_UNAVAILABLE'
+export interface ConfigurationDiagnostic {
+  key: string; status: 'CONFIG_PENDING'; effective_value: null
+  context: { tenant_id: string; environment: 'remote_test' }; observed_at: string
+  registry: {
+    origin: 'DESIGN_REGISTRY'; version: number; type_label: string | null; unit_label: string | null
+    scope_label: string | null; source_ref: string | null; decision_status_label: string | null
+    classification_label: string | null; question_ids: string[] | null
+  }
+  recent_proposals: {
+    items: { id: string; version: number; workflow_status: ConfigurationRevisionStatus; origin: 'INTERNAL_REVISION'
+      confirmation_status: 'UNVERIFIED'; evidence_input_status: 'REFERENCE_ONLY'; evidence_reference_count: number | null }[]
+    truncated: boolean
+  }
+  runtime_definition: { availability: 'NOT_IMPLEMENTED'; schema_version: null; allowed_layers: null; precedence: null; resolved_scope: null }
+  publication: { availability: 'NOT_IMPLEMENTED'; record_ref: null; revision_id: null; revision_version: null; effective_at: null
+    authorization_verified: null; production_approval_verified: null }
+  customer_verification: { availability: 'NOT_IMPLEMENTED'; required: null; decision_ref: null; authority_verified: null; authenticity_verified: null }
+  reasons: { code: ConfigurationDiagnosticReasonCode; source_kind: ConfigurationDiagnosticSource; source_id: string | null; source_version: number | null }[]
+  question_ids: string[] | null
+}
 export interface AuditEvent {
   id: string; occurred_at: string; actor_name: string; action: string; resource_type: string
   resource_id: string; result: string; reason: string | null; trace_id: string

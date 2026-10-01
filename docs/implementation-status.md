@@ -7,7 +7,7 @@
 |D01 工程/环境|完整构建/check及最终Web通过；V5独立Apply一次、再次0DDL/ACL；显式Worker/拥有者停止/依赖就绪；eba5630及照片提交f56ad1b各自3个CI job独立回读成功；真实重启、项目存储断链恢复及运行中退避重试|第二环境复现及生产部署；CI不替代组件联调|
 |D02 页面|照片36项真实Edge持久无头UI通过，1440×900/390×844仿真正常控件、0 pageerror；跨登记队列/原请求保护、下载hash、并发CAS与三张配额；修复表单被详情遮挡；113项全量+修后44项重复回归及最终类型/构建通过|物理相机、企微嵌入身份、其余页面/客户H5、全浏览器与性能验收|
 |D03 身份隔离|真实OIDC授权码+PKCE；验证签发者+sub不可变映射；每次请求成员复核；PG查询tenant+id；事务内权限版本复核；会话岗位与capabilities同取当前membership并完成纯测试/真实降级验证|客户正式岗位/身份源、生产RLS或独立库及六层隔离专项(Q02/Q09/Q17)|
-|D04 配置|185项原登记保持原value/null；PG独立草稿与CAS、内部审批及发布门禁；新增筛选/结构差异前端；显式作用域解析与不可变快照纯核心|客户证据真实性/资格与正式确认、发布适配器；解析及快照的真实仓储接入/持久化；作用域规则和实际影响对象；真实HTTP/UI验收|
+|D04 配置|185项原登记保持原value/null；PG独立草稿与CAS、内部审批及发布门禁；筛选/差异及解析/快照纯核心；当前租户只读PG/API诊断新增13JDBC+14API+8PG、V0.7、6身份50HTTP及26真实UI通过；安全metadata修复后154前端/类型/构建通过|运行定义、有效值解析/业务快照的真实仓储及发布、客户真实性/资格/正式确认、作用域/覆盖次序和实际影响对象仍待；APPROVED不生效，完整D04未完成|
 |D05 资产|双租户36条明确test_seed、manual持久草稿、同租户名称唯一/IP字面量格式/站点归属校验、事务幂等和接入门禁；新增完整图依赖校验和15列已解析行的导入纯预检|依赖关系的PG并发保存、真实20下联抑制；xlsx/csv解析、列映射、耐久预览及真实导入500行/配额/重试；IP冲突域Q31、租户资源准备、五步纳管与真实采样|
 |D07 工单|4个身份80次基础OIDC HTTP/V0.6 Ajv、36项UI通过；READY/CAS与去重追加；真实两页冲突比较重试、同原请求补传；正式状态/优先级/SLA仍null|正式状态图、资格、接单/转派/解决/确认/重开/工时/SLA/通知未完成；未知设备/共享去重待定|
 |共享底座|持久幂等、审计/hash链与24项照片PG；52次恢复/撤权专项、25次运行中Worker RETRY_WAIT及自然退避完成原任务/hash独立通过，finally恢复|RabbitMQ/其他outbox未消费；保留、外部链头、导出/恢复治理|
@@ -19,6 +19,12 @@
 本轮及历史测试分开维护于[验证记录](verification.md)，照片范围见[照片代码切片](report-photos.md)。历史fixture不用于本轮共享测试环境验收；本轮纯测试也不代替集成。
 
 历史不与本批累加。本批96纯单元/隔离、43 PG、3 MinIO通过，fixture13跳过；前端113及其修后44项重复回归、最终类型/构建与契约8项通过。基础80次、恢复52次、运行中重试25次HTTP及36 UI分别见[构建](evidence/local-photo-build-summary.json)、[HTTP](evidence/local-report-photo-http.json)、[恢复](evidence/local-photo-resilience.json)、[重试](evidence/local-photo-worker-retry.json)、[页面](evidence/local-report-photo-ui.json)，不合并单脚本计数。用户选择本平台权威仅关闭方向分歧，Q07剩余处理规则与Q08/Q09/Q14/Q16仍保留。
+
+## D04诊断独立切片
+
+[新说明](configuration-diagnostics.md)、[构建属性摘要](evidence/local-configuration-diagnostic-build.json)、[HTTP证据](evidence/local-configuration-diagnostic-http.json)和[UI证据](evidence/local-configuration-diagnostic-ui.json)记录这一后续功能：完整检查123纯/隔离+51PG+3MinIO通过，13fixture跳过；初始147前端=旧113+新34，安全metadata修复后最终154=初始147+新7，类型/构建及契约10通过。66定向回归包含于154；D04新增13JDBC、14API和8PG包含于JVM全量，旧测试不累计为新增。照片f56ad1b和CI此前结果保留各自版本。
+
+真实APPROVED提案仍CONFIG_PENDING/null，六角色OIDC、严格单key/授权、A7/B1提案近期5条与截断/租户隔离、正文不返回、PGonly503及恢复通过；原registry/draft count和服务器内SHA256前后不变。26项真实Edge桌面/390px仿真UI、0pageerror及截图复核通过，旧列表非法Q类型安全展示已修并保留negative fixture；原表单真实POST丢响应重试同ID、发布422、只读/编辑保护和迟到GET隔离均留证。诊断读取切片验证完成，来源能力仍NOT_IMPLEMENTED/null，未实现正式生效或完整D04。
 
 ## 下一批
 

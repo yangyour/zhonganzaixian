@@ -1,0 +1,293 @@
+{
+  "mode": "remote_test",
+  "passed": true,
+  "checks": [
+    {
+      "stage": "real_oidc_session_padmin",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "real_oidc_session_reviewer",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "real_oidc_session_viewerA",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "real_oidc_session_msp",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "real_oidc_session_tadmin",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "real_oidc_session_viewerB",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "anonymous_diagnostic_denied",
+      "http_status": 401,
+      "contract_valid": true
+    },
+    {
+      "stage": "viewerA_cannot_upgrade_configuration_read",
+      "http_status": 403,
+      "contract_valid": true
+    },
+    {
+      "stage": "msp_cannot_upgrade_configuration_read",
+      "http_status": 403,
+      "contract_valid": true
+    },
+    {
+      "stage": "tadmin_cannot_upgrade_configuration_read",
+      "http_status": 403,
+      "contract_valid": true
+    },
+    {
+      "stage": "viewerB_cannot_upgrade_configuration_read",
+      "http_status": 403,
+      "contract_valid": true
+    },
+    {
+      "stage": "invalid_single_key_query_rejected",
+      "http_status": 400,
+      "contract_valid": true
+    },
+    {
+      "stage": "invalid_single_key_query_rejected",
+      "http_status": 400,
+      "contract_valid": true
+    },
+    {
+      "stage": "invalid_single_key_query_rejected",
+      "http_status": 400,
+      "contract_valid": true
+    },
+    {
+      "stage": "invalid_single_key_query_rejected",
+      "http_status": 400,
+      "contract_valid": true
+    },
+    {
+      "stage": "invalid_single_key_query_rejected",
+      "http_status": 400,
+      "contract_valid": true
+    },
+    {
+      "stage": "invalid_single_key_query_rejected",
+      "http_status": 400,
+      "contract_valid": true
+    },
+    {
+      "stage": "invalid_single_key_query_rejected",
+      "http_status": 400,
+      "contract_valid": true
+    },
+    {
+      "stage": "invalid_single_key_query_rejected",
+      "http_status": 400,
+      "contract_valid": true
+    },
+    {
+      "stage": "unknown_registry_not_fabricated",
+      "http_status": 404,
+      "contract_valid": true
+    },
+    {
+      "stage": "real_existing_design_registry_stays_pending",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "fresh_fictitious_registry_metadata",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "create_fictitious_internal_proposal",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "create_fictitious_internal_proposal",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "create_fictitious_internal_proposal",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "create_fictitious_internal_proposal",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "create_fictitious_internal_proposal",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "create_fictitious_internal_proposal",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "create_fictitious_internal_proposal",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "submit_fictitious_internal_proposal",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "approve_internal_proposal_without_publication",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "approved_internal_metadata_is_not_effective",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "switch_only_authorized_current_tenant",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "tenant_b_cannot_see_tenant_a_proposals",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "create_fictitious_other_tenant_proposal",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "tenant_b_sees_only_its_metadata",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "restore_padmin_current_tenant_a",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "tenant_a_does_not_leak_tenant_b_metadata",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "real_pg_forward_failure_has_no_cached_or_fixture_diagnostic",
+      "http_status": 503,
+      "contract_valid": true
+    },
+    {
+      "stage": "pg_forward_failure_not_ready",
+      "http_status": 503,
+      "contract_valid": true
+    },
+    {
+      "stage": "pg_forward_failure_keeps_owned_api_alive",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "only_postgres_forward_disabled_identity_source_kept",
+      "http_status": 200,
+      "other_component_path_preserved": true
+    },
+    {
+      "stage": "same_context_and_registry_recover_without_false_activation",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "finally_restore_padmin_tenant",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "real_oidc_session_padmin",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "real_oidc_session_reviewer",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "real_oidc_session_viewerA",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "real_oidc_session_msp",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "real_oidc_session_tadmin",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "real_oidc_session_viewerB",
+      "http_status": 200,
+      "contract_valid": true
+    }
+  ],
+  "credential_output": "none",
+  "migrations_executed": false,
+  "existing_registry_draft_or_members_modified": false,
+  "environment": {
+    "postgresql": "17.9",
+    "keycloak": "26.2.4",
+    "minio": "RELEASE.2025-09-07T16-13-09Z",
+    "path": "designated_project_services_via_SSH"
+  },
+  "full_D04_or_runtime_publication_complete": false,
+  "result": {
+    "status": "PASS",
+    "real_oidc_current_role_and_context": true,
+    "only_padmin_configuration_read": true,
+    "strict_single_key_validation": true,
+    "unknown_registry_404": true,
+    "existing_design_registry_not_runtime_configuration": true,
+    "approved_internal_proposal_not_published_or_effective": true,
+    "current_tenant_metadata_isolated": true,
+    "recent_metadata_limit": 5,
+    "truncated": true,
+    "raw_registry_draft_proposal_review_evidence_bodies_absent": true,
+    "source_unimplemented_fields_remain_null": true,
+    "actual_pg_forward_failure_http_status": 503,
+    "no_cached_fixture_or_fake_success": true,
+    "identity_forward_remains_available": true,
+    "recovered_same_context_registry_and_pending_state": true,
+    "existing_185_registry_rows_never_updated": true
+  },
+  "restoration": {
+    "owned_pg_marker_removed": true,
+    "padmin_tenant_restored": true,
+    "dependencies_ready": true,
+    "sessions_recaptured": true
+  },
+  "http_exchanges": 50,
+  "verified_at": "2026-10-01T11:14:16.637Z"
+}

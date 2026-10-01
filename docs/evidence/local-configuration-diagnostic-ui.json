@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-10-01T12:11:02.642Z",
+  "scope": "current_tenant_configuration_diagnostic_code_slice",
+  "mode": "remote_test",
+  "browser": {
+    "product": "Microsoft Edge",
+    "version": "154.0.4258.48",
+    "persistent_Playwright": true,
+    "headless": true
+  },
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "mobile_emulation": true
+    }
+  ],
+  "real_oidc_sessions": true,
+  "designated_remote_components_only": true,
+  "checks": [
+    {
+      "name": "valid_metadata_pending_source_gaps_no_raw_body",
+      "pass": true
+    },
+    {
+      "name": "approved_recent_is_unpublished_with_five_truncated_items",
+      "pass": true
+    },
+    {
+      "name": "refresh_hides_previous_metadata",
+      "pass": true
+    },
+    {
+      "name": "late_closed_key_response_keeps_new_key",
+      "pass": true
+    },
+    {
+      "name": "known_empty_Q_label_is_explicit",
+      "pass": true
+    },
+    {
+      "name": "error_retry_without_stale_metadata",
+      "pass": true
+    },
+    {
+      "name": "manual_retry_reads_real_source",
+      "pass": true
+    },
+    {
+      "name": "readonly_panes_are_not_stacked",
+      "pass": true
+    },
+    {
+      "name": "existing_write_form_retries_committed_uncertain_proposal",
+      "pass": true
+    },
+    {
+      "name": "uncertain_proposal_replay_returns_same_server_id",
+      "pass": true
+    },
+    {
+      "name": "revisions_closed_then_diagnostic_shows_readonly_metadata",
+      "pass": true
+    },
+    {
+      "name": "tenant_B_only_single_proposal",
+      "pass": true
+    },
+    {
+      "name": "return_A_reloads_five_A_items",
+      "pass": true
+    },
+    {
+      "name": "mobile_diagnostic_primary_controls_reachable",
+      "pass": true
+    },
+    {
+      "name": "mobile_long_key_sources_and_recent_table_no_document_overflow",
+      "pass": true
+    },
+    {
+      "name": "mobile_refresh_actual_metadata",
+      "pass": true
+    },
+    {
+      "name": "mobile_row_key_and_primary_diagnostic_action_are_visible",
+      "pass": true
+    },
+    {
+      "name": "malformed_Q_row_remains_visible_with_explicit_error",
+      "pass": true
+    },
+    {
+      "name": "malformed_source_diagnostic_fails_explicitly_without_data",
+      "pass": true
+    },
+    {
+      "name": "missing_Q_preserved_as_unknown_not_known_empty",
+      "pass": true
+    },
+    {
+      "name": "viewer_direct_navigation_has_no_diagnostic_capability",
+      "pass": true
+    },
+    {
+      "name": "mixed_Q_filter_excludes_unknown_with_explicit_notice",
+      "pass": true
+    },
+    {
+      "name": "open_edit_form_remains_protected_from_background_read_action",
+      "pass": true
+    },
+    {
+      "name": "publication_stays_blocked_with_pending_rules",
+      "pass": true
+    },
+    {
+      "name": "publication_check_does_not_activate_diagnostic_value",
+      "pass": true
+    },
+    {
+      "name": "mobile_latest_item_footer_and_close_reachable",
+      "pass": true
+    }
+  ],
+  "passed": true,
+  "unhandled_page_errors": 0,
+  "visual_review": {
+    "reviewed": true,
+    "desktop_and_mobile": true,
+    "long_key_wrap": true,
+    "no_document_horizontal_overflow": true,
+    "row_identity_and_diagnostic_action_legible": true,
+    "recent_table_internal_horizontal_scroll": true,
+    "footer_actions_reachable": true,
+    "screenshots": "ignored .local/qa-configuration-diagnostics"
+  },
+  "response_faults": {
+    "real_backend_response_before_delay_or_drop": true,
+    "metadata_error_retries_GET_only": true,
+    "old_closed_key_cannot_replace_new_key": true,
+    "legacy_proposal_response_loss_replay_same_id_verified": true
+  },
+  "exploratory": {
+    "checks": [
+      "mixed_Q_filter_unknown_notice",
+      "readonly_pane_roundtrip",
+      "edit_form_overlay_protection",
+      "pending_publication_check",
+      "mobile_table_and_footer"
+    ],
+    "session_duration_seconds": 141
+  },
+  "fixed_defects": [
+    "legacy_configuration_table_non_array_Q_join_crash",
+    "non_text_metadata_label_body_projection"
+  ],
+  "limitations": [
+    "runtime_definition_and_publication_NOT_IMPLEMENTED",
+    "customer_verification_unknown",
+    "no_runtime_RESOLVED_value",
+    "full_D04_NOT_COMPLETE",
+    "all_128_acceptance_NOT_COMPLETE"
+  ],
+  "qa_kernel_restart": "One delayed-request harness wait timed out; final persistent session reran checks and was cleaned up"
+}

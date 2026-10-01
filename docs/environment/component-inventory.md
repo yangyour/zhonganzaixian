@@ -37,6 +37,14 @@
 
 公开探测摘要：`component-probe.json`。凭据仅在 `deploy/private/`；原始全机盘点输出不用于公共产品页面。
 
+## 2026-10-01后续D04诊断复用
+
+[D04诊断](../configuration-diagnostics.md)继续使用同一PostgreSQL17.9/Keycloak26.2.4及loopback项目隧道，没有新建组件、迁移或扩大照片MinIO权限。读取器在单只读REPEATABLE READ内复核mop_test/runtime、active user/membership、当前padmin与授权版本，只投影当前租户登记/提案元数据；定义、发布和客户核验来源保持NOT_IMPLEMENTED/null。
+
+后续完整检查51项指定PG=既有43回归+新诊断8，3项MinIO回归、123纯/隔离通过；[安全属性摘要](../evidence/local-configuration-diagnostic-build.json)与照片旧构建按批次分开。六个真实OIDC身份50项[HTTP记录检查](../evidence/local-configuration-diagnostic-http.json)通过；只关闭本run项目PG转发时diagnostic/ready503、live/Keycloak200，恢复同上下文后200，finally恢复标记、ready、六会话及padminA。旧registry/draft count和服务器内SHA256未变化，没有DDL/原成员/原值变更。
+
+[实际页面证据](../evidence/local-configuration-diagnostic-ui.json)另有26项PASS、0pageerror，真实Edge154.0.4258.48持续Playwright无头、1440×900/390×844仿真及Root逐图复核。旧列表非数组Q空表和非文本metadata标签投影已修，negative rows保留并可见/可查明确503；缺失Q仍unknown，没有修改数据或fixture回退伪造成功。最终前端154=初始147+新metadata7，全量/类型/构建通过，66定向不再累计。诊断不接入Redis/RabbitMQ/监控或正式发布/客户核验，不据读取成功宣称生产批准。
+
 ## 2026-10-01本地照片组件联调
 
 独立CLI默认Check、显式ApplyPhotos；V5已执行一次并冻结，重复Apply执行0DDL。API/Worker启动不执行迁移，进程拥有者记录覆盖API/Web/照片Worker；停止前核验路径、命令和启动时间，不停止远程组件或其他项目。

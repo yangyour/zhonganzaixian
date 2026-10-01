@@ -23,6 +23,62 @@ const photo = {
   upload_status: 'READY', created_by: id('3'), ticket_id: id('4'), operation_id: id('5'), version: 2, created_at: timestamp, updated_at: timestamp, source: 'postgresql',
 };
 
+const diagnostic = {
+  key: 'MOP-FAKE.rule', status: 'CONFIG_PENDING', effective_value: null,
+  context: { tenant_id: id('2'), environment: 'remote_test' }, observed_at: timestamp,
+  registry: { origin: 'DESIGN_REGISTRY', version: 1, type_label: 'integer', unit_label: null, scope_label: '原始作用域标签', source_ref: 'MOP-FAKE-source', decision_status_label: 'pending', classification_label: null, question_ids: ['Q09'] },
+  recent_proposals: { items: [{ id: id('3'), version: 3, workflow_status: 'APPROVED', origin: 'INTERNAL_REVISION', confirmation_status: 'UNVERIFIED', evidence_input_status: 'REFERENCE_ONLY', evidence_reference_count: 1 }], truncated: false },
+  runtime_definition: { availability: 'NOT_IMPLEMENTED', schema_version: null, allowed_layers: null, precedence: null, resolved_scope: null },
+  publication: { availability: 'NOT_IMPLEMENTED', record_ref: null, revision_id: null, revision_version: null, effective_at: null, authorization_verified: null, production_approval_verified: null },
+  customer_verification: { availability: 'NOT_IMPLEMENTED', required: null, decision_ref: null, authority_verified: null, authenticity_verified: null },
+  reasons: [{ code: 'DESIGN_REGISTRY_NOT_RUNTIME_CONFIG', source_kind: 'DESIGN_REGISTRY', source_id: 'MOP-FAKE.rule', source_version: 1 }],
+  question_ids: ['Q09'],
+};
+
+test('配置诊断只接受单key读取契约，拒绝生效、发布和客户核验的伪事实', () => {
+  const route = contract.paths['/settings/effective'];
+  assert.deepEqual(Object.keys(route), ['get']);
+  assert.deepEqual(route.get['x-mop-allowed-query-keys'], ['key']);
+  assert.equal(route.get['x-mop-reject-duplicate-query-keys'], true);
+  assert.equal(route.get.parameters[0].required, true);
+  assert.equal(route.get.parameters[0].schema.maxLength, 128);
+  assert.ok(validates('ConfigurationDiagnostic', diagnostic));
+  for (const change of [
+    item => { item.effective_value = 0; },
+    item => { item.effective_value = false; },
+    item => { item.status = 'RESOLVED'; },
+    item => { item.publication.availability = 'AVAILABLE'; },
+    item => { item.publication.effective_at = timestamp; },
+    item => { item.customer_verification.required = false; },
+    item => { item.customer_verification.authority_verified = true; },
+    item => { item.runtime_definition.precedence = []; },
+    item => { item.recent_proposals.items[0].confirmation_status = 'VERIFIED'; },
+  ]) {
+    const candidate = structuredClone(diagnostic); change(candidate);
+    assert.equal(validates('ConfigurationDiagnostic', candidate), false);
+  }
+});
+
+test('配置诊断保留未知Q与证据数量，不接受原值、草稿、资料正文或超量近期提案', () => {
+  const unknown = structuredClone(diagnostic);
+  unknown.question_ids = null; unknown.registry.question_ids = null;
+  unknown.recent_proposals.items[0].evidence_reference_count = null;
+  assert.ok(validates('ConfigurationDiagnostic', unknown));
+  for (const change of [
+    item => { item.registry.value = 'MOP-FAKE-private-value'; },
+    item => { item.registry.draft_value = 'MOP-FAKE-private-draft'; },
+    item => { item.recent_proposals.items[0].proposed_value = 'MOP-FAKE-private-proposal'; },
+    item => { item.recent_proposals.items[0].evidence_refs = []; },
+    item => { item.recent_proposals.items[0].review_comment = 'MOP-FAKE-private-comment'; },
+    item => { item.recent_proposals.truncated = true; },
+    item => { item.recent_proposals.items = Array.from({ length: 6 }, () => structuredClone(item.recent_proposals.items[0])); },
+    item => { item.question_ids = ['未提供的客户结论']; },
+  ]) {
+    const candidate = structuredClone(diagnostic); change(candidate);
+    assert.equal(validates('ConfigurationDiagnostic', candidate), false);
+  }
+});
+
 test('设计基线复制保持原始待确认值，没有补默认值', () => {
   assert.deepEqual(baseline, read('../doc/development/contracts/config-baseline.json'));
   assert.equal(baseline.status, 'design_registry_not_runtime_config');

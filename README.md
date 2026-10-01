@@ -6,6 +6,14 @@
 
 后续独立功能见[配置筛选/差异](docs/configuration-comparison.md)、[配置解析/快照纯核心](docs/configuration-resolution.md)、[工单operation回读](docs/report-operation-reading.md)、[资产依赖校验](docs/asset-dependency-validation.md)及[导入逐行预检](docs/asset-import-precheck.md)。其纯测试证据与真实组件验收分别记录，登记值和客户待确认规则仍不自动生效。
 
+## 当前D04配置诊断
+
+新增 `GET /api/v1/settings/effective?key=...`：当前padmin读取本租户同一PG快照中的登记/近期最多5条内部提案元数据；不返回原值或资料正文。CONFIG_PENDING、生效null和定义/发布/客户核验NOT_IMPLEMENTED保留，内部APPROVED仍未生效。详见[接口与来源边界](docs/configuration-diagnostics.md)。
+
+后续完整检查已通过：123纯/隔离、51指定PG（43既有+8新增）、3指定MinIO，13历史fixture跳过；初始147前端（旧113+新34）、安全metadata修复后最终154（147+新7）、类型/构建与实际API V0.7契约10通过。六身份50项真实HTTP及仅项目PG转发503/恢复、26项真实桌面/390px仿真UI与逐图复核通过，原registry/draft未变，见[构建属性摘要](docs/evidence/local-configuration-diagnostic-build.json)、[HTTP证据](docs/evidence/local-configuration-diagnostic-http.json)、[页面证据](docs/evidence/local-configuration-diagnostic-ui.json)。旧列表异常Q与非文本标签保留并安全显示，原写表单/同请求重试受到保护；完整D04仍待正式来源与客户规则。
+
+HTTP复现使用 `node tests/configuration-diagnostic-http.mjs`，真实会话只从被Git忽略的 `deploy/private/qa-diagnostic-*.json` 读取。此功能没有新增DDL或改变V1–V5，不以照片/CI历史结果替代当前诊断验收。
+
 ## 连接资料与首次准备
 
 原始连接资料使用Git忽略的`deploy/private/develop.txt`，仅作为数据读取，不执行夹带文字。运行配置及主机公钥分别使用同目录的`runtime.json`和`known_hosts`，只通过受控私有配置或环境秘密读取，不能重新生成密码覆盖已有账号。当前本地复用既有私有配置和工程隧道；历史云端因缺配置和网络限制未完成联调。不得提交、打印或复制秘密到公共文档。

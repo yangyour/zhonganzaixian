@@ -1,0 +1,425 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-01T11:30:11.3661088Z",
+  "scope": "Final configuration diagnostic Maven Surefire root attributes only; no tests rerun by documentation audit",
+  "mode": "remote_test",
+  "full_check_exit_code": 0,
+  "full_check_source": "Root verified deploy/check.ps1 final exit; .local/configuration-diagnostic-full-check-final.log not parsed",
+  "environment": {
+    "postgresql": "17.9",
+    "keycloak": "26.2.4",
+    "minio": "RELEASE.2025-09-07T16-13-09Z",
+    "connection": "project-scoped designated services via loopback SSH",
+    "source": "component inventory and root run record; not reprobed by documentation audit"
+  },
+  "reported_tests": 190.0,
+  "skipped_tests": 13.0,
+  "executed_passed": 177.0,
+  "totals": [
+    {
+      "category": "historical_fixture",
+      "suites": 1,
+      "tests": 13.0,
+      "failures": 0.0,
+      "errors": 0.0,
+      "skipped": 13.0
+    },
+    {
+      "category": "pure_or_isolated",
+      "suites": 22,
+      "tests": 123.0,
+      "failures": 0.0,
+      "errors": 0.0,
+      "skipped": 0.0
+    },
+    {
+      "category": "remote_postgresql",
+      "suites": 5,
+      "tests": 51.0,
+      "failures": 0.0,
+      "errors": 0.0,
+      "skipped": 0.0
+    },
+    {
+      "category": "remote_minio",
+      "suites": 1,
+      "tests": 3.0,
+      "failures": 0.0,
+      "errors": 0.0,
+      "skipped": 0.0
+    }
+  ],
+  "new_diagnostic_tests": {
+    "isolated_jdbc": 13,
+    "controller": 8,
+    "mvc_security": 6,
+    "designated_postgresql": 8,
+    "all_passed": true
+  },
+  "frontend": {
+    "source": "Root final check record; no frontend rerun by documentation audit",
+    "files": 11,
+    "tests": 147,
+    "historical_tests": 113,
+    "new_diagnostic_tests": 34,
+    "typecheck_exit_code": 0,
+    "build_exit_code": 0,
+    "vite_modules": 1665,
+    "build_seconds": 8.81,
+    "main_kb": 464.09,
+    "configurations_kb": 64.51,
+    "tickets_kb": 52.05,
+    "shared_ticket_kb": 9.68,
+    "warnings": 0,
+    "post_ui_fix_verification": "PASS",
+    "final_after_ui_fix": {
+      "status": "PASS",
+      "source": "Root final post-UI fix check record; no tests rerun by documentation audit",
+      "files": 12,
+      "tests": 154,
+      "baseline_tests": 147,
+      "added_metadata_tests": 7,
+      "targeted_regression_tests": 66,
+      "targeted_included_in_full": true,
+      "typecheck_exit_code": 0,
+      "build_exit_code": 0,
+      "build_seconds": 10.26,
+      "main_kb": 464.09,
+      "configurations_kb": 66.27,
+      "tickets_kb": 52.05,
+      "warnings": 0
+    }
+  },
+  "contract": {
+    "api_version": "0.7.0",
+    "tests": 10,
+    "generator_check_exit_code": 0,
+    "source": "Root final check record"
+  },
+  "suites": [
+    {
+      "name": "cn.mop.adapters.MinioPhotoStoreRemoteTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.adapters.MinioPhotoStoreRemoteTest.xml",
+      "category": "remote_minio",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 2.219
+    },
+    {
+      "name": "cn.mop.adapters.MinioPhotoStoreSafetyTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.adapters.MinioPhotoStoreSafetyTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 1.074
+    },
+    {
+      "name": "cn.mop.api.ConfigurationDiagnosticControllerTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.ConfigurationDiagnosticControllerTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.249
+    },
+    {
+      "name": "cn.mop.api.ConfigurationDiagnosticHttpSecurityTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.ConfigurationDiagnosticHttpSecurityTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 1.763
+    },
+    {
+      "name": "cn.mop.api.ConfigurationRevisionValidationTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.ConfigurationRevisionValidationTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.022
+    },
+    {
+      "name": "cn.mop.api.ConfigurationRevisionWorkflowTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.ConfigurationRevisionWorkflowTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.003
+    },
+    {
+      "name": "cn.mop.api.CustomerReportValidationTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.CustomerReportValidationTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.008
+    },
+    {
+      "name": "cn.mop.api.FileControllerHttpSecurityTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.FileControllerHttpSecurityTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.173
+    },
+    {
+      "name": "cn.mop.api.FileControllerTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.FileControllerTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.039
+    },
+    {
+      "name": "cn.mop.api.FixtureSecurityAndWorkflowTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.FixtureSecurityAndWorkflowTest.xml",
+      "category": "historical_fixture",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 13,
+      "time_seconds": 0.0
+    },
+    {
+      "name": "cn.mop.api.PhotoPolicyTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.PhotoPolicyTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.161
+    },
+    {
+      "name": "cn.mop.api.PhotoReadinessTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.PhotoReadinessTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.075
+    },
+    {
+      "name": "cn.mop.api.ProfilePolicyTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.ProfilePolicyTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 1.117
+    },
+    {
+      "name": "cn.mop.api.SessionMembershipRoleProjectionTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.SessionMembershipRoleProjectionTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.034
+    },
+    {
+      "name": "cn.mop.api.SessionServiceSecurityTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.SessionServiceSecurityTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.019
+    },
+    {
+      "name": "cn.mop.api.TestOidcConfigurationTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.TestOidcConfigurationTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.07
+    },
+    {
+      "name": "cn.mop.api.TicketPhotoControllerTest",
+      "report": "server/api/target/surefire-reports/TEST-cn.mop.api.TicketPhotoControllerTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.012
+    },
+    {
+      "name": "cn.mop.persistence.configuration.ConfigurationResolutionTest",
+      "report": "server/persistence/target/surefire-reports/TEST-cn.mop.persistence.configuration.ConfigurationResolutionTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.136
+    },
+    {
+      "name": "cn.mop.persistence.configuration.PostgresConfigurationDiagnosticReaderTest",
+      "report": "server/persistence/target/surefire-reports/TEST-cn.mop.persistence.configuration.PostgresConfigurationDiagnosticReaderTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.069
+    },
+    {
+      "name": "cn.mop.persistence.PhotoRulesTest",
+      "report": "server/persistence/target/surefire-reports/TEST-cn.mop.persistence.PhotoRulesTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.024
+    },
+    {
+      "name": "cn.mop.persistence.PostgresConfigurationDiagnosticIntegrationTest",
+      "report": "server/persistence/target/surefire-reports/TEST-cn.mop.persistence.PostgresConfigurationDiagnosticIntegrationTest.xml",
+      "category": "remote_postgresql",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 10.91
+    },
+    {
+      "name": "cn.mop.persistence.PostgresConfigurationRevisionIntegrationTest",
+      "report": "server/persistence/target/surefire-reports/TEST-cn.mop.persistence.PostgresConfigurationRevisionIntegrationTest.xml",
+      "category": "remote_postgresql",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 23.214
+    },
+    {
+      "name": "cn.mop.persistence.PostgresCustomerReportIntegrationTest",
+      "report": "server/persistence/target/surefire-reports/TEST-cn.mop.persistence.PostgresCustomerReportIntegrationTest.xml",
+      "category": "remote_postgresql",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 18.29
+    },
+    {
+      "name": "cn.mop.persistence.PostgresPhotoIntegrationTest",
+      "report": "server/persistence/target/surefire-reports/TEST-cn.mop.persistence.PostgresPhotoIntegrationTest.xml",
+      "category": "remote_postgresql",
+      "tests": 24,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 78.304
+    },
+    {
+      "name": "cn.mop.persistence.PostgresRepositoryIntegrationTest",
+      "report": "server/persistence/target/surefire-reports/TEST-cn.mop.persistence.PostgresRepositoryIntegrationTest.xml",
+      "category": "remote_postgresql",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 5.07
+    },
+    {
+      "name": "cn.mop.persistence.PostgresSafetyTest",
+      "report": "server/persistence/target/surefire-reports/TEST-cn.mop.persistence.PostgresSafetyTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.004
+    },
+    {
+      "name": "cn.mop.persistence.TestSchemaMigrationTest",
+      "report": "server/persistence/target/surefire-reports/TEST-cn.mop.persistence.TestSchemaMigrationTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.012
+    },
+    {
+      "name": "cn.mop.worker.PhotoWorkerRuntimeTest",
+      "report": "server/worker/target/surefire-reports/TEST-cn.mop.worker.PhotoWorkerRuntimeTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 1.165
+    },
+    {
+      "name": "cn.mop.worker.WorkerRuntimeSettingsTest",
+      "report": "server/worker/target/surefire-reports/TEST-cn.mop.worker.WorkerRuntimeSettingsTest.xml",
+      "category": "pure_or_isolated",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time_seconds": 0.011
+    }
+  ],
+  "remaining": [
+    "runtime definitions, publication, customer authenticity and qualification not implemented",
+    "full D04 and all 128 contract acceptance incomplete",
+    "mobile emulation does not prove physical device or all-browser acceptance"
+  ],
+  "credential_output": "none",
+  "report_properties_or_bodies_read": false,
+  "ui": {
+    "status": "PASS",
+    "evidence": "docs/evidence/local-configuration-diagnostic-ui.json",
+    "recorded_checks": 26,
+    "unhandled_page_errors": 0,
+    "browser": {
+      "product": "Microsoft Edge",
+      "version": "154.0.4258.48",
+      "persistent_Playwright": true,
+      "headless": true
+    },
+    "viewports": [
+      {
+        "width": 1440,
+        "height": 900
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "mobile_emulation": true
+      }
+    ],
+    "visual_reviewed_by_root": true,
+    "actual_response_before_delay_or_drop": true,
+    "exploratory_session_seconds": 141
+  },
+  "post_ui_documentation_updated_at": "2026-10-01T12:19:40.5220581Z"
+}

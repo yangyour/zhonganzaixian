@@ -47,6 +47,12 @@ const actionError = ref<unknown>(null)
 const acting = ref(false)
 let actionAttempt: { payload: string; key: string } | null = null
 const writing = computed(() => creating.value || acting.value)
+function canCloseForReadPanel() {
+  const uncertain = (error: unknown) => error instanceof ApiError && (error.status === 0 || error.status >= 500 || error.code === 'INVALID_RESPONSE')
+  return !createOpen.value && !actionOpen.value && !writing.value
+    && !(createAttempt && uncertain(createError.value)) && !(actionAttempt && uncertain(actionError.value))
+}
+defineExpose({ canCloseForReadPanel })
 const actions = computed(() => detail.value ? revisionActions(detail.value, session.value?.user, can('configurations:write')) : { submit: false, withdraw: false, review: false, waitingForReviewer: false })
 const actionAllowed = computed(() => Boolean(actionType.value && actions.value[actionType.value]))
 const actionConflict = computed(() => actionError.value instanceof ApiError && actionError.value.status === 409)

@@ -171,7 +171,9 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         List<Map<String,Object>> history=new ArrayList<>();
         try(PreparedStatement statement=connection.prepareStatement("SELECT payload FROM public.mop_ticket_history WHERE tenant_id::text=? AND ticket_id::text=? AND version<=? ORDER BY version")){
             statement.setString(1,rows.getString("tenant_id"));statement.setString(2,rows.getString("id"));statement.setLong(3,rows.getLong("version"));try(ResultSet events=statement.executeQuery()){while(events.next())history.add(mapper.convertValue(json(events.getString(1)),LinkedHashMap.class));}
-        }result.put("history",history);return result;
+        }result.put("history",history);List<Map<String,Object>> attachments=new ArrayList<>();
+        try(PreparedStatement statement=connection.prepareStatement("SELECT * FROM public.mop_file WHERE tenant_id::text=? AND ticket_id::text=? ORDER BY created_at,id")){statement.setString(1,rows.getString("tenant_id"));statement.setString(2,rows.getString("id"));try(ResultSet files=statement.executeQuery()){while(files.next())attachments.add(fileProjection(files));}}
+        result.put("attachments",attachments);return result;
     }
     @Override public List<Map<String,Object>> tickets(String tenant,String actor,String category,String urgency,String query,Instant afterCreated,String afterId,int limit){
         Membership membership=ticketAccess(tenant,actor);if(limit<1||limit>101||(afterCreated==null)!=(afterId==null))throw new DomainException(400,"VALIDATION_ERROR","工单分页参数无效");

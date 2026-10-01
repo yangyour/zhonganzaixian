@@ -51,5 +51,5 @@ export function prepareReportAttempt(previous: ReportSubmissionAttempt | null, b
   if (previous?.state === 'accepted') throw new Error('本次报障已登记，请查询登记结果，不要再次创建')
   if (previous?.state === 'uncertain' && previous.payload !== payload) throw new Error('本次提交结果尚不确定，请保留原填写内容并使用原请求重试')
   if (previous?.payload === payload) return previous
-  return { key: newKey(), payload, body: { ...body }, state: 'ready' }
+  return { key: newKey(), payload, body: { ...body, ...(body.attachment_ids ? { attachment_ids: [...body.attachment_ids] } : {}) }, state: 'ready' }
 }

@@ -32,6 +32,12 @@ public interface PlatformRepository extends AssetRepository {
     default List<Map<String, Object>> tickets(String tenantId, String actorId, String category, String urgency, String query, Instant afterCreated, String afterId, int limit) { throw ticketsUnavailable(); }
     default Optional<Map<String, Object>> ticket(String tenantId, String actorId, String id) { throw ticketsUnavailable(); }
     default Optional<Map<String, Object>> operation(String tenantId, String actorId, String id) { throw ticketsUnavailable(); }
+    default Map<String,Object> acceptPhoto(String tenant,String actor,PhotoUpload upload){throw ticketsUnavailable();}
+    default Optional<Map<String,Object>> file(String tenant,String actor,String id){throw ticketsUnavailable();}
+    default Map<String,Object> contentGrant(String tenant,String actor,String id){throw ticketsUnavailable();}
+    default Map<String,Object> photoContent(String tenant,String actor,String id,String grant){throw ticketsUnavailable();}
+    default Map<String,Object> attachPhotos(String tenant,String actor,String ticket,long expected,java.util.List<String> ids){throw ticketsUnavailable();}
+    default boolean processNextPhoto(String worker,PhotoObjectStore store){throw ticketsUnavailable();}
     private static DomainException ticketsUnavailable() { return new DomainException(503, "UPSTREAM_UNAVAILABLE", "报障受理需要指定测试环境 PostgreSQL，历史夹具不提供集成结果"); }
     void audit(String actor, String tenant, String action, String resourceType, String resourceId, String result, String reason, String trace);
     List<Map<String, Object>> audits(String tenant);

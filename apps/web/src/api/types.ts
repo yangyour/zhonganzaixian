@@ -56,7 +56,7 @@ export type TicketUrgency = 'normal' | 'urgent'
 export interface CustomerReportCreate {
   source: 'customer_report'; title?: string; description: string; category: TicketCategory
   impact_scope: TicketImpactScope; contact_name: string; contact_phone: string; urgency: TicketUrgency
-  asset_id?: string
+  asset_id?: string; attachment_ids?: string[]
 }
 export interface CustomerReportAcceptance { operation_id: string; status: 'PENDING' }
 export interface CustomerReportOperation {
@@ -72,9 +72,28 @@ export interface RegisteredTicket {
   contact_binding_status: 'UNVERIFIED'; registration_status: 'REGISTERED'; state: null
   external_id: null; external_state: null; sync_state: 'NOT_APPLICABLE'; authority_source: 'MOP'; authority_status: 'RULES_PENDING'
   priority: null; response_due_at: null; recovery_due_at: null; operation_id: string; version: number
-  created_at: string; updated_at: string; history: { action: 'REGISTER'; actor_id: string; occurred_at: string; version: number }[]
+  created_at: string; updated_at: string; attachments: ReportPhoto[]
+  history: { action: 'REGISTER' | 'ADD_ATTACHMENTS'; actor_id: string; occurred_at: string; version: number }[]
 }
 export interface TicketPage {
   items: RegisteredTicket[]; next_cursor: string | null; has_more: boolean; source: 'postgresql'
   page_size_limit: number; page_size_limit_kind: 'test_technical_limit'
 }
+export interface ReportPhotoPolicy {
+  purpose: 'customer_report_photo'; allowed_media_types: ('image/jpeg' | 'image/png')[] | null
+  max_size_bytes: number; max_attachments: number; policy_source: 'USER_DEVELOPMENT_DIRECTION'
+  production_approval: 'UNVERIFIED'; scan_status: 'UNSCANNED'; retention_until: null
+}
+export interface ReportPhoto {
+  id: string; tenant_id: string; purpose: 'customer_report_photo'; original_name: string
+  media_type: 'image/jpeg' | 'image/png'; size_bytes: number; sha256: string; upload_status: 'PENDING' | 'READY' | 'FAILED'
+  scan_status: 'UNSCANNED'; retention_until: null; production_approval: 'UNVERIFIED'; policy_source: 'USER_DEVELOPMENT_DIRECTION'
+  created_by: string; ticket_id: string | null; operation_id: string; version: number
+  created_at: string; updated_at: string; source: 'postgresql'
+}
+export interface FileUploadOperation {
+  id: string; tenant_id: string; kind: 'FILE_UPLOAD'; status: 'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED'
+  step: string; progress: null; result_ref: string; error: { code: string; message: string; retryable: boolean; question_ids: string[] } | null
+  created_at: string; updated_at: string
+}
+export interface FileContentGrant { content_url: string; expires_at: string }

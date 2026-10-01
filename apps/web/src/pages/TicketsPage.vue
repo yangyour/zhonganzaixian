@@ -13,6 +13,7 @@ import TicketReportForm from '../components/TicketReportForm.vue'
 import ReportPhotoPanel from '../components/ReportPhotoPanel.vue'
 import { createPhotoQueue } from '../utils/photoQueue'
 import { createPhotoAppender } from '../utils/photoAttachments'
+import { createReportOperationReader, type ReportOperationReadState } from '../utils/reportOperation'
 
 const route = useRoute(), router = useRouter()
 const queryString = (key: string) => typeof route.query[key] === 'string' ? route.query[key] as string : ''
@@ -62,6 +63,17 @@ const detailOpen = computed({ get: () => Boolean(queryString('ticket_id')), set:
 const ticket = ref<RegisteredTicket | null>(null)
 const detailError = ref<unknown>(null)
 const detailLoading = ref(false)
+const operationRead = ref<ReportOperationReadState>({ status: 'idle' })
+const registrationOperation = computed(() => operationRead.value.status === 'ready' ? operationRead.value.operation : null)
+const operationReader = createReportOperationReader({
+  context: () => ({ tenantId: session.value?.tenant.id || '', key: JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version]) }),
+  onChange: value => { operationRead.value = value },
+})
+function readRegistrationOperation() { if (ticket.value) return operationReader.load(ticket.value) }
+watch(() => ticket.value ? JSON.stringify([ticket.value.id, ticket.value.tenant_id, ticket.value.operation_id]) : '', () => {
+  operationReader.reset()
+  if (ticket.value) void readRegistrationOperation()
+}, { flush: 'sync' })
 const detailPhotos = createPhotoQueue()
 const photoTargetId = ref('')
 const appendTicket = ref<RegisteredTicket | null>(null)
@@ -109,6 +121,7 @@ function resetContext() {
   rows.value = []; nextCursor.value = null; hasMore.value = false; cursorHistory.value = []; loading.value = false; error.value = null
   ticket.value = null; detailError.value = null; detailLoading.value = false; createOpen.value = false; acceptedOperationId.value = ''
   detailPhotos.clear(); detailAppender.reset(); appendTicket.value = null; photoTargetId.value = ''
+  operationReader.reset()
 }
 watch(() => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version], resetContext, { flush: 'sync' })
 onUnmounted(() => { resetContext(); detailPhotos.dispose(); detailAppender.dispose() })
@@ -142,6 +155,20 @@ onUnmounted(() => { resetContext(); detailPhotos.dispose(); detailAppender.dispo
         <div class="detail-title"><span class="eyebrow">报障登记</span><h2>{{ ticket.title }}</h2><el-tag type="info">已登记 · 正式工单规则待确认</el-tag><p class="ticket-receipt mono">{{ ticket.receipt_no }}</p></div>
         <el-alert type="warning" :closable="false" show-icon title="本平台为一期工单权威；正式处理状态与时限尚未设定，不能据登记时间推断响应或恢复承诺。" />
         <el-descriptions :column="1" border class="asset-descriptions"><el-descriptions-item label="故障分类">{{ ticket.category }}</el-descriptions-item><el-descriptions-item label="关联设备">{{ ticket.asset_name || '不确定' }}</el-descriptions-item><el-descriptions-item label="影响范围">{{ impactScopeLabel[ticket.impact_scope] }}</el-descriptions-item><el-descriptions-item label="紧急程度">{{ urgencyLabel[ticket.urgency] }}</el-descriptions-item><el-descriptions-item label="故障描述"><span class="ticket-description">{{ ticket.description }}</span></el-descriptions-item><el-descriptions-item label="联系人">{{ ticket.contact_name }}</el-descriptions-item><el-descriptions-item label="联系电话">{{ ticket.contact_phone }}</el-descriptions-item><el-descriptions-item label="联系信息核验">尚未核验账号绑定关系</el-descriptions-item><el-descriptions-item label="正式工单状态">{{ ticket.state === null ? '— · 未设' : ticket.state }}</el-descriptions-item><el-descriptions-item label="优先级">{{ ticket.priority === null ? '— · 未设' : ticket.priority }}</el-descriptions-item><el-descriptions-item label="响应截止">{{ ticket.response_due_at === null ? '— · 未设' : displayTime(ticket.response_due_at) }}</el-descriptions-item><el-descriptions-item label="恢复截止">{{ ticket.recovery_due_at === null ? '— · 未设' : displayTime(ticket.recovery_due_at) }}</el-descriptions-item><el-descriptions-item label="登记来源">客户报障</el-descriptions-item><el-descriptions-item label="工单权威">本平台 · 正式规则待确认</el-descriptions-item><el-descriptions-item label="提交时间">{{ displayTime(ticket.created_at) }}</el-descriptions-item><el-descriptions-item label="更新时间">{{ displayTime(ticket.updated_at) }}</el-descriptions-item></el-descriptions>
+        <div class="detail-section ticket-registration-operation" aria-label="登记操作回读">
+          <h3>登记操作</h3>
+          <p class="muted">仅查询本次登记操作。查询失败不会撤销已登记报障，不据等待时间推断处理进度。</p>
+          <ApiErrorNotice v-if="operationRead.status === 'error'" :error="operationRead.error" />
+          <el-skeleton v-if="operationRead.status === 'loading'" :rows="3" animated />
+          <el-descriptions v-if="registrationOperation" :column="1" border class="asset-descriptions">
+            <el-descriptions-item label="操作状态"><el-tag type="info">{{ registrationOperation.status }}</el-tag><span class="cell-sub">待正式工单规则配置</span></el-descriptions-item>
+            <el-descriptions-item label="规则门禁"><span class="ticket-description">{{ registrationOperation.error.message }}</span><span class="cell-sub mono">{{ registrationOperation.error.code }}</span></el-descriptions-item>
+            <el-descriptions-item label="待确认事项">{{ registrationOperation.error.question_ids.join(' / ') || '服务端未提供待确认编号' }}</el-descriptions-item>
+            <el-descriptions-item label="处理进度">— · 服务端未提供</el-descriptions-item>
+            <el-descriptions-item label="操作更新时间">{{ displayTime(registrationOperation.updated_at) }}</el-descriptions-item>
+          </el-descriptions>
+          <el-button :loading="operationRead.status === 'loading'" @click="readRegistrationOperation">{{ operationRead.status === 'error' ? '重新查询登记操作' : '刷新登记操作' }}</el-button>
+        </div>
         <div class="detail-section"><h3>登记记录</h3><el-timeline class="ticket-history"><el-timeline-item v-for="(item, index) in ticket.history" :key="`${item.occurred_at}:${index}`" :timestamp="displayTime(item.occurred_at)" placement="top"><strong>{{ item.action === 'ADD_ATTACHMENTS' ? '报障照片已追加' : '报障已登记' }}</strong><p>{{ item.action === 'ADD_ATTACHMENTS' ? '仅追加附件引用；原报障正文与联系信息保留。' : '正式工单规则待确认，尚无处理阶段记录。' }}</p><p v-if="!customerView" class="mono">操作主体：{{ item.actor_id }} · v{{ item.version }}</p></el-timeline-item></el-timeline></div>
         <ReportPhotoPanel :queue="detailPhotos" :existing="ticket.attachments" :selectable="matchingPhotoTarget && detailAppender.permitted.value" :show-selections="matchingPhotoTarget" :disabled="detailLoading" :appender="matchingPhotoTarget ? detailAppender : undefined" />
         <div class="detail-section"><h3>后续处理</h3><p class="muted">接单、处置与客户确认将在后续功能按实际规则落实。</p></div>
@@ -155,4 +182,5 @@ onUnmounted(() => { resetContext(); detailPhotos.dispose(); detailAppender.dispo
 <style>
 .ticket-detail-drawer{max-width:100vw}.ticket-receipt{margin:16px 0 0;color:#61718a}.ticket-description{white-space:pre-wrap;overflow-wrap:anywhere}.ticket-history{padding-left:4px;margin-top:20px}.ticket-history p{font-size:12px;margin:8px 0}.ticket-detail-drawer .detail-section p{font-size:12px}
 @media(max-width:760px){.tickets-page .page-heading .el-button{min-height:44px}.tickets-page .ticket-detail-link{min-height:44px}.ticket-pagination .el-button{min-height:44px}.ticket-pagination .el-select__wrapper{min-height:44px}.ticket-filter-form .el-input__wrapper,.ticket-filter-form .el-select__wrapper,.ticket-filter-form .el-button{min-height:44px}.ticket-detail-drawer .el-drawer__footer .el-button{min-height:44px}}
+@media(max-width:760px){.ticket-registration-operation .el-button{min-height:44px}}
 </style>

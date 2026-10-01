@@ -1,0 +1,38 @@
+{
+  "recorded_at": "2026-10-01T05:21:50.265484+00:00",
+  "branch": "handoff/cloud-20261001-photos",
+  "scope": "D07 report detail reads existing persisted registration operation",
+  "status": "PASSED_ISOLATED_FRONTEND_ONLY",
+  "checks": {
+    "new_feature_tests": 29,
+    "vitest_files": 9,
+    "vitest_total": 98,
+    "baseline_tests": 69,
+    "vue_tsc": "PASS",
+    "vite_build": "PASS",
+    "diff_check": "PASS",
+    "main_bundle_kB": 464.08,
+    "ticket_chunk_kB": 51.26,
+    "bundle_warning": false
+  },
+  "commands": [
+    "npm --prefix apps/web run test",
+    "npm --prefix apps/web run build",
+    "git diff --check"
+  ],
+  "source_sha256": {
+    "apps/web/src/utils/reportOperation.ts": "cf621f793f2265395635ff93d92e00f30b2a8560cb3d38867f13b6c831654f85",
+    "apps/web/tests/reportOperation.test.ts": "e168f4fea901f02d1452e7e296060bf3ceccc5c2ded40577e4859cefb4f3eb5d",
+    "apps/web/src/pages/TicketsPage.vue": "0d147f9573b51a9544b2da8e59aa7b0831bf49ef71ebd838111fb97e42175069"
+  },
+  "not_run": [
+    "designated PostgreSQL/OIDC HTTP validation",
+    "1440/390px browser acceptance"
+  ],
+  "limitations": [
+    "Only GET existing operation; no poll or new POST",
+    "PENDING/CONFIG_PENDING and progress=null remain as returned",
+    "No configuration activated and no SLA or notification success claimed",
+    "All 128 full contract TCs remain NOT_RUN"
+  ]
+}

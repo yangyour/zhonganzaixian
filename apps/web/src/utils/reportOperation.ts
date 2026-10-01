@@ -1,0 +1,66 @@
+import { api, ApiError, isCancelled } from '../api/client'
+import type { CustomerReportOperation, RegisteredTicket } from '../api/types'
+import { isTicketUuid, ticketIdFromResultRef } from './ticket'
+
+export type ReportOperationTarget = Pick<RegisteredTicket, 'id' | 'tenant_id' | 'operation_id'>
+export interface ReportOperationContext { tenantId: string; key: string }
+export type ReportOperationReadState =
+  | { status: 'idle' }
+  | { status: 'loading'; target: ReportOperationTarget }
+  | { status: 'ready'; target: ReportOperationTarget; operation: CustomerReportOperation }
+  | { status: 'error'; target: ReportOperationTarget; error: unknown }
+
+const record = (value: unknown): value is Record<string, unknown> => value !== null && typeof value === 'object' && !Array.isArray(value)
+const timestamp = (value: unknown) => typeof value === 'string' && Number.isFinite(Date.parse(value))
+function validTarget(target: ReportOperationTarget, tenantId: string) {
+  if (!isTicketUuid(target.id) || !isTicketUuid(target.operation_id) || !tenantId || target.tenant_id !== tenantId) throw new ApiError(0, 'INVALID_REPORT_OPERATION_REFERENCE', '当前登记的操作引用或租户不一致，请重新查询详情；已登记的报障继续保留', '—')
+}
+
+/** Accept the current registration gate verbatim; do not translate it into business success or progress. */
+export function validateReportOperation(value: unknown, target: ReportOperationTarget): CustomerReportOperation {
+  validTarget(target, target.tenant_id)
+  if (!record(value) || !isTicketUuid(value.id) || value.id.toLowerCase() !== target.operation_id.toLowerCase()
+    || value.tenant_id !== target.tenant_id || value.kind !== 'CUSTOMER_REPORT_REGISTRATION'
+    || ticketIdFromResultRef(value.result_ref) !== target.id.toLowerCase()
+    || value.status !== 'PENDING' || value.step !== 'AWAITING_TICKET_CONFIGURATION' || value.progress !== null
+    || !record(value.error) || value.error.code !== 'CONFIG_PENDING' || value.error.retryable !== false
+    || typeof value.error.message !== 'string' || !value.error.message.trim()
+    || !Array.isArray(value.error.question_ids) || !value.error.question_ids.every(id => typeof id === 'string' && id.trim())
+    || !timestamp(value.created_at) || !timestamp(value.updated_at)) throw new ApiError(200, 'INVALID_REPORT_OPERATION', '登记操作返回与当前报障或既有规则门禁不一致，请手动重查；不会再次提交报障', '—')
+  return value as unknown as CustomerReportOperation
+}
+
+/** A read is independent of the ticket snapshot. Failed or superseded reads cannot erase the registration. */
+export function createReportOperationReader(options: {
+  context: () => ReportOperationContext
+  onChange: (state: ReportOperationReadState) => void
+}, client: Pick<typeof api, 'request'> = api) {
+  let generation = 0
+  let controller: AbortController | undefined
+  let state: ReportOperationReadState = { status: 'idle' }
+  function update(next: ReportOperationReadState) { state = next; options.onChange(next) }
+  return {
+    get state() { return state },
+    reset() { ++generation; controller?.abort(); controller = undefined; update({ status: 'idle' }) },
+    async load(ticket: ReportOperationTarget): Promise<boolean> {
+      const target = { id: ticket.id, tenant_id: ticket.tenant_id, operation_id: ticket.operation_id }
+      const context = { ...options.context() }, epoch = ++generation
+      controller?.abort(); const request = new AbortController(); controller = request
+      const current = () => epoch === generation && !request.signal.aborted && options.context().key === context.key && options.context().tenantId === context.tenantId
+      update({ status: 'loading', target })
+      try {
+        validTarget(target, context.tenantId)
+        const result = await client.request<unknown>(`/operations/${target.operation_id.toLowerCase()}`, { signal: request.signal })
+        if (!current()) { if (epoch === generation) update({ status: 'idle' }); return false }
+        const operation = validateReportOperation(result, target)
+        update({ status: 'ready', target, operation })
+        return true
+      } catch (cause) {
+        if (!current()) { if (epoch === generation) update({ status: 'idle' }); return false }
+        if (!isCancelled(cause)) update({ status: 'error', target, error: cause })
+        else update({ status: 'idle' })
+        return false
+      }
+    },
+  }
+}

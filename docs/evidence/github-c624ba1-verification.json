@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-01 12:26:23 UTC",
+  "commit_sha": "c624ba14bcf0d2c467e88a16a6b30c2d2baf2c4e",
+  "event": "push",
+  "run_id": 36861304649,
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/yangyour/zhonganzaixian/actions/runs/36861304649",
+  "jobs": [
+    {
+      "name": "Contracts and Web unit tests, typecheck and build",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify the Node toolchain",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install the locked dependencies",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify the actual API contract",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run the Web unit tests",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Typecheck and build the Web application",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "Backend compile, unit tests and packaging",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify the Maven toolchain",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify all Maven modules with strict artifact checksums",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Report actual JUnit counts and integration boundaries",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "name": "Pure Java source checks",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify the Java toolchain",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run the committed pure Java checks",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "real_shared_component_integration": false,
+  "boundary": "CI source, compilation, isolated tests, contracts and Web checks; designated PostgreSQL/OIDC/MinIO business verification is recorded separately.",
+  "credential_output": "none"
+}

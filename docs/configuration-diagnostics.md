@@ -115,4 +115,6 @@ node tests/configuration-diagnostic-http.mjs
 
 故障验证仅控制本项目 `.local/postgres-forward-disabled` 标记，按run UUID/项目归属核验并finally恢复，不停止或重配远程数据库。公开[HTTP摘要](evidence/local-configuration-diagnostic-http.json)记录50项实际HTTP检查，其中49项校验对应V0.7 Schema与预期状态、1项校验Keycloak well-known；辅助SQL的count/boolean不计HTTP，finally真实会话回读按实际HTTP计入。它不枚举浏览器全部SSO网络请求。[页面摘要](evidence/local-configuration-diagnostic-ui.json)另记26项正常控件/实际响应检查和视觉复核；最后前端154项与初始147项版本分别保留于[构建摘要](evidence/local-configuration-diagnostic-build.json)。
 
+提交`c624ba1`的[GitHub CI](https://github.com/yangyour/zhonganzaixian/actions/runs/36861304649)已按精确SHA独立回读：push run completed/success，契约/Web、后端编译/单元/打包及纯Java三个job全部通过。[安全摘要](evidence/github-c624ba1-verification.json)仅记录状态，CI不连接私有组件，不能替代上述真实PG/OIDC/MinIO联调。
+
 本切片仍保留客户正式资格/真实性、每键允许作用域与覆盖次序、正式发布/外部回读、生效消费、业务创建快照及完整D04验收边界，不把内部审核或诊断200标为DONE。

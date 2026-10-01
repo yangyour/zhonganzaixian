@@ -155,3 +155,5 @@ Windows当前完整检查入口为`pwsh -File deploy/check.ps1 -Install`；独�
 - 第二机器/云端复现、客户H5、全浏览器、真实设备采样、容量/性能/灾备及128项合同逐项验收尚未完成。
 
 首批local_fixture记录已归档至 [历史验证](history/2026-09-30-local-fixture-verification.md)、[历史QA计划](history/2026-09-30-local-fixture-qa-inventory.md)及 [历史摘要](history/2026-09-30-local-fixture-verification-summary.json)。其16项后端/33个HTTP等旧计数仅描述当时fixture阶段，不能合并为本轮真实组件结果。
+
+D04诊断功能提交`c624ba1`的[独立CI回读](https://github.com/yangyour/zhonganzaixian/actions/runs/36861304649)已确认三个job全部success，见[精确提交安全摘要](evidence/github-c624ba1-verification.json)。此CI只验证源码、编译与隔离检查，不替代指定服务器的业务联调，也不表示完整D04或128项完成。

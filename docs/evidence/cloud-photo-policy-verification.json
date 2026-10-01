@@ -1,0 +1,82 @@
+{
+  "recorded_at": "2026-10-01T05:03:24.080467+00:00",
+  "branch": "handoff/cloud-20261001-photos",
+  "handoff_base": "caff027d7e1fb2e65f0babf8b6de0369b46fe48e",
+  "scope": "Standalone real-source PhotoPolicy validation guards only",
+  "status": "PASSED_PURE_POLICY_GUARDS_ONLY",
+  "compiler": "javac 17.0.19",
+  "assertions": 56,
+  "compile": "real DomainException, PhotoUpload and PhotoPolicy; no framework stubs",
+  "compile_scope": [
+    "server/api/src/main/java/cn/mop/api/PhotoPolicy.java",
+    "server/domain/src/main/java/cn/mop/domain/DomainException.java",
+    "server/domain/src/main/java/cn/mop/domain/PhotoUpload.java"
+  ],
+  "source_sha256": {
+    "server/api/src/main/java/cn/mop/api/PhotoPolicy.java": "02f3152652eb82a53faf86c9fbc234e9c803acd55ffa4955954ef5ee987f66d8",
+    "server/domain/src/main/java/cn/mop/domain/DomainException.java": "fbd8389e27ea7cbe9821bcd1bfb68c37b30b9a760161b96780700a8e04fa4861",
+    "server/domain/src/main/java/cn/mop/domain/PhotoUpload.java": "10f4945f1830342d5dcdb8a48a71eaf63ef99ef45863975f2e00ffa486354679"
+  },
+  "local_harness_sha256": {
+    ".local/cloud-validation/MopPhotoPolicyCheck.java": "2bf5afedc9737a51f7bd3299fd3e4d068112ba13facd4240564c4155b4a5f198",
+    ".local/cloud-validation/JpegTrailingProbe.java": "95e72006fcebc11cce058adccaf2451a29ecd56d7ca33db74a45089b781d1960"
+  },
+  "runner": ".local/cloud-validation/verify-photo-api-pure-jdk.sh",
+  "execution_record": ".local/cloud-validation/photo-api-pure-jdk-verification.json",
+  "harness_delivery": "Ignored local harness and runner; not included in Git delivery",
+  "jpeg_boundary_regression": {
+    "before_fix_source_sha256": "129370918f4890107e171489a19bb5a5697d112ffcab1560d1d1dab9a463d212",
+    "before_fix": {
+      "jpeg_then_junk_then_eoi": "ACCEPTED",
+      "two_concatenated_jpegs": "ACCEPTED"
+    },
+    "after_fix": {
+      "jpeg_then_junk_then_eoi": "REJECTED 400 VALIDATION_ERROR",
+      "two_concatenated_jpegs": "REJECTED 400 VALIDATION_ERROR"
+    },
+    "checks": [
+      "First structural EOI must end the original codestream",
+      "APP payload marker-like bytes retain original bytes and hash",
+      "Real JDK baseline JPEG contains FF00 stuffing and RST0 and remains accepted",
+      "Real JDK progressive JPEG has multiple SOS and remains accepted",
+      "Invalid segment length/header/repeated SOI/restart position rejected",
+      "Synthetic TEM/DNL/fill input passes boundary scan but is rejected by full decoder validation"
+    ],
+    "limits": "Structural marker checks supplement mature ImageIO decoding; do not prove malware scanning or ImageIO support for synthetic DNL/TEM data"
+  },
+  "not_run": [
+    "JUnit PhotoPolicyTest",
+    "Controller/MinIO JUnit tests (33 new isolated API/adapters tests in total)",
+    "3 designated MinIO integration tests",
+    "Maven module/reactor build",
+    "Controller/Spring/MinIO type checking",
+    "PostgreSQL/MinIO/OIDC HTTP integration",
+    "V5 migration",
+    "Real mobile capture or enterprise-WeChat"
+  ],
+  "policy": {
+    "policy_source": "USER_DEVELOPMENT_DIRECTION",
+    "scan_status": "UNSCANNED",
+    "production_approval": "UNVERIFIED",
+    "retention_until": null,
+    "max_size_bytes": 5000000,
+    "max_attachments": 3,
+    "allowed_media_types": [
+      "image/jpeg",
+      "image/png"
+    ]
+  },
+  "limitations": [
+    "56 standalone JDK assertions are not JUnit or component integration results",
+    "Structural codestream validation supplements mature ImageIO decoding; no malware scanning",
+    "TEM/DNL synthetic boundary checks do not establish decoder support for those inputs",
+    "Original bytes/hash preserved for accepted APP payload markers, real baseline stuffing/restart and progressive multi-SOS cases",
+    "All 128 contract TC remain NOT_RUN; photo business and M5-5/M8-6 remain PARTIAL"
+  ],
+  "extension_boundary": {
+    "no_dot_png": "REJECTED 400 VALIDATION_ERROR",
+    "no_dot_jpg": "REJECTED 400 VALIDATION_ERROR",
+    "no_dot_jpeg": "REJECTED 400 VALIDATION_ERROR",
+    "rule": "last dot must be after the first filename character and before the final filename character; extension must match original image type"
+  }
+}

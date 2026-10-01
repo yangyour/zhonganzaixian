@@ -2,7 +2,7 @@
 
 用户最新要求“换到云端继续剩余开发”。这覆盖此前本地/Dot执行安排；仍按128项合同实施，每个独立功能验证并更新证据后立即提交推送。目标未完成，不缩减成已实现切片。实际任务设置继续为`gpt-6.1-sol`、`ultra`，启动后须核验有效配置，无法核验则明确报告。
 
-## 已验证并推送的基线
+## 历史本地已验证并推送的基线
 
 - `84eb35a`：指定PostgreSQL/Keycloak的真实持久化与OIDC底座。
 - `0722dfe`：租户配置修订与双主体内部审核，证据UNVERIFIED、不形成正式配置生效。
@@ -13,9 +13,15 @@
 
 ## 未完成快照
 
-分支`handoff/cloud-20261001-photos`是中途代码快照，不是已完成功能。保存目的为继续实施，不能直接作为可运行/可验收版本，不能合并后写DONE。当前实际API契约仍V0.4，未包含照片接口。
+分支`handoff/cloud-20261001-photos`的交接HEAD为`caff027d7e1fb2e65f0babf8b6de0369b46fe48e`，已从GitHub fetch并核验。该HEAD是中途快照，不是已完成功能。本轮云端已接续照片代码及实际API契约V0.5，但真实集成未完成，不可据代码或旧本地证据写DONE。
 
-已开始：领域照片记录/存储接口、MinIO Java 9.0.3适配器、照片策略/配置、客户报障携带附件引用的结构、前端multipart/binary客户端及照片队列工具。仓储只是预留接口和少量结构调整，完整文件Controller/持久文件任务/真实Worker/附件绑定/CAS/下载授权、上传组件与页面连线、测试和实际契约尚待完成。V5照片迁移属于未执行草稿；V1–V4已执行且不可改。
+交接时只预留照片领域/存储接口、MinIO Java 9.0.3、策略、附件输入及客户端工具。本轮新增文件Controller、PG耐久照片任务/租约fencing、仅照片Worker、附件绑定/CAS/语义去重追加、平台原图grant、前端队列及页面连接，统一history=ADD_ATTACHMENTS；纯测试与契约见[云端验证](verification.md)。这些代码尚未真实PG/MinIO/OIDC HTTP/UI联调。V5仍未执行草稿，V1–V4保持不变；API和Worker启动均不自动Flyway迁移。
+
+剩余照片后端源码按WIP保护快照保存，完整Maven类型检查、33项隔离API/3项MinIO、7项Worker及16项PG照片测试仍未执行。独立通过的纯核心、契约及前端功能有各自提交；WIP保存不完成照片验收，也不合并main。后续先恢复指定组件及依赖通道，复核V5执行方案和权限，再进行真实回归及HTTP/UI验证。
+
+当前云端`develop.txt`存在，私有`runtime.json`及`known_hosts`缺失；指定SSH路径经平台代理受到目标域名策略拒绝，Maven Central返回429、Google镜像返回403。工具链/helper语法及预检不等于依赖下载、完整构建、启动或组件联调通过。继续不依赖缺项的代码；受控私有配置和网络恢复后再验证，不旋转既有账号或本机另建替代组件。
+
+主聊天本轮只读界面核验显示GPT-6.1 Sol已选中、任务菜单为GPT-6.1 Sol Ultra，模型/强度设置为UI_CONFIGURED；代理spawn参数也按gpt-6.1-sol/ultra显式指定。当前云会话最新原生/status界面显示used 143,050/total 258K，上下文记为UI_REPORTED 258K，1M为NOT_APPLIED。底层精确窗口与自动压缩阈值仍UNKNOWN，不能据界面显示推定272000、95%或256k tokens；模型/强度服务端回显仍SERVER_NOT_ECHOED。当前Onboarding更新schema无context字段，也没有cloud-coordinator或host config工具；云端菜单没有手动窗口入口，未改无效CLI或提示词覆盖、未重启。本结论仅描述当前会话，不以原生模型最大窗口作此云会话证据，不泛断所有Cloud是否支持1M。
 
 按以下约定继续，并先审核当前文件而非假设草稿已经正确：
 
@@ -28,10 +34,12 @@
 
 ## 环境与秘密
 
-云端、本地联调均复用指定服务器组件，不在云端新建替代数据库/缓存/队列/监控。只能使用mop_test、mop-test身份域、mop-test-photos及本项目账号，不改其他项目服务/端口/全局配置。
+云端及历史本地联调均复用指定服务器组件，不在云端新建替代数据库/缓存/队列/监控。只能使用mop_test、mop-test身份域、mop-test-photos及本项目账号，不改其他项目服务/端口/全局配置。
 
 已真实使用：PostgreSQL17.9、Keycloak26.2.4、MinIO RELEASE.2025-09-07T16-13-09Z。Redis/RabbitMQ待业务接入，Zabbix/堡垒机/通知资料等缺口见组件清单。参考本地SSH转发端口15432、18110、19000；云端须建立自己的受控隧道及核验，不能访问这些本机端口就声称联调成功。
 
 原始连接资料、runtime环境、S3受限账号及拥有者恢复状态只在Git忽略的`deploy/private/`，此次Git交接不含它们。本地API/Web已停止；本机SSH隧道不能当成云端已有连接。云端缺少私有凭据时使用受控秘密存储/私有挂载交付；不把密码写入任务提示、Git、公共日志或截图，不打印SDK/SSH完整异常。不得旋转现有数据库/身份/S3账号密码来覆盖其他执行环境。
 
-先盘点云端现有工作区、网络/依赖与私有配置，保护旧未提交变更，读取AGENTS及doc/development的01–07原文。此前该云端环境曾报告Maven网络和SSH通道受阻，这只是旧证据，应重新只读核验；当前不通则具体登记并继续不依赖该项的代码。
+本轮已完整读取AGENTS及doc/development的01–07原文并核对工作区；现有工具链通过激活脚本使用，网络阻塞已重新核验并登记。全部128项追踪不缩减；当前128个TC仍NOT_RUN。完整照片范围及剩余门禁见[照片代码切片](report-photos.md)，历史MinIO组件验证不替代新增照片业务或云端复现。
+
+后续独立纯功能已逐功能提交推送：配置筛选/建议差异、显式作用域解析/不可变快照、工单详情operation回读及资产依赖结构校验。记录见[配置比较](configuration-comparison.md)、[配置核心](configuration-resolution.md)、[状态回读](report-operation-reading.md)、[依赖校验](asset-dependency-validation.md)。这些不完成整模块；继续xlsx/csv资产导入、依赖持久保存及128项剩余实现，原客户与组件门禁保留。

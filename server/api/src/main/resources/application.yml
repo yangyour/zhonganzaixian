@@ -10,9 +10,15 @@ server:
         same-site: strict
         secure: false
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5000000B
+      max-request-size: 5100000B
   profiles:
     default: remote_test
   jackson:
+    parser:
+      strict-duplicate-detection: true
     property-naming-strategy: SNAKE_CASE
     deserialization:
       fail-on-unknown-properties: true

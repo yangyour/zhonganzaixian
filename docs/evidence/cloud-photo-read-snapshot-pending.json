@@ -1,0 +1,29 @@
+{
+  "change": "Standalone ticket detail/list use one read-only REPEATABLE READ snapshot; existing write transactions are reused without changing isolation or locks.",
+  "authorization_linearization": "Main ticket SELECT snapshot; CURRENT_TICKET_ACCESS rechecks active user/membership, role and permission_version. Revocation committed after snapshot acquisition does not retroactively cancel this read.",
+  "before_v5": "No new ticket FOR SHARE or UPDATE privilege; photoSchemaPresent remains conditional. Designated V4 runtime regression NOT_RUN.",
+  "syntax_parse": {
+    "status": "PASS",
+    "files_parsed": 2,
+    "command": "source /workspace/cloud-setup/activate.sh && javac --release 17 -d .local/cloud-validation/photo-snapshot-review/classes .local/cloud-validation/photo-snapshot-review/PhotoSnapshotSyntaxCheck.java && java -cp .local/cloud-validation/photo-snapshot-review/classes PhotoSnapshotSyntaxCheck",
+    "mode": "JavacTask.parse only; no attribution or source type check"
+  },
+  "diff_check": "PASS",
+  "new_pg_regression_tests": [
+    "ticketDetailKeepsOneSnapshotWhenAnAttachmentCommitsAfterTheTicketRow",
+    "ticketListKeepsOneSnapshotWhenAnAttachmentCommitsAfterTheTicketRow"
+  ],
+  "pg_photo_test_methods": 16,
+  "pg_regression_status": "NOT_RUN: designated PostgreSQL, explicitly applied V5 and controlled private runtime required. Test hooks only schedule real JDBC reads/writes; existing scoped store doubles are not MinIO evidence.",
+  "full_module_build": "NOT_RUN",
+  "real_minio_oidc_http": "NOT_RUN",
+  "v5": "UNEXECUTED; no migration, remote access or secret read performed",
+  "source_sha256": {
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresPlatformRepository.java": "da28d514136997d42be7bb3ae0d232506026c76eaaf44ba92c3f8619ef38869f",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresPhotoIntegrationTest.java": "83a84330b4f35422b8e45c8e525f3854a04bfeed822632edeadb38cc0865586c"
+  },
+  "list_query_scope": "Full actual receipt_no read through the unhooked repository before constructing the hooked reader; hook still matches the exact ticket UUID.",
+  "history_payload_versions": "REGISTER explicitly persists version=1; ADD_ATTACHMENTS explicitly persists version=expected+1.",
+  "recorded_at": "2026-10-01T05:51:55.549503+00:00",
+  "business_status": "WIP_PENDING_FULL_TYPECHECK_AND_REAL_REGRESSION"
+}

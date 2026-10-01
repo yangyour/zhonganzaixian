@@ -7,14 +7,12 @@ import cn.mop.persistence.PostgresPlatformRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.flywaydb.core.Flyway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import javax.sql.DataSource;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @SpringBootApplication(exclude=org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration.class,
@@ -31,16 +29,13 @@ public class MopApplication {
     }
     @Bean @Profile("local_fixture") FixtureRepository fixtureRepository(ObjectMapper mapper){return new FixtureRepository(mapper);}
     @Bean(destroyMethod="close") @Profile("remote_test") HikariDataSource testDataSource(Environment environment){
-        String url=required(environment,"SPRING_DATASOURCE_URL"),migrationUser=required(environment,"MOP_MIGRATION_USERNAME"),migrationPassword=required(environment,"MOP_MIGRATION_PASSWORD");
+        String url=required(environment,"SPRING_DATASOURCE_URL");
         String runtimeUser=required(environment,"SPRING_DATASOURCE_USERNAME"),runtimePassword=required(environment,"SPRING_DATASOURCE_PASSWORD");
         if(!url.matches("jdbc:postgresql://127\\.0\\.0\\.1:[0-9]+/mop_test"))
             throw new IllegalStateException("FAIL_CLOSED: remote_test requires SSH-forwarded PostgreSQL dedicated mop_test URL without credentials");
-        if(!"mop_test_migrator".equals(migrationUser)||!"mop_test_runtime".equals(runtimeUser))throw new IllegalStateException("FAIL_CLOSED: use separate project migration/runtime roles");
-        // Verify the server response before any DDL. A misleading URL cannot migrate another database.
-        try(var connection=DriverManager.getConnection(url,migrationUser,migrationPassword);var statement=connection.createStatement();var rows=statement.executeQuery("SELECT current_database(),current_user")){
-            if(!rows.next()||!"mop_test".equals(rows.getString(1))||!migrationUser.equals(rows.getString(2)))throw new IllegalStateException("FAIL_CLOSED: unexpected migration database or role");
-        }catch(SQLException exception){throw new IllegalStateException("FAIL_CLOSED: designated test PostgreSQL migration connection unavailable");}
-        Flyway.configure().dataSource(url,migrationUser,migrationPassword).locations("classpath:db/migration").schemas("public").defaultSchema("public").createSchemas(false).cleanDisabled(true).validateMigrationNaming(true).load().migrate();
+        if(!"mop_test_runtime".equals(runtimeUser))throw new IllegalStateException("FAIL_CLOSED: use the restricted project runtime role");
+        // Application startup never performs DDL. Reviewed migrations run as a separate step;
+        // a pending photo schema must not be silently applied or prevent existing no-photo work.
         HikariConfig configuration=new HikariConfig();configuration.setJdbcUrl(url);configuration.setUsername(runtimeUser);configuration.setPassword(runtimePassword);configuration.setMaximumPoolSize(6);configuration.setMinimumIdle(1);configuration.setConnectionTimeout(5000);configuration.setValidationTimeout(3000);configuration.setInitializationFailTimeout(5000);configuration.setPoolName("mop-remote-test");
         HikariDataSource dataSource=new HikariDataSource(configuration);
         try(var connection=dataSource.getConnection();var statement=connection.createStatement();var rows=statement.executeQuery("SELECT current_database(),current_user")){

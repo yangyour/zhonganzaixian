@@ -25,7 +25,7 @@ class PostgresCustomerReportIntegrationTest {
     @BeforeAll static void connect()throws Exception{
         String url=required("SPRING_DATASOURCE_URL");assertTrue(url.matches("jdbc:postgresql://127\\.0\\.0\\.1:[0-9]+/mop_test"));
         try(Connection connection=DriverManager.getConnection(url,required("MOP_MIGRATION_USERNAME"),required("MOP_MIGRATION_PASSWORD"));Statement statement=connection.createStatement();ResultSet rows=statement.executeQuery("SELECT current_database(),current_user")){assertTrue(rows.next());assertEquals("mop_test",rows.getString(1));assertEquals("mop_test_migrator",rows.getString(2));}
-        Flyway.configure().dataSource(url,required("MOP_MIGRATION_USERNAME"),required("MOP_MIGRATION_PASSWORD")).locations("classpath:db/migration").schemas("public").createSchemas(false).cleanDisabled(true).load().migrate();
+        Flyway.configure().dataSource(url,required("MOP_MIGRATION_USERNAME"),required("MOP_MIGRATION_PASSWORD")).locations("classpath:db/migration").schemas("public").createSchemas(false).cleanDisabled(true).target("4").load().migrate();
         pool=pool(5);mapper=new ObjectMapper().registerModule(new JavaTimeModule()).setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);repository=new PostgresPlatformRepository(pool,mapper);assertTrue(repository.dependencyReady());
         customer=user("租户 A 只读用户（测试身份）");otherCustomer=user("租户 B 只读用户（测试身份）");sameTenantCustomer=user("租户 A 管理员（测试身份）");admin=user("平台管理员（测试身份）");engineer=user("服务工程师（测试身份）");
     }

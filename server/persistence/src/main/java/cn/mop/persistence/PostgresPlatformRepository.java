@@ -29,6 +29,22 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         try{if(active!=null)return work.run(active);try(Connection connection=dataSource.getConnection()){return work.run(connection);}}
         catch(SQLException exception){throw unavailable();}
     }
+    /**
+     * Standalone ticket reads authorize at the main SELECT snapshot and project that same snapshot.
+     * A later revocation does not retroactively cancel this read. Existing writes keep their locks
+     * and isolation. The read connection is not published to the transaction ThreadLocal,
+     * so it cannot introduce membership FOR SHARE locks into a read-only transaction.
+     */
+    private <T>T readSnapshot(SqlWork<T> work){
+        if(transaction.get()!=null)return connection(work);
+        try(Connection connection=dataSource.getConnection()){
+            connection.setReadOnly(true);
+            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+            connection.setAutoCommit(false);
+            try{T value=work.run(connection);connection.commit();return value;}
+            catch(SQLException|RuntimeException|Error exception){try{connection.rollback();}catch(SQLException ignored){}throw exception;}
+        }catch(SQLException exception){throw unavailable();}
+    }
     private <T>T inTransaction(Supplier<T> work){
         if(transaction.get()!=null)return work.get();
         try(Connection connection=dataSource.getConnection()){
@@ -172,28 +188,40 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         try(PreparedStatement statement=connection.prepareStatement("SELECT payload FROM public.mop_ticket_history WHERE tenant_id::text=? AND ticket_id::text=? AND version<=? ORDER BY version")){
             statement.setString(1,rows.getString("tenant_id"));statement.setString(2,rows.getString("id"));statement.setLong(3,rows.getLong("version"));try(ResultSet events=statement.executeQuery()){while(events.next())history.add(mapper.convertValue(json(events.getString(1)),LinkedHashMap.class));}
         }result.put("history",history);List<Map<String,Object>> attachments=new ArrayList<>();
-        try(PreparedStatement statement=connection.prepareStatement("SELECT * FROM public.mop_file WHERE tenant_id::text=? AND ticket_id::text=? ORDER BY created_at,id")){statement.setString(1,rows.getString("tenant_id"));statement.setString(2,rows.getString("id"));try(ResultSet files=statement.executeQuery()){while(files.next())attachments.add(fileProjection(files));}}
+        if(photoSchemaPresent(connection))try(PreparedStatement statement=connection.prepareStatement("SELECT * FROM public.mop_file WHERE tenant_id::text=? AND ticket_id::text=? ORDER BY created_at,id")){statement.setString(1,rows.getString("tenant_id"));statement.setString(2,rows.getString("id"));try(ResultSet files=statement.executeQuery()){while(files.next())attachments.add(fileProjection(files));}}
         result.put("attachments",attachments);return result;
     }
     @Override public List<Map<String,Object>> tickets(String tenant,String actor,String category,String urgency,String query,Instant afterCreated,String afterId,int limit){
         Membership membership=ticketAccess(tenant,actor);if(limit<1||limit>101||(afterCreated==null)!=(afterId==null))throw new DomainException(400,"VALIDATION_ERROR","工单分页参数无效");
         String sql="SELECT t.* FROM public.mop_ticket t WHERE t.tenant_id::text=?"+ownTicketPredicate(membership)+CURRENT_TICKET_ACCESS+(category==null?"":" AND t.category=?")+(urgency==null?"":" AND t.urgency=?")+(query==null?"":" AND position(lower(?) in lower(t.receipt_no||' '||t.title||' '||t.description))>0")+(afterCreated==null?"":" AND (t.created_at,t.id)>(?::timestamptz,?::uuid)")+" ORDER BY t.created_at,t.id LIMIT ?";
-        return connection(connection->{List<Map<String,Object>> result=new ArrayList<>();try(PreparedStatement statement=connection.prepareStatement(sql)){
+        return readSnapshot(connection->{List<Map<String,Object>> result=new ArrayList<>();try(PreparedStatement statement=connection.prepareStatement(sql)){
             int index=bindTicketScope(statement,tenant,actor,membership);if(category!=null)statement.setString(index++,category);if(urgency!=null)statement.setString(index++,urgency);if(query!=null)statement.setString(index++,query);if(afterCreated!=null){statement.setString(index++,afterCreated.toString());statement.setString(index++,afterId);}statement.setInt(index,limit);
             try(ResultSet rows=statement.executeQuery()){while(rows.next())result.add(ticketProjection(connection,rows));}
         }return result;});
     }
-    @Override public Optional<Map<String,Object>> ticket(String tenant,String actor,String id){Membership membership=ticketAccess(tenant,actor);return connection(connection->{
+    @Override public Optional<Map<String,Object>> ticket(String tenant,String actor,String id){Membership membership=ticketAccess(tenant,actor);return readSnapshot(connection->{
         try(PreparedStatement statement=connection.prepareStatement("SELECT t.* FROM public.mop_ticket t WHERE t.tenant_id::text=?"+ownTicketPredicate(membership)+CURRENT_TICKET_ACCESS+" AND t.id::text=?")){
             int index=bindTicketScope(statement,tenant,actor,membership);statement.setString(index,id);try(ResultSet rows=statement.executeQuery()){return rows.next()?Optional.of(ticketProjection(connection,rows)):Optional.empty();}
         }
     });}
-    @Override public Optional<Map<String,Object>> operation(String tenant,String actor,String id){Membership membership=ticketAccess(tenant,actor);return connection(connection->{
-        try(PreparedStatement statement=connection.prepareStatement("SELECT o.* FROM public.mop_operation o JOIN public.mop_ticket t ON t.tenant_id=o.tenant_id AND t.id=o.ticket_id AND t.operation_id=o.id WHERE t.tenant_id::text=?"+ownTicketPredicate(membership)+CURRENT_TICKET_ACCESS+" AND o.id::text=?")){
-            int index=bindTicketScope(statement,tenant,actor,membership);statement.setString(index,id);try(ResultSet rows=statement.executeQuery()){
-                if(!rows.next())return Optional.empty();Map<String,Object> result=new LinkedHashMap<>();for(String key:List.of("id","tenant_id","kind","status","step","result_ref"))result.put(key,rows.getString(key));result.put("progress",null);result.put("error",mapper.convertValue(json(rows.getString("error")),LinkedHashMap.class));result.put("created_at",instant(rows,"created_at").toString());result.put("updated_at",instant(rows,"updated_at").toString());return Optional.of(result);
+    private Map<String,Object> operationProjection(ResultSet rows)throws SQLException {
+        Map<String,Object> result=new LinkedHashMap<>();
+        for(String key:List.of("id","tenant_id","kind","status","step","result_ref"))result.put(key,rows.getString(key));
+        result.put("progress",null);String error=rows.getString("error");result.put("error",error==null?null:mapper.convertValue(json(error),LinkedHashMap.class));
+        result.put("created_at",instant(rows,"created_at").toString());result.put("updated_at",instant(rows,"updated_at").toString());return result;
+    }
+    @Override public Optional<Map<String,Object>> operation(String tenant,String actor,String id){return inTransaction(()->{
+        Membership membership=ticketAccess(tenant,actor);
+        return connection(connection->{
+            try(PreparedStatement statement=connection.prepareStatement("SELECT o.* FROM public.mop_operation o JOIN public.mop_ticket t ON t.tenant_id=o.tenant_id AND t.id=o.ticket_id AND t.operation_id=o.id WHERE t.tenant_id::text=?"+ownTicketPredicate(membership)+CURRENT_TICKET_ACCESS+" AND o.id::text=?")){
+                int index=bindTicketScope(statement,tenant,actor,membership);statement.setString(index,id);try(ResultSet rows=statement.executeQuery()){if(rows.next())return Optional.of(operationProjection(rows));}
             }
-        }
+            if(!photoSchemaPresent(connection))return Optional.empty();
+            try(PreparedStatement statement=connection.prepareStatement("SELECT o.* FROM public.mop_operation o JOIN public.mop_file f ON f.tenant_id=o.tenant_id AND f.id=o.file_id AND f.operation_id=o.id WHERE f.tenant_id::text=? AND o.id::text=?"+ownFilePredicate(membership))){
+                statement.setString(1,tenant);statement.setString(2,id);if(Capabilities.customer(membership.role()))statement.setString(3,actor);
+                try(ResultSet rows=statement.executeQuery()){return rows.next()?Optional.of(operationProjection(rows)):Optional.empty();}
+            }
+        });
     });}
     @Override public CustomerReportRegistration registerCustomerReport(String tenant,String actor,CustomerReport report){
         if(transaction.get()==null)throw new IllegalStateException("Customer report writes require idempotent transaction");Membership current=ticketAccess(tenant,actor);
@@ -201,9 +229,16 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         Asset asset=report.assetId()==null?null:find(tenant,report.assetId()).orElseThrow(PostgresPlatformRepository::missing);
         if(asset!=null){
             lock("ticket-duplicate|"+tenant+"|"+actor+"|"+asset.id()+"|"+report.category());
-            CustomerReportRegistration duplicate=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT id,operation_id FROM public.mop_ticket WHERE tenant_id::text=? AND reporter_id::text=? AND asset_id::text=? AND category=? AND created_at>=clock_timestamp()-interval '30 seconds' AND created_at<=clock_timestamp() ORDER BY created_at DESC,id DESC LIMIT 1")){
+            CustomerReportRegistration duplicate=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT id,operation_id,version FROM public.mop_ticket WHERE tenant_id::text=? AND reporter_id::text=? AND asset_id::text=? AND category=? AND created_at>=clock_timestamp()-interval '30 seconds' AND created_at<=clock_timestamp() ORDER BY created_at DESC,id DESC LIMIT 1 FOR UPDATE")){
                 statement.setString(1,tenant);statement.setString(2,actor);statement.setString(3,asset.id());statement.setString(4,report.category());try(ResultSet rows=statement.executeQuery()){return rows.next()?new CustomerReportRegistration(rows.getString("operation_id"),rows.getString("id"),false):null;}
-            }});if(duplicate!=null)return duplicate;
+            }});if(duplicate!=null){
+                boolean changed=false;
+                if(!report.attachmentIds().isEmpty()){
+                    long before=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT version FROM public.mop_ticket WHERE tenant_id::text=? AND id::text=? FOR UPDATE")){statement.setString(1,tenant);statement.setString(2,duplicate.ticketId());try(ResultSet rows=statement.executeQuery()){rows.next();return rows.getLong(1);}}});
+                    Map<String,Object> updated=attachPhotos(tenant,actor,duplicate.ticketId(),before,report.attachmentIds());changed=((Number)updated.get("version")).longValue()!=before;
+                }
+                return new CustomerReportRegistration(duplicate.operationId(),duplicate.ticketId(),false,changed);
+            }
         }
         String id=UUID.randomUUID().toString(),operationId=UUID.randomUUID().toString(),title=report.title()==null?report.category()+" / "+(asset==null?"设备不确定":asset.name()):report.title();
         Instant created=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_ticket(id,tenant_id,receipt_no,title,description,source,category,impact_scope,urgency,asset_id,asset_name,reporter_id,contact_name,contact_phone,operation_id) VALUES (?::uuid,?::uuid,?,?,?,'customer_report',?,?,?,?::uuid,?,?::uuid,?,?,?::uuid) RETURNING created_at")){
@@ -221,7 +256,188 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_outbox(id,tenant_id,ticket_id,operation_id,topic,payload,blocked_question_ids) VALUES (?::uuid,?::uuid,?::uuid,?::uuid,'ticket.customer_report.registered',?::jsonb,?::jsonb)")){
             statement.setString(1,UUID.randomUUID().toString());statement.setString(2,tenant);statement.setString(3,id);statement.setString(4,operationId);statement.setString(5,mapper.valueToTree(payload).toString());statement.setString(6,mapper.valueToTree(error.get("question_ids")).toString());statement.executeUpdate();return null;
         }});
+        if(!report.attachmentIds().isEmpty())bindPhotoRows(tenant,actor,id,report.attachmentIds(),0);
         return new CustomerReportRegistration(operationId,id,true);
+    }
+    private static boolean photoSchemaPresent(Connection connection)throws SQLException {
+        try(PreparedStatement statement=connection.prepareStatement("SELECT to_regclass('public.mop_file') IS NOT NULL AND to_regclass('public.mop_photo_job') IS NOT NULL AND to_regclass('public.mop_file_grant') IS NOT NULL" );ResultSet rows=statement.executeQuery()){return rows.next()&&rows.getBoolean(1);}
+    }
+    /** Read-only startup gate. The worker never applies schema migrations. */
+    public boolean fileWorkerReady(){
+        if(!dependencyReady())return false;
+        try{return connection(connection->{
+            if(!photoSchemaPresent(connection))return false;
+            // Earlier draft shapes rejected NULL next_at/error/ticket_id and cannot run file jobs.
+            try(PreparedStatement statement=connection.prepareStatement("SELECT count(*)=3 AND bool_and(NOT attnotnull) FROM pg_attribute WHERE NOT attisdropped AND ((attrelid='public.mop_photo_job'::regclass AND attname='next_at') OR (attrelid='public.mop_operation'::regclass AND attname IN ('ticket_id','error')))" );ResultSet rows=statement.executeQuery()){if(!rows.next()||!rows.getBoolean(1))return false;}
+            // Parse/read the exact consumed schema without fetching original bytes.
+            try(PreparedStatement statement=connection.prepareStatement("SELECT j.id,j.tenant_id,j.file_id,j.content,j.state,j.lease_owner,j.lease_until,j.fencing_token,j.attempts,j.next_at,j.created_at,f.id,f.tenant_id,f.created_by,f.purpose,f.original_name,f.media_type,f.size_bytes,f.sha256,f.object_key,f.operation_id,f.permission_version,f.upload_status,f.ticket_id,f.version,f.created_at,f.updated_at,o.file_id,o.kind,o.status,o.step,o.error,o.updated_at FROM public.mop_photo_job j JOIN public.mop_file f ON f.tenant_id=j.tenant_id AND f.id=j.file_id JOIN public.mop_operation o ON o.tenant_id=f.tenant_id AND o.id=f.operation_id WHERE FALSE")){statement.executeQuery().close();}
+            for(String table:List.of("mop_photo_job","mop_file","mop_operation","mop_membership","mop_user","mop_audit")){
+                try(PreparedStatement statement=connection.prepareStatement("SELECT has_table_privilege(current_user,?,'SELECT')")){statement.setString(1,"public."+table);try(ResultSet rows=statement.executeQuery()){if(!rows.next()||!rows.getBoolean(1))return false;}}
+            }
+            try(PreparedStatement statement=connection.prepareStatement("SELECT has_table_privilege(current_user,'public.mop_audit','INSERT')");ResultSet rows=statement.executeQuery()){if(!rows.next()||!rows.getBoolean(1))return false;}
+            // FOR SHARE authorization locks require UPDATE on at least one column.
+            for(String table:List.of("mop_membership","mop_user"))try(PreparedStatement statement=connection.prepareStatement("SELECT has_any_column_privilege(current_user,?,'UPDATE')")){statement.setString(1,"public."+table);try(ResultSet rows=statement.executeQuery()){if(!rows.next()||!rows.getBoolean(1))return false;}}
+            Map<String,List<String>> updates=Map.of("mop_photo_job",List.of("state","lease_owner","lease_until","fencing_token","attempts","next_at"),"mop_file",List.of("upload_status","version","updated_at"),"mop_operation",List.of("status","step","error","updated_at"));
+            for(var table:updates.entrySet())for(String column:table.getValue()){
+                try(PreparedStatement statement=connection.prepareStatement("SELECT has_column_privilege(current_user,?,?,'UPDATE')")){statement.setString(1,"public."+table.getKey());statement.setString(2,column);try(ResultSet rows=statement.executeQuery()){if(!rows.next()||!rows.getBoolean(1))return false;}}
+            }return true;
+        });}catch(DomainException unavailable){return false;}
+    }
+    private void requirePhotoSchema(){if(!connection(PostgresPlatformRepository::photoSchemaPresent))throw new DomainException(503,"UPSTREAM_UNAVAILABLE","照片耐久数据库结构尚未就绪，未受理照片请求");}
+    private Membership photoReporter(String tenant,String actor){
+        Membership current=ticketAccess(tenant,actor);
+        if(!Capabilities.forRole(current.role()).contains("tickets:report"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色不能上传或追加客户报障照片");return current;
+    }
+    private static String ownFilePredicate(Membership membership){return Capabilities.customer(membership.role())?" AND f.created_by::text=?":"";}
+    private static Map<String,Object> fileProjection(ResultSet rows)throws SQLException {
+        Map<String,Object> result=new LinkedHashMap<>();
+        for(String key:List.of("id","tenant_id","purpose","original_name","media_type","sha256","upload_status","created_by","ticket_id","operation_id"))result.put(key,rows.getString(key));
+        result.put("size_bytes",rows.getLong("size_bytes"));result.put("version",rows.getLong("version"));result.put("created_at",instant(rows,"created_at").toString());result.put("updated_at",instant(rows,"updated_at").toString());
+        result.put("scan_status","UNSCANNED");result.put("retention_until",null);result.put("production_approval","UNVERIFIED");result.put("policy_source","USER_DEVELOPMENT_DIRECTION");result.put("source","postgresql");return result;
+    }
+    @Override public Map<String,Object> acceptPhoto(String tenant,String actor,PhotoUpload upload){
+        if(transaction.get()==null)throw new IllegalStateException("Photo acceptance requires idempotent transaction");
+        requirePhotoSchema();Membership current=photoReporter(tenant,actor);PhotoRules.validateUpload(upload);
+        byte[] content=upload.content();String file=UUID.randomUUID().toString(),operation=UUID.randomUUID().toString();
+        connection(connection->{
+            try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_file(id,tenant_id,created_by,original_name,media_type,size_bytes,sha256,object_key,operation_id,permission_version,purpose) VALUES (?::uuid,?::uuid,?::uuid,?,?,?,?,?,?::uuid,?,'customer_report_photo')")){
+                statement.setString(1,file);statement.setString(2,tenant);statement.setString(3,actor);statement.setString(4,upload.originalName());statement.setString(5,upload.mediaType());statement.setInt(6,content.length);statement.setString(7,upload.sha256());statement.setString(8,"photos/"+tenant+"/"+file);statement.setString(9,operation);statement.setLong(10,current.permissionVersion());statement.executeUpdate();
+            }
+            try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_operation(id,tenant_id,file_id,kind,status,step,result_ref,error) VALUES (?::uuid,?::uuid,?::uuid,'FILE_UPLOAD','PENDING','QUEUED',?,NULL)")){
+                statement.setString(1,operation);statement.setString(2,tenant);statement.setString(3,file);statement.setString(4,"/api/v1/files/"+file);statement.executeUpdate();
+            }
+            try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_photo_job(id,tenant_id,file_id,content) VALUES (?::uuid,?::uuid,?::uuid,?)")){
+                statement.setString(1,UUID.randomUUID().toString());statement.setString(2,tenant);statement.setString(3,file);statement.setBytes(4,content);statement.executeUpdate();
+            }return null;
+        });return Map.of("operation_id",operation,"status","PENDING");
+    }
+    @Override public Optional<Map<String,Object>> file(String tenant,String actor,String id){return inTransaction(()->{
+        requirePhotoSchema();Membership current=ticketAccess(tenant,actor);
+        return connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT f.* FROM public.mop_file f WHERE f.tenant_id::text=? AND f.id::text=?"+ownFilePredicate(current))){
+            statement.setString(1,tenant);statement.setString(2,id);if(Capabilities.customer(current.role()))statement.setString(3,actor);try(ResultSet rows=statement.executeQuery()){return rows.next()?Optional.of(fileProjection(rows)):Optional.empty();}
+        }});
+    });}
+    @Override public Map<String,Object> contentGrant(String tenant,String actor,String id){return inTransaction(()->{
+        requirePhotoSchema();Membership current=ticketAccess(tenant,actor);Map<String,Object> photo=file(tenant,actor,id).orElseThrow(PostgresPlatformRepository::missing);
+        if(!"READY".equals(photo.get("upload_status")))throw new DomainException(422,"STATE_NOT_ALLOWED","照片尚未存储完成");
+        String grant=UUID.randomUUID().toString();Instant expires=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_file_grant(id,tenant_id,file_id,actor_id,permission_version,expires_at) VALUES (?::uuid,?::uuid,?::uuid,?::uuid,?,clock_timestamp()+interval '15 minutes') RETURNING expires_at")){
+            statement.setString(1,grant);statement.setString(2,tenant);statement.setString(3,id);statement.setString(4,actor);statement.setLong(5,current.permissionVersion());try(ResultSet rows=statement.executeQuery()){rows.next();return instant(rows,"expires_at");}
+        }});return Map.of("content_url","/api/v1/files/"+id+"/content?grant="+grant,"expires_at",expires.toString());
+    });}
+    /** Internal descriptor for authorized API proxy reads; never an HTTP metadata response. */
+    @Override public Map<String,Object> photoContent(String tenant,String actor,String id,String grant){return inTransaction(()->{
+        requirePhotoSchema();Membership current=ticketAccess(tenant,actor);
+        return connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT f.* FROM public.mop_file f JOIN public.mop_file_grant g ON g.tenant_id=f.tenant_id AND g.file_id=f.id WHERE f.tenant_id::text=? AND f.id::text=? AND g.id::text=? AND g.actor_id::text=? AND g.permission_version=? AND g.expires_at>clock_timestamp() AND f.upload_status='READY'"+ownFilePredicate(current))){
+            statement.setString(1,tenant);statement.setString(2,id);statement.setString(3,grant);statement.setString(4,actor);statement.setLong(5,current.permissionVersion());if(Capabilities.customer(current.role()))statement.setString(6,actor);
+            try(ResultSet rows=statement.executeQuery()){if(!rows.next())throw missing();return Map.of("object_key",rows.getString("object_key"),"byte_size",rows.getLong("size_bytes"),"sha256",rows.getString("sha256"),"media_type",rows.getString("media_type"),"original_name",rows.getString("original_name"));}
+        }});
+    });}
+    /** Locks requested files in stable ID order after the ticket lock; bindings cannot race across tickets. */
+    private boolean bindPhotoRows(String tenant,String actor,String ticket,List<String> ids,int existing){
+        requirePhotoSchema();List<String> requested=PhotoRules.attachmentIds(ids);List<String> additions=new ArrayList<>();
+        connection(connection->{
+            for(String id:requested){try(PreparedStatement statement=connection.prepareStatement("SELECT created_by,upload_status,ticket_id FROM public.mop_file WHERE tenant_id::text=? AND id::text=? FOR UPDATE")){
+                statement.setString(1,tenant);statement.setString(2,id);try(ResultSet rows=statement.executeQuery()){
+                    if(!rows.next()||!actor.equals(rows.getString("created_by")))throw missing();
+                    if(!"READY".equals(rows.getString("upload_status")))throw new DomainException(422,"STATE_NOT_ALLOWED","只能绑定已完成存储的照片");
+                    String bound=rows.getString("ticket_id");if(bound!=null&&!ticket.equals(bound))throw new DomainException(409,"FILE_ALREADY_ATTACHED","照片已绑定其他报障登记");if(bound==null)additions.add(id);
+                }
+            }}
+            if(existing+additions.size()>3)throw new DomainException(422,"STATE_NOT_ALLOWED","每条报障登记最多绑定3张照片");
+            for(String id:additions){try(PreparedStatement statement=connection.prepareStatement("UPDATE public.mop_file SET ticket_id=?::uuid,version=version+1,updated_at=clock_timestamp() WHERE tenant_id::text=? AND id::text=? AND created_by::text=? AND upload_status='READY' AND ticket_id IS NULL")){
+                statement.setString(1,ticket);statement.setString(2,tenant);statement.setString(3,id);statement.setString(4,actor);if(statement.executeUpdate()!=1)throw new DomainException(409,"VERSION_CONFLICT","照片绑定已变化");
+            }}return null;
+        });return !additions.isEmpty();
+    }
+    @Override public Map<String,Object> attachPhotos(String tenant,String actor,String id,long expected,List<String> ids){
+        if(transaction.get()==null)throw new IllegalStateException("Photo attachment requires idempotent transaction");
+        requirePhotoSchema();photoReporter(tenant,actor);PhotoRules.attachmentIds(ids);if(expected<1)throw new DomainException(400,"VALIDATION_ERROR","expected_version必须为正整数");
+        connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT reporter_id,version FROM public.mop_ticket WHERE tenant_id::text=? AND id::text=? FOR UPDATE")){
+            statement.setString(1,tenant);statement.setString(2,id);try(ResultSet rows=statement.executeQuery()){if(!rows.next()||!actor.equals(rows.getString("reporter_id")))throw missing();if(rows.getLong("version")!=expected)throw new DomainException(409,"VERSION_CONFLICT","报障版本已变化，请刷新后重试");}
+        }return null;});
+        int existing=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT count(*) FROM public.mop_file WHERE tenant_id::text=? AND ticket_id::text=?")){statement.setString(1,tenant);statement.setString(2,id);try(ResultSet rows=statement.executeQuery()){rows.next();return rows.getInt(1);}}});
+        if(bindPhotoRows(tenant,actor,id,ids,existing)){
+            Instant updated=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("UPDATE public.mop_ticket SET version=version+1,updated_at=clock_timestamp() WHERE tenant_id::text=? AND id::text=? AND version=? RETURNING updated_at")){statement.setString(1,tenant);statement.setString(2,id);statement.setLong(3,expected);try(ResultSet rows=statement.executeQuery()){if(!rows.next())throw new DomainException(409,"VERSION_CONFLICT","报障版本已变化");return instant(rows,"updated_at");}}});
+            Map<String,Object> event=Map.of("action","ADD_ATTACHMENTS","actor_id",actor,"occurred_at",updated.toString(),"version",expected+1);
+            connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_ticket_history(tenant_id,ticket_id,version,payload) VALUES (?::uuid,?::uuid,?,?::jsonb)")){statement.setString(1,tenant);statement.setString(2,id);statement.setLong(3,expected+1);statement.setString(4,mapper.valueToTree(event).toString());statement.executeUpdate();return null;}});
+        }return ticket(tenant,actor,id).orElseThrow(PostgresPlatformRepository::missing);
+    }
+    private record PhotoJob(String id,String tenant,String file,String actor,String operation,String key,String media,String sha,byte[] content,long permissionVersion,long token,int attempts,boolean authorizedAtClaim){}
+    private PhotoJob claimPhoto(String worker,Set<String> allowedFiles){return inTransaction(()->{
+        requirePhotoSchema();return connection(connection->{
+            String sql="SELECT j.id AS job_id,j.content,j.fencing_token,j.attempts,f.* FROM public.mop_photo_job j JOIN public.mop_file f ON f.tenant_id=j.tenant_id AND f.id=j.file_id WHERE ((j.state='PENDING' AND j.next_at<=clock_timestamp()) OR (j.state='LEASED' AND j.lease_until<=clock_timestamp())) AND f.upload_status='PENDING'"+(allowedFiles==null?"":" AND f.id::text IN ("+String.join(",",Collections.nCopies(allowedFiles.size(),"?"))+")")+" ORDER BY j.created_at,j.id LIMIT 1 FOR UPDATE OF j SKIP LOCKED";
+            PhotoJob job;try(PreparedStatement statement=connection.prepareStatement(sql)){
+                if(allowedFiles!=null){int index=1;for(String id:allowedFiles)statement.setString(index++,id);}
+                try(ResultSet rows=statement.executeQuery()){
+                    if(!rows.next())return null;
+                    job=new PhotoJob(rows.getString("job_id"),rows.getString("tenant_id"),rows.getString("id"),rows.getString("created_by"),rows.getString("operation_id"),rows.getString("object_key"),rows.getString("media_type"),rows.getString("sha256"),rows.getBytes("content"),rows.getLong("permission_version"),rows.getLong("fencing_token")+1,rows.getInt("attempts")+1,true);
+                }
+            }
+            if(!authorizedPhotoJob(job)){
+                try(PreparedStatement statement=connection.prepareStatement("UPDATE public.mop_photo_job SET state='FAILED',lease_owner=NULL,lease_until=NULL,fencing_token=?,attempts=?,next_at=NULL WHERE id::text=? AND tenant_id::text=? AND fencing_token=?")){
+                    statement.setLong(1,job.token());statement.setInt(2,job.attempts());statement.setString(3,job.id());statement.setString(4,job.tenant());statement.setLong(5,job.token()-1);if(statement.executeUpdate()!=1)throw new LostPhotoLease();
+                }
+                try(PreparedStatement statement=connection.prepareStatement("UPDATE public.mop_file SET upload_status='FAILED',version=version+1,updated_at=clock_timestamp() WHERE tenant_id::text=? AND id::text=? AND upload_status='PENDING'")){
+                    statement.setString(1,job.tenant());statement.setString(2,job.file());if(statement.executeUpdate()!=1)throw new LostPhotoLease();
+                }
+                updatePhotoOperation(job,"FAILED","AUTHORIZATION_REVOKED",photoError("AUTHORIZATION_REVOKED"));
+                audit(job.actor(),job.tenant(),"file.worker.failed","file",job.file(),"FAILED","AUTHORIZATION_REVOKED","photo-job-"+job.id()+"-"+job.token());
+                return new PhotoJob(job.id(),job.tenant(),job.file(),job.actor(),job.operation(),job.key(),job.media(),job.sha(),job.content(),job.permissionVersion(),job.token(),job.attempts(),false);
+            }
+            try(PreparedStatement statement=connection.prepareStatement("UPDATE public.mop_photo_job SET state='LEASED',lease_owner=?,lease_until=clock_timestamp()+interval '120 seconds',fencing_token=?,attempts=?,next_at=NULL WHERE id::text=? AND tenant_id::text=?")){
+                statement.setString(1,worker);statement.setLong(2,job.token());statement.setInt(3,job.attempts());statement.setString(4,job.id());statement.setString(5,job.tenant());statement.executeUpdate();
+            }
+            updatePhotoOperation(job,"RUNNING","UPLOADING",null);
+            return job;
+        });
+    });}
+    private boolean authorizedPhotoJob(PhotoJob job){return inTransaction(()->{
+        return membership(job.actor(),job.tenant()).filter(m->m.permissionVersion()==job.permissionVersion()&&Capabilities.forRole(m.role()).contains("tickets:report")).isPresent();
+    });}
+    private void updatePhotoOperation(PhotoJob job,String status,String step,Map<String,Object> error){
+        connection(connection->{try(PreparedStatement statement=connection.prepareStatement("UPDATE public.mop_operation SET status=?,step=?,error=?::jsonb,updated_at=clock_timestamp() WHERE tenant_id::text=? AND id::text=? AND file_id::text=? AND kind='FILE_UPLOAD'")){
+            statement.setString(1,status);statement.setString(2,step);statement.setString(3,error==null?null:mapper.valueToTree(error).toString());statement.setString(4,job.tenant());statement.setString(5,job.operation());statement.setString(6,job.file());if(statement.executeUpdate()!=1)throw unavailable();return null;
+        }});
+    }
+    /** Fencing and unexpired lease guard every completion, including retries and authorization failure. */
+    private boolean finishPhoto(PhotoJob job,String worker,String outcome){return inTransaction(()->{
+        boolean lease=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT 1 FROM public.mop_photo_job WHERE tenant_id::text=? AND id::text=? AND state='LEASED' AND lease_owner=? AND fencing_token=? AND lease_until>clock_timestamp() FOR UPDATE")){
+            statement.setString(1,job.tenant());statement.setString(2,job.id());statement.setString(3,worker);statement.setLong(4,job.token());try(ResultSet rows=statement.executeQuery()){return rows.next();}
+        }});if(!lease)return false;
+        String resolved=authorizedPhotoJob(job)?outcome:"AUTHORIZATION_REVOKED";
+        boolean succeeded="STORED".equals(resolved),retry="RETRY_WAIT".equals(resolved);
+        connection(connection->{try(PreparedStatement statement=connection.prepareStatement("UPDATE public.mop_photo_job SET state=?,lease_owner=NULL,lease_until=NULL,next_at=CASE WHEN ? THEN clock_timestamp()+(? * interval '1 second') ELSE NULL END WHERE tenant_id::text=? AND id::text=? AND state='LEASED' AND lease_owner=? AND fencing_token=? AND lease_until>clock_timestamp()")){
+            statement.setString(1,succeeded?"SUCCEEDED":retry?"PENDING":"FAILED");statement.setBoolean(2,retry);statement.setInt(3,PhotoRules.retrySeconds(job.attempts()));statement.setString(4,job.tenant());statement.setString(5,job.id());statement.setString(6,worker);statement.setLong(7,job.token());if(statement.executeUpdate()!=1)throw new LostPhotoLease();
+        }
+            try(PreparedStatement statement=connection.prepareStatement("UPDATE public.mop_file SET upload_status=?,version=version+1,updated_at=clock_timestamp() WHERE tenant_id::text=? AND id::text=? AND upload_status='PENDING'")){
+                statement.setString(1,succeeded?"READY":retry?"PENDING":"FAILED");statement.setString(2,job.tenant());statement.setString(3,job.file());if(statement.executeUpdate()!=1)throw new LostPhotoLease();
+            }return null;
+        });
+        Map<String,Object> error=photoError(resolved);
+        updatePhotoOperation(job,succeeded?"SUCCEEDED":retry?"PENDING":"FAILED",resolved,error);
+        audit(job.actor(),job.tenant(),"file.worker."+(succeeded?"stored":retry?"retry":"failed"),"file",job.file(),succeeded?"SUCCEEDED":retry?"PENDING":"FAILED",resolved,"photo-job-"+job.id()+"-"+job.token());return true;
+    });}
+    private static Map<String,Object> photoError(String outcome){
+        if("STORED".equals(outcome))return null;boolean retry="RETRY_WAIT".equals(outcome),revoked="AUTHORIZATION_REVOKED".equals(outcome);
+        return Map.of("code",retry?"UPSTREAM_UNAVAILABLE":revoked?"ACTION_FORBIDDEN":"FILE_INTEGRITY_CONFLICT","message",retry?"照片存储暂不可用，耐久任务等待重试":revoked?"上传授权已变化，禁止继续处理":"已有照片对象摘要不一致，禁止覆盖","retryable",retry,"question_ids",List.of());
+    }
+    private static final class LostPhotoLease extends RuntimeException {}
+    @Override public boolean processNextPhoto(String worker,PhotoObjectStore store){return processPhoto(worker,store,null);}
+    /** Package-local integration seam: injected stores can only consume explicit newly-created test file IDs. */
+    boolean processNextPhoto(String worker,PhotoObjectStore store,Set<String> allowedFileIds){
+        if(allowedFileIds==null||allowedFileIds.isEmpty()||allowedFileIds.size()>100)throw new IllegalArgumentException("A nonempty explicit photo test scope is required");
+        TreeSet<String> scope=new TreeSet<>();for(String id:allowedFileIds){if(id==null||!id.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))throw new IllegalArgumentException("Photo test scope requires canonical UUIDs");scope.add(id);}
+        return processPhoto(worker,store,Collections.unmodifiableSet(scope));
+    }
+    private boolean processPhoto(String worker,PhotoObjectStore store,Set<String> allowedFiles){
+        if(worker==null||!worker.matches("[A-Za-z0-9_-]{1,64}")||store==null)throw new IllegalArgumentException("Photo worker ID and store are required");
+        PhotoJob job=claimPhoto(worker,allowedFiles);if(job==null)return false;if(!job.authorizedAtClaim())return true;String outcome;
+        if(!authorizedPhotoJob(job))outcome="AUTHORIZATION_REVOKED";
+        else try{PhotoRules.validateStoredContent(job.content(),job.sha());store.storeImmutable(job.key(),job.content(),job.media(),job.sha());outcome="STORED";}
+        catch(DomainException error){outcome="FILE_INTEGRITY_CONFLICT".equals(error.code)?"STORAGE_CONFLICT":"RETRY_WAIT";}
+        catch(RuntimeException error){outcome="RETRY_WAIT";}
+        try{finishPhoto(job,worker,outcome);}catch(LostPhotoLease stale){/* The newer lease owns all database writes. */}
+        return true;
     }
     @Override public void audit(String actor,String tenant,String action,String resourceType,String resourceId,String result,String reason,String trace){inTransaction(()->{
         String namespace=tenant==null?"platform":tenant;lock("audit|"+namespace);

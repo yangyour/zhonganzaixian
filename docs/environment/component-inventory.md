@@ -1,10 +1,10 @@
 # 指定测试环境组件清单
 
-盘点日期：2026-09-30。依据：用户指定的私有连接资料与SSH只读探测。原连接文件保存于 `deploy/private/develop.txt`，已排除Git；本文不记录密码、token或含密连接串。
+历史本地盘点日期：2026-09-30；云端接续更新：2026-10-01。下表的服务版本及权限来自原指定服务器盘点和本地测试，不能推定当前云端已经连通。原连接资料使用Git忽略的`deploy/private/develop.txt`；本文不记录密码、token或含密连接串。
 
 用户要求本地启动及涉及外部组件的集成测试也复用本环境。默认运行模式为 `remote_test`，组件失败不得回退到fixture或本机替代服务。项目全局规则见 `AGENTS.md`。
 
-|能力|服务器已有组件/版本|本机SSH转发|本轮复用/验证状态|
+|能力|服务器已有组件/版本|历史本机SSH转发|历史本地复用/验证状态|
 |---|---|---|---|
 |关系数据库|shared-postgres：PostgreSQL 17.9；原镜像timescale/timescaledb-ha:pg17-pgvector086|127.0.0.1:15432 → 服务器127.0.0.1:12060|独立mop_test、migrator/runtime角色；资产/成员/配置/修订/报障登记/不可变历史/幂等/审计持久化；V4新增ticket/operation/history/outbox意图，19项真实PG集成及报障47次HTTP/页面留证；V1/V2/V3原权限证据保留|
 |身份|hltk-keycloak：Keycloak 26.2.4|127.0.0.1:18110 → 服务器127.0.0.1:12110|已建本项目mop-test realm、mop-web client、6个虚构测试身份（含2026-10-01新增配置复核padmin）；真实OIDC及双主体内部审核已验证，不代表正式岗位批准|
@@ -36,3 +36,15 @@
 2026-10-01新增报障切片继续复用同一PostgreSQL/Keycloak，不新装组件、不开放远程公网组件端口。V4四张登记表对运行账号仅SELECT/INSERT；outbox为CONFIG_PENDING、next_at=null，尚无RabbitMQ投递/Worker消费。联系方式绑定为UNVERIFIED；后续MinIO项目桶/受限身份已单独准备并验证，见[图片测试存储](../photo-test-storage.md)，尚不等于API图片上传与补传已接入。JPEG/PNG为用户授权的当前开发方向，Q28扫描/隔离及其他文件策略、Q10保留/清理继续待确认。会话岗位与capabilities同取租户membership，新增2项纯测试及真实HTTP降级/恢复验证通过；报障HTTP/页面证据见[报障说明](../customer-report-registration.md)。
 
 公开探测摘要：`component-probe.json`。凭据仅在 `deploy/private/`；原始全机盘点输出不用于公共产品页面。
+
+## 2026-10-01云端接续阻塞与新增代码
+
+|依赖|本轮证据与状态|影响及后续|
+|---|---|---|
+|项目私有配置|develop.txt存在；runtime.json和known_hosts缺失；helper预检明确拒绝|真实OIDC/PG/MinIO及启动NOT_RUN；通过受控私有配置交付已有绑定，不重新生成或旋转账号密码|
+|指定SSH通道|平台代理目标域名策略拒绝，未建立本项目受控隧道|指定组件云端连通及集成BLOCKED；保留原主机信任配置，不开放公网组件端口、不改其他服务|
+|Maven依赖下载|Maven Central返回429、Google镜像返回403；有工具链不等于构建已通过|完整Java编译/JUnit仍未完成；保留TLS/制品校验，网络恢复后重新验证|
+|照片PG结构与权限|V5为未执行草稿；V1–V4未改；API/Worker启动不自动迁移|新增照片请求/Worker明确未就绪；先审核再独立迁移，不以普通启动或target4测试偷偷执行V5|
+|照片业务|新增PG租约/fencing、MinIO条件写、附件CAS、15分钟平台grant及前端代码|DOING/PARTIAL；真实恢复/竞争/撤权/原图HTTP尚未验证，不把PG消费者记作RabbitMQ业务接入|
+
+当前云端未新建数据库、缓存、队列或监控替代指定组件。历史MinIO桶/IAM验证仍有参考价值，但新增业务与本轮访问权限须另外验证。Q28扫描/隔离、Q10留存清理及生产Q02/Q03/Q17等门禁继续保留，未知结果不记通过。

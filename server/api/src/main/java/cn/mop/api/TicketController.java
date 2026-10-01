@@ -31,9 +31,23 @@ public class TicketController {
             if(!Capabilities.forRole(current.role()).contains("tickets:report"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无客户报障权限");
             CustomerReportRegistration result=repository.registerCustomerReport(access.tenant,access.actor,report);
             if(result.created())repository.audit(access.actor,access.tenant,"ticket.customer_report.register","ticket",result.ticketId(),"SUCCEEDED","DURABLE_RECEIPT_ONLY_RULES_PENDING",trace(request));
+            if(result.attachmentsChanged())repository.audit(access.actor,access.tenant,"ticket.attachments.add","ticket",result.ticketId(),"SUCCEEDED","READY_ORIGINAL_PHOTOS_UNSCANNED",trace(request));
             return map("operation_id",result.operationId(),"status","PENDING");
         });
         return ResponseEntity.status(202).body(success(accepted,request));
+    }
+    @PostMapping("/tickets/{id}/attachments") Object attachments(@PathVariable String id,@RequestBody JsonNode body,HttpServletRequest request){
+        Access access=access(request);noQuery(request);String key=requestKey(request);
+        if(body==null||!body.isObject())throw CustomerReportValidator.invalid("请求体必须为JSON对象");
+        body.fieldNames().forEachRemaining(field->{if(!Set.of("expected_version","attachment_ids").contains(field))throw CustomerReportValidator.invalid("存在未知或禁止字段");});
+        JsonNode version=body.get("expected_version");if(version==null||!version.isIntegralNumber()||!version.canConvertToLong()||version.asLong()<1)throw CustomerReportValidator.invalid("expected_version 必须为正整数");
+        List<String> ids=CustomerReportValidator.attachmentIds(body.get("attachment_ids"),true);
+        Object result=repository.idempotent(access.actor,access.tenant,route(request),key,hash(body),access.membership.permissionVersion(),()->{
+            Membership current=repository.membership(access.actor,access.tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效"));
+            if(!Capabilities.forRole(current.role()).contains("tickets:report"))throw new DomainException(403,"ACTION_FORBIDDEN","仅报障人可追加照片");
+            Map<String,Object> ticket=repository.attachPhotos(access.tenant,access.actor,id,version.asLong(),ids);
+            repository.audit(access.actor,access.tenant,"ticket.attachments.add","ticket",id,"SUCCEEDED","READY_ORIGINAL_PHOTOS_UNSCANNED",trace(request));return ticket;
+        });return success(result,request);
     }
     @GetMapping("/tickets") Object list(@RequestParam Map<String,String> query,HttpServletRequest request){
         Access access=access(request);Set<String> allowed=Set.of("cursor","page_size","category","urgency","q");
@@ -52,7 +66,7 @@ public class TicketController {
     @GetMapping("/operations/{id}") Object operation(@PathVariable String id,HttpServletRequest request){Access access=access(request);noQuery(request);return success(repository.operation(access.tenant,access.actor,id).orElseThrow(TicketController::missing),request);}
     private Access access(HttpServletRequest request){
         if(request.getUserPrincipal()==null||request.getSession(false)==null)throw new DomainException(401,"SESSION_EXPIRED","会话不存在或已过期");String actor=request.getUserPrincipal().getName(),tenant=(String)request.getSession(false).getAttribute("mop.tenant_id");
-        Membership membership=repository.membership(actor,tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效"));if(!Capabilities.forRole(membership.role()).contains("tickets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无工单查询权限");return new Access(actor,tenant,membership);
+        if(tenant==null)throw new DomainException(401,"SESSION_EXPIRED","当前租户会话已失效");Membership membership=repository.membership(actor,tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效"));if(!Capabilities.forRole(membership.role()).contains("tickets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无工单查询权限");return new Access(actor,tenant,membership);
     }
     private static String requestKey(HttpServletRequest request){String key=request.getHeader("Idempotency-Key");if(key==null||!key.matches("[A-Za-z0-9._:-]{1,128}"))throw CustomerReportValidator.invalid("Idempotency-Key 为必填，长度1至128且仅包含字母数字及._:-");return key;}
     private static void noQuery(HttpServletRequest request){if(!request.getParameterMap().isEmpty())throw CustomerReportValidator.invalid("此接口不接受查询参数");}

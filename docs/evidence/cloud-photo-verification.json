@@ -1,0 +1,363 @@
+{
+  "recorded_at": "2026-10-01T05:04:25.508507+00:00",
+  "branch": "handoff/cloud-20261001-photos",
+  "handoff_base": "caff027d7e1fb2e65f0babf8b6de0369b46fe48e",
+  "business_status": "PARTIAL",
+  "contract_tc_status": {
+    "total": 128,
+    "NOT_RUN": 128,
+    "evidence_filled": 0
+  },
+  "runtime": {
+    "node": "22.22.0",
+    "npm": "10.9.4",
+    "java": "17.0.19",
+    "maven": "3.9.9",
+    "python": "3.12.14"
+  },
+  "contract": {
+    "status": "PASSED_PURE_SCHEMA_ONLY",
+    "version": "0.5.0",
+    "commands": [
+      "node tests/contracts.test.mjs",
+      "npm test",
+      "npm run contract:check"
+    ],
+    "tests": 7,
+    "failed": 0,
+    "skipped": 0,
+    "npm_test_discovery": "1 test file; do not add to the direct 7-case count",
+    "source_sha256": {
+      "tools/build-api-contract.mjs": "bc388bcc34d608e9dd65aea93a2970cae1eb395b18354b16b0ee52ae356229b3",
+      "tests/contracts.test.mjs": "003c5a6ebf96791a573f51c5699f83f4182cea3da28824d1f27b1ec12fc4ec9d",
+      "contracts/local-api.openapi.json": "b8a69ef40a8f7ee08bfdb9bc052d5d34e529ab202c80e2bbb626206460a0d1d4"
+    },
+    "performed_at": "2026-10-01T05:38:07.592455+00:00",
+    "description_correction_evidence": "docs/evidence/cloud-photo-contract-details-verification.json"
+  },
+  "frontend": {
+    "status": "PASSED_PURE_TEST_TYPECHECK_BUILD_ONLY",
+    "commands": [
+      "npm test (cwd: apps/web)",
+      "npm run build (cwd: apps/web)"
+    ],
+    "files": 7,
+    "tests": 49,
+    "historical_cases": 21,
+    "new_cases": 28,
+    "case_breakdown": {
+      "client": 12,
+      "photo": 6,
+      "photoQueue": 11,
+      "photoAttachments": 6,
+      "ticket": 6,
+      "configurationRevision": 5,
+      "configuration": 3
+    },
+    "vue_tsc": "PASSED",
+    "vite_build": "PASSED",
+    "new_dependencies": 0,
+    "bundle_kB": {
+      "main": 464.07,
+      "main_gzip": 164.36,
+      "TicketsPage": 47.41,
+      "TicketsPage_gzip": 15.61
+    },
+    "bundle_warning": false,
+    "limitations": "No real HTTP, component browser, mobile capture or enterprise-WeChat evidence",
+    "batch_note": "Photo batch remains the validated 49-test version; later D04 configuration-page additions are recorded separately"
+  },
+  "api_policy_pure_jdk": {
+    "status": "PASSED",
+    "assertions": 56,
+    "compile": "real DomainException, PhotoUpload and PhotoPolicy; no framework stubs",
+    "runner": ".local/cloud-validation/verify-photo-api-pure-jdk.sh",
+    "source_sha256": {
+      "server/api/src/main/java/cn/mop/api/PhotoPolicy.java": "02f3152652eb82a53faf86c9fbc234e9c803acd55ffa4955954ef5ee987f66d8",
+      "server/domain/src/main/java/cn/mop/domain/DomainException.java": "fbd8389e27ea7cbe9821bcd1bfb68c37b30b9a760161b96780700a8e04fa4861",
+      "server/domain/src/main/java/cn/mop/domain/PhotoUpload.java": "10f4945f1830342d5dcdb8a48a71eaf63ef99ef45863975f2e00ffa486354679",
+      ".local/cloud-validation/MopPhotoPolicyCheck.java": "2bf5afedc9737a51f7bd3299fd3e4d068112ba13facd4240564c4155b4a5f198",
+      ".local/cloud-validation/ApiAdaptersSyntaxCheck.java": "9e0c122950e6d789ce8b4ca61288f2408fab7be4d212a25e2e125eb2ebd220cd",
+      ".local/cloud-validation/JpegTrailingProbe.java": "95e72006fcebc11cce058adccaf2451a29ecd56d7ca33db74a45089b781d1960"
+    }
+  },
+  "api_adapters_syntax_only": {
+    "status": "PASSED",
+    "files_parsed": 32,
+    "roots": [
+      "server/api/src",
+      "server/adapters/src"
+    ],
+    "mode": "JavacTask.parse only; no attribution/type check",
+    "source_sha256": {
+      "server/api/src/main/java/cn/mop/api/ApiExceptionHandler.java": "7801ae931f33e911f2131296eedad4bced423aadb268b797a9f3e2602701ba3c",
+      "server/api/src/main/java/cn/mop/api/ApiResponse.java": "7fa3cbfc69b81769846f7d95090781f7e1340835d97b45e86a9b66d55ea4f289",
+      "server/api/src/main/java/cn/mop/api/ConfigurationRevisionController.java": "de4f8d28b455f26f23cac82122aeec6d5023200cbdbe6cd01019f744b4c24026",
+      "server/api/src/main/java/cn/mop/api/ConfigurationValueValidator.java": "3668c0f85ccf21c7f4ca5c3017b93e9330fa01ad77096ac071409c3071266271",
+      "server/api/src/main/java/cn/mop/api/CustomerReportValidator.java": "f1fe43a3d08ab6405b483cd7270e6e874e97733df985fd30ea3205dd4b7cf282",
+      "server/api/src/main/java/cn/mop/api/FileController.java": "3bbbc23dc786e3639516dc35e2b8c9e6c89980e49b0bffd36d9c21c6a05a412d",
+      "server/api/src/main/java/cn/mop/api/FixtureSessionController.java": "60c8eb45a27115ea726cabc32b98368b9bb9a8dd0f5a91889fae31f0e5074fe3",
+      "server/api/src/main/java/cn/mop/api/MopApplication.java": "c10f7722444b2d3b14998740eae76031db034304b0e24a5b041c6a007a559006",
+      "server/api/src/main/java/cn/mop/api/PhotoConfiguration.java": "f2a793a07f7f7879536bca647c99243883dd50f28afeced88877201c98a3976b",
+      "server/api/src/main/java/cn/mop/api/PhotoPolicy.java": "02f3152652eb82a53faf86c9fbc234e9c803acd55ffa4955954ef5ee987f66d8",
+      "server/api/src/main/java/cn/mop/api/PlatformController.java": "6b9c5a25c77a885186ccca794942b06355dccae19375a00e5e84c3962fcb8876",
+      "server/api/src/main/java/cn/mop/api/SecurityConfiguration.java": "7aadd4df57138a3694dc8698f05f52f6aa15a8a8f41582a1a8091db4d4dca8b3",
+      "server/api/src/main/java/cn/mop/api/SessionController.java": "46b8f35a1888bcd80ff67e24d9ce6b22c66705d81aa4958adcaa214d7e41025b",
+      "server/api/src/main/java/cn/mop/api/SessionService.java": "4b7fd526b8aaf39d8ad8acc2cc3332c3cd5695b680f0dd91b0c6e207595de03c",
+      "server/api/src/main/java/cn/mop/api/TestOidcConfiguration.java": "2f42e2c01d86cf221f325303f92262bd11088612521f332f3bec0c2c686b35a0",
+      "server/api/src/main/java/cn/mop/api/TicketController.java": "eff03de64bfba766bf829eec4fcd86c8df56811b20f5cc348cdd668d6abab63c",
+      "server/api/src/test/java/cn/mop/adapters/MinioPhotoStoreRemoteTest.java": "e7fd8140a10e53ccecd935372fd10834b551373fe0d84b37403309349ac02c4a",
+      "server/api/src/test/java/cn/mop/adapters/MinioPhotoStoreSafetyTest.java": "315366883e6391174fce3b178ac0bff8dd4eae84659e1cf6bfd7966e580612b9",
+      "server/api/src/test/java/cn/mop/api/ConfigurationRevisionValidationTest.java": "0babfa162d63d753d28f1389d083d13f99bf6342cfd7e53f9f059ef2f0fda418",
+      "server/api/src/test/java/cn/mop/api/ConfigurationRevisionWorkflowTest.java": "6fc90b30095eba50a88010c77fea79a68154aed22911712ec3f0a1c570ba80ab",
+      "server/api/src/test/java/cn/mop/api/CustomerReportValidationTest.java": "524d6b57ef869921af261bc3a91b9f21180c890ccff4aefc64e1e2f2e43e32df",
+      "server/api/src/test/java/cn/mop/api/FileControllerHttpSecurityTest.java": "1fd1741f8519706b928532c678879e26d12b8b683af7f1f3d3d9ae7d6e13aaa7",
+      "server/api/src/test/java/cn/mop/api/FileControllerTest.java": "25d2bee6a0f0915b89a16d100b8aba86bf7ef263f55beb9bed777b3d7f24fc3f",
+      "server/api/src/test/java/cn/mop/api/FixtureSecurityAndWorkflowTest.java": "a61379562f15146d7b360f437b1ba7ba49262b016f39e6036174118497515401",
+      "server/api/src/test/java/cn/mop/api/PhotoPolicyTest.java": "631f6e66b8b058df6b9ad456864c2c1fbcad12a354bef11dd4ba8cb96bac2444",
+      "server/api/src/test/java/cn/mop/api/ProfilePolicyTest.java": "1d141575130e20a66a803f8aea7778df79dab176838e5a5bb03126ac79fd2d44",
+      "server/api/src/test/java/cn/mop/api/SessionMembershipRoleProjectionTest.java": "7db97b79db1c4dbd69b43e835a14c825ad5f3e90f3a04f38fb4b9dd904f2ec50",
+      "server/api/src/test/java/cn/mop/api/SessionServiceSecurityTest.java": "10e750c2957416ef5c8ff32dade5abdf46d977d67c3d03f1f448985a56befcb9",
+      "server/api/src/test/java/cn/mop/api/TestOidcConfigurationTest.java": "12196e21c153fed1ad82d87d9feabe692befcf46de200c61592f1fde1da3df3a",
+      "server/api/src/test/java/cn/mop/api/TicketPhotoControllerTest.java": "443923dcda1e709f120d27365b0bfc2cf1edcc36aa4b0fe6920babcf27ff0a88",
+      "server/adapters/src/main/java/cn/mop/adapters/MinioPhotoStore.java": "ee2c46c9774fabf43f5e76130254f0767d824a011b60b936bd645894e62b761b",
+      "server/adapters/src/main/java/cn/mop/adapters/MonitoringAdapter.java": "e8000c3d7f388a6ef18ef7824ec20d3289c6f6b34a8a301b0a732360e9df2cf8"
+    }
+  },
+  "domain_worker_pure_jdk": {
+    "performed_at": "2026-10-01T04:36:37.240933+00:00",
+    "kind": "standalone_real_source_pure_jdk_checks",
+    "result": "PASS",
+    "compiler": "JDK17 javac",
+    "compile_scope": [
+      "server/domain/src/main/java/cn/mop/domain/ConfigurationRevisionWorkflow.java",
+      "server/domain/src/main/java/cn/mop/domain/Asset.java",
+      "server/domain/src/main/java/cn/mop/domain/PhotoUpload.java",
+      "server/domain/src/main/java/cn/mop/domain/PhotoObjectStore.java",
+      "server/domain/src/main/java/cn/mop/domain/FixtureUser.java",
+      "server/domain/src/main/java/cn/mop/domain/AssetRepository.java",
+      "server/domain/src/main/java/cn/mop/domain/PlatformRepository.java",
+      "server/domain/src/main/java/cn/mop/domain/Membership.java",
+      "server/domain/src/main/java/cn/mop/domain/CustomerReport.java",
+      "server/domain/src/main/java/cn/mop/domain/Capabilities.java",
+      "server/domain/src/main/java/cn/mop/domain/Tenant.java",
+      "server/domain/src/main/java/cn/mop/domain/RepositoryMetadata.java",
+      "server/domain/src/main/java/cn/mop/domain/DomainException.java",
+      "server/domain/src/main/java/cn/mop/domain/CustomerReportRegistration.java",
+      "server/domain/src/main/java/cn/mop/domain/PhotoRules.java",
+      "server/domain/src/main/java/cn/mop/domain/ProfilePolicy.java",
+      "server/worker/src/main/java/cn/mop/worker/WorkerRuntimeSettings.java"
+    ],
+    "source_sha256": {
+      "server/domain/src/main/java/cn/mop/domain/ConfigurationRevisionWorkflow.java": "501945a8d1b0ac99bbc843e6b04ccbd0bca8b15b38d0d41c9946043f1f5d0baf",
+      "server/domain/src/main/java/cn/mop/domain/Asset.java": "43b129a2062884e38b4bd09775cd54cf802c64f72d0dc7144bfcbd5acba6ad3d",
+      "server/domain/src/main/java/cn/mop/domain/PhotoUpload.java": "10f4945f1830342d5dcdb8a48a71eaf63ef99ef45863975f2e00ffa486354679",
+      "server/domain/src/main/java/cn/mop/domain/PhotoObjectStore.java": "4ac2f132216f739129f50ceaf7e31b317a868f1812449351533b593c5dc612a0",
+      "server/domain/src/main/java/cn/mop/domain/FixtureUser.java": "9728d0bd9c79685ed47d25a3bedc90fc5633195eec46a2c2a1c20a350ac1ec29",
+      "server/domain/src/main/java/cn/mop/domain/AssetRepository.java": "7b6eb9057234c45bdccb8726793ffe05e9824b38c4d5c749c1e5c7dd03fd33fa",
+      "server/domain/src/main/java/cn/mop/domain/PlatformRepository.java": "11096658772fac7fc7f5646d51f17ece61b49b48abb0884606747c1bb554e2e8",
+      "server/domain/src/main/java/cn/mop/domain/Membership.java": "84c1088eef7666bcae39addf15983094115e0940c4f10712e18252b7914ac6f2",
+      "server/domain/src/main/java/cn/mop/domain/CustomerReport.java": "88cc8b7e33564410420c9a010e94c0a7b174809c261bcbae9e7ec855b0802e42",
+      "server/domain/src/main/java/cn/mop/domain/Capabilities.java": "673e0f7930343ff2a76b17c8bf1a3ab9fc162fa7440b6d2d69f021a5bd3eb1d2",
+      "server/domain/src/main/java/cn/mop/domain/Tenant.java": "70abfa601e301e4720cdfc8068f83ca195b66a8658f3c502e0b2b02b00a4510b",
+      "server/domain/src/main/java/cn/mop/domain/RepositoryMetadata.java": "f10164f2015ecafd6c37a7c2b00e679d6df77e47f4b5baab557113c30348afa7",
+      "server/domain/src/main/java/cn/mop/domain/DomainException.java": "fbd8389e27ea7cbe9821bcd1bfb68c37b30b9a760161b96780700a8e04fa4861",
+      "server/domain/src/main/java/cn/mop/domain/CustomerReportRegistration.java": "29d43c1fca25f393f546ef4a0b5e3cf03e48727a5133997aa4e53c2596b03b7e",
+      "server/domain/src/main/java/cn/mop/domain/PhotoRules.java": "66a69a239ee2c8fc3f9b35531df304e1169854cc2c6144729cf3f135c57b70bd",
+      "server/domain/src/main/java/cn/mop/domain/ProfilePolicy.java": "7327ec8964dc1790ccfd3219128d9b677dad5ec7ed954f43ab1351b8c7087da3",
+      "server/worker/src/main/java/cn/mop/worker/WorkerRuntimeSettings.java": "92efa0bad666cbaef24d036bd5279f2eac56ce3a2d66de0da612beb6aaa40fa6"
+    },
+    "command": "bash .local/cloud-validation/verify-photo-pure-jdk.sh",
+    "programs": {
+      "PhotoRulesCheck": {
+        "assertion_count": 8,
+        "assertions": [
+          "original_byte_array_isolation",
+          "accepted_hash_and_size_guard",
+          "changed_hash_rejected",
+          "unsafe_filename_rejected",
+          "oversize_rejected",
+          "stable_unique_attachment_order",
+          "three_reference_limit",
+          "bounded_retry_delay"
+        ]
+      },
+      "WorkerRuntimeSettingsCheck": {
+        "assertion_count": 9,
+        "assertions": [
+          "valid_explicit_remote_settings_and_redacted_toString",
+          "fixture_profile_denied",
+          "mixed_profiles_denied",
+          "disabled_worker_denied",
+          "nonloopback_database_denied",
+          "migration_role_denied",
+          "wrong_bucket_denied",
+          "wrong_storage_endpoint_denied",
+          "missing_secret_name_denied"
+        ]
+      }
+    },
+    "not_run": [
+      "Maven reactor build",
+      "JUnit PhotoRulesTest (5)",
+      "JUnit worker tests (7)",
+      "PostgresPhotoIntegrationTest (14)",
+      "designated PostgreSQL/MinIO connectivity",
+      "V5 migration",
+      "HTTP/OIDC photo integration"
+    ],
+    "limitations": "Standalone source compilation and guards are not full-module or component integration evidence.",
+    "syntax_parse": {
+      "performed_at": "2026-10-01T04:41:39.098660+00:00",
+      "scope": [
+        "server/domain/src",
+        "server/persistence/src",
+        "server/worker/src"
+      ],
+      "file_count": 29,
+      "result": "PASS",
+      "command": "javac -d .local/cloud-validation/pure-jdk-classes .local/cloud-validation/OwnedJavaSyntaxCheck.java && java -cp .local/cloud-validation/pure-jdk-classes OwnedJavaSyntaxCheck",
+      "limitations": "JavacTask.parse only; no type checking, module build or integration."
+    }
+  },
+  "api_recorded_at": "2026-10-01T05:03:24.080467+00:00",
+  "api_not_run": [
+    "Maven module build",
+    "33 new isolated JUnit tests",
+    "3 designated MinIO integration tests",
+    "PostgreSQL/MinIO/OIDC HTTP integration",
+    "V5 migration",
+    "390px/1440px browser or real mobile capture"
+  ],
+  "not_run": [
+    "Maven full backend module/reactor compile and type checking",
+    "33 new isolated API JUnit tests",
+    "3 designated MinIO integration tests",
+    "5 PhotoRules JUnit tests",
+    "7 Worker JUnit tests",
+    "16 PostgreSQL photo integration tests",
+    "V5 migration",
+    "Full application/worker start",
+    "Designated PostgreSQL/MinIO/OIDC integration",
+    "HTTP contract validation against running photo endpoints",
+    "1440px/390px photo browser acceptance",
+    "Real mobile capture and enterprise-WeChat",
+    "Concurrent idempotency/CAS/deduplication and rollback",
+    "Grant expiry/revocation and download authorization",
+    "Storage conditional writes/hash conflicts, dependency interruption and recovery",
+    "Worker lease takeover/restart/fencing integration"
+  ],
+  "blockers": [
+    "Private runtime.json and known_hosts absent; develop.txt present",
+    "SSH target domain forbidden by platform proxy",
+    "Maven Central HTTP 429; Google mirror HTTP 403"
+  ],
+  "migration": {
+    "V1_V4": "UNCHANGED",
+    "V5": "DRAFT_NOT_EXECUTED",
+    "runtime_auto_flyway": false,
+    "remote_pg_test_flyway_target": "4; may execute V1-V4 and write test data; not a V5 or read-only verification entrypoint"
+  },
+  "policy": {
+    "policy_source": "USER_DEVELOPMENT_DIRECTION",
+    "scan_status": "UNSCANNED",
+    "production_approval": "UNVERIFIED",
+    "retention_until": null,
+    "media_types": [
+      "image/jpeg",
+      "image/png"
+    ],
+    "max_size_bytes": 5000000,
+    "max_attachments": 3
+  },
+  "model": {
+    "ui_model": "GPT-6.1 Sol",
+    "ui_effort_menu": "GPT-6.1 Sol Ultra",
+    "ui_status": "UI_CONFIGURED",
+    "agent_spawn": "explicit gpt-6.1-sol/ultra",
+    "server_runtime_status": "SERVER_NOT_ECHOED",
+    "effective_context_window": "UI_REPORTED_258K",
+    "one_million_enabled": false,
+    "one_million_enabled_note": "Current session UI reports 258K; 1M has not been applied",
+    "cli_or_prompt_override": false,
+    "restart": false,
+    "context_ui_status": "UI_REPORTED",
+    "context_ui_source": "Main-chat read-only verification of current cloud session native /status UI",
+    "context_ui_display": {
+      "used": "143,050",
+      "total": "258K"
+    },
+    "underlying_exact_context_window": "UNKNOWN",
+    "auto_compact_threshold": "UNKNOWN",
+    "one_million_status": "NOT_APPLIED",
+    "context_configuration_capabilities": {
+      "onboarding_update_schema_context_field": false,
+      "cloud_coordinator_tool": false,
+      "host_config_tool": false,
+      "manual_context_menu": false
+    },
+    "context_inference_limit": "UI display does not establish exact 272000, 95%, or 256k tokens",
+    "context_conclusion_scope": "Current cloud session only; native model maximum is not current session evidence; no claim that every Cloud environment rejects 1M"
+  },
+  "limitations": [
+    "Historical Windows/MinIO component results are not current cloud or photo-business results",
+    "Git-delivered pure harnesses and portable runner reproduce the domain/policy/WorkerSettings checks; local syntax parsers remain ignored artifacts",
+    "Java syntax parse is not symbol attribution/type checking or module build",
+    "Pure guards/contracts/frontend do not prove PostgreSQL transactions, object writes, lease recovery or current-actor download authorization",
+    "No migration, private credential values, tokens or storage grants are included in this record",
+    "M5-5 and M8-6 remain incomplete; no 128-item completion claim"
+  ],
+  "api_jpeg_boundary_regression": {
+    "before_fix_source_sha256": "129370918f4890107e171489a19bb5a5697d112ffcab1560d1d1dab9a463d212",
+    "before_fix": {
+      "jpeg_then_junk_then_eoi": "ACCEPTED",
+      "two_concatenated_jpegs": "ACCEPTED"
+    },
+    "after_fix": {
+      "jpeg_then_junk_then_eoi": "REJECTED 400 VALIDATION_ERROR",
+      "two_concatenated_jpegs": "REJECTED 400 VALIDATION_ERROR"
+    },
+    "checks": [
+      "First structural EOI must end the original codestream",
+      "APP payload marker-like bytes retain original bytes and hash",
+      "Real JDK baseline JPEG contains FF00 stuffing and RST0 and remains accepted",
+      "Real JDK progressive JPEG has multiple SOS and remains accepted",
+      "Invalid segment length/header/repeated SOI/restart position rejected",
+      "Synthetic TEM/DNL/fill input passes boundary scan but is rejected by full decoder validation"
+    ],
+    "limits": "Structural marker checks supplement mature ImageIO decoding; do not prove malware scanning or ImageIO support for synthetic DNL/TEM data"
+  },
+  "api_policy_public_record": "docs/evidence/cloud-photo-policy-verification.json",
+  "api_extension_boundary": {
+    "no_dot_png": "REJECTED 400 VALIDATION_ERROR",
+    "no_dot_jpg": "REJECTED 400 VALIDATION_ERROR",
+    "no_dot_jpeg": "REJECTED 400 VALIDATION_ERROR",
+    "rule": "last dot must be after the first filename character and before the final filename character; extension must match original image type"
+  },
+  "git_replay_pure_jdk": {
+    "recorded_at": "2026-10-01T05:37:08.183698+00:00",
+    "status": "PASSED_PURE_SOURCE_ONLY",
+    "command": "bash tools/verify-photo-pure-jdk.sh",
+    "compiler_flags": "--release 17 -Xlint:all,-serial -Werror",
+    "assertions": {
+      "PhotoRulesCheck": 8,
+      "MopPhotoPolicyCheck": 56,
+      "WorkerRuntimeSettingsCheck": 9
+    },
+    "new_test_cases": 0,
+    "note": "Git-delivered replay of existing checks; do not add these to prior counts. Does not compile complete API/persistence/adapters/Worker or run JUnit/remote tests.",
+    "source_sha256": {
+      "tools/verify-photo-pure-jdk.sh": "b6536a99434e806d4d8d9e3864bb4dd67963ac67d2af70f743ad40c6fd1ad402",
+      "tests/pure-java/PhotoRulesCheck.java": "b46d7f8d22ad311208ce1f5d34d4a02c440e2412ab7c4205cadd2c7432a41c8e",
+      "tests/pure-java/MopPhotoPolicyCheck.java": "2bf5afedc9737a51f7bd3299fd3e4d068112ba13facd4240564c4155b4a5f198",
+      "tests/pure-java/WorkerRuntimeSettingsCheck.java": "9fed993d006e0b936824f6c5b3206f98ab5b54905bf0828d84f56147a9e9ccbf"
+    }
+  },
+  "pending_backend_snapshot": {
+    "status": "WIP_PENDING_FULL_TYPECHECK_AND_REAL_INTEGRATION",
+    "read_consistency_patch": "docs/evidence/cloud-photo-read-snapshot-pending.json",
+    "no_done_claim": true,
+    "v5": "UNEXECUTED",
+    "main_merge": false
+  }
+}

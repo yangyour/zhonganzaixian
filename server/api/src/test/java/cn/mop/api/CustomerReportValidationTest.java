@@ -33,9 +33,9 @@ class CustomerReportValidationTest {
         assertThrows(DomainException.class,()->CustomerReportValidator.parse(body().put("description","说明\u0000"),"viewer"));assertThrows(DomainException.class,()->CustomerReportValidator.parse(body().put("contact_name","\uD800"),"viewer"));
         assertThrows(DomainException.class,()->CustomerReportValidator.parse(body().put("title","a".repeat(201)),"viewer"));
     }
-    @Test void attachmentInputIsValidatedBeforeTheUnimplementedFileServiceGate(){
+    @Test void attachmentInputIsValidatedAndReadyOwnershipIsLeftToTheRepository(){
         assertDoesNotThrow(()->CustomerReportValidator.parse(body().set("attachment_ids",mapper.createArrayNode()),"viewer"));
-        String id="55000000-0000-4000-8000-000000000001";DomainException pending=assertThrows(DomainException.class,()->CustomerReportValidator.parse(body().set("attachment_ids",mapper.createArrayNode().add(id)),"viewer"));assertEquals(422,pending.status);assertEquals("CONFIG_PENDING",pending.code);assertTrue(pending.details.toString().contains("Q28"));
+        String id="55000000-0000-4000-8000-000000000001";assertEquals(List.of(id),CustomerReportValidator.parse(body().set("attachment_ids",mapper.createArrayNode().add(id)),"viewer").attachmentIds());
         assertEquals(400,assertThrows(DomainException.class,()->CustomerReportValidator.parse(body().set("attachment_ids",mapper.createArrayNode().add(id).add(id)),"viewer")).status);
         assertEquals(400,assertThrows(DomainException.class,()->CustomerReportValidator.parse(body().set("attachment_ids",mapper.createArrayNode().add("not-a-uuid")),"viewer")).status);
         var tooMany=mapper.createArrayNode();for(int i=1;i<=4;i++)tooMany.add("55000000-0000-4000-8000-00000000000"+i);assertEquals(400,assertThrows(DomainException.class,()->CustomerReportValidator.parse(body().set("attachment_ids",tooMany),"viewer")).status);

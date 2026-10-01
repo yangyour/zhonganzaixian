@@ -1,0 +1,5 @@
+spring:
+  profiles:
+    default: remote_test
+  main:
+    banner-mode: "off"

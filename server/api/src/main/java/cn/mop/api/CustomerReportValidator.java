@@ -24,12 +24,12 @@ final class CustomerReportValidator {
         String name=text(body,"contact_name",100,false),phone=text(body,"contact_phone",64,false);
         if(!phone.matches("[0-9 +()\\-]+")||!phone.matches(".*[0-9].*"))throw invalid("contact_phone 仅允许数字、空格及+-()，必须含数字");
         String title=body.has("title")?text(body,"title",200,false):null,asset=body.has("asset_id")?uuid(body,"asset_id"):null;
-        Set<String> ids=new LinkedHashSet<>();
-        if(body.has("attachment_ids")){
-            JsonNode attachments=body.get("attachment_ids");if(!attachments.isArray()||attachments.size()>3)throw invalid("attachment_ids 必须为数组且最多3张图片");
-            for(JsonNode id:attachments){if(!ids.add(uuidValue(id,"attachment_ids")))throw invalid("attachment_ids 不得重复");}
-        }
-        return new CustomerReport(title,description,category,impact,name,phone,urgency,asset,List.copyOf(ids));
+        List<String> ids=body.has("attachment_ids")?attachmentIds(body.get("attachment_ids"),false):List.of();
+        return new CustomerReport(title,description,category,impact,name,phone,urgency,asset,ids);
+    }
+    static List<String> attachmentIds(JsonNode attachments,boolean nonempty){
+        if(attachments==null||!attachments.isArray()||attachments.size()>3||nonempty&&attachments.isEmpty())throw invalid("attachment_ids 必须为数组且最多3张图片，追加时不能为空");
+        Set<String> ids=new LinkedHashSet<>();for(JsonNode id:attachments){if(!ids.add(uuidValue(id,"attachment_ids")))throw invalid("attachment_ids 不得重复");}return List.copyOf(ids);
     }
     static String enumeration(JsonNode body,String field,Set<String> values){
         JsonNode value=body.get(field);if(value==null||!value.isTextual()||!values.contains(value.asText()))throw invalid(field+" 不在允许枚举中");return value.asText();

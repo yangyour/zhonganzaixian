@@ -1,23 +1,63 @@
 package cn.mop.worker;
 
-import cn.mop.domain.ProfilePolicy;
+import cn.mop.adapters.MinioPhotoStore;
+import cn.mop.domain.PhotoObjectStore;
+import cn.mop.persistence.PostgresPlatformRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
-@SpringBootApplication
+/** File-only worker: no customer-report outbox, messaging, or other job consumer is registered. */
+@SpringBootApplication(excludeName={
+    "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration",
+    "org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration"
+})
 public class WorkerApplication {
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(WorkerApplication.class);
         app.setWebApplicationType(WebApplicationType.NONE);
         app.run(args);
     }
-    @Bean Object requireApprovedRuntime(Environment environment) {
-        ProfilePolicy.requireSupportedRuntime(environment.getActiveProfiles());
-        if(!environment.acceptsProfiles(org.springframework.core.env.Profiles.of("local_fixture"))||!environment.getProperty("mop.fixture.unit-test",Boolean.class,false))
-            throw new IllegalStateException("FAIL_CLOSED: durable outbox execution is not implemented; no worker may claim test-environment jobs");
-        return new Object();
+    @Bean WorkerRuntimeSettings workerRuntimeSettings(Environment environment) {
+        String[] profiles=environment.getActiveProfiles().length==0
+            ?environment.getDefaultProfiles():environment.getActiveProfiles();
+        return WorkerRuntimeSettings.from(profiles,environment::getProperty);
+    }
+
+    @Bean(destroyMethod="close") HikariDataSource workerDataSource(WorkerRuntimeSettings settings) {
+        HikariConfig configuration=new HikariConfig();
+        configuration.setJdbcUrl(settings.jdbcUrl());
+        configuration.setUsername(settings.databaseUser());
+        configuration.setPassword(settings.databasePassword());
+        configuration.setMaximumPoolSize(2);
+        configuration.setMinimumIdle(0);
+        configuration.setConnectionTimeout(5000);
+        configuration.setValidationTimeout(3000);
+        configuration.setInitializationFailTimeout(5000);
+        configuration.setPoolName("mop-file-only-worker");
+        configuration.addDataSourceProperty("connectTimeout","5");
+        configuration.addDataSourceProperty("socketTimeout","20");
+        configuration.addDataSourceProperty("tcpKeepAlive","true");
+        try{return new HikariDataSource(configuration);}
+        catch(RuntimeException failure){throw new IllegalStateException("FAIL_CLOSED: designated restricted test PostgreSQL worker connection unavailable");}
+    }
+
+    @Bean ObjectMapper workerObjectMapper(){return new ObjectMapper();}
+
+    @Bean PostgresPlatformRepository workerRepository(HikariDataSource workerDataSource,ObjectMapper workerObjectMapper) {
+        return new PostgresPlatformRepository(workerDataSource,workerObjectMapper);
+    }
+
+    @Bean PhotoObjectStore photoObjectStore(WorkerRuntimeSettings settings) {
+        return new MinioPhotoStore(settings.storageEndpoint(),settings.storageBucket(),settings.storageAccessKey(),settings.storageSecretKey());
+    }
+
+    @Bean PhotoWorkerRuntime fileOnlyWorker(PostgresPlatformRepository workerRepository,PhotoObjectStore photoObjectStore) {
+        return new PhotoWorkerRuntime(workerRepository,photoObjectStore);
     }
 }

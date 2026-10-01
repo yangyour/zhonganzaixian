@@ -9,7 +9,7 @@
 |指定项目V5|独立CLI Check后ApplyPhotos一次；结构/ACL通过；再次Apply为0DDL|API/Worker启动不执行迁移；V1–V4历史不改；V5 SQL已冻结|
 |根deploy/check|完整编译/打包、96纯单元/隔离、43指定PG、3指定MinIO通过，0失败/错误|现存25份Surefire核对；PG照片24+原19，历史fixture13项跳过，不能算通过|
 |前端及实际契约|全量113项与V0.6契约8项通过；遮挡修复后41 operation+3 workspace定向回归及最终类型/构建通过|44项包含于113项，不累加；Vite7.3.6、1661 modules、8.10s，主464.09kB/Tickets54.49kB/Configurations49.84kB，无包体警告|
-|SDK提交GitHub CI|eba5630对应push run 36836074365及3个job为completed/success，已实际回读|仅该旧SHA；本批照片最终提交需独立回读，不能以旧CI替代，CI不连接私有PG/MinIO/OIDC，见[安全摘要](evidence/github-eba5630-verification.json)|
+|GitHub CI独立回读|eba5630对应run 36836074365通过；照片提交f56ad1b对应push run 36846410035及3个job为completed/success，28步骤全部成功|分别对应各自SHA；CI不连接私有PG/MinIO/OIDC，见[照片提交摘要](evidence/github-f56ad1b-verification.json)|
 |真实OIDC/HTTP|4个测试身份登录、80次HTTP全部通过并经V0.6 Ajv校验|真实Worker→PG/MinIO→平台grant原图/hash回读；[HTTP证据](evidence/local-report-photo-http.json)|
 |边界/重启/存储断链/撤权专项|4场景52次真实HTTP通过，finally已恢复|5_000_000/5_000_001原JPEG边界与hash、耐久API/Worker重启、MinIO项目转发503/恢复、成员撤权/旧授权失效；[专项证据](evidence/local-photo-resilience.json)|
 |运行中Worker断链RETRY_WAIT|独立25次真实HTTP通过，finally恢复|PG快照确认RETRY_WAIT、lease释放/未来next_at和审计，恢复后同PID/startTime按退避自然完成同job/file/op及hash；[新专项证据](evidence/local-photo-worker-retry.json)|

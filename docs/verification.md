@@ -13,7 +13,7 @@
 |指定MinIO存储|3项通过，0失败/错误/跳过|复用项目桶与受限账号；真实原图存储/hash和不可覆写行为；历史fixture13项仅跳过，不计通过|
 |前端全量、类型及构建|全量113项通过；遮挡修复后41 operation+3 workspace定向回归及最终vue-tsc/Vite build通过|44项已包含于113项，不累加；最终Vite7.3.6、1661 modules、8.10s，主464.09kB/Tickets54.49kB/Configurations49.84kB，无包体警告|
 |实际契约V0.6|最终generator --check及8项契约测试再次通过，退出0|包含typed照片就绪；此次是既有8项回归，不累加；JSON Schema与真实HTTP Ajv分别记录|
-|SDK提交GitHub CI回读|eba5630的push run 36836074365为completed/success，3个job均成功|[步骤摘要](evidence/github-eba5630-verification.json)只对应旧SHA；本批照片最终提交需独立回读对应CI，不连接私有组件、不计联调|
+|GitHub CI独立回读|eba5630的历史push run 36836074365成功；照片提交f56ad1b的push run 36846410035为completed/success，3个job及28步骤均成功|[照片步骤摘要](evidence/github-f56ad1b-verification.json)对应照片SHA，不连接私有组件、不计联调|
 |真实OIDC/HTTP及原图链路|4个测试身份真实登录，80次HTTP全部通过并经V0.6 Ajv校验|真实Worker→指定PG/MinIO原图存储、平台grant和hash回读；[公开HTTP证据](evidence/local-report-photo-http.json)|
 |边界/重启/存储断链/撤权专项|4场景52次真实HTTP通过，finally恢复|5_000_000接收/5_000_001拒绝及原图hash；耐久API/Worker重启；MinIO项目转发断链/503/恢复；成员撤权/旧Cookie与grant拒绝；[专项证据](evidence/local-photo-resilience.json)|
 |运行中Worker断链RETRY_WAIT|独立25次真实HTTP通过，finally恢复|正常ready200启动后断项目MinIO；PG快照证明真实RETRY_WAIT、未来next_at、lease释放和重试审计；恢复后同PID/startTime自然完成原任务/hash；[独立证据](evidence/local-photo-worker-retry.json)|
@@ -68,7 +68,7 @@
 
 资产导入已解析行的纯预检独立通过：JDK17严格编译、14组1,479个断言，50行三类错误准确阻断三行，500行计算12.67ms；[实现边界](asset-import-precheck.md)和[证据](evidence/cloud-asset-import-precheck-verification.json)明确没有.xlsx/CSV解析或实际入库。该计时不表示完整导入≤60秒；TC-M3-6、真实并发配额和重复导入均NOT_RUN。
 
-历史云端[CI配置](ci-validation.md)通过本地结构/语法及隔离Web构建，当时Actions读取受HTTP传输/代理拒绝，三个job为NOT_OBSERVED；此历史不改写。后续eba5630已取得上表所列真实成功回读，早期1db3976/d4375f7失败保留，本批照片最终提交需独立回读对应CI。CI不连接私有组件，不能算联调。配置解析portable脚本另复现原15组250个断言，不计新增测试。
+历史云端[CI配置](ci-validation.md)通过本地结构/语法及隔离Web构建，当时Actions读取受HTTP传输/代理拒绝，三个job为NOT_OBSERVED；此历史不改写。后续eba5630及照片提交f56ad1b已取得各自真实成功回读，早期1db3976/d4375f7失败保留。CI不连接私有组件，不能算联调。配置解析portable脚本另复现原15组250个断言，不计新增测试。
 
 ## 历史本地已执行结果
 

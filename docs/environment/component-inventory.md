@@ -59,4 +59,4 @@
 
 当前云端未新建数据库、缓存、队列或监控替代指定组件。历史MinIO桶/IAM验证仍有参考价值，但新增业务与本轮访问权限须另外验证。Q28扫描/隔离、Q10留存清理及生产Q02/Q03/Q17等门禁继续保留，未知结果不记通过。
 
-工程[GitHub Actions验证配置](../ci-validation.md)固定官方actions完整SHA及项目工具链。SDK提交`eba5630`的[run 36836074365](https://github.com/yangyour/zhonganzaixian/actions/runs/36836074365)已通过connector实际回读，契约/Web、纯Java和后端三个job均成功，见[安全摘要](../evidence/github-eba5630-verification.json)。CI不连接私有指定组件，不提供替代PG/缓存/队列/监控，不能计入组件联调；本批照片最终提交需独立回读，不能以旧CI替代。历史失败及当时读取阻塞仍保留。
+工程[GitHub Actions验证配置](../ci-validation.md)固定官方actions完整SHA及项目工具链。SDK提交`eba5630`的历史回读见[安全摘要](../evidence/github-eba5630-verification.json)。照片提交`f56ad1b`的[独立run 36846410035](https://github.com/yangyour/zhonganzaixian/actions/runs/36846410035)已通过connector实际回读，契约/Web、纯Java和后端三个job及28步骤全部成功，见[照片摘要](../evidence/github-f56ad1b-verification.json)。CI不连接私有指定组件，不提供替代PG/缓存/队列/监控，不能计入组件联调。历史失败及当时读取阻塞仍保留。

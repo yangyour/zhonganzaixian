@@ -49,7 +49,7 @@ API与Worker启动不执行Flyway。独立`deploy/migrate-test-schema.ps1`默认
 
 本批现存Surefire核对：96纯单元/隔离、43指定PG（照片24+基线19）、3指定MinIO通过，fixture13项跳过，0失败/错误。前端全量113项及V0.6契约8项通过；遮挡修复后operation41+workspace3项定向回归、类型和最终构建通过，44项包含于113项，不重复累加。最终主包464.09kB、Tickets54.49kB、Configurations49.84kB，无包体警告。见[构建摘要](evidence/local-photo-build-summary.json)及[本地接续验证](local-runtime-verification.md)。
 
-SDK提交eba5630的[GitHub CI](https://github.com/yangyour/zhonganzaixian/actions/runs/36836074365)三个job已实际回读成功，见[安全步骤摘要](evidence/github-eba5630-verification.json)。只证明该旧提交的契约/Web、纯Java和后端编译/单元/打包，本批照片最终提交需独立回读，不能以旧CI替代；CI不连接私有组件，本批真实PG/MinIO/HTTP证据独立记录。
+SDK提交eba5630的CI历史见[安全步骤摘要](evidence/github-eba5630-verification.json)。本批照片提交`f56ad1b`的[独立GitHub CI](https://github.com/yangyour/zhonganzaixian/actions/runs/36846410035)已实际回读，契约/Web、纯Java和后端编译/单元/打包三个job及28条步骤全部成功，见[照片提交摘要](evidence/github-f56ad1b-verification.json)。CI不连接私有组件，本批真实PG/MinIO/HTTP证据独立记录。
 
 后端全部模块已实际编译与打包。工单详情/列表使用只读REPEATABLE READ快照回读版本、历史和附件；交错回归包含在24项照片PG测试中。主查询复核当前成员及权限版本，随后撤权不追溯取消已授权的此次读取。
 

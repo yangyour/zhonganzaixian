@@ -154,6 +154,6 @@ node tests/report-photo-smoke.mjs
 
 基础80次HTTP、[恢复专项52次](docs/evidence/local-photo-resilience.json)、[运行中重试专项25次](docs/evidence/local-photo-worker-retry.json)和[照片UI36项](docs/evidence/local-report-photo-ui.json)分别留证，不合为单一脚本计数。UI使用Edge154.0.4258.48持久Playwright无头会话，1440×900/390×844仿真正常控件，覆盖下载PNG/hash、真实提交后丢响应及原请求重试、并发CAS、已存配额与租户/注销，0 pageerror。52次脚本验证精确5MB、重启、先停Worker的存储断链恢复及撤权；另25次脚本保持Worker运行，真实观测RETRY_WAIT与退避完成原任务/hash，同PID/startTime，finally恢复。手机仿真不等于物理相机或企微验收。
 
-SDK修复提交`eba5630`的[GitHub CI](https://github.com/yangyour/zhonganzaixian/actions/runs/36836074365)已实际回读成功，契约/Web、纯Java和后端编译/单元/打包三个job均成功。仅对应该旧SHA，本批照片最终提交需独立回读，不能以旧CI替代；CI不连接私有组件，本地PG/MinIO/OIDC另行留证，见[CI说明](docs/ci-validation.md)。
+SDK修复提交`eba5630`的GitHub CI已实际回读成功。照片功能提交`f56ad1b`的[独立CI](https://github.com/yangyour/zhonganzaixian/actions/runs/36846410035)也已回读，契约/Web、纯Java和后端编译/单元/打包三个job均成功；CI不连接私有组件，本地PG/MinIO/OIDC另行留证，见[CI说明](docs/ci-validation.md)。
 
 测试组件选择不替代Q02生产隔离、Q03许可或正式身份/岗位确认。Redis、RabbitMQ业务接入待完成，Zabbix、外部ITSM、堡垒机等资料缺口继续登记。M5-5/M8-6实机拍照、正式SLA/通知/企微、扫描和保留策略尚未验收，全部128项继续逐功能实施、留证、提交推送；未验证或仍有客户门禁的条目不标DONE。

@@ -1,6 +1,6 @@
 # MOP 基础网络代维平台
 
-依据仓库内 `doc/development/` 持续实施全部128项合同需求。2026-10-01起在云端接续`handoff/cloud-20261001-photos`交接分支，仍复用用户指定服务器的PostgreSQL、Keycloak及MinIO项目组件。已有本地持久登记证据与本轮云端验证分别记录；照片新增代码及契约不等于已通过真实联调，正式工单规则及完整闭环尚未落实。
+依据仓库内 `doc/development/` 持续实施全部128项合同需求。用户2026-10-01最新要求由本地拉取`handoff/cloud-20261001-photos`继续开发；云端业务写入已停止，接续说明见[本地交接](docs/local-development-handoff.md)。仍复用用户指定服务器的PostgreSQL、Keycloak及MinIO项目组件。已有本地持久登记证据与云端验证分别记录；照片新增代码及契约不等于已通过真实联调，正式工单规则及完整闭环尚未落实。
 
 全局要求见 [AGENTS.md](AGENTS.md)；已发现及缺失组件见 [组件清单](docs/environment/component-inventory.md)。静态原型仍保留为参考，默认运行和集成测试不再使用内存 fixture。
 

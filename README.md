@@ -4,7 +4,7 @@
 
 全局要求见 [AGENTS.md](AGENTS.md)；已发现及缺失组件见 [组件清单](docs/environment/component-inventory.md)。静态原型仍保留为参考，默认运行和集成测试不再使用内存 fixture。
 
-后续独立功能见[配置筛选/差异](docs/configuration-comparison.md)、[配置解析/快照纯核心](docs/configuration-resolution.md)、[工单operation回读](docs/report-operation-reading.md)及[资产依赖校验](docs/asset-dependency-validation.md)。其纯测试证据与真实组件验收分别记录，登记值和客户待确认规则仍不自动生效。
+后续独立功能见[配置筛选/差异](docs/configuration-comparison.md)、[配置解析/快照纯核心](docs/configuration-resolution.md)、[工单operation回读](docs/report-operation-reading.md)、[资产依赖校验](docs/asset-dependency-validation.md)及[导入逐行预检](docs/asset-import-precheck.md)。其纯测试证据与真实组件验收分别记录，登记值和客户待确认规则仍不自动生效。
 
 ## 连接资料与首次准备
 

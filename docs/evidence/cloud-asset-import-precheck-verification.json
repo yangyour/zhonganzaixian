@@ -1,0 +1,38 @@
+{
+  "recorded_at": "2026-10-01T06:05:10.330009+00:00",
+  "command": "bash tools/verify-asset-import-pure.sh",
+  "compiler": {
+    "java": "17.0.19",
+    "javac": "17.0.19",
+    "flags": "--release 17 -Xlint:all -Werror",
+    "status": "PASS"
+  },
+  "checks": {
+    "status": "PASS",
+    "groups": 14,
+    "assertions": 1479,
+    "scope": "pure_parsed_asset_import_precheck",
+    "synthetic_inputs": true,
+    "rows50": 50,
+    "error_classes50": 3,
+    "blocked_rows50": 3,
+    "rows500": 500,
+    "pure_precheck_500_elapsed_ns": 12674160,
+    "junit": "NOT_RUN",
+    "integration": "NOT_RUN",
+    "full_import_60s_acceptance": "NOT_RUN"
+  },
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/assetimport/AssetImportPrechecker.java": "c0f6952e7a3a9aaacdc9677f18dfe2c60881ebd5227e7f2d32da937dd03ee7b5",
+    "server/domain/src/main/java/cn/mop/domain/assetimport/HostFormatValidator.java": "45d7af6b575bfe5236add7abd94e3d4df45ea969560ab86d95c598603c8efcd1",
+    "server/persistence/src/test/java/cn/mop/persistence/assetimport/AssetImportPrecheckChecks.java": "33a8c1c3a483638cf1af05a1ca2f8412a34029c8f7a99f3d6932ba51332a1dcf",
+    "tools/verify-asset-import-pure.sh": "a3c01b6c3bd15625a793db8819ceede494bee1d0d92a9e7acb6efd48d00f2184"
+  },
+  "limitations": [
+    "Already parsed 15-column inputs only; no xlsx/CSV parser, HTTP endpoint or durable acceptance.",
+    "Input authorization, dictionary completeness and customer decisions are trusted provider facts; their actual origin/version/evidence require adapters.",
+    "No import execution, quota transaction, preview hash, audit or exact-tuple replay implementation.",
+    "500-row timing covers the pure calculation only; the complete import SLA remains NOT_RUN.",
+    "All real component and HTTP/UI acceptance is NOT_RUN."
+  ]
+}

@@ -37,6 +37,8 @@
 
 资产依赖纯结构校验随后独立通过：JDK17严格编译、12组14,987个断言，其中独立算法对照4096个四节点图与25,000边深链。实现与复现见[资产依赖校验](asset-dependency-validation.md)及[机器证据](evidence/cloud-asset-dependency-verification.json)。没有API/PG保存或真实抑制联调，TC-M3-9仍NOT_RUN；不与照片或前端测试计数合并。
 
+资产导入已解析行的纯预检独立通过：JDK17严格编译、14组1,479个断言，50行三类错误准确阻断三行，500行计算12.67ms；[实现边界](asset-import-precheck.md)和[证据](evidence/cloud-asset-import-precheck-verification.json)明确没有.xlsx/CSV解析或实际入库。该计时不表示完整导入≤60秒；TC-M3-6、真实并发配额和重复导入均NOT_RUN。
+
 ## 历史本地已执行结果
 
 以下仅为云端交接前的本地记录。本机当时为Windows 11、Temurin JDK 17.0.20、Maven 3.9.6、Node 22.22.1、npm 10.9.4、Python 3.12，使用独立`mop_test`、`mop-test`身份域和虚构测试数据。指定组件版本及缺失项见[组件清单](environment/component-inventory.md)；测试环境接入不表示客户生产配置、许可或合同验收已批准。

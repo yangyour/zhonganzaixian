@@ -43,3 +43,5 @@
 本轮已完整读取AGENTS及doc/development的01–07原文并核对工作区；现有工具链通过激活脚本使用，网络阻塞已重新核验并登记。全部128项追踪不缩减；当前128个TC仍NOT_RUN。完整照片范围及剩余门禁见[照片代码切片](report-photos.md)，历史MinIO组件验证不替代新增照片业务或云端复现。
 
 后续独立纯功能已逐功能提交推送：配置筛选/建议差异、显式作用域解析/不可变快照、工单详情operation回读及资产依赖结构校验。记录见[配置比较](configuration-comparison.md)、[配置核心](configuration-resolution.md)、[状态回读](report-operation-reading.md)、[依赖校验](asset-dependency-validation.md)。这些不完成整模块；继续xlsx/csv资产导入、依赖持久保存及128项剩余实现，原客户与组件门禁保留。
+
+导入纯预检随后完成：15列已解析行、5ERROR/3WARNING、事实缺失保持CONFIG_PENDING，14组1,479个JDK17断言通过，见[导入核心](asset-import-precheck.md)。文件解析、耐久202、preview_hash、配额、实际导入/审计及60秒验收尚未实现或执行；继续按M3-D08/D09补齐，不将TC-M3-6标DONE。

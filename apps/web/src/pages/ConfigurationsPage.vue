@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { api, ApiError, isCancelled } from '../api/client'
-import type { Configuration } from '../api/types'
+import type { Configuration, ConfigurationRevision } from '../api/types'
 import { displayValue } from '../utils/display'
 import { editorKind, parseProposedValue } from '../utils/configuration'
+import { revisionStatusLabel } from '../utils/configurationRevision'
+import { comparisonValue, configurationComparison, createConfigurationComparisonReader, filterConfigurations, type ConfigurationComparisonReadState, type ConfigurationFilters } from '../utils/configurationComparison'
 import AppTable from '../components/AppTable.vue'
 import PermissionGate from '../components/PermissionGate.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
@@ -16,15 +18,22 @@ const controller = new AbortController()
 let loadGeneration = 0
 const pendingCount = computed(() => rows.value.filter(item => item.decision_status === 'pending').length)
 const draftCount = computed(() => rows.value.filter(item => item.lifecycle_status === 'DRAFT').length)
+const filters = reactive<ConfigurationFilters>({ config_key: '', question_id: '', pending_only: false, registered_scope: '' })
+const filteredRows = computed(() => filterConfigurations(rows.value, filters))
+const questions = computed(() => [...new Set(rows.value.flatMap(item => item.question_ids))].sort())
+const registeredScopes = computed(() => [...new Set(rows.value.map(item => item.scope))].sort())
+const countsUnknown = computed(() => loading.value || Boolean(error.value))
+function resetFilters() { Object.assign(filters, { config_key: '', question_id: '', pending_only: false, registered_scope: '' }) }
 async function load() {
   const generation = ++loadGeneration
-  loading.value = true; error.value = null
+  loading.value = true; error.value = null; rows.value = []
+  if (comparisonOpen.value) void loadComparison()
   try { const result = await api.request<{ items: Configuration[] }>('/configurations', { signal: controller.signal }); if (generation === loadGeneration) rows.value = result.items }
   catch (cause) { if (!isCancelled(cause) && generation === loadGeneration) { error.value = cause; rows.value = [] } }
   finally { if (generation === loadGeneration) loading.value = false }
 }
 onMounted(load)
-onUnmounted(() => controller.abort())
+onUnmounted(() => { controller.abort(); comparisonReader.reset() })
 const editing = ref<Configuration | null>(null)
 const editingOpen = computed({ get: () => Boolean(editing.value), set: value => { if (!value) editing.value = null } })
 const proposed = ref<string | boolean>('')
@@ -68,21 +77,89 @@ const showConflict = computed(() => editError.value instanceof ApiError && editE
 const revisionsOpen = ref(false)
 const revisionConfiguration = ref<Configuration | null>(null)
 function openRevisions(item: Configuration) { revisionConfiguration.value = item; revisionsOpen.value = true }
+
+const comparisonOpen = ref(false)
+const comparisonKey = ref('')
+const proposalSelection = ref('draft')
+const comparisonState = shallowRef<ConfigurationComparisonReadState>({ status: 'idle' })
+const comparisonReader = createConfigurationComparisonReader({
+  readConfigurations: async signal => (await api.request<{ items: Configuration[] }>('/configurations', { signal })).items,
+  readRevisions: async (key, signal) => (await api.request<{ items: ConfigurationRevision[] }>(`/configurations/${encodeURIComponent(key)}/revisions`, { signal })).items,
+  onChange: state => { comparisonState.value = state },
+})
+const comparisonSnapshot = computed(() => comparisonState.value.status === 'ready' ? comparisonState.value : null)
+const comparisonLoading = computed(() => comparisonState.value.status === 'loading')
+const comparisonError = computed(() => comparisonState.value.status === 'error' ? comparisonState.value.error : null)
+const selectedRevision = computed(() => comparisonSnapshot.value?.revisions.find(item => item.id === proposalSelection.value))
+const comparison = computed(() => {
+  const snapshot = comparisonSnapshot.value
+  if (!snapshot) return null
+  if (proposalSelection.value === 'draft') return configurationComparison(snapshot.configuration, { kind: 'draft' })
+  return selectedRevision.value ? configurationComparison(snapshot.configuration, { kind: 'revision', revision: selectedRevision.value }) : null
+})
+const hasDraft = computed(() => comparisonSnapshot.value?.configuration.draft_value !== null && comparisonSnapshot.value?.configuration.draft_value !== undefined)
+function openComparison(item: Configuration) {
+  comparisonKey.value = item.key; proposalSelection.value = 'draft'; comparisonOpen.value = true
+  void loadComparison()
+}
+async function loadComparison() {
+  if (!comparisonOpen.value || !comparisonKey.value) return
+  const loaded = await comparisonReader.load(comparisonKey.value)
+  if (!loaded || !comparisonSnapshot.value) return
+  const snapshot = comparisonSnapshot.value
+  if ((proposalSelection.value === 'draft' && hasDraft.value) || snapshot.revisions.some(item => item.id === proposalSelection.value)) return
+  proposalSelection.value = snapshot.revisions[0]?.id || 'draft'
+}
+watch(comparisonOpen, open => { if (!open) { comparisonReader.reset(); comparisonKey.value = ''; proposalSelection.value = 'draft' } })
 </script>
 <template>
   <section>
     <div class="page-heading"><div><span class="eyebrow">ADMINISTRATION / CONFIGURATION</span><h1>配置确认登记</h1><p>统一记录合同值、客户待确认项与建议草稿。测试环境草稿均未发布为运行配置。</p></div><el-button :loading="loading" @click="load">刷新登记表</el-button></div>
-    <div class="scope-card"><div><span class="small-label">登记项</span><strong>{{ loading ? '—' : rows.length }} <small>项</small></strong></div><div><span class="small-label">待客户确认</span><strong>{{ loading ? '—' : pendingCount }} <small>项</small></strong></div><div><span class="small-label">草稿版本</span><strong>{{ loading ? '—' : draftCount }} <small>项</small></strong></div><div class="scope-explanation">运行配置尚未启用。待确认项保留 null，禁止回退为演示默认。</div></div>
+    <div class="scope-card"><div><span class="small-label">登记项</span><strong>{{ countsUnknown ? '—' : rows.length }} <small>项</small></strong></div><div><span class="small-label">待客户确认</span><strong>{{ countsUnknown ? '—' : pendingCount }} <small>项</small></strong></div><div><span class="small-label">草稿版本</span><strong>{{ countsUnknown ? '—' : draftCount }} <small>项</small></strong></div><div class="scope-explanation">运行配置尚未启用。待确认项保留 null，禁止回退为演示默认。</div></div>
     <el-alert class="page-note" type="warning" :closable="false" show-icon title="配置修订支持证据引用与内部审批；证据未核验，客户确认与外部下发仍待接入，内部审批通过后尚未生效。" />
-    <div class="panel"><ApiErrorNotice :error="error"><el-button size="small" @click="load">重试</el-button></ApiErrorNotice><AppTable :rows="rows" :loading="loading" row-key="key" :empty-text="error ? '登记表加载失败，请重试' : '暂无配置登记项'">
+    <div class="panel"><ApiErrorNotice :error="error"><el-button size="small" @click="load">重试</el-button></ApiErrorNotice>
+      <el-form class="configuration-filters" label-position="top" @submit.prevent>
+        <el-form-item label="配置键（config_key）"><el-input v-model="filters.config_key" clearable placeholder="按配置键查找" aria-label="筛选配置键" /></el-form-item>
+        <el-form-item label="关联确认 Q 编号"><el-select v-model="filters.question_id" clearable filterable placeholder="全部 Q 编号" aria-label="筛选关联确认 Q 编号"><el-option v-for="question in questions" :key="question" :value="question" :label="question" /></el-select></el-form-item>
+        <el-form-item label="登记作用域"><el-select v-model="filters.registered_scope" clearable placeholder="全部登记作用域" aria-label="筛选登记作用域"><el-option v-for="scope in registeredScopes" :key="scope" :value="scope" :label="scope" /></el-select></el-form-item>
+        <el-form-item label="确认状态"><el-checkbox v-model="filters.pending_only" aria-label="仅显示待客户确认">仅待客户确认</el-checkbox></el-form-item>
+        <el-button @click="resetFilters">重置筛选</el-button>
+      </el-form>
+      <p class="configuration-filter-count" aria-live="polite">{{ countsUnknown ? '登记项数量等待读取' : `匹配 ${filteredRows.length} / ${rows.length} 项登记配置` }} · 在本次读取的登记表内组合筛选。</p>
+      <AppTable :rows="filteredRows" :loading="loading" row-key="key" :empty-text="error ? '登记表加载失败，请重试' : rows.length ? '暂无符合筛选条件的登记项' : '暂无配置登记项'">
       <el-table-column label="配置项" min-width="280"><template #default="{ row }"><strong class="configuration-name">{{ row.description }}</strong><span class="cell-sub mono">{{ row.key }}</span></template></el-table-column>
-      <el-table-column label="作用域 / 类型" min-width="130"><template #default="{ row }">{{ row.scope }}<span class="cell-sub">{{ row.type }}{{ row.unit ? ` · ${row.unit}` : '' }}</span></template></el-table-column>
+      <el-table-column label="登记作用域 / 类型" min-width="145"><template #default="{ row }">{{ row.scope }}<span class="cell-sub">{{ row.type }}{{ row.unit ? ` · ${row.unit}` : '' }} · 非影响对象清单</span></template></el-table-column>
       <el-table-column label="登记 / 合同值" min-width="150"><template #default="{ row }"><span :class="{ muted: row.registered_value === null }">{{ displayValue(row.registered_value) }}</span><span class="cell-sub">{{ row.source }} · 未运行激活</span></template></el-table-column>
       <el-table-column label="确认状态" min-width="140"><template #default="{ row }"><el-tag :type="row.decision_status === 'pending' ? 'warning' : 'info'">{{ row.decision_status === 'pending' ? '待客户确认' : row.decision_status === 'contract_fixed' ? '合同有据' : row.decision_status === 'confirmed' ? '已确认' : row.decision_status }}</el-tag><span class="cell-sub">{{ row.question_ids?.join(' / ') || '—' }}</span></template></el-table-column>
       <el-table-column label="建议草稿 / 版本" min-width="180"><template #default="{ row }"><span>{{ row.draft_value === null || row.draft_value === undefined ? '尚未填写' : displayValue(row.draft_value) }}</span><span class="cell-sub">v{{ row.version }} · {{ row.lifecycle_status === 'DRAFT' ? '草稿' : row.lifecycle_status }}</span></template></el-table-column>
-      <el-table-column label="操作" min-width="250" fixed="right"><template #default="{ row }"><el-button type="primary" link @click="openRevisions(row)">修订与审批</el-button><PermissionGate capability="configurations:write"><el-button type="primary" link :disabled="row.contract_value_kind === 'fixed_constraint'" @click="openDraft(row)">{{ row.contract_value_kind === 'fixed_constraint' ? '固定约束' : '编辑草稿' }}</el-button><el-button type="primary" link @click="openPublish(row)">发布检查</el-button></PermissionGate></template></el-table-column>
+      <el-table-column label="运行生效值" min-width="150"><template #default="{ row }"><span>{{ row.effective_value === undefined ? '生效值未知' : row.effective_value === null ? '尚未生效' : displayValue(row.effective_value) }}</span><span class="cell-sub">以接口生效值为准</span></template></el-table-column>
+      <el-table-column label="操作" min-width="320" fixed="right"><template #default="{ row }"><el-button type="primary" link @click="openComparison(row)">建议差异</el-button><el-button type="primary" link @click="openRevisions(row)">修订与审批</el-button><PermissionGate capability="configurations:write"><el-button type="primary" link :disabled="row.contract_value_kind === 'fixed_constraint'" @click="openDraft(row)">{{ row.contract_value_kind === 'fixed_constraint' ? '固定约束' : '编辑草稿' }}</el-button><el-button type="primary" link @click="openPublish(row)">发布检查</el-button></PermissionGate></template></el-table-column>
     </AppTable><div class="table-footer"><span>客户确认结论与生产许可按文档登记；测试环境草稿不构成正式确认。</span></div></div>
     <ConfigurationRevisions v-model="revisionsOpen" :configuration="revisionConfiguration" @changed="load" />
+    <el-drawer v-model="comparisonOpen" title="登记值与建议值差异" size="820px" class="configuration-comparison-drawer" destroy-on-close>
+      <p class="mono configuration-comparison-key">{{ comparisonKey }}</p>
+      <el-alert type="info" :closable="false" show-icon title="比较本次接口回读的登记值与已保存建议。差异不代表发布、生效或客户确认。" />
+      <ApiErrorNotice :error="comparisonError"><el-button size="small" @click="loadComparison">重试读取</el-button></ApiErrorNotice>
+      <el-skeleton v-if="comparisonLoading" :rows="7" animated class="configuration-comparison-loading" />
+      <template v-else-if="comparisonSnapshot && comparison">
+        <div class="config-dialog-context"><strong>{{ comparisonSnapshot.configuration.description }}</strong><p>登记版本 v{{ comparisonSnapshot.configuration.version }} · {{ comparison.decisionStatus === 'pending' ? '待客户确认' : comparison.decisionStatus === 'contract_fixed' ? '合同有据' : comparison.decisionStatus === 'confirmed' ? '已确认' : comparison.decisionStatus }}</p><p>关联确认：{{ comparisonSnapshot.configuration.question_ids.join(' / ') || '无关联 Q 编号' }}</p></div>
+        <el-form label-position="top" class="configuration-comparison-selector"><el-form-item label="选择已保存建议来源"><el-select v-model="proposalSelection" aria-label="选择差异比较建议来源"><el-option value="draft" :disabled="!hasDraft" :label="hasDraft ? `登记建议草稿 · v${comparisonSnapshot.configuration.version}` : '登记建议草稿 · 尚未填写'" /><el-option v-for="revision in comparisonSnapshot.revisions" :key="revision.id" :value="revision.id" :label="`${revisionStatusLabel[revision.workflow_status]} · v${revision.version} · ${revision.id}`" /></el-select></el-form-item></el-form>
+        <p v-if="selectedRevision" class="field-help">修订 {{ selectedRevision.id }} · {{ revisionStatusLabel[selectedRevision.workflow_status] }}。客户证据未核验（{{ comparison.confirmationStatus }}）；内部审批通过仍未生效，未构成发布许可。</p>
+        <el-descriptions :column="1" border class="configuration-comparison-facts">
+          <el-descriptions-item label="登记作用域">{{ comparison.registeredScope }}</el-descriptions-item>
+          <el-descriptions-item label="登记 / 合同值"><pre>{{ comparisonValue(comparison.registeredValue) }}</pre></el-descriptions-item>
+          <el-descriptions-item label="建议值"><pre>{{ comparison.proposalAvailable ? comparisonValue(comparison.proposedValue) : '尚未填写建议值' }}</pre></el-descriptions-item>
+          <el-descriptions-item label="运行生效值"><pre>{{ comparison.effectiveValue === undefined ? '接口未提供生效值（未知）' : comparison.effectiveValue === null ? '尚未生效（null）' : comparisonValue(comparison.effectiveValue) }}</pre></el-descriptions-item>
+          <el-descriptions-item label="实际影响对象">未知 · 接口尚未返回受影响租户、模板、路由的对象清单或数量。登记作用域是配置目录信息。</el-descriptions-item>
+        </el-descriptions>
+        <div class="detail-section"><h3>登记值 → 建议值</h3><p class="field-help">路径使用 JSON Pointer；数组按位置比较。字段不存在与 null、0、false 分别显示。</p>
+          <el-empty v-if="!comparison.proposalAvailable" description="尚无已保存建议，无法比较" :image-size="70" />
+          <el-empty v-else-if="!comparison.differences.length" description="建议值与登记值一致；仍未因此发布或生效" :image-size="70" />
+          <AppTable v-else :rows="comparison.differences" row-key="path"><el-table-column label="字段路径 / 变化" min-width="160"><template #default="{ row }"><span class="mono">{{ row.path || '根值（整个值）' }}</span><span class="cell-sub">{{ row.kind === 'added' ? '新增字段' : row.kind === 'removed' ? '移除字段' : '值改变' }}</span></template></el-table-column><el-table-column label="登记值" min-width="180"><template #default="{ row }"><pre class="configuration-difference-value">{{ comparisonValue(row.before, row.before_present) }}</pre></template></el-table-column><el-table-column label="建议值" min-width="180"><template #default="{ row }"><pre class="configuration-difference-value">{{ comparisonValue(row.after, row.after_present) }}</pre></template></el-table-column></AppTable>
+        </div>
+      </template>
+      <template #footer><el-button :loading="comparisonLoading" @click="loadComparison">回读登记与修订</el-button><el-button @click="comparisonOpen = false">关闭</el-button></template>
+    </el-drawer>
     <el-dialog v-model="editingOpen" title="编辑配置草稿" width="560px" class="responsive-dialog" :close-on-click-modal="!saving" :show-close="!saving" destroy-on-close>
       <template v-if="editing"><div class="config-dialog-context"><strong>{{ editing.description }}</strong><span class="mono">{{ editing.key }}</span><p>当前版本 v{{ editing.version }} · 登记值：{{ displayValue(editing.registered_value) }}</p><p>运行生效：{{ editing.effective_value === null ? '尚未启用' : displayValue(editing.effective_value) }}</p><p v-if="editing.question_ids?.length">关联确认：{{ editing.question_ids.join(' / ') }}</p></div>
         <el-alert type="info" :closable="false" title="仅保存建议值；原登记值与待确认状态保持不变。" show-icon />
@@ -100,3 +177,19 @@ function openRevisions(item: Configuration) { revisionConfiguration.value = item
     </el-dialog>
   </section>
 </template>
+
+<style>
+.configuration-filters{display:grid;grid-template-columns:minmax(180px,1.5fr) minmax(130px,1fr) minmax(150px,1fr) minmax(150px,1fr) auto;align-items:end;gap:12px;padding:18px 20px 0}
+.configuration-filters .el-form-item{margin-bottom:0}
+.configuration-filters .el-select{width:100%}
+.configuration-filters>.el-button{margin-bottom:1px}
+.configuration-filter-count{font-size:12px;color:#64748b;margin:14px 20px 18px}
+.configuration-comparison-drawer{max-width:100vw}
+.configuration-comparison-key{overflow-wrap:anywhere;font-size:12px;margin:0 0 16px}
+.configuration-comparison-loading{margin-top:24px}
+.configuration-comparison-selector .el-select{width:100%}
+.configuration-comparison-facts pre,.configuration-difference-value{white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--el-font-family);font-size:12px;line-height:1.6;margin:0}
+.configuration-comparison-facts .el-descriptions__label{width:125px}
+@media(max-width:900px){.configuration-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.configuration-filters>.el-button{justify-self:start}}
+@media(max-width:480px){.configuration-filters{grid-template-columns:minmax(0,1fr);padding:16px 14px 0}.configuration-filter-count{margin:14px}.configuration-comparison-facts .el-descriptions__label{width:100px}.configuration-comparison-drawer .el-drawer__footer{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}.configuration-comparison-drawer .el-drawer__footer .el-button{margin-left:0}}
+</style>

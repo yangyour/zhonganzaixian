@@ -1,0 +1,43 @@
+{
+  "recorded_at": "2026-10-01T05:03:51.084117+00:00",
+  "branch": "handoff/cloud-20261001-photos",
+  "scope": "D04 configuration filtering and registered/proposed value comparison",
+  "status": "PASSED_ISOLATED_FRONTEND_ONLY",
+  "requirements": [
+    "doc/development/01_开发顺序与任务拆解.md D04 step6",
+    "doc/development/02_模块开发步骤与页面交互.md SET-D17"
+  ],
+  "checks": {
+    "vitest_files": 8,
+    "vitest_tests": 69,
+    "new_feature_tests": 20,
+    "existing_tests": 49,
+    "vue_tsc": "PASS",
+    "vite_build": "PASS",
+    "diff_check": "PASS",
+    "main_bundle_kB": 464.08,
+    "configuration_chunk_kB": 49.84,
+    "bundle_warning": false
+  },
+  "commands": [
+    "npm --prefix apps/web run test",
+    "npm --prefix apps/web run build",
+    "git diff --check"
+  ],
+  "source_sha256": {
+    "apps/web/src/pages/ConfigurationsPage.vue": "7addb58c09d66effee20557b7bcb2d344e604bcfb3cfe17a0f655837868caff6",
+    "apps/web/src/utils/configurationComparison.ts": "abf09374e6efdbd913002cc90f07565ac77ff6e348edde2d60c06ca6c9649a93",
+    "apps/web/tests/configurationComparison.test.ts": "8bb583f2076196b640cdbd37b56528c35f633488bca48dcac3762fbc927e904a"
+  },
+  "not_run": [
+    "designated PostgreSQL/OIDC HTTP validation",
+    "1440/390px browser acceptance",
+    "actual affected objects and counts"
+  ],
+  "limitations": [
+    "APPROVED is internal review only; customer confirmation and publication remain pending",
+    "No registry value is activated",
+    "No new dependency, API or migration",
+    "All 128 full contract TCs remain NOT_RUN"
+  ]
+}

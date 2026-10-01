@@ -6,6 +6,8 @@
 
 ## 已执行结果
 
+2026-10-01图片存储组件准备已单独验证：复用指定MinIO，项目桶/受限账号的真实Put/Get、Delete拒绝、photos前缀外写拒绝、其他项目桶不可见及匿名拒绝均通过。机器证据见[组件验证](evidence/photo-component-verification.json)，范围见[图片测试存储](photo-test-storage.md)。应用照片上传/补传、Worker及授权内容回读仍在实施，不能把这次组件验证归入尚未完成的业务验收。
+
 2026-10-01继续本地开发，新增配置修订与内部审批功能已验证：Java纯单元18项、指定PG集成11项、前端15项、契约3项均通过。新增三主体真实OIDC下40个HTTP响应及1440/390px页面流程通过，详情见[配置修订验证](configuration-revisions.md)和[evidence/configuration-revision-http.json](evidence/configuration-revision-http.json)。客户正式确认、配置生效和外部下发仍未实现，不能因内部批准记为合同全量完成。
 
 ### 客户报障登记：已执行验证
@@ -58,7 +60,7 @@
 
 - 已验证的是上述测试切片。标准OIDC成功流程不等于已经实测全部伪造签名、密钥轮换、会话超时与身份灾备分支。
 - PostgreSQL测试库和API的tenant+id约束不替代客户生产RLS/独立库及六层隔离验收；生产Q02/Q03/Q17与客户正式岗位仍待确认，production/integration不作为可用运行模式。
-- Redis、RabbitMQ与MinIO仅已盘点，本批没有对应缓存、消息或S3业务联调；Zabbix、外部ITSM、堡垒机及相关资料缺失保持登记状态，真实监控未知值不冒充正常。一期本平台工单权威已由用户确定，缺失外部ITSM不阻塞本平台持久报障登记；正式规则仍待落实。
+- Redis、RabbitMQ没有对应缓存/消息业务联调；MinIO项目空间和受限账号已经完成单独组件验证，API照片业务仍待完成。Zabbix、外部ITSM、堡垒机及相关资料缺失保持登记状态，真实监控未知值不冒充正常。一期本平台工单权威已由用户确定，缺失外部ITSM不阻塞本平台持久报障登记；正式规则仍待落实。
 - 报障新增耐久outbox意图，但消息投递、Worker消费者/租约、审计外部受保护链头及至少3年保留治理尚未实现。正常Worker运行明确拒绝，CONFIG_PENDING记录不被标为已执行或送达。
 - 第二机器/云端复现、客户H5、全浏览器、真实设备采样、容量/性能/灾备及128项合同逐项验收尚未完成。
 

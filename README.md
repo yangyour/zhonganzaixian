@@ -20,6 +20,8 @@ pwsh -File deploy/prepare-test-environment.ps1
 
 SSH 隧道仅绑定本机127.0.0.1，保持远程既有端口不变。第一次连接固定主机公钥于私有 `known_hosts`；后续公钥变化会拒绝连接。
 
+图片存储组件准备使用`pwsh -File deploy/prepare-photo-environment.ps1`，只在现有MinIO创建本项目桶与受限账号。真实读写、不可删除、前缀限制及匿名拒绝已留证，应用照片上传/补传联调仍在实施；详见[图片测试存储](docs/photo-test-storage.md)。秘密和拥有者恢复资料继续只存于`deploy/private/`。
+
 ## 启动与停止
 
 ```powershell
@@ -90,4 +92,4 @@ node tests/api-smoke.mjs http://127.0.0.1:8080/api/v1 --verify-persistence
 
 本轮24项Java纯单元、19项真实PG集成、前端21项、契约3项通过。真实OIDC下47次HTTP响应符合实际契约，会话岗位降级/恢复及1440/390px浏览器验收通过；[本轮汇总](docs/evidence/customer-report-verification-summary.json)区分全量检查与会话修正补跑。报障专用HTTP脚本及私有会话准备步骤见[登记说明](docs/customer-report-registration.md)，这些结果不代表完整工单验收完成。
 
-V1–V4迁移沿用已执行版本，禁止修改；后续结构修订必须追加迁移。测试数据库选择不替代客户正式Q02物理隔离批准，Keycloak测试域不替代正式身份/岗位确认。Redis、RabbitMQ、MinIO仅已盘点，待对应业务接入；Zabbix、外部ITSM、堡垒机缺失保持清单状态。下一批继续配置客户证据/正式确认与工单实际处理闭环，再实施outbox投递/Worker。
+V1–V4迁移沿用已执行版本，禁止修改；后续结构修订必须追加迁移。测试数据库选择不替代客户正式Q02物理隔离批准，Keycloak测试域不替代正式身份/岗位确认。Redis、RabbitMQ业务接入待完成；MinIO项目命名空间和受限账号已准备并验证，API照片业务仍在实施。Zabbix、外部ITSM、堡垒机缺失保持清单状态。用户最新要求切到云端继续剩余开发，逐功能验证/提交与指定测试组件规则保持一致。

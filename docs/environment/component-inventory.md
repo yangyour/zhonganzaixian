@@ -10,7 +10,7 @@
 |身份|hltk-keycloak：Keycloak 26.2.4|127.0.0.1:18110 → 服务器127.0.0.1:12110|已建本项目mop-test realm、mop-web client、6个虚构测试身份（含2026-10-01新增配置复核padmin）；真实OIDC及双主体内部审核已验证，不代表正式岗位批准|
 |缓存|shared-redis：Redis 7.4.9|127.0.0.1:16379 → 服务器127.0.0.1:12070|发现运行组件；本批没有依赖缓存的业务，不另建缓存、不声明已集成|
 |消息|zhsx-rabbitmq：RabbitMQ 4.3.2|本机AMQP15673 → 服务器5673；管理16673 → 15673|发现运行组件；待outbox/Worker开发时建项目vhost与受限账号，不使用其他项目队列|
-|对象存储|shared-minio：RELEASE.2025-09-07T16-13-09Z|127.0.0.1:19000 → 服务器127.0.0.1:12080|发现运行组件；待附件/报告开发时建项目bucket与受限身份，当前无S3业务调用|
+|对象存储|shared-minio：RELEASE.2025-09-07T16-13-09Z|127.0.0.1:19000 → 服务器127.0.0.1:12080|已建mop-test-photos项目桶与受限账号，真实Put/Get、Delete拒绝、photos前缀限制、其他桶不可见和匿名拒绝留证；API照片业务/报告存储仍未验收|
 |Web反代|已有nginx容器与服务；本项目静态原型容器zabbix-msp-prototype运行|现有原型端口10000；本地Vite5173|原型仍是静态参考，不能视为Zabbix采集引擎；未改既有反代或端口|
 
 宿主探测为CentOS Linux 7、Docker 26.1.4。本轮复用现有测试服务，未升级宿主/组件，未停止或重配其他项目服务。版本/许可/支持范围是否满足客户正式生产基线仍按Q03核验，本轮测试接入不代替正式批准。
@@ -33,6 +33,6 @@
 
 角色的成员关系从项目数据库读取，Keycloak签发者与sub仅用于身份映射。用户名只用于展示，同名重建账户不得自动继承旧映射。数据库服务共享不表示已经完成客户生产租户RLS或全部六层隔离，Q02仍单独确认。
 
-2026-10-01新增报障切片继续复用同一PostgreSQL/Keycloak，不新装组件、不开放远程公网组件端口。V4四张登记表对运行账号仅SELECT/INSERT；outbox为CONFIG_PENDING、next_at=null，尚无RabbitMQ投递/Worker消费。联系方式绑定为UNVERIFIED；MinIO已发现服务不等于附件已接入，图片上传与补传仍待Q28和项目bucket/受限身份/文件验证能力。会话岗位与capabilities同取租户membership，新增2项纯测试及真实HTTP降级/恢复验证通过；报障HTTP/页面证据见[报障说明](../customer-report-registration.md)。
+2026-10-01新增报障切片继续复用同一PostgreSQL/Keycloak，不新装组件、不开放远程公网组件端口。V4四张登记表对运行账号仅SELECT/INSERT；outbox为CONFIG_PENDING、next_at=null，尚无RabbitMQ投递/Worker消费。联系方式绑定为UNVERIFIED；后续MinIO项目桶/受限身份已单独准备并验证，见[图片测试存储](../photo-test-storage.md)，尚不等于API图片上传与补传已接入。JPEG/PNG为用户授权的当前开发方向，Q28扫描/隔离及其他文件策略、Q10保留/清理继续待确认。会话岗位与capabilities同取租户membership，新增2项纯测试及真实HTTP降级/恢复验证通过；报障HTTP/页面证据见[报障说明](../customer-report-registration.md)。
 
 公开探测摘要：`component-probe.json`。凭据仅在 `deploy/private/`；原始全机盘点输出不用于公共产品页面。

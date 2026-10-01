@@ -1,0 +1,21 @@
+{
+  "verified_at": "2026-10-01T03:54:18.577290+00:00",
+  "component": "existing_shared_minio",
+  "version": "RELEASE.2025-09-07T16-13-09Z",
+  "python_sdk": "7.2.20",
+  "namespace": "mop-test-photos",
+  "only_project_namespace_created": true,
+  "services_installed_or_reconfigured": false,
+  "runtime_put_and_get": true,
+  "runtime_delete_denied": true,
+  "runtime_bucket_visibility": "PROJECT_BUCKET_ONLY",
+  "runtime_other_project_buckets_not_visible": true,
+  "runtime_outside_photo_prefix_write_denied": true,
+  "anonymous_access_denied": true,
+  "customer_photo_type_direction": "JPEG_PNG_user_development_direction",
+  "production_approval": "UNVERIFIED",
+  "scanner": "NOT_CONFIGURED",
+  "retention_until": null,
+  "application_photo_integration": "NOT_YET_VERIFIED",
+  "credential_output": "none"
+}

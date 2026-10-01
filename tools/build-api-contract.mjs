@@ -33,6 +33,23 @@ const blocked = (operationId, summary, pathParameter) => ({ ...mutation(operatio
 const tenant = object({ id: { type: 'string', format: 'uuid' }, name: string });
 const asset = object({ id: { type: 'string', format: 'uuid' }, tenant_id: { type: 'string', format: 'uuid' }, name: string, type: { type: 'string', enum: types }, management_ip: string, site_id: string, status: { type: 'string', enum: ['unknown', 'ok', 'problem', 'maintenance', 'disabled'] }, lifecycle_status: string, source: { type: 'string', enum: ['test_seed', 'manual'] }, sampled_at: nullableString, unknown_reason: nullableString, version: { type: 'integer', minimum: 1 }, created_at: { type: 'string', format: 'date-time' }, updated_at: { type: 'string', format: 'date-time' }, availability: string, sync_state: string }, ['id', 'tenant_id', 'name', 'type', 'management_ip', 'site_id', 'status', 'lifecycle_status', 'source', 'sampled_at', 'unknown_reason', 'version', 'created_at', 'updated_at']);
 const ticketCreate = JSON.parse(readFileSync(new URL('../contracts/design-core.openapi.json', import.meta.url), 'utf8')).components.schemas.TicketCreate;
+ticketCreate.properties.attachment_ids.maxItems = 3;
+ticketCreate.properties.attachment_ids.description = '可省略或为空；仅绑定同租户、同报障人上传的READY原图。每张1..5_000_000 bytes，原登记累计最多3张；图片失败可先无图登记后CAS追加。';
+const uuid = { type: 'string', format: 'uuid' };
+const dateTime = { type: 'string', format: 'date-time' };
+const positiveVersion = { type: 'integer', minimum: 1, description: '服务端64位正整数版本；客户端使用所见版本，冲突409，不自动覆盖。' };
+const photoFacts = { purpose: { const: 'customer_report_photo' }, scan_status: { const: 'UNSCANNED' }, retention_until: { type: 'null' }, production_approval: { const: 'UNVERIFIED' }, policy_source: { const: 'USER_DEVELOPMENT_DIRECTION' } };
+const photoPolicy = object({ ...photoFacts, allowed_media_types: { type: ['array', 'null'], minItems: 1, maxItems: 2, uniqueItems: true, items: { type: 'string', enum: ['image/jpeg', 'image/png'] }, description: 'null表示白名单未配置或无效，上传返回CONFIG_PENDING；解码不等于病毒扫描或客户生产批准。' }, max_size_bytes: { const: 5000000 }, max_attachments: { const: 3 } });
+const reportPhoto = object({
+  id: uuid, tenant_id: uuid, ...photoFacts, original_name: { type: 'string', minLength: 1, maxLength: 200 },
+  media_type: { type: 'string', enum: ['image/jpeg', 'image/png'] }, size_bytes: { type: 'integer', minimum: 1, maximum: 5000000 }, sha256: { type: 'string', pattern: '^[0-9a-f]{64}$' },
+  upload_status: { type: 'string', enum: ['PENDING', 'READY', 'FAILED'] }, created_by: uuid, ticket_id: { type: ['string', 'null'], format: 'uuid' }, operation_id: uuid,
+  version: positiveVersion, created_at: dateTime, updated_at: dateTime, source: { const: 'postgresql' },
+});
+const photoUpload = object({ file: { type: 'string', format: 'binary', 'x-mop-max-bytes': 5000000, description: '原图不重编码；仅jpg/jpeg/png文件名，声明MIME与扩展及真实解码内容须一致。每张1..5_000_000 bytes；尺寸<=16_384且像素<=25_000_000为技术解码防护。未知/重复part及超大multipart均400。' }, purpose: { const: 'customer_report_photo' } });
+const photoAttachments = object({ expected_version: positiveVersion, attachment_ids: { type: 'array', minItems: 1, maxItems: 3, uniqueItems: true, items: uuid, description: '仅报障人可追加自己上传的READY照片；同租户，未绑定其他登记，原登记累计最多3张。同键重放复用结果，旧版本409。' } });
+const uuidPattern = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
+const contentGrant = object({ content_url: { type: 'string', pattern: `^/api/v1/files/${uuidPattern}/content\\?grant=${uuidPattern}$`, description: '平台相对地址；grant绑定actor/tenant/file/permission_version，15分钟内每次访问仍重新授权。不是S3预签名直链；同键重放不会延长过期时间。' }, expires_at: dateTime });
 const ticketRegistration = object({
   id: { type: 'string', format: 'uuid' }, tenant_id: { type: 'string', format: 'uuid' }, receipt_no: string,
   title: string, description: string, source: { const: 'customer_report' }, category: { type: 'string', enum: ['网络不通', '网速慢', 'WiFi问题', '设备异常', '其他'] },
@@ -41,18 +58,31 @@ const ticketRegistration = object({
   reporter_id: { type: 'string', format: 'uuid' }, contact_name: string, contact_phone: string, contact_binding_status: { const: 'UNVERIFIED' },
   registration_status: { const: 'REGISTERED' }, state: { type: 'null' }, external_id: { type: 'null' }, external_state: { type: 'null' }, sync_state: { const: 'NOT_APPLICABLE' },
   authority_source: { const: 'MOP' }, authority_status: { const: 'RULES_PENDING' }, priority: { type: 'null' }, response_due_at: { type: 'null' }, recovery_due_at: { type: 'null' },
-  operation_id: { type: 'string', format: 'uuid' }, version: { const: 1 }, created_at: { type: 'string', format: 'date-time' }, updated_at: { type: 'string', format: 'date-time' },
-  history: { type: 'array', items: object({ action: { const: 'REGISTER' }, actor_id: { type: 'string', format: 'uuid' }, occurred_at: { type: 'string', format: 'date-time' }, version: { const: 1 } }) },
+  operation_id: uuid, version: positiveVersion, created_at: dateTime, updated_at: dateTime,
+  attachments: { type: 'array', maxItems: 3, items: ref('ReportPhoto') },
+  history: { type: 'array', items: object({ action: { type: 'string', enum: ['REGISTER', 'ADD_ATTACHMENTS'] }, actor_id: uuid, occurred_at: dateTime, version: positiveVersion }) },
 });
 const operation = object({
   id: { type: 'string', format: 'uuid' }, tenant_id: { type: 'string', format: 'uuid' }, kind: { const: 'CUSTOMER_REPORT_REGISTRATION' },
-  status: { const: 'PENDING' }, step: { const: 'AWAITING_TICKET_CONFIGURATION' }, progress: { type: 'null' }, result_ref: string,
+  status: { const: 'PENDING' }, step: { const: 'AWAITING_TICKET_CONFIGURATION' }, progress: { type: 'null' }, result_ref: { type: 'string', pattern: `^/api/v1/tickets/${uuidPattern}$` },
   error: object({ code: { const: 'CONFIG_PENDING' }, message: string, retryable: { const: false }, question_ids: { type: 'array', items: string } }),
   created_at: { type: 'string', format: 'date-time' }, updated_at: { type: 'string', format: 'date-time' },
 });
+const fileOperation = object({
+  id: uuid, tenant_id: uuid, kind: { const: 'FILE_UPLOAD' }, status: { type: 'string', enum: ['PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED'] },
+  step: { type: 'string', enum: ['QUEUED', 'UPLOADING', 'RETRY_WAIT', 'STORED', 'AUTHORIZATION_REVOKED', 'STORAGE_CONFLICT'] }, progress: { type: 'null' },
+  result_ref: { type: 'string', pattern: `^/api/v1/files/${uuidPattern}$` },
+  error: { anyOf: [{ type: 'null' }, object({ code: { type: 'string', enum: ['UPSTREAM_UNAVAILABLE', 'ACTION_FORBIDDEN', 'FILE_INTEGRITY_CONFLICT'] }, message: string, retryable: { type: 'boolean' }, question_ids: { type: 'array', items: string } })] },
+  created_at: dateTime, updated_at: dateTime,
+});
+fileOperation.allOf = [{ oneOf: [
+  ...[['QUEUED', 'PENDING'], ['UPLOADING', 'RUNNING'], ['STORED', 'SUCCEEDED']].map(([step, status]) => ({ properties: { step: { const: step }, status: { const: status }, error: { type: 'null' } } })),
+  ...[['RETRY_WAIT', 'PENDING', 'UPSTREAM_UNAVAILABLE', true], ['AUTHORIZATION_REVOKED', 'FAILED', 'ACTION_FORBIDDEN', false], ['STORAGE_CONFLICT', 'FAILED', 'FILE_INTEGRITY_CONFLICT', false]].map(([step, status, code, retryable]) => ({ properties: { step: { const: step }, status: { const: status }, error: { type: 'object', properties: { code: { const: code }, retryable: { const: retryable } } } } })),
+] }];
+const acceptedResponse = (description) => ({ 202: { description, content: { 'application/json': { schema: ref('Accepted') } } }, ...errors });
 const contract = {
   openapi: '3.1.0',
-  info: { title: 'MOP 共享测试环境 API', version: '0.4.0', description: '本地应用通过SSH复用指定服务器的PostgreSQL与Keycloak。配置内部审核不形成客户确认。工单权威开发方向由用户明确选择MOP；客户报障202只代表ticket/operation/outbox等同事务耐久登记，正式业务状态、优先级与SLA仍待规则落实，不冒充完整建单。fixture身份入口在remote_test不可调用。' },
+  info: { title: 'MOP 共享测试环境 API', version: '0.5.0', description: '云端接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；本契约描述代码接口，不能证明本轮真实联调或V5迁移已执行。配置内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。fixture身份入口在remote_test不可调用。' },
   servers: [{ url: '/api/v1' }],
   security: [{ SessionCookie: [] }],
   paths: {
@@ -83,7 +113,13 @@ const contract = {
       post: { ...mutation('registerCustomerReport', '耐久登记客户报障；不保证正式业务建单或SLA承诺', ref('TicketCreate'), ref('Accepted')), responses: { 202: { description: '真实PG事务已提交；只返回operation_id/PENDING，需回读本平台受理记录。', content: { 'application/json': { schema: ref('Accepted') } } }, ...errors } },
     },
     '/tickets/{id}': { get: action('getCustomerRegistration', '读取本人或授权租户内部报障登记；跨范围404', ref('TicketRegistrationResult'), { parameters: [pathId] }) },
-    '/operations/{id}': { get: action('getOperation', '读取耐久受理operation；PENDING门禁，不冒充远端成功', ref('OperationResult'), { parameters: [pathId] }) },
+    '/tickets/{id}/attachments': { post: mutation('appendCustomerReportPhotos', '报障人CAS追加READY原图；不改变原正文、联系人或正式工单规则', ref('PhotoAttachmentCreate'), ref('TicketRegistrationResult'), { parameters: [pathId, ...headers] }) },
+    '/files/policy': { get: action('getReportPhotoPolicy', '读取当前开发照片策略；无白名单拒绝上传，不表示客户生产批准', ref('ReportPhotoPolicyResult')) },
+    '/files': { post: { ...mutation('acceptReportPhoto', '耐久受理原图；存储不可用时新请求503，已受理同键重放无需再次上传', ref('ReportPhotoUpload'), ref('Accepted')), requestBody: { required: true, content: { 'multipart/form-data': { schema: ref('ReportPhotoUpload') } } }, responses: acceptedResponse('PG原图内容、file、job、operation、成功审计和幂等结果已同事务持久保存；后续GET回读真实存储状态。') } },
+    '/files/{id}': { get: action('getReportPhoto', '读取本人或授权租户照片元数据；不返回桶、对象key或暂存原图bytes', ref('ReportPhotoResult'), { parameters: [pathId] }) },
+    '/files/{id}/content-grants': { post: mutation('createReportPhotoContentGrant', '为READY原图签发15分钟平台grant；actor/tenant/file/permission_version绑定', object({}), ref('ReportPhotoContentGrantResult'), { parameters: [pathId, ...headers] }) },
+    '/files/{id}/content': { get: { operationId: 'readReportPhotoContent', summary: '通过当前会话及持久grant回读原图；读前后复核授权，过期/撤权/其他主体404', parameters: [pathId, parameter('grant', 'query', { type: 'string', format: 'uuid', pattern: `^${uuidPattern}$` })], responses: { 200: { description: '实际JPEG/PNG原图；校验大小及SHA，不重编码。Cache-Control:no-store、X-Content-Type-Options:nosniff、Content-Disposition:inline。', headers: { 'Cache-Control': { schema: { const: 'no-store' } }, 'X-Content-Type-Options': { schema: { const: 'nosniff' } }, 'Content-Disposition': { schema: string } }, content: Object.fromEntries(['image/jpeg', 'image/png'].map(media => [media, { schema: { type: 'string', format: 'binary' } }])) }, ...errors } } },
+    '/operations/{id}': { get: action('getOperation', '读取耐久报障或FILE_UPLOAD操作；GET不执行任务，等待超时不表示FAILED', ref('OperationResult'), { parameters: [pathId] }) },
     '/audit': { get: action('listAudit', '仅平台管理员读取脱敏持久审计', ref('ResourceResult')) },
   },
   components: {
@@ -102,7 +138,17 @@ const contract = {
       TicketRegistrationResult: envelope(ref('TicketRegistration')),
       TicketRegistrationListResult: list(ref('TicketRegistration')),
       Accepted: envelope(object({ operation_id: { type: 'string', format: 'uuid' }, status: { const: 'PENDING' } })),
-      OperationResult: envelope(operation),
+      CustomerReportOperation: operation,
+      FileUploadOperation: fileOperation,
+      ReportPhotoPolicy: photoPolicy,
+      ReportPhotoPolicyResult: envelope(ref('ReportPhotoPolicy')),
+      ReportPhoto: reportPhoto,
+      ReportPhotoResult: envelope(ref('ReportPhoto')),
+      ReportPhotoUpload: photoUpload,
+      PhotoAttachmentCreate: photoAttachments,
+      ReportPhotoContentGrant: contentGrant,
+      ReportPhotoContentGrantResult: envelope(ref('ReportPhotoContentGrant')),
+      OperationResult: envelope({ oneOf: [ref('CustomerReportOperation'), ref('FileUploadOperation')] }),
     },
   },
 };

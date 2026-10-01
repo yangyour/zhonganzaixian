@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.4.0",
-    "description": "本地应用通过SSH复用指定服务器的PostgreSQL与Keycloak。配置内部审核不形成客户确认。工单权威开发方向由用户明确选择MOP；客户报障202只代表ticket/operation/outbox等同事务耐久登记，正式业务状态、优先级与SLA仍待规则落实，不冒充完整建单。fixture身份入口在remote_test不可调用。"
+    "version": "0.5.0",
+    "description": "云端接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；本契约描述代码接口，不能证明本轮真实联调或V5迁移已执行。配置内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
     {
@@ -3597,10 +3597,948 @@
         }
       }
     },
+    "/tickets/{id}/attachments": {
+      "post": {
+        "operationId": "appendCustomerReportPhotos",
+        "summary": "报障人CAS追加READY原图；不改变原正文、联系人或正式工单规则",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhotoAttachmentCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketRegistrationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/policy": {
+      "get": {
+        "operationId": "getReportPhotoPolicy",
+        "summary": "读取当前开发照片策略；无白名单拒绝上传，不表示客户生产批准",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportPhotoPolicyResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files": {
+      "post": {
+        "operationId": "acceptReportPhoto",
+        "summary": "耐久受理原图；存储不可用时新请求503，已受理同键重放无需再次上传",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportPhotoUpload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "PG原图内容、file、job、operation、成功审计和幂等结果已同事务持久保存；后续GET回读真实存储状态。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Accepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/{id}": {
+      "get": {
+        "operationId": "getReportPhoto",
+        "summary": "读取本人或授权租户照片元数据；不返回桶、对象key或暂存原图bytes",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportPhotoResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/{id}/content-grants": {
+      "post": {
+        "operationId": "createReportPhotoContentGrant",
+        "summary": "为READY原图签发15分钟平台grant；actor/tenant/file/permission_version绑定",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportPhotoContentGrantResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/{id}/content": {
+      "get": {
+        "operationId": "readReportPhotoContent",
+        "summary": "通过当前会话及持久grant回读原图；读前后复核授权，过期/撤权/其他主体404",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "grant",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "实际JPEG/PNG原图；校验大小及SHA，不重编码。Cache-Control:no-store、X-Content-Type-Options:nosniff、Content-Disposition:inline。",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "no-store"
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "const": "nosniff"
+                }
+              },
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/operations/{id}": {
       "get": {
         "operationId": "getOperation",
-        "summary": "读取耐久受理operation；PENDING门禁，不冒充远端成功",
+        "summary": "读取耐久报障或FILE_UPLOAD操作；GET不执行任务，等待超时不表示FAILED",
         "parameters": [
           {
             "name": "id",
@@ -4481,7 +5419,9 @@
               "type": "string",
               "format": "uuid"
             },
-            "uniqueItems": true
+            "uniqueItems": true,
+            "maxItems": 3,
+            "description": "可省略或为空；仅绑定同租户、同报障人上传的READY原图。每张1..5_000_000 bytes，原登记累计最多3张；图片失败可先无图登记后CAS追加。"
           }
         },
         "required": [
@@ -4654,7 +5594,9 @@
             "format": "uuid"
           },
           "version": {
-            "const": 1
+            "type": "integer",
+            "minimum": 1,
+            "description": "服务端64位正整数版本；客户端使用所见版本，冲突409，不自动覆盖。"
           },
           "created_at": {
             "type": "string",
@@ -4664,13 +5606,24 @@
             "type": "string",
             "format": "date-time"
           },
+          "attachments": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "$ref": "#/components/schemas/ReportPhoto"
+            }
+          },
           "history": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
                 "action": {
-                  "const": "REGISTER"
+                  "type": "string",
+                  "enum": [
+                    "REGISTER",
+                    "ADD_ATTACHMENTS"
+                  ]
                 },
                 "actor_id": {
                   "type": "string",
@@ -4681,7 +5634,9 @@
                   "format": "date-time"
                 },
                 "version": {
-                  "const": 1
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "服务端64位正整数版本；客户端使用所见版本，冲突409，不自动覆盖。"
                 }
               },
               "required": [
@@ -4724,6 +5679,7 @@
           "version",
           "created_at",
           "updated_at",
+          "attachments",
           "history"
         ],
         "additionalProperties": false
@@ -4825,46 +5781,145 @@
         ],
         "additionalProperties": false
       },
-      "OperationResult": {
+      "CustomerReportOperation": {
         "type": "object",
         "properties": {
-          "data": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "const": "CUSTOMER_REPORT_REGISTRATION"
+          },
+          "status": {
+            "const": "PENDING"
+          },
+          "step": {
+            "const": "AWAITING_TICKET_CONFIGURATION"
+          },
+          "progress": {
+            "type": "null"
+          },
+          "result_ref": {
+            "type": "string",
+            "pattern": "^/api/v1/tickets/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "error": {
             "type": "object",
             "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid"
+              "code": {
+                "const": "CONFIG_PENDING"
               },
-              "tenant_id": {
-                "type": "string",
-                "format": "uuid"
-              },
-              "kind": {
-                "const": "CUSTOMER_REPORT_REGISTRATION"
-              },
-              "status": {
-                "const": "PENDING"
-              },
-              "step": {
-                "const": "AWAITING_TICKET_CONFIGURATION"
-              },
-              "progress": {
-                "type": "null"
-              },
-              "result_ref": {
+              "message": {
                 "type": "string"
               },
-              "error": {
+              "retryable": {
+                "const": false
+              },
+              "question_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable",
+              "question_ids"
+            ],
+            "additionalProperties": false
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "kind",
+          "status",
+          "step",
+          "progress",
+          "result_ref",
+          "error",
+          "created_at",
+          "updated_at"
+        ],
+        "additionalProperties": false
+      },
+      "FileUploadOperation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "const": "FILE_UPLOAD"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "RUNNING",
+              "SUCCEEDED",
+              "FAILED"
+            ]
+          },
+          "step": {
+            "type": "string",
+            "enum": [
+              "QUEUED",
+              "UPLOADING",
+              "RETRY_WAIT",
+              "STORED",
+              "AUTHORIZATION_REVOKED",
+              "STORAGE_CONFLICT"
+            ]
+          },
+          "progress": {
+            "type": "null"
+          },
+          "result_ref": {
+            "type": "string",
+            "pattern": "^/api/v1/files/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
                 "type": "object",
                 "properties": {
                   "code": {
-                    "const": "CONFIG_PENDING"
+                    "type": "string",
+                    "enum": [
+                      "UPSTREAM_UNAVAILABLE",
+                      "ACTION_FORBIDDEN",
+                      "FILE_INTEGRITY_CONFLICT"
+                    ]
                   },
                   "message": {
                     "type": "string"
                   },
                   "retryable": {
-                    "const": false
+                    "type": "boolean"
                   },
                   "question_ids": {
                     "type": "array",
@@ -4880,29 +5935,428 @@
                   "question_ids"
                 ],
                 "additionalProperties": false
-              },
-              "created_at": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "updated_at": {
-                "type": "string",
-                "format": "date-time"
               }
-            },
-            "required": [
-              "id",
-              "tenant_id",
-              "kind",
-              "status",
-              "step",
-              "progress",
-              "result_ref",
-              "error",
-              "created_at",
-              "updated_at"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "kind",
+          "status",
+          "step",
+          "progress",
+          "result_ref",
+          "error",
+          "created_at",
+          "updated_at"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "properties": {
+                  "step": {
+                    "const": "QUEUED"
+                  },
+                  "status": {
+                    "const": "PENDING"
+                  },
+                  "error": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "step": {
+                    "const": "UPLOADING"
+                  },
+                  "status": {
+                    "const": "RUNNING"
+                  },
+                  "error": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "step": {
+                    "const": "STORED"
+                  },
+                  "status": {
+                    "const": "SUCCEEDED"
+                  },
+                  "error": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "step": {
+                    "const": "RETRY_WAIT"
+                  },
+                  "status": {
+                    "const": "PENDING"
+                  },
+                  "error": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "const": "UPSTREAM_UNAVAILABLE"
+                      },
+                      "retryable": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "step": {
+                    "const": "AUTHORIZATION_REVOKED"
+                  },
+                  "status": {
+                    "const": "FAILED"
+                  },
+                  "error": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "const": "ACTION_FORBIDDEN"
+                      },
+                      "retryable": {
+                        "const": false
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "step": {
+                    "const": "STORAGE_CONFLICT"
+                  },
+                  "status": {
+                    "const": "FAILED"
+                  },
+                  "error": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "const": "FILE_INTEGRITY_CONFLICT"
+                      },
+                      "retryable": {
+                        "const": false
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "ReportPhotoPolicy": {
+        "type": "object",
+        "properties": {
+          "purpose": {
+            "const": "customer_report_photo"
+          },
+          "scan_status": {
+            "const": "UNSCANNED"
+          },
+          "retention_until": {
+            "type": "null"
+          },
+          "production_approval": {
+            "const": "UNVERIFIED"
+          },
+          "policy_source": {
+            "const": "USER_DEVELOPMENT_DIRECTION"
+          },
+          "allowed_media_types": {
+            "type": [
+              "array",
+              "null"
             ],
-            "additionalProperties": false
+            "minItems": 1,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "image/jpeg",
+                "image/png"
+              ]
+            },
+            "description": "null表示白名单未配置或无效，上传返回CONFIG_PENDING；解码不等于病毒扫描或客户生产批准。"
+          },
+          "max_size_bytes": {
+            "const": 5000000
+          },
+          "max_attachments": {
+            "const": 3
+          }
+        },
+        "required": [
+          "purpose",
+          "scan_status",
+          "retention_until",
+          "production_approval",
+          "policy_source",
+          "allowed_media_types",
+          "max_size_bytes",
+          "max_attachments"
+        ],
+        "additionalProperties": false
+      },
+      "ReportPhotoPolicyResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReportPhotoPolicy"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ReportPhoto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "purpose": {
+            "const": "customer_report_photo"
+          },
+          "scan_status": {
+            "const": "UNSCANNED"
+          },
+          "retention_until": {
+            "type": "null"
+          },
+          "production_approval": {
+            "const": "UNVERIFIED"
+          },
+          "policy_source": {
+            "const": "USER_DEVELOPMENT_DIRECTION"
+          },
+          "original_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "media_type": {
+            "type": "string",
+            "enum": [
+              "image/jpeg",
+              "image/png"
+            ]
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000000
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "upload_status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "READY",
+              "FAILED"
+            ]
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticket_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "operation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "服务端64位正整数版本；客户端使用所见版本，冲突409，不自动覆盖。"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source": {
+            "const": "postgresql"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "purpose",
+          "scan_status",
+          "retention_until",
+          "production_approval",
+          "policy_source",
+          "original_name",
+          "media_type",
+          "size_bytes",
+          "sha256",
+          "upload_status",
+          "created_by",
+          "ticket_id",
+          "operation_id",
+          "version",
+          "created_at",
+          "updated_at",
+          "source"
+        ],
+        "additionalProperties": false
+      },
+      "ReportPhotoResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReportPhoto"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ReportPhotoUpload": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "x-mop-max-bytes": 5000000,
+            "description": "原图不重编码；仅jpg/jpeg/png文件名，声明MIME与扩展及真实解码内容须一致。每张1..5_000_000 bytes；尺寸<=16_384且像素<=25_000_000为技术解码防护。未知/重复part及超大multipart均400。"
+          },
+          "purpose": {
+            "const": "customer_report_photo"
+          }
+        },
+        "required": [
+          "file",
+          "purpose"
+        ],
+        "additionalProperties": false
+      },
+      "PhotoAttachmentCreate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "服务端64位正整数版本；客户端使用所见版本，冲突409，不自动覆盖。"
+          },
+          "attachment_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "仅报障人可追加自己上传的READY照片；同租户，未绑定其他登记，原登记累计最多3张。同键重放复用结果，旧版本409。"
+          }
+        },
+        "required": [
+          "expected_version",
+          "attachment_ids"
+        ],
+        "additionalProperties": false
+      },
+      "ReportPhotoContentGrant": {
+        "type": "object",
+        "properties": {
+          "content_url": {
+            "type": "string",
+            "pattern": "^/api/v1/files/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/content\\?grant=[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            "description": "平台相对地址；grant绑定actor/tenant/file/permission_version，15分钟内每次访问仍重新授权。不是S3预签名直链；同键重放不会延长过期时间。"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "content_url",
+          "expires_at"
+        ],
+        "additionalProperties": false
+      },
+      "ReportPhotoContentGrantResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReportPhotoContentGrant"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "OperationResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CustomerReportOperation"
+              },
+              {
+                "$ref": "#/components/schemas/FileUploadOperation"
+              }
+            ]
           },
           "trace_id": {
             "type": "string"

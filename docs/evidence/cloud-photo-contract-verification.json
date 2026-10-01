@@ -1,0 +1,36 @@
+{
+  "recorded_at": "2026-10-01T04:56:43.741178+00:00",
+  "branch": "handoff/cloud-20261001-photos",
+  "scope": "V0.5 photo API schema, operation discrimination, grants and attachment compare-and-set",
+  "status": "PASSED_PURE_CONTRACT_ONLY",
+  "checks": {
+    "status": "PASSED_PURE_SCHEMA_ONLY",
+    "version": "0.5.0",
+    "commands": [
+      "node tests/contracts.test.mjs",
+      "npm test",
+      "npm run contract:check"
+    ],
+    "tests": 7,
+    "failed": 0,
+    "skipped": 0,
+    "npm_test_discovery": "1 test file; do not add to the direct 7-case count",
+    "source_sha256": {
+      "tools/build-api-contract.mjs": "01d9928bf18eb9e8d40b4b6f642e8dd1a14acff3c1ed7df55eb35f447d617059",
+      "tests/contracts.test.mjs": "003c5a6ebf96791a573f51c5699f83f4182cea3da28824d1f27b1ec12fc4ec9d",
+      "contracts/local-api.openapi.json": "03748e31e67d795882783d7bfdf8ea729d1418537c906223b9b3976b20b1ac1b"
+    }
+  },
+  "source_sha256": {
+    "tools/build-api-contract.mjs": "01d9928bf18eb9e8d40b4b6f642e8dd1a14acff3c1ed7df55eb35f447d617059",
+    "tests/contracts.test.mjs": "003c5a6ebf96791a573f51c5699f83f4182cea3da28824d1f27b1ec12fc4ec9d",
+    "contracts/local-api.openapi.json": "03748e31e67d795882783d7bfdf8ea729d1418537c906223b9b3976b20b1ac1b"
+  },
+  "not_run": [
+    "actual backend module build",
+    "photo HTTP validation",
+    "designated PostgreSQL/MinIO/OIDC",
+    "full photo acceptance"
+  ],
+  "limitations": "Schema tests do not demonstrate successful HTTP implementation, durable jobs or external writes."
+}

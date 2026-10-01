@@ -1,0 +1,167 @@
+name: Cloud validation
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  # Integration requires the designated server and a separate authorized run.
+  MOP_RUN_REMOTE_TESTS: 'false'
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  pure-java:
+    name: Pure Java source checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Verify the Java toolchain
+        run: |
+          java -version
+          javac -version
+      - name: Run the committed pure Java checks
+        run: |
+          bash tools/verify-photo-pure-jdk.sh
+          bash tools/verify-asset-dependencies-pure.sh
+          bash tools/verify-configuration-resolution-pure.sh
+          bash tools/verify-asset-import-pure.sh
+
+  backend:
+    name: Backend compile, unit tests and packaging
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Verify the Maven toolchain
+        run: |
+          java -version
+          maven_version_output=$(mvn -B -version)
+          printf '%s\n' "$maven_version_output"
+          maven_version_clean=$(printf '%s\n' "$maven_version_output" | sed -E 's/\x1B\[[0-9;]*[[:alpha:]]//g')
+          if ! [[ "$maven_version_clean" =~ Apache\ Maven\ 3\.9\.[0-9]+([[:space:]]|$) ]]; then
+            printf '%s\n' 'Maven 3.9.x is required.' >&2
+            exit 1
+          fi
+      - name: Verify all Maven modules with strict artifact checksums
+        id: maven
+        env:
+          MOP_RUN_REMOTE_TESTS: 'false'
+        run: mvn -B -C --no-transfer-progress -Dmop.fixture.unit-test=false verify
+      - name: Report actual JUnit counts and integration boundaries
+        if: ${{ always() }}
+        env:
+          MAVEN_OUTCOME: ${{ steps.maven.outcome }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          disabled = (
+              'cn.mop.persistence.PostgresRepositoryIntegrationTest',
+              'cn.mop.persistence.PostgresCustomerReportIntegrationTest',
+              'cn.mop.persistence.PostgresConfigurationRevisionIntegrationTest',
+              'cn.mop.persistence.PostgresPhotoIntegrationTest',
+              'cn.mop.adapters.MinioPhotoStoreRemoteTest',
+              'cn.mop.api.FixtureSecurityAndWorkflowTest',
+          )
+          totals = dict(tests=0, failures=0, errors=0, skipped=0)
+          suites = {}
+          reports = sorted(Path('server').glob('*/target/surefire-reports/TEST-*.xml'))
+          for report in reports:
+              suite = ET.parse(report).getroot()
+              counts = {key: int(suite.get(key, '0')) for key in totals}
+              suites[suite.get('name', '')] = counts
+              for key, value in counts.items():
+                  totals[key] += value
+
+          executed = totals['tests'] - totals['skipped']
+          lines = [
+              f"Maven verify outcome: {os.environ['MAVEN_OUTCOME']}.",
+              f"Current Surefire XML reports: {len(reports)}; tests: {totals['tests']}; "
+              f"executed: {executed}; failures: {totals['failures']}; "
+              f"errors: {totals['errors']}; skipped: {totals['skipped']}.",
+              '',
+              '| Disabled suite | Actual result |',
+              '| --- | --- |',
+          ]
+          unexpected = False
+          for name in disabled:
+              counts = suites.get(name)
+              if counts is None or counts['tests'] == 0:
+                  status = 'NOT_RUN (no current test result)'
+              elif counts['tests'] == counts['skipped']:
+                  status = f"SKIPPED ({counts['skipped']} tests)"
+              else:
+                  status = 'UNEXPECTED_EXECUTION'
+                  unexpected = True
+              lines.append(f'| {name} | {status} |')
+          lines.extend([
+              '',
+              'Runtime API/UI, designated-server PostgreSQL/MinIO/OIDC, '
+              'cache/queue/monitoring, migrations and contract acceptance: NOT_RUN.',
+              'A skipped integration suite provides no integration acceptance evidence.',
+          ])
+          summary = '\n'.join(lines) + '\n'
+          print(summary)
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as output:
+              output.write(summary)
+          if unexpected:
+              raise SystemExit('A suite that must remain disabled executed.')
+          if os.environ['MAVEN_OUTCOME'] == 'success' and (
+              executed == 0 or totals['failures'] or totals['errors']
+          ):
+              raise SystemExit('Successful packaging alone does not validate unit tests.')
+          PY
+
+  contracts-web:
+    name: Contracts and Web unit tests, typecheck and build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Verify the Node toolchain
+        run: |
+          node --version
+          npm --version
+      - name: Install the locked dependencies
+        run: |
+          npm ci --registry=https://registry.npmjs.org --replace-registry-host=always --ignore-scripts --no-audit --no-fund
+          npm ci --prefix apps/web --registry=https://registry.npmjs.org --replace-registry-host=always --ignore-scripts --no-audit --no-fund
+      - name: Verify the actual API contract
+        run: |
+          npm run contract:check
+          npm test
+      - name: Run the Web unit tests
+        run: npm --prefix apps/web run test -- --environment node
+      - name: Typecheck and build the Web application
+        run: npm --prefix apps/web run build

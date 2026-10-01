@@ -48,3 +48,5 @@
 |照片业务|新增PG租约/fencing、MinIO条件写、附件CAS、15分钟平台grant及前端代码|DOING/PARTIAL；真实恢复/竞争/撤权/原图HTTP尚未验证，不把PG消费者记作RabbitMQ业务接入|
 
 当前云端未新建数据库、缓存、队列或监控替代指定组件。历史MinIO桶/IAM验证仍有参考价值，但新增业务与本轮访问权限须另外验证。Q28扫描/隔离、Q10留存清理及生产Q02/Q03/Q17等门禁继续保留，未知结果不记通过。
+
+工程新增[GitHub Actions验证配置](../ci-validation.md)：官方checkout/setup-java/setup-node按已核验完整SHA固定，均MIT；actions自身Node24运行于GitHub-hosted Ubuntu24.04，项目工具链为JDK17、Maven3.9.x、Node22。仅定义构建和纯检查，不提供替代PG/缓存/队列/监控；真实CI结果未回读，不归入组件联调证据。

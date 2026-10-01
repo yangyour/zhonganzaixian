@@ -53,5 +53,17 @@
   "requirements": [
     "doc/development/01_开发顺序与任务拆解.md D04 steps4-5",
     "doc/development/02_模块开发步骤与页面交互.md SET-D15/19"
-  ]
+  ],
+  "git_runner_replay": {
+    "recorded_at": "2026-10-01T06:12:11.539454+00:00",
+    "command": "bash tools/verify-configuration-resolution-pure.sh",
+    "compile": "PASSED_REAL_SOURCE_JDK17",
+    "groups": 15,
+    "assertions": 250,
+    "new_test_cases": 0,
+    "source_sha256": {
+      "tools/verify-configuration-resolution-pure.sh": "8e6863528719286c19d37c31015411244d91b620855a51c8d0a604dfdf30b657"
+    },
+    "scope": "Portable replay of existing standalone checks; not JUnit or actual evidence/persistence integration."
+  }
 }

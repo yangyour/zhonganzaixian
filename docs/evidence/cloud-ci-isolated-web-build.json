@@ -1,0 +1,65 @@
+{
+  "checked_at": "2026-10-01T06:11:18.908092+00:00",
+  "scope": "Isolated actual npm offline frozen install with lifecycle scripts disabled, esbuild/Rollup execution and public Web typecheck/build",
+  "temporary_root": "/tmp/mop-ci-npm-yop5kvu3",
+  "cache_source": "/workspace/cloud-setup/npm-cache/_cacache",
+  "cache_mode": "Read existing artifact cache; work only on a private temporary copy",
+  "network": "npm --offline; no network fallback",
+  "services_started": false,
+  "private_runtime_files_copied": false,
+  "checkout_node_modules_changed": false,
+  "lockfile_sha256_before": "df197a04fdebe27f9ebf22f9e1e6fd38e9da28cfe38490a3eb99e61700800ff3",
+  "checks": [
+    {
+      "name": "npm-offline-install",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 3.746,
+      "command": [
+        "npm",
+        "ci",
+        "--offline",
+        "--ignore-scripts",
+        "--registry=https://registry.npmjs.org",
+        "--replace-registry-host=always",
+        "--no-audit",
+        "--no-fund",
+        "--cache",
+        "/tmp/mop-ci-npm-yop5kvu3/cache"
+      ],
+      "log": ".local/cloud-validation/ci/npm-offline-install.log"
+    },
+    {
+      "name": "native-tool-execution",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.172,
+      "command": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "\nimport assert from 'node:assert/strict';\nimport { transformSync } from 'esbuild';\nimport { rollup } from 'rollup';\nconst transformed = transformSync('export const checkValue: number = 7;', {loader: 'ts'});\nassert.match(transformed.code, /checkValue = 7/);\nconst bundle = await rollup({input: 'virtual-entry', plugins: [{\n  name: 'isolated-native-check',\n  resolveId(id) { return id === 'virtual-entry' ? id : null; },\n  load(id) { return id === 'virtual-entry' ? 'export const checkValue = 7;' : null; }\n}]});\nconst generated = await bundle.generate({format: 'es'});\nassert.ok(generated.output.some(chunk => chunk.type === 'chunk' && chunk.code.includes('checkValue = 7')));\nawait bundle.close();\nconsole.log('PASS: esbuild TypeScript transform and Rollup actual bundle generation.');\n"
+      ],
+      "log": ".local/cloud-validation/ci/native-tool-execution.log"
+    },
+    {
+      "name": "web-typecheck-build",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 11.994,
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "log": ".local/cloud-validation/ci/web-typecheck-build.log"
+    }
+  ],
+  "lockfile_sha256_after": "df197a04fdebe27f9ebf22f9e1e6fd38e9da28cfe38490a3eb99e61700800ff3",
+  "copied_lockfile_sha256_after": "df197a04fdebe27f9ebf22f9e1e6fd38e9da28cfe38490a3eb99e61700800ff3",
+  "lockfiles_unchanged": true,
+  "node": "v22.22.0",
+  "npm": "10.9.4",
+  "status": "PASS",
+  "raw_logs_delivery": "IGNORED_LOCAL_ONLY"
+}

@@ -13,9 +13,7 @@
 复现纯测试（先激活云工具）：
 
 ```bash
-mkdir -p .local/configuration-resolution-check
-javac --release 17 -Xlint:all,-serial -Werror -d .local/configuration-resolution-check server/domain/src/main/java/cn/mop/domain/DomainException.java server/domain/src/main/java/cn/mop/domain/configuration/*.java server/persistence/src/test/java/cn/mop/persistence/configuration/ConfigurationResolutionChecks.java
-java -cp .local/configuration-resolution-check cn.mop.persistence.configuration.ConfigurationResolutionChecks
+bash tools/verify-configuration-resolution-pure.sh
 ```
 
 此命令不连接组件、不执行迁移，也不证明D04或128项合同整体验收完成。

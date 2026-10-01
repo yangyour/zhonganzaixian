@@ -39,6 +39,8 @@
 
 资产导入已解析行的纯预检独立通过：JDK17严格编译、14组1,479个断言，50行三类错误准确阻断三行，500行计算12.67ms；[实现边界](asset-import-precheck.md)和[证据](evidence/cloud-asset-import-precheck-verification.json)明确没有.xlsx/CSV解析或实际入库。该计时不表示完整导入≤60秒；TC-M3-6、真实并发配额和重复导入均NOT_RUN。
 
+[工程CI配置](ci-validation.md)通过本地结构/脚本语法、官方action refs/metadata核验和实际Maven版本门禁；隔离离线安装及公开Web类型/构建实际通过，未改源码锁或node_modules。配置定义的三个GitHub job结果NOT_OBSERVED，Actions回读通道受到HTTP传输/代理拒绝，不能把配置或本地构建写成完整后端CI/联调通过。配置解析portable脚本另实际复现原15组250个断言，不计为新增测试。
+
 ## 历史本地已执行结果
 
 以下仅为云端交接前的本地记录。本机当时为Windows 11、Temurin JDK 17.0.20、Maven 3.9.6、Node 22.22.1、npm 10.9.4、Python 3.12，使用独立`mop_test`、`mop-test`身份域和虚构测试数据。指定组件版本及缺失项见[组件清单](environment/component-inventory.md)；测试环境接入不表示客户生产配置、许可或合同验收已批准。

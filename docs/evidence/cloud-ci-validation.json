@@ -1,0 +1,95 @@
+{
+  "checked_at": "2026-10-01T06:14:26.647987+00:00",
+  "baseline_commit": "d30e9e553144e031327889cf0e7f85b9b981fb5c",
+  "workflow": ".github/workflows/cloud-validation.yml",
+  "workflow_sha256": "6319d7cb7977c0cbbaa1417aca0f680355c74d3ccaa75e840bff4c7dbb1e43f3",
+  "local_checks": {
+    "status": "PASS",
+    "scope": "Workflow structure, exact action metadata/input compatibility, bash syntax and Python AST only",
+    "jobs": 3,
+    "shell_blocks": 10,
+    "python_blocks": 1,
+    "pure_runner_paths": [
+      "tools/verify-photo-pure-jdk.sh",
+      "tools/verify-asset-dependencies-pure.sh",
+      "tools/verify-configuration-resolution-pure.sh",
+      "tools/verify-asset-import-pure.sh"
+    ],
+    "maven_version_gate": "PASS: actual version-only command completed; no verify or dependency resolution"
+  },
+  "github_actions_run": {
+    "status": "NOT_OBSERVED",
+    "reason": "Normal push may trigger the committed workflow; actual runs/results cannot be read through the current supported API route."
+  },
+  "github_actions_read_channel": {
+    "gh_available": true,
+    "GH_TOKEN_binding_present": true,
+    "credentials_values_inspected": false,
+    "runs_list": "UNAVAILABLE",
+    "classification": "http_transport_or_proxy_denial_before_github_response",
+    "gh_exit_code": 1,
+    "http_status": null,
+    "github_response_header_present": false,
+    "logs": "NOT_RUN: run listing unavailable; no log IDs obtained",
+    "new_credentials_created": false
+  },
+  "backend_verify": {
+    "status": "NOT_RUN",
+    "reason": "This subtask does not execute Maven; parent reports existing strict Maven artifact requests blocked by HTTP429"
+  },
+  "pure_java_suites": {
+    "status": "NOT_RUN_BY_THIS_SUBTASK",
+    "reason": "Only runner path and command compatibility reviewed; real evidence belongs to feature owners"
+  },
+  "remote_integration": {
+    "status": "NOT_RUN",
+    "forced_MOP_RUN_REMOTE_TESTS": "false",
+    "fixture_system_property": "false",
+    "services_started": false,
+    "migrations_executed": false
+  },
+  "skipped_reporting": "Only a current Surefire XML report with tests>0 and tests==skipped is labelled SKIPPED; missing/zero reports are NOT_RUN. Disabled suites that execute or successful Maven with zero executed tests fail the reporter.",
+  "npm_install": {
+    "frozen_lockfiles": true,
+    "lockfile_resolved_hosts": [
+      "registry.npmmirror.com"
+    ],
+    "runtime_registry_override": "https://registry.npmjs.org",
+    "replace_registry_host": "always",
+    "integrity_checks": "unchanged",
+    "lifecycle_scripts": "disabled; optional native packages still installed",
+    "status": "PASS: actual isolated offline frozen install; real native-tool execution and public Web typecheck/build",
+    "job_environment": {
+      "NPM_CONFIG_REGISTRY": "https://registry.npmjs.org",
+      "NPM_CONFIG_REPLACE_REGISTRY_HOST": "always"
+    }
+  },
+  "actionlint": {
+    "status": "NOT_RUN",
+    "reason": "Binary is not installed; PyYAML structure checks are not an Actions runner/schema execution"
+  },
+  "isolated_web_build": {
+    "status": "PASS",
+    "evidence": "docs/evidence/cloud-ci-isolated-web-build.json",
+    "node": "v22.22.0",
+    "npm": "10.9.4",
+    "checkout_lockfile_unchanged": true,
+    "checkout_node_modules_changed": false,
+    "source_scope": "Public tracked apps/web copied to /tmp; private .env and remote configuration not copied"
+  },
+  "independent_static_review": {
+    "status": "PASS: no blocking found",
+    "agent": "workflow_safety_review",
+    "suite_execution": "NOT_RUN",
+    "latest_maven_version_block_review": "PASS: no blocking; actual-output check fails closed outside Maven3.9.x",
+    "npm_config_env_review": "PASS: npm10 recognizes the two job variables; registry override retains lock integrity and disabled lifecycle scripts"
+  },
+  "contract_and_web_unit_suites": {
+    "status": "NOT_RUN_BY_THIS_SUBTASK",
+    "reason": "Only safe test entrypoints reviewed; the separately recorded isolated Web typecheck/build did actually run"
+  },
+  "source_sha256": {
+    ".github/workflows/cloud-validation.yml": "6319d7cb7977c0cbbaa1417aca0f680355c74d3ccaa75e840bff4c7dbb1e43f3",
+    "tools/verify-configuration-resolution-pure.sh": "8e6863528719286c19d37c31015411244d91b620855a51c8d0a604dfdf30b657"
+  }
+}

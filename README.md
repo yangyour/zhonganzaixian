@@ -1,6 +1,6 @@
 # MOP 基础网络代维平台
 
-依据仓库内 `doc/development/` 开发。当前本地应用复用用户指定服务器的真实测试组件：PostgreSQL 持久仓储与 Keycloak OIDC 登录。资产、配置草稿、幂等记录及审计保存在远程独立测试数据库，重启 API 不清除。
+依据仓库内 `doc/development/` 开发。当前本地应用复用用户指定服务器的真实测试组件：PostgreSQL 持久仓储与 Keycloak OIDC 登录。资产、配置草稿/修订、报障登记/操作/历史/outbox意图、幂等记录及审计保存在远程独立测试数据库；正式工单处理规则尚未落实，持久登记不表示业务闭环完成。
 
 全局要求见 [AGENTS.md](AGENTS.md)；已发现及缺失组件见 [组件清单](docs/environment/component-inventory.md)。静态原型仍保留为参考，默认运行和集成测试不再使用内存 fixture。
 
@@ -28,7 +28,7 @@ pwsh -File deploy/start-dev.ps1
 
 默认构建 API、安装前端依赖、复用或启动本项目 SSH 隧道，再注入私有运行配置启动 `remote_test`。已有构建可加 `-SkipBuild`。
 
-访问 <http://127.0.0.1:5173>，点击 Keycloak 登录。测试身份用户名在私有 `runtime.json` 的 `test_users` 中，密码只在那里读取；它们是虚构测试账号。平台管理员有两租户及配置/审计能力，客户角色只访问所属租户。
+访问 <http://127.0.0.1:5173>，点击 Keycloak 登录。测试身份用户名在私有 `runtime.json` 的 `test_users` 中，密码只在那里读取；它们是虚构测试账号。平台管理员有两租户及配置/审计能力，客户角色只访问所属租户。新增 `/tickets` 报障与受理页：viewer/tadmin可登记并查本人报障，msp/padmin按授权租户只读查看；会话岗位与capabilities同取当前租户成员关系。
 
 API 默认8080；可用 `-ApiPort 18080` 修改 API 端口。Web端口5173与 Keycloak精确回调登记一致，修改Web端口前须同步本项目client回调配置。
 
@@ -82,8 +82,12 @@ node tests/api-smoke.mjs http://127.0.0.1:8080/api/v1 --verify-persistence
 |`contracts`|原设计副本、原配置登记及当前实际API契约|
 |`deploy` / `tools`|私有配置引用、本机SSH隧道、项目命名空间准备与检查|
 
-当前实际契约为 `contracts/local-api.openapi.json`（命名沿用首批，内容已更新为remote_test V0.3）；生成源为 `tools/build-api-contract.mjs`。`design-core.openapi.json` 仍是设计原件，未实现路径不可视为可调用。
+当前实际契约为 `contracts/local-api.openapi.json`（命名沿用首批，内容已更新为remote_test V0.4）；生成源为 `tools/build-api-contract.mjs`。`design-core.openapi.json` 仍是设计原件，未实现路径不可视为可调用。
 
-配置登记页现支持“修订与审批”：提案保存外部资料引用及hash，创建者提交后由另一平台管理员内部复核，所有动作与历史持久化。内部通过仍为证据未核验、配置未生效，不替客户确认或正式发布。接口、运行账号权限和真实验证记录见[配置修订说明](docs/configuration-revisions.md)，实际契约已更新到V0.3。
+配置登记页现支持“修订与审批”：提案保存外部资料引用及hash，创建者提交后由另一平台管理员内部复核，所有动作与历史持久化。内部通过仍为证据未核验、配置未生效，不替客户确认或正式发布。接口、运行账号权限和真实验证记录见[配置修订说明](docs/configuration-revisions.md)。
 
-V1迁移已在测试库执行，禁止修改；结构修订必须追加迁移。测试数据库选择不替代客户正式Q02物理隔离批准，Keycloak测试域不替代正式身份/岗位确认。Redis、RabbitMQ、MinIO仅已盘点，待对应业务接入；Zabbix、ITSM、堡垒机缺失保持清单状态。下一批继续配置审批/证据与工单领域闭环，再实施耐久outbox/Worker。
+用户已明确一期以本平台工单为权威。新增客户报障支持真实PostgreSQL持久登记、operation与登记详情查询；202只代表“报障已耐久登记，正式工单规则待确认”。正式state/priority/SLA截止均为null，联系方式UNVERIFIED，图片上传及补传尚未实现，接单/转派/解决/客户确认等其余D07闭环继续开发。outbox仅保存CONFIG_PENDING意图，没有RabbitMQ投递或Worker执行；缺少外部ITSM不阻塞本平台这一登记切片。详见[客户报障登记说明](docs/customer-report-registration.md)。
+
+本轮24项Java纯单元、19项真实PG集成、前端21项、契约3项通过。真实OIDC下47次HTTP响应符合实际契约，会话岗位降级/恢复及1440/390px浏览器验收通过；[本轮汇总](docs/evidence/customer-report-verification-summary.json)区分全量检查与会话修正补跑。报障专用HTTP脚本及私有会话准备步骤见[登记说明](docs/customer-report-registration.md)，这些结果不代表完整工单验收完成。
+
+V1–V4迁移沿用已执行版本，禁止修改；后续结构修订必须追加迁移。测试数据库选择不替代客户正式Q02物理隔离批准，Keycloak测试域不替代正式身份/岗位确认。Redis、RabbitMQ、MinIO仅已盘点，待对应业务接入；Zabbix、外部ITSM、堡垒机缺失保持清单状态。下一批继续配置客户证据/正式确认与工单实际处理闭环，再实施outbox投递/Worker。

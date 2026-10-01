@@ -155,6 +155,72 @@ public final class PostgresPlatformRepository implements PlatformRepository {
             statement.setString(1,tenant);statement.setString(2,id);statement.setLong(3,version);statement.setString(4,mapper.valueToTree(event).toString());statement.executeUpdate();return null;
         }});
     }
+    private Membership ticketAccess(String tenant,String actor){
+        Membership current=membership(actor,tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效"));
+        if(!Capabilities.forRole(current.role()).contains("tickets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无工单查询权限");return current;
+    }
+    private static String ownTicketPredicate(Membership membership){return Capabilities.customer(membership.role())?" AND t.reporter_id::text=?":"";}
+    private static final String CURRENT_TICKET_ACCESS=" AND EXISTS(SELECT 1 FROM public.mop_membership access JOIN public.mop_user u ON u.id=access.user_id WHERE access.tenant_id=t.tenant_id AND access.user_id::text=? AND access.active AND u.active AND access.permission_version=? AND access.role_code=?)";
+    private static int bindTicketScope(PreparedStatement statement,String tenant,String actor,Membership membership)throws SQLException{
+        statement.setString(1,tenant);int index=2;if(Capabilities.customer(membership.role()))statement.setString(index++,actor);statement.setString(index++,actor);statement.setLong(index++,membership.permissionVersion());statement.setString(index++,membership.role());return index;
+    }
+    private Map<String,Object> ticketProjection(Connection connection,ResultSet rows)throws SQLException{
+        Map<String,Object> result=new LinkedHashMap<>();
+        for(String key:List.of("id","tenant_id","receipt_no","title","description","source","category","impact_scope","urgency","asset_id","asset_name","reporter_id","contact_name","contact_phone","contact_binding_status","registration_status","state","external_id","external_state","sync_state","authority_source","authority_status","priority","operation_id"))result.put(key,rows.getString(key));
+        result.put("response_due_at",instant(rows,"response_due_at"));result.put("recovery_due_at",instant(rows,"recovery_due_at"));result.put("version",rows.getLong("version"));result.put("created_at",instant(rows,"created_at").toString());result.put("updated_at",instant(rows,"updated_at").toString());
+        List<Map<String,Object>> history=new ArrayList<>();
+        try(PreparedStatement statement=connection.prepareStatement("SELECT payload FROM public.mop_ticket_history WHERE tenant_id::text=? AND ticket_id::text=? AND version<=? ORDER BY version")){
+            statement.setString(1,rows.getString("tenant_id"));statement.setString(2,rows.getString("id"));statement.setLong(3,rows.getLong("version"));try(ResultSet events=statement.executeQuery()){while(events.next())history.add(mapper.convertValue(json(events.getString(1)),LinkedHashMap.class));}
+        }result.put("history",history);return result;
+    }
+    @Override public List<Map<String,Object>> tickets(String tenant,String actor,String category,String urgency,String query,Instant afterCreated,String afterId,int limit){
+        Membership membership=ticketAccess(tenant,actor);if(limit<1||limit>101||(afterCreated==null)!=(afterId==null))throw new DomainException(400,"VALIDATION_ERROR","工单分页参数无效");
+        String sql="SELECT t.* FROM public.mop_ticket t WHERE t.tenant_id::text=?"+ownTicketPredicate(membership)+CURRENT_TICKET_ACCESS+(category==null?"":" AND t.category=?")+(urgency==null?"":" AND t.urgency=?")+(query==null?"":" AND position(lower(?) in lower(t.receipt_no||' '||t.title||' '||t.description))>0")+(afterCreated==null?"":" AND (t.created_at,t.id)>(?::timestamptz,?::uuid)")+" ORDER BY t.created_at,t.id LIMIT ?";
+        return connection(connection->{List<Map<String,Object>> result=new ArrayList<>();try(PreparedStatement statement=connection.prepareStatement(sql)){
+            int index=bindTicketScope(statement,tenant,actor,membership);if(category!=null)statement.setString(index++,category);if(urgency!=null)statement.setString(index++,urgency);if(query!=null)statement.setString(index++,query);if(afterCreated!=null){statement.setString(index++,afterCreated.toString());statement.setString(index++,afterId);}statement.setInt(index,limit);
+            try(ResultSet rows=statement.executeQuery()){while(rows.next())result.add(ticketProjection(connection,rows));}
+        }return result;});
+    }
+    @Override public Optional<Map<String,Object>> ticket(String tenant,String actor,String id){Membership membership=ticketAccess(tenant,actor);return connection(connection->{
+        try(PreparedStatement statement=connection.prepareStatement("SELECT t.* FROM public.mop_ticket t WHERE t.tenant_id::text=?"+ownTicketPredicate(membership)+CURRENT_TICKET_ACCESS+" AND t.id::text=?")){
+            int index=bindTicketScope(statement,tenant,actor,membership);statement.setString(index,id);try(ResultSet rows=statement.executeQuery()){return rows.next()?Optional.of(ticketProjection(connection,rows)):Optional.empty();}
+        }
+    });}
+    @Override public Optional<Map<String,Object>> operation(String tenant,String actor,String id){Membership membership=ticketAccess(tenant,actor);return connection(connection->{
+        try(PreparedStatement statement=connection.prepareStatement("SELECT o.* FROM public.mop_operation o JOIN public.mop_ticket t ON t.tenant_id=o.tenant_id AND t.id=o.ticket_id AND t.operation_id=o.id WHERE t.tenant_id::text=?"+ownTicketPredicate(membership)+CURRENT_TICKET_ACCESS+" AND o.id::text=?")){
+            int index=bindTicketScope(statement,tenant,actor,membership);statement.setString(index,id);try(ResultSet rows=statement.executeQuery()){
+                if(!rows.next())return Optional.empty();Map<String,Object> result=new LinkedHashMap<>();for(String key:List.of("id","tenant_id","kind","status","step","result_ref"))result.put(key,rows.getString(key));result.put("progress",null);result.put("error",mapper.convertValue(json(rows.getString("error")),LinkedHashMap.class));result.put("created_at",instant(rows,"created_at").toString());result.put("updated_at",instant(rows,"updated_at").toString());return Optional.of(result);
+            }
+        }
+    });}
+    @Override public CustomerReportRegistration registerCustomerReport(String tenant,String actor,CustomerReport report){
+        if(transaction.get()==null)throw new IllegalStateException("Customer report writes require idempotent transaction");Membership current=ticketAccess(tenant,actor);
+        if(!Capabilities.forRole(current.role()).contains("tickets:report"))throw new DomainException(403,"ACTION_FORBIDDEN","内部角色不能代客户报障");
+        Asset asset=report.assetId()==null?null:find(tenant,report.assetId()).orElseThrow(PostgresPlatformRepository::missing);
+        if(asset!=null){
+            lock("ticket-duplicate|"+tenant+"|"+actor+"|"+asset.id()+"|"+report.category());
+            CustomerReportRegistration duplicate=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT id,operation_id FROM public.mop_ticket WHERE tenant_id::text=? AND reporter_id::text=? AND asset_id::text=? AND category=? AND created_at>=clock_timestamp()-interval '30 seconds' AND created_at<=clock_timestamp() ORDER BY created_at DESC,id DESC LIMIT 1")){
+                statement.setString(1,tenant);statement.setString(2,actor);statement.setString(3,asset.id());statement.setString(4,report.category());try(ResultSet rows=statement.executeQuery()){return rows.next()?new CustomerReportRegistration(rows.getString("operation_id"),rows.getString("id"),false):null;}
+            }});if(duplicate!=null)return duplicate;
+        }
+        String id=UUID.randomUUID().toString(),operationId=UUID.randomUUID().toString(),title=report.title()==null?report.category()+" / "+(asset==null?"设备不确定":asset.name()):report.title();
+        Instant created=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_ticket(id,tenant_id,receipt_no,title,description,source,category,impact_scope,urgency,asset_id,asset_name,reporter_id,contact_name,contact_phone,operation_id) VALUES (?::uuid,?::uuid,?,?,?,'customer_report',?,?,?,?::uuid,?,?::uuid,?,?,?::uuid) RETURNING created_at")){
+            statement.setString(1,id);statement.setString(2,tenant);statement.setString(3,"REG-"+id);statement.setString(4,title);statement.setString(5,report.description());statement.setString(6,report.category());statement.setString(7,report.impactScope());statement.setString(8,report.urgency());statement.setString(9,asset==null?null:asset.id());statement.setString(10,asset==null?null:asset.name());statement.setString(11,actor);statement.setString(12,report.contactName());statement.setString(13,report.contactPhone());statement.setString(14,operationId);try(ResultSet rows=statement.executeQuery()){rows.next();return instant(rows,"created_at");}
+        }});
+        Map<String,Object> event=new LinkedHashMap<>();event.put("action","REGISTER");event.put("actor_id",actor);event.put("occurred_at",created.toString());event.put("version",1);
+        connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_ticket_history(tenant_id,ticket_id,version,payload) VALUES (?::uuid,?::uuid,1,?::jsonb)")){
+            statement.setString(1,tenant);statement.setString(2,id);statement.setString(3,mapper.valueToTree(event).toString());statement.executeUpdate();return null;
+        }});
+        Map<String,Object> error=new LinkedHashMap<>();error.put("code","CONFIG_PENDING");error.put("message","本平台为一期工单权威；正式状态、SLA、授权、通知与处理规则尚待配置，受理已持久保存");error.put("retryable",false);error.put("question_ids",List.of("Q07","Q08","Q09","Q14","Q16"));
+        connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_operation(id,tenant_id,ticket_id,kind,result_ref,error) VALUES (?::uuid,?::uuid,?::uuid,'CUSTOMER_REPORT_REGISTRATION',?,?::jsonb)")){
+            statement.setString(1,operationId);statement.setString(2,tenant);statement.setString(3,id);statement.setString(4,"/api/v1/tickets/"+id);statement.setString(5,mapper.valueToTree(error).toString());statement.executeUpdate();return null;
+        }});
+        Map<String,Object> payload=Map.of("ticket_id",id,"operation_id",operationId,"kind","CUSTOMER_REPORT_REGISTRATION");
+        connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_outbox(id,tenant_id,ticket_id,operation_id,topic,payload,blocked_question_ids) VALUES (?::uuid,?::uuid,?::uuid,?::uuid,'ticket.customer_report.registered',?::jsonb,?::jsonb)")){
+            statement.setString(1,UUID.randomUUID().toString());statement.setString(2,tenant);statement.setString(3,id);statement.setString(4,operationId);statement.setString(5,mapper.valueToTree(payload).toString());statement.setString(6,mapper.valueToTree(error.get("question_ids")).toString());statement.executeUpdate();return null;
+        }});
+        return new CustomerReportRegistration(operationId,id,true);
+    }
     @Override public void audit(String actor,String tenant,String action,String resourceType,String resourceId,String result,String reason,String trace){inTransaction(()->{
         String namespace=tenant==null?"platform":tenant;lock("audit|"+namespace);
         Map<String,Object> row=new LinkedHashMap<>();row.put("id",UUID.randomUUID().toString());row.put("occurred_at",Instant.now().truncatedTo(ChronoUnit.MILLIS).toString());row.put("actor_id",actor);row.put("actor_name",actor==null?"未认证主体":user(actor).map(FixtureUser::displayName).orElse("未认证主体"));row.put("tenant_id",tenant);row.put("action",action);row.put("resource_type",resourceType);row.put("resource_id",resourceId);row.put("result",result);row.put("reason",reason);row.put("trace_id",trace);row.put("source","postgresql");

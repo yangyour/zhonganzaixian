@@ -1,0 +1,162 @@
+{
+  "date": "2026-10-01",
+  "mode": "remote_test",
+  "scope": "durable_customer_report_registration_not_full_D07",
+  "authority_direction": "MOP_user_selected",
+  "environment": {
+    "database": "PostgreSQL 17.9",
+    "namespace": "mop_test",
+    "identity": "Keycloak 26.2.4",
+    "access": "loopback_ssh_tunnel_to_designated_shared_test_server",
+    "virtual_test_data": true
+  },
+  "backend_isolated_unit_tests": 24.0,
+  "backend_remote_integration_tests": 19.0,
+  "backend_historical_fixture_skipped": 13,
+  "backend_suites": [
+    {
+      "suite": "cn.mop.api.ConfigurationRevisionValidationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "isolated_unit"
+    },
+    {
+      "suite": "cn.mop.api.ConfigurationRevisionWorkflowTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "isolated_unit"
+    },
+    {
+      "suite": "cn.mop.api.CustomerReportValidationTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "isolated_unit"
+    },
+    {
+      "suite": "cn.mop.api.FixtureSecurityAndWorkflowTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 13,
+      "kind": "historical_fixture"
+    },
+    {
+      "suite": "cn.mop.api.ProfilePolicyTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "isolated_unit"
+    },
+    {
+      "suite": "cn.mop.api.SessionMembershipRoleProjectionTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "isolated_unit"
+    },
+    {
+      "suite": "cn.mop.api.SessionServiceSecurityTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "isolated_unit"
+    },
+    {
+      "suite": "cn.mop.api.TestOidcConfigurationTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "isolated_unit"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresConfigurationRevisionIntegrationTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "remote_postgresql_integration"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresCustomerReportIntegrationTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "remote_postgresql_integration"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresRepositoryIntegrationTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "remote_postgresql_integration"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresSafetyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "kind": "isolated_unit"
+    }
+  ],
+  "execution_batches": [
+    {
+      "kind": "full_deploy_check",
+      "isolated_unit": 22,
+      "remote_postgresql": 19,
+      "exit_code": 0
+    },
+    {
+      "kind": "membership_projection_pure_test_supplement",
+      "isolated_unit": 2,
+      "remote_postgresql": 0,
+      "exit_code": 0
+    }
+  ],
+  "final_jar_package": "passed",
+  "frontend_tests": 21,
+  "frontend_typecheck": "passed",
+  "frontend_build": "passed",
+  "contract_tests": 3,
+  "http_contract_checks": 47,
+  "membership_role_http_checks": 8,
+  "browser_check_categories": 16,
+  "migrations_applied": [
+    "V1",
+    "V2",
+    "V3",
+    "V4"
+  ],
+  "runtime_new_tables_update_delete": false,
+  "local_component_substitutes": false,
+  "production_ready": false,
+  "full_contract_acceptance": false,
+  "evidence_sources": [
+    "customer-report-http-verification.json",
+    "membership-role-http-verification.json",
+    "customer-report-ui-verification.json"
+  ],
+  "remaining": [
+    "formal_ticket_state_and_processing_commands",
+    "SLA_calendar_priority_and_service_tier",
+    "formal_roles_and_contact_binding",
+    "photos_upload_and_supplement",
+    "RabbitMQ_delivery_and_worker",
+    "notifications",
+    "cross_reporter_and_unknown_asset_semantic_merge",
+    "remaining_128_contract_requirements"
+  ],
+  "evidence_policy": "No passwords, cookies, CSRF/OIDC tokens, secret URLs, or contact payloads."
+}

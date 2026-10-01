@@ -20,7 +20,7 @@ async function changeTenant(value: unknown) {
   try {
     await Promise.all([
       switchTenant(String(value)),
-      router.replace({ query: { ...route.query, asset_id: undefined, cursor: undefined, site_id: undefined } }),
+      router.replace({ query: { ...route.query, asset_id: undefined, ticket_id: undefined, operation_id: undefined, cursor: undefined, site_id: undefined } }),
     ])
   }
   catch (cause) { if (!isCancelled(cause)) error.value = cause }
@@ -42,6 +42,7 @@ async function endSession() {
       <div class="nav-heading">资源</div>
       <el-menu :default-active="String(route.name)" class="side-menu" @select="router.push({ name: $event })">
         <el-menu-item index="assets"><span class="nav-symbol">▤</span>资产管理</el-menu-item>
+        <el-menu-item v-if="can('tickets:read')" index="tickets"><span class="nav-symbol">▣</span>报障与受理</el-menu-item>
       </el-menu>
       <template v-if="can('configurations:read') || can('audit:read')">
         <div class="nav-heading">管理</div>
@@ -71,11 +72,12 @@ async function endSession() {
         <div v-if="switchingTenant || tenantTransition" class="switching-panel"><el-skeleton :rows="5" animated /><p>正在切换租户，已取消旧上下文请求…</p></div>
         <router-view v-else :key="pageKey" />
       </main>
-      <footer class="app-footer">MOP 开发验证 V0.1 <span>当前范围：资产草稿 · 配置登记 · 审计</span></footer>
+      <footer class="app-footer">MOP 开发验证 V0.1 <span>资产草稿 · 配置登记 · 报障登记 · 审计</span></footer>
     </div>
     <el-drawer v-model="navigationOpen" title="MOP 导航" direction="ltr" size="260px">
       <el-menu :default-active="String(route.name)" @select="router.push({ name: $event })">
         <el-menu-item index="assets">资产管理</el-menu-item>
+        <el-menu-item v-if="can('tickets:read')" index="tickets">报障与受理</el-menu-item>
         <el-menu-item v-if="can('configurations:read')" index="configurations">配置确认登记</el-menu-item>
         <el-menu-item v-if="can('audit:read')" index="audit">审计日志</el-menu-item>
       </el-menu>

@@ -103,7 +103,7 @@ public class PlatformController {
         List<String> capabilities=capabilities(membership.role());if(!capabilities.contains(capability))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无此动作权限");
         return new Access(repository.user(actor).orElseThrow(()->notFound()),repository.tenant(tenant),membership,capabilities);
     }
-    private static List<String> capabilities(String role){if(role.equals("padmin"))return List.of("assets:read","assets:write","configurations:read","configurations:write","audit:read");if(Set.of("msp","tadmin").contains(role))return List.of("assets:read","assets:write");return List.of("assets:read");}
+    private static List<String> capabilities(String role){return Capabilities.forRole(role);}
     private Object write(Access access,JsonNode body,HttpServletRequest request,Supplier<Object> command){
         return repository.idempotent(access.user.id(),access.tenant.id(),route(request),requestKey(request),hash(body),access.membership.permissionVersion(),()->{
             // Recheck under the same monitor as the write; concurrent revocation cannot race a commit.

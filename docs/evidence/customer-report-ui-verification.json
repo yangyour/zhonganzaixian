@@ -1,0 +1,39 @@
+{
+  "verified_at": "2026-10-01T03:21:08.259Z",
+  "mode": "remote_test",
+  "browser": "installed_Microsoft_Edge_via_Playwright",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "all_passed": true,
+  "checks": [
+    "real_SSO_cookie_customer_view",
+    "empty_required_fields_do_not_POST",
+    "known_and_unknown_asset_choice",
+    "create_registration_and_read_detail",
+    "pending_formal_state_priority_SLA_visible",
+    "accepted_read_failure_retries_GET_only",
+    "uncertain_POST_retains_body_and_idempotency_key",
+    "close_and_reopen_preserves_uncertain_attempt",
+    "same_key_retry_returns_single_durable_registration",
+    "URL_search_category_urgency_filters_and_reset",
+    "refresh_page_size_next_previous",
+    "detail_refresh_close",
+    "operator_read_only",
+    "tenant_switch_clears_previous_context",
+    "mobile_list_form_footer_detail_fit",
+    "multiline_description_and_long_title_wrap"
+  ],
+  "client_pageerrors": 0,
+  "horizontal_overflow": false,
+  "screenshots_location": "ignored_local_qa_customer_reports",
+  "credential_output": "none",
+  "scope": "durable_registration_only_not_full_D07"
+}

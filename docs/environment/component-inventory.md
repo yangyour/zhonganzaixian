@@ -6,7 +6,7 @@
 
 |能力|服务器已有组件/版本|本机SSH转发|本轮复用/验证状态|
 |---|---|---|---|
-|关系数据库|shared-postgres：PostgreSQL 17.9；原镜像timescale/timescaledb-ha:pg17-pgvector086|127.0.0.1:15432 → 服务器127.0.0.1:12060|独立mop_test、migrator/runtime角色；资产/成员/配置/修订/不可变历史/幂等/审计持久化；V1/V2/V3迁移与真实权限测试通过|
+|关系数据库|shared-postgres：PostgreSQL 17.9；原镜像timescale/timescaledb-ha:pg17-pgvector086|127.0.0.1:15432 → 服务器127.0.0.1:12060|独立mop_test、migrator/runtime角色；资产/成员/配置/修订/报障登记/不可变历史/幂等/审计持久化；V4新增ticket/operation/history/outbox意图，19项真实PG集成及报障47次HTTP/页面留证；V1/V2/V3原权限证据保留|
 |身份|hltk-keycloak：Keycloak 26.2.4|127.0.0.1:18110 → 服务器127.0.0.1:12110|已建本项目mop-test realm、mop-web client、6个虚构测试身份（含2026-10-01新增配置复核padmin）；真实OIDC及双主体内部审核已验证，不代表正式岗位批准|
 |缓存|shared-redis：Redis 7.4.9|127.0.0.1:16379 → 服务器127.0.0.1:12070|发现运行组件；本批没有依赖缓存的业务，不另建缓存、不声明已集成|
 |消息|zhsx-rabbitmq：RabbitMQ 4.3.2|本机AMQP15673 → 服务器5673；管理16673 → 15673|发现运行组件；待outbox/Worker开发时建项目vhost与受限账号，不使用其他项目队列|
@@ -22,7 +22,7 @@
 |组件|探测依据|影响|替代候选|后续状态|
 |---|---|---|---|---|
 |Zabbix Server/Proxy|容器与运行进程未发现采集引擎；仅有同名静态原型|资产草稿可以持久化，真实纳管、采样、事件处理保持CONFIG_PENDING|优先客户既有监控；Zabbix具体版本待许可，无已批准替代|登记缺失；待组件许可/环境与Q03/Q06确认，不擅自安装|
-|ITSM/工单系统|未发现可确认的专用实例或接口资料|后续可开发平台领域动作，真实外部建单/回读待Q07|优先客户既有ITSM；平台内部权威方案需Q07结论|登记缺失；确定权威源及映射后接入|
+|外部ITSM/工单系统|未发现可确认的专用实例或接口资料|一期本平台权威已由用户明确选择，本轮PG报障登记不依赖外部ITSM；若后续需要外部对接仍缺接口，正式状态/SLA/处理规则尚未完成|本平台为已确认开发方向，不新增替代组件；外部ITSM候选仅在后续明确对接需求后评估|缺失登记保留；权威方向已明确，Q07剩余状态/规则及Q08/Q09/Q14/Q16继续登记|
 |堡垒机/录屏服务|未发现可确认的JumpServer/Guacamole或客户堡垒机入口|真实远程连接、双审批执行、录屏不能验证|优先客户堡垒机；JumpServer/Guacamole仅条件候选|登记缺失；按Q01/Q03确认路线后实施|
 |通知通道/企业微信应用|仅凭主机盘点不能证实账号、应用或回执API|通知送达和客户H5绑定暂不能联调|按客户指定通道，当前无已批准替代|资料缺失；按Q17等提供测试应用与授权|
 |客户CMDB接口|未提供可确认的接口资料或测试凭据|现有测试种子不代表真实客户资产来源|客户指定CMDB优先，测试种子不充当正式替代|资料缺失；后续绑定外部asset/source映射|
@@ -32,5 +32,7 @@
 只新增本项目mop_test数据库、mop_test_migrator/mop_test_runtime角色以及mop-test realm/client/test users。数据库运行角色非超级用户、无建库/建角色/复制权限；Flyway与运行身份分离，运行角色不具DDL权限，审计表仅SELECT/INSERT。不存在自动数据库clean入口。
 
 角色的成员关系从项目数据库读取，Keycloak签发者与sub仅用于身份映射。用户名只用于展示，同名重建账户不得自动继承旧映射。数据库服务共享不表示已经完成客户生产租户RLS或全部六层隔离，Q02仍单独确认。
+
+2026-10-01新增报障切片继续复用同一PostgreSQL/Keycloak，不新装组件、不开放远程公网组件端口。V4四张登记表对运行账号仅SELECT/INSERT；outbox为CONFIG_PENDING、next_at=null，尚无RabbitMQ投递/Worker消费。联系方式绑定为UNVERIFIED；MinIO已发现服务不等于附件已接入，图片上传与补传仍待Q28和项目bucket/受限身份/文件验证能力。会话岗位与capabilities同取租户membership，新增2项纯测试及真实HTTP降级/恢复验证通过；报障HTTP/页面证据见[报障说明](../customer-report-registration.md)。
 
 公开探测摘要：`component-probe.json`。凭据仅在 `deploy/private/`；原始全机盘点输出不用于公共产品页面。

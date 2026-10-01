@@ -32,9 +32,27 @@ const revision = object({
 const blocked = (operationId, summary, pathParameter) => ({ ...mutation(operationId, summary, version, ref('ResourceResult'), { parameters: [pathParameter, ...headers] }), responses: errors });
 const tenant = object({ id: { type: 'string', format: 'uuid' }, name: string });
 const asset = object({ id: { type: 'string', format: 'uuid' }, tenant_id: { type: 'string', format: 'uuid' }, name: string, type: { type: 'string', enum: types }, management_ip: string, site_id: string, status: { type: 'string', enum: ['unknown', 'ok', 'problem', 'maintenance', 'disabled'] }, lifecycle_status: string, source: { type: 'string', enum: ['test_seed', 'manual'] }, sampled_at: nullableString, unknown_reason: nullableString, version: { type: 'integer', minimum: 1 }, created_at: { type: 'string', format: 'date-time' }, updated_at: { type: 'string', format: 'date-time' }, availability: string, sync_state: string }, ['id', 'tenant_id', 'name', 'type', 'management_ip', 'site_id', 'status', 'lifecycle_status', 'source', 'sampled_at', 'unknown_reason', 'version', 'created_at', 'updated_at']);
+const ticketCreate = JSON.parse(readFileSync(new URL('../contracts/design-core.openapi.json', import.meta.url), 'utf8')).components.schemas.TicketCreate;
+const ticketRegistration = object({
+  id: { type: 'string', format: 'uuid' }, tenant_id: { type: 'string', format: 'uuid' }, receipt_no: string,
+  title: string, description: string, source: { const: 'customer_report' }, category: { type: 'string', enum: ['网络不通', '网速慢', 'WiFi问题', '设备异常', '其他'] },
+  impact_scope: { type: 'string', enum: ['company', 'partial_area', 'individual'] }, urgency: { type: 'string', enum: ['normal', 'urgent'] },
+  asset_id: { type: ['string', 'null'], format: 'uuid' }, asset_name: nullableString,
+  reporter_id: { type: 'string', format: 'uuid' }, contact_name: string, contact_phone: string, contact_binding_status: { const: 'UNVERIFIED' },
+  registration_status: { const: 'REGISTERED' }, state: { type: 'null' }, external_id: { type: 'null' }, external_state: { type: 'null' }, sync_state: { const: 'NOT_APPLICABLE' },
+  authority_source: { const: 'MOP' }, authority_status: { const: 'RULES_PENDING' }, priority: { type: 'null' }, response_due_at: { type: 'null' }, recovery_due_at: { type: 'null' },
+  operation_id: { type: 'string', format: 'uuid' }, version: { const: 1 }, created_at: { type: 'string', format: 'date-time' }, updated_at: { type: 'string', format: 'date-time' },
+  history: { type: 'array', items: object({ action: { const: 'REGISTER' }, actor_id: { type: 'string', format: 'uuid' }, occurred_at: { type: 'string', format: 'date-time' }, version: { const: 1 } }) },
+});
+const operation = object({
+  id: { type: 'string', format: 'uuid' }, tenant_id: { type: 'string', format: 'uuid' }, kind: { const: 'CUSTOMER_REPORT_REGISTRATION' },
+  status: { const: 'PENDING' }, step: { const: 'AWAITING_TICKET_CONFIGURATION' }, progress: { type: 'null' }, result_ref: string,
+  error: object({ code: { const: 'CONFIG_PENDING' }, message: string, retryable: { const: false }, question_ids: { type: 'array', items: string } }),
+  created_at: { type: 'string', format: 'date-time' }, updated_at: { type: 'string', format: 'date-time' },
+});
 const contract = {
   openapi: '3.1.0',
-  info: { title: 'MOP 共享测试环境 API', version: '0.3.0', description: '本地应用通过SSH复用指定服务器的PostgreSQL与Keycloak。配置修订保存外部书面资料引用、内部审批与不可变历史；引用与内部审批均不构成客户确认，不激活登记值。客户正式审批发布和监控纳管尚未实现，publish/onboarding保持门禁。fixture身份入口在remote_test不可调用。' },
+  info: { title: 'MOP 共享测试环境 API', version: '0.4.0', description: '本地应用通过SSH复用指定服务器的PostgreSQL与Keycloak。配置内部审核不形成客户确认。工单权威开发方向由用户明确选择MOP；客户报障202只代表ticket/operation/outbox等同事务耐久登记，正式业务状态、优先级与SLA仍待规则落实，不冒充完整建单。fixture身份入口在remote_test不可调用。' },
   servers: [{ url: '/api/v1' }],
   security: [{ SessionCookie: [] }],
   paths: {
@@ -60,6 +78,12 @@ const contract = {
     '/configuration-revisions/{id}/submit': { post: mutation('submitConfigurationRevision', '创建者提交DRAFT进入内部审核', version, ref('ConfigurationRevisionResult'), { parameters: [pathId, ...headers] }) },
     '/configuration-revisions/{id}/review': { post: mutation('reviewConfigurationRevision', '非创建者平台管理员审核；不形成客户确认或生效', object({ expected_version: { type: 'integer', minimum: 1 }, decision: { type: 'string', enum: ['approve', 'reject'] }, comment: boundedComment }), ref('ConfigurationRevisionResult'), { parameters: [pathId, ...headers] }) },
     '/configuration-revisions/{id}/withdraw': { post: mutation('withdrawConfigurationRevision', '创建者撤回DRAFT或IN_REVIEW，保留历史', object({ expected_version: { type: 'integer', minimum: 1 }, reason: boundedComment }), ref('ConfigurationRevisionResult'), { parameters: [pathId, ...headers] }) },
+    '/tickets': {
+      get: action('listCustomerRegistrations', '查询本租户获准的报障登记；客户仅本人，内部角色仅授权租户', ref('TicketRegistrationListResult'), { parameters: [parameter('cursor', 'query', string, false), parameter('page_size', 'query', { type: 'integer', enum: [10, 15, 25, 50, 100], default: 15 }, false), ...['category', 'urgency', 'q'].map(name => parameter(name, 'query', string, false))] }),
+      post: { ...mutation('registerCustomerReport', '耐久登记客户报障；不保证正式业务建单或SLA承诺', ref('TicketCreate'), ref('Accepted')), responses: { 202: { description: '真实PG事务已提交；只返回operation_id/PENDING，需回读本平台受理记录。', content: { 'application/json': { schema: ref('Accepted') } } }, ...errors } },
+    },
+    '/tickets/{id}': { get: action('getCustomerRegistration', '读取本人或授权租户内部报障登记；跨范围404', ref('TicketRegistrationResult'), { parameters: [pathId] }) },
+    '/operations/{id}': { get: action('getOperation', '读取耐久受理operation；PENDING门禁，不冒充远端成功', ref('OperationResult'), { parameters: [pathId] }) },
     '/audit': { get: action('listAudit', '仅平台管理员读取脱敏持久审计', ref('ResourceResult')) },
   },
   components: {
@@ -73,6 +97,12 @@ const contract = {
       AssetListResult: list(ref('Asset')),
       ConfigurationRevision: revision,
       ConfigurationRevisionResult: envelope(ref('ConfigurationRevision')),
+      TicketCreate: ticketCreate,
+      TicketRegistration: ticketRegistration,
+      TicketRegistrationResult: envelope(ref('TicketRegistration')),
+      TicketRegistrationListResult: list(ref('TicketRegistration')),
+      Accepted: envelope(object({ operation_id: { type: 'string', format: 'uuid' }, status: { const: 'PENDING' } })),
+      OperationResult: envelope(operation),
     },
   },
 };

@@ -1,0 +1,138 @@
+<script setup lang="ts">
+import { computed, onUnmounted, reactive, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ElTimeline, ElTimelineItem } from 'element-plus'
+import { api, isCancelled } from '../api/client'
+import type { RegisteredTicket, TicketPage } from '../api/types'
+import { can, contextGeneration, session } from '../stores/session'
+import { displayTime } from '../utils/display'
+import { impactScopeLabel, ticketCategories, urgencyLabel } from '../utils/ticket'
+import AppTable from '../components/AppTable.vue'
+import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import TicketReportForm from '../components/TicketReportForm.vue'
+
+const route = useRoute(), router = useRouter()
+const queryString = (key: string) => typeof route.query[key] === 'string' ? route.query[key] as string : ''
+const pageSizes = [10, 15, 25, 50, 100]
+const pageSize = computed(() => pageSizes.includes(Number(queryString('page_size'))) ? Number(queryString('page_size')) : 15)
+const filters = reactive({ q: '', category: '', urgency: '' })
+const customerView = computed(() => ['viewer', 'tadmin'].includes(session.value?.user.role || ''))
+const mayReport = computed(() => customerView.value && can('tickets:report'))
+const rows = ref<RegisteredTicket[]>([])
+const nextCursor = ref<string | null>(null)
+const hasMore = ref(false)
+const cursorHistory = ref<string[]>([])
+const loading = ref(false)
+const error = ref<unknown>(null)
+const pageSizeLimit = ref(100)
+let listController: AbortController | undefined
+let listGeneration = 0
+const signature = computed(() => JSON.stringify(['q', 'category', 'urgency', 'cursor', 'page_size'].map(queryString)))
+watch(signature, () => {
+  for (const key of ['q', 'category', 'urgency'] as const) filters[key] = queryString(key)
+  void loadTickets()
+}, { immediate: true })
+async function loadTickets() {
+  listController?.abort(); const controller = new AbortController(); listController = controller
+  const generation = ++listGeneration
+  loading.value = true; error.value = null; rows.value = []; nextCursor.value = null; hasMore.value = false
+  const params = new URLSearchParams({ page_size: String(pageSize.value) })
+  for (const key of ['q', 'category', 'urgency', 'cursor']) if (queryString(key)) params.set(key, queryString(key))
+  try {
+    const page = await api.request<TicketPage>(`/tickets?${params}`, { signal: controller.signal })
+    if (generation !== listGeneration) return
+    rows.value = page.items; nextCursor.value = page.next_cursor; hasMore.value = page.has_more; pageSizeLimit.value = page.page_size_limit
+  } catch (cause) { if (!isCancelled(cause) && generation === listGeneration) error.value = cause }
+  finally { if (generation === listGeneration) loading.value = false }
+}
+function applyFilters() {
+  cursorHistory.value = []
+  void router.replace({ query: { ...route.query, ...Object.fromEntries(Object.entries(filters).map(([key, value]) => [key, value.trim() || undefined])), cursor: undefined, page_size: String(pageSize.value) } })
+}
+function resetFilters() { Object.assign(filters, { q: '', category: '', urgency: '' }); applyFilters() }
+function resizePage(value: unknown) { cursorHistory.value = []; void router.replace({ query: { ...route.query, cursor: undefined, page_size: String(value) } }) }
+function nextPage() { if (!nextCursor.value) return; cursorHistory.value.push(queryString('cursor')); void router.replace({ query: { ...route.query, cursor: nextCursor.value, page_size: String(pageSize.value) } }) }
+function previousPage() { const cursor = cursorHistory.value.pop(); void router.replace({ query: { ...route.query, cursor: cursor || undefined } }) }
+function firstPage() { cursorHistory.value = []; void router.replace({ query: { ...route.query, cursor: undefined } }) }
+
+const detailOpen = computed({ get: () => Boolean(queryString('ticket_id')), set: value => { if (!value) void router.replace({ query: { ...route.query, ticket_id: undefined } }) } })
+const ticket = ref<RegisteredTicket | null>(null)
+const detailError = ref<unknown>(null)
+const detailLoading = ref(false)
+let detailController: AbortController | undefined
+let detailGeneration = 0
+watch(() => queryString('ticket_id'), id => { void loadDetail(id) }, { immediate: true })
+async function loadDetail(id = queryString('ticket_id')) {
+  detailController?.abort(); const controller = new AbortController(); detailController = controller
+  const generation = ++detailGeneration
+  ticket.value = null; detailError.value = null
+  if (!id) { detailLoading.value = false; return }
+  detailLoading.value = true
+  try {
+    const result = await api.request<RegisteredTicket>(`/tickets/${encodeURIComponent(id)}`, { signal: controller.signal })
+    if (generation === detailGeneration) ticket.value = result
+  } catch (cause) { if (!isCancelled(cause) && generation === detailGeneration) detailError.value = cause }
+  finally { if (generation === detailGeneration) detailLoading.value = false }
+}
+function openDetail(id: string) { void router.replace({ query: { ...route.query, ticket_id: id } }) }
+const createOpen = ref(false)
+const acceptedOperationId = ref('')
+function recordAcceptance(id: string) { acceptedOperationId.value = id }
+async function showRegistered(id: string) {
+  const generation = contextGeneration.value
+  const alreadySelected = queryString('ticket_id') === id
+  await router.replace({ query: { ...route.query, ticket_id: id } })
+  if (generation !== contextGeneration.value) return
+  if (alreadySelected) await loadDetail(id)
+  if (generation !== contextGeneration.value) return
+  await loadTickets()
+}
+function resetContext() {
+  listController?.abort(); detailController?.abort(); ++listGeneration; ++detailGeneration
+  rows.value = []; nextCursor.value = null; hasMore.value = false; cursorHistory.value = []; loading.value = false; error.value = null
+  ticket.value = null; detailError.value = null; detailLoading.value = false; createOpen.value = false; acceptedOperationId.value = ''
+}
+watch(contextGeneration, resetContext, { flush: 'sync' })
+onUnmounted(resetContext)
+</script>
+
+<template>
+  <section class="tickets-page">
+    <div class="page-heading"><div><span class="eyebrow">SERVICE / CUSTOMER REPORTS</span><h1>报障与受理</h1><p>{{ customerView ? '查看本人报障登记，填写故障现象与联系方式。' : '只读查看当前授权租户的报障登记。' }}</p></div><el-button v-if="mayReport" type="primary" @click="createOpen = true">填写报障信息</el-button></div>
+    <div class="scope-card"><div><span class="small-label">当前租户</span><strong>{{ session?.tenant.name }}</strong></div><div><span class="small-label">本页登记</span><strong>{{ loading ? '—' : rows.length }} <small>项</small></strong></div><div class="scope-explanation">{{ customerView ? '客户仅查看本人记录。联系方式尚未核验，紧急程度仅供参考。' : '内部人员只读查看当前租户记录；本页不提供接单或解决动作。' }}</div></div>
+    <el-alert class="page-note" type="warning" :closable="false" show-icon title="一期已选择本平台为工单权威。当前报障可登记与查询；正式状态、SLA 时限和处理资格规则仍待落实。" />
+    <el-alert v-if="acceptedOperationId" class="page-note" type="info" :closable="false" show-icon title="报障已耐久登记，正式工单规则待确认。登记结果以详情回读为准，不重复提交或推断为外部建单成功。" />
+    <div class="panel">
+      <el-form :inline="true" class="filter-form ticket-filter-form" @submit.prevent="applyFilters"><el-form-item label="搜索"><el-input v-model="filters.q" clearable placeholder="登记号 / 标题 / 描述" aria-label="搜索报障登记" /></el-form-item><el-form-item label="故障分类"><el-select v-model="filters.category" clearable placeholder="全部分类" aria-label="报障分类筛选"><el-option v-for="category in ticketCategories" :key="category" :label="category" :value="category" /></el-select></el-form-item><el-form-item label="紧急程度"><el-select v-model="filters.urgency" clearable placeholder="全部程度" aria-label="报障紧急程度筛选"><el-option label="一般" value="normal" /><el-option label="很急（参考）" value="urgent" /></el-select></el-form-item><el-form-item class="filter-actions"><el-button type="primary" native-type="submit">查询</el-button><el-button @click="resetFilters">重置</el-button><el-button :loading="loading" @click="loadTickets">刷新</el-button></el-form-item></el-form>
+      <ApiErrorNotice :error="error"><el-button size="small" @click="loadTickets">重试</el-button></ApiErrorNotice>
+      <AppTable :rows="rows" :loading="loading" :empty-text="error ? '报障登记加载失败，请重试' : customerView ? '当前筛选下暂无本人报障登记' : '当前筛选下暂无本租户报障登记'">
+        <el-table-column label="登记号 / 标题" min-width="250"><template #default="{ row }"><el-button type="primary" link class="asset-link ticket-detail-link" @click="openDetail(row.id)">{{ row.title }}</el-button><span class="cell-sub mono">{{ row.receipt_no }}</span></template></el-table-column>
+        <el-table-column label="故障分类 / 设备" min-width="160"><template #default="{ row }">{{ row.category }}<span class="cell-sub">{{ row.asset_name || '设备不确定' }}</span></template></el-table-column>
+        <el-table-column label="影响 / 紧急程度" min-width="150"><template #default="{ row }">{{ impactScopeLabel[row.impact_scope as keyof typeof impactScopeLabel] }}<span class="cell-sub">{{ urgencyLabel[row.urgency as keyof typeof urgencyLabel] }}</span></template></el-table-column>
+        <el-table-column label="登记 / 正式状态" min-width="175"><template #default="{ row }"><el-tag type="info">{{ row.registration_status === 'REGISTERED' ? '已登记' : row.registration_status }}</el-tag><span class="cell-sub">{{ row.state === null ? '正式工单状态未设' : row.state }}</span></template></el-table-column>
+        <el-table-column label="提交时间" min-width="170"><template #default="{ row }">{{ displayTime(row.created_at) }}</template></el-table-column>
+        <el-table-column label="操作" width="90" fixed="right"><template #default="{ row }"><el-button type="primary" link class="ticket-detail-link" @click="openDetail(row.id)">查看详情</el-button></template></el-table-column>
+      </AppTable>
+      <div class="table-footer"><span>{{ customerView ? '仅本人登记' : '当前租户只读' }} · 本页 {{ rows.length }} 条</span><div class="cursor-pagination ticket-pagination"><el-select :model-value="pageSize" aria-label="报障每页条数" @change="resizePage"><el-option v-for="size in pageSizes.filter(size => size <= pageSizeLimit)" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button v-if="queryString('cursor') && !cursorHistory.length" :disabled="loading" @click="firstPage">返回首页</el-button><el-button v-else :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
+    </div>
+    <TicketReportForm v-if="mayReport" v-model="createOpen" @accepted="recordAcceptance" @registered="showRegistered" />
+    <el-drawer v-model="detailOpen" title="报障登记详情" size="650px" class="ticket-detail-drawer" destroy-on-close>
+      <ApiErrorNotice :error="detailError"><el-button size="small" @click="loadDetail()">重试详情查询</el-button></ApiErrorNotice>
+      <el-skeleton v-if="detailLoading" :rows="9" animated />
+      <template v-if="ticket">
+        <div class="detail-title"><span class="eyebrow">报障登记</span><h2>{{ ticket.title }}</h2><el-tag type="info">已登记 · 正式工单规则待确认</el-tag><p class="ticket-receipt mono">{{ ticket.receipt_no }}</p></div>
+        <el-alert type="warning" :closable="false" show-icon title="本平台为一期工单权威；正式处理状态与时限尚未设定，不能据登记时间推断响应或恢复承诺。" />
+        <el-descriptions :column="1" border class="asset-descriptions"><el-descriptions-item label="故障分类">{{ ticket.category }}</el-descriptions-item><el-descriptions-item label="关联设备">{{ ticket.asset_name || '不确定' }}</el-descriptions-item><el-descriptions-item label="影响范围">{{ impactScopeLabel[ticket.impact_scope] }}</el-descriptions-item><el-descriptions-item label="紧急程度">{{ urgencyLabel[ticket.urgency] }}</el-descriptions-item><el-descriptions-item label="故障描述"><span class="ticket-description">{{ ticket.description }}</span></el-descriptions-item><el-descriptions-item label="联系人">{{ ticket.contact_name }}</el-descriptions-item><el-descriptions-item label="联系电话">{{ ticket.contact_phone }}</el-descriptions-item><el-descriptions-item label="联系信息核验">尚未核验账号绑定关系</el-descriptions-item><el-descriptions-item label="正式工单状态">{{ ticket.state === null ? '— · 未设' : ticket.state }}</el-descriptions-item><el-descriptions-item label="优先级">{{ ticket.priority === null ? '— · 未设' : ticket.priority }}</el-descriptions-item><el-descriptions-item label="响应截止">{{ ticket.response_due_at === null ? '— · 未设' : displayTime(ticket.response_due_at) }}</el-descriptions-item><el-descriptions-item label="恢复截止">{{ ticket.recovery_due_at === null ? '— · 未设' : displayTime(ticket.recovery_due_at) }}</el-descriptions-item><el-descriptions-item label="登记来源">客户报障</el-descriptions-item><el-descriptions-item label="工单权威">本平台 · 正式规则待确认</el-descriptions-item><el-descriptions-item label="提交时间">{{ displayTime(ticket.created_at) }}</el-descriptions-item><el-descriptions-item label="更新时间">{{ displayTime(ticket.updated_at) }}</el-descriptions-item></el-descriptions>
+        <div class="detail-section"><h3>登记记录</h3><el-timeline class="ticket-history"><el-timeline-item v-for="(item, index) in ticket.history" :key="`${item.occurred_at}:${index}`" :timestamp="displayTime(item.occurred_at)" placement="top"><strong>报障已登记</strong><p>正式工单规则待确认，尚无处理阶段记录。</p><p v-if="!customerView" class="mono">登记主体：{{ item.actor_id }} · v{{ item.version }}</p></el-timeline-item></el-timeline></div>
+        <div class="detail-section"><h3>图片与后续处理</h3><p class="muted">图片上传及补传尚未实现，已登记的报障继续保留。接单、处置与客户确认将在后续功能按实际规则落实。</p></div>
+        <el-descriptions v-if="!customerView" :column="1" border class="asset-descriptions"><el-descriptions-item label="记录 ID"><span class="mono">{{ ticket.id }}</span></el-descriptions-item><el-descriptions-item label="租户 ID"><span class="mono">{{ ticket.tenant_id }}</span></el-descriptions-item><el-descriptions-item label="报障人 ID"><span class="mono">{{ ticket.reporter_id }}</span></el-descriptions-item><el-descriptions-item label="登记操作 ID"><span class="mono">{{ ticket.operation_id }}</span></el-descriptions-item><el-descriptions-item label="版本">v{{ ticket.version }}</el-descriptions-item><el-descriptions-item label="外部同步">不适用 · 未创建外部工单</el-descriptions-item></el-descriptions>
+      </template>
+      <template #footer><el-button :loading="detailLoading" @click="loadDetail()">刷新详情</el-button><el-button @click="detailOpen = false">关闭</el-button></template>
+    </el-drawer>
+  </section>
+</template>
+
+<style>
+.ticket-detail-drawer{max-width:100vw}.ticket-receipt{margin:16px 0 0;color:#61718a}.ticket-description{white-space:pre-wrap;overflow-wrap:anywhere}.ticket-history{padding-left:4px;margin-top:20px}.ticket-history p{font-size:12px;margin:8px 0}.ticket-detail-drawer .detail-section p{font-size:12px}
+@media(max-width:760px){.tickets-page .page-heading .el-button{min-height:44px}.tickets-page .ticket-detail-link{min-height:44px}.ticket-pagination .el-button{min-height:44px}.ticket-pagination .el-select__wrapper{min-height:44px}.ticket-filter-form .el-input__wrapper,.ticket-filter-form .el-select__wrapper,.ticket-filter-form .el-button{min-height:44px}.ticket-detail-drawer .el-drawer__footer .el-button{min-height:44px}}
+</style>

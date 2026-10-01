@@ -50,3 +50,31 @@ export interface Operation {
   id?: string; operation_id?: string; status: string; progress?: number | null
   result?: unknown; error?: { code: string; message: string } | null
 }
+export type TicketCategory = '网络不通' | '网速慢' | 'WiFi问题' | '设备异常' | '其他'
+export type TicketImpactScope = 'company' | 'partial_area' | 'individual'
+export type TicketUrgency = 'normal' | 'urgent'
+export interface CustomerReportCreate {
+  source: 'customer_report'; title?: string; description: string; category: TicketCategory
+  impact_scope: TicketImpactScope; contact_name: string; contact_phone: string; urgency: TicketUrgency
+  asset_id?: string
+}
+export interface CustomerReportAcceptance { operation_id: string; status: 'PENDING' }
+export interface CustomerReportOperation {
+  id: string; tenant_id?: string; kind: 'CUSTOMER_REPORT_REGISTRATION'; status: 'PENDING'
+  step: 'AWAITING_TICKET_CONFIGURATION'; progress: null; result_ref: string
+  error: { code: 'CONFIG_PENDING'; message: string; retryable: false; question_ids: string[] }
+  created_at: string; updated_at: string
+}
+export interface RegisteredTicket {
+  id: string; tenant_id: string; receipt_no: string; title: string; description: string
+  source: 'customer_report'; category: TicketCategory; impact_scope: TicketImpactScope; urgency: TicketUrgency
+  asset_id: string | null; asset_name: string | null; reporter_id: string; contact_name: string; contact_phone: string
+  contact_binding_status: 'UNVERIFIED'; registration_status: 'REGISTERED'; state: null
+  external_id: null; external_state: null; sync_state: 'NOT_APPLICABLE'; authority_source: 'MOP'; authority_status: 'RULES_PENDING'
+  priority: null; response_due_at: null; recovery_due_at: null; operation_id: string; version: number
+  created_at: string; updated_at: string; history: { action: 'REGISTER'; actor_id: string; occurred_at: string; version: number }[]
+}
+export interface TicketPage {
+  items: RegisteredTicket[]; next_cursor: string | null; has_more: boolean; source: 'postgresql'
+  page_size_limit: number; page_size_limit_kind: 'test_technical_limit'
+}

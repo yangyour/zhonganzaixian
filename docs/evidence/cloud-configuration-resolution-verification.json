@@ -1,0 +1,57 @@
+{
+  "run_at": "2026-10-01T05:02:14.531917+00:00",
+  "baseline_commit": "b30fd86dc79e905856c8fc20048a43a72f57d997",
+  "jdk": [
+    "openjdk version \"17.0.19\" 2026-04-21",
+    "OpenJDK Runtime Environment (build 17.0.19+10-1-deb12u2-Debian)",
+    "OpenJDK 64-Bit Server VM (build 17.0.19+10-1-deb12u2-Debian, mixed mode, sharing)"
+  ],
+  "compile": {
+    "status": "PASS",
+    "release": 17,
+    "lint": "all,-serial",
+    "warnings_as_errors": true,
+    "compiled_sources": [
+      "server/domain/src/main/java/cn/mop/domain/DomainException.java",
+      "server/domain/src/main/java/cn/mop/domain/configuration/ConfigurationResolver.java",
+      "server/domain/src/main/java/cn/mop/domain/configuration/ConfigurationScope.java",
+      "server/domain/src/main/java/cn/mop/domain/configuration/ConfigurationSnapshot.java",
+      "server/domain/src/main/java/cn/mop/domain/configuration/ImmutableConfigurationValue.java",
+      "server/persistence/src/test/java/cn/mop/persistence/configuration/ConfigurationResolutionChecks.java"
+    ]
+  },
+  "checks": {
+    "status": "PASS",
+    "groups": 15,
+    "assertions": 250,
+    "scope": "pure_jdk_configuration_resolution",
+    "provenance": "synthetic_contract_inputs_only",
+    "junit": "NOT_RUN",
+    "integration": "NOT_RUN"
+  },
+  "junit": {
+    "status": "NOT_RUN",
+    "reason": "Maven artifact access remains blocked; no annotation or dependency stubs were used"
+  },
+  "integration": {
+    "status": "NOT_RUN",
+    "reason": "Pure package only; no runtime repository integration or evidence authentication was attempted"
+  },
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/DomainException.java": "fbd8389e27ea7cbe9821bcd1bfb68c37b30b9a760161b96780700a8e04fa4861",
+    "server/domain/src/main/java/cn/mop/domain/configuration/ConfigurationResolver.java": "4676ca8d9ee6493bb5aa1c70467e650b2365ce5c4a4c632876d4cca9d4e0f2d8",
+    "server/domain/src/main/java/cn/mop/domain/configuration/ConfigurationScope.java": "ae9ba56354f6752164172dcce46eacea6b856e307d15772fa58fbc830a6902fc",
+    "server/domain/src/main/java/cn/mop/domain/configuration/ConfigurationSnapshot.java": "9d15039c3fe841f791bbe348a7b706b32df8cd5d47ff340c79b81de4a266fdeb",
+    "server/domain/src/main/java/cn/mop/domain/configuration/ImmutableConfigurationValue.java": "0da51b35aca25d954dc2074841074790c64403953eb3070dc68df156f787eed4",
+    "server/persistence/src/test/java/cn/mop/persistence/configuration/ConfigurationResolutionChecks.java": "7c675f3086498d168b94073edfda724dc5d213d4c2ca73317124a10c2320a334",
+    "server/persistence/src/test/java/cn/mop/persistence/configuration/ConfigurationResolutionTest.java": "7d876705a5c694c869abc6c4ec3bcdda438c677067ffe11bb33fa9d229fe2f0c",
+    ".local/cloud-validation/verify-configuration-resolution.sh": "4ecbf735976a7fd24a5cd41af3c4e2e3702e03c5eb5bcdd2756725c05974f831"
+  },
+  "customer_decisions": "No customer rules, scope precedence, thresholds, formula or approval were inferred",
+  "delivery": "ConfigurationResolutionChecks.java is included in Git; local replay wrapper is ignored",
+  "business_status": "PURE_CORE_ONLY; no database persistence, customer evidence verification or runtime configuration activation",
+  "requirements": [
+    "doc/development/01_开发顺序与任务拆解.md D04 steps4-5",
+    "doc/development/02_模块开发步骤与页面交互.md SET-D15/19"
+  ]
+}

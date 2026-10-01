@@ -1,0 +1,423 @@
+{
+  "verified_at": "2026-10-01T08:52:36.215Z",
+  "mode": "remote_test",
+  "http_exchanges": 80,
+  "all_passed": true,
+  "environment": {
+    "postgresql": "17.9",
+    "keycloak": "26.2.4",
+    "minio": "RELEASE.2025-09-07T16-13-09Z",
+    "path": "designated_project_services_via_SSH"
+  },
+  "original_worker_storage_and_authorized_readback": true,
+  "checks": [
+    {
+      "name": "real_session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "real_session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "real_session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "real_session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "real_photo_dependencies_ready",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "real_policy_with_pending_production_and_scan",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_read_denied",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_upload_without_csrf_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "operator_cannot_customer_upload",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "csrf_required",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "idempotency_required",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "non_image_content_denied",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "declared_mime_mismatch_denied",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "truncated_image_denied",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "over_five_mb_denied",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "multipart_actor_scope_spoof_denied",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "durable_upload_first",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "read_upload_operation_first",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_first",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_first",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_first",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_first",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_terminal_operation_first",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_original_request_replay",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "same_upload_key_changed_original_rejected",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_unbound_metadata_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_unbound_operation_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_unbound_grant_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_unbound_metadata_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_unbound_operation_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_unbound_grant_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "msp_unbound_metadata_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "msp_unbound_operation_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "msp_unbound_grant_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "grant_owner_before_binding",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_owner_before_binding",
+      "status": 200,
+      "original_hash_verified": true
+    },
+    {
+      "name": "copied_grant_cannot_expand_identity",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "register_with_ready_original",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "registration_remains_rules_pending",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "registration_photo_snapshot",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "operator_bound_metadata_allowed",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "operator_bound_operation_allowed",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "grant_operator_after_binding",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_operator_after_binding",
+      "status": 200,
+      "original_hash_verified": true
+    },
+    {
+      "name": "tadmin_bound_metadata_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_bound_metadata_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "durable_upload_second",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "read_upload_operation_second",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_second",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_second",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_second",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_second",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_second",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_terminal_operation_second",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "durable_upload_third",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "read_upload_operation_third",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_third",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_third",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_third",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_third",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_terminal_operation_third",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "append_two_ready_originals_cas",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "append_same_key_does_not_repeat_history",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "stale_append_version_rejected",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "durable_upload_fourth",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "read_upload_operation_fourth",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_fourth",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_fourth",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_fourth",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_file_readback_fourth",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worker_terminal_operation_fourth",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "fourth_photo_capacity_rejected",
+      "status": 422,
+      "contract_valid": true
+    },
+    {
+      "name": "same_tenant_other_reporter_append_rejected",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "internal_append_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "empty_registration_for_binding_conflict",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "second_registration_readback",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "already_bound_photo_cannot_move",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "grant_jpeg_after_append",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_jpeg_after_append",
+      "status": 200,
+      "original_hash_verified": true
+    },
+    {
+      "name": "rejected_append_preserves_registration_history",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "full_M5_M8_acceptance": false,
+  "remaining": [
+    "formal_ticket_rules_SLA_notification",
+    "malware_scanning",
+    "retention_policy",
+    "physical_mobile_and_WeCom_acceptance"
+  ],
+  "credential_output": "none"
+}

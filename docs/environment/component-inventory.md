@@ -1,16 +1,16 @@
 # 指定测试环境组件清单
 
-历史本地盘点日期：2026-09-30；云端接续更新：2026-10-01。下表的服务版本及权限来自原指定服务器盘点和本地测试，不能推定当前云端已经连通。原连接资料使用Git忽略的`deploy/private/develop.txt`；本文不记录密码、token或含密连接串。
+历史服务器盘点日期：2026-09-30；本地接续验证更新：2026-10-01。云端已停止业务写入，本批本地通过工程loopback隧道复用同一指定服务器，照片PG/MinIO/OIDC实际联调已通过；历史云端未连通记录另保留。原连接资料仅在Git忽略的`deploy/private/develop.txt`，本文不记录密码、token或含密连接串。
 
 用户要求本地启动及涉及外部组件的集成测试也复用本环境。默认运行模式为 `remote_test`，组件失败不得回退到fixture或本机替代服务。项目全局规则见 `AGENTS.md`。
 
-|能力|服务器已有组件/版本|历史本机SSH转发|历史本地复用/验证状态|
+|能力|服务器已有组件/版本|项目本机SSH转发|测试环境复用/验证状态|
 |---|---|---|---|
-|关系数据库|shared-postgres：PostgreSQL 17.9；原镜像timescale/timescaledb-ha:pg17-pgvector086|127.0.0.1:15432 → 服务器127.0.0.1:12060|独立mop_test、migrator/runtime角色；资产/成员/配置/修订/报障登记/不可变历史/幂等/审计持久化；V4新增ticket/operation/history/outbox意图，19项真实PG集成及报障47次HTTP/页面留证；V1/V2/V3原权限证据保留|
-|身份|hltk-keycloak：Keycloak 26.2.4|127.0.0.1:18110 → 服务器127.0.0.1:12110|已建本项目mop-test realm、mop-web client、6个虚构测试身份（含2026-10-01新增配置复核padmin）；真实OIDC及双主体内部审核已验证，不代表正式岗位批准|
+|关系数据库|shared-postgres：PostgreSQL 17.9；原镜像timescale/timescaledb-ha:pg17-pgvector086|127.0.0.1:15432 → 服务器127.0.0.1:12060|独立mop_test、migrator/runtime；V5独立迁移一次及结构/ACL核验，重复Apply为0DDL；43项真实PG测试（照片24+原19）通过；file/job/grant/operation/附件CAS/审计持久化，V1–V4历史保持|
+|身份|hltk-keycloak：Keycloak 26.2.4|127.0.0.1:18110 → 服务器127.0.0.1:12110|本项目mop-test realm/client及6个虚构身份；本批4个测试身份真实OIDC与80次HTTP/契约通过，沿用当前membership授权；正式身份源/岗位及客户批准仍待确认|
 |缓存|shared-redis：Redis 7.4.9|127.0.0.1:16379 → 服务器127.0.0.1:12070|发现运行组件；本批没有依赖缓存的业务，不另建缓存、不声明已集成|
 |消息|zhsx-rabbitmq：RabbitMQ 4.3.2|本机AMQP15673 → 服务器5673；管理16673 → 15673|发现运行组件；待outbox/Worker开发时建项目vhost与受限账号，不使用其他项目队列|
-|对象存储|shared-minio：RELEASE.2025-09-07T16-13-09Z|127.0.0.1:19000 → 服务器127.0.0.1:12080|已建mop-test-photos项目桶与受限账号，真实Put/Get、Delete拒绝、photos前缀限制、其他桶不可见和匿名拒绝留证；API照片业务/报告存储仍未验收|
+|对象存储|shared-minio：RELEASE.2025-09-07T16-13-09Z|127.0.0.1:19000 → 服务器127.0.0.1:12080|3项真实存储、原图/grant/hash；52次边界/恢复/撤权和25次运行中RETRY_WAIT/自然完成独立通过，finally恢复；历史IAM证据保留；扫描/保留/报告存储仍待|
 |Web反代|已有nginx容器与服务；本项目静态原型容器zabbix-msp-prototype运行|现有原型端口10000；本地Vite5173|原型仍是静态参考，不能视为Zabbix采集引擎；未改既有反代或端口|
 
 宿主探测为CentOS Linux 7、Docker 26.1.4。本轮复用现有测试服务，未升级宿主/组件，未停止或重配其他项目服务。版本/许可/支持范围是否满足客户正式生产基线仍按Q03核验，本轮测试接入不代替正式批准。
@@ -33,11 +33,21 @@
 
 角色的成员关系从项目数据库读取，Keycloak签发者与sub仅用于身份映射。用户名只用于展示，同名重建账户不得自动继承旧映射。数据库服务共享不表示已经完成客户生产租户RLS或全部六层隔离，Q02仍单独确认。
 
-2026-10-01新增报障切片继续复用同一PostgreSQL/Keycloak，不新装组件、不开放远程公网组件端口。V4四张登记表对运行账号仅SELECT/INSERT；outbox为CONFIG_PENDING、next_at=null，尚无RabbitMQ投递/Worker消费。联系方式绑定为UNVERIFIED；后续MinIO项目桶/受限身份已单独准备并验证，见[图片测试存储](../photo-test-storage.md)，尚不等于API图片上传与补传已接入。JPEG/PNG为用户授权的当前开发方向，Q28扫描/隔离及其他文件策略、Q10保留/清理继续待确认。会话岗位与capabilities同取租户membership，新增2项纯测试及真实HTTP降级/恢复验证通过；报障HTTP/页面证据见[报障说明](../customer-report-registration.md)。
+报障及照片切片复用同一PostgreSQL/Keycloak/MinIO，不安装组件或开放公网端口。V5仅新增所需照片权限和ticket的version/updated_at更新，原内容与审计无覆写/删除权限，运行身份无DDL；结构与ACL已真实核验。报障outbox仍CONFIG_PENDING、next_at=null，没有RabbitMQ投递；独立PG Worker只消费照片任务。联系方式UNVERIFIED，JPEG/PNG仅用户开发方向，扫描UNSCANNED、生产UNVERIFIED、留存null；Q28/Q10及正式岗位门禁保留。
 
 公开探测摘要：`component-probe.json`。凭据仅在 `deploy/private/`；原始全机盘点输出不用于公共产品页面。
 
-## 2026-10-01云端接续阻塞与新增代码
+## 2026-10-01本地照片组件联调
+
+独立CLI默认Check、显式ApplyPhotos；V5已执行一次并冻结，重复Apply执行0DDL。API/Worker启动不执行迁移，进程拥有者记录覆盖API/Web/照片Worker；停止前核验路径、命令和启动时间，不停止远程组件或其他项目。
+
+配置照片能力后，`health/ready`实际核对PG/OIDC、策略、V5结构/ACL及MinIO，照片`enabled/ready/policy_ready/schema_ready/storage_ready`全部true才就绪，失败503及脱敏原因码，不静默回退。未绑定文件仅上传人可读，内部授权成员只可读取其他人已绑定登记的文件；原图必须经当前会话和平台grant授权。
+
+[构建摘要](../evidence/local-photo-build-summary.json)为96纯单元/隔离、43 PG、3 MinIO通过，fixture13跳过。基础80次HTTP、[恢复52次](../evidence/local-photo-resilience.json)、[运行中重试25次](../evidence/local-photo-worker-retry.json)和[UI36项](../evidence/local-report-photo-ui.json)分别通过。旧52次脚本先停Worker，其RETRY_WAIT未执行范围保留；新25次在正常就绪后断项目转发，真实RETRY_WAIT与同PID/startTime退避完成原图/hash，finally恢复marker/hold、三进程就绪及四会话。新专项未改V5/IAM/成员/全局或远程配置；UI为Edge持久无头和手机仿真，非物理相机/企微；未新建组件替代服务。
+
+## 历史：2026-10-01云端接续阻塞与新增代码
+
+下表保留云端当时的NOT_RUN/BLOCKED，不作为本批本地状态；V5及后端编译的本地结果以上述记录为准。
 
 |依赖|本轮证据与状态|影响及后续|
 |---|---|---|
@@ -49,4 +59,4 @@
 
 当前云端未新建数据库、缓存、队列或监控替代指定组件。历史MinIO桶/IAM验证仍有参考价值，但新增业务与本轮访问权限须另外验证。Q28扫描/隔离、Q10留存清理及生产Q02/Q03/Q17等门禁继续保留，未知结果不记通过。
 
-工程新增[GitHub Actions验证配置](../ci-validation.md)：官方checkout/setup-java/setup-node按已核验完整SHA固定，均MIT；actions自身Node24运行于GitHub-hosted Ubuntu24.04，项目工具链为JDK17、Maven3.9.x、Node22。仅定义构建和纯检查，不提供替代PG/缓存/队列/监控；真实CI结果未回读，不归入组件联调证据。
+工程[GitHub Actions验证配置](../ci-validation.md)固定官方actions完整SHA及项目工具链。SDK提交`eba5630`的[run 36836074365](https://github.com/yangyour/zhonganzaixian/actions/runs/36836074365)已通过connector实际回读，契约/Web、纯Java和后端三个job均成功，见[安全摘要](../evidence/github-eba5630-verification.json)。CI不连接私有指定组件，不提供替代PG/缓存/队列/监控，不能计入组件联调；本批照片最终提交需独立回读，不能以旧CI替代。历史失败及当时读取阻塞仍保留。

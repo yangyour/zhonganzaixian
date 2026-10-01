@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 
 /** Shared test PostgreSQL only. No in-memory recovery path exists. */
 public final class PostgresPlatformRepository implements PlatformRepository {
+    private static final System.Logger log=System.getLogger(PostgresPlatformRepository.class.getName());
     private final DataSource dataSource;
     private final ObjectMapper mapper;
     private final ThreadLocal<Connection> transaction = new ThreadLocal<>();
@@ -27,7 +28,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     private <T>T connection(SqlWork<T> work){
         Connection active=transaction.get();
         try{if(active!=null)return work.run(active);try(Connection connection=dataSource.getConnection()){return work.run(connection);}}
-        catch(SQLException exception){throw unavailable();}
+        catch(SQLException exception){logSqlFailure(exception);throw unavailable();}
     }
     /**
      * Standalone ticket reads authorize at the main SELECT snapshot and project that same snapshot.
@@ -43,7 +44,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
             connection.setAutoCommit(false);
             try{T value=work.run(connection);connection.commit();return value;}
             catch(SQLException|RuntimeException|Error exception){try{connection.rollback();}catch(SQLException ignored){}throw exception;}
-        }catch(SQLException exception){throw unavailable();}
+        }catch(SQLException exception){logSqlFailure(exception);throw unavailable();}
     }
     private <T>T inTransaction(Supplier<T> work){
         if(transaction.get()!=null)return work.get();
@@ -52,10 +53,11 @@ public final class PostgresPlatformRepository implements PlatformRepository {
             try{T value=work.get();connection.commit();return value;}
             catch(RuntimeException|Error exception){try{connection.rollback();}catch(SQLException ignored){}throw exception;}
             finally{transaction.remove();}
-        }catch(SQLException exception){throw unavailable();}
+        }catch(SQLException exception){logSqlFailure(exception);throw unavailable();}
     }
     private void lock(String scope){connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT pg_advisory_xact_lock(hashtextextended(?,0))")){statement.setString(1,scope);statement.execute();return null;}});}
     private static DomainException unavailable(){return new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境 PostgreSQL 不可用，未受理请求");}
+    private static void logSqlFailure(SQLException failure){String state=failure.getSQLState();log.log(System.Logger.Level.WARNING,"Project PostgreSQL operation failed sql_state={0} exception_type={1}",state!=null&&state.matches("[A-Z0-9]{5}")?state:"UNKNOWN",failure.getClass().getSimpleName());}
     private static DomainException missing(){return new DomainException(404,"OBJECT_NOT_FOUND","对象不存在或不可见");}
     private static FixtureUser user(ResultSet rows)throws SQLException{return new FixtureUser(rows.getString("id"),rows.getString("display_name"),rows.getString("role_code"));}
     @Override public List<FixtureUser> users(){return connection(connection->{List<FixtureUser> result=new ArrayList<>();try(PreparedStatement statement=connection.prepareStatement("SELECT id,display_name,role_code FROM public.mop_user WHERE active ORDER BY id");ResultSet rows=statement.executeQuery()){while(rows.next())result.add(user(rows));}return result;});}
@@ -218,7 +220,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
             }
             if(!photoSchemaPresent(connection))return Optional.empty();
             try(PreparedStatement statement=connection.prepareStatement("SELECT o.* FROM public.mop_operation o JOIN public.mop_file f ON f.tenant_id=o.tenant_id AND f.id=o.file_id AND f.operation_id=o.id WHERE f.tenant_id::text=? AND o.id::text=?"+ownFilePredicate(membership))){
-                statement.setString(1,tenant);statement.setString(2,id);if(Capabilities.customer(membership.role()))statement.setString(3,actor);
+                statement.setString(1,tenant);statement.setString(2,id);statement.setString(3,actor);
                 try(ResultSet rows=statement.executeQuery()){return rows.next()?Optional.of(operationProjection(rows)):Optional.empty();}
             }
         });
@@ -226,10 +228,14 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     @Override public CustomerReportRegistration registerCustomerReport(String tenant,String actor,CustomerReport report){
         if(transaction.get()==null)throw new IllegalStateException("Customer report writes require idempotent transaction");Membership current=ticketAccess(tenant,actor);
         if(!Capabilities.forRole(current.role()).contains("tickets:report"))throw new DomainException(403,"ACTION_FORBIDDEN","内部角色不能代客户报障");
+        if(!report.attachmentIds().isEmpty())requirePhotoSchema();
         Asset asset=report.assetId()==null?null:find(tenant,report.assetId()).orElseThrow(PostgresPlatformRepository::missing);
         if(asset!=null){
             lock("ticket-duplicate|"+tenant+"|"+actor+"|"+asset.id()+"|"+report.category());
-            CustomerReportRegistration duplicate=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT id,operation_id,version FROM public.mop_ticket WHERE tenant_id::text=? AND reporter_id::text=? AND asset_id::text=? AND category=? AND created_at>=clock_timestamp()-interval '30 seconds' AND created_at<=clock_timestamp() ORDER BY created_at DESC,id DESC LIMIT 1 FOR UPDATE")){
+            // The advisory lock serializes semantic registration. A plain read keeps V4
+            // no-photo deduplication usable without granting its append-only table UPDATE.
+            // Adding photos separately takes the ticket lock and CAS under the V5 gate.
+            CustomerReportRegistration duplicate=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT id,operation_id,version FROM public.mop_ticket WHERE tenant_id::text=? AND reporter_id::text=? AND asset_id::text=? AND category=? AND created_at>=clock_timestamp()-interval '30 seconds' AND created_at<=clock_timestamp() ORDER BY created_at DESC,id DESC LIMIT 1")){
                 statement.setString(1,tenant);statement.setString(2,actor);statement.setString(3,asset.id());statement.setString(4,report.category());try(ResultSet rows=statement.executeQuery()){return rows.next()?new CustomerReportRegistration(rows.getString("operation_id"),rows.getString("id"),false):null;}
             }});if(duplicate!=null){
                 boolean changed=false;
@@ -284,11 +290,62 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         });}catch(DomainException unavailable){return false;}
     }
     private void requirePhotoSchema(){if(!connection(PostgresPlatformRepository::photoSchemaPresent))throw new DomainException(503,"UPSTREAM_UNAVAILABLE","照片耐久数据库结构尚未就绪，未受理照片请求");}
+    /** Read-only capability probe: no migration history access, row locks or schema mutation. */
+    @Override public List<String> photoDependencyProblems(){
+        try(Connection connection=dataSource.getConnection()){
+            connection.setReadOnly(true);
+            List<String> problems=new ArrayList<>();
+            try(PreparedStatement statement=photoProbe(connection,"SELECT current_database()='mop_test' AND current_user='mop_test_runtime'");ResultSet rows=statement.executeQuery()){
+                if(!rows.next()||!rows.getBoolean(1))return List.of("PHOTO_NAMESPACE_INVALID");
+            }
+            try(PreparedStatement statement=photoProbe(connection,"SELECT name FROM (VALUES ('mop_file'),('mop_photo_job'),('mop_file_grant')) required(name) WHERE to_regclass('public.'||name) IS NULL");ResultSet rows=statement.executeQuery()){
+                while(rows.next())problems.add("PHOTO_SCHEMA_MISSING:"+rows.getString(1));
+            }
+            if(!problems.isEmpty())return List.copyOf(problems);
+            // The application needs the V5 nullable fields; an earlier incompatible draft cannot run jobs.
+            try(PreparedStatement statement=photoProbe(connection,"SELECT count(*)=3 AND bool_and(NOT attnotnull) FROM pg_attribute WHERE NOT attisdropped AND ((attrelid='public.mop_photo_job'::regclass AND attname='next_at') OR (attrelid='public.mop_operation'::regclass AND attname IN ('ticket_id','error')))");ResultSet rows=statement.executeQuery()){
+                if(!rows.next()||!rows.getBoolean(1))problems.add("PHOTO_SCHEMA_INCOMPATIBLE");
+            }
+            String privilegeSql="SELECT object_name,privilege FROM (VALUES "
+                +"('mop_file','SELECT'),('mop_photo_job','SELECT'),('mop_file_grant','SELECT'),('mop_operation','SELECT'),('mop_membership','SELECT'),('mop_user','SELECT'),('mop_audit','SELECT'),('mop_ticket','SELECT'),('mop_ticket_history','SELECT'),('mop_idempotency','SELECT'),('mop_outbox','SELECT'),"
+                +"('mop_file','INSERT'),('mop_photo_job','INSERT'),('mop_file_grant','INSERT'),('mop_operation','INSERT'),('mop_audit','INSERT'),('mop_ticket','INSERT'),('mop_ticket_history','INSERT'),('mop_idempotency','INSERT'),('mop_outbox','INSERT')) required(object_name,privilege) "
+                +"WHERE NOT has_table_privilege(current_user,'public.'||object_name,privilege)";
+            try(PreparedStatement statement=photoProbe(connection,privilegeSql);ResultSet rows=statement.executeQuery()){
+                while(rows.next())problems.add("PHOTO_PRIVILEGE_MISSING:"+rows.getString(1)+":"+rows.getString(2));
+            }
+            try(PreparedStatement statement=photoProbe(connection,"SELECT object_name FROM (VALUES ('mop_membership'),('mop_user')) required(object_name) WHERE NOT has_any_column_privilege(current_user,'public.'||object_name,'UPDATE')");ResultSet rows=statement.executeQuery()){
+                while(rows.next())problems.add("PHOTO_AUTHORIZATION_LOCK_PRIVILEGE_MISSING:"+rows.getString(1));
+            }
+            String updateSql="SELECT object_name,column_name FROM (VALUES "
+                +"('mop_file','upload_status'),('mop_file','ticket_id'),('mop_file','version'),('mop_file','updated_at'),"
+                +"('mop_photo_job','state'),('mop_photo_job','lease_owner'),('mop_photo_job','lease_until'),('mop_photo_job','fencing_token'),('mop_photo_job','attempts'),('mop_photo_job','next_at'),"
+                +"('mop_operation','status'),('mop_operation','step'),('mop_operation','error'),('mop_operation','updated_at'),('mop_ticket','version'),('mop_ticket','updated_at')) required(object_name,column_name) "
+                +"WHERE NOT has_column_privilege(current_user,'public.'||object_name,column_name,'UPDATE')";
+            try(PreparedStatement statement=photoProbe(connection,updateSql);ResultSet rows=statement.executeQuery()){
+                while(rows.next())problems.add("PHOTO_PRIVILEGE_MISSING:"+rows.getString(1)+"."+rows.getString(2)+":UPDATE");
+            }
+            if(!problems.isEmpty())return List.copyOf(problems);
+            // Parse the consumed columns and verify SELECT access without reading any original photo bytes.
+            try(PreparedStatement statement=photoProbe(connection,"SELECT j.id,j.tenant_id,j.file_id,j.content,j.state,j.lease_owner,j.lease_until,j.fencing_token,j.attempts,j.next_at,j.created_at,f.id,f.tenant_id,f.created_by,f.purpose,f.original_name,f.media_type,f.size_bytes,f.sha256,f.object_key,f.operation_id,f.permission_version,f.upload_status,f.ticket_id,f.version,f.created_at,f.updated_at,o.file_id,o.kind,o.status,o.step,o.error,o.updated_at,g.id,g.tenant_id,g.file_id,g.actor_id,g.permission_version,g.expires_at FROM public.mop_photo_job j JOIN public.mop_file f ON f.tenant_id=j.tenant_id AND f.id=j.file_id JOIN public.mop_operation o ON o.tenant_id=f.tenant_id AND o.id=f.operation_id JOIN public.mop_file_grant g ON g.tenant_id=f.tenant_id AND g.file_id=f.id WHERE FALSE")){
+                statement.executeQuery().close();
+            }
+            return List.of();
+        }catch(SQLException unavailable){
+            return List.of(switch(String.valueOf(unavailable.getSQLState())){case "42501"->"PHOTO_SCHEMA_ACCESS_DENIED";case "42703","42P01"->"PHOTO_SCHEMA_INCOMPATIBLE";default->"PHOTO_DATABASE_UNAVAILABLE";});
+        }catch(RuntimeException unavailable){return List.of("PHOTO_DATABASE_UNAVAILABLE");}
+    }
+    private static PreparedStatement photoProbe(Connection connection,String sql)throws SQLException{
+        PreparedStatement statement=connection.prepareStatement(sql);statement.setQueryTimeout(3);return statement;
+    }
     private Membership photoReporter(String tenant,String actor){
         Membership current=ticketAccess(tenant,actor);
         if(!Capabilities.forRole(current.role()).contains("tickets:report"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色不能上传或追加客户报障照片");return current;
     }
-    private static String ownFilePredicate(Membership membership){return Capabilities.customer(membership.role())?" AND f.created_by::text=?":"";}
+    private static String ownFilePredicate(Membership membership){
+        // An upload is private staging until its owner attaches it to a visible tenant ticket.
+        return Capabilities.customer(membership.role())?" AND f.created_by::text=?"
+            :" AND (f.created_by::text=? OR EXISTS(SELECT 1 FROM public.mop_ticket visible_ticket WHERE visible_ticket.tenant_id=f.tenant_id AND visible_ticket.id=f.ticket_id))";
+    }
     private static Map<String,Object> fileProjection(ResultSet rows)throws SQLException {
         Map<String,Object> result=new LinkedHashMap<>();
         for(String key:List.of("id","tenant_id","purpose","original_name","media_type","sha256","upload_status","created_by","ticket_id","operation_id"))result.put(key,rows.getString(key));
@@ -314,7 +371,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     @Override public Optional<Map<String,Object>> file(String tenant,String actor,String id){return inTransaction(()->{
         requirePhotoSchema();Membership current=ticketAccess(tenant,actor);
         return connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT f.* FROM public.mop_file f WHERE f.tenant_id::text=? AND f.id::text=?"+ownFilePredicate(current))){
-            statement.setString(1,tenant);statement.setString(2,id);if(Capabilities.customer(current.role()))statement.setString(3,actor);try(ResultSet rows=statement.executeQuery()){return rows.next()?Optional.of(fileProjection(rows)):Optional.empty();}
+            statement.setString(1,tenant);statement.setString(2,id);statement.setString(3,actor);try(ResultSet rows=statement.executeQuery()){return rows.next()?Optional.of(fileProjection(rows)):Optional.empty();}
         }});
     });}
     @Override public Map<String,Object> contentGrant(String tenant,String actor,String id){return inTransaction(()->{
@@ -328,7 +385,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     @Override public Map<String,Object> photoContent(String tenant,String actor,String id,String grant){return inTransaction(()->{
         requirePhotoSchema();Membership current=ticketAccess(tenant,actor);
         return connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT f.* FROM public.mop_file f JOIN public.mop_file_grant g ON g.tenant_id=f.tenant_id AND g.file_id=f.id WHERE f.tenant_id::text=? AND f.id::text=? AND g.id::text=? AND g.actor_id::text=? AND g.permission_version=? AND g.expires_at>clock_timestamp() AND f.upload_status='READY'"+ownFilePredicate(current))){
-            statement.setString(1,tenant);statement.setString(2,id);statement.setString(3,grant);statement.setString(4,actor);statement.setLong(5,current.permissionVersion());if(Capabilities.customer(current.role()))statement.setString(6,actor);
+            statement.setString(1,tenant);statement.setString(2,id);statement.setString(3,grant);statement.setString(4,actor);statement.setLong(5,current.permissionVersion());statement.setString(6,actor);
             try(ResultSet rows=statement.executeQuery()){if(!rows.next())throw missing();return Map.of("object_key",rows.getString("object_key"),"byte_size",rows.getLong("size_bytes"),"sha256",rows.getString("sha256"),"media_type",rows.getString("media_type"),"original_name",rows.getString("original_name"));}
         }});
     });}

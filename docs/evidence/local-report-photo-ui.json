@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-10-01T09:45:32.697Z",
+  "mode": "remote_test",
+  "browser": {
+    "product": "Microsoft Edge",
+    "version": "154.0.4258.48",
+    "automation": "persistent_Playwright",
+    "headless": true
+  },
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "mobile_emulation": true
+    }
+  ],
+  "real_oidc_sessions": true,
+  "designated_remote_postgresql_keycloak_minio": true,
+  "fixtures": "clearly_fictitious_original_JPEG_PNG",
+  "checks": [
+    {
+      "name": "desktop_registration_preserves_selected_unuploaded_photo",
+      "pass": true
+    },
+    {
+      "name": "registration_form_remains_uncovered_with_selected_photo",
+      "pass": true
+    },
+    {
+      "name": "desktop_upload_original_refresh_compare_append",
+      "pass": true
+    },
+    {
+      "name": "desktop_authorized_original_download_hash",
+      "pass": true
+    },
+    {
+      "name": "closing_registered_photo_form_opens_preserved_detail",
+      "pass": true
+    },
+    {
+      "name": "switch_A_to_B_displays_retained_target_and_blocks_selection",
+      "pass": true
+    },
+    {
+      "name": "return_to_A_preserves_original_selection",
+      "pass": true
+    },
+    {
+      "name": "safe_discard_opens_clean_B_workspace",
+      "pass": true
+    },
+    {
+      "name": "lost_upload_response_preserves_file_key_and_disables_remove",
+      "pass": true
+    },
+    {
+      "name": "uncertain_upload_cannot_be_discarded_or_moved_to_other_report",
+      "pass": true
+    },
+    {
+      "name": "accepted_upload_failed_get_keeps_read_only_retry",
+      "pass": true
+    },
+    {
+      "name": "manual_uncertain_upload_replays_same_key_original_bytes",
+      "pass": true
+    },
+    {
+      "name": "lost_append_response_preserves_original_target_and_blocks_discard",
+      "pass": true
+    },
+    {
+      "name": "uncertain_append_replays_same_key_body_version_and_target",
+      "pass": true
+    },
+    {
+      "name": "remove_completed_local_selection_preserves_bound_server_photo",
+      "pass": true
+    },
+    {
+      "name": "mobile_registration_keeps_unuploaded_long_name_and_uncovered_controls",
+      "pass": true
+    },
+    {
+      "name": "mobile_original_upload_append_authorized_preview",
+      "pass": true
+    },
+    {
+      "name": "mobile_closing_form_opens_correct_registered_detail",
+      "pass": true
+    },
+    {
+      "name": "actual_concurrent_append_shows_CAS_conflict_and_blocks_write",
+      "pass": true
+    },
+    {
+      "name": "explicit_compare_then_append_preserves_all_three_photos",
+      "pass": true
+    },
+    {
+      "name": "three_persisted_photos_disable_both_selection_and_camera",
+      "pass": true
+    },
+    {
+      "name": "policy_load_failure_is_explicit_and_reload_uses_real_server",
+      "pass": true
+    },
+    {
+      "name": "mobile_three_photo_capacity_and_policy_recovery",
+      "pass": true
+    },
+    {
+      "name": "detail_URL_refresh_reads_three_persisted_attachments",
+      "pass": true
+    },
+    {
+      "name": "internal_role_reads_bound_photos_without_report_or_append_controls",
+      "pass": true
+    },
+    {
+      "name": "internal_authorized_bound_original_preview",
+      "pass": true
+    },
+    {
+      "name": "tenant_B_cannot_read_A_detail_and_old_preview_cleared",
+      "pass": true
+    },
+    {
+      "name": "return_to_tenant_A_requires_new_authorized_preview",
+      "pass": true
+    },
+    {
+      "name": "customer_tenant_switch_control_hidden",
+      "pass": true
+    },
+    {
+      "name": "logout_removes_photo_views_and_old_session",
+      "pass": true
+    },
+    {
+      "name": "mobile_unsupported_selection_rejected_before_upload",
+      "pass": true
+    },
+    {
+      "name": "empty_form_keeps_missing_business_choices_unset",
+      "pass": true
+    },
+    {
+      "name": "search_filter_survives_URL_refresh",
+      "pass": true
+    },
+    {
+      "name": "exploratory_filter_reset_pagination_cycle",
+      "pass": true
+    },
+    {
+      "name": "mobile_safe_local_remove_and_photo_capacity_visual_fit",
+      "pass": true
+    },
+    {
+      "name": "mobile_last_attached_original_control_reachable_above_footer",
+      "pass": true
+    }
+  ],
+  "passed": true,
+  "unhandled_page_errors": 0,
+  "covered_controls": [
+    "register_without_photo",
+    "upload_original",
+    "refresh_policy",
+    "reload_policy",
+    "refresh_upload_state",
+    "remove_local_selection",
+    "compare_attachments",
+    "append_ready_originals",
+    "same_upload_request_retry",
+    "same_append_request_retry",
+    "resume_retained_target",
+    "discard_safe_local_queue",
+    "authorized_original_read",
+    "download_original",
+    "close_form_then_show_detail",
+    "search",
+    "reset",
+    "refresh",
+    "pagination",
+    "tenant_switch_A_B_A",
+    "logout"
+  ],
+  "visual_review": {
+    "reviewed": true,
+    "initial_desktop_and_mobile": true,
+    "mobile_dialog_width": 366,
+    "long_filename_wrap": true,
+    "no_document_horizontal_overflow": true,
+    "photo_capacity_includes_persisted": true,
+    "modal_obstruction_fixed": true,
+    "layout_clipping_or_overlap_defect_after_fix": false,
+    "scrolling": "form/detail body intentionally scroll; footer and actions remain reachable",
+    "screenshots": "ignored .local/qa-report-photos; no SSO or grant URLs captured"
+  },
+  "exploratory": {
+    "duration_seconds": 50,
+    "checks": [
+      "unsupported_file_rejected",
+      "empty_required_choices_stay_unset",
+      "URL_filter_reload",
+      "reset_pagination_roundtrip",
+      "safe_selection_remove"
+    ]
+  },
+  "response_loss_injection": {
+    "backend": "real route.fetch before dropping upload/append response; real GET aborted for read retry",
+    "same_key_original_bytes_verified": true,
+    "same_append_key_body_version_target_verified": true,
+    "no_fake_success_responses": true
+  },
+  "limitations": [
+    "physical_camera_NOT_RUN",
+    "WeCom_embedded_identity_NOT_RUN",
+    "production_browser_matrix_NOT_RUN",
+    "scan_UNSCANNED",
+    "retention_null",
+    "formal_ticket_SLA_notifications_NOT_RUN",
+    "all_128_acceptance_NOT_COMPLETE"
+  ]
+}

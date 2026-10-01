@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.5.0",
-    "description": "云端接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；本契约描述代码接口，不能证明本轮真实联调或V5迁移已执行。配置内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。fixture身份入口在remote_test不可调用。"
+    "version": "0.6.0",
+    "description": "本地接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
     {
@@ -148,7 +148,7 @@
     "/health/ready": {
       "get": {
         "operationId": "readiness",
-        "summary": "实际PostgreSQL与Keycloak依赖就绪；不证明生产就绪",
+        "summary": "实际PG/OIDC及已启用照片策略/schema/MinIO就绪；失败503及安全原因，不证明生产就绪",
         "security": [],
         "responses": {
           "200": {
@@ -156,7 +156,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ResourceResult"
+                  "$ref": "#/components/schemas/ReadinessResult"
                 }
               }
             }
@@ -4855,6 +4855,149 @@
           "data": {
             "type": "object",
             "additionalProperties": true
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ReadinessResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "READY_REMOTE_TEST"
+              },
+              "ready": {
+                "const": true
+              },
+              "mode": {
+                "const": "remote_test"
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "durable": {
+                "const": true
+              },
+              "production_ready": {
+                "const": false
+              },
+              "photos": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "ready": {
+                    "type": "boolean"
+                  },
+                  "policy_ready": {
+                    "type": "boolean"
+                  },
+                  "schema_ready": {
+                    "type": "boolean"
+                  },
+                  "storage_ready": {
+                    "type": "boolean"
+                  },
+                  "policy_source": {
+                    "type": "string",
+                    "enum": [
+                      "USER_DEVELOPMENT_DIRECTION",
+                      "PENDING"
+                    ]
+                  },
+                  "reasons": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "enabled",
+                  "ready",
+                  "policy_ready",
+                  "schema_ready",
+                  "storage_ready",
+                  "policy_source",
+                  "reasons"
+                ],
+                "additionalProperties": false,
+                "oneOf": [
+                  {
+                    "properties": {
+                      "enabled": {
+                        "const": true
+                      },
+                      "ready": {
+                        "const": true
+                      },
+                      "policy_ready": {
+                        "const": true
+                      },
+                      "schema_ready": {
+                        "const": true
+                      },
+                      "storage_ready": {
+                        "const": true
+                      },
+                      "policy_source": {
+                        "const": "USER_DEVELOPMENT_DIRECTION"
+                      },
+                      "reasons": {
+                        "maxItems": 0
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "enabled": {
+                        "const": false
+                      },
+                      "ready": {
+                        "const": false
+                      },
+                      "policy_ready": {
+                        "const": false
+                      },
+                      "schema_ready": {
+                        "const": false
+                      },
+                      "storage_ready": {
+                        "const": false
+                      },
+                      "policy_source": {
+                        "const": "PENDING"
+                      },
+                      "reasons": {
+                        "const": [
+                          "PHOTO_NOT_CONFIGURED"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "required": [
+              "status",
+              "ready",
+              "mode",
+              "source",
+              "durable",
+              "production_ready",
+              "photos"
+            ],
+            "additionalProperties": false
           },
           "trace_id": {
             "type": "string"

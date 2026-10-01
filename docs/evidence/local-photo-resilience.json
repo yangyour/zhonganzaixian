@@ -1,0 +1,509 @@
+{
+  "verified_at": "2026-10-01T09:25:15.159Z",
+  "mode": "remote_test",
+  "passed": true,
+  "scenarios": {
+    "jpeg_size_boundary": {
+      "status": "PASS",
+      "accepted_original_bytes": 5000000,
+      "rejected_original_bytes": 5000001,
+      "preserved_original_codestream_with_legal_COM_segments": true,
+      "original_hash_readback_verified": true
+    },
+    "durable_restart": {
+      "status": "PASS",
+      "owned_worker_stopped": true,
+      "file_pending_and_operation_queued_observed": true,
+      "registration_preserved": true,
+      "owned_api_and_worker_pid_and_start_time_changed": true,
+      "same_pg_operation_succeeded": true,
+      "original_hash_readback_verified": true,
+      "same_key_replay_returned_same_receipt": true
+    },
+    "minio_disconnect": {
+      "status": "PASS",
+      "only_project_minio_forward_disabled": true,
+      "existing_minio_channels_closed": true,
+      "health_http_status": 503,
+      "schema_ready_during_disconnect": true,
+      "storage_ready_during_disconnect": false,
+      "postgres_and_oidc_routes_preserved": true,
+      "failed_upload_http_status": 503,
+      "no_file_job_or_operation_receipt_created": true,
+      "existing_registration_preserved": true,
+      "recovery_http_status": 200,
+      "accepted_durable_job_completed_after_recovery": true,
+      "original_hash_readback_verified": true,
+      "running_worker_RETRY_WAIT": "NOT_RUN: worker was safely stopped before the disconnect; startup would reject disconnected storage"
+    },
+    "revocation": {
+      "status": "PASS",
+      "only_project_test_membership_changed": true,
+      "role_restored": true,
+      "cas_restore_used": true,
+      "initial_permission_version": 14,
+      "revoked_permission_version": 15,
+      "restored_permission_version": 16,
+      "old_cookie_metadata_denied": true,
+      "old_grant_bytes_denied": true,
+      "old_cookie_write_replay_denied": true,
+      "old_grant_stays_invalid_after_restore": true,
+      "fresh_oidc_session_recaptured": true,
+      "fresh_authorized_readback_verified": true
+    }
+  },
+  "checks": [
+    {
+      "stage": "initial_real_dependencies",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "accept_exact-five-million",
+      "http_status": 202,
+      "contract_valid": true
+    },
+    {
+      "stage": "operation_exact-five-million",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "poll_exact-five-million",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "poll_exact-five-million",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "poll_exact-five-million",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "poll_exact-five-million",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "poll_exact-five-million",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "poll_exact-five-million",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "poll_exact-five-million",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "poll_exact-five-million",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "completed_exact-five-million",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "grant_exact-five-million",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "original_exact-five-million",
+      "http_status": 200,
+      "original_bytes_and_hash_verified": true
+    },
+    {
+      "stage": "valid_jpeg_one_byte_over_rejected",
+      "http_status": 400,
+      "contract_valid": true
+    },
+    {
+      "stage": "registration_without_ready_photo",
+      "http_status": 202,
+      "contract_valid": true
+    },
+    {
+      "stage": "registration_operation_before_restart",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "accept_pending-owned-worker-stopped",
+      "http_status": 202,
+      "contract_valid": true
+    },
+    {
+      "stage": "operation_pending-owned-worker-stopped",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "durable_pending_before_restart",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "queued_before_restart",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "pending_photo_does_not_cancel_registration",
+      "http_status": 422,
+      "contract_valid": true
+    },
+    {
+      "stage": "registration_survives_pending_photo",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "poll_same-durable-task-after-restart",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "completed_same-durable-task-after-restart",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "grant_same-durable-task-after-restart",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "original_same-durable-task-after-restart",
+      "http_status": 200,
+      "original_bytes_and_hash_verified": true
+    },
+    {
+      "stage": "same_durable_request_after_restart",
+      "http_status": 202,
+      "contract_valid": true
+    },
+    {
+      "stage": "same_registration_after_api_restart",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "recovered_original_attaches_to_preserved_registration",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "accept_queued-before-minio-disconnect",
+      "http_status": 202,
+      "contract_valid": true
+    },
+    {
+      "stage": "operation_queued-before-minio-disconnect",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "only_minio_forward_disconnected",
+      "http_status": 503,
+      "contract_valid": true
+    },
+    {
+      "stage": "postgres_identity_path_survives_minio_disconnect",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "minio_disconnect_upload_has_no_receipt",
+      "http_status": 503,
+      "contract_valid": true
+    },
+    {
+      "stage": "registration_preserved_during_minio_disconnect",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "minio_forward_recovered_before_worker",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "poll_queued-job-after-minio-recovery",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "completed_queued-job-after-minio-recovery",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "grant_queued-job-after-minio-recovery",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "original_queued-job-after-minio-recovery",
+      "http_status": 200,
+      "original_bytes_and_hash_verified": true
+    },
+    {
+      "stage": "grant_before-membership-revocation",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "original_before-membership-revocation",
+      "http_status": 200,
+      "original_bytes_and_hash_verified": true
+    },
+    {
+      "stage": "revoked_old_cookie_metadata_denied",
+      "http_status": 401,
+      "contract_valid": true
+    },
+    {
+      "stage": "revoked_old_grant_bytes_denied",
+      "http_status": 401,
+      "contract_valid": true
+    },
+    {
+      "stage": "revoked_old_cookie_write_replay_denied",
+      "http_status": 401,
+      "contract_valid": true
+    },
+    {
+      "stage": "revoked_old_cookie_operation_denied",
+      "http_status": 401,
+      "contract_valid": true
+    },
+    {
+      "stage": "restored_fresh_oidc_session",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "permission_version_keeps_old_grant_invalid_after_restore",
+      "http_status": 404,
+      "contract_valid": true
+    },
+    {
+      "stage": "fresh_session_metadata_after_cas_restore",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "grant_fresh-grant-after-cas-restore",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "original_fresh-grant-after-cas-restore",
+      "http_status": 200,
+      "original_bytes_and_hash_verified": true
+    }
+  ],
+  "processes": [
+    {
+      "action": "Snapshot",
+      "processes": [
+        {
+          "start_time": "2026-10-01T09:07:45.4715358Z",
+          "name": "api",
+          "owned": true,
+          "pid": 39408
+        },
+        {
+          "start_time": "2026-10-01T09:07:45.4919391Z",
+          "name": "web",
+          "owned": true,
+          "pid": 36848
+        },
+        {
+          "start_time": "2026-10-01T09:07:50.9802702Z",
+          "name": "photo-worker",
+          "owned": true,
+          "pid": 33020
+        }
+      ]
+    },
+    {
+      "action": "RestartTunnelApps",
+      "processes": [
+        {
+          "pid": 30072,
+          "start_time": "2026-10-01T09:13:38.0350686Z",
+          "name": "api",
+          "owned": true
+        },
+        {
+          "pid": 6000,
+          "start_time": "2026-10-01T09:13:38.0536848Z",
+          "name": "web",
+          "owned": true
+        },
+        {
+          "pid": 31172,
+          "start_time": "2026-10-01T09:13:43.3096539Z",
+          "name": "photo-worker",
+          "owned": true
+        }
+      ]
+    },
+    {
+      "action": "Snapshot",
+      "processes": [
+        {
+          "pid": 30072,
+          "owned": true,
+          "start_time": "2026-10-01T09:13:38.0350686Z",
+          "name": "api"
+        },
+        {
+          "pid": 6000,
+          "owned": true,
+          "start_time": "2026-10-01T09:13:38.0536848Z",
+          "name": "web"
+        },
+        {
+          "pid": 31172,
+          "owned": true,
+          "start_time": "2026-10-01T09:13:43.3096539Z",
+          "name": "photo-worker"
+        }
+      ]
+    },
+    {
+      "action": "StopWorker",
+      "processes": [
+        {
+          "name": "api",
+          "owned": true,
+          "start_time": "2026-10-01T09:13:38.0350686Z",
+          "pid": 30072
+        },
+        {
+          "name": "web",
+          "owned": true,
+          "start_time": "2026-10-01T09:13:38.0536848Z",
+          "pid": 6000
+        }
+      ]
+    },
+    {
+      "action": "RestartApps",
+      "processes": [
+        {
+          "owned": true,
+          "start_time": "2026-10-01T09:17:22.2473500Z",
+          "name": "api",
+          "pid": 9016
+        },
+        {
+          "owned": true,
+          "start_time": "2026-10-01T09:17:22.2836216Z",
+          "name": "web",
+          "pid": 34000
+        },
+        {
+          "owned": true,
+          "start_time": "2026-10-01T09:17:27.6797745Z",
+          "name": "photo-worker",
+          "pid": 13388
+        }
+      ]
+    },
+    {
+      "action": "StopWorker",
+      "processes": [
+        {
+          "pid": 9016,
+          "start_time": "2026-10-01T09:17:22.2473500Z",
+          "owned": true,
+          "name": "api"
+        },
+        {
+          "pid": 34000,
+          "start_time": "2026-10-01T09:17:22.2836216Z",
+          "owned": true,
+          "name": "web"
+        }
+      ]
+    },
+    {
+      "action": "RestartApps",
+      "processes": [
+        {
+          "owned": true,
+          "pid": 18996,
+          "name": "api",
+          "start_time": "2026-10-01T09:21:24.1704111Z"
+        },
+        {
+          "owned": true,
+          "pid": 26608,
+          "name": "web",
+          "start_time": "2026-10-01T09:21:24.2038557Z"
+        },
+        {
+          "owned": true,
+          "pid": 32120,
+          "name": "photo-worker",
+          "start_time": "2026-10-01T09:21:29.5486540Z"
+        }
+      ]
+    },
+    {
+      "action": "Snapshot",
+      "processes": [
+        {
+          "owned": true,
+          "pid": 18996,
+          "name": "api",
+          "start_time": "2026-10-01T09:21:24.1704111Z"
+        },
+        {
+          "owned": true,
+          "pid": 26608,
+          "name": "web",
+          "start_time": "2026-10-01T09:21:24.2038557Z"
+        },
+        {
+          "owned": true,
+          "pid": 32120,
+          "name": "photo-worker",
+          "start_time": "2026-10-01T09:21:29.5486540Z"
+        }
+      ]
+    }
+  ],
+  "environment": {
+    "postgresql": "17.9",
+    "keycloak": "26.2.4",
+    "minio": "RELEASE.2025-09-07T16-13-09Z",
+    "path": "designated_project_services_via_SSH"
+  },
+  "real_components_only": true,
+  "remote_service_configuration_changed": false,
+  "migrations_executed": false,
+  "credential_output": "none",
+  "full_M5_M8_acceptance": false,
+  "restoration": {
+    "minio_marker_removed": true,
+    "membership_restored": true,
+    "owned_apps_ready": true,
+    "sessions_refreshed": true
+  },
+  "http_exchanges": 52
+}

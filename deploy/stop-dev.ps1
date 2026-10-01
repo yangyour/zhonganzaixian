@@ -1,19 +1,18 @@
 $ErrorActionPreference = 'Stop'
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+. (Join-Path $PSScriptRoot 'dev-process-ownership.ps1')
 $stateFile = Join-Path $projectRoot '.local/processes.json'
 if (-not (Test-Path -LiteralPath $stateFile)) { Write-Host '没有本工程的启动记录。'; exit 0 }
 $state = Get-Content -Raw -LiteralPath $stateFile | ConvertFrom-Json
 if ($state.project_root -ne $projectRoot) { throw '启动记录目录不匹配，拒绝停止进程。' }
-foreach ($taskProcess in $state.processes) {
-    $running = Get-Process -Id $taskProcess.id -ErrorAction SilentlyContinue
+# Validate every entry before stopping any process. PID reuse/path mismatch leaves the record intact for review.
+foreach ($record in $state.processes) { $null = Get-MopOwnedProcess -Record $record -ProjectRoot $projectRoot }
+foreach ($record in $state.processes) {
+    $running = Get-MopOwnedProcess -Record $record -ProjectRoot $projectRoot
     if (-not $running) { continue }
-    $actualStart = $running.StartTime.ToUniversalTime().Ticks
-    $recordedStart = ([DateTime]$taskProcess.start_time).ToUniversalTime().Ticks
-    $processInfo = Get-CimInstance Win32_Process -Filter "ProcessId = $($taskProcess.id)"
-    if ($actualStart -ne $recordedStart -or -not $processInfo.CommandLine.Contains($projectRoot, [StringComparison]::OrdinalIgnoreCase)) {
-        throw "PID $($taskProcess.id) 与本工程启动记录不匹配，拒绝停止。"
-    }
-    Stop-Process -Id $taskProcess.id
-    Write-Host "已停止 $($taskProcess.name) 进程 $($taskProcess.id)。"
+    Stop-Process -InputObject $running -ErrorAction Stop
+    $null = $running.WaitForExit(5000)
+    if (-not $running.HasExited) { throw '本工程应用仍未退出；保留启动记录。' }
+    Write-Host "已停止 $($record.name) 进程 $($record.id)。"
 }
 Remove-Item -LiteralPath $stateFile

@@ -1,5 +1,5 @@
--- UNEXECUTED PHOTO DRAFT. Review and explicitly apply with mop_test_migrator only.
--- API / file worker startup must not migrate this draft. No lifecycle, deletion or RabbitMQ consumer is enabled.
+-- Reviewed photo migration, applied only through the explicit mop_test_migrator step.
+-- API / file worker startup never migrates. No lifecycle, deletion or RabbitMQ consumer is enabled.
 DO $$ BEGIN
   IF current_database()<>'mop_test' OR current_user<>'mop_test_migrator' THEN
     RAISE EXCEPTION 'MOP photo draft requires dedicated mop_test database and migration role';
@@ -70,9 +70,18 @@ ALTER TABLE public.mop_operation ADD CHECK(step IN ('AWAITING_TICKET_CONFIGURATI
 ALTER TABLE public.mop_operation ALTER COLUMN error DROP NOT NULL;
 ALTER TABLE public.mop_operation ADD CHECK(
   (kind='CUSTOMER_REPORT_REGISTRATION' AND ticket_id IS NOT NULL AND file_id IS NULL AND status='PENDING' AND step='AWAITING_TICKET_CONFIGURATION' AND error IS NOT NULL)
-  OR (kind='FILE_UPLOAD' AND ticket_id IS NULL AND file_id IS NOT NULL AND step<>'AWAITING_TICKET_CONFIGURATION')
+  OR (kind='FILE_UPLOAD' AND ticket_id IS NULL AND file_id IS NOT NULL AND (
+    (status='PENDING' AND step='QUEUED' AND error IS NULL)
+    OR (status='PENDING' AND step='RETRY_WAIT' AND error IS NOT NULL)
+    OR (status='RUNNING' AND step='UPLOADING' AND error IS NULL)
+    OR (status='SUCCEEDED' AND step='STORED' AND error IS NULL)
+    OR (status='FAILED' AND step IN ('AUTHORIZATION_REVOKED','STORAGE_CONFLICT') AND error IS NOT NULL)
+  ))
 );
-ALTER TABLE public.mop_file ADD FOREIGN KEY(tenant_id,operation_id) REFERENCES public.mop_operation(tenant_id,id) DEFERRABLE INITIALLY DEFERRED;
+-- Each file and its operation must point back to the same file, not merely exist in one tenant.
+ALTER TABLE public.mop_operation ADD UNIQUE(tenant_id,file_id);
+ALTER TABLE public.mop_operation ADD UNIQUE(tenant_id,file_id,id);
+ALTER TABLE public.mop_file ADD FOREIGN KEY(tenant_id,id,operation_id) REFERENCES public.mop_operation(tenant_id,file_id,id) DEFERRABLE INITIALLY DEFERRED;
 
 REVOKE ALL ON public.mop_file,public.mop_photo_job,public.mop_file_grant FROM PUBLIC,mop_test_runtime;
 GRANT SELECT,INSERT ON public.mop_file,public.mop_photo_job,public.mop_file_grant TO mop_test_runtime;

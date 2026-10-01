@@ -60,7 +60,7 @@ export interface CustomerReportCreate {
 }
 export interface CustomerReportAcceptance { operation_id: string; status: 'PENDING' }
 export interface CustomerReportOperation {
-  id: string; tenant_id?: string; kind: 'CUSTOMER_REPORT_REGISTRATION'; status: 'PENDING'
+  id: string; tenant_id: string; kind: 'CUSTOMER_REPORT_REGISTRATION'; status: 'PENDING'
   step: 'AWAITING_TICKET_CONFIGURATION'; progress: null; result_ref: string
   error: { code: 'CONFIG_PENDING'; message: string; retryable: false; question_ids: string[] }
   created_at: string; updated_at: string

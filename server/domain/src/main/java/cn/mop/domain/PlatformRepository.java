@@ -10,6 +10,8 @@ import java.time.Instant;
 public interface PlatformRepository extends AssetRepository {
     RepositoryMetadata metadata();
     boolean dependencyReady();
+    /** Safe readiness reasons for the designated durable photo schema and runtime privileges. */
+    default List<String> photoDependencyProblems(){return List.of("PHOTO_REPOSITORY_UNAVAILABLE");}
     List<FixtureUser> users();
     Optional<FixtureUser> user(String id);
     Optional<FixtureUser> resolveIdentity(String identitySource, String subject);

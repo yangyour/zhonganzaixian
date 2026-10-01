@@ -80,14 +80,20 @@ fileOperation.allOf = [{ oneOf: [
   ...[['RETRY_WAIT', 'PENDING', 'UPSTREAM_UNAVAILABLE', true], ['AUTHORIZATION_REVOKED', 'FAILED', 'ACTION_FORBIDDEN', false], ['STORAGE_CONFLICT', 'FAILED', 'FILE_INTEGRITY_CONFLICT', false]].map(([step, status, code, retryable]) => ({ properties: { step: { const: step }, status: { const: status }, error: { type: 'object', properties: { code: { const: code }, retryable: { const: retryable } } } } })),
 ] }];
 const acceptedResponse = (description) => ({ 202: { description, content: { 'application/json': { schema: ref('Accepted') } } }, ...errors });
+const photosReady = object({ enabled: { type: 'boolean' }, ready: { type: 'boolean' }, policy_ready: { type: 'boolean' }, schema_ready: { type: 'boolean' }, storage_ready: { type: 'boolean' }, policy_source: { type: 'string', enum: ['USER_DEVELOPMENT_DIRECTION', 'PENDING'] }, reasons: { type: 'array', items: string } });
+photosReady.oneOf = [
+  { properties: { enabled: { const: true }, ready: { const: true }, policy_ready: { const: true }, schema_ready: { const: true }, storage_ready: { const: true }, policy_source: { const: 'USER_DEVELOPMENT_DIRECTION' }, reasons: { maxItems: 0 } } },
+  { properties: { enabled: { const: false }, ready: { const: false }, policy_ready: { const: false }, schema_ready: { const: false }, storage_ready: { const: false }, policy_source: { const: 'PENDING' }, reasons: { const: ['PHOTO_NOT_CONFIGURED'] } } },
+];
+const readiness = envelope(object({ status: { const: 'READY_REMOTE_TEST' }, ready: { const: true }, mode: { const: 'remote_test' }, source: { const: 'postgresql' }, durable: { const: true }, production_ready: { const: false }, photos: photosReady }));
 const contract = {
   openapi: '3.1.0',
-  info: { title: 'MOP 共享测试环境 API', version: '0.5.0', description: '云端接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；本契约描述代码接口，不能证明本轮真实联调或V5迁移已执行。配置内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。fixture身份入口在remote_test不可调用。' },
+  info: { title: 'MOP 共享测试环境 API', version: '0.6.0', description: '本地接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。fixture身份入口在remote_test不可调用。' },
   servers: [{ url: '/api/v1' }],
   security: [{ SessionCookie: [] }],
   paths: {
     '/health/live': { get: action('liveness', '本地进程存活', ref('ResourceResult'), { security: [] }) },
-    '/health/ready': { get: action('readiness', '实际PostgreSQL与Keycloak依赖就绪；不证明生产就绪', ref('ResourceResult'), { security: [] }) },
+    '/health/ready': { get: action('readiness', '实际PG/OIDC及已启用照片策略/schema/MinIO就绪；失败503及安全原因，不证明生产就绪', ref('ReadinessResult'), { security: [] }) },
     '/auth/options': { get: action('authOptions', '读取Keycloak授权登录入口；不返回秘密', envelope(object({ mode: { const: 'remote_test' }, identity_source: { const: 'test_oidc' }, login_url: { const: '/oauth2/authorization/mop' } })), { security: [] }) },
     '/session': { get: action('getSession', '读取可信会话与能力', ref('SessionResult')), delete: action('logout', '注销会话', ref('ResourceResult'), { parameters: headers }) },
     '/session/tenant': { post: mutation('switchTenant', '在服务端授权集合中切换租户', object({ tenant_id: { type: 'string', format: 'uuid' } }), ref('SessionResult')) },
@@ -127,6 +133,7 @@ const contract = {
     schemas: {
       Error: object({ error: object({ code: string, message: string, details: { type: 'array', items: { type: 'object', additionalProperties: true } } }), trace_id: string }),
       ResourceResult: envelope({ type: 'object', additionalProperties: true }),
+      ReadinessResult: readiness,
       SessionResult: envelope(object({ user: object({ id: string, display_name: string, role: { type: 'string', enum: ['viewer', 'tadmin', 'msp', 'padmin'] } }), tenant, allowed_tenants: { type: 'array', items: tenant }, capabilities: { type: 'array', items: string }, permission_version: { type: 'integer' }, csrf_token: string, mode: { const: 'remote_test' }, identity_source: { const: 'test_oidc' } })),
       Asset: asset,
       AssetResult: envelope(ref('Asset')),

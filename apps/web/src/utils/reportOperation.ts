@@ -1,4 +1,4 @@
-import { api, ApiError, isCancelled } from '../api/client'
+import { api, ApiError, isCancelled, StaleRequestError } from '../api/client'
 import type { CustomerReportOperation, RegisteredTicket } from '../api/types'
 import { isTicketUuid, ticketIdFromResultRef } from './ticket'
 
@@ -28,6 +28,30 @@ export function validateReportOperation(value: unknown, target: ReportOperationT
     || !Array.isArray(value.error.question_ids) || !value.error.question_ids.every(id => typeof id === 'string' && id.trim())
     || !timestamp(value.created_at) || !timestamp(value.updated_at)) throw new ApiError(200, 'INVALID_REPORT_OPERATION', '登记操作返回与当前报障或既有规则门禁不一致，请手动重查；不会再次提交报障', '—')
   return value as unknown as CustomerReportOperation
+}
+
+/** Resolve a durable acceptance with GETs only, publishing nothing until both references agree. */
+export async function readAcceptedReport(operationId: string, context: { tenantId: string; actorId: string }, options: {
+  signal?: AbortSignal; isCurrent?: () => boolean
+} = {}, client: Pick<typeof api, 'request'> = api): Promise<{ operation: CustomerReportOperation; ticket: RegisteredTicket }> {
+  const current = () => {
+    if (options.signal?.aborted || options.isCurrent?.() === false) throw new StaleRequestError()
+  }
+  current()
+  if (!isTicketUuid(operationId) || !isTicketUuid(context.tenantId) || !isTicketUuid(context.actorId)) throw new ApiError(0, 'INVALID_REPORT_OPERATION_REFERENCE', '当前登记操作或登录主体不一致，请重新查询；已受理报障不会再次提交', '—')
+  const id = operationId.toLowerCase()
+  const result = await client.request<unknown>(`/operations/${id}`, { signal: options.signal })
+  current()
+  const ticketId = record(result) ? ticketIdFromResultRef(result.result_ref) : null
+  if (!ticketId) throw new ApiError(200, 'INVALID_REPORT_OPERATION', '登记结果引用不符合本应用路径，请重新查询；不会打开外部地址或再次提交', '—')
+  const operation = validateReportOperation(result, { id: ticketId, tenant_id: context.tenantId, operation_id: id })
+  const detail = await client.request<unknown>(`/tickets/${ticketId}`, { signal: options.signal })
+  current()
+  if (!record(detail) || !isTicketUuid(detail.id) || detail.id.toLowerCase() !== ticketId
+    || detail.tenant_id !== context.tenantId || detail.reporter_id !== context.actorId
+    || !isTicketUuid(detail.operation_id) || detail.operation_id.toLowerCase() !== id
+    || typeof detail.version !== 'number' || !Number.isSafeInteger(detail.version) || detail.version < 1 || !Array.isArray(detail.attachments)) throw new ApiError(200, 'INVALID_REPORT_DETAIL', '登记详情与本次操作或当前报障主体不一致，请重查；不会重新提交报障', '—')
+  return { operation, ticket: detail as unknown as RegisteredTicket }
 }
 
 /** A read is independent of the ticket snapshot. Failed or superseded reads cannot erase the registration. */

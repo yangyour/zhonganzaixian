@@ -33,15 +33,23 @@ public class PlatformController {
     private final PlatformRepository repository;
     private final ObjectMapper mapper;
     private final ObjectProvider<TestOidcConfiguration.OidcDependencyProbe> identityProbe;
+    private final ObjectProvider<PhotoConfiguration.PhotoDependencyProbe> photoProbe;
     private final byte[] cursorSecret=new byte[32];
     private static final Set<String> TYPES=Set.of("router","switch","firewall","ap","wireless_controller","other");
     private record Access(FixtureUser user,Tenant tenant,Membership membership,List<String> capabilities){}
-    public PlatformController(PlatformRepository repository,ObjectMapper mapper,ObjectProvider<TestOidcConfiguration.OidcDependencyProbe> identityProbe){this.repository=repository;this.mapper=mapper;this.identityProbe=identityProbe;new SecureRandom().nextBytes(cursorSecret);}
+    public PlatformController(PlatformRepository repository,ObjectMapper mapper,ObjectProvider<TestOidcConfiguration.OidcDependencyProbe> identityProbe,ObjectProvider<PhotoConfiguration.PhotoDependencyProbe> photoProbe){this.repository=repository;this.mapper=mapper;this.identityProbe=identityProbe;this.photoProbe=photoProbe;new SecureRandom().nextBytes(cursorSecret);}
     @GetMapping("/health/live") Object live(HttpServletRequest request){return success(map("status","UP","mode",repository.metadata().mode(),"source",repository.metadata().source()),request);}
     @GetMapping("/health/ready") Object ready(HttpServletRequest request){
         if(!repository.dependencyReady())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境 PostgreSQL 不可用，未就绪");
         if(repository.metadata().mode().equals("remote_test")&&(identityProbe.getIfAvailable()==null||!identityProbe.getIfAvailable().ready()))throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境 Keycloak 身份源不可用，未就绪");
-        return success(map("status","READY_REMOTE_TEST","ready",true,"mode",repository.metadata().mode(),"source",repository.metadata().source(),"durable",repository.metadata().durable(),"production_ready",false),request);
+        PhotoConfiguration.PhotoReadiness photos=new PhotoConfiguration.PhotoReadiness(false,false,false,false,List.of("PHOTO_NOT_CONFIGURED"));
+        if(repository.metadata().mode().equals("remote_test")){
+            PhotoConfiguration.PhotoDependencyProbe probe=photoProbe.getIfAvailable();
+            if(probe==null)throw new DomainException(503,"UPSTREAM_UNAVAILABLE","照片依赖探测未注册，未就绪",List.of(map("component","photos","reasons",List.of("PHOTO_PROBE_MISSING"))));
+            photos=probe.status();
+            if(photos.enabled()&&!photos.ready())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境照片能力未就绪",List.of(map("component","photos","photos",photos.dto())));
+        }
+        return success(map("status","READY_REMOTE_TEST","ready",true,"mode",repository.metadata().mode(),"source",repository.metadata().source(),"durable",repository.metadata().durable(),"production_ready",false,"photos",photos.dto()),request);
     }
     @GetMapping("/assets") Object assets(@RequestParam Map<String,String> query,HttpServletRequest request){
         Access access=access(request,"assets:read");Set<String> allowed=Set.of("cursor","page_size","type","site_id","status","q");

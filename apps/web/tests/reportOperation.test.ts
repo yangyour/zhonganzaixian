@@ -1,13 +1,14 @@
 import { describe, expect, it, vi } from 'vitest'
 import { ApiClient } from '../src/api/client'
 import type { CustomerReportOperation, RegisteredTicket } from '../src/api/types'
-import { createReportOperationReader, validateReportOperation, type ReportOperationContext, type ReportOperationReadState, type ReportOperationTarget } from '../src/utils/reportOperation'
+import { createReportOperationReader, readAcceptedReport, validateReportOperation, type ReportOperationContext, type ReportOperationReadState, type ReportOperationTarget } from '../src/utils/reportOperation'
 
 const tenantId = '10000000-0000-0000-0000-000000000000'
 const ticketId = '20000000-0000-0000-0000-000000000000'
 const operationId = '30000000-0000-0000-0000-000000000000'
 const otherTicketId = '40000000-0000-0000-0000-000000000000'
 const otherOperationId = '50000000-0000-0000-0000-000000000000'
+const actorId = '60000000-0000-0000-0000-000000000000'
 const target: ReportOperationTarget = { id: ticketId, tenant_id: tenantId, operation_id: operationId }
 const operation = (changes: Record<string, unknown> = {}): CustomerReportOperation => ({
   id: operationId, tenant_id: tenantId, kind: 'CUSTOMER_REPORT_REGISTRATION', status: 'PENDING', step: 'AWAITING_TICKET_CONFIGURATION', progress: null,
@@ -144,5 +145,74 @@ describe('read-only registration operation state', () => {
     expect(await result.load(ticket)).toBe(false)
     expect(result.state).toMatchObject({ status: 'error', error: { code: 'INVALID_REPORT_OPERATION' } })
     expect(ticket.description).toBe('original registration'); expect(result.state).not.toHaveProperty('operation')
+  })
+})
+
+describe('accepted registration form reads', () => {
+  const context = { tenantId, actorId }
+  const registeredDetail: RegisteredTicket = {
+    ...target, reporter_id: actorId, receipt_no: 'EXISTING-RECEIPT', title: 'Existing registration', description: 'original saved description',
+    source: 'customer_report', category: '网络不通', impact_scope: 'partial_area', urgency: 'normal', asset_id: otherTicketId, asset_name: 'Unit device',
+    contact_name: 'original contact', contact_phone: '1234', contact_binding_status: 'UNVERIFIED', registration_status: 'REGISTERED', version: 1, attachments: [],
+    state: null, external_id: null, external_state: null, sync_state: 'NOT_APPLICABLE', authority_source: 'MOP', authority_status: 'RULES_PENDING',
+    priority: null, response_due_at: null, recovery_due_at: null, created_at: '2026-10-01T00:00:00Z', updated_at: '2026-10-01T00:00:00Z',
+    history: [{ action: 'REGISTER', actor_id: actorId, occurred_at: '2026-10-01T00:00:00Z', version: 1 }],
+  }
+  const detail = (changes: Record<string, unknown> = {}): unknown => ({ ...registeredDetail, ...changes })
+
+  it('resolves an existing registration returned by semantic deduplication without replacing its text or null SLA values', async () => {
+    const transport = vi.fn(async (url: RequestInfo | URL, _options?: RequestInit) => json(String(url).includes('/operations/') ? operation() : detail()))
+    const result = await readAcceptedReport(operationId, context, {}, new ApiClient(transport))
+    expect(result.operation).toMatchObject({ id: operationId, status: 'PENDING', progress: null, error: { code: 'CONFIG_PENDING', retryable: false } })
+    expect(result.ticket).toMatchObject({ operation_id: operationId, receipt_no: 'EXISTING-RECEIPT', description: 'original saved description', contact_name: 'original contact', version: 1, state: null, priority: null, response_due_at: null, recovery_due_at: null })
+    expect(transport.mock.calls.map(([url]) => url)).toEqual([`/api/v1/operations/${operationId}`, `/api/v1/tickets/${ticketId}`])
+    for (const [, options] of transport.mock.calls) expect(options).toMatchObject({ method: 'GET', body: undefined })
+  })
+
+  it.each([
+    ['null gate', { error: null }],
+    ['missing questions', { error: { code: 'CONFIG_PENDING', message: 'pending', retryable: false } }],
+    ['retry instruction', { error: { ...operation().error, retryable: true } }],
+    ['another tenant', { tenant_id: otherTicketId }],
+    ['invalid time', { updated_at: 'not-a-date' }],
+  ])('rejects %s before reading or exposing a detail, leaving acceptance available for a GET requery', async (_boundary, changes) => {
+    const transport = vi.fn(async (_url: RequestInfo | URL, _options?: RequestInit) => json(operation(changes as Record<string, unknown>)))
+    const client = new ApiClient(transport)
+    await expect(readAcceptedReport(operationId, context, {}, client)).rejects.toMatchObject({ code: 'INVALID_REPORT_OPERATION' })
+    expect(transport).toHaveBeenCalledTimes(1)
+    transport.mockImplementation(async (url: RequestInfo | URL) => json(String(url).includes('/operations/') ? operation() : detail()))
+    await expect(readAcceptedReport(operationId, context, {}, client)).resolves.toMatchObject({ ticket: { id: ticketId, operation_id: operationId } })
+    expect(transport).toHaveBeenCalledTimes(3)
+    for (const [, options] of transport.mock.calls) expect(options).toMatchObject({ method: 'GET', body: undefined })
+  })
+
+  it.each([
+    ['another operation', { operation_id: otherOperationId }],
+    ['another ticket', { id: otherTicketId }],
+    ['another tenant', { tenant_id: otherTicketId }],
+    ['another reporter', { reporter_id: otherTicketId }],
+  ])('rejects a detail belonging to %s instead of completing the accepted registration', async (_boundary, changes) => {
+    const transport = vi.fn(async (url: RequestInfo | URL, _options?: RequestInit) => json(String(url).includes('/operations/') ? operation() : detail(changes as Record<string, unknown>)))
+    await expect(readAcceptedReport(operationId, context, {}, new ApiClient(transport))).rejects.toMatchObject({ code: 'INVALID_REPORT_DETAIL' })
+    expect(transport).toHaveBeenCalledTimes(2)
+    for (const [, options] of transport.mock.calls) expect(options).toMatchObject({ method: 'GET', body: undefined })
+  })
+
+  it('requeries after a failed accepted-operation GET without creating another registration', async () => {
+    const transport = vi.fn().mockResolvedValueOnce(failed()).mockResolvedValueOnce(json(operation())).mockResolvedValueOnce(json(detail()))
+    const client = new ApiClient(transport)
+    await expect(readAcceptedReport(operationId, context, {}, client)).rejects.toMatchObject({ status: 503 })
+    await expect(readAcceptedReport(operationId, context, {}, client)).resolves.toMatchObject({ ticket: { id: ticketId } })
+    expect(transport.mock.calls.map(([url]) => url)).toEqual([`/api/v1/operations/${operationId}`, `/api/v1/operations/${operationId}`, `/api/v1/tickets/${ticketId}`])
+    for (const [, options] of transport.mock.calls) expect(options).toMatchObject({ method: 'GET', body: undefined })
+  })
+
+  it('does not follow an old result reference after the form context changes before operation response arrives', async () => {
+    const pending = deferred<Response>(), transport = vi.fn(async (_url: RequestInfo | URL, _options?: RequestInit) => pending.promise)
+    let current = true
+    const read = readAcceptedReport(operationId, context, { isCurrent: () => current }, new ApiClient(transport))
+    const rejected = expect(read).rejects.toMatchObject({ name: 'AbortError' })
+    current = false; pending.resolve(json(operation())); await rejected
+    expect(transport).toHaveBeenCalledTimes(1)
   })
 })

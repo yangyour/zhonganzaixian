@@ -1,10 +1,37 @@
 # 本地、云端与指定测试环境验证记录
 
-2026-10-01最新接回本地后，MinIO JVM依赖兼容修复已有独立实际证据：5项适配器安全测试、8项Controller隔离测试、3项指定MinIO存储测试通过。范围及工作区构建边界见[本地接续验证](local-runtime-verification.md)，不把这次SDK结果当作完整照片PG/HTTP/UI验收；以下云端结果保留其原环境和版本边界。
+更新：2026-10-01。云端最后交接`1db3976`已接回本地并停止云端业务写入；本批使用指定服务器组件和虚构项目数据，不以fixture或本机新服务替代。当前本地结果与以下云端/历史记录分开，不跨批次重复累加。
 
-首次记录：2026-09-30；更新：2026-10-01。当前在云端接续`handoff/cloud-20261001-photos`，目标仍为全部128项合同需求。历史Windows本地应用曾通过loopback SSH隧道连接指定PostgreSQL/Keycloak/MinIO；云端尚未复现组件连接或应用启动。以下分开记录本轮云端验证与历史本地证据，不合并计数，不以fixture或新建本地服务代替指定组件。
+## 本批本地照片接续
 
-## 本轮云端照片：PARTIAL
+|检查|实际结果|证据与边界|
+|---|---|---|
+|V5独立迁移及结构/ACL|Check后ApplyPhotos执行V5一次；核验通过；再次Apply为0DDL|迁移身份执行，API/Worker不自动迁移，V1–V4历史保留；V5 SQL SHA-256 `5A84F62BDAAB9BADFD5D87F4D30AE0AC1F9C1AE2F48D0D84E0635485A7BBDC55` 已冻结|
+|完整Maven编译、打包及纯单元/隔离|96项通过，0失败/错误/跳过|根`deploy/check.ps1`真实执行通过；现存25份Surefire仅解析安全testsuite属性，不读取日志/环境属性|
+|配置解析JUnit包装|15项通过，0失败/错误/跳过|`cn.mop.persistence.configuration.ConfigurationResolutionTest`包含于96项；仍无配置解析PG/API接入或客户批准|
+|指定PostgreSQL集成|43项通过，0失败/错误/跳过|照片24项+原基线19项；PG事务/ACL/快照/CAS/租约/fencing测试，不代替真实MinIO或页面|
+|指定MinIO存储|3项通过，0失败/错误/跳过|复用项目桶与受限账号；真实原图存储/hash和不可覆写行为；历史fixture13项仅跳过，不计通过|
+|前端全量、类型及构建|全量113项通过；遮挡修复后41 operation+3 workspace定向回归及最终vue-tsc/Vite build通过|44项已包含于113项，不累加；最终Vite7.3.6、1661 modules、8.10s，主464.09kB/Tickets54.49kB/Configurations49.84kB，无包体警告|
+|实际契约V0.6|最终generator --check及8项契约测试再次通过，退出0|包含typed照片就绪；此次是既有8项回归，不累加；JSON Schema与真实HTTP Ajv分别记录|
+|SDK提交GitHub CI回读|eba5630的push run 36836074365为completed/success，3个job均成功|[步骤摘要](evidence/github-eba5630-verification.json)只对应旧SHA；本批照片最终提交需独立回读对应CI，不连接私有组件、不计联调|
+|真实OIDC/HTTP及原图链路|4个测试身份真实登录，80次HTTP全部通过并经V0.6 Ajv校验|真实Worker→指定PG/MinIO原图存储、平台grant和hash回读；[公开HTTP证据](evidence/local-report-photo-http.json)|
+|边界/重启/存储断链/撤权专项|4场景52次真实HTTP通过，finally恢复|5_000_000接收/5_000_001拒绝及原图hash；耐久API/Worker重启；MinIO项目转发断链/503/恢复；成员撤权/旧Cookie与grant拒绝；[专项证据](evidence/local-photo-resilience.json)|
+|运行中Worker断链RETRY_WAIT|独立25次真实HTTP通过，finally恢复|正常ready200启动后断项目MinIO；PG快照证明真实RETRY_WAIT、未来next_at、lease释放和重试审计；恢复后同PID/startTime自然完成原任务/hash；[独立证据](evidence/local-photo-worker-retry.json)|
+|照片1440px/390px页面|36项通过，0 pageerror；Edge154.0.4258.48持久Playwright无头|1440×900及390×844手机仿真，正常控件操作与逐图检查；[UI证据](evidence/local-report-photo-ui.json)，不代表物理相机/企微/全浏览器|
+
+[local-photo-build-summary.json](evidence/local-photo-build-summary.json)核对现存Surefire：25套155项，142项通过、13项历史fixture跳过，0失败/错误。96纯单元/隔离、43 PG和3 MinIO与旧SDK16项有包含关系，不重复累加。SDK修复已独立提交`eba5630`，详情和运行入口见[本地接续验证](local-runtime-verification.md)。
+
+照片就绪实际检查PG/OIDC、策略、V5结构/ACL及MinIO；已配置时照片enabled/ready/policy_ready/schema_ready/storage_ready全true，缺依赖503且不会fixture回退。未绑定file/FILE_UPLOAD仅上传人可读，内部角色按当前授权读取其他人已绑定登记的照片。前端受理后只GET，跨登记明确原队列目标，不确定请求保留原File/键/版本/目标。JPEG/PNG是开发方向，16_384边长/25_000_000像素是技术防护，不代表生产文件批准或病毒扫描。
+
+真实UI发现登记回读打开详情抽屉遮挡仍需补传的表单。本批改为表单打开时暂存登记ID、只刷新列表，关闭后才展示详情，上下文重置清空待ID；修复后正常上传/追加可达。36项包括授权下载PNG原始hash、先真实route.fetch提交再丢上传/追加响应并验证同File/key与追加key/body/version/target、两页真实CAS409比较重试、3张已存配额、跨登记A/B队列保护、策略重载、租户A/B/A与logout401。另有50秒探索；390px仿真表单366px、长名换行无水平溢出，截图仅在Git忽略的`.local`。
+
+80次基础HTTP、52次恢复/撤权HTTP、25次运行中Worker重试HTTP和36项UI分别记录，不当作同一脚本或测试数；44项定向单元是113项的重复回归，不加为157项。旧52次脚本先停Worker，其RETRY_WAIT=NOT_RUN保留为单脚本历史边界，另25次证据补齐运行时重试。新专项只对新虚构job.next_at执行两次各1行CAS，不改lease/token/attempt/status；finally恢复marker/hold、三进程就绪与四会话，未改远程配置/V5/IAM/成员。
+
+完整M5-5/M8-6、全部128合同TC未完成。正式state/priority/SLA仍null，扫描UNSCANNED、生产UNVERIFIED、保留null；真实手机拍照、企微送达、客户正式规则和许可仍待确认。
+
+## 历史云端照片：PARTIAL
+
+以下保留云端当时的版本及NOT_RUN，不能改写为在云端执行成功；本批本地V5、完整构建及真实组件结果以上节为准。
 
 云端实际工具链为Node 22.22.0、npm 10.9.4、JDK 17.0.19、Maven 3.9.9、Python 3.12.14，通过`/workspace/cloud-setup/activate.sh`激活。`develop.txt`存在，私有runtime及known_hosts缺失；指定SSH路径经平台代理受到目标域名策略拒绝，Maven Central返回429、Google镜像403。完整后端构建、fullstart及照片真实联调均未执行完成。V1–V4无修改，V5仍是未执行草稿；API/Worker启动无自动Flyway迁移。
 
@@ -27,12 +54,12 @@
 
 主聊天只读UI显示GPT-6.1 Sol选中、GPT-6.1 Sol Ultra菜单配置，记为UI_CONFIGURED；代理spawn参数显式指定同模型/强度。当前云会话最新原生/status界面显示used 143,050/total 258K，上下文记为UI_REPORTED 258K，1M为NOT_APPLIED。底层精确窗口与自动压缩阈值仍UNKNOWN，不由显示推定272000、95%或256k tokens；模型/强度服务端回显仍SERVER_NOT_ECHOED。当前Onboarding更新schema无context字段，也没有cloud-coordinator或host config工具；未改无效CLI或提示词覆盖，未重启。本结论仅描述当前云会话，不将原生模型最大窗口当作此会话证据，也不推定所有Cloud都不支持1M。
 
-## 后续独立D04/D07纯功能
+## 历史云端后续独立D04/D07纯功能
 
 |功能|实际执行结果|边界与记录|
 |---|---|---|
 |配置筛选/建议差异|新增20项；当次全前端69项、类型和构建通过|[独立证据](evidence/cloud-configuration-comparison-verification.json)；无真实影响对象、HTTP/UI或发布验证|
-|配置解析/不可变快照|Java17严格编译；15组250个纯断言通过|[独立证据](evidence/cloud-configuration-resolution-verification.json)；15个JUnit包装及真实持久化/客户核验未执行；登记值未激活|
+|配置解析/不可变快照|Java17严格编译；15组250个纯断言通过|[云端证据](evidence/cloud-configuration-resolution-verification.json)；云端当时15个JUnit包装未执行，本批本地15项已通过；真实持久化/客户核验未实现，登记值未激活|
 |工单详情operation回读|新增29项；当次全前端98项、类型和构建通过|[独立证据](evidence/cloud-report-operation-verification.json)；只GET现有操作，真实OIDC/HTTP/UI仍未执行|
 
 98项包含此前69项，69项包含照片批次49项，不重复累加。纯核心的合成核验/发布事实不表示真实客户批准；上述切片不完成完整D04/D07或128项合同验收。
@@ -41,7 +68,7 @@
 
 资产导入已解析行的纯预检独立通过：JDK17严格编译、14组1,479个断言，50行三类错误准确阻断三行，500行计算12.67ms；[实现边界](asset-import-precheck.md)和[证据](evidence/cloud-asset-import-precheck-verification.json)明确没有.xlsx/CSV解析或实际入库。该计时不表示完整导入≤60秒；TC-M3-6、真实并发配额和重复导入均NOT_RUN。
 
-[工程CI配置](ci-validation.md)通过本地结构/脚本语法、官方action refs/metadata核验和实际Maven版本门禁；隔离离线安装及公开Web类型/构建实际通过，未改源码锁或node_modules。配置定义的三个GitHub job结果NOT_OBSERVED，Actions回读通道受到HTTP传输/代理拒绝，不能把配置或本地构建写成完整后端CI/联调通过。配置解析portable脚本另实际复现原15组250个断言，不计为新增测试。
+历史云端[CI配置](ci-validation.md)通过本地结构/语法及隔离Web构建，当时Actions读取受HTTP传输/代理拒绝，三个job为NOT_OBSERVED；此历史不改写。后续eba5630已取得上表所列真实成功回读，早期1db3976/d4375f7失败保留，本批照片最终提交需独立回读对应CI。CI不连接私有组件，不能算联调。配置解析portable脚本另复现原15组250个断言，不计新增测试。
 
 ## 历史本地已执行结果
 
@@ -91,9 +118,9 @@
 
 移动截图已生成于本机 `.local/qa-remote/assets-mobile.png`。`.local/`、编译产物、私有运行配置和会话文件均未作为Git交付材料；截图不等同于服务端授权或组件联调证据。
 
-## 历史本地复现入口与云端待执行
+## 当前本地复现入口与历史云端边界
 
-Windows历史入口为`pwsh -File deploy/check.ps1 -Install`；云端Linux入口及迁移审批/执行分离见[运行说明](../README.md)。需先备齐受控私有配置、网络和已审核结构。现有远程PG测试的Flyway target为4，可能执行V1–V4与写入测试数据，不能作为只读检查或V5照片验收。
+Windows当前完整检查入口为`pwsh -File deploy/check.ps1 -Install`；独立迁移默认Check→显式ApplyPhotos及`-WithPhotoWorker`运行见[README](../README.md)。先停止本项目应用并备齐受控私有配置，测试会写项目数据，不能称只读。原target4测试保留基线作用，V5由独立CLI执行；历史云端NOT_RUN不代表本批本地未验证。
 
 启动应用后执行 `npm run test:api`：捕获工具在已安装浏览器中完成真实Keycloak登录，将临时Cookie/CSRF只写入被Git忽略的私有会话文件，随后执行HTTP契约检查。重启验证的入口及执行顺序见README。云端或第二机器复现仍须通过受控私有配置连接同一指定测试环境；缺少连接资料不能据纯单元通过宣称已联调。
 
@@ -101,8 +128,8 @@ Windows历史入口为`pwsh -File deploy/check.ps1 -Install`；云端Linux入口
 
 - 已验证的是上述测试切片。标准OIDC成功流程不等于已经实测全部伪造签名、密钥轮换、会话超时与身份灾备分支。
 - PostgreSQL测试库和API的tenant+id约束不替代客户生产RLS/独立库及六层隔离验收；生产Q02/Q03/Q17与客户正式岗位仍待确认，production/integration不作为可用运行模式。
-- Redis、RabbitMQ没有对应缓存/消息业务联调；MinIO项目空间和受限账号的历史组件验证不代替云端照片应用验证。Zabbix、外部ITSM、堡垒机及相关资料缺失保持登记状态，真实监控未知值不冒充正常。一期本平台工单权威已由用户确定，缺失外部ITSM不阻塞本平台持久报障登记；正式规则仍待落实。
-- 报障耐久outbox仍CONFIG_PENDING，消息投递、其他业务消费者、审计外部受保护链头及至少3年保留治理尚未实现。本轮新增仅照片PG消费者/租约fencing代码，未真实运行，不因该代码宣称报障outbox已执行或送达。
+- Redis、RabbitMQ没有对应缓存/消息业务联调；本批MinIO照片链路已实际验证，历史云端未执行记录保持原边界。Zabbix、外部ITSM、堡垒机及相关资料缺失继续登记，真实监控未知值不冒充正常。本平台权威方向已明确，正式工单规则仍待落实。
+- 报障耐久outbox仍CONFIG_PENDING，消息投递、其他业务消费者、审计外部受保护链头及至少3年保留治理未实现。本批真实运行的是照片PG Worker，不表示报障outbox已执行或送达。
 - 第二机器/云端复现、客户H5、全浏览器、真实设备采样、容量/性能/灾备及128项合同逐项验收尚未完成。
 
 首批local_fixture记录已归档至 [历史验证](history/2026-09-30-local-fixture-verification.md)、[历史QA计划](history/2026-09-30-local-fixture-qa-inventory.md)及 [历史摘要](history/2026-09-30-local-fixture-verification-summary.json)。其16项后端/33个HTTP等旧计数仅描述当时fixture阶段，不能合并为本轮真实组件结果。

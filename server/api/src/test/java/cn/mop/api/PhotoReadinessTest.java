@@ -1,0 +1,79 @@
+package cn.mop.api;
+
+import cn.mop.domain.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.mock.env.MockEnvironment;
+import org.springframework.mock.web.MockHttpServletRequest;
+import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+/** Isolated readiness behavior only; actual PostgreSQL/MinIO availability requires remote checks. */
+class PhotoReadinessTest {
+    private PlatformRepository repository;
+    private PhotoObjectStore store;
+    private PhotoConfiguration configuration;
+    private MockHttpServletRequest request;
+
+    @BeforeEach void setup(){
+        repository=mock(PlatformRepository.class);store=mock(PhotoObjectStore.class);configuration=new PhotoConfiguration();
+        when(repository.metadata()).thenReturn(new RepositoryMetadata("remote_test","postgresql",true,"test_oidc"));
+        when(repository.dependencyReady()).thenReturn(true);when(repository.photoDependencyProblems()).thenReturn(List.of());
+        when(store.ready()).thenReturn(true);request=new MockHttpServletRequest();request.setAttribute("mop.trace_id","isolated-readiness");
+    }
+    private PhotoConfiguration.PhotoDependencyProbe probe(MockEnvironment environment){
+        return configuration.photoDependencyProbe(environment,configuration.photoPolicy(environment),store,repository);
+    }
+    private PlatformController controller(PhotoConfiguration.PhotoDependencyProbe probe){
+        var identity=mock(TestOidcConfiguration.OidcDependencyProbe.class);when(identity.ready()).thenReturn(true);
+        return new PlatformController(repository,new ObjectMapper(),provider(identity),provider(probe));
+    }
+    private static <T> ObjectProvider<T> provider(T bean){
+        ObjectProvider<T> provider=mock(ObjectProvider.class);when(provider.getIfAvailable()).thenReturn(bean);return provider;
+    }
+    private static MockEnvironment enabled(){return new MockEnvironment().withProperty("MOP_PHOTO_ALLOWED_MEDIA_TYPES","image/jpeg,image/png");}
+    private static Map<?,?> data(Object response){return (Map<?,?>)((Map<?,?>)response).get("data");}
+    private static Map<?,?> photos(DomainException error){return (Map<?,?>)((Map<?,?>)error.details.get(0)).get("photos");}
+
+    @Test void noPhotoConfigurationKeepsBaseReadinessButNeverReportsPhotoReady(){
+        var probe=probe(new MockEnvironment());var response=data(controller(probe).ready(request));Map<?,?> photos=(Map<?,?>)response.get("photos");
+        assertEquals(true,response.get("ready"));assertEquals(false,photos.get("enabled"));assertEquals(false,photos.get("ready"));
+        assertEquals("PENDING",photos.get("policy_source"));assertEquals(List.of("PHOTO_NOT_CONFIGURED"),photos.get("reasons"));
+        verify(repository,never()).photoDependencyProblems();verifyNoInteractions(store);
+    }
+    @Test void configuredPhotoSchemaFailureCannotHideBehindHealthyPostgresAndOidc(){
+        when(repository.photoDependencyProblems()).thenReturn(List.of("PHOTO_SCHEMA_MISSING:mop_file"));
+        DomainException error=assertThrows(DomainException.class,()->controller(probe(enabled())).ready(request));
+        assertEquals(503,error.status);assertEquals("UPSTREAM_UNAVAILABLE",error.code);
+        assertEquals(false,photos(error).get("schema_ready"));assertEquals(true,photos(error).get("storage_ready"));
+        assertEquals(List.of("PHOTO_SCHEMA_MISSING:mop_file"),photos(error).get("reasons"));
+    }
+    @Test void storageOutageAndRecoveryAreReflectedOnEachReadyRequest(){
+        var controller=controller(probe(enabled()));when(store.ready()).thenReturn(false).thenReturn(true);
+        DomainException outage=assertThrows(DomainException.class,()->controller.ready(request));assertEquals(503,outage.status);
+        assertEquals(false,photos(outage).get("ready"));assertEquals(List.of("PHOTO_STORAGE_UNAVAILABLE"),photos(outage).get("reasons"));
+        Map<?,?> recovered=(Map<?,?>)data(controller.ready(request)).get("photos");assertEquals(true,recovered.get("ready"));assertEquals(List.of(),recovered.get("reasons"));
+        verify(store,times(2)).ready();verify(repository,times(2)).photoDependencyProblems();
+    }
+    @Test void storageConfigurationWithoutPolicyIsEnabledAndExplicitlyNotReady(){
+        var environment=new MockEnvironment().withProperty("MOP_S3_BUCKET","mop-test-photos");
+        DomainException error=assertThrows(DomainException.class,()->controller(probe(environment)).ready(request));
+        assertEquals(503,error.status);assertEquals(true,photos(error).get("enabled"));assertEquals(false,photos(error).get("policy_ready"));
+        assertEquals("PENDING",photos(error).get("policy_source"));assertEquals(List.of("PHOTO_POLICY_NOT_CONFIGURED"),photos(error).get("reasons"));
+    }
+    @Test void dependencyExceptionsDoNotLeakProviderOrCredentialMessages(){
+        when(repository.photoDependencyProblems()).thenThrow(new IllegalStateException("private-connection-detail"));
+        when(store.ready()).thenThrow(new IllegalStateException("private-storage-detail"));
+        DomainException error=assertThrows(DomainException.class,()->controller(probe(enabled())).ready(request));
+        assertEquals(503,error.status);assertEquals(List.of("PHOTO_DATABASE_UNAVAILABLE","PHOTO_STORAGE_UNAVAILABLE"),photos(error).get("reasons"));
+        assertFalse(error.details.toString().contains("private-"));
+    }
+    @Test void missingProbeFailsClosedAndLivenessDoesNotProbePhotoComponents(){
+        PlatformController controller=controller(null);DomainException error=assertThrows(DomainException.class,()->controller.ready(request));
+        assertEquals(503,error.status);assertEquals(List.of("PHOTO_PROBE_MISSING"),((Map<?,?>)error.details.get(0)).get("reasons"));
+        assertEquals("UP",data(controller.live(request)).get("status"));verify(repository,never()).photoDependencyProblems();verifyNoInteractions(store);
+    }
+}

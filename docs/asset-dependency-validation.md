@@ -4,7 +4,7 @@ M3-9、M3-D10及TOPO-D01的结构核心位于`cn.mop.domain.assetdependency`。�
 
 未知、未授权及跨租户对象统一404且不披露引用标识。不完整图返回待复核错误；完整图与整个新增批次一起检查，拒绝自指、有向环及跨类型/停用边绕过。类型、抑制范围和启用状态按输入保留，包括null，不推定客户字典、抑制政策或正式批准。返回值是不可变的校验提案，版本未递增，也未保存。
 
-真实JDK17严格编译及12组14,987个隔离断言通过：独立Floyd-Warshall算法对照4096种四节点有向图（543个DAG、3553个有环图）；25,000边深链在256k栈下校验并拒绝反向成环。数字是断言数，不是合同验收条数。证据见[独立记录](evidence/cloud-asset-dependency-verification.json)。激活JDK17后可复现：
+历史云端JDK17严格编译及12组14,987个隔离断言通过：独立Floyd-Warshall算法对照4096种四节点有向图（543个DAG、3553个有环图）；25,000边深链在256k栈下校验并拒绝反向成环。数字是断言数，不是合同验收条数，见[独立证据](evidence/cloud-asset-dependency-verification.json)。2026-10-01本地完整Maven模块编译/打包已通过；现存Surefire没有本核心专用JUnit套件，不新增其测试计数，真实PG/API/监控边界仍如下，见[本地验证](local-runtime-verification.md)。激活JDK17后可复现历史纯断言：
 
 ```bash
 bash tools/verify-asset-dependencies-pure.sh

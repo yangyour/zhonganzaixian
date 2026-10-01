@@ -1,0 +1,305 @@
+{
+  "mode": "remote_test",
+  "passed": true,
+  "checks": [
+    {
+      "stage": "initial_current_viewer",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "initial_storage_and_schema_ready",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "fresh_durable_photo_while_worker_stopped",
+      "http_status": 202,
+      "contract_valid": true
+    },
+    {
+      "stage": "fresh_queued_operation",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "fresh_pending_file",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "fresh_session_viewerA",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "fresh_session_tadmin",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "fresh_session_msp",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "fresh_session_viewerB",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "normal_worker_startup_gate_completed",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "only_minio_forward_disconnected_with_worker_running",
+      "http_status": 503,
+      "contract_valid": true
+    },
+    {
+      "stage": "running_worker_retry_wait_http",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "storage_recovered_without_worker_restart",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "same_operation_after_storage_recovery",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "same_operation_after_storage_recovery",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "same_operation_after_storage_recovery",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "same_operation_after_storage_recovery",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "same_operation_after_storage_recovery",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "same_file_ready_after_natural_retry",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "new_authorized_original_grant",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "natural_retry_original_hash_readback",
+      "http_status": 200,
+      "original_size_and_hash_verified": true
+    },
+    {
+      "stage": "fresh_session_viewerA",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "fresh_session_tadmin",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "fresh_session_msp",
+      "http_status": 200,
+      "contract_valid": true
+    },
+    {
+      "stage": "fresh_session_viewerB",
+      "http_status": 200,
+      "contract_valid": true
+    }
+  ],
+  "processes": [
+    {
+      "action": "Snapshot",
+      "processes": [
+        {
+          "owned": true,
+          "pid": 18996,
+          "start_time": "2026-10-01T09:21:24.1704111Z",
+          "name": "api"
+        },
+        {
+          "owned": true,
+          "pid": 26608,
+          "start_time": "2026-10-01T09:21:24.2038557Z",
+          "name": "web"
+        },
+        {
+          "owned": true,
+          "pid": 32120,
+          "start_time": "2026-10-01T09:21:29.5486540Z",
+          "name": "photo-worker"
+        }
+      ]
+    },
+    {
+      "action": "StopWorker",
+      "processes": [
+        {
+          "owned": true,
+          "start_time": "2026-10-01T09:21:24.1704111Z",
+          "name": "api",
+          "pid": 18996
+        },
+        {
+          "owned": true,
+          "start_time": "2026-10-01T09:21:24.2038557Z",
+          "name": "web",
+          "pid": 26608
+        }
+      ]
+    },
+    {
+      "action": "RestartApps",
+      "processes": [
+        {
+          "name": "api",
+          "pid": 16840,
+          "owned": true,
+          "start_time": "2026-10-01T09:48:48.3389339Z"
+        },
+        {
+          "name": "web",
+          "pid": 44444,
+          "owned": true,
+          "start_time": "2026-10-01T09:48:48.3704861Z"
+        },
+        {
+          "name": "photo-worker",
+          "pid": 48120,
+          "owned": true,
+          "start_time": "2026-10-01T09:48:53.2783733Z"
+        }
+      ]
+    },
+    {
+      "action": "Snapshot",
+      "processes": [
+        {
+          "owned": true,
+          "pid": 16840,
+          "start_time": "2026-10-01T09:48:48.3389339Z",
+          "name": "api"
+        },
+        {
+          "owned": true,
+          "pid": 44444,
+          "start_time": "2026-10-01T09:48:48.3704861Z",
+          "name": "web"
+        },
+        {
+          "owned": true,
+          "pid": 48120,
+          "start_time": "2026-10-01T09:48:53.2783733Z",
+          "name": "photo-worker"
+        }
+      ]
+    },
+    {
+      "action": "Snapshot",
+      "processes": [
+        {
+          "name": "api",
+          "pid": 16840,
+          "owned": true,
+          "start_time": "2026-10-01T09:48:48.3389339Z"
+        },
+        {
+          "name": "web",
+          "pid": 44444,
+          "owned": true,
+          "start_time": "2026-10-01T09:48:48.3704861Z"
+        },
+        {
+          "name": "photo-worker",
+          "pid": 48120,
+          "owned": true,
+          "start_time": "2026-10-01T09:48:53.2783733Z"
+        }
+      ]
+    },
+    {
+      "action": "Snapshot",
+      "processes": [
+        {
+          "pid": 16840,
+          "name": "api",
+          "start_time": "2026-10-01T09:48:48.3389339Z",
+          "owned": true
+        },
+        {
+          "pid": 44444,
+          "name": "web",
+          "start_time": "2026-10-01T09:48:48.3704861Z",
+          "owned": true
+        },
+        {
+          "pid": 48120,
+          "name": "photo-worker",
+          "start_time": "2026-10-01T09:48:53.2783733Z",
+          "owned": true
+        }
+      ]
+    }
+  ],
+  "real_components_only": true,
+  "migrations_executed": false,
+  "remote_configuration_changed": false,
+  "credential_output": "none",
+  "full_M5_M8_acceptance": false,
+  "environment": {
+    "postgresql": "17.9",
+    "keycloak": "26.2.4",
+    "minio": "RELEASE.2025-09-07T16-13-09Z",
+    "path": "designated_project_services_via_SSH"
+  },
+  "result": {
+    "status": "PASS",
+    "normal_worker_startup_gate_passed": true,
+    "only_owned_minio_forward_disabled": true,
+    "only_one_fictitious_next_at_field_scheduled": true,
+    "initial_hold_cas_rows": 1,
+    "release_cas_rows": 1,
+    "actual_retry_wait_http_and_consistent_pg_snapshot": true,
+    "retry_error_code": "UPSTREAM_UNAVAILABLE",
+    "retryable": true,
+    "retry_attempts": 1,
+    "retry_fencing_token": 1,
+    "retry_file_version": 2,
+    "actual_worker_retry_audit": true,
+    "natural_backoff_completed_without_manual_success_or_lease_reset": true,
+    "recovered_attempts": 2,
+    "recovered_fencing_token": 2,
+    "worker_pid_and_start_time_unchanged_during_fault_and_recovery": true,
+    "same_file_job_operation_completed": true,
+    "real_minio_original_hash_verified": true
+  },
+  "restoration": {
+    "minio_marker_removed": true,
+    "initial_owned_hold_released_without_lease_reset": true,
+    "owned_apps_ready": true,
+    "four_role_sessions_refreshed": true
+  },
+  "http_exchanges": 25,
+  "verified_at": "2026-10-01T09:52:42.619Z"
+}

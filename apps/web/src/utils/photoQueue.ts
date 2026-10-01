@@ -32,9 +32,15 @@ export function createPhotoQueue(client: Pick<typeof api, 'request' | 'requestBl
     rows.value.push({ uid, file: markRaw(file), previewUrl: URL.createObjectURL(file), attempt: null, status: 'SELECTED', operationId: null, record: null, uploading: false, reading: false, error: null, message: '', generation: 0 })
     return null
   }
+  function canRemove(uid: number) {
+    const row = rows.value.find(item => item.uid === uid)
+    if (!row || row.uploading || row.reading || row.status === 'UNCERTAIN') return false
+    // A 202 is durable. Keep its original File/key until both operation and file were read to a terminal state.
+    return !row.operationId || Boolean(row.record && ((row.status === 'READY' && row.record.upload_status === 'READY') || (row.status === 'FAILED' && row.record.upload_status === 'FAILED')))
+  }
   function remove(uid: number) {
     const row = rows.value.find(item => item.uid === uid)
-    if (!row || row.uploading || row.status === 'UNCERTAIN') return
+    if (!row || !canRemove(uid)) return
     ++row.generation; controllers.get(uid)?.abort(); controllers.delete(uid); URL.revokeObjectURL(row.previewUrl)
     rows.value = rows.value.filter(item => item.uid !== uid)
   }
@@ -133,6 +139,6 @@ export function createPhotoQueue(client: Pick<typeof api, 'request' | 'requestBl
   }
   const stopContextWatch = watch(() => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version], clear, { flush: 'sync' })
   function dispose() { stopContextWatch(); clear() }
-  return { rows, policy, policyLoading, policyError, contentUrls, contentBusy, contentErrors, loadPolicy, add, remove, upload, refresh, readyIds, view, reconcile, releaseContent, clear, dispose }
+  return { rows, policy, policyLoading, policyError, contentUrls, contentBusy, contentErrors, loadPolicy, add, canRemove, remove, upload, refresh, readyIds, view, reconcile, releaseContent, clear, dispose }
 }
 export type PhotoQueue = ReturnType<typeof createPhotoQueue>

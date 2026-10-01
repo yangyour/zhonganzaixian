@@ -49,8 +49,9 @@ function select(event: Event) {
       <div class="photo-row-actions">
         <el-button v-if="!row.operationId" :loading="row.uploading" :disabled="disabled || appender?.busy.value || appender?.uncertain.value" @click="queue.upload(row.uid)">{{ row.status === 'UNCERTAIN' ? '使用原文件与请求重试' : '上传原图' }}</el-button>
         <el-button v-else :loading="row.reading" :disabled="disabled" @click="queue.refresh(row.uid)">刷新上传状态</el-button>
-        <el-button :disabled="disabled || row.uploading || row.status === 'UNCERTAIN' || appender?.busy.value || appender?.uncertain.value" @click="queue.remove(row.uid)">移除本地选择</el-button>
+        <el-button :disabled="disabled || !queue.canRemove(row.uid) || appender?.busy.value || appender?.uncertain.value" @click="queue.remove(row.uid)">移除本地选择</el-button>
       </div>
+      <p v-if="!queue.canRemove(row.uid) && !row.uploading && !row.reading" class="field-help">{{ row.status === 'UNCERTAIN' ? '原文件与请求标识须保留，请使用原请求确认上传结果后再移除。' : '图片已受理，请先刷新至上传完成或处理失败，再移除本地选择。' }}</p>
       <ApiErrorNotice :error="row.error" pending-message="原文件仍保留在本页面；已受理图片只查询状态，不会另行上传。" />
     </div>
     <template v-if="appender && appender.permitted.value">

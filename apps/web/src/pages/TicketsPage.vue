@@ -11,8 +11,9 @@ import AppTable from '../components/AppTable.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import TicketReportForm from '../components/TicketReportForm.vue'
 import ReportPhotoPanel from '../components/ReportPhotoPanel.vue'
+import RetainedPhotoNotice from '../components/RetainedPhotoNotice.vue'
 import { createPhotoQueue } from '../utils/photoQueue'
-import { createPhotoAppender } from '../utils/photoAttachments'
+import { createTicketPhotoWorkspace } from '../utils/ticketPhotoWorkspace'
 import { createReportOperationReader, type ReportOperationReadState } from '../utils/reportOperation'
 
 const route = useRoute(), router = useRouter()
@@ -75,10 +76,9 @@ watch(() => ticket.value ? JSON.stringify([ticket.value.id, ticket.value.tenant_
   if (ticket.value) void readRegistrationOperation()
 }, { flush: 'sync' })
 const detailPhotos = createPhotoQueue()
-const photoTargetId = ref('')
-const appendTicket = ref<RegisteredTicket | null>(null)
-const detailAppender = createPhotoAppender(appendTicket, detailPhotos)
-const unresolvedPhotos = computed(() => detailAppender.uncertain.value || detailPhotos.rows.value.some(row => row.record?.ticket_id !== photoTargetId.value))
+const photoWorkspace = createTicketPhotoWorkspace(detailPhotos)
+const photoTargetId = photoWorkspace.targetId, appendTicket = photoWorkspace.ticket, detailAppender = photoWorkspace.appender
+const retainedPhotos = computed(() => photoWorkspace.unresolved.value && Boolean(photoTargetId.value) && queryString('ticket_id') !== photoTargetId.value)
 const matchingPhotoTarget = computed(() => ticket.value?.id === photoTargetId.value)
 watch(appendTicket, result => { if (result && result.id === queryString('ticket_id')) { ticket.value = result; void loadTickets() } })
 let detailController: AbortController | undefined
@@ -87,10 +87,7 @@ watch(() => queryString('ticket_id'), id => { void loadDetail(id) }, { immediate
 async function loadDetail(id = queryString('ticket_id')) {
   detailController?.abort(); const controller = new AbortController(); detailController = controller
   const generation = ++detailGeneration
-  if (id !== photoTargetId.value) {
-    detailPhotos.releaseContent()
-    if (!unresolvedPhotos.value) { detailPhotos.clear(); detailAppender.reset(); appendTicket.value = null; photoTargetId.value = id }
-  }
+  photoWorkspace.visit(id)
   ticket.value = null; detailError.value = null
   if (!id) { detailLoading.value = false; return }
   detailLoading.value = true
@@ -98,17 +95,29 @@ async function loadDetail(id = queryString('ticket_id')) {
     const result = await api.request<RegisteredTicket>(`/tickets/${encodeURIComponent(id)}`, { signal: controller.signal })
     if (generation === detailGeneration) {
       ticket.value = result
-      if (id === photoTargetId.value) { appendTicket.value = result; detailPhotos.reconcile(result.attachments); if (mayReport.value && !detailPhotos.policy.value) void detailPhotos.loadPolicy() }
+      if (photoWorkspace.accept(result) && mayReport.value && !detailPhotos.policy.value) void detailPhotos.loadPolicy()
     }
   } catch (cause) { if (!isCancelled(cause) && generation === detailGeneration) detailError.value = cause }
   finally { if (generation === detailGeneration) detailLoading.value = false }
 }
 function openDetail(id: string) { void router.replace({ query: { ...route.query, ticket_id: id } }) }
+function discardRetainedPhotos() {
+  const id = queryString('ticket_id')
+  if (photoWorkspace.discard(id) && id) void loadDetail(id)
+}
 const createOpen = ref(false)
 const acceptedOperationId = ref('')
+const pendingRegistered = ref<{ id: string; context: number } | null>(null)
 function recordAcceptance(id: string) { acceptedOperationId.value = id }
 async function showRegistered(id: string) {
   const generation = contextGeneration.value
+  if (createOpen.value) {
+    // Keep photo upload/append controls reachable until the registration form closes.
+    pendingRegistered.value = { id, context: generation }
+    await loadTickets()
+    return
+  }
+  pendingRegistered.value = null
   const alreadySelected = queryString('ticket_id') === id
   await router.replace({ query: { ...route.query, ticket_id: id } })
   if (generation !== contextGeneration.value) return
@@ -116,15 +125,21 @@ async function showRegistered(id: string) {
   if (generation !== contextGeneration.value) return
   await loadTickets()
 }
+watch(createOpen, open => {
+  const pending = pendingRegistered.value
+  if (open || !pending) return
+  pendingRegistered.value = null
+  if (pending.context === contextGeneration.value) void showRegistered(pending.id)
+}, { flush: 'post' })
 function resetContext() {
   listController?.abort(); detailController?.abort(); ++listGeneration; ++detailGeneration
   rows.value = []; nextCursor.value = null; hasMore.value = false; cursorHistory.value = []; loading.value = false; error.value = null
-  ticket.value = null; detailError.value = null; detailLoading.value = false; createOpen.value = false; acceptedOperationId.value = ''
-  detailPhotos.clear(); detailAppender.reset(); appendTicket.value = null; photoTargetId.value = ''
+  ticket.value = null; detailError.value = null; detailLoading.value = false; pendingRegistered.value = null; createOpen.value = false; acceptedOperationId.value = ''
+  photoWorkspace.reset()
   operationReader.reset()
 }
 watch(() => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version], resetContext, { flush: 'sync' })
-onUnmounted(() => { resetContext(); detailPhotos.dispose(); detailAppender.dispose() })
+onUnmounted(() => { resetContext(); detailPhotos.dispose(); photoWorkspace.dispose() })
 </script>
 
 <template>
@@ -133,7 +148,7 @@ onUnmounted(() => { resetContext(); detailPhotos.dispose(); detailAppender.dispo
     <div class="scope-card"><div><span class="small-label">当前租户</span><strong>{{ session?.tenant.name }}</strong></div><div><span class="small-label">本页登记</span><strong>{{ loading ? '—' : rows.length }} <small>项</small></strong></div><div class="scope-explanation">{{ customerView ? '客户仅查看本人记录。联系方式尚未核验，紧急程度仅供参考。' : '内部人员只读查看当前租户记录；本页不提供接单或解决动作。' }}</div></div>
     <el-alert class="page-note" type="warning" :closable="false" show-icon title="一期已选择本平台为工单权威。当前报障可登记与查询；正式状态、SLA 时限和处理资格规则仍待落实。" />
     <el-alert v-if="acceptedOperationId" class="page-note" type="info" :closable="false" show-icon title="报障已耐久登记，正式工单规则待确认。登记结果以详情回读为准，不重复提交或推断为外部建单成功。" />
-    <div v-if="unresolvedPhotos && photoTargetId && queryString('ticket_id') !== photoTargetId" class="panel photo-retained-note"><p>另一个登记的照片选择和原请求仍保留在本页。</p><el-button @click="openDetail(photoTargetId)">返回原登记继续处理照片</el-button></div>
+    <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />
     <div class="panel">
       <el-form :inline="true" class="filter-form ticket-filter-form" @submit.prevent="applyFilters"><el-form-item label="搜索"><el-input v-model="filters.q" clearable placeholder="登记号 / 标题 / 描述" aria-label="搜索报障登记" /></el-form-item><el-form-item label="故障分类"><el-select v-model="filters.category" clearable placeholder="全部分类" aria-label="报障分类筛选"><el-option v-for="category in ticketCategories" :key="category" :label="category" :value="category" /></el-select></el-form-item><el-form-item label="紧急程度"><el-select v-model="filters.urgency" clearable placeholder="全部程度" aria-label="报障紧急程度筛选"><el-option label="一般" value="normal" /><el-option label="很急（参考）" value="urgent" /></el-select></el-form-item><el-form-item class="filter-actions"><el-button type="primary" native-type="submit">查询</el-button><el-button @click="resetFilters">重置</el-button><el-button :loading="loading" @click="loadTickets">刷新</el-button></el-form-item></el-form>
       <ApiErrorNotice :error="error"><el-button size="small" @click="loadTickets">重试</el-button></ApiErrorNotice>
@@ -149,6 +164,7 @@ onUnmounted(() => { resetContext(); detailPhotos.dispose(); detailAppender.dispo
     </div>
     <TicketReportForm v-if="mayReport" v-model="createOpen" @accepted="recordAcceptance" @registered="showRegistered" />
     <el-drawer v-model="detailOpen" title="报障登记详情" size="650px" class="ticket-detail-drawer" destroy-on-close>
+      <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />
       <ApiErrorNotice :error="detailError"><el-button size="small" @click="loadDetail()">重试详情查询</el-button></ApiErrorNotice>
       <el-skeleton v-if="detailLoading" :rows="9" animated />
       <template v-if="ticket">

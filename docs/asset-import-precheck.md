@@ -6,7 +6,7 @@
 
 地址只做纯格式检查，不查询DNS、不验证可达性或地址所有权。JDK URI/IDN支持IPv6及明确的IDN策略；前导零、IPv4映射、单标签、尾随root dot和旧式数字地址歧义均由显式策略决定。日期使用严格JDK格式（例如`uuuu-MM-dd`）和`LocalDate/null`，没有1970年或默认负责人。输出防御复制且不可变；可见原值只来自本次输入，不附带跨租户字典对象。
 
-真实Java17严格编译、14组1,479个隔离断言通过，50行含三类错误准确定位并阻断三行，500行纯预检耗时见[机器证据](evidence/cloud-asset-import-precheck-verification.json)。激活JDK17后复现：
+历史云端Java17严格编译、14组1,479个隔离断言通过，50行含三类错误准确定位并阻断三行，500行纯预检耗时见[机器证据](evidence/cloud-asset-import-precheck-verification.json)。2026-10-01本地完整Maven模块编译/打包已通过；现存Surefire没有本核心专用JUnit套件，不新增其测试计数，也未执行导入PG/API联调，见[本地验证](local-runtime-verification.md)。激活JDK17后复现历史纯断言：
 
 ```bash
 bash tools/verify-asset-import-pure.sh

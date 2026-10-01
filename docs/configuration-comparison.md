@@ -8,6 +8,6 @@
 
 复用现有 `GET /api/v1/configurations` 和 `GET /api/v1/configurations/{key}/revisions`，没有新增接口、依赖、数据库迁移或发布动作。
 
-实际验证：新增20项隔离测试，前端8个测试文件共69项通过；Vue类型检查、Vite构建及差异格式检查通过。主包464.08kB，配置页面49.84kB，无包体警告。机器记录见 [独立证据](evidence/cloud-configuration-comparison-verification.json)。
+历史云端验证：新增20项隔离测试，当次前端8文件69项、类型/构建及差异格式检查通过，主包464.08kB、配置页49.84kB，见[独立证据](evidence/cloud-configuration-comparison-verification.json)。2026-10-01本地前端全量113项、Vue类型检查及Vite构建实际通过，覆盖现有配置比较测试；计数包含历史用例，不重复累加，见[本地验证](local-runtime-verification.md)。
 
 指定服务器下的真实 OIDC/PG/HTTP、1440/390px 页面和受影响对象核验仍未执行。本切片不完成 D04、SET-D17 或128项合同整体验收。

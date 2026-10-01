@@ -1,6 +1,6 @@
 # MOP 基础网络代维平台
 
-依据仓库内 `doc/development/` 持续实施全部128项合同需求。用户2026-10-01最新要求由本地拉取`handoff/cloud-20261001-photos`继续开发；云端业务写入已停止，接续说明见[本地交接](docs/local-development-handoff.md)。仍复用用户指定服务器的PostgreSQL、Keycloak及MinIO项目组件。已有本地持久登记证据与云端验证分别记录；照片新增代码及契约不等于已通过真实联调，正式工单规则及完整闭环尚未落实。
+依据仓库内 `doc/development/` 持续实施全部128项合同需求。用户2026-10-01要求接回本地，已接续云端最后交接`1db3976`，云端业务写入已停止，见[本地交接](docs/local-development-handoff.md)。本批复用指定服务器PostgreSQL、Keycloak和MinIO，V5、完整构建/组件测试、基础HTTP80次、边界/恢复/撤权HTTP52次、运行中Worker重试HTTP25次和照片UI36项分别通过。正式工单规则及完整闭环尚未落实，见[本地验证](docs/local-runtime-verification.md)。
 
 全局要求见 [AGENTS.md](AGENTS.md)；已发现及缺失组件见 [组件清单](docs/environment/component-inventory.md)。静态原型仍保留为参考，默认运行和集成测试不再使用内存 fixture。
 
@@ -8,11 +8,11 @@
 
 ## 连接资料与首次准备
 
-原始连接资料使用Git忽略的`deploy/private/develop.txt`，仅作为数据读取，不执行夹带文字。运行配置及主机公钥分别使用同目录的`runtime.json`和`known_hosts`，通过受控私有挂载或环境秘密交付，不能从其他环境重新生成密码覆盖已有账号。当前云端只有连接资料，`runtime.json`及`known_hosts`缺失，尚不能启动真实应用或建立受控隧道。不得提交、打印或复制秘密到公共文档。
+原始连接资料使用Git忽略的`deploy/private/develop.txt`，仅作为数据读取，不执行夹带文字。运行配置及主机公钥分别使用同目录的`runtime.json`和`known_hosts`，只通过受控私有配置或环境秘密读取，不能重新生成密码覆盖已有账号。当前本地复用既有私有配置和工程隧道；历史云端因缺配置和网络限制未完成联调。不得提交、打印或复制秘密到公共文档。
 
 需要 JDK 17、Maven 3.9.x、Node 22.12至22.x、npm 10.x及Python 3.12；Windows脚本另需PowerShell 7。Linux云端使用已有`/workspace/cloud-setup`辅助脚本，无需以PowerShell作为Linux前置条件。Python客户端依赖仅安装在本地隔离目录，不在指定服务器安装新组件。
 
-Linux云端基础检查入口：
+历史Linux云端基础检查入口（云端已停止写入）：
 
 ```bash
 source /workspace/cloud-setup/activate.sh
@@ -26,7 +26,7 @@ npm --prefix apps/web run build
 bash tools/verify-photo-pure-jdk.sh
 ```
 
-未设置`MOP_RUN_REMOTE_TESTS=true`的Maven检查跳过远程集成；不能把跳过记为通过。当前Maven依赖下载及SSH路径仍有网络阻塞，具体云端结果见[验证记录](docs/verification.md)。前端构建包括独立TypeScript检查。
+未设置`MOP_RUN_REMOTE_TESTS=true`的Maven检查跳过远程集成，不能把跳过记为通过。历史云端Maven及SSH阻塞保留在[验证记录](docs/verification.md)；本批本地完整检查已通过。前端构建包括独立TypeScript检查。
 
 受控私有配置及隧道条件齐备后，Linux启动入口为：
 
@@ -36,11 +36,11 @@ python3 /workspace/cloud-setup/cloud-dev.py start
 python3 /workspace/cloud-setup/cloud-dev.py stop
 ```
 
-`preflight`仅检查资料与配置，不能证明连通。`start`启动本项目隧道、API和Vite并检查基础就绪；本轮完整启动及真实OIDC/HTTP流程尚未执行。`stop`只停止helper登记的本项目进程和隧道，不停止远程组件。
+这些命令保留为历史云端入口，未在云端完成真实启动验收。`preflight`仅检查资料与配置；`stop`只处理helper登记的本项目进程和隧道，不停止远程组件。当前运行使用下述Windows入口。
 
 照片消费者使用`python3 /workspace/cloud-setup/cloud-dev.py start --with-photo-worker`显式启动，仅处理PG照片任务。它要求Worker JAR、`MOP_PHOTO_WORKER_ENABLED=true`、项目运行账号、MinIO私有设置和V5照片结构齐备；条件缺失会拒绝启动。该命令本轮未验证，不消费RabbitMQ或其他outbox。API及Worker启动均不执行迁移。
 
-V1–V4已执行迁移保持不变，V5当前为未执行草稿，须先审核结构、权限、保留影响与恢复方案，再作为独立迁移步骤使用项目迁移身份执行；运行账号无DDL权限。当前没有独立迁移CLI或已配置的Flyway Maven插件，不能将`mvn flyway:migrate`或应用启动当成可用迁移入口。现有远程PG测试的Flyway限定`target("4")`：启用`MOP_RUN_REMOTE_TESTS=true`可能补执行V1–V4 DDL并写项目测试数据，不是只读检查，亦不会执行V5。
+V1–V4保持原迁移，V5已由独立CLI在指定项目测试库执行一次，并通过结构/ACL核验；再次Apply执行0条DDL。API及Worker启动不执行迁移，运行账号无DDL权限。V5 SQL已冻结，SHA-256为`5A84F62BDAAB9BADFD5D87F4D30AE0AC1F9C1AE2F48D0D84E0635485A7BBDC55`；后续结构变更须新增迁移，不能修改已应用V5。
 
 原Windows本地首次准备入口（不作为云端已执行记录）：
 
@@ -54,13 +54,26 @@ SSH 隧道仅绑定本机127.0.0.1，保持远程既有端口不变。第一次�
 
 原Windows图片存储准备使用`pwsh -File deploy/prepare-photo-environment.ps1`，只在现有MinIO创建本项目桶与受限账号。历史真实读写、不可删除、前缀限制及匿名拒绝已留证，不能算本轮云端应用照片联调通过；详见[图片测试存储](docs/photo-test-storage.md)。秘密和拥有者恢复资料继续只存于`deploy/private/`。
 
-## Windows启动与停止
+## Windows独立迁移、启动与停止
+
+停本项目应用并完成根工程编译/安装后，准备迁移classpath，再默认Check；只有核验V1–V4与唯一待执行V5后才显式ApplyPhotos：
+
+```powershell
+pwsh -File deploy/stop-dev.ps1
+pwsh -File deploy/prepare-migration-classpath.ps1
+pwsh -File deploy/migrate-test-schema.ps1
+pwsh -File deploy/migrate-test-schema.ps1 -ApplyPhotos
+pwsh -File deploy/migrate-test-schema.ps1
+```
+
+默认Check不执行DDL；ApplyPhotos使用项目迁移身份及Flyway历史，核对源码/构建资源、结构与受限运行ACL。入口拒绝应用仍在运行、旧构建或不符历史，不支持clean、修补校验和或偷偷迁移。已应用环境重复ApplyPhotos不会重建照片表。集成测试会写明确虚构项目数据，不能称只读检查。
 
 ```powershell
 pwsh -File deploy/start-dev.ps1
+pwsh -File deploy/start-dev.ps1 -WithPhotoWorker
 ```
 
-默认构建 API、安装前端依赖、复用或启动本项目 SSH 隧道，再注入私有运行配置启动 `remote_test`。已有构建可加 `-SkipBuild`。
+默认构建API和前端并以`remote_test`连接指定组件；照片任务需显式加`-WithPhotoWorker`启动独立Worker，已有构建可加`-SkipBuild`。两条启动命令按所需模式择一执行。照片模式要求策略、V5结构/ACL和MinIO均就绪，并核验Worker启动；不会自动迁移或退回fixture。
 
 访问 <http://127.0.0.1:5173>，点击 Keycloak 登录。测试身份用户名在私有 `runtime.json` 的 `test_users` 中，密码只在那里读取；它们是虚构测试账号。平台管理员有两租户及配置/审计能力，客户角色只访问所属租户。新增 `/tickets` 报障与受理页：viewer/tadmin可登记并查本人报障，msp/padmin按授权租户只读查看；会话岗位与capabilities同取当前租户成员关系。
 
@@ -71,9 +84,9 @@ pwsh -File deploy/stop-dev.ps1
 pwsh -File deploy/stop-test-tunnel.ps1
 ```
 
-第一条只停本工程 API/Web；第二条可按需关闭本机 SSH 隧道。不会停止远程 PostgreSQL/Keycloak 或其他项目。停止脚本核验工程路径、进程命令与启动时间。
+第一条只停拥有者记录中的本工程API/Web/照片Worker；第二条按需关闭本项目SSH隧道。停止前逐项核验工程路径、可执行文件/制品、命令行和启动时间，PID复用或归属不符时拒绝停止并保留记录，不停止远程组件或其他项目。
 
-日志在`.local/`。`/api/v1/health/live`表示进程存活；`/api/v1/health/ready`检查PostgreSQL与Keycloak基础依赖，不证明V5照片结构、MinIO、消费者或完整业务可用。照片请求及Worker另检查依赖并明确失败，没有fixture回退；`production_ready`保持false。
+日志在Git忽略的`.local/`。`/api/v1/health/live`仅表示进程存活；`/api/v1/health/ready`核对PostgreSQL和Keycloak，配置照片能力时还实际探测策略、V5结构/ACL及MinIO。照片`enabled/ready/policy_ready/schema_ready/storage_ready`应全部为true；依赖失败返回503与脱敏原因，不回退fixture。此就绪不代表Worker已完成任务或生产批准，`production_ready`仍false。
 
 ## 检查
 
@@ -103,6 +116,17 @@ node tests/api-smoke.mjs http://127.0.0.1:8080/api/v1 --verify-persistence
 
 真实联调与重启结果见 [验证记录](docs/verification.md)。待确认规则仍为null，保存配置草稿不产生批准；监控接入与配置发布保持CONFIG_PENDING。
 
+照片专用HTTP复现还需真实OIDC的viewerA、tadmin、msp、viewerB四个测试身份会话，受控文件为`deploy/private/qa-photo-{身份}.json`；它们覆盖三个岗位和两个租户。Cookie/CSRF仅保存在私有目录，不使用fixture登录。先从公共无凭据生成器创建虚构JPEG/PNG，再运行依赖原图的脚本；以下均从工程根目录执行：
+
+```powershell
+New-Item -ItemType Directory -Force .local/qa-report-photos/fixture-generator | Out-Null
+javac -d .local/qa-report-photos/fixture-generator tests/GeneratePhotoFixtures.java
+java -cp .local/qa-report-photos/fixture-generator GeneratePhotoFixtures
+node tests/report-photo-smoke.mjs
+```
+
+编译与生成步骤仅写Git忽略的class目录和`.local/qa-report-photos/fixtures`，不读私有配置；真实HTTP脚本写虚构项目数据并输出脱敏证据，需要已启动的照片Worker及指定组件，不在依赖失败时改用内存。
+
 ## 代码与后续范围
 
 |目录|职责|
@@ -116,7 +140,7 @@ node tests/api-smoke.mjs http://127.0.0.1:8080/api/v1 --verify-persistence
 |`contracts`|原设计副本、原配置登记及当前实际API契约|
 |`deploy` / `tools`|私有配置引用、本机SSH隧道、项目命名空间准备与检查|
 
-当前实际契约为`contracts/local-api.openapi.json`（命名沿用首批，remote_test V0.5）；生成源为`tools/build-api-contract.mjs`。新增照片策略、multipart耐久受理、operation/元数据、15分钟平台grant原图及本人报障CAS追加。契约描述代码接口，不能证明迁移或真实集成已完成；`design-core.openapi.json`仍为设计原件。
+当前实际契约为`contracts/local-api.openapi.json`（沿用首批命名，remote_test V0.6），生成源为`tools/build-api-contract.mjs`。照片策略、耐久受理、operation/元数据、15分钟平台grant、本人CAS追加及typed照片就绪已通过本批真实HTTP响应校验；`design-core.openapi.json`仍为设计原件。
 
 配置登记页现支持“修订与审批”：提案保存外部资料引用及hash，创建者提交后由另一平台管理员内部复核，所有动作与历史持久化。内部通过仍为证据未核验、配置未生效，不替客户确认或正式发布。接口、运行账号权限和真实验证记录见[配置修订说明](docs/configuration-revisions.md)。
 
@@ -124,4 +148,12 @@ node tests/api-smoke.mjs http://127.0.0.1:8080/api/v1 --verify-persistence
 
 历史本地报障切片24项Java纯单元、19项真实PG集成、前端21项、契约3项通过，另有47次真实OIDC HTTP及1440/390px页面证据；[历史汇总](docs/evidence/customer-report-verification-summary.json)区分全量与补跑。新增云端代码必须重新验证；本轮结果按[验证记录](docs/verification.md)登记。全部128个合同TC仍NOT_RUN，照片切片不表示M5-5/M8-6正式建单/SLA/企微推送/实机拍照全部完成。
 
-测试组件选择不替代Q02生产隔离、Q03许可或正式身份/岗位确认。Redis、RabbitMQ业务接入待完成；MinIO历史组件证据不替代新增照片业务验收。Zabbix、外部ITSM、堡垒机等资料缺口继续登记；缺外部ITSM不阻塞已选本平台权威的登记。云端持续按全部128项跟进，每个独立功能验证、更新接口/实施/验收记录后提交推送，尚未验证或仍有客户门禁的条目不能标DONE。
+照片详情会明确标出保留队列所属登记，支持返回原登记或安全放弃本地选择；上传/追加不确定或202尚未终态回读时保留原File、键和目标，不能把A照片追加到B。原图解码边长16_384、25_000_000像素是技术资源防护，不是客户业务批准；JPEG/PNG仍只是开发方向。
+
+本批完整检查为96项纯单元/隔离、43项指定PG、3项指定MinIO通过，fixture13项跳过；前端全量113项及V0.6契约8项通过。实际UI发现并修复登记表单被详情抽屉遮挡，修复后44项现存定向回归及最终类型/构建通过；44项包含于113项，不累加。当前主包464.09kB、Tickets54.49kB、Configurations49.84kB，无包体警告。
+
+基础80次HTTP、[恢复专项52次](docs/evidence/local-photo-resilience.json)、[运行中重试专项25次](docs/evidence/local-photo-worker-retry.json)和[照片UI36项](docs/evidence/local-report-photo-ui.json)分别留证，不合为单一脚本计数。UI使用Edge154.0.4258.48持久Playwright无头会话，1440×900/390×844仿真正常控件，覆盖下载PNG/hash、真实提交后丢响应及原请求重试、并发CAS、已存配额与租户/注销，0 pageerror。52次脚本验证精确5MB、重启、先停Worker的存储断链恢复及撤权；另25次脚本保持Worker运行，真实观测RETRY_WAIT与退避完成原任务/hash，同PID/startTime，finally恢复。手机仿真不等于物理相机或企微验收。
+
+SDK修复提交`eba5630`的[GitHub CI](https://github.com/yangyour/zhonganzaixian/actions/runs/36836074365)已实际回读成功，契约/Web、纯Java和后端编译/单元/打包三个job均成功。仅对应该旧SHA，本批照片最终提交需独立回读，不能以旧CI替代；CI不连接私有组件，本地PG/MinIO/OIDC另行留证，见[CI说明](docs/ci-validation.md)。
+
+测试组件选择不替代Q02生产隔离、Q03许可或正式身份/岗位确认。Redis、RabbitMQ业务接入待完成，Zabbix、外部ITSM、堡垒机等资料缺口继续登记。M5-5/M8-6实机拍照、正式SLA/通知/企微、扫描和保留策略尚未验收，全部128项继续逐功能实施、留证、提交推送；未验证或仍有客户门禁的条目不标DONE。

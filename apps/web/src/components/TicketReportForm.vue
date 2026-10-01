@@ -5,11 +5,12 @@ import { api, ApiError, isCancelled } from '../api/client'
 import type { Asset, AssetPage, CustomerReportAcceptance, CustomerReportOperation, RegisteredTicket } from '../api/types'
 import { can, contextGeneration, session } from '../stores/session'
 import { displayTime } from '../utils/display'
-import { emptyReportForm, impactScopeLabel, isTicketUuid, parseCustomerReport, prepareReportAttempt, ReportValidationError, ticketCategories, ticketIdFromResultRef, urgencyLabel, type ReportSubmissionAttempt } from '../utils/ticket'
+import { emptyReportForm, impactScopeLabel, isTicketUuid, parseCustomerReport, prepareReportAttempt, ReportValidationError, ticketCategories, urgencyLabel, type ReportSubmissionAttempt } from '../utils/ticket'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 import ReportPhotoPanel from './ReportPhotoPanel.vue'
 import { createPhotoQueue } from '../utils/photoQueue'
 import { createPhotoAppender } from '../utils/photoAttachments'
+import { readAcceptedReport } from '../utils/reportOperation'
 
 const props = defineProps<{ modelValue: boolean }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean]; accepted: [operationId: string]; registered: [ticketId: string] }>()
@@ -77,22 +78,18 @@ async function readRegistration() {
   operationController?.abort(); const controller = new AbortController(); operationController = controller
   const generation = ++operationGeneration
   const writeContext = writeGeneration
+  const context = { tenantId: session.value?.tenant.id || '', actorId: session.value?.user.id || '' }
   operationLoading.value = true; operationError.value = null
   try {
-    const result = await api.request<CustomerReportOperation>(`/operations/${encodeURIComponent(acceptedOperationId.value)}`, { signal: controller.signal })
+    const result = await readAcceptedReport(acceptedOperationId.value, context, {
+      signal: controller.signal,
+      isCurrent: () => generation === operationGeneration && writeContext === writeGeneration && session.value?.tenant.id === context.tenantId && session.value?.user.id === context.actorId,
+    })
     if (generation !== operationGeneration || writeContext !== writeGeneration) return
-    if (!result || !isTicketUuid(result.id) || result.id.toLowerCase() !== acceptedOperationId.value || result.kind !== 'CUSTOMER_REPORT_REGISTRATION'
-      || result.status !== 'PENDING' || result.step !== 'AWAITING_TICKET_CONFIGURATION' || result.progress !== null) throw new ApiError(200, 'INVALID_RESPONSE', '登记结果返回异常，请重新查询；本次报障不会再次提交', '—')
-    operation.value = result
-    const ticketId = ticketIdFromResultRef(result.result_ref)
-    if (!ticketId) throw new ApiError(200, 'INVALID_RESULT_REFERENCE', '登记结果引用不符合本应用路径，请重新查询；不会打开外部地址或再次提交', '—')
-    const detail = await api.request<RegisteredTicket>(`/tickets/${ticketId}`, { signal: controller.signal })
-    if (generation !== operationGeneration || writeContext !== writeGeneration) return
-    if (!detail || detail.id !== ticketId || detail.tenant_id !== session.value?.tenant.id || detail.reporter_id !== session.value?.user.id || !Array.isArray(detail.attachments)) throw new ApiError(200, 'INVALID_RESPONSE', '登记详情与当前报障主体不一致，请重查；不会重新提交报障', '—')
-    registeredTicket.value = detail; photos.reconcile(detail.attachments)
+    operation.value = result.operation; registeredTicket.value = result.ticket; photos.reconcile(result.ticket.attachments)
     complete.value = true
     if (!photos.rows.value.length) open.value = false
-    emit('registered', ticketId)
+    emit('registered', result.ticket.id)
   } catch (cause) { if (!isCancelled(cause) && generation === operationGeneration && writeContext === writeGeneration) operationError.value = cause }
   finally { if (generation === operationGeneration && writeContext === writeGeneration) operationLoading.value = false }
 }

@@ -8,7 +8,7 @@
 
 本核心没有接入现有仓储、API或正式发布流程，没有持久化快照或激活登记值。客户资格/证据真实性、每个键的层级和范围、发布记录来源及真实PG事务仍待完成；不能把纯Java中的合成事实当成客户批准。
 
-实际验证：Java17以 `--release 17 -Xlint:all,-serial -Werror` 编译真实源码通过，15组共250个隔离断言通过。15个JUnit包装及所有运行组件联调未执行。可复用的断言程序随Git提交，机器证据见 [独立验证](evidence/cloud-configuration-resolution-verification.json)。
+历史云端验证：Java17以 `--release 17 -Xlint:all,-serial -Werror` 编译真实源码，15组250个隔离断言通过，见[独立证据](evidence/cloud-configuration-resolution-verification.json)。2026-10-01本地完整Maven构建后，`cn.mop.persistence.configuration.ConfigurationResolutionTest` 的15个JUnit包装实际通过，0失败/错误/跳过，已包含于全量96项纯单元/隔离计数，见[Surefire摘要](evidence/local-photo-build-summary.json)。本核心仍无真实仓储/API/发布接入、持久快照或客户核验，不据纯测试宣称组件联调完成。
 
 复现纯测试（先激活云工具）：
 

@@ -68,4 +68,13 @@ class PostgresManualAssetMetadataIntegrationTest {
         }
         Asset asset=asset();assertEquals(2,update(asset,1,facts(asset,"least-privilege reference validation")).snapshot().asset().version());
     }
+    @Test void referenceChoicesUseActiveTenantMembersAndLiteralQueryWithoutWriting()throws SQLException{
+        Asset asset=asset();References choices=metadata.references(access(engineer),asset.id(),"");assertTrue(choices.sites().stream().anyMatch(v->v.id().equals(asset.siteId())));assertFalse(choices.sites().stream().anyMatch(v->v.id().equals("site-b-main")));assertTrue(choices.owners().stream().anyMatch(v->v.id().equals(engineer)));assertFalse(choices.owners().stream().anyMatch(v->v.id().equals(foreignOwner)));assertTrue(choices.sites().size()<=100);assertTrue(choices.owners().size()<=100);assertFalse(choices.sitesTruncated());assertFalse(choices.ownersTruncated());
+        assertEquals(List.of(engineer),metadata.references(access(admin),asset.id(),engineer).owners().stream().map(Reference::id).toList());assertEquals(List.of(asset.siteId()),metadata.references(access(engineer),asset.id(),"SITE-A-MAIN").sites().stream().map(Reference::id).toList());
+        for(String query:List.of("%","_","x' OR '1'='1")){References absent=metadata.references(access(engineer),asset.id(),query);assertTrue(absent.sites().isEmpty());assertTrue(absent.owners().isEmpty());}assertEquals(0,audits(asset.id()));assertNull(metadata.current(access(engineer),asset.id()).snapshot().metadata());
+    }
+    @Test void referenceChoicesReauthorizeAndHideForeignAssetWithoutLeakingDirectory(){
+        Asset asset=asset();Access a=access(engineer);assertEquals(403,assertThrows(DomainException.class,()->metadata.references(access(viewer),asset.id(),"")).status);assertEquals(403,assertThrows(DomainException.class,()->metadata.references(access(tadmin),asset.id(),"")).status);assertEquals(401,assertThrows(DomainException.class,()->metadata.references(new Access(a.actorId(),a.tenantId(),a.permissionVersion()+1,a.traceId()),asset.id(),"")).status);assertEquals(404,assertThrows(DomainException.class,()->metadata.references(a,platform.list(OTHER).get(0).id(),"")).status);for(String query:List.of("a".repeat(101),"x\n"))assertEquals(400,assertThrows(DomainException.class,()->metadata.references(a,asset.id(),query)).status);
+    }
+
 }

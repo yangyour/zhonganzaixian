@@ -57,4 +57,12 @@ class ManualAssetMetadataControllerTest {
     @Test void semanticOrderHasSameHashAndChangesOrMissingIdempotencyAreRejected(){
         List<String> hashes=new ArrayList<>();when(platform.idempotent(any(),any(),any(),any(),any(),anyLong(),any())).thenAnswer(c->{hashes.add(c.getArgument(4));return Map.of("replayed",true);});var first=body();var reverse=mapper.createObjectNode();List<String> names=new ArrayList<>();first.fieldNames().forEachRemaining(names::add);Collections.reverse(names);names.forEach(k->reverse.set(k,first.get(k)));controller.write(ID,first,request("PATCH"));controller.write(ID,reverse,request("PATCH"));controller.write(ID,reverse.put("note","明确更改"),request("PATCH"));assertEquals(hashes.get(0),hashes.get(1));assertNotEquals(hashes.get(0),hashes.get(2));var missing=request("PATCH");missing.removeHeader("Idempotency-Key");assertEquals(400,assertThrows(DomainException.class,()->controller.write(ID,body(),missing)).status);verifyNoInteractions(metadata);
     }
+    @Test void referenceChoicesAreBoundedReadOnlyAndDoNotInventOwner(){
+        when(metadata.references(access(),ID,"")).thenReturn(new References(List.of(new Reference("site-a","站点")),List.of(new Reference(ACTOR,"内部人员")),false,false));Map<?,?> value=data(controller.references(ID,request("GET")));assertNull(value.get("default_owner_id"));assertEquals("RECHECKED_ON_WRITE",value.get("reference_validation"));assertEquals(100,value.get("limit_per_kind"));assertEquals(false,value.get("owners_truncated"));verify(platform,never()).idempotent(any(),any(),any(),any(),any(),anyLong(),any());
+    }
+    @Test void referenceQueriesRejectUnknownDuplicateAndNonScalarBoundaries(){
+        for(String key:List.of("tenant_id","owner_id","page_size")){var r=request("GET");r.addParameter(key,"x");assertEquals(400,assertThrows(DomainException.class,()->controller.references(ID,r)).status);}for(String q:List.of("a".repeat(101),"x\n")){var r=request("GET");r.addParameter("q",q);assertEquals(400,assertThrows(DomainException.class,()->controller.references(ID,r)).status);}var duplicate=request("GET");duplicate.addParameter("q",new String[]{"a","b"});assertEquals(400,assertThrows(DomainException.class,()->controller.references(ID,duplicate)).status);
+        var unicode=request("GET");unicode.addParameter("q","😀".repeat(100));when(metadata.references(access(),ID,"😀".repeat(100))).thenReturn(new References(List.of(),List.of(),false,false));assertEquals("😀".repeat(100),data(controller.references(ID,unicode)).get("query"));
+    }
+
 }

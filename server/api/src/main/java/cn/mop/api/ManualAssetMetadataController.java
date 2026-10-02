@@ -23,6 +23,11 @@ public final class ManualAssetMetadataController {
     private final PlatformRepository platform;private final ManualAssetMetadataRepository metadata;private final ObjectMapper mapper;
     public ManualAssetMetadataController(PlatformRepository platform,ManualAssetMetadataRepository metadata,ObjectMapper mapper){this.platform=platform;this.metadata=metadata;this.mapper=mapper;}
     @GetMapping Object get(@PathVariable String id,HttpServletRequest request){Access a=access(request);query(request,Set.of());return success(dto(metadata.current(a,uuid(id))),request);}
+    @GetMapping("/references") Object references(@PathVariable String id,HttpServletRequest request){
+        Access a=access(request);Map<String,String[]> params=request.getParameterMap();if(params.size()>1||params.keySet().stream().anyMatch(key->!key.equals("q"))||params.values().stream().anyMatch(values->values.length!=1))throw invalid();
+        String q=params.containsKey("q")?params.get("q")[0]:"";if(q.codePointCount(0,q.length())>100||q.codePoints().anyMatch(cp->Character.isISOControl(cp)||Character.getType(cp)==Character.SURROGATE))throw invalid();
+        References choices=metadata.references(a,uuid(id),q);return success(map("sites",choices.sites(),"owners",choices.owners(),"sites_truncated",choices.sitesTruncated(),"owners_truncated",choices.ownersTruncated(),"query",q,"limit_per_kind",100,"scope","CURRENT_TENANT_ACTIVE_REFERENCES","source","postgresql","reference_validation","RECHECKED_ON_WRITE","default_owner_id",null),request);
+    }
     @GetMapping("/history") Object history(@PathVariable String id,HttpServletRequest request){
         Access a=access(request);Map<String,String> query=query(request,Set.of("page_size","before_version"));int size=pageSize(query);Long before=query.containsKey("before_version")?queryVersion(query.get("before_version")):null;if(before!=null&&before<2)throw invalid();
         List<Revision> all=metadata.history(a,uuid(id),size+1,before);boolean more=all.size()>size;List<Revision> items=all.subList(0,Math.min(size,all.size()));

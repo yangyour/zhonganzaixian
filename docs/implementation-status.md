@@ -315,3 +315,8 @@ ManualAssetMetadataRepository/PostgresManualAssetMetadataRepository接入既有�
 ### 2026-10-02 手工资产草稿资料API
 
 实际API升级V0.13，新增内部msp/padmin的资料当前/修订/PATCH及schema/ACL就绪检查；严格全字段显式null、CAS/幂等/CSRF/审计，IP/source/监控不改，客户Q09权限未放开。8控制器+1就绪新增，根545=532执行（含131真实PG）+13fixture跳过，6MinIO排除；70项真实HTTP响应契约全部通过，契约25、Web239及类型/构建通过。历史真实before、旧键旧收据不回退现值、并发一200一409和3条成功维护审计已验证。页面/引用选择器及最终浏览器验收待，不标M3-5 DONE。V1–V9未改，无OSS操作。详见[资料说明](manual-asset-metadata.md)和[API证据](evidence/niko-asset-metadata-api-20261002.json)。
+
+
+### 2026-10-02 手工资产资料只读引用选择器接口
+
+API V0.13.1新增同租户站点/活跃负责人查询；内部授权和资产404隔离、每类100有界/独立truncated、参数化字面子串、null默认负责人及写时重验。新增2控制器+2真实PG，根549=536执行含133PG+13skip，6MinIO排除；26契约及28真实HTTP响应校验通过。未改迁移、权限、账户或监控；大目录边界与浏览器选择交互不冒充已实测。页面继续开发，M3-5仍非DONE。见[说明](manual-asset-metadata.md)和[引用证据](evidence/niko-asset-reference-http-20261002.json)。

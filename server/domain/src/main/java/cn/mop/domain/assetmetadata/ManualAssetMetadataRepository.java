@@ -12,6 +12,10 @@ public interface ManualAssetMetadataRepository {
     }
     record Current(Snapshot snapshot,String recordedBy,Instant recordedAt,List<String> editBlockers) { public Current { editBlockers=List.copyOf(editBlockers); } }
     record Revision(long assetVersion,Long previousMetadataVersion,String actorId,Instant recordedAt,Snapshot before,ManualAssetMetadata metadata,String managementIp) {}
+    record Reference(String id,String label) {}
+    record References(List<Reference> sites,List<Reference> owners,boolean sitesTruncated,boolean ownersTruncated) { public References { sites=List.copyOf(sites);owners=List.copyOf(owners); } }
+    /** Read-only bounded choices; selected references are rechecked during the actual write. */
+    References references(Access access,String assetId,String query);
     Current current(Access access,String assetId);
     List<Revision> history(Access access,String assetId,int limit,Long beforeVersion);
     /** Caller must use the platform idempotent transaction; implementation locks and reauthorizes all references. */

@@ -23,6 +23,16 @@ public final class PostgresManualAssetMetadataRepository implements ManualAssetM
             catch(SQLException|RuntimeException|Error failure){try{c.rollback();}catch(SQLException ignored){}throw failure;}
         }catch(SQLException failure){throw sqlFailure(failure);}
     }
+    @Override public References references(Access access,String id,String query){
+        if(query==null||query.codePointCount(0,query.length())>100||query.codePoints().anyMatch(cp->Character.isISOControl(cp)||Character.getType(cp)==Character.SURROGATE))throw invalid();
+        return read(access,id,(c,asset)->{
+            List<Reference> sites=new ArrayList<>(),owners=new ArrayList<>();
+            // strpos is a literal substring match: %, _, backslash and quotes are never patterns or SQL.
+            try(var s=statement(c,"SELECT id,name FROM public.mop_site WHERE tenant_id=?::uuid AND (strpos(lower(id),lower(?))>0 OR strpos(lower(name),lower(?))>0) ORDER BY name,id LIMIT 101")){s.setString(1,access.tenantId());s.setString(2,query);s.setString(3,query);try(var r=s.executeQuery()){while(r.next())sites.add(new Reference(r.getString(1),r.getString(2)));}}
+            try(var s=statement(c,"SELECT u.id::text,u.display_name FROM public.mop_user u JOIN public.mop_membership m ON m.user_id=u.id WHERE m.tenant_id=?::uuid AND m.active AND u.active AND (strpos(lower(u.id::text),lower(?))>0 OR strpos(lower(u.display_name),lower(?))>0) ORDER BY u.display_name,u.id LIMIT 101")){s.setString(1,access.tenantId());s.setString(2,query);s.setString(3,query);try(var r=s.executeQuery()){while(r.next())owners.add(new Reference(r.getString(1),r.getString(2)));}}
+            return new References(sites.subList(0,Math.min(100,sites.size())),owners.subList(0,Math.min(100,owners.size())),sites.size()>100,owners.size()>100);
+        });
+    }
     @Override public Current current(Access access,String id){return read(access,id,(c,asset)->current(c,access,asset));}
     @Override public List<Revision> history(Access access,String id,int limit,Long beforeVersion){
         return read(access,id,(c,asset)->{if(limit<1||limit>101||beforeVersion!=null&&beforeVersion<2)throw invalid();current(c,access,asset);List<Revision> values=new ArrayList<>();

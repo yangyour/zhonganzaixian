@@ -235,7 +235,7 @@ const dependencyDraft = object({
 const dependencyAppend = object({ expected_version: { type: 'integer', minimum: 0, maximum: 9007199254740990, description: '当前完整租户图的CAS版本，不是资产版本；所有引用在同租户且每条新增边须连接路径资产。未知业务元数据明确null。' }, additions: { type: 'array', minItems: 1, maxItems: 100, uniqueItems: true, items: dependencyEdge } });
 const contract = {
   openapi: '3.1.0',
-  info: { title: 'MOP 共享测试环境 API', version: '0.13.0', description: '本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。' },
+  info: { title: 'MOP 共享测试环境 API', version: '0.13.1', description: '本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。' },
   servers: [{ url: '/api/v1' }],
   security: [{ SessionCookie: [] }],
   paths: {
@@ -294,6 +294,7 @@ const contract = {
       get: action('getManualAssetMetadata', '当前手工草稿资料与明确编辑门禁；无资料保留null', ref('ManualAssetCurrentResult'), { ...assetMetadataAccess, parameters: [pathId] }),
       patch: mutation('updateManualAssetMetadata', '严格全字段CAS资料修订；资产/历史/审计/幂等同事务，IP不变', ref('ManualAssetUpdate'), ref('ManualAssetCurrentResult'), { ...assetMetadataAccess, parameters: [pathId, ...headers], 'x-mop-max-body-bytes': 32768, 'x-mop-reject-duplicate-json-keys': true }),
     },
+    '/assets/{id}/manual-metadata/references': { get: action('listManualAssetReferences', '当前租户活跃负责人/站点有界只读选择，不默认负责人，写入时重验', ref('ManualAssetReferencesResult'), { ...assetMetadataAccess, parameters: [pathId, parameter('q', 'query', { type: 'string', maxLength: 100, description: '原样字面子串匹配；百分号/下划线不是通配符；拒绝控制字符及不完整Unicode' }, false)] }) },
     '/assets/{id}/manual-metadata/history': { get: action('listManualAssetMetadataHistory', '不可变资料修订及真实before快照，版本倒序有界分页', ref('ManualAssetHistoryResult'), { ...assetMetadataAccess, parameters: [pathId, worklogPageSize, parameter('before_version', 'query', { ...assetMetadataVersion, maximum: 9007199254740990 }, false)] }) },
     '/tickets/{ticketId}/worklogs': {
       get: action('listOwnWorklogs', '工程师本人实填工时有界keyset列表', ref('WorklogListResult'), { ...worklogAccess, parameters: [worklogPath, worklogPageSize, parameter('before_created_at', 'query', dateTime, false), parameter('before_id', 'query', uuid, false)], 'x-mop-paired-query-keys': ['before_created_at', 'before_id'] }),
@@ -330,6 +331,7 @@ const contract = {
       ConfigurationDiagnostic: configurationDiagnostic,
       ConfigurationDiagnosticResult: envelope(ref('ConfigurationDiagnostic')),
       TicketCreate: ticketCreate,
+      ManualAssetReferencesResult: envelope(object({ sites: { type: 'array', maxItems: 100, items: object({ id: { type: 'string', minLength: 1, maxLength: 64 }, label: { type: 'string', maxLength: 100 } }) }, owners: { type: 'array', maxItems: 100, items: object({ id: uuid, label: { type: 'string', maxLength: 100 } }) }, sites_truncated: { type: 'boolean' }, owners_truncated: { type: 'boolean' }, query: { type: 'string', maxLength: 100 }, limit_per_kind: { const: 100 }, scope: { const: 'CURRENT_TENANT_ACTIVE_REFERENCES' }, source: { const: 'postgresql' }, reference_validation: { const: 'RECHECKED_ON_WRITE' }, default_owner_id: { type: 'null' } })),
       ManualAssetMetadata: object(assetMetadataFields), ManualAssetUpdate: object({ expected_version: worklogVersion, ...assetMetadataFields }), ManualAssetSnapshot: assetMetadataSnapshot, ManualAssetCurrent: assetMetadataCurrent, ManualAssetRevision: assetMetadataRevision, ManualAssetHistory: assetMetadataHistory,
       ManualAssetCurrentResult: envelope(ref('ManualAssetCurrent')), ManualAssetHistoryResult: envelope(ref('ManualAssetHistory')),
       AuditRecord: auditRecord, AuditRecordPage: auditPage, AuditRecordPageResult: envelope(ref('AuditRecordPage')), AuditIntegrity: auditIntegrity, AuditIntegrityResult: envelope(ref('AuditIntegrity')),

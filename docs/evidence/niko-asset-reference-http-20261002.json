@@ -1,0 +1,177 @@
+{
+  "verified_at": "2026-10-02T18:52:31.500Z",
+  "environment": "niko-local-test",
+  "api_version": "0.13.1",
+  "passed": true,
+  "http_checks": 28,
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_reference_asset",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "read_tail_before",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "active_same_tenant_references",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "admin_same_reference_scope",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "owner_by_literal_id",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "case_insensitive_literal_site",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "literal_query_12",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "literal_query_13",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "literal_query_14",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "literal_query_15",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "read_tail_after",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_directory_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_directory_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_directory_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_denied",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_own_asset",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_asset_hides_directory",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_reference_query_23",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_reference_query_24",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_reference_query_25",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_reference_query_26",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_reference_query_27",
+      "status": 400,
+      "contract_valid": true
+    }
+  ],
+  "reference_scope": "CURRENT_TENANT_ACTIVE_REFERENCES",
+  "query_semantics": "LITERAL_CASE_INSENSITIVE_SUBSTRING",
+  "default_owner_id": null,
+  "successful_reads_did_not_append_audit": true,
+  "credentials_output": false,
+  "limitations": [
+    "No browser selector interaction",
+    "Results capped at100 per kind with explicit truncated flags; production large directories not created for this check",
+    "Write always rechecks selected owner and site",
+    "Customer Q09 maintenance remains pending"
+  ],
+  "root_tests": {
+    "reported": 549,
+    "executed": 536,
+    "real_postgresql": 133,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "new_controller_tests": 2,
+  "new_real_pg_tests": 2,
+  "contract_tests": 26,
+  "prior_api_ci": {
+    "commit": "93ac0a792c4a282211d02fdc0b81d41a37a8a208",
+    "run_id": 37050157504,
+    "conclusion": "success"
+  }
+}

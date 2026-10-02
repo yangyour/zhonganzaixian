@@ -44,3 +44,10 @@ PATCH严格要求expected_version及全部14个资料字段，可选字段显式
 ready新增asset_manual_metadata真实schema/ACL检查；缺表或权限返回503，live不探测，API/Worker无自动DDL。V1–V9不改。资料始终SELF_REPORTED、monitoring_applied=false、cmdb_applied=false，管理IP变更保持CONFIG_PENDING。
 
 8项控制器隔离测试+1项就绪测试，根545=532执行（含131真实PG）+13历史fixture跳过，6MinIO排除，0失败错误；契约25项、Web239项及类型/构建通过。70项真实PG/OIDC HTTP均通过响应契约校验，覆盖显式null、日期0001/9999、两种内部角色、跨租户对象/引用404、seed422、权限/CSRF/请求边界、旧键返回旧收据而不回退当前值、实际before历史、并发一200一409和恰好3条成功维护审计。首次执行通过，无存储或浏览器替身。资料页面、引用选择器及完整M3-5验收仍待；见[HTTP证据](evidence/niko-asset-metadata-api-http-20261002.json)与[汇总](evidence/niko-asset-metadata-api-20261002.json)。上一仓储2e39c30的CI37048403534已回读success。
+
+
+## 2026-10-02 V0.13.1只读引用选择
+
+GET /assets/{id}/manual-metadata/references提供当前租户站点与启用成员标签，复用内部角色/权限版本及资产归属核验后，在同一只读快照查询。仅id/label，不返回身份subject或连接资料；两类各最多100条并独立truncated，q最多100 Unicode code points，以参数化strpos(lower(...),lower(?))作字面子串查询，百分号/下划线/引号不变成通配或SQL。不默认选择当前操作者；default_owner_id=null，实际PATCH重新核验引用。
+
+新增2控制器+2真实PG回归，根549=536执行（含133真实PG）+13fixture跳过，6MinIO排除；26契约检查通过。28项真实HTTP/响应契约覆盖内部两角色、当前租户选择、外租户目录404、客户403、100 emoji/超界/控制符、通配符字面匹配和成功查询不增加审计。没有新建100+身份或站点以冒充生产大目录覆盖；truncated实际大目录、浏览器控件和完整客户验收仍待。上一API93ac0a7的CI37050157504已回读success。见[引用HTTP证据](evidence/niko-asset-reference-http-20261002.json)。

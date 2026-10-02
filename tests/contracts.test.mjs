@@ -206,7 +206,7 @@ const importSource = {
 };
 
 test('V0.12保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.13.0');
+  assert.equal(contract.info.version, '0.13.1');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -387,4 +387,11 @@ test('手工草稿资料严格全字段、显式null、版本历史与未知监�
   const revision = { asset_version: 2, previous_metadata_version: null, actor_id: id('3'), recorded_at: timestamp, before: { asset, metadata: null, metadata_version: null }, metadata, management_ip: asset.management_ip, verification_status: 'SELF_REPORTED', monitoring_applied: false, cmdb_applied: false }; assert.ok(validates('ManualAssetRevision', revision));
   const history = { items: [revision], has_more: false, next_before_version: null, source: 'postgresql', scope: 'INTERNAL_MANUAL_DRAFT', page_size_limit: 100 }; assert.ok(validates('ManualAssetHistory', history)); assert.equal(validates('ManualAssetHistory', { ...history, has_more: true }), false);
   const route = contract.paths['/assets/{id}/manual-metadata']; assert.deepEqual(route.patch['x-mop-roles'], ['msp', 'padmin']); assert.equal(route.patch['x-mop-reject-duplicate-json-keys'], true); assert.equal(route.delete, undefined);
+});
+
+
+test('资料引用选择只公开同租户有界标签并保留未知负责人', () => {
+  const value = { data: { sites: [{ id: 'site-a', label: '虚构站点' }], owners: [{ id: id('1'), label: '虚构负责人' }], sites_truncated: false, owners_truncated: false, query: '', limit_per_kind: 100, scope: 'CURRENT_TENANT_ACTIVE_REFERENCES', source: 'postgresql', reference_validation: 'RECHECKED_ON_WRITE', default_owner_id: null }, trace_id: 'synthetic' };
+  assert.ok(validates('ManualAssetReferencesResult', value)); assert.equal(validates('ManualAssetReferencesResult', { ...value, data: { ...value.data, default_owner_id: id('1') } }), false); assert.equal(validates('ManualAssetReferencesResult', { ...value, data: { ...value.data, owners: Array(101).fill(value.data.owners[0]) } }), false);
+  assert.deepEqual(Object.keys(contract.paths['/assets/{id}/manual-metadata/references']), ['get']);
 });

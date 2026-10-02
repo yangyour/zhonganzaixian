@@ -68,7 +68,12 @@ public class PlatformController {
             try{List<String> reasons=repository.worklogProblems();worklogsReady=reasons!=null&&reasons.isEmpty();}catch(RuntimeException unavailable){worklogsReady=false;}
             if(!worklogsReady)throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境工时schema或权限未就绪",List.of(map("component","worklogs","reasons",List.of("WORKLOG_SCHEMA_OR_ACCESS_UNAVAILABLE"))));
         }
-        return success(map("status","READY_REMOTE_TEST","ready",true,"mode",repository.metadata().mode(),"source",repository.metadata().source(),"durable",repository.metadata().durable(),"production_ready",false,"photos",photos.dto(),"asset_imports",imports.dto(),"worklogs",map("ready",worklogsReady,"schema_access_ready",worklogsReady,"financial_status","CONFIG_PENDING"),"asset_dependencies",map("ready",dependencyDraftReady,"schema_access_ready",dependencyDraftReady,"configuration_status","CONFIG_PENDING","monitoring_applied",false,"effective_rules",null)),request);
+        boolean assetMetadataReady=false;
+        if(repository.metadata().mode().equals("remote_test")){
+            try{List<String> reasons=repository.assetMetadataProblems();assetMetadataReady=reasons!=null&&reasons.isEmpty();}catch(RuntimeException unavailable){assetMetadataReady=false;}
+            if(!assetMetadataReady)throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境手工草稿资料schema或权限未就绪",List.of(map("component","asset_manual_metadata","reasons",List.of("ASSET_METADATA_SCHEMA_OR_ACCESS_UNAVAILABLE"))));
+        }
+        return success(map("status","READY_REMOTE_TEST","ready",true,"mode",repository.metadata().mode(),"source",repository.metadata().source(),"durable",repository.metadata().durable(),"production_ready",false,"photos",photos.dto(),"asset_imports",imports.dto(),"asset_manual_metadata",map("schema_access_ready",assetMetadataReady,"scope","INTERNAL_MANUAL_DRAFT","monitoring_applied",false,"cmdb_applied",false),"worklogs",map("ready",worklogsReady,"schema_access_ready",worklogsReady,"financial_status","CONFIG_PENDING"),"asset_dependencies",map("ready",dependencyDraftReady,"schema_access_ready",dependencyDraftReady,"configuration_status","CONFIG_PENDING","monitoring_applied",false,"effective_rules",null)),request);
     }
     @GetMapping("/assets") Object assets(@RequestParam Map<String,String> query,HttpServletRequest request){
         Access access=access(request,"assets:read");Set<String> allowed=Set.of("cursor","page_size","type","site_id","status","q");

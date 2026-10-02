@@ -177,7 +177,7 @@ test('operation区分报障门禁与真实文件状态，终态不得伪造', ()
 
 test('就绪成功不能把已启用但缺schema或存储的照片能力写成READY', () => {
   const photos = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, policy_source: 'USER_DEVELOPMENT_DIRECTION', reasons: [] };
-  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
+  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
   assert.equal(validates('ReadinessResult', { data, trace_id: 'MOP-FAKE-readiness' }), true);
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('ReadinessResult', { data: { ...data, photos: { ...photos, [key]: false } }, trace_id: 'MOP-FAKE-readiness' }), false);
   assert.equal(validates('ReadinessResult', { data: { ...data, production_ready: true }, trace_id: 'MOP-FAKE-readiness' }), false);
@@ -206,7 +206,7 @@ const importSource = {
 };
 
 test('V0.12保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.12.0');
+  assert.equal(contract.info.version, '0.13.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -371,4 +371,20 @@ test('审计查询仅GET、有界当前租户，区间校验不冒充外部可�
   assert.ok(validates('AuditIntegrity', invalid)); assert.equal(validates('AuditIntegrity', { ...invalid, valid: true }), false); assert.equal(validates('AuditIntegrity', { ...invalid, failure: 'NONE' }), false);
   const page = { items: [], snapshot_sequence: 0, next_before_sequence: null, has_more: false, source: 'postgresql', scope: 'CURRENT_TENANT', page_size_limit: 100, filter_semantics: 'EXACT_MATCH_HALF_OPEN_TIME', integrity_scope: 'EACH_RECORD_LOCAL_HASH_ONLY', externally_anchored: false };
   assert.ok(validates('AuditRecordPage', page)); assert.equal(validates('AuditRecordPage', { ...page, has_more: true }), false); assert.equal(validates('AuditRecordPage', { ...page, scope: 'PLATFORM' }), false);
+});
+
+
+test('手工草稿资料严格全字段、显式null、版本历史与未知监控边界', () => {
+  const metadata = { name: '虚构设备', type: 'router', site_id: 'site-a-main', brand: null, model: null, serial_number: null, location: null, owner_id: null, business_description: null, purchase_date: null, warranty_expiry: null, overdue_service_date: null, collection_method_note: null, note: '维护备注' };
+  const input = { expected_version: 1, ...metadata }; assert.ok(validates('ManualAssetUpdate', input));
+  for (const extra of ['management_ip', 'tenant_id', 'source', 'status', 'actor_id', 'monitoring_applied']) assert.equal(validates('ManualAssetUpdate', { ...input, [extra]: 'forged' }), false);
+  const missing = { ...input }; delete missing.owner_id; assert.equal(validates('ManualAssetUpdate', missing), false);
+  for (const date of ['0000-01-01', '2026-02-30', '2026-10-02T00:00:00Z', 123]) assert.equal(validates('ManualAssetUpdate', { ...input, purchase_date: date }), false);
+  const asset = { id: id('1'), tenant_id: id('2'), name: metadata.name, type: metadata.type, management_ip: '192.0.2.1', site_id: metadata.site_id, status: 'unknown', lifecycle_status: 'DRAFT', source: 'manual', sampled_at: null, unknown_reason: 'NOT_ONBOARDED', version: 1, created_at: timestamp, updated_at: timestamp, availability: 'UNKNOWN', sync_state: 'PENDING_ONBOARDING' };
+  const absent = { asset, metadata: null, metadata_version: null, recorded_by: null, recorded_at: null, can_edit: true, edit_blockers: [], scope: 'INTERNAL_MANUAL_DRAFT', verification_status: null, source: 'postgresql', monitoring_applied: false, cmdb_applied: false, management_ip_change_status: 'CONFIG_PENDING' };
+  assert.ok(validates('ManualAssetCurrent', absent)); assert.equal(validates('ManualAssetCurrent', { ...absent, verification_status: 'SELF_REPORTED' }), false); assert.equal(validates('ManualAssetCurrent', { ...absent, can_edit: false }), false);
+  const saved = { ...absent, asset: { ...asset, version: 2 }, metadata, metadata_version: 2, recorded_by: id('3'), recorded_at: timestamp, verification_status: 'SELF_REPORTED' }; assert.ok(validates('ManualAssetCurrent', saved)); assert.equal(validates('ManualAssetCurrent', { ...saved, monitoring_applied: true }), false);
+  const revision = { asset_version: 2, previous_metadata_version: null, actor_id: id('3'), recorded_at: timestamp, before: { asset, metadata: null, metadata_version: null }, metadata, management_ip: asset.management_ip, verification_status: 'SELF_REPORTED', monitoring_applied: false, cmdb_applied: false }; assert.ok(validates('ManualAssetRevision', revision));
+  const history = { items: [revision], has_more: false, next_before_version: null, source: 'postgresql', scope: 'INTERNAL_MANUAL_DRAFT', page_size_limit: 100 }; assert.ok(validates('ManualAssetHistory', history)); assert.equal(validates('ManualAssetHistory', { ...history, has_more: true }), false);
+  const route = contract.paths['/assets/{id}/manual-metadata']; assert.deepEqual(route.patch['x-mop-roles'], ['msp', 'padmin']); assert.equal(route.patch['x-mop-reject-duplicate-json-keys'], true); assert.equal(route.delete, undefined);
 });

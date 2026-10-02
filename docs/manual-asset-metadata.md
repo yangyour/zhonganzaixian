@@ -1,6 +1,6 @@
 # 手工资产草稿资料维护
 
-对应M3-D03/M3-5。当前已完成输入核心及独立V9结构/约束验证，授权仓储已有12项真实PG证据，API/页面待，不标DONE。
+对应M3-D03/M3-5。当前已完成输入核心及独立V9结构/约束验证，授权仓储已有12项真实PG证据，API已完成70项真实HTTP验证、页面待，不标DONE。
 
 ## 明确范围
 
@@ -33,3 +33,14 @@ ManualAssetMetadataRepository/PostgresManualAssetMetadataRepository接入既有�
 新增12项真实PG回归通过：实际前后值/日期/原文、连续历史、旧键回原收据不回退现值、改名与CAS、角色/引用范围、外部来源门禁、下游回滚、两独立连接并发一胜一409、协议日期边界以及站点最小权限。首轮11项中4失败/6错误，原因是显式SELECT FOR KEY SHARE需要站点UPDATE权；运行身份刻意只有SELECT。修正为普通授权引用查询，并由实际写入的复合FK取得引用锁，未扩大站点权限；新增42501回归确认这一边界，最终全量通过。V9未改。
 
 根536=523执行（含131真实PG）+13fixture跳过，6MinIO排除，0失败错误；断库503和无受保护事务拒写同时通过。公开资料API/页面仍未接线，M3-5非DONE。见[仓储证据](evidence/niko-manual-asset-metadata-repository-20261002.json)。上一V9 dcbca1f的CI37046265831已回读success。
+
+
+## 2026-10-02 内部资料API V0.13
+
+新增GET/PATCH /api/v1/assets/{id}/manual-metadata与GET .../history，仅当前活跃msp/padmin且assets:write；tadmin/viewer未开放Q09客户维护。当前视图返回asset、可空metadata/metadata_version/recorded_by/recorded_at/verification_status，以及can_edit/edit_blockers；没有资料不会合成已核验数据。修订返回不可变实际before快照及after资料，不提供DELETE。
+
+PATCH严格要求expected_version及全部14个资料字段，可选字段显式null，缺字段/额外字段/重复JSON/尾随JSON/超过32KiB拒绝。IP、tenant、actor、source和监控字段不可输入。既有全局CSRF、当前成员校验和幂等事务接线；版本为JS安全范围，保留原始内容的规范字段排序哈希。历史按资产版本降序，before_version>=2、技术单页10/15/25/50/100。成功读取不追加审计。
+
+ready新增asset_manual_metadata真实schema/ACL检查；缺表或权限返回503，live不探测，API/Worker无自动DDL。V1–V9不改。资料始终SELF_REPORTED、monitoring_applied=false、cmdb_applied=false，管理IP变更保持CONFIG_PENDING。
+
+8项控制器隔离测试+1项就绪测试，根545=532执行（含131真实PG）+13历史fixture跳过，6MinIO排除，0失败错误；契约25项、Web239项及类型/构建通过。70项真实PG/OIDC HTTP均通过响应契约校验，覆盖显式null、日期0001/9999、两种内部角色、跨租户对象/引用404、seed422、权限/CSRF/请求边界、旧键返回旧收据而不回退当前值、实际before历史、并发一200一409和恰好3条成功维护审计。首次执行通过，无存储或浏览器替身。资料页面、引用选择器及完整M3-5验收仍待；见[HTTP证据](evidence/niko-asset-metadata-api-http-20261002.json)与[汇总](evidence/niko-asset-metadata-api-20261002.json)。上一仓储2e39c30的CI37048403534已回读success。

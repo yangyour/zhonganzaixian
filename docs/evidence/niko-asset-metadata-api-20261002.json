@@ -1,0 +1,41 @@
+{
+  "verified_at": "2026-10-02T18:46:02.682296+00:00",
+  "environment": "niko-local-test",
+  "api_version": "0.13.0",
+  "status": "VERIFIED_API_SLICE_NOT_FULL_ACCEPTANCE",
+  "previous_repository_commit": "2e39c30189f8baffb6ea0a8ea42cb03ca1d4776e",
+  "previous_ci": {
+    "id": 37048403534,
+    "conclusion": "success"
+  },
+  "root_tests": {
+    "reported": 545,
+    "executed": 532,
+    "real_postgresql": 131,
+    "failures": 0,
+    "errors": 0,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6
+  },
+  "new_isolated_controller_tests": 8,
+  "new_readiness_tests": 1,
+  "contract_tests": 25,
+  "web_tests": 239,
+  "web_typecheck_and_build": "passed",
+  "real_http": {
+    "checks": 70,
+    "all_response_contract_valid": true,
+    "evidence": "niko-asset-metadata-api-http-20261002.json"
+  },
+  "migration_actions": 0,
+  "frozen_migrations": "V1-V9 unchanged",
+  "storage_actions": 0,
+  "credentials_output": false,
+  "remaining": [
+    "Metadata page and reference selectors",
+    "Browser DOM/390px acceptance B03",
+    "Customer Q09 maintenance permission",
+    "IP/CMDB/monitoring rules and external verification",
+    "Full 128 contract acceptance"
+  ]
+}

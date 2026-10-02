@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.12.0",
+    "version": "0.13.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -5506,6 +5506,529 @@
         }
       }
     },
+    "/assets/{id}/manual-metadata": {
+      "get": {
+        "operationId": "getManualAssetMetadata",
+        "summary": "当前手工草稿资料与明确编辑门禁；无资料保留null",
+        "x-mop-capability": "assets:write",
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "仅当前租户启用内部msp/padmin成员；客户资料维护范围Q09待确认。跨租户资产及站点/负责人404。仅未接入手工DRAFT草稿可写，管理IP与监控/source不可写；资料SELF_REPORTED，不发布CMDB/监控。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManualAssetCurrentResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateManualAssetMetadata",
+        "summary": "严格全字段CAS资料修订；资产/历史/审计/幂等同事务，IP不变",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManualAssetUpdate"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "assets:write",
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "仅当前租户启用内部msp/padmin成员；客户资料维护范围Q09待确认。跨租户资产及站点/负责人404。仅未接入手工DRAFT草稿可写，管理IP与监控/source不可写；资料SELF_REPORTED，不发布CMDB/监控。",
+        "x-mop-max-body-bytes": 32768,
+        "x-mop-reject-duplicate-json-keys": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManualAssetCurrentResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{id}/manual-metadata/history": {
+      "get": {
+        "operationId": "listManualAssetMetadataHistory",
+        "summary": "不可变资料修订及真实before快照，版本倒序有界分页",
+        "x-mop-capability": "assets:write",
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "仅当前租户启用内部msp/padmin成员；客户资料维护范围Q09待确认。跨租户资产及站点/负责人404。仅未接入手工DRAFT草稿可写，管理IP与监控/source不可写；资料SELF_REPORTED，不发布CMDB/监控。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                25,
+                50,
+                100
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 9007199254740990
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManualAssetHistoryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tickets/{ticketId}/worklogs": {
       "get": {
         "operationId": "listOwnWorklogs",
@@ -8452,6 +8975,30 @@
                   "financial_status"
                 ],
                 "additionalProperties": false
+              },
+              "asset_manual_metadata": {
+                "type": "object",
+                "properties": {
+                  "schema_access_ready": {
+                    "const": true
+                  },
+                  "scope": {
+                    "const": "INTERNAL_MANUAL_DRAFT"
+                  },
+                  "monitoring_applied": {
+                    "const": false
+                  },
+                  "cmdb_applied": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "schema_access_ready",
+                  "scope",
+                  "monitoring_applied",
+                  "cmdb_applied"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -8464,7 +9011,8 @@
               "photos",
               "asset_imports",
               "asset_dependencies",
-              "worklogs"
+              "worklogs",
+              "asset_manual_metadata"
             ],
             "additionalProperties": false
           },
@@ -9489,6 +10037,662 @@
             }
           }
         ]
+      },
+      "ManualAssetMetadata": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "router",
+              "switch",
+              "firewall",
+              "ap",
+              "wireless_controller",
+              "other"
+            ]
+          },
+          "site_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "brand": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "显式null或非空白原文；拒绝控制字符和不完整Unicode，不自动清洗或默认补值"
+          },
+          "model": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "显式null或非空白原文；拒绝控制字符和不完整Unicode，不自动清洗或默认补值"
+          },
+          "serial_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "显式null或非空白原文；拒绝控制字符和不完整Unicode，不自动清洗或默认补值"
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "显式null或非空白原文；拒绝控制字符和不完整Unicode，不自动清洗或默认补值"
+          },
+          "owner_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "business_description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "显式null或非空白原文；拒绝控制字符和不完整Unicode，不自动清洗或默认补值"
+          },
+          "purchase_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "pattern": "^(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            "description": "严格ISO日期0001..9999，不推断逾期、默认日期或Excel序列"
+          },
+          "warranty_expiry": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "pattern": "^(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            "description": "严格ISO日期0001..9999，不推断逾期、默认日期或Excel序列"
+          },
+          "overdue_service_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "pattern": "^(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            "description": "严格ISO日期0001..9999，不推断逾期、默认日期或Excel序列"
+          },
+          "collection_method_note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "显式null或非空白原文；拒绝控制字符和不完整Unicode，不自动清洗或默认补值"
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "明确维护备注，非空白，允许LF/CR/TAB，按Unicode code point校验"
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "site_id",
+          "brand",
+          "model",
+          "serial_number",
+          "location",
+          "owner_id",
+          "business_description",
+          "purchase_date",
+          "warranty_expiry",
+          "overdue_service_date",
+          "collection_method_note",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "ManualAssetUpdate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "router",
+              "switch",
+              "firewall",
+              "ap",
+              "wireless_controller",
+              "other"
+            ]
+          },
+          "site_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "brand": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "显式null或非空白原文；拒绝控制字符和不完整Unicode，不自动清洗或默认补值"
+          },
+          "model": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "显式null或非空白原文；拒绝控制字符和不完整Unicode，不自动清洗或默认补值"
+          },
+          "serial_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "显式null或非空白原文；拒绝控制字符和不完整Unicode，不自动清洗或默认补值"
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "显式null或非空白原文；拒绝控制字符和不完整Unicode，不自动清洗或默认补值"
+          },
+          "owner_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "business_description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "显式null或非空白原文；拒绝控制字符和不完整Unicode，不自动清洗或默认补值"
+          },
+          "purchase_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "pattern": "^(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            "description": "严格ISO日期0001..9999，不推断逾期、默认日期或Excel序列"
+          },
+          "warranty_expiry": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "pattern": "^(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            "description": "严格ISO日期0001..9999，不推断逾期、默认日期或Excel序列"
+          },
+          "overdue_service_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "pattern": "^(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            "description": "严格ISO日期0001..9999，不推断逾期、默认日期或Excel序列"
+          },
+          "collection_method_note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "显式null或非空白原文；拒绝控制字符和不完整Unicode，不自动清洗或默认补值"
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "明确维护备注，非空白，允许LF/CR/TAB，按Unicode code point校验"
+          }
+        },
+        "required": [
+          "expected_version",
+          "name",
+          "type",
+          "site_id",
+          "brand",
+          "model",
+          "serial_number",
+          "location",
+          "owner_id",
+          "business_description",
+          "purchase_date",
+          "warranty_expiry",
+          "overdue_service_date",
+          "collection_method_note",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "ManualAssetSnapshot": {
+        "type": "object",
+        "properties": {
+          "asset": {
+            "$ref": "#/components/schemas/Asset"
+          },
+          "metadata": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ManualAssetMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metadata_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 2,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "asset",
+          "metadata",
+          "metadata_version"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "metadata": {
+                "type": "null"
+              },
+              "metadata_version": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "metadata": {
+                "$ref": "#/components/schemas/ManualAssetMetadata"
+              },
+              "metadata_version": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 9007199254740991
+              }
+            }
+          }
+        ]
+      },
+      "ManualAssetCurrent": {
+        "type": "object",
+        "properties": {
+          "asset": {
+            "$ref": "#/components/schemas/Asset"
+          },
+          "metadata": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ManualAssetMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metadata_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 2,
+            "maximum": 9007199254740991
+          },
+          "recorded_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "can_edit": {
+            "type": "boolean"
+          },
+          "edit_blockers": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "MANUAL_DRAFT_REQUIRED",
+                "MONITORING_STATE_NOT_PRISTINE",
+                "MANUAL_METADATA_CORE_DRIFT"
+              ]
+            }
+          },
+          "scope": {
+            "const": "INTERNAL_MANUAL_DRAFT"
+          },
+          "verification_status": {
+            "enum": [
+              null,
+              "SELF_REPORTED"
+            ]
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "monitoring_applied": {
+            "const": false
+          },
+          "cmdb_applied": {
+            "const": false
+          },
+          "management_ip_change_status": {
+            "const": "CONFIG_PENDING"
+          }
+        },
+        "required": [
+          "asset",
+          "metadata",
+          "metadata_version",
+          "recorded_by",
+          "recorded_at",
+          "can_edit",
+          "edit_blockers",
+          "scope",
+          "verification_status",
+          "source",
+          "monitoring_applied",
+          "cmdb_applied",
+          "management_ip_change_status"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "properties": {
+                  "metadata": {
+                    "type": "null"
+                  },
+                  "metadata_version": {
+                    "type": "null"
+                  },
+                  "recorded_by": {
+                    "type": "null"
+                  },
+                  "recorded_at": {
+                    "type": "null"
+                  },
+                  "verification_status": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "metadata": {
+                    "$ref": "#/components/schemas/ManualAssetMetadata"
+                  },
+                  "metadata_version": {
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 9007199254740991
+                  },
+                  "recorded_by": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "recorded_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "verification_status": {
+                    "const": "SELF_REPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "oneOf": [
+              {
+                "properties": {
+                  "can_edit": {
+                    "const": true
+                  },
+                  "edit_blockers": {
+                    "maxItems": 0
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "can_edit": {
+                    "const": false
+                  },
+                  "edit_blockers": {
+                    "minItems": 1
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "ManualAssetRevision": {
+        "type": "object",
+        "properties": {
+          "asset_version": {
+            "type": "integer",
+            "minimum": 2,
+            "maximum": 9007199254740991
+          },
+          "previous_metadata_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 2,
+            "maximum": 9007199254740991
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "before": {
+            "$ref": "#/components/schemas/ManualAssetSnapshot"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/ManualAssetMetadata"
+          },
+          "management_ip": {
+            "type": "string"
+          },
+          "verification_status": {
+            "const": "SELF_REPORTED"
+          },
+          "monitoring_applied": {
+            "const": false
+          },
+          "cmdb_applied": {
+            "const": false
+          }
+        },
+        "required": [
+          "asset_version",
+          "previous_metadata_version",
+          "actor_id",
+          "recorded_at",
+          "before",
+          "metadata",
+          "management_ip",
+          "verification_status",
+          "monitoring_applied",
+          "cmdb_applied"
+        ],
+        "additionalProperties": false
+      },
+      "ManualAssetHistory": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/ManualAssetRevision"
+            }
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_before_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 2,
+            "maximum": 9007199254740991
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "scope": {
+            "const": "INTERNAL_MANUAL_DRAFT"
+          },
+          "page_size_limit": {
+            "const": 100
+          }
+        },
+        "required": [
+          "items",
+          "has_more",
+          "next_before_version",
+          "source",
+          "scope",
+          "page_size_limit"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "has_more": {
+                "const": false
+              },
+              "next_before_version": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "has_more": {
+                "const": true
+              },
+              "next_before_version": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 9007199254740991
+              },
+              "items": {
+                "minItems": 1
+              }
+            }
+          }
+        ]
+      },
+      "ManualAssetCurrentResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ManualAssetCurrent"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ManualAssetHistoryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ManualAssetHistory"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
       },
       "AuditRecord": {
         "type": "object",

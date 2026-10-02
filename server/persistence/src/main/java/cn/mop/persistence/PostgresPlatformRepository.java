@@ -26,6 +26,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         try(Connection connection=dataSource.getConnection();PreparedStatement statement=connection.prepareStatement("SELECT current_database()='mop_test' AND current_user='mop_test_runtime' AND EXISTS(SELECT 1 FROM public.mop_tenant)")){statement.setQueryTimeout(3);try(ResultSet rows=statement.executeQuery()){return rows.next()&&rows.getBoolean(1);}}
         catch(SQLException exception){return false;}
     }
+    @Override public List<String> assetMetadataProblems(){return new PostgresManualAssetMetadataRepository(dataSource,this,mapper).readinessProblems();}
     @Override public List<String> worklogProblems(){return new PostgresWorklogRepository(dataSource,this).readinessProblems();}
     @Override public List<String> assetDependencyProblems(){return new PostgresAssetDependencyRepository(dataSource,this).readinessProblems();}
     @FunctionalInterface private interface SqlWork<T>{T run(Connection connection)throws SQLException;}

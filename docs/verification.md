@@ -427,3 +427,8 @@ ManualAssetMetadataRepository/PostgresManualAssetMetadataRepository接入既有�
 新增12项真实PG回归通过：实际前后值/日期/原文、连续历史、旧键回原收据不回退现值、改名与CAS、角色/引用范围、外部来源门禁、下游回滚、两独立连接并发一胜一409、协议日期边界以及站点最小权限。首轮11项中4失败/6错误，原因是显式SELECT FOR KEY SHARE需要站点UPDATE权；运行身份刻意只有SELECT。修正为普通授权引用查询，并由实际写入的复合FK取得引用锁，未扩大站点权限；新增42501回归确认这一边界，最终全量通过。V9未改。
 
 根536=523执行（含131真实PG）+13fixture跳过，6MinIO排除，0失败错误；断库503和无受保护事务拒写同时通过。公开资料API/页面仍未接线，M3-5非DONE。见[仓储证据](evidence/niko-manual-asset-metadata-repository-20261002.json)。上一V9 dcbca1f的CI37046265831已回读success。
+
+
+### 2026-10-02 手工资产草稿资料API
+
+实际API升级V0.13，新增内部msp/padmin的资料当前/修订/PATCH及schema/ACL就绪检查；严格全字段显式null、CAS/幂等/CSRF/审计，IP/source/监控不改，客户Q09权限未放开。8控制器+1就绪新增，根545=532执行（含131真实PG）+13fixture跳过，6MinIO排除；70项真实HTTP响应契约全部通过，契约25、Web239及类型/构建通过。历史真实before、旧键旧收据不回退现值、并发一200一409和3条成功维护审计已验证。页面/引用选择器及最终浏览器验收待，不标M3-5 DONE。V1–V9未改，无OSS操作。详见[资料说明](manual-asset-metadata.md)和[API证据](evidence/niko-asset-metadata-api-20261002.json)。

@@ -1,0 +1,43 @@
+{
+  "verified_at": "2026-10-02T22:25:19.535380+00:00",
+  "environment": "niko-local-test",
+  "status": "SCHEMA_AND_ACL_VERIFIED_ONLY",
+  "migration": "V11__immutable_ticket_comments.sql",
+  "sha256": "d8535bbf13ca9e35c115278f36232a786b4562c99cc9afd9f5195a416028a8e3",
+  "frozen_through": "V11",
+  "explicit_migration_summaries": {
+    "before": "MOP_SCHEMA status=INTERNAL_NOTES_APPLIED mode=READ_ONLY_CHECK migrations_executed=0 baseline=V1_V9_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=NOT_APPLIED",
+    "apply": "MOP_SCHEMA status=TICKET_COMMENTS_APPLIED mode=APPLY_TICKET_COMMENTS migrations_executed=1 baseline=V1_V10_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED",
+    "repeat": "MOP_SCHEMA status=TICKET_COMMENTS_APPLIED mode=APPLY_TICKET_COMMENTS migrations_executed=0 baseline=V1_V10_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED",
+    "after": "MOP_SCHEMA status=TICKET_COMMENTS_APPLIED mode=READ_ONLY_CHECK migrations_executed=0 baseline=V1_V10_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED",
+    "old-mode": "MOP_SCHEMA status=TICKET_COMMENTS_APPLIED mode=APPLY_INTERNAL_NOTES migrations_executed=0 baseline=V1_V10_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED"
+  },
+  "checks": 14,
+  "schema_real_pg_tests": 7,
+  "all_schema_test_writes_rolled_back": true,
+  "comment_rows_after_schema_tests": 0,
+  "migration_policy_tests": 12,
+  "python_guards": 49,
+  "root_tests": {
+    "reported": 642,
+    "executed": 629,
+    "real_postgresql": 172,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "runtime_acl": [
+    "SELECT",
+    "INSERT"
+  ],
+  "runtime_update_delete_truncate_public_access": false,
+  "parent_ticket_acl_changed": false,
+  "new_credentials_created": false,
+  "original_server_changed": false,
+  "api_worker_auto_migration": false,
+  "business_repository_verified": false,
+  "public_api_added": false,
+  "browser_dom_tested": false,
+  "credentials_output": false
+}

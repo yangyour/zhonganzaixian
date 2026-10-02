@@ -100,3 +100,10 @@ V9新增mop_asset_manual_revision/details，当前指针引用不可变修订；
 新增每次启动独立SHA256只读JAR副本，完整ZIP/本项目入口/复制稳定性/UID/权限/路径守卫，拒绝直接target回退；保持确切父进程/JVM命令/回环监听检查。48 Python守卫及语法通过；真实API运行期间强制Maven重打包，根616=603执行含163PG+13skip/6MinIO排除通过，target SHA变化而API PID/start-ticks/运行副本不变；不重启捕获6个新OIDC身份并20只读HTTP通过（含/assets404）。初次证据工具/proc children缺失失败已记录并修正为只读严格身份枚举；之前ThrowableProxy故障不声称唯一根因已复现。旧SIGKILL证据保留未重跑，V1–V10/API0.16/原私有配置不变。
 
 见[运行产物隔离](niko-runtime-artifact.md)。
+
+
+## 2026-10-02 V11客户可见评论schema（已执行冻结，业务仍待）
+
+独立mop_ticket_comment/16列/14CHECK/复合租户FK与只追加ACL已显式check0→apply1→重复0→check0，旧内部备注apply0；V11 SHA256 d8535bbf13ca9e35c115278f36232a786b4562c99cc9afd9f5195a416028a8e3，V1–V11冻结。7真实PG schema测试全部回滚，新表只读复查0行；12迁移策略/49 Python守卫、根642=629执行含172PG+13skip/6MinIO排除通过。角色/报障关系仍须后续事务重查，schema不能冒充业务授权；没有评论API/页面/ITSM或状态变更，原服务器/私有配置不改。
+
+见[客户评论V11结构证据](ticket-comments.md)。

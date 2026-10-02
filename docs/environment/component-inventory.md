@@ -102,3 +102,6 @@
 
 
 2026-10-02补充：niko API从每次启动独立SHA256/0400副本运行，不再直接使用可被Maven覆盖的target。真实重构建中target字节变化、API进程及副本不变，随后6身份OIDC/20只读HTTP通过；原ThrowableProxy时序线索、首轮/proc children采集失败和边界见[运行产物隔离](../niko-runtime-artifact.md)。未改变组件版本/账号/权限/原服务器；48守卫和根616（163真实PG）通过，其他阻塞仍在。
+
+
+2026-10-02：niko独立V11客户评论表显式迁移1、重复/检查/旧模式0，16列/14CHECK/租户FK及runtime只追加ACL核验，7真实PG schema测试全部回滚后新表0行。V1–V11冻结，无原服务器/组件账号/父工单授权变化；尚无评论业务仓储/HTTP证据。见[客户评论结构](../ticket-comments.md)。

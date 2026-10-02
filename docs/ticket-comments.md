@@ -11,3 +11,16 @@
 8项纯规则测试覆盖原文/hash、不归一、2000/2001emoji、空白/控制/代理字符、本人/内部角色、过期权限/未知角色/跨租户、缺关系/缺主体/缺父上下文、公共标签与Entry字段白名单。串行根634报告=621执行（其中165为已有功能真实PG回归）+13历史fixture跳过，6MinIO排除，0失败错误；既有PG测试不能作为评论持久化证据。30契约一致性通过，前端未改。
 
 后续需新建V11、独立显式执行和冻结，再实施真实PG授权/不可变追加/审计、公开API及页面。V1–V10保持原字节；API/Worker不自动迁移。评论是否同步外部ITSM须单独受控，不把未知组件或Q07确认视为已完成，不使用fixture替代真实联调。完整M5-7/M8-7仍非DONE。见[核心证据](evidence/niko-ticket-comment-core-20261002.json)。
+
+
+## 2026-10-02 V11独立结构已执行并冻结
+
+V11新增独立mop_ticket_comment，不改V10内部备注。16列含私有actor_id、固定author_kind、原文/精确UTF8 hash、父版本、创建时间及REPORTER_AND_INTERNAL/MANUAL_TICKET_COMMENT/SELF_REPORTED标签。14个CHECK保证技术长度/空白控制符/摘要、允许作者类别和明确未改变工单/SLA/未同步ITSM；tenant/父/作者复合FK，创建时间/id分页索引。SQL仅约束结构，不能证明REPORTER确实是报障人或ENGINEER具有当前权限，后续真实仓储必须同事务重查关系、角色、权限版本、父版本并写审计。
+
+运行角色仅SELECT/INSERT，不得UPDATE/DELETE/TRUNCATE，PUBLIC无访问；没有增加父工单授权。显式--apply-ticket-comments要求已验证V1–V10，默认--check只读，源和编译资源hash先验证，再加载私有设置。API/Worker不执行迁移。
+
+niko真实PG已执行check0→apply1→重复0→check0，旧--apply-internal-notes也是0，结构和ACL逐次验证。V11 SHA256 d8535bbf13ca9e35c115278f36232a786b4562c99cc9afd9f5195a416028a8e3，自此V1–V11字节冻结，结构修正必须新增V12或更高，不能因应用测试失败重写已执行脚本。
+
+7项真实PG schema测试覆盖原文/hash和父行摘要不变、跨租户FK、错误hash/父版本、空白/控制/2000与2001emoji、运行角色不可变权限/PUBLIC无访问、错误可见性/伪造状态或ITSM标签、两种作者类别及未知类别拒绝。测试写入全部回滚，另行只读核对新评论表0行；不是实际客户评论写入/业务仓储证据。12迁移策略、49 Python守卫通过，根642=629执行（含172真实PG）+13skip/6MinIO排除，0失败错误。
+
+V11迁移及schema验证首轮通过；原6私有配置、既有组件版本/账号、原服务器不变。API仍0.16.1，评论API/仓储/页面与外部同步仍待，不标M5-7/M8-7 DONE。见[V11证据](evidence/niko-ticket-comment-schema-20261002.json)。

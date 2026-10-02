@@ -1,0 +1,7 @@
+{
+  "status": "APPLIED_AND_FROZEN",
+  "environment": "niko-local-test",
+  "sha256": {
+    "V11__immutable_ticket_comments.sql": "d8535bbf13ca9e35c115278f36232a786b4562c99cc9afd9f5195a416028a8e3"
+  }
+}

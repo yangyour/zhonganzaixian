@@ -1,0 +1,26 @@
+{
+  "recorded_at": "2026-10-02T11:42:57.329051+00:00",
+  "base_commit": "bf1abfe9097de3449df8b6a7cddaacd6d7ab872e",
+  "failed_ci_run": 37001705608,
+  "failed_job": 110820652345,
+  "cause": "Pure-JDK explicit javac source list omitted the two new SDK-independent OSS configuration classes",
+  "local_before": "FAIL_CANNOT_FIND_SYMBOL",
+  "local_after": "PASS_ALL_FOUR_PURE_JDK_SCRIPTS",
+  "pure_assertions": {
+    "photo_rules": 8,
+    "photo_policy": 56,
+    "worker_settings": 15,
+    "asset_dependencies": 14987,
+    "configuration_resolution": 250,
+    "asset_import_precheck": 1479
+  },
+  "new_worker_assertions": 6,
+  "maven_rerun_for_this_script_only_fix": false,
+  "previous_commit_backend_ci": "success",
+  "previous_commit_web_contract_ci": "success",
+  "sdk_or_network_added_to_pure_checks": false,
+  "application_changed": false,
+  "migrations_changed": false,
+  "private_configuration_changed": false,
+  "oss_cloud_tests": "NOT_RUN"
+}

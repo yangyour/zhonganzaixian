@@ -1,0 +1,43 @@
+{
+  "recorded_at": "2026-10-02T04:34:16.053053+00:00",
+  "base_commit": "f1596dbf1c698fc4105b5259a8c1f61d62612b84",
+  "scope": "mobile presentation and duplicate-header input validation; partial, not real UI acceptance",
+  "node": "22.22.1",
+  "npm": "10.9.4",
+  "web": {
+    "tests": 182,
+    "files": 14,
+    "failures": 0,
+    "typecheck": "PASS",
+    "build": "PASS"
+  },
+  "contract": {
+    "tests": 18,
+    "failures": 0,
+    "generator_consistency": "PASS",
+    "wire_change": false
+  },
+  "added_input_tests": 1,
+  "visual_validation": {
+    "status": "BLOCKED",
+    "headless_chromium": "socket Operation not permitted at launch, including escalated retry",
+    "cloud_browser": "file protocol navigation denied; not bypassed",
+    "screenshots": 0
+  },
+  "mobile_real_mapping_and_readback": "NOT_RUN_PRIVATE_CONFIGURATION_ABSENT",
+  "fault_restart_tests": "NOT_RUN_PRIVATE_CONFIGURATION_ABSENT",
+  "full_contract_acceptance": "NOT_RUN",
+  "migrations_changed": false,
+  "files": {
+    "apps/web/src/components/AssetImportWorkspace.vue": "e295219f1c8a2d39dd7dd2ad5dcfa10e660f411a72be9a146834116f579b1cc4",
+    "apps/web/tests/assetImportMapping.test.ts": "aa0381cff69e07aec8b89f6590b882313d5d3d3b7d76e1ea55d46619b5b31fc7"
+  },
+  "preceding_commit_ci": {
+    "sha": "f1596dbf1c698fc4105b5259a8c1f61d62612b84",
+    "run_id": 36964745708,
+    "url": "https://github.com/yangyour/zhonganzaixian/actions/runs/36964745708",
+    "conclusion": "success",
+    "jobs": 3,
+    "scope": "pure Java, Maven compile/unit/package, contracts/web; not external integration"
+  }
+}

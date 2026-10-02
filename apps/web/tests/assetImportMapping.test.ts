@@ -39,6 +39,28 @@ describe('explicit asset source selection and contract mapping', () => {
     draft.targets.NOTE = 13
     expect(() => buildAssetImportMappingRequest(3, hash, columns, draft)).toThrow(AssetImportInputError)
   })
+  it('requires explicit position 0 and ignoring both duplicate/extra columns 15 and 16', () => {
+    const extended: AssetImportSourceColumn[] = [...columns,
+      { index: 15, header: '设备名称', target_suggestions: ['NAME'] },
+      { index: 16, header: '附加说明', target_suggestions: [] },
+    ]
+    const draft = createAssetImportMappingDraft(extended)
+    expect(draft.targets.NAME).toBe('UNDECIDED'); expect(draft.ignored).toEqual([])
+    expect(() => buildAssetImportMappingRequest(4, hash, extended, draft)).toThrow(AssetImportInputError)
+    draft.targets.NAME = 0
+    for (const ignored of [[], [15], [16], [0, 15, 16]]) {
+      draft.ignored = ignored
+      expect(() => buildAssetImportMappingRequest(4, hash, extended, draft)).toThrow(AssetImportInputError)
+    }
+    draft.ignored = [16, 15]
+    const request = buildAssetImportMappingRequest(4, hash, extended, draft)
+    expect(request.target_source_columns.NAME).toBe(0)
+    expect(request.target_source_columns.NOTE).toBe(14)
+    expect(Object.keys(request.target_source_columns)).toHaveLength(15)
+    expect(request.ignored_source_columns).toEqual([15, 16])
+    expect(draft.ignored).toEqual([16, 15]) // Request normalization must not mutate the draft.
+    expect(extended.map(column => column.index)).toEqual(Array.from({ length: 17 }, (_, index) => index))
+  })
   it('does not suggest normalization, alternate dictionaries or missing header values', () => {
     const draft = createAssetImportMappingDraft([{ index: 0, header: ' 备注 ', target_suggestions: [] }, { index: 1, header: null, target_suggestions: [] }])
     expect(draft.targets.NOTE).toBe('UNDECIDED')

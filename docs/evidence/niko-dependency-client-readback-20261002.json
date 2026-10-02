@@ -1,0 +1,18 @@
+{
+  "verified_at": "2026-10-02T13:54:36.866Z",
+  "environment": "niko-local-test",
+  "scope": "actual frontend TypeScript workspace/readback over real PG/OIDC HTTP",
+  "http_gets": 4,
+  "http_writes": 0,
+  "passed": true,
+  "checks": [
+    "Real response accepted by strict frontend binding/graph validator",
+    "Repeated refresh GET-only and identical snapshot",
+    "No write key/attempt/receipt manufactured",
+    "Wrong tenant and applied-monitoring claims rejected",
+    "Context reset removes displayed graph and prevents further read"
+  ],
+  "browser_ui_tested": false,
+  "visual_acceptance": "NOT_RUN",
+  "credentials_output": false
+}

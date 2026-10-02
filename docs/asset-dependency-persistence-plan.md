@@ -1,6 +1,6 @@
 # 资产依赖草稿持久化实施边界
 
-状态：V7草稿schema已在niko-local-test独立执行1次，重复apply与只读check均0；原V1–V6未改。事务仓储已通过9项真实PG检查；API已接入，页面尚未接入，不是完整依赖功能完成证据。
+状态：V7草稿schema已在niko-local-test独立执行1次，重复apply与只读check均0；原V1–V6未改。事务仓储已通过9项真实PG检查；API及页面代码已接入，实际DOM/视觉尚未验收，不是完整依赖功能完成证据。
 
 目标：把既有`AssetDependencyValidator`的结构防环规则接入真实PostgreSQL事务，支持逐租户保存人工提出的依赖草稿。Q20真实依赖资料/影响范围和监控发布仍未确认，不把人工草稿变为已生效抑制规则。
 
@@ -17,4 +17,4 @@
 
 先验证真实PG的A→B→C后拒绝C→A、两并发相反边、跨租户/撤权、CAS、同键重放/冲突、写入审计与回滚、历史不可变和重新连接读回。随后接入实际API契约、HTTP权限/CSRF及页面。浏览器受当前执行环境限制，未取得实际页面证据前保留NOT_RUN；OSS阻塞不影响本切片。
 
-仓储验证已完成的具体范围见[独立证据](evidence/niko-asset-dependency-repository-20261002.json)。当前只追加提案、不提供删除/替换/发布动作，旧修订保留；HTTP动作与实际V0.9契约已接入，页面为下一切片，详见[API说明](asset-dependency-api.md)。
+仓储验证已完成的具体范围见[独立证据](evidence/niko-asset-dependency-repository-20261002.json)。当前只追加提案、不提供删除/替换/发布动作，旧修订保留；HTTP动作与实际V0.9契约已接入，页面代码和实际客户端模块已验证，DOM/视觉仍等待B03解除，详见[API说明](asset-dependency-api.md)。

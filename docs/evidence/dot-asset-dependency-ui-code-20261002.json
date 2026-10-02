@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-02",
+  "scope": "dependency drawer code and actual frontend state/readback module",
+  "frontend_module_sha256": "5180df38e586d0ae92955393a2b655f7a96fae1b4924d63afdfc4e4603887353",
+  "new_isolated_tests": 16,
+  "web_total_passed": 200,
+  "typecheck_build": "PASS",
+  "contract_tests": 20,
+  "contract_generation": "PASS",
+  "first_typecheck": {
+    "errors": 2,
+    "fixed": [
+      "AssetPage source field narrowed at validation boundary",
+      "Explicit string-returning request key factory type"
+    ]
+  },
+  "actual_http_frontend_module": {
+    "readonly_requests": 4,
+    "readonly_writes": 0,
+    "retry_run_requests": 9,
+    "retry_post_attempts": 2,
+    "committed_graph_versions": 1,
+    "same_key_and_body": true,
+    "matching_audit_records": 1
+  },
+  "initial_readonly_attempt": {
+    "status": "FAILED_AT_TRUSTED_SESSION",
+    "resolution": "Fresh real OIDC session capture then successful rerun; no payload or credential output"
+  },
+  "browser_ui": "BLOCKED_NOT_RUN",
+  "visual_acceptance": "NOT_RUN",
+  "limitations": [
+    "Actual frontend module over HTTP is not DOM/control/visual acceptance",
+    "Response-loss injection is deliberate client-side loss after server 200, not physical network or Worker failure",
+    "No monitoring publication or OSS proof"
+  ],
+  "backend_or_migrations_changed": false
+}

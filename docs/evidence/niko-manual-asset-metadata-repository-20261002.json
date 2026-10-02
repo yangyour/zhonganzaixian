@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-02",
+  "environment": "niko-local-test",
+  "scope": "authorized pristine manual asset metadata repository",
+  "result": "PASS",
+  "new_real_pg_tests": 12,
+  "root_maven": {
+    "total": 536,
+    "executed_passed": 523,
+    "real_pg_included": 131,
+    "fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "log_sha256": "0978d7d8bd46b409837dff7647d4ecdad35942040b9ce785e86a1916dc7e7930"
+  },
+  "first_run": {
+    "tests": 11,
+    "failures": 4,
+    "errors": 6,
+    "cause": "explicit site FOR KEY SHARE requires UPDATE privilege, intentionally absent",
+    "fix": "authorized SELECT plus actual composite-FK reference locking; retain minimal grants",
+    "regression_sqlstate": "42501"
+  },
+  "checks": [
+    "fresh internal membership and permission version",
+    "locked asset CAS/name uniqueness",
+    "tenant-scoped owner/site references checked before CAS",
+    "actual immutable before/after history and current pointer",
+    "source/IP/monitoring unchanged",
+    "original receipt replay after later update",
+    "all asset/revision/pointer/audit/replay roll back together",
+    "two independent connections one success one409",
+    "LocalDate0001..9999 and explicit null facts",
+    "disconnected503/no unprotected writes"
+  ],
+  "v1_v9_changed": false,
+  "site_update_grant_added": false,
+  "api_added": false,
+  "remaining": [
+    "Metadata API and reference selectors",
+    "Page and browser acceptance",
+    "IP/CMDB/customer scope decisions",
+    "Full M3-5 acceptance"
+  ]
+}

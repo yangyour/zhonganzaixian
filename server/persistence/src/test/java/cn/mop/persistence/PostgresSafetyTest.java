@@ -42,5 +42,10 @@ class PostgresSafetyTest {
         var auditAccess=new cn.mop.domain.audit.AuditReader.Access(id,id,1);
         assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->auditReader.list(auditAccess,new cn.mop.domain.audit.AuditReader.Filters(null,null,null,null,null,null,null,null),10,null,null)).status);
         assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->auditReader.verify(auditAccess,1,null)).status);
+        var metadata=new PostgresManualAssetMetadataRepository(disconnected,repository,new ObjectMapper());
+        var metadataAccess=new cn.mop.domain.assetmetadata.ManualAssetMetadataRepository.Access(id,id,1,"trace");
+        assertEquals(java.util.List.of("ASSET_METADATA_SCHEMA_OR_ACCESS_UNAVAILABLE"),metadata.readinessProblems());
+        assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->metadata.current(metadataAccess,id)).status);
+        assertThrows(IllegalStateException.class,()->metadata.update(metadataAccess,id,1,null));
     }
 }

@@ -1,0 +1,31 @@
+{
+  "recorded_at": "2026-10-02T11:29:17.586Z",
+  "environment": "niko-local-test",
+  "scope": "incomplete OSS provider fails closed while PG/OIDC and configuration reads work",
+  "checks": [
+    {
+      "path": "/health/live",
+      "status": 200
+    },
+    {
+      "path": "/health/ready",
+      "status": 503
+    },
+    {
+      "path": "/session",
+      "status": 200
+    },
+    {
+      "path": "/configurations",
+      "status": 200
+    },
+    {
+      "path": "/fixture/users",
+      "status": 403
+    }
+  ],
+  "oss_authentication": false,
+  "oss_writes": 0,
+  "minio_fallback": false,
+  "browser_ui_tested": false
+}

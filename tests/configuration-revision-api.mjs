@@ -70,7 +70,7 @@ async function main() {
   await request('creator', 'POST', `/configurations/${encodeURIComponent(objectDefinition.key)}/revisions`, { body: { ...proposal, proposed_value: { client_secret: 'not-a-real-credential' } }, status: 400, path: routePath });
   const objectRoute = `/configurations/${encodeURIComponent(objectDefinition.key)}/revisions`;
   const objectBefore = (await request('creator', 'GET', objectRoute, { path: routePath })).data.items.length;
-  for (const numericValue of ['{"limit":1e999}', '{"nested":[-1e999]}']) {
+  for (const numericValue of ['{"limit":1e999}', '{"nested":[-1e999]}', '{"OBJECT_STORAGE_SECRET_KEY":"SYNTHETIC-NOT-A-CREDENTIAL"}']) {
     const rawBody = `{"proposed_value":${numericValue},"reason":${JSON.stringify(proposal.reason)},"evidence_refs":${JSON.stringify(proposal.evidence_refs)}}`;
     await request('creator', 'POST', objectRoute, { rawBody, status: 400, path: routePath });
   }
@@ -138,7 +138,7 @@ async function main() {
   const audit = (await request('creator', 'GET', '/audit')).data.items;
   assert.equal(audit.filter(item => item.resource_id === created.id && item.action === 'configuration_revision.approve' && item.result === 'SUCCEEDED').length, 1);
   mkdirSync(new URL('docs/evidence/', root), { recursive: true });
-  const summary = { date: new Date().toISOString(), environment: process.env.MOP_TEST_ENVIRONMENT_NAME ?? 'designated-server', mode: 'remote_test', oidc_subjects: 3, http_responses_validated: checked, states_verified: ['DRAFT', 'IN_REVIEW', 'APPROVED', 'REJECTED', 'WITHDRAWN'], self_review_rejected: true, cross_tenant_objects_invisible: true, actor_spoof_rejected: true, replay_has_no_duplicate_history_or_audit: true, registry_unchanged: true, nested_numeric_overflow_rejected_without_revision: true, internal_approval_does_not_confirm_customer_or_activate: true };
+  const summary = { date: new Date().toISOString(), environment: process.env.MOP_TEST_ENVIRONMENT_NAME ?? 'designated-server', mode: 'remote_test', oidc_subjects: 3, http_responses_validated: checked, states_verified: ['DRAFT', 'IN_REVIEW', 'APPROVED', 'REJECTED', 'WITHDRAWN'], self_review_rejected: true, cross_tenant_objects_invisible: true, actor_spoof_rejected: true, replay_has_no_duplicate_history_or_audit: true, registry_unchanged: true, nested_numeric_overflow_rejected_without_revision: true, runtime_storage_secret_field_rejected: true, internal_approval_does_not_confirm_customer_or_activate: true };
   writeFileSync(process.env.MOP_EVIDENCE_OUTPUT ? resolve(process.env.MOP_EVIDENCE_OUTPUT) : new URL('docs/evidence/configuration-revision-http.json', root), JSON.stringify(summary, null, 2) + '\n');
   console.log(JSON.stringify(summary, null, 2));
 }

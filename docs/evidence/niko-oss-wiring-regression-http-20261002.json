@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-02T11:29:59.976Z",
+  "environment": "niko-local-test",
+  "mode": "remote_test",
+  "oidc_subjects": 3,
+  "http_responses_validated": 45,
+  "states_verified": [
+    "DRAFT",
+    "IN_REVIEW",
+    "APPROVED",
+    "REJECTED",
+    "WITHDRAWN"
+  ],
+  "self_review_rejected": true,
+  "cross_tenant_objects_invisible": true,
+  "actor_spoof_rejected": true,
+  "replay_has_no_duplicate_history_or_audit": true,
+  "registry_unchanged": true,
+  "nested_numeric_overflow_rejected_without_revision": true,
+  "runtime_storage_secret_field_rejected": true,
+  "internal_approval_does_not_confirm_customer_or_activate": true
+}

@@ -36,6 +36,9 @@ class OssProjectStoreTest {
         var env=new HashMap<String,String>();env.put("OBJECT_STORAGE_ENABLED","True");env.put("OBJECT_STORAGE_PROVIDER","oss");
         env.put("OBJECT_STORAGE_ENDPOINT",settings().endpoint());env.put("OBJECT_STORAGE_PUBLIC_ENDPOINT",settings().publicEndpoint());env.put("OBJECT_STORAGE_REGION","cn-beijing");env.put("OBJECT_STORAGE_BUCKET",BUCKET);env.put("OBJECT_STORAGE_ACCESS_KEY","synthetic-id");env.put("OBJECT_STORAGE_SECRET_KEY","synthetic-secret");env.put("MOP_OBJECT_STORAGE_PREFIX",PREFIX);env.put("OBJECT_STORAGE_PRESIGN_EXPIRES","3600");
         var parsed=OssStorageSettings.from(env::get);assertEquals(3600,parsed.presignExpiresSeconds());assertFalse(parsed.toString().contains("synthetic-secret"));assertFalse(parsed.toString().contains("synthetic-id"));
+        for(String name:List.of("OBJECT_STORAGE_ACCESS_KEY","OBJECT_STORAGE_SECRET_KEY","OBJECT_STORAGE_SECURITY_TOKEN")){
+            var invalid=new HashMap<>(env);invalid.put(name,"synthetic\nvalue");assertThrows(IllegalArgumentException.class,()->OssStorageSettings.from(invalid::get));
+        }
         for(String key:List.copyOf(env.keySet())){var missing=new HashMap<>(env);missing.remove(key);assertThrows(IllegalArgumentException.class,()->OssStorageSettings.from(missing::get),key);}
         for(var change:Map.of("OBJECT_STORAGE_ENABLED","false","OBJECT_STORAGE_PROVIDER","other","OBJECT_STORAGE_ENDPOINT","http://oss-cn-beijing.aliyuncs.com","OBJECT_STORAGE_PUBLIC_ENDPOINT","https://untrusted.invalid","OBJECT_STORAGE_REGION","cn-other","OBJECT_STORAGE_BUCKET","BAD","MOP_OBJECT_STORAGE_PREFIX","../","OBJECT_STORAGE_PRESIGN_EXPIRES","3601").entrySet()){
             var invalid=new HashMap<>(env);invalid.put(change.getKey(),change.getValue());assertThrows(IllegalArgumentException.class,()->OssStorageSettings.from(invalid::get));
@@ -114,4 +117,20 @@ class OssProjectStoreTest {
         assertThrows(IllegalArgumentException.class,()->store.photos().storeImmutable(KEY,BYTES,"image/svg+xml",sha(BYTES)));assertEquals(409,assertThrows(DomainException.class,()->store.photos().storeImmutable(KEY,BYTES,"image/png","a".repeat(64))).status);verifyNoInteractions(client);
     }
     @Test void closingStoreReleasesSdkClient(){OSS client=mock(OSS.class);new OssProjectStore(client,settings()).close();verify(client).shutdown();}
+    @Test void managedViewsReleaseSharedClientExactlyOnce()throws Exception{
+        OSS client=mock(OSS.class);var store=new OssProjectStore(client,settings());
+        ((AutoCloseable)store.photos()).close();((AutoCloseable)store.imports()).close();store.close();verify(client,times(1)).shutdown();
+    }
+
+    @Test void bucketVersioningIsRecheckedAfterEarlierReady()throws Exception{
+        OSS client=safeClient();var store=new OssProjectStore(client,settings());assertTrue(store.ready());
+        when(client.getBucketVersioning(BUCKET)).thenReturn(new BucketVersioningConfiguration("Enabled"));
+        assertEquals(503,assertThrows(DomainException.class,()->store.photos().storeImmutable(KEY,BYTES,"image/png",sha(BYTES))).status);verify(client,never()).putObject(any(PutObjectRequest.class));
+    }
+    @Test void closedStoresNeverStartNewSdkCalls()throws Exception{
+        OSS client=mock(OSS.class);var store=new OssProjectStore(client,settings());store.close();clearInvocations(client);
+        assertFalse(store.ready());assertEquals(503,assertThrows(DomainException.class,()->store.photos().read(KEY,BYTES.length,sha(BYTES))).status);
+        assertEquals(503,assertThrows(DomainException.class,()->store.photos().storeImmutable(KEY,BYTES,"image/png",sha(BYTES))).status);verifyNoInteractions(client);
+    }
+
 }

@@ -3,3 +3,7 @@ spring:
     default: remote_test
   main:
     banner-mode: "off"
+
+logging:
+  level:
+    com.aliyun.oss: 'OFF'

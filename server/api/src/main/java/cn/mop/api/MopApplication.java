@@ -32,7 +32,7 @@ public class MopApplication {
         String url=required(environment,"SPRING_DATASOURCE_URL");
         String runtimeUser=required(environment,"SPRING_DATASOURCE_USERNAME"),runtimePassword=required(environment,"SPRING_DATASOURCE_PASSWORD");
         if(!url.matches("jdbc:postgresql://127\\.0\\.0\\.1:[0-9]+/mop_test"))
-            throw new IllegalStateException("FAIL_CLOSED: remote_test requires SSH-forwarded PostgreSQL dedicated mop_test URL without credentials");
+            throw new IllegalStateException("FAIL_CLOSED: remote_test requires approved loopback PostgreSQL dedicated mop_test URL without credentials");
         if(!"mop_test_runtime".equals(runtimeUser))throw new IllegalStateException("FAIL_CLOSED: use the restricted project runtime role");
         // Application startup never performs DDL. Reviewed migrations run as a separate step;
         // a pending photo schema must not be silently applied or prevent existing no-photo work.

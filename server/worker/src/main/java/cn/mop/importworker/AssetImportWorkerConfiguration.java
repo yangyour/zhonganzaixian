@@ -1,6 +1,7 @@
 package cn.mop.importworker;
 
 import cn.mop.adapters.MinioAssetImportStore;
+import cn.mop.adapters.oss.OssProjectStore;
 import cn.mop.domain.assetimport.source.*;
 import cn.mop.persistence.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +24,7 @@ class AssetImportWorkerConfiguration {
     }
     @Bean ObjectMapper assetImportObjectMapper(){return new ObjectMapper();}
     @Bean AssetImportSourceRepository assetImportRepository(HikariDataSource assetImportDataSource,ObjectMapper assetImportObjectMapper){return new PostgresAssetImportRepository(assetImportDataSource,assetImportObjectMapper,new PostgresPlatformRepository(assetImportDataSource,assetImportObjectMapper));}
-    @Bean AssetImportObjectStore assetImportStore(AssetImportWorkerRuntimeSettings settings){return new MinioAssetImportStore(settings.storageEndpoint(),settings.storageBucket(),settings.storageAccessKey(),settings.storageSecretKey());}
+    @Bean AssetImportObjectStore assetImportStore(AssetImportWorkerRuntimeSettings settings){if(settings.ossSettings()!=null){try{return new OssProjectStore(settings.ossSettings()).imports();}catch(RuntimeException invalid){throw new IllegalStateException("FAIL_CLOSED: OSS import client could not be initialized; private details withheld");}}return new MinioAssetImportStore(settings.storageEndpoint(),settings.storageBucket(),settings.storageAccessKey(),settings.storageSecretKey());}
     @Bean(destroyMethod="close") AssetImportParserProcess assetImportParser(AssetImportWorkerRuntimeSettings settings){return new AssetImportParserProcess(settings.parserJar());}
     @Bean AssetImportWorkerRuntime assetImportWorker(AssetImportSourceRepository assetImportRepository,AssetImportObjectStore assetImportStore,AssetImportParserProcess assetImportParser){return new AssetImportWorkerRuntime(assetImportRepository,assetImportStore,assetImportParser);}
 }

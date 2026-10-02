@@ -61,4 +61,12 @@ class ConfigurationRevisionValidationTest {
         assertTrue(value.get("values").get(3).isNull());
     }
 
+    @Test void runtimeCredentialNamesCannotEnterConfigurationProposals() {
+        for(String key:List.of("OBJECT_STORAGE_ACCESS_KEY","OBJECT_STORAGE_SECRET_KEY","OBJECT_STORAGE_SECURITY_TOKEN","MOP_S3_ACCESS_KEY","MOP_S3_SECRET_KEY","MOP_IMPORT_S3_ACCESS_KEY","MOP_IMPORT_S3_SECRET_KEY","SPRING_DATASOURCE_PASSWORD","MOP_MIGRATION_PASSWORD","MOP_OIDC_CLIENT_SECRET","OSS_ACCESS_KEY_ID","OSS_ACCESS_KEY_SECRET","OSS_SECURITY_TOKEN")) {
+            var value=mapper.createObjectNode();value.putObject("nested").put(key,"SYNTHETIC-NOT-A-CREDENTIAL");
+            assertThrows(DomainException.class,()->ConfigurationValueValidator.validate(Map.of("type","object"),value),key);
+        }
+        assertDoesNotThrow(()->ConfigurationValueValidator.validate(Map.of("type","object"),mapper.createObjectNode().put("secret_ref","document-ref:synthetic-reference")));
+    }
+
 }

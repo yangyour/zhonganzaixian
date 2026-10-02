@@ -1,5 +1,6 @@
 package cn.mop.api;
 import cn.mop.adapters.MinioPhotoStore;
+import cn.mop.adapters.oss.*;
 import cn.mop.domain.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
@@ -9,12 +10,17 @@ public class PhotoConfiguration {
     private static final System.Logger log=System.getLogger(PhotoConfiguration.class.getName());
     @Bean PhotoPolicy photoPolicy(Environment environment){try{return new PhotoPolicy(environment.getProperty("MOP_PHOTO_ALLOWED_MEDIA_TYPES"));}catch(IllegalStateException invalid){log.log(System.Logger.Level.WARNING,"Photo allowlist unavailable exception_type={0}",invalid.getClass().getName());return new PhotoPolicy(null);}}
     @Bean PhotoObjectStore photoObjectStore(Environment environment){
+        try {
+            var selection=StorageProviderSelection.from(environment::getProperty);
+            if(selection.mode()==StorageProviderSelection.Mode.DISABLED)return unavailableStore();
+            if(selection.mode()==StorageProviderSelection.Mode.OSS)return new OssProjectStore(selection.ossSettings()).photos();
+        } catch(RuntimeException invalid) {log.log(System.Logger.Level.WARNING,"Photo provider configuration unavailable exception_type={0}",invalid.getClass().getName());return unavailableStore();}
         String endpoint=environment.getProperty("MOP_S3_ENDPOINT"),bucket=environment.getProperty("MOP_S3_BUCKET"),access=environment.getProperty("MOP_S3_ACCESS_KEY"),secret=environment.getProperty("MOP_S3_SECRET_KEY");
         if(java.util.stream.Stream.of(endpoint,bucket,access,secret).anyMatch(value->value==null||value.isBlank()))return unavailableStore();
         try{return new MinioPhotoStore(endpoint,bucket,access,secret);}catch(IllegalStateException invalid){log.log(System.Logger.Level.WARNING,"Photo storage configuration unavailable exception_type={0}",invalid.getClass().getName());return unavailableStore();}
     }
     @Bean PhotoDependencyProbe photoDependencyProbe(Environment environment,PhotoPolicy policy,PhotoObjectStore store,PlatformRepository repository){
-        boolean enabled=List.of("MOP_PHOTO_ALLOWED_MEDIA_TYPES","MOP_S3_ENDPOINT","MOP_S3_BUCKET","MOP_S3_ACCESS_KEY","MOP_S3_SECRET_KEY").stream()
+        boolean enabled=StorageProviderSelection.capabilityRequested(environment::getProperty)||List.of("MOP_PHOTO_ALLOWED_MEDIA_TYPES","MOP_S3_ENDPOINT","MOP_S3_BUCKET","MOP_S3_ACCESS_KEY","MOP_S3_SECRET_KEY").stream()
             .map(environment::getProperty).anyMatch(value->value!=null&&!value.isBlank());
         return new PhotoDependencyProbe(enabled,policy,store,repository);
     }

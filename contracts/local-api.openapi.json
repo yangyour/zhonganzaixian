@@ -148,7 +148,7 @@
     "/health/ready": {
       "get": {
         "operationId": "readiness",
-        "summary": "实际PG/OIDC及已启用照片/导入源策略/schema/ACL/MinIO就绪；失败503及安全原因。导入worker_activity=NOT_PROBED，不证明Worker运行、业务导入或生产就绪",
+        "summary": "实际PG/OIDC及已启用照片/导入源策略/schema/ACL/已选对象存储就绪；失败503及安全原因。导入worker_activity=NOT_PROBED，不证明Worker运行、业务导入或生产就绪",
         "security": [],
         "responses": {
           "200": {
@@ -2845,7 +2845,7 @@
                     "not": {
                       "type": "null"
                     },
-                    "description": "按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义。"
+                    "description": "按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义；拒绝对象存储/数据库/OIDC等运行凭据字段。"
                   },
                   "expected_version": {
                     "type": "integer",
@@ -3357,7 +3357,7 @@
                     "not": {
                       "type": "null"
                     },
-                    "description": "按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义。"
+                    "description": "按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义；拒绝对象存储/数据库/OIDC等运行凭据字段。"
                   },
                   "reason": {
                     "type": "string",
@@ -6206,7 +6206,14 @@
           "data",
           "trace_id"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-mop-storage-provider-routing": [
+          "完全无OBJECT_STORAGE配置时保留既有MinIO路径",
+          "明确关闭或不完整OSS配置不回退到MinIO",
+          "OSS必须使用受限部署前缀；运行凭据不作为MOP API请求/响应字段",
+          "缺失存储前提返回503，但PG/OIDC及无存储依赖的接口继续可用",
+          "平台授权grant和预签名配置不混用"
+        ]
       },
       "SessionResult": {
         "type": "object",
@@ -6503,7 +6510,7 @@
             "not": {
               "type": "null"
             },
-            "description": "按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义。"
+            "description": "按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义；拒绝对象存储/数据库/OIDC等运行凭据字段。"
           },
           "reason": {
             "type": "string",

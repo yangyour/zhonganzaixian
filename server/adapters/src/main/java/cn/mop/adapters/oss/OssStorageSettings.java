@@ -10,8 +10,8 @@ public record OssStorageSettings(String endpoint, String publicEndpoint, String 
         if (!"cn-beijing".equals(region) || !"https://oss-cn-beijing.aliyuncs.com".equals(endpoint)
                 || !endpoint.equals(publicEndpoint)) throw invalid();
         if (bucket == null || !bucket.matches("[a-z0-9][a-z0-9-]{1,61}[a-z0-9]")) throw invalid();
-        if (accessKey == null || accessKey.isBlank() || secretKey == null || secretKey.isBlank()) throw invalid();
-        if (securityToken != null && securityToken.isBlank()) throw invalid();
+        if (!credentialText(accessKey) || !credentialText(secretKey)) throw invalid();
+        if (securityToken != null && !credentialText(securityToken)) throw invalid();
         // A fresh explicitly chosen deployment namespace, never the bucket root or an arbitrary prefix.
         if (prefix == null || !prefix.matches("mop-niko-test/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/")) throw invalid();
         if (presignExpiresSeconds < 1 || presignExpiresSeconds > 3600) throw invalid();
@@ -27,5 +27,6 @@ public record OssStorageSettings(String endpoint, String publicEndpoint, String 
         } catch (RuntimeException failure) { throw invalid(); }
     }
     @Override public String toString() { return "OssStorageSettings[credentials=REDACTED]"; }
+    private static boolean credentialText(String value) { return value != null && !value.isBlank() && value.codePoints().noneMatch(c -> Character.isISOControl(c) || Character.isWhitespace(c)); }
     private static IllegalArgumentException invalid() { return new IllegalArgumentException("Explicit scoped OSS configuration is incomplete or invalid"); }
 }

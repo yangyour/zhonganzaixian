@@ -22,7 +22,7 @@ const evidence = object({ reference: { type: 'string', pattern: '^document-ref:[
 const boundedComment = { type: 'string', minLength: 1, maxLength: 500, description: '按Unicode code point计数，拒绝控制字符；不能包含凭据或token。' };
 const revision = object({
   id: { type: 'string', format: 'uuid' }, tenant_id: { type: 'string', format: 'uuid' }, configuration_key: string,
-  proposed_value: { not: { type: 'null' }, description: '按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义。' }, reason: boundedComment, evidence_refs: { type: 'array', minItems: 1, maxItems: 5, items: evidence },
+  proposed_value: { not: { type: 'null' }, description: '按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义；拒绝对象存储/数据库/OIDC等运行凭据字段。' }, reason: boundedComment, evidence_refs: { type: 'array', minItems: 1, maxItems: 5, items: evidence },
   workflow_status: { type: 'string', enum: ['DRAFT', 'IN_REVIEW', 'APPROVED', 'REJECTED', 'WITHDRAWN'] }, version: { type: 'integer', minimum: 1 },
   created_by: { type: 'string', format: 'uuid' }, created_at: { type: 'string', format: 'date-time' }, updated_at: { type: 'string', format: 'date-time' },
   reviewed_by: { type: ['string', 'null'], format: 'uuid' }, reviewed_at: { type: ['string', 'null'], format: 'date-time' }, review_comment: nullableString,
@@ -174,7 +174,7 @@ const contract = {
   security: [{ SessionCookie: [] }],
   paths: {
     '/health/live': { get: action('liveness', '本地进程存活', ref('ResourceResult'), { security: [] }) },
-    '/health/ready': { get: action('readiness', '实际PG/OIDC及已启用照片/导入源策略/schema/ACL/MinIO就绪；失败503及安全原因。导入worker_activity=NOT_PROBED，不证明Worker运行、业务导入或生产就绪', ref('ReadinessResult'), { security: [] }) },
+    '/health/ready': { get: action('readiness', '实际PG/OIDC及已启用照片/导入源策略/schema/ACL/已选对象存储就绪；失败503及安全原因。导入worker_activity=NOT_PROBED，不证明Worker运行、业务导入或生产就绪', ref('ReadinessResult'), { security: [] }) },
     '/auth/options': { get: action('authOptions', '读取Keycloak授权登录入口；不返回秘密', envelope(object({ mode: { const: 'remote_test' }, identity_source: { const: 'test_oidc' }, login_url: { const: '/oauth2/authorization/mop' } })), { security: [] }) },
     '/session': { get: action('getSession', '读取可信会话与能力', ref('SessionResult')), delete: action('logout', '注销会话', ref('ResourceResult'), { parameters: headers }) },
     '/session/tenant': { post: mutation('switchTenant', '在服务端授权集合中切换租户', object({ tenant_id: { type: 'string', format: 'uuid' } }), ref('SessionResult')) },
@@ -192,11 +192,11 @@ const contract = {
     '/asset-import-operations/{id}': { get: action('getAssetImportOperation', '创建者回读独立STORE_RAW/PARSE操作；GET不执行任务，等待不代表失败', ref('AssetImportOperationResult'), { ...importAccess, parameters: [pathId] }) },
     '/configurations': { get: action('listConfigurations', '仅平台管理员读取设计登记和测试环境持久草稿', ref('ResourceResult'), { parameters: [parameter('decision_status', 'query', { type: 'string', enum: ['pending', 'contract_fixed'] }, false)] }) },
     '/settings/effective': { get: action('readConfigurationDiagnostic', '当前padmin读取单key配置来源诊断；200只表示PG元数据读取成功，CONFIG_PENDING/null不代表生效', ref('ConfigurationDiagnosticResult'), { parameters: [parameter('key', 'query', configurationKey)], 'x-mop-allowed-query-keys': ['key'], 'x-mop-reject-duplicate-query-keys': true, description: '拒绝额外或重复query，客户端不能提供tenant、对象scope、precedence或核验事实。未知key404、无权403、失效会话401、PG不可用503。授权、登记版本及本租户最多5条近期提案来自一个只读REPEATABLE READ快照；后续提交在下一请求可见。近期提案不是选中的有效版本，APPROVED也未发布。运行定义、发布及客户核验能力明确NOT_IMPLEMENTED/null，不以空集合冒充已接入；不返回原值、旧草稿、提案、意见或资料正文。' }) },
-    '/configurations/{key}/draft': { post: mutation('saveConfigurationDraft', '保存独立草稿；不改变value或客户确认状态，动态校验登记类型', object({ proposed_value: { not: { type: 'null' }, description: '按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义。' }, expected_version: { type: 'integer', minimum: 1 } }), ref('ResourceResult'), { parameters: [pathKey, ...headers] }) },
+    '/configurations/{key}/draft': { post: mutation('saveConfigurationDraft', '保存独立草稿；不改变value或客户确认状态，动态校验登记类型', object({ proposed_value: { not: { type: 'null' }, description: '按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义；拒绝对象存储/数据库/OIDC等运行凭据字段。' }, expected_version: { type: 'integer', minimum: 1 } }), ref('ResourceResult'), { parameters: [pathKey, ...headers] }) },
     '/configurations/{key}/publish': { post: blocked('publishConfiguration', '发布门禁；管理员保存不代表客户书面确认', pathKey) },
     '/configurations/{key}/revisions': {
       get: action('listConfigurationRevisions', '本租户配置修订列表；不跨租户聚合', envelope(object({ items: { type: 'array', items: ref('ConfigurationRevision') } })), { parameters: [pathKey] }),
-      post: mutation('createConfigurationRevision', '创建持久配置提案和未核验书面资料引用', object({ proposed_value: { not: { type: 'null' }, description: '按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义。' }, reason: boundedComment, evidence_refs: { type: 'array', minItems: 1, maxItems: 5, items: evidence } }), ref('ConfigurationRevisionResult'), { parameters: [pathKey, ...headers] }),
+      post: mutation('createConfigurationRevision', '创建持久配置提案和未核验书面资料引用', object({ proposed_value: { not: { type: 'null' }, description: '按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义；拒绝对象存储/数据库/OIDC等运行凭据字段。' }, reason: boundedComment, evidence_refs: { type: 'array', minItems: 1, maxItems: 5, items: evidence } }), ref('ConfigurationRevisionResult'), { parameters: [pathKey, ...headers] }),
     },
     '/configuration-revisions/{id}': { get: action('getConfigurationRevision', '读取本租户配置修订、状态及历史', ref('ConfigurationRevisionResult'), { parameters: [pathId] }) },
     '/configuration-revisions/{id}/submit': { post: mutation('submitConfigurationRevision', '创建者提交DRAFT进入内部审核', version, ref('ConfigurationRevisionResult'), { parameters: [pathId, ...headers] }) },
@@ -266,6 +266,7 @@ const contract = {
     },
   },
 };
+contract.components.schemas.ReadinessResult['x-mop-storage-provider-routing'] = ['完全无OBJECT_STORAGE配置时保留既有MinIO路径', '明确关闭或不完整OSS配置不回退到MinIO', 'OSS必须使用受限部署前缀；运行凭据不作为MOP API请求/响应字段', '缺失存储前提返回503，但PG/OIDC及无存储依赖的接口继续可用', '平台授权grant和预签名配置不混用'];
 const target = fileURLToPath(new URL('../contracts/local-api.openapi.json', import.meta.url));
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {

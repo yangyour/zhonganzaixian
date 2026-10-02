@@ -28,3 +28,4 @@ spring:
 logging:
   level:
     org.springframework.security: WARN
+    com.aliyun.oss: 'OFF'

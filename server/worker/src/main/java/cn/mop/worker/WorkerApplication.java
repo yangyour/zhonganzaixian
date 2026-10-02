@@ -1,6 +1,7 @@
 package cn.mop.worker;
 
 import cn.mop.adapters.MinioPhotoStore;
+import cn.mop.adapters.oss.OssProjectStore;
 import cn.mop.domain.PhotoObjectStore;
 import cn.mop.persistence.PostgresPlatformRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,6 +55,7 @@ public class WorkerApplication {
     }
 
     @Bean PhotoObjectStore photoObjectStore(WorkerRuntimeSettings settings) {
+        if(settings.ossSettings()!=null){try{return new OssProjectStore(settings.ossSettings()).photos();}catch(RuntimeException invalid){throw new IllegalStateException("FAIL_CLOSED: OSS photo client could not be initialized; private details withheld");}}
         return new MinioPhotoStore(settings.storageEndpoint(),settings.storageBucket(),settings.storageAccessKey(),settings.storageSecretKey());
     }
 

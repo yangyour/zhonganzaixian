@@ -1,6 +1,7 @@
 package cn.mop.api;
 
 import cn.mop.adapters.MinioAssetImportStore;
+import cn.mop.adapters.oss.*;
 import cn.mop.domain.*;
 import cn.mop.domain.assetimport.source.*;
 import cn.mop.persistence.*;
@@ -17,12 +18,17 @@ public class AssetImportConfiguration {
     @Bean AssetImportPolicy assetImportPolicy(Environment environment){return new AssetImportPolicy(environment.getProperty("MOP_IMPORT_ALLOWED_FORMATS"));}
     @Bean AssetImportSourceRepository assetImportSourceRepository(DataSource testDataSource,ObjectMapper mapper,PlatformRepository platform){if(!(platform instanceof PostgresPlatformRepository postgres))throw new IllegalStateException("FAIL_CLOSED: designated PostgreSQL import transactions required");return new PostgresAssetImportRepository(testDataSource,mapper,postgres);}
     @Bean AssetImportObjectStore assetImportObjectStore(Environment environment){
+        try {
+            var selection=StorageProviderSelection.from(environment::getProperty);
+            if(selection.mode()==StorageProviderSelection.Mode.DISABLED)return unavailable();
+            if(selection.mode()==StorageProviderSelection.Mode.OSS)return new OssProjectStore(selection.ossSettings()).imports();
+        } catch(RuntimeException invalid) {LOG.log(System.Logger.Level.WARNING,"Import provider configuration unavailable exception_type={0}",invalid.getClass().getName());return unavailable();}
         String endpoint=environment.getProperty("MOP_IMPORT_S3_ENDPOINT"),bucket=environment.getProperty("MOP_IMPORT_S3_BUCKET"),access=environment.getProperty("MOP_IMPORT_S3_ACCESS_KEY"),secret=environment.getProperty("MOP_IMPORT_S3_SECRET_KEY");
         if(java.util.stream.Stream.of(endpoint,bucket,access,secret).anyMatch(value->value==null||value.isBlank()))return unavailable();
         try{return new MinioAssetImportStore(endpoint,bucket,access,secret);}catch(RuntimeException invalid){LOG.log(System.Logger.Level.WARNING,"Import storage configuration unavailable exception_type={0}",invalid.getClass().getName());return unavailable();}
     }
     @Bean ImportDependencyProbe assetImportDependencyProbe(Environment environment,AssetImportSourceRepository sources,AssetImportObjectStore store){
-        boolean enabled=List.of("MOP_IMPORT_ALLOWED_FORMATS","MOP_IMPORT_S3_ENDPOINT","MOP_IMPORT_S3_BUCKET","MOP_IMPORT_S3_ACCESS_KEY","MOP_IMPORT_S3_SECRET_KEY").stream().map(environment::getProperty).anyMatch(value->value!=null&&!value.isBlank());
+        boolean enabled=StorageProviderSelection.capabilityRequested(environment::getProperty)||List.of("MOP_IMPORT_ALLOWED_FORMATS","MOP_IMPORT_S3_ENDPOINT","MOP_IMPORT_S3_BUCKET","MOP_IMPORT_S3_ACCESS_KEY","MOP_IMPORT_S3_SECRET_KEY").stream().map(environment::getProperty).anyMatch(value->value!=null&&!value.isBlank());
         return new ImportDependencyProbe(enabled,"CSV,XLSX".equals(environment.getProperty("MOP_IMPORT_ALLOWED_FORMATS")),sources,store);
     }
     public record ImportReadiness(boolean enabled,boolean policyReady,boolean schemaReady,boolean storageReady,List<String> reasons){

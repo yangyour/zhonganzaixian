@@ -1,0 +1,47 @@
+{
+  "recorded_at": "2026-10-02T11:31:37.636502+00:00",
+  "base_commit": "c576ce35ea272ce3bce3332a505c8739af2270c9",
+  "scope": "API and two worker provider selection, lifecycle and missing-configuration gating",
+  "new_junit_tests": 16,
+  "isolated_maven": {
+    "tests": 419,
+    "executed": 331,
+    "skipped": 88,
+    "failures": 0,
+    "errors": 0
+  },
+  "niko_real_pg_maven": {
+    "tests": 413,
+    "executed": 400,
+    "skipped_historical_fixture": 13,
+    "explicitly_excluded_minio_checks": 6,
+    "real_pg_cases_included": 69,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts": {
+    "tests": 18,
+    "generation_consistency": "PASS",
+    "version": "0.8",
+    "response_shape_changed": false
+  },
+  "partial_oss_http_checks": 5,
+  "restored_configuration_http_checks": 45,
+  "api_and_workers_wired": true,
+  "oss_authentication": "NOT_RUN",
+  "oss_cloud_writes": 0,
+  "oss_iam": "NOT_RUN",
+  "credentials_from_chat_saved": false,
+  "credential_configuration_status": "AWAITING_CONTROLLED_PRIVATE_REPLACEMENT_FILE",
+  "legacy_minio_fallback_when_oss_invalid": false,
+  "presigned_downloads_enabled": false,
+  "parser_environment_clears_oss_credentials": true,
+  "migrations_changed": false,
+  "original_private_configuration_changed": false,
+  "preceding_commit_ci": {
+    "sha": "c576ce35ea272ce3bce3332a505c8739af2270c9",
+    "run_id": 36997962248,
+    "conclusion": "success"
+  },
+  "post_regression_schema_check": "PASS_EXECUTED_0"
+}

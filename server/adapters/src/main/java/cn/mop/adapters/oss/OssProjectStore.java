@@ -12,11 +12,13 @@ import com.aliyun.oss.model.*;
 import java.io.ByteArrayInputStream;
 import java.security.MessageDigest;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Native OSS V4 transport. No bucket mutation, delete, ACL expansion or public/presigned download API. */
 public final class OssProjectStore implements AutoCloseable {
     private static final System.Logger LOG=System.getLogger(OssProjectStore.class.getName());
     private static final String UUID="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+    private final AtomicBoolean closed=new AtomicBoolean();
     private final OSS client;
     private final OssStorageSettings settings;
 
@@ -43,6 +45,7 @@ public final class OssProjectStore implements AutoCloseable {
     /** Read-only capability prerequisites; real anonymous-access/IAM tests are separate evidence. */
     public boolean ready() { try { requireBucketSafety();return true; } catch(Exception e) { safeLog(e);return false; } }
     private void requireBucketSafety() {
+        if(closed.get())throw unavailable();
         BucketVersioningConfiguration versioning=client.getBucketVersioning(settings.bucket());
         if(versioning==null)throw unavailable();
         // The official service returns absent Status for a bucket never versioned; SDK parses it as null.
@@ -52,25 +55,25 @@ public final class OssProjectStore implements AutoCloseable {
         if(acl==null||acl.getCannedACL()!=CannedAccessControlList.Private)throw unavailable();
         // Enabled AND Suspended versioning ignore x-oss-forbid-overwrite. Never disable bucket settings here.
     }
-    public PhotoObjectStore photos() {
-        return new PhotoObjectStore() {
+    public PhotoObjectStore photos() { return new PhotoView(); }
+    public final class PhotoView implements PhotoObjectStore,AutoCloseable {
             public boolean ready(){return OssProjectStore.this.ready();}
             public void storeImmutable(String key,byte[] bytes,String media,String hash) {
                 if(media==null||!Set.of("image/jpeg","image/png").contains(media))throw new IllegalArgumentException("Invalid accepted photo media");
                 write("photos",key,bytes,media,hash,5_000_000,Map.of());
             }
             public byte[] read(String key,long size,String hash){return readVerified("photos",key,size,hash,5_000_000);}
-        };
+            public void close(){OssProjectStore.this.close();}
     }
-    public AssetImportObjectStore imports() {
-        return new AssetImportObjectStore() {
+    public AssetImportObjectStore imports() { return new ImportView(); }
+    public final class ImportView implements AssetImportObjectStore,AutoCloseable {
             public boolean ready(){return OssProjectStore.this.ready();}
             public void storeImmutable(String key,byte[] bytes,ImportFormat format,String hash) {
                 Objects.requireNonNull(format,"declared import format");
                 write("asset-import-sources",key,bytes,"application/octet-stream",hash,ImportLimits.MAX_SOURCE_BYTES,Map.of("declared-format",format.name()));
             }
             public byte[] read(String key,long size,String hash){return readVerified("asset-import-sources",key,size,hash,ImportLimits.MAX_SOURCE_BYTES);}
-        };
+            public void close(){OssProjectStore.this.close();}
     }
     private String objectKey(String namespace,String key) {
         if(key==null||!key.matches(namespace+"/"+UUID+"/"+UUID))throw new IllegalArgumentException("Invalid project object key");
@@ -99,6 +102,7 @@ public final class OssProjectStore implements AutoCloseable {
     }
     private byte[] readVerified(String namespace,String key,long size,String hash,long limit) {
         String physical=objectKey(namespace,key);expected(size,hash,limit);
+        if(closed.get())throw unavailable();
         try {
             ObjectMetadata metadata=client.getObjectMetadata(settings.bucket(),physical);
             if(metadata==null||metadata.getContentLength()!=size)throw integrity();
@@ -117,5 +121,5 @@ public final class OssProjectStore implements AutoCloseable {
     private static void safeLog(Exception e){LOG.log(System.Logger.Level.WARNING,"OSS storage failure exception_type={0}",e.getClass().getName());}
     private static DomainException unavailable(){return new DomainException(503,"UPSTREAM_UNAVAILABLE","OSS存储或不可覆盖前提未核验，未取得存储成功证据");}
     private static DomainException integrity(){return new DomainException(409,"FILE_INTEGRITY_CONFLICT","对象大小或摘要不符，禁止覆盖");}
-    @Override public void close(){client.shutdown();}
+    @Override public void close(){if(closed.compareAndSet(false,true))client.shutdown();}
 }

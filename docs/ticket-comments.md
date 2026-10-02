@@ -37,3 +37,16 @@ PostgresTicketCommentRepository每次同快照核验活跃用户/成员、当前
 16项真实PG首轮全部通过：独立连接原文/hash、本人及双内部角色/其他客户隔离、内部备注不泄漏、父DTO/版本不变、原键重放/冲突、父CAS与未保护事务拒绝、错父/跨租户、权限版本、整笔回滚及原键恢复、同原键两连接仅一条评论/审计、不同作者并发保留两条、分页/2000emoji、成功读不追加审计、单连接池无嵌套借用、关闭单独真实连接池后明确503、缓存收据前资源守卫仍执行。最后一项用不存在父资源的真实PG守卫拒绝验证，没有修改任何账号角色来假称撤权演练。
 
 根658=645执行（含188真实PG）+13历史fixture跳过、6MinIO排除，0失败错误；30契约不变。schema阶段的0行是当时全回滚后的历史核验，现在仓储测试已有明确合成评论提交，不能继续说新表当前为空。V1–V11不改，公开评论API/页面尚待，尚未真实HTTP/浏览器验收。见[仓储证据](evidence/niko-ticket-comment-repository-20261002.json)。
+
+
+## 2026-10-02 公开评论API V0.17
+
+GET/POST /tickets/{ticketId}/comments和GET .../{id}已接真实仓储。四种既有角色取得明确comment读/写能力，但客户仍只限本人报障，内部限当前授权租户；其他客户/跨租户/错父404。POST只接受expected_ticket_version与text，32KiB正文/重复键/尾随JSON/Unicode和父版本严格校验；不接受actor/visibility/author_kind/附件/ITSM同步字段。CSRF、原键/原body与版本边界保持，缓存收据前也必须先通过当前资源授权回调。
+
+响应仅包含固定作者类别及报障人/工程师标签，不含结构化内部actor ID/name；自由文本保留作者主动提交的原文，不把内部备注转换为评论。immutable=true、状态/SLA不变，itsm_applied=false、itsm_sync_status=NOT_REQUESTED、itsm_sync_available=false；没有消息送达或外部同步声明。只读分页至多100、配对创建时间/id降序；没有PATCH/DELETE。ready实际检查V11结构及运行ACL，失败503，live不探测；API/Worker不迁移。
+
+10控制器+1就绪新增；最终根669=656执行（含188真实PG）+13历史fixture跳过、6MinIO排除，0失败错误；32契约/298Web/类型和生产构建通过。首次单元编译因新测试残留旧幂等方法签名失败，修正到新授权入口后23项聚焦测试通过；原ready契约样例未带新字段导致1断言失败，补齐样例后32通过，均保留原日志。
+
+首轮84次真实PG/OIDC/API检查全部逐响应契约通过（无PATCH/DELETE端点的405使用共同Error schema）：6身份、本人和内部读写/其他客户与跨租户404、明确作者标签/内部备注隔离、CSRF/字段/正文/分页门禁、原键旧收据与冲突、父CAS、同键并发2响应1行、2000emoji及10+2分页。主父登记最终14评论/14成功审计，其他报障人另1条；真实actor只留内部审计，回放无重复成功审计，原父状态/SLA/版本和客户DTO不变。成功只读查询不追加审计；拒绝请求安全审计保留。
+
+见[API HTTP证据](evidence/niko-ticket-comment-api-http-20261002.json)及[汇总](evidence/niko-ticket-comment-api-20261002.json)。仓储d01d0ab及CI37078043122成功。当前公开API完成的是本地手工评论切片，评论页面/实际浏览器/通知/附件/ITSM和完整M5-7/M8-7仍待，不能标DONE；V1–V11不改。

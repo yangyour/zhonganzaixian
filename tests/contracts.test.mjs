@@ -177,7 +177,7 @@ test('operation区分报障门禁与真实文件状态，终态不得伪造', ()
 
 test('就绪成功不能把已启用但缺schema或存储的照片能力写成READY', () => {
   const photos = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, policy_source: 'USER_DEVELOPMENT_DIRECTION', reasons: [] };
-  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, asset_reads: { unicode_search_ready: true, pagination: 'BOUNDED_POSTGRESQL_KEYSET' }, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
+  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, asset_reads: { unicode_search_ready: true, pagination: 'BOUNDED_POSTGRESQL_KEYSET' }, ticket_comments: { schema_access_ready: true, visibility: 'REPORTER_AND_INTERNAL', internal_identity_exposed: false, itsm_applied: false }, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
   assert.equal(validates('ReadinessResult', { data, trace_id: 'MOP-FAKE-readiness' }), true);
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('ReadinessResult', { data: { ...data, photos: { ...photos, [key]: false } }, trace_id: 'MOP-FAKE-readiness' }), false);
   assert.equal(validates('ReadinessResult', { data: { ...data, production_ready: true }, trace_id: 'MOP-FAKE-readiness' }), false);
@@ -205,8 +205,8 @@ const importSource = {
   ...importFacts, effective_rule_versions: null, quota_reservation: null,
 };
 
-test('V0.16.1保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.16.1');
+test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
+  assert.equal(contract.info.version, '0.17.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -428,4 +428,19 @@ test('ticket query contract bounds Unicode input without expanding reporter visi
   assert.deepEqual(parameters.category.enum, ['网络不通', '网速慢', 'WiFi问题', '设备异常', '其他']);
   assert.match(operation['x-mop-filter-semantics'], /reporter-only/);
   assert.match(operation['x-mop-filter-semantics'], /no normalization/);
+});
+
+
+test('customer comment DTO rejects private identity, incorrect attribution and provider claims', () => {
+  const input = { expected_ticket_version: 1, text: '明确客户可见原文' }; assert.ok(validates('TicketCommentCreate', input));
+  for (const extra of [{ actor_id: id('4') }, { visibility: 'INTERNAL' }, { itsm_sync_requested: true }, { attachment_ids: [] }, { author_kind: 'ENGINEER' }]) assert.equal(validates('TicketCommentCreate', { ...input, ...extra }), false);
+  const comment = { id: id('1'), tenant_id: id('2'), ticket_id: id('3'), observed_ticket_version: 1, author_kind: 'ENGINEER', author_label: '工程师', text: input.text, text_sha256: createHash('sha256').update(input.text).digest('hex'), created_at: timestamp, visibility: 'REPORTER_AND_INTERNAL', record_source: 'MANUAL_TICKET_COMMENT', verification_status: 'SELF_REPORTED', source: 'postgresql', immutable: true, ticket_state_changed: false, sla_changed: false, itsm_applied: false, itsm_sync_status: 'NOT_REQUESTED', itsm_sync_available: false };
+  assert.ok(validates('TicketComment', comment)); assert.ok(validates('TicketComment', { ...comment, author_kind: 'REPORTER', author_label: '报障人' }));
+  for (const extra of [{ actor_id: id('4') }, { actor_name: 'private name' }, { author_label: '报障人' }, { visibility: 'INTERNAL' }, { itsm_applied: true }, { itsm_sync_available: true }, { ticket_state_changed: true }, { sla_changed: true }]) assert.equal(validates('TicketComment', { ...comment, ...extra }), false);
+  const page = { items: [comment], has_more: false, next_before_created_at: null, next_before_id: null, source: 'postgresql', scope: 'REPORTER_OR_CURRENT_TENANT_INTERNAL', page_size_limit: 100 }; assert.ok(validates('TicketCommentPage', page)); assert.equal(validates('TicketCommentPage', { ...page, has_more: true }), false);
+});
+
+test('customer comment routes bind scoped replay and actual readiness without new mutation routes', () => {
+  const path = contract.paths['/tickets/{ticketId}/comments']; assert.deepEqual(Object.keys(path), ['get', 'post']); assert.deepEqual(path.get['x-mop-roles'], ['viewer', 'tadmin', 'msp', 'padmin']); assert.match(path.post['x-mop-replay-authorization'], /before cached receipt/); assert.equal(path.post['x-mop-max-body-bytes'], 32768); assert.deepEqual(Object.keys(contract.paths['/tickets/{ticketId}/comments/{id}']), ['get']);
+  const ready = contract.components.schemas.ReadinessResult.properties.data; assert.ok(ready.required.includes('ticket_comments')); assert.equal(ready.properties.ticket_comments.properties.internal_identity_exposed.const, false); assert.equal(ready.properties.ticket_comments.properties.itsm_applied.const, false);
 });

@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-02T23:45:39.777434+00:00",
+  "environment": "niko-local-test",
+  "api_version": "0.17.0",
+  "status": "REAL_HTTP_COMMENT_SLICE_VERIFIED",
+  "new_controller_tests": 10,
+  "new_readiness_tests": 1,
+  "root_tests": {
+    "reported": 669,
+    "executed": 656,
+    "real_postgresql": 188,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contract_tests": 32,
+  "web_tests": 298,
+  "typecheck_build": "passed",
+  "http_checks": 84,
+  "http_evidence": "niko-ticket-comment-api-http-20261002.json",
+  "first_http_run_passed": true,
+  "initial_failures": [
+    "Copied new controller test retained old idempotent method name with eight arguments; fixed to authorized replay method",
+    "Old readiness contract sample omitted new required ticket_comments field; sample updated"
+  ],
+  "customer_scope": "own reporter only",
+  "internal_structured_identity_in_public_dto": false,
+  "internal_notes_in_public_comments": false,
+  "replay_authorization": "current parent guard before cached receipt",
+  "public_comment_page_implemented": false,
+  "itsm_or_notification_delivery": false,
+  "browser_dom_tested": false,
+  "frozen_migrations": "V1-V11 unchanged",
+  "full_contract_done": false,
+  "credentials_output": false
+}

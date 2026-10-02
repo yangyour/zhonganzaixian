@@ -27,6 +27,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         catch(SQLException exception){return false;}
     }
     @Override public List<String> assetReadProblems(){try(Connection c=dataSource.getConnection()){c.setReadOnly(true);return PostgresUnicodeSearch.ready(c)?List.of():List.of("ASSET_UNICODE_SEARCH_UNAVAILABLE");}catch(SQLException|RuntimeException unavailable){return List.of("ASSET_UNICODE_SEARCH_UNAVAILABLE");}}
+    @Override public List<String> ticketCommentProblems(){return new PostgresTicketCommentRepository(dataSource,this).readinessProblems();}
     @Override public List<String> internalNoteProblems(){return new PostgresInternalTicketNoteRepository(dataSource,this).readinessProblems();}
     @Override public List<String> assetMetadataProblems(){return new PostgresManualAssetMetadataRepository(dataSource,this,mapper).readinessProblems();}
     @Override public List<String> worklogProblems(){return new PostgresWorklogRepository(dataSource,this).readinessProblems();}

@@ -54,3 +54,7 @@ OSS连接/IAM/不可覆盖/大文件/照片及导入整链、浏览器UI、真�
 ## V7依赖草稿迁移（独立执行）
 
 2026-10-02在niko新库单独执行`python tools/niko-test/run-migration.py --apply-asset-dependencies`：首次1、重复0、check0。启动API/Worker不会调用它。`frozen-migrations.json`继续保存原6版不变，`frozen-dependency-migration.json`单独保存已执行V7字节hash；后续结构修改另起迁移，不重写V7。旧指定服务器未执行本批迁移。当前只有草稿schema和实际约束测试，防环仓储/API/页面仍在开发。
+
+## V8实填工时迁移（独立执行）
+
+2026-10-02在niko新库执行`--apply-worklogs`首次1、重复0、默认check0；只在已验证V1–V7后允许。V8校验和另外保存在frozen-worklog-migration.json；源文件与编译资源一致后才允许CLI读取私有连接配置。原服务器没有执行V8；API/Worker不自动迁移，后续结构变更新增版本，V1–V8不可重写。当前是schema切片，未宣称工时API或页面完成。

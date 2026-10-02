@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-02",
+  "environment": "niko-local-test",
+  "scope": "V8 manual worklog schema only",
+  "migration": {
+    "script": "V8__manual_worklog_revisions.sql",
+    "sha256": "942ea4dc88a8169b40662edcfd89871e8280a429ac922bd0cc1eb451b82ad2f8",
+    "before_check_executed": 0,
+    "explicit_apply_executed": 1,
+    "repeat_apply_executed": 0,
+    "after_check_executed": 0,
+    "structure_acl": "PASS",
+    "v1_v7_modified": false,
+    "api_worker_auto_migration": false
+  },
+  "tests": {
+    "schema_policy_unit": 9,
+    "new_real_pg_schema": 6,
+    "current_root_total": 463,
+    "executed_passed": 450,
+    "real_pg_included": 90,
+    "skipped_fixture": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "python_guards": 20
+  },
+  "first_schema_test_run": {
+    "failures": 2,
+    "errors": 1,
+    "cause": "One extra placeholder in the test INSERT; corrected test statement and full rerun passed without changing applied V8"
+  },
+  "checks": [
+    "Manual source only, no default/cost columns",
+    "49-hour explicit interval allowed; no demo 24h cap",
+    "Negative/range/kind/source/action guards",
+    "Revision actor matches immutable owner",
+    "Tenant/ticket/owner composite foreign keys",
+    "Latest revision must exist at commit",
+    "Runtime cannot change parent/owner/history or delete"
+  ],
+  "test_data": "schema test transactions rolled back",
+  "not_completed": [
+    "Worklog repository/API/page",
+    "Default hours or cost/margin calculation",
+    "Full M5-21/M10-13 acceptance"
+  ]
+}

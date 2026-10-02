@@ -323,3 +323,9 @@ API V0.10字段形状不变，补充当前成员角色来源与默认拒绝元�
 按Q23允许的实际工时记录先实现ManualWorklog：4类合同工作类型、显式带offset的起止、结束不早于开始、毫秒精度、原始备注及物理经过时长。缺值不变0/4小时，明确相同起止才为实填0；不套用原型0–24小时限制，不执行计费取整/成本/SLA口径。
 
 新增6项隔离测试通过，根456=443执行通过（含既有84真实PG回归）+13fixture跳过、6MinIO排除，0失败错误。既有PG计数不冒充工时存储证明；当前尚无工时V8/仓储/API/页面。API V0.10、V1–V7及私有配置不变；M5-21/M10-13非DONE，见[实施边界](manual-worklogs.md)、[独立证据](evidence/dot-manual-worklog-domain-20261002.json)。上一a5dc571的CI37022715272总run已回读success。
+
+## 2026-10-02 V8实填工时不可变修订结构
+
+独立新V8仅创建工时头记录/修订：固定owner和父工单、同租户FK、修订actor=owner、最新修订延迟FK、MANUAL_INTERVAL来源及4类型/起止边界。运行账号不获历史UPDATE/DELETE或owner/parent修改权；未加默认工时或成本字段，不更新工单/SLA状态。niko显式check0→apply1→repeat0→check0，结构/ACL通过，V1–V7及原私有文件未改，V8执行后另存冻结hash；API/Worker不迁移。
+
+9项迁移策略、6项新增真实PG约束、20项Python守卫通过；根463=450执行通过（含90真实PG）+13fixture跳过，6MinIO排除。首轮测试INSERT多一个占位符造成2失败/1错误；修正测试语句后全量通过，不改变已执行SQL。约束测试事务均回滚，不冒充工时服务持久化成功；仓储/API/页面及成本/毛利仍待。见[工时说明](manual-worklogs.md)、[schema证据](evidence/niko-worklog-schema-20261002.json)。

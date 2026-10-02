@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-02",
+  "scope": "pure manual worklog input/elapsed time",
+  "new_tests": 6,
+  "passed": 6,
+  "maven_current_run": {
+    "total": 456,
+    "executed_passed": 443,
+    "real_pg_included": 84,
+    "skipped_fixture": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "boundaries": [
+    "Existing 84 PostgreSQL tests are regression only, not new worklog persistence evidence",
+    "No V8/worklog repository/API/UI yet",
+    "No default hours, labor rate, billing rounding or margin conclusion",
+    "No demo 24-hour duration cap"
+  ],
+  "api_version": "0.10.0 unchanged",
+  "v1_v7_modified": false,
+  "original_private_config_changed": false
+}

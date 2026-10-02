@@ -1,0 +1,69 @@
+{
+  "environment": {
+    "SPRING_DATASOURCE_URL": "jdbc:postgresql://127.0.0.1:15432/mop_test",
+    "SPRING_DATASOURCE_USERNAME": "mop_test_runtime",
+    "SPRING_DATASOURCE_PASSWORD": "4qFCHLecoVwQURDIltxSND8Q-NSRefVZOETNx6vsWEY",
+    "MOP_MIGRATION_USERNAME": "mop_test_migrator",
+    "MOP_MIGRATION_PASSWORD": "Qeya0-e437rxKdPYMVnE_LHUIeKw1tD2h3RbED5n5jo",
+    "MOP_OIDC_ISSUER": "http://127.0.0.1:18110/realms/mop-test",
+    "MOP_OIDC_CLIENT_ID": "mop-web",
+    "MOP_OIDC_CLIENT_SECRET": "fyWhM_T8m6FFMl0fyuofyWgZL7SSLQ-8Quz7mPXrA8d0T-iZ54kiuw",
+    "MOP_S3_ENDPOINT": "http://127.0.0.1:19000",
+    "MOP_S3_BUCKET": "mop-test-photos",
+    "MOP_S3_ACCESS_KEY": "mop-photo-5b3d1be60b3f9b92",
+    "MOP_S3_SECRET_KEY": "-pepuEyHksRx2h4jeBMZHKEb5QZL_Nv6P1tWdVqwYaUsd4uq",
+    "MOP_PHOTO_ALLOWED_MEDIA_TYPES": "image/jpeg,image/png",
+    "MOP_IMPORT_S3_ENDPOINT": "http://127.0.0.1:19000",
+    "MOP_IMPORT_S3_BUCKET": "mop-test-asset-imports",
+    "MOP_IMPORT_S3_ACCESS_KEY": "mop-asset-import-0427e20cf0f1786e",
+    "MOP_IMPORT_S3_SECRET_KEY": "GKIi5X_fVP4T4nGqiM6aOxwDaXGiusZaTUWd25p3-l1My9nN",
+    "MOP_IMPORT_ALLOWED_FORMATS": "CSV,XLSX",
+    "MOP_IMPORT_PARSER_JAR": "E:\\work\\wxw9\\zhonganzaixian\\mop-platform\\server\\import-parser\\target\\mop-import-parser-0.1.0-SNAPSHOT.jar",
+    "MOP_IMPORT_WORKER_ENABLED": "true"
+  },
+  "test_users": [
+    {
+      "username": "mopfixture-padmin",
+      "password": "ZY0R0S69Gc_EOOJ5a_4jAEgAURVq803h",
+      "role": "padmin",
+      "id": "814da2d2-30fb-474f-a78f-727b3ccff9d5",
+      "identity_subject": "http://127.0.0.1:18110/realms/mop-test|814da2d2-30fb-474f-a78f-727b3ccff9d5"
+    },
+    {
+      "username": "mopfixture-msp",
+      "password": "7sfpA1aIpObxEIPAhL71r06ZNITlrI0b",
+      "role": "msp",
+      "id": "64bbc229-8f87-4418-adff-dab86f421e99",
+      "identity_subject": "http://127.0.0.1:18110/realms/mop-test|64bbc229-8f87-4418-adff-dab86f421e99"
+    },
+    {
+      "username": "mopfixture-tadmin",
+      "password": "q00qe7Q1BYnAjm-azD1pdQ3bJ-DfuDnG",
+      "role": "tadmin",
+      "id": "9d51723e-f151-40c9-8c76-4df3b9168f9f",
+      "identity_subject": "http://127.0.0.1:18110/realms/mop-test|9d51723e-f151-40c9-8c76-4df3b9168f9f"
+    },
+    {
+      "username": "mopfixture-viewerA",
+      "password": "LNn9k1sI1np7fDCKhV3BPTTVeoMza43k",
+      "role": "viewerA",
+      "id": "397d0deb-5915-41ea-8618-cc9527147eca",
+      "identity_subject": "http://127.0.0.1:18110/realms/mop-test|397d0deb-5915-41ea-8618-cc9527147eca"
+    },
+    {
+      "username": "mopfixture-viewerB",
+      "password": "h5X5LDYEXpDeXTMLbuEJUyp-ifNUnfMb",
+      "role": "viewerB",
+      "id": "b95554f5-10a2-41aa-a551-e44fc7394cbe",
+      "identity_subject": "http://127.0.0.1:18110/realms/mop-test|b95554f5-10a2-41aa-a551-e44fc7394cbe"
+    },
+    {
+      "username": "mopfixture-reviewer",
+      "password": "6jdOGNaymCbAOf8JUCCoi8bmityr5Uzp",
+      "role": "reviewer",
+      "id": "aae96a1d-7cc0-4b37-9370-6741d93865fd",
+      "identity_subject": "http://127.0.0.1:18110/realms/mop-test|aae96a1d-7cc0-4b37-9370-6741d93865fd"
+    }
+  ],
+  "status": "shared_remote_test_only_not_production"
+}

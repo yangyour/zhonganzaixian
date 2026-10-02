@@ -8,7 +8,15 @@
 .env
 !.env.example
 tests/artifacts/
-deploy/private/
+# 2026-10-02: user-authorized test configuration in the private MOP repository only.
+# Sessions, backups, generated fixtures and other private files remain ignored.
+deploy/private/*
+!deploy/private/develop.txt
+!deploy/private/runtime.json
+!deploy/private/known_hosts
+!deploy/private/existing-components.json
+!deploy/private/photo-namespace.json
+!deploy/private/asset-import-namespace.json
 **/__pycache__/
 *.pyc
 zabbix-msp-prototype/tests/.knowledge-qa/

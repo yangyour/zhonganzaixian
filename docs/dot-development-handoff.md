@@ -33,6 +33,8 @@ Dot 直接使用自己的云电脑、终端、编辑器、浏览器和可用工�
 
 私有文件引用 `deploy/private/develop.txt`、`runtime.json`、`known_hosts`、导入命名空间文件；都保持Git忽略，未随提交上传。通过受控私有配置/秘密存储提供，不向Dot消息、公共日志或Git粘贴原值。Dot若不能直接取得秘密，登记阻塞并先开发不依赖该项的代码；不得为了取本地秘密自行创建Codex/Work任务。
 
+以上是首次交接的历史状态。2026-10-02用户最新授权把6个真实联调配置以原格式提交到其本人使用的private仓库，覆盖先前全部忽略安排；名单与限制以最新 `AGENTS.md` 和[配置接续说明](private-test-configuration.md)为准。临时QA会话、备份和测试产物仍忽略。Dot取得文件后须适配自身本地路径并实际验证组件，不因配置已提交就宣称云端联调通过；禁止把密值复制到聊天、日志或公共证据。
+
 V1–V6已执行且不可改字节。V6 SHA256 `1F532822668274B7AEBD12EA78B57E6BE0AA9FD53CEB77023EE8067589CD2B4B`；独立ApplyAssetImports执行1、重复0、只读Check0，均结构/ACL核验。V6头部历史UNEXECUTED注释因checksum冻结保留，当前执行状态以独立证据为准。API/Worker启动不迁移。未来结构变化新增迁移，不编辑已执行SQL。
 
 本地启动 `deploy/start-dev.ps1 -SkipBuild -WithPhotoWorker -WithAssetImportWorker`，独立导入Worker `*-imports.jar` 和指定 standalone parser JAR；只处理导入job，不消费照片或其他outbox。API `asset_imports.worker_activity=NOT_PROBED`；ready不证明Worker在消费。进程停止使用严格PID/启动时间/路径拥有权脚本，只停本工程。详情 `docs/asset-import-runtime.md`。

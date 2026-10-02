@@ -1,0 +1,33 @@
+{
+  "project": "zhonganzaixian-mop-test",
+  "bucket": "mop-test-asset-imports",
+  "ownership_id": "8f57622b-18d0-4761-b322-63f85e2c1fd8",
+  "policy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "s3:GetBucketLocation",
+          "s3:ListBucket"
+        ],
+        "Resource": [
+          "arn:aws:s3:::mop-test-asset-imports"
+        ]
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "s3:GetObject",
+          "s3:PutObject"
+        ],
+        "Resource": [
+          "arn:aws:s3:::mop-test-asset-imports/asset-import-sources/*"
+        ]
+      }
+    ]
+  },
+  "access_key": "mop-asset-import-0427e20cf0f1786e",
+  "secret_key": "GKIi5X_fVP4T4nGqiM6aOxwDaXGiusZaTUWd25p3-l1My9nN",
+  "status": "READY"
+}

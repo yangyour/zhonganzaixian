@@ -84,3 +84,12 @@ V9新增mop_asset_manual_revision/details，当前指针引用不可变修订；
 可选资料/日期无默认值，SELF_REPORTED/monitoring_applied=false/cmdb_applied=false固定；运行身份只获资产name/type/site_id/version/updated_at/updated_by六列UPDATE，不能改IP、source、tenant或监控状态；历史资料没有UPDATE/DELETE权限。新schema只在niko显式check0→apply1→repeat0→check0，旧worklogs显式apply再次为0。V1–V8字节未改，V9应用后另存冻结hash；API/Worker不迁移，后续结构需新版本。
 
 10项迁移策略、8项新增真实PG结构/ACL回归、30项niko守卫通过；schema测试事务全部回滚，不冒充资料服务持久化。根524=511执行（含119真实PG）+13fixture跳过，6MinIO排除，0失败错误。仓储/API/页面未接线，M3-5非DONE；API仍V0.12。见[结构证据](evidence/niko-asset-metadata-schema-20261002.json)。上一c6f2f25的CI37043222178已回读success。
+
+
+## 2026-10-02 V10资料/内部备注独立API中断场景
+
+新增独立--verify-owned-v10-api-crash模式，旧工时故障脚本、首轮失败及最终证据均保留。先退出原交互run-stack，让它清理自身组件，再修改并重新启动新场景；未改写运行中的启动脚本。本次仍只SIGKILL本次拥有、父PID/UID/JVM完整命令/回环监听归属都通过检查的API子进程，等待exit137及确认连接拒绝。PG/Keycloak在API故障窗口不重启，同一构建jar SHA256在前后相同；无新账户/秘密/权限/迁移/端口/防火墙或原服务器操作。
+
+首轮完整通过：故障前14次HTTP提交合成报障、2位内部作者的2条备注、手工资产两版资料并读取历史/审计；14张明确白名单业务表（原11+V9两表+V10备注）在同一只读快照计算排序行指纹，重启后、重新登录前全部一致。故障后12次HTTP核验原客户登记、2条备注、当前资料v3和历史[3,2]；原资料键仍返回原v2，原备注键返回原记录，现值不回退、各自审计仍2条。重新OIDC登录成功；结束后默认交互模式与当前拥有API监听、既有账号会话恢复。
+
+新增4隔离守卫，总35niko守卫通过，检查14表白名单、与旧证据路径分离、覆盖碰撞拒绝以及未知模式不读私有配置；shell/Node语法通过。该场景只证明“已提交后API突然终止”的恢复，不证明在途事务杀进程、PG/WAL、Worker/OSS故障、浏览器或原服务器验收。指纹是相等性，不是外部真实性。不得删除既有checkpoint后假装首次复现；同场景会拒绝覆盖。[V10故障证据](evidence/niko-api-v10-crash-recovery-20261002.json)。

@@ -48,4 +48,19 @@ class NikoFaultGuardTest(unittest.TestCase):
         module_value=module('niko_crash_snapshot',ROOT/'tools/niko-test/api-crash-snapshot.py')
         with tempfile.TemporaryDirectory() as d:
             path=Path(d)/'record.json';module_value.private_write(path,{'synthetic':True});self.assertEqual(0o600,path.stat().st_mode&0o777);original=path.read_bytes();self.assertRaises(FileExistsError,module_value.private_write,path,{'other':True});self.assertEqual(original,path.read_bytes())
+    def test_v10_scenario_whitelists_fourteen_tables_and_keeps_original_evidence_separate(self):
+        original=module('niko_original_snapshot_scope',ROOT/'tools/niko-test/api-crash-snapshot.py');latest=module('niko_v10_snapshot_scope',ROOT/'tools/niko-test/api-v10-crash-snapshot.py')
+        self.assertEqual(11,len(original.TABLES));self.assertEqual(14,len(latest.TABLES));self.assertEqual(set(original.TABLES)|{'mop_asset_manual_details','mop_asset_manual_revision','mop_ticket_internal_note'},set(latest.TABLES))
+        self.assertTrue({original.BEFORE,original.AFTER,original.HTTP,original.FINAL}.isdisjoint({latest.BEFORE,latest.AFTER,latest.HTTP,latest.FINAL}))
+    def test_v10_checkpoint_collision_refuses_overwrite_before_any_private_read(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);local=root/'.local/niko-test';local.mkdir(parents=True);record=local/'api-v10-crash-http-before.json';record.write_text('synthetic-v10-existing')
+            result=subprocess.run([sys.executable,str(ROOT/'tools/niko-test/api-v10-crash-snapshot.py'),'--check-new-run'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,result.returncode);self.assertEqual('synthetic-v10-existing',record.read_text());self.assertNotIn('synthetic-v10-existing',result.stdout+result.stderr)
+    def test_v10_unknown_mode_does_not_open_configuration_or_create_files(self):
+        with tempfile.TemporaryDirectory() as d:
+            result=subprocess.run([sys.executable,str(ROOT/'tools/niko-test/api-v10-crash-snapshot.py'),'--unknown'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,result.returncode);self.assertFalse((Path(d)/'.local').exists())
+    def test_original_checkpoint_does_not_silently_become_v10_checkpoint(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);local=root/'.local/niko-test';local.mkdir(parents=True);old=local/'api-crash-http-before.json';old.write_text('original-preserved')
+            result=subprocess.run([sys.executable,str(ROOT/'tools/niko-test/api-v10-crash-snapshot.py'),'--check-new-run'],cwd=d,capture_output=True,text=True);self.assertEqual(0,result.returncode);self.assertEqual('original-preserved',old.read_text());self.assertFalse((local/'api-v10-crash-http-before.json').exists())
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,107 @@
+{
+  "verified_at": "2026-10-02T20:39:28.040Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "fault": "SIGKILL verified owned API child only; wait exit137 and confirmed connection refusal; restart unchanged built artifact",
+  "api_exit_code": 137,
+  "api_artifact_sha256": "1861912fe861cab5ed5970a3a04e0a04c8ba370af06f24bcff0227b52de70f80",
+  "owned_process_identity_and_loopback_listener_guard": true,
+  "postgres_restarted_during_api_fault": false,
+  "keycloak_restarted_during_api_fault": false,
+  "api_auto_migration": false,
+  "new_real_oidc_sessions_after_restart": true,
+  "http_before": 14,
+  "http_after": 12,
+  "database_fingerprints_equal": true,
+  "tables": {
+    "mop_asset": {
+      "rows": 1070,
+      "equality_sha256": "74eb109855f262026f70a264ec7e6542f8c3c93a8a5fc5b42a4e0cb27a401b44"
+    },
+    "mop_ticket": {
+      "rows": 1362,
+      "equality_sha256": "400c35ebd31bea6a39bc22dc14c63f03d5de123f2a931ca204c9b58a8d43b42b"
+    },
+    "mop_worklog": {
+      "rows": 477,
+      "equality_sha256": "4bb8c3d392718e74d78e573b484f430ce025ea22184722b23ba20db73d784b16"
+    },
+    "mop_worklog_revision": {
+      "rows": 681,
+      "equality_sha256": "8d4a77ab447b83533de3ea9dfe4ef51bb2a8a76df932417a2291d3d2f2614b41"
+    },
+    "mop_asset_dependency_graph": {
+      "rows": 1,
+      "equality_sha256": "0d7c220e39fd1350d330ea9a530228cda43d8487d21e06cfea009475480e40f3"
+    },
+    "mop_asset_dependency_revision": {
+      "rows": 231,
+      "equality_sha256": "1edadbea64501b2f19b7390f682d267778ea6a370e94e3d59a2bc203a81b7f7f"
+    },
+    "mop_asset_dependency_edge": {
+      "rows": 30453,
+      "equality_sha256": "f9a84ee2841e50d29b1a01b9b807451e4bb32ec60e16a60c74263980ebd3dd78"
+    },
+    "mop_configuration_revision": {
+      "rows": 718,
+      "equality_sha256": "0752d0f320b9f19f2f4d2ef0d1961f3ea34d6e5fa1958fe4d49509bff2837f40"
+    },
+    "mop_configuration_revision_history": {
+      "rows": 780,
+      "equality_sha256": "346472c8baff444ab2b72dcdb5b4f7db2d8e07dd405bb965ca9a58278b28dd78"
+    },
+    "mop_idempotency": {
+      "rows": 7475,
+      "equality_sha256": "4e65b090921353ff51618b149c47fdc28d21ff86b4ca32c75466a7222aa25e50"
+    },
+    "mop_audit": {
+      "rows": 10850,
+      "equality_sha256": "a8c3dbdcb366919e94f02fc72fbdf7201658cdecee5d65745c6b35377b288b10"
+    },
+    "mop_asset_manual_details": {
+      "rows": 117,
+      "equality_sha256": "89828ed453de67e13a9667db9339e71238044b243da68c5e0f0672a120e4a6b6"
+    },
+    "mop_asset_manual_revision": {
+      "rows": 146,
+      "equality_sha256": "48181a94dc81c0fe7d4c28f2e9fd4a5ca00b637bdb6cd2d0961574e46d392212"
+    },
+    "mop_ticket_internal_note": {
+      "rows": 53,
+      "equality_sha256": "472955e947366757291c6675970f63fbd5a4b32e14aa2130d55b9468c99f904a"
+    }
+  },
+  "internal_notes_after": 2,
+  "metadata_current_version": 3,
+  "metadata_history_versions": [
+    3,
+    2
+  ],
+  "old_metadata_replay_version": 2,
+  "old_note_original_receipt_preserved": true,
+  "matching_note_audits": 2,
+  "matching_metadata_audits": 2,
+  "management_ip_and_customer_parent_unchanged": true,
+  "readback_sha256": "44f23cca2fd6a47c964cc5b3a99ab13bf699ed116fa8af620f9f7e14ae189384",
+  "credentials_output": false,
+  "limitations": [
+    "Writes committed before termination; not kill during an in-flight transaction",
+    "Not PostgreSQL/WAL, Worker or OSS crash recovery",
+    "Not browser/session-control or original-server testing",
+    "Equality fingerprints are not external authenticity evidence"
+  ],
+  "isolated_guard_tests": 35,
+  "new_scenario_guard_tests": 4,
+  "shell_node_syntax": "passed",
+  "normal_interactive_stack_restored": true,
+  "existing_oidc_sessions_recaptured": true,
+  "original_api_crash_evidence_preserved": true,
+  "first_attempt": "passed",
+  "prior_internal_note_page_ci": {
+    "commit": "c2931e592f11a59838071f84109a09f077acd27e",
+    "id": 37062100480,
+    "conclusion": "success"
+  },
+  "post_recovery_schema_check_migrations_executed": 0,
+  "frozen_migrations": "V1-V10 unchanged"
+}

@@ -13,6 +13,7 @@ import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import AssetImportWorkspace from '../components/AssetImportWorkspace.vue'
 import AssetDependencyWorkspace from '../components/AssetDependencyWorkspace.vue'
 import AssetMetadataWorkspace from '../components/AssetMetadataWorkspace.vue'
+import AssetMetadataQuery from '../components/AssetMetadataQuery.vue'
 const route = useRoute()
 const router = useRouter()
 const pageSizes = [10, 15, 25, 50, 100]
@@ -92,6 +93,7 @@ function openDependencies() {
   if (dependencyPanel.value?.hasUnresolved() && dependencyAsset.value?.id !== asset.value.id) { ElMessage.warning('另一台设备的依赖保存结果尚未确认，请先打开原设备并使用原请求重试'); return }
   dependencyAsset.value = asset.value; dependencyOpen.value = true
 }
+const metadataQueryOpen = ref(false)
 const metadataOpen = ref(false), metadataAsset = ref<Asset | null>(null)
 const metadataPanel = ref<InstanceType<typeof AssetMetadataWorkspace> | null>(null)
 const metadataAllowed = computed(() => ['msp', 'padmin'].includes(session.value?.user.role || ''))
@@ -99,6 +101,10 @@ function openMetadata() {
   if (!asset.value) return
   if (metadataPanel.value?.hasUnresolved() && metadataAsset.value?.id !== asset.value.id) { ElMessage.warning('另一台设备的资料保存结果尚未确认，请先打开原设备并使用原请求重试'); return }
   metadataAsset.value = asset.value; metadataOpen.value = true
+}
+function openQueryMetadata(selected: Asset) {
+  if (metadataPanel.value?.hasUnresolved() && metadataAsset.value?.id !== selected.id) { ElMessage.warning('另一台设备的资料保存结果尚未确认，请先处理原请求'); return }
+  metadataAsset.value = selected; metadataOpen.value = true; metadataQueryOpen.value = false
 }
 function metadataSaved() { void loadAssets(); if (queryString('asset_id') === metadataAsset.value?.id) void loadDetail(queryString('asset_id')) }
 const importOpen = ref(false)
@@ -126,7 +132,7 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
 </script>
 <template>
   <section>
-    <div class="page-heading"><div><span class="eyebrow">RESOURCE / ASSETS</span><h1>资产管理</h1><p>管理当前租户的资产台账，查看来源与接入状态。</p></div><div class="assets-heading-actions"><PermissionGate capability="assets:write"><el-button type="primary" @click="openCreate">＋ 创建资产草稿</el-button><el-button v-if="importAllowed" plain @click="importOpen = true">导入资产来源</el-button></PermissionGate></div></div>
+    <div class="page-heading"><div><span class="eyebrow">RESOURCE / ASSETS</span><h1>资产管理</h1><p>管理当前租户的资产台账，查看来源与接入状态。</p></div><div class="assets-heading-actions"><PermissionGate capability="assets:write"><el-button type="primary" @click="openCreate">＋ 创建资产草稿</el-button><el-button v-if="metadataAllowed" plain @click="metadataQueryOpen = true">手工资料筛选</el-button><el-button v-if="importAllowed" plain @click="importOpen = true">导入资产来源</el-button></PermissionGate></div></div>
     <div class="scope-card"><div><span class="small-label">当前租户</span><strong>{{ session?.tenant.name }}</strong></div><div><span class="small-label">本页资产</span><strong>{{ loading ? '—' : rows.length }} <small>个</small></strong></div><div class="scope-explanation"><span class="scope-dot" /><span>未知不代表正常。测试种子与手动草稿未真实采集，采样时间与指标保留为空。</span></div></div>
     <div class="panel">
       <el-form class="filter-form" :inline="true" @submit.prevent="applyFilters">
@@ -166,6 +172,7 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
       <template #footer><el-button :disabled="creating" @click="createOpen = false">取消</el-button><el-button type="primary" :loading="creating" @click="createAsset">保存草稿</el-button></template>
     </el-dialog>
     <AssetImportWorkspace v-model="importOpen" />
+    <AssetMetadataQuery v-model="metadataQueryOpen" @select="openQueryMetadata" />
     <AssetMetadataWorkspace ref="metadataPanel" v-model="metadataOpen" :asset="metadataAsset" @saved="metadataSaved" />
     <AssetDependencyWorkspace ref="dependencyPanel" v-model="dependencyOpen" :asset="dependencyAsset" />
   </section>

@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-02T19:35:26.912Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "http_requests": 29,
+  "actual_query_gets": 8,
+  "frontend": "actual assetMetadataQuery and ApiClient bundle",
+  "synthetic_asset_setup": 16,
+  "explicit_setup_metadata_writes": 2,
+  "page_sizes": [
+    15,
+    1
+  ],
+  "filter_reset_and_edit_visibility": true,
+  "explicit_unknown_kept_null": true,
+  "inferred_warranty_state_rejected_before_request": true,
+  "readonly_query_did_not_append_audit": true,
+  "pagination_consistency": "CURRENT_REQUEST_SNAPSHOT_ONLY",
+  "browser_ui_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "DOM/390px filter controls B03",
+    "Customer Q09 and fixed-layout Q31 acceptance",
+    "No frozen export or production large-directory performance claim"
+  ],
+  "new_frontend_tests": 12,
+  "total_web_tests": 271,
+  "typecheck_build": "passed",
+  "contract_tests": 27,
+  "generated_contract_consistency": "passed",
+  "prior_api_ci": {
+    "commit": "cd1391b89a36b64dd01efcab0790204ff30b436b",
+    "id": 37054501713,
+    "conclusion": "success"
+  },
+  "mobile_layout": "CODE_ONLY_NOT_DOM_VERIFIED"
+}

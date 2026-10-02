@@ -15,6 +15,23 @@ public final class PostgresAssetDependencyRepository implements AssetDependencyR
     private final PostgresPlatformRepository platform;
     public PostgresAssetDependencyRepository(DataSource dataSource,PostgresPlatformRepository platform){this.dataSource=Objects.requireNonNull(dataSource);this.platform=Objects.requireNonNull(platform);}
 
+    /** Read-only schema/privilege availability, not graph publication or monitoring health. */
+    public List<String> readinessProblems(){
+        try(Connection c=dataSource.getConnection()){
+            c.setReadOnly(true);
+            try(var s=c.prepareStatement("SELECT g.tenant_id,g.version,g.updated_at,r.created_by,r.created_at,r.lifecycle_status,r.decision_status,r.monitoring_applied,e.parent_id,e.child_id,e.proposed_dependency_type,e.proposed_suppression_scope,e.proposed_enabled FROM public.mop_asset_dependency_graph g JOIN public.mop_asset_dependency_revision r ON r.tenant_id=g.tenant_id AND r.version=g.version JOIN public.mop_asset_dependency_edge e ON e.tenant_id=r.tenant_id AND e.revision_version=r.version WHERE false")){s.setQueryTimeout(3);s.executeQuery().close();}
+            for(String table:List.of("mop_asset_dependency_graph","mop_asset_dependency_revision","mop_asset_dependency_edge")){
+                try(var s=c.prepareStatement("SELECT current_database()='mop_test' AND current_user='mop_test_runtime' AND has_table_privilege(current_user,?,'SELECT') AND has_table_privilege(current_user,?,'INSERT') AND NOT has_table_privilege(current_user,?,'UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') AND NOT EXISTS(SELECT 1 FROM pg_class c CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl,acldefault('r',c.relowner))) a WHERE c.oid=?::regclass AND a.grantee=0)")){
+                    s.setQueryTimeout(3);for(int i=1;i<=4;i++)s.setString(i,"public."+table);try(var r=s.executeQuery()){if(!r.next()||!r.getBoolean(1))return List.of("ASSET_DEPENDENCY_SCHEMA_OR_ACCESS_UNAVAILABLE");}
+                }
+                Set<String> allowed=table.equals("mop_asset_dependency_graph")?Set.of("version","updated_at"):Set.of();
+                try(var s=c.prepareStatement("SELECT attname,has_column_privilege(current_user,attrelid,attnum,'UPDATE') FROM pg_attribute WHERE attrelid=?::regclass AND attnum>0 AND NOT attisdropped")){
+                    s.setQueryTimeout(3);s.setString(1,"public."+table);try(var r=s.executeQuery()){while(r.next())if(r.getBoolean(2)!=allowed.contains(r.getString(1)))return List.of("ASSET_DEPENDENCY_SCHEMA_OR_ACCESS_UNAVAILABLE");}
+                }
+            }
+            return List.of();
+        }catch(SQLException|RuntimeException failure){return List.of("ASSET_DEPENDENCY_SCHEMA_OR_ACCESS_UNAVAILABLE");}
+    }
     @Override public Draft current(String tenant,String actor){
         try(Connection c=dataSource.getConnection()){
             c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);c.setAutoCommit(false);

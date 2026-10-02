@@ -9,7 +9,7 @@ const envelope = (data) => object({ data, trace_id: string });
 const list = (items) => envelope(object({ items: { type: 'array', items }, next_cursor: nullableString, has_more: { type: 'boolean' }, source: { const: 'postgresql' }, page_size_limit: { const: 100 }, page_size_limit_kind: { const: 'test_technical_limit' } }));
 const types = ['router', 'switch', 'firewall', 'ap', 'wireless_controller', 'other'];
 const errorResponse = (description) => ({ description, content: { 'application/json': { schema: ref('Error') } } });
-const errors = Object.fromEntries(Object.entries({ 400: '参数或未知字段错误', 401: '会话失效', 403: '动作权限或CSRF错误', 404: '对象不存在或不可见', 405: '方法不允许', 409: '版本或幂等冲突', 415: '内容类型不支持', 422: '状态禁止或CONFIG_PENDING', 429: '配额限制', 500: '内部错误；按trace_id排查', 503: '依赖未就绪' }).map(([code, label]) => [code, errorResponse(label)]));
+const errors = Object.fromEntries(Object.entries({ 400: '参数或未知字段错误', 401: '会话失效', 403: '动作权限或CSRF错误', 404: '对象不存在或不可见', 405: '方法不允许', 409: '版本或幂等冲突', 413: '技术资源上限，未截断执行', 415: '内容类型不支持', 422: '状态禁止或CONFIG_PENDING', 429: '配额限制', 500: '内部错误；按trace_id排查', 503: '依赖未就绪' }).map(([code, label]) => [code, errorResponse(label)]));
 const parameter = (name, location, schema, required = true) => ({ name, in: location, required, schema });
 const headers = [parameter('Idempotency-Key', 'header', { type: 'string', minLength: 1, maxLength: 128, pattern: '^[A-Za-z0-9._:-]{1,128}$' }), parameter('X-CSRF-Token', 'header', string)];
 const jsonBody = (schema) => ({ required: true, content: { 'application/json': { schema } } });
@@ -120,6 +120,8 @@ importReadiness.oneOf = [
 ];
 readiness.properties.data.properties.asset_imports = importReadiness;
 readiness.properties.data.required.push('asset_imports');
+readiness.properties.data.properties.asset_dependencies = object({ ready: { const: true }, schema_access_ready: { const: true }, configuration_status: { const: 'CONFIG_PENDING' }, monitoring_applied: { const: false }, effective_rules: { type: 'null' } });
+readiness.properties.data.required.push('asset_dependencies');
 const importSelection = object({ declared_format: importFormat, encoding: { type: ['string', 'null'], enum: ['UTF-8', 'UTF-16LE', 'UTF-16BE', 'GB18030', null] }, delimiter: { type: ['string', 'null'], enum: [',', ';', '\t', null] }, sheet_index: { type: ['integer', 'null'], minimum: 0, maximum: 31 }, header_row: headerRow });
 importSelection.allOf = [{ if: { properties: { declared_format: { const: 'CSV' } } }, then: { properties: { encoding: { type: 'string' }, delimiter: { type: 'string' }, sheet_index: { type: 'null' }, header_row: { type: 'integer' } } }, else: { properties: { encoding: { type: 'null' }, delimiter: { type: 'null' } } } }];
 const importParseRequest = { ...importSelection, properties: { expected_version: positiveVersion, ...importSelection.properties }, required: ['expected_version', ...importSelection.required], description: 'CSV必须明确编码/分隔符/1起表头；XLSX编码与分隔符必须null。XLSX工作表或表头为null时只返回SELECTION_REQUIRED目录，之后以0起sheet与1起header显式请求；不得猜测隐藏工作表、日期或业务规则。' };
@@ -170,9 +172,25 @@ const importPolicy = object({ ...importFacts, purpose: { const: 'asset_import_so
 const importUpload = object({ file: { type: 'string', format: 'binary', 'x-mop-min-bytes': 1, 'x-mop-max-bytes': 20971520, description: '只受理匹配声明的.csv/.xlsx安全文件名及原bytes。实际格式在受限解析器验证；禁止JSON/base64、未知或重复part。全局multipart文件上限20MiB不改变照片独立5_000_000 bytes限制。' }, purpose: { const: 'asset_import_source' }, format: importFormat });
 const importAccess = { 'x-mop-capability': 'assets:write', 'x-mop-roles': ['padmin', 'msp', 'tadmin'], 'x-mop-creator-only': true, 'x-mop-permission-version-recheck': true, 'x-mop-reject-unknown-query-keys': true };
 const importAcceptanceResponses = { 202: { description: '原bytes或解析意图、来源、job、operation、审计与幂等结果已在PG事务受理；需以GET操作与来源读取当前状态。不是资产导入或配额承诺。', content: { 'application/json': { schema: ref('AssetImportAccepted') } } }, ...errors };
+const dependencyEdge = object({
+  parent_id: { type: 'string', format: 'uuid' }, child_id: { type: 'string', format: 'uuid' },
+  proposed_type: { type: ['string', 'null'], minLength: 1, maxLength: 64 },
+  proposed_suppression_scope: { type: ['string', 'null'], minLength: 1, maxLength: 128 },
+  proposed_enabled: { type: ['boolean', 'null'] },
+});
+const dependencyDraft = object({
+  asset_id: { type: 'string', format: 'uuid' }, tenant_id: { type: 'string', format: 'uuid' },
+  version: { type: 'integer', minimum: 0 }, version_kind: { const: 'tenant_dependency_graph' },
+  updated_at: { type: ['string', 'null'], format: 'date-time' }, complete: { const: true },
+  proposed_edges: { type: 'array', maxItems: 10000, items: dependencyEdge },
+  lifecycle_status: { const: 'DRAFT' }, decision_status: { const: 'pending' }, configuration_status: { const: 'CONFIG_PENDING' },
+  effective_rules: { type: 'null' }, monitoring_applied: { const: false }, question_ids: { const: ['Q20'] }, source: { const: 'postgresql' },
+  technical_limits: object({ max_additions: { const: 100 }, max_graph_edges: { const: 10000 }, max_body_bytes: { const: 131072 } }),
+});
+const dependencyAppend = object({ expected_version: { type: 'integer', minimum: 0, maximum: 9007199254740990, description: '当前完整租户图的CAS版本，不是资产版本；所有引用在同租户且每条新增边须连接路径资产。未知业务元数据明确null。' }, additions: { type: 'array', minItems: 1, maxItems: 100, uniqueItems: true, items: dependencyEdge } });
 const contract = {
   openapi: '3.1.0',
-  info: { title: 'MOP 共享测试环境 API', version: '0.8.0', description: '本地接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。fixture身份入口在remote_test不可调用。' },
+  info: { title: 'MOP 共享测试环境 API', version: '0.9.0', description: '本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。' },
   servers: [{ url: '/api/v1' }],
   security: [{ SessionCookie: [] }],
   paths: {
@@ -186,6 +204,10 @@ const contract = {
       post: mutation('createAssetDraft', '创建本租户持久资产草稿；不自动纳管', object({ name: { type: 'string', minLength: 1, maxLength: 100 }, type: { type: 'string', enum: types }, management_ip: string, site_id: string }), ref('AssetResult')),
     },
     '/assets/{id}': { get: action('getAsset', '读取本租户资产详情；不存在及无权均404', ref('AssetResult'), { parameters: [pathId] }) },
+    '/assets/{id}/dependencies': {
+      get: action('readAssetDependencyDraft', '读取完整租户依赖草稿；路径资产必须同租户可见，读不写入，无监控生效', ref('AssetDependencyDraftResult'), { parameters: [pathId], 'x-mop-capability': 'assets:read', 'x-mop-reject-unknown-query-keys': true }),
+      post: mutation('appendAssetDependencyDraft', '租户图CAS、完整图防环及幂等事务追加不可变草稿；不发布抑制规则。JSON<=128KiB/2048tokens/4层，拒绝重复键/尾随值', ref('AssetDependencyAppend'), ref('AssetDependencyDraftResult'), { parameters: [pathId, ...headers], 'x-mop-capability': 'assets:write', 'x-mop-roles': ['padmin', 'msp', 'tadmin'], 'x-mop-permission-version-recheck': true, 'x-mop-reject-unknown-query-keys': true }),
+    },
     '/assets/{id}/onboarding': { post: blocked('requestOnboarding', '接入门禁：Q02/Q03/Q06待确认，拒绝执行', pathId) },
     '/assets/import-policy': { get: action('getAssetImportPolicy', '读取CSV/XLSX来源技术政策与合同15列；不批准最终导入规则', ref('AssetImportPolicyResult'), importAccess) },
     '/assets/import-sources': { post: { ...mutation('acceptAssetImportSource', '耐久受理原始CSV/XLSX来源；不是导入资产', ref('AssetImportSourceUpload'), ref('AssetImportAccepted'), { ...importAccess, parameters: headers }), requestBody: { required: true, content: { 'multipart/form-data': { schema: ref('AssetImportSourceUpload') } } }, responses: importAcceptanceResponses } },
@@ -234,6 +256,7 @@ const contract = {
       ConfigurationDiagnostic: configurationDiagnostic,
       ConfigurationDiagnosticResult: envelope(ref('ConfigurationDiagnostic')),
       TicketCreate: ticketCreate,
+      AssetDependencyEdge: dependencyEdge, AssetDependencyDraft: dependencyDraft, AssetDependencyDraftResult: envelope(ref('AssetDependencyDraft')), AssetDependencyAppend: dependencyAppend,
       TicketRegistration: ticketRegistration,
       TicketRegistrationResult: envelope(ref('TicketRegistration')),
       TicketRegistrationListResult: list(ref('TicketRegistration')),

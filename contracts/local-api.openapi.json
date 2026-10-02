@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.8.0",
-    "description": "本地接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。fixture身份入口在remote_test不可调用。"
+    "version": "0.9.0",
+    "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
     {
@@ -84,6 +84,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -213,6 +223,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -380,6 +400,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -500,6 +530,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -647,6 +687,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -816,6 +866,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -1002,6 +1062,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -1198,6 +1268,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -1329,6 +1409,351 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{id}/dependencies": {
+      "get": {
+        "operationId": "readAssetDependencyDraft",
+        "summary": "读取完整租户依赖草稿；路径资产必须同租户可见，读不写入，无监控生效",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-capability": "assets:read",
+        "x-mop-reject-unknown-query-keys": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDependencyDraftResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "appendAssetDependencyDraft",
+        "summary": "租户图CAS、完整图防环及幂等事务追加不可变草稿；不发布抑制规则。JSON<=128KiB/2048tokens/4层，拒绝重复键/尾随值",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetDependencyAppend"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "assets:write",
+        "x-mop-roles": [
+          "padmin",
+          "msp",
+          "tadmin"
+        ],
+        "x-mop-permission-version-recheck": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDependencyDraftResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -1505,6 +1930,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -1634,6 +2069,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -1810,6 +2255,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -1950,6 +2405,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -2135,6 +2600,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -2312,6 +2787,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -2452,6 +2937,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -2602,6 +3097,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -2740,6 +3245,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -2932,6 +3447,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -3099,6 +3624,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -3254,6 +3789,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -3478,6 +4023,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -3609,6 +4164,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -3787,6 +4352,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -3988,6 +4563,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -4165,6 +4750,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -4351,6 +4946,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -4508,6 +5113,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -4639,6 +5254,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -4815,6 +5440,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -4935,6 +5570,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -5102,6 +5747,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -5233,6 +5888,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -5404,6 +6069,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -5585,6 +6260,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -5724,6 +6409,16 @@
               }
             }
           },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "415": {
             "description": "内容类型不支持",
             "content": {
@@ -5844,6 +6539,16 @@
           },
           "409": {
             "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
             "content": {
               "application/json": {
                 "schema": {
@@ -6184,6 +6889,34 @@
                     }
                   }
                 ]
+              },
+              "asset_dependencies": {
+                "type": "object",
+                "properties": {
+                  "ready": {
+                    "const": true
+                  },
+                  "schema_access_ready": {
+                    "const": true
+                  },
+                  "configuration_status": {
+                    "const": "CONFIG_PENDING"
+                  },
+                  "monitoring_applied": {
+                    "const": false
+                  },
+                  "effective_rules": {
+                    "type": "null"
+                  }
+                },
+                "required": [
+                  "ready",
+                  "schema_access_ready",
+                  "configuration_status",
+                  "monitoring_applied",
+                  "effective_rules"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -6194,7 +6927,8 @@
               "durable",
               "production_ready",
               "photos",
-              "asset_imports"
+              "asset_imports",
+              "asset_dependencies"
             ],
             "additionalProperties": false
           },
@@ -7217,6 +7951,268 @@
             }
           }
         ]
+      },
+      "AssetDependencyEdge": {
+        "type": "object",
+        "properties": {
+          "parent_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "child_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "proposed_type": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "proposed_suppression_scope": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "proposed_enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "parent_id",
+          "child_id",
+          "proposed_type",
+          "proposed_suppression_scope",
+          "proposed_enabled"
+        ],
+        "additionalProperties": false
+      },
+      "AssetDependencyDraft": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "version_kind": {
+            "const": "tenant_dependency_graph"
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "complete": {
+            "const": true
+          },
+          "proposed_edges": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "parent_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "child_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "proposed_type": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "proposed_suppression_scope": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "proposed_enabled": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "parent_id",
+                "child_id",
+                "proposed_type",
+                "proposed_suppression_scope",
+                "proposed_enabled"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "lifecycle_status": {
+            "const": "DRAFT"
+          },
+          "decision_status": {
+            "const": "pending"
+          },
+          "configuration_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "effective_rules": {
+            "type": "null"
+          },
+          "monitoring_applied": {
+            "const": false
+          },
+          "question_ids": {
+            "const": [
+              "Q20"
+            ]
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "technical_limits": {
+            "type": "object",
+            "properties": {
+              "max_additions": {
+                "const": 100
+              },
+              "max_graph_edges": {
+                "const": 10000
+              },
+              "max_body_bytes": {
+                "const": 131072
+              }
+            },
+            "required": [
+              "max_additions",
+              "max_graph_edges",
+              "max_body_bytes"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "asset_id",
+          "tenant_id",
+          "version",
+          "version_kind",
+          "updated_at",
+          "complete",
+          "proposed_edges",
+          "lifecycle_status",
+          "decision_status",
+          "configuration_status",
+          "effective_rules",
+          "monitoring_applied",
+          "question_ids",
+          "source",
+          "technical_limits"
+        ],
+        "additionalProperties": false
+      },
+      "AssetDependencyDraftResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AssetDependencyDraft"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "AssetDependencyAppend": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990,
+            "description": "当前完整租户图的CAS版本，不是资产版本；所有引用在同租户且每条新增边须连接路径资产。未知业务元数据明确null。"
+          },
+          "additions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "parent_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "child_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "proposed_type": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "proposed_suppression_scope": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "proposed_enabled": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "parent_id",
+                "child_id",
+                "proposed_type",
+                "proposed_suppression_scope",
+                "proposed_enabled"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "expected_version",
+          "additions"
+        ],
+        "additionalProperties": false
       },
       "TicketRegistration": {
         "type": "object",

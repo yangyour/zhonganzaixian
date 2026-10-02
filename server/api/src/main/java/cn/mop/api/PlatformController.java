@@ -58,7 +58,12 @@ public class PlatformController {
             imports=probe.status();
             if(imports.enabled()&&!imports.ready())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境导入源能力未就绪",List.of(map("component","asset_imports","asset_imports",imports.dto())));
         }
-        return success(map("status","READY_REMOTE_TEST","ready",true,"mode",repository.metadata().mode(),"source",repository.metadata().source(),"durable",repository.metadata().durable(),"production_ready",false,"photos",photos.dto(),"asset_imports",imports.dto()),request);
+        boolean dependencyDraftReady=false;
+        if(repository.metadata().mode().equals("remote_test")){
+            try{List<String> reasons=repository.assetDependencyProblems();dependencyDraftReady=reasons!=null&&reasons.isEmpty();}catch(RuntimeException unavailable){dependencyDraftReady=false;}
+            if(!dependencyDraftReady)throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境资产依赖草稿schema或权限未就绪",List.of(map("component","asset_dependencies","reasons",List.of("ASSET_DEPENDENCY_SCHEMA_OR_ACCESS_UNAVAILABLE"))));
+        }
+        return success(map("status","READY_REMOTE_TEST","ready",true,"mode",repository.metadata().mode(),"source",repository.metadata().source(),"durable",repository.metadata().durable(),"production_ready",false,"photos",photos.dto(),"asset_imports",imports.dto(),"asset_dependencies",map("ready",dependencyDraftReady,"schema_access_ready",dependencyDraftReady,"configuration_status","CONFIG_PENDING","monitoring_applied",false,"effective_rules",null)),request);
     }
     @GetMapping("/assets") Object assets(@RequestParam Map<String,String> query,HttpServletRequest request){
         Access access=access(request,"assets:read");Set<String> allowed=Set.of("cursor","page_size","type","site_id","status","q");

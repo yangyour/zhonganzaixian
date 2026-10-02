@@ -176,7 +176,7 @@ test('operation区分报障门禁与真实文件状态，终态不得伪造', ()
 
 test('就绪成功不能把已启用但缺schema或存储的照片能力写成READY', () => {
   const photos = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, policy_source: 'USER_DEVELOPMENT_DIRECTION', reasons: [] };
-  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
+  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
   assert.equal(validates('ReadinessResult', { data, trace_id: 'MOP-FAKE-readiness' }), true);
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('ReadinessResult', { data: { ...data, photos: { ...photos, [key]: false } }, trace_id: 'MOP-FAKE-readiness' }), false);
   assert.equal(validates('ReadinessResult', { data: { ...data, production_ready: true }, trace_id: 'MOP-FAKE-readiness' }), false);
@@ -204,8 +204,8 @@ const importSource = {
   ...importFacts, effective_rule_versions: null, quota_reservation: null,
 };
 
-test('V0.8来源接口独立creator-only，POST带CSRF/幂等，上传及解析只202', () => {
-  assert.equal(contract.info.version, '0.8.0');
+test('V0.9保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
+  assert.equal(contract.info.version, '0.9.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -298,4 +298,25 @@ test('技术政策与就绪不冒充业务资格或Worker活动，实际限制�
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('AssetImportReadiness', { ...ready, [key]: false }), false);
   assert.equal(validates('AssetImportReadiness', { ...ready, worker_activity: 'RUNNING' }), false);
   assert.equal(validates('AssetImportReadiness', { ...ready, can_import: true }), false);
+});
+
+test('依赖草稿请求明确图CAS、空业务元数据与写动作保护', () => {
+  const route = contract.paths['/assets/{id}/dependencies'];
+  assert.deepEqual(Object.keys(route), ['get', 'post']);
+  assert.equal(route.post['x-mop-capability'], 'assets:write');
+  assert.equal(route.post['x-mop-permission-version-recheck'], true);
+  const edge = { parent_id: id('1'), child_id: id('2'), proposed_type: null, proposed_suppression_scope: null, proposed_enabled: null };
+  const request = { expected_version: 0, additions: [edge] };
+  assert.ok(validates('AssetDependencyAppend', request));
+  for (const change of [x => { x.expected_version = -1; }, x => { x.expected_version = 1.5; }, x => { x.tenant_id = id('3'); }, x => { x.additions = []; }, x => { x.additions = Array.from({ length: 101 }, () => edge); }, x => { delete x.additions[0].proposed_type; }, x => { x.additions[0].enabled = true; }, x => { x.additions[0].proposed_enabled = 'true'; }]) {
+    const invalid = structuredClone(request); change(invalid); assert.equal(validates('AssetDependencyAppend', invalid), false);
+  }
+});
+
+test('依赖回读只代表完整持久草稿，拒绝有效规则与已发布伪事实', () => {
+  const draft = { asset_id: id('1'), tenant_id: id('2'), version: 0, version_kind: 'tenant_dependency_graph', updated_at: null, complete: true, proposed_edges: [], lifecycle_status: 'DRAFT', decision_status: 'pending', configuration_status: 'CONFIG_PENDING', effective_rules: null, monitoring_applied: false, question_ids: ['Q20'], source: 'postgresql', technical_limits: { max_additions: 100, max_graph_edges: 10000, max_body_bytes: 131072 } };
+  assert.ok(validates('AssetDependencyDraft', draft));
+  for (const change of [x => { x.effective_rules = []; }, x => { x.monitoring_applied = true; }, x => { x.lifecycle_status = 'PUBLISHED'; }, x => { x.decision_status = 'approved'; }, x => { x.complete = false; }, x => { x.technical_limits.max_graph_edges = 0; }, x => { x.configuration_status = 'READY'; }]) {
+    const invalid = structuredClone(draft); change(invalid); assert.equal(validates('AssetDependencyDraft', invalid), false);
+  }
 });

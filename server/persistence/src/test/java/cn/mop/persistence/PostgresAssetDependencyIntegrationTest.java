@@ -29,7 +29,7 @@ class PostgresAssetDependencyIntegrationTest {
         platform=new PostgresPlatformRepository(pool,mapper);dependencies=new PostgresAssetDependencyRepository(pool,platform);
         engineer=platform.users().stream().filter(u->platform.membership(u.id(),TENANT).filter(m->m.role().equals("msp")).isPresent()).findFirst().orElseThrow().id();
         viewer=platform.users().stream().filter(u->platform.membership(u.id(),TENANT).filter(m->m.role().equals("viewer")).isPresent()).findFirst().orElseThrow().id();
-        foreign=platform.list(OTHER).get(0).id();
+        foreign=platform.list(OTHER).get(0).id();assertEquals(List.of(),dependencies.readinessProblems());
         try(var c=pool.getConnection();var s=c.createStatement();var r=s.executeQuery("SELECT current_database()='mop_test' AND current_user='mop_test_runtime' AND to_regclass('public.mop_asset_dependency_revision') IS NOT NULL")){assertTrue(r.next());assertTrue(r.getBoolean(1));}
     }
     @AfterAll static void close(){if(pool!=null)pool.close();}
@@ -47,7 +47,11 @@ class PostgresAssetDependencyIntegrationTest {
     static long historyEdges(long version)throws SQLException{
         try(var c=pool.getConnection();var s=c.prepareStatement("SELECT count(*) FROM public.mop_asset_dependency_edge WHERE tenant_id::text=? AND revision_version=?")){s.setString(1,TENANT);s.setLong(2,version);try(var r=s.executeQuery()){r.next();return r.getLong(1);}}
     }
-    static long auditCount(){return platform.audits(TENANT).stream().filter(a->"asset_dependency.draft.append".equals(a.get("action"))).count();}
+    static long auditCount(){
+        try(var c=pool.getConnection();var s=c.prepareStatement("SELECT count(*) FROM public.mop_audit WHERE tenant_id::text=? AND payload->>'action'='asset_dependency.draft.append'")){
+            s.setString(1,TENANT);try(var r=s.executeQuery()){r.next();return r.getLong(1);}
+        }catch(SQLException failure){throw new AssertionError("Synthetic audit count unavailable");}
+    }
     @Test void savesImmutableFullRevisionAndNeverInventsEffectiveValues()throws SQLException{
         String a=asset(),b=asset(),c=asset();Draft before=current();
         Draft one=add(before.version(),List.of(edge(a,b)));assertEquals(before.version()+1,one.version());assertEquals(before.edges().size()+1,one.edges().size());

@@ -1,0 +1,254 @@
+{
+  "verified_at": "2026-10-02T12:55:21.305Z",
+  "environment": "niko-local-test",
+  "api_version": "0.9.0",
+  "http_checks": 46,
+  "all_passed": true,
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_synthetic_a",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_synthetic_b",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_synthetic_c",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_asset_lookup",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "read_complete_graph",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "customer_read_draft_without_write",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_before",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "append_a_to_b",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_exact_replay",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_changed_body_rejected",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "read_saved_draft",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "append_b_to_c",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "transitive_cycle_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "self_reference_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "stale_graph_version_rejected",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "duplicate_pair_not_overwritten",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "cross_tenant_read_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_path_asset_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_path_write_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_edge_hidden_before_stale_version",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "viewer_write_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_read_forbidden",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_csrf_rejected",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_key_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "client_tenant_spoof_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_spoof_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unanchored_batch_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "explicit_null_required",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "blank_metadata_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "batch_limit_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "duplicate_json_key_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "trailing_json_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "body_size_limit_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "all_rejections_preserve_complete_graph",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_after",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_synthetic_race_d",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_synthetic_race_e",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "concurrent_opposite_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "concurrent_opposite_0",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "concurrent_loser_retry_cycle_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "final_readback",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "postgres": "17.11",
+  "keycloak": "26.2.4",
+  "concurrent_result": [
+    200,
+    409
+  ],
+  "monitoring_applied": false,
+  "effective_rules": null,
+  "credentials_output": false,
+  "remaining": [
+    "Browser UI",
+    "Monitoring rule publication and confirmed Q20 impact",
+    "Full M3-9 acceptance",
+    "OSS verification"
+  ]
+}

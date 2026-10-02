@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-02",
+  "api_version": "0.9.0",
+  "environment": "niko-local-test",
+  "new_controller_tests": 7,
+  "new_readiness_tests": 2,
+  "maven_current_run": {
+    "total": 440,
+    "executed_passed": 427,
+    "real_pg_included": 84,
+    "skipped_fixture": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "web_tests": 184,
+  "web_typecheck_build": "PASS",
+  "contract_tests": 20,
+  "contract_generation": "PASS",
+  "http_runs": {
+    "initial": 46,
+    "final": 47,
+    "overlap": "Do not sum; final adds readiness check"
+  },
+  "first_contract_check": "One failure from expected old 0.8 version; updated for new 0.9 routes then all passed",
+  "v1_v7_modified": false,
+  "credentials_output": false,
+  "limitations": [
+    "No browser UI or OSS verification",
+    "No monitoring publication or confirmed Q20 impact",
+    "Full M3-9 NOT_DONE"
+  ]
+}

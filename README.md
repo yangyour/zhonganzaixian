@@ -1,5 +1,11 @@
 # MOP 基础网络代维平台
 
+## 当前接续状态（2026-10-02）
+
+当前在niko获准独立测试环境继续开发，原服务器网络阻塞单独保留。实际API为V0.9，新增[资产依赖持久草稿API](docs/asset-dependency-api.md)；真实PG/OIDC/HTTP证据与尚未完成的UI/监控/OSS分别记录。存储按用户选定OSS接线，尚待受控替换凭据及真实云验证，不能视为已通过。运行说明见[独立环境](docs/niko-local-test.md)，最新实施和验收见[状态](docs/implementation-status.md)。
+
+## 历史本地交接状态
+
 依据仓库内 `doc/development/` 持续实施全部128项合同需求。用户2026-10-01要求接回本地，已接续云端最后交接`1db3976`，云端业务写入已停止，见[本地交接](docs/local-development-handoff.md)。本批复用指定服务器PostgreSQL、Keycloak和MinIO，V5、完整构建/组件测试、基础HTTP80次、边界/恢复/撤权HTTP52次、运行中Worker重试HTTP25次和照片UI36项分别通过。正式工单规则及完整闭环尚未落实，见[本地验证](docs/local-runtime-verification.md)。
 
 全局要求见 [AGENTS.md](AGENTS.md)；已发现及缺失组件见 [组件清单](docs/environment/component-inventory.md)。静态原型仍保留为参考，默认运行和集成测试不再使用内存 fixture。

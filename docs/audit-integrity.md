@@ -1,6 +1,6 @@
 # 审计链只读验证
 
-对应M2-12、通用M7-5，当前阶段为算法、授权只读仓储与真实PG验证；公开区间校验/检索接口已接线并有61项真实HTTP证据，页面待实现，不能标完整合同验收DONE。
+对应M2-12、通用M7-5，当前阶段为算法、授权只读仓储与真实PG验证；公开区间校验/检索接口已接线并有61项真实HTTP证据，页面代码/状态和真实客户端已验证，浏览器DOM待，不能标完整合同验收DONE。
 
 ## 保持已存编码不变
 
@@ -33,10 +33,24 @@ AuditReader/PostgresAuditReader在REPEATABLE READ内重新核验当前启用padm
 
 7项新增controller隔离测试、契约24、Web225及类型/构建通过；根509=496执行通过（含111真实PG）+13fixture跳过，6MinIO排除，0失败错误。61项真实PG/OIDC HTTP/Ajv检查通过：12条筛选记录10+2稳定分页、正常追加后新首页13条、全精确筛选/半开时间、注入文本不改变谓词、区间与默认1000条、成功GET不追加审计、各非管理员/匿名拒绝、非法/重复/伪造scope和未来区间拒绝、无修改/删除入口405、denied可追溯。
 
-没有对真实表进行篡改；INVALID只在隔离与真实行内存副本覆盖，不能称为真实存储攻击测试。V1–V8、原私有配置、角色能力未改，原/audit兼容入口保留近期100条，不当完整检索结果。新页面仍待，M2-12/M7-5整体非DONE。上一4823b9a的CI37036201421已回读success。见[HTTP证据](evidence/niko-audit-api-http-20261002.json)、[本地回归](evidence/dot-audit-api-20261002.json)。
+没有对真实表进行篡改；INVALID只在隔离与真实行内存副本覆盖，不能称为真实存储攻击测试。V1–V8、原私有配置、角色能力未改，原/audit兼容入口保留近期100条，不当完整检索结果。本API阶段新页面仍待，后续见页面章节；M2-12/M7-5整体非DONE。上一4823b9a的CI37036201421已回读success。见[HTTP证据](evidence/niko-audit-api-http-20261002.json)、[本地回归](evidence/dot-audit-api-20261002.json)。
 
 ### 请求边界
 
 records允许page_size（10/15/25/50/100，默认15）、snapshot_sequence、before_sequence、actor_id、action、result、resource_type、resource_id、trace_id、occurred_from、occurred_before。before_sequence必须同时提供snapshot_sequence；筛选或身份上下文改变应清空两个分页边界，新追加日志须刷新第一页查看。时间必须显式秒/时区且最多毫秒精度，范围[开始,结束)；未提供时间意味着不另设时间筛选，不代表超过已存留存。
 
 integrity仅接受from_sequence/to_sequence，默认from=1；每次独立读快照，自动补全/循环验证不由本接口执行。返回checked_at、snapshot_sequence、范围、验证数、失败序号/固定枚举和本地前驱/末尾hash，不包含该区间原始payload。不提供修复、重签名、删除或留存变更。
+
+## 2026-10-02 审计检索与区间校验页面
+
+AuditPage切换到实际有界API，新增操作者/动作/结果/对象/trace精确筛选、UTC半开时间、应用筛选与固定序号上界分页；未应用输入不混入下一页。记录摘要只展示既存hash，并明确选择区间，查看不自动发起校验。区间面板独立显示当次快照、范围、前后hash、失败枚举及是否覆盖该快照整链；最多1000条/批，下一批需明确点击，不能将多次独立快照累计冒充整链证明。
+
+严格客户端校验租户/排序/唯一性/分页边界/EMPTY-null/INVALID/外部锚为false；失败或非法输入清除旧结果，查询与校验各自取消迟到响应，租户/身份/权限改变清空两区。无修改/删除/修复入口，不改变保留策略。
+
+14项新增状态/DTO/输入回归通过，全Web239、契约24、类型/构建通过。首轮模板dialog回调参数隐式any导致类型检查失败，改为具名boolean处理函数后通过。实际auditWorkspace+ApiClient模块连接真实PG/OIDC执行8次GET：20条两页稳定回读、trace筛选、单条校验、先1000再明确下一1000且不累计、最后序号上界不变；没有业务写请求或读取追加审计。另上一API的61项HTTP包括58项契约响应检查和3项不支持写方法405检查，不将不存在的写端点称为schema通过。
+
+API c7294a1的CI37037860376已回读success。当前是页面代码/状态与真实客户端HTTP证据，浏览器DOM/390px仍NOT_RUN_B03，M2-12/M7-5整体非DONE。V1–V8、API V0.12、角色和私有配置不改。见[前端回归](evidence/dot-audit-ui-20261002.json)、[实际客户端HTTP](evidence/niko-audit-client-http-20261002.json)。
+
+### 实际前端模块复现
+
+安装已锁定Web依赖后执行node tools/build-audit-client-test.mjs；在已批准组件所在QA会话中显式运行node tests/niko-audit-client-http.mjs。脚本仅使用当前私有padmin会话，全部GET，不生成账号或组件；拒绝覆盖已有证据。生成bundle在忽略的.local/niko-test，不包含凭据。该步骤不运行浏览器，不能替代控件与视觉验收。

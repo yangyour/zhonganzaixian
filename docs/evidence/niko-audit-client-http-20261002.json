@@ -1,0 +1,26 @@
+{
+  "verified_at": "2026-10-02T17:09:24.819Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "http_requests": 8,
+  "all_methods": "GET",
+  "api_mutations": 0,
+  "audit_sequence_unchanged": true,
+  "frontend": "actual auditWorkspace + ApiClient bundle",
+  "checks": [
+    "20 records across stable first/next page",
+    "exact trace filter resets page",
+    "one-record proof",
+    "first1000 then explicit next1000",
+    "independent proofs never aggregated into whole-chain claim",
+    "disposed state clears records/proof"
+  ],
+  "externally_anchored": false,
+  "browser_ui_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "Browser desktop/390px controls and visual acceptance",
+    "External trust anchor if required",
+    "Full M2-12/M7-5 and production retention"
+  ]
+}

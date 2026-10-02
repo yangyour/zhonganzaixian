@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-02",
+  "scope": "audit query and range verification page",
+  "result": "PASS_WITH_BROWSER_NOT_RUN",
+  "new_web_tests": 14,
+  "all_web_tests": 239,
+  "contract_tests": 24,
+  "typecheck_build": "PASS",
+  "actual_client_http_gets": 8,
+  "client_mutations": 0,
+  "audit_sequence_unchanged": true,
+  "first_build_failure": "dialog update:model-value callback implicit any; replaced with named boolean handler and rebuilt successfully",
+  "test_log_sha256": "e5c3744ad835461dfad9f831729c90d93570877b04eb864d431abb186b88c3e0",
+  "build_log_sha256": "845c20cf7c2575d88112ce0f8f53444a2d2b57c7020eb06944947db208108f5c",
+  "browser_desktop": "NOT_RUN_B03",
+  "browser_390px": "NOT_RUN_B03",
+  "external_trust_anchor": false,
+  "api_version": "0.12.0",
+  "remaining": [
+    "Browser controls/visual acceptance",
+    "Full M2-12/M7-5",
+    "Customer retention policy",
+    "External trusted anchoring if required"
+  ]
+}

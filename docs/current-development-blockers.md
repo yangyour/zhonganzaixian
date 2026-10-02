@@ -17,7 +17,7 @@
 - V7依赖草稿、V8实填工时schema均独立执行1、重复0、check0；V1–V8字节冻结，API/Worker启动不迁移
 - 实际API已到V0.12，依赖页面代码/真实客户端请求与标准15列模板下载继续推进并留证；真实浏览器验收仍保留NOT_RUN
 - 本人工时仓储与12项真实PG回归已完成，75项公开API、28次实际前端模块HTTP及225项Web测试通过，页面代码已接线，DOM验收继续保留阻塞；不受OSS/浏览器阻塞而停止，成本/默认值继续pending
-- 审计区间与有界检索API已完成61项真实HTTP；继续页面，不以此解除外部可信锚/留存/浏览器限制
+- 审计区间与有界检索API已完成61项真实HTTP；页面代码/239项Web及8次实际客户端GET通过，不以此解除外部可信锚/留存/浏览器限制
 - 完整128项仍未DONE；每项未完成范围继续在合同追踪保留
 
 关联：[组件清单](environment/component-inventory.md)、[浏览器探测](evidence/niko-ui-blocker-20261002.json)、[OSS](oss-storage-adapter.md)、[当前实施](implementation-status.md)、[验证](verification.md)。本表不包含凭据、连接秘密或未经批准的绕行方案。

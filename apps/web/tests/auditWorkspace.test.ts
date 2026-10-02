@@ -1,0 +1,60 @@
+import { it, expect, vi } from 'vitest'
+import { ApiError, type ApiClient } from '../src/api/client'
+import { createAuditWorkspace, emptyAuditState, readAuditPage, readAuditProof, validateAuditFilters, type AuditContext, type AuditState } from '../src/utils/auditWorkspace'
+const id = (n: number) => `55000000-0000-4000-8000-${n.toString(16).padStart(12, '0')}`
+const context: AuditContext = { tenantId: id(1), actorId: id(2), permissionVersion: 1 }
+const timestamp = '2026-10-02T00:00:00.123Z'
+const row = (n = 20) => ({ id: id(n + 100), occurred_at: timestamp, actor_id: id(2), actor_name: '合成操作人', tenant_id: id(1), action: 'synthetic.action', resource_type: 'synthetic', resource_id: null, result: 'DENIED', reason: 'synthetic', trace_id: 'synthetic-trace', source: 'postgresql', sequence: n, previous_hash: '0'.repeat(64), entry_hash: 'a'.repeat(64) })
+const page = (items = [row()], more = false, snapshot = 20) => ({ items, snapshot_sequence: snapshot, next_before_sequence: more ? items.at(-1)!.sequence : null, has_more: more, source: 'postgresql', scope: 'CURRENT_TENANT', page_size_limit: 100, filter_semantics: 'EXACT_MATCH_HALF_OPEN_TIME', integrity_scope: 'EACH_RECORD_LOCAL_HASH_ONLY', externally_anchored: false })
+const proof = (from = 1, to = 20, tail = 20) => ({ status: 'VALID', valid: true, snapshot_sequence: tail, from_sequence: from, to_sequence: to, verified_records: to - from + 1, failure_sequence: null, failure: 'NONE', anchor_hash: from === 1 ? '0'.repeat(64) : 'a'.repeat(64), final_hash: 'b'.repeat(64), has_more: to < tail, next_from_sequence: to < tail ? to + 1 : null, checked_at: '2026-10-02T00:00:00.123456Z', source: 'postgresql', scope: 'CURRENT_TENANT', verification_scope: 'LOCAL_DATABASE_SNAPSHOT', externally_anchored: false, max_range_records: 1000, hash_algorithm: 'SHA256_TOPLEVEL_SORTED_JSON_V1', whole_snapshot_chain_checked: from === 1 && to === tail })
+const empty = () => ({ ...proof(), status: 'EMPTY', valid: null, snapshot_sequence: 0, from_sequence: null, to_sequence: null, verified_records: 0, anchor_hash: null, final_hash: null, whole_snapshot_chain_checked: false })
+type Options = Parameters<ApiClient['request']>[1]
+function harness(handler: (url: string, options?: Options) => unknown | Promise<unknown>) { let state: AuditState = emptyAuditState(); const request = vi.fn(async (url: string, options?: Options) => handler(url, options)); const workspace = createAuditWorkspace({ request } as unknown as Pick<ApiClient, 'request'>, value => { state = value }); workspace.reset(context); return { workspace, request, state: () => state } }
+it('accepts exact scope records, empty filter results and stable bounded pages', () => {
+  expect(readAuditPage(page(), context, 15).items).toHaveLength(1); expect(readAuditPage(page([], false, 0), context, 15).snapshot_sequence).toBe(0)
+  const items = Array.from({ length: 10 }, (_, i) => row(20 - i)); expect(readAuditPage(page(items, true), context, 10).next_before_sequence).toBe(11); expect(readAuditPage(page([row(10)]), context, 10, { snapshot: 20, before: 11 }).items).toHaveLength(1)
+})
+it('rejects cross-tenant, duplicate, unsorted, wrong upper bound and false external-anchor records', () => {
+  for (const value of [page([{ ...row(), tenant_id: id(9) }]), page([row(), row()]), page([row(19), row(20)]), page([row(21)]), { ...page(), externally_anchored: true }, { ...page(), has_more: true }, { ...page(), next_before_sequence: 10 }, page([{ ...row(), previous_hash: 'bad' }]), page([{ ...row(), occurred_at: '2026-02-29T00:00:00Z' }])]) expect(() => readAuditPage(value, context, 15)).toThrow()
+  expect(() => readAuditPage(page(), context, 10, { snapshot: 19, before: 10 })).toThrow()
+})
+it('proof preserves microsecond checked time, local genesis and partial boundaries', () => {
+  expect(readAuditProof(proof(), 1, null).whole_snapshot_chain_checked).toBe(true); expect(readAuditProof(proof(2, 20), 2, 20).whole_snapshot_chain_checked).toBe(false); expect(readAuditProof(proof(1, 1000, 2000), 1, null).next_from_sequence).toBe(1001); expect(readAuditProof(empty(), 1, null).valid).toBeNull()
+})
+it('rejects empty-as-valid, partial-as-whole, wrong requested range and fabricated trust', () => {
+  for (const value of [{ ...empty(), valid: true }, { ...proof(), externally_anchored: true }, { ...proof(), verified_records: 19 }, { ...proof(), anchor_hash: 'f'.repeat(64) }, { ...proof(), checked_at: 'bad' }]) expect(() => readAuditProof(value, 1, null)).toThrow()
+  expect(() => readAuditProof({ ...proof(1, 1000, 2000), whole_snapshot_chain_checked: true }, 1, null)).toThrow(); expect(() => readAuditProof(proof(2, 20), 1, 20)).toThrow()
+})
+it('keeps an invalid chain as an explicit result and rejects malformed failure facts', () => {
+  const value = { ...proof(), status: 'INVALID', valid: false, verified_records: 4, failure: 'HASH_MISMATCH', failure_sequence: 5, whole_snapshot_chain_checked: false }
+  expect(readAuditProof(value, 1, null).status).toBe('INVALID')
+  for (const change of [{ valid: true }, { failure: 'NONE' }, { failure: ['HASH_MISMATCH'] }, { failure_sequence: 30 }, { whole_snapshot_chain_checked: true }, { next_from_sequence: 21 }]) expect(() => readAuditProof({ ...value, ...change }, 1, null)).toThrow()
+})
+it('filters remain exact and validate UTC bounds without guessed time windows', () => {
+  expect(validateAuditFilters({ action: "x' OR '1'='1", occurred_from: timestamp })).toEqual({ action: "x' OR '1'='1", occurred_from: timestamp })
+  for (const value of [{ tenant_id: id(1) }, { action: ' ' }, { action: 'x\u0000' }, { action: '\ud800' }, { actor_id: 'name' }, { occurred_from: '2026-10-02T00:00:00' }, { occurred_from: '2026-10-02T00:00:00.1234Z' }, { occurred_from: timestamp, occurred_before: timestamp }]) expect(() => validateAuditFilters(value as never)).toThrow()
+})
+it('list and proof issue GET-only requests and neither automatically triggers the other', async () => {
+  const h = harness(url => url.startsWith('/audit/records?') ? page() : proof()); expect(await h.workspace.load()).toBe(true); expect(h.request).toHaveBeenCalledTimes(1); expect(h.state().proof).toBeNull(); expect(await h.workspace.verify()).toBe(true); expect(h.request).toHaveBeenCalledTimes(2); expect(h.request.mock.calls.every(([, options]) => options?.method === undefined && options?.body === undefined && options?.idempotencyKey === undefined)).toBe(true)
+})
+it('next page reuses applied filters and snapshot, while refresh drops both boundaries', async () => {
+  const first = page(Array.from({ length: 10 }, (_, i) => row(20 - i)), true); const h = harness(url => url.includes('before_sequence=') ? page([row(10)]) : first); await h.workspace.load({ action: 'synthetic.action' }, 10); await h.workspace.next(); const next = new URL('https://example.invalid' + h.request.mock.calls[1]![0]); expect(next.searchParams.get('snapshot_sequence')).toBe('20'); expect(next.searchParams.get('before_sequence')).toBe('11'); expect(next.searchParams.get('action')).toBe('synthetic.action'); await h.workspace.load(); expect(h.request.mock.calls[2]![0]).not.toContain('snapshot_sequence'); expect(h.state().paged).toBe(false)
+})
+it('invalid filters clear previous page without network and fail-closed source errors stay visible', async () => {
+  let offline = false; const h = harness(() => { if (offline) throw new ApiError(503, 'UPSTREAM_UNAVAILABLE', 'isolated', 't'); return page() }); await h.workspace.load(); expect(await h.workspace.load({ action: ' ' })).toBe(false); expect(h.request).toHaveBeenCalledTimes(1); expect(h.state().page).toBeNull(); offline = true; expect(await h.workspace.load({})).toBe(false); expect(h.state().error).toBeInstanceOf(ApiError)
+})
+it('verification errors and invalid input clear prior green result without auto-retry', async () => {
+  const h = harness(() => proof()); await h.workspace.verify(); expect(await h.workspace.verify(1, 1001)).toBe(false); expect(h.state().proof).toBeNull(); expect(h.request).toHaveBeenCalledTimes(1); expect(await h.workspace.verifyNext()).toBe(false)
+})
+it('valid next-range is explicit, failure cannot skip forward, and batches are never aggregated', async () => {
+  let invalid = false; const h = harness(url => invalid ? { ...proof(1001, 2000, 3000), status: 'INVALID', valid: false, failure: 'HASH_MISMATCH', failure_sequence: 1001, verified_records: 0, next_from_sequence: null } : url.includes('from_sequence=1001') ? proof(1001, 2000, 3000) : proof(1, 1000, 3000)); await h.workspace.verify(); expect(h.request).toHaveBeenCalledTimes(1); await h.workspace.verifyNext(); expect(h.state().proof?.verified_records).toBe(1000); expect(h.state().proof?.from_sequence).toBe(1001); expect(h.state().proof?.whole_snapshot_chain_checked).toBe(false); invalid = true; await h.workspace.verify(1001); expect(h.state().proof?.status).toBe('INVALID'); expect(await h.workspace.verifyNext()).toBe(false); expect(h.request).toHaveBeenCalledTimes(3)
+})
+it('list and proof channels can run independently and reset rejects both late responses', async () => {
+  let listRelease!: (value: unknown) => void, proofRelease!: (value: unknown) => void; const h = harness(url => new Promise(resolve => { if (url.startsWith('/audit/records?')) listRelease = resolve; else proofRelease = resolve })); const list = h.workspace.load(), verify = h.workspace.verify(); expect(h.state().loading).toBe(true); expect(h.state().verifying).toBe(true); h.workspace.reset({ ...context, tenantId: id(9) }); listRelease(page()); proofRelease(proof()); expect(await list).toBe(false); expect(await verify).toBe(false); expect(h.state().page).toBeNull(); expect(h.state().proof).toBeNull()
+})
+it('older same-context list response cannot replace a newer query', async () => {
+  let release!: (value: unknown) => void; const h = harness(url => url.includes('action=old') ? new Promise(resolve => { release = resolve }) : page([row(19)])); const first = h.workspace.load({ action: 'old' }); await h.workspace.load({ action: 'new' }); release(page()); expect(await first).toBe(false); expect(h.state().filters.action).toBe('new'); expect(h.state().page?.items[0]?.sequence).toBe(19)
+})
+it('invalid contexts never issue list or verification requests', async () => {
+  const h = harness(() => page()); h.workspace.reset({ ...context, permissionVersion: 0 }); expect(await h.workspace.load()).toBe(false); expect(await h.workspace.verify()).toBe(false); expect(h.request).not.toHaveBeenCalled(); h.workspace.dispose(); expect(h.state().page).toBeNull()
+})

@@ -1,0 +1,155 @@
+{
+  "recorded_at": "2026-10-02T10:32:43.692085+00:00",
+  "base_commit": "414dd4655c63033b1c2f7de33ad9ef48c5e53511",
+  "environment": "niko-local-test",
+  "authorization": "Owner explicitly approved local components and scoped test credentials on 2026-10-02; subsequent storage selection is OSS",
+  "components": {
+    "postgresql": {
+      "version": "17.11",
+      "endpoint": "127.0.0.1:25432",
+      "status": "REAL_TESTED",
+      "different_from_original_server_version": true
+    },
+    "keycloak": {
+      "version": "26.2.4",
+      "endpoint": "127.0.0.1:28110",
+      "status": "REAL_OIDC_HTTP_TESTED"
+    },
+    "api": {
+      "endpoint": "127.0.0.1:8080",
+      "profile": "remote_test",
+      "migration_credentials_injected": false
+    },
+    "minio": {
+      "source_tag": "RELEASE.2025-09-07T16-13-09Z",
+      "build": "compiled from official source with Go1.24.6",
+      "startup": "BLOCKED_NETLINK_EPERM",
+      "escalated_retry": "SAME_EPERM",
+      "object_store_tests": "NOT_RUN"
+    },
+    "oss": {
+      "selected_by_owner": true,
+      "authentication_tested": false,
+      "writes_executed": 0,
+      "status": "ADAPTER_PENDING"
+    }
+  },
+  "migration": {
+    "frozen_sources_modified": false,
+    "initial_new_database_V1_V4_executed": 4,
+    "separate_V5_executed": 1,
+    "separate_V6_executed": 1,
+    "post_restart_check_executed": 0,
+    "schema_acl_check": "PASS"
+  },
+  "postgres_integration": {
+    "passed": 69,
+    "by_suite": {
+      "repository": 5,
+      "configuration_revision": 6,
+      "customer_report": 8,
+      "photo_transactions": 24,
+      "configuration_diagnostic": 8,
+      "asset_import_transactions": 18
+    },
+    "storage_adapters_in_transaction_tests": "isolated test doubles; not evidence of object-store integration"
+  },
+  "root_maven": {
+    "status": "PASS_WITH_EXPLICIT_STORAGE_EXCLUSIONS",
+    "tests": 380,
+    "executed": 367,
+    "skipped_historical_fixture": 13,
+    "explicitly_excluded_minio_checks": 6,
+    "failures": 0,
+    "errors": 0,
+    "command_scope": "verify -Dtest=*,!MinioPhotoStoreRemoteTest,!MinioAssetImportStoreRemoteTest; MOP_RUN_REMOTE_TESTS=true"
+  },
+  "oidc": {
+    "environment": "niko-local-test",
+    "real_oidc_http_checks": [
+      {
+        "role": "padmin",
+        "authenticated": true,
+        "pkce": "S256",
+        "http_only_session": true
+      },
+      {
+        "role": "reviewer",
+        "authenticated": true,
+        "pkce": "S256",
+        "http_only_session": true
+      },
+      {
+        "role": "msp",
+        "authenticated": true,
+        "pkce": "S256",
+        "http_only_session": true
+      },
+      {
+        "role": "tadmin",
+        "authenticated": true,
+        "pkce": "S256",
+        "http_only_session": true
+      },
+      {
+        "role": "viewerA",
+        "authenticated": true,
+        "pkce": "S256",
+        "http_only_session": true
+      },
+      {
+        "role": "viewerB",
+        "authenticated": true,
+        "pkce": "S256",
+        "http_only_session": true
+      }
+    ],
+    "browser_ui_tested": false,
+    "credentials_output": false
+  },
+  "http_contract_responses": 44,
+  "python_configuration_guard_tests": 4,
+  "contract_tests": 18,
+  "contract_generation": "PASS",
+  "graceful_restart": "PASS_8_TABLE_FINGERPRINTS_EQUAL",
+  "crash_recovery": "NOT_RUN",
+  "storage_fault_retry": "NOT_RUN",
+  "browser_ui": "NOT_RUN",
+  "full_contract_acceptance": "NOT_RUN",
+  "original_private_configuration_modified": false,
+  "original_server_modified": false,
+  "artifacts": {
+    "keycloak-26.2.4.tar.gz": {
+      "bytes": 155039204,
+      "sha256": "6ef2ae3a339a21c246fdcc5ddea5edcc362eb2f466fb422c5b82072f6dbc55d1"
+    },
+    "go1.24.6.linux-amd64.tar.gz": {
+      "bytes": 78583176,
+      "sha256": "bbca37cc395c974ffa4893ee35819ad23ebb27426df87af92e93a9ec66ef8712"
+    },
+    "minio-source.tar.gz": {
+      "bytes": 24229194,
+      "sha256": "c9598dcce3440977e79f787f2ba0e7e4d92c8d556bd51e7cef3785bafd6635f3"
+    }
+  },
+  "initial_failures": [
+    {
+      "scope": "separate command loopback",
+      "result": "unreachable; moved owned services and tests to same execution session"
+    },
+    {
+      "scope": "PostgreSQL Unix socket",
+      "result": "EPERM; configured approved authenticated TCP loopback only"
+    },
+    {
+      "scope": "first integration test run",
+      "result": "4 class initializations failed for missing test-only migration variables; subsequent corrected run passed"
+    },
+    {
+      "scope": "Python default cookie policy on Keycloak loopback",
+      "result": "cookie not sent; test client narrowly handles two owned loopback origins without changing cookie flags; not browser proof"
+    }
+  ],
+  "qa_output_path_negative_checks": 2,
+  "niko_bootstrap_java_compilation": "PASS"
+}

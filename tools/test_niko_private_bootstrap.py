@@ -1,0 +1,25 @@
+"""Isolated configuration-file tests; no component or account is created."""
+from pathlib import Path
+import json,subprocess,sys,tempfile,unittest,stat,hashlib
+ROOT=Path(__file__).resolve().parents[1]
+SCRIPT=ROOT/'tools/niko-test/prepare-private.py'
+class NikoPrivateBootstrapTest(unittest.TestCase):
+ def test_explicit_flag_required_before_any_write(self):
+  with tempfile.TemporaryDirectory() as d:
+   r=subprocess.run([sys.executable,str(SCRIPT)],cwd=d,capture_output=True,text=True)
+   self.assertNotEqual(0,r.returncode);self.assertFalse((Path(d)/'.local').exists())
+ def test_new_private_files_are_restricted_and_secrets_never_printed(self):
+  with tempfile.TemporaryDirectory() as d:
+   r=subprocess.run([sys.executable,str(SCRIPT),'--create-approved-local-test-credentials'],cwd=d,capture_output=True,text=True)
+   self.assertEqual(0,r.returncode);p=Path(d)/'.local/niko-test/private/bootstrap.json';data=json.loads(p.read_text())
+   self.assertEqual(6,len(data['test_users']));self.assertEqual(0o600,stat.S_IMODE(p.stat().st_mode));self.assertEqual(0o700,stat.S_IMODE(p.parent.stat().st_mode))
+   for secret in list(data['component_credentials'].values())+[u['password'] for u in data['test_users']]:self.assertNotIn(secret,r.stdout+r.stderr)
+ def test_existing_credentials_are_never_rotated_implicitly(self):
+  with tempfile.TemporaryDirectory() as d:
+   args=[sys.executable,str(SCRIPT),'--create-approved-local-test-credentials'];subprocess.run(args,cwd=d,capture_output=True,check=True)
+   p=Path(d)/'.local/niko-test/private/bootstrap.json';before=p.read_bytes();r=subprocess.run(args,cwd=d,capture_output=True)
+   self.assertNotEqual(0,r.returncode);self.assertEqual(before,p.read_bytes())
+ def test_all_six_migration_hashes_match_frozen_sources(self):
+  manifest=json.loads((ROOT/'tools/niko-test/frozen-migrations.json').read_text())['sha256'];self.assertEqual(6,len(manifest))
+  for name,expected in manifest.items():self.assertEqual(expected,hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest())
+if __name__=='__main__':unittest.main()

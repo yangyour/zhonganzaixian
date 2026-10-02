@@ -1,0 +1,11 @@
+{
+  "baseline": "f51fed151aa9e5bbb1fc0ab3b22cde02c140720b",
+  "sha256": {
+    "V1__remote_test_platform.sql": "1a0fbebcd4d32e899e8d344007ac7ed060550e1deaa04e02706a19210aaf1063",
+    "V2__tenant_configuration_revisions.sql": "1894b9807a3384bc1818af7019318fbe43cafe2a9656ad163e127a808b638626",
+    "V3__configuration_review_test_identity.sql": "cbcebf62edb25ce83c47f048efa5fba2f61b11a69a4b43639725dbe450f42237",
+    "V4__durable_customer_report_registration.sql": "4fefc7470369fa4c4c78318b6e990935e7483fd3d4b3a8a2cd215f58af2567d8",
+    "V5__durable_report_photos.sql": "5a84f62bdaab9badfd5d87f4d30ae0ac1f9c1ae2f48d0d84e0635485a7bbdc55",
+    "V6__asset_import_sources_and_mapping.sql": "1f532822668274b7aebd12ea78b57e6be0aa9fd53ceb77023ee8067589cd2b4b"
+  }
+}

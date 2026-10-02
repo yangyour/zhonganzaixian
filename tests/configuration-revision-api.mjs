@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { createHash, randomUUID } from 'node:crypto';
+import { resolve, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
@@ -9,19 +11,22 @@ async function main() {
   const root = new URL('../', import.meta.url);
   const base = process.argv[2] ?? 'http://127.0.0.1:8080/api/v1';
   assert.equal(new URL(base).hostname, '127.0.0.1');
-  const sessions = Object.fromEntries(['creator', 'reviewer', 'viewer'].map(role => [role, JSON.parse(readFileSync(new URL(`deploy/private/qa-revision-${role}.json`, root), 'utf8').replace(/^\uFEFF/, ''))]));
+  const sessionDirectory = process.env.MOP_TEST_SESSION_DIRECTORY ? resolve(process.env.MOP_TEST_SESSION_DIRECTORY) : fileURLToPath(new URL('deploy/private/', root));
+  if (process.env.MOP_TEST_SESSION_DIRECTORY) assert.ok(process.env.MOP_EVIDENCE_OUTPUT && process.env.MOP_TEST_ENVIRONMENT_NAME, '独立环境必须明确证据输出和环境名称，不能覆盖原环境记录');
+  if (process.env.MOP_TEST_SESSION_DIRECTORY) assert.notEqual(resolve(process.env.MOP_EVIDENCE_OUTPUT), fileURLToPath(new URL('docs/evidence/configuration-revision-http.json', root)), '独立环境不得覆盖原环境证据');
+  const sessions = Object.fromEntries(['creator', 'reviewer', 'viewer'].map(role => [role, JSON.parse(readFileSync(join(sessionDirectory, `qa-revision-${role}.json`), 'utf8').replace(/^\uFEFF/, ''))]));
   assert.notEqual(sessions.creator.user_id, sessions.reviewer.user_id, '必须两个不同真实OIDC主体');
   const contract = JSON.parse(readFileSync(new URL('contracts/local-api.openapi.json', root), 'utf8'));
   const ajv = new Ajv2020({ strict: false, allErrors: true });
   addFormats(ajv);
   let checked = 0;
   const key = () => randomUUID();
-  async function request(role, method, route, { body, status = 200, path = route.split('?')[0], idem = key(), csrf } = {}) {
+  async function request(role, method, route, { body, rawBody, status = 200, path = route.split('?')[0], idem = key(), csrf } = {}) {
     verificationStage = `${role} ${method} ${path}`;
     const session = sessions[role];
     const headers = { Cookie: session.cookie, 'Idempotency-Key': idem, 'X-CSRF-Token': csrf ?? session.csrf_token, Accept: 'application/json' };
-    if (body !== undefined) headers['Content-Type'] = 'application/json';
-    const response = await fetch(base + route, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), redirect: 'manual' });
+    if (body !== undefined || rawBody !== undefined) headers['Content-Type'] = 'application/json';
+    const response = await fetch(base + route, { method, headers, body: rawBody ?? (body === undefined ? undefined : JSON.stringify(body)), redirect: 'manual' });
     const data = await response.json();
     verificationStage += ` actual=${response.status} expected=${status}`;
     assert.equal(response.status, status, `${role} ${method} ${path}: unexpected_status`);
@@ -63,6 +68,13 @@ async function main() {
   await request('creator', 'POST', route, { body: { ...proposal, reason: '😀'.repeat(501) }, status: 400, path: routePath });
   await request('creator', 'POST', '/configurations/business.timezone/revisions', { body: { ...proposal, proposed_value: 'UTC' }, status: 422, path: routePath });
   await request('creator', 'POST', `/configurations/${encodeURIComponent(objectDefinition.key)}/revisions`, { body: { ...proposal, proposed_value: { client_secret: 'not-a-real-credential' } }, status: 400, path: routePath });
+  const objectRoute = `/configurations/${encodeURIComponent(objectDefinition.key)}/revisions`;
+  const objectBefore = (await request('creator', 'GET', objectRoute, { path: routePath })).data.items.length;
+  for (const numericValue of ['{"limit":1e999}', '{"nested":[-1e999]}']) {
+    const rawBody = `{"proposed_value":${numericValue},"reason":${JSON.stringify(proposal.reason)},"evidence_refs":${JSON.stringify(proposal.evidence_refs)}}`;
+    await request('creator', 'POST', objectRoute, { rawBody, status: 400, path: routePath });
+  }
+  assert.equal((await request('creator', 'GET', objectRoute, { path: routePath })).data.items.length, objectBefore, '溢出拒绝不应保存提案');
   const createKey = key();
   const created = (await request('creator', 'POST', route, { body: proposal, idem: createKey, path: routePath })).data;
   assert.equal(created.workflow_status, 'DRAFT');
@@ -126,8 +138,8 @@ async function main() {
   const audit = (await request('creator', 'GET', '/audit')).data.items;
   assert.equal(audit.filter(item => item.resource_id === created.id && item.action === 'configuration_revision.approve' && item.result === 'SUCCEEDED').length, 1);
   mkdirSync(new URL('docs/evidence/', root), { recursive: true });
-  const summary = { date: '2026-10-01', mode: 'remote_test', oidc_subjects: 3, http_responses_validated: checked, states_verified: ['DRAFT', 'IN_REVIEW', 'APPROVED', 'REJECTED', 'WITHDRAWN'], self_review_rejected: true, cross_tenant_objects_invisible: true, actor_spoof_rejected: true, replay_has_no_duplicate_history_or_audit: true, registry_unchanged: true, internal_approval_does_not_confirm_customer_or_activate: true };
-  writeFileSync(new URL('docs/evidence/configuration-revision-http.json', root), JSON.stringify(summary, null, 2) + '\n');
+  const summary = { date: new Date().toISOString(), environment: process.env.MOP_TEST_ENVIRONMENT_NAME ?? 'designated-server', mode: 'remote_test', oidc_subjects: 3, http_responses_validated: checked, states_verified: ['DRAFT', 'IN_REVIEW', 'APPROVED', 'REJECTED', 'WITHDRAWN'], self_review_rejected: true, cross_tenant_objects_invisible: true, actor_spoof_rejected: true, replay_has_no_duplicate_history_or_audit: true, registry_unchanged: true, nested_numeric_overflow_rejected_without_revision: true, internal_approval_does_not_confirm_customer_or_activate: true };
+  writeFileSync(process.env.MOP_EVIDENCE_OUTPUT ? resolve(process.env.MOP_EVIDENCE_OUTPUT) : new URL('docs/evidence/configuration-revision-http.json', root), JSON.stringify(summary, null, 2) + '\n');
   console.log(JSON.stringify(summary, null, 2));
 }
 

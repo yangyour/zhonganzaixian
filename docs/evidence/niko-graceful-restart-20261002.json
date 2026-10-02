@@ -1,0 +1,43 @@
+{
+  "recorded_at": "2026-10-02T10:22:16.184400+00:00",
+  "environment": "niko-local-test",
+  "scope": "owned PostgreSQL/Keycloak/API graceful restart",
+  "database_fingerprints_equal": true,
+  "tables": {
+    "mop_user": {
+      "rows": 16,
+      "sha256": "830c576f6be26d604173c33d0bfaf09d300de2d5ac14915668485291cbbfc005"
+    },
+    "mop_membership": {
+      "rows": 29,
+      "sha256": "3203f9722b4fd14fff4e4b160f1391218c394f34915c9c680cb133f1f25878c9"
+    },
+    "mop_configuration": {
+      "rows": 205,
+      "sha256": "e4c7143cea84fe6ee9a004b348511b75cf17486cd4782b56ad1e251f7bba57dd"
+    },
+    "mop_configuration_revision": {
+      "rows": 44,
+      "sha256": "4eb6bab9d2dab4350217ef92a00e58f6aca5b6b24beb210be126c3ffb06009ed"
+    },
+    "mop_configuration_revision_history": {
+      "rows": 56,
+      "sha256": "aec93c928547fe5e671d014c0b5f0398e07ab67146673ace1149c2376beadfbc"
+    },
+    "mop_asset": {
+      "rows": 47,
+      "sha256": "8dcd4bf48f38d5985c5c1bd437289651656b979a70eea8aab495ea374a93ba47"
+    },
+    "mop_ticket": {
+      "rows": 67,
+      "sha256": "a3edee7b1d6ea9aaa14411b5f7c1cbd116f6fdb40112ac982e28f49488ab00f1"
+    },
+    "mop_audit": {
+      "rows": 639,
+      "sha256": "fba338c89709d8903cd6fdce4261320d1d5a42951096d87914fc1f1b7ee90b64"
+    }
+  },
+  "crash_recovery_tested": false,
+  "minio_restart_tested": false,
+  "browser_ui_tested": false
+}

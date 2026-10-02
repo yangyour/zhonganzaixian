@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 env:
-  # Integration requires the designated server and a separate authorized run.
+  # Real-component integration requires an explicitly authorized environment and separate run.
   MOP_RUN_REMOTE_TESTS: 'false'
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
 
@@ -44,6 +44,9 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/mop-ssh-test"
           "$RUNNER_TEMP/mop-ssh-test/bin/python" -m pip install -r tools/requirements.txt
           "$RUNNER_TEMP/mop-ssh-test/bin/python" -m unittest discover -s tools -p test_ssh_host_trust.py -v
+
+      - name: Verify isolated niko configuration guards
+        run: python3 -m unittest discover -s tools -p test_niko_private_bootstrap.py -v
 
   backend:
     name: Backend compile, unit tests and packaging

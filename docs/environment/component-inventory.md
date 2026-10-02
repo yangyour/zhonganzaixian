@@ -86,3 +86,7 @@
 原runtime的解析器JAR是Windows路径，在Linux不可直接使用；工程内已有构建JAR可作为启动时进程环境覆盖，尚未启动API/Worker。后续运行仍排除迁移账号变量，保持V1–V6冻结和不自动迁移。
 
 发现旧`inspect_test_server.connect`使用AutoAddPolicy且会重写known_hosts，已改为强制既有固定目标键、RejectPolicy、不保存主机键；缺文件/缺目标键在认证前失败。5项隔离信任策略回归通过，不是服务器握手验证。见[脱敏连接记录](../evidence/dot-private-connectivity-20261002.json)。
+
+## 2026-10-02 niko独立环境新增授权与真实结果
+
+用户明确允许niko部署组件，新增范围不修改原服务器。新PG17.11/Keycloak26.2.4及API已运行，69真实PG、6真实OIDC身份及44配置审批HTTP通过；正常重启8表指纹一致。MinIO因netlink EPERM未启动，提升执行同样失败；存储改按用户选定OSS推进，尚未认证或写入。原远程网络阻塞保留，新环境与旧结果不混合。详见[独立说明](../niko-local-test.md)和[新证据](../evidence/niko-local-components-20261002.json)。

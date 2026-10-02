@@ -1,0 +1,295 @@
+{
+  "verified_at": "2026-10-02T21:10:24.442Z",
+  "environment": "niko-local-test",
+  "api_version": "0.16.0",
+  "passed": true,
+  "http_checks": 54,
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "known_role_scope_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "known_role_scope_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "known_role_scope_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "known_role_scope_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "known_role_scope_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "known_role_scope_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_3",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_4",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_5",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_6",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_7",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_8",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_9",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_10",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_11",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_first_ten",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_remaining_two",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "conjunctive_filters",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "cursor_wrong_filter",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "cursor_wrong_actor",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "cursor_wrong_tenant",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "cursor_tampered",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_unicode_name",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_root_lowercase_match",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "canonical_uuid_detail",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "exact_case_ip_substring",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "lowercase_ip_not_rewritten",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "literal_injection_text",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "percent_underscore_not_wildcards",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_assets_own_scope",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_detail_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "malformed_detail_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_site_filter_empty",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_main_query_42",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_main_query_43",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_main_query_44",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_main_query_45",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_metadata_prepare",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "metadata_unicode_lowercase_match",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "reference_search_retains_case_insensitive_scope",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_dependency_readiness",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_tail_before",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_asset_page",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_asset_detail",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_tail_after",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "main_page_sizes": [
+    10,
+    2
+  ],
+  "known_roles_current_tenant_only": true,
+  "signed_cursor_scope_unchanged": true,
+  "unicode_expression": "existing pg_catalog.und-x-icu root lowercase, literal substring, no normalization",
+  "database_global_collation_changed": false,
+  "query_and_detail_reads_do_not_append_audit": true,
+  "credentials_output": false,
+  "limitations": [
+    "No production 5000-asset benchmark or resource quota acceptance",
+    "Cursor is live creation-keyset, not frozen multi-page export",
+    "Original server Unicode dependency availability remains unverified",
+    "No browser DOM acceptance"
+  ]
+}

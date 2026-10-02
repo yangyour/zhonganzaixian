@@ -177,7 +177,7 @@ test('operation区分报障门禁与真实文件状态，终态不得伪造', ()
 
 test('就绪成功不能把已启用但缺schema或存储的照片能力写成READY', () => {
   const photos = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, policy_source: 'USER_DEVELOPMENT_DIRECTION', reasons: [] };
-  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
+  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, asset_reads: { unicode_search_ready: true, pagination: 'BOUNDED_POSTGRESQL_KEYSET' }, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
   assert.equal(validates('ReadinessResult', { data, trace_id: 'MOP-FAKE-readiness' }), true);
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('ReadinessResult', { data: { ...data, photos: { ...photos, [key]: false } }, trace_id: 'MOP-FAKE-readiness' }), false);
   assert.equal(validates('ReadinessResult', { data: { ...data, production_ready: true }, trace_id: 'MOP-FAKE-readiness' }), false);
@@ -206,7 +206,7 @@ const importSource = {
 };
 
 test('V0.12保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.15.0');
+  assert.equal(contract.info.version, '0.16.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -412,4 +412,10 @@ test('内部备注严格身份/可见性/不可变和不改工单SLA的真实契
   for (const change of [{ visibility: 'CUSTOMER' }, { immutable: false }, { ticket_state_changed: true }, { sla_changed: true }, { verification_status: 'VERIFIED' }]) assert.equal(validates('InternalTicketNote', { ...note, ...change }), false);
   const page = { items: [note], has_more: false, next_before_created_at: null, next_before_id: null, source: 'postgresql', scope: 'CURRENT_TENANT_INTERNAL', page_size_limit: 100 }; assert.ok(validates('InternalTicketNotePage', page)); assert.equal(validates('InternalTicketNotePage', { ...page, has_more: true }), false);
   assert.equal(contract.paths['/tickets/{ticketId}/internal-notes'].post['x-mop-capability'], 'ticket_notes:write_internal'); assert.deepEqual(Object.keys(contract.paths['/tickets/{ticketId}/internal-notes/{id}']), ['get']);
+});
+
+
+test('主台账查询保留签名游标且数据库有界读取与Unicode依赖明确', () => {
+  const route = contract.paths['/assets'].get; assert.match(route['x-mop-repository-pagination'], /page_size\+1 LIMIT/); assert.match(route['x-mop-read-authorization'], /permission-version/); assert.match(route['x-mop-unicode-search'], /no normalization/); assert.match(contract.paths['/assets/{id}'].get['x-mop-read-authorization'], /fresh active/);
+  const data = contract.components.schemas.ReadinessResult.properties.data; assert.ok(data.required.includes('asset_reads')); assert.equal(data.properties.asset_reads.properties.unicode_search_ready.const, true);
 });

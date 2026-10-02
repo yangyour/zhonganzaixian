@@ -12,10 +12,14 @@ public interface PlatformRepository extends AssetRepository {
     boolean dependencyReady();
     /** Safe readiness reasons for the designated durable photo schema and runtime privileges. */
     default List<String> photoDependencyProblems(){return List.of("PHOTO_REPOSITORY_UNAVAILABLE");}
+    default List<String> assetReadProblems(){return List.of("ASSET_UNICODE_SEARCH_UNAVAILABLE");}
     default List<String> internalNoteProblems(){return List.of("INTERNAL_NOTE_SCHEMA_OR_ACCESS_UNAVAILABLE");}
     default List<String> assetMetadataProblems(){return List.of("ASSET_METADATA_SCHEMA_OR_ACCESS_UNAVAILABLE");}
     default List<String> worklogProblems(){return List.of("WORKLOG_SCHEMA_OR_ACCESS_UNAVAILABLE");}
     default List<String> assetDependencyProblems(){return List.of("ASSET_DEPENDENCY_SCHEMA_OR_ACCESS_UNAVAILABLE");}
+    /** Authorize and read the bounded ledger in one real database snapshot; no unbounded/fixture fallback. */
+    default List<Asset> authorizedAssets(String tenant,String actor,long permissionVersion,AssetReadQuery query){throw new DomainException(503,"UPSTREAM_UNAVAILABLE","资产授权分页需要真实PostgreSQL仓储");}
+    default Optional<Asset> authorizedAsset(String tenant,String actor,long permissionVersion,String id){throw new DomainException(503,"UPSTREAM_UNAVAILABLE","资产授权回读需要真实PostgreSQL仓储");}
     List<FixtureUser> users();
     Optional<FixtureUser> user(String id);
     Optional<FixtureUser> resolveIdentity(String identitySource, String subject);

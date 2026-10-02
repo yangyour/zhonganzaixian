@@ -76,6 +76,12 @@ public final class FixtureRepository implements PlatformRepository {
         Membership prior=memberships.get(key(tenantId,userId));
         if(prior!=null) memberships.put(key(tenantId,userId),new Membership(userId,tenantId,prior.role(),prior.permissionVersion()+1,false));
     }
+    /** Historical isolated MockMvc adapter only. Real PostgreSQL never calls or falls back to this class. */
+    @Override public synchronized List<Asset> authorizedAssets(String tenant,String actor,long permissionVersion,AssetReadQuery query){
+        fixtureAssetReadAccess(tenant,actor,permissionVersion);return list(tenant).stream().filter(a->query.type()==null||a.type().equals(query.type())).filter(a->query.status()==null||a.status().equals(query.status())).filter(a->query.siteId()==null||a.siteId().equals(query.siteId())).filter(a->query.query()==null||a.name().toLowerCase(Locale.ROOT).contains(query.query().toLowerCase(Locale.ROOT))||a.managementIp().contains(query.query())).filter(a->query.afterCreatedAt()==null||a.createdAt().isAfter(query.afterCreatedAt())||a.createdAt().equals(query.afterCreatedAt())&&a.id().compareTo(query.afterId())>0).limit(query.limit()).toList();
+    }
+    @Override public synchronized Optional<Asset> authorizedAsset(String tenant,String actor,long permissionVersion,String id){fixtureAssetReadAccess(tenant,actor,permissionVersion);return id==null?Optional.empty():find(tenant,id.toLowerCase(Locale.ROOT));}
+    private void fixtureAssetReadAccess(String tenant,String actor,long permissionVersion){Membership member=membership(actor,tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","Historical fixture membership unavailable"));if(member.permissionVersion()!=permissionVersion)throw new DomainException(401,"SESSION_EXPIRED","Historical fixture version changed");if(!Capabilities.forRole(member.role()).contains("assets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","Historical fixture role denied");}
     @Override public synchronized List<Asset> list(String tenantId){return assets.values().stream().filter(a->a.tenantId().equals(tenantId)).sorted(Comparator.comparing(Asset::createdAt).thenComparing(Asset::id)).toList();}
     @Override public synchronized Optional<Asset> find(String tenantId,String id){return Optional.ofNullable(assets.get(key(tenantId,id)));}
     @Override public boolean siteBelongsTo(String tenantId,String siteId){return (tenantId.equals(TENANT_A)?"site-a-main":"site-b-main").equals(siteId);}

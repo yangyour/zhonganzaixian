@@ -492,3 +492,8 @@ API V0.13.1新增同租户站点/活跃负责人查询；内部授权和资产40
 ### 2026-10-02 V10资料/备注已提交后API中断恢复
 
 新独立拥有API故障场景首轮通过，旧工时及失败证据保留。故障前14HTTP、后12HTTP；只kill本次已核验API，exit137/连接拒绝/同jar重启，14白名单业务表指纹一致。2内部备注、资料当前v3/历史[3,2]保持；原键返回原备注/旧v2而不回退现值、不重复审计。默认组件/真实OIDC已恢复，35隔离守卫通过。没有PG/WAL/Worker/OSS/浏览器或原服务器故障验收，V1–V10不改，API V0.15不变。见[独立测试环境](niko-local-test.md)、[故障证据](evidence/niko-api-v10-crash-recovery-20261002.json)。
+
+
+### 2026-10-02 主台账数据库有界分页/授权快照与Unicode修复
+
+主GET /assets及详情改为真实PG同快照成员/权限版本核验，筛选/升序keyset/LIMIT在PG执行，应用最多取得page_size+1行，签名cursor绑定保持；不再主台账整租户加载。实际PG发现默认C/C locale不能对Ä小写，改用现有ICU根collation表达式并加真实就绪检查，资料查询/引用选择同步修复；未改全局locale/存储原文/角色/迁移。根616=603执行含163真实PG+13默认历史skip/6MinIO排除，54实际HTTP、29契约/289Web/构建通过。历史13 MockMvc仅单独隔离回归，不算组件证明；共享target并发Maven失败保留，最终串行全量通过。API V0.16；不声称5000台性能/DOM或完整合同验收。见[主台账读取](asset-ledger-reads.md)、[证据](evidence/niko-asset-ledger-read-20261002.json)。

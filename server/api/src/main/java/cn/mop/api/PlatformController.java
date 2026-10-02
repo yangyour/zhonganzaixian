@@ -73,12 +73,17 @@ public class PlatformController {
             try{List<String> reasons=repository.assetMetadataProblems();assetMetadataReady=reasons!=null&&reasons.isEmpty();}catch(RuntimeException unavailable){assetMetadataReady=false;}
             if(!assetMetadataReady)throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境手工草稿资料schema或权限未就绪",List.of(map("component","asset_manual_metadata","reasons",List.of("ASSET_METADATA_SCHEMA_OR_ACCESS_UNAVAILABLE"))));
         }
+        boolean assetReadReady=false;
+        if(repository.metadata().mode().equals("remote_test")){
+            try{List<String> reasons=repository.assetReadProblems();assetReadReady=reasons!=null&&reasons.isEmpty();}catch(RuntimeException unavailable){assetReadReady=false;}
+            if(!assetReadReady)throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境资产Unicode查询依赖未就绪",List.of(map("component","asset_reads","reasons",List.of("ASSET_UNICODE_SEARCH_UNAVAILABLE"))));
+        }
         boolean internalNotesReady=false;
         if(repository.metadata().mode().equals("remote_test")){
             try{List<String> reasons=repository.internalNoteProblems();internalNotesReady=reasons!=null&&reasons.isEmpty();}catch(RuntimeException unavailable){internalNotesReady=false;}
             if(!internalNotesReady)throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境内部备注schema或权限未就绪",List.of(map("component","internal_notes","reasons",List.of("INTERNAL_NOTE_SCHEMA_OR_ACCESS_UNAVAILABLE"))));
         }
-        return success(map("status","READY_REMOTE_TEST","ready",true,"mode",repository.metadata().mode(),"source",repository.metadata().source(),"durable",repository.metadata().durable(),"production_ready",false,"photos",photos.dto(),"asset_imports",imports.dto(),"internal_notes",map("schema_access_ready",internalNotesReady,"visibility","INTERNAL","ticket_state_changed",false,"sla_changed",false),"asset_manual_metadata",map("schema_access_ready",assetMetadataReady,"scope","INTERNAL_MANUAL_DRAFT","monitoring_applied",false,"cmdb_applied",false),"worklogs",map("ready",worklogsReady,"schema_access_ready",worklogsReady,"financial_status","CONFIG_PENDING"),"asset_dependencies",map("ready",dependencyDraftReady,"schema_access_ready",dependencyDraftReady,"configuration_status","CONFIG_PENDING","monitoring_applied",false,"effective_rules",null)),request);
+        return success(map("status","READY_REMOTE_TEST","ready",true,"mode",repository.metadata().mode(),"source",repository.metadata().source(),"durable",repository.metadata().durable(),"production_ready",false,"photos",photos.dto(),"asset_imports",imports.dto(),"asset_reads",map("unicode_search_ready",assetReadReady,"pagination","BOUNDED_POSTGRESQL_KEYSET"),"internal_notes",map("schema_access_ready",internalNotesReady,"visibility","INTERNAL","ticket_state_changed",false,"sla_changed",false),"asset_manual_metadata",map("schema_access_ready",assetMetadataReady,"scope","INTERNAL_MANUAL_DRAFT","monitoring_applied",false,"cmdb_applied",false),"worklogs",map("ready",worklogsReady,"schema_access_ready",worklogsReady,"financial_status","CONFIG_PENDING"),"asset_dependencies",map("ready",dependencyDraftReady,"schema_access_ready",dependencyDraftReady,"configuration_status","CONFIG_PENDING","monitoring_applied",false,"effective_rules",null)),request);
     }
     @GetMapping("/assets") Object assets(@RequestParam Map<String,String> query,HttpServletRequest request){
         Access access=access(request,"assets:read");Set<String> allowed=Set.of("cursor","page_size","type","site_id","status","q");
@@ -90,17 +95,13 @@ public class PlatformController {
         if(query.getOrDefault("q","").length()>100||query.getOrDefault("site_id","").length()>64)throw validation("筛选文字过长");
         SortedMap<String,String> filters=new TreeMap<>(query);filters.remove("cursor");filters.remove("page_size");String filterHash=hash(mapper.valueToTree(filters));
         JsonNode cursor=query.containsKey("cursor")?readCursor(query.get("cursor"),access,filterHash):null;
-        List<Asset> matches=repository.list(access.tenant.id()).stream()
-            .filter(a->!query.containsKey("type")||a.type().equals(query.get("type")))
-            .filter(a->!query.containsKey("status")||a.status().equals(query.get("status")))
-            .filter(a->!query.containsKey("site_id")||a.siteId().equals(query.get("site_id")))
-            .filter(a->!query.containsKey("q")||a.name().toLowerCase(Locale.ROOT).contains(query.get("q").toLowerCase(Locale.ROOT))||a.managementIp().contains(query.get("q")))
-            .filter(a->cursor==null||after(a,cursor)).toList();
+        List<Asset> matches=repository.authorizedAssets(access.tenant.id(),access.user.id(),access.membership.permissionVersion(),
+            new AssetReadQuery(query.get("type"),query.get("status"),query.get("site_id"),query.get("q"),size+1,cursor==null?null:Instant.parse(cursor.path("created_at").asText()),cursor==null?null:cursor.path("id").asText()));
         boolean more=matches.size()>size;List<Asset> items=matches.subList(0,Math.min(size,matches.size()));
         String next=more?cursor(access,filterHash,items.get(items.size()-1)):null;
         return success(map("items",items,"next_cursor",next,"has_more",more,"source",repository.metadata().source(),"page_size_limit",100,"page_size_limit_kind","test_technical_limit"),request);
     }
-    @GetMapping("/assets/{id}") Object asset(@PathVariable String id,HttpServletRequest request){Access access=access(request,"assets:read");return success(repository.find(access.tenant.id(),id).orElseThrow(()->notFound()),request);}
+    @GetMapping("/assets/{id}") Object asset(@PathVariable String id,HttpServletRequest request){Access access=access(request,"assets:read");return success(repository.authorizedAsset(access.tenant.id(),access.user.id(),access.membership.permissionVersion(),id).orElseThrow(()->notFound()),request);}
     @PostMapping("/assets") Object createAsset(@RequestBody JsonNode body,HttpServletRequest request){
         Access access=access(request,"assets:write");fields(body,Set.of("name","type","management_ip","site_id"));
         String name=text(body,"name",100),type=text(body,"type",32),ip=text(body,"management_ip",45),site=text(body,"site_id",64);
@@ -135,8 +136,10 @@ public class PlatformController {
 
     private Access access(HttpServletRequest request,String capability){
         if(request.getUserPrincipal()==null||request.getSession(false)==null)throw new DomainException(401,"SESSION_EXPIRED","会话不存在或已过期");
-        String actor=request.getUserPrincipal().getName(),tenant=(String)request.getSession().getAttribute("mop.tenant_id");
+        Object tenantValue=request.getSession(false).getAttribute("mop.tenant_id");if(!(tenantValue instanceof String tenant)||tenant.isBlank())throw new DomainException(401,"SESSION_EXPIRED","当前租户会话无效");
+        String actor=request.getUserPrincipal().getName();
         Membership membership=repository.membership(actor,tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效，请重新登录"));
+        if(!membership.active())throw new DomainException(401,"SESSION_EXPIRED","成员关系已失效，请重新登录");
         List<String> capabilities=capabilities(membership.role());if(!capabilities.contains(capability))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无此动作权限");
         return new Access(repository.user(actor).orElseThrow(()->notFound()),repository.tenant(tenant),membership,capabilities);
     }
@@ -160,7 +163,6 @@ public class PlatformController {
     private String cursor(Access access,String filter,Asset last){try{String payload=Base64.getUrlEncoder().withoutPadding().encodeToString(mapper.writeValueAsBytes(map("tenant",access.tenant.id(),"actor",access.user.id(),"permission_version",access.membership.permissionVersion(),"filter",filter,"created_at",last.createdAt().toString(),"id",last.id())));return payload+"."+signature(payload);}catch(Exception e){throw new IllegalStateException(e);}}
     private String signature(String payload){try{Mac mac=Mac.getInstance("HmacSHA256");mac.init(new SecretKeySpec(cursorSecret,"HmacSHA256"));return Base64.getUrlEncoder().withoutPadding().encodeToString(mac.doFinal(payload.getBytes(StandardCharsets.UTF_8)));}catch(Exception e){throw new IllegalStateException(e);}}
     private JsonNode readCursor(String token,Access access,String filter){try{String[] parts=token.split("\\.");if(parts.length!=2||!MessageDigest.isEqual(parts[1].getBytes(StandardCharsets.UTF_8),signature(parts[0]).getBytes(StandardCharsets.UTF_8)))throw new IllegalArgumentException();JsonNode cursor=mapper.readTree(Base64.getUrlDecoder().decode(parts[0]));if(!cursor.path("tenant").asText().equals(access.tenant.id())||!cursor.path("actor").asText().equals(access.user.id())||cursor.path("permission_version").asLong()!=access.membership.permissionVersion()||!cursor.path("filter").asText().equals(filter))throw new IllegalArgumentException();Instant.parse(cursor.path("created_at").asText());return cursor;}catch(Exception e){throw new DomainException(400,"CURSOR_INVALID","游标无效、过期或不属于当前授权筛选范围");}}
-    private static boolean after(Asset asset,JsonNode cursor){int compare=asset.createdAt().compareTo(Instant.parse(cursor.path("created_at").asText()));return compare>0||compare==0&&asset.id().compareTo(cursor.path("id").asText())>0;}
     private static DomainException validation(String message){return new DomainException(400,"VALIDATION_ERROR",message);}
     private static DomainException notFound(){return new DomainException(404,"OBJECT_NOT_FOUND","对象不存在或不可见");}
     private static DomainException conflict(){return new DomainException(409,"VERSION_CONFLICT","对象版本已变化，请刷新");}

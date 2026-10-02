@@ -94,3 +94,8 @@
 ## 2026-10-02 独立浏览器验收边界
 
 新环境PG/OIDC/API的客户报障HTTP可以继续；同执行空间Chromium启动前因Unix socket EPERM终止，支持的云浏览器访问127.0.0.1前端被ERR_BLOCKED_BY_CLIENT拒绝。未加载页面、无UI通过证据，不改变系统权限或创建代理/转接绕过。详见[独立记录](../evidence/niko-ui-blocker-20261002.json)。真实OSS仍待受控替换配置。
+
+
+## 2026-10-02 niko PostgreSQL Unicode查询依赖
+
+实际目录读取确认新库server_encoding=UTF8、datcollate/datctype=C/C，已有pg_catalog.und-x-icu（ICU提供者）；默认lower保持Ä不变，导致新增Unicode资产筛选回归首轮失败。改用该既有collation的逐表达式小写，不创建collation、不修改数据库/服务器locale或权限。真实PG检查Ä/ΟΣ/İ/K、原文保持和无Unicode归一，前后全局C/C未变；主台账/资料查询/引用文本采用一致表达式，ready实际验证依赖、缺失失败503。原指定服务器尚无法连通，不能宣称具有相同依赖或效果。详见[主台账读取](../asset-ledger-reads.md)。

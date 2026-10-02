@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.15.0",
+    "version": "0.16.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -940,7 +940,10 @@
     "/assets": {
       "get": {
         "operationId": "listAssets",
-        "summary": "读取当前租户资产；游标绑定筛选和权限版本",
+        "summary": "当前租户资产由真实PG有界分页；当前授权与数据同一只读快照，游标绑定筛选和权限版本",
+        "x-mop-repository-pagination": "PostgreSQL filters + creation-time/id ascending keyset + page_size+1 LIMIT; no whole-tenant materialization",
+        "x-mop-read-authorization": "active user/member/permission-version and assets:read checked in readonly repeatable-read snapshot",
+        "x-mop-unicode-search": "existing ICU root lowercase then literal name substring; case-sensitive raw IP substring; no normalization, transliteration or database collation changes",
         "parameters": [
           {
             "name": "cursor",
@@ -1334,7 +1337,8 @@
     "/assets/{id}": {
       "get": {
         "operationId": "getAsset",
-        "summary": "读取本租户资产详情；不存在及无权均404",
+        "summary": "当前授权与资产详情同一只读快照；不存在及跨租户均404",
+        "x-mop-read-authorization": "fresh active user/member/permission-version in database snapshot",
         "parameters": [
           {
             "name": "id",
@@ -5724,7 +5728,7 @@
           "before_id"
         ],
         "x-mop-max-encoded-query-bytes": 4096,
-        "x-mop-filter-semantics": "AND; type/site_id/owner_id/dates exact, other text literal case-insensitive substring; no wildcard or inferred warranty status",
+        "x-mop-filter-semantics": "AND; type/site_id/owner_id/dates exact, other text existing ICU root lowercase plus literal substring; no wildcard, normalization or inferred warranty status",
         "x-mop-pagination": "creation time/id descending; each request uses a current readonly snapshot, not a frozen multi-page export; reset cursor on changed filters and refresh first page for edits/new matches",
         "responses": {
           "200": {
@@ -6229,7 +6233,7 @@
             "schema": {
               "type": "string",
               "maxLength": 100,
-              "description": "原样字面子串匹配；百分号/下划线不是通配符；拒绝控制字符及不完整Unicode"
+              "description": "原样字面子串匹配，按既有ICU根locale小写；百分号/下划线不是通配符，不归一；拒绝控制字符及不完整Unicode"
             }
           }
         ],
@@ -10087,6 +10091,22 @@
                   "sla_changed"
                 ],
                 "additionalProperties": false
+              },
+              "asset_reads": {
+                "type": "object",
+                "properties": {
+                  "unicode_search_ready": {
+                    "const": true
+                  },
+                  "pagination": {
+                    "const": "BOUNDED_POSTGRESQL_KEYSET"
+                  }
+                },
+                "required": [
+                  "unicode_search_ready",
+                  "pagination"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -10101,7 +10121,8 @@
               "asset_dependencies",
               "worklogs",
               "asset_manual_metadata",
-              "internal_notes"
+              "internal_notes",
+              "asset_reads"
             ],
             "additionalProperties": false
           },

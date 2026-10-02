@@ -1,0 +1,59 @@
+{
+  "verified_at": "2026-10-02T21:23:15.809395+00:00",
+  "environment": "niko-local-test",
+  "api_version": "0.16.0",
+  "status": "VERIFIED_BOUNDED_AUTHORIZED_READ_SLICE",
+  "new_tests": {
+    "query_core": 3,
+    "controller": 5,
+    "readiness": 1,
+    "main_ledger_real_pg": 8,
+    "metadata_unicode_real_pg": 1
+  },
+  "root_tests": {
+    "reported": 616,
+    "executed": 603,
+    "real_postgresql": 163,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "separate_historical_mockmvc_isolated_tests": {
+    "tests": 13,
+    "passed": true,
+    "not_component_evidence": true
+  },
+  "http": {
+    "checks": 54,
+    "all_response_contract_valid": true,
+    "evidence": "niko-asset-ledger-read-http-20261002.json"
+  },
+  "contract_tests": 29,
+  "web_tests": 289,
+  "typecheck_build": "passed",
+  "initial_failures": [
+    "Concurrent Maven invocations sharing target encountered missing test classes; serialized reruns passed",
+    "Initial7 new PG ledger cases had1 failure because default C locale did not lowercase Unicode; ICU expression repair and expanded8 cases passed"
+  ],
+  "unicode_dependency": {
+    "server_encoding": "UTF8",
+    "database_lc_collate": "C",
+    "database_lc_ctype": "C",
+    "existing_collation": "pg_catalog.und-x-icu",
+    "global_settings_changed": false,
+    "normalization_applied": false,
+    "original_server_verified": false
+  },
+  "read_semantics": "current active authorization and data in one readonly REPEATABLE_READ; PostgreSQL filters/order/keyset/LIMIT; existing signed cursor retained",
+  "maximum_rows_returned_to_application": 101,
+  "database_scan_or_production_performance_bound_claimed": false,
+  "runtime_fixture_or_unbounded_fallback": false,
+  "schema_or_role_changes": false,
+  "credentials_output": false,
+  "prior_recovery_ci": {
+    "commit": "9ca4ca8932e08154b131b614d084c6ff08e071ce",
+    "id": 37063335499,
+    "conclusion": "success"
+  }
+}

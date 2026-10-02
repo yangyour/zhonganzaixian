@@ -85,3 +85,8 @@ GET /api/v1/assets/manual-metadata新增内部附加视图（静态路由独立�
 前端查询模块仅GET，校验条件回显、manual来源/租户、UUID/版本/资料事实、排序/唯一行及真实配对cursor；新条件或租户/权限变化取消旧请求、忽略迟到响应。失败清空结果而非伪造空匹配，编码总长>4096在客户端拒绝不截断。界面包含单列窄屏布局，但DOM仍未执行。
 
 新增12模块测试，总271Web及类型/构建、27契约通过；实际assetMetadataQuery+ApiClient共29HTTP，其中8次只读查询，另含16虚构资产准备与2次明确资料修改。验证15+1分页无重复、新条件重置cursor、字面百分号/下划线、显式未知、独立编辑后刷新改变匹配、非法推断字段在发送前拦截、查询不追加审计。无浏览器/生产规模或冻结导出承诺。上一APIcd1391b的CI37054501713 success。见[真实查询客户端证据](evidence/niko-asset-query-client-http-20261002.json)。
+
+
+### Unicode查询后续修复
+
+V0.16把资料文本筛选/引用选择的lower显式置于niko已存在的ICU根collation；默认C locale曾漏掉非ASCII大小写。新增实际PG品牌ÄBC→äbc及HTTP验证，不改字段原文、全局locale或迁移；详情见[主台账读取](asset-ledger-reads.md)。

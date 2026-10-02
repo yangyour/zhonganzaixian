@@ -25,9 +25,11 @@ class PostgresSafetyTest {
             public <T>T unwrap(Class<T> type)throws SQLException{throw new SQLException();} public boolean isWrapperFor(Class<?> type){return false;}
         };
         PostgresPlatformRepository repository=new PostgresPlatformRepository(disconnected,new ObjectMapper());
-        assertFalse(repository.dependencyReady());assertTrue(repository.metadata().durable());
+        assertFalse(repository.dependencyReady());assertTrue(repository.metadata().durable());assertEquals(java.util.List.of("ASSET_UNICODE_SEARCH_UNAVAILABLE"),repository.assetReadProblems());
         cn.mop.domain.DomainException exception=assertThrows(cn.mop.domain.DomainException.class,()->repository.list("tenant"));
         assertEquals(503,exception.status);assertEquals("UPSTREAM_UNAVAILABLE",exception.code);
+        assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->repository.authorizedAssets("55000000-0000-4000-8000-000000000001","55000000-0000-4000-8000-000000000001",1,new cn.mop.domain.AssetReadQuery(null,null,null,null,10,null,null))).status);
+        assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->repository.authorizedAsset("55000000-0000-4000-8000-000000000001","55000000-0000-4000-8000-000000000001",1,"55000000-0000-4000-8000-000000000001")).status);
         var dependencies=new PostgresAssetDependencyRepository(disconnected,repository);
         assertEquals(java.util.List.of("ASSET_DEPENDENCY_SCHEMA_OR_ACCESS_UNAVAILABLE"),dependencies.readinessProblems());
         assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->dependencies.current("tenant","actor")).status);

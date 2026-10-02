@@ -93,4 +93,6 @@ class PostgresManualAssetMetadataIntegrationTest {
         var empty=ManualAssetFilter.fromQuery(Map.of());assertEquals(403,assertThrows(DomainException.class,()->metadata.search(access(viewer),empty,10,null,null)).status);assertEquals(403,assertThrows(DomainException.class,()->metadata.search(access(tadmin),empty,10,null,null)).status);Access a=access(engineer);assertEquals(401,assertThrows(DomainException.class,()->metadata.search(new Access(a.actorId(),a.tenantId(),a.permissionVersion()+1,a.traceId()),empty,10,null,null)).status);assertTrue(metadata.search(a,ManualAssetFilter.fromQuery(Map.of("site_id","site-b-main")),10,null,null).isEmpty());assertEquals(400,assertThrows(DomainException.class,()->metadata.search(a,empty,102,null,null)).status);assertEquals(400,assertThrows(DomainException.class,()->metadata.search(a,empty,10,Instant.now(),null)).status);
     }
 
+    @Test void metadataTextQueriesUseUnicodeRootLowerRatherThanDatabaseAsciiLocale(){Asset asset=asset();var facts=new ManualAssetMetadata(asset.name(),asset.type(),asset.siteId(),"ÄBC",null,null,null,null,null,null,null,null,null,"Unicode资料筛选");update(asset,1,facts);var result=metadata.search(access(engineer),ManualAssetFilter.fromQuery(Map.of("name",asset.name(),"brand","äbc")),10,null,null);assertEquals(List.of(asset.id()),result.stream().map(v->v.snapshot().asset().id()).toList());}
+
 }

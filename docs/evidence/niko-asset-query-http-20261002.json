@@ -1,0 +1,358 @@
+{
+  "verified_at": "2026-10-02T19:24:25.600Z",
+  "environment": "niko-local-test",
+  "api_version": "0.14.0",
+  "passed": true,
+  "http_checks": 63,
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_3",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_4",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_5",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_6",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_7",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_8",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_9",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_10",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_11",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "first_filtered_page",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "second_filtered_page",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "save_query_target",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "all_fields_conjunction",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "field_name",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "field_type",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "field_site_id",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "field_brand",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "field_model",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "field_serial_number",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "field_location",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "field_owner_id",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "field_business_description",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "field_purchase_date",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "field_warranty_expiry",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "field_collection_method_note",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "field_note",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "literal_percent_underscore_casefold",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "parameterized_injection_text",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "explicit_unknown_not_blank_or_default",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "change_filter_membership",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "refresh_old_filter_sees_no_match",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "refresh_new_filter_sees_updated_metadata",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_site_has_no_matches",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_owner_has_no_matches",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_query_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_query_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_query_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_query_denied",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_47",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_48",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_49",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_50",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_51",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_52",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_53",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_54",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_55",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_56",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_57",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_58",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_59",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_audit_before",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_query",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "query_audit_after",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "synthetic_manual_assets": 12,
+  "page_sizes": [
+    10,
+    2
+  ],
+  "all_maintenance_fields_queryable": true,
+  "filter_semantics": "explicit AND/literal text/exact type-site-owner-dates/explicit null",
+  "pagination_consistency": "CURRENT_REQUEST_SNAPSHOT_ONLY",
+  "successful_queries_did_not_append_audit": true,
+  "credentials_output": false,
+  "limitations": [
+    "Internal manual-source appended view only; original fixed12 columns unchanged",
+    "No warranty state inference or customer Q09 permission expansion",
+    "No frozen export or cross-request snapshot guarantee",
+    "Browser query controls not tested"
+  ],
+  "root_tests": {
+    "reported": 562,
+    "executed": 549,
+    "real_postgresql": 136,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "new_controller_tests": 4,
+  "contract_tests": 27,
+  "web_tests": 259,
+  "web_typecheck_build": "passed",
+  "prior_filter_repository_ci": {
+    "commit": "4f2177769f58795342f50c1321bee5b1fbe0ee84",
+    "id": 37053520486,
+    "conclusion": "success"
+  }
+}

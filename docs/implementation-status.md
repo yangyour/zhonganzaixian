@@ -330,3 +330,8 @@ API V0.13.1新增同租户站点/活跃负责人查询；内部授权和资产40
 ### 2026-10-02 资料字段筛选核心/仓储
 
 新增14维护字段显式AND查询及可空字段unknown_fields；固定列枚举/参数化字面子串，严格日期不推断维保状态。真实PG只读快照、当前内部成员/租户manual来源、至多101有界created_at/id keyset；跨页非冻结快照。6核心+3真实PG新增，根558=545执行含136PG+13skip/6MinIO排除全部通过。API和页面查询待接线，未改变主台账12列或客户权限，M3-5非DONE。见[资料说明](manual-asset-metadata.md)、[仓储证据](evidence/niko-asset-metadata-filter-repository-20261002.json)。
+
+
+### 2026-10-02 内部资料筛选API V0.14
+
+新增GET /assets/manual-metadata附加视图，严格14字段/显式未知AND、只读当前请求快照、成对创建时间/id分页和4096-byte编码查询限额。4控制器新增，根562=549执行含136PG+13skip/6MinIO排除，27契约/259Web/构建及63真实HTTP响应全部通过；12资产10+2分页、每字段/联合查询、编辑后筛选变动和跨租户/角色边界已验。页面筛选控件待，DOM/客户权限/主列版式Q31及全M3-5非DONE。见[资料](manual-asset-metadata.md)和[筛选API证据](evidence/niko-asset-query-http-20261002.json)。

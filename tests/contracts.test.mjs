@@ -206,7 +206,7 @@ const importSource = {
 };
 
 test('V0.12保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.13.1');
+  assert.equal(contract.info.version, '0.14.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -394,4 +394,12 @@ test('资料引用选择只公开同租户有界标签并保留未知负责人',
   const value = { data: { sites: [{ id: 'site-a', label: '虚构站点' }], owners: [{ id: id('1'), label: '虚构负责人' }], sites_truncated: false, owners_truncated: false, query: '', limit_per_kind: 100, scope: 'CURRENT_TENANT_ACTIVE_REFERENCES', source: 'postgresql', reference_validation: 'RECHECKED_ON_WRITE', default_owner_id: null }, trace_id: 'synthetic' };
   assert.ok(validates('ManualAssetReferencesResult', value)); assert.equal(validates('ManualAssetReferencesResult', { ...value, data: { ...value.data, default_owner_id: id('1') } }), false); assert.equal(validates('ManualAssetReferencesResult', { ...value, data: { ...value.data, owners: Array(101).fill(value.data.owners[0]) } }), false);
   assert.deepEqual(Object.keys(contract.paths['/assets/{id}/manual-metadata/references']), ['get']);
+});
+
+
+test('资料查询使用显式条件和有界配对cursor，不冒充冻结导出快照', () => {
+  const filters = { name: '虚构', brand: '%_', purchase_date: '2024-02-29', unknown_fields: 'owner_id,warranty_expiry' }; assert.ok(validates('ManualAssetQueryFilters', filters));
+  for (const change of [{ tenant_id: id('2') }, { brand: null }, { warranty_status: 'expired' }, { purchase_date: '2026-02-30' }, { unknown_fields: 'name' }]) assert.equal(validates('ManualAssetQueryFilters', { ...filters, ...change }), false);
+  const page = { items: [], has_more: false, next_before_created_at: null, next_before_id: null, filters, source: 'postgresql', scope: 'CURRENT_TENANT_INTERNAL_MANUAL_SOURCE', page_size_limit: 100, pagination_consistency: 'CURRENT_REQUEST_SNAPSHOT_ONLY', unknown_semantics: 'EXPLICIT_NULL_NO_INFERENCE' }; assert.ok(validates('ManualAssetQueryPage', page)); assert.equal(validates('ManualAssetQueryPage', { ...page, has_more: true }), false); assert.equal(validates('ManualAssetQueryPage', { ...page, pagination_consistency: 'FROZEN_EXPORT' }), false);
+  const route = contract.paths['/assets/manual-metadata']; assert.deepEqual(Object.keys(route), ['get']); assert.equal(route.get['x-mop-max-encoded-query-bytes'], 4096); assert.deepEqual(route.get['x-mop-roles'], ['msp', 'padmin']);
 });

@@ -14,6 +14,7 @@ export interface Asset {
   id: string; tenant_id: string; name: string; type: AssetType; management_ip: string
   site_id: string; site_name?: string; status: AssetStatus; lifecycle_status: string
   source: string; sampled_at: string | null; unknown_reason: string | null
+  availability?: string | null; sync_state?: string | null
   version: number; created_at: string; updated_at: string
 }
 export interface AssetPage { items: Asset[]; next_cursor: string | null; has_more: boolean }

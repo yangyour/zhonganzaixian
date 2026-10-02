@@ -14,6 +14,7 @@ import AssetImportWorkspace from '../components/AssetImportWorkspace.vue'
 import AssetDependencyWorkspace from '../components/AssetDependencyWorkspace.vue'
 import AssetMetadataWorkspace from '../components/AssetMetadataWorkspace.vue'
 import AssetMetadataQuery from '../components/AssetMetadataQuery.vue'
+import { assetLedgerColumns, assetLedgerCell } from '../utils/assetLedgerColumns'
 const route = useRoute()
 const router = useRouter()
 const pageSizes = [10, 15, 25, 50, 100]
@@ -144,14 +145,15 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
       </el-form>
       <ApiErrorNotice :error="error"><el-button size="small" @click="loadAssets">重试</el-button></ApiErrorNotice>
       <AppTable :rows="rows" :loading="loading" :empty-text="error ? '数据加载失败，请重试' : '当前筛选下没有资产'">
-        <el-table-column label="资产" min-width="220"><template #default="{ row }"><el-button link type="primary" class="asset-link" @click="openDetail(row.id)">{{ row.name }}</el-button><span class="cell-sub mono">{{ row.management_ip }}</span></template></el-table-column>
-        <el-table-column label="设备类型" min-width="130"><template #default="{ row }">{{ typeLabel(row.type) }}</template></el-table-column>
-        <el-table-column label="站点" min-width="150"><template #default="{ row }">{{ row.site_name || row.site_id }}</template></el-table-column>
-        <el-table-column label="可用性" min-width="110"><template #default="{ row }"><StatusTag :status="row.status" /></template></el-table-column>
-        <el-table-column label="生命周期" min-width="110"><template #default="{ row }"><el-tag type="info" effect="plain">{{ row.lifecycle_status === 'DRAFT' ? '草稿' : row.lifecycle_status }}</el-tag></template></el-table-column>
-        <el-table-column label="数据来源 / 最近采样" min-width="180"><template #default="{ row }"><span>{{ sourceLabel(row.source) }}</span><span class="cell-sub">{{ displayTime(row.sampled_at) }}</span></template></el-table-column>
-        <el-table-column label="操作" min-width="80" fixed="right"><template #default="{ row }"><el-button link type="primary" @click="openDetail(row.id)">详情</el-button></template></el-table-column>
+        <el-table-column v-for="column in assetLedgerColumns" :key="column.key" :label="column.label" :min-width="column.minWidth" :fixed="column.key === 'actions' ? 'right' : undefined">
+          <template #default="{ row }">
+            <el-button v-if="column.key === 'name' || column.key === 'actions'" link type="primary" :class="{ 'asset-link': column.key === 'name' }" @click="openDetail(row.id)">{{ assetLedgerCell(row, column.key).text }}</el-button>
+            <span v-else>{{ assetLedgerCell(row, column.key).text }}</span>
+            <span v-if="assetLedgerCell(row, column.key).detail" class="cell-sub">{{ assetLedgerCell(row, column.key).detail }}</span>
+          </template>
+        </el-table-column>
       </AppTable>
+      <p class="muted asset-ledger-explanation">固定12列按合同顺序展示，可横向滚动。Proxy、所属业务系统、CPU、内存、当前问题数和负责人尚未由当前接口提供；“—”不表示零、正常或未配置。内部手工资料仍在单独授权视图中。</p>
       <div class="table-footer"><span>仅显示当前租户授权对象 · 本页 {{ rows.length }} 条</span><div class="cursor-pagination"><el-select :model-value="pageSize" aria-label="每页条数" @change="resizePage"><el-option v-for="size in pageSizes" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
     </div>
     <el-drawer v-model="detailOpen" title="资产详情" size="560px" class="asset-drawer" destroy-on-close>

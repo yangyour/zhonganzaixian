@@ -5513,7 +5513,7 @@
     "/assets/manual-metadata": {
       "get": {
         "operationId": "queryManualAssetMetadata",
-        "summary": "内部手工资料附加视图：14维护字段AND筛选和显式未知，不改变主台账12列",
+        "summary": "内部手工资料附加视图：14维护字段AND筛选和显式未知，不改变主台账布局或扩大客户可见范围",
         "x-mop-capability": "assets:write",
         "x-mop-roles": [
           "msp",
@@ -10353,7 +10353,8 @@
           "created_at",
           "updated_at"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "当前授权租户的资产事实。availability与sync_state各自独立，不可从status或生命周期推断；当前公共DTO未提供Proxy、所属业务系统、CPU、内存、当前问题数或负责人，页面必须显示未提供，不得以0/正常或内部资料补值。sampled_at=null表示未取得采样时间，不可使用updated_at替代。"
       },
       "AssetResult": {
         "type": "object",

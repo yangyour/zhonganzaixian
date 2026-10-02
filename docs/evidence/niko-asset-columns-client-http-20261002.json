@@ -1,0 +1,36 @@
+{
+  "verified_at": "2026-10-02T21:38:07.714Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual assetLedgerColumns and ApiClient bundle",
+  "http_requests": 20,
+  "all_get": true,
+  "all_responses_contract_valid": true,
+  "identity_contexts": 6,
+  "projected_rows": 90,
+  "column_labels": [
+    "资产名称",
+    "设备类型",
+    "站点·Proxy",
+    "所属业务系统",
+    "CPU",
+    "内存",
+    "可用性",
+    "当前问题数",
+    "配置同步状态",
+    "负责人",
+    "最近采集时间",
+    "操作"
+  ],
+  "missing_values_explicit": true,
+  "internal_metadata_requests": 0,
+  "audit_unchanged": true,
+  "credentials_output": false,
+  "browser_dom_tested": false,
+  "limitations": [
+    "No DOM/390px/scroll/visual acceptance",
+    "Proxy/business/CPU/memory/problem count/owner not supplied by current public Asset DTO",
+    "No actual monitoring facts",
+    "M3-2 not DONE"
+  ]
+}

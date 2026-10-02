@@ -1,0 +1,41 @@
+{
+  "verified_at": "2026-10-02T21:40:42.367128+00:00",
+  "environment": "niko-local-test",
+  "status": "FIXED_COLUMN_CODE_AND_CLIENT_SLICE",
+  "previous_actual_columns": 7,
+  "contract_columns": 12,
+  "contract_source": "M3-2/T00R027",
+  "misleading_prior_docs_corrected": true,
+  "web_tests": 298,
+  "new_web_tests": 9,
+  "contract_tests": 29,
+  "typecheck_build": "passed",
+  "api_fields_changed": false,
+  "database_schema_changed": false,
+  "root_java_tests_rerun": false,
+  "http_requests_per_run": 20,
+  "projected_rows_per_run": 90,
+  "identity_contexts": 6,
+  "fresh_session_repeat_passed": true,
+  "http_runs_not_counted_as_distinct_cases": true,
+  "initial_session_capture": {
+    "passed": false,
+    "followup_path": "/assets",
+    "status": 500,
+    "observed_missing_class": "ch.qos.logback.classic.spi.ThrowableProxy",
+    "mitigation": "owned stack restart from stable build, followed by six fresh OIDC sessions and repeated HTTP",
+    "remaining": "isolate runtime artifact from rebuilt Maven target; root cause not solely established by temporal correlation"
+  },
+  "unknown_fields_not_inferred": [
+    "proxy",
+    "business_system",
+    "cpu",
+    "memory",
+    "problem_count",
+    "owner"
+  ],
+  "internal_metadata_requests": 0,
+  "browser_dom_tested": false,
+  "contract_done": false,
+  "credentials_output": false
+}

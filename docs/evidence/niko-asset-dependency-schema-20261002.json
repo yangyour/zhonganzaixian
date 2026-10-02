@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-02",
+  "environment": "niko-local-test",
+  "postgres": "17.11",
+  "scope": "V7 asset dependency draft schema only",
+  "migration": {
+    "script": "V7__asset_dependency_draft_revisions.sql",
+    "sha256": "5a8ce8d49fe948fc0e9586c102f7c8bfc46cb975a0b5d9f32d4bd1ccc72670bb",
+    "before_read_only_check_executed": 0,
+    "explicit_apply_executed": 1,
+    "repeat_apply_executed": 0,
+    "after_read_only_check_executed": 0,
+    "structure_acl": "PASS",
+    "V1_V6_modified": false,
+    "api_worker_auto_migrate": false
+  },
+  "tests": {
+    "schema_policy_unit": 8,
+    "new_real_pg_schema_checks": 6,
+    "root_current_run": {
+      "total": 422,
+      "executed_passed": 409,
+      "skipped_fixture": 13,
+      "failed": 0,
+      "errors": 0,
+      "real_pg_included": 75,
+      "minio_excluded": 6
+    },
+    "python_guards": 19
+  },
+  "schema_checks": [
+    "DRAFT/pending/not-applied and nullable proposed values",
+    "Historical update/delete and graph tenant change denied",
+    "Published/applied revision insert rejected",
+    "Cross-tenant/missing/self edge rejected",
+    "Graph pointer cannot commit without a matching revision",
+    "Duplicate edge cannot overwrite history"
+  ],
+  "test_data": "all schema constraint test transactions rolled back",
+  "not_completed": [
+    "Dependency repository/API/UI",
+    "Transactional complete-graph cycle/concurrency validation",
+    "Monitoring suppression publication",
+    "Real OSS",
+    "Full M3-9 acceptance"
+  ]
+}

@@ -17,8 +17,9 @@ public final class TestSchemaMigration {
     private static final Map<String,String> SCRIPTS=Map.of(
         "1","V1__remote_test_platform.sql", "2","V2__tenant_configuration_revisions.sql",
         "3","V3__configuration_review_test_identity.sql", "4","V4__durable_customer_report_registration.sql",
-        "5","V5__durable_report_photos.sql", "6","V6__asset_import_sources_and_mapping.sql");
+        "5","V5__durable_report_photos.sql", "6","V6__asset_import_sources_and_mapping.sql", "7","V7__asset_dependency_draft_revisions.sql");
     static final String IMPORT_SHA256="1f532822668274b7aebd12ea78b57e6be0aa9fd53ceb77023ee8067589cd2b4b";
+    static final String DEPENDENCY_SHA256="5a8ce8d49fe948fc0e9586c102f7c8bfc46cb975a0b5d9f32d4bd1ccc72670bb";
     private static final String RUNTIME="mop_test_runtime";
     private TestSchemaMigration() {}
 
@@ -33,8 +34,8 @@ public final class TestSchemaMigration {
         @Override public String toString(){return "Settings[mop_test,mop_test_migrator,credentials=REDACTED]";}
     }
     record Entry(String version,String script,String type,MigrationState state,boolean applied,boolean checksumMatches,Integer checksum) {}
-    enum Plan { PHOTOS_PENDING, ASSET_IMPORTS_PENDING, ASSET_IMPORTS_APPLIED }
-    enum Mode { READ_ONLY_CHECK, APPLY_PHOTOS, APPLY_ASSET_IMPORTS }
+    enum Plan { PHOTOS_PENDING, ASSET_IMPORTS_PENDING, ASSET_IMPORTS_APPLIED, ASSET_DEPENDENCIES_APPLIED }
+    enum Mode { READ_ONLY_CHECK, APPLY_PHOTOS, APPLY_ASSET_IMPORTS, APPLY_ASSET_DEPENDENCIES }
 
     static boolean applyRequested(String[] args) {
         return requestedMode(args)!=Mode.READ_ONLY_CHECK;
@@ -43,25 +44,29 @@ public final class TestSchemaMigration {
         if(args.length==0||(args.length==1&&"--check".equals(args[0])))return Mode.READ_ONLY_CHECK;
         if(args.length==1&&"--apply-photos".equals(args[0]))return Mode.APPLY_PHOTOS;
         if(args.length==1&&"--apply-asset-imports".equals(args[0]))return Mode.APPLY_ASSET_IMPORTS;
-        throw new IllegalArgumentException("Use --check, --apply-photos or --apply-asset-imports");
+        if(args.length==1&&"--apply-asset-dependencies".equals(args[0]))return Mode.APPLY_ASSET_DEPENDENCIES;
+        throw new IllegalArgumentException("Use --check, --apply-photos, --apply-asset-imports or --apply-asset-dependencies");
     }
     static Plan inspect(List<Entry> entries) {
-        if(entries.size()!=6)throw new IllegalStateException("Unexpected migration set");
-        Set<String> seen=new HashSet<>();boolean photosPending=false,importsPending=false;
+        if(entries.size()!=7)throw new IllegalStateException("Unexpected migration set");
+        Set<String> seen=new HashSet<>();boolean photosPending=false,importsPending=false,dependenciesPending=false;
         for(Entry entry:entries) {
             if(entry.version()==null||!seen.add(entry.version())||!Objects.equals(SCRIPTS.get(entry.version()),entry.script())||!"SQL".equals(entry.type())||entry.checksum()==null)
                 throw new IllegalStateException("Unexpected migration identity");
             if("5".equals(entry.version())&&entry.state()==MigrationState.PENDING&&!entry.applied())photosPending=true;
             else if("6".equals(entry.version())&&(entry.state()==MigrationState.PENDING||entry.state()==MigrationState.ABOVE_TARGET)&&!entry.applied())importsPending=true;
+            else if("7".equals(entry.version())&&(entry.state()==MigrationState.PENDING||entry.state()==MigrationState.ABOVE_TARGET)&&!entry.applied())dependenciesPending=true;
             else if(entry.state()!=MigrationState.SUCCESS||!entry.applied()||!entry.checksumMatches())throw new IllegalStateException("Inconsistent migration history");
         }
         if(!seen.equals(SCRIPTS.keySet()))throw new IllegalStateException("Missing migration");
         if(photosPending&&!importsPending)throw new IllegalStateException("Asset imports precede the photo baseline");
-        return photosPending?Plan.PHOTOS_PENDING:importsPending?Plan.ASSET_IMPORTS_PENDING:Plan.ASSET_IMPORTS_APPLIED;
+        if(!dependenciesPending&&(photosPending||importsPending))throw new IllegalStateException("Dependencies precede the import baseline");
+        return photosPending?Plan.PHOTOS_PENDING:importsPending?Plan.ASSET_IMPORTS_PENDING:dependenciesPending?Plan.ASSET_IMPORTS_APPLIED:Plan.ASSET_DEPENDENCIES_APPLIED;
     }
     static boolean shouldMigrate(Mode mode,Plan plan){
         if(mode==Mode.APPLY_ASSET_IMPORTS&&plan==Plan.PHOTOS_PENDING)throw new IllegalStateException("Apply asset imports requires validated V1-V5 history");
-        return mode==Mode.APPLY_PHOTOS&&plan==Plan.PHOTOS_PENDING||mode==Mode.APPLY_ASSET_IMPORTS&&plan==Plan.ASSET_IMPORTS_PENDING;
+        if(mode==Mode.APPLY_ASSET_DEPENDENCIES&&(plan==Plan.PHOTOS_PENDING||plan==Plan.ASSET_IMPORTS_PENDING))throw new IllegalStateException("Apply dependencies requires validated V1-V6 history");
+        return mode==Mode.APPLY_PHOTOS&&plan==Plan.PHOTOS_PENDING||mode==Mode.APPLY_ASSET_IMPORTS&&plan==Plan.ASSET_IMPORTS_PENDING||mode==Mode.APPLY_ASSET_DEPENDENCIES&&plan==Plan.ASSET_IMPORTS_APPLIED;
     }
     private static Plan inspect(Flyway flyway) {
         List<Entry> entries=new ArrayList<>();
@@ -83,7 +88,7 @@ public final class TestSchemaMigration {
                 public void warn(String message){} public void error(String message){} public void error(String message,Exception error){} public void notice(String message){}
             });
             Mode mode=requestedMode(args);boolean apply=mode!=Mode.READ_ONLY_CHECK;
-            stage="migration_resources";verifyImportResource();stage="private_settings";Settings settings=Settings.from(System::getenv);
+            stage="migration_resources";verifyImportResource();verifyDependencyResource();stage="private_settings";Settings settings=Settings.from(System::getenv);
             stage="identity";
             try(Connection guard=connection(settings,!apply)) {
                 verifyIdentity(guard);
@@ -92,7 +97,7 @@ public final class TestSchemaMigration {
                 Flyway flyway=Flyway.configure().dataSource(settings.url(),settings.user(),settings.password())
                     .jdbcProperties(jdbcProperties(!apply)).locations("classpath:db/migration").schemas("public").defaultSchema("public")
                     .createSchemas(false).cleanDisabled(true).baselineOnMigrate(false).outOfOrder(false).mixed(false)
-                    .executeInTransaction(true).group(true).target(mode==Mode.APPLY_PHOTOS?"5":"6").validateOnMigrate(true).validateMigrationNaming(true)
+                    .executeInTransaction(true).group(true).target(mode==Mode.APPLY_PHOTOS?"5":mode==Mode.APPLY_ASSET_IMPORTS?"6":"7").validateOnMigrate(true).validateMigrationNaming(true)
                     .failOnMissingLocations(true).skipDefaultCallbacks(true).ignoreMigrationPatterns("*:pending").load();
                 flyway.validate();stage="history";Plan before=inspect(flyway);boolean migrate=shouldMigrate(mode,before);
                 stage="structure";
@@ -100,17 +105,18 @@ public final class TestSchemaMigration {
                 int executed=0;
                 Plan after=before;
                 if(migrate) {
-                    stage=mode==Mode.APPLY_PHOTOS?"apply_photos":"apply_asset_imports";var result=flyway.migrate();executed=result.migrationsExecuted;
+                    stage=mode==Mode.APPLY_PHOTOS?"apply_photos":mode==Mode.APPLY_ASSET_IMPORTS?"apply_asset_imports":"apply_asset_dependencies";var result=flyway.migrate();executed=result.migrationsExecuted;
                     if(!result.success||executed!=1)throw new IllegalStateException("Unexpected migration result");
                     stage="post_validate";flyway.validate();
-                    after=inspect(flyway);Plan expected=mode==Mode.APPLY_PHOTOS?Plan.ASSET_IMPORTS_PENDING:Plan.ASSET_IMPORTS_APPLIED;
+                    after=inspect(flyway);Plan expected=mode==Mode.APPLY_PHOTOS?Plan.ASSET_IMPORTS_PENDING:mode==Mode.APPLY_ASSET_IMPORTS?Plan.ASSET_IMPORTS_APPLIED:Plan.ASSET_DEPENDENCIES_APPLIED;
                     if(after!=expected)throw new IllegalStateException("Explicit migration incomplete");
                     stage="post_structure_acl";verifyStructure(guard,after);
                 }
                 output.println("MOP_SCHEMA status="+after+" mode="+mode+" migrations_executed="+executed+
                     " baseline="+(after==Plan.PHOTOS_PENDING?"V1_V4_VALIDATED":"V1_V5_VALIDATED")+
                     " photos="+(after==Plan.PHOTOS_PENDING?"NOT_APPLIED":"STRUCTURE_ACL_VERIFIED")+
-                    " asset_imports="+(after==Plan.ASSET_IMPORTS_APPLIED?"STRUCTURE_ACL_VERIFIED":"NOT_APPLIED"));
+                    " asset_imports="+((after==Plan.ASSET_IMPORTS_APPLIED||after==Plan.ASSET_DEPENDENCIES_APPLIED)?"STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
+                    " asset_dependencies="+(after==Plan.ASSET_DEPENDENCIES_APPLIED?"DRAFT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED"));
             }
         }catch(Throwable failure){errors.println(safeFailure(stage,failure));exit=1;}
         finally{System.setOut(output);System.setErr(errors);}
@@ -123,7 +129,33 @@ public final class TestSchemaMigration {
     }
     private static void verifyStructure(Connection connection,Plan plan)throws SQLException{
         if(plan==Plan.PHOTOS_PENDING)verifyBeforePhotos(connection);else verifyPhotos(connection);
-        if(plan==Plan.ASSET_IMPORTS_APPLIED)verifyAssetImports(connection);else verifyBeforeAssetImports(connection);
+        if(plan==Plan.ASSET_IMPORTS_APPLIED||plan==Plan.ASSET_DEPENDENCIES_APPLIED)verifyAssetImports(connection);else verifyBeforeAssetImports(connection);
+        if(plan==Plan.ASSET_DEPENDENCIES_APPLIED)verifyAssetDependencies(connection);else requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_asset_dependency_graph','mop_asset_dependency_revision','mop_asset_dependency_edge')");
+    }
+    static void verifyDependencyResource()throws Exception{
+        try(var input=TestSchemaMigration.class.getResourceAsStream("/db/migration/"+SCRIPTS.get("7"))){
+            if(input==null||!DEPENDENCY_SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(input.readAllBytes()))))throw new IllegalStateException("Unreviewed asset dependency migration resource");
+        }
+    }
+    private static void verifyAssetDependencies(Connection connection)throws SQLException{
+        verifyColumns(connection,"mop_asset_dependency_graph",Map.of("tenant_id","uuid","version","bigint","updated_at","timestamp(3) with time zone"),Set.of(),true);
+        verifyColumns(connection,"mop_asset_dependency_revision",Map.of("tenant_id","uuid","version","bigint","created_by","uuid","created_at","timestamp(3) with time zone","lifecycle_status","character varying(16)","decision_status","character varying(16)","monitoring_applied","boolean"),Set.of(),true);
+        verifyColumns(connection,"mop_asset_dependency_edge",Map.of("tenant_id","uuid","revision_version","bigint","parent_id","uuid","child_id","uuid","proposed_dependency_type","character varying(64)","proposed_suppression_scope","character varying(128)","proposed_enabled","boolean"),Set.of("proposed_dependency_type","proposed_suppression_scope","proposed_enabled"),true);
+        for(String table:List.of("mop_asset_dependency_graph","mop_asset_dependency_revision","mop_asset_dependency_edge")){
+            requireTrue(connection,"SELECT relkind='r' AND relowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') FROM pg_class WHERE oid=?::regclass","public."+table);
+            verifyRuntimeAcl(connection,table,table.equals("mop_asset_dependency_graph")?Set.of("version","updated_at"):Set.of());
+            requireTrue(connection,"SELECT NOT EXISTS(SELECT 1 FROM pg_constraint WHERE conrelid=?::regclass AND NOT convalidated)","public."+table);
+        }
+        requireConstraint(connection,"mop_asset_dependency_graph","p",List.of("tenant_id"),null,List.of(),false);
+        requireConstraint(connection,"mop_asset_dependency_graph","f",List.of("tenant_id"),"mop_tenant",List.of("id"),false);
+        requireConstraint(connection,"mop_asset_dependency_graph","f",List.of("tenant_id","version"),"mop_asset_dependency_revision",List.of("tenant_id","version"),true);
+        requireConstraint(connection,"mop_asset_dependency_revision","p",List.of("tenant_id","version"),null,List.of(),false);
+        requireConstraint(connection,"mop_asset_dependency_revision","f",List.of("tenant_id"),"mop_asset_dependency_graph",List.of("tenant_id"),false);
+        requireConstraint(connection,"mop_asset_dependency_revision","f",List.of("tenant_id","created_by"),"mop_membership",List.of("tenant_id","user_id"),false);
+        requireConstraint(connection,"mop_asset_dependency_edge","p",List.of("tenant_id","revision_version","parent_id","child_id"),null,List.of(),false);
+        requireConstraint(connection,"mop_asset_dependency_edge","f",List.of("tenant_id","revision_version"),"mop_asset_dependency_revision",List.of("tenant_id","version"),false);
+        for(String column:List.of("parent_id","child_id"))requireConstraint(connection,"mop_asset_dependency_edge","f",List.of("tenant_id",column),"mop_asset",List.of("tenant_id","id"),false);
+        requireTrue(connection,"SELECT i.indisvalid AND i.indisready FROM pg_index i JOIN pg_class c ON c.oid=i.indexrelid WHERE c.relname='mop_asset_dependency_edge_child' AND c.relnamespace='public'::regnamespace");
     }
     private static void verifyBeforeAssetImports(Connection connection)throws SQLException{
         requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_asset_import_source','mop_asset_import_operation','mop_asset_import_job','mop_asset_import_artifact','mop_asset_import_mapping')");

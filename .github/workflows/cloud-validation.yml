@@ -92,6 +92,7 @@ jobs:
               'cn.mop.persistence.PostgresCustomerReportIntegrationTest',
               'cn.mop.persistence.PostgresConfigurationRevisionIntegrationTest',
               'cn.mop.persistence.PostgresPhotoIntegrationTest',
+              'cn.mop.persistence.PostgresAssetDependencySchemaIntegrationTest',
               'cn.mop.adapters.MinioPhotoStoreRemoteTest',
               'cn.mop.api.FixtureSecurityAndWorkflowTest',
           )

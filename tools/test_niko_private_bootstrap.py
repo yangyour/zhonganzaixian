@@ -22,4 +22,7 @@ class NikoPrivateBootstrapTest(unittest.TestCase):
  def test_all_six_migration_hashes_match_frozen_sources(self):
   manifest=json.loads((ROOT/'tools/niko-test/frozen-migrations.json').read_text())['sha256'];self.assertEqual(6,len(manifest))
   for name,expected in manifest.items():self.assertEqual(expected,hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest())
+ def test_independently_applied_v7_hash_is_frozen_separately(self):
+  manifest=json.loads((ROOT/'tools/niko-test/frozen-dependency-migration.json').read_text())['sha256'];self.assertEqual(1,len(manifest))
+  for name,expected in manifest.items():self.assertEqual(expected,hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest())
 if __name__=='__main__':unittest.main()

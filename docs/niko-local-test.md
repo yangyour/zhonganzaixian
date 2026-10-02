@@ -50,3 +50,7 @@ OSS连接/IAM/不可覆盖/大文件/照片及导入整链、浏览器UI、真�
 `capture-http-sessions.py`另输出4个`qa-ticket-<role>.json`私有别名。`customer-report-smoke.mjs`支持MOP_TEST_SESSION_DIRECTORY、MOP_TEST_ENVIRONMENT_NAME、MOP_TEST_POSTGRES_VERSION、MOP_TEST_KEYCLOAK_VERSION及MOP_EVIDENCE_OUTPUT；自定义环境必须显式全部信息且不能指向旧证据路径。当前脚本要求冻结V5照片表存在，未知附件404，不再沿用V4/Q28预期；照片上传未测试。分页只使用该次真实API创建的虚构报障，测试记录保留不自动删除。
 
 正常重启验证：在同一组件命名空间运行`node tests/niko-report-restart-http.mjs before`；退出run-stack子shell使其仅停止所属组件；重新启动run-stack并重新capture会话，再运行同脚本`after`。脚本不自行重启或迁移、不覆盖既有checkpoint/重启证据，只比较该次已完成HTTP脚本留下的报障与operation；如需新一轮，先使用新的独立证据方案，不删除历史记录。该流程不能标为Worker故障或崩溃恢复通过。
+
+## V7依赖草稿迁移（独立执行）
+
+2026-10-02在niko新库单独执行`python tools/niko-test/run-migration.py --apply-asset-dependencies`：首次1、重复0、check0。启动API/Worker不会调用它。`frozen-migrations.json`继续保存原6版不变，`frozen-dependency-migration.json`单独保存已执行V7字节hash；后续结构修改另起迁移，不重写V7。旧指定服务器未执行本批迁移。当前只有草稿schema和实际约束测试，防环仓储/API/页面仍在开发。

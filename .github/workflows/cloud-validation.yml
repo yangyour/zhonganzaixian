@@ -97,6 +97,7 @@ jobs:
               'cn.mop.persistence.PostgresWorklogSchemaIntegrationTest',
               'cn.mop.persistence.PostgresWorklogIntegrationTest',
               'cn.mop.persistence.PostgresAuditChainIntegrationTest',
+              'cn.mop.persistence.PostgresAuditReaderIntegrationTest',
               'cn.mop.adapters.MinioPhotoStoreRemoteTest',
               'cn.mop.api.FixtureSecurityAndWorkflowTest',
           )

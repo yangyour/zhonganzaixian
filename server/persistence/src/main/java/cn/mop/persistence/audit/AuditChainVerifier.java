@@ -37,6 +37,8 @@ public final class AuditChainVerifier {
         return new Result(true,from,to,verified,null,Failure.NONE,initial,previous,false);
     }
     private static Result failed(long from,long to,int verified,long sequence,Failure failure,String anchor,String last){return new Result(false,from,to,verified,sequence,failure,anchor,last,false);}
+    /** Verifies a single stored envelope/hash only, not its predecessor chain. */
+    public static Failure verifyLocalRecord(String tenant,Row row){return row==null?Failure.ROW_PAYLOAD_MISMATCH:rowFailure(tenant,row);}
     private static Failure rowFailure(String tenant,Row row){
         JsonNode p=row.payload;
         if(!uuid(row.id())||!tenant.equals(row.namespace())||!tenant.equals(row.tenantId())||row.sequence()<1||!hash(row.previousHash())||!hash(row.entryHash())||p==null||!p.isObject()||p.size()!=KEYS.size())return Failure.ROW_PAYLOAD_MISMATCH;

@@ -38,5 +38,9 @@ class PostgresSafetyTest {
         var access=new cn.mop.domain.worklog.WorklogRepository.Access(id,id,1,"trace");
         assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->worklogs.listOwn(access,id,10,null,null)).status);
         assertThrows(IllegalStateException.class,()->worklogs.create(access,id,1,null));
+        var auditReader=new PostgresAuditReader(disconnected,new ObjectMapper());
+        var auditAccess=new cn.mop.domain.audit.AuditReader.Access(id,id,1);
+        assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->auditReader.list(auditAccess,new cn.mop.domain.audit.AuditReader.Filters(null,null,null,null,null,null,null,null),10,null,null)).status);
+        assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->auditReader.verify(auditAccess,1,null)).status);
     }
 }

@@ -21,7 +21,7 @@ class PhotoReadinessTest {
     @BeforeEach void setup(){
         repository=mock(PlatformRepository.class);store=mock(PhotoObjectStore.class);configuration=new PhotoConfiguration();
         when(repository.metadata()).thenReturn(new RepositoryMetadata("remote_test","postgresql",true,"test_oidc"));
-        when(repository.assetMetadataProblems()).thenReturn(List.of());when(repository.worklogProblems()).thenReturn(List.of());when(repository.assetDependencyProblems()).thenReturn(List.of());when(repository.dependencyReady()).thenReturn(true);when(repository.photoDependencyProblems()).thenReturn(List.of());
+        when(repository.internalNoteProblems()).thenReturn(List.of());when(repository.assetMetadataProblems()).thenReturn(List.of());when(repository.worklogProblems()).thenReturn(List.of());when(repository.assetDependencyProblems()).thenReturn(List.of());when(repository.dependencyReady()).thenReturn(true);when(repository.photoDependencyProblems()).thenReturn(List.of());
         when(store.ready()).thenReturn(true);request=new MockHttpServletRequest();request.setAttribute("mop.trace_id","isolated-readiness");
     }
     private PhotoConfiguration.PhotoDependencyProbe probe(MockEnvironment environment){
@@ -94,6 +94,10 @@ class PhotoReadinessTest {
         var controller=controller(probe(new MockEnvironment()));when(repository.assetMetadataProblems()).thenReturn(List.of("missing"));
         controller.live(request);verify(repository,never()).assetMetadataProblems();var failure=assertThrows(DomainException.class,()->controller.ready(request));assertEquals(503,failure.status);assertEquals("asset_manual_metadata",((Map<?,?>)failure.details.get(0)).get("component"));
         when(repository.assetMetadataProblems()).thenReturn(List.of());Map<?,?> available=(Map<?,?>)data(controller.ready(request)).get("asset_manual_metadata");assertEquals(true,available.get("schema_access_ready"));assertEquals(false,available.get("monitoring_applied"));assertEquals(false,available.get("cmdb_applied"));
+    }
+
+    @Test void internalNoteReadinessRequiresRealSchemaWithoutWritingOrMigrating(){
+        var controller=controller(probe(new MockEnvironment()));when(repository.internalNoteProblems()).thenReturn(List.of("missing"));controller.live(request);verify(repository,never()).internalNoteProblems();var failure=assertThrows(DomainException.class,()->controller.ready(request));assertEquals(503,failure.status);assertEquals("internal_notes",((Map<?,?>)failure.details.get(0)).get("component"));when(repository.internalNoteProblems()).thenReturn(List.of());Map<?,?> available=(Map<?,?>)data(controller.ready(request)).get("internal_notes");assertEquals(true,available.get("schema_access_ready"));assertEquals("INTERNAL",available.get("visibility"));assertEquals(false,available.get("ticket_state_changed"));assertEquals(false,available.get("sla_changed"));
     }
 
 }

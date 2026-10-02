@@ -177,7 +177,7 @@ test('operation区分报障门禁与真实文件状态，终态不得伪造', ()
 
 test('就绪成功不能把已启用但缺schema或存储的照片能力写成READY', () => {
   const photos = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, policy_source: 'USER_DEVELOPMENT_DIRECTION', reasons: [] };
-  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
+  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
   assert.equal(validates('ReadinessResult', { data, trace_id: 'MOP-FAKE-readiness' }), true);
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('ReadinessResult', { data: { ...data, photos: { ...photos, [key]: false } }, trace_id: 'MOP-FAKE-readiness' }), false);
   assert.equal(validates('ReadinessResult', { data: { ...data, production_ready: true }, trace_id: 'MOP-FAKE-readiness' }), false);
@@ -206,7 +206,7 @@ const importSource = {
 };
 
 test('V0.12保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.14.0');
+  assert.equal(contract.info.version, '0.15.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -402,4 +402,14 @@ test('资料查询使用显式条件和有界配对cursor，不冒充冻结导�
   for (const change of [{ tenant_id: id('2') }, { brand: null }, { warranty_status: 'expired' }, { purchase_date: '2026-02-30' }, { unknown_fields: 'name' }]) assert.equal(validates('ManualAssetQueryFilters', { ...filters, ...change }), false);
   const page = { items: [], has_more: false, next_before_created_at: null, next_before_id: null, filters, source: 'postgresql', scope: 'CURRENT_TENANT_INTERNAL_MANUAL_SOURCE', page_size_limit: 100, pagination_consistency: 'CURRENT_REQUEST_SNAPSHOT_ONLY', unknown_semantics: 'EXPLICIT_NULL_NO_INFERENCE' }; assert.ok(validates('ManualAssetQueryPage', page)); assert.equal(validates('ManualAssetQueryPage', { ...page, has_more: true }), false); assert.equal(validates('ManualAssetQueryPage', { ...page, pagination_consistency: 'FROZEN_EXPORT' }), false);
   const route = contract.paths['/assets/manual-metadata']; assert.deepEqual(Object.keys(route), ['get']); assert.equal(route.get['x-mop-max-encoded-query-bytes'], 4096); assert.deepEqual(route.get['x-mop-roles'], ['msp', 'padmin']);
+});
+
+
+test('内部备注严格身份/可见性/不可变和不改工单SLA的真实契约', () => {
+  const input = { expected_ticket_version: 1, text: '内部文字' }; assert.ok(validates('InternalTicketNoteCreate', input));
+  for (const change of [{ visibility: 'CUSTOMER' }, { actor_id: id('3') }, { tenant_id: id('2') }, { attachment_ids: [] }, { expected_ticket_version: 0 }, { text: null }]) assert.equal(validates('InternalTicketNoteCreate', { ...input, ...change }), false);
+  const note = { id: id('1'), tenant_id: id('2'), ticket_id: id('3'), actor_id: id('4'), observed_ticket_version: 1, text: input.text, text_sha256: createHash('sha256').update(input.text).digest('hex'), created_at: timestamp, visibility: 'INTERNAL', record_source: 'MANUAL_INTERNAL_NOTE', verification_status: 'SELF_REPORTED', source: 'postgresql', immutable: true, ticket_state_changed: false, sla_changed: false }; assert.ok(validates('InternalTicketNote', note));
+  for (const change of [{ visibility: 'CUSTOMER' }, { immutable: false }, { ticket_state_changed: true }, { sla_changed: true }, { verification_status: 'VERIFIED' }]) assert.equal(validates('InternalTicketNote', { ...note, ...change }), false);
+  const page = { items: [note], has_more: false, next_before_created_at: null, next_before_id: null, source: 'postgresql', scope: 'CURRENT_TENANT_INTERNAL', page_size_limit: 100 }; assert.ok(validates('InternalTicketNotePage', page)); assert.equal(validates('InternalTicketNotePage', { ...page, has_more: true }), false);
+  assert.equal(contract.paths['/tickets/{ticketId}/internal-notes'].post['x-mop-capability'], 'ticket_notes:write_internal'); assert.deepEqual(Object.keys(contract.paths['/tickets/{ticketId}/internal-notes/{id}']), ['get']);
 });

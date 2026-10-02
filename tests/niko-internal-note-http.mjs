@@ -1,0 +1,57 @@
+// Real niko PG/OIDC API checks. No storage adapter, fixture route, browser or migration is invoked.
+import assert from 'node:assert/strict';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
+import Ajv from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
+const root=new URL('../',import.meta.url);
+let stage='initialization';
+try {
+  const contract=JSON.parse(readFileSync(new URL('contracts/local-api.openapi.json',root),'utf8'));
+  const ajv=new Ajv({strict:false,allErrors:true});addFormats(ajv);ajv.addSchema({$id:'urn:mop:internal-note-http',components:contract.components});
+  const validators=new Map(),checks=[],traces=new Map();
+  const sessions=Object.fromEntries(['msp','tadmin','viewerA','viewerB','padmin','reviewer'].map(role=>{
+    const session=JSON.parse(readFileSync(new URL(`.local/niko-test/private/sessions/qa-${role}.json`,root),'utf8'));
+    assert.equal(session.environment,'niko-local-test');return [role,session];
+  }));
+  async function request(role,method,path,route,expected,name,body,options={}){
+    stage=name;const headers={'Content-Type':'application/json'};
+    if(role){headers.Cookie=sessions[role].cookie;if(!options.noCsrf)headers['X-CSRF-Token']=sessions[role].csrf_token;}
+    if(!options.noKey)headers['Idempotency-Key']=options.key??randomUUID();
+    const response=await fetch('http://127.0.0.1:8080/api/v1'+path,{method,headers,body:options.raw??(body===undefined?undefined:JSON.stringify(body)),redirect:'manual',signal:AbortSignal.timeout(20000)});
+    stage=`${name}: actual=${response.status}`;assert.ok((Array.isArray(expected)?expected:[expected]).includes(response.status));
+    const payload=await response.json();const schema=contract.paths[route]?.[method.toLowerCase()]?.responses[response.status]?.content?.['application/json']?.schema;assert.ok(schema);
+    const key=JSON.stringify(schema);if(!validators.has(key))validators.set(key,ajv.compile(schema.$ref?{$ref:'urn:mop:internal-note-http'+schema.$ref}:schema));
+    assert.ok(validators.get(key)(payload));assert.equal(payload.trace_id,response.headers.get('x-trace-id'));checks.push({name,status:response.status,contract_valid:true});traces.set(name,payload.trace_id);return {status:response.status,value:payload.data??payload};
+  }
+  const route='/tickets/{ticketId}/internal-notes',detail=route+'/{id}',current={};for(const role of Object.keys(sessions)){current[role]=(await request(role,'GET','/session','/session',200,'session_'+role)).value;for(const cap of ['ticket_notes:read_internal','ticket_notes:write_internal'])assert.equal(current[role].capabilities.includes(cap),['msp','padmin','reviewer'].includes(role));}
+  async function parent(role,label){const accepted=(await request(role,'POST','/tickets','/tickets',202,label+'_register',{title:'INTERNAL-NOTE-HTTP-'+randomUUID(),source:'customer_report',description:'虚构内部备注父登记',category:'网络不通',impact_scope:'individual',contact_name:'虚构联系人',contact_phone:'+00 000',urgency:'normal',attachment_ids:[]})).value;const operation=(await request(role,'GET','/operations/'+accepted.operation_id,'/operations/{id}',200,label+'_receipt')).value;return operation.result_ref.split('/').at(-1);}
+  const ticket=await parent('viewerA','own_parent'),other=await parent('viewerA','other_parent'),foreign=await parent('viewerB','foreign_parent'),path='/tickets/'+ticket+'/internal-notes';
+  const customerBefore=(await request('viewerA','GET','/tickets/'+ticket,'/tickets/{id}',200,'customer_before')).value;const internalBefore=(await request('msp','GET','/tickets/'+ticket,'/tickets/{id}',200,'internal_before')).value;
+  const ready=(await request(null,'GET','/health/ready','/health/ready',200,'internal_note_schema_ready')).value;assert.equal(ready.internal_notes.schema_access_ready,true);assert.equal(ready.internal_notes.visibility,'INTERNAL');assert.equal(ready.internal_notes.ticket_state_changed,false);
+  assert.deepEqual((await request('msp','GET',path,route,200,'empty_internal_notes')).value.items,[]);
+  const body={expected_ticket_version:internalBefore.version,text:'  内部讨论原文😀\n下一行\t  '},key=randomUUID(),first=(await request('msp','POST',path,route,200,'create_original_note',body,{key})).value;assert.equal(first.text,body.text);assert.equal(first.actor_id,current.msp.user.id);assert.equal(first.ticket_id,ticket);assert.equal(first.visibility,'INTERNAL');assert.equal(first.immutable,true);assert.equal(first.ticket_state_changed,false);assert.equal(first.sla_changed,false);assert.equal(first.observed_ticket_version,internalBefore.version);
+  assert.deepEqual((await request('msp','POST',path,route,200,'same_original_key_replay',body,{key})).value,first);await request('msp','POST',path,route,409,'same_key_different_text',{...body,text:'changed'},{key});
+  const admin=(await request('padmin','POST',path,route,200,'admin_note',{expected_ticket_version:internalBefore.version,text:'管理员内部协作'})).value;assert.equal(admin.actor_id,current.padmin.user.id);assert.deepEqual((await request('reviewer','GET',path+'/'+first.id,detail,200,'other_internal_reader')).value,first);
+  assert.deepEqual((await request('msp','POST',path,route,200,'old_key_receipt_after_later_note',body,{key})).value,first);
+  const all=[first,admin];for(let i=0;i<10;i++)all.push((await request('msp','POST',path,route,200,'append_for_paging_'+i,{expected_ticket_version:internalBefore.version,text:'虚构独立备注-'+i})).value);
+  const page1=(await request('msp','GET',path+'?page_size=10',route,200,'first_ten_notes')).value;assert.equal(page1.items.length,10);assert.equal(page1.has_more,true);const q=new URLSearchParams({page_size:'10',before_created_at:page1.next_before_created_at,before_id:page1.next_before_id});const page2=(await request('padmin','GET',path+'?'+q,route,200,'remaining_two_notes')).value;assert.equal(page2.items.length,2);assert.equal(page2.has_more,false);assert.equal(new Set([...page1.items,...page2.items].map(n=>n.id)).size,12);
+  await request('msp','POST',path,route,409,'wrong_parent_version',{...body,expected_ticket_version:internalBefore.version+1});
+  for(const role of ['viewerA','viewerB','tadmin']){await request(role,'GET',path,route,403,role+'_list_denied');await request(role,'GET',path+'/'+first.id,detail,403,role+'_note_denied');await request(role,'POST',path,route,403,role+'_append_denied',body);}
+  await request('msp','GET','/tickets/'+foreign+'/internal-notes',route,404,'foreign_parent_hidden');await request('msp','POST','/tickets/'+foreign+'/internal-notes',route,404,'foreign_parent_write_hidden',body);await request('msp','GET','/tickets/'+other+'/internal-notes/'+first.id,detail,404,'wrong_parent_note_hidden');
+  await request(null,'GET',path,route,401,'anonymous_denied');await request('msp','POST',path,route,403,'csrf_required',body,{noCsrf:true});await request('msp','POST',path,route,400,'idempotency_key_required',body,{noKey:true});
+  for(const field of ['visibility','actor_id','tenant_id','ticket_id','attachment_ids','state','sla_changed'])await request('msp','POST',path,route,400,'forbidden_field_'+field,{...body,[field]:'forged'});
+  for(const text of ['',null,'\ufeff','x\u0000','😀'.repeat(2001)])await request('msp','POST',path,route,400,'invalid_text_'+checks.length,{...body,text});
+  for(const raw of ['{"text":"a","text":"b"}','{} {}',' '.repeat(32769)])await request('msp','POST',path,route,400,'invalid_json_'+checks.length,undefined,{raw});
+  for(const q of ['?tenant_id='+current.viewerB.tenant.id,'?page_size=10&page_size=15','?page_size=1000','?before_id='+first.id,'?before_created_at=2026-10-02T00:00:00Z'])await request('msp','GET',path+q,route,400,'invalid_list_query_'+checks.length);
+  const concurrentKey=randomUUID(),concurrentBody={expected_ticket_version:internalBefore.version,text:'同原请求并发只追加一次'};const concurrent=await Promise.all([1,2].map(i=>request('msp','POST',path,route,200,'concurrent_same_key_'+i,concurrentBody,{key:concurrentKey})));assert.deepEqual(concurrent[0].value,concurrent[1].value);all.push(concurrent[0].value);
+  const longest=(await request('msp','POST',path,route,200,'max_unicode_text',{expected_ticket_version:internalBefore.version,text:'😀'.repeat(2000)})).value;assert.equal([...longest.text].length,2000);all.push(longest);
+  assert.deepEqual((await request('viewerA','GET','/tickets/'+ticket,'/tickets/{id}',200,'customer_after_no_internal_projection')).value,customerBefore);assert.deepEqual((await request('msp','GET','/tickets/'+ticket,'/tickets/{id}',200,'parent_state_sla_version_unchanged')).value,internalBefore);
+  const final=(await request('padmin','GET',path,route,200,'fourteen_immutable_notes')).value;assert.equal(final.items.length,14);assert.equal(new Set(final.items.map(n=>n.id)).size,14);assert.ok(final.items.every(n=>n.visibility==='INTERNAL'&&n.observed_ticket_version===internalBefore.version));
+  const audit=(await request('padmin','GET','/audit/records?action=ticket.internal_note.create&page_size=100','/audit/records',200,'note_audit_once')).value.items;assert.equal(audit.filter(row=>all.some(note=>note.id===row.resource_id)).length,14);assert.equal(audit.filter(row=>row.trace_id===traces.get('create_original_note')&&row.resource_id===first.id).length,1);assert.equal(audit.filter(row=>row.trace_id===traces.get('same_original_key_replay')&&row.resource_id===first.id).length,0);
+  const tail=(await request('padmin','GET','/audit/records?page_size=10','/audit/records',200,'readonly_tail_before')).value.snapshot_sequence;await request('msp','GET',path,route,200,'readonly_list');await request('msp','GET',path+'/'+first.id,detail,200,'readonly_note');assert.equal((await request('padmin','GET','/audit/records?page_size=10','/audit/records',200,'readonly_tail_after')).value.snapshot_sequence,tail);
+  for(const method of ['PATCH','DELETE']){
+    stage='immutable_method_'+method;const response=await fetch('http://127.0.0.1:8080/api/v1'+path+'/'+first.id,{method,headers:{Cookie:sessions.msp.cookie,'X-CSRF-Token':sessions.msp.csrf_token,'Idempotency-Key':randomUUID(),'Content-Type':'application/json'},body:JSON.stringify({text:'must not modify immutable note'}),redirect:'manual',signal:AbortSignal.timeout(15000)});assert.equal(response.status,405);const payload=await response.json();assert.ok(ajv.compile({$ref:'urn:mop:internal-note-http#/components/schemas/Error'})(payload));checks.push({name:stage,status:405,contract_valid:true,schema:'Error; no mutation endpoint'});
+  }
+  const evidence={verified_at:new Date().toISOString(),environment:'niko-local-test',api_version:contract.info.version,passed:true,http_checks:checks.length,checks,durable_internal_notes:14,matching_success_audits:14,concurrent_same_key_receipts:2,concurrent_same_key_notes:1,parent_and_customer_dto_unchanged:true,successful_reads_did_not_append_audit:true,credentials_output:false,limitations:['Internal text only; no customer-visible comments, attachments or notifications','No formal ticket transition, SLA or customer confirmation','No browser notes page or full M5-D05 acceptance']};writeFileSync(new URL('docs/evidence/niko-internal-note-api-http-20261002.json',root),JSON.stringify(evidence,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({status:'passed',http_checks:checks.length,durable_internal_notes:14,credentials_output:false}));
+}catch{console.error(JSON.stringify({status:'failed',stage,details:'redacted'}));process.exitCode=1;}

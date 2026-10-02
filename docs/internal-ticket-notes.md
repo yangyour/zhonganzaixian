@@ -34,3 +34,10 @@ PostgresInternalTicketNoteRepository每次读写重新核验当前启用用户/�
 同原键并发两独立连接仅一条备注/审计；不同原请求是不同备注，可同时保留，不能把追加行为冒充工单版本推进。客户viewer/tadmin读/写均403；客户原ticket DTO保持原样，不含备注/作者信息。失败下游整笔回滚，原键可安全重试；成功读取不写审计。断库/未受保护事务失败关闭，无fixture回退。
 
 新增12真实PG通过（首次全量通过）：原文/hash独立回读、父与客户DTO不变、内部双角色/客户隔离、旧键原收据、版本冲突、跨租户/错父、权限版本、回滚、原键并发、独立备注并发、分页及2000emoji。根589=576执行（含154真实PG）+13fixture跳过，6MinIO排除。公开API/页面仍待接线，原V10不改；见[仓储证据](evidence/niko-internal-note-repository-20261002.json)。纯核心46cf5ed的CI37057313765 success。
+
+
+## 2026-10-02 内部备注API V0.15
+
+GET/POST /tickets/{ticketId}/internal-notes及GET .../{id}已接真实仓储。仅msp/padmin获得ticket_notes:read_internal/write_internal，角色与当前成员每次重新核验；客户/tadmin没有这些能力。POST只接受expected_ticket_version、text，32KiB/重复键/尾随JSON/类型/Unicode边界严格检查；actor/tenant/visibility/附件/业务状态均不可由请求指定。父版本核对、备注/审计/原键收据同事务，原父状态/SLA/版本不变。GET分页配对创建时间/id，技术10/15/25/50/100；无PATCH/DELETE。ready新增内部备注真实结构/ACL检查，live不探测，不自动迁移。
+
+8控制器+1就绪新增，根598=585执行（含154真实PG）+13fixture跳过/6MinIO排除，28契约、271Web及类型/构建通过。83真实HTTP均验证响应契约（其中PATCH/DELETE的405用通用Error schema）：内部双角色追加/跨内部读取、客户403、错父/跨租户404、CSRF/正文/分页门禁、原键旧收据、同原键并发两响应一记录、2000emoji、12条10+2分页、最终14备注对应14成功审计，父与客户DTO一致，成功查询不写审计。首次HTTP通过。公开API已完成，内部备注页面仍待；客户可见评论/附件/通知和正式状态闭环不在此切片。上一仓储69f41cb的CI37059227266 success，见[HTTP证据](evidence/niko-internal-note-api-http-20261002.json)。

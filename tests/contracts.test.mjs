@@ -205,8 +205,8 @@ const importSource = {
   ...importFacts, effective_rule_versions: null, quota_reservation: null,
 };
 
-test('V0.11保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.11.0');
+test('V0.12保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
+  assert.equal(contract.info.version, '0.12.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -358,4 +358,17 @@ test('本人工时保留明确事实与未知成本，写入不接受actor/tenan
   assert.equal(contract.paths['/tickets/{ticketId}/worklogs'].get['x-mop-capability'], 'worklogs:read_own');
   assert.equal(contract.paths['/tickets/{ticketId}/worklogs/{id}'].patch['x-mop-capability'], 'worklogs:write_own');
   assert.equal(contract.paths['/tickets/{ticketId}/worklogs/{id}'].delete, undefined);
+});
+
+
+test('审计查询仅GET、有界当前租户，区间校验不冒充外部可信锚', () => {
+  for (const path of ['/audit/records', '/audit/integrity']) { assert.deepEqual(Object.keys(contract.paths[path]), ['get']); assert.equal(contract.paths[path].get['x-mop-capability'], 'audit:read'); }
+  const empty = { status: 'EMPTY', valid: null, snapshot_sequence: 0, from_sequence: null, to_sequence: null, verified_records: 0, failure_sequence: null, failure: 'NONE', anchor_hash: null, final_hash: null, has_more: false, next_from_sequence: null, checked_at: timestamp, source: 'postgresql', scope: 'CURRENT_TENANT', verification_scope: 'LOCAL_DATABASE_SNAPSHOT', externally_anchored: false, max_range_records: 1000, hash_algorithm: 'SHA256_TOPLEVEL_SORTED_JSON_V1', whole_snapshot_chain_checked: false };
+  assert.ok(validates('AuditIntegrity', empty)); assert.equal(validates('AuditIntegrity', { ...empty, valid: true }), false);
+  const partial = { ...empty, status: 'VALID', valid: true, snapshot_sequence: 2000, from_sequence: 1, to_sequence: 1000, verified_records: 1000, anchor_hash: '0'.repeat(64), final_hash: 'a'.repeat(64), has_more: true, next_from_sequence: 1001 };
+  assert.ok(validates('AuditIntegrity', partial)); assert.equal(validates('AuditIntegrity', { ...partial, externally_anchored: true }), false); assert.equal(validates('AuditIntegrity', { ...partial, whole_snapshot_chain_checked: true }), false);
+  const invalid = { ...partial, status: 'INVALID', valid: false, failure_sequence: 5, failure: 'HASH_MISMATCH', verified_records: 4, next_from_sequence: null };
+  assert.ok(validates('AuditIntegrity', invalid)); assert.equal(validates('AuditIntegrity', { ...invalid, valid: true }), false); assert.equal(validates('AuditIntegrity', { ...invalid, failure: 'NONE' }), false);
+  const page = { items: [], snapshot_sequence: 0, next_before_sequence: null, has_more: false, source: 'postgresql', scope: 'CURRENT_TENANT', page_size_limit: 100, filter_semantics: 'EXACT_MATCH_HALF_OPEN_TIME', integrity_scope: 'EACH_RECORD_LOCAL_HASH_ONLY', externally_anchored: false };
+  assert.ok(validates('AuditRecordPage', page)); assert.equal(validates('AuditRecordPage', { ...page, has_more: true }), false); assert.equal(validates('AuditRecordPage', { ...page, scope: 'PLATFORM' }), false);
 });

@@ -1,0 +1,328 @@
+{
+  "verified_at": "2026-10-02T16:53:17.911Z",
+  "environment": "niko-local-test",
+  "api_version": "0.12.0",
+  "passed": true,
+  "http_checks": 61,
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_3",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_4",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_5",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_6",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_7",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_8",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_9",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_10",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_11",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "filtered_first_page",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "synthetic_asset_12",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "filtered_stable_second_page",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "new_first_page_sees_append",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "all_exact_filters",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "exclusive_time_end",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "parameterized_injection_text",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "local_interval_proof",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "default_bounded_proof",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "read_snapshot_before",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "read_only_verification",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "read_snapshot_after",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "future_range_not_invented",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "msp_records_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "msp_integrity_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_records_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_integrity_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_records_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_integrity_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_records_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_integrity_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_records",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_integrity",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_41",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_42",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_43",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_44",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_45",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_46",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_47",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_48",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_49",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_50",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_integrity_51",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_integrity_52",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_integrity_53",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_integrity_54",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_integrity_55",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unsupported_POST",
+      "status": 405,
+      "contract_valid": "no mutation endpoint"
+    },
+    {
+      "name": "unsupported_PATCH",
+      "status": 405,
+      "contract_valid": "no mutation endpoint"
+    },
+    {
+      "name": "unsupported_DELETE",
+      "status": 405,
+      "contract_valid": "no mutation endpoint"
+    },
+    {
+      "name": "denial_remains_auditable",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "final_tenant_only_page",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "stable_filtered_snapshot_size": 12,
+  "new_first_page_size": 13,
+  "interval_records_verified": 12,
+  "default_range_records": 1000,
+  "successful_reads_did_not_append_audit": true,
+  "externally_anchored": false,
+  "stored_audit_edit_delete_repair_actions": 0,
+  "credentials_output": false,
+  "limitations": [
+    "No real table tampering; INVALID branches tested with isolated/in-memory copies",
+    "No external trusted anchor or WORM guarantee",
+    "No browser query UI yet",
+    "Full M2-12/M7-5 and production retention still incomplete"
+  ]
+}

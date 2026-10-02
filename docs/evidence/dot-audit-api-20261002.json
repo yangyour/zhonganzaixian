@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-02",
+  "environment": "niko-local-test",
+  "api_version": "0.12.0",
+  "scope": "read-only tenant audit records and integrity endpoints",
+  "result": "PASS",
+  "new_controller_tests": 7,
+  "root_maven": {
+    "total": 509,
+    "executed_passed": 496,
+    "real_pg_included": 111,
+    "fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "log_sha256": "7dbfe2cecf8f970ad84fc1fa5562d15b5e041c1c9f13029e7cd3d0e9a404e404"
+  },
+  "contract_tests": 24,
+  "web_tests": 225,
+  "typecheck_build": "PASS",
+  "real_http_checks": 61,
+  "roles_changed": false,
+  "migration_changed": false,
+  "stored_audit_tampering": false,
+  "externally_anchored": false,
+  "write_delete_repair_endpoints": false,
+  "empty_means_valid": null,
+  "remaining": [
+    "Audit query/range UI",
+    "Browser acceptance",
+    "Full M2-12/M7-5 and retention decisions",
+    "External trust anchor if required"
+  ]
+}

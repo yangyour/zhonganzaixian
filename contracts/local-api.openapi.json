@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.11.0",
+    "version": "0.12.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -7562,6 +7562,431 @@
         }
       }
     },
+    "/audit/records": {
+      "get": {
+        "operationId": "queryCurrentTenantAudit",
+        "summary": "按精确字段及半开时间检索当前租户审计，序号上界固定分页",
+        "x-mop-capability": "audit:read",
+        "x-mop-allowed-role": "current_active_padmin",
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "当前成员授权与数据在一个只读REPEATABLE READ快照读取；只返回当前租户，无平台namespace或任意tenant参数。查询不写审计/修复/签名。生产留存未确认，没有外部可信锚。",
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                25,
+                50,
+                100
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "snapshot_sequence",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          {
+            "name": "before_sequence",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          },
+          {
+            "name": "actor_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "action",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          },
+          {
+            "name": "result",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
+            }
+          },
+          {
+            "name": "resource_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          },
+          {
+            "name": "resource_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            }
+          },
+          {
+            "name": "trace_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "occurred_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "occurred_before",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "x-mop-pagination": "before_sequence requires snapshot_sequence; reset both on filter/context change; new appended records appear only on first-page refresh",
+        "x-mop-time": "explicit seconds and timezone, maximum millisecond precision, UTC years0001..9999; [occurred_from,occurred_before)",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditRecordPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/audit/integrity": {
+      "get": {
+        "operationId": "verifyCurrentTenantAuditRange",
+        "summary": "只读检查最多1000条本地链；无外部可信锚，不能证明特权整链重写未发生",
+        "x-mop-capability": "audit:read",
+        "x-mop-allowed-role": "current_active_padmin",
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "当前成员授权与数据在一个只读REPEATABLE READ快照读取；只返回当前租户，无平台namespace或任意tenant参数。查询不写审计/修复/签名。生产留存未确认，没有外部可信锚。",
+        "parameters": [
+          {
+            "name": "from_sequence",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991,
+              "default": 1
+            }
+          },
+          {
+            "name": "to_sequence",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          }
+        ],
+        "x-mop-range": "inclusive range <=1000; omitted end=min(snapshot tail,start+999); empty source has valid=null; future range404; INVALID is a200 verification result, never success proof",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditIntegrityResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/audit": {
       "get": {
         "operationId": "listAudit",
@@ -9064,6 +9489,525 @@
             }
           }
         ]
+      },
+      "AuditRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actor_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "actor_name": {
+            "type": "string"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action": {
+            "type": "string"
+          },
+          "resource_type": {
+            "type": "string"
+          },
+          "resource_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "result": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "previous_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "entry_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "id",
+          "occurred_at",
+          "actor_id",
+          "actor_name",
+          "tenant_id",
+          "action",
+          "resource_type",
+          "resource_id",
+          "result",
+          "reason",
+          "trace_id",
+          "source",
+          "sequence",
+          "previous_hash",
+          "entry_hash"
+        ],
+        "additionalProperties": false
+      },
+      "AuditRecordPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/AuditRecord"
+            }
+          },
+          "snapshot_sequence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "next_before_sequence": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT"
+          },
+          "page_size_limit": {
+            "const": 100
+          },
+          "filter_semantics": {
+            "const": "EXACT_MATCH_HALF_OPEN_TIME"
+          },
+          "integrity_scope": {
+            "const": "EACH_RECORD_LOCAL_HASH_ONLY"
+          },
+          "externally_anchored": {
+            "const": false
+          }
+        },
+        "required": [
+          "items",
+          "snapshot_sequence",
+          "next_before_sequence",
+          "has_more",
+          "source",
+          "scope",
+          "page_size_limit",
+          "filter_semantics",
+          "integrity_scope",
+          "externally_anchored"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "has_more": {
+                  "const": false
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "next_before_sequence": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "next_before_sequence": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "items": {
+                  "minItems": 10
+                }
+              }
+            }
+          }
+        ]
+      },
+      "AuditRecordPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AuditRecordPage"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "AuditIntegrity": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "EMPTY",
+              "VALID",
+              "INVALID"
+            ]
+          },
+          "valid": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "snapshot_sequence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "from_sequence": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "to_sequence": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "verified_records": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "failure_sequence": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "failure": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "MISSING_RECORD",
+              "SEQUENCE_MISMATCH",
+              "ROW_PAYLOAD_MISMATCH",
+              "HASH_MISMATCH",
+              "PREVIOUS_HASH_MISMATCH",
+              "ANCHOR_INVALID",
+              "DUPLICATE_ID",
+              "UNEXPECTED_RECORD"
+            ]
+          },
+          "anchor_hash": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "final_hash": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_from_sequence": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT"
+          },
+          "verification_scope": {
+            "const": "LOCAL_DATABASE_SNAPSHOT"
+          },
+          "externally_anchored": {
+            "const": false
+          },
+          "max_range_records": {
+            "const": 1000
+          },
+          "hash_algorithm": {
+            "const": "SHA256_TOPLEVEL_SORTED_JSON_V1"
+          },
+          "whole_snapshot_chain_checked": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "status",
+          "valid",
+          "snapshot_sequence",
+          "from_sequence",
+          "to_sequence",
+          "verified_records",
+          "failure_sequence",
+          "failure",
+          "anchor_hash",
+          "final_hash",
+          "has_more",
+          "next_from_sequence",
+          "checked_at",
+          "source",
+          "scope",
+          "verification_scope",
+          "externally_anchored",
+          "max_range_records",
+          "hash_algorithm",
+          "whole_snapshot_chain_checked"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "EMPTY"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "valid": {
+                  "type": "null"
+                },
+                "snapshot_sequence": {
+                  "const": 0
+                },
+                "from_sequence": {
+                  "type": "null"
+                },
+                "to_sequence": {
+                  "type": "null"
+                },
+                "verified_records": {
+                  "const": 0
+                },
+                "failure_sequence": {
+                  "type": "null"
+                },
+                "failure": {
+                  "const": "NONE"
+                },
+                "anchor_hash": {
+                  "type": "null"
+                },
+                "final_hash": {
+                  "type": "null"
+                },
+                "has_more": {
+                  "const": false
+                },
+                "next_from_sequence": {
+                  "type": "null"
+                },
+                "whole_snapshot_chain_checked": {
+                  "const": false
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "VALID"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "valid": {
+                  "const": true
+                },
+                "from_sequence": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "to_sequence": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "verified_records": {
+                  "minimum": 1
+                },
+                "failure_sequence": {
+                  "type": "null"
+                },
+                "failure": {
+                  "const": "NONE"
+                },
+                "anchor_hash": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "final_hash": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "INVALID"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "valid": {
+                  "const": false
+                },
+                "from_sequence": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "to_sequence": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "failure_sequence": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "failure": {
+                  "not": {
+                    "const": "NONE"
+                  }
+                },
+                "next_from_sequence": {
+                  "type": "null"
+                },
+                "whole_snapshot_chain_checked": {
+                  "const": false
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "has_more": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "whole_snapshot_chain_checked": {
+                  "const": false
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "next_from_sequence": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "from_sequence": {
+                  "type": "integer",
+                  "minimum": 2
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "whole_snapshot_chain_checked": {
+                  "const": false
+                }
+              }
+            }
+          }
+        ]
+      },
+      "AuditIntegrityResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AuditIntegrity"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
       },
       "Worklog": {
         "type": "object",

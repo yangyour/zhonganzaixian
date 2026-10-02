@@ -20,6 +20,8 @@ Dot 直接使用自己的云电脑、终端、编辑器、浏览器和可用工�
 
 ## Dot 首先处理的已知问题
 
+2026-10-02后续：第1项已完成代码修复及隔离回归，真实UI因当前云工作区缺私有配置仍未验证；原交接问题和当时证据保留如下。见[新回归记录](evidence/dot-import-refresh-20261002.json)。
+
 1. `apps/web/src/utils/assetImportWorkspace.ts` 的普通 `refresh` 在旧请求 COMPLETE 后只读当前来源，`acceptSource` 仍可能保留旧 `operation` 显示。另一客户端已发起新 PARSE 时，页面会同时显示新来源 PENDING 和旧操作 SUCCEEDED。来源通过完整身份/hash/版本校验后，若操作ID不匹配当前 `store_operation_id`/`parse_operation_id` 或产物绑定不符，清空旧显示操作；保留历史请求与收据，不自动 GET 新操作或 POST。补“完成后被新解析覆盖”的只读刷新测试，再实际UI核验。此前仅修复 ACCEPTED/UNCERTAIN 被取代后的冲突分支，不能视为此项已修。
 2. 完成移动视口重复表头手动映射/忽略列、最终回读和视觉检查。390px步骤条当前逐字换行，需要改善可读性；最终映射截图尚未归档。操作可见选框包装或标签，避免强制点击被覆盖的内部输入。仅报告真实执行结果。
 3. 补导入实际 Worker/API 重启、运行中存储断链恢复和完整流水线资源边界验证；仓储18项采用明确的隔离存储/解析适配器，仅证明真实PG事务与fencing，不能代替整个 MinIO/独立解析子进程链路的故障验证。

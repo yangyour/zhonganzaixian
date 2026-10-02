@@ -1,0 +1,58 @@
+{
+  "recorded_at": "2026-10-02T04:27:13.454534+00:00",
+  "base_commit": "f51fed151aa9e5bbb1fc0ab3b22cde02c140720b",
+  "branch": "handoff/cloud-20261001-photos",
+  "scope": "COMPLETE refresh presentation binding only",
+  "environment": {
+    "node": "22.22.1",
+    "npm": "10.9.4",
+    "execution": "Dot cloud workspace direct",
+    "external_components": "NOT_PROBED_PRIVATE_CONFIGURATION_ABSENT"
+  },
+  "regression_before": {
+    "total": 22,
+    "failed": 3,
+    "passed": 19
+  },
+  "regression_after": {
+    "total": 22,
+    "passed": 22,
+    "failed": 0
+  },
+  "web": {
+    "files": 14,
+    "tests": 181,
+    "passed": 181,
+    "typecheck": "PASS",
+    "build": "PASS"
+  },
+  "contract": {
+    "tests": 18,
+    "passed": 18,
+    "generator_consistency": "PASS",
+    "wire_schema_version": "0.8",
+    "change": "client readback metadata only"
+  },
+  "new_tests": 9,
+  "counting": "22 focused tests are included in 181 web tests",
+  "real_ui": "NOT_RUN",
+  "real_api": "NOT_RUN",
+  "pg_minio": "NOT_RUN",
+  "private_configuration": "BLOCKED",
+  "migration_bytes": "V1-V6 unchanged from base",
+  "migration_execution": 0,
+  "full_contract_acceptance": "NOT_RUN",
+  "business_state": {
+    "business_status": "CONFIG_PENDING",
+    "can_import": false,
+    "effective_rule_versions": null,
+    "quota_reservation": null,
+    "precheck_status": "NOT_RUN"
+  },
+  "files": {
+    "apps/web/src/utils/assetImportWorkspace.ts": "db1f0685afcd9b71a74aa7319e4c988b9422bfbba4c921e2788efe448bd3a28a",
+    "apps/web/tests/assetImportWorkspace.test.ts": "88f05fe8fab5cf6f61ebc257c9b8a3d447916933945d4e9cdefe03f634de4972",
+    "tools/build-api-contract.mjs": "c1196cc8b73c94ffc65422950fad47e40d2e528e6bcf562757fa3c9874534f9d",
+    "contracts/local-api.openapi.json": "67d6eb49d3e7048015ac208da14d79999e6ea1e17beeff313f6bf5f989332ca8"
+  }
+}

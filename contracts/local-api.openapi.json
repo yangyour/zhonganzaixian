@@ -10203,6 +10203,10 @@
           "READY只表示原始bytes存储成功；PARSED只表示技术解析成功；映射保存仍CONFIG_PENDING/can_import=false",
           "再次请求解析会清空当前artifact/mapping引用；历史artifact/mapping保留",
           "所有失败保持明确状态；不回退内存仓储或fixture"
+        ],
+        "x-mop-client-readback": [
+          "来源身份/原文件摘要/单调版本及资源政策校验全部通过后，清除不匹配当前store_operation_id/parse_operation_id或result_artifact_id绑定的旧显示操作",
+          "历史请求、幂等键、原参数与映射收据不因普通刷新而改写；不自动GET新操作或POST"
         ]
       },
       "AssetImportSourceResult": {

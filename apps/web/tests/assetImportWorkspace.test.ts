@@ -190,6 +190,74 @@ describe('durable import browser workspace', () => {
     session.value = { ...session.value!, permission_version: 2 }
     expect(workspace.mappingAttempt.value).toBeNull(); expect(workspace.source.value).toBeNull(); expect(workspace.file.value).toBeNull(); expect(workspace.operation.value).toBeNull(); expect(workspace.mappingDraft.value).toBeNull(); expect(writes).toBe(1)
   })
+  it.each(['pending parse', 'completed parse', 'different artifact'] as const)('clears the obsolete COMPLETE display on a read-only refresh: %s', async replacement => {
+    const nextParseId = '80000000-0000-0000-0000-000000000000'
+    const nextArtifactId = '90000000-0000-0000-0000-000000000000'
+    let parsed = false, current = makeSource()
+    const { workspace, transport } = await stored((url, options) => {
+      if (url.endsWith('/parses')) { parsed = true; current = parsedSource(); return acceptance(true) }
+      if (url.endsWith('/mappings')) { current = savedSource(); return json(current) }
+      if (options?.method === 'POST') return acceptance()
+      return json(url.includes('asset-import-operations') ? makeOperation(parsed) : current)
+    })
+    workspace.selection.value = { encoding: 'UTF-8', delimiter: ',', sheetIndex: null, headerRow: 1 }
+    await workspace.parse(); await workspace.saveMapping()
+    expect(workspace.parseAttempt.value?.state).toBe('COMPLETE')
+    expect(workspace.mappingAttempt.value?.state).toBe('COMPLETE')
+    expect(workspace.operation.value?.status).toBe('SUCCEEDED')
+    const history = JSON.stringify({ upload: workspace.uploadAttempt.value, parse: workspace.parseAttempt.value, mapping: workspace.mappingAttempt.value })
+    const originalFile = workspace.file.value
+    current = replacement === 'pending parse'
+      ? makeSource({ version: 6, parse_status: 'PENDING', parse_operation_id: nextParseId })
+      : makeSource({ version: 7, parse_status: 'PARSED', parse_operation_id: replacement === 'different artifact' ? parseId : nextParseId,
+        latest_artifact_id: nextArtifactId, parsed_artifact: makeArtifact({ id: nextArtifactId, operation_id: replacement === 'different artifact' ? parseId : nextParseId, parse_hash: 'c'.repeat(64) }) })
+    const start = transport.mock.calls.length
+    await workspace.refresh(); await workspace.refresh()
+    expect(workspace.error.value).toBeNull(); expect(workspace.source.value).toEqual(current)
+    expect(workspace.operation.value).toBeNull()
+    expect(JSON.stringify({ upload: workspace.uploadAttempt.value, parse: workspace.parseAttempt.value, mapping: workspace.mappingAttempt.value })).toBe(history)
+    expect(workspace.mappingAttempt.value?.receiptId).toBe(mappingId)
+    expect(workspace.file.value).toBe(originalFile)
+    expect(transport.mock.calls.slice(start).map(([url, options]) => [url, options?.method || 'GET'])).toEqual([
+      [`/api/v1/assets/import-sources/${sourceId}`, 'GET'], [`/api/v1/assets/import-sources/${sourceId}`, 'GET'],
+    ])
+    expect(workspace.source.value?.can_import).toBe(false)
+    expect(workspace.source.value?.effective_rule_versions).toBeNull(); expect(workspace.source.value?.quota_reservation).toBeNull()
+  })
+  it.each(['STORE_RAW', 'PARSE'] as const)('retains a still-bound completed %s display during ordinary refresh', async kind => {
+    let parsed = false
+    const { workspace, transport } = await stored((url, options) => {
+      if (url.endsWith('/parses')) { parsed = true; return acceptance(true) }
+      if (options?.method === 'POST') return acceptance()
+      return json(url.includes('asset-import-operations') ? makeOperation(parsed) : parsed ? parsedSource() : makeSource())
+    })
+    if (kind === 'PARSE') { workspace.selection.value = { encoding: 'UTF-8', delimiter: ',', sheetIndex: null, headerRow: 1 }; await workspace.parse() }
+    const displayed = workspace.operation.value, start = transport.mock.calls.length
+    await workspace.refresh()
+    expect(workspace.error.value).toBeNull(); expect(workspace.operation.value).toBe(displayed)
+    expect(transport.mock.calls.slice(start)).toHaveLength(1)
+    expect(String(transport.mock.calls[start]![0])).toBe(`/api/v1/assets/import-sources/${sourceId}`)
+  })
+  it.each(['owner', 'hash', 'version', 'policy'] as const)('does not clear the display or history before source validation succeeds: %s', async invalid => {
+    let parsed = false, current = makeSource()
+    const { workspace } = await stored((url, options) => {
+      if (url.endsWith('/parses')) { parsed = true; current = parsedSource(); return acceptance(true) }
+      if (options?.method === 'POST') return acceptance()
+      return json(url.includes('asset-import-operations') ? makeOperation(parsed) : current)
+    })
+    workspace.selection.value = { encoding: 'UTF-8', delimiter: ',', sheetIndex: null, headerRow: 1 }; await workspace.parse()
+    const displayed = workspace.operation.value, previous = workspace.source.value, history = JSON.stringify(workspace.parseAttempt.value)
+    const nextParseId = '80000000-0000-0000-0000-000000000000'
+    current = invalid === 'policy'
+      ? makeSource({ version: 6, parse_status: 'PARSED', parse_operation_id: nextParseId, latest_artifact_id: artifactId,
+        parsed_artifact: makeArtifact({ operation_id: nextParseId, resource_policy_version: 'unrecognized-policy' }) })
+      : makeSource({ version: invalid === 'version' ? 3 : 5, parse_status: 'PENDING', parse_operation_id: nextParseId,
+        ...(invalid === 'owner' ? { created_by: sourceId } : invalid === 'hash' ? { sha256: 'c'.repeat(64) } : {}) })
+    await workspace.refresh()
+    expect(workspace.error.value).toMatchObject({ code: 'INVALID_IMPORT_READBACK' })
+    expect(workspace.operation.value).toBe(displayed); expect(workspace.source.value).toBe(previous)
+    expect(JSON.stringify(workspace.parseAttempt.value)).toBe(history)
+  })
   it('clears and aborts in-flight requests on session change, rejecting any late response', async () => {
     let release: ((response: Response) => void) | undefined, requestSignal: AbortSignal | null | undefined
     const { workspace } = await workflow((_url, options) => { requestSignal = options?.signal; return new Promise<Response>(resolve => { release = resolve }) })

@@ -70,3 +70,9 @@
 当前云端未新建数据库、缓存、队列或监控替代指定组件。历史MinIO桶/IAM验证仍有参考价值，但新增业务与本轮访问权限须另外验证。Q28扫描/隔离、Q10留存清理及生产Q02/Q03/Q17等门禁继续保留，未知结果不记通过。
 
 工程[GitHub Actions验证配置](../ci-validation.md)固定官方actions完整SHA及项目工具链。SDK提交`eba5630`的历史回读见[安全摘要](../evidence/github-eba5630-verification.json)。照片提交`f56ad1b`的[独立run 36846410035](https://github.com/yangyour/zhonganzaixian/actions/runs/36846410035)已通过connector实际回读，契约/Web、纯Java和后端三个job及28步骤全部成功，见[照片摘要](../evidence/github-f56ad1b-verification.json)。CI不连接私有指定组件，不提供替代PG/缓存/队列/监控，不能计入组件联调。历史失败及当时读取阻塞仍保留。
+
+## 2026-10-02 Dot直接工作区访问检查
+
+本次从指定handoff分支SHA恢复源码并校验全部400文件，未接回此前云工作区的私有运行资料。`deploy/private/develop.txt`、`runtime.json`、`known_hosts`及导入命名空间私有配置均不存在；已检查MOP环境变量引用但未输出任何秘密。指定PG/Keycloak/MinIO/SSH本轮没有执行连接探测，状态为BLOCKED_PRIVATE_CONFIGURATION，不能沿用本地历史PASS宣布云端就绪。影响：真实API/UI、完整Worker故障/重启及指定组件集成验收未运行。后续需要受控提供既有私有配置和主机信任资料；不重新生成凭据、不创建替代服务、不放开公网组件端口。代码、隔离单元、契约、类型及前端构建可独立推进。
+
+终端Git/gh未登录，普通HTTPS Git读取失败；已连接GitHub工具可读取指定分支，并用于逐文件校验获取源码。没有在日志或仓库保存访问令牌。

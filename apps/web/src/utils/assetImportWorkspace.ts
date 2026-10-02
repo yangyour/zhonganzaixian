@@ -70,6 +70,12 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
   function acceptSource(result: AssetImportSource, id: string, readContext: ImportReadContext) {
     validateAssetImportSource(result, readContext, id, original(), source.value)
     if (result.parsed_artifact && policy.value && (result.parsed_artifact.resource_policy_version !== policy.value.resource_policy_version || result.parsed_artifact.schema_version !== policy.value.schema_version)) throw new ApiError(200, 'INVALID_IMPORT_READBACK', '解析结果与技术政策版本不一致', '—')
+    // A completed request is historical evidence, not necessarily the current operation.
+    // Reconcile only the display after validating the source; never fetch or run a new request here.
+    const displayed = operation.value
+    if (displayed && (displayed.source_id !== result.id || displayed.tenant_id !== result.tenant_id || displayed.created_by !== result.created_by
+      || displayed.id !== (displayed.kind === 'STORE_RAW' ? result.store_operation_id : result.parse_operation_id)
+      || displayed.kind === 'PARSE' && displayed.result_artifact_id !== null && (displayed.result_artifact_id !== result.parsed_artifact?.id || displayed.id !== result.parsed_artifact?.operation_id))) operation.value = null
     const changed = result.parsed_artifact?.parse_hash !== source.value?.parsed_artifact?.parse_hash
     source.value = result
     if (result.parsed_artifact?.state === 'PARSED' && (changed || !mappingDraft.value)) mappingDraft.value = result.mapping

@@ -1,0 +1,10 @@
+{
+  "filename": "asset-import-standard15.xlsx",
+  "media_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "size_bytes": 4573,
+  "sha256": "8bf810106054cacd60e41e47848d06d677cf62622fa3c5109c8040c66088932c",
+  "schema_version": "contract-m3-6-standard15-v1",
+  "business_status": "CONFIG_PENDING",
+  "data_rows": 0,
+  "columns": 15
+}

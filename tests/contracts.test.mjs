@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 const read = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'));
@@ -204,8 +205,8 @@ const importSource = {
   ...importFacts, effective_rule_versions: null, quota_reservation: null,
 };
 
-test('V0.9保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.9.0');
+test('V0.10保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
+  assert.equal(contract.info.version, '0.10.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -319,4 +320,20 @@ test('依赖回读只代表完整持久草稿，拒绝有效规则与已发布�
   for (const change of [x => { x.effective_rules = []; }, x => { x.monitoring_applied = true; }, x => { x.lifecycle_status = 'PUBLISHED'; }, x => { x.decision_status = 'approved'; }, x => { x.complete = false; }, x => { x.technical_limits.max_graph_edges = 0; }, x => { x.configuration_status = 'READY'; }]) {
     const invalid = structuredClone(draft); change(invalid); assert.equal(validates('AssetDependencyDraft', invalid), false);
   }
+});
+
+
+test('标准15列模板为授权的固定二进制GET，不产生导入写请求', () => {
+  const spec = read('../contracts/asset-import-template.json');
+  const bytes = readFileSync(new URL('../server/api/src/main/resources/templates/asset-import-standard15.xlsx', import.meta.url));
+  assert.equal(bytes.length, spec.size_bytes);
+  assert.equal(createHash('sha256').update(bytes).digest('hex'), spec.sha256);
+  assert.equal(spec.data_rows, 0); assert.equal(spec.columns, 15); assert.equal(spec.business_status, 'CONFIG_PENDING');
+  const route = contract.paths['/assets/import-template']; assert.deepEqual(Object.keys(route), ['get']);
+  assert.equal(route.get['x-mop-capability'], 'assets:write');
+  assert.deepEqual(route.get['x-mop-roles'], ['padmin', 'msp', 'tadmin']);
+  assert.equal(route.get.responses[200].content[spec.media_type].schema.format, 'binary');
+  assert.equal(route.get.responses[200].headers['X-MOP-Template-SHA256'].schema.const, spec.sha256);
+  assert.equal(route.get.responses[200].headers['X-MOP-Business-Status'].schema.const, 'CONFIG_PENDING');
+  assert.ok(route.get.responses[401].content['application/json']); assert.ok(route.get.responses[503].content['application/json']);
 });

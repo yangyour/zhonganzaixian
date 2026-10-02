@@ -184,3 +184,11 @@ bf1abfe的CI37001705608中，后端完整编译/测试/打包与契约/Web两个
 新增16项状态/回读隔离测试，前端总200项、类型/构建通过；契约20及生成一致性通过。首次类型检查2项错误（AssetPage未声明source、默认UUID函数过窄推断）已修复后复验，不省略失败记录。实际前端TS模块另经esbuild打包，在同一niko命名空间连真实HTTP：4次只读刷新/上下文校验通过；另9次HTTP以服务器首个200返回后主动丢弃响应模拟客户端丢响应，原键/body重试2次POST仅新增1图版本/1匹配审计。原候选对象修改也不替换待重试payload。首次只读运行停在会话验证，重新真实OIDC登录后通过。
 
 这些客户端模块验证不是浏览器DOM/控件/视觉验收，浏览器阻塞及OSS等依赖集中登记在[当前阻塞表](current-development-blockers.md)，只暂停相关步骤。V1–V7及后端本批未改，API仍V0.9；M3-9不标DONE。见[代码验证](evidence/dot-asset-dependency-ui-code-20261002.json)、[真实只读模块](evidence/niko-dependency-client-readback-20261002.json)、[实际原请求重试](evidence/niko-dependency-client-retry-20261002.json)。上一3d8826e的CI37014617573总run已回读success。
+
+## 2026-10-02 标准15列模板授权下载
+
+实际API升级V0.10：GET assets/import-template按当前assets:write权限返回固定4573 bytes空XLSX及SHA/schema/CONFIG_PENDING头；无数据行/宏/外部链接/业务默认字典，不依赖OSS、不自动上传或解析。API只读预生成资源并核验固定摘要，没有在持有凭据的API进程引入POI或解析外部文件。导入抽屉新增独立下载按钮，客户端完整核验后才交给浏览器；拒绝长短读/摘要变化/错误JSON/206及失效上下文，不替换原上传请求。
+
+新增后端5项（4授权/完整性、1实际包内模板+真实解析器空数据拒绝）及前端7项，根445=432执行通过（含84真实PG）+13fixture跳过、6MinIO排除，0失败错误；Web207、类型/构建、契约21与生成一致性通过。首轮真实HTTP发现全局过滤器与控制器重复设置no-store，原bytes/hash正确；删除控制器的冗余头后重建重启，11项完整真实HTTP通过，使用实际前端字节校验模块。没有将初次失败改写为成功。
+
+见[下载说明](asset-import-template.md)、[构建边界](evidence/dot-import-template-download-20261002.json)、[真实HTTP](evidence/niko-import-template-http-20261002.json)。浏览器保存/视觉、OSS及完整导入仍未验收；V1–V7和原私有6文件不变，M3-6非DONE。前一3e66b2d的CI37017197287总run已回读success。

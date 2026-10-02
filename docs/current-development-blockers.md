@@ -15,7 +15,7 @@
 - 已在niko新环境运行真实PG17.11/Keycloak26.2.4/API；原指定服务器结果与新环境分别留证
 - 配置审批、客户报障、依赖草稿的PG/HTTP及并发/幂等/正常重启切片已执行；详见实施/验收记录，不累计重叠用例
 - V7依赖草稿独立执行1、重复0、check0；V1–V7字节冻结，API/Worker启动不迁移
-- 依赖API为实际V0.9；页面代码继续完善，真实浏览器验收仍保留NOT_RUN
+- 实际API已到V0.10，依赖页面代码/真实客户端请求与标准15列模板下载继续推进并留证；真实浏览器验收仍保留NOT_RUN
 - 完整128项仍未DONE；每项未完成范围继续在合同追踪保留
 
 关联：[组件清单](environment/component-inventory.md)、[浏览器探测](evidence/niko-ui-blocker-20261002.json)、[OSS](oss-storage-adapter.md)、[当前实施](implementation-status.md)、[验证](verification.md)。本表不包含凭据、连接秘密或未经批准的绕行方案。

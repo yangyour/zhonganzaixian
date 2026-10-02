@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-02",
+  "environment": "niko-local-test",
+  "api_version": "0.10.0",
+  "scope": "authorized fixed empty XLSX template download",
+  "template": {
+    "filename": "asset-import-standard15.xlsx",
+    "media_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "size_bytes": 4573,
+    "sha256": "8bf810106054cacd60e41e47848d06d677cf62622fa3c5109c8040c66088932c",
+    "schema_version": "contract-m3-6-standard15-v1",
+    "business_status": "CONFIG_PENDING",
+    "data_rows": 0,
+    "columns": 15
+  },
+  "new_backend_tests": 5,
+  "new_frontend_tests": 7,
+  "maven_current_run": {
+    "total": 445,
+    "executed_passed": 432,
+    "real_pg_included": 84,
+    "skipped_fixture": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "frontend_tests_passed": 207,
+  "frontend_typecheck_build": "PASS",
+  "contract_tests": 21,
+  "contract_generation": "PASS",
+  "real_http": {
+    "checks": 11,
+    "actual_frontend_byte_verifier": true,
+    "passed": true
+  },
+  "initial_http_attempt": {
+    "status": "FAILED",
+    "reason": "Duplicate no-store header from global security filter and controller; bytes/hash were correct",
+    "fix": "Controller no longer appends the already supplied global no-store header; complete real HTTP rerun passed"
+  },
+  "runtime_parser_or_oss_calls": 0,
+  "browser_ui_tested": false,
+  "v1_v7_modified": false,
+  "original_private_config_changed": false,
+  "limitations": [
+    "No template filling, upload, preview or actual import",
+    "No Q20/Q31 approval",
+    "Browser save/visual acceptance remains blocked"
+  ]
+}

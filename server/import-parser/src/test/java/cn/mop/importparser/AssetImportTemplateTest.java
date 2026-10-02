@@ -79,4 +79,18 @@ class AssetImportTemplateTest {
         assertThrows(IllegalArgumentException.class, () -> AssetImportTemplate.main(new String[0]));
         assertThrows(IllegalArgumentException.class, () -> AssetImportTemplate.main(new String[] { directory.resolve("bad.csv").toString() }));
     }
+    @Test void bundledDownloadResourceHasExactContractLabelsAndStillRequiresData()throws Exception{
+        byte[] bytes;
+        try(var input=getClass().getResourceAsStream("/asset-import-standard15.xlsx")){assertNotNull(input);bytes=input.readAllBytes();}
+        assertEquals("8bf810106054cacd60e41e47848d06d677cf62622fa3c5109c8040c66088932c",java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes)));
+        try(var workbook=new XSSFWorkbook(new ByteArrayInputStream(bytes))){
+            assertEquals(1,workbook.getNumberOfSheets());assertFalse(workbook.isSheetHidden(0));assertFalse(workbook.isMacroEnabled());assertTrue(workbook.getExternalLinksTable().isEmpty());var sheet=workbook.getSheetAt(0);
+            assertEquals(1,sheet.getPhysicalNumberOfRows());assertEquals(15,sheet.getRow(0).getPhysicalNumberOfCells());assertTrue(sheet.getDataValidations().isEmpty());
+            for(int i=0;i<15;i++){assertEquals(AssetImportSchema.columns().get(i).label(),sheet.getRow(0).getCell(i).getStringCellValue());assertEquals("@",sheet.getColumnStyle(i).getDataFormatString());}
+            assertEquals("CONFIG_PENDING",workbook.getProperties().getCustomProperties().getProperty("mop.business_status").getLpwstr());
+        }
+        Path path=directory.resolve("bundled-download.xlsx");Files.write(path,bytes);var parser=new ImportFileParser();
+        assertEquals(ParsedArtifact.State.SELECTION_REQUIRED,parser.parse(path,new ParseSelection(ImportFormat.XLSX,null,null,null,null)).state());
+        assertEquals(ParseFailure.Code.EMPTY_DATA,assertThrows(ParseFailure.class,()->parser.parse(path,new ParseSelection(ImportFormat.XLSX,null,null,0,1))).code());
+    }
 }

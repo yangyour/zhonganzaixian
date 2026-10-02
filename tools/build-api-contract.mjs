@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
+const templateSpec = JSON.parse(readFileSync(new URL('../contracts/asset-import-template.json', import.meta.url), 'utf8'));
 const string = { type: 'string' };
 const nullableString = { type: ['string', 'null'] };
 const ref = (name) => ({ $ref: `#/components/schemas/${name}` });
@@ -190,7 +191,7 @@ const dependencyDraft = object({
 const dependencyAppend = object({ expected_version: { type: 'integer', minimum: 0, maximum: 9007199254740990, description: '当前完整租户图的CAS版本，不是资产版本；所有引用在同租户且每条新增边须连接路径资产。未知业务元数据明确null。' }, additions: { type: 'array', minItems: 1, maxItems: 100, uniqueItems: true, items: dependencyEdge } });
 const contract = {
   openapi: '3.1.0',
-  info: { title: 'MOP 共享测试环境 API', version: '0.9.0', description: '本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。' },
+  info: { title: 'MOP 共享测试环境 API', version: '0.10.0', description: '本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。' },
   servers: [{ url: '/api/v1' }],
   security: [{ SessionCookie: [] }],
   paths: {
@@ -209,6 +210,19 @@ const contract = {
       post: mutation('appendAssetDependencyDraft', '租户图CAS、完整图防环及幂等事务追加不可变草稿；不发布抑制规则。JSON<=128KiB/2048tokens/4层，拒绝重复键/尾随值', ref('AssetDependencyAppend'), ref('AssetDependencyDraftResult'), { parameters: [pathId, ...headers], 'x-mop-capability': 'assets:write', 'x-mop-roles': ['padmin', 'msp', 'tadmin'], 'x-mop-permission-version-recheck': true, 'x-mop-reject-unknown-query-keys': true }),
     },
     '/assets/{id}/onboarding': { post: blocked('requestOnboarding', '接入门禁：Q02/Q03/Q06待确认，拒绝执行', pathId) },
+    '/assets/import-template': { get: {
+      operationId: 'downloadAssetImportTemplate', summary: '下载完整性固定的合同15列空XLSX模板；无示例资产/业务默认值，不创建来源或自动解析，不依赖OSS',
+      'x-mop-capability': 'assets:write', 'x-mop-roles': ['padmin', 'msp', 'tadmin'], 'x-mop-reject-unknown-query-keys': true,
+      responses: { 200: { description: '原始模板bytes；必须核对长度、SHA256和CONFIG_PENDING。不是资产导入成功。',
+        headers: {
+          'Content-Disposition': { schema: { const: `attachment; filename="${templateSpec.filename}"` } },
+          'Content-Length': { schema: { type: 'integer', const: templateSpec.size_bytes } },
+          'X-MOP-Template-SHA256': { schema: { const: templateSpec.sha256 } },
+          'X-MOP-Template-Schema': { schema: { const: templateSpec.schema_version } },
+          'X-MOP-Business-Status': { schema: { const: templateSpec.business_status } },
+          'Cache-Control': { schema: { const: 'no-store' } },
+        }, content: { [templateSpec.media_type]: { schema: { type: 'string', format: 'binary', 'x-mop-size-bytes': templateSpec.size_bytes, 'x-mop-sha256': templateSpec.sha256 } } } }, ...errors },
+    } },
     '/assets/import-policy': { get: action('getAssetImportPolicy', '读取CSV/XLSX来源技术政策与合同15列；不批准最终导入规则', ref('AssetImportPolicyResult'), importAccess) },
     '/assets/import-sources': { post: { ...mutation('acceptAssetImportSource', '耐久受理原始CSV/XLSX来源；不是导入资产', ref('AssetImportSourceUpload'), ref('AssetImportAccepted'), { ...importAccess, parameters: headers }), requestBody: { required: true, content: { 'multipart/form-data': { schema: ref('AssetImportSourceUpload') } } }, responses: importAcceptanceResponses } },
     '/assets/import-sources/{id}': { get: action('getAssetImportSource', '当前租户创建者读取来源及一致快照的解析artifact/mapping；跨范围统一404', ref('AssetImportSourceResult'), { ...importAccess, parameters: [pathId] }) },

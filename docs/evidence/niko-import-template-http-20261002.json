@@ -1,0 +1,81 @@
+{
+  "verified_at": "2026-10-02T14:23:11.556Z",
+  "environment": "niko-local-test",
+  "api_version": "0.10.0",
+  "passed": true,
+  "http_checks": 11,
+  "checks": [
+    {
+      "name": "authorized_msp",
+      "status": 200,
+      "binary_verified": true
+    },
+    {
+      "name": "authorized_tadmin",
+      "status": 200,
+      "binary_verified": true
+    },
+    {
+      "name": "authorized_padmin",
+      "status": 200,
+      "binary_verified": true
+    },
+    {
+      "name": "authorized_msp",
+      "status": 200,
+      "binary_verified": true
+    },
+    {
+      "name": "viewer_a_forbidden",
+      "status": 403,
+      "error_contract_valid": true
+    },
+    {
+      "name": "viewer_b_forbidden",
+      "status": 403,
+      "error_contract_valid": true
+    },
+    {
+      "name": "anonymous_forbidden",
+      "status": 401,
+      "error_contract_valid": true
+    },
+    {
+      "name": "query_tenant_id_rejected",
+      "status": 400,
+      "error_contract_valid": true
+    },
+    {
+      "name": "query_filename_rejected",
+      "status": 400,
+      "error_contract_valid": true
+    },
+    {
+      "name": "query_format_rejected",
+      "status": 400,
+      "error_contract_valid": true
+    },
+    {
+      "name": "post_does_not_create_source",
+      "status": 405,
+      "error_contract_valid": true
+    }
+  ],
+  "template": {
+    "filename": "asset-import-standard15.xlsx",
+    "size_bytes": 4573,
+    "sha256": "8bf810106054cacd60e41e47848d06d677cf62622fa3c5109c8040c66088932c",
+    "schema_version": "contract-m3-6-standard15-v1",
+    "business_status": "CONFIG_PENDING",
+    "data_rows": 0
+  },
+  "actual_frontend_verifier": true,
+  "storage_operations": 0,
+  "browser_ui_tested": false,
+  "credentials_output": false,
+  "limitations": [
+    "No file upload, precheck or asset import performed",
+    "Downloaded empty template does not confirm Q20/Q31",
+    "OS/browser save dialog and visual acceptance NOT_RUN"
+  ]
+}

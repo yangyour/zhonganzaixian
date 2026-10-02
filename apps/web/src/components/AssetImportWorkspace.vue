@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AssetImportTemplateDownload from './AssetImportTemplateDownload.vue'
 import { computed, onUnmounted, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -41,6 +42,7 @@ onUnmounted(workspace.dispose)
 <template>
   <el-drawer v-model="open" title="导入资产来源" size="940px" class="asset-import-drawer" :close-on-click-modal="false">
     <el-alert type="info" :closable="false" title="保存原文件、选择解析参数、确认15列映射。实际资产写入仍待Q20/Q31确认。" />
+    <AssetImportTemplateDownload />
     <el-steps class="asset-import-steps" :active="stage" simple aria-label="资产来源处理阶段"><el-step title="原文件"/><el-step title="明确解析"/><el-step title="原始结果"/><el-step title="保存映射"/><el-step title="业务待确认"/></el-steps>
     <el-skeleton v-if="policyLoading" :rows="3" animated aria-label="读取来源技术政策" />
     <ApiErrorNotice :error="policyError"><el-button size="small" :disabled="policyLoading" @click="workspace.loadPolicy">重新读取技术政策</el-button></ApiErrorNotice>

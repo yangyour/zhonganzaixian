@@ -1,0 +1,34 @@
+{
+  "recorded_at": "2026-10-02T05:55:50.317562+00:00",
+  "base_commit": "bf0845262efebeaca99b99dee947b16ace1e1ae4",
+  "scope": "M10-7 explicit-parameter capacity arithmetic, estimates only",
+  "new_junit_tests": 10,
+  "maven_verify": "PASS",
+  "junit": {
+    "tests": 357,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 88,
+    "executed": 269
+  },
+  "contracts_tests": 18,
+  "generator_consistency": "PASS",
+  "api_version": "0.8",
+  "api_wire_change": false,
+  "private_configuration_modified": false,
+  "migrations_changed": false,
+  "real_components": "NOT_RUN_NETWORK_BLOCKED",
+  "real_capacity_benchmark": "NOT_RUN",
+  "full_contract_acceptance": "NOT_RUN",
+  "precision": "DECIMAL128; pool ceiling uses exact unrounded ratio",
+  "required_model_parameters": [
+    "version",
+    "bytes_per_trend_row",
+    "pool_nvps_limit"
+  ],
+  "preceding_commit_ci": {
+    "sha": "bf0845262efebeaca99b99dee947b16ace1e1ae4",
+    "run_id": 36970495081,
+    "conclusion": "success"
+  }
+}

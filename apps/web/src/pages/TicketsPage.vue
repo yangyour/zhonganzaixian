@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElTimeline, ElTimelineItem } from 'element-plus'
+import { ElMessage, ElTimeline, ElTimelineItem } from 'element-plus'
 import { api, isCancelled } from '../api/client'
 import type { RegisteredTicket, TicketPage } from '../api/types'
 import { can, contextGeneration, session } from '../stores/session'
@@ -10,6 +10,7 @@ import { impactScopeLabel, ticketCategories, urgencyLabel } from '../utils/ticke
 import AppTable from '../components/AppTable.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import TicketReportForm from '../components/TicketReportForm.vue'
+import WorklogWorkspace from '../components/WorklogWorkspace.vue'
 import ReportPhotoPanel from '../components/ReportPhotoPanel.vue'
 import RetainedPhotoNotice from '../components/RetainedPhotoNotice.vue'
 import { createPhotoQueue } from '../utils/photoQueue'
@@ -105,6 +106,13 @@ function discardRetainedPhotos() {
   const id = queryString('ticket_id')
   if (photoWorkspace.discard(id) && id) void loadDetail(id)
 }
+const worklogOpen = ref(false), worklogTarget = ref<RegisteredTicket | null>(null)
+const worklogWorkspace = ref<InstanceType<typeof WorklogWorkspace> | null>(null)
+function openWorklogs() {
+  if (!ticket.value || !can('worklogs:read_own')) return
+  if (worklogTarget.value?.id !== ticket.value.id && worklogWorkspace.value?.hasUnresolved()) { ElMessage.warning('上一条登记的工时结果未确认，请先恢复并重试原请求'); worklogOpen.value = true; return }
+  worklogTarget.value = ticket.value; worklogOpen.value = true
+}
 const createOpen = ref(false)
 const acceptedOperationId = ref('')
 const pendingRegistered = ref<{ id: string; context: number } | null>(null)
@@ -135,6 +143,7 @@ function resetContext() {
   listController?.abort(); detailController?.abort(); ++listGeneration; ++detailGeneration
   rows.value = []; nextCursor.value = null; hasMore.value = false; cursorHistory.value = []; loading.value = false; error.value = null
   ticket.value = null; detailError.value = null; detailLoading.value = false; pendingRegistered.value = null; createOpen.value = false; acceptedOperationId.value = ''
+  worklogOpen.value = false; worklogTarget.value = null
   photoWorkspace.reset()
   operationReader.reset()
 }
@@ -163,6 +172,8 @@ onUnmounted(() => { resetContext(); detailPhotos.dispose(); photoWorkspace.dispo
       <div class="table-footer"><span>{{ customerView ? '仅本人登记' : '当前租户只读' }} · 本页 {{ rows.length }} 条</span><div class="cursor-pagination ticket-pagination"><el-select :model-value="pageSize" aria-label="报障每页条数" @change="resizePage"><el-option v-for="size in pageSizes.filter(size => size <= pageSizeLimit)" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button v-if="queryString('cursor') && !cursorHistory.length" :disabled="loading" @click="firstPage">返回首页</el-button><el-button v-else :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
     </div>
     <TicketReportForm v-if="mayReport" v-model="createOpen" @accepted="recordAcceptance" @registered="showRegistered" />
+    <WorklogWorkspace ref="worklogWorkspace" v-model="worklogOpen" :ticket="worklogTarget" />
+    <el-button v-if="worklogTarget && can('worklogs:read_own')" class="retained-worklog-button" @click="worklogOpen = true">恢复“{{ worklogTarget.receipt_no }}”的本人工时面板</el-button>
     <el-drawer v-model="detailOpen" title="报障登记详情" size="650px" class="ticket-detail-drawer" destroy-on-close>
       <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />
       <ApiErrorNotice :error="detailError"><el-button size="small" @click="loadDetail()">重试详情查询</el-button></ApiErrorNotice>
@@ -187,6 +198,7 @@ onUnmounted(() => { resetContext(); detailPhotos.dispose(); photoWorkspace.dispo
         </div>
         <div class="detail-section"><h3>登记记录</h3><el-timeline class="ticket-history"><el-timeline-item v-for="(item, index) in ticket.history" :key="`${item.occurred_at}:${index}`" :timestamp="displayTime(item.occurred_at)" placement="top"><strong>{{ item.action === 'ADD_ATTACHMENTS' ? '报障照片已追加' : '报障已登记' }}</strong><p>{{ item.action === 'ADD_ATTACHMENTS' ? '仅追加附件引用；原报障正文与联系信息保留。' : '正式工单规则待确认，尚无处理阶段记录。' }}</p><p v-if="!customerView" class="mono">操作主体：{{ item.actor_id }} · v{{ item.version }}</p></el-timeline-item></el-timeline></div>
         <ReportPhotoPanel :queue="detailPhotos" :existing="ticket.attachments" :selectable="matchingPhotoTarget && detailAppender.permitted.value" :show-selections="matchingPhotoTarget" :disabled="detailLoading" :appender="matchingPhotoTarget ? detailAppender : undefined" />
+        <div v-if="can('worklogs:read_own')" class="detail-section"><h3>我的实填工时</h3><p class="muted">登记本人明确起止并保留修改历史；默认工时与成本仍待确认。</p><el-button type="primary" @click="openWorklogs">打开本人工时</el-button></div>
         <div class="detail-section"><h3>后续处理</h3><p class="muted">接单、处置与客户确认将在后续功能按实际规则落实。</p></div>
         <el-descriptions v-if="!customerView" :column="1" border class="asset-descriptions"><el-descriptions-item label="记录 ID"><span class="mono">{{ ticket.id }}</span></el-descriptions-item><el-descriptions-item label="租户 ID"><span class="mono">{{ ticket.tenant_id }}</span></el-descriptions-item><el-descriptions-item label="报障人 ID"><span class="mono">{{ ticket.reporter_id }}</span></el-descriptions-item><el-descriptions-item label="登记操作 ID"><span class="mono">{{ ticket.operation_id }}</span></el-descriptions-item><el-descriptions-item label="版本">v{{ ticket.version }}</el-descriptions-item><el-descriptions-item label="外部同步">不适用 · 未创建外部工单</el-descriptions-item></el-descriptions>
       </template>
@@ -196,7 +208,7 @@ onUnmounted(() => { resetContext(); detailPhotos.dispose(); photoWorkspace.dispo
 </template>
 
 <style>
-.ticket-detail-drawer{max-width:100vw}.ticket-receipt{margin:16px 0 0;color:#61718a}.ticket-description{white-space:pre-wrap;overflow-wrap:anywhere}.ticket-history{padding-left:4px;margin-top:20px}.ticket-history p{font-size:12px;margin:8px 0}.ticket-detail-drawer .detail-section p{font-size:12px}
+.retained-worklog-button{margin-top:12px;max-width:100%;height:auto;min-height:44px;white-space:normal;overflow-wrap:anywhere}.ticket-detail-drawer{max-width:100vw}.ticket-receipt{margin:16px 0 0;color:#61718a}.ticket-description{white-space:pre-wrap;overflow-wrap:anywhere}.ticket-history{padding-left:4px;margin-top:20px}.ticket-history p{font-size:12px;margin:8px 0}.ticket-detail-drawer .detail-section p{font-size:12px}
 @media(max-width:760px){.tickets-page .page-heading .el-button{min-height:44px}.tickets-page .ticket-detail-link{min-height:44px}.ticket-pagination .el-button{min-height:44px}.ticket-pagination .el-select__wrapper{min-height:44px}.ticket-filter-form .el-input__wrapper,.ticket-filter-form .el-select__wrapper,.ticket-filter-form .el-button{min-height:44px}.ticket-detail-drawer .el-drawer__footer .el-button{min-height:44px}}
 @media(max-width:760px){.ticket-registration-operation .el-button{min-height:44px}}
 </style>

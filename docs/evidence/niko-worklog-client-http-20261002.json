@@ -1,0 +1,26 @@
+{
+  "verified_at": "2026-10-02T16:19:22.093Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "http_requests": 28,
+  "frontend": "actual WorklogWorkspace state + ApiClient bundle",
+  "write_attempts": 5,
+  "worklog_versions": 3,
+  "original_create_and_update_key_body_reused": true,
+  "readonly_refresh_never_wrote": true,
+  "stale_editor_http_status": 409,
+  "history_versions": [
+    3,
+    2,
+    1
+  ],
+  "matching_mutation_audits": 3,
+  "fault_injection": "Intentionally discard two successful server200 responses in client transport; not physical network failure",
+  "browser_ui_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "DOM controls and390px visual acceptance",
+    "OSS and original server network",
+    "Full M5-21/M10-13 and customer financial decisions"
+  ]
+}

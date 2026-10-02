@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-02",
+  "scope": "engineer-own worklog page and request-state module",
+  "result": "PASS_WITH_BROWSER_NOT_RUN",
+  "new_web_tests": 18,
+  "all_web_tests": 225,
+  "typecheck_build": "PASS",
+  "contract_tests": 23,
+  "actual_client_http_requests": 28,
+  "backend_change": false,
+  "api_version": "0.11.0",
+  "ui_source": [
+    "apps/web/src/components/WorklogWorkspace.vue",
+    "apps/web/src/utils/worklogWorkspace.ts",
+    "apps/web/src/pages/TicketsPage.vue"
+  ],
+  "test_log_sha256": "cd6128a9c16d7dfaf5e48396cecf8725c360adf2356a9347a85c34bead7bfa5c",
+  "build_log_sha256": "8858a256fc352b769063c49cf5900554aacaf0fdde87eb62e1ba9685ea2d014d",
+  "browser_desktop": "NOT_RUN_B03",
+  "browser_390px": "NOT_RUN_B03",
+  "verified": [
+    "explicit interval validation and no defaults",
+    "strict own-scope DTO and null financial facts",
+    "keyset/contiguous immutable history",
+    "original create/update key/body/CAS retained through uncertainty",
+    "readonly refresh never posts",
+    "explicit selected id/version required for edit",
+    "late-context response ignored",
+    "accepted receipt retained after read failure"
+  ],
+  "limitations": [
+    "No browser DOM/visual proof",
+    "Controlled successful response loss is not physical network fault",
+    "Costs/defaults/Q23 remain pending",
+    "Full contract acceptance incomplete"
+  ]
+}

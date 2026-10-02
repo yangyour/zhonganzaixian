@@ -90,3 +90,7 @@
 ## 2026-10-02 niko独立环境新增授权与真实结果
 
 用户明确允许niko部署组件，新增范围不修改原服务器。新PG17.11/Keycloak26.2.4及API已运行，69真实PG、6真实OIDC身份及44配置审批HTTP通过；正常重启8表指纹一致。MinIO因netlink EPERM未启动，提升执行同样失败；存储改按用户选定OSS推进，尚未认证或写入。原远程网络阻塞保留，新环境与旧结果不混合。详见[独立说明](../niko-local-test.md)和[新证据](../evidence/niko-local-components-20261002.json)。
+
+## 2026-10-02 独立浏览器验收边界
+
+新环境PG/OIDC/API的客户报障HTTP可以继续；同执行空间Chromium启动前因Unix socket EPERM终止，支持的云浏览器访问127.0.0.1前端被ERR_BLOCKED_BY_CLIENT拒绝。未加载页面、无UI通过证据，不改变系统权限或创建代理/转接绕过。详见[独立记录](../evidence/niko-ui-blocker-20261002.json)。真实OSS仍待受控替换配置。

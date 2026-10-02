@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-02",
+  "environment": "niko-local-test",
+  "scope": "real browser page verification",
+  "status": "BLOCKED_BEFORE_PAGE_LOAD",
+  "attempts": [
+    {
+      "route": "Playwright with installed Chromium in component execution namespace",
+      "result": "process_singleton Unix socket EPERM; browser aborted before page load"
+    },
+    {
+      "route": "supported dot cloud browser to loopback frontend",
+      "result": "net::ERR_BLOCKED_BY_CLIENT"
+    }
+  ],
+  "browser_checks_passed": 0,
+  "permissions_changed": false,
+  "proxy_or_tunnel_created": false,
+  "limitations": [
+    "No screenshots or mobile mapping acceptance produced",
+    "Independent real PG/OIDC HTTP checks continue"
+  ]
+}

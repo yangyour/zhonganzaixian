@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
+import { resolve, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
@@ -9,13 +11,20 @@ import addFormats from 'ajv-formats';
 const root = new URL('../', import.meta.url);
 let stage = 'initialization';
 try {
+  const custom = Boolean(process.env.MOP_TEST_SESSION_DIRECTORY);
+  const historicalEvidence = fileURLToPath(new URL('docs/evidence/customer-report-http-verification.json', root));
+  const sessionDirectory = custom ? resolve(process.env.MOP_TEST_SESSION_DIRECTORY) : fileURLToPath(new URL('deploy/private/', root));
+  if (custom) {
+    assert.ok(process.env.MOP_EVIDENCE_OUTPUT && process.env.MOP_TEST_ENVIRONMENT_NAME && process.env.MOP_TEST_POSTGRES_VERSION && process.env.MOP_TEST_KEYCLOAK_VERSION);
+    assert.notEqual(resolve(process.env.MOP_EVIDENCE_OUTPUT), historicalEvidence, 'Independent environment must not overwrite historical evidence');
+  }
   const contract = JSON.parse(readFileSync(new URL('contracts/local-api.openapi.json', root), 'utf8'));
   const ajv = new Ajv({ strict: false, allErrors: true });
   addFormats(ajv);
   ajv.addSchema({ $id: 'urn:mop:customer-report-smoke', components: contract.components });
   const validators = new Map();
   const sessions = Object.fromEntries(['viewerA', 'tadmin', 'msp', 'viewerB'].map(role => [role,
-    JSON.parse(readFileSync(new URL(`deploy/private/qa-ticket-${role}.json`, root), 'utf8').replace(/^\uFEFF/, ''))]));
+    JSON.parse(readFileSync(join(sessionDirectory, `qa-ticket-${role}.json`), 'utf8').replace(/^\uFEFF/, ''))]));
   const run = randomUUID();
   const prefix = `MOP-FAKE-REPORT-${run.slice(0, 8)}`;
   const checks = [];
@@ -28,6 +37,7 @@ try {
     const response = await fetch(`http://127.0.0.1:8080/api/v1${path}`, {
       method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(12000), redirect: 'manual',
     });
+    stage = `${name}: actual=${response.status}, expected=${expected}`;
     assert.equal(response.status, expected);
     const payload = await response.json();
     const schema = contract.paths[route][method.toLowerCase()].responses[String(expected)]?.content?.['application/json']?.schema;
@@ -103,9 +113,9 @@ try {
   await request('viewerA', 'POST', '/tickets', '/tickets', 400, 'priority_spoof_rejected', { ...command, priority: 'P1' });
   await request('viewerA', 'POST', '/tickets', '/tickets', 400, 'actor_spoof_rejected', { ...command, actor_id: sessions.msp.user_id });
   await request('viewerA', 'POST', '/tickets', '/tickets', 400, 'tenant_spoof_rejected', { ...command, tenant_id: current.viewerB.tenant.id });
-  const photo = await request('viewerA', 'POST', '/tickets', '/tickets', 422, 'unavailable_photo_service_rejected', { ...command, attachment_ids: [randomUUID()] });
-  assert.equal(photo.error.code, 'CONFIG_PENDING');
-  assert.deepEqual(photo.error.details[0].question_ids, ['Q28']);
+  // V5 is frozen/applied: a nonexistent attachment remains hidden even when storage is disabled.
+  const photo = await request('viewerA', 'POST', '/tickets', '/tickets', 404, 'unknown_photo_reference_rejected', { ...command, attachment_ids: [randomUUID()] });
+  assert.equal(photo.error.code, 'OBJECT_NOT_FOUND');
   await request('viewerA', 'POST', '/tickets', '/tickets', 403, 'customer_manual_source_rejected', { ...command, source: 'manual' });
   await request('msp', 'POST', '/tickets', '/tickets', 422, 'internal_manual_workflow_pending', { ...command, source: 'manual' });
   await request('viewerA', 'POST', '/tickets', '/tickets', 400, 'invalid_phone_rejected', { ...command, contact_phone: 'abc' });
@@ -123,24 +133,33 @@ try {
   await request('viewerA', 'GET', '/tickets?category=UNKNOWN', '/tickets', 400, 'category_filter_whitelist');
   await request('viewerA', 'GET', '/tickets?q=a&q=b', '/tickets', 400, 'duplicate_query_rejected');
   await request('viewerA', 'GET', '/tickets?actor_id=spoof', '/tickets', 400, 'query_spoof_rejected');
-  const page = await request('msp', 'GET', '/tickets?page_size=10', '/tickets', 200, 'keyset_first_page');
+  // Seed only through the real API, under this run's unique prefix. Never depend on old tickets.
+  for (let index = 0; index < 7; index++) {
+    await request('viewerA', 'POST', '/tickets', '/tickets', 202, `scoped_pagination_registration_${index + 1}`, { ...unknown, title: `${prefix}-PAGE-${index + 1}` });
+  }
+  const pageQuery = `page_size=10&q=${encodeURIComponent(prefix)}`;
+  const page = await request('msp', 'GET', `/tickets?${pageQuery}`, '/tickets', 200, 'keyset_first_page');
   assert.equal(page.has_more, true);
   const cursor = encodeURIComponent(page.next_cursor);
-  const next = await request('msp', 'GET', `/tickets?page_size=10&cursor=${cursor}`, '/tickets', 200, 'keyset_second_page');
+  const next = await request('msp', 'GET', `/tickets?${pageQuery}&cursor=${cursor}`, '/tickets', 200, 'keyset_second_page');
   assert.ok(next.items.every(item => !page.items.some(first => first.id === item.id)));
-  await request('viewerA', 'GET', `/tickets?page_size=10&cursor=${cursor}`, '/tickets', 400, 'cursor_bound_to_actor');
-  await request('msp', 'GET', `/tickets?page_size=10&category=网络不通&cursor=${cursor}`, '/tickets', 400, 'cursor_bound_to_filter');
+  assert.equal(page.items.length, 10);
+  assert.equal(next.items.length, 1);
+  assert.equal(next.has_more, false);
+  assert.ok([...page.items, ...next.items].every(item => item.title.startsWith(prefix)));
+  await request('viewerA', 'GET', `/tickets?${pageQuery}&cursor=${cursor}`, '/tickets', 400, 'cursor_bound_to_actor');
+  await request('msp', 'GET', `/tickets?${pageQuery}&category=网络不通&cursor=${cursor}`, '/tickets', 400, 'cursor_bound_to_filter');
   const finalRead = await request('viewerA', 'GET', `/tickets/${ticketId}`, '/tickets/{id}', 200, 'rejected_requests_preserve_registration');
   assert.equal(finalRead.history.length, 1);
   const evidence = {
     verified_at: new Date().toISOString(), mode: 'remote_test', authority_direction: 'MOP',
-    environment: { postgres: '17.9', keycloak: '26.2.4', access: 'existing_shared_services_via_ssh_tunnel' },
+    environment: custom ? { name: process.env.MOP_TEST_ENVIRONMENT_NAME, postgres: process.env.MOP_TEST_POSTGRES_VERSION, keycloak: process.env.MOP_TEST_KEYCLOAK_VERSION, access: 'explicit_independent_loopback_test_environment' } : { postgres: '17.9', keycloak: '26.2.4', access: 'existing_shared_services_via_ssh_tunnel' },
     http_checks: checks.length, all_passed: true, checks, credential_output: 'none',
     remaining: ['formal_ticket_state', 'SLA_configuration', 'contact_binding', 'photo_upload', 'cross_reporter_semantic_merge', 'unknown_asset_semantic_merge'],
   };
-  writeFileSync(new URL('docs/evidence/customer-report-http-verification.json', root), JSON.stringify(evidence, null, 2) + '\n');
-  writeFileSync(new URL('.local/customer-report-smoke.json', root), JSON.stringify({ ticket_id: ticketId, operation_id: accepted.operation_id, asset_id: asset.id, fake_prefix: prefix }) + '\n');
-  console.log(JSON.stringify({ status: 'passed', http_checks: checks.length, contract_valid: true, environment: 'remote_test', credential_output: 'none' }));
+  writeFileSync(process.env.MOP_EVIDENCE_OUTPUT ? resolve(process.env.MOP_EVIDENCE_OUTPUT) : historicalEvidence, JSON.stringify(evidence, null, 2) + '\n');
+  writeFileSync(new URL(custom ? '.local/niko-test/customer-report-smoke.json' : '.local/customer-report-smoke.json', root), JSON.stringify({ ticket_id: ticketId, operation_id: accepted.operation_id, asset_id: asset.id, fake_prefix: prefix }) + '\n');
+  console.log(JSON.stringify({ status: 'passed', http_checks: checks.length, contract_valid: true, environment: process.env.MOP_TEST_ENVIRONMENT_NAME ?? 'remote_test', credential_output: 'none' }));
 } catch {
   console.error(JSON.stringify({ status: 'failed', stage, details: 'redacted; no private values or HTTP bodies printed' }));
   process.exitCode = 1;

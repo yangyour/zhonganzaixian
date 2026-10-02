@@ -1,0 +1,24 @@
+{
+  "verified_at": "2026-10-02T12:09:08.909Z",
+  "before_at": "2026-10-02T12:07:11.250Z",
+  "environment": "niko-local-test",
+  "checks": {
+    "ticket_and_operation_readback_identical": true,
+    "formal_ticket_state": null,
+    "priority": null,
+    "sla_deadlines": null,
+    "contact_binding": "UNVERIFIED",
+    "operation_status": "PENDING",
+    "operation_error": "CONFIG_PENDING"
+  },
+  "http_reads_before": 2,
+  "http_reads_after": 2,
+  "readback_sha256": "de2c66b243c7e9e488b3cfea58d9691c7a1dfd4d52f51f7756c9398cba713dd6",
+  "restart_control": "external_run_stack_graceful_restart",
+  "limitations": [
+    "Not crash recovery or Worker failure validation",
+    "No OSS operations or photo verification",
+    "No formal ticket workflow/SLA activation"
+  ],
+  "credentials_output": false
+}

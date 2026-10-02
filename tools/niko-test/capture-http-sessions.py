@@ -44,6 +44,7 @@ try:
   cookie=next(c for c in jar if c.name=='MOP_SESSION');assert cookie.has_nonstandard_attr('HttpOnly')
   value={'cookie':'MOP_SESSION='+cookie.value,'user_id':session['user']['id'],'csrf_token':session['csrf_token'],'mode':session['mode'],'environment':'niko-local-test'}
   names=['qa-'+user['role']+'.json']
+  if user['role'] in ['viewerA','tadmin','msp','viewerB']:names.append('qa-ticket-'+user['role']+'.json')
   alias={'padmin':'creator','reviewer':'reviewer','viewerA':'viewer'}.get(user['role'])
   if alias:names.append('qa-revision-'+alias+'.json')
   for name in names:

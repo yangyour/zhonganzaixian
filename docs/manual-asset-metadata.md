@@ -1,6 +1,6 @@
 # 手工资产草稿资料维护
 
-对应M3-D03/M3-5。本阶段仅完成输入事实与可编辑状态的纯核心，没有新持久化/API/页面，不标DONE。
+对应M3-D03/M3-5。当前已完成输入核心及独立V9结构/约束验证，仓储/API/页面待，不标DONE。
 
 ## 明确范围
 
@@ -14,4 +14,12 @@
 
 6项隔离测试覆盖既有类型、显式null/原文、Unicode/文本技术边界、严格日期、UUID语法、手工草稿与监控状态门禁。根515=502执行通过（含既有111真实PG）+13fixture跳过，6MinIO排除；111项是既有功能回归，不是新资料持久化证明。
 
-后续新增结构需独立新迁移，V1–V8不改；客户资料维护权限/Q09及CMDB/IP规则未确认分支继续明确保留。不会把草稿资料保存当作监控已生效。
+V9已经独立执行并冻结；后续新增结构需V10等独立新迁移，V1–V9不改；客户资料维护权限/Q09及CMDB/IP规则未确认分支继续明确保留。不会把草稿资料保存当作监控已生效。
+
+## 2026-10-02 V9手工资产资料不可变修订结构
+
+V9新增mop_asset_manual_revision/details，当前指针引用不可变修订；actor/owner/site/asset均有同租户复合FK，修订可链接更早资料版本。before_snapshot中的资产标识/旧版本/IP/手工草稿状态受约束，首次未知metadata须为null；后续仓储仍必须锁定真实资产并构建真实前后快照，schema约束不能替代实际成员授权或来源核验。
+
+可选资料/日期无默认值，SELF_REPORTED/monitoring_applied=false/cmdb_applied=false固定；运行身份只获资产name/type/site_id/version/updated_at/updated_by六列UPDATE，不能改IP、source、tenant或监控状态；历史资料没有UPDATE/DELETE权限。新schema只在niko显式check0→apply1→repeat0→check0，旧worklogs显式apply再次为0。V1–V8字节未改，V9应用后另存冻结hash；API/Worker不迁移，后续结构需新版本。
+
+10项迁移策略、8项新增真实PG结构/ACL回归、30项niko守卫通过；schema测试事务全部回滚，不冒充资料服务持久化。根524=511执行（含119真实PG）+13fixture跳过，6MinIO排除，0失败错误。仓储/API/页面未接线，M3-5非DONE；API仍V0.12。见[结构证据](evidence/niko-asset-metadata-schema-20261002.json)。上一c6f2f25的CI37043222178已回读success。

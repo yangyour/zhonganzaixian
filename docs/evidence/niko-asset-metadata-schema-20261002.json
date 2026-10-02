@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-02",
+  "environment": "niko-local-test",
+  "scope": "V9 manual asset metadata schema only",
+  "result": "PASS",
+  "migration": "V9__manual_asset_metadata_revisions.sql",
+  "sha256": "a311d8ea11516bb60f2375cafd02b293beb904d07c03c890653dd5bb3751412c",
+  "explicit_execution": {
+    "before_readonly": 0,
+    "apply": 1,
+    "repeat_apply": 0,
+    "after_readonly": 0,
+    "legacy_worklog_apply": 0
+  },
+  "migration_policy_tests": 10,
+  "new_real_pg_schema_tests": 8,
+  "niko_python_guards": 30,
+  "root_maven": {
+    "total": 524,
+    "executed_passed": 511,
+    "real_pg_included": 119,
+    "fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "log_sha256": "b35912a351101a1cff001355730b59de26beb6043777b8914126ff1c01b99ff1"
+  },
+  "schema_test_transactions": "ALL_ROLLED_BACK",
+  "mutable_asset_columns": [
+    "name",
+    "type",
+    "site_id",
+    "version",
+    "updated_at",
+    "updated_by"
+  ],
+  "ip_source_monitoring_update_granted": false,
+  "historical_update_delete_granted": false,
+  "v1_v8_changed": false,
+  "v9_frozen_after_execution": true,
+  "automatic_api_worker_migration": false,
+  "original_server_migrated": false,
+  "new_metadata_repository_api_ui_connected": false,
+  "remaining": [
+    "Authorized locked repository and actual before/after facts",
+    "API/UI",
+    "IP/CMDB policy and customer permission scope",
+    "Browser/full M3-5 acceptance"
+  ]
+}

@@ -76,3 +76,11 @@ OSS连接/IAM/不可覆盖/大文件/照片及导入整链、浏览器UI、真�
 只对已经获准的niko组件执行bash tools/niko-test/run-stack.sh --verify-owned-api-crash。该模式启动已有组件，不初始化数据库/用户或执行迁移；要求本次证据路径全新。若检查失败，保留日志和私有checkpoint，不删除或覆盖它们来假装第一次通过。后续新一轮应明确采用独立证据方案；默认无参数仍进入交互QA shell。不要在运行过程中改写实际启动脚本，修改后下次重新启动使用新代码。
 
 指纹查询只输出SHA-256和行数，原始行不进入工具日志/公共证据。它用于本次提交数据相等性，不是外部真实性/存储防篡改证明。真实重新OIDC登录会追加审计，因此指纹比较必须先于恢复登录。测试不证明浏览器会话体验，未触碰OSS或原服务器。
+
+## 2026-10-02 V9手工资产资料不可变修订结构
+
+V9新增mop_asset_manual_revision/details，当前指针引用不可变修订；actor/owner/site/asset均有同租户复合FK，修订可链接更早资料版本。before_snapshot中的资产标识/旧版本/IP/手工草稿状态受约束，首次未知metadata须为null；后续仓储仍必须锁定真实资产并构建真实前后快照，schema约束不能替代实际成员授权或来源核验。
+
+可选资料/日期无默认值，SELF_REPORTED/monitoring_applied=false/cmdb_applied=false固定；运行身份只获资产name/type/site_id/version/updated_at/updated_by六列UPDATE，不能改IP、source、tenant或监控状态；历史资料没有UPDATE/DELETE权限。新schema只在niko显式check0→apply1→repeat0→check0，旧worklogs显式apply再次为0。V1–V8字节未改，V9应用后另存冻结hash；API/Worker不迁移，后续结构需新版本。
+
+10项迁移策略、8项新增真实PG结构/ACL回归、30项niko守卫通过；schema测试事务全部回滚，不冒充资料服务持久化。根524=511执行（含119真实PG）+13fixture跳过，6MinIO排除，0失败错误。仓储/API/页面未接线，M3-5非DONE；API仍V0.12。见[结构证据](evidence/niko-asset-metadata-schema-20261002.json)。上一c6f2f25的CI37043222178已回读success。

@@ -409,3 +409,11 @@ API c7294a1的CI37037860376已回读success。当前是页面代码/状态与真
 新增ManualAssetMetadata：名称/既有6类类型/站点及明确备注，其他手工资料显式null；严格ISO日期和Unicode技术边界，保留原文。仅pristine manual DRAFT状态允许后续维护，任何监控采样、非UNKNOWN可用性或接入进展都阻断。管理IP不进入新输入，不执行CMDB覆盖/凭据/模板或监控变化；owner格式校验不是租户成员授权。
 
 6项隔离测试通过，根515=502执行（含既有111真实PG）+13fixture跳过，6MinIO排除，0失败错误。还没有此功能的结构/仓储/API/页面，既有PG回归不算新资料持久化证据；M3-5非DONE。V1–V8/API V0.12不改。见[边界](manual-asset-metadata.md)、[证据](evidence/dot-manual-asset-metadata-20261002.json)。上一API故障验证677d16a的CI37042152562已回读success。
+
+## 2026-10-02 V9手工资产资料不可变修订结构
+
+V9新增mop_asset_manual_revision/details，当前指针引用不可变修订；actor/owner/site/asset均有同租户复合FK，修订可链接更早资料版本。before_snapshot中的资产标识/旧版本/IP/手工草稿状态受约束，首次未知metadata须为null；后续仓储仍必须锁定真实资产并构建真实前后快照，schema约束不能替代实际成员授权或来源核验。
+
+可选资料/日期无默认值，SELF_REPORTED/monitoring_applied=false/cmdb_applied=false固定；运行身份只获资产name/type/site_id/version/updated_at/updated_by六列UPDATE，不能改IP、source、tenant或监控状态；历史资料没有UPDATE/DELETE权限。新schema只在niko显式check0→apply1→repeat0→check0，旧worklogs显式apply再次为0。V1–V8字节未改，V9应用后另存冻结hash；API/Worker不迁移，后续结构需新版本。
+
+10项迁移策略、8项新增真实PG结构/ACL回归、30项niko守卫通过；schema测试事务全部回滚，不冒充资料服务持久化。根524=511执行（含119真实PG）+13fixture跳过，6MinIO排除，0失败错误。仓储/API/页面未接线，M3-5非DONE；API仍V0.12。见[结构证据](evidence/niko-asset-metadata-schema-20261002.json)。上一c6f2f25的CI37043222178已回读success。

@@ -28,4 +28,7 @@ class NikoPrivateBootstrapTest(unittest.TestCase):
  def test_independently_applied_v8_hash_is_frozen_separately(self):
   manifest=json.loads((ROOT/'tools/niko-test/frozen-worklog-migration.json').read_text())['sha256'];self.assertEqual(1,len(manifest))
   for name,expected in manifest.items():self.assertEqual(expected,hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest())
+ def test_independently_applied_v9_hash_is_frozen_separately(self):
+  manifest=json.loads((ROOT/'tools/niko-test/frozen-asset-metadata-migration.json').read_text())['sha256'];self.assertEqual(1,len(manifest))
+  for name,expected in manifest.items():self.assertEqual(expected,hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest())
 if __name__=='__main__':unittest.main()

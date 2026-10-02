@@ -1,0 +1,28 @@
+{
+  "verified_at": "2026-10-02T22:15:33.063853+00:00",
+  "environment": "niko-local-test",
+  "status": "PURE_COMMENT_RULES_ONLY",
+  "new_core_tests": 8,
+  "root_tests": {
+    "reported": 634,
+    "executed": 621,
+    "existing_feature_real_postgresql": 165,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "comment_pg_verified": false,
+  "schema_added": false,
+  "public_api_added": false,
+  "frontend_added": false,
+  "private_internal_notes_exposed": false,
+  "public_entry_contains_actor_identity": false,
+  "customer_scope": "reporter only, no tenant-wide customer sharing",
+  "provider_or_itsm_called": false,
+  "workflow_state_changed": false,
+  "api_version_unchanged": "0.16.1",
+  "frozen_migrations": "V1-V10 unchanged",
+  "full_contract_done": false,
+  "credentials_output": false
+}

@@ -67,6 +67,8 @@ public final class TicketCustomerActionRules {
             throw new DomainException(400, "VALIDATION_ERROR", "说明不能为空");
         for (int index = 0; index < value.length(); index++) {
             char current = value.charAt(index);
+            if(Character.isISOControl(current)&&current!='\n'&&current!='\r'&&current!='\t')
+                throw new DomainException(400, "VALIDATION_ERROR", "说明包含非文本控制字符");
             if (Character.isHighSurrogate(current)) {
                 if (++index >= value.length() || !Character.isLowSurrogate(value.charAt(index)))
                     throw new DomainException(400, "VALIDATION_ERROR", "说明包含无效Unicode字符");
@@ -76,7 +78,7 @@ public final class TicketCustomerActionRules {
         }
     }
 
-    private static boolean isWhitespace(int point) { return Character.isWhitespace(point) || Character.isSpaceChar(point); }
+    private static boolean isWhitespace(int point) { return Character.isWhitespace(point) || Character.isSpaceChar(point) || point == 0xfeff; }
     private static String stripBoundaryWhitespace(String value) {
         int start = 0, end = value.length();
         while (start < end && isWhitespace(value.codePointAt(start))) start += Character.charCount(value.codePointAt(start));

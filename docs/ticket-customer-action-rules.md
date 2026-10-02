@@ -1,6 +1,6 @@
 # D07 客户动作的合同固定校验核心
 
-`TicketCustomerActionRules` 是独立纯Java校验器，覆盖 M5-15/M5-17 的确定约束。当前未接入HTTP或PG工单事务，不新增接口、工单状态或客户批准记录，实际 API 契约仍为 V0.8。不能据此宣称客户确认、重开、SLA或完整工单闭环完成。
+`TicketCustomerActionRules` 是独立纯Java校验器，覆盖 M5-15/M5-17 的确定约束。当前未接入HTTP或PG工单事务，不新增接口、工单状态或客户批准记录，首次切片时实际API为V0.8；当前V0.14的其他功能不代表本校验器已接线。不能据此宣称客户确认、重开、SLA或完整工单闭环完成。
 
 ## 已实现的输入边界
 
@@ -22,3 +22,10 @@
 11项JUnit是合成输入的隔离校验，包括客户/内部角色、对象404、撤权、关系未知、集合不可变、19/20码点、补充平面字符、Unicode空白及72小时纳秒边界。它们不读取私有配置、不启动替代组件，也不证明真实客户资格、PG并发或UI验收。
 
 运行：`mvn -B -ntp -C -pl server/api -am -Dtest=TicketCustomerActionRulesTest -Dsurefire.failIfNoSpecifiedTests=false test`。完整Maven、契约检查及真实环境未执行项分别记录于[验证记录](verification.md)。
+
+
+## 2026-10-02 说明文字边界修复
+
+发现纯核心会把BOM-only当作非空原因，20字符检查亦可能把边界BOM算入；NUL/ESC等非文本控制字符此前未拒绝。先新增3项回归，14项中2项真实失败，再修正：BOM按边界空白处理；拒绝ISO控制字符，保留LF/CR/TAB多行输入。仍按既有Unicode码点计算、仅去掉边界空白用于长度判断，校验不改原文；未新增业务默认值或状态。
+
+14项核心最终通过；根565=552执行（含136既有真实PG回归）+13fixture跳过，6MinIO排除，0失败错误。136PG为已有功能回归，本修复没有工单关闭/重开HTTP或数据库状态证明。API V0.14不变，V1–V9及私有配置不改；完整D07/Q07/Q09/Q27门禁保留。见[回归证据](evidence/niko-ticket-text-guards-20261002.json)。

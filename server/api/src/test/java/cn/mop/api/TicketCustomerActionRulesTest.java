@@ -89,4 +89,15 @@ class TicketCustomerActionRulesTest {
         assertEquals(422, assertThrows(DomainException.class, () -> TicketCustomerActionRules.requireReopenWindow(null, Instant.EPOCH)).status);
         assertEquals(422, assertThrows(DomainException.class, () -> TicketCustomerActionRules.requireReopenWindow(Instant.EPOCH, null)).status);
     }
+    @Test void bomOnlyReasonsAndBoundaryPaddingCannotSatisfyRequiredExplanation(){
+        for(String reason:new String[]{"\ufeff"," \ufeff\u00a0"}){assertThrows(DomainException.class,()->TicketCustomerActionRules.requireUnresolvedReason(reason));assertThrows(DomainException.class,()->TicketCustomerActionRules.requireReopenReason(reason));}
+        assertThrows(DomainException.class,()->TicketCustomerActionRules.requireSolution("\ufeff"+"修".repeat(19)+"\ufeff"));assertDoesNotThrow(()->TicketCustomerActionRules.requireSolution("\ufeff"+"修".repeat(20)+"\ufeff"));
+    }
+    @Test void nonTextControlsAreRejectedInsteadOfCountingTowardSolutionLength(){
+        for(char control:new char[]{0,7,11,12,27,127,133}){String value="修".repeat(20)+control;assertThrows(DomainException.class,()->TicketCustomerActionRules.requireSolution(value));assertThrows(DomainException.class,()->TicketCustomerActionRules.requireUnresolvedReason(value));assertThrows(DomainException.class,()->TicketCustomerActionRules.requireReopenReason(value));}
+    }
+    @Test void multilineHumanTextIsAcceptedWithoutRewritingTheOriginal(){
+        String value="\ufeff  "+"修".repeat(10)+"\n"+"复".repeat(10)+"\t说明\r\n";String original=value;assertDoesNotThrow(()->TicketCustomerActionRules.requireSolution(value));assertDoesNotThrow(()->TicketCustomerActionRules.requireUnresolvedReason(value));assertDoesNotThrow(()->TicketCustomerActionRules.requireReopenReason(value));assertEquals(original,value);
+    }
+
 }

@@ -1,0 +1,34 @@
+{
+  "verified_at": "2026-10-02T19:43:10.376135+00:00",
+  "environment": "niko-local-test",
+  "scope": "PURE_TICKET_CUSTOMER_ACTION_TEXT_GUARDS",
+  "red_phase": {
+    "tests": 14,
+    "failures": 2,
+    "errors": 0,
+    "cause": [
+      "BOM-only and boundary BOM not treated as whitespace",
+      "Non-text controls previously accepted"
+    ]
+  },
+  "green_phase": {
+    "guard_tests": 14,
+    "root_reported": 565,
+    "root_executed": 552,
+    "existing_real_pg_regressions": 136,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "preserved": [
+    "raw human text",
+    "LF CR TAB multiline input",
+    "20 Unicode code point boundary rule",
+    "72 hour and relationship guards"
+  ],
+  "api_version": "0.14.0 unchanged",
+  "new_http_or_workflow_state_evidence": false,
+  "frozen_migrations_changed": false,
+  "credentials_output": false
+}

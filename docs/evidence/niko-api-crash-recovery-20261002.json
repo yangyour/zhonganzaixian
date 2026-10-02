@@ -1,0 +1,78 @@
+{
+  "verified_at": "2026-10-02T17:27:13.565Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "fault": "SIGKILL of verified owned API child only; wait exit137, confirmed connection refusal, restart same built API",
+  "api_exit_code": 137,
+  "owned_process_identity_guard": true,
+  "postgres_restarted": false,
+  "keycloak_restarted": false,
+  "api_auto_migration": false,
+  "http_before": 7,
+  "http_after": 8,
+  "new_real_oidc_sessions_after_restart": true,
+  "database_fingerprints_equal": true,
+  "tables": {
+    "mop_asset": {
+      "rows": 522,
+      "equality_sha256": "c3b4856bd92586217d4747e9e520c6a6183cc8d99d59586ad973d467180f9d4a"
+    },
+    "mop_ticket": {
+      "rows": 771,
+      "equality_sha256": "ede9c2e63d82b46706f5a401708488aed3d48ea81d032e65c4cf5e9dca923c55"
+    },
+    "mop_worklog": {
+      "rows": 183,
+      "equality_sha256": "a5655a030176d9ccaaa06ae931a17614c16a9705ab7defea76151935dde9055d"
+    },
+    "mop_worklog_revision": {
+      "rows": 261,
+      "equality_sha256": "951ce75a4c27f0ddea83f7cf5016be9f2cf3d0a977c40e574917bc303d1e3075"
+    },
+    "mop_asset_dependency_graph": {
+      "rows": 1,
+      "equality_sha256": "be62365def68563d552b730cc34d5abdea4144c7239a291a2cc02c27601c94b9"
+    },
+    "mop_asset_dependency_revision": {
+      "rows": 133,
+      "equality_sha256": "c434253ffed9509fd1287f8161c318e36b376cf697e33c3ac04fe4be6682d4cd"
+    },
+    "mop_asset_dependency_edge": {
+      "rows": 10097,
+      "equality_sha256": "689d7ff49b9ff4361b695d8af073d6951eccc2b131b2126182868c10e3da5a86"
+    },
+    "mop_configuration_revision": {
+      "rows": 452,
+      "equality_sha256": "38ababdeb523a9715634211b374155cf548249571384f44cfb0dfea106e3e032"
+    },
+    "mop_configuration_revision_history": {
+      "rows": 500,
+      "equality_sha256": "8e6dfde8f3b4a5793474c7e79d9702095b2d338238f4cb828ee1b2e5c8917142"
+    },
+    "mop_idempotency": {
+      "rows": 4177,
+      "equality_sha256": "25f7689bea69609ce2d32cd841753e9228599f2cec744348c1132a0c9f00f6a0"
+    },
+    "mop_audit": {
+      "rows": 6268,
+      "equality_sha256": "674f33810f175c96e9ccfa8b3cca5ed10b80aaae0fd69dcd24451e7172954e6b"
+    }
+  },
+  "worklog_version_after": 2,
+  "history_versions_after": [
+    2,
+    1
+  ],
+  "original_create_replay_version": 1,
+  "original_update_replay_version": 2,
+  "matching_worklog_audit_records": 2,
+  "readback_sha256": "4bf31db028f515762d8d03512a118dcfa46aeb975760c10f203073e03a91d9bb",
+  "credentials_output": false,
+  "limitations": [
+    "Writes were confirmed committed before abrupt termination; not kill during an in-flight transaction",
+    "Not PostgreSQL/WAL crash recovery",
+    "No Worker or OSS fault/restart verification",
+    "No browser DOM/session UX acceptance",
+    "No original server lifecycle changes"
+  ]
+}

@@ -58,3 +58,21 @@ OSS连接/IAM/不可覆盖/大文件/照片及导入整链、浏览器UI、真�
 ## V8实填工时迁移（独立执行）
 
 2026-10-02在niko新库执行`--apply-worklogs`首次1、重复0、默认check0；只在已验证V1–V7后允许。V8校验和另外保存在frozen-worklog-migration.json；源文件与编译资源一致后才允许CLI读取私有连接配置。原服务器没有执行V8；API/Worker不自动迁移，后续结构变更新增版本，V1–V8不可重写。当前是schema切片，未宣称工时API或页面完成。
+
+## 2026-10-02 拥有的API突然中断与恢复
+
+新增显式run-stack --verify-owned-api-crash模式，只针对本次启动且父PID/UID对应、JVM完整命令/项目jar及回环8080 LISTEN socket归属都核验的API进程。业务写先收到提交回执，再SIGKILL并等待exit137、确认连接拒绝；PG/Keycloak在该故障步骤不重启。随后重启同一API，重新验证监听归属和健康，再恢复OIDC会话；不扫描并批量停止其他项目进程。
+
+最终故障测试通过：先7次HTTP提交合成报障及本人v1/v2工时；同一只读REPEATABLE READ快照对11张既有业务表计算排序行SHA-256/行数，API突然中断重启后、再次登录前逐表完全一致。恢复后8次HTTP读取父记录/工时/历史，原创建键仍重放原v1、修改键重放原v2，当前记录保持v2、历史[2,1]且对应审计仍2条。属于“已确认提交后API中断恢复”，不是在途事务杀进程、PG/WAL崩溃恢复或Worker/OSS故障。
+
+首轮未通过：启动脚本运行期间发生修改，旧脚本退出出现MODE未绑定，先前已启动的本项目API残留；新子进程被kill后旧监听仍可达，所以未产生恢复成功证据。核验旧进程固定PID/start-ticks/UID/完整JVM命令和项目路径后仅正常停止该实例；归档首轮私有checkpoint不覆盖，补充runner函数一次解析与监听归属校验后另轮完整通过。首轮失败单独保留。[首轮证据](evidence/niko-api-crash-first-attempt-20261002.json)、[最终证据](evidence/niko-api-crash-recovery-20261002.json)。
+
+新增9项无真实进程的守卫单测，合计29项niko私有配置/OSS配置/故障守卫通过；shell/Python/Node语法检查通过。结束后默认交互启动模式再次核验当前API监听并重新捕获既有OIDC会话。没有新账号、凭据、权限、迁移、端口/防火墙或原服务器操作。API V0.12和V1–V8不改。
+
+上一审计UIebee0ab的CI37039467414初次backend在maven-resources-plugin的slf4j-api描述符解析阶段失败，未进入业务测试；Web与pure Java通过。仅重跑失败job，attempt2整体success，不改锁定依赖/校验或跳过测试以求通过。此处不推断具体网络错误码。
+
+### 故障验证入口与复现限制
+
+只对已经获准的niko组件执行bash tools/niko-test/run-stack.sh --verify-owned-api-crash。该模式启动已有组件，不初始化数据库/用户或执行迁移；要求本次证据路径全新。若检查失败，保留日志和私有checkpoint，不删除或覆盖它们来假装第一次通过。后续新一轮应明确采用独立证据方案；默认无参数仍进入交互QA shell。不要在运行过程中改写实际启动脚本，修改后下次重新启动使用新代码。
+
+指纹查询只输出SHA-256和行数，原始行不进入工具日志/公共证据。它用于本次提交数据相等性，不是外部真实性/存储防篡改证明。真实重新OIDC登录会追加审计，因此指纹比较必须先于恢复登录。测试不证明浏览器会话体验，未触碰OSS或原服务器。

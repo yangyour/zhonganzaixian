@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-02",
+  "environment": "niko-local-test",
+  "status": "FAILED_NOT_ACCEPTED",
+  "scope": "first owned API crash verification attempt",
+  "observed": [
+    "new child identity and SIGKILL exit137 confirmed",
+    "API listener remained reachable; unavailability assertion failed",
+    "an earlier owned project API launched16:52 remained orphaned after editing a running shell script",
+    "exact prior PID/start-ticks/UID/JVM command and project path verified before graceful stopping"
+  ],
+  "fix": [
+    "runner body parsed once as a function",
+    "readiness requires current owned process to own loopback8080 LISTEN socket",
+    "pre-kill guard checks same listener ownership",
+    "failed private checkpoints archived, not overwritten"
+  ],
+  "log_sha256": "ac47a7f87fb8b46d878862ac8b2f4637012e9f00a681162fd92fd6005468aabe",
+  "credentials_output": false,
+  "counts_as_crash_recovery_pass": false
+}

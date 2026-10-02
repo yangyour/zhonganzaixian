@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-02",
+  "scope": "owned API fault runner guards",
+  "isolated_guard_tests": 9,
+  "all_niko_guard_tests": 29,
+  "shell_python_node_syntax": "PASS",
+  "guard_test_log_sha256": "7ba61e3ec27fc667fd7453db433f36d0b6ead3110eef8d39d91f99659fabc453",
+  "final_fault_log_sha256": "a19ae9011baa53a01afcae69e0a05c38b289459c2d058ccc98019e69fae67f32",
+  "ci_previous_run": {
+    "id": 37039467414,
+    "first_attempt": "backend dependency descriptor resolution failure; other2jobs passed",
+    "retry": "failed job only",
+    "attempt2": "success"
+  },
+  "secrets_output": false,
+  "new_credentials": false,
+  "new_components": false,
+  "original_server_changed": false,
+  "normal_mode_restarted_and_oidc_identities_verified": 6,
+  "current_owned_api_uid_parent_command_and_listener_verified": true
+}

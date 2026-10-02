@@ -274,3 +274,15 @@ AuditPage切换到实际有界API，新增操作者/动作/结果/对象/trace�
 14项新增状态/DTO/输入回归通过，全Web239、契约24、类型/构建通过。首轮模板dialog回调参数隐式any导致类型检查失败，改为具名boolean处理函数后通过。实际auditWorkspace+ApiClient模块连接真实PG/OIDC执行8次GET：20条两页稳定回读、trace筛选、单条校验、先1000再明确下一1000且不累计、最后序号上界不变；没有业务写请求或读取追加审计。另上一API的61项HTTP包括58项契约响应检查和3项不支持写方法405检查，不将不存在的写端点称为schema通过。
 
 API c7294a1的CI37037860376已回读success。当前是页面代码/状态与真实客户端HTTP证据，浏览器DOM/390px仍NOT_RUN_B03，M2-12/M7-5整体非DONE。V1–V8、API V0.12、角色和私有配置不改。见[前端回归](evidence/dot-audit-ui-20261002.json)、[实际客户端HTTP](evidence/niko-audit-client-http-20261002.json)。
+
+## 2026-10-02 拥有的API突然中断与恢复
+
+新增显式run-stack --verify-owned-api-crash模式，只针对本次启动且父PID/UID对应、JVM完整命令/项目jar及回环8080 LISTEN socket归属都核验的API进程。业务写先收到提交回执，再SIGKILL并等待exit137、确认连接拒绝；PG/Keycloak在该故障步骤不重启。随后重启同一API，重新验证监听归属和健康，再恢复OIDC会话；不扫描并批量停止其他项目进程。
+
+最终故障测试通过：先7次HTTP提交合成报障及本人v1/v2工时；同一只读REPEATABLE READ快照对11张既有业务表计算排序行SHA-256/行数，API突然中断重启后、再次登录前逐表完全一致。恢复后8次HTTP读取父记录/工时/历史，原创建键仍重放原v1、修改键重放原v2，当前记录保持v2、历史[2,1]且对应审计仍2条。属于“已确认提交后API中断恢复”，不是在途事务杀进程、PG/WAL崩溃恢复或Worker/OSS故障。
+
+首轮未通过：启动脚本运行期间发生修改，旧脚本退出出现MODE未绑定，先前已启动的本项目API残留；新子进程被kill后旧监听仍可达，所以未产生恢复成功证据。核验旧进程固定PID/start-ticks/UID/完整JVM命令和项目路径后仅正常停止该实例；归档首轮私有checkpoint不覆盖，补充runner函数一次解析与监听归属校验后另轮完整通过。首轮失败单独保留。[首轮证据](evidence/niko-api-crash-first-attempt-20261002.json)、[最终证据](evidence/niko-api-crash-recovery-20261002.json)。
+
+新增9项无真实进程的守卫单测，合计29项niko私有配置/OSS配置/故障守卫通过；shell/Python/Node语法检查通过。结束后默认交互启动模式再次核验当前API监听并重新捕获既有OIDC会话。没有新账号、凭据、权限、迁移、端口/防火墙或原服务器操作。API V0.12和V1–V8不改。
+
+上一审计UIebee0ab的CI37039467414初次backend在maven-resources-plugin的slf4j-api描述符解析阶段失败，未进入业务测试；Web与pure Java通过。仅重跑失败job，attempt2整体success，不改锁定依赖/校验或跳过测试以求通过。此处不推断具体网络错误码。

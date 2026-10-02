@@ -482,3 +482,8 @@ API V0.13.1新增同租户站点/活跃负责人查询；内部授权和资产40
 ### 2026-10-02 D07内部备注API V0.15
 
 当前租户内部备注列表/追加/单条回读接线，msp/padmin专用能力，客户403、跨租户/错父404，严格body/CSRF/幂等/父版本；immutable/INTERNAL/SELF_REPORTED，父版本与SLA不变，无PATCH/DELETE。新增8控制器+1就绪，根598=585执行含154PG+13skip/6MinIO排除；83真实HTTP响应契约、28契约/271Web/构建通过，14备注14审计且客户DTO无泄露。页面继续；完整评论/附件/通知/工单闭环未DONE。见[内部备注](internal-ticket-notes.md)、[API证据](evidence/niko-internal-note-api-http-20261002.json)。
+
+
+### 2026-10-02 内部备注页面与实际客户端
+
+工单详情外保留内部备注目标/恢复入口、明确父版本、不可变追加、原请求不确定重试及独立回执接线。18新模块测试共289Web/类型/构建，28契约通过；实际模块/WebCrypto/ApiClient28HTTP，页面4POST含2原键重试+1独立内部作者追加，3备注3审计，父与客户DTO不变。原文摘要实际校验，不同租户/权限迟到响应清除；无编辑/删除、客户发送、附件或通知。DOM/390px仍B03，完整M5-7/D07非DONE。见[内部备注](internal-ticket-notes.md)、[客户端证据](evidence/niko-internal-note-client-http-20261002.json)。

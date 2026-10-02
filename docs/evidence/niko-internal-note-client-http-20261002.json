@@ -1,0 +1,34 @@
+{
+  "verified_at": "2026-10-02T20:31:41.038Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "http_requests": 28,
+  "frontend": "actual internalNoteWorkspace + WebCrypto SHA256 + ApiClient",
+  "frontend_post_attempts": 4,
+  "independent_internal_author_posts": 1,
+  "durable_notes": 3,
+  "matching_success_audits": 3,
+  "original_body_key_parent_version_preserved": true,
+  "readonly_refresh_never_wrote": true,
+  "parent_and_customer_dto_unchanged": true,
+  "original_notes_immutable": true,
+  "fault_injection": "Discard two successful server200 responses in client transport; not physical network failure",
+  "browser_ui_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "DOM/390px controls B03",
+    "Customer-visible comments, attachments and notification providers",
+    "Formal workflow and full M5-7/D07 acceptance"
+  ],
+  "new_frontend_tests": 18,
+  "total_web_tests": 289,
+  "typecheck_build": "passed",
+  "contract_tests": 28,
+  "generated_contract_consistency": "passed",
+  "prior_api_ci": {
+    "commit": "56d241994ecc48f6b1905f2d82543073bb5aff1b",
+    "id": 37060940547,
+    "conclusion": "success"
+  },
+  "mobile_styles": "CODE_ONLY_NOT_DOM_VERIFIED"
+}

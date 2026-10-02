@@ -2844,7 +2844,8 @@
                   "proposed_value": {
                     "not": {
                       "type": "null"
-                    }
+                    },
+                    "description": "按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义。"
                   },
                   "expected_version": {
                     "type": "integer",
@@ -3355,7 +3356,8 @@
                   "proposed_value": {
                     "not": {
                       "type": "null"
-                    }
+                    },
+                    "description": "按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义。"
                   },
                   "reason": {
                     "type": "string",
@@ -6500,7 +6502,8 @@
           "proposed_value": {
             "not": {
               "type": "null"
-            }
+            },
+            "description": "按登记类型校验；任意嵌套层级的数值转为double后须为有限值，否则400；嵌套null保留未知语义。"
           },
           "reason": {
             "type": "string",

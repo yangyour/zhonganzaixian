@@ -45,4 +45,20 @@ class ConfigurationRevisionValidationTest {
         assertDoesNotThrow(() -> ConfigurationValueValidator.validate(Map.of("type", "object"), mapper.readTree("{\"secret_ref\":\"document-ref:mop.credentials\",\"credential_ref\":\"document-ref:mop.reference\"}")));
         assertThrows(DomainException.class, () -> ConfigurationValueValidator.validate(Map.of("type", "string"), mapper.getNodeFactory().textNode("a".repeat(2001))));
     }
+    @Test void nestedNumbersRejectOverflowInsteadOfPersistingQuotedInfinity() throws Exception {
+        for (String body : List.of("{\"limit\":1e999}", "{\"limits\":[-1e999]}", "[1e999]")) {
+            var value = mapper.readTree(body);
+            assertThrows(DomainException.class, () -> ConfigurationValueValidator.validate(
+                    Map.of("type", value.isArray() ? "array" : "object"), value), body);
+        }
+    }
+
+    @Test void nestedFiniteNumbersAndUnknownNullRemainUnchanged() throws Exception {
+        var value = mapper.readTree("{\"limit\":1.25,\"values\":[0,-3,1e100,null]}");
+        var before = value.deepCopy();
+        assertDoesNotThrow(() -> ConfigurationValueValidator.validate(Map.of("type", "object"), value));
+        assertEquals(before, value);
+        assertTrue(value.get("values").get(3).isNull());
+    }
+
 }

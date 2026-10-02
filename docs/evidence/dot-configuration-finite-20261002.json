@@ -1,0 +1,33 @@
+{
+  "recorded_at": "2026-10-02T06:09:18.041546+00:00",
+  "base_commit": "34cec3a98854a74cd03f8e289e1ba53fe1540017",
+  "scope": "D04 nested numeric overflow input validation",
+  "new_junit_tests": 2,
+  "before": {
+    "tests": 5,
+    "failures": 1,
+    "errors": 0
+  },
+  "maven_verify": "PASS",
+  "junit": {
+    "tests": 359,
+    "executed": 271,
+    "skipped": 88,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts_tests": 18,
+  "generator_consistency": "PASS",
+  "api_version": "0.8",
+  "contract_change": "Describe recursive finite-double numeric validation; no shape or endpoint change",
+  "real_components": "NOT_RUN_NETWORK_BLOCKED",
+  "real_http_pg": "NOT_RUN",
+  "full_contract_acceptance": "NOT_RUN",
+  "private_configuration_modified": false,
+  "migrations_changed": false,
+  "preceding_commit_ci": {
+    "sha": "34cec3a98854a74cd03f8e289e1ba53fe1540017",
+    "run_id": 36971237098,
+    "conclusion": "success"
+  }
+}

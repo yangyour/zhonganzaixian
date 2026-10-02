@@ -26,6 +26,8 @@ final class ConfigurationValueValidator {
     }
 
     private static void inspect(JsonNode value) {
+        if (value.isNumber() && !Double.isFinite(value.doubleValue()))
+            throw invalid("proposed_value 任意层级的数值必须在有限数值范围内");
         if (value.isObject()) value.fields().forEachRemaining(field -> {
             String key = field.getKey().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
             if (Set.of("password", "secret", "token", "privatekey", "credential", "actorid", "tenantid", "accesstoken", "refreshtoken", "idtoken", "csrftoken", "clientsecret", "apikey", "apitoken", "bearertoken", "clientpassword", "secretkey").contains(key))

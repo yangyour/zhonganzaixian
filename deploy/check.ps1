@@ -15,6 +15,8 @@ try {
     }
     $previousEnvironment['MOP_RUN_REMOTE_TESTS'] = $env:MOP_RUN_REMOTE_TESTS
     $env:MOP_RUN_REMOTE_TESTS = 'true'
+    $previousEnvironment['MOP_RUN_IMPORT_REMOTE_TESTS'] = $env:MOP_RUN_IMPORT_REMOTE_TESTS
+    $env:MOP_RUN_IMPORT_REMOTE_TESTS = 'true'
     & node tools/build-api-contract.mjs --check
     if ($LASTEXITCODE -ne 0) { throw 'API契约检查失败。' }
     & node --test tests/contracts.test.mjs

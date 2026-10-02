@@ -34,10 +34,12 @@ public class PlatformController {
     private final ObjectMapper mapper;
     private final ObjectProvider<TestOidcConfiguration.OidcDependencyProbe> identityProbe;
     private final ObjectProvider<PhotoConfiguration.PhotoDependencyProbe> photoProbe;
+    private final ObjectProvider<AssetImportConfiguration.ImportDependencyProbe> importProbe;
     private final byte[] cursorSecret=new byte[32];
     private static final Set<String> TYPES=Set.of("router","switch","firewall","ap","wireless_controller","other");
     private record Access(FixtureUser user,Tenant tenant,Membership membership,List<String> capabilities){}
-    public PlatformController(PlatformRepository repository,ObjectMapper mapper,ObjectProvider<TestOidcConfiguration.OidcDependencyProbe> identityProbe,ObjectProvider<PhotoConfiguration.PhotoDependencyProbe> photoProbe){this.repository=repository;this.mapper=mapper;this.identityProbe=identityProbe;this.photoProbe=photoProbe;new SecureRandom().nextBytes(cursorSecret);}
+    @org.springframework.beans.factory.annotation.Autowired
+    public PlatformController(PlatformRepository repository,ObjectMapper mapper,ObjectProvider<TestOidcConfiguration.OidcDependencyProbe> identityProbe,ObjectProvider<PhotoConfiguration.PhotoDependencyProbe> photoProbe,ObjectProvider<AssetImportConfiguration.ImportDependencyProbe> importProbe){this.repository=repository;this.mapper=mapper;this.identityProbe=identityProbe;this.photoProbe=photoProbe;this.importProbe=importProbe;new SecureRandom().nextBytes(cursorSecret);}
     @GetMapping("/health/live") Object live(HttpServletRequest request){return success(map("status","UP","mode",repository.metadata().mode(),"source",repository.metadata().source()),request);}
     @GetMapping("/health/ready") Object ready(HttpServletRequest request){
         if(!repository.dependencyReady())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境 PostgreSQL 不可用，未就绪");
@@ -49,7 +51,14 @@ public class PlatformController {
             photos=probe.status();
             if(photos.enabled()&&!photos.ready())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境照片能力未就绪",List.of(map("component","photos","photos",photos.dto())));
         }
-        return success(map("status","READY_REMOTE_TEST","ready",true,"mode",repository.metadata().mode(),"source",repository.metadata().source(),"durable",repository.metadata().durable(),"production_ready",false,"photos",photos.dto()),request);
+        AssetImportConfiguration.ImportReadiness imports=new AssetImportConfiguration.ImportReadiness(false,false,false,false,List.of("ASSET_IMPORT_NOT_CONFIGURED"));
+        if(repository.metadata().mode().equals("remote_test")){
+            AssetImportConfiguration.ImportDependencyProbe probe=importProbe.getIfAvailable();
+            if(probe==null)throw new DomainException(503,"UPSTREAM_UNAVAILABLE","导入源依赖探测未注册，未就绪",List.of(map("component","asset_imports","reasons",List.of("ASSET_IMPORT_PROBE_MISSING"))));
+            imports=probe.status();
+            if(imports.enabled()&&!imports.ready())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境导入源能力未就绪",List.of(map("component","asset_imports","asset_imports",imports.dto())));
+        }
+        return success(map("status","READY_REMOTE_TEST","ready",true,"mode",repository.metadata().mode(),"source",repository.metadata().source(),"durable",repository.metadata().durable(),"production_ready",false,"photos",photos.dto(),"asset_imports",imports.dto()),request);
     }
     @GetMapping("/assets") Object assets(@RequestParam Map<String,String> query,HttpServletRequest request){
         Access access=access(request,"assets:read");Set<String> allowed=Set.of("cursor","page_size","type","site_id","status","q");

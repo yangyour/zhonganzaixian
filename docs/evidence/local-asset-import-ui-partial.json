@@ -1,0 +1,67 @@
+{
+  "status": "PARTIAL",
+  "recorded_at": "2026-10-02T04:04:32.068Z",
+  "browser": "154.0.4258.48",
+  "desktop_viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "mobile_emulation": {
+    "width": 390,
+    "height": 844,
+    "isMobile": true,
+    "hasTouch": true
+  },
+  "completed_desktop_checks": [
+    {
+      "name": "normal_browser_original_upload_hash_and_ready",
+      "passed": true
+    },
+    {
+      "name": "uploaded_real_original_then_dropped_response",
+      "passed": true
+    },
+    {
+      "name": "uncertain_upload_locks_file_and_reset",
+      "passed": true
+    },
+    {
+      "name": "upload_retry_same_key_single_receipt_original_hash",
+      "passed": true
+    },
+    {
+      "name": "real_parse_commit_drop_locks_original_parameters",
+      "passed": true
+    },
+    {
+      "name": "parse_retry_same_key_body_and_operation",
+      "passed": true
+    },
+    {
+      "name": "mapping_real_commit_drop_preserves_request_and_locks_reset",
+      "passed": true
+    },
+    {
+      "name": "mapping_replay_same_body_key_readback_and_pending_business_gate",
+      "passed": true
+    }
+  ],
+  "mobile_checks": [
+    {
+      "name": "mobile_normal_xlsx_upload_real_directory_no_auto_sheet",
+      "passed": true
+    }
+  ],
+  "not_completed": [
+    "mobile_duplicate_header_manual_mapping",
+    "final_mobile_mapping_and_visual_QA",
+    "complete_refresh_new_operation_display_binding"
+  ],
+  "fault_injection": {
+    "upload": "Real POST with original file bytes explicitly restored into the observed multipart envelope before dropping the real 202 response; Playwright CDP postData omits file bytes.",
+    "parse": "Real JSON POST returned 202 before response abort.",
+    "mapping": "Real JSON POST returned 200 before response abort."
+  },
+  "full_contract_acceptance": "NOT_RUN",
+  "credentials_output": "none"
+}

@@ -29,7 +29,7 @@ class PhotoReadinessTest {
     }
     private PlatformController controller(PhotoConfiguration.PhotoDependencyProbe probe){
         var identity=mock(TestOidcConfiguration.OidcDependencyProbe.class);when(identity.ready()).thenReturn(true);
-        return new PlatformController(repository,new ObjectMapper(),provider(identity),provider(probe));
+        return new PlatformController(repository,new ObjectMapper(),provider(identity),provider(probe),provider(new AssetImportConfiguration.ImportDependencyProbe(false,false,null,null)));
     }
     private static <T> ObjectProvider<T> provider(T bean){
         ObjectProvider<T> provider=mock(ObjectProvider.class);when(provider.getIfAvailable()).thenReturn(bean);return provider;

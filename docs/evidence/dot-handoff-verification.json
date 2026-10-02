@@ -1,0 +1,54 @@
+{
+  "recorded_at": "2026-10-02T04:06:28.0064902Z",
+  "scope": "asset_import_source_staging_handoff_not_all_contract_done",
+  "status": "PARTIAL_IMPLEMENTATION_VERIFIED_SLICE_WITH_KNOWN_REMAINING_ISSUES",
+  "backend": {
+    "current_report_tests": 290.0,
+    "current_report_executed": 277.0,
+    "current_report_skipped": 13.0,
+    "errors": 0.0,
+    "failures": 0.0,
+    "isolated": 202,
+    "designated_postgresql": 69,
+    "designated_minio_import": 3,
+    "designated_minio_photo": 3,
+    "historical_fixture_skipped": 13,
+    "notes": "Reports collected across full isolated reactor, designated remote reactor through API, and successful targeted SDK retest. Initial remote verify failed conditional large-body test, subsequently fixed and explicitly retested; no single successful complete remote verify is claimed."
+  },
+  "web": {
+    "test_files": 14,
+    "tests": 172,
+    "typecheck": "PASS",
+    "vite_build": "PASS"
+  },
+  "contract": {
+    "version": "0.8",
+    "generator_consistency": "PASS",
+    "node_ajv_tests": 18
+  },
+  "ownership": {
+    "isolated_checks": 12,
+    "actual_process_actions": 0
+  },
+  "migration": {
+    "version": 6,
+    "sha256": "1F532822668274B7AEBD12EA78B57E6BE0AA9FD53CEB77023EE8067589CD2B4B",
+    "apply_executed": 1,
+    "repeat_executed": 0,
+    "read_only_executed": 0,
+    "structure_and_runtime_acl": "PASS"
+  },
+  "http_evidence": [
+    "local-asset-import-http-e2409bac-13ed-4096-b275-412d2123888a.json",
+    "local-asset-import-http-9da3050c-243e-45e9-9275-9e41818682df.json"
+  ],
+  "ui_evidence": "local-asset-import-ui-partial.json",
+  "full_contract_acceptance": "NOT_RUN",
+  "remaining": [
+    "COMPLETE refresh old operation display binding",
+    "final mobile duplicate header mapping and readable step layout",
+    "real full pipeline restart/storage outage boundary tests",
+    "business rules quota precheck final asset import and remaining 128 requirements"
+  ],
+  "credentials_output": "none"
+}

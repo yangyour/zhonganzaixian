@@ -100,14 +100,80 @@ photosReady.oneOf = [
   { properties: { enabled: { const: false }, ready: { const: false }, policy_ready: { const: false }, schema_ready: { const: false }, storage_ready: { const: false }, policy_source: { const: 'PENDING' }, reasons: { const: ['PHOTO_NOT_CONFIGURED'] } } },
 ];
 const readiness = envelope(object({ status: { const: 'READY_REMOTE_TEST' }, ready: { const: true }, mode: { const: 'remote_test' }, source: { const: 'postgresql' }, durable: { const: true }, production_ready: { const: false }, photos: photosReady }));
+const importLabels = { NAME: '设备名称', TYPE: '设备类型', ADDRESS: 'IP或域名', BRAND: '品牌', MODEL: '型号', SERIAL_NUMBER: '序列号', SITE: '站点', LOCATION: '位置', OWNER: '负责人', BUSINESS: '所属业务', PURCHASE_DATE: '采购日期', WARRANTY_EXPIRY: '维保到期日', OVERDUE_SERVICE_DATE: '超期服役日期', COLLECTION_METHOD: '采集方式', NOTE: '备注' };
+const importTargets = Object.keys(importLabels);
+const importHash = { type: 'string', pattern: '^[0-9a-f]{64}$' };
+const importFormat = { type: 'string', enum: ['CSV', 'XLSX'] };
+const nullableUuid = { type: ['string', 'null'], format: 'uuid' };
+const sourceIndex = { type: 'integer', minimum: 0, maximum: 63 };
+const nullableSourceIndex = { type: ['integer', 'null'], minimum: 0, maximum: 63 };
+const headerRow = { type: ['integer', 'null'], minimum: 1, maximum: 20000 };
+const importQuestions = { const: ['Q20', 'Q31'] };
+const importFacts = { business_status: { const: 'CONFIG_PENDING' }, can_import: { const: false }, question_ids: importQuestions, scan_status: { const: 'UNSCANNED' }, production_approval: { const: 'UNVERIFIED' }, retention_until: { type: 'null' } };
+const importReadiness = object({ enabled: { type: 'boolean' }, ready: { type: 'boolean' }, policy_ready: { type: 'boolean' }, schema_ready: { type: 'boolean' }, storage_ready: { type: 'boolean' }, worker_activity: { const: 'NOT_PROBED' }, business_status: { const: 'CONFIG_PENDING' }, can_import: { const: false }, reasons: { type: 'array', items: string } });
+importReadiness.oneOf = [
+  { properties: { enabled: { const: true }, ready: { const: true }, policy_ready: { const: true }, schema_ready: { const: true }, storage_ready: { const: true }, reasons: { maxItems: 0 } } },
+  { properties: { enabled: { const: false }, ready: { const: false }, policy_ready: { const: false }, schema_ready: { const: false }, storage_ready: { const: false }, reasons: { const: ['ASSET_IMPORT_NOT_CONFIGURED'] } } },
+];
+readiness.properties.data.properties.asset_imports = importReadiness;
+readiness.properties.data.required.push('asset_imports');
+const importSelection = object({ declared_format: importFormat, encoding: { type: ['string', 'null'], enum: ['UTF-8', 'UTF-16LE', 'UTF-16BE', 'GB18030', null] }, delimiter: { type: ['string', 'null'], enum: [',', ';', '\t', null] }, sheet_index: { type: ['integer', 'null'], minimum: 0, maximum: 31 }, header_row: headerRow });
+importSelection.allOf = [{ if: { properties: { declared_format: { const: 'CSV' } } }, then: { properties: { encoding: { type: 'string' }, delimiter: { type: 'string' }, sheet_index: { type: 'null' }, header_row: { type: 'integer' } } }, else: { properties: { encoding: { type: 'null' }, delimiter: { type: 'null' } } } }];
+const importParseRequest = { ...importSelection, properties: { expected_version: positiveVersion, ...importSelection.properties }, required: ['expected_version', ...importSelection.required], description: 'CSV必须明确编码/分隔符/1起表头；XLSX编码与分隔符必须null。XLSX工作表或表头为null时只返回SELECTION_REQUIRED目录，之后以0起sheet与1起header显式请求；不得猜测隐藏工作表、日期或业务规则。' };
+const importTargetsMapping = object(Object.fromEntries(importTargets.map(code => [code, code === 'NOTE' ? sourceIndex : nullableSourceIndex])));
+const importIgnoredColumns = { type: 'array', maxItems: 64, uniqueItems: true, items: sourceIndex };
+const importMappingRequest = object({ expected_version: positiveVersion, source_parse_hash: importHash, target_source_columns: importTargetsMapping, ignored_source_columns: importIgnoredColumns });
+importMappingRequest['x-mop-semantic-checks'] = ['source_parse_hash绑定当前租户/创建者/来源/原始bytes/解析选择/schema的已保存artifact', '全部15个目标显式index或null；NOTE必须index', '非null源列不得重复分配；忽略集合不得与映射集合交叉', '所有当前源列必须显式映射或忽略；不接受不存在的源列', 'expected_version CAS且重新授权；失败不运行资产导入或配额占用'];
+const importCell = object({ column_index: sourceIndex, kind: { type: 'string', enum: ['TEXT', 'NUMERIC', 'BOOLEAN', 'ERROR', 'ISO_DATE', 'BLANK'] }, lexical: { type: ['string', 'null'], maxLength: 4096 }, display: { type: ['string', 'null'], maxLength: 4096 }, style_index: { type: ['integer', 'null'], minimum: 0 }, format_code: { type: ['string', 'null'], maxLength: 4096 } });
+const importRowNumbers = { logical_record_number: { type: 'integer', minimum: 1 }, source_row_number: { type: 'integer', minimum: 1, maximum: 20000 }, physical_start_line: { type: ['integer', 'null'], minimum: 1 }, physical_end_line: { type: ['integer', 'null'], minimum: 1 } };
+const importRawRow = object({ ...importRowNumbers, cells: { type: 'array', maxItems: 64, items: ref('AssetImportSourceCell') } });
+const importMappedRow = object({ ...importRowNumbers, cells: object(Object.fromEntries(importTargets.map(code => [code, { anyOf: [{ type: 'null' }, ref('AssetImportSourceCell')] }]))) });
+const importArtifact = object({
+  id: uuid, tenant_id: uuid, source_id: uuid, operation_id: uuid, parse_hash: importHash, source_sha256: importHash, schema_version: { const: 'contract-m3-6-standard15-v1' }, selection: ref('AssetImportParseSelection'), created_at: dateTime,
+  state: { type: 'string', enum: ['PARSED', 'SELECTION_REQUIRED'] }, detected_format: importFormat,
+  sheets: { type: 'array', minItems: 1, maxItems: 32, items: object({ index: { type: 'integer', minimum: 0, maximum: 31 }, name: { type: 'string', maxLength: 255 }, hidden: { type: 'boolean' } }) }, selected_sheet_index: { type: ['integer', 'null'], minimum: 0, maximum: 31 }, header_row: headerRow,
+  date_epoch: { type: 'string', enum: ['NOT_APPLICABLE', 'WINDOWS_1900', 'MAC_1904'] }, columns: { type: 'array', maxItems: 64, items: object({ index: sourceIndex, header: { type: ['string', 'null'], maxLength: 4096 }, target_suggestions: { type: 'array', maxItems: 15, uniqueItems: true, items: { type: 'string', enum: importTargets } } }) },
+  rows: { type: 'array', maxItems: 500, items: ref('AssetImportSourceRow') }, parser_version: { type: 'string', minLength: 1 }, resource_policy_version: { const: 'asset-import-technical-v1' },
+});
+importArtifact.allOf = [
+  { if: { properties: { state: { const: 'SELECTION_REQUIRED' } } }, then: { properties: { detected_format: { const: 'XLSX' }, selected_sheet_index: { type: 'null' }, header_row: { type: 'null' }, columns: { maxItems: 0 }, rows: { maxItems: 0 } } }, else: { properties: { selected_sheet_index: { type: 'integer' }, header_row: { type: 'integer' }, columns: { minItems: 1 } } } },
+  { if: { properties: { detected_format: { const: 'CSV' } } }, then: { properties: { date_epoch: { const: 'NOT_APPLICABLE' }, selected_sheet_index: { const: 0 }, sheets: { maxItems: 1 } } }, else: { properties: { date_epoch: { enum: ['WINDOWS_1900', 'MAC_1904'] } } } },
+];
+importArtifact['x-mop-binding-checks'] = ['tenant/source/operation与来源和操作投影相同', 'source_sha256与不可变原始bytes摘要相同', '保留lexical/display/kind/style/format/date_epoch；没有业务日期或字典规范化', '表头重名不合并，源列index和原始行号不重排', 'XLSX公式、外部链接、宏及加密安全拒绝；不读取公式缓存替代公式解析'];
+const importMapping = object({ id: uuid, tenant_id: uuid, source_id: uuid, artifact_id: uuid, version: positiveVersion, source_parse_hash: importHash, preview_hash: importHash, schema_version: { const: 'contract-m3-6-standard15-v1' }, target_source_columns: importTargetsMapping, ignored_source_columns: importIgnoredColumns, mapped_raw_rows: { type: 'array', maxItems: 500, items: ref('AssetImportMappedRow') }, precheck_status: { const: 'NOT_RUN' }, created_at: dateTime });
+const importSource = object({
+  id: uuid, tenant_id: uuid, created_by: uuid, purpose: { const: 'asset_import_source' }, original_name: { type: 'string', minLength: 1, maxLength: 200 }, declared_format: importFormat, size_bytes: { type: 'integer', minimum: 1, maximum: 20971520 }, sha256: importHash,
+  storage_status: { type: 'string', enum: ['PENDING', 'READY', 'FAILED'] }, parse_status: { type: 'string', enum: ['NOT_REQUESTED', 'PENDING', 'PARSED', 'SELECTION_REQUIRED', 'FAILED'] }, store_operation_id: uuid, parse_operation_id: nullableUuid, latest_artifact_id: nullableUuid, latest_mapping_id: nullableUuid,
+  version: positiveVersion, created_at: dateTime, updated_at: dateTime, parsed_artifact: { anyOf: [{ type: 'null' }, ref('AssetImportParsedArtifact')] }, mapping: { anyOf: [{ type: 'null' }, ref('AssetImportMapping')] }, ...importFacts, effective_rule_versions: { type: 'null' }, quota_reservation: { type: 'null' },
+});
+importSource.allOf = [
+  { if: { properties: { parsed_artifact: { type: 'null' } } }, then: { properties: { latest_artifact_id: { type: 'null' } } }, else: { properties: { latest_artifact_id: uuid } } },
+  { if: { properties: { mapping: { type: 'null' } } }, then: { properties: { latest_mapping_id: { type: 'null' } } }, else: { properties: { latest_mapping_id: uuid, parse_status: { const: 'PARSED' } } } },
+  { if: { properties: { parse_status: { const: 'NOT_REQUESTED' } } }, then: { properties: { parse_operation_id: { type: 'null' }, parsed_artifact: { type: 'null' }, mapping: { type: 'null' } } }, else: { properties: { parse_operation_id: uuid } } },
+  { if: { properties: { parse_status: { enum: ['PENDING', 'FAILED'] } } }, then: { properties: { parsed_artifact: { type: 'null' }, mapping: { type: 'null' } } } },
+  ...['PARSED', 'SELECTION_REQUIRED'].map(state => ({ if: { properties: { parse_status: { const: state } } }, then: { properties: { storage_status: { const: 'READY' }, parsed_artifact: { type: 'object', properties: { state: { const: state } } } } } })),
+];
+importSource['x-mop-binding-checks'] = ['仅当前授权租户且created_by为当前actor可读取', 'RR一致快照内读取来源、当前artifact与当前mapping；缺投影返回503', 'READY只表示原始bytes存储成功；PARSED只表示技术解析成功；映射保存仍CONFIG_PENDING/can_import=false', '再次请求解析会清空当前artifact/mapping引用；历史artifact/mapping保留', '所有失败保持明确状态；不回退内存仓储或fixture'];
+const importOperation = object({ id: uuid, tenant_id: uuid, source_id: uuid, created_by: uuid, kind: { type: 'string', enum: ['STORE_RAW', 'PARSE'] }, status: { type: 'string', enum: ['PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED'] }, step: { type: 'string', enum: ['QUEUED', 'STORING', 'PARSING', 'RETRY_WAIT', 'STORED', 'PARSED', 'SELECTION_REQUIRED', 'AUTHORIZATION_REVOKED', 'STORAGE_CONFLICT', 'PARSE_INVALID'] }, result_artifact_id: nullableUuid, result_ref: { type: 'string', pattern: `^/api/v1/assets/import-sources/${uuidPattern}$` }, error: { anyOf: [{ type: 'null' }, object({ code: { type: 'string', enum: ['UPSTREAM_UNAVAILABLE', 'ACTION_FORBIDDEN', 'FILE_INTEGRITY_CONFLICT', 'IMPORT_SOURCE_INVALID'] }, message: string, retryable: { type: 'boolean' }, question_ids: { const: [] } })] }, created_at: dateTime, updated_at: dateTime });
+importOperation.allOf = [{ oneOf: [
+  { properties: { step: { const: 'QUEUED' }, status: { const: 'PENDING' }, error: { type: 'null' }, result_artifact_id: { type: 'null' } } },
+  ...[['STORING', 'STORE_RAW'], ['PARSING', 'PARSE']].map(([step, kind]) => ({ properties: { step: { const: step }, kind: { const: kind }, status: { const: 'RUNNING' }, error: { type: 'null' }, result_artifact_id: { type: 'null' } } })),
+  { properties: { step: { const: 'STORED' }, kind: { const: 'STORE_RAW' }, status: { const: 'SUCCEEDED' }, error: { type: 'null' }, result_artifact_id: { type: 'null' } } },
+  ...['PARSED', 'SELECTION_REQUIRED'].map(step => ({ properties: { step: { const: step }, kind: { const: 'PARSE' }, status: { const: 'SUCCEEDED' }, error: { type: 'null' }, result_artifact_id: uuid } })),
+  ...[['RETRY_WAIT', 'PENDING', 'UPSTREAM_UNAVAILABLE', true], ['AUTHORIZATION_REVOKED', 'FAILED', 'ACTION_FORBIDDEN', false], ['STORAGE_CONFLICT', 'FAILED', 'FILE_INTEGRITY_CONFLICT', false], ['PARSE_INVALID', 'FAILED', 'IMPORT_SOURCE_INVALID', false]].map(([step, status, code, retryable]) => ({ properties: { step: { const: step }, status: { const: status }, result_artifact_id: { type: 'null' }, error: { type: 'object', properties: { code: { const: code }, retryable: { const: retryable } } } } })),
+] }];
+const importPolicy = object({ ...importFacts, purpose: { const: 'asset_import_source' }, allowed_formats: { const: ['CSV', 'XLSX'] }, format_source: { const: 'CONTRACT_M3_6' }, max_source_bytes: { const: 20971520 }, max_data_rows: { const: 500 }, max_source_columns: { const: 64 }, max_sheets: { const: 32 }, max_header_row: { const: 20000 }, max_cell_chars: { const: 4096 }, resource_policy_version: { const: 'asset-import-technical-v1' }, resource_limit_kind: { const: 'TECHNICAL_CONTAINMENT' }, schema_version: { const: 'contract-m3-6-standard15-v1' }, target_columns: { type: 'array', minItems: 15, maxItems: 15, uniqueItems: true, items: { oneOf: importTargets.map(code => object({ code: { const: code }, label: { const: importLabels[code] }, contract_always_required: { const: code === 'NOTE' } })) } }, csv_encodings: { const: ['UTF-8', 'UTF-16LE', 'UTF-16BE', 'GB18030'] }, csv_delimiters: { const: [',', ';', '\t'] }, sheet_index_base: { const: 0 }, column_index_base: { const: 0 }, row_number_base: { const: 1 } });
+const importUpload = object({ file: { type: 'string', format: 'binary', 'x-mop-min-bytes': 1, 'x-mop-max-bytes': 20971520, description: '只受理匹配声明的.csv/.xlsx安全文件名及原bytes。实际格式在受限解析器验证；禁止JSON/base64、未知或重复part。全局multipart文件上限20MiB不改变照片独立5_000_000 bytes限制。' }, purpose: { const: 'asset_import_source' }, format: importFormat });
+const importAccess = { 'x-mop-capability': 'assets:write', 'x-mop-roles': ['padmin', 'msp', 'tadmin'], 'x-mop-creator-only': true, 'x-mop-permission-version-recheck': true, 'x-mop-reject-unknown-query-keys': true };
+const importAcceptanceResponses = { 202: { description: '原bytes或解析意图、来源、job、operation、审计与幂等结果已在PG事务受理；需以GET操作与来源读取当前状态。不是资产导入或配额承诺。', content: { 'application/json': { schema: ref('AssetImportAccepted') } } }, ...errors };
 const contract = {
   openapi: '3.1.0',
-  info: { title: 'MOP 共享测试环境 API', version: '0.7.0', description: '本地接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。fixture身份入口在remote_test不可调用。' },
+  info: { title: 'MOP 共享测试环境 API', version: '0.8.0', description: '本地接续开发复用指定服务器的PostgreSQL、Keycloak与MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。fixture身份入口在remote_test不可调用。' },
   servers: [{ url: '/api/v1' }],
   security: [{ SessionCookie: [] }],
   paths: {
     '/health/live': { get: action('liveness', '本地进程存活', ref('ResourceResult'), { security: [] }) },
-    '/health/ready': { get: action('readiness', '实际PG/OIDC及已启用照片策略/schema/MinIO就绪；失败503及安全原因，不证明生产就绪', ref('ReadinessResult'), { security: [] }) },
+    '/health/ready': { get: action('readiness', '实际PG/OIDC及已启用照片/导入源策略/schema/ACL/MinIO就绪；失败503及安全原因。导入worker_activity=NOT_PROBED，不证明Worker运行、业务导入或生产就绪', ref('ReadinessResult'), { security: [] }) },
     '/auth/options': { get: action('authOptions', '读取Keycloak授权登录入口；不返回秘密', envelope(object({ mode: { const: 'remote_test' }, identity_source: { const: 'test_oidc' }, login_url: { const: '/oauth2/authorization/mop' } })), { security: [] }) },
     '/session': { get: action('getSession', '读取可信会话与能力', ref('SessionResult')), delete: action('logout', '注销会话', ref('ResourceResult'), { parameters: headers }) },
     '/session/tenant': { post: mutation('switchTenant', '在服务端授权集合中切换租户', object({ tenant_id: { type: 'string', format: 'uuid' } }), ref('SessionResult')) },
@@ -117,6 +183,12 @@ const contract = {
     },
     '/assets/{id}': { get: action('getAsset', '读取本租户资产详情；不存在及无权均404', ref('AssetResult'), { parameters: [pathId] }) },
     '/assets/{id}/onboarding': { post: blocked('requestOnboarding', '接入门禁：Q02/Q03/Q06待确认，拒绝执行', pathId) },
+    '/assets/import-policy': { get: action('getAssetImportPolicy', '读取CSV/XLSX来源技术政策与合同15列；不批准最终导入规则', ref('AssetImportPolicyResult'), importAccess) },
+    '/assets/import-sources': { post: { ...mutation('acceptAssetImportSource', '耐久受理原始CSV/XLSX来源；不是导入资产', ref('AssetImportSourceUpload'), ref('AssetImportAccepted'), { ...importAccess, parameters: headers }), requestBody: { required: true, content: { 'multipart/form-data': { schema: ref('AssetImportSourceUpload') } } }, responses: importAcceptanceResponses } },
+    '/assets/import-sources/{id}': { get: action('getAssetImportSource', '当前租户创建者读取来源及一致快照的解析artifact/mapping；跨范围统一404', ref('AssetImportSourceResult'), { ...importAccess, parameters: [pathId] }) },
+    '/assets/import-sources/{id}/parses': { post: { ...mutation('parseAssetImportSource', 'CAS受理明确解析选择；XLSX缺sheet/header只读取目录，公式拒绝', ref('AssetImportParseRequest'), ref('AssetImportAccepted'), { ...importAccess, parameters: [pathId, ...headers] }), responses: importAcceptanceResponses } },
+    '/assets/import-sources/{id}/mappings': { post: mutation('saveAssetImportMapping', 'CAS保存15列映射与原始预览hash；业务预检NOT_RUN，资产写入与配额未运行', ref('AssetImportMappingRequest'), ref('AssetImportSourceResult'), { ...importAccess, parameters: [pathId, ...headers] }) },
+    '/asset-import-operations/{id}': { get: action('getAssetImportOperation', '创建者回读独立STORE_RAW/PARSE操作；GET不执行任务，等待不代表失败', ref('AssetImportOperationResult'), { ...importAccess, parameters: [pathId] }) },
     '/configurations': { get: action('listConfigurations', '仅平台管理员读取设计登记和测试环境持久草稿', ref('ResourceResult'), { parameters: [parameter('decision_status', 'query', { type: 'string', enum: ['pending', 'contract_fixed'] }, false)] }) },
     '/settings/effective': { get: action('readConfigurationDiagnostic', '当前padmin读取单key配置来源诊断；200只表示PG元数据读取成功，CONFIG_PENDING/null不代表生效', ref('ConfigurationDiagnosticResult'), { parameters: [parameter('key', 'query', configurationKey)], 'x-mop-allowed-query-keys': ['key'], 'x-mop-reject-duplicate-query-keys': true, description: '拒绝额外或重复query，客户端不能提供tenant、对象scope、precedence或核验事实。未知key404、无权403、失效会话401、PG不可用503。授权、登记版本及本租户最多5条近期提案来自一个只读REPEATABLE READ快照；后续提交在下一请求可见。近期提案不是选中的有效版本，APPROVED也未发布。运行定义、发布及客户核验能力明确NOT_IMPLEMENTED/null，不以空集合冒充已接入；不返回原值、旧草稿、提案、意见或资料正文。' }) },
     '/configurations/{key}/draft': { post: mutation('saveConfigurationDraft', '保存独立草稿；不改变value或客户确认状态，动态校验登记类型', object({ proposed_value: { not: { type: 'null' } }, expected_version: { type: 'integer', minimum: 1 } }), ref('ResourceResult'), { parameters: [pathKey, ...headers] }) },
@@ -173,6 +245,23 @@ const contract = {
       ReportPhotoContentGrant: contentGrant,
       ReportPhotoContentGrantResult: envelope(ref('ReportPhotoContentGrant')),
       OperationResult: envelope({ oneOf: [ref('CustomerReportOperation'), ref('FileUploadOperation')] }),
+      AssetImportPolicy: importPolicy,
+      AssetImportReadiness: importReadiness,
+      AssetImportPolicyResult: envelope(ref('AssetImportPolicy')),
+      AssetImportSourceUpload: importUpload,
+      AssetImportAccepted: envelope(object({ source_id: uuid, operation_id: uuid, status: { const: 'PENDING' } })),
+      AssetImportParseSelection: importSelection,
+      AssetImportParseRequest: importParseRequest,
+      AssetImportMappingRequest: importMappingRequest,
+      AssetImportSourceCell: importCell,
+      AssetImportSourceRow: importRawRow,
+      AssetImportMappedRow: importMappedRow,
+      AssetImportParsedArtifact: importArtifact,
+      AssetImportMapping: importMapping,
+      AssetImportSource: importSource,
+      AssetImportSourceResult: envelope(ref('AssetImportSource')),
+      AssetImportOperation: importOperation,
+      AssetImportOperationResult: envelope(ref('AssetImportOperation')),
     },
   },
 };

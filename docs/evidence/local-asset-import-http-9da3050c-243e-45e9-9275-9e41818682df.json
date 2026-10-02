@@ -1,0 +1,1919 @@
+{
+  "scope": "REAL_HTTP_SOURCE_STORE_PARSE_MAPPING_ONLY",
+  "status": "PASS",
+  "credential_output": "none",
+  "raw_requests_and_responses": "OMITTED",
+  "database_access": false,
+  "service_lifecycle_changes": false,
+  "tenant_switches": false,
+  "business_import": "NOT_IMPLEMENTED",
+  "contract_acceptance": "NOT_RUN",
+  "can_import": false,
+  "effective_rule_versions": null,
+  "quota_reservation": null,
+  "started_at": "2026-10-02T03:17:44.886Z",
+  "run_id": "9da3050c-243e-45e9-9275-9e41818682df",
+  "api_port": 8080,
+  "api_version": "0.8.0",
+  "selected_mode": "BASIC_AND_XLSX",
+  "private_fixture_reference": "ignored_deploy_private_qa_import_fixtures",
+  "checks": [
+    {
+      "name": "contract_version_0_8",
+      "status": "PASS"
+    },
+    {
+      "name": "private_session_padmin_shape",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_session_padmin",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "real_oidc_session_padmin_trusted_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_session_padmin_capability",
+      "status": "PASS"
+    },
+    {
+      "name": "private_session_msp_shape",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_session_msp",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "real_oidc_session_msp_trusted_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_session_msp_capability",
+      "status": "PASS"
+    },
+    {
+      "name": "private_session_tadmin_shape",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_session_tadmin",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "real_oidc_session_tadmin_trusted_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_session_tadmin_capability",
+      "status": "PASS"
+    },
+    {
+      "name": "private_session_viewerA_shape",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_session_viewerA",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "real_oidc_session_viewerA_trusted_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_session_viewerA_capability",
+      "status": "PASS"
+    },
+    {
+      "name": "private_session_viewerB_shape",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_session_viewerB",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "real_oidc_session_viewerB_trusted_identity",
+      "status": "PASS"
+    },
+    {
+      "name": "real_oidc_session_viewerB_capability",
+      "status": "PASS"
+    },
+    {
+      "name": "prerequisite_two_same_tenant_distinct_writers",
+      "status": "PASS"
+    },
+    {
+      "name": "prerequisite_cross_tenant_writer_already_captured",
+      "status": "PASS"
+    },
+    {
+      "name": "prerequisite_viewer_a_and_b_actual_tenants",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_dependencies_ready",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "actual_dependencies_ready_no_worker_guess",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_import_policy",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "actual_import_20mib_and_contract_columns",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_photo_policy_independent",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "actual_photo_stays_5000000_bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "upload_missing_csrf",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "CSRF_INVALID"
+    },
+    {
+      "name": "upload_missing_csrf_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "upload_unknown_part",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "upload_unknown_part_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "upload_duplicate_part",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "upload_duplicate_part_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_accepted",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_source_accepted_ids",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_same_key_boundary_mime_replay",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_source_same_source_and_operation",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_different_bytes_same_key_conflict",
+      "status": "PASS",
+      "http_status": 409,
+      "expected_status": 409,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "IDEMPOTENCY_CONFLICT"
+    },
+    {
+      "name": "csv_source_different_bytes_same_key_conflict_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_operation_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_source_store_operation_binding_1",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_source_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_source_store_source_001_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_source_001_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_operation_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_source_store_operation_binding_2",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_source_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_source_store_source_002_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_source_002_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_operation_003",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_source_store_operation_binding_3",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_source_003",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_source_store_source_003_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_source_003_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_operation_004",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_source_store_operation_binding_4",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_source_004",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_source_store_source_004_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_source_004_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_operation_005",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_source_store_operation_binding_5",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_source_005",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_source_store_source_005_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_source_005_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_real_worker_terminal",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_source_store_raw_ready_only",
+      "status": "PASS"
+    },
+    {
+      "name": "parse_unknown_field",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "parse_unknown_field_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "parse_missing_csrf",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "CSRF_INVALID"
+    },
+    {
+      "name": "parse_missing_csrf_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "metadata_over_16kib",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "metadata_over_16kib_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "metadata_deep_nesting",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "metadata_deep_nesting_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "metadata_over_256_tokens",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "metadata_over_256_tokens_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "metadata_duplicate_key",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "metadata_duplicate_key_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "metadata_trailing_json",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "metadata_trailing_json_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_parse_accepted",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_parse_same_source",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_parse_canonical_object_replay",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_parse_same_source_and_operation",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_parse_operation_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_parse_operation_binding_1",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_parse_source_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_parse_source_001_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_parse_source_001_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_parse_operation_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_parse_operation_binding_2",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_parse_source_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_parse_source_002_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_parse_source_002_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_parse_real_worker_terminal",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_parse_artifact_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_parse_artifact_binding_canonical_parse_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_parse_parse_status_matches",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_bom_quoted_multiline_original_records",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_lexical_display_and_no_date_normalization",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_all_source_cells_preserve_fictional_input",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_duplicate_headers_keep_positions",
+      "status": "PASS"
+    },
+    {
+      "name": "parse_stale_cas",
+      "status": "PASS",
+      "http_status": 409,
+      "expected_status": 409,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "parse_stale_cas_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_stale_cas",
+      "status": "PASS",
+      "http_status": 409,
+      "expected_status": 409,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "csv_mapping_stale_cas_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_wrong_parse_hash",
+      "status": "PASS",
+      "http_status": 409,
+      "expected_status": 409,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "csv_mapping_wrong_parse_hash_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_unknown_field",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "csv_mapping_unknown_field_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_note_must_map",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "csv_mapping_note_must_map_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_duplicate_source_assignment",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "csv_mapping_duplicate_source_assignment_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_explicit_all_ignored_required",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "csv_mapping_explicit_all_ignored_required_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_saved_response",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_mapping_canonical_object_replay",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_mapping_same_mapping_replay",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_durable_source_readback",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "csv_mapping_durable_source_readback_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_durable_source_readback_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_mapping_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_canonical_preview_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_raw_mapped_row_count",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_raw_row_2",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_raw_row_3",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_changed_body_same_key_conflict",
+      "status": "PASS",
+      "http_status": 409,
+      "expected_status": 409,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "IDEMPOTENCY_CONFLICT"
+    },
+    {
+      "name": "csv_mapping_changed_body_same_key_conflict_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "csv_mapping_business_rules_and_quota_unconfirmed",
+      "status": "PASS"
+    },
+    {
+      "name": "viewerA_forbidden_policy",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "name": "viewerA_forbidden_policy_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "viewerA_forbidden_source",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "name": "viewerA_forbidden_source_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "viewerA_forbidden_operation",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "name": "viewerA_forbidden_operation_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "viewerA_forbidden_parse",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "name": "viewerA_forbidden_parse_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "viewerA_forbidden_mapping",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "name": "viewerA_forbidden_mapping_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "viewerA_forbidden_upload",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "name": "viewerA_forbidden_upload_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "viewerB_forbidden_policy",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "name": "viewerB_forbidden_policy_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "viewerB_forbidden_source",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "name": "viewerB_forbidden_source_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "viewerB_forbidden_operation",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "name": "viewerB_forbidden_operation_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "viewerB_forbidden_parse",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "name": "viewerB_forbidden_parse_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "viewerB_forbidden_mapping",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "name": "viewerB_forbidden_mapping_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "viewerB_forbidden_upload",
+      "status": "PASS",
+      "http_status": 403,
+      "expected_status": 403,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "name": "viewerB_forbidden_upload_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "foreign_creator_404_source",
+      "status": "PASS",
+      "http_status": 404,
+      "expected_status": 404,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "OBJECT_NOT_FOUND"
+    },
+    {
+      "name": "foreign_creator_404_source_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "foreign_creator_404_operation",
+      "status": "PASS",
+      "http_status": 404,
+      "expected_status": 404,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "OBJECT_NOT_FOUND"
+    },
+    {
+      "name": "foreign_creator_404_operation_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "foreign_creator_404_parse",
+      "status": "PASS",
+      "http_status": 404,
+      "expected_status": 404,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "OBJECT_NOT_FOUND"
+    },
+    {
+      "name": "foreign_creator_404_parse_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "foreign_creator_404_mapping",
+      "status": "PASS",
+      "http_status": 404,
+      "expected_status": 404,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "OBJECT_NOT_FOUND"
+    },
+    {
+      "name": "foreign_creator_404_mapping_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "cross_tenant_404_source",
+      "status": "PASS",
+      "http_status": 404,
+      "expected_status": 404,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "OBJECT_NOT_FOUND"
+    },
+    {
+      "name": "cross_tenant_404_source_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "cross_tenant_404_operation",
+      "status": "PASS",
+      "http_status": 404,
+      "expected_status": 404,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "OBJECT_NOT_FOUND"
+    },
+    {
+      "name": "cross_tenant_404_operation_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "cross_tenant_404_parse",
+      "status": "PASS",
+      "http_status": 404,
+      "expected_status": 404,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "OBJECT_NOT_FOUND"
+    },
+    {
+      "name": "cross_tenant_404_parse_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "cross_tenant_404_mapping",
+      "status": "PASS",
+      "http_status": 404,
+      "expected_status": 404,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "OBJECT_NOT_FOUND"
+    },
+    {
+      "name": "cross_tenant_404_mapping_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_original_fixture_digest",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_accepted",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_source_accepted_ids",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_same_key_boundary_mime_replay",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_source_same_source_and_operation",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_different_bytes_same_key_conflict",
+      "status": "PASS",
+      "http_status": 409,
+      "expected_status": 409,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "IDEMPOTENCY_CONFLICT"
+    },
+    {
+      "name": "xlsx_source_different_bytes_same_key_conflict_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_operation_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_source_store_operation_binding_1",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_source_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_source_store_source_001_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_source_001_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_operation_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_source_store_operation_binding_2",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_source_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_source_store_source_002_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_source_002_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_operation_003",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_source_store_operation_binding_3",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_source_003",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_source_store_source_003_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_source_003_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_operation_004",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_source_store_operation_binding_4",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_source_004",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_source_store_source_004_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_source_004_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_real_worker_terminal",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_store_raw_ready_only",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_accepted",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_inventory_same_source",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_canonical_object_replay",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_inventory_same_source_and_operation",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_operation_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_inventory_operation_binding_1",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_source_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_inventory_source_001_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_source_001_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_operation_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_inventory_operation_binding_2",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_source_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_inventory_source_002_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_source_002_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_operation_003",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_inventory_operation_binding_3",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_source_003",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_inventory_source_003_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_source_003_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_real_worker_terminal",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_artifact_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_artifact_binding_canonical_parse_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_parse_status_matches",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_inventory_no_guess",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_accepted",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_same_source",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_canonical_object_replay",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_same_source_and_operation",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_operation_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_operation_binding_1",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_source_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_source_001_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_source_001_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_operation_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_operation_binding_2",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_source_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_source_002_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_source_002_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_operation_003",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_operation_binding_3",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_source_003",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_source_003_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_source_003_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_operation_004",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_operation_binding_4",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_source_004",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_source_004_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_source_004_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_real_worker_terminal",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_artifact_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_artifact_binding_canonical_parse_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_selected_hidden_sheet_parse_status_matches",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_serial_date_raw_kind_style_epoch",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_source_row_and_physical_line_metadata",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_stale_cas",
+      "status": "PASS",
+      "http_status": 409,
+      "expected_status": 409,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "xlsx_mapping_stale_cas_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_wrong_parse_hash",
+      "status": "PASS",
+      "http_status": 409,
+      "expected_status": 409,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VERSION_CONFLICT"
+    },
+    {
+      "name": "xlsx_mapping_wrong_parse_hash_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_unknown_field",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "xlsx_mapping_unknown_field_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_note_must_map",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "xlsx_mapping_note_must_map_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_duplicate_source_assignment",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "xlsx_mapping_duplicate_source_assignment_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_explicit_all_ignored_required",
+      "status": "PASS",
+      "http_status": 400,
+      "expected_status": 400,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "xlsx_mapping_explicit_all_ignored_required_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_saved_response",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_mapping_canonical_object_replay",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_mapping_same_mapping_replay",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_durable_source_readback",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_mapping_durable_source_readback_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_durable_source_readback_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_mapping_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_canonical_preview_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_raw_mapped_row_count",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_raw_row_1",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_changed_body_same_key_conflict",
+      "status": "PASS",
+      "http_status": 409,
+      "expected_status": 409,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "IDEMPOTENCY_CONFLICT"
+    },
+    {
+      "name": "xlsx_mapping_changed_body_same_key_conflict_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_mapping_business_rules_and_quota_unconfirmed",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_fixture_owned",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_fixture_digest",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_accepted",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_source_accepted_ids",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_same_key_boundary_mime_replay",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_source_same_source_and_operation",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_different_bytes_same_key_conflict",
+      "status": "PASS",
+      "http_status": 409,
+      "expected_status": 409,
+      "schema_valid": true,
+      "trace_header_matches": true,
+      "error_code": "IDEMPOTENCY_CONFLICT"
+    },
+    {
+      "name": "xlsx_formula_source_different_bytes_same_key_conflict_error_code",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_operation_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_source_store_operation_binding_1",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_source_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_source_store_source_001_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_source_001_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_operation_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_source_store_operation_binding_2",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_source_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_source_store_source_002_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_source_002_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_operation_003",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_source_store_operation_binding_3",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_source_003",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_source_store_source_003_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_source_003_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_operation_004",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_source_store_operation_binding_4",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_source_004",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_source_store_source_004_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_source_004_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_real_worker_terminal",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_source_store_raw_ready_only",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_accepted",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_same_source",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_canonical_object_replay",
+      "status": "PASS",
+      "http_status": 202,
+      "expected_status": 202,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_same_source_and_operation",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_operation_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_operation_binding_1",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_source_001",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_source_001_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_source_001_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_operation_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_operation_binding_2",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_source_002",
+      "status": "PASS",
+      "http_status": 200,
+      "expected_status": 200,
+      "schema_valid": true,
+      "trace_header_matches": true
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_source_002_metadata_binding",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_source_002_metadata_binding_unapproved",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_real_worker_terminal",
+      "status": "PASS"
+    },
+    {
+      "name": "xlsx_formula_cached_value_rejected_invalid_has_no_artifact",
+      "status": "PASS"
+    }
+  ],
+  "role_context": {
+    "owner": "padmin",
+    "foreign_creator": "tadmin",
+    "cross_tenant_writer": "msp",
+    "viewer_same_tenant": "viewerA",
+    "viewer_other_tenant": "viewerB",
+    "all_from_real_session": true
+  },
+  "completed_at": "2026-10-02T03:18:34.892Z",
+  "actual_http_responses": 124,
+  "check_count": 327,
+  "passed": 327,
+  "failed": 0,
+  "artifacts": [
+    {
+      "format": "CSV",
+      "source_id": "a9880a94-67e9-47e4-8aaf-b874cf0d72f7",
+      "storage_operation_id": "0a2dfcf2-3773-42eb-a7a2-de9052b89d56",
+      "parse_operation_id": "02c83dff-5d55-4d8d-bb40-82a54022c06e",
+      "source_sha256": "4f1d758db6860ec5d656f041496ecd03558af4b0e44b27f799ca395b06344369",
+      "parse_hash": "8beaa5e0ff97498bdf3a328c30fea4b496176420ab44373ed55b70fababac349",
+      "preview_hash": "4adc37d174b2d1545c72d031cc3129d04ed5dcab4b578d11939246e19e5aed42",
+      "source_version": 5,
+      "date_epoch": "NOT_APPLICABLE",
+      "original_rows": 2,
+      "precheck_status": "NOT_RUN",
+      "business_status": "CONFIG_PENDING",
+      "can_import": false
+    },
+    {
+      "format": "XLSX",
+      "source_id": "ab5debca-1f6f-4d4e-a16a-def12de1e1ac",
+      "storage_operation_id": "23c18165-edbf-43c8-9999-6e1da46f41c5",
+      "parse_operation_id": "74f9a395-1baa-4e59-9ef8-f5b24a8a6e77",
+      "source_sha256": "3aa199ea0d502a2ecbdbf8b7ebf08d6d2cecadf5db6fb32e9b87afbad0b0a9a3",
+      "parse_hash": "f5b36e7d7716bb6656f9323fcb826771b174349b09c53f20d0c98ae36af73ea0",
+      "preview_hash": "b42144614e6077ce5862933995a705d497e3f7294b933eb3b1d2fdef0a10e392",
+      "source_version": 7,
+      "date_epoch": "MAC_1904",
+      "original_rows": 1,
+      "precheck_status": "NOT_RUN",
+      "business_status": "CONFIG_PENDING",
+      "can_import": false
+    }
+  ]
+}

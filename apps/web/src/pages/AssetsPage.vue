@@ -10,6 +10,7 @@ import AppTable from '../components/AppTable.vue'
 import StatusTag from '../components/StatusTag.vue'
 import PermissionGate from '../components/PermissionGate.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import AssetImportWorkspace from '../components/AssetImportWorkspace.vue'
 const route = useRoute()
 const router = useRouter()
 const pageSizes = [10, 15, 25, 50, 100]
@@ -82,6 +83,8 @@ const formRef = ref<FormInstance>()
 const draft = reactive<AssetDraft>({ name: '', type: 'switch', management_ip: '', site_id: '' })
 const createError = ref<unknown>(null)
 const creating = ref(false)
+const importOpen = ref(false)
+const importAllowed = computed(() => ['padmin', 'msp', 'tadmin'].includes(session.value?.user.role || ''))
 const availableSites = computed(() => [...new Set(rows.value.map(item => item.site_id))])
 const rules: FormRules<AssetDraft> = {
   name: [{ required: true, whitespace: true, message: '请输入资产名称', trigger: 'blur' }, { max: 100, message: '名称最多 100 个字符', trigger: 'blur' }],
@@ -105,7 +108,7 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
 </script>
 <template>
   <section>
-    <div class="page-heading"><div><span class="eyebrow">RESOURCE / ASSETS</span><h1>资产管理</h1><p>管理当前租户的资产台账，查看来源与接入状态。</p></div><PermissionGate capability="assets:write"><el-button type="primary" @click="openCreate">＋ 创建资产草稿</el-button></PermissionGate></div>
+    <div class="page-heading"><div><span class="eyebrow">RESOURCE / ASSETS</span><h1>资产管理</h1><p>管理当前租户的资产台账，查看来源与接入状态。</p></div><div class="assets-heading-actions"><PermissionGate capability="assets:write"><el-button type="primary" @click="openCreate">＋ 创建资产草稿</el-button><el-button v-if="importAllowed" plain @click="importOpen = true">导入资产来源</el-button></PermissionGate></div></div>
     <div class="scope-card"><div><span class="small-label">当前租户</span><strong>{{ session?.tenant.name }}</strong></div><div><span class="small-label">本页资产</span><strong>{{ loading ? '—' : rows.length }} <small>个</small></strong></div><div class="scope-explanation"><span class="scope-dot" /><span>未知不代表正常。测试种子与手动草稿未真实采集，采样时间与指标保留为空。</span></div></div>
     <div class="panel">
       <el-form class="filter-form" :inline="true" @submit.prevent="applyFilters">
@@ -142,5 +145,11 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
       <el-form ref="formRef" :model="draft" :rules="rules" label-position="top" class="dialog-form" @submit.prevent="createAsset"><el-form-item label="资产名称" prop="name"><el-input v-model="draft.name" maxlength="100" show-word-limit placeholder="例如：总部核心交换机" /></el-form-item><el-form-item label="设备类型" prop="type"><el-select v-model="draft.type"><el-option v-for="type in assetTypes" :key="type.value" :label="type.label" :value="type.value" /></el-select></el-form-item><el-form-item label="管理 IP" prop="management_ip"><el-input v-model="draft.management_ip" placeholder="IPv4 或 IPv6，最终由服务端校验" /></el-form-item><el-form-item label="站点 ID" prop="site_id"><el-select v-model="draft.site_id" filterable allow-create default-first-option placeholder="当前租户站点 ID"><el-option v-for="site in availableSites" :key="site" :label="site" :value="site" /></el-select><span class="field-help">选项来自本页资产的服务端站点 ID；草稿提交后还须通过服务端归属校验。</span></el-form-item></el-form>
       <template #footer><el-button :disabled="creating" @click="createOpen = false">取消</el-button><el-button type="primary" :loading="creating" @click="createAsset">保存草稿</el-button></template>
     </el-dialog>
+    <AssetImportWorkspace v-model="importOpen" />
   </section>
 </template>
+
+<style>
+.assets-heading-actions{display:flex;flex-wrap:wrap;gap:8px}.assets-heading-actions .el-button+.el-button{margin-left:0}
+@media(max-width:760px){.assets-heading-actions .el-button{min-height:44px;height:auto;white-space:normal}}
+</style>

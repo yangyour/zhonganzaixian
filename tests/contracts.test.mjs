@@ -176,8 +176,125 @@ test('operation区分报障门禁与真实文件状态，终态不得伪造', ()
 
 test('就绪成功不能把已启用但缺schema或存储的照片能力写成READY', () => {
   const photos = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, policy_source: 'USER_DEVELOPMENT_DIRECTION', reasons: [] };
-  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos };
+  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
   assert.equal(validates('ReadinessResult', { data, trace_id: 'MOP-FAKE-readiness' }), true);
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('ReadinessResult', { data: { ...data, photos: { ...photos, [key]: false } }, trace_id: 'MOP-FAKE-readiness' }), false);
   assert.equal(validates('ReadinessResult', { data: { ...data, production_ready: true }, trace_id: 'MOP-FAKE-readiness' }), false);
+});
+
+const importColumns = ['NAME', 'TYPE', 'ADDRESS', 'BRAND', 'MODEL', 'SERIAL_NUMBER', 'SITE', 'LOCATION', 'OWNER', 'BUSINESS', 'PURCHASE_DATE', 'WARRANTY_EXPIRY', 'OVERDUE_SERVICE_DATE', 'COLLECTION_METHOD', 'NOTE'];
+const importLabels = ['设备名称', '设备类型', 'IP或域名', '品牌', '型号', '序列号', '站点', '位置', '负责人', '所属业务', '采购日期', '维保到期日', '超期服役日期', '采集方式', '备注'];
+const importFacts = { business_status: 'CONFIG_PENDING', can_import: false, question_ids: ['Q20', 'Q31'], scan_status: 'UNSCANNED', production_approval: 'UNVERIFIED', retention_until: null };
+const importSelection = { declared_format: 'CSV', encoding: 'GB18030', delimiter: '\t', sheet_index: null, header_row: 1 };
+const importArtifact = {
+  id: id('6'), tenant_id: id('2'), source_id: id('1'), operation_id: id('5'), parse_hash: 'b'.repeat(64), source_sha256: 'a'.repeat(64), schema_version: 'contract-m3-6-standard15-v1', selection: importSelection, created_at: timestamp,
+  state: 'PARSED', detected_format: 'CSV', sheets: [{ index: 0, name: 'CSV', hidden: false }], selected_sheet_index: 0, header_row: 1, date_epoch: 'NOT_APPLICABLE',
+  columns: importColumns.map((code, index) => ({ index, header: importLabels[index], target_suggestions: [code] })),
+  rows: [{ logical_record_number: 2, source_row_number: 2, physical_start_line: 2, physical_end_line: 2, cells: importColumns.map((_code, index) => ({ column_index: index, kind: 'TEXT', lexical: index === 14 ? 'MOP-FAKE原备注' : 'MOP-FAKE原值', display: index === 14 ? 'MOP-FAKE原备注' : 'MOP-FAKE原值', style_index: null, format_code: null })) }],
+  parser_version: 'mop-source-parser-v1', resource_policy_version: 'asset-import-technical-v1',
+};
+const importMapping = {
+  id: id('7'), tenant_id: id('2'), source_id: id('1'), artifact_id: id('6'), version: 1, source_parse_hash: 'b'.repeat(64), preview_hash: 'c'.repeat(64), schema_version: 'contract-m3-6-standard15-v1',
+  target_source_columns: Object.fromEntries(importColumns.map((code, index) => [code, index])), ignored_source_columns: [],
+  mapped_raw_rows: importArtifact.rows.map(row => ({ ...row, cells: Object.fromEntries(importColumns.map((code, index) => [code, row.cells[index]])) })), precheck_status: 'NOT_RUN', created_at: timestamp,
+};
+const importSource = {
+  id: id('1'), tenant_id: id('2'), created_by: id('3'), purpose: 'asset_import_source', original_name: 'MOP-FAKE.csv', declared_format: 'CSV', size_bytes: 20971520, sha256: 'a'.repeat(64), storage_status: 'READY', parse_status: 'PARSED',
+  store_operation_id: id('4'), parse_operation_id: id('5'), latest_artifact_id: id('6'), latest_mapping_id: id('7'), version: 5, created_at: timestamp, updated_at: timestamp, parsed_artifact: importArtifact, mapping: importMapping,
+  ...importFacts, effective_rule_versions: null, quota_reservation: null,
+};
+
+test('V0.8来源接口独立creator-only，POST带CSRF/幂等，上传及解析只202', () => {
+  assert.equal(contract.info.version, '0.8.0');
+  const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
+  for (const [path, method] of Object.entries(routes)) {
+    const operation = contract.paths[path][method];
+    assert.equal(operation['x-mop-capability'], 'assets:write'); assert.deepEqual(operation['x-mop-roles'], ['padmin', 'msp', 'tadmin']);
+    assert.equal(operation['x-mop-creator-only'], true); assert.equal(operation['x-mop-permission-version-recheck'], true); assert.equal(operation['x-mop-reject-unknown-query-keys'], true);
+    assert.ok(operation.responses['404']); assert.ok(operation.responses['503']);
+    if (path.endsWith('import-sources') || path.endsWith('/parses')) { assert.ok(operation.responses['202']); assert.equal(operation.responses['200'], undefined) }
+  }
+  assert.equal(contract.paths['/assets/import-sources/{id}/imports'], undefined);
+  assert.equal(contract.paths['/assets/import-sources/{id}/mappings'].post.responses['200'].content['application/json'].schema.$ref, '#/components/schemas/AssetImportSourceResult');
+  const accepted = { data: { source_id: id('1'), operation_id: id('4'), status: 'PENDING' }, trace_id: 'MOP-FAKE-import' };
+  assert.equal(validates('AssetImportAccepted', accepted), true);
+  assert.equal(validates('AssetImportAccepted', { ...accepted, data: { operation_id: id('4'), status: 'PENDING' } }), false);
+  assert.equal(validates('Accepted', accepted), false);
+});
+
+test('来源multipart严格三parts、CSV/XLSX与20MiB，照片维持独立5MB', () => {
+  const upload = contract.paths['/assets/import-sources'].post.requestBody;
+  assert.deepEqual(Object.keys(upload.content), ['multipart/form-data']);
+  const schema = contract.components.schemas.AssetImportSourceUpload;
+  assert.equal(schema.additionalProperties, false); assert.deepEqual([...schema.required].sort(), ['file', 'format', 'purpose']); assert.equal(schema.properties.file['x-mop-max-bytes'], 20971520);
+  assert.equal(contract.components.schemas.ReportPhotoUpload.properties.file['x-mop-max-bytes'], 5000000);
+  assert.equal(validates('AssetImportSourceUpload', { file: 'binary-placeholder', purpose: 'asset_import_source', format: 'XLSX' }), true);
+  for (const invalid of [{ file: 'binary-placeholder', purpose: 'customer_report_photo', format: 'CSV' }, { file: 'binary-placeholder', purpose: 'asset_import_source', format: 'XLS' }, { file: 'binary-placeholder', purpose: 'asset_import_source', format: 'CSV', tenant_id: id('2') }]) assert.equal(validates('AssetImportSourceUpload', invalid), false);
+});
+
+test('解析flat参数拒绝默认编码、literal TAB、零表头、客户端主体与缺CAS', () => {
+  const request = { expected_version: 2, ...importSelection };
+  assert.equal(validates('AssetImportParseRequest', request), true);
+  for (const invalid of [
+    { ...request, encoding: null }, { ...request, encoding: 'GBK' }, { ...request, delimiter: '\\t' }, { ...request, sheet_index: 0 }, { ...request, header_row: 0 }, { ...request, header_row: null },
+    { ...request, expected_version: 0 }, { ...request, expected_version: 1.5 }, { ...request, tenant_id: id('2') }, { ...request, selection: importSelection },
+    Object.fromEntries(Object.entries(request).filter(([key]) => key !== 'expected_version')),
+  ]) assert.equal(validates('AssetImportParseRequest', invalid), false);
+  const inventory = { expected_version: 2, declared_format: 'XLSX', encoding: null, delimiter: null, sheet_index: null, header_row: null };
+  assert.equal(validates('AssetImportParseRequest', inventory), true);
+  assert.equal(validates('AssetImportParseRequest', { ...inventory, sheet_index: 1, header_row: 2 }), true);
+  for (const invalid of [{ ...inventory, sheet_index: 32 }, { ...inventory, header_row: 20001 }, { ...inventory, encoding: 'UTF-8' }, { ...inventory, delimiter: ',' }]) assert.equal(validates('AssetImportParseRequest', invalid), false);
+});
+
+test('映射恰好15个目标、NOTE必须index，显式null与ignore有独立语义', () => {
+  const request = { expected_version: 4, source_parse_hash: 'b'.repeat(64), target_source_columns: importMapping.target_source_columns, ignored_source_columns: [] };
+  assert.equal(validates('AssetImportMappingRequest', request), true);
+  assert.equal(validates('AssetImportMappingRequest', { ...request, target_source_columns: { ...request.target_source_columns, NAME: null }, ignored_source_columns: [0] }), true);
+  for (const change of [
+    value => { delete value.target_source_columns.NAME }, value => { value.target_source_columns.EXTRA = null }, value => { value.target_source_columns.NOTE = null }, value => { value.target_source_columns.NAME = 'UNDECIDED' },
+    value => { value.target_source_columns.NAME = -1 }, value => { value.target_source_columns.NAME = 64 }, value => { value.ignored_source_columns = [1, 1] }, value => { value.source_parse_hash = 'unknown' }, value => { delete value.expected_version }, value => { value.actor_id = id('3') },
+  ]) { const candidate = structuredClone(request); change(candidate); assert.equal(validates('AssetImportMappingRequest', candidate), false) }
+  const semantic = contract.components.schemas.AssetImportMappingRequest['x-mop-semantic-checks'].join(' ');
+  assert.match(semantic, /不得重复分配/); assert.match(semantic, /不得与映射集合交叉/); assert.match(semantic, /所有当前源列必须显式映射或忽略/);
+});
+
+test('raw artifact保留lexical/display/style/date_epoch，目录状态不冒充PARSED', () => {
+  assert.equal(validates('AssetImportParsedArtifact', importArtifact), true);
+  const inventory = { ...importArtifact, detected_format: 'XLSX', state: 'SELECTION_REQUIRED', selection: { declared_format: 'XLSX', encoding: null, delimiter: null, sheet_index: null, header_row: null }, sheets: [{ index: 0, name: 'Cover', hidden: false }, { index: 1, name: 'MOP-FAKE hidden', hidden: true }], selected_sheet_index: null, header_row: null, date_epoch: 'MAC_1904', columns: [], rows: [] };
+  assert.equal(validates('AssetImportParsedArtifact', inventory), true);
+  for (const invalid of [{ ...inventory, rows: importArtifact.rows }, { ...inventory, columns: importArtifact.columns }, { ...inventory, date_epoch: 'NOT_APPLICABLE' }, { ...importArtifact, date_epoch: 'MAC_1904' }, { ...importArtifact, selected_sheet_index: null }, { ...importArtifact, rows: Array.from({ length: 501 }, () => importArtifact.rows[0]) }]) assert.equal(validates('AssetImportParsedArtifact', invalid), false);
+  assert.equal(validates('AssetImportSourceCell', { column_index: 0, kind: 'NUMERIC', lexical: '46000.25', display: '2025/12/09 06:00', style_index: 2, format_code: 'yyyy/mm/dd hh:mm' }), true);
+  assert.equal(validates('AssetImportSourceCell', { ...importArtifact.rows[0].cells[0], kind: 'FORMULA', cached_value: 'fake' }), false);
+});
+
+test('来源和映射拒绝实际导入、配额、生效规则以及私有存储伪事实', () => {
+  assert.equal(validates('AssetImportSource', importSource), true); assert.equal(validates('AssetImportMapping', importMapping), true);
+  for (const change of [
+    value => { value.can_import = true }, value => { value.business_status = 'IMPORTED' }, value => { value.effective_rule_versions = [] }, value => { value.quota_reservation = { count: 1 } },
+    value => { value.scan_status = 'CLEAN' }, value => { value.production_approval = 'APPROVED' }, value => { value.retention_until = timestamp }, value => { value.size_bytes = 20971521 },
+    value => { value.mapping.precheck_status = 'PASS' }, value => { value.mapping.can_import = true }, value => { value.object_key = 'private/source' }, value => { value.bucket = 'private-bucket' }, value => { value.imported_count = 1 },
+  ]) { const candidate = structuredClone(importSource); change(candidate); assert.equal(validates('AssetImportSource', candidate), false) }
+  const pending = { ...importSource, storage_status: 'PENDING', parse_status: 'NOT_REQUESTED', parse_operation_id: null, latest_artifact_id: null, latest_mapping_id: null, parsed_artifact: null, mapping: null };
+  assert.equal(validates('AssetImportSource', pending), true);
+  for (const invalid of [{ ...importSource, latest_artifact_id: null }, { ...importSource, latest_mapping_id: null }, { ...importSource, parse_status: 'PENDING' }, { ...pending, parse_status: 'PARSED' }]) assert.equal(validates('AssetImportSource', invalid), false);
+});
+
+test('STORE_RAW/PARSE操作终态与error一致，独立于照片operation', () => {
+  const base = { id: id('4'), tenant_id: id('2'), source_id: id('1'), created_by: id('3'), kind: 'STORE_RAW', result_ref: `/api/v1/assets/import-sources/${id('1')}`, result_artifact_id: null, created_at: timestamp, updated_at: timestamp };
+  for (const [kind, step, status, result_artifact_id, error] of [
+    ['STORE_RAW', 'QUEUED', 'PENDING', null, null], ['STORE_RAW', 'STORING', 'RUNNING', null, null], ['STORE_RAW', 'STORED', 'SUCCEEDED', null, null], ['PARSE', 'PARSING', 'RUNNING', null, null], ['PARSE', 'PARSED', 'SUCCEEDED', id('6'), null], ['PARSE', 'SELECTION_REQUIRED', 'SUCCEEDED', id('6'), null],
+    ['PARSE', 'RETRY_WAIT', 'PENDING', null, { code: 'UPSTREAM_UNAVAILABLE', message: 'MOP-FAKE unavailable', retryable: true, question_ids: [] }], ['PARSE', 'PARSE_INVALID', 'FAILED', null, { code: 'IMPORT_SOURCE_INVALID', message: 'MOP-FAKE invalid input', retryable: false, question_ids: [] }],
+  ]) assert.equal(validates('AssetImportOperation', { ...base, kind, step, status, result_artifact_id, error }), true);
+  for (const invalid of [{ ...base, status: 'SUCCEEDED', step: 'QUEUED', error: null }, { ...base, status: 'SUCCEEDED', step: 'PARSED', error: null }, { ...base, status: 'RUNNING', step: 'PARSING', error: null }, { ...base, status: 'SUCCEEDED', step: 'STORED', error: null, object_key: 'private' }, { ...base, status: 'SUCCEEDED', step: 'STORED', error: null, result_ref: `/api/v1/files/${id('1')}` }]) assert.equal(validates('AssetImportOperation', invalid), false);
+});
+
+test('技术政策与就绪不冒充业务资格或Worker活动，实际限制不可与照片混同', () => {
+  const policy = { ...importFacts, purpose: 'asset_import_source', allowed_formats: ['CSV', 'XLSX'], format_source: 'CONTRACT_M3_6', max_source_bytes: 20971520, max_data_rows: 500, max_source_columns: 64, max_sheets: 32, max_header_row: 20000, max_cell_chars: 4096, resource_policy_version: 'asset-import-technical-v1', resource_limit_kind: 'TECHNICAL_CONTAINMENT', schema_version: 'contract-m3-6-standard15-v1', target_columns: importColumns.map((code, index) => ({ code, label: importLabels[index], contract_always_required: code === 'NOTE' })), csv_encodings: ['UTF-8', 'UTF-16LE', 'UTF-16BE', 'GB18030'], csv_delimiters: [',', ';', '\t'], sheet_index_base: 0, column_index_base: 0, row_number_base: 1 };
+  assert.equal(validates('AssetImportPolicy', policy), true);
+  for (const invalid of [{ ...policy, max_source_bytes: 5000000 }, { ...policy, max_data_rows: 501 }, { ...policy, can_import: true }, { ...policy, csv_delimiters: [',', ';', '\\t'] }, { ...policy, target_columns: [...policy.target_columns.slice(0, 14), policy.target_columns[0]] }]) assert.equal(validates('AssetImportPolicy', invalid), false);
+  const ready = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: [] };
+  assert.equal(validates('AssetImportReadiness', ready), true);
+  for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('AssetImportReadiness', { ...ready, [key]: false }), false);
+  assert.equal(validates('AssetImportReadiness', { ...ready, worker_activity: 'RUNNING' }), false);
+  assert.equal(validates('AssetImportReadiness', { ...ready, can_import: true }), false);
 });

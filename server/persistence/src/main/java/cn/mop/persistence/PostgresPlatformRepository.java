@@ -18,6 +18,8 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     private final DataSource dataSource;
     private final ObjectMapper mapper;
     private final ThreadLocal<Connection> transaction = new ThreadLocal<>();
+    private final ThreadLocal<Boolean> idempotentCommandScope = new ThreadLocal<>();
+    private final ThreadLocal<Boolean> importJobScope = new ThreadLocal<>();
     public PostgresPlatformRepository(DataSource dataSource,ObjectMapper mapper){this.dataSource=dataSource;this.mapper=mapper;}
     @Override public RepositoryMetadata metadata(){return new RepositoryMetadata("remote_test","postgresql",true,"test_oidc");}
     @Override public boolean dependencyReady(){
@@ -55,6 +57,11 @@ public final class PostgresPlatformRepository implements PlatformRepository {
             finally{transaction.remove();}
         }catch(SQLException exception){logSqlFailure(exception);throw unavailable();}
     }
+    /** Package-private bridge for the independent asset-import repository; preserves this class's transaction ThreadLocal. */
+    <T>T importJobTransaction(Supplier<T> work){return inTransaction(()->scoped(importJobScope,work));}
+    /** Requires an actual idempotent command or import-job callback, not merely an unrelated audit transaction. */
+    Connection importCommandConnection(){Connection active=transaction.get();if(active==null||!Boolean.TRUE.equals(idempotentCommandScope.get())&&!Boolean.TRUE.equals(importJobScope.get()))throw new IllegalStateException("Import writes require a protected command or job transaction");return active;}
+    private static <T>T scoped(ThreadLocal<Boolean> scope,Supplier<T> work){Boolean previous=scope.get();scope.set(true);try{return work.get();}finally{if(previous==null)scope.remove();else scope.set(previous);}}
     private void lock(String scope){connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT pg_advisory_xact_lock(hashtextextended(?,0))")){statement.setString(1,scope);statement.execute();return null;}});}
     private static DomainException unavailable(){return new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境 PostgreSQL 不可用，未受理请求");}
     private static void logSqlFailure(SQLException failure){String state=failure.getSQLState();log.log(System.Logger.Level.WARNING,"Project PostgreSQL operation failed sql_state={0} exception_type={1}",state!=null&&state.matches("[A-Z0-9]{5}")?state:"UNKNOWN",failure.getClass().getSimpleName());}
@@ -90,7 +97,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         if(expectedPermissionVersion>0&&current.permissionVersion()!=expectedPermissionVersion)throw new DomainException(401,"SESSION_EXPIRED","权限已变化，请刷新会话");
         Object saved=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT payload_hash,response_json FROM public.mop_idempotency WHERE actor_id::text=? AND tenant_id::text=? AND route=? AND request_key=?")){statement.setString(1,actor);statement.setString(2,tenant);statement.setString(3,route);statement.setString(4,key);try(ResultSet rows=statement.executeQuery()){if(!rows.next())return null;if(!rows.getString(1).equals(hash))throw new DomainException(409,"IDEMPOTENCY_CONFLICT","同一幂等键不能用于不同请求内容");return json(rows.getString(2));}}});
         if(saved!=null)return saved;
-        Object result=command.get();JsonNode response=mapper.valueToTree(result);rejectSessionSecrets(response);
+        Object result=scoped(idempotentCommandScope,command);JsonNode response=mapper.valueToTree(result);rejectSessionSecrets(response);
         connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_idempotency(actor_id,tenant_id,route,request_key,payload_hash,response_json) VALUES (?::uuid,?::uuid,?,?,?,?::jsonb)")){statement.setString(1,actor);statement.setString(2,tenant);statement.setString(3,route);statement.setString(4,key);statement.setString(5,hash);statement.setString(6,response.toString());statement.executeUpdate();return null;}});
         return result;
     });}

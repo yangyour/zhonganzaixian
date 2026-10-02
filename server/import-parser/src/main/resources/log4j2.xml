@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The parser subprocess communicates only through its single JSON response. -->
+<Configuration status="OFF"><Loggers><Root level="OFF"/></Loggers></Configuration>

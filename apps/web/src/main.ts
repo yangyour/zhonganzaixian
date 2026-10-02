@@ -1,9 +1,9 @@
 import { createApp } from 'vue'
 import {
-  ElAlert, ElBreadcrumb, ElBreadcrumbItem, ElButton, ElConfigProvider,
+  ElAlert, ElBreadcrumb, ElBreadcrumbItem, ElButton, ElCheckbox, ElCheckboxGroup, ElConfigProvider,
   ElDescriptions, ElDescriptionsItem, ElDialog, ElDrawer, ElForm, ElFormItem,
-  ElInput, ElLoading, ElMenu, ElMenuItem, ElOption, ElSelect, ElSkeleton,
-  ElTable, ElTableColumn, ElTag,
+  ElEmpty, ElInput, ElLoading, ElMenu, ElMenuItem, ElOption, ElSelect, ElSkeleton,
+  ElStep, ElSteps, ElTable, ElTableColumn, ElTag,
 } from 'element-plus'
 import 'element-plus/dist/index.css'
 import './styles.css'
@@ -15,9 +15,9 @@ import { router } from './router'
 api.onUnauthorized = () => { forgetSession(); void router.replace({ name: 'login' }) }
 const app = createApp(App)
 for (const component of [
-  ElAlert, ElBreadcrumb, ElBreadcrumbItem, ElButton, ElConfigProvider,
+  ElAlert, ElBreadcrumb, ElBreadcrumbItem, ElButton, ElCheckbox, ElCheckboxGroup, ElConfigProvider,
   ElDescriptions, ElDescriptionsItem, ElDialog, ElDrawer, ElForm, ElFormItem,
-  ElInput, ElMenu, ElMenuItem, ElOption, ElSelect, ElSkeleton, ElTable, ElTableColumn, ElTag,
+  ElEmpty, ElInput, ElMenu, ElMenuItem, ElOption, ElSelect, ElSkeleton, ElStep, ElSteps, ElTable, ElTableColumn, ElTag,
 ]) app.use(component)
 app.directive('loading', ElLoading.directive)
 app.use(router).mount('#app')

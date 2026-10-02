@@ -7,6 +7,7 @@ import org.flywaydb.core.api.logging.Log;
 import org.flywaydb.core.api.logging.LogFactory;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.security.MessageDigest;
 import java.sql.*;
 import java.util.*;
 import java.util.function.Function;
@@ -16,7 +17,8 @@ public final class TestSchemaMigration {
     private static final Map<String,String> SCRIPTS=Map.of(
         "1","V1__remote_test_platform.sql", "2","V2__tenant_configuration_revisions.sql",
         "3","V3__configuration_review_test_identity.sql", "4","V4__durable_customer_report_registration.sql",
-        "5","V5__durable_report_photos.sql");
+        "5","V5__durable_report_photos.sql", "6","V6__asset_import_sources_and_mapping.sql");
+    static final String IMPORT_SHA256="1f532822668274b7aebd12ea78b57e6be0aa9fd53ceb77023ee8067589cd2b4b";
     private static final String RUNTIME="mop_test_runtime";
     private TestSchemaMigration() {}
 
@@ -31,24 +33,35 @@ public final class TestSchemaMigration {
         @Override public String toString(){return "Settings[mop_test,mop_test_migrator,credentials=REDACTED]";}
     }
     record Entry(String version,String script,String type,MigrationState state,boolean applied,boolean checksumMatches,Integer checksum) {}
-    enum Plan { PHOTOS_PENDING, PHOTOS_APPLIED }
+    enum Plan { PHOTOS_PENDING, ASSET_IMPORTS_PENDING, ASSET_IMPORTS_APPLIED }
+    enum Mode { READ_ONLY_CHECK, APPLY_PHOTOS, APPLY_ASSET_IMPORTS }
 
     static boolean applyRequested(String[] args) {
-        if(args.length==0||(args.length==1&&"--check".equals(args[0])))return false;
-        if(args.length==1&&"--apply-photos".equals(args[0]))return true;
-        throw new IllegalArgumentException("Use --check or --apply-photos");
+        return requestedMode(args)!=Mode.READ_ONLY_CHECK;
+    }
+    static Mode requestedMode(String[] args) {
+        if(args.length==0||(args.length==1&&"--check".equals(args[0])))return Mode.READ_ONLY_CHECK;
+        if(args.length==1&&"--apply-photos".equals(args[0]))return Mode.APPLY_PHOTOS;
+        if(args.length==1&&"--apply-asset-imports".equals(args[0]))return Mode.APPLY_ASSET_IMPORTS;
+        throw new IllegalArgumentException("Use --check, --apply-photos or --apply-asset-imports");
     }
     static Plan inspect(List<Entry> entries) {
-        if(entries.size()!=5)throw new IllegalStateException("Unexpected migration set");
-        Set<String> seen=new HashSet<>();Plan plan=null;
+        if(entries.size()!=6)throw new IllegalStateException("Unexpected migration set");
+        Set<String> seen=new HashSet<>();boolean photosPending=false,importsPending=false;
         for(Entry entry:entries) {
             if(entry.version()==null||!seen.add(entry.version())||!Objects.equals(SCRIPTS.get(entry.version()),entry.script())||!"SQL".equals(entry.type())||entry.checksum()==null)
                 throw new IllegalStateException("Unexpected migration identity");
-            if("5".equals(entry.version())&&entry.state()==MigrationState.PENDING&&!entry.applied())plan=Plan.PHOTOS_PENDING;
+            if("5".equals(entry.version())&&entry.state()==MigrationState.PENDING&&!entry.applied())photosPending=true;
+            else if("6".equals(entry.version())&&(entry.state()==MigrationState.PENDING||entry.state()==MigrationState.ABOVE_TARGET)&&!entry.applied())importsPending=true;
             else if(entry.state()!=MigrationState.SUCCESS||!entry.applied()||!entry.checksumMatches())throw new IllegalStateException("Inconsistent migration history");
         }
         if(!seen.equals(SCRIPTS.keySet()))throw new IllegalStateException("Missing migration");
-        return plan==null?Plan.PHOTOS_APPLIED:plan;
+        if(photosPending&&!importsPending)throw new IllegalStateException("Asset imports precede the photo baseline");
+        return photosPending?Plan.PHOTOS_PENDING:importsPending?Plan.ASSET_IMPORTS_PENDING:Plan.ASSET_IMPORTS_APPLIED;
+    }
+    static boolean shouldMigrate(Mode mode,Plan plan){
+        if(mode==Mode.APPLY_ASSET_IMPORTS&&plan==Plan.PHOTOS_PENDING)throw new IllegalStateException("Apply asset imports requires validated V1-V5 history");
+        return mode==Mode.APPLY_PHOTOS&&plan==Plan.PHOTOS_PENDING||mode==Mode.APPLY_ASSET_IMPORTS&&plan==Plan.ASSET_IMPORTS_PENDING;
     }
     private static Plan inspect(Flyway flyway) {
         List<Entry> entries=new ArrayList<>();
@@ -69,35 +82,51 @@ public final class TestSchemaMigration {
                 public boolean isDebugEnabled(){return false;} public void debug(String message){} public void info(String message){}
                 public void warn(String message){} public void error(String message){} public void error(String message,Exception error){} public void notice(String message){}
             });
-            boolean apply=applyRequested(args);stage="private_settings";Settings settings=Settings.from(System::getenv);
+            Mode mode=requestedMode(args);boolean apply=mode!=Mode.READ_ONLY_CHECK;
+            stage="migration_resources";verifyImportResource();stage="private_settings";Settings settings=Settings.from(System::getenv);
             stage="identity";
             try(Connection guard=connection(settings,!apply)) {
                 verifyIdentity(guard);
-                if(apply)requireTrue(guard,"SELECT pg_try_advisory_lock(hashtextextended('mop_test|V5_photo_migration',0))");
+                if(apply)requireTrue(guard,"SELECT pg_try_advisory_lock(hashtextextended('mop_test|explicit_schema_migration',0))");
                 stage="validate";
                 Flyway flyway=Flyway.configure().dataSource(settings.url(),settings.user(),settings.password())
                     .jdbcProperties(jdbcProperties(!apply)).locations("classpath:db/migration").schemas("public").defaultSchema("public")
                     .createSchemas(false).cleanDisabled(true).baselineOnMigrate(false).outOfOrder(false).mixed(false)
-                    .executeInTransaction(true).group(true).target("5").validateOnMigrate(true).validateMigrationNaming(true)
+                    .executeInTransaction(true).group(true).target(mode==Mode.APPLY_PHOTOS?"5":"6").validateOnMigrate(true).validateMigrationNaming(true)
                     .failOnMissingLocations(true).skipDefaultCallbacks(true).ignoreMigrationPatterns("*:pending").load();
-                flyway.validate();stage="history";Plan before=inspect(flyway);
+                flyway.validate();stage="history";Plan before=inspect(flyway);boolean migrate=shouldMigrate(mode,before);
                 stage="structure";
-                if(before==Plan.PHOTOS_PENDING)verifyBeforePhotos(guard);else verifyPhotos(guard);
+                verifyStructure(guard,before);
                 int executed=0;
-                if(apply&&before==Plan.PHOTOS_PENDING) {
-                    stage="apply_photos";var result=flyway.migrate();executed=result.migrationsExecuted;
-                    if(!result.success||executed>1)throw new IllegalStateException("Unexpected migration result");
+                Plan after=before;
+                if(migrate) {
+                    stage=mode==Mode.APPLY_PHOTOS?"apply_photos":"apply_asset_imports";var result=flyway.migrate();executed=result.migrationsExecuted;
+                    if(!result.success||executed!=1)throw new IllegalStateException("Unexpected migration result");
                     stage="post_validate";flyway.validate();
-                    if(inspect(flyway)!=Plan.PHOTOS_APPLIED)throw new IllegalStateException("Photo migration incomplete");
-                    stage="post_structure_acl";verifyPhotos(guard);
+                    after=inspect(flyway);Plan expected=mode==Mode.APPLY_PHOTOS?Plan.ASSET_IMPORTS_PENDING:Plan.ASSET_IMPORTS_APPLIED;
+                    if(after!=expected)throw new IllegalStateException("Explicit migration incomplete");
+                    stage="post_structure_acl";verifyStructure(guard,after);
                 }
-                output.println("MOP_SCHEMA status="+(before==Plan.PHOTOS_PENDING&&!apply?"PHOTOS_PENDING":"PHOTOS_APPLIED")+
-                    " mode="+(apply?"APPLY_PHOTOS":"READ_ONLY_CHECK")+" migrations_executed="+executed+
-                    " baseline=V1_V4_VALIDATED photos="+(before==Plan.PHOTOS_PENDING&&!apply?"NOT_APPLIED":"STRUCTURE_ACL_VERIFIED"));
+                output.println("MOP_SCHEMA status="+after+" mode="+mode+" migrations_executed="+executed+
+                    " baseline="+(after==Plan.PHOTOS_PENDING?"V1_V4_VALIDATED":"V1_V5_VALIDATED")+
+                    " photos="+(after==Plan.PHOTOS_PENDING?"NOT_APPLIED":"STRUCTURE_ACL_VERIFIED")+
+                    " asset_imports="+(after==Plan.ASSET_IMPORTS_APPLIED?"STRUCTURE_ACL_VERIFIED":"NOT_APPLIED"));
             }
         }catch(Throwable failure){errors.println(safeFailure(stage,failure));exit=1;}
         finally{System.setOut(output);System.setErr(errors);}
         if(exit!=0)System.exit(exit);
+    }
+    static void verifyImportResource()throws Exception{
+        try(var input=TestSchemaMigration.class.getResourceAsStream("/db/migration/"+SCRIPTS.get("6"))){
+            if(input==null||!IMPORT_SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(input.readAllBytes()))))throw new IllegalStateException("Unreviewed asset import migration resource");
+        }
+    }
+    private static void verifyStructure(Connection connection,Plan plan)throws SQLException{
+        if(plan==Plan.PHOTOS_PENDING)verifyBeforePhotos(connection);else verifyPhotos(connection);
+        if(plan==Plan.ASSET_IMPORTS_APPLIED)verifyAssetImports(connection);else verifyBeforeAssetImports(connection);
+    }
+    private static void verifyBeforeAssetImports(Connection connection)throws SQLException{
+        requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_asset_import_source','mop_asset_import_operation','mop_asset_import_job','mop_asset_import_artifact','mop_asset_import_mapping')");
     }
     private static String required(Function<String,String> environment,String name) {
         String value=environment.apply(name);if(value==null||value.isBlank())throw new IllegalArgumentException("Missing private setting");return value;
@@ -159,6 +188,60 @@ public final class TestSchemaMigration {
         for(var table:updates.entrySet())verifyRuntimeAcl(connection,table.getKey(),table.getValue());
         requireTrue(connection,"SELECT NOT has_table_privilege('mop_test_runtime','public.flyway_schema_history','SELECT') AND NOT has_table_privilege('mop_test_runtime','public.flyway_schema_history','INSERT,UPDATE,DELETE,TRUNCATE') AND NOT has_schema_privilege('mop_test_runtime','public','CREATE')");
     }
+    private static void verifyAssetImports(Connection connection)throws SQLException {
+        verifyColumns(connection,"mop_asset_import_source",Map.ofEntries(
+            Map.entry("id","uuid"),Map.entry("tenant_id","uuid"),Map.entry("created_by","uuid"),Map.entry("purpose","character varying(64)"),Map.entry("original_name","character varying(200)"),Map.entry("declared_format","character varying(8)"),
+            Map.entry("size_bytes","integer"),Map.entry("sha256","character(64)"),Map.entry("object_key","character varying(160)"),Map.entry("permission_version","bigint"),Map.entry("resource_policy_version","character varying(64)"),
+            Map.entry("store_kind","character varying(16)"),Map.entry("parse_kind","character varying(16)"),Map.entry("store_operation_id","uuid"),Map.entry("parse_operation_id","uuid"),Map.entry("storage_status","character varying(16)"),Map.entry("parse_status","character varying(24)"),
+            Map.entry("latest_artifact_id","uuid"),Map.entry("latest_mapping_id","uuid"),Map.entry("version","bigint"),Map.entry("created_at","timestamp(3) with time zone"),Map.entry("updated_at","timestamp(3) with time zone")),Set.of("parse_operation_id","latest_artifact_id","latest_mapping_id"),true);
+        verifyColumns(connection,"mop_asset_import_operation",Map.ofEntries(
+            Map.entry("id","uuid"),Map.entry("tenant_id","uuid"),Map.entry("source_id","uuid"),Map.entry("created_by","uuid"),Map.entry("permission_version","bigint"),Map.entry("kind","character varying(16)"),Map.entry("status","character varying(16)"),
+            Map.entry("step","character varying(32)"),Map.entry("result_artifact_id","uuid"),Map.entry("error","jsonb"),Map.entry("created_at","timestamp(3) with time zone"),Map.entry("updated_at","timestamp(3) with time zone")),Set.of("result_artifact_id","error"),true);
+        verifyColumns(connection,"mop_asset_import_job",Map.ofEntries(
+            Map.entry("id","uuid"),Map.entry("tenant_id","uuid"),Map.entry("source_id","uuid"),Map.entry("operation_id","uuid"),Map.entry("kind","character varying(16)"),Map.entry("content","bytea"),Map.entry("selection_json","jsonb"),
+            Map.entry("content_size","integer"),Map.entry("content_sha256","character(64)"),Map.entry("store_operation_id","uuid"),Map.entry("state","character varying(16)"),Map.entry("lease_owner","character varying(64)"),Map.entry("lease_until","timestamp(3) with time zone"),
+            Map.entry("fencing_token","bigint"),Map.entry("attempts","integer"),Map.entry("next_at","timestamp(3) with time zone"),Map.entry("created_at","timestamp(3) with time zone")),Set.of("content","selection_json","content_size","content_sha256","store_operation_id","lease_owner","lease_until","next_at"),true);
+        verifyColumns(connection,"mop_asset_import_artifact",Map.ofEntries(
+            Map.entry("id","uuid"),Map.entry("tenant_id","uuid"),Map.entry("source_id","uuid"),Map.entry("operation_id","uuid"),Map.entry("kind","character varying(16)"),Map.entry("parse_hash","character(64)"),Map.entry("source_sha256","character(64)"),
+            Map.entry("selection_json","jsonb"),Map.entry("artifact_json","jsonb"),Map.entry("schema_version","character varying(64)"),Map.entry("created_at","timestamp(3) with time zone")),Set.of(),true);
+        verifyColumns(connection,"mop_asset_import_mapping",Map.ofEntries(
+            Map.entry("id","uuid"),Map.entry("tenant_id","uuid"),Map.entry("source_id","uuid"),Map.entry("artifact_id","uuid"),Map.entry("created_by","uuid"),Map.entry("permission_version","bigint"),Map.entry("version","bigint"),Map.entry("source_parse_hash","character(64)"),
+            Map.entry("preview_hash","character(64)"),Map.entry("schema_version","character varying(64)"),Map.entry("target_source_columns","jsonb"),Map.entry("ignored_source_columns","jsonb"),Map.entry("mapped_raw_rows","jsonb"),Map.entry("created_at","timestamp(3) with time zone")),Set.of(),true);
+        List<String> tables=List.of("mop_asset_import_source","mop_asset_import_operation","mop_asset_import_job","mop_asset_import_artifact","mop_asset_import_mapping");
+        for(String table:tables){
+            requireTrue(connection,"SELECT relkind='r' AND relowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') FROM pg_class WHERE oid=?::regclass","public."+table);
+            requireConstraint(connection,table,"p",List.of("id"),null,List.of(),false);
+        }
+        String source="mop_asset_import_source",operation="mop_asset_import_operation",job="mop_asset_import_job",artifact="mop_asset_import_artifact",mapping="mop_asset_import_mapping";
+        for(List<String> columns:List.of(List.of("object_key"),List.of("store_operation_id"),List.of("tenant_id","id"),List.of("tenant_id","id","created_by"),List.of("tenant_id","id","sha256"),List.of("tenant_id","id","size_bytes","sha256"),List.of("tenant_id","id","store_operation_id")))requireConstraint(connection,source,"u",columns,null,List.of(),false);
+        for(List<String> columns:List.of(List.of("tenant_id","source_id","kind","id"),List.of("tenant_id","source_id","created_by","kind","id"),List.of("tenant_id","source_id","created_by","permission_version","kind","id")))requireConstraint(connection,operation,"u",columns,null,List.of(),false);
+        requireConstraint(connection,job,"u",List.of("operation_id"),null,List.of(),false);
+        for(List<String> columns:List.of(List.of("operation_id"),List.of("tenant_id","source_id","id"),List.of("tenant_id","source_id","operation_id","id"),List.of("tenant_id","source_id","id","parse_hash")))requireConstraint(connection,artifact,"u",columns,null,List.of(),false);
+        for(List<String> columns:List.of(List.of("tenant_id","source_id","version"),List.of("tenant_id","source_id","id"),List.of("tenant_id","source_id","artifact_id","id")))requireConstraint(connection,mapping,"u",columns,null,List.of(),false);
+        requireConstraint(connection,source,"f",List.of("tenant_id"),"mop_tenant",List.of("id"),false);
+        requireConstraint(connection,source,"f",List.of("tenant_id","created_by"),"mop_membership",List.of("tenant_id","user_id"),false);
+        requireConstraint(connection,operation,"f",List.of("tenant_id","source_id","created_by"),source,List.of("tenant_id","id","created_by"),false);
+        requireConstraint(connection,source,"f",List.of("tenant_id","id","created_by","permission_version","store_kind","store_operation_id"),operation,List.of("tenant_id","source_id","created_by","permission_version","kind","id"),true);
+        requireConstraint(connection,source,"f",List.of("tenant_id","id","created_by","parse_kind","parse_operation_id"),operation,List.of("tenant_id","source_id","created_by","kind","id"),false);
+        for(String table:List.of(job,artifact))requireConstraint(connection,table,"f",List.of("tenant_id","source_id","kind","operation_id"),operation,List.of("tenant_id","source_id","kind","id"),false);
+        requireConstraint(connection,job,"f",List.of("tenant_id","source_id","content_size","content_sha256"),source,List.of("tenant_id","id","size_bytes","sha256"),false);
+        requireConstraint(connection,job,"f",List.of("tenant_id","source_id","store_operation_id"),source,List.of("tenant_id","id","store_operation_id"),false);
+        requireConstraint(connection,artifact,"f",List.of("tenant_id","source_id","source_sha256"),source,List.of("tenant_id","id","sha256"),false);
+        requireConstraint(connection,operation,"f",List.of("tenant_id","source_id","id","result_artifact_id"),artifact,List.of("tenant_id","source_id","operation_id","id"),false);
+        requireConstraint(connection,source,"f",List.of("tenant_id","id","parse_operation_id","latest_artifact_id"),artifact,List.of("tenant_id","source_id","operation_id","id"),false);
+        requireConstraint(connection,mapping,"f",List.of("tenant_id","source_id","created_by"),source,List.of("tenant_id","id","created_by"),false);
+        requireConstraint(connection,mapping,"f",List.of("tenant_id","source_id","artifact_id","source_parse_hash"),artifact,List.of("tenant_id","source_id","id","parse_hash"),false);
+        requireConstraint(connection,source,"f",List.of("tenant_id","id","latest_artifact_id","latest_mapping_id"),mapping,List.of("tenant_id","source_id","artifact_id","id"),false);
+        requireTrue(connection,"SELECT count(*)=3 AND bool_and(attgenerated='s') FROM pg_attribute WHERE attrelid='public.mop_asset_import_job'::regclass AND attname IN ('content_size','content_sha256','store_operation_id') AND NOT attisdropped");
+        requireTrue(connection,"SELECT replace(regexp_replace(pg_get_expr(d.adbin,d.adrelid),'[[:space:]]','','g'),'pg_catalog.','')='octet_length(content)' FROM pg_attrdef d JOIN pg_attribute a ON a.attrelid=d.adrelid AND a.attnum=d.adnum WHERE d.adrelid='public.mop_asset_import_job'::regclass AND a.attname='content_size'");
+        requireTrue(connection,"SELECT position('encode(sha256(content),''hex''::text)' IN replace(regexp_replace(pg_get_expr(d.adbin,d.adrelid),'[[:space:]]','','g'),'pg_catalog.',''))>0 FROM pg_attrdef d JOIN pg_attribute a ON a.attrelid=d.adrelid AND a.attnum=d.adnum WHERE d.adrelid='public.mop_asset_import_job'::regclass AND a.attname='content_sha256'");
+        requireTrue(connection,"SELECT pg_get_expr(d.adbin,d.adrelid) ~ 'CASE[[:space:]]+WHEN.*kind.*STORE_RAW.*THEN[[:space:]]+operation_id.*ELSE[[:space:]]+NULL::uuid.*END' FROM pg_attrdef d JOIN pg_attribute a ON a.attrelid=d.adrelid AND a.attnum=d.adnum WHERE d.adrelid='public.mop_asset_import_job'::regclass AND a.attname='store_operation_id'");
+        for(var expected:Map.of(source,15,operation,5,job,6,artifact,6,mapping,8).entrySet())requireTrue(connection,"SELECT count(*)="+expected.getValue()+" AND bool_and(convalidated) FROM pg_constraint WHERE conrelid=?::regclass AND contype='c'","public."+expected.getKey());
+        requireTrue(connection,"SELECT count(*)=4 AND bool_and(i.indisvalid AND i.indisready) FROM pg_index i JOIN pg_class idx ON idx.oid=i.indexrelid JOIN pg_namespace n ON n.oid=idx.relnamespace WHERE n.nspname='public' AND idx.relname IN ('mop_asset_import_source_owner','mop_asset_import_operation_owner','mop_asset_import_job_pending','mop_asset_import_job_expired')");
+        Map<String,Set<String>> updates=Map.of(source,Set.of("storage_status","parse_status","parse_operation_id","latest_artifact_id","latest_mapping_id","version","updated_at"),operation,Set.of("status","step","result_artifact_id","error","updated_at"),job,Set.of("state","lease_owner","lease_until","fencing_token","attempts","next_at"),artifact,Set.of(),mapping,Set.of());
+        for(var entry:updates.entrySet())verifyRuntimeAcl(connection,entry.getKey(),entry.getValue());
+        requireTrue(connection,"SELECT NOT has_schema_privilege('mop_test_runtime','public','CREATE') AND NOT has_database_privilege('mop_test_runtime',current_database(),'CREATE') AND NOT pg_has_role('mop_test_runtime','mop_test_migrator','MEMBER')");
+    }
     private static void verifyColumns(Connection connection,String table,Map<String,String> types,Set<String> nullable,boolean complete)throws SQLException {
         Set<String> found=new HashSet<>();
         try(PreparedStatement statement=connection.prepareStatement("SELECT attname,format_type(atttypid,atttypmod),attnotnull FROM pg_attribute WHERE attrelid=?::regclass AND attnum>0 AND NOT attisdropped")) {
@@ -170,7 +253,7 @@ public final class TestSchemaMigration {
         if(!found.equals(types.keySet()))throw new IllegalStateException("Missing photo column");
     }
     private static void verifyRuntimeAcl(Connection connection,String table,Set<String> allowedUpdates)throws SQLException {
-        requireTrue(connection,"SELECT has_table_privilege(?,?,'SELECT') AND has_table_privilege(?,?,'INSERT') AND NOT has_table_privilege(?,?,'UPDATE,DELETE,TRUNCATE,TRIGGER')",RUNTIME,"public."+table,RUNTIME,"public."+table,RUNTIME,"public."+table);
+        requireTrue(connection,"SELECT has_table_privilege(?,?,'SELECT') AND has_table_privilege(?,?,'INSERT') AND NOT has_table_privilege(?,?,'UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')",RUNTIME,"public."+table,RUNTIME,"public."+table,RUNTIME,"public."+table);
         requireTrue(connection,"SELECT NOT EXISTS(SELECT 1 FROM pg_class c CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl,acldefault('r',c.relowner))) a WHERE c.oid=?::regclass AND a.grantee=0)","public."+table);
         Set<String> found=new HashSet<>();
         try(PreparedStatement statement=connection.prepareStatement("SELECT attname,has_column_privilege('mop_test_runtime',attrelid,attnum,'UPDATE'),NOT EXISTS(SELECT 1 FROM aclexplode(attacl) a WHERE a.grantee=0) FROM pg_attribute WHERE attrelid=?::regclass AND attnum>0 AND NOT attisdropped")) {
@@ -182,7 +265,7 @@ public final class TestSchemaMigration {
     }
     private static void requireConstraint(Connection connection,String table,String type,List<String> columns,String reference,List<String> referencedColumns,boolean deferred)throws SQLException {
         String sql="SELECT EXISTS(SELECT 1 FROM pg_constraint c WHERE c.conrelid=?::regclass AND c.contype=?::\"char\" AND c.convalidated AND c.condeferrable=? AND c.condeferred=? AND ARRAY(SELECT a.attname::text FROM unnest(c.conkey) WITH ORDINALITY k(num,position) JOIN pg_attribute a ON a.attrelid=c.conrelid AND a.attnum=k.num ORDER BY k.position)=?::text[]"+
-            (reference==null?"":" AND c.confrelid=?::regclass AND ARRAY(SELECT a.attname::text FROM unnest(c.confkey) WITH ORDINALITY k(num,position) JOIN pg_attribute a ON a.attrelid=c.confrelid AND a.attnum=k.num ORDER BY k.position)=?::text[]")+")";
+            (reference==null?"":" AND c.confmatchtype='s' AND c.confdeltype='a' AND c.confupdtype='a' AND c.confrelid=?::regclass AND ARRAY(SELECT a.attname::text FROM unnest(c.confkey) WITH ORDINALITY k(num,position) JOIN pg_attribute a ON a.attrelid=c.confrelid AND a.attnum=k.num ORDER BY k.position)=?::text[]")+")";
         try(PreparedStatement statement=connection.prepareStatement(sql)) {
             statement.setString(1,"public."+table);statement.setString(2,type);statement.setBoolean(3,deferred);statement.setBoolean(4,deferred);statement.setArray(5,connection.createArrayOf("text",columns.toArray()));
             if(reference!=null){statement.setString(6,"public."+reference);statement.setArray(7,connection.createArrayOf("text",referencedColumns.toArray()));}

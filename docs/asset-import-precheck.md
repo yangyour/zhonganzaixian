@@ -12,4 +12,6 @@
 bash tools/verify-asset-import-pure.sh
 ```
 
-没有实现.xlsx/CSV文件解析、上传、列映射页面、HTTP endpoint、耐久operation、preview_hash、配额、实际入库或审计。完整M3-6仍需同时支持.xlsx与.csv，后续.xlsx采用Apache POI，并保护解压资源、公式和回执文本类型；照片5MB限制不能套用于导入文件。确认导入须重新核验授权、冲突、配额及预览绑定，并按租户+名称+IP去重；并发及重试要在指定PG验证。纯预检耗时不证明完整500行导入≤60秒，TC-M3-6及128项验收继续NOT_RUN。
+以上证据对应历史“已解析行纯预检”切片。2026-10-02 后续 [原始来源与映射代码](asset-import-source.md)已补CSV/XLSX解析、原文件受理、独立STORE_RAW/PARSE operation、15列映射页面与原始preview_hash代码契约。指定MinIO命名空间有独立组件证据，parser/前端/Schema隔离结果另列，不把它们回填为历史纯预检的组件联调；新增应用事务、Worker、API/UI的真实指定环境链路待独立补证。照片5MB限制独立于来源20MiB技术限制。
+
+来源映射的precheck_status=NOT_RUN。本纯预检尚未接入真实来源事实与客户规则，没有配额、最终资产入库或导入统计。确认导入仍须重新核验授权、冲突、配额与预览绑定，按租户+名称+IP去重，并发及重试须在指定PG验证。标准模板与错误回执仍须保护文本类型，完整500行导入≤60秒指标未执行；TC-M3-6及128项验收继续NOT_RUN。

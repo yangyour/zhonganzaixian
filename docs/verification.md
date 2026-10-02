@@ -329,3 +329,11 @@ API V0.10字段形状不变，补充当前成员角色来源与默认拒绝元�
 独立新V8仅创建工时头记录/修订：固定owner和父工单、同租户FK、修订actor=owner、最新修订延迟FK、MANUAL_INTERVAL来源及4类型/起止边界。运行账号不获历史UPDATE/DELETE或owner/parent修改权；未加默认工时或成本字段，不更新工单/SLA状态。niko显式check0→apply1→repeat0→check0，结构/ACL通过，V1–V7及原私有文件未改，V8执行后另存冻结hash；API/Worker不迁移。
 
 9项迁移策略、6项新增真实PG约束、20项Python守卫通过；根463=450执行通过（含90真实PG）+13fixture跳过，6MinIO排除。首轮测试INSERT多一个占位符造成2失败/1错误；修正测试语句后全量通过，不改变已执行SQL。约束测试事务均回滚，不冒充工时服务持久化成功；仓储/API/页面及成本/毛利仍待。见[工时说明](manual-worklogs.md)、[schema证据](evidence/niko-worklog-schema-20261002.json)。
+
+## 2026-10-02 本人实填工时持久化
+
+WorklogRepository及PostgresWorklogRepository已接入既有幂等事务，限定当前启用msp成员本人：父工单同租户、创建检查父版本、修改检查工时版本、固定owner/parent、不可变修订和同事务审计。本人列表/历史使用有界keyset；外人记录和错误父范围404，权限版本失效401，管理员没有自动代改权。物理经过时间不改变工单、SLA、默认工时或成本。
+
+12项新增真实PG仓储回归通过，覆盖持久回读、49小时/显式0、两类重放、CAS、本人权限、其他owner隐藏、下游失败回滚、两个独立连接并发、分页及0001..9999毫秒边界。首次并发测试未获得预期409，定位为联表FOR UPDATE等待后旧修订快照与新头版本不匹配；改为先锁稳定头记录、再单独读取当前修订，完整回归通过。其他owner场景为显式标记的历史合成记录，未提升viewer角色或宣称viewer经API创建成功。
+
+根475=462执行通过（含102真实PG）+13历史fixture跳过，6MinIO排除，0失败错误；断库503/无受保护事务拒写守卫同时通过。API仍V0.10，尚无公开工时端点/页面；真实OSS、浏览器及完整M5-21/M10-13验收不在本切片内。V1–V8和6个原私有配置均未修改。见[仓储证据](evidence/niko-worklog-repository-20261002.json)。上一95dca54的CI37026678180已回读success。

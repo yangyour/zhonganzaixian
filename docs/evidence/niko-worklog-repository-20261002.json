@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-02",
+  "environment": "niko-local-test",
+  "component": "PostgreSQL 17.11",
+  "scope": "manual worklog repository, no public HTTP/UI",
+  "result": "PASS",
+  "root_maven": {
+    "total": 475,
+    "executed_passed": 462,
+    "real_postgresql_included": 102,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "log_sha256": "0e29b7f1067c4848530d98e8d91d17c3c93adb60e95eeabb297705bfaa9b8fff"
+  },
+  "new_real_pg_tests": 12,
+  "checks": [
+    "create/update independent readback",
+    "unchanged parent ticket/SLA/version",
+    "create/update exact idempotent replay",
+    "parent and record CAS",
+    "msp owner only, no admin override",
+    "permission version expiration",
+    "parent scope 404",
+    "synthetic historical other owner hidden",
+    "record/revision/audit/replay rollback together",
+    "two independent connections: one success and one conflict",
+    "bounded list/history keyset",
+    "0001..9999 millisecond roundtrip"
+  ],
+  "first_run": {
+    "result": "FAIL",
+    "test": "concurrentRevisionsProduceOneSuccessAndOneConflict",
+    "observed": "expected one 409 outcome; count was zero",
+    "fix": "lock stable header before separate joined revision read; full root rerun passed"
+  },
+  "evidence_limits": [
+    "Other-owner record is synthetic SQL history, not a viewer API permission claim",
+    "No new identities or role promotions",
+    "No public worklog endpoints or UI yet",
+    "No real OSS or browser acceptance",
+    "No default minutes, costs or margin",
+    "All 128 requirements remain incomplete"
+  ],
+  "migration_changes": false,
+  "private_config_changes": false
+}

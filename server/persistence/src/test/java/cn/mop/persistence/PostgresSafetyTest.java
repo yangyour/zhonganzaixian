@@ -32,5 +32,11 @@ class PostgresSafetyTest {
         assertEquals(java.util.List.of("ASSET_DEPENDENCY_SCHEMA_OR_ACCESS_UNAVAILABLE"),dependencies.readinessProblems());
         assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->dependencies.current("tenant","actor")).status);
         assertThrows(IllegalStateException.class,()->dependencies.append("tenant","actor",0,java.util.List.of(),"trace"));
+        var worklogs=new PostgresWorklogRepository(disconnected,repository);
+        assertEquals(java.util.List.of("WORKLOG_SCHEMA_OR_ACCESS_UNAVAILABLE"),worklogs.readinessProblems());
+        String id="55000000-0000-4000-8000-000000000001";
+        var access=new cn.mop.domain.worklog.WorklogRepository.Access(id,id,1,"trace");
+        assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->worklogs.listOwn(access,id,10,null,null)).status);
+        assertThrows(IllegalStateException.class,()->worklogs.create(access,id,1,null));
     }
 }

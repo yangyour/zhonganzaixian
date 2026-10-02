@@ -16,6 +16,7 @@
 - 配置审批、客户报障、依赖草稿的PG/HTTP及并发/幂等/正常重启切片已执行；详见实施/验收记录，不累计重叠用例
 - V7依赖草稿、V8实填工时schema均独立执行1、重复0、check0；V1–V8字节冻结，API/Worker启动不迁移
 - 实际API已到V0.10，依赖页面代码/真实客户端请求与标准15列模板下载继续推进并留证；真实浏览器验收仍保留NOT_RUN
+- 本人工时仓储与12项真实PG回归已完成，公开API/页面继续实施；不受OSS/浏览器阻塞而停止，成本/默认值继续pending
 - 完整128项仍未DONE；每项未完成范围继续在合同追踪保留
 
 关联：[组件清单](environment/component-inventory.md)、[浏览器探测](evidence/niko-ui-blocker-20261002.json)、[OSS](oss-storage-adapter.md)、[当前实施](implementation-status.md)、[验证](verification.md)。本表不包含凭据、连接秘密或未经批准的绕行方案。

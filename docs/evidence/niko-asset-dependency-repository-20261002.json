@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-02",
+  "environment": "niko-local-test",
+  "scope": "asset dependency PostgreSQL draft repository",
+  "first_run": {
+    "new_pg_tests": 9,
+    "failed": 1,
+    "reason": "Test compared Jackson LongNode with deserialized IntNode; corrected to actual JSON serialization/readback comparison, not an application failure exemption"
+  },
+  "verified_run": {
+    "root_total": 431,
+    "executed_passed": 418,
+    "real_pg_included": 84,
+    "skipped_fixture": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "new_pg_repository_tests": 9
+  },
+  "checks": [
+    "Immutable full revisions and null proposed metadata",
+    "Transitive cycle and self-reference rejection",
+    "Cross-tenant/unknown references 404 before stale-version diagnostics",
+    "CAS and duplicate pairs preserve old proposals",
+    "Idempotent replay and one audit only",
+    "Role and protected transaction required",
+    "Graph/history/replay/audit rollback together",
+    "Two connections with opposite edges: one success, one version conflict; retry rejects cycle",
+    "Explicit batch/metadata limits reject without truncation",
+    "Disconnected reader fails 503 rather than empty or fixture graph"
+  ],
+  "limits": {
+    "max_additions": 100,
+    "max_graph_edges": 10000,
+    "kind": "explicit technical guard, not customer quota"
+  },
+  "v1_v7_modified": false,
+  "api_worker_migration": false,
+  "not_completed": [
+    "HTTP/API wiring",
+    "Page UI",
+    "Monitoring publication or confirmed Q20 impact",
+    "Full M3-9 acceptance"
+  ]
+}

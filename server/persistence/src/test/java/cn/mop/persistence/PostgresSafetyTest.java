@@ -28,5 +28,8 @@ class PostgresSafetyTest {
         assertFalse(repository.dependencyReady());assertTrue(repository.metadata().durable());
         cn.mop.domain.DomainException exception=assertThrows(cn.mop.domain.DomainException.class,()->repository.list("tenant"));
         assertEquals(503,exception.status);assertEquals("UPSTREAM_UNAVAILABLE",exception.code);
+        var dependencies=new PostgresAssetDependencyRepository(disconnected,repository);
+        assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->dependencies.current("tenant","actor")).status);
+        assertThrows(IllegalStateException.class,()->dependencies.append("tenant","actor",0,java.util.List.of(),"trace"));
     }
 }

@@ -61,6 +61,8 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     <T>T importJobTransaction(Supplier<T> work){return inTransaction(()->scoped(importJobScope,work));}
     /** Requires an actual idempotent command or import-job callback, not merely an unrelated audit transaction. */
     Connection importCommandConnection(){Connection active=transaction.get();if(active==null||!Boolean.TRUE.equals(idempotentCommandScope.get())&&!Boolean.TRUE.equals(importJobScope.get()))throw new IllegalStateException("Import writes require a protected command or job transaction");return active;}
+    /** Dependency drafts require the caller's idempotent command, never a worker or unrelated transaction. */
+    Connection idempotentCommandConnection(){Connection active=transaction.get();if(active==null||!Boolean.TRUE.equals(idempotentCommandScope.get()))throw new IllegalStateException("Dependency drafts require an idempotent command transaction");return active;}
     private static <T>T scoped(ThreadLocal<Boolean> scope,Supplier<T> work){Boolean previous=scope.get();scope.set(true);try{return work.get();}finally{if(previous==null)scope.remove();else scope.set(previous);}}
     private void lock(String scope){connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT pg_advisory_xact_lock(hashtextextended(?,0))")){statement.setString(1,scope);statement.execute();return null;}});}
     private static DomainException unavailable(){return new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境 PostgreSQL 不可用，未受理请求");}

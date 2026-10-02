@@ -1,0 +1,30 @@
+{
+  "recorded_at": "2026-10-02T05:46:06.222791+00:00",
+  "base_commit": "7e3ce75e8e1be0fc32a9502551d660b0e63c08c6",
+  "scope": "explicit working-window arithmetic only, no published calendar or SLA promise",
+  "new_junit_tests": 26,
+  "parameterized_boundary_cases": 20,
+  "maven_verify": "PASS",
+  "junit": {
+    "tests": 347,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 88,
+    "executed": 259
+  },
+  "contracts_tests": 18,
+  "generator_consistency": "PASS",
+  "api_version": "0.8",
+  "api_wire_change": false,
+  "private_configuration_modified": false,
+  "migrations_changed": false,
+  "real_components": "NOT_RUN_NETWORK_BLOCKED",
+  "real_ui": "NOT_RUN",
+  "full_contract_acceptance": "NOT_RUN",
+  "earlier_attempt": "Initial test compile used Duration.isPositive unavailable on Java17; replaced by compareTo before successful runs",
+  "preceding_commit_ci": {
+    "sha": "7e3ce75e8e1be0fc32a9502551d660b0e63c08c6",
+    "run_id": 36969801922,
+    "conclusion": "success"
+  }
+}

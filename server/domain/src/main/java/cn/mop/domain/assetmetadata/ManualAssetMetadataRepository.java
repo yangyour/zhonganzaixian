@@ -16,6 +16,8 @@ public interface ManualAssetMetadataRepository {
     record References(List<Reference> sites,List<Reference> owners,boolean sitesTruncated,boolean ownersTruncated) { public References { sites=List.copyOf(sites);owners=List.copyOf(owners); } }
     /** Read-only bounded choices; selected references are rechecked during the actual write. */
     References references(Access access,String assetId,String query);
+    /** Current tenant manual-source view; creation cursor is a technical keyset, not a frozen cross-page snapshot. */
+    List<Current> search(Access access,ManualAssetFilter filters,int limit,Instant beforeCreatedAt,String beforeId);
     Current current(Access access,String assetId);
     List<Revision> history(Access access,String assetId,int limit,Long beforeVersion);
     /** Caller must use the platform idempotent transaction; implementation locks and reauthorizes all references. */

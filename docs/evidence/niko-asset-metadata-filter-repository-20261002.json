@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-02T19:17:00.441752+00:00",
+  "environment": "niko-local-test",
+  "status": "VERIFIED_CORE_AND_REPOSITORY_NOT_PUBLIC_API",
+  "new_pure_filter_tests": 6,
+  "new_real_pg_tests": 3,
+  "root_tests": {
+    "reported": 558,
+    "executed": 545,
+    "real_postgresql": 136,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "field_count": 14,
+  "scope": "CURRENT_TENANT_INTERNAL_MANUAL_SOURCE",
+  "query_logic": "AND with exact type/site/owner/dates and case-insensitive literal text substrings",
+  "unknown_fields": "explicit nullable columns only, no conflicting specified value",
+  "read_isolation": "REPEATABLE_READ",
+  "keyset": "created_at/id descending; not cross-page frozen snapshot",
+  "query_limit_including_lookahead": 101,
+  "migration_or_permission_changes": 0,
+  "credentials_output": false,
+  "initial_failure": "JUnit test was placed in domain module without JUnit dependency; relocated to existing persistence test module, reran successfully",
+  "prior_page_ci": {
+    "commit": "14e4673940ba24bf55d89911cfc5f2408434096f",
+    "run_id": 37052717490,
+    "conclusion": "success"
+  },
+  "remaining": [
+    "Expose bounded API and page filters",
+    "Browser acceptance B03",
+    "Q09/Q31 and external CMDB gates",
+    "Full M3-5 acceptance"
+  ]
+}

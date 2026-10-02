@@ -33,6 +33,22 @@ public final class PostgresManualAssetMetadataRepository implements ManualAssetM
             return new References(sites.subList(0,Math.min(100,sites.size())),owners.subList(0,Math.min(100,owners.size())),sites.size()>100,owners.size()>100);
         });
     }
+    @Override public List<Current> search(Access access,ManualAssetFilter filters,int limit,Instant beforeCreatedAt,String beforeId){
+        if(filters==null||limit<1||limit>101||(beforeCreatedAt==null)!=(beforeId==null))throw invalid();if(beforeId!=null)beforeId=uuid(beforeId);
+        if(beforeCreatedAt!=null&&(beforeCreatedAt.isBefore(Instant.parse("0001-01-01T00:00:00Z"))||beforeCreatedAt.isAfter(Instant.parse("9999-12-31T23:59:59.999Z"))||beforeCreatedAt.getNano()%1000000!=0))throw invalid();
+        try(Connection c=source.getConnection()){
+            c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);c.setAutoCommit(false);
+            try{
+                authorize(c,access,false);StringBuilder sql=new StringBuilder("SELECT a.id::text FROM public.mop_asset a LEFT JOIN public.mop_asset_manual_details d ON d.tenant_id=a.tenant_id AND d.asset_id=a.id LEFT JOIN public.mop_asset_manual_revision r ON r.tenant_id=d.tenant_id AND r.asset_id=d.asset_id AND r.asset_version=d.revision_version WHERE a.tenant_id=?::uuid AND a.source='manual'");
+                for(var entry:filters.values().entrySet()){var field=entry.getKey();sql.append(" AND ").append(field.exact()?filterColumn(field)+"=?"+(field.date()?"::date":field==ManualAssetFilter.Field.OWNER_ID?"::uuid":""):"strpos(lower("+filterColumn(field)+"),lower(?))>0");}
+                for(var field:filters.unknownFields())sql.append(" AND ").append(filterColumn(field)).append(" IS NULL");
+                if(beforeCreatedAt!=null)sql.append(" AND (a.created_at,a.id)<(?::timestamptz,?::uuid)");sql.append(" ORDER BY a.created_at DESC,a.id DESC LIMIT ?");List<String> ids=new ArrayList<>();
+                try(var s=statement(c,sql.toString())){int p=1;s.setString(p++,access.tenantId());for(String value:filters.values().values())s.setString(p++,value);if(beforeCreatedAt!=null){s.setObject(p++,OffsetDateTime.ofInstant(beforeCreatedAt,ZoneOffset.UTC));s.setString(p++,beforeId);}s.setInt(p,limit);try(var r=s.executeQuery()){while(r.next())ids.add(r.getString(1));}}
+                List<Current> matches=new ArrayList<>();for(String id:ids)matches.add(current(c,access,asset(c,access,id,false)));c.commit();return List.copyOf(matches);
+            }catch(SQLException|RuntimeException|Error failure){try{c.rollback();}catch(SQLException ignored){}throw failure;}
+        }catch(SQLException failure){throw sqlFailure(failure);}
+    }
+    private static String filterColumn(ManualAssetFilter.Field field){return switch(field){case NAME,TYPE,SITE_ID->"a."+field.key();default->"r."+field.key();};}
     @Override public Current current(Access access,String id){return read(access,id,(c,asset)->current(c,access,asset));}
     @Override public List<Revision> history(Access access,String id,int limit,Long beforeVersion){
         return read(access,id,(c,asset)->{if(limit<1||limit>101||beforeVersion!=null&&beforeVersion<2)throw invalid();current(c,access,asset);List<Revision> values=new ArrayList<>();

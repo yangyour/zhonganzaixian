@@ -442,3 +442,8 @@ API V0.13.1新增同租户站点/活跃负责人查询；内部授权和资产40
 ### 2026-10-02 资料维护页面与实际客户端
 
 资料页接入当前/历史/站点与负责人选项、明确编辑版本、原请求不确定重试及独立成功回执。新20项Web单测，总259项及类型/构建、26契约通过；实际前端模块/ApiClient接真实API22次HTTP，5次写尝试含2原键重放/1CAS409，另1独立客户端修改，3修订和3成功审计、IP/监控不变。首次TS闭包unknown错误已修正并完整重跑。窄屏样式仅代码完成，浏览器DOM/390px仍B03未执行；M3-5/Q09/IP/CMDB整体非DONE。见[资料](manual-asset-metadata.md)及[客户端证据](evidence/niko-asset-metadata-client-http-20261002.json)。
+
+
+### 2026-10-02 资料字段筛选核心/仓储
+
+新增14维护字段显式AND查询及可空字段unknown_fields；固定列枚举/参数化字面子串，严格日期不推断维保状态。真实PG只读快照、当前内部成员/租户manual来源、至多101有界created_at/id keyset；跨页非冻结快照。6核心+3真实PG新增，根558=545执行含136PG+13skip/6MinIO排除全部通过。API和页面查询待接线，未改变主台账12列或客户权限，M3-5非DONE。见[资料说明](manual-asset-metadata.md)、[仓储证据](evidence/niko-asset-metadata-filter-repository-20261002.json)。

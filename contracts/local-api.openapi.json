@@ -7088,12 +7088,13 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "description": "客户报障可省略，由类别与设备生成。"
+            "description": "客户报障可省略，由类别与设备生成。 服务端拒绝去除首尾Unicode空白（含不换行空格与BOM）后为空的字符串；仅去除边界，内部原始空白不改写。控制字符/不完整Unicode仍拒绝，description允许换行及制表。 可选title应省略而非传空。"
           },
           "description": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 3000
+            "maxLength": 3000,
+            "description": "服务端拒绝去除首尾Unicode空白（含不换行空格与BOM）后为空的字符串；仅去除边界，内部原始空白不改写。控制字符/不完整Unicode仍拒绝，description允许换行及制表。"
           },
           "source": {
             "type": "string",
@@ -7128,12 +7129,14 @@
           "contact_name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 100
+            "maxLength": 100,
+            "description": "服务端拒绝去除首尾Unicode空白（含不换行空格与BOM）后为空的字符串；仅去除边界，内部原始空白不改写。控制字符/不完整Unicode仍拒绝，description允许换行及制表。"
           },
           "contact_phone": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 64
+            "maxLength": 64,
+            "description": "服务端拒绝去除首尾Unicode空白（含不换行空格与BOM）后为空的字符串；仅去除边界，内部原始空白不改写。控制字符/不完整Unicode仍拒绝，description允许换行及制表。"
           },
           "urgency": {
             "type": "string",

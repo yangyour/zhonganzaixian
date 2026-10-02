@@ -121,6 +121,11 @@ try {
   await request('viewerA', 'POST', '/tickets', '/tickets', 400, 'invalid_phone_rejected', { ...command, contact_phone: 'abc' });
   await request('viewerA', 'POST', '/tickets', '/tickets', 400, 'invalid_category_rejected', { ...command, category: 'UNKNOWN' });
   await request('viewerA', 'POST', '/tickets', '/tickets', 400, 'overlong_description_rejected', { ...command, description: '测'.repeat(3001) });
+  for (const field of ['description', 'contact_name', 'title']) {
+    for (const [index, space] of ['\u00a0','\u2007','\u202f','\ufeff','\u3000',' \u00a0\u202f\ufeff '].entries()) {
+      await request('viewerA', 'POST', '/tickets', '/tickets', 400, `unicode_blank_${field}_${index + 1}_rejected`, { ...command, [field]: space });
+    }
+  }
   const filter = new URLSearchParams({ q: prefix, category: '网络不通', urgency: 'normal', page_size: '10' });
   const own = await request('viewerA', 'GET', `/tickets?${filter}`, '/tickets', 200, 'customer_list_scope_and_filters');
   assert.equal(own.items.length, 3);
@@ -151,6 +156,14 @@ try {
   await request('msp', 'GET', `/tickets?${pageQuery}&category=网络不通&cursor=${cursor}`, '/tickets', 400, 'cursor_bound_to_filter');
   const finalRead = await request('viewerA', 'GET', `/tickets/${ticketId}`, '/tickets/{id}', 200, 'rejected_requests_preserve_registration');
   assert.equal(finalRead.history.length, 1);
+  const normalizedInput = { ...unknown, title: `\ufeff${prefix}-NORMALIZED\u00a0`, description: '\u00a0一\u00a0行\n二行\ufeff', contact_name: '\u202f测试\u2007联系人\u2007', contact_phone: '\u00a0+00 000\ufeff' };
+  const normalizedReceipt = await request('viewerA', 'POST', '/tickets', '/tickets', 202, 'unicode_boundary_normalized_registration', normalizedInput);
+  const normalizedOperation = await request('viewerA', 'GET', `/operations/${normalizedReceipt.operation_id}`, '/operations/{id}', 200, 'unicode_normalized_operation');
+  const normalized = await request('viewerA', 'GET', normalizedOperation.result_ref.slice('/api/v1'.length), '/tickets/{id}', 200, 'unicode_normalized_persisted_readback');
+  assert.equal(normalized.title, `${prefix}-NORMALIZED`);
+  assert.equal(normalized.description, '一\u00a0行\n二行');
+  assert.equal(normalized.contact_name, '测试\u2007联系人');
+  assert.equal(normalized.contact_phone, '+00 000');
   const evidence = {
     verified_at: new Date().toISOString(), mode: 'remote_test', authority_direction: 'MOP',
     environment: custom ? { name: process.env.MOP_TEST_ENVIRONMENT_NAME, postgres: process.env.MOP_TEST_POSTGRES_VERSION, keycloak: process.env.MOP_TEST_KEYCLOAK_VERSION, access: 'explicit_independent_loopback_test_environment' } : { postgres: '17.9', keycloak: '26.2.4', access: 'existing_shared_services_via_ssh_tunnel' },

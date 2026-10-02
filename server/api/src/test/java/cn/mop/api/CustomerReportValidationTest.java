@@ -46,4 +46,18 @@ class CustomerReportValidationTest {
         for(String role:List.of("msp","padmin"))assertFalse(Capabilities.forRole(role).contains("tickets:report"));
         assertTrue(Capabilities.forRole("padmin").containsAll(Set.of("configurations:read","configurations:write","audit:read")));assertFalse(Capabilities.forRole("viewer").contains("assets:write"));assertTrue(Capabilities.forRole("tadmin").contains("assets:write"));assertFalse(Capabilities.forRole("unknown").contains("tickets:read"));
     }
+    @Test void unicodeBoundaryWhitespaceCannotBecomeAnEmptyReportOrContact(){
+        for(String field:List.of("description","contact_name","title")){
+            for(String space:List.of("\u00a0","\u2007","\u202f","\ufeff","\u3000"," \u00a0\u202f\ufeff ")){
+                assertEquals(400,assertThrows(DomainException.class,()->CustomerReportValidator.parse(body().put(field,space),"viewer"),field).status);
+            }
+        }
+    }
+    @Test void unicodeBoundaryWhitespaceMatchesClientTrimWithoutRewritingInterior(){
+        CustomerReport report=CustomerReportValidator.parse(body().put("description","\u00a0一\u00a0行\n二行\ufeff")
+            .put("contact_name","\u202f测试\u2007联系人\u2007").put("title","\ufeff标题\u00a0")
+            .put("contact_phone","\u00a0+00 000\ufeff"),"viewer");
+        assertEquals("一\u00a0行\n二行",report.description());assertEquals("测试\u2007联系人",report.contactName());
+        assertEquals("标题",report.title());assertEquals("+00 000",report.contactPhone());
+    }
 }

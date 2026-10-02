@@ -33,6 +33,9 @@ const blocked = (operationId, summary, pathParameter) => ({ ...mutation(operatio
 const tenant = object({ id: { type: 'string', format: 'uuid' }, name: string });
 const asset = object({ id: { type: 'string', format: 'uuid' }, tenant_id: { type: 'string', format: 'uuid' }, name: string, type: { type: 'string', enum: types }, management_ip: string, site_id: string, status: { type: 'string', enum: ['unknown', 'ok', 'problem', 'maintenance', 'disabled'] }, lifecycle_status: string, source: { type: 'string', enum: ['test_seed', 'manual'] }, sampled_at: nullableString, unknown_reason: nullableString, version: { type: 'integer', minimum: 1 }, created_at: { type: 'string', format: 'date-time' }, updated_at: { type: 'string', format: 'date-time' }, availability: string, sync_state: string }, ['id', 'tenant_id', 'name', 'type', 'management_ip', 'site_id', 'status', 'lifecycle_status', 'source', 'sampled_at', 'unknown_reason', 'version', 'created_at', 'updated_at']);
 const ticketCreate = JSON.parse(readFileSync(new URL('../contracts/design-core.openapi.json', import.meta.url), 'utf8')).components.schemas.TicketCreate;
+for (const field of ['title', 'description', 'contact_name', 'contact_phone']) {
+  ticketCreate.properties[field].description = [ticketCreate.properties[field].description, '服务端拒绝去除首尾Unicode空白（含不换行空格与BOM）后为空的字符串；仅去除边界，内部原始空白不改写。控制字符/不完整Unicode仍拒绝，description允许换行及制表。', field === 'title' ? '可选title应省略而非传空。' : null].filter(Boolean).join(' ');
+}
 ticketCreate.properties.attachment_ids.maxItems = 3;
 ticketCreate.properties.attachment_ids.description = '可省略或为空；仅绑定同租户、同报障人上传的READY原图。每张1..5_000_000 bytes，原登记累计最多3张；图片失败可先无图登记后CAS追加。';
 const uuid = { type: 'string', format: 'uuid' };

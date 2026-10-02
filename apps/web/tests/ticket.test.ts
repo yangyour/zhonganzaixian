@@ -32,6 +32,18 @@ describe('customer report input', () => {
     expect(errors({ ...validForm(), description: '描述\u0000' }).description).toBeTruthy()
   })
 })
+describe('Unicode report boundaries', () => {
+  it('rejects space-only required text and omits an empty optional title', () => {
+    for (const space of ['\u00a0', '\u2007', '\u202f', '\ufeff', '\u3000']) {
+      expect(errors({ ...validForm(), description: space }).description).toBeTruthy()
+      expect(errors({ ...validForm(), contact_name: space }).contact_name).toBeTruthy()
+      expect(parseCustomerReport({ ...validForm(), title: space }, [])).not.toHaveProperty('title')
+    }
+  })
+  it('trims boundaries while preserving interior nonbreaking spaces and multiline content', () => {
+    expect(parseCustomerReport({ ...validForm(), title: '\ufeff标题\u00a0', description: '\u00a0一\u00a0行\n二行\ufeff', contact_name: '\u202f测试\u2007联系人\u2007', contact_phone: '\u00a0+00 000\ufeff' }, [])).toMatchObject({ title: '标题', description: '一\u00a0行\n二行', contact_name: '测试\u2007联系人', contact_phone: '+00 000' })
+  })
+})
 describe('registration result references', () => {
   it('only accepts the exact local ticket API path with a UUID', () => {
     expect(ticketIdFromResultRef(`/api/v1/tickets/${assetId}`)).toBe(assetId)

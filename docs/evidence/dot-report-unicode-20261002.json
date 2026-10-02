@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-02",
+  "scope": "customer report Unicode boundary whitespace validation",
+  "regression_before_fix": {
+    "test_class": "CustomerReportValidationTest",
+    "total": 6,
+    "failures": 1,
+    "errors": 1,
+    "new_tests": 2
+  },
+  "after_fix": {
+    "maven_current_run": {
+      "total": 415,
+      "executed_passed": 402,
+      "skipped_historical_fixture": 13,
+      "failures": 0,
+      "errors": 0,
+      "real_pg_included": 69,
+      "minio_explicitly_excluded": 6
+    },
+    "web_tests": 184,
+    "web_typecheck_build": "PASS",
+    "contract_tests": 18,
+    "contract_generation": "PASS",
+    "real_http_ajv": 75,
+    "new_http_checks": 21
+  },
+  "evidence_boundaries": [
+    "Totals from current Maven log, not stale XML reports",
+    "75 HTTP checks overlap the previous 54; do not sum",
+    "No OSS, browser UI, formal ticket state or SLA completion"
+  ],
+  "api_version": "V0.8; input descriptions updated, shapes unchanged",
+  "migrations_changed": false,
+  "original_private_config_changed": false,
+  "previous_ci": {
+    "commit": "842f87bae4db7bc6e8bdc3e4d57b83e27728acea",
+    "run_id": 37005174219,
+    "jobs_succeeded": 3
+  }
+}

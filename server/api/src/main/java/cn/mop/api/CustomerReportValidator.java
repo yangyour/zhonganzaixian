@@ -35,8 +35,17 @@ final class CustomerReportValidator {
         JsonNode value=body.get(field);if(value==null||!value.isTextual()||!values.contains(value.asText()))throw invalid(field+" 不在允许枚举中");return value.asText();
     }
     static String text(JsonNode body,String field,int maximum,boolean multiline){
-        JsonNode value=body.get(field);if(value==null||!value.isTextual())throw invalid(field+" 必须为字符串");String raw=value.asText(),result=raw.strip();
+        JsonNode value=body.get(field);if(value==null||!value.isTextual())throw invalid(field+" 必须为字符串");String raw=value.asText(),result=stripBoundaryWhitespace(raw);
         if(result.isEmpty()||raw.codePointCount(0,raw.length())>maximum||raw.codePoints().anyMatch(cp->ConfigurationValueValidator.invalidCharacter(cp)&&!(multiline&&(cp=='\n'||cp=='\r'||cp=='\t'))))throw invalid(field+" 为空、过长或含非法字符");return result;
+    }
+    // Align with the browser trim boundary for Unicode space separators and BOM.
+    // Interior spacing/newlines remain untouched; raw control/Unicode checks still apply.
+    private static boolean boundaryWhitespace(int cp){return Character.isWhitespace(cp)||Character.isSpaceChar(cp)||cp==0xfeff;}
+    private static String stripBoundaryWhitespace(String raw){
+        int start=0,end=raw.length();
+        while(start<end&&boundaryWhitespace(raw.codePointAt(start)))start+=Character.charCount(raw.codePointAt(start));
+        while(end>start&&boundaryWhitespace(raw.codePointBefore(end)))end-=Character.charCount(raw.codePointBefore(end));
+        return raw.substring(start,end);
     }
     private static String uuid(JsonNode body,String field){return uuidValue(body.get(field),field);}
     private static String uuidValue(JsonNode value,String field){if(value==null||!value.isTextual()||!value.asText().matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))throw invalid(field+" 必须为UUID");return UUID.fromString(value.asText()).toString();}

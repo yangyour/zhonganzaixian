@@ -1,0 +1,399 @@
+{
+  "verified_at": "2026-10-02T12:16:08.842Z",
+  "mode": "remote_test",
+  "authority_direction": "MOP",
+  "environment": {
+    "name": "niko-local-test",
+    "postgres": "17.11",
+    "keycloak": "26.2.4",
+    "access": "explicit_independent_loopback_test_environment"
+  },
+  "http_checks": 75,
+  "all_passed": true,
+  "checks": [
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_tenant_asset_lookup",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "isolated_fake_asset_creation",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "durable_registration_202",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "read_pending_operation",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "read_durable_registration",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_exact_replay",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_changed_body_rejected",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "known_asset_semantic_duplicate",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "semantic_duplicate_keeps_original_payload",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "separate_customer_registration",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_asset_registration",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_asset_not_semantically_merged",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "operator_authorized_tenant_read",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "operator_authorized_operation_read",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_hidden_ticket_404",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_hidden_operation_404",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_hidden_ticket_404",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_hidden_operation_404",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_tenant_asset_rejected",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "operator_cannot_impersonate_customer",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_csrf_rejected",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_idempotency_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "priority_spoof_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "actor_spoof_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "tenant_spoof_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_photo_reference_rejected",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "customer_manual_source_rejected",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "internal_manual_workflow_pending",
+      "status": 422,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_phone_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_category_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "overlong_description_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_description_1_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_description_2_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_description_3_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_description_4_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_description_5_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_description_6_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_contact_name_1_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_contact_name_2_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_contact_name_3_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_contact_name_4_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_contact_name_5_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_contact_name_6_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_title_1_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_title_2_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_title_3_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_title_4_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_title_5_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_blank_title_6_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "customer_list_scope_and_filters",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "operator_list_current_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_tenant_list_has_no_records",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "page_size_whitelist",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "category_filter_whitelist",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "duplicate_query_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_spoof_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "scoped_pagination_registration_1",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "scoped_pagination_registration_2",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "scoped_pagination_registration_3",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "scoped_pagination_registration_4",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "scoped_pagination_registration_5",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "scoped_pagination_registration_6",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "scoped_pagination_registration_7",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "keyset_first_page",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "keyset_second_page",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "cursor_bound_to_actor",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "cursor_bound_to_filter",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "rejected_requests_preserve_registration",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_boundary_normalized_registration",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_normalized_operation",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_normalized_persisted_readback",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "credential_output": "none",
+  "remaining": [
+    "formal_ticket_state",
+    "SLA_configuration",
+    "contact_binding",
+    "photo_upload",
+    "cross_reporter_semantic_merge",
+    "unknown_asset_semantic_merge"
+  ]
+}

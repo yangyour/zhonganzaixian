@@ -1,0 +1,79 @@
+{
+  "recorded_at": "2026-10-02T04:46:59.734678+00:00",
+  "base_commit": "e5b1b4312aafef4811e15a1ddf269649dba38e4b",
+  "scope": "standalone empty XLSX template generator; not a new API or completed import",
+  "runtime": {
+    "jdk": "Microsoft OpenJDK 17.0.20.1+1",
+    "maven": "3.9.9",
+    "poi": "5.5.1",
+    "distribution_sources": [
+      "https://learn.microsoft.com/en-us/java/openjdk/download",
+      "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.9/"
+    ],
+    "distribution_checksums": "official JDK SHA256 and Maven SHA512 verified",
+    "transport": "existing execution proxy, existing system Java CA store, TLS and strict Maven checksums retained"
+  },
+  "parser_module_tests": [
+    {
+      "suite": "cn.mop.importparser.AssetImportTemplateTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.importparser.ImportFileParserTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.importparser.CsvBoundaryTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.importparser.XlsxBoundaryTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.importparser.ParserProtocolTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "tests_total": 29,
+  "new_tests": 4,
+  "package": "PASS",
+  "packaged_cli": {
+    "create_new_xlsx": "PASS",
+    "default_parser_inventory": "PASS",
+    "empty_data_rejection": "EMPTY_DATA"
+  },
+  "generated_sample": {
+    "bytes": 4573,
+    "sha256": "e0ec89a3bc490928e12b778e11c0b3f897bfce3602bd2aa2f3ae8bd62b13a7a1",
+    "committed_binary": false
+  },
+  "earlier_attempts": [
+    "JRE21 had no Java17 release compiler; installed verified JDK17",
+    "Maven direct DNS/expired proxy/trust mismatch fixed using current environment proxy and existing system CA; no TLS bypass",
+    "One initial test incorrectly expected shared-string text in lexical; corrected to assert display and preserve original SST index; parser unchanged"
+  ],
+  "api_contract": {
+    "version": "0.8",
+    "wire_change": false
+  },
+  "external_components": "NOT_RUN_PRIVATE_CONFIGURATION_ABSENT",
+  "real_ui": "NOT_RUN",
+  "full_contract_acceptance": "NOT_RUN",
+  "migrations_changed": false
+}

@@ -1,0 +1,25 @@
+{
+  "recorded_at": "2026-10-02T05:29:59.744113+00:00",
+  "base_commit": "a09902cff955d959f5d26adace1f337df7d84d97",
+  "scope": "D07 contract-fixed pure guards, no HTTP/PG workflow integration",
+  "new_junit_tests": 11,
+  "maven_verify": "PASS",
+  "junit": {
+    "tests": 305,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 88,
+    "executed": 217
+  },
+  "web_tests": 182,
+  "contracts_tests": 18,
+  "contract_generator": "PASS",
+  "api_wire_change": false,
+  "schema_version": "0.8",
+  "private_configuration_modified": false,
+  "migrations_changed": false,
+  "real_component_integration": "NOT_RUN_NETWORK_BLOCKED",
+  "real_ui": "NOT_RUN",
+  "full_contract_acceptance": "NOT_RUN",
+  "business_limits": "Q07/Q09/Q27 not approved by these isolated facts; state/CAS/CSRF/idempotency/audit/SLA integration remains required"
+}

@@ -1,0 +1,36 @@
+{
+  "verified_at": "2026-10-02T19:06:38.148Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "http_requests": 22,
+  "frontend": "actual assetMetadataWorkspace and ApiClient bundle",
+  "write_attempts": 5,
+  "metadata_revisions": 3,
+  "asset_version": 4,
+  "original_body_key_cas_preserved": true,
+  "readonly_refresh_never_wrote": true,
+  "stale_editor_status": 409,
+  "mutation_audits": 3,
+  "management_ip_unchanged": true,
+  "monitoring_applied": false,
+  "cmdb_applied": false,
+  "fault_injection": "Two successful server200 responses deliberately discarded in client transport; not physical network failure",
+  "browser_ui_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "DOM/390px controls and visual acceptance B03",
+    "Customer Q09 and IP/CMDB monitoring gates",
+    "Full M3-5 and all128 acceptance"
+  ],
+  "new_web_tests": 20,
+  "total_web_tests": 259,
+  "typecheck_build": "passed_after_fixing_unknown_narrowing_in_history_callback",
+  "contract_tests": 26,
+  "contract_generated_consistency": "passed",
+  "prior_reference_commit": "b4158546a5330a2199d91eb8130ebfe99c0ae20a",
+  "prior_reference_ci": {
+    "id": 37051351964,
+    "conclusion": "success"
+  },
+  "mobile_styles": "CODE_ONLY_NOT_DOM_VERIFIED"
+}

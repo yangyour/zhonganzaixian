@@ -437,3 +437,8 @@ ManualAssetMetadataRepository/PostgresManualAssetMetadataRepository接入既有�
 ### 2026-10-02 手工资产资料只读引用选择器接口
 
 API V0.13.1新增同租户站点/活跃负责人查询；内部授权和资产404隔离、每类100有界/独立truncated、参数化字面子串、null默认负责人及写时重验。新增2控制器+2真实PG，根549=536执行含133PG+13skip，6MinIO排除；26契约及28真实HTTP响应校验通过。未改迁移、权限、账户或监控；大目录边界与浏览器选择交互不冒充已实测。页面继续开发，M3-5仍非DONE。见[说明](manual-asset-metadata.md)和[引用证据](evidence/niko-asset-reference-http-20261002.json)。
+
+
+### 2026-10-02 资料维护页面与实际客户端
+
+资料页接入当前/历史/站点与负责人选项、明确编辑版本、原请求不确定重试及独立成功回执。新20项Web单测，总259项及类型/构建、26契约通过；实际前端模块/ApiClient接真实API22次HTTP，5次写尝试含2原键重放/1CAS409，另1独立客户端修改，3修订和3成功审计、IP/监控不变。首次TS闭包unknown错误已修正并完整重跑。窄屏样式仅代码完成，浏览器DOM/390px仍B03未执行；M3-5/Q09/IP/CMDB整体非DONE。见[资料](manual-asset-metadata.md)及[客户端证据](evidence/niko-asset-metadata-client-http-20261002.json)。

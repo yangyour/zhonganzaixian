@@ -30,6 +30,8 @@ public interface PlatformRepository extends AssetRepository {
         return idempotent(actor,tenant,route,requestKey,hash,0,command);
     }
     Object idempotent(String actor, String tenant, String route, String requestKey, String hash, long expectedPermissionVersion, Supplier<Object> command);
+    /** Resource authorization runs in the protected transaction before looking up any cached receipt. */
+    default Object idempotentAuthorized(String actor,String tenant,String route,String requestKey,String hash,long expectedPermissionVersion,Runnable authorize,Supplier<Object> command){throw new DomainException(503,"UPSTREAM_UNAVAILABLE","资源级重放授权需要真实PostgreSQL事务");}
     List<Map<String, Object>> configurations();
     Map<String, Object> configuration(String key);
     Map<String, Object> draftConfiguration(String key, Object proposed, long expectedVersion);

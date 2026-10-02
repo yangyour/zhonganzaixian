@@ -112,10 +112,16 @@ public final class PostgresPlatformRepository implements PlatformRepository {
             try(ResultSet rows=statement.executeQuery()){rows.next();return asset(rows);}catch(SQLException exception){if("23505".equals(exception.getSQLState()))throw new DomainException(409,"ASSET_NAME_CONFLICT","同租户资产名称已存在");throw exception;}
         }});
     }
-    @Override public Object idempotent(String actor,String tenant,String route,String key,String hash,long expectedPermissionVersion,Supplier<Object> command){return inTransaction(()->{
+    @Override public Object idempotent(String actor,String tenant,String route,String key,String hash,long expectedPermissionVersion,Supplier<Object> command){return idempotentChecked(actor,tenant,route,key,hash,expectedPermissionVersion,()->{},command);}
+    @Override public Object idempotentAuthorized(String actor,String tenant,String route,String key,String hash,long expectedPermissionVersion,Runnable authorize,Supplier<Object> command){
+        if(expectedPermissionVersion<1)throw new DomainException(401,"SESSION_EXPIRED","资源级重放必须绑定当前权限版本");
+        return idempotentChecked(actor,tenant,route,key,hash,expectedPermissionVersion,Objects.requireNonNull(authorize),command);
+    }
+    private Object idempotentChecked(String actor,String tenant,String route,String key,String hash,long expectedPermissionVersion,Runnable authorize,Supplier<Object> command){return inTransaction(()->{
         lock("idempotency|"+actor+"|"+tenant+"|"+route+"|"+key);
         Membership current=membership(actor,tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效，禁止重放或写入"));
         if(expectedPermissionVersion>0&&current.permissionVersion()!=expectedPermissionVersion)throw new DomainException(401,"SESSION_EXPIRED","权限已变化，请刷新会话");
+        scoped(idempotentCommandScope,()->{authorize.run();return null;});
         Object saved=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT payload_hash,response_json FROM public.mop_idempotency WHERE actor_id::text=? AND tenant_id::text=? AND route=? AND request_key=?")){statement.setString(1,actor);statement.setString(2,tenant);statement.setString(3,route);statement.setString(4,key);try(ResultSet rows=statement.executeQuery()){if(!rows.next())return null;if(!rows.getString(1).equals(hash))throw new DomainException(409,"IDEMPOTENCY_CONFLICT","同一幂等键不能用于不同请求内容");return json(rows.getString(2));}}});
         if(saved!=null)return saved;
         Object result=scoped(idempotentCommandScope,command);JsonNode response=mapper.valueToTree(result);rejectSessionSecrets(response);

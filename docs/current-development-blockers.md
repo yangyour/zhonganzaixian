@@ -24,7 +24,7 @@
 - 主台账授权与数据同快照、有界PG分页及现有ICU表达式已通过54HTTP；原服务器ICU可用性仍随B01未验证，不改数据库locale或以niko证明原服务器
 - 主台账已按合同12列接线，旧7列记录已纠正；298Web及6身份20只读HTTP投影通过，缺失字段/DOM仍待。首次会话刷新500/ThrowableProxy类缺失在拥有的栈重启后恢复；运行JAR与Maven target已独立隔离，真实重构建后同一API进程及运行哈希保持、6新OIDC身份/20只读HTTP通过，不以此解除其他阻塞
 - 工单Unicode字面搜索和失效会话/拒绝审计防护已通过626根测试报告（613执行含165PG）与62真实HTTP；客户仍只看本人，未把客户共享/正式状态等待确认项放行
-- 客户可见评论V11结构/ACL及7真实PG schema测试通过（全部回滚），新表0行；真实业务仓储/API/页面继续实现，未把结构完成算为评论功能验收
+- 客户可见评论V11结构/ACL及7真实PG schema测试通过（当时全部回滚后0行）；后续仓储16真实PG已通过并提交合成评论，API/页面继续实现，未把结构完成算为评论功能验收
 - 完整128项仍未DONE；每项未完成范围继续在合同追踪保留
 
 关联：[组件清单](environment/component-inventory.md)、[浏览器探测](evidence/niko-ui-blocker-20261002.json)、[OSS](oss-storage-adapter.md)、[当前实施](implementation-status.md)、[验证](verification.md)。本表不包含凭据、连接秘密或未经批准的绕行方案。

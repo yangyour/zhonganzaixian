@@ -101,6 +101,7 @@ jobs:
               'cn.mop.persistence.PostgresManualAssetMetadataIntegrationTest',
               'cn.mop.persistence.PostgresInternalNoteSchemaIntegrationTest',
               'cn.mop.persistence.PostgresTicketCommentSchemaIntegrationTest',
+              'cn.mop.persistence.PostgresTicketCommentIntegrationTest',
               'cn.mop.persistence.PostgresInternalTicketNoteIntegrationTest',
               'cn.mop.persistence.PostgresAssetReadIntegrationTest',
               'cn.mop.persistence.PostgresWorklogIntegrationTest',

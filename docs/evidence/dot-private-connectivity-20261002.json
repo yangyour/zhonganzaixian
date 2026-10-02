@@ -1,0 +1,61 @@
+{
+  "recorded_at": "2026-10-02T05:09:01.463936+00:00",
+  "base_commit": "81b2352d19198c76e8e8bbfb705f224b7a9b599c",
+  "repository_visibility_verified": "private",
+  "configuration": {
+    "files_verified": 6,
+    "json_parse": "PASS",
+    "namespace_bucket_match": "PASS",
+    "designated_host_pin_present": true,
+    "test_identities": 6,
+    "value_disclosure": "none",
+    "files_modified": false
+  },
+  "network_probes": [
+    {
+      "kind": "loopback_listener",
+      "result": "PASS"
+    },
+    {
+      "kind": "designated_ssh_tcp_no_auth",
+      "result": "ENETUNREACH",
+      "errno": 101
+    },
+    {
+      "kind": "approved_execution_ssh_tcp_no_auth",
+      "result": "ENETUNREACH",
+      "errno": 101
+    },
+    {
+      "kind": "existing_environment_proxy_connect",
+      "result": "TimeoutError"
+    }
+  ],
+  "authentication_attempts": 0,
+  "remote_commands": 0,
+  "tunnel_established": false,
+  "components": {
+    "postgresql": "NOT_RUN",
+    "keycloak": "NOT_RUN",
+    "minio": "NOT_RUN"
+  },
+  "api_ui": "NOT_RUN",
+  "fault_restart": "NOT_RUN",
+  "blocker": "NETWORK_PATH_UNAVAILABLE",
+  "parser_path": {
+    "original_windows_path_valid_on_linux": false,
+    "project_built_jar_exists": true,
+    "runtime_override_applied": false
+  },
+  "host_trust_hardening": {
+    "tests": 5,
+    "passed": 5,
+    "failed": 0,
+    "scope": "isolated mock-client trust policy checks; no real SSH",
+    "automatic_enrollment": false,
+    "known_hosts_rewrite": false
+  },
+  "migration_execution": 0,
+  "new_components_created": 0,
+  "task_delegation": false
+}

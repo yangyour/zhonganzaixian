@@ -1,4 +1,4 @@
-"""Read-only inventory. Credentials are loaded from an ignored local file."""
+"""Read-only inventory. Credentials stay in private configuration, never output."""
 import argparse
 import hashlib
 import ipaddress
@@ -19,11 +19,17 @@ def connect():
     host, user, password = connection_values()
     client = paramiko.SSHClient()
     known_hosts = ROOT / 'deploy/private/known_hosts'
-    if known_hosts.exists():
+    try:
+        if not known_hosts.is_file():
+            raise ValueError('Pinned SSH host keys are required; automatic enrollment is disabled')
         client.load_host_keys(str(known_hosts))
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(host, username=user, password=password, timeout=15, auth_timeout=15, banner_timeout=15, look_for_keys=False, allow_agent=False)
-    client.save_host_keys(str(known_hosts))
+        client.set_missing_host_key_policy(paramiko.RejectPolicy())
+        if not client.get_host_keys().lookup(host):
+            raise ValueError('The designated SSH host has no pinned key; connection refused')
+        client.connect(host, username=user, password=password, timeout=15, auth_timeout=15, banner_timeout=15, look_for_keys=False, allow_agent=False)
+    except Exception:
+        client.close()
+        raise
     return client
 
 def main():

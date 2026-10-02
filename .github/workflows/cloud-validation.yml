@@ -18,7 +18,7 @@ defaults:
 
 jobs:
   pure-java:
-    name: Pure Java source checks
+    name: Pure Java and SSH trust checks
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -39,6 +39,11 @@ jobs:
           bash tools/verify-asset-dependencies-pure.sh
           bash tools/verify-configuration-resolution-pure.sh
           bash tools/verify-asset-import-pure.sh
+      - name: Verify SSH host trust without network or private configuration
+        run: |
+          python3 -m venv "$RUNNER_TEMP/mop-ssh-test"
+          "$RUNNER_TEMP/mop-ssh-test/bin/python" -m pip install -r tools/requirements.txt
+          "$RUNNER_TEMP/mop-ssh-test/bin/python" -m unittest discover -s tools -p test_ssh_host_trust.py -v
 
   backend:
     name: Backend compile, unit tests and packaging

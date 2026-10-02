@@ -17,3 +17,5 @@
 [公开回读摘要](evidence/github-eba5630-verification.json)仅含commit/run/job状态及28条步骤摘要，不复制原始actor、runner身份或日志。该结果只对应`eba5630`旧提交。照片功能提交`f56ad1baf8c943f5bec8e7bc658ff347f9bc5a99`的[run 36846410035](https://github.com/yangyour/zhonganzaixian/actions/runs/36846410035)已另外回读，push、completed/success，三个job及28条步骤全部成功；见[照片提交安全摘要](evidence/github-f56ad1b-verification.json)。CI固定`MOP_RUN_REMOTE_TESTS=false`，不连接私有PG/MinIO/OIDC，不执行应用、迁移或组件联调；本地真实组件结果另见[本地验证](local-runtime-verification.md)。
 
 历史`1db3976`、`d4375f7`对应运行失败仍保留，不能因后续成功改写成通过。此前gh读取受HTTP传输/代理阻断的NOT_OBSERVED仅描述当时读取渠道，不是当前GitHub状态。本批实际回读不替代完整M5-5/M8-6或128项合同验收。
+
+2026-10-02追加：Pure Java job同时运行5项SSH信任策略隔离测试，使用临时Python环境及现有锁定requirements；mock客户端和临时ROOT，不读取真实私有配置、不连接SSH服务器。验证固定键缺失时拒绝，禁止自动登记/重写known_hosts；不据此声明真实SSH或组件已连通。

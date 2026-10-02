@@ -76,3 +76,13 @@
 本次从指定handoff分支SHA恢复源码并校验全部400文件，未接回此前云工作区的私有运行资料。`deploy/private/develop.txt`、`runtime.json`、`known_hosts`及导入命名空间私有配置均不存在；已检查MOP环境变量引用但未输出任何秘密。指定PG/Keycloak/MinIO/SSH本轮没有执行连接探测，状态为BLOCKED_PRIVATE_CONFIGURATION，不能沿用本地历史PASS宣布云端就绪。影响：真实API/UI、完整Worker故障/重启及指定组件集成验收未运行。后续需要受控提供既有私有配置和主机信任资料；不重新生成凭据、不创建替代服务、不放开公网组件端口。代码、隔离单元、契约、类型及前端构建可独立推进。
 
 终端Git/gh未登录，普通HTTPS Git读取失败；已连接GitHub工具可读取指定分支，并用于逐文件校验获取源码。没有在日志或仓库保存访问令牌。
+
+## 2026-10-02 Dot获取私有配置后的实际检查
+
+在原工作区更新到`81b2352d19198c76e8e8bbfb705f224b7a9b599c`，确认远端分支和本地提交/目录树一致。6个配置已逐文件校验，JSON可解析，照片/导入桶与runtime一致，指定SSH目标在固定known_hosts中存在。没有输出秘密或改变这些文件。
+
+凭据缺失阻塞已解除，网络阻塞仍在：指定SSH端口直连返回ENETUNREACH(errno101)，获准提升执行后的同一无认证探测结果相同；仅尝试现有环境代理的CONNECT超时。未发送登录凭据，未执行远程命令，未建立隧道，因此PG/Keycloak/MinIO及真实HTTP/UI未运行，不能记为组件故障或凭据错误。当前只证实本地loopback监听可用。需当前云工作区具备到指定SSH端点的已批准可用网络路径；未开放远端公网组件端口、修改网络/服务或切换任务环境。
+
+原runtime的解析器JAR是Windows路径，在Linux不可直接使用；工程内已有构建JAR可作为启动时进程环境覆盖，尚未启动API/Worker。后续运行仍排除迁移账号变量，保持V1–V6冻结和不自动迁移。
+
+发现旧`inspect_test_server.connect`使用AutoAddPolicy且会重写known_hosts，已改为强制既有固定目标键、RejectPolicy、不保存主机键；缺文件/缺目标键在认证前失败。5项隔离信任策略回归通过，不是服务器握手验证。见[脱敏连接记录](../evidence/dot-private-connectivity-20261002.json)。

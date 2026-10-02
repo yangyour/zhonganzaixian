@@ -17,6 +17,8 @@
 
 ## 缺失或尚未具备的组件
 
+2026-10-02 资产导入测试存储已在同一现有 MinIO 中新增独立桶 `mop-test-asset-imports` 与仅限 `asset-import-sources/*` 的受限账号。真实 Get/Put、Delete 拒绝、其他桶不可见、前缀外及匿名访问拒绝已验证；照片账号/IAM、服务配置和生命周期不变。见[原始源存储说明](../asset-import-storage.md)及[组件证据](../evidence/asset-import-component-verification.json)。应用大文件条件写、V6/Worker/解析/映射仍待独立验证，不能据本组件证明导入完成；扫描、留存和生产许可门禁继续保留。
+
 以下结论仅为当前盘点范围内未发现运行实例，不代表合同功能被取消。
 
 |组件|探测依据|影响|替代候选|后续状态|

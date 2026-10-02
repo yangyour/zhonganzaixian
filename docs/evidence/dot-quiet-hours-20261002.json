@@ -1,0 +1,28 @@
+{
+  "recorded_at": "2026-10-02T06:15:21.215174+00:00",
+  "base_commit": "8af7ddeeafd64c3a9c550e7321449d1414a09bbe",
+  "scope": "M8-10 pure local-calendar quiet filtering, no dispatch",
+  "new_junit_tests": 20,
+  "maven_verify": "PASS",
+  "junit": {
+    "tests": 379,
+    "executed": 291,
+    "skipped": 88,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts_tests": 18,
+  "generator_consistency": "PASS",
+  "api_version": "0.8",
+  "api_wire_change": false,
+  "real_components": "NOT_RUN_NETWORK_BLOCKED",
+  "real_notification_dispatch": "NOT_RUN",
+  "full_contract_acceptance": "NOT_RUN",
+  "private_configuration_modified": false,
+  "migrations_changed": false,
+  "preceding_commit_ci": {
+    "sha": "8af7ddeeafd64c3a9c550e7321449d1414a09bbe",
+    "run_id": 36972330429,
+    "conclusion": "success"
+  }
+}

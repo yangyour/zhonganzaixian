@@ -1,0 +1,34 @@
+{
+  "recorded_at": "2026-10-02T06:43:22.063647+00:00",
+  "base_commit": "32a9776d080b1547ad903f27321879469fe1b8ab",
+  "scope": "D05 parsed-artifact structural invariants",
+  "new_junit_tests": 7,
+  "before": {
+    "tests": 7,
+    "failures": 6,
+    "errors": 0
+  },
+  "maven_verify": "PASS",
+  "junit": {
+    "tests": 386,
+    "executed": 298,
+    "skipped": 88,
+    "failures": 0,
+    "errors": 0
+  },
+  "existing_parser_tests": 29,
+  "contracts_tests": 18,
+  "generator_consistency": "PASS",
+  "api_version": "0.8",
+  "contract_change": "PARSED minItems=1 rows; explicit cross-field identity and reference invariants",
+  "real_components": "NOT_RUN_NETWORK_BLOCKED",
+  "real_http_ui": "NOT_RUN",
+  "full_contract_acceptance": "NOT_RUN",
+  "private_configuration_modified": false,
+  "migrations_changed": false,
+  "preceding_commit_ci": {
+    "sha": "32a9776d080b1547ad903f27321879469fe1b8ab",
+    "run_id": 36973004629,
+    "conclusion": "success"
+  }
+}

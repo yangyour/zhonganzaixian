@@ -259,6 +259,7 @@ test('映射恰好15个目标、NOTE必须index，显式null与ignore有独立�
 });
 
 test('raw artifact保留lexical/display/style/date_epoch，目录状态不冒充PARSED', () => {
+  assert.equal(validates('AssetImportParsedArtifact', { ...importArtifact, rows: [] }), false);
   assert.equal(validates('AssetImportParsedArtifact', importArtifact), true);
   const inventory = { ...importArtifact, detected_format: 'XLSX', state: 'SELECTION_REQUIRED', selection: { declared_format: 'XLSX', encoding: null, delimiter: null, sheet_index: null, header_row: null }, sheets: [{ index: 0, name: 'Cover', hidden: false }, { index: 1, name: 'MOP-FAKE hidden', hidden: true }], selected_sheet_index: null, header_row: null, date_epoch: 'MAC_1904', columns: [], rows: [] };
   assert.equal(validates('AssetImportParsedArtifact', inventory), true);

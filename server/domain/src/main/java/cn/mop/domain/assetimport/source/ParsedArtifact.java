@@ -23,9 +23,20 @@ public record ParsedArtifact(State state,ImportFormat detectedFormat,List<SheetI
     }
     public ParsedArtifact{
         Objects.requireNonNull(state);Objects.requireNonNull(detectedFormat);Objects.requireNonNull(dateEpoch);sheets=List.copyOf(sheets);columns=List.copyOf(columns);rows=List.copyOf(rows);
-        if(sheets.isEmpty()||sheets.size()>ImportLimits.MAX_SHEETS||columns.size()>ImportLimits.MAX_COLUMNS||rows.size()>ImportLimits.MAX_DATA_ROWS||parserVersion==null||resourcePolicyVersion==null)throw new IllegalArgumentException("Invalid parsed artifact");
-        if(state==State.SELECTION_REQUIRED&&(!columns.isEmpty()||!rows.isEmpty()))throw new IllegalArgumentException("Selection is required before rows are parsed");
-        if(state==State.PARSED&&(selectedSheetIndex==null||headerRow==null||headerRow<1||columns.isEmpty()))throw new IllegalArgumentException("Parsed selection is incomplete");
+        if(sheets.isEmpty()||sheets.size()>ImportLimits.MAX_SHEETS||columns.size()>ImportLimits.MAX_COLUMNS||rows.size()>ImportLimits.MAX_DATA_ROWS||parserVersion==null||parserVersion.isBlank()||resourcePolicyVersion==null||resourcePolicyVersion.isBlank())throw new IllegalArgumentException("Invalid parsed artifact");
+        if(state==State.SELECTION_REQUIRED&&(selectedSheetIndex!=null||headerRow!=null||!columns.isEmpty()||!rows.isEmpty()))throw new IllegalArgumentException("Selection is required before rows are parsed");
+        if(state==State.PARSED&&(selectedSheetIndex==null||headerRow==null||headerRow<1||headerRow>ImportLimits.MAX_SOURCE_ROW_INDEX||columns.isEmpty()||rows.isEmpty()))throw new IllegalArgumentException("Parsed selection is incomplete");
+        Set<Integer> sheetIndices=new HashSet<>();
+        for(SheetInfo sheet:sheets)if(!sheetIndices.add(sheet.index()))throw new IllegalArgumentException("Duplicate sheet identity");
+        if(state==State.PARSED&&!sheetIndices.contains(selectedSheetIndex))throw new IllegalArgumentException("Selected sheet is absent");
+        Set<Integer> columnIndices=new HashSet<>();
+        for(SourceColumn column:columns)if(!columnIndices.add(column.index()))throw new IllegalArgumentException("Duplicate column identity");
+        Set<Integer> sourceRows=new HashSet<>();Set<Long> logicalRows=new HashSet<>();
+        for(SourceRow row:rows){
+            if(!sourceRows.add(row.sourceRowNumber())||!logicalRows.add(row.logicalRecordNumber()))throw new IllegalArgumentException("Duplicate row identity");
+            if(row.sourceRowNumber()<=headerRow)throw new IllegalArgumentException("Data row must follow header");
+            for(SourceCell cell:row.cells())if(!columnIndices.contains(cell.columnIndex()))throw new IllegalArgumentException("Cell has no declared source column");
+        }
     }
     public static List<SourceColumn> columns(List<String> headers){
         List<SourceColumn> result=new ArrayList<>();for(int index=0;index<headers.size();index++){String header=headers.get(index);List<Column> matches=Arrays.stream(Column.values()).filter(column->column.label().equals(header)).toList();result.add(new SourceColumn(index,header,matches));}return List.copyOf(result);

@@ -9612,6 +9612,9 @@
                 },
                 "columns": {
                   "minItems": 1
+                },
+                "rows": {
+                  "minItems": 1
                 }
               }
             }
@@ -9654,6 +9657,7 @@
           "source_sha256与不可变原始bytes摘要相同",
           "保留lexical/display/kind/style/format/date_epoch；没有业务日期或字典规范化",
           "表头重名不合并，源列index和原始行号不重排",
+          "sheet index、column index、source row number及logical record number各自唯一；选中sheet必须存在；数据行在表头后且所有cell属于声明列",
           "XLSX公式、外部链接、宏及加密安全拒绝；不读取公式缓存替代公式解析"
         ]
       },

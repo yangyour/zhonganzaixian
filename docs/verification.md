@@ -357,3 +357,9 @@ WorklogRepository及PostgresWorklogRepository已接入既有幂等事务，限�
 18项新增前端输入/DTO/分页/历史/状态回归通过，全Web225、类型检查/构建、契约23及生成一致性通过。实际前端WorklogWorkspace状态模块与ApiClient打包后连接真实PG/OIDC，28次HTTP完成：故意丢弃创建及修改的两个成功200响应，明确同键同body重试；普通刷新没有写入；另一客户端修改后旧编辑得到409，用户重新读取明确选新版；最终修订1/2/3且仅3条对应写审计。5次受测写尝试包含两次重放和一次409；另一个真实客户端的修改单独在28次HTTP内，不混淆为5次都新增版本。
 
 这是受控客户端响应丢失注入，不是物理断网，也不是浏览器DOM/控件操作。桌面/390px视觉验收仍受B03阻塞，完整M5-21/M10-13及128项非DONE。V1–V8、API V0.11、私有配置未改。API提交e18ffac的CI37032139921已回读success。见[客户端HTTP证据](evidence/niko-worklog-client-http-20261002.json)、[页面回归](evidence/dot-worklog-ui-20261002.json)。
+
+## 2026-10-02 审计链区间计算与既存PG验证
+
+新增只读AuditChainVerifier，不改变V1写入编码或历史。最多1000条/批，完整核对row/payload、顺序/缺失/重复及前驱摘要；部分区间带前一条本地记录，但externallyAnchored=false，不冒充外部可信锚或WORM。8项隔离测试及2项真实PG测试通过：两租户5162条既存记录分7个区间，在各自REPEATABLE READ快照一致；真实行内存副本改字段被拒，数据库原记录回读未变。
+
+根495=482执行（含104真实PG）+13fixture跳过、6MinIO排除，0失败错误。原写入器、V1–V8、API V0.11和私有配置不变；公开区间接口、检索分页与页面待，M2-12/M7-5非DONE。见[边界](audit-integrity.md)、[证据](evidence/niko-audit-chain-core-20261002.json)。上一工时UI1512e2c的CI37033778518已回读success；DOM验收仍受B03阻塞。

@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-02",
+  "environment": "niko-local-test",
+  "scope": "existing audit chain verifier and PostgreSQL read-only snapshots",
+  "result": "PASS",
+  "isolated_tests": 8,
+  "new_real_pg_tests": 2,
+  "observed_records": 5162,
+  "bounded_ranges": 7,
+  "tenant_count": 2,
+  "range_limit": 1000,
+  "isolation": "REPEATABLE_READ_PER_TENANT",
+  "stored_audit_mutations": 0,
+  "tamper_test": "in-memory copy of a real row only; stored original reread unchanged",
+  "hash_encoding_changed": false,
+  "externally_anchored": false,
+  "root_maven": {
+    "total": 495,
+    "executed_passed": 482,
+    "real_pg_included": 104,
+    "fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "log_sha256": "e66a63f2c47976e4eb0ded5a4f6c83e3f51b9b0efd49ccd82a76479304c4227a"
+  },
+  "limitations": [
+    "No external trust anchor or WORM proof",
+    "No public range-verifier endpoint/page yet",
+    "Not full M2-12/M7-5 acceptance",
+    "No original server/OSS/browser acceptance"
+  ]
+}

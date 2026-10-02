@@ -1,0 +1,30 @@
+package cn.mop.persistence.audit;
+
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.junit.jupiter.api.Test;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static cn.mop.persistence.audit.AuditChainVerifier.*;
+
+class AuditChainVerifierTest {
+    static final String TENANT="55000000-0000-4000-8000-000000000001",ACTOR="55000000-0000-4000-8000-000000000002",OTHER="55000000-0000-4000-8000-000000000003";
+    static final ObjectMapper JSON=new ObjectMapper();
+    static ObjectNode payload(long sequence,String previous){return JSON.createObjectNode().put("id",String.format("55000000-0000-4000-8000-%012x",sequence+100)).put("occurred_at","2026-10-02T00:00:00.123Z").put("actor_id",ACTOR).put("actor_name","合成操作人😀").put("tenant_id",TENANT).put("action","synthetic.audit.test").put("resource_type","synthetic").putNull("resource_id").put("result","DENIED").put("reason","引用保留\\n原始引号\"").put("trace_id","synthetic-trace").put("source","postgresql").put("sequence",sequence).put("previous_hash",previous);}
+    static Row sign(ObjectNode payload){payload.put("entry_hash",calculateHash(payload));return new Row(payload.get("id").textValue(),TENANT,TENANT,payload.get("sequence").longValue(),payload.get("previous_hash").textValue(),payload.get("entry_hash").textValue(),payload);}
+    static List<Row> chain(int size){List<Row> rows=new ArrayList<>();String previous="0".repeat(64);for(int i=1;i<=size;i++){Row row=sign(payload(i,previous));rows.add(row);previous=row.entryHash();}return rows;}
+    @Test void completeGenesisAndAnchoredSubrangeVerifyWithoutExternalTrustClaim(){var rows=chain(3);Result full=verify(TENANT,1,3,null,rows);assertTrue(full.valid());assertEquals(3,full.verifiedRecords());assertFalse(full.externallyAnchored());assertNull(full.failureSequence());Result part=verify(TENANT,2,3,rows.get(0),rows.subList(1,3));assertTrue(part.valid());assertEquals(rows.get(0).entryHash(),part.anchorHash());assertEquals(full.finalHash(),part.finalHash());}
+    @Test void exactExistingWriterEncodingIsPreservedIncludingUnicodeNullAndEscapes()throws Exception{
+        ObjectNode payload=payload(1,"0".repeat(64));Map<String,Object> original=JSON.convertValue(payload,LinkedHashMap.class);String canonical=JSON.valueToTree(new TreeMap<>(original)).toString();String old=HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest((original.get("previous_hash")+canonical).getBytes(StandardCharsets.UTF_8)));assertEquals(old,calculateHash(payload));var reordered=JSON.createObjectNode();List<String> keys=new ArrayList<>();payload.fieldNames().forEachRemaining(keys::add);Collections.reverse(keys);for(String key:keys)reordered.set(key,payload.get(key));assertEquals(old,calculateHash(reordered));
+    }
+    @Test void changedPayloadHashOrLinkNeverReportsValid(){var rows=chain(2);ObjectNode changed=(ObjectNode)rows.get(1).payload();changed.put("reason","changed");Row tampered=new Row(rows.get(1).id(),TENANT,TENANT,2,rows.get(1).previousHash(),rows.get(1).entryHash(),changed);assertEquals(Failure.HASH_MISMATCH,verify(TENANT,1,2,null,List.of(rows.get(0),tampered)).failure());Row badLink=sign(payload(2,"f".repeat(64)));assertEquals(Failure.PREVIOUS_HASH_MISMATCH,verify(TENANT,1,2,null,List.of(rows.get(0),badLink)).failure());}
+    @Test void deletedReorderedAndExtraRowsAreNotAValidRange(){var rows=chain(3);assertEquals(Failure.MISSING_RECORD,verify(TENANT,1,3,null,rows.subList(0,2)).failure());assertEquals(Failure.SEQUENCE_MISMATCH,verify(TENANT,1,3,null,List.of(rows.get(0),rows.get(2))).failure());assertEquals(Failure.SEQUENCE_MISMATCH,verify(TENANT,1,3,null,List.of(rows.get(1),rows.get(0),rows.get(2))).failure());assertEquals(Failure.UNEXPECTED_RECORD,verify(TENANT,1,2,null,rows).failure());}
+    @Test void foreignScopeColumnMismatchAndDuplicateIdsAreRejected(){var rows=chain(2);Row row=rows.get(0);for(Row invalid:List.of(new Row(row.id(),OTHER,TENANT,1,row.previousHash(),row.entryHash(),row.payload()),new Row(row.id(),TENANT,OTHER,1,row.previousHash(),row.entryHash(),row.payload()),new Row(OTHER,TENANT,TENANT,1,row.previousHash(),row.entryHash(),row.payload())))assertEquals(Failure.ROW_PAYLOAD_MISMATCH,verify(TENANT,1,1,null,List.of(invalid)).failure());ObjectNode second=payload(2,row.entryHash()).put("id",row.id());assertEquals(Failure.DUPLICATE_ID,verify(TENANT,1,2,null,List.of(row,sign(second))).failure());}
+    @Test void missingCorruptOrWrongPredecessorIsNotAnAnchor(){var rows=chain(3);assertEquals(Failure.ANCHOR_INVALID,verify(TENANT,2,3,null,rows.subList(1,3)).failure());assertEquals(Failure.ANCHOR_INVALID,verify(TENANT,3,3,rows.get(0),rows.subList(2,3)).failure());Row row=rows.get(0);ObjectNode bad=(ObjectNode)row.payload();bad.put("action","tampered");Row anchor=new Row(row.id(),TENANT,TENANT,1,row.previousHash(),row.entryHash(),bad);assertEquals(Failure.ANCHOR_INVALID,verify(TENANT,2,2,anchor,List.of(rows.get(1))).failure());}
+    @Test void strictPayloadShapeAndScalarTypesRejectReSignedIncompatibleRecords(){
+        for(ObjectNode payload:List.of(payload(1,"0".repeat(64)).put("extra","unexpected"),payload(1,"0".repeat(64)).put("sequence",1.0),payload(1,"0".repeat(64)).put("actor_id","wrong"),payload(1,"0".repeat(64)).put("reason",5),payload(1,"0".repeat(64)).put("source","fixture")))assertEquals(Failure.ROW_PAYLOAD_MISMATCH,verify(TENANT,1,1,null,List.of(sign(payload))).failure());
+    }
+    @Test void boundedRangeAndDefensiveCopiesKeepInputOwnership(){assertThrows(IllegalArgumentException.class,()->verify(TENANT,1,1001,null,List.of()));assertThrows(IllegalArgumentException.class,()->verify(TENANT,0,1,null,List.of()));assertThrows(IllegalArgumentException.class,()->verify(TENANT,2,1,null,List.of()));ObjectNode payload=payload(1,"0".repeat(64));Row row=sign(payload);payload.put("reason","external change");((ObjectNode)row.payload()).put("reason","accessor change");assertTrue(verify(TENANT,1,1,null,List.of(row)).valid());}
+}

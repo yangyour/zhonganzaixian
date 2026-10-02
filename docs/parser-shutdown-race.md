@@ -1,0 +1,9 @@
+# 解析子进程关闭/发布竞态修复
+
+2026-10-02，工时仓储提交ecdc95d的CI37029531770：Web与pure Java通过，backend在既有AssetImportParserProcessTest.closeTerminatesAnActiveNativeChildAndDisablesFurtherClaims失败，close返回后原生子进程仍存活；不标整轮成功。
+
+原因：launcher已创建进程但尚未返回时，active仍为空，close可先返回。新增独立lifecycle锁覆盖启动与active发布；close在同一锁内标记关闭并取得已发布子进程，随后等待原生退出。parse主体不与close共用长周期锁，关闭仍可终止在运行的孩子；只处理自己创建的进程，无端口扫描或其他项目进程操作。
+
+新增明确暂停launcher返回的回归：关闭须等启动交接，然后确认子进程退出、解析线程结束、运行目录清理和后续拒绝执行。9项独立原生子进程协议/资源/关闭测试全部通过。测试使用明确的无凭据ParserMain替身Jar，只验证进程生命周期；不冒充OSS下载、真实CSV/XLSX业务解析或Worker全流水线。
+
+没有修改API契约、冻结迁移或私有配置。工时API V0.11仍另行开发与验证，本修复独立提交。

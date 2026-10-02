@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-02",
+  "scope": "owned parser child lifecycle",
+  "ci_trigger": {
+    "commit": "ecdc95d1459105d3284dc592e51bbdd0bbf1eb84",
+    "run": 37029531770,
+    "failed_job": 110912579936,
+    "failure": "close returned while native child was alive"
+  },
+  "fix": "serialize process launch/publication with close; await native termination",
+  "tests": 9,
+  "failures": 0,
+  "errors": 0,
+  "log_sha256": "687551df0c31683298678128db7399f314099c9c3aa60a6ccde254c5fc399f69",
+  "test_source": "explicit credential-free synthetic ParserMain child",
+  "real_oss": false,
+  "full_worker_pipeline_verified": false
+}

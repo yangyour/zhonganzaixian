@@ -60,6 +60,21 @@ class AssetImportParserProcessTest {
             Path input=source("TIMEOUT");Thread thread=new Thread(()->{try{parser.parse(input,selection());}catch(Throwable safe){failure.set(safe);}});thread.start();assertTrue(started.await(3,TimeUnit.SECONDS));parser.close();assertFalse(child.get().isAlive());thread.join(5000);assertFalse(thread.isAlive());assertInstanceOf(ParseFailure.class,failure.get());assertFalse(parser.available());assertThrows(ParseFailure.class,()->parser.parse(input,selection()));
         }emptyRuns();
     }
+    @Test void closeWaitsForNativeLaunchPublicationBeforeReturning()throws Exception{
+        CountDownLatch launched=new CountDownLatch(1),releaseLaunch=new CountDownLatch(1),closing=new CountDownLatch(1);
+        AtomicReference<Process> child=new AtomicReference<>();AtomicReference<Throwable> failure=new AtomicReference<>();
+        var executor=Executors.newSingleThreadExecutor();
+        try(var parser=new AssetImportParserProcess(jar(),5000,parent(),builder->{
+            Process process=builder.start();child.set(process);launched.countDown();
+            try{if(!releaseLaunch.await(5,TimeUnit.SECONDS))throw new IOException("synthetic launch gate timeout");}catch(InterruptedException stopped){Thread.currentThread().interrupt();throw new IOException("synthetic launch gate interrupted");}
+            return process;
+        })){
+            Path input=source("TIMEOUT");Thread parsing=new Thread(()->{try{parser.parse(input,selection());}catch(Throwable safe){failure.set(safe);}});parsing.start();assertTrue(launched.await(3,TimeUnit.SECONDS));
+            Future<?> close=executor.submit(()->{closing.countDown();parser.close();});assertTrue(closing.await(3,TimeUnit.SECONDS));
+            try{assertThrows(TimeoutException.class,()->close.get(100,TimeUnit.MILLISECONDS));}finally{releaseLaunch.countDown();}
+            close.get(5,TimeUnit.SECONDS);assertFalse(child.get().isAlive());parsing.join(5000);assertFalse(parsing.isAlive());assertInstanceOf(ParseFailure.class,failure.get());assertFalse(parser.available());
+        }finally{releaseLaunch.countDown();executor.shutdownNow();}emptyRuns();
+    }
     @Test void duplicateTrailingAndInconsistentSchemasCannotBecomeArtifacts()throws Exception{
         for(String mode:List.of("TWODOCS","DUPLICATE","WRONG_ROW","WRONG_SUGGESTION","BAD_ENUM","EXTRA","MANY_NODES"))try(var parser=new AssetImportParserProcess(jar(),5000,parent(),ProcessBuilder::start)){
             var failure=assertThrows(ParseFailure.class,()->parser.parse(source(mode),selection()));assertEquals(ParseFailure.Code.INTERNAL_PARSER_FAILURE,failure.code());assertFalse(failure.getMessage().contains("PRIVATE"));assertNull(failure.getCause());emptyRuns();

@@ -29,6 +29,7 @@ final class AssetImportParserProcess implements AssetImportParser,AutoCloseable 
     private final long timeoutMillis;
     private final Map<String,String> parentEnvironment;
     private final ProcessLauncher launcher;
+    private final Object lifecycle=new Object();
     private volatile Process active;
     private volatile boolean closed;
 
@@ -98,7 +99,13 @@ final class AssetImportParserProcess implements AssetImportParser,AutoCloseable 
             builder.directory(run.toFile());builder.environment().clear();
             String systemRoot=parentEnvironment.get("SystemRoot");if(systemRoot==null)systemRoot=parentEnvironment.get("SYSTEMROOT");if(systemRoot!=null&&!systemRoot.isBlank())builder.environment().put("SystemRoot",systemRoot);
             builder.environment().put("TEMP",run.resolve("tmp").toString());builder.environment().put("TMP",run.resolve("tmp").toString());
-            child=launcher.start(builder);active=child;if(closed){terminate(child);throw new ParseFailure(ParseFailure.Code.RESOURCE_LIMIT);}
+            // Publish a launched child atomically with respect to close(). A native process may
+            // already exist while launcher.start has not returned; close must await that handoff.
+            synchronized(lifecycle){
+                if(closed)throw new ParseFailure(ParseFailure.Code.RESOURCE_LIMIT);
+                child=launcher.start(builder);active=child;
+            }
+            if(closed){terminate(child);throw new ParseFailure(ParseFailure.Code.RESOURCE_LIMIT);}
             AtomicReference<ParseFailure.Code> overflow=new AtomicReference<>();
             stdout=new OutputCapture(child,overflow);stderr=new ErrorCapture(child,overflow);stdout.start();stderr.start();
             try(OutputStream request=child.getOutputStream()){JSON.writeValue(request,Map.of("path",source.toString(),"selection",selection));}
@@ -144,7 +151,7 @@ final class AssetImportParserProcess implements AssetImportParser,AutoCloseable 
             });
         }catch(IOException invalid){throw new ParseFailure(ParseFailure.Code.INTERNAL_PARSER_FAILURE);}
     }
-    @Override public void close(){closed=true;Process child=active;if(child!=null)terminate(child);}
+    @Override public void close(){Process child;synchronized(lifecycle){closed=true;child=active;}if(child!=null)terminate(child);}
     private static final class OutputCapture extends Thread {
         private final Process child;private final AtomicReference<ParseFailure.Code> overflow;byte[] bytes;boolean failure;
         OutputCapture(Process child,AtomicReference<ParseFailure.Code> overflow){super("mop-import-parser-stdout");this.child=child;this.overflow=overflow;}

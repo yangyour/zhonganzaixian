@@ -1,0 +1,116 @@
+{
+  "verified_at": "2026-10-02T14:44:48.026Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "http_checks": 25,
+  "checks": [
+    {
+      "name": "padmin_/session",
+      "status": 200
+    },
+    {
+      "name": "padmin_/assets",
+      "status": 200
+    },
+    {
+      "name": "padmin_/configurations",
+      "status": 200
+    },
+    {
+      "name": "padmin_/assets/import-template",
+      "status": 200
+    },
+    {
+      "name": "reviewer_/session",
+      "status": 200
+    },
+    {
+      "name": "reviewer_/assets",
+      "status": 200
+    },
+    {
+      "name": "reviewer_/configurations",
+      "status": 200
+    },
+    {
+      "name": "reviewer_/assets/import-template",
+      "status": 200
+    },
+    {
+      "name": "msp_/session",
+      "status": 200
+    },
+    {
+      "name": "msp_/assets",
+      "status": 200
+    },
+    {
+      "name": "msp_/configurations",
+      "status": 403
+    },
+    {
+      "name": "msp_/assets/import-template",
+      "status": 200
+    },
+    {
+      "name": "tadmin_/session",
+      "status": 200
+    },
+    {
+      "name": "tadmin_/assets",
+      "status": 200
+    },
+    {
+      "name": "tadmin_/configurations",
+      "status": 403
+    },
+    {
+      "name": "tadmin_/assets/import-template",
+      "status": 200
+    },
+    {
+      "name": "viewerA_/session",
+      "status": 200
+    },
+    {
+      "name": "viewerA_/assets",
+      "status": 200
+    },
+    {
+      "name": "viewerA_/configurations",
+      "status": 403
+    },
+    {
+      "name": "viewerA_/assets/import-template",
+      "status": 403
+    },
+    {
+      "name": "viewerB_/session",
+      "status": 200
+    },
+    {
+      "name": "viewerB_/assets",
+      "status": 200
+    },
+    {
+      "name": "viewerB_/configurations",
+      "status": 403
+    },
+    {
+      "name": "viewerB_/assets/import-template",
+      "status": 403
+    },
+    {
+      "name": "anonymous_assets",
+      "status": 401
+    }
+  ],
+  "known_roles_unchanged": true,
+  "real_oidc_identities": 6,
+  "malformed_role_database_mutations": 0,
+  "credentials_output": false,
+  "limitations": [
+    "Unknown/null/inactive membership cases verified in isolated guards, not inserted into real identity/database",
+    "Not production Q09 permission approval or full M2 acceptance"
+  ]
+}

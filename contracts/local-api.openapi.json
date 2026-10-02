@@ -7238,7 +7238,9 @@
           "data",
           "trace_id"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-mop-role-source": "current_active_tenant_membership",
+        "x-mop-unsupported-role": "deny_all_and_do_not_establish_or_project_platform_session"
       },
       "Asset": {
         "type": "object",

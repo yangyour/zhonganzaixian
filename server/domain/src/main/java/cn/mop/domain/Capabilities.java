@@ -6,12 +6,13 @@ import java.util.List;
 public final class Capabilities {
     private Capabilities() {}
     public static List<String> forRole(String role) {
+        if(role==null)return List.of();
         return switch (role) {
             case "padmin" -> List.of("assets:read", "assets:write", "configurations:read", "configurations:write", "audit:read", "tickets:read");
             case "msp" -> List.of("assets:read", "assets:write", "tickets:read");
             case "tadmin" -> List.of("assets:read", "assets:write", "tickets:read", "tickets:report");
             case "viewer" -> List.of("assets:read", "tickets:read", "tickets:report");
-            default -> List.of("assets:read");
+            default -> List.of();
         };
     }
     public static boolean customer(String role) { return "viewer".equals(role) || "tadmin".equals(role); }

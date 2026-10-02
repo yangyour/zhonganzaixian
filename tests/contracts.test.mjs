@@ -337,3 +337,9 @@ test('标准15列模板为授权的固定二进制GET，不产生导入写请求
   assert.equal(route.get.responses[200].headers['X-MOP-Business-Status'].schema.const, 'CONFIG_PENDING');
   assert.ok(route.get.responses[401].content['application/json']); assert.ok(route.get.responses[503].content['application/json']);
 });
+
+
+test('会话权限来自当前启用成员角色，未知角色没有资产读取兜底', () => {
+  assert.equal(contract.components.schemas.SessionResult['x-mop-role-source'], 'current_active_tenant_membership');
+  assert.equal(contract.components.schemas.SessionResult['x-mop-unsupported-role'], 'deny_all_and_do_not_establish_or_project_platform_session');
+});

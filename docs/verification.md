@@ -309,3 +309,11 @@ bf1abfe的CI37001705608中，后端完整编译/测试/打包与契约/Web两个
 新增后端5项（4授权/完整性、1实际包内模板+真实解析器空数据拒绝）及前端7项，根445=432执行通过（含84真实PG）+13fixture跳过、6MinIO排除，0失败错误；Web207、类型/构建、契约21与生成一致性通过。首轮真实HTTP发现全局过滤器与控制器重复设置no-store，原bytes/hash正确；删除控制器的冗余头后重建重启，11项完整真实HTTP通过，使用实际前端字节校验模块。没有将初次失败改写为成功。
 
 见[下载说明](asset-import-template.md)、[构建边界](evidence/dot-import-template-download-20261002.json)、[真实HTTP](evidence/niko-import-template-http-20261002.json)。浏览器保存/视觉、OSS及完整导入仍未验收；V1–V7和原私有6文件不变，M3-6非DONE。前一3e66b2d的CI37017197287总run已回读success。
+
+## 2026-10-02 未识别成员角色默认拒绝
+
+复现Capabilities对未知角色兜底授予assets:read、null角色导致异常；会话建立/投影和切租户未统一拒绝不支持角色。现未知/null/大小写或空格变体返回空能力集；会话路径先核验启用成员和受支持角色，OIDC在成功审计/平台session创建前拒绝，切换目标在幂等记录和会话修改前拒绝。已知padmin/msp/tadmin/viewer四类能力列表未改，也没有扩大角色权限。
+
+新增5项隔离回归修复前4失败/1错误，修复后通过；根450=437执行通过（含84真实PG）+13fixture跳过、6MinIO排除，0失败错误；Web207、类型/构建、契约22及生成一致性通过。重新真实OIDC登录6个既有身份，25项session能力/资产租户范围/配置权限/模板权限/匿名拒绝HTTP回归通过。未知角色只在隔离守卫中模拟，未向真实数据库/身份源插入非法角色，不能将此描述为真实未知角色账号测试。
+
+API V0.10字段形状不变，补充当前成员角色来源与默认拒绝元数据；V1–V7及原私有6文件未动，不替代Q09生产权限确认，M2-6非DONE。见[守卫记录](evidence/dot-unknown-role-guard-20261002.json)、[已知角色真实HTTP](evidence/niko-known-role-http-20261002.json)。上一33ffb2e的CI37020293486总run已回读success。

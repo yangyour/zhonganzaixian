@@ -44,7 +44,7 @@ public class SessionService {
         List<Tenant> tenants=repository.allowedTenants(actor);
         if(tenants.isEmpty())throw new DomainException(401,"SESSION_EXPIRED","此身份没有有效成员关系");
         String tenant=tenants.get(0).id();
-        repository.membership(actor,tenant).orElseThrow(SessionService::notFound);
+        validMembership(repository.membership(actor,tenant).orElseThrow(SessionService::notFound));
         repository.audit(actor,tenant,"oidc.login","session",null,"SUCCEEDED","KEYCLOAK_VERIFIED_IDENTITY",trace(request));
         var browserSession=request.getSession(true);
         int timeout=request.getServletContext().getSessionTimeout();
@@ -60,6 +60,7 @@ public class SessionService {
         FixtureUser user=repository.user(userId).orElseThrow(SessionService::notFound);
         List<Tenant> allowed=repository.allowedTenants(userId);if(allowed.isEmpty())throw new DomainException(401,"SESSION_EXPIRED","此历史夹具身份已撤权");
         String tenant=allowed.get(0).id();
+        validMembership(repository.membership(userId,tenant).orElseThrow(SessionService::notFound));
         repository.idempotent(userId,tenant,route(request),requestKey(request),hash(body),()->userId);
         if(request.getSession(false)!=null)request.getSession(false).invalidate();
         request.getSession(true).setAttribute("mop.tenant_id",tenant);
@@ -67,21 +68,21 @@ public class SessionService {
         SecurityContextHolder.setContext(context);contexts.saveContext(context,request,response);
         CsrfToken token=csrfRepository.generateToken(request);csrfRepository.saveToken(token,request,response);
         repository.audit(userId,tenant,"fixture.login","session",null,"SUCCEEDED","LOCAL_FIXTURE_IDENTITY",trace(request));
-        Membership current=repository.membership(userId,tenant).orElseThrow();
+        Membership current=validMembership(repository.membership(userId,tenant).orElseThrow());
         return sessionData(new Access(user,repository.tenant(tenant),current,capabilities(current.role())),token.getToken());
     }
     public Object session(HttpServletRequest request){return sessionData(access(request),csrf(request));}
     public Object switchTenant(JsonNode body,HttpServletRequest request){
         Access before=access(request);fields(body,Set.of("tenant_id"));String target=text(body,"tenant_id",36);
-        repository.membership(before.user.id(),target).orElseThrow(SessionService::notFound);
+        validMembership(repository.membership(before.user.id(),target).orElseThrow(SessionService::notFound));
         // Durable replay saves only the authorized target, never a browser's CSRF token or session DTO.
         repository.idempotent(before.user.id(),before.tenant.id(),route(request),requestKey(request),hash(body),()->{
-            repository.membership(before.user.id(),before.tenant.id()).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效"));
-            repository.membership(before.user.id(),target).orElseThrow(SessionService::notFound);
+            validMembership(repository.membership(before.user.id(),before.tenant.id()).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效")));
+            validMembership(repository.membership(before.user.id(),target).orElseThrow(SessionService::notFound));
             repository.audit(before.user.id(),target,"session.switch_tenant","tenant",target,"SUCCEEDED","AUTHORIZED_MEMBERSHIP",trace(request));
             return map("tenant_id",target);
         });
-        Membership member=repository.membership(before.user.id(),target).orElseThrow(SessionService::notFound);
+        Membership member=validMembership(repository.membership(before.user.id(),target).orElseThrow(SessionService::notFound));
         request.getSession().setAttribute("mop.tenant_id",target);
         return sessionData(new Access(before.user,repository.tenant(target),member,capabilities(member.role())),csrf(request));
     }
@@ -118,13 +119,18 @@ public class SessionService {
     private Access access(HttpServletRequest request){
         if(request.getUserPrincipal()==null||request.getSession(false)==null)throw new DomainException(401,"SESSION_EXPIRED","会话不存在或已过期");
         String actor=request.getUserPrincipal().getName(),tenant=(String)request.getSession().getAttribute("mop.tenant_id");
-        Membership membership=repository.membership(actor,tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效，请重新登录"));
+        Membership membership=validMembership(repository.membership(actor,tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效，请重新登录")));
         List<String> capabilities=capabilities(membership.role());if(!capabilities.contains("assets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无此动作权限");
         return new Access(repository.user(actor).orElseThrow(SessionService::notFound),repository.tenant(tenant),membership,capabilities);
     }
     private Map<String,Object> sessionData(Access access,String token){
+        validMembership(access.membership);
         FixtureUser projected=new FixtureUser(access.user.id(),access.user.displayName(),access.membership.role());
         return map("user",projected,"tenant",access.tenant,"allowed_tenants",repository.allowedTenants(access.user.id()),"capabilities",capabilities(access.membership.role()),"permission_version",access.membership.permissionVersion(),"csrf_token",token,"mode",repository.metadata().mode(),"identity_source",repository.metadata().identitySource());
+    }
+    private static Membership validMembership(Membership membership){
+        if(membership==null||!membership.active()||Capabilities.forRole(membership.role()).isEmpty())throw new DomainException(401,"SESSION_EXPIRED","成员角色未受支持或已失效");
+        return membership;
     }
     private static List<String> capabilities(String role){return Capabilities.forRole(role);}
     private String csrf(HttpServletRequest request){CsrfToken token=(CsrfToken)request.getAttribute(CsrfToken.class.getName());if(token==null)token=csrfRepository.loadToken(request);if(token==null)throw new IllegalStateException("CSRF token unavailable");return token.getToken();}

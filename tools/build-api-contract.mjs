@@ -306,6 +306,8 @@ const contract = {
     },
   },
 };
+contract.components.schemas.SessionResult['x-mop-role-source'] = 'current_active_tenant_membership';
+contract.components.schemas.SessionResult['x-mop-unsupported-role'] = 'deny_all_and_do_not_establish_or_project_platform_session';
 contract.components.schemas.ReadinessResult['x-mop-storage-provider-routing'] = ['完全无OBJECT_STORAGE配置时保留既有MinIO路径', '明确关闭或不完整OSS配置不回退到MinIO', 'OSS必须使用受限部署前缀；运行凭据不作为MOP API请求/响应字段', '缺失存储前提返回503，但PG/OIDC及无存储依赖的接口继续可用', '平台授权grant和预签名配置不混用'];
 const target = fileURLToPath(new URL('../contracts/local-api.openapi.json', import.meta.url));
 const serialized = JSON.stringify(contract, null, 2) + '\n';

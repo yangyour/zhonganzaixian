@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-02",
+  "scope": "fail-closed malformed membership roles",
+  "isolated_regression_before": {
+    "new_tests": 5,
+    "failures": 4,
+    "errors": 1
+  },
+  "after": {
+    "new_guard_tests_passed": 5,
+    "maven_current_run": {
+      "total": 450,
+      "executed_passed": 437,
+      "real_pg_included": 84,
+      "skipped_fixture": 13,
+      "minio_excluded": 6,
+      "failures": 0,
+      "errors": 0
+    },
+    "frontend_tests": 207,
+    "frontend_typecheck_build": "PASS",
+    "contract_tests": 22,
+    "contract_generation": "PASS",
+    "known_role_real_http": 25,
+    "real_oidc_identities": 6
+  },
+  "behavior": [
+    "Unknown/null/case-changed/whitespace roles have no fallback capability",
+    "Unsupported/inactive memberships cannot produce a usable platform session",
+    "OIDC platform session guard runs before success audit/session creation",
+    "Invalid target role cannot change tenant or create a replay record",
+    "Existing four role capability lists remain unchanged"
+  ],
+  "boundaries": [
+    "Malformed roles were not inserted into real PostgreSQL or identity provider",
+    "Malformed-role behavior is isolated guard evidence; real HTTP verifies known-role compatibility",
+    "No production Q09 approval or full M2 acceptance"
+  ],
+  "v1_v7_modified": false,
+  "original_private_config_changed": false,
+  "api_version": "0.10.0; metadata clarified, response shapes unchanged"
+}

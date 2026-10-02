@@ -462,3 +462,8 @@ API V0.13.1新增同租户站点/活跃负责人查询；内部授权和资产40
 ### 2026-10-02 D07原因/解决说明文字校验修复
 
 先补3回归重现2失败：BOM-only原因及非文本控制字符可穿过既有纯核心。修正BOM边界空白和ISO控制符拒绝（保留LF/CR/TAB），不改变原文或业务状态。14核心/根565=552执行含136既有PG+13skip/6MinIO排除通过。没有关闭/重开真实状态或接口接线证据，API V0.14不变，完整D07仍待。见[说明](ticket-customer-action-rules.md)、[证据](evidence/niko-ticket-text-guards-20261002.json)。
+
+
+### 2026-10-02 D07内部备注输入核心
+
+新增InternalTicketNote原文/2000 Unicode界限/精确UTF8 SHA256及追加仓储契约。5核心通过，根570=557执行含136既有PG+13skip/6MinIO排除通过；此136PG不是新备注持久化证明。真实结构/仓储/API/页面待，不向客户暴露内部身份，不改变工单状态/SLA；API V0.14与V1–V9不变，M5-D05非DONE。见[内部备注](internal-ticket-notes.md)、[证据](evidence/niko-internal-note-core-20261002.json)。

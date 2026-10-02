@@ -1,0 +1,25 @@
+{
+  "verified_at": "2026-10-02T19:48:41.282031+00:00",
+  "environment": "niko-local-test",
+  "scope": "PURE_INTERNAL_NOTE_INPUT_AND_REPOSITORY_CONTRACT_ONLY",
+  "new_core_tests": 5,
+  "root_tests": {
+    "reported": 570,
+    "executed": 557,
+    "existing_real_pg_regressions": 136,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "new_note_database_http_ui_evidence": false,
+  "api_version": "0.14.0 unchanged",
+  "migration_actions": 0,
+  "credentials_output": false,
+  "remaining": [
+    "Independent V10 schema and actual repository",
+    "Internal role and cross-tenant transactional checks",
+    "API/page and browser validation",
+    "Customer-visible comments/attachments/notifications and formal workflow remain separate gates"
+  ]
+}

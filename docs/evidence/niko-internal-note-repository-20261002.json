@@ -1,0 +1,29 @@
+{
+  "verified_at": "2026-10-02T20:08:00.306673+00:00",
+  "environment": "niko-local-test",
+  "status": "VERIFIED_REPOSITORY_NOT_PUBLIC_API",
+  "new_real_pg_tests": 12,
+  "root_tests": {
+    "reported": 589,
+    "executed": 576,
+    "real_postgresql": 154,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "write_transaction": "current internal membership + parent shared lock/version + immutable note + audit + idempotent receipt",
+  "same_key_concurrent_receipts": 2,
+  "same_key_concurrent_notes": 1,
+  "independent_requests": "separate immutable notes without parent version mutation",
+  "customer_ticket_projection_unchanged": true,
+  "read_failure_fallback": false,
+  "migration_changes": false,
+  "credentials_output": false,
+  "remaining": [
+    "Public API and strict request/readiness wiring",
+    "Internal note page and browser controls",
+    "Customer-visible comments/attachments/notifications",
+    "Full D07 state/SLA/confirmation workflow"
+  ]
+}

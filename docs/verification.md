@@ -472,3 +472,8 @@ API V0.13.1新增同租户站点/活跃负责人查询；内部授权和资产40
 ### 2026-10-02 V10不可变内部备注结构
 
 仅niko独立PG执行新V10：check0→apply1→重复0→check0，旧资产迁移target也0。V1–V10现在全部冻结，新增结构另用V11；默认check只读、API/Worker不迁移。6真实PG约束/ACL回归事务回滚，11策略+31Python守卫，根577=564执行含142PG+13skip/6MinIO排除通过。SHA256 ba1ad02e7df8079936288d8712a84062a5bd695885b1e45daacec9f4d35ad198。内部备注仍待实际仓储/角色/幂等/API/页面，不改变父工单状态/SLA或扩展客户可见范围。见[内部备注](internal-ticket-notes.md)、[V10证据](evidence/niko-internal-note-schema-20261002.json)。
+
+
+### 2026-10-02 D07不可变内部备注仓储
+
+12新增真实PG覆盖授权/父版本/不可变原文/幂等并发/回滚/客户DTO不泄露；同原键仅一条，不同追加请求可分别保留，父业务版本和SLA不变。根589=576执行含154PG+13skip/6MinIO排除通过；断库503、不受保护事务拒写，无V10修改。公开API/页面继续，完整评论/客户可见/附件/通知及D07未DONE。见[内部备注](internal-ticket-notes.md)、[仓储证据](evidence/niko-internal-note-repository-20261002.json)。

@@ -99,6 +99,7 @@ jobs:
               'cn.mop.persistence.PostgresAssetMetadataSchemaIntegrationTest',
               'cn.mop.persistence.PostgresManualAssetMetadataIntegrationTest',
               'cn.mop.persistence.PostgresInternalNoteSchemaIntegrationTest',
+              'cn.mop.persistence.PostgresInternalTicketNoteIntegrationTest',
               'cn.mop.persistence.PostgresWorklogIntegrationTest',
               'cn.mop.persistence.PostgresAuditChainIntegrationTest',
               'cn.mop.persistence.PostgresAuditReaderIntegrationTest',

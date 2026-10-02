@@ -1,0 +1,340 @@
+{
+  "verified_at": "2026-10-02T22:05:49.146Z",
+  "environment": "niko-local-test",
+  "api_version": "0.16.1",
+  "passed": true,
+  "http_checks": 62,
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_viewerA_00",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_viewerA_00",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_viewerA_01",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_viewerA_01",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_viewerA_02",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_viewerA_02",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_viewerA_03",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_viewerA_03",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_viewerA_04",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_viewerA_04",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_viewerA_05",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_viewerA_05",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_viewerA_06",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_viewerA_06",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_viewerA_07",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_viewerA_07",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_viewerA_08",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_viewerA_08",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_viewerA_09",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_viewerA_09",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_viewerA_10",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_viewerA_10",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_viewerA_11",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_viewerA_11",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_tadmin_same-tenant-other-reporter",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_tadmin_same-tenant-other-reporter",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "prepare_viewerB_other-tenant",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "receipt_viewerB_other-tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_before_reads",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_lowercase_first_ten",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_lowercase_next_two",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "msp_internal_same_tenant_unicode",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "padmin_internal_same_tenant_unicode",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "reviewer_internal_same_tenant_unicode",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_own_report_only",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_own_report_only",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "literal_or_non_normalized_42",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "literal_or_non_normalized_43",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "literal_or_non_normalized_44",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "literal_or_non_normalized_45",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_description_search",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_after_reads",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_tenant_other_customer_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_internal_detail_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "cursor_wrong_actor",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "cursor_wrong_tenant",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "cursor_wrong_filter",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_53",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_54",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_55",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_56",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_57",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_58",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_59",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_60",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_query",
+      "status": 401,
+      "contract_valid": true
+    }
+  ],
+  "synthetic_report_setup": 14,
+  "unicode_page_sizes": [
+    10,
+    2
+  ],
+  "all_responses_contract_valid": true,
+  "customer_visibility": "own reporter only",
+  "internal_visibility": "current authorized tenant only",
+  "literal_percent_underscore_and_quote": true,
+  "unicode_normalization": false,
+  "formal_state_priority_sla_still_null": true,
+  "successful_read_queries_do_not_append_audit": true,
+  "denial_audit_checks_outside_readonly_window": true,
+  "credentials_output": false,
+  "browser_dom_tested": false,
+  "limitations": [
+    "Malformed server-side session values and inactive membership branches covered only by isolated controller tests",
+    "No production monitoring/ITSM activation",
+    "No browser DOM acceptance",
+    "No database global locale change"
+  ]
+}

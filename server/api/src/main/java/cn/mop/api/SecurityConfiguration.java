@@ -79,7 +79,7 @@ public class SecurityConfiguration {
     }
     static void writeError(ObjectMapper mapper,PlatformRepository repository,HttpServletRequest req,HttpServletResponse res,int status,String code,String message)throws IOException{
         String actor=req.getUserPrincipal()==null?null:req.getUserPrincipal().getName();
-        String tenant=req.getSession(false)==null?null:(String)req.getSession(false).getAttribute("mop.tenant_id");
+        String tenant=ApiResponse.auditTenant(req);
         try{repository.audit(actor,tenant,req.getMethod()+" "+ApiResponse.route(req),"request",null,"DENIED",code,ApiResponse.trace(req));}
         catch(RuntimeException unavailable){status=503;code="UPSTREAM_UNAVAILABLE";message="测试环境审计依赖不可用，未记录此次拒绝事件";}
         res.setStatus(status);res.setContentType("application/json");res.setCharacterEncoding("UTF-8");

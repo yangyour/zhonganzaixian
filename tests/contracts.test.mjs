@@ -205,8 +205,8 @@ const importSource = {
   ...importFacts, effective_rule_versions: null, quota_reservation: null,
 };
 
-test('V0.12保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.16.0');
+test('V0.16.1保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
+  assert.equal(contract.info.version, '0.16.1');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -418,4 +418,14 @@ test('内部备注严格身份/可见性/不可变和不改工单SLA的真实契
 test('主台账查询保留签名游标且数据库有界读取与Unicode依赖明确', () => {
   const route = contract.paths['/assets'].get; assert.match(route['x-mop-repository-pagination'], /page_size\+1 LIMIT/); assert.match(route['x-mop-read-authorization'], /permission-version/); assert.match(route['x-mop-unicode-search'], /no normalization/); assert.match(contract.paths['/assets/{id}'].get['x-mop-read-authorization'], /fresh active/);
   const data = contract.components.schemas.ReadinessResult.properties.data; assert.ok(data.required.includes('asset_reads')); assert.equal(data.properties.asset_reads.properties.unicode_search_ready.const, true);
+});
+
+test('ticket query contract bounds Unicode input without expanding reporter visibility', () => {
+  const operation = contract.paths['/tickets'].get;
+  const parameters = Object.fromEntries(operation.parameters.map(item => [item.name, item.schema]));
+  assert.equal(parameters.q.maxLength, 100);
+  assert.deepEqual(parameters.urgency.enum, ['normal', 'urgent']);
+  assert.deepEqual(parameters.category.enum, ['网络不通', '网速慢', 'WiFi问题', '设备异常', '其他']);
+  assert.match(operation['x-mop-filter-semantics'], /reporter-only/);
+  assert.match(operation['x-mop-filter-semantics'], /no normalization/);
 });

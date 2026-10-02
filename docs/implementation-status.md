@@ -408,3 +408,10 @@ API V0.13.1新增同租户站点/活跃负责人查询；内部授权和资产40
 新增每次启动独立SHA256只读JAR副本，完整ZIP/本项目入口/复制稳定性/UID/权限/路径守卫，拒绝直接target回退；保持确切父进程/JVM命令/回环监听检查。48 Python守卫及语法通过；真实API运行期间强制Maven重打包，根616=603执行含163PG+13skip/6MinIO排除通过，target SHA变化而API PID/start-ticks/运行副本不变；不重启捕获6个新OIDC身份并20只读HTTP通过（含/assets404）。初次证据工具/proc children缺失失败已记录并修正为只读严格身份枚举；之前ThrowableProxy故障不声称唯一根因已复现。旧SIGKILL证据保留未重跑，V1–V10/API0.16/原私有配置不变。
 
 见[运行产物隔离](niko-runtime-artifact.md)。
+
+
+## 2026-10-02 工单Unicode查询与失效会话（API0.16.1）
+
+2真实PG先复现Unicode漏查，再使用既有ICU根locale字面查询，保留原文/本人客户范围/授权租户和签名分页。8新增控制器含实际advice与安全响应的非字符串/空白租户、inactive成员拒绝，消除审计二次强转500，保留DENIED审计。最终根626=613执行含165PG+13skip/6MinIO排除、30契约/298Web/类型构建、62逐响应契约真实HTTP通过；14本轮合成登记/10+2分页、Unicode描述/字面边界/越权与非法输入已验。失败轮PG、控制器、版本断言和HTTP验收窗口/数据隔离修正均记录；不删除失败轮合成数据、不累计重复轮。正式状态/优先级/SLA仍null，浏览器/ITSM/OSS/完整M5未DONE，V1–V10不改。
+
+见[工单读取防护](ticket-read-hardening.md)。

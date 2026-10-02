@@ -35,7 +35,7 @@ public class ApiExceptionHandler {
     }
     private void audit(HttpServletRequest request,String code){
         String actor=request.getUserPrincipal()==null?null:request.getUserPrincipal().getName();
-        String tenant=request.getSession(false)==null?null:(String)request.getSession(false).getAttribute("mop.tenant_id");
+        String tenant=ApiResponse.auditTenant(request);
         try{repository.audit(actor,tenant,request.getMethod()+" "+ApiResponse.route(request),"request",null,"DENIED",code,ApiResponse.trace(request));}
         catch(DomainException unavailable){if(unavailable.status!=503)throw unavailable;log.warn("Audit dependency unavailable trace_id={}",ApiResponse.trace(request));}
     }

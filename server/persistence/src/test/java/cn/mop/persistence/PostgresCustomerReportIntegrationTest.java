@@ -51,6 +51,20 @@ class PostgresCustomerReportIntegrationTest {
     }
     static String freshAsset(){String key=UUID.randomUUID().toString();Asset asset=(Asset)repository.idempotent(admin,TENANT,"POST /integration/ticket-assets",key,"a".repeat(64),()->repository.insert(TENANT,admin,"虚构报障设备 "+key,"router","192.0.2.95","site-a-main"));return asset.id();}
 
+    @Test void unicodeTicketSearchUsesRootLowercaseAndPreservesCustomerOwnership(){
+        String marker="TICKET-UNICODE-"+UUID.randomUUID(),description=marker+" ÄBC ΟΣ İ K Éliteral%_";
+        Map<String,Object> saved=ticket(register(report(description,null)),customer,TENANT);String id=saved.get("id").toString();
+        assertEquals(List.of(id),repository.tickets(TENANT,customer,null,null,description.toLowerCase(Locale.ROOT),null,null,15).stream().map(row->row.get("id")).toList());
+        assertEquals(List.of(id),repository.tickets(TENANT,admin,null,null,description.toLowerCase(Locale.ROOT),null,null,15).stream().map(row->row.get("id")).toList());
+        assertTrue(repository.tickets(TENANT,sameTenantCustomer,null,null,description.toLowerCase(Locale.ROOT),null,null,15).isEmpty());
+        assertEquals(description,repository.ticket(TENANT,customer,id).orElseThrow().get("description"));assertNull(saved.get("state"));assertNull(saved.get("priority"));
+    }
+    @Test void unicodeTicketSearchDoesNotNormalizeOrInterpretWildcardsAndSql(){
+        String marker="TICKET-LITERAL-"+UUID.randomUUID(),description=marker+" É_%'字面";
+        Map<String,Object> saved=ticket(register(report(description,null)),customer,TENANT);String id=saved.get("id").toString();
+        assertEquals(List.of(id),repository.tickets(TENANT,customer,null,null,description.toLowerCase(Locale.ROOT),null,null,15).stream().map(row->row.get("id")).toList());
+        for(String query:List.of(marker+" E\u0301_%'字面",marker+" %_",marker+"' OR '1'='1"))assertTrue(repository.tickets(TENANT,customer,null,null,query,null,null,15).isEmpty());
+    }
     @Test void acceptedIntentPersistsAcrossRepositoryRestartWithoutFalseBusinessOrExternalStatus()throws Exception{
         Object accepted=register(report("虚构耐久受理 "+UUID.randomUUID(),null));Map<String,Object> ticket=ticket(accepted,customer,TENANT);String id=ticket.get("id").toString();
         assertEquals(Set.of("operation_id","status"),fields(httpJson(accepted)));assertEquals("PENDING",httpJson(accepted).path("status").asText());

@@ -1,0 +1,39 @@
+{
+  "verified_at": "2026-10-02T22:06:55.360366+00:00",
+  "environment": "niko-local-test",
+  "api_version": "0.16.1",
+  "status": "VERIFIED_TICKET_READ_SLICE",
+  "new_real_pg_tests": 2,
+  "new_controller_tests": 8,
+  "root_tests": {
+    "reported": 626,
+    "executed": 613,
+    "real_postgresql": 165,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contract_tests": 30,
+  "web_tests": 298,
+  "typecheck_build": "passed",
+  "real_http_checks": 62,
+  "http_evidence": "niko-ticket-unicode-http-20261002.json",
+  "unicode_search": "existing ICU root lowercase literal substring, no normalization",
+  "malformed_session_and_inactive_membership": "isolated controller tests; advice and security denial writer explicitly included",
+  "denied_request_auditing_preserved": true,
+  "successful_readonly_audit_window_separate_from_denials": true,
+  "failed_attempts": [
+    "Initial new PG cases:2 failures under database default C lower",
+    "Initial6 controller cases:2 failures for inactive and non-string tenant scope",
+    "Expanded8 controller cases:2 errors from secondary audit scope casts",
+    "Contract still expected0.16.0:1 failed assertion before update",
+    "First HTTP run compared audit tail across intentionally denied requests",
+    "Second HTTP run reused description across separate test prefixes; corrected data isolation"
+  ],
+  "schema_changed": false,
+  "database_global_collation_changed": false,
+  "browser_dom_tested": false,
+  "full_contract_done": false,
+  "credentials_output": false
+}

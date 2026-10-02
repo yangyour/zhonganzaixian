@@ -1,0 +1,30 @@
+{
+  "recorded_at": "2026-10-02T05:36:43.519438+00:00",
+  "base_commit": "cd0a531e7c5be3a1446edade2d9663e36ab48481",
+  "scope": "pure half-open interval mathematics, not business SLA/availability",
+  "new_junit_tests": 16,
+  "independent_oracle_cases": 500,
+  "oracle_counting": "500 cases are within one of the16 JUnit tests",
+  "maven_verify": "PASS",
+  "junit": {
+    "tests": 321,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 88,
+    "executed": 233
+  },
+  "contracts_tests": 18,
+  "generator_consistency": "PASS",
+  "api_version": "0.8",
+  "api_wire_change": false,
+  "private_configuration_modified": false,
+  "migrations_changed": false,
+  "real_components": "NOT_RUN_NETWORK_BLOCKED",
+  "real_ui": "NOT_RUN",
+  "full_contract_acceptance": "NOT_RUN",
+  "preceding_commit_ci": {
+    "sha": "cd0a531e7c5be3a1446edade2d9663e36ab48481",
+    "run_id": 36969314716,
+    "conclusion": "success"
+  }
+}

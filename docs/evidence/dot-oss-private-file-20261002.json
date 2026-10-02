@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-02",
+  "scope": "OSS private configuration read-only file guards",
+  "environment": "isolated synthetic unit checks",
+  "tests": {
+    "python_unittest": 14,
+    "passed": 14,
+    "failed": 0
+  },
+  "runtime_activation": false,
+  "cloud_authentication": "NOT_RUN",
+  "network_requests": 0,
+  "credential_writes": 0,
+  "api_contract": "V0.8 unchanged",
+  "frozen_migrations_changed": false,
+  "original_private_config_changed": false,
+  "previous_ci": {
+    "commit": "6a704033c95b2191548b7a422f4cd53ac2b6d6c7",
+    "run_id": 37002701110,
+    "jobs_succeeded": 3
+  },
+  "limitations": [
+    "No owner replacement credential file loaded",
+    "No IAM, anonymous access, bucket state or object operations verified",
+    "Synthetic tests do not replace OSS integration"
+  ]
+}

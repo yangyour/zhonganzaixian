@@ -37,3 +37,11 @@ API和Worker关闭OSS SDK可能含私有细节的日志，仅保留自有脱敏�
 API公开字段仍V0.8，只补充后端选择与输入禁密说明；平台授权grant未修改，OBJECT_STORAGE_PRESIGN_EXPIRES仍不启用直接下载。原始15列映射、can_import=false与规则/配额null等业务门禁不变。后续通过独立真实OSS核验后再启动对应Worker、验证照片/源文件全链。
 
 接线验证汇总见[独立记录](evidence/dot-oss-wiring-20261002.json)。当前统一OSS配置不代表已经取得旧MinIO两套账号的同等IAM隔离证据；照片/导入逻辑键仍各自校验，云端账号/前缀实际权限须另验。
+
+## 私有配置文件只读校验入口
+
+`tools/niko-test/oss_config.py`可读取受控的JSON字符串对象或简单dotenv文件；仅按数据解析，不source、不执行、不插值。文件必须为当前用户所有、无组/其他用户权限的普通文件，拒绝叶子符号链接、目录、FIFO及超过64KiB的内容。严格拒绝重复键、未知字段、非字符串JSON值、缺少配置、其他端点/桶/前缀、非法凭据字符及过期时间越界；错误输出不回显路径、参数或配置值。
+
+调用者必须显式提供`--file`、`--expected-bucket`及`--expected-prefix`，文件也必须包含同一个`MOP_OBJECT_STORAGE_PREFIX`，不自动生成/更换部署前缀。不接受命令行凭据参数。CLI只输出`CONFIG_VALID_NOT_ACTIVE_NOT_VERIFIED`或`CONFIG_REJECTED`；即使格式正确，也不会写入runtime、创建账号、建立持久访问、启动SDK或请求OSS。接收替换凭据、批准加载和实际云验证仍是独立步骤。当前用户粘贴的长期密钥未用于此工具。
+
+14项合成数据单元测试覆盖上述解析、范围、权限/文件类型、CLI脱敏及读取不改文件；加入CI。API契约V0.8和迁移未改变，真实OSS仍未执行。这是私有文件处理守卫，不是存储验收证据。

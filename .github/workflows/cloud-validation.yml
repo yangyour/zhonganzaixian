@@ -46,7 +46,9 @@ jobs:
           "$RUNNER_TEMP/mop-ssh-test/bin/python" -m unittest discover -s tools -p test_ssh_host_trust.py -v
 
       - name: Verify isolated niko configuration guards
-        run: python3 -m unittest discover -s tools -p test_niko_private_bootstrap.py -v
+        run: |
+          python3 -m unittest discover -s tools -p test_niko_private_bootstrap.py -v
+          python3 -m unittest discover -s tools -p test_niko_oss_config.py -v
 
   backend:
     name: Backend compile, unit tests and packaging

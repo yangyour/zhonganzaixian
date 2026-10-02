@@ -9,7 +9,7 @@ public final class Capabilities {
         if(role==null)return List.of();
         return switch (role) {
             case "padmin" -> List.of("assets:read", "assets:write", "configurations:read", "configurations:write", "audit:read", "tickets:read");
-            case "msp" -> List.of("assets:read", "assets:write", "tickets:read");
+            case "msp" -> List.of("assets:read", "assets:write", "tickets:read", "worklogs:read_own", "worklogs:write_own");
             case "tadmin" -> List.of("assets:read", "assets:write", "tickets:read", "tickets:report");
             case "viewer" -> List.of("assets:read", "tickets:read", "tickets:report");
             default -> List.of();

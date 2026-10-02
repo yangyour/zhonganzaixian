@@ -42,6 +42,18 @@ ticketCreate.properties.attachment_ids.description = '可省略或为空；仅�
 const uuid = { type: 'string', format: 'uuid' };
 const dateTime = { type: 'string', format: 'date-time' };
 const positiveVersion = { type: 'integer', minimum: 1, description: '服务端64位正整数版本；客户端使用所见版本，冲突409，不自动覆盖。' };
+const worklogVersion = { type: 'integer', minimum: 1, maximum: 9007199254740990 };
+const worklogInputFields = { kind: { type: 'string', enum: ['REMOTE', 'ONSITE', 'INSPECTION', 'COMMUTE'] }, started_at: { ...dateTime, description: '必须显式Z/offset及秒，最多3位小数；规范化UTC范围0001..9999' }, ended_at: { ...dateTime, description: '结束不得早于开始；显式相等是实填0，不是缺值默认；不限制为24小时' }, note: { type: ['string', 'null'], minLength: 1, maxLength: 2000, description: '显式null或原始非空白备注；按Unicode code point，允许换行/制表，拒绝其他控制字符及不完整Unicode' } };
+const worklogFacts = { ...worklogInputFields, elapsed_millis: { type: 'integer', minimum: 0, maximum: 315537897599999, description: '起止物理差，未计费取整或SLA折算' }, record_source: { const: 'MANUAL_INTERVAL' }, source: { const: 'postgresql' }, verification_status: { const: 'SELF_REPORTED' }, financial_status: { const: 'CONFIG_PENDING' }, default_minutes: { type: 'null' }, labor_cost: { type: 'null' }, transport_cost: { type: 'null' }, gross_margin: { type: 'null' } };
+const worklogEntry = object({ id: uuid, tenant_id: uuid, ticket_id: uuid, owner_id: uuid, version: { type: 'integer', minimum: 1, maximum: 9007199254740991 }, created_at: dateTime, updated_at: dateTime, ...worklogFacts });
+const worklogRevision = object({ version: { type: 'integer', minimum: 1, maximum: 9007199254740991 }, action: { type: 'string', enum: ['CREATE', 'UPDATE'] }, actor_id: uuid, recorded_at: dateTime, ...worklogFacts });
+const worklogPaging = { has_more: { type: 'boolean' }, source: { const: 'postgresql' }, scope: { const: 'OWN' }, page_size_limit: { const: 100 } };
+const worklogList = object({ items: { type: 'array', maxItems: 100, items: ref('Worklog') }, ...worklogPaging, next_before_created_at: { type: ['string', 'null'], format: 'date-time' }, next_before_id: { type: ['string', 'null'], format: 'uuid' } });
+const worklogHistory = object({ items: { type: 'array', maxItems: 100, items: ref('WorklogRevision') }, ...worklogPaging, next_before_version: { type: ['integer', 'null'], minimum: 1, maximum: 9007199254740991 } });
+const worklogAccess = { 'x-mop-capability': 'worklogs:read_own', 'x-mop-reject-duplicate-query-keys': true, description: '当前启用msp成员本人记录；tenant/owner来自会话及当前成员，外人记录和错误父工单404。无系统管理员代改或团队权限。原始分页边界仅裁剪已授权范围，不授予访问权限；新记录在第一页刷新可见。无默认工时、成本、SLA或工单状态变更。' };
+const worklogPath = parameter('ticketId', 'path', uuid);
+const worklogPageSize = parameter('page_size', 'query', { type: 'integer', enum: [10, 15, 25, 50, 100], default: 15 }, false);
+const worklogWrite = { ...worklogAccess, 'x-mop-capability': 'worklogs:write_own', 'x-mop-max-body-bytes': 32768, 'x-mop-reject-duplicate-json-keys': true };
 const configurationKey = { type: 'string', minLength: 1, maxLength: 128, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$' };
 const diagnosticQuestions = { type: ['array', 'null'], items: { type: 'string', pattern: '^Q[0-9]{2}$' }, description: '保留登记中的原Q编号；null表示来源缺失，空数组表示来源明确没有关联Q，不补造结论。' };
 const configurationDiagnostic = object({
@@ -123,6 +135,8 @@ readiness.properties.data.properties.asset_imports = importReadiness;
 readiness.properties.data.required.push('asset_imports');
 readiness.properties.data.properties.asset_dependencies = object({ ready: { const: true }, schema_access_ready: { const: true }, configuration_status: { const: 'CONFIG_PENDING' }, monitoring_applied: { const: false }, effective_rules: { type: 'null' } });
 readiness.properties.data.required.push('asset_dependencies');
+readiness.properties.data.properties.worklogs = object({ ready: { const: true }, schema_access_ready: { const: true }, financial_status: { const: 'CONFIG_PENDING' } });
+readiness.properties.data.required.push('worklogs');
 const importSelection = object({ declared_format: importFormat, encoding: { type: ['string', 'null'], enum: ['UTF-8', 'UTF-16LE', 'UTF-16BE', 'GB18030', null] }, delimiter: { type: ['string', 'null'], enum: [',', ';', '\t', null] }, sheet_index: { type: ['integer', 'null'], minimum: 0, maximum: 31 }, header_row: headerRow });
 importSelection.allOf = [{ if: { properties: { declared_format: { const: 'CSV' } } }, then: { properties: { encoding: { type: 'string' }, delimiter: { type: 'string' }, sheet_index: { type: 'null' }, header_row: { type: 'integer' } } }, else: { properties: { encoding: { type: 'null' }, delimiter: { type: 'null' } } } }];
 const importParseRequest = { ...importSelection, properties: { expected_version: positiveVersion, ...importSelection.properties }, required: ['expected_version', ...importSelection.required], description: 'CSV必须明确编码/分隔符/1起表头；XLSX编码与分隔符必须null。XLSX工作表或表头为null时只返回SELECTION_REQUIRED目录，之后以0起sheet与1起header显式请求；不得猜测隐藏工作表、日期或业务规则。' };
@@ -191,7 +205,7 @@ const dependencyDraft = object({
 const dependencyAppend = object({ expected_version: { type: 'integer', minimum: 0, maximum: 9007199254740990, description: '当前完整租户图的CAS版本，不是资产版本；所有引用在同租户且每条新增边须连接路径资产。未知业务元数据明确null。' }, additions: { type: 'array', minItems: 1, maxItems: 100, uniqueItems: true, items: dependencyEdge } });
 const contract = {
   openapi: '3.1.0',
-  info: { title: 'MOP 共享测试环境 API', version: '0.10.0', description: '本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。' },
+  info: { title: 'MOP 共享测试环境 API', version: '0.11.0', description: '本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。' },
   servers: [{ url: '/api/v1' }],
   security: [{ SessionCookie: [] }],
   paths: {
@@ -246,6 +260,15 @@ const contract = {
       post: { ...mutation('registerCustomerReport', '耐久登记客户报障；不保证正式业务建单或SLA承诺', ref('TicketCreate'), ref('Accepted')), responses: { 202: { description: '真实PG事务已提交；只返回operation_id/PENDING，需回读本平台受理记录。', content: { 'application/json': { schema: ref('Accepted') } } }, ...errors } },
     },
     '/tickets/{id}': { get: action('getCustomerRegistration', '读取本人或授权租户内部报障登记；跨范围404', ref('TicketRegistrationResult'), { parameters: [pathId] }) },
+    '/tickets/{ticketId}/worklogs': {
+      get: action('listOwnWorklogs', '工程师本人实填工时有界keyset列表', ref('WorklogListResult'), { ...worklogAccess, parameters: [worklogPath, worklogPageSize, parameter('before_created_at', 'query', dateTime, false), parameter('before_id', 'query', uuid, false)], 'x-mop-paired-query-keys': ['before_created_at', 'before_id'] }),
+      post: mutation('createOwnWorklog', '保存明确起止工时及不可变首修订；检查父登记版本而不改父登记', ref('WorklogCreate'), ref('WorklogResult'), { ...worklogWrite, parameters: [worklogPath, ...headers] }),
+    },
+    '/tickets/{ticketId}/worklogs/{id}': {
+      get: action('getOwnWorklog', '回读本人当前工时事实', ref('WorklogResult'), { ...worklogAccess, parameters: [worklogPath, pathId] }),
+      patch: mutation('updateOwnWorklog', '本人CAS追加修订；固定owner/parent，审计/修订/重放同事务', ref('WorklogUpdate'), ref('WorklogResult'), { ...worklogWrite, parameters: [worklogPath, pathId, ...headers] }),
+    },
+    '/tickets/{ticketId}/worklogs/{id}/history': { get: action('listOwnWorklogHistory', '本人不可变工时历史；版本倒序分页', ref('WorklogHistoryResult'), { ...worklogAccess, parameters: [worklogPath, pathId, worklogPageSize, parameter('before_version', 'query', worklogVersion, false)] }) },
     '/tickets/{id}/attachments': { post: mutation('appendCustomerReportPhotos', '报障人CAS追加READY原图；不改变原正文、联系人或正式工单规则', ref('PhotoAttachmentCreate'), ref('TicketRegistrationResult'), { parameters: [pathId, ...headers] }) },
     '/files/policy': { get: action('getReportPhotoPolicy', '读取当前开发照片策略；无白名单拒绝上传，不表示客户生产批准', ref('ReportPhotoPolicyResult')) },
     '/files': { post: { ...mutation('acceptReportPhoto', '耐久受理原图；存储不可用时新请求503，已受理同键重放无需再次上传', ref('ReportPhotoUpload'), ref('Accepted')), requestBody: { required: true, content: { 'multipart/form-data': { schema: ref('ReportPhotoUpload') } } }, responses: acceptedResponse('PG原图内容、file、job、operation、成功审计和幂等结果已同事务持久保存；后续GET回读真实存储状态。') } },
@@ -270,6 +293,9 @@ const contract = {
       ConfigurationDiagnostic: configurationDiagnostic,
       ConfigurationDiagnosticResult: envelope(ref('ConfigurationDiagnostic')),
       TicketCreate: ticketCreate,
+      Worklog: worklogEntry, WorklogRevision: worklogRevision,
+      WorklogCreate: object({ expected_ticket_version: worklogVersion, ...worklogInputFields }), WorklogUpdate: object({ expected_version: worklogVersion, ...worklogInputFields }),
+      WorklogResult: envelope(ref('Worklog')), WorklogListResult: envelope(worklogList), WorklogHistoryResult: envelope(worklogHistory),
       AssetDependencyEdge: dependencyEdge, AssetDependencyDraft: dependencyDraft, AssetDependencyDraftResult: envelope(ref('AssetDependencyDraft')), AssetDependencyAppend: dependencyAppend,
       TicketRegistration: ticketRegistration,
       TicketRegistrationResult: envelope(ref('TicketRegistration')),

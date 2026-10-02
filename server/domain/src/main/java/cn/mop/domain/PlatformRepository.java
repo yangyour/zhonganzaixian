@@ -12,6 +12,7 @@ public interface PlatformRepository extends AssetRepository {
     boolean dependencyReady();
     /** Safe readiness reasons for the designated durable photo schema and runtime privileges. */
     default List<String> photoDependencyProblems(){return List.of("PHOTO_REPOSITORY_UNAVAILABLE");}
+    default List<String> worklogProblems(){return List.of("WORKLOG_SCHEMA_OR_ACCESS_UNAVAILABLE");}
     default List<String> assetDependencyProblems(){return List.of("ASSET_DEPENDENCY_SCHEMA_OR_ACCESS_UNAVAILABLE");}
     List<FixtureUser> users();
     Optional<FixtureUser> user(String id);

@@ -177,7 +177,7 @@ test('operation区分报障门禁与真实文件状态，终态不得伪造', ()
 
 test('就绪成功不能把已启用但缺schema或存储的照片能力写成READY', () => {
   const photos = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, policy_source: 'USER_DEVELOPMENT_DIRECTION', reasons: [] };
-  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
+  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
   assert.equal(validates('ReadinessResult', { data, trace_id: 'MOP-FAKE-readiness' }), true);
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('ReadinessResult', { data: { ...data, photos: { ...photos, [key]: false } }, trace_id: 'MOP-FAKE-readiness' }), false);
   assert.equal(validates('ReadinessResult', { data: { ...data, production_ready: true }, trace_id: 'MOP-FAKE-readiness' }), false);
@@ -205,8 +205,8 @@ const importSource = {
   ...importFacts, effective_rule_versions: null, quota_reservation: null,
 };
 
-test('V0.10保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.10.0');
+test('V0.11保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
+  assert.equal(contract.info.version, '0.11.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -342,4 +342,20 @@ test('标准15列模板为授权的固定二进制GET，不产生导入写请求
 test('会话权限来自当前启用成员角色，未知角色没有资产读取兜底', () => {
   assert.equal(contract.components.schemas.SessionResult['x-mop-role-source'], 'current_active_tenant_membership');
   assert.equal(contract.components.schemas.SessionResult['x-mop-unsupported-role'], 'deny_all_and_do_not_establish_or_project_platform_session');
+});
+
+
+test('本人工时保留明确事实与未知成本，写入不接受actor/tenant/default', () => {
+  const fields = { kind: 'REMOTE', started_at: timestamp, ended_at: timestamp, note: null };
+  assert.ok(validates('WorklogCreate', { expected_ticket_version: 1, ...fields }));
+  assert.ok(validates('WorklogUpdate', { expected_version: 1, ...fields }));
+  for (const key of ['owner_id', 'tenant_id', 'default_minutes', 'labor_cost']) assert.equal(validates('WorklogCreate', { expected_ticket_version: 1, ...fields, [key]: 0 }), false);
+  assert.equal(validates('WorklogCreate', { expected_ticket_version: 9007199254740991, ...fields }), false);
+  const entry = { id: id('1'), tenant_id: id('2'), ticket_id: id('3'), owner_id: id('4'), version: 1, created_at: timestamp, updated_at: timestamp, ...fields, elapsed_millis: 0, record_source: 'MANUAL_INTERVAL', source: 'postgresql', verification_status: 'SELF_REPORTED', financial_status: 'CONFIG_PENDING', default_minutes: null, labor_cost: null, transport_cost: null, gross_margin: null };
+  assert.ok(validates('Worklog', entry));
+  for (const key of ['default_minutes', 'labor_cost', 'transport_cost', 'gross_margin']) assert.equal(validates('Worklog', { ...entry, [key]: 0 }), false);
+  assert.equal(validates('Worklog', { ...entry, verification_status: 'VERIFIED' }), false);
+  assert.equal(contract.paths['/tickets/{ticketId}/worklogs'].get['x-mop-capability'], 'worklogs:read_own');
+  assert.equal(contract.paths['/tickets/{ticketId}/worklogs/{id}'].patch['x-mop-capability'], 'worklogs:write_own');
+  assert.equal(contract.paths['/tickets/{ticketId}/worklogs/{id}'].delete, undefined);
 });

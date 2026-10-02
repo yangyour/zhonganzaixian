@@ -6,7 +6,7 @@ const root=new URL('../',import.meta.url);let stage='initialization';
 try{
  const contract=JSON.parse(readFileSync(new URL('contracts/local-api.openapi.json',root),'utf8'));
  const ajv=new Ajv({strict:false});addFormats(ajv);const validators=new Map();const checks=[];
- const expected={padmin:['assets:read','assets:write','configurations:read','configurations:write','audit:read','tickets:read'],msp:['assets:read','assets:write','tickets:read'],tadmin:['assets:read','assets:write','tickets:read','tickets:report'],viewer:['assets:read','tickets:read','tickets:report']};
+ const expected={padmin:['assets:read','assets:write','configurations:read','configurations:write','audit:read','tickets:read'],msp:['assets:read','assets:write','tickets:read','worklogs:read_own','worklogs:write_own'],tadmin:['assets:read','assets:write','tickets:read','tickets:report'],viewer:['assets:read','tickets:read','tickets:report']};
  const roles={padmin:'padmin',reviewer:'padmin',msp:'msp',tadmin:'tadmin',viewerA:'viewer',viewerB:'viewer'};
  for(const [name,role] of Object.entries(roles)){
   const session=JSON.parse(readFileSync(new URL(`.local/niko-test/private/sessions/qa-${name}.json`,root),'utf8'));assert.equal(session.environment,'niko-local-test');let tenant;
@@ -22,6 +22,6 @@ try{
   }
  }
  stage='anonymous_assets';const anonymous=await fetch('http://127.0.0.1:8080/api/v1/assets?page_size=10',{redirect:'manual',signal:AbortSignal.timeout(12000)});assert.equal(anonymous.status,401);checks.push({name:'anonymous_assets',status:401});
- const evidence={verified_at:new Date().toISOString(),environment:'niko-local-test',passed:true,http_checks:checks.length,checks,known_roles_unchanged:true,real_oidc_identities:6,malformed_role_database_mutations:0,credentials_output:false,limitations:['Unknown/null/inactive membership cases verified in isolated guards, not inserted into real identity/database','Not production Q09 permission approval or full M2 acceptance']};
- writeFileSync(new URL('docs/evidence/niko-known-role-http-20261002.json',root),JSON.stringify(evidence,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({status:'passed',http_checks:checks.length,known_roles_unchanged:true,malformed_role_database_mutations:0}));
+ const evidence={verified_at:new Date().toISOString(),environment:'niko-local-test',passed:true,http_checks:checks.length,checks,current_capabilities_verified:true,real_oidc_identities:6,malformed_role_database_mutations:0,credentials_output:false,limitations:['Unknown/null/inactive membership cases verified in isolated guards, not inserted into real identity/database','Not production Q09 permission approval or full M2 acceptance']};
+ writeFileSync(new URL('docs/evidence/niko-worklog-role-http-20261002.json',root),JSON.stringify(evidence,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({status:'passed',http_checks:checks.length,current_capabilities_verified:true,malformed_role_database_mutations:0}));
 }catch{console.error(JSON.stringify({status:'failed',stage,details:'redacted'}));process.exitCode=1;}

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.10.0",
+    "version": "0.11.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -5506,6 +5506,915 @@
         }
       }
     },
+    "/tickets/{ticketId}/worklogs": {
+      "get": {
+        "operationId": "listOwnWorklogs",
+        "summary": "工程师本人实填工时有界keyset列表",
+        "x-mop-capability": "worklogs:read_own",
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "当前启用msp成员本人记录；tenant/owner来自会话及当前成员，外人记录和错误父工单404。无系统管理员代改或团队权限。原始分页边界仅裁剪已授权范围，不授予访问权限；新记录在第一页刷新可见。无默认工时、成本、SLA或工单状态变更。",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                25,
+                50,
+                100
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_created_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-paired-query-keys": [
+          "before_created_at",
+          "before_id"
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorklogListResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createOwnWorklog",
+        "summary": "保存明确起止工时及不可变首修订；检查父登记版本而不改父登记",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorklogCreate"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "worklogs:write_own",
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "当前启用msp成员本人记录；tenant/owner来自会话及当前成员，外人记录和错误父工单404。无系统管理员代改或团队权限。原始分页边界仅裁剪已授权范围，不授予访问权限；新记录在第一页刷新可见。无默认工时、成本、SLA或工单状态变更。",
+        "x-mop-max-body-bytes": 32768,
+        "x-mop-reject-duplicate-json-keys": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorklogResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}/worklogs/{id}": {
+      "get": {
+        "operationId": "getOwnWorklog",
+        "summary": "回读本人当前工时事实",
+        "x-mop-capability": "worklogs:read_own",
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "当前启用msp成员本人记录；tenant/owner来自会话及当前成员，外人记录和错误父工单404。无系统管理员代改或团队权限。原始分页边界仅裁剪已授权范围，不授予访问权限；新记录在第一页刷新可见。无默认工时、成本、SLA或工单状态变更。",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorklogResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateOwnWorklog",
+        "summary": "本人CAS追加修订；固定owner/parent，审计/修订/重放同事务",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorklogUpdate"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "worklogs:write_own",
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "当前启用msp成员本人记录；tenant/owner来自会话及当前成员，外人记录和错误父工单404。无系统管理员代改或团队权限。原始分页边界仅裁剪已授权范围，不授予访问权限；新记录在第一页刷新可见。无默认工时、成本、SLA或工单状态变更。",
+        "x-mop-max-body-bytes": 32768,
+        "x-mop-reject-duplicate-json-keys": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorklogResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}/worklogs/{id}/history": {
+      "get": {
+        "operationId": "listOwnWorklogHistory",
+        "summary": "本人不可变工时历史；版本倒序分页",
+        "x-mop-capability": "worklogs:read_own",
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "当前启用msp成员本人记录；tenant/owner来自会话及当前成员，外人记录和错误父工单404。无系统管理员代改或团队权限。原始分页边界仅裁剪已授权范围，不授予访问权限；新记录在第一页刷新可见。无默认工时、成本、SLA或工单状态变更。",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                25,
+                50,
+                100
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740990
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorklogHistoryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tickets/{id}/attachments": {
       "post": {
         "operationId": "appendCustomerReportPhotos",
@@ -7098,6 +8007,26 @@
                   "effective_rules"
                 ],
                 "additionalProperties": false
+              },
+              "worklogs": {
+                "type": "object",
+                "properties": {
+                  "ready": {
+                    "const": true
+                  },
+                  "schema_access_ready": {
+                    "const": true
+                  },
+                  "financial_status": {
+                    "const": "CONFIG_PENDING"
+                  }
+                },
+                "required": [
+                  "ready",
+                  "schema_access_ready",
+                  "financial_status"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -7109,7 +8038,8 @@
               "production_ready",
               "photos",
               "asset_imports",
-              "asset_dependencies"
+              "asset_dependencies",
+              "worklogs"
             ],
             "additionalProperties": false
           },
@@ -8134,6 +9064,447 @@
             }
           }
         ]
+      },
+      "Worklog": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticket_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "owner_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "REMOTE",
+              "ONSITE",
+              "INSPECTION",
+              "COMMUTE"
+            ]
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "必须显式Z/offset及秒，最多3位小数；规范化UTC范围0001..9999"
+          },
+          "ended_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "结束不得早于开始；显式相等是实填0，不是缺值默认；不限制为24小时"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "显式null或原始非空白备注；按Unicode code point，允许换行/制表，拒绝其他控制字符及不完整Unicode"
+          },
+          "elapsed_millis": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 315537897599999,
+            "description": "起止物理差，未计费取整或SLA折算"
+          },
+          "record_source": {
+            "const": "MANUAL_INTERVAL"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "verification_status": {
+            "const": "SELF_REPORTED"
+          },
+          "financial_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "default_minutes": {
+            "type": "null"
+          },
+          "labor_cost": {
+            "type": "null"
+          },
+          "transport_cost": {
+            "type": "null"
+          },
+          "gross_margin": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "ticket_id",
+          "owner_id",
+          "version",
+          "created_at",
+          "updated_at",
+          "kind",
+          "started_at",
+          "ended_at",
+          "note",
+          "elapsed_millis",
+          "record_source",
+          "source",
+          "verification_status",
+          "financial_status",
+          "default_minutes",
+          "labor_cost",
+          "transport_cost",
+          "gross_margin"
+        ],
+        "additionalProperties": false
+      },
+      "WorklogRevision": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "CREATE",
+              "UPDATE"
+            ]
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "REMOTE",
+              "ONSITE",
+              "INSPECTION",
+              "COMMUTE"
+            ]
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "必须显式Z/offset及秒，最多3位小数；规范化UTC范围0001..9999"
+          },
+          "ended_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "结束不得早于开始；显式相等是实填0，不是缺值默认；不限制为24小时"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "显式null或原始非空白备注；按Unicode code point，允许换行/制表，拒绝其他控制字符及不完整Unicode"
+          },
+          "elapsed_millis": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 315537897599999,
+            "description": "起止物理差，未计费取整或SLA折算"
+          },
+          "record_source": {
+            "const": "MANUAL_INTERVAL"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "verification_status": {
+            "const": "SELF_REPORTED"
+          },
+          "financial_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "default_minutes": {
+            "type": "null"
+          },
+          "labor_cost": {
+            "type": "null"
+          },
+          "transport_cost": {
+            "type": "null"
+          },
+          "gross_margin": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "version",
+          "action",
+          "actor_id",
+          "recorded_at",
+          "kind",
+          "started_at",
+          "ended_at",
+          "note",
+          "elapsed_millis",
+          "record_source",
+          "source",
+          "verification_status",
+          "financial_status",
+          "default_minutes",
+          "labor_cost",
+          "transport_cost",
+          "gross_margin"
+        ],
+        "additionalProperties": false
+      },
+      "WorklogCreate": {
+        "type": "object",
+        "properties": {
+          "expected_ticket_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "REMOTE",
+              "ONSITE",
+              "INSPECTION",
+              "COMMUTE"
+            ]
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "必须显式Z/offset及秒，最多3位小数；规范化UTC范围0001..9999"
+          },
+          "ended_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "结束不得早于开始；显式相等是实填0，不是缺值默认；不限制为24小时"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "显式null或原始非空白备注；按Unicode code point，允许换行/制表，拒绝其他控制字符及不完整Unicode"
+          }
+        },
+        "required": [
+          "expected_ticket_version",
+          "kind",
+          "started_at",
+          "ended_at",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "WorklogUpdate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "REMOTE",
+              "ONSITE",
+              "INSPECTION",
+              "COMMUTE"
+            ]
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "必须显式Z/offset及秒，最多3位小数；规范化UTC范围0001..9999"
+          },
+          "ended_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "结束不得早于开始；显式相等是实填0，不是缺值默认；不限制为24小时"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "显式null或原始非空白备注；按Unicode code point，允许换行/制表，拒绝其他控制字符及不完整Unicode"
+          }
+        },
+        "required": [
+          "expected_version",
+          "kind",
+          "started_at",
+          "ended_at",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "WorklogResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Worklog"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "WorklogListResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "$ref": "#/components/schemas/Worklog"
+                }
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "scope": {
+                "const": "OWN"
+              },
+              "page_size_limit": {
+                "const": 100
+              },
+              "next_before_created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "next_before_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "items",
+              "has_more",
+              "source",
+              "scope",
+              "page_size_limit",
+              "next_before_created_at",
+              "next_before_id"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "WorklogHistoryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "$ref": "#/components/schemas/WorklogRevision"
+                }
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "scope": {
+                "const": "OWN"
+              },
+              "page_size_limit": {
+                "const": 100
+              },
+              "next_before_version": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "items",
+              "has_more",
+              "source",
+              "scope",
+              "page_size_limit",
+              "next_before_version"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
       },
       "AssetDependencyEdge": {
         "type": "object",

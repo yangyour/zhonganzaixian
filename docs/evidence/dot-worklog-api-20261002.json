@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-02",
+  "api_version": "0.11.0",
+  "environment": "niko-local-test",
+  "scope": "engineer-own manual worklog API",
+  "result": "PASS",
+  "root_maven": {
+    "total": 485,
+    "executed_passed": 472,
+    "real_pg_included": 102,
+    "fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "log_sha256": "b971876197fbec8ece526c00507a26229f89ae88c831bee618808d01e3852a05"
+  },
+  "new_controller_tests": 8,
+  "new_readiness_tests": 1,
+  "contract_tests": 23,
+  "web_tests": 207,
+  "typecheck_build": "PASS",
+  "http_checks": 75,
+  "known_role_http_checks": 25,
+  "role_change": "msp gains worklogs:read_own/worklogs:write_own only; others unchanged",
+  "first_http_attempt": "synthetic parent test sent optional asset_id:null; actual API correctly rejected400; omitted optional field and reran75 checks successfully",
+  "preserved": [
+    "V1-V8 byte freeze",
+    "no automatic migration",
+    "no private config changes",
+    "no cost/default/billing/SLA conclusions",
+    "no team/admin override"
+  ],
+  "remaining": [
+    "Worklog page",
+    "Browser acceptance",
+    "Full M5-21/M10-13",
+    "OSS and original server path",
+    "Pending customer business decisions"
+  ]
+}

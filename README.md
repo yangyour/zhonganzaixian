@@ -2,7 +2,7 @@
 
 ## 当前接续状态（2026-10-02）
 
-当前在niko获准独立测试环境继续开发，原服务器网络阻塞单独保留。实际API为V0.10，提供[标准15列模板授权下载](docs/asset-import-template.md)及[资产依赖持久草稿API](docs/asset-dependency-api.md)；真实PG/OIDC/HTTP证据与尚未完成的UI/监控/OSS分别记录。存储按用户选定OSS接线，尚待受控替换凭据及真实云验证，不能视为已通过。运行说明见[独立环境](docs/niko-local-test.md)，最新实施和验收见[状态](docs/implementation-status.md)，所有已知阻塞与可继续范围见[当前阻塞表](docs/current-development-blockers.md)。
+当前在niko获准独立测试环境继续开发，原服务器网络阻塞单独保留。实际API为V0.11，提供[标准15列模板授权下载](docs/asset-import-template.md)、[资产依赖持久草稿API](docs/asset-dependency-api.md)及[本人工时API](docs/manual-worklogs.md)；真实PG/OIDC/HTTP证据与尚未完成的UI/监控/OSS分别记录。存储按用户选定OSS接线，尚待受控替换凭据及真实云验证，不能视为已通过。运行说明见[独立环境](docs/niko-local-test.md)，最新实施和验收见[状态](docs/implementation-status.md)，所有已知阻塞与可继续范围见[当前阻塞表](docs/current-development-blockers.md)。
 
 ## 历史本地交接状态
 

@@ -1,0 +1,399 @@
+{
+  "verified_at": "2026-10-02T16:01:13.242Z",
+  "environment": "niko-local-test",
+  "api_version": "0.11.0",
+  "passed": true,
+  "http_checks": 75,
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "own_parent_register",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "own_parent_receipt",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "other_parent_register",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "other_parent_receipt",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_parent_register",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_parent_receipt",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "parent_before",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "worklog_schema_readiness",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "initial_own_list",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_49h",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_exact_replay",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_changed_key_conflict",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "update_explicit_zero",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "update_exact_replay",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "update_changed_key_conflict",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "stale_record_cas",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "stale_parent_cas",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "current_readback",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "immutable_history",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_keyset",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_read_not_granted",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_write_not_granted",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_read_not_granted",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_write_not_granted",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_read_not_granted",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_write_not_granted",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "padmin_read_not_granted",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "padmin_write_not_granted",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "reviewer_read_not_granted",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "reviewer_write_not_granted",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "cross_tenant_parent_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "cross_tenant_write_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "wrong_parent_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "wrong_parent_update_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_read",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_csrf",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_key",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "duplicate_json",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "oversized_body",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "owner_spoof",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "tenant_spoof",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "cost_spoof",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "default_spoof",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "no_offset",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "microseconds",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "backwards",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "blank_note",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unsafe_version",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_list_query_54",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_list_query_55",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_list_query_56",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_list_query_57",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "concurrent_update_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "concurrent_update_2",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "paging_record_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "paging_record_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "paging_record_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "paging_record_3",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "paging_record_4",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "paging_record_5",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "paging_record_6",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "paging_record_7",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "paging_record_8",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "paging_record_9",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "paging_record_10",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "first_page",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "second_page",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "parent_unchanged",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_write_once",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "concurrent_statuses": [
+    200,
+    409
+  ],
+  "postgres": "17.11",
+  "keycloak": "26.2.4",
+  "costs_and_defaults": null,
+  "credentials_output": false,
+  "limitations": [
+    "No browser DOM or final page acceptance",
+    "Manual SELF_REPORTED facts are not independently verified attendance",
+    "No default hours/cost/margin or team/administrator override",
+    "Not full M5-21/M10-13 acceptance",
+    "No real OSS operations"
+  ]
+}

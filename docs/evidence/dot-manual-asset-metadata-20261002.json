@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-02",
+  "scope": "manual asset draft metadata input and eligibility only",
+  "result": "PASS",
+  "new_isolated_tests": 6,
+  "root_maven": {
+    "total": 515,
+    "executed_passed": 502,
+    "existing_real_pg_regressions_included": 111,
+    "fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "log_sha256": "ad49b1dc96ecfaf2292cabaa3ce09f3ad7763ca147c4bc50bbaabb0d378ea27d"
+  },
+  "new_metadata_persistence_tested": false,
+  "migration_added": false,
+  "api_added": false,
+  "management_ip_mutation": false,
+  "monitoring_or_cmdb_applied": false,
+  "business_defaults_added": false,
+  "remaining": [
+    "Independent new migration",
+    "Scoped protected repository/history",
+    "API/UI",
+    "IP/CMDB and customer permission decisions",
+    "Browser and full M3-5 acceptance"
+  ]
+}

@@ -286,3 +286,9 @@ API c7294a1的CI37037860376已回读success。当前是页面代码/状态与真
 新增9项无真实进程的守卫单测，合计29项niko私有配置/OSS配置/故障守卫通过；shell/Python/Node语法检查通过。结束后默认交互启动模式再次核验当前API监听并重新捕获既有OIDC会话。没有新账号、凭据、权限、迁移、端口/防火墙或原服务器操作。API V0.12和V1–V8不改。
 
 上一审计UIebee0ab的CI37039467414初次backend在maven-resources-plugin的slf4j-api描述符解析阶段失败，未进入业务测试；Web与pure Java通过。仅重跑失败job，attempt2整体success，不改锁定依赖/校验或跳过测试以求通过。此处不推断具体网络错误码。
+
+## 2026-10-02 手工资产草稿资料纯核心
+
+新增ManualAssetMetadata：名称/既有6类类型/站点及明确备注，其他手工资料显式null；严格ISO日期和Unicode技术边界，保留原文。仅pristine manual DRAFT状态允许后续维护，任何监控采样、非UNKNOWN可用性或接入进展都阻断。管理IP不进入新输入，不执行CMDB覆盖/凭据/模板或监控变化；owner格式校验不是租户成员授权。
+
+6项隔离测试通过，根515=502执行（含既有111真实PG）+13fixture跳过，6MinIO排除，0失败错误。还没有此功能的结构/仓储/API/页面，既有PG回归不算新资料持久化证据；M3-5非DONE。V1–V8/API V0.12不改。见[边界](manual-asset-metadata.md)、[证据](evidence/dot-manual-asset-metadata-20261002.json)。上一API故障验证677d16a的CI37042152562已回读success。

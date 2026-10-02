@@ -16,3 +16,12 @@
 5项纯核心检查：原文/多行、Unicode长度、未知/空白、控制符/代理字符、精确UTF-8指纹与不归一。根570=557执行（含136既有真实PG回归）+13fixture跳过，6MinIO排除，0失败错误。既有PG回归不代表备注持久化通过；API V0.14不变，V1–V9及私有配置不改。
 
 下一步新增独立V10及真实PG仓储/授权/事务验证，执行后冻结迁移；API/Worker不自动迁移。参见[核心证据](evidence/niko-internal-note-core-20261002.json)。完整M5-D05/D07未DONE。
+
+
+## 2026-10-02 V10独立结构已执行并冻结
+
+V10新增mop_ticket_internal_note，tenant/ticket/actor均有同租户FK，记录仅追加。精确UTF8 note_sha256由SQL CHECK重算核验，1..2000码点/空白BOM/控制字符、正父版本、时间范围及INTERNAL/MANUAL_INTERNAL_NOTE/SELF_REPORTED/状态不变标签共11个CHECK。运行身份仅SELECT/INSERT，无UPDATE/DELETE/TRUNCATE/引用/触发器或PUBLIC访问；没有增加父工单权限。实际授权/权限版本和父版本新鲜性仍必须由后续仓储事务核验，schema不能代替角色检查。
+
+显式--apply-internal-notes要求V1–V9已验证；默认--check只读，API/Worker不迁移。niko真实PG check0→apply1→重复0→check0；旧--apply-asset-metadata也0，结构/ACL全部核验。V10 SHA256 ba1ad02e7df8079936288d8712a84062a5bd695885b1e45daacec9f4d35ad198，自此V1–V10冻结，未来结构修改新增V11等独立迁移。
+
+6项真实PG schema/ACL回归均事务回滚：原文及hash/标签、父行摘要不变、跨租户FK、hash/父版本、空白控制符2000/2001emoji、不可变权限与禁止customer/状态改变标记。11项迁移策略和31项Python守卫通过；根577=564执行（含142真实PG）+13fixture跳过，6MinIO排除，0失败错误。并非备注业务仓储、HTTP或页面通过，后续继续，见[V10证据](evidence/niko-internal-note-schema-20261002.json)。

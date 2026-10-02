@@ -1,0 +1,33 @@
+{
+  "verified_at": "2026-10-02T19:58:59.581949+00:00",
+  "environment": "niko-local-test",
+  "status": "VERIFIED_SCHEMA_NOT_NOTE_WORKFLOW",
+  "migration": {
+    "file": "V10__immutable_internal_ticket_notes.sql",
+    "sha256": "ba1ad02e7df8079936288d8712a84062a5bd695885b1e45daacec9f4d35ad198",
+    "check_before": 0,
+    "explicit_apply": 1,
+    "repeat_apply": 0,
+    "check_after": 0,
+    "previous_asset_metadata_apply": 0,
+    "frozen": "V1-V10 byte frozen after execution"
+  },
+  "new_real_pg_schema_tests": 6,
+  "test_notes": "All constraint/ACL test notes rolled back; existing synthetic parents unchanged",
+  "migration_policy_tests": 11,
+  "python_guards": 31,
+  "root_tests": {
+    "reported": 577,
+    "executed": 564,
+    "real_postgresql": 142,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "table_checks": 11,
+  "runtime_access": "SELECT INSERT only; no historical update/delete or PUBLIC grants",
+  "application_or_worker_auto_migration": false,
+  "new_note_repository_http_ui_evidence": false,
+  "credentials_output": false
+}

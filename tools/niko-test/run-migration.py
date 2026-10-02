@@ -5,6 +5,7 @@ manifest=json.loads((root/'tools/niko-test/frozen-migrations.json').read_text())
 manifest.update(json.loads((root/'tools/niko-test/frozen-dependency-migration.json').read_text())['sha256'])
 manifest.update(json.loads((root/'tools/niko-test/frozen-worklog-migration.json').read_text())['sha256'])
 manifest.update(json.loads((root/'tools/niko-test/frozen-asset-metadata-migration.json').read_text())['sha256'])
+manifest.update(json.loads((root/'tools/niko-test/frozen-internal-note-migration.json').read_text())['sha256'])
 for name,expected in manifest.items():
  source=root/'server/persistence/src/main/resources/db/migration'/name
  compiled=root/'server/persistence/target/classes/db/migration'/name
@@ -15,6 +16,6 @@ java=root.parent/'mop-toolchain/jdk-17.0.20.1+1/bin';cp=os.pathsep.join([str(roo
 if sys.argv[1:] == ['--initialize-new-niko-database']:
  subprocess.run([str(java/'javac'),'-cp',cp,'-d',str(root/'.local/niko-test'),str(root/'tools/niko-test/NikoSchemaBootstrap.java')],check=True,env=env)
  args=[str(java/'java'),'-cp',cp,'NikoSchemaBootstrap']+sys.argv[1:]
-elif sys.argv[1:] in [['--check'],['--apply-photos'],['--apply-asset-imports'],['--apply-asset-dependencies'],['--apply-worklogs'],['--apply-asset-metadata']]:args=[str(java/'java'),'-cp',cp,'cn.mop.persistence.TestSchemaMigration']+sys.argv[1:]
+elif sys.argv[1:] in [['--check'],['--apply-photos'],['--apply-asset-imports'],['--apply-asset-dependencies'],['--apply-worklogs'],['--apply-asset-metadata'],['--apply-internal-notes']]:args=[str(java/'java'),'-cp',cp,'cn.mop.persistence.TestSchemaMigration']+sys.argv[1:]
 else:raise SystemExit('Explicit migration mode required')
 raise SystemExit(subprocess.run(args,env=env).returncode)

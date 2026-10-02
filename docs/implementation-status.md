@@ -6,7 +6,7 @@
 
 |范围|当前真实证据|仍未完成|
 |---|---|---|
-|环境与恢复|niko PG17.11/OIDC26.2.4/API真实测试；V1–V9字节冻结；拥有API的SIGKILL/重启/11表指纹与幂等恢复通过|原服务器新联调、PG/Worker/OSS故障、生产部署|
+|环境与恢复|niko PG17.11/OIDC26.2.4/API真实测试；V1–V10字节冻结；拥有API的SIGKILL/重启/11表指纹与幂等恢复通过|原服务器新联调、PG/Worker/OSS故障、生产部署|
 |工单与工时|耐久报障/附件已有历史与新环境分开证据；本人工时12PG/75API/28实际前端HTTP及页面代码完成|正式工单状态/资格/外部ITSM/SLA/客户确认/通知、团队工时及成本规则|
 |手工资产资料|V9结构/核心、资料仓储与引用/筛选真实PG；API V0.14，维护70/引用28/查询63HTTP；维护22/查询29实际客户端HTTP|浏览器/390px、客户Q09、主列Q31、管理IP/CMDB权威字段与监控接入|
 |配置与审计|内部提案/CAS/诊断继续保留null门禁；当前租户审计查询/区间校验API与页面、真实模块只读HTTP完成|正式配置定义/客户真实性/发布生效；审计外部可信锚、留存与导出|
@@ -364,3 +364,8 @@ API V0.13.1新增同租户站点/活跃负责人查询；内部授权和资产40
 ### 2026-10-02 D07内部备注输入核心
 
 新增InternalTicketNote原文/2000 Unicode界限/精确UTF8 SHA256及追加仓储契约。5核心通过，根570=557执行含136既有PG+13skip/6MinIO排除通过；此136PG不是新备注持久化证明。真实结构/仓储/API/页面待，不向客户暴露内部身份，不改变工单状态/SLA；API V0.14与V1–V9不变，M5-D05非DONE。见[内部备注](internal-ticket-notes.md)、[证据](evidence/niko-internal-note-core-20261002.json)。
+
+
+### 2026-10-02 V10不可变内部备注结构
+
+仅niko独立PG执行新V10：check0→apply1→重复0→check0，旧资产迁移target也0。V1–V10现在全部冻结，新增结构另用V11；默认check只读、API/Worker不迁移。6真实PG约束/ACL回归事务回滚，11策略+31Python守卫，根577=564执行含142PG+13skip/6MinIO排除通过。SHA256 ba1ad02e7df8079936288d8712a84062a5bd695885b1e45daacec9f4d35ad198。内部备注仍待实际仓储/角色/幂等/API/页面，不改变父工单状态/SLA或扩展客户可见范围。见[内部备注](internal-ticket-notes.md)、[V10证据](evidence/niko-internal-note-schema-20261002.json)。

@@ -1,0 +1,6 @@
+{
+  "environment": "niko-local-test",
+  "sha256": {
+    "V10__immutable_internal_ticket_notes.sql": "ba1ad02e7df8079936288d8712a84062a5bd695885b1e45daacec9f4d35ad198"
+  }
+}

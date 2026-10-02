@@ -1,12 +1,13 @@
 // Separate owned API SIGKILL scenario for committed V9 metadata and V10 internal notes.
 // Original V8 crash evidence remains untouched; only clearly synthetic business data are prepared.
 import assert from 'node:assert/strict';
-import {readFileSync,writeFileSync,existsSync} from 'node:fs';
+import {readFileSync,writeFileSync,existsSync,realpathSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
 import {randomUUID,createHash} from 'node:crypto';
 const root=new URL('../',import.meta.url),checkpoint=new URL('.local/niko-test/api-v10-crash-http-before.json',root),output=new URL('docs/evidence/niko-api-v10-crash-recovery-20261002.json',root),mode=process.argv[2];let stage='initialization';
 const canonical=v=>Array.isArray(v)?v.map(canonical):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k])])):v;
 const digest=v=>createHash('sha256').update(JSON.stringify(canonical(v))).digest('hex');
-const artifact=()=>createHash('sha256').update(readFileSync(new URL('server/api/target/mop-api-0.1.0-SNAPSHOT.jar',root))).digest('hex');
+const artifact=()=>{const path=process.env.MOP_NIKO_API_ARTIFACT,base=fileURLToPath(new URL('.local/niko-test/runtime-artifacts/',root));assert.equal(typeof path,'string');assert.equal(realpathSync(path),path);assert.ok(path.startsWith(base));assert.match(path.slice(base.length),/^api-[a-z0-9_]{8}\/[0-9a-f]{64}\.jar$/);const sha=createHash('sha256').update(readFileSync(path)).digest('hex');assert.ok(path.endsWith('/'+sha+'.jar'));return sha;};
 try{
  assert.ok(['before','after'].includes(mode));assert.equal(existsSync(output),false);if(mode==='before')assert.equal(existsSync(checkpoint),false);
  const sessions=Object.fromEntries(['msp','padmin','viewerA'].map(role=>{const s=JSON.parse(readFileSync(new URL(`.local/niko-test/private/sessions/qa-${role}.json`,root),'utf8'));assert.equal(s.environment,'niko-local-test');return [role,s];}));let requests=0;

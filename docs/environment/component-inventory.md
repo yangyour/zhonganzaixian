@@ -99,3 +99,6 @@
 ## 2026-10-02 niko PostgreSQL Unicode查询依赖
 
 实际目录读取确认新库server_encoding=UTF8、datcollate/datctype=C/C，已有pg_catalog.und-x-icu（ICU提供者）；默认lower保持Ä不变，导致新增Unicode资产筛选回归首轮失败。改用该既有collation的逐表达式小写，不创建collation、不修改数据库/服务器locale或权限。真实PG检查Ä/ΟΣ/İ/K、原文保持和无Unicode归一，前后全局C/C未变；主台账/资料查询/引用文本采用一致表达式，ready实际验证依赖、缺失失败503。原指定服务器尚无法连通，不能宣称具有相同依赖或效果。详见[主台账读取](../asset-ledger-reads.md)。
+
+
+2026-10-02补充：niko API从每次启动独立SHA256/0400副本运行，不再直接使用可被Maven覆盖的target。真实重构建中target字节变化、API进程及副本不变，随后6身份OIDC/20只读HTTP通过；原ThrowableProxy时序线索、首轮/proc children采集失败和边界见[运行产物隔离](../niko-runtime-artifact.md)。未改变组件版本/账号/权限/原服务器；48守卫和根616（163真实PG）通过，其他阻塞仍在。

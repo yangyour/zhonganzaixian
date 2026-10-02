@@ -19,6 +19,8 @@ BASE="$ROOT/../mop-toolchain/components"
 LOCAL="$ROOT/.local/niko-test"
 [[ -f "$LOCAL/data/postgres/PG_VERSION" && -f "$LOCAL/private/runtime.json" ]] || { echo 'Prepare the explicitly approved local environment first'; exit 1; }
 if [[ -n "$MODE" ]]; then python "$SNAPSHOT" --check-new-run; fi
+API_ARTIFACT=$(python tools/niko-test/api_artifact.py --prepare)
+export MOP_NIKO_API_ARTIFACT="$API_ARTIFACT"
 export TZ=UTC LD_LIBRARY_PATH="$BASE/pg/usr/lib/x86_64-linux-gnu"
 PG_PID='' KC_PID='' API_PID=''
 owned_child() {
@@ -38,9 +40,9 @@ PG_PID=$!
 python tools/niko-test/start-keycloak.py >> "$LOCAL/logs/keycloak.log" 2>&1 &
 KC_PID=$!
 python tools/niko-test/wait-components.py
-python tools/niko-test/start-api.py >> "$LOCAL/logs/api.log" 2>&1 &
+python tools/niko-test/start-api.py "$API_ARTIFACT" >> "$LOCAL/logs/api.log" 2>&1 &
 API_PID=$!
-python tools/niko-test/owned_api.py --wait-ready "$API_PID" "$$"
+python tools/niko-test/owned_api.py --wait-ready "$API_PID" "$$" "$API_ARTIFACT"
 export PATH="$ROOT/../mop-toolchain/node_modules/.bin:$PATH"
 if [[ -n "$MODE" ]]; then
   python tools/niko-test/capture-http-sessions.py > "$LOCAL/logs/$SESSION_PREFIX-sessions-before.json"
@@ -48,15 +50,15 @@ if [[ -n "$MODE" ]]; then
   python "$SNAPSHOT" --record
   # The signal target comes only from this launch; validate parent and exact JVM command again.
   owned_child "$API_PID"
-  python tools/niko-test/owned_api.py --require-listener "$API_PID" "$$"
+  python tools/niko-test/owned_api.py --require-listener "$API_PID" "$$" "$API_ARTIFACT"
   kill -KILL "$API_PID"
   if wait "$API_PID"; then API_EXIT=0; else API_EXIT=$?; fi
   [[ "$API_EXIT" == 137 ]] || { echo 'Unexpected API exit; crash proof is incomplete'; exit 1; }
   API_PID=''
   python "$SNAPSHOT" --api-unavailable
-  python tools/niko-test/start-api.py >> "$LOCAL/logs/api.log" 2>&1 &
+  python tools/niko-test/start-api.py "$API_ARTIFACT" >> "$LOCAL/logs/api.log" 2>&1 &
   API_PID=$!
-  python tools/niko-test/owned_api.py --wait-ready "$API_PID" "$$"
+  python tools/niko-test/owned_api.py --wait-ready "$API_PID" "$$" "$API_ARTIFACT"
   # Compare before logging in again, because real OIDC login intentionally adds audit entries.
   python "$SNAPSHOT" --verify
   python tools/niko-test/capture-http-sessions.py > "$LOCAL/logs/$SESSION_PREFIX-sessions-after.json"

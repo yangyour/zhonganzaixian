@@ -1,0 +1,32 @@
+{
+  "verified_at": "2026-10-02T21:50:40.125208+00:00",
+  "environment": "niko-local-test",
+  "passed": true,
+  "runtime_sha256": "50baf8b91c4ddffaa36e9a6e65ba09365333530ab861fedaa5fb064436bda816",
+  "target_sha256_before": "50baf8b91c4ddffaa36e9a6e65ba09365333530ab861fedaa5fb064436bda816",
+  "target_sha256_after": "e76b9c17cbe803482f14c35340f5f575dc28474c51f34f0426216c39b19511a6",
+  "target_bytes_changed": true,
+  "target_inode_or_mtime_changed": true,
+  "api_pid_and_start_time_unchanged": true,
+  "runtime_copy_unchanged": true,
+  "owned_parent_exact_command_uid_and_loopback_listener_verified": true,
+  "new_real_oidc_identities_after_build": 6,
+  "http": {
+    "passed": true,
+    "identity_contexts": 6,
+    "http_requests": 20,
+    "all_get": true,
+    "current_tenant_asset_reads": true,
+    "absent_spa_resource_status": 404,
+    "browser_dom_tested": false,
+    "credentials_output": false
+  },
+  "credentials_output": false,
+  "browser_dom_tested": false,
+  "limitations": [
+    "The prior ThrowableProxy failure is not claimed to be conclusively reproduced",
+    "No API SIGKILL scenario rerun; previous fault evidence unchanged",
+    "Not PG/Worker/OSS crash recovery",
+    "No original server changes"
+  ]
+}

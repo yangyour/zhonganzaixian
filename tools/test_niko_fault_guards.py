@@ -3,6 +3,8 @@ from pathlib import Path
 import importlib.util,json,os,subprocess,sys,tempfile,unittest
 from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'tools/niko-test'))
+import api_artifact,zipfile
 def module(name,path):
     spec=importlib.util.spec_from_file_location(name,path);value=importlib.util.module_from_spec(spec);spec.loader.exec_module(value);return value
 GUARD=module('niko_owned_api',ROOT/'tools/niko-test/owned_api.py')
@@ -11,19 +13,32 @@ class NikoFaultGuardTest(unittest.TestCase):
         root=base/'repo';root.mkdir();proc=base/'proc';child=proc/'902';child.mkdir(parents=True);java=base/'mop-toolchain/jdk-17.0.20.1+1/bin/java';java.parent.mkdir(parents=True);java.write_text('synthetic-non-executable')
         # stat index1 after the comm field is PPID; include spaces in comm to catch naive splitting.
         (child/'stat').write_text('902 (synthetic java worker) S '+str(parent)+' '+' '.join(['0']*20))
-        cmd=command or [str(java),'-Xms128m','-Xmx512m','-jar',str(root/'server/api/target/mop-api-0.1.0-SNAPSHOT.jar')]
+        local=root/'.local/niko-test';local.mkdir(parents=True);source=root/'server/api/target/mop-api-0.1.0-SNAPSHOT.jar';source.parent.mkdir(parents=True)
+        with zipfile.ZipFile(source,'w') as z:
+            z.writestr('META-INF/MANIFEST.MF','synthetic');z.writestr('BOOT-INF/classes/cn/mop/api/MopApplication.class',b'synthetic')
+        artifact=api_artifact.prepare_artifact(root)
+        cmd=command or [str(java),'-Xms128m','-Xmx512m','-jar',str(artifact)]
         (child/'cmdline').write_bytes(b'\0'.join(x.encode() for x in cmd)+b'\0');(child/'exe').symlink_to(java)
         return root,proc,child
+    def artifact(self,root):return next((root/'.local/niko-test/runtime-artifacts').glob('api-*/*.jar'))
     def test_exact_owned_api_identity_accepts_only_known_parent_and_command(self):
         with tempfile.TemporaryDirectory() as d:
-            root,proc,child=self.fixture(Path(d));self.assertTrue(GUARD.is_owned_api(902,901,root,proc));self.assertFalse(GUARD.is_owned_api(902,903,root,proc));self.assertFalse(GUARD.is_owned_api(1,901,root,proc));self.assertFalse(GUARD.is_owned_api(999,901,root,proc))
-            with patch.object(GUARD.os,'getuid',return_value=root.stat().st_uid+1):self.assertFalse(GUARD.is_owned_api(902,901,root,proc))
+            root,proc,child=self.fixture(Path(d));self.assertTrue(GUARD.is_owned_api(902,901,root,proc,artifact=self.artifact(root)));self.assertFalse(GUARD.is_owned_api(902,903,root,proc,artifact=self.artifact(root)));self.assertFalse(GUARD.is_owned_api(1,901,root,proc,artifact=self.artifact(root)));self.assertFalse(GUARD.is_owned_api(999,901,root,proc,artifact=self.artifact(root)))
+            with patch.object(GUARD.os,'getuid',return_value=root.stat().st_uid+1):self.assertFalse(GUARD.is_owned_api(902,901,root,proc,artifact=self.artifact(root)))
     def test_other_program_or_repo_is_never_a_signal_target(self):
         with tempfile.TemporaryDirectory() as d:
-            root,proc,child=self.fixture(Path(d));original=(child/'cmdline').read_bytes();(child/'cmdline').write_bytes(original.replace(b'mop-api-0.1.0-SNAPSHOT.jar',b'unrelated.jar'));self.assertFalse(GUARD.is_owned_api(902,901,root,proc));(child/'cmdline').write_bytes(original+b'--extra\0');self.assertFalse(GUARD.is_owned_api(902,901,root,proc))
+            root,proc,child=self.fixture(Path(d));original=(child/'cmdline').read_bytes();(child/'cmdline').write_bytes(original.replace(b'.jar',b'-unrelated.jar'));self.assertFalse(GUARD.is_owned_api(902,901,root,proc,artifact=self.artifact(root)));(child/'cmdline').write_bytes(original+b'--extra\0');self.assertFalse(GUARD.is_owned_api(902,901,root,proc,artifact=self.artifact(root)))
     def test_missing_or_invalid_process_metadata_fails_closed(self):
         with tempfile.TemporaryDirectory() as d:
-            root,proc,child=self.fixture(Path(d));(child/'stat').write_text('invalid');self.assertFalse(GUARD.is_owned_api(902,901,root,proc));(child/'stat').unlink();self.assertFalse(GUARD.is_owned_api(902,901,root,proc))
+            root,proc,child=self.fixture(Path(d));(child/'stat').write_text('invalid');self.assertFalse(GUARD.is_owned_api(902,901,root,proc,artifact=self.artifact(root)));(child/'stat').unlink();self.assertFalse(GUARD.is_owned_api(902,901,root,proc,artifact=self.artifact(root)))
+    def test_missing_pinned_artifact_never_authorizes_a_process(self):
+        with tempfile.TemporaryDirectory() as d:
+            root,proc,child=self.fixture(Path(d));self.assertFalse(GUARD.is_owned_api(902,901,root,proc))
+            self.assertFalse(GUARD.is_owned_api(902,901,root,proc,artifact=root/'server/api/target/mop-api-0.1.0-SNAPSHOT.jar'))
+    def test_changed_pinned_bytes_fail_identity_even_with_matching_command(self):
+        with tempfile.TemporaryDirectory() as d:
+            root,proc,child=self.fixture(Path(d));pinned=self.artifact(root);pinned.chmod(0o600);pinned.write_bytes(b'changed runtime');pinned.chmod(0o400)
+            self.assertFalse(GUARD.is_owned_api(902,901,root,proc,artifact=pinned))
     def test_listener_must_belong_to_exact_process_and_loopback_port(self):
         with tempfile.TemporaryDirectory() as d:
             root,proc,child=self.fixture(Path(d));(proc/'net').mkdir();(child/'fd').mkdir()

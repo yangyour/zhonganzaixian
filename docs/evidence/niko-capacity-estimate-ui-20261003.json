@@ -1,0 +1,45 @@
+{
+  "verified_at": "2026-10-03T11:00:34.378398+00:00",
+  "environment": "niko-local-test",
+  "status": "UI_SOURCE_ARITHMETIC_AND_REAL_MODULE_HTTP_VERIFIED_DOM_PENDING",
+  "tests": {
+    "new_web": 18,
+    "web_total": 592,
+    "contracts": 53,
+    "typecheck_and_build": true,
+    "actual_frontend_http": 18,
+    "readonly_estimate_posts": 15,
+    "failures": 0,
+    "errors": 0
+  },
+  "api_unchanged": "0.27.0",
+  "schema_unchanged": "V1-V15_FROZEN",
+  "verified": [
+    "eight initially blank input fields and explicit model coefficients; no prototype defaults",
+    "all decimal inputs/results preserved as strings; no unsafe Number conversion",
+    "independent BigInt rational verification of nine outputs and buffer, final34significant HALF_EVEN rounding",
+    "pure tests cover exact half-even ties, rounding carry and tiny decimals",
+    "actual responses cover40digit inputs, repeating fractions and1e-160 plain decimal",
+    "input edits clear previous result immediately without automatic calculation",
+    "duplicate click suppressed; delayed actual replies rejected after edit, permission change or disposal",
+    "forged local admin context remains denied by actual msp session403",
+    "result and input claims remain unverified; successful readonly calculation leaves audit tail unchanged"
+  ],
+  "scenario_or_business_writes": 0,
+  "poc_executed": false,
+  "saved_scenarios_implemented": false,
+  "growth_curve_implemented": false,
+  "measured_baseline_verified": false,
+  "browser_dom_tested": false,
+  "mobile_390px_tested": false,
+  "credentials_output": false,
+  "all_128_done": false,
+  "concurrent_remote_sync": {
+    "latest_source": "28fa9fe07d22f7fe267e36c7e3a1ea6528db0a52",
+    "local_runtime_and_browser_fixes_preserved": true,
+    "remote_screenshot_blob_references_preserved": 13,
+    "remote_screenshot_bytes_reviewed_here": false,
+    "reported_windows_browser_scope_does_not_cover_capacity_page": true,
+    "designated_capacity_api_http_preserved": 72
+  }
+}

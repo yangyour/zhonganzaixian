@@ -1,0 +1,29 @@
+{
+  "verified_at": "2026-10-03T10:58:35.399Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual capacityEstimateWorkspace BigInt arithmetic verifier and ApiClient",
+  "http_requests": 18,
+  "readonly_estimate_posts": 15,
+  "business_or_scenario_writes": 0,
+  "nine_output_and_buffer_verification": true,
+  "forty_digit_input_boundary": true,
+  "unknowns_remain_null": true,
+  "input_edits_clear_without_autorequest": true,
+  "duplicate_click_suppressed": true,
+  "actual_late_responses_discarded_on_input_permission_and_disposal": true,
+  "actual_msp_denied_after_forged_local_admin": true,
+  "successful_readonly_audit_tail_unchanged": true,
+  "model_or_measurement_approval": false,
+  "poc_executed": false,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "faults": "one successful response discarded; four actual responses delayed in client transport; not physical network or process faults",
+  "remaining": [
+    "DOM/mobile field controls and navigation",
+    "Persistent scenarios/growth curve/real benchmark provenance",
+    "Actual Proxy and PoC load evidence"
+  ],
+  "very_small_plain_decimal_verified": true,
+  "decimal128_response_arithmetic_and_no_float_coercion": true
+}

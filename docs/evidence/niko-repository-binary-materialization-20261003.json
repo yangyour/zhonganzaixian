@@ -1,0 +1,83 @@
+{
+  "verified_at": "2026-10-03T11:07:01.435283+00:00",
+  "environment": "niko-cloud-workspace",
+  "source_commit": "5da15e5dec6e352affdcc5add6ba42f83f6075d0",
+  "status": "BINARY_LOCAL_MATERIALIZATION_BLOCKED_REMOTE_ENTRIES_PRESERVED",
+  "binary_count": 13,
+  "entries": [
+    {
+      "path": "docs/evidence/local-ui-20261003/desktop-assets.png",
+      "sha": "4790d0b8df6b8409e03e0228863ad6620be15dc2",
+      "mode": "100644"
+    },
+    {
+      "path": "docs/evidence/local-ui-20261003/desktop-audit.png",
+      "sha": "9ed5f25137388201c1280354532e4b6fe2a57b79",
+      "mode": "100644"
+    },
+    {
+      "path": "docs/evidence/local-ui-20261003/desktop-capability-catalog.png",
+      "sha": "6c646436945a016587d5b50b3368931f2b587b83",
+      "mode": "100644"
+    },
+    {
+      "path": "docs/evidence/local-ui-20261003/desktop-global-search.png",
+      "sha": "b0e58af7e8154f827dde66b179855e1e9ca8115a",
+      "mode": "100644"
+    },
+    {
+      "path": "docs/evidence/local-ui-20261003/desktop-metadata-filters.png",
+      "sha": "434bc66da3286c5d315c61e011b60c0d33b3f7e6",
+      "mode": "100644"
+    },
+    {
+      "path": "docs/evidence/local-ui-20261003/desktop-warranty-saved.png",
+      "sha": "f48ae0a10d50188516e497b4b4d1eeb1c25df9b8",
+      "mode": "100644"
+    },
+    {
+      "path": "docs/evidence/local-ui-20261003/mobile-assets.png",
+      "sha": "15aff90679652031198b283475405d4f045b2609",
+      "mode": "100644"
+    },
+    {
+      "path": "docs/evidence/local-ui-20261003/mobile-global-search.png",
+      "sha": "29803eee058f784f7b5c207704e589008b523b5a",
+      "mode": "100644"
+    },
+    {
+      "path": "docs/evidence/local-ui-20261003/mobile-import-initial-fixed.png",
+      "sha": "11287b9480a70c89437b69a9fc5702c633d18d40",
+      "mode": "100644"
+    },
+    {
+      "path": "docs/evidence/local-ui-20261003/mobile-import-initial.png",
+      "sha": "b93a7d9a0280ea0cd97ae4724edb7b7b96e9451c",
+      "mode": "100644"
+    },
+    {
+      "path": "docs/evidence/local-ui-20261003/mobile-import-mapping-saved.png",
+      "sha": "9fad758ec8407bc140238cc6635dbdab47014986",
+      "mode": "100644"
+    },
+    {
+      "path": "docs/evidence/local-ui-20261003/mobile-viewer-assets.png",
+      "sha": "cf5221613a4e4cb753dfff42d9bf9f7c97ed9fd9",
+      "mode": "100644"
+    },
+    {
+      "path": "docs/evidence/local-ui-20261003/mobile-warranty-saved.png",
+      "sha": "a8d4187dcafddb0b0c767e00ba1d25cc351a9239",
+      "mode": "100644"
+    }
+  ],
+  "github_text_fetch": "HTTP400 only UTF-8 text; binary downloads unsupported",
+  "github_blob_fetch": "UnicodeDecodeError on PNG bytes",
+  "local_bytes_available": false,
+  "root_pixel_review_performed": false,
+  "remote_blob_references_preserved": true,
+  "placeholder_files_created": false,
+  "screenshot_replacements_uploaded": false,
+  "code_and_tests_can_continue": true,
+  "credentials_output": false
+}

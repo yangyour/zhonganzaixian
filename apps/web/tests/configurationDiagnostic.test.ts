@@ -149,3 +149,6 @@ describe('current-tenant metadata-only configuration diagnosis', () => {
     expect(transport).not.toHaveBeenCalled()
   })
 })
+
+it('rejects normalized impossible diagnostic observation dates',()=>{for(const value of ['2026-02-30T00:00:00Z','2026-02-29T00:00:00Z','0000-01-01T00:00:00Z'])expect(()=>validateConfigurationDiagnostic({...diagnostic(),observed_at:value},configKey,tenantId)).toThrow()})
+it('preserves valid nanosecond diagnostic time without truncation',()=>{const observed_at='2026-10-01T00:00:00.123456789Z';expect(validateConfigurationDiagnostic({...diagnostic(),observed_at},configKey,tenantId).observed_at).toBe(observed_at)})

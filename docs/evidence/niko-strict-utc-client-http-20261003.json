@@ -1,0 +1,24 @@
+{
+  "verified_at": "2026-10-03T22:54:36.325Z",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "http_requests": 43,
+  "http_methods": [
+    "GET"
+  ],
+  "diagnostics_checked": 10,
+  "asset_metadata_snapshots_checked": 5,
+  "existing_registration_operations_checked": 20,
+  "operation_dataset_status": "EXISTING_REAL_ROWS_VERIFIED",
+  "timestamps_checked": 60,
+  "submillisecond_timestamps_preserved": 10,
+  "registry_entries": 415,
+  "registry_sha256_unchanged": "787f964e3c0ce3c0645026e73718bf45c99768874ce1fa1f6d9545fbc05eaee2",
+  "business_writes": 0,
+  "synthetic_new_rows_created": 0,
+  "invalid_timestamp_cases": "ISOLATED_UNIT_ONLY",
+  "frontend": "actual bundled validators and ApiClient",
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "contract_done": false
+}

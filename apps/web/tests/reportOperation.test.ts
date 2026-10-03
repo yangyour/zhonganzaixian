@@ -216,3 +216,7 @@ describe('accepted registration form reads', () => {
     expect(transport).toHaveBeenCalledTimes(1)
   })
 })
+
+it('rejects normalized calendar dates and noncanonical operation timestamps',()=>{for(const value of ['0','2026-02-30T00:00:00Z','2026-02-29T00:00:00Z','2026-10-01','2026-10-01T00:00:00+00:00','0000-01-01T00:00:00Z'])expect(()=>validateReportOperation(operation({created_at:value,updated_at:value}),target)).toThrow()})
+it('rejects reversed operation chronology even within the same millisecond',()=>{expect(()=>validateReportOperation(operation({created_at:'2026-10-01T00:00:00.000000002Z',updated_at:'2026-10-01T00:00:00.000000001Z'}),target)).toThrow()})
+it('preserves valid nanosecond operation timestamps exactly',()=>{const created_at='2026-10-01T00:00:00.000000001Z',updated_at='2026-10-01T00:00:00.000000002Z';expect(validateReportOperation(operation({created_at,updated_at}),target)).toMatchObject({created_at,updated_at})})

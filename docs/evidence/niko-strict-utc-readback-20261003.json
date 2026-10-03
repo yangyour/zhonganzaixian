@@ -1,0 +1,68 @@
+{
+  "verified_at": "2026-10-03T22:56:25.106307+00:00",
+  "scope": "STRICT_UTC_READBACK_FOR_THREE_EXISTING_CLIENTS",
+  "initial_regression": {
+    "tests": 101,
+    "failed": 5,
+    "passed": 96
+  },
+  "new_tests": 16,
+  "web_tests_passed": 792,
+  "typecheck": "PASS",
+  "production_build": "PASS_WITH_EXISTING_CHUNK_SIZE_ADVISORY",
+  "contracts": 70,
+  "generation_check": "PASS",
+  "canonical_utc_years": [
+    1,
+    9999
+  ],
+  "fraction_digits": [
+    1,
+    9
+  ],
+  "calendar_roundtrip": true,
+  "nanosecond_order": "BIGINT",
+  "original_timestamp_strings_preserved": true,
+  "readers": [
+    "reportOperation",
+    "configurationDiagnostic",
+    "assetMetadataWorkspace"
+  ],
+  "existing_real_http_evidence": "niko-strict-utc-client-http-20261003.json",
+  "http_requests": 43,
+  "business_writes": 0,
+  "invalid_date_cases": "ISOLATED_UNIT_ONLY",
+  "first_http_attempt": "INITIALIZATION_FAILED_BEFORE_HTTP_DUE_TO_WRONG_SESSION_FILENAME",
+  "final_http_attempt": "PASS_WITH_EXISTING_QA_VIEWERA_SESSION",
+  "api_version": "0.33.0",
+  "api_restarted": false,
+  "v1_v19_changed": false,
+  "browser_dom_tested": false,
+  "contract_done": false,
+  "previous_backup_diff_commit": {
+    "sha": "198258891d77c775d97ac05ad9248440a0826f1c",
+    "ci_run": 37159495107,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "apps/web/src/utils/utcInstant.ts": "db5300796ea46173f9a92eaba2c481053f969f35e0da8c34797d661709ee1e8d",
+    "apps/web/src/utils/reportOperation.ts": "7489a7b41f42a06240e49e595da23781b91ce4d9b1740402616f276a3b27411b",
+    "apps/web/src/utils/configurationDiagnostic.ts": "000adce16c26cfadecdc3ffa90c8c5c28912debfc3da74231e156ad0b45aa604",
+    "apps/web/src/utils/assetMetadataWorkspace.ts": "4a674acb89ef398da4071228e08dcaa7901f6d0e052c96e88540270594e0d1b1",
+    "apps/web/tests/utcInstant.test.ts": "3568a81509003e0bd8b8a74a57f45fa64d139700793e74039203a76341ed5205",
+    "apps/web/tests/reportOperation.test.ts": "2f7bc36c520c0b2596a5665ee603ae33de710f2a5972297d6588835fc21a2d20",
+    "apps/web/tests/configurationDiagnostic.test.ts": "08103aba47f45234e539cf1f31f482e5de5e8c2fd4c11d03cc50045ddadf29f2",
+    "apps/web/tests/assetMetadataWorkspace.test.ts": "f9b1da8f95fc4b18cc0a78637154fb102f39470f4c97be265357041953fce9e1",
+    "tools/build-strict-utc-client-test.mjs": "7f0ed175252bbbb85569d8c482477d4df266e2a76484e8d3635576eed692747c",
+    "tests/niko-strict-utc-client-http.mjs": "a2cb6b85e5657a3ccaee0245de94af22698399a6f1a4928a6a36712c37b9a30b"
+  },
+  "logs_sha256": {
+    ".local/niko-test/logs/strict-utc-readback-red.log": "f86c6d96d64879662eef187a5494818981dabed571034a6b61b66225c7d4ee46",
+    ".local/niko-test/logs/strict-utc-readback-focused.log": "042a23dcc5ffc7028e0c49c67c96b39ceacaa62fa327275711715c614f31730e",
+    ".local/niko-test/logs/strict-utc-readback-web.log": "74460ee5a14941b3577078ed972feb5d296cab87e4c082463b9be1f384aaca1b",
+    ".local/niko-test/logs/strict-utc-readback-build.log": "9688ed1703341ded00fd45f2284b119c558b56f260e8553f3d7713e0d4705790",
+    ".local/niko-test/logs/strict-utc-readback-contract.log": "fb99752634fd6ede24220e092c9f1ff02a4e9f0e775f456020fb1dafc14433fe",
+    ".local/niko-test/logs/strict-utc-client-http-initialization-failed.log": "5eac5d3cd737ffd7534de39e4a0395293d43eca506610cdeb3d1f5c6ed3a0569",
+    ".local/niko-test/logs/strict-utc-client-http-final.log": "6a175f47613b38ff7be751ae05922c719c387b169c5a880f41ff0ead038cffc4"
+  }
+}

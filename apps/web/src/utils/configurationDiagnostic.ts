@@ -1,3 +1,4 @@
+import { isUtcInstant } from './utcInstant'
 import { api, ApiError, isCancelled } from '../api/client'
 import type { ConfigurationDiagnostic, ConfigurationDiagnosticReasonCode, ConfigurationDiagnosticSource } from '../api/types'
 import { isTicketUuid } from './ticket'
@@ -30,7 +31,7 @@ export function validateConfigurationDiagnostic(value: unknown, key: string, ten
   if (!validKey(key) || !isTicketUuid(tenantId) || !shape(value, ['key', 'status', 'effective_value', 'context', 'observed_at', 'registry', 'recent_proposals', 'runtime_definition', 'publication', 'customer_verification', 'reasons', 'question_ids'])
     || value.key !== key || value.status !== 'CONFIG_PENDING' || value.effective_value !== null
     || !shape(value.context, ['tenant_id', 'environment']) || value.context.tenant_id !== tenantId || value.context.environment !== 'remote_test'
-    || typeof value.observed_at !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z$/.test(value.observed_at) || !Number.isFinite(Date.parse(value.observed_at))
+    || !isUtcInstant(value.observed_at)
     || !shape(value.registry, ['origin', 'version', 'type_label', 'unit_label', 'scope_label', 'source_ref', 'decision_status_label', 'classification_label', 'question_ids'])
     || value.registry.origin !== 'DESIGN_REGISTRY' || !version(value.registry.version)
     || !['type_label', 'unit_label', 'scope_label', 'source_ref', 'decision_status_label', 'classification_label'].every(field => nullableText(value.registry && (value.registry as Record<string, unknown>)[field]))

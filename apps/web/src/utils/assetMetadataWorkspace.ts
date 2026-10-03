@@ -1,3 +1,4 @@
+import { isUtcInstant, utcNotBefore } from './utcInstant'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import type { Asset, AssetType } from '../api/types'
 
@@ -35,11 +36,11 @@ export function validateMetadataInput(value: unknown): asserts value is Metadata
   if (value.owner_id !== null && (typeof value.owner_id !== 'string' || !uuid.test(value.owner_id))) throw inputInvalid()
   if (['purchase_date', 'warranty_expiry', 'overdue_service_date'].some(key => !validMetadataDate(value[key]))) throw inputInvalid()
 }
-const timestamp = (value: unknown) => typeof value === 'string' && value.endsWith('Z') && Number.isFinite(Date.parse(value))
+const timestamp = isUtcInstant
 function readSnapshot(value: unknown, context: MetadataContext): MetadataSnapshot {
   if (!exact(value, ['asset', 'metadata', 'metadata_version']) || !object(value.asset)) throw invalid()
   const a = value.asset
-  if (a.id !== context.assetId || a.tenant_id !== context.tenantId || !version(a.version) || !text(a.name, 100) || typeof a.type !== 'string' || !types.includes(a.type) || !text(a.site_id, 64) || !text(a.management_ip, 45) || !timestamp(a.created_at) || !timestamp(a.updated_at) || typeof a.source !== 'string' || typeof a.status !== 'string' || typeof a.lifecycle_status !== 'string' || typeof a.availability !== 'string' || typeof a.sync_state !== 'string' || !(a.sampled_at === null || timestamp(a.sampled_at))) throw invalid()
+  if (a.id !== context.assetId || a.tenant_id !== context.tenantId || !version(a.version) || !text(a.name, 100) || typeof a.type !== 'string' || !types.includes(a.type) || !text(a.site_id, 64) || !text(a.management_ip, 45) || !timestamp(a.created_at) || !timestamp(a.updated_at) || !utcNotBefore(a.updated_at, a.created_at) || typeof a.source !== 'string' || typeof a.status !== 'string' || typeof a.lifecycle_status !== 'string' || typeof a.availability !== 'string' || typeof a.sync_state !== 'string' || !(a.sampled_at === null || timestamp(a.sampled_at))) throw invalid()
   if (value.metadata === null) { if (value.metadata_version !== null) throw invalid() }
   else { validateMetadataInput(value.metadata); if (!version(value.metadata_version) || value.metadata_version < 2 || value.metadata_version > a.version) throw invalid() }
   return clone(value) as unknown as MetadataSnapshot

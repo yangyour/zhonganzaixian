@@ -1,0 +1,55 @@
+{
+  "verified_at": "2026-10-03T22:22:07.790895+00:00",
+  "scope": "ISOLATED_HTTP_TRANSPORT_CODE_NOT_PROVIDER_INTEGRATION",
+  "new_isolated_tests": 20,
+  "root_tests_reported": 1307,
+  "root_tests_executed": 1294,
+  "actual_postgresql_regressions": 392,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "contracts": 70,
+  "generation_check": "PASS",
+  "request_method_fixed": "apiinfo.version",
+  "explicit_loopback_only": true,
+  "redirects": "NEVER",
+  "proxy": "EXPLICIT_NO_PROXY",
+  "cookie_handler": false,
+  "authenticator": false,
+  "tls_endpoint_identification": "HTTPS",
+  "tls_trust_bypassed": false,
+  "timeout_ms_bounds": [
+    1,
+    30000
+  ],
+  "whole_milliseconds_required": true,
+  "streaming_response_max_bytes": 16384,
+  "application_retry": false,
+  "future_cancellation_requested_on_timeout_or_interrupt": true,
+  "actual_socket_cancellation_verified": false,
+  "body_or_exception_details_logged": false,
+  "monitoring_ready": null,
+  "application_wired": false,
+  "actual_zabbix_calls": 0,
+  "local_fake_http_server": false,
+  "component_installed": false,
+  "new_credentials": false,
+  "component_setup_approval": "PENDING_EXPLICIT_REPLY",
+  "api_version": "0.33.0",
+  "api_restarted": false,
+  "v1_v19_changed": false,
+  "contract_done": false,
+  "previous_protocol_commit": {
+    "sha": "ae695121a78e5a8e340ebdadf061a706f7ccd7c2",
+    "ci_run": 37157472477,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "server/adapters/src/main/java/cn/mop/adapters/monitoring/ZabbixVersionTransport.java": "a9e2d22f57df89f8af1ef5e30e9d9338c030f1d092d8d7fca42e7b8faac369ce",
+    "server/api/src/test/java/cn/mop/adapters/monitoring/ZabbixVersionTransportTest.java": "633e3cd190edf7a03d06b0ed8495392fd541aa48e142466d379149f7416a1c0d"
+  },
+  "logs_sha256": {
+    ".local/niko-test/logs/zabbix-version-transport-focused.log": "e6eb9f995fec38216be64271845219e572524e1c1a736b1bd153d8b776dc64f7",
+    ".local/niko-test/logs/zabbix-version-transport-root.log": "e3889c31ec0b56180c8a0374c7433c0786040fd8cba5297175241d8050d6f1f3",
+    ".local/niko-test/logs/zabbix-version-transport-contract.log": "09f72d2133df6a2604f47d48dae9bb6aee46ff0776b72900164398f6b0d58c8b"
+  }
+}

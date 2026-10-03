@@ -15,3 +15,13 @@ VERSION_READ仅描述这一份响应中的版本，monitoringReady=null、observ
 15隔离字节/URI单元通过，覆盖无auth空数组请求、整数精度、响应id串/浮点/错号、非200/HTML/错编码、重复键/过限、API错误脱敏、系列不匹配、固定回环与路径/凭据拒绝。完整根1287=1274执行（392既有PG回归）+13历史fixture跳过/6MinIO排除，70契约/生成一致性通过；392PG不包含Zabbix业务。
 
 新增adapter显式Jackson依赖沿用项目BOM，未改API0.33或V1–V19，未重启API，也未增加Provider HTTP、数据库表/凭据/权限。候选阻塞记录338764e CI37156695981 success已回读。真实传输超时/字节界限/禁止代理与重定向、组件版本/权限/观测仍待后续分别实施及批准后的真实联调，不能标D06/128项DONE。见[证据](evidence/niko-zabbix-version-protocol-20261003.json)。
+
+## 2026-10-03 限回环、无凭据版本传输器
+
+新增ZabbixVersionTransport仅提供显式configured/probe调用，尚未接入Spring、API、就绪检查或定时采集。构造器不请求网络；目标复用上述精确回环语法门禁，调用者仍须确认指定目标已获许可。仅POST固定无auth版本请求，不提供任意方法、请求头或凭据参数。
+
+使用JDK17 HttpClient，显式NO_PROXY、NEVER重定向、无CookieHandler/Authenticator、HTTP1.1、HTTPS端点名校验与正常JVM信任。连接及请求超时均要求显式1..30000整毫秒；等待响应正文完成的future还受同一上限约束，超时/中断请求取消future，保留中断标志，不在应用层重试。依据[JDK17 HttpClient](https://docs.oracle.com/en/java/javase/17/docs/api/java.net.http/java/net/http/HttpClient.html)，取消是尽力操作，当前隔离测试不证明实际套接字已关闭或服务端未收到请求。
+
+自定义BodySubscriber按收到的ByteBuffer批次先计数再复制，累计最多16384字节，适用于没有Content-Length的分块正文；超限取消订阅并返回RESPONSE_TOO_LARGE，不能把部分正文当成功。重复订阅、提前取消、上游错误、完成后额外数据均被隔离。多Content-Type拼合后按严格协议拒绝；重定向/错误状态不能成为版本成功。结果只含固定传输分类及受限协议结果，不含异常文本、响应正文、地址或凭据。RESPONSE_RECEIVED不代表HTTP/RPC成功，更不代表监控就绪，必须检查protocol.outcome；monitoringReady始终null。
+
+20隔离future/流订阅/请求构造单元通过，无本机假Zabbix HTTP服务器、真实监控请求或新账号。完整根1307报告=1294执行，含392既有PG回归、13历史fixture跳过和6MinIO排除；70契约/生成一致性通过。前一纯协议提交ae695121 CI37157472477 success已回读。当前未改变API0.33、V1–V19、应用启动或权限；真实网络/证书/实际超时取消、Zabbix组件及权限/租户映射/采集仍待批准后的独立验证。见[本切片证据](evidence/niko-zabbix-version-transport-20261003.json)。

@@ -1,0 +1,54 @@
+{
+  "verified_at": "2026-10-03T21:03:47.433674+00:00",
+  "scope": "PURE_EXPLICIT_THRESHOLD_PREDICATE_DIAGNOSTIC",
+  "requirements": [
+    "M4-D12",
+    "M4-5",
+    "M4-18",
+    "Q06"
+  ],
+  "new_pure_tests": 20,
+  "independent_partition_vectors_in_one_test": 1728,
+  "root_tests_reported": 1262,
+  "root_tests_executed": 1249,
+  "actual_postgresql_regressions": 392,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "contracts": 67,
+  "generation_check": "PASS",
+  "numeric_arithmetic": "EXACT_BIGDECIMAL_NO_BINARY_ROUNDING",
+  "comparison_operators": [
+    "GT",
+    "GE",
+    "LT",
+    "LE"
+  ],
+  "directions": [
+    "HIGH_IS_BAD",
+    "LOW_IS_BAD"
+  ],
+  "missing_values_preserved": true,
+  "physical_range_check": "NOT_RUN",
+  "units_converted": false,
+  "auto_swapped_values_or_operators": false,
+  "publishable": false,
+  "effective_rule": null,
+  "customer_confirmation": "UNVERIFIED",
+  "monitoring_applied": false,
+  "api_version": "0.32.0",
+  "new_http_endpoint": false,
+  "real_monitoring_components": "NOT_RUN",
+  "new_pg_schema_or_repository": false,
+  "v1_v19_changed": false,
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/monitoring/ThresholdConditionAnalysis.java": "16a81cf21f243f0c2275ad727c45916a05e2dd1c2fc0ac956da993d592cf7981",
+    "server/api/src/test/java/cn/mop/api/ThresholdConditionAnalysisTest.java": "0ec401b640b00e3767f146fe5f3fae101ed3c1c0d8826f1371ee38a016c11d05"
+  },
+  "initial_compile_issue": "Condition record unit accessor shadowed same-named validation helper; renamed helper to validateUnit then focused20 and full root passed",
+  "previous_ticket_guard_commit": {
+    "sha": "4803492b9f81c7a04254162d9e0fe0789ebf2211",
+    "ci_run": 37153448635,
+    "conclusion": "success"
+  },
+  "contract_done": false
+}

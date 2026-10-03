@@ -1,0 +1,39 @@
+{
+  "verified_at": "2026-10-03T07:45:20.153305+00:00",
+  "environment": "niko-local-test",
+  "status": "GROUPED_SEARCH_REPOSITORY_ONLY",
+  "tests": {
+    "new_pure_rules": 8,
+    "new_real_pg": 9,
+    "root_reported": 892,
+    "root_executed": 879,
+    "real_pg_integration": 273,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 45
+  },
+  "contract_group_limits": {
+    "assets": 5,
+    "events": 4,
+    "tickets": 3,
+    "automation_scripts": 3
+  },
+  "supported_sources": [
+    "asset names",
+    "customer_report registration titles and receipt numbers"
+  ],
+  "same_readonly_snapshot_authorization": true,
+  "customer_and_tadmin_reports_own_only": true,
+  "cross_tenant_keyword_hidden": true,
+  "query_literal_unicode_casefold": true,
+  "private_descriptions_contacts_ip_not_returned": true,
+  "events_or_scripts_queried": false,
+  "notification_bell_queried": false,
+  "public_api_implemented": false,
+  "new_ui": false,
+  "migrations_executed": 0,
+  "rls_claimed": false,
+  "large_scale_performance_tested": false,
+  "all_128_done": false,
+  "credentials_output": false
+}

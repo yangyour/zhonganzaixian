@@ -1,0 +1,32 @@
+{
+  "verified_at": "2026-10-03T04:47:53.519841+00:00",
+  "status": "READONLY_PAGE_CODE_AND_ACTUAL_CLIENT_HTTP_VERIFIED",
+  "environment": "niko-local-test",
+  "new_unit_tests": 15,
+  "web_tests": 433,
+  "typecheck_and_build": true,
+  "contract_tests": 37,
+  "api_version_unchanged": "0.19.0",
+  "actual_client_evidence": "niko-manual-incident-reader-http-20261003.json",
+  "strict_validation": [
+    "24 exact fields, current tenant, UUIDs and safe asset version",
+    "Manual source and matched severity label",
+    "Null monitoring/disposition/priority/actual occurrence/recovery",
+    "No automatic recovery or ticket creation",
+    "Descending registered_at/id keyset and exact next cursor"
+  ],
+  "ui_source_wiring": [
+    "Capability-gated route and desktop/mobile navigation",
+    "Current context synchronous reset on tenant, identity or permission changes",
+    "Original title and asset name snapshot preserved",
+    "Registration timestamp distinct from actual fault occurrence",
+    "Read failure clears detail; unknown list is not empty",
+    "Responsive single-column rules, not visually verified"
+  ],
+  "browser_dom_tested": false,
+  "create_form_implemented": false,
+  "manual_recovery_implemented": false,
+  "credentials_output": false,
+  "frozen_migrations_unchanged": "V1-V13",
+  "full_contract_done": false
+}

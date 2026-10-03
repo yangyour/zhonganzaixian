@@ -46,3 +46,14 @@ PostgresManualIncidentRepository已实现同租户内部成员的有界列表/�
 ready检查真实手工表/ACL并声明MANUAL、REGISTERED_ONLY、监控恢复false/自动建单false，live不探测不迁移。V1–V13未改，存储仍关闭。下一步页面的明确手工标记、只读列表与原请求恢复表单；该模块尚无UI/DOM验收、人工恢复或正式事件处置/建单/SLA联调。完整M5-6/D06/D07/128项仍未DONE。
 
 见[API与回归证据](evidence/niko-manual-incident-api-20261003.json)及[真实HTTP证据](evidence/niko-manual-incident-api-http-20261003.json)。
+
+
+## 2026-10-03 手工来源只读页面与真实前端模块
+
+新增内部能力受控的“手工来源登记”路由及桌面/移动导航；列表与详情明确手工标记、原文标题/资产名快照/所见资产版本、五级严重度。技术登记时间与实际发生时间分开，监控/正式处置/优先级/实际发生恢复仍显示未知；不提供恢复或正式建单按钮。15条有界keyset，严格24字段/租户/身份/级别标签/固定来源/未知投影/时间排序和游标验证，拒绝把监控NORMAL或RESOLVED当作有效手工回读。
+
+15新增Web共433项、类型与构建、37契约通过。使用实际manualIncidentReader+ApiClient连接真实PG/OIDC，15次实际GET（其中reader8次），只读取既有合成登记，没有准备或业务写入；GET分页无重复、原始详情不变、客户列表/详情403、只读成功审计尾不变。刻意丢弃一次已完成GET响应后清除旧详情，再读恢复；挂起一次已完成响应跨授权上下文重置后丢弃。故障注入不是物理断网，页面源码接线/响应式CSS测试不是DOM或390px视觉验收。
+
+API0.19/V1–V13未改。当前只读页功能已接线，创建表单和原请求恢复继续下一独立功能；人工恢复/正式处置/事件建单闭环与全部128项未DONE，B03浏览器路径及其他外部依赖仍按范围保留。
+
+见[只读页面回归](evidence/niko-manual-incident-reader-web-20261003.json)和[真实模块HTTP](evidence/niko-manual-incident-reader-http-20261003.json)。

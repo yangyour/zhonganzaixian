@@ -1,0 +1,26 @@
+{
+  "verified_at": "2026-10-03T04:47:01.513Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual manualIncidentReader + ApiClient",
+  "http_requests": 15,
+  "reader_requests": 8,
+  "write_requests": 0,
+  "setup_mutations": 0,
+  "existing_synthetic_records_only": true,
+  "descending_keyset_no_overlap": true,
+  "original_detail_unchanged": true,
+  "source_manual_unknowns_preserved": true,
+  "failed_read_clears_stale_detail": true,
+  "held_completed_response_after_context_reset_discarded": true,
+  "customer_list_and_detail_403": true,
+  "readonly_success_audit_tail_unchanged": true,
+  "credentials_output": false,
+  "browser_dom_tested": false,
+  "fault_injection": "Discard one completed successful GET response and hold one completed response across context reset; not physical network or server crash",
+  "remaining": [
+    "Create form and original-request recovery UI",
+    "DOM/390px browser validation B03",
+    "Human recovery and formal event-to-ticket/SLA workflow"
+  ]
+}

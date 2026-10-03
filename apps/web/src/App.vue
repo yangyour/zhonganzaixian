@@ -39,6 +39,7 @@ async function endSession() {
       <div class="nav-heading">资源</div>
       <el-menu :default-active="String(route.name)" class="side-menu" @select="router.push({ name: $event })">
         <el-menu-item index="assets"><span class="nav-symbol">▤</span>资产管理</el-menu-item>
+        <el-menu-item v-if="can('manual_incidents:read')" index="manual-incidents"><span class="nav-symbol">◇</span>手工来源登记</el-menu-item>
         <el-menu-item v-if="can('tickets:read')" index="tickets"><span class="nav-symbol">▣</span>报障与受理</el-menu-item>
       </el-menu>
       <template v-if="can('configurations:read') || can('audit:read')">
@@ -74,6 +75,7 @@ async function endSession() {
     <el-drawer v-model="navigationOpen" title="MOP 导航" direction="ltr" size="260px">
       <el-menu :default-active="String(route.name)" @select="router.push({ name: $event })">
         <el-menu-item index="assets">资产管理</el-menu-item>
+        <el-menu-item v-if="can('manual_incidents:read')" index="manual-incidents">手工来源登记</el-menu-item>
         <el-menu-item v-if="can('tickets:read')" index="tickets">报障与受理</el-menu-item>
         <el-menu-item v-if="can('configurations:read')" index="configurations">配置确认登记</el-menu-item>
         <el-menu-item v-if="can('audit:read')" index="audit">审计日志</el-menu-item>

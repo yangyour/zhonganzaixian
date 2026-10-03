@@ -18,17 +18,14 @@ async function changeTenant(value: unknown) {
   error.value = null
   tenantTransition.value = true
   try {
-    await Promise.all([
-      switchTenant(String(value)),
-      router.replace({ query: { ...route.query, asset_id: undefined, ticket_id: undefined, operation_id: undefined, cursor: undefined, site_id: undefined } }),
-    ])
+    if (await switchTenant(String(value))) await router.replace({ query: { ...route.query, asset_id: undefined, ticket_id: undefined, operation_id: undefined, cursor: undefined, site_id: undefined } })
   }
   catch (cause) { if (!isCancelled(cause)) error.value = cause }
   finally { tenantTransition.value = false }
 }
 async function endSession() {
   leaving.value = true; error.value = null
-  try { if (!await logout()) await router.replace('/login') }
+  try { if (await logout() === 'local') await router.replace('/login') }
   catch (cause) { if (!isCancelled(cause)) error.value = cause }
   finally { leaving.value = false }
 }
@@ -69,7 +66,7 @@ async function endSession() {
       <div class="environment-strip"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '共享测试环境 · PostgreSQL / Keycloak · 非生产' : '历史隔离单元夹具 · 非集成验收环境' }} · 资产状态尚无真实采集依据</div>
       <main class="content">
         <ApiErrorNotice :error="error" />
-        <div v-if="switchingTenant || tenantTransition" class="switching-panel"><el-skeleton :rows="5" animated /><p>正在切换租户，已取消旧上下文请求…</p></div>
+        <div v-if="switchingTenant" class="switching-panel"><el-skeleton :rows="5" animated /><p>正在切换租户，已取消旧上下文请求…</p></div>
         <router-view v-else :key="pageKey" />
       </main>
       <footer class="app-footer">MOP 开发验证 V0.1 <span>资产草稿 · 配置登记 · 报障登记 · 审计</span></footer>

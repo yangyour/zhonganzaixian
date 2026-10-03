@@ -1,0 +1,16 @@
+{
+  "verified_at": "2026-10-03T02:05:34.057Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "http_requests": 3,
+  "frontend": "actual session store + ApiClient + contextTransitionGuards",
+  "controlled_guard_decisions": true,
+  "denied_switch_or_logout_sent_no_request": true,
+  "pending_guard_blocked_competing_actions": true,
+  "approved_tenant_switch_and_restore_verified": true,
+  "original_tenant_restored": true,
+  "forced_local_forget_did_not_wait_for_guard": true,
+  "logout_http_executed": false,
+  "browser_dom_tested": false,
+  "credentials_output": false
+}

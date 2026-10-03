@@ -1,0 +1,14 @@
+// Actual session store + ApiClient + transition registry. Guard decisions controlled by test; not a DOM test.
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {session,initializeSession,switchTenant,logout,forgetSession,contextTransitionGuards} from '../.local/niko-test/session-guard-client.mjs';
+const root=new URL('../',import.meta.url);let stage='init';
+try{
+ const auth=JSON.parse(readFileSync(new URL('.local/niko-test/private/sessions/qa-padmin.json',root),'utf8'));assert.equal(auth.environment,'niko-local-test');const transport=globalThis.fetch;let requests=0;globalThis.fetch=async(url,options={})=>{assert.ok(String(url).startsWith('/api/v1/'));requests++;return transport('http://127.0.0.1:8080'+url,{...options,headers:{...options.headers,Cookie:auth.cookie},redirect:'manual'});};
+ stage='initial_session';await initializeSession();const original=session.value.tenant.id,other=original.endsWith('1')?'55000000-0000-4000-8000-000000000002':'55000000-0000-4000-8000-000000000001';assert.equal(requests,1);
+ stage='guard_rejection_no_auth_action';const stop=contextTransitionGuards.register(()=>false);assert.equal(await switchTenant(other),false);assert.equal(await logout(),'cancelled');assert.equal(requests,1);assert.equal(session.value.tenant.id,original);stop();
+ stage='pending_guard_blocks_competing_transition';let resolve;const stopPending=contextTransitionGuards.register(()=>new Promise(r=>{resolve=r}));const pending=switchTenant(other);assert.equal(await logout(),'cancelled');assert.equal(await switchTenant(other),false);resolve(false);assert.equal(await pending,false);assert.equal(requests,1);stopPending();
+ stage='approved_switch';try{assert.equal(await switchTenant(other),true);assert.equal(session.value.tenant.id,other);}finally{stage='restore_original';assert.equal(await switchTenant(original),true);assert.equal(session.value.tenant.id,original);}
+ assert.equal(requests,3);forgetSession();assert.equal(session.value,null);assert.equal(requests,3);globalThis.fetch=transport;
+ const evidence={verified_at:new Date().toISOString(),environment:'niko-local-test',passed:true,http_requests:requests,frontend:'actual session store + ApiClient + contextTransitionGuards',controlled_guard_decisions:true,denied_switch_or_logout_sent_no_request:true,pending_guard_blocked_competing_actions:true,approved_tenant_switch_and_restore_verified:true,original_tenant_restored:true,forced_local_forget_did_not_wait_for_guard:true,logout_http_executed:false,browser_dom_tested:false,credentials_output:false};writeFileSync(new URL('docs/evidence/niko-context-guard-http-20261003.json',root),JSON.stringify(evidence,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({passed:true,http_requests:requests,original_tenant_restored:true}));
+}catch{console.error(JSON.stringify({passed:false,stage,details:'redacted'}));process.exitCode=1;}

@@ -1,0 +1,27 @@
+{
+  "verified_at": "2026-10-03T01:59:52.543Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual workingCalendarWriter + ApiClient",
+  "http_requests": 22,
+  "frontend_write_attempts": 6,
+  "frontend_successful_logical_mutations": 3,
+  "independent_concurrent_mutations": 1,
+  "customer_write_denied": true,
+  "final_draft_version": 4,
+  "immutable_history_revisions": 4,
+  "success_audits": 4,
+  "original_body_key_target_and_baseline_preserved": true,
+  "readonly_refresh_never_rebased_or_retried": true,
+  "rejected_409_not_retried": true,
+  "accepted_receipt_retained_when_followup_read_failed": true,
+  "explicit_empty_incomplete_and_null_preserved": true,
+  "offsets_normalized_without_text_changes": true,
+  "credentials_output": false,
+  "browser_dom_tested": false,
+  "fault_injection": "Discard two successful mutation responses and one completed followup GET in transport; not physical network failure",
+  "remaining": [
+    "DOM/390px form validation B03",
+    "Formal customer-approved calendar, production configuration and SLA activation"
+  ]
+}

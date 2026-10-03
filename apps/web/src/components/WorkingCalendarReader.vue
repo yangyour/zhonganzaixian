@@ -5,12 +5,16 @@ import { can, contextGeneration, session, switchingTenant } from '../stores/sess
 import { createWorkingCalendarReader, emptyCalendarReadState, type CalendarReadState } from '../utils/workingCalendarReader'
 import { displayTime } from '../utils/display'
 import ApiErrorNotice from './ApiErrorNotice.vue'
+import WorkingCalendarEditor from './WorkingCalendarEditor.vue'
+import type { CalendarSnapshot } from '../utils/workingCalendarReader'
 const props = defineProps<{ modelValue: boolean }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
 const open = computed({ get: () => props.modelValue, set: value => emit('update:modelValue', value) })
 const permitted = computed(() => Boolean(session.value?.user.role === 'padmin' && can('configurations:read') && !switchingTenant.value))
 const state = shallowRef<CalendarReadState>(emptyCalendarReadState())
 const reader = createWorkingCalendarReader(api, value => { state.value = value })
+const editorOpen = ref(false), editor = ref<InstanceType<typeof WorkingCalendarEditor> | null>(null)
+async function afterSaved(value: CalendarSnapshot) { if (open.value && permitted.value) { await reader.list(); await reader.select(value.id) } }
 const start = ref(''), seconds = ref(''), validation = ref('')
 watch([start, seconds], () => { reader.clearPreview(); validation.value = '' })
 const contextKey = computed(() => JSON.stringify([open.value, contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, permitted.value]))
@@ -31,18 +35,19 @@ onUnmounted(reader.dispose)
 </script>
 
 <template>
+  <WorkingCalendarEditor ref="editor" v-model="editorOpen" @saved="afterSaved" />
   <el-drawer v-model="open" title="工作日历草稿 · 查询与只读试算" size="920px" class="calendar-reader" :close-on-click-modal="false">
     <el-alert type="warning" :closable="false" show-icon title="全部记录仍是未生效草稿。覆盖完整仅为填报声明；客户确认未核验，试算不是正式SLA承诺。" />
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前租户配置读取权限不可用，原范围数据已清除" />
     <template v-else>
-      <div class="calendar-actions"><el-button :loading="state.busy" @click="reader.list()">刷新第一页（只读）</el-button><el-button :disabled="state.busy || !state.page?.has_more" @click="reader.list(true)">下一页</el-button><span>{{ state.paged ? '后续页' : '第一页' }} · 每页15份</span></div>
+      <div class="calendar-actions"><el-button :loading="state.busy" @click="reader.list()">刷新第一页（只读）</el-button><el-button :disabled="state.busy || !state.page?.has_more" @click="reader.list(true)">下一页</el-button><el-button v-if="can('configurations:write')" :disabled="state.busy" @click="editor?.prepare(null)">新建未生效草稿</el-button><span>{{ state.paged ? '后续页' : '第一页' }} · 每页15份</span></div>
       <ApiErrorNotice :error="state.error" />
       <p v-if="!state.page" class="field-help">列表尚未成功读取，不能视为没有日历</p>
       <el-empty v-else-if="!state.page.items.length" description="本页没有工作日历草稿" />
       <div class="calendar-list"><button v-for="item in state.page?.items || []" :key="item.id" class="calendar-item" :disabled="state.busy" :aria-pressed="state.selected?.id === item.id" @click="select(item.id)"><strong>{{ item.draft.name }}</strong><span>v{{ item.version }} · {{ item.draft.working_windows.length }}个原始窗口 · {{ item.draft.coverage_complete ? '填报为完整' : '填报为不完整' }}</span><small>{{ displayTime(item.updated_at) }} · 未生效</small></button></div>
       <section v-if="state.selected" class="calendar-section">
         <div class="calendar-actions"><h3>{{ state.selected.draft.name }} · v{{ state.selected.version }}</h3><el-button :disabled="state.busy" @click="select(state.selected.id)">重新读取所选版本</el-button></div>
-        <p class="calendar-id">{{ state.selected.id }}</p>
+        <p class="calendar-id">{{ state.selected.id }}</p><el-button v-if="can('configurations:write')" :disabled="state.busy" @click="editor?.prepare(state.selected)">以所选v{{ state.selected.version }}明确编辑</el-button>
         <p>时区：Asia/Shanghai · 覆盖：{{ displayTime(state.selected.draft.coverage_start) }} 至 {{ displayTime(state.selected.draft.coverage_end) }}</p>
         <p>覆盖完整性：{{ state.selected.draft.coverage_complete ? '填报人声明完整（未独立核验）' : '不完整，不能生成试算截止' }}</p>
         <p class="calendar-text">说明：{{ state.selected.draft.note ?? '未提供' }}</p>
@@ -58,7 +63,7 @@ onUnmounted(reader.dispose)
         <article v-for="revision in state.history?.items || []" :key="revision.version" class="calendar-revision"><strong>v{{ revision.version }} · {{ displayTime(revision.recorded_at) }}</strong><p>名称：{{ revision.after.name }} · 窗口{{ revision.after.working_windows.length }}个 · {{ revision.after.coverage_complete ? '声明完整' : '不完整' }}</p><details><summary>{{ revision.before ? '查看该版本前后原始草稿' : '查看初版原始草稿' }}</summary><pre>{{ JSON.stringify({ before: revision.before, after: revision.after }, null, 2) }}</pre></details></article>
       </section>
     </template>
-    <template #footer><el-button @click="open = false">关闭查询</el-button><p class="field-help">此面板只查询和试算，不修改日历草稿或客户生效配置</p></template>
+    <template #footer><el-button @click="open = false">关闭查询</el-button><p class="field-help">查询和试算不修改日历草稿；创建/编辑需在独立面板明确保存，客户生效配置仍未启用</p></template>
   </el-drawer>
 </template>
 <style>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ElTableColumn } from 'element-plus'
 import AssetImportTemplateDownload from './AssetImportTemplateDownload.vue'
 import { computed, onUnmounted, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'

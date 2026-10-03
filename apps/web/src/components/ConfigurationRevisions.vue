@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ElTableColumn } from 'element-plus'
 import { computed, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'

@@ -1,0 +1,84 @@
+{
+  "verified_at": "2026-10-03T23:55:41.596105+00:00",
+  "scope": "PRODUCTION_STATIC_IMPORT_GRAPH_NOT_BROWSER_TIMING",
+  "baseline_commit": "14b67943e71e68ea3da13e407744d8b598eeedea",
+  "new_tests": 13,
+  "vue_compiler_local_component_checks": 12,
+  "eager_registration_source_checks": 1,
+  "first_two_checks_failed_before_change": 2,
+  "expanded_red_run": {
+    "reported": 13,
+    "failed": 12,
+    "passed": 1
+  },
+  "typecheck_failures_fixed": [
+    "optional compiler binding metadata",
+    "DefaultRow incompatible with business record",
+    "configuration page contains different row types"
+  ],
+  "web_tests_passed": 853,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts": 70,
+  "generation_check": "PASS",
+  "entry_static_js_bytes": {
+    "before": 501639,
+    "first_table_only_attempt": 501645,
+    "after": 424970
+  },
+  "login_static_js_bytes": {
+    "before": 504275,
+    "after": 427606
+  },
+  "assets_route_static_js_bytes": {
+    "before": 663215,
+    "after": 664142,
+    "increase_bytes": 927
+  },
+  "css_bytes_unchanged": true,
+  "gzip_measurement": "NODE_ZLIB_LEVEL9_PER_FILE_SUM",
+  "maximum_emitted_js_bytes": 424970,
+  "all_manifest_references_exist": true,
+  "chunk_warning_threshold_changed": false,
+  "oversized_chunk_warning_in_final_build": false,
+  "browser_performance_measured": false,
+  "browser_dom_tested": false,
+  "new_http_calls": 0,
+  "api_version": "0.33.0",
+  "api_restarted": false,
+  "v1_v19_changed": false,
+  "contract_done": false,
+  "previous_import_readonly_commit": {
+    "sha": "14b67943e71e68ea3da13e407744d8b598eeedea",
+    "ci_run": 37162432876,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "apps/web/src/components/AppTable.vue": "c357a7872560495283813ca3e54f3eda2ea0caa5bdb5619f49fa282f4ad163d9",
+    "apps/web/src/components/AssetDateQuery.vue": "1884d0c9a78972be8ce9029858da71651a50d0ab9731672352386b2bd6c70e07",
+    "apps/web/src/components/AssetDependencyWorkspace.vue": "9f1ce201f59fd9faadf1bba8da8893e0c8ba410b4dc57c6a3ca0eb6f60f3d94a",
+    "apps/web/src/components/AssetImportWorkspace.vue": "c733c38007a212b6e60295bccc6224b260f1625af7d5fcfaa2bc3c63d3e5b429",
+    "apps/web/src/components/AssetMetadataQuery.vue": "d01af38b2533a8a1d5eae083343f5d4a606bb880b319ae4cbae896b4c79a5432",
+    "apps/web/src/components/ConfigurationDiagnosticPanel.vue": "e9a50a38d6e4c7ac128d215b138d9dd9fd95f22df5449ec93eb3e78769381bbb",
+    "apps/web/src/components/ConfigurationRevisions.vue": "a7eb5ac06d65e3dd60bbb2e84fb3e37f3b4f47a077ae55ef6be040086e2d2ce5",
+    "apps/web/src/components/WorklogWorkspace.vue": "8910cf2708e5a2ca0ba0342d215ba8b1eb256b782348f4318b39cc8b775a7cc8",
+    "apps/web/src/main.ts": "a9f503efb4cc35238ef6bb3bf394c56059cbc8caceab1bd2695a7971ead74161",
+    "apps/web/src/pages/AssetsPage.vue": "516e7c5778e2627dbc6dee364613484c00df2e2fe93bf4a8e8925b0029856fc2",
+    "apps/web/src/pages/AuditPage.vue": "7fee8bf3c433e30839faf15619d9a8266d39e43b5140eb2a03e163da163fbd57",
+    "apps/web/src/pages/ConfigurationsPage.vue": "4cc106232f0f542231026a3465a8c5f00cc9fdfd617f5b8b291dc4ae37270ac7",
+    "apps/web/src/pages/TicketsPage.vue": "5707bbc8f049bcb349ed570b153a6cb1e35dc3d3d297652a11c61eb95fb406c0",
+    "apps/web/tests/tableLoadingBoundary.test.ts": "a75ebfcbfc912668aa65bdc5f3f08efc9e2f7c2fb2db619700f1bdf09fadaed6",
+    "tools/inspect-web-bundle.mjs": "92ef21f88cddf550d28a9c41e2544131fdebbdf88aaf3ec9eb9de51f652c0e6b"
+  },
+  "logs_sha256": {
+    ".local/niko-test/logs/table-lazy-before-build.log": "6539b60b9af36254709f45db5878affc8af53009a4f35ac8372c796ff3324958",
+    ".local/niko-test/logs/table-lazy-red.log": "3cd79aa94f5e8a9991bb0a42f8f2813da4160319b12978b0d312d087612d77de",
+    ".local/niko-test/logs/table-lazy-first-typecheck-failure.log": "8a40e3bb7e7148d24329c3c9490a3ee86f1e1c10ccbbf72e9a00b4fc1df89c71",
+    ".local/niko-test/logs/table-column-lazy-red.log": "bb88054d50dbc06bb98efbee5a5da285f94240240f7b8a3ff7f70f8449bda233",
+    ".local/niko-test/logs/table-column-first-typecheck-failure.log": "7e6cdd3f17be3c12ef8e9acb21b054d0ab7bbf43aa6dcff73efe5644d64a0829",
+    ".local/niko-test/logs/table-column-single-row-typecheck-failure.log": "4d8342e1fe4b33657bc1f503243259c8eb45a1365354cc085ce972ff3e192301",
+    ".local/niko-test/logs/table-column-lazy-web.log": "3f7ff74341f8ca86c19b6b7de842927c04704ef46f1721d39af7573c9fab67bc",
+    ".local/niko-test/logs/table-column-lazy-build.log": "6893f0a0b33175ba0cc33102f6d62664e61881d44108fba0068a61538400330f",
+    ".local/niko-test/logs/table-column-lazy-contract.log": "2cf8bf637748d6e4d8c9d7e52b1f62db6a7e2eddca6f3cd262f1f0e0a0b2945c"
+  }
+}

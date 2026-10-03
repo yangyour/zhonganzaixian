@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ElTableColumn as ElementTableColumn } from 'element-plus'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
@@ -18,6 +19,7 @@ import AssetMetadataQuery from '../components/AssetMetadataQuery.vue'
 import AssetDateAssessmentPanel from '../components/AssetDateAssessmentPanel.vue'
 import AssetDateQuery from '../components/AssetDateQuery.vue'
 import { assetLedgerColumns, assetLedgerCell } from '../utils/assetLedgerColumns'
+const ElTableColumn = ElementTableColumn<Asset>
 const route = useRoute()
 const router = useRouter()
 const pageSizes = [10, 15, 25, 50, 100]

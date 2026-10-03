@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ElTableColumn } from 'element-plus'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElTimeline, ElTimelineItem } from 'element-plus'

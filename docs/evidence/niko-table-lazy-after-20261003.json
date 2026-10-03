@@ -1,0 +1,133 @@
+{
+  "measured_at": "2026-10-03T23:50:55.316Z",
+  "node_version": "v22.22.1",
+  "scope": "LOCAL_STATIC_IMPORT_GRAPH_NOT_NETWORK_TIMING",
+  "entry": {
+    "javascript": {
+      "bytes": 424970,
+      "gzip_level9_bytes": 150828
+    },
+    "css": {
+      "bytes": 375223,
+      "gzip_level9_bytes": 51106
+    },
+    "files": [
+      {
+        "file": "assets/index-CldimvuA.css",
+        "kind": "css",
+        "bytes": 375223,
+        "gzip_level9_bytes": 51106,
+        "sha256": "9eaf28aaef513a50a2f9e1191eabe8e376ef0e0db871b53c9724231b2f46e4bd"
+      },
+      {
+        "file": "assets/index-D9d4aGWn.js",
+        "kind": "javascript",
+        "bytes": 424970,
+        "gzip_level9_bytes": 150828,
+        "sha256": "d382006b470a6e9b059719e3f65301dbd0e877538b5c50450c5f54237aa55ab8"
+      }
+    ]
+  },
+  "login_route": {
+    "javascript": {
+      "bytes": 427606,
+      "gzip_level9_bytes": 152419
+    },
+    "css": {
+      "bytes": 375223,
+      "gzip_level9_bytes": 51106
+    },
+    "files": [
+      {
+        "file": "assets/LoginPage-DNGAfmL6.js",
+        "kind": "javascript",
+        "bytes": 2636,
+        "gzip_level9_bytes": 1591,
+        "sha256": "90838567c55a5bcf13b34597d91c7071c56ca85921e5b1f61d3af971761c0520"
+      },
+      {
+        "file": "assets/index-CldimvuA.css",
+        "kind": "css",
+        "bytes": 375223,
+        "gzip_level9_bytes": 51106,
+        "sha256": "9eaf28aaef513a50a2f9e1191eabe8e376ef0e0db871b53c9724231b2f46e4bd"
+      },
+      {
+        "file": "assets/index-D9d4aGWn.js",
+        "kind": "javascript",
+        "bytes": 424970,
+        "gzip_level9_bytes": 150828,
+        "sha256": "d382006b470a6e9b059719e3f65301dbd0e877538b5c50450c5f54237aa55ab8"
+      }
+    ]
+  },
+  "assets_route": {
+    "javascript": {
+      "bytes": 664142,
+      "gzip_level9_bytes": 227373
+    },
+    "css": {
+      "bytes": 384046,
+      "gzip_level9_bytes": 52817
+    },
+    "files": [
+      {
+        "file": "assets/AppTable.vue_vue_type_script_setup_true_lang-Cv2XEAkW.js",
+        "kind": "javascript",
+        "bytes": 78201,
+        "gzip_level9_bytes": 27325,
+        "sha256": "30aedc696257b0a4f9380458b6269bec4c1a0a577f509134ae54ceaeadf96d95"
+      },
+      {
+        "file": "assets/AssetsPage-C-r7kLX1.css",
+        "kind": "css",
+        "bytes": 8823,
+        "gzip_level9_bytes": 1711,
+        "sha256": "bd296b65c92bd39212d5575ed4cfb569d8cbd9c59e9f2b171531e680be6569d5"
+      },
+      {
+        "file": "assets/AssetsPage-DXEkg6Z2.js",
+        "kind": "javascript",
+        "bytes": 152732,
+        "gzip_level9_bytes": 45461,
+        "sha256": "2b25dd46b315f7d48af5c88f844290f4c47f9e94242745f508b69de3576ea938"
+      },
+      {
+        "file": "assets/PermissionGate.vue_vue_type_script_setup_true_lang-DUfjSfkR.js",
+        "kind": "javascript",
+        "bytes": 284,
+        "gzip_level9_bytes": 221,
+        "sha256": "ca9827d86ed33a925da610ecdfc51b698c1221a308a1f1e8c6ae960f9b243866"
+      },
+      {
+        "file": "assets/index-C63mFMgt.js",
+        "kind": "javascript",
+        "bytes": 7534,
+        "gzip_level9_bytes": 3239,
+        "sha256": "e470e455a833e0f971ad45013c002030cf2559d26c24af0ce662021c5d73fdd6"
+      },
+      {
+        "file": "assets/index-CldimvuA.css",
+        "kind": "css",
+        "bytes": 375223,
+        "gzip_level9_bytes": 51106,
+        "sha256": "9eaf28aaef513a50a2f9e1191eabe8e376ef0e0db871b53c9724231b2f46e4bd"
+      },
+      {
+        "file": "assets/index-D9d4aGWn.js",
+        "kind": "javascript",
+        "bytes": 424970,
+        "gzip_level9_bytes": 150828,
+        "sha256": "d382006b470a6e9b059719e3f65301dbd0e877538b5c50450c5f54237aa55ab8"
+      },
+      {
+        "file": "assets/utcInstant-BwLinfUh.js",
+        "kind": "javascript",
+        "bytes": 421,
+        "gzip_level9_bytes": 299,
+        "sha256": "84b59d9be7271123418305335aab82543514966791ae96f7cb46b31555e6b84a"
+      }
+    ]
+  },
+  "all_manifest_references_exist": true
+}

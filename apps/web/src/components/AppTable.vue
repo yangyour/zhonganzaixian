@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ElTable } from 'element-plus'
 defineProps<{ rows: object[]; loading?: boolean; rowKey?: string; emptyText?: string }>()
 </script>
 <template>

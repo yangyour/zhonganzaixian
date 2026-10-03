@@ -1031,3 +1031,7 @@ V18队列/不可变行结果结构显式1/重复0/check0且26表不变，但13�
 ## 2026-10-03 导入原请求与事实只读ref
 
 上传/解析/映射attempt及来源/解析/政策/File/格式/busy改为公开Vue深只读视图，明确selection/mappingDraft仍编辑；4回归先红后绿，全840Web构建70契约。实际生产Vue模块3GET仅验证政策与本地文件引用，0上传/存储/解析，OSS/新DOM仍未验，见docs/workspace-snapshot-isolation.md。
+
+## 2026-10-03 表格按路由加载
+
+ElTable/AppTable及11个列组件局部绑定，入口静态JS501639→424970 bytes（-15.28%），登录-15.20%，资产路由联合JS+927bytes（+0.14%），CSS不变；最终最大JS424970、原500kB警告自然消失。13编译器/结构新增纳入853Web构建70契约。仅静态产物，非DOM/首屏/FPS证明，见docs/web-table-loading-boundary.md。

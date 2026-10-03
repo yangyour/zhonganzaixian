@@ -3,7 +3,7 @@ import {
   ElAlert, ElBreadcrumb, ElBreadcrumbItem, ElButton, ElCheckbox, ElCheckboxGroup, ElConfigProvider,
   ElDescriptions, ElDescriptionsItem, ElDialog, ElDrawer, ElForm, ElFormItem,
   ElEmpty, ElInput, ElLoading, ElMenu, ElMenuItem, ElOption, ElSelect, ElSkeleton,
-  ElStep, ElSteps, ElTable, ElTableColumn, ElTag,
+  ElStep, ElSteps, ElTag,
 } from 'element-plus'
 import 'element-plus/dist/index.css'
 import './styles.css'
@@ -17,7 +17,7 @@ const app = createApp(App)
 for (const component of [
   ElAlert, ElBreadcrumb, ElBreadcrumbItem, ElButton, ElCheckbox, ElCheckboxGroup, ElConfigProvider,
   ElDescriptions, ElDescriptionsItem, ElDialog, ElDrawer, ElForm, ElFormItem,
-  ElEmpty, ElInput, ElMenu, ElMenuItem, ElOption, ElSelect, ElSkeleton, ElStep, ElSteps, ElTable, ElTableColumn, ElTag,
+  ElEmpty, ElInput, ElMenu, ElMenuItem, ElOption, ElSelect, ElSkeleton, ElStep, ElSteps, ElTag,
 ]) app.use(component)
 app.directive('loading', ElLoading.directive)
 app.use(router).mount('#app')

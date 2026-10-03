@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { ElTableColumn as ElementTableColumn } from 'element-plus'
 import { computed, onBeforeUnmount, reactive, shallowRef, watch } from 'vue'
 import { api } from '../api/client'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createAssetDateQuery, type DateQueryInput, type DateQueryState, type DateQueryItem } from '../utils/assetDateQuery'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 import AppTable from './AppTable.vue'
+const ElTableColumn = ElementTableColumn<DateQueryItem>
 const props = defineProps<{ modelValue: boolean }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean]; select: [assetId: string] }>()
 const open = computed({get:()=>props.modelValue,set:value=>emit('update:modelValue',value)})

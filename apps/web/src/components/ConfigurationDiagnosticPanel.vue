@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ElTableColumn } from 'element-plus'
 import { computed, onUnmounted, shallowRef, watch } from 'vue'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { displayTime } from '../utils/display'

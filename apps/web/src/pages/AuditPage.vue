@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ElTableColumn as ElementTableColumn } from 'element-plus'
 import { computed, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
 import { api } from '../api/client'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
@@ -6,6 +7,7 @@ import { displayTime } from '../utils/display'
 import { createAuditWorkspace, emptyAuditState, type AuditFilters, type AuditRecord, type AuditState } from '../utils/auditWorkspace'
 import AppTable from '../components/AppTable.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+const ElTableColumn = ElementTableColumn<AuditRecord>
 const state = shallowRef<AuditState>(emptyAuditState())
 const workspace = createAuditWorkspace(api, value => { state.value = value })
 const draft = reactive({ actor_id: '', action: '', result: '', resource_type: '', resource_id: '', trace_id: '', occurred_from: '', occurred_before: '' })

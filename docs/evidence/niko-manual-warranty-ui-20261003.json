@@ -1,0 +1,51 @@
+{
+  "verified_at": "2026-10-03T10:14:16.756201+00:00",
+  "environment": "niko-local-test",
+  "status": "UI_SOURCE_MODULE_HTTP_VERIFIED_DOM_BLOCKED",
+  "tests": {
+    "new_web": 20,
+    "web_total": 574,
+    "contracts": 51,
+    "typecheck_and_build": true,
+    "actual_frontend_http": 54,
+    "failures": 0,
+    "errors": 0
+  },
+  "api_unchanged": "0.26.0",
+  "schema_unchanged": "V1-V15_FROZEN",
+  "verified": [
+    "strict supplemental current/history readers reuse existing base validators",
+    "explicit baseline and prefilled asset metadata note; unknown inputs preserve explicit null semantics",
+    "original key payload asset version retained through response loss and readonly discovery",
+    "old receipt never temporarily shown as latest current state",
+    "known version monotonicity survives failed refresh and hidden panel",
+    "hide aborts stale reads but does not cancel in-flight write or discard uncertain attempt",
+    "successful hidden write retains receipt without hidden auto GET",
+    "current permission/context invalidation clears protected state and ignores late responses",
+    "15+1 actual history pagination and readonly audit equality",
+    "parent panel mounted outside destroyed detail drawer; mutual unresolved edit guards wired",
+    "voluntary context/logout/route/unload guards source verified"
+  ],
+  "iteration_corrections": [
+    "New context UUID regex initially omitted one four-digit group; 12 new lifecycle tests failed; corrected then all574 and real module54HTTP passed"
+  ],
+  "browser_dom_executed": false,
+  "mobile_390px_executed": false,
+  "navigation_browser_executed": false,
+  "supplier_verified": false,
+  "warranty_coverage_verified": false,
+  "hazard_or_notification_implemented": false,
+  "credentials_output": false,
+  "all_128_done": false,
+  "concurrent_remote_sync": {
+    "commit": "c7a4e834ec0966d769f113c24ed2f2a5feff3b7c",
+    "remote_parent_preserved": true,
+    "six_private_files_local_bytes_unchanged": true,
+    "six_private_files_ignored_and_untracked": true,
+    "private_contents_output": false,
+    "private_files_republished": false,
+    "windows_migration_commit": "dd3f70855d5e8ce3f1891a4a26c8140485cb8b5a",
+    "windows_migration_and_evidence_preserved": true,
+    "local_powershell_execution": false
+  }
+}

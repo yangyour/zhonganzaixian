@@ -1,0 +1,35 @@
+{
+  "verified_at": "2026-10-03T10:11:44.850Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual manualWarrantyWorkspace and ApiClient",
+  "http_requests": 54,
+  "module_write_attempts": 5,
+  "synthetic_assets": 1,
+  "durable_metadata_revisions": 16,
+  "successful_mutation_audits": 16,
+  "original_body_key_version_retained": true,
+  "readonly_discovery_does_not_resolve_attempt": true,
+  "old_receipt_never_displayed_as_current": true,
+  "hide_preserves_pending_write_and_receipt": true,
+  "hide_cancels_late_reads": true,
+  "forced_permission_change_discards_late_result": true,
+  "explicit_clear_keeps_declaration": true,
+  "stale_editor_actual_status": 409,
+  "history_pages": [
+    15,
+    1
+  ],
+  "accepted_receipt_survives_read_failure": true,
+  "readonly_audit_tail_unchanged": true,
+  "warranty_coverage_verified": false,
+  "supplier_verified": false,
+  "faults": "Controlled discard of one successful PATCH response and one successful GET; delayed actual GET/PATCH responses. Not physical disconnection or process crash.",
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "Browser DOM/390px controls and navigation B03",
+    "Supplier verification and coverage evidence",
+    "Hazard, actual notification delivery and quarterly export"
+  ]
+}

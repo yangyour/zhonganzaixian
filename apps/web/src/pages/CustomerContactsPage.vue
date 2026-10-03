@@ -62,7 +62,7 @@ defineExpose({ prepareCreate, prepareFrom, browse, hasUnresolved: workspace.unre
    <ApiErrorNotice :error="state.error" />
    <el-alert v-if="validation" type="warning" :closable="false" :title="validation" />
    <section class="contact-section">
-    <h2>只读查询</h2><div class="contact-query">
+    <h2>只读查询</h2><p v-if="writable"><router-link to="/contact-import-preview">打开导入格式预览（不保存联系人）</router-link></p><div class="contact-query">
      <el-input v-model="query" aria-label="联系人姓名查询" placeholder="姓名字面查询，最多200字符" :disabled="state.busy === 'write'" @keyup.enter="browse(false)" />
      <el-select v-model="view" aria-label="联系人记录视图" :disabled="state.busy === 'write'"><el-option value="CURRENT" label="未归档（含停用）" /><el-option value="ARCHIVED" label="已归档" /><el-option value="ALL" label="全部记录" /></el-select>
      <el-button :disabled="Boolean(state.busy)" @click="browse(false)">只读刷新第一页</el-button><el-button :disabled="!nextList" @click="browse(true)">下一页</el-button>

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.26.0",
+    "version": "0.27.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -6094,6 +6094,172 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ManualAssetCurrentResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/capacity/estimates": {
+      "post": {
+        "operationId": "estimateExplicitCapacity",
+        "summary": "显式输入容量与Proxy缓冲只读试算，不保存场景或冒充实测",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CapacityEstimateInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-mop-read-only": true,
+        "x-mop-capability": "capacity:estimate",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-max-body-bytes": 16384,
+        "x-mop-reject-duplicate-json-keys": true,
+        "description": "全部query拒绝，CSRF必需，无幂等或业务写入。三个组必须存在且可明确null，非空组须完整字段。8输入+明确模型系数；数量/小数用字符串以免精度丢失，天数非负32位整数。间隔/每值字节/池上限/缓冲倍率>0，trend_ratio/headroom_ratio为0..1。Proxy倍率直接相乘，<1明确警告，不自动加1。最终DECIMAL128一次舍入，各输出为十进制字符串。模型/每值空间和池上限未核验，不生成已保存场景、实测容量或压测通过结论。",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CapacityEstimateResult"
                 }
               }
             }
@@ -20129,6 +20295,559 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/InternalTicketNotePage"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "CapacityEstimateInput": {
+        "type": "object",
+        "properties": {
+          "inputs": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "hosts": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})$",
+                    "maxLength": 40,
+                    "description": "显式非负整数字符串，避免JS安全整数之外精度丢失；null未知，不自动补值"
+                  },
+                  "items_per_host": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})$",
+                    "maxLength": 40,
+                    "description": "显式非负整数字符串，避免JS安全整数之外精度丢失；null未知，不自动补值"
+                  },
+                  "interval_seconds": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})(\\.[0-9]{1,40})?$",
+                    "maxLength": 81,
+                    "description": "非负十进制字符串，最多40位整数/40位小数；无指数、符号、前导零或空白。具体比例和分母另按字段校验。"
+                  },
+                  "history_days": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "bytes_per_value": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})(\\.[0-9]{1,40})?$",
+                    "maxLength": 81,
+                    "description": "非负十进制字符串，最多40位整数/40位小数；无指数、符号、前导零或空白。具体比例和分母另按字段校验。"
+                  },
+                  "trend_ratio": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})(\\.[0-9]{1,40})?$",
+                    "maxLength": 81,
+                    "description": "非负十进制字符串，最多40位整数/40位小数；无指数、符号、前导零或空白。具体比例和分母另按字段校验。"
+                  },
+                  "trend_days": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "headroom_ratio": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})(\\.[0-9]{1,40})?$",
+                    "maxLength": 81,
+                    "description": "非负十进制字符串，最多40位整数/40位小数；无指数、符号、前导零或空白。具体比例和分母另按字段校验。"
+                  }
+                },
+                "required": [
+                  "hosts",
+                  "items_per_host",
+                  "interval_seconds",
+                  "history_days",
+                  "bytes_per_value",
+                  "trend_ratio",
+                  "trend_days",
+                  "headroom_ratio"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "bytes_per_trend_row": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})(\\.[0-9]{1,40})?$",
+                    "maxLength": 81,
+                    "description": "非负十进制字符串，最多40位整数/40位小数；无指数、符号、前导零或空白。具体比例和分母另按字段校验。"
+                  },
+                  "pool_nvps_limit": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})(\\.[0-9]{1,40})?$",
+                    "maxLength": 81,
+                    "description": "非负十进制字符串，最多40位整数/40位小数；无指数、符号、前导零或空白。具体比例和分母另按字段校验。"
+                  }
+                },
+                "required": [
+                  "version",
+                  "bytes_per_trend_row",
+                  "pool_nvps_limit"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "proxy_buffer": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "site_nvps": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})(\\.[0-9]{1,40})?$",
+                    "maxLength": 81,
+                    "description": "非负十进制字符串，最多40位整数/40位小数；无指数、符号、前导零或空白。具体比例和分母另按字段校验。"
+                  },
+                  "outage_seconds": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})(\\.[0-9]{1,40})?$",
+                    "maxLength": 81,
+                    "description": "非负十进制字符串，最多40位整数/40位小数；无指数、符号、前导零或空白。具体比例和分母另按字段校验。"
+                  },
+                  "bytes_per_value": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})(\\.[0-9]{1,40})?$",
+                    "maxLength": 81,
+                    "description": "非负十进制字符串，最多40位整数/40位小数；无指数、符号、前导零或空白。具体比例和分母另按字段校验。"
+                  },
+                  "margin_factor": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})(\\.[0-9]{1,40})?$",
+                    "maxLength": 81,
+                    "description": "非负十进制字符串，最多40位整数/40位小数；无指数、符号、前导零或空白。具体比例和分母另按字段校验。"
+                  }
+                },
+                "required": [
+                  "site_nvps",
+                  "outage_seconds",
+                  "bytes_per_value",
+                  "margin_factor"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "inputs",
+          "model",
+          "proxy_buffer"
+        ],
+        "additionalProperties": false
+      },
+      "CapacityEstimateOutputs": {
+        "type": "object",
+        "properties": {
+          "nvps": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "maxLength": 256
+          },
+          "daily_bytes": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "maxLength": 256
+          },
+          "history_bytes": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "maxLength": 256
+          },
+          "trend_bytes": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "maxLength": 256
+          },
+          "single_node_bytes": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "maxLength": 256
+          },
+          "two_node_bytes": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "maxLength": 256
+          },
+          "peak_nvps": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "maxLength": 256
+          },
+          "total_items": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "maxLength": 256
+          },
+          "pools": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)$",
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "nvps",
+          "daily_bytes",
+          "history_bytes",
+          "trend_bytes",
+          "single_node_bytes",
+          "two_node_bytes",
+          "peak_nvps",
+          "total_items",
+          "pools"
+        ],
+        "additionalProperties": false
+      },
+      "ProxyBufferEstimate": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "enum": [
+              "ESTIMATED",
+              "UNRESOLVED"
+            ]
+          },
+          "formula_version": {
+            "const": "contract-m4-15-buffer-v1"
+          },
+          "missing_inputs": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 4,
+            "items": {
+              "enum": [
+                "proxy_buffer",
+                "site_nvps",
+                "outage_seconds",
+                "bytes_per_value",
+                "margin_factor"
+              ]
+            }
+          },
+          "estimated_bytes": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                "maxLength": 256
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "margin_factor_below_one": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "measurement_verified": {
+            "const": false
+          },
+          "failover_verified": {
+            "const": false
+          }
+        },
+        "required": [
+          "status",
+          "formula_version",
+          "missing_inputs",
+          "estimated_bytes",
+          "margin_factor_below_one",
+          "measurement_verified",
+          "failover_verified"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "status": {
+                "const": "ESTIMATED"
+              },
+              "missing_inputs": {
+                "maxItems": 0
+              },
+              "estimated_bytes": {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                "maxLength": 256
+              },
+              "margin_factor_below_one": {
+                "type": "boolean"
+              }
+            }
+          },
+          {
+            "properties": {
+              "status": {
+                "const": "UNRESOLVED"
+              },
+              "missing_inputs": {
+                "minItems": 1
+              },
+              "estimated_bytes": {
+                "type": "null"
+              }
+            }
+          }
+        ]
+      },
+      "CapacityEstimate": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scope": {
+            "const": "EXPLICIT_CAPACITY_ESTIMATE"
+          },
+          "source": {
+            "const": "EXPLICIT_INPUT_NOT_MEASURED_DATA"
+          },
+          "formula_version": {
+            "const": "contract-m10-7-capacity-v1"
+          },
+          "input": {
+            "$ref": "#/components/schemas/CapacityEstimateInput"
+          },
+          "status": {
+            "enum": [
+              "ESTIMATED",
+              "UNRESOLVED"
+            ]
+          },
+          "model_version": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "missing_inputs": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 11,
+            "items": {
+              "enum": [
+                "inputs",
+                "model",
+                "hosts",
+                "items_per_host",
+                "interval_seconds",
+                "history_days",
+                "bytes_per_value",
+                "trend_ratio",
+                "trend_days",
+                "headroom_ratio",
+                "model.version",
+                "model.bytes_per_trend_row",
+                "model.pool_nvps_limit"
+              ]
+            }
+          },
+          "outputs": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CapacityEstimateOutputs"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "decimal_precision": {
+            "const": "DECIMAL128"
+          },
+          "decimal_encoding": {
+            "const": "BASE10_STRINGS"
+          },
+          "estimate_only": {
+            "const": true
+          },
+          "scenario_saved": {
+            "const": false
+          },
+          "model_approval_status": {
+            "const": "UNVERIFIED"
+          },
+          "measurement_verification": {
+            "const": "UNVERIFIED"
+          },
+          "approved_pool_nvps_limit": {
+            "type": "null"
+          },
+          "measured_capacity": {
+            "type": "null"
+          },
+          "production_capacity_verified": {
+            "const": false
+          },
+          "poc_status": {
+            "const": "NOT_RUN"
+          },
+          "proxy_buffer": {
+            "$ref": "#/components/schemas/ProxyBufferEstimate"
+          },
+          "units": {
+            "type": "object",
+            "properties": {
+              "nvps": {
+                "const": "values_per_second"
+              },
+              "storage": {
+                "const": "bytes"
+              },
+              "counts": {
+                "const": "integers"
+              }
+            },
+            "required": [
+              "nvps",
+              "storage",
+              "counts"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "tenant_id",
+          "scope",
+          "source",
+          "formula_version",
+          "input",
+          "status",
+          "model_version",
+          "missing_inputs",
+          "outputs",
+          "decimal_precision",
+          "decimal_encoding",
+          "estimate_only",
+          "scenario_saved",
+          "model_approval_status",
+          "measurement_verification",
+          "approved_pool_nvps_limit",
+          "measured_capacity",
+          "production_capacity_verified",
+          "poc_status",
+          "proxy_buffer",
+          "units"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "status": {
+                "const": "ESTIMATED"
+              },
+              "missing_inputs": {
+                "maxItems": 0
+              },
+              "outputs": {
+                "$ref": "#/components/schemas/CapacityEstimateOutputs"
+              },
+              "model_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              }
+            }
+          },
+          {
+            "properties": {
+              "status": {
+                "const": "UNRESOLVED"
+              },
+              "missing_inputs": {
+                "minItems": 1
+              },
+              "outputs": {
+                "type": "null"
+              }
+            }
+          }
+        ]
+      },
+      "CapacityEstimateResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CapacityEstimate"
           },
           "trace_id": {
             "type": "string"

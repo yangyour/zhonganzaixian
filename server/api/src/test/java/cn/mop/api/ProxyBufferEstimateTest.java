@@ -1,0 +1,19 @@
+package cn.mop.api;
+import cn.mop.domain.capacity.ProxyBufferEstimate;
+import cn.mop.domain.capacity.ProxyBufferEstimate.*;
+import org.junit.jupiter.api.Test;
+import java.math.*;
+import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
+/** Synthetic arithmetic only; no measured Proxy, network outage or automatic configuration. */
+class ProxyBufferEstimateTest {
+    private static BigDecimal d(String value){return new BigDecimal(value);}
+    @Test void explicitFourFactorProductMatchesIndependentHandCalculation(){var r=ProxyBufferEstimate.calculate(new Inputs(d("125"),d("3600"),d("80"),d("1.4")));assertEquals(Status.ESTIMATED,r.status());assertEquals(0,d("50400000").compareTo(r.estimatedBytes()));assertEquals(List.of(),r.missingInputs());assertEquals("contract-m4-15-buffer-v1",r.formulaVersion());assertTrue(r.estimateOnly());assertFalse(r.measurementVerified());assertFalse(r.failoverVerified());}
+    @Test void unknownInputsDoNotReceivePrototypeDefaults(){var r=ProxyBufferEstimate.calculate(new Inputs(null,null,null,null));assertEquals(Status.UNRESOLVED,r.status());assertNull(r.estimatedBytes());assertEquals(List.of("site_nvps","outage_seconds","bytes_per_value","margin_factor"),r.missingInputs());assertEquals(List.of("proxy_buffer"),ProxyBufferEstimate.calculate(null).missingInputs());assertThrows(UnsupportedOperationException.class,()->r.missingInputs().clear());}
+    @Test void zeroTrafficOrDurationDoesNotHideMissingByteSize(){assertNull(ProxyBufferEstimate.calculate(new Inputs(BigDecimal.ZERO,BigDecimal.ZERO,null,d("1.4"))).estimatedBytes());for(var input:List.of(new Inputs(BigDecimal.ZERO,d("3600"),d("80"),d("1.4")),new Inputs(d("125"),BigDecimal.ZERO,d("80"),d("1.4"))))assertEquals(0,ProxyBufferEstimate.calculate(input).estimatedBytes().signum());}
+    @Test void nonnegativeTrafficAndDurationAndPositiveBytesAndFactorAreRequired(){for(var input:List.of(new Inputs(d("-1"),d("1"),d("1"),d("1")),new Inputs(d("1"),d("-1"),d("1"),d("1")),new Inputs(d("1"),d("1"),d("0"),d("1")),new Inputs(d("1"),d("1"),d("-1"),d("1")),new Inputs(d("1"),d("1"),d("1"),d("0")),new Inputs(d("1"),d("1"),d("1"),d("-1"))))assertThrows(IllegalArgumentException.class,()->ProxyBufferEstimate.calculate(input));}
+    @Test void factorIsExplicitMultiplierNotImplicitOnePlusRatio(){assertEquals(0,d("100").compareTo(ProxyBufferEstimate.calculate(new Inputs(d("10"),d("10"),d("1"),d("1"))).estimatedBytes()));assertEquals(0,d("40").compareTo(ProxyBufferEstimate.calculate(new Inputs(d("10"),d("10"),d("1"),d("0.4"))).estimatedBytes()));}
+    @Test void fractionalDecimalArithmeticRoundsOnlyFinalProduct(){BigDecimal a=d("1.23456789012345678901234567890123456789"),b=d("0.12345678901234567890123456789"),c=d("80.125"),m=d("1.4");var expected=a.multiply(b).multiply(c).multiply(m).round(MathContext.DECIMAL128);var r=ProxyBufferEstimate.calculate(new Inputs(a,b,c,m));assertEquals(expected,r.estimatedBytes());assertEquals("DECIMAL128",r.decimalPrecision());}
+    @Test void valuesAboveFixedIntegerRangeDoNotOverflowOrPretendGiB(){var r=ProxyBufferEstimate.calculate(new Inputs(d("1000000000000000000000000000000"),d("86400"),d("128"),d("1.25")));assertEquals(0,d("13824000000000000000000000000000000000").compareTo(r.estimatedBytes()));assertTrue(r.estimatedBytes().compareTo(BigDecimal.valueOf(Long.MAX_VALUE))>0);}
+    @Test void resultCannotMixUnresolvedAndEstimatedEvidence(){assertThrows(IllegalArgumentException.class,()->new Result(Status.ESTIMATED,null,List.of()));assertThrows(IllegalArgumentException.class,()->new Result(Status.ESTIMATED,d("1"),List.of("missing")));assertThrows(IllegalArgumentException.class,()->new Result(Status.UNRESOLVED,d("1"),List.of("missing")));assertThrows(IllegalArgumentException.class,()->new Result(Status.UNRESOLVED,null,List.of()));assertThrows(IllegalArgumentException.class,()->new Result(Status.ESTIMATED,d("-1"),List.of()));}
+}

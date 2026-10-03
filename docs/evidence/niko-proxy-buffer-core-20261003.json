@@ -1,0 +1,38 @@
+{
+  "verified_at": "2026-10-03T10:30:37.093386+00:00",
+  "status": "PURE_PROXY_BUFFER_ARITHMETIC_ONLY",
+  "environment": "niko-local-test",
+  "tests": {
+    "new_pure": 8,
+    "root_reported": 970,
+    "root_executed": 957,
+    "existing_real_pg": 295,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 51,
+    "failures": 0,
+    "errors": 0
+  },
+  "formula_version": "contract-m4-15-buffer-v1",
+  "formula": "site_nvps * outage_seconds * bytes_per_value * margin_factor",
+  "rounding": "single final DECIMAL128 rounding",
+  "unit": "bytes",
+  "inputs_defaulted": false,
+  "missing_output": null,
+  "measurement_verified": false,
+  "actual_proxy_connected": false,
+  "outage_tested": false,
+  "failover_verified": false,
+  "poc_12500_nvps_24h_executed": false,
+  "api_added": false,
+  "ui_added": false,
+  "schema_changed": false,
+  "credentials_output": false,
+  "all_128_done": false,
+  "iteration_corrections": [
+    "Java var compound declaration in a new test failed compilation; changed to BigDecimal and reran complete root successfully"
+  ],
+  "synchronized_remote_parent": "e6eb1151b55d7b0865870f6a518cc9fffcdcd472",
+  "designated_server_timezone_test_fix_preserved": true,
+  "full_root_and_contracts_rerun_after_sync": true
+}

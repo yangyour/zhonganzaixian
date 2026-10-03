@@ -97,7 +97,7 @@ test('所有业务写接口明确要求幂等及CSRF，remote_test不存在fixtu
   for (const [path, methods] of Object.entries(contract.paths)) {
     for (const [method, operation] of Object.entries(methods)) {
       if (!['post', 'put', 'patch', 'delete'].includes(method)) continue;
-      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios'].includes(path);
+      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates'].includes(path);
       if (readonlyPreview) assert.equal(operation['x-mop-read-only'], true);
       for (const name of readonlyPreview ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
         assert.ok(operation.parameters.some((p) => p.in === 'header' && p.name === name && p.required), `${method} ${path} ${name}`);
@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.26.0');
+  assert.equal(contract.info.version, '0.27.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -592,4 +592,17 @@ test('补充资料未登记与显式null不同，供应商和覆盖不能冒充�
   assert.equal(validates('ManualWarrantyDetails', { warranty_start: null, warranty_supplier: null }), true); assert.equal(validates('ManualWarrantyDetails', null), false); assert.equal(validates('ManualWarrantyDetails', { warranty_start: null }), false);
   const current = contract.components.schemas.ManualWarrantyCurrent; assert.equal(current.properties.warranty_coverage_verified.const, false); assert.equal(current.properties.warranty_supplier_verification.const, 'UNVERIFIED'); assert.equal(current.properties.warranty_details.oneOf[1].type, 'null');
   const snapshot = contract.components.schemas.ManualWarrantySnapshot; assert.equal(snapshot.allOf[1].then.properties.warranty_details.type, 'null'); assert.equal(contract.components.schemas.ManualWarrantyRevision.properties.before.$ref, '#/components/schemas/ManualWarrantySnapshot');
+});
+
+test('容量输入用十进制字符串保精度，未知必须明确null且不补原型参数', () => {
+  const unknown = { inputs: null, model: null, proxy_buffer: null }; assert.equal(validates('CapacityEstimateInput', unknown), true);
+  const v = { inputs: { hosts: '9007199254740993', items_per_host: '100', interval_seconds: '10', history_days: 2, bytes_per_value: '80', trend_ratio: '0.5', trend_days: 3, headroom_ratio: '0.25' }, model: { version: 'SYNTHETIC-ONLY', bytes_per_trend_row: '128', pool_nvps_limit: '60' }, proxy_buffer: null }; assert.equal(validates('CapacityEstimateInput', v), true);
+  for (const value of [1, '1e3', '01', '-1', '1'.repeat(41)]) assert.equal(validates('CapacityEstimateInput', { ...v, inputs: { ...v.inputs, hosts: value } }), false);
+  const missing = structuredClone(v); delete missing.model.pool_nvps_limit; assert.equal(validates('CapacityEstimateInput', missing), false); assert.equal(validates('CapacityEstimateInput', { ...v, tenant_id: id('2') }), false);
+  const route = contract.paths['/capacity/estimates'].post; assert.equal(route['x-mop-read-only'], true); assert.deepEqual(route['x-mop-roles'], ['padmin']); assert.deepEqual(route.parameters.map(p => p.name), ['X-CSRF-Token']);
+});
+test('容量与缓冲结果不能声称已保存场景、已测容量、批准池限或压测通过', () => {
+  const buffer = { status: 'UNRESOLVED', formula_version: 'contract-m4-15-buffer-v1', missing_inputs: ['proxy_buffer'], estimated_bytes: null, margin_factor_below_one: null, measurement_verified: false, failover_verified: false }; assert.equal(validates('ProxyBufferEstimate', buffer), true); for (const patch of [{ estimated_bytes: '0' }, { measurement_verified: true }, { failover_verified: true }, { missing_inputs: [] }]) assert.equal(validates('ProxyBufferEstimate', { ...buffer, ...patch }), false);
+  const v = { tenant_id: id('1'), scope: 'EXPLICIT_CAPACITY_ESTIMATE', source: 'EXPLICIT_INPUT_NOT_MEASURED_DATA', formula_version: 'contract-m10-7-capacity-v1', input: { inputs: null, model: null, proxy_buffer: null }, status: 'UNRESOLVED', model_version: null, missing_inputs: ['inputs', 'model'], outputs: null, decimal_precision: 'DECIMAL128', decimal_encoding: 'BASE10_STRINGS', estimate_only: true, scenario_saved: false, model_approval_status: 'UNVERIFIED', measurement_verification: 'UNVERIFIED', approved_pool_nvps_limit: null, measured_capacity: null, production_capacity_verified: false, poc_status: 'NOT_RUN', proxy_buffer: buffer, units: { nvps: 'values_per_second', storage: 'bytes', counts: 'integers' } }; assert.equal(validates('CapacityEstimate', v), true);
+  for (const patch of [{ scenario_saved: true }, { measured_capacity: '12500' }, { poc_status: 'PASSED' }, { estimate_only: false }, { model_approval_status: 'APPROVED' }, { approved_pool_nvps_limit: '5000' }, { missing_inputs: [] }]) assert.equal(validates('CapacityEstimate', { ...v, ...patch }), false);
 });

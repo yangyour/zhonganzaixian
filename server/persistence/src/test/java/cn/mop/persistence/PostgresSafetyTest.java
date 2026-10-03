@@ -54,5 +54,7 @@ class PostgresSafetyTest {
         assertEquals(java.util.List.of("ASSET_METADATA_SCHEMA_OR_ACCESS_UNAVAILABLE"),metadata.readinessProblems());
         assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->metadata.current(metadataAccess,id)).status);
         assertThrows(IllegalStateException.class,()->metadata.update(metadataAccess,id,1,null));
+        assertThrows(IllegalStateException.class,()->metadata.updateWarranty(metadataAccess,id,1,null));
+        assertThrows(IllegalStateException.class,()->metadata.authorizeCurrentAsset(metadataAccess,id));
     }
 }

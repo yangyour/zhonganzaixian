@@ -13,7 +13,7 @@ import java.util.*;
 public final class PostgresManualAssetMetadataRepository implements ManualAssetMetadataRepository {
     private static final System.Logger LOG=System.getLogger(PostgresManualAssetMetadataRepository.class.getName());
     private final DataSource source;private final PostgresPlatformRepository platform;private final ObjectMapper mapper;
-    private static final String COLUMNS="tenant_id,asset_id,asset_version,previous_metadata_version,actor_id,recorded_at,name,type,management_ip,site_id,brand,model,serial_number,location,owner_id,business_description,purchase_date,warranty_expiry,overdue_service_date,collection_method_note,note,before_snapshot,verification_status,monitoring_applied,cmdb_applied";
+    private static final String COLUMNS="tenant_id,asset_id,asset_version,previous_metadata_version,actor_id,recorded_at,name,type,management_ip,site_id,brand,model,serial_number,location,owner_id,business_description,purchase_date,warranty_expiry,overdue_service_date,collection_method_note,note,before_snapshot,verification_status,monitoring_applied,cmdb_applied,warranty_start,warranty_supplier,warranty_details_declared";
     public PostgresManualAssetMetadataRepository(DataSource source,PostgresPlatformRepository platform,ObjectMapper mapper){this.source=Objects.requireNonNull(source);this.platform=Objects.requireNonNull(platform);this.mapper=Objects.requireNonNull(mapper);}
     @FunctionalInterface private interface Read<T>{T run(Connection c,Asset asset)throws SQLException;}
     private <T>T read(Access access,String id,Read<T> action){
@@ -59,18 +59,27 @@ public final class PostgresManualAssetMetadataRepository implements ManualAssetM
             return List.copyOf(values);
         });
     }
-    @Override public Current update(Access access,String id,long expected,ManualAssetMetadata metadata){
-        Connection c=platform.idempotentCommandConnection();if(expected<1||expected==Long.MAX_VALUE||metadata==null)throw invalid();
+    @Override public void authorizeCurrentAsset(Access access,String id){
+        Connection c=platform.idempotentCommandConnection();try{authorize(c,access,true);asset(c,access,uuid(id),true);}catch(SQLException failure){throw sqlFailure(failure);}
+    }
+    @Override public Current update(Access access,String id,long expected,ManualAssetMetadata metadata){return updateInternal(access,id,expected,metadata,null);}
+    @Override public Current updateWarranty(Access access,String id,long expected,ManualWarrantyUpdate warranty){return updateInternal(access,id,expected,null,warranty);}
+    private Current updateInternal(Access access,String id,long expected,ManualAssetMetadata metadata,ManualWarrantyUpdate warranty){
+        Connection c=platform.idempotentCommandConnection();if(expected<1||expected==Long.MAX_VALUE||(metadata==null)==(warranty==null))throw invalid();
         try{
-            authorize(c,access,true);Asset asset=asset(c,access,uuid(id),true);references(c,access.tenantId(),metadata);Current before=current(c,access,asset);
+            authorize(c,access,true);Asset asset=asset(c,access,uuid(id),true);Current before=current(c,access,asset);
+            if(warranty!=null)metadata=warranty.applyTo(asset,before.snapshot().metadata());
+            references(c,access.tenantId(),metadata);
+            ManualWarrantyDetails details=ManualWarrantyDetails.forUpdate(before.snapshot().warrantyDetails(),warranty==null?null:warranty.details(),warranty!=null);
+            if(details!=null)details.validateAgainstExpiry(metadata.warrantyExpiry());
             if(!before.editBlockers().isEmpty())throw new DomainException(422,"ASSET_METADATA_NOT_EDITABLE","仅能维护未接入的手工草稿资料；不会覆盖CMDB或监控状态",List.of(Map.of("blockers",before.editBlockers(),"question_ids",List.of("Q19","Q20","Q31"))));
             if(asset.version()!=expected)throw conflict();
             try(var s=statement(c,"UPDATE public.mop_asset SET name=?,type=?,site_id=?,version=version+1,updated_at=statement_timestamp(),updated_by=?::uuid WHERE tenant_id=?::uuid AND id=?::uuid AND version=?")){
                 s.setString(1,metadata.name());s.setString(2,metadata.type());s.setString(3,metadata.siteId());s.setString(4,access.actorId());s.setString(5,access.tenantId());s.setString(6,asset.id());s.setLong(7,expected);if(s.executeUpdate()!=1)throw conflict();
             }catch(SQLException failure){if("23505".equals(failure.getSQLState()))throw new DomainException(409,"ASSET_NAME_CONFLICT","同租户资产名称已存在");if("23503".equals(failure.getSQLState()))throw missing();throw failure;}
-            insert(c,access,asset,expected+1,metadata,before.snapshot());
+            insert(c,access,asset,expected+1,metadata,details,before.snapshot());
             try(var s=statement(c,"INSERT INTO public.mop_asset_manual_details(tenant_id,asset_id,revision_version) VALUES (?::uuid,?::uuid,?) ON CONFLICT(tenant_id,asset_id) DO UPDATE SET revision_version=EXCLUDED.revision_version")){s.setString(1,access.tenantId());s.setString(2,asset.id());s.setLong(3,expected+1);s.executeUpdate();}
-            platform.audit(access.actorId(),access.tenantId(),"asset.manual_metadata.update","asset",asset.id(),"SUCCEEDED","MANUAL_DRAFT_ONLY_IP_UNCHANGED_CMDB_NOT_APPLIED",access.traceId());
+            platform.audit(access.actorId(),access.tenantId(),warranty==null?"asset.manual_metadata.update":"asset.manual_warranty.update","asset",asset.id(),"SUCCEEDED","MANUAL_DRAFT_ONLY_IP_UNCHANGED_CMDB_NOT_APPLIED",access.traceId());
             return current(c,access,asset(c,access,asset.id(),false));
         }catch(SQLException failure){throw sqlFailure(failure);}
     }
@@ -84,7 +93,7 @@ public final class PostgresManualAssetMetadataRepository implements ManualAssetM
         try(var s=statement(c,"SELECT "+COLUMNS+" FROM public.mop_asset_manual_revision WHERE tenant_id=?::uuid AND asset_id=?::uuid AND asset_version=?")){s.setString(1,access.tenantId());s.setString(2,asset.id());s.setLong(3,head);try(var r=s.executeQuery()){if(!r.next())throw corrupt();revision=revision(r,access.tenantId(),asset.id());}}
         ManualAssetMetadata metadata=revision.metadata();
         if(!asset.name().equals(metadata.name())||!asset.type().equals(metadata.type())||!asset.siteId().equals(metadata.siteId())||!asset.managementIp().equals(revision.managementIp()))blockers.add("MANUAL_METADATA_CORE_DRIFT");
-        return new Current(new Snapshot(asset,metadata,head),revision.actorId(),revision.recordedAt(),blockers);
+        return new Current(new Snapshot(asset,metadata,head,revision.warrantyDetails()),revision.actorId(),revision.recordedAt(),blockers);
     }
     private Revision revision(ResultSet r,String tenant,String id)throws SQLException{
         try{
@@ -93,14 +102,18 @@ public final class PostgresManualAssetMetadataRepository implements ManualAssetM
             Snapshot before=mapper.readValue(r.getString("before_snapshot"),Snapshot.class);ManualAssetMetadata metadata=metadata(r);
             if(!before.asset().tenantId().equals(tenant)||!before.asset().id().equals(id)||before.asset().version()!=version-1||!Objects.equals(before.metadataVersion(),previous)||!ManualAssetMetadata.editBlockers(before.asset()).isEmpty()||!before.asset().managementIp().equals(r.getString("management_ip")))throw corrupt();
             if(before.metadata()!=null&&(!before.asset().name().equals(before.metadata().name())||!before.asset().type().equals(before.metadata().type())||!before.asset().siteId().equals(before.metadata().siteId())))throw corrupt();
-            return new Revision(version,previous,r.getString("actor_id"),instant(r,"recorded_at"),before,metadata,r.getString("management_ip"));
+            ManualWarrantyDetails details=r.getBoolean("warranty_details_declared")?new ManualWarrantyDetails(r.getObject("warranty_start",LocalDate.class),r.getString("warranty_supplier")):null;
+            if(details==null&&(r.getObject("warranty_start")!=null||r.getString("warranty_supplier")!=null))throw corrupt();
+            if(details!=null)details.validateAgainstExpiry(metadata.warrantyExpiry());
+            if(before.warrantyDetails()!=null&&details==null)throw corrupt();
+            return new Revision(version,previous,r.getString("actor_id"),instant(r,"recorded_at"),before,metadata,r.getString("management_ip"),details);
         }catch(com.fasterxml.jackson.core.JsonProcessingException|RuntimeException failure){throw corrupt();}
     }
     private static ManualAssetMetadata metadata(ResultSet r)throws SQLException{return new ManualAssetMetadata(r.getString("name"),r.getString("type"),r.getString("site_id"),r.getString("brand"),r.getString("model"),r.getString("serial_number"),r.getString("location"),r.getString("owner_id"),r.getString("business_description"),r.getObject("purchase_date",LocalDate.class),r.getObject("warranty_expiry",LocalDate.class),r.getObject("overdue_service_date",LocalDate.class),r.getString("collection_method_note"),r.getString("note"));}
-    private void insert(Connection c,Access access,Asset asset,long version,ManualAssetMetadata m,Snapshot before)throws SQLException{
-        String encoded;try{encoded=mapper.writeValueAsString(before);}catch(com.fasterxml.jackson.core.JsonProcessingException failure){throw corrupt();}
-        try(var s=statement(c,"INSERT INTO public.mop_asset_manual_revision(tenant_id,asset_id,asset_version,previous_metadata_version,actor_id,name,type,management_ip,site_id,brand,model,serial_number,location,owner_id,business_description,purchase_date,warranty_expiry,overdue_service_date,collection_method_note,note,before_snapshot) VALUES (?::uuid,?::uuid,?,?,?::uuid,?,?,?,?,?,?,?,?,?::uuid,?,?,?,?,?,?,?::jsonb)")){
-            int i=1;s.setString(i++,access.tenantId());s.setString(i++,asset.id());s.setLong(i++,version);if(before.metadataVersion()==null)s.setNull(i++,Types.BIGINT);else s.setLong(i++,before.metadataVersion());s.setString(i++,access.actorId());s.setString(i++,m.name());s.setString(i++,m.type());s.setString(i++,asset.managementIp());s.setString(i++,m.siteId());s.setString(i++,m.brand());s.setString(i++,m.model());s.setString(i++,m.serialNumber());s.setString(i++,m.location());s.setString(i++,m.ownerId());s.setString(i++,m.businessDescription());s.setObject(i++,m.purchaseDate());s.setObject(i++,m.warrantyExpiry());s.setObject(i++,m.overdueServiceDate());s.setString(i++,m.collectionMethodNote());s.setString(i++,m.note());s.setString(i,encoded);s.executeUpdate();
+    private void insert(Connection c,Access access,Asset asset,long version,ManualAssetMetadata m,ManualWarrantyDetails warranty,Snapshot before)throws SQLException{
+        String encoded;try{com.fasterxml.jackson.databind.node.ObjectNode snapshot=mapper.valueToTree(before);if(before.warrantyDetails()==null)snapshot.remove("warranty_details");encoded=mapper.writeValueAsString(snapshot);}catch(com.fasterxml.jackson.core.JsonProcessingException failure){throw corrupt();}
+        try(var s=statement(c,"INSERT INTO public.mop_asset_manual_revision(tenant_id,asset_id,asset_version,previous_metadata_version,actor_id,name,type,management_ip,site_id,brand,model,serial_number,location,owner_id,business_description,purchase_date,warranty_expiry,overdue_service_date,collection_method_note,note,before_snapshot,warranty_start,warranty_supplier,warranty_details_declared) VALUES (?::uuid,?::uuid,?,?,?::uuid,?,?,?,?,?,?,?,?,?::uuid,?,?,?,?,?,?,?::jsonb,?,?,?)")){
+            int i=1;s.setString(i++,access.tenantId());s.setString(i++,asset.id());s.setLong(i++,version);if(before.metadataVersion()==null)s.setNull(i++,Types.BIGINT);else s.setLong(i++,before.metadataVersion());s.setString(i++,access.actorId());s.setString(i++,m.name());s.setString(i++,m.type());s.setString(i++,asset.managementIp());s.setString(i++,m.siteId());s.setString(i++,m.brand());s.setString(i++,m.model());s.setString(i++,m.serialNumber());s.setString(i++,m.location());s.setString(i++,m.ownerId());s.setString(i++,m.businessDescription());s.setObject(i++,m.purchaseDate());s.setObject(i++,m.warrantyExpiry());s.setObject(i++,m.overdueServiceDate());s.setString(i++,m.collectionMethodNote());s.setString(i++,m.note());s.setString(i++,encoded);s.setObject(i++,warranty==null?null:warranty.warrantyStart());s.setString(i++,warranty==null?null:warranty.warrantySupplier());s.setBoolean(i,warranty!=null);s.executeUpdate();
         }
     }
     private static void authorize(Connection c,Access a,boolean lock)throws SQLException{
@@ -133,7 +146,9 @@ public final class PostgresManualAssetMetadataRepository implements ManualAssetM
                 try(var s=statement(c,"SELECT current_database()='mop_test' AND current_user='mop_test_runtime' AND has_table_privilege(current_user,?,'SELECT') AND has_table_privilege(current_user,?,'INSERT') AND NOT has_table_privilege(current_user,?,'UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') AND NOT EXISTS(SELECT 1 FROM pg_class c CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl,acldefault('r',c.relowner))) a WHERE c.oid=?::regclass AND a.grantee=0)")){for(int i=1;i<=4;i++)s.setString(i,"public."+table);try(var r=s.executeQuery()){if(!r.next()||!r.getBoolean(1))return List.of("ASSET_METADATA_SCHEMA_OR_ACCESS_UNAVAILABLE");}}
                 Set<String> updates=table.equals("mop_asset")?Set.of("name","type","site_id","version","updated_at","updated_by"):table.equals("mop_asset_manual_details")?Set.of("revision_version"):Set.of();
                 try(var s=statement(c,"SELECT attname,has_column_privilege(current_user,attrelid,attnum,'UPDATE') FROM pg_attribute WHERE attrelid=?::regclass AND attnum>0 AND NOT attisdropped")){s.setString(1,"public."+table);try(var r=s.executeQuery()){while(r.next())if(r.getBoolean(2)!=updates.contains(r.getString(1)))return List.of("ASSET_METADATA_SCHEMA_OR_ACCESS_UNAVAILABLE");}}
-            }return List.of();
+            }
+            try(var s=statement(c,"SELECT count(*)=1 FROM pg_trigger WHERE tgrelid='public.mop_asset_manual_revision'::regclass AND tgname='mop_asset_warranty_declaration_guard' AND tgenabled='O' AND tgtype=7 AND tgfoid=to_regprocedure('public.mop_warranty_declaration_guard()') AND NOT tgisinternal")){try(var r=s.executeQuery()){if(!r.next()||!r.getBoolean(1))return List.of("ASSET_METADATA_WARRANTY_GUARD_UNAVAILABLE");}}
+            return List.of();
         }catch(SQLException|RuntimeException failure){return List.of("ASSET_METADATA_SCHEMA_OR_ACCESS_UNAVAILABLE");}
     }
 }

@@ -1,0 +1,46 @@
+{
+  "verified_at": "2026-10-03T09:45:35.394799+00:00",
+  "environment": "niko-local-test",
+  "status": "REPOSITORY_VERIFIED_PUBLIC_WARRANTY_API_PENDING",
+  "schema": "V1-V15_FROZEN_UNCHANGED",
+  "tests": {
+    "new_real_pg": 12,
+    "new_pure": 5,
+    "root_reported": 952,
+    "root_executed": 939,
+    "real_pg": 295,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 49,
+    "failures": 0,
+    "errors": 0
+  },
+  "verified": [
+    "first declaration uses actual asset identity and nullable optional facts",
+    "dedicated atomic warranty update preserves unrelated base fields",
+    "legacy base update preserves supplemental start/supplier including explicit clears",
+    "existing expiry cannot contradict preserved start; rejected transaction leaves no revision or success audit",
+    "asset lock/CAS mixed warranty and legacy race yields one success and one409",
+    "fresh tenant/resource/permission check runs before cached receipt",
+    "old original receipt replays after newer declaration without reverting current values",
+    "before snapshots retain old three-field JSON when supplemental wrapper absent",
+    "explicit clear is a declaration and immutable history retains previous values",
+    "downstream failure rolls back asset revision pointer warranty audit and receipt",
+    "readonly current/history/search projection returns actual current supplemental facts",
+    "runtime connection prerequisite precedes input validation; disconnected repository never falls back"
+  ],
+  "iteration_corrections": [
+    "restored transaction-first validation after PostgresSafetyTest exposed changed ordering",
+    "changed test JSON existence query to jsonb_exists because JDBC interprets question-mark operator as parameter; full root rerun succeeded"
+  ],
+  "public_warranty_http_executed": false,
+  "legacy_public_dto_shape_unchanged": true,
+  "api_version_unchanged": "0.25.0",
+  "supplier_verified": false,
+  "coverage_verified": false,
+  "automatic_hazard_or_notification": false,
+  "browser_dom_executed": false,
+  "original_server_changed": false,
+  "credentials_output": false,
+  "all_128_done": false
+}

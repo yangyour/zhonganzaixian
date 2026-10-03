@@ -1,0 +1,14 @@
+{
+  "verified_at": "2026-10-03T12:02:25.753865+00:00",
+  "source_commit": "834f4f1ed919086ad76e3223127007dbc4b73c7f",
+  "workflow_run": 37120360437,
+  "workflow_url": "https://github.com/yangyour/zhonganzaixian/actions/runs/37120360437",
+  "conclusion": "success",
+  "migration_guard_job": 111195115937,
+  "migration_guard_step": "Verify local migration selection and frozen resource guards without database access",
+  "verified_log_line": "PASS 49 isolated migration policy checks; database operations=0.",
+  "powershell_checks": 49,
+  "database_operations": 0,
+  "executed_locally_in_niko": false,
+  "original_designated_server_v16_verified": false
+}

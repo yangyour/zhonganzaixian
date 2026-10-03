@@ -56,5 +56,7 @@ class PostgresSafetyTest {
         assertThrows(IllegalStateException.class,()->metadata.update(metadataAccess,id,1,null));
         assertThrows(IllegalStateException.class,()->metadata.updateWarranty(metadataAccess,id,1,null));
         assertThrows(IllegalStateException.class,()->metadata.authorizeCurrentAsset(metadataAccess,id));
+        var scenarios=new PostgresCapacityScenarioRepository(disconnected,repository,new ObjectMapper());var scenarioAccess=new cn.mop.domain.capacity.CapacityScenarioRepository.Access(id,id,1,"trace");
+        assertEquals(java.util.List.of("CAPACITY_SCENARIO_SCHEMA_OR_ACCESS_UNAVAILABLE"),scenarios.readinessProblems());assertEquals(503,assertThrows(cn.mop.domain.DomainException.class,()->scenarios.get(scenarioAccess,id)).status);assertThrows(IllegalStateException.class,()->scenarios.create(scenarioAccess,0,null));assertThrows(IllegalStateException.class,()->scenarios.authorizeCreate(scenarioAccess));
     }
 }

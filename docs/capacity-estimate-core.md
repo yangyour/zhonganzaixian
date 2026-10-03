@@ -88,3 +88,16 @@ JSONB摘要证明存储值等同，不证明真实文档或压测。结构校验
 Linux显式模式为--apply-capacity-scenarios；Windows包装层新增-ApplyFeature capacity-scenarios并复用16份冻结资源，默认仍只读。PowerShell49项保护用例已接CI，本niko工作区无pwsh，发布时不声称本机已执行。原指定服务器仍只掌握V15证据，本次没有修改或迁移它；应按其已有拥有权/停应用/构建/私有连接流程另行显式运行，API/Worker不能自动补迁移。
 
 API0.27未改；真实场景保存仓储/API/UI、基准文档验真和现场PoC继续，M10-7/128项非DONE。见[结构证据](evidence/niko-capacity-scenario-schema-20261003.json)。
+
+
+## 2026-10-03 容量场景真实仓储
+
+真实V16仓储已实现受保护事务创建、当前租户padmin回读及按名称字面筛选/创建时间+ID倒序分页。创建必须expected_version=0，生成新的不可变v1对象；这是仅创建语义，不冒充集合覆盖CAS。不同明确请求可保存同名独立方案，原请求幂等键相同则只产生1个对象/1条成功审计；重放前仍重新检查当前用户、成员、权限版本，拒绝客户/工程师和跨租户对象404。
+
+calculation以严格十进制字符串编码保留原始有效小数位和大整数；数据库JSONB只对计算结果数值作语义规范化，回读使用精确BigInteger/BigDecimal比较，不经double也不拿Jackson数字节点类型当业务值。每次读按已记录公式版本重新计算并核验快照/两个JSONB摘要；形状合法或摘要匹配不能掩盖错误数学。压测基准仍只是可空未验真引用，不变成已测量/批准/生效。
+
+15新真实PG和5新纯codec/JSON规则、完整根1024（1011执行含322真实PG）/13历史跳过/6MinIO排除、53契约通过。包含独立连接同键竞态仅1写入、错误后草稿/审计/回执全回滚、旧回执保持、2/2/1分页、只读审计尾不变。伪造算术/数值输入类型的负例用真实PG回滚事务中的生产行解码器验证，不声称跑了公开HTTP损坏场景。就绪还检查真实owner、22列、21验证CHECK、有序索引与无更新/删除权限，不回退fixture。
+
+V16后续CI37120360437已通过，日志明确49项PowerShell迁移保护/0数据库操作；本机niko没有执行PowerShell，原指定服务器V16仍未验。见[CI补充](evidence/niko-capacity-scenario-schema-ci-20261003.json)。
+
+场景表现在已有本仓储测试提交的明显合成草稿，先前schema时点0行仅保留当时含义。公开场景API/CSRF/完整DTO与页面尚未接线，API0.27/V1–V16不变；真实基准/PoC、完整M10-7与128项非DONE。见[仓储证据](evidence/niko-capacity-scenario-repository-20261003.json)。

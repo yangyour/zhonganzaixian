@@ -1,0 +1,159 @@
+{
+  "verified_at": "2026-10-03T09:32:57.272400+00:00",
+  "environment": "niko-local-test",
+  "status": "SCHEMA_APPLIED_AND_FROZEN",
+  "migration": "V15__manual_warranty_details.sql",
+  "sha256": "317b865df601888f2d6ea5324415f469acdeaea4c2b49b6c837fef9954a30baf",
+  "guard_body_sha256": "89451fe60c0fc9774967bbb3b018694bc6a5e4d2c623a14bc947924662312e9e",
+  "independent_migration": {
+    "before_check": 0,
+    "apply": 1,
+    "repeat": 0,
+    "after_check": 0,
+    "older_manual_recoveries_mode": 0,
+    "post_tests_check": 0
+  },
+  "schema": {
+    "history_columns": 28,
+    "history_check_constraints": 26,
+    "new_optional_fields": [
+      "warranty_start",
+      "warranty_supplier"
+    ],
+    "new_declaration_flag_default": false,
+    "guard_security": "INVOKER",
+    "guard_search_path": "pg_catalog",
+    "history_updates_deletes_truncates_allowed": false
+  },
+  "legacy_row_preservation": {
+    "verified_at": "2026-10-03T09:29:40.531800+00:00",
+    "before_at": "2026-10-03T09:29:18.661594+00:00",
+    "legacy_rows_equal": true,
+    "tables": {
+      "mop_asset": {
+        "rows": 4131,
+        "equality_sha256": "1ca54430f7272dfd244abac0d9e565625e68bb3ddcba946068ccbef21614da9f"
+      },
+      "mop_ticket": {
+        "rows": 4482,
+        "equality_sha256": "ab7b66364383e759ae1dd955bcaf4589ce4cb7d3cc23e2124c1722e510f58952"
+      },
+      "mop_worklog": {
+        "rows": 1380,
+        "equality_sha256": "beeb6482cee84ee1eefcf47ff4faec1d3b9f49d0dad438c154e46ef1259c396b"
+      },
+      "mop_worklog_revision": {
+        "rows": 1971,
+        "equality_sha256": "2ab08557520c21a14637f0ced8de4015f25aa885a5ccb25958816737afc34a92"
+      },
+      "mop_asset_dependency_graph": {
+        "rows": 1,
+        "equality_sha256": "7eb7a4930ce769e695dacb2547feda6db817878dbce668581111580f9ae7ad29"
+      },
+      "mop_asset_dependency_revision": {
+        "rows": 532,
+        "equality_sha256": "374ae0da233e74137b5aa6491489ce578440497178b4902b2f92697173d642e3"
+      },
+      "mop_asset_dependency_edge": {
+        "rows": 161603,
+        "equality_sha256": "d2116fb9912377901eeb89fe4682eb87afdf7b5435af908a466d4f9f22aa831e"
+      },
+      "mop_configuration_revision": {
+        "rows": 1538,
+        "equality_sha256": "08365df53c00978305ece90e3e55ad684128266de8b76f81bdd1e1acba5cede2"
+      },
+      "mop_configuration_revision_history": {
+        "rows": 1648,
+        "equality_sha256": "60d42f78c060cc11029a4487df9e14e1d26b95a33de282cafef6d64ce3aa6574"
+      },
+      "mop_idempotency": {
+        "rows": 23710,
+        "equality_sha256": "cc01b535b0cd1de37b004b207fa0eebabceb1481880e22622897f8faf60e9baa"
+      },
+      "mop_audit": {
+        "rows": 31055,
+        "equality_sha256": "b8474ef0afd815708b54b8fcd16788ef9e1164b4fa5eb511b2e458fc54479c95"
+      },
+      "mop_asset_manual_details": {
+        "rows": 824,
+        "equality_sha256": "f034242f03710502ef52b877cfa9a4b1b7535b51beb2e6934a3063e49023ce79"
+      },
+      "mop_asset_manual_revision": {
+        "rows": 956,
+        "equality_sha256": "d34df3afe6bbbad3ad0feefbac39cb250d34590e0b28a0a069e00f4b9675ea42"
+      },
+      "mop_ticket_internal_note": {
+        "rows": 820,
+        "equality_sha256": "238dc650e67b2f6fedc037a801f552f4ce9a6b41e64abe6942ccad6a5b99af29"
+      },
+      "mop_ticket_comment": {
+        "rows": 768,
+        "equality_sha256": "273c4e4e06c391f45b834b8900db4fca49d8266c33c22ed29760dc663811c6ae"
+      },
+      "mop_working_calendar_draft": {
+        "rows": 423,
+        "equality_sha256": "0bd79286a5f85eb1df65a7e3bfb2ff36f6007d28f5313e2c52a724425c70a6b5"
+      },
+      "mop_working_calendar_revision": {
+        "rows": 705,
+        "equality_sha256": "ebb5d08ea3a57f004150ea44b07aa665ffdb083067145026f93b7c86d9dc41cf"
+      },
+      "mop_manual_incident_registration": {
+        "rows": 759,
+        "equality_sha256": "22eab3506c50834e8863c5c7d68348da7e89090665a5d24705d83b73887514f3"
+      },
+      "mop_manual_recovery_confirmation": {
+        "rows": 195,
+        "equality_sha256": "b29f38c86e7c5734cf00114373b1cc52754be3e4db77cf520c1a092b9bc9d5f4"
+      },
+      "mop_configuration": {
+        "rows": 985,
+        "equality_sha256": "3f1a71ba21e0f119637d13624bdf0961c492720e9c09a69f3a8c9de5992d2fdf"
+      }
+    },
+    "excluded_columns": {
+      "mop_asset_manual_revision": [
+        "warranty_start",
+        "warranty_supplier",
+        "warranty_details_declared"
+      ]
+    },
+    "purpose": "equality_only_not_authenticity"
+  },
+  "tests": {
+    "new_schema_real_pg": 10,
+    "migration_policy": 17,
+    "python_guards": 60,
+    "root_reported": 935,
+    "root_executed": 922,
+    "real_pg": 283,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 49,
+    "failures": 0,
+    "errors": 0
+  },
+  "readonly_after_tests": {
+    "rows": 991,
+    "declared_rows": 0,
+    "nonnull_supplemental_rows": 0,
+    "verified_at": "2026-10-03T09:32:57.272400+00:00"
+  },
+  "schema_tests_rolled_back": true,
+  "business_repository_implemented": false,
+  "api_added": false,
+  "frontend_warranty_editor_added": false,
+  "frozen_migrations": "V1-V15",
+  "next_schema_correction": "V16+",
+  "api_worker_automatic_migration": false,
+  "api_version_unchanged": "0.25.0",
+  "credentials_output": false,
+  "original_server_changed": false,
+  "full_contract_done": false,
+  "limitations": [
+    "Equality fingerprints cover 20 whitelisted legacy projections, not the whole database or provenance",
+    "Old SQL inserts are blocked after any declaration; new repository omission preservation and HTTP behavior are not yet implemented",
+    "API must serialize writers and enforce current tenant authorization, CSRF, idempotency, CAS and atomic audit",
+    "No supplier verification, coverage decision, P4 hazard, notification delivery or export acceptance"
+  ]
+}

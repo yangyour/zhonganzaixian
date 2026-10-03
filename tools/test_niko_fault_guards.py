@@ -92,4 +92,15 @@ class NikoFaultGuardTest(unittest.TestCase):
             result=subprocess.run([sys.executable,str(ROOT/'tools/niko-test/api-v14-crash-snapshot.py'),'--unknown'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,result.returncode);self.assertFalse((Path(d)/'.local').exists())
     def test_v14_mode_is_explicit_and_reuses_owned_process_guard(self):
         source=(ROOT/'tools/niko-test/run-stack.sh').read_text();self.assertIn("--verify-owned-v14-api-crash",source);self.assertIn("tools/niko-test/api-v14-crash-snapshot.py",source);self.assertIn('owned_child "$API_PID"',source);self.assertIn('--require-listener "$API_PID" "$$" "$API_ARTIFACT"',source);self.assertIn('[[ "$API_EXIT" == 137 ]]',source)
+    def test_warranty_fingerprint_scope_excludes_only_additive_fields_and_is_readonly(self):
+        latest=module('niko_warranty_snapshot',ROOT/'tools/niko-test/warranty-migration-snapshot.py');prior=module('niko_warranty_prior_scope',ROOT/'tools/niko-test/api-v14-crash-snapshot.py')
+        self.assertEqual(prior.TABLES,latest.TABLES);source=(ROOT/'tools/niko-test/warranty-migration-snapshot.py').read_text()
+        self.assertIn("if table=='mop_asset_manual_revision' else 'to_jsonb(t)::text'",source);self.assertIn("ARRAY['warranty_start','warranty_supplier','warranty_details_declared']",source);self.assertIn('REPEATABLE READ READ ONLY',source);self.assertIn('ROLLBACK;',source)
+        self.assertTrue({latest.BEFORE,latest.AFTER}.isdisjoint({prior.BEFORE,prior.AFTER,prior.HTTP,prior.FINAL}))
+    def test_warranty_record_collision_and_unknown_mode_stop_before_configuration_access(self):
+        script=ROOT/'tools/niko-test/warranty-migration-snapshot.py'
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);r=subprocess.run([sys.executable,str(script),'--unknown'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertFalse((root/'.local').exists())
+            local=root/'.local/niko-test';local.mkdir(parents=True);p=local/'warranty-v15-legacy-before.json';p.write_text('existing-evidence')
+            r=subprocess.run([sys.executable,str(script),'--record'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertEqual('existing-evidence',p.read_text());self.assertNotIn('existing-evidence',r.stdout+r.stderr)
 if __name__=='__main__':unittest.main()

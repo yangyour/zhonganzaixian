@@ -1,0 +1,10 @@
+{
+  "status": "APPLIED_AND_FROZEN",
+  "environment": "niko-local-test",
+  "sha256": {
+    "V15__manual_warranty_details.sql": "317b865df601888f2d6ea5324415f469acdeaea4c2b49b6c837fef9954a30baf"
+  },
+  "guard_body_sha256": "89451fe60c0fc9774967bbb3b018694bc6a5e4d2c623a14bc947924662312e9e",
+  "evidence": "docs/evidence/niko-manual-warranty-schema-20261003.json",
+  "verified_at": "2026-10-03T09:29:40.531800+00:00"
+}

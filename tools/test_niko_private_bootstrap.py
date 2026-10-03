@@ -46,4 +46,15 @@ class NikoPrivateBootstrapTest(unittest.TestCase):
  def test_v14_recovery_hash_is_separate_from_frozen_v1_to_v13(self):
   manifest=json.loads((ROOT/'tools/niko-test/frozen-manual-recovery-migration.json').read_text())['sha256'];self.assertEqual(1,len(manifest))
   for name,expected in manifest.items():self.assertEqual(expected,hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest())
+ def test_v15_warranty_hash_and_guard_are_pinned_separately(self):
+  manifest=json.loads((ROOT/'tools/niko-test/frozen-manual-warranty-migration.json').read_text());self.assertEqual(1,len(manifest['sha256']))
+  for name,expected in manifest['sha256'].items():
+   raw=(ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes();self.assertEqual(expected,hashlib.sha256(raw).hexdigest())
+   body=raw.decode().split(' AS $$',1)[1].split('$$;',1)[0];self.assertEqual(manifest['guard_body_sha256'],hashlib.sha256(body.encode()).hexdigest())
+ def test_migration_unknown_or_combined_modes_fail_before_private_or_component_access(self):
+  script=ROOT/'tools/niko-test/run-migration.py'
+  for args in [[],['--apply'],['--check','--apply-manual-warranty'],['--unknown']]:
+   with tempfile.TemporaryDirectory() as d:
+    r=subprocess.run([sys.executable,str(script),*args],cwd=d,capture_output=True,text=True)
+    self.assertNotEqual(0,r.returncode);self.assertIn('Explicit migration mode required',r.stderr);self.assertFalse((Path(d)/'.local').exists())
 if __name__=='__main__':unittest.main()

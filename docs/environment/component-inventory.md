@@ -160,3 +160,12 @@
 
 
 2026-10-03 20:18 niko重建实例：自有隔离PG/KC/API正常关闭再以固定API0.32重启，六真实OIDC会话刷新；公开202/creator回读与专用Worker合计388HTTP通过，19作业119自建联系人已归档。仅复用现有受限PG账号，V1–V19不变；Worker验证后正常停止，ready仅证明结构/访问，worker_liveness=null。五无关队列/身份表指纹未变，原服务器/OSS/通知/浏览器B03仍未补齐。
+
+
+## 2026-10-03 21:40 niko监控组件候选：待单次明确授权
+
+为补齐B05真实监控缺口，已提出仅niko的Zabbix 7.0 LTS Server/Web/Agent及必需依赖候选，并请求批准新建独立测试库、受限数据库用户、测试管理账号和只读API账号。范围为本项目测试实例、回环监听、随机凭据仅私有目录；原服务器和MOP库不改。此时尚未收到本次明确确认，**未安装、未创建身份/令牌/数据库、未启动采集**；此前PG/KC许可不自动扩张到新Zabbix账号。相关步骤保持待许可，其余代码/测试继续。
+
+只读预检：当前自己的执行环境为Debian13.6/x86_64；command -v未发现docker/php/nginx，可见dpkg-deb。未取得可用的cgroup memory.max，因此资源容量未确认，不能把宿主机内存推成测试容量。只有公开官方文档/包索引查询，未下载或运行新组件。官方[生命周期](https://www.zabbix.com/life_cycle_and_release_policy)列7.0 LTS完整支持至2027-06-30、有限支持至2029-06-30；官方[7.0要求](https://www.zabbix.com/documentation/7.0/en/manual/installation/requirements)和[Debian包目录](https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix/)可作后续版本/依赖核验来源。具体补丁包、签名/摘要、资源与真实兼容性尚待核验，不使用不稳定版本或关闭TLS/主机信任。
+
+该候选仅开发测试，不替代客户Q03生产许可/版本决定、Q06阈值矩阵或原服务器环境。未知监控仍未知；不会把当前阈值数学诊断当采集引擎。

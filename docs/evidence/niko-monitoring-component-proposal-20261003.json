@@ -1,0 +1,32 @@
+{
+  "recorded_at": "2026-10-03T21:47:51.015657+00:00",
+  "environment": "niko-local-test",
+  "scope": "READONLY_COMPONENT_CANDIDATE_PREFLIGHT_AND_PENDING_APPROVAL",
+  "candidate": "Zabbix 7.0 LTS Server/Web/Agent with required dependencies",
+  "approval_requested_at": "2026-10-03T21:40:21Z",
+  "approval_state": "PENDING_EXPLICIT_REPLY",
+  "requested_access": "New isolated test database, restricted database user, test management account and read-only API account, loopback only; random credentials private only",
+  "installed": false,
+  "credentials_created": false,
+  "database_created": false,
+  "monitoring_started": false,
+  "original_server_changed": false,
+  "mop_database_changed": false,
+  "observed_platform": {
+    "os": "Debian GNU/Linux 13.6",
+    "architecture": "x86_64",
+    "docker_in_path": false,
+    "php_in_path": false,
+    "nginx_in_path": false,
+    "dpkg_deb_in_path": true,
+    "memory_limit": "NOT_VERIFIED"
+  },
+  "official_sources": [
+    "https://www.zabbix.com/life_cycle_and_release_policy",
+    "https://www.zabbix.com/documentation/7.0/en/manual/installation/requirements",
+    "https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix/"
+  ],
+  "exact_patch_and_download_integrity": "NOT_VERIFIED",
+  "production_approval": "UNVERIFIED",
+  "contract_done": false
+}

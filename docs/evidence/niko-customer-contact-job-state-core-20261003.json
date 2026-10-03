@@ -1,0 +1,40 @@
+{
+  "verified_at": "2026-10-03T18:19:16.955973+00:00",
+  "environment": "niko-local-test",
+  "scope": "PURE_IMPORT_JOB_TRANSITION_MODEL_NOT_DURABLE_QUEUE",
+  "new_pure_tests": 16,
+  "root_tests_reported": 1168,
+  "root_tests_executed": 1155,
+  "existing_actual_postgresql_tests": 359,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "failures": 0,
+  "errors": 0,
+  "contracts": 64,
+  "generation_check": "PASS",
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/contact/ContactImportJobState.java": "0de96a014d67467d7b000db2f21ea76cb440663d8c56aa1b2745a1ff2620a252",
+    "server/api/src/test/java/cn/mop/api/ContactImportJobStateTest.java": "e948d38426bbe8233c25b9714fe862bc2b65297b6ec1610cb4ce333676fe82c0"
+  },
+  "pending_leased_succeeded_failed_shapes_validated": true,
+  "explicit_millisecond_due_and_lease_start_expiry": true,
+  "counter_fence_safe_integer_bounds": true,
+  "expired_or_superseded_lease_cannot_commit": true,
+  "success_requires_whole_batch_count": true,
+  "initial_compile_failure": "test compound var declaration replaced by two declarations",
+  "previous_batch_commit": {
+    "sha": "ffa7cdc14b2518ec6162afb40b28ae7989a9dce1",
+    "ci_run": 37143247462,
+    "conclusion": "success"
+  },
+  "api_version": "0.31.0",
+  "api_changed": false,
+  "v1_v17_changed": false,
+  "durable_queue": "NOT_IMPLEMENTED",
+  "actual_worker_claim_fencing": "NOT_RUN",
+  "worker_restart_recovery": "NOT_RUN",
+  "import_http": "NOT_IMPLEMENTED",
+  "browser_dom": "NOT_RUN",
+  "can_import": false,
+  "contract_done": false
+}

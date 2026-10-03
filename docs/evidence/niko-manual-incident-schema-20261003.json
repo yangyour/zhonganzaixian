@@ -1,0 +1,50 @@
+{
+  "verified_at": "2026-10-03T03:44:54.372756+00:00",
+  "environment": "niko-local-test",
+  "status": "SCHEMA_APPLIED_AND_FROZEN",
+  "migration": "V13__immutable_manual_incident_registrations.sql",
+  "sha256": "80734d0a0dcd436a3008ed76af0b7da3e81956f516a25d778c0717df79665700",
+  "independent_migration": {
+    "before_check": 0,
+    "apply": 1,
+    "repeat": 0,
+    "after_check": 0,
+    "older_working_calendars_mode": 0
+  },
+  "tests": {
+    "new_schema_real_pg": 8,
+    "migration_policy": 15,
+    "python_guards": 51,
+    "root_reported": 736,
+    "root_executed": 723,
+    "real_pg": 220,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 35,
+    "failures": 0,
+    "errors": 0
+  },
+  "readonly_after_tests": {
+    "registration_rows": 0,
+    "q08_null_values": 2
+  },
+  "schema_tests_rolled_back": true,
+  "business_repository_implemented": false,
+  "api_added": false,
+  "frontend_added": false,
+  "manual_recovery_implemented": false,
+  "monitoring_callback_tested": false,
+  "ticket_automatically_created": false,
+  "api_version_unchanged": "0.18.0",
+  "frozen_migrations": "V1-V13",
+  "next_schema_correction": "V14+",
+  "api_worker_automatic_migration": false,
+  "credentials_output": false,
+  "original_server_changed": false,
+  "full_contract_done": false,
+  "limitations": [
+    "Schema tenant foreign keys do not establish current role or observed-asset-version authorization",
+    "No manual-incident repository, HTTP, UI or recovery acceptance yet",
+    "Original server, OSS, browser and business confirmation blockers remain scoped separately"
+  ]
+}

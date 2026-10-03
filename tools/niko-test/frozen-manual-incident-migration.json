@@ -1,0 +1,7 @@
+{
+  "status": "APPLIED_AND_FROZEN",
+  "environment": "niko-local-test",
+  "sha256": {
+    "V13__immutable_manual_incident_registrations.sql": "80734d0a0dcd436a3008ed76af0b7da3e81956f516a25d778c0717df79665700"
+  }
+}

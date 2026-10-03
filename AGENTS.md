@@ -56,4 +56,4 @@ Dot 必须遵守下文与本地完全相同的测试环境、秘密、客户待�
 
 ## 已执行迁移冻结边界（2026-10-02）
 
-在niko独立测试库，V7–V12均已按功能显式独立执行并留证；当前V1–V12全部字节冻结。V12__unpublished_working_calendar_drafts.sql的SHA256为e6e0412e8a96936a6f4e09dc9f96431cd6551dd9c15ebaf7d2ed414467aedb1a。后续结构修正新增V13或更高，不重写已执行SQL。tools/niko-test/frozen-*.json与独立迁移CLI校验源/编译资源及历史；API/Worker启动仍禁止自动迁移。表结构完成不代表工作日历仓储、API、页面或正式生效验收通过，详见docs/working-calendar-drafts.md。
+在niko独立测试库，V7–V13均已按功能显式独立执行并留证；当前V1–V13全部字节冻结。V13__immutable_manual_incident_registrations.sql的SHA256为80734d0a0dcd436a3008ed76af0b7da3e81956f516a25d778c0717df79665700。后续结构修正新增V14或更高，不重写已执行SQL。tools/niko-test/frozen-*.json与独立迁移CLI校验源/编译资源及历史；API/Worker启动仍禁止自动迁移。表结构完成不代表手工来源事件仓储、API、页面、人工恢复或正式建单验收通过，详见docs/manual-incidents.md。

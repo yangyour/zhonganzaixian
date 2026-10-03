@@ -1,0 +1,62 @@
+{
+  "verified_at": "2026-10-03T16:03:32.720859+00:00",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "new_real_pg_repository_tests": 17,
+  "repository_tests_skipped": 0,
+  "root_regression": {
+    "reported": 1105,
+    "executed": 1092,
+    "real_pg": 351,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "log_sha256": "51619a773c03fe9b2bfa4cbb822df2eaa4480a8f475dd82e74975a6fe69e6e95"
+  },
+  "contracts": 57,
+  "generation_check": "PASS",
+  "two_independent_last_decision_commands": {
+    "outcomes": [
+      200,
+      409
+    ],
+    "remaining_enabled_decision_makers": 1,
+    "executed": true
+  },
+  "same_version_concurrent_updates": {
+    "outcomes": [
+      200,
+      409
+    ],
+    "executed": true
+  },
+  "existing_identity_and_membership_rows_unchanged": true,
+  "new_tenants_accounts_or_grants": false,
+  "test_data_policy": "Existing authorized test tenants; durable synthetic baseline contact per tenant; other own synthetic contacts archived, immutable history retained; no permanent delete",
+  "readonly_audit_unchanged": true,
+  "original_create_and_archive_receipts_preserved": true,
+  "authorization_callback_denial": "ISOLATED_CALLBACK_NOT_REAL_REVOCATION",
+  "v1_v17_changed": false,
+  "ddl_executed": false,
+  "api_version": "0.29.0",
+  "contact_public_api": "NOT_IMPLEMENTED",
+  "contact_ui": "NOT_IMPLEMENTED",
+  "contact_import": "NOT_IMPLEMENTED",
+  "notification_dispatched": false,
+  "browser_dom_tested": false,
+  "original_server_repository_tests": "NOT_RUN",
+  "previous_schema_commit": {
+    "sha": "90d23d00b4583c63344c1ee273806425079358ff",
+    "ci_run": 37134157209,
+    "conclusion": "success",
+    "migration_policy_job": 111235128995,
+    "actual_powershell_checks": 52,
+    "database_operations": 0
+  },
+  "initial_test_failures": [
+    "Void test lambda compile error corrected",
+    "LongNode versus IntNode assertion normalization corrected via serialize/read; equivalent JSON receipt was unchanged"
+  ],
+  "contract_done": false
+}

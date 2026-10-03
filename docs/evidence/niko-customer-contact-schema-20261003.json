@@ -1,0 +1,58 @@
+{
+  "verified_at": "2026-10-03T15:39:41.844207+00:00",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "migration": "V17__customer_contact_revisions.sql",
+  "sha256": "3e7d2f89729682f9a51d0ccf4be9738ac25421d94738943d3d5f06461417a10b",
+  "guard_body_sha256": "b3c16bf2730f173a86d001e835cec861758650d7fed379ad8e1a7873ee587ed7",
+  "explicit_apply_migrations": 1,
+  "repeat_apply_migrations": 0,
+  "readonly_check_migrations": 0,
+  "v1_v16_changed": false,
+  "legacy_business_tables_compared": 21,
+  "legacy_all_columns_equal": true,
+  "legacy_equality_is_not_authenticity_proof": true,
+  "new_real_pg_schema_tests": 12,
+  "schema_test_identity_scope": {
+    "migrator_with_new_uncommitted_tenant_and_inactive_membership_rollback": 10,
+    "actual_restricted_runtime_acl_and_trigger": 2
+  },
+  "migration_policy_tests": 19,
+  "python_tests": 82,
+  "contracts": 57,
+  "contract_generation": "PASS",
+  "root_regression": {
+    "reported": 1088,
+    "executed": 1075,
+    "real_pg": 334,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "log_sha256": "4bcea2028e5ce4bb55f009ef51b85762e55aa748fb3834deb0b239e24fa799c8"
+  },
+  "postcheck": {
+    "contact_tables_after_rollback_tests": {
+      "mop_contact_tenant_guard": 0,
+      "mop_customer_contact": 0,
+      "mop_customer_contact_revision": 0
+    },
+    "api_ready": true,
+    "schema_tests_left_persistent_contacts": false
+  },
+  "concurrent_last_decision_removal": "NOT_RUN",
+  "contact_repository": "NOT_IMPLEMENTED",
+  "contact_api": "NOT_IMPLEMENTED",
+  "contact_ui": "NOT_IMPLEMENTED",
+  "notification_delivery": "NOT_RUN",
+  "original_server_v17": "NOT_RUN",
+  "windows_migration_policy": "PENDING_CI",
+  "api_worker_automatic_migration": false,
+  "api_version": "0.29.0",
+  "contact_core_commit": {
+    "sha": "afd078d6f6ca9fbeeac6ef0cc09664eb8161e015",
+    "ci_run": 37132914339,
+    "conclusion": "success"
+  },
+  "contract_done": false
+}

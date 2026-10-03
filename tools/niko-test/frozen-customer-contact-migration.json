@@ -1,0 +1,9 @@
+{
+  "status": "APPLIED_AND_FROZEN",
+  "environment": "niko-local-test",
+  "sha256": {
+    "V17__customer_contact_revisions.sql": "3e7d2f89729682f9a51d0ccf4be9738ac25421d94738943d3d5f06461417a10b"
+  },
+  "verified_at": "2026-10-03T15:35:08.550632+00:00",
+  "evidence": "docs/evidence/niko-customer-contact-schema-20261003.json"
+}

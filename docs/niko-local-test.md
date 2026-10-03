@@ -22,7 +22,7 @@
 1. 经账号/凭据创建批准后，当前PG/Keycloak范围显式运行`python tools/niko-test/prepare-private.py --create-approved-database-identity-credentials`；不会创建存储密钥。旧完整flag仅用于另行明确获准的全组件准备，已有配置拒绝再生成、扩展或轮换
 2. 用该私有目录的pg-init-password显式initdb，`-U mop_niko_admin --auth=scram-sha-256 --encoding=UTF8 --locale=C`；启动受限回环PG后运行`bootstrap-postgres.py`
 3. 启动Keycloak后运行`bootstrap-keycloak.py`，只操作带niko项目归属标记的realm；绑定过的用户消失或ID改变时拒绝同名继承
-4. 从已构建API jar提取BOOT-INF/lib到`.local/niko-test/java-libs`供独立CLI使用；显式`run-migration.py --initialize-new-niko-database`只接受空的新niko库，应用冻结V1–V4；再分别`--apply-photos`、`--apply-asset-imports`、`--apply-asset-dependencies`、`--apply-worklogs`、`--apply-asset-metadata`、`--apply-internal-notes`、`--apply-ticket-comments`、`--apply-working-calendars`、`--apply-manual-incidents`、`--apply-manual-recoveries`、`--apply-manual-warranty`、`--apply-capacity-scenarios`，最后`--check`。manifest核对全部V1–V16源码和编译资源；不是修改旧迁移或重跑原服务器
+4. 从已构建API jar提取BOOT-INF/lib到`.local/niko-test/java-libs`供独立CLI使用；显式`run-migration.py --initialize-new-niko-database`只接受空的新niko库，应用冻结V1–V4；再分别`--apply-photos`、`--apply-asset-imports`、`--apply-asset-dependencies`、`--apply-worklogs`、`--apply-asset-metadata`、`--apply-internal-notes`、`--apply-ticket-comments`、`--apply-working-calendars`、`--apply-manual-incidents`、`--apply-manual-recoveries`、`--apply-manual-warranty`、`--apply-capacity-scenarios`、`--apply-customer-contacts`，最后`--check`。manifest核对全部V1–V17源码和编译资源；不是修改旧迁移或重跑原服务器
 5. `bind-local-identities.py`仅初次空业务新库，把冻结SQL的合成用户明确绑定新realm签发者+sub；记录本地绑定，后续不按用户名重绑定；不改变角色或原SQL
 6. `bash tools/niko-test/run-stack.sh`供后续已有环境启动和正常停止；MinIO/OSS不被隐式启动或伪装就绪
 
@@ -155,3 +155,8 @@ V1–V14全部字节冻结，V14 SHA256为39be55d8759de87c6e2b8f85b3958c60be24ae
 新实例真实PG完整根1036=1023执行（322真实PG）+13历史fixture跳过，6MinIO排除；Web643/55契约/类型构建/Python79通过。另冷启动纯Java1042=701执行+341跳过（322PG+13历史+6存储），不和真实批次叠加。正常启动拥有的固定API JAR并验证回环监听，6个新OIDC授权码登录、34真实HTTP核对读写/原键重放/23能力/跨租户404/只读审计尾不变；4条合成业务记录不是旧数据。存储显式关闭，上传组件重测仍NOT_RUN。
 
 [源码恢复](evidence/niko-workspace-recovery-20261003.json)、[截图物化](evidence/niko-repository-binary-materialization-recovered-20261003.json)、[新组件](evidence/niko-rebuilt-components-20261003.json)、[新HTTP](evidence/niko-rebuilt-environment-http-20261003.json)。B09源码与新PG/OIDC/API可用性已解决，但旧临时数据库未恢复；B01原服务器入口/私有连接、B02 OSS、B03新环境浏览器验收、客户口径/监控组件仍分别保留，继续独立开发。
+
+
+## 2026-10-03 V17联系人结构
+
+重建niko库独立V17执行1、重复0、只读check0，21表既有业务全列指纹不变；12结构PG/19迁移策略/82Python/57契约、根1088=1075执行含334真实PG通过。10项结构验证在未提交隔离租户用migrator、2项真实runtime验证ACL/触发器，全部回滚后新3表0行；没有新增身份绑定或持久联系人。API0.29保持ready，仓储/双连接竞争/API/UI/通知送达尚未验。V1–V17全部冻结，后续V18+，见[联系人](customer-contacts.md)。

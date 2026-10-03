@@ -31,7 +31,8 @@ public final class TestSchemaMigration {
         Map.entry("13","V13__immutable_manual_incident_registrations.sql"),
         Map.entry("14","V14__immutable_manual_recovery_confirmations.sql"),
         Map.entry("15","V15__manual_warranty_details.sql"),
-        Map.entry("16","V16__immutable_capacity_scenario_drafts.sql"));
+        Map.entry("16","V16__immutable_capacity_scenario_drafts.sql"),
+        Map.entry("17","V17__customer_contact_revisions.sql"));
     static final String IMPORT_SHA256="1f532822668274b7aebd12ea78b57e6be0aa9fd53ceb77023ee8067589cd2b4b";
     static final String DEPENDENCY_SHA256="5a8ce8d49fe948fc0e9586c102f7c8bfc46cb975a0b5d9f32d4bd1ccc72670bb";
     static final String WORKLOG_SHA256="942ea4dc88a8169b40662edcfd89871e8280a429ac922bd0cc1eb451b82ad2f8";
@@ -44,6 +45,8 @@ public final class TestSchemaMigration {
     static final String MANUAL_WARRANTY_SHA256="317b865df601888f2d6ea5324415f469acdeaea4c2b49b6c837fef9954a30baf";
     static final String WARRANTY_GUARD_SHA256="89451fe60c0fc9774967bbb3b018694bc6a5e4d2c623a14bc947924662312e9e";
     static final String CAPACITY_SCENARIO_SHA256="74f095f56ca8735ef6d97405908aa523b554e76316acca052eeaa3cbbe010d05";
+    static final String CUSTOMER_CONTACT_SHA256="3e7d2f89729682f9a51d0ccf4be9738ac25421d94738943d3d5f06461417a10b";
+    static final String CONTACT_GUARD_SHA256="b3c16bf2730f173a86d001e835cec861758650d7fed379ad8e1a7873ee587ed7";
     private static final String RUNTIME="mop_test_runtime";
     private TestSchemaMigration() {}
 
@@ -60,12 +63,12 @@ public final class TestSchemaMigration {
     record Entry(String version,String script,String type,MigrationState state,boolean applied,boolean checksumMatches,Integer checksum) {}
     static final String WORKING_CALENDAR_CHECKER_SHA256="07749cb8084dc2f0e9f2a6ed899b77be3dc4e1aeb55f15eed1bf558e48b18fb6";
     enum Plan {
-        PHOTOS_PENDING(4),ASSET_IMPORTS_PENDING(5),ASSET_IMPORTS_APPLIED(6),ASSET_DEPENDENCIES_APPLIED(7),WORKLOGS_APPLIED(8),ASSET_METADATA_APPLIED(9),INTERNAL_NOTES_APPLIED(10),TICKET_COMMENTS_APPLIED(11),WORKING_CALENDARS_APPLIED(12),MANUAL_INCIDENTS_APPLIED(13),MANUAL_RECOVERIES_APPLIED(14),MANUAL_WARRANTY_APPLIED(15),CAPACITY_SCENARIOS_APPLIED(16);
+        PHOTOS_PENDING(4),ASSET_IMPORTS_PENDING(5),ASSET_IMPORTS_APPLIED(6),ASSET_DEPENDENCIES_APPLIED(7),WORKLOGS_APPLIED(8),ASSET_METADATA_APPLIED(9),INTERNAL_NOTES_APPLIED(10),TICKET_COMMENTS_APPLIED(11),WORKING_CALENDARS_APPLIED(12),MANUAL_INCIDENTS_APPLIED(13),MANUAL_RECOVERIES_APPLIED(14),MANUAL_WARRANTY_APPLIED(15),CAPACITY_SCENARIOS_APPLIED(16),CUSTOMER_CONTACTS_APPLIED(17);
         final int schemaVersion;Plan(int version){schemaVersion=version;}
         static Plan atVersion(int version){for(Plan value:values())if(value.schemaVersion==version)return value;throw new IllegalStateException("Unsupported validated schema version");}
     }
     enum Mode {
-        READ_ONLY_CHECK(0),APPLY_PHOTOS(5),APPLY_ASSET_IMPORTS(6),APPLY_ASSET_DEPENDENCIES(7),APPLY_WORKLOGS(8),APPLY_ASSET_METADATA(9),APPLY_INTERNAL_NOTES(10),APPLY_TICKET_COMMENTS(11),APPLY_WORKING_CALENDARS(12),APPLY_MANUAL_INCIDENTS(13),APPLY_MANUAL_RECOVERIES(14),APPLY_MANUAL_WARRANTY(15),APPLY_CAPACITY_SCENARIOS(16);
+        READ_ONLY_CHECK(0),APPLY_PHOTOS(5),APPLY_ASSET_IMPORTS(6),APPLY_ASSET_DEPENDENCIES(7),APPLY_WORKLOGS(8),APPLY_ASSET_METADATA(9),APPLY_INTERNAL_NOTES(10),APPLY_TICKET_COMMENTS(11),APPLY_WORKING_CALENDARS(12),APPLY_MANUAL_INCIDENTS(13),APPLY_MANUAL_RECOVERIES(14),APPLY_MANUAL_WARRANTY(15),APPLY_CAPACITY_SCENARIOS(16),APPLY_CUSTOMER_CONTACTS(17);
         final int targetVersion;Mode(int version){targetVersion=version;}
     }
 
@@ -86,6 +89,7 @@ public final class TestSchemaMigration {
         if(args.length==1&&"--apply-manual-recoveries".equals(args[0]))return Mode.APPLY_MANUAL_RECOVERIES;
         if(args.length==1&&"--apply-manual-warranty".equals(args[0]))return Mode.APPLY_MANUAL_WARRANTY;
         if(args.length==1&&"--apply-capacity-scenarios".equals(args[0]))return Mode.APPLY_CAPACITY_SCENARIOS;
+        if(args.length==1&&"--apply-customer-contacts".equals(args[0]))return Mode.APPLY_CUSTOMER_CONTACTS;
         throw new IllegalArgumentException("Use --check or one explicit supported feature apply mode");
     }
     static Plan inspect(List<Entry> entries) {
@@ -130,7 +134,7 @@ public final class TestSchemaMigration {
                 public void warn(String message){} public void error(String message){} public void error(String message,Exception error){} public void notice(String message){}
             });
             Mode mode=requestedMode(args);boolean apply=mode!=Mode.READ_ONLY_CHECK;
-            stage="migration_resources";verifyImportResource();verifyDependencyResource();verifyWorklogResource();verifyAssetMetadataResource();verifyInternalNoteResource();verifyTicketCommentResource();verifyWorkingCalendarResource();verifyManualIncidentResource();verifyManualRecoveryResource();verifyManualWarrantyResource();verifyCapacityScenarioResource();stage="private_settings";Settings settings=Settings.from(System::getenv);
+            stage="migration_resources";verifyImportResource();verifyDependencyResource();verifyWorklogResource();verifyAssetMetadataResource();verifyInternalNoteResource();verifyTicketCommentResource();verifyWorkingCalendarResource();verifyManualIncidentResource();verifyManualRecoveryResource();verifyManualWarrantyResource();verifyCapacityScenarioResource();verifyCustomerContactResource();stage="private_settings";Settings settings=Settings.from(System::getenv);
             stage="identity";
             try(Connection guard=connection(settings,!apply)) {
                 verifyIdentity(guard);
@@ -167,7 +171,8 @@ public final class TestSchemaMigration {
                     " manual_incidents="+(after.schemaVersion>=13?"IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
                     " manual_recoveries="+(after.schemaVersion>=14?"IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
                     " manual_warranty="+(after.schemaVersion>=15?"ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED":"NOT_APPLIED")+
-                    " capacity_scenarios="+(after.schemaVersion>=16?"IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED"));
+                    " capacity_scenarios="+(after.schemaVersion>=16?"IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
+                    " customer_contacts="+(after.schemaVersion>=17?"SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED"));
             }
         }catch(Throwable failure){errors.println(safeFailure(stage,failure));exit=1;}
         finally{System.setOut(output);System.setErr(errors);}
@@ -179,6 +184,7 @@ public final class TestSchemaMigration {
         }
     }
     private static void verifyStructure(Connection connection,Plan plan)throws SQLException{
+        if(plan.schemaVersion>=17)verifyCustomerContacts(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_customer_contact') IS NULL AND to_regclass('public.mop_customer_contact_revision') IS NULL AND to_regclass('public.mop_contact_tenant_guard') IS NULL AND to_regprocedure('public.mop_contact_decision_guard()') IS NULL");
         if(plan.schemaVersion>=16)verifyCapacityScenarios(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_capacity_scenario_draft') IS NULL");
         if(plan.schemaVersion>=15)verifyManualWarranty(connection);else requireTrue(connection,"SELECT to_regprocedure('public.mop_warranty_declaration_guard()') IS NULL AND NOT EXISTS(SELECT 1 FROM pg_attribute WHERE attrelid=to_regclass('public.mop_asset_manual_revision') AND attname IN ('warranty_start','warranty_supplier','warranty_details_declared') AND NOT attisdropped)");
         if(plan.schemaVersion>=14)verifyManualRecoveries(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_manual_recovery_confirmation') IS NULL");
@@ -192,6 +198,39 @@ public final class TestSchemaMigration {
         if(plan.schemaVersion>=8)verifyWorklogs(connection);else requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_worklog','mop_worklog_revision')");
         if(plan.schemaVersion>=9)verifyAssetMetadata(connection,plan.schemaVersion>=15);
         else {requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_asset_manual_details','mop_asset_manual_revision')");verifyRuntimeAcl(connection,"mop_asset",Set.of());}
+    }
+    static void verifyCustomerContactResource()throws Exception{
+        try(var input=TestSchemaMigration.class.getResourceAsStream("/db/migration/"+SCRIPTS.get("17"))){
+            if(input==null)throw new IllegalStateException("Missing contact migration");byte[] bytes=input.readAllBytes();
+            if(!CUSTOMER_CONTACT_SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes))))throw new IllegalStateException("Unreviewed contact migration resource");
+            String sql=new String(bytes,StandardCharsets.UTF_8);int marker=sql.indexOf(" AS $$"),end=marker<0?-1:sql.indexOf("$$;",marker+6);
+            if(marker<0||end<0||!CONTACT_GUARD_SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(sql.substring(marker+6,end).getBytes(StandardCharsets.UTF_8)))))throw new IllegalStateException("Unreviewed contact guard body");
+        }
+    }
+    private static void verifyCustomerContacts(Connection connection)throws SQLException{
+        verifyColumns(connection,"mop_contact_tenant_guard",Map.of("tenant_id","uuid","version","bigint"),Set.of(),true);
+        verifyColumns(connection,"mop_customer_contact",Map.of("id","uuid","tenant_id","uuid","created_by","uuid","version","bigint","created_at","timestamp(3) with time zone","updated_at","timestamp(3) with time zone"),Set.of(),true);
+        verifyColumns(connection,"mop_customer_contact_revision",Map.ofEntries(Map.entry("tenant_id","uuid"),Map.entry("contact_id","uuid"),Map.entry("version","bigint"),Map.entry("previous_version","bigint"),Map.entry("recorded_by","uuid"),Map.entry("recorded_at","timestamp(3) with time zone"),Map.entry("action","character varying(16)"),Map.entry("name","character varying(200)"),Map.entry("roles","text[]"),Map.entry("mobile","character varying(16)"),Map.entry("email","character varying(254)"),Map.entry("wecom_user_id","character varying(256)"),Map.entry("preferred_priorities","text[]"),Map.entry("quiet_declared","boolean"),Map.entry("quiet_enabled","boolean"),Map.entry("quiet_start","character varying(5)"),Map.entry("quiet_end","character varying(5)"),Map.entry("enabled","boolean"),Map.entry("archived","boolean"),Map.entry("record_source","character varying(40)")),Set.of("previous_version","mobile","email","wecom_user_id","preferred_priorities","quiet_enabled","quiet_start","quiet_end"),true);
+        verifyRuntimeAcl(connection,"mop_contact_tenant_guard",Set.of("version"));verifyRuntimeAcl(connection,"mop_customer_contact",Set.of("version","updated_at"));verifyRuntimeAcl(connection,"mop_customer_contact_revision",Set.of());
+        for(String table:List.of("mop_contact_tenant_guard","mop_customer_contact","mop_customer_contact_revision")){
+            requireTrue(connection,"SELECT relkind='r' AND relowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') FROM pg_class WHERE oid=('public.'||?)::regclass",table);
+            requireTrue(connection,"SELECT NOT EXISTS(SELECT 1 FROM pg_constraint WHERE conrelid=('public.'||?)::regclass AND NOT convalidated)",table);
+        }
+        requireConstraint(connection,"mop_contact_tenant_guard","p",List.of("tenant_id"),null,List.of(),false);
+        requireConstraint(connection,"mop_contact_tenant_guard","f",List.of("tenant_id"),"mop_tenant",List.of("id"),false);
+        requireConstraint(connection,"mop_customer_contact","p",List.of("id"),null,List.of(),false);requireConstraint(connection,"mop_customer_contact","u",List.of("tenant_id","id"),null,List.of(),false);
+        requireConstraint(connection,"mop_customer_contact","f",List.of("tenant_id"),"mop_tenant",List.of("id"),false);
+        requireConstraint(connection,"mop_customer_contact","f",List.of("tenant_id","created_by"),"mop_membership",List.of("tenant_id","user_id"),false);
+        requireConstraint(connection,"mop_customer_contact","f",List.of("tenant_id","id","version"),"mop_customer_contact_revision",List.of("tenant_id","contact_id","version"),true);
+        requireConstraint(connection,"mop_customer_contact_revision","p",List.of("tenant_id","contact_id","version"),null,List.of(),false);
+        requireConstraint(connection,"mop_customer_contact_revision","f",List.of("tenant_id","contact_id"),"mop_customer_contact",List.of("tenant_id","id"),false);
+        requireConstraint(connection,"mop_customer_contact_revision","f",List.of("tenant_id","recorded_by"),"mop_membership",List.of("tenant_id","user_id"),false);
+        requireConstraint(connection,"mop_customer_contact_revision","f",List.of("tenant_id","contact_id","previous_version"),"mop_customer_contact_revision",List.of("tenant_id","contact_id","version"),false);
+        for(var pair:Map.of("mop_contact_tenant_guard",1,"mop_customer_contact",3,"mop_customer_contact_revision",15).entrySet())requireTrue(connection,"SELECT count(*)="+pair.getValue()+" FROM pg_constraint WHERE conrelid=('public.'||?)::regclass AND contype='c'",pair.getKey());
+        requireTrue(connection,"SELECT i.indisvalid AND i.indisready FROM pg_index i JOIN pg_class c ON c.oid=i.indexrelid WHERE c.relname='mop_customer_contact_order' AND c.relnamespace='public'::regnamespace");
+        requireTrue(connection,"SELECT NOT p.prosecdef AND p.prorettype='trigger'::regtype AND p.proowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') AND encode(sha256(convert_to(p.prosrc,'UTF8')),'hex')=? AND p.proconfig=ARRAY['search_path=pg_catalog'] AND has_function_privilege('mop_test_runtime',p.oid,'EXECUTE') AND NOT EXISTS(SELECT 1 FROM aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) a WHERE a.grantee=0) FROM pg_proc p WHERE p.oid=to_regprocedure('public.mop_contact_decision_guard()')",CONTACT_GUARD_SHA256);
+        requireTrue(connection,"SELECT count(*)=1 FROM pg_trigger WHERE tgrelid='public.mop_customer_contact'::regclass AND NOT tgisinternal");
+        requireTrue(connection,"SELECT tgenabled='O' AND tgtype=21 AND tgfoid=to_regprocedure('public.mop_contact_decision_guard()') AND tgdeferrable AND tginitdeferred FROM pg_trigger WHERE tgrelid='public.mop_customer_contact'::regclass AND tgname='mop_contact_decision_guard_trigger'");
     }
     static void verifyCapacityScenarioResource()throws Exception{
         try(var input=TestSchemaMigration.class.getResourceAsStream("/db/migration/"+SCRIPTS.get("16"))){if(input==null||!CAPACITY_SCENARIO_SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(input.readAllBytes()))))throw new IllegalStateException("Unreviewed capacity scenario migration resource");}

@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Pure CLI policy tests. No network, database, migration, or alternate component is used. */
 class TestSchemaMigrationTest {
-    private static final List<String> SCRIPTS=List.of("V1__remote_test_platform.sql","V2__tenant_configuration_revisions.sql","V3__configuration_review_test_identity.sql","V4__durable_customer_report_registration.sql","V5__durable_report_photos.sql","V6__asset_import_sources_and_mapping.sql","V7__asset_dependency_draft_revisions.sql","V8__manual_worklog_revisions.sql","V9__manual_asset_metadata_revisions.sql","V10__immutable_internal_ticket_notes.sql","V11__immutable_ticket_comments.sql","V12__unpublished_working_calendar_drafts.sql","V13__immutable_manual_incident_registrations.sql","V14__immutable_manual_recovery_confirmations.sql","V15__manual_warranty_details.sql","V16__immutable_capacity_scenario_drafts.sql");
+    private static final List<String> SCRIPTS=List.of("V1__remote_test_platform.sql","V2__tenant_configuration_revisions.sql","V3__configuration_review_test_identity.sql","V4__durable_customer_report_registration.sql","V5__durable_report_photos.sql","V6__asset_import_sources_and_mapping.sql","V7__asset_dependency_draft_revisions.sql","V8__manual_worklog_revisions.sql","V9__manual_asset_metadata_revisions.sql","V10__immutable_internal_ticket_notes.sql","V11__immutable_ticket_comments.sql","V12__unpublished_working_calendar_drafts.sql","V13__immutable_manual_incident_registrations.sql","V14__immutable_manual_recovery_confirmations.sql","V15__manual_warranty_details.sql","V16__immutable_capacity_scenario_drafts.sql","V17__customer_contact_revisions.sql");
     private static List<TestSchemaMigration.Entry> entries(boolean photosApplied,boolean importsApplied) {
         return entries(photosApplied,importsApplied,false);
     }
@@ -40,8 +40,11 @@ class TestSchemaMigrationTest {
         return entries(photosApplied,importsApplied,dependenciesApplied,worklogsApplied,metadataApplied,notesApplied,commentsApplied,calendarsApplied,manualApplied,recoveryApplied,warrantyApplied,false);
     }
     private static List<TestSchemaMigration.Entry> entries(boolean photosApplied,boolean importsApplied,boolean dependenciesApplied,boolean worklogsApplied,boolean metadataApplied,boolean notesApplied,boolean commentsApplied,boolean calendarsApplied,boolean manualApplied,boolean recoveryApplied,boolean warrantyApplied,boolean scenariosApplied) {
-        List<TestSchemaMigration.Entry> entries=new ArrayList<>();for(int version=1;version<=16;version++) {
-            boolean applied=version<5||version==5&&photosApplied||version==6&&importsApplied||version==7&&dependenciesApplied||version==8&&worklogsApplied||version==9&&metadataApplied||version==10&&notesApplied||version==11&&commentsApplied||version==12&&calendarsApplied||version==13&&manualApplied||version==14&&recoveryApplied||version==15&&warrantyApplied||version==16&&scenariosApplied;entries.add(new TestSchemaMigration.Entry(Integer.toString(version),SCRIPTS.get(version-1),"SQL",applied?MigrationState.SUCCESS:MigrationState.PENDING,applied,true,123));
+        return entries(photosApplied,importsApplied,dependenciesApplied,worklogsApplied,metadataApplied,notesApplied,commentsApplied,calendarsApplied,manualApplied,recoveryApplied,warrantyApplied,scenariosApplied,false);
+    }
+    private static List<TestSchemaMigration.Entry> entries(boolean photosApplied,boolean importsApplied,boolean dependenciesApplied,boolean worklogsApplied,boolean metadataApplied,boolean notesApplied,boolean commentsApplied,boolean calendarsApplied,boolean manualApplied,boolean recoveryApplied,boolean warrantyApplied,boolean scenariosApplied,boolean contactsApplied) {
+        List<TestSchemaMigration.Entry> entries=new ArrayList<>();for(int version=1;version<=17;version++) {
+            boolean applied=version<5||version==5&&photosApplied||version==6&&importsApplied||version==7&&dependenciesApplied||version==8&&worklogsApplied||version==9&&metadataApplied||version==10&&notesApplied||version==11&&commentsApplied||version==12&&calendarsApplied||version==13&&manualApplied||version==14&&recoveryApplied||version==15&&warrantyApplied||version==16&&scenariosApplied||version==17&&contactsApplied;entries.add(new TestSchemaMigration.Entry(Integer.toString(version),SCRIPTS.get(version-1),"SQL",applied?MigrationState.SUCCESS:MigrationState.PENDING,applied,true,123));
         }return entries;
     }
     @Test void defaultAndExplicitCheckNeverRequestApply(){assertFalse(TestSchemaMigration.applyRequested(new String[0]));assertFalse(TestSchemaMigration.applyRequested(new String[]{"--check"}));assertTrue(TestSchemaMigration.applyRequested(new String[]{"--apply-photos"}));assertTrue(TestSchemaMigration.applyRequested(new String[]{"--apply-asset-imports"}));assertEquals(TestSchemaMigration.Mode.APPLY_ASSET_IMPORTS,TestSchemaMigration.requestedMode(new String[]{"--apply-asset-imports"}));for(String[] invalid:List.of(new String[]{"--apply"},new String[]{"--check","--apply-photos"},new String[]{"--apply-photos","--apply-asset-imports"},new String[]{"repair"}))assertThrows(IllegalArgumentException.class,()->TestSchemaMigration.applyRequested(invalid));}
@@ -171,7 +174,7 @@ class TestSchemaMigrationTest {
         assertEquals(TestSchemaMigration.Plan.MANUAL_RECOVERIES_APPLIED,TestSchemaMigration.inspect(pending));
         var applied=TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true,true,true,true,true));
         assertEquals(TestSchemaMigration.Plan.MANUAL_WARRANTY_APPLIED,applied);
-        for(var mode:TestSchemaMigration.Mode.values())assertEquals(mode==TestSchemaMigration.Mode.APPLY_CAPACITY_SCENARIOS,TestSchemaMigration.shouldMigrate(mode,applied));
+        for(var mode:TestSchemaMigration.Mode.values())if(mode.targetVersion>16)assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(mode,applied));else assertEquals(mode==TestSchemaMigration.Mode.APPLY_CAPACITY_SCENARIOS,TestSchemaMigration.shouldMigrate(mode,applied));
         TestSchemaMigration.verifyManualWarrantyResource();assertEquals(64,TestSchemaMigration.MANUAL_WARRANTY_SHA256.length());assertEquals(64,TestSchemaMigration.WARRANTY_GUARD_SHA256.length());
     }
 
@@ -183,8 +186,20 @@ class TestSchemaMigrationTest {
         var pending=entries(true,true,true,true,true,true,true,true,true,true,true,false);
         assertEquals(TestSchemaMigration.Plan.MANUAL_WARRANTY_APPLIED,TestSchemaMigration.inspect(pending));assertTrue(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_CAPACITY_SCENARIOS,TestSchemaMigration.inspect(pending)));
         var last=pending.get(15);pending.set(15,new TestSchemaMigration.Entry(last.version(),last.script(),last.type(),MigrationState.ABOVE_TARGET,false,false,last.checksum()));assertEquals(TestSchemaMigration.Plan.MANUAL_WARRANTY_APPLIED,TestSchemaMigration.inspect(pending));
-        var applied=TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true,true,true,true,true,true));assertEquals(TestSchemaMigration.Plan.CAPACITY_SCENARIOS_APPLIED,applied);for(var mode:TestSchemaMigration.Mode.values())assertFalse(TestSchemaMigration.shouldMigrate(mode,applied));
+        var applied=TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true,true,true,true,true,true));assertEquals(TestSchemaMigration.Plan.CAPACITY_SCENARIOS_APPLIED,applied);for(var mode:TestSchemaMigration.Mode.values())assertEquals(mode==TestSchemaMigration.Mode.APPLY_CUSTOMER_CONTACTS,TestSchemaMigration.shouldMigrate(mode,applied));
         TestSchemaMigration.verifyCapacityScenarioResource();assertEquals(64,TestSchemaMigration.CAPACITY_SCENARIO_SHA256.length());
+    }
+
+    @Test void customerContactsRequireSeparateExplicitApplyAndFrozenSixteenVersionPredecessor()throws Exception{
+        assertEquals(TestSchemaMigration.Mode.APPLY_CUSTOMER_CONTACTS,TestSchemaMigration.requestedMode(new String[]{"--apply-customer-contacts"}));
+        assertThrows(IllegalArgumentException.class,()->TestSchemaMigration.requestedMode(new String[]{"--apply-capacity-scenarios","--apply-customer-contacts"}));
+        for(var plan:TestSchemaMigration.Plan.values())if(plan.schemaVersion<16)assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_CUSTOMER_CONTACTS,plan));
+        var pending=entries(true,true,true,true,true,true,true,true,true,true,true,true,false);
+        assertEquals(TestSchemaMigration.Plan.CAPACITY_SCENARIOS_APPLIED,TestSchemaMigration.inspect(pending));assertTrue(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_CUSTOMER_CONTACTS,TestSchemaMigration.inspect(pending)));
+        var last=pending.get(16);pending.set(16,new TestSchemaMigration.Entry(last.version(),last.script(),last.type(),MigrationState.ABOVE_TARGET,false,false,last.checksum()));assertEquals(TestSchemaMigration.Plan.CAPACITY_SCENARIOS_APPLIED,TestSchemaMigration.inspect(pending));
+        var applied=TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true,true,true,true,true,true,true));assertEquals(TestSchemaMigration.Plan.CUSTOMER_CONTACTS_APPLIED,applied);for(var mode:TestSchemaMigration.Mode.values())assertFalse(TestSchemaMigration.shouldMigrate(mode,applied));
+        assertThrows(IllegalStateException.class,()->TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true,true,true,true,true,false,true)));
+        TestSchemaMigration.verifyCustomerContactResource();assertEquals(64,TestSchemaMigration.CUSTOMER_CONTACT_SHA256.length());assertEquals(64,TestSchemaMigration.CONTACT_GUARD_SHA256.length());
     }
 
 }

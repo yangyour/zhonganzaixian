@@ -61,3 +61,8 @@ Dot 必须遵守下文与本地完全相同的测试环境、秘密、客户待�
 ## 已执行迁移冻结边界（2026-10-02）
 
 在niko独立测试库，V7–V16均已按功能显式独立执行并留证；当前V1–V16全部字节冻结。V16__immutable_capacity_scenario_drafts.sql的SHA256为74f095f56ca8735ef6d97405908aa523b554e76316acca052eeaa3cbbe010d05。V15__manual_warranty_details.sql的SHA256为317b865df601888f2d6ea5324415f469acdeaea4c2b49b6c837fef9954a30baf。V14__immutable_manual_recovery_confirmations.sql的SHA256为39be55d8759de87c6e2b8f85b3958c60be24ae9e6ece2deb5d849c225050ed72。后续结构修正新增V17或更高，不重写已执行SQL。tools/niko-test/frozen-*.json与独立迁移CLI校验源/编译资源及历史；API/Worker启动仍禁止自动迁移。表结构完成不代表人工恢复仓储、API、页面或正式建单验收通过，详见docs/manual-incidents.md。
+
+
+## V17联系人结构新增冻结（2026-10-03 15:34 UTC）
+
+niko重建测试库已显式独立执行V17__customer_contact_revisions.sql一次，SHA256为3e7d2f89729682f9a51d0ccf4be9738ac25421d94738943d3d5f06461417a10b，后续修正必须新增V18或更高；V1–V17全部字节冻结。联系人结构不代表仓储/API/UI/通知送达或合同验收完成；原指定服务器V17尚未执行。API/Worker不自动迁移。后续实际重复执行/只读检查/结构测试结果见docs/customer-contacts.md与独立证据，不预先声明通过。

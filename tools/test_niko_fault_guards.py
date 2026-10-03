@@ -112,4 +112,15 @@ class NikoFaultGuardTest(unittest.TestCase):
             root=Path(d);r=subprocess.run([sys.executable,str(script),'--unknown'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertFalse((root/'.local').exists())
             local=root/'.local/niko-test';local.mkdir(parents=True);p=local/'capacity-v16-business-before.json';p.write_text('existing')
             r=subprocess.run([sys.executable,str(script),'--record'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertEqual('existing',p.read_text())
+
+    def test_contact_migration_preserves_all_prior_tables_and_adds_capacity_fingerprint(self):
+        current=module('niko_contact_fingerprint',ROOT/'tools/niko-test/customer-contact-migration-snapshot.py');prior=module('niko_capacity_fingerprint_for_contacts',ROOT/'tools/niko-test/capacity-migration-snapshot.py')
+        self.assertEqual(prior.TABLES+('mop_capacity_scenario_draft',),current.TABLES);self.assertTrue({current.BEFORE,current.AFTER}.isdisjoint({prior.BEFORE,prior.AFTER}))
+        source=(ROOT/'tools/niko-test/customer-contact-migration-snapshot.py').read_text();self.assertIn("projection='to_jsonb(t)::text'",source);self.assertIn('REPEATABLE READ READ ONLY',source)
+    def test_contact_fingerprint_rejects_unknown_mode_and_existing_evidence_before_private_read(self):
+        script=ROOT/'tools/niko-test/customer-contact-migration-snapshot.py'
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);r=subprocess.run([sys.executable,str(script),'--unknown'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertFalse((root/'.local').exists())
+            local=root/'.local/niko-test';local.mkdir(parents=True);p=local/'contacts-v17-business-before.json';p.write_text('existing')
+            r=subprocess.run([sys.executable,str(script),'--record'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertEqual('existing',p.read_text())
 if __name__=='__main__':unittest.main()

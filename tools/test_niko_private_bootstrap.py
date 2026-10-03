@@ -74,4 +74,9 @@ class NikoPrivateBootstrapTest(unittest.TestCase):
    for flag in ['--create-approved-database-identity-credentials','--create-approved-local-test-credentials']:
     result=subprocess.run([sys.executable,str(SCRIPT),flag],cwd=d,capture_output=True)
     self.assertNotEqual(0,result.returncode);self.assertEqual(before,p.read_bytes())
+ def test_v17_contacts_have_separate_reviewed_hash_and_explicit_mode(self):
+  manifest=json.loads((ROOT/'tools/niko-test/frozen-customer-contact-migration.json').read_text())['sha256'];self.assertEqual(1,len(manifest))
+  name='V17__customer_contact_revisions.sql';self.assertEqual(hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest(),manifest[name])
+  source=(ROOT/'tools/niko-test/run-migration.py').read_text();self.assertIn('--apply-customer-contacts',source);self.assertIn('frozen-customer-contact-migration.json',source)
+
 if __name__=='__main__':unittest.main()

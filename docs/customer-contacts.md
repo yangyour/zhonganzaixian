@@ -19,3 +19,16 @@
 下一步新增独立V17结构与受限权限，再实现真实PG并发最后决策人保护、可恢复停用/归档及历史、API和页面。永久删除不作为默认路径，通知送达仍独立受渠道与Q14门禁约束。完整M2-9不标DONE。
 
 证据：[核心回归](evidence/niko-customer-contact-core-20261003.json)。
+
+
+## V17真实结构验证（2026-10-03 15:38 UTC）
+
+新增联系人头（6列）、不可变修订（20列）与租户串行化guard（2列）；同租户创建人/记录人复合FK、前修订链与延迟当前修订FK。身份绑定不变，原租户不补虚构联系人。静音组声明标记保留null组与明确未知组差异；各枚举、集合重复/未知/null、文本、联系方式、分钟窗口、归档必须停用均受DB约束。归档为留历史的状态，不授予运行账号永久DELETE/TRUNCATE；仅头version/updated_at、guard version可UPDATE，历史仅INSERT/SELECT。
+
+延迟约束触发器检查最终租户至少一名启用未归档决策人；修改guard epoch取得共同租户行锁，较旧RR事务不能静默通过。函数SECURITY INVOKER、固定pg_catalog search_path、全表名限定public，函数体hash/owner/ACL/触发器形态由独立CLI核对，PUBLIC无表或函数权限。该设计尚未当双连接并发实测结论；仓储仍需当前成员、CSRF/幂等/CAS/审计和事务内授权。
+
+仅niko新库显式V17执行1、重复0、只读check0；21张已有业务表全列等值指纹不变。V1–V17现在字节冻结，后续结构修正V18+，API/Worker不自动迁移；原指定服务器V17未执行。
+
+12新增真实PG结构测试通过：10项使用迁移角色，在同一未提交事务建立隔离合成租户和停用成员关系后验证结构/最后决策人/归档恢复，全部回滚；2项以真实受限runtime验证触发器可执行及历史/范围/删除权限禁止。没有据此冒充应用授权或双连接竞争。测试后3张新表均0行；既有API仍ready。根1088=1075执行（334真实PG）+13历史跳过，6MinIO排除；19迁移策略/82Python/57契约与生成一致性通过。Windows52项隔离策略预期由CI执行，本机无PowerShell，当前未报通过。
+
+SQL SHA256：3e7d2f89729682f9a51d0ccf4be9738ac25421d94738943d3d5f06461417a10b；guard body SHA256：b3c16bf2730f173a86d001e835cec861758650d7fed379ad8e1a7873ee587ed7。纯核心afd078d CI37132914339 success已核验。下一步真实仓储/双连接竞争/API/UI/导入，通知渠道/Q14仍待；M2-9与128项不标DONE。见[结构证据](evidence/niko-customer-contact-schema-20261003.json)。

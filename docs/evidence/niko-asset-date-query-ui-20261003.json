@@ -1,0 +1,29 @@
+{
+  "verified_at": "2026-10-03T07:32:35.441917+00:00",
+  "status": "DATE_QUERY_UI_SOURCE_AND_REAL_MODULE_HTTP_ONLY",
+  "tests": {
+    "new_web": 16,
+    "web_total": 520,
+    "web_typecheck_build": true,
+    "contracts": 45,
+    "real_module_http": 36,
+    "query_get_requests": 13,
+    "query_write_requests": 0
+  },
+  "synthetic_setup_mutations": 18,
+  "first_typecheck_error_corrected": "Validated unknown filter echo cast to Record within callback; full Web/typebuild rerun passed",
+  "explicit_filter_choice": true,
+  "late_edit_close_context_results_discarded": true,
+  "actual_409_requires_explicit_first_page_refresh": true,
+  "natural_midnight_rollover": false,
+  "source_wiring_and_responsive_css_checked": true,
+  "browser_dom_tested": false,
+  "screenshots_captured": false,
+  "coverage_verified": false,
+  "hazard_created": false,
+  "notification_sent": false,
+  "api_version": "0.23.0 unchanged",
+  "migrations_executed": 0,
+  "all_128_done": false,
+  "credentials_output": false
+}

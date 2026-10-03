@@ -1,0 +1,35 @@
+{
+  "verified_at": "2026-10-03T07:30:39.586Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual assetDateQuery + ApiClient",
+  "http_requests": 36,
+  "query_get_requests": 13,
+  "query_writes": 0,
+  "synthetic_asset_creations": 16,
+  "synthetic_metadata_revisions": 2,
+  "setup_mutations": 18,
+  "keyset_pages": [
+    15,
+    1
+  ],
+  "actual_409_after_stale_reference_injection": true,
+  "natural_midnight_rollover": false,
+  "fault_injection": "Rewrite one next-page expected_reference_date to2000-01-01, discard one completed200GET, hold two completedGET across edit or permission reset",
+  "old_rows_cleared_on_failure": true,
+  "no_automatic_retry_after_409": true,
+  "readonly_audit_tail_unchanged": true,
+  "metadata_current_revision_reflected": true,
+  "customer_403": true,
+  "coverage_verified": false,
+  "hazard_created": false,
+  "notification_sent": false,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "Desktop/390px drawer DOM B03",
+    "Daily hazard/reminder Worker and verified provider delivery B05",
+    "Quarter export/report integration",
+    "Large-scale performance"
+  ]
+}

@@ -1,0 +1,42 @@
+package cn.mop.api;
+import cn.mop.domain.*;
+import cn.mop.domain.contact.*;
+import cn.mop.domain.contact.CustomerContactRepository.Access;
+import cn.mop.domain.contact.ContactImportRepository.*;
+import cn.mop.domain.worklog.ManualWorklog;
+import com.fasterxml.jackson.databind.*;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import java.security.MessageDigest;
+import java.time.Instant;
+import java.util.*;
+import static cn.mop.api.ApiResponse.*;
+
+/** Durable create-only acceptance; original 202 receipt is independent of the current worker outcome. */
+@RestController @RequestMapping("/api/v1/contact-imports") @Profile("remote_test")
+public final class ContactImportController {
+    private static final Set<String> FIELDS=Set.of("expected_version","mode","acknowledge_exact_duplicate_rows","rows");
+    private static final ObjectMapper JSON=new ObjectMapper();
+    private final PlatformRepository platform;private final ContactImportRepository imports;
+    public ContactImportController(PlatformRepository platform,ContactImportRepository imports){this.platform=platform;this.imports=imports;}
+    @PostMapping(consumes=MediaType.APPLICATION_JSON_VALUE) @ResponseStatus(HttpStatus.ACCEPTED)
+    Object accept(HttpServletRequest request){Access a=access(request,true);query(request,Set.of());JsonNode input=CustomerContactImportPreviewController.body(request);fields(input,FIELDS);
+        if(!input.get("expected_version").isIntegralNumber()||!input.get("expected_version").canConvertToLong()||input.get("expected_version").longValue()!=0||!input.get("mode").isTextual()||!input.get("mode").textValue().equals("CREATE_ONLY")||!input.get("acknowledge_exact_duplicate_rows").isBoolean())throw invalid();
+        JsonNode values=input.get("rows");if(!values.isArray()||values.isEmpty()||values.size()>100)throw invalid();List<CustomerContactImportPreview.Row> rows=new ArrayList<>();for(JsonNode value:values)rows.add(CustomerContactImportPreviewController.row(value));var preview=CustomerContactImportPreview.preview(rows);if(preview.invalidRows()>0)throw new DomainException(400,"CONTACT_IMPORT_ROWS_INVALID","存在无效联系人行，整批未受理；请先修正格式预览错误");if(preview.identicalRows()>0&&!input.get("acknowledge_exact_duplicate_rows").booleanValue())throw new DomainException(409,"CONTACT_IMPORT_DUPLICATE_ACK_REQUIRED","存在字段完全相同的行；须明确确认每行分别新建，不自动合并或跳过");
+        String key=request.getHeader("Idempotency-Key");if(key==null||!key.matches("[A-Za-z0-9._:-]{1,128}"))throw invalid();var facts=preview.rows().stream().map(CustomerContactImportPreview.RowResult::contact).toList();Object receipt=platform.idempotentAuthorized(a.actorId(),a.tenantId(),request.getMethod()+" "+route(request),key,hash(input),a.permissionVersion(),()->imports.authorizeAcceptance(a),()->{Job job=imports.accept(a,facts);return map("operation_id",job.id(),"status","PENDING");});return success(receipt,request);
+    }
+    @GetMapping Object list(HttpServletRequest request){Access a=access(request,false);var q=query(request,Set.of("page_size","before_created_at","before_id"));String size=q.getOrDefault("page_size","15");if(!Set.of("10","15","25","50","100").contains(size)||q.containsKey("before_created_at")!=q.containsKey("before_id"))throw invalid();Instant before=q.containsKey("before_created_at")?ManualWorklog.parseInstant(q.get("before_created_at")):null;String id=q.containsKey("before_id")?uuid(q.get("before_id")):null;int limit=Integer.parseInt(size);var records=imports.list(a,limit+1,before,id);boolean more=records.size()>limit;var items=records.subList(0,Math.min(limit,records.size()));Job last=more?items.get(items.size()-1):null;return success(map("tenant_id",a.tenantId(),"created_by",a.actorId(),"items",items.stream().map(ContactImportController::summary).toList(),"has_more",more,"next_before_created_at",last==null?null:last.createdAt().toString(),"next_before_id",last==null?null:last.id(),"source","postgresql","scope","CURRENT_CREATOR_TENANT","page_size_limit",100),request);}
+    @GetMapping("/{id}") Object get(@PathVariable String id,HttpServletRequest request){Access a=access(request,false);query(request,Set.of());Job job=imports.get(a,uuid(id));var value=summary(job);value.put("results",job.results().stream().map(row->map("row_number",row.rowNumber(),"contact_id",row.contactId(),"contact_version",row.contactVersion())).toList());return success(value,request);}
+    static Map<String,Object> summary(Job job){var state=job.state();String status=switch(state.state()){case PENDING->"PENDING";case LEASED->"RUNNING";case SUCCEEDED->"SUCCEEDED";case FAILED->"FAILED";};return map("id",job.id(),"tenant_id",job.tenantId(),"created_by",job.createdBy(),"accepted_permission_version",job.permissionVersion(),"input_sha256",job.inputSha256(),"mode","CREATE_ONLY","row_count",state.rowCount(),"status",status,"step",state.step(),"attempts",state.attempts(),"version",job.version(),"completed_rows",state.completedRows(),"error",state.error()==null?null:map("code",state.error().name(),"message",errorMessage(state.error())),"next_attempt_at",state.nextAt()==null?null:state.nextAt().toString(),"created_at",job.createdAt().toString(),"updated_at",job.updatedAt().toString(),"worker_liveness",null,"notification_dispatched",false,"identity_binding_created",false,"contact_verification","SELF_REPORTED_UNVERIFIED","source","postgresql","scope","CURRENT_CREATOR_TENANT");}
+    private static String errorMessage(ContactImportJobState.Failure reason){return switch(reason){case UPSTREAM_UNAVAILABLE->"依赖暂时不可用，整批未完成，等待后台重试";case AUTHORIZATION_REVOKED->"受理时成员权限已失效，未执行本批新建";case PAYLOAD_INVALID->"耐久载荷未通过核对，未执行本批新建";case LAST_ENABLED_DECISION_MAKER->"租户必须保留启用决策人，未执行本批新建";};}
+    private Access access(HttpServletRequest request,boolean write){if(request.getUserPrincipal()==null||request.getSession(false)==null)throw expired();Object selected=request.getSession(false).getAttribute("mop.tenant_id");if(!(selected instanceof String tenant)||tenant.isBlank())throw expired();String actor=request.getUserPrincipal().getName();var current=platform.membership(actor,tenant).orElseThrow(ContactImportController::expired);if(!current.active()||current.permissionVersion()<1)throw expired();if(!Capabilities.forRole(current.role()).contains(write?"contacts:write":"contacts:read"))throw new DomainException(403,"ACTION_FORBIDDEN","仅当前授权管理员可受理或读取自己的联系人导入作业");return new Access(actor,tenant,current.permissionVersion(),trace(request));}
+    private static Map<String,String> query(HttpServletRequest request,Set<String> allowed){var q=new HashMap<String,String>();request.getParameterMap().forEach((key,values)->{if(!allowed.contains(key)||values.length!=1||values[0]==null||values[0].length()>64)throw invalid();q.put(key,values[0]);});return q;}
+    private static void fields(JsonNode value,Set<String> keys){if(value==null||!value.isObject()||value.size()!=keys.size())throw invalid();value.fieldNames().forEachRemaining(key->{if(!keys.contains(key))throw invalid();});}
+    private static String uuid(String value){if(value==null||!value.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))throw invalid();return UUID.fromString(value).toString();}
+    private static JsonNode canonical(JsonNode value,String field){if(value.isObject()){var result=JSON.createObjectNode();var keys=new TreeSet<String>();value.fieldNames().forEachRemaining(keys::add);for(String key:keys)result.set(key,canonical(value.get(key),key));return result;}if(value.isArray()){var result=JSON.createArrayNode();if(Set.of("roles","preferred_priorities").contains(field)){var values=new TreeSet<String>();value.forEach(v->values.add(v.textValue()));values.forEach(result::add);}else value.forEach(v->result.add(canonical(v,"")));return result;}return value;}
+    private static String hash(JsonNode value){try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(JSON.writeValueAsBytes(canonical(value,""))));}catch(Exception failure){throw new IllegalStateException("Contact import request hash unavailable");}}
+    private static DomainException invalid(){return new DomainException(400,"VALIDATION_ERROR","联系人导入须显式CREATE_ONLY、expected_version=0及完整1–100行；不接受租户、已有对象或通知覆盖");}
+    private static DomainException expired(){return new DomainException(401,"SESSION_EXPIRED","当前会话或成员关系已失效");}
+}

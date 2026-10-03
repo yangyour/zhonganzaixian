@@ -944,3 +944,8 @@ V18队列/不可变行结果结构显式1/重复0/check0且26表不变，但13�
 ## 2026-10-03 联系人独立Worker及真实重启
 
 独立contact-imports JAR、精确remote_test/显式flag/受限PG验证、仅专用队列/无存储或身份秘密已接入。15Java Worker单元+7Python artifact/PID保护，根1224=1211执行含390PG、94Python64契约通过。实际3次JVM：正常3条；真实PG guard锁观察在途等待后仅杀自有Worker(-9)，零部分行；同JAR重启到期fence2完整3条，原受理收据仍PENDING。6自建联系人归档，5无关队列/身份表指纹不变，API/PG/KC不停止，V1–V19/API0.31不变。公开202/导入页面未接，见[实际进程证据](customer-contacts.md)。
+
+
+## 2026-10-03 联系人公开耐久导入API0.32
+
+严格CREATE_ONLY整批202、显式重复行确认、creator+tenant回读/键集分页、原回执与当前Worker状态分离、V19结构ready门禁已接。12控制器+1ready+2真实PG新增，根1239=1226执行含392PG、67契约/714Web/typecheck/build通过。388实际HTTP+独立Worker，19作业119合成联系人均v1读取后归档，100行整批/幂等/授权404/原回执/只读审计已验；5无关表指纹不变，Worker停止，无新凭据/迁移/存储/通知。页面提交/进度/恢复与DOM待，M2-9不标DONE，见[边界与证据](customer-contacts.md)。

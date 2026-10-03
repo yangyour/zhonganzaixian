@@ -64,4 +64,14 @@ class PostgresContactImportIntegrationTest {
 
     @Test void nextClaimScansOnlyDedicatedQueueAndLeasedRowsAreSkipped()throws Exception{Assumptions.assumeTrue(count("SELECT count(*) FROM public.mop_contact_import_job WHERE state IN ('PENDING','LEASED')")==0,"Do not claim unrelated pending jobs during test");Job one=accept(row("scanA")),two=accept(row("scanB"));Set<String> expected=Set.of(one.id(),two.id());Claim first=imports.claimNext("scan-one",Duration.ofSeconds(30)).orElseThrow(),second=imports.claimNext("scan-two",Duration.ofSeconds(30)).orElseThrow();assertEquals(expected,Set.of(first.jobId(),second.jobId()));assertTrue(imports.claimNext("scan-three",Duration.ofSeconds(30)).isEmpty());assertTrue(imports.process(first));assertTrue(imports.process(second));}
 
+    @Test void ownCreatorTenantKeysetPagesStayBoundedUniqueAndReadonly()throws Exception{
+        Access a=access(tadmin,A);Set<String> expected=new HashSet<>();for(int i=0;i<17;i++)expected.add(accept(a,List.of(row("page_"+i))).id());long audit=count("SELECT count(*) FROM public.mop_audit");
+        var first=imports.list(a,15,null,null);assertEquals(15,first.size());var last=first.get(14);var second=imports.list(a,15,last.createdAt(),last.id());Set<String> seen=new HashSet<>();for(var j:first){assertTrue(seen.add(j.id()));assertEquals(A,j.tenantId());assertEquals(tadmin,j.createdBy());}for(var j:second)assertTrue(seen.add(j.id()));assertTrue(seen.containsAll(expected));assertThrows(UnsupportedOperationException.class,()->first.clear());assertEquals(audit,count("SELECT count(*) FROM public.mop_audit"));
+        for(var other:imports.list(access(admin,A),101,null,null))assertFalse(expected.contains(other.id()));for(var other:imports.list(access(admin,B),101,null,null))assertFalse(expected.contains(other.id()));
+    }
+    @Test void listRechecksAuthorizationAndRejectsUnboundedOrUnpairedCursors(){
+        for(int limit:List.of(0,102,-1))assertEquals(400,assertThrows(DomainException.class,()->imports.list(admin(),limit,null,null)).status);
+        assertEquals(400,assertThrows(DomainException.class,()->imports.list(admin(),15,Instant.now(),null)).status);assertEquals(400,assertThrows(DomainException.class,()->imports.list(admin(),15,null,UUID.randomUUID().toString())).status);
+        for(String user:List.of(msp,viewer))assertEquals(403,assertThrows(DomainException.class,()->imports.list(access(user,A),15,null,null)).status);var a=admin();assertEquals(401,assertThrows(DomainException.class,()->imports.list(new Access(a.actorId(),a.tenantId(),a.permissionVersion()+1,a.traceId()),15,null,null)).status);
+    }
 }

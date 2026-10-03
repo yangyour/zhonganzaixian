@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.31.0');
+  assert.equal(contract.info.version, '0.32.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -668,4 +668,25 @@ test('联系人预览坏行不能伪造通过或回显资料，预览不等于�
 test('联系人预览不能声称导入许可、存储或事务检查已完成',()=>{
  const value={tenant_id:id('2'),scope:'NEW_CONTACT_FORMAT_PREVIEW_ONLY',source:'EXPLICIT_INPUT',rows:[{row_number:1,status:'INVALID',code:'VALIDATION_ERROR',contact:null,identical_to_row:null}],valid_rows:0,invalid_rows:1,identical_rows:0,row_limit:100,row_limit_kind:'TECHNICAL_REQUEST_BOUND',can_import:false,tenant_authorization:'CURRENT_MEMBERSHIP_VERIFIED',existing_contact_check:'NOT_RUN',last_decision_maker_check:'NOT_RUN',notification_routing_status:'CONFIG_PENDING',writes_performed:false,notification_dispatched:false,preview_saved:false,job_created:false};assert.equal(validates('ContactImportPreview',value),true);
  for(const patch of [{can_import:true},{preview_saved:true},{job_created:true},{writes_performed:true},{existing_contact_check:'PASS'},{last_decision_maker_check:'PASS'},{notification_dispatched:true}])assert.equal(validates('ContactImportPreview',{...value,...patch}),false);
+});
+
+test('联系人耐久导入202与当前状态分开，全部写保护且无隐式去重', () => {
+  const post=contract.paths['/contact-imports'].post;
+  assert.ok(post.responses[202]);assert.equal(post.responses[200],undefined);
+  assert.deepEqual(post.parameters.map(p=>p.name),['Idempotency-Key','X-CSRF-Token']);
+  assert.deepEqual(post['x-mop-roles'],['padmin','tadmin']);assert.equal(post['x-mop-capability'],'contacts:write');
+  const row={name:'SYNTHETIC',roles:['REPORTER'],mobile:null,email:null,wecom_user_id:null,preferred_priorities:null,quiet_window:null,enabled:false};
+  const body={expected_version:0,mode:'CREATE_ONLY',acknowledge_exact_duplicate_rows:false,rows:[row]};
+  assert.ok(validates('ContactImportInput',body));assert.equal(validates('ContactImportInput',{...body,mode:'UPSERT'}),false);assert.equal(validates('ContactImportInput',{...body,tenant_id:id('2')}),false);
+  assert.equal(validates('ContactImportInput',{...body,rows:[{...row,enabled:null}]}),false);assert.equal(validates('ContactImportInput',{...body,rows:Array(101).fill(row)}),false);
+});
+const contactJob={id:id('1'),tenant_id:id('2'),created_by:id('3'),accepted_permission_version:1,input_sha256:'a'.repeat(64),mode:'CREATE_ONLY',row_count:1,status:'PENDING',step:'QUEUED',attempts:0,version:1,completed_rows:null,error:null,next_attempt_at:timestamp,created_at:timestamp,updated_at:timestamp,worker_liveness:null,notification_dispatched:false,identity_binding_created:false,contact_verification:'SELF_REPORTED_UNVERIFIED',source:'postgresql',scope:'CURRENT_CREATOR_TENANT'};
+test('导入作业不暴露载荷租约，不把未知Worker和部分结果冒充完成',()=>{
+  assert.ok(validates('ContactImportSummary',contactJob));for(const extra of [{worker_liveness:true},{lease_owner:'worker'},{payload_bytes:'private'},{notification_dispatched:true},{status:'SUCCEEDED'}])assert.equal(validates('ContactImportSummary',{...contactJob,...extra}),false);
+  assert.ok(validates('ContactImportDetail',{...contactJob,results:[]}));assert.equal(validates('ContactImportDetail',{...contactJob,results:[{row_number:1,contact_id:id('4'),contact_version:1}]}),false);
+  const done={...contactJob,status:'SUCCEEDED',step:'APPLIED',attempts:1,version:3,completed_rows:1,next_attempt_at:null,results:[{row_number:1,contact_id:id('4'),contact_version:1}]};assert.ok(validates('ContactImportDetail',done));assert.equal(validates('ContactImportDetail',{...done,results:[]}),false);assert.equal(validates('ContactImportDetail',{...done,results:[{...done.results[0],contact_version:2}]}),false);
+});
+test('创建者租户分页只返回元数据且游标必须成对',()=>{
+  const route=contract.paths['/contact-imports'].get;assert.deepEqual(route['x-mop-paired-query-keys'],['before_created_at','before_id']);assert.equal(route['x-mop-read-only'],true);
+  const page={tenant_id:id('2'),created_by:id('3'),items:[contactJob],has_more:false,next_before_created_at:null,next_before_id:null,source:'postgresql',scope:'CURRENT_CREATOR_TENANT',page_size_limit:100};assert.ok(validates('ContactImportPage',page));assert.equal(validates('ContactImportPage',{...page,has_more:true}),false);assert.equal(validates('ContactImportPage',{...page,items:[{...contactJob,results:[]}]}),false);
 });

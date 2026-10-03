@@ -185,3 +185,16 @@ V18 SHA256为75325f0423f788d5a71b71e0b1c8ba3b5c30e628aa3c588437f671954cbb39e9；
 真实进程验证运行3次同一固定JAR：正常Worker完成3条后SIGTERM退出143；第二次以真实测试租户guard行锁确保作业已领取且进程确实等待PG Lock，再仅对已核验自有JVM发SIGKILL，退出-9。终止后耐久作业仍LEASED/fence1，联系人/结果部分行均0；释放测试锁后启动第三个相同JAR，3秒租期到期自动重领fence2/attempt2，完整完成3条，无重复创建，源摘要不变。再原键回读仍得到PENDING/v1原受理收据；当前结果另读SUCCEEDED。全部6条自建联系人随后归档保历史、两作业留终态。用户/成员、报障outbox、照片job、资产来源job的5表指纹前后相同；API未重启，PG/KC与原服务器均未停止或改配置。
 
 受理通过真实仓储Java探针完成，不冒充公开202 HTTP；本次是实际Worker进程在途终止/重启，不是单纯对象重建或客户端丢包。API0.31/V1–V19保持，公开导入HTTP/UI、CSV/XLSX、通知/Q14及M2-9整体验收仍待；浏览器B03未解除。仓储69fbb43 CI37147330694 success已回读，见[Worker证据](evidence/niko-contact-import-worker-20261003.json)、[真实进程故障证据](evidence/niko-contact-import-worker-process-20261003.json)。
+
+
+## 2026-10-03 API0.32联系人耐久导入公开链路
+
+POST /contact-imports严格显式expected_version=0、CREATE_ONLY、acknowledge_exact_duplicate_rows与完整1–100行；当前管理员授权先于解析，CSRF/幂等/审计保护，全部query与租户/已有ID覆盖拒绝。一行无效则整批400未受理；字段完全相同行需明确ack=true，否则409，确认后每行分别新建，不自动合并/更新/跳过。角色和优先级集合顺序规范化，原行序、null/空/未知组及ack语义进入幂等摘要。202只返回operation_id/PENDING，原回执始终保持原状态，当前结果另GET。
+
+GET /contact-imports按当前创建者及租户进行RR一致只读分页，15默认、10/15/25/50/100有界、created_at/id成对键集游标；详情GET /contact-imports/{id}含完整连续原行号与不可变contact_version=1结果链接。其他创建者/租户404，不公开原字节、联系人事实、执行者或fence。状态PENDING/RUNNING/SUCCEEDED/FAILED与step区分原受理/重试/处理/完成；worker_liveness固定null，租约不证明进程在线。V19结构/ACL新增ready门禁，liveness不查数据库；未知Worker、身份或通知不冒充正常或已执行。
+
+12控制器+1ready+2真实PG分页授权新用例通过，完整根1239=1226执行（392真实PG）+13历史fixture跳过、6MinIO排除；67契约、714Web、typecheck/生产构建/生成一致性通过。首次Mockito回执重stub触发原answer导致测试NPE，改doAnswer后全根通过；未修改应用授权断言。
+
+重启自有隔离测试栈加载本次固定API JAR、刷新6个实际OIDC会话，在Worker停止时先验证真实202/PENDING，再启动已核验身份的专用Worker，合计388实际HTTP均按0.32契约校验。19真实作业包含100行上限、明确2条相同记录、集合规范重放、17+创建者分页、另一管理员/租户404、MSP/viewer403、CSRF/缺键/未知根/query/无效行/重复JSON/超界拒绝；全部生成119条合成联系人，每条按实际v1读取后归档保历史。再次原键重放仍PENDING，当前作业SUCCEEDED且链接仍v1。只读列表前后审计尾不变；用户、成员、报障outbox、照片job及资产来源job五表指纹不变。专用Worker最后SIGTERM退出143，未留后台常驻声称；原服务器、对象存储和通知未接入。
+
+V1–V19字节不变、无迁移或新凭据。原公开格式预览can_import=false继续表示格式检查不授予写入许可；新增耐久受理为独立显式写动作。页面目前仍仅格式预览，提交/进度/原请求恢复下一切片，真实浏览器B03、CSV/XLSX、通知/Q14及M2-9整体验收待。Worker前提交be7b724 CI37149191734 success已回读。见[API汇总](evidence/niko-contact-import-api-20261003.json)、[388 HTTP](evidence/niko-contact-import-api-http-20261003.json)、[实际Worker](evidence/niko-contact-import-api-worker-20261003.json)。

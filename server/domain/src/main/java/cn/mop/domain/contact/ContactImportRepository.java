@@ -13,6 +13,7 @@ public interface ContactImportRepository {
     void authorizeAcceptance(Access access);
     Job accept(Access access,List<CustomerContact> explicitRows);
     Job get(Access access,String id);
+    List<Job> list(Access access,int limit,Instant beforeCreatedAt,String beforeId);
     Optional<Claim> claimNext(String worker,Duration lease);
     /** Targeted internal worker claim; completion still rechecks captured current authorization. */
     Optional<Claim> claim(String jobId,String worker,Duration lease);

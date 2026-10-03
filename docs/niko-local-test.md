@@ -170,3 +170,8 @@ V1–V14全部字节冻结，V14 SHA256为39be55d8759de87c6e2b8f85b3958c60be24ae
 ## 联系人Worker验证入口
 
 根构建产出server/worker/target/mop-worker-0.1.0-SNAPSHOT-contact-imports.jar；仅显式开启MOP_CONTACT_IMPORT_WORKER_ENABLED=true，remote_test，复用私有runtime的3项受限PG连接。tools/niko-test/start-contact-worker.py要求先准备的独立固定artifact和明确租期，不初始化组件或自动迁移。tools/niko-test/verify-contact-worker.py --verify-owned-contact-worker只在自己的niko作用域进行一次实际进程证明；已有控制文件或证据时拒绝重复启动。验证使用真实仓储受理，6条合成联系人已归档，job历史保留，不等于公开HTTP或DOM。见联系人Worker证据。
+
+
+## API0.32联系人导入实际HTTP入口
+
+在已有隔离PG/KC与固定API0.32启动的QA shell，先运行capture-http-sessions.py刷新6会话，再显式运行tools/niko-test/verify-contact-import-api.py --verify-public-contact-import-api。一次性控制与证据已存在则拒绝重启场景；先确认无未完成作业/其他Worker，真实公开202受理后只启动/核验/关闭自身固定专用Worker。结果按实际公开接口逐条读取和归档合成联系人，5无关队列/身份表指纹一致，无迁移/新凭据。当前已验388请求、19作业、119联系人归档，Worker最终停止；重建栈只复用已批准本地数据，原服务器不改。

@@ -1,0 +1,1965 @@
+{
+  "verified_at": "2026-10-03T20:17:56.177Z",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "api_version": "0.32.0",
+  "http_requests": 388,
+  "checks": [
+    {
+      "name": "initial_session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "initial_session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "initial_session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "initial_session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "initial_session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "initial_session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "real_durable_202_without_worker",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "actual_pending_no_worker",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_original_pending",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_different_rows",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "other_creator_reviewer",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "other_creator_tadmin",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "switch_other_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "other_tenant_404",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "restore_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "write_denied_msp",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "list_denied_msp",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "write_denied_viewerA",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "list_denied_viewerA",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "write_denied_viewerB",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "list_denied_viewerB",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_read_denied",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "csrf_required",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "idempotency_required",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "duplicate_needs_explicit_ack",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "duplicates_two_new_rows",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "whole_batch_rejected_26",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "whole_batch_rejected_27",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "whole_batch_rejected_28",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "whole_batch_rejected_29",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "whole_batch_rejected_30",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "whole_batch_rejected_31",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "whole_batch_rejected_32",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "whole_batch_rejected_33",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_34",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_35",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_36",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_37",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "write_query_denied",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_cursor_39",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_cursor_40",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_cursor_41",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_cursor_42",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "detail_query_denied",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "canonical_set_accept",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "canonical_set_replay",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "tenant_admin_202",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_0",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_1",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_2",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_3",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_4",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_5",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_6",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_7",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_8",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_9",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_10",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_11",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_12",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "page_accept_13",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "maximum_100_accepted",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_audit_before",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "creator_first_page",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "creator_second_page",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_audit_after",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_66",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_67",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_68",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_69",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_70",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_71",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_72",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_73",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_74",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_75",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_76",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_77",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_78",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_79",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_80",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_81",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_82",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_83",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_84",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_85",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_86",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_87",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_88",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_89",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_90",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_91",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_92",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_93",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_94",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_95",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_96",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_97",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_98",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_99",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_100",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_101",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_102",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_103",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_104",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_105",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_106",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_107",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_108",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_109",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_110",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_111",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_112",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_113",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_114",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_115",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_116",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_117",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_118",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_119",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_120",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_121",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_122",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_123",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_124",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_125",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_126",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_127",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_128",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_129",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_130",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_131",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_132",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_133",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_134",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_135",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_136",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_137",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_138",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_139",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_140",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_141",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_142",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_143",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_144",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_145",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_146",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_147",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_148",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_149",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_150",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_151",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_152",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_153",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_154",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_155",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_156",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_157",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_158",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_159",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_160",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_161",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_162",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_163",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_164",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_165",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_166",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_167",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_168",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_169",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_170",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_171",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_172",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_173",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_174",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_175",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_176",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_177",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_178",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_job_179",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_180",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_181",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_182",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_183",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_184",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_185",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_186",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_187",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_188",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_189",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_190",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_191",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_192",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_193",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_194",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_195",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_196",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_197",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_198",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_199",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_200",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_201",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_202",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_203",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_204",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_205",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_206",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_207",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_208",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_209",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_210",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_211",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_212",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_213",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_214",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_215",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_216",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_217",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_218",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_219",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_220",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_221",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_222",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_223",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_224",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_225",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_226",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_227",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_228",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_229",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_230",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_231",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_232",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_233",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_234",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_235",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_236",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_237",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_238",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_239",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_240",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_241",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_242",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_243",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_244",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_245",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_246",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_247",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_248",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_249",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_250",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_251",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_252",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_253",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_254",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_255",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_256",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_257",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_258",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_259",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_260",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_261",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_262",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_263",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_264",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_265",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_266",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_267",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_268",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_269",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_270",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_271",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_272",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_273",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_274",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_275",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_276",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_277",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_278",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_279",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_280",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_281",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_282",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_283",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_284",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_285",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_286",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_287",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_288",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_289",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_290",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_291",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_292",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_293",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_294",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_295",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_296",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_297",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_298",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_299",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_300",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_301",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_302",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_303",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_304",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_305",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_306",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_307",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_308",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_309",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_310",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_311",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_312",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_313",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_314",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_315",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_316",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_317",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_318",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_319",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_320",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_321",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_322",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_323",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_324",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_325",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_326",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_327",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_328",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_329",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_330",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_331",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_332",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_333",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_334",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_335",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_336",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_337",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_338",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_339",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_340",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_341",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_342",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_343",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_344",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_345",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_346",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_347",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_348",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_349",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_350",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_351",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_352",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_353",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_354",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_355",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_356",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_357",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_358",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_359",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_360",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_361",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_362",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_363",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_364",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_365",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_366",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_367",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_368",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_369",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_370",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_371",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_372",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_373",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_374",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_375",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_376",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_377",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "created_contact_378",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "archive_own_synthetic_379",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_receipt_after_success_380",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_links_after_contact_archival_381",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_viewerB",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "actual_public_202": true,
+  "actual_dedicated_worker": true,
+  "jobs_created": 19,
+  "synthetic_contacts_created": 119,
+  "synthetic_contacts_archived": 119,
+  "original_receipts_remain_pending": true,
+  "all_batches_atomic_success": true,
+  "creator_and_tenant_404": true,
+  "readonly_audit_unchanged": true,
+  "existing_identity_bindings_unchanged": true,
+  "worker_liveness_claimed": null,
+  "storage_used": false,
+  "notifications_sent": false,
+  "credentials_output": false,
+  "browser_dom_tested": false,
+  "contract_done": false
+}

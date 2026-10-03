@@ -1,0 +1,40 @@
+{
+  "verified_at": "2026-10-03T20:17:57.089970+00:00",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "api_version": "0.32.0",
+  "worker_artifact_sha256": "ed88c9ae08e9b028e79a3d23670de1b8fba77ecf942c523f3d94bae5eb47b541",
+  "actual_public_acceptance_before_worker": true,
+  "owned_worker_identity_verified": true,
+  "lease_millis": 30000,
+  "worker_graceful_exit": 143,
+  "unrelated_table_fingerprints_unchanged": {
+    "action": "fingerprints",
+    "mop_user": {
+      "equality_sha256": "6d1e6afaea98204873f208eefea987891d1d9c7d927846f2826233730f116b7a",
+      "rows": 81
+    },
+    "mop_membership": {
+      "equality_sha256": "3e98933f95132f455d0b50107f96434e5a177220fc38ef7053ccd8206a0119ce",
+      "rows": 159
+    },
+    "mop_outbox": {
+      "equality_sha256": "88bc7597f8a13762733d4fe66c216ba922eec7e1fcf826b614c40f8c3b9bc470",
+      "rows": 1276
+    },
+    "mop_photo_job": {
+      "equality_sha256": "a66c88dea74e7220adaed4e459a8d19a5fac2bad65bafef674433d249e449368",
+      "rows": 465
+    },
+    "mop_asset_import_job": {
+      "equality_sha256": "9bc8a006ed65ee1bf9bdeeb3f40e9ef4d678a969726c54d05e45fd6fa8d8fc5c",
+      "rows": 480
+    }
+  },
+  "schema_migrations": 0,
+  "new_credentials": false,
+  "storage_used": false,
+  "notifications_sent": false,
+  "credentials_output": false,
+  "contract_done": false
+}

@@ -84,7 +84,7 @@ const showConflict = computed(() => editError.value instanceof ApiError && editE
 const revisionsOpen = ref(false)
 const revisionConfiguration = ref<Configuration | null>(null)
 const revisionPanel = ref<InstanceType<typeof ConfigurationRevisions> | null>(null)
-function openRevisions(item: Configuration) { closeDiagnostic(); revisionConfiguration.value = item; revisionsOpen.value = true }
+function openRevisions(item: Configuration) { if (revisionConfiguration.value?.key !== item.key && revisionPanel.value?.hasUnresolved()) { ElMessage.warning('上一配置原请求尚未确认，请先恢复原面板并重试'); revisionsOpen.value = true; return } closeDiagnostic(); revisionConfiguration.value = item; revisionsOpen.value = true }
 
 const comparisonOpen = ref(false)
 const comparisonKey = ref('')

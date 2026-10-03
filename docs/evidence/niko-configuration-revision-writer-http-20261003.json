@@ -1,0 +1,33 @@
+{
+  "verified_at": "2026-10-03T02:39:07.705Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual configurationRevisionWriter + ApiClient + strict receipt/history validator",
+  "http_requests": 30,
+  "frontend_post_attempts": 12,
+  "independent_concurrent_submit_posts": 1,
+  "synthetic_proposals": 3,
+  "proposal_final_versions": [
+    3,
+    2,
+    3
+  ],
+  "successful_mutations_and_audits": 8,
+  "discarded_successful_responses": 4,
+  "create_submit_review_withdraw_original_replay_verified": true,
+  "original_body_key_target_version_preserved": true,
+  "known_409_not_retried": true,
+  "explicit_new_baseline_after_conflict_verified": true,
+  "readonly_queries_did_not_append_success_audit": true,
+  "design_registry_and_legacy_draft_unchanged": true,
+  "effective_value": null,
+  "customer_confirmation": "UNVERIFIED",
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "fault_injection": "Discard four accepted 200 responses in transport; not physical network failure",
+  "remaining": [
+    "Legacy direct value draft editor recovery B06 remains separate",
+    "DOM/390px validation B03",
+    "Customer verification and formal publication remain unimplemented"
+  ]
+}

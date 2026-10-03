@@ -1,0 +1,50 @@
+{
+  "verified_at": "2026-10-03T01:05:09.967744+00:00",
+  "environment": "niko-local-test",
+  "status": "REAL_PG_DRAFT_REPOSITORY_VERIFIED",
+  "tests": {
+    "new_repository_real_pg": 14,
+    "root_reported": 704,
+    "root_executed": 691,
+    "real_pg": 212,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "contracts": 32
+  },
+  "initial_attempt": {
+    "repository_tests": 13,
+    "failures": 2,
+    "cause": "JSON numeric node types in test comparison differed after durable receipt deserialization; serialize/parse both sides before equality, then rerun all"
+  },
+  "features": [
+    "current-tenant padmin only",
+    "fresh membership and permission version checks",
+    "repeatable read authorization and data snapshot",
+    "protected idempotent command writes only",
+    "resource authorization before cached receipt",
+    "immutable before/after history",
+    "optimistic version conflict",
+    "same-key concurrency single write",
+    "different-key CAS exactly one winner",
+    "atomic head/revision/audit/receipt rollback",
+    "bounded readonly list/history",
+    "explicit incomplete/empty windows and Unicode maxima",
+    "single connection read and closed real pool fail closed"
+  ],
+  "committed_records": "clearly synthetic unpublished calendar drafts",
+  "q08_registry_values_remain_null": true,
+  "effective": false,
+  "customer_confirmation": "UNVERIFIED",
+  "frozen_migrations": "V1-V12 unchanged",
+  "independent_migration_check_executed": 0,
+  "api_version_unchanged": "0.17.0",
+  "calendar_http_tested": false,
+  "browser_dom_tested": false,
+  "api_added": false,
+  "frontend_added": false,
+  "pg_server_failure_tested": false,
+  "full_contract_done": false,
+  "credentials_output": false
+}

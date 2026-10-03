@@ -21,7 +21,7 @@ class PhotoReadinessTest {
     @BeforeEach void setup(){
         repository=mock(PlatformRepository.class);store=mock(PhotoObjectStore.class);configuration=new PhotoConfiguration();
         when(repository.metadata()).thenReturn(new RepositoryMetadata("remote_test","postgresql",true,"test_oidc"));
-        when(repository.assetReadProblems()).thenReturn(List.of());when(repository.ticketCommentProblems()).thenReturn(List.of());when(repository.workingCalendarProblems()).thenReturn(List.of());when(repository.manualIncidentProblems()).thenReturn(List.of());when(repository.internalNoteProblems()).thenReturn(List.of());when(repository.assetMetadataProblems()).thenReturn(List.of());when(repository.worklogProblems()).thenReturn(List.of());when(repository.assetDependencyProblems()).thenReturn(List.of());when(repository.dependencyReady()).thenReturn(true);when(repository.photoDependencyProblems()).thenReturn(List.of());
+        when(repository.assetReadProblems()).thenReturn(List.of());when(repository.ticketCommentProblems()).thenReturn(List.of());when(repository.workingCalendarProblems()).thenReturn(List.of());when(repository.manualIncidentProblems()).thenReturn(List.of());when(repository.manualRecoveryProblems()).thenReturn(List.of());when(repository.internalNoteProblems()).thenReturn(List.of());when(repository.assetMetadataProblems()).thenReturn(List.of());when(repository.worklogProblems()).thenReturn(List.of());when(repository.assetDependencyProblems()).thenReturn(List.of());when(repository.dependencyReady()).thenReturn(true);when(repository.photoDependencyProblems()).thenReturn(List.of());
         when(store.ready()).thenReturn(true);request=new MockHttpServletRequest();request.setAttribute("mop.trace_id","isolated-readiness");
     }
     private PhotoConfiguration.PhotoDependencyProbe probe(MockEnvironment environment){
@@ -114,6 +114,10 @@ class PhotoReadinessTest {
 
     @Test void manualRegistrationReadinessDoesNotClaimRecoveryOrTicketCompletion(){
         var controller=controller(probe(new MockEnvironment()));when(repository.manualIncidentProblems()).thenReturn(List.of("missing"));controller.live(request);verify(repository,never()).manualIncidentProblems();var failure=assertThrows(DomainException.class,()->controller.ready(request));assertEquals(503,failure.status);assertEquals("manual_incidents",((Map<?,?>)failure.details.get(0)).get("component"));when(repository.manualIncidentProblems()).thenReturn(List.of());Map<?,?> ready=(Map<?,?>)data(controller.ready(request)).get("manual_incidents");assertEquals(true,ready.get("schema_access_ready"));assertEquals("MANUAL",ready.get("source_state"));assertEquals("REGISTERED_ONLY",ready.get("registration_status"));assertEquals(false,ready.get("monitoring_recovery_applicable"));assertEquals(false,ready.get("ticket_automatically_created"));
+    }
+
+    @Test void humanRecoveryReadinessDoesNotClaimMonitoringOrFormalClosure(){
+        var controller=controller(probe(new MockEnvironment()));when(repository.manualRecoveryProblems()).thenReturn(List.of("missing"));controller.live(request);verify(repository,never()).manualRecoveryProblems();var failure=assertThrows(DomainException.class,()->controller.ready(request));assertEquals(503,failure.status);assertEquals("manual_recovery",((Map<?,?>)failure.details.get(0)).get("component"));when(repository.manualRecoveryProblems()).thenReturn(List.of());Map<?,?> ready=(Map<?,?>)data(controller.ready(request)).get("manual_recovery");assertEquals(true,ready.get("schema_access_ready"));assertEquals(false,ready.get("monitoring_recovery_applicable"));assertEquals(false,ready.get("ticket_state_changed"));assertEquals(false,ready.get("sla_changed"));
     }
 
 }

@@ -8,8 +8,8 @@ public final class Capabilities {
     public static List<String> forRole(String role) {
         if(role==null)return List.of();
         return switch (role) {
-            case "padmin" -> List.of("assets:read", "assets:write", "configurations:read", "configurations:write", "audit:read", "tickets:read", "ticket_comments:read", "ticket_comments:write", "ticket_notes:read_internal", "ticket_notes:write_internal", "manual_incidents:read", "manual_incidents:write");
-            case "msp" -> List.of("assets:read", "assets:write", "tickets:read", "ticket_comments:read", "ticket_comments:write", "worklogs:read_own", "worklogs:write_own", "ticket_notes:read_internal", "ticket_notes:write_internal", "manual_incidents:read", "manual_incidents:write");
+            case "padmin" -> List.of("assets:read", "assets:write", "configurations:read", "configurations:write", "audit:read", "tickets:read", "ticket_comments:read", "ticket_comments:write", "ticket_notes:read_internal", "ticket_notes:write_internal", "manual_incidents:read", "manual_incidents:write", "manual_recovery:read", "manual_recovery:confirm");
+            case "msp" -> List.of("assets:read", "assets:write", "tickets:read", "ticket_comments:read", "ticket_comments:write", "worklogs:read_own", "worklogs:write_own", "ticket_notes:read_internal", "ticket_notes:write_internal", "manual_incidents:read", "manual_incidents:write", "manual_recovery:read", "manual_recovery:confirm");
             case "tadmin" -> List.of("assets:read", "assets:write", "tickets:read", "ticket_comments:read", "ticket_comments:write", "tickets:report");
             case "viewer" -> List.of("assets:read", "tickets:read", "ticket_comments:read", "ticket_comments:write", "tickets:report");
             default -> List.of();

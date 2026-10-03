@@ -1,0 +1,52 @@
+{
+  "verified_at": "2026-10-03T05:36:41.107472+00:00",
+  "environment": "niko-local-test",
+  "api_version": "0.20.0",
+  "status": "HUMAN_RECOVERY_API_AND_REAL_HTTP_VERIFIED",
+  "tests": {
+    "new_controller": 11,
+    "new_readiness": 1,
+    "root_reported": 806,
+    "root_executed": 793,
+    "real_pg": 256,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 39,
+    "web_tests": 454,
+    "typecheck_and_build": true,
+    "failures": 0,
+    "errors": 0
+  },
+  "http_evidence": "niko-manual-recovery-api-http-20261003.json",
+  "http_checks": 94,
+  "synthetic_confirmations": 4,
+  "matching_success_audits": 4,
+  "paths": [
+    "GET /api/v1/manual-incidents/{incidentId}/recovery",
+    "POST /api/v1/manual-incidents/{incidentId}/recovery"
+  ],
+  "input": [
+    "expected_version",
+    "note",
+    "reported_recovered_at"
+  ],
+  "strict_body_bytes": 32768,
+  "csrf_idempotency_and_fresh_parent_authorization": true,
+  "expected_zero_to_one_cas": true,
+  "explicit_current_projection_separate_from_original_registration": true,
+  "human_status": "HUMAN_CONFIRMED",
+  "verification_status": "SELF_REPORTED",
+  "reported_recovery_time_can_be_null": true,
+  "original_registration_and_receipt_unchanged": true,
+  "monitoring_recovery_applicable": false,
+  "ticket_state_changed": false,
+  "sla_changed": false,
+  "normal_owned_stack_restart_with_immutable_jar": true,
+  "frozen_migrations_unchanged": "V1-V14",
+  "automatic_migration": false,
+  "recovery_ui_added": false,
+  "browser_dom_tested": false,
+  "monitoring_callback_tested": false,
+  "credentials_output": false,
+  "full_contract_done": false
+}

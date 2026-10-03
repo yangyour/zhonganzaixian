@@ -1,0 +1,502 @@
+{
+  "verified_at": "2026-10-03T05:35:33.880Z",
+  "environment": "niko-local-test",
+  "api_version": "0.20.0",
+  "passed": true,
+  "http_checks": 94,
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_synthetic_asset",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "register_parent_main",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "initial_unconfirmed",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_read_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_confirm_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_read_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_confirm_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_read_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_confirm_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "csrf_required",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "key_required",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_claim_tenant_id",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_claim_confirmed_by",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_claim_recorded_at",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_claim_monitor_state",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_claim_disposition_state",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_claim_manual_recovery_status",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_claim_verification_status",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_claim_monitoring_recovery_applicable",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_claim_ticket_state_changed",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_claim_sla_changed",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_28",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_29",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_30",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_31",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_32",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_33",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_34",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_35",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_36",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_37",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_38",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_39",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_40",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_41",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_42",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "explicit_nullable_time_required",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "future_recovery_not_asserted_as_completed",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "wrong_initial_version",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_requests_left_no_confirmation",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "explicit_human_confirmation",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_confirmation_receipt",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_reordered_fields",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_changed_note",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "different_key_old_version",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "already_confirmed_cannot_overwrite",
+      "status": 422,
+      "contract_valid": true
+    },
+    {
+      "name": "other_internal_reads_current",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_registration_unchanged",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_registration_receipt_unchanged",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_registration_replay_did_not_reset_recovery",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "register_parent_same-key",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_concurrent_a",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_concurrent_b",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "register_parent_human-race",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "different_key_human_a",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "different_key_human_b",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "register_parent_historical",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "historical_offset_max_unicode",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_get_65",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_post_66",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_get_67",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_post_68",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_get_69",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_post_70",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_parent",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_visible_asset",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "switch_other_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_human_evidence_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_parent_confirm_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_synthetic_parent",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "restore_original_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_unconfirmed_parent_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_parent_hidden_before_cas",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "one_success_audit_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "immutable_confirmation_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "one_success_audit_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "immutable_confirmation_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "one_success_audit_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "immutable_confirmation_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "one_success_audit_3",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "immutable_confirmation_3",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "human_recovery_schema_ready",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "asset_unchanged",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_tail_before",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_current",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_original_snapshot",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_tail_after",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "synthetic_manual_parents": 5,
+  "human_confirmations": 4,
+  "matching_success_audits": 4,
+  "same_key_two_receipts_one_confirmation": true,
+  "different_keys_two_humans_one_winner": true,
+  "original_registration_and_receipt_unchanged": true,
+  "unknown_recovery_time_not_filled": true,
+  "explicit_historical_time_preserved": true,
+  "future_time_rejected": true,
+  "current_and_original_snapshots_separate": true,
+  "foreign_objects_404": true,
+  "original_tenant_restored": true,
+  "readonly_success_audit_tail_unchanged": true,
+  "monitoring_callback_tested": false,
+  "ticket_state_changed": false,
+  "sla_changed": false,
+  "credentials_output": false,
+  "browser_dom_tested": false,
+  "limitations": [
+    "No recovery UI/DOM acceptance yet",
+    "No live role revocation or PG process failure",
+    "No correction/withdrawal, formal disposition, event-to-ticket or SLA conclusion"
+  ]
+}

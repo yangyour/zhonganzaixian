@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.19.0",
+    "version": "0.20.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -6569,6 +6569,348 @@
         }
       }
     },
+    "/manual-incidents/{incidentId}/recovery": {
+      "get": {
+        "operationId": "getManualRecovery",
+        "summary": "当前独立人工恢复确认，不改原登记快照",
+        "x-mop-capability": "manual_recovery:read",
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "当前同租户内部成员读取独立人工确认；无确认时version=0/confirmation=null，不推断监控状态或正式处置。跨租户/不存在手工父登记404，客户403。原登记/原收据不改变；人工确认仍SELF_REPORTED，不等于正式结单或SLA结论。",
+        "parameters": [
+          {
+            "name": "incidentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManualRecoveryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "confirmManualRecovery",
+        "summary": "首个人工确认CAS与原请求回执，不触发正式处置或结单",
+        "parameters": [
+          {
+            "name": "incidentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManualRecoveryInput"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "manual_recovery:confirm",
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "当前同租户内部成员读取独立人工确认；无确认时version=0/confirmation=null，不推断监控状态或正式处置。跨租户/不存在手工父登记404，客户403。原登记/原收据不改变；人工确认仍SELF_REPORTED，不等于正式结单或SLA结论。 仅首次0到1确认；当前版本不符409，已有确认不覆盖422。原键返回原人工确认，JSON字段顺序不改变摘要，原文/已填时间原始值保持有意义。CSRF/幂等/审计必需；输入不得指定确认者、记录时间、监控恢复或工单状态。更正/撤回流程尚未提供。",
+        "x-mop-max-body-bytes": 32768,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-replay-authorization": "current internal member and manual parent before cached receipt lookup",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManualRecoveryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/manual-incidents": {
       "get": {
         "operationId": "listManualIncidents",
@@ -6579,7 +6921,7 @@
           "padmin"
         ],
         "x-mop-reject-duplicate-query-keys": true,
-        "description": "仅当前租户获准内部成员，客户与未知角色403，跨租户资产/登记404。返回不可变原登记快照，其中恢复字段仅表示登记时事实，不代表后续独立人工恢复确认。只记录明确手工来源事实，技术登记时间不推断实际故障时间；未知监控、正式处置、工单优先级和恢复时间保持null。不可修改原登记，不提供监控自动恢复、人工恢复或建单动作。",
+        "description": "仅当前租户获准内部成员，客户与未知角色403，跨租户资产/登记404。返回不可变原登记快照，其中恢复字段仅表示登记时事实，不代表后续独立人工恢复确认。只记录明确手工来源事实，技术登记时间不推断实际故障时间；未知监控、正式处置、工单优先级和恢复时间保持null。不可修改原登记，原登记接口不提供恢复或建单动作，人工确认由独立recovery接口记录。",
         "parameters": [
           {
             "name": "page_size",
@@ -6794,7 +7136,7 @@
           "padmin"
         ],
         "x-mop-reject-duplicate-query-keys": true,
-        "description": "仅当前租户获准内部成员，客户与未知角色403，跨租户资产/登记404。返回不可变原登记快照，其中恢复字段仅表示登记时事实，不代表后续独立人工恢复确认。只记录明确手工来源事实，技术登记时间不推断实际故障时间；未知监控、正式处置、工单优先级和恢复时间保持null。不可修改原登记，不提供监控自动恢复、人工恢复或建单动作。 当前资产版本冲突409；资产名快照从服务器读取，登记/审计/幂等回执同事务。200仅代表REGISTERED_ONLY。原键在当前资格重查后返回原登记，即使资产后续改名；不同内容同键409，JSON字段顺序不影响摘要，原始值仍保留。",
+        "description": "仅当前租户获准内部成员，客户与未知角色403，跨租户资产/登记404。返回不可变原登记快照，其中恢复字段仅表示登记时事实，不代表后续独立人工恢复确认。只记录明确手工来源事实，技术登记时间不推断实际故障时间；未知监控、正式处置、工单优先级和恢复时间保持null。不可修改原登记，原登记接口不提供恢复或建单动作，人工确认由独立recovery接口记录。 当前资产版本冲突409；资产名快照从服务器读取，登记/审计/幂等回执同事务。200仅代表REGISTERED_ONLY。原键在当前资格重查后返回原登记，即使资产后续改名；不同内容同键409，JSON字段顺序不影响摘要，原始值仍保留。",
         "x-mop-max-body-bytes": 8192,
         "x-mop-reject-duplicate-json-keys": true,
         "x-mop-replay-authorization": "current role and same-tenant asset guard before cached receipt lookup",
@@ -6942,7 +7284,7 @@
           "padmin"
         ],
         "x-mop-reject-duplicate-query-keys": true,
-        "description": "仅当前租户获准内部成员，客户与未知角色403，跨租户资产/登记404。返回不可变原登记快照，其中恢复字段仅表示登记时事实，不代表后续独立人工恢复确认。只记录明确手工来源事实，技术登记时间不推断实际故障时间；未知监控、正式处置、工单优先级和恢复时间保持null。不可修改原登记，不提供监控自动恢复、人工恢复或建单动作。",
+        "description": "仅当前租户获准内部成员，客户与未知角色403，跨租户资产/登记404。返回不可变原登记快照，其中恢复字段仅表示登记时事实，不代表后续独立人工恢复确认。只记录明确手工来源事实，技术登记时间不推断实际故障时间；未知监控、正式处置、工单优先级和恢复时间保持null。不可修改原登记，原登记接口不提供恢复或建单动作，人工确认由独立recovery接口记录。",
         "parameters": [
           {
             "name": "id",
@@ -12323,6 +12665,34 @@
                   "ticket_automatically_created"
                 ],
                 "additionalProperties": false
+              },
+              "manual_recovery": {
+                "type": "object",
+                "properties": {
+                  "schema_access_ready": {
+                    "type": "boolean"
+                  },
+                  "source": {
+                    "const": "HUMAN_CONFIRMATION"
+                  },
+                  "monitoring_recovery_applicable": {
+                    "const": false
+                  },
+                  "ticket_state_changed": {
+                    "const": false
+                  },
+                  "sla_changed": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "schema_access_ready",
+                  "source",
+                  "monitoring_recovery_applicable",
+                  "ticket_state_changed",
+                  "sla_changed"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -12341,7 +12711,8 @@
               "ticket_comments",
               "asset_reads",
               "working_calendars",
-              "manual_incidents"
+              "manual_incidents",
+              "manual_recovery"
             ],
             "additionalProperties": false
           },
@@ -13680,6 +14051,223 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/ManualAssetQueryPage"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ManualRecoveryConfirmation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "incident_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "confirmed_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "原始Unicode文字；拒绝全空白/BOM-only、非文本控制字符和无效代理字符，允许LF/CR/TAB，不trim或归一"
+          },
+          "note_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reported_recovered_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "人工明确提供的恢复发生时间，可null；不能用技术记录时间补全，若填写不得晚于确认记录时间"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+          },
+          "manual_recovery_status": {
+            "const": "HUMAN_CONFIRMED"
+          },
+          "verification_status": {
+            "const": "SELF_REPORTED"
+          },
+          "record_source": {
+            "const": "MANUAL_RECOVERY_CONFIRMATION"
+          },
+          "monitor_state": {
+            "type": "null"
+          },
+          "disposition_state": {
+            "type": "null"
+          },
+          "monitoring_recovery_applicable": {
+            "const": false
+          },
+          "ticket_state_changed": {
+            "const": false
+          },
+          "sla_changed": {
+            "const": false
+          },
+          "immutable": {
+            "const": true
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "incident_id",
+          "confirmed_by",
+          "note",
+          "note_sha256",
+          "reported_recovered_at",
+          "recorded_at",
+          "manual_recovery_status",
+          "verification_status",
+          "record_source",
+          "monitor_state",
+          "disposition_state",
+          "monitoring_recovery_applicable",
+          "ticket_state_changed",
+          "sla_changed",
+          "immutable"
+        ],
+        "additionalProperties": false
+      },
+      "ManualRecoveryCurrent": {
+        "type": "object",
+        "properties": {
+          "incident_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "0仅代表尚无独立人工确认；1代表已有不可变确认，不能覆盖"
+          },
+          "manual_recovery_status": {
+            "enum": [
+              "NOT_CONFIRMED",
+              "HUMAN_CONFIRMED"
+            ]
+          },
+          "confirmation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ManualRecoveryConfirmation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_INTERNAL_HUMAN_CONFIRMATION"
+          }
+        },
+        "required": [
+          "incident_id",
+          "tenant_id",
+          "version",
+          "manual_recovery_status",
+          "confirmation",
+          "source",
+          "scope"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "version": {
+                "const": 0
+              },
+              "manual_recovery_status": {
+                "const": "NOT_CONFIRMED"
+              },
+              "confirmation": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "version": {
+                "const": 1
+              },
+              "manual_recovery_status": {
+                "const": "HUMAN_CONFIRMED"
+              },
+              "confirmation": {
+                "$ref": "#/components/schemas/ManualRecoveryConfirmation"
+              }
+            }
+          }
+        ]
+      },
+      "ManualRecoveryInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "0仅代表尚无独立人工确认；1代表已有不可变确认，不能覆盖"
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "原始Unicode文字；拒绝全空白/BOM-only、非文本控制字符和无效代理字符，允许LF/CR/TAB，不trim或归一"
+          },
+          "reported_recovered_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+          }
+        },
+        "required": [
+          "expected_version",
+          "note",
+          "reported_recovered_at"
+        ],
+        "additionalProperties": false
+      },
+      "ManualRecoveryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ManualRecoveryCurrent"
           },
           "trace_id": {
             "type": "string"

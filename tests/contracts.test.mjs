@@ -179,7 +179,7 @@ test('operation区分报障门禁与真实文件状态，终态不得伪造', ()
 
 test('就绪成功不能把已启用但缺schema或存储的照片能力写成READY', () => {
   const photos = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, policy_source: 'USER_DEVELOPMENT_DIRECTION', reasons: [] };
-  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, working_calendars: { schema_access_ready: true, effective: false, customer_confirmation: 'UNVERIFIED' }, manual_incidents: { schema_access_ready: true, source_state: 'MANUAL', registration_status: 'REGISTERED_ONLY', monitoring_recovery_applicable: false, ticket_automatically_created: false }, photos, asset_reads: { unicode_search_ready: true, pagination: 'BOUNDED_POSTGRESQL_KEYSET' }, ticket_comments: { schema_access_ready: true, visibility: 'REPORTER_AND_INTERNAL', internal_identity_exposed: false, itsm_applied: false }, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
+  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, working_calendars: { schema_access_ready: true, effective: false, customer_confirmation: 'UNVERIFIED' }, manual_incidents: { schema_access_ready: true, source_state: 'MANUAL', registration_status: 'REGISTERED_ONLY', monitoring_recovery_applicable: false, ticket_automatically_created: false }, manual_recovery: { schema_access_ready: true, source: 'HUMAN_CONFIRMATION', monitoring_recovery_applicable: false, ticket_state_changed: false, sla_changed: false }, photos, asset_reads: { unicode_search_ready: true, pagination: 'BOUNDED_POSTGRESQL_KEYSET' }, ticket_comments: { schema_access_ready: true, visibility: 'REPORTER_AND_INTERNAL', internal_identity_exposed: false, itsm_applied: false }, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
   assert.equal(validates('ReadinessResult', { data, trace_id: 'MOP-FAKE-readiness' }), true);
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('ReadinessResult', { data: { ...data, photos: { ...photos, [key]: false } }, trace_id: 'MOP-FAKE-readiness' }), false);
   assert.equal(validates('ReadinessResult', { data: { ...data, production_ready: true }, trace_id: 'MOP-FAKE-readiness' }), false);
@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.19.0');
+  assert.equal(contract.info.version, '0.20.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -488,4 +488,21 @@ test('手工事件接口限定内部当前租户、原键重放资格和只读�
   const routes = contract.paths['/manual-incidents']; assert.deepEqual(Object.keys(routes), ['get', 'post']); assert.deepEqual(routes.get['x-mop-roles'], ['msp', 'padmin']); assert.match(routes.post['x-mop-replay-authorization'], /before cached receipt/); assert.equal(routes.post['x-mop-max-body-bytes'], 8192); assert.deepEqual(Object.keys(contract.paths['/manual-incidents/{id}']), ['get']);
   const page = { items: [], has_more: false, next_before_registered_at: null, next_before_id: null, source: 'postgresql', scope: 'CURRENT_TENANT_INTERNAL_MANUAL_REGISTRATIONS', page_size_limit: 100, pagination_consistency: 'CURRENT_REQUEST_SNAPSHOT_ONLY' }; assert.equal(validates('ManualIncidentPage', page), true); assert.equal(validates('ManualIncidentPage', { ...page, has_more: true }), false);
   const ready = contract.components.schemas.ReadinessResult.properties.data; assert.ok(ready.required.includes('manual_incidents')); assert.equal(ready.properties.manual_incidents.properties.ticket_automatically_created.const, false);
+});
+
+
+test('人工恢复独立当前投影区分没有确认与已有人类证据，未知时间不补齐', () => {
+  const current = { incident_id: id('1'), tenant_id: id('2'), version: 0, manual_recovery_status: 'NOT_CONFIRMED', confirmation: null, source: 'postgresql', scope: 'CURRENT_TENANT_INTERNAL_HUMAN_CONFIRMATION' };
+  assert.equal(validates('ManualRecoveryCurrent', current), true);
+  for (const patch of [{ version: 1 }, { manual_recovery_status: 'HUMAN_CONFIRMED' }, { version: 2 }]) assert.equal(validates('ManualRecoveryCurrent', { ...current, ...patch }), false);
+  const confirmation = { id: id('3'), tenant_id: id('2'), incident_id: id('1'), confirmed_by: id('4'), note: '  人工说明😀\n原文 ', note_sha256: 'a'.repeat(64), reported_recovered_at: null, recorded_at: timestamp, manual_recovery_status: 'HUMAN_CONFIRMED', verification_status: 'SELF_REPORTED', record_source: 'MANUAL_RECOVERY_CONFIRMATION', monitor_state: null, disposition_state: null, monitoring_recovery_applicable: false, ticket_state_changed: false, sla_changed: false, immutable: true };
+  assert.equal(validates('ManualRecoveryCurrent', { ...current, version: 1, manual_recovery_status: 'HUMAN_CONFIRMED', confirmation }), true);
+  for (const patch of [{ monitor_state: 'NORMAL' }, { disposition_state: 'RESOLVED' }, { verification_status: 'VERIFIED' }, { monitoring_recovery_applicable: true }, { ticket_state_changed: true }, { sla_changed: true }]) assert.equal(validates('ManualRecoveryConfirmation', { ...confirmation, ...patch }), false);
+});
+test('人工恢复必须显式说明、可空时间和版本，不接受身份或状态覆盖', () => {
+  const input = { expected_version: 0, note: '人工确认', reported_recovered_at: null }; assert.equal(validates('ManualRecoveryInput', input), true);
+  for (const patch of [{ expected_version: -1 }, { expected_version: 2 }, { expected_version: null }, { note: '' }, { note: '😀'.repeat(2001) }, { recorded_at: timestamp }, { confirmed_by: id('1') }, { monitor_state: 'NORMAL' }]) assert.equal(validates('ManualRecoveryInput', { ...input, ...patch }), false);
+  const missing = { ...input }; delete missing.reported_recovered_at; assert.equal(validates('ManualRecoveryInput', missing), false);
+  const route = contract.paths['/manual-incidents/{incidentId}/recovery']; assert.deepEqual(Object.keys(route), ['get', 'post']); assert.deepEqual(route.get['x-mop-roles'], ['msp', 'padmin']); assert.match(route.post['x-mop-replay-authorization'], /before cached receipt/); assert.equal(route.post['x-mop-max-body-bytes'], 32768);
+  assert.ok(contract.components.schemas.ReadinessResult.properties.data.required.includes('manual_recovery'));
 });

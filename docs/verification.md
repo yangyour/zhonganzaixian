@@ -769,3 +769,14 @@ PostgresManualRecoveryRepository已实现独立当前确认读取/首次人工�
 同时纠正旧只读页的“恢复未确认”徽标：原V13字段始终是原登记快照，不应在已有独立确认后被当成当前状态。现明确“原始快照/原登记时恢复状态”，当前人工确认暂未加载，不能推断；契约只补该字段描述，响应结构/API0.19不变，新增1页面源码断言后454Web/类型构建通过。当前仍未提供人工恢复公开API或操作UI，下一步接独立当前投影与确认接口；撤回/更正、正式事件五态/建单/SLA、DOM及128项整体继续未DONE。V1–V14未改。
 
 见[人工恢复仓储证据](evidence/niko-manual-recovery-repository-20261003.json)。
+
+
+## 2026-10-03 API0.20独立当前人工恢复查询/确认与94HTTP
+
+新增GET/POST /api/v1/manual-incidents/{incidentId}/recovery，当前内部manual_recovery:read/confirm能力。返回独立当前包装：无确认version0/confirmation=null/NOT_CONFIRMED；有不可变证据version1/HUMAN_CONFIRMED，仍SELF_REPORTED。原GET手工登记及原创建回执完全不变，不再把原登记快照当成当前恢复。POST仅expected_version/note/reported_recovered_at（必须显式填写null或时间），32768字节/严格重复JSON、层深、尾随内容、Unicode和时间精度；确认人/记录时间/监控/正式状态字段禁止覆盖。CSRF、幂等、当前父登记重放前再授权及审计保留，实际未来恢复时间拒绝。
+
+11controller/1ready新增，完整根806=793执行（含256真实PG）+13历史fixture跳过、6MinIO排除；39契约/454Web/类型构建通过。正常退出旧拥有栈，使用新固定JAR启动并刷新6个真实OIDC身份后，94实际HTTP首遍通过。4份合成人工确认/4成功审计；同键并发仅一次确认，不同人/不同键一成功一409；原键/JSON换序重放原回执，同键改文409，新键旧版本409、已确认不覆盖422。客户403/匿名401/CSRF403、跨租户与不存在父登记404、输入/查询覆盖400，切租户测试最终恢复。历史显式offset归一UTC、2000 emoji说明、未知实际恢复时间null都按真实契约验证。
+
+恢复GET与原登记GET独立：人工确认之后，原登记原收据及原创建键重放仍不变，当前恢复不会被原创建回执重放重置。只读审计尾与资产不变。ready核验实际恢复结构/权限并明确不触发监控恢复/工单/SLA；live不探测/不迁移。V1–V14未改。下一步页面独立当前恢复显示和确认表单，原快照不能代替当前读取。实际控件DOM、监控回调、撤回/更正、正式处置/事件建单/SLA与全部128项仍未DONE。
+
+见[API与回归证据](evidence/niko-manual-recovery-api-20261003.json)和[真实HTTP证据](evidence/niko-manual-recovery-api-http-20261003.json)。

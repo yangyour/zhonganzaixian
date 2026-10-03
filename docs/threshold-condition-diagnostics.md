@@ -36,3 +36,14 @@
 375条实际配置登记完整DTO摘要前后相同；三次单独只读重复诊断前后审计尾相同。HTTP证据中的readonly_candidate_posts=3专指这三次readonly_repeat审计探针，不是全部诊断POST数量；总75为全部实发请求。26项能力目录hash及六身份权限版本不变，除明确测试租户切换无业务写入、无新授权。纯核心f1bbbfce CI37153822693 success已回读。
 
 当前尚无新前端诊断页面/真实DOM、监控组件或规则发布，API0.33/V1–V19无结构修改和自动迁移。客户Q06矩阵/物理范围/心跳与真实模板适配继续独立待定。见[API汇总](evidence/niko-threshold-diagnostic-api-20261003.json)、[75 HTTP](evidence/niko-threshold-diagnostic-http-20261003.json)。
+
+
+## 2026-10-03 前端精确诊断状态模块
+
+新增thresholdDiagnosticWorkspace与独立严格JSON扫描器，不改既有联系人解析器。原始输入在JSON.parse前检查重复解码键/深度/字节/token/字符串和非规范或非安全数字，随后要求完整6字段、显式比较符/方向/单位及十进制字符串。18新前端测试，全766Web/typecheck/build与70契约通过；Vite另有>500kB最小化chunk建议警告，构建exit0，不据此宣称实际浏览器性能达标。
+
+用有界BigInt按小数位缩放比较，逐字段独立复核实际服务器响应的原输入/租户/版本、全部半直线关系、issues顺序与固定不可发布标记；17位接近1、40位整数/小数、负分数不经JS Number舍入。验证期望只用于核对真实响应，不提供本地成功替代。输入编辑立即清旧结果，重复诊断抑制，网络/403/坏成功响应不保留旧通过结论；强制上下文或卸载清空私有输入并丢弃迟到响应。
+
+编译实际模块+ApiClient连接API0.33/现有真实PG/OIDC，34HTTP（29只读诊断POST）、21显式候选向量全通过，包含高/低、未知、方向/单位矛盾、等号四边界、BigDecimal与BigInt最大精度/负分数逐项一致。一次真实200在客户端丢弃、四次实际200被挂起后验证编辑/双击/上下文/卸载，均无本地假成功；不是物理断网或JVM故障。MSP真实403、375登记DTO摘要不变、只读成功审计尾不变，无规则保存/发布、监控读取或其他业务写入。
+
+API提交a0cfe540 CI37154429680 success已回读。此切片未创建页面或DOM验收，Q06生产矩阵/组件仍独立待；下一步显式候选诊断页面。见[模块证据](evidence/niko-threshold-client-20261003.json)、[34真实HTTP](evidence/niko-threshold-client-http-20261003.json)。

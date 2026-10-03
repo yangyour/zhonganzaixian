@@ -198,3 +198,14 @@ GET /contact-imports按当前创建者及租户进行RR一致只读分页，15�
 重启自有隔离测试栈加载本次固定API JAR、刷新6个实际OIDC会话，在Worker停止时先验证真实202/PENDING，再启动已核验身份的专用Worker，合计388实际HTTP均按0.32契约校验。19真实作业包含100行上限、明确2条相同记录、集合规范重放、17+创建者分页、另一管理员/租户404、MSP/viewer403、CSRF/缺键/未知根/query/无效行/重复JSON/超界拒绝；全部生成119条合成联系人，每条按实际v1读取后归档保历史。再次原键重放仍PENDING，当前作业SUCCEEDED且链接仍v1。只读列表前后审计尾不变；用户、成员、报障outbox、照片job及资产来源job五表指纹不变。专用Worker最后SIGTERM退出143，未留后台常驻声称；原服务器、对象存储和通知未接入。
 
 V1–V19字节不变、无迁移或新凭据。原公开格式预览can_import=false继续表示格式检查不授予写入许可；新增耐久受理为独立显式写动作。页面目前仍仅格式预览，提交/进度/原请求恢复下一切片，真实浏览器B03、CSV/XLSX、通知/Q14及M2-9整体验收待。Worker前提交be7b724 CI37149191734 success已回读。见[API汇总](evidence/niko-contact-import-api-20261003.json)、[388 HTTP](evidence/niko-contact-import-api-http-20261003.json)、[实际Worker](evidence/niko-contact-import-api-worker-20261003.json)。
+
+
+## 2026-10-03 导入前端状态模块与原请求恢复
+
+新增contactImportWorkspace，复用原始JSON重复键/技术边界检查与8字段事实校验，任意坏行整批阻止；完全相同行须显式确认，原行顺序保留、不合并。只捕获一次规范payload和幂等key，网络或异常成功回执为uncertain；任何后续400/401/403/404/409/422/503重试都不能推翻之前未知是否提交。未知期间不能新批次替换；普通GET当前SUCCEEDED或列表刷新仍不确认旧POST，只有原key/body重试核验PENDING回执才能解除。首次明确拒绝可经显式begin重新准备，已受理回执与当前详情独立存放。
+
+逐字段验证creator/tenant/固定未知标记、安全整数/时间顺序、PENDING首次或退避、RUNNING、FAILED原因、SUCCEEDED完整连续且唯一v1结果；元数据不准混入payload/租约/结果。相同作业的原hash/行数/受理权限/创建者不可变，已读版本/尝试次数不得倒退、终态不可重写；同版本内容不一致拒绝清旧显示。15项列表验证有序/无重复/成对游标，不跨页保留旧详情。未知Worker在线保持null。强制上下文变化/卸载清空私有payload、cache和回执，所有迟到响应丢弃；重复提交抑制，外部快照不能改内部原请求。
+
+20新增前端测试，全734Web/typecheck/build、67契约/生成一致性通过。实际编译模块+ApiClient连接现有API0.32/六真实OIDC及专用Worker，72HTTP、6批7条合成联系人全部归档：一次真实202响应在客户端丢弃，MSP实际403原请求重试保持未知；GET当前成功/列表不能确认，切回原管理员同body/key取得原PENDING且无重复。三次实际202与一次GET响应被客户端延迟，验证防重复、强制reset/dispose和旧读丢弃；不声称物理网络故障或进程kill。另一创建者404清除旧显示、两页游标、明确相同行分别2条、只读审计尾不变均验。五无关表指纹保持，专用Worker已正常停止，无新凭据/迁移/存储/通知。
+
+API提交b0af459 CI37151368999 success已回读。本次仅前端状态模块，页面提交/进度/离开保护仍待接入，B03真实DOM与通知送达仍未验，不标M2-9完成。见[模块汇总](evidence/niko-contact-import-client-20261003.json)、[72真实HTTP](evidence/niko-contact-import-client-http-20261003.json)、[Worker生命周期](evidence/niko-contact-import-client-worker-20261003.json)。

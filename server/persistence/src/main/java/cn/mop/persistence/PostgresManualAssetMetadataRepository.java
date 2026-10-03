@@ -33,7 +33,9 @@ public final class PostgresManualAssetMetadataRepository implements ManualAssetM
             return new References(sites.subList(0,Math.min(100,sites.size())),owners.subList(0,Math.min(100,owners.size())),sites.size()>100,owners.size()>100);
         });
     }
-    @Override public List<Current> search(Access access,ManualAssetFilter filters,int limit,Instant beforeCreatedAt,String beforeId){
+    @Override public List<Current> search(Access access,ManualAssetFilter filters,int limit,Instant beforeCreatedAt,String beforeId){return searchInternal(access,filters,null,limit,beforeCreatedAt,beforeId);}
+    @Override public List<Current> searchDates(Access access,ManualAssetFilter filters,AssetDateFilter dates,int limit,Instant beforeCreatedAt,String beforeId){if(dates==null)throw invalid();return searchInternal(access,filters,dates,limit,beforeCreatedAt,beforeId);}
+    private List<Current> searchInternal(Access access,ManualAssetFilter filters,AssetDateFilter dates,int limit,Instant beforeCreatedAt,String beforeId){
         if(filters==null||limit<1||limit>101||(beforeCreatedAt==null)!=(beforeId==null))throw invalid();if(beforeId!=null)beforeId=uuid(beforeId);
         if(beforeCreatedAt!=null&&(beforeCreatedAt.isBefore(Instant.parse("0001-01-01T00:00:00Z"))||beforeCreatedAt.isAfter(Instant.parse("9999-12-31T23:59:59.999Z"))||beforeCreatedAt.getNano()%1000000!=0))throw invalid();
         try(Connection c=source.getConnection()){
@@ -42,8 +44,9 @@ public final class PostgresManualAssetMetadataRepository implements ManualAssetM
                 authorize(c,access,false);StringBuilder sql=new StringBuilder("SELECT a.id::text FROM public.mop_asset a LEFT JOIN public.mop_asset_manual_details d ON d.tenant_id=a.tenant_id AND d.asset_id=a.id LEFT JOIN public.mop_asset_manual_revision r ON r.tenant_id=d.tenant_id AND r.asset_id=d.asset_id AND r.asset_version=d.revision_version WHERE a.tenant_id=?::uuid AND a.source='manual'");
                 for(var entry:filters.values().entrySet()){var field=entry.getKey();sql.append(" AND ").append(field.exact()?filterColumn(field)+"=?"+(field.date()?"::date":field==ManualAssetFilter.Field.OWNER_ID?"::uuid":""):"strpos(lower("+filterColumn(field)+" COLLATE \"pg_catalog\".\"und-x-icu\"),lower(? COLLATE \"pg_catalog\".\"und-x-icu\"))>0");}
                 for(var field:filters.unknownFields())sql.append(" AND ").append(filterColumn(field)).append(" IS NULL");
+                if(dates!=null){String column="r."+dates.field().key();sql.append(" AND ").append(switch(dates.window()){case UNKNOWN->column+" IS NULL";case PAST_DATE->column+"<?::date";default->column+" BETWEEN ?::date AND ?::date";});}
                 if(beforeCreatedAt!=null)sql.append(" AND (a.created_at,a.id)<(?::timestamptz,?::uuid)");sql.append(" ORDER BY a.created_at DESC,a.id DESC LIMIT ?");List<String> ids=new ArrayList<>();
-                try(var s=statement(c,sql.toString())){int p=1;s.setString(p++,access.tenantId());for(String value:filters.values().values())s.setString(p++,value);if(beforeCreatedAt!=null){s.setObject(p++,OffsetDateTime.ofInstant(beforeCreatedAt,ZoneOffset.UTC));s.setString(p++,beforeId);}s.setInt(p,limit);try(var r=s.executeQuery()){while(r.next())ids.add(r.getString(1));}}
+                try(var s=statement(c,sql.toString())){int p=1;s.setString(p++,access.tenantId());for(String value:filters.values().values())s.setString(p++,value);if(dates!=null){switch(dates.window()){case UNKNOWN->{}case PAST_DATE->s.setObject(p++,dates.referenceDate());default->{s.setObject(p++,dates.lowerInclusive());s.setObject(p++,dates.upperInclusive());}}}if(beforeCreatedAt!=null){s.setObject(p++,OffsetDateTime.ofInstant(beforeCreatedAt,ZoneOffset.UTC));s.setString(p++,beforeId);}s.setInt(p,limit);try(var r=s.executeQuery()){while(r.next())ids.add(r.getString(1));}}
                 List<Current> matches=new ArrayList<>();for(String id:ids)matches.add(current(c,access,asset(c,access,id,false)));c.commit();return List.copyOf(matches);
             }catch(SQLException|RuntimeException|Error failure){try{c.rollback();}catch(SQLException ignored){}throw failure;}
         }catch(SQLException failure){throw sqlFailure(failure);}

@@ -18,6 +18,8 @@ public interface ManualAssetMetadataRepository {
     References references(Access access,String assetId,String query);
     /** Current tenant manual-source view; creation cursor is a technical keyset, not a frozen cross-page snapshot. */
     List<Current> search(Access access,ManualAssetFilter filters,int limit,Instant beforeCreatedAt,String beforeId);
+    /** Same authorized snapshot and keyset as manual search; date predicate uses only the explicit supplied reference day. */
+    List<Current> searchDates(Access access,ManualAssetFilter filters,AssetDateFilter dates,int limit,Instant beforeCreatedAt,String beforeId);
     Current current(Access access,String assetId);
     List<Revision> history(Access access,String assetId,int limit,Long beforeVersion);
     /** Caller must use the platform idempotent transaction; implementation locks and reauthorizes all references. */

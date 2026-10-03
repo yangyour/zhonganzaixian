@@ -1,0 +1,34 @@
+{
+  "verified_at": "2026-10-03T07:02:26.364865+00:00",
+  "environment": "niko-local-test",
+  "status": "DATE_WINDOW_REPOSITORY_ONLY",
+  "tests": {
+    "new_pure_rules": 8,
+    "new_real_pg": 8,
+    "root_reported": 866,
+    "root_executed": 853,
+    "real_pg": 264,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6
+  },
+  "windows": [
+    "UNKNOWN",
+    "PAST_DATE",
+    "WITHIN_30_DAYS",
+    "WITHIN_90_DAYS",
+    "REFERENCE_QUARTER"
+  ],
+  "reference_date_explicit": true,
+  "same_transaction_authorization_and_current_metadata": true,
+  "current_pointer_not_superseded_history": true,
+  "readonly": true,
+  "bounded_creation_keyset": true,
+  "new_public_api": false,
+  "new_ui": false,
+  "migrations_executed": 0,
+  "large_scale_performance_tested": false,
+  "coverage_verified": false,
+  "notification_sent": false,
+  "all_128_done": false,
+  "credentials_output": false
+}

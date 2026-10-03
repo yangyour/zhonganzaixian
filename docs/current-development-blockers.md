@@ -117,3 +117,14 @@ Windows已完成V15、295PG/6MinIO/六OIDC/97维保HTTP，以及导入待执行�
 ### B08/B09恢复结果（2026-10-03 14:05 UTC）
 
 源码993文件/13PNG均原hash恢复，B08本地物化限制解除。用户批准后新PG17.11/KC26.2.4/API0.28回环基线已建立，原V1–V16字节显式执行，322真实PG/6新OIDC/34HTTP通过，B09当前开发可用性解除。旧临时库不是备份恢复，历史记录保持旧时点。B01原服务器路径与原私有连接在新实例未验；B02 OSS仍关闭；B03新环境浏览器尚未重测，不能把旧EPERM自动当作新实例实测，也不能把已查看的3张旧截图当新UI验收。其他客户口径/监控/PoC门禁继续。
+
+
+## 2026-10-03 新实例浏览器阻塞实测
+
+Playwright1.62.1官方Chrome Headless Shell151下载返回HTTP200却为195bytes的Site Unavailable HTML；ZIP校验失败，未运行该浏览器。独立curl复核同一官方URL得到同样结果。未把它当成功安装。
+
+在当前PG/OIDC/API拥有命名空间启动Vite127.0.0.1:5173，直接GET返回页面200；niko专属云Chrome打开同一地址报net::ERR_BLOCKED_BY_CLIENT，未渲染页面。没有宣称网站机器人拦截、没有改浏览器/网络安全、没有公开端口/代理转发或调用用户电脑/Codex/Work任务。已关闭错误标签和按父PID/精确命令停止本次Vite；PG/OIDC/API仍可用。
+
+因此B03新环境实际DOM/桌面/移动/图形仍BLOCKED，不沿用旧实例的Unix socket EPERM作为新证据，也不拿Vue内存renderer或模块HTTP替代。继续纯代码、真实PG/API、契约和文档。见[新探测](evidence/niko-rebuilt-browser-blocker-20261003.json)。
+
+恢复提交5dfd7cd的Cloud37128842966和recovery37128843066均success。实际下载新artifact11276176345，998源码文件逐字节与当前工作区一致；原HEAD commit bytes与提交SHA匹配，不再猜时区。只保留同private仓库1日，不含历史和未跟踪凭据，见[CI与归档核验](evidence/niko-rebuilt-source-ci-20261003.json)。

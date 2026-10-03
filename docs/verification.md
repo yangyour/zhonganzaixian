@@ -958,3 +958,14 @@ M10-7现有计算/保存/读取/增长代码切片已补齐，原服务器V16、
 新实例真实PG完整根1036=1023执行（322真实PG）+13历史fixture跳过，6MinIO排除；Web643/55契约/类型构建/Python79通过。另冷启动纯Java1042=701执行+341跳过（322PG+13历史+6存储），不和真实批次叠加。正常启动拥有的固定API JAR并验证回环监听，6个新OIDC授权码登录、34真实HTTP核对读写/原键重放/23能力/跨租户404/只读审计尾不变；4条合成业务记录不是旧数据。存储显式关闭，上传组件重测仍NOT_RUN。
 
 [源码恢复](evidence/niko-workspace-recovery-20261003.json)、[截图物化](evidence/niko-repository-binary-materialization-recovered-20261003.json)、[新组件](evidence/niko-rebuilt-components-20261003.json)、[新HTTP](evidence/niko-rebuilt-environment-http-20261003.json)。B09源码与新PG/OIDC/API可用性已解决，但旧临时数据库未恢复；B01原服务器入口/私有连接、B02 OSS、B03新环境浏览器验收、客户口径/监控组件仍分别保留，继续独立开发。
+
+
+## 2026-10-03 新实例浏览器阻塞实测
+
+Playwright1.62.1官方Chrome Headless Shell151下载返回HTTP200却为195bytes的Site Unavailable HTML；ZIP校验失败，未运行该浏览器。独立curl复核同一官方URL得到同样结果。未把它当成功安装。
+
+在当前PG/OIDC/API拥有命名空间启动Vite127.0.0.1:5173，直接GET返回页面200；niko专属云Chrome打开同一地址报net::ERR_BLOCKED_BY_CLIENT，未渲染页面。没有宣称网站机器人拦截、没有改浏览器/网络安全、没有公开端口/代理转发或调用用户电脑/Codex/Work任务。已关闭错误标签和按父PID/精确命令停止本次Vite；PG/OIDC/API仍可用。
+
+因此B03新环境实际DOM/桌面/移动/图形仍BLOCKED，不沿用旧实例的Unix socket EPERM作为新证据，也不拿Vue内存renderer或模块HTTP替代。继续纯代码、真实PG/API、契约和文档。见[新探测](evidence/niko-rebuilt-browser-blocker-20261003.json)。
+
+恢复提交5dfd7cd的Cloud37128842966和recovery37128843066均success。实际下载新artifact11276176345，998源码文件逐字节与当前工作区一致；原HEAD commit bytes与提交SHA匹配，不再猜时区。只保留同private仓库1日，不含历史和未跟踪凭据，见[CI与归档核验](evidence/niko-rebuilt-source-ci-20261003.json)。

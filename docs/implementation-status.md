@@ -853,3 +853,6 @@ M10-7现有计算/保存/读取/增长代码切片已补齐，原服务器V16、
 新实例真实PG完整根1036=1023执行（322真实PG）+13历史fixture跳过，6MinIO排除；Web643/55契约/类型构建/Python79通过。另冷启动纯Java1042=701执行+341跳过（322PG+13历史+6存储），不和真实批次叠加。正常启动拥有的固定API JAR并验证回环监听，6个新OIDC授权码登录、34真实HTTP核对读写/原键重放/23能力/跨租户404/只读审计尾不变；4条合成业务记录不是旧数据。存储显式关闭，上传组件重测仍NOT_RUN。
 
 [源码恢复](evidence/niko-workspace-recovery-20261003.json)、[截图物化](evidence/niko-repository-binary-materialization-recovered-20261003.json)、[新组件](evidence/niko-rebuilt-components-20261003.json)、[新HTTP](evidence/niko-rebuilt-environment-http-20261003.json)。B09源码与新PG/OIDC/API可用性已解决，但旧临时数据库未恢复；B01原服务器入口/私有连接、B02 OSS、B03新环境浏览器验收、客户口径/监控组件仍分别保留，继续独立开发。
+
+
+2026-10-03 14:20：新环境实际浏览器仍受B03限制（官方下载返回错误HTML，专属云Chrome打开回环页ERR_BLOCKED_BY_CLIENT）；Vite直接HTTP200不等于UI验收。5dfd7cd双CI及含原HEAD bytes的恢复artifact完整验证，继续真实PG/API和其他独立功能。见niko-rebuilt-browser-blocker与niko-rebuilt-source-ci证据。

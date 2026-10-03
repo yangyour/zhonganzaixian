@@ -1,0 +1,36 @@
+{
+  "verified_at": "2026-10-03T14:21:50.971282+00:00",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "status": "B03_REAL_BROWSER_ACCEPTANCE_BLOCKED",
+  "playwright_version": "1.62.1",
+  "requested_browser": "Chrome Headless Shell151.0.7922.34 revision1234",
+  "official_download_result": {
+    "http_status": 200,
+    "content_type": "text/html",
+    "bytes": 195,
+    "zip_valid": false,
+    "title": "Site Unavailable",
+    "browser_launched": false
+  },
+  "own_vite_loopback_probe": {
+    "url": "http://127.0.0.1:5173/",
+    "http_status": 200
+  },
+  "own_cloud_browser_probe": {
+    "surface": "niko dedicated cloud Chrome",
+    "url": "http://127.0.0.1:5173",
+    "error": "net::ERR_BLOCKED_BY_CLIENT",
+    "page_render_verified": false,
+    "bot_detection_claimed": false
+  },
+  "blocked_tab_closed": true,
+  "api_pg_oidc_left_available": true,
+  "network_or_browser_security_changed": false,
+  "user_computer_used": false,
+  "new_codex_or_work_task_created": false,
+  "browser_dom_tested": false,
+  "storage_integration_executed": false,
+  "credentials_output": false,
+  "owned_vite_stopped": true
+}

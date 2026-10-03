@@ -49,6 +49,7 @@ async function endSession() {
         <el-menu :default-active="String(route.name)" class="side-menu" @select="router.push({ name: $event })">
           <el-menu-item v-if="can('configurations:read')" index="configurations"><span class="nav-symbol">⚙</span>配置确认登记</el-menu-item>
           <el-menu-item v-if="can('contacts:read')" index="customer-contacts">客户联系人</el-menu-item>
+          <el-menu-item v-if="can('contacts:write')" index="contact-imports">联系人批量新建</el-menu-item>
         <el-menu-item v-if="can('operations:compare_explicit')" index="operational-comparison">经营样本与人力对照</el-menu-item>
         <el-menu-item v-if="can('capacity:estimate')" index="capacity-estimates">容量与缓冲估算</el-menu-item>
           <el-menu-item v-if="can('configurations:read')" index="capability-catalog">代码能力声明核对</el-menu-item>
@@ -87,6 +88,7 @@ async function endSession() {
         <el-menu-item v-if="can('tickets:read')" index="tickets">报障与受理</el-menu-item>
         <el-menu-item v-if="can('configurations:read')" index="configurations">配置确认登记</el-menu-item>
         <el-menu-item v-if="can('contacts:read')" index="customer-contacts">客户联系人</el-menu-item>
+          <el-menu-item v-if="can('contacts:write')" index="contact-imports">联系人批量新建</el-menu-item>
         <el-menu-item v-if="can('operations:compare_explicit')" index="operational-comparison">经营样本与人力对照</el-menu-item>
         <el-menu-item v-if="can('capacity:estimate')" index="capacity-estimates">容量与缓冲估算</el-menu-item>
           <el-menu-item v-if="can('configurations:read')" index="capability-catalog">代码能力声明核对</el-menu-item>

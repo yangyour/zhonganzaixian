@@ -40,7 +40,7 @@ defineExpose({ change: workspace.change, preview: workspace.preview, clearInput,
    <section v-if="state.result" class="preview-results" aria-live="polite">
     <h2>服务端格式诊断</h2><p>通过 {{ state.result.valid_rows }} 行 · 错误 {{ state.result.invalid_rows }} 行 · 完全相同行警告 {{ state.result.identical_rows }} 行</p><p class="preview-help">所有原始行号均保留。格式通过不代表渠道核验、现有记录去重或正式客户身份；相同行只警告，不自动跳过或覆盖。</p>
     <ol class="preview-rows"><li v-for="row in state.result.rows" :key="row.row_number"><h3>第{{ row.row_number }}行：{{ row.status === 'FORMAT_VALID' ? '格式通过 / 未核验' : '字段错误 / 未写入' }}</h3><p v-if="row.status === 'INVALID'">请核对8个字段是否完整、类型/角色集合/手机号邮箱/启用状态/静音起止是否合法；无效行原文不回显，请在上方原始输入按行序修正。</p><p v-if="row.identical_to_row !== null" class="duplicate-warning">字段与第{{ row.identical_to_row }}行完全相同，仍保留本行；请自行核对，不认定为同一人。</p><details v-if="row.contact"><summary>查看本行格式事实</summary><CustomerContactFacts :facts="row.contact" /></details></li></ol>
-    <el-alert type="info" :closable="false" title="结果未保存，导入功能尚未开放">can_import=false；现有联系人、最后决策人和真实通知送达均未验证。本页没有批量写入按钮。</el-alert>
+    <el-alert type="info" :closable="false" title="本页结果不保存，批量新建需独立受理">can_import=false；现有联系人、最后决策人和真实通知送达均未验证。本页没有批量写入按钮。</el-alert><p><router-link to="/contact-imports">打开批量新建与我的作业（需重新明确输入）</router-link></p>
    </section>
   </template>
  </section>

@@ -1,0 +1,38 @@
+{
+  "verified_at": "2026-10-03T17:07:54.144756+00:00",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "scope": "CONTACT_FRONTEND_READER_WRITER_MODULE_NOT_PAGE",
+  "api_version": "0.30.0",
+  "new_web_tests": 22,
+  "web_total": 680,
+  "typecheck": "PASS",
+  "build": "PASS",
+  "contracts": 61,
+  "generation_check": "PASS",
+  "actual_module_http": 99,
+  "contact_mutation_attempts": 62,
+  "synthetic_contacts_created": 18,
+  "own_contacts_archived_history_retained": true,
+  "source_sha256": {
+    "apps/web/src/utils/customerContactWorkspace.ts": "6439746c8ab30e969b4d5ef01915c46ab3488ce83e9ded6a47e4b43feda2b7db",
+    "apps/web/tests/customerContactWorkspace.test.ts": "1300b93edca2aeeec7907dedd98fa663258d72df6db3b2a4561e0e193d0502fd"
+  },
+  "four_write_action_retry_denials_preserve_uncertain": true,
+  "isolated_denied_status_branches": 20,
+  "real_msp_retry_denials": 4,
+  "ordinary_reads_do_not_resolve_unknown_writes": true,
+  "receipt_separate_from_current_projection": true,
+  "http_evidence": "niko-customer-contact-client-http-20261003.json",
+  "contact_page": "NOT_IMPLEMENTED",
+  "voluntary_leave_ui_guard": "NOT_IMPLEMENTED",
+  "browser_dom": "NOT_RUN",
+  "notification_delivery": "NOT_RUN",
+  "v1_v17_changed": false,
+  "api_commit": {
+    "sha": "0e63b52a865cc87ad52adeed4a56cbf399ccc47d",
+    "ci_run": 37137805250,
+    "conclusion": "success"
+  },
+  "contract_done": false
+}

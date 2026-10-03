@@ -1,0 +1,36 @@
+{
+  "verified_at": "2026-10-03T15:09:00Z",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "scope": "EXPLICIT_INPUT_COMPARISON_UI_AND_ACTUAL_MODULE",
+  "api_version": "0.29.0",
+  "new_web_tests": 15,
+  "new_test_scope": {
+    "unit_state_input_response": 14,
+    "source_wiring": 1
+  },
+  "web_total": 658,
+  "typecheck": "PASS",
+  "build": "PASS",
+  "contracts": 57,
+  "generation_check": "PASS",
+  "actual_module_http": 23,
+  "readonly_post_attempts": 20,
+  "business_records_written": 0,
+  "source_sha256": {
+    "apps/web/src/pages/OperationalComparisonPage.vue": "410431b84bd55d53555da9eb7856b9074dbea1fcf5cdf9e80d5c862666f6c057",
+    "apps/web/src/utils/operationalComparisonWorkspace.ts": "e8103b165bb5cc97a30dda58b55ee7674f9c2ee96b2fab8797fa23117848c3a3",
+    "apps/web/tests/operationalComparisonWorkspace.test.ts": "4eb386529fa8b90b55419b19a9cde881bb5b31fe09b0d6c382233506cce242d4"
+  },
+  "http_evidence": "niko-operational-comparison-client-http-20261003.json",
+  "browser_dom_tested": false,
+  "formal_project_metrics_available": false,
+  "export_implemented": false,
+  "v1_v16_changed": false,
+  "api_commit": {
+    "sha": "20ca9c89260ad03c5a059868d62f269f75fadb61",
+    "ci_run": 37131675736,
+    "conclusion": "success"
+  },
+  "contract_done": false
+}

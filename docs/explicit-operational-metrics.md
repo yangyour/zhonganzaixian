@@ -30,3 +30,14 @@ POST /api/v1/operations/explicit-comparisons以当前有效成员、operations:c
 首次测试源码使用了异常status()而实际是字段，编译失败后修复；首次HTTP脚本缺少租户切换幂等键，切换400，补齐该既有写入口要求后完整64通过，不放宽服务端。此前失败批次不计入64。API固定JAR正常停启加载本次构建，没有执行迁移或修改组件凭据。无新DOM/存储/原指定服务器验收；下一步接入实际前端对照及状态保护，仍不标合同DONE。
 
 [API实施验证](evidence/niko-explicit-operational-api-20261003.json)、[64真实HTTP](evidence/niko-explicit-operational-api-http-20261003.json)。
+
+
+## 2026-10-03 实际前端页面与响应校验
+
+新增 /operational-comparison、桌面与移动导航（operations:compare_explicit），独立页面明确标注仅输入对照。样本有未提供null、明确空集合、逐行提供三种状态；逐行规范整数或?未知，CRLF只作换行，不丢空行、不排序改写原文、不填示例。最多10000项，空白人力字段null；人力输入组由用户明确启用，不自动从人数/出勤推断。
+
+实际workspace先校验输入，再调用既有API；使用BigInt独立核对精确中位数、FTE合计及最终DECIMAL128，验证全部响应字段、原请求输入/租户/门禁，不显示本地算术作为API成功。修改立即清旧/取消当前请求、重复点击抑制，失败不保留旧结果，权限/租户上下文变化与卸载拒绝迟到回包且清空；不自动请求或保存。未知/空/0分母用“—”及原因，明确0显示0；不画经营达标图或提供正式导出。
+
+15项新增Web（14状态机/输入/精度，1源码接线）共658通过，类型/构建与57契约/生成一致性通过。实际前端模块+ApiClient另23真实HTTP、20只读POST尝试、0业务写入：含10组边界/未知、10000×40位、超安全整数/极小FTE/大FTE和最终舍入、实际200丢弃与四个实际200迟到、重复点击、伪造本地管理员被真实MSP403、成功只读审计尾不变。受控传输延迟/丢回包不是物理断网、进程崩溃或浏览器DOM验证。
+
+API20ca9c8的CI37131675736 success已回读。页面源码44px/单列/长数换行已构建，B03真实浏览器阻塞仍在；页面控件/DOM/截图、真实经营数据、导出及完整128项不标DONE。见[页面与模块验证](evidence/niko-operational-comparison-client-20261003.json)、[23HTTP](evidence/niko-operational-comparison-client-http-20261003.json)。

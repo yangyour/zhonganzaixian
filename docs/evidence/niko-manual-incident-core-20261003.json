@@ -1,0 +1,40 @@
+{
+  "verified_at": "2026-10-03T03:19:20.099082+00:00",
+  "environment": "niko-local-test",
+  "status": "PURE_MANUAL_SOURCE_REGISTRATION_CORE",
+  "new_pure_tests": 10,
+  "root_tests": {
+    "reported": 726,
+    "executed": 713,
+    "existing_feature_real_pg": 212,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contract_tests": 35,
+  "initial_attempt": {
+    "failed_stage": "domain test compilation",
+    "cause": "Domain module intentionally has no JUnit dependency; relocated tests into existing api test module and reran full root"
+  },
+  "source_state": "MANUAL",
+  "registration_status": "REGISTERED_ONLY",
+  "verification_status": "SELF_REPORTED",
+  "monitor_state": null,
+  "disposition_state": null,
+  "ticket_priority": null,
+  "observed_at": null,
+  "recovered_at": null,
+  "automatic_monitoring_recovery_applicable": false,
+  "automatic_ticket_creation": false,
+  "manual_recovery_confirmation_implemented": false,
+  "manual_incident_pg_verified": false,
+  "schema_added": false,
+  "repository_implemented": false,
+  "api_added": false,
+  "frontend_added": false,
+  "api_version_unchanged": "0.18.0",
+  "frozen_migrations": "V1-V12 unchanged",
+  "full_contract_done": false,
+  "credentials_output": false
+}

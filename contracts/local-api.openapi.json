@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.22.0",
+    "version": "0.23.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -7303,6 +7303,248 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ManualIncidentResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/date-assessments": {
+      "get": {
+        "operationId": "searchRecordedAssetDates",
+        "summary": "真实手工资料当前日期窗口有界筛选",
+        "parameters": [
+          {
+            "name": "date_field",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "warranty_expiry",
+                "overdue_service_date"
+              ]
+            }
+          },
+          {
+            "name": "window",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "UNKNOWN",
+                "PAST_DATE",
+                "WITHIN_30_DAYS",
+                "WITHIN_90_DAYS",
+                "REFERENCE_QUARTER"
+              ]
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "site_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                25,
+                50,
+                100
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_created_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expected_reference_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "x-mop-read-only": true,
+        "x-mop-capability": "asset_dates:read",
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-reject-duplicate-query-keys": true,
+        "x-mop-paired-query-keys": [
+          "before_created_at",
+          "before_id",
+          "expected_reference_date"
+        ],
+        "description": "当前授权快照，仅手工来源；日期参考由服务端确定。首页面必须明确日期字段和窗口；下一页游标三字段同时提供，expected_reference_date仅一致性检查，不能覆盖时钟，日变化409要求从首页重查。名称字面匹配/站点精确匹配；跨页资料变动未冻结，不写资产、隐患或通知。",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDateQueryResult"
                 }
               }
             }
@@ -15205,688 +15447,888 @@
           }
         ]
       },
-      "AssetDateAssessmentResult": {
+      "AssetDateAssessment": {
         "type": "object",
         "properties": {
-          "data": {
+          "asset_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "asset_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "metadata_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 2,
+            "maximum": 9007199254740991
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+          },
+          "as_of_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "timezone": {
+            "const": "Asia/Shanghai"
+          },
+          "policy_version": {
+            "const": "contract-m3-10-date-v1"
+          },
+          "scope": {
+            "const": "RECORDED_DATE_ASSESSMENT_ONLY"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "recorded_dates_source": {
+            "const": "MANUAL_ASSET_METADATA"
+          },
+          "verification_status": {
+            "enum": [
+              null,
+              "SELF_REPORTED"
+            ]
+          },
+          "coverage_verified": {
+            "const": false
+          },
+          "warranty_expiry": {
             "type": "object",
             "properties": {
-              "asset_id": {
-                "type": "string",
-                "format": "uuid"
+              "recorded_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
               },
-              "tenant_id": {
-                "type": "string",
-                "format": "uuid"
-              },
-              "asset_version": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 9007199254740991
-              },
-              "metadata_version": {
+              "days_until": {
                 "type": [
                   "integer",
                   "null"
                 ],
-                "minimum": 2,
-                "maximum": 9007199254740991
+                "minimum": -3652058,
+                "maximum": 3652058
               },
-              "observed_at": {
-                "type": "string",
-                "format": "date-time",
-                "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
-              },
-              "as_of_date": {
-                "type": "string",
-                "format": "date"
-              },
-              "timezone": {
-                "const": "Asia/Shanghai"
-              },
-              "policy_version": {
-                "const": "contract-m3-10-date-v1"
-              },
-              "scope": {
-                "const": "RECORDED_DATE_ASSESSMENT_ONLY"
-              },
-              "source": {
-                "const": "postgresql"
-              },
-              "recorded_dates_source": {
-                "const": "MANUAL_ASSET_METADATA"
-              },
-              "verification_status": {
+              "position": {
                 "enum": [
-                  null,
-                  "SELF_REPORTED"
+                  "UNKNOWN",
+                  "PAST_DATE",
+                  "DUE_TODAY",
+                  "WITHIN_30_DAYS",
+                  "FUTURE_DATE"
                 ]
               },
-              "coverage_verified": {
-                "const": false
-              },
-              "warranty_expiry": {
-                "type": "object",
-                "properties": {
-                  "recorded_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "format": "date"
-                  },
-                  "days_until": {
-                    "type": [
-                      "integer",
-                      "null"
-                    ],
-                    "minimum": -3652058,
-                    "maximum": 3652058
-                  },
-                  "position": {
-                    "enum": [
-                      "UNKNOWN",
-                      "PAST_DATE",
-                      "DUE_TODAY",
-                      "WITHIN_30_DAYS",
-                      "FUTURE_DATE"
-                    ]
-                  },
-                  "within_7_days": {
-                    "type": [
-                      "boolean",
-                      "null"
-                    ]
-                  },
-                  "within_30_days": {
-                    "type": [
-                      "boolean",
-                      "null"
-                    ]
-                  },
-                  "within_90_days": {
-                    "type": [
-                      "boolean",
-                      "null"
-                    ]
-                  },
-                  "in_reference_quarter": {
-                    "type": [
-                      "boolean",
-                      "null"
-                    ]
-                  }
-                },
-                "required": [
-                  "recorded_date",
-                  "days_until",
-                  "position",
-                  "within_7_days",
-                  "within_30_days",
-                  "within_90_days",
-                  "in_reference_quarter"
-                ],
-                "additionalProperties": false,
-                "oneOf": [
-                  {
-                    "properties": {
-                      "position": {
-                        "const": "UNKNOWN"
-                      },
-                      "recorded_date": {
-                        "type": "null"
-                      },
-                      "days_until": {
-                        "type": "null"
-                      },
-                      "within_7_days": {
-                        "type": "null"
-                      },
-                      "within_30_days": {
-                        "type": "null"
-                      },
-                      "within_90_days": {
-                        "type": "null"
-                      },
-                      "in_reference_quarter": {
-                        "type": "null"
-                      }
-                    }
-                  },
-                  {
-                    "properties": {
-                      "position": {
-                        "const": "PAST_DATE"
-                      },
-                      "recorded_date": {
-                        "type": "string"
-                      },
-                      "days_until": {
-                        "type": "integer",
-                        "maximum": -1
-                      },
-                      "within_7_days": {
-                        "const": false
-                      },
-                      "within_30_days": {
-                        "const": false
-                      },
-                      "within_90_days": {
-                        "const": false
-                      },
-                      "in_reference_quarter": {
-                        "type": "boolean"
-                      }
-                    }
-                  },
-                  {
-                    "properties": {
-                      "position": {
-                        "const": "DUE_TODAY"
-                      },
-                      "recorded_date": {
-                        "type": "string"
-                      },
-                      "days_until": {
-                        "type": "integer",
-                        "const": 0
-                      },
-                      "within_7_days": {
-                        "const": true
-                      },
-                      "within_30_days": {
-                        "const": true
-                      },
-                      "within_90_days": {
-                        "const": true
-                      },
-                      "in_reference_quarter": {
-                        "const": true
-                      }
-                    }
-                  },
-                  {
-                    "properties": {
-                      "position": {
-                        "const": "WITHIN_30_DAYS"
-                      },
-                      "recorded_date": {
-                        "type": "string"
-                      },
-                      "days_until": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 30
-                      },
-                      "within_7_days": {
-                        "type": "boolean"
-                      },
-                      "within_30_days": {
-                        "const": true
-                      },
-                      "within_90_days": {
-                        "const": true
-                      },
-                      "in_reference_quarter": {
-                        "type": "boolean"
-                      }
-                    }
-                  },
-                  {
-                    "properties": {
-                      "position": {
-                        "const": "FUTURE_DATE"
-                      },
-                      "recorded_date": {
-                        "type": "string"
-                      },
-                      "days_until": {
-                        "type": "integer",
-                        "minimum": 31
-                      },
-                      "within_7_days": {
-                        "const": false
-                      },
-                      "within_30_days": {
-                        "const": false
-                      },
-                      "within_90_days": {
-                        "type": "boolean"
-                      },
-                      "in_reference_quarter": {
-                        "type": "boolean"
-                      }
-                    }
-                  }
-                ],
-                "allOf": [
-                  {
-                    "if": {
-                      "properties": {
-                        "days_until": {
-                          "type": "integer",
-                          "minimum": 0,
-                          "maximum": 7
-                        }
-                      }
-                    },
-                    "then": {
-                      "properties": {
-                        "within_7_days": {
-                          "const": true
-                        }
-                      }
-                    },
-                    "else": {
-                      "if": {
-                        "properties": {
-                          "days_until": {
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "then": {
-                        "properties": {
-                          "within_7_days": {
-                            "const": false
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "if": {
-                      "properties": {
-                        "days_until": {
-                          "type": "integer",
-                          "minimum": 0,
-                          "maximum": 90
-                        }
-                      }
-                    },
-                    "then": {
-                      "properties": {
-                        "within_90_days": {
-                          "const": true
-                        }
-                      }
-                    },
-                    "else": {
-                      "if": {
-                        "properties": {
-                          "days_until": {
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "then": {
-                        "properties": {
-                          "within_90_days": {
-                            "const": false
-                          }
-                        }
-                      }
-                    }
-                  }
+              "within_7_days": {
+                "type": [
+                  "boolean",
+                  "null"
                 ]
               },
-              "overdue_service_date": {
-                "type": "object",
-                "properties": {
-                  "recorded_date": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "format": "date"
-                  },
-                  "days_until": {
-                    "type": [
-                      "integer",
-                      "null"
-                    ],
-                    "minimum": -3652058,
-                    "maximum": 3652058
-                  },
-                  "position": {
-                    "enum": [
-                      "UNKNOWN",
-                      "PAST_DATE",
-                      "DUE_TODAY",
-                      "WITHIN_30_DAYS",
-                      "FUTURE_DATE"
-                    ]
-                  },
-                  "within_7_days": {
-                    "type": [
-                      "boolean",
-                      "null"
-                    ]
-                  },
-                  "within_30_days": {
-                    "type": [
-                      "boolean",
-                      "null"
-                    ]
-                  },
-                  "within_90_days": {
-                    "type": [
-                      "boolean",
-                      "null"
-                    ]
-                  },
-                  "in_reference_quarter": {
-                    "type": [
-                      "boolean",
-                      "null"
-                    ]
-                  }
-                },
-                "required": [
-                  "recorded_date",
-                  "days_until",
-                  "position",
-                  "within_7_days",
-                  "within_30_days",
-                  "within_90_days",
-                  "in_reference_quarter"
-                ],
-                "additionalProperties": false,
-                "oneOf": [
-                  {
-                    "properties": {
-                      "position": {
-                        "const": "UNKNOWN"
-                      },
-                      "recorded_date": {
-                        "type": "null"
-                      },
-                      "days_until": {
-                        "type": "null"
-                      },
-                      "within_7_days": {
-                        "type": "null"
-                      },
-                      "within_30_days": {
-                        "type": "null"
-                      },
-                      "within_90_days": {
-                        "type": "null"
-                      },
-                      "in_reference_quarter": {
-                        "type": "null"
-                      }
-                    }
-                  },
-                  {
-                    "properties": {
-                      "position": {
-                        "const": "PAST_DATE"
-                      },
-                      "recorded_date": {
-                        "type": "string"
-                      },
-                      "days_until": {
-                        "type": "integer",
-                        "maximum": -1
-                      },
-                      "within_7_days": {
-                        "const": false
-                      },
-                      "within_30_days": {
-                        "const": false
-                      },
-                      "within_90_days": {
-                        "const": false
-                      },
-                      "in_reference_quarter": {
-                        "type": "boolean"
-                      }
-                    }
-                  },
-                  {
-                    "properties": {
-                      "position": {
-                        "const": "DUE_TODAY"
-                      },
-                      "recorded_date": {
-                        "type": "string"
-                      },
-                      "days_until": {
-                        "type": "integer",
-                        "const": 0
-                      },
-                      "within_7_days": {
-                        "const": true
-                      },
-                      "within_30_days": {
-                        "const": true
-                      },
-                      "within_90_days": {
-                        "const": true
-                      },
-                      "in_reference_quarter": {
-                        "const": true
-                      }
-                    }
-                  },
-                  {
-                    "properties": {
-                      "position": {
-                        "const": "WITHIN_30_DAYS"
-                      },
-                      "recorded_date": {
-                        "type": "string"
-                      },
-                      "days_until": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "maximum": 30
-                      },
-                      "within_7_days": {
-                        "type": "boolean"
-                      },
-                      "within_30_days": {
-                        "const": true
-                      },
-                      "within_90_days": {
-                        "const": true
-                      },
-                      "in_reference_quarter": {
-                        "type": "boolean"
-                      }
-                    }
-                  },
-                  {
-                    "properties": {
-                      "position": {
-                        "const": "FUTURE_DATE"
-                      },
-                      "recorded_date": {
-                        "type": "string"
-                      },
-                      "days_until": {
-                        "type": "integer",
-                        "minimum": 31
-                      },
-                      "within_7_days": {
-                        "const": false
-                      },
-                      "within_30_days": {
-                        "const": false
-                      },
-                      "within_90_days": {
-                        "type": "boolean"
-                      },
-                      "in_reference_quarter": {
-                        "type": "boolean"
-                      }
-                    }
-                  }
-                ],
-                "allOf": [
-                  {
-                    "if": {
-                      "properties": {
-                        "days_until": {
-                          "type": "integer",
-                          "minimum": 0,
-                          "maximum": 7
-                        }
-                      }
-                    },
-                    "then": {
-                      "properties": {
-                        "within_7_days": {
-                          "const": true
-                        }
-                      }
-                    },
-                    "else": {
-                      "if": {
-                        "properties": {
-                          "days_until": {
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "then": {
-                        "properties": {
-                          "within_7_days": {
-                            "const": false
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "if": {
-                      "properties": {
-                        "days_until": {
-                          "type": "integer",
-                          "minimum": 0,
-                          "maximum": 90
-                        }
-                      }
-                    },
-                    "then": {
-                      "properties": {
-                        "within_90_days": {
-                          "const": true
-                        }
-                      }
-                    },
-                    "else": {
-                      "if": {
-                        "properties": {
-                          "days_until": {
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "then": {
-                        "properties": {
-                          "within_90_days": {
-                            "const": false
-                          }
-                        }
-                      }
-                    }
-                  }
+              "within_30_days": {
+                "type": [
+                  "boolean",
+                  "null"
                 ]
               },
-              "warranty_start": {
-                "type": "null"
+              "within_90_days": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               },
-              "warranty_provider": {
-                "type": "null"
-              },
-              "hazard_lookup_status": {
-                "const": "NOT_IMPLEMENTED"
-              },
-              "notification_lookup_status": {
-                "const": "NOT_IMPLEMENTED"
-              },
-              "actions_this_request": {
-                "type": "object",
-                "properties": {
-                  "hazard_creation": {
-                    "const": "NOT_REQUESTED"
-                  },
-                  "notification": {
-                    "const": "NOT_REQUESTED"
-                  },
-                  "asset_updated": {
-                    "const": false
-                  }
-                },
-                "required": [
-                  "hazard_creation",
-                  "notification",
-                  "asset_updated"
-                ],
-                "additionalProperties": false
+              "in_reference_quarter": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
               }
             },
             "required": [
-              "asset_id",
-              "tenant_id",
-              "asset_version",
-              "metadata_version",
-              "observed_at",
-              "as_of_date",
-              "timezone",
-              "policy_version",
-              "scope",
-              "source",
-              "recorded_dates_source",
-              "verification_status",
-              "coverage_verified",
-              "warranty_expiry",
-              "overdue_service_date",
-              "warranty_start",
-              "warranty_provider",
-              "hazard_lookup_status",
-              "notification_lookup_status",
-              "actions_this_request"
+              "recorded_date",
+              "days_until",
+              "position",
+              "within_7_days",
+              "within_30_days",
+              "within_90_days",
+              "in_reference_quarter"
             ],
             "additionalProperties": false,
             "oneOf": [
               {
                 "properties": {
-                  "metadata_version": {
+                  "position": {
+                    "const": "UNKNOWN"
+                  },
+                  "recorded_date": {
                     "type": "null"
                   },
-                  "verification_status": {
+                  "days_until": {
                     "type": "null"
                   },
-                  "warranty_expiry": {
+                  "within_7_days": {
+                    "type": "null"
+                  },
+                  "within_30_days": {
+                    "type": "null"
+                  },
+                  "within_90_days": {
+                    "type": "null"
+                  },
+                  "in_reference_quarter": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "position": {
+                    "const": "PAST_DATE"
+                  },
+                  "recorded_date": {
+                    "type": "string"
+                  },
+                  "days_until": {
+                    "type": "integer",
+                    "maximum": -1
+                  },
+                  "within_7_days": {
+                    "const": false
+                  },
+                  "within_30_days": {
+                    "const": false
+                  },
+                  "within_90_days": {
+                    "const": false
+                  },
+                  "in_reference_quarter": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "position": {
+                    "const": "DUE_TODAY"
+                  },
+                  "recorded_date": {
+                    "type": "string"
+                  },
+                  "days_until": {
+                    "type": "integer",
+                    "const": 0
+                  },
+                  "within_7_days": {
+                    "const": true
+                  },
+                  "within_30_days": {
+                    "const": true
+                  },
+                  "within_90_days": {
+                    "const": true
+                  },
+                  "in_reference_quarter": {
+                    "const": true
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "position": {
+                    "const": "WITHIN_30_DAYS"
+                  },
+                  "recorded_date": {
+                    "type": "string"
+                  },
+                  "days_until": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 30
+                  },
+                  "within_7_days": {
+                    "type": "boolean"
+                  },
+                  "within_30_days": {
+                    "const": true
+                  },
+                  "within_90_days": {
+                    "const": true
+                  },
+                  "in_reference_quarter": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "position": {
+                    "const": "FUTURE_DATE"
+                  },
+                  "recorded_date": {
+                    "type": "string"
+                  },
+                  "days_until": {
+                    "type": "integer",
+                    "minimum": 31
+                  },
+                  "within_7_days": {
+                    "const": false
+                  },
+                  "within_30_days": {
+                    "const": false
+                  },
+                  "within_90_days": {
+                    "type": "boolean"
+                  },
+                  "in_reference_quarter": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "days_until": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 7
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "within_7_days": {
+                      "const": true
+                    }
+                  }
+                },
+                "else": {
+                  "if": {
                     "properties": {
-                      "position": {
-                        "const": "UNKNOWN"
+                      "days_until": {
+                        "type": "integer"
                       }
                     }
                   },
-                  "overdue_service_date": {
+                  "then": {
                     "properties": {
-                      "position": {
-                        "const": "UNKNOWN"
+                      "within_7_days": {
+                        "const": false
                       }
                     }
                   }
                 }
               },
               {
-                "properties": {
-                  "metadata_version": {
-                    "type": "integer"
+                "if": {
+                  "properties": {
+                    "days_until": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 90
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "within_90_days": {
+                      "const": true
+                    }
+                  }
+                },
+                "else": {
+                  "if": {
+                    "properties": {
+                      "days_until": {
+                        "type": "integer"
+                      }
+                    }
                   },
-                  "verification_status": {
-                    "const": "SELF_REPORTED"
+                  "then": {
+                    "properties": {
+                      "within_90_days": {
+                        "const": false
+                      }
+                    }
                   }
                 }
               }
             ]
+          },
+          "overdue_service_date": {
+            "type": "object",
+            "properties": {
+              "recorded_date": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "days_until": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": -3652058,
+                "maximum": 3652058
+              },
+              "position": {
+                "enum": [
+                  "UNKNOWN",
+                  "PAST_DATE",
+                  "DUE_TODAY",
+                  "WITHIN_30_DAYS",
+                  "FUTURE_DATE"
+                ]
+              },
+              "within_7_days": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "within_30_days": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "within_90_days": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "in_reference_quarter": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "recorded_date",
+              "days_until",
+              "position",
+              "within_7_days",
+              "within_30_days",
+              "within_90_days",
+              "in_reference_quarter"
+            ],
+            "additionalProperties": false,
+            "oneOf": [
+              {
+                "properties": {
+                  "position": {
+                    "const": "UNKNOWN"
+                  },
+                  "recorded_date": {
+                    "type": "null"
+                  },
+                  "days_until": {
+                    "type": "null"
+                  },
+                  "within_7_days": {
+                    "type": "null"
+                  },
+                  "within_30_days": {
+                    "type": "null"
+                  },
+                  "within_90_days": {
+                    "type": "null"
+                  },
+                  "in_reference_quarter": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "position": {
+                    "const": "PAST_DATE"
+                  },
+                  "recorded_date": {
+                    "type": "string"
+                  },
+                  "days_until": {
+                    "type": "integer",
+                    "maximum": -1
+                  },
+                  "within_7_days": {
+                    "const": false
+                  },
+                  "within_30_days": {
+                    "const": false
+                  },
+                  "within_90_days": {
+                    "const": false
+                  },
+                  "in_reference_quarter": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "position": {
+                    "const": "DUE_TODAY"
+                  },
+                  "recorded_date": {
+                    "type": "string"
+                  },
+                  "days_until": {
+                    "type": "integer",
+                    "const": 0
+                  },
+                  "within_7_days": {
+                    "const": true
+                  },
+                  "within_30_days": {
+                    "const": true
+                  },
+                  "within_90_days": {
+                    "const": true
+                  },
+                  "in_reference_quarter": {
+                    "const": true
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "position": {
+                    "const": "WITHIN_30_DAYS"
+                  },
+                  "recorded_date": {
+                    "type": "string"
+                  },
+                  "days_until": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 30
+                  },
+                  "within_7_days": {
+                    "type": "boolean"
+                  },
+                  "within_30_days": {
+                    "const": true
+                  },
+                  "within_90_days": {
+                    "const": true
+                  },
+                  "in_reference_quarter": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "position": {
+                    "const": "FUTURE_DATE"
+                  },
+                  "recorded_date": {
+                    "type": "string"
+                  },
+                  "days_until": {
+                    "type": "integer",
+                    "minimum": 31
+                  },
+                  "within_7_days": {
+                    "const": false
+                  },
+                  "within_30_days": {
+                    "const": false
+                  },
+                  "within_90_days": {
+                    "type": "boolean"
+                  },
+                  "in_reference_quarter": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            ],
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "days_until": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 7
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "within_7_days": {
+                      "const": true
+                    }
+                  }
+                },
+                "else": {
+                  "if": {
+                    "properties": {
+                      "days_until": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "within_7_days": {
+                        "const": false
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "days_until": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 90
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "within_90_days": {
+                      "const": true
+                    }
+                  }
+                },
+                "else": {
+                  "if": {
+                    "properties": {
+                      "days_until": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "within_90_days": {
+                        "const": false
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "warranty_start": {
+            "type": "null"
+          },
+          "warranty_provider": {
+            "type": "null"
+          },
+          "hazard_lookup_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "notification_lookup_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "actions_this_request": {
+            "type": "object",
+            "properties": {
+              "hazard_creation": {
+                "const": "NOT_REQUESTED"
+              },
+              "notification": {
+                "const": "NOT_REQUESTED"
+              },
+              "asset_updated": {
+                "const": false
+              }
+            },
+            "required": [
+              "hazard_creation",
+              "notification",
+              "asset_updated"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "asset_id",
+          "tenant_id",
+          "asset_version",
+          "metadata_version",
+          "observed_at",
+          "as_of_date",
+          "timezone",
+          "policy_version",
+          "scope",
+          "source",
+          "recorded_dates_source",
+          "verification_status",
+          "coverage_verified",
+          "warranty_expiry",
+          "overdue_service_date",
+          "warranty_start",
+          "warranty_provider",
+          "hazard_lookup_status",
+          "notification_lookup_status",
+          "actions_this_request"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "metadata_version": {
+                "type": "null"
+              },
+              "verification_status": {
+                "type": "null"
+              },
+              "warranty_expiry": {
+                "properties": {
+                  "position": {
+                    "const": "UNKNOWN"
+                  }
+                }
+              },
+              "overdue_service_date": {
+                "properties": {
+                  "position": {
+                    "const": "UNKNOWN"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "properties": {
+              "metadata_version": {
+                "type": "integer"
+              },
+              "verification_status": {
+                "const": "SELF_REPORTED"
+              }
+            }
+          }
+        ]
+      },
+      "AssetDateAssessmentResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AssetDateAssessment"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "AssetDateQueryPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "properties": {
+                "asset_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+                },
+                "assessment": {
+                  "$ref": "#/components/schemas/AssetDateAssessment"
+                }
+              },
+              "required": [
+                "asset_id",
+                "name",
+                "created_at",
+                "assessment"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_before_created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "next_before_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "next_expected_reference_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "date_field": {
+            "enum": [
+              "warranty_expiry",
+              "overdue_service_date"
+            ]
+          },
+          "window": {
+            "enum": [
+              "UNKNOWN",
+              "PAST_DATE",
+              "WITHIN_30_DAYS",
+              "WITHIN_90_DAYS",
+              "REFERENCE_QUARTER"
+            ]
+          },
+          "filters": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "site_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "reference_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+          },
+          "timezone": {
+            "const": "Asia/Shanghai"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_INTERNAL_MANUAL_DATE_FILTER"
+          },
+          "page_size_limit": {
+            "const": 100
+          },
+          "pagination_consistency": {
+            "const": "CURRENT_REQUEST_SNAPSHOT_ONLY"
+          },
+          "metadata_change_semantics": {
+            "const": "NOT_FROZEN_ACROSS_PAGES"
+          }
+        },
+        "required": [
+          "items",
+          "has_more",
+          "next_before_created_at",
+          "next_before_id",
+          "next_expected_reference_date",
+          "date_field",
+          "window",
+          "filters",
+          "reference_date",
+          "observed_at",
+          "timezone",
+          "source",
+          "scope",
+          "page_size_limit",
+          "pagination_consistency",
+          "metadata_change_semantics"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "has_more": {
+                "const": false
+              },
+              "next_before_created_at": {
+                "type": "null"
+              },
+              "next_before_id": {
+                "type": "null"
+              },
+              "next_expected_reference_date": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "has_more": {
+                "const": true
+              },
+              "items": {
+                "minItems": 1
+              },
+              "next_before_created_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+              },
+              "next_before_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "next_expected_reference_date": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          }
+        ]
+      },
+      "AssetDateQueryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AssetDateQueryPage"
           },
           "trace_id": {
             "type": "string"

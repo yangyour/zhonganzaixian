@@ -1,0 +1,42 @@
+{
+  "verified_at": "2026-10-03T07:20:04.312308+00:00",
+  "environment": "niko-local-test",
+  "contract_version": "0.23.0",
+  "status": "AUTHORIZED_DATE_QUERY_API_ONLY",
+  "tests": {
+    "new_controller": 9,
+    "root_reported": 875,
+    "root_executed": 862,
+    "real_pg_integration": 264,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 45,
+    "web": 504,
+    "web_typecheck_build": true,
+    "real_http": 79
+  },
+  "setup_business_mutations": 33,
+  "authorized_tenant_switches": 2,
+  "query_writes": 0,
+  "reference_day_server_authoritative": true,
+  "old_reference_day_409": true,
+  "natural_midnight_rollover_observed": false,
+  "pagination_data_frozen": false,
+  "execution_transport_interruption": {
+    "observed": "2026-10-03T07:08Z",
+    "old_qa_session_resumable": false,
+    "standard_owned_runner_restarted_existing_components": true,
+    "manual_pg_pid_removal": false,
+    "ports_or_permissions_changed": false,
+    "new_credentials_or_migrations": false,
+    "recovered_readiness_and_full_tests": true,
+    "full_data_crash_recovery_proven": false
+  },
+  "browser_dom_tested": false,
+  "large_scale_performance_tested": false,
+  "coverage_verified": false,
+  "notification_sent": false,
+  "migrations_executed": 0,
+  "all_128_done": false,
+  "credentials_output": false
+}

@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.22.0');
+  assert.equal(contract.info.version, '0.23.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -542,4 +542,12 @@ test('真实记录日期对照不冒充维保覆盖、隐患生成或通知送�
   const valid = value => validates('AssetDateAssessmentResult', { data: value, trace_id: 'date-test' }); assert.equal(valid(data), true);
   for (const patch of [{ coverage_verified: true }, { warranty_provider: 'guessed' }, { verification_status: 'SELF_REPORTED' }, { notification_lookup_status: 'DELIVERED' }, { timezone: 'UTC' }, { actions_this_request: { ...data.actions_this_request, asset_updated: true } }]) assert.equal(valid({ ...data, ...patch }), false);
   const route = contract.paths['/assets/{id}/manual-metadata/date-assessment']; assert.deepEqual(Object.keys(route), ['get']); assert.equal(route.get['x-mop-read-only'], true); assert.deepEqual(route.get['x-mop-roles'], ['msp', 'padmin']);
+});
+test('日期列表只读分页绑定三字段游标和当前服务端参考日', () => {
+  const page = { items: [], has_more: false, next_before_created_at: null, next_before_id: null, next_expected_reference_date: null, date_field: 'warranty_expiry', window: 'WITHIN_30_DAYS', filters: {}, reference_date: '2026-10-03', observed_at: timestamp, timezone: 'Asia/Shanghai', source: 'postgresql', scope: 'CURRENT_TENANT_INTERNAL_MANUAL_DATE_FILTER', page_size_limit: 100, pagination_consistency: 'CURRENT_REQUEST_SNAPSHOT_ONLY', metadata_change_semantics: 'NOT_FROZEN_ACROSS_PAGES' };
+  assert.equal(validates('AssetDateQueryPage', page), true);
+  for (const patch of [{ has_more: true }, { next_expected_reference_date: '2026-10-03' }, { window: 'COVERED' }, { date_field: 'purchase_date' }, { filters: { tenant_id: id('1') } }, { pagination_consistency: 'FROZEN' }, { metadata_change_semantics: 'FROZEN' }]) assert.equal(validates('AssetDateQueryPage', { ...page, ...patch }), false);
+  const route = contract.paths['/assets/date-assessments'].get; assert.equal(route['x-mop-read-only'], true); assert.deepEqual(route['x-mop-paired-query-keys'], ['before_created_at', 'before_id', 'expected_reference_date']);
+  for (const name of ['date_field', 'window']) assert.equal(route.parameters.find(p => p.name === name).required, true);
+  assert.ok(!route.parameters.some(p => p.name === 'as_of_date' || p.name === 'tenant_id'));
 });

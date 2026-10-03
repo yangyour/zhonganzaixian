@@ -1,0 +1,431 @@
+{
+  "verified_at": "2026-10-03T07:18:08.210Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "contract_version": "0.23.0",
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "initial_empty",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_3",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_3",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_4",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_4",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_5",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_5",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_6",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_6",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_7",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_7",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_8",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_8",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_9",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_9",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_10",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_10",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_11",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_11",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_12",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_12",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_13",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_13",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_14",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_14",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_15",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_date_query_metadata_15",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_date_query_asset_16",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "warranty_expiry_UNKNOWN",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "warranty_expiry_PAST_DATE",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "warranty_expiry_WITHIN_30_DAYS",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "warranty_expiry_WITHIN_90_DAYS",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "warranty_expiry_REFERENCE_QUARTER",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "overdue_service_date_UNKNOWN",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "overdue_service_date_PAST_DATE",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "overdue_service_date_WITHIN_30_DAYS",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "overdue_service_date_WITHIN_90_DAYS",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "overdue_service_date_REFERENCE_QUARTER",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "first_ten",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "second_two",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "stale_reference_day_cannot_override_server",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "incomplete_cursor_before_created_at",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "incomplete_cursor_before_id",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "incomplete_cursor_expected_reference_date",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_casefold_literal",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "literal_injection_no_match",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_site_no_match",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "internal_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "internal_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_before_readonly",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_refresh",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_after_readonly",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "customer_denied_viewerA",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "customer_denied_viewerB",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "customer_denied_tadmin",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_denied",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_68",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_69",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_70",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_71",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_72",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_73",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "duplicate_window",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_required_filters",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "switch_authorized_other_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "other_tenant_cannot_see_same_filter",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "restore_original_tenant",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "http_requests": 79,
+  "synthetic_assets": 17,
+  "synthetic_metadata_revisions": 16,
+  "setup_business_mutations": 33,
+  "authorized_tenant_switches": 2,
+  "query_business_writes": 0,
+  "real_pg_current_metadata_windows": true,
+  "five_windows_two_date_fields": true,
+  "keyset_pages": [
+    10,
+    2
+  ],
+  "cross_tenant_empty": true,
+  "stale_reference_day_409": true,
+  "reference_day_not_client_override": true,
+  "query_values_literal_and_bounded": true,
+  "successful_readonly_sequence_audit_tail_unchanged": true,
+  "coverage_verified": false,
+  "hazard_created": false,
+  "notification_sent": false,
+  "browser_dom_tested": false,
+  "large_scale_performance_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "Date-window page and browser DOM B03",
+    "Hazard/reminder Worker and external delivery B05",
+    "Quarter export and report integration"
+  ]
+}

@@ -37,3 +37,15 @@ M3-10不是整体DONE：维保起始/供应商/提醒接收人、P4隐患与商�
 ManualAssetMetadataRepository.searchDates复用已有手工资料查询的repeatable-read只读事务、当前成员/user/权限版本校验、租户过滤、技术keyset和返回上限101（API最多100+下一页哨兵）。日期字段只来自枚举白名单，日期全部绑定参数，筛选连接当前资料指针对应修订而非任何旧历史。无资料仍可命中未知，不凭空填日期。既有14字段字面/精确查询保持原行为。
 
 8新纯筛选+8新真实PG集成测试通过，完整根866=853执行（264真实PG）+13历史fixture跳过/6MinIO排除。真实合成数据覆盖-1/0/7/29/30/90/91/null五窗口集合对照、两日期互不混用、无元数据与已清空日期、2/2/1 keyset无重叠、客户/旧权限拒绝/跨租户范围、不合法游标/上限、读取不改资产历史审计、更新到91天后旧29天修订不再匹配。尚未增加列表API/UI，不以仓储完成冒充完整筛选交付；无迁移、现有API0.22不变，大规模查询性能未验。见[仓储证据](evidence/niko-asset-date-filter-repository-20261003.json)。
+
+## 2026-10-03 API0.23 日期窗口列表
+
+GET /api/v1/assets/date-assessments要求明确date_field（warranty_expiry或overdue_service_date）与window（UNKNOWN/PAST_DATE/WITHIN_30_DAYS/WITHIN_90_DAYS/REFERENCE_QUARTER）。名称字面包含、站点精确匹配；当前msp/padmin授权，仅手工来源，资料和成员仍同一真实PG只读快照。每项复用详情日期投影，冻结本请求observed_at/reference_date，声明coverage未验真、无隐患/通知动作。既有详情响应字段不变。
+
+分页10/15/25/50/100，创建时间/id降序keyset；下一页必须同时提交before_created_at/before_id/expected_reference_date。最后者只比对当前服务端上海日期，不覆盖时钟；旧日409 DATE_REFERENCE_CHANGED要求从首页重新查询。跨页资料变化不冻结，返回NOT_FROZEN_ACROSS_PAGES，不假称月报快照。全部额外/重复query、伪造租户/时区/参考日、非法字段/窗口/上限拒绝。
+
+9新控制器、完整根875=862执行（264真实PG）+13历史fixture跳过/6MinIO排除、45契约/504Web/类型构建通过。79真实HTTP完成：17合成资产+16资料修订=33设置写入，另2次合法租户切换；两个日期字段×5窗口，-1/0..10/30/31/90/91/null集合、10+2分页无重叠、Unicode字面筛选/注入字面不匹配、客户/匿名拒绝、跨租户相同筛选空集、旧参考日实际409、三游标缺一400、只读审计尾不变。不是午夜自然跨日实测，也不是规模性能或冻结快照证明。
+
+开发中07:08执行通道短暂断连，原QA会话不可恢复；先核验文件未发生不确定写入，再使用已有标准测试栈启动脚本恢复获准组件，未手动删PG PID文件/改权限/改端口/使用新任务。07:14就绪恢复，完整根测试通过；之后正常退出该拥有栈并按新API固定工件启动，新6OIDC/79HTTP通过。该恢复不替代数据全量故障验收，亦不证明旧执行通道能继续使用。
+
+无迁移，V1–V14冻结。列表页面、真实每日隐患/通知Worker、商机工单/季度导出/报告和DOM仍待，全部128项非DONE。见[列表HTTP](evidence/niko-asset-date-query-http-20261003.json)、[回归与恢复记录](evidence/niko-asset-date-query-api-20261003.json)。

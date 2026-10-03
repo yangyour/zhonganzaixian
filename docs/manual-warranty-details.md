@@ -40,3 +40,14 @@ V15已显式执行一次，重复、只读检查、旧V14目标均0迁移；V1�
 12新真实PG与5纯规则、完整根952（939执行含295真实PG）/13历史跳过/6MinIO排除、49契约通过。覆盖旧体保留、显式清空、原回执、跨租户404、当前权限、独立连接一成功一409、下游异常全回滚，以及只读当前/历史/筛选投影。首轮保护单测暴露事务前置次序变化，已恢复；追加旧JSON测试的JDBC问号操作符冲突改为jsonb_exists，最终完整根全过。
 
 新authorizeCurrentAsset在受保护幂等事务内先验证当前身份与资源，供下一步公开维保API重放使用；未把仓储测试算作真实公开HTTP。API0.25和已执行V1–V15不变，独立维保API/UI/通知与完整合同继续。见[仓储证据](evidence/niko-manual-warranty-repository-20261003.json)。
+
+
+## 2026-10-03 API0.26独立维保入口
+
+GET/PATCH `/assets/{id}/manual-metadata/warranty` 与GET `/history` 已运行真实PG/OIDC/API。PATCH严格6字段expected_version、warranty_start、warranty_expiry、warranty_supplier、overdue_service_date、note，四个可空事实必须明确null；拒绝额外字段/重复key/query/非法日期/大体。起始≤已知到期，200码点供应商；note明确替换资料备注。msp/padmin当前租户授权、CSRF、幂等、资产版本CAS、当前资源重放授权及成功审计同事务。旧基础PATCH也新增当前资源回执前校验，旧请求/DTO不增列。
+
+独立维保当前/历史DTO复用基础资料事实并增加warranty_details（null未登记，对象含两个null为显式未知）、warranty_coverage_verified=false、warranty_supplier_verification=UNVERIFIED。before快照也含真实wrapper；历史为共享的全部资料修订，并非过滤掉基础资料变更的维保专属日志。供应商未验真、覆盖未确认，未创建隐患或发送通知。旧日期对照API的warranty_start/provider仍为其原契约未提供字段，补充真实事实应读取本新入口。
+
+10控制器、完整根962（949执行含295真实PG）/13历史跳过/6MinIO排除，51契约、554Web及类型构建通过。97真实HTTP：1合成资产11资料修订/11成功维护审计；旧体保留和清空、旧/新原回执不回滚当前、非法到期全回滚、msp/padmin及客户禁止/跨租户404、实际两角色混合并发200/409、10+1分页、只读审计尾不变全部有证。首轮控制器测试调用名复制遗漏导致编译失败已修，最终完整根通过；HTTP首轮全部通过。
+
+原API0.25拥有栈正常退出，新固定工件0.26启动就绪并重新6OIDC，不自动迁移；V1–V15字节不改。独立维护页面/实际DOM、供应商依据、每日隐患/真实通知送达/季度导出继续，不标完整M3-10或128项DONE。见[API证据](evidence/niko-manual-warranty-api-20261003.json)、[真实HTTP](evidence/niko-manual-warranty-api-http-20261003.json)。

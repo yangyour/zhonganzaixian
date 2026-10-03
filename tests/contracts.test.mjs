@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.25.0');
+  assert.equal(contract.info.version, '0.26.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -579,4 +579,17 @@ test('代码能力目录必须四角色五资源维度，不是签字或生效�
 test('能力声明行仅含声明向量，拒绝新增角色、授权结论和未知维度', () => {
   const entry = { id: 'search:read', label: '分组搜索', dimension_ids: ['ASSETS_METRICS', 'ALERTS_TICKETS'], declared_by_role: { viewer: true, tadmin: true, msp: true, padmin: true } }; assert.equal(validates('CapabilityCatalogEntry', entry), true);
   for (const patch of [{ permitted: true }, { dimension_ids: ['MENU'] }, { dimension_ids: ['ASSETS_METRICS', 'ASSETS_METRICS'] }, { declared_by_role: { ...entry.declared_by_role, super_admin: true } }, { declared_by_role: { ...entry.declared_by_role, viewer: null } }]) assert.equal(validates('CapabilityCatalogEntry', { ...entry, ...patch }), false);
+});
+test('维保专用写入要求全部显式字段且不扩展旧基础请求与DTO', () => {
+  const input = { expected_version: 1, warranty_start: null, warranty_expiry: null, warranty_supplier: null, overdue_service_date: null, note: '明确资料备注' }; assert.equal(validates('ManualWarrantyUpdate', input), true);
+  for (const key of Object.keys(input)) { const missing = { ...input }; delete missing[key]; assert.equal(validates('ManualWarrantyUpdate', missing), false); }
+  for (const patch of [{ expected_version: 0 }, { warranty_start: '0000-01-01' }, { warranty_expiry: '2026-02-30' }, { warranty_supplier: '' }, { warranty_supplier: '😀'.repeat(201) }, { tenant_id: id('2') }, { warranty_coverage_verified: true }]) assert.equal(validates('ManualWarrantyUpdate', { ...input, ...patch }), false);
+  assert.equal(validates('ManualWarrantyUpdate', { ...input, warranty_supplier: '😀'.repeat(200) }), true);
+  assert.equal(contract.components.schemas.ManualAssetCurrent.properties.warranty_details, undefined); assert.equal(contract.components.schemas.ManualAssetUpdate.properties.warranty_start, undefined);
+  const route = contract.paths['/assets/{id}/manual-metadata/warranty']; assert.deepEqual(Object.keys(route), ['get', 'patch']); assert.equal(route.get['x-mop-read-only'], true); assert.match(route.patch['x-mop-replay-authorization'], /before original receipt/); assert.equal(route.patch['x-mop-reject-duplicate-json-keys'], true);
+});
+test('补充资料未登记与显式null不同，供应商和覆盖不能冒充核验', () => {
+  assert.equal(validates('ManualWarrantyDetails', { warranty_start: null, warranty_supplier: null }), true); assert.equal(validates('ManualWarrantyDetails', null), false); assert.equal(validates('ManualWarrantyDetails', { warranty_start: null }), false);
+  const current = contract.components.schemas.ManualWarrantyCurrent; assert.equal(current.properties.warranty_coverage_verified.const, false); assert.equal(current.properties.warranty_supplier_verification.const, 'UNVERIFIED'); assert.equal(current.properties.warranty_details.oneOf[1].type, 'null');
+  const snapshot = contract.components.schemas.ManualWarrantySnapshot; assert.equal(snapshot.allOf[1].then.properties.warranty_details.type, 'null'); assert.equal(contract.components.schemas.ManualWarrantyRevision.properties.before.$ref, '#/components/schemas/ManualWarrantySnapshot');
 });

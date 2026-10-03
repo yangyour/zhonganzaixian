@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-03T09:57:12.891598+00:00",
+  "environment": "niko-local-test",
+  "status": "API_VERIFIED_UI_PENDING",
+  "contract_version": "0.26.0",
+  "tests": {
+    "new_controller": 10,
+    "root_reported": 962,
+    "root_executed": 949,
+    "real_pg": 295,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 51,
+    "web": 554,
+    "typecheck_and_build": true,
+    "http": 97,
+    "failures": 0,
+    "errors": 0
+  },
+  "runtime_launch": "normal owned API0.25 stack exit then fixed new JAR startup with verified readiness and six fresh OIDC sessions",
+  "migration_executed": false,
+  "frozen_schema": "V1-V15",
+  "legacy_public_wire_shape_preserved": true,
+  "legacy_controller_cached_replay_current_asset_authorization_added": true,
+  "new_warranty_read_write_history": true,
+  "public_http_details": "niko-manual-warranty-api-http-20261003.json",
+  "iteration_corrections": [
+    "One copied controller-test verify call still referenced update instead of updateWarranty; fixed before successful full root run"
+  ],
+  "credentials_output": false,
+  "supplier_verified": false,
+  "warranty_coverage_verified": false,
+  "hazard_generated": false,
+  "notification_sent": false,
+  "browser_dom_executed": false,
+  "all_128_done": false
+}

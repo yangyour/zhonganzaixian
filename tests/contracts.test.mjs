@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.21.0');
+  assert.equal(contract.info.version, '0.22.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -529,4 +529,17 @@ test('128项合同追踪保持唯一且逐项证据链接指向实际仓库文�
     if (evidence.trim()) assert.match(evidence, /非DONE|NOT_RUN/, row.split('|')[1] + ' must retain current incomplete acceptance boundary');
     for (const match of evidence.matchAll(/\]\(([^)]+)\)/g)) assert.ok(readFileSync(new URL(match[1], url)).length > 0, match[1]);
   }
+});
+test('记录日期为空时派生值必须null，到期当天和已过期分开', () => {
+  const unknown = { recorded_date: null, days_until: null, position: 'UNKNOWN', within_7_days: null, within_30_days: null, within_90_days: null, in_reference_quarter: null };
+  assert.equal(validates('RecordedDateResult', unknown), true);
+  for (const patch of [{ days_until: 0 }, { within_90_days: false }, { position: 'PAST_DATE' }, { recorded_date: '2026-10-03' }]) assert.equal(validates('RecordedDateResult', { ...unknown, ...patch }), false);
+  const today = { recorded_date: '2026-10-03', days_until: 0, position: 'DUE_TODAY', within_7_days: true, within_30_days: true, within_90_days: true, in_reference_quarter: true }; assert.equal(validates('RecordedDateResult', today), true); for (const patch of [{ position: 'PAST_DATE' }, { days_until: 1 }, { within_7_days: false }, { in_reference_quarter: false }]) assert.equal(validates('RecordedDateResult', { ...today, ...patch }), false);
+});
+test('真实记录日期对照不冒充维保覆盖、隐患生成或通知送达', () => {
+  const unknown = { recorded_date: null, days_until: null, position: 'UNKNOWN', within_7_days: null, within_30_days: null, within_90_days: null, in_reference_quarter: null };
+  const data = { asset_id: id('1'), tenant_id: id('2'), asset_version: 1, metadata_version: null, observed_at: timestamp, as_of_date: '2026-10-01', timezone: 'Asia/Shanghai', policy_version: 'contract-m3-10-date-v1', scope: 'RECORDED_DATE_ASSESSMENT_ONLY', source: 'postgresql', recorded_dates_source: 'MANUAL_ASSET_METADATA', verification_status: null, coverage_verified: false, warranty_expiry: unknown, overdue_service_date: unknown, warranty_start: null, warranty_provider: null, hazard_lookup_status: 'NOT_IMPLEMENTED', notification_lookup_status: 'NOT_IMPLEMENTED', actions_this_request: { hazard_creation: 'NOT_REQUESTED', notification: 'NOT_REQUESTED', asset_updated: false } };
+  const valid = value => validates('AssetDateAssessmentResult', { data: value, trace_id: 'date-test' }); assert.equal(valid(data), true);
+  for (const patch of [{ coverage_verified: true }, { warranty_provider: 'guessed' }, { verification_status: 'SELF_REPORTED' }, { notification_lookup_status: 'DELIVERED' }, { timezone: 'UTC' }, { actions_this_request: { ...data.actions_this_request, asset_updated: true } }]) assert.equal(valid({ ...data, ...patch }), false);
+  const route = contract.paths['/assets/{id}/manual-metadata/date-assessment']; assert.deepEqual(Object.keys(route), ['get']); assert.equal(route.get['x-mop-read-only'], true); assert.deepEqual(route.get['x-mop-roles'], ['msp', 'padmin']);
 });

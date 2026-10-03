@@ -1,0 +1,29 @@
+package cn.mop.api;
+import cn.mop.domain.*;
+import cn.mop.domain.assetmetadata.*;
+import cn.mop.domain.assetmetadata.ManualAssetMetadataRepository.*;
+import org.junit.jupiter.api.*;
+import org.springframework.mock.web.MockHttpServletRequest;
+import java.time.*;
+import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+class AssetDateAssessmentControllerTest {
+    static final String ACTOR="57000000-0000-4000-8000-000000000001",TENANT="57000000-0000-4000-8000-000000000011",ID="57000000-0000-4000-8000-000000000021";
+    PlatformRepository platform;ManualAssetMetadataRepository metadata;AssetDateAssessmentController controller;
+    @BeforeEach void setup(){platform=mock(PlatformRepository.class);metadata=mock(ManualAssetMetadataRepository.class);controller=new AssetDateAssessmentController(platform,metadata,Clock.fixed(Instant.parse("2026-10-02T16:00:00.123456Z"),ZoneOffset.UTC));role("msp");}
+    void role(String role){when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,role,7,true)));}
+    MockHttpServletRequest request(){var r=new MockHttpServletRequest("GET","/api/v1/assets/"+ID+"/manual-metadata/date-assessment");r.setUserPrincipal(()->ACTOR);r.getSession().setAttribute("mop.tenant_id",TENANT);r.setAttribute("mop.trace_id","synthetic-trace");return r;}
+    Access access(){return new Access(ACTOR,TENANT,7,"synthetic-trace");}
+    Asset asset(String tenant){return new Asset(ID,tenant,"记录日期草稿","router","192.0.2.1","site-a","unknown","DRAFT","manual",null,"NOT_ONBOARDED",2,Instant.EPOCH,Instant.EPOCH,"UNKNOWN","PENDING_ONBOARDING");}
+    Current current(LocalDate warranty,LocalDate eol){var m=new ManualAssetMetadata("记录日期草稿","router","site-a",null,null,null,null,null,null,null,warranty,eol,null,"合成测试");return new Current(new Snapshot(asset(TENANT),m,2L),ACTOR,Instant.EPOCH,List.of());}
+    Map<?,?> data(){return (Map<?,?>)((Map<?,?>)controller.get(ID,request())).get("data");}
+    @Test void trustedScopeActualVersionAndServerShanghaiDateOnly(){when(metadata.current(access(),ID)).thenReturn(current(LocalDate.of(2026,11,1),LocalDate.of(2026,10,2)));var r=data();assertEquals(TENANT,r.get("tenant_id"));assertEquals(2L,r.get("asset_version"));assertEquals(2L,r.get("metadata_version"));assertEquals(LocalDate.of(2026,10,3),r.get("as_of_date"));assertEquals(Instant.parse("2026-10-02T16:00:00.123Z"),r.get("observed_at"));assertEquals(29L,((Map<?,?>)r.get("warranty_expiry")).get("days_until"));assertEquals("PAST_DATE",((Map<?,?>)r.get("overdue_service_date")).get("position"));verify(metadata).current(access(),ID);verifyNoMoreInteractions(metadata);verify(platform).membership(ACTOR,TENANT);verifyNoMoreInteractions(platform);}
+    @Test void absentMetadataKeepsAllDerivedValuesUnknown(){when(metadata.current(access(),ID)).thenReturn(new Current(new Snapshot(asset(TENANT),null,null),null,null,List.of()));var r=data();assertNull(r.get("metadata_version"));assertNull(r.get("verification_status"));for(String key:List.of("warranty_expiry","overdue_service_date")){var value=(Map<?,?>)r.get(key);assertEquals("UNKNOWN",value.get("position"));for(String field:List.of("recorded_date","days_until","within_7_days","within_30_days","within_90_days","in_reference_quarter"))assertNull(value.get(field));}}
+    @Test void knownMetadataCanStillHaveUnknownDates(){when(metadata.current(access(),ID)).thenReturn(current(null,null));var r=data();assertEquals("SELF_REPORTED",r.get("verification_status"));assertEquals("UNKNOWN",((Map<?,?>)r.get("warranty_expiry")).get("position"));}
+    @Test void noCoverageHazardOrNotificationSuccessClaim(){when(metadata.current(access(),ID)).thenReturn(current(LocalDate.of(2026,10,3),null));var r=data();assertEquals(false,r.get("coverage_verified"));assertNull(r.get("warranty_start"));assertNull(r.get("warranty_provider"));assertEquals("NOT_IMPLEMENTED",r.get("hazard_lookup_status"));assertEquals("NOT_IMPLEMENTED",r.get("notification_lookup_status"));assertEquals(Map.of("hazard_creation","NOT_REQUESTED","notification","NOT_REQUESTED","asset_updated",false),r.get("actions_this_request"));}
+    @Test void rolesAndActiveCurrentMembershipAreMandatory(){when(metadata.current(access(),ID)).thenReturn(current(null,null));role("padmin");assertEquals(ID,data().get("asset_id"));for(String role:List.of("viewer","tadmin","unknown")){role(role);assertEquals(403,assertThrows(DomainException.class,this::data).status);}when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"msp",7,false)));assertEquals(401,assertThrows(DomainException.class,this::data).status);var r=request();r.setUserPrincipal(null);assertEquals(401,assertThrows(DomainException.class,()->controller.get(ID,r)).status);}
+    @Test void allQueryOverridesAndInvalidPathRejectedBeforeMetadataRead(){for(String key:List.of("as_of_date","timezone","tenant_id","expected_version")){var r=request();r.addParameter(key,"forged");assertEquals(400,assertThrows(DomainException.class,()->controller.get(ID,r)).status);}assertEquals(400,assertThrows(DomainException.class,()->controller.get("bad-id",request())).status);verifyNoInteractions(metadata);}
+    @Test void foreignOrMissingAssetStays404AndRepositoryRechecksMembership(){when(metadata.current(access(),ID)).thenThrow(new DomainException(404,"RESOURCE_NOT_FOUND","不可见"));assertEquals(404,assertThrows(DomainException.class,this::data).status);doThrow(new DomainException(401,"SESSION_EXPIRED","成员已撤权")).when(metadata).current(access(),ID);assertEquals(401,assertThrows(DomainException.class,this::data).status);}
+    @Test void mismatchedRepositoryTenantFailsClosed(){when(metadata.current(access(),ID)).thenReturn(new Current(new Snapshot(asset("57000000-0000-4000-8000-000000000099"),null,null),null,null,List.of()));assertThrows(IllegalStateException.class,this::data);}
+}

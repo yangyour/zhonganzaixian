@@ -1,0 +1,35 @@
+{
+  "verified_at": "2026-10-03T06:45:47.529938+00:00",
+  "environment": "niko-local-test",
+  "status": "AUTHORIZED_RECORDED_DATE_PROJECTION_ONLY",
+  "contract_version": "0.22.0",
+  "tests": {
+    "new_controller": 8,
+    "root_reported": 850,
+    "root_executed": 837,
+    "existing_real_pg_regression": 256,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 44,
+    "web": 490,
+    "web_typecheck_build": true,
+    "real_http": 37
+  },
+  "corrected_attempts": [
+    "Mockito re-stubbing an already throwing mock corrected with doThrow; full root rerun",
+    "Contract cross-field schema generator brace syntax corrected; regenerated then full44pass"
+  ],
+  "reused_pg_repository_snapshot": true,
+  "fresh_oidc_sessions": 6,
+  "server_shanghai_reference_date": true,
+  "assessment_business_writes": 0,
+  "synthetic_setup_mutations": 5,
+  "coverage_verified": false,
+  "hazard_lookup": "NOT_IMPLEMENTED",
+  "notification_lookup": "NOT_IMPLEMENTED",
+  "notification_sent": false,
+  "migrations_executed": 0,
+  "browser_dom_tested": false,
+  "all_128_done": false,
+  "credentials_output": false
+}

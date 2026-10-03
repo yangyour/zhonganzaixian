@@ -1,0 +1,217 @@
+{
+  "verified_at": "2026-10-03T06:44:27.305Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "contract_version": "0.22.0",
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_synthetic_date_asset",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "absent_metadata_unknown",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_dates_plus29",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "assess_plus29",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_dates_plus91",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "assess_plus91",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_dates_past",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "assess_past",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "set_dates_unknown",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "assess_unknown",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "other_internal_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "other_internal_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "metadata_before_reads",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_before_reads",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_repeat_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_repeat_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_repeat_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "metadata_after_reads",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_after_reads",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "customer_denied_viewerA",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "customer_denied_viewerB",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "customer_denied_tadmin",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_denied",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_as_of_date",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_timezone",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_tenant_id",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_expected_version",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bad_asset_id",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_asset",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_visible_asset",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "cross_tenant_hidden",
+      "status": 404,
+      "contract_valid": true
+    }
+  ],
+  "http_requests": 37,
+  "synthetic_asset_creations": 1,
+  "synthetic_metadata_revisions": 4,
+  "setup_business_mutations": 5,
+  "date_assessment_business_writes": 0,
+  "successful_readonly_sequence_audit_tail_unchanged": true,
+  "metadata_unchanged_by_assessment": true,
+  "server_shanghai_date_from_observed_instant": true,
+  "recorded_metadata_version_bound": true,
+  "unknowns_remain_null": true,
+  "warranty_coverage_verified": false,
+  "hazard_created": false,
+  "notification_sent": false,
+  "existing_hazards_or_deliveries_queried": false,
+  "cross_tenant_404": true,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "Warranty start/provider/contact facts",
+    "P4 hazard and opportunity workflow",
+    "Daily Worker and verified enterprise WeChat delivery B05",
+    "Quarter export and report integration",
+    "Page and browser DOM"
+  ]
+}

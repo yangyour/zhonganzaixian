@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.23.0",
+    "version": "0.24.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -7303,6 +7303,166 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ManualIncidentResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "operationId": "searchCurrentTenantGroups",
+        "summary": "当前租户分组搜索；未接入事件/脚本保持未知",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          }
+        ],
+        "x-mop-read-only": true,
+        "x-mop-capability": "search:read",
+        "x-mop-roles": [
+          "viewer",
+          "tadmin",
+          "msp",
+          "padmin"
+        ],
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "只接受一次q，禁止空白和控制字符，不接受身份/limit/来源覆盖。真实PG同一只读事务核验当前user/成员/权限并搜索资产名称及报障登记标题/编号；客户含tadmin仅本人登记，内部限当前租户。固定分组5/4/3/3；未接入事件/脚本items、returned、has_more均null，不冒充空集。无联系方式/IP/正文/内部备注，未实现铃铛，不执行自动化或通知。",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupedSearchResult"
                 }
               }
             }
@@ -15171,6 +15331,604 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/ManualIncidentPage"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "SearchAssetHit": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "type": {
+            "enum": [
+              "router",
+              "switch",
+              "firewall",
+              "ap",
+              "wireless_controller",
+              "other"
+            ]
+          },
+          "record_source": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "服务端64位正整数版本；客户端使用所见版本，冲突409，不自动覆盖。"
+          },
+          "resource_kind": {
+            "const": "ASSET_RECORD"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "name",
+          "type",
+          "record_source",
+          "version",
+          "resource_kind"
+        ],
+        "additionalProperties": false
+      },
+      "SearchTicketHit": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "receipt_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "record_source": {
+            "const": "customer_report"
+          },
+          "registration_status": {
+            "const": "REGISTERED"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "服务端64位正整数版本；客户端使用所见版本，冲突409，不自动覆盖。"
+          },
+          "resource_kind": {
+            "const": "CUSTOMER_REPORT_REGISTRATION"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "title",
+          "receipt_no",
+          "record_source",
+          "registration_status",
+          "version",
+          "resource_kind"
+        ],
+        "additionalProperties": false
+      },
+      "GroupedSearch": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH"
+          },
+          "coverage": {
+            "const": "PARTIAL"
+          },
+          "coverage_reason": {
+            "const": "EVENT_AND_AUTOMATION_SOURCES_NOT_IMPLEMENTED"
+          },
+          "query_semantics": {
+            "const": "LITERAL_UNICODE_CASE_INSENSITIVE"
+          },
+          "snapshot_consistency": {
+            "const": "ONE_READONLY_TRANSACTION"
+          },
+          "source": {
+            "const": "postgresql_supported_groups"
+          },
+          "notification_bell_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "groups": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "prefixItems": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "assets"
+                  },
+                  "status": {
+                    "const": "AVAILABLE"
+                  },
+                  "limit": {
+                    "const": 5
+                  },
+                  "returned": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 5
+                  },
+                  "has_more": {
+                    "type": "boolean"
+                  },
+                  "items": {
+                    "type": "array",
+                    "maxItems": 5,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "tenant_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 100
+                        },
+                        "type": {
+                          "enum": [
+                            "router",
+                            "switch",
+                            "firewall",
+                            "ap",
+                            "wireless_controller",
+                            "other"
+                          ]
+                        },
+                        "record_source": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "description": "服务端64位正整数版本；客户端使用所见版本，冲突409，不自动覆盖。"
+                        },
+                        "resource_kind": {
+                          "const": "ASSET_RECORD"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "tenant_id",
+                        "name",
+                        "type",
+                        "record_source",
+                        "version",
+                        "resource_kind"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "source_scope": {
+                    "const": "CURRENT_TENANT"
+                  },
+                  "matched_fields": {
+                    "const": [
+                      "name"
+                    ]
+                  },
+                  "reason": {
+                    "type": "null"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "status",
+                  "limit",
+                  "returned",
+                  "has_more",
+                  "items",
+                  "source_scope",
+                  "matched_fields",
+                  "reason"
+                ],
+                "additionalProperties": false,
+                "oneOf": [
+                  {
+                    "properties": {
+                      "returned": {
+                        "const": 0
+                      },
+                      "items": {
+                        "minItems": 0,
+                        "maxItems": 0
+                      },
+                      "has_more": {
+                        "const": false
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "returned": {
+                        "const": 1
+                      },
+                      "items": {
+                        "minItems": 1,
+                        "maxItems": 1
+                      },
+                      "has_more": {
+                        "const": false
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "returned": {
+                        "const": 2
+                      },
+                      "items": {
+                        "minItems": 2,
+                        "maxItems": 2
+                      },
+                      "has_more": {
+                        "const": false
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "returned": {
+                        "const": 3
+                      },
+                      "items": {
+                        "minItems": 3,
+                        "maxItems": 3
+                      },
+                      "has_more": {
+                        "const": false
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "returned": {
+                        "const": 4
+                      },
+                      "items": {
+                        "minItems": 4,
+                        "maxItems": 4
+                      },
+                      "has_more": {
+                        "const": false
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "returned": {
+                        "const": 5
+                      },
+                      "items": {
+                        "minItems": 5,
+                        "maxItems": 5
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "events"
+                  },
+                  "status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "limit": {
+                    "const": 4
+                  },
+                  "returned": {
+                    "type": "null"
+                  },
+                  "has_more": {
+                    "type": "null"
+                  },
+                  "items": {
+                    "type": "null"
+                  },
+                  "source_scope": {
+                    "type": "null"
+                  },
+                  "matched_fields": {
+                    "type": "null"
+                  },
+                  "reason": {
+                    "const": "SOURCE_NOT_IMPLEMENTED"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "status",
+                  "limit",
+                  "returned",
+                  "has_more",
+                  "items",
+                  "source_scope",
+                  "matched_fields",
+                  "reason"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "tickets"
+                  },
+                  "status": {
+                    "const": "AVAILABLE"
+                  },
+                  "limit": {
+                    "const": 3
+                  },
+                  "returned": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 3
+                  },
+                  "has_more": {
+                    "type": "boolean"
+                  },
+                  "items": {
+                    "type": "array",
+                    "maxItems": 3,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "tenant_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "title": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        },
+                        "receipt_no": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "record_source": {
+                          "const": "customer_report"
+                        },
+                        "registration_status": {
+                          "const": "REGISTERED"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "description": "服务端64位正整数版本；客户端使用所见版本，冲突409，不自动覆盖。"
+                        },
+                        "resource_kind": {
+                          "const": "CUSTOMER_REPORT_REGISTRATION"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "tenant_id",
+                        "title",
+                        "receipt_no",
+                        "record_source",
+                        "registration_status",
+                        "version",
+                        "resource_kind"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "source_scope": {
+                    "enum": [
+                      "OWN_REPORT_REGISTRATIONS",
+                      "CURRENT_TENANT_INTERNAL"
+                    ]
+                  },
+                  "matched_fields": {
+                    "const": [
+                      "title",
+                      "receipt_no"
+                    ]
+                  },
+                  "reason": {
+                    "type": "null"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "status",
+                  "limit",
+                  "returned",
+                  "has_more",
+                  "items",
+                  "source_scope",
+                  "matched_fields",
+                  "reason"
+                ],
+                "additionalProperties": false,
+                "oneOf": [
+                  {
+                    "properties": {
+                      "returned": {
+                        "const": 0
+                      },
+                      "items": {
+                        "minItems": 0,
+                        "maxItems": 0
+                      },
+                      "has_more": {
+                        "const": false
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "returned": {
+                        "const": 1
+                      },
+                      "items": {
+                        "minItems": 1,
+                        "maxItems": 1
+                      },
+                      "has_more": {
+                        "const": false
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "returned": {
+                        "const": 2
+                      },
+                      "items": {
+                        "minItems": 2,
+                        "maxItems": 2
+                      },
+                      "has_more": {
+                        "const": false
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "returned": {
+                        "const": 3
+                      },
+                      "items": {
+                        "minItems": 3,
+                        "maxItems": 3
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "const": "automation_scripts"
+                  },
+                  "status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "limit": {
+                    "const": 3
+                  },
+                  "returned": {
+                    "type": "null"
+                  },
+                  "has_more": {
+                    "type": "null"
+                  },
+                  "items": {
+                    "type": "null"
+                  },
+                  "source_scope": {
+                    "type": "null"
+                  },
+                  "matched_fields": {
+                    "type": "null"
+                  },
+                  "reason": {
+                    "const": "SOURCE_NOT_IMPLEMENTED"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "status",
+                  "limit",
+                  "returned",
+                  "has_more",
+                  "items",
+                  "source_scope",
+                  "matched_fields",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            ],
+            "items": false
+          }
+        },
+        "required": [
+          "query",
+          "tenant_id",
+          "observed_at",
+          "scope",
+          "coverage",
+          "coverage_reason",
+          "query_semantics",
+          "snapshot_consistency",
+          "source",
+          "notification_bell_status",
+          "groups"
+        ],
+        "additionalProperties": false
+      },
+      "GroupedSearchResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/GroupedSearch"
           },
           "trace_id": {
             "type": "string"

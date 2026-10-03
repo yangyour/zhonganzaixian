@@ -9,3 +9,13 @@ PostgresGlobalSearchRepository在一个repeatable-read只读事务中核验当�
 8纯规则+9新增真实PG通过；排序测试显式按created_at/id复合键而非假设插入时间互异后完整重跑，根892=879执行（273真实PG）+13历史fixture跳过/6MinIO排除，45契约通过。覆盖5/3上限溢出、客户与客户管理员各自仅本人、两租户同关键词不泄漏、Unicode/%/引号字面、受理编号搜索/正文不检索、DTO最小字段、旧权限/无成员拒绝、只读资产/审计不变和复合排序。不是RLS验收、生产授权矩阵或大规模性能证明。
 
 当前仓储阶段，无公开搜索API/页面、真实事件/脚本源或铃铛数据，API0.23/V1–V14不变，M1-8及128项未DONE。见[仓储证据](evidence/niko-global-search-repository-20261003.json)。
+
+## 2026-10-03 API0.24 分组搜索与部分来源标记
+
+GET /api/v1/search只接受一次q，当前租户/操作者来自会话，不接受tenant/actor/limit/来源覆盖。search:read仅四类既有角色，仓储同一只读事务再核验该能力及资产/登记读取能力；客户与tadmin仍仅本人登记。固定顺序assets/events/tickets/automation_scripts与5/4/3/3上限，分别结构化返回最小对象类型。工单组resource_kind=CUSTOMER_REPORT_REGISTRATION，不冒充完整工单流程。
+
+当前覆盖PARTIAL；事件和自动化脚本status=NOT_IMPLEMENTED且items/returned/has_more/source_scope/matched_fields均null，不当0或空结果。已接入组确实无匹配才items=[]、returned=0；没有全局总量。notification_bell_status=NOT_IMPLEMENTED，不从搜索数量推断未确认告警。每组严格契约限制字段/返回数/溢出；没有IP、联系人、电话、正文、内部评论/历史或权限身份字段。
+
+8新控制器、完整根900=887执行（273真实PG）+13历史fixture跳过/6MinIO排除、47契约/520Web/类型构建通过。正常退出拥有栈后按新固定JAR启动、6新OIDC；66真实HTTP均匹配API0.24，设置8合成资产+7客户登记=15写入及2合法租户切换。5/3溢出、四身份范围、两租户同关键词隔离、客户管理员不能搜索他人受理编号、Unicode字面查询、正文不检索、100emoji接受/101拒绝、额外/重复q拒绝、只读审计尾不变，事件/脚本/铃铛始终未实现。
+
+无迁移，V1–V14冻结；公开API切片不是完整M1-8/全局搜索或通知集成验收。页面、/键与DOM、事件/脚本提供方和真实铃铛仍待，规模未验，全部128项非DONE。见[真实HTTP](evidence/niko-global-search-api-http-20261003.json)、[回归证据](evidence/niko-global-search-api-20261003.json)。

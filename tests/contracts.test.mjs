@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.23.0');
+  assert.equal(contract.info.version, '0.24.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -550,4 +550,21 @@ test('日期列表只读分页绑定三字段游标和当前服务端参考日',
   const route = contract.paths['/assets/date-assessments'].get; assert.equal(route['x-mop-read-only'], true); assert.deepEqual(route['x-mop-paired-query-keys'], ['before_created_at', 'before_id', 'expected_reference_date']);
   for (const name of ['date_field', 'window']) assert.equal(route.parameters.find(p => p.name === name).required, true);
   assert.ok(!route.parameters.some(p => p.name === 'as_of_date' || p.name === 'tenant_id'));
+});
+test('全局搜索固定5/4/3/3分组且未接入来源不是空集或零计数', () => {
+  const supported = (kind, limit, scope, fields) => ({ kind, status: 'AVAILABLE', limit, returned: 0, has_more: false, items: [], source_scope: scope, matched_fields: fields, reason: null });
+  const unsupported = (kind, limit) => ({ kind, status: 'NOT_IMPLEMENTED', limit, returned: null, has_more: null, items: null, source_scope: null, matched_fields: null, reason: 'SOURCE_NOT_IMPLEMENTED' });
+  const value = { query: 'Ä%_', tenant_id: id('1'), observed_at: timestamp, scope: 'CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH', coverage: 'PARTIAL', coverage_reason: 'EVENT_AND_AUTOMATION_SOURCES_NOT_IMPLEMENTED', query_semantics: 'LITERAL_UNICODE_CASE_INSENSITIVE', snapshot_consistency: 'ONE_READONLY_TRANSACTION', source: 'postgresql_supported_groups', notification_bell_status: 'NOT_IMPLEMENTED', groups: [supported('assets', 5, 'CURRENT_TENANT', ['name']), unsupported('events', 4), supported('tickets', 3, 'OWN_REPORT_REGISTRATIONS', ['title', 'receipt_no']), unsupported('automation_scripts', 3)] };
+  assert.equal(validates('GroupedSearch', value), true);
+  for (const patch of [{ coverage: 'COMPLETE' }, { notification_bell_status: 'READY' }, { groups: value.groups.slice(0, 3) }, { query: '' }]) assert.equal(validates('GroupedSearch', { ...value, ...patch }), false);
+  for (const patch of [{ items: [] }, { returned: 0 }, { has_more: false }]) { const copy = structuredClone(value); Object.assign(copy.groups[1], patch); assert.equal(validates('GroupedSearch', copy), false); }
+  const fakeMore = structuredClone(value); fakeMore.groups[0].has_more = true; assert.equal(validates('GroupedSearch', fakeMore), false);
+});
+test('分组搜索最小DTO不允许IP、联系人、正文或内部身份字段', () => {
+  const asset = { id: id('1'), tenant_id: id('2'), name: '明确名称', type: 'router', record_source: 'manual', version: 1, resource_kind: 'ASSET_RECORD' };
+  const ticket = { id: id('3'), tenant_id: id('2'), title: '受理登记', receipt_no: 'test-receipt', record_source: 'customer_report', registration_status: 'REGISTERED', version: 1, resource_kind: 'CUSTOMER_REPORT_REGISTRATION' };
+  assert.equal(validates('SearchAssetHit', asset), true); assert.equal(validates('SearchTicketHit', ticket), true);
+  for (const key of ['management_ip', 'contact_name', 'contact_phone', 'description', 'reporter_id', 'history', 'attachments']) { assert.equal(validates('SearchAssetHit', { ...asset, [key]: 'private' }), false); assert.equal(validates('SearchTicketHit', { ...ticket, [key]: 'private' }), false); }
+  assert.equal(validates('SearchTicketHit', { ...ticket, registration_status: 'CLOSED' }), false);
+  const route = contract.paths['/search'].get; assert.deepEqual(route.parameters.map(p => p.name), ['q']); assert.equal(route.parameters[0].required, true); assert.equal(route['x-mop-read-only'], true);
 });

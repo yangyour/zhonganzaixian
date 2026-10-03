@@ -1,0 +1,31 @@
+{
+  "verified_at": "2026-10-03T07:57:55.086966+00:00",
+  "environment": "niko-local-test",
+  "status": "PARTIAL_GROUPED_SEARCH_API_ONLY",
+  "contract_version": "0.24.0",
+  "tests": {
+    "new_controller": 8,
+    "root_reported": 900,
+    "root_executed": 887,
+    "real_pg_integration": 273,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 47,
+    "web": 520,
+    "web_typecheck_build": true,
+    "real_http": 66
+  },
+  "setup_business_mutations": 15,
+  "authorized_tenant_switches": 2,
+  "fresh_oidc_sessions": 6,
+  "search_writes": 0,
+  "customer_tadmin_own_only": true,
+  "partial_groups_keep_null_items_and_counts": true,
+  "minimal_projection_no_contact_description_ip": true,
+  "events_scripts_bell_implemented": false,
+  "migrations_executed": 0,
+  "browser_dom_tested": false,
+  "large_scale_performance_tested": false,
+  "all_128_done": false,
+  "credentials_output": false
+}

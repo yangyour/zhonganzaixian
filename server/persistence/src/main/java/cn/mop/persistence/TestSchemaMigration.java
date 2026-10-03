@@ -30,7 +30,8 @@ public final class TestSchemaMigration {
         Map.entry("12","V12__unpublished_working_calendar_drafts.sql"),
         Map.entry("13","V13__immutable_manual_incident_registrations.sql"),
         Map.entry("14","V14__immutable_manual_recovery_confirmations.sql"),
-        Map.entry("15","V15__manual_warranty_details.sql"));
+        Map.entry("15","V15__manual_warranty_details.sql"),
+        Map.entry("16","V16__immutable_capacity_scenario_drafts.sql"));
     static final String IMPORT_SHA256="1f532822668274b7aebd12ea78b57e6be0aa9fd53ceb77023ee8067589cd2b4b";
     static final String DEPENDENCY_SHA256="5a8ce8d49fe948fc0e9586c102f7c8bfc46cb975a0b5d9f32d4bd1ccc72670bb";
     static final String WORKLOG_SHA256="942ea4dc88a8169b40662edcfd89871e8280a429ac922bd0cc1eb451b82ad2f8";
@@ -42,6 +43,7 @@ public final class TestSchemaMigration {
     static final String MANUAL_RECOVERY_SHA256="39be55d8759de87c6e2b8f85b3958c60be24ae9e6ece2deb5d849c225050ed72";
     static final String MANUAL_WARRANTY_SHA256="317b865df601888f2d6ea5324415f469acdeaea4c2b49b6c837fef9954a30baf";
     static final String WARRANTY_GUARD_SHA256="89451fe60c0fc9774967bbb3b018694bc6a5e4d2c623a14bc947924662312e9e";
+    static final String CAPACITY_SCENARIO_SHA256="74f095f56ca8735ef6d97405908aa523b554e76316acca052eeaa3cbbe010d05";
     private static final String RUNTIME="mop_test_runtime";
     private TestSchemaMigration() {}
 
@@ -58,12 +60,12 @@ public final class TestSchemaMigration {
     record Entry(String version,String script,String type,MigrationState state,boolean applied,boolean checksumMatches,Integer checksum) {}
     static final String WORKING_CALENDAR_CHECKER_SHA256="07749cb8084dc2f0e9f2a6ed899b77be3dc4e1aeb55f15eed1bf558e48b18fb6";
     enum Plan {
-        PHOTOS_PENDING(4),ASSET_IMPORTS_PENDING(5),ASSET_IMPORTS_APPLIED(6),ASSET_DEPENDENCIES_APPLIED(7),WORKLOGS_APPLIED(8),ASSET_METADATA_APPLIED(9),INTERNAL_NOTES_APPLIED(10),TICKET_COMMENTS_APPLIED(11),WORKING_CALENDARS_APPLIED(12),MANUAL_INCIDENTS_APPLIED(13),MANUAL_RECOVERIES_APPLIED(14),MANUAL_WARRANTY_APPLIED(15);
+        PHOTOS_PENDING(4),ASSET_IMPORTS_PENDING(5),ASSET_IMPORTS_APPLIED(6),ASSET_DEPENDENCIES_APPLIED(7),WORKLOGS_APPLIED(8),ASSET_METADATA_APPLIED(9),INTERNAL_NOTES_APPLIED(10),TICKET_COMMENTS_APPLIED(11),WORKING_CALENDARS_APPLIED(12),MANUAL_INCIDENTS_APPLIED(13),MANUAL_RECOVERIES_APPLIED(14),MANUAL_WARRANTY_APPLIED(15),CAPACITY_SCENARIOS_APPLIED(16);
         final int schemaVersion;Plan(int version){schemaVersion=version;}
         static Plan atVersion(int version){for(Plan value:values())if(value.schemaVersion==version)return value;throw new IllegalStateException("Unsupported validated schema version");}
     }
     enum Mode {
-        READ_ONLY_CHECK(0),APPLY_PHOTOS(5),APPLY_ASSET_IMPORTS(6),APPLY_ASSET_DEPENDENCIES(7),APPLY_WORKLOGS(8),APPLY_ASSET_METADATA(9),APPLY_INTERNAL_NOTES(10),APPLY_TICKET_COMMENTS(11),APPLY_WORKING_CALENDARS(12),APPLY_MANUAL_INCIDENTS(13),APPLY_MANUAL_RECOVERIES(14),APPLY_MANUAL_WARRANTY(15);
+        READ_ONLY_CHECK(0),APPLY_PHOTOS(5),APPLY_ASSET_IMPORTS(6),APPLY_ASSET_DEPENDENCIES(7),APPLY_WORKLOGS(8),APPLY_ASSET_METADATA(9),APPLY_INTERNAL_NOTES(10),APPLY_TICKET_COMMENTS(11),APPLY_WORKING_CALENDARS(12),APPLY_MANUAL_INCIDENTS(13),APPLY_MANUAL_RECOVERIES(14),APPLY_MANUAL_WARRANTY(15),APPLY_CAPACITY_SCENARIOS(16);
         final int targetVersion;Mode(int version){targetVersion=version;}
     }
 
@@ -83,6 +85,7 @@ public final class TestSchemaMigration {
         if(args.length==1&&"--apply-manual-incidents".equals(args[0]))return Mode.APPLY_MANUAL_INCIDENTS;
         if(args.length==1&&"--apply-manual-recoveries".equals(args[0]))return Mode.APPLY_MANUAL_RECOVERIES;
         if(args.length==1&&"--apply-manual-warranty".equals(args[0]))return Mode.APPLY_MANUAL_WARRANTY;
+        if(args.length==1&&"--apply-capacity-scenarios".equals(args[0]))return Mode.APPLY_CAPACITY_SCENARIOS;
         throw new IllegalArgumentException("Use --check or one explicit supported feature apply mode");
     }
     static Plan inspect(List<Entry> entries) {
@@ -127,7 +130,7 @@ public final class TestSchemaMigration {
                 public void warn(String message){} public void error(String message){} public void error(String message,Exception error){} public void notice(String message){}
             });
             Mode mode=requestedMode(args);boolean apply=mode!=Mode.READ_ONLY_CHECK;
-            stage="migration_resources";verifyImportResource();verifyDependencyResource();verifyWorklogResource();verifyAssetMetadataResource();verifyInternalNoteResource();verifyTicketCommentResource();verifyWorkingCalendarResource();verifyManualIncidentResource();verifyManualRecoveryResource();verifyManualWarrantyResource();stage="private_settings";Settings settings=Settings.from(System::getenv);
+            stage="migration_resources";verifyImportResource();verifyDependencyResource();verifyWorklogResource();verifyAssetMetadataResource();verifyInternalNoteResource();verifyTicketCommentResource();verifyWorkingCalendarResource();verifyManualIncidentResource();verifyManualRecoveryResource();verifyManualWarrantyResource();verifyCapacityScenarioResource();stage="private_settings";Settings settings=Settings.from(System::getenv);
             stage="identity";
             try(Connection guard=connection(settings,!apply)) {
                 verifyIdentity(guard);
@@ -163,7 +166,8 @@ public final class TestSchemaMigration {
                     " working_calendars="+(after.schemaVersion>=12?"UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
                     " manual_incidents="+(after.schemaVersion>=13?"IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
                     " manual_recoveries="+(after.schemaVersion>=14?"IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
-                    " manual_warranty="+(after.schemaVersion>=15?"ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED":"NOT_APPLIED"));
+                    " manual_warranty="+(after.schemaVersion>=15?"ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED":"NOT_APPLIED")+
+                    " capacity_scenarios="+(after.schemaVersion>=16?"IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED"));
             }
         }catch(Throwable failure){errors.println(safeFailure(stage,failure));exit=1;}
         finally{System.setOut(output);System.setErr(errors);}
@@ -175,6 +179,7 @@ public final class TestSchemaMigration {
         }
     }
     private static void verifyStructure(Connection connection,Plan plan)throws SQLException{
+        if(plan.schemaVersion>=16)verifyCapacityScenarios(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_capacity_scenario_draft') IS NULL");
         if(plan.schemaVersion>=15)verifyManualWarranty(connection);else requireTrue(connection,"SELECT to_regprocedure('public.mop_warranty_declaration_guard()') IS NULL AND NOT EXISTS(SELECT 1 FROM pg_attribute WHERE attrelid=to_regclass('public.mop_asset_manual_revision') AND attname IN ('warranty_start','warranty_supplier','warranty_details_declared') AND NOT attisdropped)");
         if(plan.schemaVersion>=14)verifyManualRecoveries(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_manual_recovery_confirmation') IS NULL");
         if(plan.schemaVersion>=13)verifyManualIncidents(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_manual_incident_registration') IS NULL");
@@ -187,6 +192,20 @@ public final class TestSchemaMigration {
         if(plan.schemaVersion>=8)verifyWorklogs(connection);else requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_worklog','mop_worklog_revision')");
         if(plan.schemaVersion>=9)verifyAssetMetadata(connection,plan.schemaVersion>=15);
         else {requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_asset_manual_details','mop_asset_manual_revision')");verifyRuntimeAcl(connection,"mop_asset",Set.of());}
+    }
+    static void verifyCapacityScenarioResource()throws Exception{
+        try(var input=TestSchemaMigration.class.getResourceAsStream("/db/migration/"+SCRIPTS.get("16"))){if(input==null||!CAPACITY_SCENARIO_SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(input.readAllBytes()))))throw new IllegalStateException("Unreviewed capacity scenario migration resource");}
+    }
+    private static void verifyCapacityScenarios(Connection connection)throws SQLException{
+        String table="mop_capacity_scenario_draft";
+        verifyColumns(connection,table,Map.ofEntries(Map.entry("id","uuid"),Map.entry("tenant_id","uuid"),Map.entry("actor_id","uuid"),Map.entry("version","bigint"),Map.entry("label","character varying(100)"),Map.entry("note","text"),Map.entry("calculation","jsonb"),Map.entry("calculation_sha256","character(64)"),Map.entry("snapshot","jsonb"),Map.entry("snapshot_sha256","character(64)"),Map.entry("capacity_formula_version","character varying(64)"),Map.entry("buffer_formula_version","character varying(64)"),Map.entry("benchmark_reference","character varying(160)"),Map.entry("benchmark_title","character varying(200)"),Map.entry("benchmark_sha256","character(64)"),Map.entry("recorded_at","timestamp(3) with time zone"),Map.entry("lifecycle_status","character varying(16)"),Map.entry("model_approval_status","character varying(16)"),Map.entry("measurement_verified","boolean"),Map.entry("poc_executed","boolean"),Map.entry("effective","boolean"),Map.entry("record_source","character varying(40)")),Set.of("benchmark_reference","benchmark_title","benchmark_sha256"),true);
+        verifyRuntimeAcl(connection,table,Set.of());
+        requireTrue(connection,"SELECT relkind='r' AND relowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') FROM pg_class WHERE oid='public.mop_capacity_scenario_draft'::regclass");
+        requireTrue(connection,"SELECT NOT EXISTS(SELECT 1 FROM pg_constraint WHERE conrelid='public.mop_capacity_scenario_draft'::regclass AND NOT convalidated)");
+        requireConstraint(connection,table,"p",List.of("id"),null,List.of(),false);requireConstraint(connection,table,"u",List.of("tenant_id","id"),null,List.of(),false);
+        requireConstraint(connection,table,"f",List.of("tenant_id"),"mop_tenant",List.of("id"),false);requireConstraint(connection,table,"f",List.of("tenant_id","actor_id"),"mop_membership",List.of("tenant_id","user_id"),false);
+        requireTrue(connection,"SELECT count(*)=21 FROM pg_constraint WHERE conrelid='public.mop_capacity_scenario_draft'::regclass AND contype='c'");
+        requireTrue(connection,"SELECT i.indisvalid AND i.indisready FROM pg_index i JOIN pg_class c ON c.oid=i.indexrelid WHERE c.relname='mop_capacity_scenario_order' AND c.relnamespace='public'::regnamespace");
     }
     static void verifyManualWarrantyResource()throws Exception{
         try(var input=TestSchemaMigration.class.getResourceAsStream("/db/migration/"+SCRIPTS.get("15"))){

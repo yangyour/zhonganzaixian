@@ -57,4 +57,7 @@ class NikoPrivateBootstrapTest(unittest.TestCase):
    with tempfile.TemporaryDirectory() as d:
     r=subprocess.run([sys.executable,str(script),*args],cwd=d,capture_output=True,text=True)
     self.assertNotEqual(0,r.returncode);self.assertIn('Explicit migration mode required',r.stderr);self.assertFalse((Path(d)/'.local').exists())
+ def test_v16_capacity_scenarios_hash_is_separate_from_frozen_previous_migrations(self):
+  manifest=json.loads((ROOT/'tools/niko-test/frozen-capacity-scenario-migration.json').read_text())['sha256'];self.assertEqual(1,len(manifest))
+  for name,expected in manifest.items():self.assertEqual(expected,hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest())
 if __name__=='__main__':unittest.main()

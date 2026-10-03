@@ -25,3 +25,7 @@ Windows 包装层在连接前校验固定清单覆盖 V1–V15、无重复/未�
 首轮保护检查发现历史本地 V1 检出仍为 CRLF，连接前拒绝；随后恢复为已冻结的 Git blob 原字节、重新复制构建资源，没有改 SQL 逻辑或修复 Flyway 历史。实际API仍0.26.0，迁移入口变化不增加业务API。完整应用、存储流水线、UI和128项验收独立记录；schema升级不能代替它们。
 
 证据：[本地 V15 结构接续](evidence/local-schema-v15-20261003.json)。
+
+## 后续V16容量场景（niko独立验证）
+
+包装层新增 `-ApplyFeature capacity-scenarios`，必须已完成V15，仍先停止本工程拥有的API/Worker、构建并验证16份冻结资源后才显式执行。无参数只读、不提供全部迁移。V16已在niko验证，不代表原指定服务器已执行；本地旧V15证据保留原范围。PowerShell保护用例扩至49项并由CI验证，本机niko未运行PowerShell。见[容量结构边界](capacity-estimate-core.md)。

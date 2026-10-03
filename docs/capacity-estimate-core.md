@@ -75,3 +75,16 @@ CapacityCalculation保存有界的显式容量/模型/Proxy输入，并生成带
 CapacityScenarioDraft要求明确名称（100码点）和说明（2000码点，保留多行原文）；可选基准引用仅接受document-ref标识、标题与64位SHA256。URL、磁盘路径与明显凭据标记拒绝；提供引用或摘要不证明文件存在、真实压测或已验真。无引用NOT_PROVIDED，有引用REFERENCE_ONLY_UNVERIFIED，始终DRAFT/effective=false/PoC未执行。纯对象不是持久化成功收据。
 
 9纯规则与完整根991（978执行含295既有PG）/13历史跳过/6MinIO排除、53契约通过；API0.27/已执行V1–V15不变。下一步独立结构、真实保存仓储/原回执/当前租户权限与场景页面，现阶段未写场景表，M10-7/128项非DONE。见[纯草稿证据](evidence/niko-capacity-scenario-core-20261003.json)。
+
+
+## 2026-10-03 V16不可变容量场景草稿结构
+
+V16只在niko独立项目库显式执行1次；重复、只读、旧V15目标以及测试后只读均0次。V1–V16现在字节冻结，后续修正新增V17+。mop_capacity_scenario_draft有22列/21CHECK，运行身份仅SELECT/INSERT，不能修改、删除、清空或给PUBLIC授权；租户与操作者复合FK、有界JSONB及摘要、明确公式版本、引用完整组和DRAFT/未批准/未测量/PoC未执行/不生效固定约束已验。
+
+JSONB摘要证明存储值等同，不证明真实文档或压测。结构校验不等于算术校验、当前padmin授权、幂等和审计事务；后续仓储必须重新计算已记录公式版本并比较结果，重放前重验当前成员与资源，不能只信JSON形状。旧业务20张白名单表全部现有列指纹迁移前后相同，未排除任何已有列；不是整库/外部真实性证明。
+
+12新真实PG结构测试全部回滚、最终场景表0行；18Java迁移策略、63Python保护、根1004（991执行含307真实PG）/13历史跳过/6MinIO排除、53契约通过。首轮3个断言把布尔文字t/f或Jackson数字节点类型当值本身，已改JDBC布尔和精确JSONB等值比较并完整重跑；已执行SQL未改。
+
+Linux显式模式为--apply-capacity-scenarios；Windows包装层新增-ApplyFeature capacity-scenarios并复用16份冻结资源，默认仍只读。PowerShell49项保护用例已接CI，本niko工作区无pwsh，发布时不声称本机已执行。原指定服务器仍只掌握V15证据，本次没有修改或迁移它；应按其已有拥有权/停应用/构建/私有连接流程另行显式运行，API/Worker不能自动补迁移。
+
+API0.27未改；真实场景保存仓储/API/UI、基准文档验真和现场PoC继续，M10-7/128项非DONE。见[结构证据](evidence/niko-capacity-scenario-schema-20261003.json)。

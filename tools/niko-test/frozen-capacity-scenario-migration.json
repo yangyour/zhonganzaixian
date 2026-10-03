@@ -1,0 +1,9 @@
+{
+  "status": "APPLIED_AND_FROZEN",
+  "environment": "niko-local-test",
+  "sha256": {
+    "V16__immutable_capacity_scenario_drafts.sql": "74f095f56ca8735ef6d97405908aa523b554e76316acca052eeaa3cbbe010d05"
+  },
+  "verified_at": "2026-10-03T11:28:05.684385+00:00",
+  "evidence": "docs/evidence/niko-capacity-scenario-schema-20261003.json"
+}

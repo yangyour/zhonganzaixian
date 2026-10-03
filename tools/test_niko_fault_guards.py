@@ -103,4 +103,13 @@ class NikoFaultGuardTest(unittest.TestCase):
             root=Path(d);r=subprocess.run([sys.executable,str(script),'--unknown'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertFalse((root/'.local').exists())
             local=root/'.local/niko-test';local.mkdir(parents=True);p=local/'warranty-v15-legacy-before.json';p.write_text('existing-evidence')
             r=subprocess.run([sys.executable,str(script),'--record'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertEqual('existing-evidence',p.read_text());self.assertNotIn('existing-evidence',r.stdout+r.stderr)
+    def test_capacity_migration_fingerprints_all_existing_columns_without_changing_prior_evidence(self):
+        current=module('niko_capacity_fingerprint',ROOT/'tools/niko-test/capacity-migration-snapshot.py');prior=module('niko_warranty_fingerprint_prior',ROOT/'tools/niko-test/warranty-migration-snapshot.py')
+        self.assertEqual(prior.TABLES,current.TABLES);source=(ROOT/'tools/niko-test/capacity-migration-snapshot.py').read_text();self.assertIn("projection='to_jsonb(t)::text'",source);self.assertIn("'excluded_columns':{}",source);self.assertTrue({current.BEFORE,current.AFTER}.isdisjoint({prior.BEFORE,prior.AFTER}));self.assertIn('REPEATABLE READ READ ONLY',source)
+    def test_capacity_migration_snapshot_unknown_mode_and_existing_record_fail_before_private_read(self):
+        script=ROOT/'tools/niko-test/capacity-migration-snapshot.py'
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);r=subprocess.run([sys.executable,str(script),'--unknown'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertFalse((root/'.local').exists())
+            local=root/'.local/niko-test';local.mkdir(parents=True);p=local/'capacity-v16-business-before.json';p.write_text('existing')
+            r=subprocess.run([sys.executable,str(script),'--record'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertEqual('existing',p.read_text())
 if __name__=='__main__':unittest.main()

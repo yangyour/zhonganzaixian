@@ -1,0 +1,152 @@
+{
+  "verified_at": "2026-10-03T11:35:14.390462+00:00",
+  "environment": "niko-local-test",
+  "status": "SCHEMA_APPLIED_AND_FROZEN",
+  "migration": "V16__immutable_capacity_scenario_drafts.sql",
+  "sha256": "74f095f56ca8735ef6d97405908aa523b554e76316acca052eeaa3cbbe010d05",
+  "independent_migration": {
+    "before_check": 0,
+    "apply": 1,
+    "repeat": 0,
+    "after_check": 0,
+    "older_manual_warranty_mode": 0,
+    "post_tests_check": 0
+  },
+  "schema": {
+    "table": "mop_capacity_scenario_draft",
+    "columns": 22,
+    "check_constraints": 21,
+    "runtime_access": "SELECT_INSERT_ONLY",
+    "history_update_delete_truncate": false,
+    "benchmark_group_nullable": true,
+    "stored_digest_semantics": "JSONB_EQUALITY_NOT_AUTHENTICITY",
+    "arithmetic_validation_in_schema": false
+  },
+  "legacy_business_preservation": {
+    "verified_at": "2026-10-03T11:28:05.684385+00:00",
+    "before_at": "2026-10-03T11:27:57.049097+00:00",
+    "legacy_rows_equal": true,
+    "tables": {
+      "mop_asset": {
+        "rows": 5644,
+        "equality_sha256": "0e1468f5cefa90daf4ccf1fc949bf886b873b10f4e5ba2d4ba56e8aa64504afa"
+      },
+      "mop_ticket": {
+        "rows": 5502,
+        "equality_sha256": "f7083e0a4bbb2f5628dca32c5242d86bf147eabfc490c319731379f586e56e50"
+      },
+      "mop_worklog": {
+        "rows": 1632,
+        "equality_sha256": "3d1f6620ba91db82a7982518a57f137638fa2b39f5072c120ed9e1208150e6b1"
+      },
+      "mop_worklog_revision": {
+        "rows": 2331,
+        "equality_sha256": "3b112c2a6d5b70133ce39222c71e6d43fb2aa180e02e2f8ccb1d5fc7af37e38d"
+      },
+      "mop_asset_dependency_graph": {
+        "rows": 1,
+        "equality_sha256": "53ba6a009d63c3f812395c01392074b3cd9dd2144b3425c2eedfd50646d9a52c"
+      },
+      "mop_asset_dependency_revision": {
+        "rows": 616,
+        "equality_sha256": "31e29b9faca0c10f2546056a97e152ce348c640165f9e63945ed90880ceac1fb"
+      },
+      "mop_asset_dependency_edge": {
+        "rows": 216683,
+        "equality_sha256": "8864736d2d76e5c49a742c07bb34ca3e7c6126c8cf16bcde9dcce96ff119c2e2"
+      },
+      "mop_configuration_revision": {
+        "rows": 1766,
+        "equality_sha256": "6445388eca9e929fdab5f9d168b603292e63c76a56d7b5407c61fc328ec6eea1"
+      },
+      "mop_configuration_revision_history": {
+        "rows": 1888,
+        "equality_sha256": "d37c8ef71244a2d23c86d1c0ea51825fdd0fcac482ce7b4976c2920b403c0eb1"
+      },
+      "mop_idempotency": {
+        "rows": 29946,
+        "equality_sha256": "afead62813ad7385d9cea11bea417fe22f9ebe68daaa8db1682d33a7b095d1c4"
+      },
+      "mop_audit": {
+        "rows": 38350,
+        "equality_sha256": "de39d031d043e7fa7ce68e597cbd34fd2ae73c8f25ab4fec174c4e610a997c8a"
+      },
+      "mop_asset_manual_details": {
+        "rows": 1341,
+        "equality_sha256": "65312132af2a4f085541853d00b30a3fbb2a249e52b53f6103509d81063d25c0"
+      },
+      "mop_asset_manual_revision": {
+        "rows": 1631,
+        "equality_sha256": "df1cbf9f584ae25db481eda1f2ab5040cb6fea4abdb334238fd089c8f7c801a6"
+      },
+      "mop_ticket_internal_note": {
+        "rows": 1036,
+        "equality_sha256": "6d4f4548f193770996257a183f22ae073c53e4f05e42145cb645b9441ba4bd99"
+      },
+      "mop_ticket_comment": {
+        "rows": 1032,
+        "equality_sha256": "f132edd3e59beae576210cb73a5ace3cd50d77f2e2912f84b5532ca7a55a8d1c"
+      },
+      "mop_working_calendar_draft": {
+        "rows": 603,
+        "equality_sha256": "9fdcced1f3654f3f9ac342f81387c0a19f7f9cfa58600a9ebe5610fe97e8729b"
+      },
+      "mop_working_calendar_revision": {
+        "rows": 993,
+        "equality_sha256": "5d5cc7fd0f2bca7c63fb7b00ef44e284d3c15644e6e537c92707dd7616bb6fa9"
+      },
+      "mop_manual_incident_registration": {
+        "rows": 1203,
+        "equality_sha256": "3e6138c4f361bf18fc5731f30cefb28b0c25d828cc56a999ebd83e5368a810df"
+      },
+      "mop_manual_recovery_confirmation": {
+        "rows": 327,
+        "equality_sha256": "661b3f51fea820896fc2e28ad3d5859602036f6e59800d6a9bdc3c25516a02f2"
+      },
+      "mop_configuration": {
+        "rows": 1105,
+        "equality_sha256": "287c16eecae26d300c284ca4313302b497b2b4a034640e03e04d05e2ea0ed28b"
+      }
+    },
+    "excluded_columns": {},
+    "purpose": "equality_only_not_authenticity"
+  },
+  "tests": {
+    "new_real_pg_schema": 12,
+    "migration_policy": 18,
+    "python_guards": 63,
+    "root_reported": 1004,
+    "root_executed": 991,
+    "real_pg": 307,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 53,
+    "failures": 0,
+    "errors": 0
+  },
+  "windows_wrapper": {
+    "new_explicit_mode": "capacity-scenarios",
+    "expected_pure_checks": 49,
+    "executed_in_niko_workspace": false,
+    "verification": "COMMITTED_CI_STEP_PENDING_AT_PUBLICATION"
+  },
+  "readonly_after_tests": {
+    "scenario_rows": 0,
+    "verified_at": "2026-10-03T11:35:14.390462+00:00"
+  },
+  "schema_tests_rolled_back": true,
+  "frozen_migrations": "V1-V16",
+  "next_schema_correction": "V17+",
+  "scenario_business_repository_implemented": false,
+  "scenario_http_implemented": false,
+  "scenario_ui_implemented": false,
+  "api_worker_auto_migration": false,
+  "api_version_unchanged": "0.27.0",
+  "original_designated_server_changed": false,
+  "original_designated_server_v16_verified": false,
+  "credentials_output": false,
+  "all_128_done": false,
+  "iteration_corrections": [
+    "Three initial schema test assertions used PostgreSQL boolean text and Jackson numeric node-class equality; switched to JDBC getBoolean and exact JSONB equality, reran whole root successfully; applied SQL bytes unchanged"
+  ]
+}

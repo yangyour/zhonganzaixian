@@ -33,3 +33,16 @@ PostgresManualIncidentRepository已实现同租户内部成员的有界列表/�
 完整根750=737执行（含234真实PG）+13历史fixture跳过、6MinIO排除，35契约及生成一致性通过。两次全量运行均通过，最后一遍包括新增资产更新竞争测试。测试已提交专用合成资产/登记；此前schema阶段0行只表示当时回滚证据。API0.18和V1–V13字节未改；尚无手工登记公开API/CSRF/页面证据，人工恢复、正式处置/建单/通知/SLA及完整M5-6/128项继续未DONE。
 
 见[手工登记仓储证据](evidence/niko-manual-incident-repository-20261003.json)。
+
+
+## 2026-10-03 API0.19手工来源登记与108真实HTTP
+
+新增GET/POST /api/v1/manual-incidents及GET /api/v1/manual-incidents/{id}，仅当前租户内部msp/padmin，以manual_incidents:read/write明确能力投影。POST只接受title/severity/asset_id/expected_asset_version；8192字节、严格JSON重复键/深度/尾随内容、字段白名单、原Unicode与五等级、安全正整数/完整UUID。请求不得覆盖租户/作者/资产名快照/监控/正式状态/优先级/发生恢复时间；CSRF与幂等键必需。字段顺序规范化摘要，原始值仍有意义。200明确仅REGISTERED_ONLY。列表技术单页10/15/25/50/100，成对登记时间/ID keyset，当前请求快照而非跨页冻结。
+
+11controller与1ready新增测试，完整根762=749执行（含234真实PG）+13历史fixture跳过、6MinIO排除；37契约、418Web与类型构建通过。首次契约验证中的旧就绪成功样本缺新增必需manual_incidents，已补实际字段并完整重跑37通过，未放松生产校验。真实拥有栈正常退出后以新固定只读JAR启动，刷新6个实际OIDC身份后108HTTP首遍通过，全部响应按API0.19契约验证。
+
+14合成登记/14成功审计；同键并发/JSON换序/后续资产改名均重放原收据，无重复审计；不同明确来源独立登记，新请求旧版本409；五级与200 emoji标题通过，客户403/匿名401/CSRF403，跨租户资产和登记404并恢复原租户，越权字段/未知值/过限/坏分页400。原始资产名/所见版本快照保持；登记不更改资产，后续资料改名是独立测试动作。只读列表/详情不新增成功审计。
+
+ready检查真实手工表/ACL并声明MANUAL、REGISTERED_ONLY、监控恢复false/自动建单false，live不探测不迁移。V1–V13未改，存储仍关闭。下一步页面的明确手工标记、只读列表与原请求恢复表单；该模块尚无UI/DOM验收、人工恢复或正式事件处置/建单/SLA联调。完整M5-6/D06/D07/128项仍未DONE。
+
+见[API与回归证据](evidence/niko-manual-incident-api-20261003.json)及[真实HTTP证据](evidence/niko-manual-incident-api-http-20261003.json)。

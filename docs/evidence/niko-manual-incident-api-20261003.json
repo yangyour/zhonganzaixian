@@ -1,0 +1,51 @@
+{
+  "verified_at": "2026-10-03T04:12:10.807157+00:00",
+  "environment": "niko-local-test",
+  "api_version": "0.19.0",
+  "status": "API_CODE_AND_REAL_HTTP_VERIFIED",
+  "tests": {
+    "new_controller": 11,
+    "new_readiness": 1,
+    "root_reported": 762,
+    "root_executed": 749,
+    "real_pg": 234,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contract_tests": 37,
+    "web_tests": 418,
+    "typecheck_and_web_build": true,
+    "failures": 0,
+    "errors": 0
+  },
+  "real_http_evidence": "niko-manual-incident-api-http-20261003.json",
+  "real_http_checks": 108,
+  "test_repair": "First contract check used an outdated successful-readiness sample lacking new required manual_incidents; added the actual required readiness projection and reran all 37 successfully. Production validation was not weakened.",
+  "api_paths": [
+    "GET /api/v1/manual-incidents",
+    "POST /api/v1/manual-incidents",
+    "GET /api/v1/manual-incidents/{id}"
+  ],
+  "create_result": "200 REGISTERED_ONLY, not formal ticket or recovery",
+  "input": [
+    "title",
+    "severity",
+    "asset_id",
+    "expected_asset_version"
+  ],
+  "strict_body_bytes": 8192,
+  "duplicate_json_rejected": true,
+  "duplicate_query_rejected": true,
+  "source_recovery_or_identity_overrides_rejected": true,
+  "csrf_and_idempotency_required": true,
+  "canonical_json_key_order": true,
+  "raw_values_preserved": true,
+  "readiness_real_schema_acl": true,
+  "liveness_does_not_probe_or_migrate": true,
+  "api_restarted_with_owned_immutable_jar": true,
+  "frozen_migrations_unchanged": "V1-V13",
+  "frontend_added": false,
+  "browser_dom_tested": false,
+  "original_server_changed": false,
+  "credentials_output": false,
+  "full_contract_done": false
+}

@@ -179,7 +179,7 @@ test('operation区分报障门禁与真实文件状态，终态不得伪造', ()
 
 test('就绪成功不能把已启用但缺schema或存储的照片能力写成READY', () => {
   const photos = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, policy_source: 'USER_DEVELOPMENT_DIRECTION', reasons: [] };
-  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, working_calendars: { schema_access_ready: true, effective: false, customer_confirmation: 'UNVERIFIED' }, photos, asset_reads: { unicode_search_ready: true, pagination: 'BOUNDED_POSTGRESQL_KEYSET' }, ticket_comments: { schema_access_ready: true, visibility: 'REPORTER_AND_INTERNAL', internal_identity_exposed: false, itsm_applied: false }, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
+  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, working_calendars: { schema_access_ready: true, effective: false, customer_confirmation: 'UNVERIFIED' }, manual_incidents: { schema_access_ready: true, source_state: 'MANUAL', registration_status: 'REGISTERED_ONLY', monitoring_recovery_applicable: false, ticket_automatically_created: false }, photos, asset_reads: { unicode_search_ready: true, pagination: 'BOUNDED_POSTGRESQL_KEYSET' }, ticket_comments: { schema_access_ready: true, visibility: 'REPORTER_AND_INTERNAL', internal_identity_exposed: false, itsm_applied: false }, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
   assert.equal(validates('ReadinessResult', { data, trace_id: 'MOP-FAKE-readiness' }), true);
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('ReadinessResult', { data: { ...data, photos: { ...photos, [key]: false } }, trace_id: 'MOP-FAKE-readiness' }), false);
   assert.equal(validates('ReadinessResult', { data: { ...data, production_ready: true }, trace_id: 'MOP-FAKE-readiness' }), false);
@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.18.0');
+  assert.equal(contract.info.version, '0.19.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -473,3 +473,19 @@ test('日历计算结果与未知原因的契约不允许混淆或冒充正式�
 });
 
 test('旧直接建议草稿明确全局设计登记范围，不冒充租户运行配置', () => { const operation = contract.paths['/configurations/{key}/draft'].post; assert.equal(operation['x-mop-scope'], 'GLOBAL_DESIGN_REGISTRY_DRAFT_NOT_TENANT_RUNTIME'); assert.match(operation.description, /revisions/); assert.match(operation.description, /effective_value/); });
+
+
+test('手工事件仅登记明确原始事实，禁止自动恢复和正式状态覆盖', () => {
+  const id = '55000000-0000-4000-8000-000000000001';
+  const input = { title: '  手工故障😀  ', severity: 'warning', asset_id: id, expected_asset_version: 1 };
+  assert.equal(validates('ManualIncidentCreate', input), true);
+  for (const patch of [{ severity: 'none' }, { severity: null }, { expected_asset_version: 0 }, { expected_asset_version: 9007199254740992 }, { title: '😀'.repeat(201) }, { tenant_id: id }, { monitor_state: 'NORMAL' }, { recovered_at: '2026-10-03T00:00:00Z' }, { ticket_priority: 'P1' }]) assert.equal(validates('ManualIncidentCreate', { ...input, ...patch }), false);
+  const value = { id, tenant_id: id, asset_id: id, asset_name_at_registration: '合成资产', observed_asset_version: 1, title: input.title, severity: 'warning', severity_label: '警告', registered_by: id, registered_at: '2026-10-03T00:00:00Z', source_state: 'MANUAL', registration_status: 'REGISTERED_ONLY', verification_status: 'SELF_REPORTED', monitor_state: null, disposition_state: null, ticket_priority: null, observed_at: null, recovered_at: null, manual_recovery_status: 'NOT_CONFIRMED', monitoring_recovery_applicable: false, ticket_automatically_created: false, source: 'postgresql', record_source: 'MANUAL_INCIDENT_REGISTRATION', immutable: true };
+  assert.equal(validates('ManualIncident', value), true);
+  for (const patch of [{ severity_label: '灾难' }, { source_state: 'MONITOR' }, { monitor_state: 'NORMAL' }, { disposition_state: 'RESOLVED' }, { ticket_priority: 'P1' }, { monitoring_recovery_applicable: true }, { manual_recovery_status: 'CONFIRMED' }, { ticket_automatically_created: true }]) assert.equal(validates('ManualIncident', { ...value, ...patch }), false);
+});
+test('手工事件接口限定内部当前租户、原键重放资格和只读详情', () => {
+  const routes = contract.paths['/manual-incidents']; assert.deepEqual(Object.keys(routes), ['get', 'post']); assert.deepEqual(routes.get['x-mop-roles'], ['msp', 'padmin']); assert.match(routes.post['x-mop-replay-authorization'], /before cached receipt/); assert.equal(routes.post['x-mop-max-body-bytes'], 8192); assert.deepEqual(Object.keys(contract.paths['/manual-incidents/{id}']), ['get']);
+  const page = { items: [], has_more: false, next_before_registered_at: null, next_before_id: null, source: 'postgresql', scope: 'CURRENT_TENANT_INTERNAL_MANUAL_REGISTRATIONS', page_size_limit: 100, pagination_consistency: 'CURRENT_REQUEST_SNAPSHOT_ONLY' }; assert.equal(validates('ManualIncidentPage', page), true); assert.equal(validates('ManualIncidentPage', { ...page, has_more: true }), false);
+  const ready = contract.components.schemas.ReadinessResult.properties.data; assert.ok(ready.required.includes('manual_incidents')); assert.equal(ready.properties.manual_incidents.properties.ticket_automatically_created.const, false);
+});

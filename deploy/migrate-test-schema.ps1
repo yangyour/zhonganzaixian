@@ -1,6 +1,7 @@
-param([switch]$ApplyPhotos, [switch]$ApplyAssetImports)
+param([switch]$ApplyPhotos, [switch]$ApplyAssetImports, [string]$ApplyFeature)
 $ErrorActionPreference = 'Stop'
-if ($ApplyPhotos -and $ApplyAssetImports) { throw '照片与资产导入迁移必须分别显式执行，不能组合两个 Apply 开关。' }
+. (Join-Path $PSScriptRoot 'migration-policy.ps1')
+$mode = Get-MopMigrationMode -ApplyPhotos:$ApplyPhotos -ApplyAssetImports:$ApplyAssetImports -ApplyFeature $ApplyFeature
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 . (Join-Path $PSScriptRoot 'dev-process-ownership.ps1')
 Assert-MopAppsStopped -ProjectRoot $projectRoot
@@ -16,20 +17,7 @@ if (-not (Test-Path -LiteralPath $cliClass) -or -not (Test-Path -LiteralPath $do
 if ((Get-Item -LiteralPath $cliClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $cliSource).LastWriteTimeUtc) {
     throw '迁移 CLI 构建早于源码；拒绝使用旧入口。'
 }
-$migrationSources = @(Get-ChildItem -LiteralPath (Join-Path $projectRoot 'server/persistence/src/main/resources/db/migration') -Filter '*.sql')
-$migrationResources = @(Get-ChildItem -LiteralPath (Join-Path $persistenceClasses 'db/migration') -Filter '*.sql')
-if ($migrationSources.Count -ne 6 -or $migrationResources.Count -ne 6) { throw '迁移资源集合不符；独立入口仅支持已核验 V1–V5 和冻结 V6。' }
-foreach ($source in $migrationSources) {
-    $compiledResource = Join-Path $persistenceClasses ('db/migration/' + $source.Name)
-    if (-not (Test-Path -LiteralPath $compiledResource) -or
-        (Get-FileHash -LiteralPath $source.FullName -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $compiledResource -Algorithm SHA256).Hash) {
-        throw '构建中的迁移 SQL 与工作区不一致；拒绝执行旧结构。'
-    }
-}
-$importMigration = Join-Path $projectRoot 'server/persistence/src/main/resources/db/migration/V6__asset_import_sources_and_mapping.sql'
-if ((Get-FileHash -LiteralPath $importMigration -Algorithm SHA256).Hash -ne '1F532822668274B7AEBD12EA78B57E6BE0AA9FD53CEB77023EE8067589CD2B4B') {
-    throw 'V6 与已审阅冻结摘要不符；拒绝迁移或结构检查。'
-}
+Assert-MopMigrationResources -ProjectRoot $projectRoot -PersistenceClasses $persistenceClasses
 $dependencies = (Get-Content -Raw -LiteralPath $classpathFile).Trim()
 if (-not $dependencies -or $dependencies.Contains("`n") -or $dependencies.Contains("`r")) { throw '迁移 classpath 无效。' }
 foreach ($dependency in $dependencies.Split([IO.Path]::PathSeparator)) {
@@ -47,7 +35,6 @@ try {
         [Environment]::SetEnvironmentVariable($name, [string]$property.Value, 'Process')
     }
     Assert-MopAppsStopped -ProjectRoot $projectRoot
-    $mode = if ($ApplyPhotos) { '--apply-photos' } elseif ($ApplyAssetImports) { '--apply-asset-imports' } else { '--check' }
     $classpath = [string]::Join([IO.Path]::PathSeparator, @($persistenceClasses, $domainClasses, $dependencies))
     & (Get-Command java.exe -ErrorAction Stop).Source '-cp' $classpath 'cn.mop.persistence.TestSchemaMigration' $mode
     if ($LASTEXITCODE -ne 0) { throw '独立迁移入口拒绝操作；按安全阶段摘要排查，默认检查不会执行 DDL。' }

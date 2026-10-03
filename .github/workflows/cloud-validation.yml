@@ -45,6 +45,10 @@ jobs:
           "$RUNNER_TEMP/mop-ssh-test/bin/python" -m pip install -r tools/requirements.txt
           "$RUNNER_TEMP/mop-ssh-test/bin/python" -m unittest discover -s tools -p test_ssh_host_trust.py -v
 
+      - name: Verify local migration selection and frozen resource guards without database access
+        shell: pwsh
+        run: ./tools/test-migration-policy.ps1
+
       - name: Verify isolated niko configuration guards
         run: |
           python3 -m unittest discover -s tools -p test_niko_private_bootstrap.py -v

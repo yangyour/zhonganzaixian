@@ -1,0 +1,139 @@
+{
+  "verified_at": "2026-10-03T10:15:32.508145+00:00",
+  "environment": "designated-server-via-SSH-from-Windows",
+  "source_baseline": "2acf9f0",
+  "postgresql": "17.9",
+  "keycloak": "26.2.4",
+  "minio": "RELEASE.2025-09-07T16-13-09Z",
+  "icu_available": true,
+  "migration_identity": "mop_test_migrator",
+  "database": "mop_test",
+  "schema_before": 6,
+  "schema_after": 15,
+  "feature_migrations": [
+    {
+      "version": 7,
+      "feature": "asset-dependencies",
+      "migration": {
+        "status": "ASSET_DEPENDENCIES_APPLIED",
+        "migrations_executed": 1
+      },
+      "repeat": {
+        "status": "ASSET_DEPENDENCIES_APPLIED",
+        "migrations_executed": 0
+      }
+    },
+    {
+      "version": 8,
+      "feature": "worklogs",
+      "migration": {
+        "status": "WORKLOGS_APPLIED",
+        "migrations_executed": 1
+      },
+      "repeat": {
+        "status": "WORKLOGS_APPLIED",
+        "migrations_executed": 0
+      }
+    },
+    {
+      "version": 9,
+      "feature": "asset-metadata",
+      "migration": {
+        "status": "ASSET_METADATA_APPLIED",
+        "migrations_executed": 1
+      },
+      "repeat": {
+        "status": "ASSET_METADATA_APPLIED",
+        "migrations_executed": 0
+      }
+    },
+    {
+      "version": 10,
+      "feature": "internal-notes",
+      "migration": {
+        "status": "INTERNAL_NOTES_APPLIED",
+        "migrations_executed": 1
+      },
+      "repeat": {
+        "status": "INTERNAL_NOTES_APPLIED",
+        "migrations_executed": 0
+      }
+    },
+    {
+      "version": 11,
+      "feature": "ticket-comments",
+      "migration": {
+        "status": "TICKET_COMMENTS_APPLIED",
+        "migrations_executed": 1
+      },
+      "repeat": {
+        "status": "TICKET_COMMENTS_APPLIED",
+        "migrations_executed": 0
+      }
+    },
+    {
+      "version": 12,
+      "feature": "working-calendars",
+      "migration": {
+        "status": "WORKING_CALENDARS_APPLIED",
+        "migrations_executed": 1
+      },
+      "repeat": {
+        "status": "WORKING_CALENDARS_APPLIED",
+        "migrations_executed": 0
+      }
+    },
+    {
+      "version": 13,
+      "feature": "manual-incidents",
+      "migration": {
+        "status": "MANUAL_INCIDENTS_APPLIED",
+        "migrations_executed": 1
+      },
+      "repeat": {
+        "status": "MANUAL_INCIDENTS_APPLIED",
+        "migrations_executed": 0
+      }
+    },
+    {
+      "version": 14,
+      "feature": "manual-recoveries",
+      "migration": {
+        "status": "MANUAL_RECOVERIES_APPLIED",
+        "migrations_executed": 1
+      },
+      "repeat": {
+        "status": "MANUAL_RECOVERIES_APPLIED",
+        "migrations_executed": 0
+      }
+    },
+    {
+      "version": 15,
+      "feature": "manual-warranty",
+      "migration": {
+        "status": "MANUAL_WARRANTY_APPLIED",
+        "migrations_executed": 1
+      },
+      "repeat": {
+        "status": "MANUAL_WARRANTY_APPLIED",
+        "migrations_executed": 0
+      }
+    }
+  ],
+  "final_readonly_migrations": 0,
+  "isolated_policy_checks": 46,
+  "backup": {
+    "database": "mop_test",
+    "schema_before": 6,
+    "format": "pg_dump_custom",
+    "bytes": 590761,
+    "sha256": "37b06d8a57962bdd66ff8b11cffe5fcd13044cba6c52bfafe38b8fb87e7d68aa",
+    "location": "ignored_local_file",
+    "restore_executed": false
+  },
+  "initial_failure": "Frozen check rejected historical local V1 CRLF checkout before database access; restored exact frozen Git blob and rebuilt resources. No SQL semantic change or migration history repair.",
+  "api_contract_changed": false,
+  "credentials_output": false,
+  "remote_component_lifecycle_changes": false,
+  "all_128_done": false
+}

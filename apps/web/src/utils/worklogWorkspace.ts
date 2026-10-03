@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 
 export type WorklogKind = 'REMOTE' | 'ONSITE' | 'INSPECTION' | 'COMMUTE'
@@ -70,7 +71,7 @@ function readHistory(value: unknown, scope: WorklogContext, selected: WorklogEnt
 export const emptyWorklogState = (): WorklogState => ({ page: null, parentVersion: null, selected: null, history: null, receipt: null, attempt: null, busy: null, error: null, paged: false })
 export function createWorklogWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: WorklogState) => void, newKey: () => string = () => crypto.randomUUID()) {
   let scope: WorklogContext | null = null, state = emptyWorklogState(), epoch = 0, controller: AbortController | undefined
-  const emit = () => changed({ ...state }), path = () => `/tickets/${scope!.ticketId}/worklogs`
+  const emit = () => changed(detachedWorkspaceState(state)), path = () => `/tickets/${scope!.ticketId}/worklogs`
   const unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: WorklogContext | null) { controller?.abort(); ++epoch; const valid = next && [next.tenantId, next.ticketId, next.actorId].every(id => uuid.test(id)) && safeVersion(next.permissionVersion) && typeof next.canWrite === 'boolean'; scope = valid ? { ...next! } : null; state = emptyWorklogState(); if (next && !valid) state.error = invalid(); emit() }
   async function refresh(next = false) {
@@ -134,5 +135,5 @@ export function createWorklogWorkspace(client: Pick<ApiClient, 'request'>, chang
     return send({ path: path() + (baseline ? '/' + baseline.id : ''), method: edit ? 'PATCH' : 'POST', key: newKey(), payload, baseline, state: 'uncertain' })
   }
   emit()
-  return { reset, refresh, show, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => state }
+  return { reset, refresh, show, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => detachedWorkspaceState(state) }
 }

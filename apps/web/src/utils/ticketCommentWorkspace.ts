@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { worklogInstant } from './worklogWorkspace'
 
@@ -35,7 +36,7 @@ async function readPage(value: unknown, scope: CommentContext, parentVersion: nu
 export const emptyCommentState = (): CommentState => ({ page: null, parentVersion: null, receipt: null, attempt: null, busy: null, error: null, paged: false })
 export function createTicketCommentWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: CommentState) => void, newKey: () => string = () => crypto.randomUUID()) {
   let scope: CommentContext | null = null, state = emptyCommentState(), epoch = 0, controller: AbortController | undefined
-  const emit = () => changed({ ...state }), path = () => `/tickets/${scope!.ticketId}/comments`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
+  const emit = () => changed(detachedWorkspaceState(state)), path = () => `/tickets/${scope!.ticketId}/comments`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: CommentContext | null) { controller?.abort(); ++epoch; const valid = next && [next.tenantId, next.ticketId, next.actorId].every(id => uuid.test(id)) && version(next.permissionVersion) && typeof next.canWrite === 'boolean' && ['REPORTER', 'ENGINEER'].includes(next.authorKind); scope = valid ? { ...next! } : null; state = emptyCommentState(); if (next && !valid) state.error = invalid(); emit() }
   async function refresh(next = false) {
     if (!scope || state.busy === 'write' || next && (state.busy || !state.page?.has_more)) return false
@@ -72,5 +73,5 @@ export function createTicketCommentWorkspace(client: Pick<ApiClient, 'request'>,
     if (!scope?.canWrite || state.busy || unresolved() || !state.parentVersion || state.parentVersion !== expectedParentVersion) return false
     validateTicketCommentText(text); return send({ key: newKey(), payload: JSON.stringify({ expected_ticket_version: expectedParentVersion, text }), state: 'uncertain' })
   }
-  emit(); return { reset, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => state }
+  emit(); return { reset, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => detachedWorkspaceState(state) }
 }

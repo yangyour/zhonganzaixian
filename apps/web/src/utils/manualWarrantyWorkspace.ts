@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { readMetadataCurrent, readMetadataHistory, validMetadataDate, validateMetadataInput, type MetadataContext, type MetadataCurrent, type MetadataInput, type MetadataSnapshot, type MetadataRevision, type MetadataHistory } from './assetMetadataWorkspace'
 export interface WarrantyDetails { warranty_start: string | null; warranty_supplier: string | null }
@@ -55,7 +56,7 @@ const sameSnapshot = (a: WarrantyCurrent, b: WarrantyCurrent) => a.metadata_vers
 export const emptyWarrantyState = (): WarrantyState => ({ current: null, history: null, receipt: null, attempt: null, busy: null, error: null })
 export function createWarrantyWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: WarrantyState) => void, newKey: () => string = () => crypto.randomUUID()) {
   let context: MetadataContext | null = null, state = emptyWarrantyState(), epoch = 0, controller: AbortController | undefined, known: WarrantyCurrent | null = null, visible = true
-  const emit = () => changed({ ...state }), path = () => `/assets/${context!.assetId}/manual-metadata/warranty`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
+  const emit = () => changed(detachedWorkspaceState(state)), path = () => `/assets/${context!.assetId}/manual-metadata/warranty`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: MetadataContext | null) { controller?.abort(); ++epoch; const valid = next && [next.tenantId, next.assetId, next.actorId].every(v => uuid.test(v)) && version(next.permissionVersion) && typeof next.canWrite === 'boolean'; context = valid ? { ...next! } : null; known = null; state = emptyWarrantyState(); if (next && !valid) state.error = invalid(); emit() }
   function setVisible(value: boolean) { visible = value; if (!visible && state.busy !== 'write') { controller?.abort(); ++epoch; state = { ...state, current: null, history: null, busy: null }; emit() } }
   function observe(current: WarrantyCurrent) { if (known && (current.asset.version < known.asset.version || current.asset.version === known.asset.version && !sameSnapshot(current, known))) throw invalid(); known = clone(current) }
@@ -90,5 +91,5 @@ export function createWarrantyWorkspace(client: Pick<ApiClient, 'request'>, chan
     } finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
   async function submit(input: WarrantyInput, expectedVersion: number) { if (!visible || !context?.canWrite || state.busy || unresolved() || !state.current?.can_edit || state.current.asset.version !== expectedVersion) return false; validateWarrantyInput(input); if (expectedVersion >= Number.MAX_SAFE_INTEGER) throw badInput(); return send({ key: newKey(), payload: JSON.stringify({ expected_version: expectedVersion, ...clone(input) }), baseline: clone(state.current), state: 'uncertain' }) }
-  emit(); return { reset, setVisible, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => state }
+  emit(); return { reset, setVisible, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => detachedWorkspaceState(state) }
 }

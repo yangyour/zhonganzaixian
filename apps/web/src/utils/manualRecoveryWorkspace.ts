@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { readManualIncident, type ManualIncidentContext, type ManualIncidentEntry } from './manualIncidentReader'
 import { internalNoteHash, validateInternalNoteText } from './internalNoteWorkspace'
@@ -31,7 +32,7 @@ function sameCurrent(a: ManualRecoveryCurrent, b: ManualRecoveryCurrent) {
 export const emptyManualRecoveryState = (): ManualRecoveryState => ({ parent: null, current: null, receipt: null, attempt: null, busy: null, error: null })
 export function createManualRecoveryWorkspace(client: Pick<ApiClient, 'request'>, changed: (value: ManualRecoveryState) => void, newKey: () => string = () => crypto.randomUUID()) {
   let context: ManualIncidentContext | null = null, state = emptyManualRecoveryState(), epoch = 0, abort: AbortController | undefined, lastKnown: ManualRecoveryCurrent | null = null
-  const emit = () => changed({ ...state }), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
+  const emit = () => changed(detachedWorkspaceState(state)), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: ManualIncidentContext | null) { abort?.abort(); ++epoch; const valid = next && uuid.test(next.actorId) && uuid.test(next.tenantId) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion > 0; context = valid ? { ...next! } : null; state = emptyManualRecoveryState(); lastKnown = null; if (next && !valid) state.error = bad(); emit() }
   function begin(parent: ManualIncidentEntry) { if (!context || state.busy || unresolved()) return false; const value = readManualIncident(parent, context); if (state.parent?.id !== value.id) lastKnown = null; state = { ...emptyManualRecoveryState(), parent: value }; emit(); return true }
   async function refresh() {
@@ -60,5 +61,5 @@ export function createManualRecoveryWorkspace(client: Pick<ApiClient, 'request'>
     validateInternalNoteText(note); const time = reportedRecoveredAt === null ? null : new Date(worklogInstant(reportedRecoveredAt)).toISOString()
     return send({ parentId: state.parent.id, payload: JSON.stringify({ expected_version: 0, note, reported_recovered_at: time }), key: newKey(), state: 'uncertain' })
   }
-  emit(); return { reset, begin, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => state, dispose: () => reset(null) }
+  emit(); return { reset, begin, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => detachedWorkspaceState(state), dispose: () => reset(null) }
 }

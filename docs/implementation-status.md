@@ -1019,3 +1019,7 @@ V18队列/不可变行结果结构显式1/重复0/check0且26表不变，但13�
 ## 2026-10-03 原请求展示快照别名修复
 
 四个旧模块getter/回调浅复制允许外部改写内部attempt，8回归先红后绿；统一业务快照深复制，Error原型保留。12新增纳入804Web构建70契约；16真实HTTP中1合成提案实际200丢弃后原path/body/key重放只创建1次，随后撤回，另三模块只读快照隔离通过。无生效配置/迁移/DOM，见docs/workspace-snapshot-isolation.md。
+
+## 2026-10-03 另外七个写模块快照修复
+
+内部备注/客户评论/工时/日历/人工恢复/维保/手工事件原attempt共享问题，14回归先红后绿；全818Web构建70契约通过，原path/method/key/body不受展示副本污染。此轮没有新HTTP/业务写/组件/DOM，前16HTTP不重计，见docs/workspace-snapshot-isolation.md。

@@ -1,0 +1,72 @@
+{
+  "verified_at": "2026-10-03T23:15:08.716220+00:00",
+  "scope": "SEVEN_MORE_WRITE_STATE_BUSINESS_SNAPSHOT_ALIASES",
+  "affected_modules": [
+    "internalNoteWorkspace",
+    "ticketCommentWorkspace",
+    "worklogWorkspace",
+    "workingCalendarWriter",
+    "manualRecoveryWorkspace",
+    "manualWarrantyWorkspace",
+    "manualIncidentWriter"
+  ],
+  "initial_regression": {
+    "tests": 160,
+    "failed": 14,
+    "passed": 146
+  },
+  "final_focused": {
+    "tests": 160,
+    "failed": 0
+  },
+  "new_tests": 14,
+  "web_tests_passed": 818,
+  "typecheck": "PASS",
+  "production_build": "PASS_WITH_EXISTING_CHUNK_SIZE_ADVISORY",
+  "contracts": 70,
+  "generation_check": "PASS",
+  "getter_and_callback_both_detached": true,
+  "frozen_retry_fields": [
+    "path",
+    "method",
+    "idempotency_key",
+    "body"
+  ],
+  "error_object_preserves_original_reference_and_prototype": true,
+  "new_actual_http_requests": 0,
+  "new_business_writes": 0,
+  "new_components_or_credentials": false,
+  "api_version": "0.33.0",
+  "api_restarted": false,
+  "v1_v19_changed": false,
+  "browser_dom_tested": false,
+  "contract_done": false,
+  "previous_snapshot_commit": {
+    "sha": "77f20a77f3f866463828a26f9323f84a5af2e66a",
+    "ci_run": 37160849771,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "apps/web/src/utils/internalNoteWorkspace.ts": "8d6db4f417433625189623b3bb86cca0175379035afb6ca16a24afd0c4a8aff2",
+    "apps/web/src/utils/ticketCommentWorkspace.ts": "c21eb41308cc457e1847832c7ba13d5ac6e8c203aaa690fcaabd6c3f8b293377",
+    "apps/web/src/utils/worklogWorkspace.ts": "5ee4e18508d21dc611e6ab303cd521f6161f423496455fcf13a7e9c5aee6bb6f",
+    "apps/web/src/utils/workingCalendarWriter.ts": "489dfeb2623de531f4944e9642b614a34afeaec3e6a6bfcde22d2b226b7c5597",
+    "apps/web/src/utils/manualRecoveryWorkspace.ts": "daedc242c2a1c1901e82fc4f16e3f2c83cfeb08f1bd0e313bd5ad7d909e246e8",
+    "apps/web/src/utils/manualWarrantyWorkspace.ts": "2677c31b23ebb596d9758207ca49f6fae52ce2baecf52a1ebb8b58c5918eb713",
+    "apps/web/src/utils/manualIncidentWriter.ts": "8c426f3cce4920db8006aaeaf9abd2312354eaee0ccf35b8a51199e385954488",
+    "apps/web/tests/internalNoteWorkspace.test.ts": "2c94fab9ec47bea61320e42d8abed0256aa705e244ab8f4e81120d0d502eb495",
+    "apps/web/tests/ticketCommentWorkspace.test.ts": "32d019df7fe8b07ff50ba718217b5129a795ae85d31daa156ec13f691e0bb974",
+    "apps/web/tests/worklogWorkspace.test.ts": "1aa12524e02333e59946ac51dad330cba2c66254d3a90c1d760bbd8b2f45800e",
+    "apps/web/tests/workingCalendarWriter.test.ts": "15ffb65bc941cccf927fd9d6cf1ca2e4cdcca2c77aee41e84ff671b959201256",
+    "apps/web/tests/manualRecoveryWorkspace.test.ts": "14702229d5e126b742de72f20b68b21caee19e79ec5a5c384f2100e075cb4a4d",
+    "apps/web/tests/manualWarrantyWorkspace.test.ts": "fabc96afda72699416ef67998d0089e39a90903e509a6834705bd97709573c81",
+    "apps/web/tests/manualIncidentWriter.test.ts": "feaa354b4a4efd78620cb111b98b711b324a59f724f2270e6a38b4cc8c25ce32"
+  },
+  "logs_sha256": {
+    ".local/niko-test/logs/remaining-writer-snapshots-red.log": "8ba2d5719ef00f4022716752e46e78c6f9014db757624da68f74133669aa9800",
+    ".local/niko-test/logs/remaining-writer-snapshots-focused.log": "8506b1f11a29f9a85c2b057036dde072e71fcd08a94d1df5bf8c2008d7563195",
+    ".local/niko-test/logs/remaining-writer-snapshots-web.log": "d0b9362b0f1fe85a1aff8a8aa574abbdd62600b17333fab9efacffdf3f449aa7",
+    ".local/niko-test/logs/remaining-writer-snapshots-build.log": "7f4f657d342c8903d277cba01d682ca96af819c0c2655512b94b5a93ff3a3f36",
+    ".local/niko-test/logs/remaining-writer-snapshots-contract.log": "bc39b11852d17e23c644bd67d14fb75e932f37bdaddb6ad2dd1306d592e6ccc0"
+  }
+}

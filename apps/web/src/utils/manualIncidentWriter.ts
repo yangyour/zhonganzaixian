@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { readManualIncident, validManualTitle, manualSeverityLabels, type ManualSeverity, type ManualIncidentContext, type ManualIncidentEntry } from './manualIncidentReader'
 import { worklogInstant } from './worklogWorkspace'
@@ -18,7 +19,7 @@ function sameEntry(a: ManualIncidentEntry, b: ManualIncidentEntry) { return Obje
 export const emptyManualIncidentWriteState = (): ManualIncidentWriteState => ({ editing: false, asset: null, lastAssetRead: null, choices: null, nextAssetCursor: null, assetSearch: '', assetPaged: false, receipt: null, verifiedReceipt: null, attempt: null, busy: null, error: null })
 export function createManualIncidentWriter(client: Pick<ApiClient, 'request'>, changed: (value: ManualIncidentWriteState) => void, newKey: () => string = () => crypto.randomUUID()) {
   let context: ManualIncidentContext | null = null, state = emptyManualIncidentWriteState(), epoch = 0, abort: AbortController | undefined
-  const emit = () => changed({ ...state }), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
+  const emit = () => changed(detachedWorkspaceState(state)), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: ManualIncidentContext | null) { abort?.abort(); ++epoch; const valid = next && uuid.test(next.actorId) && uuid.test(next.tenantId) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion > 0; context = valid ? { ...next! } : null; state = emptyManualIncidentWriteState(); if (next && !valid) state.error = bad(); emit() }
   function begin() { if (!context || state.busy || unresolved()) return false; state = { ...emptyManualIncidentWriteState(), editing: true }; emit(); return true }
   async function read(action: (signal: AbortSignal, scope: ManualIncidentContext) => Promise<Partial<ManualIncidentWriteState>>, clear: Partial<ManualIncidentWriteState>) {
@@ -65,5 +66,5 @@ export function createManualIncidentWriter(client: Pick<ApiClient, 'request'>, c
     const current = copy(state.asset)
     return send({ payload: JSON.stringify({ title: input.title, severity: input.severity, asset_id: current.id, expected_asset_version: current.version }), key: newKey(), asset: current, state: 'uncertain' })
   }
-  emit(); return { reset, begin, search, choose, refreshAsset, adoptLatestAsset, refreshReceipt, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => state, dispose: () => reset(null) }
+  emit(); return { reset, begin, search, choose, refreshAsset, adoptLatestAsset, refreshReceipt, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => detachedWorkspaceState(state), dispose: () => reset(null) }
 }

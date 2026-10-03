@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { readCalendar, readCalendarDraft, type CalendarDraft, type CalendarSnapshot, type CalendarReadContext } from './workingCalendarReader'
 import { worklogInstant } from './worklogWorkspace'
@@ -21,7 +22,7 @@ export function validateCalendarInput(value: unknown): CalendarInput {
 export const emptyCalendarWriteState = (): CalendarWriteState => ({ editing: false, baseline: null, lastRead: null, receipt: null, attempt: null, busy: null, error: null })
 export function createWorkingCalendarWriter(client: Pick<ApiClient, 'request'>, changed: (value: CalendarWriteState) => void, newKey: () => string = () => crypto.randomUUID()) {
   let scope: CalendarReadContext | null = null, state = emptyCalendarWriteState(), epoch = 0, controller: AbortController | undefined
-  const emit = () => changed({ ...state }), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
+  const emit = () => changed(detachedWorkspaceState(state)), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: CalendarReadContext | null) { controller?.abort(); ++epoch; const valid = next && uuid.test(next.tenantId) && uuid.test(next.actorId) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion > 0; scope = valid ? { ...next! } : null; state = emptyCalendarWriteState(); if (next && !valid) state.error = bad(); emit() }
   function begin(baseline: CalendarSnapshot | null) { if (!scope || state.busy || unresolved()) return false; const value = baseline === null ? null : readCalendar(baseline, scope); state = { ...emptyCalendarWriteState(), editing: true, baseline: value, lastRead: value }; emit(); return true }
   async function refresh() {
@@ -49,5 +50,5 @@ export function createWorkingCalendarWriter(client: Pick<ApiClient, 'request'>, 
     } finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
   async function submit(input: CalendarInput) { if (!scope || !state.editing || state.busy || state.attempt) return false; const value = validateCalendarInput(input), baseline = state.baseline ? copy(state.baseline) : null; if (baseline && state.lastRead && state.lastRead.version !== baseline.version) { state = { ...state, error: new ApiError(409, 'VERSION_CONFLICT', '已发现新版本，请明确重新准备编辑，不会自动重定基准', '—') }; emit(); return false } if (baseline && baseline.version >= Number.MAX_SAFE_INTEGER) throw new Error('版本已到技术边界，不能继续递增'); return send({ path: baseline ? '/working-calendars/' + baseline.id : '/working-calendars', method: baseline ? 'PATCH' : 'POST', key: newKey(), payload: JSON.stringify(baseline ? { ...value, expected_version: baseline.version } : value), baseline, state: 'uncertain' }) }
-  emit(); return { reset, begin, submit, refresh, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => state, dispose: () => reset(null) }
+  emit(); return { reset, begin, submit, refresh, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => detachedWorkspaceState(state), dispose: () => reset(null) }
 }

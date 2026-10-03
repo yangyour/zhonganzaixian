@@ -28,7 +28,8 @@ public final class TestSchemaMigration {
         Map.entry("10","V10__immutable_internal_ticket_notes.sql"),
         Map.entry("11","V11__immutable_ticket_comments.sql"),
         Map.entry("12","V12__unpublished_working_calendar_drafts.sql"),
-        Map.entry("13","V13__immutable_manual_incident_registrations.sql"));
+        Map.entry("13","V13__immutable_manual_incident_registrations.sql"),
+        Map.entry("14","V14__immutable_manual_recovery_confirmations.sql"));
     static final String IMPORT_SHA256="1f532822668274b7aebd12ea78b57e6be0aa9fd53ceb77023ee8067589cd2b4b";
     static final String DEPENDENCY_SHA256="5a8ce8d49fe948fc0e9586c102f7c8bfc46cb975a0b5d9f32d4bd1ccc72670bb";
     static final String WORKLOG_SHA256="942ea4dc88a8169b40662edcfd89871e8280a429ac922bd0cc1eb451b82ad2f8";
@@ -37,6 +38,7 @@ public final class TestSchemaMigration {
     static final String TICKET_COMMENT_SHA256="d8535bbf13ca9e35c115278f36232a786b4562c99cc9afd9f5195a416028a8e3";
     static final String WORKING_CALENDAR_SHA256="e6e0412e8a96936a6f4e09dc9f96431cd6551dd9c15ebaf7d2ed414467aedb1a";
     static final String MANUAL_INCIDENT_SHA256="80734d0a0dcd436a3008ed76af0b7da3e81956f516a25d778c0717df79665700";
+    static final String MANUAL_RECOVERY_SHA256="39be55d8759de87c6e2b8f85b3958c60be24ae9e6ece2deb5d849c225050ed72";
     private static final String RUNTIME="mop_test_runtime";
     private TestSchemaMigration() {}
 
@@ -53,12 +55,12 @@ public final class TestSchemaMigration {
     record Entry(String version,String script,String type,MigrationState state,boolean applied,boolean checksumMatches,Integer checksum) {}
     static final String WORKING_CALENDAR_CHECKER_SHA256="07749cb8084dc2f0e9f2a6ed899b77be3dc4e1aeb55f15eed1bf558e48b18fb6";
     enum Plan {
-        PHOTOS_PENDING(4),ASSET_IMPORTS_PENDING(5),ASSET_IMPORTS_APPLIED(6),ASSET_DEPENDENCIES_APPLIED(7),WORKLOGS_APPLIED(8),ASSET_METADATA_APPLIED(9),INTERNAL_NOTES_APPLIED(10),TICKET_COMMENTS_APPLIED(11),WORKING_CALENDARS_APPLIED(12),MANUAL_INCIDENTS_APPLIED(13);
+        PHOTOS_PENDING(4),ASSET_IMPORTS_PENDING(5),ASSET_IMPORTS_APPLIED(6),ASSET_DEPENDENCIES_APPLIED(7),WORKLOGS_APPLIED(8),ASSET_METADATA_APPLIED(9),INTERNAL_NOTES_APPLIED(10),TICKET_COMMENTS_APPLIED(11),WORKING_CALENDARS_APPLIED(12),MANUAL_INCIDENTS_APPLIED(13),MANUAL_RECOVERIES_APPLIED(14);
         final int schemaVersion;Plan(int version){schemaVersion=version;}
         static Plan atVersion(int version){for(Plan value:values())if(value.schemaVersion==version)return value;throw new IllegalStateException("Unsupported validated schema version");}
     }
     enum Mode {
-        READ_ONLY_CHECK(0),APPLY_PHOTOS(5),APPLY_ASSET_IMPORTS(6),APPLY_ASSET_DEPENDENCIES(7),APPLY_WORKLOGS(8),APPLY_ASSET_METADATA(9),APPLY_INTERNAL_NOTES(10),APPLY_TICKET_COMMENTS(11),APPLY_WORKING_CALENDARS(12),APPLY_MANUAL_INCIDENTS(13);
+        READ_ONLY_CHECK(0),APPLY_PHOTOS(5),APPLY_ASSET_IMPORTS(6),APPLY_ASSET_DEPENDENCIES(7),APPLY_WORKLOGS(8),APPLY_ASSET_METADATA(9),APPLY_INTERNAL_NOTES(10),APPLY_TICKET_COMMENTS(11),APPLY_WORKING_CALENDARS(12),APPLY_MANUAL_INCIDENTS(13),APPLY_MANUAL_RECOVERIES(14);
         final int targetVersion;Mode(int version){targetVersion=version;}
     }
 
@@ -76,6 +78,7 @@ public final class TestSchemaMigration {
         if(args.length==1&&"--apply-ticket-comments".equals(args[0]))return Mode.APPLY_TICKET_COMMENTS;
         if(args.length==1&&"--apply-working-calendars".equals(args[0]))return Mode.APPLY_WORKING_CALENDARS;
         if(args.length==1&&"--apply-manual-incidents".equals(args[0]))return Mode.APPLY_MANUAL_INCIDENTS;
+        if(args.length==1&&"--apply-manual-recoveries".equals(args[0]))return Mode.APPLY_MANUAL_RECOVERIES;
         throw new IllegalArgumentException("Use --check or one explicit supported feature apply mode");
     }
     static Plan inspect(List<Entry> entries) {
@@ -120,7 +123,7 @@ public final class TestSchemaMigration {
                 public void warn(String message){} public void error(String message){} public void error(String message,Exception error){} public void notice(String message){}
             });
             Mode mode=requestedMode(args);boolean apply=mode!=Mode.READ_ONLY_CHECK;
-            stage="migration_resources";verifyImportResource();verifyDependencyResource();verifyWorklogResource();verifyAssetMetadataResource();verifyInternalNoteResource();verifyTicketCommentResource();verifyWorkingCalendarResource();verifyManualIncidentResource();stage="private_settings";Settings settings=Settings.from(System::getenv);
+            stage="migration_resources";verifyImportResource();verifyDependencyResource();verifyWorklogResource();verifyAssetMetadataResource();verifyInternalNoteResource();verifyTicketCommentResource();verifyWorkingCalendarResource();verifyManualIncidentResource();verifyManualRecoveryResource();stage="private_settings";Settings settings=Settings.from(System::getenv);
             stage="identity";
             try(Connection guard=connection(settings,!apply)) {
                 verifyIdentity(guard);
@@ -154,7 +157,8 @@ public final class TestSchemaMigration {
                     " internal_notes="+(after.schemaVersion>=10?"IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
                     " ticket_comments="+(after.schemaVersion>=11?"IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
                     " working_calendars="+(after.schemaVersion>=12?"UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
-                    " manual_incidents="+(after.schemaVersion>=13?"IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED"));
+                    " manual_incidents="+(after.schemaVersion>=13?"IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
+                    " manual_recoveries="+(after.schemaVersion>=14?"IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED"));
             }
         }catch(Throwable failure){errors.println(safeFailure(stage,failure));exit=1;}
         finally{System.setOut(output);System.setErr(errors);}
@@ -166,6 +170,7 @@ public final class TestSchemaMigration {
         }
     }
     private static void verifyStructure(Connection connection,Plan plan)throws SQLException{
+        if(plan.schemaVersion>=14)verifyManualRecoveries(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_manual_recovery_confirmation') IS NULL");
         if(plan.schemaVersion>=13)verifyManualIncidents(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_manual_incident_registration') IS NULL");
         if(plan.schemaVersion>=12)verifyWorkingCalendars(connection);else {requireTrue(connection,"SELECT to_regclass('public.mop_working_calendar_draft') IS NULL AND to_regclass('public.mop_working_calendar_revision') IS NULL");requireTrue(connection,"SELECT to_regprocedure('public.mop_calendar_windows_valid(jsonb,timestamp with time zone,timestamp with time zone)') IS NULL");}
         if(plan.schemaVersion>=11)verifyTicketComments(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_ticket_comment') IS NULL");
@@ -176,6 +181,19 @@ public final class TestSchemaMigration {
         if(plan.schemaVersion>=8)verifyWorklogs(connection);else requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_worklog','mop_worklog_revision')");
         if(plan.schemaVersion>=9)verifyAssetMetadata(connection);
         else {requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_asset_manual_details','mop_asset_manual_revision')");verifyRuntimeAcl(connection,"mop_asset",Set.of());}
+    }
+    static void verifyManualRecoveryResource()throws Exception{
+        try(var input=TestSchemaMigration.class.getResourceAsStream("/db/migration/"+SCRIPTS.get("14"))){if(input==null||!MANUAL_RECOVERY_SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(input.readAllBytes()))))throw new IllegalStateException("Unreviewed manual recovery migration resource");}
+    }
+    private static void verifyManualRecoveries(Connection connection)throws SQLException{
+        String table="mop_manual_recovery_confirmation";
+        verifyColumns(connection,table,Map.ofEntries(Map.entry("id","uuid"),Map.entry("tenant_id","uuid"),Map.entry("incident_id","uuid"),Map.entry("actor_id","uuid"),Map.entry("version","bigint"),Map.entry("note","text"),Map.entry("note_sha256","character(64)"),Map.entry("reported_recovered_at","timestamp(3) with time zone"),Map.entry("recorded_at","timestamp(3) with time zone"),Map.entry("manual_recovery_status","character varying(24)"),Map.entry("verification_status","character varying(24)"),Map.entry("monitor_state","character varying(32)"),Map.entry("disposition_state","character varying(32)"),Map.entry("monitoring_recovery_applicable","boolean"),Map.entry("ticket_state_changed","boolean"),Map.entry("sla_changed","boolean"),Map.entry("record_source","character varying(40)")),Set.of("reported_recovered_at","monitor_state","disposition_state"),true);
+        verifyRuntimeAcl(connection,table,Set.of());
+        requireTrue(connection,"SELECT relkind='r' AND relowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') FROM pg_class WHERE oid='public.mop_manual_recovery_confirmation'::regclass");
+        requireTrue(connection,"SELECT NOT EXISTS(SELECT 1 FROM pg_constraint WHERE conrelid='public.mop_manual_recovery_confirmation'::regclass AND NOT convalidated)");
+        requireConstraint(connection,table,"p",List.of("id"),null,List.of(),false);requireConstraint(connection,table,"u",List.of("tenant_id","id"),null,List.of(),false);requireConstraint(connection,table,"u",List.of("tenant_id","incident_id"),null,List.of(),false);
+        requireConstraint(connection,table,"f",List.of("tenant_id"),"mop_tenant",List.of("id"),false);requireConstraint(connection,table,"f",List.of("tenant_id","incident_id"),"mop_manual_incident_registration",List.of("tenant_id","id"),false);requireConstraint(connection,table,"f",List.of("tenant_id","actor_id"),"mop_membership",List.of("tenant_id","user_id"),false);
+        requireTrue(connection,"SELECT count(*)=16 FROM pg_constraint WHERE conrelid='public.mop_manual_recovery_confirmation'::regclass AND contype='c'");
     }
     static void verifyManualIncidentResource()throws Exception{
         try(var input=TestSchemaMigration.class.getResourceAsStream("/db/migration/"+SCRIPTS.get("13"))){if(input==null||!MANUAL_INCIDENT_SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(input.readAllBytes()))))throw new IllegalStateException("Unreviewed manual incident migration resource");}

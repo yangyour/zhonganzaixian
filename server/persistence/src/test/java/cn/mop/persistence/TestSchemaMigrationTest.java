@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Pure CLI policy tests. No network, database, migration, or alternate component is used. */
 class TestSchemaMigrationTest {
-    private static final List<String> SCRIPTS=List.of("V1__remote_test_platform.sql","V2__tenant_configuration_revisions.sql","V3__configuration_review_test_identity.sql","V4__durable_customer_report_registration.sql","V5__durable_report_photos.sql","V6__asset_import_sources_and_mapping.sql","V7__asset_dependency_draft_revisions.sql","V8__manual_worklog_revisions.sql","V9__manual_asset_metadata_revisions.sql","V10__immutable_internal_ticket_notes.sql","V11__immutable_ticket_comments.sql","V12__unpublished_working_calendar_drafts.sql","V13__immutable_manual_incident_registrations.sql");
+    private static final List<String> SCRIPTS=List.of("V1__remote_test_platform.sql","V2__tenant_configuration_revisions.sql","V3__configuration_review_test_identity.sql","V4__durable_customer_report_registration.sql","V5__durable_report_photos.sql","V6__asset_import_sources_and_mapping.sql","V7__asset_dependency_draft_revisions.sql","V8__manual_worklog_revisions.sql","V9__manual_asset_metadata_revisions.sql","V10__immutable_internal_ticket_notes.sql","V11__immutable_ticket_comments.sql","V12__unpublished_working_calendar_drafts.sql","V13__immutable_manual_incident_registrations.sql","V14__immutable_manual_recovery_confirmations.sql");
     private static List<TestSchemaMigration.Entry> entries(boolean photosApplied,boolean importsApplied) {
         return entries(photosApplied,importsApplied,false);
     }
@@ -31,8 +31,11 @@ class TestSchemaMigrationTest {
         return entries(photosApplied,importsApplied,dependenciesApplied,worklogsApplied,metadataApplied,notesApplied,commentsApplied,calendarsApplied,false);
     }
     private static List<TestSchemaMigration.Entry> entries(boolean photosApplied,boolean importsApplied,boolean dependenciesApplied,boolean worklogsApplied,boolean metadataApplied,boolean notesApplied,boolean commentsApplied,boolean calendarsApplied,boolean manualApplied) {
-        List<TestSchemaMigration.Entry> entries=new ArrayList<>();for(int version=1;version<=13;version++) {
-            boolean applied=version<5||version==5&&photosApplied||version==6&&importsApplied||version==7&&dependenciesApplied||version==8&&worklogsApplied||version==9&&metadataApplied||version==10&&notesApplied||version==11&&commentsApplied||version==12&&calendarsApplied||version==13&&manualApplied;entries.add(new TestSchemaMigration.Entry(Integer.toString(version),SCRIPTS.get(version-1),"SQL",applied?MigrationState.SUCCESS:MigrationState.PENDING,applied,true,123));
+        return entries(photosApplied,importsApplied,dependenciesApplied,worklogsApplied,metadataApplied,notesApplied,commentsApplied,calendarsApplied,manualApplied,false);
+    }
+    private static List<TestSchemaMigration.Entry> entries(boolean photosApplied,boolean importsApplied,boolean dependenciesApplied,boolean worklogsApplied,boolean metadataApplied,boolean notesApplied,boolean commentsApplied,boolean calendarsApplied,boolean manualApplied,boolean recoveryApplied) {
+        List<TestSchemaMigration.Entry> entries=new ArrayList<>();for(int version=1;version<=14;version++) {
+            boolean applied=version<5||version==5&&photosApplied||version==6&&importsApplied||version==7&&dependenciesApplied||version==8&&worklogsApplied||version==9&&metadataApplied||version==10&&notesApplied||version==11&&commentsApplied||version==12&&calendarsApplied||version==13&&manualApplied||version==14&&recoveryApplied;entries.add(new TestSchemaMigration.Entry(Integer.toString(version),SCRIPTS.get(version-1),"SQL",applied?MigrationState.SUCCESS:MigrationState.PENDING,applied,true,123));
         }return entries;
     }
     @Test void defaultAndExplicitCheckNeverRequestApply(){assertFalse(TestSchemaMigration.applyRequested(new String[0]));assertFalse(TestSchemaMigration.applyRequested(new String[]{"--check"}));assertTrue(TestSchemaMigration.applyRequested(new String[]{"--apply-photos"}));assertTrue(TestSchemaMigration.applyRequested(new String[]{"--apply-asset-imports"}));assertEquals(TestSchemaMigration.Mode.APPLY_ASSET_IMPORTS,TestSchemaMigration.requestedMode(new String[]{"--apply-asset-imports"}));for(String[] invalid:List.of(new String[]{"--apply"},new String[]{"--check","--apply-photos"},new String[]{"--apply-photos","--apply-asset-imports"},new String[]{"repair"}))assertThrows(IllegalArgumentException.class,()->TestSchemaMigration.applyRequested(invalid));}
@@ -60,7 +63,7 @@ class TestSchemaMigrationTest {
         for(MigrationState state:List.of(MigrationState.FAILED,MigrationState.FUTURE_SUCCESS,MigrationState.BASELINE,MigrationState.OUT_OF_ORDER,MigrationState.PENDING,MigrationState.MISSING_SUCCESS)) {
             List<TestSchemaMigration.Entry> entries=entries(false,false);var original=entries.get(0);entries.set(0,new TestSchemaMigration.Entry(original.version(),original.script(),original.type(),state,true,true,1));assertThrows(IllegalStateException.class,()->TestSchemaMigration.inspect(entries));
         }
-        for(int index=0;index<13;index++){List<TestSchemaMigration.Entry> entries=entries(true,true,true,true,true,true,true,true,true);var original=entries.get(index);entries.set(index,new TestSchemaMigration.Entry(original.version(),original.script(),original.type(),original.state(),true,false,1));assertThrows(IllegalStateException.class,()->TestSchemaMigration.inspect(entries));}
+        for(int index=0;index<14;index++){List<TestSchemaMigration.Entry> entries=entries(true,true,true,true,true,true,true,true,true,true);var original=entries.get(index);entries.set(index,new TestSchemaMigration.Entry(original.version(),original.script(),original.type(),original.state(),true,false,1));assertThrows(IllegalStateException.class,()->TestSchemaMigration.inspect(entries));}
     }
     @Test void failureSummaryCannotEchoSqlConnectionOrPassword(){String summary=TestSchemaMigration.safeFailure("validate",new SQLException("password=UNIT_ONLY_SECRET jdbc:postgresql://secret.invalid/private; SELECT secret"));assertEquals("MOP_SCHEMA status=FAILED stage=validate exception_type=SQLException",summary);}
     @Test void dependenciesRequireTheirOwnExplicitApplyAfterValidatedSixVersions()throws Exception{
@@ -95,7 +98,7 @@ class TestSchemaMigrationTest {
     }
     @Test void internalNotesRequireTheirOwnApplyAfterFrozenNineVersions()throws Exception{
         assertEquals(TestSchemaMigration.Mode.APPLY_INTERNAL_NOTES,TestSchemaMigration.requestedMode(new String[]{"--apply-internal-notes"}));
-        for(var early:TestSchemaMigration.Plan.values())if(early!=TestSchemaMigration.Plan.ASSET_METADATA_APPLIED&&early!=TestSchemaMigration.Plan.INTERNAL_NOTES_APPLIED&&early!=TestSchemaMigration.Plan.TICKET_COMMENTS_APPLIED&&early!=TestSchemaMigration.Plan.WORKING_CALENDARS_APPLIED&&early!=TestSchemaMigration.Plan.MANUAL_INCIDENTS_APPLIED)assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_INTERNAL_NOTES,early));
+        for(var early:TestSchemaMigration.Plan.values())if(early!=TestSchemaMigration.Plan.ASSET_METADATA_APPLIED&&early!=TestSchemaMigration.Plan.INTERNAL_NOTES_APPLIED&&early!=TestSchemaMigration.Plan.TICKET_COMMENTS_APPLIED&&early!=TestSchemaMigration.Plan.WORKING_CALENDARS_APPLIED&&early!=TestSchemaMigration.Plan.MANUAL_INCIDENTS_APPLIED&&early!=TestSchemaMigration.Plan.MANUAL_RECOVERIES_APPLIED)assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_INTERNAL_NOTES,early));
         assertThrows(IllegalStateException.class,()->TestSchemaMigration.inspect(entries(true,true,true,true,false,true)));
         assertTrue(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_INTERNAL_NOTES,TestSchemaMigration.inspect(entries(true,true,true,true,true,false))));
         var applied=TestSchemaMigration.inspect(entries(true,true,true,true,true,true));assertEquals(TestSchemaMigration.Plan.INTERNAL_NOTES_APPLIED,applied);for(var mode:legacyModes()){if(mode==TestSchemaMigration.Mode.APPLY_WORKING_CALENDARS)assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(mode,applied));else assertEquals(mode==TestSchemaMigration.Mode.APPLY_TICKET_COMMENTS,TestSchemaMigration.shouldMigrate(mode,applied));}
@@ -104,7 +107,7 @@ class TestSchemaMigrationTest {
 
     @Test void reporterCommentsRequireTheirOwnApplyAfterFrozenTenVersions()throws Exception{
         assertEquals(TestSchemaMigration.Mode.APPLY_TICKET_COMMENTS,TestSchemaMigration.requestedMode(new String[]{"--apply-ticket-comments"}));
-        for(var early:TestSchemaMigration.Plan.values())if(early!=TestSchemaMigration.Plan.INTERNAL_NOTES_APPLIED&&early!=TestSchemaMigration.Plan.TICKET_COMMENTS_APPLIED&&early!=TestSchemaMigration.Plan.WORKING_CALENDARS_APPLIED&&early!=TestSchemaMigration.Plan.MANUAL_INCIDENTS_APPLIED)assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_TICKET_COMMENTS,early));
+        for(var early:TestSchemaMigration.Plan.values())if(early!=TestSchemaMigration.Plan.INTERNAL_NOTES_APPLIED&&early!=TestSchemaMigration.Plan.TICKET_COMMENTS_APPLIED&&early!=TestSchemaMigration.Plan.WORKING_CALENDARS_APPLIED&&early!=TestSchemaMigration.Plan.MANUAL_INCIDENTS_APPLIED&&early!=TestSchemaMigration.Plan.MANUAL_RECOVERIES_APPLIED)assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_TICKET_COMMENTS,early));
         assertThrows(IllegalStateException.class,()->TestSchemaMigration.inspect(entries(true,true,true,true,true,false,true)));
         assertTrue(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_TICKET_COMMENTS,TestSchemaMigration.inspect(entries(true,true,true,true,true,true,false))));
         var applied=TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true));assertEquals(TestSchemaMigration.Plan.TICKET_COMMENTS_APPLIED,applied);for(var mode:legacyModes())assertEquals(mode==TestSchemaMigration.Mode.APPLY_WORKING_CALENDARS,TestSchemaMigration.shouldMigrate(mode,applied));
@@ -113,14 +116,14 @@ class TestSchemaMigrationTest {
 
     @Test void workingCalendarDraftsRequireSeparateApplyAfterFrozenElevenVersions()throws Exception{
         assertEquals(TestSchemaMigration.Mode.APPLY_WORKING_CALENDARS,TestSchemaMigration.requestedMode(new String[]{"--apply-working-calendars"}));
-        for(var early:TestSchemaMigration.Plan.values())if(early!=TestSchemaMigration.Plan.TICKET_COMMENTS_APPLIED&&early!=TestSchemaMigration.Plan.WORKING_CALENDARS_APPLIED&&early!=TestSchemaMigration.Plan.MANUAL_INCIDENTS_APPLIED)assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_WORKING_CALENDARS,early));
+        for(var early:TestSchemaMigration.Plan.values())if(early!=TestSchemaMigration.Plan.TICKET_COMMENTS_APPLIED&&early!=TestSchemaMigration.Plan.WORKING_CALENDARS_APPLIED&&early!=TestSchemaMigration.Plan.MANUAL_INCIDENTS_APPLIED&&early!=TestSchemaMigration.Plan.MANUAL_RECOVERIES_APPLIED)assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_WORKING_CALENDARS,early));
         assertThrows(IllegalStateException.class,()->TestSchemaMigration.inspect(entries(true,true,true,true,true,true,false,true)));
         assertTrue(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_WORKING_CALENDARS,TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true,false))));
         var applied=TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true,true));assertEquals(TestSchemaMigration.Plan.WORKING_CALENDARS_APPLIED,applied);for(var mode:legacyModes())assertFalse(TestSchemaMigration.shouldMigrate(mode,applied));
         var above=entries(true,true,true,true,true,true,true,false);var last=above.get(11);above.set(11,new TestSchemaMigration.Entry(last.version(),last.script(),last.type(),MigrationState.ABOVE_TARGET,false,false,last.checksum()));assertEquals(TestSchemaMigration.Plan.TICKET_COMMENTS_APPLIED,TestSchemaMigration.inspect(above));TestSchemaMigration.verifyWorkingCalendarResource();assertEquals(64,TestSchemaMigration.WORKING_CALENDAR_SHA256.length());assertEquals(64,TestSchemaMigration.WORKING_CALENDAR_CHECKER_SHA256.length());
     }
 
-    private static List<TestSchemaMigration.Mode> legacyModes(){return Arrays.stream(TestSchemaMigration.Mode.values()).filter(v->v!=TestSchemaMigration.Mode.APPLY_MANUAL_INCIDENTS).toList();}
+    private static List<TestSchemaMigration.Mode> legacyModes(){return Arrays.stream(TestSchemaMigration.Mode.values()).filter(v->v.targetVersion<=12).toList();}
     @Test void manualRegistrationsRequireExplicitApplyAfterFrozenTwelveVersions()throws Exception{
         assertEquals(TestSchemaMigration.Mode.APPLY_MANUAL_INCIDENTS,TestSchemaMigration.requestedMode(new String[]{"--apply-manual-incidents"}));
         assertTrue(TestSchemaMigration.applyRequested(new String[]{"--apply-manual-incidents"}));
@@ -128,7 +131,7 @@ class TestSchemaMigrationTest {
         assertThrows(IllegalStateException.class,()->TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true,false,true)));
         assertTrue(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_MANUAL_INCIDENTS,TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true,true,false))));
         var applied=TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true,true,true));assertEquals(TestSchemaMigration.Plan.MANUAL_INCIDENTS_APPLIED,applied);
-        for(var mode:TestSchemaMigration.Mode.values())assertFalse(TestSchemaMigration.shouldMigrate(mode,applied));
+        for(var mode:TestSchemaMigration.Mode.values())assertEquals(mode==TestSchemaMigration.Mode.APPLY_MANUAL_RECOVERIES,TestSchemaMigration.shouldMigrate(mode,applied));
         var above=entries(true,true,true,true,true,true,true,true,false);var last=above.get(12);above.set(12,new TestSchemaMigration.Entry(last.version(),last.script(),last.type(),MigrationState.ABOVE_TARGET,false,false,last.checksum()));assertEquals(TestSchemaMigration.Plan.WORKING_CALENDARS_APPLIED,TestSchemaMigration.inspect(above));
         TestSchemaMigration.verifyManualIncidentResource();assertEquals(64,TestSchemaMigration.MANUAL_INCIDENT_SHA256.length());
     }
@@ -139,6 +142,15 @@ class TestSchemaMigrationTest {
             else if(plan.schemaVersion<mode.targetVersion-1)assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(mode,plan));
             else assertEquals(plan.schemaVersion==mode.targetVersion-1,TestSchemaMigration.shouldMigrate(mode,plan));
         }
+    }
+
+    @Test void humanRecoveryRequiresExplicitApplyAfterFrozenThirteenVersions()throws Exception{
+        assertEquals(TestSchemaMigration.Mode.APPLY_MANUAL_RECOVERIES,TestSchemaMigration.requestedMode(new String[]{"--apply-manual-recoveries"}));
+        for(var plan:TestSchemaMigration.Plan.values())if(plan.schemaVersion<13)assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_MANUAL_RECOVERIES,plan));
+        assertThrows(IllegalStateException.class,()->TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true,true,false,true)));
+        assertTrue(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_MANUAL_RECOVERIES,TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true,true,true,false))));
+        var applied=TestSchemaMigration.inspect(entries(true,true,true,true,true,true,true,true,true,true));assertEquals(TestSchemaMigration.Plan.MANUAL_RECOVERIES_APPLIED,applied);for(var mode:TestSchemaMigration.Mode.values())assertFalse(TestSchemaMigration.shouldMigrate(mode,applied));
+        var above=entries(true,true,true,true,true,true,true,true,true,false);var last=above.get(13);above.set(13,new TestSchemaMigration.Entry(last.version(),last.script(),last.type(),MigrationState.ABOVE_TARGET,false,false,last.checksum()));assertEquals(TestSchemaMigration.Plan.MANUAL_INCIDENTS_APPLIED,TestSchemaMigration.inspect(above));TestSchemaMigration.verifyManualRecoveryResource();assertEquals(64,TestSchemaMigration.MANUAL_RECOVERY_SHA256.length());
     }
 
 }

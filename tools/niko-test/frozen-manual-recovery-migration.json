@@ -1,0 +1,7 @@
+{
+  "status": "APPLIED_AND_FROZEN",
+  "environment": "niko-local-test",
+  "sha256": {
+    "V14__immutable_manual_recovery_confirmations.sql": "39be55d8759de87c6e2b8f85b3958c60be24ae9e6ece2deb5d849c225050ed72"
+  }
+}

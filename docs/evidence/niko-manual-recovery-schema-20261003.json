@@ -1,0 +1,49 @@
+{
+  "verified_at": "2026-10-03T05:21:21.324360+00:00",
+  "environment": "niko-local-test",
+  "status": "SCHEMA_APPLIED_AND_FROZEN",
+  "migration": "V14__immutable_manual_recovery_confirmations.sql",
+  "sha256": "39be55d8759de87c6e2b8f85b3958c60be24ae9e6ece2deb5d849c225050ed72",
+  "independent_migration": {
+    "before_check": 0,
+    "apply": 1,
+    "repeat": 0,
+    "after_check": 0,
+    "older_manual_incidents_mode": 0
+  },
+  "tests": {
+    "new_schema_real_pg": 8,
+    "migration_policy": 16,
+    "python_guards": 52,
+    "root_reported": 780,
+    "root_executed": 767,
+    "real_pg": 242,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 37,
+    "failures": 0,
+    "errors": 0
+  },
+  "readonly_after_tests": {
+    "confirmation_rows": 0,
+    "q08_null_values": 2
+  },
+  "schema_tests_rolled_back": true,
+  "original_registration_unchanged": true,
+  "business_repository_implemented": false,
+  "api_added": false,
+  "frontend_recovery_added": false,
+  "monitoring_callback_tested": false,
+  "frozen_migrations": "V1-V14",
+  "next_schema_correction": "V15+",
+  "api_worker_automatic_migration": false,
+  "api_version_unchanged": "0.19.0",
+  "credentials_output": false,
+  "original_server_changed": false,
+  "full_contract_done": false,
+  "limitations": [
+    "Schema constraints are not current role or resource authorization",
+    "No human-recovery business transaction/HTTP/UI acceptance yet",
+    "No withdrawal/correction, formal disposition, ticket state or SLA workflow"
+  ]
+}

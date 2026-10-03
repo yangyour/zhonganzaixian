@@ -118,3 +118,14 @@ V9新增mop_asset_manual_revision/details，当前指针引用不可变修订；
 V1–V13已字节冻结，V13 SHA256为80734d0a0dcd436a3008ed76af0b7da3e81956f516a25d778c0717df79665700；后续结构修正V14+，API/Worker启动不迁移，API0.18不变。结构通过不等于当前角色授权、资产实际版本CAS、幂等/审计仓储或API/UI已验。下一步实现同租户当前内部成员的登记仓储、原请求重放前再授权及真实PG并发；人工恢复/正式事件状态/建单闭环与完整M5-6/D06/D07/128项仍未DONE。
 
 独立命令：python tools/niko-test/run-migration.py --apply-manual-incidents；只读复核使用--check。运行角色不可迁移；V13已执行，不编辑原SQL。
+
+
+## 2026-10-03 V14人工恢复独立证据结构与真实PG
+
+显式独立执行V14一次；此前只读check0，重复执行/之后check/旧V13模式均0。mop_manual_recovery_confirmation共17列、16项CHECK，租户+原登记唯一保证一份不可变确认，外键只指向V13手工登记和同租户作者。原说明及UTF8摘要、可null的reported_recovered_at、单独recorded_at保留；已填恢复时间不得晚于确认时间。HUMAN_CONFIRMED仍SELF_REPORTED，监控/处置null、自动监控恢复/工单状态/SLA变更false。运行角色只SELECT/INSERT，无PUBLIC授权/列级UPDATE，也没有为原V13父表扩张UPDATE授权。
+
+8新增真实PG schema测试涵盖原文/hash/未知时间、原登记指纹不变、跨租户外键、唯一确认与版本、Unicode/空白/控制符/错误摘要、未来恢复时间、声明伪造及ACL。测试原登记和确认全部事务回滚，随后只读确认恢复表0行、Q08两项value仍null。16迁移策略/52Python保护、完整根780=767执行（含242真实PG）+13历史fixture跳过、6MinIO排除及37契约通过。
+
+V1–V14全部字节冻结，V14 SHA256为39be55d8759de87c6e2b8f85b3958c60be24ae9e6ece2deb5d849c225050ed72；后续结构修正V15+，API/Worker不自动迁移，API0.19不变。下一步当前成员与同租户手工父登记授权、确认CAS/审计/回执事务及真实并发；父表不可变且无UPDATE权限，不以额外授权换取显式父表FOR SHARE锁。结构测试不算业务恢复、公开HTTP、UI、监控回调或正式工单闭环验收。
+
+显式独立命令：python tools/niko-test/run-migration.py --apply-manual-recoveries；只读复核--check。V14已执行，不能改原SQL。

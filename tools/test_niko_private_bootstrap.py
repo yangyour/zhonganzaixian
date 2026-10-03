@@ -43,4 +43,7 @@ class NikoPrivateBootstrapTest(unittest.TestCase):
  def test_v13_manual_incident_hash_is_separate_from_frozen_v1_to_v12(self):
   manifest=json.loads((ROOT/'tools/niko-test/frozen-manual-incident-migration.json').read_text())['sha256'];self.assertEqual(1,len(manifest))
   for name,expected in manifest.items():self.assertEqual(expected,hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest())
+ def test_v14_recovery_hash_is_separate_from_frozen_v1_to_v13(self):
+  manifest=json.loads((ROOT/'tools/niko-test/frozen-manual-recovery-migration.json').read_text())['sha256'];self.assertEqual(1,len(manifest))
+  for name,expected in manifest.items():self.assertEqual(expected,hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest())
 if __name__=='__main__':unittest.main()

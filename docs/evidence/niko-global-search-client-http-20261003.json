@@ -1,0 +1,31 @@
+{
+  "verified_at": "2026-10-03T08:10:16.076Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual globalSearchWorkspace + ApiClient + typed destinations",
+  "http_requests": 36,
+  "workspace_get_requests": 9,
+  "workspace_writes": 0,
+  "synthetic_asset_creations": 6,
+  "synthetic_report_registrations": 4,
+  "setup_mutations": 10,
+  "contract_group_caps_and_partial_nulls": true,
+  "customer_own_only": true,
+  "other_reporter_deep_link_404": true,
+  "typed_asset_and_ticket_detail_gets": true,
+  "private_description_not_searchable": true,
+  "late_edit_clear_close_permission_results_discarded": true,
+  "double_click_suppressed": true,
+  "lost_success_response_clears_old_result": true,
+  "readonly_audit_tail_unchanged": true,
+  "events_scripts_bell_implemented": false,
+  "browser_dom_tested": false,
+  "slash_key_browser_verified": false,
+  "credentials_output": false,
+  "remaining": [
+    "Dialog/slash-key/navigation-cancel/mobile DOM B03",
+    "Event and automation-script sources",
+    "Real notification bell and delivery B05",
+    "Large-scale performance"
+  ]
+}

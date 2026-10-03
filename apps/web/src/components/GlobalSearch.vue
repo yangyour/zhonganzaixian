@@ -1,0 +1,46 @@
+<script setup lang="ts">
+import { computed,nextTick,onBeforeUnmount,onMounted,ref,shallowRef,watch } from 'vue'
+import { isNavigationFailure,NavigationFailureType,useRoute,useRouter } from 'vue-router'
+import { api } from '../api/client'
+import { can,contextGeneration,session,switchingTenant } from '../stores/session'
+import { createGlobalSearchWorkspace,searchDestination,shouldFocusGlobalSearch,type SearchState } from '../utils/globalSearchWorkspace'
+import { displayTime,typeLabel } from '../utils/display'
+import ApiErrorNotice from './ApiErrorNotice.vue'
+const router=useRouter(),route=useRoute(),open=ref(false),navigating=ref(false),navigationError=ref(''),input=ref<{focus:()=>void}|null>(null)
+const state=shallowRef<SearchState>({query:'',result:null,busy:false,error:null})
+const workspace=createGlobalSearchWorkspace(api,value=>{state.value=value})
+const permitted=computed(()=>can('search:read')&&!switchingTenant.value)
+watch(()=>[session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,contextGeneration.value,permitted.value],()=>{const s=session.value;open.value=false;navigationError.value='';workspace.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role}:null)},{immediate:true,flush:'sync'})
+watch(open,value=>{if(!value){workspace.clear();navigationError.value=''}},{flush:'sync'})
+watch(()=>route.fullPath,()=>{open.value=false},{flush:'sync'})
+async function show(){if(!permitted.value)return;open.value=true;await nextTick();input.value?.focus()}
+function shortcut(event:KeyboardEvent){if(permitted.value&&shouldFocusGlobalSearch(event)){event.preventDefault();void show()}}
+onMounted(()=>window.addEventListener('keydown',shortcut))
+onBeforeUnmount(()=>{window.removeEventListener('keydown',shortcut);workspace.dispose()})
+async function visit(kind:'assets'|'tickets',id:string){if(navigating.value)return;navigating.value=true;navigationError.value='';try{const failure=await router.push(searchDestination(kind,id));if(isNavigationFailure(failure)&&!isNavigationFailure(failure,NavigationFailureType.duplicated))navigationError.value='跳转未完成，搜索结果已保留，请先处理当前页面的提示';else open.value=false}catch{navigationError.value='跳转失败，搜索结果已保留'}finally{navigating.value=false}}
+</script>
+<template>
+ <el-button v-if="permitted" class="global-search-trigger" aria-label="打开全局搜索，快捷键斜杠" @click="show">搜索 <kbd>/</kbd></el-button>
+ <el-dialog v-model="open" title="当前租户分组搜索" width="680px" class="global-search-dialog" :close-on-click-modal="false" :close-on-press-escape="!navigating" :show-close="!navigating" @opened="input?.focus()">
+  <el-form @submit.prevent="workspace.search()"><el-form-item><el-input ref="input" :model-value="state.query" :disabled="navigating" clearable aria-label="当前租户搜索词" placeholder="资产名称 / 报障标题 / 受理编号" @update:model-value="workspace.change(String($event))"/></el-form-item><el-button native-type="submit" type="primary" :loading="state.busy" :disabled="navigating">搜索</el-button></el-form>
+  <p class="search-boundary">仅已接入的资产与报障登记。事件、自动化脚本和通知铃铛尚未实现；未知不表示没有告警。修改关键词立即清除旧结果，不自动查询。</p>
+  <ApiErrorNotice :error="state.error"/>
+  <el-alert v-if="navigationError" :title="navigationError" type="warning" :closable="false"/>
+  <el-skeleton v-if="state.busy" :rows="4" animated/>
+  <template v-if="state.result">
+   <p class="search-observed">读取时刻：{{displayTime(state.result.observed_at)}} · 当前租户 · 部分来源</p>
+   <section class="search-group"><h3>资产 <small>最多5条</small></h3><p v-if="!state.result.groups[0].returned">不存在或无权限</p><ul v-else><li v-for="hit in state.result.groups[0].items" :key="hit.id"><el-button link :disabled="navigating" @click="visit('assets',hit.id)">{{hit.name}}</el-button><span>{{typeLabel(hit.type)}} · 资产记录</span></li></ul><p v-if="state.result.groups[0].has_more">还有匹配记录，请进入资产列表继续查询；此处不是总量。</p></section>
+   <section class="search-group unavailable"><h3>事件 <small>最多4条</small></h3><p>来源尚未接入，结果未知；不是空事件列表。</p></section>
+   <section class="search-group"><h3>工单（当前仅报障登记） <small>最多3条</small></h3><p>{{state.result.groups[2].source_scope==='OWN_REPORT_REGISTRATIONS'?'仅本人报障，不包含同租户其他报障人':'当前租户内部可见登记'}}</p><p v-if="!state.result.groups[2].returned">不存在或无权限</p><ul v-else><li v-for="hit in state.result.groups[2].items" :key="hit.id"><el-button link :disabled="navigating" @click="visit('tickets',hit.id)">{{hit.title}}</el-button><span>{{hit.receipt_no}} · 已登记，非正式工单状态</span></li></ul><p v-if="state.result.groups[2].has_more">还有匹配登记，请进入报障列表继续查询；此处不是总量。</p></section>
+   <section class="search-group unavailable"><h3>自动化脚本 <small>最多3条</small></h3><p>来源尚未接入，结果未知；本搜索不执行脚本。</p></section>
+  </template>
+  <p v-else-if="!state.busy&&!state.error">输入明确关键词后搜索；尚未查询，不显示0条。</p>
+  <template #footer><el-button :disabled="navigating" @click="open=false">关闭并清除搜索</el-button></template>
+ </el-dialog>
+</template>
+<style scoped>
+.global-search-trigger{min-height:44px;padding:8px 12px}kbd{margin-left:8px;border:1px solid #c9d4e2;border-radius:4px;padding:0 5px;color:#596d88}.search-boundary,.search-observed,.search-group p{color:#536276;line-height:1.6;font-size:13px}.search-group{border-top:1px solid #e2e9f2;padding:15px 0;overflow-wrap:anywhere}.search-group h3{display:flex;justify-content:space-between;gap:12px}.search-group small{color:#73839a;font-weight:400}.search-group ul{list-style:none;padding:0;margin:0}.search-group li{display:flex;flex-direction:column;align-items:flex-start;padding:8px 0;gap:3px}.search-group li span{font-size:12px;color:#687991}.search-group :deep(.el-button){white-space:normal;text-align:left;min-height:44px}.unavailable{background:#f8fafc;padding:15px 10px}.global-search-dialog :deep(.el-input__wrapper){min-height:44px}@media(max-width:700px){.global-search-trigger{padding:6px 8px}.global-search-trigger kbd{display:none}.search-group h3{flex-wrap:wrap}.search-group small{font-size:12px}}
+</style>
+<style>
+@media(max-width:700px){.global-search-dialog{width:calc(100vw - 24px)!important;margin-top:5vh!important;padding:18px}.global-search-dialog .el-dialog__body{max-height:70vh;overflow:auto}}
+</style>

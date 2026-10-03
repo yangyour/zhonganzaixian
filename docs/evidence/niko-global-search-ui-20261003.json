@@ -1,0 +1,31 @@
+{
+  "verified_at": "2026-10-03T08:11:48.737763+00:00",
+  "status": "GLOBAL_SEARCH_UI_SOURCE_AND_REAL_MODULE_HTTP_ONLY",
+  "tests": {
+    "new_web": 20,
+    "web_total": 540,
+    "web_typecheck_build": true,
+    "contracts": 47,
+    "real_module_http": 36,
+    "workspace_get_requests": 9,
+    "workspace_write_requests": 0
+  },
+  "synthetic_setup_mutations": 10,
+  "explicit_query_only": true,
+  "typed_local_destinations": true,
+  "late_edit_close_permission_results_discarded": true,
+  "read_failures_clear_old_results": true,
+  "partial_groups_null_not_empty": true,
+  "customer_own_registration_scope": true,
+  "other_reporter_deep_link_404": true,
+  "source_keyboard_navigation_and_responsive_css_checked": true,
+  "slash_key_browser_verified": false,
+  "browser_dom_tested": false,
+  "navigation_cancel_dom_tested": false,
+  "screenshots_captured": false,
+  "events_scripts_bell_implemented": false,
+  "api_version": "0.24.0 unchanged",
+  "migrations_executed": 0,
+  "all_128_done": false,
+  "credentials_output": false
+}

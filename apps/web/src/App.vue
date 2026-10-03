@@ -5,6 +5,7 @@ import { can, session, contextGeneration, switchingTenant, maySwitchTenant, swit
 import { isCancelled } from './api/client'
 import { roleLabel } from './utils/display'
 import ApiErrorNotice from './components/ApiErrorNotice.vue'
+import GlobalSearch from './components/GlobalSearch.vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 const route = useRoute()
 const router = useRouter()
@@ -57,6 +58,7 @@ async function endSession() {
         <el-button class="mobile-menu" aria-label="打开导航" @click="navigationOpen = true">☰</el-button>
         <el-breadcrumb separator="/"><el-breadcrumb-item>MOP</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.group }}</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.title }}</el-breadcrumb-item></el-breadcrumb>
         <div class="topbar-controls">
+          <GlobalSearch />
           <el-select v-if="maySwitchTenant" :model-value="session.tenant.id" :disabled="switchingTenant || tenantTransition" class="tenant-select" aria-label="切换租户" @change="changeTenant">
             <el-option v-for="tenant in session.allowed_tenants" :key="tenant.id" :label="tenant.name" :value="tenant.id" />
           </el-select>

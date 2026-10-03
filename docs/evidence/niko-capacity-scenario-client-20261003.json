@@ -1,0 +1,30 @@
+{
+  "verified_at": "2026-10-03T12:36:16.916547+00:00",
+  "environment": "niko-local-test",
+  "status": "SCENARIO_FRONTEND_STATE_MACHINE_VERIFIED_UI_PENDING",
+  "new_web_tests": 13,
+  "web_total": 605,
+  "type_and_build": true,
+  "contracts": 55,
+  "actual_module_http_final": 19,
+  "final_scenario_post_attempts": 9,
+  "final_synthetic_scenarios_created": 5,
+  "prior_http_batch": {
+    "requests": 16,
+    "post_attempts": 6,
+    "synthetic_scenarios": 4,
+    "separate_not_added_as_distinct_coverage": true
+  },
+  "denied_retry_retains_original_uncertainty": true,
+  "api_commit": "d247b917f36d12fc4db99d20fd854db0aac83a00",
+  "api_ci": {
+    "run": 37122927576,
+    "conclusion": "success"
+  },
+  "browser_dom_tested": false,
+  "scenario_ui_implemented": false,
+  "schema_changed": false,
+  "model_approved": false,
+  "poc_executed": false,
+  "all_128_done": false
+}

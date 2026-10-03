@@ -1,0 +1,22 @@
+{
+  "verified_at": "2026-10-03T12:34:04.233Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual capacityScenarioWorkspace and ApiClient",
+  "http_requests": 16,
+  "scenario_post_attempts": 6,
+  "synthetic_scenarios_created": 4,
+  "actual_math_recomputed": true,
+  "original_key_and_body_retained": true,
+  "readonly_refresh_does_not_resolve_or_repeat_uncertain_write": true,
+  "duplicate_click_suppressed": true,
+  "failed_read_keeps_receipt_but_clears_display": true,
+  "late_actual_read_and_write_rejected_after_context_or_disposal": true,
+  "actual_msp403_despite_forged_local_admin": true,
+  "readonly_audit_tail_unchanged": true,
+  "browser_dom_tested": false,
+  "scenario_ui_implemented": false,
+  "poc_executed": false,
+  "credentials_output": false,
+  "faults": "one successful POST and one successful GET discarded; one write held for duplicate-click check; one GET and one POST held across context/disposal; not physical network/process faults"
+}

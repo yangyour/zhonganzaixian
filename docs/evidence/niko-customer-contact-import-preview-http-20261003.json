@@ -1,0 +1,283 @@
+{
+  "verified_at": "2026-10-03T17:47:46.406Z",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "api_version": "0.31.0",
+  "http_requests": 51,
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "one_format_valid_no_write",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "administrator_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "administrator_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "denied_msp",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "denied_viewerA",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "denied_viewerB",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "csrf_required",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "bad_rows_keep_positions_and_redact",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_empty_quiet_disabled_positive_channels",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "equal_sets_warn_only_no_skip",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "maximum_100_rows",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "bad_quiet_18",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "bad_quiet_19",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "bad_quiet_20",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "bad_quiet_21",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "bad_quiet_22",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "bad_root_23",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bad_root_24",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bad_root_25",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bad_root_26",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bad_root_27",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_json_28",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_json_29",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_json_30",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_json_31",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_json_32",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_scope_override",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "switch_authorized_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "actual_other_tenant_format_only",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "restore_original_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_catalog",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "contacts_before_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_before",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_repeat_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_repeat_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_repeat_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "contacts_after_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_after",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_reviewer",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "preview_only": true,
+  "business_writes": 0,
+  "synthetic_contacts_created": 0,
+  "readonly_success_audit_tail_unchanged": true,
+  "existing_contacts_snapshot_unchanged": {
+    "count": 39,
+    "sha256": "8f856cad8cecb946e3920501eb8ba4025e197318d431511e89dcc4111ab704c5"
+  },
+  "catalog_entries": 26,
+  "catalog_declaration_hash": "a348d208a3398caefab6c03632ec962f8223ab66b1488cf61da27ce13bb313f8",
+  "existing_member_bindings_changed": false,
+  "authorized_tenant_switches": 2,
+  "browser_dom_tested": false,
+  "storage_integration_tested": false,
+  "import_job_created": false,
+  "can_import": false,
+  "credentials_output": false,
+  "notification_delivery": "NOT_RUN",
+  "contract_done": false
+}

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.30.0",
+    "version": "0.31.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -6786,6 +6786,175 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ExplicitOperationalResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contacts/import-preview": {
+      "post": {
+        "operationId": "previewCustomerContactImport",
+        "summary": "仅诊断显式新联系人格式，不持久化、不创建导入作业",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactImportPreviewInput"
+              }
+            }
+          }
+        },
+        "x-mop-read-only": true,
+        "x-mop-roles": [
+          "padmin",
+          "tadmin"
+        ],
+        "x-mop-capability": "contacts:write",
+        "x-mop-max-body-bytes": 524288,
+        "x-mop-max-json-depth": 5,
+        "x-mop-max-json-tokens": 8000,
+        "x-mop-reject-duplicate-json-keys": true,
+        "description": "当前成员授权先于解析，全部query与根范围覆盖拒绝。1至100行为技术边界非配额；行错误留原序号但不回显无效资料。固定can_import=false；格式通过不代表真实联系人、现有记录去重、最后决策人检查或导入许可。只读POST无需幂等键，不产生业务写入。",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactImportPreviewResult"
                 }
               }
             }
@@ -22314,6 +22483,440 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/InternalTicketNotePage"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ContactImportPreviewInput": {
+        "type": "object",
+        "properties": {
+          "rows": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "description": "显式新联系人原始行；逐行检查全部8字段，类型/缺失/额外/枚举/格式错误返回INVALID且不回显该行。任意JSON行均可进入诊断，不自动丢弃或写入。"
+            }
+          }
+        },
+        "required": [
+          "rows"
+        ],
+        "additionalProperties": false
+      },
+      "ContactImportPreviewFacts": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "保留原文，拒绝全Unicode空白/控制字符/不完整代理；不是客户身份真实性核验。"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "REPORTER",
+                "DECISION_MAKER",
+                "TECHNICAL_CONTACT"
+              ]
+            }
+          },
+          "mobile": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^\\+[1-9][0-9]{1,14}$",
+            "maxLength": 16,
+            "description": "明确国际号码格式，不猜区号；不核验所有权或可达性。"
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "email",
+            "maxLength": 254,
+            "pattern": "^[\\x21-\\x7e]+$",
+            "description": "服务端仅接受ASCII dot-atom本地部分最长64、域标签最长63且含点；不声称完整RFC/EAI支持或送达。"
+          },
+          "wecom_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 256,
+            "description": "显式null或非空白原文；拒绝控制字符和不完整Unicode，不自动清洗或默认补值"
+          },
+          "preferred_priorities": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "maxItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "P1",
+                "P2",
+                "P3",
+                "P4"
+              ]
+            },
+            "description": "null未知；空数组为明确未选订阅级别，不选择Q14通知优先级冲突规则。"
+          },
+          "quiet_window": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$",
+                    "minLength": 5,
+                    "maxLength": 5
+                  },
+                  "end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$",
+                    "minLength": 5,
+                    "maxLength": 5
+                  }
+                },
+                "required": [
+                  "enabled",
+                  "start",
+                  "end"
+                ],
+                "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "enabled": {
+                          "const": true
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "start": {
+                          "type": "string"
+                        },
+                        "end": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "else": {
+                      "properties": {
+                        "start": {
+                          "type": "null"
+                        },
+                        "end": {
+                          "type": "null"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "x-mop-cross-field-checks": [
+                  "enabled=true时start必须不同于end；同起止不猜全天；跨午夜允许",
+                  "固定Asia/Shanghai；null组与明确enabled:null的未知组保留区别",
+                  "只存偏好，不证明P1/停用/决策人必达/渠道之间的优先次序"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "quiet_timezone": {
+            "const": "Asia/Shanghai"
+          },
+          "contact_verification": {
+            "const": "SELF_REPORTED_UNVERIFIED"
+          },
+          "channel_verification": {
+            "const": "NOT_VERIFIED"
+          },
+          "notification_routing_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "delivery_eligible": {
+            "enum": [
+              null,
+              false
+            ]
+          },
+          "identity_binding_created": {
+            "const": false
+          },
+          "notification_dispatched": {
+            "const": false
+          },
+          "source": {
+            "const": "EXPLICIT_INPUT"
+          },
+          "record_source": {
+            "const": "EXPLICIT_NEW_CONTACT_INPUT"
+          }
+        },
+        "required": [
+          "name",
+          "roles",
+          "mobile",
+          "email",
+          "wecom_user_id",
+          "preferred_priorities",
+          "quiet_window",
+          "enabled",
+          "quiet_timezone",
+          "contact_verification",
+          "channel_verification",
+          "notification_routing_status",
+          "delivery_eligible",
+          "identity_binding_created",
+          "notification_dispatched",
+          "source",
+          "record_source"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "enabled": {
+                  "const": false
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "delivery_eligible": {
+                  "const": false
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "delivery_eligible": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ContactImportPreviewRow": {
+        "type": "object",
+        "properties": {
+          "row_number": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "status": {
+            "enum": [
+              "FORMAT_VALID",
+              "INVALID"
+            ]
+          },
+          "code": {
+            "enum": [
+              null,
+              "VALIDATION_ERROR"
+            ]
+          },
+          "contact": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ContactImportPreviewFacts"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "identical_to_row": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 99
+          }
+        },
+        "required": [
+          "row_number",
+          "status",
+          "code",
+          "contact",
+          "identical_to_row"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "status": {
+                "const": "INVALID"
+              },
+              "code": {
+                "const": "VALIDATION_ERROR"
+              },
+              "contact": {
+                "type": "null"
+              },
+              "identical_to_row": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "status": {
+                "const": "FORMAT_VALID"
+              },
+              "code": {
+                "type": "null"
+              },
+              "contact": {
+                "type": "object"
+              }
+            }
+          }
+        ]
+      },
+      "ContactImportPreview": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scope": {
+            "const": "NEW_CONTACT_FORMAT_PREVIEW_ONLY"
+          },
+          "source": {
+            "const": "EXPLICIT_INPUT"
+          },
+          "rows": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/ContactImportPreviewRow"
+            }
+          },
+          "valid_rows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "invalid_rows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "identical_rows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 99
+          },
+          "row_limit": {
+            "const": 100
+          },
+          "row_limit_kind": {
+            "const": "TECHNICAL_REQUEST_BOUND"
+          },
+          "can_import": {
+            "const": false
+          },
+          "tenant_authorization": {
+            "const": "CURRENT_MEMBERSHIP_VERIFIED"
+          },
+          "existing_contact_check": {
+            "const": "NOT_RUN"
+          },
+          "last_decision_maker_check": {
+            "const": "NOT_RUN"
+          },
+          "notification_routing_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "writes_performed": {
+            "const": false
+          },
+          "notification_dispatched": {
+            "const": false
+          },
+          "preview_saved": {
+            "const": false
+          },
+          "job_created": {
+            "const": false
+          }
+        },
+        "required": [
+          "tenant_id",
+          "scope",
+          "source",
+          "rows",
+          "valid_rows",
+          "invalid_rows",
+          "identical_rows",
+          "row_limit",
+          "row_limit_kind",
+          "can_import",
+          "tenant_authorization",
+          "existing_contact_check",
+          "last_decision_maker_check",
+          "notification_routing_status",
+          "writes_performed",
+          "notification_dispatched",
+          "preview_saved",
+          "job_created"
+        ],
+        "additionalProperties": false,
+        "x-mop-cross-field-checks": [
+          "rows行号必须从1连续；valid_rows+invalid_rows=rows.length且分别与状态计数相等",
+          "identical_rows与非null的identical_to_row数量相等；引用只能指向更早的第一个完整事实相同的有效行",
+          "相同行仅警告，不自动合并、过滤、覆写或认定同一身份；不查询现有联系人、配额或最后决策人"
+        ]
+      },
+      "ContactImportPreviewResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ContactImportPreview"
           },
           "trace_id": {
             "type": "string"

@@ -97,3 +97,14 @@ API0.30和V1–V17未修改，未增加存储、迁移、账号绑定或通知�
 完全相同字段的后续有效行仅标记首次相同行号作为警告，集合次序不影响比较；姓名相同或部分联系方式相同不推断同一人，不自动合并、跳过或覆盖。所有合法行及重复警告仍留在结果中，输入/结果集合防外部修改。没有已存在联系人查询、租户授权、最后决策人事务检查或存储写入；canImport恒false，NOT_CHECKED/NOT_RUN门禁明确，不把格式通过当可导入。没有CSV/XLSX文件解析、上传、导入作业、HTTP端点或页面入口。
 
 12新纯单元覆盖边界100/101、坏行定位、缺启用、重复集合、静音、未知/空、相同行警告、保留原文、不可变集合等；完整回归和证据见[导入预览核心](evidence/niko-customer-contact-import-preview-core-20261003.json)。API0.30/V1–V17不变，既有PG回归不作为导入持久化验收；下一步受限只读HTTP预览，真正批量写入仍需独立作业/幂等/事务/授权和真实验收。页面9703faf CI37141262397 success已回读，M2-9不标DONE。
+
+
+## 2026-10-03 API0.31只读导入格式预览
+
+新增POST /api/v1/contacts/import-preview，当前contacts:write的padmin/tadmin且CSRF有效才可调用；当前成员检查先于解析，无幂等键要求，因为没有业务写入/作业/存储预览。请求仅rows，1–100行是技术边界，不是配额。根范围覆盖、query、重复JSON键、尾随内容、超过512KiB/5层/8000token拒绝整个请求；单行8字段的缺失、额外、类型或格式错误则保留序号标INVALID，不回显无效行原文。
+
+有效行只返回规范集合及原始文字、EXPLICIT_INPUT/EXPLICIT_NEW_CONTACT_INPUT，无联系人id/version；未知/空偏好和静音组不合并。相同行引用更早的首个有效行，仅警告不去重或认定同一人。固定can_import=false、preview_saved/job_created/writes_performed=false；现有联系人和最后决策人检查NOT_RUN，不能据预览绕过实际写入授权、并发约束或批量作业。
+
+12新增控制器，完整根1144=1131执行（351真实PG）+13历史fixture跳过、6MinIO排除；64契约/生成一致性和691Web/类型构建通过。初始通用写接口测试未把新增只读POST列入明确例外而失败，补该精确只读路径后全部通过，业务写端点幂等要求未放宽。正常退出自有QA进程后启动新固定JAR，重新取得6OIDC会话；51真实HTTP逐响应契约校验，含实际管理员/403/CSRF、20坏行定位、100/101行、未知与空/静音、正值国际号码/邮箱、根/JSON边界、实际授权租户切换及恢复。只读成功前后39条现有联系人完整DTO快照相等、审计尾相等，6成员权限版本不变，目录仍26项。没有新增联系人、账号、权限或通知。
+
+纯核心caa0247 CI37141522285 success已回读。V1–V17不动；不把51HTTP当文件CSV/XLSX解析、导入异步作业或浏览器入口验收。页面/文件解析/真正批量写入待，Q14通知送达仍待，M2-9未DONE。见[API证据](evidence/niko-customer-contact-import-preview-api-20261003.json)、[真实HTTP](evidence/niko-customer-contact-import-preview-http-20261003.json)。

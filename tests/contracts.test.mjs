@@ -97,7 +97,7 @@ test('所有业务写接口明确要求幂等及CSRF，remote_test不存在fixtu
   for (const [path, methods] of Object.entries(contract.paths)) {
     for (const [method, operation] of Object.entries(methods)) {
       if (!['post', 'put', 'patch', 'delete'].includes(method)) continue;
-      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons'].includes(path);
+      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons', '/contacts/import-preview'].includes(path);
       if (readonlyPreview) assert.equal(operation['x-mop-read-only'], true);
       for (const name of readonlyPreview ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
         assert.ok(operation.parameters.some((p) => p.in === 'header' && p.name === name && p.required), `${method} ${path} ${name}`);
@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.30.0');
+  assert.equal(contract.info.version, '0.31.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -651,4 +651,21 @@ test('归档联系人必须停用，不能伪造渠道送达与身份授权',()=
 test('联系人API只有可恢复归档，无永久删除，版本与重放门禁明确',()=>{
  assert.deepEqual(Object.keys(contract.paths['/contacts/{id}']),['get','patch']);assert.deepEqual(contract.paths['/contacts'].post['x-mop-roles'],['padmin','tadmin']);assert.match(contract.paths['/contacts/{id}/archive'].post['x-mop-replay-authorization'],/before cached receipt/);assert.equal(validates('CustomerContactArchive',{expected_version:1}),true);assert.equal(validates('CustomerContactArchive',{expected_version:1,enabled:false}),false);assert.equal(validates('CustomerContactArchive',{expected_version:9007199254740991}),false);
  assert.equal(validates('CustomerContactPage',{tenant_id:id('1'),items:[],has_more:false,next_before_created_at:null,next_before_id:null,view:'CURRENT',source:'postgresql',scope:'CURRENT_TENANT',page_size_limit:100}),true);
+});
+
+
+test('联系人格式预览接收原始行诊断，根范围和技术边界严格且不是写动作',()=>{
+ assert.equal(validates('ContactImportPreviewInput',{rows:[null,{},true,[]]}),true);
+ for(const value of [{rows:[]},{rows:Array(101).fill(null)},{rows:[{}],tenant_id:id('2')},{}])assert.equal(validates('ContactImportPreviewInput',value),false);
+ const route=contract.paths['/contacts/import-preview'].post;assert.equal(route['x-mop-read-only'],true);assert.equal(route['x-mop-capability'],'contacts:write');assert.deepEqual(route['x-mop-roles'],['padmin','tadmin']);assert.deepEqual(route.parameters.map(p=>p.name),['X-CSRF-Token']);
+});
+test('联系人预览坏行不能伪造通过或回显资料，预览不等于已保存联系人',()=>{
+ const row={row_number:1,status:'INVALID',code:'VALIDATION_ERROR',contact:null,identical_to_row:null};assert.equal(validates('ContactImportPreviewRow',row),true);
+ for(const patch of [{status:'FORMAT_VALID'},{code:null},{identical_to_row:1},{row_number:0}])assert.equal(validates('ContactImportPreviewRow',{...row,...patch}),false);
+ const facts={name:'synthetic',roles:['REPORTER'],mobile:null,email:null,wecom_user_id:null,preferred_priorities:null,quiet_window:null,enabled:true,quiet_timezone:'Asia/Shanghai',contact_verification:'SELF_REPORTED_UNVERIFIED',channel_verification:'NOT_VERIFIED',notification_routing_status:'CONFIG_PENDING',delivery_eligible:null,identity_binding_created:false,notification_dispatched:false,source:'EXPLICIT_INPUT',record_source:'EXPLICIT_NEW_CONTACT_INPUT'};
+ assert.equal(validates('ContactImportPreviewFacts',facts),true);for(const patch of [{source:'postgresql'},{id:id('1')},{version:1},{delivery_eligible:true}])assert.equal(validates('ContactImportPreviewFacts',{...facts,...patch}),false);
+});
+test('联系人预览不能声称导入许可、存储或事务检查已完成',()=>{
+ const value={tenant_id:id('2'),scope:'NEW_CONTACT_FORMAT_PREVIEW_ONLY',source:'EXPLICIT_INPUT',rows:[{row_number:1,status:'INVALID',code:'VALIDATION_ERROR',contact:null,identical_to_row:null}],valid_rows:0,invalid_rows:1,identical_rows:0,row_limit:100,row_limit_kind:'TECHNICAL_REQUEST_BOUND',can_import:false,tenant_authorization:'CURRENT_MEMBERSHIP_VERIFIED',existing_contact_check:'NOT_RUN',last_decision_maker_check:'NOT_RUN',notification_routing_status:'CONFIG_PENDING',writes_performed:false,notification_dispatched:false,preview_saved:false,job_created:false};assert.equal(validates('ContactImportPreview',value),true);
+ for(const patch of [{can_import:true},{preview_saved:true},{job_created:true},{writes_performed:true},{existing_contact_check:'PASS'},{last_decision_maker_check:'PASS'},{notification_dispatched:true}])assert.equal(validates('ContactImportPreview',{...value,...patch}),false);
 });

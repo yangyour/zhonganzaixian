@@ -1,0 +1,16 @@
+{
+  "verified_at": "2026-10-03T18:00:08.785Z",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "api_version": "0.31.0",
+  "http_requests": 2,
+  "readonly_preview_posts": 1,
+  "noncanonical_tokens_rejected_before_network": 5,
+  "safe_integer_diagnostic_rows": 3,
+  "business_writes": 0,
+  "frontend": "actual updated contactImportPreviewWorkspace and ApiClient",
+  "browser_dom_tested": false,
+  "can_import": false,
+  "credentials_output": false,
+  "contract_done": false
+}

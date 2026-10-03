@@ -33,7 +33,7 @@ defineExpose({ change: workspace.change, preview: workspace.preview, clearInput,
     <h2>原始JSON资料</h2><p>根对象只含rows；1–100条是单次技术上限，不是合同配额。每条需完整提供姓名、角色、手机、邮箱、企微userid、级别偏好、静音组、启用状态这8个字段，未知显式null；enabled必须明确true或false。</p>
     <details><summary>查看明确标记的格式示例（不会自动填入或发送）</summary><pre>{{ example }}</pre><p>角色：REPORTER、DECISION_MAKER、TECHNICAL_CONTACT；偏好为P1–P4数组，null表示未知，[]表示明确空。静音组为null，或完整enabled/start/end；启用窗口要求HH:mm且两端不同，时区Asia/Shanghai。</p></details>
     <el-input type="textarea" :rows="14" :model-value="state.text" aria-label="联系人预览原始JSON" placeholder="在此粘贴明确资料；不要填入密码、token或API密钥" @update:model-value="workspace.change($event)" />
-    <p class="preview-help">最多512KiB、5层、8000个JSON token；拒绝重复键和不安全或非整数数值，业务字段不使用数值类型。编辑立即清除旧结果；不会自动预览、保存或合并相同行。</p>
+    <p class="preview-help">最多512KiB、5层、8000个JSON token；拒绝重复键和非规范安全整数（含小数、指数及负零），业务字段不使用数值类型。编辑立即清除旧结果；不会自动预览、保存或合并相同行。</p>
     <div class="preview-actions"><el-button type="primary" :disabled="state.busy || !state.text" :loading="state.busy" @click="workspace.preview()">只读检查格式</el-button><el-button :disabled="!state.text" @click="clearInput">清除输入与结果</el-button></div>
    </section>
    <ApiErrorNotice :error="state.error" />

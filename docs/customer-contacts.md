@@ -119,3 +119,10 @@ API0.30和V1–V17未修改，未增加存储、迁移、账号绑定或通知�
 23新增Web（16解析/状态、6实际Vue SFC处理器、1接线）使总714；类型/构建和64契约/生成一致性通过。初始SFC测试替身读取model-value属性名和jsdom源码URL方式错误已修；类型测试构造租户漏name已补，未删除生产断言。另实际编译模块+ApiClient的20真实HTTP/17只读预览POST通过：100行、坏行位置、全字段/相同行复核、未知/空/静音组、国际联系方式及Unicode边界；1个成功回包丢弃、4个真实200延迟验证编辑/重复/权限/关闭；实际MSP403和只读审计尾不变。无业务记录新增或修改。故障在客户端响应处理层，不是物理断网或进程崩溃。
 
 API7c5c417 CI37141975725 success已验，API0.31和V1–V17未改。Vue内存renderer不是浏览器DOM；桌面/390px实际控件与视觉B03仍待。CSV/XLSX来源、真正异步批量写入、通知送达/Q14和M2-9整体验收仍未完成。见[页面与状态证据](evidence/niko-customer-contact-import-preview-ui-20261003.json)、[20HTTP](evidence/niko-customer-contact-preview-client-http-20261003.json)。
+
+
+### JSON数值词法补强（2026-10-03 18:00 UTC）
+
+复核发现仅对Number转换后的结果检查safe integer仍会接受1e-9999变0、0.99999999999999999变1；用上一版实际编译模块复现，两次均未发送请求。现在先要求规范安全整数字面量，明确拒绝所有小数、指数、负零及超安全整数，不让无效原始数值先静默舍入后进入诊断。合法联系人字段不使用数字类型，故不影响有效联系资料。
+
+扩展5种原始数值回归，714Web/类型构建、64契约/生成一致性通过；新实际编译模块2HTTP（会话GET+1只读预览POST）验证5种数值本地拒绝且0次POST，规范0/-1/最大安全整数三行仍送真实API逐行标INVALID。没有业务写入，不把前一批20HTTP重复记成本补丁验证。预览页657c316 CI37142471886 success已回读；API0.31/V1–V17不改，见[回归](evidence/niko-customer-contact-preview-number-regression-20261003.json)、[2HTTP](evidence/niko-customer-contact-preview-number-http-20261003.json)。

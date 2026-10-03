@@ -1,0 +1,44 @@
+{
+  "verified_at": "2026-10-03T18:00:38.682120+00:00",
+  "scope": "CONTACT_PREVIEW_JSON_NUMERIC_ROUNDING_REGRESSION",
+  "environment": "niko-local-test",
+  "api_version": "0.31.0",
+  "previous_compiled_parser_reproductions": [
+    {
+      "lexical": "1e-9999",
+      "coerced": 0
+    },
+    {
+      "lexical": "0.99999999999999999",
+      "coerced": 1
+    }
+  ],
+  "fix": "Require canonical safe integer lexical form before JSON.parse; reject decimal, exponent and negative zero as well as unsafe integer",
+  "expanded_regression_tokens": 5,
+  "web_tests": 714,
+  "typecheck": "PASS",
+  "build": "PASS",
+  "contracts": 64,
+  "generation_check": "PASS",
+  "updated_module_actual_http": 2,
+  "readonly_posts": 1,
+  "local_rejections_without_post": 5,
+  "safe_integer_diagnostic_rows": 3,
+  "business_writes": 0,
+  "source_sha256": {
+    "apps/web/src/utils/contactImportPreviewWorkspace.ts": "19789b7f05bd68bd477c07fb2615549737f52d676c0fb0fce6e26c7d5fe87552",
+    "apps/web/src/pages/ContactImportPreviewPage.vue": "f1dd02df983523c01855ada805dfe9d25a1b32e9ff4e82437400655854c735e0",
+    "apps/web/tests/contactImportPreviewWorkspace.test.ts": "23f6b4ca08a7db4019a52d1a65f21d227cff5eae0de4ab72f1aff00591c5015b",
+    "tests/niko-customer-contact-preview-number-http.mjs": "31aa3921b2d9278aaf4c4bd9a3e04a25af8d8610654f62d4b855142c85ca760f"
+  },
+  "prior_ui_commit": {
+    "sha": "657c316664f95f3326af9b2ca659308d55b9a3d6",
+    "ci_run": 37142471886,
+    "conclusion": "success"
+  },
+  "api_changed": false,
+  "v1_v17_changed": false,
+  "browser_dom": "NOT_RUN",
+  "can_import": false,
+  "contract_done": false
+}

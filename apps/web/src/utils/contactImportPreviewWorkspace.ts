@@ -25,7 +25,7 @@ export function parseContactPreviewText(text: string): { rows: unknown[] } {
   if (ch === '"') { string(); return }
   const literal = /^(?:true|false|null)/.exec(text.slice(position)); if (literal) { position += literal[0].length; return }
   const number = /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?/.exec(text.slice(position)); if (!number || number[0].length > 32) throw bad()
-  const parsed = Number(number[0]); if (!Number.isFinite(parsed) || !Number.isSafeInteger(parsed)) throw bad(); position += number[0].length
+  const parsed = Number(number[0]); if (!/^(?:0|-?[1-9][0-9]*)$/.test(number[0]) || !Number.isSafeInteger(parsed)) throw bad(); position += number[0].length
  }
  try { value(1); space(); if (position !== text.length) throw bad(); const parsed: unknown = JSON.parse(text); if (!exact(parsed, ['rows']) || !Array.isArray(parsed.rows) || !parsed.rows.length || parsed.rows.length > 100) throw bad(); return parsed as { rows: unknown[] } } catch { throw bad() }
 }

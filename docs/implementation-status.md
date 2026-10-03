@@ -856,3 +856,8 @@ M10-7现有计算/保存/读取/增长代码切片已补齐，原服务器V16、
 
 
 2026-10-03 14:20：新环境实际浏览器仍受B03限制（官方下载返回错误HTML，专属云Chrome打开回环页ERR_BLOCKED_BY_CLIENT）；Vite直接HTTP200不等于UI验收。5dfd7cd双CI及含原HEAD bytes的恢复artifact完整验证，继续真实PG/API和其他独立功能。见niko-rebuilt-browser-blocker与niko-rebuilt-source-ci证据。
+
+
+## 2026-10-03 显式经营指标核心
+
+新增样本中位数与活跃租户/FTE纯算术，14测试通过，完整根1050=1037执行含既有322真实PG+13历史跳过，6MinIO排除；55契约/生成一致性通过。空/未知/0样本和0分母分开，精确大数与最终DECIMAL128，不选Q23/Q27/Q30业务口径。API仍0.28，没有新数据源/接口/页面或正式指标结论，M10-5/10-10/10-12仍未DONE。见[边界与证据](explicit-operational-metrics.md)。

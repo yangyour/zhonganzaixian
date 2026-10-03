@@ -1,0 +1,41 @@
+{
+  "verified_at": "2026-10-03T14:33:35Z",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "scope": "PURE_EXPLICIT_ARITHMETIC_ONLY",
+  "contract_requirements": [
+    "M10-5",
+    "M10-10",
+    "M10-12"
+  ],
+  "new_pure_tests": 14,
+  "root_regression": {
+    "reported": 1050,
+    "executed": 1037,
+    "existing_real_pg_tests": 322,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "log_sha256": "33c20c5ea89d9c06198fccf9c156b83de7e02d4f3a55826cfe69bb8667d30610"
+  },
+  "contracts": {
+    "tests": 55,
+    "generation_check": "PASS",
+    "public_api_version": "0.28",
+    "public_api_changed": false
+  },
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/operations/ExplicitOperationalMetrics.java": "59a37da1fe1638cd4603948acc191487dd5df9731b7a1e24235bd50d10dce57a",
+    "server/api/src/test/java/cn/mop/api/ExplicitOperationalMetricsTest.java": "f9dc48b7083d547bd10a95cdc77320b637bcded07e4b57ba09daad0ea8193f3e"
+  },
+  "new_project_metrics_data_integration": "NOT_RUN",
+  "new_http_endpoint": false,
+  "browser_dom_tested": false,
+  "formal_metrics_available": false,
+  "q23_q27_q30": "UNVERIFIED",
+  "effective_values": null,
+  "v1_v16_changed": false,
+  "ddl_executed": false,
+  "contract_done": false
+}

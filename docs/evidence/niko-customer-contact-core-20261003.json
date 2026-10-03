@@ -1,0 +1,36 @@
+{
+  "verified_at": "2026-10-03T15:17:36Z",
+  "scope": "PURE_CONTACT_FACTS_AND_DECISION_MAKER_COUNT_GUARD",
+  "contract_requirement": "M2-9",
+  "new_pure_tests": 14,
+  "root_regression": {
+    "reported": 1075,
+    "executed": 1062,
+    "existing_real_pg": 322,
+    "historical_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "log_sha256": "8d83d1d166d8a584b25e366b34a97655cd041483dde60240c3e8ccbecdb5e309"
+  },
+  "api_version": "0.29.0",
+  "api_changed": false,
+  "new_contact_schema": false,
+  "contact_real_pg_integration": "NOT_RUN",
+  "contact_concurrency_verified": false,
+  "notification_dispatched": false,
+  "channel_delivery_verified": false,
+  "identity_binding_created": false,
+  "contact_customer_verification": "UNVERIFIED",
+  "q14": "UNVERIFIED",
+  "v1_v16_changed": false,
+  "ddl_executed": false,
+  "previous_commit": {
+    "sha": "54b578c8d97a2bc39f3e2776bb789b0557b4bffb",
+    "ci_run": 37132364878,
+    "conclusion": "success"
+  },
+  "contract_done": false,
+  "contracts": 57,
+  "generation_check": "PASS"
+}

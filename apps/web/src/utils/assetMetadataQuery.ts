@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { readMetadataCurrent, validMetadataDate, type MetadataCurrent } from './assetMetadataWorkspace'
 
@@ -51,7 +52,7 @@ function readPage(value: unknown, scope: MetadataQueryContext, filters: Metadata
 export const emptyMetadataQueryState = (): MetadataQueryState => ({ page: null, filters: {}, busy: false, error: null, paged: false })
 export function createMetadataQuery(client: Pick<ApiClient, 'request'>, changed: (state: MetadataQueryState) => void) {
   let scope: MetadataQueryContext | null = null, state = emptyMetadataQueryState(), epoch = 0, controller: AbortController | undefined
-  const emit = () => changed({ ...state, filters: { ...state.filters } })
+  const emit = () => changed(detachedWorkspaceState(state))
   function reset(next: MetadataQueryContext | null) { controller?.abort(); ++epoch; scope = next && uuid.test(next.tenantId) && uuid.test(next.actorId) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion > 0 ? { ...next } : null; state = emptyMetadataQueryState(); if (next && !scope) state.error = invalid(); emit() }
   async function load(rawFilters: MetadataFilters, boundary: { time: string; id: string } | null) {
     if (!scope) return false
@@ -65,5 +66,5 @@ export function createMetadataQuery(client: Pick<ApiClient, 'request'>, changed:
     } catch (error) { if (turn === epoch && !isCancelled(error)) state = { ...state, error }; return false }
     finally { if (turn === epoch) { state = { ...state, busy: false }; emit() } }
   }
-  emit(); return { reset, apply: (filters: MetadataFilters) => load(filters, null), refresh: () => load(state.filters, null), next: () => !state.busy && state.page?.has_more ? load(state.filters, { time: state.page.next_before_created_at!, id: state.page.next_before_id! }) : Promise.resolve(false), dispose: () => reset(null), state: () => state }
+  emit(); return { reset, apply: (filters: MetadataFilters) => load(filters, null), refresh: () => load(state.filters, null), next: () => !state.busy && state.page?.has_more ? load(state.filters, { time: state.page.next_before_created_at!, id: state.page.next_before_id! }) : Promise.resolve(false), dispose: () => reset(null), state: () => detachedWorkspaceState(state) }
 }

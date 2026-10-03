@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { worklogInstant } from './worklogWorkspace'
 export interface CalendarWindow { start: string; end: string }
@@ -72,7 +73,7 @@ function readPreview(v: unknown, current: CalendarSnapshot, start: string | null
 export const emptyCalendarReadState = (): CalendarReadState => ({ page: null, selected: null, history: null, preview: null, busy: false, error: null, paged: false, historyPaged: false })
 export function createWorkingCalendarReader(client: Pick<ApiClient, 'request'>, changed: (value: CalendarReadState) => void) {
   let scope: CalendarReadContext | null = null, state = emptyCalendarReadState(), epoch = 0, abort: AbortController | undefined
-  const emit = () => changed({ ...state })
+  const emit = () => changed(detachedWorkspaceState(state))
   function reset(next: CalendarReadContext | null) { abort?.abort(); ++epoch; const valid = next && uuid.test(next.tenantId) && uuid.test(next.actorId) && version(next.permissionVersion); scope = valid ? { ...next! } : null; state = emptyCalendarReadState(); if (next && !valid) state.error = bad(); emit() }
   async function run(action: (signal: AbortSignal, context: CalendarReadContext) => Promise<Partial<CalendarReadState>>, clear: Partial<CalendarReadState>) {
     if (!scope) return false
@@ -111,5 +112,5 @@ export function createWorkingCalendarReader(client: Pick<ApiClient, 'request'>, 
     if (!state.selected || state.busy) return Promise.resolve(false); validateCalendarScenario(start, seconds); const current = copy(state.selected)
     return run(async (signal) => ({ preview: readPreview(await client.request<unknown>('/working-calendars/' + current.id + '/preview', { method: 'POST', body: { expected_version: current.version, start, required_seconds: seconds }, signal }), current, start, seconds) }), { preview: null })
   }
-  emit(); return { reset, list, select, preview, clearPreview: () => { state = { ...state, preview: null }; emit() }, state: () => state, dispose: () => reset(null) }
+  emit(); return { reset, list, select, preview, clearPreview: () => { state = { ...state, preview: null }; emit() }, state: () => detachedWorkspaceState(state), dispose: () => reset(null) }
 }

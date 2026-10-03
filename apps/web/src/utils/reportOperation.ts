@@ -1,3 +1,4 @@
+import { detachedReadState } from './detachedWorkspaceState'
 import { isUtcInstant, utcNotBefore } from './utcInstant'
 import { api, ApiError, isCancelled, StaleRequestError } from '../api/client'
 import type { CustomerReportOperation, RegisteredTicket } from '../api/types'
@@ -63,9 +64,9 @@ export function createReportOperationReader(options: {
   let generation = 0
   let controller: AbortController | undefined
   let state: ReportOperationReadState = { status: 'idle' }
-  function update(next: ReportOperationReadState) { state = next; options.onChange(next) }
+  function update(next: ReportOperationReadState) { state = detachedReadState(next); options.onChange(detachedReadState(state)) }
   return {
-    get state() { return state },
+    get state() { return detachedReadState(state) },
     reset() { ++generation; controller?.abort(); controller = undefined; update({ status: 'idle' }) },
     async load(ticket: ReportOperationTarget): Promise<boolean> {
       const target = { id: ticket.id, tenant_id: ticket.tenant_id, operation_id: ticket.operation_id }

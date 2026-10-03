@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 
 export interface AuditContext { tenantId: string; actorId: string; permissionVersion: number }
@@ -59,7 +60,7 @@ export function validateAuditFilters(value: AuditFilters): AuditFilters {
 export const emptyAuditState = (): AuditState => ({ page: null, filters: {}, pageSize: 15, paged: false, loading: false, error: null, proof: null, verifying: false, proofError: null })
 export function createAuditWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: AuditState) => void) {
   let scope: AuditContext | null = null, state = emptyAuditState(), listGeneration = 0, proofGeneration = 0, listAbort: AbortController | undefined, proofAbort: AbortController | undefined
-  const emit = () => changed({ ...state })
+  const emit = () => changed(detachedWorkspaceState(state))
   function reset(next: AuditContext | null) { listAbort?.abort(); proofAbort?.abort(); ++listGeneration; ++proofGeneration; scope = next && [next.tenantId, next.actorId].every(id => uuid.test(id)) && sequence(next.permissionVersion) ? { ...next } : null; state = emptyAuditState(); if (next && !scope) state.error = invalid(); emit() }
   async function load(filters: AuditFilters = state.filters, size = state.pageSize, next = false) {
     if (!scope || next && (!state.page?.has_more || state.loading)) return false
@@ -89,5 +90,5 @@ export function createAuditWorkspace(client: Pick<ApiClient, 'request'>, changed
     finally { if (generation === proofGeneration) { state = { ...state, verifying: false }; emit() } }
   }
   emit()
-  return { reset, load, next: () => load(state.filters, state.pageSize, true), verify, verifyNext: () => state.proof?.status === 'VALID' && state.proof.next_from_sequence && !state.verifying ? verify(state.proof.next_from_sequence) : Promise.resolve(false), state: () => state, dispose: () => reset(null) }
+  return { reset, load, next: () => load(state.filters, state.pageSize, true), verify, verifyNext: () => state.proof?.status === 'VALID' && state.proof.next_from_sequence && !state.verifying ? verify(state.proof.next_from_sequence) : Promise.resolve(false), state: () => detachedWorkspaceState(state), dispose: () => reset(null) }
 }

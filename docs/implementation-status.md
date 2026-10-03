@@ -1023,3 +1023,7 @@ V18队列/不可变行结果结构显式1/重复0/check0且26表不变，但13�
 ## 2026-10-03 另外七个写模块快照修复
 
 内部备注/客户评论/工时/日历/人工恢复/维保/手工事件原attempt共享问题，14回归先红后绿；全818Web构建70契约通过，原path/method/key/body不受展示副本污染。此轮没有新HTTP/业务写/组件/DOM，前16HTTP不重计，见docs/workspace-snapshot-isolation.md。
+
+## 2026-10-03 只读快照与审计游标隔离
+
+七个只读模块业务getter/回调和配置对照输入源数组已脱离内部已验快照；15缺陷回归先红后绿，18新增纳入836Web构建70契约。16真实GET覆盖已有列表/详情/对照/operation及末20条局部审计链VALID，无业务写/新样本，非全库或外部锚定，见docs/workspace-snapshot-isolation.md。

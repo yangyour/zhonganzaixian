@@ -1,0 +1,28 @@
+{
+  "verified_at": "2026-10-03T23:23:43.526Z",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "http_requests": 16,
+  "http_methods": [
+    "GET"
+  ],
+  "audit_rows": 15,
+  "audit_proof_status": "VALID",
+  "audit_verified_records": 20,
+  "audit_proof_externally_anchored": false,
+  "calendar_rows": 15,
+  "calendar_selected_snapshot_verified": true,
+  "manual_incident_rows": 15,
+  "incident_selected_snapshot_verified": true,
+  "metadata_query_rows": 15,
+  "configuration_comparison_and_input_source_detached": true,
+  "configuration_diagnostic_detached": true,
+  "existing_report_operation_verified": true,
+  "business_writes": 0,
+  "new_rows_created": 0,
+  "registry_entries": 415,
+  "registry_sha256_unchanged": "787f964e3c0ce3c0645026e73718bf45c99768874ce1fa1f6d9545fbc05eaee2",
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "contract_done": false
+}

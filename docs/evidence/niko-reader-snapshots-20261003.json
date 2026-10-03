@@ -1,0 +1,81 @@
+{
+  "verified_at": "2026-10-03T23:25:12.650656+00:00",
+  "scope": "READ_SNAPSHOT_PROOF_AND_CURSOR_ALIAS_ISOLATION",
+  "read_modules": [
+    "auditWorkspace",
+    "workingCalendarReader",
+    "manualIncidentReader",
+    "assetMetadataQuery",
+    "configurationComparison",
+    "configurationDiagnostic",
+    "reportOperation"
+  ],
+  "initial_regression": {
+    "tests": 179,
+    "failed": 15,
+    "passed": 164
+  },
+  "final_focused": {
+    "tests": 185,
+    "failed": 0
+  },
+  "new_tests": 18,
+  "web_tests_passed": 836,
+  "typecheck": "PASS",
+  "production_build": "PASS_WITH_EXISTING_CHUNK_SIZE_ADVISORY",
+  "minified_main_chunk_kb": 501.63,
+  "warning_threshold_increased": false,
+  "contracts": 70,
+  "generation_check": "PASS",
+  "getter_and_callback_business_fields_detached": true,
+  "comparison_source_array_detached": true,
+  "opaque_top_level_error_fields": [
+    "error",
+    "proofError"
+  ],
+  "http_evidence": "niko-reader-snapshot-client-http-20261003.json",
+  "http_requests": 16,
+  "business_writes": 0,
+  "actual_audit_verified_records": 20,
+  "actual_audit_status": "VALID",
+  "whole_database_chain_verified": false,
+  "externally_anchored": false,
+  "api_version": "0.33.0",
+  "api_restarted": false,
+  "v1_v19_changed": false,
+  "browser_dom_tested": false,
+  "contract_done": false,
+  "previous_writers_commit": {
+    "sha": "ac3c049421d97d1f9f90fd7784c33b4d1e4cf015",
+    "ci_run": 37161242225,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "apps/web/src/utils/auditWorkspace.ts": "3c2c5db4bf755cf83cfe522bcd4c628d424a53cd895afd5d354314ec10de28b3",
+    "apps/web/src/utils/workingCalendarReader.ts": "711b62f5a75453ea1f7b55dd996d650471471e24e7c19db1dddd91ed91764bcf",
+    "apps/web/src/utils/manualIncidentReader.ts": "99ddb912a7a9dc7f8a8a74b5012f8a1f341fe0f14b4f610d20ffea2dcbe8232e",
+    "apps/web/src/utils/assetMetadataQuery.ts": "4456b36b1fc927dd34876a545837418fd24a44499b3e19e7271b88644174c3a1",
+    "apps/web/src/utils/configurationComparison.ts": "8e1dbb0fd2437682b96c21a289dcf1f25c6bc2598ad3471a1698bc02170b6dc3",
+    "apps/web/src/utils/configurationDiagnostic.ts": "2b896af41fdac2f715fa49860fed4ca7088c8ba52597a187ea2451c1277774bb",
+    "apps/web/src/utils/reportOperation.ts": "c1dd79d2f29d6fc41120c721b6128886758b4dc7c3d58d34d223be6b442df682",
+    "apps/web/src/utils/detachedWorkspaceState.ts": "eb558bf93acc408699d7d3d7d4cd48c1de39043d3c987da5efbc87583d9f34c2",
+    "apps/web/tests/auditWorkspace.test.ts": "c563b39303246b28de5bd004565e126f45170ae05cd05aba5253f49b376b8adf",
+    "apps/web/tests/workingCalendarReader.test.ts": "c3c8ee0fc165f46e56187ede6845e48c0e20b19c0605835776eb4a3f3d907b85",
+    "apps/web/tests/manualIncidentReader.test.ts": "fde5d03c7efb158d7cae5d628ca2287dbe29a23ab987b4a0d82be944cfc3d2a8",
+    "apps/web/tests/assetMetadataQuery.test.ts": "4a2337bcf4ce8d17fac17972d12f72d915a414cb112fb5473dc17f88b21156b9",
+    "apps/web/tests/configurationComparison.test.ts": "282d66eac1247972a29e611e9651aa8aa5a8780f097787f7b6170637535fc461",
+    "apps/web/tests/configurationDiagnostic.test.ts": "bc6c58308a6daea21a4c870b59a116d7df8e4fc616466a5c925d36d967cd04a0",
+    "apps/web/tests/reportOperation.test.ts": "bf8d1bf1dc24188889519c03896d9eaa36b3724801c13e5aaf6566cceed7798d",
+    "apps/web/tests/detachedWorkspaceState.test.ts": "49cf0c98dc9eaccf3ec2962df380a14e7c439f85fbb83fdd8f16bb3ada0d9441",
+    "tools/build-reader-snapshot-client-test.mjs": "2bc704bd584634fd6dce92ccfcdaa20043eea96b5f1954366483d331324faf3f",
+    "tests/niko-reader-snapshot-client-http.mjs": "aa195b690b530381befc5287729b249ad28f8afff4dc2f0272aea86a2197f196"
+  },
+  "logs_sha256": {
+    ".local/niko-test/logs/reader-snapshots-red.log": "5ed81fb458f667fcd1619dd1f9879ad189a0e51f77fdf21a0ac9a4bc3855d554",
+    ".local/niko-test/logs/reader-snapshots-focused.log": "a0634243acab954e1e8152ce04f1dc5f4bb6c8de3312fb9cc342ad2ee97ad478",
+    ".local/niko-test/logs/reader-snapshots-web.log": "cf071d355d908d24c8c8a8283797aaae29c8b5f3ab9272f2148b46dbb210cae9",
+    ".local/niko-test/logs/reader-snapshots-build.log": "4dad36b8757961c1bb058a7081d5e13f0034ca4fb90fea17d0b366f4187f61be",
+    ".local/niko-test/logs/reader-snapshots-contract.log": "4835655e66f515c64f4526f2fff9020b37e2494a819e69b9ae2e83a4582cb924",
+    ".local/niko-test/logs/reader-snapshot-client-http.log": "38aa4430a84384ae2015bc4d5674dffdd87119f0d47bb6f0d58946293349378e"
+  }
+}

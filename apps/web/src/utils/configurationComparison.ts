@@ -1,3 +1,4 @@
+import { detachedReadState } from './detachedWorkspaceState'
 import type { Configuration, ConfigurationRevision } from '../api/types'
 
 export interface ConfigurationFilters {
@@ -134,9 +135,9 @@ export function createConfigurationComparisonReader(options: {
   let generation = 0
   let controller: AbortController | undefined
   let state: ConfigurationComparisonReadState = { status: 'idle' }
-  function update(next: ConfigurationComparisonReadState) { state = next; options.onChange(next) }
+  function update(next: ConfigurationComparisonReadState) { state = detachedReadState(next); options.onChange(detachedReadState(state)) }
   return {
-    get state() { return state },
+    get state() { return detachedReadState(state) },
     reset() { ++generation; controller?.abort(); update({ status: 'idle' }) },
     async load(key: string): Promise<boolean> {
       const current = ++generation

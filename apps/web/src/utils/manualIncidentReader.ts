@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { worklogInstant } from './worklogWorkspace'
 export const manualSeverityLabels = { disaster: '灾难', high: '严重', average: '一般', warning: '警告', info: '信息' } as const
@@ -21,7 +22,7 @@ export function readManualIncident(value: unknown, context: ManualIncidentContex
 export const emptyManualIncidentReadState = (): ManualIncidentReadState => ({ page: null, selected: null, busy: false, error: null, paged: false })
 export function createManualIncidentReader(client: Pick<ApiClient, 'request'>, changed: (value: ManualIncidentReadState) => void) {
   let scope: ManualIncidentContext | null = null, state = emptyManualIncidentReadState(), epoch = 0, abort: AbortController | undefined
-  const emit = () => changed({ ...state })
+  const emit = () => changed(detachedWorkspaceState(state))
   function reset(next: ManualIncidentContext | null) { abort?.abort(); ++epoch; const valid = next && uuid.test(next.tenantId) && uuid.test(next.actorId) && version(next.permissionVersion); scope = valid ? { ...next! } : null; state = emptyManualIncidentReadState(); if (next && !valid) state.error = bad(); emit() }
   async function run(action: (signal: AbortSignal, context: ManualIncidentContext) => Promise<Partial<ManualIncidentReadState>>, clear: Partial<ManualIncidentReadState>) {
     if (!scope) return false
@@ -46,5 +47,5 @@ export function createManualIncidentReader(client: Pick<ApiClient, 'request'>, c
     if (!uuid.test(id)) return Promise.resolve(false)
     return run(async (signal, context) => { const value = readManualIncident(await client.request<unknown>('/manual-incidents/' + id, { signal }), context); if (value.id !== id) throw bad(); return { selected: value } }, { selected: null })
   }
-  emit(); return { reset, list, select, state: () => state, dispose: () => reset(null) }
+  emit(); return { reset, list, select, state: () => detachedWorkspaceState(state), dispose: () => reset(null) }
 }

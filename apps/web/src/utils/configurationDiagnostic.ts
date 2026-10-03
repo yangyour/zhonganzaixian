@@ -1,3 +1,4 @@
+import { detachedReadState } from './detachedWorkspaceState'
 import { isUtcInstant } from './utcInstant'
 import { api, ApiError, isCancelled } from '../api/client'
 import type { ConfigurationDiagnostic, ConfigurationDiagnosticReasonCode, ConfigurationDiagnosticSource } from '../api/types'
@@ -80,9 +81,9 @@ export function createConfigurationDiagnosticReader(options: {
 }, client: Pick<typeof api, 'request'> = api) {
   let generation = 0, controller: AbortController | undefined
   let state: ConfigurationDiagnosticReadState = { status: 'idle' }
-  function update(next: ConfigurationDiagnosticReadState) { state = next; options.onChange(next) }
+  function update(next: ConfigurationDiagnosticReadState) { state = detachedReadState(next); options.onChange(detachedReadState(state)) }
   return {
-    get state() { return state },
+    get state() { return detachedReadState(state) },
     reset() { ++generation; controller?.abort(); controller = undefined; update({ status: 'idle' }) },
     async load(key: string): Promise<boolean> {
       const context = { ...options.context() }, epoch = ++generation

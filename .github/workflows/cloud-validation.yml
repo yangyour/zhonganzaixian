@@ -104,6 +104,7 @@ jobs:
               'cn.mop.persistence.PostgresWorkingCalendarSchemaIntegrationTest',
               'cn.mop.persistence.PostgresManualIncidentSchemaIntegrationTest',
               'cn.mop.persistence.PostgresManualRecoverySchemaIntegrationTest',
+              'cn.mop.persistence.PostgresManualRecoveryIntegrationTest',
               'cn.mop.persistence.PostgresManualIncidentIntegrationTest',
               'cn.mop.persistence.PostgresWorkingCalendarIntegrationTest',
               'cn.mop.persistence.PostgresTicketCommentIntegrationTest',

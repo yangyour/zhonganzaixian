@@ -1,0 +1,55 @@
+{
+  "verified_at": "2026-10-03T05:28:07.477363+00:00",
+  "environment": "niko-local-test",
+  "status": "HUMAN_RECOVERY_REPOSITORY_REAL_PG_VERIFIED",
+  "tests": {
+    "new_recovery_repository_real_pg": 14,
+    "root_reported": 794,
+    "root_executed": 781,
+    "real_pg": 256,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 37,
+    "web_tests": 454,
+    "typecheck_and_web_build": true,
+    "failures": 0,
+    "errors": 0
+  },
+  "initial_test_failure": "First test compilation rejected a compound var declaration; split the local declarations, reran all modules successfully, then repeated after readiness parent SELECT hardening. No migration was rewritten.",
+  "authorization": [
+    "Current active internal membership and permission version in same read snapshot",
+    "Membership/user SHARE locks during writes",
+    "Same-tenant MANUAL parent checked before cached receipt",
+    "Immutable parent read without new UPDATE grant; composite FK protects insertion"
+  ],
+  "transaction": [
+    "Per-parent advisory transaction lock plus unique tenant/incident constraint",
+    "Technical confirmation version 0->1; different-key old-version conflict",
+    "Original same-key receipt and no duplicate audit",
+    "Evidence, audit and receipt atomic; downstream rollback",
+    "Server-recorded millisecond timestamp; unknown reported recovery time null"
+  ],
+  "concurrency": {
+    "same_key_one_confirmation_and_audit": true,
+    "different_keys_one_winner_one_409": true
+  },
+  "original_registration_unchanged": true,
+  "ticket_count_unchanged": true,
+  "manual_human_status": "HUMAN_CONFIRMED",
+  "verification_status": "SELF_REPORTED",
+  "monitor_state": null,
+  "disposition_state": null,
+  "ticket_state_changed": false,
+  "sla_changed": false,
+  "synthetic_confirmations_committed": true,
+  "schema_zero_rows_is_historical": true,
+  "api_recovery_added": false,
+  "ui_recovery_added": false,
+  "api_version_unchanged": "0.19.0",
+  "contract_description_only_updated": true,
+  "legacy_page_labels_original_snapshot_not_current_recovery": true,
+  "browser_dom_tested": false,
+  "frozen_migrations_unchanged": "V1-V14",
+  "credentials_output": false,
+  "full_contract_done": false
+}

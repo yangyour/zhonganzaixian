@@ -174,3 +174,14 @@ V18 SHA256为75325f0423f788d5a71b71e0b1c8ba3b5c30e628aa3c588437f671954cbb39e9；
 各批自建作业保留终态；成功导入的自建联系人归档并保留历史，末次检查非终态作业0、未归档导入联系人0，无永久删除。新仓储实例/连接回读不当作进程重启证明；尚无公开202端点、独立Worker启动或真实HTTP/进程故障重启。本切片未修改API0.31/V1–V19，公开格式预览仍can_import=false，通知/存储/CSV/XLSX和M2-9整体验收待。
 
 结构8259d7 CI37145624801 success已回读，job111268832939实际输出58项PowerShell隔离保护通过、DB操作0，补齐前节待CI；见[仓储证据](evidence/niko-customer-contact-import-repository-20261003.json)。下一步独立Worker和202/回读接口，继续实际应用链路验收。
+
+
+## 2026-10-03 独立Worker与真实在途进程终止/恢复
+
+新增单独contact-imports可执行classifier，入口cn.mop.contactworker.ContactImportWorkerApplication不扫描其他应用，禁用自动DataSource/Flyway，不加载对象存储、OIDC或迁移凭据，只消费专用联系人队列。启动必须exact remote_test、MOP_CONTACT_IMPORT_WORKER_ENABLED=true、受限mop_test_runtime和无参数的已批准loopback/mop_test URL；其他Worker启用标志混用拒绝。默认30秒租期，可显式技术覆盖1秒–1小时；单线程领取/处理，空闲与依赖故障有界退避，依赖未知/关闭不报正常，未就绪不领取，停止后未退出的旧操作禁止另起同实例。
+
+新增7设置/8生命周期单元、7非执行ZIP/PID保护单元，根1224=1211执行（390真实PG）+13历史fixture跳过、6MinIO排除，94Python/64契约及生成一致性通过。Worker复制为每次启动独立只读hash JAR，并核对专用Start-Class；实际信号前再次核对UID、直接父PID、完整Java参数、exe路径、start ticks和固定artifact，不扫描端口后杀进程。启动环境仅传3项已有runtime数据库连接与明确profile/技术flag，不继承存储、OIDC、迁移秘密或代理配置。未创建新凭据/身份授权。
+
+真实进程验证运行3次同一固定JAR：正常Worker完成3条后SIGTERM退出143；第二次以真实测试租户guard行锁确保作业已领取且进程确实等待PG Lock，再仅对已核验自有JVM发SIGKILL，退出-9。终止后耐久作业仍LEASED/fence1，联系人/结果部分行均0；释放测试锁后启动第三个相同JAR，3秒租期到期自动重领fence2/attempt2，完整完成3条，无重复创建，源摘要不变。再原键回读仍得到PENDING/v1原受理收据；当前结果另读SUCCEEDED。全部6条自建联系人随后归档保历史、两作业留终态。用户/成员、报障outbox、照片job、资产来源job的5表指纹前后相同；API未重启，PG/KC与原服务器均未停止或改配置。
+
+受理通过真实仓储Java探针完成，不冒充公开202 HTTP；本次是实际Worker进程在途终止/重启，不是单纯对象重建或客户端丢包。API0.31/V1–V19保持，公开导入HTTP/UI、CSV/XLSX、通知/Q14及M2-9整体验收仍待；浏览器B03未解除。仓储69fbb43 CI37147330694 success已回读，见[Worker证据](evidence/niko-contact-import-worker-20261003.json)、[真实进程故障证据](evidence/niko-contact-import-worker-process-20261003.json)。

@@ -55,6 +55,7 @@ jobs:
           python3 -m unittest discover -s tools -p test_niko_oss_config.py -v
           python3 -m unittest discover -s tools -p test_niko_fault_guards.py -v
           python3 -m unittest discover -s tools -p test_niko_api_artifact.py -v
+          python3 -m unittest discover -s tools -p test_niko_contact_worker.py -v
 
   backend:
     name: Backend compile, unit tests and packaging

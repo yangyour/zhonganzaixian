@@ -12,10 +12,11 @@
   <build><plugins>
     <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><executions><execution>
       <id>import-plain-jar</id><phase>package</phase><goals><goal>jar</goal></goals><configuration><classifier>imports</classifier><forceCreation>true</forceCreation></configuration>
-    </execution></executions></plugin>
+    </execution><execution><id>contact-import-plain-jar</id><phase>package</phase><goals><goal>jar</goal></goals><configuration><classifier>contact-imports</classifier><forceCreation>true</forceCreation></configuration></execution></executions></plugin>
     <plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId><executions>
       <execution><id>repackage</id><goals><goal>repackage</goal></goals><configuration><mainClass>cn.mop.worker.WorkerApplication</mainClass></configuration></execution>
       <execution><id>repackage-imports</id><goals><goal>repackage</goal></goals><configuration><classifier>imports</classifier><mainClass>cn.mop.importworker.AssetImportWorkerApplication</mainClass></configuration></execution>
+      <execution><id>repackage-contact-imports</id><goals><goal>repackage</goal></goals><configuration><classifier>contact-imports</classifier><mainClass>cn.mop.contactworker.ContactImportWorkerApplication</mainClass></configuration></execution>
     </executions></plugin>
   </plugins></build>
 </project>

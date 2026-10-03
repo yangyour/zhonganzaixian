@@ -165,3 +165,8 @@ V1–V14全部字节冻结，V14 SHA256为39be55d8759de87c6e2b8f85b3958c60be24ae
 ## 2026-10-03 联系人导入结构
 
 仅niko重建PG显式执行V18再V19，分别使用--apply-contact-imports和--apply-contact-import-fix，每次独立1、重复0、--check只读0。V19修复V18生成列在BEFORE触发器中的误比较，冻结V1–V19，下一修正V20+。26/28旧表等值指纹与13真实runtime结构回归通过，原服务器未执行；API仍0.31、没有业务导入作业执行，见docs/customer-contacts.md。
+
+
+## 联系人Worker验证入口
+
+根构建产出server/worker/target/mop-worker-0.1.0-SNAPSHOT-contact-imports.jar；仅显式开启MOP_CONTACT_IMPORT_WORKER_ENABLED=true，remote_test，复用私有runtime的3项受限PG连接。tools/niko-test/start-contact-worker.py要求先准备的独立固定artifact和明确租期，不初始化组件或自动迁移。tools/niko-test/verify-contact-worker.py --verify-owned-contact-worker只在自己的niko作用域进行一次实际进程证明；已有控制文件或证据时拒绝重复启动。验证使用真实仓储受理，6条合成联系人已归档，job历史保留，不等于公开HTTP或DOM。见联系人Worker证据。

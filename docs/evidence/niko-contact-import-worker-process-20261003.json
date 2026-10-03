@@ -1,0 +1,71 @@
+{
+  "verified_at": "2026-10-03T19:39:33.200031+00:00",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "scope": "ACTUAL_CONTACT_IMPORT_WORKER_PROCESS_NORMAL_AND_INFLIGHT_KILL_RESTART",
+  "worker_artifact_sha256": "1287831041dafc852fb13ca180fce19841d01e923e1b1fe90f7d282bbfe6910f",
+  "start_class": "cn.mop.contactworker.ContactImportWorkerApplication",
+  "owned_process_identity_checks": [
+    "uid",
+    "direct_parent",
+    "exact_java_argv",
+    "exe_path",
+    "start_ticks",
+    "immutable_pinned_jar_hash_and_manifest"
+  ],
+  "lease_millis": 3000,
+  "normal": {
+    "attempts": 1,
+    "rows": 3,
+    "graceful_exit": 143
+  },
+  "crash": {
+    "real_pg_guard_lock_wait_observed": true,
+    "signal": "SIGKILL",
+    "exit_code": -9,
+    "retained_state": "LEASED",
+    "partial_contact_rows": 0,
+    "partial_result_rows": 0,
+    "recovered_fencing_token": 2,
+    "recovered_attempts": 2,
+    "completed_rows": 3,
+    "graceful_restart_exit": 143
+  },
+  "source_hash_preserved": true,
+  "original_acceptance_receipt_stays_pending_version_one": true,
+  "created_synthetic_contacts": 6,
+  "owned_contacts_archived": 6,
+  "jobs_retained_terminal": true,
+  "unrelated_fingerprints_unchanged": {
+    "action": "fingerprints",
+    "mop_user": {
+      "rows": 76,
+      "equality_sha256": "4fca7f122708b0c6bee7b807bc5355c894d2a58fc0457a6c86e56d1bd8056eac"
+    },
+    "mop_membership": {
+      "rows": 149,
+      "equality_sha256": "d07335c0dbaf086c5f03d9483e654ce931ad4a2c1bf58466e663b799462b0eb5"
+    },
+    "mop_outbox": {
+      "rows": 1191,
+      "equality_sha256": "d8cb551d287742375fe570cbc2391a80f3b281485d85e71b7325aab1a593c92c"
+    },
+    "mop_photo_job": {
+      "rows": 434,
+      "equality_sha256": "b3b09962a9dedcad04f52604071d45e8fda6620adda4199a007b17b38802704c"
+    },
+    "mop_asset_import_job": {
+      "rows": 448,
+      "equality_sha256": "357e7ae4bcd96176548c56e2c70604ded56778dd4740c685e3b511e74e284cc1"
+    }
+  },
+  "new_credentials_or_identity_grants": false,
+  "storage_used": false,
+  "notification_sent": false,
+  "schema_migrations_executed": 0,
+  "api_restarted": false,
+  "public_202_http_tested": false,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "contract_done": false
+}

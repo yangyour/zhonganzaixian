@@ -1,18 +1,23 @@
-// Real niko PG/OIDC API checks. No storage adapter, fixture route, browser or migration is invoked.
+// Real PG/OIDC API checks in an explicitly named environment. No storage adapter, fixture route or migration.
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 const root=new URL('../',import.meta.url);
 let stage='initialization';
 try {
+  const environment=process.env.MOP_HTTP_ENVIRONMENT??'niko-local-test';
+  assert.ok(['niko-local-test','designated-server'].includes(environment));
+  const sessionDirectory=environment==='designated-server'?'.local/designated-test/private/sessions/':'.local/niko-test/private/sessions/';
+  const evidenceFile=new URL(environment==='designated-server'?'docs/evidence/local-manual-warranty-api-http-20261003.json':'docs/evidence/niko-manual-warranty-api-http-20261003.json',root);
+  assert.equal(existsSync(evidenceFile),false,'Evidence already exists; refuse a duplicate mutation run');
   const contract=JSON.parse(readFileSync(new URL('contracts/local-api.openapi.json',root),'utf8'));assert.equal(contract.info.version,'0.26.0');
   const ajv=new Ajv({strict:false,allErrors:true});addFormats(ajv);ajv.addSchema({$id:'urn:mop:warranty-http',components:contract.components});
   const validators=new Map(),checks=[],traces=new Map();
   const sessions=Object.fromEntries(['msp','tadmin','viewerA','viewerB','padmin','reviewer'].map(role=>{
-    const session=JSON.parse(readFileSync(new URL(`.local/niko-test/private/sessions/qa-${role}.json`,root),'utf8'));
-    assert.equal(session.environment,'niko-local-test');return [role,session];
+    const session=JSON.parse(readFileSync(new URL(`${sessionDirectory}qa-${role}.json`,root),'utf8'));
+    assert.equal(session.environment,environment);return [role,session];
   }));
   async function request(role,method,path,route,expected,name,body,options={}){
     stage=name;const headers={'Content-Type':'application/json'};
@@ -63,6 +68,6 @@ try {
   const allAudit=(await request('padmin','GET','/audit/records?resource_id='+asset.id+'&page_size=100','/audit/records',200,'only_successful_atomic_audits')).value.items;const mutations=allAudit.filter(x=>['asset.manual_metadata.update','asset.manual_warranty.update'].includes(x.action));assert.equal(mutations.length,11);for(const name of ['original_warranty_exact_replay','old_legacy_receipt_unchanged_after_warranty','old_warranty_receipt_unchanged_after_clear'])assert.equal(mutations.filter(x=>x.trace_id===traces.get(name)).length,0);
   const tail=(await request('padmin','GET','/audit/records?page_size=10','/audit/records',200,'readonly_tail_before')).value.snapshot_sequence;await request('msp','GET',path,route,200,'readonly_current');await request('msp','GET',path+'/history',history,200,'readonly_history');await request('msp','GET',legacyPath,legacyRoute,200,'legacy_dto_still_exact');assert.equal((await request('padmin','GET','/audit/records?page_size=10','/audit/records',200,'readonly_tail_after')).value.snapshot_sequence,tail);
   assert.equal(latest.asset.management_ip,asset.management_ip);assert.equal(latest.asset.status,'unknown');assert.equal(latest.asset.availability,'UNKNOWN');assert.equal(latest.asset.sampled_at,null);assert.equal(latest.warranty_coverage_verified,false);assert.equal(latest.warranty_supplier_verification,'UNVERIFIED');
-  const evidence={verified_at:new Date().toISOString(),environment:'niko-local-test',passed:true,contract_version:contract.info.version,http_requests:checks.length,checks,synthetic_assets:1,durable_metadata_revisions:11,successful_metadata_and_warranty_audits:11,mixed_concurrency_statuses:[200,409],history_pages:[10,1],original_legacy_and_warranty_receipts_preserved:true,legacy_request_preserves_supplementals:true,explicit_clear_stays_declared:true,legacy_public_dto_unchanged:true,invalid_expiry_rolled_back:true,readonly_audit_tail_unchanged:true,authorized_tenant_switches:2,warranty_coverage_verified:false,supplier_verified:false,hazard_created:false,notification_sent:false,browser_dom_tested:false,credentials_output:false,remaining:['Dedicated warranty UI and DOM B03','Supplier evidence/coverage verification','Hazard and notification workflow and quarterly export']};
-  writeFileSync(new URL('docs/evidence/niko-manual-warranty-api-http-20261003.json',root),JSON.stringify(evidence,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({passed:true,http_requests:checks.length,metadata_revisions:11}));
+  const evidence={verified_at:new Date().toISOString(),environment,passed:true,contract_version:contract.info.version,http_requests:checks.length,checks,synthetic_assets:1,durable_metadata_revisions:11,successful_metadata_and_warranty_audits:11,mixed_concurrency_statuses:[200,409],history_pages:[10,1],original_legacy_and_warranty_receipts_preserved:true,legacy_request_preserves_supplementals:true,explicit_clear_stays_declared:true,legacy_public_dto_unchanged:true,invalid_expiry_rolled_back:true,readonly_audit_tail_unchanged:true,authorized_tenant_switches:2,warranty_coverage_verified:false,supplier_verified:false,hazard_created:false,notification_sent:false,browser_dom_tested:false,credentials_output:false,remaining:['Dedicated warranty UI and DOM B03','Supplier evidence/coverage verification','Hazard and notification workflow and quarterly export']};
+  writeFileSync(evidenceFile,JSON.stringify(evidence,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({passed:true,http_requests:checks.length,metadata_revisions:11}));
 }catch{console.error(JSON.stringify({status:'failed',stage,details:'redacted'}));process.exitCode=1;}

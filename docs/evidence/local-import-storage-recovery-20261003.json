@@ -1,0 +1,29 @@
+{
+  "verified_at": "2026-10-03T10:45:21.011Z",
+  "environment": "designated-server",
+  "passed": true,
+  "scope": "owned_local_minio_forward_only",
+  "remote_service_changes": false,
+  "credentials_output": false,
+  "readiness_status": 503,
+  "while_disconnected": {
+    "status": "PENDING",
+    "step": "RETRY_WAIT",
+    "operation_id": "f42c2753-6ae8-4f5f-9e5d-486945d1cca0"
+  },
+  "forward_restored": true,
+  "recovered": {
+    "operation_id": "f42c2753-6ae8-4f5f-9e5d-486945d1cca0",
+    "status": "SUCCEEDED",
+    "step": "PARSED",
+    "parsed_rows": 1,
+    "raw_sha256_verified": true,
+    "readiness_status": 200
+  },
+  "real_pipeline": "PostgreSQL durable job / original MinIO source / standalone parser process / PostgreSQL parsed artifact",
+  "remaining": [
+    "In-flight parser kill and lease fencing",
+    "OSS adapter authentication",
+    "Formal business import after Q20/Q31"
+  ]
+}

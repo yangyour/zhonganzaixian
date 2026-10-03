@@ -129,4 +129,23 @@ Check-Ownership 'proved child survives parent exit; unproved child is rejected' 
         $parent.parser_children = @(); Require-Rejected { Get-MopImportParserCandidates -ParentRecord $parent -ProjectRoot $projectRoot }
     } finally { $script:fakeProcesses[44123] = $parentProcess; $parent.parser_children = @() }
 }
+Check-Ownership 'system console helper is ignored without becoming an owned parser' {
+    $script:fakeInfos[44126] = [pscustomobject]@{ ProcessId=44126; ParentProcessId=44123; Name='conhost.exe'; ExecutablePath=(Join-Path ([Environment]::GetFolderPath('Windows')) 'System32/conhost.exe'); CommandLine='MOP-FAKE console helper' }
+    try {
+        $found = @(Get-MopImportParserCandidates -ParentRecord $parent -ProjectRoot $projectRoot)
+        if ($found.Count -ne 1 -or $found[0].id -ne 44125) { throw 'Console helper was adopted as a parser' }
+    } finally { $script:fakeInfos.Remove(44126) }
+}
+Check-Ownership 'console basename in another path, missing image and foreign parent remain untrusted' {
+    $info = [pscustomobject]@{ ProcessId=44126; ParentProcessId=44123; Name='conhost.exe'; ExecutablePath='C:\MOP-FAKE\conhost.exe'; CommandLine='MOP-FAKE lookalike' }
+    $script:fakeInfos[44126] = $info
+    try {
+        Require-Rejected { Get-MopImportParserCandidates -ParentRecord $parent -ProjectRoot $projectRoot }
+        $info.ExecutablePath=$null
+        Require-Rejected { Get-MopImportParserCandidates -ParentRecord $parent -ProjectRoot $projectRoot }
+        $info.ExecutablePath=Join-Path ([Environment]::GetFolderPath('Windows')) 'System32/conhost.exe'
+        $info.ParentProcessId=99999
+        if (Test-MopImportConsoleHost -ProcessInfo $info -ParentRecord $parent) { throw 'Foreign console helper trusted' }
+    } finally { $script:fakeInfos.Remove(44126) }
+}
 Write-Host "MOP_OWNERSHIP_TEST status=PASS isolated_checks=$script:checks fake_process_queries=$script:processQueries fake_cim_queries=$script:cimQueries actual_process_actions=0"

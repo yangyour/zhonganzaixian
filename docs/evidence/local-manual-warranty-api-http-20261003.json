@@ -1,0 +1,523 @@
+{
+  "verified_at": "2026-10-03T10:30:12.467Z",
+  "environment": "designated-server",
+  "passed": true,
+  "contract_version": "0.26.0",
+  "http_requests": 97,
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_synthetic_asset",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unrecorded_details_null",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_base_metadata_legacy_body",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "first_warranty_declaration",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_warranty_exact_replay",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_changed_body",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "legacy_body_preserves_supplemental_fields",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "supplemental_fields_survive_old_update",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "legacy_expiry_cannot_precede_preserved_start",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_expiry_rollback",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "explicit_clear_is_declaration",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "legacy_after_clear_keeps_declaration",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "declared_null_not_unrecorded",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "old_legacy_receipt_unchanged_after_warranty",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "old_warranty_receipt_unchanged_after_clear",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "replays_do_not_reset_current",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "shared_immutable_history_with_supplementals",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "version_keyset",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "stale_version_conflict",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_read_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_write_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_history_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_read_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_write_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_history_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_read_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_write_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_history_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_read",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "csrf_required",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "idempotency_required",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_asset_in_own_scope",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_read_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_history_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_write_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "switch_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "replay_from_other_tenant_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "restore_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "forbidden_field_tenant_id",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "forbidden_field_actor_id",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "forbidden_field_management_ip",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "forbidden_field_source",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "forbidden_field_monitoring_applied",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "forbidden_field_warranty_coverage_verified",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "forbidden_field_brand",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_explicit_expected_version",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_explicit_warranty_start",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_explicit_warranty_expiry",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_explicit_warranty_supplier",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_explicit_overdue_service_date",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_explicit_note",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_body_57",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_body_58",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_body_59",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_body_60",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_body_61",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_body_62",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_body_63",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_body_64",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_body_65",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_body_66",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_body_67",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_body_68",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_json_69",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_json_70",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_json_71",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_json_72",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "history_query_73",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "history_query_74",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "history_query_75",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "history_query_76",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "history_query_77",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "read_query_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "write_query_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "concurrent_warranty",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "concurrent_legacy",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "current_after_mixed_race",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_boundary_revision_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_boundary_revision_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_boundary_revision_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_boundary_revision_3",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "ten_history_rows_no_more",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "eleventh_history_revision",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_ten_plus_one_first_page",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_ten_plus_one_tail",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "only_successful_atomic_audits",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_tail_before",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_current",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_history",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "legacy_dto_still_exact",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_tail_after",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "synthetic_assets": 1,
+  "durable_metadata_revisions": 11,
+  "successful_metadata_and_warranty_audits": 11,
+  "mixed_concurrency_statuses": [
+    200,
+    409
+  ],
+  "history_pages": [
+    10,
+    1
+  ],
+  "original_legacy_and_warranty_receipts_preserved": true,
+  "legacy_request_preserves_supplementals": true,
+  "explicit_clear_stays_declared": true,
+  "legacy_public_dto_unchanged": true,
+  "invalid_expiry_rolled_back": true,
+  "readonly_audit_tail_unchanged": true,
+  "authorized_tenant_switches": 2,
+  "warranty_coverage_verified": false,
+  "supplier_verified": false,
+  "hazard_created": false,
+  "notification_sent": false,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "Dedicated warranty UI and DOM B03",
+    "Supplier evidence/coverage verification",
+    "Hazard and notification workflow and quarterly export"
+  ]
+}

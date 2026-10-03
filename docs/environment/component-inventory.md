@@ -135,3 +135,7 @@
 # 2026-10-03 本地复核补充
 
 当前 Windows 可通过固定主机键 SSH 访问原指定组件；实读 PostgreSQL17.9、Keycloak26.2.4、MinIO RELEASE.2025-09-07T16-13-09Z，PG已有 `und-x-icu`。原项目 `mop_test` 从V6逐功能升级到V15，运行/迁移角色及其他项目隔离不变，未改服务生命周期或全局配置。每功能1次、重复0次、最终只读0次；见[本地迁移记录](../local-schema-continuation.md)与[结构证据](../evidence/local-schema-v15-20261003.json)。用途是承接新增工时、资料、评论、日历和人工事件等真实业务验证，结构通过本身不等于这些功能联调完成。云端B01、OSS受控认证及外部监控/通知缺口仍保留其原范围。
+
+## 2026-10-03 本地应用与完整存储流水线
+
+原指定PG17.9/Keycloak26.2.4/MinIO的API、照片Worker、导入Worker均已实际启动；295PG、6MinIO、六OIDC及97维保HTTP已验。原文件在真实PG受理、MinIO存储、独立解析子进程解析；本项目回环存储断链进入RETRY_WAIT、恢复后同一任务完成。用途与状态已从仅组件可访问推进到上述明确范围的真实业务验证；Redis/RabbitMQ业务集成、监控/通知/堡垒机、OSS受控凭据仍沿用缺口，未擅装替代组件。就绪仍不虚称Worker活性，任务执行证据另见[本地记录](../local-runtime-validation-20261003.md)。

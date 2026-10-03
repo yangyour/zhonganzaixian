@@ -1,0 +1,31 @@
+{
+  "verified_at": "2026-10-03T10:44:17.828Z",
+  "environment": "designated-server",
+  "passed": true,
+  "queued_source_id": "ce625866-f28b-4e06-88ae-9817353ecce9",
+  "queued_before": {
+    "storage": "PENDING",
+    "operation": "PENDING",
+    "step": "QUEUED"
+  },
+  "after_restart": {
+    "storage": "READY",
+    "operation": "SUCCEEDED",
+    "step": "STORED"
+  },
+  "old_session_status": 401,
+  "fresh_real_oidc_same_actor": true,
+  "original_acceptance_replayed": true,
+  "completed_xlsx_and_mapping_unchanged": true,
+  "warranty_snapshot_unchanged": true,
+  "previous_api_pid": 48604,
+  "current_api_pid": 44924,
+  "remote_components_restarted": false,
+  "migrations_executed": 0,
+  "credentials_output": false,
+  "remaining": [
+    "In-flight parser termination and lease fencing end-to-end",
+    "Remote database/WAL crash or restore",
+    "OSS adapter authentication"
+  ]
+}

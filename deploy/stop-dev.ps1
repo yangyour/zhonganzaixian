@@ -28,6 +28,7 @@ foreach ($record in $state.processes) {
     # An unproved child created during the stop race is retained for review, never killed by name.
     $knownIds = @($record.parser_children | ForEach-Object { [long]$_.id })
     foreach ($processInfo in @(Get-CimInstance Win32_Process -Filter "ParentProcessId = $([int]$record.id)" -ErrorAction Stop)) {
+        if (Test-MopImportConsoleHost -ProcessInfo $processInfo -ParentRecord $record) { continue }
         if ([long]$processInfo.ProcessId -notin $knownIds) { throw '停止父进程后发现未事前证明的解析候选；保留启动记录，拒绝继续停止。' }
     }
     foreach ($child in @($record.parser_children)) { $null = Get-MopOwnedImportParserProcess -Record $child -ParentRecord $record -ProjectRoot $projectRoot }

@@ -1,0 +1,50 @@
+{
+  "verified_at": "2026-10-03T10:53:20.380682+00:00",
+  "environment": "designated-server-via-SSH-from-Windows",
+  "versions": {
+    "postgresql": "17.9",
+    "keycloak": "26.2.4",
+    "minio": "RELEASE.2025-09-07T16-13-09Z",
+    "java": "17.0.20",
+    "node": "22.22.1",
+    "maven": "3.9.6"
+  },
+  "junit": {
+    "tests": 968,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 13,
+    "executed": 955,
+    "real_postgresql": 295,
+    "real_minio": 6
+  },
+  "run_boundary": "Initial full verify stopped after one UTC text assertion failure in persistence. Corrected suite independently passed 8 tests, then remaining reactor modules verified. Counts are deduplicated final JUnit suite results, not a claim of a single clean full run.",
+  "contracts": 51,
+  "web_tests": 574,
+  "web_typecheck_build": true,
+  "process_ownership_isolated_checks": 14,
+  "real_oidc_identities": 6,
+  "warranty_http_requests": 97,
+  "startup": {
+    "api": true,
+    "photo_worker": true,
+    "asset_import_worker": true,
+    "mode": "remote_test",
+    "durable": true,
+    "photos_ready": true,
+    "imports_ready": true,
+    "worker_activity_claim": "NOT_PROBED; actual processing separately observed in import evidence"
+  },
+  "initial_startup_failure": "Healthy V15 readiness response exceeded legacy one-second launcher timeout; 5-second request timeout and 90-second overall deadline verified by actual restart.",
+  "initial_stop_failure": "Exact Windows System32 conhost child rejected as unknown parser; now excluded from parser adoption and never explicitly killed. Arbitrary or lookalike children still rejected.",
+  "evidence": [
+    "local-recovery-timezone-20261003.json",
+    "local-manual-warranty-api-http-20261003.json",
+    "local-import-restart-20261003.json",
+    "local-import-storage-recovery-20261003.json"
+  ],
+  "remote_services_restarted": false,
+  "private_files_tracked": false,
+  "all_128_done": false,
+  "credentials_output": false
+}

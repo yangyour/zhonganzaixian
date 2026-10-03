@@ -71,6 +71,17 @@ function Get-MopOwnedImportParserProcess {
     return $running
 }
 
+function Test-MopImportConsoleHost {
+    param([Parameter(Mandatory)]$ProcessInfo, [Parameter(Mandatory)]$ParentRecord)
+    # Start-Process on Windows can attach a system console host directly to Java.
+    # It is not a parser and must never be adopted or explicitly terminated here.
+    $windows = [Environment]::GetFolderPath('Windows')
+    if (-not $windows -or $ParentRecord.name -ne 'asset-import-worker' -or
+        [long]$ProcessInfo.ParentProcessId -ne [long]$ParentRecord.id -or
+        $ProcessInfo.Name -ine 'conhost.exe' -or -not $ProcessInfo.ExecutablePath) { return $false }
+    return ([string]$ProcessInfo.ExecutablePath).Equals((Join-Path $windows 'System32/conhost.exe'), [StringComparison]::OrdinalIgnoreCase)
+}
+
 function Get-MopImportParserCandidates {
     param([Parameter(Mandatory)]$ParentRecord, [Parameter(Mandatory)][string]$ProjectRoot)
     if ($ParentRecord.name -ne 'asset-import-worker') { throw '仅允许核验资产导入 Worker 的解析子进程。' }
@@ -83,6 +94,7 @@ function Get-MopImportParserCandidates {
     $parent = Get-MopOwnedProcess -Record $ParentRecord -ProjectRoot $ProjectRoot
     $current = @(Get-CimInstance Win32_Process -Filter "ParentProcessId = $([int]$ParentRecord.id)" -ErrorAction Stop)
     foreach ($processInfo in $current) {
+        if (Test-MopImportConsoleHost -ProcessInfo $processInfo -ParentRecord $ParentRecord) { continue }
         if (@($records | Where-Object { [long]$_.id -eq [long]$processInfo.ProcessId }).Count) { continue }
         if (-not $parent) { throw '发现未在父进程存活时记录的解析候选，保留启动记录并拒绝停止。' }
         $null = Get-MopOwnedProcess -Record $ParentRecord -ProjectRoot $ProjectRoot

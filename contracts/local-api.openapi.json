@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.32.0",
+    "version": "0.33.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -6786,6 +6786,174 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ExplicitOperationalResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/monitoring/threshold-diagnostics": {
+      "post": {
+        "operationId": "analyzeExplicitThresholdCandidates",
+        "summary": "只读诊断显式阈值候选方向、单位及恢复交集，不保存或发布",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThresholdCandidateInput"
+              }
+            }
+          }
+        },
+        "x-mop-read-only": true,
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-capability": "configurations:read",
+        "x-mop-max-body-bytes": 16384,
+        "x-mop-max-json-depth": 3,
+        "x-mop-max-json-tokens": 256,
+        "x-mop-reject-duplicate-json-keys": true,
+        "description": "当前平台配置管理员先于输入解析重新授权；全部query、租户和发布字段覆盖拒绝。显式null保持未定，负持续时间为CONFLICT，形状错误400。CONSISTENT仅数学一致，publishable=false/effective_rule=null/监控未应用；不查询当前规则/监控/客户资料，不创建草稿、作业或审计成功写入。只读POST无需幂等键，仍要求CSRF。",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThresholdDiagnosticResult"
                 }
               }
             }
@@ -23002,6 +23170,391 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/InternalTicketNotePage"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ThresholdCandidateCondition": {
+        "type": "object",
+        "properties": {
+          "comparison": {
+            "enum": [
+              null,
+              "GT",
+              "GE",
+              "LT",
+              "LE"
+            ]
+          },
+          "threshold": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$",
+            "not": {
+              "type": "string",
+              "pattern": "^-0(?:\\.0+)?$"
+            },
+            "description": "精确十进制字符串，最多40位整数/40位小数；null未定，不自动置零；拒绝指数与负零"
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 32,
+            "description": "明确单位标签，拒绝空白/控制字符/无效Unicode；不换算、不补默认或认定别名相同"
+          }
+        },
+        "required": [
+          "comparison",
+          "threshold",
+          "unit"
+        ],
+        "additionalProperties": false
+      },
+      "ThresholdCandidateInput": {
+        "type": "object",
+        "properties": {
+          "direction": {
+            "enum": [
+              null,
+              "HIGH_IS_BAD",
+              "LOW_IS_BAD"
+            ]
+          },
+          "warning": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ThresholdCandidateCondition"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "critical": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ThresholdCandidateCondition"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recovery": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ThresholdCandidateCondition"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trigger_hold_seconds": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$",
+            "not": {
+              "type": "string",
+              "pattern": "^-0(?:\\.0+)?$"
+            },
+            "description": "精确十进制字符串，最多40位整数/40位小数；null未定，不自动置零；拒绝指数与负零"
+          },
+          "recovery_hold_seconds": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$",
+            "not": {
+              "type": "string",
+              "pattern": "^-0(?:\\.0+)?$"
+            },
+            "description": "精确十进制字符串，最多40位整数/40位小数；null未定，不自动置零；拒绝指数与负零"
+          }
+        },
+        "required": [
+          "direction",
+          "warning",
+          "critical",
+          "recovery",
+          "trigger_hold_seconds",
+          "recovery_hold_seconds"
+        ],
+        "additionalProperties": false
+      },
+      "ThresholdDiagnostic": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source": {
+            "const": "EXPLICIT_INPUT"
+          },
+          "scope": {
+            "const": "EXPLICIT_PREDICATE_DIAGNOSTIC_ONLY"
+          },
+          "analysis_version": {
+            "const": "threshold-half-lines-v1"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/ThresholdCandidateInput"
+          },
+          "status": {
+            "enum": [
+              "CONSISTENT",
+              "UNRESOLVED",
+              "CONFLICT"
+            ]
+          },
+          "direction_consistent": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "critical_strict_subset_of_warning": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "recovery_overlaps_warning": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "recovery_overlaps_critical": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "durations_nonnegative": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "issues": {
+            "type": "array",
+            "maxItems": 15,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "enum": [
+                    "DIRECTION_MISSING",
+                    "WARNING_CONDITION_INCOMPLETE",
+                    "CRITICAL_CONDITION_INCOMPLETE",
+                    "RECOVERY_CONDITION_INCOMPLETE",
+                    "UNIT_MISMATCH",
+                    "WARNING_DIRECTION_CONFLICT",
+                    "CRITICAL_DIRECTION_CONFLICT",
+                    "RECOVERY_DIRECTION_CONFLICT",
+                    "CRITICAL_NOT_STRICTER_THAN_WARNING",
+                    "RECOVERY_OVERLAPS_WARNING",
+                    "RECOVERY_OVERLAPS_CRITICAL",
+                    "TRIGGER_DURATION_MISSING",
+                    "RECOVERY_DURATION_MISSING",
+                    "NEGATIVE_TRIGGER_DURATION",
+                    "NEGATIVE_RECOVERY_DURATION"
+                  ]
+                },
+                "kind": {
+                  "enum": [
+                    "UNRESOLVED",
+                    "CONFLICT"
+                  ]
+                }
+              },
+              "required": [
+                "code",
+                "kind"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "publishable": {
+            "const": false
+          },
+          "effective_rule": {
+            "type": "null"
+          },
+          "customer_confirmation": {
+            "const": "UNVERIFIED"
+          },
+          "physical_range_check": {
+            "const": "NOT_RUN"
+          },
+          "units_converted": {
+            "const": false
+          },
+          "monitoring_applied": {
+            "const": false
+          },
+          "time_series_evaluated": {
+            "const": false
+          },
+          "rule_saved": {
+            "const": false
+          },
+          "writes_performed": {
+            "const": false
+          },
+          "tenant_authorization": {
+            "const": "CURRENT_MEMBERSHIP_VERIFIED"
+          }
+        },
+        "required": [
+          "tenant_id",
+          "source",
+          "scope",
+          "analysis_version",
+          "inputs",
+          "status",
+          "direction_consistent",
+          "critical_strict_subset_of_warning",
+          "recovery_overlaps_warning",
+          "recovery_overlaps_critical",
+          "durations_nonnegative",
+          "issues",
+          "publishable",
+          "effective_rule",
+          "customer_confirmation",
+          "physical_range_check",
+          "units_converted",
+          "monitoring_applied",
+          "time_series_evaluated",
+          "rule_saved",
+          "writes_performed",
+          "tenant_authorization"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "status": {
+                "const": "CONSISTENT"
+              },
+              "direction_consistent": {
+                "const": true
+              },
+              "critical_strict_subset_of_warning": {
+                "const": true
+              },
+              "recovery_overlaps_warning": {
+                "const": false
+              },
+              "recovery_overlaps_critical": {
+                "const": false
+              },
+              "durations_nonnegative": {
+                "const": true
+              },
+              "issues": {
+                "maxItems": 0
+              }
+            }
+          },
+          {
+            "properties": {
+              "status": {
+                "const": "UNRESOLVED"
+              },
+              "direction_consistent": {
+                "enum": [
+                  true,
+                  null
+                ]
+              },
+              "critical_strict_subset_of_warning": {
+                "enum": [
+                  true,
+                  null
+                ]
+              },
+              "recovery_overlaps_warning": {
+                "enum": [
+                  false,
+                  null
+                ]
+              },
+              "recovery_overlaps_critical": {
+                "enum": [
+                  false,
+                  null
+                ]
+              },
+              "durations_nonnegative": {
+                "enum": [
+                  true,
+                  null
+                ]
+              },
+              "issues": {
+                "minItems": 1,
+                "items": {
+                  "properties": {
+                    "kind": {
+                      "const": "UNRESOLVED"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "properties": {
+              "status": {
+                "const": "CONFLICT"
+              },
+              "issues": {
+                "minItems": 1,
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "CONFLICT"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "x-mop-cross-field-checks": [
+          "inputs为本次原始显式条件和十进制字符串，不交换值/比较符，不从登记值或客户资料补默认",
+          "全部谓词关系和问题码须与精确BigDecimal半直线计算一致；单位不同或条件不完整的关系保持null",
+          "数学一致不代表物理范围、持续窗口、真实指标、客户批准、规则发布或事件触发/恢复已验证"
+        ]
+      },
+      "ThresholdDiagnosticResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ThresholdDiagnostic"
           },
           "trace_id": {
             "type": "string"

@@ -1,0 +1,402 @@
+{
+  "verified_at": "2026-10-03T21:11:27.727Z",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "api_version": "0.33.0",
+  "http_requests": 75,
+  "checks": [
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "registry_before",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "consistent_explicit_high",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_other_platform_admin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "forbidden_msp",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "forbidden_tadmin",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "forbidden_viewerA",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "forbidden_viewerB",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "csrf_required",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "low_direction_explicit",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "reversed_low_severity_not_swapped",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "wrong_recovery_operator_not_flipped",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "boundary_GT_LT",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "boundary_GT_LE",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "boundary_GE_LT",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "boundary_GE_LE",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "decimal_precision_and_original_scale",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "negative_metric_no_physical_default",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "all_unknown_no_defaults",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "partial_condition_unknown",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unit_mismatch_no_conversion",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "negative_duration_conflict",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "explicit_zero_is_not_unknown",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "critical_recovery_direct_overlap",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_direction",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_warning",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_critical",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_recovery",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_trigger_hold_seconds",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_recovery_hold_seconds",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_shape_36",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_shape_37",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_shape_38",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_shape_39",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_shape_40",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_shape_41",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_shape_42",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_shape_43",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_44",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_45",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_46",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_47",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_48",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_49",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_50",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_51",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_52",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_53",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_54",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_55",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_56",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_57",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_scope_override",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "switch_authorized_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "other_authorized_context",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "restore_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_before_readonly",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_repeat_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_repeat_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_repeat_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_after_readonly",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "registry_after",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_permission_catalog",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_binding_viewerB",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "readonly_candidate_posts": 3,
+  "registry_sha256_unchanged": "bd2780951040fd14d7279915da4e7eec2e11bb03d7416060b241185fb5d7eefc",
+  "registry_entries": 375,
+  "readonly_audit_tail_unchanged": true,
+  "catalog_entries": 26,
+  "catalog_declaration_hash": "a348d208a3398caefab6c03632ec962f8223ab66b1488cf61da27ce13bb313f8",
+  "existing_member_bindings_changed": false,
+  "authorized_tenant_switches": 2,
+  "candidate_business_writes": 0,
+  "monitoring_provider_read": false,
+  "monitoring_applied": false,
+  "rule_saved": false,
+  "customer_confirmation": "UNVERIFIED",
+  "publishable": false,
+  "physical_range_check": "NOT_RUN",
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "contract_done": false
+}

@@ -97,7 +97,7 @@ test('所有业务写接口明确要求幂等及CSRF，remote_test不存在fixtu
   for (const [path, methods] of Object.entries(contract.paths)) {
     for (const [method, operation] of Object.entries(methods)) {
       if (!['post', 'put', 'patch', 'delete'].includes(method)) continue;
-      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons', '/contacts/import-preview'].includes(path);
+      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons', '/contacts/import-preview', '/monitoring/threshold-diagnostics'].includes(path);
       if (readonlyPreview) assert.equal(operation['x-mop-read-only'], true);
       for (const name of readonlyPreview ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
         assert.ok(operation.parameters.some((p) => p.in === 'header' && p.name === name && p.required), `${method} ${path} ${name}`);
@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.32.0');
+  assert.equal(contract.info.version, '0.33.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -689,4 +689,17 @@ test('导入作业不暴露载荷租约，不把未知Worker和部分结果冒�
 test('创建者租户分页只返回元数据且游标必须成对',()=>{
   const route=contract.paths['/contact-imports'].get;assert.deepEqual(route['x-mop-paired-query-keys'],['before_created_at','before_id']);assert.equal(route['x-mop-read-only'],true);
   const page={tenant_id:id('2'),created_by:id('3'),items:[contactJob],has_more:false,next_before_created_at:null,next_before_id:null,source:'postgresql',scope:'CURRENT_CREATOR_TENANT',page_size_limit:100};assert.ok(validates('ContactImportPage',page));assert.equal(validates('ContactImportPage',{...page,has_more:true}),false);assert.equal(validates('ContactImportPage',{...page,items:[{...contactJob,results:[]}]}),false);
+});
+
+const thresholdInputSample={direction:'HIGH_IS_BAD',warning:{comparison:'GT',threshold:'70',unit:'EXPLICIT_UNIT'},critical:{comparison:'GT',threshold:'85',unit:'EXPLICIT_UNIT'},recovery:{comparison:'LT',threshold:'65',unit:'EXPLICIT_UNIT'},trigger_hold_seconds:'300',recovery_hold_seconds:'60'};
+const thresholdResultSample={tenant_id:id('1'),source:'EXPLICIT_INPUT',scope:'EXPLICIT_PREDICATE_DIAGNOSTIC_ONLY',analysis_version:'threshold-half-lines-v1',inputs:thresholdInputSample,status:'CONSISTENT',direction_consistent:true,critical_strict_subset_of_warning:true,recovery_overlaps_warning:false,recovery_overlaps_critical:false,durations_nonnegative:true,issues:[],publishable:false,effective_rule:null,customer_confirmation:'UNVERIFIED',physical_range_check:'NOT_RUN',units_converted:false,monitoring_applied:false,time_series_evaluated:false,rule_saved:false,writes_performed:false,tenant_authorization:'CURRENT_MEMBERSHIP_VERIFIED'};
+test('阈值候选诊断仅配置读取权限与CSRF，不产生幂等写或发布',()=>{
+ const route=contract.paths['/monitoring/threshold-diagnostics'].post;assert.equal(route['x-mop-read-only'],true);assert.deepEqual(route['x-mop-roles'],['padmin']);assert.equal(route['x-mop-capability'],'configurations:read');assert.deepEqual(route.parameters.map(p=>p.name),['X-CSRF-Token']);assert.ok(validates('ThresholdCandidateInput',thresholdInputSample));assert.ok(validates('ThresholdDiagnostic',thresholdResultSample));for(const flag of ['publishable','monitoring_applied','rule_saved','writes_performed','time_series_evaluated'])assert.equal(validates('ThresholdDiagnostic',{...thresholdResultSample,[flag]:true}),false);
+});
+test('阈值诊断十进制字符串保精度，未知不转换为默认值',()=>{
+ for(const value of [null,'0','-0.5','0.99999999999999999'])assert.ok(validates('ThresholdCandidateInput',{...thresholdInputSample,trigger_hold_seconds:value}));for(const value of [0,0.5,'-0','-0.000','01','1e3','NaN'])assert.equal(validates('ThresholdCandidateInput',{...thresholdInputSample,trigger_hold_seconds:value}),false);assert.equal(validates('ThresholdCandidateInput',{...thresholdInputSample,tenant_id:id('2')}),false);
+ const input=Object.fromEntries(Object.keys(thresholdInputSample).map(k=>[k,null]));const unknown={...thresholdResultSample,inputs:input,status:'UNRESOLVED',direction_consistent:null,critical_strict_subset_of_warning:null,recovery_overlaps_warning:null,recovery_overlaps_critical:null,durations_nonnegative:null,issues:[{code:'DIRECTION_MISSING',kind:'UNRESOLVED'}]};assert.ok(validates('ThresholdDiagnostic',unknown));assert.equal(validates('ThresholdDiagnostic',{...unknown,status:'CONSISTENT'}),false);
+});
+test('阈值冲突须有冲突原因，数学通过不能替代物理范围与客户批准',()=>{
+ const conflict={...thresholdResultSample,status:'CONFLICT',direction_consistent:false,issues:[{code:'RECOVERY_DIRECTION_CONFLICT',kind:'CONFLICT'}]};assert.ok(validates('ThresholdDiagnostic',conflict));assert.equal(validates('ThresholdDiagnostic',{...conflict,issues:[]}),false);assert.equal(validates('ThresholdDiagnostic',{...conflict,issues:[{code:'DIRECTION_MISSING',kind:'UNRESOLVED'}]}),false);assert.equal(validates('ThresholdDiagnostic',{...thresholdResultSample,physical_range_check:'VERIFIED'}),false);assert.equal(validates('ThresholdDiagnostic',{...thresholdResultSample,effective_rule:{}}),false);
 });

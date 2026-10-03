@@ -23,3 +23,16 @@
 首次编译发现record的unit访问器遮蔽同名helper，重命名为validateUnit后20项及完整根1262=1249执行（392既有真实PG回归）+13历史fixture跳过/6MinIO排除全部通过，67契约/生成一致性通过。392PG不包含新监控联调；本核心未接HTTP/仓储/页面/模板组件，API0.32/V1–V19均不改。前D07守卫4803492 CI37153448635 success已回读。
 
 下一步只读诊断API与显式候选页面；客户Q06矩阵/指标物理范围/心跳/监控组件未确认仍独立阻塞。M4-5/M4-18、完整D06和128项均未DONE。见[纯核心证据](evidence/niko-threshold-predicate-core-20261003.json)。
+
+
+## 2026-10-03 API0.33只读诊断与75真实HTTP
+
+新增POST /monitoring/threshold-diagnostics，仅当前平台管理员且具已有configurations:read，不增权限目录/身份绑定。当前成员/版本/租户/用户先于解析核对，CSRF必需，无幂等写或自动作业。全部query及根租户/发布字段覆盖拒绝；正文16KiB、3层、256 token、严格重复键/尾随检查，单位Unicode与精确十进制字符串由纯核心核对。形状错误400，数学矛盾200/CONFLICT，明确未定200/UNRESOLVED；输入原方向、操作符和小数scale回显，不交换或补值。
+
+响应包含各关系的true/false/null与全部问题码、固定版本threshold-half-lines-v1。始终source=EXPLICIT_INPUT、publishable=false/effective_rule=null、客户未核验/物理范围NOT_RUN、units_converted/monitoring_applied/time_series_evaluated/rule_saved/writes_performed=false，不查询监控、规则当前值或客户证据。CONSISTENT仅数学一致。
+
+10新控制器、根1272=1259执行（392既有真实PG回归）+13历史fixture跳过/6MinIO排除、70契约、748Web/typecheck/build与生成一致性通过。正常关闭自有隔离栈并以本次固定API JAR重启、刷新六实际OIDC后75HTTP全部按0.33契约核对：高/低值、反向严重顺序、错误恢复>15不翻转、四组开闭边界、17位小数接近1/1.000原scale、负指标与中文单位、全null/部分条件、单位不换算、负持续/明确0、恢复直接重叠严重、严格字段/数值/JSON边界、四种无权限角色先403、CSRF、匿名、另一授权租户与恢复原上下文均验。
+
+375条实际配置登记完整DTO摘要前后相同；三次单独只读重复诊断前后审计尾相同。HTTP证据中的readonly_candidate_posts=3专指这三次readonly_repeat审计探针，不是全部诊断POST数量；总75为全部实发请求。26项能力目录hash及六身份权限版本不变，除明确测试租户切换无业务写入、无新授权。纯核心f1bbbfce CI37153822693 success已回读。
+
+当前尚无新前端诊断页面/真实DOM、监控组件或规则发布，API0.33/V1–V19无结构修改和自动迁移。客户Q06矩阵/物理范围/心跳与真实模板适配继续独立待定。见[API汇总](evidence/niko-threshold-diagnostic-api-20261003.json)、[75 HTTP](evidence/niko-threshold-diagnostic-http-20261003.json)。

@@ -12,6 +12,7 @@ import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import TicketReportForm from '../components/TicketReportForm.vue'
 import WorklogWorkspace from '../components/WorklogWorkspace.vue'
 import InternalNoteWorkspace from '../components/InternalNoteWorkspace.vue'
+import TicketCommentWorkspace from '../components/TicketCommentWorkspace.vue'
 import ReportPhotoPanel from '../components/ReportPhotoPanel.vue'
 import RetainedPhotoNotice from '../components/RetainedPhotoNotice.vue'
 import { createPhotoQueue } from '../utils/photoQueue'
@@ -107,6 +108,13 @@ function discardRetainedPhotos() {
   const id = queryString('ticket_id')
   if (photoWorkspace.discard(id) && id) void loadDetail(id)
 }
+const commentOpen = ref(false), commentTarget = ref<RegisteredTicket | null>(null)
+const commentWorkspace = ref<InstanceType<typeof TicketCommentWorkspace> | null>(null)
+function openComments() {
+  if (!ticket.value || !can('ticket_comments:read')) return
+  if (commentTarget.value?.id !== ticket.value.id && commentWorkspace.value?.hasUnresolved()) { ElMessage.warning('上一条登记的评论尚未确认，请先恢复原面板并重试原请求'); commentOpen.value = true; return }
+  commentTarget.value = ticket.value; commentOpen.value = true
+}
 const noteOpen = ref(false), noteTarget = ref<RegisteredTicket | null>(null)
 const noteWorkspace = ref<InstanceType<typeof InternalNoteWorkspace> | null>(null)
 function openInternalNotes() {
@@ -181,8 +189,10 @@ onUnmounted(() => { resetContext(); detailPhotos.dispose(); photoWorkspace.dispo
       <div class="table-footer"><span>{{ customerView ? '仅本人登记' : '当前租户只读' }} · 本页 {{ rows.length }} 条</span><div class="cursor-pagination ticket-pagination"><el-select :model-value="pageSize" aria-label="报障每页条数" @change="resizePage"><el-option v-for="size in pageSizes.filter(size => size <= pageSizeLimit)" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button v-if="queryString('cursor') && !cursorHistory.length" :disabled="loading" @click="firstPage">返回首页</el-button><el-button v-else :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
     </div>
     <TicketReportForm v-if="mayReport" v-model="createOpen" @accepted="recordAcceptance" @registered="showRegistered" />
+    <TicketCommentWorkspace ref="commentWorkspace" v-model="commentOpen" :ticket="commentTarget" />
+    <el-button v-if="commentTarget && commentTarget.tenant_id === session?.tenant.id && (!customerView || commentTarget.reporter_id === session?.user.id) && can('ticket_comments:read')" class="retained-worklog-button" @click="commentOpen = true">恢复“{{ commentTarget.receipt_no }}”的客户可见评论面板</el-button>
     <InternalNoteWorkspace ref="noteWorkspace" v-model="noteOpen" :ticket="noteTarget" />
-    <el-button v-if="noteTarget && can('ticket_notes:read_internal')" class="retained-worklog-button" @click="noteOpen = true">恢复“{{ noteTarget.receipt_no }}”的内部备注面板</el-button>
+    <el-button v-if="noteTarget && noteTarget.tenant_id === session?.tenant.id && can('ticket_notes:read_internal')" class="retained-worklog-button" @click="noteOpen = true">恢复“{{ noteTarget.receipt_no }}”的内部备注面板</el-button>
     <WorklogWorkspace ref="worklogWorkspace" v-model="worklogOpen" :ticket="worklogTarget" />
     <el-button v-if="worklogTarget && can('worklogs:read_own')" class="retained-worklog-button" @click="worklogOpen = true">恢复“{{ worklogTarget.receipt_no }}”的本人工时面板</el-button>
     <el-drawer v-model="detailOpen" title="报障登记详情" size="650px" class="ticket-detail-drawer" destroy-on-close>
@@ -209,6 +219,7 @@ onUnmounted(() => { resetContext(); detailPhotos.dispose(); photoWorkspace.dispo
         </div>
         <div class="detail-section"><h3>登记记录</h3><el-timeline class="ticket-history"><el-timeline-item v-for="(item, index) in ticket.history" :key="`${item.occurred_at}:${index}`" :timestamp="displayTime(item.occurred_at)" placement="top"><strong>{{ item.action === 'ADD_ATTACHMENTS' ? '报障照片已追加' : '报障已登记' }}</strong><p>{{ item.action === 'ADD_ATTACHMENTS' ? '仅追加附件引用；原报障正文与联系信息保留。' : '正式工单规则待确认，尚无处理阶段记录。' }}</p><p v-if="!customerView" class="mono">操作主体：{{ item.actor_id }} · v{{ item.version }}</p></el-timeline-item></el-timeline></div>
         <ReportPhotoPanel :queue="detailPhotos" :existing="ticket.attachments" :selectable="matchingPhotoTarget && detailAppender.permitted.value" :show-selections="matchingPhotoTarget" :disabled="detailLoading" :appender="matchingPhotoTarget ? detailAppender : undefined" />
+        <div v-if="can('ticket_comments:read')" class="detail-section"><h3>客户可见评论</h3><p class="muted">报障人和获准内部人员可见；与内部备注分开，不改变工单状态或SLA，也不代表通知送达。</p><el-button @click="openComments">查看或追加客户可见评论</el-button></div>
         <div v-if="can('ticket_notes:read_internal')" class="detail-section"><h3>内部备注</h3><p class="muted">内部人员间追加不可变文字；客户不可见，不改变工单或SLA。</p><el-button @click="openInternalNotes">打开内部备注</el-button></div>
         <div v-if="can('worklogs:read_own')" class="detail-section"><h3>我的实填工时</h3><p class="muted">登记本人明确起止并保留修改历史；默认工时与成本仍待确认。</p><el-button type="primary" @click="openWorklogs">打开本人工时</el-button></div>
         <div class="detail-section"><h3>后续处理</h3><p class="muted">接单、处置与客户确认将在后续功能按实际规则落实。</p></div>

@@ -38,8 +38,8 @@ defineExpose({ hasUnresolved: workspace.unresolved })
 
 <template>
   <el-drawer v-model="open" title="内部备注（仅内部人员）" size="820px" class="internal-note-drawer" :close-on-click-modal="false">
-    <p v-if="ticket"><strong>{{ ticket.title }}</strong><span class="internal-note-id">{{ ticket.receipt_no }} · {{ ticket.id }}</span></p>
-    <el-alert type="info" :closable="false" title="备注仅在当前租户内部人员间可见，追加后不可编辑或删除。内容为人工记录，不改变工单状态或SLA；客户评论、附件及通知尚未开放。不要填写密码或密钥。" />
+    <p v-if="ticket && permitted"><strong>{{ ticket.title }}</strong><span class="internal-note-id">{{ ticket.receipt_no }} · {{ ticket.id }}</span></p>
+    <el-alert type="info" :closable="false" title="备注仅在当前租户内部人员间可见，追加后不可编辑或删除。内容为人工记录，不改变工单状态或SLA；客户可见评论请使用独立面板；本内部面板不含附件、通知或ITSM同步。不要填写密码或密钥。" />
     <el-empty v-if="!permitted" description="当前身份或租户没有内部备注权限" />
     <template v-else>
       <div class="internal-note-actions"><el-button :loading="state.busy === 'read'" :disabled="state.busy === 'write'" @click="workspace.refresh()">刷新第一页（只读）</el-button><el-button :disabled="Boolean(state.busy) || !state.page?.has_more" @click="workspace.refresh(true)">下一页</el-button><span>{{ state.paged ? '后续页' : '第一页' }} · 每页15条</span></div>

@@ -1,0 +1,27 @@
+{
+  "verified_at": "2026-10-02T23:56:23.765Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "http_requests": 39,
+  "frontend": "actual ticketCommentWorkspace + WebCrypto SHA256 + ApiClient",
+  "frontend_post_attempts": 4,
+  "independent_internal_author_posts": 1,
+  "engineer_frontend_post_attempts": 1,
+  "durable_comments": 4,
+  "matching_success_audits": 4,
+  "other_customer_workspace_denied": true,
+  "internal_note_excluded": true,
+  "structured_internal_identity_excluded": true,
+  "original_body_key_parent_version_preserved": true,
+  "readonly_refresh_never_wrote": true,
+  "parent_and_customer_dto_unchanged": true,
+  "original_comments_immutable": true,
+  "fault_injection": "Discard two successful server200 responses in client transport; not physical network failure",
+  "browser_ui_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "DOM/390px controls B03",
+    "Attachments, notifications and ITSM provider delivery",
+    "Formal workflow and full M5-7/D07 acceptance"
+  ]
+}

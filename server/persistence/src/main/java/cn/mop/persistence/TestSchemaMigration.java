@@ -32,7 +32,7 @@ public final class TestSchemaMigration {
         Map.entry("14","V14__immutable_manual_recovery_confirmations.sql"),
         Map.entry("15","V15__manual_warranty_details.sql"),
         Map.entry("16","V16__immutable_capacity_scenario_drafts.sql"),
-        Map.entry("17","V17__customer_contact_revisions.sql"));
+        Map.entry("17","V17__customer_contact_revisions.sql"),Map.entry("18","V18__durable_contact_import_jobs.sql"),Map.entry("19","V19__contact_import_generated_hash_guard.sql"));
     static final String IMPORT_SHA256="1f532822668274b7aebd12ea78b57e6be0aa9fd53ceb77023ee8067589cd2b4b";
     static final String DEPENDENCY_SHA256="5a8ce8d49fe948fc0e9586c102f7c8bfc46cb975a0b5d9f32d4bd1ccc72670bb";
     static final String WORKLOG_SHA256="942ea4dc88a8169b40662edcfd89871e8280a429ac922bd0cc1eb451b82ad2f8";
@@ -47,6 +47,11 @@ public final class TestSchemaMigration {
     static final String CAPACITY_SCENARIO_SHA256="74f095f56ca8735ef6d97405908aa523b554e76316acca052eeaa3cbbe010d05";
     static final String CUSTOMER_CONTACT_SHA256="3e7d2f89729682f9a51d0ccf4be9738ac25421d94738943d3d5f06461417a10b";
     static final String CONTACT_GUARD_SHA256="b3c16bf2730f173a86d001e835cec861758650d7fed379ad8e1a7873ee587ed7";
+    static final String CONTACT_IMPORT_SHA256="75325f0423f788d5a71b71e0b1c8ba3b5c30e628aa3c588437f671954cbb39e9";
+    static final String CONTACT_IMPORT_TRANSITION_SHA256="4690490d675a6d16e978631cd6996ba3e1e6552216a01149106d47d18388ec19";
+    static final String CONTACT_IMPORT_COMPLETION_SHA256="d16a4a8dd54ef416e25be027e89bfbf1626aec46b6470132f7808a7815a55211";
+    static final String CONTACT_IMPORT_FIX_SHA256="b84a80aa548a7c2d7d3050bb983214353cd3e1951f5d3ac1b04b413cedc2cdc7";
+    static final String CONTACT_IMPORT_FIXED_TRANSITION_SHA256="199559616f25813c7d45acf02ecdca89cab3bf06d836669f50e78964d671d283";
     private static final String RUNTIME="mop_test_runtime";
     private TestSchemaMigration() {}
 
@@ -63,12 +68,12 @@ public final class TestSchemaMigration {
     record Entry(String version,String script,String type,MigrationState state,boolean applied,boolean checksumMatches,Integer checksum) {}
     static final String WORKING_CALENDAR_CHECKER_SHA256="07749cb8084dc2f0e9f2a6ed899b77be3dc4e1aeb55f15eed1bf558e48b18fb6";
     enum Plan {
-        PHOTOS_PENDING(4),ASSET_IMPORTS_PENDING(5),ASSET_IMPORTS_APPLIED(6),ASSET_DEPENDENCIES_APPLIED(7),WORKLOGS_APPLIED(8),ASSET_METADATA_APPLIED(9),INTERNAL_NOTES_APPLIED(10),TICKET_COMMENTS_APPLIED(11),WORKING_CALENDARS_APPLIED(12),MANUAL_INCIDENTS_APPLIED(13),MANUAL_RECOVERIES_APPLIED(14),MANUAL_WARRANTY_APPLIED(15),CAPACITY_SCENARIOS_APPLIED(16),CUSTOMER_CONTACTS_APPLIED(17);
+        PHOTOS_PENDING(4),ASSET_IMPORTS_PENDING(5),ASSET_IMPORTS_APPLIED(6),ASSET_DEPENDENCIES_APPLIED(7),WORKLOGS_APPLIED(8),ASSET_METADATA_APPLIED(9),INTERNAL_NOTES_APPLIED(10),TICKET_COMMENTS_APPLIED(11),WORKING_CALENDARS_APPLIED(12),MANUAL_INCIDENTS_APPLIED(13),MANUAL_RECOVERIES_APPLIED(14),MANUAL_WARRANTY_APPLIED(15),CAPACITY_SCENARIOS_APPLIED(16),CUSTOMER_CONTACTS_APPLIED(17),CONTACT_IMPORTS_APPLIED(18),CONTACT_IMPORTS_FIXED(19);
         final int schemaVersion;Plan(int version){schemaVersion=version;}
         static Plan atVersion(int version){for(Plan value:values())if(value.schemaVersion==version)return value;throw new IllegalStateException("Unsupported validated schema version");}
     }
     enum Mode {
-        READ_ONLY_CHECK(0),APPLY_PHOTOS(5),APPLY_ASSET_IMPORTS(6),APPLY_ASSET_DEPENDENCIES(7),APPLY_WORKLOGS(8),APPLY_ASSET_METADATA(9),APPLY_INTERNAL_NOTES(10),APPLY_TICKET_COMMENTS(11),APPLY_WORKING_CALENDARS(12),APPLY_MANUAL_INCIDENTS(13),APPLY_MANUAL_RECOVERIES(14),APPLY_MANUAL_WARRANTY(15),APPLY_CAPACITY_SCENARIOS(16),APPLY_CUSTOMER_CONTACTS(17);
+        READ_ONLY_CHECK(0),APPLY_PHOTOS(5),APPLY_ASSET_IMPORTS(6),APPLY_ASSET_DEPENDENCIES(7),APPLY_WORKLOGS(8),APPLY_ASSET_METADATA(9),APPLY_INTERNAL_NOTES(10),APPLY_TICKET_COMMENTS(11),APPLY_WORKING_CALENDARS(12),APPLY_MANUAL_INCIDENTS(13),APPLY_MANUAL_RECOVERIES(14),APPLY_MANUAL_WARRANTY(15),APPLY_CAPACITY_SCENARIOS(16),APPLY_CUSTOMER_CONTACTS(17),APPLY_CONTACT_IMPORTS(18),APPLY_CONTACT_IMPORT_FIX(19);
         final int targetVersion;Mode(int version){targetVersion=version;}
     }
 
@@ -90,6 +95,8 @@ public final class TestSchemaMigration {
         if(args.length==1&&"--apply-manual-warranty".equals(args[0]))return Mode.APPLY_MANUAL_WARRANTY;
         if(args.length==1&&"--apply-capacity-scenarios".equals(args[0]))return Mode.APPLY_CAPACITY_SCENARIOS;
         if(args.length==1&&"--apply-customer-contacts".equals(args[0]))return Mode.APPLY_CUSTOMER_CONTACTS;
+        if(args.length==1&&"--apply-contact-imports".equals(args[0]))return Mode.APPLY_CONTACT_IMPORTS;
+        if(args.length==1&&"--apply-contact-import-fix".equals(args[0]))return Mode.APPLY_CONTACT_IMPORT_FIX;
         throw new IllegalArgumentException("Use --check or one explicit supported feature apply mode");
     }
     static Plan inspect(List<Entry> entries) {
@@ -134,7 +141,7 @@ public final class TestSchemaMigration {
                 public void warn(String message){} public void error(String message){} public void error(String message,Exception error){} public void notice(String message){}
             });
             Mode mode=requestedMode(args);boolean apply=mode!=Mode.READ_ONLY_CHECK;
-            stage="migration_resources";verifyImportResource();verifyDependencyResource();verifyWorklogResource();verifyAssetMetadataResource();verifyInternalNoteResource();verifyTicketCommentResource();verifyWorkingCalendarResource();verifyManualIncidentResource();verifyManualRecoveryResource();verifyManualWarrantyResource();verifyCapacityScenarioResource();verifyCustomerContactResource();stage="private_settings";Settings settings=Settings.from(System::getenv);
+            stage="migration_resources";verifyImportResource();verifyDependencyResource();verifyWorklogResource();verifyAssetMetadataResource();verifyInternalNoteResource();verifyTicketCommentResource();verifyWorkingCalendarResource();verifyManualIncidentResource();verifyManualRecoveryResource();verifyManualWarrantyResource();verifyCapacityScenarioResource();verifyCustomerContactResource();verifyContactImportResource();verifyContactImportFixResource();stage="private_settings";Settings settings=Settings.from(System::getenv);
             stage="identity";
             try(Connection guard=connection(settings,!apply)) {
                 verifyIdentity(guard);
@@ -172,7 +179,8 @@ public final class TestSchemaMigration {
                     " manual_recoveries="+(after.schemaVersion>=14?"IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
                     " manual_warranty="+(after.schemaVersion>=15?"ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED":"NOT_APPLIED")+
                     " capacity_scenarios="+(after.schemaVersion>=16?"IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
-                    " customer_contacts="+(after.schemaVersion>=17?"SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED"));
+                    " customer_contacts="+(after.schemaVersion>=17?"SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
+                    " contact_imports="+(after.schemaVersion>=19?"DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED":after.schemaVersion>=18?"STRUCTURE_ONLY_GENERATED_GUARD_FIX_REQUIRED":"NOT_APPLIED"));
             }
         }catch(Throwable failure){errors.println(safeFailure(stage,failure));exit=1;}
         finally{System.setOut(output);System.setErr(errors);}
@@ -184,6 +192,7 @@ public final class TestSchemaMigration {
         }
     }
     private static void verifyStructure(Connection connection,Plan plan)throws SQLException{
+        if(plan.schemaVersion>=18)ContactImportSchemaVerifier.verify(connection,plan.schemaVersion>=19);else requireTrue(connection,"SELECT to_regclass('public.mop_contact_import_job') IS NULL AND to_regclass('public.mop_contact_import_result') IS NULL AND to_regprocedure('public.mop_contact_import_transition_guard()') IS NULL AND to_regprocedure('public.mop_contact_import_completion_guard()') IS NULL");
         if(plan.schemaVersion>=17)verifyCustomerContacts(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_customer_contact') IS NULL AND to_regclass('public.mop_customer_contact_revision') IS NULL AND to_regclass('public.mop_contact_tenant_guard') IS NULL AND to_regprocedure('public.mop_contact_decision_guard()') IS NULL");
         if(plan.schemaVersion>=16)verifyCapacityScenarios(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_capacity_scenario_draft') IS NULL");
         if(plan.schemaVersion>=15)verifyManualWarranty(connection);else requireTrue(connection,"SELECT to_regprocedure('public.mop_warranty_declaration_guard()') IS NULL AND NOT EXISTS(SELECT 1 FROM pg_attribute WHERE attrelid=to_regclass('public.mop_asset_manual_revision') AND attname IN ('warranty_start','warranty_supplier','warranty_details_declared') AND NOT attisdropped)");
@@ -199,6 +208,9 @@ public final class TestSchemaMigration {
         if(plan.schemaVersion>=9)verifyAssetMetadata(connection,plan.schemaVersion>=15);
         else {requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_asset_manual_details','mop_asset_manual_revision')");verifyRuntimeAcl(connection,"mop_asset",Set.of());}
     }
+    static void verifyContactImportResource()throws Exception{ContactImportSchemaVerifier.resource();}
+    static void verifyContactImportFixResource()throws Exception{ContactImportSchemaVerifier.fixResource();}
+    static void verifyContactImports(Connection connection)throws SQLException{ContactImportSchemaVerifier.verify(connection,true);}
     static void verifyCustomerContactResource()throws Exception{
         try(var input=TestSchemaMigration.class.getResourceAsStream("/db/migration/"+SCRIPTS.get("17"))){
             if(input==null)throw new IllegalStateException("Missing contact migration");byte[] bytes=input.readAllBytes();
@@ -543,7 +555,7 @@ public final class TestSchemaMigration {
         for(var entry:updates.entrySet())verifyRuntimeAcl(connection,entry.getKey(),entry.getValue());
         requireTrue(connection,"SELECT NOT has_schema_privilege('mop_test_runtime','public','CREATE') AND NOT has_database_privilege('mop_test_runtime',current_database(),'CREATE') AND NOT pg_has_role('mop_test_runtime','mop_test_migrator','MEMBER')");
     }
-    private static void verifyColumns(Connection connection,String table,Map<String,String> types,Set<String> nullable,boolean complete)throws SQLException {
+    static void verifyColumns(Connection connection,String table,Map<String,String> types,Set<String> nullable,boolean complete)throws SQLException {
         Set<String> found=new HashSet<>();
         try(PreparedStatement statement=connection.prepareStatement("SELECT attname,format_type(atttypid,atttypmod),attnotnull FROM pg_attribute WHERE attrelid=?::regclass AND attnum>0 AND NOT attisdropped")) {
             statement.setString(1,"public."+table);try(ResultSet rows=statement.executeQuery()){while(rows.next()) {
@@ -553,7 +565,7 @@ public final class TestSchemaMigration {
         }
         if(!found.equals(types.keySet()))throw new IllegalStateException("Missing photo column");
     }
-    private static void verifyRuntimeAcl(Connection connection,String table,Set<String> allowedUpdates)throws SQLException {
+    static void verifyRuntimeAcl(Connection connection,String table,Set<String> allowedUpdates)throws SQLException {
         requireTrue(connection,"SELECT has_table_privilege(?,?,'SELECT') AND has_table_privilege(?,?,'INSERT') AND NOT has_table_privilege(?,?,'UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')",RUNTIME,"public."+table,RUNTIME,"public."+table,RUNTIME,"public."+table);
         requireTrue(connection,"SELECT NOT EXISTS(SELECT 1 FROM pg_class c CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl,acldefault('r',c.relowner))) a WHERE c.oid=?::regclass AND a.grantee=0)","public."+table);
         Set<String> found=new HashSet<>();
@@ -564,7 +576,7 @@ public final class TestSchemaMigration {
         }
         if(!found.containsAll(allowedUpdates))throw new IllegalStateException("Missing runtime update column");
     }
-    private static void requireConstraint(Connection connection,String table,String type,List<String> columns,String reference,List<String> referencedColumns,boolean deferred)throws SQLException {
+    static void requireConstraint(Connection connection,String table,String type,List<String> columns,String reference,List<String> referencedColumns,boolean deferred)throws SQLException {
         String sql="SELECT EXISTS(SELECT 1 FROM pg_constraint c WHERE c.conrelid=?::regclass AND c.contype=?::\"char\" AND c.convalidated AND c.condeferrable=? AND c.condeferred=? AND ARRAY(SELECT a.attname::text FROM unnest(c.conkey) WITH ORDINALITY k(num,position) JOIN pg_attribute a ON a.attrelid=c.conrelid AND a.attnum=k.num ORDER BY k.position)=?::text[]"+
             (reference==null?"":" AND c.confmatchtype='s' AND c.confdeltype='a' AND c.confupdtype='a' AND c.confrelid=?::regclass AND ARRAY(SELECT a.attname::text FROM unnest(c.confkey) WITH ORDINALITY k(num,position) JOIN pg_attribute a ON a.attrelid=c.confrelid AND a.attnum=k.num ORDER BY k.position)=?::text[]")+")";
         try(PreparedStatement statement=connection.prepareStatement(sql)) {
@@ -573,7 +585,7 @@ public final class TestSchemaMigration {
             try(ResultSet rows=statement.executeQuery()){if(!rows.next()||!rows.getBoolean(1))throw new IllegalStateException("Missing validated photo constraint");}
         }
     }
-    private static void requireTrue(Connection connection,String sql,String...parameters)throws SQLException {
+    static void requireTrue(Connection connection,String sql,String...parameters)throws SQLException {
         try(PreparedStatement statement=connection.prepareStatement(sql)){statement.setQueryTimeout(10);for(int index=0;index<parameters.length;index++)statement.setString(index+1,parameters[index]);try(ResultSet rows=statement.executeQuery()){if(!rows.next()||!rows.getBoolean(1)||rows.next())throw new IllegalStateException("Schema verification rejected");}}
     }
 }

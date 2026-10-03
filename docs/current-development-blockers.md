@@ -128,3 +128,8 @@ Playwright1.62.1官方Chrome Headless Shell151下载返回HTTP200却为195bytes�
 因此B03新环境实际DOM/桌面/移动/图形仍BLOCKED，不沿用旧实例的Unix socket EPERM作为新证据，也不拿Vue内存renderer或模块HTTP替代。继续纯代码、真实PG/API、契约和文档。见[新探测](evidence/niko-rebuilt-browser-blocker-20261003.json)。
 
 恢复提交5dfd7cd的Cloud37128842966和recovery37128843066均success。实际下载新artifact11276176345，998源码文件逐字节与当前工作区一致；原HEAD commit bytes与提交SHA匹配，不再猜时区。只保留同private仓库1日，不含历史和未跟踪凭据，见[CI与归档核验](evidence/niko-rebuilt-source-ci-20261003.json)。
+
+
+## B10 联系人V18生成列触发器问题（V19已本地实测修复）
+
+2026-10-03 18:34：V18结构核验通过后，13真实PG功能用例有6项因BEFORE触发器误比较生成列而失败，不能把schema存在当领取可用。保持V18冻结，独立V19修正基础字段比较；18:41最终13项全部通过，1/0/check0和28表等值验证完成。该缺陷本地解除；真正作业受理/Worker执行及重启恢复仍未实现，后续继续。证据见niko-customer-contact-import-schema-20261003.json；原指定服务器未应用V18/V19。

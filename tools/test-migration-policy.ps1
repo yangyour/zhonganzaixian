@@ -11,7 +11,7 @@ function Require-Rejected([scriptblock]$Action) {
 if ((Get-MopMigrationMode) -ne '--check') { throw 'Default must be read-only.' }; $checks++
 if ((Get-MopMigrationMode -ApplyPhotos) -ne '--apply-photos') { throw 'Legacy photos mode changed.' }; $checks++
 if ((Get-MopMigrationMode -ApplyAssetImports) -ne '--apply-asset-imports') { throw 'Legacy imports mode changed.' }; $checks++
-foreach ($feature in @('asset-dependencies','worklogs','asset-metadata','internal-notes','ticket-comments','working-calendars','manual-incidents','manual-recoveries','manual-warranty','capacity-scenarios','customer-contacts')) {
+foreach ($feature in @('asset-dependencies','worklogs','asset-metadata','internal-notes','ticket-comments','working-calendars','manual-incidents','manual-recoveries','manual-warranty','capacity-scenarios','customer-contacts','contact-imports','contact-import-fix')) {
     if ((Get-MopMigrationMode -ApplyFeature $feature) -cne "--apply-$feature") { throw 'Feature mode mismatch.' }; $checks++
     Require-Rejected { Get-MopMigrationMode -ApplyPhotos -ApplyFeature $feature }; $checks++
     Require-Rejected { Get-MopMigrationMode -ApplyAssetImports -ApplyFeature $feature }; $checks++
@@ -31,7 +31,7 @@ Copy-Item -Path (Join-Path $source '*.sql') -Destination $compiled
 Copy-Item -Path (Join-Path $root 'tools/niko-test/frozen-*.json') -Destination $manifests
 function Check-Resources { Assert-MopMigrationResources -ProjectRoot $fixture -PersistenceClasses $classes }
 Check-Resources; $checks++
-$file = 'V17__customer_contact_revisions.sql'
+$file = 'V19__contact_import_generated_hash_guard.sql'
 $original = [IO.File]::ReadAllBytes((Join-Path $source $file))
 foreach ($directory in @($source,$compiled)) {
     [IO.File]::AppendAllText((Join-Path $directory $file), '-- changed')
@@ -40,11 +40,11 @@ foreach ($directory in @($source,$compiled)) {
     Move-Item -LiteralPath (Join-Path $directory $file) -Destination (Join-Path $fixture 'held.sql')
     Require-Rejected { Check-Resources }; $checks++
     Move-Item -LiteralPath (Join-Path $fixture 'held.sql') -Destination (Join-Path $directory $file)
-    Set-Content -LiteralPath (Join-Path $directory 'V18__unreviewed.sql') -Value '-- unexpected'
+    Set-Content -LiteralPath (Join-Path $directory 'V20__unreviewed.sql') -Value '-- unexpected'
     Require-Rejected { Check-Resources }; $checks++
-    Remove-Item -LiteralPath (Join-Path $directory 'V18__unreviewed.sql')
+    Remove-Item -LiteralPath (Join-Path $directory 'V20__unreviewed.sql')
 }
-$manifestFile = Join-Path $manifests 'frozen-customer-contact-migration.json'
+$manifestFile = Join-Path $manifests 'frozen-contact-import-fix-migration.json'
 $originalManifest = [IO.File]::ReadAllBytes($manifestFile)
 Set-Content -LiteralPath $manifestFile -Value '{"sha256":{}}'
 Require-Rejected { Check-Resources }; $checks++

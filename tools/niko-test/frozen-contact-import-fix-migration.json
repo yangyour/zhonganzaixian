@@ -1,0 +1,8 @@
+{
+  "sha256": {
+    "V19__contact_import_generated_hash_guard.sql": "b84a80aa548a7c2d7d3050bb983214353cd3e1951f5d3ac1b04b413cedc2cdc7"
+  },
+  "function_body_sha256": {
+    "mop_contact_import_transition_guard": "199559616f25813c7d45acf02ecdca89cab3bf06d836669f50e78964d671d283"
+  }
+}

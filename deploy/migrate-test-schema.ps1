@@ -17,6 +17,9 @@ if (-not (Test-Path -LiteralPath $cliClass) -or -not (Test-Path -LiteralPath $do
 if ((Get-Item -LiteralPath $cliClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $cliSource).LastWriteTimeUtc) {
     throw '迁移 CLI 构建早于源码；拒绝使用旧入口。'
 }
+$contactVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/ContactImportSchemaVerifier.java'
+$contactVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/ContactImportSchemaVerifier.class'
+if (-not (Test-Path -LiteralPath $contactVerifierClass) -or (Get-Item -LiteralPath $contactVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $contactVerifierSource).LastWriteTimeUtc) { throw '联系人导入结构核验器缺失或早于源码；先重新编译。' }
 Assert-MopMigrationResources -ProjectRoot $projectRoot -PersistenceClasses $persistenceClasses
 $dependencies = (Get-Content -Raw -LiteralPath $classpathFile).Trim()
 if (-not $dependencies -or $dependencies.Contains("`n") -or $dependencies.Contains("`r")) { throw '迁移 classpath 无效。' }

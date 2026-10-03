@@ -160,3 +160,8 @@ V1–V14全部字节冻结，V14 SHA256为39be55d8759de87c6e2b8f85b3958c60be24ae
 ## 2026-10-03 V17联系人结构
 
 重建niko库独立V17执行1、重复0、只读check0，21表既有业务全列指纹不变；12结构PG/19迁移策略/82Python/57契约、根1088=1075执行含334真实PG通过。10项结构验证在未提交隔离租户用migrator、2项真实runtime验证ACL/触发器，全部回滚后新3表0行；没有新增身份绑定或持久联系人。API0.29保持ready，仓储/双连接竞争/API/UI/通知送达尚未验。V1–V17全部冻结，后续V18+，见[联系人](customer-contacts.md)。
+
+
+## 2026-10-03 联系人导入结构
+
+仅niko重建PG显式执行V18再V19，分别使用--apply-contact-imports和--apply-contact-import-fix，每次独立1、重复0、--check只读0。V19修复V18生成列在BEFORE触发器中的误比较，冻结V1–V19，下一修正V20+。26/28旧表等值指纹与13真实runtime结构回归通过，原服务器未执行；API仍0.31、没有业务导入作业执行，见docs/customer-contacts.md。

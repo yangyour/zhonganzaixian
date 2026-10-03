@@ -1,0 +1,9 @@
+{
+  "sha256": {
+    "V18__durable_contact_import_jobs.sql": "75325f0423f788d5a71b71e0b1c8ba3b5c30e628aa3c588437f671954cbb39e9"
+  },
+  "function_body_sha256": {
+    "mop_contact_import_transition_guard": "4690490d675a6d16e978631cd6996ba3e1e6552216a01149106d47d18388ec19",
+    "mop_contact_import_completion_guard": "d16a4a8dd54ef416e25be027e89bfbf1626aec46b6470132f7808a7815a55211"
+  }
+}

@@ -123,4 +123,16 @@ class NikoFaultGuardTest(unittest.TestCase):
             root=Path(d);r=subprocess.run([sys.executable,str(script),'--unknown'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertFalse((root/'.local').exists())
             local=root/'.local/niko-test';local.mkdir(parents=True);p=local/'contacts-v17-business-before.json';p.write_text('existing')
             r=subprocess.run([sys.executable,str(script),'--record'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertEqual('existing',p.read_text())
+    def test_contact_import_snapshot_preserves_contacts_and_identity_fingerprints(self):
+        current=module('niko_contact_import_snapshot',ROOT/'tools/niko-test/contact-import-migration-snapshot.py');prior=module('niko_contact_snapshot_previous',ROOT/'tools/niko-test/customer-contact-migration-snapshot.py')
+        self.assertEqual(prior.TABLES+('mop_customer_contact','mop_customer_contact_revision','mop_contact_tenant_guard','mop_user','mop_membership'),current.TABLES);self.assertEqual(26,len(current.TABLES));self.assertTrue({current.BEFORE,current.AFTER}.isdisjoint({prior.BEFORE,prior.AFTER}))
+    def test_contact_import_fix_snapshot_also_covers_new_job_and_result_tables(self):
+        current=module('niko_contact_import_fix_snapshot',ROOT/'tools/niko-test/contact-import-fix-migration-snapshot.py');prior=module('niko_contact_import_previous_snapshot',ROOT/'tools/niko-test/contact-import-migration-snapshot.py')
+        self.assertEqual(prior.TABLES+('mop_contact_import_job','mop_contact_import_result'),current.TABLES);self.assertEqual(28,len(current.TABLES));self.assertTrue({current.BEFORE,current.AFTER}.isdisjoint({prior.BEFORE,prior.AFTER}));source=(ROOT/'tools/niko-test/contact-import-fix-migration-snapshot.py').read_text();self.assertIn("projection='to_jsonb(t)::text'",source);self.assertIn('REPEATABLE READ READ ONLY',source)
+    def test_contact_import_snapshot_modes_and_existing_evidence_fail_before_private_read(self):
+        for script_name,prefix in [('contact-import-migration-snapshot.py','contact-import-v18-business'),('contact-import-fix-migration-snapshot.py','contact-import-v19-business')]:
+            script=ROOT/'tools/niko-test'/script_name
+            with tempfile.TemporaryDirectory() as d:
+                root=Path(d);r=subprocess.run([sys.executable,str(script),'--unknown'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertFalse((root/'.local').exists());local=root/'.local/niko-test';local.mkdir(parents=True);p=local/(prefix+'-before.json');p.write_text('existing-evidence');r=subprocess.run([sys.executable,str(script),'--record'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,r.returncode);self.assertEqual('existing-evidence',p.read_text());self.assertNotIn('existing-evidence',r.stdout+r.stderr)
+
 if __name__=='__main__':unittest.main()

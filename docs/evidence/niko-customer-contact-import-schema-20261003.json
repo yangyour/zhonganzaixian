@@ -1,0 +1,85 @@
+{
+  "verified_at": "2026-10-03T18:47:23.675544+00:00",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "scope": "CONTACT_IMPORT_SCHEMA_AND_GENERATED_COLUMN_GUARD_FIX_NOT_WORKER_ACCEPTANCE",
+  "v18": {
+    "executed": 1,
+    "repeat_executed": 0,
+    "readonly_check_executed": 0,
+    "legacy_tables_unchanged": 26,
+    "sha256": {
+      "V18__durable_contact_import_jobs.sql": "75325f0423f788d5a71b71e0b1c8ba3b5c30e628aa3c588437f671954cbb39e9"
+    },
+    "function_body_sha256": {
+      "mop_contact_import_transition_guard": "4690490d675a6d16e978631cd6996ba3e1e6552216a01149106d47d18388ec19",
+      "mop_contact_import_completion_guard": "d16a4a8dd54ef416e25be027e89bfbf1626aec46b6470132f7808a7815a55211"
+    },
+    "initial_real_pg_tests": 13,
+    "initial_errors": 6,
+    "initial_failures": 0,
+    "initial_result": "BEFORE transition compared generated hash before its value was computed; normal claims were rejected; never marked functional pass"
+  },
+  "v19": {
+    "executed": 1,
+    "repeat_executed": 0,
+    "readonly_check_executed": 0,
+    "legacy_tables_unchanged": 28,
+    "sha256": {
+      "V19__contact_import_generated_hash_guard.sql": "b84a80aa548a7c2d7d3050bb983214353cd3e1951f5d3ac1b04b413cedc2cdc7"
+    },
+    "function_body_sha256": {
+      "mop_contact_import_transition_guard": "199559616f25813c7d45acf02ecdca89cab3bf06d836669f50e78964d671d283"
+    },
+    "fix": "Compare the nine immutable base fields explicitly; generated payload hash remains database-owned and checked separately"
+  },
+  "official_reference": "https://www.postgresql.org/docs/17/ddl-generated-columns.html",
+  "new_real_pg_schema_tests": 13,
+  "schema_tests_skipped": 0,
+  "final_schema_failures": 0,
+  "final_schema_errors": 0,
+  "all_schema_test_records_rolled_back": true,
+  "jobs_after_tests": 0,
+  "results_after_tests": 0,
+  "new_tenants_or_identity_grants": false,
+  "root_tests_reported": 1183,
+  "root_tests_executed": 1170,
+  "actual_postgresql_tests": 372,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "migration_policy_tests": 21,
+  "python_tests": 87,
+  "contracts": 64,
+  "generation_check": "PASS",
+  "powershell_policy_tests": "PENDING_CI_EXPECTED_58_NOT_RUN_ON_THIS_LINUX",
+  "api_version": "0.31.0",
+  "api_readiness_http": 200,
+  "readiness_path": "/api/v1/health/ready",
+  "initial_wrong_health_path_probe": {
+    "path": "/actuator/health/readiness",
+    "status": 401,
+    "interpretation": "not the registered readiness endpoint; not component unready evidence"
+  },
+  "source_sha256": {
+    "server/persistence/src/main/java/cn/mop/persistence/ContactImportSchemaVerifier.java": "b238a5f3cd0d307dcf0a62d7720e55da407f59f4cb0674e0c433145ebe21d5ca",
+    "server/persistence/src/main/java/cn/mop/persistence/TestSchemaMigration.java": "d9b8e9053e701d9676e31b6fd232cb56099118166a8a16717a87dfcfafc4510b",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresContactImportSchemaIntegrationTest.java": "40bf3d0618b18c5cbbc6809ce59c83e8cd592dea2a46f808f98710a561899447",
+    "tools/niko-test/contact-import-migration-snapshot.py": "1e0e256a882c0720e33e00a5ef35adea96ef538c3125f71717ad702e20565d5f",
+    "tools/niko-test/contact-import-fix-migration-snapshot.py": "31253a80dadf46b772dd7d8c4004fb325ed54fed2758fffdcc6a39c96cd1b7fa"
+  },
+  "prior_state_model_commit": {
+    "sha": "ad0903767b97f1036bd23cc6487b34781c1a2389",
+    "ci_run": 37143816329,
+    "conclusion": "success"
+  },
+  "frozen_migrations_through": 19,
+  "next_schema_correction_minimum_version": 20,
+  "original_designated_server_v18_v19": "NOT_RUN",
+  "public_import_acceptance": "NOT_IMPLEMENTED",
+  "actual_worker_claims": "NOT_RUN",
+  "worker_restart_recovery": "NOT_RUN",
+  "browser_dom": "NOT_RUN",
+  "notification_delivery": "NOT_RUN",
+  "can_import": false,
+  "contract_done": false
+}

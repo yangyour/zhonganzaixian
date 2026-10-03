@@ -146,3 +146,16 @@ CustomerContactRepository新增createBatch，只允许受保护的幂等命令�
 暂时依赖失败只安排明确未来retryAt，不默认立即重试或猜成功；权限撤销、无效载荷和最后决策人失败分别作为明确终态原因，不静默转成成功/部分写入。记录不可变，所有时间精度/范围、状态字段和整批数量先验证。此模型没有DB锁、当前成员复核或实际worker；调用方后续必须用可信数据库时钟和同一耐久行的原子CAS/租约校验，不能拿纯函数当并发或重启证据。
 
 16新纯测试通过，根1168=1155执行含359既有真实PG、13历史fixture跳过、6MinIO排除；64契约/生成一致性通过。初始测试编译因var复合声明失败，已拆分声明，最终通过。批次ffa7cdc CI37143247462 success已回读；API0.31和V1–V17未动，尚无202受理/队列/Worker领取/重启或新HTTP验证，can_import仍false。下一步新增独立V18持久化结构，明确执行后再做真实领取与失效恢复；M2-9未DONE。见[纯状态证据](evidence/niko-customer-contact-job-state-core-20261003.json)。
+
+
+## 2026-10-03 V18/V19耐久结构与真实生成列回归修正
+
+V18新增21列mop_contact_import_job及7列mop_contact_import_result；作业原始载荷bytea、DB生成SHA256、创建者/权限版本/行数/格式/trace不可改，runtime只可更新明确租约/状态/版本字段，结果仅INSERT/SELECT，禁止DELETE/TRUNCATE及PUBLIC权限。两个SECURITY INVOKER函数固定pg_catalog search_path：领取/重领/重试/终态的版本、fence与DB时钟检查；成功必须有全部原始行位对应的同租户v1联系人修订，否则延迟约束拒绝提交。失败/待处理不允许留下部分结果，终态不能重写。表/函数/索引/约束/生成表达式/owner/列级ACL均纳入只读核验；API/Worker不自动迁移。
+
+先在niko独立显式执行V18一次，重复0/check0，26张旧表全部列等值指纹保持。随后13真实结构用例中6项正常领取失败，原因是BEFORE触发器把整体NEW转JSON比较时含尚未计算的生成hash列；7项通过不代表功能通过。[PostgreSQL17官方说明](https://www.postgresql.org/docs/17/ddl-generated-columns.html)明确生成列在BEFORE触发器之后计算。V18字节保持冻结，新增V19只比较9个不可变基础字段，生成摘要另行核验；V19单独执行1、重复0/check0，含新增作业/结果的28表全部列等值指纹保持。没有重写V18或删除历史。
+
+修正后13真实runtime PG结构用例全部通过、0跳过：初始状态/生成hash、同租户FK、行数/序号/v1引用、正常领取hash不变、活跃租约禁止抢占、10ms实际租期后等待30ms重领fence递增、过期不能完成、重试必须明确未来与非null瞬时错误、终态不可改、完整结果和禁止半批、runtime不可改载荷/身份/结果及删除。所有测试仅用已有身份/租户，每个事务回滚，测试后新2表均0行，没有实际工作进程领取或新身份授权。
+
+完整根1183=1170执行（372真实PG）+13历史fixture跳过、6MinIO排除；21迁移策略/87Python/64契约与生成一致性通过。初始策略测试对新增未来mode的预期也已按显式相邻版本规则修正。PowerShell58项由CI待执行，此Linux未运行，不能预先报通过。已有API0.31在正确/api/v1/health/ready返回200；先误探测/actuator/health/readiness得401，属于非登记路径，不计作组件故障或就绪证据。
+
+V18 SHA256为75325f0423f788d5a71b71e0b1c8ba3b5c30e628aa3c588437f671954cbb39e9；V19为b84a80aa548a7c2d7d3050bb983214353cd3e1951f5d3ac1b04b413cedc2cdc7。当前V1–V19全部冻结，后续修正V20+。原服务器V18/V19未执行；真正202受理/Worker/重启恢复/导入UI尚待，can_import保持false，完整M2-9未DONE。前一纯模型ad09037 CI37143816329 success已回读，见[完整结构证据](evidence/niko-customer-contact-import-schema-20261003.json)。

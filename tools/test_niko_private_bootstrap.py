@@ -79,4 +79,13 @@ class NikoPrivateBootstrapTest(unittest.TestCase):
   name='V17__customer_contact_revisions.sql';self.assertEqual(hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest(),manifest[name])
   source=(ROOT/'tools/niko-test/run-migration.py').read_text();self.assertIn('--apply-customer-contacts',source);self.assertIn('frozen-customer-contact-migration.json',source)
 
+ def test_v18_contact_import_has_explicit_mode_and_frozen_resource(self):
+  manifest=json.loads((ROOT/'tools/niko-test/frozen-contact-import-migration.json').read_text());name='V18__durable_contact_import_jobs.sql'
+  self.assertEqual({name},set(manifest['sha256']));self.assertEqual(hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest(),manifest['sha256'][name]);self.assertEqual(2,len(manifest['function_body_sha256']))
+  source=(ROOT/'tools/niko-test/run-migration.py').read_text();self.assertIn('--apply-contact-imports',source);self.assertIn('frozen-contact-import-migration.json',source)
+
+ def test_v19_guard_fix_is_independent_and_v18_stays_frozen(self):
+  manifest=json.loads((ROOT/'tools/niko-test/frozen-contact-import-fix-migration.json').read_text());name='V19__contact_import_generated_hash_guard.sql';self.assertEqual({name},set(manifest['sha256']));self.assertEqual(hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest(),manifest['sha256'][name]);self.assertEqual(1,len(manifest['function_body_sha256']))
+  self.assertEqual('75325f0423f788d5a71b71e0b1c8ba3b5c30e628aa3c588437f671954cbb39e9',hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration/V18__durable_contact_import_jobs.sql').read_bytes()).hexdigest());self.assertIn('--apply-contact-import-fix',(ROOT/'tools/niko-test/run-migration.py').read_text())
+
 if __name__=='__main__':unittest.main()

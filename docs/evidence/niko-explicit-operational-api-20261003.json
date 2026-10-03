@@ -1,0 +1,41 @@
+{
+  "verified_at": "2026-10-03T14:55:00Z",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "api_version": "0.29.0",
+  "new_controller_tests": 11,
+  "root_regression": {
+    "reported": 1061,
+    "executed": 1048,
+    "existing_real_pg_tests": 322,
+    "historical_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0,
+    "log_sha256": "904a2712b69f04748dcbd122b0ae6328770d67e897bf90c7de30d539bd044d01"
+  },
+  "contracts": 57,
+  "contract_generation_check": "PASS",
+  "web_regression": 643,
+  "typecheck_and_build": "PASS",
+  "actual_http_requests": 64,
+  "http_evidence": "niko-explicit-operational-api-http-20261003.json",
+  "catalog_entries": 24,
+  "business_records_written": 0,
+  "formal_project_metrics": false,
+  "comparison_ui": "NOT_IMPLEMENTED",
+  "browser_dom": "NOT_RUN",
+  "q23_q27_q30": "UNVERIFIED",
+  "v1_v16_changed": false,
+  "ddl_executed": false,
+  "initial_failures": [
+    "Test source mistakenly called status() instead of the existing status field; corrected before successful run",
+    "HTTP harness omitted required idempotency key on existing tenant-switch write; actual 400, fixed harness and reran full batch; no service protection relaxed"
+  ],
+  "previous_commit": {
+    "sha": "eaa7d48a64490a0d494c2d561eb4e75f97f27c13",
+    "ci_run": 37130724964,
+    "conclusion": "success"
+  },
+  "contract_done": false
+}

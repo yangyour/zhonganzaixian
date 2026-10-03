@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.28.0",
+    "version": "0.29.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -6620,6 +6620,172 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CapacityScenarioResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/explicit-comparisons": {
+      "post": {
+        "operationId": "compareExplicitOperationalInputs",
+        "summary": "明确样本中位数与FTE只读算术对照，非经营指标查询",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExplicitOperationalInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-mop-read-only": true,
+        "x-mop-capability": "operations:compare_explicit",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-max-body-bytes": 524288,
+        "x-mop-reject-duplicate-json-keys": true,
+        "description": "当前成员复核在解析之前；CSRF必需，全部query拒绝，两个字段必须存在，未知null。不读取项目业务数据、不保存比较。整数和小数为规范十进制字符串，至多40位整数/40位小数；耗时最多10000条，偶数中位数精确平均；未知样本不滤除，空集合无结果。FTE显式相加，最终除法DECIMAL128；分母0结果null。Q23/Q27/Q30未核验，正式指标/达标判断/计费保持null或false，不替代四处统一经营服务。",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExplicitOperationalResult"
                 }
               }
             }
@@ -21415,6 +21581,494 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/CapacityScenarioPage"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ExplicitOperationalInput": {
+        "type": "object",
+        "properties": {
+          "elapsed_millis": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "maxItems": 10000,
+            "items": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^(0|[1-9][0-9]{0,39})$",
+              "maxLength": 40,
+              "description": "显式非负整数字符串，避免JS安全整数之外精度丢失；null未知，不自动补值"
+            }
+          },
+          "staffing": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "active_tenants": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})$",
+                    "maxLength": 40,
+                    "description": "显式非负整数字符串，避免JS安全整数之外精度丢失；null未知，不自动补值"
+                  },
+                  "on_call_fte": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})(\\.[0-9]{1,40})?$",
+                    "maxLength": 81,
+                    "description": "非负十进制字符串，最多40位整数/40位小数；无指数、符号、前导零或空白。具体比例和分母另按字段校验。"
+                  },
+                  "second_line_fte": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^(0|[1-9][0-9]{0,39})(\\.[0-9]{1,40})?$",
+                    "maxLength": 81,
+                    "description": "非负十进制字符串，最多40位整数/40位小数；无指数、符号、前导零或空白。具体比例和分母另按字段校验。"
+                  }
+                },
+                "required": [
+                  "active_tenants",
+                  "on_call_fte",
+                  "second_line_fte"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "elapsed_millis",
+          "staffing"
+        ],
+        "additionalProperties": false
+      },
+      "ExplicitOperationalMedian": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "enum": [
+              "CALCULATED",
+              "UNRESOLVED",
+              "UNDEFINED"
+            ]
+          },
+          "reason": {
+            "enum": [
+              "ALL_EXPLICIT",
+              "INPUT_UNAVAILABLE",
+              "EMPTY_SAMPLE",
+              "UNKNOWN_SAMPLE"
+            ]
+          },
+          "formula_version": {
+            "const": "explicit-elapsed-median-v1"
+          },
+          "unit": {
+            "const": "milliseconds"
+          },
+          "sample_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "unknown_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "median_millis": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "maxLength": 160
+          },
+          "duration_basis_verification": {
+            "const": "UNVERIFIED_Q27"
+          },
+          "population_verification": {
+            "const": "UNVERIFIED"
+          },
+          "effective_processing_duration": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "status",
+          "reason",
+          "formula_version",
+          "unit",
+          "sample_count",
+          "unknown_count",
+          "median_millis",
+          "duration_basis_verification",
+          "population_verification",
+          "effective_processing_duration"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "reason": {
+                "const": "ALL_EXPLICIT"
+              },
+              "status": {
+                "const": "CALCULATED"
+              },
+              "sample_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "unknown_count": {
+                "const": 0
+              },
+              "median_millis": {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]{0,39})(\\.5)?$"
+              }
+            }
+          },
+          {
+            "properties": {
+              "reason": {
+                "const": "INPUT_UNAVAILABLE"
+              },
+              "status": {
+                "const": "UNRESOLVED"
+              },
+              "sample_count": {
+                "type": "null"
+              },
+              "unknown_count": {
+                "type": "null"
+              },
+              "median_millis": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "reason": {
+                "const": "EMPTY_SAMPLE"
+              },
+              "status": {
+                "const": "UNDEFINED"
+              },
+              "sample_count": {
+                "const": 0
+              },
+              "unknown_count": {
+                "const": 0
+              },
+              "median_millis": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "reason": {
+                "const": "UNKNOWN_SAMPLE"
+              },
+              "status": {
+                "const": "UNRESOLVED"
+              },
+              "sample_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "unknown_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "median_millis": {
+                "type": "null"
+              }
+            }
+          }
+        ]
+      },
+      "ExplicitOperationalStaffing": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "enum": [
+              "CALCULATED",
+              "UNRESOLVED",
+              "UNDEFINED"
+            ]
+          },
+          "reason": {
+            "enum": [
+              "ALL_EXPLICIT",
+              "INPUT_UNAVAILABLE",
+              "MISSING_INPUT",
+              "ZERO_FTE"
+            ]
+          },
+          "formula_version": {
+            "const": "explicit-tenants-per-fte-v1"
+          },
+          "explicit_total_fte": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "maxLength": 160
+          },
+          "tenants_per_fte": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+            "maxLength": 160
+          },
+          "missing_inputs": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 3,
+            "items": {
+              "enum": [
+                "input",
+                "active_tenants",
+                "on_call_fte",
+                "second_line_fte"
+              ]
+            }
+          },
+          "decimal_precision": {
+            "const": "DECIMAL128"
+          },
+          "population_verification": {
+            "const": "UNVERIFIED_Q30"
+          },
+          "staffing_basis_verification": {
+            "const": "UNVERIFIED_Q23"
+          },
+          "effective_tenants_per_fte": {
+            "type": "null"
+          },
+          "target_met": {
+            "type": "null"
+          },
+          "billing_applicable": {
+            "const": false
+          }
+        },
+        "required": [
+          "status",
+          "reason",
+          "formula_version",
+          "explicit_total_fte",
+          "tenants_per_fte",
+          "missing_inputs",
+          "decimal_precision",
+          "population_verification",
+          "staffing_basis_verification",
+          "effective_tenants_per_fte",
+          "target_met",
+          "billing_applicable"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "reason": {
+                "const": "ALL_EXPLICIT"
+              },
+              "status": {
+                "const": "CALCULATED"
+              },
+              "explicit_total_fte": {
+                "type": "string",
+                "not": {
+                  "const": "0"
+                }
+              },
+              "tenants_per_fte": {
+                "type": "string"
+              },
+              "missing_inputs": {
+                "maxItems": 0
+              }
+            }
+          },
+          {
+            "properties": {
+              "reason": {
+                "const": "INPUT_UNAVAILABLE"
+              },
+              "status": {
+                "const": "UNRESOLVED"
+              },
+              "explicit_total_fte": {
+                "type": "null"
+              },
+              "tenants_per_fte": {
+                "type": "null"
+              },
+              "missing_inputs": {
+                "const": [
+                  "input"
+                ]
+              }
+            }
+          },
+          {
+            "properties": {
+              "reason": {
+                "const": "MISSING_INPUT"
+              },
+              "status": {
+                "const": "UNRESOLVED"
+              },
+              "tenants_per_fte": {
+                "type": "null"
+              },
+              "missing_inputs": {
+                "minItems": 1,
+                "items": {
+                  "enum": [
+                    "active_tenants",
+                    "on_call_fte",
+                    "second_line_fte"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "properties": {
+              "reason": {
+                "const": "ZERO_FTE"
+              },
+              "status": {
+                "const": "UNDEFINED"
+              },
+              "explicit_total_fte": {
+                "const": "0"
+              },
+              "tenants_per_fte": {
+                "type": "null"
+              },
+              "missing_inputs": {
+                "maxItems": 0
+              }
+            }
+          }
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "reason": {
+                  "const": "MISSING_INPUT"
+                },
+                "missing_inputs": {
+                  "contains": {
+                    "enum": [
+                      "on_call_fte",
+                      "second_line_fte"
+                    ]
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "explicit_total_fte": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ExplicitOperationalComparison": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scope": {
+            "const": "EXPLICIT_OPERATIONAL_COMPARISON"
+          },
+          "source": {
+            "const": "EXPLICIT_INPUT_NOT_PROJECT_METRICS"
+          },
+          "input": {
+            "$ref": "#/components/schemas/ExplicitOperationalInput"
+          },
+          "decimal_encoding": {
+            "const": "BASE10_STRINGS"
+          },
+          "sample_median": {
+            "$ref": "#/components/schemas/ExplicitOperationalMedian"
+          },
+          "staffing": {
+            "$ref": "#/components/schemas/ExplicitOperationalStaffing"
+          },
+          "comparison_saved": {
+            "const": false
+          },
+          "formal_metrics_available": {
+            "const": false
+          },
+          "business_data_queried": {
+            "const": false
+          }
+        },
+        "required": [
+          "tenant_id",
+          "scope",
+          "source",
+          "input",
+          "decimal_encoding",
+          "sample_median",
+          "staffing",
+          "comparison_saved",
+          "formal_metrics_available",
+          "business_data_queried"
+        ],
+        "additionalProperties": false
+      },
+      "ExplicitOperationalResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ExplicitOperationalComparison"
           },
           "trace_id": {
             "type": "string"

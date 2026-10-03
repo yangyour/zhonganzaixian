@@ -97,7 +97,7 @@ test('所有业务写接口明确要求幂等及CSRF，remote_test不存在fixtu
   for (const [path, methods] of Object.entries(contract.paths)) {
     for (const [method, operation] of Object.entries(methods)) {
       if (!['post', 'put', 'patch', 'delete'].includes(method)) continue;
-      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates'].includes(path);
+      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons'].includes(path);
       if (readonlyPreview) assert.equal(operation['x-mop-read-only'], true);
       for (const name of readonlyPreview ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
         assert.ok(operation.parameters.some((p) => p.in === 'header' && p.name === name && p.required), `${method} ${path} ${name}`);
@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.28.0');
+  assert.equal(contract.info.version, '0.29.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -618,4 +618,17 @@ test('已保存容量草稿仍禁止生效和实测结论，引用与状态必�
  const value={id:id('1'),tenant_id:id('2'),created_by:id('3'),recorded_at:timestamp,version:1,label:'方案',note:'说明',calculation:{inputs:null,model:null,proxy_buffer:null},calculation_sha256:'a'.repeat(64),snapshot_sha256:'b'.repeat(64),benchmark_reference:null,benchmark_verification:'NOT_PROVIDED',snapshot,decimal_encoding:'BASE10_STRINGS',decimal_precision:'DECIMAL128',lifecycle_status:'DRAFT',model_approval_status:'UNVERIFIED',measurement_verification:'UNVERIFIED',production_capacity_verified:false,approved_pool_nvps_limit:null,measured_capacity:null,poc_status:'NOT_RUN',effective:false,immutable:true,source:'postgresql',record_source:'EXPLICIT_CAPACITY_DRAFT'};
  assert.equal(validates('CapacityScenario',value),true);for(const patch of [{effective:true},{production_capacity_verified:true},{poc_status:'PASSED'},{model_approval_status:'APPROVED'},{version:2},{benchmark_verification:'REFERENCE_ONLY_UNVERIFIED'}])assert.equal(validates('CapacityScenario',{...value,...patch}),false);
  const ref={reference:'document-ref:synthetic-01',title:'未核验',sha256:'a'.repeat(64)};assert.equal(validates('CapacityScenario',{...value,benchmark_reference:ref,benchmark_verification:'REFERENCE_ONLY_UNVERIFIED'}),true);
+});
+
+test('显式经营对照输入完整且大数使用规范字符串',()=>{
+ const v={elapsed_millis:['0',null,'9007199254740993'],staffing:{active_tenants:'30',on_call_fte:'1.5',second_line_fte:'1'}};assert.equal(validates('ExplicitOperationalInput',v),true);assert.equal(validates('ExplicitOperationalInput',{elapsed_millis:null,staffing:null}),true);
+ for(const bad of [1,'01','1e2','-1','1.5','1'.repeat(41)])assert.equal(validates('ExplicitOperationalInput',{...v,elapsed_millis:[bad]}),false);
+ assert.equal(validates('ExplicitOperationalInput',{...v,elapsed_millis:Array(10001).fill('0')}),false);assert.equal(validates('ExplicitOperationalInput',{staffing:null}),false);assert.equal(validates('ExplicitOperationalInput',{...v,tenant_id:id('2')}),false);
+ const route=contract.paths['/operations/explicit-comparisons'].post;assert.equal(route['x-mop-read-only'],true);assert.deepEqual(route.parameters.map(p=>p.name),['X-CSRF-Token']);assert.deepEqual(route['x-mop-roles'],['padmin']);
+});
+test('显式中位数空值与0分母不能伪装为0或正式指标',()=>{
+ const median={status:'UNDEFINED',reason:'EMPTY_SAMPLE',formula_version:'explicit-elapsed-median-v1',unit:'milliseconds',sample_count:0,unknown_count:0,median_millis:null,duration_basis_verification:'UNVERIFIED_Q27',population_verification:'UNVERIFIED',effective_processing_duration:null};assert.equal(validates('ExplicitOperationalMedian',median),true);
+ for(const patch of [{median_millis:'0'},{status:'CALCULATED'},{effective_processing_duration:'0'},{sample_count:null}])assert.equal(validates('ExplicitOperationalMedian',{...median,...patch}),false);
+ const staffing={status:'UNDEFINED',reason:'ZERO_FTE',formula_version:'explicit-tenants-per-fte-v1',explicit_total_fte:'0',tenants_per_fte:null,missing_inputs:[],decimal_precision:'DECIMAL128',population_verification:'UNVERIFIED_Q30',staffing_basis_verification:'UNVERIFIED_Q23',effective_tenants_per_fte:null,target_met:null,billing_applicable:false};assert.equal(validates('ExplicitOperationalStaffing',staffing),true);
+ for(const patch of [{tenants_per_fte:'0'},{target_met:false},{billing_applicable:true},{explicit_total_fte:'1'},{missing_inputs:['input']}])assert.equal(validates('ExplicitOperationalStaffing',{...staffing,...patch}),false);
 });

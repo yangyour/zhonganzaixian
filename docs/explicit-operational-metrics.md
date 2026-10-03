@@ -1,6 +1,6 @@
 # 显式经营指标算术核心
 
-## 2026-10-03 实施范围
+## 2026-10-03 纯核心提交范围（eaa7d48，CI37130724964 success）
 
 M10-5、M10-10、M10-12的可独立验证切片：ExplicitOperationalMetrics只计算调用方明确提供的样本中位数和活跃租户数/FTE。尚无公开API、项目数据读取、页面或正式经营报表；现有API契约仍0.28，没有偷偷增加路径或改变旧响应。
 
@@ -17,3 +17,16 @@ M10-5、M10-10、M10-12的可独立验证切片：ExplicitOperationalMetrics只�
 14项新增纯核心测试通过；完整根真实PG回归1050报告=1037执行（含既有322真实PG）+13历史fixture跳过，6MinIO排除，0失败/错误。新增14项没有组件依赖，不把既有PG回归当成本功能真实数据来源联调。55契约测试和生成一致性通过；本次未修改Web、未重跑浏览器。V1–V16字节不变，未执行DDL。
 
 证据：[本批验证](evidence/niko-explicit-operational-metrics-core-20261003.json)。API/数据源/页面、客户口径、正式经营指标与合同完整验收仍未完成，三项均不标DONE。
+
+
+## 2026-10-03 API0.29显式输入对照
+
+POST /api/v1/operations/explicit-comparisons以当前有效成员、operations:compare_explicit能力（仅padmin）与CSRF保护。授权在解析请求前执行，每次重新查询成员，不接受客户端tenant_id/query覆盖。技术请求上限512KiB、10000样本、JSON深度3、重复键/尾随内容拒绝；两个完整组elapsed_millis/staffing可显式null，非null staffing必须提供active_tenants/on_call_fte/second_line_fte。数量/小数为规范十进制字符串，不接受JSON数字、指数、符号、前导零/空白。
+
+成功响应返回当前租户、原显式输入、样本中位数/未知计数和FTE计算；精确结果为BASE10_STRINGS。各UNRESOLVED/UNDEFINED/CALCULATED原因独立校验，正式处理时长/人力指标/target_met仍null，不返回达标或计费结论。当前没有正式均值/P95/MTTR/工单指标、实际工程师/活跃租户查询，不能替代M10-12四处统一统计服务。无业务持久化、不要求幂等键；拒绝仍按已有安全审计记账，成功只读不加业务审计。
+
+新增11控制器测试、完整根1061=1048执行（含既有322真实PG）+13历史跳过，6MinIO排除；57契约、643Web/类型构建通过。真实新PG/OIDC/API批次64HTTP逐响应Ajv校验，涵盖六会话、第二管理员、4类非授权身份403、匿名/CSRF拒绝、精度/空/未知/0分母、10000×40位边界、10001拒绝、严格JSON、真实租户切换与恢复、目录24项和成功只读审计尾不变；0业务记录写入。原样本都是明确合成输入，PG仅用于身份/审计，不冒充真实经营数据源。
+
+首次测试源码使用了异常status()而实际是字段，编译失败后修复；首次HTTP脚本缺少租户切换幂等键，切换400，补齐该既有写入口要求后完整64通过，不放宽服务端。此前失败批次不计入64。API固定JAR正常停启加载本次构建，没有执行迁移或修改组件凭据。无新DOM/存储/原指定服务器验收；下一步接入实际前端对照及状态保护，仍不标合同DONE。
+
+[API实施验证](evidence/niko-explicit-operational-api-20261003.json)、[64真实HTTP](evidence/niko-explicit-operational-api-http-20261003.json)。

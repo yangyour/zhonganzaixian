@@ -1,0 +1,65 @@
+{
+  "verified_at": "2026-10-03T22:43:49.084885+00:00",
+  "scope": "BOUNDED_ALL_TEXT_WITHHELD_DIFF_CORE_NOT_BACKUP_INTEGRATION",
+  "dependency": "io.github.java-diff-utils:java-diff-utils:4.17",
+  "dependency_jar_sha256": "3e3b6e149bf5d091422689ad6fcc22baad503a52b1139a9baf250fb6de633024",
+  "algorithm": "MyersDiffWithLinearSpace",
+  "license": "Apache-2.0",
+  "dependency_license_and_notice_verified_in_adapter_jar": true,
+  "whole_product_license_audit_complete": false,
+  "new_pure_tests": 21,
+  "deterministic_corpus_pairs_within_one_test": 200,
+  "initial_overflow_regression": {
+    "reported": 21,
+    "failed": 1
+  },
+  "final_focused": {
+    "reported": 21,
+    "failed": 0
+  },
+  "root_tests_reported": 1348,
+  "root_tests_executed": 1335,
+  "actual_postgresql_regressions": 392,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "contracts": 70,
+  "generation_check": "PASS",
+  "max_bytes_each": 131072,
+  "max_lines_each": 1000,
+  "max_utf8_bytes_per_line_including_terminator": 8192,
+  "max_comparisons": 250000,
+  "cooperative_budget_nanoseconds": 2000000000,
+  "hard_process_deadline_verified": false,
+  "redaction": "ALL_TEXT_WITHHELD",
+  "noise_policy": "NONE_APPLIED_UNCONFIRMED",
+  "text_or_secret_hashes_returned": false,
+  "actual_provider_or_storage_calls": 0,
+  "device_fixture_server": false,
+  "schema_added": false,
+  "q22_failure_count_semantics": null,
+  "automatic_ticket_allowed": false,
+  "change_approved": false,
+  "api_version": "0.33.0",
+  "api_restarted": false,
+  "v1_v19_changed": false,
+  "contract_done": false,
+  "previous_backup_state_commit": {
+    "sha": "4079778fd4a3a73033c83e896abc26faa6689869",
+    "ci_run": 37158825549,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "server/adapters/pom.xml": "976e41f192e0260c89f313b46158f96e952b754d29d355fbe9a8e92c71ad8e6a",
+    "server/adapters/src/main/java/cn/mop/adapters/backup/RedactedBackupDiff.java": "2c21fdacd03fa292dda89404a85b9f8bdd4073bdd5b44f7d7e82a0ee8d933990",
+    "server/api/src/test/java/cn/mop/adapters/backup/RedactedBackupDiffTest.java": "56d3b7d5175fd7f7b2e3f2a699255efa0737cebd468a66943f52a62c193961e5",
+    "server/adapters/src/main/resources/META-INF/licenses/java-diff-utils-Apache-2.0.txt": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "server/adapters/src/main/resources/META-INF/NOTICE-mop-java-diff-utils.txt": "9bb3fe5e30543ef0bbb931cc70eec20d918cadb25f6e46aebe383b3f5bd6dce9"
+  },
+  "logs_sha256": {
+    ".local/niko-test/logs/backup-redacted-diff-bounds-red.log": "e2afaee3dc5c76d736648dd9c292da770fbb6828d1e535c35443cb8fa668f7fb",
+    ".local/niko-test/logs/backup-redacted-diff-final.log": "b12b21528340c2fc6df4e4657d00473cd008fc4400a209d789fcaab1cc3c4e8e",
+    ".local/niko-test/logs/backup-redacted-diff-root.log": "2cee81e1bb4ae140498388536e8f46ac4fbd2cb0829d7f5e738c720301dd3301",
+    ".local/niko-test/logs/backup-redacted-diff-contract.log": "d2f1870b6f915a4c3226c7c59db117b3492b4926b0c4f0fb2edd2b40726538b9",
+    ".local/niko-test/logs/backup-redacted-diff-license-package.log": "a768077c511389426a7ea77a5ea966a9d74eb6e1a3c2a6e53e27fc58946f1933"
+  }
+}

@@ -1,0 +1,6 @@
+MOP uses the unmodified java-diff-utils 4.17 binary from Maven Central.
+Project: https://github.com/java-diff-utils/java-diff-utils
+License: Apache License 2.0
+See META-INF/licenses/java-diff-utils-Apache-2.0.txt in this artifact.
+Upstream source headers identify Copyright 2021 java-diff-utils.
+This notice covers this dependency, not the complete MOP dependency inventory.

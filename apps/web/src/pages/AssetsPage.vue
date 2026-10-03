@@ -14,6 +14,7 @@ import AssetImportWorkspace from '../components/AssetImportWorkspace.vue'
 import AssetDependencyWorkspace from '../components/AssetDependencyWorkspace.vue'
 import AssetMetadataWorkspace from '../components/AssetMetadataWorkspace.vue'
 import AssetMetadataQuery from '../components/AssetMetadataQuery.vue'
+import AssetDateAssessmentPanel from '../components/AssetDateAssessmentPanel.vue'
 import { assetLedgerColumns, assetLedgerCell } from '../utils/assetLedgerColumns'
 const route = useRoute()
 const router = useRouter()
@@ -162,6 +163,7 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
       <template v-if="asset"><div class="detail-title"><span class="eyebrow">{{ typeLabel(asset.type) }}</span><h2>{{ asset.name }}</h2><StatusTag :status="asset.status" /></div><el-alert type="info" :closable="false" show-icon :title="asset.unknown_reason || '当前未取得真实采集数据，不能判断为正常。'" />
         <el-descriptions :column="1" border class="asset-descriptions"><el-descriptions-item label="资产 ID"><span class="mono">{{ asset.id }}</span></el-descriptions-item><el-descriptions-item label="所属租户">{{ asset.tenant_id }}</el-descriptions-item><el-descriptions-item label="管理 IP"><span class="mono">{{ asset.management_ip }}</span></el-descriptions-item><el-descriptions-item label="站点">{{ asset.site_name || asset.site_id }}</el-descriptions-item><el-descriptions-item label="生命周期">{{ asset.lifecycle_status === 'DRAFT' ? '草稿' : asset.lifecycle_status }}</el-descriptions-item><el-descriptions-item label="来源">{{ sourceLabel(asset.source) }}</el-descriptions-item><el-descriptions-item label="采样时间">{{ displayTime(asset.sampled_at) }}</el-descriptions-item><el-descriptions-item label="版本">v{{ asset.version }}</el-descriptions-item><el-descriptions-item label="创建时间">{{ displayTime(asset.created_at) }}</el-descriptions-item><el-descriptions-item label="更新时间">{{ displayTime(asset.updated_at) }}</el-descriptions-item></el-descriptions>
         <div v-if="metadataAllowed" class="detail-section"><h3>手工草稿资料</h3><p class="muted">内部维护明确资料并留存前后历史；管理IP、CMDB和监控配置不变。</p><PermissionGate capability="assets:write"><el-button @click="openMetadata">查看资料与修订历史</el-button></PermissionGate></div>
+        <AssetDateAssessmentPanel v-if="metadataAllowed" :asset="asset" />
         <div class="detail-section"><h3>依赖草稿</h3><p class="muted">按完整租户图保存人工依赖提案，监控抑制尚未生效。</p><el-button @click="openDependencies">查看或追加依赖草稿</el-button></div>
         <div class="detail-section"><h3>监控接入</h3><p class="muted">测试环境数据已持久保存；生产隔离、监控组件许可与阈值依赖 Q02 / Q03 / Q06。完成客户确认前，草稿不能发布到真实监控。</p><PermissionGate capability="assets:write"><el-button type="primary" plain :loading="onboarding" @click="requestOnboarding">检查接入条件</el-button></PermissionGate></div>
       </template>

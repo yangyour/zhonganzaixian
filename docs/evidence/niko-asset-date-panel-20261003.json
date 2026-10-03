@@ -1,0 +1,27 @@
+{
+  "verified_at": "2026-10-03T06:54:49.924497+00:00",
+  "status": "ASSET_DATE_PANEL_SOURCE_AND_REAL_READER_HTTP_ONLY",
+  "tests": {
+    "new_web": 14,
+    "web_total": 504,
+    "web_typecheck_build": true,
+    "contracts": 44,
+    "real_module_http": 20,
+    "reader_get_requests": 9,
+    "reader_write_requests": 0
+  },
+  "synthetic_setup_mutations": 4,
+  "explicit_refresh_no_auto_write": true,
+  "version_monotonic_within_reader_context": true,
+  "server_instant_shanghai_reference_date_verified": true,
+  "source_wiring_and_responsive_css_checked": true,
+  "browser_dom_tested": false,
+  "screenshots_captured": false,
+  "coverage_verified": false,
+  "hazard_created": false,
+  "notification_sent": false,
+  "api_version": "0.22.0 unchanged",
+  "migrations_executed": 0,
+  "all_128_done": false,
+  "credentials_output": false
+}

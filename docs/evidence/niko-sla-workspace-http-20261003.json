@@ -1,0 +1,28 @@
+{
+  "verified_at": "2026-10-03T06:26:52.553Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual slaScenarioWorkspace + ApiClient",
+  "http_requests": 21,
+  "scenario_post_requests": 17,
+  "explicit_scenario_source": true,
+  "real_business_population_loaded": false,
+  "formal_achievement": null,
+  "compensation_amount": null,
+  "approval_verified": false,
+  "setup_business_writes": 0,
+  "successful_readonly_sequence_audit_tail_unchanged": true,
+  "late_result_after_input_edit_discarded": true,
+  "late_result_after_context_reset_discarded": true,
+  "double_click_suppressed": true,
+  "lost_read_response_cleared_old_result": true,
+  "customer_denied_403": true,
+  "unknowns_and_pending_exclusions_preserved": true,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "Browser desktop/mobile DOM and visual acceptance B03",
+    "Real formal ticket population/snapshots and exclusion approval workflow",
+    "Customer Q08/Q26 decisions"
+  ]
+}

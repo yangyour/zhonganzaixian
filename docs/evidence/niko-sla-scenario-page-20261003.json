@@ -1,0 +1,28 @@
+{
+  "verified_at": "2026-10-03T06:27:57.263375+00:00",
+  "status": "EXPLICIT_SCENARIO_UI_SOURCE_AND_REAL_MODULE_HTTP_ONLY",
+  "tests": {
+    "new_web": 16,
+    "web_total": 490,
+    "web_typecheck_build": true,
+    "contracts": 41,
+    "real_module_http": 21,
+    "scenario_posts": 17
+  },
+  "input_defaults": "unknown/null, no automatic calculation",
+  "readonly": true,
+  "business_writes": 0,
+  "real_population_loaded": false,
+  "formal_achievement": null,
+  "compensation_amount": null,
+  "response_invariants_validated": true,
+  "input_edit_context_reset_and_dispose_discard_late_response": true,
+  "lost_response_does_not_keep_old_result": true,
+  "source_wiring_and_responsive_css_checked": true,
+  "browser_dom_tested": false,
+  "screenshots_captured": false,
+  "api_version": "0.21.0 unchanged",
+  "migrations_executed": 0,
+  "all_128_done": false,
+  "credentials_output": false
+}

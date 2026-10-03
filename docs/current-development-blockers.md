@@ -35,3 +35,5 @@
 关联：[组件清单](environment/component-inventory.md)、[浏览器探测](evidence/niko-ui-blocker-20261002.json)、[OSS](oss-storage-adapter.md)、[当前实施](implementation-status.md)、[验证](verification.md)。本表不包含凭据、连接秘密或未经批准的绕行方案。
 
 - SLA显式对照API0.21：11控制器/13核心、根830（817执行含256既有PG）、41契约/474Web及49真实HTTP通过；当前会话授权与只读数学已验，正式工单全集/审批核验/生效快照与Q08/Q26仍独立等待。成功只读不新增审计，安全拒绝保留全局审计。页面/DOM尚未验，128项未DONE。
+
+- SLA显式对照页面：490Web/41契约/类型构建、实际状态模块21HTTP通过；输入修改/权限切换丢弃旧结果，无业务写入。正式业务来源/批准核验仍缺，DOM仍B03，未称正式达标率或全部128项完成。

@@ -47,3 +47,18 @@ CustomerContactRepository/PostgresCustomerContactRepository接入现有幂等事
 首次测试编译把返回值三元表达式用于void断言lambda，改为语句块；第一轮14仓储用例中1项用LongNode/IntNode的Java类型相等误判语义相同JSON收据，改为真实JSON序列化/重读后比较，未改变业务数据或放宽回执检查。最终17项与完整根均通过，早期失败批次不累加为覆盖数。
 
 V17提交90d23d0 CI37134157209 success；job111235128995实际输出52项PowerShell隔离迁移保护通过、DB操作0，补齐前节PENDING_CI。当前公开API仍0.29，没有联系人端点/页面/导入或实际通知派发；下一步接入真实HTTP及前端，完整M2-9仍不标DONE。见[仓储证据](evidence/niko-customer-contact-repository-20261003.json)。
+
+
+## 2026-10-03 API0.30与136真实HTTP
+
+新增GET/POST /api/v1/contacts、GET/PATCH /contacts/{id}、GET /contacts/{id}/history及POST /contacts/{id}/archive、/restore。仅当前授权padmin/tadmin，contacts:read/write能力当前代码声明，不改人员绑定；MSP/观察者403，已授权另一租户资源404。联系人REPORTER/DECISION_MAKER/TECHNICAL_CONTACT仅联系业务标签，不是账号角色或已核验客户确认资格。
+
+创建expected_version=0；更新/归档/恢复1..9007199254740990以便下一版本仍JS安全。创建/修改/恢复9字段完整，归档只传expected_version；明确空/未知组保留，集合重复/非法值拒绝；角色/P级排列不影响幂等摘要，对象键顺序也不影响，原文字和null分组有意义。16KiB/JSON深度3/64token/重复键/尾随内容限制，CSRF+幂等键必需、全写query拒绝。列表默认15，10/15/25/50/100技术分页；名字字面查询和CURRENT/ARCHIVED/ALL视图、成对cursor，历史按version分页。归档停用保历史、恢复需完整明确事实，无永久DELETE接口。
+
+DTO独立映射并稳定排序集合；联系与渠道未核验、通知CONFIG_PENDING/未派发、无身份绑定。停用delivery_eligible=false，启用仍null，不能把“启用”当已送达。当前API readiness加入真实V17列/约束/ACL/函数/触发器检查，缺失503，liveness独立，不自动迁移。
+
+新增14控制器+1就绪测试，根1120=1107执行（351真实PG）+13历史跳过，6MinIO排除；61契约/生成一致性、658Web/类型构建通过。首次Mockito已存答案重设时因matcher空参数触发测试NPE，改doAnswer重设，最终40项聚焦与全根通过；业务代码无降级。手机/邮箱正值契约检查通过。
+
+正常停启自己拥有的固定API JAR后，重新取得六OIDC会话，136真实HTTP逐响应Ajv验证：联系资料/未知与空组、两类管理员、403/跨租户404/CSRF/缺幂等、原键/集合顺序/历史、归档恢复/旧收据与当前状态分离、11条10+1分页、有界非法输入、两个真实同版本PATCH 200/409、两个真实最后决策人归档200/409且剩1。新建14合成联系人均归档保留历史；本轮临时涉及的自有合成决策人基线已恢复，未永久删除、创建账号或变更既有成员/权限版本。真实目录26项和成功只读审计尾不变；不把HTTP当浏览器或通知验收。
+
+仓储eabfa2c CI37135557637 success已回读；原服务器0.30/V17、联系人页面/导入、通知真实送达仍待。见[API实施证据](evidence/niko-customer-contact-api-20261003.json)、[136HTTP](evidence/niko-customer-contact-api-http-20261003.json)，M2-9/128项不标DONE。

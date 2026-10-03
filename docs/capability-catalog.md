@@ -6,13 +6,13 @@
 
 API0.25新增GET /api/v1/authorization/capability-catalog，仅当前启用padmin、有效权限版本及configurations:read；拒绝全部query。只返回代码角色/维度/能力声明，不读取或返回人员绑定，不能创建角色、修改权限或发布配置。effective_customer_matrix、resource_access_decision及客户/供应商签字均null；customer_approval_status=UNVERIFIED、configuration_status=CONFIG_PENDING、configuration_driven_authorization=false、新增角色配置驱动运行NOT_IMPLEMENTED。auth.role_matrix_and_assignments仍不可当运行配置。
 
-目录覆盖24项当前声明；search:read同时归属资产与指标、告警与工单，但总目录只一行。声明映射摘要算法为UTF-8 SHA256：前缀mop-capability-declarations-v1换行，viewer|tadmin|msp|padmin换行，随后按能力ID排序的“ID|逗号连接维度ID|四角色1/0向量”逐行。摘要不覆盖说明标签，也不是签名、客户确认或授权令牌。
+目录覆盖26项当前声明；search:read同时归属资产与指标、告警与工单，但总目录只一行。声明映射摘要算法为UTF-8 SHA256：前缀mop-capability-declarations-v1换行，viewer|tadmin|msp|padmin换行，随后按能力ID排序的“ID|逗号连接维度ID|四角色1/0向量”逐行。摘要不覆盖说明标签，也不是签名、客户确认或授权令牌。
 
 ## 来自真实授权API的只读快照
 
-以下表更新自显式经营对照API0.29的64次实测中的1次niko-local-test真实授权GET，重新计算摘要一致；没有人员或凭据。它方便在GitHub核对，不能作为生效配置或签字验收。
+以下表更新自联系人API0.30的136次实测中的1次niko-local-test真实授权GET，重新计算摘要一致；没有人员或凭据。它方便在GitHub核对，不能作为生效配置或签字验收。
 
-声明映射SHA256：`5f0eabdbb8a1826e54ca74b5c79f52b1d4f5cf91140f561c6f89db0696f1696e`
+声明映射SHA256：`a348d208a3398caefab6c03632ec962f8223ab66b1488cf61da27ce13bb313f8`
 
 |能力|说明|资源维度|客户观察者|客户管理员|MSP值班工程师|平台管理员|
 |---|---|---|---|---|---|---|
@@ -25,6 +25,8 @@ API0.25新增GET /api/v1/authorization/capability-catalog，仅当前启用padmi
 |capacity_scenarios:write|保存不可变容量方案草稿|平台管理|未声明|未声明|未声明|已声明|
 |configurations:read|读取设计配置与提案|平台管理|未声明|未声明|未声明|已声明|
 |configurations:write|维护设计草稿与内部提案|平台管理|未声明|未声明|未声明|已声明|
+|contacts:read|读取当前租户联系人|成员管理|未声明|已声明|未声明|已声明|
+|contacts:write|维护当前租户联系人与归档|成员管理|未声明|已声明|未声明|已声明|
 |manual_incidents:read|读取手工来源登记|告警与工单|未声明|未声明|已声明|已声明|
 |manual_incidents:write|创建手工来源登记|告警与工单|未声明|未声明|已声明|已声明|
 |manual_recovery:confirm|提交独立人工恢复确认|告警与工单|未声明|未声明|已声明|已声明|
@@ -41,7 +43,7 @@ API0.25新增GET /api/v1/authorization/capability-catalog，仅当前启用padmi
 |worklogs:read_own|读取本人工时|告警与工单|未声明|未声明|已声明|未声明|
 |worklogs:write_own|维护本人工时|告警与工单|未声明|未声明|已声明|未声明|
 
-模板与自动化、成员管理两个维度保留在API/页面，当前声明条目数为0；不因此标已完成。四类角色来源固定合同，服务经理/值班长/二线审批人/审计职责的真实映射、工程师资源范围、审批回避与替补、客户确认关系仍待Q09。
+模板与自动化维度保留在API/页面，当前声明条目数为0。成员管理维度现有2项联系人能力，但并未实现账号邀请/角色授予或身份源治理；不因此标完整成员管理完成。四类角色来源固定合同，服务经理/值班长/二线审批人/审计职责的真实映射、工程师资源范围、审批回避与替补、客户确认关系仍待Q09。
 
 ## 原API0.25页面与初始验证
 
@@ -67,3 +69,8 @@ capacity:estimate仅平台管理员声明，目录21行；当前表及摘要已�
 ## API0.29显式经营对照声明增量
 
 operations:compare_explicit仅padmin声明，目录24行；本批64真实HTTP含六会话/真实目录和摘要核对，未改人员绑定。该能力仅显式样本算术，不读取团队经营数据或开放正式经营指标。原20/21/23行证据保持历史含义，见[HTTP证据](evidence/niko-explicit-operational-api-http-20261003.json)。
+
+
+## API0.30联系人能力增量
+
+contacts:read/write仅当前授权padmin/tadmin，目录26项；真实GET和六会话核对能力集合/摘要及前后权限版本未变。联系人角色是业务标签，不能授予账号权限或直接当客户确认资格。旧24项证据保持历史含义；136HTTP见[联系人API](evidence/niko-customer-contact-api-http-20261003.json)。

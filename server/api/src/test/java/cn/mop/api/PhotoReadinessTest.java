@@ -21,7 +21,7 @@ class PhotoReadinessTest {
     @BeforeEach void setup(){
         repository=mock(PlatformRepository.class);store=mock(PhotoObjectStore.class);configuration=new PhotoConfiguration();
         when(repository.metadata()).thenReturn(new RepositoryMetadata("remote_test","postgresql",true,"test_oidc"));
-        when(repository.assetReadProblems()).thenReturn(List.of());when(repository.ticketCommentProblems()).thenReturn(List.of());when(repository.workingCalendarProblems()).thenReturn(List.of());when(repository.manualIncidentProblems()).thenReturn(List.of());when(repository.manualRecoveryProblems()).thenReturn(List.of());when(repository.capacityScenarioProblems()).thenReturn(List.of());when(repository.internalNoteProblems()).thenReturn(List.of());when(repository.assetMetadataProblems()).thenReturn(List.of());when(repository.worklogProblems()).thenReturn(List.of());when(repository.assetDependencyProblems()).thenReturn(List.of());when(repository.dependencyReady()).thenReturn(true);when(repository.photoDependencyProblems()).thenReturn(List.of());
+        when(repository.customerContactProblems()).thenReturn(List.of());when(repository.assetReadProblems()).thenReturn(List.of());when(repository.ticketCommentProblems()).thenReturn(List.of());when(repository.workingCalendarProblems()).thenReturn(List.of());when(repository.manualIncidentProblems()).thenReturn(List.of());when(repository.manualRecoveryProblems()).thenReturn(List.of());when(repository.capacityScenarioProblems()).thenReturn(List.of());when(repository.internalNoteProblems()).thenReturn(List.of());when(repository.assetMetadataProblems()).thenReturn(List.of());when(repository.worklogProblems()).thenReturn(List.of());when(repository.assetDependencyProblems()).thenReturn(List.of());when(repository.dependencyReady()).thenReturn(true);when(repository.photoDependencyProblems()).thenReturn(List.of());
         when(store.ready()).thenReturn(true);request=new MockHttpServletRequest();request.setAttribute("mop.trace_id","isolated-readiness");
     }
     private PhotoConfiguration.PhotoDependencyProbe probe(MockEnvironment environment){
@@ -122,6 +122,10 @@ class PhotoReadinessTest {
 
     @Test void capacityDraftReadinessDoesNotClaimApprovalOrMeasurement(){
         var controller=controller(probe(new MockEnvironment()));when(repository.capacityScenarioProblems()).thenReturn(List.of("missing"));controller.live(request);verify(repository,never()).capacityScenarioProblems();var failure=assertThrows(DomainException.class,()->controller.ready(request));assertEquals(503,failure.status);assertEquals("capacity_scenarios",((Map<?,?>)failure.details.get(0)).get("component"));when(repository.capacityScenarioProblems()).thenReturn(List.of());Map<?,?> ready=(Map<?,?>)data(controller.ready(request)).get("capacity_scenarios");assertEquals(true,ready.get("schema_access_ready"));assertEquals(false,ready.get("effective"));assertEquals(false,ready.get("measurement_verified"));assertEquals(false,ready.get("poc_executed"));
+    }
+
+    @Test void contactReadinessFailsClosedWithoutClaimingNotificationOrIdentityIntegration(){
+        var controller=controller(probe(new MockEnvironment()));when(repository.customerContactProblems()).thenReturn(List.of("missing"));controller.live(request);verify(repository,never()).customerContactProblems();var failure=assertThrows(DomainException.class,()->controller.ready(request));assertEquals(503,failure.status);assertEquals("customer_contacts",((Map<?,?>)failure.details.get(0)).get("component"));when(repository.customerContactProblems()).thenReturn(List.of());Map<?,?> ready=(Map<?,?>)data(controller.ready(request)).get("customer_contacts");assertEquals(true,ready.get("schema_access_ready"));assertEquals(false,ready.get("notification_dispatched"));assertEquals(false,ready.get("identity_binding_created"));assertEquals("NOT_VERIFIED",ready.get("channel_verification"));
     }
 
 }

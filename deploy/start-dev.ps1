@@ -3,7 +3,8 @@ param(
     [int]$WebPort = 5173,
     [switch]$SkipBuild,
     [switch]$WithPhotoWorker,
-    [switch]$WithAssetImportWorker
+    [switch]$WithAssetImportWorker,
+    [switch]$WithContactImportWorker
 )
 $ErrorActionPreference = 'Stop'
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
@@ -31,6 +32,7 @@ function Save-MopDevState {
         web_port = $WebPort
         photo_worker_enabled = [bool]$WithPhotoWorker
         asset_import_worker_enabled = [bool]$WithAssetImportWorker
+        contact_import_worker_enabled = [bool]$WithContactImportWorker
         processes = @($ownedProcesses.ToArray())
     } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $stateFile -Encoding utf8
 }
@@ -98,6 +100,12 @@ try {
         $importWorkerJar = $importWorkerJars[0]
         Assert-MopJavaJar -Path $importWorkerJar.FullName -MainClass 'org.springframework.boot.loader.launch.JarLauncher' -StartClass 'cn.mop.importworker.AssetImportWorkerApplication'
     }
+    if ($WithContactImportWorker) {
+        $contactWorkerJars = @(Get-ChildItem -LiteralPath (Join-Path $projectRoot 'server/worker/target') -Filter 'mop-worker-*-contact-imports.jar' | Where-Object { Test-MopWorkerArtifactName -Name $_.Name -Role 'contact-import-worker' })
+        if ($contactWorkerJars.Count -ne 1) { throw '联系人导入模式需要唯一已构建 contact-imports Worker jar。' }
+        $contactWorkerJar = $contactWorkerJars[0]
+        Assert-MopJavaJar -Path $contactWorkerJar.FullName -MainClass 'org.springframework.boot.loader.launch.JarLauncher' -StartClass 'cn.mop.contactworker.ContactImportWorkerApplication'
+    }
     $vitePath = Join-Path $projectRoot 'apps/web/node_modules/vite/bin/vite.js'
     if (-not (Test-Path -LiteralPath $vitePath)) { throw '缺少Vite依赖，请先运行 npm --prefix apps/web ci。' }
     New-Item -ItemType Directory -Force -Path $runtimeDir | Out-Null
@@ -115,13 +123,13 @@ try {
     $previousEnvironment = @{}
     try {
         foreach ($property in $runtimeConfig.environment.PSObject.Properties) {
-            if ($property.Name -like 'MOP_MIGRATION_*' -or $property.Name -in @('MOP_PHOTO_WORKER_ENABLED', 'MOP_IMPORT_WORKER_ENABLED')) { continue }
+            if ($property.Name -like 'MOP_MIGRATION_*' -or $property.Name -in @('MOP_PHOTO_WORKER_ENABLED', 'MOP_IMPORT_WORKER_ENABLED', 'MOP_CONTACT_IMPORT_WORKER_ENABLED')) { continue }
             $previousEnvironment[$property.Name] = [Environment]::GetEnvironmentVariable($property.Name, 'Process')
             [Environment]::SetEnvironmentVariable($property.Name, [string]$property.Value, 'Process')
         }
-        foreach ($name in @('MOP_MIGRATION_USERNAME', 'MOP_MIGRATION_PASSWORD', 'MOP_PHOTO_WORKER_ENABLED', 'MOP_IMPORT_WORKER_ENABLED')) {
+        foreach ($name in @('MOP_MIGRATION_USERNAME', 'MOP_MIGRATION_PASSWORD', 'MOP_PHOTO_WORKER_ENABLED', 'MOP_IMPORT_WORKER_ENABLED', 'MOP_CONTACT_IMPORT_WORKER_ENABLED')) {
             $previousEnvironment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process')
-            [Environment]::SetEnvironmentVariable($name, $(if ($name -in @('MOP_PHOTO_WORKER_ENABLED', 'MOP_IMPORT_WORKER_ENABLED')) { 'false' } else { $null }), 'Process')
+            [Environment]::SetEnvironmentVariable($name, $(if ($name -in @('MOP_PHOTO_WORKER_ENABLED', 'MOP_IMPORT_WORKER_ENABLED', 'MOP_CONTACT_IMPORT_WORKER_ENABLED')) { 'false' } else { $null }), 'Process')
         }
         $apiProcess = Start-Process -FilePath $javaExecutable -ArgumentList @('-jar', ('"' + $apiJar.FullName + '"'), '--spring.profiles.active=remote_test', "--server.port=$ApiPort", '--server.address=127.0.0.1') -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $runtimeDir 'api.stdout.log') -RedirectStandardError (Join-Path $runtimeDir 'api.stderr.log')
         Register-MopDevProcess -Process $apiProcess -Name 'api' -ExecutablePath $javaExecutable -ArtifactPath $apiJar.FullName
@@ -146,6 +154,7 @@ try {
             if ($health.data.mode -ne 'remote_test' -or $health.data.ready -ne $true -or $health.data.durable -ne $true) { throw 'API未连接指定共享测试环境。' }
             if ($WithPhotoWorker -and $health.data.photos.ready -ne $true) { throw '照片结构、策略或 MinIO 尚未就绪。' }
             if ($WithAssetImportWorker -and $health.data.asset_imports.ready -ne $true) { throw '资产导入结构、存储或解析器尚未就绪。' }
+            if ($WithContactImportWorker -and $health.data.contact_imports.schema_access_ready -ne $true) { throw '联系人导入 V19 结构或受限权限尚未就绪；启动不会自动迁移。' }
             Invoke-WebRequest -Uri "http://127.0.0.1:$WebPort" -TimeoutSec 1 | Out-Null
             $ready = $true
             break
@@ -220,6 +229,29 @@ try {
         }
         if (-not $importWorkerReady) { throw '资产导入 Worker 未通过 V6/受限账号/导入存储/独立解析器门禁；没有自动迁移或组件回退。' }
         Write-Host '资产导入 Worker 已通过启动门禁，仅处理本项目 PG 导入暂存与解析任务。'
+    }
+    if ($WithContactImportWorker) {
+        $previousContactEnvironment = [Environment]::GetEnvironmentVariables('Process')
+        $contactEnvironment = Get-MopContactWorkerEnvironment -RuntimeEnvironment $runtimeConfig.environment -Ambient $previousContactEnvironment
+        $contactRun = [guid]::NewGuid().ToString('N')
+        $contactWorkerOutput = Join-Path $runtimeDir ("contact-import-worker.$contactRun.stdout.log")
+        try {
+            foreach ($name in @($previousContactEnvironment.Keys)) { [Environment]::SetEnvironmentVariable([string]$name, $null, 'Process') }
+            foreach ($name in $contactEnvironment.Keys) { [Environment]::SetEnvironmentVariable([string]$name, [string]$contactEnvironment[$name], 'Process') }
+            $contactWorkerProcess = Start-Process -FilePath $javaExecutable -ArgumentList @('-jar', ('"' + $contactWorkerJar.FullName + '"'), '--spring.profiles.active=remote_test') -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput $contactWorkerOutput -RedirectStandardError (Join-Path $runtimeDir ("contact-import-worker.$contactRun.stderr.log"))
+            Register-MopDevProcess -Process $contactWorkerProcess -Name 'contact-import-worker' -ExecutablePath $javaExecutable -ArtifactPath $contactWorkerJar.FullName
+        } finally {
+            foreach ($name in @([Environment]::GetEnvironmentVariables('Process').Keys)) { [Environment]::SetEnvironmentVariable([string]$name, $null, 'Process') }
+            foreach ($name in $previousContactEnvironment.Keys) { [Environment]::SetEnvironmentVariable([string]$name, [string]$previousContactEnvironment[$name], 'Process') }
+        }
+        $contactWorkerReady = $false
+        for ($attempt = 0; $attempt -lt 120; $attempt++) {
+            if ($contactWorkerProcess.HasExited -or $apiProcess.HasExited -or $webProcess.HasExited) { throw '联系人导入模式进程提前退出，请查看本次独立日志。' }
+            if ((Test-Path -LiteralPath $contactWorkerOutput) -and (Select-String -LiteralPath $contactWorkerOutput -SimpleMatch 'Dedicated contact import worker started; only contact jobs are eligible' -Quiet)) { $contactWorkerReady = $true; break }
+            Start-Sleep -Milliseconds 500
+        }
+        if (-not $contactWorkerReady) { throw '联系人 Worker 未通过 V19/受限账号启动门禁；没有自动迁移或fixture回退。' }
+        Write-Host '联系人 Worker 已通过本次启动门禁，仅处理联系人作业；不证明持续在线或整批业务完成。'
     }
     Write-Host "本地应用已连接共享测试环境：http://127.0.0.1:$WebPort"
     Write-Host "API：http://127.0.0.1:$ApiPort/api/v1/session"

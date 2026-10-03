@@ -1,0 +1,36 @@
+{
+  "verified_at": "2026-10-03T20:52:39.256861+00:00",
+  "scope": "EXPLICIT_WINDOWS_CONTACT_WORKER_START_OPTION_AND_MINIMAL_ENVIRONMENT",
+  "switch": "WithContactImportWorker",
+  "default_enabled": false,
+  "required_schema": "V19",
+  "only_existing_runtime_database_credentials": true,
+  "new_credentials": false,
+  "migrations": 0,
+  "ambient_application_cloud_oidc_migration_credentials_inherited": false,
+  "per_run_unique_log_path": true,
+  "dedicated_ownership_role": "contact-import-worker",
+  "lease_millis": 30000,
+  "new_isolated_powershell_checks": 6,
+  "isolated_powershell_checks_expected": 27,
+  "powershell_execution": "PENDING_WINDOWS_CI_NO_LOCAL_PWSH",
+  "actual_windows_process_actions": 0,
+  "actual_designated_server_startup": "NOT_RUN",
+  "previous_role_regression_ci": {
+    "sha": "7587fa8224e919cbe60309b54dc1803af5b7b744",
+    "run": 37152864074,
+    "job": 111290142515,
+    "conclusion": "success",
+    "isolated_checks": 21,
+    "actual_process_actions": 0
+  },
+  "source_sha256": {
+    "deploy/start-dev.ps1": "2b8bd2bea016d20910275bd86aa963a9a1c379a1385dcc09642b1325233e4fd0",
+    "deploy/dev-process-ownership.ps1": "2fbd898ebfb7262081d495c7a0e3fc6f49365af767852641811d17945ec825be",
+    "tools/test-dev-process-ownership.ps1": "3631f15cd4079c598bd610b329beeb71f328c6dc6d5fdb91d71d0631c5945503"
+  },
+  "api_version": "0.32.0",
+  "v1_v19_changed": false,
+  "browser_dom": "NOT_RUN_B03",
+  "contract_done": false
+}

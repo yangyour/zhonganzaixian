@@ -11,6 +11,27 @@ function Test-MopWorkerArtifactName {
     }
 }
 
+# Pure projection of existing private settings; no credential creation or ambient application secrets.
+function Get-MopContactWorkerEnvironment {
+    param([Parameter(Mandatory)]$RuntimeEnvironment, [Parameter(Mandatory)][Collections.IDictionary]$Ambient)
+    $child = @{}
+    foreach ($name in @('PATH','SystemRoot','WINDIR','SystemDrive','TEMP','TMP','USERPROFILE','LOCALAPPDATA','APPDATA','ProgramData','ProgramFiles','ProgramFiles(x86)','PROCESSOR_ARCHITECTURE','ComSpec','PATHEXT','OS')) {
+        if ($Ambient.Contains($name) -and $null -ne $Ambient[$name]) { $child[$name] = [string]$Ambient[$name] }
+    }
+    foreach ($name in @('SPRING_DATASOURCE_URL','SPRING_DATASOURCE_USERNAME','SPRING_DATASOURCE_PASSWORD')) {
+        $property = $RuntimeEnvironment.PSObject.Properties[$name]
+        if (-not $property -or $property.Value -isnot [string] -or [string]::IsNullOrWhiteSpace([string]$property.Value)) { throw '联系人 Worker 私有数据库配置不完整；原值不输出。' }
+        $child[$name] = [string]$property.Value
+    }
+    if ($child['SPRING_DATASOURCE_URL'] -cnotmatch '\Ajdbc:postgresql://127\.0\.0\.1:([0-9]{1,5})/mop_test\z') { throw '联系人 Worker 只允许项目回环数据库连接且不可附加选项。' }
+    $port = [int]$Matches[1]
+    if ($port -lt 1 -or $port -gt 65535 -or $child['SPRING_DATASOURCE_USERNAME'] -cne 'mop_test_runtime') { throw '联系人 Worker 必须使用受限项目运行账号和有效回环端口。' }
+    $child['SPRING_PROFILES_ACTIVE'] = 'remote_test'
+    $child['MOP_CONTACT_IMPORT_WORKER_ENABLED'] = 'true'
+    $child['MOP_CONTACT_IMPORT_LEASE_MILLIS'] = '30000'
+    return $child
+}
+
 # Shared ownership verification. This helper never discovers a PID and then stops it by name.
 function Get-MopOwnedProcess {
     param([Parameter(Mandatory)]$Record, [Parameter(Mandatory)][string]$ProjectRoot)

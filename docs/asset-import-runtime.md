@@ -89,3 +89,8 @@ pwsh -File tools/test-dev-process-ownership.ps1
 ```
 
 该脚本仅以本地 fake `Get-Process`/`Get-CimInstance` 调用纯归属 helper，当前 12 项检查通过。它覆盖角色/工程目录、照片与导入 classifier、精确 `-jar` 参数、PID/启动时间复用、解析父子关系、未知 run/子进程，以及父进程退出后的保存候选恢复。它不启动、不停止或盘点实际进程，不能作为实际停服证据。
+
+
+## 2026-10-03 独立联系人产物兼容补充
+
+新增的contact-imports.jar也符合旧*-imports.jar通配符，旧选择器会误判两个候选。现启动/停止共享Test-MopWorkerArtifactName三族互斥，资产导入明确排除*-contact-imports.jar，联系人单独-WithContactImportWorker选择；详情见[联系人运行说明](contact-import-runtime.md)。角色修复7587fa8的Windows CI21项隔离校验通过，不代表原服务器真实重启。

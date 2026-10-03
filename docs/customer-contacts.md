@@ -229,3 +229,10 @@ API提交b0af459 CI37151368999 success已回读。本次仅前端状态模块，
 另修正联系人Worker混合开关校验：既有资产实际开关为MOP_IMPORT_WORKER_ENABLED，原只校验MOP_ASSET_IMPORT_WORKER_ENABLED别名；现两者及照片开关都拒绝混入。新增1 Java回归（设置总8项），根1240=1227执行含392真实PG、13历史fixture跳过/6MinIO排除全部通过；新固定JAR实际JVM在两个真实开关true时退出1，明确FAIL_CLOSED，未提供或读取任何数据库凭据、未启动Hikari/访问组件。
 
 PowerShell隔离用例从14增至21，新增三族互斥/原候选重叠/同路径伪角色/直接入口保护；本机无pwsh，实际执行留给新增Windows CI job，当前提交不预先声明通过。该job只使用本地进程测试替身，实际进程操作0，不能当Windows原服务器启动验收。未新增WithContactImportWorker选项，niko专用启动器仍可用；原服务器入口/迁移/真实进程验证待。页面6dd6350 CI37152643951 success已回读。见[回归记录](evidence/niko-worker-artifact-role-regression-20261003.json)、[实际JVM拒绝](evidence/niko-contact-worker-role-startup-20261003.json)。
+
+
+## 2026-10-03 Windows显式联系人Worker选项
+
+新增start-dev.ps1 -WithContactImportWorker，默认不开启；先检查V19结构/权限ready，再核验唯一专用JAR manifest/入口并启动，记录contact-import-worker精确归属。纯环境投影仅允许普通OS路径+现有受限PG三项+专用profile/flag/30秒租期，拒绝远端/其他库/URL参数/高权限，不继承OIDC/迁移/存储/其他Worker或Java注入变量，不新建秘密。启动无论成功失败都恢复父环境；每次日志随机后缀避免旧标记，启动门禁不冒充持续在线。API启动环境明确关闭联系人Worker开关。
+
+增加6项PowerShell隔离检查（投影/缺失类型/连接边界/无别名副作用/显式启动接线/AST语法），总27项待本次Windows CI回读，本机无pwsh，未运行真实Windows进程。前一角色回归7587fa8 CI37152864074 success，Windows job111290142515实际21项全部通过且真实进程操作0，补齐前节待CI。原服务器V19/实际启动仍待；没有迁移/组件/凭据变更。见[运行说明](contact-import-runtime.md)、[启动器边界](evidence/niko-contact-worker-windows-launcher-20261003.json)。

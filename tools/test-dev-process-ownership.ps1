@@ -199,4 +199,42 @@ Check-Ownership 'startup uses shared classifier discriminator and migration guar
     $helper = Get-Content -Raw -LiteralPath (Join-Path $projectRoot 'deploy/dev-process-ownership.ps1')
     if (-not $helper.Contains("Contains('cn.mop.contactworker.ContactImportWorkerApplication'")) { throw 'Contact main class missing from refuse-migration guard' }
 }
+$contactRuntime = [pscustomobject]@{ SPRING_DATASOURCE_URL='jdbc:postgresql://127.0.0.1:25432/mop_test'; SPRING_DATASOURCE_USERNAME='mop_test_runtime'; SPRING_DATASOURCE_PASSWORD='SYNTHETIC_UNIT_ONLY'; MOP_OIDC_CLIENT_SECRET='SYNTHETIC_NOT_COPIED'; MOP_IMPORT_WORKER_ENABLED='true' }
+Check-Ownership 'contact child environment copies existing runtime database settings only' {
+    $childEnv = Get-MopContactWorkerEnvironment -RuntimeEnvironment $contactRuntime -Ambient @{PATH='SYNTHETIC_PATH'; TEMP='SYNTHETIC_TEMP'; AWS_SECRET_ACCESS_KEY='SYNTHETIC_NOT_COPIED'; JAVA_TOOL_OPTIONS='SYNTHETIC_NOT_COPIED'; MOP_MIGRATION_PASSWORD='SYNTHETIC_NOT_COPIED'; SPRING_DATASOURCE_PASSWORD='SYNTHETIC_AMBIENT_NOT_COPIED'}
+    if ($childEnv.Count -ne 8 -or $childEnv['SPRING_DATASOURCE_PASSWORD'] -ne 'SYNTHETIC_UNIT_ONLY' -or $childEnv['SPRING_PROFILES_ACTIVE'] -ne 'remote_test' -or $childEnv['MOP_CONTACT_IMPORT_WORKER_ENABLED'] -ne 'true' -or $childEnv['MOP_CONTACT_IMPORT_LEASE_MILLIS'] -ne '30000') { throw 'Contact environment projection mismatch' }
+    foreach ($name in @('AWS_SECRET_ACCESS_KEY','JAVA_TOOL_OPTIONS','MOP_MIGRATION_PASSWORD','MOP_OIDC_CLIENT_SECRET','MOP_IMPORT_WORKER_ENABLED')) { if ($childEnv.ContainsKey($name)) { throw 'Ambient or unrelated application setting leaked' } }
+}
+Check-Ownership 'contact child environment rejects missing or nonstring private fields' {
+    foreach ($name in @('SPRING_DATASOURCE_URL','SPRING_DATASOURCE_USERNAME','SPRING_DATASOURCE_PASSWORD')) {
+        $original = $contactRuntime.$name
+        try { foreach ($invalid in @($null,' ',42)) { $contactRuntime.$name=$invalid; Require-Rejected { Get-MopContactWorkerEnvironment -RuntimeEnvironment $contactRuntime -Ambient @{} } } } finally { $contactRuntime.$name=$original }
+    }
+}
+Check-Ownership 'contact environment rejects nonproject destinations options and elevated role' {
+    $url=$contactRuntime.SPRING_DATASOURCE_URL; $user=$contactRuntime.SPRING_DATASOURCE_USERNAME
+    try {
+        foreach ($invalid in @('jdbc:postgresql://remote.invalid:25432/mop_test','jdbc:postgresql://127.0.0.1:0/mop_test','jdbc:postgresql://127.0.0.1:65536/mop_test','jdbc:postgresql://127.0.0.1:25432/other','jdbc:postgresql://127.0.0.1:25432/mop_test?password=SYNTHETIC_ONLY')) { $contactRuntime.SPRING_DATASOURCE_URL=$invalid; Require-Rejected { Get-MopContactWorkerEnvironment -RuntimeEnvironment $contactRuntime -Ambient @{} } }
+        $contactRuntime.SPRING_DATASOURCE_URL=$url; $contactRuntime.SPRING_DATASOURCE_USERNAME='mop_test_migrator'; Require-Rejected { Get-MopContactWorkerEnvironment -RuntimeEnvironment $contactRuntime -Ambient @{} }
+    } finally { $contactRuntime.SPRING_DATASOURCE_URL=$url; $contactRuntime.SPRING_DATASOURCE_USERNAME=$user }
+}
+Check-Ownership 'contact environment accepts empty ambient without mutating supplied secrets' {
+    $ambient=@{}; $original=$contactRuntime.SPRING_DATASOURCE_PASSWORD
+    $projected=Get-MopContactWorkerEnvironment -RuntimeEnvironment $contactRuntime -Ambient $ambient
+    if ($projected.Count -ne 6 -or $ambient.Count -ne 0 -or $contactRuntime.SPRING_DATASOURCE_PASSWORD -ne $original) { throw 'Projection mutated inputs or inherited unexpected values' }
+    $projected['SPRING_DATASOURCE_PASSWORD']='SYNTHETIC_COPY_CHANGED'
+    if ($contactRuntime.SPRING_DATASOURCE_PASSWORD -ne $original) { throw 'Returned environment aliases private settings' }
+}
+Check-Ownership 'contact startup is opt-in and records dedicated role and fresh logs' {
+    $startup=Get-Content -Raw -LiteralPath (Join-Path $projectRoot 'deploy/start-dev.ps1')
+    foreach ($required in @('[switch]$WithContactImportWorker','contact_import_worker_enabled = [bool]$WithContactImportWorker',"-Name 'contact-import-worker'","-StartClass 'cn.mop.contactworker.ContactImportWorkerApplication'",'Get-MopContactWorkerEnvironment -RuntimeEnvironment $runtimeConfig.environment','contact-import-worker.$contactRun.stdout.log','$health.data.contact_imports.schema_access_ready')) { if (-not $startup.Contains($required)) { throw 'Contact startup role, fresh log or readiness gate missing' } }
+    if ($startup.Contains('WithContactImportWorker = $true')) { throw 'Contact worker must not start implicitly' }
+}
+Check-Ownership 'startup and stop scripts parse without executing application actions' {
+    foreach ($file in @('deploy/start-dev.ps1','deploy/stop-dev.ps1','deploy/dev-process-ownership.ps1')) {
+        $tokens=$null; $errors=$null
+        $null=[Management.Automation.Language.Parser]::ParseFile((Join-Path $projectRoot $file),[ref]$tokens,[ref]$errors)
+        if ($errors.Count -ne 0) { throw 'PowerShell application script syntax invalid' }
+    }
+}
 Write-Host "MOP_OWNERSHIP_TEST status=PASS isolated_checks=$script:checks fake_process_queries=$script:processQueries fake_cim_queries=$script:cimQueries actual_process_actions=0"

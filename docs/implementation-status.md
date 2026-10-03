@@ -964,3 +964,8 @@ V18队列/不可变行结果结构显式1/重复0/check0且26表不变，但13�
 ## 2026-10-03 Worker角色匹配回归
 
 实际三JAR复现旧资产通配符同时选中contact-imports，已改启动/停止共享三族互斥判别并补直接联系人入口迁移拒绝；实际资产启用flag混入也已补拒绝。新增1 Java/根1240报告1227执行含392PG通过，固定JVM混合flags真实退出1且未读秘密/连库。PowerShell21项待新增Windows CI实际运行，未冒充本地或原服务器执行，见[回归边界](customer-contacts.md)。
+
+
+## 2026-10-03 Windows可选联系人Worker启动器
+
+新增显式WithContactImportWorker、V19 ready/JAR门禁、最小已有PG环境、每次独立日志和精确已登记停止归属；默认不启用、不迁移/建凭据。27隔离PowerShell用例待本次CI，实际Windows/原服务器启动NOT_RUN。前角色修复7587fa8 CI37152864074/Windows21项已实证通过，真实进程操作0，见docs/contact-import-runtime.md。

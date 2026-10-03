@@ -7,6 +7,7 @@ import type { RegisteredTicket } from '../api/types'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createInternalNoteWorkspace, emptyNoteState, validateInternalNoteText, type NoteState } from '../utils/internalNoteWorkspace'
 import ApiErrorNotice from './ApiErrorNotice.vue'
+import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 const props = defineProps<{ modelValue: boolean; ticket: RegisteredTicket | null }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
 const open = computed({ get: () => props.modelValue, set: value => emit('update:modelValue', value) })
@@ -32,7 +33,8 @@ async function retryOriginal() { if (await workspace.retry()) clearForm() }
 function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved()) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
 onBeforeRouteLeave(() => { if (!workspace.unresolved()) return true; ElMessage.warning('内部备注结果尚未确认，请先使用原请求重试，再离开本页'); return false })
-onUnmounted(() => { workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
+const unregisterContextGuard = contextTransitionGuards.register(() => { if (!workspace.unresolved()) return true; ElMessage.warning('内部备注保存结果尚未确认，请先处理原请求再切换租户或退出'); return false })
+onUnmounted(() => { unregisterContextGuard(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
 defineExpose({ hasUnresolved: workspace.unresolved })
 </script>
 

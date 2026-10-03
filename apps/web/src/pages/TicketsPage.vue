@@ -17,6 +17,7 @@ import ReportPhotoPanel from '../components/ReportPhotoPanel.vue'
 import RetainedPhotoNotice from '../components/RetainedPhotoNotice.vue'
 import { createPhotoQueue } from '../utils/photoQueue'
 import { createTicketPhotoWorkspace } from '../utils/ticketPhotoWorkspace'
+import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import { createReportOperationReader, type ReportOperationReadState } from '../utils/reportOperation'
 
 const route = useRoute(), router = useRouter()
@@ -165,7 +166,8 @@ function resetContext() {
   operationReader.reset()
 }
 watch(() => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version], resetContext, { flush: 'sync' })
-onUnmounted(() => { resetContext(); detailPhotos.dispose(); photoWorkspace.dispose() })
+const unregisterContextGuard = contextTransitionGuards.register(() => { if (!photoWorkspace.unresolved.value) return true; ElMessage.warning('已有报障照片或追加请求未处理完，请先恢复原登记并处理，再切换租户或退出'); return false })
+onUnmounted(() => { unregisterContextGuard(); resetContext(); detailPhotos.dispose(); photoWorkspace.dispose() })
 </script>
 
 <template>

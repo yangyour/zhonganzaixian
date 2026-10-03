@@ -1,0 +1,23 @@
+{
+  "verified_at": "2026-10-03T02:16:46.123Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "http_requests": 16,
+  "frontend": "actual ticketCommentWorkspace + ApiClient + session store + transition registry",
+  "synthetic_parent_reports": 1,
+  "comment_post_attempts": 2,
+  "durable_comments": 1,
+  "matching_success_audits": 1,
+  "uncertain_comment_blocked_switch_and_logout_without_http": true,
+  "readonly_refresh_did_not_release_guard": true,
+  "original_body_and_key_preserved": true,
+  "explicit_retry_resolved_once": true,
+  "resolved_switch_and_return_verified": true,
+  "original_tenant_restored": true,
+  "guard_uses_actual_workspace_unresolved_state": true,
+  "component_wiring_verified_by_source_tests_not_dom": true,
+  "asset_import_or_photo_storage_http_tested": false,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "fault_injection": "Discard one successful comment POST response; not physical network failure"
+}

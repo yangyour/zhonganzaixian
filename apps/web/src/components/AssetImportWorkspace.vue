@@ -9,6 +9,7 @@ import { assetImportTargets, assetImportUnaddressedColumns } from '../utils/asse
 import { createAssetImportWorkspace } from '../utils/assetImportWorkspace'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 import AppTable from './AppTable.vue'
+import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 
 const props = defineProps<{ modelValue: boolean }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
@@ -36,7 +37,8 @@ onBeforeRouteLeave(() => {
   ElMessage.warning('来源请求结果尚未确认；请先回读或使用原请求重试，再离开资产页面。')
   return false
 })
-onUnmounted(workspace.dispose)
+const unregisterContextGuard = contextTransitionGuards.register(() => { if (!hasUnresolved.value) return true; ElMessage.warning('资产来源请求尚未确认，请先回读或重试原请求再切换租户或退出'); return false })
+onUnmounted(() => { unregisterContextGuard(); workspace.dispose() })
 </script>
 
 <template>

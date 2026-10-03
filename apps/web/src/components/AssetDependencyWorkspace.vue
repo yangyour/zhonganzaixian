@@ -7,6 +7,7 @@ import type { Asset, AssetPage } from '../api/types'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createDependencyWorkspace, type DependencyState, type ProposedDependency } from '../utils/assetDependencyWorkspace'
 import ApiErrorNotice from './ApiErrorNotice.vue'
+import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import AppTable from './AppTable.vue'
 
 const props = defineProps<{ modelValue: boolean; asset: Asset | null }>()
@@ -57,7 +58,8 @@ function label(id: string) { return id === props.asset?.id ? props.asset.name : 
 function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved()) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
 onBeforeRouteLeave(() => { if (!workspace.unresolved()) return true; ElMessage.warning('依赖保存结果尚未确认，请先使用原请求重试，再离开资产页面'); return false })
-onUnmounted(() => { searchController?.abort(); ++searchGeneration; workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
+const unregisterContextGuard = contextTransitionGuards.register(() => { if (!workspace.unresolved()) return true; ElMessage.warning('资产依赖保存结果尚未确认，请先处理原请求再切换租户或退出'); return false })
+onUnmounted(() => { unregisterContextGuard(); searchController?.abort(); ++searchGeneration; workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
 defineExpose({ hasUnresolved: workspace.unresolved })
 </script>
 

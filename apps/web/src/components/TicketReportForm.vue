@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
-import { ElRadio, ElRadioGroup } from 'element-plus'
+import { ElRadio, ElRadioGroup, ElMessage } from 'element-plus'
+import { contextTransitionGuards } from '../utils/contextTransitionGuard'
+import { reportContextUnresolved } from '../utils/reportContextGuard'
 import { api, ApiError, isCancelled } from '../api/client'
 import type { Asset, AssetPage, CustomerReportAcceptance, CustomerReportOperation, RegisteredTicket } from '../api/types'
 import { can, contextGeneration, session } from '../stores/session'
@@ -59,7 +61,8 @@ watch(() => props.modelValue, value => {
   } else { assetsController?.abort(); ++assetsGeneration; assetsLoading.value = false }
 })
 watch(() => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version], () => { reset(); open.value = false }, { flush: 'sync' })
-onUnmounted(() => { reset(); photos.dispose(); appender.dispose() })
+const unregisterContextGuard = contextTransitionGuards.register(() => { if (!reportContextUnresolved({ submitting: submitting.value, uncertain: uncertain.value, accepted: Boolean(acceptedOperationId.value), complete: complete.value, appending: appender.busy.value, appendUncertain: appender.uncertain.value, unresolvedPhotos: unresolvedPhotos.value })) return true; ElMessage.warning('报障登记或照片尚未处理完，请先回读、使用原请求重试或移除可撤回的本地照片，再切换租户或退出'); return false })
+onUnmounted(() => { unregisterContextGuard(); reset(); photos.dispose(); appender.dispose() })
 watch(appender.comparison, value => { if (value && registeredTicket.value) emit('registered', registeredTicket.value.id) })
 async function loadAssets() {
   if (!can('assets:read')) { assets.value = []; return }

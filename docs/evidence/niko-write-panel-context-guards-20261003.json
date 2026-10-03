@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-03T02:19:00.587999+00:00",
+  "environment": "niko-local-test",
+  "status": "EIGHT_WRITE_CONTEXT_GUARDS_WIRED_AND_VERIFIED",
+  "new_tests": {
+    "component_source_wiring": 8,
+    "live_and_report_state": 3
+  },
+  "total_web_tests": 384,
+  "typecheck_build": true,
+  "contract_tests": 34,
+  "actual_http_requests": 16,
+  "actual_http_evidence": "niko-write-context-guard-http-20261003.json",
+  "guarded_entries": [
+    "WorklogWorkspace",
+    "AssetDependencyWorkspace",
+    "AssetMetadataWorkspace",
+    "InternalNoteWorkspace",
+    "TicketCommentWorkspace",
+    "AssetImportWorkspace",
+    "TicketReportForm",
+    "TicketsPage detail photos"
+  ],
+  "actual_http_scope": "customer-visible comment unresolved writer + session store + registry",
+  "uncertain_transition_sent_no_http": true,
+  "readonly_refresh_did_not_unblock": true,
+  "original_retry_one_comment_one_audit": true,
+  "original_tenant_restored": true,
+  "component_dom_tested": false,
+  "photo_or_import_storage_http_tested": false,
+  "configuration_revision_recovery_pending": "B06",
+  "java_tests_rerun": false,
+  "api_version_unchanged": "0.18.0",
+  "frozen_migrations": "V1-V12 unchanged",
+  "full_contract_done": false,
+  "credentials_output": false
+}

@@ -1,0 +1,377 @@
+{
+  "verified_at": "2026-10-03T12:22:58.330Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "contract_version": "0.28.0",
+  "http_requests": 71,
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_immutable_proposal",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "original_key_replays_original_receipt",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "nested_order_same_receipt",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_changed_body_conflicts",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "durable_readback",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_tenant_other_admin_read",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "read_denied_msp",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "write_denied_msp",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "read_denied_tadmin",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "write_denied_tadmin",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "read_denied_viewerA",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "write_denied_viewerA",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "read_denied_viewerB",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "write_denied_viewerB",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "csrf_required",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "key_required",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_create_23",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_create_24",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_create_25",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_create_26",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_create_27",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_create_28",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_create_29",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_create_30",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_expected_version",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_label",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_note",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_calculation",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_benchmark_reference",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "numeric_input_not_coerced",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_json_37",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_json_38",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_json_39",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_json_40",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "create_query_denied",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "list_query_denied_42",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "list_query_denied_43",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "list_query_denied_44",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "list_query_denied_45",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "list_query_denied_46",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_id_404",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "detail_query_denied",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "switch_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "cross_tenant_id_404",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "cross_tenant_list_empty",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "restore_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "explicit_unknown_and_unverified_reference",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "large_inputs_and_repeating_output",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "concurrent_original_a",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "concurrent_original_b",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "independent_same_label_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "independent_same_label_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "independent_same_label_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "independent_same_label_3",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "independent_same_label_4",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "independent_same_label_5",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "independent_same_label_6",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "first_ten_keyset",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "last_one_keyset",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_before_reads",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "read_only_detail_again",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "read_only_default_list",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_after_reads",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "new_capability_catalog",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "synthetic_scenarios_created": 11,
+  "concurrent_same_key_one_id": true,
+  "readonly_audit_tail_unchanged": true,
+  "current_capability_count": 23,
+  "current_capability_hash": "ea0e1f81607b38c71a74f0bf03eb0aa9e46f0927e89325c68f194cd05b4c13b8",
+  "original_key_and_nested_order_replay": true,
+  "cross_tenant_404": true,
+  "model_approved": false,
+  "measurement_verified": false,
+  "poc_executed": false,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "all_128_done": false
+}

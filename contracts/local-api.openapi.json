@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.27.0",
+    "version": "0.28.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -6094,6 +6094,532 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ManualAssetCurrentResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/capacity/scenarios": {
+      "get": {
+        "operationId": "listCapacityScenarios",
+        "summary": "当前租户不可变容量草稿分页",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "仅当前租户平台管理员；记录DRAFT不可变，不代表模型批准/文档真实性/实测或压测。标签查询为ICU小写字面子串，不搜索说明，分页非跨请求冻结快照。",
+        "x-mop-capability": "capacity_scenarios:read",
+        "x-mop-read-only": true,
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                25,
+                50,
+                100
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "label_query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "before_recorded_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-paired-query-keys": [
+          "before_recorded_at",
+          "before_id"
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CapacityScenarioPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createCapacityScenario",
+        "summary": "显式保存不可变容量方案草稿",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CapacityScenarioCreate"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "仅当前租户平台管理员；记录DRAFT不可变，不代表模型批准/文档真实性/实测或压测。标签查询为ICU小写字面子串，不搜索说明，分页非跨请求冻结快照。 创建版本必须为0，写入版本1；不是集合覆盖CAS。全query拒绝，五字段必需，引用显式null。输入/固定公式结果/审计/幂等同事务；嵌套键顺序不改变摘要，原文字和十进制字符串保持意义。原键恢复原收据；新键可创建独立同标签草稿，无覆盖/生效/删除接口。",
+        "x-mop-capability": "capacity_scenarios:write",
+        "x-mop-max-body-bytes": 32768,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-replay-authorization": "current active platform administrator before cached receipt",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CapacityScenarioResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/capacity/scenarios/{id}": {
+      "get": {
+        "operationId": "getCapacityScenario",
+        "summary": "读取授权租户已保存容量草稿，跨租户404",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "仅当前租户平台管理员；记录DRAFT不可变，不代表模型批准/文档真实性/实测或压测。标签查询为ICU小写字面子串，不搜索说明，分页非跨请求冻结快照。",
+        "x-mop-capability": "capacity_scenarios:read",
+        "x-mop-read-only": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CapacityScenarioResult"
                 }
               }
             }
@@ -14254,6 +14780,30 @@
                   "sla_changed"
                 ],
                 "additionalProperties": false
+              },
+              "capacity_scenarios": {
+                "type": "object",
+                "properties": {
+                  "schema_access_ready": {
+                    "type": "boolean"
+                  },
+                  "effective": {
+                    "const": false
+                  },
+                  "measurement_verified": {
+                    "const": false
+                  },
+                  "poc_executed": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "schema_access_ready",
+                  "effective",
+                  "measurement_verified",
+                  "poc_executed"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -14273,7 +14823,8 @@
               "asset_reads",
               "working_calendars",
               "manual_incidents",
-              "manual_recovery"
+              "manual_recovery",
+              "capacity_scenarios"
             ],
             "additionalProperties": false
           },
@@ -20295,6 +20846,575 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/InternalTicketNotePage"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "CapacityScenarioCreate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "const": 0
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "calculation": {
+            "$ref": "#/components/schemas/CapacityEstimateInput"
+          },
+          "benchmark_reference": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "reference": {
+                    "type": "string",
+                    "pattern": "^document-ref:[A-Za-z0-9._:-]+$",
+                    "maxLength": 160,
+                    "description": "仅非敏感资料标识；后缀不得是磁盘路径或包含token/password/secret/credential/private-key等凭据正文标记。不是附件下载地址，不核验文档真实性。"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[A-Fa-f0-9]{64}$"
+                  }
+                },
+                "required": [
+                  "reference",
+                  "title",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "expected_version",
+          "label",
+          "note",
+          "calculation",
+          "benchmark_reference"
+        ],
+        "additionalProperties": false
+      },
+      "CapacityScenario": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "calculation": {
+            "$ref": "#/components/schemas/CapacityEstimateInput"
+          },
+          "calculation_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "snapshot_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "benchmark_reference": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "reference": {
+                    "type": "string",
+                    "pattern": "^document-ref:[A-Za-z0-9._:-]+$",
+                    "maxLength": 160,
+                    "description": "仅非敏感资料标识；后缀不得是磁盘路径或包含token/password/secret/credential/private-key等凭据正文标记。不是附件下载地址，不核验文档真实性。"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[A-Fa-f0-9]{64}$"
+                  }
+                },
+                "required": [
+                  "reference",
+                  "title",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "benchmark_verification": {
+            "enum": [
+              "NOT_PROVIDED",
+              "REFERENCE_ONLY_UNVERIFIED"
+            ]
+          },
+          "snapshot": {
+            "type": "object",
+            "properties": {
+              "capacity_formula_version": {
+                "const": "contract-m10-7-capacity-v1"
+              },
+              "buffer_formula_version": {
+                "const": "contract-m4-15-buffer-v1"
+              },
+              "status": {
+                "enum": [
+                  "ESTIMATED",
+                  "UNRESOLVED"
+                ]
+              },
+              "model_version": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "missing_inputs": {
+                "type": "array",
+                "uniqueItems": true,
+                "maxItems": 11,
+                "items": {
+                  "enum": [
+                    "inputs",
+                    "model",
+                    "hosts",
+                    "items_per_host",
+                    "interval_seconds",
+                    "history_days",
+                    "bytes_per_value",
+                    "trend_ratio",
+                    "trend_days",
+                    "headroom_ratio",
+                    "model.version",
+                    "model.bytes_per_trend_row",
+                    "model.pool_nvps_limit"
+                  ]
+                }
+              },
+              "outputs": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CapacityEstimateOutputs"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "proxy_buffer": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "ESTIMATED",
+                      "UNRESOLVED"
+                    ]
+                  },
+                  "missing_inputs": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "maxItems": 4,
+                    "items": {
+                      "enum": [
+                        "proxy_buffer",
+                        "site_nvps",
+                        "outage_seconds",
+                        "bytes_per_value",
+                        "margin_factor"
+                      ]
+                    }
+                  },
+                  "estimated_bytes": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                        "maxLength": 256
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "margin_factor_below_one": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "measurement_verified": {
+                    "const": false
+                  },
+                  "failover_verified": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "status",
+                  "missing_inputs",
+                  "estimated_bytes",
+                  "margin_factor_below_one",
+                  "measurement_verified",
+                  "failover_verified"
+                ],
+                "additionalProperties": false,
+                "oneOf": [
+                  {
+                    "properties": {
+                      "status": {
+                        "const": "ESTIMATED"
+                      },
+                      "missing_inputs": {
+                        "maxItems": 0
+                      },
+                      "estimated_bytes": {
+                        "type": "string",
+                        "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                        "maxLength": 256
+                      },
+                      "margin_factor_below_one": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "status": {
+                        "const": "UNRESOLVED"
+                      },
+                      "missing_inputs": {
+                        "minItems": 1
+                      },
+                      "estimated_bytes": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "required": [
+              "capacity_formula_version",
+              "buffer_formula_version",
+              "status",
+              "model_version",
+              "missing_inputs",
+              "outputs",
+              "proxy_buffer"
+            ],
+            "additionalProperties": false,
+            "oneOf": [
+              {
+                "properties": {
+                  "status": {
+                    "const": "ESTIMATED"
+                  },
+                  "missing_inputs": {
+                    "maxItems": 0
+                  },
+                  "outputs": {
+                    "$ref": "#/components/schemas/CapacityEstimateOutputs"
+                  },
+                  "model_version": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "status": {
+                    "const": "UNRESOLVED"
+                  },
+                  "missing_inputs": {
+                    "minItems": 1
+                  },
+                  "outputs": {
+                    "type": "null"
+                  }
+                }
+              }
+            ]
+          },
+          "decimal_encoding": {
+            "const": "BASE10_STRINGS"
+          },
+          "decimal_precision": {
+            "const": "DECIMAL128"
+          },
+          "lifecycle_status": {
+            "const": "DRAFT"
+          },
+          "model_approval_status": {
+            "const": "UNVERIFIED"
+          },
+          "measurement_verification": {
+            "const": "UNVERIFIED"
+          },
+          "production_capacity_verified": {
+            "const": false
+          },
+          "approved_pool_nvps_limit": {
+            "type": "null"
+          },
+          "measured_capacity": {
+            "type": "null"
+          },
+          "poc_status": {
+            "const": "NOT_RUN"
+          },
+          "effective": {
+            "const": false
+          },
+          "immutable": {
+            "const": true
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "record_source": {
+            "const": "EXPLICIT_CAPACITY_DRAFT"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "created_by",
+          "recorded_at",
+          "version",
+          "label",
+          "note",
+          "calculation",
+          "calculation_sha256",
+          "snapshot_sha256",
+          "benchmark_reference",
+          "benchmark_verification",
+          "snapshot",
+          "decimal_encoding",
+          "decimal_precision",
+          "lifecycle_status",
+          "model_approval_status",
+          "measurement_verification",
+          "production_capacity_verified",
+          "approved_pool_nvps_limit",
+          "measured_capacity",
+          "poc_status",
+          "effective",
+          "immutable",
+          "source",
+          "record_source"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "benchmark_reference": {
+                "type": "null"
+              },
+              "benchmark_verification": {
+                "const": "NOT_PROVIDED"
+              }
+            }
+          },
+          {
+            "properties": {
+              "benchmark_reference": {
+                "type": "object",
+                "properties": {
+                  "reference": {
+                    "type": "string",
+                    "pattern": "^document-ref:[A-Za-z0-9._:-]+$",
+                    "maxLength": 160,
+                    "description": "仅非敏感资料标识；后缀不得是磁盘路径或包含token/password/secret/credential/private-key等凭据正文标记。不是附件下载地址，不核验文档真实性。"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[A-Fa-f0-9]{64}$"
+                  }
+                },
+                "required": [
+                  "reference",
+                  "title",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              },
+              "benchmark_verification": {
+                "const": "REFERENCE_ONLY_UNVERIFIED"
+              }
+            }
+          }
+        ]
+      },
+      "CapacityScenarioResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CapacityScenario"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "CapacityScenarioPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/CapacityScenario"
+            }
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_before_recorded_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "next_before_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_CAPACITY_DRAFTS"
+          },
+          "page_size_limit": {
+            "const": 100
+          },
+          "pagination_consistency": {
+            "const": "CURRENT_REQUEST_SNAPSHOT_ONLY"
+          }
+        },
+        "required": [
+          "items",
+          "has_more",
+          "next_before_recorded_at",
+          "next_before_id",
+          "source",
+          "scope",
+          "page_size_limit",
+          "pagination_consistency"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "has_more": {
+                "const": false
+              },
+              "next_before_recorded_at": {
+                "type": "null"
+              },
+              "next_before_id": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "has_more": {
+                "const": true
+              },
+              "next_before_recorded_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "next_before_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "items": {
+                "minItems": 1
+              }
+            }
+          }
+        ]
+      },
+      "CapacityScenarioPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CapacityScenarioPage"
           },
           "trace_id": {
             "type": "string"

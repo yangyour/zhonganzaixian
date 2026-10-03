@@ -6,13 +6,13 @@
 
 API0.25新增GET /api/v1/authorization/capability-catalog，仅当前启用padmin、有效权限版本及configurations:read；拒绝全部query。只返回代码角色/维度/能力声明，不读取或返回人员绑定，不能创建角色、修改权限或发布配置。effective_customer_matrix、resource_access_decision及客户/供应商签字均null；customer_approval_status=UNVERIFIED、configuration_status=CONFIG_PENDING、configuration_driven_authorization=false、新增角色配置驱动运行NOT_IMPLEMENTED。auth.role_matrix_and_assignments仍不可当运行配置。
 
-目录覆盖21项当前声明；search:read同时归属资产与指标、告警与工单，但总目录只一行。声明映射摘要算法为UTF-8 SHA256：前缀mop-capability-declarations-v1换行，viewer|tadmin|msp|padmin换行，随后按能力ID排序的“ID|逗号连接维度ID|四角色1/0向量”逐行。摘要不覆盖说明标签，也不是签名、客户确认或授权令牌。
+目录覆盖23项当前声明；search:read同时归属资产与指标、告警与工单，但总目录只一行。声明映射摘要算法为UTF-8 SHA256：前缀mop-capability-declarations-v1换行，viewer|tadmin|msp|padmin换行，随后按能力ID排序的“ID|逗号连接维度ID|四角色1/0向量”逐行。摘要不覆盖说明标签，也不是签名、客户确认或授权令牌。
 
 ## 来自真实授权API的只读快照
 
-以下表更新自容量API0.27实测中的1次niko-local-test真实授权GET，重新计算摘要一致；没有人员或凭据。它方便在GitHub核对，不能作为生效配置或签字验收。
+以下表更新自容量草稿API0.28实测中的1次niko-local-test真实授权GET，重新计算摘要一致；没有人员或凭据。它方便在GitHub核对，不能作为生效配置或签字验收。
 
-声明映射SHA256：`5c8d8a369181d7d71dcbaf2000400d70057f30f238f2747cff1ae601b7a957e1`
+声明映射SHA256：`ea0e1f81607b38c71a74f0bf03eb0aa9e46f0927e89325c68f194cd05b4c13b8`
 
 |能力|说明|资源维度|客户观察者|客户管理员|MSP值班工程师|平台管理员|
 |---|---|---|---|---|---|---|
@@ -21,6 +21,8 @@ API0.25新增GET /api/v1/authorization/capability-catalog，仅当前启用padmi
 |assets:write|资产相关写入口能力声明|资产与指标|未声明|已声明|已声明|已声明|
 |audit:read|读取当前租户审计|平台管理|未声明|未声明|未声明|已声明|
 |capacity:estimate|显式容量与缓冲估算|平台管理|未声明|未声明|未声明|已声明|
+|capacity_scenarios:read|读取容量方案草稿|平台管理|未声明|未声明|未声明|已声明|
+|capacity_scenarios:write|保存不可变容量方案草稿|平台管理|未声明|未声明|未声明|已声明|
 |configurations:read|读取设计配置与提案|平台管理|未声明|未声明|未声明|已声明|
 |configurations:write|维护设计草稿与内部提案|平台管理|未声明|未声明|未声明|已声明|
 |manual_incidents:read|读取手工来源登记|告警与工单|未声明|未声明|已声明|已声明|
@@ -54,3 +56,8 @@ API0.25新增GET /api/v1/authorization/capability-catalog，仅当前启用padmi
 ## API0.27容量能力声明增量
 
 capacity:estimate仅平台管理员声明，目录21行；当前表及摘要已由72次容量HTTP中的1次真实GET更新，六个实际会话核对该能力及前后权限版本不变。只新增当前代码的显式数学入口，不改身份绑定、客户签字矩阵或配置发布。初始20行证据保留原时点含义，不能冒充当前21行。见[增量HTTP证据](evidence/niko-capacity-estimate-api-http-20261003.json)。
+
+
+## API0.28容量草稿声明增量
+
+新增capacity_scenarios:read/write，仅padmin静态代码能力；真实GET核对23项声明和摘要。旧20/21项证据保持原时点，不改写历史。没有修改人员绑定或客户签字状态。

@@ -885,3 +885,14 @@ Edge154下模板下载、隐藏工作表XLSX解析/重复表头映射v1回读、
 ## 2026-10-03 容量场景仓储切片
 
 15新真实PG+5纯codec/JSON规则、根1024（1011执行含322PG）/53契约通过。当前padmin授权/跨租户404、创建基准0→不可变v1、同键竞态只1行1审计、精确字符串输入/重算快照/回执、全回滚和分页有证。V16 CI另确认49PowerShell保护通过；原服务器V16未验。公开保存API/UI/真实基准/PoC后续，M10-7/128项非DONE。见[仓储边界](capacity-estimate-core.md)。
+
+
+## 2026-10-03 容量方案API0.28
+
+POST /api/v1/capacity/scenarios 明确创建不可变DRAFT（expected_version=0→1），GET列表/详情真实PG回读、每次验证输入摘要和固定公式重算结果。仅当前租户启用padmin，CSRF、幂等和审计；原收据返回前重新校验当前授权。严格五字段 label/note/calculation/benchmark_reference/expected_version，引用显式null或未核验资料标识；全部数量/小数输入输出为十进制字符串。嵌套字段顺序不改请求摘要，原文和数值字符串保持有意义。新键可建同标签独立方案，不提供覆盖、删除或生效操作。
+
+列表标签ICU小写字面匹配，不搜索说明；10/15/25/50/100分页，paired before_recorded_at/id；每页一致快照，不是冻结导出。跨租户详情404；unknown/duplicate query拒绝。就绪纳入V16真实schema/ACL检查，API/Worker仍不自动迁移。模型/基准/实测/PoC均未核验，保存不改变这些门禁。原容量估算接口语义未变。
+
+11新增控制器+1就绪测试，根1036=1023执行（322真实PG）+13历史fixture跳过，6MinIO排除；55契约、592Web、类型/构建通过。停止旧自有API0.27并从新构建启动0.28，六个新真实OIDC会话；71真实HTTP覆盖原键/嵌套顺序重放、改体409、并发同键、11个独立合成方案、10+1游标、权限/CSRF/跨租户404、数值精度/未知/引用门禁、只读审计尾不变。23项代码声明真实GET摘要验证，不改人员绑定。源码接口测试不是浏览器DOM或客户验收。
+
+[完整回归](evidence/niko-capacity-scenario-api-20261003.json)；[真实HTTP](evidence/niko-capacity-scenario-api-http-20261003.json)。下一步保存页面/原请求不确定结果恢复与真实前端模块；原指定服务器V16未验、OSS、实际基准、增长曲线和长期PoC仍待补，128项不标DONE。

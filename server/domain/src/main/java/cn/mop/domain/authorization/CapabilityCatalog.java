@@ -17,6 +17,8 @@ public final class CapabilityCatalog {
     static {
         var dimensions=new LinkedHashMap<String,String>();dimensions.put("ASSETS_METRICS","资产与指标");dimensions.put("ALERTS_TICKETS","告警与工单");dimensions.put("TEMPLATES_AUTOMATION","模板与自动化");dimensions.put("PLATFORM_ADMIN","平台管理");dimensions.put("MEMBER_ADMIN","成员管理");DIMENSIONS=Collections.unmodifiableMap(dimensions);
         var definitions=new TreeMap<String,Definition>();
+        define(definitions,"capacity_scenarios:read","读取容量方案草稿","PLATFORM_ADMIN");
+        define(definitions,"capacity_scenarios:write","保存不可变容量方案草稿","PLATFORM_ADMIN");
         define(definitions,"capacity:estimate","显式容量与缓冲估算","PLATFORM_ADMIN");
         define(definitions,"search:read","分组搜索","ASSETS_METRICS","ALERTS_TICKETS");
         define(definitions,"assets:read","读取资产记录","ASSETS_METRICS");define(definitions,"assets:write","资产相关写入口能力声明","ASSETS_METRICS");define(definitions,"asset_dates:read","读取记录日期对照","ASSETS_METRICS");

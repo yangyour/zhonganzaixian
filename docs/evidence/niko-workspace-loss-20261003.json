@@ -1,0 +1,18 @@
+{
+  "observed_at": "2026-10-03T13:23:20Z",
+  "status": "EXECUTOR_CHANGED_SOURCE_RECOVERY_PENDING",
+  "last_pushed_commit": "002a89d744d5074f8e1bbf9858fa660a396a72c9",
+  "last_ci_run": 37125698984,
+  "last_ci_conclusion": "success",
+  "old_repository_available": false,
+  "old_toolchain_available": false,
+  "old_qa_session_accessible": false,
+  "failure": "exec-server protocol error: executor key changed during session recovery",
+  "new_shell_available": true,
+  "git_https_probe": "No username; terminal prompts disabled",
+  "source_recovery_export_unit_tests": 8,
+  "source_restored": false,
+  "new_components_validated": false,
+  "user_computer_or_original_server_changed": false,
+  "credentials_output": false
+}

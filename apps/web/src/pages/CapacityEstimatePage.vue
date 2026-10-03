@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, reactive, shallowRef, watch } from 'vue'
+import { computed, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue'
 import { api } from '../api/client'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createCapacityWorkspace, emptyCapacityInput, type CapacityState, type CapacityOutputs } from '../utils/capacityEstimateWorkspace'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import CapacityScenarioPanel from '../components/CapacityScenarioPanel.vue'
+const scenarios = ref<InstanceType<typeof CapacityScenarioPanel> | null>(null)
 const fields = [
   { key: 'hosts', label: '主机数', help: '非负整数' }, { key: 'items_per_host', label: '每台有效监控项数', help: '非负整数' },
   { key: 'interval_seconds', label: '采样间隔（秒）', help: '正数' }, { key: 'history_days', label: '历史保留天数', help: '非负整数' },
@@ -29,13 +31,15 @@ const missingLabels: Record<string, string> = Object.fromEntries([...fields.map(
 const bufferMissing: Record<string, string> = Object.fromEntries([...bufferFields.map(f => [f.key, f.label]), ['proxy_buffer', '尚未启用Proxy缓冲输入']])
 </script>
 <template>
+  <CapacityScenarioPanel ref="scenarios" :calculation="input()" />
   <section class="capacity-page">
     <div class="page-heading"><div><span class="eyebrow">EXPLICIT ESTIMATES</span><h1>容量与 Proxy 缓冲估算</h1><p>平台管理员 · 显式输入 · 只读数学工具</p></div></div>
-    <el-alert type="warning" :closable="false" title="估算不是实测容量、采购规格或PoC验收">所有系数须明确输入，不自动填入80/128字节、5000NVPS或余量示例。模型版本和池上限未核验；不保存场景，不改变监控、资源池或租户配额。</el-alert>
+    <el-alert type="warning" :closable="false" title="估算不是实测容量、采购规格或PoC验收">所有系数须明确输入，不自动填入80/128字节、5000NVPS或余量示例。模型版本和池上限未核验；只读估算不保存场景；可单独明确保存不可变方案草稿，不改变监控、资源池或租户配额。</el-alert>
     <p class="capacity-help">空白表示未知（null），不会当成零。输入修改立即清除旧结果，离开或切换租户后清空；不会自动计算。数量和小数始终以十进制字符串传输，避免大整数精度丢失。</p>
     <el-empty v-if="!permitted" description="当前身份没有平台容量估算权限" />
     <template v-else>
       <ApiErrorNotice :error="state.error" />
+      <div class="capacity-actions"><el-button v-if="can('capacity_scenarios:write')" @click="scenarios?.prepare()">以当前输入准备保存方案</el-button><el-button v-if="can('capacity_scenarios:read')" @click="scenarios?.browse()">只读查看已保存方案</el-button></div>
       <el-form label-position="top" @submit.prevent="calculate">
         <section class="capacity-input-section"><h2>八项容量输入</h2><div class="capacity-fields"><el-form-item v-for="field in fields" :key="field.key" :label="field.label"><el-input v-model="draft.inputs[field.key]" :aria-label="field.label" inputmode="decimal" placeholder="未知留空，明确0请填写0" /><span class="field-help">{{ field.help }}</span></el-form-item></div></section>
         <section class="capacity-input-section"><h2>明确的模型系数</h2><p class="capacity-help">原型示例不是运行默认，也不能证明客户批准或实测单池能力。</p><div class="capacity-fields"><el-form-item v-for="field in modelFields" :key="field.key" :label="field.label"><el-input v-model="draft.model[field.key]" :aria-label="field.label" placeholder="未知留空" /><span class="field-help">{{ field.help }}</span></el-form-item></div></section>
@@ -50,7 +54,7 @@ const bufferMissing: Record<string, string> = Object.fromEntries([...bufferField
         <el-alert v-if="state.result.proxy_buffer.margin_factor_below_one" type="warning" :closable="false" title="缓冲倍率小于1，结果小于基础需求；未自动把它解释成额外余量，也不能视为容量足够" />
         <p class="capacity-help">主备两份只是数学估算，不证明HA、Proxy接管或断网无丢失。每值空间来源未核验，实际容量和获准池限仍未知。</p>
       </section>
-      <section class="capacity-boundaries"><h2>仍待真实验收</h2><p>PoC目标：12,500NVPS持续24小时，2倍峰值30分钟；本工具没有执行该压测。场景持久化、压测基准关联和增长曲线尚未提供。当前输入仅在本页，不是已保存方案。</p></section>
+      <section class="capacity-boundaries"><h2>仍待真实验收</h2><p>PoC目标：12,500NVPS持续24小时，2倍峰值30分钟；本工具没有执行该压测。已提供独立草稿保存与未核验基准引用；增长曲线、实际基准验证及PoC仍待完成。当前主页面输入不会自动保存，只有确认成功的方案回执才代表已写入。</p></section>
     </template>
   </section>
 </template>

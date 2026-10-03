@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-03T12:47:21.035287+00:00",
+  "environment": "niko-local-test",
+  "status": "SCENARIO_PANEL_IMPLEMENTED_BROWSER_ACCEPTANCE_PENDING",
+  "new_tests": 8,
+  "actual_vue_sfc_handler_tests": 7,
+  "source_wiring_test": 1,
+  "web_total": 613,
+  "contracts": 55,
+  "type_and_build": true,
+  "test_harness": "Vue SFC executed with custom in-memory renderer and stub Element Plus controls under pinned jsdom26.1.0; not actual browser DOM/visual/network integration",
+  "verified": [
+    "explicit prepare copies current page calculation without request",
+    "later parent edits do not change fixed submission snapshot",
+    "uncertain write blocks route and tenant transition",
+    "beforeunload warning registered and removed",
+    "draft discard cancellation preserves form",
+    "forced session invalidation clears protected form",
+    "oversized query caught without request",
+    "drawer hide does not abort or discard sent request",
+    "readonly browse cannot resolve or repeat uncertain save"
+  ],
+  "module_real_http_evidence": "niko-capacity-scenario-client-http-20261003-retry-guard.json",
+  "new_http_batch_for_panel": false,
+  "module_source_unchanged": true,
+  "module_commit": "388044464248a2f0fd380a8c94a44d5e3f88244f",
+  "module_ci": {
+    "run": 37123480879,
+    "conclusion": "success"
+  },
+  "browser_dom_tested": false,
+  "physical_mobile_tested": false,
+  "schema_changed": false,
+  "production_ready": false,
+  "all_128_done": false,
+  "test_setup_corrections": "Initial Node SFC test compiled SSR and could not mount; installed pinned official-registry jsdom test-only dependency with scripts disabled and writable npm cache. File-source test switched from browser URL to filesystem path; final8 pass."
+}

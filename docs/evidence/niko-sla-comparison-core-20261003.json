@@ -1,0 +1,47 @@
+{
+  "verified_at": "2026-10-03T06:04:26.288312+00:00",
+  "status": "PURE_SLA_COMPARISON_SCENARIO_CORE_ONLY",
+  "tests": {
+    "new_pure_rules": 12,
+    "root_reported": 818,
+    "root_executed": 805,
+    "existing_real_pg_regression": 256,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 39,
+    "failures": 0,
+    "errors": 0
+  },
+  "contract_source": [
+    "M5-19",
+    "Q08",
+    "Q26"
+  ],
+  "comparison": "response actual <= frozen response due AND recovery actual <= frozen recovery due",
+  "ten_ticket_example": {
+    "applicable": 10,
+    "met": 7,
+    "not_met": 3,
+    "exact_fraction": {
+      "numerator": 7,
+      "denominator": 10
+    }
+  },
+  "missing_times_never_defaulted": true,
+  "known_late_dimension_definitely_not_met_even_if_other_unknown": true,
+  "pending_or_rejected_exclusion_does_not_remove_ticket": true,
+  "approved_exclusion_requires_explicit_scenario_reference": true,
+  "reference_proves_real_approval": false,
+  "frozen_input_not_latest_configuration": true,
+  "empty_or_incomplete_population_does_not_get_fake_rate": true,
+  "no_duration_or_tier_parameter_hardcoded": true,
+  "effective_achievement": null,
+  "compensation_amount": null,
+  "financial_rounding_policy_chosen": false,
+  "business_data_read": false,
+  "api_added": false,
+  "ui_added": false,
+  "frozen_migrations_unchanged": "V1-V14",
+  "api_version_unchanged": "0.20.0",
+  "full_contract_done": false
+}

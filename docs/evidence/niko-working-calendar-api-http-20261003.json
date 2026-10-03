@@ -1,0 +1,450 @@
+{
+  "verified_at": "2026-10-03T01:19:21.693Z",
+  "environment": "niko-local-test",
+  "api_version": "0.18.0",
+  "passed": true,
+  "http_checks": 84,
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_explicit_draft",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_original_receipt",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_changed_payload_same_key",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "second_admin_same_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "msp_cannot_read_config",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "msp_cannot_create",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_cannot_read_config",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_cannot_create",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_cannot_read_config",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_cannot_create",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_cannot_read_config",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_cannot_create",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "create_missing_csrf",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "create_missing_key",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_tenant_id",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_actor_id",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_timezone",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_effective",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_customer_confirmation",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_recurrence",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "reject_default_hours",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_28",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_29",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_json_30",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_31",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_32",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_33",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_34",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_35",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_36",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_input_37",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_union_scenario",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_duration",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_start",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "explicit_zero",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "insufficient_windows",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "preview_missing_csrf",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "preview_negative_duration",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "preview_spoof_effective",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "update_version",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "update_replay",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "stale_version",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "preview_stale_version",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_a",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "same_key_b",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "cas_a",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "cas_b",
+      "status": 409,
+      "contract_valid": true
+    },
+    {
+      "name": "history_seed_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_seed_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_seed_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_seed_3",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_seed_4",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_seed_5",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_seed_6",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_seed_7",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_page_10",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "history_page_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "create_incomplete_unicode",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "incomplete_no_deadline",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_66",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_67",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_68",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_query_69",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_history_cursor",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "switch_to_other_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_calendar_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_update_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_preview_hidden",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "restore_original_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "calendar_success_audits",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "calendar_readiness",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "read_tail_before",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_final_detail",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_final_history",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_final_list",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_final_preview",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "read_tail_after",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "main_calendar_revisions": 12,
+  "main_calendar_success_audits": 12,
+  "second_incomplete_calendar": true,
+  "same_key_two_receipts_one_revision": true,
+  "different_key_cas_one_winner": true,
+  "history_pages": [
+    10,
+    2
+  ],
+  "readonly_preview_no_success_audit": true,
+  "effective_deadline_always_null": true,
+  "customer_confirmation": "UNVERIFIED",
+  "foreign_tenant_get_update_preview_404": true,
+  "original_tenant_restored": true,
+  "credentials_output": false,
+  "browser_dom_tested": false,
+  "limitations": [
+    "No calendar activation, customer approval, holiday recurrence or formal SLA",
+    "No UI/DOM acceptance",
+    "No live role revocation or PG server outage"
+  ]
+}

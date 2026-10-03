@@ -97,7 +97,9 @@ test('所有业务写接口明确要求幂等及CSRF，remote_test不存在fixtu
   for (const [path, methods] of Object.entries(contract.paths)) {
     for (const [method, operation] of Object.entries(methods)) {
       if (!['post', 'put', 'patch', 'delete'].includes(method)) continue;
-      for (const name of ['Idempotency-Key', 'X-CSRF-Token']) {
+      const readonlyPreview = method === 'post' && path === '/working-calendars/{id}/preview';
+      if (readonlyPreview) assert.equal(operation['x-mop-read-only'], true);
+      for (const name of readonlyPreview ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
         assert.ok(operation.parameters.some((p) => p.in === 'header' && p.name === name && p.required), `${method} ${path} ${name}`);
       }
     }
@@ -177,7 +179,7 @@ test('operation区分报障门禁与真实文件状态，终态不得伪造', ()
 
 test('就绪成功不能把已启用但缺schema或存储的照片能力写成READY', () => {
   const photos = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, policy_source: 'USER_DEVELOPMENT_DIRECTION', reasons: [] };
-  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, photos, asset_reads: { unicode_search_ready: true, pagination: 'BOUNDED_POSTGRESQL_KEYSET' }, ticket_comments: { schema_access_ready: true, visibility: 'REPORTER_AND_INTERNAL', internal_identity_exposed: false, itsm_applied: false }, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
+  const data = { status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, working_calendars: { schema_access_ready: true, effective: false, customer_confirmation: 'UNVERIFIED' }, photos, asset_reads: { unicode_search_ready: true, pagination: 'BOUNDED_POSTGRESQL_KEYSET' }, ticket_comments: { schema_access_ready: true, visibility: 'REPORTER_AND_INTERNAL', internal_identity_exposed: false, itsm_applied: false }, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
   assert.equal(validates('ReadinessResult', { data, trace_id: 'MOP-FAKE-readiness' }), true);
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('ReadinessResult', { data: { ...data, photos: { ...photos, [key]: false } }, trace_id: 'MOP-FAKE-readiness' }), false);
   assert.equal(validates('ReadinessResult', { data: { ...data, production_ready: true }, trace_id: 'MOP-FAKE-readiness' }), false);
@@ -206,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.17.0');
+  assert.equal(contract.info.version, '0.18.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -443,4 +445,29 @@ test('customer comment DTO rejects private identity, incorrect attribution and p
 test('customer comment routes bind scoped replay and actual readiness without new mutation routes', () => {
   const path = contract.paths['/tickets/{ticketId}/comments']; assert.deepEqual(Object.keys(path), ['get', 'post']); assert.deepEqual(path.get['x-mop-roles'], ['viewer', 'tadmin', 'msp', 'padmin']); assert.match(path.post['x-mop-replay-authorization'], /before cached receipt/); assert.equal(path.post['x-mop-max-body-bytes'], 32768); assert.deepEqual(Object.keys(contract.paths['/tickets/{ticketId}/comments/{id}']), ['get']);
   const ready = contract.components.schemas.ReadinessResult.properties.data; assert.ok(ready.required.includes('ticket_comments')); assert.equal(ready.properties.ticket_comments.properties.internal_identity_exposed.const, false); assert.equal(ready.properties.ticket_comments.properties.itsm_applied.const, false);
+});
+
+
+test('日历草稿与试算始终未生效，未知不能补默认', () => {
+  const input = { name: '合成日历', coverage_start: '2026-10-01T00:00:00Z', coverage_end: '2026-10-03T00:00:00Z', working_windows: [], coverage_complete: false, note: null };
+  assert.equal(validates('WorkingCalendarCreate', input), true);
+  for (const field of ['effective', 'tenant_id', 'timezone', 'customer_confirmation']) assert.equal(validates('WorkingCalendarCreate', { ...input, [field]: true }), false);
+  assert.equal(validates('WorkingCalendarCreate', { ...input, coverage_complete: null }), false);
+  assert.equal(validates('WorkingCalendarCreate', { ...input, working_windows: null }), false);
+  assert.equal(validates('WorkingCalendarPreviewInput', { expected_version: 1, start: null, required_seconds: null }), true);
+  assert.equal(validates('WorkingCalendarPreviewInput', { expected_version: 1, start: null, required_seconds: 0 }), true);
+  assert.equal(validates('WorkingCalendarPreviewInput', { expected_version: 1, start: null, required_seconds: -1 }), false);
+  assert.equal(contract.components.schemas.WorkingCalendar.properties.effective.const, false);
+  assert.equal(contract.paths['/working-calendars/{id}/preview'].post['x-mop-read-only'], true);
+  assert.equal(contract.paths['/working-calendars/{id}/preview'].post.parameters.some(p => p.name === 'Idempotency-Key'), false);
+});
+test('日历计算结果与未知原因的契约不允许混淆或冒充正式截止', () => {
+  const value = { calendar_id: '55000000-0000-4000-8000-000000000001', tenant_id: '55000000-0000-4000-8000-000000000002', calendar_version: 1, status: 'UNRESOLVED', reason: 'DURATION_MISSING', scenario_deadline: null, effective_deadline: null, scope: 'UNPUBLISHED_DRAFT_SCENARIO', effective: false, customer_confirmation: 'UNVERIFIED', source: 'postgresql', timezone: 'Asia/Shanghai', start: null, required_seconds: null, remaining_duration: null, consumed: [] };
+  const result = data => ({ data, trace_id: 'MOP-synthetic' });
+  assert.equal(validates('WorkingCalendarPreviewResult', result(value)), true);
+  assert.equal(validates('WorkingCalendarPreviewResult', result({ ...value, scenario_deadline: '2026-10-01T00:00:00Z' })), false);
+  assert.equal(validates('WorkingCalendarPreviewResult', result({ ...value, effective: true })), false);
+  assert.equal(validates('WorkingCalendarPreviewResult', result({ ...value, effective_deadline: '2026-10-01T00:00:00Z' })), false);
+  const calculated = { ...value, status: 'CALCULATED', reason: null, scenario_deadline: '2026-10-01T00:00:00Z', remaining_duration: 'PT0S', required_seconds: 0, start: '2026-10-01T00:00:00Z' };
+  assert.equal(validates('WorkingCalendarPreviewResult', result(calculated)), true);
 });

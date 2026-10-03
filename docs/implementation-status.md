@@ -1,6 +1,6 @@
 # MOP 实施状态
 
-## 当前接续概览（2026-10-03 01:04 UTC）
+## 当前接续概览（2026-10-03 01:21 UTC）
 
 开发在已批准niko-local-test独立环境持续推进；原指定服务器、OSS受控认证和浏览器验收等阻塞分别记录于[阻塞清单](current-development-blockers.md)，不阻止无关功能。以下历史环境证据不转记为niko新环境通过，全部128项仍未整体验收DONE。
 
@@ -9,8 +9,8 @@
 |环境与恢复|niko PG17.11/OIDC26.2.4/API真实测试；V1–V12字节冻结；拥有API的SIGKILL/重启/原11表及独立V10场景14表指纹/幂等恢复通过|原服务器新联调、PG/Worker/OSS故障、生产部署|
 |工单与工时|耐久报障/附件已有历史与新环境分开证据；本人工时12PG/75API/28实际前端HTTP；内部备注12PG/83API/28实际前端HTTP及页面代码；客户评论16PG/84API/39实际客户端HTTP及页面代码完成|正式工单状态/资格/外部ITSM/SLA/客户确认/通知、团队工时及成本规则|
 |手工资产资料|V9结构/核心、资料仓储与引用/筛选真实PG；API V0.16，主台账授权有界分页54HTTP；维护70/引用28/查询63HTTP；维护22/查询29实际客户端HTTP|浏览器/390px、客户Q09、主列Q31、管理IP/CMDB权威字段与监控接入|
-|配置与审计|内部提案/CAS/诊断继续保留null门禁；审计API/页面与实际HTTP；Q08日历草稿10纯核心、V12结构10真实PG及仓储14真实PG通过，API/UI继续|正式配置定义/客户真实性/发布生效；审计外部可信锚、留存与导出|
-|质量边界|最近Java根704=691执行含212PG+13历史fixture跳过，6MinIO明确排除；前一页面切片Web321/构建通过，契约32|不将CI、纯测试或实际客户端请求当作浏览器及完整合同验收|
+|配置与审计|内部提案/CAS/诊断继续保留null门禁；审计API/页面与实际HTTP；Q08日历草稿10纯核心、V12结构10PG/仓储14PG、API0.18/84HTTP通过，页面继续|正式配置定义/客户真实性/发布生效；审计外部可信锚、留存与导出|
+|质量边界|最近Java根716=703执行含212PG+13历史fixture跳过，6MinIO明确排除；Web321/类型构建及契约34通过|不将CI、纯测试或实际客户端请求当作浏览器及完整合同验收|
 
 ## 2026-10-01历史交接基线（保留原环境事实）
 
@@ -479,3 +479,16 @@ PostgresWorkingCalendarRepository已实现当前租户padmin草稿创建、CAS�
 初次13仓储用例有2个JSON比较断言失败：Java long节点与PG JSON反序列化int节点数值相同但JsonNode类型不同。改成双方经实际序列化/解析后比较，并新增同键并发，未放宽业务断言。最终根704=691执行（含212真实PG）+13历史fixture跳过、6MinIO排除，0失败错误；32契约与生成一致性通过；独立迁移check0、V1–V12字节未改。API仍0.17，日历HTTP/页面、浏览器与正式生效仍待，完整合同未DONE。
 
 见[仓储证据](evidence/niko-working-calendar-repository-20261003.json)。
+
+
+## 2026-10-03 API0.18日历草稿与只读试算
+
+公开GET/POST /working-calendars、GET/PATCH /{id}、GET /{id}/history与POST /{id}/preview已接真实PG，仅当前租户padmin配置权限。输入精确白名单，262144字节/1000窗口/Unicode与毫秒精度边界、严格重复JSON键/嵌套/尾随数据检查；时区/租户/身份/生效/周期默认覆盖均不接受。写入保留CSRF、原始请求规范哈希、幂等、重放前当前授权、CAS与事务审计；窗口数组顺序不归一，嵌套对象键顺序不影响请求哈希。列表/历史至多100+1取数，所有查询参数拒绝重复及覆盖。
+
+只读试算使用POST承载明确expected_version/start/required_seconds，仍要求CSRF；不要求幂等键，不创建收据或成功审计。缺起点/时长保持UNRESOLVED，显式0只是数学值；覆盖不完整/不足不返回scenario_deadline。结果绑定当前草稿版本，版本变化409；effective_deadline始终null、effective=false、customer_confirmation=UNVERIFIED。未实现正式SLA、生效发布、周期工作周、节假日或次日默认。就绪新增实际日历schema/ACL/校验器指纹探测；liveness不探测，不自动迁移。
+
+11控制器+1就绪新增用例；最终根716=703执行（含212真实PG）+13历史fixture跳过、6MinIO排除通过，34契约/321Web/类型构建通过。首轮契约测试把全部POST视为写入，单个只读preview无Idempotency-Key断言失败；修为只针对该确切只读路由豁免幂等头，仍强制CSRF，并增加未知/正式截止分离契约用例，未放宽其他写操作。
+
+实际栈正常重启加载新JAR并完成6身份OIDC后，首轮84HTTP逐响应契约通过：主日历12修订/12成功审计、10+2历史、第二不完整Unicode上限草稿、重放/同键并发单修订/异键CAS一胜一冲突、客户/工程师403、跨租户GET/PATCH/preview404与租户恢复、无CSRF/未知字段/坏JSON/精度/窗口/分页拒绝、原始窗口重叠合并试算、未知/零/不足/不完整、只读查询及preview前后审计尾序不变。没有物理断网、角色在线撤销或浏览器DOM验证。V1–V12仍冻结，API/Worker不迁移，完整D04/D08和128项未DONE；下一步日历管理/试算页面。
+
+见[真实HTTP证据](evidence/niko-working-calendar-api-http-20261003.json)与[API回归](evidence/niko-working-calendar-api-20261003.json)。

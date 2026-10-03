@@ -1,0 +1,43 @@
+{
+  "verified_at": "2026-10-03T01:21:43.471493+00:00",
+  "environment": "niko-local-test",
+  "api_version": "0.18.0",
+  "status": "REAL_PG_OIDC_HTTP_VERIFIED",
+  "new_tests": {
+    "controller": 11,
+    "readiness": 1,
+    "contract": 2
+  },
+  "root_tests": {
+    "reported": 716,
+    "executed": 703,
+    "real_pg": 212,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contract_tests": 34,
+  "web_tests": 321,
+  "web_typecheck_build": true,
+  "actual_http": {
+    "checks": 84,
+    "passed": true,
+    "evidence": "niko-working-calendar-api-http-20261003.json"
+  },
+  "initial_contract_attempt": {
+    "failures": 1,
+    "cause": "Generic all-POST mutation assertion did not distinguish exact readonly preview route; explicit route exception retains mandatory CSRF and all other write idempotency requirements"
+  },
+  "preview_writes_receipt_or_success_audit": false,
+  "effective_deadline": null,
+  "effective": false,
+  "customer_confirmation": "UNVERIFIED",
+  "frontend_added": false,
+  "browser_dom_tested": false,
+  "formal_sla_activated": false,
+  "frozen_migrations": "V1-V12 unchanged",
+  "api_worker_automatic_migration": false,
+  "full_contract_done": false,
+  "credentials_output": false
+}

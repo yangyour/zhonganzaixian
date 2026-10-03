@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-03T17:42:05.657161+00:00",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "scope": "CONTACT_IMPORT_PURE_FORMAT_PREVIEW",
+  "new_pure_tests": 12,
+  "root_tests_reported": 1132,
+  "root_tests_executed": 1119,
+  "historical_fixture_skipped": 13,
+  "existing_actual_postgresql_tests": 351,
+  "excluded_minio_tests": 6,
+  "failures": 0,
+  "errors": 0,
+  "contracts": 61,
+  "generation_check": "PASS",
+  "api_version": "0.30.0",
+  "api_changed": false,
+  "v1_v17_changed": false,
+  "request_technical_row_limit": 100,
+  "contract_contact_quota": null,
+  "can_import": false,
+  "import_storage_integration": "NOT_IMPLEMENTED",
+  "import_http": "NOT_IMPLEMENTED",
+  "import_page": "NOT_IMPLEMENTED",
+  "browser_dom": "BLOCKED_B03",
+  "notification_delivery": "NOT_RUN",
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/contact/CustomerContactImportPreview.java": "90457be3f6ace8c234449f3b6c7f5228a856aa5934fb16c4675f752412c6838a",
+    "server/api/src/test/java/cn/mop/api/CustomerContactImportPreviewTest.java": "84f2090a07bc6c91cd5275fe53619a87b603bfb9aa4d2a621b0849c96674c5f1"
+  },
+  "contact_page_commit": {
+    "sha": "9703faf2b60fcee6e6bde3c1cb9bb97ecb466e40",
+    "ci_run": 37141262397,
+    "conclusion": "success"
+  },
+  "contract_done": false
+}

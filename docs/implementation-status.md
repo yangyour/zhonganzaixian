@@ -1015,3 +1015,7 @@ V18队列/不可变行结果结构显式1/重复0/check0且26表不变，但13�
 ## 2026-10-03 时间回读校验缺陷修复
 
 报障operation/配置诊断/手工资产资料改用严格UTC日历往返与BigInt纳秒顺序，5缺陷回归先红；16新增纳入792Web/typecheck/build/70契约通过。实际模块43只读HTTP，60时间/10亚毫秒原文保留、415登记本轮前后摘要相同，无业务写/DOM/迁移。见docs/strict-utc-readback.md。
+
+## 2026-10-03 原请求展示快照别名修复
+
+四个旧模块getter/回调浅复制允许外部改写内部attempt，8回归先红后绿；统一业务快照深复制，Error原型保留。12新增纳入804Web构建70契约；16真实HTTP中1合成提案实际200丢弃后原path/body/key重放只创建1次，随后撤回，另三模块只读快照隔离通过。无生效配置/迁移/DOM，见docs/workspace-snapshot-isolation.md。

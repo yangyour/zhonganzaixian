@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { isUtcInstant, utcNotBefore } from './utcInstant'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import type { Asset, AssetType } from '../api/types'
@@ -83,7 +84,7 @@ function readReferences(value: unknown, query: string): MetadataReferences {
 export const emptyMetadataState = (): MetadataState => ({ current: null, history: null, references: null, receipt: null, attempt: null, busy: null, error: null })
 export function createMetadataWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: MetadataState) => void, newKey: () => string = () => crypto.randomUUID()) {
   let context: MetadataContext | null = null, state = emptyMetadataState(), epoch = 0, controller: AbortController | undefined
-  const emit = () => changed({ ...state }), path = () => `/assets/${context!.assetId}/manual-metadata`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
+  const emit = () => changed(detachedWorkspaceState(state)), path = () => `/assets/${context!.assetId}/manual-metadata`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: MetadataContext | null) { controller?.abort(); ++epoch; const valid = next && [next.tenantId, next.assetId, next.actorId].every(id => uuid.test(id)) && version(next.permissionVersion) && typeof next.canWrite === 'boolean'; context = valid ? { ...next! } : null; state = emptyMetadataState(); if (next && !valid) state.error = invalid(); emit() }
   async function refresh(moreHistory = false) {
     if (!context || state.busy === 'write' || moreHistory && (state.busy || !state.history?.has_more)) return false
@@ -128,5 +129,5 @@ export function createMetadataWorkspace(client: Pick<ApiClient, 'request'>, chan
     validateMetadataInput(input); if (expectedVersion >= Number.MAX_SAFE_INTEGER) throw inputInvalid()
     return send({ key: newKey(), payload: JSON.stringify({ expected_version: expectedVersion, ...clone(input) }), baseline: clone(state.current), state: 'uncertain' })
   }
-  emit(); return { reset, refresh, references, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => state }
+  emit(); return { reset, refresh, references, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => detachedWorkspaceState(state) }
 }

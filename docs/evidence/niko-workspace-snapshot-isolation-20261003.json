@@ -1,0 +1,65 @@
+{
+  "verified_at": "2026-10-03T23:08:11.526410+00:00",
+  "scope": "DETACH_BUSINESS_SNAPSHOTS_FROM_ORIGINAL_WRITE_COMMANDS",
+  "affected_modules": [
+    "assetDependencyWorkspace",
+    "assetMetadataWorkspace",
+    "configurationDraftWriter",
+    "configurationRevisionWriter"
+  ],
+  "initial_regression": {
+    "tests": 85,
+    "failed": 8,
+    "passed": 77
+  },
+  "new_tests": 12,
+  "web_tests_passed": 804,
+  "typecheck": "PASS",
+  "production_build": "PASS_WITH_EXISTING_CHUNK_SIZE_ADVISORY",
+  "contracts": 70,
+  "generation_check": "PASS",
+  "getter_and_callback_both_detached": true,
+  "error_object_preserves_original_reference_and_prototype": true,
+  "server_authorization_replaced": false,
+  "real_http_evidence": "niko-workspace-snapshot-client-http-20261003.json",
+  "http_requests": 16,
+  "post_attempts": 3,
+  "logical_revision_writes": 2,
+  "synthetic_revision_final_status": "WITHDRAWN",
+  "other_three_module_http_scope": "READ_ONLY",
+  "other_three_module_unknown_write_regression": "ISOLATED_UNIT",
+  "actual_success_discarded": 1,
+  "physical_network_fault": false,
+  "api_version": "0.33.0",
+  "api_restarted": false,
+  "v1_v19_changed": false,
+  "browser_dom_tested": false,
+  "contract_done": false,
+  "previous_utc_commit": {
+    "sha": "d8bff785627065769b103068daf9c85c6f5c745b",
+    "ci_run": 37160197413,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "apps/web/src/utils/detachedWorkspaceState.ts": "245ecefa3bf1ae61ccaf800b54e2b458cc2481ddb58ed292bfce2f3c784ea549",
+    "apps/web/src/utils/assetDependencyWorkspace.ts": "2c7665da24f203a986d02128043255eb3be91d29e5bb2d66188040a5cad9ab6d",
+    "apps/web/src/utils/assetMetadataWorkspace.ts": "5174bee10ec1927937317b6b7cb1c7549ef3372689c032c2c8d56a8378d43081",
+    "apps/web/src/utils/configurationDraftWriter.ts": "c74fd05b33eaee773b0c330e5fce3468133bfce802fc35df7f0ea1b40e7aeb23",
+    "apps/web/src/utils/configurationRevisionWriter.ts": "b1bf61205e2c37b9821f547292940a6430ed9533b237a4b0623700b30af48f55",
+    "apps/web/tests/detachedWorkspaceState.test.ts": "cc45b266dba4bf5c253bfec8950da91bf04f7e49611f459f099734c05ddb3735",
+    "apps/web/tests/assetDependencyWorkspace.test.ts": "d9c41653badc496dc03632289f5ba82f40f4c3413b441ebbc9f3e5988e447ff1",
+    "apps/web/tests/assetMetadataWorkspace.test.ts": "167125636ab408f37eb4c033664473e226d94b820ba861a40cba62d5254a9c51",
+    "apps/web/tests/configurationDraftWriter.test.ts": "84205b52d3663ff025ecc9803a2b5524487559307fc3ec8ddbcd62c4c1da54c1",
+    "apps/web/tests/configurationRevisionWriter.test.ts": "2cc26a1e1fac5aa2f9db64cd11101a1535efa09721c7e0f9edef913913f79486",
+    "tools/build-workspace-snapshot-client-test.mjs": "054c060532d5c8f1f68882f09bb8e5048b8fd5e1f509d36b3d67f2d2efa2fa6b",
+    "tests/niko-workspace-snapshot-client-http.mjs": "e5d45eadca043162885886dade6d1f1b0a0e64f0b125672049298b2e44273119"
+  },
+  "logs_sha256": {
+    ".local/niko-test/logs/workspace-snapshot-red.log": "c418544d860d815db2d2c1eda065ac6456bfc02d089b037d0bd1adbb893d9dce",
+    ".local/niko-test/logs/workspace-snapshot-focused.log": "1e3c6d3959ea5482e2469edb9133477f0cbc8e1e8ec518edf413073ced20a761",
+    ".local/niko-test/logs/workspace-snapshot-web.log": "19e20154d7d792ee7d8a8ec705a0592d120c029921adbea9fb533634e6cfb2da",
+    ".local/niko-test/logs/workspace-snapshot-build.log": "e2815a53210ca2b3db20272d437c5db24fd7b755b18df6cbbd6a657032d1fa8e",
+    ".local/niko-test/logs/workspace-snapshot-contract.log": "ef0b74b6b7bc18d7dd66e1f619904ec3748b79bfb2527e9b1837114252429455",
+    ".local/niko-test/logs/workspace-snapshot-client-http.log": "a23917427de6f6cbde91890c0caa179de387555cb18e0901630789336de9de28"
+  }
+}

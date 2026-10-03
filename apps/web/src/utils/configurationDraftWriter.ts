@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import type { Configuration } from '../api/types'
 export interface ConfigurationDraftContext { tenantId: string; actorId: string; permissionVersion: number }
@@ -19,7 +20,7 @@ function unchangedMetadata(v: RegistryDraft) { return Object.fromEntries(Object.
 export const emptyConfigurationDraftState = (): ConfigurationDraftState => ({ baseline: null, lastRead: null, receipt: null, attempt: null, busy: null, error: null })
 export function createConfigurationDraftWriter(client: Pick<ApiClient, 'request'>, changed: (state: ConfigurationDraftState) => void, newKey: () => string = () => crypto.randomUUID()) {
   let scope: ConfigurationDraftContext | null = null, state = emptyConfigurationDraftState(), epoch = 0, controller: AbortController | undefined
-  const emit = () => changed({ ...state }), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
+  const emit = () => changed(detachedWorkspaceState(state)), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: ConfigurationDraftContext | null) { controller?.abort(); ++epoch; const valid = next && uuid.test(next.actorId) && uuid.test(next.tenantId) && version(next.permissionVersion); scope = valid ? { ...next! } : null; state = emptyConfigurationDraftState(); if (next && !valid) state.error = invalid(); emit() }
   function begin(value: unknown) { if (!scope || state.busy || unresolved()) return false; const baseline = readRegistryDraft(value); if (baseline.contract_value_kind === 'fixed_constraint') throw invalid(); state = { ...emptyConfigurationDraftState(), baseline, lastRead: baseline }; emit(); return true }
   async function refresh() {
@@ -37,5 +38,5 @@ export function createConfigurationDraftWriter(client: Pick<ApiClient, 'request'
     finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
   async function submit(proposed: unknown) { if (!scope || !state.baseline || state.busy || state.attempt) return false; if (proposed === null || proposed === undefined || state.baseline.version >= Number.MAX_SAFE_INTEGER) throw invalid(); if (state.lastRead && state.lastRead.version !== state.baseline.version) { state = { ...state, error: new ApiError(409, 'VERSION_CONFLICT', '已知版本已变化，请明确重新准备编辑', '—') }; emit(); return false } const payload = JSON.stringify({ proposed_value: proposed, expected_version: state.baseline.version }, (_key, value) => { if (value === undefined || typeof value === 'number' && !Number.isFinite(value) || ['bigint', 'function', 'symbol'].includes(typeof value)) throw invalid(); return value }); return send({ path: '/configurations/' + encodeURIComponent(state.baseline.key) + '/draft', key: newKey(), payload, baseline: copy(state.baseline), state: 'uncertain' }) }
-  emit(); return { reset, begin, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => state, dispose: () => reset(null) }
+  emit(); return { reset, begin, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => detachedWorkspaceState(state), dispose: () => reset(null) }
 }

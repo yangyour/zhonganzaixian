@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import type { ConfigurationRevision, ConfigurationRevisionDraft } from '../api/types'
 export interface RevisionWriteContext { tenantId: string; actorId: string; permissionVersion: number; configurationKey: string }
@@ -27,7 +28,7 @@ export function readConfigurationRevision(v: unknown, context: RevisionWriteCont
 export const emptyRevisionWriteState = (): RevisionWriteState => ({ attempt: null, receipt: null, busy: false, error: null })
 export function createConfigurationRevisionWriter(client: Pick<ApiClient, 'request'>, changed: (state: RevisionWriteState) => void, newKey: () => string = () => crypto.randomUUID()) {
   let scope: RevisionWriteContext | null = null, state = emptyRevisionWriteState(), epoch = 0, controller: AbortController | undefined
-  const emit = () => changed({ ...state }), unresolved = () => state.busy || state.attempt?.state === 'uncertain'
+  const emit = () => changed(detachedWorkspaceState(state)), unresolved = () => state.busy || state.attempt?.state === 'uncertain'
   function reset(next: RevisionWriteContext | null) { controller?.abort(); ++epoch; const valid = next && uuid.test(next.actorId) && uuid.test(next.tenantId) && version(next.permissionVersion) && /^[A-Za-z0-9_.:-]{1,160}$/.test(next.configurationKey); scope = valid ? { ...next! } : null; state = emptyRevisionWriteState(); if (next && !valid) state.error = invalid(); emit() }
   function prepare() { if (!scope || unresolved()) return false; state = emptyRevisionWriteState(); emit(); return true }
   async function send(attempt: Attempt, retry = false) {
@@ -49,5 +50,5 @@ export function createConfigurationRevisionWriter(client: Pick<ApiClient, 'reque
     else { if (!target || target.version >= Number.MAX_SAFE_INTEGER || payload.expected_version !== target.version) throw invalid(); const own = target.created_by === scope.actorId; if (action === 'submit' ? !own || target.workflow_status !== 'DRAFT' || !exact(payload, ['expected_version']) : action === 'withdraw' ? !own || !['DRAFT', 'IN_REVIEW'].includes(target.workflow_status) || !exact(payload, ['expected_version', 'reason']) || typeof payload.reason !== 'string' || !payload.reason.trim() : action !== 'review' || own || target.workflow_status !== 'IN_REVIEW' || !exact(payload, ['expected_version', 'decision', 'comment']) || !['approve', 'reject'].includes(String(payload.decision)) || typeof payload.comment !== 'string' || !payload.comment.trim()) throw invalid() }
     return send({ action, baseline: target, path: action === 'create' ? '/configurations/' + encodeURIComponent(scope.configurationKey) + '/revisions' : '/configuration-revisions/' + target!.id + '/' + action, key: newKey(), payload: JSON.stringify(payload), state: 'uncertain' })
   }
-  emit(); return { reset, prepare, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => state, dispose: () => reset(null) }
+  emit(); return { reset, prepare, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => detachedWorkspaceState(state), dispose: () => reset(null) }
 }

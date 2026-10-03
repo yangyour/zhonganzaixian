@@ -1,3 +1,4 @@
+import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 
 export interface ProposedDependency { parent_id: string; child_id: string; proposed_type: string | null; proposed_suppression_scope: string | null; proposed_enabled: boolean | null }
@@ -61,7 +62,7 @@ export function readDependencyReceipt(value: unknown, context: DependencyContext
 export function createDependencyWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: DependencyState) => void, newKey: () => string = () => crypto.randomUUID()) {
   let context: DependencyContext | null = null, epoch = 0, request: AbortController | undefined
   let state: DependencyState = { draft: null, receipt: null, attempt: null, busy: null, error: null }
-  const emit = () => changed({ ...state })
+  const emit = () => changed(detachedWorkspaceState(state))
   const path = () => `/assets/${context!.assetId}/dependencies`
   const unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: DependencyContext | null) { request?.abort(); ++epoch; const valid = next && [next.tenantId, next.assetId, next.actorId].every(id => uuid.test(id)) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion >= 1 && typeof next.canWrite === 'boolean'; context = valid ? { ...next! } : null; state = { draft: null, receipt: null, attempt: null, busy: null, error: next && !valid ? invalid() : null }; emit() }
@@ -103,5 +104,5 @@ export function createDependencyWorkspace(client: Pick<ApiClient, 'request'>, ch
   }
   async function retry() { return state.attempt?.state === 'uncertain' ? send(state.attempt, true) : false }
   emit()
-  return { reset, refresh, submit, retry, unresolved, dispose: () => reset(null), state: () => state }
+  return { reset, refresh, submit, retry, unresolved, dispose: () => reset(null), state: () => detachedWorkspaceState(state) }
 }

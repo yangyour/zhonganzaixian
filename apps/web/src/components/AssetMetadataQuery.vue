@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
+import { ElCollapse, ElCollapseItem } from 'element-plus'
 import { api } from '../api/client'
 import type { Asset } from '../api/types'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'

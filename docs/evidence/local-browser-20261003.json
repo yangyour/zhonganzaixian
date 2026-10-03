@@ -1,0 +1,188 @@
+{
+  "verified_at": "2026-10-03T10:50:44.911Z",
+  "environment": "designated-server",
+  "source_ui_baseline": "dabd9d3 plus local UI fixes",
+  "browser": "154.0.4258.53",
+  "viewports": [
+    [
+      1440,
+      900
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "passed": true,
+  "checks": [
+    {
+      "name": "real_oidc_padmin",
+      "passed": true
+    },
+    {
+      "name": "real_oidc_padmin",
+      "passed": true
+    },
+    {
+      "name": "metadata_collapse_expand_and_empty_filter",
+      "passed": true
+    },
+    {
+      "name": "mobile_contract15_browser_download",
+      "passed": true,
+      "filename": "asset-import-standard15.xlsx"
+    },
+    {
+      "name": "mobile_xlsx_durable_store_ready",
+      "passed": true
+    },
+    {
+      "name": "mobile_hidden_sheet_duplicate_header_mapping",
+      "passed": true,
+      "source_id": "dced51e2-8ed4-4577-802d-2b2975026105",
+      "source_version": 7,
+      "mapping_version": 1,
+      "preview_hash": "1eeb10c384151b7b36d24a86d09185214172f59b051ef08533009aa32bafcc57"
+    },
+    {
+      "name": "mobile_import_close_reopen_preserves_receipt_no_repost",
+      "passed": true
+    },
+    {
+      "name": "desktop_slash_search_with_real_asset_hit",
+      "passed": true
+    },
+    {
+      "name": "desktop_warranty_note_prefill_and_save",
+      "passed": true
+    },
+    {
+      "name": "mobile_warranty_reject_bad_date_and_explicit_null_save",
+      "passed": true
+    },
+    {
+      "name": "real_oidc_padmin",
+      "passed": true
+    },
+    {
+      "name": "real_oidc_padmin",
+      "passed": true
+    },
+    {
+      "name": "real_oidc_viewerA",
+      "passed": true
+    },
+    {
+      "name": "mobile_viewer_hides_write_and_import_controls",
+      "passed": true,
+      "writeAssetButtons": 0,
+      "importButtons": 0,
+      "fit": {
+        "width": 390,
+        "documentWidth": 390,
+        "overflow": false
+      }
+    },
+    {
+      "name": "six_new_page_entries_render_with_real_api",
+      "passed": true,
+      "pages": [
+        {
+          "menu": "手工来源登记",
+          "heading": "手工来源事件登记",
+          "fit": {
+            "width": 1440,
+            "documentWidth": 1440,
+            "overflow": false
+          },
+          "errorAlerts": 0
+        },
+        {
+          "menu": "SLA 显式对照",
+          "heading": "SLA 显式对照",
+          "fit": {
+            "width": 1440,
+            "documentWidth": 1440,
+            "overflow": false
+          },
+          "errorAlerts": 0
+        },
+        {
+          "menu": "报障与受理",
+          "heading": "报障与受理",
+          "fit": {
+            "width": 1440,
+            "documentWidth": 1440,
+            "overflow": false
+          },
+          "errorAlerts": 0
+        },
+        {
+          "menu": "配置确认登记",
+          "heading": "配置确认登记",
+          "fit": {
+            "width": 1440,
+            "documentWidth": 1440,
+            "overflow": false
+          },
+          "errorAlerts": 0
+        },
+        {
+          "menu": "代码能力声明核对",
+          "heading": "代码能力声明核对",
+          "fit": {
+            "width": 1440,
+            "documentWidth": 1440,
+            "overflow": false
+          },
+          "errorAlerts": 0
+        },
+        {
+          "menu": "审计日志",
+          "heading": "审计检索与区间校验",
+          "fit": {
+            "width": 1440,
+            "documentWidth": 1440,
+            "overflow": false
+          },
+          "errorAlerts": 0
+        }
+      ]
+    },
+    {
+      "name": "search_empty_results_close_and_clear_cycle",
+      "passed": true
+    }
+  ],
+  "unresolved_component_warnings": [],
+  "final_screenshots": [
+    "desktop-assets.png",
+    "desktop-audit.png",
+    "desktop-capability-catalog.png",
+    "desktop-global-search.png",
+    "desktop-metadata-filters.png",
+    "desktop-warranty-saved.png",
+    "mobile-assets.png",
+    "mobile-global-search.png",
+    "mobile-import-initial-fixed.png",
+    "mobile-import-mapping-saved.png",
+    "mobile-viewer-assets.png",
+    "mobile-warranty-saved.png"
+  ],
+  "before_fix_screenshot": "mobile-import-initial.png",
+  "fixes": [
+    "Explicit ElCollapse/ElCollapseItem registration in metadata filter",
+    "Mobile step specificity and final inline max-width override"
+  ],
+  "business_import_completed": false,
+  "can_import": false,
+  "precheck": "NOT_RUN",
+  "supplier_verified": false,
+  "credentials_output": false,
+  "remaining": [
+    "Full control acceptance for calendars, worklogs, comments, manual incidents and SLA scenarios",
+    "Physical mobile device and enterprise WeChat",
+    "Print dialog and full contract performance acceptance"
+  ],
+  "completed_at": "2026-10-03T10:51:37.442Z"
+}

@@ -1,0 +1,30 @@
+{
+  "verified_at": "2026-10-03T00:18:44.398774+00:00",
+  "environment": "niko-local-test",
+  "status": "PURE_UNPUBLISHED_CALENDAR_DRAFT_CORE",
+  "new_core_tests": 10,
+  "root_tests": {
+    "reported": 679,
+    "executed": 666,
+    "existing_feature_real_postgresql": 188,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "calendar_pg_verified": false,
+  "schema_added": false,
+  "api_added": false,
+  "frontend_added": false,
+  "customer_confirmation": "UNVERIFIED",
+  "effective": false,
+  "effective_deadline": null,
+  "scenario_scope": "UNPUBLISHED_DRAFT_SCENARIO",
+  "default_working_hours_added": false,
+  "next_day_interpreted_as_24_hours": false,
+  "technical_max_windows": 1000,
+  "api_version_unchanged": "0.17.0",
+  "frozen_migrations": "V1-V11 unchanged",
+  "full_contract_done": false,
+  "credentials_output": false
+}

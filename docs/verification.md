@@ -562,3 +562,14 @@ API V0.13.1新增同租户站点/活跃负责人查询；内部授权和资产40
 依据Q08明确可推进范围，新增不可变草稿/仓储接口及显式试算：原始工作窗口保留，计算单独归并，覆盖声明不等于客户批准。无默认工作周/时段/节假日，不把次日补24小时；未知起点/时长/覆盖返回未解决，scenarioDeadline与始终null的effectiveDeadline严格分开。10纯测试及根679=666执行（188已有PG）+13skip/6MinIO排除通过；日历真实PG/API/UI尚未执行，未建V12，不能沿用既有PG证明日历。API0.17/32契约不变，V1–V11冻结，正式SLA与完整M5-D04/D08非DONE。
 
 见[工作日历草稿核心](working-calendar-drafts.md)。
+
+
+## 2026-10-03 V12工作日历草稿结构（已执行冻结）
+
+新增独立草稿头与不可变修订表，原始窗口JSON随修订保存，复合租户/作者/前版FK、延迟当前修订FK及精确列级ACL限制写入。头表仅更新版本/更新时间，历史只追加；DRAFT、UNVERIFIED、effective=false、Asia/Shanghai与MANUAL_CALENDAR_DRAFT固定，不能借schema发布日历。输入纯SQL函数不读业务表、不以定义者权限运行、固定pg_catalog搜索路径，PUBLIC无执行权限；独立CLI校验其实际函数体SHA256，拒绝结构相同但函数体漂移。
+
+V12已独立check0→apply1→重复0→check0；旧评论apply0。函数体指纹校验加入后又check0/重复apply0。V12 SHA256 e6e0412e8a96936a6f4e09dc9f96431cd6551dd9c15ebaf7d2ed414467aedb1a，V1–V12全部字节冻结，后续结构更正必须V13+；API/Worker无自动迁移。
+
+10新增真实PG schema测试、13迁移策略、50 Python守卫通过；最终根690=677执行（含198真实PG）+13历史fixture跳过，6MinIO排除，0失败错误。schema测试全部回滚，测试后只读两新表均0行，Q08两项配置value仍null。首次执行前补强previous_version非空CHECK，执行后SQL未再改；函数指纹仅增强Java校验。API仍0.17，未新增日历HTTP、业务仓储、页面、正式SLA或客户批准，完整合同仍未DONE。继续下一步真实事务仓储，不因B01/B02/B03/B04暂停无关开发。
+
+见[结构证据](evidence/niko-working-calendar-schema-20261003.json)。

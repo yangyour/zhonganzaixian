@@ -1,0 +1,7 @@
+{
+  "status": "APPLIED_AND_FROZEN",
+  "environment": "niko-local-test",
+  "sha256": {
+    "V12__unpublished_working_calendar_drafts.sql": "e6e0412e8a96936a6f4e09dc9f96431cd6551dd9c15ebaf7d2ed414467aedb1a"
+  }
+}

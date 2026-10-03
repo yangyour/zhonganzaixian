@@ -8,6 +8,7 @@ import org.flywaydb.core.api.logging.LogFactory;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
 import java.util.function.Function;
@@ -25,13 +26,15 @@ public final class TestSchemaMigration {
         Map.entry("8","V8__manual_worklog_revisions.sql"),
         Map.entry("9","V9__manual_asset_metadata_revisions.sql"),
         Map.entry("10","V10__immutable_internal_ticket_notes.sql"),
-        Map.entry("11","V11__immutable_ticket_comments.sql"));
+        Map.entry("11","V11__immutable_ticket_comments.sql"),
+        Map.entry("12","V12__unpublished_working_calendar_drafts.sql"));
     static final String IMPORT_SHA256="1f532822668274b7aebd12ea78b57e6be0aa9fd53ceb77023ee8067589cd2b4b";
     static final String DEPENDENCY_SHA256="5a8ce8d49fe948fc0e9586c102f7c8bfc46cb975a0b5d9f32d4bd1ccc72670bb";
     static final String WORKLOG_SHA256="942ea4dc88a8169b40662edcfd89871e8280a429ac922bd0cc1eb451b82ad2f8";
     static final String ASSET_METADATA_SHA256="a311d8ea11516bb60f2375cafd02b293beb904d07c03c890653dd5bb3751412c";
     static final String INTERNAL_NOTE_SHA256="ba1ad02e7df8079936288d8712a84062a5bd695885b1e45daacec9f4d35ad198";
     static final String TICKET_COMMENT_SHA256="d8535bbf13ca9e35c115278f36232a786b4562c99cc9afd9f5195a416028a8e3";
+    static final String WORKING_CALENDAR_SHA256="e6e0412e8a96936a6f4e09dc9f96431cd6551dd9c15ebaf7d2ed414467aedb1a";
     private static final String RUNTIME="mop_test_runtime";
     private TestSchemaMigration() {}
 
@@ -46,8 +49,9 @@ public final class TestSchemaMigration {
         @Override public String toString(){return "Settings[mop_test,mop_test_migrator,credentials=REDACTED]";}
     }
     record Entry(String version,String script,String type,MigrationState state,boolean applied,boolean checksumMatches,Integer checksum) {}
-    enum Plan { PHOTOS_PENDING, ASSET_IMPORTS_PENDING, ASSET_IMPORTS_APPLIED, ASSET_DEPENDENCIES_APPLIED, WORKLOGS_APPLIED, ASSET_METADATA_APPLIED, INTERNAL_NOTES_APPLIED, TICKET_COMMENTS_APPLIED }
-    enum Mode { READ_ONLY_CHECK, APPLY_PHOTOS, APPLY_ASSET_IMPORTS, APPLY_ASSET_DEPENDENCIES, APPLY_WORKLOGS, APPLY_ASSET_METADATA, APPLY_INTERNAL_NOTES, APPLY_TICKET_COMMENTS }
+    static final String WORKING_CALENDAR_CHECKER_SHA256="07749cb8084dc2f0e9f2a6ed899b77be3dc4e1aeb55f15eed1bf558e48b18fb6";
+    enum Plan { PHOTOS_PENDING, ASSET_IMPORTS_PENDING, ASSET_IMPORTS_APPLIED, ASSET_DEPENDENCIES_APPLIED, WORKLOGS_APPLIED, ASSET_METADATA_APPLIED, INTERNAL_NOTES_APPLIED, TICKET_COMMENTS_APPLIED, WORKING_CALENDARS_APPLIED }
+    enum Mode { READ_ONLY_CHECK, APPLY_PHOTOS, APPLY_ASSET_IMPORTS, APPLY_ASSET_DEPENDENCIES, APPLY_WORKLOGS, APPLY_ASSET_METADATA, APPLY_INTERNAL_NOTES, APPLY_TICKET_COMMENTS, APPLY_WORKING_CALENDARS }
 
     static boolean applyRequested(String[] args) {
         return requestedMode(args)!=Mode.READ_ONLY_CHECK;
@@ -61,11 +65,12 @@ public final class TestSchemaMigration {
         if(args.length==1&&"--apply-asset-metadata".equals(args[0]))return Mode.APPLY_ASSET_METADATA;
         if(args.length==1&&"--apply-internal-notes".equals(args[0]))return Mode.APPLY_INTERNAL_NOTES;
         if(args.length==1&&"--apply-ticket-comments".equals(args[0]))return Mode.APPLY_TICKET_COMMENTS;
+        if(args.length==1&&"--apply-working-calendars".equals(args[0]))return Mode.APPLY_WORKING_CALENDARS;
         throw new IllegalArgumentException("Use --check or one explicit supported feature apply mode");
     }
     static Plan inspect(List<Entry> entries) {
-        if(entries.size()!=11)throw new IllegalStateException("Unexpected migration set");
-        Set<String> seen=new HashSet<>();boolean photosPending=false,importsPending=false,dependenciesPending=false,worklogsPending=false,metadataPending=false,notesPending=false,commentsPending=false;
+        if(entries.size()!=12)throw new IllegalStateException("Unexpected migration set");
+        Set<String> seen=new HashSet<>();boolean photosPending=false,importsPending=false,dependenciesPending=false,worklogsPending=false,metadataPending=false,notesPending=false,commentsPending=false,calendarsPending=false;
         for(Entry entry:entries) {
             if(entry.version()==null||!seen.add(entry.version())||!Objects.equals(SCRIPTS.get(entry.version()),entry.script())||!"SQL".equals(entry.type())||entry.checksum()==null)
                 throw new IllegalStateException("Unexpected migration identity");
@@ -76,6 +81,7 @@ public final class TestSchemaMigration {
             else if("9".equals(entry.version())&&(entry.state()==MigrationState.PENDING||entry.state()==MigrationState.ABOVE_TARGET)&&!entry.applied())metadataPending=true;
             else if("10".equals(entry.version())&&(entry.state()==MigrationState.PENDING||entry.state()==MigrationState.ABOVE_TARGET)&&!entry.applied())notesPending=true;
             else if("11".equals(entry.version())&&(entry.state()==MigrationState.PENDING||entry.state()==MigrationState.ABOVE_TARGET)&&!entry.applied())commentsPending=true;
+            else if("12".equals(entry.version())&&(entry.state()==MigrationState.PENDING||entry.state()==MigrationState.ABOVE_TARGET)&&!entry.applied())calendarsPending=true;
             else if(entry.state()!=MigrationState.SUCCESS||!entry.applied()||!entry.checksumMatches())throw new IllegalStateException("Inconsistent migration history");
         }
         if(!seen.equals(SCRIPTS.keySet()))throw new IllegalStateException("Missing migration");
@@ -85,16 +91,18 @@ public final class TestSchemaMigration {
         if(!metadataPending&&(photosPending||importsPending||dependenciesPending||worklogsPending))throw new IllegalStateException("Asset metadata precedes the V1-V8 baseline");
         if(!notesPending&&(photosPending||importsPending||dependenciesPending||worklogsPending||metadataPending))throw new IllegalStateException("Internal notes precede the V1-V9 baseline");
         if(!commentsPending&&(photosPending||importsPending||dependenciesPending||worklogsPending||metadataPending||notesPending))throw new IllegalStateException("Ticket comments precede the V1-V10 baseline");
-        return photosPending?Plan.PHOTOS_PENDING:importsPending?Plan.ASSET_IMPORTS_PENDING:dependenciesPending?Plan.ASSET_IMPORTS_APPLIED:worklogsPending?Plan.ASSET_DEPENDENCIES_APPLIED:metadataPending?Plan.WORKLOGS_APPLIED:notesPending?Plan.ASSET_METADATA_APPLIED:commentsPending?Plan.INTERNAL_NOTES_APPLIED:Plan.TICKET_COMMENTS_APPLIED;
+        if(!calendarsPending&&(photosPending||importsPending||dependenciesPending||worklogsPending||metadataPending||notesPending||commentsPending))throw new IllegalStateException("Working calendars precede the V1-V11 baseline");
+        return photosPending?Plan.PHOTOS_PENDING:importsPending?Plan.ASSET_IMPORTS_PENDING:dependenciesPending?Plan.ASSET_IMPORTS_APPLIED:worklogsPending?Plan.ASSET_DEPENDENCIES_APPLIED:metadataPending?Plan.WORKLOGS_APPLIED:notesPending?Plan.ASSET_METADATA_APPLIED:commentsPending?Plan.INTERNAL_NOTES_APPLIED:calendarsPending?Plan.TICKET_COMMENTS_APPLIED:Plan.WORKING_CALENDARS_APPLIED;
     }
     static boolean shouldMigrate(Mode mode,Plan plan){
         if(mode==Mode.APPLY_ASSET_IMPORTS&&plan==Plan.PHOTOS_PENDING)throw new IllegalStateException("Apply asset imports requires validated V1-V5 history");
         if(mode==Mode.APPLY_ASSET_DEPENDENCIES&&(plan==Plan.PHOTOS_PENDING||plan==Plan.ASSET_IMPORTS_PENDING))throw new IllegalStateException("Apply dependencies requires validated V1-V6 history");
-        if(mode==Mode.APPLY_WORKLOGS&&plan!=Plan.ASSET_DEPENDENCIES_APPLIED&&plan!=Plan.WORKLOGS_APPLIED&&plan!=Plan.ASSET_METADATA_APPLIED&&plan!=Plan.INTERNAL_NOTES_APPLIED&&plan!=Plan.TICKET_COMMENTS_APPLIED)throw new IllegalStateException("Apply worklogs requires validated V1-V7 history");
-        if(mode==Mode.APPLY_ASSET_METADATA&&plan!=Plan.WORKLOGS_APPLIED&&plan!=Plan.ASSET_METADATA_APPLIED&&plan!=Plan.INTERNAL_NOTES_APPLIED&&plan!=Plan.TICKET_COMMENTS_APPLIED)throw new IllegalStateException("Apply asset metadata requires validated V1-V8 history");
-        if(mode==Mode.APPLY_INTERNAL_NOTES&&plan!=Plan.ASSET_METADATA_APPLIED&&plan!=Plan.INTERNAL_NOTES_APPLIED&&plan!=Plan.TICKET_COMMENTS_APPLIED)throw new IllegalStateException("Apply internal notes requires validated V1-V9 history");
-        if(mode==Mode.APPLY_TICKET_COMMENTS&&plan!=Plan.INTERNAL_NOTES_APPLIED&&plan!=Plan.TICKET_COMMENTS_APPLIED)throw new IllegalStateException("Apply ticket comments requires validated V1-V10 history");
-        return mode==Mode.APPLY_PHOTOS&&plan==Plan.PHOTOS_PENDING||mode==Mode.APPLY_ASSET_IMPORTS&&plan==Plan.ASSET_IMPORTS_PENDING||mode==Mode.APPLY_ASSET_DEPENDENCIES&&plan==Plan.ASSET_IMPORTS_APPLIED||mode==Mode.APPLY_WORKLOGS&&plan==Plan.ASSET_DEPENDENCIES_APPLIED||mode==Mode.APPLY_ASSET_METADATA&&plan==Plan.WORKLOGS_APPLIED||mode==Mode.APPLY_INTERNAL_NOTES&&plan==Plan.ASSET_METADATA_APPLIED||mode==Mode.APPLY_TICKET_COMMENTS&&plan==Plan.INTERNAL_NOTES_APPLIED;
+        if(mode==Mode.APPLY_WORKLOGS&&plan!=Plan.ASSET_DEPENDENCIES_APPLIED&&plan!=Plan.WORKLOGS_APPLIED&&plan!=Plan.ASSET_METADATA_APPLIED&&plan!=Plan.INTERNAL_NOTES_APPLIED&&plan!=Plan.TICKET_COMMENTS_APPLIED&&plan!=Plan.WORKING_CALENDARS_APPLIED)throw new IllegalStateException("Apply worklogs requires validated V1-V7 history");
+        if(mode==Mode.APPLY_ASSET_METADATA&&plan!=Plan.WORKLOGS_APPLIED&&plan!=Plan.ASSET_METADATA_APPLIED&&plan!=Plan.INTERNAL_NOTES_APPLIED&&plan!=Plan.TICKET_COMMENTS_APPLIED&&plan!=Plan.WORKING_CALENDARS_APPLIED)throw new IllegalStateException("Apply asset metadata requires validated V1-V8 history");
+        if(mode==Mode.APPLY_INTERNAL_NOTES&&plan!=Plan.ASSET_METADATA_APPLIED&&plan!=Plan.INTERNAL_NOTES_APPLIED&&plan!=Plan.TICKET_COMMENTS_APPLIED&&plan!=Plan.WORKING_CALENDARS_APPLIED)throw new IllegalStateException("Apply internal notes requires validated V1-V9 history");
+        if(mode==Mode.APPLY_TICKET_COMMENTS&&plan!=Plan.INTERNAL_NOTES_APPLIED&&plan!=Plan.TICKET_COMMENTS_APPLIED&&plan!=Plan.WORKING_CALENDARS_APPLIED)throw new IllegalStateException("Apply ticket comments requires validated V1-V10 history");
+        if(mode==Mode.APPLY_WORKING_CALENDARS&&plan!=Plan.TICKET_COMMENTS_APPLIED&&plan!=Plan.WORKING_CALENDARS_APPLIED)throw new IllegalStateException("Apply working calendars requires validated V1-V11 history");
+        return mode==Mode.APPLY_PHOTOS&&plan==Plan.PHOTOS_PENDING||mode==Mode.APPLY_ASSET_IMPORTS&&plan==Plan.ASSET_IMPORTS_PENDING||mode==Mode.APPLY_ASSET_DEPENDENCIES&&plan==Plan.ASSET_IMPORTS_APPLIED||mode==Mode.APPLY_WORKLOGS&&plan==Plan.ASSET_DEPENDENCIES_APPLIED||mode==Mode.APPLY_ASSET_METADATA&&plan==Plan.WORKLOGS_APPLIED||mode==Mode.APPLY_INTERNAL_NOTES&&plan==Plan.ASSET_METADATA_APPLIED||mode==Mode.APPLY_TICKET_COMMENTS&&plan==Plan.INTERNAL_NOTES_APPLIED||mode==Mode.APPLY_WORKING_CALENDARS&&plan==Plan.TICKET_COMMENTS_APPLIED;
     }
     private static Plan inspect(Flyway flyway) {
         List<Entry> entries=new ArrayList<>();
@@ -116,7 +124,7 @@ public final class TestSchemaMigration {
                 public void warn(String message){} public void error(String message){} public void error(String message,Exception error){} public void notice(String message){}
             });
             Mode mode=requestedMode(args);boolean apply=mode!=Mode.READ_ONLY_CHECK;
-            stage="migration_resources";verifyImportResource();verifyDependencyResource();verifyWorklogResource();verifyAssetMetadataResource();verifyInternalNoteResource();verifyTicketCommentResource();stage="private_settings";Settings settings=Settings.from(System::getenv);
+            stage="migration_resources";verifyImportResource();verifyDependencyResource();verifyWorklogResource();verifyAssetMetadataResource();verifyInternalNoteResource();verifyTicketCommentResource();verifyWorkingCalendarResource();stage="private_settings";Settings settings=Settings.from(System::getenv);
             stage="identity";
             try(Connection guard=connection(settings,!apply)) {
                 verifyIdentity(guard);
@@ -125,7 +133,7 @@ public final class TestSchemaMigration {
                 Flyway flyway=Flyway.configure().dataSource(settings.url(),settings.user(),settings.password())
                     .jdbcProperties(jdbcProperties(!apply)).locations("classpath:db/migration").schemas("public").defaultSchema("public")
                     .createSchemas(false).cleanDisabled(true).baselineOnMigrate(false).outOfOrder(false).mixed(false)
-                    .executeInTransaction(true).group(true).target(mode==Mode.APPLY_PHOTOS?"5":mode==Mode.APPLY_ASSET_IMPORTS?"6":mode==Mode.APPLY_ASSET_DEPENDENCIES?"7":mode==Mode.APPLY_WORKLOGS?"8":mode==Mode.APPLY_ASSET_METADATA?"9":mode==Mode.APPLY_INTERNAL_NOTES?"10":"11").validateOnMigrate(true).validateMigrationNaming(true)
+                    .executeInTransaction(true).group(true).target(mode==Mode.APPLY_PHOTOS?"5":mode==Mode.APPLY_ASSET_IMPORTS?"6":mode==Mode.APPLY_ASSET_DEPENDENCIES?"7":mode==Mode.APPLY_WORKLOGS?"8":mode==Mode.APPLY_ASSET_METADATA?"9":mode==Mode.APPLY_INTERNAL_NOTES?"10":mode==Mode.APPLY_TICKET_COMMENTS?"11":"12").validateOnMigrate(true).validateMigrationNaming(true)
                     .failOnMissingLocations(true).skipDefaultCallbacks(true).ignoreMigrationPatterns("*:pending").load();
                 flyway.validate();stage="history";Plan before=inspect(flyway);boolean migrate=shouldMigrate(mode,before);
                 stage="structure";
@@ -133,22 +141,23 @@ public final class TestSchemaMigration {
                 int executed=0;
                 Plan after=before;
                 if(migrate) {
-                    stage=mode==Mode.APPLY_PHOTOS?"apply_photos":mode==Mode.APPLY_ASSET_IMPORTS?"apply_asset_imports":mode==Mode.APPLY_ASSET_DEPENDENCIES?"apply_asset_dependencies":mode==Mode.APPLY_WORKLOGS?"apply_worklogs":mode==Mode.APPLY_ASSET_METADATA?"apply_asset_metadata":mode==Mode.APPLY_INTERNAL_NOTES?"apply_internal_notes":"apply_ticket_comments";var result=flyway.migrate();executed=result.migrationsExecuted;
+                    stage=mode==Mode.APPLY_PHOTOS?"apply_photos":mode==Mode.APPLY_ASSET_IMPORTS?"apply_asset_imports":mode==Mode.APPLY_ASSET_DEPENDENCIES?"apply_asset_dependencies":mode==Mode.APPLY_WORKLOGS?"apply_worklogs":mode==Mode.APPLY_ASSET_METADATA?"apply_asset_metadata":mode==Mode.APPLY_INTERNAL_NOTES?"apply_internal_notes":mode==Mode.APPLY_TICKET_COMMENTS?"apply_ticket_comments":"apply_working_calendars";var result=flyway.migrate();executed=result.migrationsExecuted;
                     if(!result.success||executed!=1)throw new IllegalStateException("Unexpected migration result");
                     stage="post_validate";flyway.validate();
-                    after=inspect(flyway);Plan expected=mode==Mode.APPLY_PHOTOS?Plan.ASSET_IMPORTS_PENDING:mode==Mode.APPLY_ASSET_IMPORTS?Plan.ASSET_IMPORTS_APPLIED:mode==Mode.APPLY_ASSET_DEPENDENCIES?Plan.ASSET_DEPENDENCIES_APPLIED:mode==Mode.APPLY_WORKLOGS?Plan.WORKLOGS_APPLIED:mode==Mode.APPLY_ASSET_METADATA?Plan.ASSET_METADATA_APPLIED:mode==Mode.APPLY_INTERNAL_NOTES?Plan.INTERNAL_NOTES_APPLIED:Plan.TICKET_COMMENTS_APPLIED;
+                    after=inspect(flyway);Plan expected=mode==Mode.APPLY_PHOTOS?Plan.ASSET_IMPORTS_PENDING:mode==Mode.APPLY_ASSET_IMPORTS?Plan.ASSET_IMPORTS_APPLIED:mode==Mode.APPLY_ASSET_DEPENDENCIES?Plan.ASSET_DEPENDENCIES_APPLIED:mode==Mode.APPLY_WORKLOGS?Plan.WORKLOGS_APPLIED:mode==Mode.APPLY_ASSET_METADATA?Plan.ASSET_METADATA_APPLIED:mode==Mode.APPLY_INTERNAL_NOTES?Plan.INTERNAL_NOTES_APPLIED:mode==Mode.APPLY_TICKET_COMMENTS?Plan.TICKET_COMMENTS_APPLIED:Plan.WORKING_CALENDARS_APPLIED;
                     if(after!=expected)throw new IllegalStateException("Explicit migration incomplete");
                     stage="post_structure_acl";verifyStructure(guard,after);
                 }
                 output.println("MOP_SCHEMA status="+after+" mode="+mode+" migrations_executed="+executed+
-                    " baseline="+(after==Plan.TICKET_COMMENTS_APPLIED?"V1_V10_VALIDATED":(after==Plan.INTERNAL_NOTES_APPLIED||after==Plan.TICKET_COMMENTS_APPLIED)?"V1_V9_VALIDATED":after==Plan.ASSET_METADATA_APPLIED?"V1_V8_VALIDATED":after==Plan.WORKLOGS_APPLIED?"V1_V7_VALIDATED":after==Plan.ASSET_DEPENDENCIES_APPLIED?"V1_V6_VALIDATED":after==Plan.PHOTOS_PENDING?"V1_V4_VALIDATED":"V1_V5_VALIDATED")+
+                    " baseline="+(after==Plan.WORKING_CALENDARS_APPLIED?"V1_V11_VALIDATED":(after==Plan.TICKET_COMMENTS_APPLIED||after==Plan.WORKING_CALENDARS_APPLIED)?"V1_V10_VALIDATED":(after==Plan.INTERNAL_NOTES_APPLIED||(after==Plan.TICKET_COMMENTS_APPLIED||after==Plan.WORKING_CALENDARS_APPLIED))?"V1_V9_VALIDATED":after==Plan.ASSET_METADATA_APPLIED?"V1_V8_VALIDATED":after==Plan.WORKLOGS_APPLIED?"V1_V7_VALIDATED":after==Plan.ASSET_DEPENDENCIES_APPLIED?"V1_V6_VALIDATED":after==Plan.PHOTOS_PENDING?"V1_V4_VALIDATED":"V1_V5_VALIDATED")+
                     " photos="+(after==Plan.PHOTOS_PENDING?"NOT_APPLIED":"STRUCTURE_ACL_VERIFIED")+
-                    " asset_imports="+((after==Plan.ASSET_IMPORTS_APPLIED||after==Plan.ASSET_DEPENDENCIES_APPLIED||after==Plan.WORKLOGS_APPLIED||after==Plan.ASSET_METADATA_APPLIED||(after==Plan.INTERNAL_NOTES_APPLIED||after==Plan.TICKET_COMMENTS_APPLIED))?"STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
-                    " asset_dependencies="+((after==Plan.ASSET_DEPENDENCIES_APPLIED||after==Plan.WORKLOGS_APPLIED||after==Plan.ASSET_METADATA_APPLIED||(after==Plan.INTERNAL_NOTES_APPLIED||after==Plan.TICKET_COMMENTS_APPLIED))?"DRAFT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
-                    " worklogs="+((after==Plan.WORKLOGS_APPLIED||after==Plan.ASSET_METADATA_APPLIED||(after==Plan.INTERNAL_NOTES_APPLIED||after==Plan.TICKET_COMMENTS_APPLIED))?"MANUAL_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
-                    " asset_metadata="+((after==Plan.ASSET_METADATA_APPLIED||(after==Plan.INTERNAL_NOTES_APPLIED||after==Plan.TICKET_COMMENTS_APPLIED))?"MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
-                    " internal_notes="+((after==Plan.INTERNAL_NOTES_APPLIED||after==Plan.TICKET_COMMENTS_APPLIED)?"IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
-                    " ticket_comments="+(after==Plan.TICKET_COMMENTS_APPLIED?"IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED"));
+                    " asset_imports="+((after==Plan.ASSET_IMPORTS_APPLIED||after==Plan.ASSET_DEPENDENCIES_APPLIED||after==Plan.WORKLOGS_APPLIED||after==Plan.ASSET_METADATA_APPLIED||(after==Plan.INTERNAL_NOTES_APPLIED||(after==Plan.TICKET_COMMENTS_APPLIED||after==Plan.WORKING_CALENDARS_APPLIED)))?"STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
+                    " asset_dependencies="+((after==Plan.ASSET_DEPENDENCIES_APPLIED||after==Plan.WORKLOGS_APPLIED||after==Plan.ASSET_METADATA_APPLIED||(after==Plan.INTERNAL_NOTES_APPLIED||(after==Plan.TICKET_COMMENTS_APPLIED||after==Plan.WORKING_CALENDARS_APPLIED)))?"DRAFT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
+                    " worklogs="+((after==Plan.WORKLOGS_APPLIED||after==Plan.ASSET_METADATA_APPLIED||(after==Plan.INTERNAL_NOTES_APPLIED||(after==Plan.TICKET_COMMENTS_APPLIED||after==Plan.WORKING_CALENDARS_APPLIED)))?"MANUAL_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
+                    " asset_metadata="+((after==Plan.ASSET_METADATA_APPLIED||(after==Plan.INTERNAL_NOTES_APPLIED||(after==Plan.TICKET_COMMENTS_APPLIED||after==Plan.WORKING_CALENDARS_APPLIED)))?"MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
+                    " internal_notes="+((after==Plan.INTERNAL_NOTES_APPLIED||(after==Plan.TICKET_COMMENTS_APPLIED||after==Plan.WORKING_CALENDARS_APPLIED))?"IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
+                    " ticket_comments="+((after==Plan.TICKET_COMMENTS_APPLIED||after==Plan.WORKING_CALENDARS_APPLIED)?"IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED")+
+                    " working_calendars="+(after==Plan.WORKING_CALENDARS_APPLIED?"UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED":"NOT_APPLIED"));
             }
         }catch(Throwable failure){errors.println(safeFailure(stage,failure));exit=1;}
         finally{System.setOut(output);System.setErr(errors);}
@@ -160,13 +169,14 @@ public final class TestSchemaMigration {
         }
     }
     private static void verifyStructure(Connection connection,Plan plan)throws SQLException{
-        if(plan==Plan.TICKET_COMMENTS_APPLIED)verifyTicketComments(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_ticket_comment') IS NULL");
-        if((plan==Plan.INTERNAL_NOTES_APPLIED||plan==Plan.TICKET_COMMENTS_APPLIED))verifyInternalNotes(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_ticket_internal_note') IS NULL");
+        if(plan==Plan.WORKING_CALENDARS_APPLIED)verifyWorkingCalendars(connection);else {requireTrue(connection,"SELECT to_regclass('public.mop_working_calendar_draft') IS NULL AND to_regclass('public.mop_working_calendar_revision') IS NULL");requireTrue(connection,"SELECT to_regprocedure('public.mop_calendar_windows_valid(jsonb,timestamp with time zone,timestamp with time zone)') IS NULL");}
+        if((plan==Plan.TICKET_COMMENTS_APPLIED||plan==Plan.WORKING_CALENDARS_APPLIED))verifyTicketComments(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_ticket_comment') IS NULL");
+        if((plan==Plan.INTERNAL_NOTES_APPLIED||(plan==Plan.TICKET_COMMENTS_APPLIED||plan==Plan.WORKING_CALENDARS_APPLIED)))verifyInternalNotes(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_ticket_internal_note') IS NULL");
         if(plan==Plan.PHOTOS_PENDING)verifyBeforePhotos(connection);else verifyPhotos(connection);
-        if(plan==Plan.ASSET_IMPORTS_APPLIED||plan==Plan.ASSET_DEPENDENCIES_APPLIED||plan==Plan.WORKLOGS_APPLIED||plan==Plan.ASSET_METADATA_APPLIED||(plan==Plan.INTERNAL_NOTES_APPLIED||plan==Plan.TICKET_COMMENTS_APPLIED))verifyAssetImports(connection);else verifyBeforeAssetImports(connection);
-        if(plan==Plan.ASSET_DEPENDENCIES_APPLIED||plan==Plan.WORKLOGS_APPLIED||plan==Plan.ASSET_METADATA_APPLIED||(plan==Plan.INTERNAL_NOTES_APPLIED||plan==Plan.TICKET_COMMENTS_APPLIED))verifyAssetDependencies(connection);else requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_asset_dependency_graph','mop_asset_dependency_revision','mop_asset_dependency_edge')");
-        if(plan==Plan.WORKLOGS_APPLIED||plan==Plan.ASSET_METADATA_APPLIED||(plan==Plan.INTERNAL_NOTES_APPLIED||plan==Plan.TICKET_COMMENTS_APPLIED))verifyWorklogs(connection);else requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_worklog','mop_worklog_revision')");
-        if(plan==Plan.ASSET_METADATA_APPLIED||(plan==Plan.INTERNAL_NOTES_APPLIED||plan==Plan.TICKET_COMMENTS_APPLIED))verifyAssetMetadata(connection);
+        if(plan==Plan.ASSET_IMPORTS_APPLIED||plan==Plan.ASSET_DEPENDENCIES_APPLIED||plan==Plan.WORKLOGS_APPLIED||plan==Plan.ASSET_METADATA_APPLIED||(plan==Plan.INTERNAL_NOTES_APPLIED||(plan==Plan.TICKET_COMMENTS_APPLIED||plan==Plan.WORKING_CALENDARS_APPLIED)))verifyAssetImports(connection);else verifyBeforeAssetImports(connection);
+        if(plan==Plan.ASSET_DEPENDENCIES_APPLIED||plan==Plan.WORKLOGS_APPLIED||plan==Plan.ASSET_METADATA_APPLIED||(plan==Plan.INTERNAL_NOTES_APPLIED||(plan==Plan.TICKET_COMMENTS_APPLIED||plan==Plan.WORKING_CALENDARS_APPLIED)))verifyAssetDependencies(connection);else requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_asset_dependency_graph','mop_asset_dependency_revision','mop_asset_dependency_edge')");
+        if(plan==Plan.WORKLOGS_APPLIED||plan==Plan.ASSET_METADATA_APPLIED||(plan==Plan.INTERNAL_NOTES_APPLIED||(plan==Plan.TICKET_COMMENTS_APPLIED||plan==Plan.WORKING_CALENDARS_APPLIED)))verifyWorklogs(connection);else requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_worklog','mop_worklog_revision')");
+        if(plan==Plan.ASSET_METADATA_APPLIED||(plan==Plan.INTERNAL_NOTES_APPLIED||(plan==Plan.TICKET_COMMENTS_APPLIED||plan==Plan.WORKING_CALENDARS_APPLIED)))verifyAssetMetadata(connection);
         else {requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_asset_manual_details','mop_asset_manual_revision')");verifyRuntimeAcl(connection,"mop_asset",Set.of());}
     }
     static void verifyDependencyResource()throws Exception{
@@ -272,6 +282,36 @@ public final class TestSchemaMigration {
         requireConstraint(connection,"mop_ticket_comment","f",List.of("tenant_id","actor_id"),"mop_membership",List.of("tenant_id","user_id"),false);
         requireTrue(connection,"SELECT count(*)=14 FROM pg_constraint WHERE conrelid='public.mop_ticket_comment'::regclass AND contype='c'");
         requireTrue(connection,"SELECT i.indisvalid AND i.indisready FROM pg_index i JOIN pg_class c ON c.oid=i.indexrelid WHERE c.relname='mop_ticket_comment_order' AND c.relnamespace='public'::regnamespace");
+    }
+    static void verifyWorkingCalendarResource()throws Exception{
+        try(var input=TestSchemaMigration.class.getResourceAsStream("/db/migration/"+SCRIPTS.get("12"))){
+            if(input==null)throw new IllegalStateException("Missing working calendar migration resource");
+            byte[] bytes=input.readAllBytes();
+            if(!WORKING_CALENDAR_SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes))))throw new IllegalStateException("Unreviewed working calendar migration resource");
+            String sql=new String(bytes,StandardCharsets.UTF_8);int marker=sql.indexOf(" AS $$");int end=marker<0?-1:sql.indexOf("$$;",marker+6);
+            if(marker<0||end<0||!WORKING_CALENDAR_CHECKER_SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(sql.substring(marker+6,end).getBytes(StandardCharsets.UTF_8)))))throw new IllegalStateException("Unreviewed working calendar checker body");
+        }
+    }
+    private static void verifyWorkingCalendars(Connection connection)throws SQLException{
+        verifyColumns(connection,"mop_working_calendar_draft",Map.of("id","uuid","tenant_id","uuid","version","bigint","created_at","timestamp(3) with time zone","updated_at","timestamp(3) with time zone"),Set.of(),true);
+        verifyColumns(connection,"mop_working_calendar_revision",Map.ofEntries(Map.entry("tenant_id","uuid"),Map.entry("calendar_id","uuid"),Map.entry("version","bigint"),Map.entry("previous_version","bigint"),Map.entry("actor_id","uuid"),Map.entry("name","character varying(100)"),Map.entry("coverage_start","timestamp(3) with time zone"),Map.entry("coverage_end","timestamp(3) with time zone"),Map.entry("working_windows","jsonb"),Map.entry("coverage_complete","boolean"),Map.entry("note","text"),Map.entry("recorded_at","timestamp(3) with time zone"),Map.entry("timezone","character varying(64)"),Map.entry("lifecycle_status","character varying(16)"),Map.entry("customer_confirmation","character varying(24)"),Map.entry("effective","boolean"),Map.entry("record_source","character varying(32)")),Set.of("previous_version","note"),true);
+        verifyRuntimeAcl(connection,"mop_working_calendar_draft",Set.of("version","updated_at"));verifyRuntimeAcl(connection,"mop_working_calendar_revision",Set.of());
+        for(String table:List.of("mop_working_calendar_draft","mop_working_calendar_revision")){
+            requireTrue(connection,"SELECT relkind='r' AND relowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') FROM pg_class WHERE oid=?::regclass","public."+table);
+            requireTrue(connection,"SELECT NOT EXISTS(SELECT 1 FROM pg_constraint WHERE conrelid=?::regclass AND NOT convalidated)","public."+table);
+        }
+        requireConstraint(connection,"mop_working_calendar_draft","p",List.of("id"),null,List.of(),false);
+        requireConstraint(connection,"mop_working_calendar_draft","u",List.of("tenant_id","id"),null,List.of(),false);
+        requireConstraint(connection,"mop_working_calendar_draft","f",List.of("tenant_id"),"mop_tenant",List.of("id"),false);
+        requireConstraint(connection,"mop_working_calendar_draft","f",List.of("tenant_id","id","version"),"mop_working_calendar_revision",List.of("tenant_id","calendar_id","version"),true);
+        requireConstraint(connection,"mop_working_calendar_revision","p",List.of("tenant_id","calendar_id","version"),null,List.of(),false);
+        requireConstraint(connection,"mop_working_calendar_revision","f",List.of("tenant_id","calendar_id"),"mop_working_calendar_draft",List.of("tenant_id","id"),false);
+        requireConstraint(connection,"mop_working_calendar_revision","f",List.of("tenant_id","calendar_id","previous_version"),"mop_working_calendar_revision",List.of("tenant_id","calendar_id","version"),false);
+        requireConstraint(connection,"mop_working_calendar_revision","f",List.of("tenant_id","actor_id"),"mop_membership",List.of("tenant_id","user_id"),false);
+        requireTrue(connection,"SELECT count(*)=4 FROM pg_constraint WHERE conrelid='public.mop_working_calendar_draft'::regclass AND contype='c'");
+        requireTrue(connection,"SELECT count(*)=14 FROM pg_constraint WHERE conrelid='public.mop_working_calendar_revision'::regclass AND contype='c'");
+        requireTrue(connection,"SELECT i.indisvalid AND i.indisready FROM pg_index i JOIN pg_class c ON c.oid=i.indexrelid WHERE c.relname='mop_working_calendar_draft_order' AND c.relnamespace='public'::regnamespace");
+        requireTrue(connection,"SELECT NOT p.prosecdef AND p.provolatile='i' AND p.proparallel='s' AND p.proowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') AND p.proconfig @> ARRAY['search_path=pg_catalog']::text[] AND encode(sha256(convert_to(p.prosrc,'UTF8')),'hex')=? AND has_function_privilege('mop_test_runtime',p.oid,'EXECUTE') AND NOT EXISTS(SELECT 1 FROM aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) a WHERE a.grantee=0) FROM pg_proc p WHERE p.oid='public.mop_calendar_windows_valid(jsonb,timestamp with time zone,timestamp with time zone)'::regprocedure",WORKING_CALENDAR_CHECKER_SHA256);
     }
     private static void verifyBeforeAssetImports(Connection connection)throws SQLException{
         requireTrue(connection,"SELECT count(*)=0 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('mop_asset_import_source','mop_asset_import_operation','mop_asset_import_job','mop_asset_import_artifact','mop_asset_import_mapping')");

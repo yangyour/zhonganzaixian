@@ -37,4 +37,7 @@ class NikoPrivateBootstrapTest(unittest.TestCase):
  def test_v11_comment_hash_is_separate_from_frozen_v1_to_v10(self):
   manifest=json.loads((ROOT/'tools/niko-test/frozen-ticket-comment-migration.json').read_text())['sha256'];self.assertEqual(1,len(manifest))
   for name,expected in manifest.items():self.assertEqual(expected,hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest())
+ def test_v12_calendar_hash_is_separate_from_frozen_v1_to_v11(self):
+  manifest=json.loads((ROOT/'tools/niko-test/frozen-working-calendar-migration.json').read_text())['sha256'];self.assertEqual(1,len(manifest))
+  for name,expected in manifest.items():self.assertEqual(expected,hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest())
 if __name__=='__main__':unittest.main()

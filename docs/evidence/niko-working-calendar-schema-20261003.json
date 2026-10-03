@@ -1,0 +1,52 @@
+{
+  "verified_at": "2026-10-03T00:53:03.737524+00:00",
+  "environment": "niko-local-test",
+  "status": "SCHEMA_APPLIED_AND_FROZEN",
+  "migration": "V12__unpublished_working_calendar_drafts.sql",
+  "sha256": "e6e0412e8a96936a6f4e09dc9f96431cd6551dd9c15ebaf7d2ed414467aedb1a",
+  "checker_body_sha256": "07749cb8084dc2f0e9f2a6ed899b77be3dc4e1aeb55f15eed1bf558e48b18fb6",
+  "independent_migration": {
+    "before_check": 0,
+    "apply": 1,
+    "repeat": 0,
+    "after_check": 0,
+    "older_comment_mode": 0,
+    "fingerprint_check": 0,
+    "fingerprint_repeat": 0
+  },
+  "tests": {
+    "new_schema_real_pg": 10,
+    "migration_policy": 13,
+    "python_guards": 50,
+    "root_reported": 690,
+    "root_executed": 677,
+    "real_pg": 198,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "readonly_after_tests": {
+    "draft_rows": 0,
+    "revision_rows": 0,
+    "q08_null_values": 2
+  },
+  "schema_tests_rolled_back": true,
+  "business_repository_implemented": false,
+  "api_added": false,
+  "frontend_added": false,
+  "effective": false,
+  "customer_confirmation": "UNVERIFIED",
+  "api_version_unchanged": "0.17.0",
+  "frozen_migrations": "V1-V12",
+  "next_schema_correction": "V13+",
+  "api_worker_automatic_migration": false,
+  "credentials_output": false,
+  "original_server_changed": false,
+  "full_contract_done": false,
+  "limitations": [
+    "Schema constraints and ACL do not establish business role/resource authorization",
+    "No real calendar CRUD/HTTP/DOM acceptance yet",
+    "No customer-approved calendar, recurrence or formal SLA deadline"
+  ]
+}

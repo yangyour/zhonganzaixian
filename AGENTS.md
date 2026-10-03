@@ -56,4 +56,4 @@ Dot 必须遵守下文与本地完全相同的测试环境、秘密、客户待�
 
 ## 已执行迁移冻结边界（2026-10-02）
 
-在niko独立测试库，V7–V11均已按功能显式独立执行并留证；当前V1–V11全部字节冻结。V11__immutable_ticket_comments.sql的SHA256为d8535bbf13ca9e35c115278f36232a786b4562c99cc9afd9f5195a416028a8e3。后续结构修正新增V12或更高，不重写已执行SQL。tools/niko-test/frozen-*.json与独立迁移CLI校验源/编译资源及历史；API/Worker启动仍禁止自动迁移。表结构完成不代表客户评论仓储、API或页面验收通过，详见docs/ticket-comments.md。
+在niko独立测试库，V7–V12均已按功能显式独立执行并留证；当前V1–V12全部字节冻结。V12__unpublished_working_calendar_drafts.sql的SHA256为e6e0412e8a96936a6f4e09dc9f96431cd6551dd9c15ebaf7d2ed414467aedb1a。后续结构修正新增V13或更高，不重写已执行SQL。tools/niko-test/frozen-*.json与独立迁移CLI校验源/编译资源及历史；API/Worker启动仍禁止自动迁移。表结构完成不代表工作日历仓储、API、页面或正式生效验收通过，详见docs/working-calendar-drafts.md。

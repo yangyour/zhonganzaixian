@@ -1,0 +1,43 @@
+{
+  "verified_at": "2026-10-03T21:42:24.603374+00:00",
+  "scope": "THRESHOLD_DIAGNOSTIC_VUE_PAGE_AND_NAVIGATION",
+  "api_version": "0.33.0",
+  "route": "/threshold-diagnostics",
+  "new_sfc_handler_tests": 9,
+  "new_source_wiring_tests": 1,
+  "web_tests": 776,
+  "complete_web_run_max_workers": 2,
+  "initial_full_run": "INCOMPLETE_NO_SUMMARY_EXECUTION_POLL_CANCELLED_NOT_COUNTED_AS_PASS",
+  "typecheck": "PASS",
+  "web_build": "PASS",
+  "build_advisory": "Minified chunk >500kB advisory remains; no actual browser performance claimed",
+  "contracts": 70,
+  "generation_check": "PASS",
+  "renderer": "Actual Vue SFC with in-memory renderer and stub controls, not browser DOM",
+  "default_input": "EMPTY_NO_DEFAULT_THRESHOLD_SEED",
+  "explicit_readonly_diagnostic_only": true,
+  "no_save_publish_or_auto_correction_controls": true,
+  "unknown_and_conflict_labels_kept": true,
+  "original_decimal_precision_and_units_displayed": true,
+  "voluntary_discard_confirmation_and_forced_context_erasure": true,
+  "source_sha256": {
+    "apps/web/src/pages/ThresholdDiagnosticsPage.vue": "20474275ac3beaaece0e9bd95211bca6da6079e2e4089ad4338661994f0957d1",
+    "apps/web/tests/thresholdDiagnosticsPage.test.ts": "793fc597577a37074e02af1bc62e747501bee21227569eecea8861f7168d7dc7",
+    "apps/web/src/router.ts": "e7ee6e4256ce22b20ce560a71fbdbf6e80d98c0699c56e9ed73027ee2828e8a8",
+    "apps/web/src/App.vue": "6e994382b5c369a3f5567667550747561088bba5e942404b231eee9d3e0a42ee"
+  },
+  "state_module_commit": {
+    "sha": "1308d6a8ef203a2f96cdda3be6f3f99215ddd28c",
+    "ci_run": 37154979716,
+    "conclusion": "success"
+  },
+  "module_http_evidence": "niko-threshold-client-http-20261003.json",
+  "new_http_execution_claimed": false,
+  "browser_dom": "NOT_RUN_B03",
+  "desktop_or_mobile_visual": "NOT_RUN_B03",
+  "monitoring_applied": false,
+  "customer_confirmation": "UNVERIFIED",
+  "publishable": false,
+  "v1_v19_changed": false,
+  "contract_done": false
+}

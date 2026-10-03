@@ -1,0 +1,40 @@
+{
+  "verified_at": "2026-10-03T20:47:55.144230+00:00",
+  "scope": "DISJOINT_WORKER_CLASSIFIER_SELECTION_AND_ACTUAL_ASSET_FLAG_REJECTION",
+  "regression": "New contact-imports.jar also matched legacy *-imports.jar wildcard, producing two asset-worker candidates and overlapping stop role acceptance",
+  "actual_built_artifacts_reproduce_old_candidate_count": 2,
+  "disjoint_asset_candidates": 1,
+  "shared_powershell_classifier_discriminator": true,
+  "startup_and_ownership_share_role_filter": true,
+  "contact_main_blocks_migration": true,
+  "actual_asset_enable_flag_rejected": true,
+  "new_java_tests": 1,
+  "contact_worker_settings_tests": 8,
+  "root_tests_reported": 1240,
+  "root_tests_executed": 1227,
+  "actual_postgresql_tests": 392,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "packaged_jvm_mixed_flags_rejected_without_db_credentials": true,
+  "isolated_powershell_ownership_checks_expected": 21,
+  "powershell_execution": "PENDING_WINDOWS_CI_NO_LOCAL_PWSH",
+  "windows_real_process_actions": 0,
+  "windows_real_startup": "NOT_RUN",
+  "new_windows_contact_start_option": false,
+  "api_version": "0.32.0",
+  "v1_v19_changed": false,
+  "source_sha256": {
+    "deploy/start-dev.ps1": "b3e942765b75fb5a844871493193c17cf4073e1d791a23ab2fe6e5be8320282e",
+    "deploy/dev-process-ownership.ps1": "1bfb18fc0e537c714ab7e466305523ef8c41d07db419076143f32e836bfa868a",
+    "tools/test-dev-process-ownership.ps1": "8f9b2841897dec97e62ebe1306c5cd765b34b748c052573cfee50b51f48d6419",
+    "server/worker/src/main/java/cn/mop/contactworker/ContactImportWorkerSettings.java": "b97a5f4d38567578a3f267dce9a16b793d968c621ff1bcd72482f6e2a917b858",
+    "server/worker/src/test/java/cn/mop/contactworker/ContactImportWorkerSettingsTest.java": "ab31bd0ec9eb9df65c003b7195c7473cd4f16ab14992b0be008b6640bba7b488",
+    ".github/workflows/cloud-validation.yml": "e72bcbb0d33191c425a3dc244d9c7c5eb7a0f7b0e2a069d11a3189d17df26118"
+  },
+  "previous_page_commit": {
+    "sha": "6dd635019b923e0e90461aa944ea953030f64399",
+    "ci_run": 37152643951,
+    "conclusion": "success"
+  },
+  "contract_done": false
+}

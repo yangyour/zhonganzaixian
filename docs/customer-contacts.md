@@ -220,3 +220,12 @@ API提交b0af459 CI37151368999 success已回读。本次仅前端状态模块，
 用户可显式开启每2秒GET进度刷新，终态、查询失败、上下文切换或卸载停止，手动停止可随时取消后续计时；轮询绝不POST受理/重试。13实际SFC处理器+1源接线新测试，全748Web、typecheck/build、67契约/生成一致性通过；包含确认取消/旧上下文、未知原请求403仍锁定、普通成功GET不解除未知、相同行ack/编辑失效、只读轮询终止及失败清旧显示。测试用Vue内存renderer与stub控件，不等于浏览器DOM/真实390px视觉，B03仍保留。前一状态模块9e77bb0 CI37152083159 success和72真实HTTP证据保留，本页面未把前证据重算为新HTTP执行。
 
 原只读预览页仍没有批量写按钮/can_import=false，文案更新为独立受理入口可用。JSON联系人创建链路已有证据，CSV/XLSX、通知送达/Q14、原指定服务器V17–V19与全M2-9验收尚未通过；不标DONE。见[页面证据](evidence/niko-contact-import-page-20261003.json)。
+
+
+## 2026-10-03 Worker产物角色交叉匹配回归修复
+
+在检查部署兼容性时发现，新增contact-imports.jar也命中旧资产Worker的*-imports.jar通配符。实际target的三个构建产物复现旧资产选择2个候选，Windows WithAssetImportWorker会因非唯一拒绝启动；原停止归属规则也未区分两类导入JAR。这是产物选择回归，不是原服务器故障证据。新增共享纯Test-MopWorkerArtifactName，照片/资产导入/联系人导入三族互斥；启动与停止核验复用同一判别，仍校验实际目录、PID/启动时间/完整Java路径，不按名称接管。迁移拒绝守卫同时识别直接ContactImportWorkerApplication启动，V1–V19不改。
+
+另修正联系人Worker混合开关校验：既有资产实际开关为MOP_IMPORT_WORKER_ENABLED，原只校验MOP_ASSET_IMPORT_WORKER_ENABLED别名；现两者及照片开关都拒绝混入。新增1 Java回归（设置总8项），根1240=1227执行含392真实PG、13历史fixture跳过/6MinIO排除全部通过；新固定JAR实际JVM在两个真实开关true时退出1，明确FAIL_CLOSED，未提供或读取任何数据库凭据、未启动Hikari/访问组件。
+
+PowerShell隔离用例从14增至21，新增三族互斥/原候选重叠/同路径伪角色/直接入口保护；本机无pwsh，实际执行留给新增Windows CI job，当前提交不预先声明通过。该job只使用本地进程测试替身，实际进程操作0，不能当Windows原服务器启动验收。未新增WithContactImportWorker选项，niko专用启动器仍可用；原服务器入口/迁移/真实进程验证待。页面6dd6350 CI37152643951 success已回读。见[回归记录](evidence/niko-worker-artifact-role-regression-20261003.json)、[实际JVM拒绝](evidence/niko-contact-worker-role-startup-20261003.json)。

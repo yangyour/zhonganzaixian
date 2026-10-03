@@ -148,4 +148,55 @@ Check-Ownership 'console basename in another path, missing image and foreign par
         if (Test-MopImportConsoleHost -ProcessInfo $info -ParentRecord $parent) { throw 'Foreign console helper trusted' }
     } finally { $script:fakeInfos.Remove(44126) }
 }
+Check-Ownership 'three classifier names map to exactly one dedicated role' {
+    $pairs = @{
+        'mop-worker-0.1.0-SNAPSHOT.jar' = 'photo-worker'
+        'mop-worker-0.1.0-SNAPSHOT-imports.jar' = 'asset-import-worker'
+        'mop-worker-0.1.0-SNAPSHOT-contact-imports.jar' = 'contact-import-worker'
+    }
+    foreach ($name in $pairs.Keys) {
+        foreach ($role in @('photo-worker','asset-import-worker','contact-import-worker')) {
+            if ((Test-MopWorkerArtifactName -Name $name -Role $role) -ne ($pairs[$name] -eq $role)) { throw 'Classifier role overlap or missing family' }
+        }
+    }
+}
+Check-Ownership 'artifact role rejects path references ancillary artifacts and unknown roles' {
+    foreach ($name in @('mop-worker-test-sources.jar','mop-worker-test-javadoc.jar','../mop-worker-test.jar','mop-worker-test.jar.bak',"mop-worker-test.jar`n",'other-worker-test.jar')) {
+        foreach ($role in @('photo-worker','asset-import-worker','contact-import-worker')) {
+            if (Test-MopWorkerArtifactName -Name $name -Role $role) { throw 'Unsafe artifact basename accepted' }
+        }
+    }
+    if (Test-MopWorkerArtifactName -Name 'mop-worker-test.jar' -Role 'unknown') { throw 'Unknown worker role accepted' }
+}
+Check-Ownership 'asset startup candidate filter remains unique with contact classifier present' {
+    $names = @('mop-worker-0.1.0-SNAPSHOT.jar','mop-worker-0.1.0-SNAPSHOT-imports.jar','mop-worker-0.1.0-SNAPSHOT-contact-imports.jar')
+    $oldCandidates = @($names | Where-Object { $_ -like 'mop-worker-*-imports.jar' })
+    if ($oldCandidates.Count -ne 2) { throw 'Overlap reproduction did not exercise original failure' }
+    $newCandidates = @($names | Where-Object { Test-MopWorkerArtifactName -Name $_ -Role 'asset-import-worker' })
+    if ($newCandidates.Count -ne 1 -or $newCandidates[0] -ne 'mop-worker-0.1.0-SNAPSHOT-imports.jar') { throw 'Asset worker selection still ambiguous' }
+}
+$contactWorker = New-FakeOwned -Id 44127 -Name 'contact-import-worker' -Artifact (Join-Path $projectRoot 'server/worker/target/mop-worker-MOP-FAKE-contact-imports.jar') -Executable $java
+Check-Ownership 'dedicated contact ownership validates exact process identity' {
+    if ((Get-MopOwnedProcess -Record $contactWorker -ProjectRoot $projectRoot).Id -ne 44127) { throw 'Contact worker ownership missing' }
+    $started = $script:fakeProcesses[44127].StartTime
+    try { $script:fakeProcesses[44127].StartTime = $started.AddSeconds(1); Require-Rejected { Get-MopOwnedProcess -Record $contactWorker -ProjectRoot $projectRoot } } finally { $script:fakeProcesses[44127].StartTime = $started }
+}
+Check-Ownership 'asset worker cannot adopt contact artifact even if process and record both match it' {
+    $name = $contactWorker.name
+    try { $contactWorker.name = 'asset-import-worker'; Require-Rejected { Get-MopOwnedProcess -Record $contactWorker -ProjectRoot $projectRoot } } finally { $contactWorker.name = $name }
+}
+Check-Ownership 'contact worker cannot adopt asset or photo artifact even with matching process command' {
+    $artifact = $contactWorker.artifact_path; $command = $script:fakeInfos[44127].CommandLine
+    try {
+        foreach ($other in @($parent.artifact_path,$photo.artifact_path)) {
+            $contactWorker.artifact_path=$other; $script:fakeInfos[44127].CommandLine='java -jar "'+$other+'"'; Require-Rejected { Get-MopOwnedProcess -Record $contactWorker -ProjectRoot $projectRoot }
+        }
+    } finally { $contactWorker.artifact_path=$artifact; $script:fakeInfos[44127].CommandLine=$command }
+}
+Check-Ownership 'startup uses shared classifier discriminator and migration guard includes contact main' {
+    $startup = Get-Content -Raw -LiteralPath (Join-Path $projectRoot 'deploy/start-dev.ps1')
+    foreach ($role in @('photo-worker','asset-import-worker')) { if (-not $startup.Contains("Test-MopWorkerArtifactName -Name `$_.Name -Role '$role'")) { throw 'Startup bypasses common artifact role discriminator' } }
+    $helper = Get-Content -Raw -LiteralPath (Join-Path $projectRoot 'deploy/dev-process-ownership.ps1')
+    if (-not $helper.Contains("Contains('cn.mop.contactworker.ContactImportWorkerApplication'")) { throw 'Contact main class missing from refuse-migration guard' }
+}
 Write-Host "MOP_OWNERSHIP_TEST status=PASS isolated_checks=$script:checks fake_process_queries=$script:processQueries fake_cim_queries=$script:cimQueries actual_process_actions=0"

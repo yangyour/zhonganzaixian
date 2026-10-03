@@ -88,12 +88,12 @@ try {
     if ($apiJars.Count -ne 1) { throw '需要唯一已构建 API jar，请先构建并核验 target。' }
     $apiJar = $apiJars[0]
     if ($WithPhotoWorker) {
-        $workerJars = @(Get-ChildItem -LiteralPath (Join-Path $projectRoot 'server/worker/target') -Filter 'mop-worker-*.jar' | Where-Object { $_.Name -notlike '*sources*' -and $_.Name -notlike '*javadoc*' -and $_.Name -notlike '*-imports.jar' })
+        $workerJars = @(Get-ChildItem -LiteralPath (Join-Path $projectRoot 'server/worker/target') -Filter 'mop-worker-*.jar' | Where-Object { Test-MopWorkerArtifactName -Name $_.Name -Role 'photo-worker' })
         if ($workerJars.Count -ne 1) { throw '照片模式需要唯一已构建 Worker jar，请先完成根工程构建。' }
         $workerJar = $workerJars[0]
     }
     if ($WithAssetImportWorker) {
-        $importWorkerJars = @(Get-ChildItem -LiteralPath (Join-Path $projectRoot 'server/worker/target') -Filter 'mop-worker-*-imports.jar' | Where-Object { $_.Name -notlike '*sources*' -and $_.Name -notlike '*javadoc*' })
+        $importWorkerJars = @(Get-ChildItem -LiteralPath (Join-Path $projectRoot 'server/worker/target') -Filter 'mop-worker-*-imports.jar' | Where-Object { Test-MopWorkerArtifactName -Name $_.Name -Role 'asset-import-worker' })
         if ($importWorkerJars.Count -ne 1) { throw '资产导入模式需要唯一已构建 imports Worker jar，请先完成根工程构建。' }
         $importWorkerJar = $importWorkerJars[0]
         Assert-MopJavaJar -Path $importWorkerJar.FullName -MainClass 'org.springframework.boot.loader.launch.JarLauncher' -StartClass 'cn.mop.importworker.AssetImportWorkerApplication'

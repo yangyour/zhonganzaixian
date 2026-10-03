@@ -1,0 +1,17 @@
+{
+  "verified_at": "2026-10-03T20:47:26.737507+00:00",
+  "environment": "niko-local-test",
+  "scope": "REAL_PACKAGED_JVM_REJECTS_MIXED_WORKER_FLAGS_BEFORE_DATABASE_CONFIG",
+  "artifact_sha256": "5c69ba8ed391f3abbab43908eccbf85b050136b137e66ba4efe36f7049357269",
+  "exit_code": 1,
+  "contact_flag": true,
+  "actual_asset_flag": true,
+  "expected_fail_closed_reason_observed": true,
+  "private_configuration_read": false,
+  "database_credentials_supplied": false,
+  "hikari_started": false,
+  "storage_used": false,
+  "existing_components_restarted": false,
+  "credentials_output": false,
+  "windows_startup_tested": false
+}

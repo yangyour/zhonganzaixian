@@ -1,8 +1,21 @@
+# Pure filename role discriminator shared by startup selection and stop ownership checks.
+# The contact-imports suffix also matches *-imports.jar, so asset selection must exclude it explicitly.
+function Test-MopWorkerArtifactName {
+    param([Parameter(Mandatory)][string]$Name, [Parameter(Mandatory)][string]$Role)
+    if ($Name -cnotmatch '\Amop-worker-[A-Za-z0-9._-]+\.jar\z' -or $Name -match '(?i)(sources|javadoc)') { return $false }
+    switch ($Role) {
+        'photo-worker' { return $Name -notlike '*-imports.jar' }
+        'asset-import-worker' { return $Name -like '*-imports.jar' -and $Name -notlike '*-contact-imports.jar' }
+        'contact-import-worker' { return $Name -like '*-contact-imports.jar' }
+        default { return $false }
+    }
+}
+
 # Shared ownership verification. This helper never discovers a PID and then stops it by name.
 function Get-MopOwnedProcess {
     param([Parameter(Mandatory)]$Record, [Parameter(Mandatory)][string]$ProjectRoot)
     $rootPath = [IO.Path]::GetFullPath($ProjectRoot).TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
-    if ($Record.name -notin @('api', 'web', 'photo-worker', 'asset-import-worker')) { throw '应用进程记录包含未知类型，拒绝停止。' }
+    if ($Record.name -notin @('api', 'web', 'photo-worker', 'asset-import-worker', 'contact-import-worker')) { throw '应用进程记录包含未知类型，拒绝停止。' }
     if (-not $Record.executable_path -or -not $Record.artifact_path -or -not $Record.start_time -or [long]$Record.id -lt 1) {
         throw '应用进程记录缺少精确归属字段；请先核验旧记录，拒绝按名称停止。'
     }
@@ -12,8 +25,9 @@ function Get-MopOwnedProcess {
     $artifactName = [IO.Path]::GetFileName($artifactPath)
     $roleMatches = switch ($Record.name) {
         'api' { $artifactDirectory.Equals([IO.Path]::GetFullPath((Join-Path $ProjectRoot 'server/api/target')), [StringComparison]::OrdinalIgnoreCase) -and $artifactName -like 'mop-api-*.jar' -and $artifactName -notmatch '(?i)(sources|javadoc)' }
-        'photo-worker' { $artifactDirectory.Equals([IO.Path]::GetFullPath((Join-Path $ProjectRoot 'server/worker/target')), [StringComparison]::OrdinalIgnoreCase) -and $artifactName -like 'mop-worker-*.jar' -and $artifactName -notlike '*-imports.jar' -and $artifactName -notmatch '(?i)(sources|javadoc)' }
-        'asset-import-worker' { $artifactDirectory.Equals([IO.Path]::GetFullPath((Join-Path $ProjectRoot 'server/worker/target')), [StringComparison]::OrdinalIgnoreCase) -and $artifactName -like 'mop-worker-*-imports.jar' -and $artifactName -notmatch '(?i)(sources|javadoc)' }
+        'photo-worker' { $artifactDirectory.Equals([IO.Path]::GetFullPath((Join-Path $ProjectRoot 'server/worker/target')), [StringComparison]::OrdinalIgnoreCase) -and (Test-MopWorkerArtifactName -Name $artifactName -Role 'photo-worker') }
+        'asset-import-worker' { $artifactDirectory.Equals([IO.Path]::GetFullPath((Join-Path $ProjectRoot 'server/worker/target')), [StringComparison]::OrdinalIgnoreCase) -and (Test-MopWorkerArtifactName -Name $artifactName -Role 'asset-import-worker') }
+        'contact-import-worker' { $artifactDirectory.Equals([IO.Path]::GetFullPath((Join-Path $ProjectRoot 'server/worker/target')), [StringComparison]::OrdinalIgnoreCase) -and (Test-MopWorkerArtifactName -Name $artifactName -Role 'contact-import-worker') }
         'web' { $artifactPath.Equals([IO.Path]::GetFullPath((Join-Path $ProjectRoot 'apps/web/node_modules/vite/bin/vite.js')), [StringComparison]::OrdinalIgnoreCase) }
     }
     if (-not $roleMatches) { throw '应用产物目录或角色不符，拒绝停止。' }
@@ -122,7 +136,7 @@ function Assert-MopAppsStopped {
     param([Parameter(Mandatory)][string]$ProjectRoot)
     $rootPath = [IO.Path]::GetFullPath($ProjectRoot)
     if (Test-Path -LiteralPath (Join-Path $rootPath '.local/processes.json')) {
-        throw '存在本工程应用启动记录；先安全停止 API、Web、照片和资产导入 Worker，再检查或执行迁移。'
+        throw '存在本工程应用启动记录；先安全停止 API、Web、照片、资产导入和联系人导入 Worker，再检查或执行迁移。'
     }
     # Relative jar launches do not expose their working directory through Win32_Process.
     # Refuse a known MOP API/worker launch even when its project isolation cannot be proved; never stop it here.
@@ -134,8 +148,9 @@ function Assert-MopAppsStopped {
              $commandLine.Contains('mop-worker-', [StringComparison]::OrdinalIgnoreCase) -or
              $commandLine.Contains('cn.mop.api.MopApplication', [StringComparison]::Ordinal) -or
              $commandLine.Contains('cn.mop.worker.WorkerApplication', [StringComparison]::Ordinal) -or
-             $commandLine.Contains('cn.mop.importworker.AssetImportWorkerApplication', [StringComparison]::Ordinal)) {
-            throw '检测到 MOP API、照片或资产导入 Worker 正在运行；不能证明其项目隔离，拒绝迁移且不停止未登记进程。'
+             $commandLine.Contains('cn.mop.importworker.AssetImportWorkerApplication', [StringComparison]::Ordinal) -or
+             $commandLine.Contains('cn.mop.contactworker.ContactImportWorkerApplication', [StringComparison]::Ordinal)) {
+            throw '检测到 MOP API、照片、资产导入或联系人导入 Worker 正在运行；不能证明其项目隔离，拒绝迁移且不停止未登记进程。'
         }
     }
 }

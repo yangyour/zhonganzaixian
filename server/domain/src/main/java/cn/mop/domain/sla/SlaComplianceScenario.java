@@ -17,9 +17,9 @@ public final class SlaComplianceScenario {
     public enum AggregateStatus { CALCULATED,UNRESOLVED,NO_APPLICABLE }
     public enum AggregateReason { POPULATION_NOT_COMPLETE,APPLICABILITY_UNKNOWN,TIMING_UNRESOLVED,NO_APPLICABLE_TICKETS }
     /** Reference is an explicit scenario input, not proof that customer/manager approval or publication exists. */
-    public record Reference(String id,long version){public Reference{if(id==null||id.isBlank()||id.length()>160||version<1||version>9007199254740991L)throw invalid();}}
+    public record Reference(String id,long version){public Reference{if(!validReferenceText(id)||version<1||version>9007199254740991L)throw invalid();}}
     public record Evidence(String ticketId,Priority priority,Exclusion exclusion,Reference exclusionApproval,Reference slaSnapshot,Instant responseDueAt,Instant recoveryDueAt,Instant responseActualAt,Instant recoveryActualAt){
-        public Evidence{if(ticketId==null||ticketId.isBlank()||ticketId.length()>160)throw invalid();for(Instant time:new Instant[]{responseDueAt,recoveryDueAt,responseActualAt,recoveryActualAt})if(time!=null)validateTime(time);}
+        public Evidence{if(!validReferenceText(ticketId))throw invalid();for(Instant time:new Instant[]{responseDueAt,recoveryDueAt,responseActualAt,recoveryActualAt})if(time!=null)validateTime(time);}
     }
     public record Evaluation(Evidence evidence,Boolean applicable,Outcome outcome,Check response,Check recovery,boolean exclusionApplied,boolean unapprovedExclusionIgnored,List<Reason> reasons){public Evaluation{Objects.requireNonNull(evidence);Objects.requireNonNull(outcome);Objects.requireNonNull(response);Objects.requireNonNull(recovery);reasons=List.copyOf(reasons);}}
     /** Exact numerator/denominator; no unstated decimal or compensation rounding policy. */
@@ -58,6 +58,7 @@ public final class SlaComplianceScenario {
         AggregateStatus status=reason==null?AggregateStatus.CALCULATED:reason==AggregateReason.NO_APPLICABLE_TICKETS?AggregateStatus.NO_APPLICABLE:AggregateStatus.UNRESOLVED;
         return new Aggregate(status,reason,items,applicable,unknownScope,met,notMet,timingUnknown,outside,reason==null?new Fraction(met,applicable):null);
     }
+    public static boolean validReferenceText(String value){return value!=null&&!value.isEmpty()&&value.codePointCount(0,value.length())<=160&&!value.codePoints().allMatch(cp->Character.isWhitespace(cp)||Character.isSpaceChar(cp)||cp==0xfeff)&&!value.codePoints().anyMatch(cp->Character.isISOControl(cp)||Character.getType(cp)==Character.SURROGATE);}
     private static void validateTime(Instant time){if(time.getNano()%1000000!=0||time.isBefore(Instant.parse("0001-01-01T00:00:00Z"))||time.isAfter(Instant.parse("9999-12-31T23:59:59.999Z")))throw invalid();}
     private static DomainException invalid(){return new DomainException(400,"VALIDATION_ERROR","SLA对照输入、明确快照引用、时间精度或有界工单集合无效；不补截止时间或金额");}
 }

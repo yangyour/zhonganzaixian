@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-03T06:16:40.251029+00:00",
+  "environment": "niko-local-test",
+  "contract_version": "0.21.0",
+  "status": "READONLY_EXPLICIT_SCENARIO_API_ONLY",
+  "tests": {
+    "controller": 11,
+    "pure_core": 13,
+    "root_reported": 830,
+    "root_executed": 817,
+    "existing_real_pg_regression": 256,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 41,
+    "web": 474,
+    "web_typecheck_build": true,
+    "actual_http": 49
+  },
+  "corrected_attempts": [
+    "Java Iterator.forEach compile failure corrected to forEachRemaining; full root rerun success",
+    "HTTP test URN namespace format corrected",
+    "Anonymous POST CSRF 403 expectation corrected",
+    "Security rejections may append denial audit; verify successful readonly sequence separately"
+  ],
+  "no_business_repository_calls": true,
+  "no_idempotency_receipts": true,
+  "real_population_loaded": false,
+  "approval_verified": false,
+  "effective_snapshot_verified": false,
+  "formal_achievement": null,
+  "compensation_amount": null,
+  "migrations_executed": 0,
+  "frozen_migrations": "V1-V14 unchanged",
+  "browser_dom_tested": false,
+  "all_128_done": false,
+  "credentials_output": false
+}

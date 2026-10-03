@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.20.0",
+    "version": "0.21.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -7430,6 +7430,173 @@
         }
       }
     },
+    "/sla/compliance-scenarios": {
+      "post": {
+        "operationId": "compareExplicitSlaScenarios",
+        "summary": "只读显式SLA对照，不是实际项目达标率",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SlaComplianceScenarioInput"
+              }
+            }
+          }
+        },
+        "x-mop-read-only": true,
+        "x-mop-capability": "sla_scenarios:read",
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-max-body-bytes": 262144,
+        "x-mop-reject-duplicate-json-keys": true,
+        "description": "仅当前授权租户内部人员；拒绝所有query。POST仅承载显式场景，不查询工单或核验审批/生效快照，不写业务、幂等收据或成功审计。APPROVED仅是假设，缺值不补默认；正式达标率和赔偿始终null。",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlaComplianceScenarioResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/working-calendars": {
       "get": {
         "operationId": "listWorkingCalendars",
@@ -14606,6 +14773,597 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/ManualIncidentPage"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "SlaComplianceScenarioInput": {
+        "type": "object",
+        "properties": {
+          "population_complete": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "tickets": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "object",
+              "properties": {
+                "scenario_ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160,
+                  "description": "显式场景标签，按Unicode code point计数；不是业务对象查询，不证明真实审批。拒绝全空白/BOM、控制字符及无效代理字符"
+                },
+                "priority": {
+                  "enum": [
+                    null,
+                    "P1",
+                    "P2",
+                    "P3",
+                    "P4"
+                  ]
+                },
+                "exclusion": {
+                  "enum": [
+                    null,
+                    "NONE",
+                    "PENDING_APPROVAL",
+                    "APPROVED",
+                    "REJECTED",
+                    "UNKNOWN"
+                  ]
+                },
+                "exclusion_approval": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 160,
+                          "description": "显式场景标签，按Unicode code point计数；不是业务对象查询，不证明真实审批。拒绝全空白/BOM、控制字符及无效代理字符"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sla_snapshot": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 160,
+                          "description": "显式场景标签，按Unicode code point计数；不是业务对象查询，不证明真实审批。拒绝全空白/BOM、控制字符及无效代理字符"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "version"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "response_due_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+                },
+                "recovery_due_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+                },
+                "response_actual_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+                },
+                "recovery_actual_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+                }
+              },
+              "required": [
+                "scenario_ref",
+                "priority",
+                "exclusion",
+                "exclusion_approval",
+                "sla_snapshot",
+                "response_due_at",
+                "recovery_due_at",
+                "response_actual_at",
+                "recovery_actual_at"
+              ],
+              "additionalProperties": false
+            },
+            "description": "scenario_ref必须唯一；完整性只是调用者声明，不代表实际项目工单全集"
+          }
+        },
+        "required": [
+          "population_complete",
+          "tickets"
+        ],
+        "additionalProperties": false
+      },
+      "SlaComplianceScenarioResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "scope": {
+                "const": "EXPLICIT_SLA_COMPARISON_SCENARIO"
+              },
+              "metric_version": {
+                "const": "contract-m5-19-comparison-v1"
+              },
+              "source": {
+                "const": "EXPLICIT_INPUT_NOT_PROJECT_DATA"
+              },
+              "status": {
+                "enum": [
+                  "CALCULATED",
+                  "UNRESOLVED",
+                  "NO_APPLICABLE"
+                ]
+              },
+              "reason": {
+                "enum": [
+                  null,
+                  "POPULATION_NOT_COMPLETE",
+                  "APPLICABILITY_UNKNOWN",
+                  "TIMING_UNRESOLVED",
+                  "NO_APPLICABLE_TICKETS"
+                ]
+              },
+              "population_complete_declared": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "approval_validation_status": {
+                "const": "UNVERIFIED"
+              },
+              "runtime_snapshot_validation": {
+                "const": "NOT_CHECKED"
+              },
+              "effective": {
+                "const": false
+              },
+              "effective_achievement": {
+                "type": "null"
+              },
+              "compensation_amount": {
+                "type": "null"
+              },
+              "compensation_status": {
+                "const": "CONFIG_PENDING"
+              },
+              "counts": {
+                "type": "object",
+                "properties": {
+                  "input_total": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 200
+                  },
+                  "known_applicable": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 200
+                  },
+                  "applicability_unknown": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 200
+                  },
+                  "met": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 200
+                  },
+                  "not_met": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 200
+                  },
+                  "timing_unresolved": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 200
+                  },
+                  "not_applicable": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 200
+                  }
+                },
+                "required": [
+                  "input_total",
+                  "known_applicable",
+                  "applicability_unknown",
+                  "met",
+                  "not_met",
+                  "timing_unresolved",
+                  "not_applicable"
+                ],
+                "additionalProperties": false
+              },
+              "scenario_achievement": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "numerator": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 200
+                      },
+                      "denominator": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 200
+                      }
+                    },
+                    "required": [
+                      "numerator",
+                      "denominator"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "items": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "input": {
+                      "type": "object",
+                      "properties": {
+                        "scenario_ref": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 160,
+                          "description": "显式场景标签，按Unicode code point计数；不是业务对象查询，不证明真实审批。拒绝全空白/BOM、控制字符及无效代理字符"
+                        },
+                        "priority": {
+                          "enum": [
+                            null,
+                            "P1",
+                            "P2",
+                            "P3",
+                            "P4"
+                          ]
+                        },
+                        "exclusion": {
+                          "enum": [
+                            null,
+                            "NONE",
+                            "PENDING_APPROVAL",
+                            "APPROVED",
+                            "REJECTED",
+                            "UNKNOWN"
+                          ]
+                        },
+                        "exclusion_approval": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 160,
+                                  "description": "显式场景标签，按Unicode code point计数；不是业务对象查询，不证明真实审批。拒绝全空白/BOM、控制字符及无效代理字符"
+                                },
+                                "version": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 9007199254740991
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "version"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "sla_snapshot": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 160,
+                                  "description": "显式场景标签，按Unicode code point计数；不是业务对象查询，不证明真实审批。拒绝全空白/BOM、控制字符及无效代理字符"
+                                },
+                                "version": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 9007199254740991
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "version"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "response_due_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date-time",
+                          "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+                        },
+                        "recovery_due_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date-time",
+                          "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+                        },
+                        "response_actual_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date-time",
+                          "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+                        },
+                        "recovery_actual_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date-time",
+                          "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+                        }
+                      },
+                      "required": [
+                        "scenario_ref",
+                        "priority",
+                        "exclusion",
+                        "exclusion_approval",
+                        "sla_snapshot",
+                        "response_due_at",
+                        "recovery_due_at",
+                        "response_actual_at",
+                        "recovery_actual_at"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "applicable": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ]
+                    },
+                    "scenario_outcome": {
+                      "enum": [
+                        "MET",
+                        "NOT_MET",
+                        "UNRESOLVED",
+                        "NOT_APPLICABLE"
+                      ]
+                    },
+                    "response_check": {
+                      "enum": [
+                        "MET",
+                        "NOT_MET",
+                        "UNKNOWN"
+                      ]
+                    },
+                    "recovery_check": {
+                      "enum": [
+                        "MET",
+                        "NOT_MET",
+                        "UNKNOWN"
+                      ]
+                    },
+                    "exclusion_applied_in_scenario": {
+                      "type": "boolean"
+                    },
+                    "unapproved_exclusion_ignored": {
+                      "type": "boolean"
+                    },
+                    "reasons": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "items": {
+                        "enum": [
+                          "PRIORITY_UNKNOWN",
+                          "PRIORITY_OUTSIDE_SLA",
+                          "EXCLUSION_UNKNOWN",
+                          "APPROVAL_EVIDENCE_MISSING",
+                          "APPROVED_EXCLUSION",
+                          "SLA_SNAPSHOT_MISSING",
+                          "RESPONSE_DUE_MISSING",
+                          "RESPONSE_ACTUAL_MISSING",
+                          "RECOVERY_DUE_MISSING",
+                          "RECOVERY_ACTUAL_MISSING",
+                          "RESPONSE_LATE",
+                          "RECOVERY_LATE"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "input",
+                    "applicable",
+                    "scenario_outcome",
+                    "response_check",
+                    "recovery_check",
+                    "exclusion_applied_in_scenario",
+                    "unapproved_exclusion_ignored",
+                    "reasons"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "scenario_limit": {
+                "const": 200
+              }
+            },
+            "required": [
+              "tenant_id",
+              "scope",
+              "metric_version",
+              "source",
+              "status",
+              "reason",
+              "population_complete_declared",
+              "approval_validation_status",
+              "runtime_snapshot_validation",
+              "effective",
+              "effective_achievement",
+              "compensation_amount",
+              "compensation_status",
+              "counts",
+              "scenario_achievement",
+              "items",
+              "scenario_limit"
+            ],
+            "additionalProperties": false,
+            "oneOf": [
+              {
+                "properties": {
+                  "status": {
+                    "const": "CALCULATED"
+                  },
+                  "reason": {
+                    "type": "null"
+                  },
+                  "population_complete_declared": {
+                    "const": true
+                  },
+                  "scenario_achievement": {
+                    "type": "object",
+                    "properties": {
+                      "numerator": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 200
+                      },
+                      "denominator": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 200
+                      }
+                    },
+                    "required": [
+                      "numerator",
+                      "denominator"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "status": {
+                    "const": "UNRESOLVED"
+                  },
+                  "reason": {
+                    "enum": [
+                      "POPULATION_NOT_COMPLETE",
+                      "APPLICABILITY_UNKNOWN",
+                      "TIMING_UNRESOLVED"
+                    ]
+                  },
+                  "scenario_achievement": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "status": {
+                    "const": "NO_APPLICABLE"
+                  },
+                  "reason": {
+                    "const": "NO_APPLICABLE_TICKETS"
+                  },
+                  "scenario_achievement": {
+                    "type": "null"
+                  }
+                }
+              }
+            ]
           },
           "trace_id": {
             "type": "string"

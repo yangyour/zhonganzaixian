@@ -1,0 +1,277 @@
+{
+  "verified_at": "2026-10-03T06:16:12.403Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "contract_version": "0.21.0",
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "internal_no_idempotency_key_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "internal_no_idempotency_key_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "internal_no_idempotency_key_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "customer_denied_viewerA",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "customer_denied_viewerB",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "customer_denied_tadmin",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_post_csrf_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "csrf_required",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "ten_three_late",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_response_due_at",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_recovery_due_at",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_response_actual_at",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_recovery_actual_at",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_sla_snapshot",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_priority",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unknown_exclusion",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unapproved_PENDING_APPROVAL",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unapproved_REJECTED",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "approved_without_reference",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "declared_approval_not_real_validation",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "incomplete_null",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "incomplete_false",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "zero_denominator",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unicode_and_offset",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "full_batch_200",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "batch_201_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "authority_override_tenant_id",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "authority_override_actor_id",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "authority_override_effective",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "authority_override_compensation_amount",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "duplicate_scenario_labels",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_raw_37",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_raw_38",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_raw_39",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "strict_raw_40",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_row_41",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_row_42",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_row_43",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_row_44",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_scope_override",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_before_success_only",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_success_does_not_audit",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_after_success_only",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "http_requests": 49,
+  "real_components": [
+    "PostgreSQL 17.11 current membership",
+    "Keycloak 26.2.4 OIDC",
+    "API remote_test"
+  ],
+  "business_source": "EXPLICIT_INPUT_NOT_PROJECT_DATA",
+  "real_ticket_population_loaded": false,
+  "real_approval_validated": false,
+  "real_effective_snapshot_validated": false,
+  "formal_achievement": null,
+  "compensation_amount": null,
+  "scenario_posts_require_csrf": true,
+  "idempotency_key_not_required": true,
+  "successful_readonly_sequence_audit_tail_unchanged": true,
+  "setup_business_writes": 0,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "Actual immutable formal ticket SLA snapshots and population selection",
+    "Approved exclusion workflow and evidence validation",
+    "Customer Q08/Q26 decisions",
+    "UI/DOM verification"
+  ]
+}

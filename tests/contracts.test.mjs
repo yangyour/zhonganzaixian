@@ -97,7 +97,7 @@ test('所有业务写接口明确要求幂等及CSRF，remote_test不存在fixtu
   for (const [path, methods] of Object.entries(contract.paths)) {
     for (const [method, operation] of Object.entries(methods)) {
       if (!['post', 'put', 'patch', 'delete'].includes(method)) continue;
-      const readonlyPreview = method === 'post' && path === '/working-calendars/{id}/preview';
+      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios'].includes(path);
       if (readonlyPreview) assert.equal(operation['x-mop-read-only'], true);
       for (const name of readonlyPreview ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
         assert.ok(operation.parameters.some((p) => p.in === 'header' && p.name === name && p.required), `${method} ${path} ${name}`);
@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.20.0');
+  assert.equal(contract.info.version, '0.21.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -505,4 +505,18 @@ test('人工恢复必须显式说明、可空时间和版本，不接受身份�
   const missing = { ...input }; delete missing.reported_recovered_at; assert.equal(validates('ManualRecoveryInput', missing), false);
   const route = contract.paths['/manual-incidents/{incidentId}/recovery']; assert.deepEqual(Object.keys(route), ['get', 'post']); assert.deepEqual(route.get['x-mop-roles'], ['msp', 'padmin']); assert.match(route.post['x-mop-replay-authorization'], /before cached receipt/); assert.equal(route.post['x-mop-max-body-bytes'], 32768);
   assert.ok(contract.components.schemas.ReadinessResult.properties.data.required.includes('manual_recovery'));
+});
+test('SLA显式场景契约只读、未知值明确且拒绝业务权限覆盖', () => {
+  const row = { scenario_ref: '😀'.repeat(160), priority: null, exclusion: null, exclusion_approval: null, sla_snapshot: null, response_due_at: null, recovery_due_at: null, response_actual_at: null, recovery_actual_at: null };
+  const input = { population_complete: null, tickets: [row] };
+  assert.equal(validates('SlaComplianceScenarioInput', input), true);
+  for (const patch of [{ tenant_id: id('1') }, { effective: true }, { population_complete: 'true' }, { tickets: Array(201).fill(row) }]) assert.equal(validates('SlaComplianceScenarioInput', { ...input, ...patch }), false);
+  for (const patch of [{ priority: 'p1' }, { scenario_ref: '😀'.repeat(161) }, { exclusion_approval: { id: 'x', version: 0 } }, { response_due_at: timestamp, forged: true }]) assert.equal(validates('SlaComplianceScenarioInput', { ...input, tickets: [{ ...row, ...patch }] }), false);
+  const route = contract.paths['/sla/compliance-scenarios'].post;
+  assert.equal(route['x-mop-read-only'], true); assert.deepEqual(route['x-mop-roles'], ['msp', 'padmin']); assert.equal(route.parameters.some(p => p.name === 'Idempotency-Key'), false); assert.equal(route['x-mop-max-body-bytes'], 262144);
+});
+test('SLA对照输出不能声称正式达标率、已验真审批或赔偿金额', () => {
+  const data = { tenant_id: id('1'), scope: 'EXPLICIT_SLA_COMPARISON_SCENARIO', metric_version: 'contract-m5-19-comparison-v1', source: 'EXPLICIT_INPUT_NOT_PROJECT_DATA', status: 'NO_APPLICABLE', reason: 'NO_APPLICABLE_TICKETS', population_complete_declared: true, approval_validation_status: 'UNVERIFIED', runtime_snapshot_validation: 'NOT_CHECKED', effective: false, effective_achievement: null, compensation_amount: null, compensation_status: 'CONFIG_PENDING', counts: { input_total: 0, known_applicable: 0, applicability_unknown: 0, met: 0, not_met: 0, timing_unresolved: 0, not_applicable: 0 }, scenario_achievement: null, items: [], scenario_limit: 200 };
+  const valid = value => validates('SlaComplianceScenarioResult', { data: value, trace_id: 'scenario-test' }); assert.equal(valid(data), true);
+  for (const patch of [{ effective: true }, { effective_achievement: 1 }, { compensation_amount: 0 }, { approval_validation_status: 'VERIFIED' }, { source: 'postgresql' }, { status: 'CALCULATED' }, { scenario_achievement: { numerator: 0, denominator: 0 } }]) assert.equal(valid({ ...data, ...patch }), false);
 });

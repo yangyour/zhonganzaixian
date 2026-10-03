@@ -33,3 +33,5 @@
 - 完整128项仍未DONE；每项未完成范围继续在合同追踪保留
 
 关联：[组件清单](environment/component-inventory.md)、[浏览器探测](evidence/niko-ui-blocker-20261002.json)、[OSS](oss-storage-adapter.md)、[当前实施](implementation-status.md)、[验证](verification.md)。本表不包含凭据、连接秘密或未经批准的绕行方案。
+
+- SLA显式对照API0.21：11控制器/13核心、根830（817执行含256既有PG）、41契约/474Web及49真实HTTP通过；当前会话授权与只读数学已验，正式工单全集/审批核验/生效快照与Q08/Q26仍独立等待。成功只读不新增审计，安全拒绝保留全局审计。页面/DOM尚未验，128项未DONE。

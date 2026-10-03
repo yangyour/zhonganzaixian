@@ -1,0 +1,22 @@
+{
+  "verified_at": "2026-10-03T13:14:48.442Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "http_requests": 6,
+  "report_post_attempts": 3,
+  "status_sequence": [
+    202,
+    403,
+    202
+  ],
+  "same_operation_replayed": true,
+  "report_version": 1,
+  "attachments": 0,
+  "original_body_and_key_retained": true,
+  "record_source": "customer_report",
+  "formal_ticket_status": "CONFIG_PENDING",
+  "scope": "Actual TicketReportForm helper functions and ApiClient; SFC submit handler wiring covered by source test, not executed against HTTP here",
+  "storage_integration_executed": false,
+  "browser_dom_tested": false,
+  "credentials_output": false
+}

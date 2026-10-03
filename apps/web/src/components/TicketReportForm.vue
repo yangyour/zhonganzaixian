@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { writeFailureUncertain } from '../utils/writeFailure'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import { ElRadio, ElRadioGroup, ElMessage } from 'element-plus'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
@@ -109,7 +110,7 @@ async function submitReport() {
   if (!attempt.value) return
   reportController?.abort(); const controller = new AbortController(); reportController = controller
   const generation = ++writeGeneration
-  const currentAttempt = attempt.value
+  const currentAttempt = attempt.value, retry = currentAttempt.state === 'uncertain'
   submitting.value = true; submitError.value = null
   try {
     const result = await api.request<CustomerReportAcceptance>('/tickets', { method: 'POST', body: currentAttempt.body, idempotencyKey: currentAttempt.key, signal: controller.signal })
@@ -120,7 +121,7 @@ async function submitReport() {
     await readRegistration()
   } catch (cause) {
     if (!isCancelled(cause) && generation === writeGeneration) {
-      if (cause instanceof ApiError && (cause.status === 0 || cause.status >= 500 || cause.code === 'INVALID_RESPONSE')) currentAttempt.state = 'uncertain'
+      if (writeFailureUncertain(retry, cause)) currentAttempt.state = 'uncertain'
       else currentAttempt.state = 'ready'
       submitError.value = cause
     }

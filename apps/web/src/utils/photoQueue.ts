@@ -1,3 +1,4 @@
+import { writeFailureUncertain } from './writeFailure'
 import { markRaw, ref, watch } from 'vue'
 import { api, ApiError, isCancelled } from '../api/client'
 import type { CustomerReportAcceptance, FileContentGrant, FileUploadOperation, ReportPhoto, ReportPhotoPolicy } from '../api/types'
@@ -80,6 +81,7 @@ export function createPhotoQueue(client: Pick<typeof api, 'request' | 'requestBl
     if (!row || row.uploading || row.operationId || row.status === 'FAILED') return
     const validation = photoSelectionError(row.file, policy.value, 0)
     if (validation) { row.error = new ApiError(0, 'PHOTO_INPUT_ERROR', validation, '—'); return }
+    const retry = row.attempt?.state === 'uncertain'
     row.attempt = preparePhotoAttempt(row.attempt, row.file)
     const controller = new AbortController(); controllers.get(uid)?.abort(); controllers.set(uid, controller)
     const epoch = generation, version = ++row.generation
@@ -93,7 +95,7 @@ export function createPhotoQueue(client: Pick<typeof api, 'request' | 'requestBl
       void refresh(uid, true)
     } catch (cause) {
       if (!isCancelled(cause) && current(row, version, epoch)) {
-        const uncertain = cause instanceof ApiError && (cause.status === 0 || cause.status >= 500 || cause.code === 'INVALID_RESPONSE')
+        const uncertain = writeFailureUncertain(retry, cause)
         row.attempt.state = uncertain ? 'uncertain' : 'ready'; row.status = uncertain ? 'UNCERTAIN' : 'SELECTED'; row.error = cause
       }
     } finally { if (current(row, version, epoch)) row.uploading = false }

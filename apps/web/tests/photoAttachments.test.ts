@@ -103,3 +103,5 @@ describe('attachment writes on already registered reports', () => {
     expect(ticket.value?.version).toBe(1); expect(queue.rows.value).toEqual([]); expect(appender.attempt.value).toBeNull()
   })
 })
+
+it('denied attachment retry cannot rebase the original uncertain request or force conflict reset',async()=>{for(const status of [400,403,404,409,422]){let writes=0;const {appender}=workflow(vi.fn(async()=>{if(++writes===1)throw new TypeError('lost');return new Response(JSON.stringify({error:{code:status===409?'VERSION_CONFLICT':'ACTION_FORBIDDEN',message:'isolated',details:[]},trace_id:'isolated'}),{status})}));await appender.append();const key=appender.attempt.value!.key,body=JSON.stringify(appender.attempt.value!.body);await appender.append();expect(appender.uncertain.value).toBe(true);expect(appender.conflict.value).toBe(false);expect(appender.attempt.value!.key).toBe(key);expect(JSON.stringify(appender.attempt.value!.body)).toBe(body)}})

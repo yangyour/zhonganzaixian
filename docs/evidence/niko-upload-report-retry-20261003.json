@@ -1,0 +1,48 @@
+{
+  "verified_at": "2026-10-03T13:16:22.782277+00:00",
+  "environment": "niko-local-test",
+  "status": "UPLOAD_AND_REPORT_DENIED_RETRY_GUARDS_FIXED_STORAGE_RETEST_PENDING",
+  "isolated_regressions": {
+    "before_new_failed": 5,
+    "before_existing_passed_in_targeted_files": 39,
+    "after_new_tests": 9,
+    "total_web": 643,
+    "storage_lifecycle_cases": 25,
+    "report_classifier_and_wiring_tests": 4,
+    "type_and_build": true,
+    "contracts": 55
+  },
+  "paths": [
+    "import source upload",
+    "import parse",
+    "import mapping",
+    "photo upload",
+    "attachment append",
+    "customer report submit"
+  ],
+  "real_http": {
+    "requests": 6,
+    "report_posts": 3,
+    "statuses": [
+      202,
+      403,
+      202
+    ],
+    "same_original_operation": true,
+    "new_report_version": 1,
+    "attachments": 0,
+    "scope": "Actual form helper functions and ApiClient; not whole SFC HTTP execution"
+  },
+  "storage_integration_retested": false,
+  "reason": "Current runtime storage disabled pending secure OSS configuration; no local substitute started for this regression",
+  "browser_dom_tested": false,
+  "api_schema_changed": false,
+  "previous_writer_fix_ci": {
+    "commit": "6da1c2188252d556547ba1ab7ee67c5f957ae885",
+    "run": 37125164792,
+    "conclusion": "success"
+  },
+  "test_correction": "Initial final typecheck caught optional unit transport override returningundefined; supplied explicit isolated fallback responses and reran full tests/build. No production fallback added.",
+  "credentials_output": false,
+  "all_128_done": false
+}

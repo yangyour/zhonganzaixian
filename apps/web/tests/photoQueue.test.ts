@@ -150,3 +150,5 @@ describe('platform-granted original image reads', () => {
     expect(result.contentUrls.value).toEqual({})
   })
 })
+
+it('a denied original photo retry stays uncertain and the original file cannot be removed', async()=>{for(const status of [400,403,404,409,422]){let writes=0;const result=queue(vi.fn(async()=>{if(++writes===1)throw new TypeError('lost');return failure(status)}));const original=selected(result);await result.upload(1);const key=result.rows.value[0]!.attempt!.key;await result.upload(1);expect(result.rows.value[0]!.attempt!.state).toBe('uncertain');expect(result.rows.value[0]!.status).toBe('UNCERTAIN');expect(result.rows.value[0]!.attempt!.key).toBe(key);expect(result.rows.value[0]!.attempt!.file).toBe(original);result.remove(1);expect(result.rows.value).toHaveLength(1)}})

@@ -1,0 +1,11 @@
+import { describe,it,expect } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { ApiError } from '../src/api/client'
+import { writeFailureUncertain } from '../src/utils/writeFailure'
+import { emptyReportForm, parseCustomerReport, prepareReportAttempt } from '../src/utils/ticket'
+describe('uncertain original report and upload failure',()=>{
+ it('only first known4xx is definitely rejected; every failed replay remains uncertain',()=>{for(const status of [400,401,403,404,409,413,415,422,429]){const error=new ApiError(status,'REJECTED','isolated','trace');expect(writeFailureUncertain(false,error)).toBe(false);expect(writeFailureUncertain(true,error)).toBe(true)}})
+ it('transport invalid response and ambiguous statuses are not converted to editable new writes',()=>{for(const error of [new TypeError('lost'),new ApiError(0,'NETWORK_ERROR','lost','t'),new ApiError(200,'INVALID_RESPONSE','bad','t'),new ApiError(403,'INVALID_RESPONSE','bad','t'),new ApiError(503,'UNAVAILABLE','bad','t')])expect(writeFailureUncertain(false,error)).toBe(true)})
+ it('report original body and key remain locked after a denied retry rather than being rekeyed',()=>{const body=parseCustomerReport({...emptyReportForm(),description:'合成报障说明',category:'网络不通',impact_scope:'individual',contact_name:'合成联系人',contact_phone:'1234',urgency:'normal'},[]);const attempt=prepareReportAttempt(null,body,()=> 'original-key');attempt.state='uncertain';attempt.state=writeFailureUncertain(attempt.state==='uncertain',new ApiError(403,'ACTION_FORBIDDEN','denied','trace'))?'uncertain':'ready';expect(prepareReportAttempt(attempt,body,()=> 'new-key')).toBe(attempt);expect(()=>prepareReportAttempt(attempt,{...body,description:'would duplicate'},()=> 'new-key')).toThrow();expect(attempt.key).toBe('original-key')})
+ it('report form captures old uncertainty before request and uses the tested classifier',()=>{const s=readFileSync(new URL('../src/components/TicketReportForm.vue',import.meta.url),'utf8');expect(s).toContain("retry = currentAttempt.state === 'uncertain'");expect(s).toContain('if (writeFailureUncertain(retry, cause))');expect(s.indexOf("retry = currentAttempt.state === 'uncertain'")).toBeLessThan(s.indexOf("api.request<CustomerReportAcceptance>('/tickets'"))})
+})

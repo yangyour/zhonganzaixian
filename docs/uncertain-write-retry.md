@@ -15,3 +15,14 @@
 前两次探测在合成父登记POST被真实CSRF_INVALID403拒绝；重新采集6个获准测试身份的会话后完整通过，未绕开CSRF。失败批次未并入31计数，没有输出凭据。
 
 证据：[回归](evidence/niko-uncertain-write-retry-20261003.json)、[真实前端HTTP](evidence/niko-uncertain-retry-client-http-20261003.json)。这不是物理网络故障、浏览器DOM或全部写入口验收。导入、照片/附件等不同状态机继续单独审查，API0.28/V1–V16未改。
+
+
+## 2026-10-03 导入/照片/报障后续排查
+
+继续复现5处：导入原文件/解析/映射、照片上传、附件追加的原uncertain重试4xx会误降级。5新增隔离回归在修前全部失败（同批39既有通过），修后每处400/403/404/409/422共25分支通过。追加附件的原unknown重试409也不再进入阻止原键重试的conflict模式。首次明确拒绝/版本冲突，以及已确认受理后的只读操作结果、可信“被后续操作替代”比较保持原语义。
+
+报障表单采用共同writeFailureUncertain判定，并在发送前保存原uncertain标记；9新增测试（上述5+分类/报障body-key/接线4）后完整643Web、55契约、类型构建通过。真实表单helper和ApiClient另6HTTP：丢弃真实202→用不具备报障能力的真实MSP会话重试403→仍保留原键/体→原身份202返回同一operation→GET核对同一登记v1，0附件。此为helper+API，不是整份Vue表单或浏览器DOM操作。
+
+本批未重新执行真实存储上传/解析/映射/附件联调：当前存储关闭，OSS安全配置仍缺。已有旧MinIO证据不升级为本补丁/OSS验证，也未启动替代存储。继续其他独立开发；原始报障仍CONFIG_PENDING，未冒充正式工单完成。
+
+证据：[分支回归](evidence/niko-upload-report-retry-20261003.json)、[真实报障helper](evidence/niko-report-retry-client-http-20261003.json)。前一11writer修复6da1c21 CI37125164792 success；本次没有改变API0.28和V1–V16。

@@ -140,6 +140,7 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
     if (!permitted.value || !policy.value || busy.value || !file.value || !format.value) return
     if (uploadAttempt.value?.state === 'ACCEPTED') { await refresh(); return }
     if (source.value || uploadAttempt.value && uploadAttempt.value.state !== 'UNCERTAIN') return
+    const retry = uploadAttempt.value?.state === 'UNCERTAIN'
     const attempt = uploadAttempt.value || { file: file.value, format: format.value, key: crypto.randomUUID(), state: 'UNCERTAIN' as const, sourceId: null, operationId: null, compared: false }
     uploadAttempt.value = attempt; const active = uploadAttempt.value; const request = begin('upload'); uploadError.value = null
     const body = new FormData(); body.append('file', attempt.file, attempt.file.name); body.append('purpose', 'asset_import_source'); body.append('format', attempt.format)
@@ -147,14 +148,15 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
       if (!active.sha256) { const digest = await crypto.subtle.digest('SHA-256', await active.file.arrayBuffer()); alive(request.expected); active.sha256 = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('') }
       const result = await client.request<AssetImportAcceptance>('/assets/import-sources', { method: 'POST', body, idempotencyKey: active.key, signal: request.signal }); alive(request.expected); accept(active, result); await readAttempt(active, 'STORE_RAW', request, true)
     }
-    catch (cause) { if (!isCancelled(cause) && request.expected === epoch) { if (active.state === 'UNCERTAIN') active.state = failureState(cause); uploadError.value = cause } }
+    catch (cause) { if (!isCancelled(cause) && request.expected === epoch) { if (active.state === 'UNCERTAIN' && !retry) active.state = failureState(cause); uploadError.value = cause } }
     finally { if (request.expected === epoch) busy.value = null }
   }
   async function parse(inventory = false) {
     if (!permitted.value || !policy.value || busy.value || hasConflict.value || !source.value || source.value.storage_status !== 'READY' || !format.value || source.value.mapping) return
     if (parseAttempt.value?.state === 'ACCEPTED') { await refresh(); return }
     if (parseAttempt.value?.state === 'CONFLICT' || source.value.parse_status === 'PENDING' && parseAttempt.value?.state !== 'UNCERTAIN') return
-    let attempt = parseAttempt.value?.state === 'UNCERTAIN' ? parseAttempt.value : null
+    const retry = parseAttempt.value?.state === 'UNCERTAIN'
+    let attempt = retry ? parseAttempt.value : null
     if (!attempt) {
       try {
         const body = { ...buildAssetImportParseSelection(format.value, selection.value, inventory), expected_version: source.value.version }
@@ -164,7 +166,7 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
     }
     const request = begin('parse'); parseError.value = null
     try { const result = await client.request<AssetImportAcceptance>(`/assets/import-sources/${attempt.sourceId}/parses`, { method: 'POST', body: attempt.body, idempotencyKey: attempt.key, signal: request.signal }); alive(request.expected); accept(attempt, result); await readAttempt(attempt, 'PARSE', request, true) }
-    catch (cause) { if (!isCancelled(cause) && request.expected === epoch) { if (attempt.state === 'UNCERTAIN') attempt.state = failureState(cause); parseError.value = cause } }
+    catch (cause) { if (!isCancelled(cause) && request.expected === epoch) { if (attempt.state === 'UNCERTAIN' && !retry) attempt.state = failureState(cause); parseError.value = cause } }
     finally { if (request.expected === epoch) busy.value = null }
   }
   function sameMapping(result: AssetImportSource, attempt: MappingAttempt) {
@@ -187,7 +189,8 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
     if (!permitted.value || !policy.value || busy.value || hasConflict.value || !source.value || !isParsed.value || !artifact.value || !mappingDraft.value) return
     if (mappingAttempt.value?.state === 'ACCEPTED') { await refresh(); return }
     if (mappingAttempt.value?.state === 'CONFLICT' || source.value.mapping && mappingAttempt.value?.state !== 'UNCERTAIN') return
-    let attempt = mappingAttempt.value?.state === 'UNCERTAIN' ? mappingAttempt.value : null
+    const retry = mappingAttempt.value?.state === 'UNCERTAIN'
+    let attempt = retry ? mappingAttempt.value : null
     if (!attempt) {
       try { const body = buildAssetImportMappingRequest(source.value.version, artifact.value.parse_hash, artifact.value.columns, mappingDraft.value); attempt = { sourceId: source.value.id, body, key: crypto.randomUUID(), state: 'UNCERTAIN', operationId: null, compared: false }; mappingAttempt.value = attempt; fields.value = {} }
       catch (cause) { if (cause instanceof AssetImportInputError) fields.value = cause.fields; else mappingError.value = cause; return }
@@ -199,7 +202,7 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
       if (!sameMapping(result, attempt)) throw new ApiError(200, 'INVALID_IMPORT_READBACK', '映射响应与原请求不一致；保留原请求', '—')
       attempt.receiptId = result.mapping!.id; attempt.committedArtifactId = result.mapping!.artifact_id; attempt.committedSourceVersion = result.version
       attempt.state = 'ACCEPTED'; await readMapping(attempt, request)
-    } catch (cause) { if (!isCancelled(cause) && request.expected === epoch) { if (attempt.state === 'UNCERTAIN') attempt.state = failureState(cause); mappingError.value = cause } }
+    } catch (cause) { if (!isCancelled(cause) && request.expected === epoch) { if (attempt.state === 'UNCERTAIN' && !retry) attempt.state = failureState(cause); mappingError.value = cause } }
     finally { if (request.expected === epoch) busy.value = null }
   }
   async function refresh() {

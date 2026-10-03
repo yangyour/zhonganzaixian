@@ -1,3 +1,4 @@
+import { writeFailureUncertain } from './writeFailure'
 import { computed, ref, watch, type Ref } from 'vue'
 import { api, ApiError, isCancelled } from '../api/client'
 import type { RegisteredTicket } from '../api/types'
@@ -23,7 +24,7 @@ export function createPhotoAppender(ticket: Ref<RegisteredTicket | null>, queue:
     try {
       attempt.value = prepareAttachmentAttempt(attempt.value, ticket.value, queue.rows.value.filter(row => row.status === 'READY' && row.record).map(row => row.record!), { tenantId: session.value!.tenant.id, actorId: session.value!.user.id })
     } catch (cause) { error.value = new ApiError(0, 'PHOTO_INPUT_ERROR', (cause as Error).message, '—'); return }
-    const original = attempt.value, epoch = ++generation
+    const original = attempt.value, retry = original.state === 'uncertain', epoch = ++generation
     controller?.abort(); controller = new AbortController(); const signal = controller.signal
     busy.value = true; error.value = null; comparison.value = ''
     try {
@@ -35,8 +36,8 @@ export function createPhotoAppender(ticket: Ref<RegisteredTicket | null>, queue:
       comparison.value = `照片已关联至登记 v${result.version}；原描述与联系信息保持服务端记录。`
     } catch (cause) {
       if (!isCancelled(cause) && epoch === generation && !signal.aborted) {
-        original.state = cause instanceof ApiError && (cause.status === 0 || cause.status >= 500 || ['INVALID_RESPONSE', 'INVALID_ATTACHMENT_RESULT'].includes(cause.code)) ? 'uncertain' : 'ready'
-        conflict.value = cause instanceof ApiError && cause.status === 409 && cause.code === 'VERSION_CONFLICT'
+        original.state = writeFailureUncertain(retry, cause) ? 'uncertain' : 'ready'
+        conflict.value = !retry && cause instanceof ApiError && cause.status === 409 && cause.code === 'VERSION_CONFLICT'
         error.value = cause
       }
     } finally { if (epoch === generation) busy.value = false }

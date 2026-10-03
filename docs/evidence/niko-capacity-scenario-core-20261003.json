@@ -1,0 +1,32 @@
+{
+  "verified_at": "2026-10-03T11:17:33.084702+00:00",
+  "environment": "niko-local-test",
+  "status": "PURE_CAPACITY_SCENARIO_DRAFT_ONLY",
+  "tests": {
+    "new_pure": 9,
+    "root_reported": 991,
+    "root_executed": 978,
+    "existing_real_pg": 295,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 53,
+    "failures": 0,
+    "errors": 0
+  },
+  "calculation_inputs_bounded": true,
+  "capacity_formula_version": "contract-m10-7-capacity-v1",
+  "buffer_formula_version": "contract-m4-15-buffer-v1",
+  "unknowns_defaulted": false,
+  "lifecycle": "DRAFT",
+  "baseline_reference_only": true,
+  "reference_urls_paths_and_sensitive_markers_rejected": true,
+  "benchmark_document_or_digest_verified": false,
+  "effective": false,
+  "poc_executed": false,
+  "saved_scenario_repository_implemented": false,
+  "migration_added": false,
+  "api_changed": false,
+  "frontend_changed": false,
+  "credentials_output": false,
+  "all_128_done": false
+}

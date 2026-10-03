@@ -78,4 +78,18 @@ class NikoFaultGuardTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d);local=root/'.local/niko-test';local.mkdir(parents=True);old=local/'api-crash-http-before.json';old.write_text('original-preserved')
             result=subprocess.run([sys.executable,str(ROOT/'tools/niko-test/api-v10-crash-snapshot.py'),'--check-new-run'],cwd=d,capture_output=True,text=True);self.assertEqual(0,result.returncode);self.assertEqual('original-preserved',old.read_text());self.assertFalse((local/'api-v10-crash-http-before.json').exists())
+    def test_v14_scope_adds_six_explicit_tables_and_keeps_old_evidence_separate(self):
+        older=module('niko_v10_old_scope',ROOT/'tools/niko-test/api-v10-crash-snapshot.py');latest=module('niko_v14_scope',ROOT/'tools/niko-test/api-v14-crash-snapshot.py')
+        self.assertEqual(20,len(latest.TABLES));self.assertEqual(len(latest.TABLES),len(set(latest.TABLES)))
+        self.assertEqual(set(older.TABLES)|{'mop_ticket_comment','mop_working_calendar_draft','mop_working_calendar_revision','mop_manual_incident_registration','mop_manual_recovery_confirmation','mop_configuration'},set(latest.TABLES))
+        self.assertTrue({older.BEFORE,older.AFTER,older.HTTP,older.FINAL}.isdisjoint({latest.BEFORE,latest.AFTER,latest.HTTP,latest.FINAL}))
+    def test_v14_checkpoint_collision_prevents_any_new_fault_or_overwrite(self):
+        with tempfile.TemporaryDirectory() as d:
+            local=Path(d)/'.local/niko-test';local.mkdir(parents=True);record=local/'api-v14-crash-http-before.json';record.write_text('existing-v14-proof')
+            result=subprocess.run([sys.executable,str(ROOT/'tools/niko-test/api-v14-crash-snapshot.py'),'--check-new-run'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,result.returncode);self.assertEqual('existing-v14-proof',record.read_text());self.assertNotIn('existing-v14-proof',result.stdout+result.stderr)
+    def test_v14_unknown_mode_never_reads_private_settings(self):
+        with tempfile.TemporaryDirectory() as d:
+            result=subprocess.run([sys.executable,str(ROOT/'tools/niko-test/api-v14-crash-snapshot.py'),'--unknown'],cwd=d,capture_output=True,text=True);self.assertNotEqual(0,result.returncode);self.assertFalse((Path(d)/'.local').exists())
+    def test_v14_mode_is_explicit_and_reuses_owned_process_guard(self):
+        source=(ROOT/'tools/niko-test/run-stack.sh').read_text();self.assertIn("--verify-owned-v14-api-crash",source);self.assertIn("tools/niko-test/api-v14-crash-snapshot.py",source);self.assertIn('owned_child "$API_PID"',source);self.assertIn('--require-listener "$API_PID" "$$" "$API_ARTIFACT"',source);self.assertIn('[[ "$API_EXIT" == 137 ]]',source)
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,119 @@
+{
+  "verified_at": "2026-10-03T05:52:43.397Z",
+  "environment": "niko-local-test",
+  "api_version": "0.20.0",
+  "passed": true,
+  "fault": "SIGKILL exact owned API child; wait exit137 and confirmed loopback connection refusal, restart same pinned artifact",
+  "api_exit_code": 137,
+  "api_artifact_sha256": "83196fef0739354a6af14d16408489c6e1d3bf360b3e5c1b256f301522f8608c",
+  "owned_identity_and_listener_guard": true,
+  "postgres_restarted_during_api_fault": false,
+  "keycloak_restarted_during_api_fault": false,
+  "api_auto_migration": false,
+  "readonly_v1_v14_schema_checks": [
+    0,
+    0
+  ],
+  "new_real_oidc_sessions_after_restart": true,
+  "http_before": 10,
+  "http_after": 12,
+  "all_http_responses_contract_valid": true,
+  "database_fingerprints_equal": true,
+  "tables": {
+    "mop_asset": {
+      "rows": 2841,
+      "equality_sha256": "b4217724df51c7b679b71cf149ba4ba520494511165d00bf3046f306158493bd"
+    },
+    "mop_ticket": {
+      "rows": 3389,
+      "equality_sha256": "48cefdbfca6086a207fdb247a3472eb214555740c2354863d5c39035b289f39e"
+    },
+    "mop_worklog": {
+      "rows": 1086,
+      "equality_sha256": "3a8a900846b568f8c88e6c5db24736a6cb90dc009d8c811ccae151899e51ed99"
+    },
+    "mop_worklog_revision": {
+      "rows": 1551,
+      "equality_sha256": "3bbb3334f142aff9802ff5163ff0c07183eb182e53ecab58650466d998648dc9"
+    },
+    "mop_asset_dependency_graph": {
+      "rows": 1,
+      "equality_sha256": "21134389eab2923f14b6ba02e2a77fd2c42ed02f23913838ef13aef0c398c3c6"
+    },
+    "mop_asset_dependency_revision": {
+      "rows": 434,
+      "equality_sha256": "32d8dc5bf3a9d91460bc0298d61cbdb8ab872cd94a70be0b5e1198200ee93117"
+    },
+    "mop_asset_dependency_edge": {
+      "rows": 107535,
+      "equality_sha256": "91923f8d65cb703aac90b0fb009cc79d4f70b0b90aa6a5d6630c688b65a10cbc"
+    },
+    "mop_configuration_revision": {
+      "rows": 1272,
+      "equality_sha256": "da3100f606e30730bdb2f9233549f4530d0f5656657dd662a852662e7cb99806"
+    },
+    "mop_configuration_revision_history": {
+      "rows": 1368,
+      "equality_sha256": "9ea98414ed448ae3d7e5cb7775f4f9750b55fc1cbac5e22791437247b582223d"
+    },
+    "mop_idempotency": {
+      "rows": 17413,
+      "equality_sha256": "cec7f11b03b8df630a5f14ad94d831568f7ae6056138871930799dfc8bb69afb"
+    },
+    "mop_audit": {
+      "rows": 23494,
+      "equality_sha256": "ac2f6067971482119417f39971b965236eb8a487d40c39ff62612d716ddde0ba"
+    },
+    "mop_asset_manual_details": {
+      "rows": 483,
+      "equality_sha256": "cb488ce4323c53699b163e945aba2784ee1ac8c6cc5057c63d38eeb56c972a85"
+    },
+    "mop_asset_manual_revision": {
+      "rows": 574,
+      "equality_sha256": "864dac6be95fad2e5e2aea78e9e76eea90225b3ff7f15feea1cd85edaccd44a2"
+    },
+    "mop_ticket_internal_note": {
+      "rows": 568,
+      "equality_sha256": "11e7e87a3518dce8734b01d8e31bea2b7dea64e477b9d1bb7f4c7636c6bfef19"
+    },
+    "mop_ticket_comment": {
+      "rows": 460,
+      "equality_sha256": "4ec56124e4e20295e43b7aa417670539020c65cff012350e0a21590fd5dd87fa"
+    },
+    "mop_working_calendar_draft": {
+      "rows": 213,
+      "equality_sha256": "1b2892ca950e43fa37de9bab030b2d8be1a382efcb3fa6c93dde85345f9a0068"
+    },
+    "mop_working_calendar_revision": {
+      "rows": 369,
+      "equality_sha256": "ebb2ffec8129b1c579e6a0c0a40469771aab2b515aa6df400be928f6a23d570a"
+    },
+    "mop_manual_incident_registration": {
+      "rows": 241,
+      "equality_sha256": "abb70285eb41f669b02a3474e48208bb8e7859a40ef9935a04368efbf4e805f3"
+    },
+    "mop_manual_recovery_confirmation": {
+      "rows": 41,
+      "equality_sha256": "ff74cb34cf5bdf8c81fb12038c879733b3fba6e2c703c0b197f07a4c16031cdd"
+    },
+    "mop_configuration": {
+      "rows": 845,
+      "equality_sha256": "f217d7d85d9c4265b42cdebf0adabde997af463aa82802fae9522b34ea639fb2"
+    }
+  },
+  "confirmed_and_unconfirmed_parents_preserved": true,
+  "original_registration_receipt_preserved": true,
+  "original_human_confirmation_receipt_preserved": true,
+  "unknown_recovery_time_preserved": true,
+  "original_registration_success_audits": 1,
+  "original_confirmation_success_audits": 1,
+  "asset_unchanged": true,
+  "readback_sha256": "48dcd7f378f4e82d933f26cee2489c176d68321694967a50064d7cf62163f907",
+  "credentials_output": false,
+  "limitations": [
+    "All writes committed before SIGKILL; not termination during an in-flight transaction",
+    "Not PostgreSQL/WAL, Worker or OSS crash recovery",
+    "Not browser DOM or original-server testing",
+    "20 whitelisted table fingerprints are equality evidence, not the entire database or external authenticity"
+  ]
+}

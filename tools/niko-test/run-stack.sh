@@ -5,7 +5,7 @@ set -euo pipefail
 # Parse the runner body once; editing the repository copy cannot alter a running shell mid-function.
 main() {
 MODE=${1:-}
-[[ $# -le 1 && ( -z "$MODE" || "$MODE" == '--verify-owned-api-crash' || "$MODE" == '--verify-owned-v10-api-crash' ) ]] || { echo 'Use no argument or one explicit owned API crash scenario'; exit 2; }
+[[ $# -le 1 && ( -z "$MODE" || "$MODE" == '--verify-owned-api-crash' || "$MODE" == '--verify-owned-v10-api-crash' || "$MODE" == '--verify-owned-v14-api-crash' ) ]] || { echo 'Use no argument or one explicit owned API crash scenario'; exit 2; }
 ROOT=$(pwd)
 SNAPSHOT='tools/niko-test/api-crash-snapshot.py'
 HTTP_PROOF='tests/niko-api-crash-http.mjs'
@@ -14,6 +14,11 @@ if [[ "$MODE" == '--verify-owned-v10-api-crash' ]]; then
   SNAPSHOT='tools/niko-test/api-v10-crash-snapshot.py'
   HTTP_PROOF='tests/niko-api-v10-crash-http.mjs'
   SESSION_PREFIX='api-v10-crash'
+fi
+if [[ "$MODE" == '--verify-owned-v14-api-crash' ]]; then
+  SNAPSHOT='tools/niko-test/api-v14-crash-snapshot.py'
+  HTTP_PROOF='tests/niko-api-v14-crash-http.mjs'
+  SESSION_PREFIX='api-v14-crash'
 fi
 BASE="$ROOT/../mop-toolchain/components"
 LOCAL="$ROOT/.local/niko-test"
@@ -47,6 +52,7 @@ export PATH="$ROOT/../mop-toolchain/node_modules/.bin:$PATH"
 if [[ -n "$MODE" ]]; then
   python tools/niko-test/capture-http-sessions.py > "$LOCAL/logs/$SESSION_PREFIX-sessions-before.json"
   node "$HTTP_PROOF" before
+  if [[ "$MODE" == '--verify-owned-v14-api-crash' ]]; then python tools/niko-test/run-migration.py --check > "$LOCAL/logs/$SESSION_PREFIX-schema-before.log"; fi
   python "$SNAPSHOT" --record
   # The signal target comes only from this launch; validate parent and exact JVM command again.
   owned_child "$API_PID"
@@ -61,6 +67,7 @@ if [[ -n "$MODE" ]]; then
   python tools/niko-test/owned_api.py --wait-ready "$API_PID" "$$" "$API_ARTIFACT"
   # Compare before logging in again, because real OIDC login intentionally adds audit entries.
   python "$SNAPSHOT" --verify
+  if [[ "$MODE" == '--verify-owned-v14-api-crash' ]]; then python tools/niko-test/run-migration.py --check > "$LOCAL/logs/$SESSION_PREFIX-schema-after.log"; fi
   python tools/niko-test/capture-http-sessions.py > "$LOCAL/logs/$SESSION_PREFIX-sessions-after.json"
   node "$HTTP_PROOF" after
   exit 0

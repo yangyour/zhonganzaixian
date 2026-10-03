@@ -1,0 +1,54 @@
+{
+  "verified_at": "2026-10-03T03:57:08.201936+00:00",
+  "environment": "niko-local-test",
+  "status": "REPOSITORY_REAL_PG_VERIFIED",
+  "tests": {
+    "new_manual_incident_repository_real_pg": 14,
+    "root_reported": 750,
+    "root_executed": 737,
+    "real_pg": 234,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 35,
+    "failures": 0,
+    "errors": 0
+  },
+  "authorization": {
+    "current_internal_membership_and_permission_version": true,
+    "membership_user_share_lock_on_write": true,
+    "reads_same_repeatable_read_snapshot": true,
+    "cross_tenant_objects_404": true,
+    "current_asset_guard_before_cached_receipt": true
+  },
+  "writes": {
+    "protected_idempotent_transaction_required": true,
+    "asset_share_lock_and_observed_version_cas": true,
+    "original_asset_name_snapshot": true,
+    "registration_audit_receipt_atomic": true,
+    "concurrent_same_key_single_write_and_audit": true,
+    "downstream_failure_rolls_back_all": true,
+    "original_receipt_after_asset_revision": true,
+    "asset_update_lock_requires_committed_version_recheck": true
+  },
+  "no_side_effects": {
+    "asset_unchanged_by_registration": true,
+    "ticket_count_unchanged_by_registration": true,
+    "monitoring_callback_invoked": false,
+    "manual_recovery_implemented": false,
+    "formal_disposition_assigned": false,
+    "priority_inferred": false
+  },
+  "test_data": "Dedicated synthetic assets and registrations committed, not production data; schema-stage zero-row assertion is historical only",
+  "api_added": false,
+  "frontend_added": false,
+  "api_version_unchanged": "0.18.0",
+  "frozen_migrations_unchanged": "V1-V13",
+  "credentials_output": false,
+  "original_server_changed": false,
+  "full_contract_done": false,
+  "limitations": [
+    "Repository tests do not establish HTTP CSRF or UI behavior",
+    "No monitoring callback, manual recovery, formal ticket or SLA acceptance",
+    "Original server, OSS, browser and customer decision blockers remain separately recorded"
+  ]
+}

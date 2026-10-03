@@ -1,0 +1,33 @@
+{
+  "verified_at": "2026-10-03T05:46:34.921Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual manualRecoveryWorkspace + ApiClient",
+  "http_requests": 32,
+  "workspace_requests": 15,
+  "frontend_post_attempts": 4,
+  "frontend_logical_confirmations": 2,
+  "independent_human_confirmation": 1,
+  "total_successful_confirmations": 3,
+  "matching_success_audits": 3,
+  "independent_setup_mutations": 5,
+  "original_request_body_key_parent_preserved": true,
+  "read_discovery_did_not_claim_original_request_success": true,
+  "accepted_receipt_survived_lost_get": true,
+  "actual_409_no_automatic_retry": true,
+  "known_confirmation_prevented_second_write_locally": true,
+  "original_registrations_unchanged": true,
+  "unknown_actual_time_kept_null": true,
+  "explicit_historical_time_and_max_note": true,
+  "customer_current_read_403_and_no_post": true,
+  "late_read_context_reset_discarded": true,
+  "readonly_audit_tail_unchanged": true,
+  "credentials_output": false,
+  "browser_dom_tested": false,
+  "fault_injection": "Discard one successful POST and one successful GET, hold another completed GET across context reset; not physical outage or process restart",
+  "remaining": [
+    "Actual drawer, checkbox, route and mobile DOM validation B03",
+    "Monitoring callback integration B05",
+    "Correction/withdrawal, formal disposition, event-to-ticket and SLA workflow"
+  ]
+}

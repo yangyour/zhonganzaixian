@@ -1,0 +1,47 @@
+{
+  "verified_at": "2026-10-03T05:47:45.473043+00:00",
+  "status": "CURRENT_HUMAN_RECOVERY_PANEL_AND_REAL_WORKSPACE_HTTP_VERIFIED",
+  "environment": "niko-local-test",
+  "new_unit_tests": 20,
+  "web_tests": 474,
+  "typecheck_and_build": true,
+  "contract_tests": 39,
+  "api_version_unchanged": "0.20.0",
+  "actual_http_evidence": "niko-manual-recovery-workspace-http-20261003.json",
+  "http_requests": 32,
+  "frontend_post_attempts": 4,
+  "frontend_logical_confirmations": 2,
+  "independent_human_confirmation": 1,
+  "matching_success_audits": 3,
+  "strict_read_validation": [
+    "Exact current/evidence fields with same tenant and incident",
+    "Explicit zero/null absence distinct from human confirmation",
+    "Raw UTF8 SHA256, exact note, valid millisecond times",
+    "Reported recovery time unknown or not after record time",
+    "No monitored recovery, disposition, ticket or SLA claims",
+    "Known immutable confirmation cannot downgrade after a failed read"
+  ],
+  "request_handling": [
+    "Fresh current read required before confirm",
+    "Note and optional explicit recovery time; no current-time default",
+    "Unknown write clears stale current display and freezes original body/key/parent",
+    "Read-discovered confirmation does not settle the unknown original request",
+    "Accepted receipt survives subsequent failed GET",
+    "Known confirmation blocks second write; 409 has no automatic retry",
+    "Late context response cannot refill evidence"
+  ],
+  "ui_source_wiring": [
+    "Separate current recovery drawer, original registration remains original snapshot",
+    "Human confirmation checkbox starts false and is mandatory in submit handler",
+    "Drawer hide retains inputs and original request",
+    "Route and voluntary tenant/logout guards, beforeunload, forced expiry clearing"
+  ],
+  "browser_dom_tested": false,
+  "monitoring_callback_tested": false,
+  "formal_ticket_closure": false,
+  "sla_changed": false,
+  "correction_withdrawal_implemented": false,
+  "frozen_migrations_unchanged": "V1-V14",
+  "credentials_output": false,
+  "full_contract_done": false
+}

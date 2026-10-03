@@ -60,4 +60,18 @@ class NikoPrivateBootstrapTest(unittest.TestCase):
  def test_v16_capacity_scenarios_hash_is_separate_from_frozen_previous_migrations(self):
   manifest=json.loads((ROOT/'tools/niko-test/frozen-capacity-scenario-migration.json').read_text())['sha256'];self.assertEqual(1,len(manifest))
   for name,expected in manifest.items():self.assertEqual(expected,hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest())
+ def test_database_identity_only_flag_creates_no_storage_credentials(self):
+  with tempfile.TemporaryDirectory() as d:
+   r=subprocess.run([sys.executable,str(SCRIPT),'--create-approved-database-identity-credentials'],cwd=d,capture_output=True,text=True)
+   self.assertEqual(0,r.returncode);p=Path(d)/'.local/niko-test/private/bootstrap.json';data=json.loads(p.read_text())
+   self.assertEqual({'pg_admin_password','pg_migrator_password','pg_runtime_password','kc_db_password','kc_admin_password','oidc_client_secret'},set(data['component_credentials']))
+   self.assertEqual(6,len(data['test_users']));self.assertEqual(0o600,stat.S_IMODE(p.stat().st_mode))
+   for secret in list(data['component_credentials'].values())+[u['password'] for u in data['test_users']]:self.assertNotIn(secret,r.stdout+r.stderr)
+ def test_narrow_flag_cannot_expand_or_overwrite_existing_configuration(self):
+  with tempfile.TemporaryDirectory() as d:
+   subprocess.run([sys.executable,str(SCRIPT),'--create-approved-database-identity-credentials'],cwd=d,capture_output=True,check=True)
+   p=Path(d)/'.local/niko-test/private/bootstrap.json';before=p.read_bytes()
+   for flag in ['--create-approved-database-identity-credentials','--create-approved-local-test-credentials']:
+    result=subprocess.run([sys.executable,str(SCRIPT),flag],cwd=d,capture_output=True)
+    self.assertNotEqual(0,result.returncode);self.assertEqual(before,p.read_bytes())
 if __name__=='__main__':unittest.main()

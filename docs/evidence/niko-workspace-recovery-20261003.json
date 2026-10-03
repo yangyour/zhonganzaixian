@@ -1,0 +1,52 @@
+{
+  "verified_at": "2026-10-03T14:09:14.801714+00:00",
+  "environment": "niko-cloud-workspace",
+  "status": "TRACKED_SOURCE_AND_TOOLCHAIN_RECOVERED",
+  "recovered_commit": "09b58541ab0fc7360177e2aad11eacd7a38c812d",
+  "recovered_tree": "1b42735b5e02dd6cf31c8bbe09e9e0a32a6bae71",
+  "tracked_files": 993,
+  "all_git_blob_hashes_verified": true,
+  "working_tree_clean_at_recovery": true,
+  "git_history_restored": false,
+  "git_history_mode": "shallow verified HEAD only",
+  "artifact_id": 11274808193,
+  "artifact_workflow_run": 37126508572,
+  "artifact_workflow_conclusion": "success",
+  "cloud_validation_run": 37126508504,
+  "cloud_validation_conclusion": "success",
+  "artifact_sha256": "5c93146b3878d9ee700cf480667aa307083aec069f3747d050ff4ac93bdd0878",
+  "artifact_retention_days": 1,
+  "private_or_untracked_files_exported": false,
+  "exact_commit_reconstruction": "Matched original +0800 Git header timezone and no extra final newline; new exporter now includes raw HEAD object to avoid reconstruction guesses",
+  "toolchain": {
+    "Node22.22.1": {
+      "official_publisher_checksum_verified": "SHA256",
+      "download_sha256": "9a6bc82f9b491279147219f6a18add1e18424dce90d41d2a5fcd69d4924ba3aa"
+    },
+    "Maven3.9.9": {
+      "official_publisher_checksum_verified": "SHA512",
+      "download_sha256": "7a9cdf674fc1703d6382f5f330b3d110ea1b512b51f1652846d9e4e8a588d766"
+    },
+    "Temurin17.0.20.1+1": {
+      "official_publisher_checksum_verified": "SHA256",
+      "download_sha256": "3808d1d15e3ec6bd5b84057fb5d84c33d8a1536a258146bcea2e603fc726e08e"
+    }
+  },
+  "source_restore_did_not_restore_old_database": true,
+  "user_computer_or_original_server_changed": false,
+  "credentials_output": false,
+  "fresh_pure_verification": {
+    "java_reported": 1042,
+    "java_executed": 701,
+    "skipped": 341,
+    "skip_breakdown": {
+      "real_pg_disabled": 322,
+      "historical_fixture_disabled": 13,
+      "storage_remote_disabled": 6
+    },
+    "web": 643,
+    "contracts": 55,
+    "python": 79,
+    "type_and_build": true
+  }
+}

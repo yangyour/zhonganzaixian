@@ -945,3 +945,16 @@ M10-7现有计算/保存/读取/增长代码切片已补齐，原服务器V16、
 
 原niko源码/工具链及QA15927不可访问，exec返回executor key changed；最新002a89d/CI37125698984 success已保留远端。新增同一private仓库的短期HEAD源码恢复归档：8项隔离测试校验只含普通tracked文件、排除private/生成物/历史、逐blob清单、archive SHA256和tree、拒绝覆盖/符号链接/超限。恢复尚待实际CI产物/下载校验，不当已恢复或新组件验收，见[B09](current-development-blockers.md)。
 
+
+
+## 2026-10-03 工作区丢失后的源码恢复与新组件基线
+
+13:23 executor切换后，原MOP工作区/工具链/测试进程不可访问。通过同private仓库短期CI artifact恢复993个tracked文件，逐blob/整tree/原commit09b5854完全相符；Git仅恢复shallow HEAD，不带历史私有配置/未跟踪文件。13张旧截图全部原hash恢复，B08物化限制解除；仅查看其中3张历史移动截图，不等于新容量页面或实时浏览器验收。恢复导出新增原HEAD commit bytes并校验SHA，避免GitAPI日期丢失原+0800头信息；仍不导出祖先历史或秘密路径。
+
+用户13:40明确批准重新建立PG/Keycloak隔离测试账号/随机凭据。新增窄范围prepare-private.py --create-approved-database-identity-credentials，只创建PG/Keycloak/OIDC6类凭据和6个测试用户，不创建MinIO/照片/导入签名凭据，不覆盖既有配置；2新增保护测试。凭据只在.local/niko-test/private，未进Git/提示/公共日志。
+
+官方Node22.22.1/Maven3.9.9/Temurin17.0.20.1+1校验和恢复；PostgreSQL17.11官方Debian签名索引+3deb SHA256核验后仅解包工作区，Keycloak26.2.4官方发行SHA1核验。新PG/SCRAM/migrator-runtime分离、KC独立PG库/S256 PKCE/禁应用password grant，均回环；不是旧数据库备份恢复或原指定服务器操作。新库V1–V4显式执行4，V5–V16各独立执行1且立即重复0，最终只读check0；原SQL字节不改。API/Worker没有自动迁移。
+
+新实例真实PG完整根1036=1023执行（322真实PG）+13历史fixture跳过，6MinIO排除；Web643/55契约/类型构建/Python79通过。另冷启动纯Java1042=701执行+341跳过（322PG+13历史+6存储），不和真实批次叠加。正常启动拥有的固定API JAR并验证回环监听，6个新OIDC授权码登录、34真实HTTP核对读写/原键重放/23能力/跨租户404/只读审计尾不变；4条合成业务记录不是旧数据。存储显式关闭，上传组件重测仍NOT_RUN。
+
+[源码恢复](evidence/niko-workspace-recovery-20261003.json)、[截图物化](evidence/niko-repository-binary-materialization-recovered-20261003.json)、[新组件](evidence/niko-rebuilt-components-20261003.json)、[新HTTP](evidence/niko-rebuilt-environment-http-20261003.json)。B09源码与新PG/OIDC/API可用性已解决，但旧临时数据库未恢复；B01原服务器入口/私有连接、B02 OSS、B03新环境浏览器验收、客户口径/监控组件仍分别保留，继续独立开发。

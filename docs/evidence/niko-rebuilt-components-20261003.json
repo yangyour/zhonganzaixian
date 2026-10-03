@@ -1,0 +1,205 @@
+{
+  "verified_at": "2026-10-03T14:09:14.801714+00:00",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "status": "NEW_PG_OIDC_API_BASELINE_VERIFIED_STORAGE_DISABLED",
+  "owner_approval_message": "Sentinel_0d57c9ec385c8191a8559017435cd00a",
+  "postgres": "17.11 Debian17.11-0+deb13u1",
+  "postgres_provenance": "Debian trixie InRelease verified with existing OS archive keyring via gpg; package index and all3 deb SHA256 verified; extracted into workspace, not installed as system service",
+  "keycloak": "26.2.4",
+  "keycloak_provenance": "Official GitHub release tarball, publisher SHA1 verified and independent SHA256 recorded",
+  "keycloak_sha256": "6ef2ae3a339a21c246fdcc5ddea5edcc362eb2f466fb422c5b82072f6dbc55d1",
+  "loopback_only": true,
+  "ports": {
+    "postgres": 25432,
+    "keycloak": 28110,
+    "api": 8080
+  },
+  "database_role_separation": true,
+  "application_oidc_pkce": "S256",
+  "application_password_grant": false,
+  "test_identities": 6,
+  "credentials_scope": "POSTGRES_KEYCLOAK_ONLY",
+  "storage_credentials_created": false,
+  "storage_enabled": false,
+  "old_database_restored": false,
+  "migration_evidence": {
+    "verified_at": "2026-10-03T13:56:07.563449+00:00",
+    "environment": "niko-local-test",
+    "environment_instance": "rebuilt-20261003-after-executor-loss",
+    "baseline_v1_v4": 4,
+    "checks": [
+      {
+        "version": 5,
+        "replay": false,
+        "migrations_executed": 1,
+        "passed": true
+      },
+      {
+        "version": 5,
+        "replay": true,
+        "migrations_executed": 0,
+        "passed": true
+      },
+      {
+        "version": 6,
+        "replay": false,
+        "migrations_executed": 1,
+        "passed": true
+      },
+      {
+        "version": 6,
+        "replay": true,
+        "migrations_executed": 0,
+        "passed": true
+      },
+      {
+        "version": 7,
+        "replay": false,
+        "migrations_executed": 1,
+        "passed": true
+      },
+      {
+        "version": 7,
+        "replay": true,
+        "migrations_executed": 0,
+        "passed": true
+      },
+      {
+        "version": 8,
+        "replay": false,
+        "migrations_executed": 1,
+        "passed": true
+      },
+      {
+        "version": 8,
+        "replay": true,
+        "migrations_executed": 0,
+        "passed": true
+      },
+      {
+        "version": 9,
+        "replay": false,
+        "migrations_executed": 1,
+        "passed": true
+      },
+      {
+        "version": 9,
+        "replay": true,
+        "migrations_executed": 0,
+        "passed": true
+      },
+      {
+        "version": 10,
+        "replay": false,
+        "migrations_executed": 1,
+        "passed": true
+      },
+      {
+        "version": 10,
+        "replay": true,
+        "migrations_executed": 0,
+        "passed": true
+      },
+      {
+        "version": 11,
+        "replay": false,
+        "migrations_executed": 1,
+        "passed": true
+      },
+      {
+        "version": 11,
+        "replay": true,
+        "migrations_executed": 0,
+        "passed": true
+      },
+      {
+        "version": 12,
+        "replay": false,
+        "migrations_executed": 1,
+        "passed": true
+      },
+      {
+        "version": 12,
+        "replay": true,
+        "migrations_executed": 0,
+        "passed": true
+      },
+      {
+        "version": 13,
+        "replay": false,
+        "migrations_executed": 1,
+        "passed": true
+      },
+      {
+        "version": 13,
+        "replay": true,
+        "migrations_executed": 0,
+        "passed": true
+      },
+      {
+        "version": 14,
+        "replay": false,
+        "migrations_executed": 1,
+        "passed": true
+      },
+      {
+        "version": 14,
+        "replay": true,
+        "migrations_executed": 0,
+        "passed": true
+      },
+      {
+        "version": 15,
+        "replay": false,
+        "migrations_executed": 1,
+        "passed": true
+      },
+      {
+        "version": 15,
+        "replay": true,
+        "migrations_executed": 0,
+        "passed": true
+      },
+      {
+        "version": 16,
+        "replay": false,
+        "migrations_executed": 1,
+        "passed": true
+      },
+      {
+        "version": 16,
+        "replay": true,
+        "migrations_executed": 0,
+        "passed": true
+      }
+    ],
+    "readonly_check_executed": 0,
+    "identities_bound": 6,
+    "new_database_not_old_data_restore": true,
+    "frozen_sources_modified": false
+  },
+  "root_real_pg_regression": {
+    "reported": 1036,
+    "executed": 1023,
+    "real_pg": 322,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "fresh_oidc_http": 34,
+  "owned_api_exact_jar_and_listener_verified": true,
+  "source_migrations_v1_v16_changed": false,
+  "original_server_changed": false,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "all_128_done": false,
+  "setup_failures_handled": [
+    "PGDG package index URL unavailable; used signature-verified official Debian repository",
+    "Downloaded Keycloak asset metadata rather than tarball first; checksum rejected it before extraction; corrected to official browser_download_url",
+    "Fresh JDK did not trust executor TLS chain; reused existing system Java trust store, no TLS bypass or new CA",
+    "Mockito Java agent absent in empty Maven cache and dependency:get resolver DNS failed; fetched exact official Maven artifact with publisher checksum, then strict Maven verify passed",
+    "Python broad unit run initially lacked pinned paramiko; installed tools/requirements.txt in local venv, all79 passed"
+  ]
+}

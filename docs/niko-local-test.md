@@ -4,14 +4,14 @@
 
 2026-10-02用户明确允许在niko部署必要组件，并单独批准本机回环的PostgreSQL/Keycloak/MinIO专用测试账号和随机凭据；其后指定阿里云OSS作为存储方向。本文件记录新环境，不代表原指定服务器网络恢复，不沿用旧服务器的通过记录。`remote_test`仍是应用的真实组件适配器profile名称，环境证据必须另标`niko-local-test`；没有启用`local_fixture`。
 
-原`deploy/private/`六文件、原服务器服务/网络/端口不变。新凭据、会话、数据库和日志只在Git忽略的`.local/niko-test/`，私有目录0700、凭据文件0600。任何新环境凭据均不得提交Git；代码不包含实际访问密钥。
+2026-10-03新实例恢复只带tracked HEAD源码，不恢复Git历史中的私有配置或旧临时数据库；原服务器服务/网络/端口不变。新凭据、会话、数据库和日志只在Git忽略的`.local/niko-test/`，私有目录0700、凭据文件0600。任何新环境凭据均不得提交Git；代码不包含实际访问密钥。
 
 ## 实际组件
 
 - PostgreSQL 17.11，Debian 13官方签名包仓库下载并解包到工作区，非系统服务安装；原服务器17.9结果不能合并。仅127.0.0.1:25432，SCRAM认证，migrator/runtime分离，运行身份无超级用户/建库/建角色/复制/bypassRLS权限
 - Keycloak 26.2.4，Maven Central官方quarkus发行包，发行SHA1校验并另记SHA256；独立PG库mop_keycloak，只127.0.0.1:28110，管理接口也显式绑定回环。应用client关闭password grant和service account，启用S256 PKCE，6个合成测试身份
 - API只127.0.0.1:8080；只注入runtime凭据，不注入migrator凭据；API/Worker启动不执行迁移
-- MinIO按官方RELEASE.2025-09-07T16-13-09Z源码、已校验官方Go1.24.6编译成功，不是官方预编译包。启动前网络接口枚举因netlink权限EPERM失败，获准提升执行后同样失败，尚未运行对象存储或IAM测试。没有修改系统限制、补丁绕过或用内存存储宣称成功。后续存储按用户选定OSS另行实现/验证
+- MinIO（旧实例历史，新实例未建立）按官方RELEASE.2025-09-07T16-13-09Z源码、已校验官方Go1.24.6编译成功，不是官方预编译包。启动前网络接口枚举因netlink权限EPERM失败，获准提升执行后同样失败，尚未运行对象存储或IAM测试。没有修改系统限制、补丁绕过或用内存存储宣称成功。后续存储按用户选定OSS另行实现/验证
 
 ## 同一会话运行
 
@@ -19,10 +19,10 @@
 
 前置：仓库根目录、JDK17/Maven已构建工程；相邻`mop-toolchain/components/pg`为解包PG17目录，`keycloak-26.2.4`为官方发行目录；工具链和第三方二进制不进Git。首次准备不是`run-stack`的隐含动作：
 
-1. 经账号/凭据创建批准后，显式运行`python tools/niko-test/prepare-private.py --create-approved-local-test-credentials`；已有配置拒绝再生成或轮换
+1. 经账号/凭据创建批准后，当前PG/Keycloak范围显式运行`python tools/niko-test/prepare-private.py --create-approved-database-identity-credentials`；不会创建存储密钥。旧完整flag仅用于另行明确获准的全组件准备，已有配置拒绝再生成、扩展或轮换
 2. 用该私有目录的pg-init-password显式initdb，`-U mop_niko_admin --auth=scram-sha-256 --encoding=UTF8 --locale=C`；启动受限回环PG后运行`bootstrap-postgres.py`
 3. 启动Keycloak后运行`bootstrap-keycloak.py`，只操作带niko项目归属标记的realm；绑定过的用户消失或ID改变时拒绝同名继承
-4. 从已构建API jar提取BOOT-INF/lib到`.local/niko-test/java-libs`供独立CLI使用；显式`run-migration.py --initialize-new-niko-database`只接受空的新niko库，应用冻结V1–V4；再分别`--apply-photos`、`--apply-asset-imports`，最后`--check`。manifest核对全部V1–V6源码和编译资源；不是修改旧迁移或重跑原服务器
+4. 从已构建API jar提取BOOT-INF/lib到`.local/niko-test/java-libs`供独立CLI使用；显式`run-migration.py --initialize-new-niko-database`只接受空的新niko库，应用冻结V1–V4；再分别`--apply-photos`、`--apply-asset-imports`、`--apply-asset-dependencies`、`--apply-worklogs`、`--apply-asset-metadata`、`--apply-internal-notes`、`--apply-ticket-comments`、`--apply-working-calendars`、`--apply-manual-incidents`、`--apply-manual-recoveries`、`--apply-manual-warranty`、`--apply-capacity-scenarios`，最后`--check`。manifest核对全部V1–V16源码和编译资源；不是修改旧迁移或重跑原服务器
 5. `bind-local-identities.py`仅初次空业务新库，把冻结SQL的合成用户明确绑定新realm签发者+sub；记录本地绑定，后续不按用户名重绑定；不改变角色或原SQL
 6. `bash tools/niko-test/run-stack.sh`供后续已有环境启动和正常停止；MinIO/OSS不被隐式启动或伪装就绪
 
@@ -142,3 +142,16 @@ V1–V14全部字节冻结，V14 SHA256为39be55d8759de87c6e2b8f85b3958c60be24ae
 这是已提交后终止API，不是事务进行中被杀，不覆盖PG/WAL、Worker、OSS、浏览器/390px或原指定服务器故障验收。V1–V14和API0.20未改，其他合同阻塞仍保留，不把此场景标为所有恢复验收或128项完成。
 
 见[真实V14 API崩溃证据](evidence/niko-api-v14-crash-recovery-20261003.json)。
+
+
+## 2026-10-03 工作区丢失后的源码恢复与新组件基线
+
+13:23 executor切换后，原MOP工作区/工具链/测试进程不可访问。通过同private仓库短期CI artifact恢复993个tracked文件，逐blob/整tree/原commit09b5854完全相符；Git仅恢复shallow HEAD，不带历史私有配置/未跟踪文件。13张旧截图全部原hash恢复，B08物化限制解除；仅查看其中3张历史移动截图，不等于新容量页面或实时浏览器验收。恢复导出新增原HEAD commit bytes并校验SHA，避免GitAPI日期丢失原+0800头信息；仍不导出祖先历史或秘密路径。
+
+用户13:40明确批准重新建立PG/Keycloak隔离测试账号/随机凭据。新增窄范围prepare-private.py --create-approved-database-identity-credentials，只创建PG/Keycloak/OIDC6类凭据和6个测试用户，不创建MinIO/照片/导入签名凭据，不覆盖既有配置；2新增保护测试。凭据只在.local/niko-test/private，未进Git/提示/公共日志。
+
+官方Node22.22.1/Maven3.9.9/Temurin17.0.20.1+1校验和恢复；PostgreSQL17.11官方Debian签名索引+3deb SHA256核验后仅解包工作区，Keycloak26.2.4官方发行SHA1核验。新PG/SCRAM/migrator-runtime分离、KC独立PG库/S256 PKCE/禁应用password grant，均回环；不是旧数据库备份恢复或原指定服务器操作。新库V1–V4显式执行4，V5–V16各独立执行1且立即重复0，最终只读check0；原SQL字节不改。API/Worker没有自动迁移。
+
+新实例真实PG完整根1036=1023执行（322真实PG）+13历史fixture跳过，6MinIO排除；Web643/55契约/类型构建/Python79通过。另冷启动纯Java1042=701执行+341跳过（322PG+13历史+6存储），不和真实批次叠加。正常启动拥有的固定API JAR并验证回环监听，6个新OIDC授权码登录、34真实HTTP核对读写/原键重放/23能力/跨租户404/只读审计尾不变；4条合成业务记录不是旧数据。存储显式关闭，上传组件重测仍NOT_RUN。
+
+[源码恢复](evidence/niko-workspace-recovery-20261003.json)、[截图物化](evidence/niko-repository-binary-materialization-recovered-20261003.json)、[新组件](evidence/niko-rebuilt-components-20261003.json)、[新HTTP](evidence/niko-rebuilt-environment-http-20261003.json)。B09源码与新PG/OIDC/API可用性已解决，但旧临时数据库未恢复；B01原服务器入口/私有连接、B02 OSS、B03新环境浏览器验收、客户口径/监控组件仍分别保留，继续独立开发。

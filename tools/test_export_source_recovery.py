@@ -85,5 +85,13 @@ class SourceRecoveryExportTest(unittest.TestCase):
         self.assertEqual(self.run_git('rev-parse', 'HEAD^{tree}').decode().strip(), result['source_tree'])
         self.assertEqual(hashlib.sha256((self.root / m.OUTPUT / 'source.zip').read_bytes()).hexdigest(), result['archive_sha256'])
 
+    def test_exact_commit_bytes_preserved_without_timezone_reconstruction(self):
+        result = m.export(self.root)
+        raw = (self.root / m.OUTPUT / 'head-commit.bin').read_bytes()
+        self.assertEqual(self.run_git('cat-file', 'commit', 'HEAD'), raw)
+        self.assertEqual(result['source_commit'], hashlib.sha1(b'commit ' + str(len(raw)).encode() + b'\0' + raw).hexdigest())
+        self.assertTrue(result['head_commit_object_included'])
+        self.assertFalse(result['git_history_included'])
+
 
 if __name__ == '__main__': unittest.main()

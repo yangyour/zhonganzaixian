@@ -42,7 +42,12 @@ def export(root: Path):
     output.mkdir()
     archive = output / 'source.zip'
     git(root, 'archive', '--format=zip', '-o', str(archive), 'HEAD')
-    result = {'source_commit': git(root, 'rev-parse', 'HEAD').decode().strip(), 'source_tree': git(root, 'rev-parse', 'HEAD^{tree}').decode().strip(), 'file_count': len(entries), 'total_source_bytes': sum(sizes), 'archive_sha256': hashlib.sha256(archive.read_bytes()).hexdigest(), 'entries': entries, 'git_history_included': False, 'untracked_files_included': False, 'components_started': False}
+    commit = git(root, 'cat-file', 'commit', 'HEAD')
+    commit_sha = git(root, 'rev-parse', 'HEAD').decode().strip()
+    if hashlib.sha1(b'commit ' + str(len(commit)).encode() + b'\0' + commit).hexdigest() != commit_sha:
+        raise ValueError('Exact commit bytes mismatch')
+    (output / 'head-commit.bin').write_bytes(commit)
+    result = {'source_commit': commit_sha, 'head_commit_object_included': True, 'source_tree': git(root, 'rev-parse', 'HEAD^{tree}').decode().strip(), 'file_count': len(entries), 'total_source_bytes': sum(sizes), 'archive_sha256': hashlib.sha256(archive.read_bytes()).hexdigest(), 'entries': entries, 'git_history_included': False, 'untracked_files_included': False, 'components_started': False}
     (output / 'manifest.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     return result
 

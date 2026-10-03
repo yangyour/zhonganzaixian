@@ -1,16 +1,19 @@
 # MOP 实施状态
 
-## 当前接续概览（2026-10-03 03:18 UTC）
+## 当前接续概览（2026-10-03 14:05 UTC）
 
-开发在已批准niko-local-test独立环境持续推进；原指定服务器、OSS受控认证和浏览器验收等阻塞分别记录于[阻塞清单](current-development-blockers.md)，不阻止无关功能。以下历史环境证据不转记为niko新环境通过，全部128项仍未整体验收DONE。
+开发已从executor丢失恢复到自己的工作区。源码993文件/13截图原hash核验；用户批准重建后的新niko-local-test实例与旧测试库分开留证。全部128项仍未整体验收DONE，历史批次不累加。
 
 |范围|当前真实证据|仍未完成|
 |---|---|---|
-|环境与恢复|niko PG17.11/OIDC26.2.4/API真实测试；V1–V12字节冻结；拥有API的SIGKILL/重启/原11表及独立V10场景14表指纹/幂等恢复通过|原服务器新联调、PG/Worker/OSS故障、生产部署|
-|工单与工时|耐久报障/附件已有历史与新环境分开证据；本人工时12PG/75API/28实际前端HTTP；内部备注12PG/83API/28实际前端HTTP及页面代码；客户评论16PG/84API/39实际客户端HTTP及页面代码完成|正式工单状态/资格/外部ITSM/SLA/客户确认/通知、团队工时及成本规则|
-|手工资产资料|V9结构/核心、资料仓储与引用/筛选真实PG；API V0.16，主台账授权有界分页54HTTP；维护70/引用28/查询63HTTP；维护22/查询29实际客户端HTTP|浏览器/390px、客户Q09、主列Q31、管理IP/CMDB权威字段与监控接入|
-|配置与审计|内部提案/CAS/诊断继续保留null门禁；审计API/页面与实际HTTP；Q08日历草稿10纯核心、V12结构10PG/仓储14PG、API0.18/84HTTP、查询/编辑页面及reader47/writer22实际HTTP通过，DOM/生效仍待|正式配置定义/客户真实性/发布生效；审计外部可信锚、留存与导出|
-|质量边界|最近Java根726=713执行含212PG+13历史fixture跳过，6MinIO明确排除；Web418/类型构建及契约35通过|不将CI、纯测试或实际客户端请求当作浏览器及完整合同验收|
+|环境与恢复|源码09b5854/tree完整恢复；新PG17.11/KC26.2.4/API0.28，V1–V16原字节显式初始化；6新OIDC和34HTTP；旧Windows原服务器V15证据单列|旧临时数据库未恢复；原服务器新入口/私有连接、OSS、生产部署与完整灾备|
+|工单与工时|本人实填/历史、评论/内部备注、手工登记/独立人工恢复均有PG/API/实际模块切片；17个既有写路径原unknown重试保护已补并分别留证|正式工单状态/岗位资格/SLA/客户确认/通知、团队工时与成本；外部ITSM不是一期建单前提|
+|资产资料|基础资料/筛选/日期对照/维保开始与供应商、查询与原请求回读均有真实证据；Windows所列移动导入/维保控件和13截图历史保留|新补丁真实存储、原生移动/完整浏览器、CMDB/监控和真实导入门禁|
+|配置与审计|草稿/内部提案/诊断/日历/能力目录23项与审计查询有证；配置原请求重试4xx保护已修复|正式客户核验/发布生效、岗位矩阵、外部可信审计锚及导出|
+|容量|8输入9输出/Proxy、不可变方案PG/API/原键恢复/保存回读面板、2–20明确主机数增长对照；API71、状态机19、增长39HTTP为各自批次|新页面实际浏览器/图形、原服务器V16、真实基准和12,500NVPS24h/2倍峰值30min PoC|
+|最新质量|新实例根1036=1023执行含322真实PG+13历史跳过，6MinIO排除；Web643/55契约/构建/Python79|不将纯测试、CI、自定义Vue renderer或模块HTTP冒充浏览器或完整合同验收|
+
+详见[工作区恢复与新组件](evidence/niko-rebuilt-components-20261003.json)、[阻塞清单](current-development-blockers.md)。
 
 ## 2026-10-01历史交接基线（保留原环境事实）
 
@@ -837,3 +840,16 @@ M10-7现有计算/保存/读取/增长代码切片已补齐，原服务器V16、
 
 原niko源码/工具链及QA15927不可访问，exec返回executor key changed；最新002a89d/CI37125698984 success已保留远端。新增同一private仓库的短期HEAD源码恢复归档：8项隔离测试校验只含普通tracked文件、排除private/生成物/历史、逐blob清单、archive SHA256和tree、拒绝覆盖/符号链接/超限。恢复尚待实际CI产物/下载校验，不当已恢复或新组件验收，见[B09](current-development-blockers.md)。
 
+
+
+## 2026-10-03 工作区丢失后的源码恢复与新组件基线
+
+13:23 executor切换后，原MOP工作区/工具链/测试进程不可访问。通过同private仓库短期CI artifact恢复993个tracked文件，逐blob/整tree/原commit09b5854完全相符；Git仅恢复shallow HEAD，不带历史私有配置/未跟踪文件。13张旧截图全部原hash恢复，B08物化限制解除；仅查看其中3张历史移动截图，不等于新容量页面或实时浏览器验收。恢复导出新增原HEAD commit bytes并校验SHA，避免GitAPI日期丢失原+0800头信息；仍不导出祖先历史或秘密路径。
+
+用户13:40明确批准重新建立PG/Keycloak隔离测试账号/随机凭据。新增窄范围prepare-private.py --create-approved-database-identity-credentials，只创建PG/Keycloak/OIDC6类凭据和6个测试用户，不创建MinIO/照片/导入签名凭据，不覆盖既有配置；2新增保护测试。凭据只在.local/niko-test/private，未进Git/提示/公共日志。
+
+官方Node22.22.1/Maven3.9.9/Temurin17.0.20.1+1校验和恢复；PostgreSQL17.11官方Debian签名索引+3deb SHA256核验后仅解包工作区，Keycloak26.2.4官方发行SHA1核验。新PG/SCRAM/migrator-runtime分离、KC独立PG库/S256 PKCE/禁应用password grant，均回环；不是旧数据库备份恢复或原指定服务器操作。新库V1–V4显式执行4，V5–V16各独立执行1且立即重复0，最终只读check0；原SQL字节不改。API/Worker没有自动迁移。
+
+新实例真实PG完整根1036=1023执行（322真实PG）+13历史fixture跳过，6MinIO排除；Web643/55契约/类型构建/Python79通过。另冷启动纯Java1042=701执行+341跳过（322PG+13历史+6存储），不和真实批次叠加。正常启动拥有的固定API JAR并验证回环监听，6个新OIDC授权码登录、34真实HTTP核对读写/原键重放/23能力/跨租户404/只读审计尾不变；4条合成业务记录不是旧数据。存储显式关闭，上传组件重测仍NOT_RUN。
+
+[源码恢复](evidence/niko-workspace-recovery-20261003.json)、[截图物化](evidence/niko-repository-binary-materialization-recovered-20261003.json)、[新组件](evidence/niko-rebuilt-components-20261003.json)、[新HTTP](evidence/niko-rebuilt-environment-http-20261003.json)。B09源码与新PG/OIDC/API可用性已解决，但旧临时数据库未恢复；B01原服务器入口/私有连接、B02 OSS、B03新环境浏览器验收、客户口径/监控组件仍分别保留，继续独立开发。

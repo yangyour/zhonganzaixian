@@ -1,0 +1,198 @@
+{
+  "verified_at": "2026-10-03T14:03:10.424Z",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "passed": true,
+  "contract_version": "0.28.0",
+  "http_requests": 34,
+  "checks": [
+    {
+      "name": "new_oidc_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "new_oidc_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "new_oidc_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "new_oidc_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "new_oidc_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "new_oidc_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "actual_new_dependencies_ready",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "current_23_capabilities",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "scoped_assets_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "scoped_assets_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "scoped_assets_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "scoped_assets_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "scoped_assets_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "scoped_assets_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "new_report_registration",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "original_report_replay",
+      "status": 202,
+      "contract_valid": true
+    },
+    {
+      "name": "new_registration_operation",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "new_report_read",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "foreign_report404",
+      "status": 404,
+      "contract_valid": true
+    },
+    {
+      "name": "new_worklog",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "new_worklog_original_replay",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "no_admin_worklog_override",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "new_capacity_draft",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "new_capacity_original_replay",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "other_admin_same_tenant_read",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "msp_capacity_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "registry_before",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "new_config_draft",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "new_config_original_replay",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "registry_after",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_before_readonly",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_capacity_list",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "readonly_worklog_list",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_after_readonly",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "new_oidc_identities_verified": 6,
+  "capability_count": 23,
+  "new_synthetic_records": {
+    "report": 1,
+    "worklog": 1,
+    "capacity_draft": 1,
+    "configuration_proposal": 1
+  },
+  "original_replays": 4,
+  "cross_tenant404": true,
+  "readonly_audit_tail_unchanged": true,
+  "storage_enabled": false,
+  "storage_integration_executed": false,
+  "old_database_restored": false,
+  "original_server_changed": false,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "all_128_done": false
+}

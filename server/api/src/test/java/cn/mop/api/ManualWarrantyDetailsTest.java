@@ -1,0 +1,17 @@
+package cn.mop.api;
+import cn.mop.domain.DomainException;
+import cn.mop.domain.assetmetadata.ManualWarrantyDetails;
+import org.junit.jupiter.api.Test;
+import java.time.LocalDate;
+import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
+class ManualWarrantyDetailsTest {
+    @Test void explicitUnknownsRemainNullAndAreNotAbsentWrapper(){var details=new ManualWarrantyDetails(null,null);assertNotNull(details);assertNull(details.warrantyStart());assertNull(details.warrantySupplier());assertFalse(details.coverageVerified());assertEquals("SELF_REPORTED",details.verificationStatus());}
+    @Test void supplierOriginalUnicodeAndBoundarySpacesArePreserved(){String supplier="  明确合成供应商😀  ";assertEquals(supplier,new ManualWarrantyDetails(LocalDate.of(2024,2,29),supplier).warrantySupplier());assertEquals("😀".repeat(200),new ManualWarrantyDetails(null,"😀".repeat(200)).warrantySupplier());assertThrows(DomainException.class,()->new ManualWarrantyDetails(null,"😀".repeat(201)));}
+    @Test void blankControlAndMalformedUnicodeSuppliersRejected(){for(String text:List.of(""," \ufeff\u3000","x\n","x\t","x\u0085","x\ud800"))assertThrows(DomainException.class,()->new ManualWarrantyDetails(null,text));}
+    @Test void explicitDateRangeIsBoundedWithoutDefaultCurrentDate(){assertEquals(LocalDate.of(1,1,1),new ManualWarrantyDetails(LocalDate.of(1,1,1),null).warrantyStart());assertEquals(LocalDate.of(9999,12,31),new ManualWarrantyDetails(LocalDate.of(9999,12,31),null).warrantyStart());assertThrows(DomainException.class,()->new ManualWarrantyDetails(LocalDate.of(0,1,1),null));assertThrows(DomainException.class,()->new ManualWarrantyDetails(LocalDate.of(10000,1,1),null));}
+    @Test void startAndExpiryCompareOnlyWhenBothKnownAndAllowSameDay(){var details=new ManualWarrantyDetails(LocalDate.of(2026,10,3),"合成供应商");assertDoesNotThrow(()->details.validateAgainstExpiry(null));assertDoesNotThrow(()->details.validateAgainstExpiry(LocalDate.of(2026,10,3)));assertDoesNotThrow(()->details.validateAgainstExpiry(LocalDate.of(2027,10,3)));assertThrows(DomainException.class,()->details.validateAgainstExpiry(LocalDate.of(2026,10,2)));assertDoesNotThrow(()->new ManualWarrantyDetails(null,"合成供应商").validateAgainstExpiry(LocalDate.of(2020,1,1)));}
+    @Test void legacyRequestPreservesPreviouslyRecordedFieldsAndOriginalAbsence(){var current=new ManualWarrantyDetails(LocalDate.of(2026,10,3),"原供应商");assertSame(current,ManualWarrantyDetails.forUpdate(current,null,false));assertNull(ManualWarrantyDetails.forUpdate(null,null,false));assertEquals("原供应商",current.warrantySupplier());}
+    @Test void explicitClearAndReplacementNeverMutateOldSnapshot(){var current=new ManualWarrantyDetails(LocalDate.of(2026,10,3),"原供应商");var clear=new ManualWarrantyDetails(null,null);assertSame(clear,ManualWarrantyDetails.forUpdate(current,clear,true));var replacement=new ManualWarrantyDetails(LocalDate.of(2026,11,1),"新供应商");assertSame(replacement,ManualWarrantyDetails.forUpdate(current,replacement,true));assertEquals("原供应商",current.warrantySupplier());}
+    @Test void ambiguousProvidedFlagsAndInvalidComparisonDateFailClosed(){var details=new ManualWarrantyDetails(null,null);assertThrows(DomainException.class,()->ManualWarrantyDetails.forUpdate(details,null,true));assertThrows(DomainException.class,()->ManualWarrantyDetails.forUpdate(details,details,false));assertThrows(DomainException.class,()->details.validateAgainstExpiry(LocalDate.of(0,1,1)));}
+}

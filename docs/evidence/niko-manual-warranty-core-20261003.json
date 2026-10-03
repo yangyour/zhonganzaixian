@@ -1,0 +1,25 @@
+{
+  "verified_at": "2026-10-03T09:10:23.724617+00:00",
+  "status": "PURE_SUPPLEMENTAL_WARRANTY_RULES_ONLY",
+  "tests": {
+    "new_pure_rules": 8,
+    "root_reported": 924,
+    "root_executed": 911,
+    "existing_real_pg_integration": 273,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 49
+  },
+  "explicit_nullable_start_and_supplier": true,
+  "supplier_code_point_limit": 200,
+  "known_start_not_after_known_expiry": true,
+  "missing_wrapper_distinct_from_explicit_null_fields": true,
+  "legacy_omission_preserves_current_in_pure_function": true,
+  "runtime_legacy_compatibility_verified": false,
+  "new_schema_or_api": false,
+  "new_ui": false,
+  "coverage_verified": false,
+  "migrations_executed": 0,
+  "all_128_done": false,
+  "credentials_output": false
+}

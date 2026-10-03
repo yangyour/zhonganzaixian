@@ -1,0 +1,30 @@
+{
+  "verified_at": "2026-10-03T08:36:45.015Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual capabilityCatalogReader + ApiClient + SHA256 verification",
+  "http_requests": 12,
+  "reader_get_requests": 6,
+  "writes": 0,
+  "setup_business_mutations": 0,
+  "entry_count": 20,
+  "declaration_hash_validated": true,
+  "repeat_hash_stable": true,
+  "late_permission_and_dispose_responses_discarded": true,
+  "double_click_suppressed": true,
+  "lost_response_clears_printable_catalog": true,
+  "forged_local_admin_role_server_denied_403": true,
+  "actual_session_capabilities_and_version_unchanged": true,
+  "readonly_audit_tail_unchanged": true,
+  "effective_customer_matrix": null,
+  "resource_access_decision": null,
+  "production_authority_verified": false,
+  "printed": false,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "Actual review table/mobile/print DOM B03",
+    "Q09 both-party signed matrix and real assignments",
+    "Dynamic configuration-driven roles"
+  ]
+}

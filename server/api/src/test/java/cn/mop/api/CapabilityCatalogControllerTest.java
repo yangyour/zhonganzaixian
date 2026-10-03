@@ -1,0 +1,21 @@
+package cn.mop.api;
+import cn.mop.domain.*;
+import org.junit.jupiter.api.*;
+import org.springframework.mock.web.MockHttpServletRequest;
+import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+class CapabilityCatalogControllerTest {
+    static final String ACTOR="62000000-0000-4000-8000-000000000001",TENANT="62000000-0000-4000-8000-000000000011";PlatformRepository platform;CapabilityCatalogController controller;
+    @BeforeEach void setup(){platform=mock(PlatformRepository.class);controller=new CapabilityCatalogController(platform);when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"padmin",7,true)));}
+    MockHttpServletRequest request(){var r=new MockHttpServletRequest("GET","/api/v1/authorization/capability-catalog");r.setUserPrincipal(()->ACTOR);r.getSession().setAttribute("mop.tenant_id",TENANT);r.setAttribute("mop.trace_id","synthetic-trace");return r;}
+    Map<?,?> data(MockHttpServletRequest r){return (Map<?,?>)((Map<?,?>)controller.get(r)).get("data");}
+    @Test void catalogIsReadonlyCurrentCodeNotASignedMatrix(){var r=data(request());assertEquals(TENANT,r.get("tenant_id"));assertEquals("STATIC_CODE_CAPABILITIES",r.get("source"));assertEquals("DECLARED_CAPABILITIES_ONLY",r.get("coverage"));assertEquals(false,r.get("configuration_driven_authorization"));assertEquals(false,r.get("production_authority_verified"));assertEquals(true,r.get("resource_authorization_required"));for(String key:List.of("effective_customer_matrix","resource_access_decision","customer_signature","supplier_signature"))assertNull(r.get(key));assertEquals("CONFIG_PENDING",r.get("configuration_status"));assertEquals("UNVERIFIED",r.get("customer_approval_status"));assertEquals(false,r.get("subject_bindings_included"));}
+    @Test void noRoleGrantConfigurationOrResourceWriteIsCalled(){var r=data(request());assertEquals(Map.of("role_created",false,"permissions_changed",false,"configuration_published",false),r.get("actions_this_request"));verify(platform).membership(ACTOR,TENANT);verifyNoMoreInteractions(platform);}
+    @Test void customerEngineerAndUnknownCannotReadAdministratorReview(){for(String role:List.of("viewer","tadmin","msp","unknown")){when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,role,7,true)));assertEquals(403,assertThrows(DomainException.class,()->data(request())).status);}}
+    @Test void inactiveMissingOrInvalidMembershipFailsClosed(){when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.empty());assertEquals(401,assertThrows(DomainException.class,()->data(request())).status);when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"padmin",7,false)));assertEquals(401,assertThrows(DomainException.class,()->data(request())).status);when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"padmin",0,true)));assertEquals(401,assertThrows(DomainException.class,()->data(request())).status);}
+    @Test void authenticationAndTenantAreNotTakenFromHeaders(){var anonymous=request();anonymous.setUserPrincipal(null);assertEquals(401,assertThrows(DomainException.class,()->data(anonymous)).status);var wrong=request();wrong.getSession().setAttribute("mop.tenant_id",5);assertEquals(401,assertThrows(DomainException.class,()->data(wrong)).status);var valid=request();valid.addHeader("X-Tenant-ID","forged");assertEquals(TENANT,data(valid).get("tenant_id"));}
+    @Test void allQueryOverridesRejected(){for(String key:List.of("role","tenant_id","effective","approved","capabilities")){var r=request();r.addParameter(key,"forged");assertEquals(400,assertThrows(DomainException.class,()->data(r)).status);}}
+    @Test void catalogCarriesEveryRoleAndDimensionButNoSubjectBindings(){var r=data(request());assertEquals(4,((List<?>)r.get("roles")).size());assertEquals(5,((List<?>)r.get("dimensions")).size());assertEquals(((List<?>)r.get("entries")).size(),r.get("entry_count"));assertEquals("CODE_DECLARATIONS_NOT_TENANT_ASSIGNMENTS",r.get("scope"));assertEquals("auth.role_matrix_and_assignments",r.get("configuration_key"));}
+    @Test void repeatedReadsHaveStableContentWithoutAcceptingConfig(){assertEquals(data(request()),data(request()));assertEquals("NOT_IMPLEMENTED",data(request()).get("dynamic_roles_status"));}
+}

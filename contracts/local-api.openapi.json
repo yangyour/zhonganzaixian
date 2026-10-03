@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.24.0",
+    "version": "0.25.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -7303,6 +7303,150 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ManualIncidentResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/authorization/capability-catalog": {
+      "get": {
+        "operationId": "readTechnicalCapabilityCatalog",
+        "summary": "平台管理员只读核对代码能力声明，不是已签权限矩阵",
+        "x-mop-read-only": true,
+        "x-mop-capability": "configurations:read",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "description": "当前启用padmin及权限版本；拒绝全部query。按合同四角色/五资源维度整理Capabilities代码声明，true/false仅表示代码目录是否声明，不是具体对象访问决定。无实际人员绑定、签字或客户批准；配置驱动/新角色运行未实现，effective_customer_matrix=null。不得使用本目录代替后端资源授权；不创建角色、不改权限、不发布配置。",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CapabilityCatalogResult"
                 }
               }
             }
@@ -15331,6 +15475,484 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/ManualIncidentPage"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "CapabilityCatalogEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z_]+:[a-z_]+$",
+            "maxLength": 100
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "dimension_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 5,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "ASSETS_METRICS",
+                "ALERTS_TICKETS",
+                "TEMPLATES_AUTOMATION",
+                "PLATFORM_ADMIN",
+                "MEMBER_ADMIN"
+              ]
+            }
+          },
+          "declared_by_role": {
+            "type": "object",
+            "properties": {
+              "viewer": {
+                "type": "boolean"
+              },
+              "tadmin": {
+                "type": "boolean"
+              },
+              "msp": {
+                "type": "boolean"
+              },
+              "padmin": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "viewer",
+              "tadmin",
+              "msp",
+              "padmin"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "dimension_ids",
+          "declared_by_role"
+        ],
+        "additionalProperties": false
+      },
+      "CapabilityCatalog": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scope": {
+            "const": "CODE_DECLARATIONS_NOT_TENANT_ASSIGNMENTS"
+          },
+          "catalog_version": {
+            "const": "mop-capability-declarations-v1"
+          },
+          "source": {
+            "const": "STATIC_CODE_CAPABILITIES"
+          },
+          "declaration_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "仅版本前缀、固定角色顺序、排序能力ID/维度/四位声明向量的UTF8 SHA256；不是客户签字或授权令牌"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "prefixItems": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "viewer"
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                },
+                "required": [
+                  "id",
+                  "label"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "tadmin"
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                },
+                "required": [
+                  "id",
+                  "label"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "msp"
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                },
+                "required": [
+                  "id",
+                  "label"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "padmin"
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                },
+                "required": [
+                  "id",
+                  "label"
+                ],
+                "additionalProperties": false
+              }
+            ],
+            "items": false
+          },
+          "dimensions": {
+            "type": "array",
+            "minItems": 5,
+            "maxItems": 5,
+            "prefixItems": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "ASSETS_METRICS"
+                  },
+                  "label": {
+                    "const": "资产与指标"
+                  },
+                  "capability_ids": {
+                    "type": "array",
+                    "maxItems": 256,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z_]+:[a-z_]+$",
+                      "maxLength": 100
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "label",
+                  "capability_ids"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "ALERTS_TICKETS"
+                  },
+                  "label": {
+                    "const": "告警与工单"
+                  },
+                  "capability_ids": {
+                    "type": "array",
+                    "maxItems": 256,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z_]+:[a-z_]+$",
+                      "maxLength": 100
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "label",
+                  "capability_ids"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "TEMPLATES_AUTOMATION"
+                  },
+                  "label": {
+                    "const": "模板与自动化"
+                  },
+                  "capability_ids": {
+                    "type": "array",
+                    "maxItems": 256,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z_]+:[a-z_]+$",
+                      "maxLength": 100
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "label",
+                  "capability_ids"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "PLATFORM_ADMIN"
+                  },
+                  "label": {
+                    "const": "平台管理"
+                  },
+                  "capability_ids": {
+                    "type": "array",
+                    "maxItems": 256,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z_]+:[a-z_]+$",
+                      "maxLength": 100
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "label",
+                  "capability_ids"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "MEMBER_ADMIN"
+                  },
+                  "label": {
+                    "const": "成员管理"
+                  },
+                  "capability_ids": {
+                    "type": "array",
+                    "maxItems": 256,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z_]+:[a-z_]+$",
+                      "maxLength": 100
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "label",
+                  "capability_ids"
+                ],
+                "additionalProperties": false
+              }
+            ],
+            "items": false
+          },
+          "entries": {
+            "type": "array",
+            "maxItems": 256,
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-z_]+:[a-z_]+$",
+                  "maxLength": 100
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "dimension_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 5,
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "ASSETS_METRICS",
+                      "ALERTS_TICKETS",
+                      "TEMPLATES_AUTOMATION",
+                      "PLATFORM_ADMIN",
+                      "MEMBER_ADMIN"
+                    ]
+                  }
+                },
+                "declared_by_role": {
+                  "type": "object",
+                  "properties": {
+                    "viewer": {
+                      "type": "boolean"
+                    },
+                    "tadmin": {
+                      "type": "boolean"
+                    },
+                    "msp": {
+                      "type": "boolean"
+                    },
+                    "padmin": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "viewer",
+                    "tadmin",
+                    "msp",
+                    "padmin"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "id",
+                "label",
+                "dimension_ids",
+                "declared_by_role"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "coverage": {
+            "const": "DECLARED_CAPABILITIES_ONLY"
+          },
+          "entry_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 256
+          },
+          "resource_authorization_required": {
+            "const": true
+          },
+          "resource_access_decision": {
+            "type": "null"
+          },
+          "configuration_driven_authorization": {
+            "const": false
+          },
+          "dynamic_roles_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "effective_customer_matrix": {
+            "type": "null"
+          },
+          "customer_approval_status": {
+            "const": "UNVERIFIED"
+          },
+          "customer_signature": {
+            "type": "null"
+          },
+          "supplier_signature": {
+            "type": "null"
+          },
+          "subject_bindings_included": {
+            "const": false
+          },
+          "production_authority_verified": {
+            "const": false
+          },
+          "configuration_key": {
+            "const": "auth.role_matrix_and_assignments"
+          },
+          "configuration_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "actions_this_request": {
+            "type": "object",
+            "properties": {
+              "role_created": {
+                "const": false
+              },
+              "permissions_changed": {
+                "const": false
+              },
+              "configuration_published": {
+                "const": false
+              }
+            },
+            "required": [
+              "role_created",
+              "permissions_changed",
+              "configuration_published"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "tenant_id",
+          "scope",
+          "catalog_version",
+          "source",
+          "declaration_hash",
+          "roles",
+          "dimensions",
+          "entries",
+          "coverage",
+          "entry_count",
+          "resource_authorization_required",
+          "resource_access_decision",
+          "configuration_driven_authorization",
+          "dynamic_roles_status",
+          "effective_customer_matrix",
+          "customer_approval_status",
+          "customer_signature",
+          "supplier_signature",
+          "subject_bindings_included",
+          "production_authority_verified",
+          "configuration_key",
+          "configuration_status",
+          "actions_this_request"
+        ],
+        "additionalProperties": false
+      },
+      "CapabilityCatalogResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CapabilityCatalog"
           },
           "trace_id": {
             "type": "string"

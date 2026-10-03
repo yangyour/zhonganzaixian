@@ -1,0 +1,166 @@
+{
+  "verified_at": "2026-10-03T08:30:52.845Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "contract_version": "0.25.0",
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "read_admin_catalog",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_before_reads",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "second_admin_catalog",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "repeat_stable_hash",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_after_reads",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "nonadmin_denied_msp",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "nonadmin_denied_viewerA",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "nonadmin_denied_viewerB",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "nonadmin_denied_tadmin",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_denied",
+      "status": 401,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_role",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_tenant_id",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_approved",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_effective",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_rejected_capabilities",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "http_requests": 27,
+  "actual_current_membership_authorized": true,
+  "four_roles_match_six_actual_sessions": true,
+  "contract_five_resource_dimensions": true,
+  "entry_count": 20,
+  "declaration_hash_recomputed": true,
+  "dimension_membership_crosschecked": true,
+  "role_or_permission_mutations": 0,
+  "setup_business_mutations": 0,
+  "six_sessions_capabilities_and_versions_unchanged": true,
+  "readonly_audit_tail_unchanged": true,
+  "resource_access_decision": null,
+  "effective_customer_matrix": null,
+  "customer_or_supplier_signature": null,
+  "configuration_driven_authorization": false,
+  "production_authority_verified": false,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "Administrator review/print page and browser DOM B03",
+    "Q09 signed matrix and real assignments",
+    "Config-driven role activation and new-role combinations"
+  ]
+}

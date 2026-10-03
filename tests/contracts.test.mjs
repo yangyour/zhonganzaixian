@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.24.0');
+  assert.equal(contract.info.version, '0.25.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -567,4 +567,16 @@ test('分组搜索最小DTO不允许IP、联系人、正文或内部身份字段
   for (const key of ['management_ip', 'contact_name', 'contact_phone', 'description', 'reporter_id', 'history', 'attachments']) { assert.equal(validates('SearchAssetHit', { ...asset, [key]: 'private' }), false); assert.equal(validates('SearchTicketHit', { ...ticket, [key]: 'private' }), false); }
   assert.equal(validates('SearchTicketHit', { ...ticket, registration_status: 'CLOSED' }), false);
   const route = contract.paths['/search'].get; assert.deepEqual(route.parameters.map(p => p.name), ['q']); assert.equal(route.parameters[0].required, true); assert.equal(route['x-mop-read-only'], true);
+});
+test('代码能力目录必须四角色五资源维度，不是签字或生效授权矩阵', () => {
+  const schema = contract.components.schemas.CapabilityCatalog;
+  assert.deepEqual(schema.properties.roles.prefixItems.map(v => v.properties.id.const), ['viewer', 'tadmin', 'msp', 'padmin']);
+  assert.deepEqual(schema.properties.dimensions.prefixItems.map(v => v.properties.label.const), ['资产与指标', '告警与工单', '模板与自动化', '平台管理', '成员管理']);
+  for (const key of ['effective_customer_matrix', 'customer_signature', 'supplier_signature', 'resource_access_decision']) assert.equal(schema.properties[key].type, 'null');
+  assert.equal(schema.properties.configuration_driven_authorization.const, false); assert.equal(schema.properties.production_authority_verified.const, false); assert.equal(schema.properties.resource_authorization_required.const, true); assert.equal(schema.properties.subject_bindings_included.const, false);
+  const route = contract.paths['/authorization/capability-catalog']; assert.deepEqual(Object.keys(route), ['get']); assert.equal(route.get['x-mop-read-only'], true); assert.deepEqual(route.get['x-mop-roles'], ['padmin']);
+});
+test('能力声明行仅含声明向量，拒绝新增角色、授权结论和未知维度', () => {
+  const entry = { id: 'search:read', label: '分组搜索', dimension_ids: ['ASSETS_METRICS', 'ALERTS_TICKETS'], declared_by_role: { viewer: true, tadmin: true, msp: true, padmin: true } }; assert.equal(validates('CapabilityCatalogEntry', entry), true);
+  for (const patch of [{ permitted: true }, { dimension_ids: ['MENU'] }, { dimension_ids: ['ASSETS_METRICS', 'ASSETS_METRICS'] }, { declared_by_role: { ...entry.declared_by_role, super_admin: true } }, { declared_by_role: { ...entry.declared_by_role, viewer: null } }]) assert.equal(validates('CapabilityCatalogEntry', { ...entry, ...patch }), false);
 });

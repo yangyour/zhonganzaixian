@@ -1,24 +1,29 @@
 <script setup lang="ts">
-import { computed, onUnmounted, shallowRef, watch } from 'vue'
+import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { api } from '../api/client'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createManualIncidentReader, emptyManualIncidentReadState, type ManualIncidentReadState } from '../utils/manualIncidentReader'
 import { displayTime } from '../utils/display'
+import ManualIncidentEditor from '../components/ManualIncidentEditor.vue'
+import type { ManualIncidentEntry } from '../utils/manualIncidentReader'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 const state = shallowRef<ManualIncidentReadState>(emptyManualIncidentReadState())
 const reader = createManualIncidentReader(api, value => { state.value = value })
+const editorOpen = ref(false), editor = ref<InstanceType<typeof ManualIncidentEditor> | null>(null)
+async function afterSaved(value: ManualIncidentEntry) { if (permitted.value && await reader.list()) await reader.select(value.id) }
 const permitted = computed(() => Boolean(session.value && ['msp', 'padmin'].includes(session.value.user.role) && can('manual_incidents:read') && !switchingTenant.value))
 const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, permitted.value]))
 watch(contextKey, () => { const current = session.value; reader.reset(permitted.value && current ? { tenantId: current.tenant.id, actorId: current.user.id, permissionVersion: current.permission_version } : null); if (permitted.value) void reader.list() }, { immediate: true, flush: 'sync' })
 onUnmounted(reader.dispose)
 </script>
 <template>
+  <ManualIncidentEditor ref="editor" v-model="editorOpen" @saved="afterSaved" />
   <section class="manual-incidents-page">
     <header><h1>手工来源事件登记</h1><p>电话、现场等外部来源的明确登记事实 · 当前授权租户内部可见</p></header>
     <el-alert type="warning" :closable="false" show-icon title="仅完成登记，内容为自述、未经独立核验。监控正常不会让手工记录自动恢复；正式处置、工单关联和SLA尚未完成。" />
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前读取权限不可用，原范围数据已清除" />
     <template v-else>
-      <div class="manual-actions"><el-button :loading="state.busy" @click="reader.list()">刷新第一页（只读）</el-button><el-button :disabled="state.busy || !state.page?.has_more" @click="reader.list(true)">下一页</el-button><span>{{ state.paged ? '后续页' : '第一页' }} · 每页15条 · 翻页按各次读取快照</span></div>
+      <div class="manual-actions"><el-button v-if="can('manual_incidents:write')" :disabled="state.busy" type="primary" @click="editor?.prepare()">新建手工登记</el-button><el-button :loading="state.busy" @click="reader.list()">刷新第一页（只读）</el-button><el-button :disabled="state.busy || !state.page?.has_more" @click="reader.list(true)">下一页</el-button><span>{{ state.paged ? '后续页' : '第一页' }} · 每页15条 · 翻页按各次读取快照</span></div>
       <ApiErrorNotice :error="state.error" />
       <p v-if="!state.page" class="field-help">列表尚未成功读取，不能据此认定没有事件</p>
       <el-empty v-else-if="!state.page.items.length" description="本页没有手工登记" />

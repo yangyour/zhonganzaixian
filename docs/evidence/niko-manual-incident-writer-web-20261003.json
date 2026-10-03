@@ -1,0 +1,40 @@
+{
+  "verified_at": "2026-10-03T05:03:14.038521+00:00",
+  "status": "REGISTRATION_FORM_CODE_AND_REAL_CLIENT_HTTP_VERIFIED",
+  "environment": "niko-local-test",
+  "new_unit_tests": 20,
+  "web_tests": 453,
+  "typecheck_and_build": true,
+  "contract_tests": 37,
+  "api_version_unchanged": "0.19.0",
+  "actual_client_evidence": "niko-manual-incident-writer-http-final-20261003.json",
+  "earlier_independent_pass_retained": "niko-manual-incident-writer-http-20261003.json",
+  "http_final_requests": 38,
+  "http_final_post_attempts": 5,
+  "http_final_logical_registrations": 3,
+  "http_final_success_audits": 3,
+  "asset_picker": "Current tenant bounded real asset search, then fresh detail read before selecting version",
+  "request_recovery": [
+    "Frozen title/severity/asset/version/idempotency key",
+    "Unknown result blocks replacement, alternate target or changed-body submit",
+    "Readonly asset refresh does not rebase or resend",
+    "Known newer baseline locally blocks new stale submit",
+    "Actual 409 requires explicit recheck and adoption",
+    "Adoption bound to exact asset ID/name/version shown in confirmation",
+    "Accepted receipt retained even when followup GET is lost",
+    "Double submit and busy retry blocked"
+  ],
+  "navigation_wiring": [
+    "Drawer hide retains current editor state",
+    "Route and voluntary tenant/logout guards block unresolved request",
+    "Unsent edits require explicit discard confirmation",
+    "beforeunload warns; forced invalid session still clears protected data"
+  ],
+  "guard_dom_tested": false,
+  "browser_dom_tested": false,
+  "manual_recovery_implemented": false,
+  "formal_ticket_created": false,
+  "credentials_output": false,
+  "frozen_migrations_unchanged": "V1-V13",
+  "full_contract_done": false
+}

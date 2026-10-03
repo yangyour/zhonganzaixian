@@ -1,0 +1,29 @@
+{
+  "verified_at": "2026-10-03T05:02:09.686Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual manualIncidentWriter + ApiClient",
+  "http_requests": 38,
+  "writer_requests": 20,
+  "frontend_post_attempts": 5,
+  "logical_registrations": 3,
+  "matching_registration_success_audits": 3,
+  "independent_setup_mutations": 4,
+  "synthetic_asset_final_version": 4,
+  "original_body_key_asset_version_preserved": true,
+  "read_refresh_did_not_rebase_or_write": true,
+  "known_newer_baseline_blocked_locally": true,
+  "actual_409_required_explicit_adoption": true,
+  "double_submit_and_busy_retry_blocked": true,
+  "accepted_receipt_survived_followup_get_failure": true,
+  "customer_write_403": true,
+  "asset_unchanged_by_registration": true,
+  "readonly_audit_tail_unchanged": true,
+  "credentials_output": false,
+  "browser_dom_tested": false,
+  "fault_injection": "Discard one successful POST response, discard one later GET response, hold another completed POST to exercise double-submit guards; not physical network/server failure",
+  "remaining": [
+    "DOM/390px and actual drawer navigation B03",
+    "Human recovery, formal disposition, event-to-ticket and SLA workflow"
+  ]
+}

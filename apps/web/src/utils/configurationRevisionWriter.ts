@@ -30,7 +30,7 @@ export function createConfigurationRevisionWriter(client: Pick<ApiClient, 'reque
   const emit = () => changed({ ...state }), unresolved = () => state.busy || state.attempt?.state === 'uncertain'
   function reset(next: RevisionWriteContext | null) { controller?.abort(); ++epoch; const valid = next && uuid.test(next.actorId) && uuid.test(next.tenantId) && version(next.permissionVersion) && /^[A-Za-z0-9_.:-]{1,160}$/.test(next.configurationKey); scope = valid ? { ...next! } : null; state = emptyRevisionWriteState(); if (next && !valid) state.error = invalid(); emit() }
   function prepare() { if (!scope || unresolved()) return false; state = emptyRevisionWriteState(); emit(); return true }
-  async function send(attempt: Attempt) {
+  async function send(attempt: Attempt, retry = false) {
     if (!scope || state.busy) return false
     const context = { ...scope }, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort; state = { ...state, busy: true, error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
     try {
@@ -39,7 +39,7 @@ export function createConfigurationRevisionWriter(client: Pick<ApiClient, 'reque
       if (attempt.action === 'create') { if (result.version !== 1 || result.workflow_status !== 'DRAFT' || result.created_by !== context.actorId || canonical(result.proposed_value) !== canonical(body.proposed_value) || result.reason !== body.reason || canonical(result.evidence_refs) !== canonical(body.evidence_refs)) throw bad() }
       else { const expected = attempt.action === 'submit' ? 'IN_REVIEW' : attempt.action === 'withdraw' ? 'WITHDRAWN' : body.decision === 'approve' ? 'APPROVED' : 'REJECTED'; const last = result.history.at(-1)!; if (!baseline || result.id !== baseline.id || result.version !== baseline.version + 1 || result.workflow_status !== expected || result.created_by !== baseline.created_by || result.created_at !== baseline.created_at || canonical(result.proposed_value) !== canonical(baseline.proposed_value) || result.reason !== baseline.reason || canonical(result.evidence_refs) !== canonical(baseline.evidence_refs) || canonical(result.history.slice(0, -1)) !== canonical(baseline.history) || last.actor_id !== context.actorId || last.comment !== (attempt.action === 'submit' ? null : attempt.action === 'withdraw' ? body.reason : body.comment)) throw bad() }
       state = { ...state, busy: false, receipt: result, attempt: { ...attempt, state: 'accepted' } }; return true
-    } catch (error) { if (turn !== epoch) return false; const uncertain = isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_'); state = { ...state, error, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } }; return false }
+    } catch (error) { if (turn !== epoch) return false; const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_'); state = { ...state, error, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } }; return false }
     finally { if (turn === epoch) { state = { ...state, busy: false }; emit() } }
   }
   async function submit(action: Action, baseline: ConfigurationRevision | null, body: ConfigurationRevisionDraft | Record<string, unknown>) {
@@ -49,5 +49,5 @@ export function createConfigurationRevisionWriter(client: Pick<ApiClient, 'reque
     else { if (!target || target.version >= Number.MAX_SAFE_INTEGER || payload.expected_version !== target.version) throw invalid(); const own = target.created_by === scope.actorId; if (action === 'submit' ? !own || target.workflow_status !== 'DRAFT' || !exact(payload, ['expected_version']) : action === 'withdraw' ? !own || !['DRAFT', 'IN_REVIEW'].includes(target.workflow_status) || !exact(payload, ['expected_version', 'reason']) || typeof payload.reason !== 'string' || !payload.reason.trim() : action !== 'review' || own || target.workflow_status !== 'IN_REVIEW' || !exact(payload, ['expected_version', 'decision', 'comment']) || !['approve', 'reject'].includes(String(payload.decision)) || typeof payload.comment !== 'string' || !payload.comment.trim()) throw invalid() }
     return send({ action, baseline: target, path: action === 'create' ? '/configurations/' + encodeURIComponent(scope.configurationKey) + '/revisions' : '/configuration-revisions/' + target!.id + '/' + action, key: newKey(), payload: JSON.stringify(payload), state: 'uncertain' })
   }
-  emit(); return { reset, prepare, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt) : Promise.resolve(false), unresolved, state: () => state, dispose: () => reset(null) }
+  emit(); return { reset, prepare, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => state, dispose: () => reset(null) }
 }

@@ -66,3 +66,5 @@ describe('metadata request state', () => {
   })
 
 })
+
+it('retains prior uncertainty when original retry is denied with any definite4xx', async () => { for(const status of [400,403,404,409,422]) { let writes=0;const h=harness((url,o)=>{if(o?.method){if(++writes===1)throw new TypeError('lost');throw new ApiError(status,'RETRY_DENIED','synthetic','trace')}return reads(url)});await h.workspace.refresh();expect(await h.workspace.submit(input(), 1)).toBe(false);const original=structuredClone(h.workspace.state().attempt);expect(await h.workspace.retry()).toBe(false);expect(h.workspace.unresolved()).toBe(true);expect(h.workspace.state().attempt).toEqual(original);expect(h.request.mock.calls.filter(c=>c[1]?.method)).toHaveLength(2) } })

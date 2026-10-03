@@ -1,0 +1,23 @@
+{
+  "verified_at": "2026-10-03T13:04:39.649Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "http_requests": 31,
+  "guarded_write_attempts": 9,
+  "controlled_successful_responses_discarded": 3,
+  "real_forbidden_retries": 3,
+  "successful_original_replays": 3,
+  "synthetic_parent_registrations": 1,
+  "worklog_records": 1,
+  "worklog_final_version": 2,
+  "configuration_proposals": 1,
+  "configuration_final_version": 1,
+  "worklog_success_audits": 2,
+  "configuration_registry_unchanged": true,
+  "readonly_refresh_never_resolves_uncertainty": true,
+  "original_body_key_path_preserved": true,
+  "effective_value": null,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "scope": "Actual worklog create/update and configuration proposal create; other nine writers covered by isolated regression tests, not claimed as new HTTP runs"
+}

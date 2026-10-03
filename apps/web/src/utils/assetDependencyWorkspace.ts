@@ -77,7 +77,7 @@ export function createDependencyWorkspace(client: Pick<ApiClient, 'request'>, ch
     } catch (error) { if (current === epoch && !isCancelled(error)) state = { ...state, error }; return false }
     finally { if (current === epoch) { state = { ...state, busy: null }; emit() } }
   }
-  async function send(attempt: Attempt) {
+  async function send(attempt: Attempt, retry = false) {
     if (!context?.canWrite || state.busy) return false
     const current = ++epoch, scope = { ...context }, controller = new AbortController(); request?.abort(); request = controller
     state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
@@ -90,7 +90,7 @@ export function createDependencyWorkspace(client: Pick<ApiClient, 'request'>, ch
       await refresh(); return true
     } catch (error) {
       if (current !== epoch) return false
-      const uncertain = isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
+      const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
       state = { ...state, error, draft: null, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } }; return false
     } finally { if (current === epoch) { state = { ...state, busy: null }; emit() } }
   }
@@ -101,7 +101,7 @@ export function createDependencyWorkspace(client: Pick<ApiClient, 'request'>, ch
     const baseline = copy(state.draft), payload = JSON.stringify({ expected_version: baseline.version, additions: [copy(edge)] })
     return send({ key: newKey(), payload, baseline, state: 'uncertain' })
   }
-  async function retry() { return state.attempt?.state === 'uncertain' ? send(state.attempt) : false }
+  async function retry() { return state.attempt?.state === 'uncertain' ? send(state.attempt, true) : false }
   emit()
   return { reset, refresh, submit, retry, unresolved, dispose: () => reset(null), state: () => state }
 }

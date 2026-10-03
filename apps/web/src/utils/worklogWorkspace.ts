@@ -108,7 +108,7 @@ export function createWorklogWorkspace(client: Pick<ApiClient, 'request'>, chang
     } catch (error) { if (current === epoch && !isCancelled(error)) state = { ...state, error }; return false }
     finally { if (current === epoch) { state = { ...state, busy: null }; emit() } }
   }
-  async function send(attempt: Attempt) {
+  async function send(attempt: Attempt, retry = false) {
     if (!scope?.canWrite || state.busy) return false
     const context = { ...scope }, current = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort
     state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
@@ -121,7 +121,7 @@ export function createWorklogWorkspace(client: Pick<ApiClient, 'request'>, chang
       state = { ...state, receipt, selected: receipt, history: null, busy: null, attempt: { ...attempt, state: 'accepted' } }; emit(); await refresh(); return true
     } catch (error) {
       if (current !== epoch) return false
-      const uncertain = isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
+      const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
       state = { ...state, selected: null, history: null, parentVersion: null, error, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } }; return false
     } finally { if (current === epoch) { state = { ...state, busy: null }; emit() } }
   }
@@ -134,5 +134,5 @@ export function createWorklogWorkspace(client: Pick<ApiClient, 'request'>, chang
     return send({ path: path() + (baseline ? '/' + baseline.id : ''), method: edit ? 'PATCH' : 'POST', key: newKey(), payload, baseline, state: 'uncertain' })
   }
   emit()
-  return { reset, refresh, show, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => state }
+  return { reset, refresh, show, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => state }
 }

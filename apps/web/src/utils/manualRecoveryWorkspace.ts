@@ -41,7 +41,7 @@ export function createManualRecoveryWorkspace(client: Pick<ApiClient, 'request'>
     catch (error) { if (turn === epoch && !isCancelled(error)) state = { ...state, current: null, error }; return false }
     finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
-  async function send(attempt: Attempt) {
+  async function send(attempt: Attempt, retry = false) {
     if (!context || state.busy || state.parent?.id !== attempt.parentId) return false
     const scope = { ...context }, turn = ++epoch, controller = new AbortController(); abort?.abort(); abort = controller; state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
     try {
@@ -51,7 +51,7 @@ export function createManualRecoveryWorkspace(client: Pick<ApiClient, 'request'>
       const evidence = value.confirmation
       if (value.version !== 1 || !evidence || evidence.confirmed_by !== scope.actorId || evidence.note !== payload.note || (payload.reported_recovered_at === null ? evidence.reported_recovered_at !== null : evidence.reported_recovered_at === null || date(evidence.reported_recovered_at) !== worklogInstant(payload.reported_recovered_at))) throw bad()
       lastKnown = value; state = { ...state, receipt: value, current: value, attempt: { ...attempt, state: 'accepted' }, busy: null }; emit(); await refresh(); return true
-    } catch (error) { if (turn !== epoch) return false; const uncertain = isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_'); state = { ...state, current: null, error, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } }; return false }
+    } catch (error) { if (turn !== epoch) return false; const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_'); state = { ...state, current: null, error, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } }; return false }
     finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
   function submit(note: string, reportedRecoveredAt: string | null) {
@@ -60,5 +60,5 @@ export function createManualRecoveryWorkspace(client: Pick<ApiClient, 'request'>
     validateInternalNoteText(note); const time = reportedRecoveredAt === null ? null : new Date(worklogInstant(reportedRecoveredAt)).toISOString()
     return send({ parentId: state.parent.id, payload: JSON.stringify({ expected_version: 0, note, reported_recovered_at: time }), key: newKey(), state: 'uncertain' })
   }
-  emit(); return { reset, begin, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt) : Promise.resolve(false), unresolved, state: () => state, dispose: () => reset(null) }
+  emit(); return { reset, begin, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => state, dispose: () => reset(null) }
 }

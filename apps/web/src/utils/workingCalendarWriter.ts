@@ -32,7 +32,7 @@ export function createWorkingCalendarWriter(client: Pick<ApiClient, 'request'>, 
     catch (error) { if (turn === epoch && !isCancelled(error)) state = { ...state, error, lastRead: null }; return false }
     finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
-  async function send(attempt: Attempt) {
+  async function send(attempt: Attempt, retry = false) {
     if (!scope || state.busy) return false
     const context = { ...scope }, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort; state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
     try {
@@ -44,10 +44,10 @@ export function createWorkingCalendarWriter(client: Pick<ApiClient, 'request'>, 
       state = { ...state, receipt: value, attempt: { ...attempt, state: 'accepted' }, busy: null, editing: false }; emit(); await refresh(); return true
     } catch (error) {
       if (turn !== epoch) return false
-      const uncertain = isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
+      const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
       state = { ...state, lastRead: null, error, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } }; return false
     } finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
   async function submit(input: CalendarInput) { if (!scope || !state.editing || state.busy || state.attempt) return false; const value = validateCalendarInput(input), baseline = state.baseline ? copy(state.baseline) : null; if (baseline && state.lastRead && state.lastRead.version !== baseline.version) { state = { ...state, error: new ApiError(409, 'VERSION_CONFLICT', '已发现新版本，请明确重新准备编辑，不会自动重定基准', '—') }; emit(); return false } if (baseline && baseline.version >= Number.MAX_SAFE_INTEGER) throw new Error('版本已到技术边界，不能继续递增'); return send({ path: baseline ? '/working-calendars/' + baseline.id : '/working-calendars', method: baseline ? 'PATCH' : 'POST', key: newKey(), payload: JSON.stringify(baseline ? { ...value, expected_version: baseline.version } : value), baseline, state: 'uncertain' }) }
-  emit(); return { reset, begin, submit, refresh, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt) : Promise.resolve(false), unresolved, state: () => state, dispose: () => reset(null) }
+  emit(); return { reset, begin, submit, refresh, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => state, dispose: () => reset(null) }
 }

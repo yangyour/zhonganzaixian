@@ -1,0 +1,53 @@
+{
+  "verified_at": "2026-10-03T13:06:18.896199+00:00",
+  "environment": "niko-local-test",
+  "status": "ELEVEN_WRITERS_ORIGINAL_UNCERTAINTY_FIXED",
+  "writers": [
+    "configurationDraftWriter",
+    "configurationRevisionWriter",
+    "workingCalendarWriter",
+    "worklogWorkspace",
+    "manualIncidentWriter",
+    "manualRecoveryWorkspace",
+    "internalNoteWorkspace",
+    "ticketCommentWorkspace",
+    "assetDependencyWorkspace",
+    "assetMetadataWorkspace",
+    "manualWarrantyWorkspace"
+  ],
+  "regression_before": {
+    "new_failed": 11,
+    "existing_passed": 623
+  },
+  "regression_after": {
+    "new_passed": 11,
+    "web_total": 634,
+    "each_new_test_statuses": [
+      400,
+      403,
+      404,
+      409,
+      422
+    ],
+    "failure_cases": 55,
+    "type_and_build": true,
+    "contracts": 55
+  },
+  "real_http": {
+    "requests": 31,
+    "guarded_write_attempts": 9,
+    "discarded_committed200": 3,
+    "real403_retries": 3,
+    "original_success_replays": 3,
+    "worklog_versions": 2,
+    "configuration_proposals": 1,
+    "worklog_success_audits": 2,
+    "coverage": "Actual worklog create/PATCH and configuration proposal create; remaining9 writers pure regressions only"
+  },
+  "initial_probe": "Two prior attempts rejected parent POST by actual CSRF_INVALID403 before tested business writes. Recaptured six approved test OIDC sessions, final full31HTTP passed; security guards not weakened.",
+  "api_or_schema_changed": false,
+  "browser_dom_tested": false,
+  "other_upload_paths": "Import/photo/attachment paths still under separate audit; not claimed fixed here",
+  "credentials_output": false,
+  "all_128_done": false
+}

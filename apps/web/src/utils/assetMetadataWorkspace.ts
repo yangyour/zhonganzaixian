@@ -107,7 +107,7 @@ export function createMetadataWorkspace(client: Pick<ApiClient, 'request'>, chan
     catch (error) { if (turn === epoch && !isCancelled(error)) state = { ...state, error }; return false }
     finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
-  async function send(attempt: Attempt) {
+  async function send(attempt: Attempt, retry = false) {
     if (!context?.canWrite || state.busy) return false
     const scope = { ...context }, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort; state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
     try {
@@ -118,7 +118,7 @@ export function createMetadataWorkspace(client: Pick<ApiClient, 'request'>, chan
       state = { ...state, receipt, current: receipt, history: null, busy: null, attempt: { ...attempt, state: 'accepted' } }; emit(); await refresh(); return true
     } catch (error) {
       if (turn !== epoch) return false
-      const uncertain = isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
+      const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
       state = { ...state, current: null, history: null, error, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } }; return false
     } finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
@@ -127,5 +127,5 @@ export function createMetadataWorkspace(client: Pick<ApiClient, 'request'>, chan
     validateMetadataInput(input); if (expectedVersion >= Number.MAX_SAFE_INTEGER) throw inputInvalid()
     return send({ key: newKey(), payload: JSON.stringify({ expected_version: expectedVersion, ...clone(input) }), baseline: clone(state.current), state: 'uncertain' })
   }
-  emit(); return { reset, refresh, references, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => state }
+  emit(); return { reset, refresh, references, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => state }
 }

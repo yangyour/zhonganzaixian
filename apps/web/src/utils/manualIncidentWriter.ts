@@ -43,7 +43,7 @@ export function createManualIncidentWriter(client: Pick<ApiClient, 'request'>, c
   function refreshAsset() { const known = state.asset; if (!known) return Promise.resolve(false); return read(async (signal, scope) => { const current = asset(await client.request<unknown>('/assets/' + known.id, { signal }), scope, known.id); if (current.version < known.version || current.version === known.version && current.name !== known.name) throw bad(); return { lastAssetRead: current } }, { lastAssetRead: null }) }
   function adoptLatestAsset(expected: RegistrationAsset | null = state.lastAssetRead) { if (!context || state.busy || unresolved() || !state.editing || !state.lastAssetRead || !state.asset || state.asset.id !== state.lastAssetRead.id || !expected || expected.id !== state.lastAssetRead.id || expected.tenant_id !== state.lastAssetRead.tenant_id || expected.version !== state.lastAssetRead.version || expected.name !== state.lastAssetRead.name) return false; state = { ...state, asset: copy(state.lastAssetRead), attempt: null, error: null }; emit(); return true }
   function refreshReceipt() { const known = state.receipt; if (!known) return Promise.resolve(false); return read(async (signal, scope) => { const current = readManualIncident(await client.request<unknown>('/manual-incidents/' + known.id, { signal }), scope); if (!sameEntry(known, current)) throw bad(); return { verifiedReceipt: current } }, { verifiedReceipt: null }) }
-  async function send(attempt: Attempt) {
+  async function send(attempt: Attempt, retry = false) {
     if (!context || state.busy) return false
     const scope = { ...context }, turn = ++epoch, controller = new AbortController(); abort?.abort(); abort = controller; state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
     try {
@@ -54,7 +54,7 @@ export function createManualIncidentWriter(client: Pick<ApiClient, 'request'>, c
       state = { ...state, receipt: value, verifiedReceipt: null, attempt: { ...attempt, state: 'accepted' }, editing: false, busy: null }; emit(); await refreshReceipt(); return true
     } catch (error) {
       if (turn !== epoch) return false
-      const uncertain = isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
+      const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
       state = { ...state, error, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } }; return false
     } finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
@@ -65,5 +65,5 @@ export function createManualIncidentWriter(client: Pick<ApiClient, 'request'>, c
     const current = copy(state.asset)
     return send({ payload: JSON.stringify({ title: input.title, severity: input.severity, asset_id: current.id, expected_asset_version: current.version }), key: newKey(), asset: current, state: 'uncertain' })
   }
-  emit(); return { reset, begin, search, choose, refreshAsset, adoptLatestAsset, refreshReceipt, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt) : Promise.resolve(false), unresolved, state: () => state, dispose: () => reset(null) }
+  emit(); return { reset, begin, search, choose, refreshAsset, adoptLatestAsset, refreshReceipt, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => state, dispose: () => reset(null) }
 }

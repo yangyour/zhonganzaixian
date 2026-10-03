@@ -100,4 +100,10 @@ class TicketCustomerActionRulesTest {
         String value="\ufeff  "+"修".repeat(10)+"\n"+"复".repeat(10)+"\t说明\r\n";String original=value;assertDoesNotThrow(()->TicketCustomerActionRules.requireSolution(value));assertDoesNotThrow(()->TicketCustomerActionRules.requireUnresolvedReason(value));assertDoesNotThrow(()->TicketCustomerActionRules.requireReopenReason(value));assertEquals(original,value);
     }
 
+    @Test void nonpositivePermissionVersionCannotAuthorizeEvenOriginalReporter(){
+        for(long version:new long[]{0,-1,Long.MIN_VALUE}){var actor=new Membership("reporter","tenant-a","viewer",version,true);assertEquals(401,assertThrows(DomainException.class,()->TicketCustomerActionRules.requireCustomer(actor,facts())).status);assertEquals(401,assertThrows(DomainException.class,()->TicketCustomerActionRules.requireCustomer(actor,null)).status);}
+    }
+    @Test void malformedMembershipTenantFailsAsExpiredBeforeObjectEvaluation(){
+        for(String tenant:new String[]{null,""," "}){var actor=new Membership("reporter",tenant,"viewer",1,true);assertEquals(401,assertThrows(DomainException.class,()->TicketCustomerActionRules.requireCustomer(actor,facts())).status);}
+    }
 }

@@ -1,0 +1,13 @@
+{
+  "verified_at": "2026-10-03T20:57:43.942255+00:00",
+  "commit": "c33cc11fc5025f27be9043d9983a1dff626e1b0d",
+  "workflow_run": 37153152496,
+  "conclusion": "success",
+  "windows_job": 111290992448,
+  "actual_log_summary": "MOP_OWNERSHIP_TEST status=PASS isolated_checks=27 fake_process_queries=32 fake_cim_queries=35 actual_process_actions=0",
+  "scope": "ISOLATED_POWERSHELL_ENVIRONMENT_ROLE_AND_SYNTAX_CHECKS",
+  "real_windows_start_or_stop": "NOT_RUN",
+  "designated_server_migrations": "NOT_RUN",
+  "credentials_read": false,
+  "contract_done": false
+}

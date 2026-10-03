@@ -41,6 +41,6 @@ PENDING/QUEUED为待领取，PENDING/RETRY_WAIT为临时依赖失败后的技术
 ## 当前验证边界
 
 - 产物角色修复7587fa8的CI37152864074已成功，Windows job111290142515实际执行21项隔离进程/角色测试，真实进程操作0
-- 新增WithContactImportWorker选项及环境投影，新增6项隔离检查，总27项；本次Windows CI结果待独立回读，不预先报通过
+- 新增WithContactImportWorker选项及环境投影，新增6项隔离检查，总27项；c33cc11 CI37153152496及Windows job111290992448已回读成功，实际隔离检查27项/真实进程操作0，见niko-contact-worker-windows-ci-20261003.json
 - 此Linux环境没有pwsh；本次没有执行原Windows机器的启动、SSH、迁移或停止
 - API/Worker真实PG与HTTP证据、Vue内存处理器测试、浏览器真实DOM和通知送达分别记录，完整M2-9/128项未完成

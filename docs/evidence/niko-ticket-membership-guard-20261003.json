@@ -1,0 +1,28 @@
+{
+  "verified_at": "2026-10-03T20:57:43.941951+00:00",
+  "scope": "PURE_D07_CUSTOMER_ACTION_MEMBERSHIP_VALIDITY_GUARD",
+  "initial_regression_tests": 16,
+  "initial_failures": 2,
+  "final_rule_tests": 16,
+  "final_failures": 0,
+  "root_tests_reported": 1242,
+  "root_tests_executed": 1229,
+  "actual_postgresql_regressions": 392,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "nonpositive_permission_versions_fail_401": true,
+  "missing_or_blank_tenant_fails_401_before_object_lookup": true,
+  "valid_cross_tenant_stays_404": true,
+  "customer_relationship_authority_changed": false,
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/TicketCustomerActionRules.java": "8b56fbf212f76d73882cba57e827650437d7beb3b3562d50596368594774955c",
+    "server/api/src/test/java/cn/mop/api/TicketCustomerActionRulesTest.java": "03b1e56b956c8a397b6327089defbf09124b256c2d1f238fb61e7e14e5d9a73e"
+  },
+  "api_version": "0.32.0",
+  "actual_customer_close_or_reopen_http": "NOT_RUN",
+  "new_identity_or_permission_grants": false,
+  "v1_v19_changed": false,
+  "q09_customer_identity_qualification": "UNRESOLVED",
+  "formal_ticket_workflow": "CONFIG_PENDING",
+  "contract_done": false
+}

@@ -30,7 +30,9 @@ public final class TicketCustomerActionRules {
     }
 
     public static void requireCustomer(Membership membership, Relationships relationships) {
-        if (membership == null || !membership.active() || membership.userId() == null || membership.userId().isBlank())
+        if (membership == null || !membership.active() || membership.permissionVersion() < 1
+                || membership.userId() == null || membership.userId().isBlank()
+                || membership.tenantId() == null || membership.tenantId().isBlank())
             throw new DomainException(401, "SESSION_EXPIRED", "当前成员身份已失效");
         if (relationships == null || !relationships.tenantId().equals(membership.tenantId()))
             throw new DomainException(404, "OBJECT_NOT_FOUND", "对象不存在或无权限");

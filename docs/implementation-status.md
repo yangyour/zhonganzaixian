@@ -969,3 +969,8 @@ V18队列/不可变行结果结构显式1/重复0/check0且26表不变，但13�
 ## 2026-10-03 Windows可选联系人Worker启动器
 
 新增显式WithContactImportWorker、V19 ready/JAR门禁、最小已有PG环境、每次独立日志和精确已登记停止归属；默认不启用、不迁移/建凭据。27隔离PowerShell用例待本次CI，实际Windows/原服务器启动NOT_RUN。前角色修复7587fa8 CI37152864074/Windows21项已实证通过，真实进程操作0，见docs/contact-import-runtime.md。
+
+
+## 2026-10-03 D07成员资格纯守卫补正
+
+先增2回归复现非正权限版本可能放行、空租户未先401，再修正requireCustomer成员完整性；16纯规则全通过，根1242=1229执行含392既有PG/13skip/6MinIO排除。正式客户关单/重开仍未接，不把此守卫当资格授权。API0.32/V1–V19不变。另回读c33cc11 CI37153152496 success，Windows job111290992448实际27隔离检查/真实进程操作0，补齐启动器待CI，仍无原Windows启动或迁移证明。

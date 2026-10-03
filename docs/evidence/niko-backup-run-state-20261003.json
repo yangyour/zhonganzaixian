@@ -1,0 +1,52 @@
+{
+  "verified_at": "2026-10-03T22:31:46.567015+00:00",
+  "scope": "PURE_BACKUP_RUN_AND_ATTEMPT_FACTS_NOT_RUNTIME",
+  "new_pure_tests": 20,
+  "root_tests_reported": 1327,
+  "root_tests_executed": 1314,
+  "actual_postgresql_regressions": 392,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "contracts": 70,
+  "generation_check": "PASS",
+  "contract_sources": [
+    "M6-1/T00R078",
+    "M6-4/T00R081",
+    "Q22"
+  ],
+  "maximum_attempts": 3,
+  "retry_delay_seconds": 600,
+  "unknown_result_starts_new_attempt": false,
+  "unknown_result_counts_as_failure": false,
+  "logical_version_checked": true,
+  "actual_database_cas_verified": false,
+  "attempt_history_immutable": true,
+  "observation_event_audit_implemented": false,
+  "storage_reference_requires_same_tenant_and_asset": true,
+  "storage_reference_is_actual_storage_proof": false,
+  "failure_count_semantics": null,
+  "automatic_ticket_status": "CONFIG_PENDING",
+  "automatic_ticket_allowed": false,
+  "actual_ssh_calls": 0,
+  "actual_backup_storage_calls": 0,
+  "actual_backup_jobs": 0,
+  "schema_added": false,
+  "api_version": "0.33.0",
+  "api_restarted": false,
+  "v1_v19_changed": false,
+  "contract_done": false,
+  "previous_transport_commit": {
+    "sha": "12e6cb46aee3eed1df2cd78a09f2e874f0b7e1c2",
+    "ci_run": 37158297916,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/backup/BackupRunState.java": "8929c7127b9551f13ae2c6c3bad7181419efa27e8077410576d5ab4b95172eda",
+    "server/api/src/test/java/cn/mop/api/BackupRunStateTest.java": "4c76f86f98b28d15ebf480c432d762c7dd4c8ec6dfa1e1b819145c7f2147d9ce"
+  },
+  "logs_sha256": {
+    ".local/niko-test/logs/backup-run-state-focused.log": "a046956e08c8792fdd9a2072e7f8bd24e8bd169ea90afebf73a4391b214576bc",
+    ".local/niko-test/logs/backup-run-state-root.log": "13e95de0d8eb2907b1615a6142f40df4e26443649a1ebce9f5e022ec023be782",
+    ".local/niko-test/logs/backup-run-state-contract.log": "5ec6d98e6a14b183c7d3fd30f3ff891835edf5e9d351c276643756e74fcef776"
+  }
+}

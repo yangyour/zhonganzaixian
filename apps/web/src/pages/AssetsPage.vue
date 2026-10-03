@@ -13,6 +13,7 @@ import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import AssetImportWorkspace from '../components/AssetImportWorkspace.vue'
 import AssetDependencyWorkspace from '../components/AssetDependencyWorkspace.vue'
 import AssetMetadataWorkspace from '../components/AssetMetadataWorkspace.vue'
+import ManualWarrantyWorkspace from '../components/ManualWarrantyWorkspace.vue'
 import AssetMetadataQuery from '../components/AssetMetadataQuery.vue'
 import AssetDateAssessmentPanel from '../components/AssetDateAssessmentPanel.vue'
 import AssetDateQuery from '../components/AssetDateQuery.vue'
@@ -99,13 +100,24 @@ function openDependencies() {
 const metadataQueryOpen = ref(false), dateQueryOpen = ref(false)
 const metadataOpen = ref(false), metadataAsset = ref<Asset | null>(null)
 const metadataPanel = ref<InstanceType<typeof AssetMetadataWorkspace> | null>(null)
+const warrantyOpen = ref(false), warrantyAsset = ref<Asset | null>(null)
+const warrantyPanel = ref<InstanceType<typeof ManualWarrantyWorkspace> | null>(null)
+function openWarranty() {
+  if (!asset.value) return
+  if (metadataPanel.value?.hasUnresolved()) { ElMessage.warning('基础资料保存结果未确认，请先处理原请求'); return }
+  if (warrantyPanel.value?.hasUnresolved() && warrantyAsset.value?.id !== asset.value.id) { ElMessage.warning('另一台设备的维保保存结果未确认，请先打开原设备重试'); return }
+  warrantyAsset.value = asset.value; warrantyOpen.value = true
+}
+function warrantySaved() { void loadAssets(); if (queryString('asset_id') === warrantyAsset.value?.id) void loadDetail(queryString('asset_id')) }
 const metadataAllowed = computed(() => ['msp', 'padmin'].includes(session.value?.user.role || ''))
 function openMetadata() {
+  if (warrantyPanel.value?.hasUnresolved()) { ElMessage.warning('维保保存结果未确认，请先处理原请求'); return }
   if (!asset.value) return
   if (metadataPanel.value?.hasUnresolved() && metadataAsset.value?.id !== asset.value.id) { ElMessage.warning('另一台设备的资料保存结果尚未确认，请先打开原设备并使用原请求重试'); return }
   metadataAsset.value = asset.value; metadataOpen.value = true
 }
 function openQueryMetadata(selected: Asset) {
+  if (warrantyPanel.value?.hasUnresolved()) { ElMessage.warning('维保保存结果未确认，请先处理原请求'); return }
   if (metadataPanel.value?.hasUnresolved() && metadataAsset.value?.id !== selected.id) { ElMessage.warning('另一台设备的资料保存结果尚未确认，请先处理原请求'); return }
   metadataAsset.value = selected; metadataOpen.value = true; metadataQueryOpen.value = false
 }
@@ -163,7 +175,7 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
       <el-skeleton v-if="detailLoading" :rows="8" animated />
       <template v-if="asset"><div class="detail-title"><span class="eyebrow">{{ typeLabel(asset.type) }}</span><h2>{{ asset.name }}</h2><StatusTag :status="asset.status" /></div><el-alert type="info" :closable="false" show-icon :title="asset.unknown_reason || '当前未取得真实采集数据，不能判断为正常。'" />
         <el-descriptions :column="1" border class="asset-descriptions"><el-descriptions-item label="资产 ID"><span class="mono">{{ asset.id }}</span></el-descriptions-item><el-descriptions-item label="所属租户">{{ asset.tenant_id }}</el-descriptions-item><el-descriptions-item label="管理 IP"><span class="mono">{{ asset.management_ip }}</span></el-descriptions-item><el-descriptions-item label="站点">{{ asset.site_name || asset.site_id }}</el-descriptions-item><el-descriptions-item label="生命周期">{{ asset.lifecycle_status === 'DRAFT' ? '草稿' : asset.lifecycle_status }}</el-descriptions-item><el-descriptions-item label="来源">{{ sourceLabel(asset.source) }}</el-descriptions-item><el-descriptions-item label="采样时间">{{ displayTime(asset.sampled_at) }}</el-descriptions-item><el-descriptions-item label="版本">v{{ asset.version }}</el-descriptions-item><el-descriptions-item label="创建时间">{{ displayTime(asset.created_at) }}</el-descriptions-item><el-descriptions-item label="更新时间">{{ displayTime(asset.updated_at) }}</el-descriptions-item></el-descriptions>
-        <div v-if="metadataAllowed" class="detail-section"><h3>手工草稿资料</h3><p class="muted">内部维护明确资料并留存前后历史；管理IP、CMDB和监控配置不变。</p><PermissionGate capability="assets:write"><el-button @click="openMetadata">查看资料与修订历史</el-button></PermissionGate></div>
+        <div v-if="metadataAllowed" class="detail-section"><h3>手工草稿资料</h3><p class="muted">内部维护明确资料并留存前后历史；管理IP、CMDB和监控配置不变。</p><PermissionGate capability="assets:write"><el-button @click="openMetadata">查看资料与修订历史</el-button><el-button @click="openWarranty">维护维保日期与供应商</el-button></PermissionGate></div>
         <AssetDateAssessmentPanel v-if="metadataAllowed" :asset="asset" />
         <div class="detail-section"><h3>依赖草稿</h3><p class="muted">按完整租户图保存人工依赖提案，监控抑制尚未生效。</p><el-button @click="openDependencies">查看或追加依赖草稿</el-button></div>
         <div class="detail-section"><h3>监控接入</h3><p class="muted">测试环境数据已持久保存；生产隔离、监控组件许可与阈值依赖 Q02 / Q03 / Q06。完成客户确认前，草稿不能发布到真实监控。</p><PermissionGate capability="assets:write"><el-button type="primary" plain :loading="onboarding" @click="requestOnboarding">检查接入条件</el-button></PermissionGate></div>
@@ -179,6 +191,7 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
     <AssetImportWorkspace v-model="importOpen" />
     <AssetDateQuery v-model="dateQueryOpen" @select="openDetail" />
     <AssetMetadataQuery v-model="metadataQueryOpen" @select="openQueryMetadata" />
+    <ManualWarrantyWorkspace ref="warrantyPanel" v-model="warrantyOpen" :asset="warrantyAsset" @saved="warrantySaved" />
     <AssetMetadataWorkspace ref="metadataPanel" v-model="metadataOpen" :asset="metadataAsset" @saved="metadataSaved" />
     <AssetDependencyWorkspace ref="dependencyPanel" v-model="dependencyOpen" :asset="dependencyAsset" />
   </section>

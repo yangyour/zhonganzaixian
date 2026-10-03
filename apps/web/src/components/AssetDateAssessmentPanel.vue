@@ -20,7 +20,7 @@ const fields = [{ key: 'warranty_expiry', label: '维保到期日期' }, { key: 
 </script>
 <template>
   <section v-if="permitted" class="date-assessment detail-section">
-    <h3>维保与超期日期对照</h3><p>只读对照已登记日期，不证明真实维保覆盖。空日期保持未知；起始日、供应商和实际送达尚未提供。</p>
+    <h3>维保与超期日期对照</h3><p>只读对照已登记日期，不证明真实维保覆盖。空日期保持未知；本日期对照接口不展示补充起始日和供应商，请在“维护维保日期与供应商”查看。实际通知送达尚未接入。</p>
     <el-button :loading="state.busy" @click="reader.refresh()">{{ state.current ? '重新读取日期' : '读取日期对照' }}</el-button>
     <ApiErrorNotice :error="state.error" />
     <el-skeleton v-if="state.busy" :rows="3" animated />

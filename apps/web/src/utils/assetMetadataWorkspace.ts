@@ -56,7 +56,7 @@ export function readMetadataCurrent(value: unknown, context: MetadataContext): M
     return clone(value) as unknown as MetadataCurrent
   } catch { throw invalid() }
 }
-function readHistory(value: unknown, context: MetadataContext, current: MetadataCurrent, before: number | null): MetadataHistory {
+export function readMetadataHistory(value: unknown, context: MetadataContext, current: MetadataCurrent, before: number | null): MetadataHistory {
   if (!exact(value, ['items', 'has_more', 'next_before_version', 'source', 'scope', 'page_size_limit']) || !Array.isArray(value.items) || value.items.length > 15 || typeof value.has_more !== 'boolean' || value.source !== 'postgresql' || value.scope !== 'INTERNAL_MANUAL_DRAFT' || value.page_size_limit !== 100) throw invalid()
   let prior = before ?? current.asset.version + 1, priorRevision: MetadataRevision | null = null
   for (const item of value.items) {
@@ -94,7 +94,7 @@ export function createMetadataWorkspace(client: Pick<ApiClient, 'request'>, chan
       if (previous && current.asset.version < previous.asset.version || state.receipt && current.asset.version < state.receipt.asset.version) throw invalid()
       for (const known of [previous, state.receipt]) if (known && current.asset.version === known.asset.version && (current.metadata_version !== known.metadata_version || current.asset.management_ip !== known.asset.management_ip || current.metadata && known.metadata && inputKeys.some(key => current.metadata![key as keyof MetadataInput] !== known.metadata![key as keyof MetadataInput]))) throw invalid()
       const boundary = moreHistory && previous?.asset.version === current.asset.version ? before : null
-      const history = readHistory(await client.request<unknown>(path() + '/history?page_size=15' + (boundary ? '&before_version=' + boundary : ''), { signal: abort.signal }), scope, current, boundary)
+      const history = readMetadataHistory(await client.request<unknown>(path() + '/history?page_size=15' + (boundary ? '&before_version=' + boundary : ''), { signal: abort.signal }), scope, current, boundary)
       if (turn !== epoch || abort.signal.aborted) return false
       state = { ...state, current, history }; return true
     } catch (error) { if (turn === epoch && !isCancelled(error)) state = { ...state, error }; return false }

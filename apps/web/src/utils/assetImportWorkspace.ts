@@ -1,4 +1,4 @@
-import { computed, ref, shallowRef, watch } from 'vue'
+import { computed, readonly, ref, shallowRef, watch } from 'vue'
 import { api, ApiError, isCancelled, StaleRequestError } from '../api/client'
 import type { AssetImportAcceptance, AssetImportFormat, AssetImportMappingRequest, AssetImportOperation, AssetImportParseRequest, AssetImportPolicy, AssetImportSource } from '../api/assetImportTypes'
 import { can, contextGeneration, session } from '../stores/session'
@@ -227,6 +227,6 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
   }
   const stop = watch(() => [contextGeneration.value, session.value], clear, { flush: 'sync' })
   function dispose() { stop(); clear() }
-  return { file, format, source, artifact, operation, policy, policyLoading, policyError, permitted, busy, error, uploadError, parseError, mappingError, selectionMessage, fields, selection, mappingDraft,
-    uploadAttempt, parseAttempt, mappingAttempt, hasUnresolved, canReset, isParsed, selectionLocked, mappingLocked, chooseFile, upload, parse, saveMapping, refresh, reviseConflict, loadPolicy, reset, dispose }
+  return { file: readonly(file), format: readonly(format), source: readonly(source), artifact: readonly(artifact), operation: readonly(operation), policy: readonly(policy), policyLoading: readonly(policyLoading), policyError, permitted, busy: readonly(busy), error, uploadError, parseError, mappingError, selectionMessage, fields, selection, mappingDraft,
+    uploadAttempt: readonly(uploadAttempt), parseAttempt: readonly(parseAttempt), mappingAttempt: readonly(mappingAttempt), hasUnresolved, canReset, isParsed, selectionLocked, mappingLocked, chooseFile, upload, parse, saveMapping, refresh, reviseConflict, loadPolicy, reset, dispose }
 }

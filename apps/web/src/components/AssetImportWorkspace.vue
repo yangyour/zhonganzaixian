@@ -109,7 +109,7 @@ onUnmounted(() => { unregisterContextGuard(); workspace.dispose() })
         <p>状态 {{ artifact.state }} · 格式 {{ artifact.detected_format }} · 日期系统 {{ artifact.date_epoch }}</p>
         <p class="field-help">parser {{ artifact.parser_version }} · 资源政策 {{ artifact.resource_policy_version }} · schema {{ artifact.schema_version }}</p>
         <p v-if="artifact.state === 'SELECTION_REQUIRED'" class="field-help">已保存工作表目录；工作表或表头未明确，尚无数据行可映射。</p>
-        <AppTable v-if="artifact.columns.length" :rows="artifact.columns" row-key="index">
+        <AppTable v-if="artifact.columns.length" :rows="artifact.columns.slice()" row-key="index">
           <el-table-column label="源列位置" width="100" prop="index"/>
           <el-table-column label="原始表头" min-width="190"><template #default="{ row }">{{ row.header === null ? '表头缺失' : row.header }}<span class="cell-sub">{{ row.target_suggestions.length ? `精确表头建议：${row.target_suggestions.join(' / ')}` : '无精确建议' }}</span></template></el-table-column>
         </AppTable>

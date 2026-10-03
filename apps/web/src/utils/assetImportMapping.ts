@@ -1,3 +1,4 @@
+import type { DeepReadonly } from 'vue'
 import type { AssetImportFormat, AssetImportMappingRequest, AssetImportParseSelection, AssetImportSourceColumn, AssetImportTarget } from '../api/assetImportTypes'
 
 /** Labels and NOTE's fixed source requirement are the existing contract Column enum, not a guessed dictionary. */
@@ -32,18 +33,18 @@ export function buildAssetImportParseSelection(format: AssetImportFormat, values
   if (Object.keys(fields).length) throw new AssetImportInputError(fields)
   return { declared_format: format, encoding: values.encoding as AssetImportParseSelection['encoding'], delimiter: values.delimiter as AssetImportParseSelection['delimiter'], sheet_index: values.sheetIndex, header_row: values.headerRow }
 }
-export function assetImportHeaderSuggestions(columns: readonly AssetImportSourceColumn[]) {
+export function assetImportHeaderSuggestions(columns: readonly DeepReadonly<AssetImportSourceColumn>[]) {
   return assetImportTargets.map(target => ({ ...target, candidates: columns.filter(column => column.header === target.label).map(column => column.index) }))
 }
-export function createAssetImportMappingDraft(columns: readonly AssetImportSourceColumn[]): AssetImportMappingDraft {
+export function createAssetImportMappingDraft(columns: readonly DeepReadonly<AssetImportSourceColumn>[]): AssetImportMappingDraft {
   const targets = Object.fromEntries(assetImportHeaderSuggestions(columns).map(target => [target.code, target.candidates.length === 1 ? target.candidates[0]! : 'UNDECIDED'])) as Record<AssetImportTarget, AssetImportMappingChoice>
   return { targets, ignored: [] }
 }
-export function assetImportUnaddressedColumns(columns: readonly AssetImportSourceColumn[], draft: AssetImportMappingDraft) {
+export function assetImportUnaddressedColumns(columns: readonly DeepReadonly<AssetImportSourceColumn>[], draft: AssetImportMappingDraft) {
   const used = new Set(Object.values(draft.targets).filter((value): value is number => typeof value === 'number'))
   return columns.filter(column => !used.has(column.index) && !draft.ignored.includes(column.index))
 }
-export function buildAssetImportMappingRequest(expectedVersion: number, parseHash: string, columns: readonly AssetImportSourceColumn[], draft: AssetImportMappingDraft): AssetImportMappingRequest {
+export function buildAssetImportMappingRequest(expectedVersion: number, parseHash: string, columns: readonly DeepReadonly<AssetImportSourceColumn>[], draft: AssetImportMappingDraft): AssetImportMappingRequest {
   const fields: Record<string, string> = {}, available = new Set(columns.map(column => column.index))
   if (!integer(expectedVersion, 1, Number.MAX_SAFE_INTEGER)) fields.version = '请回读当前来源版本'
   if (!/^[0-9a-f]{64}$/.test(parseHash)) fields.parseHash = '请回读已保存的解析结果hash'

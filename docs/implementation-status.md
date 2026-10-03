@@ -1027,3 +1027,7 @@ V18队列/不可变行结果结构显式1/重复0/check0且26表不变，但13�
 ## 2026-10-03 只读快照与审计游标隔离
 
 七个只读模块业务getter/回调和配置对照输入源数组已脱离内部已验快照；15缺陷回归先红后绿，18新增纳入836Web构建70契约。16真实GET覆盖已有列表/详情/对照/operation及末20条局部审计链VALID，无业务写/新样本，非全库或外部锚定，见docs/workspace-snapshot-isolation.md。
+
+## 2026-10-03 导入原请求与事实只读ref
+
+上传/解析/映射attempt及来源/解析/政策/File/格式/busy改为公开Vue深只读视图，明确selection/mappingDraft仍编辑；4回归先红后绿，全840Web构建70契约。实际生产Vue模块3GET仅验证政策与本地文件引用，0上传/存储/解析，OSS/新DOM仍未验，见docs/workspace-snapshot-isolation.md。

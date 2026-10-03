@@ -1,0 +1,71 @@
+{
+  "verified_at": "2026-10-03T23:36:48.522043+00:00",
+  "scope": "IMPORT_READONLY_REACTIVE_FACTS_AND_ATTEMPTS",
+  "initial_regression": {
+    "tests": 29,
+    "failed": 4,
+    "passed": 25
+  },
+  "final_import_and_mapping_tests": 35,
+  "new_tests": 4,
+  "web_tests_passed": 840,
+  "typecheck": "PASS",
+  "production_build": "PASS_WITH_EXISTING_CHUNK_SIZE_ADVISORY",
+  "contracts": 70,
+  "generation_check": "PASS",
+  "readonly_views": [
+    "file",
+    "format",
+    "source",
+    "artifact",
+    "operation",
+    "policy",
+    "policyLoading",
+    "busy",
+    "uploadAttempt",
+    "parseAttempt",
+    "mappingAttempt"
+  ],
+  "editable_inputs_preserved": [
+    "selection",
+    "mappingDraft"
+  ],
+  "readonly_views_are_detached_history": false,
+  "raw_object_escape_security_boundary": false,
+  "http_evidence": "niko-import-readonly-policy-http-20261003.json",
+  "actual_http_gets": 3,
+  "actual_policy_reads": 2,
+  "uploads": 0,
+  "actual_storage_or_parser_calls": 0,
+  "actual_original_request_replay_tested": false,
+  "replay_regression_scope": "ISOLATED_UNIT_ONLY",
+  "can_import": false,
+  "business_status": "CONFIG_PENDING",
+  "api_version": "0.33.0",
+  "api_restarted": false,
+  "v1_v19_changed": false,
+  "browser_dom_tested": false,
+  "contract_done": false,
+  "previous_reader_commit": {
+    "sha": "12f0b9ad18e9ae42d226bf0944be6ae6b70e7a11",
+    "ci_run": 37161799473,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "apps/web/src/utils/assetImportWorkspace.ts": "25332291651630a2c6e160bdbd63aec4b71fa2517580ac135ba8cb52f095e4c9",
+    "apps/web/src/utils/assetImportMapping.ts": "df7b9f74b3c067b181edc1068c0102ab09a882cdd2e250098131ec6069832923",
+    "apps/web/src/components/AssetImportWorkspace.vue": "1455c02e222417f056f2085902bfafaab99296c3ec63f929664982862f672969",
+    "apps/web/tests/assetImportWorkspace.test.ts": "527dd26939a09b462b623512618a080cfc0385a03764fc0c3a1284962ee59251",
+    "tools/build-import-readonly-client-test.mjs": "3d28e586d3b93f88b59956aecbdac2019109d4c32138482a1670694929add032",
+    "tests/niko-import-readonly-policy-http.mjs": "a017e1cb9c92d3118079e60d657b33f7eb9407e7e8ed720c5a444e7a94d0a933"
+  },
+  "logs_sha256": {
+    ".local/niko-test/logs/import-readonly-refs-red.log": "3a2cfa1596e129054bd3b2efea3973306ede2b909d09cd9b84171e45a3d25fc9",
+    ".local/niko-test/logs/import-readonly-refs-focused.log": "5dc75e7e5de8cdeafc87f057b348050d2b5a42b16d6c44cd82d549c0149619b7",
+    ".local/niko-test/logs/import-readonly-refs-typecheck.log": "23dab8adfa33c140b42cb5b8273cfd40bc769a7bdca1dca125da3e1d4db85480",
+    ".local/niko-test/logs/import-readonly-refs-web.log": "27d19cd438b94a3b9c44e2d3cafa155e7751d959580294fdd9978c490c5fd3ba",
+    ".local/niko-test/logs/import-readonly-refs-build.log": "f304380a73ca36a97c12028e795b4389d3002dbaf2b10ea1ec0056a8d8801a37",
+    ".local/niko-test/logs/import-readonly-refs-contract.log": "cef7e2bb95423b7845242b58cf4c6c1d7c55aac523e3feed1dd669028921cec9",
+    ".local/niko-test/logs/import-readonly-policy-http.log": "38a9312820efd42d5576fec9bfddeefc2a343b05e318bec56fce740ff323c36f"
+  }
+}

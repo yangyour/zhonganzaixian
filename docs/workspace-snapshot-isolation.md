@@ -29,3 +29,11 @@
 15缺陷回归先失败（该轮179项中15失败/164通过）；修复getter与回调，三个联合状态reader在接受新结果时也先复制源数据。公共工具只为顶层error/proofError保留不透明异常原型/分类，其他业务字段全部独立复制；不为无error字段的idle/ready状态补造error。18新增纳入全836Web/typecheck/build/70契约通过。构建main chunk仍501.63kB并保留原>500kB建议，未提高告警阈值或冒称性能已验。
 
 实际七模块只读16次GET，均来自原niko PG/OIDC/API0.33已有数据：审计15行及末20条局部链VALID（非全库、非外部锚定），日历/手工事件/资料查询各15行且选中详情验证；配置对照源数组、配置诊断及既有报障operation均验证副本改动不影响内部快照。415登记DTO前后摘要相同，无业务写或补造样本。实际审计下一段范围保护由隔离单元覆盖，HTTP仅证明本次真实返回与局部链证据保持；不扩大为全链或浏览器证明。前七写模块ac3c0494 CI37161242225 success已回读，见[HTTP](evidence/niko-reader-snapshot-client-http-20261003.json)与[回归](evidence/niko-reader-snapshots-20261003.json)。
+
+## 2026-10-03 D05导入工作区只读事实视图
+
+导入工作区使用Vue ref而非上述普通state结构，也曾把上传/解析/映射attempt及source/artifact/operation/policy、file/format/busy直接暴露为可写ref。4项新回归先失败（29项中4失败/25通过）；现向组件返回Vue深只读视图，内部工作流仍可按实际API回读更新这些ref。原上传File内容/格式/键、原解析参数与expected_version、原映射位置/忽略列/body/key无法被普通展示引用赋值改写；来源版本、原始表头/单元格、技术政策can_import也不能从展示端反写。
+
+这些是随内部状态更新的只读响应式视图，不是独立历史快照；也不声称能阻止已控制同一执行环境并刻意取raw对象的恶意代码。selection和mappingDraft作为明确的用户编辑区继续可写，修改新表单不改变已冻结的旧请求。错误/字段提示属于诊断展示，未被宣称深度不可变。列工具签名接受深只读列，表格只复制列数组容器以适配现有AppTable，不改列内容或15列业务规则。
+
+4回归修复后，导入/映射定向35项、全840Web/typecheck/build/70契约与生成一致性通过。实际生产模式Vue模块连接API只做3次GET（会话+两次技术政策），验证政策与本地选中文件/格式只读、销毁仍清空；0上传、0存储/解析调用，can_import=false。上传/解析/映射原重放保护仍是隔离单元证据，没有用模拟源替代当前OSS真实联调；技术政策可读取不代表存储可用。DOM/390px新改动未验，原指定服务器的旧浏览器证据不扩大。前读取快照12f0b9ad CI37161799473 success已回读，见[政策HTTP](evidence/niko-import-readonly-policy-http-20261003.json)与[本轮证据](evidence/niko-import-readonly-refs-20261003.json)。

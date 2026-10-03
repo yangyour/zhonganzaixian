@@ -1,0 +1,41 @@
+{
+  "verified_at": "2026-10-03T17:37:45.665007+00:00",
+  "environment": "niko-local-test",
+  "scope": "CONTACT_PAGE_SFC_HANDLERS_AND_ROUTE_WIRING",
+  "api_version": "0.30.0",
+  "new_tests": 11,
+  "actual_vue_handler_tests": 10,
+  "source_wiring_test": 1,
+  "web_total": 691,
+  "typecheck": "PASS",
+  "build": "PASS",
+  "contracts": 61,
+  "generation_check": "PASS",
+  "source_sha256": {
+    "apps/web/src/pages/CustomerContactsPage.vue": "1d756a45389f62224de7cf743f8ef0c015d8a7e4b9a3eadd00f2d5c186350d97",
+    "apps/web/src/components/CustomerContactFacts.vue": "27121b941d725c53787e47ee8953616bd093120c488a8de2d8c98ba504515eb9",
+    "apps/web/src/utils/customerContactPresentation.ts": "1c44628fd6dccc4e45d8670aa5b6dba1609cbd9d930a5626717d4282c9b71a57",
+    "apps/web/tests/customerContactsPage.test.ts": "b064d4edc828159a1413064fb34fe46cab8568c1570338a56b77852fb8fce4d1",
+    "apps/web/src/App.vue": "1254f1b2c5eca723c22a472fa679f4fc6db70040e182d1a7cdc86f560aaec59b",
+    "apps/web/src/router.ts": "75d4426835a1dba4195ad05b98e9d6ef18d48711783ba456026e87038520975b"
+  },
+  "page_route": "/customer-contacts",
+  "unknown_write_blocks_voluntary_leave": true,
+  "dirty_draft_confirmation": true,
+  "forced_context_clears_protected_state": true,
+  "current_projection_separate_from_receipt": true,
+  "new_page_http_batch": "NOT_RUN",
+  "unchanged_module_http_evidence": "niko-customer-contact-client-http-20261003.json",
+  "test_renderer": "in-memory Vue SFC renderer with stub controls; not browser DOM",
+  "browser_dom": "BLOCKED_B03",
+  "mobile_visual_acceptance": "NOT_RUN",
+  "batch_import": "NOT_IMPLEMENTED",
+  "notification_delivery": "NOT_RUN",
+  "v1_v17_changed": false,
+  "module_commit": {
+    "sha": "e8687c01d45113e59149c625519e7980e1fab0fa",
+    "ci_run": 37139475036,
+    "conclusion": "success"
+  },
+  "contract_done": false
+}

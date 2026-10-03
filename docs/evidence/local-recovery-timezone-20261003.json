@@ -1,0 +1,22 @@
+{
+  "verified_at": "2026-10-03T10:25:27.322204+00:00",
+  "environment": "designated-server-via-SSH-from-Windows",
+  "postgresql": "17.9",
+  "class": "PostgresManualRecoverySchemaIntegrationTest",
+  "first_run": {
+    "tests": 8,
+    "failures": 1,
+    "reason": "Same instant displayed as 2020-02-29 08:00:00.123+08 instead of UTC text"
+  },
+  "corrected_run": {
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "assertion": "JDBC OffsetDateTime converted to Instant; expected 2020-02-29T00:00:00.123Z",
+  "future_and_out_of_range_rejection_retained": true,
+  "global_timezone_changed": false,
+  "schema_or_api_changed": false,
+  "credentials_output": false
+}

@@ -45,7 +45,16 @@ class PostgresManualRecoverySchemaIntegrationTest {
         rejected("23514",()->insert("future","reported_recovered_at=statement_timestamp()+interval '1 hour'"));
         rejected("23514",()->insert("outside range","reported_recovered_at=TIMESTAMPTZ '10000-01-01 00:00:00+00'"));
         rejected("23514",()->insert("outside range","recorded_at=TIMESTAMPTZ '0001-01-01 00:00:00 BC'"));
-        String id=insert("明确历史人工恢复时间","reported_recovered_at=TIMESTAMPTZ '2020-02-29 00:00:00.123+00'");assertEquals("2020-02-29 00:00:00.123+00",scalar("SELECT reported_recovered_at::text FROM public.mop_manual_recovery_confirmation WHERE id='"+id+"'::uuid"));
+        String id=insert("明确历史人工恢复时间","reported_recovered_at=TIMESTAMPTZ '2020-02-29 00:00:00.123+00'");
+        // The designated server uses +08 while the cloud test session used UTC.
+        // Compare the stored instant, not PostgreSQL's session-dependent text rendering.
+        try(var statement=connection.prepareStatement("SELECT reported_recovered_at FROM public.mop_manual_recovery_confirmation WHERE id=?::uuid")){
+            statement.setString(1,id);
+            try(var result=statement.executeQuery()){
+                assertTrue(result.next());
+                assertEquals(OffsetDateTime.parse("2020-02-29T00:00:00.123Z").toInstant(),result.getObject(1,OffsetDateTime.class).toInstant());
+            }
+        }
     }
     @Test void runtimeCannotMutateOrDeleteEvidenceAndPublicHasNoGrant()throws SQLException{
         for(String sql:List.of("UPDATE public.mop_manual_recovery_confirmation SET note='changed' WHERE false","DELETE FROM public.mop_manual_recovery_confirmation WHERE false","TRUNCATE public.mop_manual_recovery_confirmation"))rejected("42501",()->{try(var s=connection.createStatement()){s.executeUpdate(sql);}});

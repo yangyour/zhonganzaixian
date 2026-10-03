@@ -836,3 +836,7 @@ P1–P3且未获准排除为适用范围；P4不计入SLA适用分母。排除�
 ## 2026-10-03 本地独立迁移入口与原指定库
 
 46项PowerShell隔离检查通过；真实固定主机键SSH、PG17.9/Keycloak26.2.4/MinIO版本及ICU可用性实读。V7–V15每功能显式迁移1次，重复0次，最终只读0次；未修改冻结SQL或其他项目组件。初始V1本地CRLF检出被保护检查拒绝，恢复为已审核Git blob并重建后通过，未改历史checksum。备份在私有忽略目录，恢复尚未演练。最新本地554Web、51契约、类型构建也通过；完整PG/API/UI结果另列，不能累加云端同一批测试。见[迁移证据](evidence/local-schema-v15-20261003.json)。
+
+## 2026-10-03 原服务器会话时区兼容复验
+
+完整指定PG回归首次发现人工恢复结构用例按timestamptz文本比较UTC/+08表示而误判。改为JDBC OffsetDateTime转Instant比较，保留毫秒、未来/越界拒绝与事务回滚。该套8项指定PG复验全部通过；没有改变数据库全局时区、SQL或API。其余完整回归结果单列，不能把本次8项重复计入新的总数。证据见[evidence/local-recovery-timezone-20261003.json](evidence/local-recovery-timezone-20261003.json)。

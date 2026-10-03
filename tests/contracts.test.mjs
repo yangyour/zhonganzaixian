@@ -471,3 +471,5 @@ test('日历计算结果与未知原因的契约不允许混淆或冒充正式�
   const calculated = { ...value, status: 'CALCULATED', reason: null, scenario_deadline: '2026-10-01T00:00:00Z', remaining_duration: 'PT0S', required_seconds: 0, start: '2026-10-01T00:00:00Z' };
   assert.equal(validates('WorkingCalendarPreviewResult', result(calculated)), true);
 });
+
+test('旧直接建议草稿明确全局设计登记范围，不冒充租户运行配置', () => { const operation = contract.paths['/configurations/{key}/draft'].post; assert.equal(operation['x-mop-scope'], 'GLOBAL_DESIGN_REGISTRY_DRAFT_NOT_TENANT_RUNTIME'); assert.match(operation.description, /revisions/); assert.match(operation.description, /effective_value/); });

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { onBeforeRouteLeave } from 'vue-router'
+import { contextTransitionGuards } from '../utils/contextTransitionGuard'
+import { createConfigurationDraftWriter, emptyConfigurationDraftState, type ConfigurationDraftState } from '../utils/configurationDraftWriter'
 import { api, ApiError, isCancelled } from '../api/client'
 import type { Configuration, ConfigurationRevision } from '../api/types'
 import { displayValue } from '../utils/display'
@@ -39,32 +42,54 @@ async function load() {
 }
 onMounted(load)
 onUnmounted(() => { ++diagnosticOpenGeneration; controller.abort(); comparisonReader.reset() })
+const draftState = shallowRef<ConfigurationDraftState>(emptyConfigurationDraftState())
+const draftWriter = createConfigurationDraftWriter(api, value => { draftState.value = value })
 const editing = ref<Configuration | null>(null)
-const editingOpen = computed({ get: () => Boolean(editing.value), set: value => { if (!value) editing.value = null } })
-const proposed = ref<string | boolean>('')
+const editingOpen = computed({ get: () => Boolean(editing.value), set: value => { if (!value) { if (draftWriter.unresolved()) { ElMessage.warning('原设计草稿请求尚未确认，请先原请求重试'); return } editing.value = null } } })
+const proposed = ref<string | boolean>(''), initialProposed = ref<string | boolean>('')
 const validationError = ref('')
-const editError = ref<unknown>(null)
-const saving = ref(false)
+const editError = computed(() => draftState.value.error)
+const saving = computed(() => draftState.value.busy === 'write')
+const draftUnresolved = computed(() => draftState.value.busy === 'write' || draftState.value.attempt?.state === 'uncertain')
+const draftLocked = computed(() => Boolean(draftState.value.busy) || draftUnresolved.value || Boolean(draftState.value.attempt))
+const draftChanged = computed(() => Boolean(editing.value) && proposed.value !== initialProposed.value)
 const kind = computed(() => editing.value ? editorKind(editing.value) : 'text')
+function editorValue(item: Configuration): string | boolean { const value = item.draft_value; return value === null || value === undefined ? '' : typeof value === 'boolean' ? value : typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value) }
 function openDraft(item: Configuration) {
+  if (draftWriter.unresolved()) { ElMessage.warning('请先处理原设计草稿请求，不能更换配置键'); return }
   if (typeof item.type !== 'string') { ElMessage.warning('登记类型格式异常，请先查询该配置的有效性诊断'); return }
-  closeDiagnostic()
-  editing.value = item; editError.value = null; validationError.value = ''
-  const value = item.draft_value
-  proposed.value = value === null || value === undefined ? '' : typeof value === 'boolean' ? value : typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)
+  try { if (!draftWriter.begin(item)) return } catch (cause) { ElMessage.warning(cause instanceof Error ? cause.message : '登记草稿基准不可用'); return }
+  closeDiagnostic(); editing.value = draftState.value.baseline; validationError.value = ''; proposed.value = editorValue(item); initialProposed.value = proposed.value
 }
+async function savedDraft() { if (draftState.value.receipt) { editing.value = null; ElMessage.success('设计登记建议草稿已保存，未成为租户运行配置'); await load() } }
 async function saveDraft() {
-  if (!editing.value) return
+  if (!editing.value || draftLocked.value) return
   let value: unknown
   try { value = parseProposedValue(kind.value, proposed.value) }
   catch (cause) { validationError.value = cause instanceof Error ? cause.message : '建议值有误'; return }
-  validationError.value = ''; saving.value = true; editError.value = null
-  try {
-    await api.request(`/configurations/${encodeURIComponent(editing.value.key)}/draft`, { method: 'POST', body: { proposed_value: value, expected_version: editing.value.version }, signal: controller.signal })
-    editing.value = null; ElMessage.success('配置草稿已保存，尚未生效'); await load()
-  } catch (cause) { if (!isCancelled(cause)) editError.value = cause }
-  finally { saving.value = false }
+  validationError.value = ''
+  try { if (await draftWriter.submit(value)) await savedDraft() }
+  catch (cause) { validationError.value = cause instanceof Error ? cause.message : '建议值有误' }
 }
+async function retryDraft() { if (await draftWriter.retry()) await savedDraft() }
+async function rebaseDraft() {
+  if (draftWriter.unresolved() || !await draftWriter.refresh() || !draftState.value.lastRead) return
+  const next = draftState.value.lastRead, generation = contextGeneration.value
+  try { await ElMessageBox.confirm('将采用刚回读的最新版本作为编辑基准，保留你当前填写的建议值。请确认已核对版本与旧建议差异。', '明确更换基准', { type: 'warning', confirmButtonText: '确认使用新基准', cancelButtonText: '保留原基准' }) } catch { return }
+  if (generation !== contextGeneration.value || !draftWriter.begin(next)) return
+  editing.value = next; initialProposed.value = editorValue(next); validationError.value = ''
+}
+async function leaveDraftContext() {
+  if (draftWriter.unresolved()) { ElMessage.warning('设计登记草稿原请求尚未确认，请先原请求重试'); return false }
+  if (!draftChanged.value) return true
+  try { await ElMessageBox.confirm('离开将舍弃尚未发送的设计草稿编辑内容。', '未发送的建议值', { type: 'warning', confirmButtonText: '舍弃并继续', cancelButtonText: '保留编辑' }); return true } catch { return false }
+}
+const unregisterDraftGuard = contextTransitionGuards.register(leaveDraftContext)
+onBeforeRouteLeave(leaveDraftContext)
+function draftBeforeUnload(event: BeforeUnloadEvent) { if (draftWriter.unresolved() || draftChanged.value) { event.preventDefault(); event.returnValue = '' } }
+window.addEventListener('beforeunload', draftBeforeUnload)
+watch(() => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, can('configurations:write'), switchingTenant.value], () => { const value = session.value; draftWriter.reset(value && value.user.role === 'padmin' && can('configurations:write') && !switchingTenant.value ? { tenantId: value.tenant.id, actorId: value.user.id, permissionVersion: value.permission_version } : null); editing.value = null; proposed.value = ''; initialProposed.value = ''; validationError.value = '' }, { immediate: true })
+onUnmounted(() => { unregisterDraftGuard(); window.removeEventListener('beforeunload', draftBeforeUnload); draftWriter.dispose() })
 const publishing = ref<Configuration | null>(null)
 const publishOpen = computed({ get: () => Boolean(publishing.value), set: value => { if (!value) publishing.value = null } })
 const publishError = ref<unknown>(null)
@@ -147,6 +172,7 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
     <div class="page-heading"><div><span class="eyebrow">ADMINISTRATION / CONFIGURATION</span><h1>配置确认登记</h1><p>统一记录合同值、客户待确认项与建议草稿。测试环境草稿均未发布为运行配置。</p></div><el-button :loading="loading" @click="load">刷新登记表</el-button></div>
     <div class="calendar-entry"><el-button :disabled="!can('configurations:read') || switchingTenant" @click="calendarOpen = true">工作日历草稿查询与试算</el-button></div>
     <WorkingCalendarReader v-model="calendarOpen" />
+    <el-alert v-if="draftState.receipt" type="success" :closable="false" :title="'设计登记原请求已确认：' + draftState.receipt.key + ' · v' + draftState.receipt.version + '；只是旧建议草稿，未生效'" />
     <div class="scope-card"><div><span class="small-label">登记项</span><strong>{{ countsUnknown ? '—' : rows.length }} <small>项</small></strong></div><div><span class="small-label">待客户确认</span><strong>{{ countsUnknown ? '—' : pendingCount }} <small>项</small></strong></div><div><span class="small-label">草稿版本</span><strong>{{ countsUnknown ? '—' : draftCount }} <small>项</small></strong></div><div class="scope-explanation">运行配置尚未启用。待确认项保留 null，禁止回退为演示默认。</div></div>
     <el-alert class="page-note" type="warning" :closable="false" show-icon title="配置修订支持证据引用与内部审批；证据未核验，客户确认与外部下发仍待接入，内部审批通过后尚未生效。" />
     <div class="panel"><ApiErrorNotice :error="error"><el-button size="small" @click="load">重试</el-button></ApiErrorNotice>
@@ -194,16 +220,19 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
       </template>
       <template #footer><el-button :loading="comparisonLoading" @click="loadComparison">回读登记与修订</el-button><el-button @click="comparisonOpen = false">关闭</el-button></template>
     </el-drawer>
-    <el-dialog v-model="editingOpen" title="编辑配置草稿" width="560px" class="responsive-dialog" :close-on-click-modal="!saving" :show-close="!saving" destroy-on-close>
+    <el-dialog v-model="editingOpen" title="编辑旧设计登记建议草稿（非租户运行配置）" width="560px" class="responsive-dialog" :close-on-click-modal="!draftUnresolved" :close-on-press-escape="!draftUnresolved" :show-close="!draftUnresolved" destroy-on-close>
       <template v-if="editing"><div class="config-dialog-context"><strong>{{ configurationMetadataLabel(editing.description, '配置描述') }}</strong><span class="mono">{{ editing.key }}</span><p>当前版本 v{{ editing.version }} · 登记值：{{ displayValue(editing.registered_value) }}</p><p>运行生效：{{ editing.effective_value === null ? '尚未启用' : displayValue(editing.effective_value) }}</p><p>关联确认：{{ configurationQuestionsLabel(editing.question_ids) }}</p></div>
-        <el-alert type="info" :closable="false" title="仅保存建议值；原登记值与待确认状态保持不变。" show-icon />
+        <el-alert type="info" :closable="false" title="这里只修改旧设计登记建议草稿，独立于当前租户提案与审批；不会修改原登记值、客户确认或运行生效配置。" show-icon />
         <ApiErrorNotice :error="editError" />
-        <p v-if="showConflict" class="field-help">版本已变化，建议值仍保留在表单。关闭后刷新登记表，再基于新版本编辑；系统不会覆盖他人修改。</p>
-        <el-form class="dialog-form" label-position="top" @submit.prevent="saveDraft"><el-form-item :label="`建议值${editing.unit !== null && editing.unit !== undefined ? `（${configurationMetadataLabel(editing.unit, '单位')}）` : ''}`" :error="validationError">
+        <el-alert v-if="draftUnresolved" type="warning" :closable="false" title="原body/key/配置键/版本已保留，结果未确认。只读刷新不重试、不重定基准，请勿刷新浏览器。" />
+        <div class="calendar-actions"><el-button :disabled="saving" @click="draftWriter.refresh()">只读核对最新登记</el-button><el-button v-if="draftUnresolved" type="warning" :disabled="Boolean(draftState.busy)" @click="retryDraft">使用原设计草稿请求重试</el-button><el-button v-if="!draftUnresolved" :disabled="Boolean(draftState.busy)" @click="rebaseDraft">明确采用新基准，保留填写值</el-button></div>
+        <p v-if="draftState.lastRead">最近只读所见v{{ draftState.lastRead.version }} · 已存旧建议：{{ displayValue(draftState.lastRead.draft_value) }}；当前填写与固定基准不自动替换</p>
+        <p v-if="showConflict" class="field-help">版本已变化，建议值仍保留在表单。请只读核对差异，再明确采用新基准；系统不会自动覆盖或重发。</p>
+        <el-form :disabled="draftLocked" class="dialog-form" label-position="top" @submit.prevent="saveDraft"><el-form-item :label="`建议值${editing.unit !== null && editing.unit !== undefined ? `（${configurationMetadataLabel(editing.unit, '单位')}）` : ''}`" :error="validationError">
           <el-select v-if="kind === 'boolean'" v-model="proposed" placeholder="请选择；未选择不等于否"><el-option label="是（true）" :value="true" /><el-option label="否（false）" :value="false" /></el-select>
           <el-input v-else v-model="proposed" :type="kind === 'json' ? 'textarea' : 'text'" :rows="kind === 'json' ? 7 : 1" :placeholder="kind === 'number' ? '请输入数字，本批校验登记类型' : kind === 'json' ? '请输入 JSON，保持字段类型与结构' : '请输入建议值'" />
         </el-form-item><p v-if="editing.allowed_range !== null" class="field-help">登记范围：{{ displayValue(editing.allowed_range) }} · 范围待正式规则核验</p><p v-if="editing.notes !== null && editing.notes !== undefined" class="field-help">{{ configurationMetadataLabel(editing.notes, '登记说明') }}</p></el-form>
-      </template><template #footer><el-button :disabled="saving" @click="editingOpen = false">取消</el-button><el-button type="primary" :loading="saving" @click="saveDraft">保存草稿</el-button></template>
+      </template><template #footer><el-button :disabled="draftUnresolved" @click="editingOpen = false">取消</el-button><el-button type="primary" :loading="saving" :disabled="draftLocked" @click="saveDraft">保存草稿</el-button></template>
     </el-dialog>
     <el-dialog v-model="publishOpen" title="配置发布条件" width="520px" class="responsive-dialog" :close-on-click-modal="!checking" :show-close="!checking" destroy-on-close>
       <template v-if="publishing"><div class="config-dialog-context"><strong>{{ configurationMetadataLabel(publishing.description, '配置描述') }}</strong><span class="mono">{{ publishing.key }}</span></div><el-alert type="warning" :closable="false" show-icon title="发布等待客户确认与审批。服务端将检查门禁，未满足条件时返回 CONFIG_PENDING。" /><p class="muted">关联确认：{{ configurationQuestionsLabel(publishing.question_ids) }}<br>发布条件：{{ configurationMetadataLabel(publishing.activation_gate, '发布条件') }}</p><ApiErrorNotice :error="publishError" /></template>

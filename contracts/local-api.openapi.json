@@ -3504,7 +3504,7 @@
     "/configurations/{key}/draft": {
       "post": {
         "operationId": "saveConfigurationDraft",
-        "summary": "保存独立草稿；不改变value或客户确认状态，动态校验登记类型",
+        "summary": "保存旧设计登记建议草稿；非租户运行配置，不改变value或客户确认",
         "parameters": [
           {
             "name": "key",
@@ -3561,6 +3561,8 @@
             }
           }
         },
+        "x-mop-scope": "GLOBAL_DESIGN_REGISTRY_DRAFT_NOT_TENANT_RUNTIME",
+        "description": "旧设计登记建议草稿按配置键共享保存；当前租户用于授权与审计，不将该全局建议值冒充租户运行配置。仅draft_value/version/lifecycle_status变化，value/registered_value/effective_value及客户确认不改变。当前租户提案与审批使用独立revisions接口。",
         "responses": {
           "200": {
             "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",

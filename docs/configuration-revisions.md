@@ -58,3 +58,16 @@ ConfigurationRevisions已改用独立configurationRevisionWriter保存不可变�
 B06的提案/审批部分代码与真实HTTP已修；旧简易值草稿编辑尚未覆盖，继续下一独立功能。API/Java/V1–V12未改，不重复计入上一根回归。DOM/390px/实际控件验收仍随B03未执行，客户真实性/正式配置生效和完整D04/128项未DONE。
 
 见[实际原请求恢复HTTP](evidence/niko-configuration-revision-writer-http-20261003.json)及[页面回归](evidence/niko-configuration-revision-recovery-web-20261003.json)。
+
+
+## 2026-10-03 B06旧设计登记草稿原请求恢复修复
+
+旧“编辑草稿”入口已接独立configurationDraftWriter，明确标识全局设计登记建议草稿，不能冒充当前租户运行配置。此范围来自既有API实际按配置键存储事实；契约仅补x-mop-scope/说明，路径、输入输出行为及API0.18版本不变。当前租户提案/审批仍使用独立revisions接口，设计value/registered_value/effective_value及客户确认不改变。
+
+保存时冻结原配置键、期望版本、proposed_value和幂等键；未知结果阻止换目标/改正文重发，显式原请求重试。只读整份登记回查不重定基准；已知新版本阻止旧基准提交，采用新基准必须明确确认且保留当前填写值。回执需与原值/目标/版本增量相符，所有不可写登记元数据保持一致；成功回执后GET失败仍保留已确认成功。409不重试，双击防重，过时授权上下文响应丢弃。主动切租户/退出、路由离开与beforeunload保护未知或未发送编辑；强制会话失效仍清理。
+
+18新Web共418项、类型构建、35契约与生成一致性通过。实际writer+ApiClient22HTTP，4前端POST尝试（丢弃一次成功写响应后的原键重放、一次409、一次明确新基准保存）对应2逻辑保存；另2独立变更为并发草稿和最终恢复，合计4变更/4成功审计，版本增加4。测试只选择niko库已被JUnit CAS用例写入31/32的设计草稿；finally按版本/本次值边界核对并恢复原draft_value，原登记/生效/元数据前后相等，保留真实版本与审计，不删除证据。没有更改Keycloak配置、运行安全策略、原服务器或客户正式配置。
+
+另丢弃一次后续GET，已确认回执仍保留；客户403、只读审计尾不变、原body/key/目标/版本均核验。响应丢弃不是物理断网。B06提案/审批及旧草稿的代码/真实模块HTTP缺口已修；其DOM/390px控件仍随B03未验，不把代码完成记作完整合同验收。Java/API实现/V1–V12未改，正式运行定义、客户真实性与发布继续保留门禁。
+
+见[旧草稿实际HTTP](evidence/niko-configuration-draft-writer-http-20261003.json)及[页面回归](evidence/niko-configuration-draft-recovery-web-20261003.json)。

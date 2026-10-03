@@ -1,18 +1,24 @@
-// Real niko PG/OIDC API checks. No storage adapter, fixture route, browser or migration is invoked.
+// Real PG/OIDC API checks with separate named environments and immutable evidence files.
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { randomUUID, createHash } from 'node:crypto';
 import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 const root=new URL('../',import.meta.url);
 let stage='initialization';
 try {
+  const environment=process.env.MOP_HTTP_ENVIRONMENT??'niko-local-test';
+  assert.ok(['niko-local-test','designated-server'].includes(environment));
+  const privateDirectory=environment==='designated-server'?'.local/designated-test/private/':'.local/niko-test/private/';
+  const evidenceFile=new URL(environment==='designated-server'?'docs/evidence/local-capacity-estimate-api-http-20261003.json':'docs/evidence/niko-capacity-estimate-api-http-20261003.json',root);
+  const catalogFile=new URL(environment==='designated-server'?'.local/designated-test/capacity-api-catalog-snapshot.json':'.local/niko-test/capacity-api-catalog-snapshot.json',root);
+  assert.equal(existsSync(evidenceFile)||existsSync(catalogFile),false,'Existing evidence must be preserved');
   const contract=JSON.parse(readFileSync(new URL('contracts/local-api.openapi.json',root),'utf8'));assert.equal(contract.info.version,'0.27.0');
   const ajv=new Ajv({strict:false,allErrors:true});addFormats(ajv);ajv.addSchema({$id:'urn:mop:capacity-http',components:contract.components});
   const validators=new Map(),checks=[],traces=new Map();
   const sessions=Object.fromEntries(['msp','tadmin','viewerA','viewerB','padmin','reviewer'].map(role=>{
-    const session=JSON.parse(readFileSync(new URL(`.local/niko-test/private/sessions/qa-${role}.json`,root),'utf8'));
-    assert.equal(session.environment,'niko-local-test');return [role,session];
+    const session=JSON.parse(readFileSync(new URL(`${privateDirectory}sessions/qa-${role}.json`,root),'utf8'));
+    assert.equal(session.environment,environment);return [role,session];
   }));
   async function request(role,method,path,route,expected,name,body,options={}){
     stage=name;const headers={'Content-Type':'application/json'};
@@ -51,6 +57,6 @@ try {
   assert.equal(catalog.declaration_hash,createHash('sha256').update(canonical).digest('hex'));
   const tail=(await request('padmin','GET','/audit/records?page_size=10','/audit/records',200,'audit_tail_before_readonly_estimates')).value.snapshot_sequence;for(let i=0;i<3;i++)await request('padmin','POST',route,route,200,'repeat_readonly_'+i,body,{noKey:true});assert.equal((await request('padmin','GET','/audit/records?page_size=10','/audit/records',200,'audit_tail_after_readonly_estimates')).value.snapshot_sequence,tail);
   for(const role of Object.keys(sessions)){const after=(await request(role,'GET','/session','/session',200,'unchanged_roles_'+role)).value;assert.deepEqual(after.capabilities,current[role].capabilities);assert.equal(after.permission_version,current[role].permission_version);}
-  writeFileSync(new URL('.local/niko-test/capacity-api-catalog-snapshot.json',root),JSON.stringify(catalog,null,2)+'\n',{flag:'wx'});
-  const evidence={verified_at:new Date().toISOString(),environment:'niko-local-test',passed:true,contract_version:'0.27.0',http_requests:checks.length,checks,hand_calculation_all_nine_and_buffer:true,decimal_strings_preserve_big_integer:true,exact_pool_ceiling:true,unknowns_never_defaulted:true,below_one_buffer_multiplier_explicit:true,platform_admin_only:true,session_tenant_enforced:true,current_capability_count:catalog.entry_count,current_capability_hash:catalog.declaration_hash,new_code_capability:'capacity:estimate',existing_role_bindings_changed:false,authorized_tenant_switches:2,scenario_or_business_writes:0,readonly_success_audit_tail_unchanged:true,measurement_verified:false,model_approval_verified:false,approved_pool_limit:null,poc_executed:false,proxy_failover_verified:false,browser_dom_tested:false,credentials_output:false,remaining:['Estimate UI and DOM','Saved scenarios and actual baseline provenance','Real Proxy and 12500NVPS24h PoC']};writeFileSync(new URL('docs/evidence/niko-capacity-estimate-api-http-20261003.json',root),JSON.stringify(evidence,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({passed:true,http_requests:checks.length,business_writes:0,catalog_entries:21}));
+  writeFileSync(catalogFile,JSON.stringify(catalog,null,2)+'\n',{flag:'wx'});
+  const evidence={verified_at:new Date().toISOString(),environment,passed:true,contract_version:'0.27.0',http_requests:checks.length,checks,hand_calculation_all_nine_and_buffer:true,decimal_strings_preserve_big_integer:true,exact_pool_ceiling:true,unknowns_never_defaulted:true,below_one_buffer_multiplier_explicit:true,platform_admin_only:true,session_tenant_enforced:true,current_capability_count:catalog.entry_count,current_capability_hash:catalog.declaration_hash,new_code_capability:'capacity:estimate',existing_role_bindings_changed:false,authorized_tenant_switches:2,scenario_or_business_writes:0,readonly_success_audit_tail_unchanged:true,measurement_verified:false,model_approval_verified:false,approved_pool_limit:null,poc_executed:false,proxy_failover_verified:false,browser_dom_tested:false,credentials_output:false,remaining:['Estimate UI and DOM','Saved scenarios and actual baseline provenance','Real Proxy and 12500NVPS24h PoC']};writeFileSync(evidenceFile,JSON.stringify(evidence,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({passed:true,http_requests:checks.length,business_writes:0,catalog_entries:21}));
 }catch{console.error(JSON.stringify({status:'failed',stage,details:'redacted'}));process.exitCode=1;}

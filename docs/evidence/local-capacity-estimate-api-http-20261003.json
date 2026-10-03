@@ -1,0 +1,395 @@
+{
+  "verified_at": "2026-10-03T11:00:40.598Z",
+  "environment": "designated-server",
+  "passed": true,
+  "contract_version": "0.27.0",
+  "http_requests": 72,
+  "checks": [
+    {
+      "name": "session_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "session_reviewer",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "explicit_hand_calculation_no_idempotency",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "second_platform_admin_same_math",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "msp_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "tadmin_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerA_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "viewerB_forbidden",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "csrf_required",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "anonymous_csrf_denied",
+      "status": 403,
+      "contract_valid": true
+    },
+    {
+      "name": "all_unknown_no_defaults",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "eleven_capacity_missing_four_buffer_missing",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "beyond_js_safe_integer_preserved",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "pool_ceiling_uses_exact_unrounded_input",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "decimal128_repeating_fraction",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "explicit_zero_not_unknown",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "zero_does_not_hide_missing_coefficients",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "factor_below_one_explicit_warning",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_group_inputs",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_group_model",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_group_proxy_buffer",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_nested_inputs",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_nested_model",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "missing_nested_proxy_buffer",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_28",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_29",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_30",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_31",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_32",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_33",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_34",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_decimal_35",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_36",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_37",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_38",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_39",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_40",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_41",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_42",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_43",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_44",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_45",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_46",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_47",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_48",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "invalid_bound_49",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "cannot_forge_model_approval",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "cannot_forge_tenant",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "query_override_rejected",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_json_53",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_json_54",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_json_55",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "bounded_json_56",
+      "status": 400,
+      "contract_valid": true
+    },
+    {
+      "name": "switch_authorized_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "actual_session_scope_changes_only",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "restore_original_tenant",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "updated_code_capability_catalog",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_tail_before_readonly_estimates",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "repeat_readonly_0",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "repeat_readonly_1",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "repeat_readonly_2",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "audit_tail_after_readonly_estimates",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_roles_msp",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_roles_tadmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_roles_viewerA",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_roles_viewerB",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_roles_padmin",
+      "status": 200,
+      "contract_valid": true
+    },
+    {
+      "name": "unchanged_roles_reviewer",
+      "status": 200,
+      "contract_valid": true
+    }
+  ],
+  "hand_calculation_all_nine_and_buffer": true,
+  "decimal_strings_preserve_big_integer": true,
+  "exact_pool_ceiling": true,
+  "unknowns_never_defaulted": true,
+  "below_one_buffer_multiplier_explicit": true,
+  "platform_admin_only": true,
+  "session_tenant_enforced": true,
+  "current_capability_count": 21,
+  "current_capability_hash": "5c8d8a369181d7d71dcbaf2000400d70057f30f238f2747cff1ae601b7a957e1",
+  "new_code_capability": "capacity:estimate",
+  "existing_role_bindings_changed": false,
+  "authorized_tenant_switches": 2,
+  "scenario_or_business_writes": 0,
+  "readonly_success_audit_tail_unchanged": true,
+  "measurement_verified": false,
+  "model_approval_verified": false,
+  "approved_pool_limit": null,
+  "poc_executed": false,
+  "proxy_failover_verified": false,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "remaining": [
+    "Estimate UI and DOM",
+    "Saved scenarios and actual baseline provenance",
+    "Real Proxy and 12500NVPS24h PoC"
+  ]
+}

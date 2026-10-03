@@ -1,0 +1,32 @@
+{
+  "verified_at": "2026-10-03T06:35:35.602253+00:00",
+  "status": "PURE_RECORDED_DATE_ARITHMETIC_ONLY",
+  "tests": {
+    "new_pure_rules": 12,
+    "root_reported": 842,
+    "root_executed": 829,
+    "existing_real_pg_regression": 256,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 42
+  },
+  "timezone": "Asia/Shanghai",
+  "reference_date_required": true,
+  "unknown_dates_keep_nullable_derived_fields": true,
+  "today_separate_from_past": true,
+  "upcoming_windows_inclusive_days": [
+    7,
+    30,
+    90
+  ],
+  "same_year_and_quarter": true,
+  "warranty_and_end_of_service_independent": true,
+  "coverage_verified": false,
+  "hazard_created": false,
+  "notification_sent": false,
+  "new_api_or_ui": false,
+  "new_pg_integration": false,
+  "migrations_executed": 0,
+  "all_128_done": false,
+  "credentials_output": false
+}

@@ -520,3 +520,13 @@ test('SLA对照输出不能声称正式达标率、已验真审批或赔偿金�
   const valid = value => validates('SlaComplianceScenarioResult', { data: value, trace_id: 'scenario-test' }); assert.equal(valid(data), true);
   for (const patch of [{ effective: true }, { effective_achievement: 1 }, { compensation_amount: 0 }, { approval_validation_status: 'VERIFIED' }, { source: 'postgresql' }, { status: 'CALCULATED' }, { scenario_achievement: { numerator: 0, denominator: 0 } }]) assert.equal(valid({ ...data, ...patch }), false);
 });
+test('128项合同追踪保持唯一且逐项证据链接指向实际仓库文件', () => {
+  const url = new URL('../doc/development/07_合同逐项开发追踪.md', import.meta.url);
+  const rows = readFileSync(url, 'utf8').split('\n').filter(line => /^\|M\d+-\d+\|/.test(line));
+  assert.equal(rows.length, 128); assert.equal(new Set(rows.map(row => row.split('|')[1])).size, 128);
+  for (const row of rows) {
+    const evidence = row.split('|').at(-2);
+    if (evidence.trim()) assert.match(evidence, /非DONE|NOT_RUN/, row.split('|')[1] + ' must retain current incomplete acceptance boundary');
+    for (const match of evidence.matchAll(/\]\(([^)]+)\)/g)) assert.ok(readFileSync(new URL(match[1], url)).length > 0, match[1]);
+  }
+});

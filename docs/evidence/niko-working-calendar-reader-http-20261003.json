@@ -1,0 +1,32 @@
+{
+  "verified_at": "2026-10-03T01:42:46.428Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "frontend": "actual workingCalendarReader + ApiClient",
+  "http_requests": 47,
+  "reader_requests": 22,
+  "reader_preview_posts": 7,
+  "independent_setup_mutations": 18,
+  "final_draft_version": 18,
+  "matching_success_audits": 18,
+  "history_pages": [
+    15,
+    2
+  ],
+  "readonly_gets_and_preview_did_not_append_success_audit": true,
+  "draft_unchanged_by_reader": true,
+  "union_arithmetic_checked": true,
+  "unknown_zero_and_insufficient_distinguished": true,
+  "stale_preview_409_without_auto_retry": true,
+  "failed_history_cleared_selection": true,
+  "customer_read_403": true,
+  "context_reset_cleared_data": true,
+  "credentials_output": false,
+  "browser_dom_tested": false,
+  "fault_injection": "Discard one completed successful history GET response in transport; not physical network failure",
+  "remaining": [
+    "Calendar create/edit UI still pending",
+    "DOM/390px browser validation B03",
+    "Customer-approved calendar and formal SLA activation"
+  ]
+}

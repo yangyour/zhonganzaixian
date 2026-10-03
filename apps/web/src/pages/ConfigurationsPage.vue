@@ -12,7 +12,9 @@ import PermissionGate from '../components/PermissionGate.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import ConfigurationRevisions from '../components/ConfigurationRevisions.vue'
 import ConfigurationDiagnosticPanel from '../components/ConfigurationDiagnosticPanel.vue'
+import WorkingCalendarReader from '../components/WorkingCalendarReader.vue'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
+const calendarOpen = ref(false)
 const rows = ref<Configuration[]>([])
 const loading = ref(false)
 const error = ref<unknown>(null)
@@ -143,6 +145,8 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
 <template>
   <section>
     <div class="page-heading"><div><span class="eyebrow">ADMINISTRATION / CONFIGURATION</span><h1>配置确认登记</h1><p>统一记录合同值、客户待确认项与建议草稿。测试环境草稿均未发布为运行配置。</p></div><el-button :loading="loading" @click="load">刷新登记表</el-button></div>
+    <div class="calendar-entry"><el-button :disabled="!can('configurations:read') || switchingTenant" @click="calendarOpen = true">工作日历草稿查询与试算</el-button></div>
+    <WorkingCalendarReader v-model="calendarOpen" />
     <div class="scope-card"><div><span class="small-label">登记项</span><strong>{{ countsUnknown ? '—' : rows.length }} <small>项</small></strong></div><div><span class="small-label">待客户确认</span><strong>{{ countsUnknown ? '—' : pendingCount }} <small>项</small></strong></div><div><span class="small-label">草稿版本</span><strong>{{ countsUnknown ? '—' : draftCount }} <small>项</small></strong></div><div class="scope-explanation">运行配置尚未启用。待确认项保留 null，禁止回退为演示默认。</div></div>
     <el-alert class="page-note" type="warning" :closable="false" show-icon title="配置修订支持证据引用与内部审批；证据未核验，客户确认与外部下发仍待接入，内部审批通过后尚未生效。" />
     <div class="panel"><ApiErrorNotice :error="error"><el-button size="small" @click="load">重试</el-button></ApiErrorNotice>

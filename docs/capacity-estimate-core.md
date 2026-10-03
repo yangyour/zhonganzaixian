@@ -1,6 +1,6 @@
 # M10-7 显式参数容量估算核心
 
-`CapacityEstimate` 是D13中的纯数学估算器，按开发文档02的8输入/9输出模型实现。它未接入页面、HTTP、配置仓储、真实采样或采购流程，结果始终标记 `estimateOnly=true`。
+`CapacityEstimate` 是D13中的纯数学估算器，按开发文档02的8输入/9输出模型实现。初始纯核心时点未接入页面、HTTP、配置仓储、真实采样或采购流程；后续API见下节。结果始终标记 `estimateOnly=true`。
 
 ## 输入
 
@@ -40,3 +40,14 @@ ProxyBufferEstimate补齐M4-15/M10-7的纯公式：站点NVPS×最长断网秒�
 8新纯测试涵盖手算50,400,000bytes、空输入/不补默认、0值不掩盖缺项、负数/分母、倍率语义、小数精度和超固定整数范围。完整根970（957执行含295既有真实PG）/13历史跳过/6MinIO排除、51契约通过；这批PG是回归，不是新Proxy组件联调。首轮新测试var复合声明编译失败，改为明确BigDecimal后完整根通过。公开估算API、页面、保存场景/基准关联、实际Proxy和12,500NVPS×24h压测继续，M10-7/128项非DONE。见[纯核心证据](evidence/niko-proxy-buffer-core-20261003.json)。
 
 提交前同步e6eb115及其本地父提交ee2f77b，保留原指定库时区用例修复和双方验收记录；随后根970及51契约再次通过。本功能不重算或改写已发布维保证据。
+
+
+## 2026-10-03 容量与缓冲只读API0.27
+
+POST `/capacity/estimates` 当前只开放padmin的capacity:estimate，必须真实启用会话/当前租户/CSRF；不需要幂等键，不保存场景或成功业务审计。三个组inputs/model/proxy_buffer都必须出现，可明确null；非空组字段必须完整，缺失与null不混用。数量/小数用十进制字符串（最多40整数位+40小数位，无指数/前导零/空白），天数是非负32位JSON整数。此为技术有界解析，不是合同容量上限；8个输入和模型版本/趋势字节/池上限全部由用户明确提供。
+
+九个输出为不含指数的十进制字符串，避免JavaScript安全整数边界及小数二次舍入；单位明确bytes/values_per_second/整数。未知返回UNRESOLVED及null输出/缺项列表，主模型与Proxy独立。Proxy倍率直接相乘，低于1时显式margin_factor_below_one=true，不能当成额外40%或已满足基础存储。输入系数和版本仅为自述，approved_pool_nvps_limit、measured_capacity始终null，scenario_saved=false、生产容量未核验、PoC NOT_RUN；主备数学不证明HA/接管。
+
+12控制器、完整根982（969执行含295既有PG）/13历史跳过/6MinIO排除、53契约/574Web/类型构建与72真实HTTP通过。手算九输出+Proxy、40位精度临界池数ceil、超JS安全整数、循环小数、0不掩盖缺项、完整字段/边界、平台管理员与其他角色403、会话切租户和成功只读审计尾不变均有证；无场景或业务数据写入。实际角色绑定未改；代码能力目录从20增至21，真实GET生成的表和摘要见[能力目录](capability-catalog.md)。
+
+契约生成首轮错用helper名、通用写入测试未列只读例外，已修并完整53通过；HTTP脚本语法在请求前修复，实际72请求首轮通过。API0.26拥有栈正常退出，新固定API0.27就绪且6OIDC重新认证；V1–V15未改，不自动迁移。估算页面、持久化场景/真实基准依据、实际Proxy与12,500NVPS持续24h/2倍峰值30分钟未验，M10-7/128项非DONE。见[API回归](evidence/niko-capacity-estimate-api-20261003.json)、[真实HTTP](evidence/niko-capacity-estimate-api-http-20261003.json)。

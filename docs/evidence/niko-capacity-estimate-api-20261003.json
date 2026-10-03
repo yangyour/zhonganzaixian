@@ -1,0 +1,47 @@
+{
+  "verified_at": "2026-10-03T10:44:12.657173+00:00",
+  "environment": "niko-local-test",
+  "status": "READONLY_ESTIMATE_API_VERIFIED_UI_PENDING",
+  "contract_version": "0.27.0",
+  "tests": {
+    "new_controller": 12,
+    "root_reported": 982,
+    "root_executed": 969,
+    "existing_real_pg": 295,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "contracts": 53,
+    "web": 574,
+    "typecheck_and_build": true,
+    "real_http": 72,
+    "failures": 0,
+    "errors": 0
+  },
+  "capability": "capacity:estimate",
+  "roles": [
+    "padmin"
+  ],
+  "current_catalog_entries": 21,
+  "current_catalog_hash": "5c8d8a369181d7d71dcbaf2000400d70057f30f238f2747cff1ae601b7a957e1",
+  "business_or_scenario_writes": 0,
+  "input_encoding": "nonnegative decimal strings up to40 integer and40 fractional digits; days nonnegative32bit JSONintegers",
+  "output_encoding": "canonical base10 strings without exponent; final DECIMAL128 rounding",
+  "unknown_values_defaulted": false,
+  "scenario_saved": false,
+  "measurements_verified": false,
+  "model_approved": false,
+  "approved_pool_limit": null,
+  "poc_12500nvps_24h_run": false,
+  "proxy_failover_verified": false,
+  "api_worker_auto_migration": false,
+  "schema_unchanged": "V1-V15_FROZEN",
+  "runtime": "normal owned API0.26 exit, fixed API0.27 startup readiness and six fresh OIDC sessions",
+  "iteration_corrections": [
+    "Contract generator helper renamed json to existing jsonBody",
+    "Added this explicitly readonly POST to the contract test allowlist while retaining required CSRF",
+    "HTTP script newline syntax corrected before any test request; completed HTTP run passed first time"
+  ],
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "all_128_done": false
+}

@@ -17,6 +17,21 @@ public final class PostgresCustomerContactRepository implements CustomerContactR
     public PostgresCustomerContactRepository(DataSource source,PostgresPlatformRepository platform){this.source=Objects.requireNonNull(source);this.platform=Objects.requireNonNull(platform);}
     @Override public void authorizeWrite(Access a,String id){Connection c=platform.idempotentCommandConnection();try{authorize(c,a,true);if(id!=null)get(c,a,uuid(id));}catch(SQLException failure){throw unavailable(failure);}}
     @Override public Entry create(Access a,long expectedVersion,CustomerContact facts){Connection c=platform.idempotentCommandConnection();if(expectedVersion!=0||facts==null)throw invalid();try{authorize(c,a,true);lockTenant(c,a);CustomerContact.requireDecisionMakerAfterChange(countDecisions(c,a),null,facts);String id=UUID.randomUUID().toString();try(var s=statement(c,"INSERT INTO public.mop_customer_contact(id,tenant_id,created_by) VALUES (?::uuid,?::uuid,?::uuid)")){s.setString(1,id);s.setString(2,a.tenantId());s.setString(3,a.actorId());if(s.executeUpdate()!=1)throw corrupt();}revision(c,a,id,1,"CREATE",false,facts);audit(a,id,"create");return get(c,a,id);}catch(SQLException failure){throw unavailable(failure);}}
+    @Override public List<Entry> createBatch(Access a,List<CustomerContact> explicitRows){
+        Connection c=platform.idempotentCommandConnection();
+        if(explicitRows==null||explicitRows.isEmpty()||explicitRows.size()>CustomerContactImportPreview.MAX_ROWS||explicitRows.stream().anyMatch(Objects::isNull))throw invalid();
+        List<CustomerContact> rows=List.copyOf(explicitRows);Savepoint savepoint;
+        try{authorize(c,a,true);lockTenant(c,a);long count=countDecisions(c,a);
+            // Preserve the existing explicit first-contact rule and the submitted row order, never silently reorder.
+            for(CustomerContact row:rows)count=CustomerContact.requireDecisionMakerAfterChange(count,null,row);
+            savepoint=c.setSavepoint();
+        }catch(SQLException failure){throw unavailable(failure);}
+        try{List<Entry> created=new ArrayList<>(rows.size());for(CustomerContact row:rows)created.add(create(a,0,row));c.releaseSavepoint(savepoint);return List.copyOf(created);}
+        catch(RuntimeException|Error failure){rollbackBatch(c,savepoint,failure);throw failure;}
+        catch(SQLException failure){rollbackBatch(c,savepoint,failure);throw unavailable(failure);}
+    }
+    /** Also protects the batch if an outer caller catches a failure instead of aborting its command. */
+    private static void rollbackBatch(Connection c,Savepoint savepoint,Throwable original){try{c.rollback(savepoint);c.releaseSavepoint(savepoint);}catch(SQLException failure){failure.addSuppressed(original);throw unavailable(failure);}}
     @Override public Entry update(Access a,String id,long expectedVersion,CustomerContact facts){if(facts==null)throw invalid();return change(a,id,expectedVersion,"UPDATE",facts);}
     @Override public Entry archive(Access a,String id,long expectedVersion){return change(a,id,expectedVersion,"ARCHIVE",null);}
     @Override public Entry restore(Access a,String id,long expectedVersion,CustomerContact explicitFacts){if(explicitFacts==null)throw invalid();return change(a,id,expectedVersion,"RESTORE",explicitFacts);}

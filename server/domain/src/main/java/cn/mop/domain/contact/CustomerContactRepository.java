@@ -11,6 +11,10 @@ public interface CustomerContactRepository {
     /** Current member/resource checks inside the idempotent command, before returning a stored receipt. */
     void authorizeWrite(Access access,String id);
     Entry create(Access access,long expectedVersion,CustomerContact facts);
+    /** Internal atomic create-only batch, input order retained. Requires a protected idempotent command.
+     * This is not a public synchronous import API; durable asynchronous acceptance is separate.
+     */
+    List<Entry> createBatch(Access access,List<CustomerContact> explicitRows);
     Entry update(Access access,String id,long expectedVersion,CustomerContact facts);
     Entry archive(Access access,String id,long expectedVersion);
     Entry restore(Access access,String id,long expectedVersion,CustomerContact explicitFacts);

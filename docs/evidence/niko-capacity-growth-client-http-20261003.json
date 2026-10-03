@@ -1,0 +1,23 @@
+{
+  "verified_at": "2026-10-03T12:54:44.916Z",
+  "environment": "niko-local-test",
+  "passed": true,
+  "http_requests": 39,
+  "readonly_estimate_posts": 35,
+  "business_writes": 0,
+  "explicit_zero_and_large_counts": true,
+  "twenty_points_bound_verified": true,
+  "math_independently_verified": true,
+  "unknown_model_no_curve": true,
+  "partial_failure_no_curve": true,
+  "late_response_no_next_request": true,
+  "duplicate_click_suppressed": true,
+  "actual_msp403": true,
+  "successful_readonly_audit_tail_unchanged": true,
+  "initial_audit_sequence": 41512,
+  "scenario_saved": false,
+  "poc_executed": false,
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "faults": "one real successful second response discarded and three real responses held; no fake component or physical failure claim"
+}

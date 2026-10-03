@@ -5,6 +5,7 @@ import { can, contextGeneration, session, switchingTenant } from '../stores/sess
 import { createCapacityWorkspace, emptyCapacityInput, type CapacityState, type CapacityOutputs } from '../utils/capacityEstimateWorkspace'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import CapacityScenarioPanel from '../components/CapacityScenarioPanel.vue'
+import CapacityGrowthPanel from '../components/CapacityGrowthPanel.vue'
 const scenarios = ref<InstanceType<typeof CapacityScenarioPanel> | null>(null)
 const fields = [
   { key: 'hosts', label: '主机数', help: '非负整数' }, { key: 'items_per_host', label: '每台有效监控项数', help: '非负整数' },
@@ -54,7 +55,8 @@ const bufferMissing: Record<string, string> = Object.fromEntries([...bufferField
         <el-alert v-if="state.result.proxy_buffer.margin_factor_below_one" type="warning" :closable="false" title="缓冲倍率小于1，结果小于基础需求；未自动把它解释成额外余量，也不能视为容量足够" />
         <p class="capacity-help">主备两份只是数学估算，不证明HA、Proxy接管或断网无丢失。每值空间来源未核验，实际容量和获准池限仍未知。</p>
       </section>
-      <section class="capacity-boundaries"><h2>仍待真实验收</h2><p>PoC目标：12,500NVPS持续24小时，2倍峰值30分钟；本工具没有执行该压测。已提供独立草稿保存与未核验基准引用；增长曲线、实际基准验证及PoC仍待完成。当前主页面输入不会自动保存，只有确认成功的方案回执才代表已写入。</p></section>
+      <CapacityGrowthPanel :calculation="input()" />
+      <section class="capacity-boundaries"><h2>仍待真实验收</h2><p>PoC目标：12,500NVPS持续24小时，2倍峰值30分钟；本工具没有执行该压测。已提供独立草稿保存与未核验基准引用；显式增长对照已提供，实际基准验证及PoC仍待完成。当前主页面输入不会自动保存，只有确认成功的方案回执才代表已写入。</p></section>
     </template>
   </section>
 </template>

@@ -1,0 +1,27 @@
+{
+  "verified_at": "2026-10-03T12:56:08.371848+00:00",
+  "environment": "niko-local-test",
+  "status": "EXPLICIT_GROWTH_COMPARISON_VERIFIED_BROWSER_PENDING",
+  "new_web_tests": 10,
+  "web_total": 623,
+  "type_and_build": true,
+  "contracts": 55,
+  "real_frontend_http": 39,
+  "readonly_estimate_posts": 35,
+  "business_writes": 0,
+  "api_version_unchanged": "0.28.0",
+  "schema_changed": false,
+  "browser_dom_tested": false,
+  "formula": "Existing capacity formula per explicitly supplied increasing host count, all other capacity parameters unchanged; no time-growth forecast or measured trend",
+  "points": "Explicit2..20; no prototype fixed500..20000 defaults",
+  "visual": "Shared scale for history without headroom, trends without headroom, single-node including headroom; not stacked. Exact original decimal strings remain visible; BigInt basis-point width only affects rendering",
+  "prototype_discrepancy": "Prototype title says including headroom but its historical/trend stacked bars omit headroom. New chart explicitly separates these facts instead of reproducing that misleading label.",
+  "poc_executed": false,
+  "scenario_saved": false,
+  "all_128_done": false,
+  "panel_ci": {
+    "commit": "bc319637a3db92b067d5be963c6af806fc626a34",
+    "run": 37124086660,
+    "conclusion": "success"
+  }
+}

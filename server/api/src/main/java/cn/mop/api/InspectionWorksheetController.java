@@ -33,6 +33,18 @@ public final class InspectionWorksheetController {
         return success(map("tenant_id",a.tenantId(),"items",items.stream().map(InspectionWorksheetController::summaryDto).toList(),"has_more",more,"next_before_created_at",last==null?null:last.createdAt().toString(),"next_before_id",last==null?null:last.id(),"view",view.name(),"source","postgresql","scope","CURRENT_TENANT_PADMIN","page_size_limit",20),request);
     }
     @GetMapping("/{id}") Object get(@PathVariable String id,HttpServletRequest request){Access a=access(request,false);query(request,Set.of());return success(dto(worksheets.get(a,uuid(id))),request);}
+    @GetMapping("/{id}/revisions/{version}") Object sourceRevision(@PathVariable String id,@PathVariable String version,HttpServletRequest request){
+        Access a=access(request,false);query(request,Set.of());String record=uuid(id);long revision=version(version);
+        var captured=worksheets.captureSources(a,List.of(new Selection(record,revision)));
+        if(captured==null||!captured.tenantId().toString().equals(a.tenantId())||captured.sources().size()!=1)throw sourceUnavailable();
+        var source=captured.sources().get(0);if(!source.worksheetId().toString().equals(record)||source.version()!=revision)throw sourceUnavailable();
+        return success(sourceDto(source),request);
+    }
+    static Map<String,Object> sourceDto(InspectionSourceSnapshot source){
+        var result=map("worksheet_id",source.worksheetId().toString(),"tenant_id",source.tenantId().toString(),"version",source.version(),"created_by",source.createdBy().toString(),"created_at",source.createdAt().toString(),"recorded_by",source.recordedBy().toString(),"recorded_at",source.recordedAt().toString(),"action",source.action(),"archived",source.revisionArchived(),"source_type",source.sourceType(),"source_format",InspectionSourceSnapshot.FORMAT,"source_snapshot_sha256",source.fingerprint(),"scope","CURRENT_TENANT_PADMIN","evidence_access_granted",false);
+        result.putAll(contentDto(source.content(),true));return result;
+    }
+    private static DomainException sourceUnavailable(){return new DomainException(503,"UPSTREAM_UNAVAILABLE","来源读取未返回所请求的租户内明确修订，未提供替代结果");}
     @GetMapping("/{id}/history") Object history(@PathVariable String id,HttpServletRequest request){
         Access a=access(request,false);var q=query(request,Set.of("page_size","before_version"));int size=pageSize(q);Long before=q.containsKey("before_version")?version(q.get("before_version")):null;String record=uuid(id);var rows=worksheets.history(a,record,size+1,before);boolean more=rows.size()>size;var items=rows.subList(0,Math.min(size,rows.size()));
         return success(map("tenant_id",a.tenantId(),"worksheet_id",record,"items",items.stream().map(InspectionWorksheetController::revisionDto).toList(),"has_more",more,"next_before_version",more?items.get(items.size()-1).version():null,"source","postgresql","scope","CURRENT_TENANT_PADMIN","page_size_limit",20),request);

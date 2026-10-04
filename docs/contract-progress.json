@@ -1336,6 +1336,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "b659252f740882138dd4cddd6c91ef4137bb42e4978830c6d754419712521a15"
+    "doc/development/07_合同逐项开发追踪.md": "630c7d38fcdf36369e8074c07de20c3cfc62150ad925a0fe7629a8b4ada9b611"
   }
 }

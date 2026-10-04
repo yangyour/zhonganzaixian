@@ -1,3 +1,4 @@
+# Refresh private tracked-source archive to materialize four new Windows evidence PNGs; no credentials or Git history.
 name: Private tracked source recovery
 on:
   push:

@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.36.0');
+  assert.equal(contract.info.version, '0.37.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -780,3 +780,8 @@ test('worksheet routes declare actual authorization replay guards limits and no 
   for(const suffix of ['/publish','/verify','/scan'])assert.equal(contract.paths['/inspection-worksheets/{id}'+suffix],undefined);
   const ready=contract.components.schemas.ReadinessResult.properties.data;assert.ok(ready.required.includes('inspection_worksheets'));assert.equal(ready.properties.inspection_worksheets.properties.verification_status.const,'SELF_REPORTED_UNVERIFIED');assert.equal(ready.properties.inspection_worksheets.properties.report_published.const,false);
 });
+
+const worksheetSource={worksheet_id:id('1'),tenant_id:id('2'),version:1,created_by:id('3'),created_at:timestamp,recorded_by:id('3'),recorded_at:timestamp,action:'CREATE',archived:false,source_type:'IMMUTABLE_INSPECTION_WORKSHEET_REVISION',source_format:'MOP_INSPECTION_SOURCE_SNAPSHOT_V1',source_snapshot_sha256:'c'.repeat(64),scope:'CURRENT_TENANT_PADMIN',evidence_access_granted:false,...worksheetFacts,template_items:[inspectionItem],observations:[]};
+test('明确历史来源包含完整模板与不可变记录事实，不投影可变头时间',()=>{assert.ok(validates('InspectionWorksheetSource',worksheetSource));for(const patch of [{updated_at:timestamp},{source_type:'CURRENT_HEAD'},{source_format:'v2'},{source_snapshot_sha256:'broken'},{evidence_access_granted:true},{report_published:true},{verification_status:'VERIFIED'}])assert.equal(validates('InspectionWorksheetSource',{...worksheetSource,...patch}),false);});
+test('来源修订生命周期和未知自述时间保持原事实',()=>{assert.equal(validates('InspectionWorksheetSource',{...worksheetSource,version:2}),false);assert.ok(validates('InspectionWorksheetSource',{...worksheetSource,version:2,action:'ARCHIVE',archived:true}));assert.equal(validates('InspectionWorksheetSource',{...worksheetSource,action:'ARCHIVE',archived:false}),false);assert.equal(validates('InspectionWorksheetSource',{...worksheetSource,reported_performed_at:timestamp}),false);});
+test('历史下钻是显式版本只读事务，不提供发布或隐式latest路径',()=>{const p=contract.paths['/inspection-worksheets/{id}/revisions/{version}'];assert.deepEqual(Object.keys(p),['get']);assert.equal(p.get['x-mop-explicit-version-only'],true);assert.equal(p.get['x-mop-writes-audit-or-receipts'],false);assert.equal(p.get['x-mop-read-consistency'],'READ_ONLY_REPEATABLE_READ');assert.deepEqual(p.get['x-mop-roles'],['padmin']);assert.equal(p.get.parameters.find(x=>x.name==='version').required,true);assert.equal(contract.paths['/inspection-worksheets/{id}/revisions/latest'],undefined);});

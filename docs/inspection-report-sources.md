@@ -42,3 +42,21 @@ PostgreSQL实现先要求独立读取，再开启READ ONLY / REPEATABLE READ事�
 初次编译因模板缓存键与答案键局部变量重名失败，改为templateKey后重跑成功，失败日志保留。执行终端62871已不可访问，复用既有数据目录和私有配置重启批准组件；PG于12:32:43 UTC记录异常停止后的WAL恢复并就绪，固定API产物就绪检查通过。没有本次故障前全库即时摘要，不将恢复启动冒充全库等值、原服务器连通或受控灾备验收。
 
 最终57聚焦测试与根1789报告=1776实际执行（567真实PG）+13历史跳过/6MinIO排除通过；86契约/生成一致性、17追踪单测通过。只读schema检查0迁移，测试后248合成执行单均归档且保持SELF_REPORTED_UNVERIFIED，不当作业务执行。见[来源捕获证据](evidence/niko-inspection-source-capture-20261004.json)。来源捕获不等于独立报告持久化、正式季度规则或发布验收。
+
+
+## 2026-10-04 API0.37明确修订下钻
+
+新增GET `/api/v1/inspection-worksheets/{id}/revisions/{version}`，仅当前租户padmin、当前成员/权限版本和同快照来源读取。路径修订必须显式十进制正整数，不接受latest、前导零、小数或超安全范围；拒绝全部查询字段，不能通过query覆盖租户/版本。不存在或跨租户404，不回退当前头。
+
+返回完整冻结模板、答案、自述时间/未填统计，原创建与所选修订记录身份/时间、动作/归档状态及`source_snapshot_sha256`。source_format固定MOP_INSPECTION_SOURCE_SNAPSHOT_V1，来源类型固定IMMUTABLE_INSPECTION_WORKSHEET_REVISION；不包含可变头updated_at。模板/执行单/完整来源三个摘要可独立复算。scope当前租户padmin、SELF_REPORTED_UNVERIFIED、evidence_access_granted=false和report_published=false；读取不创建报告，不发布、不授予附件访问，也不新增写审计/原请求收据。
+
+6新增控制器测试、42聚焦纯测试通过；真实根1795报告=1782执行（567PG）+13历史跳过，6MinIO排除。89契约测试/生成一致性通过，全部既有86路径和191schema逐对象等值，只有新路径/两个来源schema及版本变更。首轮新增契约测试发现CREATE与版本关联未声明，在新来源schema添加版本1 iff CREATE约束后通过；旧schema未改，失败日志保留。
+
+44真实HTTP（200×26、400×10、401×1、403×4、404×3）通过，独立Node二进制编码核对三个摘要。执行单修改/归档、模板更改/归档后，旧版本来源仍整对象相同；archive使来源元数据摘要变化，但内容hash不变。另一当前padmin同租户可读，其他角色403、匿名401、跨租户404、非法版本/查询400；成功只读窗口审计尾不变。仅1个合成执行单/1个模板且均归档留历史，无永久删除/存储请求/迁移。
+
+普通重启已有批准组件到固定新API工件前后9张业务/身份表完整行指纹一致（含287张既有执行单），比较在重启后OIDC登录之前完成；此次是普通发布重启，不是故障注入/全库灾备。随后6个真实OIDC登录通过，HTTP实测来自新固定JAR。见[来源API真实HTTP](evidence/niko-inspection-source-api-http-20261004.json)和[本轮汇总](evidence/niko-inspection-source-api-20261004.json)。实际浏览器B03、来源下钻页面、独立报告冻结持久化及季度规则/正式发布仍待，不将M9-2/M9-7/M9-9标完成。
+
+既有Web1156项/70文件、typecheck和生产构建亦通过，17追踪测试通过；没有将模拟DOM回归称为真实浏览器验收。
+
+
+提交前接回c0cf514/8313fd0/ba61471及其Windows指定PG/OIDC/MinIO与真实Edge证据：模板15、执行单13桌面和390px模拟视口检查，以及原指定PG17.9来源36测试；这些是已有上游执行记录，niko没有重跑Windows操作。niko Chromium EPERM与物理手机/WeChat边界不变。上游CI37204113832因追踪源hash过期失败，接回后重生成索引并通过133Python守卫（含17追踪）及新增上游JS语法检查，待本提交CI复核。新截图blob在合并树中原样保留；现有私有短期源码归档工作流仅加刷新说明，以物化四张GitHub文本接口不能读取的PNG，不含秘密或Git历史，不创建开发任务。

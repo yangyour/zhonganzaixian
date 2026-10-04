@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.36.0",
+    "version": "0.37.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -19202,6 +19202,175 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/InspectionWorksheetResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inspection-worksheets/{id}/revisions/{version}": {
+      "get": {
+        "operationId": "getInspectionWorksheetSourceRevision",
+        "summary": "当前授权租户内按明确版本追溯完整冻结来源；不回退当前版本，不写审计或收据",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-readonly": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-reject-duplicate-query-keys": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740990
+            }
+          }
+        ],
+        "x-mop-read-consistency": "READ_ONLY_REPEATABLE_READ",
+        "x-mop-explicit-version-only": true,
+        "x-mop-writes-audit-or-receipts": false,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionWorksheetSourceResult"
                 }
               }
             }
@@ -38691,6 +38860,304 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/InspectionWorksheetHistory"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionWorksheetSource": {
+        "type": "object",
+        "properties": {
+          "worksheet_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "recorded_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "action": {
+            "enum": [
+              "CREATE",
+              "UPDATE",
+              "ARCHIVE",
+              "RESTORE"
+            ]
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "source_type": {
+            "const": "IMMUTABLE_INSPECTION_WORKSHEET_REVISION"
+          },
+          "source_format": {
+            "const": "MOP_INSPECTION_SOURCE_SNAPSHOT_V1"
+          },
+          "source_snapshot_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_PADMIN"
+          },
+          "evidence_access_granted": {
+            "const": false
+          },
+          "asset_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "asset_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "template_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "template_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "template_content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "template_device_type": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+            "maxLength": 64
+          },
+          "template_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "template_item_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reported_performed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Explicit self-reported inspection time, timezone and millisecond precision, year0001–9999, no later than actual PG recording time. Null is not replaced with recording time."
+          },
+          "time_source": {
+            "enum": [
+              "NOT_PROVIDED",
+              "SELF_REPORTED_TIME"
+            ]
+          },
+          "summary": {
+            "$ref": "#/components/schemas/InspectionWorksheetCounts"
+          },
+          "verification_status": {
+            "const": "SELF_REPORTED_UNVERIFIED"
+          },
+          "template_approval_status": {
+            "const": "UNVERIFIED"
+          },
+          "template_applicability_status": {
+            "const": "UNVERIFIED"
+          },
+          "publication_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "report_published": {
+            "const": false
+          },
+          "active_scan_performed": {
+            "const": false
+          },
+          "evidence_binding_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "record_source": {
+            "const": "MANUAL_INSPECTION_DRAFT"
+          },
+          "template_items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/InspectionTemplateItem"
+            },
+            "x-mop-unique-key": "key",
+            "description": "Ordered items; duplicate keys forbidden. Item order, original text and null versus empty instruction are material."
+          },
+          "observations": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/InspectionWorksheetObservation"
+            },
+            "x-mop-unique-key": "key",
+            "description": "Only answered frozen-template keys. Missing keys remain unanswered; no evidence reference fields."
+          }
+        },
+        "required": [
+          "worksheet_id",
+          "tenant_id",
+          "version",
+          "created_by",
+          "created_at",
+          "recorded_by",
+          "recorded_at",
+          "action",
+          "archived",
+          "source_type",
+          "source_format",
+          "source_snapshot_sha256",
+          "scope",
+          "evidence_access_granted",
+          "asset_id",
+          "asset_name",
+          "template_id",
+          "template_version",
+          "template_content_sha256",
+          "template_device_type",
+          "template_name",
+          "template_item_count",
+          "content_sha256",
+          "reported_performed_at",
+          "time_source",
+          "summary",
+          "verification_status",
+          "template_approval_status",
+          "template_applicability_status",
+          "publication_status",
+          "report_published",
+          "active_scan_performed",
+          "evidence_binding_status",
+          "source",
+          "record_source",
+          "template_items",
+          "observations"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "ARCHIVE"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "archived": {
+                  "const": true
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "archived": {
+                  "const": false
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "time_source": {
+                  "const": "NOT_PROVIDED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "reported_performed_at": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "reported_performed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "version": {
+                  "const": 1
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "action": {
+                  "const": "CREATE"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "action": {
+                  "enum": [
+                    "UPDATE",
+                    "ARCHIVE",
+                    "RESTORE"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "x-mop-integrity": "MOP_INSPECTION_SOURCE_SNAPSHOT_V1 binds immutable creation/recording facts and full frozen template/worksheet. Hashes are consistency checks, not inspection attestation or file grants."
+      },
+      "InspectionWorksheetSourceResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/InspectionWorksheetSource"
           },
           "trace_id": {
             "type": "string"

@@ -1,0 +1,115 @@
+{
+  "verified_at": "2026-10-04T12:47:25.498740+00:00",
+  "environment": "niko-local-test",
+  "api_version": "0.37.0",
+  "new_controller_tests": 6,
+  "focused_tests": 42,
+  "root_tests": {
+    "reported": 1795,
+    "executed": 1782,
+    "real_postgres": 567,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contract_tests": 89,
+  "contract_generation": "PASS",
+  "unchanged_existing_paths": 86,
+  "unchanged_existing_schemas": 191,
+  "actual_http_evidence": "niko-inspection-source-api-http-20261004.json",
+  "runtime_artifact_sha256": "1d8ee9157c49f2996b0c99fb899435b074d8eb52c855803e650e52010cf7c811",
+  "ordinary_restart": {
+    "table_count": 9,
+    "full_row_fingerprints_equal": true,
+    "before_at": "2026-10-04T12:45:07.784203+00:00",
+    "verified_at": "2026-10-04T12:46:08.832242+00:00",
+    "worksheet_heads_before_login": 287,
+    "tables": {
+      "mop_inspection_worksheet": {
+        "rows": 287,
+        "equality_sha256": "3069a0c6d04b0b598d9eb72bcc27cce3ea254cae00912653efb3d66296aedb59"
+      },
+      "mop_inspection_worksheet_revision": {
+        "rows": 736,
+        "equality_sha256": "6b2149841173c324a4d040c631f775bd57d859ff9b7dc62b5f68f4b3b98b6932"
+      },
+      "mop_inspection_template": {
+        "rows": 559,
+        "equality_sha256": "ca2d55013ff782a0dfb3791dd6f74f8c19123f678348854c14b00e6512053315"
+      },
+      "mop_inspection_template_revision": {
+        "rows": 1226,
+        "equality_sha256": "29bbf2794ff87932ea3188c92da8435080c47fb3fd15d7e6b102024733b5a97b"
+      },
+      "mop_inspection_template_item": {
+        "rows": 3166,
+        "equality_sha256": "36bdc8176506fc5df746f1b750e917016fd07f80e9f41d032e6ce52e5b86deb4"
+      },
+      "mop_audit": {
+        "rows": 69288,
+        "equality_sha256": "b4be11a972aaa24ac8ef407f864639c0f041fd28da94294bdecdb173397fa790"
+      },
+      "mop_idempotency": {
+        "rows": 50685,
+        "equality_sha256": "2f9801ed0330439c9fe5faf4fd7d3fc248a69440a04ceacb87436721b1896301"
+      },
+      "mop_user": {
+        "rows": 286,
+        "equality_sha256": "fa65865add7620fb92660d9866bfb4ced9194c776265705f5406140951f00617"
+      },
+      "mop_membership": {
+        "rows": 569,
+        "equality_sha256": "221f92826c563fb04559cdda3dfbfb6779d920f7ce53fa8ba95bbb105332257b"
+      }
+    },
+    "fault_injection": false,
+    "comparison_before_oidc_logins": true
+  },
+  "oidc_roles_authenticated": 6,
+  "schema_version": 22,
+  "new_migrations": 0,
+  "source_ui_implemented": false,
+  "report_snapshot_database_implemented": false,
+  "quarter_selection_rule": null,
+  "formal_report_generatable": false,
+  "formal_acceptance": "NOT_RUN",
+  "first_contract_failure": "New source schema omitted version1 iff CREATE association; added new-schema-only condition and reran89success",
+  "source_sha256": {
+    "server/api/src/main/java/cn/mop/api/InspectionWorksheetController.java": "f64fd7d69a9b1ceefe72710ff5d73a99b0bf08816342082d7f36f623f2f61468",
+    "server/api/src/test/java/cn/mop/api/InspectionWorksheetSourceControllerTest.java": "8c30899cb61d5fea23a6e980036cdfb6cdc7e42d78b2ad667ec93b626b85930f",
+    "tests/niko-inspection-source-api-http.mjs": "67e5d3dbf8836a23ab76217a52fe9f58025c6b42c1bcc2677b3c109ee88ae4fb",
+    "tools/build-api-contract.mjs": "3ca9553877ffebcf97d60d790f8c08433c332b0865e6feadc59b5c9a57d39280",
+    "contracts/local-api.openapi.json": "02c812ab76f418004de769496383ddabfb46985da8e08c632925d18059eb2bab"
+  },
+  "logs": [
+    ".local/niko-test/logs/source-api-contracts-20261004-r2.log",
+    ".local/niko-test/logs/source-api-contracts-20261004.log",
+    ".local/niko-test/logs/source-api-focused-20261004.log",
+    ".local/niko-test/logs/source-api-http-20261004.log",
+    ".local/niko-test/logs/source-api-root-20261004.log",
+    ".local/niko-test/logs/source-api-sessions-20261004.json",
+    ".local/niko-test/logs/source-api-web-20261004.log"
+  ],
+  "web_tests": 1156,
+  "web_test_files": 70,
+  "web_typecheck": "PASS",
+  "web_build": "PASS",
+  "tracker_tests": 17,
+  "upstream_sync": {
+    "head": "c0cf5149b5799292f74df2ba1b089695b500d98b",
+    "previous_ci_run": 37204113832,
+    "previous_ci_conclusion": "failure",
+    "reason": "generated contract progress source hash stale",
+    "tracker_regenerated_and_checked": true,
+    "python_tests": 133,
+    "imported_windows_template_dom_checks": 15,
+    "imported_windows_worksheet_dom_checks": 13,
+    "windows_browser_execution_by_niko": false,
+    "niko_chromium_blocker_resolved": false,
+    "imported_designated_source_tests": 36,
+    "existing_png_blobs_preserved": 4,
+    "png_local_materialization": "PENDING_PRIVATE_SOURCE_RECOVERY_ARTIFACT",
+    "new_credentials": 0
+  }
+}

@@ -1,0 +1,54 @@
+<script setup lang="ts">
+import {computed,onUnmounted,reactive,ref,shallowRef,watch} from 'vue'
+import {api} from '../api/client'
+import {can,contextGeneration,session,switchingTenant} from '../stores/session'
+import {createOwnWorklogBrowser,emptyOwnWorklogBrowserState,type OwnWorklogBrowserState} from '../utils/ownWorklogBrowser'
+import type {OwnWorklogContext,OwnWorklogFilters} from '../utils/ownWorklogBrowse'
+import type {WorklogKind} from '../utils/worklogWorkspace'
+import {displayTime} from '../utils/display'
+import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import OwnWorklogFacts from '../components/OwnWorklogFacts.vue'
+const labels:Record<WorklogKind,string>={REMOTE:'远程处理',ONSITE:'现场处理',INSPECTION:'巡检',COMMUTE:'通勤'}
+const form=reactive({ticket:'',kind:'',from:'',before:''}),dirty=ref(false),validation=ref(''),expanded=ref<number|null>(null)
+let resetting=false,disposed=false,draftEpoch=0
+const state=shallowRef<OwnWorklogBrowserState>(emptyOwnWorklogBrowserState()),reader=createOwnWorklogBrowser(api,s=>{state.value=s})
+const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&session.value.user.role==='msp'&&can('worklogs:read_own')&&!switchingTenant.value))
+const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value]))
+const newerThanList=computed(()=>state.value.selected&&state.value.page?.items.some(v=>v.id===state.value.selected!.id&&v.version<state.value.selected!.version))
+function context():OwnWorklogContext|null{const s=session.value;return permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true}:null}
+function filters():OwnWorklogFilters{return{ticket_id:form.ticket===''?null:form.ticket.toLowerCase(),kind:form.kind===''?null:form.kind as WorklogKind,started_from:form.from===''?null:form.from,started_before:form.before===''?null:form.before}}
+async function apply(){if(disposed||!permitted.value)return false;const turn=draftEpoch,key=contextKey.value;validation.value='';expanded.value=null;const okay=await reader.apply(filters());if(disposed||turn!==draftEpoch||key!==contextKey.value)return false;if(okay)dirty.value=false;else if(state.value.error)validation.value='条件未通过或读取失败；旧结果已清除。起始范围须成对，不能指定他人或团队';return okay}
+async function clearFilters(){if(!permitted.value||disposed)return false;Object.assign(form,{ticket:'',kind:'',from:'',before:''});return apply()}
+async function refresh(){if(dirty.value||!permitted.value)return false;validation.value='';expanded.value=null;return reader.refresh()}
+async function next(){if(dirty.value||!permitted.value)return false;expanded.value=null;return reader.next()}
+async function show(id:string){expanded.value=null;return reader.show(id)}
+async function moreHistory(){expanded.value=null;return reader.moreHistory()}
+function closeDetails(){expanded.value=null;return reader.closeDetails()}
+watch(()=>JSON.stringify(form),()=>{if(resetting||disposed)return;++draftEpoch;dirty.value=true;validation.value='';expanded.value=null;reader.invalidate()},{flush:'sync'})
+watch(contextKey,()=>{++draftEpoch;resetting=true;Object.assign(form,{ticket:'',kind:'',from:'',before:''});resetting=false;dirty.value=false;validation.value='';expanded.value=null;reader.reset(disposed?null:context());if(permitted.value&&!disposed)void apply()},{immediate:true,flush:'sync'})
+onUnmounted(()=>{disposed=true;reader.dispose()})
+defineExpose({form,state,dirty,filters,apply,clearFilters,refresh,next,show,moreHistory,closeDetails})
+</script>
+<template>
+ <section class="own-worklogs-page"><div class="page-heading"><div><p class="eyebrow">服务 / 本人实填事实</p><h1>我的实填工时</h1><p>当前租户、当前工程师本人。只查询原记录，不汇总团队、期间工时或经营成本</p></div></div>
+ <el-alert type="warning" :closable="false" show-icon title="这些是自述记录；缺记录不默认0小时，成本与默认工时待配置。此页只读，不修改工单或工时" />
+ <p v-if="!permitted" class="panel no-access">当前没有本人记录读取权限，或租户正在切换；未展示旧数据</p>
+ <template v-else>
+  <form class="panel own-filters" @submit.prevent="apply"><h2>明确筛选条件</h2><p>全部留空读取本人记录，不默认本月。时间范围筛选“记录开始时刻”：下界含、上界不含，跨界记录的完整时长不裁剪</p>
+   <div class="filter-grid"><label>可选工单UUID<input v-model="form.ticket" aria-label="本人工时工单筛选" maxlength="36" placeholder="留空不限工单，不接受他人或租户覆盖" /></label><label>实填类型<select v-model="form.kind" aria-label="本人工时类型筛选"><option value="">全部明确类型</option><option v-for="(label,key) in labels" :key="key" :value="key">{{label}}</option></select></label><label>记录开始下界（含）<input v-model="form.from" aria-label="本人工时开始下界" maxlength="35" placeholder="例如 2026-10-01T00:00:00+08:00" /></label><label>记录开始上界（不含）<input v-model="form.before" aria-label="本人工时开始上界" maxlength="35" placeholder="需与下界同时填写，且严格晚于下界" /></label></div><p class="hint">明确Z/offset与秒，小数最多3位；查询按同一时刻归一化UTC，展示使用Asia/Shanghai</p>
+   <p v-if="dirty" class="query-dirty" aria-live="polite">条件已修改，旧结果已清除；请明确应用后读取</p><p v-if="validation" class="validation" role="alert">{{validation}}</p><div class="actions"><button type="submit" :disabled="Boolean(state.busy)">应用条件并读取</button><button type="button" :disabled="Boolean(state.busy)" @click="clearFilters">清除条件并读取</button><button type="button" :disabled="dirty||Boolean(state.busy)||!state.filters" @click="refresh">重新读取已应用条件</button></div>
+  </form>
+  <ApiErrorNotice :error="state.error" />
+  <section class="panel own-results"><h2>当前查询结果</h2><p v-if="!state.page" class="query-empty">{{state.busy==='list'?'正在读取，数量未知':dirty?'尚未应用新条件，数量未知':state.error?'读取未通过，数量未知':'尚未读取，数量未知'}}</p>
+   <template v-else><div class="applied-filters"><h3>本次已应用条件</h3><p>工单 {{state.page.filters.ticket_id??'不限'}} · 类型 {{state.page.filters.kind===null?'全部明确类型':labels[state.page.filters.kind]}}</p><p>开始范围UTC {{state.page.filters.started_from??'未限定'}} → {{state.page.filters.started_before??'未限定'}}（前闭后开）</p></div><p class="query-count">本页 {{state.page.items.length}} 条 · {{state.paged?'续页':'第一页'}}；不是总记录数或期间总工时，聚合未计算</p>
+    <ul class="worklog-cards"><li v-for="r in state.page.items" :key="r.id"><h3>{{labels[r.kind]}} · v{{r.version}}</h3><p>{{displayTime(r.started_at)}} → {{displayTime(r.ended_at)}}（Asia/Shanghai）</p><p>{{r.elapsed_millis}} ms · {{r.elapsed_millis===0?'明确实填零，不是默认':'完整原区间，未裁剪'}} · 成本待配置</p><small>记录 {{r.id}}</small><small>父工单 {{r.ticket_id}}</small><button type="button" :disabled="Boolean(state.busy)" @click="show(r.id)">查看当前记录与历史</button></li></ul>
+    <p v-if="!state.page.items.length" class="no-matches">当前条件没有匹配记录；不代表没有工作，也不生成默认工时或零成本</p><div class="actions"><button type="button" :disabled="dirty||Boolean(state.busy)||!state.page.has_more" @click="next">下一页本人记录</button><span class="hint">每次读取当前修订；分页不是冻结快照</span></div>
+   </template>
+  </section>
+  <section v-if="state.busy==='detail'||state.selected" class="panel current-worklog"><div class="actions"><h2>明确选择的当前记录</h2><button type="button" @click="closeDetails">关闭当前记录</button></div><p v-if="!state.selected">正在核对当前记录与历史，旧详情已清除</p><template v-else><p>{{state.selected.id}} · v{{state.selected.version}}</p><small>父工单 {{state.selected.ticket_id}} · 当前执行者本人 {{state.selected.owner_id}}</small><p v-if="newerThanList" class="validation">当前回读版本比列表更新，筛选结果可能已变化；请重新读取查询，不会拼接旧历史</p><OwnWorklogFacts :value="state.selected" /></template></section>
+  <section v-if="state.history" class="panel own-history"><h2>本人的不可变修订历史</h2><p v-if="state.historyRestarted" class="validation">记录已更新，已重新从最新历史开始读取，没有沿用旧边界</p><article v-for="r in state.history.items" :key="r.version"><div class="actions"><h3>v{{r.version}} · {{r.action==='CREATE'?'首次实填':'修改原记录'}}</h3><button type="button" :aria-expanded="expanded===r.version" @click="expanded=expanded===r.version?null:r.version">{{expanded===r.version?'收起该版原文':'展开该版原文'}}</button></div><p>{{displayTime(r.recorded_at)}}（Asia/Shanghai）· {{r.elapsed_millis}} ms · 自述</p><OwnWorklogFacts v-if="expanded===r.version" :value="r" /></article><button type="button" :disabled="Boolean(state.busy)||!state.history.has_more" @click="moreHistory">更早本人修订</button></section>
+ </template></section>
+</template>
+<style scoped>
+.own-worklogs-page{min-width:0}.own-worklogs-page .panel{padding:20px;margin-top:18px;min-width:0}.own-worklogs-page h2{font-size:18px;margin:0 0 12px;overflow-wrap:anywhere}.own-worklogs-page h3{font-size:15px;margin:10px 0}.own-worklogs-page p{line-height:1.7;overflow-wrap:anywhere}.own-worklogs-page small{display:block;font:12px monospace;overflow-wrap:anywhere;color:#607086;margin:6px 0}.own-worklogs-page button{min-height:44px;padding:9px 14px;border:1px solid #cbd7e5;border-radius:8px;background:#fff;color:#294665;font:inherit;cursor:pointer}.own-worklogs-page button:disabled{opacity:.5;cursor:not-allowed}.own-worklogs-page button:focus-visible,.own-worklogs-page input:focus-visible,.own-worklogs-page select:focus-visible{outline:3px solid #176bb5;outline-offset:2px}.own-worklogs-page input,.own-worklogs-page select{min-height:44px;width:100%;box-sizing:border-box;padding:10px;border:1px solid #bccbdc;border-radius:7px;background:#fff;font:inherit}.filter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.filter-grid label{display:grid;gap:7px;min-width:0;font-size:13px}.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.hint,.query-empty{color:#607086;font-size:13px}.query-dirty,.validation{color:#a04913}.worklog-cards{list-style:none;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.worklog-cards li{border:1px solid #dce5f0;border-radius:10px;padding:14px;min-width:0}.applied-filters{border-left:4px solid #6b93bc;padding-left:12px}.own-history article{padding:12px 0;border-bottom:1px solid #dce5f0}.own-history>button{margin-top:16px}@media(max-width:760px){.filter-grid,.worklog-cards{grid-template-columns:1fr}.own-worklogs-page .panel{padding:14px}}
+</style>

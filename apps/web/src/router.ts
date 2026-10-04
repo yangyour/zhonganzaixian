@@ -9,6 +9,7 @@ export const router = createRouter({
     { path: '/assets', name: 'assets', component: () => import('./pages/AssetsPage.vue'), meta: { title: '资产管理', group: '资源', capability: 'assets:read' } },
     { path: '/manual-incidents', name: 'manual-incidents', component: () => import('./pages/ManualIncidentsPage.vue'), meta: { title: '手工来源登记', group: '服务', capability: 'manual_incidents:read' } },
     { path: '/tickets', name: 'tickets', component: () => import('./pages/TicketsPage.vue'), meta: { title: '报障与受理', group: '服务', capability: 'tickets:read' } },
+    { path: '/my-worklogs', name: 'my-worklogs', component: () => import('./pages/OwnWorklogsPage.vue'), meta: { title: '我的实填工时', group: '服务', role: 'msp', capability: 'worklogs:read_own' } },
     { path: '/sla-scenarios', name: 'sla-scenarios', component: () => import('./pages/SlaScenariosPage.vue'), meta: { title: 'SLA 显式对照', group: '服务', capability: 'sla_scenarios:read' } },
     { path: '/configurations', name: 'configurations', component: () => import('./pages/ConfigurationsPage.vue'), meta: { title: '配置确认登记', group: '管理', capability: 'configurations:read' } },
     { path: '/threshold-diagnostics', name: 'threshold-diagnostics', component: () => import('./pages/ThresholdDiagnosticsPage.vue'), meta: { title: '阈值候选诊断', group: '管理', capability: 'configurations:read' } },

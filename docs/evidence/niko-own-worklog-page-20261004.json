@@ -1,0 +1,89 @@
+{
+  "verified_at": "2026-10-04T21:37:21.612288+00:00",
+  "environment": "niko-local-test",
+  "api_version": "0.41.0",
+  "scope": "READ_ONLY_OWN_WORKLOG_PAGE",
+  "new_sfc_tests": 18,
+  "new_state_tests": 1,
+  "web_tests": 1452,
+  "web_test_files": 85,
+  "typecheck": "PASS",
+  "build": "PASS",
+  "actual_component_http_requests": 15,
+  "actual_component_http_statuses": {
+    "200": 14,
+    "404": 1
+  },
+  "actual_write_requests": 0,
+  "successful_readonly_window_audit_unchanged": true,
+  "real_browser": false,
+  "css_visual_verified": false,
+  "phone_or_wechat_verified": false,
+  "new_credentials": false,
+  "new_migrations": 0,
+  "backend_rebuilt_or_restarted": false,
+  "api_contract_changed": false,
+  "formal_acceptance": "NOT_RUN",
+  "failure_history": [
+    {
+      "evidence": "docs/evidence/niko-own-worklog-page-http-20261004.json",
+      "stage": "actual_foreign_parent_404",
+      "outcome": "WAIT_TIMEOUT",
+      "get_attempts": 14,
+      "observed_200": 13,
+      "production_changed_for_failure": false,
+      "resolution": "Added Vue render waits after clicks/input and safe exchange ledger; repeat passed. Premature old DOM predicate is an inference."
+    },
+    {
+      "stage": "tracker_test_invocation",
+      "outcome": "IMPORT_ERROR_BEFORE_TESTS",
+      "resolution": "Invoked existing standalone tools/test_contract_progress.py with its expected module path; no test source changed."
+    }
+  ],
+  "independent_foreign_probe": {
+    "verified_at": "2026-10-04T21:32:04.766Z",
+    "method": "GET",
+    "case": "existing_foreign_synthetic_parent",
+    "status": 404,
+    "code": "OBJECT_NOT_FOUND",
+    "elapsed_ms": 29,
+    "write_requests": 0
+  },
+  "http_evidence": "docs/evidence/niko-own-worklog-page-http-20261004-r2.json",
+  "previous_commit": {
+    "sha": "817fa63f064470def9c67d104afdc6a04b27ac53",
+    "ci_run": 37235201202,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "apps/web/src/pages/OwnWorklogsPage.vue": "eba2d656d50fe0ef6896e7db3693a63e0fe94e8d9f179e7395c8485add0c8471",
+    "apps/web/src/components/OwnWorklogFacts.vue": "ffccf491791ee1241dc4ebe2522dca92b1f5e1b67748e33613c877a34cae4773",
+    "apps/web/src/utils/ownWorklogBrowser.ts": "d493d25c7fbd1a766a6316728c70e2c33885ba24129f007104b62f792df7150f",
+    "apps/web/src/App.vue": "37ab920be82a3b6076b906ae471541a836b3ea74e6938625cf386f4261358118",
+    "apps/web/src/router.ts": "2fd69e4c0470814545f8ba2ef500fedf04e2d39ab232a4c76cf7a3a8dcd09239",
+    "apps/web/tests/ownWorklogsPage.test.ts": "ade6080e10bf69ba0dc81d0b6e25fadd62b68f6f53edfe868e22a3104544792f",
+    "apps/web/tests/ownWorklogBrowser.test.ts": "4afaf69a726aa4cd49fa6c760a7624a37c12e1e13f465736af4da16530ea7b6f",
+    "apps/web/qa/own-worklog-page.http.ts": "f17827739980dc9c608a440357fabce82a079bfd84d1e3c7c90d30d3aa4dc5d8",
+    "apps/web/vitest.niko-own-worklog-page.config.ts": "bbcc77a0fb41dff4337b39f6d0c86f3e2ea9a4546c120555a84ee2b4e657394c"
+  },
+  "contracts": 113,
+  "contract_generation": "PASS",
+  "tracker_tests": 17,
+  "tracker_requirements": 128,
+  "tracker_rows_with_notes": 39,
+  "logs_sha256": {
+    "own-worklog-page-build-20261004.log": "69674059e4a27257333380de36d48440ab12da040e82caa0c6e56f5f18386516",
+    "own-worklog-page-build-final-20261004.log": "18d11c738c10863b63701115d1f211c8012679c229bf0d9a559c5fba3a106c6a",
+    "own-worklog-page-contract-generation-20261004.log": "129bf5677531bd45622801bd32295794b8e8895885336bd90e8c596b647b3036",
+    "own-worklog-page-contracts-20261004.log": "d156e3212eafbdeaf2c901ef867ca67a4a643d47960dc9af467afc18b13c57fd",
+    "own-worklog-page-focused-20261004.log": "3093f686827a593dc1f84b46dc8a86417a509718854409a5b9dbedd62b0a9a6f",
+    "own-worklog-page-foreign-probe-20261004.log": "fbc9b44ae140906d11fc00855789e3ec4d7ab844b6625d61d57b32af406a315c",
+    "own-worklog-page-full-web-20261004.log": "986e2f4c26e5a2aab18351eb4749008bd1c0db13f120e806fb84afcdb24b442d",
+    "own-worklog-page-http-20261004.log": "47289383281ebf695f7bb5077b7a834408814a288391f39f00a5427f750d6dcf",
+    "own-worklog-page-http-r2-20261004.log": "606350050868bdb187b6c0286951ec473a56aa0d08a85f1fecebe1aa7667e212",
+    "own-worklog-page-tracker-20261004.log": "0893d61e080bfdef35bd1edd0a7eb794bc4b4b3a5b25f31310fef3ae1b6f45fe",
+    "own-worklog-page-tracker-r2-20261004.log": "5bb8b40040770827862692d0ce2cfa7c8ec3ab7b70397aac34345606fd8842c6",
+    "own-worklog-page-typecheck-20261004.log": "0ddf2dd5b403ef92e91d16be19434a7726aacdc1c1a66ae6b7b1462c611215de",
+    "own-worklog-page-typecheck-final-20261004.log": "d3e36ebd18243cf6bc1dbfbfbc7bb98b43c188193eaa420029cfbcc9eda07b4f"
+  }
+}

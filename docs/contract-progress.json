@@ -843,6 +843,7 @@
       "local_references": [
         "docs/evidence/niko-own-worklog-api-20261004.json",
         "docs/evidence/niko-own-worklog-client-20261004.json",
+        "docs/evidence/niko-own-worklog-page-20261004.json",
         "docs/evidence/niko-own-worklog-reader-20261004.json",
         "docs/manual-worklogs.md"
       ],
@@ -1350,6 +1351,7 @@
       "local_references": [
         "docs/evidence/niko-own-worklog-api-20261004.json",
         "docs/evidence/niko-own-worklog-client-20261004.json",
+        "docs/evidence/niko-own-worklog-page-20261004.json",
         "docs/evidence/niko-own-worklog-reader-20261004.json",
         "docs/manual-worklogs.md"
       ],
@@ -1359,6 +1361,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "e3a87b8b373d93c47bba8c17aac31e88f0a5ca37fa70f44c9793e7735dd82bae"
+    "doc/development/07_合同逐项开发追踪.md": "752838715d556dcf16120f5981eebad7bed63742ad26ceeb806d325710ba5788"
   }
 }

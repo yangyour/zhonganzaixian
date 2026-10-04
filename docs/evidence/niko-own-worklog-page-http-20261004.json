@@ -1,0 +1,29 @@
+{
+  "verified_at": "2026-10-04T21:26:54.408Z",
+  "environment": "niko-local-test",
+  "api_version": "0.41.0",
+  "vue_sfc_native_jsdom": true,
+  "real_browser": false,
+  "css_visual_verified": false,
+  "phone_or_wechat_verified": false,
+  "fixture_adapter": false,
+  "http_requests": 14,
+  "methods": [
+    "GET"
+  ],
+  "write_requests": 0,
+  "statuses": {
+    "200": 13
+  },
+  "completed": false,
+  "failure": {
+    "stage": "actual_foreign_parent_404",
+    "details": "GET-only component verification incomplete; no mutation is allowed"
+  },
+  "successful_readonly_window_audit_unchanged": true,
+  "existing_synthetic_worklogs_reused": 3,
+  "native_explicit_filters_current_history_zero_and_empty": false,
+  "new_credentials": false,
+  "new_migrations": 0,
+  "formal_acceptance": "NOT_RUN"
+}

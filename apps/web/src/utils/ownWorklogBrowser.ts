@@ -28,5 +28,6 @@ export function createOwnWorklogBrowser(client:Pick<ApiClient,'request'>,changed
    const history=readWorklogHistory(historyRaw,{tenantId:context.tenantId,actorId:context.actorId,ticketId:row.ticket_id,permissionVersion:context.permissionVersion,canWrite:false},row,before);state={...state,selected:row,history,historyRestarted:more&&before===null};return true
   }catch(error){if(turn===epoch&&!disposed&&!isCancelled(error))state.error=error;return false}finally{if(turn===epoch&&!disposed){state.busy=null;abort=null;emit()}}
  }
- emit();return{reset,invalidate,apply:(v:unknown)=>list(v),refresh:()=>list(state.filters??emptyOwnWorklogFilters()),next:()=>state.filters?list(state.filters,true):Promise.resolve(false),show:(id:string)=>show(id),moreHistory:()=>state.selected?show(state.selected.id,true):Promise.resolve(false),state:snapshot,dispose:()=>{disposed=true;reset(null)}}
+ function closeDetails(){if(!scope||disposed||state.busy==='list')return false;if(state.busy==='detail'){abort?.abort();abort=null;++epoch}state={...state,selected:null,history:null,busy:null,historyRestarted:false,error:null};emit();return true}
+ emit();return{reset,invalidate,closeDetails,apply:(v:unknown)=>list(v),refresh:()=>list(state.filters??emptyOwnWorklogFilters()),next:()=>state.filters?list(state.filters,true):Promise.resolve(false),show:(id:string)=>show(id),moreHistory:()=>state.selected?show(state.selected.id,true):Promise.resolve(false),state:snapshot,dispose:()=>{disposed=true;reset(null)}}
 }

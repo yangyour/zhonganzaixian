@@ -35,3 +35,21 @@
 验证入口必须显式传 `--verify-owned-export-preparation-worker`，既有control/evidence存在时拒绝重跑。原始过程日志与控制记录保留在Git忽略的私有测试目录；不能删除控制记录后盲目重跑或把前后不同场景拼成一次成功。
 
 证据见[实际进程与故障恢复](evidence/niko-export-preparation-worker-process-20261004.json)。原测试服务器未执行这组进程验证，HTTP导出/OSS/下载/通知仍未验，M3-7不是DONE。
+
+## 2026-10-04 Windows独立入口与原指定PG实测
+
+新增deploy/prepare-asset-export.ps1：必须明确单个规范JobId、WorkerId及1000–600000ms租期。只从忽略的runtime投影受限PG/必要OS环境，Java子进程没有迁移、OIDC、存储或其他Worker秘密。逐次复制为本工程独立GUID目录内的SHA256命名只读JAR，核验入口、依赖及字节；API/Worker仍不自动迁移。仅准备文件，未实现公开导出受理/OSS/签名下载/站内信。
+
+启动采用Node文件句柄、windowsHide与独立子进程；控制工具收到已发出的原进程记录后即继续，不再等重定向输出EOF。终止前核验当前用户SID、PID/父PID/启动时间、完整Java命令、目标job和固定JAR hash。12项隔离环境/归属/错误角色及参数守卫通过，已接Windows CI，实际行为另由真实JVM验证。
+
+原指定PG17.9上验证正常16列表格准备、源备注修改后的原文件/hash保留、已提交领取后的Windows强制终止及新进程接管四个步骤。实际共14次Worker尝试，早期环境大小写、UTF-8读取、输出EOF等待以及audit锁调度失败均留在私有控制/日志；没有抹去失败记录或重新创建原作业。最终故障点为项目应用停止时，在自有连接短暂锁住本项目测试库mop_asset源表，确认原job领取已提交后仅终止已核验JVM。fence4保留且无prepared文件，租约过期新进程fence5生成并回读真实XLSX。所有临时锁和Worker已结束，共享组件不重启、不改权限/端口。
+
+这不是prepared字节事务写入中途被杀、PG/WAL灾备或完整发布验收。正常/保留步骤来自前次有效运行；七张身份/其他消费者表等值只对最终恢复窗口核验，不冒充14次尝试的整窗等值。原受理收据保持不变，发布/OSS/下载/通知全部0。见[Windows真实证据](evidence/local-export-preparation-worker-20261004.json)。
+
+可复现的单作业入口（JobId必须来自自己已授权的真实请求，以下为参数说明）：
+
+```powershell
+./deploy/prepare-asset-export.ps1 -JobId <canonical-job-uuid> -WorkerId designated-manual -LeaseMillis 30000
+```
+
+强杀验证仅用tools/verify-designated-export-worker.py的显式模式，既有证据存在时拒绝重跑；保留原控制。原项目其他应用须停止，测试锁只属于mop_test，不操作其他项目或共享服务生命周期。

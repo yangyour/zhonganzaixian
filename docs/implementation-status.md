@@ -1177,3 +1177,7 @@ c40bf37的CI37175873116中Java/Web/Windows进程检查通过，但PowerShell迁�
 ## 2026-10-04 API0.36人工巡检执行单与124真实HTTP
 
 新增padmin租户内创建/摘要分页/详情/修改/历史/归档/恢复，固定资产/模板版本、未知自述时间null、显式三结果及自动数量；CSRF/幂等前授权、CAS/原子审计，能力目录和ready同步。16控制器+1ready新增、根1753报告1740执行含554PG/13跳过/6MinIO排除、86契约、1059Web/类型构建通过。124实际HTTP与独立指纹验证通过，14执行单/2模板归档、28无关表等值；原组件正常重启前后9表等值涵盖75旧执行单，无新迁移/账号。执行单UI/真实浏览器/OSS证据/季度汇总/发布仍未完成，M9-7非DONE，见docs/inspection-worksheets.md。
+
+## 2026-10-04 原指定PG的Windows导出准备Worker
+
+单作业显式PS/Node入口、私有PG环境投影、独立只读SHA产物、强杀前完整用户/进程/目标/字节核验已接，12隔离守卫通过。原PG17.9实际16列XLSX、源变化后保留旧文件、源读取受阻时只杀已核验JVM、fence4到期后新JVM fence5恢复通过。共14次尝试，前次有效正常/保留步骤与最终故障恢复窗口分列，失败日志保留；两原请求未替换、七表最终窗口等值、发布/存储/下载/通知0。不是prepared写事务中途或PG灾备验收，M3-7非DONE，见[Windows入口](export-preparation-worker.md)及[独立证据](evidence/local-export-preparation-worker-20261004.json)。

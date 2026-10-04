@@ -1,0 +1,67 @@
+{
+  "verified_at": "2026-10-04T20:06:17.432679+08:00",
+  "environment": "designated-server-from-Windows",
+  "postgresql": "17.9",
+  "artifact_sha256": "205f7a04b27be176ae0ba9f77592b728f4519e82e4d8ab3f8f2d40fb33f2d9b9",
+  "lease_millis": 30000,
+  "normal_exit_codes": [
+    0,
+    0,
+    0
+  ],
+  "actual_xlsx_16_columns_verified": true,
+  "retained_original_bytes_after_source_change": true,
+  "inflight_committed_claim_fence": 4,
+  "termination": "WINDOWS_STOP_PROCESS_FORCE_AFTER_EXACT_OWNER_SID_PID_PARENT_TIME_EXECUTABLE_COMMAND_JOB_AND_HASH_CHECKS",
+  "termination_exit_code": 4294967295,
+  "recovered_new_jvm_fence": 5,
+  "original_acceptance_receipts_unchanged": true,
+  "unrelated_table_fingerprints_unchanged": {
+    "mop_user": {
+      "rows": 41,
+      "row_hash_aggregate_sha256": "d6232c179a1c6f36947630cd05aa96934296685171273cf0d868f022c5b6cfbe"
+    },
+    "mop_membership": {
+      "rows": 79,
+      "row_hash_aggregate_sha256": "84e6e34fa89e9274c61c3c593eee3bc10ea837f8bb786eac489f6bfd1371add0"
+    },
+    "mop_outbox": {
+      "rows": 443,
+      "row_hash_aggregate_sha256": "a2d92753994e20582a7c075c209fc4cadeaf53700737c6d7e39f23f744e6abfe"
+    },
+    "mop_photo_job": {
+      "rows": 265,
+      "row_hash_aggregate_sha256": "92d21b7f7f8b0004f4867700bda6eddd8e57a6800404cd49599a64c3aa682fb0"
+    },
+    "mop_asset_import_job": {
+      "rows": 152,
+      "row_hash_aggregate_sha256": "d57fc9b254cd11982f45ba5e839201c76688aff5dd8d273b5b5c023eb395f41a"
+    },
+    "mop_contact_import_job": {
+      "rows": 107,
+      "row_hash_aggregate_sha256": "1cb4cb041ec38a076161331137688e8cb86a158d6b6165d7761a1c073aa27a54"
+    },
+    "mop_contact_import_result": {
+      "rows": 411,
+      "row_hash_aggregate_sha256": "4127cce643e0f232312e1a03a97622c322b58a8bf9c105d198d87925e0c67567"
+    }
+  },
+  "worker_connections_after": 0,
+  "published": false,
+  "store_requests": 0,
+  "download_grants": 0,
+  "notifications_sent": 0,
+  "new_credentials_or_grants": 0,
+  "migrations": 0,
+  "formal_acceptance": "NOT_RUN",
+  "actual_worker_attempts": 14,
+  "resumed_same_original_job": true,
+  "prior_failed_observation_attempts_preserved": true,
+  "normal_and_retained_valid_steps_from_prior_attempt": true,
+  "fingerprint_window": "RESUMED_CRASH_SCENARIO",
+  "prepare_audit_wait_specifically_observed": false,
+  "inflight_point": "CLAIM_COMMITTED_SOURCE_READ_BLOCKED_BEFORE_PREPARED_COMMIT",
+  "no_prepared_file_committed_at_termination": true,
+  "prepared_file_transaction_killed_midwrite": false,
+  "validated_scenario_steps": 4
+}

@@ -220,3 +220,8 @@ jobs:
       - name: Verify ownership and classifier selection with isolated process doubles
         shell: pwsh
         run: ./tools/test-dev-process-ownership.ps1
+      - name: Verify preparation-only export environment and exact artifact ownership
+        shell: pwsh
+        run: |
+          node --check ./deploy/export-preparation-spawn.mjs
+          ./tools/test-export-preparation-launcher.ps1

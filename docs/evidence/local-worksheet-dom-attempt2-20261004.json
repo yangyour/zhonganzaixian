@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-04T12:33:55.879Z",
+  "environment": "designated-server-from-Windows",
+  "api_version": "0.36.0",
+  "checks": [
+    "asset_and_template_start_unselected",
+    "all_results_and_time_start_unknown",
+    "unanswered_and_null_time_not_normal",
+    "null_and_empty_notes_distinct",
+    "real_template_update_does_not_rewrite_frozen_sheet",
+    "unknown_revision_locks_inputs",
+    "original_revision_restored_once",
+    "two_frozen_revisions_visible",
+    "old_unknown_time_and_unanswered_kept",
+    "desktop_no_document_overflow",
+    "mobile_same_frozen_revision_history",
+    "mobile_no_document_overflow",
+    "no_browser_page_errors"
+  ],
+  "passed": true,
+  "viewport_sizes": [
+    [
+      1440,
+      900
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "fault_type": "actual committed PATCH success discarded in browser transport",
+  "active_scan_performed": false,
+  "report_published": false,
+  "formal_acceptance": "NOT_RUN",
+  "browser_version": "154.0.4258.53",
+  "own_records_archived": true
+}

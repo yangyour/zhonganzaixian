@@ -1,0 +1,39 @@
+{
+  "verified_at": "2026-10-04T12:43:36.803Z",
+  "environment": "designated-server",
+  "api_version": "0.36.0",
+  "frontend": "actual inspectionWorksheetWorkspace, dual SHA validators and ApiClient",
+  "http_requests": 105,
+  "worksheet_mutation_attempts": 62,
+  "synthetic_worksheets_created": 18,
+  "synthetic_templates_created": 1,
+  "all_owned_records_archived_with_history": true,
+  "permanent_deletes": 0,
+  "four_original_actions_recovered_after_actual_403": true,
+  "original_body_method_path_key_and_source_snapshot_preserved": true,
+  "source_template_archive_does_not_prevent_original_receipt": true,
+  "ordinary_get_does_not_ack_unknown_write": true,
+  "original_receipt_separate_from_newer_current": true,
+  "actual_list_pages": [
+    15,
+    1
+  ],
+  "actual_history_pages": [
+    15,
+    2
+  ],
+  "double_submit_suppressed": true,
+  "late_real_response_ignored_after_reset_and_dispose": true,
+  "readonly_audit_tail_unchanged": true,
+  "faults": "4 committed write responses and1 successfulGET discarded;4 successfulresponses held;4 retries used actualMSP session and returned403; not physical network or process outage",
+  "new_identities": false,
+  "evidence_binding_implemented": false,
+  "browser_dom_tested": false,
+  "worksheet_page_implemented": true,
+  "inspection_verification": "SELF_REPORTED_UNVERIFIED",
+  "template_approval": "UNVERIFIED",
+  "report_published": false,
+  "active_scan_performed": false,
+  "credentials_output": false,
+  "formal_acceptance": "NOT_RUN"
+}

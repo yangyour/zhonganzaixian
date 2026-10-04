@@ -1,0 +1,42 @@
+{
+  "verified_at": "2026-10-04T12:28:44.311Z",
+  "environment": "designated-server-from-Windows",
+  "browser": "installed Edge with sandbox",
+  "checks": [
+    "real_padmin_page_loaded",
+    "duplicate_keys_keep_two_rows_and_send_no_request",
+    "real_dom_reorder_preserves_distinct_fields",
+    "ordered_null_and_empty_persist",
+    "unknown_write_locks_original_input",
+    "ordinary_real_get_keeps_original_unknown",
+    "original_receipt_recovered_once",
+    "actual_409_keeps_stale_input_and_baseline",
+    "archive_restore_keep_unverified_history",
+    "all_five_real_revisions_visible",
+    "old_null_and_empty_definition_visible",
+    "desktop_no_document_overflow",
+    "mobile_same_frozen_history",
+    "mobile_no_document_overflow",
+    "no_browser_page_errors"
+  ],
+  "passed": true,
+  "viewport_sizes": [
+    [
+      1440,
+      900
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "fault_type": "one actual committed PATCH success response discarded in browser transport",
+  "published": false,
+  "active_scan_performed": false,
+  "formal_acceptance": "NOT_RUN",
+  "original_request_body_sha256": "cba379c030c231300a6ad414bb6812cfea3c90142937d6fa5d9aaaf1569c2b1c",
+  "browser_version": "154.0.4258.53",
+  "synthetic_candidates_created": 1,
+  "report_published": false,
+  "all_own_candidates_archived": true
+}

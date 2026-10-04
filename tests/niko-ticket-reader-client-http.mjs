@@ -2,17 +2,18 @@
 import assert from 'node:assert/strict'
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { createHash } from 'node:crypto'
+import {realEnvironment,realTestDirectory,realEvidencePrefix,realEnvironmentInstance} from './real-test-environment.mjs'
 import { ApiClient, readRegisteredTicket, readTicketPage } from '../.local/niko-test/ticket-reader-client.mjs'
 const root=new URL('../',import.meta.url)
 const args=process.argv.slice(2);assert.ok(args.length===0 || args.length===1 && args[0]==='--reverify')
-const output=new URL(args.length ? 'docs/evidence/niko-ticket-reader-client-http-final-20261004.json' : 'docs/evidence/niko-ticket-reader-client-http-20261004.json',root)
+const output=new URL(`docs/evidence/${realEvidencePrefix}-ticket-reader-client-http${args.length?'-final':''}-20261004.json`,root)
 let stage='initialize',requests=0
 try {
   assert.equal(existsSync(output),false)
   const clients={},scopes={},pages={},results=[]
   for(const role of ['padmin','msp','tadmin','viewerA','viewerB','reviewer']){
-    const auth=JSON.parse(readFileSync(new URL(`.local/niko-test/private/sessions/qa-${role}.json`,root),'utf8'))
-    assert.equal(auth.environment,'niko-local-test')
+    const auth=JSON.parse(readFileSync(new URL(`${realTestDirectory}private/sessions/qa-${role}.json`,root),'utf8'))
+    assert.equal(auth.environment,realEnvironment)
     clients[role]=new ApiClient(async(url,options)=>{
       assert.equal(options.method,'GET');assert.equal(options.body,undefined);requests++
       return fetch(url,{...options,headers:{...options.headers,Cookie:auth.cookie},signal:AbortSignal.any([options.signal,AbortSignal.timeout(20000)])})
@@ -52,6 +53,6 @@ try {
   await assert.rejects(clients.tadmin.request('/tickets/'+own.id),error=>error.status===404)
   stage='registry_readback'
   const after=await clients.padmin.request('/configurations');assert.equal(createHash('sha256').update(JSON.stringify(after)).digest('hex'),hash)
-  const evidence={verified_at:new Date().toISOString(),environment:'niko-local-test',api_contract_version:'0.34.0',http_requests:requests,http_methods:['GET'],roles:results,existing_records_only:true,cross_tenant_detail_404:true,same_tenant_nonreporter_404:true,registry_entries:registry.items.length,registry_sha256_unchanged:hash,business_writes:0,oidc_refresh_separate:true,security_denials_may_write_audit:true,browser_dom_tested:false,oss_tested:false,formal_workflow_activated:false,contract_done:false}
+  const evidence={verified_at:new Date().toISOString(),environment:realEnvironment,api_contract_version:JSON.parse(readFileSync(new URL('contracts/local-api.openapi.json',root),'utf8')).info.version,http_requests:requests,http_methods:['GET'],roles:results,existing_records_only:true,cross_tenant_detail_404:true,same_tenant_nonreporter_404:true,registry_entries:registry.items.length,registry_sha256_unchanged:hash,business_writes:0,oidc_refresh_separate:true,security_denials_may_write_audit:true,browser_dom_tested:false,oss_tested:false,formal_workflow_activated:false,contract_done:false}
   writeFileSync(output,JSON.stringify(evidence,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({passed:true,http_requests:requests,roles:results,business_writes:0}))
 } catch {console.error(JSON.stringify({status:'failed',stage,details:'redacted'}));process.exitCode=1}

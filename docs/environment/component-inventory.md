@@ -224,3 +224,6 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 
 
 2026-10-04 API0.36/V22本地五角色已连接原PG17.9/KC26.2.4/MinIO，ready实测8.253秒后200；只调项目启动等待窗口，未改共享组件。100行专用Windows联系人作业真实完成并归档，见[实际证据](../evidence/local-contact-maximum-worker-20261004.json)。通知/身份绑定/OSS保持原门禁。
+
+
+2026-10-04 原指定PG17.9/KC26.2.4巡检模板、执行单API/请求模块及真实Edge桌面/390px已验；B03只对这两页面明确场景解除，物理设备、证据/通知/季度发布和客户确认仍待。没有新组件/账号；见[本地记录](../local-inspection-validation-20261004.md)。

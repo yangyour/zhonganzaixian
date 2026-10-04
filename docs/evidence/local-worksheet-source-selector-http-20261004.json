@@ -1,0 +1,21 @@
+{
+  "verified_at": "2026-10-04T12:43:40.538Z",
+  "environment": "designated-server",
+  "api_version": "0.36.0",
+  "http_requests": 11,
+  "frontend": "actual worksheetAssetChoices/worksheetAssetChoice/readWorksheetSource and ApiClient",
+  "asset_identity_label_projection_only": true,
+  "actual_asset_cursor_page_verified": true,
+  "literal_asset_query_verified": true,
+  "explicit_template_selection_version_verified": true,
+  "template_digest_verified": true,
+  "source_read_audit_tail_unchanged": true,
+  "synthetic_templates_created": 1,
+  "synthetic_templates_archived": 1,
+  "worksheet_mutations": 0,
+  "permanent_deletes": 0,
+  "browser_dom_tested": false,
+  "application_page_rendered": false,
+  "production_approval": "UNVERIFIED",
+  "formal_acceptance": "NOT_RUN"
+}

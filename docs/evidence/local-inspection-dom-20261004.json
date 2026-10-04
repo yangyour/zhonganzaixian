@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-04T12:25:18.502Z",
+  "environment": "designated-server-from-Windows",
+  "browser": "installed Edge with sandbox",
+  "checks": [
+    "real_padmin_page_loaded",
+    "duplicate_keys_keep_two_rows_and_send_no_request",
+    "real_dom_reorder_preserves_distinct_fields",
+    "ordered_null_and_empty_persist",
+    "unknown_write_locks_original_input",
+    "ordinary_real_get_keeps_original_unknown",
+    "original_receipt_recovered_once",
+    "actual_409_keeps_stale_input_and_baseline",
+    "archive_restore_keep_unverified_history"
+  ],
+  "passed": false,
+  "viewport_sizes": [
+    [
+      1440,
+      900
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "fault_type": "one actual committed PATCH success response discarded in browser transport",
+  "published": false,
+  "active_scan_performed": false,
+  "formal_acceptance": "NOT_RUN",
+  "original_request_body_sha256": "5181a30b00cbe63405299249581a2978e5256ae7bcdf296c4228e5ca582b9b45",
+  "failure": {
+    "stage": "archive",
+    "details": "redacted"
+  },
+  "all_own_candidates_archived": true
+}

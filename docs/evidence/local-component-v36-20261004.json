@@ -1,0 +1,29 @@
+{
+  "verified_at": "2026-10-04T12:40:23.800060+00:00",
+  "environment": "designated-server-from-Windows",
+  "java_api_contract": "0.36.0",
+  "schema_version": 22,
+  "postgresql": "17.9",
+  "keycloak": "26.2.4",
+  "minio": "RELEASE.2025-09-07T16-13-09Z",
+  "ssh_trust": "existing_fixed_host_key",
+  "new_components": 0,
+  "latest_surefire_suites": 170,
+  "tests": 1759,
+  "executed": 1746,
+  "skipped": 13,
+  "failures": 0,
+  "errors": 0,
+  "real_pg_executed": 554,
+  "real_minio_executed": 6,
+  "validation_method": "initial full reactor, correction of two failing remote lease suites, reactor remainder, then merged API0.36 module and six real MinIO suites; no duplicate counting",
+  "initial_failures_preserved": [
+    "500ms export test lease expired across SSH",
+    "100 contact rows exceeded original 30-second test lease"
+  ],
+  "web_tests": 1156,
+  "web_types_and_production_build": true,
+  "contract_tests": 86,
+  "fixture_isolated_skips_not_passes": 13,
+  "production_acceptance": "NOT_RUN"
+}

@@ -1,0 +1,26 @@
+{
+  "verified_at": "2026-10-04T12:31:34.247Z",
+  "environment": "designated-server-from-Windows",
+  "api_version": "0.36.0",
+  "checks": [],
+  "passed": false,
+  "viewport_sizes": [
+    [
+      1440,
+      900
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "fault_type": "actual committed PATCH success discarded in browser transport",
+  "active_scan_performed": false,
+  "report_published": false,
+  "formal_acceptance": "NOT_RUN",
+  "failure": {
+    "stage": "own_template",
+    "details": "redacted"
+  },
+  "own_records_archived": true
+}

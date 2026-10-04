@@ -39,7 +39,7 @@
   "failures": 0,
   "errors": 0,
   "python_tests": 136,
-  "native_powershell": "NOT_RUN_LOCALLY_AWAITING_EXACT_COMMIT_CI",
+  "native_powershell": "PASS_112_ISOLATED_CHECKS_ON_UBUNTU_CI_DATABASE_OPERATIONS_0",
   "expected_powershell_policy_checks": 112,
   "windows_database_execution": "NOT_RUN",
   "retained_synthetic_state": {
@@ -105,5 +105,13 @@
   "contract_generation": "PASS",
   "tracker_tests": 17,
   "tracker_requirements": 128,
-  "tracker_rows_with_notes": 39
+  "tracker_rows_with_notes": 39,
+  "verified_commit_ci": {
+    "sha": "0c119ee84d58a9a07046428534e6dfe70cf71ff7",
+    "run_id": 37228504044,
+    "job_id": 111513046229,
+    "conclusion": "success",
+    "native_powershell_checks": 112,
+    "database_operations": 0
+  }
 }

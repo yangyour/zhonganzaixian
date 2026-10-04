@@ -28,7 +28,7 @@ FORMAT=MOP_CHANGE_NOTICE_DRAFT_V1。F表示大端int32 UTF-8字节长度及原�
 
 ## 未完成部分
 
-V25结构已显式实施，但仍没有真实报备仓储/API/页面、审批、设备采集、diff事件或自动P3；API0.39与在线固定包未改变。纯模型与既有PG回归不能冒充报备联调、已批准数据或M6-7完整验收。V1—V25保持冻结，后续结构修改需新增显式迁移；所有写入仍须当前授权/CSRF/幂等/CAS/审计，跨租户对象404。实际计数见[核心证据](evidence/niko-change-notice-core-20261004.json)。
+V25结构已显式实施，但已新增受保护真实PG仓储；仍没有报备API/页面、审批、设备采集、diff事件或自动P3；API0.39与在线固定包未改变。纯模型与既有PG回归不能冒充报备联调、已批准数据或M6-7完整验收。V1—V25保持冻结，后续结构修改需新增显式迁移；所有写入仍须当前授权/CSRF/幂等/CAS/审计，跨租户对象404。实际计数见[核心证据](evidence/niko-change-notice-core-20261004.json)。
 
 ## 2026-10-04 V25真实草稿结构
 
@@ -38,4 +38,14 @@ mop_change_notice_draft记录不可重新绑定的原申请人与严格递增版
 
 四个固定invoker守卫验证创建事务、版本完整、设备数量/顺序、Java一致的二进制内容SHA；提交后的修订不能再追加设备，提前SET CONSTRAINTS也不能超出声明数量。归档和恢复须逐字保持前一提案，未归档不能RESTORE、已归档不能UPDATE。结构保持approval_status/automatic_p3_decision为SQL NULL，approval/matching CONFIG_PENDING、所有执行/生效/抑制标志false。不生成审批结果、设备命令或告警事件。
 
-新增21项真实受限runtime PG测试通过，覆盖Java↔PG摘要/UTF-8/顺序/可空结束、未知审批、同租户引用、历史ACL、状态转换、事务完整性、控制字符与固定上海9999年边界。另新增2项纯迁移策略测试。完整计数和文件指纹见[结构证据](evidence/niko-change-notice-schema-20261004.json)。这不是M6-7完整验收；审批/Q22、报备仓储/API/UI、实际采集/diff/有效报备联动仍NOT_RUN。
+新增21项真实受限runtime PG测试通过，覆盖Java↔PG摘要/UTF-8/顺序/可空结束、未知审批、同租户引用、历史ACL、状态转换、事务完整性、控制字符与固定上海9999年边界。另新增2项纯迁移策略测试。完整计数和文件指纹见[结构证据](evidence/niko-change-notice-schema-20261004.json)。这不是M6-7完整验收；审批/Q22、报备API/UI、实际采集/diff/有效报备联动仍NOT_RUN。
+
+## 2026-10-04 当前租户草稿仓储
+
+ChangeNoticeDraftRepository及PostgresChangeNoticeDraftRepository增加create/get/list/update/history/archive/restore。本切片只开放当前有效padmin成员维护未审核草稿；不据此宣称全部MSP/客户角色流程已完成。创建申请人必须等于当前授权操作者，更新不可重新指定申请人；后续操作者与原申请人独立记录。可选工单和全部设备在同一受保护事务中核验真实当前租户对象并加共享锁，缺失/跨租户均404，不以UUID格式冒充存在性。
+
+写入必须从平台idempotentAuthorized原子事务进入；当前成员/权限版本回查早于已有回执重放。头/历史/设备/审计/幂等回执一并提交；CAS不同key并发只有一个200、一个409；相同key重放原收据不追加，归档后原创建收据仍保持原样。归档/恢复无新提案参数，保持原申请人/工单/摘要/窗口/设备顺序，不批准或执行。
+
+读取使用独立REPEATABLE READ只读事务，不能混入受保护写事务；列表和历史有显式游标/上限，每个完整定义重新计算SHA并校验未知审批和全部false标志。实际SQL读取后受控修改抑制标志或摘要值都会503且真实库未改；该受控返回损坏不是数据库已遭篡改。真实SQL审计除零、设备FK失败及调用方异常分别证明五表回滚。就绪只验证结构，不声称审批、SSH、存储或事件链正常。
+
+新增24真实PG仓储测试；第一轮23全部通过，追加指纹损坏防护后最终24全部通过。合成数据留存并由测试归档；没有删除旧业务、执行设备动作或创建新凭据，V1—V25字节不变。实际计数见[仓储证据](evidence/niko-change-notice-repository-20261004.json)。HTTP/CSRF/浏览器页面仍待独立实施验证，正式M6-7验收NOT_RUN。

@@ -918,6 +918,7 @@
       "local_references": [
         "docs/change-notice-drafts.md",
         "docs/evidence/niko-change-notice-core-20261004.json",
+        "docs/evidence/niko-change-notice-repository-20261004.json",
         "docs/evidence/niko-change-notice-schema-20261004.json"
       ],
       "external_references_unchecked": 0,
@@ -1348,6 +1349,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "2c2e1bc2817c0ba30bbaaf1d147e004fac89437d3434bf91bd14df838406b685"
+    "doc/development/07_合同逐项开发追踪.md": "e66154ce13e22db99d82bed204a0c94d4650127a09311fe9f8edee8054c65655"
   }
 }

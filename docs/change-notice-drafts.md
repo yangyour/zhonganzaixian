@@ -28,4 +28,14 @@ FORMAT=MOP_CHANGE_NOTICE_DRAFT_V1。F表示大端int32 UTF-8字节长度及原�
 
 ## 未完成部分
 
-当前没有新迁移、真实报备仓储/API/页面、审批、设备采集、diff事件或自动P3；API0.39与在线固定包未改变。纯模型与既有PG回归不能冒充报备联调、已批准数据或M6-7完整验收。V1—V24保持冻结，后续持久化需新增显式迁移；所有写入仍须当前授权/CSRF/幂等/CAS/审计，跨租户对象404。实际计数见[核心证据](evidence/niko-change-notice-core-20261004.json)。
+V25结构已显式实施，但仍没有真实报备仓储/API/页面、审批、设备采集、diff事件或自动P3；API0.39与在线固定包未改变。纯模型与既有PG回归不能冒充报备联调、已批准数据或M6-7完整验收。V1—V25保持冻结，后续结构修改需新增显式迁移；所有写入仍须当前授权/CSRF/幂等/CAS/审计，跨租户对象404。实际计数见[核心证据](evidence/niko-change-notice-core-20261004.json)。
+
+## 2026-10-04 V25真实草稿结构
+
+在既有niko PG17.11使用独立迁移身份显式执行V25一次，重复、只读检查及旧V24模式均0迁移。53张既有项目表在任何新增测试写入前完整行指纹一致、无排除字段；原服务器未操作。SQL SHA256=650ce8f83e9fc673cfb6a4838872638149650f735a90f37c5861a6fce771bc67，V1—V25冻结。API/Worker启动不自动迁移，在线API0.39固定包未重启或替换。
+
+mop_change_notice_draft记录不可重新绑定的原申请人与严格递增版本；revision保留每次CREATE/UPDATE/ARCHIVE/RESTORE及原始内容；asset保留有序设备。同租户申请人/记录人/设备/可选工单外键不等同业务资格或审批授权，后续仓储仍须校验当前权限。runtime只能追加/读取修订及设备、更新头version/updated_at，禁止历史修改、删除、TRUNCATE或申请人重绑。
+
+四个固定invoker守卫验证创建事务、版本完整、设备数量/顺序、Java一致的二进制内容SHA；提交后的修订不能再追加设备，提前SET CONSTRAINTS也不能超出声明数量。归档和恢复须逐字保持前一提案，未归档不能RESTORE、已归档不能UPDATE。结构保持approval_status/automatic_p3_decision为SQL NULL，approval/matching CONFIG_PENDING、所有执行/生效/抑制标志false。不生成审批结果、设备命令或告警事件。
+
+新增21项真实受限runtime PG测试通过，覆盖Java↔PG摘要/UTF-8/顺序/可空结束、未知审批、同租户引用、历史ACL、状态转换、事务完整性、控制字符与固定上海9999年边界。另新增2项纯迁移策略测试。完整计数和文件指纹见[结构证据](evidence/niko-change-notice-schema-20261004.json)。这不是M6-7完整验收；审批/Q22、报备仓储/API/UI、实际采集/diff/有效报备联动仍NOT_RUN。

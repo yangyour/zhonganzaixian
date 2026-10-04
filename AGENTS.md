@@ -95,3 +95,7 @@ niko独立测试库已通过独立CLI显式执行V22__manual_inspection_workshee
 ## V23巡检来源集合结构冻结（2026-10-04 14:26 UTC）
 
 niko独立测试库通过显式独立CLI执行V23__immutable_inspection_source_collections.sql一次，重复执行/只读检查均0迁移；48张既有项目表完整行指纹在迁移前后相同。V23 SHA256为eabc4cf2512cdea920acf97ba1991499fde9d0901c7b91b5a8cc7b51f13599e8，当前V1–V23全部字节冻结，后续SQL修正必须新增V24或更高，不能改已执行SQL。两表与三触发器只保护明确修订的不可变来源文档/引用集合，不是正式月报/季度规则、发布或附件授权。原指定服务器V22已有本地独立证据；本次未操作该服务器，API/Worker仍不自动迁移；运行角色真实结构测试、仓储/API/页面与报告持久化业务按实际证据分别登记，结构完成不标全部需求DONE。
+
+## V25未审核变更报备草稿结构冻结（2026-10-04 19:23 UTC）
+
+niko独立测试库通过显式独立CLI执行V25__unreviewed_change_notice_drafts.sql一次并通过结构/ACL核对，SHA256为650ce8f83e9fc673cfb6a4838872638149650f735a90f37c5861a6fce771bc67。V1–V25全部字节冻结（包含已执行V24备份计划草稿），后续SQL修正必须新增V26或更高；不修改已执行SQL。三表/四守卫只保护申请人、计划内容、设备引用和不可变修订，不证明审批、有效窗口匹配、告警抑制、自动P3、仓储/API/页面完成。approval_status与automatic_p3_decision保持null，生效/执行/抑制标志均false；Q22待确认。原服务器未操作，API/Worker不自动迁移；旧表行指纹、重复执行与真实运行角色测试以实际独立证据为准。

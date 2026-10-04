@@ -32,7 +32,7 @@ public final class TestSchemaMigration {
         Map.entry("14","V14__immutable_manual_recovery_confirmations.sql"),
         Map.entry("15","V15__manual_warranty_details.sql"),
         Map.entry("16","V16__immutable_capacity_scenario_drafts.sql"),
-        Map.entry("17","V17__customer_contact_revisions.sql"),Map.entry("18","V18__durable_contact_import_jobs.sql"),Map.entry("19","V19__contact_import_generated_hash_guard.sql"),Map.entry("20","V20__durable_asset_export_jobs.sql"),Map.entry("21","V21__inspection_template_revisions.sql"),Map.entry("22","V22__manual_inspection_worksheet_drafts.sql"),Map.entry("23","V23__immutable_inspection_source_collections.sql"),Map.entry("24","V24__unpublished_backup_plan_drafts.sql"));
+        Map.entry("17","V17__customer_contact_revisions.sql"),Map.entry("18","V18__durable_contact_import_jobs.sql"),Map.entry("19","V19__contact_import_generated_hash_guard.sql"),Map.entry("20","V20__durable_asset_export_jobs.sql"),Map.entry("21","V21__inspection_template_revisions.sql"),Map.entry("22","V22__manual_inspection_worksheet_drafts.sql"),Map.entry("23","V23__immutable_inspection_source_collections.sql"),Map.entry("24","V24__unpublished_backup_plan_drafts.sql"),Map.entry("25","V25__unreviewed_change_notice_drafts.sql"));
     static final String IMPORT_SHA256="1f532822668274b7aebd12ea78b57e6be0aa9fd53ceb77023ee8067589cd2b4b";
     static final String DEPENDENCY_SHA256="5a8ce8d49fe948fc0e9586c102f7c8bfc46cb975a0b5d9f32d4bd1ccc72670bb";
     static final String WORKLOG_SHA256="942ea4dc88a8169b40662edcfd89871e8280a429ac922bd0cc1eb451b82ad2f8";
@@ -68,12 +68,12 @@ public final class TestSchemaMigration {
     record Entry(String version,String script,String type,MigrationState state,boolean applied,boolean checksumMatches,Integer checksum) {}
     static final String WORKING_CALENDAR_CHECKER_SHA256="07749cb8084dc2f0e9f2a6ed899b77be3dc4e1aeb55f15eed1bf558e48b18fb6";
     enum Plan {
-        PHOTOS_PENDING(4),ASSET_IMPORTS_PENDING(5),ASSET_IMPORTS_APPLIED(6),ASSET_DEPENDENCIES_APPLIED(7),WORKLOGS_APPLIED(8),ASSET_METADATA_APPLIED(9),INTERNAL_NOTES_APPLIED(10),TICKET_COMMENTS_APPLIED(11),WORKING_CALENDARS_APPLIED(12),MANUAL_INCIDENTS_APPLIED(13),MANUAL_RECOVERIES_APPLIED(14),MANUAL_WARRANTY_APPLIED(15),CAPACITY_SCENARIOS_APPLIED(16),CUSTOMER_CONTACTS_APPLIED(17),CONTACT_IMPORTS_APPLIED(18),CONTACT_IMPORTS_FIXED(19),ASSET_EXPORTS_APPLIED(20),INSPECTION_TEMPLATES_APPLIED(21),INSPECTION_WORKSHEETS_APPLIED(22),INSPECTION_SOURCE_COLLECTIONS_APPLIED(23),BACKUP_PLAN_DRAFTS_APPLIED(24);
+        PHOTOS_PENDING(4),ASSET_IMPORTS_PENDING(5),ASSET_IMPORTS_APPLIED(6),ASSET_DEPENDENCIES_APPLIED(7),WORKLOGS_APPLIED(8),ASSET_METADATA_APPLIED(9),INTERNAL_NOTES_APPLIED(10),TICKET_COMMENTS_APPLIED(11),WORKING_CALENDARS_APPLIED(12),MANUAL_INCIDENTS_APPLIED(13),MANUAL_RECOVERIES_APPLIED(14),MANUAL_WARRANTY_APPLIED(15),CAPACITY_SCENARIOS_APPLIED(16),CUSTOMER_CONTACTS_APPLIED(17),CONTACT_IMPORTS_APPLIED(18),CONTACT_IMPORTS_FIXED(19),ASSET_EXPORTS_APPLIED(20),INSPECTION_TEMPLATES_APPLIED(21),INSPECTION_WORKSHEETS_APPLIED(22),INSPECTION_SOURCE_COLLECTIONS_APPLIED(23),BACKUP_PLAN_DRAFTS_APPLIED(24),CHANGE_NOTICE_DRAFTS_APPLIED(25);
         final int schemaVersion;Plan(int version){schemaVersion=version;}
         static Plan atVersion(int version){for(Plan value:values())if(value.schemaVersion==version)return value;throw new IllegalStateException("Unsupported validated schema version");}
     }
     enum Mode {
-        READ_ONLY_CHECK(0),APPLY_PHOTOS(5),APPLY_ASSET_IMPORTS(6),APPLY_ASSET_DEPENDENCIES(7),APPLY_WORKLOGS(8),APPLY_ASSET_METADATA(9),APPLY_INTERNAL_NOTES(10),APPLY_TICKET_COMMENTS(11),APPLY_WORKING_CALENDARS(12),APPLY_MANUAL_INCIDENTS(13),APPLY_MANUAL_RECOVERIES(14),APPLY_MANUAL_WARRANTY(15),APPLY_CAPACITY_SCENARIOS(16),APPLY_CUSTOMER_CONTACTS(17),APPLY_CONTACT_IMPORTS(18),APPLY_CONTACT_IMPORT_FIX(19),APPLY_ASSET_EXPORTS(20),APPLY_INSPECTION_TEMPLATES(21),APPLY_INSPECTION_WORKSHEETS(22),APPLY_INSPECTION_SOURCE_COLLECTIONS(23),APPLY_BACKUP_PLAN_DRAFTS(24);
+        READ_ONLY_CHECK(0),APPLY_PHOTOS(5),APPLY_ASSET_IMPORTS(6),APPLY_ASSET_DEPENDENCIES(7),APPLY_WORKLOGS(8),APPLY_ASSET_METADATA(9),APPLY_INTERNAL_NOTES(10),APPLY_TICKET_COMMENTS(11),APPLY_WORKING_CALENDARS(12),APPLY_MANUAL_INCIDENTS(13),APPLY_MANUAL_RECOVERIES(14),APPLY_MANUAL_WARRANTY(15),APPLY_CAPACITY_SCENARIOS(16),APPLY_CUSTOMER_CONTACTS(17),APPLY_CONTACT_IMPORTS(18),APPLY_CONTACT_IMPORT_FIX(19),APPLY_ASSET_EXPORTS(20),APPLY_INSPECTION_TEMPLATES(21),APPLY_INSPECTION_WORKSHEETS(22),APPLY_INSPECTION_SOURCE_COLLECTIONS(23),APPLY_BACKUP_PLAN_DRAFTS(24),APPLY_CHANGE_NOTICE_DRAFTS(25);
         final int targetVersion;Mode(int version){targetVersion=version;}
     }
 
@@ -101,6 +101,7 @@ public final class TestSchemaMigration {
         if(args.length==1&&"--apply-inspection-templates".equals(args[0]))return Mode.APPLY_INSPECTION_TEMPLATES;
         if(args.length==1&&"--apply-inspection-worksheets".equals(args[0]))return Mode.APPLY_INSPECTION_WORKSHEETS;
         if(args.length==1&&"--apply-inspection-source-collections".equals(args[0]))return Mode.APPLY_INSPECTION_SOURCE_COLLECTIONS;
+        if(args.length==1&&"--apply-change-notice-drafts".equals(args[0]))return Mode.APPLY_CHANGE_NOTICE_DRAFTS;
         if(args.length==1&&"--apply-backup-plan-drafts".equals(args[0]))return Mode.APPLY_BACKUP_PLAN_DRAFTS;
         throw new IllegalArgumentException("Use --check or one explicit supported feature apply mode");
     }
@@ -146,7 +147,7 @@ public final class TestSchemaMigration {
                 public void warn(String message){} public void error(String message){} public void error(String message,Exception error){} public void notice(String message){}
             });
             Mode mode=requestedMode(args);boolean apply=mode!=Mode.READ_ONLY_CHECK;
-            stage="migration_resources";verifyImportResource();verifyDependencyResource();verifyWorklogResource();verifyAssetMetadataResource();verifyInternalNoteResource();verifyTicketCommentResource();verifyWorkingCalendarResource();verifyManualIncidentResource();verifyManualRecoveryResource();verifyManualWarrantyResource();verifyCapacityScenarioResource();verifyCustomerContactResource();verifyContactImportResource();verifyContactImportFixResource();AssetExportSchemaVerifier.resource();InspectionTemplateSchemaVerifier.resource();InspectionWorksheetSchemaVerifier.resource();InspectionSourceCollectionSchemaVerifier.resource();BackupPlanSchemaVerifier.resource();stage="private_settings";Settings settings=Settings.from(System::getenv);
+            stage="migration_resources";verifyImportResource();verifyDependencyResource();verifyWorklogResource();verifyAssetMetadataResource();verifyInternalNoteResource();verifyTicketCommentResource();verifyWorkingCalendarResource();verifyManualIncidentResource();verifyManualRecoveryResource();verifyManualWarrantyResource();verifyCapacityScenarioResource();verifyCustomerContactResource();verifyContactImportResource();verifyContactImportFixResource();AssetExportSchemaVerifier.resource();InspectionTemplateSchemaVerifier.resource();InspectionWorksheetSchemaVerifier.resource();InspectionSourceCollectionSchemaVerifier.resource();BackupPlanSchemaVerifier.resource();ChangeNoticeSchemaVerifier.resource();stage="private_settings";Settings settings=Settings.from(System::getenv);
             stage="identity";
             try(Connection guard=connection(settings,!apply)) {
                 verifyIdentity(guard);
@@ -190,6 +191,7 @@ public final class TestSchemaMigration {
                     " inspection_templates="+(after.schemaVersion>=21?"UNPUBLISHED_STRUCTURE_ONLY":"NOT_APPLIED")+
                     " inspection_worksheets="+(after.schemaVersion>=22?"MANUAL_DRAFT_STRUCTURE_ONLY":"NOT_APPLIED")+
                     " inspection_source_collections="+(after.schemaVersion>=23?"IMMUTABLE_SOURCE_ONLY_NOT_REPORT":"NOT_APPLIED")+
+                    " change_notice_drafts="+(after.schemaVersion>=25?"UNREVIEWED_DRAFT_ONLY_NO_APPROVAL":"NOT_APPLIED")+
                     " backup_plan_drafts="+(after.schemaVersion>=24?"UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION":"NOT_APPLIED"));
             }
         }catch(Throwable failure){errors.println(safeFailure(stage,failure));exit=1;}
@@ -203,6 +205,7 @@ public final class TestSchemaMigration {
     }
     private static void verifyStructure(Connection connection,Plan plan)throws SQLException{
         if(plan.schemaVersion>=24)BackupPlanSchemaVerifier.verify(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_backup_plan_draft') IS NULL AND to_regclass('public.mop_backup_plan_revision') IS NULL AND to_regclass('public.mop_backup_plan_target') IS NULL AND to_regprocedure('public.mop_backup_plan_head_guard()') IS NULL AND to_regprocedure('public.mop_backup_plan_revision_insert_guard()') IS NULL AND to_regprocedure('public.mop_backup_plan_target_insert_guard()') IS NULL AND to_regprocedure('public.mop_backup_plan_revision_complete()') IS NULL");
+        if(plan.schemaVersion>=25)ChangeNoticeSchemaVerifier.verify(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_change_notice_draft') IS NULL AND to_regclass('public.mop_change_notice_revision') IS NULL AND to_regclass('public.mop_change_notice_asset') IS NULL AND to_regprocedure('public.mop_change_notice_head_guard()') IS NULL AND to_regprocedure('public.mop_change_notice_revision_insert_guard()') IS NULL AND to_regprocedure('public.mop_change_notice_asset_insert_guard()') IS NULL AND to_regprocedure('public.mop_change_notice_revision_complete()') IS NULL");
         if(plan.schemaVersion>=22)InspectionWorksheetSchemaVerifier.verify(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_inspection_worksheet') IS NULL AND to_regclass('public.mop_inspection_worksheet_revision') IS NULL AND to_regprocedure('public.mop_inspection_worksheet_head_guard()') IS NULL AND to_regprocedure('public.mop_inspection_worksheet_content_guard()') IS NULL");
         if(plan.schemaVersion>=23)InspectionSourceCollectionSchemaVerifier.verify(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_inspection_source_collection') IS NULL AND to_regclass('public.mop_inspection_source_collection_item') IS NULL AND to_regprocedure('public.mop_inspection_source_document_guard()') IS NULL AND to_regprocedure('public.mop_inspection_source_item_insert_guard()') IS NULL AND to_regprocedure('public.mop_inspection_source_collection_complete()') IS NULL");
         if(plan.schemaVersion>=21)InspectionTemplateSchemaVerifier.verify(connection);else requireTrue(connection,"SELECT to_regclass('public.mop_inspection_template') IS NULL AND to_regclass('public.mop_inspection_template_revision') IS NULL AND to_regclass('public.mop_inspection_template_item') IS NULL AND to_regprocedure('public.mop_inspection_template_head_guard()') IS NULL AND to_regprocedure('public.mop_inspection_template_revision_guard()') IS NULL");

@@ -250,3 +250,8 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 ## 2026-10-04 集合页面组件真实HTTP边界
 
 显式jsdom/Vue组件场景通过11次真实PG/OIDC HTTP（API0.38），不是浏览器导航或CSS/手机验收；未安装新组件、启动Vite、改地址/代理或绕过原URL策略。首轮在途等待断言失败造成未知请求，只读PG及原key/body恢复后保留该1集合，独立r2另1集合；无新父对象/账号/迁移/存储/删除。B03仍未解除，原Windows旧页面证据不能替代。见../evidence/niko-inspection-source-collection-page-20261004.json。
+
+
+## 2026-10-04 V25变更报备草稿独立结构
+
+继续复用niko-local-test既有PG17.11，独立CLI --apply-change-notice-drafts实际1次、重复/--check/旧--apply-backup-plan-drafts均0；53张旧表完整行指纹前后相同。新增三表四invoker守卫，没有新组件、账号、凭据、端口或代理；仅现有runtime具有所需草稿追加/读取和头版本更新权限。21真实PG结构测试通过，API0.39固定包未重启、Worker未启动，不自动迁移。审批/P3为null、执行/抑制false；原服务器、OSS、审批/SSH/通知联调均未因此完成。V1—V25冻结，后续修正新增V26，详见docs/evidence/niko-change-notice-schema-20261004.json。

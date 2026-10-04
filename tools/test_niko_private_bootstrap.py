@@ -96,7 +96,7 @@ class MigrationManifestParityTest(unittest.TestCase):
    text=(ROOT/entrypoint).read_text();names=re.findall(r"frozen-[a-z-]+\.json",text);self.assertEqual(len(names),len(set(names)));expected={}
    for name in names:
     values=json.loads((ROOT/'tools/niko-test'/name).read_text())['sha256'];self.assertTrue(set(values).isdisjoint(expected));expected.update(values)
-   self.assertEqual(actual,expected);self.assertEqual(set(range(1,25)),{int(name.split('__')[0][1:]) for name in expected})
+   self.assertEqual(actual,expected);self.assertEqual(set(range(1,26)),{int(name.split('__')[0][1:]) for name in expected})
  def test_v20_remains_frozen_and_both_launchers_require_explicit_feature(self):
   manifest=json.loads((ROOT/'tools/niko-test/frozen-asset-export-migration.json').read_text());self.assertEqual({'V20__durable_asset_export_jobs.sql':'5f8114dcdd2bd1cdf0c60fb75a5b521175462f583786602cd2b4a1835f960a83'},manifest['sha256']);self.assertEqual(3,len(manifest['function_body_sha256']))
   for path in ['deploy/migration-policy.ps1','tools/niko-test/run-migration.py']:self.assertIn('--apply-asset-exports',(ROOT/path).read_text())
@@ -122,5 +122,10 @@ class MigrationManifestParityTest(unittest.TestCase):
   manifest=json.loads((ROOT/'tools/niko-test/frozen-backup-plan-migration.json').read_text());self.assertEqual(1,len(manifest['sha256']));self.assertEqual(4,len(manifest['function_body_sha256']))
   for path in ['deploy/migration-policy.ps1','tools/niko-test/run-migration.py']:self.assertIn('--apply-backup-plan-drafts',(ROOT/path).read_text())
   windows=(ROOT/'deploy/migrate-test-schema.ps1').read_text();self.assertIn('BackupPlanSchemaVerifier.class',windows);self.assertIn('(Get-Item -LiteralPath $backupPlanVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $backupPlanVerifierSource).LastWriteTimeUtc',windows)
+
+ def test_change_notice_migration_has_explicit_mode_and_fresh_windows_verifier(self):
+  manifest=json.loads((ROOT/'tools/niko-test/frozen-change-notice-migration.json').read_text());self.assertEqual(1,len(manifest['sha256']));self.assertEqual(4,len(manifest['function_body_sha256']))
+  for path in ['deploy/migration-policy.ps1','tools/niko-test/run-migration.py']:self.assertIn('--apply-change-notice-drafts',(ROOT/path).read_text())
+  windows=(ROOT/'deploy/migrate-test-schema.ps1').read_text();self.assertIn('ChangeNoticeSchemaVerifier.class',windows);self.assertIn('(Get-Item -LiteralPath $changeNoticeVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $changeNoticeVerifierSource).LastWriteTimeUtc',windows)
 
 if __name__=='__main__':unittest.main()

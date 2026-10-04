@@ -202,3 +202,8 @@ V23已独立冻结，本轮仅只读check0执行，启动不迁移。正常退�
 ## 2026-10-04 集合页面显式组件HTTP测试
 
 生产Page/Picker在`apps/web/qa/inspection-source-collection-page.http.ts`中用原生jsdom控件连接既有API；必须显式MOP_RUN_NIKO_SOURCE_PAGE_HTTP=true并选`--config vitest.niko-source-page.config.ts`，默认单元测试不收集该*.http.ts，不能将其称为真实浏览器。首次在途等待断言失败的控制已有reconciled标记和同key/body恢复证据；显式MOP_NIKO_SOURCE_PAGE_RETRY_AFTER_WAIT_FIX仅允许旧请求已恢复后使用独立r2控制。当前两控制与最终证据已经存在，不得盲目再运行或覆盖；新验证需另建明确测试场景。首轮/r2共2不可变合成集合保留，成功r2场景为真实HTTP11次/1创建审计，首轮失败及另3次原请求恢复分别留证；真实CSS/手机/WeChat仍NOT_RUN。
+
+
+## 2026-10-04 V25变更报备草稿独立结构
+
+继续复用niko-local-test既有PG17.11，独立CLI --apply-change-notice-drafts实际1次、重复/--check/旧--apply-backup-plan-drafts均0；53张旧表完整行指纹前后相同。新增三表四invoker守卫，没有新组件、账号、凭据、端口或代理；仅现有runtime具有所需草稿追加/读取和头版本更新权限。21真实PG结构测试通过，API0.39固定包未重启、Worker未启动，不自动迁移。审批/P3为null、执行/抑制false；原服务器、OSS、审批/SSH/通知联调均未因此完成。V1—V25冻结，后续修正新增V26，详见docs/evidence/niko-change-notice-schema-20261004.json。

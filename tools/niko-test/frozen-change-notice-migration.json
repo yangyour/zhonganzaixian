@@ -1,0 +1,11 @@
+{
+  "sha256": {
+    "V25__unreviewed_change_notice_drafts.sql": "650ce8f83e9fc673cfb6a4838872638149650f735a90f37c5861a6fce771bc67"
+  },
+  "function_body_sha256": {
+    "mop_change_notice_head_guard": "e87e125b2ed94fd4c070b2c68dcb76c10d63fc42258d5b633393f7916571bfcf",
+    "mop_change_notice_revision_insert_guard": "ccbd715508cfe5e3a79f8b6a9094ace45d58eac7f3f944325a105170fe2c769a",
+    "mop_change_notice_asset_insert_guard": "cf3899c4ea8863d6abccf489cf289bd279b82c07665f6fc0260fe9a8596b0924",
+    "mop_change_notice_revision_complete": "5d8fb28f0723101d5f091010d860f1c558aeb9b094b239a1d84df61c246157ab"
+  }
+}

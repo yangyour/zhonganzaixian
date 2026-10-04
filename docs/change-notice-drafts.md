@@ -28,7 +28,7 @@ FORMAT=MOP_CHANGE_NOTICE_DRAFT_V1。F表示大端int32 UTF-8字节长度及原�
 
 ## 未完成部分
 
-V25结构已显式实施，但已新增受保护真实PG仓储；仍没有报备API/页面、审批、设备采集、diff事件或自动P3；API0.39与在线固定包未改变。纯模型与既有PG回归不能冒充报备联调、已批准数据或M6-7完整验收。V1—V25保持冻结，后续结构修改需新增显式迁移；所有写入仍须当前授权/CSRF/幂等/CAS/审计，跨租户对象404。实际计数见[核心证据](evidence/niko-change-notice-core-20261004.json)。
+V25结构、受保护真实PG仓储及API0.40草稿HTTP已实现；仍没有报备页面、审批、设备采集、diff事件或自动P3。纯模型与既有PG回归不能冒充报备联调、已批准数据或M6-7完整验收。V1—V25保持冻结，后续结构修改需新增显式迁移；所有写入仍须当前授权/CSRF/幂等/CAS/审计，跨租户对象404。实际计数见[核心证据](evidence/niko-change-notice-core-20261004.json)。
 
 ## 2026-10-04 V25真实草稿结构
 
@@ -48,4 +48,18 @@ ChangeNoticeDraftRepository及PostgresChangeNoticeDraftRepository增加create/ge
 
 读取使用独立REPEATABLE READ只读事务，不能混入受保护写事务；列表和历史有显式游标/上限，每个完整定义重新计算SHA并校验未知审批和全部false标志。实际SQL读取后受控修改抑制标志或摘要值都会503且真实库未改；该受控返回损坏不是数据库已遭篡改。真实SQL审计除零、设备FK失败及调用方异常分别证明五表回滚。就绪只验证结构，不声称审批、SSH、存储或事件链正常。
 
-新增24真实PG仓储测试；第一轮23全部通过，追加指纹损坏防护后最终24全部通过。合成数据留存并由测试归档；没有删除旧业务、执行设备动作或创建新凭据，V1—V25字节不变。实际计数见[仓储证据](evidence/niko-change-notice-repository-20261004.json)。HTTP/CSRF/浏览器页面仍待独立实施验证，正式M6-7验收NOT_RUN。
+新增24真实PG仓储测试；第一轮23全部通过，追加指纹损坏防护后最终24全部通过。合成数据留存并由测试归档；没有删除旧业务、执行设备动作或创建新凭据，V1—V25字节不变。实际计数见[仓储证据](evidence/niko-change-notice-repository-20261004.json)。本仓储批未验证HTTP/CSRF；后续API证据见下，浏览器页面仍待，正式M6-7验收NOT_RUN。
+
+## 2026-10-04 API0.40未审核报备草稿入口
+
+实际新增GET/POST `/api/v1/change-notice-drafts`、GET/PATCH `/{id}`、GET `/{id}/history`与POST `/{id}/archive|restore`；这是同步200草稿入口，正式 `/change-notices` 审批/有效窗口/事件联动仍未实现，不返回伪202或伪操作完成。current padmin拥有两个显式draft能力，其他角色403；CSRF、当前成员、幂等、CAS、审计与跨租户404沿用真实平台事务。
+
+创建必须精确提交expected_version=0、change_summary、asset_ids、planned_start_at、planned_end_at、ticket_id；后两项未知须显式null，不默认执行时刻或工单。申请人只从当前会话确定，更新先读取不可重绑的原申请人再走受保护CAS，客户端不能传applicant_id。更新expected_version为正；归档/恢复只接受版本、不接受修改原提案。UTC整毫秒与上海日期范围、结束严格晚于开始仍由服务端校验。JSON最大262144字节/4000token/深度4，拒绝重复字段、未知字段、尾随文档和非整数版本。
+
+列表只返回有界元数据（含原申请人、可选工单、明确窗口/设备数/内容SHA），不返回设备ID集合和变更摘要正文；详情与每条历史含完整原文/有序设备。page_size只10/15/20，列表成对游标、历史before_version；读取不追加审计/收据。摘要SHA不是审批证据，unknown审批/P3保持null，审批/匹配CONFIG_PENDING，生效/执行/抑制均false。
+
+ready新增V25结构依赖，缺失/null/异常503，live独立；schema_access_ready仅表示结构权限，不表示审批策略、SSH/diff或告警健康。旧94路径除ready扩展均未改变、207个非ready旧schema不变；新增5路径9schema，总99路径217schema。实际契约见contracts/local-api.openapi.json版本0.40.0。
+
+19新增控制器测试与1新增ready测试、全量2063报告/2050执行/687真实PG（13历史跳过、6MinIO排除）；109契约、1327Web/79文件、类型/构建、136Python通过。初次契约107通过2失败为旧ready样例缺新依赖与旧版本断言；补齐样例并保留原检查后109全部通过。
+
+固定API工件普通拥有者守卫重启，56张既有表完整行指纹在6次真实OIDC新登录前相同；不声称崩溃/故障恢复。83真实HTTP（42×200、18×400、1×401、9×403、6×404、5×409、2×413）覆盖原收据重放/同key并发/不同key CAS/15版历史、同租户可选工单与设备/角色/CSRF/技术边界。仅2个自有合成草稿留存归档，不产生设备或审批动作；完整回读见[API证据](evidence/niko-change-notice-api-20261004.json)和[HTTP证据](evidence/niko-change-notice-http-20261004.json)。B03真实浏览器/手机/WeChat和Q22审批策略仍阻塞相应验收，所有128项NOT_RUN。

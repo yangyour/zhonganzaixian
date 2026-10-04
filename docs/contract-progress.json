@@ -917,6 +917,7 @@
       "has_progress_note": true,
       "local_references": [
         "docs/change-notice-drafts.md",
+        "docs/evidence/niko-change-notice-api-20261004.json",
         "docs/evidence/niko-change-notice-core-20261004.json",
         "docs/evidence/niko-change-notice-repository-20261004.json",
         "docs/evidence/niko-change-notice-schema-20261004.json"
@@ -1349,6 +1350,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "e66154ce13e22db99d82bed204a0c94d4650127a09311fe9f8edee8054c65655"
+    "doc/development/07_合同逐项开发追踪.md": "9194ae7ad2434b0fed23ffb46fe3e73f894313de0d0b9dbff2ca98dd4f63a7cf"
   }
 }

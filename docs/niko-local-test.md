@@ -207,3 +207,8 @@ V23已独立冻结，本轮仅只读check0执行，启动不迁移。正常退�
 ## 2026-10-04 V25变更报备草稿独立结构
 
 继续复用niko-local-test既有PG17.11，独立CLI --apply-change-notice-drafts实际1次、重复/--check/旧--apply-backup-plan-drafts均0；53张旧表完整行指纹前后相同。新增三表四invoker守卫，没有新组件、账号、凭据、端口或代理；仅现有runtime具有所需草稿追加/读取和头版本更新权限。21真实PG结构测试通过，API0.39固定包未重启、Worker未启动，不自动迁移。审批/P3为null、执行/抑制false；原服务器、OSS、审批/SSH/通知联调均未因此完成。V1—V25冻结，后续修正新增V26，详见docs/evidence/niko-change-notice-schema-20261004.json。
+
+
+## 2026-10-04 API0.40未审核报备草稿真实HTTP
+
+复用既有PG17.11/KC26.2.4与V25；独立schema只读检查0迁移。旧拥有者runner正常退出后新固定API工件5cdbfa7620e72eb8caabf335a064e5138ee70d45ed6cda6fc492a7d066d36823启动，56张旧表在6OIDC新登录前完整行指纹等值；不称崩溃/故障恢复。83HTTP成功完成，2个自有合成草稿已归档，18修订/36设备引用/18成功审计（2创建），无pending原请求。审批/P3未知、不执行或抑制；原服务器/OSS未操作、无新账号或代理，API/Worker不自动迁移。当前completed控制.local/niko-test/change-notice-api-control.json禁止盲目重跑；需新场景才能再验证。见docs/evidence/niko-change-notice-api-20261004.json。

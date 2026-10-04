@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.39.0",
+    "version": "0.40.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -21314,6 +21314,1310 @@
           }
         }
       }
+    },
+    "/change-notice-drafts": {
+      "get": {
+        "operationId": "listChangeNoticeDrafts",
+        "summary": "当前租户未审核报备元数据分页；不返回设备明细或摘要正文，不认定已获批准",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-readonly": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-reject-duplicate-query-keys": true,
+        "x-mop-read-consistency": "READ_ONLY_REPEATABLE_READ",
+        "x-mop-success-writes-audit-or-receipts": false,
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                20
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_created_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-paired-query-keys": [
+          "before_created_at",
+          "before_id"
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeNoticeDraftPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createChangeNoticeDraft",
+        "summary": "原子保存未审核报备；申请人来自会话，设备与可选工单同租户校验，不批准或抑制",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeNoticeDraftCreate"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-before-replay-authorization": true,
+        "x-mop-body-max-bytes": 262144,
+        "x-mop-json-max-tokens": 4000,
+        "x-mop-json-max-depth": 4,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-reject-all-query-keys": true,
+        "x-mop-no-side-effects": [
+          "APPROVAL",
+          "ALERT_SUPPRESSION",
+          "AUTOMATIC_P3",
+          "DEVICE_EXECUTION",
+          "OBJECT_STORAGE"
+        ],
+        "x-mop-replay": "CURRENT_AUTHORIZATION_THEN_ORIGINAL_RECEIPT",
+        "x-mop-integer-token-required": true,
+        "x-mop-applicant": "CREATE_FROM_CURRENT_ACTOR_UPDATE_PRESERVES_ORIGINAL",
+        "x-mop-window": "UTC_MILLISECONDS_SHANGHAI_YEAR_1_9999_END_NULL_OR_STRICTLY_AFTER_START",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeNoticeDraftResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/change-notice-drafts/{id}": {
+      "get": {
+        "operationId": "getChangeNoticeDraft",
+        "summary": "读取未审核完整提案；跨租户404",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-readonly": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-reject-duplicate-query-keys": true,
+        "x-mop-read-consistency": "READ_ONLY_REPEATABLE_READ",
+        "x-mop-success-writes-audit-or-receipts": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeNoticeDraftResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateChangeNoticeDraft",
+        "summary": "明确CAS追加草稿修订；原申请人和历史不变",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeNoticeDraftUpdate"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-before-replay-authorization": true,
+        "x-mop-body-max-bytes": 262144,
+        "x-mop-json-max-tokens": 4000,
+        "x-mop-json-max-depth": 4,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-reject-all-query-keys": true,
+        "x-mop-no-side-effects": [
+          "APPROVAL",
+          "ALERT_SUPPRESSION",
+          "AUTOMATIC_P3",
+          "DEVICE_EXECUTION",
+          "OBJECT_STORAGE"
+        ],
+        "x-mop-replay": "CURRENT_AUTHORIZATION_THEN_ORIGINAL_RECEIPT",
+        "x-mop-integer-token-required": true,
+        "x-mop-applicant": "CREATE_FROM_CURRENT_ACTOR_UPDATE_PRESERVES_ORIGINAL",
+        "x-mop-window": "UTC_MILLISECONDS_SHANGHAI_YEAR_1_9999_END_NULL_OR_STRICTLY_AFTER_START",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeNoticeDraftResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/change-notice-drafts/{id}/history": {
+      "get": {
+        "operationId": "listChangeNoticeDraftHistory",
+        "summary": "当前授权读取不可变提案历史，不是审批历史",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-readonly": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-reject-duplicate-query-keys": true,
+        "x-mop-read-consistency": "READ_ONLY_REPEATABLE_READ",
+        "x-mop-success-writes-audit-or-receipts": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                20
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740990
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeNoticeDraftHistoryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/change-notice-drafts/{id}/archive": {
+      "post": {
+        "operationId": "archiveChangeNoticeDraft",
+        "summary": "归档未审核草稿，原提案保留",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeNoticeDraftLifecycle"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-before-replay-authorization": true,
+        "x-mop-body-max-bytes": 262144,
+        "x-mop-json-max-tokens": 4000,
+        "x-mop-json-max-depth": 4,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-reject-all-query-keys": true,
+        "x-mop-no-side-effects": [
+          "APPROVAL",
+          "ALERT_SUPPRESSION",
+          "AUTOMATIC_P3",
+          "DEVICE_EXECUTION",
+          "OBJECT_STORAGE"
+        ],
+        "x-mop-replay": "CURRENT_AUTHORIZATION_THEN_ORIGINAL_RECEIPT",
+        "x-mop-integer-token-required": true,
+        "x-mop-applicant": "CREATE_FROM_CURRENT_ACTOR_UPDATE_PRESERVES_ORIGINAL",
+        "x-mop-window": "UTC_MILLISECONDS_SHANGHAI_YEAR_1_9999_END_NULL_OR_STRICTLY_AFTER_START",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeNoticeDraftResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/change-notice-drafts/{id}/restore": {
+      "post": {
+        "operationId": "restoreChangeNoticeDraft",
+        "summary": "恢复原样未审核草稿，不批准或抑制告警",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeNoticeDraftLifecycle"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-before-replay-authorization": true,
+        "x-mop-body-max-bytes": 262144,
+        "x-mop-json-max-tokens": 4000,
+        "x-mop-json-max-depth": 4,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-reject-all-query-keys": true,
+        "x-mop-no-side-effects": [
+          "APPROVAL",
+          "ALERT_SUPPRESSION",
+          "AUTOMATIC_P3",
+          "DEVICE_EXECUTION",
+          "OBJECT_STORAGE"
+        ],
+        "x-mop-replay": "CURRENT_AUTHORIZATION_THEN_ORIGINAL_RECEIPT",
+        "x-mop-integer-token-required": true,
+        "x-mop-applicant": "CREATE_FROM_CURRENT_ACTOR_UPDATE_PRESERVES_ORIGINAL",
+        "x-mop-window": "UTC_MILLISECONDS_SHANGHAI_YEAR_1_9999_END_NULL_OR_STRICTLY_AFTER_START",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeNoticeDraftResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -22060,6 +23364,46 @@
                 ],
                 "additionalProperties": false
               },
+              "change_notice_drafts": {
+                "type": "object",
+                "properties": {
+                  "schema_access_ready": {
+                    "const": true
+                  },
+                  "approval_status": {
+                    "type": "null"
+                  },
+                  "automatic_p3_decision": {
+                    "type": "null"
+                  },
+                  "approval_workflow_status": {
+                    "const": "CONFIG_PENDING"
+                  },
+                  "matching_policy_status": {
+                    "const": "CONFIG_PENDING"
+                  },
+                  "effective": {
+                    "const": false
+                  },
+                  "device_execution_allowed": {
+                    "const": false
+                  },
+                  "alert_suppression_allowed": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "schema_access_ready",
+                  "approval_status",
+                  "automatic_p3_decision",
+                  "approval_workflow_status",
+                  "matching_policy_status",
+                  "effective",
+                  "device_execution_allowed",
+                  "alert_suppression_allowed"
+                ],
+                "additionalProperties": false
+              },
               "working_calendars": {
                 "type": "object",
                 "properties": {
@@ -22205,6 +23549,7 @@
               "inspection_worksheets",
               "inspection_source_collections",
               "backup_plan_drafts",
+              "change_notice_drafts",
               "working_calendars",
               "manual_incidents",
               "manual_recovery",
@@ -42595,6 +43940,847 @@
             "required": [
               "tenant_id",
               "plan_id",
+              "items",
+              "has_more",
+              "next_before_version",
+              "scope",
+              "source",
+              "page_size_limit"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "has_more": {
+                      "const": true
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "items": {
+                      "minItems": 1
+                    },
+                    "next_before_version": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740990
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "next_before_version": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeNoticeDraftCreate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "const": 0
+          },
+          "change_summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "asset_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "x-mop-uniqueness": "CANONICAL_UUID_CASE_INSENSITIVE",
+            "x-mop-scope": "Every asset must exist in current tenant; no device authority"
+          },
+          "planned_start_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "planned_end_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "ticket_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "expected_version",
+          "change_summary",
+          "asset_ids",
+          "planned_start_at",
+          "planned_end_at",
+          "ticket_id"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeNoticeDraftUpdate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740989
+          },
+          "change_summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "asset_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "x-mop-uniqueness": "CANONICAL_UUID_CASE_INSENSITIVE",
+            "x-mop-scope": "Every asset must exist in current tenant; no device authority"
+          },
+          "planned_start_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "planned_end_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "ticket_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "expected_version",
+          "change_summary",
+          "asset_ids",
+          "planned_start_at",
+          "planned_end_at",
+          "ticket_id"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeNoticeDraftLifecycle": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740989
+          }
+        },
+        "required": [
+          "expected_version"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeNoticeDraftSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "recorded_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "applicant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticket_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "asset_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "planned_start_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "planned_end_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "timezone": {
+            "const": "Asia/Shanghai"
+          },
+          "effective": {
+            "const": false
+          },
+          "lifecycle_status": {
+            "const": "DRAFT"
+          },
+          "approval_status": {
+            "type": "null"
+          },
+          "approval_workflow_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "matching_policy_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "automatic_p3_decision": {
+            "type": "null"
+          },
+          "approval_evidence_verified": {
+            "const": false
+          },
+          "device_execution_allowed": {
+            "const": false
+          },
+          "alert_suppression_allowed": {
+            "const": false
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "record_source": {
+            "const": "UNREVIEWED_CHANGE_NOTICE_DRAFT"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "version",
+          "archived",
+          "recorded_by",
+          "created_at",
+          "updated_at",
+          "recorded_at",
+          "applicant_id",
+          "ticket_id",
+          "asset_count",
+          "planned_start_at",
+          "planned_end_at",
+          "content_sha256",
+          "timezone",
+          "effective",
+          "lifecycle_status",
+          "approval_status",
+          "approval_workflow_status",
+          "matching_policy_status",
+          "automatic_p3_decision",
+          "approval_evidence_verified",
+          "device_execution_allowed",
+          "alert_suppression_allowed",
+          "source",
+          "record_source"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeNoticeDraftDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "recorded_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "applicant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticket_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "asset_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "planned_start_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "planned_end_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "timezone": {
+            "const": "Asia/Shanghai"
+          },
+          "effective": {
+            "const": false
+          },
+          "lifecycle_status": {
+            "const": "DRAFT"
+          },
+          "approval_status": {
+            "type": "null"
+          },
+          "approval_workflow_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "matching_policy_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "automatic_p3_decision": {
+            "type": "null"
+          },
+          "approval_evidence_verified": {
+            "const": false
+          },
+          "device_execution_allowed": {
+            "const": false
+          },
+          "alert_suppression_allowed": {
+            "const": false
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "record_source": {
+            "const": "UNREVIEWED_CHANGE_NOTICE_DRAFT"
+          },
+          "asset_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "x-mop-uniqueness": "CANONICAL_UUID_CASE_INSENSITIVE",
+            "x-mop-scope": "Every asset must exist in current tenant; no device authority"
+          },
+          "change_summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "version",
+          "archived",
+          "recorded_by",
+          "created_at",
+          "updated_at",
+          "recorded_at",
+          "applicant_id",
+          "ticket_id",
+          "asset_count",
+          "planned_start_at",
+          "planned_end_at",
+          "content_sha256",
+          "timezone",
+          "effective",
+          "lifecycle_status",
+          "approval_status",
+          "approval_workflow_status",
+          "matching_policy_status",
+          "automatic_p3_decision",
+          "approval_evidence_verified",
+          "device_execution_allowed",
+          "alert_suppression_allowed",
+          "source",
+          "record_source",
+          "asset_ids",
+          "change_summary"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeNoticeDraftRevision": {
+        "type": "object",
+        "properties": {
+          "notice_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "previous_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9007199254740989
+          },
+          "action": {
+            "enum": [
+              "CREATE",
+              "UPDATE",
+              "ARCHIVE",
+              "RESTORE"
+            ]
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "recorded_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "applicant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticket_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "asset_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "planned_start_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "planned_end_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "timezone": {
+            "const": "Asia/Shanghai"
+          },
+          "effective": {
+            "const": false
+          },
+          "lifecycle_status": {
+            "const": "DRAFT"
+          },
+          "approval_status": {
+            "type": "null"
+          },
+          "approval_workflow_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "matching_policy_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "automatic_p3_decision": {
+            "type": "null"
+          },
+          "approval_evidence_verified": {
+            "const": false
+          },
+          "device_execution_allowed": {
+            "const": false
+          },
+          "alert_suppression_allowed": {
+            "const": false
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "record_source": {
+            "const": "UNREVIEWED_CHANGE_NOTICE_DRAFT"
+          },
+          "asset_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "x-mop-uniqueness": "CANONICAL_UUID_CASE_INSENSITIVE",
+            "x-mop-scope": "Every asset must exist in current tenant; no device authority"
+          },
+          "change_summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "notice_id",
+          "tenant_id",
+          "version",
+          "previous_version",
+          "action",
+          "archived",
+          "recorded_by",
+          "recorded_at",
+          "applicant_id",
+          "ticket_id",
+          "asset_count",
+          "planned_start_at",
+          "planned_end_at",
+          "content_sha256",
+          "timezone",
+          "effective",
+          "lifecycle_status",
+          "approval_status",
+          "approval_workflow_status",
+          "matching_policy_status",
+          "automatic_p3_decision",
+          "approval_evidence_verified",
+          "device_execution_allowed",
+          "alert_suppression_allowed",
+          "source",
+          "record_source",
+          "asset_ids",
+          "change_summary"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "version": {
+                  "const": 1
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "previous_version": {
+                  "type": "null"
+                },
+                "action": {
+                  "const": "CREATE"
+                },
+                "archived": {
+                  "const": false
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "previous_version": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740989
+                },
+                "action": {
+                  "enum": [
+                    "UPDATE",
+                    "ARCHIVE",
+                    "RESTORE"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "ARCHIVE"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "archived": {
+                  "const": true
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "archived": {
+                  "const": false
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ChangeNoticeDraftResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ChangeNoticeDraftDetail"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeNoticeDraftPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "items": {
+                "type": "array",
+                "maxItems": 20,
+                "items": {
+                  "$ref": "#/components/schemas/ChangeNoticeDraftSummary"
+                }
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_before_created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "next_before_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "scope": {
+                "const": "CURRENT_TENANT_PADMIN"
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "page_size_limit": {
+                "const": 20
+              }
+            },
+            "required": [
+              "tenant_id",
+              "items",
+              "has_more",
+              "next_before_created_at",
+              "next_before_id",
+              "scope",
+              "source",
+              "page_size_limit"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "has_more": {
+                      "const": true
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "items": {
+                      "minItems": 1
+                    },
+                    "next_before_created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "next_before_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "next_before_created_at": {
+                      "type": "null"
+                    },
+                    "next_before_id": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeNoticeDraftHistoryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "notice_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "items": {
+                "type": "array",
+                "maxItems": 20,
+                "items": {
+                  "$ref": "#/components/schemas/ChangeNoticeDraftRevision"
+                }
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_before_version": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "scope": {
+                "const": "CURRENT_TENANT_PADMIN"
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "page_size_limit": {
+                "const": 20
+              }
+            },
+            "required": [
+              "tenant_id",
+              "notice_id",
               "items",
               "has_more",
               "next_before_version",

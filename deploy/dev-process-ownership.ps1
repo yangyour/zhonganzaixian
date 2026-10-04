@@ -28,7 +28,10 @@ function Get-MopContactWorkerEnvironment {
     if ($port -lt 1 -or $port -gt 65535 -or $child['SPRING_DATASOURCE_USERNAME'] -cne 'mop_test_runtime') { throw '联系人 Worker 必须使用受限项目运行账号和有效回环端口。' }
     $child['SPRING_PROFILES_ACTIVE'] = 'remote_test'
     $child['MOP_CONTACT_IMPORT_WORKER_ENABLED'] = 'true'
-    $child['MOP_CONTACT_IMPORT_LEASE_MILLIS'] = '30000'
+    $lease = $RuntimeEnvironment.PSObject.Properties['MOP_CONTACT_IMPORT_LEASE_MILLIS']
+    $leaseValue = if ($lease) { $lease.Value } else { '30000' }
+    if ($leaseValue -isnot [string] -or $leaseValue -cnotmatch '\A[1-9][0-9]{0,6}\z' -or [long]$leaseValue -lt 1000 -or [long]$leaseValue -gt 3600000) { throw '联系人 Worker 私有技术租期必须为1000至3600000的规范毫秒字符串。' }
+    $child['MOP_CONTACT_IMPORT_LEASE_MILLIS'] = $leaseValue
     return $child
 }
 
@@ -167,11 +170,14 @@ function Assert-MopAppsStopped {
         if (-not $commandLine) { continue }
         if ($commandLine.Contains('mop-api-', [StringComparison]::OrdinalIgnoreCase) -or
              $commandLine.Contains('mop-worker-', [StringComparison]::OrdinalIgnoreCase) -or
+             $commandLine.Contains('mop-export-preparation-worker-', [StringComparison]::OrdinalIgnoreCase) -or
+             $commandLine.Contains('cn.mop.exportworker.ExportPreparationWorkerApplication', [StringComparison]::Ordinal) -or
+             $commandLine -match '(?i)-jar\s+"?[^"\r\n]*\\export-preparation\\[0-9a-f-]{36}\\[0-9a-f]{64}\.jar(?:"|\s|$)' -or
              $commandLine.Contains('cn.mop.api.MopApplication', [StringComparison]::Ordinal) -or
              $commandLine.Contains('cn.mop.worker.WorkerApplication', [StringComparison]::Ordinal) -or
              $commandLine.Contains('cn.mop.importworker.AssetImportWorkerApplication', [StringComparison]::Ordinal) -or
              $commandLine.Contains('cn.mop.contactworker.ContactImportWorkerApplication', [StringComparison]::Ordinal)) {
-            throw '检测到 MOP API、照片、资产导入或联系人导入 Worker 正在运行；不能证明其项目隔离，拒绝迁移且不停止未登记进程。'
+            throw '检测到 MOP API 或专用 Worker 正在运行；不能证明其项目隔离，拒绝迁移且不停止未登记进程。'
         }
     }
 }

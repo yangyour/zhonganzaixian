@@ -237,4 +237,17 @@ Check-Ownership 'startup and stop scripts parse without executing application ac
         if ($errors.Count -ne 0) { throw 'PowerShell application script syntax invalid' }
     }
 }
-Write-Host "MOP_OWNERSHIP_TEST status=PASS isolated_checks=$script:checks fake_process_queries=$script:processQueries fake_cim_queries=$script:cimQueries actual_process_actions=0"
+
+
+Check-Ownership 'contact private explicit lease reaches the dedicated runtime unchanged' {
+    $explicit = [pscustomobject]@{SPRING_DATASOURCE_URL='jdbc:postgresql://127.0.0.1:15432/mop_test';SPRING_DATASOURCE_USERNAME='mop_test_runtime';SPRING_DATASOURCE_PASSWORD='ISOLATED_FAKE';MOP_CONTACT_IMPORT_LEASE_MILLIS='300000'}
+    $child=Get-MopContactWorkerEnvironment -RuntimeEnvironment $explicit -Ambient @{}
+    if($child.MOP_CONTACT_IMPORT_LEASE_MILLIS -cne '300000'){throw 'Explicit technical lease lost'}
+}
+Check-Ownership 'contact private lease rejects invalid limits types and canonical form' {
+    foreach($lease in @('0999','999','3600001','30000.0','',30000,$null)) {
+        $explicit = [pscustomobject]@{SPRING_DATASOURCE_URL='jdbc:postgresql://127.0.0.1:15432/mop_test';SPRING_DATASOURCE_USERNAME='mop_test_runtime';SPRING_DATASOURCE_PASSWORD='ISOLATED_FAKE';MOP_CONTACT_IMPORT_LEASE_MILLIS=$lease}
+        Require-Rejected {Get-MopContactWorkerEnvironment -RuntimeEnvironment $explicit -Ambient @{}}
+    }
+}
+Write-Host "MOP_OWNERSHIP_TEST status=PASS isolated_checks=$script:checks actual_process_actions=0"

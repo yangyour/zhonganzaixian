@@ -1,0 +1,16 @@
+{
+  "observed_at": "2026-10-04T11:34:58.266Z",
+  "environment": "niko-local-test",
+  "browser": "Chromium 154.0.8037.57 built on Debian GNU/Linux 13 (trixie)",
+  "playwright_version": "1.62.1",
+  "chromium_sandbox": true,
+  "status": "BLOCKED",
+  "reason": "EPERM_OR_OPERATION_NOT_PERMITTED",
+  "application_pages_opened": 0,
+  "application_dom_tested": false,
+  "system_security_settings_changed": false,
+  "sandbox_disabled": false,
+  "new_proxy": false,
+  "user_computer_used": false,
+  "formal_acceptance": "NOT_RUN"
+}

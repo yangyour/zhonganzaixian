@@ -1,0 +1,75 @@
+{
+  "verified_at": "2026-10-04T23:50:34.823648+00:00",
+  "scope": "OWN_NOTIFICATION_PREFERENCE_PROTECTED_REPOSITORY",
+  "environment": "niko-local-test",
+  "previous_commit": {
+    "sha": "c8ff4fb0a547d54e2131dc8da0b3ce72045b1084",
+    "ci_run": 37244543726,
+    "conclusion": "success",
+    "native_powershell_policy_checks": 121,
+    "database_operations": 0
+  },
+  "new_real_postgresql_tests": 26,
+  "focused_tests": 67,
+  "root_tests_reported": 2189,
+  "root_tests_executed": 2176,
+  "real_postgresql_tests": 754,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "failures": 0,
+  "errors": 0,
+  "contracts": 116,
+  "contract_generation": "PASS",
+  "python_tests": 146,
+  "current_owner_only": true,
+  "administrator_other_owner_override": false,
+  "authorization_before_receipt": true,
+  "repeatable_read_queries_without_writes": true,
+  "original_creation_receipt_retained": true,
+  "concurrent_same_update_key_single_revision_audit": true,
+  "concurrent_different_update_keys_single_cas_winner": true,
+  "actual_audit_and_revision_sql_failure_rollback": true,
+  "controlled_corrupt_result_checks": "real queries with deliberately altered result fields; database not corrupted",
+  "baseline": "one existing QA viewerB/B slot; fixed create key and immutable v1 receipt; existing history retained, requested fields restored using a new legitimate revision",
+  "fresh_slot_test": "an existing unused membership; valid creation then deliberate caller failure and rollback, no identity creation",
+  "all_six_channels_and_explicit_quiet_false_roundtrip": true,
+  "migration_executed": false,
+  "api_contract_changed": false,
+  "backend_restarted": false,
+  "live_api_version": "0.42.0",
+  "effective": false,
+  "receiver_binding_verified": false,
+  "notification_dispatched": false,
+  "new_credentials": false,
+  "new_http_or_page": false,
+  "formal_acceptance": "NOT_RUN",
+  "failure_history": [
+    {
+      "stage": "first Python invocation",
+      "result": "143 discovered entries, 2 import errors",
+      "cause": "system interpreter lacks paramiko",
+      "resolution": "reran unchanged tests with the existing authorized .local/venv-tools interpreter; 146 passed",
+      "original_log_retained": true
+    }
+  ],
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/notification/OwnNotificationPreferenceRepository.java": "8bcbb6333b771d3c707e61ce583398794242f37a1d1ba6544b73b1ed01b9b5ea",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresOwnNotificationPreferenceRepository.java": "565024f462851abe49848f89d92b09543ab9354fa205dba58ab2f522f9fdb3fc",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresOwnNotificationPreferenceIntegrationTest.java": "6fc947a6bc08a748ea211bfb75b55a763668f8f06835a7b2034c4242e1345131"
+  },
+  "logs_sha256": {
+    "own-notification-preference-repo-contract-generation-20261004.log": "bfce1280710ad8a8894801d1e284c4fe852b6219f312a835a88e75f84af337db",
+    "own-notification-preference-repo-contracts-20261004.log": "9fcc01afb9263a188e2a70ffaf3eac07296d293b7d83aa2d4b33e07a5c648ee1",
+    "own-notification-preference-repo-focused-20261004.log": "494983ab8661ab46900e298bca4764267eefd47c30798caca1aa2fe816034d33",
+    "own-notification-preference-repo-focused-final-20261004.log": "76ed158d49cd63ed13a0728dccff456f65a51a358d7d1cfcba677c2a21300346",
+    "own-notification-preference-repo-full-20261004.log": "e38e70f0990fac9cb37cc2929ade7da68b6547cc66ff73dac80c8f045984dfa6",
+    "own-notification-preference-repo-python-20261004.log": "01db16c1cf7028792ad19332d6323db8e9f724aa9b17dc88c8928e33803361e5",
+    "own-notification-preference-repo-python-r2-20261004.log": "976e5934341241acebcf4c1854fa633af5d7c2f8871927273ba0209e7bb899a6"
+  },
+  "preference_rows_after_final_full_run": {
+    "heads": 1,
+    "revisions": 43,
+    "history_retained": true,
+    "observed_before_utc": "2026-10-04T23:50:35Z"
+  }
+}

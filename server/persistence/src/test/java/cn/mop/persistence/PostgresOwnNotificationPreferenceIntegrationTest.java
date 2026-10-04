@@ -1,0 +1,104 @@
+package cn.mop.persistence;
+
+import cn.mop.domain.DomainException;
+import cn.mop.domain.contact.CustomerContact.QuietWindow;
+import cn.mop.domain.notification.*;
+import cn.mop.domain.notification.OwnNotificationPreferenceRepository.*;
+import cn.mop.domain.notification.OwnNotificationPreferenceDraft.LevelPreference;
+import cn.mop.domain.notification.DeliveryReceiptState.Channel;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.zaxxer.hikari.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import javax.sql.DataSource;
+import java.sql.*;
+import java.time.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.Supplier;
+import static org.junit.jupiter.api.Assertions.*;
+
+/** Existing real PG and actual QA identities only. Singleton history is retained; restore by a new revision. */
+@EnabledIfEnvironmentVariable(named="MOP_RUN_REMOTE_TESTS",matches="true")
+class PostgresOwnNotificationPreferenceIntegrationTest {
+    static final String A="55000000-0000-4000-8000-000000000001",B="55000000-0000-4000-8000-000000000002";
+    static final String BASE_ROUTE="POST /integration/own-notification-preference-baseline",BASE_KEY="niko-own-notification-preference-repo-v1";
+    static HikariDataSource pool;static ObjectMapper mapper;static PostgresPlatformRepository platform;static PostgresOwnNotificationPreferenceRepository repo;
+    static String owner,admin;static Snapshot baseline;static OwnNotificationPreferenceDraft restoreDraft;
+    @BeforeAll static void connect()throws Exception{
+        String url=System.getenv("SPRING_DATASOURCE_URL");assertNotNull(url);assertTrue(url.matches("jdbc:postgresql://127\\.0\\.0\\.1:[0-9]+/mop_test"));assertEquals("mop_test_runtime",System.getenv("SPRING_DATASOURCE_USERNAME"));
+        var cfg=new HikariConfig();cfg.setJdbcUrl(url);cfg.setUsername(System.getenv("SPRING_DATASOURCE_USERNAME"));cfg.setPassword(System.getenv("SPRING_DATASOURCE_PASSWORD"));cfg.setMaximumPoolSize(6);cfg.setConnectionTimeout(5000);pool=new HikariDataSource(cfg);
+        mapper=new ObjectMapper().registerModule(new JavaTimeModule()).setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        platform=new PostgresPlatformRepository(pool,mapper);repo=new PostgresOwnNotificationPreferenceRepository(pool,platform);
+        owner=actor("viewer",B);admin=actor("padmin",B);assertEquals(List.of(),repo.readinessProblems());
+        var a=access();var initial=draft(null,null,null);var before=repo.current(a);restoreDraft=before.map(Snapshot::draft).orElse(initial);
+        // The fixed receipt is reused on every run. Never delete the owner's singleton to create it again.
+        baseline=snapshot(command(a,null,BASE_ROUTE,BASE_KEY,hash(initial),()->repo.create(a,initial)));assertEquals(1,baseline.version());
+    }
+    @AfterAll static void close(){try{if(baseline!=null){var latest=repo.get(access(),baseline.id());if(!latest.draft().equals(restoreDraft))update(latest,restoreDraft);}}finally{if(pool!=null)pool.close();}}
+    static String actor(String role,String tenant){return platform.users().stream().filter(u->platform.membership(u.id(),tenant).filter(m->m.role().equals(role)).isPresent()).findFirst().orElseThrow().id();}
+    static Access access(){return access(owner,B);}
+    static Access access(String actor,String tenant){return new Access(actor,tenant,platform.membership(actor,tenant).orElseThrow().permissionVersion(),UUID.randomUUID().toString());}
+    static OwnNotificationPreferenceDraft draft(LevelPreference level,List<Channel> channels,QuietWindow quiet){return new OwnNotificationPreferenceDraft(UUID.fromString(B),UUID.fromString(owner),level,channels,quiet);}
+    static String hash(Object value){try{return HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(mapper.writeValueAsBytes(value)));}catch(Exception e){throw new IllegalStateException(e);}}
+    static Object command(Access a,String id,String route,String key,String hash,Supplier<Object> work){return platform.idempotentAuthorized(a.actorId(),a.tenantId(),route,key,hash,a.permissionVersion(),()->repo.authorizeCurrentAccess(a,id),work);}
+    static Snapshot snapshot(Object value){return mapper.convertValue(value,Snapshot.class);}
+    static Snapshot update(Snapshot previous,OwnNotificationPreferenceDraft d){var a=access();return snapshot(command(a,previous.id(),"PATCH /integration/own-notification-preferences/"+previous.id(),UUID.randomUUID().toString(),hash(List.of(previous.version(),d)),()->repo.update(a,previous.id(),previous.version(),d)));}
+    static Snapshot current(){return repo.current(access()).orElseThrow();}
+    static String scalar(String sql)throws SQLException{try(var c=pool.getConnection();var s=c.createStatement();var r=s.executeQuery(sql)){assertTrue(r.next());return r.getString(1);}}
+    static List<String> counts()throws SQLException{List<String> counts=new ArrayList<>();for(String t:List.of("mop_notification_preference_draft","mop_notification_preference_revision","mop_audit","mop_idempotency"))counts.add(scalar("SELECT count(*)::text FROM public."+t));return counts;}
+    static void status(int expected,org.junit.jupiter.api.function.Executable action){assertEquals(expected,assertThrows(DomainException.class,action).status);}
+
+    @Test void freshOwnerSlotReadIsEmptyAndCreationCanRollbackWithoutResettingIdentities()throws Exception{
+        Access a;
+        try(var c=pool.getConnection();var st=c.createStatement();var rows=st.executeQuery("SELECT m.user_id::text,m.tenant_id::text,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.active AND u.active AND NOT EXISTS(SELECT 1 FROM public.mop_notification_preference_draft p WHERE p.tenant_id=m.tenant_id AND p.owner_id=m.user_id) ORDER BY m.tenant_id,m.user_id LIMIT 1")){
+            assertTrue(rows.next(),"An existing unused QA membership is required; do not delete preferences or create identities");a=new Access(rows.getString(1),rows.getString(2),rows.getLong(3),UUID.randomUUID().toString());
+        }
+        assertTrue(repo.current(a).isEmpty());var before=counts();
+        var d=new OwnNotificationPreferenceDraft(UUID.fromString(a.tenantId()),UUID.fromString(a.actorId()),LevelPreference.ALL,List.of(Channel.VOICE,Channel.WEBHOOK,Channel.WECHAT_WORK,Channel.DINGTALK,Channel.SMS,Channel.EMAIL),new QuietWindow(false,null,null));
+        assertThrows(IllegalStateException.class,()->command(a,null,"POST /integration/own-preference-fresh-rollback",UUID.randomUUID().toString(),hash(d),()->{
+            var created=repo.create(a,d);assertEquals(1,created.version());assertEquals(d,created.draft());assertEquals(created.createdAt(),created.updatedAt());
+            throw new IllegalStateException("Synthetic failure after complete owner-slot creation");
+        }));assertEquals(before,counts());assertTrue(repo.current(a).isEmpty());
+    }
+    @Test void currentRoundTripRetainsScopeAndNoEffectiveRouting(){var s=current();assertEquals(s,repo.get(access(),s.id()));assertEquals(owner,s.recordedBy());assertEquals(UUID.fromString(owner),s.draft().ownerId());assertFalse(s.draft().effective());assertNull(s.draft().deliveryDecision());assertNull(s.draft().verifiedReceiverId());assertFalse(s.draft().notificationDispatched());}
+    @Test void duplicateCreateNeverOverwritesExistingSingleton()throws Exception{var a=access();var before=counts();status(409,()->command(a,null,"POST /integration/own-preference-duplicate",UUID.randomUUID().toString(),hash(baseline.draft()),()->repo.create(a,baseline.draft())));assertEquals(before,counts());}
+    @Test void updateKeepsImmutablePreviousRevisionAndExplicitMinuteWindow(){var previous=current();var d=draft(LevelPreference.P1_P2,List.of(Channel.SMS,Channel.EMAIL),new QuietWindow(true,LocalTime.of(22,30),LocalTime.of(7,0)));var next=update(previous,d);assertEquals(previous.version()+1,next.version());assertEquals(d,next.draft());assertFalse(next.updatedAt().isBefore(previous.updatedAt()));assertEquals(List.of(Channel.EMAIL,Channel.SMS),next.draft().requestedChannels());var h=repo.history(access(),next.id(),2,null);assertEquals(next.draft(),h.get(0).draft());assertEquals(previous.draft(),h.get(1).draft());assertEquals(owner,h.get(0).recordedBy());assertEquals(access().permissionVersion(),h.get(0).recordedPermissionVersion());}
+    @Test void nullEmptyChannelsAndUnknownWindowAreDistinctPersistedRequests(){var a=update(current(),draft(null,null,null));var b=update(a,draft(null,List.of(),new QuietWindow(null,null,null)));assertNotEquals(a.draft().fingerprint(),b.draft().fingerprint());assertNull(a.draft().requestedChannels());assertEquals(List.of(),b.draft().requestedChannels());assertNull(a.draft().requestedQuietWindow());assertNotNull(b.draft().requestedQuietWindow());assertNull(b.draft().requestedQuietWindow().enabled());var c=update(b,draft(null,null,null));assertEquals(a.draft(),c.draft());}
+    @Test void staleVersionLeavesAllTablesUnchanged()throws Exception{var before=current();update(before,draft(LevelPreference.ALL,null,null));var counts=counts();status(409,()->update(before,draft(LevelPreference.P1_ONLY,null,null)));assertEquals(counts,counts());}
+    @Test void originalCreationReceiptRemainsVersionOneAfterUpdates(){var previous=current();update(previous,draft(LevelPreference.ALL,List.of(Channel.EMAIL),null));var a=access();var replay=snapshot(command(a,null,BASE_ROUTE,BASE_KEY,hash(baseline.draft()),()->{throw new AssertionError("Creation must not repeat");}));assertEquals(baseline,replay);assertTrue(current().version()>replay.version());}
+    @Test void sameUpdateKeyReplaysOriginalReceiptAfterLaterRevision()throws Exception{var old=current();var a=access();var d=draft(LevelPreference.P1_ONLY,List.of(Channel.SMS),null);String route="PATCH /integration/own-preference-replay",key=UUID.randomUUID().toString(),h=hash(List.of(old.version(),d));var one=snapshot(command(a,old.id(),route,key,h,()->repo.update(a,old.id(),old.version(),d)));update(one,draft(LevelPreference.ALL,null,null));var before=counts();var two=snapshot(command(a,old.id(),route,key,h,()->{throw new AssertionError();}));assertEquals(one,two);assertEquals(before,counts());}
+    @Test void sameKeyChangedPayloadConflictsBeforeMutation()throws Exception{var old=current();var a=access();var d=draft(null,List.of(),null);String route="PATCH /integration/own-preference-key",key=UUID.randomUUID().toString(),h=hash(List.of(old.version(),d));command(a,old.id(),route,key,h,()->repo.update(a,old.id(),old.version(),d));var before=counts();status(409,()->command(a,old.id(),route,key,"f".repeat(64),()->null));assertEquals(before,counts());}
+    @Test void readsDoNotAddAuditReceiptOrRevision()throws Exception{var before=counts();repo.current(access());repo.get(access(),baseline.id());repo.history(access(),baseline.id(),10,null);assertEquals(before,counts());}
+    @Test void administratorsCannotReadOrModifyAnotherOwnersPreference()throws Exception{var a=access(admin,B);var before=counts();status(404,()->repo.get(a,baseline.id()));status(404,()->repo.history(a,baseline.id(),10,null));status(404,()->command(a,baseline.id(),"PATCH /integration/own-preference-admin",UUID.randomUUID().toString(),"a".repeat(64),()->repo.update(a,baseline.id(),current().version(),baseline.draft())));assertEquals(before,counts());}
+    @Test void crossTenantAndMissingObjectsStay404(){var a=access(admin,A);status(404,()->repo.get(a,baseline.id()));status(404,()->repo.history(a,baseline.id(),10,null));status(404,()->repo.get(access(),UUID.randomUUID().toString()));}
+    @Test void changedPermissionAndAbsentMembershipAreRejectedBeforeRead(){var a=access();status(401,()->repo.current(new Access(owner,B,a.permissionVersion()+1,a.traceId())));status(401,()->repo.history(new Access(owner,A,1,a.traceId()),baseline.id(),10,null));status(401,()->repo.current(new Access(UUID.randomUUID().toString(),B,1,a.traceId())));}
+    @Test void stalePermissionCannotReplayCachedCreation()throws Exception{var a=access();var before=counts();var stale=new Access(owner,B,a.permissionVersion()+1,a.traceId());status(401,()->command(stale,null,BASE_ROUTE,BASE_KEY,hash(baseline.draft()),()->null));assertEquals(before,counts());}
+    @Test void resourceAuthorizationRunsBeforeSavedReceipt()throws Exception{var a=access();var before=counts();status(403,()->platform.idempotentAuthorized(owner,B,BASE_ROUTE,BASE_KEY,hash(baseline.draft()),a.permissionVersion(),()->{throw new DomainException(403,"ACTION_FORBIDDEN","Synthetic authorization rejection");},()->null));assertEquals(before,counts());}
+    @Test void forgedOwnerAndTenantNeverWrite()throws Exception{var old=current();var a=access();for(var d:List.of(new OwnNotificationPreferenceDraft(UUID.fromString(A),UUID.fromString(owner),null,null,null),new OwnNotificationPreferenceDraft(UUID.fromString(B),UUID.fromString(admin),null,null,null))){var before=counts();status(404,()->command(a,old.id(),"PATCH /integration/own-preference-forged",UUID.randomUUID().toString(),hash(d),()->repo.update(a,old.id(),old.version(),d)));assertEquals(before,counts());}}
+    @Test void callerFailureRollsBackRevisionAuditAndReceipt()throws Exception{var old=current();var a=access();var d=draft(LevelPreference.ALL,List.of(Channel.VOICE),null);var before=counts();assertThrows(IllegalStateException.class,()->command(a,old.id(),"PATCH /integration/own-preference-caller-fault",UUID.randomUUID().toString(),hash(d),()->{repo.update(a,old.id(),old.version(),d);throw new IllegalStateException("Synthetic caller failure");}));assertEquals(before,counts());assertEquals(old,current());}
+    @Test void unprotectedWriteAndStandaloneReadInsideCommandFail()throws Exception{var a=access();var old=current();var before=counts();assertThrows(IllegalStateException.class,()->repo.create(a,old.draft()));assertThrows(IllegalStateException.class,()->repo.update(a,old.id(),old.version(),old.draft()));assertThrows(IllegalStateException.class,()->repo.authorizeCurrentAccess(a,null));assertThrows(IllegalStateException.class,()->command(a,old.id(),"PATCH /integration/own-preference-nested",UUID.randomUUID().toString(),"a".repeat(64),()->repo.current(a)));assertEquals(before,counts());}
+    @Test void boundedHistoryPagesAreDescendingAndStable(){var previous=current();var one=update(previous,draft(null,List.of(Channel.EMAIL),null));var two=update(one,draft(null,List.of(Channel.SMS),null));var page=repo.history(access(),two.id(),1,null);assertEquals(two.version(),page.get(0).version());var next=repo.history(access(),two.id(),1,page.get(0).version());assertEquals(one.version(),next.get(0).version());assertEquals(previous.version(),repo.history(access(),two.id(),1,next.get(0).version()).get(0).version());}
+    @Test void invalidBoundsAndVersionCannotWrite()throws Exception{var a=access();var old=current();var before=counts();for(int n:List.of(0,102))status(400,()->repo.history(a,old.id(),n,null));for(long v:List.of(0L,9007199254740991L))status(400,()->repo.history(a,old.id(),10,v));for(long v:List.of(0L,9007199254740990L))status(400,()->command(a,old.id(),"PATCH /integration/own-preference-invalid",UUID.randomUUID().toString(),"a".repeat(64),()->repo.update(a,old.id(),v,old.draft())));assertEquals(before,counts());}
+    @Test void concurrentSameKeyCreatesOneNewRevisionAndOneAudit()throws Exception{var old=current();var a=access();var d=draft(LevelPreference.P1_ONLY,null,null);String route="PATCH /integration/own-preference-concurrent",key=UUID.randomUUID().toString(),h=hash(List.of(old.version(),d));String audits=scalar("SELECT count(*)::text FROM public.mop_audit WHERE payload->>'resource_id'='"+old.id()+"'");var gate=new CountDownLatch(1);var executor=Executors.newFixedThreadPool(2);try{Callable<Snapshot> work=()->{gate.await();return snapshot(command(a,old.id(),route,key,h,()->repo.update(a,old.id(),old.version(),d)));};var f1=executor.submit(work);var f2=executor.submit(work);gate.countDown();assertEquals(f1.get(15,TimeUnit.SECONDS),f2.get(15,TimeUnit.SECONDS));assertEquals(old.version()+1,current().version());assertEquals(Long.parseLong(audits)+1,Long.parseLong(scalar("SELECT count(*)::text FROM public.mop_audit WHERE payload->>'resource_id'='"+old.id()+"'")));}finally{executor.shutdownNow();}}
+    @Test void concurrentDifferentKeysSameVersionHaveOneWinner()throws Exception{var old=current();var gate=new CountDownLatch(1);var executor=Executors.newFixedThreadPool(2);try{Callable<Integer> work=()->{gate.await();try{update(old,draft(LevelPreference.ALL,null,null));return 200;}catch(DomainException e){return e.status;}};var f1=executor.submit(work);var f2=executor.submit(work);gate.countDown();var codes=new ArrayList<>(List.of(f1.get(15,TimeUnit.SECONDS),f2.get(15,TimeUnit.SECONDS)));Collections.sort(codes);assertEquals(List.of(200,409),codes);assertEquals(old.version()+1,current().version());}finally{executor.shutdownNow();}}
+    @Test void allExistingKnownRolesCanReadOnlyTheirOwnCurrentSlot(){for(String role:List.of("padmin","msp","tadmin","viewer")){String tenant=role.equals("tadmin")?A:B;var a=access(actor(role,tenant),tenant);repo.current(a).ifPresent(s->assertEquals(a.actorId(),s.draft().ownerId().toString()));}}
+    @Test void incompleteQuietOrActivationReadFailsClosedWithoutDatabaseMutation()throws Exception{corruptRead("getObject","effective",true);corruptRead("getObject","notification_dispatched",null);corruptRead("getString","content_sha256","0".repeat(64));corruptRead("getString","owner_id",admin);}
+    void corruptRead(String getter,String field,Object replacement)throws Exception{
+        var original=current();var before=counts();DataSource altered=proxy(pool,(real,sql)->false,(method,args)->method.equals(getter)&&field.equals(args[0])?Optional.of(new Object[]{replacement}):Optional.empty());var reader=new PostgresOwnNotificationPreferenceRepository(altered,platform);status(503,()->reader.get(access(),original.id()));assertEquals(before,counts());assertEquals(original,current());
+    }
+    @Test void actualAuditSqlFailureRollsBackAllChanges()throws Exception{sqlFailure("INSERT INTO public.mop_audit");}
+    @Test void actualRevisionSqlFailureRollsBackHead()throws Exception{sqlFailure("INSERT INTO public.mop_notification_preference_revision");}
+    void sqlFailure(String prefix)throws Exception{
+        var original=current();var before=counts();DataSource altered=proxy(pool,(real,sql)->{if(sql.startsWith(prefix)){try(var statement=real.createStatement()){statement.execute("SELECT 1/0");}}return false;},(method,args)->Optional.empty());
+        var p=new PostgresPlatformRepository(altered,mapper);var r=new PostgresOwnNotificationPreferenceRepository(altered,p);var a=access();status(503,()->p.idempotentAuthorized(owner,B,"PATCH /integration/own-preference-sql-fault",UUID.randomUUID().toString(),hash(original),a.permissionVersion(),()->r.authorizeCurrentAccess(a,original.id()),()->r.update(a,original.id(),original.version(),draft(LevelPreference.ALL,null,null))));assertEquals(before,counts());assertEquals(original,current());
+    }
+    @FunctionalInterface interface SqlHook{boolean run(Connection real,String sql)throws Exception;}
+    @FunctionalInterface interface ReadHook{Optional<Object[]> value(String method,Object[] args);}
+    static DataSource proxy(DataSource real,SqlHook sqlHook,ReadHook readHook){return (DataSource)java.lang.reflect.Proxy.newProxyInstance(DataSource.class.getClassLoader(),new Class[]{DataSource.class},(p,m,a)->{
+        if(m.getName().equals("getConnection")){Connection c=(Connection)invoke(m,real,a);return java.lang.reflect.Proxy.newProxyInstance(Connection.class.getClassLoader(),new Class[]{Connection.class},(cp,cm,ca)->{
+            if(cm.getName().equals("prepareStatement")&&ca[0]instanceof String sql){sqlHook.run(c,sql);PreparedStatement ps=(PreparedStatement)invoke(cm,c,ca);if(sql.startsWith("SELECT h.id::text"))return java.lang.reflect.Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),new Class[]{PreparedStatement.class},(sp,sm,sa)->{
+                if(sm.getName().equals("executeQuery")){ResultSet rows=(ResultSet)invoke(sm,ps,sa);return java.lang.reflect.Proxy.newProxyInstance(ResultSet.class.getClassLoader(),new Class[]{ResultSet.class},(rp,rm,ra)->{if(ra!=null&&ra.length>0){var replacement=readHook.value(rm.getName(),ra);if(replacement.isPresent())return replacement.get()[0];}return invoke(rm,rows,ra);});}return invoke(sm,ps,sa);});return ps;}return invoke(cm,c,ca);});}return invoke(m,real,a);});}
+    static Object invoke(java.lang.reflect.Method method,Object object,Object[] args)throws Throwable{try{return method.invoke(object,args);}catch(java.lang.reflect.InvocationTargetException e){throw e.getCause();}}
+}

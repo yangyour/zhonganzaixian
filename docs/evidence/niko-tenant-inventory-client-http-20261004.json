@@ -1,0 +1,21 @@
+{
+  "verified_at": "2026-10-04T01:56:41.610Z",
+  "environment": "niko-local-test",
+  "api_contract_version": "0.34.0",
+  "http_requests": 7,
+  "http_methods": [
+    "GET"
+  ],
+  "actual_tenant_rows_checked": 2,
+  "projection_columns": 12,
+  "refresh_kept_same_existing_rows": true,
+  "getter_and_callback_detached": true,
+  "non_admin_context_sent_requests": 0,
+  "forged_local_role_received_actual_403": true,
+  "registry_entries": 445,
+  "registry_sha256_unchanged": "c5346ee5b7ced97bd826d750afc0381658814804ab26eda5d7d419794db01a5f",
+  "business_writes": 0,
+  "browser_dom_tested": false,
+  "quota_coloring_tested": false,
+  "contract_done": false
+}

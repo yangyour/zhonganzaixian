@@ -1,4 +1,5 @@
 import { detachedWorkspaceState } from './detachedWorkspaceState'
+import { utcInstantNanos } from './utcInstant'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import type { ConfigurationRevision, ConfigurationRevisionDraft } from '../api/types'
 export interface RevisionWriteContext { tenantId: string; actorId: string; permissionVersion: number; configurationKey: string }
@@ -11,7 +12,7 @@ const copy = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T
 const exact = (v: unknown, keys: string[]): v is Record<string, unknown> => Boolean(v && typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === keys.length && keys.every(k => Object.hasOwn(v, k)))
 const bad = () => new ApiError(200, 'INVALID_CONFIGURATION_REVISION_RESPONSE', '配置修订范围、版本或未生效事实回读异常，未确认新的成功结果', '—')
 const invalid = () => new Error('修订动作、原目标或输入不完整；请明确准备后提交')
-const timestamp = (v: unknown) => { if (typeof v !== 'string') throw bad(); const match = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,9}))?Z$/.exec(v); if (!match) throw bad(); const normalized = match[1] + '.' + (match[2] || '').padEnd(3, '0').slice(0, 3) + 'Z'; const millis = Date.parse(normalized); if (!Number.isFinite(millis) || new Date(millis).toISOString() !== normalized || millis < -62135596800000 || millis > 253402300799999) throw bad(); return millis }
+const timestamp = (value: unknown) => { const nanos = utcInstantNanos(value); if (nanos === null) throw bad(); return nanos }
 
 const canonical = (v: unknown): string => JSON.stringify(v && typeof v === 'object' ? Array.isArray(v) ? v.map(x => JSON.parse(canonical(x))) : Object.fromEntries(Object.entries(v).sort(([a], [b]) => a.localeCompare(b)).map(([k, x]) => [k, JSON.parse(canonical(x))])) : v)
 function evidence(v: unknown) { if (!Array.isArray(v) || v.length < 1 || v.length > 5) throw bad(); for (const item of v) if (!exact(item, ['reference', 'title', 'sha256']) || typeof item.reference !== 'string' || !/^document-ref:[A-Za-z0-9._:-]+$/.test(item.reference) || typeof item.title !== 'string' || !item.title.trim() || typeof item.sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(item.sha256)) throw bad() }

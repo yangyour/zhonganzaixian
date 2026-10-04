@@ -1,4 +1,5 @@
 import { detachedWorkspaceState } from './detachedWorkspaceState'
+import { utcInstantNanos } from './utcInstant'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { readMetadataCurrent, validMetadataDate, type MetadataCurrent } from './assetMetadataWorkspace'
 
@@ -44,7 +45,15 @@ function readPage(value: unknown, scope: MetadataQueryContext, filters: Metadata
   const items = value.items.map(raw => { if (!object(raw) || !object(raw.asset) || typeof raw.asset.id !== 'string' || !uuid.test(raw.asset.id) || raw.asset.source !== 'manual') throw invalid(); return readMetadataCurrent(raw, { ...scope, assetId: raw.asset.id, canWrite: true }) })
   if (new Set(items.map(v => v.asset.id)).size !== items.length) throw invalid()
   let previous = boundary
-  for (const row of items) { const a = row.asset; if (previous && (Date.parse(a.created_at) > Date.parse(previous.time) || Date.parse(a.created_at) === Date.parse(previous.time) && a.id >= previous.id)) throw invalid(); previous = { time: a.created_at, id: a.id } }
+  for (const row of items) {
+    const a = row.asset, currentTime = utcInstantNanos(a.created_at)
+    if (currentTime === null) throw invalid()
+    if (previous) {
+      const previousTime = utcInstantNanos(previous.time)
+      if (previousTime === null || currentTime > previousTime || currentTime === previousTime && a.id >= previous.id) throw invalid()
+    }
+    previous = { time: a.created_at, id: a.id }
+  }
   const tail = items.at(-1)?.asset
   if (value.has_more ? items.length !== 15 || value.next_before_created_at !== tail?.created_at || value.next_before_id !== tail?.id : value.next_before_created_at !== null || value.next_before_id !== null) throw invalid()
   return { ...value, items } as unknown as MetadataQueryPage

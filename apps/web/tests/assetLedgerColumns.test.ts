@@ -61,3 +61,5 @@ describe('M3-2 fixed ledger columns and explicit missing facts', () => {
     expect(source('../src/utils/assetLedgerColumns.ts')).not.toMatch(/fetch\(|api\.request|manual-metadata/)
   })
 })
+it('rejects normalized impossible or non-UTC collection timestamps instead of displaying another day',()=>{for(const sampled_at of ['2026-02-30T00:00:00Z','2026-10-02T24:00:00Z','0000-01-01T00:00:00Z','2026-10-02T01:02:03+08:00','2026-10-02'])expect(assetLedgerCell({...asset,sampled_at},'sampled')).toEqual({text:'—',detail:'采样时间无效'})})
+it('accepts precise leap-day collection timestamps without replacing their source',()=>{const sampled_at='2024-02-29T01:02:03.123456789Z';const value={...asset,sampled_at};expect(assetLedgerCell(value,'sampled').text).toContain('09:02:03');expect(value.sampled_at).toBe(sampled_at)})

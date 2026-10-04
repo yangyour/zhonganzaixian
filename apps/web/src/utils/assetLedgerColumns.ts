@@ -1,4 +1,5 @@
 import type { Asset } from '../api/types'
+import { isUtcInstant } from './utcInstant'
 import { displayTime, sourceLabel, typeLabel } from './display'
 
 /** M3-2 / T00R027. Fixed order; extra internal metadata remains in its own view. */
@@ -32,7 +33,7 @@ export function assetLedgerCell(asset: Asset, key: AssetLedgerColumnKey): Ledger
     case 'site': return { text: asset.site_name || asset.site_id || '—', detail: 'Proxy：— 当前接口未提供' }
     case 'availability': return explicitState(asset.availability, { UNKNOWN: '未知' })
     case 'sync': return explicitState(asset.sync_state, { PENDING_ONBOARDING: '待接入' })
-    case 'sampled': return !asset.sampled_at ? { text: '—', detail: '未取得采样时间' } : Number.isNaN(Date.parse(asset.sampled_at)) ? { text: '—', detail: '采样时间无效' } : { text: displayTime(asset.sampled_at) }
+    case 'sampled': return !asset.sampled_at ? { text: '—', detail: '未取得采样时间' } : !isUtcInstant(asset.sampled_at) ? { text: '—', detail: '采样时间无效' } : { text: displayTime(asset.sampled_at) }
     case 'actions': return { text: '详情' }
     default: return missing()
   }

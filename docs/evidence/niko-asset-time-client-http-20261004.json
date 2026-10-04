@@ -1,0 +1,24 @@
+{
+  "verified_at": "2026-10-04T01:24:37.535Z",
+  "environment": "niko-local-test",
+  "instance": "rebuilt-20261003-after-executor-loss",
+  "http_requests": 7,
+  "http_methods": [
+    "GET"
+  ],
+  "metadata_rows_checked": 30,
+  "metadata_pages_checked": 2,
+  "submillisecond_metadata_creation_times": 0,
+  "ledger_missing_sample_rows": 15,
+  "ledger_present_sample_rows": 0,
+  "existing_withdrawn_revisions_checked": 1,
+  "revision_json_unchanged": true,
+  "registry_entries": 425,
+  "registry_sha256_unchanged": "398ee650fbc5904c70fe73ec0016352ee4c0de51167ae4733499b7dfaa5f42aa",
+  "business_writes": 0,
+  "synthetic_new_rows": 0,
+  "malformed_nanosecond_cases": "ISOLATED_TESTS_ONLY",
+  "browser_dom_tested": false,
+  "credentials_output": false,
+  "contract_done": false
+}

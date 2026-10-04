@@ -1,0 +1,43 @@
+{
+  "verified_at": "2026-10-04T13:29:20.154017+00:00",
+  "source_commit": "af54ced37e9a89219bff8e9bdbce3f20f8b92a12",
+  "artifact_id": 11304820230,
+  "workflow_run": 37205722581,
+  "artifact_sha256": "645f256dcab4ca2a0448d0733670db2e4ff1bd30f54c7d1af26b32ea0de8dd3f",
+  "files": [
+    {
+      "path": "docs/evidence/local-ui-inspection-20261004-attempt2/desktop-inspection-history.png",
+      "blob_sha1": "35e0d24b0aa2d8cc554d6c1477b6f40783894057",
+      "sha256": "6f5eacb49773b0b28c907d10f3c60a28a14f6140f50b6b47c15f35a1444f070a",
+      "bytes": 104253
+    },
+    {
+      "path": "docs/evidence/local-ui-inspection-20261004-attempt2/mobile-inspection-history.png",
+      "blob_sha1": "00287dc840749b41507f2a69ea174cdf04606efa",
+      "sha256": "8ecf7b976e29007899216ce2699294b090eadf03cad6445b7ac171dc977c8e80",
+      "bytes": 43910
+    },
+    {
+      "path": "docs/evidence/local-ui-worksheet-20261004-attempt2/desktop-worksheet-history.png",
+      "blob_sha1": "18dc6109f87a7c3a451f6b1e70cacd32db5a40ff",
+      "sha256": "e9ed76ceac60fc7debaa4a779ff142f7de7f01de826654a1489bb85494594a99",
+      "bytes": 85358
+    },
+    {
+      "path": "docs/evidence/local-ui-worksheet-20261004-attempt2/mobile-worksheet-history.png",
+      "blob_sha1": "714130766e22197917b694e73aef95b417bde974",
+      "sha256": "64df968e2269f26b86641f55114fc2f07b746d2af8828b6418906bc53768656a",
+      "bytes": 46201
+    }
+  ],
+  "files_replaced": 0,
+  "new_windows_browser_execution": false,
+  "materialized": true,
+  "private_credentials_exported": false,
+  "git_history_exported": false,
+  "cloud_validation_run": 37205722598,
+  "cloud_validation_conclusion": "success",
+  "source_recovery_conclusion": "success",
+  "screenshots_visually_inspected": 4,
+  "visual_observations": "Existing desktop/mobile history screenshots show frozen versions, null/unanswered facts, wrapping hashes and unknown-state disclaimers. This is inspection of prior Windows images, not a new browser run."
+}

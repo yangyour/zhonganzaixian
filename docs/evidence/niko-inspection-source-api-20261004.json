@@ -109,7 +109,13 @@
     "niko_chromium_blocker_resolved": false,
     "imported_designated_source_tests": 36,
     "existing_png_blobs_preserved": 4,
-    "png_local_materialization": "PENDING_PRIVATE_SOURCE_RECOVERY_ARTIFACT",
-    "new_credentials": 0
+    "png_local_materialization": "PASS",
+    "new_credentials": 0,
+    "materialization_evidence": "niko-inspection-upstream-materialization-20261004.json"
+  },
+  "published_validation": {
+    "commit": "af54ced37e9a89219bff8e9bdbce3f20f8b92a12",
+    "ci_run": 37205722598,
+    "conclusion": "success"
   }
 }

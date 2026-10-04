@@ -1,0 +1,38 @@
+{
+  "verified_at": "2026-10-04T10:46:46.476Z",
+  "environment": "niko-local-test",
+  "api_contract_version": "0.36.0",
+  "http_requests": 124,
+  "response_status_counts": {
+    "200": 81,
+    "400": 21,
+    "401": 1,
+    "403": 9,
+    "404": 6,
+    "409": 6
+  },
+  "worksheet_json_schema_validated": true,
+  "independent_utf8_fingerprint_checked": true,
+  "real_same_version_statuses": [
+    200,
+    409
+  ],
+  "same_key_single_worksheet": true,
+  "unknown_time_and_unanswered_preserved": true,
+  "immutable_template_version_after_source_changes": true,
+  "original_receipt_after_source_archive": true,
+  "foreign_worksheet_asset_template_404": true,
+  "other_roles_403": true,
+  "csrf_missing_403": true,
+  "new_capabilities_classified": 2,
+  "created_worksheets": 14,
+  "created_templates": 2,
+  "all_owned_records_archived": true,
+  "permanent_deletes": 0,
+  "new_migrations": 0,
+  "evidence_file_binding_tested": false,
+  "browser_tested": false,
+  "quarterly_report_tested": false,
+  "production_approval": "UNVERIFIED",
+  "formal_acceptance": "NOT_RUN"
+}

@@ -10,7 +10,7 @@ import java.time.*;
 import java.util.*;
 
 /** Real draft metadata/history, joined to stable asset identity; never overwrites an observed/CMDB asset. */
-public final class PostgresManualAssetMetadataRepository implements ManualAssetMetadataRepository {
+public final class PostgresManualAssetMetadataRepository implements ManualAssetMetadataRepository,cn.mop.domain.assetexport.AssetExportSnapshotRepository {
     private static final System.Logger LOG=System.getLogger(PostgresManualAssetMetadataRepository.class.getName());
     private final DataSource source;private final PostgresPlatformRepository platform;private final ObjectMapper mapper;
     private static final String COLUMNS="tenant_id,asset_id,asset_version,previous_metadata_version,actor_id,recorded_at,name,type,management_ip,site_id,brand,model,serial_number,location,owner_id,business_description,purchase_date,warranty_expiry,overdue_service_date,collection_method_note,note,before_snapshot,verification_status,monitoring_applied,cmdb_applied,warranty_start,warranty_supplier,warranty_details_declared";
@@ -53,6 +53,28 @@ public final class PostgresManualAssetMetadataRepository implements ManualAssetM
     }
     private static String filterColumn(ManualAssetFilter.Field field){return switch(field){case NAME,TYPE,SITE_ID->"a."+field.key();default->"r."+field.key();};}
     @Override public Current current(Access access,String id){return read(access,id,(c,asset)->current(c,access,asset));}
+    /** All sources, exactly the public main-ledger predicates, without paging across independent snapshots. */
+    @Override public Selection select(cn.mop.domain.assetexport.AssetExportJobState.Command command){
+        if(command==null)throw invalid();
+        platform.requireStandaloneRead();
+        var accepted=command.acceptedAccess();var f=command.filters();
+        var access=new Access(accepted.actorId().toString(),accepted.tenantId().toString(),accepted.permissionVersion(),"asset-export-snapshot");
+        try(Connection c=source.getConnection()){
+            c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);c.setAutoCommit(false);
+            try{
+                authorize(c,access,false);
+                try(var s=statement(c,"SELECT role_code FROM public.mop_membership WHERE tenant_id=?::uuid AND user_id=?::uuid")){s.setString(1,access.tenantId());s.setString(2,access.actorId());try(var r=s.executeQuery()){if(!r.next()||!accepted.role().equals(r.getString(1)))throw expired();}}
+                Instant snapshotAt;try(var s=statement(c,"SELECT transaction_timestamp()" );var r=s.executeQuery()){r.next();snapshotAt=r.getObject(1,OffsetDateTime.class).toInstant();}
+                var sql=new StringBuilder("SELECT a.id::text FROM public.mop_asset a WHERE a.tenant_id=?::uuid");
+                if(f.type()!=null)sql.append(" AND a.type=?");if(f.status()!=null)sql.append(" AND a.status=?");if(f.siteId()!=null)sql.append(" AND a.site_id=?");if(f.query()!=null)sql.append(" AND (strpos(lower(a.name COLLATE \"pg_catalog\".\"und-x-icu\"),lower(? COLLATE \"pg_catalog\".\"und-x-icu\"))>0 OR strpos(a.management_ip,?)>0)");
+                sql.append(" ORDER BY a.created_at,a.id LIMIT ?");var ids=new ArrayList<String>();
+                try(var s=statement(c,sql.toString())){int p=1;s.setString(p++,access.tenantId());if(f.type()!=null)s.setString(p++,f.type());if(f.status()!=null)s.setString(p++,f.status());if(f.siteId()!=null)s.setString(p++,f.siteId());if(f.query()!=null){s.setString(p++,f.query());s.setString(p++,f.query());}s.setInt(p,cn.mop.domain.assetexport.AssetExportJobState.MAX_DATA_ROWS+1);try(var r=s.executeQuery()){while(r.next())ids.add(r.getString(1));}}
+                if(ids.size()>cn.mop.domain.assetexport.AssetExportJobState.MAX_DATA_ROWS)throw new DomainException(413,"EXPORT_ROW_LIMIT","Complete selection exceeds technical export row limit; no truncated result returned");
+                var rows=new ArrayList<Current>();for(String id:ids)rows.add(current(c,access,asset(c,access,id,false)));
+                Selection result=new Selection(command,snapshotAt,rows);c.commit();return result;
+            }catch(SQLException|RuntimeException|Error failure){try{c.rollback();}catch(SQLException ignored){}throw failure;}
+        }catch(SQLException failure){throw sqlFailure(failure);}
+    }
     @Override public List<Revision> history(Access access,String id,int limit,Long beforeVersion){
         return read(access,id,(c,asset)->{if(limit<1||limit>101||beforeVersion!=null&&beforeVersion<2)throw invalid();current(c,access,asset);List<Revision> values=new ArrayList<>();
             try(var s=statement(c,"SELECT "+COLUMNS+" FROM public.mop_asset_manual_revision WHERE tenant_id=?::uuid AND asset_id=?::uuid"+(beforeVersion==null?"":" AND asset_version<?")+" ORDER BY asset_version DESC LIMIT ?")){s.setString(1,access.tenantId());s.setString(2,asset.id());int next=3;if(beforeVersion!=null)s.setLong(next++,beforeVersion);s.setInt(next,limit);try(var r=s.executeQuery()){while(r.next())values.add(revision(r,access.tenantId(),asset.id()));}}

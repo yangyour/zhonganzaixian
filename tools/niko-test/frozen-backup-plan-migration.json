@@ -1,0 +1,11 @@
+{
+  "sha256": {
+    "V24__unpublished_backup_plan_drafts.sql": "3b28fe6679d787faafdf0d5ea175712ec622b5017c103650cfa42ff12c73816a"
+  },
+  "function_body_sha256": {
+    "mop_backup_plan_head_guard": "5397288405a2b6a1e4c805649693c391c42f9427c5a203f6eed43599692f7f89",
+    "mop_backup_plan_revision_insert_guard": "74a39ce6047d92f4b6354e56cb27af595c05704065b916cd9a1ef68821c814bb",
+    "mop_backup_plan_target_insert_guard": "1e56808544a4468ec28318a3f47389ba80348d12a91caeadd788d105b7f4939d",
+    "mop_backup_plan_revision_complete": "47dc881cdec9bbb446c879dde4614847afce270eb60b4afd9b0ba4c9f4273822"
+  }
+}

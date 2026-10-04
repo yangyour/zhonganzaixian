@@ -1,0 +1,104 @@
+{
+  "verified_at": "2026-10-04T17:26:51.686414+00:00",
+  "scope": "EXPLICIT_V24_UNPUBLISHED_BACKUP_PLAN_DRAFT_STRUCTURE_ONLY",
+  "environment": "niko-local-test",
+  "postgresql_version": "17.11",
+  "schema_version": 24,
+  "explicit_migrations_executed": 1,
+  "repeat_apply_migrations_executed": 0,
+  "read_only_check_migrations_executed": 0,
+  "legacy_v23_apply_migrations_executed": 0,
+  "v1_v23_bytes_changed": false,
+  "v24_byte_frozen": true,
+  "freeze_manifest": {
+    "sha256": {
+      "V24__unpublished_backup_plan_drafts.sql": "3b28fe6679d787faafdf0d5ea175712ec622b5017c103650cfa42ff12c73816a"
+    },
+    "function_body_sha256": {
+      "mop_backup_plan_head_guard": "5397288405a2b6a1e4c805649693c391c42f9427c5a203f6eed43599692f7f89",
+      "mop_backup_plan_revision_insert_guard": "74a39ce6047d92f4b6354e56cb27af595c05704065b916cd9a1ef68821c814bb",
+      "mop_backup_plan_target_insert_guard": "1e56808544a4468ec28318a3f47389ba80348d12a91caeadd788d105b7f4939d",
+      "mop_backup_plan_revision_complete": "47dc881cdec9bbb446c879dde4614847afce270eb60b4afd9b0ba4c9f4273822"
+    }
+  },
+  "legacy_full_row_equality": {
+    "tables": 50,
+    "equal": true,
+    "excluded_columns": {},
+    "before_at": "2026-10-04T17:21:28.994969+00:00",
+    "verified_at": "2026-10-04T17:22:28.586237+00:00"
+  },
+  "new_real_pg_schema_tests": 19,
+  "new_java_migration_policy_tests": 2,
+  "focused_tests": 50,
+  "java_migration_policy_tests": 31,
+  "root_tests_reported": 1935,
+  "root_tests_executed": 1922,
+  "actual_postgresql_regressions": 621,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "failures": 0,
+  "errors": 0,
+  "python_tests": 135,
+  "contracts": 97,
+  "native_powershell": "NOT_RUN_LOCALLY_AWAIT_EXACT_COMMIT_CI",
+  "expected_powershell_policy_checks": 103,
+  "windows_database_execution": "NOT_RUN",
+  "retained_synthetic_state": {
+    "retained_synthetic_drafts": 2,
+    "all_unpublished": true,
+    "target_count_matches": true,
+    "verified_at": "2026-10-04T17:26:00.616384+00:00"
+  },
+  "failure_history": [
+    "Initial Python parity test expected V1..V23; updated exact range to V1..V24 and final135passed",
+    "Initial snapshot CLI supplied unsupported --before; rejected before reading/writing database or snapshot. Correct --record then --verify proved50tables equal"
+  ],
+  "business_api_implemented": false,
+  "repository_implemented": false,
+  "api_version": "0.38.0",
+  "api_contract_changed": false,
+  "live_api_restarted": false,
+  "api_worker_auto_migration": false,
+  "plans_enabled": 0,
+  "actual_ssh_calls": 0,
+  "actual_backup_storage_calls": 0,
+  "credentials_configured": false,
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "server/persistence/src/main/resources/db/migration/V24__unpublished_backup_plan_drafts.sql": "3b28fe6679d787faafdf0d5ea175712ec622b5017c103650cfa42ff12c73816a",
+    "server/persistence/src/main/java/cn/mop/persistence/BackupPlanSchemaVerifier.java": "bc551fe7d068c7b7aea34955d1c078f6c066ede90810bec31dd8ed38cc885c0b",
+    "server/persistence/src/main/java/cn/mop/persistence/TestSchemaMigration.java": "11cb7d9efa8429826b3b71d907e324523310b6107cd30e01e86582a00f78f013",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresBackupPlanSchemaIntegrationTest.java": "34b235aef71bd5f91bfb037a36acc58defd1a52565a48c3302a0e11c1bbb0088",
+    "server/persistence/src/test/java/cn/mop/persistence/TestSchemaMigrationTest.java": "9e305e261cfc2ad7ca68930ccf9b42a5d287d4b8086a2b162f6c05cfa383078c",
+    "deploy/migration-policy.ps1": "ca288c70a04137a421c1e676cdad7ae9c4941cd6d7f91540045c956343842920",
+    "deploy/migrate-test-schema.ps1": "d56ec7cf88a61bade1ea95a091735b87106b531ee62648fcf2bae1b6d155fa35",
+    "tools/niko-test/run-migration.py": "9573ae0766ad5f795905dd33ce95d87cf6c0445b0a6e97ebd6732bf22caec76d",
+    "tools/niko-test/backup-plan-migration-snapshot.py": "7e4a52ff4de4c0ae1a12eec09278595647bb2b9c327a388060f3cce10c7edff4",
+    "tools/test-migration-policy.ps1": "558d029622c1344065c32dc0e080c09d6c8ed19d14292d994be93e6c26c4e1ef",
+    "tools/test_niko_private_bootstrap.py": "dde7eb312094f087b2328c395970087fd6c0fd870bb830b88ff40ac35b69b0db"
+  },
+  "logs_sha256": {
+    "backup-plan-schema-policy-20261004.log": "f0e20772a6822eee7fca7f58bb4cdb1aa021d42a805af4cf4328951875a0f1a2",
+    "backup-plan-schema-focused-20261004.log": "e6792a0b1bcac232e0e87de5c1c3d22009013314fb9e606d376667aa0dd1c51c",
+    "backup-plan-schema-full-20261004.log": "723db1b226d9cd28a977b30d787f712bfae48d1c8cd614f04e50862b59631553",
+    "backup-plan-schema-python-20261004-final.log": "885f15f9fdca0f9bc4a3ec4af97bbc2ac2cc6421229e9959f26b42d41b5dd912",
+    "backup-plan-schema-contracts-20261004.log": "dcdd181911514faf9c105f32e3f9d771e3e6b9a3cb1a960a376305b2c2852ed2",
+    "backup-plan-v24-precheck-20261004.log": "fce3c542aab3fdf55a3951f93577c2444222b3ad45fa355c90a288be7c768455",
+    "backup-plan-v24-apply-20261004.log": "019f0062b4b32c33360cdd4030401bd9d0514689731fca507adee4a180d19798",
+    "backup-plan-v24-repeat-20261004.log": "f2c1e8e27c124a7d328feb636e388cf8c0e5ef983494f342c2b82ff98a9c5445",
+    "backup-plan-v24-postcheck-20261004.log": "ab23d4f48813208c7a9bb07ff3fdd7a5ea6ebc139dc9330c9dc14effcc6b1f70",
+    "backup-plan-v24-legacy-20261004.log": "3f8e13583d5d6eead71a2e9672f714eeca559c5e20efe0b811c91007eac93482",
+    "backup-plan-schema-postcheck-20261004.json": "c9bb648d91b756d411d3a34cbdb7f01668d7a97d77a1ff757eb4cf3fe86e04f9",
+    "backup-plan-schema-contracts-20261004-final.log": "4902fe2de43246f27c5d11df2d4c5e25656a15172b744481906e61c19fda16aa"
+  },
+  "previous_commit": {
+    "sha": "829ef2c9f44f7dc6b0bb881c7df13cb84c79e984",
+    "ci_run": 37219698445,
+    "conclusion": "success"
+  },
+  "tracker_tests": 17,
+  "tracker_requirements": 128,
+  "tracker_rows_with_notes": 38,
+  "contract_generation": "PASS"
+}

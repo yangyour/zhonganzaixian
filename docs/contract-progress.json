@@ -1318,6 +1318,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "9f21105b37319bfb7a9610c8bdfc99f1fca2575ec9979def8805f67698066cb2"
+    "doc/development/07_合同逐项开发追踪.md": "fae86866863f0a175ad316ffef546a29f2ac06e7fc6efac2d9bd67d1ee0ca409"
   }
 }

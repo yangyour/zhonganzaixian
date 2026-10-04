@@ -1,0 +1,32 @@
+{
+  "observed_at_utc": "2026-10-04T01:18:52Z",
+  "environment": "niko-cloud-executor",
+  "scope": "B03_LOCAL_BROWSER_STARTUP_ONLY",
+  "installed_executable": "/usr/bin/chromium",
+  "version_output": "Chromium 154.0.8037.57 built on Debian GNU/Linux 13 (trixie)",
+  "playwright_package": "1.62.1",
+  "attempts": [
+    {
+      "mode": "default sandbox",
+      "chromium_sandbox_requested": true,
+      "result": "LAUNCH_FAILED",
+      "process_singleton_socket_error": "Operation not permitted",
+      "crashpad_error": "database required"
+    },
+    {
+      "mode": "reviewed require_escalated; private XDG config/cache paths",
+      "chromium_sandbox_requested": true,
+      "result": "LAUNCH_FAILED",
+      "process_singleton_socket_error": "Operation not permitted",
+      "ptrace_error": "Operation not permitted"
+    }
+  ],
+  "pages_opened": 0,
+  "actual_ui_validation": "NOT_RUN",
+  "sandbox_disabled": false,
+  "network_or_server_configuration_changed": false,
+  "public_exposure_created": false,
+  "credentials_entered": false,
+  "new_browser_package_installed": false,
+  "next_boundary": "Compatible execution permissions/environment required; do not disable security controls or substitute jsdom as real UI evidence"
+}

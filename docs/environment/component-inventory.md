@@ -169,3 +169,9 @@
 只读预检：当前自己的执行环境为Debian13.6/x86_64；command -v未发现docker/php/nginx，可见dpkg-deb。未取得可用的cgroup memory.max，因此资源容量未确认，不能把宿主机内存推成测试容量。只有公开官方文档/包索引查询，未下载或运行新组件。官方[生命周期](https://www.zabbix.com/life_cycle_and_release_policy)列7.0 LTS完整支持至2027-06-30、有限支持至2029-06-30；官方[7.0要求](https://www.zabbix.com/documentation/7.0/en/manual/installation/requirements)和[Debian包目录](https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix/)可作后续版本/依赖核验来源。具体补丁包、签名/摘要、资源与真实兼容性尚待核验，不使用不稳定版本或关闭TLS/主机信任。
 
 该候选仅开发测试，不替代客户Q03生产许可/版本决定、Q06阈值矩阵或原服务器环境。未知监控仍未知；不会把当前阈值数学诊断当采集引擎。
+
+## 2026-10-04 01:18 B03现有Chromium启动探测
+
+本次实际发现 `/usr/bin/chromium`，版本154.0.8037.57（Debian13）；不再将“未取得Playwright下载包”解释为系统没有浏览器。使用已安装Playwright1.62.1，要求Chromium沙箱开启，先普通启动、再通过执行权限审核路径启动空白页；两次均在process_singleton的socket创建阶段返回Operation not permitted，页面打开0。第二次使用项目私有XDG目录，仍失败；ptrace也被禁止。
+
+未关闭沙箱、修改防火墙/端口/系统权限、开放公网、传入凭据或安装新软件。原云浏览器localhost阻塞、官方包下载失败保留为各自历史，不能混为新探测结果。B03仍阻塞当前真实DOM/移动视口验收；继续代码和隔离测试。证据见 [启动结果](../evidence/niko-browser-startup-blocker-20261004.json)。

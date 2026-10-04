@@ -399,6 +399,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/asset-export-job-state.md",
         "docs/asset-ledger-export-encoding.md"
       ],
       "external_references_unchecked": 0,
@@ -1322,6 +1323,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "bb4541c7537ba3d84616a43db498e3c527649a49a377ecea0f7621e35e9e4f87"
+    "doc/development/07_合同逐项开发追踪.md": "7db142b46ac9f87b9414c669fcce38776918d8e3233ed531e6427102c3f78a6d"
   }
 }

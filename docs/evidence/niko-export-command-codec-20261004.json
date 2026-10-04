@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-04",
+  "environment": "niko-local-test",
+  "scope": "PURE_CANONICAL_EXPORT_COMMAND_CODEC_AND_ACCEPTANCE_BINDING",
+  "new_codec_tests": 21,
+  "focused_codec_and_state_tests": 52,
+  "initial_failure": "Required null UUID escaped as NullPointerException; explicit validation now returns 400",
+  "root_reported": 1484,
+  "root_executed": 1471,
+  "root_failures": 0,
+  "root_errors": 0,
+  "existing_real_postgresql_tests": 405,
+  "historical_fixture_skipped": 13,
+  "minio_tests_excluded": 6,
+  "contract_tests": 73,
+  "contract_generation_consistent": true,
+  "golden_fingerprint_unchanged": true,
+  "bound_decode_is_not_current_authorization": true,
+  "new_durable_export_jobs": 0,
+  "schema_migrations": 0,
+  "new_real_worker_tests": 0,
+  "oss_requests": 0,
+  "actual_download_grants_created": 0,
+  "notifications_sent": 0,
+  "api_contract_changed": false,
+  "formal_acceptance": "NOT_RUN",
+  "log_sha256": {
+    "export-command-codec-focused-20261004.log": "292cbff1d425e2e1a8c72ba128fde03b738b32094d3d3cfbf296a235a3c9b430",
+    "export-command-codec-focused-final-20261004.log": "201c93fbc1e437512ef31215ec6744e28e0db64524a9ca770ca23be8781b1451",
+    "export-command-codec-root-20261004.log": "772511ac98f7778d342650cf8018ba7807f746bfaceea338b8df97a44fd2499a",
+    "export-command-codec-contracts-20261004.log": "2b05f83435cc95fc83d51a304abb336fbd5dd95bbee0748f77f7638a124691c2"
+  }
+}

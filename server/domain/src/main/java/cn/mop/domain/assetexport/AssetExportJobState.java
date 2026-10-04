@@ -2,8 +2,6 @@ package cn.mop.domain.assetexport;
 
 import cn.mop.domain.AssetReadQuery;
 import cn.mop.domain.DomainException;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.time.*;
 import java.util.*;
@@ -20,16 +18,11 @@ public final class AssetExportJobState {
     }
     public record Command(Access acceptedAccess,Filters filters) {
         public Command {if(!valid(acceptedAccess)||filters==null)throw invalid();}
-        /** Fixed length-prefixed UTF-8 distinguishes null, empty, delimiter-like text and scope/version changes. */
-        public String fingerprint(){
-            try(var bytes=new ByteArrayOutputStream();var out=new DataOutputStream(bytes)){
-                for(String value:Arrays.asList("mop-asset-export-command-v1",acceptedAccess.tenantId().toString(),acceptedAccess.actorId().toString(),Long.toString(acceptedAccess.permissionVersion()),acceptedAccess.role(),filters.type(),filters.status(),filters.siteId(),filters.query())){
-                    if(value==null)out.writeInt(-1);else{byte[] text=value.getBytes(StandardCharsets.UTF_8);out.writeInt(text.length);out.write(text);}
-                }
-                return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes.toByteArray()));
-            }catch(IOException|NoSuchAlgorithmException impossible){throw new IllegalStateException(impossible);}
-        }
+        /** Returns a fresh canonical byte array; the digest is consistency metadata, not authentication. */
+        public byte[] canonicalBytes(){return AssetExportCommandCodec.encode(this);}
+        public String fingerprint(){try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(canonicalBytes()));}catch(NoSuchAlgorithmException impossible){throw new IllegalStateException(impossible);}}
     }
+
     public record Attempt(long fence,Instant startedAt,Instant leaseUntil) {
         public Attempt {time(startedAt);time(leaseUntil);if(fence<1||fence>MAX_VERSION||!startedAt.isBefore(leaseUntil))throw invalid();}
     }

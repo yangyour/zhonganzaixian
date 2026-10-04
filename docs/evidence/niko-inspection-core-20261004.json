@@ -1,0 +1,46 @@
+{
+  "verified_at": "2026-10-04T07:37:39Z",
+  "environment": "niko-local-test",
+  "scope": "PURE_INSPECTION_TEMPLATE_AND_WORKSHEET_MODEL",
+  "api_version": "0.34.0",
+  "http_contract_changed": false,
+  "new_java_tests": 20,
+  "root_tests": {
+    "reported": 1624,
+    "executed": 1611,
+    "real_existing_postgres": 482,
+    "new_inspection_postgres": 0,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts": 74,
+  "contract_generation": "PASS",
+  "dynamic_device_types_tested": [
+    "router",
+    "switch",
+    "firewall",
+    "ap",
+    "new_customer_device_type"
+  ],
+  "production_templates_seeded": false,
+  "template_approval": "UNVERIFIED",
+  "new_migrations": 0,
+  "persistence_implemented": false,
+  "http_implemented": false,
+  "browser_tested": false,
+  "report_publication": false,
+  "active_scanning": false,
+  "component_substitutes_used_for_integration": false,
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/inspection/InspectionTemplate.java": "9eca4a0c4e653caa28b91d8bdfce78d24ecbe9b43ececbe9066a17bfe86f5668",
+    "server/domain/src/main/java/cn/mop/domain/inspection/InspectionWorksheet.java": "0104a7210b9ab4d056a3879b99da68ccc557ddf52cf53cd249b2e5ffd281e20e"
+  },
+  "logs": [
+    ".local/niko-test/logs/inspection-core-focused-first-20261004.log",
+    ".local/niko-test/logs/inspection-core-root-20261004.log",
+    ".local/niko-test/logs/inspection-core-contracts-20261004.log"
+  ]
+}

@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 34,
-  "rows_without_progress_notes": 94,
+  "rows_with_progress_notes": 35,
+  "rows_without_progress_notes": 93,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -72,7 +72,7 @@
     },
     "M9": {
       "requirements": 9,
-      "rows_with_progress_notes": 1,
+      "rows_with_progress_notes": 2,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 9
       }
@@ -1173,8 +1173,10 @@
       "id": "M9-7",
       "title": "季度巡检报告",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/inspection-templates.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1327,6 +1329,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "b387fdd8f4fdfdb227f10a3627045c97398a74a3345888951e679b2f98e68181"
+    "doc/development/07_合同逐项开发追踪.md": "1a2504df91b8192c2dadbad0e25ea3c7371fedc47e24c872a0eff24f134f9deb"
   }
 }

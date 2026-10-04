@@ -15,6 +15,7 @@ export const router = createRouter({
     { path: '/contact-imports', name: 'contact-imports', component: () => import('./pages/ContactImportsPage.vue'), meta: { title: '联系人批量新建与作业', group: '管理', capability: 'contacts:write' } },
     { path: '/contact-import-preview', name: 'contact-import-preview', component: () => import('./pages/ContactImportPreviewPage.vue'), meta: { title: '联系人导入格式预览', group: '管理', capability: 'contacts:write' } },
     { path: '/inspection-templates', name: 'inspection-templates', component: () => import('./pages/InspectionTemplatesPage.vue'), meta: { title: '巡检模板候选', group: '管理', role: 'padmin', capability: 'inspection_templates:read' } },
+    { path: '/inspection-worksheets', name: 'inspection-worksheets', component: () => import('./pages/InspectionWorksheetsPage.vue'), meta: { title: '人工巡检执行单', group: '管理', role: 'padmin', capability: 'inspection_worksheets:read' } },
     { path: '/customer-contacts', name: 'customer-contacts', component: () => import('./pages/CustomerContactsPage.vue'), meta: { title: '客户联系人', group: '管理', capability: 'contacts:read' } },
     { path: '/operational-comparison', name: 'operational-comparison', component: () => import('./pages/OperationalComparisonPage.vue'), meta: { title: '经营样本与人力对照', group: '管理', capability: 'operations:compare_explicit' } },
     { path: '/capacity-estimates', name: 'capacity-estimates', component: () => import('./pages/CapacityEstimatePage.vue'), meta: { title: '容量与缓冲估算', group: '管理', capability: 'capacity:estimate' } },

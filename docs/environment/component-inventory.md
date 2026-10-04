@@ -215,3 +215,7 @@ QA2689主动正常退出后，以原脚本/原数据/原凭据重启现有PG17.1
 ## 2026-10-04 本地原指定库V22接续
 
 本轮固定主机键SSH实读原PG17.9的mop_test为V19；应用停止后逐功能执行V20导出队列、V21模板修订、V22人工执行单，各1次/重复0次/最终只读0次。41张既有业务表行数与全行摘要保持一致，备份仅存本机忽略目录且未实际恢复。复用原运行/迁移角色，无新服务、账号、全局权限或端口变更。结构可用不等于导出发布、模板批准、执行单公开API或季度报告可用；Worker/HTTP/DOM另行留证。见[独立结构证据](../evidence/local-schema-v22-20261004.json)。
+
+## 2026-10-04 11:34 执行单页面B03复核
+
+niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在启动时EPERM/Operation not permitted，应用页打开0；未降低沙箱/系统安全或建立代理。30输入/SFC模拟DOM测试与11实际来源HTTP分别通过，不能合并宣称浏览器/移动视觉验收。见[当前探测](../evidence/niko-worksheet-page-browser-probe-20261004.json)及[页面边界](../evidence/niko-inspection-worksheet-page-20261004.json)，继续不依赖该入口的开发。

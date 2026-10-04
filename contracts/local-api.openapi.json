@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.37.0",
+    "version": "0.38.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -19498,6 +19498,530 @@
           }
         }
       }
+    },
+    "/inspection-source-collections": {
+      "get": {
+        "operationId": "listInspectionSourceCollections",
+        "summary": "当前租户明确来源集合元数据分页；不读取正文，不宣称正文已验或正式报告",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-readonly": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-reject-duplicate-query-keys": true,
+        "x-mop-read-consistency": "READ_ONLY_REPEATABLE_READ",
+        "x-mop-success-writes-audit-or-receipts": false,
+        "x-mop-denied-read-security-audit": "EXISTING_DENIED_REQUEST_AUDIT",
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                20
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_recorded_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-paired-query-keys": [
+          "before_recorded_at",
+          "before_id"
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionSourceCollectionPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createInspectionSourceCollection",
+        "summary": "明确版本与预期来源摘要一致后保护事务保存独立来源草稿；不自动选择最新/季度，不发布",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionSourceCollectionCreate"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-before-replay-authorization": true,
+        "x-mop-body-max-bytes": 262144,
+        "x-mop-json-max-tokens": 12000,
+        "x-mop-json-max-depth": 4,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-reject-all-query-keys": true,
+        "x-mop-empty-selection": "VALID_TECHNICAL_DRAFT_NOT_ZERO_TENANT_POPULATION",
+        "x-mop-source-hash-conflict": 409,
+        "x-mop-replay": "CURRENT_AUTHORIZATION_THEN_ORIGINAL_SMALL_RECEIPT_NO_RECAPTURE",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionSourceCollectionSummaryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inspection-source-collections/{id}": {
+      "get": {
+        "operationId": "getInspectionSourceCollection",
+        "summary": "完整冻结来源与缺值/多修订诊断；按当前租户授权回读且逐层验hash，不按当前头重算",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-readonly": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-reject-duplicate-query-keys": true,
+        "x-mop-read-consistency": "READ_ONLY_REPEATABLE_READ",
+        "x-mop-success-writes-audit-or-receipts": false,
+        "x-mop-denied-read-security-audit": "EXISTING_DENIED_REQUEST_AUDIT",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionSourceCollectionDetailResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -20188,6 +20712,34 @@
                 ],
                 "additionalProperties": false
               },
+              "inspection_source_collections": {
+                "type": "object",
+                "properties": {
+                  "schema_access_ready": {
+                    "const": true
+                  },
+                  "verification_status": {
+                    "const": "SELF_REPORTED_UNVERIFIED"
+                  },
+                  "generation_status": {
+                    "const": "CONFIG_PENDING"
+                  },
+                  "formal_report_generatable": {
+                    "const": false
+                  },
+                  "report_published": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "schema_access_ready",
+                  "verification_status",
+                  "generation_status",
+                  "formal_report_generatable",
+                  "report_published"
+                ],
+                "additionalProperties": false
+              },
               "working_calendars": {
                 "type": "object",
                 "properties": {
@@ -20331,6 +20883,7 @@
               "inspection_templates",
               "contact_imports",
               "inspection_worksheets",
+              "inspection_source_collections",
               "working_calendars",
               "manual_incidents",
               "manual_recovery",
@@ -39159,6 +39712,674 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/InspectionWorksheetSource"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionSourceCollectionCreate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "const": 0
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Unicode code points; nonblank, no control characters or isolated surrogates; retained verbatim"
+          },
+          "sources": {
+            "type": "array",
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "worksheet_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740990
+                },
+                "expected_source_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "worksheet_id",
+                "version",
+                "expected_source_sha256"
+              ],
+              "additionalProperties": false
+            },
+            "x-mop-unique-by": [
+              "worksheet_id",
+              "version"
+            ]
+          }
+        },
+        "required": [
+          "expected_version",
+          "label",
+          "sources"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionSourceCollectionSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "const": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Unicode code points; nonblank, no control characters or isolated surrogates; retained verbatim"
+          },
+          "source_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "document_format": {
+            "const": "MOP_INSPECTION_SOURCE_DOCUMENT_V1"
+          },
+          "document_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_manifest_format": {
+            "const": "MOP_INSPECTION_SOURCE_MANIFEST_V1"
+          },
+          "source_manifest_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "projection": {
+            "const": "METADATA_ONLY"
+          },
+          "record_source": {
+            "const": "EXPLICIT_IMMUTABLE_SOURCE_COLLECTION"
+          },
+          "verification_status": {
+            "const": "SELF_REPORTED_UNVERIFIED"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_PADMIN"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "evidence_access_granted": {
+            "const": false
+          },
+          "period_time_zone": {
+            "type": "null"
+          },
+          "quarter_selection_rule": {
+            "type": "null"
+          },
+          "archived_source_policy": {
+            "type": "null"
+          },
+          "metric_version": {
+            "type": "null"
+          },
+          "report_template_version": {
+            "type": "null"
+          },
+          "tenant_asset_population": {
+            "type": "null"
+          },
+          "generation_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "formal_report_generatable": {
+            "const": false
+          },
+          "report_published": {
+            "const": false
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "created_by",
+          "recorded_at",
+          "version",
+          "label",
+          "source_count",
+          "document_format",
+          "document_sha256",
+          "source_manifest_format",
+          "source_manifest_sha256",
+          "projection",
+          "record_source",
+          "verification_status",
+          "scope",
+          "source",
+          "evidence_access_granted",
+          "period_time_zone",
+          "quarter_selection_rule",
+          "archived_source_policy",
+          "metric_version",
+          "report_template_version",
+          "tenant_asset_population",
+          "generation_status",
+          "formal_report_generatable",
+          "report_published"
+        ],
+        "additionalProperties": false,
+        "x-mop-integrity": "Metadata projection only; list does not read/verify full document body. document_sha256 describes persisted canonical UTF-8 bytea, not this HTTP response JSON. No authenticity or file grant."
+      },
+      "InspectionSourceCollectionDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "const": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Unicode code points; nonblank, no control characters or isolated surrogates; retained verbatim"
+          },
+          "source_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "document_format": {
+            "const": "MOP_INSPECTION_SOURCE_DOCUMENT_V1"
+          },
+          "document_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_manifest_format": {
+            "const": "MOP_INSPECTION_SOURCE_MANIFEST_V1"
+          },
+          "source_manifest_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "projection": {
+            "const": "FULL_SOURCES"
+          },
+          "record_source": {
+            "const": "EXPLICIT_IMMUTABLE_SOURCE_COLLECTION"
+          },
+          "verification_status": {
+            "const": "SELF_REPORTED_UNVERIFIED"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_PADMIN"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "evidence_access_granted": {
+            "const": false
+          },
+          "period_time_zone": {
+            "type": "null"
+          },
+          "quarter_selection_rule": {
+            "type": "null"
+          },
+          "archived_source_policy": {
+            "type": "null"
+          },
+          "metric_version": {
+            "type": "null"
+          },
+          "report_template_version": {
+            "type": "null"
+          },
+          "tenant_asset_population": {
+            "type": "null"
+          },
+          "generation_status": {
+            "const": "CONFIG_PENDING"
+          },
+          "formal_report_generatable": {
+            "const": false
+          },
+          "report_published": {
+            "const": false
+          },
+          "document_integrity": {
+            "const": "VERIFIED_SERVER_SIDE"
+          },
+          "sources": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "$ref": "#/components/schemas/InspectionWorksheetSource"
+            }
+          },
+          "diagnostics": {
+            "type": "object",
+            "properties": {
+              "distinct_selected_assets": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "unknown_inspection_time": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "worksheet_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740990
+                    },
+                    "source_snapshot_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "content_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "worksheet_id",
+                    "version",
+                    "source_snapshot_sha256",
+                    "content_sha256"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "incompletely_entered": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "worksheet_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740990
+                    },
+                    "source_snapshot_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "content_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "worksheet_id",
+                    "version",
+                    "source_snapshot_sha256",
+                    "content_sha256"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "archived_selected_revisions": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "worksheet_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740990
+                    },
+                    "source_snapshot_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "content_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "worksheet_id",
+                    "version",
+                    "source_snapshot_sha256",
+                    "content_sha256"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "assets_with_multiple_sources": {
+                "type": "array",
+                "maxItems": 500,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "asset_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "sources": {
+                      "type": "array",
+                      "maxItems": 1000,
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "worksheet_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "version": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 9007199254740990
+                          },
+                          "source_snapshot_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "content_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "worksheet_id",
+                          "version",
+                          "source_snapshot_sha256",
+                          "content_sha256"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 2
+                    }
+                  },
+                  "required": [
+                    "asset_id",
+                    "sources"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "distinct_selected_assets",
+              "unknown_inspection_time",
+              "incompletely_entered",
+              "archived_selected_revisions",
+              "assets_with_multiple_sources"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "created_by",
+          "recorded_at",
+          "version",
+          "label",
+          "source_count",
+          "document_format",
+          "document_sha256",
+          "source_manifest_format",
+          "source_manifest_sha256",
+          "projection",
+          "record_source",
+          "verification_status",
+          "scope",
+          "source",
+          "evidence_access_granted",
+          "period_time_zone",
+          "quarter_selection_rule",
+          "archived_source_policy",
+          "metric_version",
+          "report_template_version",
+          "tenant_asset_population",
+          "generation_status",
+          "formal_report_generatable",
+          "report_published",
+          "document_integrity",
+          "sources",
+          "diagnostics"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "source_count": {
+                  "const": 0
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "sources": {
+                  "maxItems": 0
+                },
+                "diagnostics": {
+                  "properties": {
+                    "distinct_selected_assets": {
+                      "const": 0
+                    },
+                    "unknown_inspection_time": {
+                      "maxItems": 0
+                    },
+                    "incompletely_entered": {
+                      "maxItems": 0
+                    },
+                    "archived_selected_revisions": {
+                      "maxItems": 0
+                    },
+                    "assets_with_multiple_sources": {
+                      "maxItems": 0
+                    }
+                  }
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "sources": {
+                  "minItems": 1
+                },
+                "diagnostics": {
+                  "properties": {
+                    "distinct_selected_assets": {
+                      "minimum": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "x-mop-integrity": "Server verifies persisted original document SHA, canonical encoding, tenant, all nested hashes and source timestamps; source_manifest_sha256 binds sorted explicit source IDs/versions/hashes. Lists and create receipts omit the full body."
+      },
+      "InspectionSourceCollectionSummaryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/InspectionSourceCollectionSummary"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionSourceCollectionDetailResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/InspectionSourceCollectionDetail"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionSourceCollectionPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "items": {
+                "type": "array",
+                "maxItems": 20,
+                "items": {
+                  "$ref": "#/components/schemas/InspectionSourceCollectionSummary"
+                }
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_before_recorded_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "next_before_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "page_size_limit": {
+                "const": 20
+              },
+              "scope": {
+                "const": "CURRENT_TENANT_PADMIN"
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "items",
+              "has_more",
+              "next_before_recorded_at",
+              "next_before_id",
+              "page_size_limit",
+              "scope",
+              "source"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "has_more": {
+                      "const": true
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "items": {
+                      "minItems": 1
+                    },
+                    "next_before_recorded_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "next_before_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "next_before_recorded_at": {
+                      "type": "null"
+                    },
+                    "next_before_id": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            ]
           },
           "trace_id": {
             "type": "string"

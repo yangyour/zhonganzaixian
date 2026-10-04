@@ -192,3 +192,8 @@ V1–V14全部字节冻结，V14 SHA256为39be55d8759de87c6e2b8f85b3958c60be24ae
 ## 2026-10-04 V23来源集合独立结构
 
 显式`--apply-inspection-source-collections`执行1次，重复、`--check`及旧`--apply-inspection-worksheets`均0。48旧项目表全行指纹等值；17真实runtime结构与完整根1820实际执行（584PG）通过。V23 eabc4cf2512cdea920acf97ba1991499fde9d0901c7b91b5a8cc7b51f13599e8已冻结，修正只能V24+；原服务器不操作，API/Worker不自动迁移。新表只保存独立明确来源，不是正式报告；代码仓储/HTTP/新集合页面仍须后续验证。证据与范围见docs/inspection-report-sources.md。
+
+
+## 2026-10-04 API0.38来源集合HTTP入口
+
+V23已独立冻结，本轮仅只读check0执行，启动不迁移。正常退出自有旧runner后复用PG/KC数据目录/私有配置，固定API SHA42f6174a56dc40ba2efa4e2ad46a746733db381304a914263763973b9443ca89，11表在登录前全行等值。6既有OIDC登录后tests/niko-inspection-source-collection-http.mjs完成73请求/3不可变集合/1执行单1模板归档；原控制文件和成功证据已存在，不盲目重跑、不删除旧证据或集合。runtime账号仅追加/读取集合，summary不是正文校验，详情另核五层SHA；未知规则仍null且不生成正式报告。创建、列表、详情与ready契约见API0.38及docs/inspection-report-sources.md。

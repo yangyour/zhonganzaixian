@@ -240,3 +240,8 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 ## 2026-10-04 niko来源集合V23结构
 
 只在已批准niko-local-test PG17.11执行独立V23一次、重复/检查0；48既有项目表迁移前后完整行hash一致。新增两张来源集合表及三触发器，已有runtime仅追加/读取，无新账号、组件、端口或代理。17真实runtime结构测试通过；原指定服务器本轮未操作，API/Worker不自动迁移。这里只证明冻结来源结构，不代表季度业务规则、正式报告/存储/附件发布，见docs/evidence/niko-inspection-source-collection-schema-20261004.json。
+
+
+## 2026-10-04 niko来源集合API0.38
+
+继续复用既有PG17.11/Keycloak26.2.4，普通拥有者守卫重启到固定API0.38工件，11表完整行在再次OIDC前等值（含88既有集合）。6登录/73HTTP通过，3新增合成集合留存且全未发布，父1执行单/1模板已归档；未改端口、身份、网络、存储或迁移。只读V23结构检查0执行。原服务器未操作，新集合UI及B03浏览器路径仍未验，季度规则待确认；见../evidence/niko-inspection-source-collection-api-20261004.json。

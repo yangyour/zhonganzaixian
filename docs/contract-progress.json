@@ -1200,6 +1200,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/evidence/niko-inspection-source-collection-repository-20261004.json",
         "docs/inspection-report-sources.md"
       ],
       "external_references_unchecked": 0,
@@ -1336,6 +1337,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "31021c86d7cec410123f902e4447f5998b0601fab342926e149fa11d29576ac5"
+    "doc/development/07_合同逐项开发追踪.md": "85139e133c2bc8f12051abdde346d5d62361ba33767c1e7aa3cb2a08852c414f"
   }
 }

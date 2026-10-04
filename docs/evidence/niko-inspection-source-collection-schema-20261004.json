@@ -265,7 +265,15 @@
     "late_items_rejected_by_creation_transaction": true,
     "same_transaction_extra_item_after_early_flush_rejected": true
   },
-  "native_powershell": "PENDING_CI",
+  "native_powershell": {
+    "status": "PASS",
+    "checks": 94,
+    "database_operations": 0,
+    "environment": "GitHub Actions Ubuntu native pwsh",
+    "run_id": 37210517201,
+    "job_id": 111460582909,
+    "verified_at": "2026-10-04T15:01:02Z"
+  },
   "new_repository_implemented": false,
   "new_api_implemented": false,
   "new_collection_ui_implemented": false,

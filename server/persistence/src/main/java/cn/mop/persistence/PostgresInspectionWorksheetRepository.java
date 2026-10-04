@@ -74,14 +74,21 @@ public final class PostgresInspectionWorksheetRepository implements InspectionWo
         return readonly(a,c->{Entry current=get(c,a,record);var values=new ArrayList<Revision>();try(var s=statement(c,SELECT+" WHERE h.tenant_id=?::uuid AND h.id=?::uuid AND r.version<=?"+(beforeVersion==null?"":" AND r.version<?")+" ORDER BY r.version DESC LIMIT ?")){
             int p=1;s.setString(p++,a.tenantId());s.setString(p++,record);s.setLong(p++,current.version());if(beforeVersion!=null)s.setLong(p++,beforeVersion);s.setInt(p,limit);try(var r=s.executeQuery()){while(r.next()){Entry entry=entry(c,r,a);values.add(new Revision(entry.version(),(Long)r.getObject("previous_version"),entry.recordedBy(),entry.recordedAt(),entry.action(),entry.archived(),entry.content()));}}}return List.copyOf(values);});
     }
-    @Override public InspectionSourceManifest captureSources(Access a,List<Selection> selections){
+    @Override public InspectionSourceManifest captureSources(Access a,List<Selection> selections){var selected=sourceSelections(selections);return readonly(a,c->captureSources(c,a,selected));}
+    /** Same real source validation inside a caller-owned protected write transaction, never an unprotected write path. */
+    InspectionSourceManifest captureForProtectedWrite(Access a,List<Selection> selections){
+        Connection c=platform.idempotentCommandConnection();var selected=sourceSelections(selections);try{authorize(c,a,true);return captureSources(c,a,selected);}catch(SQLException failure){throw unavailable(failure);}
+    }
+    private static List<Selection> sourceSelections(List<Selection> selections){
         if(selections==null)throw invalid();
         if(selections.size()>InspectionSourceManifest.MAX_SOURCES)throw sourceLimit();
         var selected=new ArrayList<>(selections);
         if(selected.size()>InspectionSourceManifest.MAX_SOURCES)throw sourceLimit();
         if(selected.stream().anyMatch(Objects::isNull)||new HashSet<>(selected).size()!=selected.size())throw invalid();
         selected.sort(Comparator.comparing(Selection::worksheetId).thenComparingLong(Selection::version));
-        return readonly(a,c->{
+        return List.copyOf(selected);
+    }
+    private static InspectionSourceManifest captureSources(Connection c,Access a,List<Selection> selected)throws SQLException{
             if(selected.isEmpty())return new InspectionSourceManifest(UUID.fromString(a.tenantId()),List.of());
             String requested="WITH requested(worksheet_id,version) AS (VALUES "+String.join(",",Collections.nCopies(selected.size(),"(?::uuid,?::bigint)"))+") ";
             String scope=" JOIN requested q ON q.worksheet_id=h.id AND q.version=r.version WHERE h.tenant_id=?::uuid AND r.version<=h.version";
@@ -95,7 +102,6 @@ public final class PostgresInspectionWorksheetRepository implements InspectionWo
             try(var s=statement(c,requested+SELECT+scope+" ORDER BY h.id,r.version")){bindSelections(s,selected,a.tenantId());try(var r=s.executeQuery()){while(r.next())values.add(InspectionSourceSnapshot.fromEntry(entry(c,r,a,templates)));}}
             if(values.size()!=selected.size())throw corrupt();
             return new InspectionSourceManifest(UUID.fromString(a.tenantId()),values);
-        });
     }
     private static void bindSelections(PreparedStatement s,List<Selection> selections,String tenant)throws SQLException{int p=1;for(var selection:selections){s.setString(p++,selection.worksheetId());s.setLong(p++,selection.version());}s.setString(p,tenant);}
     private static DomainException sourceLimit(){return new DomainException(413,"INSPECTION_SOURCE_TECHNICAL_LIMIT","来源清单超过1000项或16MiB读取保护；未截断或生成正式报告");}

@@ -1,0 +1,104 @@
+{
+  "verified_at": "2026-10-04T15:06:21.552402+00:00",
+  "scope": "PROTECTED_IMMUTABLE_INSPECTION_SOURCE_COLLECTION_REPOSITORY",
+  "environment": "niko-local-test",
+  "postgresql_version": "17.11",
+  "new_real_postgres_tests": 18,
+  "new_pure_input_tests": 6,
+  "focused_first_batch": 52,
+  "focused_second_batch": 57,
+  "final_additional_timestamp_case": "PASS_IN_FULL_ROOT",
+  "root_tests": {
+    "reported": 1857,
+    "executed": 1844,
+    "real_postgres": 602,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts": 90,
+  "contract_generation": "PASS",
+  "tracker_tests": 17,
+  "schema_version": 23,
+  "migrations_executed": 0,
+  "api_version": "0.37.0",
+  "http_contract_identical_to_parent": true,
+  "http_contract_sha256": "ace35841fe2b8aaf31342e602192fae5cd8fd3dfb8781dd9398d008b9395c9b8",
+  "new_http_endpoints": 0,
+  "new_collection_http_tests": 0,
+  "new_collection_ui": "NOT_IMPLEMENTED",
+  "write_transaction": {
+    "requires_existing_protected_idempotent_command": true,
+    "current_membership_role_permission_version_rechecked_before_replay": true,
+    "expected_version": 0,
+    "explicit_source_hash_required": true,
+    "hash_mismatch": 409,
+    "missing_or_foreign": 404,
+    "same_connection_capture_document_items_audit_receipt": true,
+    "deferred_constraints_checked_at_commit": true,
+    "receipt_contains_document_body": false,
+    "automatic_latest_or_quarter_selection": false
+  },
+  "read_transaction": {
+    "read_only": true,
+    "isolation": "REPEATABLE_READ",
+    "full_document_and_all_nested_hashes_checked_on_detail": true,
+    "collection_timestamp_not_before_source_records": true,
+    "metadata_list_reads_document": false,
+    "metadata_list_claims_body_verification": false,
+    "successful_reads_append_audit_or_receipt": false
+  },
+  "real_faults": [
+    "Actual PG deferred item/document hash constraint rejects modified bound item SHA; collection/items/audit/receipt all roll back",
+    "Actual PG SELECT1/0 during audit execution rolls back complete protected creation",
+    "Caller failure after full repository create rolls back all writes"
+  ],
+  "controlled_read_faults": [
+    "Driver returns changed document byte from real stored row:503; stored row unaffected",
+    "Driver returns collection recorded_at earlier than actual source:503; stored row unaffected"
+  ],
+  "concurrency": "Two real connections same key return original JSON receipt and exactly one collection/item/audit/receipt commit",
+  "frozen_source": "Explicit earlier versions and archive flag preserved after worksheet/template changes; no recompute from current heads",
+  "postcheck": {
+    "collections": 58,
+    "nonempty_collections": 35,
+    "repository_test_collections": 50,
+    "labelled_synthetic": true,
+    "unverified_not_generatable_or_published": true,
+    "document_hashes_valid": true,
+    "item_counts_match": true
+  },
+  "permanent_deletes": 0,
+  "storage_requests": 0,
+  "formal_report_generatable": false,
+  "report_published": false,
+  "quarter_selection_rule": null,
+  "period_time_zone": null,
+  "metric_version": null,
+  "formal_acceptance": "NOT_RUN",
+  "prior_schema_ci": {
+    "commit": "0b2aa30068b1df0582b3d855a2b4536ccd4b6743",
+    "run_id": 37210517201,
+    "conclusion": "success",
+    "native_pwsh_checks": 94,
+    "pwsh_environment": "Ubuntu",
+    "database_operations": 0
+  },
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/inspection/InspectionSourceCollectionRepository.java": "9d892e03575a5f2b5f22a8070cc1df877bac999428b8e1b4e4c1860c19aba772",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresInspectionSourceCollectionRepository.java": "a798c82c00356ebf1f226a9b7199919780263e1b2c51ce8e90b46e300067c391",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresInspectionWorksheetRepository.java": "68f2d8a9443946afc7508457f8707e9649a2d57680a09c8b099b167d3e6a2f49",
+    "server/persistence/src/test/java/cn/mop/persistence/InspectionSourceCollectionInputTest.java": "0a5913e1b1d553edb6df4cb51e73c067d5787f6eba765c30fc9e13f7caf2d89e",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresInspectionSourceCollectionRepositoryIntegrationTest.java": "56e9db585102991f1149b6a786c3baa5d39dc2b7e3726a9dfc89115f5ede8037"
+  },
+  "logs": [
+    ".local/niko-test/logs/source-collection-repository-20261004-r1.log",
+    ".local/niko-test/logs/source-collection-repository-20261004-r2.log",
+    ".local/niko-test/logs/source-collection-repository-contracts-20261004.log",
+    ".local/niko-test/logs/source-collection-repository-postcheck-20261004.json",
+    ".local/niko-test/logs/source-collection-repository-root-20261004-r2.log",
+    ".local/niko-test/logs/source-collection-repository-root-20261004.log",
+    ".local/niko-test/logs/source-collection-repository-tracker-20261004.log"
+  ]
+}

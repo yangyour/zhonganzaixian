@@ -140,3 +140,6 @@ Playwright1.62.1官方Chrome Headless Shell151下载返回HTTP200却为195bytes�
 
 
 2026-10-04 API0.39备份计划草稿80真实HTTP通过，V24/草稿仓储与元数据历史已可用；这不解除B01原服务器路径、B02 OSS、B03真实浏览器或Q22设备命令/主机授权、Q28密钥组件。下一步草稿前端/原请求恢复不依赖SSH和存储，继续推进；enabled/effective始终false，正式计划202执行/默认模板自动纳入仍未完成，详见docs/backup-plan-drafts.md。
+
+
+2026-10-04备份计划草稿前端和原请求恢复已实现：模块26真实HTTP、页面24单测/18真实组件HTTP、1327Web通过。这里的组件是native jsdom，不是浏览器/CSS/手机/企微，B03仍待；不再把页面代码列为缺失。正式调度/设备SSH授权/OSS/KMS及自动默认模板纳入继续受相应门禁约束，草稿始终未生效。见docs/backup-plan-drafts.md。

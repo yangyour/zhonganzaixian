@@ -18,6 +18,7 @@ export const router = createRouter({
     { path: '/operational-comparison', name: 'operational-comparison', component: () => import('./pages/OperationalComparisonPage.vue'), meta: { title: '经营样本与人力对照', group: '管理', capability: 'operations:compare_explicit' } },
     { path: '/capacity-estimates', name: 'capacity-estimates', component: () => import('./pages/CapacityEstimatePage.vue'), meta: { title: '容量与缓冲估算', group: '管理', capability: 'capacity:estimate' } },
     { path: '/capability-catalog', name: 'capability-catalog', component: () => import('./pages/CapabilityCatalogPage.vue'), meta: { title: '代码能力声明核对', group: '管理', capability: 'configurations:read' } },
+    { path: '/tenant-inventory', name: 'tenant-inventory', component: () => import('./pages/TenantInventoryPage.vue'), meta: { title: '租户登记资源', group: '管理', role: 'padmin' } },
     { path: '/audit', name: 'audit', component: () => import('./pages/AuditPage.vue'), meta: { title: '审计日志', group: '管理', capability: 'audit:read' } },
     { path: '/:pathMatch(.*)*', redirect: '/assets' },
   ],
@@ -27,6 +28,7 @@ router.beforeEach(async to => {
   catch { if (to.name !== 'login') return { name: 'login' } }
   if (!session.value && to.name !== 'login') return { name: 'login' }
   if (session.value && to.name === 'login') return { name: 'assets' }
+  if (to.meta.role && session.value?.user.role !== to.meta.role) return { name: 'assets' }
   if (to.meta.capability && !can(String(to.meta.capability))) return { name: 'assets' }
   document.title = `${String(to.meta.title || '管理端')} · MOP`
 })

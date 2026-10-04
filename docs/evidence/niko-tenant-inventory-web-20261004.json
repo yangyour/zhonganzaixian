@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-04",
+  "environment": "niko-local-test",
+  "scope": "TENANT_INVENTORY_READONLY_PAGE",
+  "new_frontend_tests": 33,
+  "new_jsdom_component_tests": 8,
+  "web_tests": 927,
+  "typecheck": true,
+  "production_build": true,
+  "contract_tests": 73,
+  "contract_generation_consistent": true,
+  "actual_client_http_requests": 7,
+  "actual_authorized_tenant_rows": 2,
+  "getter_callback_snapshots_detached": true,
+  "actual_msp_cookie_with_forged_local_role_received_403": true,
+  "new_business_writes": 0,
+  "actual_browser_dom_tested": false,
+  "viewport_390px_tested": false,
+  "quota_coloring_implemented": false,
+  "effective_quotas": null,
+  "monitoring_verified": false,
+  "formal_acceptance": "NOT_RUN",
+  "log_sha256": {
+    "tenant-inventory-web-component-20261004.log": "9f567a9ac82862557ee869a686703ad7fde7c927716f14ba8731f13374802296",
+    "tenant-inventory-web-all-20261004.log": "b75418c7bda1ca5d9b051002a878cc6398da374f7164f103bf8645aac89868c4",
+    "tenant-inventory-web-build-20261004.log": "36d85bd6dc17dcd2257b420921a454d9f6349124e902bcb47035e71cad1d8178",
+    "tenant-inventory-web-contracts-20261004.log": "e2b9f867fafa9adc0f2e34bab05a0e8adda6d024f147c5da3590e4b614006e90",
+    "tenant-inventory-client-http-20261004.log": "8f5c0e3f357ba6fa52282b8b2541f330d3168477a3b437da8ffd0c58655cd0e6"
+  }
+}

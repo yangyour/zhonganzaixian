@@ -108,3 +108,17 @@ selectionFingerprint固定版本、长度前缀和字段顺序，绑定原规范
 没有改Job原收据结构、领取/准备写动作或V20字节；Worker不使用该公开进度投影。真实受理/领取/准备测试仍构造明确标识的合成任务与不透明测试bytes，并非OSS/XLSX本次联调。公开HTTP受理/进度接口、发布Worker、OSS和下载继续实现/等待验证；测试结果及失败历史见独立证据，不将该投影标作完整导出验收。
 
 本批6新增纯检查、7新增真实PG检查通过，聚焦60（39真实PG）通过；根2103报告/2090执行/706真实PG、13历史fixture跳过、6MinIO排除，113契约/136Python通过。首轮聚焦有1个纯断言失败：domain已编译后才追加零attempt不许有文件的守卫及对应断言，保留首次日志后按最终代码串行复跑聚焦及根全部通过。实际PG覆盖原收据保持、当前角色/权限/其他创建人拒绝、独立只读事务、准备后接管及真实结果集历史计数篡改503；没有篡改PG已提交行、提升权限或修改旧SQL。[进度证据](evidence/niko-export-progress-20261004.json)。
+
+## 2026-10-04 API0.42准备受理与本人进度
+
+新增POST /api/v1/asset-export-jobs，必须明确mode=PREPARE_ONLY_NO_PUBLICATION、expected_version=0和filters的type/status/site_id/query四个可空字段。只当前padmin/msp可用，复用assets:read且再核对内部角色；当前成员检查、CSRF、原key/规范body与受理/审计/原收据在同一既有事务中完成，回放前再次授权。202只返回不可变QUEUED首收据，不启动Worker、不发布OSS、不发下载或通知。空字符串与null按原筛选含义保留，不自行扩大查询。
+
+GET同路径按当前租户/当前创建人和受理角色/权限版本分页；GET /{id}返回原作业与独立只读进度，未知prepared=null和明确row_count=0分开，Worker存活null、下载false。保留原收据，不用当前进度覆盖旧202。未来发布必须另行明确授权，不能自动将本路由的准备请求当作发布授权。没有公开claim/prepare/下载/取消/重试状态变更入口；单任务准备Worker仍必须另行明确启动。缺V20结构或守卫使readiness返回503，live不受该检查影响；结构通过不等于OSS、Worker或业务导出已就绪。
+
+原100路径保持，新增2路径7schema；仅既有ReadinessResult增加明确准备能力边界。有限请求8192字节/64token/深度3、严格重复键/尾随JSON拒绝；查询2048原始字节/单参数64字符，未知/重复参数拒绝。具体根回归、HTTP与正常重启证据如下，正式验收仍NOT_RUN。
+
+16新增控制器+1readiness测试，47聚焦、根2120报告/2107执行/706真实PG、13历史fixture跳过/6MinIO排除通过；116契约、1452Web/85文件/类型构建、136Python通过。首次契约版本断言遗漏和Mockito重stub错误均保留日志后修正测试，未放宽业务守卫。API0.42固定包SHA875ee6c525f0e02976cf1dc64f2ca858c66b2787eb0b74b7596224351e0a3f76经正常拥有者守卫停启部署，56张旧表完整行等值核验先于6次OIDC会话刷新，不是崩溃验证。
+
+54真实HTTP（17×200、6×202、15×400、1×401、10×403、3×404、1×409、1×413）通过，其中20写请求含拒绝和回放，最终仅3个本人QUEUED/version0作业、3条accept审计，attempt/file/object全部0。当前角色、不同创建人404、原key回放/异体409、CSRF、输入与分页拒绝/继续页已验；读取既有准备描述仍没有下载权，成功只读窗口审计不变。另1次实际readiness GET通过完整schema，Worker存活仍null、发布未实现。没有启动后台Worker或实际OSS/下载/通知。
+
+首次HTTP在第1次session GET200后因测试脚本误读私有会话文件结构终止，零写/零作业/零待处理；保留原控制与失败证据，修正脚本加载真实session响应后，在明确验证首轮没有写入的门禁下独立r2通过。完成后的r2控制不可盲重跑。见[API证据](evidence/niko-export-api-20261004.json)、[首次未完成](evidence/niko-export-jobs-http-20261004.json)、[实际复测](evidence/niko-export-jobs-http-20261004-r2.json)。前端原请求恢复/页面继续，完整M3-7仍NOT_RUN。

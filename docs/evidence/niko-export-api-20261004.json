@@ -1,0 +1,119 @@
+{
+  "verified_at": "2026-10-04T22:03:16.419627+00:00",
+  "environment": "niko-local-test",
+  "api_version": "0.42.0",
+  "new_controller_tests": 16,
+  "new_readiness_tests": 1,
+  "focused_tests": 47,
+  "root_tests_reported": 2120,
+  "root_tests_executed": 2107,
+  "actual_postgresql_regressions": 706,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "web_tests": 1452,
+  "web_test_files": 85,
+  "typecheck": "PASS",
+  "build": "PASS",
+  "contracts": 116,
+  "python_tests": 136,
+  "failures": 0,
+  "errors": 0,
+  "api_paths": 102,
+  "api_schemas": 226,
+  "old_paths_unchanged": 100,
+  "old_schemas_changed": [
+    "ReadinessResult"
+  ],
+  "api_jar_sha256": "875ee6c525f0e02976cf1dc64f2ca858c66b2787eb0b74b7596224351e0a3f76",
+  "normal_owned_stack_restart": {
+    "legacy_tables_equal": 56,
+    "before_at": "2026-10-04T21:59:09.819088+00:00",
+    "verified_at": "2026-10-04T22:00:35.904236+00:00",
+    "compared_before_oidc_refresh": true,
+    "crash_test": false
+  },
+  "actual_http_requests": 54,
+  "actual_write_dispatches": 20,
+  "http_evidence": "docs/evidence/niko-export-jobs-http-20261004-r2.json",
+  "owned_postcheck": {
+    "owned_jobs": 3,
+    "all_queued_version_zero": true,
+    "prepared_files": 0,
+    "object_receipts": 0,
+    "errors": 0,
+    "attempt_rows": 0,
+    "accept_audits": 3,
+    "verified_at": "2026-10-04T22:01:31.790604+00:00"
+  },
+  "additional_readiness_get": {
+    "verified_at": "2026-10-04T22:01:59.153Z",
+    "status": 200,
+    "requests": 1,
+    "methods": [
+      "GET"
+    ],
+    "schema_valid": true,
+    "asset_exports": {
+      "schema_access_ready": true,
+      "mode": "PREPARE_ONLY_NO_PUBLICATION",
+      "worker_liveness": null,
+      "publication_status": "NOT_IMPLEMENTED",
+      "download_allowed": false
+    },
+    "production_ready": false
+  },
+  "worker_started": false,
+  "object_store_requests": 0,
+  "download_granted": false,
+  "new_migrations": 0,
+  "new_credentials": false,
+  "formal_acceptance": "NOT_RUN",
+  "failure_history": [
+    {
+      "stage": "initial_contract",
+      "failure": "Version assertion still0.41 while generator0.42; updated expected version,116pass."
+    },
+    {
+      "stage": "initial_focused_java",
+      "failure": "Mockito replay restub invoked earlier answer with null callback; changed test to doAnswer; final47focused and root pass."
+    },
+    {
+      "stage": "initial_http",
+      "evidence": "docs/evidence/niko-export-jobs-http-20261004.json",
+      "failure": "Harness assumed private session file contained nested session; first GET200 then TypeError, zero writes and zero jobs. Load actual session response and compare existing user_id. Guarded independent r2 preserves original empty control and first evidence."
+    }
+  ],
+  "previous_commit": {
+    "sha": "8dc58a392f89dbc2a86766591d059e91705ab3a6",
+    "ci_run": 37237618047,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "contracts/local-api.openapi.json": "847b480e4c7eceb2b2b766b7dbc679d4465a3b0b853130b0ac5b0b877c22ac6c",
+    "server/api/src/main/java/cn/mop/api/PlatformController.java": "1d3f28970ec202aa8989c805d460b32b9baf54cc31ee3a4408a6a4ee7d17c94e",
+    "server/api/src/test/java/cn/mop/api/PhotoReadinessTest.java": "8b136095d8ca9b03bd5dab559e1b75d4a2eb816e1a4324316b149f10998ff7ed",
+    "server/domain/src/main/java/cn/mop/domain/PlatformRepository.java": "2a0977fd674dd655aa30a04dc1e417de73bdfe3d8c98870129c2b7e53c2ad835",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresPlatformRepository.java": "9592f179d6544c7d451341db55fdc6d0d5da11a4ab8fc137df62c406e6844d63",
+    "tests/contracts.test.mjs": "0970f47a85c8cf4c16ef85d2c0bf77a15523520fce0b928156e6629e4fb69671",
+    "tools/build-api-contract.mjs": "31a2909938a6924c3f9f39b18477c7ce5ec3ab44d5a78d9f9410aa08395b23ca",
+    "server/api/src/main/java/cn/mop/api/AssetExportJobConfiguration.java": "3e130c98cee672c609251d6fd1223ae17b352fcf08854cf5f710fe4bef19af0f",
+    "server/api/src/main/java/cn/mop/api/AssetExportJobController.java": "a0a60861e3b2d3fe0bea74c80854dfa5fe987a765e7d162ea6b4daefa72b0f19",
+    "server/api/src/test/java/cn/mop/api/AssetExportJobControllerTest.java": "96c8de69f701bdd5bc27efcfd172a89b12f0afb46f9278228e7211f65be3dcff",
+    "tests/niko-asset-export-jobs-http.mjs": "54ca856dc985db5e3d78e24143226a8d1232567f3bd03b08a7fe1cc0ae672d36"
+  },
+  "logs_sha256": {
+    "export-api-build-20261004.log": "8f58b8c93c9a97e4bd85c98b76bd156a8deff96a93a05b7951c41aa0b31e764a",
+    "export-api-contracts-20261004.log": "376ba49d2927562fcd1e054310b0a99e42d3ae13583fb50cdc4776e039e7aa12",
+    "export-api-contracts-initial-20261004.log": "a677a5384f42b5240e12d0fe677f3b8c7b44ff49edd342def48fb5094ad7cec0",
+    "export-api-focused-20261004.log": "8422089c90ca25cc9cf0427b390f25700dc8f5306962778159d2cb5acd67a4ff",
+    "export-api-focused-r2-20261004.log": "c2fb6118ea168a40a5e470afbb47754e96a35088312b6ba9aabed40c534aa1c5",
+    "export-api-full-20261004.log": "d85396edc0212a34e47f2e64b6f8117e0ef12000448640c9cd2683fa47c74023",
+    "export-api-http-20261004.log": "6486d3e9ca9b256b2e1592738c3acbb019843f8ed5f9d2d93f8da307c650742d",
+    "export-api-http-r2-20261004.log": "42be1f59c1e7922e216f67f987edbf78315d08da4ef8bc24ad6298ac403eb8d6",
+    "export-api-postcheck-20261004.json": "9278ad712f48c353593cd6aa4992fc63dea2efe0f44136f3569bca09586fb81d",
+    "export-api-python-20261004.log": "8fcb765bb8e5184e9ba34cdaa0cf26fed6db50d76200bc28c222f8db971b1a98",
+    "export-api-readiness-20261004.json": "c7882b76843df7b8979af2fcc204e7047ffc373ca81a813dadbf67642c11db66",
+    "export-api-sessions-20261004.json": "7c40bbcfc72be85221a77be4438c69e180fdaed8864c58a73814f9cb9d8b41fb",
+    "export-api-web-20261004.log": "ef02c46708b3032a168eb2cfb15d56e6462bb582f6a9b8c73009aff179983f94"
+  }
+}

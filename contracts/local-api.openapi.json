@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.41.0",
+    "version": "0.42.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -22854,6 +22854,539 @@
           }
         }
       }
+    },
+    "/asset-export-jobs": {
+      "post": {
+        "operationId": "acceptAssetExportPreparation",
+        "summary": "明确仅准备模式：202只受理QUEUED，既有单任务Worker另行启动，未开放发布或下载",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetExportAcceptance"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin",
+          "msp"
+        ],
+        "x-mop-capabilities": [
+          "assets:read"
+        ],
+        "x-mop-object-scope": "CURRENT_CREATOR_TENANT",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-max-encoded-query-bytes": 2048,
+        "x-mop-storage-or-download-grant": false,
+        "x-mop-max-raw-body-bytes": 8192,
+        "x-mop-max-json-tokens": 64,
+        "x-mop-max-json-depth": 3,
+        "x-mop-current-membership-before-replay": true,
+        "x-mop-immutable-original-receipt": true,
+        "responses": {
+          "202": {
+            "description": "仅耐久受理；不代表Worker已执行、文件已准备或OSS已发布",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetExportReceipt"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOwnAssetExportJobs",
+        "summary": "当前内部创建人原作业列表；不自动轮询，不返回文件内容",
+        "x-mop-roles": [
+          "padmin",
+          "msp"
+        ],
+        "x-mop-capabilities": [
+          "assets:read"
+        ],
+        "x-mop-object-scope": "CURRENT_CREATOR_TENANT",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-max-encoded-query-bytes": 2048,
+        "x-mop-storage-or-download-grant": false,
+        "x-mop-paired-query-keys": [
+          "before_created_at",
+          "before_id"
+        ],
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                20
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_created_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetExportJobListResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/asset-export-jobs/{id}": {
+      "get": {
+        "operationId": "getOwnAssetExportProgress",
+        "summary": "同快照原受理与存储阶段描述；准备null与零行不同，文件访问未授权",
+        "x-mop-roles": [
+          "padmin",
+          "msp"
+        ],
+        "x-mop-capabilities": [
+          "assets:read"
+        ],
+        "x-mop-object-scope": "CURRENT_CREATOR_TENANT",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-max-encoded-query-bytes": 2048,
+        "x-mop-storage-or-download-grant": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetExportJobResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -23763,6 +24296,34 @@
                   "identity_binding_created"
                 ],
                 "additionalProperties": false
+              },
+              "asset_exports": {
+                "type": "object",
+                "properties": {
+                  "schema_access_ready": {
+                    "const": true
+                  },
+                  "mode": {
+                    "const": "PREPARE_ONLY_NO_PUBLICATION"
+                  },
+                  "worker_liveness": {
+                    "type": "null"
+                  },
+                  "publication_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "download_allowed": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "schema_access_ready",
+                  "mode",
+                  "worker_liveness",
+                  "publication_status",
+                  "download_allowed"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -23790,7 +24351,8 @@
               "manual_incidents",
               "manual_recovery",
               "capacity_scenarios",
-              "customer_contacts"
+              "customer_contacts",
+              "asset_exports"
             ],
             "additionalProperties": false
           },
@@ -45270,6 +45832,476 @@
                 }
               }
             ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "AssetExportFilters": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              null,
+              "router",
+              "switch",
+              "firewall",
+              "ap",
+              "wireless_controller",
+              "other"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              null,
+              "unknown",
+              "ok",
+              "problem",
+              "maintenance",
+              "disabled"
+            ]
+          },
+          "site_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 64
+          },
+          "query": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "type",
+          "status",
+          "site_id",
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "AssetExportAcceptance": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "const": 0
+          },
+          "mode": {
+            "const": "PREPARE_ONLY_NO_PUBLICATION"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/AssetExportFilters"
+          }
+        },
+        "required": [
+          "expected_version",
+          "mode",
+          "filters"
+        ],
+        "additionalProperties": false
+      },
+      "AssetExportReceipt": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "job_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "status": {
+                "const": "QUEUED"
+              },
+              "version": {
+                "const": 0
+              },
+              "mode": {
+                "const": "PREPARE_ONLY_NO_PUBLICATION"
+              },
+              "publication_status": {
+                "const": "NOT_IMPLEMENTED"
+              },
+              "download_allowed": {
+                "const": false
+              }
+            },
+            "required": [
+              "job_id",
+              "status",
+              "version",
+              "mode",
+              "publication_status",
+              "download_allowed"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "AssetExportJob": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accepted_permission_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "accepted_role": {
+            "enum": [
+              "padmin",
+              "msp"
+            ]
+          },
+          "input_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/AssetExportFilters"
+          },
+          "status": {
+            "enum": [
+              "QUEUED",
+              "RUNNING",
+              "RECONCILING_STORAGE",
+              "SUCCEEDED",
+              "FAILED"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "scope": {
+            "const": "CURRENT_CREATOR_TENANT"
+          },
+          "worker_liveness": {
+            "type": "null"
+          },
+          "object_verification": {
+            "const": "NOT_CHECKED_BY_PROGRESS_READER"
+          },
+          "publication_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "download_allowed": {
+            "const": false
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "created_by",
+          "accepted_permission_version",
+          "accepted_role",
+          "input_sha256",
+          "filters",
+          "status",
+          "version",
+          "created_at",
+          "updated_at",
+          "source",
+          "scope",
+          "worker_liveness",
+          "object_verification",
+          "publication_status",
+          "download_allowed"
+        ],
+        "additionalProperties": false
+      },
+      "AssetExportPreparedDescriptor": {
+        "type": "object",
+        "properties": {
+          "selection_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "file_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 16777216
+          },
+          "row_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "selection_sha256",
+          "file_sha256",
+          "size_bytes",
+          "row_count",
+          "generated_at"
+        ],
+        "additionalProperties": false
+      },
+      "AssetExportJobResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "created_by": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "accepted_permission_version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "accepted_role": {
+                "enum": [
+                  "padmin",
+                  "msp"
+                ]
+              },
+              "input_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "filters": {
+                "$ref": "#/components/schemas/AssetExportFilters"
+              },
+              "status": {
+                "enum": [
+                  "QUEUED",
+                  "RUNNING",
+                  "RECONCILING_STORAGE",
+                  "SUCCEEDED",
+                  "FAILED"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "scope": {
+                "const": "CURRENT_CREATOR_TENANT"
+              },
+              "worker_liveness": {
+                "type": "null"
+              },
+              "object_verification": {
+                "const": "NOT_CHECKED_BY_PROGRESS_READER"
+              },
+              "publication_status": {
+                "const": "NOT_IMPLEMENTED"
+              },
+              "download_allowed": {
+                "const": false
+              },
+              "attempts": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "prepared": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/AssetExportPreparedDescriptor"
+                  }
+                ]
+              },
+              "error_code": {
+                "enum": [
+                  null,
+                  "AUTHORIZATION_CHANGED",
+                  "SOURCE_UNAVAILABLE",
+                  "INPUT_LIMIT",
+                  "ENCODING_FAILED",
+                  "CONFIRMED_STORAGE_REJECTION"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "tenant_id",
+              "created_by",
+              "accepted_permission_version",
+              "accepted_role",
+              "input_sha256",
+              "filters",
+              "status",
+              "version",
+              "created_at",
+              "updated_at",
+              "source",
+              "scope",
+              "worker_liveness",
+              "object_verification",
+              "publication_status",
+              "download_allowed",
+              "attempts",
+              "prepared",
+              "error_code"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "AssetExportJobListResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "created_by": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "items": {
+                "type": "array",
+                "maxItems": 20,
+                "items": {
+                  "$ref": "#/components/schemas/AssetExportJob"
+                }
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_before_created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "next_before_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "page_size_limit": {
+                "const": 20
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "scope": {
+                "const": "CURRENT_CREATOR_TENANT"
+              },
+              "worker_liveness": {
+                "type": "null"
+              },
+              "publication_status": {
+                "const": "NOT_IMPLEMENTED"
+              },
+              "download_allowed": {
+                "const": false
+              }
+            },
+            "required": [
+              "tenant_id",
+              "created_by",
+              "items",
+              "has_more",
+              "next_before_created_at",
+              "next_before_id",
+              "page_size_limit",
+              "source",
+              "scope",
+              "worker_liveness",
+              "publication_status",
+              "download_allowed"
+            ],
+            "additionalProperties": false
           },
           "trace_id": {
             "type": "string"

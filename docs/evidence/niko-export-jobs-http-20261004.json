@@ -1,0 +1,31 @@
+{
+  "verified_at": "2026-10-04T22:00:38.626Z",
+  "environment": "niko-local-test",
+  "api_version": "0.42.0",
+  "actual_pg_oidc": true,
+  "fixture_adapter": false,
+  "http_requests": 1,
+  "write_requests": 0,
+  "statuses": {
+    "200": 1
+  },
+  "completed": false,
+  "pending_original_requests": 0,
+  "owned_jobs": 0,
+  "successful_readonly_window_audit_unchanged": false,
+  "actual_paging_followed": false,
+  "existing_prepared_descriptor_read": false,
+  "worker_started": false,
+  "object_store_requests": 0,
+  "download_requests": 0,
+  "notification_sent": false,
+  "new_identity_or_credentials": false,
+  "new_migrations": 0,
+  "browser": false,
+  "failure": {
+    "stage": "actual_sessions",
+    "type": "TypeError",
+    "details": "Incomplete; preserve original requests and receipts, no blind rerun."
+  },
+  "formal_acceptance": "NOT_RUN"
+}

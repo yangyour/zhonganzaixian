@@ -1,0 +1,9 @@
+{
+  "sha256": {
+    "V22__manual_inspection_worksheet_drafts.sql": "ab3f98ddf1c8803b8398347b9bc7d36af8d9741abdcb7591f29f1a2810791dc3"
+  },
+  "function_body_sha256": {
+    "mop_inspection_worksheet_head_guard": "ce87c51b501e8aae96529bb674ba5b3f9ff0da0693e7858076221a8462cfc7e3",
+    "mop_inspection_worksheet_content_guard": "4fcb087c6a00cf7dbfe6a59dbfa24a01da00e1a33cf1fd269241c9e5773f4177"
+  }
+}

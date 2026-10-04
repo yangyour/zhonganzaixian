@@ -26,6 +26,9 @@ $inspectionVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/
 $inspectionVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/InspectionTemplateSchemaVerifier.class'
 if (-not (Test-Path -LiteralPath $exportVerifierClass) -or (Get-Item -LiteralPath $exportVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $exportVerifierSource).LastWriteTimeUtc) { throw '台账导出结构核验器缺失或早于源码；先重新编译。' }
 if (-not (Test-Path -LiteralPath $inspectionVerifierClass) -or (Get-Item -LiteralPath $inspectionVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $inspectionVerifierSource).LastWriteTimeUtc) { throw '巡检模板结构核验器缺失或早于源码；先重新编译。' }
+$worksheetVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/InspectionWorksheetSchemaVerifier.java'
+$worksheetVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/InspectionWorksheetSchemaVerifier.class'
+if (-not (Test-Path -LiteralPath $worksheetVerifierClass) -or (Get-Item -LiteralPath $worksheetVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $worksheetVerifierSource).LastWriteTimeUtc) { throw '巡检执行单结构核验器缺失或早于源码；先重新编译。' }
 Assert-MopMigrationResources -ProjectRoot $projectRoot -PersistenceClasses $persistenceClasses
 $dependencies = (Get-Content -Raw -LiteralPath $classpathFile).Trim()
 if (-not $dependencies -or $dependencies.Contains("`n") -or $dependencies.Contains("`r")) { throw '迁移 classpath 无效。' }

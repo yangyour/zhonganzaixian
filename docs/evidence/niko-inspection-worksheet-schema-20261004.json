@@ -1,0 +1,84 @@
+{
+  "verified_at": "2026-10-04T10:17:11.310824+00:00",
+  "environment": "niko-local-test",
+  "component": "existing approved PostgreSQL 17.11",
+  "schema_version": 22,
+  "explicit_apply_count": 1,
+  "repeat_apply_count": 0,
+  "readonly_check_apply_count": 0,
+  "frozen_manifest": {
+    "sha256": {
+      "V22__manual_inspection_worksheet_drafts.sql": "ab3f98ddf1c8803b8398347b9bc7d36af8d9741abdcb7591f29f1a2810791dc3"
+    },
+    "function_body_sha256": {
+      "mop_inspection_worksheet_head_guard": "ce87c51b501e8aae96529bb674ba5b3f9ff0da0693e7858076221a8462cfc7e3",
+      "mop_inspection_worksheet_content_guard": "4fcb087c6a00cf7dbfe6a59dbfa24a01da00e1a33cf1fd269241c9e5773f4177"
+    }
+  },
+  "old_business_tables_count": 33,
+  "old_business_tables_equal": true,
+  "equality_window": "migration only, before full root regression",
+  "equality_only_not_authenticity": true,
+  "new_tables_after_rollback_tests": {
+    "mop_inspection_worksheet": {
+      "rows": 0,
+      "equality_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_worksheet_revision": {
+      "rows": 0,
+      "equality_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "new_real_runtime_postgres_tests": 18,
+  "migration_policy_tests": 27,
+  "python_tests": 133,
+  "contracts": 80,
+  "contract_generation": "PASS",
+  "root_tests": {
+    "reported": 1712,
+    "executed": 1699,
+    "real_postgres": 533,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "windows_native_policy": {
+    "status": "PENDING_POST_COMMIT_CI",
+    "database_operations": 0
+  },
+  "api_contract_version": "0.35.0",
+  "worksheet_repository_implemented": false,
+  "worksheet_http_implemented": false,
+  "worksheet_ui_tested": false,
+  "quarterly_report_implemented": false,
+  "worksheets_seeded": false,
+  "evidence_binding_implemented": false,
+  "production_approval": "UNVERIFIED",
+  "original_server_migrated": false,
+  "new_identity_or_membership_for_this_schema": false,
+  "root_regression_may_write_existing_synthetic_diagnostic_identities": true,
+  "api_worker_automatic_migration": false,
+  "formal_acceptance": "NOT_RUN",
+  "first_python_attempt": {
+    "status": "FAILED",
+    "reason": "system Python lacks paramiko; two test modules failed to import",
+    "resolved": "existing project venv; all133 tests passed"
+  },
+  "logs": [
+    ".local/niko-test/logs/worksheet-schema-after-20261004.log",
+    ".local/niko-test/logs/worksheet-schema-apply-first-20261004.log",
+    ".local/niko-test/logs/worksheet-schema-before-20261004.log",
+    ".local/niko-test/logs/worksheet-schema-check-20261004.log",
+    ".local/niko-test/logs/worksheet-schema-contracts-20261004.log",
+    ".local/niko-test/logs/worksheet-schema-focused-first-20261004.log",
+    ".local/niko-test/logs/worksheet-schema-policy-first-20261004.log",
+    ".local/niko-test/logs/worksheet-schema-postcheck-20261004.json",
+    ".local/niko-test/logs/worksheet-schema-postroot-20261004.json",
+    ".local/niko-test/logs/worksheet-schema-precheck-20261004.log",
+    ".local/niko-test/logs/worksheet-schema-python-20261004.log",
+    ".local/niko-test/logs/worksheet-schema-python-venv-20261004.log",
+    ".local/niko-test/logs/worksheet-schema-repeat-20261004.log",
+    ".local/niko-test/logs/worksheet-schema-root-20261004.log"
+  ]
+}

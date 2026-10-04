@@ -6,7 +6,7 @@ function Get-MopMigrationMode {
         'asset-metadata' = '--apply-asset-metadata'; 'internal-notes' = '--apply-internal-notes'
         'ticket-comments' = '--apply-ticket-comments'; 'working-calendars' = '--apply-working-calendars'
         'manual-incidents' = '--apply-manual-incidents'; 'manual-recoveries' = '--apply-manual-recoveries'
-        'manual-warranty' = '--apply-manual-warranty'; 'capacity-scenarios' = '--apply-capacity-scenarios'; 'customer-contacts' = '--apply-customer-contacts'; 'contact-imports' = '--apply-contact-imports'; 'contact-import-fix' = '--apply-contact-import-fix'; 'asset-exports' = '--apply-asset-exports'; 'inspection-templates' = '--apply-inspection-templates'
+        'manual-warranty' = '--apply-manual-warranty'; 'capacity-scenarios' = '--apply-capacity-scenarios'; 'customer-contacts' = '--apply-customer-contacts'; 'contact-imports' = '--apply-contact-imports'; 'contact-import-fix' = '--apply-contact-import-fix'; 'asset-exports' = '--apply-asset-exports'; 'inspection-templates' = '--apply-inspection-templates'; 'inspection-worksheets' = '--apply-inspection-worksheets'
     }
     $requested = [int][bool]$ApplyPhotos + [int][bool]$ApplyAssetImports + [int](-not [string]::IsNullOrEmpty($ApplyFeature))
     if ($requested -gt 1) { throw '每次只能显式执行一个功能迁移，不能组合 Apply 参数。' }
@@ -25,7 +25,7 @@ function Assert-MopMigrationResources {
     $manifests = @('frozen-migrations.json', 'frozen-dependency-migration.json', 'frozen-worklog-migration.json',
         'frozen-asset-metadata-migration.json', 'frozen-internal-note-migration.json', 'frozen-ticket-comment-migration.json',
         'frozen-working-calendar-migration.json', 'frozen-manual-incident-migration.json',
-        'frozen-manual-recovery-migration.json', 'frozen-manual-warranty-migration.json', 'frozen-capacity-scenario-migration.json', 'frozen-customer-contact-migration.json', 'frozen-contact-import-migration.json', 'frozen-contact-import-fix-migration.json', 'frozen-asset-export-migration.json', 'frozen-inspection-template-migration.json')
+        'frozen-manual-recovery-migration.json', 'frozen-manual-warranty-migration.json', 'frozen-capacity-scenario-migration.json', 'frozen-customer-contact-migration.json', 'frozen-contact-import-migration.json', 'frozen-contact-import-fix-migration.json', 'frozen-asset-export-migration.json', 'frozen-inspection-template-migration.json', 'frozen-inspection-worksheet-migration.json')
     $expected = @{}
     $versions = @{}
     foreach ($file in $manifests) {
@@ -33,12 +33,12 @@ function Assert-MopMigrationResources {
         foreach ($entry in $manifest.sha256.PSObject.Properties) {
             if ($entry.Name -cnotmatch '^V([1-9][0-9]?)__[a-z0-9_]+\.sql$' -or $entry.Value -cnotmatch '^[a-f0-9]{64}$') { throw '冻结清单条目无效。' }
             $version = [int]([regex]::Match($entry.Name, '^V([0-9]+)__').Groups[1].Value)
-            if ($version -gt 21 -or $versions.ContainsKey($version) -or $expected.ContainsKey($entry.Name)) { throw '冻结迁移版本重复或超出已审核范围。' }
+            if ($version -gt 22 -or $versions.ContainsKey($version) -or $expected.ContainsKey($entry.Name)) { throw '冻结迁移版本重复或超出已审核范围。' }
             $versions[$version] = $true
             $expected[$entry.Name] = $entry.Value
         }
     }
-    if ($expected.Count -ne 21) { throw '冻结迁移必须完整覆盖 V1–V21。' }
+    if ($expected.Count -ne 22) { throw '冻结迁移必须完整覆盖 V1–V22。' }
     foreach ($directory in @((Join-Path $ProjectRoot 'server/persistence/src/main/resources/db/migration'), (Join-Path $PersistenceClasses 'db/migration'))) {
         $files = @(Get-ChildItem -LiteralPath $directory -File -ErrorAction Stop)
         if ($files.Count -ne $expected.Count) { throw '源码或构建迁移集合与冻结清单不一致。' }

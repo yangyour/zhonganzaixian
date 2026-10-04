@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Pure CLI policy tests. No network, database, migration, or alternate component is used. */
 class TestSchemaMigrationTest {
-    private static final List<String> SCRIPTS=List.of("V1__remote_test_platform.sql","V2__tenant_configuration_revisions.sql","V3__configuration_review_test_identity.sql","V4__durable_customer_report_registration.sql","V5__durable_report_photos.sql","V6__asset_import_sources_and_mapping.sql","V7__asset_dependency_draft_revisions.sql","V8__manual_worklog_revisions.sql","V9__manual_asset_metadata_revisions.sql","V10__immutable_internal_ticket_notes.sql","V11__immutable_ticket_comments.sql","V12__unpublished_working_calendar_drafts.sql","V13__immutable_manual_incident_registrations.sql","V14__immutable_manual_recovery_confirmations.sql","V15__manual_warranty_details.sql","V16__immutable_capacity_scenario_drafts.sql","V17__customer_contact_revisions.sql","V18__durable_contact_import_jobs.sql","V19__contact_import_generated_hash_guard.sql","V20__durable_asset_export_jobs.sql","V21__inspection_template_revisions.sql");
+    private static final List<String> SCRIPTS=List.of("V1__remote_test_platform.sql","V2__tenant_configuration_revisions.sql","V3__configuration_review_test_identity.sql","V4__durable_customer_report_registration.sql","V5__durable_report_photos.sql","V6__asset_import_sources_and_mapping.sql","V7__asset_dependency_draft_revisions.sql","V8__manual_worklog_revisions.sql","V9__manual_asset_metadata_revisions.sql","V10__immutable_internal_ticket_notes.sql","V11__immutable_ticket_comments.sql","V12__unpublished_working_calendar_drafts.sql","V13__immutable_manual_incident_registrations.sql","V14__immutable_manual_recovery_confirmations.sql","V15__manual_warranty_details.sql","V16__immutable_capacity_scenario_drafts.sql","V17__customer_contact_revisions.sql","V18__durable_contact_import_jobs.sql","V19__contact_import_generated_hash_guard.sql","V20__durable_asset_export_jobs.sql","V21__inspection_template_revisions.sql","V22__manual_inspection_worksheet_drafts.sql");
     private static List<TestSchemaMigration.Entry> entries(boolean photosApplied,boolean importsApplied) {
         return entries(photosApplied,importsApplied,false);
     }
@@ -222,5 +222,13 @@ class TestSchemaMigrationTest {
         for(int i=17;i<21;i++){var old=all.get(i);all.set(i,new TestSchemaMigration.Entry(old.version(),old.script(),old.type(),MigrationState.SUCCESS,true,true,old.checksum()));}
         assertEquals(TestSchemaMigration.Plan.INSPECTION_TEMPLATES_APPLIED,TestSchemaMigration.inspect(all));
         var last=all.get(20);all.set(20,new TestSchemaMigration.Entry(last.version(),last.script(),last.type(),last.state(),true,false,last.checksum()));assertThrows(IllegalStateException.class,()->TestSchemaMigration.inspect(all));
+    }
+
+    @Test void worksheetDraftsRequireExplicitV22AfterFrozenTemplateHistory() throws Exception {
+        assertEquals(TestSchemaMigration.Mode.APPLY_INSPECTION_WORKSHEETS,TestSchemaMigration.requestedMode(new String[]{"--apply-inspection-worksheets"}));assertTrue(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_INSPECTION_WORKSHEETS,TestSchemaMigration.Plan.INSPECTION_TEMPLATES_APPLIED));assertFalse(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_INSPECTION_WORKSHEETS,TestSchemaMigration.Plan.INSPECTION_WORKSHEETS_APPLIED));
+        for(var plan:TestSchemaMigration.Plan.values())if(plan.schemaVersion<21)assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_INSPECTION_WORKSHEETS,plan));InspectionWorksheetSchemaVerifier.resource();assertEquals(2,InspectionWorksheetSchemaVerifier.FUNCTIONS.size());
+    }
+    @Test void worksheetHistoryCannotSkipOrChangeItsChecksum() {
+        var all=entries(true,true,true,true,true,true,true,true,true,true,true,true,true);for(int i=17;i<22;i++){var old=all.get(i);all.set(i,new TestSchemaMigration.Entry(old.version(),old.script(),old.type(),MigrationState.SUCCESS,true,true,old.checksum()));}assertEquals(TestSchemaMigration.Plan.INSPECTION_WORKSHEETS_APPLIED,TestSchemaMigration.inspect(all));var last=all.get(21);all.set(21,new TestSchemaMigration.Entry(last.version(),last.script(),last.type(),last.state(),true,false,last.checksum()));assertThrows(IllegalStateException.class,()->TestSchemaMigration.inspect(all));
     }
 }

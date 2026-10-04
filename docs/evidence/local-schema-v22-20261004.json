@@ -1,0 +1,47 @@
+{
+  "verified_at": "2026-10-04T10:49:23.7003168Z",
+  "environment": "designated-server-via-SSH-from-Windows",
+  "source_baseline": "38b7824",
+  "postgresql": "17.9 (Ubuntu 17.9-1.pgdg22.04+1)",
+  "schema_before": 19,
+  "schema_after": 22,
+  "features": [
+    {
+      "apply": 1,
+      "repeat": 0,
+      "version": 20,
+      "feature": "asset-exports"
+    },
+    {
+      "apply": 1,
+      "repeat": 0,
+      "version": 21,
+      "feature": "inspection-templates"
+    },
+    {
+      "apply": 1,
+      "repeat": 0,
+      "version": 22,
+      "feature": "inspection-worksheets"
+    }
+  ],
+  "final_read_only_migrations": 0,
+  "prior_business_tables": 41,
+  "all_prior_rows_and_hashes_unchanged": true,
+  "total_business_tables_after": 48,
+  "frozen_source_and_compiled_sql": "V1-V22_MATCH_REVIEWED_MANIFESTS",
+  "migration_policy_isolated_checks": 85,
+  "backup": {
+    "database": "mop_test",
+    "format": "PGDMP",
+    "size_bytes": 1360925,
+    "sha256": "0669c143ebcdb6636a752a6330fdb1c47bb9e559c7aceea936e4875395c3bdda",
+    "restored": false,
+    "path": "ignored_local_directory"
+  },
+  "runtime_business_validation": "SEPARATE_PENDING",
+  "new_components": 0,
+  "shared_service_lifecycle_changed": false,
+  "credentials_output": false,
+  "formal_acceptance": "NOT_RUN"
+}

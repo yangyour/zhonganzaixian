@@ -19,6 +19,7 @@ class AssetExportPreparationProcessorTest {
     Current current(){return new Current(new Snapshot(new Asset(UUID.randomUUID().toString(),tenant.toString(),"=literal","router","192.0.2.1","site-a","unknown","draft","manual",null,"NOT_OBSERVED",1,time,time,null,null),null,null),null,null,List.of());}
     AssetLedgerWorkbook.Row row(UUID id,String value){var cells=new EnumMap<Column,String>(Column.class);for(Column c:Column.values())cells.put(c,null);cells.put(Column.NAME,value);return new AssetLedgerWorkbook.Row(tenant,id,cells,null);}
     class Jobs implements AssetExportJobRepository {
+        public Progress progress(AssetExportJobRepository.Access a,String id){throw new AssertionError("Worker must not use the public progress projection");}
         int loads,prepares;Claim claim=new Claim(UUID.randomUUID().toString(),"unit-stage",1,1,time.plusSeconds(60),command(),false);AssetExportPreparedFile retained;java.util.function.UnaryOperator<Work> transform=java.util.function.UnaryOperator.identity();
         public Work loadWork(Claim offered){loads++;var current=retained==null?claim:new Claim(claim.jobId(),claim.worker(),claim.fencingToken(),2,claim.leaseUntil(),claim.command(),claim.storageReconciliationRequired());return transform.apply(new Work(current,time.plusMillis(loads),retained));}
         public Work prepare(Claim offered,AssetExportPreparedFile file){prepares++;retained=file;claim=new Claim(claim.jobId(),claim.worker(),1,2,claim.leaseUntil(),claim.command(),false);return new Work(claim,time.plusMillis(loads+1),file);}

@@ -1,0 +1,72 @@
+{
+  "verified_at": "2026-10-04T21:48:19.499816+00:00",
+  "scope": "CURRENT_CREATOR_READONLY_EXPORT_PROGRESS_DESCRIPTORS",
+  "environment": "niko-local-test",
+  "new_pure_tests": 6,
+  "new_postgresql_tests": 7,
+  "focused_tests": 60,
+  "focused_postgresql_tests": 39,
+  "root_tests_reported": 2103,
+  "root_tests_executed": 2090,
+  "actual_postgresql_regressions": 706,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "failures": 0,
+  "errors": 0,
+  "contracts": 113,
+  "contract_generation": "PASS",
+  "python_tests": 136,
+  "current_creator_current_membership_rechecked": true,
+  "readonly_repeatable_read_snapshot": true,
+  "attempt_history_count_and_version_checked": true,
+  "no_preparation_distinct_from_explicit_zero_rows": true,
+  "original_receipt_unchanged": true,
+  "progress_reads_do_not_write_audit": true,
+  "prepared_bytes_returned": false,
+  "object_identity_returned": false,
+  "lease_owner_or_trace_returned": false,
+  "object_store_verified": false,
+  "download_authorized": false,
+  "worker_liveness": null,
+  "controlled_actual_result_damage_rejected": true,
+  "actual_oss_requests": 0,
+  "new_public_api": false,
+  "api_contract_changed": false,
+  "api_version": "0.41.0",
+  "backend_restarted": false,
+  "new_migrations": 0,
+  "new_credentials": false,
+  "formal_acceptance": "NOT_RUN",
+  "test_data_note": "Real repository tests create clearly synthetic jobs and opaque test bytes; no claim of zero writes for test setup or actual XLSX/OSS validation in this batch.",
+  "failure_history": [
+    {
+      "stage": "focused_first",
+      "pure_failures": 1,
+      "cause": "Domain compiled before subsequent zero-attempt/prepared-file guard and matching test edit; final sources rerun serially.",
+      "first_log_preserved": true,
+      "final_focused": "PASS",
+      "final_root": "PASS"
+    }
+  ],
+  "previous_commit": {
+    "sha": "614ae22ace46337f062e24164135e215304d8497",
+    "ci_run": 37236938804,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "server/asset-export/src/test/java/cn/mop/assetexport/AssetExportPreparationProcessorTest.java": "8acd1aa01ffa25c828ff6e3c9e17ca09f3f0d5b7553637315eb585540ee3ad3f",
+    "server/domain/src/main/java/cn/mop/domain/assetexport/AssetExportJobRepository.java": "cd0b859a08ce9ece821d5f590cc47bfcaab63b6347384b3ba49a9aeb145ed41d",
+    "server/export-preparation-worker/src/test/java/cn/mop/exportworker/ExportPreparationWorkerRuntimeTest.java": "049bce59ce7a03f4f011935ae52b5788ad682bd80ef9fbb1ae858aadd8a1bfd4",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresAssetExportRepository.java": "1e12f9dc7fc05787216aae90e780c3b1efb53b7f1d2529a09dd84ec628745da3",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresAssetExportPrepareIntegrationTest.java": "c86a75589ae7ab2d5ecdb6f6b0625bb11e3f05169009ca88049830ff64a972ad",
+    "server/api/src/test/java/cn/mop/api/AssetExportProgressTest.java": "811eaff8eb5195ca89195fe91137feb8053e8c29a143c5b2d6272334e768ebf5"
+  },
+  "logs_sha256": {
+    "export-progress-contract-generation-20261004.log": "524c5b404a0c5b14953f3fd548babe2b07c4023fbe5020cabbfa145c8cf1e6bf",
+    "export-progress-contracts-20261004.log": "b3572e18dbde44d0a3d4ab8e396b1070fe55fbade379d626dcc63167c48cb9df",
+    "export-progress-focused-20261004.log": "b86ae6467a33c97d2e8168ccae4acc9ce7a92275585e182ffe461f250ccc3a94",
+    "export-progress-focused-r2-20261004.log": "66a5d535de11557693a0a2d274d87587eadeedccb248b11101022e7be78938d0",
+    "export-progress-full-20261004.log": "866859a46c672173c158c01523425490411872bd3deb83868d6c003dab2bb37d",
+    "export-progress-python-20261004.log": "6a82c7b36b5312d54e930074acfe039bac75b428fe863a0b94bc6cf4a7bf62ed"
+  }
+}

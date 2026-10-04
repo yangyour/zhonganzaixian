@@ -404,6 +404,7 @@
         "docs/asset-export-jobs.md",
         "docs/asset-export-snapshot.md",
         "docs/asset-ledger-export-encoding.md",
+        "docs/evidence/niko-export-progress-20261004.json",
         "docs/export-preparation-worker.md"
       ],
       "external_references_unchecked": 0,
@@ -1361,6 +1362,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "752838715d556dcf16120f5981eebad7bed63742ad26ceeb806d325710ba5788"
+    "doc/development/07_合同逐项开发追踪.md": "577ef31bddfd976604e897069de7600937fe8db638a8202c02efe2d6c5b545e6"
   }
 }

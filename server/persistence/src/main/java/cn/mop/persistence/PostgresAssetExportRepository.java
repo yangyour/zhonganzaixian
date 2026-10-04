@@ -37,6 +37,31 @@ public final class PostgresAssetExportRepository implements AssetExportJobReposi
         }catch(SQLException failure){throw unavailable(failure);}
     }
     @Override public Job get(Access a,String id){String canonical=uuid(id);return readonly(a,(c,role)->read(c,a,role,canonical));}
+    @Override public Progress progress(Access a,String id){
+        String canonical=uuid(id);
+        return readonly(a,(c,role)->{
+            Job job=read(c,a,role,canonical);
+            // Only descriptors are selected: never materialize file bytes, object identity, lease owner or trace.
+            String sql="SELECT version,fencing_token,error_code,(file_bytes IS NOT NULL) AS prepared,file_sha256,file_size,selection_sha256,row_count,generated_at,(SELECT count(*) FROM public.mop_asset_export_attempt h WHERE h.tenant_id=j.tenant_id AND h.job_id=j.id) AS history_count FROM public.mop_asset_export_job j WHERE tenant_id=?::uuid AND created_by=?::uuid AND id=?::uuid";
+            try(var statement=statement(c,sql)){
+                statement.setString(1,a.tenantId());statement.setString(2,a.actorId());statement.setString(3,canonical);
+                try(var r=statement.executeQuery()){
+                    if(!r.next())throw corrupt();
+                    try{
+                        int attempts=r.getInt("fencing_token");
+                        if(r.getLong("version")!=job.version()||r.getLong("history_count")!=attempts)throw corrupt();
+                        AssetExportJobState.Encoding prepared=null;
+                        if(r.getBoolean("prepared")){
+                            if(r.getObject("file_size")==null||r.getObject("row_count")==null)throw corrupt();
+                            prepared=new AssetExportJobState.Encoding(r.getString("selection_sha256"),r.getString("file_sha256"),r.getLong("file_size"),r.getInt("row_count"),time(r,"generated_at"));
+                        }else if(r.getString("file_sha256")!=null||r.getObject("file_size")!=null||r.getString("selection_sha256")!=null||r.getObject("row_count")!=null||r.getObject("generated_at")!=null)throw corrupt();
+                        String error=r.getString("error_code");
+                        return new Progress(job,attempts,prepared,error==null?null:AssetExportJobState.Failure.valueOf(error));
+                    }catch(RuntimeException malformed){throw corrupt();}
+                }
+            }
+        });
+    }
     @Override public List<Job> list(Access a,int limit,Instant beforeCreatedAt,String beforeId){
         if(limit<1||limit>101||(beforeCreatedAt==null)!=(beforeId==null))throw invalid();String cursor=beforeId==null?null:uuid(beforeId);
         if(beforeCreatedAt!=null&&(beforeCreatedAt.getNano()%1000000!=0||beforeCreatedAt.isBefore(Instant.parse("0001-01-01T00:00:00Z"))||beforeCreatedAt.isAfter(Instant.parse("9999-12-31T23:59:59.999Z"))))throw invalid();

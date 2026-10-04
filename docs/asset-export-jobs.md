@@ -98,3 +98,13 @@ selectionFingerprint固定版本、长度前缀和字段顺序，绑定原规范
 根1589报告1576执行含482PG、13历史跳过、6MinIO排除，73契约通过。这里的处理器在测试JVM中运行，尚未启动独立Worker进程或开放HTTP/OSS/下载/通知；结果仍是准备文件，不能当整份导出已发布。[链路证据](evidence/niko-export-preparation-processor-20261004.json)。
 
 后续独立单任务准备Worker已完成4个真实JVM及处理中SIGKILL恢复验证，见[独立Worker说明](export-preparation-worker.md)；它仍不上传OSS或发布文件。
+
+## 2026-10-04 面向本人进度的独立只读投影
+
+新增progress读取：复用当前内部成员/权限版本、当前租户和原创建人约束，在独立READ ONLY REPEATABLE READ事务内读取原受理与准备描述。只返回原Job、已存attempt数量、可空文件描述和受限错误枚举；不返回文件bytes、对象UUID、租约持有人、trace、命令bytes、签名URL或下载地址。未准备的描述为null，实际准备空结果的row_count=0是不同事实；两者不能混成“零行导出成功”。
+
+读取核对fencing_token与真实历史行数相同、同快照逻辑版本、描述完整性/生成时间、状态与错误匹配。QUEUED不能带准备结果；RUNNING可未准备或已准备；RECONCILING_STORAGE/SUCCEEDED必须有准备描述；失败保留已准备描述供调查。状态名仍是数据库所存阶段，不是本次读取对OSS进行验证。workerLiveness为null、downloadAllowed=false、objectVerification=NOT_CHECKED_BY_PROGRESS_READER；不推断进程在线、上传成功或授予文件权限。
+
+没有改Job原收据结构、领取/准备写动作或V20字节；Worker不使用该公开进度投影。真实受理/领取/准备测试仍构造明确标识的合成任务与不透明测试bytes，并非OSS/XLSX本次联调。公开HTTP受理/进度接口、发布Worker、OSS和下载继续实现/等待验证；测试结果及失败历史见独立证据，不将该投影标作完整导出验收。
+
+本批6新增纯检查、7新增真实PG检查通过，聚焦60（39真实PG）通过；根2103报告/2090执行/706真实PG、13历史fixture跳过、6MinIO排除，113契约/136Python通过。首轮聚焦有1个纯断言失败：domain已编译后才追加零attempt不许有文件的守卫及对应断言，保留首次日志后按最终代码串行复跑聚焦及根全部通过。实际PG覆盖原收据保持、当前角色/权限/其他创建人拒绝、独立只读事务、准备后接管及真实结果集历史计数篡改503；没有篡改PG已提交行、提升权限或修改旧SQL。[进度证据](evidence/niko-export-progress-20261004.json)。

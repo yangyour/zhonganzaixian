@@ -13,6 +13,7 @@ class ExportPreparationWorkerRuntimeTest {
     final Instant time=Instant.parse("2026-10-04T00:00:00Z");
     ExportPreparationWorkerSettings settings(){return ExportPreparationWorkerSettings.from(ExportPreparationWorkerSettingsTest.args(),ExportPreparationWorkerSettingsTest.valid()::get);}
     class Jobs implements AssetExportJobRepository {
+        public Progress progress(AssetExportJobRepository.Access a,String id){throw new AssertionError("Worker must not use the public progress projection");}
         String target;int nextCalls,loads,prepares;boolean empty;DomainException failure;AssetExportPreparedFile retained;
         final Command command=new Command(new AssetExportJobState.Access(UUID.randomUUID(),UUID.randomUUID(),1,"msp",true),new Filters(null,null,null,null));Claim current;
         public Optional<Claim> claim(String id,String worker,Duration lease){target=id;if(failure!=null)throw failure;if(empty)return Optional.empty();current=new Claim(id,worker,retained==null?1:2,retained==null?1:3,time.plus(lease),command,retained!=null);return Optional.of(current);}

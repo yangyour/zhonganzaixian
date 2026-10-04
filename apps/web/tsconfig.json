@@ -5,5 +5,5 @@
     "noEmit": true, "isolatedModules": true, "resolveJsonModule": true,
     "esModuleInterop": true, "skipLibCheck": true, "types": ["vite/client", "node"]
   },
-  "include": ["src/**/*.ts", "src/**/*.vue", "vite.config.ts", "tests/**/*.ts"]
+  "include": ["src/**/*.ts", "src/**/*.vue", "vite.config.ts", "tests/**/*.ts", "qa/**/*.ts", "vitest.niko-source-page.config.ts"]
 }

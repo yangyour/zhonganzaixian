@@ -197,3 +197,8 @@ V1–V14全部字节冻结，V14 SHA256为39be55d8759de87c6e2b8f85b3958c60be24ae
 ## 2026-10-04 API0.38来源集合HTTP入口
 
 V23已独立冻结，本轮仅只读check0执行，启动不迁移。正常退出自有旧runner后复用PG/KC数据目录/私有配置，固定API SHA42f6174a56dc40ba2efa4e2ad46a746733db381304a914263763973b9443ca89，11表在登录前全行等值。6既有OIDC登录后tests/niko-inspection-source-collection-http.mjs完成73请求/3不可变集合/1执行单1模板归档；原控制文件和成功证据已存在，不盲目重跑、不删除旧证据或集合。runtime账号仅追加/读取集合，summary不是正文校验，详情另核五层SHA；未知规则仍null且不生成正式报告。创建、列表、详情与ready契约见API0.38及docs/inspection-report-sources.md。
+
+
+## 2026-10-04 集合页面显式组件HTTP测试
+
+生产Page/Picker在`apps/web/qa/inspection-source-collection-page.http.ts`中用原生jsdom控件连接既有API；必须显式MOP_RUN_NIKO_SOURCE_PAGE_HTTP=true并选`--config vitest.niko-source-page.config.ts`，默认单元测试不收集该*.http.ts，不能将其称为真实浏览器。首次在途等待断言失败的控制已有reconciled标记和同key/body恢复证据；显式MOP_NIKO_SOURCE_PAGE_RETRY_AFTER_WAIT_FIX仅允许旧请求已恢复后使用独立r2控制。当前两控制与最终证据已经存在，不得盲目再运行或覆盖；新验证需另建明确测试场景。首轮/r2共2不可变合成集合保留，成功r2场景为真实HTTP11次/1创建审计，首轮失败及另3次原请求恢复分别留证；真实CSS/手机/WeChat仍NOT_RUN。

@@ -1,0 +1,19 @@
+{
+  "verified_at": "2026-10-04T16:11:36.209Z",
+  "environment": "niko-local-test",
+  "failed_attempt": "Component test matched in-flight uncertain UI before network response was observed, then asserted known collection prematurely; cleanup aborted the pending client request",
+  "scope": "RECONCILE_FIRST_COMPONENT_TEST_ORIGINAL_REQUEST_NOT_PAGE_ACCEPTANCE",
+  "existing_receipts_before_retry": 1,
+  "read_only_receipt_precheck": true,
+  "original_key_body_retried_without_change": true,
+  "original_receipt_confirmed": true,
+  "same_preexisting_collection_returned": true,
+  "full_five_hash_detail_verified": true,
+  "http_requests": 3,
+  "retained_synthetic_collections": 1,
+  "pending_requests": 0,
+  "original_component_test_completed": false,
+  "permanent_deletes": 0,
+  "report_published": false,
+  "formal_acceptance": "NOT_RUN"
+}

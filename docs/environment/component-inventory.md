@@ -245,3 +245,8 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 ## 2026-10-04 niko来源集合API0.38
 
 继续复用既有PG17.11/Keycloak26.2.4，普通拥有者守卫重启到固定API0.38工件，11表完整行在再次OIDC前等值（含88既有集合）。6登录/73HTTP通过，3新增合成集合留存且全未发布，父1执行单/1模板已归档；未改端口、身份、网络、存储或迁移。只读V23结构检查0执行。原服务器未操作，新集合UI及B03浏览器路径仍未验，季度规则待确认；见../evidence/niko-inspection-source-collection-api-20261004.json。
+
+
+## 2026-10-04 集合页面组件真实HTTP边界
+
+显式jsdom/Vue组件场景通过11次真实PG/OIDC HTTP（API0.38），不是浏览器导航或CSS/手机验收；未安装新组件、启动Vite、改地址/代理或绕过原URL策略。首轮在途等待断言失败造成未知请求，只读PG及原key/body恢复后保留该1集合，独立r2另1集合；无新父对象/账号/迁移/存储/删除。B03仍未解除，原Windows旧页面证据不能替代。见../evidence/niko-inspection-source-collection-page-20261004.json。

@@ -1,0 +1,123 @@
+{
+  "verified_at": "2026-10-04T16:22:26.877189+00:00",
+  "scope": "EXPLICIT_INSPECTION_SOURCE_COLLECTION_PAGE_AND_PICKER",
+  "environment": "niko-local-test",
+  "api_version": "0.38.0",
+  "new_jsdom_sfc_tests": 23,
+  "web_tests": 1260,
+  "web_test_files": 75,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts": 96,
+  "contract_generation": "PASS",
+  "api_contract_unchanged": true,
+  "new_backend_test_execution": false,
+  "previous_client_ci": {
+    "commit": "17a406e86fb1e19c04d3d4b5ce2a3b4ba9bd83f4",
+    "run_id": 37214525361,
+    "conclusion": "success"
+  },
+  "page_features": [
+    "Current remote-test padmin/read capability enforced by route, both menus and page",
+    "Explicit UUID/revision source lookup checks three hashes; no default first/latest selection",
+    "Input/context/disabled changes cancel and clear old verified candidate; same version duplicates blocked",
+    "Selected archived and multiple revisions retained; empty selection requires separate explicit checkbox",
+    "Label and verified source hashes preserved on rejection; explicit unlock/new creation actions only",
+    "Unknown or in-flight request locks editing/removal/replacement and blocks navigation/context transitions; original retry only",
+    "Candidate-only unsaved input also prompts before leaving; unmount/reset cannot restore stale source",
+    "Metadata list/create receipt separate from full verified detail; ordinary reads never acknowledge unknown request",
+    "Details paginate already fully verified sources ten at a time; only one explicitly expanded full source is rendered",
+    "Responsive single-column steps/cards,44pxcontrols,long-ID/hash wrapping,Vue escaped text"
+  ],
+  "actual_component_http": {
+    "engine": "actual Vue SFC/native jsdom controls with production workspace/ApiClient and real PG/OIDC HTTP",
+    "successful_scenarios": 1,
+    "http_requests": 11,
+    "post_requests": 2,
+    "all_responses_200": true,
+    "one_collection_created": true,
+    "original_payload_key_preserved": true,
+    "source_versions": [
+      1,
+      3
+    ],
+    "archived_source_retained": true,
+    "ordinary_refresh_kept_unknown": true,
+    "single_creation_audit": true,
+    "real_browser": false,
+    "real_css_layout": false,
+    "physical_phone_or_wechat": false
+  },
+  "initial_component_attempt": {
+    "status": "FAILED_TEST_HARNESS_WAIT_NOT_PAGE_ACCEPTANCE",
+    "cause": "Predicate matched in-flight uncertain UI before response was observed; premature known-collection assertion failed, cleanup aborted client request",
+    "known_collection_ids_at_failure": 0,
+    "pending_request_count_at_failure": 1,
+    "read_only_pg_existing_receipts_before_recovery": 1,
+    "recovery_http_requests": 3,
+    "original_key_body_reused": true,
+    "same_preexisting_collection_returned": true,
+    "full_five_hash_detail_verified": true,
+    "pending_after_recovery": 0,
+    "failed_attempt_collection_retained": true,
+    "retry_guard": "Explicit MOP_NIKO_SOURCE_PAGE_RETRY_AFTER_WAIT_FIX plus reconciled original control required; independent-r2 control; no overwrite",
+    "added_regression": "In-flight native retry/edit/create disabled until transport settles",
+    "http_requests_attempted": 6,
+    "observed_response_counts": {
+      "200": 5
+    },
+    "cancelled_response_not_observed": 1
+  },
+  "postcheck": {
+    "retained_collections": 2,
+    "each_contains_two_sources": true,
+    "labelled_synthetic": true,
+    "unverified_not_generatable_or_published": true,
+    "document_hashes_valid": true,
+    "item_counts_match": true
+  },
+  "integration_harness": {
+    "default_web_test_glob_includes_real_http": false,
+    "explicit_flag_required": "MOP_RUN_NIKO_SOURCE_PAGE_HTTP=true",
+    "private_session_read_only_under_explicit_run": true,
+    "private_harness_absent_from_production_bundle": true,
+    "no_components_started": true
+  },
+  "browser_blocker": "Existing managed-browser loopback URL security denial remains; no alternate origin/proxy/sandbox bypass attempted in this feature",
+  "browser_acceptance": "NOT_RUN",
+  "migrations_executed": 0,
+  "storage_requests": 0,
+  "new_parent_records": 0,
+  "permanent_deletes": 0,
+  "report_published": false,
+  "formal_report_generatable": false,
+  "quarter_selection_rule": null,
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "apps/web/src/pages/InspectionSourceCollectionsPage.vue": "2221a34c89f0de7ab0abe568be747c62c0edfc1c718cb4cc246bd8b223f36dcd",
+    "apps/web/src/components/InspectionSourcePicker.vue": "1a3465de075a1523a08e1c2110b5e93e95cea50d18b381283a68c26d75540e56",
+    "apps/web/src/App.vue": "bf0f4a36c3093b2dc61805e528393b476520bf1c4c41f8466092abb8cbce3b7c",
+    "apps/web/src/router.ts": "8c42e4018c2783310c57997e67120f01a67902c82dcf993683caacbc358fef83",
+    "apps/web/tests/inspectionSourceCollectionsPage.test.ts": "acd3321bf96c7b6f1bfafd89a4c3098a7df066fd54c588d8756404bb3fbe2099",
+    "apps/web/qa/inspection-source-collection-page.http.ts": "5c4335da31e7c27d2fa4299a4e6644801cfa39f293fe4bbaa9191f2a6fea7c42",
+    "apps/web/vitest.niko-source-page.config.ts": "57e039612f655c5d04da1cfadc88bc90681b3bca1161ea79d416c71114f32d6c",
+    "apps/web/tsconfig.json": "136bf419224b1e3a701bf9861d145aed908dd6fcb2e7901ce021c471524b4d2a"
+  },
+  "logs": [
+    ".local/niko-test/logs/source-collection-page-contracts-20261004.log",
+    ".local/niko-test/logs/source-collection-page-focused-20261004.log",
+    ".local/niko-test/logs/source-collection-page-http-20261004-r2.log",
+    ".local/niko-test/logs/source-collection-page-http-20261004.log",
+    ".local/niko-test/logs/source-collection-page-postcheck-20261004.json",
+    ".local/niko-test/logs/source-collection-page-pre-recovery-20261004.json",
+    ".local/niko-test/logs/source-collection-page-recovery-20261004.log",
+    ".local/niko-test/logs/source-collection-page-types-20261004-r2.log",
+    ".local/niko-test/logs/source-collection-page-types-20261004-r3.log",
+    ".local/niko-test/logs/source-collection-page-types-20261004-r4.log",
+    ".local/niko-test/logs/source-collection-page-types-20261004.log",
+    ".local/niko-test/logs/source-collection-page-web-20261004-r2.log",
+    ".local/niko-test/logs/source-collection-page-web-20261004.log",
+    ".local/niko-test/logs/source-collection-page-web-build-20261004-r2.log",
+    ".local/niko-test/logs/source-collection-page-web-build-20261004.log"
+  ]
+}

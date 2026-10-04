@@ -49,6 +49,7 @@ async function endSession() {
         <el-menu :default-active="String(route.name)" class="side-menu" @select="router.push({ name: $event })">
           <el-menu-item v-if="can('configurations:read')" index="configurations"><span class="nav-symbol">⚙</span>配置确认登记</el-menu-item>
           <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_templates:read')" index="inspection-templates">巡检模板候选</el-menu-item>
+          <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_source_collections:read')" index="inspection-source-collections">巡检来源集合草稿</el-menu-item>
           <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_worksheets:read')" index="inspection-worksheets">人工巡检执行单</el-menu-item>
           <el-menu-item v-if="can('contacts:read')" index="customer-contacts">客户联系人</el-menu-item>
           <el-menu-item v-if="can('contacts:write')" index="contact-imports">联系人批量新建</el-menu-item>
@@ -92,6 +93,7 @@ async function endSession() {
         <el-menu-item v-if="can('tickets:read')" index="tickets">报障与受理</el-menu-item>
         <el-menu-item v-if="can('configurations:read')" index="configurations">配置确认登记</el-menu-item>
         <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_templates:read')" index="inspection-templates">巡检模板候选</el-menu-item>
+          <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_source_collections:read')" index="inspection-source-collections">巡检来源集合草稿</el-menu-item>
           <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_worksheets:read')" index="inspection-worksheets">人工巡检执行单</el-menu-item>
           <el-menu-item v-if="can('contacts:read')" index="customer-contacts">客户联系人</el-menu-item>
           <el-menu-item v-if="can('contacts:write')" index="contact-imports">联系人批量新建</el-menu-item>

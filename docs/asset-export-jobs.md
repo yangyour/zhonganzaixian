@@ -38,3 +38,17 @@ V20__durable_asset_export_jobs.sql已在niko-local-test显式独立执行一次�
 ## 2026-10-04 V20跨平台冻结清单遗漏修正
 
 c40bf37的CI37175873116中Java/Web/Windows进程检查通过，但PowerShell迁移策略仍只列V1–V19，拒绝新V20源码集合。补齐V20清单、独立asset-exports选择及导出核验器新旧检查；保留只读默认与单功能执行，V1–V20 SQL字节不动。新增跨入口清单回归对原提交先红，113Python/73契约通过；niko无pwsh，PowerShell原生执行留给既有CI，不冒充本地通过。见docs/evidence/niko-export-migration-policy-20261004.json。
+
+后续9b95a8b的CI37176283202四个job全部通过；原生PowerShell迁移策略67项通过、数据库操作0（job111359441377）。该结果不表示原服务器已执行V20，niko本地pwsh仍未安装。
+
+## 2026-10-04 事务化受理与自己的任务读取
+
+`PostgresAssetExportRepository` 仅在平台受保护的幂等事务中接受明确筛选。受理与原响应、审计原子提交；原key/原body回放相同任务，改body为409。`authorizeAcceptance` 也在回放前从实际PG检查成员活跃、版本及padmin/msp角色并加共享锁，不能用缓存回执绕过已变更权限。受理只写QUEUED，不宣称文件生成或发布。
+
+读取仅允许当前内部角色查看同租户、同创建人的任务。合法内部身份读其他租户/创建人的ID为404，失效版本401；客户角色403。列表仅展示与当前受理角色/版本匹配的原任务，旧请求/原回执不删除，按created_at/id成对游标降序读取，技术limit为1–101，无自动轮询。
+
+get/list是独立只读REPEATABLE READ快照，拒绝嵌入写事务。规范命令bytes必须通过decodeBound与不可变受理列/数据库生成SHA一致；错误、非规范或其他租户命令正文作为存储不一致503拒绝，不反射原文字段。公共仓储DTO不包含命令bytes、文件bytes、object_id、trace、下载地址或授权token。
+
+本阶段没有HTTP导出端点、202收据契约、CSRF入口、实际Worker、对象存储或下载；仓储的幂等保护不能被算作HTTP安全验收。新Java对象读回同一PG任务只是仓储持久化回读，不称为JVM/机器故障重启。
+
+本批20新增真实PG检查通过，含同key并发只提交一次、原回执回放、跨租户/创建人404、当前成员检查、审计失败/错误命令/其他租户正文故障注入后三表原子回滚。成功受理测试持久化明确合成的QUEUED任务；不能称整批零写。根1542报告1529执行含454PG、13历史跳过、6MinIO排除，73契约通过。[仓储证据](evidence/niko-export-repository-20261004.json)。

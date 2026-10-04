@@ -1106,3 +1106,7 @@ V20首次候选CASE语法失败完整回滚，只读确认仍V19/无新表函数
 ## 2026-10-04 V20跨平台冻结清单遗漏修正
 
 c40bf37的CI37175873116中Java/Web/Windows进程检查通过，但PowerShell迁移策略仍只列V1–V19，拒绝新V20源码集合。补齐V20清单、独立asset-exports选择及导出核验器新旧检查；保留只读默认与单功能执行，V1–V20 SQL字节不动。新增跨入口清单回归对原提交先红，113Python/73契约通过；niko无pwsh，PowerShell原生执行留给既有CI，不冒充本地通过。见docs/evidence/niko-export-migration-policy-20261004.json。
+
+## 2026-10-04 导出仓储受理、原回执与范围读取
+
+20新增真实PG覆盖QUEUED受理/审计/原响应同事务、同key并发唯一写、改body409、当前成员回放前检查、外租户/非创建人404及独立只读get/list；错误命令或审计失败整体回滚，DTO无原始bytes/对象地址。根1542报告1529执行含454PG/13跳过/6MinIO排除、73契约。尚无实际HTTP/Worker/OSS/下载/通知，见docs/asset-export-jobs.md，M3-7非DONE。此前V20脚本修复9b95a8b的CI37176283202全过，原生PowerShell67隔离检查通过且数据库操作0。

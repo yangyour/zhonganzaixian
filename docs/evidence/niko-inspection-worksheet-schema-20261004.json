@@ -44,8 +44,12 @@
     "errors": 0
   },
   "windows_native_policy": {
-    "status": "PENDING_POST_COMMIT_CI",
-    "database_operations": 0
+    "status": "PASS",
+    "ci_run": 37194955848,
+    "job": 111414787860,
+    "isolated_checks": 85,
+    "database_operations": 0,
+    "source_commit": "de6a3f04e0afc813dffd444bac1e369e6946e72d"
   },
   "api_contract_version": "0.35.0",
   "worksheet_repository_implemented": false,

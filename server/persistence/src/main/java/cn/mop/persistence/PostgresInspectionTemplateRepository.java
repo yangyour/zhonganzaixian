@@ -88,6 +88,12 @@ public final class PostgresInspectionTemplateRepository implements InspectionTem
         long version=r.getLong("version");Long previous=(Long)r.getObject("previous_version");String action=r.getString("action");
         if(version<1||version>MAX_VERSION||action==null||!Set.of("CREATE","UPDATE","ARCHIVE","RESTORE").contains(action)||r.getBoolean("archived")!=action.equals("ARCHIVE")||(version==1?previous!=null||!action.equals("CREATE"):previous==null||previous!=version-1||action.equals("CREATE"))||!"UNVERIFIED".equals(r.getString("approval_status")))throw corrupt();
     }
+    /** Package-local frozen revision reader; caller must enforce current membership and tenant scope on its own transaction. */
+    static InspectionTemplate.Snapshot capturedSnapshot(Connection c,String tenant,String id,long version)throws SQLException{
+        try(var s=statement(c,"SELECT * FROM public.mop_inspection_template_revision WHERE tenant_id=?::uuid AND template_id=?::uuid AND version=?")){
+            s.setString(1,tenant);s.setString(2,id);s.setLong(3,version);try(var r=s.executeQuery()){if(!r.next())throw missing();validateRevision(r);return snapshot(c,r,tenant,id);}
+        }
+    }
     private static InspectionTemplate.Snapshot snapshot(Connection c,ResultSet r,String tenant,String id)throws SQLException{
         int count=r.getInt("item_count");long version=r.getLong("version");if(count<1||count>InspectionTemplate.MAX_ITEMS)throw corrupt();
         var items=new ArrayList<InspectionTemplate.Item>();

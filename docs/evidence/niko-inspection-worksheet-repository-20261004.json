@@ -1,0 +1,80 @@
+{
+  "verified_at": "2026-10-04T10:30:09.997389+00:00",
+  "environment": "niko-local-test",
+  "component": "existing approved PostgreSQL17.11",
+  "scope": "INTERNAL_MANUAL_WORKSHEET_DRAFT_REPOSITORY",
+  "new_pure_java_tests": 3,
+  "new_real_postgres_tests": 21,
+  "root_tests": {
+    "reported": 1736,
+    "executed": 1723,
+    "real_postgres": 554,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts": 80,
+  "contract_generation": "PASS",
+  "focused_identity_membership_equality": {
+    "equal": true,
+    "tables": {
+      "mop_user": {
+        "rows": 261,
+        "equality_sha256": "1238800be94801e2c233baeb0652a4acbdf30cbeb30214e5bf2bc63e07140af5"
+      },
+      "mop_membership": {
+        "rows": 519,
+        "equality_sha256": "838ce00194203db37008ca450cb9bf97a595c2e283248db07c1dcbd2eea43733"
+      }
+    },
+    "window": "focused repository tests only; excludes later root regression"
+  },
+  "synthetic_worksheet_cleanup": {
+    "worksheets": {
+      "worksheet_heads": 50,
+      "archived": 50,
+      "unverified": 50,
+      "source_drafts": 50
+    },
+    "permanent_deletes": 0,
+    "production_approval": "UNVERIFIED"
+  },
+  "fault_proof": {
+    "same_idempotency_key_two_real_connections_one_commit": true,
+    "same_version_two_connections_statuses": [
+      200,
+      409
+    ],
+    "caller_exception_atomic_rollback": true,
+    "injected_audit_statement_exception_rollback": true,
+    "injected_actual_pg_insert_json_tamper_rollback": true,
+    "physical_database_failure_tested": false,
+    "process_restart_tested_for_worksheets": false
+  },
+  "known_initial_failure": "pure test initially placed in dependency-free domain module; moved to existing persistence test module and rerun",
+  "api_contract_version": "0.35.0",
+  "schema_version": 22,
+  "new_migrations": 0,
+  "new_identity_or_membership_in_focused_suite": false,
+  "root_regression_can_write_existing_synthetic_diagnostic_identities": true,
+  "worksheet_http_implemented": false,
+  "worksheet_ui_implemented": false,
+  "evidence_file_binding_implemented": false,
+  "template_applicability": "UNVERIFIED",
+  "inspection_verification": "SELF_REPORTED_UNVERIFIED",
+  "quarterly_report_implemented": false,
+  "formal_acceptance": "NOT_RUN",
+  "logs": [
+    ".local/niko-test/logs/worksheet-repository-compile-20261004.log",
+    ".local/niko-test/logs/worksheet-repository-contracts-20261004.log",
+    ".local/niko-test/logs/worksheet-repository-focused-first-20261004.log",
+    ".local/niko-test/logs/worksheet-repository-focused-second-20261004.log",
+    ".local/niko-test/logs/worksheet-repository-identity-after-20261004.log",
+    ".local/niko-test/logs/worksheet-repository-identity-before-20261004.log",
+    ".local/niko-test/logs/worksheet-repository-postfocused-20261004.json",
+    ".local/niko-test/logs/worksheet-repository-postroot-20261004.json",
+    ".local/niko-test/logs/worksheet-repository-root-20261004.log",
+    ".local/niko-test/logs/worksheet-repository-schema-20261004.log"
+  ]
+}

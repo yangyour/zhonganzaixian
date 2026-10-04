@@ -74,12 +74,40 @@ public final class PostgresInspectionWorksheetRepository implements InspectionWo
         return readonly(a,c->{Entry current=get(c,a,record);var values=new ArrayList<Revision>();try(var s=statement(c,SELECT+" WHERE h.tenant_id=?::uuid AND h.id=?::uuid AND r.version<=?"+(beforeVersion==null?"":" AND r.version<?")+" ORDER BY r.version DESC LIMIT ?")){
             int p=1;s.setString(p++,a.tenantId());s.setString(p++,record);s.setLong(p++,current.version());if(beforeVersion!=null)s.setLong(p++,beforeVersion);s.setInt(p,limit);try(var r=s.executeQuery()){while(r.next()){Entry entry=entry(c,r,a);values.add(new Revision(entry.version(),(Long)r.getObject("previous_version"),entry.recordedBy(),entry.recordedAt(),entry.action(),entry.archived(),entry.content()));}}}return List.copyOf(values);});
     }
-    private static Entry entry(Connection c,ResultSet r,Access a)throws SQLException{
+    @Override public InspectionSourceManifest captureSources(Access a,List<Selection> selections){
+        if(selections==null)throw invalid();
+        if(selections.size()>InspectionSourceManifest.MAX_SOURCES)throw sourceLimit();
+        var selected=new ArrayList<>(selections);
+        if(selected.size()>InspectionSourceManifest.MAX_SOURCES)throw sourceLimit();
+        if(selected.stream().anyMatch(Objects::isNull)||new HashSet<>(selected).size()!=selected.size())throw invalid();
+        selected.sort(Comparator.comparing(Selection::worksheetId).thenComparingLong(Selection::version));
+        return readonly(a,c->{
+            if(selected.isEmpty())return new InspectionSourceManifest(UUID.fromString(a.tenantId()),List.of());
+            String requested="WITH requested(worksheet_id,version) AS (VALUES "+String.join(",",Collections.nCopies(selected.size(),"(?::uuid,?::bigint)"))+") ";
+            String scope=" JOIN requested q ON q.worksheet_id=h.id AND q.version=r.version WHERE h.tenant_id=?::uuid AND r.version<=h.version";
+            // Reject a missing/foreign revision before loading any full JSON or template. Estimate includes
+            // uncompressed UTF-8, template framing per item, and ample fixed metadata, not TOAST disk size.
+            String preflight=requested+"SELECT count(*),COALESCE(sum(octet_length(convert_to(r.observations::text,'UTF8'))+octet_length(convert_to(h.asset_name,'UTF8'))+4096"+
+                "+octet_length(convert_to(t.device_type,'UTF8'))+octet_length(convert_to(t.name,'UTF8'))+COALESCE((SELECT sum(16+octet_length(convert_to(i.item_key,'UTF8'))+octet_length(convert_to(i.section,'UTF8'))+octet_length(convert_to(i.label,'UTF8'))+COALESCE(octet_length(convert_to(i.instruction,'UTF8')),0)) FROM public.mop_inspection_template_item i WHERE i.tenant_id=h.tenant_id AND i.template_id=h.template_id AND i.version=h.template_version),0)),0)"+
+                " FROM public.mop_inspection_worksheet h JOIN public.mop_inspection_worksheet_revision r ON r.tenant_id=h.tenant_id AND r.worksheet_id=h.id JOIN public.mop_inspection_template_revision t ON t.tenant_id=h.tenant_id AND t.template_id=h.template_id AND t.version=h.template_version"+scope;
+            try(var s=statement(c,preflight)){bindSelections(s,selected,a.tenantId());try(var r=s.executeQuery()){if(!r.next())throw corrupt();if(r.getLong(1)!=selected.size())throw missing();if(r.getLong(2)>InspectionSourceManifest.MAX_CAPTURED_BYTES)throw sourceLimit();}}
+            var values=new ArrayList<InspectionSourceSnapshot>();var templates=new HashMap<TemplateKey,InspectionTemplate.Snapshot>();
+            try(var s=statement(c,requested+SELECT+scope+" ORDER BY h.id,r.version")){bindSelections(s,selected,a.tenantId());try(var r=s.executeQuery()){while(r.next())values.add(InspectionSourceSnapshot.fromEntry(entry(c,r,a,templates)));}}
+            if(values.size()!=selected.size())throw corrupt();
+            return new InspectionSourceManifest(UUID.fromString(a.tenantId()),values);
+        });
+    }
+    private static void bindSelections(PreparedStatement s,List<Selection> selections,String tenant)throws SQLException{int p=1;for(var selection:selections){s.setString(p++,selection.worksheetId());s.setLong(p++,selection.version());}s.setString(p,tenant);}
+    private static DomainException sourceLimit(){return new DomainException(413,"INSPECTION_SOURCE_TECHNICAL_LIMIT","来源清单超过1000项或16MiB读取保护；未截断或生成正式报告");}
+    private record TemplateKey(String tenant,String id,long version){}
+    private static Entry entry(Connection c,ResultSet r,Access a)throws SQLException{return entry(c,r,a,new HashMap<>());}
+    private static Entry entry(Connection c,ResultSet r,Access a,Map<TemplateKey,InspectionTemplate.Snapshot> templates)throws SQLException{
         if(!a.tenantId().equals(r.getString("tenant_id"))||!"MANUAL_INSPECTION_DRAFT".equals(r.getString("record_source"))||!"SELF_REPORTED_UNVERIFIED".equals(r.getString("verification_status")))throw corrupt();
         long version=r.getLong("version");Long previous=(Long)r.getObject("previous_version");String action=r.getString("action");boolean archived=r.getBoolean("archived");
         if(version<1||version>MAX_VERSION||action==null||!Set.of("CREATE","UPDATE","ARCHIVE","RESTORE").contains(action)||archived!=action.equals("ARCHIVE")||(version==1?previous!=null||!action.equals("CREATE"):previous==null||previous!=version-1||action.equals("CREATE")))throw corrupt();
         Instant created=instant(r,"created_at"),updated=instant(r,"updated_at"),recorded=instant(r,"recorded_at");if(updated.isBefore(created)||recorded.isBefore(created)||recorded.isAfter(updated))throw corrupt();
-        var template=PostgresInspectionTemplateRepository.capturedSnapshot(c,a.tenantId(),r.getString("template_id"),r.getLong("template_version"));if(!template.contentSha256().equals(r.getString("template_content_sha256")))throw corrupt();
+        var templateKey=new TemplateKey(a.tenantId(),r.getString("template_id"),r.getLong("template_version"));
+        var template=templates.get(templateKey);if(template==null){template=PostgresInspectionTemplateRepository.capturedSnapshot(c,templateKey.tenant(),templateKey.id(),templateKey.version());templates.put(templateKey,template);}if(!template.contentSha256().equals(r.getString("template_content_sha256")))throw corrupt();
         InspectionWorksheetContent content;
         try{
             var json=JSON.readTree(r.getString("observations"));if(json==null||!json.isArray()||json.size()>100)throw corrupt();var observations=new LinkedHashMap<String,InspectionWorksheet.Observation>();

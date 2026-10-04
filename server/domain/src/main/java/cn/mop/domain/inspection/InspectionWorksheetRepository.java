@@ -4,6 +4,7 @@ import cn.mop.domain.DomainException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /** Internal manual worksheet drafts. No inspection attestation, automatic scan or report publication. */
 public interface InspectionWorksheetRepository {
@@ -19,6 +20,14 @@ public interface InspectionWorksheetRepository {
     record Creation(String assetId,String templateId,long templateVersion,Content content) {}
     record Entry(String id,String tenantId,String createdBy,long version,Instant createdAt,Instant updatedAt,
                  String recordedBy,Instant recordedAt,String action,boolean archived,InspectionWorksheetContent content) {}
+    /** Explicit historical revision, never an implicit latest/quarter selection. */
+    record Selection(String worksheetId,long version) {
+        public Selection {
+            if(worksheetId==null||!worksheetId.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")||version<1||version>9_007_199_254_740_990L)
+                throw new DomainException(400,"VALIDATION_ERROR","来源执行单和明确修订号无效");
+            worksheetId=UUID.fromString(worksheetId).toString();
+        }
+    }
     record Revision(long version,Long previousVersion,String recordedBy,Instant recordedAt,String action,
                     boolean archived,InspectionWorksheetContent content) {}
     /** Must run before an original protected-command receipt is replayed. Source freshness is checked only for new execution. */
@@ -30,5 +39,7 @@ public interface InspectionWorksheetRepository {
     Entry get(Access access,String id);
     List<Entry> list(Access access,String assetId,View view,int limit,Instant beforeCreatedAt,String beforeId);
     List<Revision> history(Access access,String id,int limit,Long beforeVersion);
+    /** Current authorization and all selected content share a read-only repeatable-read transaction; all-or-nothing. */
+    InspectionSourceManifest captureSources(Access access,List<Selection> selections);
     List<String> readinessProblems();
 }

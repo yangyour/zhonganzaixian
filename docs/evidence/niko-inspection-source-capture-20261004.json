@@ -1,0 +1,92 @@
+{
+  "verified_at": "2026-10-04T12:37:51.246708+00:00",
+  "scope": "READ_ONLY_EXPLICIT_INSPECTION_SOURCE_CAPTURE",
+  "environment": "niko-local-test",
+  "postgresql_version": "17.11",
+  "new_real_postgres_tests": 13,
+  "new_pure_selection_tests": 3,
+  "focused_tests": 57,
+  "root_tests": {
+    "reported": 1789,
+    "executed": 1776,
+    "real_postgres": 567,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts": 86,
+  "contract_generation": "PASS",
+  "tracker_tests": 17,
+  "schema_version": 22,
+  "migrations_executed": 0,
+  "api_version": "0.36.0",
+  "new_http_endpoints": 0,
+  "new_source_capture_http_tests": 0,
+  "read_transaction": {
+    "read_only": true,
+    "isolation": "REPEATABLE_READ",
+    "current_member_role_permission_version_checked": true,
+    "all_or_nothing": true,
+    "current_template_head_not_substituted": true,
+    "writes_audit_receipts": false
+  },
+  "technical_limits": {
+    "max_sources": 1000,
+    "max_bytes": 16777216,
+    "preflight": "UNCOMPRESSED_UTF8_WITH_CONSERVATIVE_FRAMING_AND_4096_BYTES_METADATA_PER_SOURCE",
+    "oversize_real_case": {
+      "revisions": 21,
+      "template_items": 100,
+      "instruction_emoji_per_item": 2000,
+      "status": 413,
+      "full_content_queries": 0
+    },
+    "truncation": false,
+    "business_quota": false
+  },
+  "concurrency_evidence": "Second real connection commits revision after capture transaction authorization; old transaction returns404, fresh transaction reads it",
+  "integrity_fault": "Driver read hash changed to synthetic invalid value; returns503, real stored source unchanged; not a PG replacement",
+  "postcheck": {
+    "worksheets": {
+      "worksheet_heads": 248,
+      "archived": 248,
+      "unverified": 248,
+      "source_drafts": 248
+    },
+    "permanent_deletes": 0,
+    "production_approval": "UNVERIFIED"
+  },
+  "runtime_recovery": {
+    "previous_qa_session_unavailable": true,
+    "postgres_wal_recovered_at": "2026-10-04T12:32:43Z",
+    "existing_components_reused": true,
+    "new_credentials": 0,
+    "fixed_api_readiness": "PASS",
+    "full_database_before_after_equality": "NOT_RUN"
+  },
+  "first_attempt": "Compile failed on duplicate local key name; renamed cache variable, retained failure log and reran",
+  "period_time_zone": null,
+  "quarter_selection_rule": null,
+  "archived_source_policy": null,
+  "formal_report_generatable": false,
+  "report_snapshot_database_implemented": false,
+  "report_publication_implemented": false,
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/inspection/InspectionWorksheetRepository.java": "5287cae9cece6bd348612823cc07d3c4c52652d9406c94e3a1d051ce312f1568",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresInspectionWorksheetRepository.java": "c489131652685b3495fec9a163bf02bf2e54cabc51b386cb7e24e7b15b5fecb8",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresInspectionSourceCaptureIntegrationTest.java": "483f664d03abeef5c7611c03d58e59e4813bc2d43a760ba36806fd9317ad6c21",
+    "server/persistence/src/test/java/cn/mop/persistence/InspectionSourceSelectionTest.java": "4d41731e32af9699b80c3bd837e3737b5f23d321080b9d5f81bfe8c45eaecdb7"
+  },
+  "logs": [
+    ".local/niko-test/logs/source-capture-contracts-20261004.log",
+    ".local/niko-test/logs/source-capture-focused-20261004-r2.log",
+    ".local/niko-test/logs/source-capture-focused-20261004-r3.log",
+    ".local/niko-test/logs/source-capture-focused-20261004.log",
+    ".local/niko-test/logs/source-capture-postcheck-20261004.json",
+    ".local/niko-test/logs/source-capture-root-20261004.log",
+    ".local/niko-test/logs/source-capture-schema-check-20261004.log",
+    ".local/niko-test/logs/source-capture-tracker-20261004.log"
+  ]
+}

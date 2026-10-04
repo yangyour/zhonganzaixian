@@ -53,3 +53,19 @@ BackupPlanDraftRepository增加创建、明确expectedVersion修改、归档、�
 21新增真实PG仓储测试覆盖创建/更新/历史/归档恢复、当前权限/过期版本、跨租户和缺目标、CAS冲突、原重放/变body、调用者回滚、独立只读、两连接同键/不同键竞争。审计故障实际执行SELECT 1/0、目标故障在同一真实连接改为跨租户FK，两者五表全部回滚；额外实际查询后受控篡改enabled读取返回503而数据库不变。首轮测试的审计计数误用扁平resource_id列，SQL报不存在；改读真实payload JSON后全部通过，未改业务代码或删除失败轮合成数据。自有合成草稿在测试结束后归档保留，未启用、无SSH/存储/凭据配置。
 
 聚焦58项通过（21仓储+19结构+18纯核心），完整回归及只读合成数据核对见[仓储证据](evidence/niko-backup-plan-repository-20261004.json)。V24原字节保持，0新迁移，HTTP/页面尚未接入；API0.38及在线固定包未改。前结构提交ead1113的CI37220663039成功，Ubuntu原生pwsh真实执行103策略检查/0数据库操作；这不代表Windows数据库联调。
+
+## API0.39：独立草稿入口
+
+新增GET/POST /api/v1/backup-plan-drafts、GET/PATCH /{id}、GET /{id}/history、POST /{id}/archive与/restore。两项backup_plan_drafts:read/write仅当前padmin，能力目录明确归类并保留未知能力拒绝。正式/backups/plans、/backups/runs的202+operation流程仍未实现；这些同步200只表示草稿事务完成，不代表已启用、同步设备或实际备份。
+
+创建需expected_version=0及所有明确字段：name、target_asset_ids、daily_local_time、credential_ref（可null）、requested_enabled、note（可null）。修改需当前正版本；归档/恢复只接收expected_version，恢复不允许顺便改提案。拒绝未知/重复JSON字段、尾随JSON、租户/生效/执行/秘密字段覆盖和全部写query。原键参与当前成员复核，body按对象键排序哈希，保留目标顺序、文字、null/空和版本差异；CSRF由真实安全链路校验。
+
+原始请求262144字节/4000 token/深度4技术边界，超字节/token返回413，不截断。列表与历史仅10/15/20页长、成对created_at/id或明确before_version；摘要不含目标数组/备注，详情和历史返回当版完整提案。目标唯一按规范化UUID判断；模板默认时间/重试值不冒充已经生效的配置。凭据UUID即使保存，也固定NOT_VERIFIED_BY_THIS_MODEL；无引用NOT_SUPPLIED。所有返回enabled/effective/device_execution_allowed=false、next_execution_at=null。
+
+/health/ready实际检查V24结构/权限，缺失、null或异常503；liveness独立。schema_access_ready不等于凭据、存储或调度可用，scheduler_running=null。新增5路径9schema，89旧路径及198旧非ReadinessResult schema逐对象等值；API版本0.38→0.39。没有旧路径默默改义或额外启动调度。
+
+18控制器+1ready新增；聚焦50通过，完整1975报告1962执行含642真实PG、13历史跳过/6MinIO排除；103契约/1263Web（76文件）/类型构建通过。首轮聚焦暴露两项能力目录旧列表期待和一次测试重复读取同一流；更新精确期待并使用新请求后通过，未放宽未知能力策略或服务器输入校验。
+
+真实PG17.11/Keycloak26.2.4/API0.39完成80HTTP：40×200、18×400、1×401、9×403、5×404、5×409、2×413。核验创建/原回执、15版本历史分页、归档原样恢复、并发同键只建一次/不同键CAS只一个成功、角色/CSRF、跨租户对象和目标404及限额。保留2个自有合成草稿并全部归档，18历史/36目标/18成功计划审计（含2创建），待处理原请求0；没有永久删除、SSH、存储或凭据配置。控制文件已完成，不重跑原场景。
+
+正常部署重启前后53张业务表全部原行指纹等值，在新OIDC登录前完成；这不是故障中断/灾备验证。在线固定JAR SHA256=c144ecc0c62311f3f0a3cef4333381dacc540e97bb077369f1ce5bd62af41ec9，0新迁移。新页面/原请求恢复客户端尚待；真实浏览器B03、设备SSH/Q22、OSS/KMS/Q28及正式发布仍未解除。见[API证据](evidence/niko-backup-plan-api-20261004.json)和[HTTP证据](evidence/niko-backup-plan-http-20261004.json)。

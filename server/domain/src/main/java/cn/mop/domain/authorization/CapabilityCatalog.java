@@ -17,6 +17,8 @@ public final class CapabilityCatalog {
     static {
         var dimensions=new LinkedHashMap<String,String>();dimensions.put("ASSETS_METRICS","资产与指标");dimensions.put("ALERTS_TICKETS","告警与工单");dimensions.put("TEMPLATES_AUTOMATION","模板与自动化");dimensions.put("PLATFORM_ADMIN","平台管理");dimensions.put("MEMBER_ADMIN","成员管理");DIMENSIONS=Collections.unmodifiableMap(dimensions);
         var definitions=new TreeMap<String,Definition>();
+        define(definitions,"backup_plan_drafts:read","读取未生效备份计划草稿及历史","TEMPLATES_AUTOMATION");
+        define(definitions,"backup_plan_drafts:write","维护未生效备份计划草稿（不启用或执行设备命令）","TEMPLATES_AUTOMATION");
         define(definitions,"inspection_source_collections:read","读取不可变巡检来源草稿（非正式报告）","TEMPLATES_AUTOMATION");
         define(definitions,"inspection_source_collections:write","保存明确修订来源草稿（不生成或发布报告）","TEMPLATES_AUTOMATION");
         define(definitions,"inspection_worksheets:read","读取人工巡检执行单草稿","TEMPLATES_AUTOMATION");

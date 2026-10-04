@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.38.0",
+    "version": "0.39.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -20022,6 +20022,1298 @@
           }
         }
       }
+    },
+    "/backup-plan-drafts": {
+      "get": {
+        "operationId": "listBackupPlanDrafts",
+        "summary": "当前租户未生效计划摘要分页；不返回目标明细和备注，不证明凭据或执行可用",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-readonly": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-reject-duplicate-query-keys": true,
+        "x-mop-read-consistency": "READ_ONLY_REPEATABLE_READ",
+        "x-mop-success-writes-audit-or-receipts": false,
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                20
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_created_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-paired-query-keys": [
+          "before_created_at",
+          "before_id"
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupPlanDraftPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createBackupPlanDraft",
+        "summary": "保护事务保存未生效计划提案；目标须属于当前租户，不启用/执行SSH",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupPlanDraftCreate"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-before-replay-authorization": true,
+        "x-mop-body-max-bytes": 262144,
+        "x-mop-json-max-tokens": 4000,
+        "x-mop-json-max-depth": 4,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-reject-all-query-keys": true,
+        "x-mop-no-side-effects": [
+          "DEVICE_EXECUTION",
+          "CREDENTIAL_CONFIGURATION",
+          "SCHEDULING",
+          "OBJECT_STORAGE"
+        ],
+        "x-mop-replay": "CURRENT_AUTHORIZATION_THEN_ORIGINAL_RECEIPT",
+        "x-mop-integer-token-required": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupPlanDraftResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/backup-plan-drafts/{id}": {
+      "get": {
+        "operationId": "getBackupPlanDraft",
+        "summary": "当前授权读取未生效计划完整提案；跨租户404",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-readonly": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-reject-duplicate-query-keys": true,
+        "x-mop-read-consistency": "READ_ONLY_REPEATABLE_READ",
+        "x-mop-success-writes-audit-or-receipts": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupPlanDraftResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateBackupPlanDraft",
+        "summary": "明确CAS追加未生效计划修订；原历史不变",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupPlanDraftUpdate"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-before-replay-authorization": true,
+        "x-mop-body-max-bytes": 262144,
+        "x-mop-json-max-tokens": 4000,
+        "x-mop-json-max-depth": 4,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-reject-all-query-keys": true,
+        "x-mop-no-side-effects": [
+          "DEVICE_EXECUTION",
+          "CREDENTIAL_CONFIGURATION",
+          "SCHEDULING",
+          "OBJECT_STORAGE"
+        ],
+        "x-mop-replay": "CURRENT_AUTHORIZATION_THEN_ORIGINAL_RECEIPT",
+        "x-mop-integer-token-required": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupPlanDraftResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/backup-plan-drafts/{id}/history": {
+      "get": {
+        "operationId": "listBackupPlanDraftHistory",
+        "summary": "当前租户不可变计划提案历史；每版保留明确目标和意向",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-readonly": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-reject-duplicate-query-keys": true,
+        "x-mop-read-consistency": "READ_ONLY_REPEATABLE_READ",
+        "x-mop-success-writes-audit-or-receipts": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                20
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740990
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupPlanDraftHistoryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/backup-plan-drafts/{id}/archive": {
+      "post": {
+        "operationId": "archiveBackupPlanDraft",
+        "summary": "归档未生效草稿，完整提案原样保留",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupPlanDraftLifecycle"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-before-replay-authorization": true,
+        "x-mop-body-max-bytes": 262144,
+        "x-mop-json-max-tokens": 4000,
+        "x-mop-json-max-depth": 4,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-reject-all-query-keys": true,
+        "x-mop-no-side-effects": [
+          "DEVICE_EXECUTION",
+          "CREDENTIAL_CONFIGURATION",
+          "SCHEDULING",
+          "OBJECT_STORAGE"
+        ],
+        "x-mop-replay": "CURRENT_AUTHORIZATION_THEN_ORIGINAL_RECEIPT",
+        "x-mop-integer-token-required": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupPlanDraftResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/backup-plan-drafts/{id}/restore": {
+      "post": {
+        "operationId": "restoreBackupPlanDraft",
+        "summary": "恢复原样草稿，仍不启用或授权设备执行",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupPlanDraftLifecycle"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-before-replay-authorization": true,
+        "x-mop-body-max-bytes": 262144,
+        "x-mop-json-max-tokens": 4000,
+        "x-mop-json-max-depth": 4,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-reject-all-query-keys": true,
+        "x-mop-no-side-effects": [
+          "DEVICE_EXECUTION",
+          "CREDENTIAL_CONFIGURATION",
+          "SCHEDULING",
+          "OBJECT_STORAGE"
+        ],
+        "x-mop-replay": "CURRENT_AUTHORIZATION_THEN_ORIGINAL_RECEIPT",
+        "x-mop-integer-token-required": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupPlanDraftResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -20740,6 +22032,34 @@
                 ],
                 "additionalProperties": false
               },
+              "backup_plan_drafts": {
+                "type": "object",
+                "properties": {
+                  "schema_access_ready": {
+                    "const": true
+                  },
+                  "effective": {
+                    "const": false
+                  },
+                  "device_execution_allowed": {
+                    "const": false
+                  },
+                  "credential_verification": {
+                    "const": "NOT_VERIFIED"
+                  },
+                  "scheduler_running": {
+                    "type": "null"
+                  }
+                },
+                "required": [
+                  "schema_access_ready",
+                  "effective",
+                  "device_execution_allowed",
+                  "credential_verification",
+                  "scheduler_running"
+                ],
+                "additionalProperties": false
+              },
               "working_calendars": {
                 "type": "object",
                 "properties": {
@@ -20884,6 +22204,7 @@
               "contact_imports",
               "inspection_worksheets",
               "inspection_source_collections",
+              "backup_plan_drafts",
               "working_calendars",
               "manual_incidents",
               "manual_recovery",
@@ -40378,6 +41699,934 @@
                       "type": "null"
                     },
                     "next_before_id": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "BackupPlanDraftCreate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "const": 0
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "target_asset_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "x-mop-uniqueness": "CANONICAL_UUID_CASE_INSENSITIVE",
+            "x-mop-scope": "Every target must exist in current tenant; no SSH authority"
+          },
+          "daily_local_time": {
+            "type": "string",
+            "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+          },
+          "credential_ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Opaque unverified proposal reference only; never a key, password, verified secret binding or authorization."
+          },
+          "requested_enabled": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "expected_version",
+          "name",
+          "target_asset_ids",
+          "daily_local_time",
+          "credential_ref",
+          "requested_enabled",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "BackupPlanDraftUpdate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740989
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "target_asset_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "x-mop-uniqueness": "CANONICAL_UUID_CASE_INSENSITIVE",
+            "x-mop-scope": "Every target must exist in current tenant; no SSH authority"
+          },
+          "daily_local_time": {
+            "type": "string",
+            "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+          },
+          "credential_ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Opaque unverified proposal reference only; never a key, password, verified secret binding or authorization."
+          },
+          "requested_enabled": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "expected_version",
+          "name",
+          "target_asset_ids",
+          "daily_local_time",
+          "credential_ref",
+          "requested_enabled",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "BackupPlanDraftLifecycle": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740989
+          }
+        },
+        "required": [
+          "expected_version"
+        ],
+        "additionalProperties": false
+      },
+      "BackupPlanDraftSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "recorded_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "target_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "daily_local_time": {
+            "type": "string",
+            "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+          },
+          "timezone": {
+            "const": "Asia/Shanghai"
+          },
+          "credential_ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Opaque unverified proposal reference only; never a key, password, verified secret binding or authorization."
+          },
+          "credential_verification": {
+            "enum": [
+              "NOT_SUPPLIED",
+              "NOT_VERIFIED_BY_THIS_MODEL"
+            ]
+          },
+          "requested_enabled": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "const": false
+          },
+          "effective": {
+            "const": false
+          },
+          "lifecycle_status": {
+            "const": "DRAFT"
+          },
+          "approval_status": {
+            "const": "UNVERIFIED"
+          },
+          "device_execution_allowed": {
+            "const": false
+          },
+          "next_execution_at": {
+            "type": "null"
+          },
+          "proposed_retry_count": {
+            "const": 2
+          },
+          "proposed_retry_interval_minutes": {
+            "const": 10
+          },
+          "retry_policy_source": {
+            "const": "CONTRACT_CONFIGURABLE_DEFAULT_NOT_EFFECTIVE"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "record_source": {
+            "const": "UNPUBLISHED_BACKUP_PLAN_DRAFT"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "version",
+          "archived",
+          "recorded_by",
+          "created_at",
+          "updated_at",
+          "recorded_at",
+          "name",
+          "target_count",
+          "daily_local_time",
+          "timezone",
+          "credential_ref",
+          "credential_verification",
+          "requested_enabled",
+          "enabled",
+          "effective",
+          "lifecycle_status",
+          "approval_status",
+          "device_execution_allowed",
+          "next_execution_at",
+          "proposed_retry_count",
+          "proposed_retry_interval_minutes",
+          "retry_policy_source",
+          "source",
+          "record_source"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "credential_ref": {
+                  "type": "null"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "credential_verification": {
+                  "const": "NOT_SUPPLIED"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "credential_verification": {
+                  "const": "NOT_VERIFIED_BY_THIS_MODEL"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "BackupPlanDraftDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "recorded_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "target_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "daily_local_time": {
+            "type": "string",
+            "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+          },
+          "timezone": {
+            "const": "Asia/Shanghai"
+          },
+          "credential_ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Opaque unverified proposal reference only; never a key, password, verified secret binding or authorization."
+          },
+          "credential_verification": {
+            "enum": [
+              "NOT_SUPPLIED",
+              "NOT_VERIFIED_BY_THIS_MODEL"
+            ]
+          },
+          "requested_enabled": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "const": false
+          },
+          "effective": {
+            "const": false
+          },
+          "lifecycle_status": {
+            "const": "DRAFT"
+          },
+          "approval_status": {
+            "const": "UNVERIFIED"
+          },
+          "device_execution_allowed": {
+            "const": false
+          },
+          "next_execution_at": {
+            "type": "null"
+          },
+          "proposed_retry_count": {
+            "const": 2
+          },
+          "proposed_retry_interval_minutes": {
+            "const": 10
+          },
+          "retry_policy_source": {
+            "const": "CONTRACT_CONFIGURABLE_DEFAULT_NOT_EFFECTIVE"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "record_source": {
+            "const": "UNPUBLISHED_BACKUP_PLAN_DRAFT"
+          },
+          "target_asset_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "x-mop-uniqueness": "CANONICAL_UUID_CASE_INSENSITIVE",
+            "x-mop-scope": "Every target must exist in current tenant; no SSH authority"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "version",
+          "archived",
+          "recorded_by",
+          "created_at",
+          "updated_at",
+          "recorded_at",
+          "name",
+          "target_count",
+          "daily_local_time",
+          "timezone",
+          "credential_ref",
+          "credential_verification",
+          "requested_enabled",
+          "enabled",
+          "effective",
+          "lifecycle_status",
+          "approval_status",
+          "device_execution_allowed",
+          "next_execution_at",
+          "proposed_retry_count",
+          "proposed_retry_interval_minutes",
+          "retry_policy_source",
+          "source",
+          "record_source",
+          "target_asset_ids",
+          "note"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "credential_ref": {
+                  "type": "null"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "credential_verification": {
+                  "const": "NOT_SUPPLIED"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "credential_verification": {
+                  "const": "NOT_VERIFIED_BY_THIS_MODEL"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "BackupPlanDraftRevision": {
+        "type": "object",
+        "properties": {
+          "plan_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "previous_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9007199254740989
+          },
+          "action": {
+            "enum": [
+              "CREATE",
+              "UPDATE",
+              "ARCHIVE",
+              "RESTORE"
+            ]
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "recorded_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "target_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "daily_local_time": {
+            "type": "string",
+            "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+          },
+          "timezone": {
+            "const": "Asia/Shanghai"
+          },
+          "credential_ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Opaque unverified proposal reference only; never a key, password, verified secret binding or authorization."
+          },
+          "credential_verification": {
+            "enum": [
+              "NOT_SUPPLIED",
+              "NOT_VERIFIED_BY_THIS_MODEL"
+            ]
+          },
+          "requested_enabled": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "const": false
+          },
+          "effective": {
+            "const": false
+          },
+          "lifecycle_status": {
+            "const": "DRAFT"
+          },
+          "approval_status": {
+            "const": "UNVERIFIED"
+          },
+          "device_execution_allowed": {
+            "const": false
+          },
+          "next_execution_at": {
+            "type": "null"
+          },
+          "proposed_retry_count": {
+            "const": 2
+          },
+          "proposed_retry_interval_minutes": {
+            "const": 10
+          },
+          "retry_policy_source": {
+            "const": "CONTRACT_CONFIGURABLE_DEFAULT_NOT_EFFECTIVE"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "record_source": {
+            "const": "UNPUBLISHED_BACKUP_PLAN_DRAFT"
+          },
+          "target_asset_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "x-mop-uniqueness": "CANONICAL_UUID_CASE_INSENSITIVE",
+            "x-mop-scope": "Every target must exist in current tenant; no SSH authority"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "plan_id",
+          "tenant_id",
+          "version",
+          "previous_version",
+          "action",
+          "archived",
+          "recorded_by",
+          "recorded_at",
+          "name",
+          "target_count",
+          "daily_local_time",
+          "timezone",
+          "credential_ref",
+          "credential_verification",
+          "requested_enabled",
+          "enabled",
+          "effective",
+          "lifecycle_status",
+          "approval_status",
+          "device_execution_allowed",
+          "next_execution_at",
+          "proposed_retry_count",
+          "proposed_retry_interval_minutes",
+          "retry_policy_source",
+          "source",
+          "record_source",
+          "target_asset_ids",
+          "note"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "credential_ref": {
+                  "type": "null"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "credential_verification": {
+                  "const": "NOT_SUPPLIED"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "credential_verification": {
+                  "const": "NOT_VERIFIED_BY_THIS_MODEL"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "version": {
+                  "const": 1
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "previous_version": {
+                  "type": "null"
+                },
+                "action": {
+                  "const": "CREATE"
+                },
+                "archived": {
+                  "const": false
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "previous_version": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740989
+                },
+                "action": {
+                  "enum": [
+                    "UPDATE",
+                    "ARCHIVE",
+                    "RESTORE"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "ARCHIVE"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "archived": {
+                  "const": true
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "archived": {
+                  "const": false
+                }
+              }
+            }
+          }
+        ]
+      },
+      "BackupPlanDraftResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/BackupPlanDraftDetail"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "BackupPlanDraftPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "items": {
+                "type": "array",
+                "maxItems": 20,
+                "items": {
+                  "$ref": "#/components/schemas/BackupPlanDraftSummary"
+                }
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_before_created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "next_before_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "scope": {
+                "const": "CURRENT_TENANT_PADMIN"
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "page_size_limit": {
+                "const": 20
+              }
+            },
+            "required": [
+              "tenant_id",
+              "items",
+              "has_more",
+              "next_before_created_at",
+              "next_before_id",
+              "scope",
+              "source",
+              "page_size_limit"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "has_more": {
+                      "const": true
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "items": {
+                      "minItems": 1
+                    },
+                    "next_before_created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "next_before_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "next_before_created_at": {
+                      "type": "null"
+                    },
+                    "next_before_id": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "BackupPlanDraftHistoryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "plan_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "items": {
+                "type": "array",
+                "maxItems": 20,
+                "items": {
+                  "$ref": "#/components/schemas/BackupPlanDraftRevision"
+                }
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_before_version": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "scope": {
+                "const": "CURRENT_TENANT_PADMIN"
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "page_size_limit": {
+                "const": 20
+              }
+            },
+            "required": [
+              "tenant_id",
+              "plan_id",
+              "items",
+              "has_more",
+              "next_before_version",
+              "scope",
+              "source",
+              "page_size_limit"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "has_more": {
+                      "const": true
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "items": {
+                      "minItems": 1
+                    },
+                    "next_before_version": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740990
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "next_before_version": {
                       "type": "null"
                     }
                   }

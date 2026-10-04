@@ -1,0 +1,12 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <parent><groupId>cn.mop</groupId><artifactId>mop-platform</artifactId><version>0.1.0-SNAPSHOT</version><relativePath>../../pom.xml</relativePath></parent>
+  <artifactId>mop-asset-export</artifactId><name>Credential-free asset ledger XLSX encoding library</name>
+  <dependencies>
+    <dependency><groupId>cn.mop</groupId><artifactId>mop-domain</artifactId><version>${project.version}</version></dependency>
+    <dependency><groupId>org.apache.poi</groupId><artifactId>poi-ooxml</artifactId><version>5.5.1</version></dependency>
+    <dependency><groupId>org.apache.logging.log4j</groupId><artifactId>log4j-core</artifactId><scope>runtime</scope></dependency>
+    <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter</artifactId><scope>test</scope></dependency>
+  </dependencies>
+  <build><testResources><testResource><directory>../api/src/main/resources/templates</directory><includes><include>asset-import-standard15.xlsx</include></includes></testResource></testResources></build>
+</project>

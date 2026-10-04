@@ -1,0 +1,18 @@
+{
+  "observed_at": "2026-10-04T13:45:09.828568+00:00",
+  "environment": "niko-cloud-browser",
+  "browser_inventory": "Existing managed Chromium CDP tab available",
+  "requested_page": "http://127.0.0.1:5173/inspection-worksheets",
+  "vite_existing_api_proxy_ready": true,
+  "navigation_result": "net::ERR_BLOCKED_BY_CLIENT",
+  "subsequent_observation": "Rejected by browser URL security policy",
+  "application_pages_opened": 0,
+  "source_revision_ui_browser_tested": false,
+  "security_settings_changed": false,
+  "alternate_host_or_proxy_attempted": false,
+  "user_computer_used": false,
+  "owned_vite_stopped_after_probe": true,
+  "previous_niko_playwright_launch": "2026-10-04T11:34 sandbox-enabled EPERM; not rerun to bypass managed browser denial",
+  "formal_acceptance": "NOT_RUN",
+  "shutdown_first_guard": "Initial ad-hoc proc stat parser rejected a comm field containing spaces before sending any signal; parsed the parent field after closing parenthesis, reverified owned chain/command/cwd, then terminated only Vite"
+}

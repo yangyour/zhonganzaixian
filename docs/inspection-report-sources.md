@@ -48,7 +48,7 @@ PostgreSQL实现先要求独立读取，再开启READ ONLY / REPEATABLE READ事�
 
 新增GET `/api/v1/inspection-worksheets/{id}/revisions/{version}`，仅当前租户padmin、当前成员/权限版本和同快照来源读取。路径修订必须显式十进制正整数，不接受latest、前导零、小数或超安全范围；拒绝全部查询字段，不能通过query覆盖租户/版本。不存在或跨租户404，不回退当前头。
 
-返回完整冻结模板、答案、自述时间/未填统计，原创建与所选修订记录身份/时间、动作/归档状态及`source_snapshot_sha256`。source_format固定MOP_INSPECTION_SOURCE_SNAPSHOT_V1，来源类型固定IMMUTABLE_INSPECTION_WORKSHEET_REVISION；不包含可变头updated_at。模板/执行单/完整来源三个摘要可独立复算。scope当前租户padmin、SELF_REPORTED_UNVERIFIED、evidence_access_granted=false和report_published=false；读取不创建报告，不发布、不授予附件访问，也不新增写审计/原请求收据。
+返回完整冻结模板、答案、自述时间/未填统计，原创建与所选修订记录身份/时间、动作/归档状态及`source_snapshot_sha256`。source_format固定MOP_INSPECTION_SOURCE_SNAPSHOT_V1，来源类型固定IMMUTABLE_INSPECTION_WORKSHEET_REVISION；不包含可变头updated_at。模板/执行单/完整来源三个摘要可独立复算。scope当前租户padmin、SELF_REPORTED_UNVERIFIED、evidence_access_granted=false和report_published=false；成功读取不创建报告，不发布、不授予附件访问，也不新增业务写审计/原请求收据；拒绝请求仍由既有安全层记录DENIED审计。
 
 6新增控制器测试、42聚焦纯测试通过；真实根1795报告=1782执行（567PG）+13历史跳过，6MinIO排除。89契约测试/生成一致性通过，全部既有86路径和191schema逐对象等值，只有新路径/两个来源schema及版本变更。首轮新增契约测试发现CREATE与版本关联未声明，在新来源schema添加版本1 iff CREATE约束后通过；旧schema未改，失败日志保留。
 
@@ -62,3 +62,16 @@ PostgreSQL实现先要求独立读取，再开启READ ONLY / REPEATABLE READ事�
 提交前接回c0cf514/8313fd0/ba61471及其Windows指定PG/OIDC/MinIO与真实Edge证据：模板15、执行单13桌面和390px模拟视口检查，以及原指定PG17.9来源36测试；这些是已有上游执行记录，niko没有重跑Windows操作。niko Chromium EPERM与物理手机/WeChat边界不变。上游CI37204113832因追踪源hash过期失败，接回后重生成索引并通过133Python守卫（含17追踪）及新增上游JS语法检查，待本提交CI复核。新截图blob在合并树中原样保留；现有私有短期源码归档工作流仅加刷新说明，以物化四张GitHub文本接口不能读取的PNG，不含秘密或Git历史，不创建开发任务。
 
 API0.37提交af54ced的CI37205722598已成功，修复后的追踪检查通过；现有源码归档37205722581亦成功。仅补齐4张原PNG，Git blob/归档SHA/完整树一致并逐张查看，未替换任何已有文件；截图显示既有Windows桌面/模拟390px的冻结历史与未知值，不当作新的浏览器执行。见[物化与CI回读](evidence/niko-inspection-upstream-materialization-20261004.json)。
+
+
+## 2026-10-04 页面明确版本来源核对
+
+执行单当前回读和历史修订各增加显式来源按钮。所选目标同时绑定执行单ID、修订号和当前已显示内容hash；只读面板独立于编辑/原请求恢复状态。重新读取仍只查这一版本，不改查latest；列表/对象/授权上下文变化清除面板，卸载/关闭取消未完成读取。成功来源GET不能确认或解锁未知写入。
+
+生产TypeScript来源reader先验证完整字段/同租户/明确目标、生命周期/时间/计数，再复算完整模板、执行单和包含原创建/该修订记录事实的来源三重SHA256。内部复用内容校验的时间投影不作为真实头时间输出，DTO/页面没有updated_at。深拷贝原始响应后再异步验hash；请求、权限上下文变化以及任一hash阶段后的旧响应均不回填。读取中/失败均不显示旧私有内容；文本按Vue转义显示，摘要/UUID可换行，44px操作目标及窄屏单列样式。
+
+新增34项（22输入/reader、8新SFC、4既有页面接入）单元/模拟DOM测试；全量1190项/72文件、类型检查/生产构建和90契约通过。黄金来源565字节/15d9188e...与Java/独立Python相同；三个hash等待阶段的上下文变化、乱序响应、闭合/卸载、当前内容hash约束和未知写入不被只读确认均覆盖。首次两个页面测试误读未expose的组件内部ref，改为实际按钮/DOM观测及内容不匹配用例后通过，不为测试扩张组件公开状态。
+
+另19次真实HTTP/14次来源GET，全部HTTP方法GET，无新业务记录/写入/删除：复用已完成API证明的归档合成执行单；三版本/未知值、预期hash、实际403/404、受控响应正文/租户/hash篡改和迟到成功均验证。4次受控修改的是实际200响应的客户端传输正文，1次实际200延后释放，不是假PG或真实网络崩溃。第一次因会话超时401未进入来源验证，刷新既有6身份OIDC后重跑。第二次错误地把拒绝请求也算入无审计窗口，发现403和404各正确新增1条DENIED安全审计；调整为分别核对成功窗口审计不变、2条安全拒绝审计，然后第三次通过。契约扩展名/说明同步明确“成功读取不写业务审计”，保留拒绝审计，193响应schema和其他86路径无变更。
+
+重新检查niko托管云浏览器：已有Chromium/CDP可用，但访问运行中回环Vite的目标被ERR_BLOCKED_BY_CLIENT/URL安全策略阻断，未打开应用页；不改地址/代理/网络或沙箱绕过。该新面板真实浏览器/手机/WeChat仍NOT_RUN，不能拿此前Windows28项旧页面证据代替；只停止本次拥有且已核验父链/命令/cwd的Vite，PG/Keycloak/API继续运行。见[真实客户端](evidence/niko-inspection-source-client-http-20261004.json)、[新增浏览器阻塞](evidence/niko-inspection-source-ui-browser-blocker-20261004.json)及[本轮验证](evidence/niko-inspection-source-ui-20261004.json)。

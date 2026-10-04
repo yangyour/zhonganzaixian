@@ -19332,7 +19332,7 @@
     "/inspection-worksheets/{id}/revisions/{version}": {
       "get": {
         "operationId": "getInspectionWorksheetSourceRevision",
-        "summary": "当前授权租户内按明确版本追溯完整冻结来源；不回退当前版本，不写审计或收据",
+        "summary": "当前授权租户内按明确版本追溯完整冻结来源；不回退当前版本，成功读取不写业务审计或收据，拒绝仍记录安全审计",
         "x-mop-roles": [
           "padmin"
         ],
@@ -19363,7 +19363,8 @@
         ],
         "x-mop-read-consistency": "READ_ONLY_REPEATABLE_READ",
         "x-mop-explicit-version-only": true,
-        "x-mop-writes-audit-or-receipts": false,
+        "x-mop-success-writes-audit-or-receipts": false,
+        "x-mop-denied-read-security-audit": "EXISTING_DENIED_REQUEST_AUDIT",
         "responses": {
           "200": {
             "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",

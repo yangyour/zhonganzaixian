@@ -230,3 +230,8 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 
 
 2026-10-04 最新来源捕获只复用原PG17.9，13真实只读捕获/3选择/20清单已验，未新增接口/表/组件/身份；原V22及API0.36保持。Windows符号链接创建权限缺失只影响1条路径保护测试前置条件，未修改宿主机权限；该条明确SKIP，见[最终证据](../evidence/local-inspection-source-capture-20261004.json)。
+
+
+## 2026-10-04 niko来源追溯新UI的浏览器路径
+
+13:43 UTC已实际发现托管Chromium/CDP运行，按既有Vite回环5173/真实API8080打开来源页面；导航返回ERR_BLOCKED_BY_CLIENT，随后观测被浏览器URL安全策略拒绝。应用页打开0，新来源面板真实DOM/移动/WeChat验收NOT_RUN；不将此原因归为机器人检测，也不改协议、代理、端口或沙箱绕过。既有原Windows28项模板/执行单检查保留为旧页面独立证据，不能代替新增面板。仅关闭此轮拥有的Vite进程，PG/Keycloak/API不停止。详见docs/evidence/niko-inspection-source-ui-browser-blocker-20261004.json；其余19真实只读HTTP继续验证，无新组件/凭据/迁移。

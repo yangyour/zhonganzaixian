@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { WorksheetDetail, WorksheetRevision } from '../utils/inspectionWorksheets'
+import type { WorksheetDetail, WorksheetFacts } from '../utils/inspectionWorksheets'
 import { displayTime } from '../utils/display'
-defineProps<{ value: WorksheetDetail | WorksheetRevision }>()
+defineProps<{ value: Pick<WorksheetDetail, keyof WorksheetFacts | "recorded_at" | "template_items" | "observations"> }>()
 const resultLabel = { NORMAL: '正常（人工填写）', ATTENTION: '建议关注（人工填写）', REQUIRES_ACTION: '需处理（人工填写）' }
 </script>
 <template>

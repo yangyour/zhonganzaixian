@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.40.0",
+    "version": "0.41.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -22618,6 +22618,242 @@
           }
         }
       }
+    },
+    "/my/worklogs": {
+      "get": {
+        "operationId": "browseOwnCurrentWorklogs",
+        "summary": "当前msp本人跨工单实填记录；起始时间前闭后开筛选，返回完整原区间，不裁剪或汇总",
+        "x-mop-capability": "worklogs:read_own",
+        "x-mop-reject-duplicate-query-keys": true,
+        "description": "当前启用msp成员本人记录；tenant/owner来自会话及当前成员，外人记录和错误父工单404。无系统管理员代改或团队权限。原始分页边界仅裁剪已授权范围，不授予访问权限；新记录在第一页刷新可见。无默认工时、成本、SLA或工单状态变更。",
+        "x-mop-roles": [
+          "msp"
+        ],
+        "x-mop-readonly": true,
+        "x-mop-current-membership-recheck": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-max-encoded-query-bytes": 2048,
+        "x-mop-read-consistency": "READ_ONLY_REPEATABLE_READ_PER_REQUEST_NOT_FROZEN_PAGES",
+        "x-mop-success-writes-audit-or-receipts": false,
+        "x-mop-filter-semantics": "AND; explicit optional ticket/kind; current revision started_at >= started_from and < started_before; no default month or clipping",
+        "x-mop-paired-query-keys": [
+          [
+            "before_created_at",
+            "before_id"
+          ],
+          [
+            "started_from",
+            "started_before"
+          ]
+        ],
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                20
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_created_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "ticket_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "REMOTE",
+                "ONSITE",
+                "INSPECTION",
+                "COMMUTE"
+              ]
+            }
+          },
+          {
+            "name": "started_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "started_before",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnWorklogBrowseResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -44813,6 +45049,213 @@
                 "else": {
                   "properties": {
                     "next_before_version": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "OwnWorklogQueryFilters": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "kind": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              null,
+              "REMOTE",
+              "ONSITE",
+              "INSPECTION",
+              "COMMUTE"
+            ]
+          },
+          "started_from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "started_before": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "ticket_id",
+          "kind",
+          "started_from",
+          "started_before"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "started_from": {
+                  "type": "null"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "started_before": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "started_before": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "OwnWorklogBrowseResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "owner_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "items": {
+                "type": "array",
+                "maxItems": 20,
+                "items": {
+                  "$ref": "#/components/schemas/Worklog"
+                }
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_before_created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "next_before_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "filters": {
+                "$ref": "#/components/schemas/OwnWorklogQueryFilters"
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "scope": {
+                "const": "OWN_CURRENT_TENANT"
+              },
+              "page_size_limit": {
+                "const": 20
+              },
+              "projection": {
+                "const": "CURRENT_MANUAL_ENTRIES"
+              },
+              "time_selection": {
+                "const": "STARTED_AT_HALF_OPEN_IF_SUPPLIED"
+              },
+              "interval_projection": {
+                "const": "FULL_RECORDED_INTERVAL_NOT_CLIPPED"
+              },
+              "snapshot_frozen": {
+                "const": false
+              },
+              "aggregates": {
+                "type": "null"
+              },
+              "financial_status": {
+                "const": "CONFIG_PENDING"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "owner_id",
+              "items",
+              "has_more",
+              "next_before_created_at",
+              "next_before_id",
+              "filters",
+              "source",
+              "scope",
+              "page_size_limit",
+              "projection",
+              "time_selection",
+              "interval_projection",
+              "snapshot_frozen",
+              "aggregates",
+              "financial_status"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "has_more": {
+                      "const": true
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "items": {
+                      "minItems": 1
+                    },
+                    "next_before_created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "next_before_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "next_before_created_at": {
+                      "type": "null"
+                    },
+                    "next_before_id": {
                       "type": "null"
                     }
                   }

@@ -71,3 +71,17 @@ M5-21/M10-13的本人实填记录新增跨工单查询基础：OwnWorklogQuery +
 每次查询使用独立REPEATABLE READ只读事务，只连接当前修订；按(created_at,id)降序有界keyset（内部最多21含前探），不重复输出历史版本。跨请求页不是冻结快照，其他操作修改当前修订后过滤结果可能改变，不能冒充冻结报表。新查询原生UUID绑定，不把索引列转为文本；本次没有大规模数据或性能验收，不推定10秒语句超时等于满足业务SLO。查询不能嵌入受保护写事务，成功/空查询不增加审计/幂等/业务记录。备注/原起止保持原样，返回条目再核对操作者/租户/过滤条件。
 
 新增4纯查询校验与12真实PG读取测试，涵盖跨两工单、当前修订筛选、范围端点/不裁剪/明确0、24条keyset、真实外租户工单404、历史其他owner隐藏（只在既有真实PG插入标记合成历史，不提升该身份）、角色/PV、读不写与嵌套拒绝。测试数据保留，不另建组件或凭据，不修改V1—V25。这个提交尚不新增公开HTTP或页面，在线API0.40保持不变；实际计数见[读取仓储证据](evidence/niko-own-worklog-reader-20261004.json)。团队Q09、默认工时/成本Q23、正式统计/验收仍NOT_RUN。
+
+## 2026-10-04 API0.41本人跨工单查询
+
+新增且只新增GET `/api/v1/my/worklogs`，复用原worklogs:read_own能力与真实V8仓储；仅当前msp本人/当前租户，不增加服务经理、padmin代看或团队权限。旧99条路径及217个schema全部原样保留，新增1路径2schema，总100路径219schema。
+
+允许page_size=10/15/20（默认15）、成对before_created_at/before_id、可选ticket_id、四类kind及成对started_from/started_before。拒绝未知/重复/空参数、raw查询超过2048字节、owner/tenant/team/month/aggregate覆盖；时间必须显式Z/offset且最多毫秒，归一化UTC。全部过滤AND作用于当前修订；起始区间前闭后开，返回完整自述记录，不裁剪49小时、不把明确0当缺值，也不计算期间总工时。
+
+返回明确tenant_id/owner_id、已应用filters、OWN_CURRENT_TENANT、CURRENT_MANUAL_ENTRIES、STARTED_AT_HALF_OPEN_IF_SUPPLIED、FULL_RECORDED_INTERVAL_NOT_CLIPPED；snapshot_frozen=false、aggregates=null、financial_status=CONFIG_PENDING，原每条Worklog的default_minutes/各成本/毛利继续null。新接口没有POST/PATCH；详情/历史仍用既有按工单本人路径。没有用来源完整性替代正式经营口径，也不声称跨请求分页是冻结快照。
+
+10新增控制器测试、根2089报告/2076执行/699真实PG（13历史跳过、6MinIO排除），112契约、1402Web/82文件、类型/构建、136Python通过。普通拥有者守卫部署重启后56旧表完整行指纹在6OIDC新登录前一致，不声称崩溃/物理故障恢复；V25只读check0执行，固定API SHA14ebbdd17037c706ee9094f0a8e70fc1e36f1727046dcedc98b8caa0a52a8872。
+
+47真实HTTP通过（25×200、3×202、11×400、1×401、5×403、2×404）；其中7写请求仅为既有报障/工时接口构造3合成父登记、3本人工时及1修订，新查询本身只GET。验证真实分页、两个工单、显式offset窗口/边界排除、49小时原区间、实填0、当前修订替代而非累加历史、角色/外租户工单及输入拒绝。成功只读窗口审计序号不变；3父登记仍版本1/状态优先级SLA未知，3工时/4历史/3创建+1修改审计留存，无新身份/凭据/存储/迁移。
+
+证据见[API](evidence/niko-own-worklog-api-20261004.json)及[HTTP](evidence/niko-own-worklog-browse-http-20261004.json)。尚无跨工单查询页面，真实浏览器/团队Q09/默认成本Q23/正式经营验收仍NOT_RUN；已完成控制.local/niko-test/own-worklog-browse-api-control.json不得盲目重跑或覆盖原请求/收据。

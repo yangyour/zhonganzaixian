@@ -212,3 +212,8 @@ V23已独立冻结，本轮仅只读check0执行，启动不迁移。正常退�
 ## 2026-10-04 API0.40未审核报备草稿真实HTTP
 
 复用既有PG17.11/KC26.2.4与V25；独立schema只读检查0迁移。旧拥有者runner正常退出后新固定API工件5cdbfa7620e72eb8caabf335a064e5138ee70d45ed6cda6fc492a7d066d36823启动，56张旧表在6OIDC新登录前完整行指纹等值；不称崩溃/故障恢复。83HTTP成功完成，2个自有合成草稿已归档，18修订/36设备引用/18成功审计（2创建），无pending原请求。审批/P3未知、不执行或抑制；原服务器/OSS未操作、无新账号或代理，API/Worker不自动迁移。当前completed控制.local/niko-test/change-notice-api-control.json禁止盲目重跑；需新场景才能再验证。见docs/evidence/niko-change-notice-api-20261004.json。
+
+
+## 2026-10-04 API0.41本人工时跨工单只读查询
+
+既有niko PG17.11/KC26.2.4/V25不变，普通拥有者守卫重启到固定工件14ebbdd17037c706ee9094f0a8e70fc1e36f1727046dcedc98b8caa0a52a8872；56旧表在6OIDC新登录前完整行等值，无DDL/新账号/凭据/端口/代理。47真实HTTP含旧接口7次合成数据准备写入，新/my/worklogs只GET；成功查询审计序号不变。3父登记/3本人工时/4修订留存，父状态/SLA仍未知；不是团队或经营口径。原服务器与OSS未操作，真实浏览器未验。详见docs/evidence/niko-own-worklog-api-20261004.json。

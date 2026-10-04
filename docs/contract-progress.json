@@ -841,6 +841,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/evidence/niko-own-worklog-api-20261004.json",
         "docs/evidence/niko-own-worklog-reader-20261004.json",
         "docs/manual-worklogs.md"
       ],
@@ -1345,6 +1346,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/evidence/niko-own-worklog-api-20261004.json",
         "docs/evidence/niko-own-worklog-reader-20261004.json",
         "docs/manual-worklogs.md"
       ],
@@ -1354,6 +1356,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "573737219677a375ae369bd12420c479e29cc849ac48be2d943673c4b6cfe048"
+    "doc/development/07_合同逐项开发追踪.md": "d98bb081b3644e119280127fa8a347a344cb1b02f4eb264ca3b90f1ac5da2be2"
   }
 }

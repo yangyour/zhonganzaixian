@@ -9,6 +9,8 @@ public interface WorklogRepository {
     record Entry(String id,String tenantId,String ticketId,String ownerId,long version,Instant createdAt,Instant updatedAt,ManualWorklog facts) {}
     record Revision(long version,String action,String actorId,Instant recordedAt,ManualWorklog facts) {}
     List<Entry> listOwn(Access access,String ticketId,int limit,Instant beforeCreated,String beforeId);
+    /** Current actor/current tenant across tickets; no aggregates or team visibility. */
+    List<Entry> listOwnAcrossTickets(Access access,OwnWorklogQuery query,int limit,Instant beforeCreated,String beforeId);
     Entry getOwn(Access access,String ticketId,String id);
     List<Revision> historyOwn(Access access,String ticketId,String id,int limit,Long beforeVersion);
     /** Caller must enter the platform's idempotent command transaction. */

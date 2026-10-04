@@ -19,7 +19,7 @@ public final class PostgresWorklogRepository implements WorklogRepository {
     private <T>T read(Access access,String ticket,Read<T> action){
         try(Connection c=dataSource.getConnection()){
             c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);c.setAutoCommit(false);
-            try{authorize(c,access,false);ticket(c,access,ticket,false);T result=action.run(c);c.commit();return result;}
+            try{authorize(c,access,false);if(ticket!=null)ticket(c,access,ticket,false);T result=action.run(c);c.commit();return result;}
             catch(SQLException|RuntimeException|Error failure){try{c.rollback();}catch(SQLException ignored){}throw failure;}
         }catch(SQLException failure){throw unavailable(failure);}
     }
@@ -28,6 +28,14 @@ public final class PostgresWorklogRepository implements WorklogRepository {
         return read(a,parent,c->{List<Entry> values=new ArrayList<>();String after=beforeCreated==null?"":" AND (w.created_at,w.id)<(?,?::uuid)";
             try(var s=statement(c,SELECT+" WHERE w.tenant_id::text=? AND w.ticket_id::text=? AND w.owner_id::text=?"+after+" ORDER BY w.created_at DESC,w.id DESC LIMIT ?")){
                 bindScope(s,a,parent);int next=4;if(beforeCreated!=null){s.setObject(next++,utc(beforeCreated));s.setString(next++,uuid(beforeId));}s.setInt(next,limit);try(var r=s.executeQuery()){while(r.next())values.add(entry(r));}
+            }return List.copyOf(values);
+        });
+    }
+    @Override public List<Entry> listOwnAcrossTickets(Access a,OwnWorklogQuery q,int limit,Instant beforeCreated,String beforeId){
+        platform.requireStandaloneRead();if(q==null||limit<1||limit>21||(beforeCreated==null)!=(beforeId==null))throw invalid();String cursor=beforeId==null?null:uuid(beforeId);if(beforeCreated!=null)OwnWorklogQuery.requireProtocolInstant(beforeCreated);String parent=q.ticketId()==null?null:q.ticketId().toString();
+        return read(a,parent,c->{List<Entry> values=new ArrayList<>();String sql=SELECT+" WHERE w.tenant_id=?::uuid AND w.owner_id=?::uuid"+(parent==null?"":" AND w.ticket_id=?::uuid")+(q.kind()==null?"":" AND r.kind=?")+(q.startedFrom()==null?"":" AND r.started_at>=? AND r.started_at<?")+(beforeCreated==null?"":" AND (w.created_at,w.id)<(?,?::uuid)")+" ORDER BY w.created_at DESC,w.id DESC LIMIT ?";
+            try(var s=statement(c,sql)){int p=1;s.setString(p++,a.tenantId());s.setString(p++,a.actorId());if(parent!=null)s.setString(p++,parent);if(q.kind()!=null)s.setString(p++,q.kind().name());if(q.startedFrom()!=null){s.setObject(p++,utc(q.startedFrom()));s.setObject(p++,utc(q.startedBefore()));}if(beforeCreated!=null){s.setObject(p++,utc(beforeCreated));s.setString(p++,cursor);}s.setInt(p,limit);
+                try(var rows=s.executeQuery()){while(rows.next()){Entry value=entry(rows);if(!value.tenantId().equals(a.tenantId())||!value.ownerId().equals(a.actorId())||parent!=null&&!parent.equals(value.ticketId())||q.kind()!=null&&q.kind()!=value.facts().kind()||q.startedFrom()!=null&&(value.facts().startedAt().isBefore(q.startedFrom())||!value.facts().startedAt().isBefore(q.startedBefore())))throw corrupt();values.add(value);}}
             }return List.copyOf(values);
         });
     }

@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-04",
+  "environment": "niko-local-test",
+  "api_contract_version": "0.34.0",
+  "new_controller_tests": 15,
+  "contract_tests": 73,
+  "contract_generation_consistent": true,
+  "root_reported": 1400,
+  "root_executed": 1387,
+  "root_failures": 0,
+  "root_errors": 0,
+  "real_postgresql_tests": 399,
+  "historical_fixture_skipped": 13,
+  "minio_tests_excluded": 6,
+  "real_http_requests": 35,
+  "response_status_counts": {
+    "200": 17,
+    "400": 13,
+    "401": 1,
+    "403": 4
+  },
+  "initial_visible_tenants": 2,
+  "real_has_more_observed": false,
+  "json_schema_validated": true,
+  "no_store_verified": true,
+  "unknown_fields_remained_null": true,
+  "business_writes": 0,
+  "new_tenants_users_or_grants": 0,
+  "own_test_stack_normal_restart": true,
+  "schema_migrations_executed": 0,
+  "browser_dom_tested": false,
+  "quota_thresholds_verified": false,
+  "formal_acceptance": "NOT_RUN",
+  "log_sha256": {
+    "tenant-inventory-controller-20261004.log": "708d9b7203dfef11e99aa80e1f2557ab4052f31dea79575bd2478732338f81a5",
+    "tenant-inventory-api-real-pg-20261004.log": "4dc39fe5ea311cec5137cb9721a960c8e43c4cbd7dbcb223c5129f305e3b54de",
+    "tenant-inventory-api-contracts-20261004.log": "3d2780eabec5671227f6bc25204a7e18ffbeb900e4e95660154e08a37cf356ba",
+    "tenant-inventory-http-20261004.log": "3f3ad696d707f136cecf2016120297f31e2c065bd8eed1409405bfcd66b09f31"
+  }
+}

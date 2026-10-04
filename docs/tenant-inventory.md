@@ -21,3 +21,15 @@ M2-1 当前新增 `authorizedTenantInventory`，复用现有PG表、运行账号
 6项纯模型检查、7项真实PG检查覆盖现有授权范围、三角色拒绝、旧/缺成员、keyset不重不漏、三个计数独立SQL对账及身份/审计数量不变。只读用例未创建任何测试身份/授权/租户，不以数据库替身代替。
 
 真实并发撤权、较大租户规模性能、HTTP、完整12列/配额色阶和实际DOM待验证。继续实现读取契约和页面；新建租户异步监控/受限身份准备仍依赖独立批准与组件，不以本仓储伪装租户接入完成。详见 [本次证据](evidence/niko-tenant-inventory-repository-20261004.json)。
+
+## 2026-10-04 API V0.34与真实只读验证
+
+新增 `GET /api/v1/tenants/inventory`，只接page_size（10/15/25/50/100，默认15）和规范小写after_id；未知、重复参数和超过512字节查询拒绝。先核当前会话/padmin，再交仓储同快照复验成员权限版本及每目标范围。客户端不能传tenant_id、角色、状态或配额覆盖。
+
+响应包含当前授权上下文、items、has_more、next_after_id、source/scope及事实口径。三个计数作为精确十进制字符串输出（0..Long.MAX_VALUE），避免JS浮点损失。11个尚无来源的运行/配额/监控字段明确null；new_tenant_creation_enabled=false。API回读顺序/数量异常返回503，不返回半页“成功”。生成的实际OpenAPI增加Schema、参数和授权边界；不改既有写动作。
+
+15控制器测试、73契约/生成一致通过；根1400报告1387执行含399真实PG，13历史fixture跳过、6MinIO排除。随后仅自己的PG/KC/API正常停止并用新固定构建启动，保留原库，未执行迁移或改变原服务器；六个既有OIDC测试登录刷新。
+
+实际35个GET：17×200、13×400、1×401、4×403。两个padmin会话可读；MSP/tadmin/两个viewer被拒，匿名401；显式null、精确字符串、Schema、no-store、页面大小/游标/未知及重复参数通过。当前只有2个已授权测试租户，实际没有触发has_more=true，正向lookahead边界只在隔离控制器测试覆盖，不通过新建身份/租户补齐。445条配置登记本次前后hash一致，0业务写/0新租户用户/0权限变更。
+
+真实HTTP不是实际浏览器12列页面，配额色阶、详情一致性和完整M2-1验收仍未执行。见 [HTTP证据](evidence/niko-tenant-inventory-http-20261004.json) 与 [汇总](evidence/niko-tenant-inventory-api-20261004.json)。

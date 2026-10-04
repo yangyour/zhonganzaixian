@@ -1,0 +1,56 @@
+{
+  "verified_at": "2026-10-04T01:43:29.571Z",
+  "environment": "niko-local-test",
+  "instance": "rebuilt-20261003-after-executor-loss",
+  "api_contract_version": "0.34.0",
+  "http_requests": 35,
+  "http_methods": [
+    "GET"
+  ],
+  "response_status_counts": {
+    "200": 17,
+    "400": 13,
+    "401": 1,
+    "403": 4
+  },
+  "role_results": {
+    "padmin": {
+      "current_role": "padmin",
+      "status": 200
+    },
+    "msp": {
+      "current_role": "msp",
+      "status": 403
+    },
+    "tadmin": {
+      "current_role": "tadmin",
+      "status": 403
+    },
+    "viewerA": {
+      "current_role": "viewer",
+      "status": 403
+    },
+    "viewerB": {
+      "current_role": "viewer",
+      "status": 403
+    },
+    "reviewer": {
+      "current_role": "padmin",
+      "status": 200
+    }
+  },
+  "initial_visible_tenants": 2,
+  "has_more_observed": false,
+  "lookahead_true_boundary": "CONTROLLER_ISOLATED_TEST_ONLY_UNLESS_OBSERVED",
+  "actual_json_schema_validated": true,
+  "registered_counts_are_decimal_strings": true,
+  "unknown_fields_remained_null": true,
+  "registry_entries": 445,
+  "registry_sha256_unchanged": "c5346ee5b7ced97bd826d750afc0381658814804ab26eda5d7d419794db01a5f",
+  "business_writes": 0,
+  "tenants_or_users_created": 0,
+  "permissions_changed": false,
+  "monitoring_or_quota_verified": false,
+  "browser_dom_tested": false,
+  "contract_done": false
+}

@@ -439,12 +439,20 @@ const dependencyDraft = object({
   technical_limits: object({ max_additions: { const: 100 }, max_graph_edges: { const: 10000 }, max_body_bytes: { const: 131072 } }),
 });
 const dependencyAppend = object({ expected_version: { type: 'integer', minimum: 0, maximum: 9007199254740990, description: '当前完整租户图的CAS版本，不是资产版本；所有引用在同租户且每条新增边须连接路径资产。未知业务元数据明确null。' }, additions: { type: 'array', minItems: 1, maxItems: 100, uniqueItems: true, items: dependencyEdge } });
+const tenantLongMax = '9223372036854775807';
+const tenantLongAlternatives = ['0', '[1-9][0-9]{0,17}', tenantLongMax];
+for (let i = 0; i < tenantLongMax.length; i++) { const minimum = i === 0 ? 1 : 0, maximum = Number(tenantLongMax[i]) - 1; if (maximum >= minimum) tenantLongAlternatives.push(tenantLongMax.slice(0, i) + (minimum === maximum ? String(minimum) : `[${minimum}-${maximum}]`) + `[0-9]{${tenantLongMax.length - i - 1}}`); }
+const tenantCount = { type: 'string', pattern: `^(?:${tenantLongAlternatives.join('|')})$`, maxLength: 19, description: '非负Java long精确十进制字符串；不是监控、授权额度或JS浮点数字' };
+const tenantInventory = object({ id: uuid, name: string, created_at: dateTime, registered_asset_count: tenantCount, registered_site_count: tenantCount, active_member_count: tenantCount, ...Object.fromEntries(['isolation_mode', 'resource_pool', 'lifecycle_status', 'asset_quota', 'monitored_item_count', 'item_quota', 'nvps', 'nvps_quota', 'data_retention_days', 'itsm_integration', 'topology_enabled'].map(k => [k, { type: 'null' }])) });
+const tenantInventoryPage = object({ context_tenant_id: uuid, items: { type: 'array', maxItems: 100, items: ref('TenantInventory') }, has_more: { type: 'boolean' }, next_after_id: { ...uuid, type: ['string', 'null'] }, source: { const: 'postgresql' }, scope: { const: 'ACTIVE_PADMIN_MEMBERSHIPS_ONLY' }, page_size_limit: { const: 100 }, pagination_consistency: { const: 'CURRENT_REQUEST_SNAPSHOT_ONLY' }, count_basis: { const: 'RECORDED_ROWS_NOT_MONITORED_OR_LICENSED_USAGE' }, unknown_fields_policy: { const: 'EXPLICIT_NULL_NO_INFERENCE' }, new_tenant_creation_enabled: { const: false } });
+tenantInventoryPage.oneOf = [{ properties: { has_more: { const: false }, next_after_id: { type: 'null' } } }, { properties: { has_more: { const: true }, next_after_id: { type: 'string' }, items: { minItems: 1 } } }];
 const contract = {
   openapi: '3.1.0',
-  info: { title: 'MOP 共享测试环境 API', version: '0.33.0', description: '本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。' },
+  info: { title: 'MOP 共享测试环境 API', version: '0.34.0', description: '本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。' },
   servers: [{ url: '/api/v1' }],
   security: [{ SessionCookie: [] }],
   paths: {
+    '/tenants/inventory': { get: action('readAuthorizedTenantInventory', '当前及每目标租户活跃padmin成员授权的登记资源分页；不修改租户或猜配额/监控状态', ref('TenantInventoryResult'), { parameters: [parameter('page_size', 'query', { type: 'integer', enum: [10, 15, 25, 50, 100], default: 15 }, false), parameter('after_id', 'query', { ...uuid, pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' }, false)], 'x-mop-roles': ['padmin'], 'x-mop-reject-unknown-query-keys': true, 'x-mop-reject-duplicate-query-keys': true, 'x-mop-permission-version-recheck': true, 'x-mop-query-max-bytes': 512, 'x-mop-per-target-padmin-membership-required': true, 'x-mop-readonly': true }) },
     '/health/live': { get: action('liveness', '本地进程存活', ref('ResourceResult'), { security: [] }) },
     '/health/ready': { get: action('readiness', '实际PG/OIDC及已启用照片/导入源策略/schema/ACL/已选对象存储就绪；失败503及安全原因。导入worker_activity=NOT_PROBED，不证明Worker运行、业务导入或生产就绪', ref('ReadinessResult'), { security: [] }) },
     '/auth/options': { get: action('authOptions', '读取Keycloak授权登录入口；不返回秘密', envelope(object({ mode: { const: 'remote_test' }, identity_source: { const: 'test_oidc' }, login_url: { const: '/oauth2/authorization/mop' } })), { security: [] }) },
@@ -587,6 +595,7 @@ const contract = {
   components: {
     securitySchemes: { SessionCookie: { type: 'apiKey', in: 'cookie', name: 'MOP_SESSION' } },
     schemas: {
+      TenantInventory: tenantInventory, TenantInventoryPage: tenantInventoryPage, TenantInventoryResult: envelope(ref('TenantInventoryPage')),
       Error: object({ error: object({ code: string, message: string, details: { type: 'array', items: { type: 'object', additionalProperties: true } } }), trace_id: string }),
       ResourceResult: envelope({ type: 'object', additionalProperties: true }),
       ReadinessResult: readiness,

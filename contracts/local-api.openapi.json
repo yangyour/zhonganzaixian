@@ -39842,7 +39842,8 @@
             "const": false
           },
           "period_time_zone": {
-            "type": "null"
+            "type": "null",
+            "description": "No report period is selected for this technical source collection. Null is not an unknown platform business timezone; business.timezone is contract-fixed Asia/Shanghai."
           },
           "quarter_selection_rule": {
             "type": "null"
@@ -39898,6 +39899,7 @@
           "report_published"
         ],
         "additionalProperties": false,
+        "x-mop-business-timezone": "Asia/Shanghai",
         "x-mop-integrity": "Metadata projection only; list does not read/verify full document body. document_sha256 describes persisted canonical UTF-8 bytea, not this HTTP response JSON. No authenticity or file grant."
       },
       "InspectionSourceCollectionDetail": {
@@ -39966,7 +39968,8 @@
             "const": false
           },
           "period_time_zone": {
-            "type": "null"
+            "type": "null",
+            "description": "No report period is selected for this technical source collection. Null is not an unknown platform business timezone; business.timezone is contract-fixed Asia/Shanghai."
           },
           "quarter_selection_rule": {
             "type": "null"
@@ -40255,6 +40258,7 @@
             }
           }
         ],
+        "x-mop-business-timezone": "Asia/Shanghai",
         "x-mop-integrity": "Server verifies persisted original document SHA, canonical encoding, tenant, all nested hashes and source timestamps; source_manifest_sha256 binds sorted explicit source IDs/versions/hashes. Lists and create receipts omit the full body."
       },
       "InspectionSourceCollectionSummaryResult": {

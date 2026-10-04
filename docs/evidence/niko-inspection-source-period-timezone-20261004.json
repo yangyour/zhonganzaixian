@@ -1,0 +1,62 @@
+{
+  "verified_at": "2026-10-04T16:43:43.868308+00:00",
+  "scope": "FIXED_BUSINESS_TIMEZONE_VS_ABSENT_SOURCE_COLLECTION_REPORT_PERIOD",
+  "basis": {
+    "registry": "doc/development/04_客户待确认事项与全局设置.md",
+    "configuration_key": "business.timezone",
+    "value": "Asia/Shanghai",
+    "classification": "F/platform fixed_constraint",
+    "machine_registry": "contracts/config-baseline.json",
+    "decision_status": "contract_fixed",
+    "question_ids": []
+  },
+  "correction": "Earlier question/page wording incorrectly treated timezone as pending; user informed2026-10-04T16:35:53Z. Source collection period_time_zone remainsnull because no report period is selected, not because fixed platform timezone is unknown.",
+  "still_pending": [
+    "same-device multiple-source selection",
+    "unknown performed-time inclusion",
+    "archived-revision inclusion",
+    "approved metric/report template versions"
+  ],
+  "new_web_tests": 3,
+  "new_contract_tests": 1,
+  "focused_web_tests": 26,
+  "web_tests": 1263,
+  "web_test_files": 76,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts": 97,
+  "contract_generation": "PASS",
+  "api_version": "0.38.0",
+  "contract_changes": [
+    "components.schemas.InspectionSourceCollectionDetail.properties.period_time_zone.description",
+    "components.schemas.InspectionSourceCollectionDetail.x-mop-business-timezone",
+    "components.schemas.InspectionSourceCollectionSummary.properties.period_time_zone.description",
+    "components.schemas.InspectionSourceCollectionSummary.x-mop-business-timezone"
+  ],
+  "wire_paths_fields_types_and_gates_unchanged": true,
+  "existing_display_behavior_unchanged": true,
+  "schema_version": 23,
+  "migrations_executed": 0,
+  "http_requests": 0,
+  "business_writes": 0,
+  "new_backend_test_execution": false,
+  "browser_tested": false,
+  "formal_report_generatable": false,
+  "report_published": false,
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "apps/web/src/pages/InspectionSourceCollectionsPage.vue": "d702918d4182a14d2ddc3213b0fc28d2577352a9a8472f223647caf2213ace99",
+    "apps/web/src/utils/display.ts": "b0acfe8b05200c42e30135bc03bb0eaa5bad7e09e0892e35092cc81c0ccc857e",
+    "apps/web/tests/businessTimeZone.test.ts": "c6bf130c5daa2a1f24a48ae6ee3e963c38ef69188901f0e9cb5af9b0d3dc3c4f",
+    "apps/web/tests/inspectionSourceCollectionsPage.test.ts": "6127b84d641150a7e1277ae5c919147b8085cd2ac6ec81d56dc1e602905db460",
+    "tools/build-api-contract.mjs": "97c52a721abe522a25c8532d5fac885b81532702c5a73d214bc6aa548abf3e37",
+    "tests/contracts.test.mjs": "7a26dfa0ed2b982a0b375a6e7f8d09ebe786fddce5dca83b0ab4a0180f74ce02",
+    "contracts/local-api.openapi.json": "94f9e8d3963d9862baa1f6ef25b299fd1bf12a4245337f4d4f2cc828389a8025"
+  },
+  "logs": [
+    ".local/niko-test/logs/source-collection-timezone-contracts-20261004.log",
+    ".local/niko-test/logs/source-collection-timezone-focused-20261004.log",
+    ".local/niko-test/logs/source-collection-timezone-web-20261004.log",
+    ".local/niko-test/logs/source-collection-timezone-web-build-20261004.log"
+  ]
+}

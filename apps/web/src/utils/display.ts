@@ -7,5 +7,7 @@ export const assetTypes: { value: AssetType; label: string }[] = [
 export const typeLabel = (type: string) => assetTypes.find(item => item.value === type)?.label || '其他'
 export const roleLabel: Record<Role, string> = { viewer: '客户只读', tadmin: '客户管理员', msp: 'MSP 工程师', padmin: '平台管理员' }
 export const displayValue = (value: unknown) => value === null || value === undefined ? '待确认' : typeof value === 'object' ? JSON.stringify(value) : typeof value === 'boolean' ? value ? '是' : '否' : String(value)
-export const displayTime = (value?: string | null) => value ? new Date(value).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', hour12: false }) : '—'
+/** Contract-fixed business.timezone (04 registry), not the browser timezone or a selected report period. */
+export const businessTimeZone = 'Asia/Shanghai' as const
+export const displayTime = (value?: string | null) => value ? new Date(value).toLocaleString('zh-CN', { timeZone: businessTimeZone, hour12: false }) : '—'
 export const sourceLabel = (source: string) => ({ test_seed: '测试种子 · 未采集', manual: '手动草稿 · 未采集', manual_draft: '手动草稿 · 未采集', fixture: '历史单元夹具 · 未采集' } as Record<string, string>)[source] || source

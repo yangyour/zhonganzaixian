@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 35,
-  "rows_without_progress_notes": 93,
+  "rows_with_progress_notes": 37,
+  "rows_without_progress_notes": 91,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -72,7 +72,7 @@
     },
     "M9": {
       "requirements": 9,
-      "rows_with_progress_notes": 2,
+      "rows_with_progress_notes": 4,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 9
       }
@@ -1128,8 +1128,10 @@
       "id": "M9-2",
       "title": "月报快照与冻结",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/inspection-report-sources.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1193,8 +1195,10 @@
       "id": "M9-9",
       "title": "报告通用规则（验收硬约束）",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/inspection-report-sources.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1329,6 +1333,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "43d51390e1e25de6c590e0dd40f434f5586e8ac4595dc1cf08a2a3048c2bd4f5"
+    "doc/development/07_合同逐项开发追踪.md": "16692e11f8d587dcae5241ccbb282d263e11e69161df82a48cfdc44904e9c4f3"
   }
 }

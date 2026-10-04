@@ -39,6 +39,11 @@ jobs:
           bash tools/verify-asset-dependencies-pure.sh
           bash tools/verify-configuration-resolution-pure.sh
           bash tools/verify-asset-import-pure.sh
+      - name: Check the complete contract tracker index (not acceptance)
+        run: |
+          python3 -m unittest discover -s tools -p test_contract_progress.py -v
+          python3 tools/contract_progress.py --check
+
       - name: Verify SSH host trust without network or private configuration
         run: |
           python3 -m venv "$RUNNER_TEMP/mop-ssh-test"

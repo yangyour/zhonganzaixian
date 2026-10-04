@@ -1,0 +1,1317 @@
+{
+  "schema_version": 1,
+  "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
+  "requirement_count": 128,
+  "rows_with_progress_notes": 30,
+  "rows_without_progress_notes": 98,
+  "declared_acceptance_status_counts": {
+    "NOT_RUN": 128
+  },
+  "project_declaration_state": "ACCEPTANCE_INCOMPLETE",
+  "completion_verified": false,
+  "progress_notes_are_completed_requirements": false,
+  "test_counts_are_contract_completion_percentage": false,
+  "linked_evidence_contents_or_authenticity_verified": false,
+  "external_references_fetched": false,
+  "modules": {
+    "M1": {
+      "requirements": 11,
+      "rows_with_progress_notes": 2,
+      "declared_acceptance_status_counts": {
+        "NOT_RUN": 11
+      }
+    },
+    "M2": {
+      "requirements": 14,
+      "rows_with_progress_notes": 3,
+      "declared_acceptance_status_counts": {
+        "NOT_RUN": 14
+      }
+    },
+    "M3": {
+      "requirements": 12,
+      "rows_with_progress_notes": 6,
+      "declared_acceptance_status_counts": {
+        "NOT_RUN": 12
+      }
+    },
+    "M4": {
+      "requirements": 19,
+      "rows_with_progress_notes": 2,
+      "declared_acceptance_status_counts": {
+        "NOT_RUN": 19
+      }
+    },
+    "M5": {
+      "requirements": 21,
+      "rows_with_progress_notes": 8,
+      "declared_acceptance_status_counts": {
+        "NOT_RUN": 21
+      }
+    },
+    "M6": {
+      "requirements": 7,
+      "rows_with_progress_notes": 3,
+      "declared_acceptance_status_counts": {
+        "NOT_RUN": 7
+      }
+    },
+    "M7": {
+      "requirements": 10,
+      "rows_with_progress_notes": 0,
+      "declared_acceptance_status_counts": {
+        "NOT_RUN": 10
+      }
+    },
+    "M8": {
+      "requirements": 12,
+      "rows_with_progress_notes": 0,
+      "declared_acceptance_status_counts": {
+        "NOT_RUN": 12
+      }
+    },
+    "M9": {
+      "requirements": 9,
+      "rows_with_progress_notes": 1,
+      "declared_acceptance_status_counts": {
+        "NOT_RUN": 9
+      }
+    },
+    "M10": {
+      "requirements": 13,
+      "rows_with_progress_notes": 5,
+      "declared_acceptance_status_counts": {
+        "NOT_RUN": 13
+      }
+    }
+  },
+  "requirements": [
+    {
+      "id": "M1-1",
+      "title": "运营总览首页",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M1-2",
+      "title": "告警趋势图",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M1-3",
+      "title": "服务健康概览",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M1-4",
+      "title": "故障时间线（近24小时）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M1-5",
+      "title": "最近事件列表",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M1-6",
+      "title": "待处理工单列表",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M1-7",
+      "title": "租户视图切换",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M1-8",
+      "title": "全局搜索与通知铃铛",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/global-search.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M1-9",
+      "title": "刷新与时间范围控件",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/http-response-clock.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M1-10",
+      "title": "资源占用Top5",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M1-11",
+      "title": "首页版面管理",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-1",
+      "title": "租户列表",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-2",
+      "title": "新建租户",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-3",
+      "title": "配额管理",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-4",
+      "title": "隔离模式三档",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-5",
+      "title": "六层隔离约束与验证",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-6",
+      "title": "角色定义与权限矩阵",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/capability-catalog.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-7",
+      "title": "菜单与操作权限",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-8",
+      "title": "成员管理",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-9",
+      "title": "客户联系人管理",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/customer-contacts.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-10",
+      "title": "服务档位管理与变更留痕",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-11",
+      "title": "设备数量上限控制",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-12",
+      "title": "审计日志",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/audit-integrity.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-13",
+      "title": "数据保留与删除",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M2-14",
+      "title": "身份认证与组织",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M3-1",
+      "title": "资产列表",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/asset-ledger-reads.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M3-2",
+      "title": "资产列表字段",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/asset-ledger-columns.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M3-3",
+      "title": "资产详情",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M3-4",
+      "title": "资产接入向导（5步）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M3-5",
+      "title": "设备信息维护",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/local-browser-validation-20261003.md",
+        "docs/manual-asset-metadata.md",
+        "docs/manual-warranty-details.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M3-6",
+      "title": "Excel批量导入",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/dot-import-refresh-20261002.json",
+        "docs/evidence/dot-import-template-download-20261002.json",
+        "docs/local-browser-validation-20261003.md",
+        "docs/local-runtime-validation-20261003.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M3-7",
+      "title": "台账导出",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M3-8",
+      "title": "凭据加密托管",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M3-9",
+      "title": "设备依赖关系配置",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/niko-asset-dependency-api-final-http-20261002.json",
+        "docs/evidence/niko-asset-dependency-repository-20261002.json"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M3-10",
+      "title": "维保到期管理",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/local-browser-validation-20261003.md",
+        "docs/manual-warranty-details.md",
+        "docs/warranty-date-assessment.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M3-11",
+      "title": "资产退役与迁移",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M3-12",
+      "title": "设备来源与发现方式",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-1",
+      "title": "设备状态监控",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-2",
+      "title": "资源监控（按设备类型）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-3",
+      "title": "流量监控",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-4",
+      "title": "线路质量监控",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-5",
+      "title": "告警阈值分级与受控宏",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/threshold-condition-diagnostics.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-6",
+      "title": "触发规则管理",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-7",
+      "title": "告警防抖",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-8",
+      "title": "重复告警合并",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-9",
+      "title": "告警抑制（依赖）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-10",
+      "title": "维护窗口静默",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-11",
+      "title": "恢复通知与复核",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-12",
+      "title": "监控模板与灰度治理",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-13",
+      "title": "通知渠道管理",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-14",
+      "title": "事件中心与事件详情",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-15",
+      "title": "Proxy与站点管理",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-16",
+      "title": "监控资源池管理（平台管理员）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-17",
+      "title": "设备配置变更监控",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-18",
+      "title": "监控对象与阈值基线（必须补齐项）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/threshold-condition-diagnostics.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M4-19",
+      "title": "多品牌OID映射机制",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-1",
+      "title": "工单列表",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-2",
+      "title": "三方状态职责分离",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-3",
+      "title": "工单状态与同步状态",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-4",
+      "title": "告警自动建单与规则配置",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-5",
+      "title": "客户自助报障表单",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/dot-report-unicode-20261002.json",
+        "docs/evidence/niko-customer-report-http-20261002.json"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-6",
+      "title": "手工登记事件",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/niko-api-v14-crash-recovery-20261003.json",
+        "docs/manual-incidents.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-7",
+      "title": "处置记录与评论",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/internal-ticket-notes.md",
+        "docs/ticket-comments.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-8",
+      "title": "SLA计时口径",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-9",
+      "title": "SLA报表",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-10",
+      "title": "月报快照与合同对账",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-11",
+      "title": "SLA报表导出",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-12",
+      "title": "值班看板",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-13",
+      "title": "升级策略与值班规则",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-14",
+      "title": "工单转派与改派",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-15",
+      "title": "客户确认关单（一期核心信任机制）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/dot-ticket-action-guards-20261002.json"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-16",
+      "title": "超时自动关单",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-17",
+      "title": "工单重开",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/dot-ticket-action-guards-20261002.json"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-18",
+      "title": "超时提醒与催办",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-19",
+      "title": "SLA未达标与补偿计算",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/sla-compliance-scenarios.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-20",
+      "title": "SLA时钟引擎（底座能力）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/working-calendar-drafts.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M5-21",
+      "title": "工时记录",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/manual-worklogs.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M6-1",
+      "title": "定时备份计划",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/backup-run-state.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M6-2",
+      "title": "备份结果查询与差异比对",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/backup-redacted-diff.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M6-3",
+      "title": "版本历史与回滚参考",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M6-4",
+      "title": "备份失败自动建单",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/backup-run-state.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M6-5",
+      "title": "恢复演练记录",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M6-6",
+      "title": "客户侧只读查看",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M6-7",
+      "title": "变更检测与报备联动",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M7-0",
+      "title": "远程处置总纲与技术约束",
+      "contract_scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M7-1",
+      "title": "受控自动化执行流程（可选增强）",
+      "contract_scope": "可选增强，须书面确认后报价",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M7-2",
+      "title": "操作风险分级策略",
+      "contract_scope": "可选增强，须书面确认后报价",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M7-3",
+      "title": "读写操作审批",
+      "contract_scope": "可选增强，须书面确认后报价",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M7-4",
+      "title": "执行记录与输出归档",
+      "contract_scope": "可选增强，须书面确认后报价",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M7-5",
+      "title": "审计要求（通用）",
+      "contract_scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M7-6",
+      "title": "交互式远程连接（本期主线）",
+      "contract_scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M7-7",
+      "title": "设备授权清单",
+      "contract_scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M7-8",
+      "title": "会话录屏",
+      "contract_scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M7-9",
+      "title": "命令日志与高危命令拦截",
+      "contract_scope": "合同内主线或通用；M7排期待Q01书面确认",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M8-1",
+      "title": "通知渠道对接",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M8-2",
+      "title": "渠道×级别矩阵",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M8-3",
+      "title": "送达记录与死信管理",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M8-4",
+      "title": "企业微信门户与免密登录",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M8-5",
+      "title": "设备概况（客户视角）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M8-6",
+      "title": "拍照报障",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M8-7",
+      "title": "工单进度查询",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M8-8",
+      "title": "确认关单与重开（移动端）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M8-9",
+      "title": "报告中心",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M8-10",
+      "title": "通知偏好设置",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M8-11",
+      "title": "分级推送落地",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M8-12",
+      "title": "门户通用要求",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M9-1",
+      "title": "报表计算口径（所有报告的统一数据源）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/dot-interval-sets-20261002.json"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M9-2",
+      "title": "月报快照与冻结",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M9-3",
+      "title": "老板版月报（1页，核心交付物）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M9-4",
+      "title": "完整版月报（6章）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M9-5",
+      "title": "报告推送与阅读记录",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M9-6",
+      "title": "网络健康体检报告（售前转化工具）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M9-7",
+      "title": "季度巡检报告",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M9-8",
+      "title": "年度复盘报告（标注优先级，可二期交付）",
+      "contract_scope": "合同列项，可二期交付；阶段待Q11确认",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M9-9",
+      "title": "报告通用规则（验收硬约束）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M10-1",
+      "title": "SLA达成率",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M10-2",
+      "title": "告警确认及时率",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M10-3",
+      "title": "远程处置率",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M10-4",
+      "title": "客户毛利统计",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M10-5",
+      "title": "人员服务能力",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/explicit-operational-metrics.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M10-6",
+      "title": "运营计量看板",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M10-7",
+      "title": "容量估算模型（平台管理员）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/capacity-estimate-core.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M10-8",
+      "title": "平台健康与SLO（平台管理员）",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M10-9",
+      "title": "时间维度与导出",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M10-10",
+      "title": "单人可管客户数",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/explicit-operational-metrics.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M10-11",
+      "title": "跳档触发提示",
+      "contract_scope": "合同内一期",
+      "has_progress_note": false,
+      "local_references": [],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M10-12",
+      "title": "八项经营指标口径定义",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/explicit-operational-metrics.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    },
+    {
+      "id": "M10-13",
+      "title": "前置依赖：工时字段",
+      "contract_scope": "合同内一期",
+      "has_progress_note": true,
+      "local_references": [
+        "docs/manual-worklogs.md"
+      ],
+      "external_references_unchecked": 0,
+      "declared_acceptance_status": "NOT_RUN"
+    }
+  ],
+  "source_sha256": {
+    "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
+    "doc/development/07_合同逐项开发追踪.md": "2150d300d4a7d562937a25989b62afa556531a2ffd489b4f31d2ec824f95a6bb"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-04",
+  "environment": "niko-local-test",
+  "scope": "PURE_CONTRACT_TRACKER_INDEX",
+  "new_pure_tests": 17,
+  "python_tests": 111,
+  "python_failures": 0,
+  "contract_tests": 70,
+  "contract_failures": 0,
+  "api_contract_generation_consistent": true,
+  "index_consistent": true,
+  "requirements": 128,
+  "rows_with_progress_notes": 30,
+  "rows_without_progress_notes": 98,
+  "declared_acceptance_status_counts": {
+    "NOT_RUN": 128
+  },
+  "completion_verified": false,
+  "source_sha256": {
+    "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
+    "doc/development/07_合同逐项开发追踪.md": "2150d300d4a7d562937a25989b62afa556531a2ffd489b4f31d2ec824f95a6bb"
+  },
+  "limitations": [
+    "No evidence authenticity/content verification",
+    "No new real component, HTTP or browser verification",
+    "No business API or migration changes",
+    "Progress notes and test counts are not completed requirement counts"
+  ],
+  "log_sha256": {
+    "contract-progress-all-python-20261004.log": "2b01e74e6af96d2c03dade24e9f9a54c986d6f936ed7cc2a9b64a9d7788f73d2",
+    "contract-progress-contracts-20261004.log": "e7f96ef94eefe0c54a900cb2fb0a04e7c4f086158ebb34878a88e86c99d9bedc"
+  }
+}

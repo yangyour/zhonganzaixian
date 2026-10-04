@@ -1,0 +1,19 @@
+{
+  "verified_at": "2026-10-04T02:58:07.120089+00:00",
+  "environment": "designated-server",
+  "source": "cc67711",
+  "module": "server/asset-export",
+  "tests": {
+    "tests": 32,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "real_postgresql": 6,
+  "actual_existing_authorized_snapshot_to_workbook": true,
+  "business_data_writes": 0,
+  "api_changed": false,
+  "schema_changed": false,
+  "async_export_or_browser_download_verified": false,
+  "credentials_output": false
+}

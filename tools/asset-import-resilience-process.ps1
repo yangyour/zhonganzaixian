@@ -6,8 +6,17 @@ $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $stateFile = Join-Path $projectRoot '.local/processes.json'
 try {
     if ($Action -eq 'RestartApps') {
+        # RestartApps stops every registered role. Preserve the explicitly opted-in
+        # contact worker as well, otherwise storage recovery silently removes it.
+        $withContacts = $false
+        if (Test-Path -LiteralPath $stateFile) {
+            $before = Get-Content -Raw -LiteralPath $stateFile | ConvertFrom-Json
+            if ($before.project_root -ne $projectRoot) { throw 'Project ownership mismatch' }
+            foreach ($entry in $before.processes) { $null = Get-MopOwnedProcess -Record $entry -ProjectRoot $projectRoot }
+            $withContacts = @($before.processes | Where-Object { $_.name -eq 'contact-import-worker' }).Count -gt 0
+        }
         & (Join-Path $projectRoot 'deploy/stop-dev.ps1') | Out-Null
-        & (Join-Path $projectRoot 'deploy/start-dev.ps1') -SkipBuild -WithPhotoWorker -WithAssetImportWorker | Out-Null
+        & (Join-Path $projectRoot 'deploy/start-dev.ps1') -SkipBuild -WithPhotoWorker -WithAssetImportWorker -WithContactImportWorker:$withContacts | Out-Null
     } else {
         $state = Get-Content -Raw -LiteralPath $stateFile | ConvertFrom-Json
         if ($state.project_root -ne $projectRoot) { throw 'Project ownership mismatch' }

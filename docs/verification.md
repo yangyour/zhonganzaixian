@@ -977,3 +977,7 @@ Playwright1.62.1官方Chrome Headless Shell151下载返回HTTP200却为195bytes�
 ## 2026-10-04 本地真实桌面/390px与原请求恢复
 
 详见[DOM记录](local-browser-validation-20261004.md)。联系人v1至v4四动作与历史、真实202丢响应后的原body/key回放同一作业、专用Worker完成2个不同联系人、容量方案与增长、阈值冲突不改写、12列租户与同快照详情、读取时间不补采样、原MinIO最新XLSX映射通过。浏览器脚本最终15项，另有交互场景，不与首轮重复成功计数累加；首轮等待条件过早及REPL中断边界保留。927Web和类型/构建通过，短屏侧栏原问题已修。
+
+## 2026-10-04 联系人Worker实际恢复与新增导出库
+
+本地根一次成功1393实际执行（399PG、6MinIO）/13历史跳过；927Web、73契约通过。27隔离归属检查与实际五角色启停保留联系人Worker，原作业2行/原幂等回执不变，新受理1行已完成，远程组件未重启。联系人浏览器脚本最终15项通过，首轮及早期工具中断记录保留。后合并cc67711仅新增导出库，单独32测试/6原PG通过，无业务写/新公开导出。[整体组件](evidence/local-component-validation-20261004.json)、[恢复](evidence/local-contact-worker-restart-20261004.json)、[导出模块](evidence/local-asset-export-module-20261004.json)。

@@ -1,0 +1,25 @@
+{
+  "verified_at": "2026-10-04T02:52:01.971Z",
+  "environment": "designated-server",
+  "passed": true,
+  "before_contact_pid": 27996,
+  "after_contact_pid": 30740,
+  "all_registered_roles": [
+    "api",
+    "web",
+    "photo-worker",
+    "asset-import-worker",
+    "contact-import-worker"
+  ],
+  "contact_worker_opt_in_preserved": true,
+  "original_receipt_replayed": true,
+  "old_job_id": "d67cc46c-dee6-4062-b722-507600ffe86b",
+  "old_job_completed_rows": 2,
+  "new_job_id": "3dcbe10f-4858-4218-a56e-0b0534ccbaf8",
+  "new_job_completed_rows": 1,
+  "api_sessions_reauthenticated": true,
+  "remote_components_restarted": false,
+  "migrations_executed": 0,
+  "credentials_output": false,
+  "inflight_windows_worker_crash_tested": false
+}

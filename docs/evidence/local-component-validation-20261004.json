@@ -1,0 +1,55 @@
+{
+  "verified_at": "2026-10-04T02:52:39.899507+00:00",
+  "environment": "designated-server-via-SSH-from-Windows",
+  "backend_source": "3eb1d42",
+  "web_source": "9aad338 plus local sidebar fix",
+  "api_contract_version": "0.34.0",
+  "schema_version": 19,
+  "components": {
+    "postgresql": "17.9",
+    "keycloak": "26.2.4",
+    "minio": "RELEASE.2025-09-07T16-13-09Z"
+  },
+  "junit": {
+    "tests": 1406,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 13,
+    "executed": 1393,
+    "real_postgresql": 399,
+    "real_minio": 6
+  },
+  "single_full_maven_verify_passed": true,
+  "contracts": 73,
+  "web_tests": 927,
+  "web_typecheck_build": true,
+  "migration_policy_checks": 58,
+  "process_ownership_checks": 27,
+  "real_oidc_identities": 6,
+  "tenant_inventory_http_requests": 35,
+  "workers": [
+    "photo",
+    "asset_import",
+    "contact_import"
+  ],
+  "contact_worker_real_start_restart_and_new_job": true,
+  "remote_services_restarted": false,
+  "credentials_output": false,
+  "contract_requirements": 128,
+  "formal_acceptance_status": "ALL_NOT_RUN",
+  "index_checkout_correction": "Historical CRLF contract JSON restored to exact tracked LF bytes; no source contract edits",
+  "evidence": [
+    "local-schema-v19-20261004.json",
+    "local-contact-import-dom-final-20261004.json",
+    "local-contact-worker-restart-20261004.json",
+    "local-tenant-inventory-http-20261004.json",
+    "local-browser-20261004.json"
+  ],
+  "additional_later_module": {
+    "source": "cc67711",
+    "tests": 32,
+    "real_pg": 6,
+    "included_in_prior_full_reactor_count": false,
+    "evidence": "local-asset-export-module-20261004.json"
+  }
+}

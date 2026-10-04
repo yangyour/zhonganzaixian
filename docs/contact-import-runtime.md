@@ -44,3 +44,7 @@ PENDING/QUEUED为待领取，PENDING/RETRY_WAIT为临时依赖失败后的技术
 - 新增WithContactImportWorker选项及环境投影，新增6项隔离检查，总27项；c33cc11 CI37153152496及Windows job111290992448已回读成功，实际隔离检查27项/真实进程操作0，见niko-contact-worker-windows-ci-20261003.json
 - 此Linux环境没有pwsh；本次没有执行原Windows机器的启动、SSH、迁移或停止
 - API/Worker真实PG与HTTP证据、Vue内存处理器测试、浏览器真实DOM和通知送达分别记录，完整M2-9/128项未完成
+
+## 2026-10-04 原Windows环境新增实测
+
+原指定库已到V19，WithContactImportWorker与照片/资产导入同时实际启动；真实DOM明确受理、202丢响应原body/key恢复、Worker完成2行、手机同创建者回读均已验。旧RestartApps遗漏联系人角色的问题已修，依据停止前已核验登记保留该选项；五角色实际重启后原作业回放不重复、新1行作业完成。27归属检查通过，Windows处理中强杀/fence2仍未验，不能借niko结果放行。[本地运行证据](local-contact-validation-20261004.md)。

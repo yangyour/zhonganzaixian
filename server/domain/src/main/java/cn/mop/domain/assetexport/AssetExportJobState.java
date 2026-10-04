@@ -47,7 +47,7 @@ public final class AssetExportJobState {
         authorize(current);change(expectedVersion,now);
         if(state!=State.QUEUED&&state!=State.RUNNING&&state!=State.RECONCILING_STORAGE||attempts.size()>=MAX_ATTEMPTS)throw conflict();
         if(!attempts.isEmpty()&&now.isBefore(attempts.get(attempts.size()-1).leaseUntil()))throw conflict();
-        if(lease==null||lease.isNegative()||lease.isZero()||lease.compareTo(Duration.ofMinutes(10))>0||lease.getNano()%1000000!=0)throw invalid();
+        validateLease(lease);
         Instant until=plus(now,lease);var next=new ArrayList<>(attempts);next.add(new Attempt(next.size()+1L,now,until));
         return copy(now,encoding!=null?State.RECONCILING_STORAGE:State.RUNNING,next,encoding,null,null);
     }
@@ -105,6 +105,7 @@ public final class AssetExportJobState {
     public boolean possibleOrphanNeedsReview(){return state==State.FAILED&&encoding!=null;}
     public boolean storageReconciliationRequired(){return state==State.RECONCILING_STORAGE;}
     public boolean persisted(){return false;}public boolean actualStoreVerified(){return false;}public boolean notificationSent(){return false;}
+    public static void validateLease(Duration lease){if(lease==null||lease.isNegative()||lease.isZero()||lease.compareTo(Duration.ofMinutes(10))>0||lease.getNano()%1000000!=0)throw invalid();}
     private static boolean valid(Access a){return a!=null&&a.tenantId()!=null&&a.actorId()!=null&&a.active()&&a.permissionVersion()>0&&a.permissionVersion()<=MAX_VERSION&&Set.of("padmin","msp").contains(a.role()==null?"":a.role());}
     private static boolean hash(String value){return value!=null&&value.matches("[0-9a-f]{64}");}
     private static void time(Instant value){if(value==null||value.getNano()%1000000!=0||value.isBefore(Instant.parse("0001-01-01T00:00:00Z"))||value.isAfter(Instant.parse("9999-12-31T23:59:59.999Z")))throw invalid();}

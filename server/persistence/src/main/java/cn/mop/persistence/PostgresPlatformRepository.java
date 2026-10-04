@@ -20,6 +20,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     private final ThreadLocal<Connection> transaction = new ThreadLocal<>();
     private final ThreadLocal<Boolean> idempotentCommandScope = new ThreadLocal<>();
     private final ThreadLocal<Boolean> importJobScope = new ThreadLocal<>();
+    private final ThreadLocal<Boolean> exportJobScope = new ThreadLocal<>();
     public PostgresPlatformRepository(DataSource dataSource,ObjectMapper mapper){this.dataSource=dataSource;this.mapper=mapper;}
     @Override public RepositoryMetadata metadata(){return new RepositoryMetadata("remote_test","postgresql",true,"test_oidc");}
     @Override public boolean dependencyReady(){
@@ -76,6 +77,8 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     /** Scoped owned-record writes require the caller's idempotent command, never a worker or unrelated transaction. */
     Connection idempotentCommandConnection(){Connection active=transaction.get();if(active==null||!Boolean.TRUE.equals(idempotentCommandScope.get()))throw new IllegalStateException("Owned-record writes require an idempotent command transaction");return active;}
     void requireStandaloneRead(){if(transaction.get()!=null)throw new IllegalStateException("Export selection requires a standalone readonly snapshot");}
+    <T>T exportJobTransaction(Supplier<T> work){if(transaction.get()!=null)throw new IllegalStateException("Export worker requires an independent transaction");return inTransaction(()->scoped(exportJobScope,work));}
+    Connection exportCommandConnection(){Connection c=transaction.get();if(c==null||!Boolean.TRUE.equals(exportJobScope.get()))throw new IllegalStateException("Export worker transaction required");return c;}
     private static <T>T scoped(ThreadLocal<Boolean> scope,Supplier<T> work){Boolean previous=scope.get();scope.set(true);try{return work.get();}finally{if(previous==null)scope.remove();else scope.set(previous);}}
     private void lock(String scope){connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT pg_advisory_xact_lock(hashtextextended(?,0))")){statement.setString(1,scope);statement.execute();return null;}});}
     private static DomainException unavailable(){return new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境 PostgreSQL 不可用，未受理请求");}

@@ -48,6 +48,41 @@ public final class PostgresAssetExportRepository implements AssetExportJobReposi
             var result=new ArrayList<Job>();for(String id:ids)result.add(read(c,a,role,id));return List.copyOf(result);
         });
     }
+    @Override public Optional<Claim> claim(String jobId,String worker,Duration lease){return claimMatching(uuid(jobId),worker,lease);}
+    @Override public Optional<Claim> claimNext(String worker,Duration lease){return claimMatching(null,worker,lease);}
+    private Optional<Claim> claimMatching(String target,String worker,Duration lease){
+        if(worker==null||!worker.matches("[A-Za-z0-9._:-]{1,64}"))throw invalid();AssetExportJobState.validateLease(lease);
+        return platform.exportJobTransaction(()->{
+            Connection c=platform.exportCommandConnection();
+            try{
+                String id=null,tenant=null,actor=null,role=null,trace=null,hash=null;long permission=0,version=0;int fence=0;boolean prepared=false;byte[] bytes=null;
+                try(var s=statement(c,"SELECT "+COLUMNS+",trace_id,fencing_token,(file_bytes IS NOT NULL) AS prepared FROM public.mop_asset_export_job WHERE (state='QUEUED' OR (state IN ('RUNNING','RECONCILING_STORAGE') AND lease_until<=clock_timestamp()))"+(target==null?" AND fencing_token<1000":" AND id=?::uuid")+" ORDER BY COALESCE(lease_until,created_at),created_at,id LIMIT 1 FOR UPDATE SKIP LOCKED")){
+                    if(target!=null)s.setString(1,target);
+                    try(var r=s.executeQuery()){if(r.next()){id=r.getString("id");tenant=r.getString("tenant_id");actor=r.getString("created_by");role=r.getString("accepted_role");permission=r.getLong("permission_version");version=r.getLong("version");fence=r.getInt("fencing_token");prepared=r.getBoolean("prepared");trace=r.getString("trace_id");hash=r.getString("input_sha256");bytes=r.getBytes("command_bytes");}}
+                }
+                if(id==null)return Optional.empty();
+                if(version>=9007199254740991L)throw new DomainException(409,"VERSION_CONFLICT","Export version reached its technical bound");
+                var accepted=new AssetExportJobState.Access(UUID.fromString(tenant),UUID.fromString(actor),permission,role,true);AssetExportJobState.Command command;
+                try{command=AssetExportCommandCodec.decodeBound(bytes,accepted,hash);}catch(RuntimeException malformed){throw corrupt();}
+                // Lock actual current membership before choosing the new database clock/lease.
+                boolean authorized=false;
+                try(var s=statement(c,"SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active FOR SHARE OF m,u")){s.setString(1,tenant);s.setString(2,actor);try(var r=s.executeQuery()){authorized=r.next()&&r.getLong(2)==permission&&role.equals(r.getString(1));}}
+                Instant now=clock(c);
+                if(!authorized){
+                    try(var s=statement(c,"UPDATE public.mop_asset_export_job SET state='FAILED',error_code='AUTHORIZATION_CHANGED',version=version+1,updated_at=? WHERE id=?::uuid AND version=?")){instant(s,1,now);s.setString(2,id);s.setLong(3,version);if(s.executeUpdate()!=1)throw corrupt();}
+                    platform.audit(actor,tenant,"asset_export.authorization_changed","asset_export",id,"FAILED","CAPTURED_MEMBERSHIP_CHANGED_NOT_EXPORTED",trace);return Optional.empty();
+                }
+                if(fence>=AssetExportJobState.MAX_ATTEMPTS)throw new DomainException(409,"EXPORT_ATTEMPT_LIMIT","Technical export attempt history limit reached; no implicit retry policy selected");
+                Instant until=now.plus(lease);if(until.isAfter(Instant.parse("9999-12-31T23:59:59.999Z")))throw invalid();
+                String next=prepared?"RECONCILING_STORAGE":"RUNNING";
+                try(var s=statement(c,"UPDATE public.mop_asset_export_job SET state=?,fencing_token=fencing_token+1,lease_owner=?,lease_started_at=?,lease_until=?,version=version+1,updated_at=? WHERE id=?::uuid AND version=?")){s.setString(1,next);s.setString(2,worker);instant(s,3,now);instant(s,4,until);instant(s,5,now);s.setString(6,id);s.setLong(7,version);if(s.executeUpdate()!=1)throw corrupt();}
+                platform.audit(actor,tenant,"asset_export.claim","asset_export",id,"SUCCEEDED",prepared?"LEASE_CLAIMED_STORAGE_RECONCILIATION_REQUIRED":"LEASE_CLAIMED_NOT_ENCODED_OR_STORED",trace);
+                return Optional.of(new Claim(id,worker,fence+1,version+1,until,command,prepared));
+            }catch(SQLException failure){throw unavailable(failure);}
+        });
+    }
+    private static Instant clock(Connection c)throws SQLException{try(var s=statement(c,"SELECT clock_timestamp()::timestamptz(3)");var r=s.executeQuery()){if(!r.next())throw corrupt();return r.getObject(1,OffsetDateTime.class).toInstant();}}
+    private static void instant(PreparedStatement s,int index,Instant value)throws SQLException{s.setObject(index,OffsetDateTime.ofInstant(value,ZoneOffset.UTC));}
     private static Job read(Connection c,Access a,String currentRole,String id)throws SQLException{
         try(var s=statement(c,"SELECT "+COLUMNS+" FROM public.mop_asset_export_job WHERE tenant_id=?::uuid AND created_by=?::uuid AND id=?::uuid")){
             s.setString(1,a.tenantId());s.setString(2,a.actorId());s.setString(3,id);

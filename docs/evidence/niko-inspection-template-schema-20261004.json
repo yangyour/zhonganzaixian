@@ -1,0 +1,67 @@
+{
+  "verified_at": "2026-10-04T07:53:18Z",
+  "environment": "niko-local-test",
+  "component": "PostgreSQL 17.11 existing approved test instance",
+  "schema_version": 21,
+  "explicit_apply_count": 1,
+  "repeat_apply_count": 0,
+  "readonly_check_apply_count": 0,
+  "frozen_manifest": {
+    "sha256": {
+      "V21__inspection_template_revisions.sql": "85cf043f55b72fa1c06919ccf53705b516643468b97285980d436c3b78a4145b"
+    },
+    "function_body_sha256": {
+      "mop_inspection_template_head_guard": "5be5640edb7c5ae07a270c441c4ee7ac540ab55ef557d0bfb49ea22e1784af78",
+      "mop_inspection_template_revision_guard": "cd007d00c5c8af3a4e983d932734d77ec384033bd8481c9e0b74f347a2b83cf9"
+    }
+  },
+  "old_business_tables_count": 30,
+  "old_business_tables_equal": true,
+  "equality_only_not_authenticity": true,
+  "new_tables_after_rollback_tests": {
+    "mop_inspection_template": {
+      "rows": 0,
+      "equality_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_template_revision": {
+      "rows": 0,
+      "equality_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_template_item": {
+      "rows": 0,
+      "equality_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "new_real_runtime_postgres_tests": 14,
+  "migration_policy_tests": 25,
+  "python_tests": 132,
+  "contracts": 74,
+  "root_tests": {
+    "reported": 1640,
+    "executed": 1627,
+    "real_postgres": 496,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "windows_native_policy": "PENDING_CI",
+  "api_contract_version": "0.34.0",
+  "inspection_repository_implemented": false,
+  "inspection_http_implemented": false,
+  "inspection_ui_tested": false,
+  "templates_seeded": false,
+  "production_approval": "UNVERIFIED",
+  "original_server_migrated": false,
+  "new_identity_or_membership": false,
+  "api_worker_automatic_migration": false,
+  "formal_acceptance": "NOT_RUN",
+  "logs": [
+    ".local/niko-test/logs/inspection-schema-apply-20261004.log",
+    ".local/niko-test/logs/inspection-schema-repeat-20261004.log",
+    ".local/niko-test/logs/inspection-schema-check-20261004.log",
+    ".local/niko-test/logs/inspection-schema-pg-first-20261004.log",
+    ".local/niko-test/logs/inspection-schema-root-20261004.log",
+    ".local/niko-test/logs/inspection-schema-python-all-20261004.log"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "sha256": {
+    "V21__inspection_template_revisions.sql": "85cf043f55b72fa1c06919ccf53705b516643468b97285980d436c3b78a4145b"
+  },
+  "function_body_sha256": {
+    "mop_inspection_template_head_guard": "5be5640edb7c5ae07a270c441c4ee7ac540ab55ef557d0bfb49ea22e1784af78",
+    "mop_inspection_template_revision_guard": "cd007d00c5c8af3a4e983d932734d77ec384033bd8481c9e0b74f347a2b83cf9"
+  }
+}

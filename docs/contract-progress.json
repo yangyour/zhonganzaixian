@@ -405,6 +405,7 @@
         "docs/asset-export-snapshot.md",
         "docs/asset-ledger-export-encoding.md",
         "docs/evidence/niko-export-api-20261004.json",
+        "docs/evidence/niko-export-client-20261004.json",
         "docs/evidence/niko-export-progress-20261004.json",
         "docs/export-preparation-worker.md"
       ],
@@ -1363,6 +1364,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "f06ee08c03ace559309678800b7801655a992383ff25a0b5a12353b6b76cabab"
+    "doc/development/07_合同逐项开发追踪.md": "e82b1164e33fdae927e8f6de2511b0dd73d9e9acbaa79b86b1df20530ffd6472"
   }
 }

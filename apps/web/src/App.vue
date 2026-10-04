@@ -43,6 +43,7 @@ async function endSession() {
         <el-menu-item v-if="can('manual_incidents:read')" index="manual-incidents"><span class="nav-symbol">◇</span>手工来源登记</el-menu-item>
         <el-menu-item v-if="can('sla_scenarios:read')" index="sla-scenarios">SLA 显式对照</el-menu-item>
         <el-menu-item v-if="can('tickets:read')" index="tickets"><span class="nav-symbol">▣</span>报障与受理</el-menu-item>
+        <el-menu-item v-if="session && ['padmin','msp'].includes(session.user.role) && can('assets:read')" index="asset-export-jobs">台账导出准备</el-menu-item>
         <el-menu-item v-if="session?.user.role === 'msp' && can('worklogs:read_own')" index="my-worklogs">我的实填工时</el-menu-item>
       </el-menu>
       <template v-if="can('configurations:read') || can('audit:read')">
@@ -94,6 +95,7 @@ async function endSession() {
         <el-menu-item v-if="can('manual_incidents:read')" index="manual-incidents">手工来源登记</el-menu-item>
         <el-menu-item v-if="can('sla_scenarios:read')" index="sla-scenarios">SLA 显式对照</el-menu-item>
         <el-menu-item v-if="can('tickets:read')" index="tickets">报障与受理</el-menu-item>
+        <el-menu-item v-if="session && ['padmin','msp'].includes(session.user.role) && can('assets:read')" index="asset-export-jobs">台账导出准备</el-menu-item>
         <el-menu-item v-if="session?.user.role === 'msp' && can('worklogs:read_own')" index="my-worklogs">我的实填工时</el-menu-item>
         <el-menu-item v-if="can('configurations:read')" index="configurations">配置确认登记</el-menu-item>
         <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_templates:read')" index="inspection-templates">巡检模板候选</el-menu-item>

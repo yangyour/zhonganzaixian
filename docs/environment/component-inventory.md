@@ -195,3 +195,7 @@ V20首次候选CASE语法失败完整回滚，只读确认仍V19/无新表函数
 ## 2026-10-04 独立导出准备Worker实际进程与故障恢复
 
 新独立模块只处理显式单job，不启动其他队列/Web/迁移/存储客户端。4个真实自有JVM验证：实际XLSX准备、源备注变化后保留原文件、新PG审计等待点SIGKILL(-9)无半文件、过期后fence2恢复；原收据QUEUEDv0保留，7无关表等值指纹不变，Worker全部结束。15Java/9新增Python门禁，根1604报告1591执行含482PG/13跳过/6MinIO排除，131Python/73契约通过。仍未发布或调用OSS/下载/通知，见docs/export-preparation-worker.md，M3-7非DONE。
+
+## 2026-10-04 09:14 巡检模板页面B03复核
+
+niko现有/usr/bin/chromium版本154.0.8037.57、Playwright1.62.1，保留chromiumSandbox=true启动仍因Operation not permitted/EPERM失败，应用页打开0。没有更换组件、禁用沙箱、变更系统/网络权限或创建新任务。新的巡检模板页面17项SFC/jsdom与此前99真实客户端HTTP分别成立，不能合并宣称真实浏览器验收；桌面/移动视口仍NOT_RUN。见[当前阻塞证据](../evidence/niko-inspection-page-browser-blocker-20261004.json)，继续不依赖浏览器的开发。

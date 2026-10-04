@@ -1,0 +1,40 @@
+{
+  "verified_at": "2026-10-04T09:18:57Z",
+  "environment": "niko-local-test",
+  "api_version": "0.35.0",
+  "route": "/inspection-templates",
+  "new_sfc_jsdom_tests": 17,
+  "web_tests": 1059,
+  "web_files": 66,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts": 80,
+  "contract_generation": "PASS",
+  "capability_role_gate": "padmin AND inspection_templates:read",
+  "writes_use_previously_verified_production_workspace": true,
+  "known_http_workspace_evidence": "niko-inspection-template-client-http-20261004.json",
+  "browser_evidence": "niko-inspection-page-browser-blocker-20261004.json",
+  "real_browser_validation": "NOT_RUN",
+  "real_responsive_viewports": [],
+  "actual_screenshots": [],
+  "jsdom_is_not_browser_acceptance": true,
+  "new_http_run_for_this_page": false,
+  "new_java_tests": 0,
+  "new_migrations": 0,
+  "worksheet_persistence": false,
+  "quarterly_report": false,
+  "production_template_approval": "UNVERIFIED",
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "apps/web/src/pages/InspectionTemplatesPage.vue": "0f1ee2dd083cb61f280b917fe499097ad7184a57f0132764b6e360ed0452e477",
+    "apps/web/src/components/InspectionTemplateFacts.vue": "1066d92ea0ebd13757f834efba53678c7a5f048369661ffcc4f7a8aba7c4e4a5",
+    "apps/web/src/router.ts": "57dc72a3e2bf48253035b5ede308a7632949778ba8c41687b425186399d6fd64",
+    "apps/web/src/App.vue": "443b9695f746985941b2154d39f93918886be355ed3190a449a231f030609b58"
+  },
+  "logs": [
+    ".local/niko-test/logs/inspection-page-tests-first-20261004.log",
+    ".local/niko-test/logs/inspection-page-web-all-20261004.log",
+    ".local/niko-test/logs/inspection-page-build-final-20261004.log",
+    ".local/niko-test/logs/inspection-page-contracts-20261004.log"
+  ]
+}

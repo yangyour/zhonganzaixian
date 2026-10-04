@@ -27,6 +27,8 @@ public interface PlatformRepository extends AssetRepository {
     /** Authorize and read the bounded ledger in one real database snapshot; no unbounded/fixture fallback. */
     default List<Asset> authorizedAssets(String tenant,String actor,long permissionVersion,AssetReadQuery query){throw new DomainException(503,"UPSTREAM_UNAVAILABLE","资产授权分页需要真实PostgreSQL仓储");}
     default Optional<Asset> authorizedAsset(String tenant,String actor,long permissionVersion,String id){throw new DomainException(503,"UPSTREAM_UNAVAILABLE","资产授权回读需要真实PostgreSQL仓储");}
+    /** Same-snapshot current padmin membership and per-target padmin scope; no global role bypass. */
+    default List<TenantInventory> authorizedTenantInventory(String tenant,String actor,long permissionVersion,TenantInventory.Query query){throw new DomainException(503,"UPSTREAM_UNAVAILABLE","Tenant inventory requires real PostgreSQL");}
     List<FixtureUser> users();
     Optional<FixtureUser> user(String id);
     Optional<FixtureUser> resolveIdentity(String identitySource, String subject);

@@ -91,6 +91,27 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         String lock=transaction.get()!=null?" FOR SHARE OF m,u":"";
         try(PreparedStatement statement=connection.prepareStatement("SELECT m.user_id,m.tenant_id,m.role_code,m.permission_version,m.active FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.user_id::text=? AND m.tenant_id::text=? AND m.active AND u.active"+lock)){statement.setString(1,userId);statement.setString(2,tenantId);try(ResultSet rows=statement.executeQuery()){return rows.next()?Optional.of(new Membership(rows.getString(1),rows.getString(2),rows.getString(3),rows.getLong(4),rows.getBoolean(5))):Optional.empty();}}
     });}
+    @Override public List<TenantInventory> authorizedTenantInventory(String tenant,String actor,long permissionVersion,TenantInventory.Query query){
+        if(query==null)throw new DomainException(400,"VALIDATION_ERROR","Tenant inventory query required");
+        if(transaction.get()!=null)throw new IllegalStateException("Tenant inventory requires a standalone readonly snapshot");
+        return readSnapshot(c->{
+            if(!TenantInventory.canonicalUuid(tenant)||!TenantInventory.canonicalUuid(actor)||permissionVersion<1||permissionVersion>9007199254740991L)throw new DomainException(401,"SESSION_EXPIRED","Current membership unavailable");
+            try(var statement=c.prepareStatement("SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active")){
+                statement.setQueryTimeout(10);statement.setString(1,tenant);statement.setString(2,actor);
+                try(var rows=statement.executeQuery()){
+                    if(!rows.next()||rows.getLong(2)!=permissionVersion)throw new DomainException(401,"SESSION_EXPIRED","Current membership version changed");
+                    if(!"padmin".equals(rows.getString(1)))throw new DomainException(403,"ACTION_FORBIDDEN","Tenant inventory requires current platform-admin membership");
+                }
+            }
+            String sql="SELECT t.id,t.name,t.created_at, (SELECT count(*) FROM public.mop_asset a WHERE a.tenant_id=t.id) asset_count, (SELECT count(*) FROM public.mop_site s WHERE s.tenant_id=t.id) site_count, (SELECT count(*) FROM public.mop_membership members JOIN public.mop_user users ON users.id=members.user_id WHERE members.tenant_id=t.id AND members.active AND users.active) member_count FROM public.mop_tenant t JOIN public.mop_membership m ON m.tenant_id=t.id WHERE m.user_id=?::uuid AND m.active AND m.role_code='padmin'"+(query.afterId()==null?"":" AND t.id>?::uuid")+" ORDER BY t.id LIMIT ?";
+            var result=new ArrayList<TenantInventory>();
+            try(var statement=c.prepareStatement(sql)){
+                statement.setQueryTimeout(10);int p=1;statement.setString(p++,actor);if(query.afterId()!=null)statement.setString(p++,query.afterId());statement.setInt(p,query.limit());
+                try(var rows=statement.executeQuery()){while(rows.next())result.add(new TenantInventory(rows.getString("id"),rows.getString("name"),instant(rows,"created_at"),rows.getLong("asset_count"),rows.getLong("site_count"),rows.getLong("member_count")));}
+            }
+            return List.copyOf(result);
+        });
+    }
     @Override public Tenant tenant(String id){return connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT id,name FROM public.mop_tenant WHERE id::text=?")){statement.setString(1,id);try(ResultSet rows=statement.executeQuery()){if(!rows.next())throw missing();return new Tenant(rows.getString(1),rows.getString(2));}}});}
     private Asset asset(ResultSet rows)throws SQLException{return new Asset(rows.getString("id"),rows.getString("tenant_id"),rows.getString("name"),rows.getString("type"),rows.getString("management_ip"),rows.getString("site_id"),rows.getString("status"),rows.getString("lifecycle_status"),rows.getString("source"),instant(rows,"sampled_at"),rows.getString("unknown_reason"),rows.getLong("version"),instant(rows,"created_at"),instant(rows,"updated_at"),rows.getString("availability"),rows.getString("sync_state"));}
     private static Instant instant(ResultSet rows,String key)throws SQLException{Timestamp timestamp=rows.getTimestamp(key);return timestamp==null?null:timestamp.toInstant();}

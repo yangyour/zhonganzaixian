@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-04",
+  "scope": "CROSS_PLATFORM_MIGRATION_POLICY_V20_PARITY",
+  "failed_commit": "c40bf37d6dd8496ca55f36bf6c17f6db6370c7b3",
+  "failed_ci_run": 37175873116,
+  "failed_job": 111358239975,
+  "failure": "PowerShell frozen manifest still required exactly V1-V19 and rejected the new V20 source set",
+  "changed_sql_bytes": false,
+  "new_migrations_executed_by_fix": 0,
+  "python_tests": 113,
+  "new_manifest_parity_tests": 2,
+  "new_test_rejects_previous_committed_policy": true,
+  "contract_tests": 73,
+  "contract_generation_consistent": true,
+  "local_powershell_execution": "NOT_RUN_PWSH_NOT_INSTALLED",
+  "powershell_native_validation": "EXISTING_CI_WORKFLOW_REQUIRED",
+  "original_server_migration": "NOT_RUN",
+  "log_sha256": {
+    "export-v20-policy-python-20261004.log": "136c64ee2b29c2533affcae1b8b2f03623186238cf0a1281764e3d41831a33c7",
+    "export-v20-policy-red-regression-20261004.log": "879be547065211843c1e61d3be508d7860aeebe17c2518bb5f88321e2e6ec30a",
+    "export-v20-policy-contracts-20261004.log": "35e38b0f48d18805c99d018e4445e94b2f5e2d901db3b63df220d88c2278713f"
+  }
+}

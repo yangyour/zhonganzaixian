@@ -34,3 +34,7 @@ V20__durable_asset_export_jobs.sql已在niko-local-test显式独立执行一次�
 根Maven1522报告、1509执行通过，含434真实PG、13历史fixture跳过、6MinIO排除；73契约与生成一致性通过。见[本批脱敏证据](evidence/niko-asset-export-schema-20261004.json)。
 
 既有项目venv的111项Python检查通过；首次误用系统解释器缺paramiko导致2个模块导入失败，保留日志后改用已安装依赖的venv重跑，没有安装新组件或执行SSH连接。
+
+## 2026-10-04 V20跨平台冻结清单遗漏修正
+
+c40bf37的CI37175873116中Java/Web/Windows进程检查通过，但PowerShell迁移策略仍只列V1–V19，拒绝新V20源码集合。补齐V20清单、独立asset-exports选择及导出核验器新旧检查；保留只读默认与单功能执行，V1–V20 SQL字节不动。新增跨入口清单回归对原提交先红，113Python/73契约通过；niko无pwsh，PowerShell原生执行留给既有CI，不冒充本地通过。见docs/evidence/niko-export-migration-policy-20261004.json。

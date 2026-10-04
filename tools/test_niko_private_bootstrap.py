@@ -88,4 +88,18 @@ class NikoPrivateBootstrapTest(unittest.TestCase):
   manifest=json.loads((ROOT/'tools/niko-test/frozen-contact-import-fix-migration.json').read_text());name='V19__contact_import_generated_hash_guard.sql';self.assertEqual({name},set(manifest['sha256']));self.assertEqual(hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest(),manifest['sha256'][name]);self.assertEqual(1,len(manifest['function_body_sha256']))
   self.assertEqual('75325f0423f788d5a71b71e0b1c8ba3b5c30e628aa3c588437f671954cbb39e9',hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration/V18__durable_contact_import_jobs.sql').read_bytes()).hexdigest());self.assertIn('--apply-contact-import-fix',(ROOT/'tools/niko-test/run-migration.py').read_text())
 
+class MigrationManifestParityTest(unittest.TestCase):
+ def test_both_entrypoints_cover_exactly_all_frozen_migration_files(self):
+  import re
+  actual={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/'server/persistence/src/main/resources/db/migration').glob('*.sql')}
+  for entrypoint in ['deploy/migration-policy.ps1','tools/niko-test/run-migration.py']:
+   text=(ROOT/entrypoint).read_text();names=re.findall(r"frozen-[a-z-]+\.json",text);self.assertEqual(len(names),len(set(names)));expected={}
+   for name in names:
+    values=json.loads((ROOT/'tools/niko-test'/name).read_text())['sha256'];self.assertTrue(set(values).isdisjoint(expected));expected.update(values)
+   self.assertEqual(actual,expected);self.assertEqual(set(range(1,21)),{int(name.split('__')[0][1:]) for name in expected})
+ def test_v20_remains_frozen_and_both_launchers_require_explicit_feature(self):
+  manifest=json.loads((ROOT/'tools/niko-test/frozen-asset-export-migration.json').read_text());self.assertEqual({'V20__durable_asset_export_jobs.sql':'5f8114dcdd2bd1cdf0c60fb75a5b521175462f583786602cd2b4a1835f960a83'},manifest['sha256']);self.assertEqual(3,len(manifest['function_body_sha256']))
+  for path in ['deploy/migration-policy.ps1','tools/niko-test/run-migration.py']:self.assertIn('--apply-asset-exports',(ROOT/path).read_text())
+  windows=(ROOT/'deploy/migrate-test-schema.ps1').read_text();self.assertIn('AssetExportSchemaVerifier.class',windows);self.assertIn('$exportVerifierSource',windows)
+
 if __name__=='__main__':unittest.main()

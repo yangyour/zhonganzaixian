@@ -187,3 +187,8 @@ V1–V14全部字节冻结，V14 SHA256为39be55d8759de87c6e2b8f85b3958c60be24ae
 ## API0.35未发布巡检模板HTTP入口
 
 完成独立V21和全根构建后，正常停止原自有runner并重启现有PG/KC与固定API JAR，不初始化新组件或账号，不自动迁移。新API readiness要求巡检模板结构；storage=false保持。刷新6既有OIDC会话后运行tests/niko-inspection-template-api-http.mjs；首轮仅ready契约失败、创建0/待定0，显式--retry-after-readiness-contract-fix保留原控制文件后完成117请求/18合成模板全部归档。当前两个控制文件及成功证据均存在，不能盲目重跑；后续使用新独立场景，不删除历史证据。28无关业务表等值证明只覆盖HTTP窗口，不跨全根数据测试。API固定包SHA及结果见[实施记录](inspection-templates.md)。
+
+
+## 2026-10-04 V23来源集合独立结构
+
+显式`--apply-inspection-source-collections`执行1次，重复、`--check`及旧`--apply-inspection-worksheets`均0。48旧项目表全行指纹等值；17真实runtime结构与完整根1820实际执行（584PG）通过。V23 eabc4cf2512cdea920acf97ba1991499fde9d0901c7b91b5a8cc7b51f13599e8已冻结，修正只能V24+；原服务器不操作，API/Worker不自动迁移。新表只保存独立明确来源，不是正式报告；代码仓储/HTTP/新集合页面仍须后续验证。证据与范围见docs/inspection-report-sources.md。

@@ -1,0 +1,10 @@
+{
+  "sha256": {
+    "V23__immutable_inspection_source_collections.sql": "eabc4cf2512cdea920acf97ba1991499fde9d0901c7b91b5a8cc7b51f13599e8"
+  },
+  "function_body_sha256": {
+    "mop_inspection_source_document_guard": "5204e527e93efaef27a1c6a01cd7de716358b9412a0e35de95cd3895ff98d85c",
+    "mop_inspection_source_item_insert_guard": "825d6e4645e544b011dcbd8dc16218569b34c41868e40d0242df99e15ddd2819",
+    "mop_inspection_source_collection_complete": "073dc9199c630aabe742fadcb294d1bfcfd15c2d97f0ba5817bf5f973f437eaa"
+  }
+}

@@ -1,0 +1,34 @@
+package cn.mop.persistence;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.sql.*;
+import java.util.*;
+import static cn.mop.persistence.TestSchemaMigration.*;
+/** Frozen source storage only, not report generation, customer approval or automatic migration. */
+final class InspectionSourceCollectionSchemaVerifier {
+    static final String SHA256="eabc4cf2512cdea920acf97ba1991499fde9d0901c7b91b5a8cc7b51f13599e8";
+    static final Map<String,String> FUNCTIONS=Map.of("mop_inspection_source_document_guard","5204e527e93efaef27a1c6a01cd7de716358b9412a0e35de95cd3895ff98d85c","mop_inspection_source_item_insert_guard","825d6e4645e544b011dcbd8dc16218569b34c41868e40d0242df99e15ddd2819","mop_inspection_source_collection_complete","073dc9199c630aabe742fadcb294d1bfcfd15c2d97f0ba5817bf5f973f437eaa");
+    private InspectionSourceCollectionSchemaVerifier(){}
+    static void resource()throws Exception{
+        try(var in=InspectionSourceCollectionSchemaVerifier.class.getResourceAsStream("/db/migration/V23__immutable_inspection_source_collections.sql")){
+            if(in==null)throw new IllegalStateException("Missing source collection migration");byte[] bytes=in.readAllBytes();if(!SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes))))throw new IllegalStateException("Unreviewed source collection migration");String sql=new String(bytes,StandardCharsets.UTF_8);
+            for(var e:FUNCTIONS.entrySet()){int start=sql.indexOf("CREATE FUNCTION public."+e.getKey()+"()"),marker=start<0?-1:sql.indexOf(" AS $$",start),end=marker<0?-1:sql.indexOf("$$;",marker+6);if(marker<0||end<0||!e.getValue().equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(sql.substring(marker+6,end).getBytes(StandardCharsets.UTF_8)))))throw new IllegalStateException("Unreviewed source collection guard");}
+        }
+    }
+    static void verify(Connection c)throws SQLException{
+        String head="mop_inspection_source_collection",item="mop_inspection_source_collection_item";
+        verifyColumns(c,head,Map.ofEntries(Map.entry("id","uuid"),Map.entry("tenant_id","uuid"),Map.entry("created_by","uuid"),Map.entry("label","character varying(200)"),Map.entry("recorded_at","timestamp(3) with time zone"),Map.entry("insert_transaction","xid8"),Map.entry("version","bigint"),Map.entry("document_format","character varying(40)"),Map.entry("source_count","integer"),Map.entry("document","bytea"),Map.entry("document_sha256","character varying(64)"),Map.entry("source_manifest_sha256","character varying(64)"),Map.entry("record_source","character varying(48)"),Map.entry("verification_status","character varying(32)"),Map.entry("report_published","boolean"),Map.entry("formal_report_generatable","boolean")),Set.of(),true);
+        verifyColumns(c,item,Map.of("tenant_id","uuid","collection_id","uuid","position","integer","worksheet_id","uuid","worksheet_version","bigint","source_snapshot_sha256","character varying(64)"),Set.of(),true);
+        for(String table:List.of(head,item)){verifyRuntimeAcl(c,table,Set.of());requireTrue(c,"SELECT relkind='r' AND relowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') FROM pg_class WHERE oid=('public.'||?)::regclass",table);requireTrue(c,"SELECT NOT EXISTS(SELECT 1 FROM pg_constraint WHERE conrelid=('public.'||?)::regclass AND NOT convalidated)",table);}
+        requireConstraint(c,head,"p",List.of("id"),null,List.of(),false);requireConstraint(c,head,"u",List.of("tenant_id","id"),null,List.of(),false);requireConstraint(c,head,"f",List.of("tenant_id"),"mop_tenant",List.of("id"),false);requireConstraint(c,head,"f",List.of("tenant_id","created_by"),"mop_membership",List.of("tenant_id","user_id"),false);
+        requireConstraint(c,item,"p",List.of("tenant_id","collection_id","position"),null,List.of(),false);requireConstraint(c,item,"u",List.of("tenant_id","collection_id","worksheet_id","worksheet_version"),null,List.of(),false);requireConstraint(c,item,"f",List.of("tenant_id","collection_id"),head,List.of("tenant_id","id"),false);requireConstraint(c,item,"f",List.of("tenant_id","worksheet_id","worksheet_version"),"mop_inspection_worksheet_revision",List.of("tenant_id","worksheet_id","version"),false);
+        for(var entry:Map.of(head,11,item,3).entrySet())requireTrue(c,"SELECT count(*)="+entry.getValue()+" FROM pg_constraint WHERE conrelid=('public.'||?)::regclass AND contype='c'",entry.getKey());
+        requireTrue(c,"SELECT a.attgenerated='s' AND position('sha256(document)' IN replace(regexp_replace(pg_get_expr(d.adbin,d.adrelid),'[[:space:]]','','g'),'pg_catalog.',''))>0 FROM pg_attribute a JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum WHERE a.attrelid='public.mop_inspection_source_collection'::regclass AND a.attname='document_sha256' AND NOT a.attisdropped");
+        requireTrue(c,"SELECT position('pg_current_xact_id()' IN pg_get_expr(d.adbin,d.adrelid))>0 FROM pg_attribute a JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum WHERE a.attrelid='public.mop_inspection_source_collection'::regclass AND a.attname='insert_transaction' AND NOT a.attisdropped");
+        requireTrue(c,"SELECT i.indisvalid AND i.indisready FROM pg_index i JOIN pg_class idx ON idx.oid=i.indexrelid WHERE idx.relname='mop_inspection_source_collection_order' AND idx.relnamespace='public'::regnamespace");
+        for(var entry:FUNCTIONS.entrySet())requireTrue(c,"SELECT NOT p.prosecdef AND p.prorettype='trigger'::regtype AND p.proowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') AND encode(sha256(convert_to(p.prosrc,'UTF8')),'hex')=? AND p.proconfig=ARRAY['search_path=pg_catalog'] AND has_function_privilege('mop_test_runtime',p.oid,'EXECUTE') AND NOT EXISTS(SELECT 1 FROM aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) a WHERE a.grantee=0) FROM pg_proc p WHERE p.oid=to_regprocedure('public.'||?||'()')",entry.getValue(),entry.getKey());
+        requireTrue(c,"SELECT count(*)=2 FROM pg_trigger WHERE tgrelid='public.mop_inspection_source_collection'::regclass AND NOT tgisinternal");requireTrue(c,"SELECT count(*)=1 FROM pg_trigger WHERE tgrelid='public.mop_inspection_source_collection_item'::regclass AND NOT tgisinternal");
+        trigger(c,head,"mop_inspection_source_document_guard",7,false);trigger(c,item,"mop_inspection_source_item_insert_guard",7,false);trigger(c,head,"mop_inspection_source_collection_complete",5,true);
+    }
+    private static void trigger(Connection c,String table,String name,int type,boolean deferred)throws SQLException{requireTrue(c,"SELECT tgenabled='O' AND tgtype="+type+" AND tgfoid=to_regprocedure('public.'||?||'()') AND tgdeferrable="+deferred+" AND tginitdeferred="+deferred+" FROM pg_trigger WHERE tgrelid=('public.'||?)::regclass AND tgname=?",name,table,name);}
+}

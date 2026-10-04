@@ -1,0 +1,301 @@
+{
+  "verified_at": "2026-10-04T14:43:46.318905+00:00",
+  "environment": "niko-local-test",
+  "postgresql": "17.11",
+  "migration": "V23__immutable_inspection_source_collections.sql",
+  "sha256": "eabc4cf2512cdea920acf97ba1991499fde9d0901c7b91b5a8cc7b51f13599e8",
+  "function_body_sha256": {
+    "mop_inspection_source_document_guard": "5204e527e93efaef27a1c6a01cd7de716358b9412a0e35de95cd3895ff98d85c",
+    "mop_inspection_source_item_insert_guard": "825d6e4645e544b011dcbd8dc16218569b34c41868e40d0242df99e15ddd2819",
+    "mop_inspection_source_collection_complete": "073dc9199c630aabe742fadcb294d1bfcfd15c2d97f0ba5817bf5f973f437eaa"
+  },
+  "schema_version": 23,
+  "migration_executions": {
+    "readonly_before": 0,
+    "explicit_apply": 1,
+    "repeat_same_mode": 0,
+    "readonly_after": 0,
+    "legacy_v22_mode_after": 0
+  },
+  "existing_project_table_equality": {
+    "tables": 48,
+    "before_at": "2026-10-04T14:26:13.185958+00:00",
+    "after_at": "2026-10-04T14:26:25.167866+00:00",
+    "all_full_rows_equal": true,
+    "table_fingerprints": {
+      "mop_asset": {
+        "rows": 7277,
+        "equality_sha256": "e9d0b76379dbe1c013899242b084d9e716048ab818b619899f32558238179c20"
+      },
+      "mop_asset_dependency_edge": {
+        "rows": 91257,
+        "equality_sha256": "f491cd148f22f86a4837f2655b9564d5cfdf4bad8ba8fc931aac572afa2635da"
+      },
+      "mop_asset_dependency_graph": {
+        "rows": 1,
+        "equality_sha256": "5398e51a6ca3650ddc4e280c1d396fd0e358912ec596739e586e0955d43958a8"
+      },
+      "mop_asset_dependency_revision": {
+        "rows": 399,
+        "equality_sha256": "8716630cc7e89ae4640f0cd556c8ef294c4e0bf3627cea97fcdaae9dd96ff913"
+      },
+      "mop_asset_export_attempt": {
+        "rows": 447,
+        "equality_sha256": "1e011ce4aebfd2c782a003240694c6697ee71f45108d289c37e59eabc34525fe"
+      },
+      "mop_asset_export_job": {
+        "rows": 719,
+        "equality_sha256": "3320a0b728526a9b880ce814e7faa4d92c4823f598ec816b9dd2f5306efca455"
+      },
+      "mop_asset_import_artifact": {
+        "rows": 456,
+        "equality_sha256": "f78ddfe68d7c0ecaf0e68609d5f161ff048b8277443e90eb845ad49288259b46"
+      },
+      "mop_asset_import_job": {
+        "rows": 1824,
+        "equality_sha256": "c7b494f590d8f004a885b3a366af9fac0be8c6caec50c5bed99329e85ca16c92"
+      },
+      "mop_asset_import_mapping": {
+        "rows": 285,
+        "equality_sha256": "badbb633b0e1f8a0b3f3569b4933cead6ddfcef389e193424762cac617c082fc"
+      },
+      "mop_asset_import_operation": {
+        "rows": 1824,
+        "equality_sha256": "0bd66cea4631a3b291a0ede51f61efe42a3e4cafd9d59cdb968882eccf23c4e3"
+      },
+      "mop_asset_import_source": {
+        "rows": 1083,
+        "equality_sha256": "e406154b41907e6b792836b905f9c1d101315b69bfb8f6c7f26a54938c8a177e"
+      },
+      "mop_asset_manual_details": {
+        "rows": 2510,
+        "equality_sha256": "b1f0d691b187aaaca3fcef79acba462b942a599d90db527313edcb13e11378e8"
+      },
+      "mop_asset_manual_revision": {
+        "rows": 3195,
+        "equality_sha256": "150c07a38d42e316cdc7cece6ed35d86d2f37194b566460566bf504b565e1f88"
+      },
+      "mop_audit": {
+        "rows": 71097,
+        "equality_sha256": "e5b2f40045fcca97d451930222bd1c36d839c77996430bbb9e266ba840418de3"
+      },
+      "mop_capacity_scenario_draft": {
+        "rows": 1027,
+        "equality_sha256": "dc0cd1ba299a62be60ab886f92281f87be34f1e7e06bc955061f6e5f8ca9adbf"
+      },
+      "mop_configuration": {
+        "rows": 755,
+        "equality_sha256": "b982f8757aa632c29402d9491b18b201cea41f5b471b9d8b36c95dd9573081e7"
+      },
+      "mop_configuration_revision": {
+        "rows": 1085,
+        "equality_sha256": "85a91da0588d44ab115ba60dadbdbc80a3670f2288268e24e2bf02feaa27cc85"
+      },
+      "mop_configuration_revision_history": {
+        "rows": 1143,
+        "equality_sha256": "2ca2306f8aa08b76823a1072c4275cf4c15615b4bd975daff2a7bb6252a56f26"
+      },
+      "mop_contact_import_job": {
+        "rows": 1585,
+        "equality_sha256": "49037435b01db5c179f0ff7904934e93b9a26591c175dc3acc54c34aec86b307"
+      },
+      "mop_contact_import_result": {
+        "rows": 6489,
+        "equality_sha256": "85bc3a5415bf94ca46dc33086f5dffa74e003c37064d4de9e6ef38d34060b187"
+      },
+      "mop_contact_tenant_guard": {
+        "rows": 2,
+        "equality_sha256": "7a5f59e9268bed0d856ec7b7e95359723a6f432e7cc48a5ed28e5aeccee5a08a"
+      },
+      "mop_customer_contact": {
+        "rows": 13185,
+        "equality_sha256": "e0d3d0a9ea01d466a3cab49fdad06f5fd89d92d6adb5872e17c8eaeb54659cc9"
+      },
+      "mop_customer_contact_revision": {
+        "rows": 26875,
+        "equality_sha256": "a3f6f3f2e34ce921d9e7a8642adf0ec14e7ff82b0adb07ad155dbf246559c62a"
+      },
+      "mop_file": {
+        "rows": 1767,
+        "equality_sha256": "4932eee43ded993f81aad107e5ac4b3cf387b2ae495d2fbe171361748d5030ea"
+      },
+      "mop_file_grant": {
+        "rows": 342,
+        "equality_sha256": "fc726d722f72b0bb739043ce70c004631bb9d5a8a05415aaf9389a799aaa101c"
+      },
+      "mop_idempotency": {
+        "rows": 52055,
+        "equality_sha256": "58911bdf86285b42e09193f60d2324d18cec98141be96946e0e8c36bb2d712cb"
+      },
+      "mop_inspection_template": {
+        "rows": 664,
+        "equality_sha256": "fd42cc1d47c156dfb59b72dacc27a2886a2133494415a93432df5594496854b4"
+      },
+      "mop_inspection_template_item": {
+        "rows": 3792,
+        "equality_sha256": "1e1b84efa160dcc6e75f0c481a9ba2d5552ef9c74daf27262372dadbe803aab2"
+      },
+      "mop_inspection_template_revision": {
+        "rows": 1446,
+        "equality_sha256": "3ac4ae725b764ed28599e3e7df94db4db6dfb21727d5f0f4e0fcd512c7e34c1e"
+      },
+      "mop_inspection_worksheet": {
+        "rows": 372,
+        "equality_sha256": "e2107e8910c1fcf16a8233b051d3cb18630a0caf95da747ccb9a23890bfc63d4"
+      },
+      "mop_inspection_worksheet_revision": {
+        "rows": 939,
+        "equality_sha256": "59b07c49910e2d251be3b689798c013e50b8f3f5c39287874071fe7880c47ff1"
+      },
+      "mop_manual_incident_registration": {
+        "rows": 2109,
+        "equality_sha256": "b9e22c3dbffa74fa77aea6651370397062ea6b2b78c10418bd0fb8748131a47b"
+      },
+      "mop_manual_recovery_confirmation": {
+        "rows": 627,
+        "equality_sha256": "3453f87facaa76efe39cf056a2176e5906391371b27cad62a9f8e85c62edd68f"
+      },
+      "mop_membership": {
+        "rows": 579,
+        "equality_sha256": "15eb17d999af9ef22bdde9125dace51032212cac67c4bc41dcbf1f2a2caff9d5"
+      },
+      "mop_operation": {
+        "rows": 6613,
+        "equality_sha256": "31d0612466df479f4003115eef5609237ee037ad0d0825a747cd3bb11ff3ff5d"
+      },
+      "mop_outbox": {
+        "rows": 4846,
+        "equality_sha256": "c76614e0a78cc8ceaf76e0254150195c2b9daa153f409394994d13b12cc8adf7"
+      },
+      "mop_photo_job": {
+        "rows": 1767,
+        "equality_sha256": "4f6115cb97f72f3dc30ed2b7ed9ef22761b14ca45623a156e47d174838e5c37e"
+      },
+      "mop_site": {
+        "rows": 2,
+        "equality_sha256": "e99553852510db402a95d9c8bf333b126c9f4b832d5604251d14dc5a6c5778ae"
+      },
+      "mop_tenant": {
+        "rows": 116,
+        "equality_sha256": "186eb4f9fc6730f2aa6eaac79b8af1639ba8df7e3a69795803f1c3af58a8b592"
+      },
+      "mop_ticket": {
+        "rows": 4846,
+        "equality_sha256": "e38e4f3fc6d41e380803642162c295701b0c3207444628c4d15f3d293b9066b4"
+      },
+      "mop_ticket_comment": {
+        "rows": 1254,
+        "equality_sha256": "088f52e595604fc65acd0824ae67be81ff3c64faed1debb3fdea08fa6777fff9"
+      },
+      "mop_ticket_history": {
+        "rows": 5359,
+        "equality_sha256": "8191b93c14e73d6fba357598e4e2469443dea6ca64279c1affcf165b7582969d"
+      },
+      "mop_ticket_internal_note": {
+        "rows": 1026,
+        "equality_sha256": "97c2ec92685a96b03f4d110c0549aa079a58e49043ed4e44e65b9b99d6a84898"
+      },
+      "mop_user": {
+        "rows": 291,
+        "equality_sha256": "43c889861e4bddc3eb425f9cf14add2cde39956c14bdb6854534feb31d344260"
+      },
+      "mop_working_calendar_draft": {
+        "rows": 855,
+        "equality_sha256": "0dbb420c76ee5c36f1719004afc4cae02a4e3ed1d4a19e74cf26623915bab3cc"
+      },
+      "mop_working_calendar_revision": {
+        "rows": 1368,
+        "equality_sha256": "43b4f954c4825c887f02a94f31ced8cf8d22c63d156e55d568412e4145fc68a0"
+      },
+      "mop_worklog": {
+        "rows": 1198,
+        "equality_sha256": "64764df123ad50d5fea4aa5b31fd2b07fd73bbc2317245b3a584db45cea8954e"
+      },
+      "mop_worklog_revision": {
+        "rows": 1711,
+        "equality_sha256": "5898edad1fe461f3153a0c800b4dae04ce4227d8dfcbdbd388f60c37fb0e7c01"
+      }
+    },
+    "excludes_flyway_metadata": true
+  },
+  "pre_application_dry_run": {
+    "ddl_rolled_back": true,
+    "migration_history_changed": false,
+    "last_tests_reported": 45,
+    "real_structure_executed": 14,
+    "pure_migration_policy": 29,
+    "skipped_runtime_identity_and_commit_cases": 2
+  },
+  "real_runtime_schema_tests": 17,
+  "runtime_schema_tests_skipped": 0,
+  "migration_policy_tests": 29,
+  "python_tests": 134,
+  "root_tests": {
+    "reported": 1833,
+    "executed": 1820,
+    "real_postgres": 584,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts": 90,
+  "contract_generation": "PASS",
+  "postcheck": {
+    "collections": 6,
+    "nonempty_collections": 5,
+    "labelled_synthetic": true,
+    "unverified_not_generatable_or_published": true,
+    "document_hashes_valid": true,
+    "item_counts_match": true
+  },
+  "permanent_deletes": 0,
+  "first_runtime_attempts": "Two batches failed only the new ACL assertion SQL SELECT1 typo; corrected test SQL, preserving failures, then all16runtime cases passed. Frozen SQL unchanged.",
+  "structure": {
+    "head_columns": 16,
+    "item_columns": 6,
+    "head_check_constraints": 11,
+    "item_check_constraints": 3,
+    "trigger_functions": 3,
+    "runtime_select_insert_only": true,
+    "public_acl": false,
+    "source_template_content_and_metadata_hashes_recomputed": true,
+    "membership_and_source_composite_fks": true,
+    "single_deferred_completeness_check_per_collection": true,
+    "late_items_rejected_by_creation_transaction": true,
+    "same_transaction_extra_item_after_early_flush_rejected": true
+  },
+  "native_powershell": "PENDING_CI",
+  "new_repository_implemented": false,
+  "new_api_implemented": false,
+  "new_collection_ui_implemented": false,
+  "report_published": false,
+  "formal_report_generatable": false,
+  "quarter_rule": null,
+  "original_server_operated": false,
+  "api_worker_auto_migration": false,
+  "formal_acceptance": "NOT_RUN",
+  "logs": [
+    ".local/niko-test/logs/source-collection-contracts-20261004.log",
+    ".local/niko-test/logs/source-collection-legacy-mode-20261004.log",
+    ".local/niko-test/logs/source-collection-python-20261004.log",
+    ".local/niko-test/logs/source-collection-schema-after-20261004.log",
+    ".local/niko-test/logs/source-collection-schema-apply-20261004.log",
+    ".local/niko-test/logs/source-collection-schema-before-20261004.log",
+    ".local/niko-test/logs/source-collection-schema-dry-tests-20261004-r2.log",
+    ".local/niko-test/logs/source-collection-schema-dry-tests-20261004-r3.log",
+    ".local/niko-test/logs/source-collection-schema-dry-tests-20261004.log",
+    ".local/niko-test/logs/source-collection-schema-postcheck-20261004-r2.json",
+    ".local/niko-test/logs/source-collection-schema-postcheck-20261004.json",
+    ".local/niko-test/logs/source-collection-schema-repeat-20261004.log",
+    ".local/niko-test/logs/source-collection-schema-root-20261004-r2.log",
+    ".local/niko-test/logs/source-collection-schema-root-20261004.log",
+    ".local/niko-test/logs/source-collection-schema-runtime-tests-20261004-r2.log",
+    ".local/niko-test/logs/source-collection-schema-runtime-tests-20261004-r3.log",
+    ".local/niko-test/logs/source-collection-schema-runtime-tests-20261004-r4.log",
+    ".local/niko-test/logs/source-collection-schema-runtime-tests-20261004.log",
+    ".local/niko-test/logs/source-collection-sql-dry-run-20261004.log",
+    ".local/niko-test/logs/source-collection-tracker-20261004.log"
+  ],
+  "additional_runtime_case": "Three explicitly selected versions of one worksheet, including archived=true, match Java canonical hashes; reordered source document is rejected"
+}

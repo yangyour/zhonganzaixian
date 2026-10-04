@@ -1,0 +1,23 @@
+{
+  "verified_at": "2026-10-04T12:44:44.9576710Z",
+  "environment": "designated-server-from-Windows",
+  "api_version": "0.36.0",
+  "schema_version": 22,
+  "first_startup_request_timeout_seconds": 5,
+  "actual_successful_readiness_elapsed_ms": 8253,
+  "actual_readiness_status": 200,
+  "actual_ready": true,
+  "bounded_request_timeout_seconds": 30,
+  "bounded_overall_startup_seconds": 180,
+  "registered_roles": [
+    "api",
+    "web",
+    "photo-worker",
+    "asset-import-worker",
+    "contact-import-worker"
+  ],
+  "worker_liveness_not_inferred_from_schema": true,
+  "new_components": 0,
+  "migrations_on_startup": 0,
+  "contract_done": false
+}

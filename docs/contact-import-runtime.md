@@ -56,3 +56,9 @@ Windows环境投影现在读取私有runtime的MOP_CONTACT_IMPORT_LEASE_MILLIS�
 首轮真实组件回归的100行用例在30秒到期后整体回滚；同时导出准备回归的500ms租约在正常SSH往返中过期。未放松业务代码的租约/fencing校验：100行回归显式使用5分钟测试租期，导出恢复回归先用10秒完成准备，再以数据库时钟等待实际lease_until后接管，不依赖固定0.55秒睡眠。最终两套真实PG测试32项全部通过，前次失败日志留在忽略目录；29项隔离Windows环境/归属检查通过。
 
 迁移保护同时识别新独立导出准备Worker的类名、原JAR名及本工程固定副本路径，运行时拒绝迁移而不会停止未登记进程。API契约0.35和V1–V22字节保持；实际100行公开HTTP/WindowsWorker验证另行留证，本条不把仓储通过当Worker验收。
+
+## 2026-10-04 V22就绪等待与实际100行批次
+
+API0.36新增结构检查经指定SSH路径实测ready200约8253ms；旧5秒调用超时导致第一次Windows启动退出，未假称就绪。启动脚本现在每次请求最多30秒、总等待180秒，仍要求实际remote_test/ready/durable及所选依赖为true；失败仍退出并安全停止本工程。实际API/Web、照片、资产导入、联系人五角色均登记运行，六角色OIDC重新认证通过；ready的worker_liveness仍null，不据结构推断消费者在线。
+
+另以明确300000ms技术租期提交100行不同的禁用虚构联系人，真实202、后台专用WindowsWorker原子完成100个不同v1引用、成功后原body/key回放仍原PENDING收据；220次实际HTTP通过，100条均已归档保留历史。观测时长只记本次数据，不作为性能、容量或生产SLA；通知/身份绑定0。见[100行实际Worker](evidence/local-contact-maximum-worker-20261004.json)与[就绪等待](evidence/local-readiness-v36-20261004.json)。

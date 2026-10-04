@@ -1,0 +1,17 @@
+{
+  "verified_at": "2026-10-04T12:39:29.523Z",
+  "environment": "designated-server-from-Windows",
+  "api_contract_version": "0.36.0",
+  "actual_http_requests": 220,
+  "actual_job_rows": 100,
+  "all_100_distinct_first_revisions": true,
+  "observed_running": true,
+  "observed_202_to_completion_ms": 39090,
+  "measurement_is_not_sla_or_capacity_benchmark": true,
+  "technical_worker_lease_millis": 300000,
+  "original_202_receipt_replayed_after_completion": true,
+  "all_own_synthetic_contacts_archived": true,
+  "notifications_sent": 0,
+  "identity_bindings_created": 0,
+  "formal_acceptance": "NOT_RUN"
+}

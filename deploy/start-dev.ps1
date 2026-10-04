@@ -144,13 +144,13 @@ try {
         Register-MopDevProcess -Process $webProcess -Name 'web' -ExecutablePath $nodeExecutable -ArtifactPath $vitePath
     } finally { $env:MOP_API_PROXY_TARGET = $previousProxy }
     $ready = $false
-    # Full V15 dependency checks traverse the designated SSH path. A one-second
-    # request timeout repeatedly rejected a healthy API; keep an overall deadline.
-    $readinessDeadline = [DateTime]::UtcNow.AddSeconds(90)
+    # V22 checks traverse the designated SSH path; bound each real check and the
+    # overall startup separately, without converting a timeout to readiness.
+    $readinessDeadline = [DateTime]::UtcNow.AddSeconds(180)
     while ([DateTime]::UtcNow -lt $readinessDeadline) {
         if ($apiProcess.HasExited -or $webProcess.HasExited) { throw '开发进程提前退出，请查看 .local 中的日志。' }
         try {
-            $health = Invoke-RestMethod -Uri "http://127.0.0.1:$ApiPort/api/v1/health/ready" -TimeoutSec 5
+            $health = Invoke-RestMethod -Uri "http://127.0.0.1:$ApiPort/api/v1/health/ready" -TimeoutSec 30
             if ($health.data.mode -ne 'remote_test' -or $health.data.ready -ne $true -or $health.data.durable -ne $true) { throw 'API未连接指定共享测试环境。' }
             if ($WithPhotoWorker -and $health.data.photos.ready -ne $true) { throw '照片结构、策略或 MinIO 尚未就绪。' }
             if ($WithAssetImportWorker -and $health.data.asset_imports.ready -ne $true) { throw '资产导入结构、存储或解析器尚未就绪。' }

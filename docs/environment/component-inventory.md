@@ -221,3 +221,6 @@ QA2689主动正常退出后，以原脚本/原数据/原凭据重启现有PG17.1
 ## 2026-10-04 11:34 执行单页面B03复核
 
 niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在启动时EPERM/Operation not permitted，应用页打开0；未降低沙箱/系统安全或建立代理。30输入/SFC模拟DOM测试与11实际来源HTTP分别通过，不能合并宣称浏览器/移动视觉验收。见[当前探测](../evidence/niko-worksheet-page-browser-probe-20261004.json)及[页面边界](../evidence/niko-inspection-worksheet-page-20261004.json)，继续不依赖该入口的开发。
+
+
+2026-10-04 API0.36/V22本地五角色已连接原PG17.9/KC26.2.4/MinIO，ready实测8.253秒后200；只调项目启动等待窗口，未改共享组件。100行专用Windows联系人作业真实完成并归档，见[实际证据](../evidence/local-contact-maximum-worker-20261004.json)。通知/身份绑定/OSS保持原门禁。

@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 30,
-  "rows_without_progress_notes": 98,
+  "rows_with_progress_notes": 31,
+  "rows_without_progress_notes": 97,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -65,7 +65,7 @@
     },
     "M8": {
       "requirements": 12,
-      "rows_with_progress_notes": 0,
+      "rows_with_progress_notes": 1,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 12
       }
@@ -1013,8 +1013,10 @@
       "id": "M8-3",
       "title": "送达记录与死信管理",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/notification-receipt-state.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1312,6 +1314,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "2150d300d4a7d562937a25989b62afa556531a2ffd489b4f31d2ec824f95a6bb"
+    "doc/development/07_合同逐项开发追踪.md": "0fc49780996da310f23140bf7e3c760dfafaf15d70b07eeff0f37500df2fdeda"
   }
 }

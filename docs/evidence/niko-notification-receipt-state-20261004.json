@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-04",
+  "environment": "niko-local-test",
+  "scope": "EXPLICIT_NOTIFICATION_RECEIPT_DOMAIN_ONLY",
+  "new_pure_tests": 24,
+  "receipt_order_permutations": 6,
+  "root_reported": 1372,
+  "root_executed": 1359,
+  "root_failures": 0,
+  "root_errors": 0,
+  "historical_fixture_skipped": 13,
+  "existing_real_postgresql_tests": 392,
+  "minio_tests_excluded": 6,
+  "contract_tests": 70,
+  "contract_generation_consistent": true,
+  "new_actual_notification_deliveries": 0,
+  "provider_signature_verified": false,
+  "provider_p95_verified": false,
+  "notification_persistence_verified": false,
+  "effective_retry_budget": null,
+  "effective_sms_quota": null,
+  "automatic_send_enabled": false,
+  "schema_change": false,
+  "business_api_change": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "log_sha256": {
+    "delivery-receipt-focused-final-20261004.log": "9390d6fc476b169198b6ffcc9690027290bad0dc284b2e39d951d3fa853975f2",
+    "delivery-receipt-real-pg-20261004.log": "b1acc6882f8a87be24a85f96b9c2c68bc329b7374c2c4744fcae4997271f1150",
+    "notification-receipt-contracts-20261004.log": "8d65427af69b3d9fb0e8e2ed2282d786273cd623933b65c250aba09a1061ca16"
+  }
+}

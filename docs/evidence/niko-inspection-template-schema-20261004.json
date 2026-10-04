@@ -45,7 +45,14 @@
     "failures": 0,
     "errors": 0
   },
-  "windows_native_policy": "PENDING_CI",
+  "windows_native_policy": {
+    "status": "PASS",
+    "ci_run": 37187286768,
+    "job": 111391821682,
+    "isolated_checks": 76,
+    "database_operations": 0,
+    "source_commit": "643f59d348347105651104b30bfa817957ec65f4"
+  },
   "api_contract_version": "0.34.0",
   "inspection_repository_implemented": false,
   "inspection_http_implemented": false,

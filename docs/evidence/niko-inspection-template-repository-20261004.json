@@ -1,0 +1,81 @@
+{
+  "verified_at": "2026-10-04T08:07:58Z",
+  "environment": "niko-local-test",
+  "scope": "UNPUBLISHED_INSPECTION_TEMPLATE_REPOSITORY",
+  "new_real_pg_tests": 19,
+  "root_tests": {
+    "reported": 1659,
+    "executed": 1646,
+    "real_postgres": 515,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts": 74,
+  "contract_generation": "PASS",
+  "actual_concurrency": [
+    "same_key_one_commit",
+    "same_version_one_success_one_409"
+  ],
+  "fault_injection": [
+    "actual_jdbc_audit_statement_failure",
+    "actual_jdbc_item_mutation",
+    "isolated_authorization_callback_denial"
+  ],
+  "physical_outage_tested": false,
+  "postcheck": {
+    "identity_membership_fingerprints_unchanged_during_focused_repository_tests": true,
+    "tables": {
+      "mop_user": {
+        "rows": 241,
+        "equality_sha256": "7a8e21a428ea6530884dbcb88f596753c7ac28793c313184e8200f3438606319"
+      },
+      "mop_membership": {
+        "rows": 479,
+        "equality_sha256": "d141c5996f6f1efb3dc20c5f4b41bd9820f41e53eb6a6e6b21cfd1440b56ae50"
+      }
+    },
+    "templates": {
+      "template_heads": 75,
+      "archived": 75,
+      "non_synthetic": 0,
+      "unverified": 75
+    },
+    "permanent_deletes": 0
+  },
+  "initial_broad_window_check": {
+    "new_focused_window_recorded": true,
+    "broader_window_equal": false,
+    "broader_window_counts": {
+      "mop_user": {
+        "before_v21_root_tests": 231,
+        "after_two_root_regressions": 241
+      },
+      "mop_membership": {
+        "before_v21_root_tests": 459,
+        "after_two_root_regressions": 479
+      }
+    }
+  },
+  "initial_failed_log": ".local/niko-test/inspection-repository-postcheck.json",
+  "repeat_test_counts_not_additive": true,
+  "new_migrations": 0,
+  "api_contract_version": "0.34.0",
+  "public_http_implemented": false,
+  "csrf_http_tested": false,
+  "browser_tested": false,
+  "report_publication": false,
+  "template_approval": "UNVERIFIED",
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/inspection/InspectionTemplateRepository.java": "321f9d660fe9642e0339ef6d3b7f1a97eb5ac9049094c85823b8911e8f685c8d",
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresInspectionTemplateRepository.java": "4a5722cf6e5561bdcda70d97e92ab21f79236b431a37ec0f56eb11eea1da9f17"
+  },
+  "logs": [
+    ".local/niko-test/logs/inspection-repository-pg-first-20261004.log",
+    ".local/niko-test/logs/inspection-repository-pg-final-20261004.log",
+    ".local/niko-test/logs/inspection-repository-root-20261004.log",
+    ".local/niko-test/logs/inspection-repository-contracts-20261004.log"
+  ]
+}

@@ -35,6 +35,9 @@ if (-not (Test-Path -LiteralPath $sourceCollectionVerifierClass) -or (Get-Item -
 $backupPlanVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/BackupPlanSchemaVerifier.java'
 $backupPlanVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/BackupPlanSchemaVerifier.class'
 if (-not (Test-Path -LiteralPath $backupPlanVerifierClass) -or (Get-Item -LiteralPath $backupPlanVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $backupPlanVerifierSource).LastWriteTimeUtc) { throw '备份计划草稿核验器缺失或早于源码；先重新编译。' }
+$notificationPreferenceVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/NotificationPreferenceSchemaVerifier.java'
+$notificationPreferenceVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/NotificationPreferenceSchemaVerifier.class'
+if (-not (Test-Path -LiteralPath $notificationPreferenceVerifierClass) -or (Get-Item -LiteralPath $notificationPreferenceVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $notificationPreferenceVerifierSource).LastWriteTimeUtc) { throw '本人通知偏好草稿核验器缺失或早于源码；先重新编译。' }
 $changeNoticeVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/ChangeNoticeSchemaVerifier.java'
 $changeNoticeVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/ChangeNoticeSchemaVerifier.class'
 if (-not (Test-Path -LiteralPath $changeNoticeVerifierClass) -or (Get-Item -LiteralPath $changeNoticeVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $changeNoticeVerifierSource).LastWriteTimeUtc) { throw '变更通知草稿核验器缺失或早于源码；先重新编译。' }

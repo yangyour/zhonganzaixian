@@ -99,3 +99,7 @@ niko独立测试库通过显式独立CLI执行V23__immutable_inspection_source_c
 ## V25未审核变更报备草稿结构冻结（2026-10-04 19:23 UTC）
 
 niko独立测试库通过显式独立CLI执行V25__unreviewed_change_notice_drafts.sql一次并通过结构/ACL核对，SHA256为650ce8f83e9fc673cfb6a4838872638149650f735a90f37c5861a6fce771bc67。V1–V25全部字节冻结（包含已执行V24备份计划草稿），后续SQL修正必须新增V26或更高；不修改已执行SQL。三表/四守卫只保护申请人、计划内容、设备引用和不可变修订，不证明审批、有效窗口匹配、告警抑制、自动P3、仓储/API/页面完成。approval_status与automatic_p3_decision保持null，生效/执行/抑制标志均false；Q22待确认。原服务器未操作，API/Worker不自动迁移；旧表行指纹、重复执行与真实运行角色测试以实际独立证据为准。
+
+## V26本人通知偏好请求结构冻结（2026-10-04 23:15 UTC）
+
+niko独立测试库通过显式独立CLI执行V26__own_notification_preference_drafts.sql一次并通过结构/ACL核对，SHA256为df3c59cc6c241316b110ae87b3cb7a80aee57b4847f4122e7786b90ac94c23d8。V1–V26全部字节冻结，后续修正必须新增V27或更高；不得改已执行SQL。两表/三守卫仅保护同租户本人唯一请求草稿、连续不可变修订与规范指纹，effective=false、接收人/有效规则/派发决定null，不启动通知或解除Q14。结构不等于本人授权仓储/API/页面和供应商派发已验收，未完成项目保持NOT_RUN。旧表行指纹、重复执行、只读检查及真实运行角色测试以各自后续证据为准；本批不操作原服务器，API/Worker不自动迁移。

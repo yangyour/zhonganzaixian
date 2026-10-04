@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Pure CLI policy tests. No network, database, migration, or alternate component is used. */
 class TestSchemaMigrationTest {
-    private static final List<String> SCRIPTS=List.of("V1__remote_test_platform.sql","V2__tenant_configuration_revisions.sql","V3__configuration_review_test_identity.sql","V4__durable_customer_report_registration.sql","V5__durable_report_photos.sql","V6__asset_import_sources_and_mapping.sql","V7__asset_dependency_draft_revisions.sql","V8__manual_worklog_revisions.sql","V9__manual_asset_metadata_revisions.sql","V10__immutable_internal_ticket_notes.sql","V11__immutable_ticket_comments.sql","V12__unpublished_working_calendar_drafts.sql","V13__immutable_manual_incident_registrations.sql","V14__immutable_manual_recovery_confirmations.sql","V15__manual_warranty_details.sql","V16__immutable_capacity_scenario_drafts.sql","V17__customer_contact_revisions.sql","V18__durable_contact_import_jobs.sql","V19__contact_import_generated_hash_guard.sql","V20__durable_asset_export_jobs.sql","V21__inspection_template_revisions.sql","V22__manual_inspection_worksheet_drafts.sql","V23__immutable_inspection_source_collections.sql","V24__unpublished_backup_plan_drafts.sql","V25__unreviewed_change_notice_drafts.sql");
+    private static final List<String> SCRIPTS=List.of("V1__remote_test_platform.sql","V2__tenant_configuration_revisions.sql","V3__configuration_review_test_identity.sql","V4__durable_customer_report_registration.sql","V5__durable_report_photos.sql","V6__asset_import_sources_and_mapping.sql","V7__asset_dependency_draft_revisions.sql","V8__manual_worklog_revisions.sql","V9__manual_asset_metadata_revisions.sql","V10__immutable_internal_ticket_notes.sql","V11__immutable_ticket_comments.sql","V12__unpublished_working_calendar_drafts.sql","V13__immutable_manual_incident_registrations.sql","V14__immutable_manual_recovery_confirmations.sql","V15__manual_warranty_details.sql","V16__immutable_capacity_scenario_drafts.sql","V17__customer_contact_revisions.sql","V18__durable_contact_import_jobs.sql","V19__contact_import_generated_hash_guard.sql","V20__durable_asset_export_jobs.sql","V21__inspection_template_revisions.sql","V22__manual_inspection_worksheet_drafts.sql","V23__immutable_inspection_source_collections.sql","V24__unpublished_backup_plan_drafts.sql","V25__unreviewed_change_notice_drafts.sql","V26__own_notification_preference_drafts.sql");
     private static List<TestSchemaMigration.Entry> entries(boolean photosApplied,boolean importsApplied) {
         return entries(photosApplied,importsApplied,false);
     }
@@ -268,5 +268,20 @@ class TestSchemaMigrationTest {
         assertEquals(TestSchemaMigration.Plan.CHANGE_NOTICE_DRAFTS_APPLIED,TestSchemaMigration.inspect(all));
         var last=all.get(24);all.set(24,new TestSchemaMigration.Entry(last.version(),last.script(),last.type(),last.state(),true,false,last.checksum()));
         assertThrows(IllegalStateException.class,()->TestSchemaMigration.inspect(all));
+    }
+    @Test void ownPreferencesRequireExplicitV26AndKeepPriorModesReadOnly()throws Exception{
+        var mode=TestSchemaMigration.Mode.APPLY_NOTIFICATION_PREFERENCE_DRAFTS;
+        assertEquals(mode,TestSchemaMigration.requestedMode(new String[]{"--apply-notification-preference-drafts"}));
+        assertTrue(TestSchemaMigration.shouldMigrate(mode,TestSchemaMigration.Plan.CHANGE_NOTICE_DRAFTS_APPLIED));
+        assertFalse(TestSchemaMigration.shouldMigrate(mode,TestSchemaMigration.Plan.NOTIFICATION_PREFERENCE_DRAFTS_APPLIED));
+        assertFalse(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_CHANGE_NOTICE_DRAFTS,TestSchemaMigration.Plan.NOTIFICATION_PREFERENCE_DRAFTS_APPLIED));
+        for(var plan:TestSchemaMigration.Plan.values())if(plan.schemaVersion<25)assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(mode,plan));
+        NotificationPreferenceSchemaVerifier.resource();assertEquals(3,NotificationPreferenceSchemaVerifier.FUNCTIONS.size());
+    }
+    @Test void ownPreferenceHistoryIsContiguousAndFrozen(){
+        var all=entries(true,true,true,true,true,true,true,true,true,true,true,true,true);
+        for(int i=17;i<26;i++){var old=all.get(i);all.set(i,new TestSchemaMigration.Entry(old.version(),old.script(),old.type(),MigrationState.SUCCESS,true,true,old.checksum()));}
+        assertEquals(TestSchemaMigration.Plan.NOTIFICATION_PREFERENCE_DRAFTS_APPLIED,TestSchemaMigration.inspect(all));
+        var last=all.get(25);all.set(25,new TestSchemaMigration.Entry(last.version(),last.script(),last.type(),last.state(),true,false,last.checksum()));assertThrows(IllegalStateException.class,()->TestSchemaMigration.inspect(all));
     }
 }

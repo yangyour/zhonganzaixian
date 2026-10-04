@@ -1,0 +1,10 @@
+{
+  "sha256": {
+    "V26__own_notification_preference_drafts.sql": "df3c59cc6c241316b110ae87b3cb7a80aee57b4847f4122e7786b90ac94c23d8"
+  },
+  "function_body_sha256": {
+    "mop_notification_preference_head_guard": "3b98942ebec99912097f70061639e77ed534bc8b56d24718195c4e8d60ce97db",
+    "mop_notification_preference_insert_guard": "d587dff6578353ddc7a35ec4bf540a3ab9a07b4e5e016a8e4ef3d28f7b773419",
+    "mop_notification_preference_complete": "2330c1bd33af739a119e93f8c8b426ab8cf0d1c783775d8a9cf4df65e6b8059b"
+  }
+}

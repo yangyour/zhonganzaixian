@@ -1,0 +1,83 @@
+{
+  "verified_at": "2026-10-04T23:37:43.208049+00:00",
+  "scope": "OWN_NOTIFICATION_PREFERENCE_DRAFT_SCHEMA_ONLY",
+  "environment": "niko-local-test",
+  "previous_commit": {
+    "sha": "ec46a8aaba29119d38267d889fadef27679da1e5",
+    "ci_run": 37242323496,
+    "conclusion": "success"
+  },
+  "migration": {
+    "version": 26,
+    "explicit_mode": "--apply-notification-preference-drafts",
+    "first_apply_executed": 1,
+    "repeat_executed": 0,
+    "read_only_check_executed": 0,
+    "frozen_through": 26,
+    "api_worker_auto_migration": false
+  },
+  "legacy_rows": {
+    "tables": 56,
+    "full_rows_equal": true,
+    "verified_at": "2026-10-04T23:16:19.846645+00:00",
+    "before_tests": true
+  },
+  "focused_tests": 76,
+  "new_schema_postgresql_tests": 22,
+  "migration_policy_java_tests": 35,
+  "existing_core_tests": 19,
+  "root_tests_reported": 2163,
+  "root_tests_executed": 2150,
+  "real_postgresql_tests": 728,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "failures": 0,
+  "errors": 0,
+  "python_tests": 146,
+  "contracts": 116,
+  "contract_generation": "PASS",
+  "native_powershell_local": "NOT_RUN",
+  "schema_test_rows_after_rollback": {
+    "mop_notification_preference_draft": 0,
+    "mop_notification_preference_revision": 0
+  },
+  "test_memberships": "existing active memberships only; select an unused owner and rollback all schema test inserts; no identity creation or existing preference deletion",
+  "runtime_acl": "SELECT INSERT; head UPDATE version and updated_at only; no history update/delete",
+  "caller_authorization_implemented": false,
+  "api_contract_changed": false,
+  "backend_restarted": false,
+  "live_api_version": "0.42.0",
+  "effective": false,
+  "receiver_binding_verified": false,
+  "delivery_decision": null,
+  "notification_dispatched": false,
+  "original_server_operated": false,
+  "new_credentials": false,
+  "formal_acceptance": "NOT_RUN",
+  "failure_history": [],
+  "source_sha256": {
+    "server/persistence/src/main/resources/db/migration/V26__own_notification_preference_drafts.sql": "df3c59cc6c241316b110ae87b3cb7a80aee57b4847f4122e7786b90ac94c23d8",
+    "server/persistence/src/main/java/cn/mop/persistence/NotificationPreferenceSchemaVerifier.java": "e76e477b3ad81ea3c18aefac34f9aa5b66bbeb50d32f894dfe4b7c1ab963cf68",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresNotificationPreferenceSchemaIntegrationTest.java": "673d418634fd4ed5b971b2f873b73fdbe7cc039626bc448b352fda6a95b95410",
+    "tools/niko-test/frozen-notification-preference-migration.json": "94df5e33f87dc0fcb1d92d8b28dc81134a4b9255f23dd0dc36bb324dfe922662"
+  },
+  "logs_sha256": {
+    "notification-preference-schema-build-20261004.log": "75177ba92c6978b23a84757bcb438bbf83661658822bc0741aa46053567aa8a9",
+    "notification-preference-schema-contract-generation-20261004.log": "3b41635be7b2de9ed2566d7029f9d269577f7b44ae01aa1826bd792e803f538b",
+    "notification-preference-schema-contracts-20261004.log": "a9e15d5579b89c8078f2ac6e30632d1dc1860ebc70ba46bb798fb790674cf35f",
+    "notification-preference-schema-focused-20261004.log": "0e313b1ea2bf576105965f1779592d00e0a6db52b486e57010d28c306bbeb1aa",
+    "notification-preference-schema-focused-final-20261004.log": "9615008e25a28e9e04e8f8097c2ffdd2843fa5a3fa93e1af76936e3bf1874e14",
+    "notification-preference-schema-full-20261004.log": "1027b745d5d9b8d56cdcbdb76ce6476cebb247b61b522b5a76d677856e07ed29",
+    "notification-preference-schema-full-final-20261004.log": "a5be916abfca8b61cafef740f3189f39afacff84156c8ffec933be8f9c75d0f0",
+    "notification-preference-schema-policy-20261004.log": "d34b93afbb09e13f750323c0dfdd7bd99b1b67a3b7683a937ccc8ba2df507e79",
+    "notification-preference-schema-python-20261004.log": "453a8eb8123b84dc734bec768d5626e6a34c0b0761a5dda964eca6729aa7bb25",
+    "notification-preference-v26-after-20261004.log": "43f9f52263e59418b05cddfdfe58dc2e9ed660e587c25aa8457c2f1e31e79c13",
+    "notification-preference-v26-apply-20261004.log": "383bd5ae5e0ee89269ef10b6930251ccd1e5e75d9b01de4b49bf234f8786cbe7",
+    "notification-preference-v26-before-20261004.log": "1597dff3637fe8295dbed63a4f1f3b35f9d86ec57f5562d142c22d862de52dc5",
+    "notification-preference-v26-check-20261004.log": "e49ea77dc3e28afd3cb039fb2576d9ed2e9e0b7cb6bb0f14d58a5c79404ec0c6",
+    "notification-preference-v26-final-check-20261004.log": "efbce0c42706f7d521cb84238f23a9a172411b7abfaa39b885b373e04b1ff469",
+    "notification-preference-v26-precheck-20261004.log": "b458877ad4755ec37bc213b462d17a207f559160b1594526250792e7caad8a2a",
+    "notification-preference-v26-repeat-20261004.log": "a143bc91f6d34c0cffa9f28bc55d5b8318cad36990a1287d09c9e74a98f523cc",
+    "notification-preference-schema-python-final-20261004.log": "a1347b0658d0fee120951f05210d5333dbf8cf244e33747dce1762a727d0e347"
+  }
+}

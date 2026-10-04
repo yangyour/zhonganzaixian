@@ -227,3 +227,6 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 
 
 2026-10-04 原指定PG17.9/KC26.2.4巡检模板、执行单API/请求模块及真实Edge桌面/390px已验；B03只对这两页面明确场景解除，物理设备、证据/通知/季度发布和客户确认仍待。没有新组件/账号；见[本地记录](../local-inspection-validation-20261004.md)。
+
+
+2026-10-04 最新来源捕获只复用原PG17.9，13真实只读捕获/3选择/20清单已验，未新增接口/表/组件/身份；原V22及API0.36保持。Windows符号链接创建权限缺失只影响1条路径保护测试前置条件，未修改宿主机权限；该条明确SKIP，见[最终证据](../evidence/local-inspection-source-capture-20261004.json)。

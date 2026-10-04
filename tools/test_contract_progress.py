@@ -3,6 +3,7 @@ import copy
 import contextlib
 import io
 import json
+import os
 from unittest.mock import patch
 import contract_progress as progress
 from pathlib import Path
@@ -65,7 +66,13 @@ class ContractProgressTest(unittest.TestCase):
     def test_credential_bearing_external_link_is_not_copied(self):
         with self.assertRaises(ProgressError):self.report(self.text.replace('../../docs/proof.md','https://user:SYNTHETIC@example.invalid/proof'))
     def test_symlink_outside_repository_is_rejected_before_read(self):
-        link=self.root/'docs/link.md';link.symlink_to(self.root.parent/'unrelated-not-read.md')
+        link=self.root/'docs/link.md'
+        try:
+            link.symlink_to(self.root.parent/'unrelated-not-read.md')
+        except OSError as failure:
+            if os.name == 'nt' and getattr(failure, 'winerror', None) == 1314:
+                self.skipTest('Windows host lacks symlink creation privilege; host policy is unchanged')
+            raise
         with self.assertRaises(ProgressError):self.report(self.text.replace('proof.md','link.md'))
     def test_check_mode_never_overwrites_a_stale_index(self):
         output=self.root/'index.json';output.write_text('old')

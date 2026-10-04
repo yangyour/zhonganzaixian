@@ -1,0 +1,22 @@
+{
+  "verified_at": "2026-10-04T12:58:52.2836696Z",
+  "environment": "designated-server-from-Windows",
+  "source_baseline": "8313fd0",
+  "api_version": "0.36.0",
+  "schema_version": 22,
+  "postgresql": "17.9",
+  "new_source_selection_pure_tests": 3,
+  "new_source_capture_real_pg_tests": 13,
+  "new_source_manifest_pure_tests": 20,
+  "new_executed_tests": 36,
+  "failures": 0,
+  "errors": 0,
+  "new_migrations": 0,
+  "api_routes_added": 0,
+  "frozen_revision_and_one_read_snapshot": true,
+  "report_publication": false,
+  "contract_index_tests_executed": 16,
+  "contract_index_windows_symlink_prerequisite_skip": 1,
+  "host_policy_changed": false,
+  "formal_acceptance": "NOT_RUN"
+}

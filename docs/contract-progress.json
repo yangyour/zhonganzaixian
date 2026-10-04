@@ -273,6 +273,7 @@
       "has_progress_note": true,
       "local_references": [
         "docs/customer-contacts.md",
+        "docs/evidence/local-contact-maximum-worker-20261004.json",
         "docs/local-browser-validation-20261004.md"
       ],
       "external_references_unchecked": 0,
@@ -402,7 +403,8 @@
         "docs/asset-export-job-state.md",
         "docs/asset-export-jobs.md",
         "docs/asset-export-snapshot.md",
-        "docs/asset-ledger-export-encoding.md"
+        "docs/asset-ledger-export-encoding.md",
+        "docs/export-preparation-worker.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1177,7 +1179,8 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
-        "docs/inspection-templates.md"
+        "docs/inspection-templates.md",
+        "docs/local-inspection-validation-20261004.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1333,6 +1336,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "16692e11f8d587dcae5241ccbb282d263e11e69161df82a48cfdc44904e9c4f3"
+    "doc/development/07_合同逐项开发追踪.md": "b659252f740882138dd4cddd6c91ef4137bb42e4978830c6d754419712521a15"
   }
 }

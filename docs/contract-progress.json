@@ -920,6 +920,7 @@
         "docs/evidence/niko-change-notice-api-20261004.json",
         "docs/evidence/niko-change-notice-client-20261004.json",
         "docs/evidence/niko-change-notice-core-20261004.json",
+        "docs/evidence/niko-change-notice-page-20261004.json",
         "docs/evidence/niko-change-notice-repository-20261004.json",
         "docs/evidence/niko-change-notice-schema-20261004.json"
       ],
@@ -1351,6 +1352,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "42ac23ee3210d2831f9d7c3c0eb95d20160bae4e990e6c9cd33ad7103817f043"
+    "doc/development/07_合同逐项开发追踪.md": "6e6b6fdbec608294b972f5003553e73f05179c5a2c83459bda8dad4595a85a66"
   }
 }

@@ -50,6 +50,7 @@ async function endSession() {
           <el-menu-item v-if="can('configurations:read')" index="configurations"><span class="nav-symbol">⚙</span>配置确认登记</el-menu-item>
           <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_templates:read')" index="inspection-templates">巡检模板候选</el-menu-item>
           <el-menu-item v-if="session?.user.role === 'padmin' && can('backup_plan_drafts:read')" index="backup-plan-drafts">每日备份计划草稿</el-menu-item>
+          <el-menu-item v-if="session?.user.role === 'padmin' && can('change_notice_drafts:read')" index="change-notice-drafts">变更报备草稿</el-menu-item>
           <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_source_collections:read')" index="inspection-source-collections">巡检来源集合草稿</el-menu-item>
           <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_worksheets:read')" index="inspection-worksheets">人工巡检执行单</el-menu-item>
           <el-menu-item v-if="can('contacts:read')" index="customer-contacts">客户联系人</el-menu-item>
@@ -95,6 +96,7 @@ async function endSession() {
         <el-menu-item v-if="can('configurations:read')" index="configurations">配置确认登记</el-menu-item>
         <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_templates:read')" index="inspection-templates">巡检模板候选</el-menu-item>
           <el-menu-item v-if="session?.user.role === 'padmin' && can('backup_plan_drafts:read')" index="backup-plan-drafts">每日备份计划草稿</el-menu-item>
+          <el-menu-item v-if="session?.user.role === 'padmin' && can('change_notice_drafts:read')" index="change-notice-drafts">变更报备草稿</el-menu-item>
           <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_source_collections:read')" index="inspection-source-collections">巡检来源集合草稿</el-menu-item>
           <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_worksheets:read')" index="inspection-worksheets">人工巡检执行单</el-menu-item>
           <el-menu-item v-if="can('contacts:read')" index="customer-contacts">客户联系人</el-menu-item>

@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 37,
-  "rows_without_progress_notes": 91,
+  "rows_with_progress_notes": 38,
+  "rows_without_progress_notes": 90,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -51,7 +51,7 @@
     },
     "M6": {
       "requirements": 7,
-      "rows_with_progress_notes": 3,
+      "rows_with_progress_notes": 4,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 7
       }
@@ -892,8 +892,11 @@
       "id": "M6-5",
       "title": "恢复演练记录",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/niko-recovery-drill-core-20261004.json",
+        "docs/recovery-drill-records.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1340,6 +1343,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "7cb9dc7cc48139e0ece0b2c04992a86f5be0e633018963cf3d75307b932b77f7"
+    "doc/development/07_合同逐项开发追踪.md": "1492fc874e7729da5eec90da8d769a8cc8a41e9dbe866d78edb2660bf518b809"
   }
 }

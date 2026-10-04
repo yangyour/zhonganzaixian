@@ -1,13 +1,14 @@
 package cn.mop.domain.warranty;
 
 import cn.mop.domain.DomainException;
+import cn.mop.domain.time.BusinessDates;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 
 /** M3-10 date arithmetic only. Dates do not prove coverage, provider, hazard creation or notification delivery. */
 public final class WarrantyDateAssessment {
     private WarrantyDateAssessment(){}
-    public static final ZoneId DISPLAY_ZONE=ZoneId.of("Asia/Shanghai");
+    public static final ZoneId DISPLAY_ZONE=BusinessDates.ZONE;
     public enum Position { UNKNOWN,PAST_DATE,DUE_TODAY,WITHIN_30_DAYS,FUTURE_DATE }
     public record DateResult(LocalDate recordedDate,Long daysUntil,Position position,Boolean within7Days,Boolean within30Days,Boolean within90Days,Boolean inReferenceQuarter) {}
     public record Assessment(LocalDate asOfDate,DateResult warrantyExpiry,DateResult overdueServiceDate) {

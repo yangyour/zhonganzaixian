@@ -138,3 +138,5 @@ assetExportJobs/assetExportWorkspace固定POST准备路径、原key/完整JSON�
 原202收据与当前进度分区，普通刷新不会确认原POST。本人作业明确keyset续页，不自动轮询；prepared=null显示行数/大小未知，已准备0行显示明确空结果。即使数据库阶段SUCCEEDED也显示存储未复核、下载未授权；失败保留准备描述，没有下载/自动恢复入口。文本只做转义显示。44px控件和760px单列样式已实现，不当作实际CSS/手机验收。
 
 20新增SFC，1503Web/88文件、类型构建、116契约通过；实际Vue/native jsdom组件10HTTP（8×200、2×202）。原202真实返回后受控丢失、普通刷新仍未知、原key/体重试仅1创建、原收据/当前队列和既有本人准备描述分别读取、显式清除本页不再提交均通过；原新作业最终QUEUED/v0、1accept审计、attempt/file/object0，成功只读审计窗不变。确认弹窗只注入明确测试回复，不声称真实浏览器交互；没有启动Worker/调用OSS/授予下载。见[页面](evidence/niko-export-page-20261004.json)与[组件HTTP](evidence/niko-export-page-http-20261004.json)。
+
+后续已对独立新合成请求完成页面受理→一个真实准备JVM→同作业新页面实例回读的分段链路：首轮在Worker成功后的Base64校验失败，保留后只读续验，未重跑或新增作业。实际16列/0数据行XLSX、原收据v0与当前v2分离；不发布/下载。见[完整经过和限制](export-preparation-worker.md)及[链路证据](evidence/niko-export-page-worker-chain-20261004.json)。

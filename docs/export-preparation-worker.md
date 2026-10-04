@@ -53,3 +53,13 @@
 ```
 
 强杀验证仅用tools/verify-designated-export-worker.py的显式模式，既有证据存在时拒绝重跑；保留原控制。原项目其他应用须停止，测试锁只属于mop_test，不操作其他项目或共享服务生命周期。
+
+## 2026-10-04 页面受理→单个真实Worker→同作业页面回读
+
+新增独立链路证明，使用新的明确合成空结果筛选，不复用/覆盖此前页面或四JVM故障测试控制。Vue/native jsdom页面经真实API受理，原202受控丢失后按同key/体恢复；随后只启动这一job的拥有者守卫Java进程。严格投影原niko PG运行配置，不向Worker传入OIDC、存储或其他角色配置；不调claimNext、不排空队列、不发布或下载。实际Worker正常exit0，SHA73eac974cc86e80c7a371d1998a193094bc0f499ee5880c40803e6913d99526e，fence1/version2，生成4817字节、16列表头/0数据行XLSX。这个新批次只覆盖明确空结果，不代替非空数据或OSS验收。
+
+首轮组件流程在Worker成功后，校验脚本用严格Base64解码直接读取PG的换行base64而失败；实际有84个LF，库内准备已完成。保留首轮failed证据、原控制、原Worker日志和初始脚本，不重新创建任务、不重跑Worker、不清除原失败标记。修正只移除PG的LF后再严格解码，独立只读恢复验证原4817字节与数据库/Worker SHA一致，ZIP完整且16个唯一表头含维保状态、元数据ENCODED_NOT_PUBLISHED。
+
+随后新的Vue组件实例通过原作业列表入口读到RUNNING/v2/attempt1与明确0行准备描述，未出现下载入口；另以完全相同原key/体回读202仍QUEUED/v0。两阶段合计14HTTP，3次原key写派发仍只有1受理；最终1job/1attempt/1准备文件/0对象回执，accept/claim/prepare各1审计、原收据1且保持v0，存活的该Worker数据库连接0。续验只读和幂等回放窗口审计不变。不是同一组件实例无中断全程成功，也不是物理故障恢复；真实浏览器/CSS/手机/企微仍未验。
+
+新增9纯目标/运行配置/PG Base64守卫测试，全145Python、116契约和最终类型检查通过。未改生产Java/Web源码、API/V25或重启后端。新工具的正常入口--prepare-accepted-page-proof只接受新确认的合成页控制；--verify-existing-page-proof只读取已保留exit0且解码失败的原作业，不能启动Worker，输出独占写。完成的原控制/恢复文件不可盲目重跑。见[分段链路证据](evidence/niko-export-page-worker-chain-20261004.json)、[首轮未完成](evidence/niko-export-page-e2e-http-20261004.json)及[同作业续验](evidence/niko-export-page-e2e-continuation-20261004.json)。

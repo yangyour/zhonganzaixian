@@ -1,0 +1,27 @@
+{
+  "verified_at": "2026-10-04T22:45:03.891Z",
+  "environment": "niko-local-test",
+  "api_version": "0.42.0",
+  "completed": true,
+  "http_requests": 6,
+  "write_dispatches": 1,
+  "statuses": {
+    "200": 5,
+    "202": 1
+  },
+  "only_write_is_exact_original_replay": true,
+  "successful_readonly_and_replay_window_audit_unchanged": true,
+  "fresh_component_instance": true,
+  "same_component_in_memory_continuity": false,
+  "prepared_zero_row_descriptor_read": true,
+  "original_queued_receipt_retained": true,
+  "new_jobs_requested": 0,
+  "new_workers_started": 0,
+  "object_store_requests": 0,
+  "download_granted": false,
+  "real_browser": false,
+  "css_visual_verified": false,
+  "phone_or_wechat_verified": false,
+  "failure": null,
+  "formal_acceptance": "NOT_RUN"
+}

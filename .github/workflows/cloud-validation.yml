@@ -63,6 +63,7 @@ jobs:
           python3 -m unittest discover -s tools -p test_niko_contact_worker.py -v
           python3 -m unittest discover -s tools -p test_export_queue_restart.py -v
           python3 -m unittest discover -s tools -p test_niko_export_worker.py -v
+          python3 -m unittest discover -s tools -p test_niko_export_page_e2e.py -v
 
   backend:
     name: Backend compile, unit tests and packaging

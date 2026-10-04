@@ -175,3 +175,7 @@
 本次实际发现 `/usr/bin/chromium`，版本154.0.8037.57（Debian13）；不再将“未取得Playwright下载包”解释为系统没有浏览器。使用已安装Playwright1.62.1，要求Chromium沙箱开启，先普通启动、再通过执行权限审核路径启动空白页；两次均在process_singleton的socket创建阶段返回Operation not permitted，页面打开0。第二次使用项目私有XDG目录，仍失败；ptrace也被禁止。
 
 未关闭沙箱、修改防火墙/端口/系统权限、开放公网、传入凭据或安装新软件。原云浏览器localhost阻塞、官方包下载失败保留为各自历史，不能混为新探测结果。B03仍阻塞当前真实DOM/移动视口验收；继续代码和隔离测试。证据见 [启动结果](../evidence/niko-browser-startup-blocker-20261004.json)。
+
+## 2026-10-04 原指定库V19接续
+
+当前Windows通过固定主机键SSH实读PG17.9、Keycloak26.2.4、MinIO RELEASE.2025-09-07T16-13-09Z；原mop_test从V15逐功能升至V19。四步各1次、重复0次、最终只读0次，58迁移/27进程保护通过；备份存本机忽略目录，未实际恢复。用途为容量草稿、联系人修订与批量作业，结构通过不代表本次实际Worker/页面已验；完整组件回归和浏览器结果后续单列。未改变已有共享组件生命周期/端口/全局设置。证据：[原库V19](../evidence/local-schema-v19-20261004.json)。

@@ -969,3 +969,7 @@ Playwright1.62.1官方Chrome Headless Shell151下载返回HTTP200却为195bytes�
 因此B03新环境实际DOM/桌面/移动/图形仍BLOCKED，不沿用旧实例的Unix socket EPERM作为新证据，也不拿Vue内存renderer或模块HTTP替代。继续纯代码、真实PG/API、契约和文档。见[新探测](evidence/niko-rebuilt-browser-blocker-20261003.json)。
 
 恢复提交5dfd7cd的Cloud37128842966和recovery37128843066均success。实际下载新artifact11276176345，998源码文件逐字节与当前工作区一致；原HEAD commit bytes与提交SHA匹配，不再猜时区。只保留同private仓库1日，不含历史和未跟踪凭据，见[CI与归档核验](evidence/niko-rebuilt-source-ci-20261003.json)。
+
+## 2026-10-04 原服务器V16–V19
+
+原PG17.9项目库四功能逐次1/0、最终只读0；原Keycloak/MinIO版本实读、项目库备份文件SHA256留证，未恢复演练。58迁移和27归属隔离检查通过、真实schema/ACL通过；没有API/Worker自动迁移、没有修改冻结SQL。894Web/类型构建也通过，完整399PG/存储/Worker/DOM执行结果单列，不继承Dot结果。[V19证据](evidence/local-schema-v19-20261004.json)。

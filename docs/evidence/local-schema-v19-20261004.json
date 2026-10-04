@@ -1,0 +1,78 @@
+{
+  "verified_at": "2026-10-04T02:01:03.405439+00:00",
+  "environment": "designated-server-via-SSH-from-Windows",
+  "source_baseline": "3eb1d42",
+  "api_contract_version": "0.34.0",
+  "postgresql": "17.9",
+  "schema_before": 15,
+  "schema_after": 19,
+  "features": [
+    {
+      "version": 16,
+      "feature": "capacity-scenarios",
+      "apply": {
+        "migrations_executed": 1,
+        "status": "CAPACITY_SCENARIOS_APPLIED"
+      },
+      "repeat": {
+        "migrations_executed": 0,
+        "status": "CAPACITY_SCENARIOS_APPLIED"
+      }
+    },
+    {
+      "version": 17,
+      "feature": "customer-contacts",
+      "apply": {
+        "migrations_executed": 1,
+        "status": "CUSTOMER_CONTACTS_APPLIED"
+      },
+      "repeat": {
+        "migrations_executed": 0,
+        "status": "CUSTOMER_CONTACTS_APPLIED"
+      }
+    },
+    {
+      "version": 18,
+      "feature": "contact-imports",
+      "apply": {
+        "migrations_executed": 1,
+        "status": "CONTACT_IMPORTS_APPLIED"
+      },
+      "repeat": {
+        "migrations_executed": 0,
+        "status": "CONTACT_IMPORTS_APPLIED"
+      }
+    },
+    {
+      "version": 19,
+      "feature": "contact-import-fix",
+      "apply": {
+        "migrations_executed": 1,
+        "status": "CONTACT_IMPORTS_FIXED"
+      },
+      "repeat": {
+        "migrations_executed": 0,
+        "status": "CONTACT_IMPORTS_FIXED"
+      }
+    }
+  ],
+  "final_read_only_migrations": 0,
+  "migration_policy_checks": 58,
+  "process_ownership_checks": 27,
+  "backup": {
+    "verified_at": "2026-10-04T01:55:23.037252+00:00",
+    "database": "mop_test",
+    "schema_before": 15,
+    "bytes": 913562,
+    "sha256": "8c0a0c3effe2b2e195e04e0f85fc2d26b24429ad9487f1e3c9bdc568573994c4",
+    "restore_executed": false,
+    "location": "ignored_local_file",
+    "keycloak": "Keycloak 26.2.4",
+    "minio": "minio version RELEASE.2025-09-07T16-13-09Z (commit-id=07c3a429bfed433e49018cb0f78a52145d4bedeb)"
+  },
+  "sql_bytes_changed": false,
+  "api_worker_auto_migration": false,
+  "remote_component_lifecycle_changed": false,
+  "credentials_output": false,
+  "all_128_done": false
+}

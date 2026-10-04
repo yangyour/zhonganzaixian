@@ -1,0 +1,53 @@
+{
+  "verified_at": "2026-10-04T09:48:19Z",
+  "environment": "niko-local-test",
+  "scope": "PURE_WORKSHEET_CONTENT_AND_SELF_REPORTED_TIME_BINDING",
+  "new_java_tests": 15,
+  "root_tests": {
+    "reported": 1692,
+    "executed": 1679,
+    "real_existing_postgres": 515,
+    "new_worksheet_postgres": 0,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts": 80,
+  "contract_generation": "PASS",
+  "golden_fingerprint_source": "independent Python length-framed UTF8/int32/int64 encoding",
+  "first_compile_issue": "extra closing parenthesis corrected",
+  "api_version": "0.35.0",
+  "schema_version": 21,
+  "new_migrations": 0,
+  "worksheet_persistence_implemented": false,
+  "worksheet_http_implemented": false,
+  "quarterly_report_implemented": false,
+  "self_reported_time_not_recording_time": true,
+  "future_time_guard_requires_repository_clock": true,
+  "production_approval": "UNVERIFIED",
+  "formal_acceptance": "NOT_RUN",
+  "unexpected_session_loss": {
+    "prior_session": 73514,
+    "root_log_absent_for_failed_dispatch": true,
+    "source_and_existing_data_files_preserved": true,
+    "normal_start_script_used": true,
+    "manual_pid_removal": false,
+    "database_reinitialized": false,
+    "new_credentials_created": false,
+    "postgres_automatic_recovery_observed": true,
+    "new_session": 2689,
+    "new_whole_database_equality_claim": false,
+    "http_evidence": "niko-inspection-session-recovery-http-20261004.json"
+  },
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/inspection/InspectionWorksheetContent.java": "9d77e49b4907031e2f305a5497ab11eee60e655b2f57315a1d61007bf88bc41f"
+  },
+  "logs": [
+    ".local/niko-test/logs/inspection-worksheet-content-first-20261004.log",
+    ".local/niko-test/logs/inspection-worksheet-content-focused-20261004.log",
+    ".local/niko-test/logs/inspection-worksheet-content-root-20261004.log",
+    ".local/niko-test/logs/worksheet-recovery-http-20261004.log",
+    ".local/niko-test/logs/worksheet-recovery-schema-20261004.log"
+  ]
+}

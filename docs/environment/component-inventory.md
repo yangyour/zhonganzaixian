@@ -199,3 +199,7 @@ V20首次候选CASE语法失败完整回滚，只读确认仍V19/无新表函数
 ## 2026-10-04 09:14 巡检模板页面B03复核
 
 niko现有/usr/bin/chromium版本154.0.8037.57、Playwright1.62.1，保留chromiumSandbox=true启动仍因Operation not permitted/EPERM失败，应用页打开0。没有更换组件、禁用沙箱、变更系统/网络权限或创建新任务。新的巡检模板页面17项SFC/jsdom与此前99真实客户端HTTP分别成立，不能合并宣称真实浏览器验收；桌面/移动视口仍NOT_RUN。见[当前阻塞证据](../evidence/niko-inspection-page-browser-blocker-20261004.json)，继续不依赖浏览器的开发。
+
+## 2026-10-04 09:41 既有联调栈在终端断连后恢复
+
+QA73514传输恢复失败并返回Unknown process id；发起的新根日志不存在。源码/私有配置/既有PG数据仍在。只用原启动脚本恢复同一隔离组件，未手动移除PID、初始化数据库、创建凭据或迁移；PG17.11日志报告非正常关闭后的WAL自动恢复并ready，KC/API重新可用。新QA2689，V21只读check执行迁移0，6OIDC刷新及40HTTP核对36已知归档模板通过；不是故障前后全库字节等值证明，终端丢失原因未查明。见[恢复证据](../evidence/niko-inspection-session-recovery-http-20261004.json)，B01原服务器、B02 OSS、B03真实浏览器等不因此解除。

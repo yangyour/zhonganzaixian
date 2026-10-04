@@ -1201,6 +1201,7 @@
       "has_progress_note": true,
       "local_references": [
         "docs/evidence/niko-inspection-source-collection-api-20261004.json",
+        "docs/evidence/niko-inspection-source-collection-client-20261004.json",
         "docs/evidence/niko-inspection-source-collection-repository-20261004.json",
         "docs/inspection-report-sources.md"
       ],
@@ -1338,6 +1339,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "21b48dfd360ca75999b4aec236bed9052c61705190fd4cbbfba39bb08ef6986f"
+    "doc/development/07_合同逐项开发追踪.md": "d19014ff95a127a928e02247e7e55f9f47e96dca035cc605882917fd9aef8c9e"
   }
 }

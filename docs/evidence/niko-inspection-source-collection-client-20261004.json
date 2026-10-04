@@ -1,0 +1,106 @@
+{
+  "verified_at": "2026-10-04T15:48:16.546215+00:00",
+  "scope": "INSPECTION_SOURCE_COLLECTION_FRONTEND_REQUEST_AND_INTEGRITY_MODULES",
+  "environment": "niko-local-test",
+  "api_version": "0.38.0",
+  "new_unit_tests": 47,
+  "unit_breakdown": {
+    "input_metadata_document_integrity": 21,
+    "workspace_request_replay_and_reads": 26
+  },
+  "web_tests": 1237,
+  "web_test_files": 74,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts": 96,
+  "contract_generation": "PASS",
+  "api_contract_unchanged": true,
+  "api_contract_sha256": "9f7eb5e1cfe889a805ef84ff8c2e191e246febaabbe3391d948c0231a0b8bdc1",
+  "new_backend_test_execution": false,
+  "previous_api_ci": {
+    "commit": "37b2c000bacd77703657fcad19a2421832cda5a7",
+    "run_id": 37213285477,
+    "conclusion": "success"
+  },
+  "golden_document": {
+    "length_bytes": 1185,
+    "sha256": "cc920d7442bfb1a2f5801f5bb28ca1608e5126593b23b5a1bfd30a30cdf03b68",
+    "source": "independent Java and Python original document golden, checked by production TypeScript"
+  },
+  "technical_bounds": {
+    "max_sources": 1000,
+    "max_source_canonical_bytes": 16777216,
+    "max_document_bytes": 33554432,
+    "max_request_bytes": 262144,
+    "large_realistic_unit_case": "21 sources with100items and2000emoji instructions each rejected before first async digest",
+    "max_source_case": "1000 distinct explicit sources fully verified; not a business quota or SLA benchmark"
+  },
+  "scope_and_snapshot_safety": [
+    "Exact fields/current tenant/role/null gates and metadata-only projection",
+    "Full template,worksheet,source,manifest,canonical UTF8document digests checked; diagnostics recomputed exactly",
+    "All raw data cloned before first await; reset during hashing prevents stale POST and stale visible data",
+    "Explicit original body/key retained after actual committed response loss; reads never acknowledge or unlock unknown write",
+    "Known initial4xx rejects, denied replay after unknown keeps unknown; malformed200/503/network remain unknown",
+    "Receipt metadata matches actor/label/source count/expected source manifest but does not claim full document body read",
+    "Metadata and detail must match already accepted immutable receipt for same ID; new explicit begin required before another creation"
+  ],
+  "http": {
+    "requests": 21,
+    "post_requests": 3,
+    "statuses": {
+      "200": 19,
+      "403": 1,
+      "404": 1
+    },
+    "new_collections": 1,
+    "new_parent_worksheets": 0,
+    "new_parent_templates": 0,
+    "original_committed_response_deliberately_lost": true,
+    "damaged_original_replay_receipt_kept_unknown": true,
+    "final_original_retry_accepted": true,
+    "actual_role_and_missing_denials": true,
+    "success_read_window_audit_unchanged": true,
+    "denied_security_audits": 2,
+    "late_success_reset_ignored": true,
+    "physical_outage": false,
+    "database_replaced": false
+  },
+  "postcheck": {
+    "collections": 1,
+    "nonempty_collections": 1,
+    "labelled_synthetic": true,
+    "unverified_not_generatable_or_published": true,
+    "document_hashes_valid": true,
+    "item_counts_match": true
+  },
+  "migrations_executed": 0,
+  "storage_requests": 0,
+  "permanent_deletes": 0,
+  "page_component_implemented": false,
+  "browser_dom_tested": false,
+  "quarter_rule": null,
+  "report_published": false,
+  "formal_report_generatable": false,
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "apps/web/src/utils/inspectionSourceCollections.ts": "64afce084d27e320f8d1a35ca7158c752cfe969c918167249c891faae93a7579",
+    "apps/web/src/utils/inspectionSourceCollectionWorkspace.ts": "4c06512fdb8f7f903f168ab60a7ee9697482a536b90a811a3395238a9627bd58",
+    "apps/web/tests/inspectionSourceCollection.fixture.ts": "8ef171b1b6bcc76bdcd15216a7353a3babb68af7bff18e00ea6e131703965d6e",
+    "apps/web/tests/inspectionSourceCollections.test.ts": "8cbb000c13e873822ba10b470f5af6666810ecfde47a7da69e1d52bfcef817e9",
+    "apps/web/tests/inspectionSourceCollectionWorkspace.test.ts": "09995e1fb2dafb0a63081d934b6facdf02da647057eab60c7beb0bad6977c733",
+    "tests/niko-inspection-source-collection-client-http.mjs": "934543dc262fab5928f530cd9dcc26ea318d389cc81c959580144a94a80dbf33",
+    "tools/build-source-collection-client-test.mjs": "1e0a1fe82d5ff85b12adbe376c6747d0dd90e91654910e71e0e412799ce92e8f"
+  },
+  "logs": [
+    ".local/niko-test/logs/source-collection-client-contracts-20261004.log",
+    ".local/niko-test/logs/source-collection-client-focused-20261004-r2.log",
+    ".local/niko-test/logs/source-collection-client-focused-20261004.log",
+    ".local/niko-test/logs/source-collection-client-http-20261004.log",
+    ".local/niko-test/logs/source-collection-client-postcheck-20261004.json",
+    ".local/niko-test/logs/source-collection-client-typecheck-20261004-r2.log",
+    ".local/niko-test/logs/source-collection-client-typecheck-20261004-r3.log",
+    ".local/niko-test/logs/source-collection-client-typecheck-20261004.log",
+    ".local/niko-test/logs/source-collection-client-web-20261004.log",
+    ".local/niko-test/logs/source-collection-client-web-build-20261004.log"
+  ]
+}

@@ -13,6 +13,7 @@ public interface AssetExportJobRepository {
                long version,Instant createdAt,Instant updatedAt) {}
     record Claim(String jobId,String worker,int fencingToken,long version,Instant leaseUntil,
                  AssetExportJobState.Command command,boolean storageReconciliationRequired) {}
+    record Work(Claim claim,Instant databaseNow,AssetExportPreparedFile prepared) {}
     /** Must run inside the platform's protected idempotent transaction, including before replay. */
     void authorizeAcceptance(Access access);
     Job accept(Access access,AssetExportJobState.Filters filters);
@@ -22,5 +23,9 @@ public interface AssetExportJobRepository {
     /** Internal worker only. A claim is not current permission to upload or a successful export. */
     Optional<Claim> claim(String jobId,String worker,Duration lease);
     Optional<Claim> claimNext(String worker,Duration lease);
+    /** Trusted internal access only; rechecks current scope/lease and never grants public download access. */
+    Work loadWork(Claim claim);
+    /** Persist immutable bytes with audit, or recover an exact previously committed preparation. */
+    Work prepare(Claim claim,AssetExportPreparedFile file);
     List<String> readinessProblems();
 }

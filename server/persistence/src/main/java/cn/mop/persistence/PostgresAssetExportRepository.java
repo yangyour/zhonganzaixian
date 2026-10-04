@@ -83,6 +83,61 @@ public final class PostgresAssetExportRepository implements AssetExportJobReposi
     }
     private static Instant clock(Connection c)throws SQLException{try(var s=statement(c,"SELECT clock_timestamp()::timestamptz(3)");var r=s.executeQuery()){if(!r.next())throw corrupt();return r.getObject(1,OffsetDateTime.class).toInstant();}}
     private static void instant(PreparedStatement s,int index,Instant value)throws SQLException{s.setObject(index,OffsetDateTime.ofInstant(value,ZoneOffset.UTC));}
+    private record Locked(String id,AssetExportJobState.Command command,String trace,AssetExportJobState.State state,long version,int fence,String worker,Instant createdAt,Instant updatedAt,Instant leaseStarted,Instant leaseUntil,AssetExportJobState.Encoding encoding){}
+    @Override public Work loadWork(Claim claim){
+        validateClaim(claim);
+        return platform.exportJobTransaction(()->{Connection c=platform.exportCommandConnection();try{Locked row=locked(c,claim);Instant now=checkLeaseAndAuthorization(c,row,claim);return work(c,row,now);}catch(SQLException failure){throw unavailable(failure);}});
+    }
+    @Override public Work prepare(Claim claim,AssetExportPreparedFile file){
+        validateClaim(claim);if(file==null||!file.commandFingerprint().equals(claim.command().fingerprint()))throw invalid();
+        return platform.exportJobTransaction(()->{
+            Connection c=platform.exportCommandConnection();
+            try{
+                Locked row=locked(c,claim);Instant now=checkLeaseAndAuthorization(c,row,claim);
+                if(row.encoding()!=null){Work retained=work(c,row,now);if(!retained.prepared().sameContent(file))throw new DomainException(409,"EXPORT_PREPARED_MISMATCH","Original prepared bytes and descriptor are immutable");return retained;}
+                if(row.state()!=AssetExportJobState.State.RUNNING||row.version()!=claim.version())throw leaseLost();
+                var e=file.encoding();if(e.generatedAt().isBefore(row.createdAt())||e.generatedAt().isAfter(now))throw invalid();
+                if(row.version()>=9007199254740991L)throw new DomainException(409,"VERSION_CONFLICT","Export version reached its technical bound");
+                try(var s=statement(c,"UPDATE public.mop_asset_export_job SET file_bytes=?,selection_sha256=?,row_count=?,generated_at=?,version=version+1,updated_at=? WHERE id=?::uuid AND version=? AND fencing_token=? AND lease_owner=?")){
+                    s.setBytes(1,file.bytes());s.setString(2,e.selectionSha256());s.setInt(3,e.rowCount());instant(s,4,e.generatedAt());instant(s,5,now);s.setString(6,row.id());s.setLong(7,row.version());s.setInt(8,row.fence());s.setString(9,row.worker());if(s.executeUpdate()!=1)throw leaseLost();
+                }
+                var a=row.command().acceptedAccess();platform.audit(a.actorId().toString(),a.tenantId().toString(),"asset_export.prepare","asset_export",row.id(),"SUCCEEDED","PREPARED_BYTES_ONLY_NOT_STORED_OR_PUBLISHED",row.trace());
+                return work(c,locked(c,claim),now);
+            }catch(SQLException failure){if("23514".equals(failure.getSQLState())||"40001".equals(failure.getSQLState()))throw new DomainException(409,"EXPORT_STATE_CONFLICT","Export lease or retained facts changed during preparation");throw unavailable(failure);}
+        });
+    }
+    private static void validateClaim(Claim claim){
+        if(claim==null||claim.command()==null||claim.worker()==null||!claim.worker().matches("[A-Za-z0-9._:-]{1,64}")||claim.fencingToken()<1||claim.fencingToken()>AssetExportJobState.MAX_ATTEMPTS||claim.version()<1||claim.version()>9007199254740991L||claim.leaseUntil()==null)throw invalid();uuid(claim.jobId());
+    }
+    private static Locked locked(Connection c,Claim claim)throws SQLException{
+        String columns=COLUMNS+",trace_id,fencing_token,lease_owner,lease_started_at,lease_until,(file_bytes IS NOT NULL) AS prepared,file_sha256,file_size,selection_sha256,row_count,generated_at";
+        try(var s=statement(c,"SELECT "+columns+" FROM public.mop_asset_export_job WHERE id=?::uuid AND tenant_id=?::uuid AND created_by=?::uuid FOR UPDATE")){s.setString(1,claim.jobId());s.setString(2,claim.command().acceptedAccess().tenantId().toString());s.setString(3,claim.command().acceptedAccess().actorId().toString());try(var r=s.executeQuery()){
+            if(!r.next())throw missing();
+            try{
+                var access=new AssetExportJobState.Access(UUID.fromString(r.getString("tenant_id")),UUID.fromString(r.getString("created_by")),r.getLong("permission_version"),r.getString("accepted_role"),true);var command=AssetExportCommandCodec.decodeBound(r.getBytes("command_bytes"),access,r.getString("input_sha256"));
+                AssetExportJobState.Encoding encoding=null;
+                if(r.getBoolean("prepared")){if(r.getObject("file_size")==null||r.getObject("row_count")==null)throw corrupt();encoding=new AssetExportJobState.Encoding(r.getString("selection_sha256"),r.getString("file_sha256"),r.getLong("file_size"),r.getInt("row_count"),time(r,"generated_at"));}
+                else if(r.getObject("file_size")!=null||r.getObject("row_count")!=null||r.getString("file_sha256")!=null||r.getString("selection_sha256")!=null||r.getObject("generated_at")!=null)throw corrupt();
+                Instant created=time(r,"created_at"),updated=time(r,"updated_at");long version=r.getLong("version");if(created==null||updated==null||updated.isBefore(created)||version<0||version>9007199254740991L||encoding!=null&&(encoding.generatedAt().isBefore(created)||encoding.generatedAt().isAfter(updated)))throw corrupt();
+                return new Locked(r.getString("id"),command,r.getString("trace_id"),AssetExportJobState.State.valueOf(r.getString("state")),version,r.getInt("fencing_token"),r.getString("lease_owner"),created,updated,time(r,"lease_started_at"),time(r,"lease_until"),encoding);
+            }catch(RuntimeException malformed){throw corrupt();}
+        }}
+    }
+    private static Instant checkLeaseAndAuthorization(Connection c,Locked row,Claim claim)throws SQLException{
+        var expected=row.command().acceptedAccess();var offered=claim.command().acceptedAccess();if(!expected.tenantId().equals(offered.tenantId())||!expected.actorId().equals(offered.actorId()))throw missing();
+        if(!row.command().equals(claim.command())||row.fence()!=claim.fencingToken()||!Objects.equals(row.worker(),claim.worker())||!Objects.equals(row.leaseUntil(),claim.leaseUntil())||claim.version()>row.version()||row.leaseStarted()==null||row.leaseUntil()==null||row.state()!=AssetExportJobState.State.RUNNING&&row.state()!=AssetExportJobState.State.RECONCILING_STORAGE)throw leaseLost();
+        String role=authorize(c,new Access(expected.actorId().toString(),expected.tenantId().toString(),expected.permissionVersion(),row.trace()),true);if(!role.equals(expected.role()))throw expired();
+        Instant now=clock(c);if(now.isBefore(row.updatedAt())||now.isBefore(row.leaseStarted())||!now.isBefore(row.leaseUntil()))throw leaseLost();return now;
+    }
+    private static Work work(Connection c,Locked row,Instant now)throws SQLException{
+        AssetExportPreparedFile file=null;
+        if(row.encoding()!=null){
+            // Fetch file contents only after scope, actual membership, worker/fence and lease checks.
+            try(var s=statement(c,"SELECT file_bytes FROM public.mop_asset_export_job WHERE tenant_id=?::uuid AND id=?::uuid")){s.setString(1,row.command().acceptedAccess().tenantId().toString());s.setString(2,row.id());try(var r=s.executeQuery()){if(!r.next())throw corrupt();try{file=AssetExportPreparedFile.restore(row.command(),row.encoding(),r.getBytes(1));}catch(RuntimeException malformed){throw corrupt();}}}
+        }
+        return new Work(new Claim(row.id(),row.worker(),row.fence(),row.version(),row.leaseUntil(),row.command(),row.state()==AssetExportJobState.State.RECONCILING_STORAGE),now,file);
+    }
+    private static DomainException leaseLost(){return new DomainException(409,"LEASE_LOST","Current export worker, fence, version or lease no longer matches");}
     private static Job read(Connection c,Access a,String currentRole,String id)throws SQLException{
         try(var s=statement(c,"SELECT "+COLUMNS+" FROM public.mop_asset_export_job WHERE tenant_id=?::uuid AND created_by=?::uuid AND id=?::uuid")){
             s.setString(1,a.tenantId());s.setString(2,a.actorId());s.setString(3,id);

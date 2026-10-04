@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 39,
-  "rows_without_progress_notes": 89,
+  "rows_with_progress_notes": 40,
+  "rows_without_progress_notes": 88,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -65,7 +65,7 @@
     },
     "M8": {
       "requirements": 12,
-      "rows_with_progress_notes": 1,
+      "rows_with_progress_notes": 2,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 12
       }
@@ -1114,8 +1114,11 @@
       "id": "M8-10",
       "title": "通知偏好设置",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/niko-notification-preference-core-20261004.json",
+        "docs/own-notification-preferences.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1366,6 +1369,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "2f89fa0e00072ebe43eee0512fadd5bc67c87dfc5d4ff3ae0a24e0746288a05d"
+    "doc/development/07_合同逐项开发追踪.md": "fcac601d37638d1e11a4c14f48466e3ca3d97f1ce85a7be933c4183f05457c73"
   }
 }

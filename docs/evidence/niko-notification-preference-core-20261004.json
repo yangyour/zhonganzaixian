@@ -1,0 +1,49 @@
+{
+  "verified_at": "2026-10-04T23:02:07.245824+00:00",
+  "scope": "OWN_NOTIFICATION_PREFERENCE_REQUEST_DRAFT_PURE_MODEL",
+  "new_pure_tests": 19,
+  "focused_tests": 53,
+  "root_tests_reported": 2139,
+  "root_tests_executed": 2126,
+  "existing_postgresql_regressions": 706,
+  "new_feature_postgresql_tests": 0,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "contracts": 116,
+  "failures": 0,
+  "errors": 0,
+  "unknown_and_explicit_empty_preserved": true,
+  "channel_set_canonical_order_not_priority": true,
+  "fixed_business_timezone": "Asia/Shanghai",
+  "quiet_window_existing_minute_rules_reused": true,
+  "effective": false,
+  "delivery_decision": null,
+  "receiver_binding_verified": false,
+  "notification_dispatched": false,
+  "p1_quiet_bypass_contract_fact_only": true,
+  "golden_vector_bytes": 202,
+  "golden_vector_sha256": "ecae66e7ed94c48a01fc19b2d53add2c683c66e4a5b0f84ca1720c2fca1942a5",
+  "new_migrations": 0,
+  "new_credentials": false,
+  "api_contract_changed": false,
+  "live_api_version": "0.42.0",
+  "backend_restarted": false,
+  "new_persistence_api_or_page": false,
+  "formal_acceptance": "NOT_RUN",
+  "failure_history": [],
+  "previous_commit": {
+    "sha": "acd076794bd42388529bb446224829698394cf0a",
+    "ci_run": 37241551966,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/notification/OwnNotificationPreferenceDraft.java": "30e4156cad08c40db72695408f8f3299607b40399ca740bec660ebc1572d1637",
+    "server/api/src/test/java/cn/mop/api/OwnNotificationPreferenceDraftTest.java": "a3bedab62fb0a3a349827b1e35cfe0dda595b4d1e57f9301a58deec6e2c4eb31"
+  },
+  "logs_sha256": {
+    "notification-preference-core-contract-generation-20261004.log": "be637740059d3ba8026b13b052c5feb0eca0d1c53f01aeb2d28fa35a8da7f1bf",
+    "notification-preference-core-contracts-20261004.log": "fa8e08186399bdb8752f1c3f3bd4f961919eb3f70d6dcc979aee77b0c83d2d18",
+    "notification-preference-core-focused-20261004.log": "c953d571284505164015b071820dc742efbfb429cc31f792004e90a624521beb",
+    "notification-preference-core-full-20261004.log": "ab8b4bef6f1223396f280bfe7e09fa0678c37a40b7eb4cd98e93bf62030d756d"
+  }
+}

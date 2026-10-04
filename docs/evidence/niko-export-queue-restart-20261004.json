@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-04",
+  "environment": "niko-local-test",
+  "scope": "OWNED_GRACEFUL_STACK_RESTART_AND_NEW_JVM_ORIGINAL_EXPORT_RECEIPT_READBACK",
+  "source_commit": "a38c84ab647aad1e9c5befda290fc5976e85434d",
+  "source_ci_run": 37177043110,
+  "source_ci_conclusion": "success",
+  "components_restarted": [
+    "owned PostgreSQL",
+    "owned Keycloak",
+    "owned API"
+  ],
+  "restart_mode": "OWNED_RUNNER_NORMAL_EXIT_AND_NEW_LAUNCH",
+  "postgres_start_before": "2026-10-04T01:42:40.767615+00:00",
+  "postgres_start_after": "2026-10-04T04:30:33.136548+00:00",
+  "postgres_version": "17.11 (Debian 17.11-0+deb13u1)",
+  "tables_unchanged_before_after_restart": {
+    "mop_asset_export_job": {
+      "rows": 26,
+      "equality_sha256": "571eb6795fa62454e9bbe8f6559700af08f2f82220a7398448583914b5983555"
+    },
+    "mop_asset_export_attempt": {
+      "rows": 0,
+      "equality_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_idempotency": {
+      "rows": 31554,
+      "equality_sha256": "82b18595451eba0d7f499263aa86b3a2a6ead2333c95356fa56c6ff2970fb14a"
+    },
+    "mop_audit": {
+      "rows": 42835,
+      "equality_sha256": "d0294939f7e0d82d2cdcbecd5a8ec0029180b4be6282e905b8d390fbe47e267d"
+    }
+  },
+  "queued_jobs": 26,
+  "prepared_files": 0,
+  "stored_receipt_descriptions": 0,
+  "new_jvm_original_receipts_replayed": 26,
+  "new_acceptance_callbacks": 0,
+  "tables_unchanged_after_replay": true,
+  "additional_jobs_audit_or_idempotency_rows_from_readback": 0,
+  "new_pure_guard_tests": 9,
+  "python_tests": 122,
+  "contract_tests": 73,
+  "contract_generation_consistent": true,
+  "real_oidc_roles_authenticated_after_equality_proof": 6,
+  "initial_probe_failure": "Runtime identity correctly denied flyway_schema_history SELECT; unnecessary history probe removed, no ACL changes or alternate identity used",
+  "flyway_history_read_by_snapshot_probe": false,
+  "process_crash_or_worker_recovery_tested": false,
+  "actual_worker_executions": 0,
+  "oss_requests": 0,
+  "download_grants": 0,
+  "notifications_sent": 0,
+  "new_credentials_or_grants": 0,
+  "schema_migrations": 0,
+  "original_server_actions": 0,
+  "browser_ui_tested": false,
+  "formal_acceptance": "NOT_RUN",
+  "log_sha256": {
+    "export-queue-restart-before-20261004.log": "248be04c81be125ae121cfbf31bac384d456c0f80a8daebac3632ed560fd06bc",
+    "export-queue-restart-before-final-20261004.log": "40f786143f93bdf01dd44dd42dc02afb7741eb92925cb11e626d1835f456c4b1",
+    "export-queue-restart-after-20261004.log": "83e048553f3ce30e1a2f4ce3570ce47009efcd1a630592ad77a1c864f263fc87",
+    "export-queue-new-jvm-readback-20261004.log": "12fd733c0562d07adc6b9b3d4d9995efbae9862654253e42dfd87818a8f2cf37",
+    "export-queue-after-replay-equality-20261004.log": "b7d8c99315bbcd709f087c399af5443ec3c33e0c02d2c07af303cf12a7e9278a",
+    "export-queue-restart-python-20261004.log": "d949eafa9bf8e63c1ecd54357d8d94148f4a932c45766c714de9f7e2a3449393",
+    "export-queue-restart-contracts-20261004.log": "382b2e0386ef502719e69093c7432a59168c3524624864e808afe27fbd284381",
+    "export-queue-sessions-after-20261004.json": "7c40bbcfc72be85221a77be4438c69e180fdaed8864c58a73814f9cb9d8b41fb"
+  }
+}

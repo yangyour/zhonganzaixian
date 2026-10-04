@@ -1110,3 +1110,7 @@ c40bf37的CI37175873116中Java/Web/Windows进程检查通过，但PowerShell迁�
 ## 2026-10-04 导出仓储受理、原回执与范围读取
 
 20新增真实PG覆盖QUEUED受理/审计/原响应同事务、同key并发唯一写、改body409、当前成员回放前检查、外租户/非创建人404及独立只读get/list；错误命令或审计失败整体回滚，DTO无原始bytes/对象地址。根1542报告1529执行含454PG/13跳过/6MinIO排除、73契约。尚无实际HTTP/Worker/OSS/下载/通知，见docs/asset-export-jobs.md，M3-7非DONE。此前V20脚本修复9b95a8b的CI37176283202全过，原生PowerShell67隔离检查通过且数据库操作0。
+
+## 2026-10-04 导出排队任务正常停启与新JVM回放
+
+受理提交a38c84a的CI全过。实际停止/重启仅本runner PG/KC/API，PG启动时间改变；26排队任务、0领取及原幂等/审计四表相同。新JVM读回26任务/回放26原收据，接受回调0、四表再比相同；随后6真实OIDC登录通过。首次不必要的Flyway历史runtime读取被拒，移除该探针且未提权。9新增纯门禁/122Python/73契约通过；不当Worker崩溃或OSS完成。见docs/asset-export-jobs.md。

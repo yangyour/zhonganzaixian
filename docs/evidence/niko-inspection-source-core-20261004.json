@@ -1,0 +1,67 @@
+{
+  "verified_at": "2026-10-04T12:06:17.438377+00:00",
+  "scope": "PURE_IMMUTABLE_INSPECTION_SOURCE_SNAPSHOTS_AND_MANIFEST",
+  "new_pure_tests": 20,
+  "focused_pure_tests": 55,
+  "root_tests": {
+    "reported": 1773,
+    "executed": 1760,
+    "real_existing_postgres": 554,
+    "new_source_capture_postgres": 0,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts": 86,
+  "contract_generation": "PASS",
+  "independent_python_golden": {
+    "source_sha256": "15d9188e184636f537672c8638d31f1e5902e559d9ef0ba027d489b4bcab86b2",
+    "manifest_sha256": "c53a70ad013720e659a90396a05911945656b6c382dd216d15ae98e91e1d8d38",
+    "source_bytes": 565
+  },
+  "technical_limits": {
+    "sources": 1000,
+    "captured_full_template_and_content_bytes": 16777216,
+    "business_quota": false,
+    "truncation": false
+  },
+  "period_time_zone": null,
+  "quarter_selection_rule": null,
+  "archived_source_policy": null,
+  "metric_version": null,
+  "report_template_version": null,
+  "tenant_asset_population": null,
+  "source_capture_repository_implemented": false,
+  "report_snapshot_database_implemented": false,
+  "report_publication_implemented": false,
+  "new_migrations": 0,
+  "schema_version": 22,
+  "api_version": "0.36.0",
+  "formal_acceptance": "NOT_RUN",
+  "first_compile_failure": "two Java var compound declarations in new tests; split declarations and reran successfully",
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/inspection/InspectionTemplate.java": "db0cbc4b574bdafec233513e00e82bc19dac90554ad366283baff43dcb3474cc",
+    "server/domain/src/main/java/cn/mop/domain/inspection/InspectionSourceSnapshot.java": "0db4f45793e91714740ce05e90ecfce6f0aadce2dc8adefb77926be8075f9713",
+    "server/domain/src/main/java/cn/mop/domain/inspection/InspectionSourceManifest.java": "335db6fe8823dd54186841b6fec998a5085e7ab4dbec7af84f5c631ea7b23999"
+  },
+  "logs": [
+    ".local/niko-test/logs/inspection-source-core-compile-20261004.log",
+    ".local/niko-test/logs/inspection-source-core-contracts-20261004.log",
+    ".local/niko-test/logs/inspection-source-core-focused-first-20261004.log",
+    ".local/niko-test/logs/inspection-source-core-focused-second-20261004.log",
+    ".local/niko-test/logs/inspection-source-core-root-20261004.log",
+    ".local/niko-test/logs/inspection-source-core-tracker-20261004.log",
+    ".local/niko-test/logs/inspection-source-core-upstream-python-20261004.log"
+  ],
+  "tracker_unit_tests": 17,
+  "upstream_sync": {
+    "head": "3a3d0d234b4f961d52bd3a95192c2b2890fabd78",
+    "retained_windows_export_commit": "f15d43e33083940bec6204c0f0d68cfc05774f36",
+    "upstream_ci_run": 37201362254,
+    "upstream_ci_status": "success",
+    "python_tests": 133,
+    "node_spawn_syntax": "PASS",
+    "windows_execution_by_niko": false
+  }
+}

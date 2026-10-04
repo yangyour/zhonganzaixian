@@ -27,15 +27,19 @@ public record InspectionTemplate(String deviceType, String name, List<Item> item
         public Item { InspectionTemplate.key(key); text(section, 100, false, false); text(label, 200, false, false); text(instruction, 2000, true, true); }
     }
     /** Ordered, length-delimited UTF-8. Null instruction and explicit empty instruction stay distinct. */
-    public String fingerprint() {
+    public byte[] canonicalBytes() {
         try {
             var bytes = new ByteArrayOutputStream();
             try (var out = new DataOutputStream(bytes)) {
                 field(out, "MOP_INSPECTION_TEMPLATE_V1"); field(out, deviceType); field(out, name); out.writeInt(items.size());
                 for (Item item : items) { field(out, item.key()); field(out, item.section()); field(out, item.label()); field(out, item.instruction()); }
             }
-            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes.toByteArray()));
-        } catch (IOException | NoSuchAlgorithmException impossible) { throw new IllegalStateException("Inspection template fingerprint unavailable", impossible); }
+            return bytes.toByteArray();
+        } catch (IOException impossible) { throw new IllegalStateException("Inspection template encoding unavailable", impossible); }
+    }
+    public String fingerprint() {
+        try { return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(canonicalBytes())); }
+        catch (NoSuchAlgorithmException impossible) { throw new IllegalStateException("Inspection template fingerprint unavailable", impossible); }
     }
     public String approvalStatus() { return "UNVERIFIED"; }
     public boolean publishable() { return false; }

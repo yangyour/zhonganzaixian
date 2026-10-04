@@ -44,4 +44,6 @@ class ChangeNoticeDraftControllerTest {
     @Test void optionalTicketReferenceAndKnownEndNeverImplyApproval(){var n=input().put("ticket_id",OTHER).put("planned_end_at","2026-10-06T00:00:00Z");var out=data(controller.write(null,"CREATE",n,request("POST")));assertEquals(OTHER,out.get("ticket_id"));assertEquals("2026-10-06T00:00:00Z",out.get("planned_end_at"));assertNull(out.get("approval_status"));assertEquals(false,out.get("approval_evidence_verified"));}
     @Test void updateRetainsOriginalApplicantInsteadOfRebindingToCurrentEditor(){var d=draft();var original=new ChangeNoticeDraft(d.tenantId(),UUID.fromString(OTHER),null,d.changeSummary(),d.plannedStartAt(),null,d.assetIds());when(plans.get(access(),ID)).thenReturn(row(1,false,original));var out=data(controller.write(ID,"UPDATE",input().put("expected_version",1),request("PATCH")));assertEquals(OTHER,out.get("applicant_id"));verify(plans).update(access(),ID,1,original);}
 
+    @Test void excessZeroFractionIsRejectedWithoutTruncationOrRepositoryWrite(){for(String field:List.of("planned_start_at","planned_end_at"))for(String value:List.of("2026-10-06T00:00:00.0000Z","2026-10-06T00:00:00Z\n","2026-10-06T00:00:00Z\r\n"))assertEquals(400,assertThrows(DomainException.class,()->controller.write(null,"CREATE",input().put(field,value),request("POST"))).status);verify(plans,never()).create(any(),any());}
+
 }

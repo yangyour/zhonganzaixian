@@ -10,4 +10,6 @@ describe('canonical server UTC facts',()=>{
  it('compares submillisecond instants rather than rounded JavaScript dates',()=>{const later='2026-10-01T00:00:00.000000002Z',earlier='2026-10-01T00:00:00.000000001Z';expect(Date.parse(later)).toBe(Date.parse(earlier));expect(utcNotBefore(earlier,later)).toBe(false);expect(utcNotBefore(later,earlier)).toBe(true)})
  it('equivalent fractions are equal without mutating original strings',()=>{for(const value of ['1970-01-01T00:00:00.1Z','1970-01-01T00:00:00.100Z','1970-01-01T00:00:00.100000000Z']){expect(utcInstantNanos(value)).toBe(100000000n);expect(utcNotBefore(value,'1970-01-01T00:00:00.1Z')).toBe(true)}})
  it('rejects null scalar objects oversized fractions and separators',()=>{for(const value of [null,undefined,0,NaN,{},[],new Date(),'2026-10-01T00:00:00.Z','2026-10-01T00:00:00.1234567890Z','2026-10-01T00:00:00,1Z']){expect(utcInstantNanos(value)).toBeNull();expect(utcNotBefore(value,'2026-10-01T00:00:00Z')).toBe(false)}})
+ it('rejects final line terminators instead of accepting a prefix matched by dollar',()=>{for(const suffix of ['\n','\r','\r\n','\u2028','\u2029'])expect(utcInstantNanos('2026-10-04T10:00:00Z'+suffix)).toBeNull()})
+
 })

@@ -81,7 +81,7 @@ defineExpose({prepareCreate,prepareFrom,loadAssets,addChecked,removeTarget,moveT
    <form v-if="mode" class="panel plan-editor" @submit.prevent="save"><h2>{{mode==='CREATE'?'新报备草稿':'按明确版本编辑'}}<span v-if="baseline"> · v{{baseline.version}} · {{baseline.id}}</span></h2><p v-if="newerVersion" class="validation">已回读到更新版本；此处仍保留原版本输入，不会自动合并。请明确按当前版本重新准备</p>
     <fieldset :disabled="locked"><div class="editor-grid">
      <label class="full-width">变更摘要（最多2000 Unicode码点）<textarea v-model="form.summary" aria-label="变更报备摘要" maxlength="4000" placeholder="填写明确变更内容；原文空白与换行会保留" /></label>
-     <label>计划开始（UTC，必填）<input v-model="form.plannedStart" aria-label="变更报备开始UTC" maxlength="30" placeholder="例如 2026-10-05T16:00:00Z" /><span class="hint">必须明确Z时区与整毫秒，不默认当前时刻；回读统一显示Asia/Shanghai</span></label>
+     <label>计划开始（UTC，必填）<input v-model="form.plannedStart" aria-label="变更报备开始UTC" maxlength="30" placeholder="例如 2026-10-05T16:00:00Z" /><span class="hint">起止均需明确Z时区与秒，小数最多3位；不默认当前时刻，回读统一显示Asia/Shanghai</span></label>
      <div><label class="check-label"><input type="checkbox" :checked="form.plannedEnd===null" aria-label="结束时间未知" @change="setEndKnown(!($event.target as HTMLInputElement).checked)" />结束时间未知（null）</label><label>计划结束（UTC）<input v-model="form.plannedEnd" aria-label="变更报备结束UTC" :disabled="form.plannedEnd===null" maxlength="30" placeholder="已知时必须严格晚于开始；不会补默认窗口" /></label></div>
      <label>可选工单UUID<input v-model="form.ticketRef" aria-label="变更报备工单引用" maxlength="36" placeholder="留空为null，不会自动选择最近工单" /><span class="hint">服务端核验当前租户工单存在；关联工单不代表批准</span></label>
      <div><strong>原申请人</strong><p>{{baseline?.applicant_id??session?.user.id}}</p><span class="hint">新建取当前会话，修改保留原申请人；不可输入或替换</span></div>

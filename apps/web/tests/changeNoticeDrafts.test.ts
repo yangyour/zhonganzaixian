@@ -26,4 +26,6 @@ describe('unpublished backup proposal validation',()=>{
 
  it('rejects impossible first-version applicant metadata before displaying it',()=>{expect(()=>readChangeNoticeSummary(summary(row(1,{applicant_id:id(8)})),scope)).toThrow()})
 
+ it('matches API lexical precision even when extra fractional digits are zero',()=>{for(const value of ['2026-10-04T10:00:00.0000Z','2026-10-05T10:00:00.123000Z','2026-10-05T10:00:00Z\n']){expect(()=>readChangeNoticeDefinition({...definition(),planned_start_at:value})).toThrow();expect(()=>readChangeNoticeDefinition({...definition(),planned_end_at:value})).toThrow()}})
+
 })

@@ -1,0 +1,29 @@
+{
+  "verified_at": "2026-10-04T21:06:33.651Z",
+  "environment": "niko-local-test",
+  "api_version": "0.41.0",
+  "production_typescript_modules": true,
+  "actual_pg_oidc": true,
+  "fixture_adapter": false,
+  "http_requests": 17,
+  "methods": [
+    "GET"
+  ],
+  "write_requests": 0,
+  "statuses": {
+    "200": 16,
+    "404": 1
+  },
+  "completed": true,
+  "failure": null,
+  "successful_readonly_window_audit_unchanged": true,
+  "existing_synthetic_records_reused": true,
+  "controlled_response_damage_cases": 7,
+  "controlled_late_response_not_actual_role_revocation": true,
+  "physical_network_outage": false,
+  "team_authority_added": false,
+  "new_credentials": false,
+  "new_migrations": 0,
+  "browser_dom_tested": false,
+  "formal_acceptance": "NOT_RUN"
+}

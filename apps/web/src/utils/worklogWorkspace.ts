@@ -57,7 +57,7 @@ export function readWorklogPage(value: unknown, scope: WorklogContext): WorklogP
   if (value.has_more ? items.length !== 15 || value.next_before_created_at !== tail?.created_at || value.next_before_id !== tail?.id : value.next_before_created_at !== null || value.next_before_id !== null) throw invalid()
   return copy({ ...value, items }) as unknown as WorklogPage
 }
-function readHistory(value: unknown, scope: WorklogContext, selected: WorklogEntry, before: number | null): HistoryPage {
+export function readWorklogHistory(value: unknown, scope: WorklogContext, selected: WorklogEntry, before: number | null): HistoryPage {
   if (!exact(value, ['items', 'has_more', 'next_before_version', 'source', 'scope', 'page_size_limit']) || !Array.isArray(value.items) || value.items.length > 15 || typeof value.has_more !== 'boolean' || value.source !== 'postgresql' || value.scope !== 'OWN' || value.page_size_limit !== 100) throw invalid()
   let prior = before ?? selected.version + 1
   for (const item of value.items) {
@@ -103,7 +103,7 @@ export function createWorklogWorkspace(client: Pick<ApiClient, 'request'>, chang
       if (selected.id !== id || previous?.id === id && selected.version < previous.version || state.receipt?.id === id && selected.version < state.receipt.version) throw invalid()
       // If another editor changed the latest record, restart history rather than mixing old boundaries.
       const boundary = moreHistory && previous?.version === selected.version ? before : null
-      const history = readHistory(await client.request<unknown>(path() + '/' + id + '/history?page_size=15' + (boundary ? '&before_version=' + boundary : ''), { signal: abort.signal }), context, selected, boundary)
+      const history = readWorklogHistory(await client.request<unknown>(path() + '/' + id + '/history?page_size=15' + (boundary ? '&before_version=' + boundary : ''), { signal: abort.signal }), context, selected, boundary)
       if (current !== epoch || abort.signal.aborted) return false
       state = { ...state, selected, history }; return true
     } catch (error) { if (current === epoch && !isCancelled(error)) state = { ...state, error }; return false }

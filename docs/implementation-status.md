@@ -1130,3 +1130,7 @@ c40bf37的CI37175873116中Java/Web/Windows进程检查通过，但PowerShell迁�
 ## 2026-10-04 独立导出准备Worker实际进程与故障恢复
 
 新独立模块只处理显式单job，不启动其他队列/Web/迁移/存储客户端。4个真实自有JVM验证：实际XLSX准备、源备注变化后保留原文件、新PG审计等待点SIGKILL(-9)无半文件、过期后fence2恢复；原收据QUEUEDv0保留，7无关表等值指纹不变，Worker全部结束。15Java/9新增Python门禁，根1604报告1591执行含482PG/13跳过/6MinIO排除，131Python/73契约通过。仍未发布或调用OSS/下载/通知，见docs/export-preparation-worker.md，M3-7非DONE。
+
+## 2026-10-04 D07报障登记列表/详情防御性回读
+
+完整响应/当前范围/客户本人/详情ID/未知null/连续历史/READY附件/纳秒排序验证及深拷贝接入TicketsPage；旧响应代次保护保持，异常清旧显示并显示未知计数，复位清评论目标。56新增前端/983全量Web、类型/构建、74契约通过。最终40实际GET覆盖6身份分页/详情/筛选/刷新、外租户及他人404，业务写0；照片0张、OSS和真实浏览器未验。API0.34不变，OpenAPI补消费者边界说明；M5-1仅部分进度，正式状态/5KPI/SLA及128正式验收不冒充完成，见docs/ticket-read-hardening.md。

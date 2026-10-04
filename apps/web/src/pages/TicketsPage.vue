@@ -4,9 +4,10 @@ import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElTimeline, ElTimelineItem } from 'element-plus'
 import { api, isCancelled } from '../api/client'
-import type { RegisteredTicket, TicketPage } from '../api/types'
+import type { RegisteredTicket } from '../api/types'
 import { can, contextGeneration, session } from '../stores/session'
 import { displayTime } from '../utils/display'
+import { readRegisteredTicket, readTicketPage, type TicketReadContext } from '../utils/ticketReader'
 import { impactScopeLabel, ticketCategories, urgencyLabel } from '../utils/ticket'
 import AppTable from '../components/AppTable.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
@@ -28,6 +29,7 @@ const pageSize = computed(() => pageSizes.includes(Number(queryString('page_size
 const filters = reactive({ q: '', category: '', urgency: '' })
 const customerView = computed(() => ['viewer', 'tadmin'].includes(session.value?.user.role || ''))
 const mayReport = computed(() => customerView.value && can('tickets:report'))
+const readContext = (): TicketReadContext => ({ tenantId: session.value?.tenant.id || '', actorId: session.value?.user.id || '', role: session.value?.user.role || '', permissionVersion: session.value?.permission_version || 0 })
 const rows = ref<RegisteredTicket[]>([])
 const nextCursor = ref<string | null>(null)
 const hasMore = ref(false)
@@ -44,13 +46,15 @@ watch(signature, () => {
 }, { immediate: true })
 async function loadTickets() {
   listController?.abort(); const controller = new AbortController(); listController = controller
-  const generation = ++listGeneration
+  const generation = ++listGeneration, context = readContext(), requestedSize = pageSize.value
+  const requestedFilters = { category: queryString('category'), urgency: queryString('urgency') }
   loading.value = true; error.value = null; rows.value = []; nextCursor.value = null; hasMore.value = false
-  const params = new URLSearchParams({ page_size: String(pageSize.value) })
+  const params = new URLSearchParams({ page_size: String(requestedSize) })
   for (const key of ['q', 'category', 'urgency', 'cursor']) if (queryString(key)) params.set(key, queryString(key))
   try {
-    const page = await api.request<TicketPage>(`/tickets?${params}`, { signal: controller.signal })
-    if (generation !== listGeneration) return
+    const response = await api.request<unknown>(`/tickets?${params}`, { signal: controller.signal })
+    if (generation !== listGeneration || controller.signal.aborted) return
+    const page = readTicketPage(response, context, requestedSize, requestedFilters)
     rows.value = page.items; nextCursor.value = page.next_cursor; hasMore.value = page.has_more; pageSizeLimit.value = page.page_size_limit
   } catch (cause) { if (!isCancelled(cause) && generation === listGeneration) error.value = cause }
   finally { if (generation === listGeneration) loading.value = false }
@@ -91,14 +95,15 @@ let detailGeneration = 0
 watch(() => queryString('ticket_id'), id => { void loadDetail(id) }, { immediate: true })
 async function loadDetail(id = queryString('ticket_id')) {
   detailController?.abort(); const controller = new AbortController(); detailController = controller
-  const generation = ++detailGeneration
+  const generation = ++detailGeneration, context = readContext()
   photoWorkspace.visit(id)
   ticket.value = null; detailError.value = null
   if (!id) { detailLoading.value = false; return }
   detailLoading.value = true
   try {
-    const result = await api.request<RegisteredTicket>(`/tickets/${encodeURIComponent(id)}`, { signal: controller.signal })
-    if (generation === detailGeneration) {
+    const response = await api.request<unknown>(`/tickets/${encodeURIComponent(id)}`, { signal: controller.signal })
+    if (generation === detailGeneration && !controller.signal.aborted) {
+      const result = readRegisteredTicket(response, context, id)
       ticket.value = result
       if (photoWorkspace.accept(result) && mayReport.value && !detailPhotos.policy.value) void detailPhotos.loadPolicy()
     }
@@ -163,6 +168,7 @@ function resetContext() {
   ticket.value = null; detailError.value = null; detailLoading.value = false; pendingRegistered.value = null; createOpen.value = false; acceptedOperationId.value = ''
   worklogOpen.value = false; worklogTarget.value = null
   noteOpen.value = false; noteTarget.value = null
+  commentOpen.value = false; commentTarget.value = null
   photoWorkspace.reset()
   operationReader.reset()
 }
@@ -174,7 +180,7 @@ onUnmounted(() => { unregisterContextGuard(); resetContext(); detailPhotos.dispo
 <template>
   <section class="tickets-page">
     <div class="page-heading"><div><span class="eyebrow">SERVICE / CUSTOMER REPORTS</span><h1>报障与受理</h1><p>{{ customerView ? '查看本人报障登记，填写故障现象与联系方式。' : '只读查看当前授权租户的报障登记。' }}</p></div><el-button v-if="mayReport" type="primary" @click="createOpen = true">填写报障信息</el-button></div>
-    <div class="scope-card"><div><span class="small-label">当前租户</span><strong>{{ session?.tenant.name }}</strong></div><div><span class="small-label">本页登记</span><strong>{{ loading ? '—' : rows.length }} <small>项</small></strong></div><div class="scope-explanation">{{ customerView ? '客户仅查看本人记录。联系方式尚未核验，紧急程度仅供参考。' : '内部人员只读查看当前租户记录；本页不提供接单或解决动作。' }}</div></div>
+    <div class="scope-card"><div><span class="small-label">当前租户</span><strong>{{ session?.tenant.name }}</strong></div><div><span class="small-label">本页登记</span><strong>{{ loading || error ? '—' : rows.length }} <small>项</small></strong></div><div class="scope-explanation">{{ customerView ? '客户仅查看本人记录。联系方式尚未核验，紧急程度仅供参考。' : '内部人员只读查看当前租户记录；本页不提供接单或解决动作。' }}</div></div>
     <el-alert class="page-note" type="warning" :closable="false" show-icon title="一期已选择本平台为工单权威。当前报障可登记与查询；正式状态、SLA 时限和处理资格规则仍待落实。" />
     <el-alert v-if="acceptedOperationId" class="page-note" type="info" :closable="false" show-icon title="报障已耐久登记，正式工单规则待确认。登记结果以详情回读为准，不重复提交或推断为外部建单成功。" />
     <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />
@@ -189,7 +195,7 @@ onUnmounted(() => { unregisterContextGuard(); resetContext(); detailPhotos.dispo
         <el-table-column label="提交时间" min-width="170"><template #default="{ row }">{{ displayTime(row.created_at) }}</template></el-table-column>
         <el-table-column label="操作" width="90" fixed="right"><template #default="{ row }"><el-button type="primary" link class="ticket-detail-link" @click="openDetail(row.id)">查看详情</el-button></template></el-table-column>
       </AppTable>
-      <div class="table-footer"><span>{{ customerView ? '仅本人登记' : '当前租户只读' }} · 本页 {{ rows.length }} 条</span><div class="cursor-pagination ticket-pagination"><el-select :model-value="pageSize" aria-label="报障每页条数" @change="resizePage"><el-option v-for="size in pageSizes.filter(size => size <= pageSizeLimit)" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button v-if="queryString('cursor') && !cursorHistory.length" :disabled="loading" @click="firstPage">返回首页</el-button><el-button v-else :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
+      <div class="table-footer"><span>{{ customerView ? '仅本人登记' : '当前租户只读' }} · 本页 {{ loading || error ? '—' : rows.length }} 条</span><div class="cursor-pagination ticket-pagination"><el-select :model-value="pageSize" aria-label="报障每页条数" @change="resizePage"><el-option v-for="size in pageSizes.filter(size => size <= pageSizeLimit)" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button v-if="queryString('cursor') && !cursorHistory.length" :disabled="loading" @click="firstPage">返回首页</el-button><el-button v-else :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
     </div>
     <TicketReportForm v-if="mayReport" v-model="createOpen" @accepted="recordAcceptance" @registered="showRegistered" />
     <TicketCommentWorkspace ref="commentWorkspace" v-model="commentOpen" :ticket="commentTarget" />

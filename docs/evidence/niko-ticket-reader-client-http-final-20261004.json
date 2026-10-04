@@ -1,0 +1,71 @@
+{
+  "verified_at": "2026-10-04T07:24:26.981Z",
+  "environment": "niko-local-test",
+  "api_contract_version": "0.34.0",
+  "http_requests": 40,
+  "http_methods": [
+    "GET"
+  ],
+  "roles": [
+    {
+      "test_role": "padmin",
+      "first_page_rows": 10,
+      "detail_rows": 1,
+      "next_page_rows": 10,
+      "ready_attachment_rows": 0,
+      "refresh_equal": true
+    },
+    {
+      "test_role": "msp",
+      "first_page_rows": 10,
+      "detail_rows": 1,
+      "next_page_rows": 10,
+      "ready_attachment_rows": 0,
+      "refresh_equal": true
+    },
+    {
+      "test_role": "tadmin",
+      "first_page_rows": 10,
+      "detail_rows": 1,
+      "next_page_rows": 10,
+      "ready_attachment_rows": 0,
+      "refresh_equal": true
+    },
+    {
+      "test_role": "viewerA",
+      "first_page_rows": 10,
+      "detail_rows": 1,
+      "next_page_rows": 10,
+      "ready_attachment_rows": 0,
+      "refresh_equal": true
+    },
+    {
+      "test_role": "viewerB",
+      "first_page_rows": 10,
+      "detail_rows": 1,
+      "next_page_rows": 10,
+      "ready_attachment_rows": 0,
+      "refresh_equal": true
+    },
+    {
+      "test_role": "reviewer",
+      "first_page_rows": 10,
+      "detail_rows": 1,
+      "next_page_rows": 10,
+      "ready_attachment_rows": 0,
+      "refresh_equal": true
+    }
+  ],
+  "existing_records_only": true,
+  "cross_tenant_detail_404": true,
+  "same_tenant_nonreporter_404": true,
+  "registry_entries": 625,
+  "registry_sha256_unchanged": "2ee134dbe5c066e89501c12076a35cb3e05df2b96ed942664c4846af3dcdcc0c",
+  "business_writes": 0,
+  "oidc_refresh_separate": true,
+  "security_denials_may_write_audit": true,
+  "browser_dom_tested": false,
+  "oss_tested": false,
+  "formal_workflow_activated": false,
+  "contract_done": false
+}

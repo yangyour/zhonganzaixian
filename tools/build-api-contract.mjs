@@ -320,6 +320,14 @@ const ticketRegistration = object({
   attachments: { type: 'array', maxItems: 3, items: ref('ReportPhoto') },
   history: { type: 'array', items: object({ action: { type: 'string', enum: ['REGISTER', 'ADD_ATTACHMENTS'] }, actor_id: uuid, occurred_at: dateTime, version: positiveVersion }) },
 });
+// Defensive consumer checks, not new server fields or a replacement for authorization.
+ticketRegistration['x-mop-browser-read-validation'] = {
+  tenant: 'CAPTURED_CURRENT_TENANT', customer_scope: 'REPORTER_ONLY',
+  formal_workflow: 'EXPLICIT_NULL_NO_INFERENCE', history: 'CONTIGUOUS_REGISTRATION_VERSIONS',
+  attachments: 'UNIQUE_READY_SAME_TENANT_REPORTER_AND_TICKET',
+  timestamps: 'STRICT_UTC_NANOSECOND_PRECISION', failure_display: 'CLEAR_REJECTED_SNAPSHOT',
+  authorization: 'SERVER_RECHECK_REQUIRED',
+};
 const operation = object({
   id: { type: 'string', format: 'uuid' }, tenant_id: { type: 'string', format: 'uuid' }, kind: { const: 'CUSTOMER_REPORT_REGISTRATION' },
   status: { const: 'PENDING' }, step: { const: 'AWAITING_TICKET_CONFIGURATION' }, progress: { type: 'null' }, result_ref: { type: 'string', pattern: `^/api/v1/tickets/${uuidPattern}$` },

@@ -1,0 +1,41 @@
+{
+  "verified_date": "2026-10-04",
+  "environment": "niko-local-test",
+  "scope": "D07_REGISTRATION_LIST_DETAIL_READ_VALIDATION_ONLY",
+  "api_version": "0.34.0",
+  "api_wire_change": false,
+  "openapi_consumer_metadata_updated": true,
+  "tests": {
+    "new_pure_frontend": 46,
+    "new_actual_sfc_setup_null_render": 10,
+    "web_total": 983,
+    "web_test_files": 63,
+    "typecheck": "PASS",
+    "production_build": "PASS",
+    "contracts": 74,
+    "contract_generation": "PASS"
+  },
+  "http_evidence": "niko-ticket-reader-client-http-final-20261004.json",
+  "http_requests_final": 40,
+  "http_repeated_runs_not_additive": true,
+  "source_sha256": {
+    "apps/web/src/utils/ticketReader.ts": "12068124bd791986b91f722d9d7007078ce05b3f7196517bd34bc16c6b9905b2",
+    "apps/web/src/pages/TicketsPage.vue": "69e78a2c58fde59fed7d3631db1aa5cd50549db7b1a7b4dc2c723c884b3d21f0"
+  },
+  "real_browser_tested": false,
+  "real_ready_photo_rows_observed": 0,
+  "oss_tested": false,
+  "new_java_pg_test_run": false,
+  "database_migrations": 0,
+  "new_credentials_created": false,
+  "business_writes": 0,
+  "formal_state_and_sla_remain_null": true,
+  "m5_1_complete": false,
+  "formal_128_acceptance": "NOT_RUN",
+  "logs": [
+    ".local/niko-test/logs/ticket-reader-web-final-20261004.log",
+    ".local/niko-test/logs/ticket-reader-build-final-20261004.log",
+    ".local/niko-test/logs/ticket-reader-contracts-final-20261004.log",
+    ".local/niko-test/logs/ticket-reader-http-final-20261004.log"
+  ]
+}

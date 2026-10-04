@@ -23,3 +23,13 @@ estimateSampleAge只使用原sampled_at、响应Date秒级值、测得的请求�
 实际编译ApiClient/估计核心连接niko原PG/OIDC/API0.33：18次HTTP，含8个Date/no-store观察、5份资产DTO与旧request读取逐字一致；5份sampled_at均null，估计均NO_SAMPLE，未制造监控采样。1次正常request的只读阈值POST保留CSRF和返回形状，未保存规则；旧request时钟函数调用0次。真实403拒绝和1次挂起真实200后失效上下文均验证。415条配置登记本轮前后摘要一致，0业务写/0新样本。
 
 HTTP Date+no-store可读不代表组件采集健康。旧样本随刷新增加年龄、错误日期、亚毫秒及未来值等只由隔离单元验证，不称真实监控事件；没有浏览器DOM/性能、物理故障、迁移或API重启。前表格加载e24ad3ee CI37163403512 success已回读。见[真实HTTP](evidence/niko-http-clock-client-http-20261004.json)、[回归证据](evidence/niko-http-response-clock-20261004.json)。
+
+## 2026-10-04 资产详情采样/读取展示
+
+新增SampleFreshness并接入资产详情：并列展示响应Date（UTC秒级）、原sampled_at（UTC原值）及明确标为估计的年龄区间；缺样本不补时间、不以刷新成功显示正常或SLA达标。原有本地化业务时间仍按Asia/Shanghai显示，新面板的原值明确标UTC。详情在开始新读时清除旧clock，只有同一generation成功GET才一起安装data/clock；新增44px最小高度的显式只读刷新按钮，不增加网络轮询或写动作。
+
+只有可估计且页面可见时运行一个1秒本地显示计时器；无采样/无时钟/未来异常不空转。visibilitychange、bfcache恢复或新对象复用旧clock会使估计失效并停止计时，直到取得新读取结果；卸载清理计时器和两个事件监听。此本地显示计时器不是M1的30秒服务端轮询，也不验证OS休眠/NTP/实际采集心跳。
+
+同时补充一项边界：在本次响应完成时已明显晚于时钟估计区间的sampled_at，不能仅因本地等待而自动恢复为可用估计；先出现13核心项中1失败/12通过，再固定按接收时刻检查。只有新响应才能重新核对这项异常，原sampled_at不被改写。
+
+新增10项Vue组件jsdom隔离DOM模拟测试、1项资产页接线检查及上述1项核心回归，全887Web/typecheck/build/70契约通过。覆盖null/坏值/未来值、旧样本不归零、单计时器、无样本停计时、可见性/对象变化/bfcache失效及卸载。jsdom不是实际浏览器或390px视觉验收；此轮未新增真实HTTP，前18HTTP是SDK验证，不能重算为资产页完整浏览器联调。前c56e1591 CI37164734151 success已回读，见[面板证据](evidence/niko-sample-freshness-panel-20261004.json)。

@@ -1039,3 +1039,7 @@ ElTable/AppTable及11个列组件局部绑定，入口静态JS501639→424970 by
 ## 2026-10-04 响应Date与样本年龄基础
 
 新增GET-only requestWithClock，严格Date/no-store/无Age及单调时间观察，不改旧request写契约；年龄只估计、不补样本或判正常。22新增纳入875Web构建70契约，18真实HTTP含8时钟观察/5空样本保持NO_SAMPLE/只读POST/403/旧上下文丢弃，0业务写。无页面/采集/心跳/SLA/DOM完成声明，见docs/http-response-clock.md。
+
+## 2026-10-04 资产详情采样/读取时间面板
+
+详情接GET时钟和显式只读刷新，原样本/响应时间/估计年龄分开；可见性、bfcache、对象变化使旧估计失效，无样本停止本地计时，卸载清理。未来样本不能仅靠等待变有效的回归先红后绿；12新增纳入887Web构建70契约，含10jsdom组件模拟，非实际浏览器或新HTTP，见docs/http-response-clock.md。

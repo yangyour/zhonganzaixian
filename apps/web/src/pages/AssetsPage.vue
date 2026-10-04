@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ElTableColumn as ElementTableColumn } from 'element-plus'
-import { computed, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { api, isCancelled } from '../api/client'
@@ -9,6 +9,8 @@ import { session } from '../stores/session'
 import { assetTypes, displayTime, typeLabel, sourceLabel } from '../utils/display'
 import AppTable from '../components/AppTable.vue'
 import StatusTag from '../components/StatusTag.vue'
+import SampleFreshness from '../components/SampleFreshness.vue'
+import type { HttpClockObservation } from '../utils/httpResponseClock'
 import PermissionGate from '../components/PermissionGate.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import AssetImportWorkspace from '../components/AssetImportWorkspace.vue'
@@ -63,6 +65,7 @@ function previousPage() { const cursor = cursorHistory.value.pop(); void router.
 
 const detailOpen = computed({ get: () => Boolean(queryString('asset_id')), set: value => { if (!value) void router.replace({ query: { ...route.query, asset_id: undefined } }) } })
 const asset = ref<Asset | null>(null)
+const detailClock = shallowRef<HttpClockObservation | null>(null)
 const detailError = ref<unknown>(null)
 const detailLoading = ref(false)
 const onboarding = ref(false)
@@ -71,13 +74,14 @@ let detailGeneration = 0
 watch(() => queryString('asset_id'), id => { void loadDetail(id) }, { immediate: true })
 async function loadDetail(id: string) {
   detailController?.abort(); detailController = new AbortController(); const generation = ++detailGeneration
-  asset.value = null; detailError.value = null; onboarding.value = false
+  asset.value = null; detailClock.value = null; detailError.value = null; onboarding.value = false
   if (!id) { detailLoading.value = false; return }
   detailLoading.value = true
-  try { const result = await api.request<Asset>(`/assets/${encodeURIComponent(id)}`, { signal: detailController.signal }); if (generation === detailGeneration) asset.value = result }
+  try { const result = await api.requestWithClock<Asset>(`/assets/${encodeURIComponent(id)}`, { signal: detailController.signal }); if (generation === detailGeneration) { detailClock.value = result.clock; asset.value = result.data } }
   catch (cause) { if (!isCancelled(cause) && generation === detailGeneration) detailError.value = cause }
   finally { if (generation === detailGeneration) detailLoading.value = false }
 }
+function refreshDetail() { void loadDetail(queryString('asset_id')) }
 function openDetail(id: string) { void router.replace({ query: { ...route.query, asset_id: id } }) }
 async function requestOnboarding() {
   if (!asset.value) return
@@ -177,12 +181,13 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
       <el-skeleton v-if="detailLoading" :rows="8" animated />
       <template v-if="asset"><div class="detail-title"><span class="eyebrow">{{ typeLabel(asset.type) }}</span><h2>{{ asset.name }}</h2><StatusTag :status="asset.status" /></div><el-alert type="info" :closable="false" show-icon :title="asset.unknown_reason || '当前未取得真实采集数据，不能判断为正常。'" />
         <el-descriptions :column="1" border class="asset-descriptions"><el-descriptions-item label="资产 ID"><span class="mono">{{ asset.id }}</span></el-descriptions-item><el-descriptions-item label="所属租户">{{ asset.tenant_id }}</el-descriptions-item><el-descriptions-item label="管理 IP"><span class="mono">{{ asset.management_ip }}</span></el-descriptions-item><el-descriptions-item label="站点">{{ asset.site_name || asset.site_id }}</el-descriptions-item><el-descriptions-item label="生命周期">{{ asset.lifecycle_status === 'DRAFT' ? '草稿' : asset.lifecycle_status }}</el-descriptions-item><el-descriptions-item label="来源">{{ sourceLabel(asset.source) }}</el-descriptions-item><el-descriptions-item label="采样时间">{{ displayTime(asset.sampled_at) }}</el-descriptions-item><el-descriptions-item label="版本">v{{ asset.version }}</el-descriptions-item><el-descriptions-item label="创建时间">{{ displayTime(asset.created_at) }}</el-descriptions-item><el-descriptions-item label="更新时间">{{ displayTime(asset.updated_at) }}</el-descriptions-item></el-descriptions>
+        <SampleFreshness :clock="detailClock" :sampled-at="asset.sampled_at" :context-key="`${asset.tenant_id}:${asset.id}`" />
         <div v-if="metadataAllowed" class="detail-section"><h3>手工草稿资料</h3><p class="muted">内部维护明确资料并留存前后历史；管理IP、CMDB和监控配置不变。</p><PermissionGate capability="assets:write"><el-button @click="openMetadata">查看资料与修订历史</el-button><el-button @click="openWarranty">维护维保日期与供应商</el-button></PermissionGate></div>
         <AssetDateAssessmentPanel v-if="metadataAllowed" :asset="asset" />
         <div class="detail-section"><h3>依赖草稿</h3><p class="muted">按完整租户图保存人工依赖提案，监控抑制尚未生效。</p><el-button @click="openDependencies">查看或追加依赖草稿</el-button></div>
         <div class="detail-section"><h3>监控接入</h3><p class="muted">测试环境数据已持久保存；生产隔离、监控组件许可与阈值依赖 Q02 / Q03 / Q06。完成客户确认前，草稿不能发布到真实监控。</p><PermissionGate capability="assets:write"><el-button type="primary" plain :loading="onboarding" @click="requestOnboarding">检查接入条件</el-button></PermissionGate></div>
       </template>
-      <template #footer><el-button @click="detailOpen = false">关闭</el-button></template>
+      <template #footer><el-button class="asset-time-refresh" :loading="detailLoading" :disabled="detailLoading" @click="refreshDetail">只读刷新</el-button><el-button @click="detailOpen = false">关闭</el-button></template>
     </el-drawer>
     <el-dialog v-model="createOpen" title="创建资产草稿" width="520px" class="responsive-dialog" :close-on-click-modal="!creating" :show-close="!creating" destroy-on-close>
       <el-alert title="仅保存当前租户的测试环境草稿；不会自动接入监控或产生采集数据。" type="info" :closable="false" show-icon />
@@ -200,6 +205,7 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
 </template>
 
 <style>
+.asset-time-refresh{min-height:44px}
 .assets-heading-actions{display:flex;flex-wrap:wrap;gap:8px}.assets-heading-actions .el-button+.el-button{margin-left:0}
 @media(max-width:760px){.assets-heading-actions .el-button{min-height:44px;height:auto;white-space:normal}}
 </style>

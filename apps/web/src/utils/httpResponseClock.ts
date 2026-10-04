@@ -35,7 +35,8 @@ export function estimateSampleAge(clock: HttpClockObservation, sampledAt: string
   if (!monotonic(nowMonotonic) || nowMonotonic < clock.received_mono_ms) return result('CLOCK_REGRESSED')
   const base = utcInstantNanos(clock.date_iso); if (base === null || !monotonic(clock.started_mono_ms) || !monotonic(clock.received_mono_ms) || clock.received_mono_ms < clock.started_mono_ms) return result('CLOCK_UNAVAILABLE')
   const elapsed = nowMonotonic-clock.received_mono_ms, trip = clock.received_mono_ms-clock.started_mono_ms
-  const lower = base+BigInt(Math.floor(elapsed))*1_000_000n-sample, upper = base+(1000n+BigInt(Math.ceil(trip))+BigInt(Math.ceil(elapsed)))*1_000_000n-sample
-  if (upper <= 0n) return result('SAMPLE_AFTER_CLOCK_ESTIMATE')
+  const upperAtReceipt = base+(1000n+BigInt(Math.ceil(trip)))*1_000_000n-sample
+  if (upperAtReceipt <= 0n) return result('SAMPLE_AFTER_CLOCK_ESTIMATE')
+  const lower = base+BigInt(Math.floor(elapsed))*1_000_000n-sample, upper = upperAtReceipt+BigInt(Math.ceil(elapsed))*1_000_000n
   return result('ESTIMATED',(lower<=0n?0n:lower/1_000_000n).toString(),((upper+999_999n)/1_000_000n).toString())
 }

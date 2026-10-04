@@ -1,0 +1,59 @@
+{
+  "verified_at": "2026-10-04T00:39:13.522399+00:00",
+  "scope": "ASSET_DETAIL_RESPONSE_DATE_AND_ORIGINAL_SAMPLE_DISPLAY",
+  "new_tests": 12,
+  "simulated_vue_component_tests": 10,
+  "source_wiring_tests": 1,
+  "new_future_sample_core_regression": 1,
+  "future_sample_red_run": {
+    "reported": 13,
+    "failed": 1,
+    "passed": 12
+  },
+  "web_tests_passed": 887,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts": 70,
+  "generation_check": "PASS",
+  "response_date_and_original_sample_separate": true,
+  "display_clock_accuracy_verified": false,
+  "health_or_sla_verdict_created": false,
+  "network_polling_added": false,
+  "explicit_refresh_http_method": "GET",
+  "minimum_refresh_button_height_px": 44,
+  "local_display_timer_ms": 1000,
+  "timer_when_sample_missing": false,
+  "visibility_or_bfcache_requires_new_clock": true,
+  "same_clock_cannot_cross_object_context": true,
+  "listeners_and_timer_removed_on_unmount": true,
+  "future_sample_becomes_valid_merely_by_waiting": false,
+  "actual_new_http_calls": 0,
+  "browser_dom_tested": false,
+  "jsdom_simulated_dom_tested": true,
+  "viewport_visual_acceptance": "NOT_RUN",
+  "os_sleep_clock_behavior_verified": false,
+  "api_version": "0.33.0",
+  "api_restarted": false,
+  "v1_v19_changed": false,
+  "contract_done": false,
+  "previous_clock_sdk_commit": {
+    "sha": "c56e1591d853a222f1b86ac4b99c69be5321b4f8",
+    "ci_run": 37164734151,
+    "conclusion": "success"
+  },
+  "source_sha256": {
+    "apps/web/src/components/SampleFreshness.vue": "7de0f8105b6fb6ab3e4f9a6288c5eed9ed8f3e8d9ba2b7eddda28ee2a9dd45a5",
+    "apps/web/src/pages/AssetsPage.vue": "e98b25d572a85a552b2ccfca4df80f59558b05be187368796a56272bbc90f01d",
+    "apps/web/src/utils/httpResponseClock.ts": "1fe48deebdf634c363620ae322c2b5a57bb65bf724a3acd15121cdafed702b77",
+    "apps/web/tests/sampleFreshness.test.ts": "e3ee342a3289858cd8df5fdbfbedb9d3abea928fb015a1aa7652c36e6832dd6b",
+    "apps/web/tests/httpResponseClock.test.ts": "3bb6ec1c9a3ae0ba1572699cea35a88bc3ae9d99c74406ed884e2ad4e0f94d3c"
+  },
+  "logs_sha256": {
+    ".local/niko-test/logs/sample-freshness-focused.log": "ffa4dfaec24237195a1d7e997c7e9fb211cc42c0c47d0857dd7224d30623484b",
+    ".local/niko-test/logs/sample-freshness-typecheck.log": "e47e3e69aacecb5d890e5b0bd74a08497b1605830b983af55df73ae095d28367",
+    ".local/niko-test/logs/sample-freshness-future-red.log": "9e0a85558bbe04a4d841510ff1aef642e55406e033b9f903a95251d5c10df604",
+    ".local/niko-test/logs/sample-freshness-web.log": "2481f4555cfdfde8ecf216d2522efd96c76ca3ef461454ddc4963ea8c0a04c7e",
+    ".local/niko-test/logs/sample-freshness-build.log": "720151c2b6b9d09b3b58c0094fb764944896ef350f0a5892f196a9bad5df3f45",
+    ".local/niko-test/logs/sample-freshness-contract.log": "7f3a47676efd00bd05fa40f6e747f37a9e196260255b19156eeb0ca33893642f"
+  }
+}

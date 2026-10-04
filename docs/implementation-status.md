@@ -1126,3 +1126,7 @@ c40bf37的CI37175873116中Java/Web/Windows进程检查通过，但PowerShell迁�
 ## 2026-10-04 真实台账筛选到XLSX及PG准备链路
 
 处理器先检查Claim，再取完整有界筛选，重查当前租约/PG时钟后编码并原子保存实际XLSX；存在原文件则不再读源/编码。5新增实际PG链路、10纯指纹/阶段检查，根1589报告1576执行含482PG/13跳过/6MinIO排除，73契约。覆盖空表头、租约中途到期及审计异常回滚；独立Worker/HTTP/OSS/下载/通知仍待，见docs/asset-export-jobs.md，M3-7非DONE。
+
+## 2026-10-04 独立导出准备Worker实际进程与故障恢复
+
+新独立模块只处理显式单job，不启动其他队列/Web/迁移/存储客户端。4个真实自有JVM验证：实际XLSX准备、源备注变化后保留原文件、新PG审计等待点SIGKILL(-9)无半文件、过期后fence2恢复；原收据QUEUEDv0保留，7无关表等值指纹不变，Worker全部结束。15Java/9新增Python门禁，根1604报告1591执行含482PG/13跳过/6MinIO排除，131Python/73契约通过。仍未发布或调用OSS/下载/通知，见docs/export-preparation-worker.md，M3-7非DONE。

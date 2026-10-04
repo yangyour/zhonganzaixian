@@ -1,0 +1,13 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <parent><groupId>cn.mop</groupId><artifactId>mop-platform</artifactId><version>0.1.0-SNAPSHOT</version><relativePath>../../pom.xml</relativePath></parent>
+  <artifactId>mop-export-preparation-worker</artifactId><name>Explicit single-job export preparation worker</name>
+  <dependencies>
+    <dependency><groupId>cn.mop</groupId><artifactId>mop-domain</artifactId><version>${project.version}</version></dependency>
+    <dependency><groupId>cn.mop</groupId><artifactId>mop-persistence</artifactId><version>${project.version}</version></dependency>
+    <dependency><groupId>cn.mop</groupId><artifactId>mop-asset-export</artifactId><version>${project.version}</version></dependency>
+    <dependency><groupId>com.fasterxml.jackson.datatype</groupId><artifactId>jackson-datatype-jsr310</artifactId></dependency>
+    <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter</artifactId><scope>test</scope></dependency>
+  </dependencies>
+  <build><plugins><plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId><configuration><mainClass>cn.mop.exportworker.ExportPreparationWorkerApplication</mainClass></configuration></plugin></plugins></build>
+</project>

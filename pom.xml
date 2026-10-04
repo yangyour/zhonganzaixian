@@ -4,5 +4,5 @@
   <groupId>cn.mop</groupId><artifactId>mop-platform</artifactId><version>0.1.0-SNAPSHOT</version><packaging>pom</packaging>
   <name>MOP local development baseline</name>
   <properties><java.version>17</java.version><kotlin.version>2.2.21</kotlin.version><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>
-  <modules><module>server/domain</module><module>server/persistence</module><module>server/adapters</module><module>server/api</module><module>server/worker</module><module>server/import-parser</module><module>server/asset-export</module></modules>
+  <modules><module>server/domain</module><module>server/persistence</module><module>server/adapters</module><module>server/api</module><module>server/worker</module><module>server/import-parser</module><module>server/asset-export</module><module>server/export-preparation-worker</module></modules>
 </project>

@@ -1,0 +1,113 @@
+{
+  "verified_at": "2026-10-04T06:27:48.930259+00:00",
+  "environment": "niko-local-test",
+  "scope": "ACTUAL_SINGLE_JOB_PREPARATION_JVMS_NORMAL_RETAINED_AND_INFLIGHT_KILL_RECOVERY",
+  "artifact_sha256": "e64a590174ddbedee181b96176da58d9893bac1ac7f9a8616648cf583abf3aa9",
+  "start_class": "cn.mop.exportworker.ExportPreparationWorkerApplication",
+  "actual_worker_runs": 4,
+  "lease_millis": 30000,
+  "owned_process_checks": [
+    "uid",
+    "direct_parent",
+    "exact_java_argv_and_target_job",
+    "exe_path",
+    "start_ticks",
+    "pinned_jar_sha256_and_manifest"
+  ],
+  "normal": {
+    "fence": 1,
+    "actual_workbook_verified": true,
+    "data_rows": 1,
+    "file_sha256": "1eeafe222271cd8e09ed8de1db79e2687556c438b12a811ec4368d8713e022d1",
+    "exit_code": 0
+  },
+  "retained": {
+    "new_jvm_fence": 2,
+    "owned_source_changed_before_restart": true,
+    "original_file_sha256_unchanged": true,
+    "original_selection_sha256_unchanged": true,
+    "original_workbook_marker_retained": true,
+    "state": "RECONCILING_STORAGE",
+    "exit_code": 0
+  },
+  "crash": {
+    "actual_pg_prepare_audit_wait_observed": true,
+    "signal": "SIGKILL",
+    "exit_code": -9,
+    "committed_claim_retained": true,
+    "partially_committed_prepared_file": false,
+    "recovered_new_jvm_fence": 2,
+    "recovered_actual_workbook_verified": true,
+    "recovery_exit_code": 0
+  },
+  "synthetic_source_assets_created": 2,
+  "original_acceptance_receipts_stay_queued_version_zero": true,
+  "unrelated_table_fingerprints_unchanged": {
+    "mop_user": {
+      "row_hash_aggregate_sha256": "c71d7dcd040a49b72f60d092d65ff5c99845d94a1be735495ba0cab272c06061",
+      "rows": 221
+    },
+    "mop_membership": {
+      "row_hash_aggregate_sha256": "344005ce07499bda5dcf7d5358e0c1d44016df5d2f785fdfee41b1b30b23d813",
+      "rows": 439
+    },
+    "mop_outbox": {
+      "row_hash_aggregate_sha256": "23bd327384ae4070c821627f0a6be2bbaf988602a6fc91c73cb4600c2de1ec80",
+      "rows": 3656
+    },
+    "mop_photo_job": {
+      "row_hash_aggregate_sha256": "23bed7cdaf147edabd8f54a63fbd76b80b63f5516948f78ac40d9654a7bbb8df",
+      "rows": 1333
+    },
+    "mop_asset_import_job": {
+      "row_hash_aggregate_sha256": "b38a264b139d0b5e719282ce1e7297904372578d549c58783d7e92e99d3a4e0d",
+      "rows": 1376
+    },
+    "mop_contact_import_job": {
+      "row_hash_aggregate_sha256": "d72b9475b7f62f8d15b443db21aa6976b8738ed95db3be2e774bb4155e6b1151",
+      "rows": 1075
+    },
+    "mop_contact_import_result": {
+      "row_hash_aggregate_sha256": "1ec05d2cb48452eade4a790d39cebc6d5431f9c1b35af3c8273f0758387830e9",
+      "rows": 4479
+    }
+  },
+  "worker_connections_after_proof": 0,
+  "new_credentials_or_grants": 0,
+  "schema_migrations": 0,
+  "api_or_pg_restarted": false,
+  "export_http_tested": false,
+  "oss_requests": 0,
+  "download_grants": 0,
+  "notifications_sent": 0,
+  "published": false,
+  "formal_acceptance": "NOT_RUN",
+  "java_worker_unit_tests": 15,
+  "new_python_guard_tests": 9,
+  "all_python_tests": 131,
+  "root_reported": 1604,
+  "root_executed": 1591,
+  "root_failures": 0,
+  "root_errors": 0,
+  "total_real_postgresql_tests": 482,
+  "historical_fixture_skipped": 13,
+  "minio_tests_excluded": 6,
+  "contract_tests": 73,
+  "contract_generation_consistent": true,
+  "final_build_matches_tested_pinned_artifact": true,
+  "invalid_mode_packaged_jar_smoke_exit": 1,
+  "log_sha256": {
+    "export-worker-build-first-20261004.log": "17700e231154541ee54e45eded2323617ad98b3d8573ae597f87fc0c11914ad2",
+    "export-worker-focused-20261004.log": "4173270eccd98f622537992a97fc46fd85bee4184b08cc82243757f7040ee7c7",
+    "export-worker-process-proof-first-20261004.log": "3e1c3b14a764ba412d71b5e479dd92046a2f65c9299d99a1148f754008f4583e",
+    "export-worker-normal-20261004.log": "bb4002f8e894357097ce23589b1d80bd460cd0c3edb834b65ed51971c3db2544",
+    "export-worker-retained-20261004.log": "c0bd91516a5f4a0ca69952565bbb621a6274731b6e308a7e6d0f67b18519d76f",
+    "export-worker-crash-20261004.log": "2c58b87a0350a39bb1c3b5f4891defeeb9a785e84aa11a466dc9ddb21253bf58",
+    "export-worker-recovered-20261004.log": "9a72c21daa53523c8bb7df6b797c8d96893877cf83fc9e680366b728d78b07f5",
+    "export-worker-python-focused-20261004.log": "f2b7cdf24bb38094da8d1374d60e290ad23eb5733cbf544eb7e390233f1417cc",
+    "export-worker-python-all-20261004.log": "385ee3c1bdc7e614e8e792f790cef16723e6d781f63af99a2b1868aa9b35900c",
+    "export-worker-root-20261004.log": "bf51b962bb631944679c0007d31a879ab06c048360780d4839e5c1d767a7b1ae",
+    "export-worker-contracts-20261004.log": "100c66ac907a4c5202b9b977cd2d13e85689569d9511124bcefebf51d44a9434",
+    "export-worker-invalid-mode-smoke-20261004.log": "d68b10a3d3e2ad892f0666537579d4a652deabd669d59ba71afd3e8b87245acf"
+  }
+}

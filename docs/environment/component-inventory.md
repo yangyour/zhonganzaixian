@@ -191,3 +191,7 @@ V20首次候选CASE语法失败完整回滚，只读确认仍V19/无新表函数
 ## 2026-10-04 导出排队任务正常停启与新JVM回放
 
 受理提交a38c84a的CI全过。实际停止/重启仅本runner PG/KC/API，PG启动时间改变；26排队任务、0领取及原幂等/审计四表相同。新JVM读回26任务/回放26原收据，接受回调0、四表再比相同；随后6真实OIDC登录通过。首次不必要的Flyway历史runtime读取被拒，移除该探针且未提权。9新增纯门禁/122Python/73契约通过；不当Worker崩溃或OSS完成。见docs/asset-export-jobs.md。
+
+## 2026-10-04 独立导出准备Worker实际进程与故障恢复
+
+新独立模块只处理显式单job，不启动其他队列/Web/迁移/存储客户端。4个真实自有JVM验证：实际XLSX准备、源备注变化后保留原文件、新PG审计等待点SIGKILL(-9)无半文件、过期后fence2恢复；原收据QUEUEDv0保留，7无关表等值指纹不变，Worker全部结束。15Java/9新增Python门禁，根1604报告1591执行含482PG/13跳过/6MinIO排除，131Python/73契约通过。仍未发布或调用OSS/下载/通知，见docs/export-preparation-worker.md，M3-7非DONE。

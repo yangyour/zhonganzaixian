@@ -1,0 +1,65 @@
+{
+  "verified_at": "2026-10-04T14:02:42.162172+00:00",
+  "scope": "PURE_FROZEN_INSPECTION_SOURCE_DOCUMENT_CODEC",
+  "document_format": "MOP_INSPECTION_SOURCE_DOCUMENT_V1",
+  "new_pure_tests": 19,
+  "focused_pure_tests": 39,
+  "root_tests": {
+    "reported": 1814,
+    "executed": 1801,
+    "real_existing_postgres": 567,
+    "new_document_database_tests": 0,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts": 90,
+  "contract_generation": "PASS",
+  "golden": {
+    "document_sha256": "cc920d7442bfb1a2f5801f5bb28ca1608e5126593b23b5a1bfd30a30cdf03b68",
+    "document_bytes": 1185,
+    "manifest_sha256": "fc0b796e7e91bb298c751d6792506fc5605e53a70eaeb943e936721e02821e36",
+    "source_sha256": "d752cefd7f25666fc0b40e27b88d7604f32f939bee664758265b6262775a58c3"
+  },
+  "technical_limits": {
+    "full_canonical_sources_bytes": 16777216,
+    "document_bytes": 33554432,
+    "sources": 1000,
+    "items_per_source": 100,
+    "json_depth": 10,
+    "string_utf16_units": 12000,
+    "number_digits": 16,
+    "tokens": 4000000,
+    "business_quota": false,
+    "truncation": false
+  },
+  "maximum_count_round_trip": {
+    "sources": 1000,
+    "items_per_source": 100,
+    "answers_per_source": 100,
+    "status": "PASS"
+  },
+  "stored_bytes_requirement": "Exact canonical UTF8; JSONB normalization not accepted",
+  "outer_expected_tenant_required": true,
+  "all_layers_rehashed": true,
+  "evidence_references_are_access_grants": false,
+  "document_written_to_database": false,
+  "new_http_routes": 0,
+  "new_migrations": 0,
+  "schema_version": 22,
+  "api_version": "0.37.0",
+  "quarter_selection_rule": null,
+  "report_publication": false,
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "server/persistence/src/main/java/cn/mop/persistence/InspectionSourceDocumentCodec.java": "518348fc4fd0a9fcfd1faafb7ea3b1dc03ca08f1bc717c27eadd21943c7e28c3",
+    "server/persistence/src/test/java/cn/mop/persistence/InspectionSourceDocumentCodecTest.java": "2f0668e98f9a91d0c97ba8ff745397b43f9abeca39600eb15e917997aba87ab6"
+  },
+  "logs": [
+    ".local/niko-test/logs/source-document-codec-contracts-20261004.log",
+    ".local/niko-test/logs/source-document-codec-focused-20261004-r2.log",
+    ".local/niko-test/logs/source-document-codec-focused-20261004.log",
+    ".local/niko-test/logs/source-document-codec-root-20261004.log"
+  ]
+}

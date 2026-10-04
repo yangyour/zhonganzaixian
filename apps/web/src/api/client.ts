@@ -1,3 +1,7 @@
+import { observeHttpClock, type HttpClockObservation } from '../utils/httpResponseClock'
+
+export interface ClockedResponse<T> { data: T; clock: HttpClockObservation }
+export interface RequestOptions { method?: string; body?: unknown; signal?: AbortSignal; idempotencyKey?: string }
 export interface ErrorDetail { [key: string]: unknown }
 interface Envelope<T> { data: T; trace_id: string }
 interface FailureEnvelope { error?: { code?: string; message?: string; details?: ErrorDetail[] }; trace_id?: string }
@@ -24,7 +28,7 @@ export class ApiClient {
   private generation = 0
   private csrfToken: string | null = null
   onUnauthorized: () => void = () => undefined
-  constructor(private transport: typeof fetch = (...args) => fetch(...args), private base = '/api/v1') {}
+  constructor(private transport: typeof fetch = (...args) => fetch(...args), private base = '/api/v1', private monotonicNow: () => number = () => performance.now()) {}
   setCsrfToken(value: string | null) { this.csrfToken = value }
   invalidateContext() {
     this.generation += 1
@@ -32,7 +36,19 @@ export class ApiClient {
     this.controllers.clear()
     return this.generation
   }
-  async request<T>(path: string, options: { method?: string; body?: unknown; signal?: AbortSignal; idempotencyKey?: string } = {}): Promise<T> {
+  async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+    const generation = this.generation, result = await this.requestResult<T>(path, options)
+    if (generation !== this.generation || options.signal?.aborted) throw new StaleRequestError()
+    return result.data
+  }
+  /** GET only. Date is response metadata, never sampling success or a verified synchronization clock. */
+  async requestWithClock<T>(path: string, options: { signal?: AbortSignal } = {}): Promise<ClockedResponse<T>> {
+    const generation = this.generation, result = await this.requestResult<T>(path, { method: 'GET', signal: options.signal }, true)
+    if (generation !== this.generation || options.signal?.aborted) throw new StaleRequestError()
+    return result
+  }
+  private clockNow(): number { try { return this.monotonicNow() } catch { return NaN } }
+  private async requestResult<T>(path: string, options: RequestOptions, observeClock = false): Promise<ClockedResponse<T>> {
     assertApiPath(path)
     const generation = this.generation
     const controller = new AbortController()
@@ -48,6 +64,7 @@ export class ApiClient {
       headers['Idempotency-Key'] = options.idempotencyKey || crypto.randomUUID()
       if (this.csrfToken) headers['X-CSRF-Token'] = this.csrfToken
     }
+    const started = observeClock ? this.clockNow() : 0
     try {
       const response = await this.transport(this.base + path, {
         method, headers, credentials: 'same-origin', redirect: 'error', signal: controller.signal,
@@ -65,7 +82,9 @@ export class ApiClient {
         throw new ApiError(response.status, envelope.error?.code || `HTTP_${response.status}`, envelope.error?.message || '请求未完成，请稍后重试', traceId, envelope.error?.details || [])
       }
       if (!Object.prototype.hasOwnProperty.call(envelope, 'data')) throw new ApiError(response.status, 'INVALID_RESPONSE', '接口响应缺少 data', traceId)
-      return envelope.data
+      const clock: HttpClockObservation = observeClock ? observeHttpClock(response.headers, started, this.clockNow()) : Object.freeze({ status: 'UNKNOWN', reason: 'NOT_REQUESTED', clock_accuracy_verified: false })
+      if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
+      return { data: envelope.data, clock }
     } catch (error) {
       if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
       if (error instanceof ApiError) { if (error.status === 401) this.onUnauthorized(); throw error }

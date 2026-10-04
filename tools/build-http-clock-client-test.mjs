@@ -1,0 +1,4 @@
+// Bundle actual clock-aware client; no network or credentials at build time.
+import {mkdir} from 'node:fs/promises';import {createRequire} from 'node:module';import {fileURLToPath} from 'node:url';
+const root=fileURLToPath(new URL('../',import.meta.url)),require=createRequire(new URL('../apps/web/package.json',import.meta.url));await mkdir(new URL('../.local/niko-test/',import.meta.url),{recursive:true});
+await require('esbuild').build({stdin:{contents:"export {ApiClient} from './apps/web/src/api/client'; export * from './apps/web/src/utils/httpResponseClock'",resolveDir:root,sourcefile:'http-clock-client-entry.ts',loader:'ts'},bundle:true,platform:'node',format:'esm',outfile:fileURLToPath(new URL('../.local/niko-test/http-clock-client.mjs',import.meta.url))});console.log('Built actual clock-aware client; no HTTP or browser test ran');

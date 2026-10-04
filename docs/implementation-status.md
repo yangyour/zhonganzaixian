@@ -1035,3 +1035,7 @@ V18队列/不可变行结果结构显式1/重复0/check0且26表不变，但13�
 ## 2026-10-03 表格按路由加载
 
 ElTable/AppTable及11个列组件局部绑定，入口静态JS501639→424970 bytes（-15.28%），登录-15.20%，资产路由联合JS+927bytes（+0.14%），CSS不变；最终最大JS424970、原500kB警告自然消失。13编译器/结构新增纳入853Web构建70契约。仅静态产物，非DOM/首屏/FPS证明，见docs/web-table-loading-boundary.md。
+
+## 2026-10-04 响应Date与样本年龄基础
+
+新增GET-only requestWithClock，严格Date/no-store/无Age及单调时间观察，不改旧request写契约；年龄只估计、不补样本或判正常。22新增纳入875Web构建70契约，18真实HTTP含8时钟观察/5空样本保持NO_SAMPLE/只读POST/403/旧上下文丢弃，0业务写。无页面/采集/心跳/SLA/DOM完成声明，见docs/http-response-clock.md。

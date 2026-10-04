@@ -56,3 +56,23 @@
 V1–V22冻结、API0.35保持，执行单API/UI、实际OSS证据、正式适用性/模板批准、季度归集和发布仍未完成。最终根与状态证据见[仓储验证](evidence/niko-inspection-worksheet-repository-20261004.json)。
 
 最终根1736报告=1723实际执行（554真实PG）+13历史fixture跳过、6MinIO排除，失败/错误0；80契约/生成一致性通过。聚焦及全根共50个自建合成执行单全部归档/未核验、历史保留；只读schema检查V22、执行迁移0。
+
+## 2026-10-04 API0.36人工执行单接口
+
+新增当前租户padmin `/api/v1/inspection-worksheets` 的GET/POST，`/{id}` 的GET/PATCH，`/{id}/history` 的GET及`/{id}/archive`、`/{id}/restore` 的POST。仅remote_test真实PG配置可用，没有fixture替代入口。新增两项inspection_worksheets能力同步登记在既有“模板与自动化”维度；其他角色仍403，不改变既有成员关系或客户最终权限矩阵。
+
+创建必须给expected_version=0、asset_id、template_id、template_version、observations和reported_performed_at（未知明确null）。修改/恢复必须给明确当前expected_version和完整observations/自述时间，不接受源资产/模板重绑；归档只接受expected_version。答案精确key/result/note，0–100项技术上限、唯一键、明确三结果、备注null或原文；不接受evidence_ids、手填summary、租户/审批/报告状态等额外字段。服务端按捕获模板排序返回，缺项不填正常。只有写入时PG真实时钟校验才可确定不是“未来时间”；自述仍不证明真实执行。
+
+请求体2MiB、2000 token、深度4及字符串解析界限；重复JSON键、尾随对象、未知/重复query、缺少幂等键均拒绝。最大100项各3000 emoji备注的原始UTF-8请求可通过，转义后超过字节上限仍拒绝，不靠业务字符上限放开传输资源上限。所有非GET继续使用既有CSRF过滤，幂等范围含当前用户/租户/方法/路由，原收据回放前复核授权；对象字段顺序不影响请求摘要，原文/null/答案数组顺序/版本变化会改变请求摘要。
+
+列表返回摘要，不返回全部模板项和答案正文；page_size只允许10/15/20，当前租户与可选asset_id过滤，日期/ID游标成对。详情/历史返回冻结template_items和已填observations；只读请求不隐式保存。DTO保留独立的template_content_sha256与执行单content_sha256，并展示自动summary。reported_performed_at=null配NOT_PROVIDED，非空配SELF_REPORTED_TIME；模板批准/适用性UNVERIFIED、执行结果SELF_REPORTED_UNVERIFIED、证据绑定/报告发布NOT_IMPLEMENTED、report_published=false、active_scan_performed=false。
+
+health/ready增加执行单结构/权限核验；缺少V22或不可访问返回503，不把缺失结构当正常。ready通过也不代表巡检发生、证据上传、模板批准或季度报告发布。实际OpenAPI0.36新增13个schema；原81条路径逐项JSON比较不变，仅既有ReadinessResult增加必需执行单字段。没有新增迁移，V1–V22冻结。
+
+16控制器测试和1新增ready测试通过；初次最大输入测试的Mockito二次when触发旧answer空参数，改用doAnswer后46项聚焦通过，保留失败日志；不是实际API业务失败。86契约/生成一致性通过，根1753报告1740实际执行（554真实PG）+13历史fixture跳过、6MinIO排除，失败/错误0。后续真实HTTP、普通组件重启和Web结果另按实际证据记录，未通过项不预标成功。
+
+最终新增124次真实HTTP（200×81/400×21/401×1/403×9/404×6/409×6）通过：实际PG/OIDC/CSRF、同键/同版本并发、未知时间/未填、独立UTF-8指纹、旧收据、模板变更/归档后的原执行单解释、资产10+1分页、跨租户资源404与目录能力分类。14合成执行单和2合成模板全部归档，原历史保留；HTTP窗口28张其他业务表完整行等值。
+
+部署新API前正常退出原QA2689并用同一run-stack.sh启动现有PG/KC/API，新QA62871；PG日志确认正常关闭再启动，不是强制崩溃。重启前后9张巡检/审计/收据/身份表完整行指纹等值，涵盖75个既有执行单；此核对发生在刷新6个OIDC会话之前。新API jar SHA为66bba03043ee00d08d8f5eeaaa771dbbd01e9e347ad13bb2dca399b28eae366f；未建新凭据、未迁移、未修改原服务器。
+
+首次独立Web执行器73087在轮询时取消审核、随后Unknown process id，日志没有完整结果，不计通过；随后在现有QA62871完整执行1059Web/66文件、vue-tsc及构建通过。没有真实浏览器或执行单页面验收，B03仍在。见[API综合证据](evidence/niko-inspection-worksheet-api-20261004.json)和[实际HTTP](evidence/niko-inspection-worksheet-api-http-20261004.json)。

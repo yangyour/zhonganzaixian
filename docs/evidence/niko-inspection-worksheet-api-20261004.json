@@ -1,0 +1,81 @@
+{
+  "verified_at": "2026-10-04T10:48:25.990176+00:00",
+  "environment": "niko-local-test",
+  "api_contract_version": "0.36.0",
+  "new_java_controller_tests": 16,
+  "new_readiness_tests": 1,
+  "focused_tests": 46,
+  "contracts": 86,
+  "contract_generation": "PASS",
+  "root_tests": {
+    "reported": 1753,
+    "executed": 1740,
+    "real_postgres": 554,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "web_tests": 1059,
+  "web_files": 66,
+  "web_typecheck": "PASS",
+  "web_build": "PASS",
+  "existing_contract_paths_unchanged": 81,
+  "changed_existing_contract_schemas": [
+    "ReadinessResult"
+  ],
+  "new_schemas": 13,
+  "actual_http_evidence": "niko-inspection-worksheet-api-http-20261004.json",
+  "http_window_other_tables": 28,
+  "http_window_other_tables_equal": true,
+  "normal_existing_stack_restart": {
+    "before_session": 2689,
+    "after_session": 62871,
+    "old_stack_exited_normally": true,
+    "existing_pg_data_and_credentials_reused": true,
+    "postgres_graceful_shutdown_observed": true,
+    "fingerprinted_tables": 9,
+    "equal_before_new_logins": true,
+    "preexisting_worksheet_heads": 75,
+    "new_credentials": false,
+    "new_migrations": 0,
+    "forced_crash": false,
+    "physical_outage_tested": false,
+    "api_jar_sha256": "66bba03043ee00d08d8f5eeaaa771dbbd01e9e347ad13bb2dca399b28eae366f"
+  },
+  "schema_version": 22,
+  "original_server_changed": false,
+  "object_storage_enabled": false,
+  "browser_tested": false,
+  "worksheet_ui_implemented": false,
+  "quarterly_report_implemented": false,
+  "template_applicability": "UNVERIFIED",
+  "formal_acceptance": "NOT_RUN",
+  "corrected_initial_failures": [
+    {
+      "scope": "maximum request controller unit test",
+      "failure": "Mockito repeated when invoked prior answer with null; use doAnswer",
+      "resolved": true
+    },
+    {
+      "scope": "initial Web test executor",
+      "failure": "poll approval review cancelled, then Unknown process id73087; log partial without final suite result",
+      "resolved": "rerun completed in existing QA62871; first attempt not counted"
+    }
+  ],
+  "logs": [
+    ".local/niko-test/logs/worksheet-api-contracts-first-20261004.log",
+    ".local/niko-test/logs/worksheet-api-focused-first-20261004.log",
+    ".local/niko-test/logs/worksheet-api-focused-second-20261004.log",
+    ".local/niko-test/logs/worksheet-api-http-first-20261004.log",
+    ".local/niko-test/logs/worksheet-api-other-after-20261004.log",
+    ".local/niko-test/logs/worksheet-api-other-before-20261004.log",
+    ".local/niko-test/logs/worksheet-api-restart-after-20261004.log",
+    ".local/niko-test/logs/worksheet-api-restart-before-20261004.log",
+    ".local/niko-test/logs/worksheet-api-root-20261004.log",
+    ".local/niko-test/logs/worksheet-api-schema-20261004.log",
+    ".local/niko-test/logs/worksheet-api-sessions-20261004.json",
+    ".local/niko-test/logs/worksheet-api-web-20261004.log",
+    ".local/niko-test/logs/worksheet-api-web-retry-20261004.log"
+  ]
+}

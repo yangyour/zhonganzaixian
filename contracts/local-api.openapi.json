@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.35.0",
+    "version": "0.36.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -18052,6 +18052,1282 @@
           }
         }
       }
+    },
+    "/inspection-worksheets": {
+      "get": {
+        "operationId": "listInspectionWorksheetDrafts",
+        "summary": "读取当前租户人工执行单摘要；按资产/归档状态与稳定游标分页",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-readonly": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-reject-duplicate-query-keys": true,
+        "parameters": [
+          {
+            "name": "asset_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "CURRENT",
+                "ARCHIVED",
+                "ALL"
+              ],
+              "default": "CURRENT"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                20
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_created_at",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-paired-query-keys": [
+          "before_created_at",
+          "before_id"
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionWorksheetPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createInspectionWorksheetDraft",
+        "summary": "绑定真实资产与当前未归档模板候选版本创建人工草稿；未填不变正常",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionWorksheetCreate"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-before-replay-authorization": true,
+        "x-mop-body-max-bytes": 2097152,
+        "x-mop-json-max-tokens": 2000,
+        "x-mop-json-max-depth": 4,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-reject-all-query-keys": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionWorksheetResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inspection-worksheets/{id}": {
+      "get": {
+        "operationId": "getInspectionWorksheetDraft",
+        "summary": "读取执行单冻结模板和人工答案；跨租户404",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-readonly": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-reject-duplicate-query-keys": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionWorksheetResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateInspectionWorksheetDraft",
+        "summary": "CAS保存完整答案新修订；不重绑资产或模板",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionWorksheetUpdate"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-before-replay-authorization": true,
+        "x-mop-body-max-bytes": 2097152,
+        "x-mop-json-max-tokens": 2000,
+        "x-mop-json-max-depth": 4,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-reject-all-query-keys": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionWorksheetResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inspection-worksheets/{id}/history": {
+      "get": {
+        "operationId": "listInspectionWorksheetHistory",
+        "summary": "读取不可变执行单修订，按原模板解释而非当前模板",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-readonly": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "x-mop-reject-duplicate-query-keys": true,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                20
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740990
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionWorksheetHistoryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inspection-worksheets/{id}/archive": {
+      "post": {
+        "operationId": "archiveInspectionWorksheetDraft",
+        "summary": "显式CAS归档，复制原内容且保留历史",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionWorksheetArchive"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-before-replay-authorization": true,
+        "x-mop-body-max-bytes": 2097152,
+        "x-mop-json-max-tokens": 2000,
+        "x-mop-json-max-depth": 4,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-reject-all-query-keys": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionWorksheetResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inspection-worksheets/{id}/restore": {
+      "post": {
+        "operationId": "restoreInspectionWorksheetDraft",
+        "summary": "显式提交完整内容恢复；仍为未核验人工草稿",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionWorksheetUpdate"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-before-replay-authorization": true,
+        "x-mop-body-max-bytes": 2097152,
+        "x-mop-json-max-tokens": 2000,
+        "x-mop-json-max-depth": 4,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-reject-all-query-keys": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionWorksheetResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -18710,6 +19986,38 @@
                 ],
                 "additionalProperties": false
               },
+              "inspection_worksheets": {
+                "type": "object",
+                "properties": {
+                  "schema_access_ready": {
+                    "const": true
+                  },
+                  "verification_status": {
+                    "const": "SELF_REPORTED_UNVERIFIED"
+                  },
+                  "evidence_binding_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "publication_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "report_published": {
+                    "const": false
+                  },
+                  "active_scan_performed": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "schema_access_ready",
+                  "verification_status",
+                  "evidence_binding_status",
+                  "publication_status",
+                  "report_published",
+                  "active_scan_performed"
+                ],
+                "additionalProperties": false
+              },
               "working_calendars": {
                 "type": "object",
                 "properties": {
@@ -18852,6 +20160,7 @@
               "asset_reads",
               "inspection_templates",
               "contact_imports",
+              "inspection_worksheets",
               "working_calendars",
               "manual_incidents",
               "manual_recovery",
@@ -36244,6 +37553,1144 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/InspectionTemplateHistory"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionWorksheetObservation": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+            "maxLength": 64
+          },
+          "result": {
+            "enum": [
+              "NORMAL",
+              "ATTENTION",
+              "REQUIRES_ACTION"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 3000
+          }
+        },
+        "required": [
+          "key",
+          "result",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionWorksheetCounts": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "answered": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "normal": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "attention": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "requires_action": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "unanswered": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "all_results_entered": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "total",
+          "answered",
+          "normal",
+          "attention",
+          "requires_action",
+          "unanswered",
+          "all_results_entered"
+        ],
+        "additionalProperties": false,
+        "x-mop-derived-only": "Counts derive from observations and frozen template; answered=normal+attention+requires_action; total=answered+unanswered. Not a report numeric input.",
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "all_results_entered": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "unanswered": {
+                  "const": 0
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "unanswered": {
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        ]
+      },
+      "InspectionWorksheetCreate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "const": 0
+          },
+          "asset_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "template_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "template_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "observations": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/InspectionWorksheetObservation"
+            },
+            "x-mop-unique-key": "key",
+            "description": "Only answered frozen-template keys. Missing keys remain unanswered; no evidence reference fields."
+          },
+          "reported_performed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Explicit self-reported inspection time, timezone and millisecond precision, year0001–9999, no later than actual PG recording time. Null is not replaced with recording time."
+          }
+        },
+        "required": [
+          "expected_version",
+          "asset_id",
+          "template_id",
+          "template_version",
+          "observations",
+          "reported_performed_at"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionWorksheetUpdate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740989
+          },
+          "observations": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/InspectionWorksheetObservation"
+            },
+            "x-mop-unique-key": "key",
+            "description": "Only answered frozen-template keys. Missing keys remain unanswered; no evidence reference fields."
+          },
+          "reported_performed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Explicit self-reported inspection time, timezone and millisecond precision, year0001–9999, no later than actual PG recording time. Null is not replaced with recording time."
+          }
+        },
+        "required": [
+          "expected_version",
+          "observations",
+          "reported_performed_at"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionWorksheetArchive": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740989
+          }
+        },
+        "required": [
+          "expected_version"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionWorksheetSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "recorded_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "action": {
+            "enum": [
+              "CREATE",
+              "UPDATE",
+              "ARCHIVE",
+              "RESTORE"
+            ]
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "asset_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "asset_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "template_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "template_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "template_content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "template_device_type": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+            "maxLength": 64
+          },
+          "template_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "template_item_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reported_performed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Explicit self-reported inspection time, timezone and millisecond precision, year0001–9999, no later than actual PG recording time. Null is not replaced with recording time."
+          },
+          "time_source": {
+            "enum": [
+              "NOT_PROVIDED",
+              "SELF_REPORTED_TIME"
+            ]
+          },
+          "summary": {
+            "$ref": "#/components/schemas/InspectionWorksheetCounts"
+          },
+          "verification_status": {
+            "const": "SELF_REPORTED_UNVERIFIED"
+          },
+          "template_approval_status": {
+            "const": "UNVERIFIED"
+          },
+          "template_applicability_status": {
+            "const": "UNVERIFIED"
+          },
+          "publication_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "report_published": {
+            "const": false
+          },
+          "active_scan_performed": {
+            "const": false
+          },
+          "evidence_binding_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "record_source": {
+            "const": "MANUAL_INSPECTION_DRAFT"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "created_by",
+          "version",
+          "created_at",
+          "updated_at",
+          "recorded_by",
+          "recorded_at",
+          "action",
+          "archived",
+          "asset_id",
+          "asset_name",
+          "template_id",
+          "template_version",
+          "template_content_sha256",
+          "template_device_type",
+          "template_name",
+          "template_item_count",
+          "content_sha256",
+          "reported_performed_at",
+          "time_source",
+          "summary",
+          "verification_status",
+          "template_approval_status",
+          "template_applicability_status",
+          "publication_status",
+          "report_published",
+          "active_scan_performed",
+          "evidence_binding_status",
+          "source",
+          "record_source"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "ARCHIVE"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "archived": {
+                  "const": true
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "archived": {
+                  "const": false
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "time_source": {
+                  "const": "NOT_PROVIDED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "reported_performed_at": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "reported_performed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "InspectionWorksheet": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "recorded_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "action": {
+            "enum": [
+              "CREATE",
+              "UPDATE",
+              "ARCHIVE",
+              "RESTORE"
+            ]
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "asset_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "asset_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "template_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "template_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "template_content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "template_device_type": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+            "maxLength": 64
+          },
+          "template_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "template_item_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reported_performed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Explicit self-reported inspection time, timezone and millisecond precision, year0001–9999, no later than actual PG recording time. Null is not replaced with recording time."
+          },
+          "time_source": {
+            "enum": [
+              "NOT_PROVIDED",
+              "SELF_REPORTED_TIME"
+            ]
+          },
+          "summary": {
+            "$ref": "#/components/schemas/InspectionWorksheetCounts"
+          },
+          "verification_status": {
+            "const": "SELF_REPORTED_UNVERIFIED"
+          },
+          "template_approval_status": {
+            "const": "UNVERIFIED"
+          },
+          "template_applicability_status": {
+            "const": "UNVERIFIED"
+          },
+          "publication_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "report_published": {
+            "const": false
+          },
+          "active_scan_performed": {
+            "const": false
+          },
+          "evidence_binding_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "record_source": {
+            "const": "MANUAL_INSPECTION_DRAFT"
+          },
+          "template_items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/InspectionTemplateItem"
+            },
+            "x-mop-unique-key": "key",
+            "description": "Ordered items; duplicate keys forbidden. Item order, original text and null versus empty instruction are material."
+          },
+          "observations": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/InspectionWorksheetObservation"
+            },
+            "x-mop-unique-key": "key",
+            "description": "Only answered frozen-template keys. Missing keys remain unanswered; no evidence reference fields."
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "created_by",
+          "version",
+          "created_at",
+          "updated_at",
+          "recorded_by",
+          "recorded_at",
+          "action",
+          "archived",
+          "asset_id",
+          "asset_name",
+          "template_id",
+          "template_version",
+          "template_content_sha256",
+          "template_device_type",
+          "template_name",
+          "template_item_count",
+          "content_sha256",
+          "reported_performed_at",
+          "time_source",
+          "summary",
+          "verification_status",
+          "template_approval_status",
+          "template_applicability_status",
+          "publication_status",
+          "report_published",
+          "active_scan_performed",
+          "evidence_binding_status",
+          "source",
+          "record_source",
+          "template_items",
+          "observations"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "ARCHIVE"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "archived": {
+                  "const": true
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "archived": {
+                  "const": false
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "time_source": {
+                  "const": "NOT_PROVIDED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "reported_performed_at": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "reported_performed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        ],
+        "x-mop-integrity": "Exact MOP_INSPECTION_WORKSHEET_V1 UTF8 framed digest binds tenant/asset name/template id/version/hash/reported time and explicit observations in frozen template order. No source rebind or evidence-file grant."
+      },
+      "InspectionWorksheetResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/InspectionWorksheet"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionWorksheetRevision": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "previous_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9007199254740989
+          },
+          "recorded_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "action": {
+            "enum": [
+              "CREATE",
+              "UPDATE",
+              "ARCHIVE",
+              "RESTORE"
+            ]
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "asset_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "asset_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "template_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "template_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "template_content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "template_device_type": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+            "maxLength": 64
+          },
+          "template_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "template_item_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reported_performed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Explicit self-reported inspection time, timezone and millisecond precision, year0001–9999, no later than actual PG recording time. Null is not replaced with recording time."
+          },
+          "time_source": {
+            "enum": [
+              "NOT_PROVIDED",
+              "SELF_REPORTED_TIME"
+            ]
+          },
+          "summary": {
+            "$ref": "#/components/schemas/InspectionWorksheetCounts"
+          },
+          "verification_status": {
+            "const": "SELF_REPORTED_UNVERIFIED"
+          },
+          "template_approval_status": {
+            "const": "UNVERIFIED"
+          },
+          "template_applicability_status": {
+            "const": "UNVERIFIED"
+          },
+          "publication_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "report_published": {
+            "const": false
+          },
+          "active_scan_performed": {
+            "const": false
+          },
+          "evidence_binding_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "record_source": {
+            "const": "MANUAL_INSPECTION_DRAFT"
+          },
+          "template_items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/InspectionTemplateItem"
+            },
+            "x-mop-unique-key": "key",
+            "description": "Ordered items; duplicate keys forbidden. Item order, original text and null versus empty instruction are material."
+          },
+          "observations": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/InspectionWorksheetObservation"
+            },
+            "x-mop-unique-key": "key",
+            "description": "Only answered frozen-template keys. Missing keys remain unanswered; no evidence reference fields."
+          }
+        },
+        "required": [
+          "version",
+          "previous_version",
+          "recorded_by",
+          "recorded_at",
+          "action",
+          "archived",
+          "asset_id",
+          "asset_name",
+          "template_id",
+          "template_version",
+          "template_content_sha256",
+          "template_device_type",
+          "template_name",
+          "template_item_count",
+          "content_sha256",
+          "reported_performed_at",
+          "time_source",
+          "summary",
+          "verification_status",
+          "template_approval_status",
+          "template_applicability_status",
+          "publication_status",
+          "report_published",
+          "active_scan_performed",
+          "evidence_binding_status",
+          "source",
+          "record_source",
+          "template_items",
+          "observations"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "ARCHIVE"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "archived": {
+                  "const": true
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "archived": {
+                  "const": false
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "time_source": {
+                  "const": "NOT_PROVIDED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "reported_performed_at": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "reported_performed_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "version": {
+                  "const": 1
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "previous_version": {
+                  "type": "null"
+                },
+                "action": {
+                  "const": "CREATE"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "previous_version": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740990
+                },
+                "action": {
+                  "enum": [
+                    "UPDATE",
+                    "ARCHIVE",
+                    "RESTORE"
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      },
+      "InspectionWorksheetPage": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/InspectionWorksheetSummary"
+            }
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_before_created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "next_before_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "view": {
+            "enum": [
+              "CURRENT",
+              "ARCHIVED",
+              "ALL"
+            ]
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_PADMIN"
+          },
+          "page_size_limit": {
+            "const": 20
+          }
+        },
+        "required": [
+          "tenant_id",
+          "items",
+          "has_more",
+          "next_before_created_at",
+          "next_before_id",
+          "view",
+          "source",
+          "scope",
+          "page_size_limit"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "has_more": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "next_before_created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "next_before_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "items": {
+                  "minItems": 1
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "next_before_created_at": {
+                  "type": "null"
+                },
+                "next_before_id": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "InspectionWorksheetPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/InspectionWorksheetPage"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionWorksheetHistory": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "worksheet_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/InspectionWorksheetRevision"
+            }
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_before_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_PADMIN"
+          },
+          "page_size_limit": {
+            "const": 20
+          }
+        },
+        "required": [
+          "tenant_id",
+          "worksheet_id",
+          "items",
+          "has_more",
+          "next_before_version",
+          "source",
+          "scope",
+          "page_size_limit"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "has_more": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "next_before_version": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740990
+                },
+                "items": {
+                  "minItems": 1
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "next_before_version": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "InspectionWorksheetHistoryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/InspectionWorksheetHistory"
           },
           "trace_id": {
             "type": "string"

@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 38,
-  "rows_without_progress_notes": 90,
+  "rows_with_progress_notes": 39,
+  "rows_without_progress_notes": 89,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -51,7 +51,7 @@
     },
     "M6": {
       "requirements": 7,
-      "rows_with_progress_notes": 4,
+      "rows_with_progress_notes": 5,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 7
       }
@@ -914,8 +914,11 @@
       "id": "M6-7",
       "title": "变更检测与报备联动",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/change-notice-drafts.md",
+        "docs/evidence/niko-change-notice-core-20261004.json"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1344,6 +1347,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "e2109fb1bf6e96bb4f8fbe57a4f3d841834c9b9c55b3dce50fa023dd1aace3d3"
+    "doc/development/07_合同逐项开发追踪.md": "c9a4b871522f0f3738d88862fb42d6d72fe8cf12560d96e6b0702bb9386d10e8"
   }
 }

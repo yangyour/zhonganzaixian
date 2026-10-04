@@ -1,0 +1,60 @@
+{
+  "verified_at": "2026-10-04T19:06:52.385082+00:00",
+  "scope": "PURE_UNREVIEWED_CHANGE_NOTICE_PROPOSAL_NOT_MATCHING_OR_APPROVAL",
+  "contract": "M6-7/T00R084",
+  "related_monitoring_contract": "M4-17/T00R054",
+  "new_pure_tests": 21,
+  "focused_tests": 60,
+  "root_tests_reported": 1996,
+  "root_tests_executed": 1983,
+  "actual_postgresql_regressions": 642,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "failures": 0,
+  "errors": 0,
+  "planned_end_can_be_unknown": true,
+  "default_start_end_or_tolerance_invented": false,
+  "approval_status": null,
+  "approval_workflow_status": "CONFIG_PENDING",
+  "matching_policy_status": "CONFIG_PENDING",
+  "automatic_p3_decision": null,
+  "effective": false,
+  "alert_suppression_allowed": false,
+  "device_execution_allowed": false,
+  "reference_existence_or_authorization_verified": false,
+  "golden": {
+    "independent_encoder": "Python struct big-endian UTF-8",
+    "bytes": 243,
+    "sha256": "36e3b2c1427636355944e0a1e256b0305a82946add4498e036246f4d0165f3be"
+  },
+  "schema_version": 24,
+  "migrations_executed": 0,
+  "change_notice_business_database_writes": 0,
+  "api_version": "0.39.0",
+  "api_contract_changed": false,
+  "live_api_restarted": false,
+  "ssh_calls": 0,
+  "storage_calls": 0,
+  "new_browser_or_ui_verification": false,
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/change/ChangeNoticeDraft.java": "e4b2a371e8e19552e5f7c436f1af8a1115ff08a9a8fb7aa6f8ea2668a098a149",
+    "server/api/src/test/java/cn/mop/api/ChangeNoticeDraftTest.java": "a35f3001a45f237a32e80359f9605493accb12d2dead970e7276839db6c24c30"
+  },
+  "logs_sha256": {
+    "change-notice-core-focused-20261004.log": "0d50efd89ca90f15ce5586e5dc6800566d4669cb14fb68d2599660892e74bc16",
+    "change-notice-core-full-20261004.log": "ee2221506123d74118b0521f01be3e82f520dc5f1fc4fe8bd7ce52d450b50d0b",
+    "change-notice-core-contracts-20261004.log": "8f871d4a800027d20ed066ba966ea498ba333bc05ca47690ee09887619e867fc",
+    "change-notice-core-tracker-20261004.log": "0c3fe67f9d59ad109e3efced6a6340d3b46aaca6771b6442cb694313a2e9c14d"
+  },
+  "previous_page_commit": {
+    "sha": "7abd845f99d472f8eae4b54b2a282e71565c5bb0",
+    "ci_run": 37226209707,
+    "conclusion": "success"
+  },
+  "contracts": 103,
+  "contract_generation": "PASS",
+  "tracker_tests": 17,
+  "tracker_requirements": 128,
+  "tracker_rows_with_notes": 39
+}

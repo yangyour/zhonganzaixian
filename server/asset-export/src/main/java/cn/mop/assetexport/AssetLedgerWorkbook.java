@@ -1,6 +1,7 @@
 package cn.mop.assetexport;
 
 import cn.mop.domain.DomainException;
+import cn.mop.domain.assetexport.AssetExportJobState;
 import cn.mop.domain.assetimport.AssetImportPrechecker.Column;
 import cn.mop.domain.assetimport.source.AssetImportSchema;
 import org.apache.poi.ss.usermodel.*;
@@ -16,7 +17,7 @@ import java.util.zip.*;
 /** Bounded explicit-input encoding only. No database, object store, URL, notification, credentials or authorization grant. */
 public final class AssetLedgerWorkbook {
     private AssetLedgerWorkbook() {}
-    public static final int MAX_ROWS=1000, MAX_CELL_CODEPOINTS=2000, MAX_INPUT_UTF8_BYTES=8*1024*1024, MAX_OUTPUT_BYTES=16*1024*1024;
+    public static final int MAX_ROWS=AssetExportJobState.MAX_DATA_ROWS, MAX_CELL_CODEPOINTS=2000, MAX_INPUT_UTF8_BYTES=8*1024*1024, MAX_OUTPUT_BYTES=AssetExportJobState.MAX_FILE_BYTES;
     public static final String SCHEMA_VERSION="contract-m3-7-standard15-plus-warranty-status-v1";
     public record Row(UUID tenantId,UUID assetId,Map<Column,String> cells,String warrantyStatus) {
         public Row {

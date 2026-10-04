@@ -1,0 +1,158 @@
+{
+  "verified_at": "2026-10-04T02:48:08.382Z",
+  "environment": "designated-server",
+  "source_backend": "3eb1d42",
+  "source_web": "9aad338 with local sidebar correction",
+  "api_contract_version": "0.34.0",
+  "browser": "154.0.4258.53",
+  "viewports": [
+    [
+      1440,
+      900
+    ],
+    [
+      1366,
+      768
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "passed": true,
+  "checks": [
+    {
+      "name": "contact_crud_and_mobile_history",
+      "passed": true,
+      "id": "d203187b-5aca-43ae-9389-8d95ff75fdc9",
+      "versions": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "restore_enabled": false
+    },
+    {
+      "name": "contact_dirty_navigation_cancel",
+      "passed": true
+    },
+    {
+      "name": "fresh_browser_real_oidc",
+      "passed": true
+    },
+    {
+      "name": "explicit_capacity_and_growth_real_api",
+      "passed": true,
+      "hosts": [
+        600,
+        1200
+      ],
+      "nvps": "300"
+    },
+    {
+      "name": "capacity_immutable_draft_saved_and_readback",
+      "passed": true,
+      "id": "4bd3bb8d-75f3-4ac5-a0d3-157d2bac0f7f",
+      "benchmark_reference": null,
+      "nvps": "300"
+    },
+    {
+      "name": "mobile_capacity_saved_snapshot",
+      "passed": true,
+      "id": "4bd3bb8d-75f3-4ac5-a0d3-157d2bac0f7f",
+      "fit": {
+        "width": 390,
+        "documentWidth": 390,
+        "overflow": false
+      }
+    },
+    {
+      "name": "threshold_consistent_then_conflicting_without_rewrite",
+      "passed": true,
+      "publishable": false,
+      "recovery": "GT 15"
+    },
+    {
+      "name": "threshold_leave_cancel_then_explicit_clear",
+      "passed": true
+    },
+    {
+      "name": "tenant_twelve_columns_and_same_snapshot_detail",
+      "passed": true,
+      "column_count": 12,
+      "extra_detail_gets": 0
+    },
+    {
+      "name": "mobile_tenant_inventory_unknowns_and_detail",
+      "passed": true,
+      "fit": {
+        "width": 390,
+        "documentWidth": 390,
+        "overflow": false
+      }
+    },
+    {
+      "name": "short_desktop_sidebar_all_navigation_and_footer_reachable",
+      "passed": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "sidebar": {
+        "clientHeight": 768,
+        "scrollHeight": 886,
+        "overflowY": "auto"
+      }
+    },
+    {
+      "name": "asset_readonly_refresh_preserves_null_sample_and_fact_snapshot",
+      "passed": true,
+      "asset_id": "471b3ff3-304a-1f80-1314-990e5b8d2373",
+      "sampled_at": null,
+      "response_date": "2026-10-04T02:40:05Z"
+    },
+    {
+      "name": "switch_asset_does_not_invent_sample",
+      "passed": true
+    },
+    {
+      "name": "mobile_sample_time_readability",
+      "passed": true,
+      "fit": {
+        "width": 390,
+        "documentWidth": 390,
+        "overflow": false
+      }
+    },
+    {
+      "name": "latest_readonly_import_refs_real_xlsx_mapping",
+      "passed": true,
+      "source_id": "ec3a108b-f291-4c87-9d2a-239c0cbeab68",
+      "source_version": 7,
+      "mapping_version": 1,
+      "can_import": false,
+      "preview_hash": "12cc96d85c703671295255bc1c55fb8cc4fbf820b1f24a10196a370a213e03b1"
+    },
+    {
+      "name": "mobile_threshold_conflict_readability",
+      "passed": true,
+      "fit": {
+        "width": 390,
+        "documentWidth": 390,
+        "overflow": false
+      }
+    }
+  ],
+  "errors": [],
+  "contact_import_evidence": "local-contact-import-dom-final-20261004.json",
+  "interruption": "Earlier REPL reset after in-flight fault injection; job 4d8597f4-c152-46c4-a4af-acf8df104ec7 was read back as SUCCEEDED with two results, and never resubmitted. Dedicated browser runner now persists original requests before dispatch and waits for actual response capture.",
+  "remaining": [
+    "Physical mobile and enterprise WeChat",
+    "Actual bfcache/visibility invalidation with a real non-null monitored sample",
+    "All calendar/worklog/comment/SLA control flows",
+    "Production benchmark, monitoring publication and notifications"
+  ],
+  "credentials_output": false,
+  "contract_done": false
+}

@@ -195,6 +195,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/local-browser-validation-20261004.md",
         "docs/tenant-inventory.md"
       ],
       "external_references_unchecked": 0,
@@ -271,7 +272,8 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
-        "docs/customer-contacts.md"
+        "docs/customer-contacts.md",
+        "docs/local-browser-validation-20261004.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -385,6 +387,7 @@
         "docs/evidence/dot-import-refresh-20261002.json",
         "docs/evidence/dot-import-template-download-20261002.json",
         "docs/local-browser-validation-20261003.md",
+        "docs/local-browser-validation-20261004.md",
         "docs/local-runtime-validation-20261003.md"
       ],
       "external_references_unchecked": 0,
@@ -1250,7 +1253,8 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
-        "docs/capacity-estimate-core.md"
+        "docs/capacity-estimate-core.md",
+        "docs/local-browser-validation-20261004.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1318,6 +1322,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "fae86866863f0a175ad316ffef546a29f2ac06e7fc6efac2d9bd67d1ee0ca409"
+    "doc/development/07_合同逐项开发追踪.md": "747fbd908e73cc2186d4cccd0d4d9305a315ec03d2fa11b5e66404f5bfaaf63e"
   }
 }

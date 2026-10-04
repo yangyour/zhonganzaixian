@@ -1,0 +1,46 @@
+{
+  "verified_at": "2026-10-04T02:30:21.987Z",
+  "environment": "designated-server",
+  "passed": true,
+  "checks": [
+    "initial_input_empty",
+    "malformed_json_cannot_submit",
+    "identical_rows_require_explicit_ack",
+    "uncertain_input_locked",
+    "ordinary_read_does_not_confirm_original_post",
+    "original_body_bytes_preserved",
+    "original_idempotency_key_preserved",
+    "same_original_job_receipt",
+    "dedicated_worker_completed_both_rows",
+    "identical_rows_create_distinct_contacts",
+    "completion_refs_are_v1",
+    "receipt_still_pending_after_job_completed",
+    "desktop_no_document_horizontal_overflow",
+    "mobile_same_actor_sees_completed_job",
+    "mobile_no_document_horizontal_overflow"
+  ],
+  "real_response_discarded": true,
+  "fabricated_business_responses": 0,
+  "credentials_output": false,
+  "notifications_sent": false,
+  "browser": "154.0.4258.53",
+  "job_id": "fa242300-7455-46fb-922d-8c83cbc97ab6",
+  "original_body_sha256": "5ba7f357f1f1120676bdb72d74bb27527b7db26e7282364f0ac9abaf16dc368b",
+  "contacts": [
+    {
+      "row_number": 1,
+      "contact_id": "29a15bcc-846c-4c39-b669-e5637ec3783b",
+      "contact_version": 1
+    },
+    {
+      "row_number": 2,
+      "contact_id": "c5d0fdb4-d4f2-4cb7-953b-641a16a4462c",
+      "contact_version": 1
+    }
+  ],
+  "remaining": [
+    "Physical mobile/enterprise WeChat",
+    "Actual notification delivery",
+    "In-flight Windows worker crash and fencing"
+  ]
+}

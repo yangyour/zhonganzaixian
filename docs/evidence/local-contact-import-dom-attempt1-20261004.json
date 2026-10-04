@@ -1,0 +1,16 @@
+{
+  "verified_at": "2026-10-04T02:26:32.903Z",
+  "environment": "designated-server",
+  "passed": false,
+  "checks": [
+    "initial_input_empty",
+    "malformed_json_cannot_submit",
+    "identical_rows_require_explicit_ack"
+  ],
+  "real_response_discarded": false,
+  "fabricated_business_responses": 0,
+  "credentials_output": false,
+  "notifications_sent": false,
+  "browser": "154.0.4258.53",
+  "failed_stage": "real_202_discard"
+}

@@ -973,3 +973,7 @@ Playwright1.62.1官方Chrome Headless Shell151下载返回HTTP200却为195bytes�
 ## 2026-10-04 原服务器V16–V19
 
 原PG17.9项目库四功能逐次1/0、最终只读0；原Keycloak/MinIO版本实读、项目库备份文件SHA256留证，未恢复演练。58迁移和27归属隔离检查通过、真实schema/ACL通过；没有API/Worker自动迁移、没有修改冻结SQL。894Web/类型构建也通过，完整399PG/存储/Worker/DOM执行结果单列，不继承Dot结果。[V19证据](evidence/local-schema-v19-20261004.json)。
+
+## 2026-10-04 本地真实桌面/390px与原请求恢复
+
+详见[DOM记录](local-browser-validation-20261004.md)。联系人v1至v4四动作与历史、真实202丢响应后的原body/key回放同一作业、专用Worker完成2个不同联系人、容量方案与增长、阈值冲突不改写、12列租户与同快照详情、读取时间不补采样、原MinIO最新XLSX映射通过。浏览器脚本最终15项，另有交互场景，不与首轮重复成功计数累加；首轮等待条件过早及REPL中断边界保留。927Web和类型/构建通过，短屏侧栏原问题已修。

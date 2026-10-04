@@ -1,0 +1,10 @@
+{
+  "sha256": {
+    "V20__durable_asset_export_jobs.sql": "5f8114dcdd2bd1cdf0c60fb75a5b521175462f583786602cd2b4a1835f960a83"
+  },
+  "function_body_sha256": {
+    "mop_asset_export_transition_guard": "dc7df00d950bce4629ad150f3df6a406281b3ee44aee7c36e8ecb26bced281f5",
+    "mop_asset_export_attempt_guard": "7eb47c2b33b52a14731cd3f5e8ddf82c6b94eb55818e7123477f88a0f96e33cd",
+    "mop_asset_export_capture_attempt": "8f697e8c89a138e5adfe15de5ca179bbd6ec126ed707d65c7bcc8cc4c8788e9e"
+  }
+}

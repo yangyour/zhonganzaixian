@@ -74,3 +74,7 @@ niko重建测试库已显式独立执行V18__durable_contact_import_jobs.sql一�
 ## V19生成列触发器修正冻结（2026-10-03 18:40 UTC）
 
 V18真实领取测试发现BEFORE触发器误比较尚未计算的生成hash列，原V18保持不变，已新增V19__contact_import_generated_hash_guard.sql并在niko新库显式执行1次，SHA256为b84a80aa548a7c2d7d3050bb983214353cd3e1951f5d3ac1b04b413cedc2cdc7。当前V1–V19全部字节冻结，后续修正新增V20或更高。V19只修正不可变基础字段比较；结构通过不等于作业受理、Worker、故障重启或合同验收完成，实际回归证据另记。原指定服务器未执行V18/V19，API/Worker不自动迁移。
+
+## V20异步台账导出结构冻结（2026-10-04 03:55 UTC）
+
+niko独立测试库已通过独立CLI显式执行V20__durable_asset_export_jobs.sql一次并通过结构/ACL核对，SHA256为5f8114dcdd2bd1cdf0c60fb75a5b521175462f583786602cd2b4a1835f960a83。V1–V20全部字节冻结，后续SQL修正新增V21或更高。首次未生效候选有CASE语法错误，事务完整回滚且只读检查确认仍V19/无导出结构，保留失败日志后修正未应用候选才成功；不能把该失败候选当作已应用历史。结构仅代表不可变受理、租约历史及文件/回执描述约束，不证明实际OSS、异步API/Worker、下载或通知。原指定服务器V20未执行；API/Worker仍不自动迁移。

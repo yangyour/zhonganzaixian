@@ -175,3 +175,7 @@ V1–V14全部字节冻结，V14 SHA256为39be55d8759de87c6e2b8f85b3958c60be24ae
 ## API0.32联系人导入实际HTTP入口
 
 在已有隔离PG/KC与固定API0.32启动的QA shell，先运行capture-http-sessions.py刷新6会话，再显式运行tools/niko-test/verify-contact-import-api.py --verify-public-contact-import-api。一次性控制与证据已存在则拒绝重启场景；先确认无未完成作业/其他Worker，真实公开202受理后只启动/核验/关闭自身固定专用Worker。结果按实际公开接口逐条读取和归档合成联系人，5无关队列/身份表指纹一致，无迁移/新凭据。当前已验388请求、19作业、119联系人归档，Worker最终停止；重建栈只复用已批准本地数据，原服务器不改。
+
+## 2026-10-04 独立V20导出结构
+
+新增--apply-asset-exports，要求完整冻结V1–V19；V20真实执行1次后重复0/只读检查0，当前V1–V20冻结。28既有业务表迁移前后相同；首个未应用语法错误候选完整回滚并留证，修正后才成功。实际结构不代表API/Worker/OSS/下载已接通，原服务器V20未执行。见[导出结构与证据](asset-export-jobs.md)。

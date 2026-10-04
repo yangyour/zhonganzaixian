@@ -400,6 +400,7 @@
       "has_progress_note": true,
       "local_references": [
         "docs/asset-export-job-state.md",
+        "docs/asset-export-jobs.md",
         "docs/asset-export-snapshot.md",
         "docs/asset-ledger-export-encoding.md"
       ],
@@ -1324,6 +1325,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "d7c33ba166679f8e7c46b3d98ea8604bf6ddbccb719c537f93cf3e81fb31f36c"
+    "doc/development/07_合同逐项开发追踪.md": "e84d24a9bae5aab2dc0dfd5d2b5f824b7c4fb246305750233d8eede3e06f92c1"
   }
 }

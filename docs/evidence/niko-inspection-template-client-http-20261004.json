@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-04T08:55:53.326Z",
+  "environment": "niko-local-test",
+  "environment_instance": "rebuilt-20261003-after-executor-loss",
+  "api_version": "0.35.0",
+  "frontend": "actual inspectionTemplateWorkspace and ApiClient",
+  "http_requests": 99,
+  "template_mutation_attempts": 62,
+  "synthetic_templates_created": 18,
+  "all_own_created_templates_archived_with_history": true,
+  "permanent_deletes": 0,
+  "four_original_write_actions_recovered_after_real_403": true,
+  "original_body_path_method_key_preserved": true,
+  "ordinary_reads_do_not_resolve_unknown_writes": true,
+  "original_receipt_and_newer_current_projection_separate": true,
+  "actual_list_pages": [
+    15,
+    1
+  ],
+  "actual_history_pages": [
+    15,
+    2
+  ],
+  "duplicate_submit_suppressed": true,
+  "late_real_response_rejected_after_context_and_disposal": true,
+  "readonly_audit_tail_unchanged": true,
+  "faults": "4 committed write responses and 1 successful GET discarded; 4 successful responses held in transport; 4 retries used actual msp session and were403; not physical network/process outage",
+  "identity_binding_created": false,
+  "notification_dispatched": false,
+  "browser_dom_tested": false,
+  "template_page": "NOT_IMPLEMENTED",
+  "credentials_output": false,
+  "contract_done": false,
+  "template_approval": "UNVERIFIED",
+  "report_published": false,
+  "active_scan_performed": false
+}

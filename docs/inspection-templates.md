@@ -86,3 +86,15 @@ DTO明确approval_status=UNVERIFIED、publication_status=NOT_IMPLEMENTED、repor
 - 首次HTTP7次读取在ready阶段发现旧契约遗漏contact_imports；没有创建模板/待定写请求，失败控制记录保留。补实际契约后使用显式重试入口执行最终117次，不把失败7次合并算独立通过用例。一次辅助探针的URN标识拼写错误发生在发HTTP之前，修正探针后定位了该额外字段
 
 证据：[117HTTP](evidence/niko-inspection-template-api-http-20261004.json)、[目录回读](evidence/niko-inspection-capability-http-20261004.json)、[实施汇总](evidence/niko-inspection-template-api-20261004.json)。公开API只到未发布模板维护；模板页面、巡检执行单持久化、季度汇总和H5/PDF/客户发布仍待，Q23/Q24未解除，M9-7和128项正式验收不标DONE。
+
+## 前端请求模块、摘要校验与原请求恢复（2026-10-04）
+
+`inspectionTemplates.ts`/`inspectionTemplateWorkspace.ts`接真实API 0.35。完整定义严格字段/Unicode/项唯一性/版本校验；列表只接受摘要，详情和每条历史由WebCrypto重算与Java/PG同格式的有序UTF-8指纹。字段边界、原文、null/空及项顺序均保留。历史按连续版本倒序、列表按纳秒时间/id倒序验证，页长15与真实游标配对，拒绝未知来源/批准/发布/扫描伪事实。
+
+请求、基线、响应、getter和回调均分离拷贝；第一次await之前固定body/path/method/key。基线摘要核验在实际写请求之前进行，散列等待中租户/权限变更会阻止发送；响应散列等待中复位或卸载也不回填旧数据。第一次明确拒绝可显式解锁，成功响应丢失/无效则保持uncertain；后续403/409等拒绝不证明原请求没提交，继续保留完全相同的原请求。普通列表/详情/历史GET不确认原写回执，旧原收据与较新的当前状态分开；同版本内容变异或比已知回执更旧的读结果拒绝显示。
+
+59新增前端测试（33定义/读取、26状态场景）通过，Web全量1042、类型/构建、80契约/生成一致性通过。初次类型检查发现两处可空状态访问，改为显式非null守卫后通过。Java/数据库结构未改；此轮不重新声称新增后端回归。
+
+实际打包生产ApiClient和模块，通过99次真实PG/OIDC HTTP验证，含62次模板写尝试：四种已实际提交的成功响应在传输封装中被受控丢弃，随后各用真实MSP会话得到403，保持原body/path/method/key再恢复原收据；没有修改任何身份的角色来模拟撤权。另丢弃1次成功GET，延迟4次真实成功响应，验证双击抑制、上下文清理/卸载不回填。它们是响应处理故障注入，不是物理网络中断、浏览器故障或进程崩溃。
+
+真实列表15+1、历史15+2分页通过，原收据v1与后续v2及其他修订分开，普通GET不解锁未知写。18个自建合成模板全部归档保留历史，未永久删除；成功只读窗口的审计尾不变。审批仍UNVERIFIED、未发布/未扫描。控制文件`.local/niko-test/inspection-client-control.json`已完成且不得盲重跑；实际浏览器DOM/模板维护页面仍是下一步，见[99HTTP](evidence/niko-inspection-template-client-http-20261004.json)、[前端汇总](evidence/niko-inspection-template-client-20261004.json)。API提交9d9740e的CI37189740530已通过。

@@ -1,0 +1,38 @@
+{
+  "verified_at": "2026-10-04T08:57:42Z",
+  "environment": "niko-local-test",
+  "api_version": "0.35.0",
+  "new_frontend_tests": 59,
+  "validation_tests": 33,
+  "workspace_tests": 26,
+  "web_tests": 1042,
+  "web_files": 65,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts": 80,
+  "contract_generation": "PASS",
+  "actual_http_evidence": "niko-inspection-template-client-http-20261004.json",
+  "webcrypto_framing_matches_java_python_golden": true,
+  "state_and_command_detached": true,
+  "context_checked_before_dispatch_and_after_digest": true,
+  "initial_typecheck_issue": "two nullable-state guards fixed before final verification",
+  "initial_typecheck_log": ".local/niko-test/logs/inspection-workspace-type-first-20261004.log",
+  "new_backend_tests": 0,
+  "new_migrations": 0,
+  "browser_dom_tested": false,
+  "template_page_implemented": false,
+  "worksheet_persistence": false,
+  "quarterly_report": false,
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "apps/web/src/utils/inspectionTemplates.ts": "3f5b00522911102ca2d3733fba714bd1cc166436487d50eb14133787d9b37c47",
+    "apps/web/src/utils/inspectionTemplateWorkspace.ts": "c6e63b8b9d78515a566dd36bdc4df778481be8db926add21bcd53ab15cd12355"
+  },
+  "logs": [
+    ".local/niko-test/logs/inspection-client-all-first-20261004.log",
+    ".local/niko-test/logs/inspection-client-web-all-20261004.log",
+    ".local/niko-test/logs/inspection-client-web-build-20261004.log",
+    ".local/niko-test/logs/inspection-client-http-first-20261004.log",
+    ".local/niko-test/logs/inspection-client-contracts-20261004.log"
+  ]
+}

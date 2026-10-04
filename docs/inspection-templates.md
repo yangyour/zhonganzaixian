@@ -65,3 +65,24 @@ get/list/history使用独立只读REPEATABLE READ快照，拒绝在已有写事�
 首次后置检查错误地把“V21迁移后到两轮全根回归后”整个窗口当作本功能身份不变窗口，失败日志保留。实际旧配置诊断PG测试每轮新增5条test_pg_diagnostic合成身份记录（不创建OIDC登录账号）和10条成员测试数据，其他旧授权测试也递增权限版本；该宽窗口用户231→241、成员459→479，不能声称全根回归不改变这些表。另取最终聚焦19项前/后完整行指纹一致（用户241、成员479），才证明本巡检仓储测试没有更改身份/成员；未删除数据或回退权限版本来伪造等值。
 
 V21提交643f59d的CI37187286768已成功；job111391821682实际PowerShell执行76项隔离策略检查，DB操作0。当前仍无公开巡检HTTP、CSRF接口测试、页面或季度汇总；这些仓储事务不代替端到端验收，API仍0.34，V1–V21不改。见[仓储证据](evidence/niko-inspection-template-repository-20261004.json)。
+
+## API0.35与真实HTTP（2026-10-04）
+
+新增GET/POST `/api/v1/inspection-templates`、GET/PATCH `/{id}`、GET `/{id}/history`及POST `/{id}/archive`、`/{id}/restore`。仅当前授权padmin，新的代码能力声明同步分类到TEMPLATES_AUTOMATION；不创建角色/成员/客户签署矩阵。列表返回轻量摘要，不含检查项正文；详情/历史包含冻结有序项及内容摘要。按名称字面/设备类型/归档视图筛选，页长10/15/25/50/100，成对时间/id游标，历史版本游标；拒绝未知/重复参数。
+
+创建expected_version=0；改/归档/恢复1..9007199254740989，保留下一版本可安全表示。创建/改/恢复必须完整device_type/name/items，每项key/section/label/instruction必须显式存在，instruction可null或空。JSON对象键顺序不影响幂等摘要，数组顺序、原文、null/空、expected_version均影响；缺键/多键/重复项/重复JSON键、尾随JSON、超1MiB、深度>4、token>2000拒绝。每写需要当前CSRF与幂等键，不接受租户/批准/发布字段覆盖，也没有publish/delete/scan路径。
+
+DTO明确approval_status=UNVERIFIED、publication_status=NOT_IMPLEMENTED、report_published=false、active_scan_performed=false，source=postgresql。就绪检查增加V21结构/ACL/函数完整性，缺失503；liveness不依赖它，API/Worker不自动迁移。OpenAPI升为0.35.0，同时修复实际已返回contact_imports但旧ReadinessResult漏列的契约差异；worker_liveness仍null，结构就绪不表示Worker在线。
+
+18新增Java隔离测试（16控制器、1就绪、1能力分类）通过；根1677报告=1664执行（515真实PG）+13历史fixture跳过，6MinIO排除，0失败错误。80契约/生成一致性、983Web/类型/生产构建通过。实际正常停启本runner旧PG/KC/API并启动固定新JAR，SHA256=c36d870baf5784582a6736ed7d8ba43070226635ba67ba1a64b9306c3942a91e，6既有真实OIDC会话刷新；不是本轮故障恢复证明，不操作原指定服务器。
+
+最终117次真实HTTP逐响应Ajv核验：80×200、19×400、1×401、9×403、3×404、5×409。覆盖完整修订/历史/归档恢复、原回执、数组顺序冲突、原始UTF-8定义指纹的Node独立重算、实际双请求CAS200/409、同键并发唯一模板、当前角色/CSRF/幂等、三类外租户404、字面10+1分页和四合同设备类型/第五自定义类型。18个自建合成候选均归档保留历史；28张无关表在HTTP窗口前后完整行等值，正常审计/幂等与模板三表不在该“不变”集合内。另1次真实能力目录GET验证新增两能力padmin-only及未批准矩阵，已分类错误不再出现。
+
+### 本轮失败与修正
+
+- 最大逻辑输入测试初用Jackson字节输出，非BMP字符被转义使线上表示超过1MiB，按限制正确拒绝。改用真实字面UTF-8表示验收，同时保留转义后超限表示必须拒绝的断言；未放宽服务端上限
+- 初次契约测试的成功就绪样例漏补inspection_templates，补齐样例后通过
+- 初轮完整Java回归的12项既有目录测试报未分类能力；补两能力定义与padmin-only分类回归，保留未知能力一律拒绝的守卫，最终全根通过
+- 首次HTTP7次读取在ready阶段发现旧契约遗漏contact_imports；没有创建模板/待定写请求，失败控制记录保留。补实际契约后使用显式重试入口执行最终117次，不把失败7次合并算独立通过用例。一次辅助探针的URN标识拼写错误发生在发HTTP之前，修正探针后定位了该额外字段
+
+证据：[117HTTP](evidence/niko-inspection-template-api-http-20261004.json)、[目录回读](evidence/niko-inspection-capability-http-20261004.json)、[实施汇总](evidence/niko-inspection-template-api-20261004.json)。公开API只到未发布模板维护；模板页面、巡检执行单持久化、季度汇总和H5/PDF/客户发布仍待，Q23/Q24未解除，M9-7和128项正式验收不标DONE。

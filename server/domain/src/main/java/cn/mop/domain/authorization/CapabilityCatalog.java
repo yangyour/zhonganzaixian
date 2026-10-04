@@ -17,6 +17,8 @@ public final class CapabilityCatalog {
     static {
         var dimensions=new LinkedHashMap<String,String>();dimensions.put("ASSETS_METRICS","资产与指标");dimensions.put("ALERTS_TICKETS","告警与工单");dimensions.put("TEMPLATES_AUTOMATION","模板与自动化");dimensions.put("PLATFORM_ADMIN","平台管理");dimensions.put("MEMBER_ADMIN","成员管理");DIMENSIONS=Collections.unmodifiableMap(dimensions);
         var definitions=new TreeMap<String,Definition>();
+        define(definitions,"inspection_templates:read","读取未发布巡检模板候选","TEMPLATES_AUTOMATION");
+        define(definitions,"inspection_templates:write","维护未发布巡检模板修订（不批准或发布）","TEMPLATES_AUTOMATION");
         define(definitions,"contacts:read","读取当前租户联系人","MEMBER_ADMIN");
         define(definitions,"contacts:write","维护当前租户联系人与归档","MEMBER_ADMIN");
         define(definitions,"operations:compare_explicit","显式经营样本与人力对照","PLATFORM_ADMIN");

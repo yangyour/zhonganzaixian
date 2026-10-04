@@ -1,0 +1,36 @@
+{
+  "verified_at": "2026-10-04T08:34:48.626Z",
+  "environment": "niko-local-test",
+  "api_contract_version": "0.35.0",
+  "http_requests": 117,
+  "response_status_counts": {
+    "200": 80,
+    "400": 19,
+    "401": 1,
+    "403": 9,
+    "404": 3,
+    "409": 5
+  },
+  "actual_json_schema_validated": true,
+  "real_two_request_same_version": [
+    200,
+    409
+  ],
+  "same_key_single_candidate": true,
+  "ordered_content_fingerprint_independently_checked": true,
+  "initial_item_null_and_explicit_empty_preserved": true,
+  "template_types_from_explicit_data": true,
+  "original_receipt_kept_after_archive": true,
+  "cross_tenant_read_write_history_404": true,
+  "other_roles_403": true,
+  "csrf_missing_403": true,
+  "known_created_candidates": 18,
+  "all_created_candidates_archived": true,
+  "permanent_deletes": 0,
+  "new_migrations": 0,
+  "browser_tested": false,
+  "worksheet_persistence_tested": false,
+  "quarterly_report_tested": false,
+  "production_approval": "UNVERIFIED",
+  "contract_done": false
+}

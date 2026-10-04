@@ -456,7 +456,7 @@ const tenantInventoryPage = object({ context_tenant_id: uuid, items: { type: 'ar
 tenantInventoryPage.oneOf = [{ properties: { has_more: { const: false }, next_after_id: { type: 'null' } } }, { properties: { has_more: { const: true }, next_after_id: { type: 'string' }, items: { minItems: 1 } } }];
 const contract = {
   openapi: '3.1.0',
-  info: { title: 'MOP 共享测试环境 API', version: '0.34.0', description: '本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。' },
+  info: { title: 'MOP 共享测试环境 API', version: '0.35.0', description: '本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。' },
   servers: [{ url: '/api/v1' }],
   security: [{ SessionCookie: [] }],
   paths: {
@@ -678,6 +678,46 @@ const contract = {
     },
   },
 };
+// Unpublished inspection template maintenance. All response facts remain explicitly unapproved.
+const inspectionKey = { type: 'string', pattern: '^[a-z][a-z0-9_-]{0,63}$', maxLength: 64 };
+const inspectionItem = object({ key: inspectionKey, section: { type: 'string', minLength: 1, maxLength: 100 }, label: { type: 'string', minLength: 1, maxLength: 200 }, instruction: { type: ['string', 'null'], maxLength: 2000 } });
+const inspectionDefinition = { device_type: inspectionKey, name: { type: 'string', minLength: 1, maxLength: 200 }, items: { type: 'array', minItems: 1, maxItems: 100, items: ref('InspectionTemplateItem'), 'x-mop-unique-key': 'key', description: 'Ordered items; duplicate keys forbidden. Item order, original text and null versus empty instruction are material.' } };
+const inspectionVersion = { type: 'integer', minimum: 1, maximum: 9007199254740990 };
+const inspectionExpected = { type: 'integer', minimum: 1, maximum: 9007199254740989 };
+const inspectionFacts = { device_type: inspectionKey, name: inspectionDefinition.name, item_count: { type: 'integer', minimum: 1, maximum: 100 }, content_sha256: { type: 'string', pattern: '^[0-9a-f]{64}$' }, approval_status: { const: 'UNVERIFIED' }, publication_status: { const: 'NOT_IMPLEMENTED' }, report_published: { const: false }, active_scan_performed: { const: false }, source: { const: 'postgresql' }, record_source: { const: 'EXPLICIT_TEMPLATE_DEFINITION' } };
+const inspectionMetadata = { id: uuid, tenant_id: uuid, created_by: uuid, version: inspectionVersion, created_at: dateTime, updated_at: dateTime, recorded_by: uuid, recorded_at: dateTime, action: { enum: ['CREATE','UPDATE','ARCHIVE','RESTORE'] }, archived: { type: 'boolean' } };
+const inspectionRow = object({ ...inspectionMetadata, ...inspectionFacts });
+const inspectionDetail = object({ ...inspectionRow.properties, items: inspectionDefinition.items });
+const inspectionRevision = object({ version: inspectionVersion, previous_version: { type: ['integer','null'], minimum: 1, maximum: 9007199254740989 }, recorded_by: uuid, recorded_at: dateTime, action: inspectionMetadata.action, archived: { type: 'boolean' }, ...inspectionFacts, items: inspectionDefinition.items });
+const inspectionPage = object({ tenant_id: uuid, items: { type: 'array', maxItems: 100, items: ref('InspectionTemplateSummary') }, has_more: { type: 'boolean' }, next_before_created_at: { type: ['string','null'], format: 'date-time' }, next_before_id: nullableUuid, view: { enum: ['CURRENT','ARCHIVED','ALL'] }, source: { const: 'postgresql' }, scope: { const: 'CURRENT_TENANT_PADMIN' }, page_size_limit: { const: 100 } });
+inspectionPage.allOf = [{ if: { properties: { has_more: { const: true } } }, then: { properties: { next_before_created_at: dateTime, next_before_id: uuid, items: { minItems: 1 } } }, else: { properties: { next_before_created_at: { type: 'null' }, next_before_id: { type: 'null' } } } }];
+const inspectionHistory = object({ tenant_id: uuid, template_id: uuid, items: { type: 'array', maxItems: 100, items: ref('InspectionTemplateRevision') }, has_more: { type: 'boolean' }, next_before_version: { type: ['integer','null'], minimum: 1, maximum: 9007199254740990 }, source: { const: 'postgresql' }, scope: { const: 'CURRENT_TENANT_PADMIN' }, page_size_limit: { const: 100 } });
+inspectionHistory.allOf = [{ if: { properties: { has_more: { const: true } } }, then: { properties: { next_before_version: inspectionVersion, items: { minItems: 1 } } }, else: { properties: { next_before_version: { type: 'null' } } } }];
+for (const schema of [inspectionRow,inspectionDetail,inspectionRevision]) schema.allOf = [{ if: { properties: { action: { const: 'ARCHIVE' } } }, then: { properties: { archived: { const: true } } }, else: { properties: { archived: { const: false } } } }];
+inspectionRevision.allOf.push({ if: { properties: { version: { const: 1 } } }, then: { properties: { previous_version: { type: 'null' }, action: { const: 'CREATE' } } }, else: { properties: { previous_version: inspectionVersion, action: { enum: ['UPDATE','ARCHIVE','RESTORE'] } } } });
+inspectionDetail['x-mop-integrity'] = 'item_count equals items length; exact ordered UTF-8 framed V1 content_sha256; current tenant authorization remains required';
+Object.assign(contract.components.schemas, {
+  InspectionTemplateItem: inspectionItem, InspectionTemplateCreate: object({ expected_version: { type: 'integer', const: 0 }, ...inspectionDefinition }), InspectionTemplateUpdate: object({ expected_version: inspectionExpected, ...inspectionDefinition }), InspectionTemplateArchive: object({ expected_version: inspectionExpected }),
+  InspectionTemplateSummary: inspectionRow, InspectionTemplate: inspectionDetail, InspectionTemplateResult: envelope(ref('InspectionTemplate')), InspectionTemplateRevision: inspectionRevision,
+  InspectionTemplatePage: inspectionPage, InspectionTemplatePageResult: envelope(ref('InspectionTemplatePage')), InspectionTemplateHistory: inspectionHistory, InspectionTemplateHistoryResult: envelope(ref('InspectionTemplateHistory')),
+});
+const inspectionRead = { 'x-mop-roles': ['padmin'], 'x-mop-current-membership-recheck': true, 'x-mop-readonly': true, 'x-mop-reject-unknown-query-keys': true, 'x-mop-reject-duplicate-query-keys': true };
+const inspectionWrite = { 'x-mop-roles': ['padmin'], 'x-mop-before-replay-authorization': true, 'x-mop-body-max-bytes': 1048576, 'x-mop-json-max-tokens': 2000, 'x-mop-json-max-depth': 4, 'x-mop-reject-duplicate-json-keys': true, 'x-mop-reject-all-query-keys': true, parameters: headers };
+contract.paths['/inspection-templates'] = {
+  get: action('listInspectionTemplateCandidates','当前授权padmin读取未发布模板摘要；列表不返回检查项正文',ref('InspectionTemplatePageResult'),{...inspectionRead,parameters:[parameter('name_query','query',{type:'string',maxLength:200},false),parameter('device_type','query',inspectionKey,false),parameter('view','query',{enum:['CURRENT','ARCHIVED','ALL'],default:'CURRENT'},false),parameter('page_size','query',{type:'integer',enum:[10,15,25,50,100],default:15},false),parameter('before_created_at','query',dateTime,false),parameter('before_id','query',uuid,false)],'x-mop-paired-query-keys':['before_created_at','before_id']}),
+  post: mutation('createInspectionTemplateCandidate','创建未发布模板候选，历史/项/审计/原回执同事务；不批准或发布',ref('InspectionTemplateCreate'),ref('InspectionTemplateResult'),inspectionWrite),
+};
+contract.paths['/inspection-templates/{id}'] = {
+  get: action('getInspectionTemplateCandidate','读取本租户未发布模板完整冻结定义；跨租户404',ref('InspectionTemplateResult'),{...inspectionRead,parameters:[pathId]}),
+  patch: mutation('updateInspectionTemplateCandidate','显式CAS生成下一修订；不覆盖原项或历史',ref('InspectionTemplateUpdate'),ref('InspectionTemplateResult'),{...inspectionWrite,parameters:[pathId,...headers]}),
+};
+contract.paths['/inspection-templates/{id}/history'] = { get: action('listInspectionTemplateHistory','读取模板版本历史与冻结定义；不按最新模板回算',ref('InspectionTemplateHistoryResult'),{...inspectionRead,parameters:[pathId,parameter('page_size','query',{type:'integer',enum:[10,15,25,50,100],default:15},false),parameter('before_version','query',inspectionVersion,false)]}) };
+contract.paths['/inspection-templates/{id}/archive'] = { post: mutation('archiveInspectionTemplateCandidate','显式CAS归档并复制完整原定义，保留全部历史',ref('InspectionTemplateArchive'),ref('InspectionTemplateResult'),{...inspectionWrite,parameters:[pathId,...headers]}) };
+contract.paths['/inspection-templates/{id}/restore'] = { post: mutation('restoreInspectionTemplateCandidate','从已归档状态明确提交完整定义恢复；不自动批准',ref('InspectionTemplateUpdate'),ref('InspectionTemplateResult'),{...inspectionWrite,parameters:[pathId,...headers]}) };
+contract.components.schemas.ReadinessResult.properties.data.properties.inspection_templates = object({schema_access_ready:{const:true},approval_status:{const:'UNVERIFIED'},publication_status:{const:'NOT_IMPLEMENTED'},report_published:{const:false},active_scan_performed:{const:false}});
+contract.components.schemas.ReadinessResult.properties.data.required.push('inspection_templates');
+contract.components.schemas.ReadinessResult.properties.data.properties.contact_imports = object({schema_access_ready:{const:true},worker_liveness:{type:'null'},notification_dispatched:{const:false},identity_binding_created:{const:false}});
+contract.components.schemas.ReadinessResult.properties.data.required.push('contact_imports');
 contract.components.schemas.SessionResult['x-mop-role-source'] = 'current_active_tenant_membership';
 contract.components.schemas.SessionResult['x-mop-unsupported-role'] = 'deny_all_and_do_not_establish_or_project_platform_session';
 contract.components.schemas.ReadinessResult['x-mop-storage-provider-routing'] = ['完全无OBJECT_STORAGE配置时保留既有MinIO路径', '明确关闭或不完整OSS配置不回退到MinIO', 'OSS必须使用受限部署前缀；运行凭据不作为MOP API请求/响应字段', '缺失存储前提返回503，但PG/OIDC及无存储依赖的接口继续可用', '平台授权grant和预签名配置不混用'];

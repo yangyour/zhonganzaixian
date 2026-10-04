@@ -1,0 +1,63 @@
+{
+  "verified_at": "2026-10-04T08:36:40Z",
+  "environment": "niko-local-test",
+  "api_contract_version": "0.35.0",
+  "api_jar_sha256": "c36d870baf5784582a6736ed7d8ba43070226635ba67ba1a64b9306c3942a91e",
+  "new_java_tests": 18,
+  "root_tests": {
+    "reported": 1677,
+    "executed": 1664,
+    "real_postgres": 515,
+    "historical_fixture_skipped": 13,
+    "minio_excluded": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts": 80,
+  "contract_generation": "PASS",
+  "web": 983,
+  "web_typecheck": "PASS",
+  "web_production_build": "PASS",
+  "http_evidence": "niko-inspection-template-api-http-20261004.json",
+  "supplemental_catalog_http": "niko-inspection-capability-http-20261004.json",
+  "http_other_table_count": 28,
+  "http_other_table_fingerprints_equal": true,
+  "http_excluded_changed_tables": [
+    "mop_inspection_template",
+    "mop_inspection_template_revision",
+    "mop_inspection_template_item",
+    "mop_audit",
+    "mop_idempotency"
+  ],
+  "first_http_attempt": {
+    "requests": 7,
+    "stage": "readiness",
+    "templates_created": 0,
+    "pending_requests": 0,
+    "cause": "ReadinessResult omitted existing contact_imports field"
+  },
+  "failed_root_catalog_tests": 12,
+  "failed_root_cause": "new capabilities absent from explicit catalog definitions; fixed without disabling unknown-capability rejection",
+  "oversized_escaped_unicode_test": "server byte limit retained; literal UTF8 accepted and oversized escaped encoding rejected",
+  "new_migrations": 0,
+  "new_oidc_accounts": 0,
+  "original_server_changed": false,
+  "browser_tested": false,
+  "worksheet_persistence_tested": false,
+  "quarterly_report_tested": false,
+  "production_approval": "UNVERIFIED",
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "server/api/src/main/java/cn/mop/api/InspectionTemplateController.java": "bf99bdbafb1a124515ddc082afd99c1dfd24b7852bd248400ec727915c2a8239",
+    "contracts/local-api.openapi.json": "6a9367278b5354ccbc5286efa3bd6b918a40969a5758039765256a7b3f7967dc"
+  },
+  "logs": [
+    ".local/niko-test/logs/inspection-api-focused-first-20261004.log",
+    ".local/niko-test/logs/inspection-api-root-20261004.log",
+    ".local/niko-test/logs/inspection-api-root-final-20261004.log",
+    ".local/niko-test/logs/inspection-api-http-first-20261004.log",
+    ".local/niko-test/logs/inspection-api-http-final-20261004.log",
+    ".local/niko-test/logs/inspection-api-contract-final-20261004.log",
+    ".local/niko-test/logs/inspection-api-web-20261004.log"
+  ]
+}

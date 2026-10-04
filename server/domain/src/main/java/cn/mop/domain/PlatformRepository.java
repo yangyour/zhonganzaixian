@@ -13,6 +13,7 @@ public interface PlatformRepository extends AssetRepository {
     /** Safe readiness reasons for the designated durable photo schema and runtime privileges. */
     default List<String> photoDependencyProblems(){return List.of("PHOTO_REPOSITORY_UNAVAILABLE");}
     default List<String> assetReadProblems(){return List.of("ASSET_UNICODE_SEARCH_UNAVAILABLE");}
+    default List<String> inspectionTemplateProblems(){return List.of("INSPECTION_TEMPLATE_STRUCTURE_UNAVAILABLE");}
     default List<String> contactImportProblems(){return List.of("CONTACT_IMPORT_SCHEMA_ACCESS_NOT_READY");}
     default List<String> customerContactProblems(){return List.of("CUSTOMER_CONTACT_SCHEMA_ACCESS_NOT_READY");}
     default List<String> capacityScenarioProblems(){return List.of("CAPACITY_SCENARIO_SCHEMA_OR_ACCESS_UNAVAILABLE");}

@@ -183,3 +183,7 @@ V1–V14全部字节冻结，V14 SHA256为39be55d8759de87c6e2b8f85b3958c60be24ae
 ## 2026-10-04 V21巡检模板独立结构
 
 在已有niko测试库显式--apply-inspection-templates执行V21一次；重复0/只读检查0，30张原业务表等值指纹不变。V1–V21冻结，后续V22+；只增加未发布模板头、不可变修订/检查项及完整性指纹保护，未种入模板或创建身份。14真实runtime结构测试回滚后无持久测试模板；尚无巡检仓储/API/执行单/报告验收。原服务器未执行，见[模板结构](inspection-templates.md)。
+
+## API0.35未发布巡检模板HTTP入口
+
+完成独立V21和全根构建后，正常停止原自有runner并重启现有PG/KC与固定API JAR，不初始化新组件或账号，不自动迁移。新API readiness要求巡检模板结构；storage=false保持。刷新6既有OIDC会话后运行tests/niko-inspection-template-api-http.mjs；首轮仅ready契约失败、创建0/待定0，显式--retry-after-readiness-contract-fix保留原控制文件后完成117请求/18合成模板全部归档。当前两个控制文件及成功证据均存在，不能盲目重跑；后续使用新独立场景，不删除历史证据。28无关业务表等值证明只覆盖HTTP窗口，不跨全根数据测试。API固定包SHA及结果见[实施记录](inspection-templates.md)。

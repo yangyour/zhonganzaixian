@@ -1,0 +1,18 @@
+{
+  "verified_at": "2026-10-04T08:36:39.983Z",
+  "environment": "niko-local-test",
+  "api_contract_version": "0.35.0",
+  "http_requests": 1,
+  "http_methods": [
+    "GET"
+  ],
+  "status": 200,
+  "schema_validated": true,
+  "new_capabilities_classified": 2,
+  "dimension": "TEMPLATES_AUTOMATION",
+  "declared_role": "padmin",
+  "customer_approval": "UNVERIFIED",
+  "business_writes": 0,
+  "new_runtime_grants": false,
+  "browser_tested": false
+}

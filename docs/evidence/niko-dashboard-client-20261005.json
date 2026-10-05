@@ -1,0 +1,40 @@
+{
+  "verified_at": "2026-10-05T01:35:48.004842+00:00",
+  "scope": "PRODUCTION_DASHBOARD_PROTOCOL_AND_READ_ONLY_WORKSPACE",
+  "previous_commit": "77bc4a333d38b1098d285fa9c8dafb651c022c19",
+  "previous_ci_run": 37251834577,
+  "previous_ci_conclusion": "success",
+  "protocol_tests": 14,
+  "state_tests": 14,
+  "web_tests": 1590,
+  "web_test_files": 93,
+  "typecheck_build": "PASS",
+  "contracts": 125,
+  "contract_generation": "PASS",
+  "only_get_requests": true,
+  "strict_scope_and_time_windows": true,
+  "shanghai_historical_dst_tested": true,
+  "unknown_datasets_null_not_empty": true,
+  "late_response_context_and_preset_guard": true,
+  "request_observer_reentrancy_guard": true,
+  "clock_regression_rejected": true,
+  "fixture_responses": "ISOLATED_UNIT_TESTS_ONLY",
+  "actual_http": "NOT_RUN",
+  "real_pg": "NOT_RUN_CURRENT_EXECUTOR",
+  "browser": "NOT_RUN",
+  "new_credentials": false,
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "apps/web/src/utils/dashboardAvailability.ts": "e44269b03d46e7847faf342d0b7fbdeec0ec5cf7e1a7bd6a4c990b4c029fd0fe",
+    "apps/web/src/utils/dashboardWorkspace.ts": "f224b24d74840f5cac63536f843cac58430b73e09df3d420c5e63f2c99ce9f1c",
+    "apps/web/tests/dashboard.fixture.ts": "0c5b1650c13e1bbd39d805926da06b5af15043dd69bc47ccf3b37a62d984a4e6",
+    "apps/web/tests/dashboardAvailability.test.ts": "795f807b9a553c6cc7dec6b58af13d8dbed233ead3c0a14ffa9a312fcb426f88",
+    "apps/web/tests/dashboardWorkspace.test.ts": "82a96365580d22ca4706b0bddf8da0b6867782d6b9d9b23e3fd4aed3d1538292"
+  },
+  "log_sha256": {
+    "dashboard-client-focused-20261005.log": "e21c394eaf7ea259719d3a67ed85df0ed34b18aa96b266b46333ca8102877f28",
+    "dashboard-client-web-20261005.log": "207703166c18b8c3633f2b98190426f4f566384a3a3d30f4f07e1c1122c2419c",
+    "dashboard-client-build-20261005.log": "3533471f626247d6dc910fcb2c962b63656396fb7b2ca57d0dd4238019fd86c0",
+    "dashboard-client-contracts-20261005.log": "d43b5998a898ddf0428dfb79590e184897c7383c9800b1951a3ca1fc425498a9"
+  }
+}

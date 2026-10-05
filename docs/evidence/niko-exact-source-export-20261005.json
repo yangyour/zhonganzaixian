@@ -1,0 +1,63 @@
+{
+  "verified_at": "2026-10-05T01:51:44.634716+00:00",
+  "scope": "EXACT_TRACKED_SOURCE_RECOVERY_EXPORT_HARDENING",
+  "previous_commit": "b26cc2296c1c3a0abe62a1401c755b50dd3ee747",
+  "previous_ci": {
+    "run_id": 37252835148,
+    "conclusion": "success"
+  },
+  "regression_before": {
+    "tests": 15,
+    "failed": 6,
+    "causes": [
+      "export-ignore dropped manifest file",
+      "export-subst rewrote bytes",
+      "local info attributes changed archive",
+      "HEAD moved between tree/archive/commit reads",
+      "environment suffix variant allowed",
+      "uppercase private key suffix allowed"
+    ]
+  },
+  "final_focused": 21,
+  "python_full": 158,
+  "contracts": 125,
+  "contract_generation": "PASS",
+  "local_full_source_proof": {
+    "verified_at": "2026-10-05T01:51:11.639861+00:00",
+    "source_commit": "b26cc2296c1c3a0abe62a1401c755b50dd3ee747",
+    "source_tree": "38d4ea19b741810693e8f02223b97e72ec4399cb",
+    "file_count": 1705,
+    "total_source_bytes": 17575715,
+    "archive_bytes": 7261296,
+    "archive_sha256": "45dd33dc375704a3ffa21d72fc570f42ecfc1d13f8fb41961c0c19a891416f85",
+    "exact_commit_and_all_blob_bytes_and_modes": "PASS",
+    "dirty_worktree_included": false,
+    "contains_private_runtime": false
+  },
+  "source_commit_pinned_once": true,
+  "export_attributes_applied": false,
+  "all_blob_bytes_sizes_and_modes_verified": true,
+  "private_paths_excluded": true,
+  "reviewed_env_examples_exact_blob_allowlist": true,
+  "unreviewed_or_changed_env_examples_rejected": true,
+  "first_actual_export": "FAILED_CLOSED_BEFORE_OUTPUT_ON_EXISTING_NON_SECRET_ENV_EXAMPLES",
+  "first_actual_export_resolution": "reviewed both fixed templates (local endpoints/ports/role names only), allowed only their exact path+blob SHA; all other env variants still rejected",
+  "new_credentials": false,
+  "new_components": false,
+  "database_restored": false,
+  "business_acceptance_changed": false,
+  "source_sha256": {
+    "tools/export-source-recovery.py": "fa2204adfd9bbdb3abfcb5de72489d4b0ee53d0120226b95b7c23644c357d13d",
+    "tools/test_export_source_recovery.py": "81746b590593818654e0c73ee8c3d6d35000bc79df324d32ecf9b402a1644b35"
+  },
+  "log_sha256": {
+    "recovery-export-regression-before-20261005.log": "3d7bcf45f32662ea80515cf0f211015038e5c78d58b75e30937c99d345e83044",
+    "recovery-export-regression-after-20261005.log": "690d3b7a40960f9f78ece4eb3e1c65f02a64e3329764401c4b276ccd77c33587",
+    "recovery-export-current-head-20261005.log": "ff0469f08212e14d1dd4b66d6e99db952cea219d6f82775793a4c1fb6b2b167a",
+    "recovery-export-reviewed-final-focused-20261005.log": "ccee2a3a6bdfbafdcc6d1dc26c190c7679aa4c7c8813f62f7fa8db486ad60696",
+    "recovery-export-reviewed-python-full-20261005.log": "5d9ab30a6936bf9d547b7427da310c289af9802e511b5a0bb41e67cdc56f5180",
+    "recovery-export-current-head-r2-20261005.log": "aaef17609fe9944c40e3b71682a9019213517c83433316cccdf7e9b34cb78723",
+    "recovery-export-contracts-20261005.log": "c8d62f27621c80fb06dc803ba36fbdda24afc074963328df9f0697a0d2de6291"
+  },
+  "published_ci_archive_download_verification": "PENDING_NEXT_COMMIT"
+}

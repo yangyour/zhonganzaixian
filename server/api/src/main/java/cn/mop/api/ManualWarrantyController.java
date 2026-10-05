@@ -46,7 +46,7 @@ public final class ManualWarrantyController {
     private Access access(HttpServletRequest request){
         if(request.getUserPrincipal()==null||request.getSession(false)==null)throw expired();Object tenant=request.getSession(false).getAttribute("mop.tenant_id");if(!(tenant instanceof String scope))throw expired();
         String actor=request.getUserPrincipal().getName();Membership member=platform.membership(actor,scope).orElseThrow(ManualWarrantyController::expired);if(!member.active()||member.permissionVersion()<1)throw expired();
-        if(!("msp".equals(member.role())||"padmin".equals(member.role()))||!Capabilities.forRole(member.role()).contains("assets:write"))throw new DomainException(403,"ACTION_FORBIDDEN","仅开放内部人员的手工草稿资料维护，客户维护范围仍待确认");return new Access(actor,scope,member.permissionVersion(),trace(request));
+        if(!("msp".equals(member.role())||"padmin".equals(member.role()))||!member.capabilities().contains("assets:write"))throw new DomainException(403,"ACTION_FORBIDDEN","仅开放内部人员的手工草稿资料维护，客户维护范围仍待确认");return new Access(actor,scope,member.permissionVersion(),trace(request));
     }
     private static String nullable(JsonNode body,String key){JsonNode value=body.get(key);if(value==null||!value.isNull()&&!value.isTextual())throw invalid();return value.isNull()?null:value.textValue();}
     private static Map<String,String> query(HttpServletRequest request,Set<String> allowed){Map<String,String> result=new HashMap<>();request.getParameterMap().forEach((key,values)->{if(!allowed.contains(key)||values.length!=1||values[0].length()>64)throw invalid();result.put(key,values[0]);});return result;}

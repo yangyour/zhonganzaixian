@@ -57,7 +57,7 @@ public final class AssetDependencyController {
     private Access access(HttpServletRequest request,boolean write){
         if(request.getUserPrincipal()==null||request.getSession(false)==null)throw expired();Object tenant=request.getSession(false).getAttribute("mop.tenant_id");if(!(tenant instanceof String scope))throw expired();
         String actor=request.getUserPrincipal().getName();Membership member=platform.membership(actor,scope).orElseThrow(AssetDependencyController::expired);if(!member.active())throw expired();
-        if(!Capabilities.forRole(member.role()).contains(write?"assets:write":"assets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无资产依赖动作权限");
+        if(!member.capabilities().contains(write?"assets:write":"assets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无资产依赖动作权限");
         return new Access(actor,scope,member.permissionVersion());
     }
     private String asset(String id,String tenant){String normalized=uuid(mapper.getNodeFactory().textNode(id));if(platform.find(tenant,normalized).isEmpty())throw new DomainException(404,"OBJECT_NOT_FOUND","对象不存在或不可见");return normalized;}

@@ -460,7 +460,7 @@ const contract = {
   servers: [{ url: '/api/v1' }],
   security: [{ SessionCookie: [] }],
   paths: {
-    '/tenants/inventory': { get: action('readAuthorizedTenantInventory', '当前及每目标租户活跃padmin成员授权的登记资源分页；不修改租户或猜配额/监控状态', ref('TenantInventoryResult'), { parameters: [parameter('page_size', 'query', { type: 'integer', enum: [10, 15, 25, 50, 100], default: 15 }, false), parameter('after_id', 'query', { ...uuid, pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' }, false)], 'x-mop-roles': ['padmin'], 'x-mop-reject-unknown-query-keys': true, 'x-mop-reject-duplicate-query-keys': true, 'x-mop-permission-version-recheck': true, 'x-mop-query-max-bytes': 512, 'x-mop-per-target-padmin-membership-required': true, 'x-mop-readonly': true }) },
+    '/tenants/inventory': { get: action('readAuthorizedTenantInventory', '当前及每目标租户活跃padmin成员授权的登记资源分页；不修改租户或猜配额/监控状态', ref('TenantInventoryResult'), { parameters: [parameter('page_size', 'query', { type: 'integer', enum: [10, 15, 25, 50, 100], default: 15 }, false), parameter('after_id', 'query', { ...uuid, pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' }, false)], 'x-mop-roles': ['padmin'], 'x-mop-reject-unknown-query-keys': true, 'x-mop-reject-duplicate-query-keys': true, 'x-mop-permission-version-recheck': true, 'x-mop-query-max-bytes': 512, 'x-mop-per-target-padmin-membership-required': true, 'x-mop-capability': 'tenants:read_inventory', 'x-mop-readonly': true }) },
     '/health/live': { get: action('liveness', '本地进程存活', ref('ResourceResult'), { security: [] }) },
     '/health/ready': { get: action('readiness', '实际PG/OIDC及已启用照片/导入源策略/schema/ACL/已选对象存储就绪；失败503及安全原因。导入worker_activity=NOT_PROBED，不证明Worker运行、业务导入或生产就绪', ref('ReadinessResult'), { security: [] }) },
     '/auth/options': { get: action('authOptions', '读取Keycloak授权登录入口；不返回秘密', envelope(object({ mode: { const: 'remote_test' }, identity_source: { const: 'test_oidc' }, login_url: { const: '/oauth2/authorization/mop' } })), { security: [] }) },
@@ -826,6 +826,8 @@ contract.components.schemas.ReadinessResult.properties.data.properties.change_no
 contract.components.schemas.ReadinessResult.properties.data.required.push('change_notice_drafts');
 
 contract.components.schemas.SessionResult['x-mop-role-source'] = 'current_active_tenant_membership';
+contract.components.schemas.SessionResult['x-mop-capability-source'] = 'current_membership_effective_capabilities_no_category_fallback';
+contract.components.schemas.SessionResult['x-mop-empty-capabilities'] = 'active_supported_member_can_have_no_business_grants';
 contract.components.schemas.SessionResult['x-mop-unsupported-role'] = 'deny_all_and_do_not_establish_or_project_platform_session';
 contract.components.schemas.ReadinessResult['x-mop-storage-provider-routing'] = ['完全无OBJECT_STORAGE配置时保留既有MinIO路径', '明确关闭或不完整OSS配置不回退到MinIO', 'OSS必须使用受限部署前缀；运行凭据不作为MOP API请求/响应字段', '缺失存储前提返回503，但PG/OIDC及无存储依赖的接口继续可用', '平台授权grant和预签名配置不混用'];
 contract.components.schemas.ReadinessResult.properties.data.properties.working_calendars = object({ schema_access_ready: { type: 'boolean' }, effective: { const: false }, customer_confirmation: { const: 'UNVERIFIED' } });

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
@@ -845,3 +845,19 @@ test('固定首页完整null可用性响应和明确UTC毫秒允许序列化',()
 test('首页不能把缺失监控伪造成0正常、空事件列表或已核验时钟',()=>{for(const mutate of [s=>s.kpis[0].value=0,s=>s.kpis[0].detail_counts.total=0,s=>s.kpis[1].state='HEALTHY',s=>s.panels[0].items=[],s=>s.metric_samples_loaded=true,s=>s.clock_accuracy_verified=true,s=>s.writes_performed=true]){const sample=dashboardSample();mutate(sample);assert.equal(validates('DashboardAvailabilitySnapshot',sample),false);}});
 test('首页固定顺序数量与面板上限不允许增删或互换',()=>{for(const mutate of [s=>s.kpis.reverse(),s=>s.panels.reverse(),s=>s.kpis.pop(),s=>s.panels.push(s.panels[0]),s=>s.panels[2].contract_item_limit=10,s=>s.layout_customization_allowed=true]){const sample=dashboardSample();mutate(sample);assert.equal(validates('DashboardAvailabilitySnapshot',sample),false);}});
 test('首页严格拒绝额外字段、身份缺失、非UTC与微秒时刻',()=>{for(const mutate of [s=>s.extra=true,s=>delete s.actor_id,s=>s.permission_version=0,s=>s.generated_at='2026-10-05T09:00:00+08:00',s=>s.generated_at='2026-10-05T01:00:00.123456Z',s=>s.kpis[0].detail_counts.fake=null]){const sample=dashboardSample();mutate(sample);assert.equal(validates('DashboardAvailabilitySnapshot',sample),false);}});
+
+test('会话能力来自当前成员明确集合，空集合不补基础角色权限',()=>{
+  const schema=contract.components.schemas.SessionResult;
+  assert.equal(schema['x-mop-capability-source'],'current_membership_effective_capabilities_no_category_fallback');
+  assert.equal(contract.paths['/tenants/inventory'].get['x-mop-capability'],'tenants:read_inventory');
+  assert.equal(schema['x-mop-empty-capabilities'],'active_supported_member_can_have_no_business_grants');
+  const data={user:{id:id('1'),display_name:'合成用户',role:'padmin'},tenant:{id:id('2'),name:'合成租户'},allowed_tenants:[{id:id('2'),name:'合成租户'}],capabilities:[],permission_version:1,csrf_token:'unit-not-live',mode:'remote_test',identity_source:'test_oidc'};
+  assert.ok(validates('SessionResult',{data,trace_id:'unit'}));
+});
+test('API控制器源码不得从业务类别重新扩张有效权限集合',()=>{
+  const root=new URL('../server/api/src/main/java/cn/mop/api/',import.meta.url);
+  for(const file of readdirSync(root).filter(name=>name.endsWith('Controller.java'))){
+    const source=readFileSync(new URL(file,root),'utf8');
+    assert.equal(source.includes('Capabilities.forRole('),false,file);
+  }
+});

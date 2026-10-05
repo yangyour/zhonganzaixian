@@ -43,7 +43,7 @@ public final class DashboardController {
         Membership membership=platform.membership(actor,tenant).orElseThrow(DashboardController::expired);
         if (!membership.active() || !actor.equals(membership.userId()) || !tenant.equals(membership.tenantId())
                 || membership.permissionVersion()<1 || membership.permissionVersion()>9_007_199_254_740_991L) throw expired();
-        if (!Capabilities.forRole(membership.role()).contains("dashboard:read")) {
+        if (!membership.capabilities().contains("dashboard:read")) {
             throw new DomainException(403,"ACTION_FORBIDDEN","当前角色不能读取本租户运营首页");
         }
         return new Access(actor,tenant,membership.permissionVersion());

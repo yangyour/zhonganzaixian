@@ -22,3 +22,7 @@
 ## 2026-10-05 口令编码基础（未切换登录）
 
 新增Spring Security/Argon2id版本化编码器，22项库级测试含独立libsodium金样通过；随机盐、完整Unicode/长输入、有界存储格式、不接受明文/降级算法。未注册Bean、未创建实际账号或口令、未改会话/数据库/服务器登录；密码业务策略仍null。详见[编码说明](project-password-storage.md)和[证据](evidence/niko-project-password-storage-20261005.json)。
+
+## 当前成员有效能力在API接线
+
+控制器与会话现在使用Membership明确能力集合，避免按基础角色补齐；配置修订读写区分，租户登记有独立padmin类能力。角色类别业务限制继续保留。该更改仍未启用数据库配置角色、账号登录或Worker动态授权，真实撤权链路待PG及运行验证；详见[接口边界](effective-membership-capabilities.md)。

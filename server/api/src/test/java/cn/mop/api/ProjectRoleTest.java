@@ -25,7 +25,7 @@ class ProjectRoleTest {
         assertThat(new Membership("u", "t", "padmin", 2, false, Capabilities.forRole("padmin")).capabilities()).isEmpty();
     }
     @Test void permissionInputsCannotEscalateAcrossBusinessCategories() {
-        for (String grant : List.of("configurations:write", "audit:read", "invented:superuser")) {
+        for (String grant : List.of("configurations:write", "audit:read", "tenants:read_inventory", "invented:superuser")) {
             assertThatThrownBy(() -> new ProjectRole("客户角色", null, "viewer", List.of(grant), true)).isInstanceOf(DomainException.class);
             assertThatThrownBy(() -> new Membership("u", "t", "viewer", 1, true, List.of(grant))).isInstanceOf(IllegalArgumentException.class);
         }

@@ -20,7 +20,7 @@ public final class TenantInventoryController {
         if(!(context instanceof String tenant)||!TenantInventory.canonicalUuid(tenant)||!TenantInventory.canonicalUuid(actor))throw expired();
         Membership member=platform.membership(actor,tenant).orElseThrow(TenantInventoryController::expired);
         if(!member.active()||member.permissionVersion()<1||member.permissionVersion()>9007199254740991L)throw expired();
-        if(!"padmin".equals(member.role()))throw new DomainException(403,"ACTION_FORBIDDEN","租户登记资源仅开放当前及每目标租户的平台管理员成员");
+        if(!"padmin".equals(member.role())||!member.capabilities().contains("tenants:read_inventory"))throw new DomainException(403,"ACTION_FORBIDDEN","租户登记资源仅开放当前及每目标租户的平台管理员成员");
         if(request.getQueryString()!=null&&request.getQueryString().getBytes(StandardCharsets.UTF_8).length>512)throw invalid();
         Map<String,String> query=new HashMap<>();
         request.getParameterMap().forEach((key,values)->{if(!Set.of("page_size","after_id").contains(key)||values==null||values.length!=1||values[0]==null)throw invalid();query.put(key,values[0]);});

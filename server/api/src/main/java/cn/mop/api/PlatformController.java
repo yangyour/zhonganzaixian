@@ -210,10 +210,9 @@ public class PlatformController {
         String actor=request.getUserPrincipal().getName();
         Membership membership=repository.membership(actor,tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效，请重新登录"));
         if(!membership.active())throw new DomainException(401,"SESSION_EXPIRED","成员关系已失效，请重新登录");
-        List<String> capabilities=capabilities(membership.role());if(!capabilities.contains(capability))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无此动作权限");
+        List<String> capabilities=membership.capabilities();if(!capabilities.contains(capability))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无此动作权限");
         return new Access(repository.user(actor).orElseThrow(()->notFound()),repository.tenant(tenant),membership,capabilities);
     }
-    private static List<String> capabilities(String role){return Capabilities.forRole(role);}
     private Object write(Access access,JsonNode body,HttpServletRequest request,Supplier<Object> command){
         return repository.idempotent(access.user.id(),access.tenant.id(),route(request),requestKey(request),hash(body),access.membership.permissionVersion(),()->{
             // Recheck under the same monitor as the write; concurrent revocation cannot race a commit.

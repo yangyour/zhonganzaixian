@@ -56,6 +56,7 @@
         "x-mop-permission-version-recheck": true,
         "x-mop-query-max-bytes": 512,
         "x-mop-per-target-padmin-membership-required": true,
+        "x-mop-capability": "tenants:read_inventory",
         "x-mop-readonly": true,
         "responses": {
           "200": {
@@ -25579,6 +25580,8 @@
         ],
         "additionalProperties": false,
         "x-mop-role-source": "current_active_tenant_membership",
+        "x-mop-capability-source": "current_membership_effective_capabilities_no_category_fallback",
+        "x-mop-empty-capabilities": "active_supported_member_can_have_no_business_grants",
         "x-mop-unsupported-role": "deny_all_and_do_not_establish_or_project_platform_session"
       },
       "Asset": {

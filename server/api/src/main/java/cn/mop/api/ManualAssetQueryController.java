@@ -28,7 +28,7 @@ public final class ManualAssetQueryController {
     }
     private Access access(HttpServletRequest request){
         if(request.getUserPrincipal()==null||request.getSession(false)==null)throw expired();Object tenant=request.getSession(false).getAttribute("mop.tenant_id");if(!(tenant instanceof String scope))throw expired();String actor=request.getUserPrincipal().getName();Membership member=platform.membership(actor,scope).orElseThrow(ManualAssetQueryController::expired);if(!member.active())throw expired();
-        if(!Capabilities.internal(member.role())||!Capabilities.forRole(member.role()).contains("assets:write"))throw new DomainException(403,"ACTION_FORBIDDEN","仅开放内部手工资料视图，客户资料查询范围仍待确认");return new Access(actor,scope,member.permissionVersion(),trace(request));
+        if(!Capabilities.internal(member.role())||!member.capabilities().contains("assets:write"))throw new DomainException(403,"ACTION_FORBIDDEN","仅开放内部手工资料视图，客户资料查询范围仍待确认");return new Access(actor,scope,member.permissionVersion(),trace(request));
     }
     private static DomainException invalid(){return new DomainException(400,"VALIDATION_ERROR","资料查询参数重复、字段或分页无效，编码查询最长4096字节；不自动截断筛选条件");}
     private static DomainException expired(){return new DomainException(401,"SESSION_EXPIRED","当前会话或成员关系已失效");}

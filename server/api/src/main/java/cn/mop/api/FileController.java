@@ -82,10 +82,10 @@ public class FileController {
         if(request.getUserPrincipal()==null||request.getSession(false)==null)throw expired();
         String actor=request.getUserPrincipal().getName(),tenant=(String)request.getSession(false).getAttribute("mop.tenant_id");if(tenant==null)throw expired();
         Membership membership=repository.membership(actor,tenant).orElseThrow(FileController::expired);
-        if(!Capabilities.forRole(membership.role()).contains(write?"tickets:report":"tickets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无此照片动作权限");
+        if(!membership.capabilities().contains(write?"tickets:report":"tickets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无此照片动作权限");
         return new Access(actor,tenant,membership);
     }
-    private void current(Access access,boolean write){Membership current=repository.membership(access.actor,access.tenant).orElseThrow(FileController::expired);if(!Capabilities.forRole(current.role()).contains(write?"tickets:report":"tickets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无此照片动作权限");}
+    private void current(Access access,boolean write){Membership current=repository.membership(access.actor,access.tenant).orElseThrow(FileController::expired);if(!current.capabilities().contains(write?"tickets:report":"tickets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无此照片动作权限");}
     private static Map<String,Part> parts(HttpServletRequest request){
         try{Collection<Part> raw=request.getParts();Map<String,Part> result=new LinkedHashMap<>();for(Part part:raw){if(!Set.of("file","purpose").contains(part.getName())||result.putIfAbsent(part.getName(),part)!=null)throw invalid("multipart 含未知或重复字段");}if(!result.keySet().equals(Set.of("file","purpose")))throw invalid("multipart 必须只包含 file 和 purpose");return result;}
         catch(DomainException safe){throw safe;}catch(Exception error){throw invalid("multipart 格式无效或超过照片大小上限");}

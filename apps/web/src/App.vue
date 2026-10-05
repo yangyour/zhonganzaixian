@@ -69,7 +69,7 @@ async function endSession() {
         <el-menu-item v-if="can('operations:compare_explicit')" index="operational-comparison">经营样本与人力对照</el-menu-item>
         <el-menu-item v-if="can('capacity:estimate')" index="capacity-estimates">容量与缓冲估算</el-menu-item>
           <el-menu-item v-if="can('configurations:read')" index="capability-catalog">代码能力声明核对</el-menu-item>
-          <el-menu-item v-if="session?.user.role === 'padmin'" index="tenant-inventory">租户登记资源</el-menu-item>
+          <el-menu-item v-if="session?.user.role === 'padmin' && can('tenants:read_inventory')" index="tenant-inventory">租户登记资源</el-menu-item>
           <el-menu-item v-if="can('audit:read')" index="audit"><span class="nav-symbol">≡</span>审计日志</el-menu-item>
         </el-menu>
       </template>
@@ -119,7 +119,7 @@ async function endSession() {
         <el-menu-item v-if="can('operations:compare_explicit')" index="operational-comparison">经营样本与人力对照</el-menu-item>
         <el-menu-item v-if="can('capacity:estimate')" index="capacity-estimates">容量与缓冲估算</el-menu-item>
           <el-menu-item v-if="can('configurations:read')" index="capability-catalog">代码能力声明核对</el-menu-item>
-          <el-menu-item v-if="session?.user.role === 'padmin'" index="tenant-inventory">租户登记资源</el-menu-item>
+          <el-menu-item v-if="session?.user.role === 'padmin' && can('tenants:read_inventory')" index="tenant-inventory">租户登记资源</el-menu-item>
           <el-menu-item v-if="can('audit:read')" index="audit">审计日志</el-menu-item>
       </el-menu>
     </el-drawer>

@@ -45,6 +45,7 @@ public final class CapabilityCatalog {
         define(definitions,"manual_recovery:read","读取独立人工恢复确认","ALERTS_TICKETS");define(definitions,"manual_recovery:confirm","提交独立人工恢复确认","ALERTS_TICKETS");
         define(definitions,"sla_scenarios:read","只读SLA显式对照","ALERTS_TICKETS");
         define(definitions,"worklogs:read_own","读取本人工时","ALERTS_TICKETS");define(definitions,"worklogs:write_own","维护本人工时","ALERTS_TICKETS");
+        define(definitions,"tenants:read_inventory","读取授权租户登记资源","PLATFORM_ADMIN");
         define(definitions,"configurations:read","读取设计配置与提案","PLATFORM_ADMIN");define(definitions,"configurations:write","维护设计草稿与内部提案","PLATFORM_ADMIN");define(definitions,"audit:read","读取当前租户审计","PLATFORM_ADMIN");
         DEFINITIONS=Collections.unmodifiableMap(definitions);
     }

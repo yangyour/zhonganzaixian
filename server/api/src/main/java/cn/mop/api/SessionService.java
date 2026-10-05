@@ -69,7 +69,7 @@ public class SessionService {
         CsrfToken token=csrfRepository.generateToken(request);csrfRepository.saveToken(token,request,response);
         repository.audit(userId,tenant,"fixture.login","session",null,"SUCCEEDED","LOCAL_FIXTURE_IDENTITY",trace(request));
         Membership current=validMembership(repository.membership(userId,tenant).orElseThrow());
-        return sessionData(new Access(user,repository.tenant(tenant),current,capabilities(current.role())),token.getToken());
+        return sessionData(new Access(user,repository.tenant(tenant),current,current.capabilities()),token.getToken());
     }
     public Object session(HttpServletRequest request){return sessionData(access(request),csrf(request));}
     public Object switchTenant(JsonNode body,HttpServletRequest request){
@@ -84,7 +84,7 @@ public class SessionService {
         });
         Membership member=validMembership(repository.membership(before.user.id(),target).orElseThrow(SessionService::notFound));
         request.getSession().setAttribute("mop.tenant_id",target);
-        return sessionData(new Access(before.user,repository.tenant(target),member,capabilities(member.role())),csrf(request));
+        return sessionData(new Access(before.user,repository.tenant(target),member,member.capabilities()),csrf(request));
     }
     public Object logout(HttpServletRequest request,HttpServletResponse response){
         Access access=access(request);Authentication previous=SecurityContextHolder.getContext().getAuthentication();
@@ -120,19 +120,18 @@ public class SessionService {
         if(request.getUserPrincipal()==null||request.getSession(false)==null)throw new DomainException(401,"SESSION_EXPIRED","会话不存在或已过期");
         String actor=request.getUserPrincipal().getName(),tenant=(String)request.getSession().getAttribute("mop.tenant_id");
         Membership membership=validMembership(repository.membership(actor,tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效，请重新登录")));
-        List<String> capabilities=capabilities(membership.role());if(!capabilities.contains("assets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无此动作权限");
+        List<String> capabilities=membership.capabilities();
         return new Access(repository.user(actor).orElseThrow(SessionService::notFound),repository.tenant(tenant),membership,capabilities);
     }
     private Map<String,Object> sessionData(Access access,String token){
         validMembership(access.membership);
         FixtureUser projected=new FixtureUser(access.user.id(),access.user.displayName(),access.membership.role());
-        return map("user",projected,"tenant",access.tenant,"allowed_tenants",repository.allowedTenants(access.user.id()),"capabilities",capabilities(access.membership.role()),"permission_version",access.membership.permissionVersion(),"csrf_token",token,"mode",repository.metadata().mode(),"identity_source",repository.metadata().identitySource());
+        return map("user",projected,"tenant",access.tenant,"allowed_tenants",repository.allowedTenants(access.user.id()),"capabilities",access.membership.capabilities(),"permission_version",access.membership.permissionVersion(),"csrf_token",token,"mode",repository.metadata().mode(),"identity_source",repository.metadata().identitySource());
     }
     private static Membership validMembership(Membership membership){
-        if(membership==null||!membership.active()||Capabilities.forRole(membership.role()).isEmpty())throw new DomainException(401,"SESSION_EXPIRED","成员角色未受支持或已失效");
+        if(membership==null||!membership.active()||membership.permissionVersion()<1||membership.permissionVersion()>9_007_199_254_740_991L||Capabilities.forRole(membership.role()).isEmpty())throw new DomainException(401,"SESSION_EXPIRED","成员角色未受支持或已失效");
         return membership;
     }
-    private static List<String> capabilities(String role){return Capabilities.forRole(role);}
     private String csrf(HttpServletRequest request){CsrfToken token=(CsrfToken)request.getAttribute(CsrfToken.class.getName());if(token==null)token=csrfRepository.loadToken(request);if(token==null)throw new IllegalStateException("CSRF token unavailable");return token.getToken();}
     private static void expireCookie(HttpServletResponse response){var cookie=new jakarta.servlet.http.Cookie("MOP_SESSION","");cookie.setPath("/");cookie.setHttpOnly(true);cookie.setMaxAge(0);cookie.setAttribute("SameSite","Strict");response.addCookie(cookie);}
     private static String requestKey(HttpServletRequest request){String key=request.getHeader("Idempotency-Key");if(key==null||!key.matches("[A-Za-z0-9._:-]{1,128}"))throw validation("Idempotency-Key 为必填，长度1至128且仅包含字母数字及._:-");return key;}

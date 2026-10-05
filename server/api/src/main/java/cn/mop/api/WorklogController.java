@@ -53,7 +53,7 @@ public final class WorklogController {
     private Access access(HttpServletRequest request,boolean write){
         if(request.getUserPrincipal()==null||request.getSession(false)==null)throw expired();Object tenant=request.getSession(false).getAttribute("mop.tenant_id");if(!(tenant instanceof String scope))throw expired();
         String actor=request.getUserPrincipal().getName();Membership member=platform.membership(actor,scope).orElseThrow(WorklogController::expired);if(!member.active())throw expired();
-        if(!Capabilities.forRole(member.role()).contains(write?"worklogs:write_own":"worklogs:read_own"))throw new DomainException(403,"ACTION_FORBIDDEN","当前只开放工程师本人工时记录");return new Access(actor,scope,member.permissionVersion(),trace(request));
+        if(!member.capabilities().contains(write?"worklogs:write_own":"worklogs:read_own"))throw new DomainException(403,"ACTION_FORBIDDEN","当前只开放工程师本人工时记录");return new Access(actor,scope,member.permissionVersion(),trace(request));
     }
     private static Map<String,String> query(HttpServletRequest request,Set<String> allowed){Map<String,String> result=new HashMap<>();request.getParameterMap().forEach((key,values)->{if(!allowed.contains(key)||values.length!=1||values[0].length()>64)throw invalid();result.put(key,values[0]);});return result;}
     private static int pageSize(Map<String,String> query){String size=query.getOrDefault("page_size","15");if(!Set.of("10","15","25","50","100").contains(size))throw invalid();return Integer.parseInt(size);}

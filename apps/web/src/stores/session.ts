@@ -11,7 +11,7 @@ let initialized = false
 let contextActionPending = false
 let initialization: Promise<void> | null = null
 export const can = (capability: string) => routeAllowed({ capability }, session.value)
-export const maySwitchTenant = computed(() => ['msp', 'padmin'].includes(session.value?.user.role || ''))
+export const maySwitchTenant = computed(() => Array.isArray(session.value?.allowed_tenants) && session.value.allowed_tenants.length > 1)
 function installSession(value: Session) { session.value = value; api.setCsrfToken(value.csrf_token); initialized = true }
 export function forgetSession() {
   contextGeneration.value = api.invalidateContext()

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.43.0",
+    "version": "0.44.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
   },
   "servers": [
@@ -24282,6 +24282,178 @@
           }
         }
       }
+    },
+    "/dashboard": {
+      "get": {
+        "operationId": "getDashboardAvailability",
+        "summary": "固定首页可用性投影；只读取当前PG授权与时钟，不代表真实监控指标",
+        "parameters": [
+          {
+            "name": "window",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "HOURS_24",
+                "DAYS_7",
+                "DAYS_30"
+              ],
+              "default": "HOURS_24"
+            }
+          }
+        ],
+        "x-mop-roles": [
+          "viewer",
+          "tadmin",
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capabilities": [
+          "dashboard:read"
+        ],
+        "x-mop-read-only": true,
+        "x-mop-current-membership-recheck": true,
+        "x-mop-allowed-query-keys": [
+          "window"
+        ],
+        "x-mop-reject-duplicate-query-keys": true,
+        "x-mop-max-encoded-query-bytes": 2048,
+        "x-mop-success-writes-audit-or-receipts": false,
+        "x-mop-runtime-integration-status": "NOT_RUN_AFTER_EXECUTOR_RECOVERY",
+        "description": "当前实现只接受合同三个趋势预设，默认24小时；设计文档任意from/to接口尚未实现并明确拒绝，不允许覆盖租户/身份/观察时刻。固定布局不支持保存。所有指标仍UNKNOWN、null，列表null不暗示没有事件；数据库故障503且无替代成功。安全过滤器返回Cache-Control:no-store。",
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardAvailabilityResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -48086,6 +48258,982 @@
               "page_size_limit"
             ],
             "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "DashboardAvailabilitySnapshot": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "permission_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+          },
+          "window": {
+            "enum": [
+              "HOURS_24",
+              "DAYS_7",
+              "DAYS_30"
+            ]
+          },
+          "timezone": {
+            "const": "Asia/Shanghai"
+          },
+          "trend_period": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+              },
+              "to": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+              }
+            },
+            "required": [
+              "from",
+              "to"
+            ],
+            "additionalProperties": false
+          },
+          "last_24_hours": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+              },
+              "to": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+              }
+            },
+            "required": [
+              "from",
+              "to"
+            ],
+            "additionalProperties": false
+          },
+          "month_start": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+          },
+          "month_window_empty": {
+            "type": "boolean"
+          },
+          "layout_version": {
+            "const": "MOP_FIXED_DASHBOARD_V1"
+          },
+          "layout_customization_allowed": {
+            "const": false
+          },
+          "contract_refresh_seconds": {
+            "const": 30
+          },
+          "kpis": {
+            "type": "array",
+            "minItems": 6,
+            "maxItems": 6,
+            "prefixItems": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "ASSET_ONLINE_RATE"
+                  },
+                  "unit": {
+                    "const": "PERCENT"
+                  },
+                  "period": {
+                    "type": "null"
+                  },
+                  "value": {
+                    "type": "null"
+                  },
+                  "threshold_breached": {
+                    "type": "null"
+                  },
+                  "drilldown_path": {
+                    "type": "null"
+                  },
+                  "state": {
+                    "const": "UNKNOWN"
+                  },
+                  "reader_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "sample_count": {
+                    "type": "null"
+                  },
+                  "sampled_at": {
+                    "type": "null"
+                  },
+                  "metric_version": {
+                    "type": "null"
+                  },
+                  "unavailable_reason": {
+                    "const": "MONITORING_SAMPLE_READER_NOT_IMPLEMENTED"
+                  },
+                  "detail_counts": {
+                    "type": "object",
+                    "properties": {
+                      "normal": {
+                        "type": "null"
+                      },
+                      "unknown": {
+                        "type": "null"
+                      },
+                      "total": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "normal",
+                      "unknown",
+                      "total"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "unit",
+                  "period",
+                  "value",
+                  "threshold_breached",
+                  "drilldown_path",
+                  "state",
+                  "reader_status",
+                  "sample_count",
+                  "sampled_at",
+                  "metric_version",
+                  "unavailable_reason",
+                  "detail_counts"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "CURRENT_PROBLEMS"
+                  },
+                  "unit": {
+                    "const": "COUNT"
+                  },
+                  "period": {
+                    "type": "null"
+                  },
+                  "value": {
+                    "type": "null"
+                  },
+                  "threshold_breached": {
+                    "type": "null"
+                  },
+                  "drilldown_path": {
+                    "type": "null"
+                  },
+                  "state": {
+                    "const": "UNKNOWN"
+                  },
+                  "reader_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "sample_count": {
+                    "type": "null"
+                  },
+                  "sampled_at": {
+                    "type": "null"
+                  },
+                  "metric_version": {
+                    "type": "null"
+                  },
+                  "unavailable_reason": {
+                    "const": "EVENT_READER_NOT_IMPLEMENTED"
+                  },
+                  "detail_counts": {
+                    "type": "object",
+                    "properties": {
+                      "disaster": {
+                        "type": "null"
+                      },
+                      "severe": {
+                        "type": "null"
+                      },
+                      "average": {
+                        "type": "null"
+                      },
+                      "warning": {
+                        "type": "null"
+                      },
+                      "information": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "disaster",
+                      "severe",
+                      "average",
+                      "warning",
+                      "information"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "unit",
+                  "period",
+                  "value",
+                  "threshold_breached",
+                  "drilldown_path",
+                  "state",
+                  "reader_status",
+                  "sample_count",
+                  "sampled_at",
+                  "metric_version",
+                  "unavailable_reason",
+                  "detail_counts"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "MONTH_SERVICE_AVAILABILITY"
+                  },
+                  "unit": {
+                    "const": "PERCENT"
+                  },
+                  "period": {
+                    "type": "object",
+                    "properties": {
+                      "from": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+                      },
+                      "to": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+                      }
+                    },
+                    "required": [
+                      "from",
+                      "to"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "value": {
+                    "type": "null"
+                  },
+                  "threshold_breached": {
+                    "type": "null"
+                  },
+                  "drilldown_path": {
+                    "type": "null"
+                  },
+                  "state": {
+                    "const": "UNKNOWN"
+                  },
+                  "reader_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "sample_count": {
+                    "type": "null"
+                  },
+                  "sampled_at": {
+                    "type": "null"
+                  },
+                  "metric_version": {
+                    "type": "null"
+                  },
+                  "unavailable_reason": {
+                    "const": "SERVICE_INTERVAL_READER_NOT_IMPLEMENTED"
+                  },
+                  "detail_counts": {
+                    "type": "object",
+                    "properties": {},
+                    "required": [],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "unit",
+                  "period",
+                  "value",
+                  "threshold_breached",
+                  "drilldown_path",
+                  "state",
+                  "reader_status",
+                  "sample_count",
+                  "sampled_at",
+                  "metric_version",
+                  "unavailable_reason",
+                  "detail_counts"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "PENDING_TICKETS"
+                  },
+                  "unit": {
+                    "const": "COUNT"
+                  },
+                  "period": {
+                    "type": "null"
+                  },
+                  "value": {
+                    "type": "null"
+                  },
+                  "threshold_breached": {
+                    "type": "null"
+                  },
+                  "drilldown_path": {
+                    "type": "null"
+                  },
+                  "state": {
+                    "const": "UNKNOWN"
+                  },
+                  "reader_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "sample_count": {
+                    "type": "null"
+                  },
+                  "sampled_at": {
+                    "type": "null"
+                  },
+                  "metric_version": {
+                    "type": "null"
+                  },
+                  "unavailable_reason": {
+                    "const": "FORMAL_TICKET_STATE_NOT_AVAILABLE"
+                  },
+                  "detail_counts": {
+                    "type": "object",
+                    "properties": {
+                      "overdue_sla": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "overdue_sla"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "unit",
+                  "period",
+                  "value",
+                  "threshold_breached",
+                  "drilldown_path",
+                  "state",
+                  "reader_status",
+                  "sample_count",
+                  "sampled_at",
+                  "metric_version",
+                  "unavailable_reason",
+                  "detail_counts"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "MTTA_24H"
+                  },
+                  "unit": {
+                    "const": "MILLISECONDS"
+                  },
+                  "period": {
+                    "type": "object",
+                    "properties": {
+                      "from": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+                      },
+                      "to": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+                      }
+                    },
+                    "required": [
+                      "from",
+                      "to"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "value": {
+                    "type": "null"
+                  },
+                  "threshold_breached": {
+                    "type": "null"
+                  },
+                  "drilldown_path": {
+                    "type": "null"
+                  },
+                  "state": {
+                    "const": "UNKNOWN"
+                  },
+                  "reader_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "sample_count": {
+                    "type": "null"
+                  },
+                  "sampled_at": {
+                    "type": "null"
+                  },
+                  "metric_version": {
+                    "type": "null"
+                  },
+                  "unavailable_reason": {
+                    "const": "EVENT_ACKNOWLEDGEMENT_READER_NOT_IMPLEMENTED"
+                  },
+                  "detail_counts": {
+                    "type": "object",
+                    "properties": {},
+                    "required": [],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "unit",
+                  "period",
+                  "value",
+                  "threshold_breached",
+                  "drilldown_path",
+                  "state",
+                  "reader_status",
+                  "sample_count",
+                  "sampled_at",
+                  "metric_version",
+                  "unavailable_reason",
+                  "detail_counts"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "DELIVERY_RATE_24H"
+                  },
+                  "unit": {
+                    "const": "PERCENT"
+                  },
+                  "period": {
+                    "type": "object",
+                    "properties": {
+                      "from": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+                      },
+                      "to": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+                      }
+                    },
+                    "required": [
+                      "from",
+                      "to"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "value": {
+                    "type": "null"
+                  },
+                  "threshold_breached": {
+                    "type": "null"
+                  },
+                  "drilldown_path": {
+                    "type": "null"
+                  },
+                  "state": {
+                    "const": "UNKNOWN"
+                  },
+                  "reader_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "sample_count": {
+                    "type": "null"
+                  },
+                  "sampled_at": {
+                    "type": "null"
+                  },
+                  "metric_version": {
+                    "type": "null"
+                  },
+                  "unavailable_reason": {
+                    "const": "DELIVERY_RECEIPT_READER_NOT_IMPLEMENTED"
+                  },
+                  "detail_counts": {
+                    "type": "object",
+                    "properties": {
+                      "accepted": {
+                        "type": "null"
+                      },
+                      "delivered": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "accepted",
+                      "delivered"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "unit",
+                  "period",
+                  "value",
+                  "threshold_breached",
+                  "drilldown_path",
+                  "state",
+                  "reader_status",
+                  "sample_count",
+                  "sampled_at",
+                  "metric_version",
+                  "unavailable_reason",
+                  "detail_counts"
+                ],
+                "additionalProperties": false
+              }
+            ],
+            "items": false
+          },
+          "panels": {
+            "type": "array",
+            "minItems": 6,
+            "maxItems": 6,
+            "prefixItems": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "ALERT_TREND"
+                  },
+                  "period": {
+                    "type": "object",
+                    "properties": {
+                      "from": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+                      },
+                      "to": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+                      }
+                    },
+                    "required": [
+                      "from",
+                      "to"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "contract_item_limit": {
+                    "const": null
+                  },
+                  "items": {
+                    "type": "null"
+                  },
+                  "state": {
+                    "const": "UNKNOWN"
+                  },
+                  "reader_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "sample_count": {
+                    "type": "null"
+                  },
+                  "sampled_at": {
+                    "type": "null"
+                  },
+                  "metric_version": {
+                    "type": "null"
+                  },
+                  "unavailable_reason": {
+                    "const": "EVENT_READER_NOT_IMPLEMENTED"
+                  }
+                },
+                "required": [
+                  "id",
+                  "period",
+                  "contract_item_limit",
+                  "items",
+                  "state",
+                  "reader_status",
+                  "sample_count",
+                  "sampled_at",
+                  "metric_version",
+                  "unavailable_reason"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "SERVICE_HEALTH"
+                  },
+                  "period": {
+                    "type": "null"
+                  },
+                  "contract_item_limit": {
+                    "const": null
+                  },
+                  "items": {
+                    "type": "null"
+                  },
+                  "state": {
+                    "const": "UNKNOWN"
+                  },
+                  "reader_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "sample_count": {
+                    "type": "null"
+                  },
+                  "sampled_at": {
+                    "type": "null"
+                  },
+                  "metric_version": {
+                    "type": "null"
+                  },
+                  "unavailable_reason": {
+                    "const": "SERVICE_INTERVAL_READER_NOT_IMPLEMENTED"
+                  }
+                },
+                "required": [
+                  "id",
+                  "period",
+                  "contract_item_limit",
+                  "items",
+                  "state",
+                  "reader_status",
+                  "sample_count",
+                  "sampled_at",
+                  "metric_version",
+                  "unavailable_reason"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "FAULT_TIMELINE"
+                  },
+                  "period": {
+                    "type": "object",
+                    "properties": {
+                      "from": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+                      },
+                      "to": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
+                      }
+                    },
+                    "required": [
+                      "from",
+                      "to"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "contract_item_limit": {
+                    "const": 8
+                  },
+                  "items": {
+                    "type": "null"
+                  },
+                  "state": {
+                    "const": "UNKNOWN"
+                  },
+                  "reader_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "sample_count": {
+                    "type": "null"
+                  },
+                  "sampled_at": {
+                    "type": "null"
+                  },
+                  "metric_version": {
+                    "type": "null"
+                  },
+                  "unavailable_reason": {
+                    "const": "SERVICE_INTERVAL_READER_NOT_IMPLEMENTED"
+                  }
+                },
+                "required": [
+                  "id",
+                  "period",
+                  "contract_item_limit",
+                  "items",
+                  "state",
+                  "reader_status",
+                  "sample_count",
+                  "sampled_at",
+                  "metric_version",
+                  "unavailable_reason"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "RECENT_EVENTS"
+                  },
+                  "period": {
+                    "type": "null"
+                  },
+                  "contract_item_limit": {
+                    "const": 7
+                  },
+                  "items": {
+                    "type": "null"
+                  },
+                  "state": {
+                    "const": "UNKNOWN"
+                  },
+                  "reader_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "sample_count": {
+                    "type": "null"
+                  },
+                  "sampled_at": {
+                    "type": "null"
+                  },
+                  "metric_version": {
+                    "type": "null"
+                  },
+                  "unavailable_reason": {
+                    "const": "EVENT_READER_NOT_IMPLEMENTED"
+                  }
+                },
+                "required": [
+                  "id",
+                  "period",
+                  "contract_item_limit",
+                  "items",
+                  "state",
+                  "reader_status",
+                  "sample_count",
+                  "sampled_at",
+                  "metric_version",
+                  "unavailable_reason"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "PENDING_TICKETS"
+                  },
+                  "period": {
+                    "type": "null"
+                  },
+                  "contract_item_limit": {
+                    "const": 5
+                  },
+                  "items": {
+                    "type": "null"
+                  },
+                  "state": {
+                    "const": "UNKNOWN"
+                  },
+                  "reader_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "sample_count": {
+                    "type": "null"
+                  },
+                  "sampled_at": {
+                    "type": "null"
+                  },
+                  "metric_version": {
+                    "type": "null"
+                  },
+                  "unavailable_reason": {
+                    "const": "FORMAL_TICKET_STATE_NOT_AVAILABLE"
+                  }
+                },
+                "required": [
+                  "id",
+                  "period",
+                  "contract_item_limit",
+                  "items",
+                  "state",
+                  "reader_status",
+                  "sample_count",
+                  "sampled_at",
+                  "metric_version",
+                  "unavailable_reason"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "const": "RESOURCE_TOP5"
+                  },
+                  "period": {
+                    "type": "null"
+                  },
+                  "contract_item_limit": {
+                    "const": 5
+                  },
+                  "items": {
+                    "type": "null"
+                  },
+                  "state": {
+                    "const": "UNKNOWN"
+                  },
+                  "reader_status": {
+                    "const": "NOT_IMPLEMENTED"
+                  },
+                  "sample_count": {
+                    "type": "null"
+                  },
+                  "sampled_at": {
+                    "type": "null"
+                  },
+                  "metric_version": {
+                    "type": "null"
+                  },
+                  "unavailable_reason": {
+                    "const": "MONITORING_SAMPLE_READER_NOT_IMPLEMENTED"
+                  }
+                },
+                "required": [
+                  "id",
+                  "period",
+                  "contract_item_limit",
+                  "items",
+                  "state",
+                  "reader_status",
+                  "sample_count",
+                  "sampled_at",
+                  "metric_version",
+                  "unavailable_reason"
+                ],
+                "additionalProperties": false
+              }
+            ],
+            "items": false
+          },
+          "metric_samples_loaded": {
+            "const": false
+          },
+          "clock_accuracy_verified": {
+            "const": false
+          },
+          "source": {
+            "const": "POSTGRESQL_AUTHORIZATION_AND_CLOCK_ONLY"
+          },
+          "scope": {
+            "const": "CURRENT_AUTHORIZED_TENANT"
+          },
+          "formal_metric_status": {
+            "const": "NOT_IMPLEMENTED"
+          },
+          "writes_performed": {
+            "const": false
+          }
+        },
+        "required": [
+          "tenant_id",
+          "actor_id",
+          "permission_version",
+          "generated_at",
+          "window",
+          "timezone",
+          "trend_period",
+          "last_24_hours",
+          "month_start",
+          "month_window_empty",
+          "layout_version",
+          "layout_customization_allowed",
+          "contract_refresh_seconds",
+          "kpis",
+          "panels",
+          "metric_samples_loaded",
+          "clock_accuracy_verified",
+          "source",
+          "scope",
+          "formal_metric_status",
+          "writes_performed"
+        ],
+        "additionalProperties": false,
+        "x-mop-cross-field-checks": [
+          "actor/tenant/permission match current session membership; no administrator cross-tenant bypass",
+          "all period ends equal generated_at; trend starts 24/168/720h before generated_at; last_24_hours remains 24h independently",
+          "month_start is Asia/Shanghai first day at midnight; month_window_empty iff month_start equals generated_at; monthly KPI uses this period",
+          "MTTA/delivery KPI and fault timeline use last_24_hours; alert trend uses trend_period",
+          "database clock is not NTP verification; no unavailable dataset may become an empty array or zero"
+        ]
+      },
+      "DashboardAvailabilityResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DashboardAvailabilitySnapshot"
           },
           "trace_id": {
             "type": "string"

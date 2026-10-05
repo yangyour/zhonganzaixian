@@ -456,7 +456,7 @@ const tenantInventoryPage = object({ context_tenant_id: uuid, items: { type: 'ar
 tenantInventoryPage.oneOf = [{ properties: { has_more: { const: false }, next_after_id: { type: 'null' } } }, { properties: { has_more: { const: true }, next_after_id: { type: 'string' }, items: { minItems: 1 } } }];
 const contract = {
   openapi: '3.1.0',
-  info: { title: 'MOP 共享测试环境 API', version: '0.43.0', description: '本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。' },
+  info: { title: 'MOP 共享测试环境 API', version: '0.44.0', description: '本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。' },
   servers: [{ url: '/api/v1' }],
   security: [{ SessionCookie: [] }],
   paths: {
@@ -876,6 +876,36 @@ contract.paths['/my/notification-preferences/{id}']={get:action('getOwnNotificat
 contract.paths['/my/notification-preferences/{id}/history']={get:action('listOwnNotificationPreferenceHistory','本人不可变请求历史按版本倒序分页；不代表送达记录',ref('OwnNotificationPreferenceHistoryResult'),{...ownPreferenceRead,parameters:[pathId,worksheetPageSize,parameter('before_version','query',inspectionVersion,false)]})};
 contract.components.schemas.ReadinessResult.properties.data.properties.own_notification_preferences=object({schema_access_ready:{const:true},configuration_status:{const:'CONFIG_PENDING'},effective:{const:false},receiver_binding_status:{const:'NOT_VERIFIED'},notification_dispatched:{const:false}});
 contract.components.schemas.ReadinessResult.properties.data.required.push('own_notification_preferences');
+
+// Fixed dashboard availability only; no monitor/service/event adapter has been enabled.
+const dashboardInstant={type:'string',format:'date-time',pattern:'^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$'};
+const dashboardPeriod=object({from:dashboardInstant,to:dashboardInstant});
+const dashboardNull={type:'null'};
+const dashboardMissing={state:{const:'UNKNOWN'},reader_status:{const:'NOT_IMPLEMENTED'},sample_count:dashboardNull,sampled_at:dashboardNull,metric_version:dashboardNull};
+const dashboardKpi=(id,unit,reason,keys,hasPeriod=false)=>object({id:{const:id},unit:{const:unit},period:hasPeriod?dashboardPeriod:dashboardNull,value:dashboardNull,threshold_breached:dashboardNull,drilldown_path:dashboardNull,...dashboardMissing,unavailable_reason:{const:reason},detail_counts:object(Object.fromEntries(keys.map(k=>[k,dashboardNull])))});
+const dashboardPanel=(id,reason,limit,hasPeriod=false)=>object({id:{const:id},period:hasPeriod?dashboardPeriod:dashboardNull,contract_item_limit:{const:limit},items:dashboardNull,...dashboardMissing,unavailable_reason:{const:reason}});
+const dashboardKpis=[
+ dashboardKpi('ASSET_ONLINE_RATE','PERCENT','MONITORING_SAMPLE_READER_NOT_IMPLEMENTED',['normal','unknown','total']),
+ dashboardKpi('CURRENT_PROBLEMS','COUNT','EVENT_READER_NOT_IMPLEMENTED',['disaster','severe','average','warning','information']),
+ dashboardKpi('MONTH_SERVICE_AVAILABILITY','PERCENT','SERVICE_INTERVAL_READER_NOT_IMPLEMENTED',[],true),
+ dashboardKpi('PENDING_TICKETS','COUNT','FORMAL_TICKET_STATE_NOT_AVAILABLE',['overdue_sla']),
+ dashboardKpi('MTTA_24H','MILLISECONDS','EVENT_ACKNOWLEDGEMENT_READER_NOT_IMPLEMENTED',[],true),
+ dashboardKpi('DELIVERY_RATE_24H','PERCENT','DELIVERY_RECEIPT_READER_NOT_IMPLEMENTED',['accepted','delivered'],true)
+];
+const dashboardPanels=[
+ dashboardPanel('ALERT_TREND','EVENT_READER_NOT_IMPLEMENTED',null,true),
+ dashboardPanel('SERVICE_HEALTH','SERVICE_INTERVAL_READER_NOT_IMPLEMENTED',null),
+ dashboardPanel('FAULT_TIMELINE','SERVICE_INTERVAL_READER_NOT_IMPLEMENTED',8,true),
+ dashboardPanel('RECENT_EVENTS','EVENT_READER_NOT_IMPLEMENTED',7),
+ dashboardPanel('PENDING_TICKETS','FORMAL_TICKET_STATE_NOT_AVAILABLE',5),
+ dashboardPanel('RESOURCE_TOP5','MONITORING_SAMPLE_READER_NOT_IMPLEMENTED',5)
+];
+const dashboardWindow={enum:['HOURS_24','DAYS_7','DAYS_30']};
+const dashboardSnapshot=object({tenant_id:{...uuid,pattern:'^'+uuidPattern+'$'},actor_id:{...uuid,pattern:'^'+uuidPattern+'$'},permission_version:contactReadVersion,generated_at:dashboardInstant,window:dashboardWindow,timezone:{const:'Asia/Shanghai'},trend_period:dashboardPeriod,last_24_hours:dashboardPeriod,month_start:dashboardInstant,month_window_empty:{type:'boolean'},layout_version:{const:'MOP_FIXED_DASHBOARD_V1'},layout_customization_allowed:{const:false},contract_refresh_seconds:{const:30},kpis:{type:'array',minItems:6,maxItems:6,prefixItems:dashboardKpis,items:false},panels:{type:'array',minItems:6,maxItems:6,prefixItems:dashboardPanels,items:false},metric_samples_loaded:{const:false},clock_accuracy_verified:{const:false},source:{const:'POSTGRESQL_AUTHORIZATION_AND_CLOCK_ONLY'},scope:{const:'CURRENT_AUTHORIZED_TENANT'},formal_metric_status:{const:'NOT_IMPLEMENTED'},writes_performed:{const:false}});
+dashboardSnapshot['x-mop-cross-field-checks']=['actor/tenant/permission match current session membership; no administrator cross-tenant bypass','all period ends equal generated_at; trend starts 24/168/720h before generated_at; last_24_hours remains 24h independently','month_start is Asia/Shanghai first day at midnight; month_window_empty iff month_start equals generated_at; monthly KPI uses this period','MTTA/delivery KPI and fault timeline use last_24_hours; alert trend uses trend_period','database clock is not NTP verification; no unavailable dataset may become an empty array or zero'];
+Object.assign(contract.components.schemas,{DashboardAvailabilitySnapshot:dashboardSnapshot,DashboardAvailabilityResult:envelope(ref('DashboardAvailabilitySnapshot'))});
+contract.paths['/dashboard']={get:action('getDashboardAvailability','固定首页可用性投影；只读取当前PG授权与时钟，不代表真实监控指标',ref('DashboardAvailabilityResult'),{parameters:[parameter('window','query',{...dashboardWindow,default:'HOURS_24'},false)],'x-mop-roles':['viewer','tadmin','msp','padmin'],'x-mop-capabilities':['dashboard:read'],'x-mop-read-only':true,'x-mop-current-membership-recheck':true,'x-mop-allowed-query-keys':['window'],'x-mop-reject-duplicate-query-keys':true,'x-mop-max-encoded-query-bytes':2048,'x-mop-success-writes-audit-or-receipts':false,'x-mop-runtime-integration-status':'NOT_RUN_AFTER_EXECUTOR_RECOVERY',description:'当前实现只接受合同三个趋势预设，默认24小时；设计文档任意from/to接口尚未实现并明确拒绝，不允许覆盖租户/身份/观察时刻。固定布局不支持保存。所有指标仍UNKNOWN、null，列表null不暗示没有事件；数据库故障503且无替代成功。安全过滤器返回Cache-Control:no-store。'})};
+
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

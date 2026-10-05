@@ -1,0 +1,82 @@
+{
+  "verified_at": "2026-10-05T01:31:16.447007+00:00",
+  "scope": "DASHBOARD_READ_ONLY_HTTP_IMPLEMENTATION_WITH_ISOLATED_BOUNDARIES",
+  "api_contract_version": "0.44.0",
+  "deployed": false,
+  "current_runtime_available": false,
+  "new_controller_tests": 15,
+  "new_isolated_mvc_security_tests": 6,
+  "focused_total": 43,
+  "root_reported": 2260,
+  "root_executed": 1479,
+  "root_skipped": 781,
+  "root_failures": 0,
+  "root_errors": 0,
+  "real_pg_executed": 0,
+  "real_pg_skipped": 762,
+  "minio_skipped": 6,
+  "historical_fixture_skipped": 13,
+  "contracts": 125,
+  "web_tests": 1562,
+  "web_test_files": 91,
+  "web_typecheck_build": "PASS",
+  "python_tests": 146,
+  "old_paths_unchanged": 105,
+  "old_schemas_unchanged": 233,
+  "new_paths": [
+    "/dashboard"
+  ],
+  "total_paths": 106,
+  "total_schemas": 235,
+  "new_credentials": false,
+  "new_migrations": 0,
+  "metric_samples_loaded": false,
+  "actual_http_oidc_pg": "NOT_RUN",
+  "real_browser": "NOT_RUN",
+  "formal_acceptance": "NOT_RUN",
+  "query_contract": "one optional window preset only; arbitrary from/to not implemented and rejected",
+  "authorization": "current active membership and role; reader repeats current PG check; response actor/tenant/PV/window matched",
+  "failure_history": [
+    {
+      "stage": "core commit CI 37251409922",
+      "conclusion": "failure",
+      "cause": "two tracker notes lacked literal NOT_RUN required by existing contract test",
+      "correction_commit": "1b2c27cdd3ee7aae714b9e0a007238ce0e3c5020",
+      "acceptance_checks_weakened": false
+    },
+    {
+      "stage": "first API focused tests",
+      "tests": 37,
+      "errors": 2,
+      "cause": "Mockito when restubbing evaluated old answer using null matcher inputs",
+      "fix": "doReturn/doThrow restubbing; no production guard removed"
+    },
+    {
+      "stage": "first API contract run",
+      "tests": 120,
+      "failures": 2,
+      "cause": "version assertion still0.43 plus tracker literal NOT_RUN",
+      "fix": "actual0.44 assertion and explicit tracker boundary; final125 pass"
+    }
+  ],
+  "source_sha256": {
+    "server/api/src/main/java/cn/mop/api/DashboardConfiguration.java": "537113d878097d35c6ea249615a96c285a0036ecc927ce505900399b7652e573",
+    "server/api/src/main/java/cn/mop/api/DashboardController.java": "f235b441f45fb8726244994915457509fd4545af38c369f59af066281341c3d3",
+    "server/api/src/test/java/cn/mop/api/DashboardControllerTest.java": "eb750234de8eabd13c3f0852531a653beef87af51bdf071d497da86750f52295",
+    "server/api/src/test/java/cn/mop/api/DashboardHttpSecurityTest.java": "0a631200a2e65b1767eaeac758c2c4a72b7784cbcbbe2d33a6ddb3554b65a973",
+    "tools/build-api-contract.mjs": "277c09a26e0d992eaf4b1b013a109e83e1b16c76e80167de4b369a9c575d9a3b",
+    "tests/contracts.test.mjs": "0929be0390bba1ad5d4d449ee4b4d2ab678beeb09d000b7aaa28acecdb7181f1",
+    "contracts/local-api.openapi.json": "d5f1903e192777b4833e4dd87949c772d58d01e93cd0d4ed11794718668fd0ad"
+  },
+  "log_sha256": {
+    "dashboard-api-focused-20261005.log": "b6fedcb898560852a8730d870555b70d89040a523e829b3134130c0234cade65",
+    "dashboard-api-focused-r2-20261005.log": "891b10111d7d706d9c8c712cfcf0c96bf7874e1863d7cdef9ce2c50bbd5f4a6f",
+    "dashboard-api-focused-final-20261005.log": "8c4377c05b0c90757bc63b2a1c0ed45ee8a79f2caff27fbad4bbaf21292c4b61",
+    "dashboard-api-full-20261005.log": "47ada54e41f2fb4b092aa4c1e346e18c9c8cc0801760de854abd6c165ed966b0",
+    "dashboard-contracts-initial-20261005.log": "8dc54317920fd5a12e2e979c4d53843b68cc701f232be387ea0312afa1227a94",
+    "dashboard-contracts-final-20261005.log": "4a26afe15ce5778d9d3c565fa23edbc7de7095f5fb4996d62b48c62d4bd42fcc",
+    "dashboard-api-web-20261005.log": "7fdb2d5d61d52a60497a0c1c8e5adb5c2d0a3a141243ce889a2a95ae5b06b6fd",
+    "dashboard-api-web-build-20261005.log": "44656cb3031cd5c39aef39c773f7ff45967045cad5dc6132ece2a66e84207639",
+    "dashboard-api-python-20261005.log": "c19007bdcd0d18c3ca4fdf921a69260cfec12eef869659b62d3cb3a05c3c1fc4"
+  }
+}

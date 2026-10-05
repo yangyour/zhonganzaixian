@@ -17,3 +17,15 @@ PostgresDashboardAvailabilityReader 仅从真实PG读取当前active用户/成�
 原执行环境曾观察到30项聚焦通过（12纯核心、8真实PG授权/时钟、10能力目录），根回归2220执行/762真实PG；随后执行环境切换，原始日志和未提交源码未包含在备份中。该记录仅为历史工具观察，不能绑定当前重建源码哈希，不能冒充可重放的当前组件证据。
 
 当前重建源码重新完成22纯聚焦与Java根1458执行/781跳过（762PG、6MinIO、13历史fixture），无失败。1562Web、120契约、146Python通过。当前PG/HTTP/浏览器验证NOT_RUN，真实监控和完整合同验收NOT_RUN；待新组件重建许可与后续实际验证。详见[基础证据](evidence/niko-dashboard-availability-reader-20261005.json)与[执行环境恢复](executor-recovery-20261005.md)。
+
+## 只读HTTP边界（API 0.44.0，代码验证阶段）
+
+GET /api/v1/dashboard?window=HOURS_24 提供上述固定可用性投影，window可选HOURS_24/DAYS_7/DAYS_30，省略时24小时；拒绝重复键、任意额外参数与超过2048字节query。设计文档的任意from/to尚未实现，明确400拒绝，不能当已完成任意时间查询。租户/身份/PV由会话当前成员重新授权，reader再次核对真实PG；返回值也须匹配actor/tenant/PV/window，空或错位投影503。
+
+响应包含精确六KPI/六面板、各自时间区间与缺失原因。所有指标样本、计数、列表、真实指标版本仍null。接口可返回授权/时钟可用性，不代表监控数据已可用；PG不可用不返回替代200。既有安全过滤器no-store、匿名401、CSRF保护保持；无POST/PATCH/保存布局或请求回执，正常GET不产生业务审计/写入（拒绝事件仍按统一安全审计）。
+
+21项新增隔离HTTP边界测试（15controller、6真实MVC/filter+mock仓储）通过；包括当前成员、跨范围损坏投影、未知角色、参数覆盖、null语义、无CSRF只读、带CSRF也不提供写入、503传播。隔离依赖不代表真实PG/OIDC/HTTP联调。OpenAPI新增1路径/2schema，旧105路径/233schema完全不变；正式部署、当前组件、真实HTTP与浏览器仍NOT_RUN。
+
+基础提交7e9e9be的CI发现两条新追踪备注虽写“未验”但缺机器要求的字面NOT_RUN；1b2c27c已补齐且重新生成索引，保留失败记录。API第一轮新增单测有2项Mockito重设桩时调用旧answer而NPE，改用doReturn/doThrow后通过；第一轮契约同时发现旧版本断言及上述备注，更新实际0.44版本断言并修复备注，未降低验收检查。
+
+最终离线验证：43聚焦、Java根2260报告/1479执行/781跳过、125契约、1562Web/91文件及类型构建、146Python全部通过。见[API证据](evidence/niko-dashboard-api-20261005.json)。

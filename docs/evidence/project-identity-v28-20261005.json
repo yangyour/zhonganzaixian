@@ -1,0 +1,33 @@
+{
+  "verified_at": "2026-10-05T06:53:17.420237+00:00",
+  "environment": "designated-server",
+  "postgresql": "17.9",
+  "schema_version": 28,
+  "dryrun_rolled_back": true,
+  "explicit_migration_runs": [
+    {
+      "mode": "identity-compatibility",
+      "exit_code": 0
+    },
+    {
+      "mode": "identity-compatibility",
+      "exit_code": 0
+    },
+    {
+      "mode": "readonly",
+      "exit_code": 0
+    }
+  ],
+  "sql_sha256": "5554e23a3aabfe489ae6b9258293d0f33dda0bcc7da19c60bdb873fb16b77ad7",
+  "tables_before": 66,
+  "unchanged_tables": 63,
+  "intentionally_changed_tables": [
+    "mop_role_capability_limit",
+    "mop_membership",
+    "mop_project_role"
+  ],
+  "backup_size": 3098608,
+  "backup_sha256": "fa74a9e00373ad4c7b7c19c1b8789aedb2fa8c3dd51dc353140d277eb13214ca",
+  "shared_components_restarted": false,
+  "password_policy_changed": false
+}

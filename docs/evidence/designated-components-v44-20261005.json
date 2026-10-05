@@ -1,0 +1,30 @@
+{
+  "verified_at": "2026-10-05T04:15:20.343426+00:00",
+  "environment": "designated-server-from-Windows",
+  "schema_version": 26,
+  "api_contract": "0.44.0",
+  "java_reports": 204,
+  "java_reported": 2315,
+  "java_executed": 2302,
+  "real_postgresql_tests": 762,
+  "real_minio_tests": 6,
+  "skipped_historical_fixture": 13,
+  "failures": 0,
+  "errors": 0,
+  "execution_method": "first full reactor; corrected 5 setup failures via 41 focused real-PG cases; resumed remaining modules without recounting existing cases",
+  "web_tests_after_merge": 1685,
+  "web_typecheck_build": "PASS",
+  "contracts": 125,
+  "migration_policy": 121,
+  "new_oidc_tests_and_mapping_regression": 8,
+  "new_browser_crypto_tests": 11,
+  "deployment_safeguard_tests": 5,
+  "logs_sha256": {
+    "deploy-20261005-component-verify.log": "440b5139d2853704996721d36ee8751ca00a0bf16ee02a1f602b5baf0de20bda",
+    "deploy-20261005-component-correction.log": "6b09e8cc5df707918bea16689dfb7148f3f24ee3fbf7f925c743a42f4a76f9e6",
+    "deploy-20261005-component-remaining.log": "d6bb3e2d13fa7a8ea96edabdb0cfa33311af5de2d8cece271bbc6893654b497e",
+    "deploy-20261005-merged-web.log": "8f969687c4ee292156e71299575bbf0544ae80897a3a3779ff1aa7aa6ba34533",
+    "deploy-20261005-merged-build.log": "4f9cf45c82d2753add20072cbb9286afb32faeffda2706ec69e29925c76c9ce9"
+  },
+  "formal_acceptance": "NOT_RUN"
+}

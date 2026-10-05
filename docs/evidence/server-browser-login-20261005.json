@@ -1,0 +1,19 @@
+{
+  "verified_at": "2026-10-05T04:15:43.481Z",
+  "environment": "designated-server-acceptance",
+  "mode": "login",
+  "real_browser": true,
+  "physical_mobile": false,
+  "checks": [],
+  "screenshots": [],
+  "page_errors": 0,
+  "failed_api_gets": [],
+  "completed": false,
+  "formal_acceptance": "NOT_RUN",
+  "attempt": 1,
+  "browser_version": "154.0.4258.53",
+  "failure": {
+    "stage": "oidc_padmin",
+    "type": "TimeoutError"
+  }
+}

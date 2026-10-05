@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-05应用现部署在原指定服务器10010端口，API仅回环18010，项目Nginx回环19000只转发既有MinIO。五个项目应用容器复用服务器已有Java17/Nginx镜像；原PG/KC/MinIO启动时间在部署前后相同。独立mop-acceptance realm/client及六个虚构身份使用原Keycloak服务，原mop-test不变。真实ready/发现200、六角色登录通过；762PG/6MinIO组件回归、1685Web已验，后续业务HTTP/UI单列。见[部署说明](../test-server-deployment.md)。
+
 2026-10-05服务器验收部署盘点：原PG17.9、Keycloak26.2.4、MinIO现有实例可达。原项目库显式V23–V26各1次、重复/只读0次，48张旧业务表摘要相同；未重启共享组件。外部登录支持新增固定验收origin/独立项目realm策略，8项隔离身份测试通过，真实部署与登录验收另行记录。见[部署说明](../test-server-deployment.md)和[V26证据](../evidence/designated-schema-v26-20261005.json)。
 
 历史服务器盘点日期：2026-09-30；本地接续验证更新：2026-10-01。云端已停止业务写入，本批本地通过工程loopback隧道复用同一指定服务器，照片PG/MinIO/OIDC实际联调已通过；历史云端未连通记录另保留。原连接资料仅在Git忽略的`deploy/private/develop.txt`，本文不记录密码、token或含密连接串。

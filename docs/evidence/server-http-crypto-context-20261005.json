@@ -1,0 +1,8 @@
+{
+  "secure_context": false,
+  "random_uuid_available": false,
+  "subtle_digest_available": false,
+  "get_random_values_available": true,
+  "real_browser": "154.0.4258.53",
+  "scope": "existing project prototype on same designated HTTP IP; no business writes"
+}

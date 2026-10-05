@@ -53,8 +53,8 @@ class TestOidcConfigurationTest {
     }
     @Test void aDifferentRealmOrUnscopedClientFailsBeforeDiscovery(){
         var configuration=new TestOidcConfiguration(mock(PlatformRepository.class));
-        assertThatThrownBy(()->configuration.oidcClients("https://other-provider.example/realms/production","mop-web","isolated-unit-secret")).isInstanceOf(IllegalStateException.class);
-        assertThatThrownBy(()->configuration.oidcClients(ISSUER,"shared-client","isolated-unit-secret")).isInstanceOf(IllegalStateException.class);
-        assertThatThrownBy(()->configuration.oidcClients(ISSUER,"mop-web"," ")).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(()->configuration.oidcClients("https://other-provider.example/realms/production","mop-web","isolated-unit-secret", "")).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(()->configuration.oidcClients(ISSUER,"shared-client","isolated-unit-secret", "")).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(()->configuration.oidcClients(ISSUER,"mop-web"," ", "")).isInstanceOf(IllegalStateException.class);
     }
 }

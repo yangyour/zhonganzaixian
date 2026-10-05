@@ -36,9 +36,9 @@ public class TestOidcConfiguration {
     public TestOidcConfiguration(PlatformRepository repository){this.repository=repository;}
     @Bean ClientRegistrationRepository oidcClients(
         @Value("${MOP_OIDC_ISSUER}") String issuer,@Value("${MOP_OIDC_CLIENT_ID}") String client,
-        @Value("${MOP_OIDC_CLIENT_SECRET}") String secret){
-        if(!issuer.matches("http://127\\.0\\.0\\.1:[0-9]+/realms/mop-test")||!"mop-web".equals(client)||secret.isBlank())
-            throw new IllegalStateException("FAIL_CLOSED: use the SSH-forwarded mop-test Keycloak realm and dedicated mop-web client with a private secret");
+        @Value("${MOP_OIDC_CLIENT_SECRET}") String secret,
+        @Value("${MOP_TEST_PUBLIC_ORIGIN:}") String publicOrigin){
+        TestOidcEndpointPolicy.validate(issuer,client,secret,publicOrigin);
         return new InMemoryClientRegistrationRepository(ClientRegistrations.fromIssuerLocation(issuer)
             .registrationId("mop").clientId(client).clientSecret(secret)
             .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)

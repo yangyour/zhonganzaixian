@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 40,
-  "rows_without_progress_notes": 88,
+  "rows_with_progress_notes": 42,
+  "rows_without_progress_notes": 86,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -16,7 +16,7 @@
   "modules": {
     "M1": {
       "requirements": 11,
-      "rows_with_progress_notes": 2,
+      "rows_with_progress_notes": 4,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 11
       }
@@ -90,8 +90,11 @@
       "id": "M1-1",
       "title": "运营总览首页",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/dashboard-fixed-overview.md",
+        "docs/evidence/niko-dashboard-availability-reader-20261005.json"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -184,8 +187,11 @@
       "id": "M1-11",
       "title": "首页版面管理",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/dashboard-fixed-overview.md",
+        "docs/evidence/niko-dashboard-availability-reader-20261005.json"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1374,6 +1380,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "4a1ab0320a510caeeb480ffafe2c7b35a40f6ff81146ba72568c1f8ca07e3816"
+    "doc/development/07_合同逐项开发追踪.md": "ef6841c5483bde49041cfd98e47112897f642307c9e3c90410f0be0853c5cc00"
   }
 }

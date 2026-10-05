@@ -1,3 +1,4 @@
+import { createRequestId, digestSha256 } from './browserCrypto'
 import { computed, readonly, ref, shallowRef, watch } from 'vue'
 import { api, ApiError, isCancelled, StaleRequestError } from '../api/client'
 import type { AssetImportAcceptance, AssetImportFormat, AssetImportMappingRequest, AssetImportOperation, AssetImportParseRequest, AssetImportPolicy, AssetImportSource } from '../api/assetImportTypes'
@@ -141,11 +142,11 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
     if (uploadAttempt.value?.state === 'ACCEPTED') { await refresh(); return }
     if (source.value || uploadAttempt.value && uploadAttempt.value.state !== 'UNCERTAIN') return
     const retry = uploadAttempt.value?.state === 'UNCERTAIN'
-    const attempt = uploadAttempt.value || { file: file.value, format: format.value, key: crypto.randomUUID(), state: 'UNCERTAIN' as const, sourceId: null, operationId: null, compared: false }
+    const attempt = uploadAttempt.value || { file: file.value, format: format.value, key: createRequestId(), state: 'UNCERTAIN' as const, sourceId: null, operationId: null, compared: false }
     uploadAttempt.value = attempt; const active = uploadAttempt.value; const request = begin('upload'); uploadError.value = null
     const body = new FormData(); body.append('file', attempt.file, attempt.file.name); body.append('purpose', 'asset_import_source'); body.append('format', attempt.format)
     try {
-      if (!active.sha256) { const digest = await crypto.subtle.digest('SHA-256', await active.file.arrayBuffer()); alive(request.expected); active.sha256 = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('') }
+      if (!active.sha256) { const digest = await digestSha256( await active.file.arrayBuffer()); alive(request.expected); active.sha256 = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('') }
       const result = await client.request<AssetImportAcceptance>('/assets/import-sources', { method: 'POST', body, idempotencyKey: active.key, signal: request.signal }); alive(request.expected); accept(active, result); await readAttempt(active, 'STORE_RAW', request, true)
     }
     catch (cause) { if (!isCancelled(cause) && request.expected === epoch) { if (active.state === 'UNCERTAIN' && !retry) active.state = failureState(cause); uploadError.value = cause } }
@@ -161,7 +162,7 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
       try {
         const body = { ...buildAssetImportParseSelection(format.value, selection.value, inventory), expected_version: source.value.version }
         if (format.value === 'XLSX' && !inventory && !source.value.parsed_artifact?.sheets.some(sheet => sheet.index === body.sheet_index)) throw new AssetImportInputError({ sheetIndex: '请先读取工作表目录，再明确选择其中的工作表' })
-        attempt = { sourceId: source.value.id, body, key: crypto.randomUUID(), state: 'UNCERTAIN', operationId: null, compared: false }; parseAttempt.value = attempt; fields.value = {}
+        attempt = { sourceId: source.value.id, body, key: createRequestId(), state: 'UNCERTAIN', operationId: null, compared: false }; parseAttempt.value = attempt; fields.value = {}
       } catch (cause) { if (cause instanceof AssetImportInputError) fields.value = cause.fields; else parseError.value = cause; return }
     }
     const request = begin('parse'); parseError.value = null
@@ -192,7 +193,7 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
     const retry = mappingAttempt.value?.state === 'UNCERTAIN'
     let attempt = retry ? mappingAttempt.value : null
     if (!attempt) {
-      try { const body = buildAssetImportMappingRequest(source.value.version, artifact.value.parse_hash, artifact.value.columns, mappingDraft.value); attempt = { sourceId: source.value.id, body, key: crypto.randomUUID(), state: 'UNCERTAIN', operationId: null, compared: false }; mappingAttempt.value = attempt; fields.value = {} }
+      try { const body = buildAssetImportMappingRequest(source.value.version, artifact.value.parse_hash, artifact.value.columns, mappingDraft.value); attempt = { sourceId: source.value.id, body, key: createRequestId(), state: 'UNCERTAIN', operationId: null, compared: false }; mappingAttempt.value = attempt; fields.value = {} }
       catch (cause) { if (cause instanceof AssetImportInputError) fields.value = cause.fields; else mappingError.value = cause; return }
     }
     const request = begin('mapping'); mappingError.value = null

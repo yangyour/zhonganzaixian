@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { isCancelled, type ApiClient } from '../api/client'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { writeFailureUncertain } from './writeFailure'
@@ -7,7 +8,7 @@ export interface ChangeNoticeAttempt { path:string; method:'POST'|'PATCH'; actio
 export interface ChangeNoticeState { page:ChangeNoticePage|null; selected:ChangeNoticeDetail|null; history:ChangeNoticeHistory|null; receipt:ChangeNoticeDetail|null; attempt:ChangeNoticeAttempt|null; paged:boolean; busy:'read'|'write'|null; error:unknown }
 export const emptyChangeNoticeState=():ChangeNoticeState=>({page:null,selected:null,history:null,receipt:null,attempt:null,paged:false,busy:null,error:null})
 const same=(a:unknown,b:unknown):boolean=>{if(a===b)return true;if(Array.isArray(a)&&Array.isArray(b))return a.length===b.length&&a.every((v,i)=>same(v,b[i]));if(a&&b&&typeof a==='object'&&typeof b==='object'&&!Array.isArray(a)&&!Array.isArray(b)){const x=a as Record<string,unknown>,y=b as Record<string,unknown>;return Object.keys(x).length===Object.keys(y).length&&Object.keys(x).every(k=>Object.hasOwn(y,k)&&same(x[k],y[k]))}return false}
-export function createChangeNoticeWorkspace(client:Pick<ApiClient,'request'>,changed:(state:ChangeNoticeState)=>void,newKey:()=>string=()=>crypto.randomUUID()){
+export function createChangeNoticeWorkspace(client:Pick<ApiClient,'request'>,changed:(state:ChangeNoticeState)=>void,newKey:()=>string=()=>createRequestId()){
   let context:ChangeNoticeContext|null=null,state=emptyChangeNoticeState(),epoch=0,abort:AbortController|null=null,disposed=false
   const snapshot=()=>detachedWorkspaceState(state),emit=()=>changed(snapshot()),unresolved=()=>state.busy==='write'||state.attempt?.state==='uncertain'
   function reset(next:ChangeNoticeContext|null){abort?.abort();abort=null;++epoch;context=!disposed&&validChangeNoticeContext(next)?{...next}:null;state=emptyChangeNoticeState();emit()}

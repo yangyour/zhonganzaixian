@@ -1,3 +1,4 @@
+import { digestSha256 } from './browserCrypto'
 import { ApiError } from '../api/client'
 import { inspectionMaxVersion, inspectionUuid, validInspectionContext, validInspectionText, type InspectionContext } from './inspectionTemplates'
 import { inspectionSourceBytes, readInspectionSourceRevision, readInspectionSourceShape, type InspectionSourceRevision } from './inspectionSourceRevision'
@@ -29,7 +30,7 @@ const i8=(n:number)=>{const b=new Uint8Array(8);new DataView(b.buffer).setBigInt
 const bytes=(s:string)=>new TextEncoder().encode(s)
 const join=(parts:Uint8Array[])=>{const b=new Uint8Array(parts.reduce((n,p)=>n+p.length,0));let at=0;for(const p of parts){b.set(p,at);at+=p.length}return b}
 const field=(s:string)=>{const b=bytes(s);return join([i4(b.length),b])}
-export async function sourceCollectionSha(value:Uint8Array):Promise<string>{const digest=await crypto.subtle.digest('SHA-256',value as Uint8Array<ArrayBuffer>);return Array.from(new Uint8Array(digest)).map(n=>n.toString(16).padStart(2,'0')).join('')}
+export async function sourceCollectionSha(value:Uint8Array):Promise<string>{const digest=await digestSha256(value as Uint8Array<ArrayBuffer>);return Array.from(new Uint8Array(digest)).map(n=>n.toString(16).padStart(2,'0')).join('')}
 export function readSourceCollectionPayload(raw:unknown):SourceCollectionPayload{
   if(!exact(raw,['expected_version','label','sources'])||raw.expected_version!==0||!validInspectionText(raw.label,200)||!Array.isArray(raw.sources)||raw.sources.length>1000)throw sourceCollectionBad()
   const seen=new Set<string>(),sources:SourceCollectionSelection[]=[]

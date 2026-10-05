@@ -1,3 +1,4 @@
+import { digestSha256 } from './browserCrypto'
 import { ApiError } from '../api/client'
 import { utcInstantNanos } from './utcInstant'
 import { inspectionFingerprint, inspectionMaxVersion, inspectionUuid, readInspectionDefinition, readInspectionDetail, readInspectionDetailShape, validInspectionContext, validInspectionText, type InspectionAction, type InspectionContext, type InspectionDefinition, type InspectionDetail, type InspectionItem, type InspectionView } from './inspectionTemplates'
@@ -92,7 +93,7 @@ export function worksheetBytes(value: WorksheetDetail | WorksheetRevision, tenan
   for (const item of definition.items) { const row = byKey.get(item.key); if (!row) continue; field(row.key); field(row.result); field(row.note); parts.push(integer(0)) }
   const bytes = new Uint8Array(parts.reduce((sum, part) => sum + part.length, 0)); if (bytes.length > 2_097_152) throw worksheetBad(); let offset = 0; for (const part of parts) { bytes.set(part, offset); offset += part.length } return bytes
 }
-export async function worksheetFingerprint(value: WorksheetDetail | WorksheetRevision, tenantId: string): Promise<string> { const bytes = worksheetBytes(value, tenantId), hash = await crypto.subtle.digest('SHA-256', bytes as Uint8Array<ArrayBuffer>); return Array.from(new Uint8Array(hash)).map(byte => byte.toString(16).padStart(2, '0')).join('') }
+export async function worksheetFingerprint(value: WorksheetDetail | WorksheetRevision, tenantId: string): Promise<string> { const bytes = worksheetBytes(value, tenantId), hash = await digestSha256( bytes as Uint8Array<ArrayBuffer>); return Array.from(new Uint8Array(hash)).map(byte => byte.toString(16).padStart(2, '0')).join('') }
 async function verifyContent(value: WorksheetDetail | WorksheetRevision, tenantId: string) { if (await inspectionFingerprint(worksheetDefinition(value)) !== value.template_content_sha256 || await worksheetFingerprint(value, tenantId) !== value.content_sha256) throw worksheetBad() }
 export async function readWorksheetDetail(value: unknown, context: WorksheetContext): Promise<WorksheetDetail> { const row = readWorksheetDetailShape(value, context); await verifyContent(row, context.tenantId); return row }
 export function readWorksheetPage(value: unknown, context: WorksheetContext, view: WorksheetView, assetId: string, before?: { time: string; id: string }): WorksheetPage {

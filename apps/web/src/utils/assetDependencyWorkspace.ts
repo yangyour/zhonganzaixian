@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 
@@ -59,7 +60,7 @@ export function readDependencyReceipt(value: unknown, context: DependencyContext
   return result
 }
 
-export function createDependencyWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: DependencyState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createDependencyWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: DependencyState) => void, newKey: () => string = () => createRequestId()) {
   let context: DependencyContext | null = null, epoch = 0, request: AbortController | undefined
   let state: DependencyState = { draft: null, receipt: null, attempt: null, busy: null, error: null }
   const emit = () => changed(detachedWorkspaceState(state))

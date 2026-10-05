@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import type { Configuration } from '../api/types'
@@ -18,7 +19,7 @@ export function readRegistryDraft(v: unknown): RegistryDraft {
 }
 function unchangedMetadata(v: RegistryDraft) { return Object.fromEntries(Object.entries(v).filter(([key]) => !['version', 'draft_value', 'lifecycle_status'].includes(key))) }
 export const emptyConfigurationDraftState = (): ConfigurationDraftState => ({ baseline: null, lastRead: null, receipt: null, attempt: null, busy: null, error: null })
-export function createConfigurationDraftWriter(client: Pick<ApiClient, 'request'>, changed: (state: ConfigurationDraftState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createConfigurationDraftWriter(client: Pick<ApiClient, 'request'>, changed: (state: ConfigurationDraftState) => void, newKey: () => string = () => createRequestId()) {
   let scope: ConfigurationDraftContext | null = null, state = emptyConfigurationDraftState(), epoch = 0, controller: AbortController | undefined
   const emit = () => changed(detachedWorkspaceState(state)), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: ConfigurationDraftContext | null) { controller?.abort(); ++epoch; const valid = next && uuid.test(next.actorId) && uuid.test(next.tenantId) && version(next.permissionVersion); scope = valid ? { ...next! } : null; state = emptyConfigurationDraftState(); if (next && !valid) state.error = invalid(); emit() }

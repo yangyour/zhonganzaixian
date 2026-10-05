@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { readCapacityInput, readCapacityResult, type CapacityInput, type CapacityResult } from './capacityEstimateWorkspace'
 import { validateInternalNoteText } from './internalNoteWorkspace'
@@ -35,7 +36,7 @@ export function readScenarioPage(v: unknown, context: ScenarioContext, before?: 
   return copy(v) as unknown as ScenarioPage
 }
 export const emptyScenarioState = (): ScenarioState => ({ page: null, selected: null, receipt: null, attempt: null, query: '', paged: false, busy: null, error: null })
-export function createScenarioWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: ScenarioState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createScenarioWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: ScenarioState) => void, newKey: () => string = () => createRequestId()) {
   let context: ScenarioContext | null = null, state = emptyScenarioState(), epoch = 0, abort: AbortController | undefined
   const snapshot = () => ({ ...copy({ ...state, error: null }), error: state.error }), emit = () => changed(snapshot()), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: ScenarioContext | null) { abort?.abort(); epoch++; context = next && next.role === 'padmin' && next.canRead && uuid.test(next.actorId) && uuid.test(next.tenantId) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion > 0 ? { ...next } : null; state = emptyScenarioState(); emit() }

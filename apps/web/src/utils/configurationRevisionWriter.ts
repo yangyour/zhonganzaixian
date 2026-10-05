@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { utcInstantNanos } from './utcInstant'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
@@ -27,7 +28,7 @@ export function readConfigurationRevision(v: unknown, context: RevisionWriteCont
   return copy(v) as unknown as ConfigurationRevision
 }
 export const emptyRevisionWriteState = (): RevisionWriteState => ({ attempt: null, receipt: null, busy: false, error: null })
-export function createConfigurationRevisionWriter(client: Pick<ApiClient, 'request'>, changed: (state: RevisionWriteState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createConfigurationRevisionWriter(client: Pick<ApiClient, 'request'>, changed: (state: RevisionWriteState) => void, newKey: () => string = () => createRequestId()) {
   let scope: RevisionWriteContext | null = null, state = emptyRevisionWriteState(), epoch = 0, controller: AbortController | undefined
   const emit = () => changed(detachedWorkspaceState(state)), unresolved = () => state.busy || state.attempt?.state === 'uncertain'
   function reset(next: RevisionWriteContext | null) { controller?.abort(); ++epoch; const valid = next && uuid.test(next.actorId) && uuid.test(next.tenantId) && version(next.permissionVersion) && /^[A-Za-z0-9_.:-]{1,160}$/.test(next.configurationKey); scope = valid ? { ...next! } : null; state = emptyRevisionWriteState(); if (next && !valid) state.error = invalid(); emit() }

@@ -1,3 +1,4 @@
+import { digestSha256 } from './browserCrypto'
 import { ApiError } from '../api/client'
 import { utcInstantNanos, utcNotBefore } from './utcInstant'
 
@@ -52,7 +53,7 @@ export function inspectionTemplateBytes(value: unknown): Uint8Array {
   return bytes
 }
 export async function inspectionFingerprint(value: unknown): Promise<string> {
-  const bytes = inspectionTemplateBytes(value), hash = await crypto.subtle.digest('SHA-256', bytes as Uint8Array<ArrayBuffer>)
+  const bytes = inspectionTemplateBytes(value), hash = await digestSha256( bytes as Uint8Array<ArrayBuffer>)
   return Array.from(new Uint8Array(hash)).map(byte => byte.toString(16).padStart(2, '0')).join('')
 }
 const factKeys = ['device_type','name','item_count','content_sha256','approval_status','publication_status','report_published','active_scan_performed','source','record_source']

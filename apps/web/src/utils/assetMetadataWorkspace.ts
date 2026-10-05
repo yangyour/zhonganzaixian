@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { isUtcInstant, utcNotBefore } from './utcInstant'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
@@ -82,7 +83,7 @@ function readReferences(value: unknown, query: string): MetadataReferences {
   return clone(value) as unknown as MetadataReferences
 }
 export const emptyMetadataState = (): MetadataState => ({ current: null, history: null, references: null, receipt: null, attempt: null, busy: null, error: null })
-export function createMetadataWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: MetadataState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createMetadataWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: MetadataState) => void, newKey: () => string = () => createRequestId()) {
   let context: MetadataContext | null = null, state = emptyMetadataState(), epoch = 0, controller: AbortController | undefined
   const emit = () => changed(detachedWorkspaceState(state)), path = () => `/assets/${context!.assetId}/manual-metadata`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: MetadataContext | null) { controller?.abort(); ++epoch; const valid = next && [next.tenantId, next.assetId, next.actorId].every(id => uuid.test(id)) && version(next.permissionVersion) && typeof next.canWrite === 'boolean'; context = valid ? { ...next! } : null; state = emptyMetadataState(); if (next && !valid) state.error = invalid(); emit() }

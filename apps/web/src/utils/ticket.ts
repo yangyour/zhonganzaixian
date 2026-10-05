@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import type { CustomerReportCreate, TicketCategory, TicketImpactScope, TicketUrgency } from '../api/types'
 
 export const ticketCategories: TicketCategory[] = ['网络不通', '网速慢', 'WiFi问题', '设备异常', '其他']
@@ -46,7 +47,7 @@ export function parseCustomerReport(form: CustomerReportForm, selectableAssetIds
   }
 }
 export interface ReportSubmissionAttempt { key: string; payload: string; body: CustomerReportCreate; state: 'ready' | 'uncertain' | 'accepted' }
-export function prepareReportAttempt(previous: ReportSubmissionAttempt | null, body: CustomerReportCreate, newKey: () => string = () => crypto.randomUUID()): ReportSubmissionAttempt {
+export function prepareReportAttempt(previous: ReportSubmissionAttempt | null, body: CustomerReportCreate, newKey: () => string = () => createRequestId()): ReportSubmissionAttempt {
   const payload = JSON.stringify(body)
   if (previous?.state === 'accepted') throw new Error('本次报障已登记，请查询登记结果，不要再次创建')
   if (previous?.state === 'uncertain' && previous.payload !== payload) throw new Error('本次提交结果尚不确定，请保留原填写内容并使用原请求重试')

@@ -1,3 +1,4 @@
+import { createRequestId, digestSha256 } from './browserCrypto'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { worklogInstant } from './worklogWorkspace'
@@ -16,7 +17,7 @@ const invalid = () => new ApiError(200, 'INVALID_TICKET_COMMENT_RESPONSE', '客�
 export function validateTicketCommentText(value: unknown): asserts value is string {
   if (typeof value !== 'string' || !value.replace(/[\s\u0085]+/gu, '') || Array.from(value).length > 2000 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/.test(value) || Array.from(value).some(c => c.length === 1 && /[\ud800-\udfff]/.test(c))) throw new Error('请填写1至2000个字符的客户可见文字，允许换行和制表；不要填写密码或密钥')
 }
-export async function ticketCommentHash(text: string): Promise<string> { const bytes = new TextEncoder().encode(text); return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), v => v.toString(16).padStart(2, '0')).join('') }
+export async function ticketCommentHash(text: string): Promise<string> { const bytes = new TextEncoder().encode(text); return Array.from(new Uint8Array(await digestSha256( bytes)), v => v.toString(16).padStart(2, '0')).join('') }
 export async function readTicketComment(value: unknown, scope: CommentContext): Promise<TicketComment> {
   try {
     if (!exact(value, ['id', 'tenant_id', 'ticket_id', 'author_kind', 'author_label', 'observed_ticket_version', 'text', 'text_sha256', 'created_at', 'visibility', 'record_source', 'verification_status', 'source', 'immutable', 'ticket_state_changed', 'sla_changed', 'itsm_applied', 'itsm_sync_status', 'itsm_sync_available']) || typeof value.id !== 'string' || !uuid.test(value.id) || value.tenant_id !== scope.tenantId || value.ticket_id !== scope.ticketId || !((value.author_kind === 'REPORTER' && value.author_label === '报障人') || (value.author_kind === 'ENGINEER' && value.author_label === '工程师')) || !version(value.observed_ticket_version) || typeof value.created_at !== 'string' || !value.created_at.endsWith('Z') || !Number.isFinite(worklogInstant(value.created_at)) || value.visibility !== 'REPORTER_AND_INTERNAL' || value.record_source !== 'MANUAL_TICKET_COMMENT' || value.verification_status !== 'SELF_REPORTED' || value.source !== 'postgresql' || value.immutable !== true || value.ticket_state_changed !== false || value.sla_changed !== false || value.itsm_applied !== false || value.itsm_sync_available !== false || value.itsm_sync_status !== 'NOT_REQUESTED' || typeof value.text_sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(value.text_sha256)) throw invalid()
@@ -34,7 +35,7 @@ async function readPage(value: unknown, scope: CommentContext, parentVersion: nu
   return copy({ ...value, items }) as unknown as CommentPage
 }
 export const emptyCommentState = (): CommentState => ({ page: null, parentVersion: null, receipt: null, attempt: null, busy: null, error: null, paged: false })
-export function createTicketCommentWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: CommentState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createTicketCommentWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: CommentState) => void, newKey: () => string = () => createRequestId()) {
   let scope: CommentContext | null = null, state = emptyCommentState(), epoch = 0, controller: AbortController | undefined
   const emit = () => changed(detachedWorkspaceState(state)), path = () => `/tickets/${scope!.ticketId}/comments`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: CommentContext | null) { controller?.abort(); ++epoch; const valid = next && [next.tenantId, next.ticketId, next.actorId].every(id => uuid.test(id)) && version(next.permissionVersion) && typeof next.canWrite === 'boolean' && ['REPORTER', 'ENGINEER'].includes(next.authorKind); scope = valid ? { ...next! } : null; state = emptyCommentState(); if (next && !valid) state.error = invalid(); emit() }

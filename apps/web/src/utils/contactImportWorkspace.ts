@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { readContactFacts, type ContactContext, type ContactFacts } from './customerContactWorkspace'
 import { parseContactPreviewText } from './contactImportPreviewWorkspace'
@@ -51,7 +52,7 @@ export function readContactImportPage(raw: unknown, context: ContactContext, bef
  return copy(raw) as unknown as ContactImportPage
 }
 export const emptyContactImportState = (): ContactImportState => ({ page: null, selected: null, receipt: null, attempt: null, paged: false, busy: null, error: null })
-export function createContactImportWorkspace(client: Pick<ApiClient, 'request'>, notify: (state: ContactImportState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createContactImportWorkspace(client: Pick<ApiClient, 'request'>, notify: (state: ContactImportState) => void, newKey: () => string = () => createRequestId()) {
  let scope: ContactContext | null = null, state = emptyContactImportState(), epoch = 0, abort: AbortController | null = null, disposed = false
  const known = new Map<string, ContactImportSummary>(), snapshot = () => ({ ...copy({ ...state, error: null }), error: state.error }), emit = () => notify(snapshot()), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
  function remember(job: ContactImportSummary) { const current = Object.fromEntries(keys.map(k => [k, job[k as keyof ContactImportSummary]])) as unknown as ContactImportSummary, prior = known.get(job.id); if (prior) { for (const key of ['tenant_id', 'created_by', 'accepted_permission_version', 'input_sha256', 'mode', 'row_count', 'created_at'] as const) if (prior[key] !== current[key]) throw bad(); if (current.version < prior.version || current.attempts < prior.attempts || date(current.updated_at) < date(prior.updated_at) || (current.version === prior.version || ['SUCCEEDED', 'FAILED'].includes(prior.status)) && !equals(prior, current)) throw bad() } known.set(job.id, copy(current)); if (known.size > 512) known.delete(known.keys().next().value!) }

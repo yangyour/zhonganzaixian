@@ -1,3 +1,4 @@
+import { digestSha256 } from './browserCrypto'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { detachedReadState } from './detachedWorkspaceState'
 import { inspectionMaxVersion, inspectionTemplateBytes, inspectionUuid, validInspectionContext } from './inspectionTemplates'
@@ -40,7 +41,7 @@ export function inspectionSourceBytes(source: InspectionSourceRevision): Uint8Ar
   const result=new Uint8Array(parts.reduce((n,b)=>n+b.length,0));let offset=0;for(const p of parts){result.set(p,offset);offset+=p.length}return result
 }
 export async function inspectionSourceFingerprint(source: InspectionSourceRevision): Promise<string> {
-  const bytes=inspectionSourceBytes(source),digest=await crypto.subtle.digest('SHA-256',bytes as Uint8Array<ArrayBuffer>)
+  const bytes=inspectionSourceBytes(source),digest=await digestSha256(bytes as Uint8Array<ArrayBuffer>)
   return Array.from(new Uint8Array(digest)).map(n=>n.toString(16).padStart(2,'0')).join('')
 }
 export async function readInspectionSourceRevision(raw:unknown,context:WorksheetContext,selected:InspectionSourceTarget):Promise<InspectionSourceRevision>{

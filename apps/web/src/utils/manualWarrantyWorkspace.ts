@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { readMetadataCurrent, readMetadataHistory, validMetadataDate, validateMetadataInput, type MetadataContext, type MetadataCurrent, type MetadataInput, type MetadataSnapshot, type MetadataRevision, type MetadataHistory } from './assetMetadataWorkspace'
@@ -54,7 +55,7 @@ function readWarrantyHistory(v: unknown, scope: MetadataContext, current: Warran
 }
 const sameSnapshot = (a: WarrantyCurrent, b: WarrantyCurrent) => a.metadata_version === b.metadata_version && ['name', 'type', 'site_id', 'management_ip', 'source', 'status', 'lifecycle_status', 'sampled_at', 'availability', 'sync_state', 'created_at', 'updated_at'].every(k => a.asset[k as keyof typeof a.asset] === b.asset[k as keyof typeof b.asset]) && (a.metadata === null || b.metadata === null ? a.metadata === b.metadata : baseKeys.every(k => a.metadata![k] === b.metadata![k])) && sameDetails(a.warranty_details, b.warranty_details)
 export const emptyWarrantyState = (): WarrantyState => ({ current: null, history: null, receipt: null, attempt: null, busy: null, error: null })
-export function createWarrantyWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: WarrantyState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createWarrantyWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: WarrantyState) => void, newKey: () => string = () => createRequestId()) {
   let context: MetadataContext | null = null, state = emptyWarrantyState(), epoch = 0, controller: AbortController | undefined, known: WarrantyCurrent | null = null, visible = true
   const emit = () => changed(detachedWorkspaceState(state)), path = () => `/assets/${context!.assetId}/manual-metadata/warranty`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: MetadataContext | null) { controller?.abort(); ++epoch; const valid = next && [next.tenantId, next.assetId, next.actorId].every(v => uuid.test(v)) && version(next.permissionVersion) && typeof next.canWrite === 'boolean'; context = valid ? { ...next! } : null; known = null; state = emptyWarrantyState(); if (next && !valid) state.error = invalid(); emit() }

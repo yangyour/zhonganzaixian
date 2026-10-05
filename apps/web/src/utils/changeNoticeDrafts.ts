@@ -1,3 +1,4 @@
+import { digestSha256 } from './browserCrypto'
 import { ApiError } from '../api/client'
 import { utcInstantNanos, utcNotBefore } from './utcInstant'
 import { inspectionUuid, validInspectionContext, validInspectionText, type InspectionContext } from './inspectionTemplates'
@@ -37,7 +38,7 @@ export function changeNoticeBytes(tenant:string,applicant:string,value:unknown):
   field('MOP_CHANGE_NOTICE_DRAFT_V1');field(tenant);field(applicant);field(d.ticket_id);field(d.change_summary);parts.push(i8(utcInstantNanos(d.planned_start_at)!/1_000_000n));if(d.planned_end_at===null)parts.push(i4(-1));else parts.push(i4(8),i8(utcInstantNanos(d.planned_end_at)!/1_000_000n));parts.push(i4(d.asset_ids.length));for(const id of d.asset_ids)field(id)
   const result=new Uint8Array(parts.reduce((n,p)=>n+p.length,0));let offset=0;for(const p of parts){result.set(p,offset);offset+=p.length}return result
 }
-export async function changeNoticeFingerprint(tenant:string,applicant:string,value:unknown):Promise<string>{const bytes=changeNoticeBytes(tenant,applicant,value),hash=await crypto.subtle.digest('SHA-256',bytes as Uint8Array<ArrayBuffer>);return Array.from(new Uint8Array(hash)).map(n=>n.toString(16).padStart(2,'0')).join('')}
+export async function changeNoticeFingerprint(tenant:string,applicant:string,value:unknown):Promise<string>{const bytes=changeNoticeBytes(tenant,applicant,value),hash=await digestSha256(bytes as Uint8Array<ArrayBuffer>);return Array.from(new Uint8Array(hash)).map(n=>n.toString(16).padStart(2,'0')).join('')}
 export function readChangeNoticePayload(v: unknown, action: ChangeNoticeAction): ChangeNoticePayload {
   if (!['CREATE','UPDATE','ARCHIVE','RESTORE'].includes(action) || !exact(v,['expected_version',...(['CREATE','UPDATE'].includes(action)?definitionKeys:[])]) || !Number.isSafeInteger(v.expected_version) || (action === 'CREATE' ? v.expected_version !== 0 : !version(v.expected_version) || v.expected_version >= changeNoticeMaxVersion)) throw changeNoticeBad()
   const { expected_version, ...definition } = v

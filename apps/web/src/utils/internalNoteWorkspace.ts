@@ -1,3 +1,4 @@
+import { createRequestId, digestSha256 } from './browserCrypto'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { worklogInstant } from './worklogWorkspace'
@@ -16,7 +17,7 @@ const invalid = () => new ApiError(200, 'INVALID_INTERNAL_NOTE_RESPONSE', '内�
 export function validateInternalNoteText(value: unknown): asserts value is string {
   if (typeof value !== 'string' || !value.replace(/[\s\u0085]+/gu, '') || Array.from(value).length > 2000 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/.test(value) || Array.from(value).some(c => c.length === 1 && /[\ud800-\udfff]/.test(c))) throw new Error('请填写1至2000个字符的内部文字，允许换行和制表；不要填写密码或密钥')
 }
-export async function internalNoteHash(text: string): Promise<string> { const bytes = new TextEncoder().encode(text); return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), v => v.toString(16).padStart(2, '0')).join('') }
+export async function internalNoteHash(text: string): Promise<string> { const bytes = new TextEncoder().encode(text); return Array.from(new Uint8Array(await digestSha256( bytes)), v => v.toString(16).padStart(2, '0')).join('') }
 export async function readInternalNote(value: unknown, scope: NoteContext): Promise<InternalNote> {
   try {
     if (!exact(value, ['id', 'tenant_id', 'ticket_id', 'actor_id', 'observed_ticket_version', 'text', 'text_sha256', 'created_at', 'visibility', 'record_source', 'verification_status', 'source', 'immutable', 'ticket_state_changed', 'sla_changed']) || typeof value.id !== 'string' || !uuid.test(value.id) || value.tenant_id !== scope.tenantId || value.ticket_id !== scope.ticketId || typeof value.actor_id !== 'string' || !uuid.test(value.actor_id) || !version(value.observed_ticket_version) || typeof value.created_at !== 'string' || !value.created_at.endsWith('Z') || !Number.isFinite(worklogInstant(value.created_at)) || value.visibility !== 'INTERNAL' || value.record_source !== 'MANUAL_INTERNAL_NOTE' || value.verification_status !== 'SELF_REPORTED' || value.source !== 'postgresql' || value.immutable !== true || value.ticket_state_changed !== false || value.sla_changed !== false || typeof value.text_sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(value.text_sha256)) throw invalid()
@@ -34,7 +35,7 @@ async function readPage(value: unknown, scope: NoteContext, parentVersion: numbe
   return copy({ ...value, items }) as unknown as NotePage
 }
 export const emptyNoteState = (): NoteState => ({ page: null, parentVersion: null, receipt: null, attempt: null, busy: null, error: null, paged: false })
-export function createInternalNoteWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: NoteState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createInternalNoteWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: NoteState) => void, newKey: () => string = () => createRequestId()) {
   let scope: NoteContext | null = null, state = emptyNoteState(), epoch = 0, controller: AbortController | undefined
   const emit = () => changed(detachedWorkspaceState(state)), path = () => `/tickets/${scope!.ticketId}/internal-notes`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: NoteContext | null) { controller?.abort(); ++epoch; const valid = next && [next.tenantId, next.ticketId, next.actorId].every(id => uuid.test(id)) && version(next.permissionVersion) && typeof next.canWrite === 'boolean'; scope = valid ? { ...next! } : null; state = emptyNoteState(); if (next && !valid) state.error = invalid(); emit() }

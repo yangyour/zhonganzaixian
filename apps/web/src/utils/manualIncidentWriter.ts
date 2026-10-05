@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { readManualIncident, validManualTitle, manualSeverityLabels, type ManualSeverity, type ManualIncidentContext, type ManualIncidentEntry } from './manualIncidentReader'
@@ -17,7 +18,7 @@ function asset(value: unknown, context: ManualIncidentContext, expectedId?: stri
 }
 function sameEntry(a: ManualIncidentEntry, b: ManualIncidentEntry) { return Object.keys(a).every(key => key === 'registered_at' ? worklogInstant(a.registered_at) === worklogInstant(b.registered_at) : a[key as keyof ManualIncidentEntry] === b[key as keyof ManualIncidentEntry]) }
 export const emptyManualIncidentWriteState = (): ManualIncidentWriteState => ({ editing: false, asset: null, lastAssetRead: null, choices: null, nextAssetCursor: null, assetSearch: '', assetPaged: false, receipt: null, verifiedReceipt: null, attempt: null, busy: null, error: null })
-export function createManualIncidentWriter(client: Pick<ApiClient, 'request'>, changed: (value: ManualIncidentWriteState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createManualIncidentWriter(client: Pick<ApiClient, 'request'>, changed: (value: ManualIncidentWriteState) => void, newKey: () => string = () => createRequestId()) {
   let context: ManualIncidentContext | null = null, state = emptyManualIncidentWriteState(), epoch = 0, abort: AbortController | undefined
   const emit = () => changed(detachedWorkspaceState(state)), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: ManualIncidentContext | null) { abort?.abort(); ++epoch; const valid = next && uuid.test(next.actorId) && uuid.test(next.tenantId) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion > 0; context = valid ? { ...next! } : null; state = emptyManualIncidentWriteState(); if (next && !valid) state.error = bad(); emit() }

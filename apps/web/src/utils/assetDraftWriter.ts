@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import {ApiError,type ApiClient} from '../api/client'
 import type {Asset,AssetDraft} from '../api/types'
 import {utcInstantNanos} from './utcInstant'
@@ -34,7 +35,7 @@ export function readCreatedAssetReceipt(raw:unknown,context:AssetDraftContext,in
  return structuredClone(raw) as unknown as Asset
 }
 /** Keeps the original POST body and key independently of asset-list reads and drawer navigation. */
-export function createAssetDraftWriter(client:Pick<ApiClient,'request'>,changed:(state:AssetDraftState)=>void,newKey:()=>string=()=>crypto.randomUUID()){
+export function createAssetDraftWriter(client:Pick<ApiClient,'request'>,changed:(state:AssetDraftState)=>void,newKey:()=>string=()=>createRequestId()){
  let context:AssetDraftContext|null=null,state=emptyAssetDraftState(),epoch=0,abort:AbortController|null=null,disposed=false
  const snapshot=()=>detachedWorkspaceState(state),emit=()=>changed(snapshot()),unresolved=()=>state.busy||state.attempt?.state==='uncertain'
  function reset(next:AssetDraftContext|null){abort?.abort();abort=null;++epoch;context=!disposed&&validAssetDraftContext(next)?{...next}:null;state=emptyAssetDraftState();emit()}

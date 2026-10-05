@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { readManualIncident, type ManualIncidentContext, type ManualIncidentEntry } from './manualIncidentReader'
@@ -30,7 +31,7 @@ function sameCurrent(a: ManualRecoveryCurrent, b: ManualRecoveryCurrent) {
   return Object.keys(first).every(key => key === 'recorded_at' ? date(first.recorded_at) === date(second.recorded_at) : key === 'reported_recovered_at' ? (first.reported_recovered_at === null ? second.reported_recovered_at === null : second.reported_recovered_at !== null && date(first.reported_recovered_at) === date(second.reported_recovered_at)) : first[key as keyof HumanRecoveryConfirmation] === second[key as keyof HumanRecoveryConfirmation])
 }
 export const emptyManualRecoveryState = (): ManualRecoveryState => ({ parent: null, current: null, receipt: null, attempt: null, busy: null, error: null })
-export function createManualRecoveryWorkspace(client: Pick<ApiClient, 'request'>, changed: (value: ManualRecoveryState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createManualRecoveryWorkspace(client: Pick<ApiClient, 'request'>, changed: (value: ManualRecoveryState) => void, newKey: () => string = () => createRequestId()) {
   let context: ManualIncidentContext | null = null, state = emptyManualRecoveryState(), epoch = 0, abort: AbortController | undefined, lastKnown: ManualRecoveryCurrent | null = null
   const emit = () => changed(detachedWorkspaceState(state)), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: ManualIncidentContext | null) { abort?.abort(); ++epoch; const valid = next && uuid.test(next.actorId) && uuid.test(next.tenantId) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion > 0; context = valid ? { ...next! } : null; state = emptyManualRecoveryState(); lastKnown = null; if (next && !valid) state.error = bad(); emit() }

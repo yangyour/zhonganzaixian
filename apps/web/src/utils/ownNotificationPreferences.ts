@@ -1,3 +1,4 @@
+import { digestSha256 } from './browserCrypto'
 import {ApiError} from '../api/client'
 import {utcInstantNanos} from './utcInstant'
 export interface OwnPreferenceContext {tenantId:string;actorId:string;permissionVersion:number;role:string;canRead:boolean;canWrite:boolean}
@@ -41,7 +42,7 @@ export function ownPreferenceBytes(tenant:string,owner:string,value:unknown):Uin
  const q=d.requested_quiet_window;if(q===null)i4(-1);else{i4(3);field(q.enabled===null?null:String(q.enabled));field(q.start);field(q.end)}field('Asia/Shanghai')
  const result=new Uint8Array(parts.reduce((sum,p)=>sum+p.length,0));let offset=0;for(const p of parts){result.set(p,offset);offset+=p.length}return result
 }
-export async function ownPreferenceFingerprint(tenant:string,owner:string,value:unknown){const bytes=ownPreferenceBytes(tenant,owner,value),hash=await crypto.subtle.digest('SHA-256',bytes as Uint8Array<ArrayBuffer>);return Array.from(new Uint8Array(hash)).map(v=>v.toString(16).padStart(2,'0')).join('')}
+export async function ownPreferenceFingerprint(tenant:string,owner:string,value:unknown){const bytes=ownPreferenceBytes(tenant,owner,value),hash=await digestSha256(bytes as Uint8Array<ArrayBuffer>);return Array.from(new Uint8Array(hash)).map(v=>v.toString(16).padStart(2,'0')).join('')}
 function facts(v:Record<string,unknown>,c:OwnPreferenceContext){
  if(!validOwnPreferenceContext(c)||v.tenant_id!==c.tenantId||v.owner_id!==c.actorId||v.recorded_by!==c.actorId||!integer(v.recorded_permission_version,1,Number.MAX_SAFE_INTEGER)||!integer(v.version)||typeof v.content_sha256!=='string'||v.content_sha256.length!==64||!/^[0-9a-f]{64}$/.test(v.content_sha256)||v.timezone!=='Asia/Shanghai'||v.configuration_status!=='CONFIG_PENDING'||v.effective!==false||v.receiver_binding_status!=='NOT_VERIFIED'||v.notification_dispatched!==false||v.p1_quiet_bypass_contract_rule!==true||v.record_source!=='OWN_NOTIFICATION_PREFERENCE_DRAFT'||v.scope!=='CURRENT_OWNER_TENANT'||v.source!=='postgresql')throw ownPreferenceBad()
  for(const k of ['effective_level','effective_channels','effective_quiet_window','verified_receiver_id','delivery_decision'])if(v[k]!==null)throw ownPreferenceBad()

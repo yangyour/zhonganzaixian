@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 
@@ -69,7 +70,7 @@ export function readWorklogHistory(value: unknown, scope: WorklogContext, select
   return copy(value) as unknown as HistoryPage
 }
 export const emptyWorklogState = (): WorklogState => ({ page: null, parentVersion: null, selected: null, history: null, receipt: null, attempt: null, busy: null, error: null, paged: false })
-export function createWorklogWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: WorklogState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createWorklogWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: WorklogState) => void, newKey: () => string = () => createRequestId()) {
   let scope: WorklogContext | null = null, state = emptyWorklogState(), epoch = 0, controller: AbortController | undefined
   const emit = () => changed(detachedWorkspaceState(state)), path = () => `/tickets/${scope!.ticketId}/worklogs`
   const unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'

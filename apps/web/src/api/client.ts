@@ -1,3 +1,4 @@
+import { createRequestId } from '../utils/browserCrypto'
 import { observeHttpClock, type HttpClockObservation } from '../utils/httpResponseClock'
 
 export interface ClockedResponse<T> { data: T; clock: HttpClockObservation }
@@ -61,7 +62,7 @@ export class ApiClient {
     const multipart = options.body instanceof FormData
     if (options.body !== undefined && !multipart) headers['Content-Type'] = 'application/json'
     if (!['GET', 'HEAD'].includes(method)) {
-      headers['Idempotency-Key'] = options.idempotencyKey || crypto.randomUUID()
+      headers['Idempotency-Key'] = options.idempotencyKey || createRequestId()
       if (this.csrfToken) headers['X-CSRF-Token'] = this.csrfToken
     }
     const started = observeClock ? this.clockNow() : 0

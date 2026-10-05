@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import {isCancelled,type ApiClient} from '../api/client'
 import {detachedWorkspaceState} from './detachedWorkspaceState'
 import {writeFailureUncertain} from './writeFailure'
@@ -9,7 +10,7 @@ export const emptySourceCollectionState=():SourceCollectionState=>({page:null,se
 const same=(a:unknown,b:unknown):boolean=>{if(a===b)return true;if(Array.isArray(a)&&Array.isArray(b))return a.length===b.length&&a.every((v,i)=>same(v,b[i]));if(a&&b&&typeof a==='object'&&typeof b==='object'&&!Array.isArray(a)&&!Array.isArray(b)){const x=a as Record<string,unknown>,y=b as Record<string,unknown>;return Object.keys(x).length===Object.keys(y).length&&Object.keys(x).every(k=>Object.hasOwn(y,k)&&same(x[k],y[k]))}return false}
 function metadata(detail:SourceCollectionDetail):SourceCollectionSummary{const {sources:_sources,diagnostics:_diagnostics,document_integrity:_integrity,...value}=detail;return {...value,projection:'METADATA_ONLY'}}
 /** Only explicit user commands create a collection. Reads cannot resolve an unknown write or choose newer sources. */
-export function createSourceCollectionWorkspace(client:Pick<ApiClient,'request'>,changed:(value:SourceCollectionState)=>void,newKey:()=>string=()=>crypto.randomUUID()){
+export function createSourceCollectionWorkspace(client:Pick<ApiClient,'request'>,changed:(value:SourceCollectionState)=>void,newKey:()=>string=()=>createRequestId()){
   let context:SourceCollectionContext|null=null,state=emptySourceCollectionState(),epoch=0,abort:AbortController|null=null,disposed=false
   const snapshot=()=>detachedWorkspaceState(state),emit=()=>changed(snapshot()),unresolved=()=>state.busy==='write'||state.attempt?.state==='uncertain'
   function reset(next:SourceCollectionContext|null){abort?.abort();abort=null;++epoch;context=!disposed&&validInspectionContext(next)?{...next}:null;state=emptySourceCollectionState();emit()}

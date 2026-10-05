@@ -1,3 +1,4 @@
+import { digestSha256 } from './browserCrypto'
 import { ApiError,isCancelled,type ApiClient } from '../api/client'
 export const catalogRoleIds=['viewer','tadmin','msp','padmin'] as const
 export const catalogDimensionIds=['ASSETS_METRICS','ALERTS_TICKETS','TEMPLATES_AUTOMATION','PLATFORM_ADMIN','MEMBER_ADMIN'] as const
@@ -20,7 +21,7 @@ export async function readCapabilityCatalog(v:unknown,scope:CatalogContext):Prom
  const entries:CatalogEntry[]=[];let previous='';let canonical='mop-capability-declarations-v1\nviewer|tadmin|msp|padmin\n'
  for(const entry of v.entries){if(!exact(entry,['id','label','dimension_ids','declared_by_role'])||!cap(entry.id)||entry.id<=previous||!text(entry.label)||!Array.isArray(entry.dimension_ids)||entry.dimension_ids.length<1||entry.dimension_ids.length>5||new Set(entry.dimension_ids).size!==entry.dimension_ids.length||entry.dimension_ids.some(id=>typeof id!=='string'||!catalogDimensionIds.includes(id as CatalogDimension['id']))||!exact(entry.declared_by_role,catalogRoleIds)||Object.values(entry.declared_by_role).some(value=>typeof value!=='boolean'))throw bad();previous=entry.id;const item=copy(entry) as unknown as CatalogEntry;entries.push(item);canonical+=item.id+'|'+item.dimension_ids.join(',')+'|'+catalogRoleIds.map(role=>item.declared_by_role[role]?'1':'0').join('')+'\n'}
  const labels=['资产与指标','告警与工单','模板与自动化','平台管理','成员管理'];v.dimensions.forEach((dimension,i)=>{if(!exact(dimension,['id','label','capability_ids'])||dimension.id!==catalogDimensionIds[i]||dimension.label!==labels[i]||JSON.stringify(dimension.capability_ids)!==JSON.stringify(entries.filter(e=>e.dimension_ids.includes(catalogDimensionIds[i]!)).map(e=>e.id)))throw bad()})
- const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(canonical))),n=>n.toString(16).padStart(2,'0')).join('');if(digest!==v.declaration_hash)throw bad()
+ const digest=Array.from(new Uint8Array(await digestSha256(new TextEncoder().encode(canonical))),n=>n.toString(16).padStart(2,'0')).join('');if(digest!==v.declaration_hash)throw bad()
  return copy(v) as unknown as CapabilityCatalog
 }
 export function createCapabilityCatalogReader(client:Pick<ApiClient,'request'>,notify:(state:CatalogState)=>void){

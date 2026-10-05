@@ -1,3 +1,4 @@
+import { digestSha256 } from './browserCrypto'
 import spec from '../../../../contracts/asset-import-template.json'
 import { ApiError, StaleRequestError } from '../api/client'
 
@@ -38,7 +39,7 @@ export async function fetchAssetImportTemplate(options: { signal?: AbortSignal; 
   const bytes = await bounded(response, spec.size_bytes)
   if (!active()) throw new StaleRequestError()
   if (bytes.length !== spec.size_bytes) throw invalid()
-  const digest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))).map(value => value.toString(16).padStart(2, '0')).join('')
+  const digest = Array.from(new Uint8Array(await digestSha256( bytes))).map(value => value.toString(16).padStart(2, '0')).join('')
   if (!active()) throw new StaleRequestError()
   if (digest !== spec.sha256) throw invalid()
   return { blob: new Blob([bytes], { type: spec.media_type }), filename: spec.filename, sha256: digest }

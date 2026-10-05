@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { isCancelled, type ApiClient } from '../api/client'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { writeFailureUncertain } from './writeFailure'
@@ -12,7 +13,7 @@ const same = (a: unknown, b: unknown): boolean => {
   if (a && b && typeof a === 'object' && typeof b === 'object' && !Array.isArray(a) && !Array.isArray(b)) { const x = a as Record<string, unknown>, y = b as Record<string, unknown>; return Object.keys(x).length === Object.keys(y).length && Object.keys(x).every(key => Object.hasOwn(y, key) && same(x[key], y[key])) }
   return false
 }
-export function createWorksheetWorkspace(client: Pick<ApiClient, 'request'>, changed: (value: WorksheetState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createWorksheetWorkspace(client: Pick<ApiClient, 'request'>, changed: (value: WorksheetState) => void, newKey: () => string = () => createRequestId()) {
   let context: WorksheetContext | null = null, state = emptyWorksheetState(), epoch = 0, abort: AbortController | null = null, disposed = false
   const snapshot = () => detachedWorkspaceState(state), emit = () => changed(snapshot()), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: WorksheetContext | null) { abort?.abort(); abort = null; ++epoch; context = !disposed && validInspectionContext(next) ? { ...next } : null; state = emptyWorksheetState(); emit() }

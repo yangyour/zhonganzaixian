@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { readCalendar, readCalendarDraft, type CalendarDraft, type CalendarSnapshot, type CalendarReadContext } from './workingCalendarReader'
@@ -20,7 +21,7 @@ export function validateCalendarInput(value: unknown): CalendarInput {
   } catch { throw new Error('请明确名称、含时区及秒的覆盖范围、全部已知窗口和完整性声明；不默认时段，备注最多2000字符') }
 }
 export const emptyCalendarWriteState = (): CalendarWriteState => ({ editing: false, baseline: null, lastRead: null, receipt: null, attempt: null, busy: null, error: null })
-export function createWorkingCalendarWriter(client: Pick<ApiClient, 'request'>, changed: (value: CalendarWriteState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createWorkingCalendarWriter(client: Pick<ApiClient, 'request'>, changed: (value: CalendarWriteState) => void, newKey: () => string = () => createRequestId()) {
   let scope: CalendarReadContext | null = null, state = emptyCalendarWriteState(), epoch = 0, controller: AbortController | undefined
   const emit = () => changed(detachedWorkspaceState(state)), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
   function reset(next: CalendarReadContext | null) { controller?.abort(); ++epoch; const valid = next && uuid.test(next.tenantId) && uuid.test(next.actorId) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion > 0; scope = valid ? { ...next! } : null; state = emptyCalendarWriteState(); if (next && !valid) state.error = bad(); emit() }

@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import {isCancelled,type ApiClient} from '../api/client'
 import {detachedWorkspaceState} from './detachedWorkspaceState'
 import {writeFailureUncertain} from './writeFailure'
@@ -5,7 +6,7 @@ import {ownPreferenceBad,ownPreferenceDefinition,ownPreferenceFingerprint,ownPre
 export interface OwnPreferenceAttempt {path:string;method:'POST'|'PATCH';action:'CREATE'|'UPDATE';payload:string;key:string;baseline:OwnPreferenceSnapshot|null;state:'uncertain'|'accepted'|'rejected'}
 export interface OwnPreferenceState {current:OwnPreferenceCurrent|null;history:OwnPreferenceHistory|null;receipt:OwnPreferenceSnapshot|null;attempt:OwnPreferenceAttempt|null;busy:'read'|'write'|null;error:unknown}
 export const emptyOwnPreferenceState=():OwnPreferenceState=>({current:null,history:null,receipt:null,attempt:null,busy:null,error:null})
-export function createOwnPreferenceWorkspace(client:Pick<ApiClient,'request'>,changed:(state:OwnPreferenceState)=>void,newKey:()=>string=()=>crypto.randomUUID()){
+export function createOwnPreferenceWorkspace(client:Pick<ApiClient,'request'>,changed:(state:OwnPreferenceState)=>void,newKey:()=>string=()=>createRequestId()){
  let context:OwnPreferenceContext|null=null,state=emptyOwnPreferenceState(),epoch=0,abort:AbortController|null=null,disposed=false,known:OwnPreferenceSnapshot|null=null
  const revisions=new Map<number,OwnPreferenceRevision>(),snapshot=()=>detachedWorkspaceState(state),emit=()=>changed(snapshot()),unresolved=()=>state.busy==='write'||state.attempt?.state==='uncertain'
  function reset(next:OwnPreferenceContext|null){abort?.abort();abort=null;++epoch;context=!disposed&&validOwnPreferenceContext(next)?{...next}:null;state=emptyOwnPreferenceState();known=null;revisions.clear();emit()}

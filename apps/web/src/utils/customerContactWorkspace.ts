@@ -1,3 +1,4 @@
+import { createRequestId } from './browserCrypto'
 import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { worklogInstant } from './worklogWorkspace'
 import { writeFailureUncertain } from './writeFailure'
@@ -57,7 +58,7 @@ export function readContactHistory(v: unknown, scope: ContactContext, id: string
  return copy(v) as unknown as ContactHistory
 }
 export const emptyContactState = (): ContactState => ({ page: null, selected: null, history: null, receipt: null, attempt: null, query: '', view: 'CURRENT', paged: false, busy: null, error: null })
-export function createContactWorkspace(client: Pick<ApiClient, 'request'>, notify: (state: ContactState) => void, newKey: () => string = () => crypto.randomUUID()) {
+export function createContactWorkspace(client: Pick<ApiClient, 'request'>, notify: (state: ContactState) => void, newKey: () => string = () => createRequestId()) {
  let scope: ContactContext | null = null, state = emptyContactState(), epoch = 0, abort: AbortController | null = null, disposed = false
  const snapshot = () => ({ ...copy({ ...state, error: null }), error: state.error }), emit = () => notify(snapshot()), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
  function reset(context: ContactContext | null) { abort?.abort(); abort = null; ++epoch; scope = !disposed && context && ['padmin', 'tadmin'].includes(context.role) && context.canRead === true && typeof context.canWrite === 'boolean' && typeof context.tenantId === 'string' && typeof context.actorId === 'string' && uuid.test(context.tenantId) && uuid.test(context.actorId) && safeVersion(context.permissionVersion) ? { ...context } : null; state = emptyContactState(); emit() }

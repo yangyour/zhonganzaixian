@@ -38,14 +38,14 @@ export class ApiClient {
     return this.generation
   }
   async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-    const generation = this.generation, result = await this.requestResult<T>(path, options)
-    if (generation !== this.generation || options.signal?.aborted) throw new StaleRequestError()
+    const generation = this.generation, signal = options.signal, result = await this.requestResult<T>(path, { ...options, signal })
+    if (generation !== this.generation || signal?.aborted) throw new StaleRequestError()
     return result.data
   }
   /** GET only. Date is response metadata, never sampling success or a verified synchronization clock. */
   async requestWithClock<T>(path: string, options: { signal?: AbortSignal } = {}): Promise<ClockedResponse<T>> {
-    const generation = this.generation, result = await this.requestResult<T>(path, { method: 'GET', signal: options.signal }, true)
-    if (generation !== this.generation || options.signal?.aborted) throw new StaleRequestError()
+    const generation = this.generation, signal = options.signal, result = await this.requestResult<T>(path, { method: 'GET', signal }, true)
+    if (generation !== this.generation || signal?.aborted) throw new StaleRequestError()
     return result
   }
   private clockNow(): number { try { return this.monotonicNow() } catch { return NaN } }
@@ -54,22 +54,26 @@ export class ApiClient {
     const generation = this.generation
     const controller = new AbortController()
     this.controllers.add(controller)
+    const signal = options.signal
     const cancel = () => controller.abort()
-    options.signal?.addEventListener('abort', cancel, { once: true })
-    if (options.signal?.aborted) controller.abort()
-    const method = options.method || 'GET'
-    const headers: Record<string, string> = { Accept: 'application/json' }
-    const multipart = options.body instanceof FormData
-    if (options.body !== undefined && !multipart) headers['Content-Type'] = 'application/json'
-    if (!['GET', 'HEAD'].includes(method)) {
-      headers['Idempotency-Key'] = options.idempotencyKey || createRequestId()
-      if (this.csrfToken) headers['X-CSRF-Token'] = this.csrfToken
-    }
-    const started = observeClock ? this.clockNow() : 0
+    signal?.addEventListener('abort', cancel, { once: true })
+    if (signal?.aborted) controller.abort()
     try {
+      if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
+      const method = options.method || 'GET'
+      const headers: Record<string, string> = { Accept: 'application/json' }
+      const multipart = options.body instanceof FormData
+      if (options.body !== undefined && !multipart) headers['Content-Type'] = 'application/json'
+      if (!['GET', 'HEAD'].includes(method)) {
+        headers['Idempotency-Key'] = options.idempotencyKey || createRequestId()
+        if (this.csrfToken) headers['X-CSRF-Token'] = this.csrfToken
+      }
+      const started = observeClock ? this.clockNow() : 0
+      const body = options.body === undefined ? undefined : multipart ? options.body as FormData : JSON.stringify(options.body)
+      if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
       const response = await this.transport(this.base + path, {
         method, headers, credentials: 'same-origin', redirect: 'error', signal: controller.signal,
-        body: options.body === undefined ? undefined : multipart ? options.body as FormData : JSON.stringify(options.body),
+        body,
       })
       if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
       const raw = await response.text()
@@ -93,17 +97,19 @@ export class ApiClient {
       throw new ApiError(0, 'NETWORK_ERROR', '无法连接服务，请检查 API 是否启动后重试', '—')
     } finally {
       this.controllers.delete(controller)
-      options.signal?.removeEventListener('abort', cancel)
+      signal?.removeEventListener('abort', cancel)
     }
   }
   async requestBlob(path: string, options: { signal?: AbortSignal } = {}): Promise<Blob> {
     assertApiPath(path)
     const generation = this.generation, controller = new AbortController()
     this.controllers.add(controller)
+    const signal = options.signal
     const cancel = () => controller.abort()
-    options.signal?.addEventListener('abort', cancel, { once: true })
-    if (options.signal?.aborted) controller.abort()
+    signal?.addEventListener('abort', cancel, { once: true })
+    if (signal?.aborted) controller.abort()
     try {
+      if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
       const response = await this.transport(this.base + path, { headers: { Accept: 'image/jpeg, image/png' }, credentials: 'same-origin', redirect: 'error', signal: controller.signal })
       if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
       if (!response.ok) {
@@ -120,7 +126,7 @@ export class ApiClient {
       if (cause instanceof ApiError) { if (cause.status === 401) this.onUnauthorized(); throw cause }
       if (isCancelled(cause)) throw cause
       throw new ApiError(0, 'NETWORK_ERROR', '无法读取图片，请检查连接后重新申请查看', '—')
-    } finally { this.controllers.delete(controller); options.signal?.removeEventListener('abort', cancel) }
+    } finally { this.controllers.delete(controller); signal?.removeEventListener('abort', cancel) }
   }
   async pollOperation<T extends { status: string }>(id: string, options: { signal?: AbortSignal; intervalMs?: number; maxAttempts?: number; onUpdate?: (operation: T) => void } = {}): Promise<T> {
     const generation = this.generation

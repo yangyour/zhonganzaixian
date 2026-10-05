@@ -1,0 +1,27 @@
+{
+  "verified_at": "2026-10-05T11:35:20Z",
+  "base_commit": "0e003d157b3d75b5d38dff5a821401250ceeb7b5",
+  "new_tests": 9,
+  "before_subset_tests": 5,
+  "before_subset_failures": 5,
+  "focused_tests_including_existing": 18,
+  "focused_failures": 0,
+  "web_passed": 1773,
+  "web_files": 109,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts_passed": 127,
+  "api_version": "0.45.0",
+  "api_changed": false,
+  "sql_changed": false,
+  "actual_http_checks": 0,
+  "actual_accounts_created": 0,
+  "formal_acceptance": "NOT_RUN",
+  "logs_sha256": {
+    "identity-role-scope-before-20261005.log": "2d2ed5ce4a6f559b3d64541eac36b4e08bac3729e09093efa7ff14d572d64ac2",
+    "identity-role-scope-focused-20261005.log": "9e0eba0deaea3bcc01dbb04a8ab5e75d93df2d62a2e8bd790d3addd80dfde8dd",
+    "identity-role-scope-web-20261005.log": "94c31d2b896d0193ff967da0bc20c28daeab8c19a1e5a953b350aeef1672fd73",
+    "identity-role-scope-build-20261005.log": "cc5b3d6ce07129ecf5cd8cbada521ca6cbdafe86a08a6d3fe38ee0e1cd5f09db",
+    "identity-role-scope-contracts-20261005.log": "15f50a7e1ae064160d0e780f83362d179ab5f5ec018ea52816571abd378fd87c"
+  }
+}

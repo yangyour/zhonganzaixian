@@ -8,7 +8,7 @@ import { createIdentityCommand, type IdentityCommand } from './projectIdentity'
 export function useIdentityEditor(reload: () => Promise<boolean | 'redirected'>) {
   const command = shallowRef<IdentityCommand>({ state: 'idle', path: null, method: null, key: null, body: null, result: null, error: null })
   const dirty = ref(false), message = ref(''), readbackFailed = ref(false), reading = ref(false)
-  let disposed = false
+  let disposed = false, epoch = 0
   const writer = createIdentityCommand(api, value => { command.value = value })
   async function leave() {
     if (command.value.state === 'sending') return false
@@ -19,17 +19,17 @@ export function useIdentityEditor(reload: () => Promise<boolean | 'redirected'>)
   const unregister = contextTransitionGuards.register(leave)
   const beforeUnload = (event: BeforeUnloadEvent) => { if (dirty.value || writer.unresolved()) { event.preventDefault(); event.returnValue = '' } }
   window.addEventListener('beforeunload', beforeUnload)
-  onBeforeUnmount(() => { disposed = true; unregister(); writer.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
-  async function accepted(ok: boolean) {
-    if (!ok || disposed) return ok
+  onBeforeUnmount(() => { disposed = true; epoch++; unregister(); writer.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
+  async function accepted(ok: boolean, turn: number) {
+    if (!ok || disposed || turn !== epoch) return false
     dirty.value = false; readbackFailed.value = false; reading.value = true
     message.value = '操作已保存，正在回读最新记录。'
     let result: boolean | 'redirected' = false
-    try { result = await reload() } catch { /* The accepted write remains accepted even if refresh fails. */ } finally { reading.value = false }
-    if (disposed) return ok
+    try { result = await reload() } catch { /* The accepted write remains accepted even if refresh fails. */ } finally { if (turn === epoch) reading.value = false }
+    if (disposed || turn !== epoch) return false
     readbackFailed.value = result !== true && result !== 'redirected'
     message.value = result === true ? '操作已保存，最新记录已回读。' : result === 'redirected' ? '操作已保存，请重新登录。' : '操作已保存，但最新记录尚未确认；请重新读取，不要重复提交。'
     return ok
   }
-  return { command, dirty, message, readbackFailed, leave, busy: () => writer.unresolved() || reading.value, async save(path: string, method: string, body: unknown) { if (reading.value) return false; message.value = ''; readbackFailed.value = false; return accepted(await writer.submit(path, method, body)) }, async retry() { if (reading.value) return false; return accepted(await writer.retry()) }, clear: writer.clear }
+  return { command, dirty, message, readbackFailed, leave, busy: () => writer.unresolved() || reading.value, async save(path: string, method: string, body: unknown) { if (reading.value) return false; const turn = epoch; message.value = ''; readbackFailed.value = false; return accepted(await writer.submit(path, method, body), turn) }, async retry() { if (reading.value) return false; const turn = epoch; return accepted(await writer.retry(), turn) }, clear() { epoch++; writer.clear(); dirty.value = false; reading.value = false; readbackFailed.value = false; message.value = '' } }
 }

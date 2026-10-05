@@ -43,3 +43,9 @@ it('ignores readback completion after the editor is unmounted', async () => {
  app!.unmount(); app = undefined; const previous = editor.message.value; finish(true); await pending
  expect(editor.command.value.state).toBe('idle'); expect(editor.message.value).toBe(previous)
 })
+it('clearing the editor invalidates an accepted command late readback', async () => {
+ let finish!: (v: boolean) => void; accept(); mount(() => new Promise(resolve => { finish = resolve }))
+ const pending = write(); for (let i = 0; i < 6; i++) await Promise.resolve()
+ editor.clear(); finish(true); expect(await pending).toBe(false)
+ expect(editor.message.value).toBe(''); expect(editor.command.value.state).toBe('idle'); expect(editor.busy()).toBe(false)
+})

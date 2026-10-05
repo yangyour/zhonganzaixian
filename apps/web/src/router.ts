@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { initializeSession, session } from './stores/session'
+import { initializeSession, refreshProjectSession, session } from './stores/session'
 import { landingRoute, routeAllowed } from './utils/routeAccess'
 
 export const router = createRouter({
@@ -8,6 +8,10 @@ export const router = createRouter({
     { path: '/login', name: 'login', component: () => import('./pages/LoginPage.vue'), meta: { title: '登录' } },
     { path: '/access-unavailable', name: 'access-unavailable', component: () => import('./pages/AccessUnavailablePage.vue'), meta: { title: '暂无业务权限', group: '账号' } },
     { path: '/', redirect: '/assets' },
+    { path: '/account', name: 'account', component: () => import('./pages/AccountPage.vue'), meta: { title: '我的账号', group: '账号' } },
+    { path: '/identity/users', name: 'identity-users', component: () => import('./pages/IdentityUsersPage.vue'), meta: { title: '用户与成员授权', group: '管理', capability: 'users:read' } },
+    { path: '/identity/roles', name: 'identity-roles', component: () => import('./pages/IdentityRolesPage.vue'), meta: { title: '角色与权限', group: '管理', capability: 'roles:read' } },
+    { path: '/identity/settings', name: 'identity-settings', component: () => import('./pages/IdentitySettingsPage.vue'), meta: { title: '身份认证设置', group: '管理', capability: 'roles:read' } },
     { path: '/dashboard', name: 'dashboard', component: () => import('./pages/DashboardPage.vue'), meta: { title: '运营总览', group: '资源', capability: 'dashboard:read' } },
     { path: '/assets', name: 'assets', component: () => import('./pages/AssetsPage.vue'), meta: { title: '资产管理', group: '资源', capability: 'assets:read' } },
     { path: '/manual-incidents', name: 'manual-incidents', component: () => import('./pages/ManualIncidentsPage.vue'), meta: { title: '手工来源登记', group: '服务', capability: 'manual_incidents:read' } },
@@ -38,8 +42,13 @@ router.beforeEach(async to => {
   try { await initializeSession() }
   catch { if (to.name !== 'login') return { name: 'login' } }
   if (!session.value && to.name !== 'login') return { name: 'login' }
-  const landing = landingRoute(session.value, router.getRoutes())
+  if (to.name !== 'login' && ['project_local','oidc'].includes(session.value?.identity_source ?? '')) {
+    try { await refreshProjectSession() } catch { if (!session.value) return { name: 'login' }; return false }
+  }
+  const landing = session.value?.password_change_required ? 'account' : landingRoute(session.value, router.getRoutes())
+  if (session.value?.password_change_required && to.name !== 'account') return { name: 'account' }
   if (session.value && (to.name === 'login' || to.name === 'access-unavailable' && landing !== 'access-unavailable')) return { name: landing }
-  if (to.name !== 'login' && to.name !== 'access-unavailable' && !routeAllowed(to.meta, session.value)) return { name: landing }
+  if (!['login','access-unavailable','account'].includes(String(to.name)) && !routeAllowed(to.meta, session.value)) return { name: landing }
+
   document.title = `${String(to.meta.title || '管理端')} · MOP`
 })

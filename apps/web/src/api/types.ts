@@ -1,12 +1,13 @@
 export type Role = 'viewer' | 'tadmin' | 'msp' | 'padmin'
 export type RuntimeMode = 'remote_test' | 'local_fixture'
 export interface PlatformUser { id: string; display_name: string; role: Role }
-export interface AuthOptions { mode: RuntimeMode; identity_source: string; login_url: string | null }
+export interface AuthOptions { mode: RuntimeMode; identity_source: string; login_url: string | null; local_enabled?: boolean; sso_enabled?: boolean; local_login_url?: string; csrf_url?: string; sso_protocol?: string }
 export interface LogoutResult { logged_out: boolean; redirect_url: string | null }
 export interface Tenant { id: string; name: string }
 export interface Session {
   user: PlatformUser; tenant: Tenant; allowed_tenants: Tenant[]; capabilities: string[]
   permission_version: number; csrf_token: string; mode: RuntimeMode; identity_source: string
+  account_version?: number; password_change_required?: boolean
 }
 export type AssetStatus = 'unknown' | 'ok' | 'problem' | 'maintenance' | 'disabled'
 export type AssetType = 'router' | 'switch' | 'firewall' | 'ap' | 'wireless_controller' | 'other'

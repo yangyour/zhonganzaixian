@@ -8,6 +8,7 @@ import { landingRoute, navigationGroupVisible } from './utils/routeAccess'
 import ApiErrorNotice from './components/ApiErrorNotice.vue'
 import GlobalSearch from './components/GlobalSearch.vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import './styles/identity.css'
 const route = useRoute()
 const router = useRouter()
 const homeRoute = computed(() => landingRoute(session.value, router.getRoutes()))
@@ -58,9 +59,12 @@ async function endSession() {
         <el-menu-item v-if="session && ['padmin','msp'].includes(session.user.role) && can('assets:read')" index="asset-export-jobs">台账导出准备</el-menu-item>
         <el-menu-item v-if="session?.user.role === 'msp' && can('worklogs:read_own')" index="my-worklogs">我的实填工时</el-menu-item>
       </el-menu>
-      <template v-if="managementVisible">
+<template v-if="managementVisible">
         <div class="nav-heading">管理</div>
         <el-menu :default-active="String(route.name)" class="side-menu" @select="router.push({ name: $event })">
+          <el-menu-item v-if="can('users:read')" index="identity-users">用户与成员授权</el-menu-item>
+          <el-menu-item v-if="can('roles:read')" index="identity-roles">角色与权限</el-menu-item>
+          <el-menu-item v-if="can('roles:read')" index="identity-settings">身份认证设置</el-menu-item>
           <el-menu-item v-if="can('configurations:read')" index="configurations"><span class="nav-symbol">⚙</span>配置确认登记</el-menu-item>
           <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_templates:read')" index="inspection-templates">巡检模板候选</el-menu-item>
           <el-menu-item v-if="session?.user.role === 'padmin' && can('backup_plan_drafts:read')" index="backup-plan-drafts">每日备份计划草稿</el-menu-item>
@@ -84,16 +88,17 @@ async function endSession() {
         <el-button class="mobile-menu" aria-label="打开导航" @click="navigationOpen = true">☰</el-button>
         <el-breadcrumb separator="/"><el-breadcrumb-item>MOP</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.group }}</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.title }}</el-breadcrumb-item></el-breadcrumb>
         <div class="topbar-controls">
-          <GlobalSearch />
+          <GlobalSearch v-if="can('search:read')" />
           <el-select v-if="maySwitchTenant" :model-value="session.tenant.id" :disabled="switchingTenant || tenantTransition" class="tenant-select" aria-label="切换租户" @change="changeTenant">
             <el-option v-for="tenant in session.allowed_tenants" :key="tenant.id" :label="tenant.name" :value="tenant.id" />
           </el-select>
           <span v-else class="tenant-name">{{ session.tenant.name }}</span>
           <div class="identity"><span class="avatar">{{ session.user.display_name.slice(0, 1) }}</span><div><strong>{{ session.user.display_name }}</strong><small>{{ roleLabel[session.user.role] }}</small></div></div>
+          <el-button v-if="['project_local','oidc'].includes(session.identity_source)" text @click="router.push('/account')">我的账号</el-button>
           <el-button text :loading="leaving" @click="endSession">退出</el-button>
         </div>
       </header>
-      <div class="environment-strip"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '共享测试环境 · PostgreSQL / Keycloak · 非生产' : '历史隔离单元夹具 · 非集成验收环境' }} · 资产状态尚无真实采集依据</div>
+      <div class="environment-strip"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '项目测试环境 · 非生产' : '历史隔离单元夹具 · 非集成验收环境' }} · 资产状态尚无真实采集依据</div>
       <main class="content">
         <ApiErrorNotice :error="error" />
         <div v-if="switchingTenant" class="switching-panel"><el-skeleton :rows="5" animated /><p>正在切换租户，已取消旧上下文请求…</p></div>
@@ -105,6 +110,10 @@ async function endSession() {
       <el-menu :default-active="String(route.name)" @select="router.push({ name: $event })">
         <el-menu-item v-if="can('dashboard:read')" index="dashboard">运营总览</el-menu-item>
         <el-menu-item v-if="can('assets:read')" index="assets">资产管理</el-menu-item>
+        <el-menu-item v-if="can('users:read')" index="identity-users">用户与成员授权</el-menu-item>
+        <el-menu-item v-if="can('roles:read')" index="identity-roles">角色与权限</el-menu-item>
+        <el-menu-item v-if="can('roles:read')" index="identity-settings">身份认证设置</el-menu-item>
+        <el-menu-item v-if="['project_local','oidc'].includes(session.identity_source)" index="account">我的账号</el-menu-item>
         <el-menu-item v-if="can('manual_incidents:read')" index="manual-incidents">手工来源登记</el-menu-item>
         <el-menu-item v-if="can('sla_scenarios:read')" index="sla-scenarios">SLA 显式对照</el-menu-item>
         <el-menu-item v-if="can('tickets:read')" index="tickets">报障与受理</el-menu-item>

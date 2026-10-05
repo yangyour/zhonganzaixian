@@ -25,6 +25,18 @@ export async function initializeSession() {
   }).finally(() => { initialization = null })
   await initialization
 }
+let refreshing: Promise<void> | null = null
+/** Re-read effective grants on navigation; a changed epoch disposes old page commands and data. */
+export async function refreshProjectSession() {
+  if (!session.value || !['project_local','oidc'].includes(session.value.identity_source) || switchingTenant.value) return
+  if (!refreshing) refreshing = api.request<Session>('/session').then(value => {
+    const previous = session.value
+    if (!previous) return
+    if (value.user.id !== previous.user.id || value.tenant.id !== previous.tenant.id || value.permission_version !== previous.permission_version || value.account_version !== previous.account_version) contextGeneration.value = api.invalidateContext()
+    installSession(value)
+  }).finally(() => { refreshing = null })
+  await refreshing
+}
 export interface TenantViewTransition { fromTenantId: string | null; toTenantId: string; originalReceiptConfirmed: boolean }
 export class TenantViewSynchronizationError extends ApiError {
   constructor(public readonly originalFailure: unknown, public readonly navigationFailure: unknown, public readonly originalReceiptConfirmed: boolean) {

@@ -267,7 +267,8 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
-        "docs/effective-membership-capabilities.md"
+        "docs/effective-membership-capabilities.md",
+        "docs/effective-navigation.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1416,6 +1417,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "b07a24590d03c9f30750447915695e8579b3cd000f786f931c0a63f580897570"
+    "doc/development/07_合同逐项开发追踪.md": "3447b3780a29a341422ef26ab36e6958f34cb6a0bdbd542569b13d5370d2618c"
   }
 }

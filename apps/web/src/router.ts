@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { can, initializeSession, session } from './stores/session'
+import { initializeSession, session } from './stores/session'
+import { landingRoute, routeAllowed } from './utils/routeAccess'
 
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/login', name: 'login', component: () => import('./pages/LoginPage.vue'), meta: { title: '登录' } },
+    { path: '/access-unavailable', name: 'access-unavailable', component: () => import('./pages/AccessUnavailablePage.vue'), meta: { title: '暂无业务权限', group: '账号' } },
     { path: '/', redirect: '/assets' },
     { path: '/dashboard', name: 'dashboard', component: () => import('./pages/DashboardPage.vue'), meta: { title: '运营总览', group: '资源', capability: 'dashboard:read' } },
     { path: '/assets', name: 'assets', component: () => import('./pages/AssetsPage.vue'), meta: { title: '资产管理', group: '资源', capability: 'assets:read' } },
@@ -36,9 +38,8 @@ router.beforeEach(async to => {
   try { await initializeSession() }
   catch { if (to.name !== 'login') return { name: 'login' } }
   if (!session.value && to.name !== 'login') return { name: 'login' }
-  if (session.value && to.name === 'login') return { name: 'assets' }
-  if (Array.isArray(to.meta.roles) && !to.meta.roles.includes(session.value?.user.role)) return { name: 'assets' }
-  if (to.meta.role && session.value?.user.role !== to.meta.role) return { name: 'assets' }
-  if (to.meta.capability && !can(String(to.meta.capability))) return { name: 'assets' }
+  const landing = landingRoute(session.value, router.getRoutes())
+  if (session.value && (to.name === 'login' || to.name === 'access-unavailable' && landing !== 'access-unavailable')) return { name: landing }
+  if (to.name !== 'login' && to.name !== 'access-unavailable' && !routeAllowed(to.meta, session.value)) return { name: landing }
   document.title = `${String(to.meta.title || '管理端')} · MOP`
 })

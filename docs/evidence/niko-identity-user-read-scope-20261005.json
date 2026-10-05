@@ -1,0 +1,29 @@
+{
+  "verified_at": "2026-10-05T11:45:25Z",
+  "base_commit": "7afca508e46d954801288758bd29c35ea11d5b3b",
+  "new_tests": 8,
+  "before_tests_including_existing": 11,
+  "before_failures": 5,
+  "focused_tests_including_existing": 22,
+  "focused_failures": 0,
+  "web_passed": 1781,
+  "web_files": 109,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts_passed": 127,
+  "initial_typecheck_failure": "Test registration accidentally included ElMessageBox service as a Vue component; corrected component list and reran full tests/typecheck/build",
+  "api_version": "0.45.0",
+  "api_changed": false,
+  "sql_changed": false,
+  "actual_http_checks": 0,
+  "actual_accounts_created": 0,
+  "formal_acceptance": "NOT_RUN",
+  "logs_sha256": {
+    "identity-user-scope-before-20261005.log": "1f8ab0f5327d5f67cde1c7aad2eed1f47f4307a0dd5f3cdc924fd075dd0a30ee",
+    "identity-user-scope-focused-20261005.log": "7371b919e079de4ff65b9070e9b3af66ae0d490357bfdd4b3605318d1692baee",
+    "identity-user-scope-build-20261005.log": "5161da102ff173eb8d9dd64344bc1dcfb6e55f7be3f54db75f171eab1ea6b0e4",
+    "identity-user-scope-final-web-20261005.log": "ddd80957c6ffe8e58386b71204f1cd78d2029fe62ddda1f72dd628f2377bb778",
+    "identity-user-scope-final-build-20261005.log": "435af6c5e0dd46b754f7e988a63d0725bc666863c0701774d70475ac85c59f64",
+    "identity-user-scope-final-contracts-20261005.log": "9ebba17a2317852c6fa2db8e66ffb20ba27cd629dfcc0ebcc8909a5e16b6d14a"
+  }
+}

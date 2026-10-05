@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive, ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { api, isCancelled } from '../api/client'
-import { can, session } from '../stores/session'
+import { can, session, contextGeneration, switchingTenant } from '../stores/session'
 import { baseRoleLabels, readRolePage, readUserPage, type ProjectUser, type RolePage, type UserPage, type IdentityBinding, type IdentityMembership } from '../utils/projectIdentity'
 import { useIdentityEditor } from '../utils/useIdentityEditor'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
@@ -10,41 +10,61 @@ const users = ref<UserPage | null>(null), roles = ref<RolePage | null>(null), se
 const memberships = ref<IdentityMembership[]>([]), bindings = ref<IdentityBinding[]>([]), tab = ref('profile'), detailLoading = ref(false)
 const extraTenant = ref(''), extraRole = ref(''), extraRoles = ref<RolePage | null>(null), extraActive = ref(true)
 const form = reactive({ username: '', display_name: '', password: '', active: true, role_id: '', member_active: true, issuer: '', subject: '' })
-const controller = new AbortController(); let readGeneration = 0
-onUnmounted(() => { controller.abort(); form.password = ''; readGeneration++ })
+let controller = new AbortController(), readGeneration = 0, extraGeneration = 0, disposed = false
 const editor = useIdentityEditor(load), command = editor.command, message = editor.message
-async function load() { const turn = ++readGeneration; loading.value = true; error.value = null; try {
+const scope = computed(() => JSON.stringify([session.value?.user.id, session.value?.user.role, session.value?.tenant.id, session.value?.permission_version, session.value?.account_version, [...(session.value?.capabilities ?? [])].sort(), (session.value?.allowed_tenants ?? []).map(t => t.id).sort(), contextGeneration.value, switchingTenant.value]))
+const canRead = () => !disposed && !switchingTenant.value && can('users:read')
+const canWrite = () => canRead() && can('users:write') && opened.value && !detailLoading.value
+function clearView() {
+  readGeneration++; extraGeneration++; controller.abort(); if (!disposed) controller = new AbortController()
+  users.value = null; roles.value = null; selected.value = null; opened.value = false; error.value = null; loading.value = false; detailLoading.value = false
+  memberships.value = []; bindings.value = []; extraTenant.value = ''; extraRole.value = ''; extraRoles.value = null; extraActive.value = true
+  query.value = ''; includeInactive.value = true; page.value = 1; tab.value = 'profile'
+  Object.assign(form, { username: '', display_name: '', password: '', active: true, role_id: '', member_active: true, issuer: '', subject: '' })
+  editor.clear()
+}
+watch(scope, clearView, { flush: 'sync' })
+onUnmounted(() => { disposed = true; clearView() })
+async function load() { const turn = ++readGeneration; users.value = null; roles.value = null; loading.value = false; error.value = null; if (!canRead()) return false; loading.value = true; detailLoading.value = !!selected.value; try {
   const tenant = session.value!.tenant.id
   const value = readUserPage(await api.request(`/identity/users?query=${encodeURIComponent(query.value)}&include_inactive=${includeInactive.value}&page=${page.value}`, { signal: controller.signal }), tenant)
-  if (turn !== readGeneration) return false; users.value = value
-  if (can('roles:read')) { const freshRoles = readRolePage(await api.request('/identity/roles', { signal: controller.signal }), tenant); if (turn !== readGeneration) return false; roles.value = freshRoles }
-  if (selected.value) { const fresh = await api.request<ProjectUser>(`/identity/users/${selected.value.id}`, { signal: controller.signal }); if (turn !== readGeneration) return false; selected.value = fresh; await detail(fresh, turn) }
+  if (turn !== readGeneration || !canRead()) return false; users.value = value
+  if (can('roles:read')) { const freshRoles = readRolePage(await api.request('/identity/roles', { signal: controller.signal }), tenant); if (turn !== readGeneration || !canRead()) return false; roles.value = freshRoles }
+  if (selected.value) { const fresh = await api.request<ProjectUser>(`/identity/users/${selected.value.id}`, { signal: controller.signal }); if (turn !== readGeneration || !canRead()) return false; selected.value = fresh; await detail(fresh, turn) }
   return turn === readGeneration
-} catch (e) { if (turn === readGeneration && !isCancelled(e)) error.value = e; return false } finally { if (turn === readGeneration) loading.value = false } }
+} catch (e) { if (turn === readGeneration && !isCancelled(e)) { error.value = e; opened.value = false } return false } finally { if (turn === readGeneration) { loading.value = false; detailLoading.value = false } } }
 onMounted(load)
 async function detail(user: ProjectUser, turn: number) {
   const [members, ids] = await Promise.all([api.request<{items: IdentityMembership[]}>(`/identity/users/${user.id}/memberships`, { signal: controller.signal }), api.request<{items: IdentityBinding[]}>(`/identity/users/${user.id}/external-identities`, { signal: controller.signal })])
-  if (turn !== readGeneration) return
+  if (turn !== readGeneration || !canRead()) return
   memberships.value = members.items; bindings.value = ids.items
   Object.assign(form, { username: user.username || '', display_name: user.display_name, active: user.active, password: '', role_id: user.role_id, member_active: user.member_active, issuer: '', subject: '' })
 }
-async function edit(user?: ProjectUser) { if (editor.busy() || !await editor.leave()) return; const turn = ++readGeneration; loading.value = false; detailLoading.value = !!user; editor.clear(); selected.value = user ?? null; opened.value = true; tab.value = 'profile'; memberships.value = []; bindings.value = []; extraTenant.value = ''; extraRoles.value = null; extraRole.value = ''; extraActive.value = true; editor.dirty.value = false; form.password = ''; error.value = null
+async function edit(user?: ProjectUser) { const owner = scope.value; if (!canRead() || (!user && (!can('users:write') || !can('roles:read'))) || editor.busy() || !await editor.leave() || owner !== scope.value) return; const turn = ++readGeneration; loading.value = false; detailLoading.value = !!user; editor.clear(); selected.value = user ?? null; opened.value = true; tab.value = 'profile'; memberships.value = []; bindings.value = []; extraTenant.value = ''; extraRoles.value = null; extraRole.value = ''; extraActive.value = true; editor.dirty.value = false; form.password = ''; error.value = null
   if (user) { try { await detail(user, turn) } catch (e) { if (turn === readGeneration && !isCancelled(e)) { error.value = e; opened.value = false } } finally { if (turn === readGeneration) detailLoading.value = false } }
   else Object.assign(form, { username: '', display_name: '', password: '', active: true, role_id: roles.value?.items.find(r => r.enabled && r.base_role === 'viewer')?.id || '', member_active: true })
 }
-async function saveProfile() { const user = selected.value; if (await editor.save(user ? `/identity/users/${user.id}` : '/identity/users', user ? 'PATCH' : 'POST', user ? { expected_version: user.version, display_name: form.display_name, active: form.active } : { expected_version: 0, username: form.username, display_name: form.display_name, password: form.password, active: form.active, role_id: form.role_id })) { form.password = ''; if (!user) opened.value = false } }
-async function action(kind: 'password' | 'unlock' | 'revoke-sessions' | 'local-account') { const user = selected.value!; await editor.save(`/identity/users/${user.id}/${kind}`, 'POST', { expected_version: user.version, ...(kind === 'password' ? { new_password: form.password } : kind === 'local-account' ? { username: form.username, password: form.password } : {}) }); form.password = '' }
-async function assign() { const user = selected.value!; await editor.save(`/identity/users/${user.id}/memberships/${session.value!.tenant.id}`, 'PUT', { expected_version: user.permission_version, role_id: form.role_id, active: form.member_active }) }
-async function tenantRoles() { extraRole.value = ''; extraRoles.value = null; if (!extraTenant.value) return; const target = extraTenant.value; try { const result = readRolePage(await api.request(`/identity/roles?tenant_id=${encodeURIComponent(target)}`, { signal: controller.signal }), target); if (target === extraTenant.value) { extraRoles.value = result; extraRole.value = result.items.find(x => x.enabled && x.base_role === 'viewer')?.id ?? '' } } catch (e) { if (!isCancelled(e)) error.value = e } }
-async function grantTenant() { const target = extraTenant.value, previous = memberships.value.find(x => x.tenant_id === target); await editor.save(`/identity/users/${selected.value!.id}/memberships/${target}`, 'PUT', { expected_version: previous?.permission_version ?? 0, role_id: extraRole.value, active: extraActive.value }) }
-async function bind() { await editor.save(`/identity/users/${selected.value!.id}/external-identities`, 'POST', { expected_version: 0, issuer: form.issuer, subject: form.subject }) }
-async function disable(binding: IdentityBinding) { await editor.save(`/identity/users/${selected.value!.id}/external-identities/${binding.id}/disable`, 'POST', { expected_version: binding.version }) }
-async function search() { if (editor.busy() || !await editor.leave()) return; selected.value = null; opened.value = false; editor.dirty.value = false; page.value = 1; await load() }
-async function move(delta: number) { if (editor.busy() || !await editor.leave()) return; selected.value = null; opened.value = false; editor.dirty.value = false; page.value += delta; await load() }
+async function saveProfile() { if (!canWrite() || (!selected.value && !can('roles:read'))) return; const user = selected.value; if (await editor.save(user ? `/identity/users/${user.id}` : '/identity/users', user ? 'PATCH' : 'POST', user ? { expected_version: user.version, display_name: form.display_name, active: form.active } : { expected_version: 0, username: form.username, display_name: form.display_name, password: form.password, active: form.active, role_id: form.role_id })) { form.password = ''; if (!user) opened.value = false } }
+async function action(kind: 'password' | 'unlock' | 'revoke-sessions' | 'local-account') { if (!canWrite() || !selected.value) return; const owner = scope.value, user = selected.value!; await editor.save(`/identity/users/${user.id}/${kind}`, 'POST', { expected_version: user.version, ...(kind === 'password' ? { new_password: form.password } : kind === 'local-account' ? { username: form.username, password: form.password } : {}) }); if (owner === scope.value) form.password = '' }
+async function assign() { if (!canWrite() || !can('roles:read') || !selected.value) return; const user = selected.value!; await editor.save(`/identity/users/${user.id}/memberships/${session.value!.tenant.id}`, 'PUT', { expected_version: user.permission_version, role_id: form.role_id, active: form.member_active }) }
+async function tenantRoles() {
+  const turn = ++extraGeneration, owner = scope.value, userId = selected.value?.id, target = extraTenant.value
+  extraRole.value = ''; extraRoles.value = null
+  if (!canWrite() || !can('roles:read') || !userId || !target || !session.value?.allowed_tenants.some(t => t.id === target)) return
+  const current = () => turn === extraGeneration && owner === scope.value && userId === selected.value?.id && target === extraTenant.value && canWrite() && can('roles:read')
+  try { const result = readRolePage(await api.request(`/identity/roles?tenant_id=${encodeURIComponent(target)}`, { signal: controller.signal }), target); if (current()) { extraRoles.value = result; extraRole.value = result.items.find(x => x.enabled && x.base_role === 'viewer')?.id ?? '' } }
+  catch (e) { if (current() && !isCancelled(e)) error.value = e }
+}
+async function grantTenant() { if (!canWrite() || !can('roles:read') || !selected.value || !extraTenant.value || extraRoles.value?.tenant_id !== extraTenant.value || !session.value?.allowed_tenants.some(t => t.id === extraTenant.value) || !extraRoles.value.items.some(r => r.id === extraRole.value && r.enabled)) return; const target = extraTenant.value, previous = memberships.value.find(x => x.tenant_id === target); await editor.save(`/identity/users/${selected.value!.id}/memberships/${target}`, 'PUT', { expected_version: previous?.permission_version ?? 0, role_id: extraRole.value, active: extraActive.value }) }
+async function bind() { if (!canWrite() || !selected.value) return; await editor.save(`/identity/users/${selected.value!.id}/external-identities`, 'POST', { expected_version: 0, issuer: form.issuer, subject: form.subject }) }
+async function disable(binding: IdentityBinding) { if (!canWrite() || !selected.value) return; await editor.save(`/identity/users/${selected.value!.id}/external-identities/${binding.id}/disable`, 'POST', { expected_version: binding.version }) }
+async function search() { const owner = scope.value; if (!canRead() || editor.busy() || !await editor.leave() || owner !== scope.value) return; editor.clear(); selected.value = null; opened.value = false; editor.dirty.value = false; page.value = 1; await load() }
+async function move(delta: number) { const owner = scope.value; if (!canRead() || editor.busy() || !await editor.leave() || owner !== scope.value) return; editor.clear(); selected.value = null; opened.value = false; editor.dirty.value = false; page.value += delta; await load() }
 </script>
 <template><section class="identity-page" v-loading="loading">
   <div class="page-heading"><div><h1>用户与成员授权</h1><p>管理当前租户的账号、成员角色及统一身份绑定。</p></div><el-button v-if="can('users:write') && can('roles:read')" type="primary" :disabled="editor.busy()" @click="edit()">新建用户</el-button></div>
-  <ApiErrorNotice :error="error"><el-button @click="load">重新读取</el-button></ApiErrorNotice><IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />
+  <p v-if="!can('users:read')">当前会话无用户读取权限。</p>
+  <ApiErrorNotice :error="error"><el-button @click="search">重新读取</el-button></ApiErrorNotice><IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />
   <form class="identity-form identity-toolbar" @submit.prevent="search"><label>搜索账号或姓名<input v-model="query" maxlength="100" /></label><label class="check"><input v-model="includeInactive" type="checkbox" />包含停用记录</label><el-button native-type="submit" :disabled="editor.busy()">查询</el-button></form>
   <div class="identity-cards"><article v-for="user in users?.items" :key="user.id" class="identity-card"><h2>{{ user.display_name }}</h2><p>{{ user.username || '未开通本地账号' }}</p><p>{{ user.role_name }} · {{ baseRoleLabels[user.base_role] }}</p><el-tag :type="user.active && user.member_active ? 'success' : 'info'">{{ !user.active ? '账号停用' : !user.member_active ? '成员停用' : '正常' }}</el-tag><div class="identity-actions"><el-button :disabled="editor.busy()" @click="edit(user)">管理账号</el-button></div></article></div>
   <p v-if="users && !users.items.length">没有匹配的用户。</p><div class="identity-actions"><el-button :disabled="page <= 1 || editor.busy()" @click="move(-1)">上一页</el-button><span>第 {{ page }} 页</span><el-button :disabled="!users?.has_more || editor.busy()" @click="move(1)">下一页</el-button></div>

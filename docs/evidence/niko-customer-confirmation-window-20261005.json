@@ -1,0 +1,45 @@
+{
+  "verified_at": "2026-10-05T04:24:26Z",
+  "base_commit": "7854248501da1fa55d0499cc66b46eff0ca55ba0",
+  "previous_ci": {
+    "run_id": 37263180394,
+    "conclusion": "success"
+  },
+  "scope": "EXPLICIT_CONTRACT_CONFIRMATION_WINDOW_ONLY",
+  "contract_sources": [
+    "M5-15/T00R071",
+    "M5-16/T00R072"
+  ],
+  "new_pure_tests": 15,
+  "root_reported": 2330,
+  "root_executed": 1549,
+  "root_skipped": 781,
+  "root_failures": 0,
+  "root_errors": 0,
+  "actual_pg_executed": 0,
+  "actual_http": "NOT_RUN",
+  "real_browser": false,
+  "reminder_sent": false,
+  "ticket_closed": false,
+  "api_contract": "0.44.0",
+  "new_migrations": 0,
+  "new_credentials": false,
+  "formal_acceptance": "NOT_RUN",
+  "log_sha256": {
+    "customer-confirmation-focused-20261005.log": "4a264dabc0a4b2ca293b005cee9073c80cd3a520bfc6924bc7122f0093b981c4",
+    "customer-confirmation-java-20261005.log": "99d8853fd8e6f010bcff93cc2f78e213a84cf29fdbbc3524aa5f3ea5974c9024",
+    "customer-confirmation-python-merged-20261005.log": "c94cbf338ec6bae7297034e876937811e78d069381a2fefde1b866ccc5d8869d",
+    "customer-confirmation-contracts-merged-20261005.log": "954c3003783017445372998cba071ba81556b2098b187de3a6ea6e9082c263e3"
+  },
+  "published_base_commit": "f2dd8bb23ca59ca5926629f0bd629ff761c35a2c",
+  "incoming_ci": {
+    "run_id": 37263278332,
+    "conclusion": "success"
+  },
+  "incoming_deployment_evidence": "READ_FROM_UPSTREAM_NOT_REEXECUTED",
+  "contracts": 125,
+  "python_tests_after_upstream_merge": 163,
+  "formal_rows_with_slice_notes": 47,
+  "upstream_raw_commit_tree_blobs_verified": true,
+  "upstream_import_initial_guard": "ASSERTION_STOPPED_BEFORE_ANY_HEAD_OR_WORKTREE_CHANGE; corrected exact unchanged suffix verification"
+}

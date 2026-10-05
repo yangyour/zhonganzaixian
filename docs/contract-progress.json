@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 44,
-  "rows_without_progress_notes": 84,
+  "rows_with_progress_notes": 45,
+  "rows_without_progress_notes": 83,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -37,7 +37,7 @@
     },
     "M4": {
       "requirements": 19,
-      "rows_with_progress_notes": 4,
+      "rows_with_progress_notes": 5,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 19
       }
@@ -480,8 +480,11 @@
       "id": "M4-1",
       "title": "设备状态监控",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/asset-state-consistency.md",
+        "docs/evidence/niko-asset-state-consistency-20261005.json"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1391,6 +1394,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "9f189ac1a4848bd2169b0d16b31b0c2a42c347b1d7c6e96771af1eaac12429ac"
+    "doc/development/07_合同逐项开发追踪.md": "e5b5d0daa032ae02a86f8d79684a7f7ce4c607b03729b49831db1ec4e2ca70a4"
   }
 }

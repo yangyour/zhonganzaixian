@@ -1,0 +1,50 @@
+{
+  "verified_at": "2026-10-05T02:17:19.389382+00:00",
+  "scope": "ASSET_DETAIL_LEDGER_STATE_AND_SAMPLE_TIME_CONSISTENCY",
+  "previous_commit": "78f2b7edfc3c6300fadaefe052e43c8facc2c591",
+  "previous_ci": {
+    "run_id": 37254211476,
+    "conclusion": "success"
+  },
+  "new_native_unit_tests": 10,
+  "focused_including_ledger": 21,
+  "web_tests": 1618,
+  "web_files": 95,
+  "typecheck_build": "PASS",
+  "contracts": 125,
+  "contract_generation": "PASS",
+  "legacy_ok_does_not_override_unknown_availability": true,
+  "availability_and_sync_projected_independently": true,
+  "unknown_wire_codes_not_invented": true,
+  "strict_sample_time_reused": true,
+  "new_http_requests": 0,
+  "new_migrations": 0,
+  "new_credentials": false,
+  "api_contract_unchanged": "0.44.0",
+  "real_http": "NOT_RUN",
+  "real_browser": false,
+  "css_visual_verified": false,
+  "physical_mobile_verified": false,
+  "formal_acceptance": "NOT_RUN",
+  "failure_history": [
+    {
+      "stage": "first focused and first full runs",
+      "failures": 3,
+      "cause": "test source inspection used jsdom HTTP import.meta.url with fs.readFileSync",
+      "resolution": "use resolved local test working-directory paths; production checks retained"
+    }
+  ],
+  "source_sha256": {
+    "apps/web/src/components/AssetStateFacts.vue": "b7670297f96073eeef788c2003adb6b8720b4330b7142cb0dac9ce4f9f538f1f",
+    "apps/web/src/pages/AssetsPage.vue": "ef93294f4b0a05fc0f1cd601ee4deac286956c730f80864e1a12075e40bf1f17",
+    "apps/web/tests/assetStateFacts.test.ts": "eae19a686177484d015b355972d4e92fb2b5cd33822834f2c1ee8c7e6705d85a"
+  },
+  "log_sha256": {
+    "asset-state-detail-focused-20261005.log": "2fb90e36d87cbbac21c6a0ad7005c8e52b26cd459ac87d870c00e792d292002c",
+    "asset-state-detail-web-20261005.log": "288114f708497781190658a6b73bdcbc6ba3a5f7cdc50a621fd2fd47c8d91e9a",
+    "asset-state-detail-focused-final-20261005.log": "e0da32ba08a911729583233ac1ce5c350f35f3ded064ef7a8d92301965ec4a9a",
+    "asset-state-detail-web-final-20261005.log": "22a714182fbd647a8df97a2e793f04c41bc5153c09b8a6fbaccf037c5e3e079c",
+    "asset-state-detail-build-final-20261005.log": "da6bc3a1a2b011fbe66f41aca84336c52be618b44a03673363a261ec8efad262",
+    "asset-state-detail-contracts-20261005.log": "fc01fe1dc6e48391b612c0e6e8906a817420df64007addc63e42cf7befae7ae4"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "verified_at": "2026-10-05T05:59:03.885825+00:00",
+  "environment": "designated-server",
+  "postgresql": "17.9",
+  "schema_migration_applied": false,
+  "transaction_rolled_back": true,
+  "migration_history_still": 26,
+  "checks": [
+    "all_deferred_password_policy_values_null",
+    "base_category_cannot_escalate",
+    "builtin_role_is_protected",
+    "capability_limits_are_readonly",
+    "explicit_role_has_no_implicit_write",
+    "assignment_advances_permission_epoch",
+    "role_edit_advances_member_epoch",
+    "disabled_role_has_no_grants",
+    "cross_tenant_assignment_rejected",
+    "plaintext_credential_rejected",
+    "username_immutable_for_runtime",
+    "password_revision_required",
+    "password_change_revokes_old_authentication_revision"
+  ],
+  "passed": true,
+  "draft_sql_sha256": "41e5060d4925e7c8ea761539e4695a6ea5792743240363a7d5f50f24bcb59566",
+  "shared_components_changed": false
+}

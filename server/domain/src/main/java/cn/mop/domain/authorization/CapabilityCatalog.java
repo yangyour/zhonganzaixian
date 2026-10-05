@@ -17,6 +17,10 @@ public final class CapabilityCatalog {
     static {
         var dimensions=new LinkedHashMap<String,String>();dimensions.put("ASSETS_METRICS","资产与指标");dimensions.put("ALERTS_TICKETS","告警与工单");dimensions.put("TEMPLATES_AUTOMATION","模板与自动化");dimensions.put("PLATFORM_ADMIN","平台管理");dimensions.put("MEMBER_ADMIN","成员管理");DIMENSIONS=Collections.unmodifiableMap(dimensions);
         var definitions=new TreeMap<String,Definition>();
+        define(definitions,"users:read","读取当前租户用户与成员授权","MEMBER_ADMIN");
+        define(definitions,"users:write","管理项目账号与当前租户成员授权","MEMBER_ADMIN");
+        define(definitions,"roles:read","读取当前租户角色和有效权限","MEMBER_ADMIN");
+        define(definitions,"roles:write","管理当前租户角色及身份策略配置","MEMBER_ADMIN");
         define(definitions,"dashboard:read","读取当前授权租户的固定版式首页","ASSETS_METRICS","ALERTS_TICKETS");
         define(definitions,"notification_preferences:read_own","读取本人通知偏好请求与历史","ALERTS_TICKETS");
         define(definitions,"notification_preferences:write_own","保存本人通知偏好请求（不生效或派发）","ALERTS_TICKETS");

@@ -1,0 +1,15 @@
+{
+  "sha256": {
+    "V27__project_identity_and_roles.sql": "41e5060d4925e7c8ea761539e4695a6ea5792743240363a7d5f50f24bcb59566"
+  },
+  "function_body_sha256": {
+    "mop_identity_user_seed()": "0b775f04f2be188e1feb376190d0aac95ce8591d3d40630c0a335a035d1b99f6",
+    "mop_local_account_guard()": "29af0670bcea7e2aca5553d41d0a79ada6c53d95abaa071dbda1e0fe161594f5",
+    "mop_project_role_guard()": "6cc7a87e1756640cb720cbb43a02f33cfd3c6f3a4e9f78c8f166e05cafd42613",
+    "mop_seed_tenant_roles()": "7cdf68e7708c39d7615f70b21fba2ed2cf92de01c1eb4e2f56cdb9a2aff24ad4",
+    "mop_effective_capabilities(uuid,uuid)": "dc57af461cf5c8f5565fede6678673e764823f96aa8b22c4f41e8dda23085489",
+    "mop_role_permission_epoch()": "a8db3eb24d656235d70ec5115295894464cbaaee2505c203ba3f7836fbb97a3a",
+    "mop_assignment_scope_guard()": "210c7a8e6696a96b0e7dda5c2ca64de53979a5312741131b4bfa1d0829111973",
+    "mop_assignment_epoch()": "aec5008cfd58714ca9d54ef10909d65dc24161af6783edd030137a6beb8e8d05"
+  }
+}

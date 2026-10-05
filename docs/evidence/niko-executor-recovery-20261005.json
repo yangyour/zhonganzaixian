@@ -1,0 +1,109 @@
+{
+  "verified_at": "2026-10-05T01:20:11.506281+00:00",
+  "scope": "SOURCE_AND_OFFLINE_TOOLCHAIN_RECOVERY_AFTER_EXECUTOR_REPLACEMENT",
+  "interruption_observed_at": "2026-10-05T00:52:14Z",
+  "resume_error": "EXECUTOR_KEY_CHANGED_DURING_SESSION_RECOVERY",
+  "source_recovery": {
+    "verified_at": "2026-10-05T01:03:20.907783+00:00",
+    "head": "d24fecd09ec6403497baa1455b81131267d3dad3",
+    "tree": "d3c566a374e9668590977a03edd5b37a4f7c1c40",
+    "files": 1677,
+    "changed_text_files": 274,
+    "all_blobs_verified": true,
+    "commit_header_offset": "+0800",
+    "private_data_or_credentials_restored": false,
+    "components_started": false
+  },
+  "archive": {
+    "repository": "yangyour/zhonganzaixian",
+    "run_id": 37205722581,
+    "artifact_id": 11304820230,
+    "base_commit": "af54ced37e9a89219bff8e9bdbce3f20f8b92a12",
+    "expired_at_read": false,
+    "zip_sha256": "645f256dcab4ca2a0448d0733670db2e4ff1bd30f54c7d1af26b32ea0de8dd3f",
+    "source_zip_sha256": "ef1084360dfa981ace14a9ccb8e9596d981cbb6baea3912f2d11e856c02dc91a",
+    "git_history_included": false,
+    "private_state_included": false
+  },
+  "latest_safe_commit": {
+    "sha": "d24fecd09ec6403497baa1455b81131267d3dad3",
+    "ci_run": 37248295961,
+    "conclusion": "success"
+  },
+  "toolchain": {
+    "node": "22.22.1",
+    "jdk": "17.0.20.1+1",
+    "maven": "3.9.9",
+    "official_archives_checksums_verified": true,
+    "system_ca_store_reused_without_import_or_tls_disable": true,
+    "existing_environment_proxy_read_for_each_execution": true
+  },
+  "fresh_offline_checks": {
+    "root_java_reported": 2239,
+    "root_java_executed": 1458,
+    "root_java_skipped": 781,
+    "postgresql_executed": 0,
+    "postgresql_skipped": 762,
+    "minio_skipped": 6,
+    "historical_fixture_skipped": 13,
+    "failures": 0,
+    "errors": 0,
+    "worktree_includes_uncommitted_dashboard_reader": true,
+    "dashboard_and_catalog_pure_focused": 22,
+    "web": 1562,
+    "web_files": 91,
+    "web_typecheck_build": "PASS",
+    "contracts": 120,
+    "contract_generation": "PASS",
+    "python": 146
+  },
+  "old_postgresql_keycloak_private_state_restored": false,
+  "old_runtime_liveness": "UNKNOWN_UNREACHABLE_FROM_CURRENT_EXECUTOR",
+  "new_components_started": false,
+  "new_credentials_created": false,
+  "component_recreation_approval": "REQUESTED_NOT_GRANTED",
+  "new_real_component_http": "NOT_RUN",
+  "original_server_operated": false,
+  "oss_configured": false,
+  "formal_acceptance": "NOT_RUN",
+  "recoverable_failures": [
+    {
+      "stage": "first changed text blob fetch",
+      "result": "no usable content returned",
+      "resolution": "subsequent read returned expected blob; local git blob hash verified"
+    },
+    {
+      "stage": "initial commit-object reconstruction",
+      "result": "UTC REST timestamps alone did not reproduce original commit object",
+      "resolution": "matched actual +0800 original header and exact SHA; no commit identity or history rewritten"
+    },
+    {
+      "stage": "initial Maven dependency fetch",
+      "result": "direct name resolution failed",
+      "resolution": "used the preexisting execution proxy"
+    },
+    {
+      "stage": "Maven bundled JDK trust",
+      "result": "PKIX chain missing in bundled JDK store",
+      "resolution": "verified environment root already exists in the OS-managed Java store and read that store; no certificate import or verification disable"
+    },
+    {
+      "stage": "cross-execution Maven proxy reuse",
+      "result": "old loopback proxy port refused connection",
+      "resolution": "derive current existing proxy for every invocation"
+    }
+  ],
+  "logs_sha256": {
+    "recovered-contract-generation-20261005.log": "5ad52d6c00a717c9c996f9a67f80a7fd3588b1be71925f90849e00654eaad94d",
+    "recovered-contracts-20261005.log": "c59b6228c3e0b018603a03ae2a8326575c5552d480ab83f943cbaf93c71f746d",
+    "recovered-python-20261005.log": "3e75e572232f2e4b655df9872ad096926a495415330a67753e71cfb3c349fdb8",
+    "recovered-python-dependencies-20261005.log": "c0862389377dcb6a1291622c157fcc5d05730409c0dc03f6d6f2cde41147deb3",
+    "recovered-web-20261005.log": "3050f0b05cdfd628bdbaf836b04cd0fcaa0944c6e8097e61644f8acea0a2e1ad",
+    "recovered-web-build-20261005.log": "e073ea1e7349d1f55f67f3ca752a763ad69be71aaf8892d03ec8ba6213919f69",
+    "dashboard-recovered-pure-focused-20261005.log": "462c1cd6f6f7e7ce50e459feaa562d8f2c827bbaf50d0da82fbc084ff580d733",
+    "dashboard-recovered-pure-focused-r2-20261005.log": "0e104050ca99d2ba66023318eeb234bd1c580ed934f5e014102fcfd44734b8f0",
+    "dashboard-recovered-pure-focused-r3-20261005.log": "f61188681ee37b6229812fd946fda5165d2b80bdc4c0c8deea30bf6eefd04291",
+    "dashboard-recovered-pure-focused-r4-20261005.log": "e9075438b849f1d0e726383577ba738330208b009f0c44079553c668b2b4abde",
+    "dashboard-recovered-pure-full-20261005.log": "fd95dd94e5750bb3487eaeb42645eaa30d14817f379b4ff31880966e58cd1904"
+  }
+}

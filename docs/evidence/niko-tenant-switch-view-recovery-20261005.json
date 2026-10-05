@@ -1,0 +1,56 @@
+{
+  "verified_at": "2026-10-05T03:35:47.662315+00:00",
+  "scope": "CLIENT_TENANT_SWITCH_VIEW_CLEANUP_AFTER_AUTHORITATIVE_READBACK",
+  "previous_commit": "3cf2be0457730300db36eb502d90cbbf369c1927",
+  "previous_ci": {
+    "run_id": 37256985619,
+    "conclusion": "success"
+  },
+  "new_isolated_tests": 14,
+  "focused_total": 25,
+  "web_tests": 1674,
+  "web_files": 97,
+  "typecheck_build": "PASS",
+  "contracts": 125,
+  "contract_generation": "PASS",
+  "cleanup_while_view_hidden": true,
+  "observed_tenant_used_not_requested_tenant_assumed": true,
+  "wrong_target_http200_rejected_as_receipt": true,
+  "original_switch_error_preserved": true,
+  "independent_get_confirms_original_receipt": false,
+  "navigation_error_retries_post": false,
+  "resolved_router_failure_checked": true,
+  "actual_router_browser_tested": false,
+  "server_late_command_or_multitab_ordering_verified": false,
+  "request_level_tenant_version_binding_implemented": false,
+  "cross_reload_recovery_implemented": false,
+  "actual_http": "NOT_RUN",
+  "real_pg": "NOT_RUN_CURRENT_EXECUTOR",
+  "real_browser": false,
+  "new_credentials": false,
+  "new_migrations": 0,
+  "api_contract_unchanged": "0.44.0",
+  "formal_acceptance": "NOT_RUN",
+  "failure_history": [
+    {
+      "stage": "initial build/typecheck",
+      "errors": 2,
+      "cause": "synthetic tests assigned null and TypeScript narrowed session reads to never after an async side effect",
+      "resolution": "explicit Session-typed synthetic factory and existing pre-switch session; no production guard removed"
+    }
+  ],
+  "source_sha256": {
+    "apps/web/src/App.vue": "e1028f829613ba687b690daf7a963e4691339a47ea8261677f4b007ea31da475",
+    "apps/web/src/stores/session.ts": "faacfd2cb069fdf8732e806cb73b4edf6c19c59be00315d340553dcc2215f685",
+    "apps/web/tests/contextTransitionGuard.test.ts": "a9966f5021a6cea3f14591fa18f1de2d8adec7bfb04b9914096fd99406398f9c",
+    "apps/web/tests/sessionTransition.test.ts": "9ed93f47251657302e80d6e6a7b263aff5fd99a04c08f7ad2420882a31e99d94"
+  },
+  "log_sha256": {
+    "tenant-switch-cleanup-focused-20261005.log": "3265c6ea1d39d0f972de237b79cef02fe2e3b4915e3f9d9468d1638843eb06b2",
+    "tenant-switch-cleanup-build-20261005.log": "ed76e90245e52fda3ba7fdab6aa2b94672b2f47ac553ae16cd2c77a0cac80d5d",
+    "tenant-switch-cleanup-focused-final2-20261005.log": "df305e089c214919012835d74d680d501546f557de7e362f3367d719a7096deb",
+    "tenant-switch-cleanup-web-final2-20261005.log": "b1360f08cdb394cd60d63964d090e6f9c97d7c5d31e3b16b0157fdbd7e88ec1f",
+    "tenant-switch-cleanup-build-final2-20261005.log": "f89877ce0db2ecb1265a5555a8e6480a6712b8f916d192c5eeb847ddcfa20719",
+    "tenant-switch-cleanup-contracts-final2-20261005.log": "a9c9ce989dd90eb3a1b56804631e741ada17fe6f34f0d87044278de0b756a2ed"
+  }
+}

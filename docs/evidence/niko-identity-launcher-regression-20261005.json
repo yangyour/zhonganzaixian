@@ -1,0 +1,39 @@
+{
+  "verified_at": "2026-10-05T08:24:47Z",
+  "base_commit": "1c0d5d7906a598fa425e93836ecd60ede535bb85",
+  "upstream_fix_already_published": true,
+  "historical_failed_ci": 37275027726,
+  "verified_upstream_success_ci": 37281407373,
+  "new_tests": 3,
+  "test_purpose": [
+    "Compare Python admitted modes with Java CLI feature modes",
+    "Exercise V27/V28 mode admission in empty temporary directories, stopping before private files or components",
+    "Pin frozen V28 manifest SHA256"
+  ],
+  "before_tests": 32,
+  "before_failures_including_subtests": 4,
+  "python_passed": 167,
+  "contracts_passed": 127,
+  "web_passed": 1744,
+  "web_files": 105,
+  "java_reported": 2505,
+  "java_executed": 1714,
+  "java_skipped": 791,
+  "java_failures": 0,
+  "java_errors": 0,
+  "actual_pg_in_this_executor": 0,
+  "actual_migrations": 0,
+  "actual_accounts_created": 0,
+  "frozen_sql_changed": false,
+  "api_version": "0.45.0",
+  "formal_requirements": 128,
+  "formal_acceptance": "NOT_RUN",
+  "logs_sha256": {
+    "v28-guards-before-20261005.log": "f7493e116a9c1b2e12d46a1043d896e74dd434e278610d32cee0a83ec13a0951",
+    "identity-sync-python-20261005.log": "1f9631affb5e5318c83638eced66a46554c6a3aa40651775ee5492adc671015f",
+    "identity-sync-contracts-20261005.log": "81962a7ad91653de37bc1d5b011dbd7d9cd271414e902769c43e55301d552a6b",
+    "identity-sync-java-20261005.log": "7a046e841e28063f309d5c69aea569865a266440cf28d2b8684f21355309cf08",
+    "identity-sync-web-20261005.log": "f4a8eb5887136403208a23e33efaf884c3f2f94145f36e69e2ca0eb424df7224",
+    "identity-sync-build-20261005.log": "d1bd1a7f61373d5bb5e64992b6092f416649c79305ca7cbc04088667d19f10d6"
+  }
+}

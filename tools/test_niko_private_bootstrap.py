@@ -97,6 +97,26 @@ class MigrationManifestParityTest(unittest.TestCase):
    for name in names:
     values=json.loads((ROOT/'tools/niko-test'/name).read_text())['sha256'];self.assertTrue(set(values).isdisjoint(expected));expected.update(values)
    self.assertEqual(actual,expected);self.assertEqual(set(range(1,29)),{int(name.split('__')[0][1:]) for name in expected})
+ def test_python_admitted_modes_exactly_match_java_cli_features(self):
+  import ast,re
+  tree=ast.parse((ROOT/'tools/niko-test/run-migration.py').read_text())
+  assignment=next(n for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='MODES' for t in n.targets))
+  modes=ast.literal_eval(assignment.value)
+  java=(ROOT/'server/persistence/src/main/java/cn/mop/persistence/TestSchemaMigration.java').read_text()
+  expected=set(re.findall(r'"(--apply-[a-z-]+)"\.equals\(args\[0\]\)',java))|{'--check','--initialize-new-niko-database'}
+  self.assertEqual(len(modes),len(set(modes)));self.assertEqual(expected,set(modes))
+ def test_identity_modes_are_admitted_before_frozen_resource_checks(self):
+  for mode in ['--apply-project-identity','--apply-identity-compatibility']:
+   with self.subTest(mode=mode),tempfile.TemporaryDirectory() as d:
+    result=subprocess.run([sys.executable,str(ROOT/'tools/niko-test/run-migration.py'),mode],cwd=d,capture_output=True,text=True)
+    self.assertNotEqual(0,result.returncode)
+    self.assertNotIn('Explicit migration mode required',result.stderr)
+    self.assertIn('frozen-migrations.json',result.stderr)
+    self.assertFalse((Path(d)/'.local').exists())
+ def test_v28_frozen_compatibility_manifest_is_pinned(self):
+  data=json.loads((ROOT/'tools/niko-test/frozen-identity-compatibility-migration.json').read_text())
+  self.assertEqual({'V28__identity_inventory_and_password_formats.sql':'5554e23a3aabfe489ae6b9258293d0f33dda0bcc7da19c60bdb873fb16b77ad7'},data['sha256'])
+
  def test_v27_is_frozen_and_both_entrypoints_require_explicit_identity_migration(self):
   manifest=json.loads((ROOT/'tools/niko-test/frozen-project-identity-migration.json').read_text());name='V27__project_identity_and_roles.sql'
   self.assertEqual({name:'41e5060d4925e7c8ea761539e4695a6ea5792743240363a7d5f50f24bcb59566'},manifest['sha256'])

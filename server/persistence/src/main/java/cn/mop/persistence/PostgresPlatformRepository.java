@@ -68,6 +68,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
             catch(SQLException|RuntimeException|Error exception){try{connection.rollback();}catch(SQLException ignored){}throw exception;}
         }catch(SQLException exception){logSqlFailure(exception);throw unavailable();}
     }
+    <T>T identityTransaction(java.util.function.Function<Connection,T> work){return inTransaction(()->work.apply(transaction.get()));}
     private <T>T inTransaction(Supplier<T> work){
         if(transaction.get()!=null)return work.get();
         try(Connection connection=dataSource.getConnection()){
@@ -100,12 +101,13 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     @Override public Optional<Membership> membership(String userId,String tenantId){return connection(connection->{
         // Row lock participates in the same write transaction: revocation cannot race a commit.
         String lock=transaction.get()!=null?" FOR SHARE OF m,u":"";
-        try(PreparedStatement statement=connection.prepareStatement("SELECT m.user_id,m.tenant_id,m.role_code,m.permission_version,m.active FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.user_id::text=? AND m.tenant_id::text=? AND m.active AND u.active"+lock)){statement.setString(1,userId);statement.setString(2,tenantId);try(ResultSet rows=statement.executeQuery()){return rows.next()?Optional.of(new Membership(rows.getString(1),rows.getString(2),rows.getString(3),rows.getLong(4),rows.getBoolean(5))):Optional.empty();}}
+        try(PreparedStatement statement=connection.prepareStatement("SELECT m.user_id,m.tenant_id,m.role_code,m.permission_version,m.active FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.user_id::text=? AND m.tenant_id::text=? AND m.active AND u.active"+lock)){statement.setString(1,userId);statement.setString(2,tenantId);try(ResultSet rows=statement.executeQuery()){return rows.next()?Optional.of(new Membership(rows.getString(1),rows.getString(2),rows.getString(3),rows.getLong(4),rows.getBoolean(5),PostgresAuthorization.capabilities(connection,userId,tenantId))):Optional.empty();}}
     });}
     @Override public List<TenantInventory> authorizedTenantInventory(String tenant,String actor,long permissionVersion,TenantInventory.Query query){
         if(query==null)throw new DomainException(400,"VALIDATION_ERROR","Tenant inventory query required");
         if(transaction.get()!=null)throw new IllegalStateException("Tenant inventory requires a standalone readonly snapshot");
         return readSnapshot(c->{
+            PostgresAuthorization.require(c,actor,tenant,permissionVersion,"tenants:read_inventory");
             if(!TenantInventory.canonicalUuid(tenant)||!TenantInventory.canonicalUuid(actor)||permissionVersion<1||permissionVersion>9007199254740991L)throw new DomainException(401,"SESSION_EXPIRED","Current membership unavailable");
             try(var statement=c.prepareStatement("SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active")){
                 statement.setQueryTimeout(10);statement.setString(1,tenant);statement.setString(2,actor);
@@ -114,7 +116,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
                     if(!"padmin".equals(rows.getString(1)))throw new DomainException(403,"ACTION_FORBIDDEN","Tenant inventory requires current platform-admin membership");
                 }
             }
-            String sql="SELECT t.id,t.name,t.created_at, (SELECT count(*) FROM public.mop_asset a WHERE a.tenant_id=t.id) asset_count, (SELECT count(*) FROM public.mop_site s WHERE s.tenant_id=t.id) site_count, (SELECT count(*) FROM public.mop_membership members JOIN public.mop_user users ON users.id=members.user_id WHERE members.tenant_id=t.id AND members.active AND users.active) member_count FROM public.mop_tenant t JOIN public.mop_membership m ON m.tenant_id=t.id WHERE m.user_id=?::uuid AND m.active AND m.role_code='padmin'"+(query.afterId()==null?"":" AND t.id>?::uuid")+" ORDER BY t.id LIMIT ?";
+            String sql="SELECT t.id,t.name,t.created_at, (SELECT count(*) FROM public.mop_asset a WHERE a.tenant_id=t.id) asset_count, (SELECT count(*) FROM public.mop_site s WHERE s.tenant_id=t.id) site_count, (SELECT count(*) FROM public.mop_membership members JOIN public.mop_user users ON users.id=members.user_id WHERE members.tenant_id=t.id AND members.active AND users.active) member_count FROM public.mop_tenant t JOIN public.mop_membership m ON m.tenant_id=t.id WHERE m.user_id=?::uuid AND m.active AND m.role_code='padmin' AND public.mop_effective_capabilities(m.user_id,m.tenant_id) @> ARRAY['tenants:read_inventory']::text[]"+(query.afterId()==null?"":" AND t.id>?::uuid")+" ORDER BY t.id LIMIT ?";
             var result=new ArrayList<TenantInventory>();
             try(var statement=c.prepareStatement(sql)){
                 statement.setQueryTimeout(10);int p=1;statement.setString(p++,actor);if(query.afterId()!=null)statement.setString(p++,query.afterId());statement.setInt(p,query.limit());
@@ -138,7 +140,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     }
     private static void authorizeAssetRead(Connection c,String tenant,String actor,long permissionVersion)throws SQLException{
         if(tenant==null||actor==null||permissionVersion<1)throw new DomainException(401,"SESSION_EXPIRED","当前成员关系或权限版本已失效");
-        try(var statement=c.prepareStatement("SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active")){statement.setQueryTimeout(10);statement.setString(1,tenant);statement.setString(2,actor);try(var rows=statement.executeQuery()){if(!rows.next()||rows.getLong(2)!=permissionVersion)throw new DomainException(401,"SESSION_EXPIRED","当前成员关系或权限版本已失效");if(!Capabilities.forRole(rows.getString(1)).contains("assets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无资产读取权限");}}
+        try(var statement=c.prepareStatement("SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active")){statement.setQueryTimeout(10);statement.setString(1,tenant);statement.setString(2,actor);try(var rows=statement.executeQuery()){if(!rows.next()||rows.getLong(2)!=permissionVersion)throw new DomainException(401,"SESSION_EXPIRED","当前成员关系或权限版本已失效");if(!PostgresAuthorization.capabilities(c,actor,tenant).contains("assets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无资产读取权限");}}
     }
     @Override public List<Asset> list(String tenantId){return connection(connection->{List<Asset> result=new ArrayList<>();try(PreparedStatement statement=connection.prepareStatement("SELECT * FROM public.mop_asset WHERE tenant_id::text=? ORDER BY created_at,id")){statement.setString(1,tenantId);try(ResultSet rows=statement.executeQuery()){while(rows.next())result.add(asset(rows));}}return result;});}
     @Override public Optional<Asset> find(String tenantId,String id){return connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT * FROM public.mop_asset WHERE tenant_id::text=? AND id::text=?")){statement.setString(1,tenantId);statement.setString(2,id);try(ResultSet rows=statement.executeQuery()){return rows.next()?Optional.of(asset(rows)):Optional.empty();}}});}
@@ -248,7 +250,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     }
     private Membership ticketAccess(String tenant,String actor){
         Membership current=membership(actor,tenant).orElseThrow(()->new DomainException(401,"SESSION_EXPIRED","成员关系已失效"));
-        if(!Capabilities.forRole(current.role()).contains("tickets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无工单查询权限");return current;
+        if(!current.capabilities().contains("tickets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无工单查询权限");return current;
     }
     private static String ownTicketPredicate(Membership membership){return Capabilities.customer(membership.role())?" AND t.reporter_id::text=?":"";}
     private static final String CURRENT_TICKET_ACCESS=" AND EXISTS(SELECT 1 FROM public.mop_membership access JOIN public.mop_user u ON u.id=access.user_id WHERE access.tenant_id=t.tenant_id AND access.user_id::text=? AND access.active AND u.active AND access.permission_version=? AND access.role_code=?)";
@@ -300,7 +302,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     });}
     @Override public CustomerReportRegistration registerCustomerReport(String tenant,String actor,CustomerReport report){
         if(transaction.get()==null)throw new IllegalStateException("Customer report writes require idempotent transaction");Membership current=ticketAccess(tenant,actor);
-        if(!Capabilities.forRole(current.role()).contains("tickets:report"))throw new DomainException(403,"ACTION_FORBIDDEN","内部角色不能代客户报障");
+        if(!current.capabilities().contains("tickets:report"))throw new DomainException(403,"ACTION_FORBIDDEN","内部角色不能代客户报障");
         if(!report.attachmentIds().isEmpty())requirePhotoSchema();
         Asset asset=report.assetId()==null?null:find(tenant,report.assetId()).orElseThrow(PostgresPlatformRepository::missing);
         if(asset!=null){
@@ -412,7 +414,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     }
     private Membership photoReporter(String tenant,String actor){
         Membership current=ticketAccess(tenant,actor);
-        if(!Capabilities.forRole(current.role()).contains("tickets:report"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色不能上传或追加客户报障照片");return current;
+        if(!current.capabilities().contains("tickets:report"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色不能上传或追加客户报障照片");return current;
     }
     private static String ownFilePredicate(Membership membership){
         // An upload is private staging until its owner attaches it to a visible tenant ticket.
@@ -522,7 +524,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         });
     });}
     private boolean authorizedPhotoJob(PhotoJob job){return inTransaction(()->{
-        return membership(job.actor(),job.tenant()).filter(m->m.permissionVersion()==job.permissionVersion()&&Capabilities.forRole(m.role()).contains("tickets:report")).isPresent();
+        return membership(job.actor(),job.tenant()).filter(m->m.permissionVersion()==job.permissionVersion()&&m.capabilities().contains("tickets:report")).isPresent();
     });}
     private void updatePhotoOperation(PhotoJob job,String status,String step,Map<String,Object> error){
         connection(connection->{try(PreparedStatement statement=connection.prepareStatement("UPDATE public.mop_operation SET status=?,step=?,error=?::jsonb,updated_at=clock_timestamp() WHERE tenant_id::text=? AND id::text=? AND file_id::text=? AND kind='FILE_UPLOAD'")){

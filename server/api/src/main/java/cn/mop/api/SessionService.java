@@ -29,11 +29,17 @@ public class SessionService {
     private final SecurityContextRepository contexts;
     private final HttpSessionCsrfTokenRepository csrfRepository;
     private final ObjectProvider<OidcClientInitiatedLogoutSuccessHandler> oidcLogout;
+    private final ObjectProvider<ProjectIdentityService> projectIdentity;
     private record Access(FixtureUser user,Tenant tenant,Membership membership,List<String> capabilities){}
     public SessionService(PlatformRepository repository,ObjectMapper mapper,SecurityContextRepository contexts,HttpSessionCsrfTokenRepository csrfRepository,ObjectProvider<OidcClientInitiatedLogoutSuccessHandler> oidcLogout){
-        this.repository=repository;this.mapper=mapper;this.contexts=contexts;this.csrfRepository=csrfRepository;this.oidcLogout=oidcLogout;
+        this(repository,mapper,contexts,csrfRepository,oidcLogout,null);
+    }
+    @org.springframework.beans.factory.annotation.Autowired
+    public SessionService(PlatformRepository repository,ObjectMapper mapper,SecurityContextRepository contexts,HttpSessionCsrfTokenRepository csrfRepository,ObjectProvider<OidcClientInitiatedLogoutSuccessHandler> oidcLogout,ObjectProvider<ProjectIdentityService> projectIdentity){
+        this.repository=repository;this.mapper=mapper;this.contexts=contexts;this.csrfRepository=csrfRepository;this.oidcLogout=oidcLogout;this.projectIdentity=projectIdentity;
     }
     public Map<String,Object> authOptions(){
+        if(projectIdentity!=null&&projectIdentity.getIfAvailable()!=null)return projectIdentity.getIfAvailable().options();
         boolean remote=repository.metadata().mode().equals("remote_test");
         return map("mode",repository.metadata().mode(),"identity_source",repository.metadata().identitySource(),"login_url",remote?"/oauth2/authorization/mop":null);
     }
@@ -45,14 +51,27 @@ public class SessionService {
         if(tenants.isEmpty())throw new DomainException(401,"SESSION_EXPIRED","此身份没有有效成员关系");
         String tenant=tenants.get(0).id();
         validMembership(repository.membership(actor,tenant).orElseThrow(SessionService::notFound));
-        repository.audit(actor,tenant,"oidc.login","session",null,"SUCCEEDED","KEYCLOAK_VERIFIED_IDENTITY",trace(request));
+        repository.audit(actor,tenant,"oidc.login","session",null,"SUCCEEDED",authentication.getPrincipal() instanceof ProjectSessionIdentity?"OIDC_VERIFIED_EXPLICIT_BINDING":"KEYCLOAK_VERIFIED_IDENTITY",trace(request));
         var browserSession=request.getSession(true);
         int timeout=request.getServletContext().getSessionTimeout();
         browserSession.setMaxInactiveInterval(timeout>0?timeout*60:1800);
+        if(projectIdentity!=null&&projectIdentity.getIfAvailable()!=null){var configured=projectIdentity.getIfAvailable().repository().policy().get("idle_minutes");if(configured instanceof Number minutes)browserSession.setMaxInactiveInterval(minutes.intValue()*60);}
         browserSession.setAttribute("mop.tenant_id",tenant);
         var context=SecurityContextHolder.createEmptyContext();context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);contexts.saveContext(context,request,response);
         CsrfToken token=csrfRepository.generateToken(request);csrfRepository.saveToken(token,request,response);
+    }
+    public void establishProjectSession(Authentication authentication,Integer idleMinutes,HttpServletRequest request,HttpServletResponse response){
+        if(!(authentication.getPrincipal() instanceof ProjectSessionIdentity))throw new DomainException(401,"LOGIN_FAILED","账号认证未完成");
+        String actor=authentication.getName();repository.user(actor).orElseThrow(SessionService::notFound);
+        List<Tenant> allowed=repository.allowedTenants(actor);if(allowed.isEmpty())throw new DomainException(401,"LOGIN_FAILED","账号或密码不正确，或账号暂不可用");
+        String tenant=allowed.get(0).id();validMembership(repository.membership(actor,tenant).orElseThrow(SessionService::notFound));
+        if(request.getSession(false)!=null)request.changeSessionId();
+        var browserSession=request.getSession(true);browserSession.setAttribute("mop.tenant_id",tenant);
+        if(idleMinutes!=null)browserSession.setMaxInactiveInterval(idleMinutes*60);
+        var context=SecurityContextHolder.createEmptyContext();context.setAuthentication(authentication);SecurityContextHolder.setContext(context);contexts.saveContext(context,request,response);
+        CsrfToken token=csrfRepository.generateToken(request);csrfRepository.saveToken(token,request,response);
+        request.setAttribute(CsrfToken.class.getName(),token);request.setAttribute(token.getParameterName(),token);
     }
     public Object fixtureLogin(JsonNode body,HttpServletRequest request,HttpServletResponse response){
         if(!repository.metadata().mode().equals("local_fixture"))throw notFound();
@@ -126,7 +145,11 @@ public class SessionService {
     private Map<String,Object> sessionData(Access access,String token){
         validMembership(access.membership);
         FixtureUser projected=new FixtureUser(access.user.id(),access.user.displayName(),access.membership.role());
-        return map("user",projected,"tenant",access.tenant,"allowed_tenants",repository.allowedTenants(access.user.id()),"capabilities",access.membership.capabilities(),"permission_version",access.membership.permissionVersion(),"csrf_token",token,"mode",repository.metadata().mode(),"identity_source",repository.metadata().identitySource());
+        var authentication=SecurityContextHolder.getContext().getAuthentication();
+        var principal=authentication!=null&&authentication.getPrincipal() instanceof ProjectSessionIdentity value?value:null;
+        var result=map("user",projected,"tenant",access.tenant,"allowed_tenants",repository.allowedTenants(access.user.id()),"capabilities",access.membership.capabilities(),"permission_version",access.membership.permissionVersion(),"csrf_token",token,"mode",repository.metadata().mode(),"identity_source",principal==null?repository.metadata().identitySource():principal.identitySource());
+        if(principal!=null&&projectIdentity!=null&&projectIdentity.getIfAvailable()!=null){var current=projectIdentity.getIfAvailable().repository().sessionState(principal.getName()).orElseThrow(SessionService::notFound);result.put("account_version",current.securityVersion());result.put("password_change_required",current.passwordChangeRequired());}
+        return result;
     }
     private static Membership validMembership(Membership membership){
         if(membership==null||!membership.active()||membership.permissionVersion()<1||membership.permissionVersion()>9_007_199_254_740_991L||Capabilities.forRole(membership.role()).isEmpty())throw new DomainException(401,"SESSION_EXPIRED","成员角色未受支持或已失效");

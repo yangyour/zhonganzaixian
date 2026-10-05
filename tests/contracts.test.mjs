@@ -99,7 +99,7 @@ test('所有业务写接口明确要求幂等及CSRF，remote_test不存在fixtu
       if (!['post', 'put', 'patch', 'delete'].includes(method)) continue;
       const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons', '/contacts/import-preview', '/monitoring/threshold-diagnostics'].includes(path);
       if (readonlyPreview) assert.equal(operation['x-mop-read-only'], true);
-      for (const name of readonlyPreview ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
+      for (const name of readonlyPreview || path === '/auth/local/login' ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
         assert.ok(operation.parameters.some((p) => p.in === 'header' && p.name === name && p.required), `${method} ${path} ${name}`);
       }
     }
@@ -208,7 +208,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.44.0');
+  assert.equal(contract.info.version, '0.45.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -573,7 +573,7 @@ test('代码能力目录必须四角色五资源维度，不是签字或生效�
   assert.deepEqual(schema.properties.roles.prefixItems.map(v => v.properties.id.const), ['viewer', 'tadmin', 'msp', 'padmin']);
   assert.deepEqual(schema.properties.dimensions.prefixItems.map(v => v.properties.label.const), ['资产与指标', '告警与工单', '模板与自动化', '平台管理', '成员管理']);
   for (const key of ['effective_customer_matrix', 'customer_signature', 'supplier_signature', 'resource_access_decision']) assert.equal(schema.properties[key].type, 'null');
-  assert.equal(schema.properties.configuration_driven_authorization.const, false); assert.equal(schema.properties.production_authority_verified.const, false); assert.equal(schema.properties.resource_authorization_required.const, true); assert.equal(schema.properties.subject_bindings_included.const, false);
+  assert.equal(schema.properties.configuration_driven_authorization.type, 'boolean'); assert.equal(schema.properties.production_authority_verified.const, false); assert.equal(schema.properties.resource_authorization_required.const, true); assert.equal(schema.properties.subject_bindings_included.const, false);
   const route = contract.paths['/authorization/capability-catalog']; assert.deepEqual(Object.keys(route), ['get']); assert.equal(route.get['x-mop-read-only'], true); assert.deepEqual(route.get['x-mop-roles'], ['padmin']);
 });
 test('能力声明行仅含声明向量，拒绝新增角色、授权结论和未知维度', () => {

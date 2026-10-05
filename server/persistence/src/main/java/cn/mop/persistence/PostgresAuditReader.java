@@ -59,6 +59,7 @@ public final class PostgresAuditReader implements AuditReader {
     private Row row(ResultSet r)throws SQLException{try{return new Row(r.getString(1),r.getString(2),r.getString(3),r.getLong(4),r.getString(5),r.getString(6),mapper.readTree(r.getString(7)));}catch(com.fasterxml.jackson.core.JsonProcessingException invalid){throw unavailable();}}
     private static long tail(Connection c,String tenant)throws SQLException{try(var s=statement(c,"SELECT COALESCE(max(sequence),0) FROM public.mop_audit WHERE tenant_id=?::uuid")){s.setString(1,tenant);try(var r=s.executeQuery()){r.next();long value=r.getLong(1);if(value<0||value>MAX_SEQUENCE)throw unavailable();return value;}}}
     private static void authorize(Connection c,Access access)throws SQLException{
+        if(access==null)throw new DomainException(401,"SESSION_EXPIRED","当前授权上下文无效");PostgresAuthorization.require(c,access.actorId(),access.tenantId(),access.permissionVersion(),"audit:read");
         if(access==null||access.actorId()==null||access.tenantId()==null||access.permissionVersion()<1)throw expired();
         try(var s=statement(c,"SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id::text=? AND m.user_id::text=? AND m.active AND u.active")){
             s.setString(1,access.tenantId());s.setString(2,access.actorId());try(var r=s.executeQuery()){if(!r.next()||r.getLong(2)!=access.permissionVersion())throw expired();if(!"padmin".equals(r.getString(1)))throw new DomainException(403,"ACTION_FORBIDDEN","当前身份无本租户审计查询权限");}

@@ -38,10 +38,16 @@ public class SecurityConfiguration {
         return http.build();
     }
     @Bean @Profile("remote_test")
+    SecurityFilterChain configuredProjectSecurity(HttpSecurity http,ObjectMapper mapper,PlatformRepository repository,SecurityContextRepository contexts,HttpSessionCsrfTokenRepository csrf,org.springframework.beans.factory.ObjectProvider<TestOidcConfiguration> oidc,org.springframework.beans.factory.ObjectProvider<ClientRegistrationRepository> clients,SessionService sessions,org.springframework.beans.factory.ObjectProvider<ProjectSessionValidationFilter> localSessionFilter)throws Exception{
+        ProjectSessionValidationFilter filter=localSessionFilter.getIfAvailable();
+        if(filter!=null)http.addFilterAfter(filter,org.springframework.security.web.context.SecurityContextHolderFilter.class);
+        return testSecurity(http,mapper,repository,contexts,csrf,oidc.getIfAvailable(),clients.getIfAvailable(),sessions);
+    }
     SecurityFilterChain testSecurity(HttpSecurity http,ObjectMapper mapper,PlatformRepository repository,SecurityContextRepository contexts,HttpSessionCsrfTokenRepository csrf,TestOidcConfiguration oidc,ClientRegistrationRepository clients,SessionService sessions) throws Exception {
         common(http,mapper,repository,contexts,csrf);
-        http.authorizeHttpRequests(auth->auth.requestMatchers("/api/v1/health/live","/api/v1/health/ready","/api/v1/auth/options","/oauth2/**","/login/oauth2/**","/auth/logout").permitAll()
+        http.authorizeHttpRequests(auth->auth.requestMatchers("/api/v1/health/live","/api/v1/health/ready","/api/v1/auth/options","/api/v1/auth/csrf","/api/v1/auth/local/login","/oauth2/**","/login/oauth2/**","/auth/logout").permitAll()
             .requestMatchers("/api/v1/fixture/**").denyAll().anyRequest().authenticated());
+        if(oidc==null||clients==null)return http.build();
         var resolver=new DefaultOAuth2AuthorizationRequestResolver(clients,"/oauth2/authorization");
         resolver.setAuthorizationRequestCustomizer(OAuth2AuthorizationRequestCustomizers.withPkce());
         http.oauth2Login(login->login.authorizationEndpoint(endpoint->endpoint.authorizationRequestResolver(resolver))

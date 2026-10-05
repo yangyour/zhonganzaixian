@@ -70,6 +70,9 @@ public final class PostgresChangeNoticeDraftRepository implements ChangeNoticeDr
         if(targets.size()!=count)throw unavailable();try{var end=r.getObject("planned_end_at",OffsetDateTime.class);var value=new ChangeNoticeDraft(UUID.fromString(a.tenantId()),r.getObject("applicant_id",UUID.class),r.getObject("ticket_id",UUID.class),r.getString("change_summary"),time(r,"planned_start_at"),end==null?null:end.toInstant(),targets);if(!value.fingerprint().equals(r.getString("content_sha256")))throw unavailable();return value;}catch(RuntimeException e){throw unavailable();}
     }
     private static void authorize(Connection c,Access a,boolean lock)throws SQLException{
+        if(a==null)throw new DomainException(401,"SESSION_EXPIRED","当前授权上下文无效");
+        PostgresAuthorization.require(c,a.actorId(),a.tenantId(),a.permissionVersion(),lock?"change_notice_drafts:write":"change_notice_drafts:read");
+
         if(a==null||a.permissionVersion()<1)throw expired();if(!uuid(a.actorId()).equals(a.actorId())||!uuid(a.tenantId()).equals(a.tenantId())||a.traceId()==null||!a.traceId().matches("[A-Za-z0-9._:-]{1,128}"))throw invalid();
         try(var s=statement(c,"SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active"+(lock?" FOR SHARE OF m,u":""))){s.setString(1,a.tenantId());s.setString(2,a.actorId());try(var r=s.executeQuery()){if(!r.next()||r.getLong(2)!=a.permissionVersion())throw expired();if(!"padmin".equals(r.getString(1)))throw new DomainException(403,"ACTION_FORBIDDEN","未生效变更报备草稿维护仅限当前授权平台管理员");}}
     }

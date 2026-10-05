@@ -23,6 +23,9 @@ public final class PostgresManualIncidentRepository implements ManualIncidentRep
         }catch(SQLException failure){throw unavailable(failure);}
     }
     private static void authorize(Connection c,Access a,boolean lock)throws SQLException{
+        if(a==null)throw new DomainException(401,"SESSION_EXPIRED","当前授权上下文无效");
+        PostgresAuthorization.require(c,a.actorId(),a.tenantId(),a.permissionVersion(),lock?"manual_incidents:write":"manual_incidents:read");
+
         if(a==null||!validUuid(a.actorId())||!validUuid(a.tenantId())||a.permissionVersion()<1)throw expired();
         try(var s=statement(c,"SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active"+(lock?" FOR SHARE OF m,u":""))){
             s.setString(1,a.tenantId());s.setString(2,a.actorId());try(var r=s.executeQuery()){

@@ -6,6 +6,14 @@ import java.net.URI;
 final class TestOidcEndpointPolicy {
     private TestOidcEndpointPolicy() {}
 
+    static void validateUnified(String issuer,String client,String secret){
+        try{
+            URI uri=URI.create(issuer);
+            boolean localTest="http".equals(uri.getScheme())&&("127.0.0.1".equals(uri.getHost())||uri.getPath().equals("/realms/mop-acceptance"));
+            if((!"https".equals(uri.getScheme())&&!localTest)||uri.getHost()==null||uri.getUserInfo()!=null||uri.getQuery()!=null||uri.getFragment()!=null||issuer.endsWith("/")||!uri.normalize().equals(uri)||client==null||!client.matches("[A-Za-z0-9._:-]{1,200}")||secret==null||secret.isBlank())throw new IllegalArgumentException();
+        }catch(RuntimeException invalid){throw new IllegalStateException("FAIL_CLOSED: explicit unified OIDC issuer, client and secret are required");}
+    }
+
     static void validate(String issuer, String client, String secret, String publicOrigin) {
         boolean valid = false;
         if (issuer != null && client != null && secret != null && !secret.isBlank() && publicOrigin != null) {

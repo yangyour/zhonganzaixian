@@ -139,6 +139,9 @@ public final class PostgresManualAssetMetadataRepository implements ManualAssetM
         }
     }
     private static void authorize(Connection c,Access a,boolean lock)throws SQLException{
+        if(a==null)throw new DomainException(401,"SESSION_EXPIRED","当前授权上下文无效");
+        PostgresAuthorization.require(c,a.actorId(),a.tenantId(),a.permissionVersion(),lock?"assets:write":"assets:read");
+
         if(a==null||a.actorId()==null||a.tenantId()==null||a.permissionVersion()<1)throw expired();
         try(var s=statement(c,"SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id::text=? AND m.user_id::text=? AND m.active AND u.active"+(lock?" FOR SHARE OF m,u":""))){s.setString(1,a.tenantId());s.setString(2,a.actorId());try(var r=s.executeQuery()){if(!r.next()||r.getLong(2)!=a.permissionVersion())throw expired();if(!Set.of("padmin","msp").contains(r.getString(1)))throw new DomainException(403,"ACTION_FORBIDDEN","当前手工草稿资料维护仅开放授权内部角色；客户维护范围待确认");}}
     }

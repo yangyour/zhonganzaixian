@@ -30,6 +30,8 @@ class AssetExportSnapshotGuardTest {
         when(c.prepareStatement(anyString())).thenAnswer(call->{String sql=call.getArgument(0);sqls.add(sql);if(fail)throw new SQLException("SYNTHETIC_PRIVATE_DATABASE_TEXT","08006");PreparedStatement s=mock(PreparedStatement.class);ResultSet r=mock(ResultSet.class);when(s.executeQuery()).thenReturn(r);
             if(sql.startsWith("SELECT m.role_code")){when(r.next()).thenReturn(true,false);when(r.getLong(2)).thenReturn(7L);when(r.getString(1)).thenReturn("msp");}
             else if(sql.startsWith("SELECT role_code")){when(r.next()).thenReturn(true,false);when(r.getString(1)).thenReturn("msp");}
+            else if(sql.startsWith("SELECT permission_version")){when(r.next()).thenReturn(true,false);when(r.getLong(1)).thenReturn(7L);}
+            else if(sql.startsWith("SELECT public.mop_effective_capabilities")){when(r.next()).thenReturn(true,false);var grants=mock(java.sql.Array.class);when(grants.getArray()).thenReturn(new String[]{"assets:read"});when(r.getArray(1)).thenReturn(grants);}
             else if(sql.startsWith("SELECT transaction_timestamp")){when(r.next()).thenReturn(true,false);when(r.getObject(1,OffsetDateTime.class)).thenReturn(OffsetDateTime.ofInstant(Instant.EPOCH,ZoneOffset.UTC));}
             else if(sql.startsWith("SELECT a.id::text")){var n=new java.util.concurrent.atomic.AtomicInteger();when(r.next()).thenAnswer(x->n.getAndIncrement()<count);when(r.getString(1)).thenAnswer(x->new UUID(0,n.get()).toString());}
             else throw new AssertionError("Unexpected detail read");return s;

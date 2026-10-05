@@ -55,7 +55,7 @@ public final class PostgresConfigurationDiagnosticReader implements Configuratio
                 if(!"mop_test".equals(rows.getString("database_name"))||!"mop_test_runtime".equals(rows.getString("database_user"))||!"mop_test_runtime".equals(rows.getString("session_user_name")))throw new SQLException("Unexpected namespace");
                 if(!rows.getBoolean("user_active")||!rows.getBoolean("membership_active")||rows.getLong("permission_version")!=context.expectedPermissionVersion())throw expired();
                 String role=rows.getString("role_code");
-                if(!"padmin".equals(role)||!Capabilities.forRole(role).contains("configurations:read"))throw forbidden();
+                if(!"padmin".equals(role)||!cn.mop.persistence.PostgresAuthorization.capabilities(connection,context.actorId(),context.tenantId()).contains("configurations:read"))throw forbidden();
                 Timestamp observed=rows.getTimestamp("observed_at");if(observed==null||rows.next())throw new SQLException("Invalid authorization snapshot");
                 return observed.toInstant();
             }

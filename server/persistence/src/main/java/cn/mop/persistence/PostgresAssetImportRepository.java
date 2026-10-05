@@ -37,7 +37,7 @@ public final class PostgresAssetImportRepository implements AssetImportSourceRep
         validAccess(access);
         try(PreparedStatement statement=prepare(connection,"SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.user_id=?::uuid AND m.tenant_id=?::uuid AND m.active AND u.active"+(lock?" FOR SHARE OF m,u":""),access.actorId(),access.tenantId());ResultSet rows=statement.executeQuery()){
             if(!rows.next()||rows.getLong("permission_version")!=access.permissionVersion())throw new DomainException(401,"SESSION_EXPIRED","会话或权限已变化，请刷新会话");
-            if(write&&!Capabilities.forRole(rows.getString("role_code")).contains("assets:write"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色不能执行资产导入暂存动作");
+            if(write&&!PostgresAuthorization.capabilities(connection,access.actorId(),access.tenantId()).contains("assets:write"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色不能执行资产导入暂存动作");
         }
     }
     @FunctionalInterface private interface SqlWork<T>{T run(Connection connection)throws SQLException;}
@@ -182,7 +182,7 @@ public final class PostgresAssetImportRepository implements AssetImportSourceRep
         updateOperation(connection,job,"RUNNING","STORE_RAW".equals(job.kind())?"STORING":"PARSING",null,null);return job;
     });}
     private <T>T transaction(SqlWork<T> work){return platform.importJobTransaction(()->{try{return work.run(platform.importCommandConnection());}catch(SQLException failure){throw unavailable();}});}
-    private boolean authorized(Job job){return platform.membership(job.actor(),job.tenant()).filter(m->m.permissionVersion()==job.permissionVersion()&&Capabilities.forRole(m.role()).contains("assets:write")).isPresent();}
+    private boolean authorized(Job job){return platform.membership(job.actor(),job.tenant()).filter(m->m.permissionVersion()==job.permissionVersion()&&m.capabilities().contains("assets:write")).isPresent();}
     private boolean lease(Connection connection,Job job,String worker)throws SQLException{
         try(PreparedStatement statement=prepare(connection,"SELECT 1 FROM public.mop_asset_import_job WHERE tenant_id=?::uuid AND id=?::uuid AND operation_id=?::uuid AND state='LEASED' AND lease_owner=? AND fencing_token=? AND lease_until>clock_timestamp() FOR UPDATE",job.tenant(),job.id(),job.operation(),worker,job.token());ResultSet rows=statement.executeQuery()){return rows.next();}
     }

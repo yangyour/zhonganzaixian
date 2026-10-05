@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-05项目内身份：原PG17.9已完成V27/V28显式增量结构，V28新增Argon2id格式兼容和租户资源能力，重复/只读均0DDL；其余63表指纹不变。账号、角色、成员授权继续复用该库，不新增IAM服务。新默认登录将采用项目内账号，OIDC保留可选适配、默认关闭；既有Keycloak不停止。当前正在真实回归，尚未以结构证明完成登录切换；策略字段保持null。见[项目身份说明](../project-identity-authorization.md)。
+
 2026-10-05项目内身份/权限V27候选：继续使用原PG17.9，事务内结构探测13项通过后全部回滚，历史仍V26、无新账号或组件。密码策略字段全null，未代入建议默认值；Keycloak共享服务保持。见[项目身份说明](../project-identity-authorization.md)。
 
 2026-10-05最终实测版本：PG17.9、KC26.2.4、MinIO RELEASE.2025-09-07T16-13-09Z；项目应用Java Temurin17.0.20+8、Nginx1.31.3。三个常驻Worker37HTTP真实链路通过，单作业导出Worker生成并核验真实XLSX；API重启时其余7容器启动时间相同。未调用OSS/监控/通知/堡垒机，原门禁保持。见[验收报告](../test-server-acceptance-20261005.md)及[终态证据](../evidence/server-deployment-final-20261005.json)。

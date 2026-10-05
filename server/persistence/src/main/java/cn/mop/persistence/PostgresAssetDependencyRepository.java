@@ -72,7 +72,7 @@ public final class PostgresAssetDependencyRepository implements AssetDependencyR
         String sql="SELECT m.role_code FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id::text=? AND m.user_id::text=? AND m.active AND u.active"+(write?" FOR SHARE OF m,u":"");
         try(var s=c.prepareStatement(sql)){s.setString(1,tenant);s.setString(2,actor);try(var r=s.executeQuery()){
             if(!r.next())throw new DomainException(401,"SESSION_EXPIRED","当前租户成员关系已失效");
-            if(!Capabilities.forRole(r.getString(1)).contains(write?"assets:write":"assets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无资产依赖动作权限");
+            if(!PostgresAuthorization.capabilities(c,actor,tenant).contains(write?"assets:write":"assets:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无资产依赖动作权限");
         }}
     }
     private static Draft read(Connection c,String tenant)throws SQLException{

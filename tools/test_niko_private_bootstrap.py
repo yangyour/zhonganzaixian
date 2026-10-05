@@ -96,7 +96,7 @@ class MigrationManifestParityTest(unittest.TestCase):
    text=(ROOT/entrypoint).read_text();names=re.findall(r"frozen-[a-z-]+\.json",text);self.assertEqual(len(names),len(set(names)));expected={}
    for name in names:
     values=json.loads((ROOT/'tools/niko-test'/name).read_text())['sha256'];self.assertTrue(set(values).isdisjoint(expected));expected.update(values)
-   self.assertEqual(actual,expected);self.assertEqual(set(range(1,28)),{int(name.split('__')[0][1:]) for name in expected})
+   self.assertEqual(actual,expected);self.assertEqual(set(range(1,29)),{int(name.split('__')[0][1:]) for name in expected})
  def test_v27_is_frozen_and_both_entrypoints_require_explicit_identity_migration(self):
   manifest=json.loads((ROOT/'tools/niko-test/frozen-project-identity-migration.json').read_text());name='V27__project_identity_and_roles.sql'
   self.assertEqual({name:'41e5060d4925e7c8ea761539e4695a6ea5792743240363a7d5f50f24bcb59566'},manifest['sha256'])

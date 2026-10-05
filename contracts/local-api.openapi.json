@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.44.0",
-    "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。"
+    "version": "0.45.0",
+    "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
     {
@@ -481,37 +481,101 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
+                  "oneOf": [
+                    {
                       "type": "object",
                       "properties": {
-                        "mode": {
-                          "const": "remote_test"
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "mode": {
+                              "const": "remote_test"
+                            },
+                            "identity_source": {
+                              "const": "test_oidc"
+                            },
+                            "login_url": {
+                              "const": "/oauth2/authorization/mop"
+                            }
+                          },
+                          "required": [
+                            "mode",
+                            "identity_source",
+                            "login_url"
+                          ],
+                          "additionalProperties": false
                         },
-                        "identity_source": {
-                          "const": "test_oidc"
-                        },
-                        "login_url": {
-                          "const": "/oauth2/authorization/mop"
+                        "trace_id": {
+                          "type": "string"
                         }
                       },
                       "required": [
-                        "mode",
-                        "identity_source",
-                        "login_url"
+                        "data",
+                        "trace_id"
                       ],
                       "additionalProperties": false
                     },
-                    "trace_id": {
-                      "type": "string"
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "mode": {
+                              "const": "remote_test"
+                            },
+                            "identity_source": {
+                              "const": "project_local"
+                            },
+                            "local_enabled": {
+                              "const": true
+                            },
+                            "sso_enabled": {
+                              "type": "boolean"
+                            },
+                            "login_url": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "enum": [
+                                "/oauth2/authorization/mop",
+                                null
+                              ]
+                            },
+                            "local_login_url": {
+                              "const": "/api/v1/auth/local/login"
+                            },
+                            "csrf_url": {
+                              "const": "/api/v1/auth/csrf"
+                            },
+                            "sso_protocol": {
+                              "const": "OIDC"
+                            }
+                          },
+                          "required": [
+                            "mode",
+                            "identity_source",
+                            "local_enabled",
+                            "sso_enabled",
+                            "login_url",
+                            "local_login_url",
+                            "csrf_url",
+                            "sso_protocol"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "trace_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "data",
+                        "trace_id"
+                      ],
+                      "additionalProperties": false
                     }
-                  },
-                  "required": [
-                    "data",
-                    "trace_id"
-                  ],
-                  "additionalProperties": false
+                  ]
                 }
               }
             }
@@ -24455,6 +24519,2961 @@
           }
         }
       }
+    },
+    "/auth/csrf": {
+      "get": {
+        "operationId": "getProjectLoginCsrf",
+        "summary": "getProjectLoginCsrf",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectCsrfResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "x-mop-capabilities": [],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "security": []
+      }
+    },
+    "/auth/local/login": {
+      "post": {
+        "operationId": "loginProjectAccount",
+        "summary": "loginProjectAccount",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectLocalLogin"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Authentication rotates server session and CSRF; no business command is created.",
+        "x-mop-audit": true,
+        "security": []
+      }
+    },
+    "/account": {
+      "get": {
+        "operationId": "getOwnProjectAccount",
+        "summary": "getOwnProjectAccount",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectAccountResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "x-mop-capabilities": [],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true
+      }
+    },
+    "/account/password": {
+      "post": {
+        "operationId": "changeOwnProjectPassword",
+        "summary": "changeOwnProjectPassword",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectPasswordChangeResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectPasswordChange"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
+        "x-mop-audit": true
+      }
+    },
+    "/identity/users": {
+      "get": {
+        "operationId": "listProjectUsers",
+        "summary": "listProjectUsers",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectUserPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "required": false
+          },
+          {
+            "name": "include_inactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "required": false
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000
+            },
+            "required": false
+          }
+        ],
+        "x-mop-capabilities": [
+          "users:read"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true
+      },
+      "post": {
+        "operationId": "createProjectUser",
+        "summary": "createProjectUser",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectUserResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "users:write"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectUserCreate"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
+        "x-mop-audit": true
+      }
+    },
+    "/identity/users/{id}": {
+      "get": {
+        "operationId": "getProjectUser",
+        "summary": "getProjectUser",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectUserResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "users:read"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true
+      },
+      "patch": {
+        "operationId": "updateProjectUser",
+        "summary": "updateProjectUser",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectUserResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "users:write"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectUserUpdate"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
+        "x-mop-audit": true
+      }
+    },
+    "/identity/users/{id}/password": {
+      "post": {
+        "operationId": "resetProjectPassword",
+        "summary": "resetProjectPassword",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectPasswordResetResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "users:write"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectPasswordReset"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
+        "x-mop-audit": true
+      }
+    },
+    "/identity/users/{id}/local-account": {
+      "post": {
+        "operationId": "enableProjectLocalAccount",
+        "summary": "enableProjectLocalAccount",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectUserResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "users:write"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectLocalAccountCreate"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
+        "x-mop-audit": true
+      }
+    },
+    "/identity/users/{id}/unlock": {
+      "post": {
+        "operationId": "unlockProjectAccount",
+        "summary": "unlockProjectAccount",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectUnlockResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "users:write"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectExpectedVersion"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
+        "x-mop-audit": true
+      }
+    },
+    "/identity/users/{id}/revoke-sessions": {
+      "post": {
+        "operationId": "revokeProjectUserSessions",
+        "summary": "revokeProjectUserSessions",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectSessionRevokeResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "users:write"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectExpectedVersion"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
+        "x-mop-audit": true
+      }
+    },
+    "/identity/users/{id}/memberships": {
+      "get": {
+        "operationId": "listManagedProjectMemberships",
+        "summary": "listManagedProjectMemberships",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectMembershipPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "users:read"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true
+      }
+    },
+    "/identity/users/{id}/memberships/{tenant}": {
+      "put": {
+        "operationId": "setProjectMembership",
+        "summary": "setProjectMembership",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectMembershipResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "tenant",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "users:write"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectMembershipInput"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
+        "x-mop-audit": true
+      }
+    },
+    "/identity/roles": {
+      "get": {
+        "operationId": "listProjectRoles",
+        "summary": "listProjectRoles",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectRolePageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "显式查询已授权目标租户的角色；未授权返回404"
+          }
+        ],
+        "x-mop-capabilities": [
+          "roles:read"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true
+      },
+      "post": {
+        "operationId": "createProjectRole",
+        "summary": "createProjectRole",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectRoleResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "roles:write"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectRoleCreate"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
+        "x-mop-audit": true
+      }
+    },
+    "/identity/roles/{id}": {
+      "patch": {
+        "operationId": "updateProjectRole",
+        "summary": "updateProjectRole",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectRoleResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "roles:write"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectRoleUpdate"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
+        "x-mop-audit": true
+      }
+    },
+    "/identity/policy": {
+      "get": {
+        "operationId": "getProjectIdentityPolicy",
+        "summary": "getProjectIdentityPolicy",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectIdentityPolicyResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "x-mop-capabilities": [
+          "roles:read"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true
+      },
+      "put": {
+        "operationId": "setProjectIdentityPolicy",
+        "summary": "setProjectIdentityPolicy",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectIdentityPolicyResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "roles:write"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectPolicyUpdate"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
+        "x-mop-audit": true
+      }
+    },
+    "/identity/providers": {
+      "get": {
+        "operationId": "getProjectIdentityProviders",
+        "summary": "getProjectIdentityProviders",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectIdentityProvidersResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "x-mop-capabilities": [
+          "users:read"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true
+      }
+    },
+    "/identity/users/{id}/external-identities": {
+      "get": {
+        "operationId": "listExternalIdentityBindings",
+        "summary": "listExternalIdentityBindings",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectExternalIdentityPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "users:read"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true
+      },
+      "post": {
+        "operationId": "bindExternalIdentity",
+        "summary": "bindExternalIdentity",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectExternalIdentityResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "users:write"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectExternalIdentityCreate"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
+        "x-mop-audit": true
+      }
+    },
+    "/identity/users/{id}/external-identities/{binding}/disable": {
+      "post": {
+        "operationId": "disableExternalIdentityBinding",
+        "summary": "disableExternalIdentityBinding",
+        "responses": {
+          "200": {
+            "description": "项目内身份/授权结果；不表示客户正式签字或生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectBindingDisabledResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "严格参数/当前身份、权限、CSRF、版本或依赖校验失败",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "binding",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "users:write"
+        ],
+        "x-mop-cross-tenant": "404",
+        "x-mop-current-membership-recheck": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectExpectedVersion"
+              }
+            }
+          }
+        },
+        "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
+        "x-mop-audit": true
+      }
     }
   },
   "components": {
@@ -25555,7 +28574,19 @@
                 "const": "remote_test"
               },
               "identity_source": {
-                "const": "test_oidc"
+                "enum": [
+                  "test_oidc",
+                  "project_local",
+                  "oidc"
+                ]
+              },
+              "account_version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "password_change_required": {
+                "type": "boolean"
               }
             },
             "required": [
@@ -25568,7 +28599,8 @@
               "mode",
               "identity_source"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "x-mop-local-session": "Project authentication revision is checked on every request; effective capabilities come from stored tenant roles."
           },
           "trace_id": {
             "type": "string"
@@ -27741,10 +30773,13 @@
             "type": "null"
           },
           "configuration_driven_authorization": {
-            "const": false
+            "type": "boolean"
           },
           "dynamic_roles_status": {
-            "const": "NOT_IMPLEMENTED"
+            "enum": [
+              "NOT_IMPLEMENTED",
+              "PROJECT_RBAC"
+            ]
           },
           "effective_customer_matrix": {
             "type": "null"
@@ -49245,6 +52280,1383 @@
         "required": [
           "data",
           "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectIdentityPolicy": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "minimum_password_length": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 128
+          },
+          "password_history_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 20
+          },
+          "failed_attempt_limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 100
+          },
+          "lock_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 1440
+          },
+          "idle_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 1440
+          },
+          "force_change_on_reset": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "version",
+          "minimum_password_length",
+          "password_history_count",
+          "failed_attempt_limit",
+          "lock_minutes",
+          "idle_minutes",
+          "force_change_on_reset"
+        ],
+        "additionalProperties": false,
+        "description": "用户暂不设置的策略初始均为null；无自动15位、历史5次、锁定或强制改密默认值。"
+      },
+      "ProjectIdentityPolicyResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ProjectIdentityPolicy"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "username": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "local_login_enabled": {
+            "type": "boolean"
+          },
+          "must_change_password": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "locked_until": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "last_login_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "base_role": {
+            "enum": [
+              "viewer",
+              "tadmin",
+              "msp",
+              "padmin"
+            ]
+          },
+          "member_active": {
+            "type": "boolean"
+          },
+          "permission_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "role_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role_name": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z_]+:[a-z_]+$"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "active",
+          "username",
+          "local_login_enabled",
+          "must_change_password",
+          "locked_until",
+          "last_login_at",
+          "version",
+          "base_role",
+          "member_active",
+          "permission_version",
+          "role_id",
+          "role_name",
+          "permissions"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectUserResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ProjectUser"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectUserPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ProjectUser"
+                },
+                "maxItems": 50
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "page_size": {
+                "const": 50
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "items",
+              "has_more",
+              "page",
+              "page_size",
+              "tenant_id"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectRole": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "base_role": {
+            "enum": [
+              "viewer",
+              "tadmin",
+              "msp",
+              "padmin"
+            ]
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z_]+:[a-z_]+$"
+            }
+          },
+          "builtin": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "assigned_members": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "name",
+          "description",
+          "base_role",
+          "permissions",
+          "builtin",
+          "enabled",
+          "version",
+          "created_at",
+          "updated_at",
+          "assigned_members"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectRoleResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ProjectRole"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectRolePageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ProjectRole"
+                }
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "permission_catalog": {
+                "type": "object",
+                "properties": {
+                  "declaration_hash": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "enum": [
+                            "viewer",
+                            "tadmin",
+                            "msp",
+                            "padmin"
+                          ]
+                        },
+                        "label": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "label"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "dimensions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "capability_ids": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^[a-z_]+:[a-z_]+$"
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "label",
+                        "capability_ids"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "entries": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^[a-z_]+:[a-z_]+$"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "dimension_ids": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "declared_by_role": {
+                          "type": "object",
+                          "properties": {
+                            "viewer": {
+                              "type": "boolean"
+                            },
+                            "tadmin": {
+                              "type": "boolean"
+                            },
+                            "msp": {
+                              "type": "boolean"
+                            },
+                            "padmin": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "viewer",
+                            "tadmin",
+                            "msp",
+                            "padmin"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "label",
+                        "dimension_ids",
+                        "declared_by_role"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "declaration_hash",
+                  "roles",
+                  "dimensions",
+                  "entries"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "items",
+              "tenant_id",
+              "permission_catalog"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectAccountResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "display_name": {
+                "type": "string"
+              },
+              "active": {
+                "type": "boolean"
+              },
+              "username": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "must_change_password": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "last_login_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "password_policy": {
+                "$ref": "#/components/schemas/ProjectIdentityPolicy"
+              }
+            },
+            "required": [
+              "id",
+              "display_name",
+              "active",
+              "username",
+              "must_change_password",
+              "last_login_at",
+              "version",
+              "password_policy"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectCsrfResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "csrf_token": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "csrf_token"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectLocalLogin": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.@-]{2,63}$"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "writeOnly": true,
+            "x-mop-max-utf8-bytes": 1024,
+            "x-mop-sensitive": true
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectUserCreate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "const": 0
+          },
+          "username": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.@-]{2,63}$"
+          },
+          "display_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "writeOnly": true,
+            "x-mop-max-utf8-bytes": 1024,
+            "x-mop-sensitive": true
+          },
+          "role_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expected_version",
+          "username",
+          "display_name",
+          "password",
+          "role_id",
+          "active"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectUserUpdate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "display_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expected_version",
+          "display_name",
+          "active"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectRoleCreate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "const": 0
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000
+          },
+          "base_role": {
+            "enum": [
+              "viewer",
+              "tadmin",
+              "msp",
+              "padmin"
+            ]
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z_]+:[a-z_]+$"
+            },
+            "uniqueItems": true,
+            "maxItems": 256
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expected_version",
+          "name",
+          "description",
+          "base_role",
+          "permissions",
+          "enabled"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectRoleUpdate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000
+          },
+          "base_role": {
+            "enum": [
+              "viewer",
+              "tadmin",
+              "msp",
+              "padmin"
+            ]
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z_]+:[a-z_]+$"
+            },
+            "uniqueItems": true,
+            "maxItems": 256
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expected_version",
+          "name",
+          "description",
+          "base_role",
+          "permissions",
+          "enabled"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectPasswordReset": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "new_password": {
+            "type": "string",
+            "minLength": 1,
+            "writeOnly": true,
+            "x-mop-max-utf8-bytes": 1024,
+            "x-mop-sensitive": true
+          }
+        },
+        "required": [
+          "expected_version",
+          "new_password"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectPasswordChange": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "current_password": {
+            "type": "string",
+            "minLength": 1,
+            "writeOnly": true,
+            "x-mop-max-utf8-bytes": 1024,
+            "x-mop-sensitive": true
+          },
+          "new_password": {
+            "type": "string",
+            "minLength": 1,
+            "writeOnly": true,
+            "x-mop-max-utf8-bytes": 1024,
+            "x-mop-sensitive": true
+          }
+        },
+        "required": [
+          "expected_version",
+          "current_password",
+          "new_password"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectLocalAccountCreate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "username": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.@-]{2,63}$"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "writeOnly": true,
+            "x-mop-max-utf8-bytes": 1024,
+            "x-mop-sensitive": true
+          }
+        },
+        "required": [
+          "expected_version",
+          "username",
+          "password"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectMembershipInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "role_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expected_version",
+          "role_id",
+          "active"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectMembershipResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "user_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "base_role": {
+                "enum": [
+                  "viewer",
+                  "tadmin",
+                  "msp",
+                  "padmin"
+                ]
+              },
+              "active": {
+                "type": "boolean"
+              },
+              "permission_version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740990
+              }
+            },
+            "required": [
+              "tenant_id",
+              "user_id",
+              "base_role",
+              "active",
+              "permission_version"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectMembershipPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "tenant_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "tenant_name": {
+                      "type": "string"
+                    },
+                    "base_role": {
+                      "enum": [
+                        "viewer",
+                        "tadmin",
+                        "msp",
+                        "padmin"
+                      ]
+                    },
+                    "active": {
+                      "type": "boolean"
+                    },
+                    "permission_version": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740990
+                    },
+                    "role_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "uuid"
+                    }
+                  },
+                  "required": [
+                    "tenant_id",
+                    "tenant_name",
+                    "base_role",
+                    "active",
+                    "permission_version",
+                    "role_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectExternalIdentity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "provider": {
+            "const": "oidc"
+          },
+          "issuer": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "issuer",
+          "subject",
+          "active",
+          "version",
+          "created_at"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectExternalIdentityResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ProjectExternalIdentity"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectExternalIdentityPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ProjectExternalIdentity"
+                }
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectExternalIdentityCreate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "const": 0
+          },
+          "issuer": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "subject": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "expected_version",
+          "issuer",
+          "subject"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectPolicyUpdate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "minimum_password_length": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 128
+          },
+          "password_history_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 20
+          },
+          "failed_attempt_limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 100
+          },
+          "lock_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 1440
+          },
+          "idle_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 1440
+          },
+          "force_change_on_reset": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "expected_version",
+          "minimum_password_length",
+          "password_history_count",
+          "failed_attempt_limit",
+          "lock_minutes",
+          "idle_minutes",
+          "force_change_on_reset"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectIdentityProvidersResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "local_enabled": {
+                "const": true
+              },
+              "unified_identity": {
+                "type": "object",
+                "properties": {
+                  "protocol": {
+                    "const": "OIDC"
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "binding": {
+                    "const": "EXPLICIT_ISSUER_SUBJECT"
+                  },
+                  "automatic_user_matching": {
+                    "const": false
+                  },
+                  "external_roles_grant_permissions": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "protocol",
+                  "enabled",
+                  "binding",
+                  "automatic_user_matching",
+                  "external_roles_grant_permissions"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "local_enabled",
+              "unified_identity"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectPasswordResetResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "password_reset": {
+                "const": true
+              },
+              "sessions_revoked": {
+                "const": true
+              },
+              "user_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "password_reset",
+              "sessions_revoked",
+              "user_id"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectPasswordChangeResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "password_changed": {
+                "const": true
+              },
+              "reauthenticate": {
+                "const": true
+              }
+            },
+            "required": [
+              "password_changed",
+              "reauthenticate"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectUnlockResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "unlocked": {
+                "const": true
+              },
+              "user_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "unlocked",
+              "user_id"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectSessionRevokeResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "sessions_revoked": {
+                "const": true
+              },
+              "user_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "sessions_revoked",
+              "user_id"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectBindingDisabledResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "binding_disabled": {
+                "const": true
+              },
+              "sessions_revoked": {
+                "const": true
+              }
+            },
+            "required": [
+              "binding_disabled",
+              "sessions_revoked"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectExpectedVersion": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          }
+        },
+        "required": [
+          "expected_version"
         ],
         "additionalProperties": false
       }

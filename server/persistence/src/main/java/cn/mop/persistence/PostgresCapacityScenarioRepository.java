@@ -48,6 +48,9 @@ public final class PostgresCapacityScenarioRepository implements CapacityScenari
     /** JSONB may normalize 1E+1 to10; numeric equality stays exact and never goes through double. */
     static boolean equalNumericJson(JsonNode left,JsonNode right){if(left==null||right==null)return left==right;if(left.isNumber()&&right.isNumber())return left.decimalValue().compareTo(right.decimalValue())==0;if(left.isObject()&&right.isObject()){if(left.size()!=right.size())return false;var fields=left.fields();while(fields.hasNext()){var field=fields.next();if(!right.has(field.getKey())||!equalNumericJson(field.getValue(),right.get(field.getKey())))return false;}return true;}if(left.isArray()&&right.isArray()){if(left.size()!=right.size())return false;for(int i=0;i<left.size();i++)if(!equalNumericJson(left.get(i),right.get(i)))return false;return true;}return left.equals(right);}
     private static void authorize(Connection c,Access a,boolean lock)throws SQLException{
+        if(a==null)throw new DomainException(401,"SESSION_EXPIRED","当前授权上下文无效");
+        PostgresAuthorization.require(c,a.actorId(),a.tenantId(),a.permissionVersion(),lock?"capacity_scenarios:write":"capacity_scenarios:read");
+
         if(a==null||a.actorId()==null||a.tenantId()==null||a.permissionVersion()<1)throw expired();
         try(var s=statement(c,"SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id::text=? AND m.user_id::text=? AND m.active AND u.active"+(lock?" FOR SHARE OF m,u":""))){s.setString(1,a.tenantId());s.setString(2,a.actorId());try(var r=s.executeQuery()){if(!r.next()||r.getLong(2)!=a.permissionVersion())throw expired();if(!"padmin".equals(r.getString(1)))throw new DomainException(403,"ACTION_FORBIDDEN","容量场景草稿仅向当前租户获准平台管理员开放");}}
     }

@@ -19,7 +19,7 @@ public final class PostgresDashboardAvailabilityReader implements DashboardAvail
                     s.setQueryTimeout(10);s.setString(1,a.tenantId());s.setString(2,a.actorId());
                     try(var r=s.executeQuery()){
                         if(!r.next()||r.getLong("permission_version")!=a.permissionVersion())throw expired();
-                        if(!Capabilities.forRole(r.getString("role_code")).contains("dashboard:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色不能读取本租户运营首页");
+                        if(!PostgresAuthorization.capabilities(c,a.actorId(),a.tenantId()).contains("dashboard:read"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色不能读取本租户运营首页");
                         OffsetDateTime observed=r.getObject("observed_at",OffsetDateTime.class);if(observed==null)throw unavailable();
                         DashboardAvailabilitySnapshot result;
                         try{result=new DashboardAvailabilitySnapshot(UUID.fromString(a.tenantId()),UUID.fromString(a.actorId()),a.permissionVersion(),observed.toInstant(),window);}catch(RuntimeException corrupt){throw unavailable();}

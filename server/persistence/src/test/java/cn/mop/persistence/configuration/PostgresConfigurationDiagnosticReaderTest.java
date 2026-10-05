@@ -50,6 +50,8 @@ class PostgresConfigurationDiagnosticReaderTest {
         }
     }
 
+    @Test void padminWithExplicitEmptyGrantsCannotUseStaticRoleFallback(){Fixture fixture=new Fixture();fixture.grants=new String[0];assertEquals(403,assertThrows(DomainException.class,()->fixture.reader().read(context(),KEY)).status);assertEquals(List.of("authorization","grants"),fixture.executed);}
+
     @Test void wrongDatabaseRuntimeIdentityOrInheritedMigrationSessionFailsClosed(){
         for(String field:List.of("database_name","database_user","session_user_name")){
             Fixture fixture=new Fixture();fixture.auth.put(field,"unapproved");
@@ -60,12 +62,12 @@ class PostgresConfigurationDiagnosticReaderTest {
 
     @Test void allReadsUseOneReadOnlyRepeatableReadConnectionAndNoLocksOrWrites(){
         Fixture fixture=new Fixture();ConfigurationDiagnostic diagnostic=fixture.reader().read(context(),KEY);
-        assertEquals(1,fixture.acquired);assertEquals(List.of("authorization","registry","proposals"),fixture.executed);
+        assertEquals(1,fixture.acquired);assertEquals(List.of("authorization","grants","registry","proposals"),fixture.executed);
         assertEquals(List.of("read_only","repeatable_read","begin"),fixture.setup);
         assertTrue(fixture.committed);assertFalse(fixture.rolledBack);assertTrue(fixture.closed);
         assertEquals(AT,diagnostic.observedAt());assertEquals(TENANT,diagnostic.context().tenantId());
         for(String sql:fixture.sql){assertTrue(sql.startsWith("SELECT "));assertFalse(sql.contains("FOR UPDATE"));assertFalse(sql.contains("FOR SHARE"));assertFalse(sql.contains("SELECT *"));}
-        assertEquals(List.of(3,3,3),fixture.queryTimeouts);
+        assertEquals(List.of(3,5,3,3),fixture.queryTimeouts);
         assertEquals(Map.of(1,ACTOR,2,TENANT),fixture.parameters.get("authorization"));
         assertEquals(Map.of(1,KEY),fixture.parameters.get("registry"));
         assertEquals(Map.of(1,TENANT,2,KEY),fixture.parameters.get("proposals"));
@@ -92,7 +94,7 @@ class PostgresConfigurationDiagnosticReaderTest {
         Fixture fixture=new Fixture();for(int index=1;index<=6;index++)fixture.proposals.add(proposal(index,"DRAFT",1));
         ConfigurationDiagnostic diagnostic=fixture.reader().read(context(),KEY);
         assertEquals(5,diagnostic.recentProposals().items().size());assertTrue(diagnostic.recentProposals().truncated());
-        assertFalse(diagnostic.dto().toString().contains(id(6)));assertTrue(fixture.sql.get(2).contains("LIMIT 6"));
+        assertFalse(diagnostic.dto().toString().contains(id(6)));assertTrue(fixture.sql.get(3).contains("LIMIT 6"));
         assertThrows(UnsupportedOperationException.class,()->diagnostic.recentProposals().items().clear());
     }
 
@@ -110,7 +112,7 @@ class PostgresConfigurationDiagnosticReaderTest {
     @Test void unknownKeyIs404AfterAuthorizationAndNeverQueriesProposals(){
         Fixture fixture=new Fixture();fixture.registry=null;
         assertEquals(404,assertThrows(DomainException.class,()->fixture.reader().read(context(),KEY)).status);
-        assertEquals(List.of("authorization","registry"),fixture.executed);assertTrue(fixture.rolledBack);assertTrue(fixture.closed);
+        assertEquals(List.of("authorization","grants","registry"),fixture.executed);assertTrue(fixture.rolledBack);assertTrue(fixture.closed);
     }
 
     @Test void foreignTenantWrongKeyAndImpossibleInternalStatesCannotEnterDiagnostics(){
@@ -133,7 +135,7 @@ class PostgresConfigurationDiagnosticReaderTest {
     @Test void malformedMetadataFailsBeforeLabelsOrReferenceCountsCanExposeAnyBody(){
         Fixture registry=new Fixture();registry.registry.put("metadata_shape_valid",false);registry.registry.put("type_label",OMITTED_BODY);
         assertSafeUnavailable(assertThrows(DomainException.class,()->registry.reader().read(context(),KEY)));
-        assertFalse(registry.fetchedColumns.contains("type_label"));assertEquals(List.of("authorization","registry"),registry.executed);
+        assertFalse(registry.fetchedColumns.contains("type_label"));assertEquals(List.of("authorization","grants","registry"),registry.executed);
         Fixture proposals=new Fixture();Map<String,Object> corrupt=proposal(1,"DRAFT",1);corrupt.put("metadata_shape_valid",false);proposals.proposals.add(corrupt);
         assertSafeUnavailable(assertThrows(DomainException.class,()->proposals.reader().read(context(),KEY)));
         assertFalse(proposals.fetchedColumns.contains("evidence_reference_count"));
@@ -158,6 +160,7 @@ class PostgresConfigurationDiagnosticReaderTest {
     private static final class Fixture {
         Map<String,Object> auth=row("database_name","mop_test","database_user","mop_test_runtime","session_user_name","mop_test_runtime","user_active",true,"membership_active",true,"permission_version",8L,"role_code","padmin","observed_at",Timestamp.from(AT));
         Map<String,Object> registry=row("key",KEY,"version",3L,"type_label","integer","unit_label",null,"scope_label","租户/服务档位","source_ref","MOP_FAKE_METADATA_SOURCE","decision_status_label","pending","classification_label","customer_pending","question_ids",new String[]{"Q19"},"metadata_shape_valid",true,"registered_value",OMITTED_BODY,"draft_json",OMITTED_BODY);
+        String[] grants={"configurations:read"};
         final List<Map<String,Object>> proposals=new ArrayList<>();final List<String> setup=new ArrayList<>(),executed=new ArrayList<>(),sql=new ArrayList<>();
         final List<Integer> queryTimeouts=new ArrayList<>();final List<String> fetchedColumns=new ArrayList<>();final Map<String,Map<Integer,String>> parameters=new HashMap<>();
         int acquired;boolean readOnly,autoCommit=true,committed,rolledBack,closed;int isolation;String failAt;
@@ -178,12 +181,12 @@ class PostgresConfigurationDiagnosticReaderTest {
             default->throw new AssertionError("Unexpected connection method "+method);
         });}
         PreparedStatement statement(String query){
-            sql.add(query);String kind=query.contains("AS database_name")?"authorization":query.contains("FROM public.mop_configuration c")?"registry":query.contains("FROM public.mop_configuration_revision r")?"proposals":null;
+            sql.add(query);String kind=query.contains("mop_effective_capabilities")?"grants":query.contains("AS database_name")?"authorization":query.contains("FROM public.mop_configuration c")?"registry":query.contains("FROM public.mop_configuration_revision r")?"proposals":null;
             assertNotNull(kind,"Only explicit read queries are permitted");Map<Integer,String> bound=new HashMap<>();parameters.put(kind,bound);
             return proxy(PreparedStatement.class,(method,args)->switch(method){
                 case "setString"->{bound.put((int)args[0],(String)args[1]);yield null;}
                 case "setQueryTimeout"->{queryTimeouts.add((int)args[0]);yield null;}
-                case "executeQuery"->{executed.add(kind);fail(kind);yield results(switch(kind){case "authorization"->List.of(auth);case "registry"->registry==null?List.of():List.of(registry);default->proposals;});}
+                case "executeQuery"->{executed.add(kind);fail(kind);yield results(switch(kind){case "authorization"->List.of(auth);case "grants"->List.of(row("1",grants));case "registry"->registry==null?List.of():List.of(registry);default->proposals;});}
                 case "close"->null;
                 default->throw new AssertionError("Unexpected statement method "+method);
             });
@@ -193,7 +196,7 @@ class PostgresConfigurationDiagnosticReaderTest {
             int[] cursor={-1};boolean[] wasNull={false};
             return proxy(ResultSet.class,(method,args)->{
                 if(method.equals("next"))return ++cursor[0]<values.size();if(method.equals("close"))return null;if(method.equals("wasNull"))return wasNull[0];
-                String column=(String)args[0];fetchedColumns.add(column);assertFalse(Set.of("registry_json","registered_value","draft_json","proposal","review_comment","evidence_refs","proposed_value").contains(column),"Bodies must never be requested");
+                String column=String.valueOf(args[0]);fetchedColumns.add(column);assertFalse(Set.of("registry_json","registered_value","draft_json","proposal","review_comment","evidence_refs","proposed_value").contains(column),"Bodies must never be requested");
                 Object value=values.get(cursor[0]).get(column);wasNull[0]=value==null;
                 return switch(method){case "getString"->(String)value;case "getBoolean"->value!=null&&(boolean)value;case "getLong"->value==null?0L:((Number)value).longValue();case "getInt"->value==null?0:((Number)value).intValue();case "getTimestamp"->value;case "getArray"->value==null?null:array((Object[])value);default->throw new AssertionError("Unexpected row method "+method);};
             });

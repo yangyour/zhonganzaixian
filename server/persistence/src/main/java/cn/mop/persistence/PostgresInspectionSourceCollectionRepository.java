@@ -37,6 +37,9 @@ public final class PostgresInspectionSourceCollectionRepository implements Inspe
         try{String id=uuid(r.getString("id")),creator=uuid(r.getString("created_by")),label=r.getString("label"),documentHash=r.getString("document_sha256"),manifestHash=r.getString("source_manifest_sha256");new Creation(label,List.of());Instant recorded=r.getObject("recorded_at",OffsetDateTime.class).toInstant();bounded(recorded);int count=r.getInt("source_count");if(count<0||count>1000||documentHash==null||!documentHash.matches("[0-9a-f]{64}")||manifestHash==null||!manifestHash.matches("[0-9a-f]{64}"))throw corrupt();return new Summary(id,a.tenantId(),creator,recorded,1,label,count,documentHash,manifestHash);}catch(DomainException|NullPointerException failure){throw corrupt();}
     }
     private static void authorize(Connection c,Access a,boolean lock)throws SQLException{
+        if(a==null)throw new DomainException(401,"SESSION_EXPIRED","当前授权上下文无效");
+        PostgresAuthorization.require(c,a.actorId(),a.tenantId(),a.permissionVersion(),lock?"inspection_source_collections:write":"inspection_source_collections:read");
+
         if(a==null||a.permissionVersion()<1)throw expired();if(!uuid(a.actorId()).equals(a.actorId())||!uuid(a.tenantId()).equals(a.tenantId())||a.traceId()==null||!a.traceId().matches("[A-Za-z0-9._:-]{1,128}"))throw invalid();
         try(var s=statement(c,"SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active"+(lock?" FOR SHARE OF m,u":""))){s.setString(1,a.tenantId());s.setString(2,a.actorId());try(var r=s.executeQuery()){if(!r.next()||r.getLong(2)!=a.permissionVersion())throw expired();if(!"padmin".equals(r.getString(1)))throw new DomainException(403,"ACTION_FORBIDDEN","独立巡检来源集合仅限当前授权平台管理员");}}
     }

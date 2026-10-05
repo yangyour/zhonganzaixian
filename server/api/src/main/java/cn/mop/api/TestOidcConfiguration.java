@@ -31,18 +31,23 @@ import java.time.Duration;
 
 /** Authorization code, state, nonce, signature and issuer validation are owned by Spring Security. */
 @Configuration @Profile("remote_test")
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name="MOP_OIDC_ENABLED",havingValue="true")
 public class TestOidcConfiguration {
     private final PlatformRepository repository;
-    public TestOidcConfiguration(PlatformRepository repository){this.repository=repository;}
+    private final org.springframework.beans.factory.ObjectProvider<ProjectIdentityService> projectIdentity;
+    public TestOidcConfiguration(PlatformRepository repository){this(repository,null);}
+    @org.springframework.beans.factory.annotation.Autowired
+    public TestOidcConfiguration(PlatformRepository repository,org.springframework.beans.factory.ObjectProvider<ProjectIdentityService> projectIdentity){this.repository=repository;this.projectIdentity=projectIdentity;}
     @Bean ClientRegistrationRepository oidcClients(
         @Value("${MOP_OIDC_ISSUER}") String issuer,@Value("${MOP_OIDC_CLIENT_ID}") String client,
         @Value("${MOP_OIDC_CLIENT_SECRET}") String secret,
         @Value("${MOP_TEST_PUBLIC_ORIGIN:}") String publicOrigin){
-        TestOidcEndpointPolicy.validate(issuer,client,secret,publicOrigin);
+        if(projectIdentity!=null&&projectIdentity.getIfAvailable()!=null)TestOidcEndpointPolicy.validateUnified(issuer,client,secret);
+        else TestOidcEndpointPolicy.validate(issuer,client,secret,publicOrigin);
         return new InMemoryClientRegistrationRepository(ClientRegistrations.fromIssuerLocation(issuer)
             .registrationId("mop").clientId(client).clientSecret(secret)
             .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-            .scope("openid","profile").redirectUri("{baseUrl}/login/oauth2/code/{registrationId}").clientName("MOP 测试环境 Keycloak").build());
+            .scope("openid","profile").redirectUri("{baseUrl}/login/oauth2/code/{registrationId}").clientName("MOP 统一身份认证").build());
     }
     @Bean OidcClientInitiatedLogoutSuccessHandler oidcLogout(ClientRegistrationRepository clients){
         var handler=new OidcClientInitiatedLogoutSuccessHandler(clients);
@@ -74,6 +79,11 @@ public class TestOidcConfiguration {
             if(subject==null||subject.isBlank())throw unmapped();
             String identityKey=validated.getIdToken().getIssuer().toExternalForm()+"|"+subject;
             try{
+                if(projectIdentity!=null&&projectIdentity.getIfAvailable()!=null){
+                    var bound=projectIdentity.getIfAvailable().repository().externalIdentity(validated.getIdToken().getIssuer().toExternalForm(),subject).orElseThrow(TestOidcConfiguration::unmapped);
+                    if(repository.allowedTenants(bound.userId()).isEmpty())throw unmapped();
+                    return new ProjectOidcUser(bound.userId(),bound.securityVersion(),validated);
+                }
                 var user=repository.resolveIdentity("test_oidc",identityKey).orElseThrow(TestOidcConfiguration::unmapped);
                 if(repository.allowedTenants(user.id()).isEmpty())throw unmapped();
                 return new PlatformOidcUser(user.id(),validated);
@@ -82,6 +92,15 @@ public class TestOidcConfiguration {
         };
     }
     private static OAuth2AuthenticationException unmapped(){return new OAuth2AuthenticationException(new OAuth2Error("identity_not_mapped"),"Identity has no active project membership");}
+    private record ProjectOidcUser(String userId,long securityVersion,OidcUser delegate) implements OidcUser,ProjectSessionIdentity {
+        public String getName(){return userId;}
+        public String identitySource(){return "oidc";}
+        public Map<String,Object> getClaims(){return delegate.getClaims();}
+        public Map<String,Object> getAttributes(){return delegate.getAttributes();}
+        public Collection<? extends GrantedAuthority> getAuthorities(){return delegate.getAuthorities();}
+        public OidcUserInfo getUserInfo(){return delegate.getUserInfo();}
+        public OidcIdToken getIdToken(){return delegate.getIdToken();}
+    }
     private record PlatformOidcUser(String userId,OidcUser delegate) implements OidcUser,Serializable {
         public String getName(){return userId;}
         public Map<String,Object> getClaims(){return delegate.getClaims();}

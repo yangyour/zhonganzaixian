@@ -104,6 +104,9 @@ public final class PostgresInspectionTemplateRepository implements InspectionTem
         try{return new InspectionTemplate.Snapshot(UUID.fromString(tenant),UUID.fromString(id),version,new InspectionTemplate(r.getString("device_type"),r.getString("name"),items),r.getString("content_sha256"));}catch(RuntimeException failure){throw corrupt();}
     }
     private static void authorize(Connection c,Access a,boolean lock)throws SQLException{
+        if(a==null)throw new DomainException(401,"SESSION_EXPIRED","当前授权上下文无效");
+        PostgresAuthorization.require(c,a.actorId(),a.tenantId(),a.permissionVersion(),lock?"inspection_templates:write":"inspection_templates:read");
+
         if(a==null||a.permissionVersion()<1)throw expired();
         if(!uuid(a.actorId()).equals(a.actorId())||!uuid(a.tenantId()).equals(a.tenantId())||a.traceId()==null||!a.traceId().matches("[A-Za-z0-9._:-]{1,128}"))throw invalid();
         try(var s=statement(c,"SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active"+(lock?" FOR SHARE OF m,u":""))){s.setString(1,a.tenantId());s.setString(2,a.actorId());try(var r=s.executeQuery()){if(!r.next()||r.getLong(2)!=a.permissionVersion())throw expired();if(!"padmin".equals(r.getString(1)))throw new DomainException(403,"ACTION_FORBIDDEN","未发布巡检模板维护仅限当前授权平台管理员");}}

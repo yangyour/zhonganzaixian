@@ -39,6 +39,9 @@ public final class PostgresInternalTicketNoteRepository implements InternalTicke
         }catch(SQLException failure){throw unavailable(failure);}
     }
     private static void authorize(Connection c,Access a,boolean lock)throws SQLException{
+        if(a==null)throw new DomainException(401,"SESSION_EXPIRED","当前授权上下文无效");
+        PostgresAuthorization.require(c,a.actorId(),a.tenantId(),a.permissionVersion(),lock?"ticket_notes:write_internal":"ticket_notes:read_internal");
+
         if(a==null||a.actorId()==null||a.tenantId()==null||a.permissionVersion()<1)throw expired();
         try(var s=statement(c,"SELECT m.role_code,m.permission_version FROM public.mop_membership m JOIN public.mop_user u ON u.id=m.user_id WHERE m.tenant_id=?::uuid AND m.user_id=?::uuid AND m.active AND u.active"+(lock?" FOR SHARE OF m,u":""))){s.setString(1,a.tenantId());s.setString(2,a.actorId());try(var r=s.executeQuery()){if(!r.next()||r.getLong(2)!=a.permissionVersion())throw expired();if(!Capabilities.internal(r.getString(1)))throw new DomainException(403,"ACTION_FORBIDDEN","内部备注只向当前租户内部人员开放，客户不可读取或追加");}}
     }

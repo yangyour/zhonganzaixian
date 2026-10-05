@@ -383,6 +383,7 @@
       "has_progress_note": true,
       "local_references": [
         "docs/asset-draft-original-request.md",
+        "docs/evidence/niko-asset-draft-panel-20261005.json",
         "docs/evidence/niko-asset-draft-writer-20261005.json",
         "docs/local-browser-validation-20261003.md",
         "docs/manual-asset-metadata.md",
@@ -1396,6 +1397,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "7ebc87d00d4200bf06a88dd19226b7b89b1ee9d6567f1a9df7f33d324dc36c70"
+    "doc/development/07_合同逐项开发追踪.md": "af734e1fab8d5979066d83c54c3c8d504fae916e1be4010dc9c8d9b16e25bf8e"
   }
 }

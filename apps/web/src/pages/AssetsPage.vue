@@ -2,13 +2,14 @@
 import { ElTableColumn as ElementTableColumn } from 'element-plus'
 import { computed, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { api, isCancelled } from '../api/client'
-import type { Asset, AssetDraft, AssetPage } from '../api/types'
-import { session } from '../stores/session'
+import type { Asset, AssetPage } from '../api/types'
+import { contextGeneration, session } from '../stores/session'
 import { assetTypes, displayTime, typeLabel, sourceLabel } from '../utils/display'
 import AppTable from '../components/AppTable.vue'
 import AssetStateFacts from '../components/AssetStateFacts.vue'
+import AssetDraftCreatePanel from '../components/AssetDraftCreatePanel.vue'
 import SampleFreshness from '../components/SampleFreshness.vue'
 import type { HttpClockObservation } from '../utils/httpResponseClock'
 import PermissionGate from '../components/PermissionGate.vue'
@@ -92,10 +93,7 @@ async function requestOnboarding() {
 }
 
 const createOpen = ref(false)
-const formRef = ref<FormInstance>()
-const draft = reactive<AssetDraft>({ name: '', type: 'switch', management_ip: '', site_id: '' })
-const createError = ref<unknown>(null)
-const creating = ref(false)
+const createPanel = ref<InstanceType<typeof AssetDraftCreatePanel> | null>(null)
 const dependencyOpen = ref(false), dependencyAsset = ref<Asset | null>(null)
 const dependencyPanel = ref<InstanceType<typeof AssetDependencyWorkspace> | null>(null)
 function openDependencies() {
@@ -130,24 +128,19 @@ function openQueryMetadata(selected: Asset) {
 function metadataSaved() { void loadAssets(); if (queryString('asset_id') === metadataAsset.value?.id) void loadDetail(queryString('asset_id')) }
 const importOpen = ref(false)
 const importAllowed = computed(() => ['padmin', 'msp', 'tadmin'].includes(session.value?.user.role || ''))
-const availableSites = computed(() => [...new Set(rows.value.map(item => item.site_id))])
-const rules: FormRules<AssetDraft> = {
-  name: [{ required: true, whitespace: true, message: '请输入资产名称', trigger: 'blur' }, { max: 100, message: '名称最多 100 个字符', trigger: 'blur' }],
-  type: [{ required: true, message: '请选择设备类型', trigger: 'change' }],
-  management_ip: [{ required: true, whitespace: true, message: '请输入管理 IP', trigger: 'blur' }],
-  site_id: [{ required: true, whitespace: true, message: '请输入站点 ID', trigger: 'blur' }],
-}
-function openCreate() { Object.assign(draft, { name: '', type: 'switch', management_ip: '', site_id: availableSites.value[0] || filters.site_id || '' }); createError.value = null; createOpen.value = true; formRef.value?.clearValidate() }
-async function createAsset() {
-  if (!await formRef.value?.validate().catch(() => false)) return
-  creating.value = true; createError.value = null
+const availableSites = computed(() => [...new Set(rows.value.filter(item => item.tenant_id === session.value?.tenant.id).map(item => item.site_id))])
+function openCreate() { createOpen.value = true }
+async function beforeCloseCreate(done: () => void) { if (!createPanel.value || await createPanel.value.canLeave()) done() }
+const creationScope = () => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version])
+async function createdAsset(created: Asset) {
+  if (created.tenant_id !== session.value?.tenant.id) return
+  const scope = creationScope()
+  createOpen.value = false
+  ElMessage.success('资产草稿创建已由原请求回执确认，尚未接入监控')
   try {
-    const created = await api.request<Asset>('/assets', { method: 'POST', body: { ...draft, name: draft.name.trim(), management_ip: draft.management_ip.trim(), site_id: draft.site_id.trim() }, signal: listController.value?.signal })
-    createOpen.value = false; ElMessage.success('资产草稿已保存，状态以服务端回读为准')
     await router.replace({ query: { ...route.query, asset_id: created.id } })
-    await loadAssets()
-  } catch (cause) { if (!isCancelled(cause)) createError.value = cause }
-  finally { creating.value = false }
+    if (scope === creationScope()) await loadAssets()
+  } catch (cause) { if (!isCancelled(cause) && scope === creationScope()) error.value = cause }
 }
 onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
 </script>
@@ -189,11 +182,8 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
       </template>
       <template #footer><el-button class="asset-time-refresh" :loading="detailLoading" :disabled="detailLoading" @click="refreshDetail">只读刷新</el-button><el-button @click="detailOpen = false">关闭</el-button></template>
     </el-drawer>
-    <el-dialog v-model="createOpen" title="创建资产草稿" width="520px" class="responsive-dialog" :close-on-click-modal="!creating" :show-close="!creating" destroy-on-close>
-      <el-alert title="仅保存当前租户的测试环境草稿；不会自动接入监控或产生采集数据。" type="info" :closable="false" show-icon />
-      <ApiErrorNotice :error="createError" />
-      <el-form ref="formRef" :model="draft" :rules="rules" label-position="top" class="dialog-form" @submit.prevent="createAsset"><el-form-item label="资产名称" prop="name"><el-input v-model="draft.name" maxlength="100" show-word-limit placeholder="例如：总部核心交换机" /></el-form-item><el-form-item label="设备类型" prop="type"><el-select v-model="draft.type"><el-option v-for="type in assetTypes" :key="type.value" :label="type.label" :value="type.value" /></el-select></el-form-item><el-form-item label="管理 IP" prop="management_ip"><el-input v-model="draft.management_ip" placeholder="IPv4 或 IPv6，最终由服务端校验" /></el-form-item><el-form-item label="站点 ID" prop="site_id"><el-select v-model="draft.site_id" filterable allow-create default-first-option placeholder="当前租户站点 ID"><el-option v-for="site in availableSites" :key="site" :label="site" :value="site" /></el-select><span class="field-help">选项来自本页资产的服务端站点 ID；草稿提交后还须通过服务端归属校验。</span></el-form-item></el-form>
-      <template #footer><el-button :disabled="creating" @click="createOpen = false">取消</el-button><el-button type="primary" :loading="creating" @click="createAsset">保存草稿</el-button></template>
+    <el-dialog v-model="createOpen" title="创建资产草稿" width="520px" class="responsive-dialog" :close-on-click-modal="false" :before-close="beforeCloseCreate" destroy-on-close>
+      <AssetDraftCreatePanel ref="createPanel" :sites="availableSites" @created="createdAsset" @close="createOpen = false" />
     </el-dialog>
     <AssetImportWorkspace v-model="importOpen" />
     <AssetDateQuery v-model="dateQueryOpen" @select="openDetail" />

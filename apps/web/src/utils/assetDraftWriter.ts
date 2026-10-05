@@ -11,18 +11,19 @@ export const assetDraftBad=()=>new ApiError(0,'INVALID_ASSET_DRAFT_RECEIPT','资
 const uuid=(v:unknown)=>typeof v==='string'&&v.length===36&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(v)
 const exact=(v:unknown,keys:readonly string[]):v is Record<string,unknown>=>Boolean(v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).length===keys.length&&keys.every(k=>Object.hasOwn(v,k)))
 const types=['router','switch','firewall','ap','wireless_controller','other'] as const
+const inputError=(message:string)=>new ApiError(400,'ASSET_DRAFT_INPUT_INVALID',message,'—')
 export const validAssetDraftContext=(c:AssetDraftContext|null):c is AssetDraftContext=>Boolean(c&&uuid(c.tenantId)&&uuid(c.actorId)&&Number.isSafeInteger(c.permissionVersion)&&c.permissionVersion>=1&&['padmin','msp','tadmin'].includes(c.role)&&c.canWrite===true)
 // Match the existing Java String.strip boundary; do not silently remove NBSP as JavaScript trim would.
 const strip=(s:string)=>s.replace(/^[\u0009-\u000d\u001c-\u0020\u1680\u2000-\u2006\u2008-\u200a\u2028\u2029\u205f\u3000]+|[\u0009-\u000d\u001c-\u0020\u1680\u2000-\u2006\u2008-\u200a\u2028\u2029\u205f\u3000]+$/g,'')
-function text(v:unknown,max:number){if(typeof v!=='string')throw new Error('请提供完整资产草稿字段');const value=strip(v);if(!value.trim()||value.length>max||[...value].some(c=>{const n=c.codePointAt(0)!;return n<=31||n>=127&&n<=159||n>=0xd800&&n<=0xdfff}))throw new Error('资产草稿字段为空、过长或包含无效字符');return value}
+function text(v:unknown,max:number){if(typeof v!=='string')throw inputError('请提供完整资产草稿字段');const value=strip(v);if(!value.trim()||value.length>max||[...value].some(c=>{const n=c.codePointAt(0)!;return n<=31||n>=127&&n<=159||n>=0xd800&&n<=0xdfff}))throw inputError('资产草稿字段为空、过长或包含无效字符');return value}
 export function assetDraftIp(value:string){
  if(value.includes(':')){if(!/^[0-9a-fA-F:.]+$/.test(value))return false;try{return new URL('http://['+value+']/').hostname.startsWith('[')}catch{return false}}
  return /^[0-9]{1,3}(\.[0-9]{1,3}){3}$/.test(value)&&value.split('.').every(p=>Number(p)<=255&&(p.length===1||!p.startsWith('0')))
 }
 export function readAssetDraftInput(raw:unknown):AssetDraft{
- if(!exact(raw,['name','type','management_ip','site_id']))throw new Error('资产创建只接受名称、类型、管理IP和站点')
+ if(!exact(raw,['name','type','management_ip','site_id']))throw inputError('资产创建只接受名称、类型、管理IP和站点')
  const name=text(raw.name,100),type=text(raw.type,32),management_ip=text(raw.management_ip,45),site_id=text(raw.site_id,64)
- if(!types.includes(type as typeof types[number])||!assetDraftIp(management_ip))throw new Error('请明确选择设备类型并提供合法IPv4或IPv6字面量')
+ if(!types.includes(type as typeof types[number])||!assetDraftIp(management_ip))throw inputError('请明确选择设备类型并提供合法IPv4或IPv6字面量')
  return{name,type:type as AssetDraft['type'],management_ip,site_id}
 }
 function time(v:unknown){const n=utcInstantNanos(v);if(typeof v!=='string'||!/^(?!0000)\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(v)||n===null)throw assetDraftBad();return n}
@@ -55,7 +56,7 @@ export function createAssetDraftWriter(client:Pick<ApiClient,'request'>,changed:
  async function submit(raw:unknown){
   if(!context||disposed||state.busy||state.attempt)return false
   const turn=epoch
-  try{const body=readAssetDraftInput(raw),key=newKey();if(turn!==epoch||disposed||!context)return false;if(typeof key!=='string'||key.length<1||key.length>128||/[^A-Za-z0-9._:-]/.test(key))throw new Error('资产创建请求标识无效，未发送')
+  try{const body=readAssetDraftInput(raw),key=newKey();if(turn!==epoch||disposed||!context)return false;if(typeof key!=='string'||key.length<1||key.length>128||/[^A-Za-z0-9._:-]/.test(key))throw inputError('资产创建请求标识无效，未发送')
    return send({path:'/assets',method:'POST',key,payload:JSON.stringify(body),state:'uncertain'},false)
   }catch(error){if(turn===epoch&&!disposed){state.error=error;emit()}return false}
  }

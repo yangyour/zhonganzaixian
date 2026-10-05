@@ -1,0 +1,51 @@
+{
+  "verified_at": "2026-10-05T02:46:36.918262+00:00",
+  "scope": "ASSET_CREATE_PANEL_ORIGINAL_REQUEST_RECOVERY_AND_TRANSITION_GUARDS",
+  "previous_commit": "90ce1ac959e7c08f49ecb29a14a7f11e39b5595b",
+  "previous_ci": {
+    "run_id": 37255917154,
+    "conclusion": "success"
+  },
+  "new_native_component_tests": 20,
+  "focused_including_writer": 42,
+  "web_tests": 1660,
+  "web_files": 97,
+  "typecheck_build": "PASS",
+  "contracts": 125,
+  "contract_generation": "PASS",
+  "page_wiring_complete": true,
+  "first_site_not_auto_selected": true,
+  "acknowledgement_reset_on_change": true,
+  "uncertain_request_locks_editing_and_new_intent": true,
+  "original_path_body_method_key_retry": true,
+  "dialog_close_route_and_voluntary_context_guards": true,
+  "forced_context_clears_memory": true,
+  "beforeunload_synthetic_event_tested": true,
+  "real_browser_beforeunload_verified": false,
+  "cross_reload_persistence": false,
+  "native_confirmation_response_stubbed": true,
+  "parent_dialog_wiring_source_checked": true,
+  "navigation_or_read_failure_does_not_retry_creation": true,
+  "new_actual_http_requests": 0,
+  "real_http": "NOT_RUN",
+  "real_pg": "NOT_RUN_CURRENT_EXECUTOR",
+  "real_browser": false,
+  "css_visual_verified": false,
+  "physical_mobile_verified": false,
+  "new_credentials": false,
+  "new_migrations": 0,
+  "api_contract_unchanged": "0.44.0",
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "apps/web/src/components/AssetDraftCreatePanel.vue": "a454d0dcb1bebe20d3dace15baa1df837ff5d47643723a7873855cb3eb2a1910",
+    "apps/web/src/pages/AssetsPage.vue": "4c9b4d8ef48a6fe8bb13484ba5c228ed2a23221405f1f2aadf0efacb603e3fd0",
+    "apps/web/src/utils/assetDraftWriter.ts": "15adb1c4331aeeb128906a2229f161e52953dfc19fff18c8f9e971a2a6a496c4",
+    "apps/web/tests/assetDraftCreatePanel.test.ts": "4de207d53842d259faf2897acbd1284d791763f9d8b547afb5ef3d8fc5a85e33"
+  },
+  "log_sha256": {
+    "asset-draft-panel-focused-20261005.log": "5bdf4c64632536fd13874c43f8ac1a6049a6eeb4f38a7bfa4808e03c87d9340b",
+    "asset-draft-panel-web-20261005.log": "9f2c88ede54806aaf849127dba2a1c2aeb5814f7e0401bff3d2e298fee03c634",
+    "asset-draft-panel-build-20261005.log": "31aac4ad7bd394e53cde7fbd7569841a040528cf416e289f39b98141502a499a",
+    "asset-draft-panel-contracts-20261005.log": "d673aaddb316df0cb55ef7067b8b90edd90c670f7ac35ace41c675a9154ac8fc"
+  }
+}

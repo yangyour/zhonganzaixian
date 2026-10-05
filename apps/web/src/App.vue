@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, computed, watch, nextTick } from 'vue'
+import { useRoute, useRouter, isNavigationFailure, NavigationFailureType } from 'vue-router'
 import { can, session, contextGeneration, switchingTenant, maySwitchTenant, switchTenant, logout } from './stores/session'
 import { isCancelled } from './api/client'
 import { roleLabel } from './utils/display'
@@ -19,7 +19,13 @@ async function changeTenant(value: unknown) {
   error.value = null
   tenantTransition.value = true
   try {
-    if (await switchTenant(String(value))) await router.replace({ query: { ...route.query, asset_id: undefined, ticket_id: undefined, operation_id: undefined, cursor: undefined, site_id: undefined } })
+    await switchTenant(String(value), async transition => {
+      if (session.value?.tenant.id !== transition.toTenantId) return
+      const navigation = await router.replace({ query: { ...route.query, asset_id: undefined, ticket_id: undefined, operation_id: undefined, cursor: undefined, site_id: undefined } })
+      if (isNavigationFailure(navigation) && !isNavigationFailure(navigation, NavigationFailureType.duplicated)) throw navigation
+      // Let route watchers finish before displaying an original uncertain-switch error.
+      await nextTick()
+    })
   }
   catch (cause) { if (!isCancelled(cause)) error.value = cause }
   finally { tenantTransition.value = false }

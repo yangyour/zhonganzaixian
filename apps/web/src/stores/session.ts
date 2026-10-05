@@ -24,21 +24,42 @@ export async function initializeSession() {
   }).finally(() => { initialization = null })
   await initialization
 }
-export async function switchTenant(tenantId: string) {
+export interface TenantViewTransition { fromTenantId: string | null; toTenantId: string; originalReceiptConfirmed: boolean }
+export class TenantViewSynchronizationError extends ApiError {
+  constructor(public readonly originalFailure: unknown, public readonly navigationFailure: unknown, public readonly originalReceiptConfirmed: boolean) {
+    super(0, 'TENANT_VIEW_SYNC_FAILED', originalReceiptConfirmed ? '当前租户已由切换响应确认，但旧页面选项清理失败；请重新进入当前租户页面' : '原切换结果仍未确认；当前会话范围已回读，但旧页面选项清理失败', originalFailure instanceof ApiError ? originalFailure.traceId : '—')
+  }
+}
+/** Keep the old page hidden until scope-bound navigation is cleared, including uncertain-write readback. */
+export async function switchTenant(tenantId: string, beforeViewResume?: (transition: TenantViewTransition) => Promise<void>) {
   if (contextActionPending || switchingTenant.value || tenantId === session.value?.tenant.id) return false
   contextActionPending = true
   try {
     const generation = contextGeneration.value
     if (!await contextTransitionGuards.approve() || generation !== contextGeneration.value) return false
+    const previousTenant = session.value?.tenant.id ?? null
     switchingTenant.value = true
     contextGeneration.value = api.invalidateContext()
-    try { installSession(await api.request<Session>('/session/tenant', { method: 'POST', body: { tenant_id: tenantId } })) }
-    catch (error) {
-      // Re-read the authoritative context after an uncertain network outcome.
-      try { installSession(await api.request<Session>('/session')) } catch { forgetSession() }
-      throw error
+    try {
+      let failed = false, originalFailure: unknown
+      try {
+        const receipt = await api.request<Session>('/session/tenant', { method: 'POST', body: { tenant_id: tenantId } })
+        if (receipt?.tenant?.id !== tenantId) throw new ApiError(200, 'INVALID_TENANT_SWITCH_RESPONSE', '切换响应未匹配原目标租户，结果未确认', '—')
+        installSession(receipt)
+      }
+      catch (error) {
+        failed = true; originalFailure = error
+        // Current context readback is not an original switch receipt and cannot prove a late write did not commit.
+        try { installSession(await api.request<Session>('/session')) } catch { forgetSession() }
+      }
+      const observedTenant = session.value?.tenant.id, observedGeneration = contextGeneration.value
+      if (observedTenant && (!failed || observedTenant !== previousTenant)) {
+        try { await beforeViewResume?.({ fromTenantId: previousTenant, toTenantId: observedTenant, originalReceiptConfirmed: !failed }) }
+        catch (navigationFailure) { throw new TenantViewSynchronizationError(originalFailure, navigationFailure, !failed) }
+      }
+      if (failed) throw originalFailure
+      return observedGeneration === contextGeneration.value && observedTenant === session.value?.tenant.id
     } finally { switchingTenant.value = false }
-    return true
   } finally { contextActionPending = false }
 }
 export async function logout(): Promise<'cancelled' | 'redirected' | 'local'> {

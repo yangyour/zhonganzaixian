@@ -1,0 +1,27 @@
+{
+  "verified_at": "2026-10-05T06:13:35.440711+00:00",
+  "environment": "designated-server",
+  "postgresql": "17.9",
+  "schema_before": 26,
+  "schema_after": 27,
+  "migrations_applied": 1,
+  "repeated_apply": 0,
+  "final_read_only_migrations": 0,
+  "old_tables_compared": 58,
+  "old_table_rows_and_hashes_unchanged": true,
+  "tables_after": 66,
+  "backup": {
+    "database": "mop_test",
+    "format": "PGDMP",
+    "size_bytes": 3051618,
+    "sha256": "cef1daa6539fec29ee4685b748d01f730c9d4fe6810829e4d2fae1300ef3cf45",
+    "restored": false,
+    "path": "ignored_local_directory"
+  },
+  "shared_components_stopped": 0,
+  "existing_applications_restored": true,
+  "default_login_switched": false,
+  "policy_values_enabled": false,
+  "frozen_sql_sha256": "41e5060d4925e7c8ea761539e4695a6ea5792743240363a7d5f50f24bcb59566",
+  "formal_acceptance": "NOT_RUN"
+}

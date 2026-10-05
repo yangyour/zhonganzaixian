@@ -1,0 +1,21 @@
+{
+  "verified_at": "2026-10-05T04:20:00Z",
+  "base_commit": "e1ec790d1d178b4e44bcd35a76468cd7e7d01b8e",
+  "new_isolated_tests": 7,
+  "initial_regression": {
+    "failed": 3,
+    "passed": 2
+  },
+  "web_tests": 1701,
+  "web_files": 100,
+  "typecheck_build": "PASS",
+  "contracts": 125,
+  "api_contract": "0.44.0",
+  "actual_http": "NOT_RUN",
+  "actual_pg": "NOT_RUN",
+  "real_browser": false,
+  "new_credentials": false,
+  "migrations": 0,
+  "server_operation_cancelled_by_client": false,
+  "formal_acceptance": "NOT_RUN"
+}

@@ -129,19 +129,35 @@ export class ApiClient {
     } finally { this.controllers.delete(controller); signal?.removeEventListener('abort', cancel) }
   }
   async pollOperation<T extends { status: string }>(id: string, options: { signal?: AbortSignal; intervalMs?: number; maxAttempts?: number; onUpdate?: (operation: T) => void } = {}): Promise<T> {
-    const generation = this.generation
+    const generation = this.generation, signal = options.signal
     const terminal = new Set(['SUCCEEDED', 'FAILED', 'CANCELLED'])
     for (let attempt = 0; attempt < (options.maxAttempts ?? 120); attempt++) {
-      if (generation !== this.generation || options.signal?.aborted) throw new StaleRequestError()
-      const operation = await this.request<T>(`/operations/${encodeURIComponent(id)}`, { signal: options.signal })
+      if (generation !== this.generation || signal?.aborted) throw new StaleRequestError()
+      const operation = await this.request<T>(`/operations/${encodeURIComponent(id)}`, { signal })
       options.onUpdate?.(operation)
+      if (generation !== this.generation || signal?.aborted) throw new StaleRequestError()
       if (terminal.has(operation.status.toUpperCase())) return operation
-      await new Promise<void>((resolve, reject) => {
-        const timer = setTimeout(() => { options.signal?.removeEventListener('abort', cancel); resolve() }, options.intervalMs ?? 1500)
-        const cancel = () => { clearTimeout(timer); reject(new StaleRequestError()) }
-        options.signal?.addEventListener('abort', cancel, { once: true })
-      })
+      const delay = new AbortController()
+      this.controllers.add(delay)
+      const cancel = () => delay.abort()
+      signal?.addEventListener('abort', cancel, { once: true })
+      let timer: ReturnType<typeof setTimeout> | undefined
+      let rejectDelay: (() => void) | undefined
+      try {
+        await new Promise<void>((resolve, reject) => {
+          rejectDelay = () => reject(new StaleRequestError())
+          delay.signal.addEventListener('abort', rejectDelay, { once: true })
+          if (generation !== this.generation || signal?.aborted) { delay.abort(); return }
+          timer = setTimeout(resolve, options.intervalMs ?? 1500)
+        })
+      } finally {
+        if (timer !== undefined) clearTimeout(timer)
+        if (rejectDelay) delay.signal.removeEventListener('abort', rejectDelay)
+        signal?.removeEventListener('abort', cancel)
+        this.controllers.delete(delay)
+      }
     }
+    if (generation !== this.generation || signal?.aborted) throw new StaleRequestError()
     throw new ApiError(408, 'OPERATION_TIMEOUT', '操作仍未完成，请稍后重新查询；未判定为成功', '—')
   }
 }

@@ -39,3 +39,53 @@ describe('project identity command recovery', () => {
     expect(() => validateIdentityWrite('/identity/policy', input, { version: 2, minimum_password_length: null, force_change_on_reset: null })).not.toThrow()
   })
 })
+
+describe('identity command notification reentrancy', () => {
+  it('disposal becomes terminal before its idle notification', async () => {
+    const request = vi.fn().mockResolvedValue(receipt)
+    let react = false, nested: Promise<boolean> | undefined
+    const editor = createIdentityCommand({ request } as unknown as Pick<ApiClient, 'request'>, value => {
+      if (react && value.state === 'idle') { react = false; nested = editor.submit(`/identity/users/${id}/password`, 'POST', reset) }
+    })
+    react = true; editor.dispose()
+    expect(await nested).toBe(false); expect(request).not.toHaveBeenCalled()
+  })
+  it('does not overwrite a nested submission started by its initial idle notification', async () => {
+    let react = true, nested: Promise<boolean> | undefined, finish!: (value: unknown) => void
+    const request = vi.fn().mockImplementation(() => new Promise(resolve => { finish = resolve }))
+    const editor = createIdentityCommand({ request } as unknown as Pick<ApiClient, 'request'>, value => {
+      if (react && value.state === 'idle') { react = false; nested = editor.submit(`/identity/users/${id}/password`, 'POST', { ...reset, new_password: 'synthetic-nested' }) }
+    })
+    const outer = editor.submit(`/identity/users/${id}/password`, 'POST', reset)
+    expect(request).toHaveBeenCalledTimes(1)
+    expect(request.mock.calls[0]![1].body.new_password).toBe('synthetic-nested')
+    finish(receipt); expect(await nested).toBe(true); expect(await outer).toBe(false); editor.dispose()
+  })
+  it('retains the nested original body for recovery after response loss', async () => {
+    let react = true, nested: Promise<boolean> | undefined
+    const request = vi.fn().mockRejectedValueOnce(new ApiError(0, 'NETWORK_ERROR', 'lost', 'trace')).mockResolvedValueOnce(receipt)
+    const editor = createIdentityCommand({ request } as unknown as Pick<ApiClient, 'request'>, value => {
+      if (react && value.state === 'idle') { react = false; nested = editor.submit(`/identity/users/${id}/password`, 'POST', { ...reset, new_password: 'synthetic-nested' }) }
+    })
+    expect(await editor.submit(`/identity/users/${id}/password`, 'POST', reset)).toBe(false)
+    expect(await nested).toBe(false); expect(await editor.retry()).toBe(true)
+    expect(request.mock.calls[1]![1].body).toEqual(request.mock.calls[0]![1].body)
+    expect(request.mock.calls[1]![1].idempotencyKey).toBe(request.mock.calls[0]![1].idempotencyKey)
+    editor.dispose()
+  })
+  it('aborts preparation if its idle notification clears the command again', async () => {
+    let react = true
+    const request = vi.fn().mockResolvedValue(receipt)
+    const editor = createIdentityCommand({ request } as unknown as Pick<ApiClient, 'request'>, value => {
+      if (react && value.state === 'idle') { react = false; editor.clear() }
+    })
+    expect(await editor.submit(`/identity/users/${id}/password`, 'POST', reset)).toBe(false)
+    expect(request).not.toHaveBeenCalled(); editor.dispose()
+  })
+  it('does not dispatch if the sending notification disposes the command', async () => {
+    const request = vi.fn().mockResolvedValue(receipt)
+    const editor = createIdentityCommand({ request } as unknown as Pick<ApiClient, 'request'>, value => { if (value.state === 'sending') editor.dispose() })
+    expect(await editor.submit(`/identity/users/${id}/password`, 'POST', reset)).toBe(false)
+    expect(request).not.toHaveBeenCalled(); expect(editor.unresolved()).toBe(false)
+  })
+})

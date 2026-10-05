@@ -1,0 +1,25 @@
+{
+  "verified_at": "2026-10-05T08:31:39Z",
+  "base_commit": "b7cccb3442395716d57d7171b999d2583ed58ca9",
+  "new_tests": 5,
+  "before_tests": 14,
+  "before_failures": 3,
+  "focused_passed": 14,
+  "web_passed": 1749,
+  "web_files": 105,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts_passed": 127,
+  "api_changed": false,
+  "sql_changed": false,
+  "actual_http_checks": 0,
+  "actual_accounts_created": 0,
+  "formal_acceptance": "NOT_RUN",
+  "logs_sha256": {
+    "identity-reentrant-before-20261005.log": "8172b1c228029f9d2e192405ad26dc8a6aa3a656024d01aa5293134ef0f44eba",
+    "identity-reentrant-focused-20261005.log": "c7e0c22a380a15422496fa783cff72d3577c6d0f1821ebf1cbafce5bb257f61b",
+    "identity-reentrant-web-20261005.log": "bed716c878477790249748534f4cb4be16a7caebbba8a475c1855d89f7bf6308",
+    "identity-reentrant-build-20261005.log": "2a3a1fd3b1457a84be566ccdc63f4e8cef10bfc5678d46522304f745d826bb86",
+    "identity-reentrant-contracts-20261005.log": "2cc83c4b62d1d3962143ced145401874ba02c32167d07c40a6aacce7024e8d05"
+  }
+}

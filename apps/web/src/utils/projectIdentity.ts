@@ -78,14 +78,16 @@ export function createIdentityCommand(client: Pick<ApiClient, 'request'>, notify
   return {
     async submit(path: string, method: string, body: unknown) {
       if (disposed || ['sending', 'uncertain'].includes(value.state)) return false
-      clear(); const turn = generation
-      if (disposed) return false
+      // clear() notifies synchronously; a callback may replace or dispose this intent.
+      const turn = generation + 1
+      clear()
+      if (disposed || turn !== generation || value.state !== 'idle') return false
       const key = keyFactory(), snapshot = structuredClone(body)
       if (disposed || turn !== generation) return false
       value.path = path; value.method = method; value.key = key; value.body = snapshot; return run()
     },
     retry() { return value.state === 'uncertain' ? run() : Promise.resolve(false) },
     unresolved: () => ['sending', 'uncertain'].includes(value.state),
-    clear, dispose() { clear(); disposed = true },
+    clear, dispose() { disposed = true; clear() },
   }
 }

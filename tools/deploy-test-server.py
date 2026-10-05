@@ -238,8 +238,8 @@ def artifact(pattern, build_root=None):
 
 def stage():
     cfg = configuration()
-    if not cfg['identity_provisioned']:
-        raise RuntimeError('Provision project test identity before staging')
+    if not cfg.get('local_identity_provisioned') or not re.fullmatch('[0-9a-f]{64}',cfg.get('auth_command_key','')):
+        raise RuntimeError('Explicitly bootstrap project local accounts and private command key before staging')
     build = read_json(ROOT / '.local/server-build-context.json')
     build_revision = build['revision']
     if not re.fullmatch('[0-9a-f]{40}', build_revision): raise RuntimeError('Invalid built source revision')
@@ -266,7 +266,7 @@ def stage():
     environment['SPRING_DATASOURCE_URL'] = 'jdbc:postgresql://127.0.0.1:12060/mop_test'
     environment['MOP_S3_ENDPOINT'] = environment['MOP_IMPORT_S3_ENDPOINT'] = 'http://127.0.0.1:19000'
     environment.update({'SPRING_PROFILES_ACTIVE': 'remote_test', 'MOP_TEST_PUBLIC_ORIGIN': cfg['public_origin'],
-        'MOP_OIDC_ISSUER': cfg['issuer'], 'MOP_OIDC_CLIENT_ID': CLIENT, 'MOP_OIDC_CLIENT_SECRET': cfg['client_secret'],
+        'MOP_AUTH_MODE': 'project_local', 'MOP_AUTH_COMMAND_KEY': cfg['auth_command_key'], 'MOP_OIDC_ENABLED': 'false',
         'SERVER_ADDRESS': '127.0.0.1', 'SERVER_PORT': str(API_PORT), 'SERVER_FORWARD_HEADERS_STRATEGY': 'framework',
         'MOP_IMPORT_PARSER_JAR': '/app/server/import-parser/target/parser.jar', 'MOP_CONTACT_IMPORT_LEASE_MILLIS': '300000',
         'MOP_PHOTO_WORKER_ENABLED': 'false', 'MOP_IMPORT_WORKER_ENABLED': 'false', 'MOP_CONTACT_IMPORT_WORKER_ENABLED': 'false'})

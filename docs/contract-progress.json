@@ -256,8 +256,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
-        "docs/evidence/project-identity-components-20261005.json",
-        "docs/project-identity-authorization.md"
+        "docs/project-identity-acceptance-20261005.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -268,8 +267,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
-        "docs/evidence/project-identity-components-20261005.json",
-        "docs/project-identity-authorization.md"
+        "docs/project-identity-acceptance-20261005.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -340,8 +338,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
-        "docs/evidence/project-identity-components-20261005.json",
-        "docs/project-identity-authorization.md"
+        "docs/project-identity-acceptance-20261005.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1419,6 +1416,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "4dd00d70950bfd7ddb2ea3efaf5eaaaa7c719f3b384d6560323a030a83da2577"
+    "doc/development/07_合同逐项开发追踪.md": "6f4ec608b6707341a3a30c6fac8207d96328ee01d7ed8afc40ebd38889993f79"
   }
 }

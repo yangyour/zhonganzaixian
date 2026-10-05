@@ -1,0 +1,41 @@
+{
+  "verified_at": "2026-10-05T07:58:24.821657+00:00",
+  "environment": "designated-server",
+  "source_revision": "b68f324f1cedd2ea22fb29191e688292ef0f39e1",
+  "backend_build_revision": "050d3191975284cb8227569363a6a3e72797ac13",
+  "ready": true,
+  "default_identity": "project_local",
+  "oidc_enabled": false,
+  "schema_version": 28,
+  "all_policy_fields_null": true,
+  "project_containers": [
+    {
+      "name": "mop-test-web",
+      "running": true,
+      "restart_count": 0
+    },
+    {
+      "name": "mop-test-api",
+      "running": true,
+      "restart_count": 0
+    },
+    {
+      "name": "mop-test-photo-worker",
+      "running": true,
+      "restart_count": 0
+    },
+    {
+      "name": "mop-test-import-worker",
+      "running": true,
+      "restart_count": 0
+    },
+    {
+      "name": "mop-test-contact-worker",
+      "running": true,
+      "restart_count": 0
+    }
+  ],
+  "shared_components_start_times_unchanged": true,
+  "local_business_backend_started": false,
+  "contract_acceptance_complete": false
+}

@@ -1,0 +1,11 @@
+{
+  "verified_at": "2026-10-05T07:43:22.076Z",
+  "environment": "designated-server",
+  "passed": true,
+  "requests": 7,
+  "old_session_rejected": true,
+  "fresh_local_login": true,
+  "original_role_receipt_identical": true,
+  "current_role_rows_identical": true,
+  "password_policy_unchanged": true
+}

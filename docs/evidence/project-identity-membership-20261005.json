@@ -1,0 +1,103 @@
+{
+  "verified_at": "2026-10-05T07:56:06.208Z",
+  "passed": true,
+  "environment": "designated-server",
+  "run": "7af1965a-29d9-4d0f-9b1f-1ea3871edc27",
+  "checks": [
+    {
+      "stage": "start",
+      "status": 200
+    },
+    {
+      "stage": "start",
+      "status": 200
+    },
+    {
+      "stage": "start",
+      "status": 200
+    },
+    {
+      "stage": "retire_failed_ui_attempt",
+      "status": 200
+    },
+    {
+      "stage": "retire_failed_ui_attempt",
+      "status": 200
+    },
+    {
+      "stage": "retire_failed_ui_attempt",
+      "status": 200
+    },
+    {
+      "stage": "grant_second_tenant",
+      "status": 200
+    },
+    {
+      "stage": "grant_second_tenant",
+      "status": 200
+    },
+    {
+      "stage": "grant_second_tenant",
+      "status": 200
+    },
+    {
+      "stage": "grant_second_tenant",
+      "status": 200
+    },
+    {
+      "stage": "grant_second_tenant",
+      "status": 200
+    },
+    {
+      "stage": "browser_explicit_tenant_switch",
+      "status": "PASSED"
+    },
+    {
+      "stage": "own_password_change",
+      "status": 200
+    },
+    {
+      "stage": "own_password_change",
+      "status": 200
+    },
+    {
+      "stage": "own_password_change",
+      "status": 401
+    },
+    {
+      "stage": "own_password_change",
+      "status": 200
+    },
+    {
+      "stage": "own_password_change",
+      "status": 200
+    },
+    {
+      "stage": "revoke_second_membership",
+      "status": 200
+    },
+    {
+      "stage": "revoke_second_membership",
+      "status": 404
+    },
+    {
+      "stage": "retire_synthetic_user",
+      "status": 200
+    },
+    {
+      "stage": "retire_synthetic_user",
+      "status": 200
+    },
+    {
+      "stage": "retire_synthetic_user",
+      "status": 401
+    }
+  ],
+  "requests": 21,
+  "multi_tenant_viewer_switched_in_browser": true,
+  "own_password_changed_and_reauthenticated": true,
+  "membership_revocation_denied": true,
+  "failed_ui_roles_retired": 1,
+  "failed_membership_users_retired": 1,
+  "synthetic_user_disabled": true
+}

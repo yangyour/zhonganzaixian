@@ -1,0 +1,13 @@
+{
+  "verified_at": "2026-10-05T07:53:03.579398+00:00",
+  "environment": "designated-server",
+  "public_origin": "http://111.228.16.123:10010",
+  "previous_revision": "050d3191975284cb8227569363a6a3e72797ac13",
+  "revision": "b68f324f1cedd2ea22fb29191e688292ef0f39e1",
+  "project_local_login": true,
+  "oidc_enabled": false,
+  "ready": true,
+  "retained_previous_containers": 5,
+  "shared_component_lifecycle_changed": false,
+  "migrations_on_start": 0
+}

@@ -1,0 +1,58 @@
+{
+  "verified_at": "2026-10-05T06:00:50Z",
+  "base_commit": "ac90f01845c8e0fb4762ca650dfa10c047004a61",
+  "base_ci": {
+    "run_id": 37269186554,
+    "conclusion": "success"
+  },
+  "controllers": 40,
+  "distinct_gate_paths": 58,
+  "gate_cases_empty_and_legacy": 116,
+  "new_session_tests": 7,
+  "new_controller_entry_tests": 4,
+  "new_java_tests_total": 127,
+  "root_reported": 2486,
+  "root_executed": 1705,
+  "root_skipped": 781,
+  "root_failures": 0,
+  "root_errors": 0,
+  "new_web_tests": 2,
+  "web_tests": 1703,
+  "web_files": 100,
+  "typecheck_build": "PASS",
+  "contracts": 127,
+  "api_contract": "0.44.0",
+  "api_metadata_change": "effective membership grants and tenant inventory capability",
+  "new_capability": "tenants:read_inventory",
+  "new_capability_base_category": "padmin only; no expansion of legacy data scope",
+  "stored_dynamic_role_loading": false,
+  "worker_dynamic_grants_verified": false,
+  "per_target_dynamic_grants_verified": false,
+  "current_pg_uses_legacy_grants": true,
+  "actual_pg": 0,
+  "actual_http": "NOT_RUN",
+  "real_browser": false,
+  "credentials_created": 0,
+  "migrations": 0,
+  "formal_acceptance": "NOT_RUN",
+  "initial_regressions": {
+    "deduplicated_gates": {
+      "tests": 110,
+      "failed": 55
+    },
+    "session": {
+      "tests": 8,
+      "failed": 6
+    },
+    "legacy_menu_literal_assertion": 1
+  },
+  "log_sha256": {
+    "effective-grants-before-20261005.log": "6e564c4a64ab63a30dd2f440199f5188e54f4eedd46fb154623b6990d23d9eaa",
+    "effective-grants-distinct-before-20261005.log": "c3b860bb3f603b03cbe46fead01b0f13418b9879cb0e4bfbdaf62d3cb3222995",
+    "effective-session-before-20261005.log": "ba4f6e5a0cc2e64920afbc4971f2d66dab06c48c26cb529dc3daa2f4e585a036",
+    "effective-grants-final-java-20261005.log": "d46e29ad0c6d709a6e3dc57a65952e40e46f0c06b02b3adbfcede856f10cedf2",
+    "effective-grants-complete-web-20261005.log": "ac3f8654ac6ced790059c4aadf93765d7412ac5f03795ab3767318e3ceb90e5f",
+    "effective-grants-final-web-20261005.log": "c1f14964b2794551bf3deb32235962b33d2bf57075fe140d8fcbdafe9cf0699b",
+    "effective-grants-final-build-20261005.log": "17c4ca58eb364b20f88b5f0847f8583d67ceb002360a04b127759de04baa5e72"
+  }
+}

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {computed,onBeforeUnmount,ref,shallowRef,watch} from 'vue'
 import {api} from '../api/client'
-import {session,contextGeneration,switchingTenant} from '../stores/session'
+import {session,contextGeneration,switchingTenant,can} from '../stores/session'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import {createTenantInventoryReader,emptyTenantInventory,tenantInventoryColumns,tenantInventoryCell} from '../utils/tenantInventory'
 const state=shallowRef(emptyTenantInventory()),selectedId=ref<string|null>(null)
 const reader=createTenantInventoryReader(api,value=>{state.value=value;if(value.busy||!value.page)selectedId.value=null})
-const permitted=computed(()=>session.value?.user.role==='padmin'&&!switchingTenant.value)
+const permitted=computed(()=>session.value?.user.role==='padmin'&&can('tenants:read_inventory')&&!switchingTenant.value)
 watch(()=>[session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,contextGeneration.value,permitted.value],()=>{const s=session.value;selectedId.value=null;reader.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role}:null);if(permitted.value)void reader.refresh()},{immediate:true,flush:'sync'})
 onBeforeUnmount(()=>reader.dispose())
 const selected=computed(()=>state.value.page?.items.find(row=>row.id===selectedId.value)??null)

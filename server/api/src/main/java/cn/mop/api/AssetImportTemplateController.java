@@ -16,7 +16,7 @@ public final class AssetImportTemplateController {
         if(request.getUserPrincipal()==null||request.getSession(false)==null)throw expired();
         Object value=request.getSession(false).getAttribute("mop.tenant_id");if(!(value instanceof String tenant))throw expired();
         Membership member=platform.membership(request.getUserPrincipal().getName(),tenant).orElseThrow(AssetImportTemplateController::expired);if(!member.active())throw expired();
-        if(!Capabilities.forRole(member.role()).contains("assets:write"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无资产导入模板下载权限");
+        if(!member.capabilities().contains("assets:write"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无资产导入模板下载权限");
         if(!request.getParameterMap().isEmpty())throw new DomainException(400,"VALIDATION_ERROR","标准模板下载不接受查询参数");
         byte[] content=AssetImportTemplateFile.read();
         // The shared security filter already sets no-store; do not append a duplicate header.

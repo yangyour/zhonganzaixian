@@ -47,4 +47,53 @@ class SessionMembershipRoleProjectionTest {
             verify(repository,never()).users();
         }
     }
+    @Test void selectedCapabilitiesAreNotExpandedFromTheBusinessRole() {
+        var repository=repository("padmin","msp","remote_test");
+        when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"msp",8,true,List.of("tickets:read"))));
+        var data=(Map<?,?>)service(repository).session(authenticated());
+        assertEquals(List.of("tickets:read"),data.get("capabilities"));
+    }
+    @Test void emptyGrantsStillAllowSelfSessionWithoutRestoringAnyBusinessPermission() {
+        var repository=repository("padmin","padmin","remote_test");
+        when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"padmin",8,true,List.of())));
+        var data=(Map<?,?>)service(repository).session(authenticated());assertEquals(List.of(),data.get("capabilities"));
+    }
+    @Test void everySessionReadUsesCurrentEffectiveGrantsAndVersion() {
+        var repository=repository("padmin","msp","remote_test");var service=service(repository);
+        assertTrue(((List<?>)((Map<?,?>)service.session(authenticated())).get("capabilities")).contains("assets:write"));
+        when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"msp",9,true,List.of("assets:read"))));
+        var data=(Map<?,?>)service.session(authenticated());assertEquals(List.of("assets:read"),data.get("capabilities"));assertEquals(9L,data.get("permission_version"));
+    }
+    @Test void historicalFixtureProjectionAlsoRespectsSelectedGrants() {
+        var repository=repository("padmin","msp","local_fixture");
+        when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"msp",8,true,List.of("assets:read"))));
+        var request=new MockHttpServletRequest("POST","/api/v1/fixture/session");request.addHeader("Idempotency-Key","selected-grants-fixture");
+        var data=(Map<?,?>)service(repository).fixtureLogin(new ObjectMapper().createObjectNode().put("user_id",ACTOR),request,new MockHttpServletResponse());
+        assertEquals(List.of("assets:read"),data.get("capabilities"));
+    }
+    @Test void tenantSwitchProjectsOnlyTheTargetMembershipGrants() {
+        String target="55000000-0000-4000-8000-000000000002";
+        var repository=repository("padmin","padmin","remote_test");
+        when(repository.membership(ACTOR,target)).thenReturn(Optional.of(new Membership(ACTOR,target,"msp",9,true,List.of("tickets:read"))));
+        when(repository.tenant(target)).thenReturn(new Tenant(target,"目标租户"));
+        var request=authenticated();request.setMethod("POST");request.setRequestURI("/api/v1/session/tenant");request.addHeader("Idempotency-Key","selected-grants-switch");
+        var data=(Map<?,?>)service(repository).switchTenant(new ObjectMapper().createObjectNode().put("tenant_id",target),request);
+        assertEquals(List.of("tickets:read"),data.get("capabilities"));assertEquals(target,request.getSession().getAttribute("mop.tenant_id"));
+    }
+    @Test void invalidPermissionVersionsCannotProduceAUsableSession() {
+        var repository=repository("padmin","padmin","remote_test");
+        for(long version:new long[]{-1,0,9_007_199_254_740_992L}) {
+            when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"padmin",version,true,List.of("assets:read"))));
+            assertEquals(401,assertThrows(DomainException.class,()->service(repository).session(authenticated())).status);
+        }
+    }
+
+    @Test void emptyGrantsDoNotPreventExplicitLogout() {
+        var repository=repository("padmin","padmin","remote_test");
+        when(repository.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"padmin",8,true,List.of())));
+        var request=authenticated();request.setMethod("POST");request.addHeader("Idempotency-Key","empty-grants-logout");
+        var data=(Map<?,?>)service(repository).logout(request,new MockHttpServletResponse());
+        assertEquals(true,data.get("logged_out"));assertNull(request.getSession(false));
+    }
+
 }

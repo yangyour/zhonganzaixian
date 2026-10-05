@@ -89,7 +89,7 @@ public final class AssetImportController {
         if(request.getUserPrincipal()==null||request.getSession(false)==null)throw expired();
         Object scope=request.getSession(false).getAttribute("mop.tenant_id");if(!(scope instanceof String tenant))throw expired();String actor=request.getUserPrincipal().getName();
         Membership member=platform.membership(actor,tenant).orElseThrow(AssetImportController::expired);if(!member.active())throw expired();
-        if(!Capabilities.forRole(member.role()).contains("assets:write"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无资产导入来源暂存权限");
+        if(!member.capabilities().contains("assets:write"))throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无资产导入来源暂存权限");
         return new AssetImportSourceRepository.Access(actor,tenant,member.permissionVersion(),trace(request));
     }
     private static void fields(JsonNode body,Set<String> expected){if(body==null||!body.isObject())throw invalid("请求必须为约定 JSON 对象");Set<String> actual=new HashSet<>();body.fieldNames().forEachRemaining(actual::add);if(!actual.equals(expected))throw invalid("请求含缺失或未知字段，不能提交客户端租户或身份");}

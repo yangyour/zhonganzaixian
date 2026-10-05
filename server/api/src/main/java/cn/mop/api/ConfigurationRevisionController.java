@@ -29,21 +29,21 @@ public class ConfigurationRevisionController {
 
     @GetMapping("/configurations/{key}/revisions")
     Object list(@PathVariable String key, HttpServletRequest request) {
-        Access access = access(request);
+        Access access = access(request, false);
         noQuery(request);
         return success(map("items", repository.configurationRevisions(access.tenant, key)), request);
     }
 
     @GetMapping("/configuration-revisions/{id}")
     Object detail(@PathVariable String id, HttpServletRequest request) {
-        Access access = access(request);
+        Access access = access(request, false);
         noQuery(request);
         return success(repository.configurationRevision(access.tenant, id).orElseThrow(ConfigurationRevisionController::notFound), request);
     }
 
     @PostMapping("/configurations/{key}/revisions")
     Object create(@PathVariable String key, @RequestBody JsonNode body, HttpServletRequest request) {
-        Access access = access(request);
+        Access access = access(request, true);
         fields(body, Set.of("proposed_value", "reason", "evidence_refs"));
         Map<String, Object> entry = repository.configuration(key);
         if ("fixed_constraint".equals(entry.get("contract_value_kind"))) throw new DomainException(422, "STATE_NOT_ALLOWED", "合同固定约束不能修改");
@@ -60,14 +60,14 @@ public class ConfigurationRevisionController {
 
     @PostMapping("/configuration-revisions/{id}/submit")
     Object submit(@PathVariable String id, @RequestBody JsonNode body, HttpServletRequest request) {
-        Access access = access(request);
+        Access access = access(request, true);
         fields(body, Set.of("expected_version"));
         return transition(access, id, body, "SUBMIT", null, request);
     }
 
     @PostMapping("/configuration-revisions/{id}/review")
     Object review(@PathVariable String id, @RequestBody JsonNode body, HttpServletRequest request) {
-        Access access = access(request);
+        Access access = access(request, true);
         fields(body, Set.of("expected_version", "decision", "comment"));
         String decision = text(body, "decision", 7);
         if (!Set.of("approve", "reject").contains(decision)) throw invalid("decision 仅允许 approve 或 reject");
@@ -76,7 +76,7 @@ public class ConfigurationRevisionController {
 
     @PostMapping("/configuration-revisions/{id}/withdraw")
     Object withdraw(@PathVariable String id, @RequestBody JsonNode body, HttpServletRequest request) {
-        Access access = access(request);
+        Access access = access(request, true);
         fields(body, Set.of("expected_version", "reason"));
         return transition(access, id, body, "WITHDRAW", text(body, "reason", 500), request);
     }
@@ -94,11 +94,11 @@ public class ConfigurationRevisionController {
         repository.audit(access.actor, access.tenant, "configuration_revision." + action, "configuration_revision", id, "SUCCEEDED", "INTERNAL_REVIEW_ONLY_UNVERIFIED_NOT_EFFECTIVE", trace(request));
     }
 
-    private Access access(HttpServletRequest request) {
+    private Access access(HttpServletRequest request, boolean write) {
         if (request.getUserPrincipal() == null || request.getSession(false) == null) throw new DomainException(401, "SESSION_EXPIRED", "会话不存在或已过期");
         String actor = request.getUserPrincipal().getName(), tenant = (String) request.getSession(false).getAttribute("mop.tenant_id");
         Membership membership = repository.membership(actor, tenant).orElseThrow(() -> new DomainException(401, "SESSION_EXPIRED", "成员关系已失效，请重新登录"));
-        requireAdministrator(membership);
+        requireAdministrator(membership, write);
         return new Access(actor, tenant, membership.permissionVersion());
     }
 
@@ -108,13 +108,14 @@ public class ConfigurationRevisionController {
         if (key == null || !key.matches("[A-Za-z0-9._:-]{1,128}")) throw invalid("Idempotency-Key 为必填，长度1至128且仅包含字母数字及._:-");
         return repository.idempotent(access.actor, access.tenant, route(request), key, hash(body), access.permissionVersion, () -> {
             Membership current = repository.membership(access.actor, access.tenant).orElseThrow(() -> new DomainException(401, "SESSION_EXPIRED", "成员关系已失效"));
-            requireAdministrator(current);
+            requireAdministrator(current, true);
             return command.get();
         });
     }
 
-    private static void requireAdministrator(Membership membership) {
-        if (!"padmin".equals(membership.role())) throw new DomainException(403, "ACTION_FORBIDDEN", "当前角色无配置修订或审批权限");
+    private static void requireAdministrator(Membership membership, boolean write) {
+        if (!membership.active() || membership.permissionVersion()<1) throw new DomainException(401, "SESSION_EXPIRED", "当前成员关系已失效");
+        if (!"padmin".equals(membership.role()) || !membership.capabilities().contains(write ? "configurations:write" : "configurations:read")) throw new DomainException(403, "ACTION_FORBIDDEN", "当前角色无配置修订或审批权限");
     }
 
     static List<Map<String, String>> evidence(JsonNode value) {

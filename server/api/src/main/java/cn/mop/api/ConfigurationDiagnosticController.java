@@ -38,7 +38,7 @@ public class ConfigurationDiagnosticController {
         String actor=request.getUserPrincipal().getName();
         Membership membership=repository.membership(actor,tenant).orElseThrow(ConfigurationDiagnosticController::expired);
         if(!membership.active())throw expired();
-        if(!Capabilities.forRole(membership.role()).contains("configurations:read"))
+        if(!membership.capabilities().contains("configurations:read"))
             throw new DomainException(403,"ACTION_FORBIDDEN","当前角色无配置诊断读取权限");
         try{return new ConfigurationDiagnosticReader.TrustedContext(actor,tenant,membership.permissionVersion());}
         catch(IllegalArgumentException malformed){throw expired();}

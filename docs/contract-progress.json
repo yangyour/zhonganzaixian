@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 47,
-  "rows_without_progress_notes": 81,
+  "rows_with_progress_notes": 48,
+  "rows_without_progress_notes": 80,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -44,7 +44,7 @@
     },
     "M5": {
       "requirements": 21,
-      "rows_with_progress_notes": 9,
+      "rows_with_progress_notes": 10,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 21
       }
@@ -824,8 +824,10 @@
       "id": "M5-16",
       "title": "超时自动关单",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/customer-confirmation-window.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1410,6 +1412,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "511d6d87b096da7934a5af4f07dcad535319bd8bbe386936f8925c3fa0b4990a"
+    "doc/development/07_合同逐项开发追踪.md": "72d9ef6a083da4ce3761572c361a486f90f6d2dc4b96e2316701016d710d388c"
   }
 }

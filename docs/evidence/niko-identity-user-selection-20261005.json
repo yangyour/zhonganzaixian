@@ -1,0 +1,26 @@
+{
+  "verified_at": "2026-10-05T08:42:17Z",
+  "base_commit": "e9b550cfd902e781a86b94bea0354ad5eae01d3a",
+  "new_tests": 6,
+  "before_test_subset": 3,
+  "before_subset_failures": 2,
+  "focused_passed": 6,
+  "web_passed": 1755,
+  "web_files": 106,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts_passed": 127,
+  "interrupted_run": "identity-selection-final-web-20261005.log did not finish after execution session cancellation; not counted as pass",
+  "api_changed": false,
+  "sql_changed": false,
+  "actual_http_checks": 0,
+  "actual_accounts_created": 0,
+  "formal_acceptance": "NOT_RUN",
+  "logs_sha256": {
+    "identity-selection-before-20261005.log": "67a05a6787335ff3a544acdb33b463651e54ac78dadc4b14a22a1ed28952056c",
+    "identity-selection-focused-20261005.log": "bd5ebe06895473f9dc9a8557642c6b207cc517a592600d98c6aab2a398f814d5",
+    "identity-selection-verified-web-20261005.log": "dd40cb5d336fdcf765157d9aa1204671baa05b585c5fd68ea6c32a337c40ab9d",
+    "identity-selection-verified-build-20261005.log": "ca4664f616e6885328f9067390275748e898239dae5192e72ebc02ec6cbc39b2",
+    "identity-selection-contracts-20261005.log": "3e132c77d89343e5ab107f4ef205f017732633d03c75206b0d367dd2a6cef94b"
+  }
+}

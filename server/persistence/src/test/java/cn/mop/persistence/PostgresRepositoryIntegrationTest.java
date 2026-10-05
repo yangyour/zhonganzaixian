@@ -4,7 +4,6 @@ import cn.mop.domain.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.zaxxer.hikari.*;
-import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import java.nio.charset.StandardCharsets;
@@ -25,8 +24,7 @@ class PostgresRepositoryIntegrationTest {
     static String actor;
     @BeforeAll static void connect()throws Exception{
         String url=required("SPRING_DATASOURCE_URL");assertTrue(url.matches("jdbc:postgresql://127\\.0\\.0\\.1:[0-9]+/mop_test"));
-        try(Connection connection=DriverManager.getConnection(url,required("MOP_MIGRATION_USERNAME"),required("MOP_MIGRATION_PASSWORD"));Statement statement=connection.createStatement();ResultSet rows=statement.executeQuery("SELECT current_database(),current_user")){assertTrue(rows.next());assertEquals("mop_test",rows.getString(1));assertEquals("mop_test_migrator",rows.getString(2));}
-        Flyway.configure().dataSource(url,required("MOP_MIGRATION_USERNAME"),required("MOP_MIGRATION_PASSWORD")).locations("classpath:db/migration").schemas("public").createSchemas(false).cleanDisabled(true).target("4").load().migrate();
+        DesignatedSchemaPrecondition.requireV4(url);
         HikariConfig config=new HikariConfig();config.setJdbcUrl(url);config.setUsername(required("SPRING_DATASOURCE_USERNAME"));config.setPassword(required("SPRING_DATASOURCE_PASSWORD"));config.setMaximumPoolSize(5);config.setConnectionTimeout(5000);pool=new HikariDataSource(config);
         mapper=new ObjectMapper().registerModule(new JavaTimeModule()).setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         repository=new PostgresPlatformRepository(pool,mapper);actor=repository.users().stream()

@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-05最终实测版本：PG17.9、KC26.2.4、MinIO RELEASE.2025-09-07T16-13-09Z；项目应用Java Temurin17.0.20+8、Nginx1.31.3。三个常驻Worker37HTTP真实链路通过，单作业导出Worker生成并核验真实XLSX；API重启时其余7容器启动时间相同。未调用OSS/监控/通知/堡垒机，原门禁保持。见[验收报告](../test-server-acceptance-20261005.md)及[终态证据](../evidence/server-deployment-final-20261005.json)。
+
 2026-10-05应用现部署在原指定服务器10010端口，API仅回环18010，项目Nginx回环19000只转发既有MinIO。五个项目应用容器复用服务器已有Java17/Nginx镜像；原PG/KC/MinIO启动时间在部署前后相同。独立mop-acceptance realm/client及六个虚构身份使用原Keycloak服务，原mop-test不变。真实ready/发现200、六角色登录通过；762PG/6MinIO组件回归、1685Web已验，后续业务HTTP/UI单列。见[部署说明](../test-server-deployment.md)。
 
 2026-10-05服务器验收部署盘点：原PG17.9、Keycloak26.2.4、MinIO现有实例可达。原项目库显式V23–V26各1次、重复/只读0次，48张旧业务表摘要相同；未重启共享组件。外部登录支持新增固定验收origin/独立项目realm策略，8项隔离身份测试通过，真实部署与登录验收另行记录。见[部署说明](../test-server-deployment.md)和[V26证据](../evidence/designated-schema-v26-20261005.json)。

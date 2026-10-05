@@ -8,7 +8,7 @@ const cfg = JSON.parse(readFileSync(new URL('deploy/private/server-test-runtime.
 const base = cfg.public_origin
 assert.equal(cfg.project, 'mop-platform-test')
 const mode = process.argv[2]
-assert.ok(['login', 'pages', 'actions'].includes(mode))
+assert.ok(['login', 'pages', 'actions', 'export', 'export-readback'].includes(mode))
 const privateDir = new URL('.local/server-acceptance/private/', root)
 const sessionDir = new URL('sessions/', privateDir)
 const shots = new URL('docs/evidence/server-ui-20261005/', root)
@@ -47,8 +47,9 @@ async function attach(context) {
 async function screenshot(page, name) {
   assert.equal(new URL(page.url()).origin, base)
   assert.equal(new URL(page.url()).pathname.startsWith('/login'), false)
+  await page.evaluate(() => window.scrollTo(0, 0))
   const file = name + (attempt > 1 ? '-attempt' + attempt : '') + '.png'
-  await page.screenshot({ path: new URL(file, shots).pathname.replace(/^\/([A-Za-z]:)/, '$1'), fullPage: true })
+  await page.screenshot({ path: new URL(file, shots).pathname.replace(/^\/([A-Za-z]:)/, '$1'), fullPage: true, animations: 'disabled' })
   evidence.screenshots.push(file); save()
 }
 async function session(context) {
@@ -130,11 +131,12 @@ async function actions() {
   stage = 'asset_original_request_recovery'
   await page.goto(base + '/assets', { waitUntil: 'networkidle' })
   await page.getByRole('button', { name: '＋ 创建资产草稿', exact: true }).click()
-  await page.getByLabel('资产名称', { exact: true }).fill('验收虚构设备 ' + control.run.slice(0, 8))
-  await page.getByLabel('设备类型', { exact: true }).selectOption('switch')
-  await page.getByLabel('管理 IP', { exact: true }).fill('192.0.2.210')
-  await page.getByLabel('站点 ID', { exact: true }).fill('site-a-main')
-  await page.getByLabel('确认仅创建资产草稿', { exact: true }).check()
+  const assetForm = page.getByRole('group', { name: '明确资产资料', exact: true })
+  await assetForm.getByLabel('资产名称', { exact: true }).fill('验收虚构设备 ' + control.run.slice(0, 8))
+  await assetForm.getByLabel('设备类型', { exact: true }).selectOption('switch')
+  await assetForm.getByLabel('管理 IP', { exact: true }).fill('192.0.2.210')
+  await assetForm.getByLabel('站点 ID', { exact: true }).fill('site-a-main')
+  await assetForm.getByLabel('确认仅创建资产草稿', { exact: true }).check()
   let first = true, accepted
   await page.route(base + '/api/v1/assets', async route => {
     if (route.request().method() !== 'POST') return route.continue()
@@ -149,7 +151,7 @@ async function actions() {
   })
   await page.getByRole('button', { name: '保存草稿', exact: true }).click()
   await page.getByRole('heading', { name: '原请求结果未确认', exact: true }).waitFor()
-  assert.equal(await page.getByLabel('资产名称', { exact: true }).isDisabled(), true)
+  assert.equal(await assetForm.getByLabel('资产名称', { exact: true }).isDisabled(), true)
   await page.getByRole('button', { name: '重试完全相同的原请求', exact: true }).click()
   await page.getByText(/资产草稿创建已由原请求回执确认/).waitFor()
   assert.equal(control.requests.length, 2); assert.equal(accepted.availability, 'UNKNOWN')
@@ -187,12 +189,60 @@ async function actions() {
   await screenshot(page, 'desktop-preference-created')
   control.complete = true; persist(); await context.close()
 }
+async function exportPreparation(readback) {
+  const controlFile = new URL('browser-export-control.json', privateDir)
+  const context = await browser.newContext({ storageState: stateFile('padmin').pathname.replace(/^\/([A-Za-z]:)/, '$1'), viewport: { width: 1440, height: 900 } })
+  const page = await attach(context)
+  await page.goto(base + '/asset-export-jobs', { waitUntil: 'networkidle' })
+  if (!readback) {
+    assert.equal(existsSync(controlFile), false, 'Never repeat export acceptance blindly')
+    const control = { request: null, receipt: null }
+    const persist = () => writeFileSync(controlFile, JSON.stringify(control, null, 2) + '\n')
+    persist()
+    const actions = JSON.parse(readFileSync(new URL('browser-actions-control.json', privateDir), 'utf8'))
+    const assetName = actions.receipts[0].data.name
+    stage = 'export_native_acceptance'
+    page.on('request', request => {
+      if (request.url() === base + '/api/v1/asset-export-jobs' && request.method() === 'POST') {
+        control.request = { key: request.headers()['idempotency-key'], body: JSON.parse(request.postData()) }; persist()
+      }
+    })
+    await page.getByLabel('导出文本不限', { exact: true }).uncheck()
+    await page.getByLabel('导出检索文本', { exact: true }).fill(assetName)
+    await page.getByLabel('确认仅准备不发布', { exact: true }).check()
+    const accepted = page.waitForResponse(response => response.url() === base + '/api/v1/asset-export-jobs' && response.request().method() === 'POST')
+    await page.getByRole('button', { name: '受理本次准备请求', exact: true }).click()
+    const response = await accepted; assert.equal(response.status(), 202)
+    control.receipt = (await response.json()).data; persist()
+    await page.getByRole('heading', { name: '原受理回执：QUEUED / v0', exact: true }).waitFor()
+    await page.getByRole('button', { name: '独立读取该作业当前进度', exact: true }).click()
+    await page.locator('.current-export .no-preparation').waitFor()
+    check('export_real_202_native_form', { queued_receipt: true, premature_success: false })
+    await screenshot(page, 'desktop-export-queued')
+  } else {
+    stage = 'export_prepared_native_readback'
+    const control = JSON.parse(readFileSync(controlFile, 'utf8'))
+    const id = control.receipt.job_id
+    await page.locator('.job-cards li').filter({ hasText: id }).getByRole('button', { name: '读取当前进度', exact: true }).click()
+    await page.locator('.prepared-descriptor').waitFor()
+    const response = await context.request.get(base + '/api/v1/asset-export-jobs/' + id)
+    assert.equal(response.status(), 200)
+    const progress = (await response.json()).data
+    assert.equal(progress.prepared.row_count, 1); assert.equal(progress.download_allowed, false)
+    assert.equal(progress.publication_status, 'NOT_IMPLEMENTED')
+    check('export_prepared_native_readback', { row_count: 1, bytes: progress.prepared.size_bytes, download_allowed: false, publication: 'NOT_IMPLEMENTED' })
+    await screenshot(page, 'desktop-export-prepared')
+  }
+  await context.close()
+}
 try {
   browser = await chromium.launch({ headless: true, chromiumSandbox: true, executablePath })
   evidence.browser_version = browser.version()
   if (mode === 'login') for (const role of ['padmin', 'msp', 'tadmin', 'viewerA', 'viewerB', 'reviewer']) await login(role)
   if (mode === 'pages') await pages()
   if (mode === 'actions') await actions()
+  if (mode === 'export') await exportPreparation(false)
+  if (mode === 'export-readback') await exportPreparation(true)
   assert.equal(evidence.page_errors, 0)
   assert.equal(evidence.failed_api_gets.length, 0)
   evidence.completed = true; save()

@@ -1,0 +1,15 @@
+{
+  "verified_at": "2026-10-05T04:39:33.964Z",
+  "environment": "designated-server-acceptance",
+  "api_version": "0.44.0",
+  "requests": 15,
+  "checks": [
+    "asset original write returns same durable receipt after JVM restart",
+    "source collection and own preference original writes/readback remain durable",
+    "completed contact job keeps original pending 202 and archived created row",
+    "stored image and parsed source survive API restart",
+    "prepared export preserves original queued 202 and real descriptor"
+  ],
+  "completed": true,
+  "formal_acceptance": "NOT_RUN"
+}

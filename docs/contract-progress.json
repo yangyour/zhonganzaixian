@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 46,
-  "rows_without_progress_notes": 82,
+  "rows_with_progress_notes": 47,
+  "rows_without_progress_notes": 81,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -30,7 +30,7 @@
     },
     "M3": {
       "requirements": 12,
-      "rows_with_progress_notes": 7,
+      "rows_with_progress_notes": 8,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 12
       }
@@ -345,7 +345,8 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
-        "docs/asset-ledger-reads.md"
+        "docs/asset-ledger-reads.md",
+        "docs/test-server-acceptance-20261005.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -365,8 +366,10 @@
       "id": "M3-3",
       "title": "资产详情",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/test-server-acceptance-20261005.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -405,7 +408,8 @@
         "docs/evidence/dot-import-template-download-20261002.json",
         "docs/local-browser-validation-20261003.md",
         "docs/local-browser-validation-20261004.md",
-        "docs/local-runtime-validation-20261003.md"
+        "docs/local-runtime-validation-20261003.md",
+        "docs/test-server-acceptance-20261005.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -425,7 +429,8 @@
         "docs/evidence/niko-export-page-20261004.json",
         "docs/evidence/niko-export-page-worker-chain-20261004.json",
         "docs/evidence/niko-export-progress-20261004.json",
-        "docs/export-preparation-worker.md"
+        "docs/export-preparation-worker.md",
+        "docs/test-server-acceptance-20261005.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -876,7 +881,8 @@
         "docs/evidence/niko-own-worklog-client-20261004.json",
         "docs/evidence/niko-own-worklog-page-20261004.json",
         "docs/evidence/niko-own-worklog-reader-20261004.json",
-        "docs/manual-worklogs.md"
+        "docs/manual-worklogs.md",
+        "docs/test-server-acceptance-20261005.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -888,7 +894,8 @@
       "has_progress_note": true,
       "local_references": [
         "docs/backup-plan-drafts.md",
-        "docs/backup-run-state.md"
+        "docs/backup-run-state.md",
+        "docs/test-server-acceptance-20261005.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -958,7 +965,8 @@
         "docs/evidence/niko-change-notice-page-20261004.json",
         "docs/evidence/niko-change-notice-repository-20261004.json",
         "docs/evidence/niko-change-notice-schema-20261004.json",
-        "docs/evidence/niko-change-notice-time-lexical-20261004.json"
+        "docs/evidence/niko-change-notice-time-lexical-20261004.json",
+        "docs/test-server-acceptance-20261005.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1148,7 +1156,8 @@
         "docs/evidence/niko-own-notification-preference-repository-20261004.json",
         "docs/evidence/niko-own-preference-client-20261005.json",
         "docs/evidence/niko-own-preference-page-20261005.json",
-        "docs/own-notification-preferences.md"
+        "docs/own-notification-preferences.md",
+        "docs/test-server-acceptance-20261005.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1236,7 +1245,8 @@
       "has_progress_note": true,
       "local_references": [
         "docs/inspection-templates.md",
-        "docs/local-inspection-validation-20261004.md"
+        "docs/local-inspection-validation-20261004.md",
+        "docs/test-server-acceptance-20261005.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1400,6 +1410,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "8586849cc7e86d4212d84391a209cbc31321922b2c29797312fd9377c71180ac"
+    "doc/development/07_合同逐项开发追踪.md": "511d6d87b096da7934a5af4f07dcad535319bd8bbe386936f8925c3fa0b4990a"
   }
 }

@@ -1,0 +1,28 @@
+{
+  "environment": "designated-server-acceptance",
+  "read_only": true,
+  "checks": [
+    {
+      "left": 880,
+      "right": 1440,
+      "top": 0,
+      "bottom": 900,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "left": 0,
+      "right": 390,
+      "top": 0,
+      "bottom": 844,
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "screenshots": [
+    "docs/evidence/server-ui-20261005/desktop-asset-detail-settled.png",
+    "docs/evidence/server-ui-20261005/mobile-asset-detail-settled.png"
+  ],
+  "initial_selector_failure": "Generic drawer matched eight mounted dialogs; scoped to asset detail before any writes",
+  "completed": true
+}

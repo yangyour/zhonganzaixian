@@ -1,0 +1,25 @@
+{
+  "verified_at": "2026-10-05T04:36:02.309Z",
+  "environment": "designated-server-acceptance",
+  "mode": "export-readback",
+  "real_browser": true,
+  "physical_mobile": false,
+  "checks": [
+    {
+      "name": "export_prepared_native_readback",
+      "row_count": 1,
+      "bytes": 4931,
+      "download_allowed": false,
+      "publication": "NOT_IMPLEMENTED"
+    }
+  ],
+  "screenshots": [
+    "desktop-export-prepared.png"
+  ],
+  "page_errors": 0,
+  "failed_api_gets": [],
+  "completed": true,
+  "formal_acceptance": "NOT_RUN",
+  "attempt": 1,
+  "browser_version": "154.0.4258.53"
+}

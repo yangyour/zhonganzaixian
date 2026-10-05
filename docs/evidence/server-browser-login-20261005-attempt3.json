@@ -1,0 +1,61 @@
+{
+  "verified_at": "2026-10-05T04:21:12.066Z",
+  "environment": "designated-server-acceptance",
+  "mode": "login",
+  "real_browser": true,
+  "physical_mobile": false,
+  "checks": [
+    {
+      "name": "real_oidc_padmin",
+      "pkce": "S256",
+      "identity_mapping": true,
+      "role": "padmin"
+    },
+    {
+      "name": "http_context",
+      "secure_context": false,
+      "native_uuid": false,
+      "native_digest": false,
+      "secure_random": true
+    },
+    {
+      "name": "real_oidc_msp",
+      "pkce": "S256",
+      "identity_mapping": true,
+      "role": "msp"
+    },
+    {
+      "name": "real_oidc_tadmin",
+      "pkce": "S256",
+      "identity_mapping": true,
+      "role": "tadmin"
+    },
+    {
+      "name": "real_oidc_viewerA",
+      "pkce": "S256",
+      "identity_mapping": true,
+      "role": "viewer"
+    },
+    {
+      "name": "real_oidc_viewerB",
+      "pkce": "S256",
+      "identity_mapping": true,
+      "role": "viewer"
+    },
+    {
+      "name": "real_oidc_reviewer",
+      "pkce": "S256",
+      "identity_mapping": true,
+      "role": "padmin"
+    }
+  ],
+  "screenshots": [
+    "desktop-assets-login-attempt3.png"
+  ],
+  "page_errors": 0,
+  "failed_api_gets": [],
+  "completed": true,
+  "formal_acceptance": "NOT_RUN",
+  "attempt": 3,
+  "browser_version": "154.0.4258.53"
+}

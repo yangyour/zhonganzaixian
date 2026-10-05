@@ -1,0 +1,36 @@
+{
+  "verified_at": "2026-10-05T04:23:38.011Z",
+  "environment": "designated-server-acceptance",
+  "api_version": "0.44.0",
+  "actual_pg_oidc": true,
+  "http_requests": 32,
+  "write_requests": 14,
+  "statuses": {
+    "200": 29,
+    "409": 3
+  },
+  "completed": false,
+  "pending_original_requests": 0,
+  "new_owned_preference_slots": 2,
+  "original_receipts_retained": true,
+  "successful_readonly_window_audit_unchanged": false,
+  "existing_own_history_paging": false,
+  "independent_canonical_hash_checked": false,
+  "actual_role_revocation": false,
+  "notification_dispatched": false,
+  "receiver_binding_created": false,
+  "object_store_requests": 0,
+  "new_credentials": false,
+  "new_migrations": 0,
+  "real_browser": false,
+  "formal_acceptance": "NOT_RUN",
+  "failure": {
+    "stage": "readonly_audit_and_history",
+    "type": "AssertionError",
+    "details": "Incomplete; preserve original requests/receipts and investigate without blind rerun."
+  },
+  "scenario_original_metadata": {
+    "api_version": "0.43.0"
+  },
+  "metadata_note": "Historical scenario header corrected to independently verified designated PG17.9 and executed contract0.44; request results unchanged, original file retained privately."
+}

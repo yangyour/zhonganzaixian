@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-05T04:28:40.368Z",
+  "environment": "designated-server-acceptance",
+  "mode": "actions",
+  "real_browser": true,
+  "physical_mobile": false,
+  "checks": [
+    {
+      "name": "asset_same_request_recovery",
+      "dispatches": 2,
+      "same_key_body_and_asset": true,
+      "unknown_monitoring": true
+    },
+    {
+      "name": "source_collection_native_form",
+      "sha256_verification_retained": true,
+      "explicit_empty_selection": true
+    },
+    {
+      "name": "own_preference_native_form",
+      "effective": false,
+      "dispatched": false,
+      "sha256_verified": true
+    }
+  ],
+  "screenshots": [
+    "desktop-created-asset-attempt3.png",
+    "desktop-source-collection-created-attempt3.png",
+    "desktop-preference-created-attempt3.png"
+  ],
+  "page_errors": 0,
+  "failed_api_gets": [],
+  "completed": true,
+  "formal_acceptance": "NOT_RUN",
+  "attempt": 3,
+  "browser_version": "154.0.4258.53"
+}

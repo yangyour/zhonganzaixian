@@ -1,0 +1,73 @@
+{
+  "verified_at": "2026-10-05T04:44:29.772460+00:00",
+  "environment": "designated-server-acceptance",
+  "public_origin": "http://111.228.16.123:10010",
+  "deployed_source_revision": "225faeb8e333b0efaf2b73c30bdab37f5f66b9c3",
+  "backend_build_revision": "a3ff886d952d296bfc3593943c209474ea1e8b02",
+  "api_contract": "0.44.0",
+  "database_schema": 26,
+  "versions": {
+    "postgresql": "17.9",
+    "keycloak": "26.2.4",
+    "minio": "RELEASE.2025-09-07T16-13-09Z",
+    "java": "Temurin17.0.20+8",
+    "nginx": "1.31.3"
+  },
+  "containers": {
+    "mop-test-web": {
+      "running": true,
+      "started_at": "2026-10-05T04:20:06.573888993Z",
+      "exit_code": 0
+    },
+    "mop-test-api": {
+      "running": true,
+      "started_at": "2026-10-05T04:39:00.860464996Z",
+      "exit_code": 0
+    },
+    "mop-test-photo-worker": {
+      "running": true,
+      "started_at": "2026-10-05T04:14:07.670491107Z",
+      "exit_code": 0
+    },
+    "mop-test-import-worker": {
+      "running": true,
+      "started_at": "2026-10-05T04:17:14.166388571Z",
+      "exit_code": 0
+    },
+    "mop-test-contact-worker": {
+      "running": true,
+      "started_at": "2026-10-05T04:14:08.512389078Z",
+      "exit_code": 0
+    }
+  },
+  "shared_component_start_times_unchanged": {
+    "shared-postgres": true,
+    "hltk-keycloak": true,
+    "shared-minio": true
+  },
+  "active_nginx_configuration_sha256": "ce4d79cf252fcd5e5230467fc8690139e18015c452d3b107789e278dfe9828dc",
+  "artifact_sha256": {
+    "api.jar": "ca9bc529843371315fba6f032667b0a0e50391183f5aa31bda8bda7c42366a5c",
+    "photo-worker.jar": "891824381989bf50307199eb1432da04858a4af2b92b59c4b96c09641f38a5a6",
+    "import-worker.jar": "3d9d8767ba33a9e70308143df7fadfccf758df375be031b67e427b26321f5345",
+    "contact-worker.jar": "69e6149834c771dac3e4d2dbadc6e1599bccbded539a8d8fe5f6613c0a656bb0",
+    "server/import-parser/target/parser.jar": "d60bc2dcb94d412fa5287b3513b37a4a0e951ddce4fd87cea32b07e0954a40e7",
+    "export-worker.jar": "679e74d20d4f9d6be7f0f52f1b467f311baae34896448f99c6f82c792fd25388"
+  },
+  "loopback_api_port": 18010,
+  "public_port": 10010,
+  "ready": true,
+  "production_ready": false,
+  "http_route_checks": {
+    "/assets": 200,
+    "/assets/": 200,
+    "/assets/not-a-real-bundle.js": 404,
+    "/admin/": 404,
+    "/realms/master/.well-known/openid-configuration": 404
+  },
+  "credentials_output": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "local_component_tunnel_stopped": true,
+  "public_ready_without_local_tunnel": true,
+  "final_checked_at": "2026-10-05T04:49:13.415336+00:00"
+}

@@ -1,0 +1,339 @@
+{
+  "verified_at": "2026-10-05T04:23:26.216Z",
+  "environment": "designated-server-acceptance",
+  "mode": "pages",
+  "real_browser": true,
+  "physical_mobile": false,
+  "checks": [
+    {
+      "name": "page_1440/assets",
+      "title": "资产管理",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/dashboard",
+      "title": "运营总览",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/tickets",
+      "title": "报障与受理",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/manual-incidents",
+      "title": "手工来源登记",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/my-notification-preferences",
+      "title": "我的通知偏好请求",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/asset-export-jobs",
+      "title": "台账导出准备",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/backup-plan-drafts",
+      "title": "每日备份计划草稿",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/change-notice-drafts",
+      "title": "变更报备草稿",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/inspection-source-collections",
+      "title": "巡检来源集合草稿",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/inspection-templates",
+      "title": "巡检模板候选",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/inspection-worksheets",
+      "title": "人工巡检执行单",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/customer-contacts",
+      "title": "客户联系人",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/contact-imports",
+      "title": "联系人批量新建与作业",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/contact-import-preview",
+      "title": "联系人导入格式预览",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/configurations",
+      "title": "配置确认登记",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/threshold-diagnostics",
+      "title": "阈值候选诊断",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/sla-scenarios",
+      "title": "SLA 显式对照",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/operational-comparison",
+      "title": "经营样本与人力对照",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/capacity-estimates",
+      "title": "容量与缓冲估算",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/capability-catalog",
+      "title": "代码能力声明核对",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/tenant-inventory",
+      "title": "租户登记资源",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_1440/audit",
+      "title": "审计日志",
+      "width": 1440,
+      "content_width": 1440,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/assets",
+      "title": "资产管理",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/dashboard",
+      "title": "运营总览",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/tickets",
+      "title": "报障与受理",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/manual-incidents",
+      "title": "手工来源登记",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/my-notification-preferences",
+      "title": "我的通知偏好请求",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/asset-export-jobs",
+      "title": "台账导出准备",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/backup-plan-drafts",
+      "title": "每日备份计划草稿",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/change-notice-drafts",
+      "title": "变更报备草稿",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/inspection-source-collections",
+      "title": "巡检来源集合草稿",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/inspection-templates",
+      "title": "巡检模板候选",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/inspection-worksheets",
+      "title": "人工巡检执行单",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/customer-contacts",
+      "title": "客户联系人",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/contact-imports",
+      "title": "联系人批量新建与作业",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/contact-import-preview",
+      "title": "联系人导入格式预览",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/configurations",
+      "title": "配置确认登记",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/threshold-diagnostics",
+      "title": "阈值候选诊断",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/sla-scenarios",
+      "title": "SLA 显式对照",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/operational-comparison",
+      "title": "经营样本与人力对照",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/capacity-estimates",
+      "title": "容量与缓冲估算",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/capability-catalog",
+      "title": "代码能力声明核对",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/tenant-inventory",
+      "title": "租户登记资源",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "page_390/audit",
+      "title": "审计日志",
+      "width": 390,
+      "content_width": 390,
+      "heading_visible": true
+    },
+    {
+      "name": "msp_own_worklogs"
+    }
+  ],
+  "screenshots": [
+    "desktop-dashboard.png",
+    "desktop-my-notification-preferences.png",
+    "desktop-asset-export-jobs.png",
+    "desktop-backup-plan-drafts.png",
+    "desktop-inspection-source-collections.png",
+    "mobile-dashboard.png",
+    "mobile-my-notification-preferences.png",
+    "mobile-asset-export-jobs.png",
+    "mobile-backup-plan-drafts.png",
+    "mobile-inspection-source-collections.png",
+    "desktop-own-worklogs.png"
+  ],
+  "page_errors": 0,
+  "failed_api_gets": [],
+  "completed": true,
+  "formal_acceptance": "NOT_RUN",
+  "attempt": 1,
+  "browser_version": "154.0.4258.53"
+}

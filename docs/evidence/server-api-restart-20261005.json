@@ -1,0 +1,13 @@
+{
+  "verified_at": "2026-10-05T04:39:08.262557+00:00",
+  "environment": "designated-server-acceptance",
+  "only_project_api_restarted": true,
+  "other_seven_containers_start_times_unchanged": true,
+  "selected_persisted_rows": 7,
+  "selected_row_sha256_before_after_equal": true,
+  "ready_after_restart": true,
+  "old_session_status": 401,
+  "postgresql_restarted": false,
+  "database_restore_tested": false,
+  "formal_acceptance": "NOT_RUN"
+}

@@ -1,0 +1,14 @@
+{
+  "environment": "designated-server-acceptance",
+  "api_version": "0.44.0",
+  "http_requests": 37,
+  "checks": [
+    "remote photo Worker -> MinIO -> authorized original bytes/hash; original 202 replay",
+    "remote asset-source Worker -> MinIO -> real standalone CSV parser; business import stays gated",
+    "remote dedicated contact Worker creates one real row; archived with original 202 retained"
+  ],
+  "completed": true,
+  "formal_acceptance": "NOT_RUN",
+  "verified_at": "2026-10-05T04:32:57.052Z",
+  "pending_original_requests": 0
+}

@@ -1,0 +1,19 @@
+{
+  "verified_at": "2026-10-05T04:27:56.846Z",
+  "environment": "designated-server-acceptance",
+  "mode": "actions",
+  "real_browser": true,
+  "physical_mobile": false,
+  "checks": [],
+  "screenshots": [],
+  "page_errors": 0,
+  "failed_api_gets": [],
+  "completed": false,
+  "formal_acceptance": "NOT_RUN",
+  "attempt": 2,
+  "browser_version": "154.0.4258.53",
+  "failure": {
+    "stage": "asset_original_request_recovery",
+    "type": "Error"
+  }
+}

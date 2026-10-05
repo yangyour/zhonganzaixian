@@ -1,0 +1,20 @@
+{
+  "verified_at": "2026-10-05T04:36:01.984036+00:00",
+  "environment": "designated-server-acceptance",
+  "api_version": "0.44.0",
+  "trigger": "real browser form 202",
+  "remote_java_worker": true,
+  "row_count": 1,
+  "columns": 16,
+  "file_bytes": 4931,
+  "file_sha256": "88edf2e0c52972fd39a03de7741ec8380cc13dfe831b0e54f584f26dfe7ac87f",
+  "xlsx_zip_and_sheet_verified": true,
+  "stored_pg_bytes_equal_worker_hash": true,
+  "other_export_jobs_unchanged": true,
+  "published": false,
+  "object_store_requests": 0,
+  "download_grants": 0,
+  "notifications": 0,
+  "completed_preparation": true,
+  "formal_acceptance": "NOT_RUN"
+}

@@ -1,0 +1,23 @@
+{
+  "verified_at": "2026-10-05T04:34:13.222Z",
+  "environment": "designated-server-acceptance",
+  "mode": "export",
+  "real_browser": true,
+  "physical_mobile": false,
+  "checks": [
+    {
+      "name": "export_real_202_native_form",
+      "queued_receipt": true,
+      "premature_success": false
+    }
+  ],
+  "screenshots": [
+    "desktop-export-queued.png"
+  ],
+  "page_errors": 0,
+  "failed_api_gets": [],
+  "completed": true,
+  "formal_acceptance": "NOT_RUN",
+  "attempt": 1,
+  "browser_version": "154.0.4258.53"
+}

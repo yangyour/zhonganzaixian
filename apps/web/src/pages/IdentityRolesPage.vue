@@ -11,7 +11,7 @@ const controller = new AbortController(); onUnmounted(() => controller.abort())
 const form = reactive({ name: '', description: '', base_role: 'viewer' as BaseRole, enabled: true, permissions: [] as string[] })
 const editor = useIdentityEditor(load), command = editor.command, message = editor.message
 const available = computed(() => data.value?.permission_catalog.entries.filter(x => x.declared_by_role[form.base_role]) ?? [])
-async function load() { loading.value = true; error.value = null; try { data.value = readRolePage(await api.request('/identity/roles', { signal: controller.signal }), session.value!.tenant.id) } catch (e) { if (!isCancelled(e)) error.value = e } finally { loading.value = false } }
+async function load() { loading.value = true; error.value = null; try { data.value = readRolePage(await api.request('/identity/roles', { signal: controller.signal }), session.value!.tenant.id) ; return true } catch (e) { if (!isCancelled(e)) error.value = e; return false } finally { loading.value = false } }
 onMounted(load)
 async function edit(role?: ProjectRole, copy = false) {
   if (editor.busy() || !await editor.leave()) return
@@ -25,7 +25,7 @@ async function save() { const role = selected.value; if (await editor.save(role 
 <template>
   <section class="identity-page" v-loading="loading">
     <div class="page-heading"><div><h1>角色与权限</h1><p>按租户分配角色；角色权限变更会在后续请求中立即核验。</p></div><el-button v-if="can('roles:write')" type="primary" :disabled="editor.busy()" @click="edit()">新建角色</el-button></div>
-    <ApiErrorNotice :error="error"><el-button @click="load">重新读取</el-button></ApiErrorNotice><IdentityCommandNotice :command="command" :message="message" @retry="editor.retry" />
+    <ApiErrorNotice :error="error"><el-button @click="load">重新读取</el-button></ApiErrorNotice><IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />
     <div class="identity-cards"><article v-for="role in data?.items" :key="role.id" class="identity-card"><h2>{{ role.name }}</h2><p>{{ role.description || '未填写说明' }}</p><p>{{ baseRoleLabels[role.base_role] }} · {{ role.permissions.length }} 项权限 · {{ role.assigned_members }} 位成员</p><el-tag :type="role.enabled ? 'success' : 'info'">{{ role.enabled ? '启用' : '停用' }}</el-tag> <el-tag v-if="role.builtin" type="info">内置角色</el-tag><div class="identity-actions"><el-button @click="edit(role)">{{ can('roles:write') && !role.builtin ? '查看 / 编辑' : '查看权限' }}</el-button><el-button v-if="can('roles:write')" @click="edit(role, true)">复制为新角色</el-button></div></article></div>
     <form v-if="opened" class="identity-card identity-form" @submit.prevent="save" @input="editor.dirty.value = true" @change="editor.dirty.value = true">
       <h2>{{ selected ? selected.name : '新建自定义角色' }}</h2><p v-if="selected?.builtin">内置角色保留基线，可复制后修改权限。</p>

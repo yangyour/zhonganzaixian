@@ -16,10 +16,11 @@ const editor = useIdentityEditor(load), command = editor.command, message = edit
 async function load() { const turn = ++readGeneration; loading.value = true; error.value = null; try {
   const tenant = session.value!.tenant.id
   const value = readUserPage(await api.request(`/identity/users?query=${encodeURIComponent(query.value)}&include_inactive=${includeInactive.value}&page=${page.value}`, { signal: controller.signal }), tenant)
-  if (turn !== readGeneration) return; users.value = value
-  if (can('roles:read')) { const freshRoles = readRolePage(await api.request('/identity/roles', { signal: controller.signal }), tenant); if (turn !== readGeneration) return; roles.value = freshRoles }
-  if (selected.value) { const fresh = await api.request<ProjectUser>(`/identity/users/${selected.value.id}`, { signal: controller.signal }); if (turn !== readGeneration) return; selected.value = fresh; await detail(fresh, turn) }
-} catch (e) { if (turn === readGeneration && !isCancelled(e)) error.value = e } finally { if (turn === readGeneration) loading.value = false } }
+  if (turn !== readGeneration) return false; users.value = value
+  if (can('roles:read')) { const freshRoles = readRolePage(await api.request('/identity/roles', { signal: controller.signal }), tenant); if (turn !== readGeneration) return false; roles.value = freshRoles }
+  if (selected.value) { const fresh = await api.request<ProjectUser>(`/identity/users/${selected.value.id}`, { signal: controller.signal }); if (turn !== readGeneration) return false; selected.value = fresh; await detail(fresh, turn) }
+  return turn === readGeneration
+} catch (e) { if (turn === readGeneration && !isCancelled(e)) error.value = e; return false } finally { if (turn === readGeneration) loading.value = false } }
 onMounted(load)
 async function detail(user: ProjectUser, turn: number) {
   const [members, ids] = await Promise.all([api.request<{items: IdentityMembership[]}>(`/identity/users/${user.id}/memberships`, { signal: controller.signal }), api.request<{items: IdentityBinding[]}>(`/identity/users/${user.id}/external-identities`, { signal: controller.signal })])
@@ -43,7 +44,7 @@ async function move(delta: number) { if (editor.busy() || !await editor.leave())
 </script>
 <template><section class="identity-page" v-loading="loading">
   <div class="page-heading"><div><h1>用户与成员授权</h1><p>管理当前租户的账号、成员角色及统一身份绑定。</p></div><el-button v-if="can('users:write') && can('roles:read')" type="primary" :disabled="editor.busy()" @click="edit()">新建用户</el-button></div>
-  <ApiErrorNotice :error="error"><el-button @click="load">重新读取</el-button></ApiErrorNotice><IdentityCommandNotice :command="command" :message="message" @retry="editor.retry" />
+  <ApiErrorNotice :error="error"><el-button @click="load">重新读取</el-button></ApiErrorNotice><IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />
   <form class="identity-form identity-toolbar" @submit.prevent="search"><label>搜索账号或姓名<input v-model="query" maxlength="100" /></label><label class="check"><input v-model="includeInactive" type="checkbox" />包含停用记录</label><el-button native-type="submit" :disabled="editor.busy()">查询</el-button></form>
   <div class="identity-cards"><article v-for="user in users?.items" :key="user.id" class="identity-card"><h2>{{ user.display_name }}</h2><p>{{ user.username || '未开通本地账号' }}</p><p>{{ user.role_name }} · {{ baseRoleLabels[user.base_role] }}</p><el-tag :type="user.active && user.member_active ? 'success' : 'info'">{{ !user.active ? '账号停用' : !user.member_active ? '成员停用' : '正常' }}</el-tag><div class="identity-actions"><el-button :disabled="editor.busy()" @click="edit(user)">管理账号</el-button></div></article></div>
   <p v-if="users && !users.items.length">没有匹配的用户。</p><div class="identity-actions"><el-button :disabled="page <= 1 || editor.busy()" @click="move(-1)">上一页</el-button><span>第 {{ page }} 页</span><el-button :disabled="!users?.has_more || editor.busy()" @click="move(1)">下一页</el-button></div>

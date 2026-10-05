@@ -1,0 +1,28 @@
+{
+  "verified_at": "2026-10-05T09:56:49Z",
+  "base_commit": "796cd27c6bebb02d4717cd452be21dcd564ec159",
+  "new_tests": 9,
+  "before_subset_tests": 4,
+  "before_subset_failures": 2,
+  "focused_tests_including_existing_selection": 15,
+  "focused_failures": 0,
+  "web_passed": 1764,
+  "web_files": 108,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts_passed": 127,
+  "interrupted_run": "identity-readback-web-20261005.log incomplete after execution session cancellation; not counted as passed",
+  "api_version": "0.45.0",
+  "api_changed": false,
+  "sql_changed": false,
+  "actual_http_checks": 0,
+  "actual_accounts_created": 0,
+  "formal_acceptance": "NOT_RUN",
+  "logs_sha256": {
+    "identity-readback-before-20261005.log": "9d18f1aa5e735a318eddbbe725f6ed5a054068b29e6f2db3fdc21cd26589a9c6",
+    "identity-readback-focused-20261005.log": "e752cc47630ad083efa5511ae43c83000f836b353de0955ad25ab2a4309a5f31",
+    "identity-readback-verified-web-20261005.log": "4e35320e964caa8340e1e70915c8a57cfe6f363c023c99cac7008004564748fc",
+    "identity-readback-verified-build-20261005.log": "72f809b4c5c48cfc3f0b3b68e716fe94e20d3d314326288e511671c2a245777b",
+    "identity-readback-contracts-20261005.log": "add65876fb4052baed43bfeea2f640351257480c4776fae42f9d8889836c450b"
+  }
+}

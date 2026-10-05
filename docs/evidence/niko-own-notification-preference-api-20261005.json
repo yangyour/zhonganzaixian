@@ -1,0 +1,102 @@
+{
+  "verified_at": "2026-10-05T00:07:49.576402+00:00",
+  "scope": "OWN_NOTIFICATION_PREFERENCE_API_0_43",
+  "environment": "niko-local-test",
+  "previous_commit": {
+    "sha": "2fa0078cefc380a08a905486470e2ca2b20b39a5",
+    "ci_run": 37245301485,
+    "conclusion": "success"
+  },
+  "controller_tests": 22,
+  "new_readiness_test": 1,
+  "new_capability_catalog_test": 1,
+  "focused_tests": 77,
+  "root_tests_reported": 2213,
+  "root_tests_executed": 2200,
+  "real_postgresql_tests": 754,
+  "historical_fixture_skipped": 13,
+  "excluded_minio_tests": 6,
+  "failures": 0,
+  "errors": 0,
+  "contracts": 120,
+  "web_tests": 1503,
+  "web_test_files": 88,
+  "web_typecheck_build": "PASS",
+  "python_tests": 146,
+  "existing_paths_unchanged": 102,
+  "new_paths": 3,
+  "total_paths": 105,
+  "total_schemas": 233,
+  "existing_schemas_changed": [
+    "ReadinessResult"
+  ],
+  "real_http": {
+    "requests": 69,
+    "write_dispatches": 29,
+    "statuses": {
+      "200": 35,
+      "400": 17,
+      "401": 1,
+      "403": 1,
+      "404": 11,
+      "409": 3,
+      "413": 1
+    },
+    "completed": true,
+    "browser": false
+  },
+  "new_owned_slots": {
+    "heads": 2,
+    "revisions": 6,
+    "head_versions": [
+      2,
+      4
+    ],
+    "successful_audits": 6,
+    "distinct_original_receipts": 6,
+    "current_requested_fields_restored_null": true,
+    "all_revisions_not_effective_or_dispatched": true,
+    "verified_at": "2026-10-05T00:06:21.131758+00:00"
+  },
+  "graceful_deployment": {
+    "owned_stack_exit": 0,
+    "legacy_tables": 58,
+    "full_rows_equal": true,
+    "verified_at": "2026-10-05T00:04:43.589733+00:00",
+    "comparison_before_new_oidc_logins": true,
+    "real_oidc_sessions_refreshed": 6,
+    "new_credentials": false
+  },
+  "live_api_contract_version": "0.43.0",
+  "live_api_artifact_sha256": "1f956f76abeab887602fbb53de7aba3a08c2d8e62a956cdba67e098ad7694444",
+  "migration_check_executed": 0,
+  "frozen_migrations_through": 26,
+  "notification_dispatched": false,
+  "receiver_binding_created": false,
+  "effective": false,
+  "object_store_requests": 0,
+  "actual_role_revocation": false,
+  "formal_acceptance": "NOT_RUN",
+  "failure_history": [],
+  "source_sha256": {
+    "server/api/src/main/java/cn/mop/api/OwnNotificationPreferenceController.java": "2a8e1f4133b67bb31b0db6070436b2664c734a163372d6dcfbde94915de9be75",
+    "server/api/src/main/java/cn/mop/api/OwnNotificationPreferenceConfiguration.java": "b5d27061b98657c2685fdabe75911754bd1480fd2a9666162bb2bcf7b79ee303",
+    "server/api/src/test/java/cn/mop/api/OwnNotificationPreferenceControllerTest.java": "b2b28e0bcb37cfbdf5c48148ef670d8369ea2a53e8282068f68061d2fd6ffe22",
+    "tests/niko-own-notification-preference-http.mjs": "be3676d0d3ddf6578c285e68f8f3e5421630994728d0363645b481ab8855d019",
+    "contracts/local-api.openapi.json": "9bce26a69f6cf2089a949d3ec57f8e80147026b3f06f710dcdff314778b1692c"
+  },
+  "logs_sha256": {
+    "own-notification-preference-api-contract-generation-20261005.log": "ed6834612466f04de9032af58182fc9208b4412827c2e9863ca953b5b419bd0f",
+    "own-notification-preference-api-contracts-initial-20261004.log": "f3be0453d0c1eab9f9b2accee8ff871736806b8947c7a4ac5c1a344d4afb0e66",
+    "own-notification-preference-api-focused-20261004.log": "31296afa43ca3a2e87f7067d7906c8bd67bb4bb6e0e52f63dc2011df338732aa",
+    "own-notification-preference-api-full-20261005.log": "3fa317faa7e2612f32d357e080d94915b395a156e1dfc27febed84fef60c9079",
+    "own-notification-preference-api-http-20261005.log": "3f9d931f9f000bee1f8a072b3c5e288e2e927ce4de41cbc82c90fca0bd46bbd8",
+    "own-notification-preference-api-python-20261005.log": "7169e72109f822f44431f659f48ebb9d537c99af3281003ed499ea8f63588a7b",
+    "own-notification-preference-api-web-20261005.log": "32f505fe919732eb2b1642f14b7838eea084ed820dc79512952deb12c99f17bc",
+    "own-notification-preference-api-web-build-20261005.log": "6e7dc6a398134dd070daf0a825fb3491206295365a406aee819672b46dde5359",
+    "own-preference-api-after-restart-20261005.log": "6d8a52e5823b3d54fad2892a29d0cbbca0c01da2f5883868b83a8b91dd746332",
+    "own-preference-api-before-restart-20261005.log": "a2cc8605c0f36aa8429ec465f8fd0becde6a52dda4aa00bccaae78728f942273",
+    "own-preference-api-poststate-20261005.log": "da6131b9b4ba3a315f324f77ea15f7cc85b30ab8f4d9a922db78b6e15116d4ec",
+    "own-preference-api-schema-check-20261005.log": "efbce0c42706f7d521cb84238f23a9a172411b7abfaa39b885b373e04b1ff469"
+  }
+}

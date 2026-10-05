@@ -47,3 +47,17 @@ V26之后新增OwnNotificationPreferenceRepository与Postgres实现。所有四�
 真实集成测试使用现有QA身份和唯一固定创建回执；重跑沿用本人槽位和原v1收据，不删除历史/新建身份来重置。测试修改后以新合法修订恢复运行前请求。额外新槽位创建用另一个现有未占用成员，并在模拟调用者失败后完整回滚；全部六通道和明确关闭静音有真实往返证据。不同键相同版本并发只有一方成功，同键并发只增加一修订/审计。此批尚未新增HTTP/CSRF路由或页面，实际接收人、通知矩阵批准和发送仍待。
 
 本仓储批26新增真实PG测试通过，67聚焦（26仓储+22结构+19核心）；根2189报告/2176执行，含754真实PG、13历史fixture跳过、6MinIO排除。116契约/生成一致性、146Python通过。首次Python误用了缺paramiko的系统解释器，保留143发现/2导入错误日志；换回现有私有venv后原测试通过，没有另装依赖或修改测试规避。上批c8ff4fb结构CI37244543726四job成功，原生pwsh121策略检查/0DB已核验。API0.42/V26不变，本批不重启、不迁移，CSRF/真实HTTP/页面留待下一批；见[仓储证据](evidence/niko-own-notification-preference-repository-20261004.json)。
+
+## API0.43 本人请求与原收据
+
+`GET /api/v1/my/notification-preferences`返回当前本人可空草稿：exists=false/current=null不自动创建默认值。`POST`只接受完整五字段expected_version=0、intent=SAVE_REQUEST_DRAFT_ONLY及三个可空请求字段；渠道最多六个唯一代码，静音对象必须完整enabled/start/end。`GET/PATCH /{id}`读取/按明确版本追加请求，`GET /{id}/history`按版本倒序10/15/20条有界分页。身份/tenant来自会话，不接受接收人、实际规则、批准、生效、渠道密钥或派发覆盖；没有发送、归档或删除路由。
+
+所有现有四类技术角色具有read_own/write_own声明，能力目录归入告警与工单；这不批准Q09正式矩阵，也不授予平台管理员读取或修改他人偏好。PG再次校验当前活动成员/PV，本人授权回调先于原回执；CSRF沿用真实Spring保护。8192原始字节/64JSON token/深度3、重复键/尾随JSON拒绝；查询原编码2048字节/单值64字，无未知/重复参数。请求hash规范对象键顺序，保留数组原顺序/null/版本；内容hash按既有规范编码，两者含义不同。
+
+当前、历史和保存结果再次核验范围、本人、版本、记录时间和动作；null或错误结果不当成功。就绪检查增加V26真实结构/ACL，只输出CONFIG_PENDING、effective=false、接收人NOT_VERIFIED和未派发。契约共105路径/233 schema，102旧路径逐一不变，既有schema仅扩展ReadinessResult。
+
+22控制器+1就绪+1能力目录新测试；77聚焦、根2213报告/2200执行（754真实PG）、13历史fixture跳过、6MinIO排除通过；120契约、1503Web/88文件/类型构建、146Python通过。固定包SHA256=1f956f76abeab887602fbb53de7aba3a08c2d8e62a956cdba67e098ad7694444，正常停止旧拥有栈并启动新栈，58张旧表完整行等值先于6次新OIDC登录；只读CLI0迁移，V1–V26冻结。
+
+69真实HTTP（35×200、17×400、1×401、1×403、11×404、3×409、1×413），29写派发含原键重放/拒绝；只产生2本人槽位、6修订、6成功审计、6独立原收据，最终版本4/2，当前请求均通过新修订恢复null。实际客户viewer与tadmin保存、平台管理员/其他本人/跨租户404、缺CSRF403、重复创建409、CAS409、原创建和更新回执在新版本后保持原样；既有viewerB长历史实际分页，独立Node规范hash与PG/Java一致，只读窗口审计序号不变。控制文件已完成不得重跑删除或制造新身份；真实角色撤销/浏览器/手机/派发未验，不解除门禁。
+
+见[API与部署证据](evidence/niko-own-notification-preference-api-20261005.json)及[真实HTTP](evidence/niko-own-notification-preference-http-20261005.json)。下一步生产前端原请求恢复模块与页面；完整M8-10和128项验收仍NOT_RUN。

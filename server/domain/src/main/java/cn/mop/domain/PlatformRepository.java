@@ -14,6 +14,7 @@ public interface PlatformRepository extends AssetRepository {
     default List<String> photoDependencyProblems(){return List.of("PHOTO_REPOSITORY_UNAVAILABLE");}
     default List<String> assetReadProblems(){return List.of("ASSET_UNICODE_SEARCH_UNAVAILABLE");}
     default List<String> backupPlanDraftProblems(){return List.of("BACKUP_PLAN_DRAFT_STRUCTURE_UNAVAILABLE");}
+    default List<String> ownNotificationPreferenceProblems(){return List.of("NOTIFICATION_PREFERENCE_DRAFT_STRUCTURE_UNAVAILABLE");}
     default List<String> assetExportProblems(){return List.of("ASSET_EXPORT_STRUCTURE_OR_GUARDS_UNAVAILABLE");}
     default List<String> changeNoticeDraftProblems(){return List.of("CHANGE_NOTICE_DRAFT_STRUCTURE_UNAVAILABLE");}
     default List<String> inspectionSourceCollectionProblems(){return List.of("INSPECTION_SOURCE_COLLECTION_STRUCTURE_UNAVAILABLE");}

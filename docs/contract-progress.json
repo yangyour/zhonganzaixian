@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 42,
-  "rows_without_progress_notes": 86,
+  "rows_with_progress_notes": 44,
+  "rows_without_progress_notes": 84,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -37,7 +37,7 @@
     },
     "M4": {
       "requirements": 19,
-      "rows_with_progress_notes": 2,
+      "rows_with_progress_notes": 4,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 19
       }
@@ -489,8 +489,11 @@
       "id": "M4-2",
       "title": "资源监控（按设备类型）",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/niko-metric-series-core-20261005.json",
+        "docs/metric-series-projection.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -498,8 +501,11 @@
       "id": "M4-3",
       "title": "流量监控",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/niko-metric-series-core-20261005.json",
+        "docs/metric-series-projection.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1384,6 +1390,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "0245c863e74daa0ebceeac3b3bbd2b61f4bff0c6381eaab57a8821d9fe749b3c"
+    "doc/development/07_合同逐项开发追踪.md": "aff263e6c97e2a36816e1397008a61d7ac20dddccd3f4a5a531f222ae668db13"
   }
 }

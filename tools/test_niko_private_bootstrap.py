@@ -96,7 +96,13 @@ class MigrationManifestParityTest(unittest.TestCase):
    text=(ROOT/entrypoint).read_text();names=re.findall(r"frozen-[a-z-]+\.json",text);self.assertEqual(len(names),len(set(names)));expected={}
    for name in names:
     values=json.loads((ROOT/'tools/niko-test'/name).read_text())['sha256'];self.assertTrue(set(values).isdisjoint(expected));expected.update(values)
-   self.assertEqual(actual,expected);self.assertEqual(set(range(1,27)),{int(name.split('__')[0][1:]) for name in expected})
+   self.assertEqual(actual,expected);self.assertEqual(set(range(1,28)),{int(name.split('__')[0][1:]) for name in expected})
+ def test_v27_is_frozen_and_both_entrypoints_require_explicit_identity_migration(self):
+  manifest=json.loads((ROOT/'tools/niko-test/frozen-project-identity-migration.json').read_text());name='V27__project_identity_and_roles.sql'
+  self.assertEqual({name:'41e5060d4925e7c8ea761539e4695a6ea5792743240363a7d5f50f24bcb59566'},manifest['sha256'])
+  self.assertEqual(8,len(manifest['function_body_sha256']))
+  for path in ['deploy/migration-policy.ps1','tools/niko-test/run-migration.py']:self.assertIn('--apply-project-identity',(ROOT/path).read_text())
+  windows=(ROOT/'deploy/migrate-test-schema.ps1').read_text();self.assertIn('ProjectIdentitySchemaVerifier.class',windows);self.assertIn('$projectIdentityVerifierSource',windows)
  def test_v20_remains_frozen_and_both_launchers_require_explicit_feature(self):
   manifest=json.loads((ROOT/'tools/niko-test/frozen-asset-export-migration.json').read_text());self.assertEqual({'V20__durable_asset_export_jobs.sql':'5f8114dcdd2bd1cdf0c60fb75a5b521175462f583786602cd2b4a1835f960a83'},manifest['sha256']);self.assertEqual(3,len(manifest['function_body_sha256']))
   for path in ['deploy/migration-policy.ps1','tools/niko-test/run-migration.py']:self.assertIn('--apply-asset-exports',(ROOT/path).read_text())

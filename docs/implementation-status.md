@@ -1,5 +1,9 @@
 # MOP 实施状态
 
+## V27入口冻结清单与CI修复（2026-10-05 06:26 UTC）
+
+合入7456d2f的V27实际执行证据后，CI37271633902在Python冻结版本断言失败：范围仍止于V26，niko入口亦未登记V27清单/显式参数。保持原SQL字节不变，补两入口一致性、niko显式project-identity参数与Windows身份核验器新鲜度检查；164纯Python通过，无数据库/真实凭据/迁移执行，本机无pwsh，实际PowerShell运行待CI。另静态比对发现新tenants:read_inventory不在V27的80对上限种子中，已独立[登记阻塞](identity-capability-drift.md)，不因CI修复便宣称授权结构已协调。
+
 ## 当前成员有效能力接线（2026-10-05 06:01 UTC）
 
 口令编码ac90f01/CI37269186554已成功。修复API按基础类别重新扩张能力：40控制器58种门禁分别测空集合拒绝/完整历史集合保留共116项，加4入口及7会话新增，共127新Java；根2486报告/1705执行/781跳过通过。配置修订读写分开，租户登记新增padmin范围tenants:read_inventory，页面缺能力/撤销清屏2新测试；1703Web/100文件及类型构建通过，127契约与生成一致性通过。数据库有效授权加载及Worker/各目标事务复核仍未切换，无PG/HTTP/新账号或新部署；50行切片备注、128正式NOT_RUN，见[接线边界](effective-membership-capabilities.md)。

@@ -1,0 +1,90 @@
+{
+  "verified_at": "2026-10-05T00:36:45.772615+00:00",
+  "scope": "OWN_NOTIFICATION_PREFERENCE_PAGE_AND_NATIVE_COMPONENT_HTTP",
+  "previous_commit": {
+    "sha": "5c75ad5e442fbaf3e413d71fe2e6b114f5077aeb",
+    "ci_run": 37247374122,
+    "conclusion": "success"
+  },
+  "new_native_sfc_tests": 24,
+  "web_tests": 1562,
+  "web_test_files": 91,
+  "web_typecheck_build": "PASS",
+  "contracts": 120,
+  "contract_generation": "PASS",
+  "actual_native_component_http": 13,
+  "http_statuses": {
+    "200": 13
+  },
+  "write_dispatches": 3,
+  "same_original_key_dispatches": 2,
+  "new_owner_slots": 0,
+  "new_revisions": 2,
+  "new_successful_audits": 2,
+  "new_original_receipts": 2,
+  "baseline_version": 6,
+  "final_version": 8,
+  "poststate": {
+    "heads": 1,
+    "revisions": 8,
+    "head_versions": [
+      8
+    ],
+    "successful_audits": 8,
+    "distinct_original_receipts": 8,
+    "current_requested_fields_restored_null": true,
+    "all_revisions_not_effective_or_dispatched": true,
+    "verified_at": "2026-10-05T00:35:29.866449+00:00"
+  },
+  "requested_fields_restored_to_original": true,
+  "scope_roles": "all four current technical roles; current tenant owner only",
+  "read_first_no_default_write": true,
+  "explicit_ack_reset_on_each_edit": true,
+  "known_stale_baseline_rejected_before_dispatch": true,
+  "unknown_request_blocks_new_intent_route_and_voluntary_context_switch": true,
+  "current_read_does_not_confirm_original_write": true,
+  "native_rapid_channel_changes_preserved": true,
+  "read_only_audit_sequence_unchanged": true,
+  "confirmation_response_explicitly_stubbed": true,
+  "controlled_response_loss_after_actual_200": true,
+  "real_browser": false,
+  "css_visual_verified": false,
+  "phone_or_wechat_verified": false,
+  "notification_dispatched": false,
+  "receiver_binding_created": false,
+  "new_credentials": false,
+  "new_migrations": 0,
+  "backend_restart": false,
+  "live_api_contract_version": "0.43.0",
+  "formal_acceptance": "NOT_RUN",
+  "failure_history": [
+    {
+      "stage": "first focused SFC test run",
+      "passed": 23,
+      "failed": 1,
+      "cause": "test expected remote 409 after a refresh, but the production request module already rejected its known stale baseline locally",
+      "resolution": "retained local rejection, added clear no-dispatch UI guidance and corrected assertion to verify no write request; all 24 then passed",
+      "original_log_retained": true
+    }
+  ],
+  "source_sha256": {
+    "apps/web/src/pages/OwnNotificationPreferencesPage.vue": "de3790340ceb09daad9bb8774b27c3e12cc0a2ca42cfe866479049ee25022bfd",
+    "apps/web/src/components/OwnPreferenceFacts.vue": "60a842f3c2351107fc15df4e65127735def7cafd88d27d9090ef5ff3d6e11163",
+    "apps/web/src/router.ts": "d8d887acd2f8ab9c25660a95671b34922a99e788aa1fc39669ac6c8f31d08219",
+    "apps/web/src/App.vue": "40581f5d6ed0eb3c9d1f0801e46539248e2b2d58ab3a6ef7217ca0927bd9a9fe",
+    "apps/web/tests/ownNotificationPreferencesPage.test.ts": "7d0b8dc44a94623bcc107b195271b3b851b465288d988ed934b77c6957d84cff",
+    "apps/web/qa/own-preference-page.http.ts": "2c9cbeab4c1c4d82f85146d29346624695b3615ddf68e15407e1521ecac2e659",
+    "apps/web/vitest.niko-own-preference-page.config.ts": "ceede94e3bb741b2b6c5889a16303aee0efeb053ecb22db25b23d325cd63a376"
+  },
+  "logs_sha256": {
+    "own-preference-page-build-20261005.log": "1b7e869c1cbc7f32aef2a023ef9737ce41cf28c7dc29047281bee7aecfd681a3",
+    "own-preference-page-contract-generation-20261005.log": "bfce1280710ad8a8894801d1e284c4fe852b6219f312a835a88e75f84af337db",
+    "own-preference-page-contracts-20261005.log": "bfe461aa2b93a26ee6f8dff0c32cc5cae2e76b0908e3e3c634195e2c4053767c",
+    "own-preference-page-focused-20261005.log": "211db93a9f3db821ad7f7b87ce6376edf077ec22d5049a51aaebab866dc61a20",
+    "own-preference-page-focused-r2-20261005.log": "5e410c6798944d958f19f640e460c44fc7f3bd528df56d2e34abb33c29c09121",
+    "own-preference-page-http-20261005.log": "5d919e07a92f5540bc9126fc5340af73693cc292fcf2461acbae4112a1b85951",
+    "own-preference-page-poststate-20261005.log": "355b26ce132c9610db25fd455b81d52a55e5195b2635c35c22a1abc2df48fcd8",
+    "own-preference-page-type-initial-20261005.log": "3006dc4c146435f09e883c135f6a617249870e6ebbaec1abb024b8469cdb8873",
+    "own-preference-page-web-20261005.log": "c4dc5588979946753d1474f0b2b657bc544c60ad41ea895170165f0078e55114"
+  }
+}

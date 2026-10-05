@@ -1,0 +1,30 @@
+{
+  "verified_at": "2026-10-05T01:55:45.480576+00:00",
+  "source_commit": "6c1304764ecaae859b7f16822b65bd4eb525e3ef",
+  "source_tree": "244ae3c31f2144b3f03de68aaac7019fdf90a094",
+  "workflow_run_id": 37253121743,
+  "artifact_id": 11321441658,
+  "artifact_expired_at_download": false,
+  "artifact_expires_at": "2026-10-06T01:52:36Z",
+  "outer_zip_sha256": "624afa0a5c66a2bb2acfba8fa69af606212778bb9720ed3c34fc6c76516fa1f6",
+  "source_zip_sha256": "d3cbc10691a8bae0def8743ff36090ccbe7394e188d9f71a4b20bfde0e59d748",
+  "files": 1706,
+  "total_source_bytes": 17588446,
+  "source_zip_bytes": 7265964,
+  "commit_bytes_equal": true,
+  "all_blob_lengths_hashes_modes_equal": true,
+  "all_worktree_file_bytes_equal": true,
+  "private_runtime_included": false,
+  "git_history_included": false,
+  "components_restored": false,
+  "cloud_validation": {
+    "run_id": 37253121765,
+    "head_sha": "6c1304764ecaae859b7f16822b65bd4eb525e3ef",
+    "conclusion": "success"
+  },
+  "source_export_workflow_conclusion": "success",
+  "scope": "PRIVATE_CI_ARCHIVE_DOWNLOADED_AND_EXACT_BYTES_VERIFIED",
+  "formal_acceptance": "NOT_RUN",
+  "component_rebuild_approval": "PENDING",
+  "artifact_contains_followup_evidence_commit": false
+}

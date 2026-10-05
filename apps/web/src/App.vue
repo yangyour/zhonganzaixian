@@ -39,6 +39,7 @@ async function endSession() {
       <a class="brand" href="/assets" @click.prevent="router.push('/assets')"><span class="brand-mark">M</span><span><strong>MOP 运维托管</strong><small>网络设备管理平台</small></span></a>
       <div class="nav-heading">资源</div>
       <el-menu :default-active="String(route.name)" class="side-menu" @select="router.push({ name: $event })">
+        <el-menu-item v-if="can('dashboard:read')" index="dashboard">运营总览</el-menu-item>
         <el-menu-item index="assets"><span class="nav-symbol">▤</span>资产管理</el-menu-item>
         <el-menu-item v-if="can('manual_incidents:read')" index="manual-incidents"><span class="nav-symbol">◇</span>手工来源登记</el-menu-item>
         <el-menu-item v-if="can('sla_scenarios:read')" index="sla-scenarios">SLA 显式对照</el-menu-item>
@@ -92,6 +93,7 @@ async function endSession() {
     </div>
     <el-drawer v-model="navigationOpen" title="MOP 导航" direction="ltr" size="260px">
       <el-menu :default-active="String(route.name)" @select="router.push({ name: $event })">
+        <el-menu-item v-if="can('dashboard:read')" index="dashboard">运营总览</el-menu-item>
         <el-menu-item index="assets">资产管理</el-menu-item>
         <el-menu-item v-if="can('manual_incidents:read')" index="manual-incidents">手工来源登记</el-menu-item>
         <el-menu-item v-if="can('sla_scenarios:read')" index="sla-scenarios">SLA 显式对照</el-menu-item>

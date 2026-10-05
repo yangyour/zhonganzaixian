@@ -145,6 +145,6 @@ Playwright1.62.1官方Chrome Headless Shell151下载返回HTTP200却为195bytes�
 2026-10-04备份计划草稿前端和原请求恢复已实现：模块26真实HTTP、页面24单测/18真实组件HTTP、1327Web通过。这里的组件是native jsdom，不是浏览器/CSS/手机/企微，B03仍待；不再把页面代码列为缺失。正式调度/设备SSH授权/OSS/KMS及自动默认模板纳入继续受相应门禁约束，草稿始终未生效。见docs/backup-plan-drafts.md。
 
 
-## B10 2026-10-05 再次执行环境切换
+## B11 2026-10-05 再次执行环境切换
 
 00:52 UTC原源码/工具链及QA49179无法恢复，错误为executor key changed。最后已发布d24fecd及CI37248295961安全；现已逐blob/tree/commit恢复1677源码文件，官方工具链和离线检查恢复。旧PG/KC数据、私有配置、会话/控制文件未恢复；新组件尚未启动，新账号/随机凭据重建等待本次明确许可，新实例真实PG/OIDC/HTTP保持NOT_RUN。源码恢复不等于旧临时数据库恢复，旧HTTP证据不得盲目重跑。继续不依赖组件的代码/纯测试/契约，V1–V26冻结、原服务器/OSS与浏览器边界不变。详见[恢复说明](executor-recovery-20261005.md)和[证据](evidence/niko-executor-recovery-20261005.json)。

@@ -1,0 +1,43 @@
+{
+  "verified_at": "2026-10-05T01:39:47.717254+00:00",
+  "scope": "FIXED_DASHBOARD_NATIVE_VUE_PAGE_WITH_ISOLATED_HTTP_RESPONSES",
+  "previous_commit": "c883198b6b9ecfc17ad8ca0519a65c4fdd086422",
+  "previous_ci_run": 37252075550,
+  "previous_ci_conclusion": "success",
+  "new_native_component_tests": 18,
+  "web_tests": 1608,
+  "web_files": 94,
+  "typecheck_build": "PASS",
+  "contracts": 125,
+  "fixed_kpi_order": true,
+  "fixed_panel_order": true,
+  "layout_customization": false,
+  "only_get": true,
+  "refresh_seconds": 30,
+  "hidden_tab_polling_paused": true,
+  "user_pause_supported": true,
+  "late_preset_scope_response_protected": true,
+  "unmount_stops_polling": true,
+  "unknown_metrics_not_zero": true,
+  "scope_change_clears_prior_data": true,
+  "original_root_and_login_redirects_retained": true,
+  "actual_http": "NOT_RUN",
+  "actual_pg": "NOT_RUN_CURRENT_EXECUTOR",
+  "real_browser": false,
+  "css_visual_verified": false,
+  "physical_mobile_or_wechat_verified": false,
+  "formal_acceptance": "NOT_RUN",
+  "new_credentials": false,
+  "source_sha256": {
+    "apps/web/src/pages/DashboardPage.vue": "78be099cb635382243e5fd246ac017bb1b290a30037eeae43a4af99e6cf3d1a3",
+    "apps/web/src/router.ts": "9a3c7b2f5da7578bbcd3b9645232cbf31fca5a24d4bfe40f621f08fb4a958275",
+    "apps/web/src/App.vue": "e255cc052cccab3a84d375514d5c28bf58a3aaf8ece914b9885394d91e5fd198",
+    "apps/web/tests/dashboardPage.test.ts": "c50720f20a7e54d24f0694ba45740d92139de7711a7a44157a902bd0865a46d7"
+  },
+  "log_sha256": {
+    "dashboard-page-focused-20261005.log": "bf5a51de75f931c75a343b68800316765d6640a64aa9a8c9237d6bf18a587af7",
+    "dashboard-page-web-20261005.log": "6ef262564481784b3a99a46d743a532aded0509b263ddb018e52c6d800f15ab2",
+    "dashboard-page-build-20261005.log": "61888492261476fbc46f9c8145e011f1df53c146ea91338a440c82faaf124cb8",
+    "dashboard-page-contracts-20261005.log": "1c35326d4dcc7cffbfefa5125c8d94e5b7765f89a7c3867e13016a02f29d03e1"
+  }
+}

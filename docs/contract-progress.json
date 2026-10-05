@@ -94,7 +94,8 @@
       "local_references": [
         "docs/dashboard-fixed-overview.md",
         "docs/evidence/niko-dashboard-api-20261005.json",
-        "docs/evidence/niko-dashboard-availability-reader-20261005.json"
+        "docs/evidence/niko-dashboard-availability-reader-20261005.json",
+        "docs/evidence/niko-dashboard-page-20261005.json"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -192,7 +193,8 @@
       "local_references": [
         "docs/dashboard-fixed-overview.md",
         "docs/evidence/niko-dashboard-api-20261005.json",
-        "docs/evidence/niko-dashboard-availability-reader-20261005.json"
+        "docs/evidence/niko-dashboard-availability-reader-20261005.json",
+        "docs/evidence/niko-dashboard-page-20261005.json"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1382,6 +1384,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "7bbc2c0f0fd2de6e9b126b566538dc6b8c104f97dadb63dae7cda509252944a0"
+    "doc/development/07_合同逐项开发追踪.md": "0245c863e74daa0ebceeac3b3bbd2b61f4bff0c6381eaab57a8821d9fe749b3c"
   }
 }

@@ -1,0 +1,33 @@
+{
+  "verified_at": "2026-10-05T00:20:44.146Z",
+  "environment": "niko-local-test",
+  "api_version": "0.43.0",
+  "production_typescript_modules": true,
+  "http_requests": 26,
+  "write_dispatches": 5,
+  "statuses": {
+    "200": 25,
+    "404": 1
+  },
+  "completed": true,
+  "pending_original_requests": 0,
+  "new_slots_created": 0,
+  "restored_original_requested_fields": true,
+  "original_update_same_key_dispatches": 4,
+  "actual_other_owner_replay_404": true,
+  "controlled_response_loss_after_actual_200": true,
+  "controlled_receipt_body_damage": true,
+  "controlled_get_damage_cases": 7,
+  "readonly_success_window_audit_unchanged": true,
+  "local_context_epoch_late_read": true,
+  "actual_role_revocation": false,
+  "physical_network_outage": false,
+  "receiver_binding_created": false,
+  "notification_dispatched": false,
+  "object_store_requests": 0,
+  "new_credentials": false,
+  "new_migrations": 0,
+  "real_browser": false,
+  "failure": null,
+  "formal_acceptance": "NOT_RUN"
+}

@@ -1120,6 +1120,7 @@
         "docs/evidence/niko-notification-preference-schema-20261004.json",
         "docs/evidence/niko-own-notification-preference-api-20261005.json",
         "docs/evidence/niko-own-notification-preference-repository-20261004.json",
+        "docs/evidence/niko-own-preference-client-20261005.json",
         "docs/own-notification-preferences.md"
       ],
       "external_references_unchecked": 0,
@@ -1372,6 +1373,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "36cc242a7b409b01dcdde81c75ed93e8fe8f4cc09764db4db8032e75ea2ae90c"
+    "doc/development/07_合同逐项开发追踪.md": "3ba7588017860fd471d3d0ffbea5468a62b333c4305bb7be2df98c46a402cf2b"
   }
 }

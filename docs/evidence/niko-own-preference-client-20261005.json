@@ -1,0 +1,83 @@
+{
+  "verified_at": "2026-10-05T00:22:34.645316+00:00",
+  "scope": "OWN_NOTIFICATION_PREFERENCE_PRODUCTION_CLIENT_AND_ORIGINAL_REQUEST_STATE",
+  "previous_commit": {
+    "sha": "2c6df036af9b6601e12be3b93244d65a02d80537",
+    "ci_run": 37246418732,
+    "conclusion": "success"
+  },
+  "new_protocol_tests": 15,
+  "new_state_tests": 20,
+  "focused_tests": 35,
+  "web_tests": 1538,
+  "web_test_files": 90,
+  "web_typecheck_build": "PASS",
+  "contracts": 120,
+  "contract_generation": "PASS",
+  "actual_http_requests": 26,
+  "actual_http_statuses": {
+    "200": 25,
+    "404": 1
+  },
+  "write_dispatches": 5,
+  "original_patch_dispatches_same_key_path_payload": 4,
+  "new_owner_slots": 0,
+  "new_revisions": 2,
+  "new_successful_audits": 2,
+  "new_original_receipts": 2,
+  "poststate": {
+    "heads": 1,
+    "revisions": 6,
+    "head_versions": [
+      6
+    ],
+    "successful_audits": 6,
+    "distinct_original_receipts": 6,
+    "current_requested_fields_restored_null": true,
+    "all_revisions_not_effective_or_dispatched": true,
+    "verified_at": "2026-10-05T00:21:18.511771+00:00"
+  },
+  "prior_api_baseline_version": 4,
+  "final_version": 6,
+  "requested_fields_restored_to_baseline": true,
+  "independent_202_byte_golden_vector": true,
+  "get_does_not_resolve_unknown_write": true,
+  "response_loss_after_actual_200": "CONTROLLED_TRANSPORT_FAULT",
+  "actual_other_owner_replay_404_keeps_unknown": true,
+  "damaged_receipt_body_after_actual_200": "CONTROLLED_TRANSPORT_FAULT",
+  "damaged_get_bodies_after_actual_200": 7,
+  "readonly_success_window_audit_unchanged": true,
+  "late_read_after_local_permission_epoch_change_discarded": true,
+  "actual_membership_revocation": false,
+  "physical_network_outage": false,
+  "real_browser_or_dom": false,
+  "new_page": false,
+  "notification_dispatched": false,
+  "receiver_binding_created": false,
+  "new_credentials": false,
+  "migrations": 0,
+  "backend_restart": false,
+  "live_api_contract_version": "0.43.0",
+  "formal_acceptance": "NOT_RUN",
+  "failure_history": [],
+  "source_sha256": {
+    "apps/web/src/utils/ownNotificationPreferences.ts": "cbd9c7af4478917fed152fc64641ccea77bb3e4cb2f4f6540b97763d8278f89f",
+    "apps/web/src/utils/ownPreferenceWorkspace.ts": "f17d4c72354984939affdedb45ce3b23fecdd5b45478bf0199e633dec3c65b9e",
+    "apps/web/tests/ownNotificationPreferences.test.ts": "29eda84e5ed7feb85c0aa4c8f7ed12818f64c04f059c45c5c603b4a652b95ab0",
+    "apps/web/tests/ownPreferenceWorkspace.test.ts": "a4a4ddd7a0bc4faaa2ad9765276da4f4dc37f5c8949b96dc59027cfd9a195596",
+    "apps/web/tests/ownPreference.fixture.ts": "5b852c267f4ffce36f5bf30046207e1736c6f22fa02606282d8bf255cf2a7c4e",
+    "tests/niko-own-preference-client-http.mjs": "88ad3b5079da47cce1724acdfa5dba8b9db9fe3762da34dcefcb3f559d517610",
+    "tools/build-own-preference-client-test.mjs": "6a50c787d30395524cd89305d83d465ee2e3073bbe83d5b31db00cf57b711ca9"
+  },
+  "logs_sha256": {
+    "own-preference-client-build-20261005.log": "aaacf4c1302194d3d43784fa71ebe4188209132d350b27c5416552b4806e1dae",
+    "own-preference-client-contract-generation-20261005.log": "57d4ba268e853bf3a6397947a04dad4941d8af827ac378049d17371121f817bc",
+    "own-preference-client-contracts-20261005.log": "1b01794891a6620670e5cd9688cff35ee6a6742e10e3e7165715fc8ccfd57786",
+    "own-preference-client-focused-20261005.log": "aaa9faab643efd0c871422724bfd19d0968756574225779a7d7e8410d0ec9d50",
+    "own-preference-client-http-20261005.log": "0fd2138534d7619cf20a6ea0504cf03cd00a222a547f9eb76d170cc460c3bd61",
+    "own-preference-client-poststate-20261005.log": "6f0beedcfc174608e97cc9e7afa65ce319a6727c94d3893342f55b38a89b1dba",
+    "own-preference-client-type-20261005.log": "ed83914750c796d04b3717b382c9a12a3a499b78c88853f403528b8d22e4e499",
+    "own-preference-client-type-initial-20261005.log": "6a19887cf109dc7002054026f203c577b84ad6f89e5db4f575e4fe84ecaf946b",
+    "own-preference-client-web-20261005.log": "8177ad309a38ca70107624ed5c0baf37f114ccf2f9b64bf0234ed37d40d9788c"
+  }
+}

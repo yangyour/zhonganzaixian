@@ -84,7 +84,7 @@ public final class MetricSeriesProjection {
         if(Character.isWhitespace(first)||Character.isSpaceChar(first)||Character.isWhitespace(last)||Character.isSpaceChar(last))throw invalid();
     }
     private static void label(String value,int max){if(value==null||value.length()>max||!value.matches("[A-Za-z0-9][A-Za-z0-9._:/% -]*")||!value.equals(value.strip()))throw invalid();}
-    private static void instant(Instant value){if(value==null||value.getNano()%1_000_000!=0||value.isBefore(Instant.parse("0001-01-01T00:00:00Z"))||value.isAfter(Instant.parse("9999-12-31T23:59:59.999Z")))throw invalid();BusinessDates.localDate(value);}
+    private static void instant(Instant value){if(value==null||value.isBefore(Instant.parse("0001-01-01T00:00:00Z"))||value.isAfter(Instant.parse("9999-12-31T23:59:59.999999999Z")))throw invalid();BusinessDates.localDate(value);}
     private static DomainException invalid(){return new DomainException(400,"VALIDATION_ERROR","指标点需明确范围、原值/原单位/时间与来源标识；未知不补零，缺单位映射不猜转换，重复来源或乱序不静默丢弃");}
     private static DomainException large(){return new DomainException(413,"REQUEST_TOO_LARGE","指标点超过10000项技术安全界限；未截断、未擅自聚合");}
     public Scope scope(){return scope;}public Instant from(){return from;}public Instant to(){return to;}public Instant observedAt(){return observedAt;}public List<ProjectedPoint> points(){return points;}public String seriesStatus(){return seriesStatus;}

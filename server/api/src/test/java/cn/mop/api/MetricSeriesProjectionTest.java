@@ -28,7 +28,7 @@ class MetricSeriesProjectionTest {
     @Test void duplicateSourceIdsAreNotSilentlyDroppedButSameTimeDifferentIdsRemain(){assertThrows(DomainException.class,()->project(List.of(point("same","1"),point("same","1")),mapping));assertEquals(2,project(List.of(point("a","1"),point("b","1")),mapping).points().size());}
     @Test void immutableResultNeverMutatesInputOrderOrFillsMissingPoints(){var input=new ArrayList<>(List.of(point("a","1"),point("b",null)));var result=project(input,mapping);input.clear();assertEquals(2,result.points().size());assertThrows(UnsupportedOperationException.class,()->result.points().clear());assertEquals("a",result.points().get(0).sourcePointId());}
     @Test void explicit10000PointBoundRejectsInsteadOfSilentAggregation(){var points=new ArrayList<Point>();for(int i=0;i<10000;i++)points.add(point("p"+i,"1"));assertEquals(10000,project(points,mapping).points().size());points.add(point("overflow","1"));assertEquals(413,assertThrows(DomainException.class,()->project(points,mapping)).status);}
-    @Test void observationAndWindowMustBeExplicitAndMilliseconds(){assertThrows(DomainException.class,()->MetricSeriesProjection.project(scope,from,to,to.minusMillis(1),null,mapping));assertThrows(DomainException.class,()->MetricSeriesProjection.project(scope,to,to,to,null,mapping));assertThrows(DomainException.class,()->MetricSeriesProjection.project(scope,from,to,null,null,mapping));assertThrows(DomainException.class,()->new Point(scope,"p",to.plusNanos(1),"1","bytes/s",null));}
+    @Test void observationAndWindowMustBeExplicitWithoutFabricatedTime(){assertThrows(DomainException.class,()->MetricSeriesProjection.project(scope,from,to,to.minusMillis(1),null,mapping));assertThrows(DomainException.class,()->MetricSeriesProjection.project(scope,to,to,to,null,mapping));assertThrows(DomainException.class,()->MetricSeriesProjection.project(scope,from,to,null,null,mapping));assertEquals(to.plusNanos(1),new Point(scope,"p",to.plusNanos(1),"1","bytes/s",null).sourceRecordedAt());}
     @Test void resultDoesNotEstablishAuthorizationMappingApprovalSourceOrAlertRules(){var r=project(List.of(point("p","1")),mapping);assertFalse(r.authorizationVerified());assertFalse(r.sourceVerified());assertFalse(r.mappingApprovalVerified());assertFalse(r.aggregationApplied());assertFalse(r.writesPerformed());assertNull(r.monitoringReady());assertNull(r.ruleVersion());assertNull(r.effectiveRule());assertEquals("BASE10_STRINGS",r.numericEncoding());assertEquals("EXPLICIT_ADAPTER_INPUT_NOT_VERIFIED_MONITORING",r.source());}
     @Test void trafficColorsUseStrictContractBoundariesWithoutCallingNeutralHealthy(){assertEquals(PortUtilizationDisplay.Highlight.UNKNOWN,PortUtilizationDisplay.highlight(null));for(String n:List.of("0","50","50.000"))assertEquals(PortUtilizationDisplay.Highlight.NO_HIGHLIGHT,PortUtilizationDisplay.highlight(n));for(String n:List.of("50.0000000000000000000000000000000000000001","80"))assertEquals(PortUtilizationDisplay.Highlight.YELLOW,PortUtilizationDisplay.highlight(n));for(String n:List.of("80.0000000000000000000000000000000000000001","101"))assertEquals(PortUtilizationDisplay.Highlight.RED,PortUtilizationDisplay.highlight(n));}
     @Test void trafficColorRejectsMissingUnitsEncodedAsStringsOrMalformedValues(){for(String n:List.of("80%","-1","NaN","1e2"," 80","81\n"))assertThrows(DomainException.class,()->PortUtilizationDisplay.highlight(n));}
@@ -57,6 +57,13 @@ class MetricSeriesProjectionTest {
         var point=project(List.of(point("gap",null)),mapping).points().get(0);
         assertEquals(to,point.sourceRecordedAt());assertNull(point.sampledAt());assertNull(point.value());
         assertEquals(to,project(List.of(point("known","1")),null).points().get(0).sampledAt());
+    }
+
+    @Test void sourceNanosecondsAreRetainedAndOrderedWithoutRoundingDuplicates(){
+        var a=new Point(scope,"a",to.minusNanos(2),"1","bytes/s",null);
+        var b=new Point(scope,"b",to.minusNanos(1),"2","bytes/s",null);
+        var r=project(List.of(a,b),mapping);assertEquals(to.minusNanos(2),r.points().get(0).sampledAt());assertEquals(to.minusNanos(1),r.points().get(1).sampledAt());
+        assertThrows(DomainException.class,()->project(List.of(b,a),mapping));
     }
 
 }

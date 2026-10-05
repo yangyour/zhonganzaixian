@@ -492,6 +492,7 @@
       "has_progress_note": true,
       "local_references": [
         "docs/evidence/niko-metric-series-core-20261005.json",
+        "docs/evidence/niko-zabbix-numeric-history-20261005.json",
         "docs/metric-series-projection.md"
       ],
       "external_references_unchecked": 0,
@@ -1390,6 +1391,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "aff263e6c97e2a36816e1397008a61d7ac20dddccd3f4a5a531f222ae668db13"
+    "doc/development/07_合同逐项开发追踪.md": "9f189ac1a4848bd2169b0d16b31b0c2a42c347b1d7c6e96771af1eaac12429ac"
   }
 }

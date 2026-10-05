@@ -1,0 +1,62 @@
+{
+  "verified_at": "2026-10-05T02:06:30.991709+00:00",
+  "scope": "PURE_SINGLE_ITEM_ZABBIX_7_NUMERIC_HISTORY_CODEC",
+  "previous_commit": "12b481efb871faa9f08a09ba1c225a1ac5dd1fcd",
+  "previous_ci": {
+    "run_id": 37253444514,
+    "conclusion": "success"
+  },
+  "official_references": [
+    "https://www.zabbix.com/documentation/7.0/en/manual/api/reference/history/get",
+    "https://www.zabbix.com/documentation/7.0/en/manual/api/reference/history/object"
+  ],
+  "new_codec_tests": 26,
+  "metric_core_tests_now": 25,
+  "new_metric_precision_tests": 1,
+  "focused_total": 66,
+  "root_reported": 2311,
+  "root_executed": 1530,
+  "root_skipped": 781,
+  "root_failures": 0,
+  "root_errors": 0,
+  "real_pg_executed": 0,
+  "real_pg_skipped": 762,
+  "minio_skipped": 6,
+  "historical_fixture_skipped": 13,
+  "contracts": 125,
+  "contract_generation": "PASS",
+  "python_tests": 158,
+  "web_source_changed": false,
+  "web_reexecuted_for_this_codec": false,
+  "api_contract_unchanged": "0.44.0",
+  "new_migrations": 0,
+  "new_credentials": false,
+  "provider_http_requests": 0,
+  "runtime_wiring": false,
+  "source_received_nanoseconds_preserved": true,
+  "physical_probe_time_claimed": false,
+  "unit_mapping_inferred": false,
+  "unsigned_64_values_preserved_as_strings": true,
+  "point_limit": 10000,
+  "request_sentinel_limit": 10001,
+  "max_response_bytes": 2097152,
+  "silent_deduplication_sorting_or_aggregation": false,
+  "provider_error_text_returned": false,
+  "numeric_support": "bounded plain decimal strings only; scientific notation and unsupported encodings fail explicitly",
+  "real_provider_validation": "NOT_RUN",
+  "mapping_authorization_validation": "NOT_RUN",
+  "browser": "NOT_RUN",
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "server/adapters/src/main/java/cn/mop/adapters/monitoring/ZabbixNumericHistoryProtocol.java": "3b8aea14508bb756019a1a214714cbec64323e962a550f0a5a28a004816ea0f1",
+    "server/api/src/test/java/cn/mop/api/ZabbixNumericHistoryProtocolTest.java": "c9f075bff4930367412176e4c444701b630503d96707815d21c5a2c8c95a44ee",
+    "server/domain/src/main/java/cn/mop/domain/monitoring/MetricSeriesProjection.java": "5d5810d97035dbb8e9ddeda1ffbd94418b244347555611bc39d8809f0a51912e",
+    "server/api/src/test/java/cn/mop/api/MetricSeriesProjectionTest.java": "c20df1a151c959af7693d4cfbb140cd0b21adf3d30fd13436a4feaa8d584d16a"
+  },
+  "log_sha256": {
+    "zabbix-history-focused-final-20261005.log": "20227e776a4b660e45c9425466d31e95e48098b65dd7f3ed4fc7d644aef0a4c2",
+    "zabbix-history-full-20261005.log": "a251264256629a6424ebfcaa8fc2cc623ae7c6d3918d39df1fdbecbf9d6266d3",
+    "zabbix-history-contracts-20261005.log": "5253008938f43eda97188c208f112f5d395d081b6415b4b81e6fa2b1899cc2f9",
+    "zabbix-history-python-20261005.log": "6dd263dd3d9210c4a7330bcc517158bdace11e7e7ef3727fafd7697c50d853a3"
+  }
+}

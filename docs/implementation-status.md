@@ -1,5 +1,9 @@
 # MOP 实施状态
 
+## 单item数值历史协议（2026-10-05 02:05 UTC）
+
+12b481ef/CI37253444514成功。按Zabbix7.0官方history接口实现纯请求/响应codec：固定单item/类型/4字段/秒桶/clock+ns排序，纳秒与无符号64字符串保真，来源错位/乱序/重复/超限全拒绝、不回显上游错误。26新codec+1新纳秒回归，66聚焦、根1530执行/781跳过、125契约、158Python通过。无HTTP传输/认证/映射授权/运行接线，真实监控仍未验证，API0.44不变；见[说明](zabbix-numeric-history-protocol.md)。
+
 ## 私有CI源码归档核验（2026-10-05 01:55 UTC）
 
 6c130476的Cloud37253121765和归档37253121743均success；已实际下载artifact11321441658，1706文件逐blob/mode/长度、完整commit/tree及工作树字节一致。只保留同private仓库1日，不含运行私有数据；组件/凭据重建许可仍待答复，未把源码材料当数据库恢复。见[核验](evidence/niko-source-export-ci-20261005.json)。

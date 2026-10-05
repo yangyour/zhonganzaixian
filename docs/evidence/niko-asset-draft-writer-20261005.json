@@ -1,0 +1,41 @@
+{
+  "verified_at": "2026-10-05T02:30:31.590063+00:00",
+  "scope": "ASSET_CREATE_ORIGINAL_REQUEST_PRODUCTION_WRITER_ONLY",
+  "previous_commit": "d354a02d3501aa1a59b454b81cc549c3da5ece78",
+  "previous_ci": {
+    "run_id": 37254963732,
+    "conclusion": "success"
+  },
+  "new_isolated_tests": 22,
+  "web_tests": 1640,
+  "web_files": 96,
+  "typecheck_build": "PASS",
+  "contracts": 125,
+  "contract_generation": "PASS",
+  "same_original_path_method_payload_and_key": true,
+  "independent_abort_controller": true,
+  "unknown_replay_denial_stays_unknown": true,
+  "original_v1_receipt_strictly_checked": true,
+  "observer_and_key_factory_reentrancy_guard": true,
+  "java_strip_semantics_retained": true,
+  "cross_reload_persistence": false,
+  "page_wiring": "NOT_YET_IMPLEMENTED_IN_THIS_COMMIT",
+  "actual_http": "NOT_RUN",
+  "real_pg": "NOT_RUN_CURRENT_EXECUTOR",
+  "real_browser": false,
+  "new_credentials": false,
+  "new_migrations": 0,
+  "api_contract_unchanged": "0.44.0",
+  "formal_acceptance": "NOT_RUN",
+  "source_sha256": {
+    "apps/web/src/utils/assetDraftWriter.ts": "6e2581db064b7e969157e5fde132f9c526e2d4e8a2fcad2ea6a43c7b5c54d7b7",
+    "apps/web/tests/assetDraft.fixture.ts": "bb93e4b3927607df956c780de57ff4b25cf13b44366c23822c18062c52174113",
+    "apps/web/tests/assetDraftWriter.test.ts": "2f98c6148edae98ffe961e400488a977bb5cc123f56ff100944688e7e8d6263b"
+  },
+  "log_sha256": {
+    "asset-draft-writer-focused-final-20261005.log": "ba5f4ebb2ec1fff1b93ba32480bc4b953fec51b4f690baa9391db2217f3a4e83",
+    "asset-draft-writer-web-20261005.log": "f7093fc76dbd9a0d0859b59d861e27f5f429da96c85486db8d70c2e41e9cf6f7",
+    "asset-draft-writer-build-20261005.log": "eb0b66e3b7a25305289c6d2b9cbd96e17517f9e9860cbc3c7e9b875d08b917cc",
+    "asset-draft-writer-contracts-20261005.log": "7099cdc97f0964acd1ff65867a41d5ca202c17b254962ea95675829773793061"
+  }
+}

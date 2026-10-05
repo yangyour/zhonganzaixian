@@ -382,6 +382,8 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/asset-draft-original-request.md",
+        "docs/evidence/niko-asset-draft-writer-20261005.json",
         "docs/local-browser-validation-20261003.md",
         "docs/manual-asset-metadata.md",
         "docs/manual-warranty-details.md"
@@ -1394,6 +1396,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "e5b5d0daa032ae02a86f8d79684a7f7ce4c607b03729b49831db1ec4e2ca70a4"
+    "doc/development/07_合同逐项开发追踪.md": "7ebc87d00d4200bf06a88dd19226b7b89b1ee9d6567f1a9df7f33d324dc36c70"
   }
 }

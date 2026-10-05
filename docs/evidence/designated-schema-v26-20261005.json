@@ -1,0 +1,42 @@
+{
+  "verified_at": "2026-10-05T03:39:30.715939+00:00",
+  "environment": "designated-server",
+  "postgresql": "17.9",
+  "schema_before": 22,
+  "schema_after": 26,
+  "feature_execution": {
+    "inspection-source-collections": {
+      "migrate": 1,
+      "repeat": 0
+    },
+    "backup-plan-drafts": {
+      "migrate": 1,
+      "repeat": 0
+    },
+    "change-notice-drafts": {
+      "migrate": 1,
+      "repeat": 0
+    },
+    "notification-preference-drafts": {
+      "migrate": 1,
+      "repeat": 0
+    }
+  },
+  "final_read_only_migrations": 0,
+  "old_business_tables_compared": 48,
+  "old_rows_and_hashes_equal": true,
+  "business_tables_after": 58,
+  "backup": {
+    "database": "mop_test",
+    "format": "PGDMP",
+    "size_bytes": 2217149,
+    "sha256": "771294fcccc5148ee93a5245370db5e126d8ce4ed6828ca9af2f845886f422de",
+    "restored": false,
+    "path": "ignored_local_directory"
+  },
+  "isolated_migration_policy_checks": 121,
+  "api_or_worker_automatic_migration": false,
+  "shared_service_restarts": 0,
+  "snapshot_initial_failure": "PostgreSQL json_build_object argument limit above 50 tables; read-only snapshot changed to json_object_agg over named rows, then passed",
+  "formal_acceptance": "NOT_RUN"
+}

@@ -1,0 +1,52 @@
+{
+  "verified_at": "2026-10-05T06:22:38Z",
+  "base_commit": "c8d77ba4d21ae5fd00a7ca87c90139d99bdf7fbd",
+  "effective_grant_ci": {
+    "run_id": 37271020490,
+    "conclusion": "success"
+  },
+  "new_web_tests": 28,
+  "pure_navigation_tests": 9,
+  "vue_router_jsdom_tests": 9,
+  "vue_slot_stub_render_tests": 10,
+  "web_tests": 1731,
+  "web_files": 103,
+  "typecheck_build": "PASS",
+  "contracts": 127,
+  "root_reported_after_v27_merge": 2487,
+  "root_executed": 1706,
+  "root_skipped": 781,
+  "root_failures": 0,
+  "root_errors": 0,
+  "selected_grants_do_not_require_config_or_audit_for_management_group": true,
+  "empty_grants_redirect_loop_prevented": true,
+  "legacy_assets_home_preserved_if_allowed": true,
+  "restored_grants_leave_no_access_page": true,
+  "user_can_explicitly_logout_with_no_business_grants": true,
+  "real_browser": false,
+  "css_or_drawer_behavior_verified": false,
+  "actual_http": "NOT_RUN",
+  "actual_pg": 0,
+  "new_credentials": false,
+  "new_migrations_executed_here": 0,
+  "v27_source_and_raw_commit_verified": true,
+  "v27_compatibility_blocker_resolved": false,
+  "api_contract": "0.44.0",
+  "formal_acceptance": "NOT_RUN",
+  "failure_history": [
+    "old export route source assertion expected inline roles check",
+    "jsdom source test used HTTP import.meta URL instead of filesystem resolve"
+  ],
+  "log_sha256": {
+    "effective-navigation-web-20261005.log": "4c6655d2e03b65b6fc1176945a77d7df45a4542ce509b5796ae3dc6d2f54be63",
+    "effective-navigation-final-web-20261005.log": "090525bdc96da323860821be7de864102ae420b35eb2afe9b8fe4754acd6ec01",
+    "effective-navigation-verified-web-20261005.log": "ded49bd687b9f08238db4451cd039c449ce9756de83a02356d15c8d6cbab67b0",
+    "effective-navigation-verified-build-20261005.log": "ff39d0ad1d77b9554d39da367646ff7fce443c35aa1c9e306687492213bb8462",
+    "effective-navigation-verified-contracts-20261005.log": "25bd6ceadeefd26f8df56100b3faba2406ed75616666f58793d398aab43168b8",
+    "identity-v27-merge-java-20261005.log": "809c468aa182218b820e5b3209144bc84e6d2d732e53bcd0066984279f7114f8"
+  },
+  "base_ci": {
+    "run_id": 37272694219,
+    "conclusion": "success"
+  }
+}

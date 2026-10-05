@@ -4,11 +4,15 @@ import { useRoute, useRouter, isNavigationFailure, NavigationFailureType } from 
 import { can, session, contextGeneration, switchingTenant, maySwitchTenant, switchTenant, logout } from './stores/session'
 import { isCancelled } from './api/client'
 import { roleLabel } from './utils/display'
+import { landingRoute, navigationGroupVisible } from './utils/routeAccess'
 import ApiErrorNotice from './components/ApiErrorNotice.vue'
 import GlobalSearch from './components/GlobalSearch.vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 const route = useRoute()
 const router = useRouter()
+const homeRoute = computed(() => landingRoute(session.value, router.getRoutes()))
+const managementVisible = computed(() => navigationGroupVisible(session.value, router.getRoutes(), ['管理']))
+const resourceVisible = computed(() => navigationGroupVisible(session.value, router.getRoutes(), ['资源', '服务']))
 const navigationOpen = ref(false)
 const error = ref<unknown>(null)
 const leaving = ref(false)
@@ -42,11 +46,11 @@ async function endSession() {
   <router-view v-if="!session" />
   <div v-else class="app-shell">
     <aside class="sidebar">
-      <a class="brand" href="/assets" @click.prevent="router.push('/assets')"><span class="brand-mark">M</span><span><strong>MOP 运维托管</strong><small>网络设备管理平台</small></span></a>
-      <div class="nav-heading">资源</div>
-      <el-menu :default-active="String(route.name)" class="side-menu" @select="router.push({ name: $event })">
+      <a class="brand" :href="router.resolve({ name: homeRoute }).href" @click.prevent="router.push({ name: homeRoute })"><span class="brand-mark">M</span><span><strong>MOP 运维托管</strong><small>网络设备管理平台</small></span></a>
+      <div v-if="resourceVisible" class="nav-heading">资源</div>
+      <el-menu v-if="resourceVisible" :default-active="String(route.name)" class="side-menu" @select="router.push({ name: $event })">
         <el-menu-item v-if="can('dashboard:read')" index="dashboard">运营总览</el-menu-item>
-        <el-menu-item index="assets"><span class="nav-symbol">▤</span>资产管理</el-menu-item>
+        <el-menu-item v-if="can('assets:read')" index="assets"><span class="nav-symbol">▤</span>资产管理</el-menu-item>
         <el-menu-item v-if="can('manual_incidents:read')" index="manual-incidents"><span class="nav-symbol">◇</span>手工来源登记</el-menu-item>
         <el-menu-item v-if="can('sla_scenarios:read')" index="sla-scenarios">SLA 显式对照</el-menu-item>
         <el-menu-item v-if="can('tickets:read')" index="tickets"><span class="nav-symbol">▣</span>报障与受理</el-menu-item>
@@ -54,7 +58,7 @@ async function endSession() {
         <el-menu-item v-if="session && ['padmin','msp'].includes(session.user.role) && can('assets:read')" index="asset-export-jobs">台账导出准备</el-menu-item>
         <el-menu-item v-if="session?.user.role === 'msp' && can('worklogs:read_own')" index="my-worklogs">我的实填工时</el-menu-item>
       </el-menu>
-      <template v-if="can('configurations:read') || can('audit:read')">
+      <template v-if="managementVisible">
         <div class="nav-heading">管理</div>
         <el-menu :default-active="String(route.name)" class="side-menu" @select="router.push({ name: $event })">
           <el-menu-item v-if="can('configurations:read')" index="configurations"><span class="nav-symbol">⚙</span>配置确认登记</el-menu-item>
@@ -100,7 +104,7 @@ async function endSession() {
     <el-drawer v-model="navigationOpen" title="MOP 导航" direction="ltr" size="260px">
       <el-menu :default-active="String(route.name)" @select="router.push({ name: $event })">
         <el-menu-item v-if="can('dashboard:read')" index="dashboard">运营总览</el-menu-item>
-        <el-menu-item index="assets">资产管理</el-menu-item>
+        <el-menu-item v-if="can('assets:read')" index="assets">资产管理</el-menu-item>
         <el-menu-item v-if="can('manual_incidents:read')" index="manual-incidents">手工来源登记</el-menu-item>
         <el-menu-item v-if="can('sla_scenarios:read')" index="sla-scenarios">SLA 显式对照</el-menu-item>
         <el-menu-item v-if="can('tickets:read')" index="tickets">报障与受理</el-menu-item>

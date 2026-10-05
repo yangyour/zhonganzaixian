@@ -1,0 +1,26 @@
+{
+  "verified_at": "2026-10-05T06:25:48Z",
+  "base_commit": "7456d2ffb556d7de8f98a1362ae3452d60cbbafc",
+  "upstream_ci_failure": {
+    "run_id": 37271633902,
+    "job_id": 111639679158,
+    "step": "Verify isolated niko configuration guards",
+    "cause": "hard-coded migration versions stopped at V26; niko launcher also omitted V27"
+  },
+  "frozen_schema_version": 27,
+  "frozen_v27_sha256": "41e5060d4925e7c8ea761539e4695a6ea5792743240363a7d5f50f24bcb59566",
+  "python_tests": 164,
+  "python_failures": 0,
+  "new_pure_tests": 1,
+  "actual_database_calls": 0,
+  "actual_migrations": 0,
+  "actual_credentials_created": 0,
+  "local_powershell": "NOT_RUN_NOT_INSTALLED",
+  "v27_sql_modified": false,
+  "capability_drift_resolved": false,
+  "formal_acceptance": "NOT_RUN",
+  "logs_sha256": {
+    "identity-v27-merge-python-20261005.log": "b7f1bf446e1251c0a06136e485f7e15362e8dba2051f704448acc49079adb07f",
+    "v27-manifest-fix-python-20261005.log": "a0794400e11a1d70fc0e2acd1eedc64663a581bdfb09b3ba693ac97c0ecb5479"
+  }
+}

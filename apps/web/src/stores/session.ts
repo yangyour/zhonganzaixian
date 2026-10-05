@@ -2,6 +2,7 @@ import { computed, ref, shallowRef } from 'vue'
 import { api, ApiError } from '../api/client'
 import type { LogoutResult, Session } from '../api/types'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
+import { routeAllowed } from '../utils/routeAccess'
 
 export const session = shallowRef<Session | null>(null)
 export const switchingTenant = ref(false)
@@ -9,7 +10,7 @@ export const contextGeneration = ref(0)
 let initialized = false
 let contextActionPending = false
 let initialization: Promise<void> | null = null
-export const can = (capability: string) => session.value?.capabilities.includes(capability) ?? false
+export const can = (capability: string) => routeAllowed({ capability }, session.value)
 export const maySwitchTenant = computed(() => ['msp', 'padmin'].includes(session.value?.user.role || ''))
 function installSession(value: Session) { session.value = value; api.setCsrfToken(value.csrf_token); initialized = true }
 export function forgetSession() {

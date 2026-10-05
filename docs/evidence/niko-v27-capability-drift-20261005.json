@@ -1,0 +1,24 @@
+{
+  "checked_at": "2026-10-05T06:22:38Z",
+  "scope": "STATIC_SOURCE_COMPARISON_NOT_DATABASE_QUERY",
+  "commit": "7456d2ffb556d7de8f98a1362ae3452d60cbbafc",
+  "frozen_v27_sha256": "41e5060d4925e7c8ea761539e4695a6ea5792743240363a7d5f50f24bcb59566",
+  "code_capability_sha256": "ca4d75867c7326f7bc2af52a2c1158cd0a40c532646ca8e2efa34d3998266efe",
+  "missing_from_frozen_v27": [
+    {
+      "base_role": "padmin",
+      "capability": "tenants:read_inventory"
+    }
+  ],
+  "extra_in_frozen_v27": [],
+  "current_verifier_compares_limits_to_code": true,
+  "expected_current_v27_verifier_result": "MISMATCH_FROM_SOURCE_NOT_LIVE_VERIFIED",
+  "v27_modified": false,
+  "v28_applied": false,
+  "database_queried": false,
+  "runtime_grants_modified": false,
+  "status": "BLOCKED_REQUIRES_SEPARATE_FOLLOWUP_MIGRATION_AND_REAL_VERIFICATION",
+  "password_format_compatible": false,
+  "frozen_v27_password_prefix": "pbkdf2-sha256-v1",
+  "new_encoder_prefix": "mop-argon2id-v1"
+}

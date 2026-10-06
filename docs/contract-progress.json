@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 51,
-  "rows_without_progress_notes": 77,
+  "rows_with_progress_notes": 53,
+  "rows_without_progress_notes": 75,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -37,7 +37,7 @@
     },
     "M4": {
       "requirements": 19,
-      "rows_with_progress_notes": 6,
+      "rows_with_progress_notes": 8,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 19
       }
@@ -570,8 +570,11 @@
       "id": "M4-8",
       "title": "重复告警合并",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/niko-raw-monitoring-event-envelope-20261006.json",
+        "docs/raw-monitoring-event-envelope.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -624,8 +627,11 @@
       "id": "M4-14",
       "title": "事件中心与事件详情",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/niko-raw-monitoring-event-envelope-20261006.json",
+        "docs/raw-monitoring-event-envelope.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1419,6 +1425,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "8afa999ad47802769d54767adce75ec81063d9f30a4e8525c7f79eeebcd1a482"
+    "doc/development/07_合同逐项开发追踪.md": "fa9da7358465400bff33121b6763b0949b8721771875c7acbb7052876db27dcb"
   }
 }

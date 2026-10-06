@@ -1,0 +1,21 @@
+{
+  "verified_at": "2026-10-06T02:57:19Z",
+  "base_commit": "e54f39a08c04dc67a75e5e9b6a42f3d188bef4ce",
+  "new_java_tests": 19,
+  "java_reported": 2565,
+  "java_executed": 1774,
+  "java_skipped": 791,
+  "java_failures": 0,
+  "java_errors": 0,
+  "actual_pg_executed": 0,
+  "contracts_passed": 127,
+  "api_changed": false,
+  "sql_changed": false,
+  "durable_intake_implemented": false,
+  "formal_acceptance": "NOT_RUN",
+  "logs_sha256": {
+    "raw-event-contracts.log": "10668363575cb8b798de0aa88bb69539c5a285b77a5f2ebe883a76d4706d283d",
+    "raw-event-java-all.log": "44567a08bb92c73eb2a3598d529a445c3a5cd6bb4303ec90dc0433a8de3d7f8c",
+    "raw-event-focused.log": "acc7d2c3fe824c76094fead765fff66653b22df24fab111fe1eb6c530f1ff503"
+  }
+}

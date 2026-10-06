@@ -1,0 +1,28 @@
+{
+  "verified_at": "2026-10-06T01:26:32Z",
+  "base_commit": "7d3e4b4435d7b24c14ad948990e78dce8eede0bf",
+  "new_tests": 10,
+  "baseline_tests": 8,
+  "baseline_failed": 7,
+  "baseline_passed": 1,
+  "baseline_unhandled_errors": 1,
+  "web_passed": 1791,
+  "web_files": 110,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts_passed": 127,
+  "api_version": "0.45.0",
+  "api_changed": false,
+  "sql_changed": false,
+  "actual_http_checks": 0,
+  "actual_accounts_created": 0,
+  "policy_settings_changed": false,
+  "formal_acceptance": "NOT_RUN",
+  "logs_sha256": {
+    "identity-settings-build.log": "4b4da1da8bd9310d1e200c7ba0c3795fabb63008a7fad760c9274fb9220b2f0b",
+    "identity-settings-contracts.log": "3d465ebd53b4fd342258f06f5336d039080300080fcf3cc8663f38ca658c1133",
+    "identity-settings-all.log": "5c065da365cffb27b1252ac252fb7f9cd5b53ba0518959c6ad94f9026dd33694",
+    "identity-settings-baseline.log": "bc9049362fcac12b7447f33484dd5307c0198e0b4da2a82733a4e935d8c57283",
+    "identity-settings-fixed.log": "72451ab2a730fb49da2530fc8bb0d8da78ba207c5098e10177f9d4f61efcd7ad"
+  }
+}

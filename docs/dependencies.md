@@ -4,6 +4,7 @@
 
 |组件|冻结方式|许可/来源|
 |---|---|---|
+|SnakeYAML 2.4|adapters/pom.xml显式固定，复用构建环境已有JAR；仅未发布OID候选解析|Apache-2.0，已核对JAR内Maven POM；[项目源码](https://github.com/snakeyaml/snakeyaml)，Q03正式审查仍待|
 |Java 17|构建要求，当前验证使用Temurin 17|JDK发行许可另随客户运行环境核验|
 |Spring Boot 3.5.16 / Security|根pom使用固定Boot parent/BOM，不单独追逐Security版本|Apache-2.0，[官方兼容要求](https://docs.spring.io/spring-boot/3.5/system-requirements.html)、[源码许可](https://github.com/spring-projects/spring-boot/blob/3.5.x/LICENSE.txt)|
 |Vue 3 / Vue Router|`apps/web/package.json`精确版本+package-lock|MIT，[Vue源码](https://github.com/vuejs/core/blob/main/LICENSE)、[TypeScript与类型检查](https://vuejs.org/guide/typescript/overview)|

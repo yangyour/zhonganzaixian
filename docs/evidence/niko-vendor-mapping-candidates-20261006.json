@@ -1,0 +1,27 @@
+{
+  "verified_at": "2026-10-06T02:51:05Z",
+  "base_commit": "2afd31d1055104a07db44ac8f9d2c089e1ff410f",
+  "new_java_tests": 41,
+  "java_reported": 2546,
+  "java_executed": 1755,
+  "java_skipped": 791,
+  "java_failures": 0,
+  "java_errors": 0,
+  "actual_pg_executed": 0,
+  "python_passed": 167,
+  "contracts_passed": 127,
+  "api_version": "0.45.0",
+  "api_changed": false,
+  "sql_changed": false,
+  "effective": false,
+  "source_verified": false,
+  "device_checks": 0,
+  "formal_acceptance": "NOT_RUN",
+  "logs_sha256": {
+    "vendor-yaml-python.log": "6b08033dfa84bdd9c07dbe67865372c0b54e8e166c53150b4d11472c90240039",
+    "vendor-yaml-java-all.log": "792e3e0dc1f6b521192fb2c70af95a5e7f8f4c44bfd0adcbff0b007a98455875",
+    "vendor-yaml-final-java.log": "262dea322ca76730e6e06c2d83069773b199c0a9a43c8f05ea417171754750f7",
+    "vendor-yaml-contracts.log": "183f3943b09391e8778d00419d1cd78f2d0d07a412e26487dc22913b2079170b",
+    "vendor-yaml-focused.log": "8b85ecc560f49a0cf612914e79a1fbcefa5416fd262560e59d8c820974676ca2"
+  }
+}

@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 50,
-  "rows_without_progress_notes": 78,
+  "rows_with_progress_notes": 51,
+  "rows_without_progress_notes": 77,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -37,7 +37,7 @@
     },
     "M4": {
       "requirements": 19,
-      "rows_with_progress_notes": 5,
+      "rows_with_progress_notes": 6,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 19
       }
@@ -671,8 +671,11 @@
       "id": "M4-19",
       "title": "多品牌OID映射机制",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/evidence/niko-vendor-mapping-candidates-20261006.json",
+        "docs/vendor-mapping-candidates.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1416,6 +1419,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "6f4ec608b6707341a3a30c6fac8207d96328ee01d7ed8afc40ebd38889993f79"
+    "doc/development/07_合同逐项开发追踪.md": "8afa999ad47802769d54767adce75ec81063d9f30a4e8525c7f79eeebcd1a482"
   }
 }

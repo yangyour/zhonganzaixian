@@ -1,0 +1,24 @@
+{
+  "verified_at": "2026-10-06T02:37:59Z",
+  "base_commit": "6b7fd11118bef6bd82c8d1777f2506daf974f1a0",
+  "new_tests": 10,
+  "baseline_tests": 8,
+  "baseline_failed": 8,
+  "web_passed": 1801,
+  "web_files": 111,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "contracts_passed": 127,
+  "api_changed": false,
+  "sql_changed": false,
+  "actual_http_checks": 0,
+  "actual_password_changes": 0,
+  "formal_acceptance": "NOT_RUN",
+  "logs_sha256": {
+    "account-scope-all.log": "85e76d09b0888cdc184cc90cf88c2691f628bd7d630767c1340ffb320d82f805",
+    "account-scope-contracts.log": "9c9f824f4620f5d8c9c770ba7985030c1c685eeeeb65906fb2d2711828544682",
+    "account-scope-baseline.log": "d67895fd8b251efd30df2de26d2cf6a0d5941495543fab43cdcc1cc413b2f783",
+    "account-scope-fixed.log": "9d4ba1a3f2ddac9c5aa414dec7b31c7bf9e6c8abc2df1914568d0482404fbbba",
+    "account-scope-build.log": "2bbc050bbc240931105d1f4e9ded3df834ae9c6d9fbe5ffc7b934a00fe83b1b3"
+  }
+}

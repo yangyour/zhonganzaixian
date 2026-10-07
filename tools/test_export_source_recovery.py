@@ -1,6 +1,7 @@
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -56,7 +57,12 @@ class SourceRecoveryExportTest(unittest.TestCase):
         with self.assertRaises(ValueError): m.export(self.root)
 
     def test_symlink_refused(self):
-        (self.root / 'link').symlink_to('AGENTS.md')
+        try:
+            (self.root / 'link').symlink_to('AGENTS.md')
+        except OSError as failure:
+            if os.name == 'nt' and getattr(failure, 'winerror', None) == 1314:
+                self.skipTest('Windows host lacks symlink creation privilege; native Linux CI verifies this guard')
+            raise
         self.commit()
         with self.assertRaises(ValueError): m.export(self.root)
 

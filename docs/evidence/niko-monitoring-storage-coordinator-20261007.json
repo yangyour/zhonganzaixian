@@ -1,0 +1,38 @@
+{
+  "recorded_at": "2026-10-07T03:23:41.174381+00:00",
+  "environment": "niko-local-test-20261007",
+  "base_commit": "932ad37ea564aa2a3b5d8857090dce3dc7601a41",
+  "scope": "Internal raw-source-key conflict to durable quarantine coordinator; no HTTP intake or authorization",
+  "real_pg_tests": {
+    "coordinator": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "isolated_safety_tests": 4,
+  "full_java_remote_disabled": {
+    "tests": 2655,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 857,
+    "executed": 1798
+  },
+  "python_tests": 167,
+  "contract_tests": 127,
+  "contract_generator_consistent": true,
+  "migration_executed": false,
+  "frozen_sql_changed": false,
+  "business_tables_unchanged": 66,
+  "business_snapshot_sha256": "039419217df04471acb4ef2ae044eda1f490b878e4dd841fdfe88a873964182b",
+  "snapshot_correction": "Old helper included the new quarantine table, causing set mismatch; preserved original baseline and checked all 66 original business tables excluding both intended event targets",
+  "verification_retry": "Initial full Java invocation omitted the required fixture=false property and Mockito dynamic self-attachment failed. The property-correct retry also failed on attachment. Final verify passed with explicit already-installed Byte Buddy 1.17.8 Java test agent, without OS security changes or skipped assertions. Failed logs retained locally.",
+  "actual_process_crash_tested": false,
+  "power_loss_tested": false,
+  "two_transaction_gap_requires_upstream_replay": true,
+  "source_authentication_verified": false,
+  "public_intake_implemented": false,
+  "dispatch_allowed": false,
+  "original_server_changed": false,
+  "formal_128_acceptance_complete": false,
+  "credentials_in_evidence": false
+}

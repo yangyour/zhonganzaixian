@@ -572,8 +572,8 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
-        "docs/evidence/niko-monitoring-quarantine-storage-20261007.json",
-        "docs/monitoring-quarantine-storage.md"
+        "docs/evidence/niko-monitoring-storage-coordinator-20261007.json",
+        "docs/monitoring-storage-coordinator.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -629,8 +629,8 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
-        "docs/evidence/niko-monitoring-quarantine-storage-20261007.json",
-        "docs/monitoring-quarantine-storage.md"
+        "docs/evidence/niko-monitoring-storage-coordinator-20261007.json",
+        "docs/monitoring-storage-coordinator.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1425,6 +1425,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "1c7a4a88c53c461bd4f99419c1ab7671fe6020b78e52132410002b4495092b33"
+    "doc/development/07_合同逐项开发追踪.md": "791f77fd1fbde4e2eb434b073a9e8c496f292146a09ac396f8f3fb63291199e7"
   }
 }

@@ -1,0 +1,26 @@
+{
+  "recorded_at": "2026-10-07T03:47:48.629648+00:00",
+  "base_commit": "586f4bd15f1a67598b1e8df920ed1691523ab184",
+  "scope": "Pure consistency assessment of caller-supplied mapping snapshots; lookup interface only",
+  "mapping_tests": 28,
+  "full_java_remote_disabled": {
+    "tests": 2683,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 857,
+    "executed": 1826
+  },
+  "explicit_existing_byte_buddy_test_agent": true,
+  "sql_changed": false,
+  "public_api_changed": false,
+  "real_database_or_provider_tests": "NOT_RUN; pure model only",
+  "source_authorized": false,
+  "current_mapping_verified": false,
+  "dispatch_allowed": false,
+  "durably_accepted": false,
+  "customer_defaults_added": false,
+  "formal_128_acceptance_complete": false,
+  "python_tests": 169,
+  "contract_tests": 127,
+  "contract_generator_consistent": true
+}

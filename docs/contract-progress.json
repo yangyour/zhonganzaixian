@@ -510,8 +510,10 @@
       "has_progress_note": true,
       "local_references": [
         "docs/evidence/niko-metric-series-core-20261005.json",
+        "docs/evidence/niko-monitoring-object-mapping-20261007.json",
         "docs/evidence/niko-zabbix-numeric-history-20261005.json",
-        "docs/metric-series-projection.md"
+        "docs/metric-series-projection.md",
+        "docs/monitoring-object-mapping.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -629,7 +631,9 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/evidence/niko-monitoring-object-mapping-20261007.json",
         "docs/evidence/niko-monitoring-storage-coordinator-20261007.json",
+        "docs/monitoring-object-mapping.md",
         "docs/monitoring-storage-coordinator.md"
       ],
       "external_references_unchecked": 0,
@@ -1425,6 +1429,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "791f77fd1fbde4e2eb434b073a9e8c496f292146a09ac396f8f3fb63291199e7"
+    "doc/development/07_合同逐项开发追踪.md": "a57ae0c39106789246c747a771abab96ed8b6b1a6a48d49e74656d1aa03c6eef"
   }
 }

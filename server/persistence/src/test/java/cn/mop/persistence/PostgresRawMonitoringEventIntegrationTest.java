@@ -76,5 +76,30 @@ class PostgresRawMonitoringEventIntegrationTest {
     @Test void verifierRejectsWeakenedCheckWithSameCount()throws Exception{rejectsCatalogDrift("ALTER TABLE public.mop_raw_monitoring_event DROP CONSTRAINT mop_raw_monitoring_event_payload_check; ALTER TABLE public.mop_raw_monitoring_event ADD CONSTRAINT mop_raw_monitoring_event_payload_check CHECK(true)");}
     @Test void verifierRejectsTamperedGeneratedExpression()throws Exception{rejectsCatalogDrift("ALTER TABLE public.mop_raw_monitoring_event ALTER COLUMN content_fingerprint SET EXPRESSION AS (public.mop_raw_event_fingerprint(pool_id,source_event_id,source_phase,tenant_id,asset_id,occurred_epoch_second,occurred_nano,payload)||'tampered')");}
     @Test void verifierRejectsUnloggedStorage()throws Exception{rejectsCatalogDrift("ALTER TABLE public.mop_raw_monitoring_event SET UNLOGGED");}
+    @Test void storageForcesSynchronousCommitEvenIfPoolSessionIsAsync()throws Exception{
+        var observed=new java.util.concurrent.atomic.AtomicInteger();
+        javax.sql.DataSource source=(javax.sql.DataSource)java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),new Class<?>[]{javax.sql.DataSource.class},(p,m,a)->{
+            if(m.getName().equals("getConnection")){
+                Connection real=pool.getConnection();try(var stmt=real.createStatement()){stmt.execute("SET synchronous_commit='off'");}
+                return java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),new Class<?>[]{Connection.class},(q,n,b)->{
+                    if(n.getName().equals("commit")){try(var stmt=real.createStatement();var rows=stmt.executeQuery("SHOW synchronous_commit")){rows.next();if(!"on".equals(rows.getString(1)))throw new SQLException("Synchronous commit required");}real.commit();try(var stmt=real.createStatement();var rows=stmt.executeQuery("SHOW synchronous_commit")){rows.next();if(!"off".equals(rows.getString(1)))throw new SQLException("Transaction setting leaked");observed.incrementAndGet();}return null;}
+                    if(n.getName().equals("close")){real.setAutoCommit(true);try(var stmt=real.createStatement()){stmt.execute("SET synchronous_commit='on'");}}
+                    try{return n.invoke(real,b);}catch(java.lang.reflect.InvocationTargetException e){throw e.getCause();}
+                });
+            }try{return m.invoke(pool,a);}catch(java.lang.reflect.InvocationTargetException e){throw e.getCause();}
+        });
+        assertEquals(STORED,new PostgresRawMonitoringEventRepository(source).store(event()).outcome());
+        assertEquals(1,observed.get());
+    }
+
+    @Test void missingDefaultIsRejected()throws Exception{rejectsCatalogDrift("ALTER TABLE public.mop_raw_monitoring_event ALTER COLUMN storage_status DROP DEFAULT");}
+    @Test void inheritedChildIsRejected()throws Exception{rejectsCatalogDrift("CREATE TABLE public.drift_child () INHERITS(public.mop_raw_monitoring_event)");}
+    @Test void inheritedParentIsRejected()throws Exception{rejectsCatalogDrift("CREATE TABLE public.drift_parent (); ALTER TABLE public.mop_raw_monitoring_event INHERIT public.drift_parent");}
+    @Test void rewriteRuleIsRejected()throws Exception{rejectsCatalogDrift("CREATE RULE drift_rule AS ON UPDATE TO public.mop_raw_monitoring_event DO ALSO NOTHING");}
+    @Test void tableDelegationGrantIsRejected()throws Exception{rejectsCatalogDrift("GRANT SELECT ON public.mop_raw_monitoring_event TO mop_test_runtime WITH GRANT OPTION");}
+    @Test void columnDelegationGrantIsRejected()throws Exception{rejectsCatalogDrift("GRANT SELECT(payload) ON public.mop_raw_monitoring_event TO mop_test_runtime WITH GRANT OPTION");}
+    @Test void functionDelegationGrantIsRejected()throws Exception{rejectsCatalogDrift("GRANT EXECUTE ON FUNCTION public.mop_raw_event_fingerprint(uuid,text,text,uuid,uuid,bigint,integer,bytea) TO mop_test_runtime WITH GRANT OPTION");}
+    @Test void maintenancePrivilegeIsRejected()throws Exception{rejectsCatalogDrift("GRANT MAINTAIN ON public.mop_raw_monitoring_event TO mop_test_runtime");}
+    @Test void columnReferencePrivilegeIsRejected()throws Exception{rejectsCatalogDrift("GRANT REFERENCES(payload) ON public.mop_raw_monitoring_event TO mop_test_runtime");}
 
 }

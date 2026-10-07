@@ -8,6 +8,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Pure CLI policy tests. No network, database, migration, or alternate component is used. */
 class TestSchemaMigrationTest {
+    @Test void quarantineRequiresExplicitV30AfterRawStorage()throws Exception{
+        assertEquals(TestSchemaMigration.Mode.APPLY_MONITORING_QUARANTINE,TestSchemaMigration.requestedMode(new String[]{"--apply-monitoring-quarantine"}));
+        assertTrue(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_MONITORING_QUARANTINE,TestSchemaMigration.Plan.RAW_MONITORING_EVENTS_APPLIED));
+        assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_MONITORING_QUARANTINE,TestSchemaMigration.Plan.IDENTITY_COMPATIBILITY_APPLIED));
+        assertFalse(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_MONITORING_QUARANTINE,TestSchemaMigration.Plan.MONITORING_QUARANTINE_APPLIED));
+        assertFalse(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.READ_ONLY_CHECK,TestSchemaMigration.Plan.MONITORING_QUARANTINE_APPLIED));
+        MonitoringQuarantineSchemaVerifier.resource();
+    }
+
     @Test void rawEventStorageRequiresOnlyExplicitV29AndFrozenBytes()throws Exception{
         assertEquals(TestSchemaMigration.Mode.APPLY_RAW_MONITORING_EVENTS,TestSchemaMigration.requestedMode(new String[]{"--apply-raw-monitoring-events"}));
         assertTrue(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_RAW_MONITORING_EVENTS,TestSchemaMigration.Plan.IDENTITY_COMPATIBILITY_APPLIED));
@@ -25,7 +34,7 @@ class TestSchemaMigrationTest {
         assertFalse(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.READ_ONLY_CHECK,TestSchemaMigration.Plan.PROJECT_IDENTITY_APPLIED));
         ProjectIdentitySchemaVerifier.resource();
     }
-    private static final List<String> SCRIPTS=List.of("V1__remote_test_platform.sql","V2__tenant_configuration_revisions.sql","V3__configuration_review_test_identity.sql","V4__durable_customer_report_registration.sql","V5__durable_report_photos.sql","V6__asset_import_sources_and_mapping.sql","V7__asset_dependency_draft_revisions.sql","V8__manual_worklog_revisions.sql","V9__manual_asset_metadata_revisions.sql","V10__immutable_internal_ticket_notes.sql","V11__immutable_ticket_comments.sql","V12__unpublished_working_calendar_drafts.sql","V13__immutable_manual_incident_registrations.sql","V14__immutable_manual_recovery_confirmations.sql","V15__manual_warranty_details.sql","V16__immutable_capacity_scenario_drafts.sql","V17__customer_contact_revisions.sql","V18__durable_contact_import_jobs.sql","V19__contact_import_generated_hash_guard.sql","V20__durable_asset_export_jobs.sql","V21__inspection_template_revisions.sql","V22__manual_inspection_worksheet_drafts.sql","V23__immutable_inspection_source_collections.sql","V24__unpublished_backup_plan_drafts.sql","V25__unreviewed_change_notice_drafts.sql","V26__own_notification_preference_drafts.sql","V27__project_identity_and_roles.sql","V28__identity_inventory_and_password_formats.sql","V29__immutable_raw_monitoring_events.sql");
+    private static final List<String> SCRIPTS=List.of("V1__remote_test_platform.sql","V2__tenant_configuration_revisions.sql","V3__configuration_review_test_identity.sql","V4__durable_customer_report_registration.sql","V5__durable_report_photos.sql","V6__asset_import_sources_and_mapping.sql","V7__asset_dependency_draft_revisions.sql","V8__manual_worklog_revisions.sql","V9__manual_asset_metadata_revisions.sql","V10__immutable_internal_ticket_notes.sql","V11__immutable_ticket_comments.sql","V12__unpublished_working_calendar_drafts.sql","V13__immutable_manual_incident_registrations.sql","V14__immutable_manual_recovery_confirmations.sql","V15__manual_warranty_details.sql","V16__immutable_capacity_scenario_drafts.sql","V17__customer_contact_revisions.sql","V18__durable_contact_import_jobs.sql","V19__contact_import_generated_hash_guard.sql","V20__durable_asset_export_jobs.sql","V21__inspection_template_revisions.sql","V22__manual_inspection_worksheet_drafts.sql","V23__immutable_inspection_source_collections.sql","V24__unpublished_backup_plan_drafts.sql","V25__unreviewed_change_notice_drafts.sql","V26__own_notification_preference_drafts.sql","V27__project_identity_and_roles.sql","V28__identity_inventory_and_password_formats.sql","V29__immutable_raw_monitoring_events.sql","V30__immutable_monitoring_quarantine.sql");
     private static List<TestSchemaMigration.Entry> entries(boolean photosApplied,boolean importsApplied) {
         return entries(photosApplied,importsApplied,false);
     }

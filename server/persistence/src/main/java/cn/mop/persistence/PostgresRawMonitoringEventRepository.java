@@ -25,7 +25,7 @@ public final class PostgresRawMonitoringEventRepository {
         try(Connection c=dataSource.getConnection()){
             c.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);c.setAutoCommit(false);
             try{
-                try(var s=c.createStatement()){s.execute("SET LOCAL lock_timeout='10s'");s.execute("SET LOCAL statement_timeout='10s'");}
+                try(var s=c.createStatement()){s.execute("SET LOCAL synchronous_commit='on'");s.execute("SET LOCAL lock_timeout='10s'");s.execute("SET LOCAL statement_timeout='10s'");}
                 boolean inserted;
                 try(var s=c.prepareStatement("INSERT INTO public.mop_raw_monitoring_event(id,pool_id,source_event_id,source_phase,tenant_id,asset_id,occurred_epoch_second,occurred_nano,received_epoch_second,received_nano,payload) VALUES (?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(pool_id,source_event_id,source_phase) DO NOTHING RETURNING id")){
                     s.setObject(1,UUID.randomUUID());s.setObject(2,incoming.key().poolId());s.setString(3,incoming.key().sourceEventId());s.setString(4,incoming.key().phase().name());s.setObject(5,incoming.binding().tenantId());s.setObject(6,incoming.binding().assetId());s.setLong(7,incoming.occurredAt().getEpochSecond());s.setInt(8,incoming.occurredAt().getNano());s.setLong(9,incoming.receivedAt().getEpochSecond());s.setInt(10,incoming.receivedAt().getNano());s.setBytes(11,incoming.payload());
@@ -33,7 +33,7 @@ public final class PostgresRawMonitoringEventRepository {
                 }
                 // Separate READ COMMITTED statement observes a concurrently committed winning insert.
                 Receipt receipt;
-                try(var s=c.prepareStatement("SELECT * FROM public.mop_raw_monitoring_event WHERE pool_id=? AND source_event_id=? AND source_phase=?")){
+                try(var s=c.prepareStatement("SELECT * FROM ONLY public.mop_raw_monitoring_event WHERE pool_id=? AND source_event_id=? AND source_phase=?")){
                     s.setObject(1,incoming.key().poolId());s.setString(2,incoming.key().sourceEventId());s.setString(3,incoming.key().phase().name());
                     try(var r=s.executeQuery()){
                         if(!r.next())throw unavailable();

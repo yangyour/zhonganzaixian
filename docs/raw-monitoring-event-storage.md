@@ -23,3 +23,7 @@ V1–V28 字节不变，V29 在 2026-10-07 的 niko 独立 PostgreSQL 17.11 测�
 66 张既有业务表的完整行指纹在迁移/测试后不变。15 条已提交合成原始事件在真实 PostgreSQL 正常重启前后数量和完整行摘要相同；重启后独立只读 CLI 0 迁移。这是 graceful restart，不是 WAL/主机掉电/事务中途数据库崩溃验收。
 
 实际回归与限制见[证据](evidence/niko-raw-monitoring-event-storage-20261007.json)。原指定服务器没有操作，API/Worker 启动仍不自动迁移。Q06/Q29 不补默认值；真实监控接入、隔离队列、完整 M4-8/M4-14 与 128 项正式验收继续保留未完成状态。
+
+## 后续安全加固（2026-10-07）
+
+配合独立隔离存储切片，原始仓储也显式设置事务 synchronous_commit=on，SELECT ONLY 限定基表；schema 校验扩展到全部默认值、继承/重写、表/列/函数权限类型与转授权及 fsync/full_page_writes。新增真实 PG 探针从 off 会话开始验证提交时 on、提交后恢复 off，7类目录/授权漂移及 PG17 MAINTAIN、列REFERENCES拒绝。当前原始仓储26项真实PG通过；未修改V29 SQL。最终完整回归另见[隔离存储证据](evidence/niko-monitoring-quarantine-storage-20261007.json)。

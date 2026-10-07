@@ -1,0 +1,12 @@
+{
+  "verified_at": "2026-10-07T02:19:41.120Z",
+  "ready": true,
+  "project_local_login": true,
+  "optional_oidc_enabled": false,
+  "password_policy_all_null": true,
+  "password_policy_version": 1,
+  "real_http_requests": 5,
+  "business_commands": 0,
+  "environment": "designated-server-api-0.45",
+  "latest_frontend_deployed": false
+}

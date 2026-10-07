@@ -28,4 +28,26 @@ class RawMonitoringEventTest {
     @Test void rejectsOversizedOrEmptyPayloadAndMissingScope() {assertThrows(IllegalArgumentException.class,()->new Key(POOL,"x".repeat(257),Phase.PROBLEM));assertThrows(IllegalArgumentException.class,()->new Binding(null,ASSET));assertThrows(IllegalArgumentException.class,()->new RawMonitoringEvent(new Key(POOL,"1",Phase.PROBLEM),new Binding(TENANT,ASSET),SOURCE,RECEIVED,new byte[0]));assertThrows(IllegalArgumentException.class,()->new RawMonitoringEvent(new Key(POOL,"1",Phase.PROBLEM),new Binding(TENANT,ASSET),SOURCE,RECEIVED,new byte[RawMonitoringEvent.MAX_PAYLOAD_BYTES+1]));}
     @Test void logsCannotExposePayloadOrSourceIdentifier() {var e=event("DO_NOT_ECHO_ID",Phase.PROBLEM,SOURCE,RECEIVED,"DO_NOT_ECHO_BODY");assertFalse(e.toString().contains("DO_NOT_ECHO"));assertTrue(e.toString().contains("not durably accepted"));}
     @Test void sameSourceTimeAndBytesAreDeterministicAndNamespaced() {var e=event("1|PROBLEM",Phase.PROBLEM,SOURCE,RECEIVED,"x");assertEquals(e.contentFingerprint(),event("1|PROBLEM",Phase.PROBLEM,SOURCE,RECEIVED,"x").contentFingerprint());assertNotEquals(e.contentFingerprint(),event("1",Phase.PROBLEM,SOURCE,RECEIVED,"PROBLEM|x").contentFingerprint());}
+
+    @Test void matchesIndependentUtf8AndPreEpochNanosecondGoldenVector() {
+        // Python hashlib/struct golden bytes: UTF-8 fields with big-endian uint32
+        // lengths, then signed epoch second -1 and nanoseconds 999999999.
+        // This does not call the production encoder to derive its expected result.
+        var source = Instant.parse("1969-12-31T23:59:59.999999999Z");
+        var e = event("合成源-😀", Phase.PROBLEM, source, RECEIVED, "{\"温度\":25} \n");
+        assertEquals("129163423ff3049f073e433e8f913355e69a2283371d66ac0c15a96948b8a47e", e.payloadSha256());
+        assertEquals("06084bc23358202a93db8c85d809ea9b4ba3f2ff29fca21dd014d8dd48d8795d", e.contentFingerprint());
+        assertEquals(source, e.occurredAt());
+    }
+
+    @Test void acceptsExactTechnicalBoundsWithoutNormalizingPayloadOrIdentifier() {
+        String identifier = "😀".repeat(128); // 256 UTF-16 units, 512 UTF-8 bytes.
+        byte[] payload = new byte[RawMonitoringEvent.MAX_PAYLOAD_BYTES];
+        var e = new RawMonitoringEvent(new Key(POOL, identifier, Phase.PROBLEM),
+                new Binding(TENANT, ASSET), SOURCE, RECEIVED, payload);
+        assertEquals(identifier, e.key().sourceEventId());
+        assertArrayEquals(payload, e.payload());
+        assertEquals("30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58", e.payloadSha256());
+        assertThrows(IllegalArgumentException.class, () -> new Key(POOL, identifier + "x", Phase.PROBLEM));
+    }
 }

@@ -1,0 +1,61 @@
+{
+  "verified_at": "2026-10-07T02:11:53.486582+00:00",
+  "source_commit": "163bc6989e37f4c7df9563ddbc95bbd8e391ab2c",
+  "linux_ci": {
+    "run_id": 37560060254,
+    "conclusion": "success",
+    "url": "https://github.com/yangyour/zhonganzaixian/actions/runs/37560060254",
+    "python_executed": 162,
+    "python_batches": [
+      17,
+      21,
+      5,
+      32,
+      14,
+      28,
+      11,
+      7,
+      9,
+      9,
+      9
+    ],
+    "source_export_symlink_guard": "EXECUTED_PASS"
+  },
+  "windows": {
+    "deployment_guards": 5,
+    "migration_mode_guards": 139,
+    "process_ownership_guards": 29,
+    "export_preparation_guards": 12,
+    "source_export": {
+      "reported": 21,
+      "passed": 20,
+      "skipped": 1,
+      "skip_reason": "WinError 1314 at symlink test setup; OS permissions unchanged"
+    }
+  },
+  "distinct_python_tests_covered_across_supported_platforms": 167,
+  "first_windows_full_attempt": {
+    "reported": 167,
+    "passed": 120,
+    "skipped": 1,
+    "failures": 5,
+    "errors": 41,
+    "retained": true,
+    "scope": "Linux-specific UID/mode/proc/bash plus Windows symlink prerequisite; not counted as all-pass"
+  },
+  "server_python_preflight": {
+    "version": "3.6.8",
+    "paramiko_available": false,
+    "toolchain_installed": false
+  },
+  "real_component_operations": 0,
+  "log_sha256": {
+    "python.log": "8a5ea3e3291e0a48b3e6c6ecc394a1748264edd22e87c6d036621da86ff15513",
+    "source-recovery-windows.log": "3664217bbba8228138566c6b79201104eda096f5136c29ec5444a4b87371387d",
+    "deployment-windows.log": "8d457fcaf2c0ba146c1a88d3d796a1c262acc5a38ffbfb7c1ee3b144886cb9b7",
+    "migration-guards.log": "d7f68944283667f47e627bab4ecaffe4160f673c2afc4aeb5a8e358ddd1a78f2",
+    "process-guards.log": "9470047e28e2d0c1d744130229ff17e4688583c4c640c9dd2fb3514919d655da",
+    "export-guards.log": "0bb9c96a571004f711fe3e44009ddd339479c960d308b51447f64622b050d84c",
+    "ci-37560060254.zip": "a1776a0cda17a0d563b63cce3896df5083b212e70b1312f9ee82c3ece02055ab"
+  }
+}

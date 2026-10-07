@@ -1,0 +1,1769 @@
+{
+  "verified_at": "2026-10-07T02:19:59.949215+00:00",
+  "application_source_commit": "ce49a07370206ba16c037cd44e5ddc3b9647dbaa",
+  "additional_unit_tests": 2,
+  "environment": "Windows local JVM over pinned SSH to designated project components",
+  "postgresql_version": "17.9 (Ubuntu 17.9-1.pgdg22.04+1)",
+  "schema_version": 28,
+  "schema_migrations_applied": 0,
+  "java": {
+    "reported": 2567,
+    "executed": 2554,
+    "skipped": 13,
+    "failures": 0,
+    "errors": 0,
+    "postgresql": 772,
+    "minio": 6
+  },
+  "junit_suites": [
+    {
+      "suite": "cn.mop.adapters.backup.RedactedBackupDiffTest",
+      "tests": 21,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "bd2280a70db9ebdead7dc868a863d1ce8bab2b1878fa46b79017a36b6b8fb8bb"
+    },
+    {
+      "suite": "cn.mop.adapters.MinioAssetImportStoreRemoteTest",
+      "tests": 3,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "db8cec6abbc9a08978b3aa90f62a25e9e9024405b314e82acdedcf04564dfb09"
+    },
+    {
+      "suite": "cn.mop.adapters.MinioAssetImportStoreSafetyTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "3741b7f59dfc07819ec6d0250a1a3869fcb309b15f3baec46cf812819e86be6c"
+    },
+    {
+      "suite": "cn.mop.adapters.MinioPhotoStoreRemoteTest",
+      "tests": 3,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "5fe88453fa06e0fd560370ba63212f6065127a5fef07159f4f728f59064aa65e"
+    },
+    {
+      "suite": "cn.mop.adapters.MinioPhotoStoreSafetyTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "9ed18b9b659e9374e19d86123054ceb6ef8f9fa2c5e71c8dda307100ce9ee927"
+    },
+    {
+      "suite": "cn.mop.adapters.monitoring.ZabbixVersionTransportTest",
+      "tests": 20,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "e691808a64c545b139365ab3487038cd325b6397793f67a1883743a26b2657fc"
+    },
+    {
+      "suite": "cn.mop.adapters.oss.OssProjectStoreTest",
+      "tests": 20,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "365975746781819f57eb59e186dcc30de78852437548bbb502f9edb65d594827"
+    },
+    {
+      "suite": "cn.mop.api.AssetDateAssessmentControllerTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "a3aa5813fec58d39aa6b729bea270d0ab2120d1b9e27d44692934442ef9bc735"
+    },
+    {
+      "suite": "cn.mop.api.AssetDateFilterTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "77e7f869feb1a883a396250a1412de58f0655eccc4d8592d5b7a1fd01f6a98ff"
+    },
+    {
+      "suite": "cn.mop.api.AssetDateQueryControllerTest",
+      "tests": 9,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "f9b0bd0bfe48bd0a1030db93e7b722791abf79042b3786532407b3f5564d1b16"
+    },
+    {
+      "suite": "cn.mop.api.AssetDependencyControllerTest",
+      "tests": 7,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "857ec1c360b13e0cd88c52e751b77c4484a4a08bfaa781fd6bdd2abb547008e5"
+    },
+    {
+      "suite": "cn.mop.api.AssetExportClaimBoundaryTest",
+      "tests": 2,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "7e21d940b80f2f385f3be8801ca42d270172729ddbe0bb562b45fd3be3035fdc"
+    },
+    {
+      "suite": "cn.mop.api.AssetExportCommandCodecTest",
+      "tests": 21,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "92b13b4471e60804aac1f860a8ab5d6840523e71b87b13dbbacbba4627dc8a27"
+    },
+    {
+      "suite": "cn.mop.api.AssetExportJobControllerTest",
+      "tests": 16,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "679e041ec615725a6b576e6e3dea50e855bf2d3aeb36407124472dd94cad0ec3"
+    },
+    {
+      "suite": "cn.mop.api.AssetExportJobStateTest",
+      "tests": 31,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "ce4bade85b99a7a9901f8335c67871d0b91daa20d1766c39f161ee42c274dd1f"
+    },
+    {
+      "suite": "cn.mop.api.AssetExportPreparedFileTest",
+      "tests": 7,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "6cd1d0991a103893569a505d23ad508522d37d292a981ef2ed824955483b5983"
+    },
+    {
+      "suite": "cn.mop.api.AssetExportProgressTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "6a11099c7cd5e94c53006bf8c8e33ba2ba9e124ccfb627ecb5bbb39590b8362f"
+    },
+    {
+      "suite": "cn.mop.api.AssetExportSnapshotGuardTest",
+      "tests": 7,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "552def299d92d1276bcca0f730bdf99382e15e8113c1e18458098dcc19efe227"
+    },
+    {
+      "suite": "cn.mop.api.AssetImportControllerTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "ef0bbdf54addda5195e0505a8f4c2cb2ca0fe18c993dd2e92e6d1870ac54f871"
+    },
+    {
+      "suite": "cn.mop.api.AssetImportHttpSecurityTest",
+      "tests": 7,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "c0467182af274409fba6233d3b785989b8bae2fc035f9e86dd368dbdab522084"
+    },
+    {
+      "suite": "cn.mop.api.AssetImportPolicyTest",
+      "tests": 2,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "7743827c3ec2488d20cb011eda127fd88729b5ab9b824a76e6561b324cf1d916"
+    },
+    {
+      "suite": "cn.mop.api.AssetImportReadinessTest",
+      "tests": 4,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "0d05467c2a7e99d3b5b4ca0cbd35733cea99400aa614fcac94e067da708026b6"
+    },
+    {
+      "suite": "cn.mop.api.AssetImportTemplateControllerTest",
+      "tests": 4,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "16e682d02d41c77e787cf34a595271f96a9bf2836994d20dd78e894743ee6bdd"
+    },
+    {
+      "suite": "cn.mop.api.AssetLedgerReadControllerTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "4dc7e3c2b4fa6a4dfafab0c8224a2a93fe45d6dc462a7f01adc4623fbe3f66db"
+    },
+    {
+      "suite": "cn.mop.api.AssetReadQueryTest",
+      "tests": 3,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "29859535cae1995389418e0c750d97dd7090c695ff6ef5620da9788dc02e5b93"
+    },
+    {
+      "suite": "cn.mop.api.AuditReadControllerTest",
+      "tests": 7,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "fdd6d32c10061f2a2d57f29384944c26f750159532bc938fceaba57cb9e0f3ce"
+    },
+    {
+      "suite": "cn.mop.api.BackupPlanDraftControllerTest",
+      "tests": 18,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "4f6077453ec359760b184656e67e0f3a965755d1fe51549fb3689f7d0f825983"
+    },
+    {
+      "suite": "cn.mop.api.BackupPlanDraftTest",
+      "tests": 18,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "f33a996632897dc4cf36811642599791b0596ad50b848f79689911b34808049c"
+    },
+    {
+      "suite": "cn.mop.api.BackupRunStateTest",
+      "tests": 20,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "8804191e5e519d7a7f1710ef6a18667c2b55e04f62b09970b978fc55115bbea3"
+    },
+    {
+      "suite": "cn.mop.api.CapabilityCatalogControllerTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "4f2c446716c50b27133240c8302e89527b772938442101150095fc0e89b61952"
+    },
+    {
+      "suite": "cn.mop.api.CapabilityCatalogTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "c5b91a051b05eff4abb86b291d4cf63c860ee3495d0b77b8d61aa08019545e05"
+    },
+    {
+      "suite": "cn.mop.api.CapacityEstimateControllerTest",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "b1919e3fcb4f43541b38c881228946230e5aa186fdd91749d5b4f5e25de338aa"
+    },
+    {
+      "suite": "cn.mop.api.CapacityEstimateTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "f5307d552dc402c38fd31245937f5d4e95909ae9fb012a04fab84efc3fe8780d"
+    },
+    {
+      "suite": "cn.mop.api.CapacityScenarioControllerTest",
+      "tests": 11,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "848996d92d6adaf4d413fbf0650664a1e8762cbdac02813d43258e6c47132127"
+    },
+    {
+      "suite": "cn.mop.api.CapacityScenarioDraftTest",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "4f893a3bdd73b5aa063a51771f97a4810537cc4adf1b9d02034ae92be3872e3a"
+    },
+    {
+      "suite": "cn.mop.api.ChangeNoticeDraftControllerTest",
+      "tests": 20,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "7ca8447171584ff47e00bbdcda9ff84b4acd8d0ec3599a82fa8f232da712d846"
+    },
+    {
+      "suite": "cn.mop.api.ChangeNoticeDraftTest",
+      "tests": 21,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "6b1ae3f49bfb31f50be0dcb68c23fd27421b8adfbb1d063588e44515252b31f4"
+    },
+    {
+      "suite": "cn.mop.api.ConfigurationDiagnosticControllerTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "5ab24d4f5ceae9caf46f73f8181456d4efea122b7c304edc76f3f070c6808b49"
+    },
+    {
+      "suite": "cn.mop.api.ConfigurationDiagnosticHttpSecurityTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "303778982c808f11cea31912616f4b49e8d22ae4f5d7133cc739b45a9f497fe0"
+    },
+    {
+      "suite": "cn.mop.api.ConfigurationRevisionValidationTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "04e01607a74e707524699277d3774fa56265efed5895d9e4e9460da2b40b27b5"
+    },
+    {
+      "suite": "cn.mop.api.ConfigurationRevisionWorkflowTest",
+      "tests": 2,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "f486b50c6689c9a25c45f8027acdfd8161575d20280eca9db072ace19587d929"
+    },
+    {
+      "suite": "cn.mop.api.ContactImportControllerTest",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "0314da56e2a88982c07c8232e9190b93cb586ba880f917cf6ea87f43a90f5271"
+    },
+    {
+      "suite": "cn.mop.api.ContactImportJobStateTest",
+      "tests": 16,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "9b66e6a4f571b4033e8992a1018e5e2ee6daf1843e93a16a117ad8e367da486b"
+    },
+    {
+      "suite": "cn.mop.api.CustomerConfirmationWindowTest",
+      "tests": 15,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "00fee51c4e3912404fd13fba9645d56f4868700987f9fcf92f72ca069c7fd766"
+    },
+    {
+      "suite": "cn.mop.api.CustomerContactControllerTest",
+      "tests": 14,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "48886c8960541eb3a651963f2b0a06b15f1aa4e56ee85fc084e4fb382ec50717"
+    },
+    {
+      "suite": "cn.mop.api.CustomerContactImportPreviewControllerTest",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "d101f838f89c227def92298dd61fa9e9d94e98dd4dd4389854a9d253feb516db"
+    },
+    {
+      "suite": "cn.mop.api.CustomerContactImportPreviewTest",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "ffc45d65353b2730822e50626ebd951bf229940e1982a1699c32412e98f92e29"
+    },
+    {
+      "suite": "cn.mop.api.CustomerContactTest",
+      "tests": 14,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "0ca98e7b1d798d47f03e3390e49da17069e0fcc3571c41f587e67004a28a6f76"
+    },
+    {
+      "suite": "cn.mop.api.CustomerReportValidationTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "2003c43452fc26be051fc5bdf4e53eae373545fd9a7dc07e8d117e677a9b7a8d"
+    },
+    {
+      "suite": "cn.mop.api.DashboardAvailabilitySnapshotTest",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "1cbddc95778f700f0e3bf44ac5f9a719ff527fdf68016ce697254e536cd1261a"
+    },
+    {
+      "suite": "cn.mop.api.DashboardControllerTest",
+      "tests": 15,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "f6fc58e1aaaaeda4896358081d625d205decf0e4a182bce5b32299a0e004d80d"
+    },
+    {
+      "suite": "cn.mop.api.DashboardHttpSecurityTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "cc17436717ca50c0d23f134edd11f7c1fdf1ef8f5659d3286a81e3e08e1a121c"
+    },
+    {
+      "suite": "cn.mop.api.DeliveryReceiptStateTest",
+      "tests": 24,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "e2e3bb55bef035bb96b41681c096d08178e86b638558865ded47129cc55799af"
+    },
+    {
+      "suite": "cn.mop.api.EffectiveCapabilityEntryTest",
+      "tests": 4,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "f80d73e86a96be0cee3b5e80fcf8af0f6f5ede6627adb42e958d9ab1c0c68093"
+    },
+    {
+      "suite": "cn.mop.api.EffectiveCapabilityGateTest",
+      "tests": 116,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "dc120312c88883da2e1865e6aaf3e48cf0e43695d1ada6a6fc6ddedd34e79fab"
+    },
+    {
+      "suite": "cn.mop.api.ExplicitOperationalMetricsControllerTest",
+      "tests": 11,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "23b4e4a4f2dd16c96d7e652ee67a1048bd0091edc3d37b48eecc5bd8dc6092dd"
+    },
+    {
+      "suite": "cn.mop.api.ExplicitOperationalMetricsTest",
+      "tests": 14,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "d3d199621827216e7b3987d62c3115740bdef612c8fc5d52c7cfff01f8f71798"
+    },
+    {
+      "suite": "cn.mop.api.FileControllerHttpSecurityTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "e8605c8c8c0805b80e17359e4f144ffae53dbeee18f7e33b0e7cf926ee7e2de4"
+    },
+    {
+      "suite": "cn.mop.api.FileControllerTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "c6a3161fd14b687b8ad05c009e7919cced331834c2fcbfc911f7ea6efd7202c7"
+    },
+    {
+      "suite": "cn.mop.api.FixtureSecurityAndWorkflowTest",
+      "tests": 13,
+      "skipped": 13,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "abf9085e67fbabb19f3ad0a95c498e1f44e0fbb521113a837e906be23178d931"
+    },
+    {
+      "suite": "cn.mop.api.GlobalSearchControllerTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "4b1453f3c3cbd5448a9bb138126292b8eb18fa09920fc9ca6ebe85a50b7c1d12"
+    },
+    {
+      "suite": "cn.mop.api.GlobalSearchQueryTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "484da267980ecd5b2b0530812ee8c9f41e92d8eee4ca4cd71d23a9f942ec9d55"
+    },
+    {
+      "suite": "cn.mop.api.InspectionSourceCollectionControllerTest",
+      "tests": 17,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "ef54bb1f8cdce60ad3a39e1c1b6c2c8fa7b8156c5bcb6a0f74c972b00d2b489e"
+    },
+    {
+      "suite": "cn.mop.api.InspectionSourceManifestTest",
+      "tests": 20,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "bca9fe85ce7409aa0b1fa5696b3b1fde4e22abcc5c532da085fe0fe131c63dbd"
+    },
+    {
+      "suite": "cn.mop.api.InspectionTemplateControllerTest",
+      "tests": 16,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "7c2206a3c8fd6c140d42bb5dc5074fa7a069bae2f1bc38848e0df09da6c5ab11"
+    },
+    {
+      "suite": "cn.mop.api.InspectionTemplateTest",
+      "tests": 20,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "5274128fa573b89e145cdd2f77ab4c38584b52492dac4b08e165d1ad43270ac1"
+    },
+    {
+      "suite": "cn.mop.api.InspectionWorksheetContentTest",
+      "tests": 15,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "4b8bc751c7c1439687536d1a6c04dc354435cacbd87a08d51bf09cc68fa64875"
+    },
+    {
+      "suite": "cn.mop.api.InspectionWorksheetControllerTest",
+      "tests": 16,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "558ee1477d6149769a204e966e12fcd65af8db05a55eae58db02832ad966d2d1"
+    },
+    {
+      "suite": "cn.mop.api.InspectionWorksheetSourceControllerTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "6ca44c93b9ab2464eedefe3db4efd4c8fae028d410b7a870f5796b6f981f3983"
+    },
+    {
+      "suite": "cn.mop.api.InternalTicketNoteControllerTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "c2170a076cdb0f4c9df230e61fa1a066822f99b142698ce7886ef4b0900c4b3e"
+    },
+    {
+      "suite": "cn.mop.api.InternalTicketNoteTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "4849800b7b0f2f68ad9e13e2893db36d5f5aa113253bde7fbe460779d609027f"
+    },
+    {
+      "suite": "cn.mop.api.IntervalSetsTest",
+      "tests": 16,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "933894d98243c0d0a2cb8abaa6ef81330449ce1f1bf96c38354399bf782f00e6"
+    },
+    {
+      "suite": "cn.mop.api.ManualAssetMetadataControllerTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "faf41e3e51f53a6896f293f6bb72f586a8b2b259425ea8251f192fd3052d7a22"
+    },
+    {
+      "suite": "cn.mop.api.ManualAssetMetadataTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "2e393e21be6b8dbb332e42673bb515cd19d5635bafda70cff17de7fa3d21bc9d"
+    },
+    {
+      "suite": "cn.mop.api.ManualAssetQueryControllerTest",
+      "tests": 4,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "e0861e3e741c3770dedf4b49d60521ef405f60e7445cca53d9a363905cf2574c"
+    },
+    {
+      "suite": "cn.mop.api.ManualIncidentControllerTest",
+      "tests": 11,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "44adca375cac669280f1bffdde66a6a75f02f78306b7feabfaddb6bfc2c41a43"
+    },
+    {
+      "suite": "cn.mop.api.ManualIncidentTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "3ab44aca4cff21ce59db693d3aa947200c94eb6da57aacd799bba01757b4081f"
+    },
+    {
+      "suite": "cn.mop.api.ManualRecoveryConfirmationTest",
+      "tests": 9,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "2ca4cf60dddb1403683e94cdfda74bcf0af46494ca94269b642c109e717460b7"
+    },
+    {
+      "suite": "cn.mop.api.ManualRecoveryControllerTest",
+      "tests": 11,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "666b537dee7adda173d85425eda766fd0084b64cd6b42a958b964ba44965fdbc"
+    },
+    {
+      "suite": "cn.mop.api.ManualWarrantyControllerTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "230098fe16c5358d1fdfe8b197826f593ccc2a9f842b3cfc00875252df7d4c30"
+    },
+    {
+      "suite": "cn.mop.api.ManualWarrantyDetailsTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "acf50d823c5a6aae47f09e94aefb44461765537720bfb8501ff989dad0bb8887"
+    },
+    {
+      "suite": "cn.mop.api.ManualWarrantyUpdateTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "fcae781ea1f9b257e2b96c4106fb960845b20008215b8f6a84804de58b8da9a6"
+    },
+    {
+      "suite": "cn.mop.api.ManualWorklogTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "331464f491c315ea504ff74a73c10fc8805245ec8cc71b50ad85e29e43af9169"
+    },
+    {
+      "suite": "cn.mop.api.MetricSeriesProjectionTest",
+      "tests": 25,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "8a9060aef552729afa2a6164477dbd80d80a2b60fb63775591fc6b90a79d8a2a"
+    },
+    {
+      "suite": "cn.mop.api.OssProviderWiringTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "48f8b2333411fc7daa488081de04a9807e9346dca86098b0a39cfc966fcbc291"
+    },
+    {
+      "suite": "cn.mop.api.OwnNotificationPreferenceControllerTest",
+      "tests": 22,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "89ef2281263861acc8c540d7ba7d541c69d0096903c114ed8c47642cac533302"
+    },
+    {
+      "suite": "cn.mop.api.OwnNotificationPreferenceDraftTest",
+      "tests": 19,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "28f811cd6b55e6dfb83ef890db3dc485d2d168c1cc8c54ca4cb1193d9f2c817e"
+    },
+    {
+      "suite": "cn.mop.api.OwnWorklogControllerTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "4d5cc8cc92fa1f847d066c33e348f3e5a5170e09b02397affa74987db5bfb7b6"
+    },
+    {
+      "suite": "cn.mop.api.OwnWorklogQueryTest",
+      "tests": 4,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "03d6b56ae7d40dbe0b88078a6907af4bf4e6ade37253be353672da68b462bf6e"
+    },
+    {
+      "suite": "cn.mop.api.ParsedArtifactStructureTest",
+      "tests": 7,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "d6df35832be028f524485de420a440924749bdabfc11f20f967de05fcb129d85"
+    },
+    {
+      "suite": "cn.mop.api.PhotoPolicyTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "2b30cde3fe39dc21e4549ee6225c503423ac07fb1daffd15af14697eb8fd6caf"
+    },
+    {
+      "suite": "cn.mop.api.PhotoReadinessTest",
+      "tests": 26,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "6c9b0bfefd78caf3c62dd762cc04aa0cf49bb335c744cef42506c0a8effe5808"
+    },
+    {
+      "suite": "cn.mop.api.ProfilePolicyTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "7af31cb236bade2118eca132bfdf15ff25f74ce47ced96565c782c52f646a2b5"
+    },
+    {
+      "suite": "cn.mop.api.ProjectIdentityPostgresIntegrationTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "1ce00a6cd324b7ebd7c961b02a657e48cfb645f257f3e24a7a08b05963fb9006"
+    },
+    {
+      "suite": "cn.mop.api.ProjectIdentitySecurityTest",
+      "tests": 7,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "fac2650266ef774917c8b47b8ddd7635cd7f5e42fa428cadd7f22d1c61c923cf"
+    },
+    {
+      "suite": "cn.mop.api.ProjectPasswordEncoderTest",
+      "tests": 22,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "69610fa9e9dd23d194f12eaabec7d7e7ea00bc6dff100067d40347f71ce5dd1e"
+    },
+    {
+      "suite": "cn.mop.api.ProjectRoleTest",
+      "tests": 7,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "b5bc99fc87f39f84236dd928462a2621ac9e0da56fed52a60a4894f8c1c8cd40"
+    },
+    {
+      "suite": "cn.mop.api.ProxyBufferEstimateTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "865af2fd94defd44d9fcfb6543c1eef07f3d1d67d803eb9f2c4f24e2a73a1448"
+    },
+    {
+      "suite": "cn.mop.api.QuietHoursTest",
+      "tests": 20,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "709acd811764af0f39bf96251b5e0d9062151cb4682eb71e8ef60ee71c24c8d4"
+    },
+    {
+      "suite": "cn.mop.api.RawMonitoringEventTest",
+      "tests": 21,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "24654e48eb48341838b5ab8d34b3dd38749fad04914d68fdf905aa76548330ba"
+    },
+    {
+      "suite": "cn.mop.api.RecoveryDrillRecordTest",
+      "tests": 21,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "f844928e140c3ad1db77a59ec3c2a31f1c91babb00b7da6e2ffc369633e48e86"
+    },
+    {
+      "suite": "cn.mop.api.SessionMembershipRoleProjectionTest",
+      "tests": 9,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "4a2b92cec81a5e9a767ab5207ec6fca1f194fc6067a69c06ced0b2b62a43f751"
+    },
+    {
+      "suite": "cn.mop.api.SessionServiceSecurityTest",
+      "tests": 2,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "c664b77886527c4b519fecfbe8af778ca9681592271834a5d5b07a445da70d3c"
+    },
+    {
+      "suite": "cn.mop.api.SlaComplianceScenarioControllerTest",
+      "tests": 11,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "9fd1efeaed1f93103e89b0340a3fcc7eac80e83a173c86ef272fb7879240f2a8"
+    },
+    {
+      "suite": "cn.mop.api.SlaComplianceScenarioTest",
+      "tests": 13,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "c4081d63962e3c4777858fcde665671668d461b5589df4e16a93d8525fd56156"
+    },
+    {
+      "suite": "cn.mop.api.TenantInventoryControllerTest",
+      "tests": 15,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "f4486747b8dbc60b1f0271c1d18ca40a164acd04067e6288d648d54382332466"
+    },
+    {
+      "suite": "cn.mop.api.TenantInventoryTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "e9d62bd019ef34912f181601b4a5dea1c49e78a7a6029e9ca3cca98440fbc1a6"
+    },
+    {
+      "suite": "cn.mop.api.TestOidcConfigurationTest",
+      "tests": 4,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "76b80d805d6625dfe986671705f4b5bcfa2cd65aa0dead1ca51f1a8e118e7f26"
+    },
+    {
+      "suite": "cn.mop.api.TestOidcEndpointPolicyTest",
+      "tests": 4,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "455e18dc1e9be0bd61b788bb039f65ca044fb092a332ae95e4c1c118a6c56bb2"
+    },
+    {
+      "suite": "cn.mop.api.ThresholdConditionAnalysisTest",
+      "tests": 20,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "a4dec545e6cf92af398e80cac20577908f70c81a851105788ea74a7e514ff7a8"
+    },
+    {
+      "suite": "cn.mop.api.ThresholdDiagnosticControllerTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "796f4b225c02e2f55c35c33ea1d6fb4928870813a01f8b1db9656f5fd239e547"
+    },
+    {
+      "suite": "cn.mop.api.TicketCommentControllerTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "d6da52ad6367288ac58468c3926d9270a757dfdd1a5b59d98b9453530efe7397"
+    },
+    {
+      "suite": "cn.mop.api.TicketCommentTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "653868fb315219c1d231adbfd01345aa7d59bc0c8cf270250adcac7882038061"
+    },
+    {
+      "suite": "cn.mop.api.TicketCustomerActionRulesTest",
+      "tests": 16,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "04bf0f30567668a9c06dfbf930caafbf1dcef592d5d94530ceff62e316b53dfe"
+    },
+    {
+      "suite": "cn.mop.api.TicketPhotoControllerTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "8807063bcab56d4e4365b8196de905c824fa63966a6aedb2ea3dbe60d97c21ec"
+    },
+    {
+      "suite": "cn.mop.api.TicketReadControllerTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "95690b294a91610ac4b84e8bafddf87a1e679b07ae6030da65d5c70c43411316"
+    },
+    {
+      "suite": "cn.mop.api.UnknownRoleFailClosedTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "d9714161033f056c1de604e2c652106c635c0ac4d3a43f1a7f2ce80f3b4ce968"
+    },
+    {
+      "suite": "cn.mop.api.VendorMappingYamlTest",
+      "tests": 41,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "0e70beacca4164385d7805adfd9a886814d8cb166bc4cf39bd3219095affb732"
+    },
+    {
+      "suite": "cn.mop.api.WarrantyDateAssessmentTest",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "9194aa13f6e0c3108411f398e2b9a9a8c13660725b358b82474ffa52fe55689e"
+    },
+    {
+      "suite": "cn.mop.api.WorkingCalendarControllerTest",
+      "tests": 11,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "ce3e6ab2f082de975066d7d3c196f0b789b6a13f2e39400d68cad9c429560571"
+    },
+    {
+      "suite": "cn.mop.api.WorkingCalendarDraftTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "2805c355d7348d7f25d6c10965c754589bb55aed5fc5f6c05cb125eb206870ef"
+    },
+    {
+      "suite": "cn.mop.api.WorkingTimeTest",
+      "tests": 26,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "389e98a6da7f7c29106ebe7f2e3dde0f6899d00271fc8784b223d89699f184b1"
+    },
+    {
+      "suite": "cn.mop.api.WorklogControllerTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "24fcaa042e0cce1899f1f426e2ebbbf359f9c439df3ebd99f03a404e1c3f3c83"
+    },
+    {
+      "suite": "cn.mop.api.ZabbixNumericHistoryProtocolTest",
+      "tests": 26,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "a3c8eaebe083d6f4c08d866fb5245e7b415422dddb100f2f64c9e430cdb0e58d"
+    },
+    {
+      "suite": "cn.mop.api.ZabbixVersionProtocolTest",
+      "tests": 15,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "b585b9405fcd5aca88bd3b56d72054e59c454aa23d695427b8dac07abcc0e247"
+    },
+    {
+      "suite": "cn.mop.assetexport.AssetExportPreparationProcessorTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "254e20ca83d148cf2fc7c488eb5d4e120080c0de0cc47a11f41f5c180f5e18d3"
+    },
+    {
+      "suite": "cn.mop.assetexport.AssetLedgerProjectionTest",
+      "tests": 9,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "9f29a2b0a1bc4ed63765aa2f3c4a6a4e87a3a987d931c86d89adf563c78c738f"
+    },
+    {
+      "suite": "cn.mop.assetexport.AssetLedgerWorkbookTest",
+      "tests": 17,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "9d949ca3230d2491ed96601037c6cf30a06ffbd0fa8e5379b0ed1d58c7a9679f"
+    },
+    {
+      "suite": "cn.mop.assetexport.PostgresAssetLedgerProjectionIntegrationTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "baf8b176ee9fa03130da774e3ce1c136f9ccd6745aacb88edac783ee8471b8c5"
+    },
+    {
+      "suite": "cn.mop.assetexport.PostgresExportPreparationProcessorIntegrationTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "734c12033216482b3fe5e9755e9522ed5c36dd2d3843a6a6680d50052c7030e9"
+    },
+    {
+      "suite": "cn.mop.exportworker.ExportPreparationWorkerRuntimeTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "117ff111cc103e989ad804c12e8d15bb2dff57e4bc7926a8327da1e520332d14"
+    },
+    {
+      "suite": "cn.mop.exportworker.ExportPreparationWorkerSettingsTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "2ddaaf6629afdebf9cd28a2027a68d06b3696cbff1ac834e35dbdc3a55f4ae1f"
+    },
+    {
+      "suite": "cn.mop.importparser.AssetImportTemplateTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "20f3a2693ff9de2fa31f5d400be99a62606f4e705fe8d9289e5b501f90f61f94"
+    },
+    {
+      "suite": "cn.mop.importparser.CsvBoundaryTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "30d2ca11dc4297a9921d3ff7afbe0073934d8ad5ba80f781bb2142525be3605e"
+    },
+    {
+      "suite": "cn.mop.importparser.ImportFileParserTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "82b11968b9874893946ff1b7cf8bcf86954bf25d1ee4e0acf66d9c2cf1f3e097"
+    },
+    {
+      "suite": "cn.mop.importparser.ParserProtocolTest",
+      "tests": 4,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "66276a6c4b1b0fc7008f31a87d48079b65bde42f38e65e3cf9cd2f11245dd96f"
+    },
+    {
+      "suite": "cn.mop.importparser.XlsxBoundaryTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "427e834a464474d53a786b21efc35a93fa1475e3ba433a0e01fe4254edfdd5e8"
+    },
+    {
+      "suite": "cn.mop.persistence.audit.AuditChainVerifierTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "5185c7e9dc4b4f32f6dfeb9c2c4be0ea359cd1b92dc9ad879f7dc1c5e6c79d3a"
+    },
+    {
+      "suite": "cn.mop.persistence.CapacitySnapshotJsonTest",
+      "tests": 2,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "d46f6712a0a9a99a41ccaa059f2c4d128aa1e225da6d33484ff7070a95ad0d74"
+    },
+    {
+      "suite": "cn.mop.persistence.configuration.ConfigurationResolutionTest",
+      "tests": 15,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "d643949e260805b582ad0bbae8f18a63b56f2fe0ee6b627dc95523fa89bdb313"
+    },
+    {
+      "suite": "cn.mop.persistence.configuration.PostgresConfigurationDiagnosticReaderTest",
+      "tests": 14,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "7f38251310a5330007413105107218e2c7753111171b4a04d96d5c8a88823614"
+    },
+    {
+      "suite": "cn.mop.persistence.ContactImportPayloadCodecTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "8be973dd2e88fcea8b39dadffa52dcdefbf52224f488682dfc7314d836f79f4c"
+    },
+    {
+      "suite": "cn.mop.persistence.InspectionSourceCollectionInputTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "c3ddd49d4b78082296ed0a6811b16d6afec819da7f700441caf2113c4afa73fb"
+    },
+    {
+      "suite": "cn.mop.persistence.InspectionSourceDocumentCodecTest",
+      "tests": 19,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "419fdab69e21db819bf6d627a79046d352c121c087dc8d876e2d49cf81e692d1"
+    },
+    {
+      "suite": "cn.mop.persistence.InspectionSourceSelectionTest",
+      "tests": 3,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "3b52cebef14af8b581d661b97c64391f5e3d86a92baf0ae48d14f3af5fe6a5ec"
+    },
+    {
+      "suite": "cn.mop.persistence.InspectionWorksheetRepositoryContentTest",
+      "tests": 3,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "1742d6fcc82b195e23517ed7de1e304e4c2baa8912debaf9f4ec389e93412db4"
+    },
+    {
+      "suite": "cn.mop.persistence.ManualAssetFilterTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "c80dcdc9f7d6de80f0e93b1342eba84543411d306b8183e0e1870091d9ffd341"
+    },
+    {
+      "suite": "cn.mop.persistence.PhotoRulesTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "e29d66dc26d627869b1660fb50d007c24ead27e3640d2621a71a2c283902faca"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresAssetDependencyIntegrationTest",
+      "tests": 9,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "268c8a5d3ea343ea8bee74f8fc01596e8ebf048889808cf5ecf1a0669d7e572f"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresAssetDependencySchemaIntegrationTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "0ec9597a8b395dea54910fdc5baedbbc877082122822b8950efebe02aa461b2f"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresAssetExportClaimIntegrationTest",
+      "tests": 11,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "03ac7a381abae05181c8acbf14b527442a542dfc7df23583fb2ffbb31456a23b"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresAssetExportPrepareIntegrationTest",
+      "tests": 19,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "d2f59cb7c0fd7d163b8aa3afc21204b76f8569675677fe59185d5867c8b4ec18"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresAssetExportRepositoryIntegrationTest",
+      "tests": 20,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "c506ff78cbf295c0ba67dd9219b86acfd07878c50443beb92bf2eb140344d9dd"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresAssetExportSchemaIntegrationTest",
+      "tests": 16,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "9737e553070cb8ae77bff293d92c2e2c0361970faaad3f93ccb3e23a2f9fa63b"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresAssetImportIntegrationTest",
+      "tests": 18,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "79a5ebf6b5c5788c4f4aafa103e00c7cc29a6aab7508509ed1cc2eeaf95ec8e6"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresAssetImportRepositoryTest",
+      "tests": 9,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "8e5f729993f36bc686baaae2f44a12f7ba1af62941588873729cb66813c20b8f"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresAssetMetadataSchemaIntegrationTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "50a9404530aab25fc0026c99d002b9cec8844304a0b8907bef49ccaaf54227f8"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresAssetReadIntegrationTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "bcee5f0568536a090aa0fe8b47ea0e2648266199a8f8bbac48a7020fa00ef3cf"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresAuditChainIntegrationTest",
+      "tests": 2,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "2ed0709d64871da82b67e17947360f81b3b82852760f14505b7c994fda124694"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresAuditReaderIntegrationTest",
+      "tests": 7,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "463d7570424922e711b27b105e078ba123adea40426a7e67718d8a15b10d310a"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresBackupPlanDraftIntegrationTest",
+      "tests": 21,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "2611566e6547483e9d9dba2e2a9c645cd0f0426d0ac2ba2ee58d8ec68ae2b716"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresBackupPlanSchemaIntegrationTest",
+      "tests": 19,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "22ec273c62f698a78ec7141828a1384567e163f73ebc35bfc30f7015463ed692"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresCapacityScenarioIntegrationTest",
+      "tests": 15,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "d76be011c84dbdd08f4b64dd116968f6bafbf2a367d8fd9553b567a75c6fc2fa"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresCapacityScenarioSchemaIntegrationTest",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "0cc3bfd0ccf35386e1e95cc87376dde813009119c8e4a42029422de46bfb2f66"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresChangeNoticeDraftIntegrationTest",
+      "tests": 24,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "6bb703c436b033b6e95ff1c70c5e7d93fded0f5ec00b4626c84cf743b26ee32b"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresChangeNoticeSchemaIntegrationTest",
+      "tests": 21,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "beb6be47e3af3e9a3f3d97626c3449ed73c6d3e24840363c948f1d1cbce008bc"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresConfigurationDiagnosticIntegrationTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "69074aa7295e14d4c95ad0a55bce4063db7a9be757a02f3ed0ba2a0afc9f1b2d"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresConfigurationRevisionIntegrationTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "db52962a8bd9bded2c497c467cf1a9a943523e404632c39ed3a0eda37bd1e3f8"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresContactImportIntegrationTest",
+      "tests": 20,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "dcac9a7a1a52a301432b2f56624a4c5628756a7791c31ef6572834f4f44c8393"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresContactImportSchemaIntegrationTest",
+      "tests": 13,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "17de516f3f5552806368e7fe426eaa4177e85e64094b604111d860b6f492198d"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresCustomerContactIntegrationTest",
+      "tests": 25,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "c59efa7ec65f463dc3b01eeb5dd8be57cb0df3a8cdde91c027038bbb093a1ecf"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresCustomerContactSchemaIntegrationTest",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "8e4776a93e9fee5db8b71671aa2fde4fb84042d528cde07f8a6811c09ed8ba9e"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresCustomerReportIntegrationTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "06c607660680b30522304b5b911e106ae23c8844d9008d69eb4803178d05e268"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresDashboardAvailabilityIntegrationTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "a1aaa0867776858932726c74da950e83baf41ddde2ab1d8d6bd576cb9df36fef"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresExportSnapshotIntegrationTest",
+      "tests": 11,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "32c4aed5e82c1acd2ee841709343d8121694dab0a8ecde616e3477766256e9aa"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresGlobalSearchIntegrationTest",
+      "tests": 9,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "966310886e4801772affd1b94eac927b92683f8b60c8e4e6764a7a7f8a541efb"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresInspectionSourceCaptureIntegrationTest",
+      "tests": 13,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "f2fb6035336011f392cf76b2bad262d2c88b22719526b59058ffce462ca78839"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresInspectionSourceCollectionRepositoryIntegrationTest",
+      "tests": 18,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "1acac709e5fa437efb567eb1f5c9fc267c5d44456f7d4d1ff48381bd130d283d"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresInspectionSourceCollectionSchemaIntegrationTest",
+      "tests": 17,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "11d60002619b8e356e1293b0e8429095a9186f3b201f8153a63347df5a9eeea7"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresInspectionTemplateIntegrationTest",
+      "tests": 19,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "6de173d73db38fbd7d04daeef8028456619b898ee6bdeeeb2481f34ec61e71b0"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresInspectionTemplateSchemaIntegrationTest",
+      "tests": 14,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "7a8e0571b74da98dfcad4a997074d311142a76e7cd46a2539d520bab5c2d5aa2"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresInspectionWorksheetIntegrationTest",
+      "tests": 21,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "3cf742e2bed6f8e2a8b026f6a86444b78e4777828f9ecda6c6c3ba405047e5dd"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresInspectionWorksheetSchemaIntegrationTest",
+      "tests": 18,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "f12f09744f7a1aa4fa7866333df0edfa38899ce2b8d4e751d24f496f05033ec3"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresInternalNoteSchemaIntegrationTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "c649213417cacfc606516f580e5ca706e63b7929dcf57dfa4b5edecfbe25c2d3"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresInternalTicketNoteIntegrationTest",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "0bd8a119a268e9110744a0a8d9f1b8c20c56aab747481eac16f875d6f3c442f2"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresManualAssetMetadataIntegrationTest",
+      "tests": 26,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "9837b092ebcd398b62934fcf8edd1848c5c85522b7a9c130efc421b46fa6913d"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresManualIncidentIntegrationTest",
+      "tests": 14,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "f1b12fe7fe89f36e99829a666232643344f5ddc935f4968c661249f8928d619d"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresManualIncidentSchemaIntegrationTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "3100deb8bbf9cf4b0978f210c1e5babaa4dc511152453d14abddea4f4a6c1ffc"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresManualRecoveryIntegrationTest",
+      "tests": 14,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "c1e018b252dc058893940f69adc0d96873413fea886c0328244fe25267d7ed68"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresManualRecoverySchemaIntegrationTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "0dd6f1d6678382f8f4c9be638f91e872a00c8ccbe068fb3c2a67fec1f3af0064"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresManualWarrantyIntegrationTest",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "4c3f6c8365225320bdf298e617e713913a75b96a3eb508e4a4c31d98ccfb3d88"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresManualWarrantySchemaIntegrationTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "d2ac9c074be8362371bc567fd81018e3cacf8b76709fdccc26ef18efd2f1d6a1"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresNotificationPreferenceSchemaIntegrationTest",
+      "tests": 22,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "f5b696e76b11ef3220cd0a7dfa51294630dcfc0ecdda1b904215acc4692201f7"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresOwnNotificationPreferenceIntegrationTest",
+      "tests": 26,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "dfda89dff12dfe4f9946286f443a9a45b760bd213bb31ec835ec7780c9a569db"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresOwnWorklogReaderIntegrationTest",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "ab77b0ec70d0812050377ddbc16d377385158a9fcad97b5f966f02e19e2db446"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresPhotoIntegrationTest",
+      "tests": 24,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "02041aa99eab3e98c70d6120d0b7fb6305999fca14dad4b2e2843b3adea0b355"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresRepositoryIntegrationTest",
+      "tests": 5,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "f22bf1a1951279ddcfa76b1efbad8287703728bc0c7c789b4091bec3bfda1b6b"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresSafetyTest",
+      "tests": 2,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "082a06befd29c73ad19820b3d2e457bc02a8ad22e94637db2519dde5391f10c0"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresTenantInventoryIntegrationTest",
+      "tests": 7,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "ed26ae0d84683213728c275129444c878e35d998b4f6cf9fe57f402bebd5c444"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresTicketCommentIntegrationTest",
+      "tests": 16,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "6508dc918f0f42ca9a50d3258cb3f0f591744536b0fc75b99706febd92243ba3"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresTicketCommentSchemaIntegrationTest",
+      "tests": 7,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "313223d0363393c4f7bef20b2c50c743f36b69e7e5b1c58f664b8e6ee7b3b292"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresWorkingCalendarIntegrationTest",
+      "tests": 14,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "07fdc4c09a32240b8acff65377da63f57f724b3c090488849032a9f8f9d3bade"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresWorkingCalendarSchemaIntegrationTest",
+      "tests": 10,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "8a93a8573b0be8d313d995b6697153991f3b9e923756fd6a789d32907bf87434"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresWorklogIntegrationTest",
+      "tests": 12,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "3fadc3d98337d15a5d62c0c2632445b42b587c60fb77ca6bc02f37ae50a3ca28"
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresWorklogSchemaIntegrationTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "b4868870b1982682e6c04ad03adda053338f980c772e3c923ee4948bb671209e"
+    },
+    {
+      "suite": "cn.mop.persistence.TestSchemaMigrationTest",
+      "tests": 36,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "2a16df3f3cd158af9a7415cb87d50f3bd4f0878e9d52ff9f17b9725450a46ef6"
+    },
+    {
+      "suite": "cn.mop.contactworker.ContactImportWorkerRuntimeTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "053fd85fdb5fb528cd4976a55f925fdef56af2bb8d3ddd35143fdbbe09eca892"
+    },
+    {
+      "suite": "cn.mop.contactworker.ContactImportWorkerSettingsTest",
+      "tests": 8,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "057015c6098ee1f9be7904d6f2c7abcc88adc368587864af14b3e3c92a7ca6bc"
+    },
+    {
+      "suite": "cn.mop.importworker.AssetImportParserProcessTest",
+      "tests": 9,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "17a6f6d6017c62a94665b87c37aafac1bcfd19abf74601b5751ecb0e318cd879"
+    },
+    {
+      "suite": "cn.mop.importworker.AssetImportWorkerRuntimeSettingsTest",
+      "tests": 6,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "5acf14deabf11c4affeed59cd035902a5376529440d405c89417a94c92f382c9"
+    },
+    {
+      "suite": "cn.mop.importworker.AssetImportWorkerRuntimeTest",
+      "tests": 4,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "626149c0243cbb356552de4652663f4b1a9da30688840e79044feb7abf1d35a5"
+    },
+    {
+      "suite": "cn.mop.worker.PhotoWorkerRuntimeTest",
+      "tests": 3,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "78522df17a17f6c6f8c5dc1064245ae38654b5125a10f2bee74cdf3f927a62a8"
+    },
+    {
+      "suite": "cn.mop.worker.WorkerRuntimeSettingsTest",
+      "tests": 7,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "report_sha256": "ab3f71d3ac74211b1a951af086827e95877eeb6966b7da87d029ef77a96e01ee"
+    }
+  ],
+  "fixture_tests_executed": 0,
+  "first_attempt_failures_retained": true,
+  "first_failure_cause": "Windows socket error 10055 terminated the SSH transport; subsequent database connections refused",
+  "recovery": "Retest all 39 affected persistence suites in four serial batches; refresh only owned loopback tunnel between batches; then run remaining reactor modules",
+  "worker_isolation": "Three verified MOP test workers paused for queue tests and unpaused in finally; no shared service stopped or restarted",
+  "containers_and_start_times_unchanged": true,
+  "shared_component_lifecycle_changes": 0,
+  "component_versions": {
+    "MinIO": "RELEASE.2025-09-07T16-13-09Z",
+    "Keycloak": "26.2.4"
+  },
+  "web": {
+    "tests": 1801,
+    "files": 111,
+    "production_build": "PASS",
+    "contracts": 127,
+    "first_timeout_preserved": true,
+    "retry_workers": 2
+  },
+  "browser_evidence": "local-identity-browser-20261007/result.json",
+  "frozen_sql_changed": false,
+  "api_contract": "0.45.0",
+  "deployment_performed": false,
+  "logs_sha256": {
+    "contract-check.log": "585c4971e807ff5587e346744e852072b2e1f4a2e4ed5ffecdf4ece20a5381e7",
+    "contracts.log": "064bf688fa2d7b722ba56c283c27bb1344fa8e2c5980b4492587e6a3983e8fb3",
+    "deployment-windows.log": "8d457fcaf2c0ba146c1a88d3d796a1c262acc5a38ffbfb7c1ee3b144886cb9b7",
+    "export-guards.log": "0bb9c96a571004f711fe3e44009ddd339479c960d308b51447f64622b050d84c",
+    "first-tunnel.stderr.log": "4c7d12ed3110b36cf243a7a203a8e989e8eab06fe801ae0feac43713f660bc5e",
+    "java-install.log": "4135093ec626de93c5850ba89bea4042bf2d9a1147879c917f0bf2207edf9978",
+    "java-persistence-batch-1.log": "1fbc391f523893ac6e04eeb6730b7e5b269f81e4e431af79a9f107c3047af28f",
+    "java-persistence-batch-2.log": "fe6c898b882bf070919aa19a722ad0623e140041060c58692478965b4ba392ff",
+    "java-persistence-batch-3.log": "4fc5198a8148bed2ab1d294345c9d09d680b96cea9df969726684247be19f878",
+    "java-persistence-batch-4.log": "d5f1c525732af37cebec657e75c850928adfea62a650123d9c04917eb665b842",
+    "java-remainder.log": "aa4dfab39820d19ae7dfbb233487d45f1623654f38bb86ffafeabed7272603ad",
+    "java.log": "118e082841b228552b8d0b0ddb6a467cf5682578fc8ded98d258f584ba381522",
+    "migration-guards.log": "d7f68944283667f47e627bab4ecaffe4160f673c2afc4aeb5a8e358ddd1a78f2",
+    "process-guards.log": "9470047e28e2d0c1d744130229ff17e4688583c4c640c9dd2fb3514919d655da",
+    "python.log": "8a5ea3e3291e0a48b3e6c6ecc394a1748264edd22e87c6d036621da86ff15513",
+    "source-recovery-windows.log": "3664217bbba8228138566c6b79201104eda096f5136c29ec5444a4b87371387d",
+    "web-bounded.log": "4061565cb8fdb9a68b3103580971f0863209a0653e3e9e3d72dda77af665fda2",
+    "web-build.log": "24e46302ad477b09ec155a7d1da68dfcd8b3c8893757ff13f079bca018d83a34",
+    "web.log": "795a3cd14bb115c3454972e30aa0169aa5d188fc50215b4dc52b6b7fd57767d0"
+  },
+  "formal_contract_acceptance": "NOT_RUN"
+}

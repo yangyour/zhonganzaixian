@@ -1,0 +1,683 @@
+{
+  "verified_at": "2026-10-07T01:53:59.257Z",
+  "passed": true,
+  "run": "e52f69aa-8a04-4e73-9e53-e056a60de913",
+  "checks": [
+    "local_build_real_project_login",
+    "old_user_detail_cannot_overwrite_new_form",
+    "failed_selected_user_detail_hides_editable_form",
+    "accepted_role_write_failed_readback_does_not_report_failure_or_repeat",
+    "roles_refresh_error_clears_old_rows",
+    "settings_partial_read_failure_removes_old_policy_form",
+    "account_failed_refresh_clears_unsaved_passwords",
+    "1440px_/identity/users",
+    "1440px_/identity/roles",
+    "1440px_/identity/settings",
+    "1440px_/account",
+    "390px_/identity/users",
+    "390px_/identity/roles",
+    "390px_/identity/settings",
+    "390px_/account",
+    "tenant_change_cancel_preserves_unsaved_form",
+    "tenant_change_clears_users",
+    "tenant_change_clears_roles",
+    "tenant_change_clears_settings",
+    "tenant_change_clears_account"
+  ],
+  "stage": "tenant_changes_clear_identity_views_and_unsaved_secrets",
+  "source_commit": "ce49a07370206ba16c037cd44e5ddc3b9647dbaa",
+  "verification_script_sha256": "bf26f7f43cdd37180ab9204457722deae7f94213a924be06c9876b37e644d1fd",
+  "browser": "154.0.4258.62",
+  "frontend": "current-local-production-build-served-to-browser",
+  "backend": "designated-server-existing-api-0.45",
+  "deployed_latest_frontend": false,
+  "assets": {
+    "index.html": "47d162d438bcf599e600dfd84d99a5893482ace4081564302e18eceb41cbbdaa",
+    "assets/index-CBjoC-9W.js": "e873d1ce4b52fbf9346874d2e646af6986412342272b7acdd58db6d735680e12",
+    "assets/index-aIwZhn4V.css": "42abb985eec74d9f058a024a9bcf9ace1101e34bedd55db1e848e7cccbd5a7ac",
+    "assets/LoginPage-B3FXHu6I.js": "33295e87a5e8bff8ab64cfc49ff912e360aa3ec60aca991b7a362c4a08ed536f",
+    "assets/LoginPage-CXBRCFG7.css": "3c5c25d97d1bc51a963a79c1dcce70d179dc83bd163ed562aaa2eebf05f660fc",
+    "assets/IdentityUsersPage-CbEVrtB2.js": "d5c1e6cbcffb1c646594c6ed1cfc2fd37ba64920c91881dfd665b8feca213c35",
+    "assets/IdentityCommandNotice.vue_vue_type_script_setup_true_lang-7Boi-uuk.js": "0581be8fb934b6758bd5cbd24f86e0533f5a8d44fe8dcbae36d028268593ab7d",
+    "assets/index-DCokL-2d.js": "649931c83a73b2d26b37b540611d5e6b7206fd158a8246b2001939f64b5bba11",
+    "assets/IdentityRolesPage-CZn-7Z5o.js": "01c4ae1d41a35b14766337460dc5312a3ca59f5d1dd7e1714d29dab21b80bf31",
+    "assets/IdentitySettingsPage-CG3nX9cu.js": "0827ae4d8d2a4197fcb3af348b206c49b298dfc5d49dda0866ebde21cee3eeea",
+    "assets/AccountPage-C3dxabCt.js": "3e13ddc0ebbdb01544af249d91fdca7a32142ff1f73a11aaa93de74a3cdd8ef6"
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 401,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/options",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/csrf",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/local/login",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/session",
+      "status": 200,
+      "source": "api-check"
+    },
+    {
+      "method": "GET",
+      "path": "/identity/policy",
+      "status": 200,
+      "source": "api-check"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/users",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/users",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/users/{id}/external-identities",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/users/{id}/memberships",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/users/{id}/external-identities",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/identity/roles",
+      "status": 200,
+      "source": "api-check"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/policy",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/providers",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/policy",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/account",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/users",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/users",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/policy",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/providers",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/account",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/users",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/users",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/policy",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/providers",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/account",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/users",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/session/tenant",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/users",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/session",
+      "status": 200,
+      "source": "api-check"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/session/tenant",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/session",
+      "status": 200,
+      "source": "api-check"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/roles",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/policy",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/providers",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/session/tenant",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/policy",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/providers",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/session",
+      "status": 200,
+      "source": "api-check"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/account",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/session/tenant",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/account",
+      "status": 200,
+      "source": "browser"
+    },
+    {
+      "method": "GET",
+      "path": "/session",
+      "status": 200,
+      "source": "api-check"
+    },
+    {
+      "method": "GET",
+      "path": "/identity/policy",
+      "status": 200,
+      "source": "api-check"
+    },
+    {
+      "method": "GET",
+      "path": "/health/ready",
+      "status": 200,
+      "source": "api-check"
+    },
+    {
+      "method": "GET",
+      "path": "/session",
+      "status": 200,
+      "source": "api-check"
+    },
+    {
+      "method": "GET",
+      "path": "/identity/roles",
+      "status": 200,
+      "source": "api-check"
+    },
+    {
+      "method": "PATCH",
+      "path": "/identity/roles/{id}",
+      "status": 200,
+      "source": "api-check"
+    }
+  ],
+  "controlled_delivery_faults": [
+    {
+      "path": "/identity/users/{id}/memberships",
+      "real_status": 200,
+      "delivery": "delayed-real-response"
+    },
+    {
+      "path": "/identity/users/{id}/memberships",
+      "real_status": 200,
+      "delivery": "aborted-after-real-response"
+    },
+    {
+      "path": "/identity/roles",
+      "real_status": 200,
+      "delivery": "aborted-after-real-response"
+    },
+    {
+      "path": "/identity/roles",
+      "real_status": 200,
+      "delivery": "aborted-after-real-response"
+    },
+    {
+      "path": "/identity/providers",
+      "real_status": 200,
+      "delivery": "aborted-after-real-response"
+    },
+    {
+      "path": "/account",
+      "real_status": 200,
+      "delivery": "aborted-after-real-response"
+    },
+    {
+      "path": "/session/tenant",
+      "real_status": 200,
+      "delivery": "delayed-real-response"
+    },
+    {
+      "path": "/session/tenant",
+      "real_status": 200,
+      "delivery": "delayed-real-response"
+    },
+    {
+      "path": "/session/tenant",
+      "real_status": 200,
+      "delivery": "delayed-real-response"
+    },
+    {
+      "path": "/session/tenant",
+      "real_status": 200,
+      "delivery": "delayed-real-response"
+    }
+  ],
+  "screenshots": [
+    "desktop-new-user-after-old-detail.png",
+    "desktop-accepted-write-readback-failed.png",
+    "desktop-settings-incomplete-read.png",
+    "1440-users.png",
+    "1440-roles.png",
+    "1440-settings.png",
+    "1440-account.png",
+    "390-users.png",
+    "390-roles.png",
+    "390-settings.png",
+    "390-account.png",
+    "390-account-hidden-during-tenant-switch.png"
+  ],
+  "page_errors": [],
+  "cleanup": "SYNTHETIC_ROLE_DISABLED",
+  "policy_unchanged": true,
+  "formal_contract_acceptance": "NOT_RUN"
+}

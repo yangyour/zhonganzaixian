@@ -1,6 +1,6 @@
 from pathlib import Path
 import json,os,subprocess,sys,hashlib
-MODES=('--initialize-new-niko-database','--check','--apply-photos','--apply-asset-imports','--apply-asset-dependencies','--apply-worklogs','--apply-asset-metadata','--apply-internal-notes','--apply-ticket-comments','--apply-working-calendars','--apply-manual-incidents','--apply-manual-recoveries','--apply-manual-warranty','--apply-capacity-scenarios','--apply-customer-contacts','--apply-contact-imports','--apply-contact-import-fix','--apply-asset-exports','--apply-inspection-templates','--apply-inspection-worksheets','--apply-inspection-source-collections','--apply-backup-plan-drafts','--apply-change-notice-drafts','--apply-notification-preference-drafts','--apply-project-identity','--apply-identity-compatibility')
+MODES=('--initialize-new-niko-database','--check','--apply-photos','--apply-asset-imports','--apply-asset-dependencies','--apply-worklogs','--apply-asset-metadata','--apply-internal-notes','--apply-ticket-comments','--apply-working-calendars','--apply-manual-incidents','--apply-manual-recoveries','--apply-manual-warranty','--apply-capacity-scenarios','--apply-customer-contacts','--apply-contact-imports','--apply-contact-import-fix','--apply-asset-exports','--apply-inspection-templates','--apply-inspection-worksheets','--apply-inspection-source-collections','--apply-backup-plan-drafts','--apply-change-notice-drafts','--apply-notification-preference-drafts','--apply-project-identity','--apply-identity-compatibility','--apply-raw-monitoring-events')
 if len(sys.argv)!=2 or sys.argv[1] not in MODES:raise SystemExit('Explicit migration mode required')
 root=Path.cwd()
 manifest=json.loads((root/'tools/niko-test/frozen-migrations.json').read_text())['sha256']
@@ -26,6 +26,7 @@ manifest.update(json.loads((root/'tools/niko-test/frozen-change-notice-migration
 manifest.update(json.loads((root/'tools/niko-test/frozen-notification-preference-migration.json').read_text())['sha256'])
 manifest.update(json.loads((root/'tools/niko-test/frozen-project-identity-migration.json').read_text())['sha256'])
 manifest.update(json.loads((root/'tools/niko-test/frozen-identity-compatibility-migration.json').read_text())['sha256'])
+manifest.update(json.loads((root/'tools/niko-test/frozen-raw-monitoring-event-migration.json').read_text())['sha256'])
 for name,expected in manifest.items():
  source=root/'server/persistence/src/main/resources/db/migration'/name
  compiled=root/'server/persistence/target/classes/db/migration'/name
@@ -36,6 +37,6 @@ java=root.parent/'mop-toolchain/jdk-17.0.20.1+1/bin';cp=os.pathsep.join([str(roo
 if sys.argv[1:] == ['--initialize-new-niko-database']:
  subprocess.run([str(java/'javac'),'-cp',cp,'-d',str(root/'.local/niko-test'),str(root/'tools/niko-test/NikoSchemaBootstrap.java')],check=True,env=env)
  args=[str(java/'java'),'-cp',cp,'NikoSchemaBootstrap']+sys.argv[1:]
-elif sys.argv[1:] in [['--check'],['--apply-photos'],['--apply-asset-imports'],['--apply-asset-dependencies'],['--apply-worklogs'],['--apply-asset-metadata'],['--apply-internal-notes'],['--apply-ticket-comments'],['--apply-working-calendars'],['--apply-manual-incidents'],['--apply-manual-recoveries'],['--apply-manual-warranty'],['--apply-capacity-scenarios'],['--apply-customer-contacts'],['--apply-contact-imports'],['--apply-contact-import-fix'],['--apply-asset-exports'],['--apply-inspection-templates'],['--apply-inspection-worksheets'],['--apply-inspection-source-collections'],['--apply-backup-plan-drafts'],['--apply-change-notice-drafts'],['--apply-notification-preference-drafts'],['--apply-project-identity'],['--apply-identity-compatibility']]:args=[str(java/'java'),'-cp',cp,'cn.mop.persistence.TestSchemaMigration']+sys.argv[1:]
+elif sys.argv[1:] in [['--apply-raw-monitoring-events'],['--check'],['--apply-photos'],['--apply-asset-imports'],['--apply-asset-dependencies'],['--apply-worklogs'],['--apply-asset-metadata'],['--apply-internal-notes'],['--apply-ticket-comments'],['--apply-working-calendars'],['--apply-manual-incidents'],['--apply-manual-recoveries'],['--apply-manual-warranty'],['--apply-capacity-scenarios'],['--apply-customer-contacts'],['--apply-contact-imports'],['--apply-contact-import-fix'],['--apply-asset-exports'],['--apply-inspection-templates'],['--apply-inspection-worksheets'],['--apply-inspection-source-collections'],['--apply-backup-plan-drafts'],['--apply-change-notice-drafts'],['--apply-notification-preference-drafts'],['--apply-project-identity'],['--apply-identity-compatibility']]:args=[str(java/'java'),'-cp',cp,'cn.mop.persistence.TestSchemaMigration']+sys.argv[1:]
 else:raise SystemExit('Explicit migration mode required')
 raise SystemExit(subprocess.run(args,env=env).returncode)

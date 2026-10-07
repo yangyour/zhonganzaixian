@@ -44,6 +44,9 @@ if (-not (Test-Path -LiteralPath $notificationPreferenceVerifierClass) -or (Get-
 $changeNoticeVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/ChangeNoticeSchemaVerifier.java'
 $changeNoticeVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/ChangeNoticeSchemaVerifier.class'
 if (-not (Test-Path -LiteralPath $changeNoticeVerifierClass) -or (Get-Item -LiteralPath $changeNoticeVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $changeNoticeVerifierSource).LastWriteTimeUtc) { throw '变更通知草稿核验器缺失或早于源码；先重新编译。' }
+$rawEventVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/RawMonitoringEventSchemaVerifier.java'
+$rawEventVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/RawMonitoringEventSchemaVerifier.class'
+if (-not (Test-Path -LiteralPath $rawEventVerifierClass) -or (Get-Item -LiteralPath $rawEventVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $rawEventVerifierSource).LastWriteTimeUtc) { throw '原始事件结构核验器缺失或早于源码；先重新编译。' }
 Assert-MopMigrationResources -ProjectRoot $projectRoot -PersistenceClasses $persistenceClasses
 $dependencies = (Get-Content -Raw -LiteralPath $classpathFile).Trim()
 if (-not $dependencies -or $dependencies.Contains("`n") -or $dependencies.Contains("`r")) { throw '迁移 classpath 无效。' }

@@ -1,0 +1,359 @@
+{
+  "recorded_at": "2026-10-07T01:46:43.393336+00:00",
+  "environment": "niko-local-test-20261007",
+  "source_baseline": "ce49a07370206ba16c037cd44e5ddc3b9647dbaa",
+  "recovery": {
+    "tracked_files": 1913,
+    "exact_tree_verified": "2788bfe863b417e9ecccd0858b9cf2a26e277a39",
+    "exact_commit_verified": true,
+    "private_history_restored": false
+  },
+  "scope": "Immutable unverified raw-event storage only; no public intake, mapping authentication, durable conflict queue, incident or notification",
+  "postgres_version": "17.11 (Debian 17.11-0+deb13u1)",
+  "loopback_only": true,
+  "restricted_runtime_role_verified": true,
+  "migration": {
+    "version": 29,
+    "sha256": "2f67b28791d2533934153227a98d6e09aec4e16c7405d4408e9956a9d853e8c3",
+    "applied_once": true,
+    "initial_post_commit_verifier_failed": true,
+    "initial_failure_reason": "Generated expression contains PostgreSQL varchar-to-text cast; initial substring verifier did not match",
+    "resolution": "SQL unchanged; exact full catalog expression hashes, permanent-table check and negative drift tests added",
+    "read_only_migrations_executed": 0,
+    "repeat_apply_migrations_executed": 0,
+    "api_worker_automatic_migration": false,
+    "V1_V28_bytes_unchanged": true
+  },
+  "real_pg_tests": {
+    "executed": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "cases": [
+      "byte/nanosecond/fingerprint roundtrip",
+      "duplicate first receipt",
+      "payload/time/binding conflict",
+      "8-way identical race",
+      "different-facts race",
+      "pool/phase/source isolation",
+      "Instant.MIN/MAX",
+      "composite tenant asset FK",
+      "direct SQL invalid data and runtime mutation denial",
+      "UTF-16 boundary",
+      "1MiB payload",
+      "commit failure rollback",
+      "unknown committed result retry",
+      "CHECK drift rejection",
+      "generated expression drift rejection",
+      "unlogged table rejection"
+    ]
+  },
+  "java_full_regression_remote_disabled": {
+    "tests": 2586,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 807,
+    "executed": 1779
+  },
+  "focused_pg_and_pure_run": {
+    "tests": 57,
+    "real_pg_subset": 16,
+    "pure_storage_safety_subset": 4,
+    "migration_policy_subset": 37,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "python_tests": {
+    "executed": 167,
+    "passed": 167
+  },
+  "contract_tests": {
+    "executed": 127,
+    "passed": 127,
+    "generator_check": true
+  },
+  "powershell_local_execution": "NOT_RUN: pwsh unavailable; manifest/mode parity Python checks passed; GitHub CI retains actual PowerShell step",
+  "existing_table_fingerprints_unchanged": {
+    "mop_asset": {
+      "rows": 36,
+      "sha256": "129a842efcdafc6b53c7b7ed7431a3936b28723d360b6a41b434ce731128eac7"
+    },
+    "mop_asset_dependency_edge": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_dependency_graph": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_dependency_revision": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_export_attempt": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_export_job": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_import_artifact": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_import_job": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_import_mapping": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_import_operation": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_import_source": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_manual_details": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_manual_revision": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_audit": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_backup_plan_draft": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_backup_plan_revision": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_backup_plan_target": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_capacity_scenario_draft": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_change_notice_asset": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_change_notice_draft": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_change_notice_revision": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_configuration": {
+      "rows": 185,
+      "sha256": "1b178c9b33c2e70ed5335fbcc51be910f1a1454d7628f30d4acd3d7a36dc5253"
+    },
+    "mop_configuration_revision": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_configuration_revision_history": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_contact_import_job": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_contact_import_result": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_contact_tenant_guard": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_customer_contact": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_customer_contact_revision": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_external_identity_binding": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_file": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_file_grant": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_idempotency": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_identity_policy": {
+      "rows": 1,
+      "sha256": "05a5418498221fa197bf575713f30c8aa5501678f51d991c0d750260dc9e7fbd"
+    },
+    "mop_identity_security": {
+      "rows": 6,
+      "sha256": "10a3a73e11be1d1b90e28232eb9099765416727cc562ba8289587ff35ec94b02"
+    },
+    "mop_inspection_source_collection": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_source_collection_item": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_template": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_template_item": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_template_revision": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_worksheet": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_worksheet_revision": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_local_account": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_local_password_history": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_manual_incident_registration": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_manual_recovery_confirmation": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_member_role_assignment": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_membership": {
+      "rows": 9,
+      "sha256": "7a4bd192ce6db70dc0cffafb0e82b15a950f4a62fc1d6e75e829fddb51593863"
+    },
+    "mop_notification_preference_draft": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_notification_preference_revision": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_operation": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_outbox": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_photo_job": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_project_role": {
+      "rows": 8,
+      "sha256": "40fa4178798349037ddd7c8ca6270c72c893bcb024cecedde00f41af8501ad6c"
+    },
+    "mop_role_capability_limit": {
+      "rows": 81,
+      "sha256": "fcc82d38ded2b580316e3d335180282a3577eccd8297783ab0289b1d5ce6fc5c"
+    },
+    "mop_site": {
+      "rows": 2,
+      "sha256": "3460fb1297aa6d1c9b48fed26f8a088531a2660649e91e202bd59c9aba31af53"
+    },
+    "mop_tenant": {
+      "rows": 2,
+      "sha256": "0efd9600417a4c251dae92cbe78ff6d234d95377eed753c048dc622ceb0771e7"
+    },
+    "mop_ticket": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_ticket_comment": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_ticket_history": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_ticket_internal_note": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_user": {
+      "rows": 6,
+      "sha256": "fc299a2df459cac57a0078f23d9fd2a4ef593134b298d6c302fee8c5f006a888"
+    },
+    "mop_working_calendar_draft": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_working_calendar_revision": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_worklog": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_worklog_revision": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "graceful_postgres_restart": {
+    "raw_event_snapshot_unchanged": {
+      "rows": 15,
+      "sha256": "2f480a749bd393d88de4858b1b6ea49bb720e019e2ebf41d52d819900a09a135"
+    },
+    "post_restart_read_only_migrations": 0,
+    "database_crash_or_power_loss_tested": false
+  },
+  "original_server_changed": false,
+  "public_api_exposed": false,
+  "source_authentication_verified": false,
+  "monitoring_mapping_authorization_verified": false,
+  "durable_conflict_queue_implemented": false,
+  "inbox_processing_implemented": false,
+  "formal_acceptance_complete": false,
+  "credentials_in_evidence": false
+}

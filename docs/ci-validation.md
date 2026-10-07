@@ -19,3 +19,11 @@
 历史`1db3976`、`d4375f7`对应运行失败仍保留，不能因后续成功改写成通过。此前gh读取受HTTP传输/代理阻断的NOT_OBSERVED仅描述当时读取渠道，不是当前GitHub状态。本批实际回读不替代完整M5-5/M8-6或128项合同验收。
 
 2026-10-02追加：Pure Java job同时运行5项SSH信任策略隔离测试，使用临时Python环境及现有锁定requirements；mock客户端和临时ROOT，不读取真实私有配置、不连接SSH服务器。验证固定键缺失时拒绝，禁止自动登记/重写known_hosts；不据此声明真实SSH或组件已连通。
+
+## 2026-10-07 Maven 运行器版本漂移修复
+
+提交 `6a2cee1ab1715a5d1d42f6aaaaa2b5d8b45253eb` 的[运行37566895157](https://github.com/yangyour/zhonganzaixian/actions/runs/37566895157)在后端工具链检查失败：运行器预装 Maven 3.10.0，项目要求3.9.x；后端 Maven 测试根本未启动，不能记为代码回归通过。该次前端/契约、纯Java/SSH和Windows保护作业成功。
+
+新增独立安装步骤，在临时目录下载固定 Apache Maven 3.9.9，使用[官方SHA512](https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz.sha512)硬编码校验，校验成功才解包并通过 GITHUB_PATH 供下一步骤使用。保留原3.9.x门禁、严格制品检查、远端测试禁用边界及只读权限，不扩大为接受任意运行器版本。
+
+本地真实下载的压缩包摘要与官方值相同，解包版本实际为3.9.9/JDK17；新增两个凭据无关保护测试检查固定源/校验顺序，并验证坏摘要在解包和PATH修改前失败。全部169个Python测试通过；Bash语法检查通过，actionlint/shellcheck本地不可用。后续准确提交的CI结果另行回读；本记录不预先声明CI成功。

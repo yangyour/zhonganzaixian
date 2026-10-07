@@ -79,6 +79,19 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Install checksum-pinned Maven 3.9.9
+        run: |
+          set -euo pipefail
+          maven_dir=$(mktemp -d "${RUNNER_TEMP}/mop-maven.XXXXXX")
+          archive="$maven_dir/apache-maven-3.9.9-bin.tar.gz"
+          curl --fail --show-error --silent --location --retry 3 --connect-timeout 20 --max-time 180 \
+            --output "$archive" \
+            https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz
+          printf '%s  %s\n' \
+            a555254d6b53d267965a3404ecb14e53c3827c09c3b94b5678835887ab404556bfaf78dcfe03ba76fa2508649dca8531c74bca4d5846513522404d48e8c4ac8b \
+            "$archive" | sha512sum --check --strict
+          tar -xzf "$archive" -C "$maven_dir"
+          printf '%s\n' "$maven_dir/apache-maven-3.9.9/bin" >> "$GITHUB_PATH"
       - name: Verify the Maven toolchain
         run: |
           java -version

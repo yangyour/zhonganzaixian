@@ -57,18 +57,21 @@ services:
     <<: *application
     container_name: mop-lan-api
     env_file: [./private/api.env]
+    volumes: ["${API_RELEASE_DIR:-${RELEASE_DIR}}:/app:ro"]
     command: [java, -XX:MaxRAMPercentage=60.0, -jar, /app/api.jar]
     mem_limit: 1536m
   photo-worker:
     <<: *application
     container_name: mop-lan-photo-worker
     env_file: [./private/photo.env]
+    volumes: ["${PHOTO_RELEASE_DIR:-${RELEASE_DIR}}:/app:ro"]
     command: [java, -XX:MaxRAMPercentage=60.0, -jar, /app/photo-worker.jar]
     mem_limit: 384m
   import-worker:
     <<: *application
     container_name: mop-lan-import-worker
     env_file: [./private/import.env]
+    volumes: ["${IMPORT_RELEASE_DIR:-${RELEASE_DIR}}:/app:ro"]
     command: [java, -XX:MaxRAMPercentage=60.0, -jar, /app/import-worker.jar]
     mem_limit: 512m
     working_dir: /app

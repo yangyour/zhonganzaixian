@@ -48,6 +48,7 @@ def inspect(output: Path | None = None) -> dict:
         if owner.get('project') != 'mop-lan-test' or owner.get('environment') != cfg['environment']:
             raise ValueError('Project ownership mismatch')
         containers = {}
+        storage_providers = {}
         for suffix in NAMES:
             name = 'mop-lan-'+suffix
             item = json.loads(run(['docker', 'inspect', name], True))[0]
@@ -60,6 +61,9 @@ def inspect(output: Path | None = None) -> dict:
             containers[name]['restart_count'] = item['RestartCount']
             if 'Health' in state:
                 containers[name]['health'] = state['Health']['Status']
+            if suffix in ('api', 'photo-worker', 'import-worker'):
+                storage_providers[name] = run(['docker', 'exec', name, 'sh', '-c',
+                                              'printf "%s" "${OBJECT_STORAGE_PROVIDER:-legacy_minio}"'], True).strip()
         readiness = json.loads(run(['curl', '--fail', '--silent', '--max-time', '15',
                                     'http://127.0.0.1:10010/api/v1/health/ready']))['data']
         versions = {
@@ -82,6 +86,7 @@ def inspect(output: Path | None = None) -> dict:
             'public_origin': 'http://'+cfg['host']+':10010',
             'zabbix_origin': 'http://'+cfg['host']+':10020',
             'containers': containers, 'versions': versions, 'schema_version': schema_count,
+            'storage_providers': storage_providers,
             'all_12_containers_running': all(x['Running'] for x in containers.values()),
             'ready': readiness.get('ready') is True, 'mode': readiness.get('mode'),
             'durable': readiness.get('durable'), 'photos_ready': readiness['photos']['ready'],

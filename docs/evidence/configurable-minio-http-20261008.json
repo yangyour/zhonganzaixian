@@ -1,0 +1,15 @@
+{
+  "environment": "lan-test-20261008",
+  "api_version": "0.45.0",
+  "http_requests": 36,
+  "checks": [
+    "remote photo Worker -> MinIO -> authorized original bytes/hash; original 202 replay",
+    "remote asset-source Worker -> MinIO -> real standalone CSV parser; business import stays gated",
+    "Existing original image retains authorized byte/hash download after explicit MinIO configuration; cross-tenant 404"
+  ],
+  "completed": true,
+  "formal_acceptance": "NOT_RUN",
+  "storage_provider": "minio",
+  "verified_at": "2026-10-08T13:06:47.609Z",
+  "pending_original_requests": 0
+}

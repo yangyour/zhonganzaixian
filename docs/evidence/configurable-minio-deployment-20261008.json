@@ -1,0 +1,58 @@
+{
+  "environment": "lan-test-20261008",
+  "backend_source_revision": "77b41cf2c13cdcd0e8818b4a7a25cd329bb4ea66",
+  "release": "/opt/mop-lan-test/releases/77b41cf2c13c",
+  "provider": "minio",
+  "api_contract": "0.45.0",
+  "schema_version": 30,
+  "configuration_switch": "private_environment_then_restart",
+  "probe_cases": [
+    {
+      "case": "MINIO_VALID",
+      "http_status": 200,
+      "ready": true,
+      "photo_storage_ready": true,
+      "import_storage_ready": true,
+      "legacy_credentials_present": true
+    },
+    {
+      "case": "MINIO_EMPTY_SECRET",
+      "http_status": 503,
+      "ready": false,
+      "photo_storage_ready": false,
+      "import_storage_ready": null,
+      "legacy_credentials_present": true
+    },
+    {
+      "case": "OSS_INCOMPLETE",
+      "http_status": 503,
+      "ready": false,
+      "photo_storage_ready": false,
+      "import_storage_ready": null,
+      "legacy_credentials_present": true
+    },
+    {
+      "case": "STORAGE_DISABLED",
+      "http_status": 503,
+      "ready": false,
+      "photo_storage_ready": false,
+      "import_storage_ready": null,
+      "legacy_credentials_present": true
+    },
+    {
+      "case": "MINIO_RESTORED",
+      "http_status": 200,
+      "ready": true,
+      "photo_storage_ready": true,
+      "import_storage_ready": true,
+      "legacy_credentials_present": true
+    }
+  ],
+  "verified_at": "2026-10-08T13:04:34.004200+00:00",
+  "deployed": true,
+  "ready": true,
+  "other_9_containers_unchanged": true,
+  "no_schema_migration": true,
+  "photo_and_import_legacy_parameters_removed": true,
+  "credentials_output": false
+}

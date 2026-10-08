@@ -1,0 +1,27 @@
+{
+  "verified_at": "2026-10-08T13:10:18.970Z",
+  "environment": "lan-test-20261008",
+  "backend_source_revision": "77b41cf2c13cdcd0e8818b4a7a25cd329bb4ea66",
+  "targeted_junit": {
+    "tests": 48,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "real_configured_minio": {
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "alternate_project_buckets": true,
+    "storage_endpoint": "SSH loopback forwarding to 192.168.1.215 MinIO"
+  },
+  "pure_jdk": {
+    "assertions": 79,
+    "component_connection": false
+  },
+  "no_schema_migration": true,
+  "formal_contract_acceptance": "NOT_RUN",
+  "oss_cloud_integration": "NOT_RUN",
+  "credentials_output": false
+}

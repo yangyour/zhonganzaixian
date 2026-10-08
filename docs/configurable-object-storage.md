@@ -2,7 +2,7 @@
 
 2026-10-08用户要求上传下载切换到MinIO，并可配置、可切换。新增显式`OBJECT_STORAGE_PROVIDER=minio`，与已有`oss`共用选择入口。API、照片Worker和来源导入Worker采用相同配置解析；下载继续通过平台会话及grant鉴权、大小和SHA256核对后返回原字节，不向浏览器下发存储凭据。
 
-代码的配置/拒绝/隔离验证与两个新独立MinIO桶的真实原字节读写、不覆盖验证已通过；本节初次提交时，新服务器运行配置仍为历史MinIO模式，显式新配置部署与HTTP证据随后单独记录。数据库仍V30，本功能没有结构迁移或新的HTTP路径，现有0.45 API契约不变。
+已部署到192.168.1.215的10010入口，后端源码基线77b41cf。API、照片Worker和来源导入Worker均为显式minio，旧MOP_S3/MOP_IMPORT_S3参数已从三个运行env移除，目标仍是原两个测试桶，既有原图继续可授权下载。其余9个常驻容器启动时间相同。数据库仍V30，本功能没有结构迁移或新的HTTP路径，现有0.45 API契约不变。
 
 ## 私有配置与切换
 
@@ -30,3 +30,10 @@ MinIO字段优先级为显式能力专属值、通用值、历史MOP_S3或MOP_IM
 ## 验证边界
 
 隔离JUnit覆盖可配置端点/区域/两个桶、能力独立凭据、字段优先级、空值拒绝、私有HTTP边界、非法/关闭/其他provider不回退、API与Worker接入及凭据提案阻断。真实组件验证只连接192.168.1.215上的MinIO，通过SSH映射至21900，使用两个明确标记的独立测试桶及受限账号；原默认两个桶和其IAM不改。两个组件用例实际创建、原字节回读、原请求重放、不同内容拒绝和原对象保留通过，合成对象留存，不冒充云端OSS或完整业务HTTP验收。
+
+最终证据：
+
+- [配置和组件测试](evidence/configurable-storage-tests-20261008.json)：48项相关JUnit、2项实际MinIO和79个纯JDK断言通过，各自单列。
+- [部署与切换验证](evidence/configurable-minio-deployment-20261008.json)：隔离候选API在真实PG/MinIO上验证正常minio200、空MinIO秘密503、不完整OSS503、关闭503、恢复MinIO200。候选进程故意保留有效旧MinIO参数，所有失败均未回退。503的就绪报告在照片失败处提前返回，未报告的导入状态保持null，不推断其状态。
+- [实际上传与授权下载](evidence/configurable-minio-http-20261008.json)：36次HTTP通过，照片上传/原202重放/原图大小与摘要、来源存储/真实CSV解析，以及配置变更前的原图仍可授权下载；跨租户404，0未确认写请求。没有重做联系人或导出历史场景。
+- [最终状态](evidence/configured-minio-final-20261008.json)：关闭本轮本机验证转发后，12个容器运行、API及两个Worker的provider均为minio，ready/durable为true。OSS真实云端凭据和业务联调仍NOT_RUN。

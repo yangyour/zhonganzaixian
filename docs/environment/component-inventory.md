@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-08最新存储选择：用户要求上传下载改为MinIO并可配置切换，已在新服务器部署后端77b41cf及显式minio，API/照片/来源Worker使用统一选择和独立受限账号，端点/区域/桶可配置，历史测试默认桶/IAM不变；为真实可配置验证另建两个明确标记的测试桶及受限账号。48隔离/2实际MinIO、5种真实就绪切换、36上传下载HTTP/旧原图摘要通过；无迁移，其余9容器启动时间相同。OSS保留可选配置，资料缺失不阻塞已选MinIO的测试能力，生产批准/通知/导出发布等门禁不自动解除。见[配置说明](../configurable-object-storage.md)与[最终证据](../evidence/configured-minio-final-20261008.json)。
+
 2026-10-08新增内网测试环境：用户授权在192.168.1.215验证连通并部署全套。固定主机键SSH真实认证，空白Ubuntu26.04.1主机安装Docker29.1.3/Compose2.40.3；Web/API/三个Worker、PG17.9/V30、MinIO既有验证版本、Redis7.4.9、RabbitMQ4.3.2、Zabbix7.0.31 Server/Web/Agent共12个常驻容器运行。新入口为http://192.168.1.215:10010/login，Zabbix10020；数据库/存储/缓存/消息仅回环，均使用独立项目账号、库/桶/vhost及命名卷。旧服务器只读导出三个镜像，未迁移旧数据或改变旧服务。
 
 新环境照片/来源存储的受限读写及删除/越界/跨桶拒绝、三个Worker49次HTTP、身份53次HTTP、13项真实浏览器检查、单次导出XLSX及API重启保留19张业务表通过；V1–V30显式初始化且最终只读0迁移。临时下载/验证隧道关闭后仍ready=true。Zabbix实际采集仅为明确的合成测试Agent容器，MOP监控业务映射仍CONFIG_PENDING；Redis/RabbitMQ运行不等于MOP业务接入。OSS、通知、堡垒机/CMDB及正式规则缺口继续登记。完整[新环境部署记录](../lan-test-deployment-20261008.md)与[最终组件证据](../evidence/lan-deployment-final-20261008.json)独立于下文原环境历史。

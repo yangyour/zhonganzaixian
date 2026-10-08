@@ -21,20 +21,20 @@ async function visit(kind:'assets'|'tickets',id:string){if(navigating.value)retu
 </script>
 <template>
  <el-button v-if="permitted" class="global-search-trigger" aria-label="打开全局搜索，快捷键斜杠" @click="show">搜索 <kbd>/</kbd></el-button>
- <el-dialog v-model="open" title="当前租户分组搜索" width="680px" class="global-search-dialog" :close-on-click-modal="false" :close-on-press-escape="!navigating" :show-close="!navigating" @opened="input?.focus()">
+ <el-dialog v-model="open" title="搜索当前租户" width="680px" class="global-search-dialog" :close-on-click-modal="false" :close-on-press-escape="!navigating" :show-close="!navigating" @opened="input?.focus()">
   <el-form @submit.prevent="workspace.search()"><el-form-item><el-input ref="input" :model-value="state.query" :disabled="navigating" clearable aria-label="当前租户搜索词" placeholder="资产名称 / 报障标题 / 受理编号" @update:model-value="workspace.change(String($event))"/></el-form-item><el-button native-type="submit" type="primary" :loading="state.busy" :disabled="navigating">搜索</el-button></el-form>
-  <p class="search-boundary">仅已接入的资产与报障登记。事件、自动化脚本和通知铃铛尚未实现；未知不表示没有告警。修改关键词立即清除旧结果，不自动查询。</p>
+  <p class="search-boundary">目前可搜索有权查看的资产和报障登记。事件、自动化脚本和通知提醒尚未接入，暂时无法判断是否有相关告警。修改关键词会清除旧结果，请重新搜索。</p>
   <ApiErrorNotice :error="state.error"/>
   <el-alert v-if="navigationError" :title="navigationError" type="warning" :closable="false"/>
   <el-skeleton v-if="state.busy" :rows="4" animated/>
   <template v-if="state.result">
-   <p class="search-observed">读取时刻：{{displayTime(state.result.observed_at)}} · 当前租户 · 部分来源</p>
-   <section class="search-group"><h3>资产 <small>最多5条</small></h3><p v-if="!state.result.groups[0].returned">不存在或无权限</p><ul v-else><li v-for="hit in state.result.groups[0].items" :key="hit.id"><el-button link :disabled="navigating" @click="visit('assets',hit.id)">{{hit.name}}</el-button><span>{{typeLabel(hit.type)}} · 资产记录</span></li></ul><p v-if="state.result.groups[0].has_more">还有匹配记录，请进入资产列表继续查询；此处不是总量。</p></section>
-   <section class="search-group unavailable"><h3>事件 <small>最多4条</small></h3><p>来源尚未接入，结果未知；不是空事件列表。</p></section>
-   <section class="search-group"><h3>工单（当前仅报障登记） <small>最多3条</small></h3><p>{{state.result.groups[2].source_scope==='OWN_REPORT_REGISTRATIONS'?'仅本人报障，不包含同租户其他报障人':'当前租户内部可见登记'}}</p><p v-if="!state.result.groups[2].returned">不存在或无权限</p><ul v-else><li v-for="hit in state.result.groups[2].items" :key="hit.id"><el-button link :disabled="navigating" @click="visit('tickets',hit.id)">{{hit.title}}</el-button><span>{{hit.receipt_no}} · 已登记，非正式工单状态</span></li></ul><p v-if="state.result.groups[2].has_more">还有匹配登记，请进入报障列表继续查询；此处不是总量。</p></section>
-   <section class="search-group unavailable"><h3>自动化脚本 <small>最多3条</small></h3><p>来源尚未接入，结果未知；本搜索不执行脚本。</p></section>
+   <p class="search-observed">查询时间：{{displayTime(state.result.observed_at)}} · 仅含当前租户已接入且有权查看的数据</p>
+   <section class="search-group"><h3>资产 <small>最多5条</small></h3><p v-if="!state.result.groups[0].returned">没有找到可查看的匹配资产，请尝试其他关键词。</p><ul v-else><li v-for="hit in state.result.groups[0].items" :key="hit.id"><el-button link :disabled="navigating" @click="visit('assets',hit.id)">{{hit.name}}</el-button><span>{{typeLabel(hit.type)}} · 资产记录</span></li></ul><p v-if="state.result.groups[0].has_more">还有更多匹配资产，可到资产管理页继续查询。</p></section>
+   <section class="search-group unavailable"><h3>事件 <small>最多4条</small></h3><p>事件来源尚未接入，暂时无法查询，也无法判断是否有事件。</p></section>
+   <section class="search-group"><h3>工单（当前仅报障登记） <small>最多3条</small></h3><p>{{state.result.groups[2].source_scope==='OWN_REPORT_REGISTRATIONS'?'仅搜索本人提交的报障登记':'搜索当前租户内有权查看的报障登记'}}</p><p v-if="!state.result.groups[2].returned">没有找到可查看的匹配报障，请尝试其他关键词。</p><ul v-else><li v-for="hit in state.result.groups[2].items" :key="hit.id"><el-button link :disabled="navigating" @click="visit('tickets',hit.id)">{{hit.title}}</el-button><span>{{hit.receipt_no}} · 已登记，正式处理状态待确认</span></li></ul><p v-if="state.result.groups[2].has_more">还有更多匹配登记，可到报障与受理页继续查询。</p></section>
+   <section class="search-group unavailable"><h3>自动化脚本 <small>最多3条</small></h3><p>脚本来源尚未接入，暂时无法查询。本搜索不执行脚本。</p></section>
   </template>
-  <p v-else-if="!state.busy&&!state.error">输入明确关键词后搜索；尚未查询，不显示0条。</p>
+  <p v-else-if="!state.busy&&!state.error">输入资产名称、报障标题或受理编号，点击“搜索”或按 Enter 查看结果。</p>
   <template #footer><el-button :disabled="navigating" @click="open=false">关闭并清除搜索</el-button></template>
  </el-dialog>
 </template>

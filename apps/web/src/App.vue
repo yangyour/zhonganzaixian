@@ -81,7 +81,7 @@ async function endSession() {
           <el-menu-item v-if="can('audit:read')" index="audit"><span class="nav-symbol">≡</span>审计日志</el-menu-item>
         </el-menu>
       </template>
-      <div class="sidebar-foot"><span class="small-label">共享测试环境</span><p>公共底座与资产纵向切片</p><small>监控采集与生产身份源待确认</small></div>
+      <div class="sidebar-foot"><span class="small-label">共享测试环境</span><p>资产、报障与账号管理</p><small>监控采集和正式环境认证方式待确认</small></div>
     </aside>
     <div class="main-layout">
       <header class="topbar">
@@ -98,13 +98,13 @@ async function endSession() {
           <el-button text :loading="leaving" @click="endSession">退出</el-button>
         </div>
       </header>
-      <div class="environment-strip"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '项目测试环境 · 非生产' : '历史隔离单元夹具 · 非集成验收环境' }} · 资产状态尚无真实采集依据</div>
+      <div class="environment-strip"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '项目测试环境 · 非生产' : '历史单元测试夹具 · 不用于联调验收' }} · 尚未采集设备状态</div>
       <main class="content">
         <ApiErrorNotice :error="error" />
-        <div v-if="switchingTenant" class="switching-panel"><el-skeleton :rows="5" animated /><p>正在切换租户，已取消旧上下文请求…</p></div>
+        <div v-if="switchingTenant" class="switching-panel"><el-skeleton :rows="5" animated /><p>正在切换租户，请稍候…</p></div>
         <router-view v-else :key="pageKey" />
       </main>
-      <footer class="app-footer">MOP 开发验证 V0.1 <span>资产草稿 · 配置登记 · 报障登记 · 审计</span></footer>
+      <footer class="app-footer">MOP 测试版 V0.1 <span>资产草稿 · 配置登记 · 报障登记 · 审计</span></footer>
     </div>
     <el-drawer v-model="navigationOpen" title="MOP 导航" direction="ltr" size="260px">
       <el-menu :default-active="String(route.name)" @select="router.push({ name: $event })">

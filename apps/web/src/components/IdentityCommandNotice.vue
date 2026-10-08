@@ -5,7 +5,7 @@ defineProps<{ command: IdentityCommand; message: string; readbackFailed?: boolea
 defineEmits<{ retry: [] }>()
 </script>
 <template>
-  <ApiErrorNotice :error="command.error" />
-  <el-alert v-if="command.state === 'uncertain'" title="原操作结果尚未确认，请使用原请求重试；不要新建重复操作。" type="warning" :closable="false"><el-button @click="$emit('retry')">原请求重试</el-button></el-alert>
+  <ApiErrorNotice v-if="command.state === 'uncertain'" :error="command.error || true" type="warning" title="还无法确认是否保存成功" guidance="请用下方按钮重试这次操作，不要重新提交一份。"><el-button @click="$emit('retry')">原请求重试</el-button></ApiErrorNotice>
+  <ApiErrorNotice v-else :error="command.error" />
   <el-alert v-if="message" :title="message" :type="readbackFailed ? 'warning' : 'success'" :closable="false" />
 </template>

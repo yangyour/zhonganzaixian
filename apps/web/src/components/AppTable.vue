@@ -4,7 +4,7 @@ defineProps<{ rows: object[]; loading?: boolean; rowKey?: string; emptyText?: st
 </script>
 <template>
   <div class="table-frame" :aria-busy="loading">
-    <el-table v-loading="loading" :data="rows" :row-key="rowKey || 'id'" :empty-text="emptyText || '暂无符合条件的数据'" table-layout="auto" stripe>
+    <el-table v-loading="loading" element-loading-text="正在加载…" :data="rows" :row-key="rowKey || 'id'" :empty-text="loading ? '正在加载…' : emptyText || '暂无符合条件的数据'" table-layout="auto" stripe>
       <slot />
     </el-table>
   </div>

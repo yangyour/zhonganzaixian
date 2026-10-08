@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { ElAlert, ElButton, ElForm, ElFormItem, ElInput, ElTag, type InputInstance } from 'element-plus'
 import { useRoute } from 'vue-router'
 import { api, ApiError, isCancelled } from '../api/client'
 import type { AuthOptions, Session } from '../api/types'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import loginBackground from '../assets/login-datacenter.png'
 const route = useRoute(), options = ref<AuthOptions | null>(null), loading = ref(true), submitting = ref(false), error = ref<unknown>(null)
 const username = ref(''), password = ref(''), help = ref(false), controller = new AbortController()
-const usernameInput = ref<HTMLInputElement | null>(null), passwordInput = ref<HTMLInputElement | null>(null), errorNotice = ref<HTMLElement | null>(null)
+const usernameInput = ref<InputInstance | null>(null), passwordInput = ref<InputInstance | null>(null), errorNotice = ref<HTMLElement | null>(null)
 const usernameError = ref(''), passwordError = ref(''), passwordVisible = ref(false), capsLock = ref(false)
 const loginMethod = ref<'local' | 'unified' | null>(null)
 const passwordDescription = computed(() => [passwordError.value ? 'login-password-error' : '', capsLock.value ? 'login-caps-lock' : ''].filter(Boolean).join(' ') || undefined)
@@ -63,46 +65,80 @@ function unifiedLogin() {
   if (!path || !path.startsWith('/oauth2/authorization/') || path.startsWith('//')) { error.value = new ApiError(0, 'IDENTITY_SOURCE_UNAVAILABLE', '统一身份认证尚未配置，请联系项目管理员。', '—'); return }
   error.value = null; submitting.value = true; loginMethod.value = 'unified'; passwordVisible.value = false; window.location.assign(path)
 }
-function updateCapsLock(event: KeyboardEvent) { capsLock.value = event.getModifierState('CapsLock') }
+function updateCapsLock(event: KeyboardEvent | Event) {
+  if (event instanceof KeyboardEvent) capsLock.value = event.getModifierState('CapsLock')
+}
 </script>
 <template>
   <div class="login-screen">
-    <section class="login-intro"><div class="login-brand"><span class="brand-mark">M</span>MOP 运维托管</div><h1>查看设备状态，<br>跟进运维工作。</h1><p>网络设备运维平台</p><div class="login-scope"><span>项目账号登录，按租户授权访问</span><span>按角色分配权限，保留操作记录</span><span>支持接入统一身份认证</span></div></section>
-    <section class="login-card">
-      <span class="eyebrow">MOP ACCOUNT</span><h2>登录 MOP</h2>
-      <p class="muted">请使用项目账号登录。可访问的租户和功能由管理员分配。</p>
+    <img class="login-background" :src="loginBackground" alt="" aria-hidden="true" fetchpriority="high" />
+    <header class="login-header">
+      <div class="login-brand"><span class="brand-mark">M</span>MOP 运维托管</div>
+      <el-tag class="login-environment" type="info" effect="plain">测试环境</el-tag>
+    </header>
+    <main class="login-main">
+    <section class="login-card" aria-labelledby="login-title">
+      <h1 id="login-title">登录 MOP</h1>
       <p class="login-progress" role="status">{{ loading ? '正在连接登录服务…' : submitting ? loginMethod === 'unified' ? '正在打开统一认证页面，请稍候。' : '正在核对账号信息，请稍候。' : '' }}</p>
       <el-alert v-if="oidcFailure" :title="oidcFailure" type="error" :closable="false" show-icon class="page-note" />
       <div v-if="error" ref="errorNotice" class="login-error" tabindex="-1" aria-label="登录未完成">
         <ApiErrorNotice :error="error"><el-button v-if="!options" size="small" :loading="loading" @click="loadOptions">重新连接</el-button></ApiErrorNotice>
       </div>
-      <form v-if="options?.local_enabled" class="local-login-form" :aria-busy="submitting" novalidate @submit.prevent="localLogin">
-        <div class="login-field">
-          <label for="login-username">账号</label>
-          <input id="login-username" ref="usernameInput" v-model="username" aria-label="登录账号" autocomplete="username" autocapitalize="none" :spellcheck="false" maxlength="64" required :disabled="submitting" :aria-invalid="usernameError ? true : undefined" :aria-describedby="usernameError ? 'login-username-error' : undefined" @input="usernameError = ''" />
-          <p v-if="usernameError" id="login-username-error" class="login-field-error" role="alert">{{ usernameError }}</p>
-        </div>
-        <div class="login-field">
-          <label for="login-password">密码</label>
-          <div class="login-password-control">
-            <input id="login-password" ref="passwordInput" v-model="password" aria-label="登录密码" :type="passwordVisible ? 'text' : 'password'" autocomplete="current-password" maxlength="1024" required :disabled="submitting" :aria-invalid="passwordError ? true : undefined" :aria-describedby="passwordDescription" @input="passwordError = ''" @keydown="updateCapsLock" @keyup="updateCapsLock" @blur="capsLock = false" />
-            <button type="button" class="password-toggle" :aria-label="passwordVisible ? '隐藏密码' : '显示密码'" :aria-pressed="passwordVisible" aria-controls="login-password" :disabled="submitting" @click="passwordVisible = !passwordVisible">{{ passwordVisible ? '隐藏' : '显示' }}</button>
-          </div>
-          <p v-if="passwordError" id="login-password-error" class="login-field-error" role="alert">{{ passwordError }}</p>
-          <p v-if="capsLock" id="login-caps-lock" class="login-caps-lock" role="status">大写锁定已开启，请留意密码的大小写。</p>
-        </div>
+      <el-form v-if="options?.local_enabled" class="local-login-form" label-position="top" size="large" hide-required-asterisk :aria-busy="submitting" novalidate @submit.prevent="localLogin">
+        <el-form-item class="login-field" label="账号" for="login-username" :error="usernameError">
+          <el-input id="login-username" ref="usernameInput" v-model="username" aria-label="登录账号" autocomplete="username" autocapitalize="none" :spellcheck="false" maxlength="64" required :validate-event="false" :disabled="submitting" :aria-invalid="usernameError ? true : undefined" :aria-describedby="usernameError ? 'login-username-error' : undefined" @input="usernameError = ''" />
+          <template #error><p id="login-username-error" class="login-field-error" role="alert">{{ usernameError }}</p></template>
+        </el-form-item>
+        <el-form-item class="login-field" label="密码" for="login-password" :error="passwordError">
+          <el-input id="login-password" ref="passwordInput" v-model="password" aria-label="登录密码" :type="passwordVisible ? 'text' : 'password'" autocomplete="current-password" maxlength="1024" required :validate-event="false" :disabled="submitting" :aria-invalid="passwordError ? true : undefined" :aria-describedby="passwordDescription" @input="passwordError = ''" @keydown="updateCapsLock" @keyup="updateCapsLock" @blur="capsLock = false">
+            <template #suffix><el-button native-type="button" text size="small" class="password-toggle" :aria-label="passwordVisible ? '隐藏密码' : '显示密码'" :aria-pressed="passwordVisible" aria-controls="login-password" :disabled="submitting" @click="passwordVisible = !passwordVisible">{{ passwordVisible ? '隐藏' : '显示' }}</el-button></template>
+          </el-input>
+          <template #error><p id="login-password-error" class="login-field-error" role="alert">{{ passwordError }}</p></template>
+        </el-form-item>
+        <el-alert v-if="capsLock" id="login-caps-lock" class="login-caps-lock" role="status" title="大写锁定已开启，请留意密码的大小写。" type="warning" :closable="false" show-icon />
         <el-button native-type="submit" type="primary" size="large" :loading="loginMethod === 'local'" :disabled="submitting" class="login-submit">{{ loginMethod === 'local' ? '正在登录…' : '登录' }}</el-button>
-        <button type="button" class="password-help" :aria-expanded="help" aria-controls="login-password-help" @click="help = !help">{{ help ? '收起找回说明' : '忘记密码？' }}</button>
-        <p v-if="help" id="login-password-help" class="muted login-help">请联系项目管理员重置密码。目前还不能通过邮件或短信找回。</p>
-      </form>
+        <el-button native-type="button" link type="primary" class="password-help" :aria-expanded="help" aria-controls="login-password-help" @click="help = !help">{{ help ? '收起找回说明' : '忘记密码？' }}</el-button>
+        <el-alert v-if="help" id="login-password-help" class="login-help" title="请联系项目管理员重置密码。目前还不能通过邮件或短信找回。" type="info" :closable="false" show-icon />
+      </el-form>
       <el-button v-if="options?.sso_enabled && options.login_url" size="large" :loading="loginMethod === 'unified'" :disabled="submitting" class="login-submit" @click="unifiedLogin">{{ loginMethod === 'unified' ? '正在前往统一认证…' : '使用统一身份认证' }}</el-button>
       <el-button v-else-if="!options?.local_enabled && options?.login_url" type="primary" size="large" :loading="loginMethod === 'unified'" :disabled="submitting" class="login-submit" @click="unifiedLogin">{{ loginMethod === 'unified' ? '正在前往统一认证…' : '使用统一身份认证' }}</el-button>
       <el-alert v-else-if="!loading && !error && !options?.local_enabled" title="登录服务暂不可用，请联系项目管理员。" type="warning" :closable="false" show-icon />
-      <p class="login-foot">当前为项目测试环境。账号由项目管理员授权，统一认证配置完成后才能使用。</p>
     </section>
+    </main>
   </div>
 </template>
 <style scoped>
+.login-screen{position:relative;isolation:isolate;display:flex;flex-direction:column;min-height:100vh;min-height:100svh;background:#10243b}
+.login-background{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center}
+.login-screen::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,transparent 35%,#0b1c2e16 65%,#0b1c2e38)}
+.login-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:32px clamp(24px,4.5vw,72px);color:#fff}
+.login-brand{display:flex;align-items:center;gap:12px;font-size:19px;font-weight:600;letter-spacing:.3px}
+.login-brand .brand-mark{width:40px;height:40px;border-radius:11px;font-size:25px;background:#2878e8;box-shadow:0 4px 16px #0002}
+.login-environment{--el-tag-text-color:#dce8f7;--el-tag-bg-color:#ffffff0d;--el-tag-border-color:#ffffff30;height:28px;padding:0 12px;border-radius:20px;font-size:12px}
+.login-main{flex:1;display:flex;align-items:center;justify-content:flex-end;padding:28px clamp(48px,9vw,160px) 100px;min-width:0}
+.login-card{--el-font-size-base:14px;--el-border-radius-base:9px;--el-color-primary:#256ce4;width:420px;max-width:100%;min-width:0;padding:42px;background:#fffffffa;border:1px solid #fff;border-radius:20px;box-shadow:0 24px 80px #04102338}
+.login-card h1{margin:0 0 30px;font-size:28px;line-height:1.35;font-weight:650;letter-spacing:-.5px;color:#162b47}
+.local-login-form{margin:0;display:flex;flex-direction:column}
+.login-field{min-width:0;margin-bottom:24px}
+.local-login-form :deep(.el-form-item__label){font-size:14px;font-weight:500;line-height:20px;padding:0;margin:0 0 9px;color:#34465d}
+.local-login-form :deep(.el-input__wrapper){min-height:50px;padding:0 14px;background:#fff;box-shadow:0 0 0 1px #d4deea inset;border-radius:9px;transition:box-shadow .18s}
+.local-login-form :deep(.el-input__wrapper:hover){box-shadow:0 0 0 1px #9bb0cc inset}
+.local-login-form :deep(.el-input__wrapper.is-focus){box-shadow:0 0 0 2px #256ce4 inset}
+.local-login-form :deep(.el-form-item.is-error .el-input__wrapper){box-shadow:0 0 0 1px #c4424e inset}
+.local-login-form :deep(.el-input__inner){height:48px;color:#243750;font-size:15px}
+.local-login-form :deep(.el-input.is-disabled .el-input__wrapper){background:#f3f6fa}
+.password-toggle{min-height:42px;min-width:44px;margin-right:-7px;padding:0 8px;color:#356bad;border-radius:6px;font-size:12px}
+.login-submit{width:100%;height:50px;margin:4px 0 0;font-size:15px;font-weight:500;border-radius:9px}
+.login-submit.el-button--primary{box-shadow:0 5px 12px #256ce421}
+.password-help{align-self:flex-end;min-height:44px;margin:12px 0 0!important;padding:0 2px;font-size:13px}
+.login-field-error{width:100%;margin:7px 0 0;color:#ba3543;font-size:12px;line-height:1.6}
+.login-progress{margin:0 0 18px;color:#536b86;font-size:13px;line-height:1.7}
 .login-progress:empty{margin:0}
-.local-login-form{display:grid;gap:18px;margin:24px 0}.login-field{display:grid;gap:8px;min-width:0}.local-login-form label{color:#344d65}.local-login-form input{width:100%;box-sizing:border-box;min-height:46px;border:1px solid #b8c7d8;border-radius:8px;padding:10px 12px;font:inherit}.local-login-form input[aria-invalid=true]{border-color:#b42318}.local-login-form input:disabled{background:#f3f6fa;color:#62748a}.login-password-control{position:relative}.login-password-control input{padding-right:70px}.password-toggle{position:absolute;right:4px;top:1px;min-height:44px;min-width:60px;border:0;border-radius:6px;background:transparent;color:#2269ba;font:inherit;cursor:pointer}.password-toggle:disabled{color:#62748a;cursor:default}.password-help{justify-self:end;border:0;background:transparent;color:#2269ba;font:inherit;cursor:pointer;min-height:44px}.login-field-error,.login-caps-lock,.login-help,.login-progress{margin:0;font-size:13px;line-height:1.6}.login-field-error{color:#b42318}.login-caps-lock{color:#875900}.login-progress{margin-top:16px;color:#344d65}.local-login-form .login-submit{margin-top:4px}.local-login-form :focus-visible,.login-error:focus-visible{outline:3px solid #4c8fd5;outline-offset:2px}.login-error{border-radius:8px}
+.login-caps-lock{margin-bottom:18px}.login-help{margin-top:10px}
+.login-card :deep(.el-alert){border-radius:9px;padding:12px 14px}.login-card :deep(.el-alert__title){font-size:12px!important;line-height:1.65!important}.login-card :deep(.el-alert__icon){font-size:16px;width:16px}
+.login-error{border-radius:9px}.password-toggle:focus-visible,.password-help:focus-visible,.login-error:focus-visible{outline:2px solid #256ce4;outline-offset:3px}
+@media(max-width:1100px){.login-main{padding-right:6vw;padding-left:6vw}.login-card{width:400px;padding:36px}.login-background{object-position:42% center}}
+@media(max-width:760px){.login-header{padding:24px;gap:10px}.login-brand{font-size:16px;gap:10px}.login-brand .brand-mark{width:34px;height:34px;font-size:22px;border-radius:9px}.login-environment{padding:0 9px;font-size:11px}.login-main{align-items:center;justify-content:center;padding:24px 20px 64px}.login-card{width:400px;padding:32px 28px;border-radius:18px}.login-card h1{font-size:25px;margin-bottom:26px}.login-background{object-position:27% center}.login-screen::before{background:#0c203b40}}
+@media(max-width:360px){.login-header{padding:20px 16px}.login-brand{font-size:15px}.login-main{padding:16px 16px 40px}.login-card{padding:28px 22px}.login-environment{font-size:10px;padding:0 7px}}
+@media(prefers-reduced-motion:reduce){.local-login-form :deep(.el-input__wrapper){transition:none}}
 </style>

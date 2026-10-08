@@ -11,8 +11,8 @@ const root = resolve(import.meta.dirname, '..'), dist = resolve(root, 'apps/web/
 const run = randomUUID(), output = resolve(root, `.local/ui-polish-${run}`)
 mkdirSync(output, { recursive: true })
 const checks = [], requests = [], screenshots = [], faults = [], releases = []
-const assets = new Map(), pageErrors = [], unexpectedWrites = [], routeErrors = []
-let browser, context, page, base, stage = 'setup', failure, readiness, authenticated = false
+const assets = new Map(), imageResponses = new Map(), pageErrors = [], unexpectedWrites = [], routeErrors = []
+let browser, context, page, base, stage = 'setup', failure, readiness, loginBackground, authenticated = false
 const hash = bytes => createHash('sha256').update(bytes).digest('hex')
 const deferred = () => { let resolve; const promise = new Promise(r => { resolve = r }); return { promise, resolve } }
 function record(name) { checks.push(name); console.log(JSON.stringify({ stage, passed: name })) }
@@ -34,11 +34,20 @@ async function shot(name) {
     const field = page.locator(id)
     if (await field.count() && await field.inputValue()) masks.push(field)
   }
+  // Account display names may include the test login name after authentication.
+  if (await page.locator('.identity strong').count()) masks.push(page.locator('.identity strong'))
   await page.screenshot({ path: resolve(output, name + '.png'), fullPage: true, animations: 'disabled', mask: masks })
   screenshots.push(name + '.png')
 }
 async function noOverflow() {
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2), 'Page must not overflow horizontally')
+}
+async function controlInViewport(control) {
+  assert.equal(await control.isVisible(), true, 'Required login control must be visible')
+  assert.equal(await control.evaluate(element => {
+    const box = element.getBoundingClientRect()
+    return box.width > 0 && box.height > 0 && box.left >= -2 && box.top >= -2 && box.right <= innerWidth + 2 && box.bottom <= innerHeight + 2
+  }), true, 'Required login control must fit within the viewport')
 }
 async function call(path) {
   const response = await context.request.get(base + '/api/v1' + path, { timeout: 30000 })
@@ -60,11 +69,11 @@ function readySummary(value) {
   }
   return result
 }
-async function holdNextAssets(delivery) {
+async function holdNextRead(path, delivery) {
   const hit = deferred(), release = deferred(), done = deferred()
   let consumed = false
   releases.push(release.resolve)
-  const matcher = url => url.origin === base && url.pathname === '/api/v1/assets'
+  const matcher = url => url.origin === base && url.pathname === path
   const handler = async route => {
     if (consumed || route.request().method() !== 'GET') return route.fallback()
     consumed = true
@@ -72,8 +81,9 @@ async function holdNextAssets(delivery) {
       const response = await route.fetch({ timeout: 30000 })
       assert.equal(response.status(), 200, 'Delivery checks require a real successful read')
       const body = await response.json()
-      assert.ok(Array.isArray(body.data?.items) && body.data.items.length > 0, 'Delivery checks require real nonempty assets')
-      faults.push({ path: '/api/v1/assets', real_status: response.status(), real_item_count: body.data.items.length, delivery })
+      if (path === '/api/v1/assets') assert.ok(Array.isArray(body.data?.items) && body.data.items.length > 0, 'Delivery checks require real nonempty assets')
+      else assert.equal(body.data?.local_enabled, true, 'Login options must come from the existing enabled project identity service')
+      faults.push({ path, real_status: response.status(), ...(path === '/api/v1/assets' ? { real_item_count: body.data.items.length } : {}), delivery })
       hit.resolve({ ok: true })
       await release.promise
       if (delivery === 'aborted-after-real-response') await route.abort('failed')
@@ -89,6 +99,7 @@ async function holdNextAssets(delivery) {
   await page.route(matcher, handler)
   return { hit: async () => assert.equal((await bounded(hit.promise)).ok, true, 'Real response must be obtained'), release: release.resolve, done: () => bounded(done.promise) }
 }
+const holdNextAssets = delivery => holdNextRead('/api/v1/assets', delivery)
 async function assetRowsReady() {
   await page.locator('.table-frame .el-table__body .el-table__row').first().waitFor()
   await page.locator('.table-frame[aria-busy="false"]').waitFor()
@@ -118,7 +129,7 @@ try {
     if (!file.startsWith(dist + sep) || !existsSync(file)) return route.continue()
     const body = readFileSync(file)
     assets.set(file.slice(dist.length + 1).replaceAll('\\', '/'), hash(body))
-    const contentType = file.endsWith('.js') ? 'application/javascript' : file.endsWith('.css') ? 'text/css' : file.endsWith('.html') ? 'text/html' : undefined
+    const contentType = file.endsWith('.js') ? 'application/javascript' : file.endsWith('.css') ? 'text/css' : file.endsWith('.html') ? 'text/html' : file.endsWith('.webp') ? 'image/webp' : file.endsWith('.png') ? 'image/png' : /\.jpe?g$/i.test(file) ? 'image/jpeg' : undefined
     await route.fulfill({ status: 200, body, ...(contentType ? { contentType } : {}) })
   })
   page = await context.newPage(); page.setDefaultTimeout(30000)
@@ -128,12 +139,57 @@ try {
   })
   page.on('response', response => {
     if (new URL(response.url()).pathname.startsWith('/api/')) requests.push({ method: response.request().method(), path: safePath(response.url()), status: response.status(), source: 'browser-response' })
+    if (response.request().resourceType() === 'image') imageResponses.set(response.url(), response.status())
   })
 
-  stage = 'login_controls_before_credentials'
+  stage = 'login_background_and_empty_form_layouts'
   await page.goto(base + '/login')
   const username = page.getByLabel('登录账号', { exact: true }), password = page.getByLabel('登录密码', { exact: true })
   await username.waitFor()
+  const background = page.locator('img.login-background')
+  await background.waitFor()
+  assert.equal(await background.getAttribute('aria-hidden'), 'true')
+  assert.equal(await background.getAttribute('alt'), '')
+  const backgroundInfo = await background.evaluate(async element => {
+    await element.decode()
+    return { src: element.currentSrc, width: element.naturalWidth, height: element.naturalHeight }
+  })
+  assert.ok(backgroundInfo.width > 1000 && backgroundInfo.height > 500, 'Background must decode at the intended natural image size')
+  const backgroundURL = new URL(backgroundInfo.src)
+  assert.equal(backgroundURL.origin, base, 'Background must be served by the local production build')
+  const backgroundAsset = decodeURIComponent(backgroundURL.pathname).replace(/^\//, '')
+  assert.equal(imageResponses.get(backgroundInfo.src), 200, 'Background image request must succeed')
+  assert.ok(assets.has(backgroundAsset), 'Background must be a hashed local build resource')
+  loginBackground = { asset: backgroundAsset, sha256: assets.get(backgroundAsset), natural_width: backgroundInfo.width, natural_height: backgroundInfo.height, response_status: 200, decorative: true }
+  record('login_background_real_build_asset_decodes_with_decorative_accessibility')
+  for (const [width, height] of [[1440, 1000], [1280, 720], [390, 844], [320, 740]]) {
+    await page.setViewportSize({ width, height }); await page.evaluate(() => window.scrollTo(0, 0))
+    assert.equal(await username.inputValue(), ''); assert.equal(await password.inputValue(), '')
+    assert.equal(await username.evaluate(element => element.required), true); assert.equal(await password.evaluate(element => element.required), true)
+    for (const control of [username, password, page.getByRole('button', { name: '显示密码', exact: true }), page.getByRole('button', { name: '登录', exact: true }), page.getByRole('button', { name: '忘记密码？', exact: true })]) await controlInViewport(control)
+    await noOverflow(); await shot(`${width}x${height}-login-empty`)
+    record(`${width}x${height}_empty_login_controls_visible_without_horizontal_overflow`)
+  }
+
+  stage = 'login_options_delivery_failure_and_reconnect'
+  await page.setViewportSize({ width: 390, height: 844 })
+  const failedOptions = await holdNextRead('/api/v1/auth/options', 'aborted-after-real-response')
+  await page.goto(base + '/login'); await failedOptions.hit(); failedOptions.release(); await failedOptions.done()
+  const reconnect = page.getByRole('button', { name: '重新连接', exact: true })
+  await reconnect.waitFor(); await controlInViewport(reconnect)
+  assert.equal(await page.locator('.local-login-form').count(), 0, 'Unavailable login options must not leave an active login form')
+  await noOverflow(); await shot('390-login-options-error')
+  const optionsResponse = page.waitForResponse(response => new URL(response.url()).pathname === '/api/v1/auth/options' && response.request().method() === 'GET')
+  await reconnect.click()
+  const recoveredOptions = await optionsResponse
+  assert.equal(recoveredOptions.status(), 200); assert.equal((await recoveredOptions.json()).data?.local_enabled, true)
+  await username.waitFor(); await page.locator('.login-error').waitFor({ state: 'hidden' })
+  await controlInViewport(page.getByRole('button', { name: '登录', exact: true }))
+  await noOverflow(); await shot('390-login-options-recovered')
+  record('real_login_options_delivery_failure_recovers_after_reconnect')
+
+  stage = 'login_controls_before_credentials'
+  await page.setViewportSize({ width: 1440, height: 1000 })
   assert.equal(await page.locator('.login-progress[role="status"]').evaluate(element => element.closest('[aria-busy="true"]') === null), true)
   await password.fill('SYNTHETIC_UNSUBMITTED_INPUT')
   assert.equal(await password.getAttribute('type'), 'password')
@@ -240,7 +296,7 @@ try {
     browser: browser ? browser.version() : null,
     frontend: 'current-local-production-build-served-to-browser', backend: 'designated-server-existing-api',
     deployed_latest_frontend: false, readiness: readiness ?? null,
-    assets: Object.fromEntries(assets), requests, controlled_delivery_faults: faults,
+    assets: Object.fromEntries(assets), login_background: loginBackground ?? null, requests, controlled_delivery_faults: faults,
     technical_checks: checks, visual_evidence: { screenshots, review: 'CAPTURED_REQUIRES_SEPARATE_VISUAL_REVIEW' },
     page_errors: pageErrors, route_errors: routeErrors, unexpected_business_writes: unexpectedWrites,
     business_mutations: 'NONE', authentication: authenticated ? 'existing-project-test-account-session-created' : 'NOT_CONFIRMED',

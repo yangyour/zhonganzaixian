@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-08 登录视觉整理继续复用指定 API 的项目账号与资产读取；真实登录、remote_test/ready/durable及20项浏览器检查通过。仅新增随前端打包的生成背景图，UI复用既有Element Plus，不新增服务/组件、不执行迁移或业务写入；未将背景里的机房设备当作真实采集证据。部署与组件版本边界沿用本轮[明确记录](../login-visual-refresh-20261008.md)。
+
 2026-10-08 页面交互打磨：不新增组件依赖，API/数据库迁移不变。Edge 154.0.4258.62 接原指定 API 完成真实项目账号登录、非空虚构资产读取与 14 项交互检查；就绪返回 remote_test、ready=true、durable=true、production_ready=false。未执行业务写入或组件重启；ready 不提供组件版本，本轮未重盘点版本。隔离页面测试与上述 HTTP/浏览器证据分开，见[交互打磨记录](../ui-interaction-polish-20261008.md)。本机 Web 构建不代表服务器已部署，未解除真实监控/生产组件门禁。
 
 2026-10-07本地补测：固定主机键SSH实际连接原PG17.9/V28与MinIO RELEASE.2025-09-07T16-13-09Z；772项PG/6项MinIO全部执行通过。指定库仍28条成功迁移、0失败，本轮0新迁移。10个项目/共享容器ID与启动时间前后相同，3个项目测试Worker仅在队列测试窗口暂停并在finally恢复；共享数据库、存储、Keycloak等未停止或重配。本机隧道因套接字10055断开的一轮留作失败，后续分批复验通过，结束后仅关闭本次本机隧道。Keycloak实测26.2.4仍运行，默认项目账号登录不依赖它；最终API就绪、本地账号登录与密码策略全null/version1通过。Redis/RabbitMQ、OSS、监控、CMDB、通知、堡垒机不因本轮PG/MinIO通过而获得业务联调结论。详见[完整补测](../local-test-completion-20261007.md)及[组件证据](../evidence/local-components-20261007.json)。

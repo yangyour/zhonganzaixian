@@ -1,0 +1,419 @@
+{
+  "verified_at": "2026-10-08T02:12:23.122Z",
+  "passed": true,
+  "run": "43c968aa-1b4e-4179-a991-a028b3e87a63",
+  "stage": "final_checks",
+  "checks": [
+    "login_background_real_build_asset_decodes_with_decorative_accessibility",
+    "1440x1000_empty_login_controls_visible_without_horizontal_overflow",
+    "1280x720_empty_login_controls_visible_without_horizontal_overflow",
+    "390x844_empty_login_controls_visible_without_horizontal_overflow",
+    "320x740_empty_login_controls_visible_without_horizontal_overflow",
+    "real_login_options_delivery_failure_recovers_after_reconnect",
+    "password_visibility_preserves_input_and_accessible_state",
+    "whitespace_username_is_rejected_locally_with_focus",
+    "password_recovery_help_expands_with_available_action",
+    "1440px_login_no_horizontal_overflow",
+    "390px_login_no_horizontal_overflow",
+    "existing_project_account_reads_nonempty_real_asset_list",
+    "existing_designated_api_ready_and_durable",
+    "1440px_loading_has_progress_without_empty_result",
+    "1440px_read_failure_has_unknown_count_and_collapsed_diagnostics",
+    "1440px_retry_restores_nonempty_real_asset_list",
+    "390px_loading_has_progress_without_empty_result",
+    "390px_read_failure_has_unknown_count_and_collapsed_diagnostics",
+    "390px_retry_restores_nonempty_real_asset_list",
+    "no_pageerror_or_business_write_requests"
+  ],
+  "failure": null,
+  "source_commit": "69a6c844a5b2cb62323fcae06f8cc7c819269a0f",
+  "tracked_source_worktree_dirty": true,
+  "verification_script_sha256": "c9aef0df395165b33221d55f3b253748303266d4636c96fa50cfc7ba5164959d",
+  "browser": "154.0.4258.62",
+  "frontend": "current-local-production-build-served-to-browser",
+  "backend": "designated-server-existing-api",
+  "deployed_latest_frontend": false,
+  "readiness": {
+    "mode": "remote_test",
+    "ready": true,
+    "durable": true,
+    "production_ready": false,
+    "component_versions": "NOT_EXPOSED_BY_READY_API",
+    "capabilities": {
+      "own_notification_preferences": {
+        "schema_access_ready": true,
+        "configuration_status": "CONFIG_PENDING",
+        "effective": false,
+        "notification_dispatched": false
+      },
+      "asset_exports": {
+        "schema_access_ready": true,
+        "mode": "PREPARE_ONLY_NO_PUBLICATION",
+        "worker_liveness": null,
+        "publication_status": "NOT_IMPLEMENTED"
+      },
+      "change_notice_drafts": {
+        "schema_access_ready": true,
+        "approval_status": null,
+        "matching_policy_status": "CONFIG_PENDING",
+        "effective": false
+      },
+      "backup_plan_drafts": {
+        "schema_access_ready": true,
+        "effective": false
+      },
+      "inspection_source_collections": {
+        "schema_access_ready": true,
+        "verification_status": "SELF_REPORTED_UNVERIFIED",
+        "report_published": false
+      },
+      "inspection_worksheets": {
+        "schema_access_ready": true,
+        "verification_status": "SELF_REPORTED_UNVERIFIED",
+        "publication_status": "NOT_IMPLEMENTED",
+        "report_published": false,
+        "active_scan_performed": false
+      },
+      "inspection_templates": {
+        "schema_access_ready": true,
+        "approval_status": "UNVERIFIED",
+        "publication_status": "NOT_IMPLEMENTED",
+        "report_published": false,
+        "active_scan_performed": false
+      },
+      "contact_imports": {
+        "schema_access_ready": true,
+        "worker_liveness": null,
+        "notification_dispatched": false
+      },
+      "customer_contacts": {
+        "schema_access_ready": true,
+        "notification_dispatched": false
+      },
+      "capacity_scenarios": {
+        "schema_access_ready": true,
+        "effective": false
+      },
+      "manual_recovery": {
+        "schema_access_ready": true
+      },
+      "manual_incidents": {
+        "schema_access_ready": true
+      },
+      "working_calendars": {
+        "schema_access_ready": true,
+        "effective": false
+      },
+      "photos": {
+        "enabled": true,
+        "ready": true
+      },
+      "asset_imports": {
+        "enabled": true,
+        "ready": true
+      },
+      "asset_reads": {
+        "unicode_search_ready": true
+      },
+      "ticket_comments": {
+        "schema_access_ready": true
+      },
+      "internal_notes": {
+        "schema_access_ready": true
+      },
+      "asset_manual_metadata": {
+        "schema_access_ready": true,
+        "monitoring_applied": false
+      },
+      "worklogs": {
+        "ready": true,
+        "schema_access_ready": true
+      },
+      "asset_dependencies": {
+        "ready": true,
+        "schema_access_ready": true,
+        "configuration_status": "CONFIG_PENDING",
+        "monitoring_applied": false
+      }
+    }
+  },
+  "assets": {
+    "index.html": "550da53c7cf40819637ac441ac58f746152fa5801ab6b7126675b63a5ccc9d20",
+    "assets/index-DT1zNxkw.js": "283a24c9c99c744448656bfa6d8c510f419c47fef170a2db40c9e07f29d3aaaa",
+    "assets/index-uVAFYMwH.css": "6a1a742810ec49e195e70bcb4a7987c076c8a0e2d164672ca9e3107762868e85",
+    "assets/LoginPage-x2IWPC8T.js": "ac8975a608dbc6b5a7df17be7801f132b7e0673dba2067d1e7de0c8150eefdba",
+    "assets/LoginPage-DMiEDKL_.css": "6520f1ccdb3206ad5acb268543556cd6b470d43591c41c9a893d88248960c66c",
+    "assets/login-datacenter-B_6deBca.png": "d54f65cd93a1cdff11ac49e54e5ed84a1cb38b7752abcfb98ae7e47db0d03780",
+    "assets/AssetsPage-DhMZkDZR.js": "071195e55000ae8ccc318b9049705dba15959e0364408cea0977cb2a47640a29",
+    "assets/AppTable-DiUJ8Jdf.js": "ad4ed76ca39272b2e652d2bb986c940a5526ef8b500fce2f6b5ead4687379cee",
+    "assets/AppTable-urDceFh6.css": "6798c21dd6a9c0e87e5370a4226e6cae9ba1b9afa3f743b8a02684f78aacf9d8",
+    "assets/index-Bn8DswBF.js": "f9058efc6fd05eb1030078e97210282fb6152d85b6f1d7629635e2d12e15ff16",
+    "assets/index-C1GtQUBe.js": "619a63b64ead19ed3c8cd9deb7b1314207e32e4df22fd23d4970a25ffbd4fa15",
+    "assets/writeFailure-ByoIqKrp.js": "db7c22f0e65d12e03b82fad93ca6c87643611b04d5c816b633a15de09fff4822",
+    "assets/PermissionGate.vue_vue_type_script_setup_true_lang-uDIhSXs9.js": "fc42c1a55697b4e4979e4a03fd813c1e7665291a8566437261553c582315ca18",
+    "assets/AssetsPage-gHtxLTu0.css": "237defb508456397cb1c42fcc4f027795bf04e6cc505ec19c709a686dad02f8a"
+  },
+  "login_background": {
+    "asset": "assets/login-datacenter-B_6deBca.png",
+    "sha256": "d54f65cd93a1cdff11ac49e54e5ed84a1cb38b7752abcfb98ae7e47db0d03780",
+    "natural_width": 1672,
+    "natural_height": 941,
+    "response_status": 200,
+    "decorative": true
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 401,
+      "source": "browser-response"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/options",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/options",
+      "status": 200,
+      "source": "browser-response"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 401,
+      "source": "browser-response"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/options",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/options",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/options",
+      "status": 200,
+      "source": "browser-response"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/csrf",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/csrf",
+      "status": 200,
+      "source": "browser-response"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/local/login",
+      "source": "browser-request"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/local/login",
+      "status": 200,
+      "source": "browser-response"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser-response"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "browser-response"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "status": 200,
+      "source": "browser-response"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200,
+      "source": "api-check"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/health/ready",
+      "status": 200,
+      "source": "api-check"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "status": 200,
+      "source": "browser-response"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "status": 200,
+      "source": "browser-response"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "status": 200,
+      "source": "browser-response"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "source": "browser-request"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "status": 200,
+      "source": "browser-response"
+    }
+  ],
+  "controlled_delivery_faults": [
+    {
+      "path": "/api/v1/auth/options",
+      "real_status": 200,
+      "delivery": "aborted-after-real-response"
+    },
+    {
+      "path": "/api/v1/assets",
+      "real_status": 200,
+      "real_item_count": 15,
+      "delivery": "delayed-real-response"
+    },
+    {
+      "path": "/api/v1/assets",
+      "real_status": 200,
+      "real_item_count": 15,
+      "delivery": "aborted-after-real-response"
+    },
+    {
+      "path": "/api/v1/assets",
+      "real_status": 200,
+      "real_item_count": 15,
+      "delivery": "delayed-real-response"
+    },
+    {
+      "path": "/api/v1/assets",
+      "real_status": 200,
+      "real_item_count": 15,
+      "delivery": "aborted-after-real-response"
+    }
+  ],
+  "technical_checks": [
+    "login_background_real_build_asset_decodes_with_decorative_accessibility",
+    "1440x1000_empty_login_controls_visible_without_horizontal_overflow",
+    "1280x720_empty_login_controls_visible_without_horizontal_overflow",
+    "390x844_empty_login_controls_visible_without_horizontal_overflow",
+    "320x740_empty_login_controls_visible_without_horizontal_overflow",
+    "real_login_options_delivery_failure_recovers_after_reconnect",
+    "password_visibility_preserves_input_and_accessible_state",
+    "whitespace_username_is_rejected_locally_with_focus",
+    "password_recovery_help_expands_with_available_action",
+    "1440px_login_no_horizontal_overflow",
+    "390px_login_no_horizontal_overflow",
+    "existing_project_account_reads_nonempty_real_asset_list",
+    "existing_designated_api_ready_and_durable",
+    "1440px_loading_has_progress_without_empty_result",
+    "1440px_read_failure_has_unknown_count_and_collapsed_diagnostics",
+    "1440px_retry_restores_nonempty_real_asset_list",
+    "390px_loading_has_progress_without_empty_result",
+    "390px_read_failure_has_unknown_count_and_collapsed_diagnostics",
+    "390px_retry_restores_nonempty_real_asset_list",
+    "no_pageerror_or_business_write_requests"
+  ],
+  "visual_evidence": {
+    "screenshots": [
+      "1440x1000-login-empty.png",
+      "1280x720-login-empty.png",
+      "390x844-login-empty.png",
+      "320x740-login-empty.png",
+      "390-login-options-error.png",
+      "390-login-options-recovered.png",
+      "1440-login-help.png",
+      "390-login-help.png",
+      "1440-assets-ready.png",
+      "1440-assets-loading.png",
+      "1440-assets-error-collapsed.png",
+      "1440-assets-error-expanded.png",
+      "1440-assets-recovered.png",
+      "390-assets-ready.png",
+      "390-assets-loading.png",
+      "390-assets-error-collapsed.png",
+      "390-assets-error-expanded.png",
+      "390-assets-recovered.png"
+    ],
+    "review": "CAPTURED_REQUIRES_SEPARATE_VISUAL_REVIEW"
+  },
+  "page_errors": [],
+  "route_errors": [],
+  "unexpected_business_writes": [],
+  "business_mutations": "NONE",
+  "authentication": "existing-project-test-account-session-created",
+  "formal_contract_acceptance": "NOT_RUN",
+  "physical_device_acceptance": "NOT_RUN"
+}

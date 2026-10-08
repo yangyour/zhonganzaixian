@@ -72,12 +72,12 @@ it('rejects whitespace-only usernames before requesting CSRF and focuses the acc
   input('登录密码', 'synthetic-password')
   submit(); await settle()
   expect(request).toHaveBeenCalledTimes(1)
-  expect(host.textContent).toContain('请输入账号，不能只填写空格。')
+  await vi.waitFor(() => expect(host.textContent).toContain('请输入账号，不能只填写空格。'))
   expect(field('登录账号').getAttribute('aria-invalid')).toBe('true')
   expect(field('登录账号').getAttribute('aria-describedby')).toBe('login-username-error')
   expect(document.activeElement).toBe(field('登录账号'))
   input('登录账号', 'synthetic-user'); await settle()
-  expect(host.querySelector('#login-username-error')).toBeNull()
+  await vi.waitFor(() => expect(host.querySelector('#login-username-error')).toBeNull())
 })
 
 it('points an empty password to its field without introducing length or character rules', async () => {

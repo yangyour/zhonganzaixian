@@ -33,3 +33,11 @@ Edge 154.0.4258.62 使用当前生产静态构建连接原指定 API，20 项检
 8 张登录截图逐张核对，无叠字、遮挡、裁切或页面横向溢出；另外10张资产回归截图保留为自动检查材料。状态、产物/图片摘要和明确边界见[机器证据](evidence/login-design-20261008/result.json)与[视觉核对](evidence/login-design-20261008/visual-review.json)。本机加载新版静态文件不代表服务器已经部署，也不代表物理手机或实际读屏验收。
 
 复现：在项目根执行 `npm.cmd --prefix apps/web run build`，随后运行 `node tools/verify-ui-polish-browser.mjs`。连接资料仍由忽略的私有配置读取，每轮产生独立的 `.local/ui-polish-<UUID>/` 证据目录。
+
+## 企业后台登录交互复核
+
+沿用 [Element Plus 输入组件](https://element-plus.org/en-US/component/input) 的前缀图标/后缀控件能力，以及 [Ant Design 表单](https://ant.design/components/form/) 的字段反馈组织方式，实际仍只使用 Element Plus 一套组件。直接声明既有的 `@element-plus/icons-vue` 2.3.2 依赖，图标与原传递依赖版本一致；输入框增加账号/锁图标与简短占位提示，显隐使用可聚焦按钮，找回入口对齐密码标签。两种登录方式同时可用时才显示分隔线。
+
+已确认账号口令拒绝后聚焦并全选原密码，便于重输；连接故障单独说明重新连接或重试登录，不出现业务保存提示。页面进入后台时隐藏明文并收起大写锁定提醒，保留输入，回来后保持掩码。没有增加“记住密码”、找回通道或密码策略。
+
+最终 11 项登录隔离回归、114 文件/1822 项完整前端回归、类型/构建通过。增加的配置用例覆盖 7 种本地/统一认证组合，未声称真实SSO已启用。20 项指定API真实浏览器检查再次通过，显隐实际使用 Tab/空格操作，空白账号和实际登录使用 Enter。8 张最终登录截图已逐张查看；[最终机器证据](evidence/login-interaction-20261008/result.json)与[视觉及源码摘要](evidence/login-interaction-20261008/visual-review.json)单独保存，上一轮证据未覆盖。

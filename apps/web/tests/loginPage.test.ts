@@ -132,6 +132,63 @@ it('shows Caps Lock only while the password field reports it active', async () =
   expect(host.querySelector('#login-caps-lock')).toBeNull()
 })
 
+it('masks a revealed password when the page is hidden and never reveals it on return', async () => {
+  const visibility = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible')
+  const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(false)
+  const request = vi.spyOn(api, 'request').mockResolvedValue(options)
+  mount(); await loaded()
+  input('登录账号', 'synthetic-user'); input('登录密码', 'synthetic-password')
+  button('显示密码').click(); await settle()
+  field('登录密码').focus()
+  field('登录密码').dispatchEvent(new KeyboardEvent('keydown', { key: 'A', modifierCapsLock: true, bubbles: true }))
+  await settle()
+  expect(field('登录密码').type).toBe('text')
+  expect(host.querySelector('#login-caps-lock')).not.toBeNull()
+  visibility.mockReturnValue('hidden'); hidden.mockReturnValue(true)
+  document.dispatchEvent(new Event('visibilitychange')); await settle()
+  expect(field('登录密码').type).toBe('password')
+  expect(field('登录密码').value).toBe('synthetic-password')
+  expect(field('登录账号').value).toBe('synthetic-user')
+  expect(button('显示密码').getAttribute('aria-pressed')).toBe('false')
+  expect(host.querySelector('#login-caps-lock')).toBeNull()
+  visibility.mockReturnValue('visible'); hidden.mockReturnValue(false)
+  document.dispatchEvent(new Event('visibilitychange')); await settle()
+  expect(field('登录密码').type).toBe('password')
+  expect(field('登录密码').value).toBe('synthetic-password')
+  expect(button('显示密码').getAttribute('aria-pressed')).toBe('false')
+  expect(host.querySelector('#login-caps-lock')).toBeNull()
+  expect(request).toHaveBeenCalledTimes(1)
+})
+
+it('shows the available login methods and a separator only when both methods are available', async () => {
+  const request = vi.spyOn(api, 'request')
+  const cases: { auth: AuthOptions; local: boolean; unified: boolean }[] = [
+    { auth: options, local: true, unified: false },
+    { auth: { ...options, sso_enabled: true, login_url: '/oauth2/authorization/synthetic' }, local: true, unified: true },
+    { auth: { ...options, sso_enabled: true, login_url: null }, local: true, unified: false },
+    { auth: { ...options, sso_enabled: false, login_url: '/oauth2/authorization/synthetic' }, local: true, unified: false },
+    { auth: { ...options, local_enabled: false, sso_enabled: true, login_url: '/oauth2/authorization/synthetic' }, local: false, unified: true },
+    // Existing legacy OIDC-only options do not have the newer local/SSO flags.
+    { auth: { mode: 'remote_test', identity_source: 'oidc', login_url: '/oauth2/authorization/synthetic' }, local: false, unified: true },
+    { auth: { ...options, local_enabled: false }, local: false, unified: false },
+  ]
+  for (const [index, scenario] of cases.entries()) {
+    request.mockResolvedValueOnce(scenario.auth)
+    mount()
+    await vi.waitFor(() => expect(host.querySelector('.login-progress')?.textContent).toBe(''))
+    await settle()
+    expect(Boolean(host.querySelector('form')), `local form in options case ${index}`).toBe(scenario.local)
+    const unified = [...host.querySelectorAll<HTMLButtonElement>('button')].filter(control => control.textContent?.trim() === '使用统一身份认证')
+    expect(unified, `unified entry in options case ${index}`).toHaveLength(scenario.unified ? 1 : 0)
+    if (scenario.unified) expect(unified[0]!.disabled).toBe(false)
+    const divider = host.querySelector('.el-divider')
+    expect(Boolean(divider), `method separator in options case ${index}`).toBe(scenario.local && scenario.unified)
+    if (divider) expect(divider.textContent?.trim()).toBe('或')
+    expect(request).toHaveBeenCalledTimes(index + 1)
+    app!.unmount(); app = undefined; host.remove()
+  }
+})
+
 it('hides the password while logging in, blocks duplicate requests, and returns focus after rejected credentials', async () => {
   const pending = deferred<{ csrf_token: string }>()
   const request = vi.spyOn(api, 'request').mockResolvedValueOnce(options).mockReturnValueOnce(pending.promise as never).mockRejectedValueOnce(new ApiError(401, 'LOGIN_FAILED', '账号或密码不正确，或账号暂不可用', 'synthetic-trace'))
@@ -150,6 +207,8 @@ it('hides the password while logging in, blocks duplicate requests, and returns 
   await vi.waitFor(() => expect(document.activeElement).toBe(field('登录密码')))
   expect(request).toHaveBeenCalledTimes(3)
   expect(field('登录密码').value).toBe('synthetic-password')
+  expect(field('登录密码').selectionStart).toBe(0)
+  expect(field('登录密码').selectionEnd).toBe('synthetic-password'.length)
   expect(button('登录').disabled).toBe(false)
   expect(host.textContent).toContain('账号或密码不正确，或账号暂不可用')
 })

@@ -1,0 +1,67 @@
+{
+  "source_run": "9ce41917-3005-4ce9-a6b6-c17729de5c04",
+  "login_visual_review": "PASS_8_LOGIN_SCREENSHOTS_REVIEWED",
+  "checked_login_images": [
+    "1440x1000-login-empty.png",
+    "1280x720-login-empty.png",
+    "390x844-login-empty.png",
+    "320x740-login-empty.png",
+    "390-login-options-error.png",
+    "390-login-options-recovered.png",
+    "1440-login-help.png",
+    "390-login-help.png"
+  ],
+  "retained_asset_screenshots": "10 screenshots captured with automated layout checks, not claimed as a new manual visual pass",
+  "background": {
+    "bytes": 1913591,
+    "sha256": "d54f65cd93a1cdff11ac49e54e5ed84a1cb38b7752abcfb98ae7e47db0d03780",
+    "provider": "BUILT_IN_IMAGE_GEN",
+    "path": "apps/web/src/assets/login-datacenter.png",
+    "width": 1672,
+    "height": 941,
+    "purpose": "AI_GENERATED_DECORATIVE_DATACENTER_NOT_CUSTOMER_EQUIPMENT"
+  },
+  "source_files_sha256": {
+    "apps/web/src/pages/LoginPage.vue": "d4c1b9219be391336f635033648aa18ea6d905c8d1401f84c0949ddca776bd6e",
+    "apps/web/src/styles.css": "052c432d93a01fcbd4be33c1e7c30e5867fbae3aab8e376a11553a7c1798611d",
+    "apps/web/package.json": "5033c7e8e7eafc4b921ac8f593099d842ce45fb7320316fb034420acb9f1f2a0",
+    "apps/web/package-lock.json": "b3cb71fb80caba99bcd8ef6282fed094a5d8d05d4cbc55d5dc38686d9653b9c7",
+    "tools/verify-ui-polish-browser.mjs": "5af11ac1d8cceb0942c71b9ad1597423104c4ac99ee79472c93272c12bab0f3d"
+  },
+  "screenshot_sha256": {
+    "1280x720-login-empty.png": "dddc97e6521a42c0127b21fd0c560001be633ab3d761b8a67e32ea09f1616ca2",
+    "1440-assets-error-collapsed.png": "39fcaf3129e938c174689aad46520186fccff6482c854320e9aae10c562ec1e6",
+    "1440-assets-error-expanded.png": "570463aaaa8c5459e8ea9cce13d3e625f43e3028e41897f46c9f5fd29b2e1487",
+    "1440-assets-loading.png": "12d18e5c8125936e5f7fde380423857afe5041ed58c246b6a00f23fa8f216684",
+    "1440-assets-ready.png": "349c6f02517a34392a0732f5bc0ffe4189cc9e4973475d273c9aba90b9e7defe",
+    "1440-assets-recovered.png": "8ebac42977c37d5851952da7b48cac54cd70468a21dc190e03ceb46d3b31a506",
+    "1440-login-help.png": "ed017e94ff1e4795149d658a4f8f096da1e5a9a1fe36de822144db3dff527c7d",
+    "1440x1000-login-empty.png": "6ed8336f50c09091c4378d34215c7bad20fadfb21a6c6f8d0f437d59e1389f4a",
+    "320x740-login-empty.png": "8d4a44a7013a8ff9d30443f372579a30e70122bdbdda879bb23ab5d2f60d385b",
+    "390-assets-error-collapsed.png": "b4e239ffc2cf8b55369dfa81d8e51d141ba5cfc4eb114bbfde646d0da5b531bc",
+    "390-assets-error-expanded.png": "d9f95d0602e6762941c712534f41b6732bbebdaa1d132fbe85fd40aaafdf3919",
+    "390-assets-loading.png": "07386f3237e0a170b3b0008882e7043ec392df33becd9289d04b7ed2a41197b4",
+    "390-assets-ready.png": "a034cf44fb61380e5b08e76b61b28a7ffce971fe3fd9b9d6c3369875ea53be21",
+    "390-assets-recovered.png": "6676a64f8d691f1293a3857351cabfcef18d77d6589e1a7c6e649b893ba299af",
+    "390-login-help.png": "f15248ddfd8d0e248ed6336be0aaae7674c7343086f16ca26cd8aad47c184883",
+    "390-login-options-error.png": "744e49cbaa96fade67a0f02abf936b511d2c74da17c71130f4b011f371fe1a7c",
+    "390-login-options-recovered.png": "3c21e068db8ab3018a51d4732e11233c865983d57560cd008a847fa3de303d59",
+    "390x844-login-empty.png": "7d7bbaf1ef58ba1f607e107b0f958efa43623e4f131a9d5ac1dea26d8b86291e"
+  },
+  "checks": {
+    "business_mutations": "NONE",
+    "production_build": "PASS",
+    "focused_login": 11,
+    "page_errors": 0,
+    "frontend_tests": 1822,
+    "browser_checks": 20,
+    "typecheck": "PASS",
+    "frontend_files": 114
+  },
+  "limitations": [
+    "Not deployed to server",
+    "Not a physical phone test",
+    "Not an actual screen reader test",
+    "No changes to backend APIs, schema or components"
+  ]
+}

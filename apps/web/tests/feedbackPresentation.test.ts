@@ -56,9 +56,13 @@ it('switches from loading to the real empty state only after loading finishes', 
   const props = reactive({ rows: [], loading: true, emptyText: '没有匹配资产' })
   await mount(AppTable, props)
   expect(host.querySelector('.table-frame')?.getAttribute('aria-busy')).toBe('true')
+  const status = host.querySelector('[role="status"]')!
+  expect(status.closest('[aria-busy="true"]')).toBeNull()
   expect(host.textContent).toContain('正在加载')
   expect(host.textContent).not.toContain('没有匹配资产')
   props.loading = false; await nextTick(); await nextTick()
+  expect(host.querySelector('[role="status"]')).toBe(status)
+  expect(status.textContent).toBe('')
   expect(host.querySelector('.table-frame')?.getAttribute('aria-busy')).toBe('false')
   expect(host.textContent).toContain('没有匹配资产')
 })

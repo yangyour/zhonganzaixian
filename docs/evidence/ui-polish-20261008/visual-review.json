@@ -1,0 +1,55 @@
+{
+  "source_run": "97473a97-e0b5-4332-a08e-825d8227c80c",
+  "review": "ALL_12_SCREENSHOTS_VISUALLY_REVIEWED",
+  "browser": "Edge 154.0.4258.62",
+  "viewports": [
+    "1440x1000",
+    "390x844"
+  ],
+  "layout": "No document horizontal overflow; labels, controls and feedback remain readable; asset table scrolls horizontally within its frame.",
+  "corrected_after_first_run": [
+    "Duplicate loading text",
+    "Asset explanation spacing and type size",
+    "Mobile filter label alignment"
+  ],
+  "screenshot_hashes": {
+    "1440-assets-error-collapsed.png": "cca5c3cf6c4fe9411b5ec769a658aa03be29636b763e3c3fd9e2f2a66badeebd",
+    "1440-assets-error-expanded.png": "d77b7af3d8df4f12916516b0cfe8503956d81d844e418771dcd2ae77dc4fa9d5",
+    "1440-assets-loading.png": "81581d4c2f89258251935567389065c12c14612308a2c0ee75cf4e70b7c00f13",
+    "1440-assets-ready.png": "b1608de9e5b6fa01faa6cb57c6e2db977e329a4f16b6fe3edc336de9d7ca1345",
+    "1440-assets-recovered.png": "abdfde37cfaaf822782c150a32471e0f84470b6c4362264169dc061878cab2f1",
+    "1440-login-help.png": "1f99aec7a2215fccb88412e8e4d5404f4e3a5c184ae24dc2516839369ba14870",
+    "390-assets-error-collapsed.png": "4a5071179928375a56b4205f89b7b768870acc91eb36585ed82267f1e68426e1",
+    "390-assets-error-expanded.png": "f836f43298241b20e6a028e0758f087109ca404ffd2cfadaa7f882912f5c009e",
+    "390-assets-loading.png": "71299c431bf8f400828c974f39999bb941abe81c46522d052712b304b161db80",
+    "390-assets-ready.png": "8d94ee12d95bb398c084020576e4936e369bed085ffd48a2b09893985287a00a",
+    "390-assets-recovered.png": "8d94ee12d95bb398c084020576e4936e369bed085ffd48a2b09893985287a00a",
+    "390-login-help.png": "4cfedbd722b2596fe87be14ee15c16aa0a64d10d4ad8fe7533a26e1addcdf75c"
+  },
+  "source_files_sha256": {
+    "apps/web/src/components/AppTable.vue": "818973f490e5542d4cd1e126455fe95fbd7eed2aea1de3972fc1fb5e9cb79d8f",
+    "apps/web/src/components/ApiErrorNotice.vue": "cf5f8d6e6a6c4e43740e06764e4981c1b141355fe1db86a099f69407a89f70d3",
+    "apps/web/src/components/IdentityCommandNotice.vue": "4988824002029d8df759f229988f89dcad0727cd591f0a0d65bb7feeeee238e2",
+    "apps/web/src/components/GlobalSearch.vue": "8d86ca206f9b539ea9704a01956292d441d85f50161bdeeb7ee91a06c8471528",
+    "apps/web/src/pages/LoginPage.vue": "c14401c64d7fbd2a7ff7f861176a056ceab767dbdab3ca2d4e3546c198e0a9c2",
+    "apps/web/src/pages/AssetsPage.vue": "b36be1c2c1ef175c5af08683bba28df8977a9b43190fb0144ab58bd6a9a06d29",
+    "apps/web/src/App.vue": "b3d4fe035b65018d363d79fbcf1bf92b831302e06acbaa10117009cec50ad26d"
+  },
+  "checks": {
+    "typecheck": "PASS",
+    "frontend_files": 114,
+    "contract_tests": 127,
+    "browser_checks": 14,
+    "production_build": "PASS",
+    "contract_generation": "PASS",
+    "frontend_tests": 1820
+  },
+  "boundaries": [
+    "Local production frontend with existing designated API, not deployed frontend",
+    "Existing synthetic server records, not real device monitoring",
+    "No business mutation; login session only",
+    "Physical mobile device and full contract acceptance NOT_RUN",
+    "Ready API does not expose component versions; not re-inventoried",
+    "Live-region placement checked in DOM; actual screen-reader validation NOT_RUN"
+  ]
+}

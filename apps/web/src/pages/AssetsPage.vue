@@ -56,13 +56,18 @@ async function loadAssets() {
   finally { if (generation === listGeneration) loading.value = false }
 }
 function applyFilters() {
+  if (loading.value) return
   cursorHistory.value = []
-  void router.replace({ query: { ...route.query, ...Object.fromEntries(Object.entries(filters).map(([key, value]) => [key, value.trim() || undefined])), cursor: undefined, page_size: String(pageSize.value) } })
+  const query = { ...route.query, ...Object.fromEntries(Object.entries(filters).map(([key, value]) => [key, value.trim() || undefined])), cursor: undefined, page_size: String(pageSize.value) }
+  const unchanged = !queryString('cursor') && Object.entries(filters).every(([key, value]) => value.trim() === queryString(key))
+  if (unchanged) void loadAssets()
+  else void router.replace({ query })
 }
 function resetFilters() { Object.assign(filters, { q: '', status: '', type: '', site_id: '' }); applyFilters() }
 function resizePage(value: unknown) { cursorHistory.value = []; void router.replace({ query: { ...route.query, cursor: undefined, page_size: String(value) } }) }
 function nextPage() { if (!nextCursor.value) return; cursorHistory.value.push(queryString('cursor')); void router.replace({ query: { ...route.query, cursor: nextCursor.value, page_size: String(pageSize.value) } }) }
 function previousPage() { const cursor = cursorHistory.value.pop(); void router.replace({ query: { ...route.query, cursor: cursor || undefined } }) }
+function firstPage() { cursorHistory.value = []; void router.replace({ query: { ...route.query, cursor: undefined } }) }
 
 const detailOpen = computed({ get: () => Boolean(queryString('asset_id')), set: value => { if (!value) void router.replace({ query: { ...route.query, asset_id: undefined } }) } })
 const asset = ref<Asset | null>(null)
@@ -147,16 +152,16 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
 <template>
   <section>
     <div class="page-heading"><div><span class="eyebrow">RESOURCE / ASSETS</span><h1>资产管理</h1><p>管理当前租户的资产台账，查看来源与接入状态。</p></div><div class="assets-heading-actions"><PermissionGate capability="assets:write"><el-button type="primary" @click="openCreate">＋ 创建资产草稿</el-button><el-button v-if="metadataAllowed" plain @click="metadataQueryOpen = true">手工资料筛选</el-button><PermissionGate capability="asset_dates:read"><el-button plain @click="dateQueryOpen = true">维保与超期日期筛选</el-button></PermissionGate><el-button v-if="importAllowed" plain @click="importOpen = true">导入资产来源</el-button></PermissionGate></div></div>
-    <div class="scope-card"><div><span class="small-label">当前租户</span><strong>{{ session?.tenant.name }}</strong></div><div><span class="small-label">本页资产</span><strong>{{ loading ? '—' : rows.length }} <small>个</small></strong></div><div class="scope-explanation"><span class="scope-dot" /><span>未知不代表正常。测试种子与手动草稿未真实采集，采样时间与指标保留为空。</span></div></div>
+    <div class="scope-card"><div><span class="small-label">当前租户</span><strong>{{ session?.tenant.name }}</strong></div><div><span class="small-label">本页资产</span><strong>{{ loading || error ? '—' : rows.length }} <small>个</small></strong></div><div class="scope-explanation"><span class="scope-dot" /><span>测试数据和手动草稿尚未接入真实采集，采样时间和指标暂缺；状态“未知”不表示设备正常。</span></div></div>
     <div class="panel">
       <el-form class="filter-form" :inline="true" @submit.prevent="applyFilters">
         <el-form-item label="搜索"><el-input v-model="filters.q" clearable placeholder="资产名称 / 管理 IP" aria-label="搜索资产" /></el-form-item>
         <el-form-item label="汇总状态"><el-select v-model="filters.status" clearable placeholder="全部状态" aria-label="资产状态"><el-option label="正常" value="ok" /><el-option label="有问题" value="problem" /><el-option label="未知" value="unknown" /><el-option label="维护中" value="maintenance" /><el-option label="已停用" value="disabled" /></el-select></el-form-item>
         <el-form-item label="类型"><el-select v-model="filters.type" clearable placeholder="全部类型" aria-label="设备类型"><el-option v-for="type in assetTypes" :key="type.value" :label="type.label" :value="type.value" /></el-select></el-form-item>
         <el-form-item label="站点"><el-input v-model="filters.site_id" clearable placeholder="站点 ID" aria-label="站点 ID" /></el-form-item>
-        <el-form-item class="filter-actions"><el-button type="primary" native-type="submit">查询</el-button><el-button @click="resetFilters">重置</el-button><el-button :loading="loading" @click="loadAssets">刷新</el-button></el-form-item>
+        <el-form-item class="filter-actions"><el-button type="primary" native-type="submit" :disabled="loading">查询</el-button><el-button :disabled="loading" @click="resetFilters">重置</el-button><el-button :loading="loading" @click="loadAssets">刷新</el-button></el-form-item>
       </el-form>
-      <ApiErrorNotice :error="error"><el-button size="small" @click="loadAssets">重试</el-button></ApiErrorNotice>
+      <ApiErrorNotice :error="error" guidance="请点击“重试”重新加载当前列表。"><el-button size="small" @click="loadAssets">重试</el-button></ApiErrorNotice>
       <AppTable :rows="rows" :loading="loading" :empty-text="error ? '数据加载失败，请重试' : '当前筛选下没有资产'">
         <el-table-column v-for="column in assetLedgerColumns" :key="column.key" :label="column.label" :min-width="column.minWidth" :fixed="column.key === 'actions' ? 'right' : undefined">
           <template #default="{ row }">
@@ -166,8 +171,8 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
           </template>
         </el-table-column>
       </AppTable>
-      <p class="muted asset-ledger-explanation">固定12列按合同顺序展示，可横向滚动。Proxy、所属业务系统、CPU、内存、当前问题数和负责人尚未由当前接口提供；“—”不表示零、正常或未配置。内部手工资料仍在单独授权视图中。</p>
-      <div class="table-footer"><span>仅显示当前租户授权对象 · 本页 {{ rows.length }} 条</span><div class="cursor-pagination"><el-select :model-value="pageSize" aria-label="每页条数" @change="resizePage"><el-option v-for="size in pageSizes" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
+      <p class="muted asset-ledger-explanation">台账按约定顺序展示12列，可左右滚动查看。Proxy、所属业务系统、CPU、内存、当前问题数和负责人暂未提供，以“—”显示；这不表示数值为零、设备正常或尚未配置。手工资料需在对应页面按权限查看。</p>
+      <div class="table-footer"><span>仅显示当前租户内有权查看的资产 · 本页 {{ loading || error ? '—' : rows.length }} 条</span><div class="cursor-pagination"><el-select :model-value="pageSize" :disabled="loading" aria-label="每页条数" @change="resizePage"><el-option v-for="size in pageSizes" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button v-if="queryString('cursor') && !cursorHistory.length" :disabled="loading" @click="firstPage">返回首页</el-button><el-button v-else :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
     </div>
     <el-drawer v-model="detailOpen" title="资产详情" size="560px" class="asset-drawer" destroy-on-close>
       <ApiErrorNotice :error="detailError" />
@@ -196,6 +201,7 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
 
 <style>
 .asset-time-refresh{min-height:44px}
+.asset-ledger-explanation{padding:14px 20px;margin:0;font-size:12px;line-height:1.8;background:#f8fafd;border-top:1px solid #edf1f6}
 .assets-heading-actions{display:flex;flex-wrap:wrap;gap:8px}.assets-heading-actions .el-button+.el-button{margin-left:0}
-@media(max-width:760px){.assets-heading-actions .el-button{min-height:44px;height:auto;white-space:normal}}
+@media(max-width:760px){.assets-heading-actions .el-button{min-height:44px;height:auto;white-space:normal}.asset-ledger-explanation{padding:12px 14px}.filter-form .el-form-item__label{text-align:left}}
 </style>

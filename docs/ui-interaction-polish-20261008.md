@@ -26,3 +26,19 @@
 本轮不新增或替换外部组件，不执行数据库迁移。真实页面检查沿用既有指定服务器 API 和私有配置；本机只提供当前 Web 构建。服务器部署状态、真实浏览器结果与隔离测试分别记录，未取得的证据不标为通过。
 
 聚焦回归：`npm.cmd --prefix apps/web run test -- tests/feedbackPresentation.test.ts tests/identityRoleReadback.test.ts tests/tableLoadingBoundary.test.ts --maxWorkers=2 --minWorkers=1`。
+
+## 资产查询与分页
+
+加载或读取失败时，本页数量显示“—”；只有成功读到空列表时才显示 0。相同筛选再次点击“查询”会重新读取，请求期间禁用重复查询和翻页。直接打开带分页游标的链接时，提供“返回首页”，保留原筛选；正常前后翻页行为不变。资产说明改写为缺少哪些数据、如何查看，调整字号、内边距和窄屏标签对齐。
+
+新增 4 项实际 Vue 页面/Router/Element Plus 控件隔离回归，通过 DOM 操作验证以上分支；HTTP 与无关子工作区使用测试替身，未据此声明真实浏览器通过。最终 114 个前端测试文件、1820 项全部通过；类型检查、生产构建、127 项契约测试及生成一致性通过。首次受沙箱文件权限阻断的 Vite 构建保留失败，正常本机权限重跑成功。
+
+## 指定服务器与真实浏览器
+
+`tools/verify-ui-polish-browser.mjs` 读取本机忽略的 `deploy/private/server-test-runtime.json`，浏览器加载当前本机 `apps/web/dist` 静态文件，API 请求仍发往原指定服务器。只有既有测试账号登录产生 POST，没有业务写入、账号变更、迁移或组件重启。
+
+Edge 154.0.4258.62 在 1440×1000 与 390×844 下完成 14 项检查：密码显隐、空格账号本地拒绝及焦点、找回说明、真实项目账号登录、非空资产列表、实际 ready、加载/断连/重试。故障场景取得真实 200 响应后延迟或中止交付，不伪造成功数据，不能等同物理网络断链。就绪实际返回 `remote_test / ready=true / durable=true / production_ready=false`；API 未提供组件版本，本轮未重复盘点数据库版本，也未把历史版本当成本次实测。
+
+最终 12 张截图已逐张查看，页面无横向溢出、无脚本错误；资产表在自身容器中横向滚动。首次截图检查发现加载字样重复、资产说明字号和留白不协调，修正后重新构建并重跑。代码复核还将登录和表格的常驻状态提示移至忙碌子树外，补验其 DOM 位置，避免 busy 状态延迟播报；未声称真实读屏软件验收。早期材料留在本机忽略目录，最终[机器证据](evidence/ui-polish-20261008/result.json)、[视觉核对与源码摘要](evidence/ui-polish-20261008/visual-review.json)和截图随功能提交。
+
+复现：先执行 `npm.cmd --prefix apps/web run build`，再执行 `node tools/verify-ui-polish-browser.mjs`。每次生成独立 `.local/ui-polish-<UUID>/`，不覆盖旧结果。报告记录源码工作区是否有改动以及加载产物 SHA256，截图核对记录另外保存。真实接口读取的是标识明确的虚构测试资产，不能表示真实设备已接入；新版前端未部署，物理手机和 128 项正式验收仍未完成。

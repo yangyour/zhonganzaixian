@@ -6,6 +6,13 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WorkerRuntimeSettingsTest {
+    @Test void explicitMinioAcceptsOperatorEndpointAndBucketWithoutImportCredentials(){
+        var values=settings();values.put("OBJECT_STORAGE_ENABLED","true");values.put("OBJECT_STORAGE_PROVIDER","minio");
+        values.put("OBJECT_STORAGE_ENDPOINT","http://127.0.0.1:21900");values.put("OBJECT_STORAGE_PHOTO_BUCKET","configured-photo-bucket");
+        var parsed=parse(values,"remote_test");assertNotNull(parsed.minioSettings());assertNull(parsed.ossSettings());
+        assertEquals("configured-photo-bucket",parsed.minioSettings().bucket());assertEquals("http://127.0.0.1:21900",parsed.minioSettings().endpoint());
+        values.put("OBJECT_STORAGE_PHOTO_SECRET_KEY","");assertThrows(IllegalStateException.class,()->parse(values,"remote_test"));
+    }
     private static final String PRIVATE_PASSWORD="isolated-test-password",PRIVATE_ACCESS="isolated-test-access",PRIVATE_SECRET="isolated-test-secret";
 
     private static Map<String,String> settings() {

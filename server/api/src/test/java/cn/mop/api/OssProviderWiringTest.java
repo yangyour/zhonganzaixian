@@ -57,4 +57,22 @@ class OssProviderWiringTest {
         var env=new MockEnvironment().withProperty("OBJECT_STORAGE_ENABLED","false");var sources=mock(AssetImportSourceRepository.class);var c=new AssetImportConfiguration();var result=c.assetImportDependencyProbe(env,sources,c.assetImportObjectStore(env)).status();
         assertFalse(result.enabled());assertFalse(result.ready());verifyNoInteractions(sources);
     }
+    @Test void explicitMinioUsesConfiguredEndpointAndCapabilityBucketsWithoutCloudCalls(){
+        var env=new MockEnvironment().withProperty("OBJECT_STORAGE_ENABLED","true").withProperty("OBJECT_STORAGE_PROVIDER","minio")
+                .withProperty("OBJECT_STORAGE_ENDPOINT","http://127.0.0.1:21900")
+                .withProperty("OBJECT_STORAGE_PHOTO_BUCKET","configured-photo-bucket").withProperty("OBJECT_STORAGE_IMPORT_BUCKET","configured-import-bucket")
+                .withProperty("OBJECT_STORAGE_PHOTO_ACCESS_KEY","isolated-photo-access").withProperty("OBJECT_STORAGE_PHOTO_SECRET_KEY","isolated-photo-secret")
+                .withProperty("OBJECT_STORAGE_IMPORT_ACCESS_KEY","isolated-import-access").withProperty("OBJECT_STORAGE_IMPORT_SECRET_KEY","isolated-import-secret");
+        assertEquals(StorageProviderSelection.Mode.MINIO,StorageProviderSelection.from(env::getProperty).mode());
+        assertInstanceOf(MinioPhotoStore.class,new PhotoConfiguration().photoObjectStore(env));
+        assertInstanceOf(MinioAssetImportStore.class,new AssetImportConfiguration().assetImportObjectStore(env));
+        env.withProperty("OBJECT_STORAGE_ENABLED","false");assertFalse(new PhotoConfiguration().photoObjectStore(env).ready());assertFalse(new AssetImportConfiguration().assetImportObjectStore(env).ready());
+    }
+    @Test void incompleteExplicitMinioCannotFallBackToOldValidCredentials(){
+        var env=new MockEnvironment().withProperty("OBJECT_STORAGE_ENABLED","true").withProperty("OBJECT_STORAGE_PROVIDER","minio")
+                .withProperty("OBJECT_STORAGE_ENDPOINT","https://user:isolated-secret@invalid.test")
+                .withProperty("MOP_S3_ENDPOINT","http://127.0.0.1:19000").withProperty("MOP_S3_BUCKET","mop-test-photos")
+                .withProperty("MOP_S3_ACCESS_KEY","isolated-access").withProperty("MOP_S3_SECRET_KEY","isolated-secret");
+        var store=new PhotoConfiguration().photoObjectStore(env);assertFalse(store.ready());assertFalse(store instanceof MinioPhotoStore);
+    }
 }

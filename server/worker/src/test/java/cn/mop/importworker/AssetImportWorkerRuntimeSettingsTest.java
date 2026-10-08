@@ -7,6 +7,13 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AssetImportWorkerRuntimeSettingsTest {
+    @Test void explicitMinioAcceptsImportNamespaceWithoutPhotoCredential(){
+        var values=settings();values.put("OBJECT_STORAGE_ENABLED","true");values.put("OBJECT_STORAGE_PROVIDER","minio");
+        values.put("OBJECT_STORAGE_ENDPOINT","http://127.0.0.1:21900");values.put("OBJECT_STORAGE_IMPORT_BUCKET","configured-import-bucket");
+        var parsed=parse(values,"remote_test");assertNotNull(parsed.minioSettings());assertNull(parsed.ossSettings());
+        assertEquals("configured-import-bucket",parsed.minioSettings().bucket());
+        values.put("OBJECT_STORAGE_IMPORT_SECRET_KEY","");assertThrows(IllegalStateException.class,()->parse(values,"remote_test"));
+    }
     @TempDir Path project;
     private Map<String,String> settings(){return new HashMap<>(Map.ofEntries(
         Map.entry("MOP_IMPORT_WORKER_ENABLED","true"),Map.entry("SPRING_DATASOURCE_URL","jdbc:postgresql://127.0.0.1:15432/mop_test"),Map.entry("SPRING_DATASOURCE_USERNAME","mop_test_runtime"),Map.entry("SPRING_DATASOURCE_PASSWORD","PRIVATE-ISOLATED-DB"),

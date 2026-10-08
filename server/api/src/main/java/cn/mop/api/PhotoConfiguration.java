@@ -1,5 +1,6 @@
 package cn.mop.api;
 import cn.mop.adapters.MinioPhotoStore;
+import cn.mop.adapters.MinioStorageSettings;
 import cn.mop.adapters.oss.*;
 import cn.mop.domain.*;
 import org.springframework.context.annotation.*;
@@ -14,6 +15,7 @@ public class PhotoConfiguration {
             var selection=StorageProviderSelection.from(environment::getProperty);
             if(selection.mode()==StorageProviderSelection.Mode.DISABLED)return unavailableStore();
             if(selection.mode()==StorageProviderSelection.Mode.OSS)return new OssProjectStore(selection.ossSettings()).photos();
+            if(selection.mode()==StorageProviderSelection.Mode.MINIO)return new MinioPhotoStore(MinioStorageSettings.from(environment::getProperty,MinioStorageSettings.Scope.PHOTOS));
         } catch(RuntimeException invalid) {log.log(System.Logger.Level.WARNING,"Photo provider configuration unavailable exception_type={0}",invalid.getClass().getName());return unavailableStore();}
         String endpoint=environment.getProperty("MOP_S3_ENDPOINT"),bucket=environment.getProperty("MOP_S3_BUCKET"),access=environment.getProperty("MOP_S3_ACCESS_KEY"),secret=environment.getProperty("MOP_S3_SECRET_KEY");
         if(java.util.stream.Stream.of(endpoint,bucket,access,secret).anyMatch(value->value==null||value.isBlank()))return unavailableStore();

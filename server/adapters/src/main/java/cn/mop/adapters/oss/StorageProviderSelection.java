@@ -6,10 +6,12 @@ import java.util.function.Function;
 
 /** One fail-closed selector shared by API and workers. Partial OSS settings never select legacy MinIO. */
 public record StorageProviderSelection(Mode mode,OssStorageSettings ossSettings) {
-    public enum Mode { LEGACY_MINIO, DISABLED, OSS }
+    public enum Mode { LEGACY_MINIO, MINIO, DISABLED, OSS }
     private static final List<String> KEYS=List.of("OBJECT_STORAGE_ENABLED","OBJECT_STORAGE_PROVIDER","OBJECT_STORAGE_ENDPOINT",
             "OBJECT_STORAGE_PUBLIC_ENDPOINT","OBJECT_STORAGE_REGION","OBJECT_STORAGE_BUCKET","OBJECT_STORAGE_ACCESS_KEY",
-            "OBJECT_STORAGE_SECRET_KEY","OBJECT_STORAGE_SECURITY_TOKEN","OBJECT_STORAGE_PRESIGN_EXPIRES","MOP_OBJECT_STORAGE_PREFIX");
+            "OBJECT_STORAGE_SECRET_KEY","OBJECT_STORAGE_SECURITY_TOKEN","OBJECT_STORAGE_PRESIGN_EXPIRES","MOP_OBJECT_STORAGE_PREFIX",
+            "OBJECT_STORAGE_PHOTO_BUCKET","OBJECT_STORAGE_PHOTO_ACCESS_KEY","OBJECT_STORAGE_PHOTO_SECRET_KEY",
+            "OBJECT_STORAGE_IMPORT_BUCKET","OBJECT_STORAGE_IMPORT_ACCESS_KEY","OBJECT_STORAGE_IMPORT_SECRET_KEY");
     public StorageProviderSelection {
         Objects.requireNonNull(mode);
         if((mode==Mode.OSS)!=(ossSettings!=null))throw new IllegalArgumentException("Inconsistent storage provider selection");
@@ -20,6 +22,7 @@ public record StorageProviderSelection(Mode mode,OssStorageSettings ossSettings)
         Objects.requireNonNull(env);
         if(!explicitlyConfigured(env))return new StorageProviderSelection(Mode.LEGACY_MINIO,null);
         if("false".equalsIgnoreCase(env.apply("OBJECT_STORAGE_ENABLED")))return new StorageProviderSelection(Mode.DISABLED,null);
+        if("true".equalsIgnoreCase(env.apply("OBJECT_STORAGE_ENABLED"))&&"minio".equals(env.apply("OBJECT_STORAGE_PROVIDER")))return new StorageProviderSelection(Mode.MINIO,null);
         return new StorageProviderSelection(Mode.OSS,OssStorageSettings.from(env));
     }
     @Override public String toString(){return "StorageProviderSelection["+mode+",credentials=REDACTED]";}

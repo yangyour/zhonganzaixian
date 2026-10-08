@@ -56,6 +56,7 @@ public class WorkerApplication {
 
     @Bean PhotoObjectStore photoObjectStore(WorkerRuntimeSettings settings) {
         if(settings.ossSettings()!=null){try{return new OssProjectStore(settings.ossSettings()).photos();}catch(RuntimeException invalid){throw new IllegalStateException("FAIL_CLOSED: OSS photo client could not be initialized; private details withheld");}}
+        if(settings.minioSettings()!=null)return new MinioPhotoStore(settings.minioSettings());
         return new MinioPhotoStore(settings.storageEndpoint(),settings.storageBucket(),settings.storageAccessKey(),settings.storageSecretKey());
     }
 

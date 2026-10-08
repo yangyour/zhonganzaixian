@@ -1,6 +1,7 @@
 package cn.mop.api;
 
 import cn.mop.adapters.MinioAssetImportStore;
+import cn.mop.adapters.MinioStorageSettings;
 import cn.mop.adapters.oss.*;
 import cn.mop.domain.*;
 import cn.mop.domain.assetimport.source.*;
@@ -22,6 +23,7 @@ public class AssetImportConfiguration {
             var selection=StorageProviderSelection.from(environment::getProperty);
             if(selection.mode()==StorageProviderSelection.Mode.DISABLED)return unavailable();
             if(selection.mode()==StorageProviderSelection.Mode.OSS)return new OssProjectStore(selection.ossSettings()).imports();
+            if(selection.mode()==StorageProviderSelection.Mode.MINIO)return new MinioAssetImportStore(MinioStorageSettings.from(environment::getProperty,MinioStorageSettings.Scope.IMPORTS));
         } catch(RuntimeException invalid) {LOG.log(System.Logger.Level.WARNING,"Import provider configuration unavailable exception_type={0}",invalid.getClass().getName());return unavailable();}
         String endpoint=environment.getProperty("MOP_IMPORT_S3_ENDPOINT"),bucket=environment.getProperty("MOP_IMPORT_S3_BUCKET"),access=environment.getProperty("MOP_IMPORT_S3_ACCESS_KEY"),secret=environment.getProperty("MOP_IMPORT_S3_SECRET_KEY");
         if(java.util.stream.Stream.of(endpoint,bucket,access,secret).anyMatch(value->value==null||value.isBlank()))return unavailable();

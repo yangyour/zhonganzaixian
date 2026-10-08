@@ -2,12 +2,13 @@ package cn.mop.worker;
 
 import java.util.function.Function;
 import cn.mop.adapters.oss.*;
+import cn.mop.adapters.MinioStorageSettings;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Validates destinations before opening a connection; credentials never appear in diagnostics. */
 record WorkerRuntimeSettings(String jdbcUrl,String databaseUser,String databasePassword,
-                             String storageEndpoint,String storageBucket,String storageAccessKey,String storageSecretKey,OssStorageSettings ossSettings) {
+                             String storageEndpoint,String storageBucket,String storageAccessKey,String storageSecretKey,OssStorageSettings ossSettings,MinioStorageSettings minioSettings) {
     private static final Pattern DATABASE_URL=Pattern.compile("jdbc:postgresql://127\\.0\\.0\\.1:([0-9]{1,5})/mop_test");
 
     static WorkerRuntimeSettings from(String[] profiles,Function<String,String> setting) {
@@ -25,12 +26,17 @@ record WorkerRuntimeSettings(String jdbcUrl,String databaseUser,String databaseP
         StorageProviderSelection selected;
         try {selected=StorageProviderSelection.from(setting);}catch(RuntimeException invalid){throw new IllegalStateException("FAIL_CLOSED: explicit storage provider configuration is invalid");}
         if(selected.mode()==StorageProviderSelection.Mode.DISABLED)throw new IllegalStateException("FAIL_CLOSED: storage is explicitly disabled");
-        if(selected.mode()==StorageProviderSelection.Mode.OSS)return new WorkerRuntimeSettings(url,user,required(setting,"SPRING_DATASOURCE_PASSWORD"),null,null,null,null,selected.ossSettings());
+        if(selected.mode()==StorageProviderSelection.Mode.OSS)return new WorkerRuntimeSettings(url,user,required(setting,"SPRING_DATASOURCE_PASSWORD"),null,null,null,null,selected.ossSettings(),null);
+        if(selected.mode()==StorageProviderSelection.Mode.MINIO){
+            MinioStorageSettings minio;
+            try{minio=MinioStorageSettings.from(setting,MinioStorageSettings.Scope.PHOTOS);}catch(RuntimeException invalid){throw new IllegalStateException("FAIL_CLOSED: explicit photo MinIO configuration is invalid");}
+            return new WorkerRuntimeSettings(url,user,required(setting,"SPRING_DATASOURCE_PASSWORD"),null,null,null,null,null,minio);
+        }
         String endpoint=required(setting,"MOP_S3_ENDPOINT"),bucket=required(setting,"MOP_S3_BUCKET");
         if(!"http://127.0.0.1:19000".equals(endpoint)||!"mop-test-photos".equals(bucket))
             throw new IllegalStateException("FAIL_CLOSED: file-only worker requires the designated loopback MinIO photo namespace");
         return new WorkerRuntimeSettings(url,user,required(setting,"SPRING_DATASOURCE_PASSWORD"),
-            endpoint,bucket,required(setting,"MOP_S3_ACCESS_KEY"),required(setting,"MOP_S3_SECRET_KEY"),null);
+            endpoint,bucket,required(setting,"MOP_S3_ACCESS_KEY"),required(setting,"MOP_S3_SECRET_KEY"),null,null);
     }
 
     private static String required(Function<String,String> setting,String key) {

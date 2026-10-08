@@ -30,7 +30,7 @@ final class ConfigurationValueValidator {
             throw invalid("proposed_value 任意层级的数值必须在有限数值范围内");
         if (value.isObject()) value.fields().forEachRemaining(field -> {
             String key = field.getKey().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
-            if (Set.of("password", "secret", "token", "privatekey", "credential", "actorid", "tenantid", "accesstoken", "refreshtoken", "idtoken", "csrftoken", "clientsecret", "apikey", "apitoken", "bearertoken", "clientpassword", "secretkey", "objectstorageaccesskey", "objectstoragesecretkey", "objectstoragesecuritytoken", "mops3accesskey", "mops3secretkey", "mopimports3accesskey", "mopimports3secretkey", "springdatasourcepassword", "mopmigrationpassword", "mopoidcclientsecret", "ossaccesskeyid", "ossaccesskeysecret", "osssecuritytoken").contains(key))
+            if (Set.of("password", "secret", "token", "privatekey", "credential", "actorid", "tenantid", "accesstoken", "refreshtoken", "idtoken", "csrftoken", "clientsecret", "apikey", "apitoken", "bearertoken", "clientpassword", "secretkey", "objectstorageaccesskey", "objectstoragesecretkey", "objectstoragesecuritytoken", "objectstoragephotoaccesskey", "objectstoragephotosecretkey", "objectstorageimportaccesskey", "objectstorageimportsecretkey", "mops3accesskey", "mops3secretkey", "mopimports3accesskey", "mopimports3secretkey", "springdatasourcepassword", "mopmigrationpassword", "mopoidcclientsecret", "ossaccesskeyid", "ossaccesskeysecret", "osssecuritytoken").contains(key))
                 throw invalid("草稿不得保存秘密、主体或租户字段");
             if (field.getKey().codePoints().anyMatch(ConfigurationValueValidator::invalidCharacter)) throw invalid("proposed_value 不得含控制字符或无效Unicode");
             inspect(field.getValue());

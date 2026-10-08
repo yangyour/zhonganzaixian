@@ -2,12 +2,13 @@ package cn.mop.importworker;
 
 import java.nio.file.Path;
 import cn.mop.adapters.oss.*;
+import cn.mop.adapters.MinioStorageSettings;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /** Import worker destinations are fixed; secret values are never included in diagnostics. */
 record AssetImportWorkerRuntimeSettings(String jdbcUrl,String databaseUser,String databasePassword,
-    String storageEndpoint,String storageBucket,String storageAccessKey,String storageSecretKey,Path parserJar,OssStorageSettings ossSettings) {
+    String storageEndpoint,String storageBucket,String storageAccessKey,String storageSecretKey,Path parserJar,OssStorageSettings ossSettings,MinioStorageSettings minioSettings) {
     private static final Pattern DATABASE=Pattern.compile("jdbc:postgresql://127\\.0\\.0\\.1:([0-9]{1,5})/mop_test");
     static AssetImportWorkerRuntimeSettings from(String[] profiles,Function<String,String> setting){
         return from(profiles,setting,Path.of(System.getProperty("user.dir")).toAbsolutePath().normalize());
@@ -31,9 +32,14 @@ record AssetImportWorkerRuntimeSettings(String jdbcUrl,String databaseUser,Strin
         Path jar;
         try{jar=Path.of(required(setting,"MOP_IMPORT_PARSER_JAR"));if(!project.isAbsolute()||!jar.isAbsolute()||!jar.normalize().getParent().equals(project.normalize().resolve("server/import-parser/target")))throw new IllegalArgumentException();new AssetImportParserProcess(jar);}
         catch(RuntimeException invalid){throw new IllegalStateException("FAIL_CLOSED: import worker requires an absolute project standalone parser jar destination");}
-        if(selected.mode()==StorageProviderSelection.Mode.OSS)return new AssetImportWorkerRuntimeSettings(url,user,required(setting,"SPRING_DATASOURCE_PASSWORD"),null,null,null,null,jar.normalize(),selected.ossSettings());
+        if(selected.mode()==StorageProviderSelection.Mode.OSS)return new AssetImportWorkerRuntimeSettings(url,user,required(setting,"SPRING_DATASOURCE_PASSWORD"),null,null,null,null,jar.normalize(),selected.ossSettings(),null);
+        if(selected.mode()==StorageProviderSelection.Mode.MINIO){
+            MinioStorageSettings minio;
+            try{minio=MinioStorageSettings.from(setting,MinioStorageSettings.Scope.IMPORTS);}catch(RuntimeException invalid){throw new IllegalStateException("FAIL_CLOSED: explicit import MinIO configuration is invalid");}
+            return new AssetImportWorkerRuntimeSettings(url,user,required(setting,"SPRING_DATASOURCE_PASSWORD"),null,null,null,null,jar.normalize(),null,minio);
+        }
         return new AssetImportWorkerRuntimeSettings(url,user,required(setting,"SPRING_DATASOURCE_PASSWORD"),endpoint,bucket,
-            required(setting,"MOP_IMPORT_S3_ACCESS_KEY"),required(setting,"MOP_IMPORT_S3_SECRET_KEY"),jar.normalize(),null);
+            required(setting,"MOP_IMPORT_S3_ACCESS_KEY"),required(setting,"MOP_IMPORT_S3_SECRET_KEY"),jar.normalize(),null,null);
     }
     private static String required(Function<String,String> setting,String key){String value=setting.apply(key);if(value==null||value.isBlank())throw new IllegalStateException("FAIL_CLOSED: missing private import worker setting "+key);return value;}
     @Override public String toString(){return "AssetImportWorkerRuntimeSettings[remote_test,project-import-jobs,credentials=REDACTED]";}

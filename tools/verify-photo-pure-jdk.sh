@@ -4,10 +4,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 photo_check_dir=$(mktemp -d "${TMPDIR:-/tmp}/mop-photo-pure.XXXXXXXX")
 trap 'rm -rf "$photo_check_dir"' EXIT
-javac --release 17 -Xlint:all,-serial -Werror -d "$photo_check_dir" \
+javac --release 17 -encoding UTF-8 -Xlint:all,-serial -Werror -d "$photo_check_dir" \
   server/domain/src/main/java/cn/mop/domain/*.java \
   server/adapters/src/main/java/cn/mop/adapters/oss/OssStorageSettings.java \
   server/adapters/src/main/java/cn/mop/adapters/oss/StorageProviderSelection.java \
+  server/adapters/src/main/java/cn/mop/adapters/MinioStorageSettings.java \
   server/api/src/main/java/cn/mop/api/PhotoPolicy.java \
   server/worker/src/main/java/cn/mop/worker/WorkerRuntimeSettings.java \
   tests/pure-java/PhotoRulesCheck.java \

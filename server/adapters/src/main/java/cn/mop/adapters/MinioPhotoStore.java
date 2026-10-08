@@ -18,6 +18,13 @@ public final class MinioPhotoStore implements PhotoObjectStore {
     public MinioPhotoStore(String endpoint,String bucket,String access,String secret){
         this(projectClient(endpoint,bucket,access,secret),bucket);
     }
+    public MinioPhotoStore(MinioStorageSettings settings){
+        if(settings==null||settings.scope()!=MinioStorageSettings.Scope.PHOTOS)throw new IllegalArgumentException("Invalid photo storage scope");
+        var builder=MinioClient.builder().endpoint(settings.endpoint()).credentials(settings.accessKey(),settings.secretKey())
+                .httpClient(new OkHttpClient.Builder().connectTimeout(5,TimeUnit.SECONDS).readTimeout(15,TimeUnit.SECONDS).writeTimeout(15,TimeUnit.SECONDS).callTimeout(60,TimeUnit.SECONDS).followRedirects(false).followSslRedirects(false).build());
+        if(settings.region()!=null)builder.region(settings.region());
+        this.client=builder.build();this.bucket=settings.bucket();
+    }
     MinioPhotoStore(MinioClient client,String bucket){if(client==null||!"mop-test-photos".equals(bucket))throw new IllegalArgumentException("Invalid project photo client");this.bucket=bucket;this.client=client;}
     private static MinioClient projectClient(String endpoint,String bucket,String access,String secret){
         if(!"http://127.0.0.1:19000".equals(endpoint)||!"mop-test-photos".equals(bucket)||access==null||access.isBlank()||secret==null||secret.isBlank())throw new IllegalStateException("FAIL_CLOSED: project photo storage requires private loopback MinIO settings");

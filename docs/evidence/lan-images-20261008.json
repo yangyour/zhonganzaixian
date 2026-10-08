@@ -1,0 +1,62 @@
+{
+  "postgres:17.9-bookworm": {
+    "id": "sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641",
+    "repo_digests": [
+      "postgres@sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641"
+    ]
+  },
+  "eclipse-temurin:17-jre": {
+    "id": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+    "repo_digests": [
+      "eclipse-temurin@sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90"
+    ]
+  },
+  "nginx:alpine": {
+    "id": "sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2",
+    "repo_digests": [
+      "nginx@sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2"
+    ]
+  },
+  "zabbix/zabbix-server-pgsql:alpine-7.0-latest": {
+    "id": "sha256:415452211dea59cd4ea3346f2c2b38403660408273c672ebf91603353ce1073f",
+    "repo_digests": [
+      "zabbix/zabbix-server-pgsql@sha256:415452211dea59cd4ea3346f2c2b38403660408273c672ebf91603353ce1073f"
+    ]
+  },
+  "zabbix/zabbix-web-nginx-pgsql:alpine-7.0-latest": {
+    "id": "sha256:cd216a9968b62eb6fddd789872b9e8eb4d064539ef40b6356dd2d8c1588a3f91",
+    "repo_digests": [
+      "zabbix/zabbix-web-nginx-pgsql@sha256:cd216a9968b62eb6fddd789872b9e8eb4d064539ef40b6356dd2d8c1588a3f91"
+    ]
+  },
+  "zabbix/zabbix-agent2:alpine-7.0-latest": {
+    "id": "sha256:ba55e6d146d0f0bc550da82b29b22134655db6e31d2c9eae9b1d15f659ad86cd",
+    "repo_digests": [
+      "zabbix/zabbix-agent2@sha256:ba55e6d146d0f0bc550da82b29b22134655db6e31d2c9eae9b1d15f659ad86cd"
+    ]
+  },
+  "minio/minio:RELEASE.2025-09-07T16-13-09Z": {
+    "id": "sha256:a16cad481969d7ddb6fcd2f1c58284af3d1266190b9bedc3ef0801aeb05a93a9",
+    "source_config_sha256": "69b2ec208575b69597784255eec6fa6a2985ee9e1a47f4411a51f7f5fdd193a9",
+    "source": "read_only_existing_server_image_export",
+    "oci_manifest_sha256": "sha256:a16cad481969d7ddb6fcd2f1c58284af3d1266190b9bedc3ef0801aeb05a93a9",
+    "layers_and_configuration_verified": true,
+    "archive_sha256": "45f0c9b2d8500558c29fe3b75204679e3d822307860419a340e7c155196a1da4"
+  },
+  "redis:7-alpine": {
+    "id": "sha256:abbc5faf6f23b6835d3c357530e96c841e02cb66bd0e426573ef5acb434f597f",
+    "source_config_sha256": "487efc0616382465781b8fdc3d6d1db449e6fd80ae23bf48432a2da6b6929908",
+    "source": "read_only_existing_server_image_export",
+    "oci_manifest_sha256": "sha256:abbc5faf6f23b6835d3c357530e96c841e02cb66bd0e426573ef5acb434f597f",
+    "layers_and_configuration_verified": true,
+    "archive_sha256": "45f0c9b2d8500558c29fe3b75204679e3d822307860419a340e7c155196a1da4"
+  },
+  "rabbitmq:4.3.2-management": {
+    "id": "sha256:e3b55503d81b67c93a2914a7473e59bbd53d5f4560c421e06015ed64a3034c9e",
+    "source_config_sha256": "a7b58ebc345235ab2ad830e30db3d88bd73d64ef7f844edcffec4021b44282c9",
+    "source": "read_only_existing_server_image_export",
+    "oci_manifest_sha256": "sha256:e3b55503d81b67c93a2914a7473e59bbd53d5f4560c421e06015ed64a3034c9e",
+    "layers_and_configuration_verified": true,
+    "archive_sha256": "45f0c9b2d8500558c29fe3b75204679e3d822307860419a340e7c155196a1da4"
+  }
+}

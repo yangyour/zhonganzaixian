@@ -1,5 +1,9 @@
 # 指定测试环境组件清单
 
+2026-10-08新增内网测试环境：用户授权在192.168.1.215验证连通并部署全套。固定主机键SSH真实认证，空白Ubuntu26.04.1主机安装Docker29.1.3/Compose2.40.3；Web/API/三个Worker、PG17.9/V30、MinIO既有验证版本、Redis7.4.9、RabbitMQ4.3.2、Zabbix7.0.31 Server/Web/Agent共12个常驻容器运行。新入口为http://192.168.1.215:10010/login，Zabbix10020；数据库/存储/缓存/消息仅回环，均使用独立项目账号、库/桶/vhost及命名卷。旧服务器只读导出三个镜像，未迁移旧数据或改变旧服务。
+
+新环境照片/来源存储的受限读写及删除/越界/跨桶拒绝、三个Worker49次HTTP、身份53次HTTP、13项真实浏览器检查、单次导出XLSX及API重启保留19张业务表通过；V1–V30显式初始化且最终只读0迁移。临时下载/验证隧道关闭后仍ready=true。Zabbix实际采集仅为明确的合成测试Agent容器，MOP监控业务映射仍CONFIG_PENDING；Redis/RabbitMQ运行不等于MOP业务接入。OSS、通知、堡垒机/CMDB及正式规则缺口继续登记。完整[新环境部署记录](../lan-test-deployment-20261008.md)与[最终组件证据](../evidence/lan-deployment-final-20261008.json)独立于下文原环境历史。
+
 2026-10-08 登录视觉整理继续复用指定 API 的项目账号与资产读取；真实登录、remote_test/ready/durable及20项浏览器检查通过。仅新增随前端打包的生成背景图，UI复用既有Element Plus，不新增服务/组件、不执行迁移或业务写入；未将背景里的机房设备当作真实采集证据。部署与组件版本边界沿用本轮[明确记录](../login-visual-refresh-20261008.md)。
 
 2026-10-08 页面交互打磨：不新增组件依赖，API/数据库迁移不变。Edge 154.0.4258.62 接原指定 API 完成真实项目账号登录、非空虚构资产读取与 14 项交互检查；就绪返回 remote_test、ready=true、durable=true、production_ready=false。未执行业务写入或组件重启；ready 不提供组件版本，本轮未重盘点版本。隔离页面测试与上述 HTTP/浏览器证据分开，见[交互打磨记录](../ui-interaction-polish-20261008.md)。本机 Web 构建不代表服务器已部署，未解除真实监控/生产组件门禁。

@@ -1,0 +1,332 @@
+{
+  "verified_at": "2026-10-08T12:21:14.354Z",
+  "environment": "lan-test-20261008",
+  "base": "http://192.168.1.215:10010",
+  "run": "5880e1a3-2c34-401d-b435-6777643dc440",
+  "passed": true,
+  "requests": 53,
+  "checks": [
+    {
+      "stage": "six_existing_account_login_padmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200
+    },
+    {
+      "stage": "six_existing_account_login_padmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200
+    },
+    {
+      "stage": "six_existing_account_login_msp",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200
+    },
+    {
+      "stage": "six_existing_account_login_msp",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200
+    },
+    {
+      "stage": "six_existing_account_login_tadmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200
+    },
+    {
+      "stage": "six_existing_account_login_tadmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200
+    },
+    {
+      "stage": "six_existing_account_login_viewerA",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200
+    },
+    {
+      "stage": "six_existing_account_login_viewerA",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200
+    },
+    {
+      "stage": "six_existing_account_login_viewerB",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200
+    },
+    {
+      "stage": "six_existing_account_login_viewerB",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200
+    },
+    {
+      "stage": "six_existing_account_login_reviewer",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200
+    },
+    {
+      "stage": "six_existing_account_login_reviewer",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200
+    },
+    {
+      "stage": "local_default_optional_oidc",
+      "method": "GET",
+      "path": "/auth/options",
+      "status": 200
+    },
+    {
+      "stage": "policies_remain_unset",
+      "method": "GET",
+      "path": "/identity/policy",
+      "status": 200
+    },
+    {
+      "stage": "catalog_reports_project_rbac",
+      "method": "GET",
+      "path": "/authorization/capability-catalog",
+      "status": 200
+    },
+    {
+      "stage": "csrf_required",
+      "method": "POST",
+      "path": "/identity/roles",
+      "status": 403
+    },
+    {
+      "stage": "anonymous_admin_denied",
+      "method": "GET",
+      "path": "/identity/users",
+      "status": 401
+    },
+    {
+      "stage": "viewer_admin_denied",
+      "method": "GET",
+      "path": "/identity/users",
+      "status": 403
+    },
+    {
+      "stage": "create_restricted_role",
+      "method": "POST",
+      "path": "/identity/roles",
+      "status": 200
+    },
+    {
+      "stage": "create_user_and_replay",
+      "method": "POST",
+      "path": "/identity/users",
+      "status": 200
+    },
+    {
+      "stage": "create_user_and_replay",
+      "method": "POST",
+      "path": "/identity/users",
+      "status": 200
+    },
+    {
+      "stage": "create_user_and_replay",
+      "method": "POST",
+      "path": "/identity/users",
+      "status": 409
+    },
+    {
+      "stage": "restricted_real_login",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200
+    },
+    {
+      "stage": "restricted_real_login",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200
+    },
+    {
+      "stage": "restricted_real_login",
+      "method": "GET",
+      "path": "/assets",
+      "status": 200
+    },
+    {
+      "stage": "restricted_real_login",
+      "method": "GET",
+      "path": "/identity/roles",
+      "status": 403
+    },
+    {
+      "stage": "role_revocation_effective_without_restart",
+      "method": "PATCH",
+      "path": "/identity/roles/{id}",
+      "status": 200
+    },
+    {
+      "stage": "role_revocation_effective_without_restart",
+      "method": "GET",
+      "path": "/assets",
+      "status": 403
+    },
+    {
+      "stage": "role_revocation_effective_without_restart",
+      "method": "GET",
+      "path": "/session",
+      "status": 200
+    },
+    {
+      "stage": "cross_tenant_not_found",
+      "method": "GET",
+      "path": "/identity/users/{id}",
+      "status": 404
+    },
+    {
+      "stage": "explicit_oidc_binding",
+      "method": "POST",
+      "path": "/identity/users/{id}/external-identities",
+      "status": 200
+    },
+    {
+      "stage": "explicit_oidc_binding",
+      "method": "POST",
+      "path": "/identity/users/{id}/external-identities/{id}/disable",
+      "status": 200
+    },
+    {
+      "stage": "explicit_oidc_binding",
+      "method": "GET",
+      "path": "/session",
+      "status": 401
+    },
+    {
+      "stage": "reset_password_revokes_old_session",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200
+    },
+    {
+      "stage": "reset_password_revokes_old_session",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200
+    },
+    {
+      "stage": "reset_password_revokes_old_session",
+      "method": "GET",
+      "path": "/identity/users/{id}",
+      "status": 200
+    },
+    {
+      "stage": "reset_password_revokes_old_session",
+      "method": "POST",
+      "path": "/identity/users/{id}/password",
+      "status": 200
+    },
+    {
+      "stage": "reset_password_revokes_old_session",
+      "method": "GET",
+      "path": "/session",
+      "status": 401
+    },
+    {
+      "stage": "reset_password_revokes_old_session",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200
+    },
+    {
+      "stage": "reset_password_revokes_old_session",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 401
+    },
+    {
+      "stage": "reset_password_revokes_old_session",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200
+    },
+    {
+      "stage": "reset_password_revokes_old_session",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200
+    },
+    {
+      "stage": "revoke_all_sessions",
+      "method": "GET",
+      "path": "/identity/users/{id}",
+      "status": 200
+    },
+    {
+      "stage": "revoke_all_sessions",
+      "method": "POST",
+      "path": "/identity/users/{id}/revoke-sessions",
+      "status": 200
+    },
+    {
+      "stage": "revoke_all_sessions",
+      "method": "GET",
+      "path": "/session",
+      "status": 401
+    },
+    {
+      "stage": "disable_account",
+      "method": "GET",
+      "path": "/identity/users/{id}",
+      "status": 200
+    },
+    {
+      "stage": "disable_account",
+      "method": "PATCH",
+      "path": "/identity/users/{id}",
+      "status": 200
+    },
+    {
+      "stage": "disable_account",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200
+    },
+    {
+      "stage": "disable_account",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 401
+    },
+    {
+      "stage": "retire_synthetic_role",
+      "method": "PATCH",
+      "path": "/identity/roles/{id}",
+      "status": 200
+    },
+    {
+      "stage": "final_readiness_and_policy",
+      "method": "GET",
+      "path": "/health/ready",
+      "status": 200
+    },
+    {
+      "stage": "final_readiness_and_policy",
+      "method": "GET",
+      "path": "/identity/policy",
+      "status": 200
+    },
+    {
+      "stage": "final_readiness_and_policy",
+      "method": "GET",
+      "path": "/identity/roles",
+      "status": 200
+    }
+  ],
+  "policies_unset": true,
+  "original_six_user_ids_preserved": true,
+  "synthetic_account_disabled": true,
+  "synthetic_role_disabled": true
+}

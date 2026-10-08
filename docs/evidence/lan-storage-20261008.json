@@ -1,0 +1,23 @@
+{
+  "environment": "lan-test-20261008",
+  "verified_at": "2026-10-08T12:16:58.443995+00:00",
+  "checks": [
+    {
+      "bucket": "mop-test-photos",
+      "read_write": true,
+      "delete_denied": true,
+      "prefix_escape_denied": true,
+      "other_bucket_denied": true
+    },
+    {
+      "bucket": "mop-test-asset-imports",
+      "read_write": true,
+      "delete_denied": true,
+      "prefix_escape_denied": true,
+      "other_bucket_denied": true
+    }
+  ],
+  "data": "explicitly synthetic test objects",
+  "production_storage_approval": "UNVERIFIED",
+  "credentials_output": false
+}

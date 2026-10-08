@@ -1,0 +1,19 @@
+{
+  "environment": "lan-test-20261008",
+  "api_version": "0.45.0",
+  "http_requests": 49,
+  "checks": [
+    "remote photo Worker -> MinIO -> authorized original bytes/hash; original 202 replay",
+    "remote asset-source Worker -> MinIO -> real standalone CSV parser; business import stays gated",
+    "Dedicated contact Worker -> real PostgreSQL row -> archive -> exact original 202 replay"
+  ],
+  "completed": true,
+  "formal_acceptance": "NOT_RUN",
+  "verified_at": "2026-10-08T12:23:24.215Z",
+  "pending_original_requests": 0,
+  "initial_failure_retained": "lan-workers-initial-20261008.json",
+  "continuation_http_requests": 15,
+  "synthetic_decision_maker_retained": true,
+  "decision_maker_verification": "SELF_REPORTED_UNVERIFIED",
+  "notification_dispatched": false
+}

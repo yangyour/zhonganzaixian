@@ -1,0 +1,17 @@
+{
+  "environment": "lan-test-20261008",
+  "api_version": "0.45.0",
+  "http_requests": 34,
+  "checks": [
+    "remote photo Worker -> MinIO -> authorized original bytes/hash; original 202 replay",
+    "remote asset-source Worker -> MinIO -> real standalone CSV parser; business import stays gated"
+  ],
+  "completed": false,
+  "formal_acceptance": "NOT_RUN",
+  "failure": {
+    "stage": "remote_contact_worker_one_row",
+    "type": "AssertionError"
+  },
+  "verified_at": "2026-10-08T12:21:40.935Z",
+  "pending_original_requests": 0
+}

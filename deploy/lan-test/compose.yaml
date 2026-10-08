@@ -1,0 +1,126 @@
+name: mop-lan-test
+x-application: &application
+  image: ${JAVA_IMAGE:?pinned Java image required}
+  network_mode: host
+  restart: unless-stopped
+  user: "10001:10001"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  tmpfs: ["/tmp:rw,nosuid,size=384m"]
+  volumes: ["${RELEASE_DIR:?verified release required}:/app:ro"]
+  working_dir: /tmp
+  labels: {mop.project: mop-lan-test}
+  logging: {driver: json-file, options: {max-size: 10m, max-file: "3"}}
+services:
+  postgres:
+    image: ${PG_IMAGE:?pinned PostgreSQL image required}
+    container_name: mop-lan-postgres
+    restart: unless-stopped
+    env_file: [./private/postgres.env]
+    ports: ["127.0.0.1:12060:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    shm_size: 256m
+    mem_limit: 1536m
+    healthcheck: {test: [CMD-SHELL, "pg_isready -U postgres"], interval: 5s, timeout: 3s, retries: 20}
+    labels: {mop.project: mop-lan-test}
+  minio:
+    image: ${MINIO_IMAGE:?pinned storage image required}
+    container_name: mop-lan-minio
+    restart: unless-stopped
+    env_file: [./private/minio.env]
+    command: [server, /data, --console-address, ":9001"]
+    ports: ["127.0.0.1:19000:9000", "127.0.0.1:19001:9001"]
+    volumes: [miniodata:/data]
+    mem_limit: 512m
+    labels: {mop.project: mop-lan-test}
+  redis:
+    image: ${REDIS_IMAGE:?pinned Redis image required}
+    container_name: mop-lan-redis
+    restart: unless-stopped
+    command: [redis-server, /usr/local/etc/redis/redis.conf]
+    ports: ["127.0.0.1:12070:6379"]
+    volumes: [redisdata:/data, "./private/redis.conf:/usr/local/etc/redis/redis.conf:ro"]
+    mem_limit: 256m
+    labels: {mop.project: mop-lan-test}
+  rabbitmq:
+    image: ${RABBIT_IMAGE:?pinned RabbitMQ image required}
+    container_name: mop-lan-rabbitmq
+    hostname: mop-lan-rabbitmq
+    restart: unless-stopped
+    env_file: [./private/rabbitmq.env]
+    ports: ["127.0.0.1:5673:5672", "127.0.0.1:15673:15672"]
+    volumes: [rabbitdata:/var/lib/rabbitmq]
+    mem_limit: 512m
+    labels: {mop.project: mop-lan-test}
+  api:
+    <<: *application
+    container_name: mop-lan-api
+    env_file: [./private/api.env]
+    command: [java, -XX:MaxRAMPercentage=60.0, -jar, /app/api.jar]
+    mem_limit: 1536m
+  photo-worker:
+    <<: *application
+    container_name: mop-lan-photo-worker
+    env_file: [./private/photo.env]
+    command: [java, -XX:MaxRAMPercentage=60.0, -jar, /app/photo-worker.jar]
+    mem_limit: 384m
+  import-worker:
+    <<: *application
+    container_name: mop-lan-import-worker
+    env_file: [./private/import.env]
+    command: [java, -XX:MaxRAMPercentage=60.0, -jar, /app/import-worker.jar]
+    mem_limit: 512m
+    working_dir: /app
+    tmpfs: ["/tmp:rw,nosuid,size=256m", "/app/.local:rw,nosuid,uid=10001,gid=10001,mode=0700,size=256m"]
+  contact-worker:
+    <<: *application
+    container_name: mop-lan-contact-worker
+    env_file: [./private/contact.env]
+    command: [java, -XX:MaxRAMPercentage=60.0, -jar, /app/contact-worker.jar]
+    mem_limit: 384m
+  web:
+    image: ${NGINX_IMAGE:?pinned Nginx image required}
+    container_name: mop-lan-web
+    network_mode: host
+    restart: unless-stopped
+    user: "101:101"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:rw,nosuid,size=128m"]
+    volumes: ["${RELEASE_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro", "${RELEASE_DIR}/web:/usr/share/nginx/html:ro"]
+    command: [nginx, -g, "daemon off;"]
+    mem_limit: 128m
+    labels: {mop.project: mop-lan-test}
+  zabbix-server:
+    image: ${ZABBIX_SERVER_IMAGE:?pinned Zabbix image required}
+    container_name: mop-lan-zabbix-server
+    restart: unless-stopped
+    env_file: [./private/zabbix.env]
+    environment: {DB_SERVER_HOST: postgres, POSTGRES_DB: mop_zabbix_test, POSTGRES_USER: mop_zabbix, ZBX_CACHESIZE: 32M}
+    ports: ["127.0.0.1:10051:10051"]
+    mem_limit: 512m
+    labels: {mop.project: mop-lan-test}
+  zabbix-web:
+    image: ${ZABBIX_WEB_IMAGE:?pinned Zabbix web image required}
+    container_name: mop-lan-zabbix-web
+    restart: unless-stopped
+    env_file: [./private/zabbix.env]
+    environment: {DB_SERVER_HOST: postgres, POSTGRES_DB: mop_zabbix_test, POSTGRES_USER: mop_zabbix, ZBX_SERVER_HOST: zabbix-server, PHP_TZ: Asia/Hong_Kong}
+    # Bootstrap stays loopback-only until the default administrator password is replaced.
+    ports: ["${ZABBIX_BIND_ADDRESS:-127.0.0.1}:10020:8080"]
+    mem_limit: 384m
+    labels: {mop.project: mop-lan-test}
+  zabbix-agent:
+    image: ${ZABBIX_AGENT_IMAGE:?pinned Zabbix agent image required}
+    container_name: mop-lan-zabbix-agent
+    restart: unless-stopped
+    environment: {ZBX_SERVER_HOST: zabbix-server, ZBX_HOSTNAME: "MOP LAN synthetic container", ZBX_SERVER_ACTIVE: zabbix-server}
+    mem_limit: 128m
+    labels: {mop.project: mop-lan-test}
+volumes:
+  pgdata:
+  miniodata:
+  redisdata:
+  rabbitdata:

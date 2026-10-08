@@ -1,0 +1,15 @@
+{
+  "verified_at": "2026-10-08T12:21:37.358315+00:00",
+  "environment": "lan-test-20261008",
+  "zabbix_version": "7.0.31",
+  "public_origin": "http://192.168.1.215:10020",
+  "default_admin_password_replaced": true,
+  "real_agent_ping": {
+    "value": "1",
+    "clock": 1791462090
+  },
+  "monitored_scope": "explicit synthetic test agent container only",
+  "mop_business_monitoring_integration": "CONFIG_PENDING",
+  "customer_asset_monitoring": false,
+  "credentials_output": false
+}

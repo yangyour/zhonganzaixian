@@ -1,0 +1,88 @@
+{
+  "verified_at": "2026-10-08T12:28:34.272408+00:00",
+  "environment": "lan-test-20261008",
+  "owned_api_restart": true,
+  "ready_after_restart": true,
+  "business_tables_unchanged": 19,
+  "snapshots": {
+    "mop_asset": {
+      "count": 36,
+      "sha256": "28c3a9dd8d4daf545494796368724fc1cdc2ff0440a1d1533d12ca3f9bda6c49"
+    },
+    "mop_asset_dependency_edge": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_dependency_graph": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_dependency_revision": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_export_attempt": {
+      "count": 1,
+      "sha256": "d6d33b657281c01ec384dcffca8b13e5e772b6632f814e6942912d5a7ac35a82"
+    },
+    "mop_asset_export_job": {
+      "count": 1,
+      "sha256": "96d74c179992410583a6565f1814fd815747724e2ccb457c9527de8ad9f98fd3"
+    },
+    "mop_asset_import_artifact": {
+      "count": 1,
+      "sha256": "d0382ca7ab238ec9747f88110c01ccee18d2b7365c1f815f86fa0c733e60b9df"
+    },
+    "mop_asset_import_job": {
+      "count": 2,
+      "sha256": "129de970e276cae42ccada389a6c80c98e5831f7aac201f441bcff174ef7ca15"
+    },
+    "mop_asset_import_mapping": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_import_operation": {
+      "count": 2,
+      "sha256": "39294375f910ff132930efc02a71aa8e72920248d4e0d61ee741430559d7e3d6"
+    },
+    "mop_asset_import_source": {
+      "count": 1,
+      "sha256": "b648171e7acfb06aeae5f935c07f0551fdfbb44792d0463379cf615aca289939"
+    },
+    "mop_asset_manual_details": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_manual_revision": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_contact_import_job": {
+      "count": 2,
+      "sha256": "1e2f054818d992cfa1feb421d507646e45369af113cb29bb4ec0467f680e57cf"
+    },
+    "mop_contact_import_result": {
+      "count": 1,
+      "sha256": "8deb2c3772fd1276f129df3c5788243d380a83468211eed24bc01edf14fc276a"
+    },
+    "mop_contact_tenant_guard": {
+      "count": 1,
+      "sha256": "cc4a4f24f8e19aa31f752e3fd26a5a6deab48a6fe9ba336dd7cbab90f3cec9dd"
+    },
+    "mop_file": {
+      "count": 1,
+      "sha256": "0c71b4765e955c377755f66150e212f65630450ead7094c19a9eb73ccc58d676"
+    },
+    "mop_file_grant": {
+      "count": 1,
+      "sha256": "4a64a420e461dbed6f6709683bb5dd1538bcecda1c2a4f8b955a8c542d1bb95c"
+    },
+    "mop_photo_job": {
+      "count": 1,
+      "sha256": "11fc0b871d69ef27d79cfa75a6099507d6f124e183a393e8715f808dd215bb3b"
+    }
+  },
+  "schema_migrations_before": 30,
+  "schema_migrations_after": 30,
+  "other_11_containers_start_times_unchanged": true
+}

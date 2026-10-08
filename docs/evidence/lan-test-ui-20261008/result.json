@@ -1,0 +1,25 @@
+{
+  "verified_at": "2026-10-08T12:22:03.699Z",
+  "passed": true,
+  "environment": "lan-test-20261008",
+  "run": "104cabdc-cf90-4f77-bc0d-34ee116ac369",
+  "checks": [
+    "local_login_screen",
+    "local_admin_login",
+    "roles_capability_matrix",
+    "users_create_by_form",
+    "user_search_details",
+    "session_controls_and_binding_tabs",
+    "settings_no_invented_policy",
+    "restricted_user_real_browser",
+    "mobile_management_/identity/users",
+    "mobile_management_/identity/roles",
+    "mobile_management_/identity/settings",
+    "disable_synthetic_user",
+    "retire_synthetic_role"
+  ],
+  "screenshots": 8,
+  "console_errors": 0,
+  "synthetic_user_disabled": true,
+  "synthetic_role_disabled": true
+}

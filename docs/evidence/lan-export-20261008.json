@@ -1,0 +1,18 @@
+{
+  "environment": "lan-test-20261008",
+  "verified_at": "2026-10-08T12:26:11.141013+00:00",
+  "api_version": "0.45.0",
+  "remote_java_worker": true,
+  "accepted_by_real_http": true,
+  "data_rows": 1,
+  "columns": 16,
+  "file_size": 4916,
+  "file_sha256": "bf282fb00699b9d160cdf42853ebc691dbd76a987810fd91674a3df888c4bf7e",
+  "xlsx_verified": true,
+  "other_export_jobs_unchanged": true,
+  "publication": false,
+  "object_store_requests": 0,
+  "download_grants": 0,
+  "notifications": 0,
+  "formal_acceptance": "NOT_RUN"
+}

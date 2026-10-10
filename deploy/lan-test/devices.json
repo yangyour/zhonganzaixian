@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "environment": "lan-test-20261008",
+  "devices": [
+    {"key": "sangfor-firewall", "device_type": "防火墙", "brand": "深信服", "model": "AF-1000-B1800", "ip": "192.168.11.1"},
+    {"key": "sangfor-hci", "device_type": "超融合", "brand": "深信服", "model": "aServer-P-2200", "ip": "192.168.1.170"},
+    {"key": "huawei-switch", "device_type": "交换机", "brand": "华为", "model": "S5731-S24P4X", "ip": "192.168.1.2"},
+    {"key": "sundray-switch", "device_type": "交换机", "brand": "信锐", "model": "aRS6300-50Q-EI-24X", "ip": "192.168.1.125"}
+  ]
+}

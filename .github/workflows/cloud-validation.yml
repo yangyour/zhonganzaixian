@@ -46,6 +46,9 @@ jobs:
       - name: Verify tracked-source export guards on a native symlink-capable filesystem
         run: python3 -m unittest discover -s tools -p test_export_source_recovery.py -v
 
+      - name: Verify device preflight boundaries without device access
+        run: python3 -m unittest discover -s tools -p test_device_network_probe.py -v
+
       - name: Verify SSH host trust without network or private configuration
         run: |
           python3 -m venv "$RUNNER_TEMP/mop-ssh-test"

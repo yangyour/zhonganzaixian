@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 53,
-  "rows_without_progress_notes": 75,
+  "rows_with_progress_notes": 55,
+  "rows_without_progress_notes": 73,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -30,7 +30,7 @@
     },
     "M3": {
       "requirements": 12,
-      "rows_with_progress_notes": 8,
+      "rows_with_progress_notes": 10,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 12
       }
@@ -381,8 +381,10 @@
       "id": "M3-4",
       "title": "资产接入向导（5步）",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/device-network-preflight.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -486,8 +488,10 @@
       "id": "M3-12",
       "title": "设备来源与发现方式",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/device-network-preflight.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -683,6 +687,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/device-network-preflight.md",
         "docs/evidence/niko-vendor-mapping-candidates-20261006.json",
         "docs/vendor-mapping-candidates.md"
       ],
@@ -1429,6 +1434,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "a57ae0c39106789246c747a771abab96ed8b6b1a6a48d49e74656d1aa03c6eef"
+    "doc/development/07_合同逐项开发追踪.md": "2eb78659ca6ff5b554b9c25279204da85d3ac4e6d82f12eb8cbfc98af2c738bf"
   }
 }

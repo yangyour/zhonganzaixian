@@ -1,5 +1,7 @@
 # LAN测试部署模板
 
+2026-10-10新增四台明确设备的只读网络预检：`python tools/probe-lan-devices.py --output <报告路径>`。只读取本目录`devices.json`和原私有SSH配置，从服务器与Zabbix网络命名空间执行有界ICMP/TCP检查；不安装组件、不创建监控主机、不登录设备。退出0表示各地址均观察到网络响应，2表示至少一个未确认，1表示探测基础设施失败；这三种状态均不代表监控就绪。详见[输入输出和复验说明](../../docs/device-network-preflight.md)。
+
 本目录对应2026-10-08授权的新内网测试环境，部署结果和证据见[部署记录](../../docs/lan-test-deployment-20261008.md)。它包含12个常驻服务的Compose模板和独立空库初始化CLI。所有敏感值读取Git忽略的`deploy/private/`，不得将填好的环境文件或口令写入本目录。
 
 ## 顺序与命名空间

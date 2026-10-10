@@ -1,0 +1,27 @@
+{
+  "verified_at": "2026-10-10T11:50:08.343816+00:00",
+  "isolated_python": {
+    "run": 28,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "successful": true,
+    "real_component_access": false
+  },
+  "contract_generation_exit_code": 0,
+  "evidence_harness_repair": "Explicit UTF-8 fixed Windows GBK stdout decoding; checks rerun successfully",
+  "contract_tests": {
+    "command": "npm test",
+    "tests": 127,
+    "passed": 127,
+    "failed": 0,
+    "evidence_origin": "completed local command output in this work session"
+  },
+  "final_network_evidence_source_matches": true,
+  "real_network_exit_status": 2,
+  "real_network_summary": "3 responding addresses; firewall unconfirmed from both vantage points",
+  "monitoring_ready": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "http_contract_version_changed": false,
+  "database_migration_performed": false
+}

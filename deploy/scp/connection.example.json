@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "enabled": false,
+  "base_url": "https://192.168.1.179",
+  "tenant_id": null,
+  "asset_id": null,
+  "resource_pool_id": null,
+  "scp_project_id": null,
+  "auth_mode": null,
+  "username_ref": "MOP_SCP_USERNAME",
+  "password_ref": "MOP_SCP_PASSWORD",
+  "access_key_ref": "MOP_SCP_ACCESS_KEY",
+  "secret_key_ref": "MOP_SCP_SECRET_KEY",
+  "region": null,
+  "service": null,
+  "legacy_cookie_required": null,
+  "public_key_api": null,
+  "tls_mode": "CA_FILE",
+  "ca_file_ref": "MOP_SCP_CA_FILE"
+}

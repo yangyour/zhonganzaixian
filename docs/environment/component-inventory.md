@@ -1,5 +1,15 @@
 # 指定测试环境组件清单
 
+## 2026-10-12 SCP管理接口准备
+
+|组件/用途|探测证据|影响|替代候选与状态|
+|---|---|---|---|
+|192.168.1.179 SCP管理入口|指定服务器与Zabbix网络命名空间ICMP有回应，TCP80/443开放，22超时；[证据](../evidence/scp-network-preflight-20261012.json)|只证实网络路径，不证明软件版本或API认证|用户已指定SCP，不改为直连HCI/SNMP替代；配置准备完成，真实API待验证|
+|HTTPS证书信任/IP名称|指定服务器默认SSL验证失败；[证据](../evidence/scp-tls-preflight-20261012.json)|阻止发送认证信息，未请求业务API|待管理员提供受信任证书及匹配访问名称/IP；无关闭校验替代，TLS_CONFIG_PENDING|
+|SCP专用只读凭据与源范围|用户确认未申请，资源池/项目ID及实际版本未核验|认证、资源数据、调度采集及页面首值仍NOT_RUN|AK/SK或专用只读账号为候选，须明确选择；CREDENTIALS_AND_SCOPE_PENDING|
+
+本地库已有内部认证/资源查询与离线配置校验，复用原Java/Jackson/JCA，不安装新基础组件；现有192.168.1.170的Zabbix基础监控保留。配置只在Git忽略私有目录，公开模板不含秘密。见[SCP实施边界](../scp-connector-preparation.md)。
+
 2026-10-12最终基础监控已部署API0.46及Web：[页面](http://192.168.1.215:10010/network-monitoring)。[最终盘点](../evidence/basic-monitoring-components-final-20261012.json)与最初逐项比较，10个非API/Web容器的镜像、启动时间和重启次数相同（包含Zabbix Server/Web/Agent），PG仍17.9/V30、12常驻服务运行；仅API/Web更新。候选/负例API和本机验证转发均清理后公开ready仍通过。Zabbix18项真实基础采集已接入MOP当前租户授权读取；CPU/内存/流量等厂商指标仍DOCUMENTATION_PENDING，告警规则CONFIG_PENDING，不能沿用下文旧记录把当前基础监控说成仅测试Agent。
 
 2026-10-12新增IP基础监控：复用既有Zabbix7.0.31和其PG历史库，对三台明确设备创建独立组内18项simple check，60秒周期/7天测试历史；18项均取得真实首值。防火墙网络复测仍阻塞，详细SNMP/API指标仍待凭据及文档，无新增基础服务。MOP基础读取使用独立只读API角色/用户，仅授权该3主机组的host.get/item.get/history.get；token仅私有配置，不把管理员凭据提供应用。详见[实现与证据](../basic-network-monitoring.md)。

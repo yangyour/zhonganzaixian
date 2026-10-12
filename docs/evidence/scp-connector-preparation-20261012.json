@@ -1,0 +1,66 @@
+{
+  "verified_at": "2026-10-12T08:25:51.442480+00:00",
+  "environment": "lan-test-20261008",
+  "source_document": {
+    "name": "HCI API PDF supplied locally",
+    "pages": 1310,
+    "document_version": "OPEN-API v6.11.1",
+    "sha256": "5c79547b4f8781028227d2886c9d7b687a974fc9edc632aed6a1cda3feb214af",
+    "actual_platform_version": null
+  },
+  "isolated_suites": {
+    "cn.mop.adapters.scp.ScpConnectorTest": {
+      "tests": 43,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "cn.mop.api.NetworkMonitoringTest": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "cn.mop.api.ProfilePolicyTest": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "new_tests": 43,
+  "related_tests_total": 70,
+  "existing_http_contract_tests": 127,
+  "contract_generation_consistent": true,
+  "private_preparation_check": {
+    "configuration_status": "CONFIG_PENDING",
+    "target": "https://192.168.1.179",
+    "api_profile": "JANUS_20180725",
+    "enabled": false,
+    "blockers": [
+      "DISABLED",
+      "MOP_AND_SCP_SCOPE_PENDING",
+      "AUTH_MODE_PENDING",
+      "READ_ONLY_CREDENTIALS_PENDING",
+      "COOKIE_VERSION_POLICY_PENDING",
+      "CA_FILE_PENDING"
+    ],
+    "integration_ready": false,
+    "http_requests_sent": 0,
+    "credentials_output": false,
+    "tls_trust_verified": false,
+    "source_identity_verified": false
+  },
+  "preparation_check_exit_code": 2,
+  "actual_scp_authentication": "NOT_RUN",
+  "actual_scp_resource_read": "NOT_RUN",
+  "credentials_sent": false,
+  "app_deployment_performed": false,
+  "database_migrations_performed": 0,
+  "http_contract_version": "0.46.0",
+  "formal_contract_acceptance": "NOT_RUN",
+  "initial_test_attempts": [
+    "test lambda compile issue repaired",
+    "oversize URL cursor returned field-boundary rejection; assertion corrected without relaxing limits"
+  ]
+}

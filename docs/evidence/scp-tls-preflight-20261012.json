@@ -1,0 +1,11 @@
+{
+  "environment": "lan-test-20261008",
+  "source": "designated_test_server",
+  "target": "192.168.1.179",
+  "port": 443,
+  "credentials_sent": false,
+  "http_request_sent": false,
+  "verified_at": "2026-10-12T07:58:23.486859+00:00",
+  "tls_trusted": false,
+  "reason": "CERTIFICATE_TRUST_OR_NAME_NOT_VERIFIED"
+}

@@ -519,7 +519,8 @@
         "docs/evidence/niko-monitoring-object-mapping-20261007.json",
         "docs/evidence/niko-zabbix-numeric-history-20261005.json",
         "docs/metric-series-projection.md",
-        "docs/monitoring-object-mapping.md"
+        "docs/monitoring-object-mapping.md",
+        "docs/scp-connector-preparation.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1438,6 +1439,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "981fd63c22754bf2ac0e1646e8c72af4924ee58f9cdedacf18fb2a6333d7c90c"
+    "doc/development/07_合同逐项开发追踪.md": "96bc0ea89347dfbecaef6210ea5e2404af3d60c6063fd3c26bfef8157079634b"
   }
 }

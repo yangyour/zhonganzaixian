@@ -383,6 +383,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/basic-network-monitoring.md",
         "docs/device-network-preflight.md"
       ],
       "external_references_unchecked": 0,
@@ -502,6 +503,7 @@
       "has_progress_note": true,
       "local_references": [
         "docs/asset-state-consistency.md",
+        "docs/basic-network-monitoring.md",
         "docs/evidence/niko-asset-state-consistency-20261005.json"
       ],
       "external_references_unchecked": 0,
@@ -1436,6 +1438,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "6df120ba96954ea7a194071861e53fe3f286f9987060c15db05193b25fedae53"
+    "doc/development/07_合同逐项开发追踪.md": "981fd63c22754bf2ac0e1646e8c72af4924ee58f9cdedacf18fb2a6333d7c90c"
   }
 }

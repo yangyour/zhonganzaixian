@@ -43,4 +43,18 @@ API0.46新增只读`GET /api/v1/network-monitoring`和`GET /api/v1/network-monit
 
 [只读凭据范围](evidence/basic-monitoring-reader-scope-20261012.json)与[真实失败关闭](evidence/basic-monitoring-fail-closed-20261012.json)分别验证：独立负例API用无效token时live200/ready503，正常候选恢复ready200；未停采集、未改共享服务。72项后端相关用例（22新增）通过，1项显式SSH转发到真实Zabbix的Java读取测试单独统计。127项既有契约测试通过；本批没有PG结构迁移。
 
-真实联调暴露多包平均延迟可能有超过12位小数；初版严格读取因此503且没有假成功。现已支持整数/小数各最多40位、按BigDecimal保留原值，实际精度回归及真实历史读取通过。排查中的私有Python脚本曾因模块重名误调用旧Zabbix验收脚本，已将新辅助模块改为唯一名称lan_monitoring_zabbix，恢复被其覆盖的旧本地证据；原服务状态与最终部署盘点另行核对。HTTP验证工具首轮SSH分块响应读取中断，保留失败记录，改用Connection:close后完整重跑通过。
+真实联调暴露多包平均延迟可能有超过12位小数；初版严格读取因此503且没有假成功。现已支持整数/小数各最多40位、按BigDecimal保留原值，实际精度回归及真实历史读取通过。排查中的私有Python脚本曾因模块重名误调用旧Zabbix验收脚本，已将新辅助模块改为唯一名称lan_monitoring_zabbix，恢复被其覆盖的旧本地证据；最终盘点证实10个非API/Web服务的镜像/启动时间/重启次数与最初相同。HTTP验证工具遇到SSH分块响应读取中断，Connection:close及一次显式GET重试后完成；正式入口有1次此类重试，记录在HTTP证据transport_failures，不算独立业务测试通过。
+
+## 页面与测试站部署
+
+入口：[基础网络监控](http://192.168.1.215:10010/network-monitoring)，使用既有项目账号，在“虚构星湾A（测试环境）”查看本批设备。三张卡片分别显示地址、原始品牌型号、ICMP状态、延迟/丢包及三个TCP端口；页面每30秒读取，后台60秒采集不依赖页面是否打开。用户明确选择设备、指标和1h/24h窗口，显示实际曲线及最近12条原始值。超过180秒的样本以及本地页面失去刷新不会继续显示为可达；切换租户、权限变化和读取失败清除旧数据，晚到响应不得回写。历史缺口断开，超时返回的零延迟不画成正常值。
+
+1838项前端测试通过（含本批16项）；类型检查和正式构建通过。[真实Edge 155.0.4283.45页面验收](evidence/basic-monitoring-ui-20261012/result.json)完成16项：实际登录/三设备、六种指标、两种窗口、设备切换、刷新、错误恢复、手机导航和另租户空列表。1440×1000与390×844没有文档横向溢出，pageerror为0，6张截图已人工检查。手机宽度是浏览器仿真，不是物理手机验收。错误提示场景仅浏览器拦截响应；真实Zabbix无效token另见独立后端证据，不混为设备故障注入。
+
+现场检查还修复了全局“尚未采集”旧提示和手机导航缺少监控入口。首轮浏览器脚本因响应监听晚于输入而超时，改为先监听再执行操作后通过；菜单图标导致严格文字定位失败亦已修正。测试工具错误不计作产品通过。
+
+[最终部署证据](evidence/basic-monitoring-deployment-20261012.json)：80个Web工件上传后逐文件SHA256核对，API构建摘要e24b82969e15d7f468cfff9ffbe591f35e330d6dadbebf3acf8d6c8f931e0fee；Web在独立不可变版本目录，通过WEB_RELEASE_DIR切换。仅更新API/Web，其他10个服务保持；首次部署见[初始记录](evidence/basic-monitoring-deployment-initial-20261012.json)。最终[正式测试入口63HTTP](evidence/basic-monitoring-http-10010-20261012.json)再次核验同租户读取、36个历史查询和跨租户404，最少35个历史点，API切换前历史仍可读。
+
+[最终组件盘点](evidence/basic-monitoring-components-final-20261012.json)确认12服务运行、PG17.9/V30、Zabbix7.0.31，候选/负例API及本机验证转发已移除，公开ready仍为true/durable=true/production_ready=false。未新增数据库迁移、设备写入、通知或告警阈值。CPU/内存/接口流量/温度/防火墙会话/超融合资源等按用户要求等待文档，不因基础网络正常而推断设备完整健康。
+
+本批[分层验证汇总](evidence/basic-monitoring-validation-20261012.json)分别记录隔离、真实组件、HTTP、契约和浏览器数量，包含关系不重复累加。

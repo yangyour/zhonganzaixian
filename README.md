@@ -1,5 +1,7 @@
 # MOP 基础网络代维平台
 
+2026-10-12已上线[基础网络监控](http://192.168.1.215:10010/network-monitoring)：测试租户A内三台设备由Zabbix每60秒持续采集ICMP响应/延迟/丢包及TCP22/80/443，支持1h/24h实际历史。API0.46/V30；缺失/过期/来源失败明确显示，详细厂商指标及正式告警规则待文档/确认。见[实施、运行与验收](docs/basic-network-monitoring.md)。
+
 2026-10-10四台指定设备已完成双来源网络预检：超融合、华为/信锐交换机有响应，防火墙跨网段访问未通。可重复检查入口、设备接入准备与真实证据见[设备预检](docs/device-network-preflight.md)；尚无设备监控凭据，监控接入保持CONFIG_PENDING。
 
 新环境上传/授权下载已切换为显式可配置MinIO，后端77b41cf；支持按私有配置选择minio/oss并重启生效，错误或缺失配置不回退，见[存储配置与验证](docs/configurable-object-storage.md)。

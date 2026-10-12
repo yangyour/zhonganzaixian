@@ -1,0 +1,101 @@
+{
+  "verified_at": "2026-10-12T02:51:42.661Z",
+  "environment": "lan-test-20261008",
+  "browser": "155.0.4283.45",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "checks": [
+    {
+      "name": "desktop login, navigation and three responding devices",
+      "passed": true
+    },
+    {
+      "name": "explicit device history",
+      "passed": true
+    },
+    {
+      "name": "loss history",
+      "passed": true
+    },
+    {
+      "name": "history icmp",
+      "passed": true
+    },
+    {
+      "name": "history tcp_22",
+      "passed": true
+    },
+    {
+      "name": "history tcp_80",
+      "passed": true
+    },
+    {
+      "name": "history tcp_443",
+      "passed": true
+    },
+    {
+      "name": "history latency",
+      "passed": true
+    },
+    {
+      "name": "24h actual points and leading empty window",
+      "passed": true
+    },
+    {
+      "name": "simulated source failure clears old cards and history",
+      "passed": true
+    },
+    {
+      "name": "refresh recovers actual source",
+      "passed": true
+    },
+    {
+      "name": "390px cards without document overflow",
+      "passed": true
+    },
+    {
+      "name": "mobile drawer navigates to new module",
+      "passed": true
+    },
+    {
+      "name": "mobile selects second device and renders history",
+      "passed": true
+    },
+    {
+      "name": "other tenant browser receives no device cards",
+      "passed": true
+    },
+    {
+      "name": "exploratory device and window return cycle",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "page_errors": [],
+  "source_fault_scope": "browser intercepted response only; backend invalid-token readiness has separate evidence",
+  "screenshots": [
+    "desktop-current.png",
+    "desktop-history.png",
+    "desktop-source-error.png",
+    "mobile-current.png",
+    "mobile-history.png",
+    "other-tenant-empty.png"
+  ],
+  "harness_notes": [
+    "initial Edge default path absent; used installed Program Files executable",
+    "initial response listener attached after select and timed out; retried with listener before input",
+    "exact desktop menu locator included an icon; fixed to observed label"
+  ],
+  "visual_review_completed": true,
+  "screenshots_reviewed": 6,
+  "final_public_ready_after_local_forward_closed": true,
+  "page_error_listener_scope": "primary desktop and mobile contexts"
+}

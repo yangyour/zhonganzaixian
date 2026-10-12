@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-12最终基础监控已部署API0.46及Web：[页面](http://192.168.1.215:10010/network-monitoring)。[最终盘点](../evidence/basic-monitoring-components-final-20261012.json)与最初逐项比较，10个非API/Web容器的镜像、启动时间和重启次数相同（包含Zabbix Server/Web/Agent），PG仍17.9/V30、12常驻服务运行；仅API/Web更新。候选/负例API和本机验证转发均清理后公开ready仍通过。Zabbix18项真实基础采集已接入MOP当前租户授权读取；CPU/内存/流量等厂商指标仍DOCUMENTATION_PENDING，告警规则CONFIG_PENDING，不能沿用下文旧记录把当前基础监控说成仅测试Agent。
+
 2026-10-12新增IP基础监控：复用既有Zabbix7.0.31和其PG历史库，对三台明确设备创建独立组内18项simple check，60秒周期/7天测试历史；18项均取得真实首值。防火墙网络复测仍阻塞，详细SNMP/API指标仍待凭据及文档，无新增基础服务。MOP基础读取使用独立只读API角色/用户，仅授权该3主机组的host.get/item.get/history.get；token仅私有配置，不把管理员凭据提供应用。详见[实现与证据](../basic-network-monitoring.md)。
 
 ## 2026-10-10 四台设备预检与当前缺口

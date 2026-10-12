@@ -52,6 +52,7 @@ async function endSession() {
       <el-menu v-if="resourceVisible" :default-active="String(route.name)" class="side-menu" @select="router.push({ name: $event })">
         <el-menu-item v-if="can('dashboard:read')" index="dashboard">运营总览</el-menu-item>
         <el-menu-item v-if="can('assets:read')" index="assets"><span class="nav-symbol">▤</span>资产管理</el-menu-item>
+        <el-menu-item v-if="can('assets:read')" index="network-monitoring"><span class="nav-symbol">◉</span>基础网络监控</el-menu-item>
         <el-menu-item v-if="can('manual_incidents:read')" index="manual-incidents"><span class="nav-symbol">◇</span>手工来源登记</el-menu-item>
         <el-menu-item v-if="can('sla_scenarios:read')" index="sla-scenarios">SLA 显式对照</el-menu-item>
         <el-menu-item v-if="can('tickets:read')" index="tickets"><span class="nav-symbol">▣</span>报障与受理</el-menu-item>
@@ -98,7 +99,7 @@ async function endSession() {
           <el-button text :loading="leaving" @click="endSession">退出</el-button>
         </div>
       </header>
-      <div class="environment-strip"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '项目测试环境 · 非生产' : '历史单元测试夹具 · 不用于联调验收' }} · 尚未采集设备状态</div>
+      <div class="environment-strip"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '项目测试环境 · 非生产 · 厂商指标待接入' : '历史单元测试夹具 · 不用于联调验收' }}</div>
       <main class="content">
         <ApiErrorNotice :error="error" />
         <div v-if="switchingTenant" class="switching-panel"><el-skeleton :rows="5" animated /><p>正在切换租户，请稍候…</p></div>
@@ -110,6 +111,7 @@ async function endSession() {
       <el-menu :default-active="String(route.name)" @select="router.push({ name: $event })">
         <el-menu-item v-if="can('dashboard:read')" index="dashboard">运营总览</el-menu-item>
         <el-menu-item v-if="can('assets:read')" index="assets">资产管理</el-menu-item>
+        <el-menu-item v-if="can('assets:read')" index="network-monitoring">基础网络监控</el-menu-item>
         <el-menu-item v-if="can('users:read')" index="identity-users">用户与成员授权</el-menu-item>
         <el-menu-item v-if="can('roles:read')" index="identity-roles">角色与权限</el-menu-item>
         <el-menu-item v-if="can('roles:read')" index="identity-settings">身份认证设置</el-menu-item>

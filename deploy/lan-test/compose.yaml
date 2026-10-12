@@ -92,7 +92,7 @@ services:
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     tmpfs: ["/tmp:rw,nosuid,size=128m"]
-    volumes: ["${RELEASE_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro", "${RELEASE_DIR}/web:/usr/share/nginx/html:ro"]
+    volumes: ["${RELEASE_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro", "${WEB_RELEASE_DIR:-${RELEASE_DIR}}/web:/usr/share/nginx/html:ro"]
     command: [nginx, -g, "daemon off;"]
     mem_limit: 128m
     labels: {mop.project: mop-lan-test}

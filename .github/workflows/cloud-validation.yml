@@ -47,7 +47,9 @@ jobs:
         run: python3 -m unittest discover -s tools -p test_export_source_recovery.py -v
 
       - name: Verify device preflight boundaries without device access
-        run: python3 -m unittest discover -s tools -p test_device_network_probe.py -v
+        run: |
+          python3 -m unittest discover -s tools -p test_device_network_probe.py -v
+          python3 -m unittest discover -s tools -p test_basic_network_provision.py -v
 
       - name: Verify SSH host trust without network or private configuration
         run: |

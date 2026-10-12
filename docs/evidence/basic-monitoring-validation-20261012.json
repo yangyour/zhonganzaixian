@@ -1,0 +1,32 @@
+{
+  "verified_at": "2026-10-12T02:56:57.578417+00:00",
+  "environment": "lan-test-20261008",
+  "java_related_isolated": {
+    "tests": 72,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "java_new_tests_included": 22,
+  "real_zabbix_java": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "web_full_suite": {
+    "tests": 1838,
+    "failed": 0,
+    "new_tests_included": 16
+  },
+  "web_typecheck_and_build": "PASSED",
+  "existing_contract_tests": 127,
+  "actual_response_schema_checks": 37,
+  "python_provision_tests": 5,
+  "candidate_http_checks": 63,
+  "public_test_entry_http_checks": 63,
+  "real_browser_checks": 16,
+  "database_migrations": 0,
+  "formal_contract_acceptance": "NOT_RUN",
+  "credentials_output": false
+}

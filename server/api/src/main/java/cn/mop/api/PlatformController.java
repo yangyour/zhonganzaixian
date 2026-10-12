@@ -36,6 +36,8 @@ public class PlatformController {
     private final ObjectProvider<PhotoConfiguration.PhotoDependencyProbe> photoProbe;
     private final ObjectProvider<AssetImportConfiguration.ImportDependencyProbe> importProbe;
     private final ObjectProvider<ProjectIdentityService> projectIdentity;
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    private NetworkMonitoringService networkMonitoring;
     private final byte[] cursorSecret=new byte[32];
     private static final Set<String> TYPES=Set.of("router","switch","firewall","ap","wireless_controller","other");
     private record Access(FixtureUser user,Tenant tenant,Membership membership,List<String> capabilities){}
@@ -44,6 +46,11 @@ public class PlatformController {
     public PlatformController(PlatformRepository repository,ObjectMapper mapper,ObjectProvider<TestOidcConfiguration.OidcDependencyProbe> identityProbe,ObjectProvider<PhotoConfiguration.PhotoDependencyProbe> photoProbe,ObjectProvider<AssetImportConfiguration.ImportDependencyProbe> importProbe,ObjectProvider<ProjectIdentityService> projectIdentity){this.repository=repository;this.mapper=mapper;this.identityProbe=identityProbe;this.photoProbe=photoProbe;this.importProbe=importProbe;this.projectIdentity=projectIdentity;new SecureRandom().nextBytes(cursorSecret);}
     @GetMapping("/health/live") Object live(HttpServletRequest request){return success(map("status","UP","mode",repository.metadata().mode(),"source",repository.metadata().source()),request);}
     @GetMapping("/health/ready") Object ready(HttpServletRequest request){
+        if(networkMonitoring!=null&&networkMonitoring.enabled()){
+            var networkStatus=networkMonitoring.readiness();
+            if(!Boolean.TRUE.equals(networkStatus.get("ready")))throw new DomainException(503,"UPSTREAM_UNAVAILABLE",
+                "已启用的基础网络采集来源或新鲜样本未就绪",List.of(map("component","network_monitoring","readiness",networkStatus)));
+        }
         if(!repository.dependencyReady())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境 PostgreSQL 不可用，未就绪");
         ProjectIdentityService localIdentity=projectIdentity==null?null:projectIdentity.getIfAvailable();
         if(repository.metadata().mode().equals("remote_test")){

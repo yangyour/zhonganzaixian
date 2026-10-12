@@ -1,0 +1,26 @@
+{
+  "verified_at": "2026-10-12T02:39:57.551654+00:00",
+  "environment": "lan-test-20261008",
+  "invalid_reader_token_ready_status": 503,
+  "invalid_reader_token_live_status": 200,
+  "failure": [
+    {
+      "component": "network_monitoring",
+      "readiness": {
+        "enabled": true,
+        "ready": false,
+        "reason": "SOURCE_MAPPING_OR_FRESH_SAMPLES_UNAVAILABLE",
+        "details": [
+          {
+            "component": "zabbix_basic_reader",
+            "reason": "PROVIDER_API_REJECTED"
+          }
+        ]
+      }
+    }
+  ],
+  "valid_candidate_ready": true,
+  "main_api_changed": false,
+  "collector_changed": false,
+  "credentials_output": false
+}

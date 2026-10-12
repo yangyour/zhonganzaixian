@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 
 from device_network_probe import validate_manifest
-from lan_zabbix import LanZabbix, ROOT
+from lan_monitoring_zabbix import LanZabbix, ROOT
 
 SCOPE = 'mop-lan-basic-network-20261012'
 GROUP = 'MOP LAN basic network test 20261012'

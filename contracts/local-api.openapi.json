@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.45.0",
+    "version": "0.46.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -27474,6 +27474,124 @@
         "x-mop-idempotency": "Current authorization before durable original receipt; sensitive commands use private HMAC fingerprint; secrets never stored in receipt/audit",
         "x-mop-audit": true
       }
+    },
+    "/network-monitoring": {
+      "get": {
+        "operationId": "listBasicNetworkMonitoring",
+        "summary": "当前租户明确测试绑定的IP基础监控；网络响应不代表设备身份或正式健康",
+        "parameters": [],
+        "x-mop-capability": "assets:read",
+        "x-mop-read-only": true,
+        "x-mop-current-membership-recheck": true,
+        "x-mop-provider-ids-accepted": false,
+        "responses": {
+          "200": {
+            "description": "Current tenant authorized basic probe data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkMonitoringResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown/duplicate query or invalid metric/window"
+          },
+          "401": {
+            "description": "Expired or changed membership"
+          },
+          "403": {
+            "description": "Missing assets:read"
+          },
+          "404": {
+            "description": "Unbound, wrong IP or cross-tenant asset"
+          },
+          "422": {
+            "description": "History exceeds 2000 points; no truncation"
+          },
+          "503": {
+            "description": "Not configured, provider unavailable, mapping drift or malformed source; no fallback"
+          }
+        }
+      }
+    },
+    "/network-monitoring/{assetId}/history": {
+      "get": {
+        "operationId": "readBasicNetworkHistory",
+        "summary": "单资产单指标有界历史，保留空窗及纳秒来源时刻",
+        "parameters": [
+          {
+            "name": "assetId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "metric",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "icmp",
+                "loss",
+                "latency",
+                "tcp_22",
+                "tcp_80",
+                "tcp_443"
+              ],
+              "default": "latency"
+            }
+          },
+          {
+            "name": "window",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "HOUR_1",
+                "HOURS_24"
+              ],
+              "default": "HOUR_1"
+            }
+          }
+        ],
+        "x-mop-capability": "assets:read",
+        "x-mop-read-only": true,
+        "x-mop-current-membership-recheck": true,
+        "x-mop-provider-ids-accepted": false,
+        "responses": {
+          "200": {
+            "description": "Current tenant authorized basic probe data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkMonitoringHistoryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown/duplicate query or invalid metric/window"
+          },
+          "401": {
+            "description": "Expired or changed membership"
+          },
+          "403": {
+            "description": "Missing assets:read"
+          },
+          "404": {
+            "description": "Unbound, wrong IP or cross-tenant asset"
+          },
+          "422": {
+            "description": "History exceeds 2000 points; no truncation"
+          },
+          "503": {
+            "description": "Not configured, provider unavailable, mapping drift or malformed source; no fallback"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -53657,6 +53775,664 @@
         },
         "required": [
           "expected_version"
+        ],
+        "additionalProperties": false
+      },
+      "NetworkMonitoringSnapshot": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "devices": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "type": "object",
+              "properties": {
+                "asset_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "management_ip": {
+                  "type": "string",
+                  "format": "ipv4"
+                },
+                "brand": {
+                  "type": "string"
+                },
+                "model": {
+                  "type": "string"
+                },
+                "network_state": {
+                  "enum": [
+                    "REACHABLE",
+                    "NO_RESPONSE",
+                    "UNKNOWN"
+                  ]
+                },
+                "metrics": {
+                  "type": "object",
+                  "properties": {
+                    "icmp": {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "enum": [
+                            "FRESH",
+                            "STALE",
+                            "NO_DATA",
+                            "COLLECTOR_ERROR",
+                            "DISABLED",
+                            "CLOCK_SKEW"
+                          ]
+                        },
+                        "value": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "unit": {
+                          "enum": [
+                            "",
+                            "s",
+                            "%"
+                          ]
+                        },
+                        "recorded_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "state",
+                        "value",
+                        "unit",
+                        "recorded_at"
+                      ],
+                      "additionalProperties": false,
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "state": {
+                                "const": "FRESH"
+                              }
+                            }
+                          },
+                          "then": {
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+                              },
+                              "recorded_at": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "else": {
+                            "properties": {
+                              "value": {
+                                "type": "null"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "loss": {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "enum": [
+                            "FRESH",
+                            "STALE",
+                            "NO_DATA",
+                            "COLLECTOR_ERROR",
+                            "DISABLED",
+                            "CLOCK_SKEW"
+                          ]
+                        },
+                        "value": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "unit": {
+                          "enum": [
+                            "",
+                            "s",
+                            "%"
+                          ]
+                        },
+                        "recorded_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "state",
+                        "value",
+                        "unit",
+                        "recorded_at"
+                      ],
+                      "additionalProperties": false,
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "state": {
+                                "const": "FRESH"
+                              }
+                            }
+                          },
+                          "then": {
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+                              },
+                              "recorded_at": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "else": {
+                            "properties": {
+                              "value": {
+                                "type": "null"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "latency": {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "enum": [
+                            "FRESH",
+                            "STALE",
+                            "NO_DATA",
+                            "COLLECTOR_ERROR",
+                            "DISABLED",
+                            "CLOCK_SKEW"
+                          ]
+                        },
+                        "value": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "unit": {
+                          "enum": [
+                            "",
+                            "s",
+                            "%"
+                          ]
+                        },
+                        "recorded_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "state",
+                        "value",
+                        "unit",
+                        "recorded_at"
+                      ],
+                      "additionalProperties": false,
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "state": {
+                                "const": "FRESH"
+                              }
+                            }
+                          },
+                          "then": {
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+                              },
+                              "recorded_at": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "else": {
+                            "properties": {
+                              "value": {
+                                "type": "null"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "tcp_22": {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "enum": [
+                            "FRESH",
+                            "STALE",
+                            "NO_DATA",
+                            "COLLECTOR_ERROR",
+                            "DISABLED",
+                            "CLOCK_SKEW"
+                          ]
+                        },
+                        "value": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "unit": {
+                          "enum": [
+                            "",
+                            "s",
+                            "%"
+                          ]
+                        },
+                        "recorded_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "state",
+                        "value",
+                        "unit",
+                        "recorded_at"
+                      ],
+                      "additionalProperties": false,
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "state": {
+                                "const": "FRESH"
+                              }
+                            }
+                          },
+                          "then": {
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+                              },
+                              "recorded_at": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "else": {
+                            "properties": {
+                              "value": {
+                                "type": "null"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "tcp_80": {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "enum": [
+                            "FRESH",
+                            "STALE",
+                            "NO_DATA",
+                            "COLLECTOR_ERROR",
+                            "DISABLED",
+                            "CLOCK_SKEW"
+                          ]
+                        },
+                        "value": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "unit": {
+                          "enum": [
+                            "",
+                            "s",
+                            "%"
+                          ]
+                        },
+                        "recorded_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "state",
+                        "value",
+                        "unit",
+                        "recorded_at"
+                      ],
+                      "additionalProperties": false,
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "state": {
+                                "const": "FRESH"
+                              }
+                            }
+                          },
+                          "then": {
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+                              },
+                              "recorded_at": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "else": {
+                            "properties": {
+                              "value": {
+                                "type": "null"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "tcp_443": {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "enum": [
+                            "FRESH",
+                            "STALE",
+                            "NO_DATA",
+                            "COLLECTOR_ERROR",
+                            "DISABLED",
+                            "CLOCK_SKEW"
+                          ]
+                        },
+                        "value": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "unit": {
+                          "enum": [
+                            "",
+                            "s",
+                            "%"
+                          ]
+                        },
+                        "recorded_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "state",
+                        "value",
+                        "unit",
+                        "recorded_at"
+                      ],
+                      "additionalProperties": false,
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "state": {
+                                "const": "FRESH"
+                              }
+                            }
+                          },
+                          "then": {
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+                              },
+                              "recorded_at": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "else": {
+                            "properties": {
+                              "value": {
+                                "type": "null"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "icmp",
+                    "loss",
+                    "latency",
+                    "tcp_22",
+                    "tcp_80",
+                    "tcp_443"
+                  ],
+                  "additionalProperties": false
+                },
+                "sample_interval_seconds": {
+                  "const": 60
+                },
+                "freshness_seconds": {
+                  "const": 180
+                },
+                "vendor_metrics_status": {
+                  "const": "DOCUMENTATION_PENDING"
+                },
+                "device_identity_verified": {
+                  "const": false
+                },
+                "alert_rule_status": {
+                  "const": "CONFIG_PENDING"
+                }
+              },
+              "required": [
+                "asset_id",
+                "name",
+                "management_ip",
+                "brand",
+                "model",
+                "network_state",
+                "metrics",
+                "sample_interval_seconds",
+                "freshness_seconds",
+                "vendor_metrics_status",
+                "device_identity_verified",
+                "alert_rule_status"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "source": {
+            "const": "ZABBIX_SIMPLE_CHECK"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_EXPLICIT_TEST_BINDINGS"
+          },
+          "refresh_seconds": {
+            "const": 30
+          }
+        },
+        "required": [
+          "tenant_id",
+          "generated_at",
+          "devices",
+          "source",
+          "scope",
+          "refresh_seconds"
+        ],
+        "additionalProperties": false
+      },
+      "NetworkMonitoringResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/NetworkMonitoringSnapshot"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "NetworkMonitoringHistory": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "metric": {
+            "enum": [
+              "icmp",
+              "loss",
+              "latency",
+              "tcp_22",
+              "tcp_80",
+              "tcp_443"
+            ]
+          },
+          "unit": {
+            "enum": [
+              "",
+              "s",
+              "%"
+            ]
+          },
+          "window": {
+            "enum": [
+              "HOUR_1",
+              "HOURS_24"
+            ]
+          },
+          "from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "points": {
+            "type": "array",
+            "maxItems": 2000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "recorded_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "value": {
+                  "type": "string",
+                  "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+                }
+              },
+              "required": [
+                "recorded_at",
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "sample_interval_seconds": {
+            "const": 60
+          },
+          "gap_after_seconds": {
+            "const": 180
+          },
+          "timestamp_meaning": {
+            "const": "ZABBIX_RECORD_TIME"
+          },
+          "complete_window_claimed": {
+            "const": false
+          },
+          "source": {
+            "const": "ZABBIX_SIMPLE_CHECK"
+          }
+        },
+        "required": [
+          "asset_id",
+          "metric",
+          "unit",
+          "window",
+          "from",
+          "to",
+          "points",
+          "sample_interval_seconds",
+          "gap_after_seconds",
+          "timestamp_meaning",
+          "complete_window_claimed",
+          "source"
+        ],
+        "additionalProperties": false
+      },
+      "NetworkMonitoringHistoryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/NetworkMonitoringHistory"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
         ],
         "additionalProperties": false
       }

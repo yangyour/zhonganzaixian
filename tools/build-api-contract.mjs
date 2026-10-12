@@ -1,4 +1,5 @@
 import { addProjectIdentityContract } from './project-identity-contract.mjs';
+import { addNetworkMonitoringContract } from './network-monitoring-contract.mjs';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -910,6 +911,7 @@ Object.assign(contract.components.schemas,{DashboardAvailabilitySnapshot:dashboa
 contract.paths['/dashboard']={get:action('getDashboardAvailability','固定首页可用性投影；只读取当前PG授权与时钟，不代表真实监控指标',ref('DashboardAvailabilityResult'),{parameters:[parameter('window','query',{...dashboardWindow,default:'HOURS_24'},false)],'x-mop-roles':['viewer','tadmin','msp','padmin'],'x-mop-capabilities':['dashboard:read'],'x-mop-read-only':true,'x-mop-current-membership-recheck':true,'x-mop-allowed-query-keys':['window'],'x-mop-reject-duplicate-query-keys':true,'x-mop-max-encoded-query-bytes':2048,'x-mop-success-writes-audit-or-receipts':false,'x-mop-runtime-integration-status':'NOT_RUN_AFTER_EXECUTOR_RECOVERY',description:'当前实现只接受合同三个趋势预设，默认24小时；设计文档任意from/to接口尚未实现并明确拒绝，不允许覆盖租户/身份/观察时刻。固定布局不支持保存。所有指标仍UNKNOWN、null，列表null不暗示没有事件；数据库故障503且无替代成功。安全过滤器返回Cache-Control:no-store。'})};
 
 addProjectIdentityContract(contract);
+addNetworkMonitoringContract(contract);
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

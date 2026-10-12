@@ -1,0 +1,146 @@
+{
+  "hosts": [
+    {
+      "hostid": "10684",
+      "host": "mop-lan-basic-sangfor-hci"
+    },
+    {
+      "hostid": "10685",
+      "host": "mop-lan-basic-huawei-switch"
+    },
+    {
+      "hostid": "10686",
+      "host": "mop-lan-basic-sundray-switch"
+    }
+  ],
+  "items": [
+    {
+      "itemid": "50746",
+      "key_": "net.tcp.service[tcp,192.168.1.170,443]",
+      "state": "0",
+      "lastclock": "1791770986",
+      "lastvalue": "1"
+    },
+    {
+      "itemid": "50742",
+      "key_": "icmppingloss[192.168.1.170,3,200,56,1000]",
+      "state": "0",
+      "lastclock": "1791770940",
+      "lastvalue": "0"
+    },
+    {
+      "itemid": "50747",
+      "key_": "icmpping[192.168.1.2,3,200,56,1000]",
+      "state": "0",
+      "lastclock": "1791770940",
+      "lastvalue": "1"
+    },
+    {
+      "itemid": "50753",
+      "key_": "icmpping[192.168.1.125,3,200,56,1000]",
+      "state": "0",
+      "lastclock": "1791770940",
+      "lastvalue": "1"
+    },
+    {
+      "itemid": "50756",
+      "key_": "net.tcp.service[tcp,192.168.1.125,22]",
+      "state": "0",
+      "lastclock": "1791770936",
+      "lastvalue": "0"
+    },
+    {
+      "itemid": "50748",
+      "key_": "icmppingloss[192.168.1.2,3,200,56,1000]",
+      "state": "0",
+      "lastclock": "1791770940",
+      "lastvalue": "0"
+    },
+    {
+      "itemid": "50754",
+      "key_": "icmppingloss[192.168.1.125,3,200,56,1000]",
+      "state": "0",
+      "lastclock": "1791770940",
+      "lastvalue": "0"
+    },
+    {
+      "itemid": "50745",
+      "key_": "net.tcp.service[tcp,192.168.1.170,80]",
+      "state": "0",
+      "lastclock": "1791770985",
+      "lastvalue": "1"
+    },
+    {
+      "itemid": "50752",
+      "key_": "net.tcp.service[tcp,192.168.1.2,443]",
+      "state": "0",
+      "lastclock": "1791770992",
+      "lastvalue": "1"
+    },
+    {
+      "itemid": "50749",
+      "key_": "icmppingsec[192.168.1.2,3,200,56,1000,avg]",
+      "state": "0",
+      "lastclock": "1791770940",
+      "lastvalue": "0.0001"
+    },
+    {
+      "itemid": "50750",
+      "key_": "net.tcp.service[tcp,192.168.1.2,22]",
+      "state": "0",
+      "lastclock": "1791770990",
+      "lastvalue": "1"
+    },
+    {
+      "itemid": "50741",
+      "key_": "icmpping[192.168.1.170,3,200,56,1000]",
+      "state": "0",
+      "lastclock": "1791770940",
+      "lastvalue": "1"
+    },
+    {
+      "itemid": "50758",
+      "key_": "net.tcp.service[tcp,192.168.1.125,443]",
+      "state": "0",
+      "lastclock": "1791770938",
+      "lastvalue": "1"
+    },
+    {
+      "itemid": "50743",
+      "key_": "icmppingsec[192.168.1.170,3,200,56,1000,avg]",
+      "state": "0",
+      "lastclock": "1791770940",
+      "lastvalue": "0.0001"
+    },
+    {
+      "itemid": "50751",
+      "key_": "net.tcp.service[tcp,192.168.1.2,80]",
+      "state": "0",
+      "lastclock": "1791770991",
+      "lastvalue": "1"
+    },
+    {
+      "itemid": "50755",
+      "key_": "icmppingsec[192.168.1.125,3,200,56,1000,avg]",
+      "state": "0",
+      "lastclock": "1791770940",
+      "lastvalue": "0.0003246666666666666"
+    },
+    {
+      "itemid": "50757",
+      "key_": "net.tcp.service[tcp,192.168.1.125,80]",
+      "state": "0",
+      "lastclock": "1791770937",
+      "lastvalue": "0"
+    },
+    {
+      "itemid": "50744",
+      "key_": "net.tcp.service[tcp,192.168.1.170,22]",
+      "state": "0",
+      "lastclock": "1791770984",
+      "lastvalue": "1"
+    }
+  ],
+  "credential_scope": "read-only host.get/item.get/history.get in dedicated 3-host group",
+  "credentials_output": false
+}

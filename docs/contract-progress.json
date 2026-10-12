@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 55,
-  "rows_without_progress_notes": 73,
+  "rows_with_progress_notes": 56,
+  "rows_without_progress_notes": 72,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -37,7 +37,7 @@
     },
     "M4": {
       "requirements": 19,
-      "rows_with_progress_notes": 8,
+      "rows_with_progress_notes": 9,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 19
       }
@@ -538,8 +538,10 @@
       "id": "M4-4",
       "title": "线路质量监控",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/basic-network-monitoring.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1434,6 +1436,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "2eb78659ca6ff5b554b9c25279204da85d3ac4e6d82f12eb8cbfc98af2c738bf"
+    "doc/development/07_合同逐项开发追踪.md": "6df120ba96954ea7a194071861e53fe3f286f9987060c15db05193b25fedae53"
   }
 }

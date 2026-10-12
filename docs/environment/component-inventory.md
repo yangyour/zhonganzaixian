@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-12新增IP基础监控：复用既有Zabbix7.0.31和其PG历史库，对三台明确设备创建独立组内18项simple check，60秒周期/7天测试历史；18项均取得真实首值。防火墙网络复测仍阻塞，详细SNMP/API指标仍待凭据及文档，无新增基础服务。MOP基础读取使用独立只读API角色/用户，仅授权该3主机组的host.get/item.get/history.get；token仅私有配置，不把管理员凭据提供应用。详见[实现与证据](../basic-network-monitoring.md)。
+
 ## 2026-10-10 四台设备预检与当前缺口
 
 重新只读确认内网测试服务器12服务运行、PG17.9/V30、Zabbix7.0.31及MOP ready=true；[组件证据](../evidence/lan-device-components-20261010.json)。复用既有SSH与Zabbix容器网络命名空间，未安装组件或修改既有配置；监控组件运行不代表设备监控就绪。

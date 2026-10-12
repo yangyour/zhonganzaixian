@@ -1,0 +1,148 @@
+{
+  "verified_at": "2026-10-12T02:06:36.352843+00:00",
+  "environment": "lan-test-20261008",
+  "host": "192.168.1.215",
+  "ssh_authenticated": true,
+  "host_key_sha256": "M6tZhIFUfkEBo3Ro2B9OL6HFO8Cye69ceRj+Zh9LO78",
+  "project": "mop-lan-test",
+  "public_origin": "http://192.168.1.215:10010",
+  "zabbix_origin": "http://192.168.1.215:10020",
+  "containers": {
+    "mop-lan-postgres": {
+      "Running": true,
+      "Status": "running",
+      "StartedAt": "2026-10-08T12:15:32.354957313Z",
+      "ExitCode": 0,
+      "image_id": "sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641",
+      "restart_policy": "unless-stopped",
+      "restart_count": 0,
+      "health": "healthy"
+    },
+    "mop-lan-minio": {
+      "Running": true,
+      "Status": "running",
+      "StartedAt": "2026-10-08T12:15:32.354248163Z",
+      "ExitCode": 0,
+      "image_id": "sha256:a16cad481969d7ddb6fcd2f1c58284af3d1266190b9bedc3ef0801aeb05a93a9",
+      "restart_policy": "unless-stopped",
+      "restart_count": 0
+    },
+    "mop-lan-redis": {
+      "Running": true,
+      "Status": "running",
+      "StartedAt": "2026-10-08T12:15:32.349268223Z",
+      "ExitCode": 0,
+      "image_id": "sha256:abbc5faf6f23b6835d3c357530e96c841e02cb66bd0e426573ef5acb434f597f",
+      "restart_policy": "unless-stopped",
+      "restart_count": 0
+    },
+    "mop-lan-rabbitmq": {
+      "Running": true,
+      "Status": "running",
+      "StartedAt": "2026-10-08T12:15:32.356127727Z",
+      "ExitCode": 0,
+      "image_id": "sha256:e3b55503d81b67c93a2914a7473e59bbd53d5f4560c421e06015ed64a3034c9e",
+      "restart_policy": "unless-stopped",
+      "restart_count": 0
+    },
+    "mop-lan-api": {
+      "Running": true,
+      "Status": "running",
+      "StartedAt": "2026-10-08T13:04:19.396951509Z",
+      "ExitCode": 0,
+      "image_id": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "restart_policy": "unless-stopped",
+      "restart_count": 0
+    },
+    "mop-lan-photo-worker": {
+      "Running": true,
+      "Status": "running",
+      "StartedAt": "2026-10-08T13:04:19.411672776Z",
+      "ExitCode": 0,
+      "image_id": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "restart_policy": "unless-stopped",
+      "restart_count": 0
+    },
+    "mop-lan-import-worker": {
+      "Running": true,
+      "Status": "running",
+      "StartedAt": "2026-10-08T13:04:19.399831379Z",
+      "ExitCode": 0,
+      "image_id": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "restart_policy": "unless-stopped",
+      "restart_count": 0
+    },
+    "mop-lan-contact-worker": {
+      "Running": true,
+      "Status": "running",
+      "StartedAt": "2026-10-08T12:18:48.262492182Z",
+      "ExitCode": 0,
+      "image_id": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "restart_policy": "unless-stopped",
+      "restart_count": 0
+    },
+    "mop-lan-web": {
+      "Running": true,
+      "Status": "running",
+      "StartedAt": "2026-10-08T12:19:42.178971803Z",
+      "ExitCode": 0,
+      "image_id": "sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2",
+      "restart_policy": "unless-stopped",
+      "restart_count": 0
+    },
+    "mop-lan-zabbix-server": {
+      "Running": true,
+      "Status": "running",
+      "StartedAt": "2026-10-08T12:18:48.248721584Z",
+      "ExitCode": 0,
+      "image_id": "sha256:415452211dea59cd4ea3346f2c2b38403660408273c672ebf91603353ce1073f",
+      "restart_policy": "unless-stopped",
+      "restart_count": 0
+    },
+    "mop-lan-zabbix-web": {
+      "Running": true,
+      "Status": "running",
+      "StartedAt": "2026-10-08T12:21:37.244174288Z",
+      "ExitCode": 0,
+      "image_id": "sha256:cd216a9968b62eb6fddd789872b9e8eb4d064539ef40b6356dd2d8c1588a3f91",
+      "restart_policy": "unless-stopped",
+      "restart_count": 0,
+      "health": "healthy"
+    },
+    "mop-lan-zabbix-agent": {
+      "Running": true,
+      "Status": "running",
+      "StartedAt": "2026-10-08T12:18:48.243454374Z",
+      "ExitCode": 0,
+      "image_id": "sha256:ba55e6d146d0f0bc550da82b29b22134655db6e31d2c9eae9b1d15f659ad86cd",
+      "restart_policy": "unless-stopped",
+      "restart_count": 0
+    }
+  },
+  "versions": {
+    "docker": "29.1.3",
+    "postgresql": "17.9 (Debian 17.9-1.pgdg12+1)",
+    "redis": "Redis server v=7.4.9 sha=00000000:0 malloc=jemalloc-5.3.0 bits=64 build=b4acab9aea09546d",
+    "minio": "minio version RELEASE.2025-09-07T16-13-09Z (commit-id=07c3a429bfed433e49018cb0f78a52145d4bedeb)",
+    "zabbix": "zabbix_server (Zabbix) 7.0.31",
+    "java": "openjdk 17.0.20.1 2026-08-18",
+    "nginx": "nginx version: nginx/1.31.6",
+    "rabbitmq": "4.3.2"
+  },
+  "schema_version": 30,
+  "storage_providers": {
+    "mop-lan-api": "minio",
+    "mop-lan-photo-worker": "minio",
+    "mop-lan-import-worker": "minio"
+  },
+  "all_12_containers_running": true,
+  "ready": true,
+  "mode": "remote_test",
+  "durable": true,
+  "photos_ready": true,
+  "asset_source_storage_ready": true,
+  "production_ready": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "read_only": true,
+  "credentials_output": false
+}

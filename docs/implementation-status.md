@@ -1,5 +1,9 @@
 # MOP 实施状态
 
+## 2026-10-14 安全策略、首屏与整体上线矩阵
+
+按OWASP ASVS/CSP、WCAG和web.dev补齐历史缓存授权复核、安全响应头候选、登录图预加载及CSS预算；28业务页CSP兼容，受控内联脚本阻止、blob预览和真实后退恢复已验证。当前工作区1899前端/130契约/16发布安全测试、类型与构建通过；根/前端完整npm官方复审0项。当前站大JS未gzip的问题已形成静态压缩候选并过Nginx语法；未部署。最后只读盘点13服务/V31就绪，生产就绪仍false；HTTPS/Secure Cookie、真实用户p75和完整合同验收显式保留。见[整体标准矩阵](launch-optimization-20261014.md)及[总证据](evidence/launch-optimization-validation-20261014.json)。
+
 ## 2026-10-14 已公告npm依赖修复
 
 Vitest/mocker固定4.1.11、source-map-js1.2.2、Ajv8.20.0，旧Tinypool移除；17个变更包SRI已对照官方元数据。根工程和前端完整npm官方复审均0项。npm11临时生成锁，npm10干净ci成功，无强制/legacy-peer依赖豁免；新框架下1899前端、130契约、类型与构建通过。CI补高危/严重公告门禁。见[标准与限制](launch-optimization-20261014.md)及[证据](evidence/npm-security-remediation-20261014.json)。

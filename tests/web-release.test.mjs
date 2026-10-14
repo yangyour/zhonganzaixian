@@ -77,3 +77,11 @@ test('checks a shipped release without rewriting its manifest and detects change
   await assert.rejects(checkWebRelease(root), /RELEASE_MANIFEST_MISMATCH/)
   assert.equal(await readFile(join(root, 'release-manifest.json'), 'utf8'), before)
 }))
+test('counts required CSS once and fails an exceeded stylesheet budget', () => fixture(async (root, manifest) => {
+  await writeFile(join(root, 'assets/main.css'), 'body{color:#25364c;background:#fff}')
+  manifest['index.html'].css = ['assets/main.css']; manifest['src/main.ts'].css = ['assets/main.css']
+  await writeFile(join(root, '.vite/manifest.json'), JSON.stringify(manifest))
+  const report = await verifyWebRelease(root)
+  assert.ok(report.bootstrap_css_gzip_bytes > 0)
+  await assert.rejects(verifyWebRelease(root, { cssBudget: 1 }), /CSS_SIZE_BUDGET_EXCEEDED/)
+}))

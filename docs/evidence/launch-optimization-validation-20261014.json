@@ -1,0 +1,284 @@
+{
+  "date": "2026-10-14",
+  "scope": "launch optimization; not deployment or production acceptance",
+  "standards": [
+    "OWASP ASVS 5.0.0",
+    "OWASP HTTP Headers and CSP",
+    "WCAG 2.2",
+    "web.dev bfcache and Core Web Vitals",
+    "Vite 7 build guidance",
+    "Nginx gzip and header inheritance"
+  ],
+  "tests": {
+    "web": 1899,
+    "web_files": 126,
+    "contracts": 130,
+    "release_and_policy": 16,
+    "typecheck": "PASSED",
+    "production_build": "PASSED",
+    "archive_hashes": "PASSED"
+  },
+  "dependencies": {
+    "root_audit_total": 0,
+    "web_audit_total": 0,
+    "registry": "https://registry.npmjs.org",
+    "changed_package_integrity_matches": 17,
+    "vitest": "4.1.11",
+    "source_map_js": "1.2.2",
+    "ajv": "8.20.0",
+    "tinypool": "removed"
+  },
+  "browser": {
+    "csp_routes": [
+      {
+        "route": "/account",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/identity/users",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/identity/roles",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/identity/settings",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/dashboard",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/assets",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/network-monitoring",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/manual-incidents",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/tickets",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/my-notification-preferences",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/asset-export-jobs",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/sla-scenarios",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/configurations",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/threshold-diagnostics",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/contact-imports",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/contact-import-preview",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/inspection-templates",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/backup-plan-drafts",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/change-notice-drafts",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/inspection-source-collections",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/inspection-worksheets",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/customer-contacts",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/operational-comparison",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/capacity-estimates",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/capability-catalog",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/tenant-inventory",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/audit",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      },
+      {
+        "route": "/my-worklogs",
+        "violations": [],
+        "width": 390,
+        "apiErrors": 0
+      }
+    ],
+    "inline_script_blocked": true,
+    "blob_preview_allowed": true,
+    "login_preload": {
+      "imageRequests": 1,
+      "imageInitiator": "link",
+      "imageStart": 34.5,
+      "mainScriptFinished": 48.5,
+      "preloaded": true,
+      "imageBeforeMainFinished": true
+    },
+    "bfcache": {
+      "observed_persisted": true,
+      "offline_hides_shell_and_teleports": true,
+      "recheck_retains_input": true,
+      "revoked_session_clears_old_view": true,
+      "repeated_401_preserves_explanation": true
+    }
+  },
+  "final_workspace_smoke": {
+    "login_background_single_preload": true,
+    "image_discovered_before_main_script_finished": true,
+    "business_entry_background_requests": 0,
+    "unexpected_csp_violations": 0,
+    "mobile_overflow": false
+  },
+  "artifact": {
+    "build_id": "771e8b069bf6ce99a99ab53e9b04d296de3bf15044d24880e59abe09d69b4eef",
+    "files": 83,
+    "js_gzip_bytes": 170440,
+    "css_gzip_bytes": 54694,
+    "js_budget_bytes": 262144,
+    "css_budget_bytes": 98304,
+    "archive": "mop-web-launch-ready-771e8b06.zip",
+    "archive_sha256": "e2abff76bb72b48cb3942d7df81fdd9af362866e70b6a68427bc1d34716f464b"
+  },
+  "current_server_compression": {
+    "status": 200,
+    "content_encoding": null,
+    "vary": null,
+    "transferred_bytes": 471101,
+    "request_encoding": "gzip",
+    "scope": "current deployed main JS only"
+  },
+  "candidate_static_policy": {
+    "environment": "lan-test-20261008",
+    "nginx_version": "nginx/1.31.6",
+    "candidate_static_policy_syntax": "PASSED",
+    "service_reloaded": false,
+    "configuration_applied": false,
+    "cache_headers": {
+      "html": {
+        "status": 200,
+        "cache_control": null
+      },
+      "hashed_js": {
+        "status": 200,
+        "cache_control": "max-age=3600"
+      },
+      "missing_asset": {
+        "status": 404,
+        "cache_control": null
+      }
+    }
+  },
+  "final_environment": {
+    "environment": "lan-test-20261008",
+    "selected_container_count": 13,
+    "all_selected_containers_running": true,
+    "ready": true,
+    "schema_version": 31,
+    "production_ready": false
+  },
+  "environment_provenance": "Other concurrent project work updated the designated environment during this round; final read-only check is 13 services / V31. No migration or service reload was performed by this optimization work.",
+  "pending": [
+    "deploy and verify security/cache/compression headers",
+    "production HTTPS/certificate/Secure Cookie/HSTS checks",
+    "real-user p75 LCP/INP/CLS and physical-device coverage",
+    "full contract and operations/disaster-recovery acceptance"
+  ],
+  "physical_mobile_test": false,
+  "server_deployment": false,
+  "formal_asvs_or_wcag_certification": false
+}

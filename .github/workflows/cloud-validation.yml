@@ -232,7 +232,7 @@ jobs:
       - name: Run the Web unit tests
         run: npm --prefix apps/web run test -- --environment node
       - name: Verify static release gate failure cases
-        run: node --test tests/web-release.test.mjs
+        run: node --test tests/web-release.test.mjs tests/web-policy.test.mjs
       - name: Typecheck and build the Web application
         run: npm --prefix apps/web run build
 

@@ -35,3 +35,26 @@
 安装曾被npm10.9.4的[optional peer解析缺陷](https://github.com/npm/cli/issues/9787)阻塞，使用临时`npx npm@11.19.0`在隔离目录更新锁文件，未修改全局npm、未使用force或legacy-peer-deps。npm11.19.0官方Node范围支持本机22.22.1。生成锁后，npm10.9.4普通`npm ci --ignore-scripts`在干净目录和工作区均成功；17个变更包的SRI逐项与npm官方精确版本元数据匹配。镜像仅用于获取依赖，审计与摘要比对使用官方注册表。后续锁文件更新可使用同一临时npm11命令，普通CI继续按锁安装。
 
 新增CI高危/严重已知公告门禁：审计不可用时失败，不能把网络/镜像错误当作0项；本次中危也已消除。[脱敏修复证据](evidence/npm-security-remediation-20261014.json)与[依赖清单](evidence/npm-components.json)已同步，客户许可审批状态未变更。
+
+
+## 已验证：安全响应头与组件兼容
+
+缓存候选片段新增CSP、nosniff、no-referrer、DENY和Permissions-Policy。同源脚本且不允许内联脚本/eval；禁用object/base改写/被iframe嵌入。Element Plus需要动态内联样式，因此仅style-src保留unsafe-inline，不把该例外扩展到脚本。保留data/blob图片与本站camera能力，符合现有报障拍照/预览路径；不声称已验证真实手机相机。
+
+本机生产构建实际响应头启用该策略、API经SSH连接原指定服务器：28个业务页面无非预期CSP违例，表单/弹层可用；受控内联脚本被拦截，blob图片可解码。页面也增加no-referrer元信息。候选在原Nginx1.31.6中nginx -t通过，未修改运行配置或reload。使用时应替换同名安全头和gzip配置，不能与旧配置重复叠加。新增5项安全策略拒绝测试及1项压缩策略测试，检查脚本通配/unsafe-eval、丢失防嵌入头、图片预览破坏和头继承等回归。
+
+## 已验证：首屏与静态传输
+
+登录入口的背景图现在由小型启动入口提前发现，以high优先级预加载；业务页面入口不会请求该背景。真实浏览器观察到单次图片请求、initiator=link，图片请求早于主脚本结束；仅是加载顺序证据，不是LCP达标证明。原PNG约1.9MB，本轮未改变图片内容或编码。
+
+构建门禁新增必需CSS gzip预算96KiB，与现有JS256KiB一样属于工程回归预算。最终工作区构建JS170440字节、CSS54694字节，83个文件与发布清单/ZIP摘要核对通过。完整回归1899项、契约130项、发布/安全策略16项、类型及构建均通过。
+
+当前服务器的主JS请求Accept-Encoding:gzip，实际传输471101字节且无Content-Encoding/Vary，已确认尚未压缩。按[Nginx官方gzip说明](https://nginx.org/en/docs/http/ngx_http_gzip_module.html)，候选增加静态HTML/JS/CSS压缩、Vary和最小长度；没有将认证JSON或已压缩照片加入类型列表。候选语法验证通过，压缩/安全/缓存策略均待部署后核验真实响应，不能把本地gzip统计写成已减少线上流量。
+
+## 最终检查与仍需完成的上线门禁
+
+- [本轮脱敏总证据](evidence/launch-optimization-validation-20261014.json)包含测试、依赖、28页CSP、后退缓存、构建和当前站观测。最终只读盘点含新增导出Worker，共13服务运行、schema V31、ready=true、production_ready=false。环境由其他并行工作更新，本轮没有迁移、部署或服务重启；前期V30证据仍保留原时间边界。
+- 下一次Web发布须按[第二轮原子切换/回退流程](frontend-release-readiness-20261014.md)应用已审查片段，并核对HTML缓存、缺资源404、重复安全头、CSP、gzip和真实登录/下载。本轮未将候选配置写入服务器。
+- 生产TLS/域名/证书链尚未由本轮核验。API测试默认配置仍为Secure Cookie=false、HttpOnly=true、SameSite=Strict；生产应在HTTPS入口显式开启Secure并核验实际Set-Cookie。SSO回调、证书和HSTS需要对应环境验证，不能沿用内网HTTP测试结果。
+- Core Web Vitals的良好参考值为LCP≤2.5s、INP≤200ms、CLS≤0.1，需按手机/桌面真实用户p75评价。本轮没有真实用户样本或物理手机结果，没有接入外部遥测服务，也没有据模拟视口认定性能达标。
+- 监控指标、正式工单/SLA、通知、备份恢复及客户Q编号仍按既有合同追踪；本轮不代填正式验收状态，不把局部技术检查当作完整ASVS/WCAG认证。

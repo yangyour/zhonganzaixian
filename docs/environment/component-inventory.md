@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-14 上线优化第三轮最终只读复核包含导出队列：13服务运行、V31、ready=true、production_ready=false。候选安全头/静态gzip配置在既有Nginx1.31.6语法验证通过，临时文件移除，未reload或迁移。当前站主JS在gzip请求下仍无Content-Encoding；候选尚未生效。前期本轮V30/12项检查与后期V31/13项分别留证，环境升级属于其他并行任务。见[总证据](../evidence/launch-optimization-validation-20261014.json)。
+
 ## 2026-10-14 导出自动准备应用
 
 复用既有PostgreSQL17.9/V30、受限mop_test_runtime和Java镜像；新增独立项目应用export-preparation-worker，不引入数据库/队列/缓存/监控组件。Worker无存储/迁移/身份源秘密，仅准备真实XLSX。候选进程验证38次HTTP和领取后中断接管，常驻发布后13服务全部运行、ready=true、production_ready=false；只新增该应用并更新Web，API及另10服务生命周期未变，V30/0迁移，本机转发关闭后复核仍通过，见[最终盘点](../evidence/export-queue-components-final-20261014.json)。缺失的站内信送达链仍阻塞M3-7完整闭环，候选为既有通知设计下的耐久站内消息，尚未交付；不能把MinIO或队列在线记为通知成功。见[功能边界](../asset-export-automatic-preparation.md)。

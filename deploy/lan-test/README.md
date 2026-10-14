@@ -50,3 +50,6 @@ python tools/inspect-lan-test-server.py
 ## 自动准备应用覆盖配置
 
 独立`export-queue.compose.yaml`只增加本项目准备Worker，使用私有`export-queue.env`和已核验`EXPORT_QUEUE_RELEASE_DIR`。开启时固定UTC启用时间、受限PG角色与技术租期；重启保留同一启用时间。先使用两个Compose文件执行`config --quiet`，再`up -d --no-deps export-preparation-worker`，不要重新启动基础组件。验证用`python tools/inspect-lan-test-server.py --include-export-queue`，同时提交新虚构请求核对实际XLSX。不开覆盖文件时原12服务模板与单任务入口保持可用。
+
+
+上线优化第三轮补充：静态片段还包含CSP/安全头与仅静态HTML/JS/CSS的gzip设置；合并时替换现有同名头、gzip和location配置，避免重复。保留照片blob预览及self相机权限，Element Plus仅样式保留inline兼容。当前测试站仍未应用这些候选，本轮只做nginx -t和本地真实API浏览器验证。发布后必须核对实际CSP、Content-Encoding、Vary及Secure Cookie/TLS，不仅检查文件存在。标准矩阵和证据见[上线优化第三轮](../../docs/launch-optimization-20261014.md)。

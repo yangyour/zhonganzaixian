@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto'
 import { gzipSync } from 'node:zlib'
 
 const hash = value => createHash('sha256').update(value).digest('hex')
-export async function verifyWebRelease(directory, { writeManifest = true, bootstrapBudget = 256 * 1024 } = {}) {
+export async function verifyWebRelease(directory, { writeManifest = true, bootstrapBudget = 256 * 1024, cssBudget = 96 * 1024 } = {}) {
   const root = await realpath(resolve(directory))
   const file = async name => {
     if (typeof name !== 'string' || !name || name.startsWith('/') || /[\\?#\u0000-\u001f]/.test(name) || name.split('/').some(part => !part || part === '.' || part === '..')) throw Error('INVALID_ASSET_PATH')
@@ -42,6 +42,11 @@ export async function verifyWebRelease(directory, { writeManifest = true, bootst
   const initialFiles = new Set([...closure].map(key => manifest[key].file))
   for (const name of initialFiles) bootstrapGzip += gzipSync(await file(name)).byteLength
   if (bootstrapGzip > bootstrapBudget) throw Error('BOOTSTRAP_SIZE_BUDGET_EXCEEDED')
+  const initialCss = new Set([...closure].flatMap(key => list(manifest[key].css)))
+  for (const reference of references) if (reference.endsWith('.css')) initialCss.add(reference.slice(1))
+  let bootstrapCssGzip = 0
+  for (const name of initialCss) bootstrapCssGzip += gzipSync(await file(name)).byteLength
+  if (bootstrapCssGzip > cssBudget) throw Error('CSS_SIZE_BUDGET_EXCEEDED')
   const records = []
   async function walk(folder) {
     for (const entry of await readdir(folder, { withFileTypes: true })) {
@@ -53,7 +58,7 @@ export async function verifyWebRelease(directory, { writeManifest = true, bootst
     }
   }
   await walk(root); records.sort((a, b) => a.path.localeCompare(b.path, 'en'))
-  const report = { schema: 1, scope: 'static-artifacts-only', build_id: hash(JSON.stringify(records)), bootstrap_gzip_bytes: bootstrapGzip, bootstrap_budget_bytes: bootstrapBudget, file_count: records.length, files: records }
+  const report = { schema: 1, scope: 'static-artifacts-only', build_id: hash(JSON.stringify(records)), bootstrap_gzip_bytes: bootstrapGzip, bootstrap_budget_bytes: bootstrapBudget, bootstrap_css_gzip_bytes: bootstrapCssGzip, bootstrap_css_budget_bytes: cssBudget, file_count: records.length, files: records }
   if (writeManifest) await writeFile(resolve(root, 'release-manifest.json'), JSON.stringify(report, null, 2) + '\n')
   return report
 }
@@ -73,7 +78,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
     if (expectedPosition >= 0 && !/^[a-f0-9]{64}$/.test(expected ?? '')) throw Error('INVALID_EXPECTED_BUILD')
     if (expected && !process.argv.includes('--check')) throw Error('EXPECTED_BUILD_REQUIRES_CHECK')
     const report = process.argv.includes('--check') ? await checkWebRelease(directory, expected) : await verifyWebRelease(directory)
-    console.log(JSON.stringify({ status: 'PASSED', files: report.file_count, bootstrap_gzip_bytes: report.bootstrap_gzip_bytes, build_id: report.build_id, scope: report.scope }))
+    console.log(JSON.stringify({ status: 'PASSED', files: report.file_count, bootstrap_gzip_bytes: report.bootstrap_gzip_bytes, bootstrap_css_gzip_bytes: report.bootstrap_css_gzip_bytes, build_id: report.build_id, scope: report.scope }))
   } catch (error) {
     console.error(JSON.stringify({ status: 'FAILED', reason: /^[A-Z_]+$/.test(error.message) ? error.message : 'RELEASE_RESOURCE_INVALID_OR_MISSING' }))
     process.exitCode = 1

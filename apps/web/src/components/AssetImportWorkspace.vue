@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ElTableColumn } from 'element-plus'
+import { ElMessageBox, ElTableColumn } from 'element-plus'
 import AssetImportTemplateDownload from './AssetImportTemplateDownload.vue'
 import { computed, onUnmounted, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
@@ -21,6 +21,10 @@ const { file, format, source, artifact, operation, policy, policyLoading, policy
 const unaddressed = computed(() => artifact.value && mappingDraft.value ? assetImportUnaddressedColumns(artifact.value.columns, mappingDraft.value) : [])
 const conflict = computed(() => parseAttempt.value?.state === 'CONFLICT' ? { kind: 'parse' as const, attempt: parseAttempt.value } : mappingAttempt.value?.state === 'CONFLICT' ? { kind: 'mapping' as const, attempt: mappingAttempt.value } : null)
 const stage = computed(() => source.value?.mapping ? 4 : isParsed.value ? 3 : source.value?.parse_status === 'SELECTION_REQUIRED' || parseAttempt.value?.state === 'ACCEPTED' ? 2 : source.value?.storage_status === 'READY' ? 1 : 0)
+const unsaved = computed(() => Boolean(file.value && !source.value?.mapping))
+let disposed = false, confirming = false
+const contextKey = () => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version, session.value?.account_version, permitted.value])
+const inputKey = () => JSON.stringify([source.value?.id, source.value?.version, selection.value, mappingDraft.value])
 function chooseFile(event: Event) {
   const input = event.target as HTMLInputElement, selected = input.files?.[0]; input.value = ''
   if (selected) workspace.chooseFile(selected)
@@ -33,13 +37,23 @@ function updateTarget(target: AssetImportTarget, value: unknown) {
 function updateHeader(value: string | number) { selection.value.headerRow = value === '' ? null : Number(value) }
 watch(() => [open.value, contextGeneration.value, session.value], () => { if (open.value && !policy.value) void workspace.loadPolicy() }, { immediate: true })
 watch(permitted, value => { if (!value) open.value = false })
-onBeforeRouteLeave(() => {
-  if (!hasUnresolved.value) return true
-  ElMessage.warning('来源请求结果尚未确认；请先回读或使用原请求重试，再离开资产页面。')
-  return false
-})
-const unregisterContextGuard = contextTransitionGuards.register(() => { if (!hasUnresolved.value) return true; ElMessage.warning('资产来源请求尚未确认，请先回读或重试原请求再切换租户或退出'); return false })
-onUnmounted(() => { unregisterContextGuard(); workspace.dispose() })
+async function mayLeave() {
+  if (hasUnresolved.value) { ElMessage.warning('来源请求结果尚未确认；请先回读或使用原请求重试，再离开资产页面。'); return false }
+  if (!unsaved.value) return true
+  if (disposed || confirming) return false
+  const scope = contextKey(), input = inputKey(), original = file.value
+  confirming = true
+  try {
+    await ElMessageBox.confirm('离开将清除本页选中的原文件、解析选择和未保存映射；已受理的服务器来源仍保留。', '尚未完成的来源输入', { type: 'warning', confirmButtonText: '舍弃本页输入并继续', cancelButtonText: '保留输入' })
+    // Approval is not cleanup: a later navigation/context guard may still refuse departure.
+    return !disposed && !hasUnresolved.value && scope === contextKey() && input === inputKey() && original === file.value
+  } catch { return false } finally { confirming = false }
+}
+onBeforeRouteLeave(mayLeave)
+const unregisterContextGuard = contextTransitionGuards.register(mayLeave)
+function beforeUnload(event: BeforeUnloadEvent) { if (hasUnresolved.value || unsaved.value) { event.preventDefault(); event.returnValue = '' } }
+window.addEventListener('beforeunload', beforeUnload)
+onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEventListener('beforeunload', beforeUnload); workspace.dispose() })
 </script>
 
 <template>

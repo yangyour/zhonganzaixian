@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ElTableColumn } from 'element-plus'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 import { ElTimeline, ElTimelineItem } from 'element-plus'
 import { feedback as ElMessage } from '../utils/feedback'
 import { api, isCancelled } from '../api/client'
@@ -132,10 +132,15 @@ function openInternalNotes() {
 }
 const worklogOpen = ref(false), worklogTarget = ref<RegisteredTicket | null>(null)
 const worklogWorkspace = ref<InstanceType<typeof WorklogWorkspace> | null>(null)
-function openWorklogs() {
+async function openWorklogs() {
   if (!ticket.value || !can('worklogs:read_own')) return
-  if (worklogTarget.value?.id !== ticket.value.id && worklogWorkspace.value?.hasUnresolved()) { ElMessage.warning('上一条登记的工时结果未确认，请先恢复并重试原请求'); worklogOpen.value = true; return }
-  worklogTarget.value = ticket.value; worklogOpen.value = true
+  const target = ticket.value, previous = worklogTarget.value, generation = contextGeneration.value
+  if (previous?.id !== target.id && worklogWorkspace.value && !await worklogWorkspace.value.canLeave('切换报障登记')) {
+    if (generation === contextGeneration.value && worklogTarget.value === previous) worklogOpen.value = true
+    return
+  }
+  if (generation !== contextGeneration.value || ticket.value !== target || worklogTarget.value !== previous || !can('worklogs:read_own') || target.tenant_id !== session.value?.tenant.id) return
+  worklogTarget.value = target; worklogOpen.value = true
 }
 const createOpen = ref(false)
 const acceptedOperationId = ref('')
@@ -173,9 +178,15 @@ function resetContext() {
   photoWorkspace.reset()
   operationReader.reset()
 }
-watch(() => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version], resetContext, { flush: 'sync' })
-const unregisterContextGuard = contextTransitionGuards.register(() => { if (!photoWorkspace.unresolved.value) return true; ElMessage.warning('已有报障照片或追加请求未处理完，请先恢复原登记并处理，再切换租户或退出'); return false })
-onUnmounted(() => { unregisterContextGuard(); resetContext(); detailPhotos.dispose(); photoWorkspace.dispose() })
+// Navigation re-reads /session and replaces its object even when scope is unchanged.
+// Watch each scope value so that a normal query change cannot discard retained editors or commands.
+watch([() => contextGeneration.value, () => session.value?.tenant.id, () => session.value?.user.id, () => session.value?.user.role, () => session.value?.permission_version], resetContext, { flush: 'sync' })
+function canLeavePhotos() { if (!photoWorkspace.unresolved.value) return true; ElMessage.warning('已有报障照片或追加请求未处理完，请先恢复原登记并处理，再离开页面、切换租户或退出'); return false }
+function beforeUnload(event: BeforeUnloadEvent) { if (photoWorkspace.unresolved.value) { event.preventDefault(); event.returnValue = '' } }
+window.addEventListener('beforeunload', beforeUnload)
+onBeforeRouteLeave(() => canLeavePhotos())
+const unregisterContextGuard = contextTransitionGuards.register(() => canLeavePhotos())
+onUnmounted(() => { unregisterContextGuard(); window.removeEventListener('beforeunload', beforeUnload); resetContext(); detailPhotos.dispose(); photoWorkspace.dispose() })
 </script>
 
 <template>

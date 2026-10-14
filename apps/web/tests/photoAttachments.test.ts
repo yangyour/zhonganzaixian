@@ -30,6 +30,29 @@ beforeEach(() => {
 })
 afterEach(() => { for (const finish of cleanup.splice(0)) finish(); session.value = null; vi.restoreAllMocks() })
 describe('attachment writes on already registered reports', () => {
+  it('same-scope session refresh keeps uncertain append identity/body and local photo for the original retry', async () => {
+    let writes = 0
+    const transport = vi.fn(async (_url: RequestInfo | URL, _options?: RequestInit) => { if (++writes === 1) throw new TypeError('unit lost append response'); return json(registered(2, [{ ...photo, ticket_id: ticketId }])) })
+    const { queue, appender, original } = workflow(transport)
+    await appender.append(); const key = appender.attempt.value!.key, body = JSON.stringify(appender.attempt.value!.body)
+    session.value = { ...structuredClone(session.value!), csrf_token: 'unit-refreshed-csrf' }
+    expect(appender.uncertain.value).toBe(true); expect(appender.attempt.value!.key).toBe(key); expect(queue.rows.value[0]!.file).toBe(original)
+    await appender.append(); expect(transport).toHaveBeenCalledTimes(2)
+    expect(transport.mock.calls[1]![1]!.body).toBe(body); expect(transport.mock.calls[1]![1]!.headers).toMatchObject({ 'Idempotency-Key': key })
+    expect(appender.uncertain.value).toBe(false)
+  })
+  it('same-scope refresh keeps an in-flight append while a real permission change aborts and clears it', async () => {
+    let finish!: (response: Response) => void, signal: AbortSignal | undefined
+    const transport = vi.fn(async (_url: RequestInfo | URL, options?: RequestInit) => { signal = options?.signal as AbortSignal; return new Promise<Response>(resolve => { finish = resolve }) })
+    const { queue, ticket, appender } = workflow(transport), pending = appender.append()
+    const key = appender.attempt.value!.key
+    session.value = structuredClone(session.value!)
+    expect(signal?.aborted).toBe(false); expect(appender.busy.value).toBe(true); expect(appender.attempt.value!.key).toBe(key)
+    session.value = { ...session.value!, permission_version: session.value!.permission_version + 1, capabilities: [] }
+    expect(signal?.aborted).toBe(true); expect(appender.attempt.value).toBeNull(); expect(queue.rows.value).toEqual([])
+    finish(json(registered(2, [{ ...photo, ticket_id: ticketId }]))); await pending
+    expect(ticket.value!.version).toBe(1); expect(appender.attempt.value).toBeNull()
+  })
   it('appends only file references with an explicit version and preserves the original report', async () => {
     const transport = vi.fn(async (_url: RequestInfo | URL, _options?: RequestInit) => json(registered(2, [{ ...photo, ticket_id: ticketId }])))
     const { queue, ticket, appender, original } = workflow(transport)

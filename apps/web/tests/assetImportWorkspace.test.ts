@@ -39,6 +39,33 @@ afterEach(() => { cleanup.splice(0).forEach(dispose => dispose()); session.value
 
 // Isolated transport substitutes prove browser behavior only; they do not prove PostgreSQL/MinIO integration.
 describe('durable import browser workspace', () => {
+  it('keeps selected input and explicit parsing choices after an equivalent session refresh', async () => {
+    const { workspace, transport } = await workflow(() => { throw new Error('No request expected') })
+    const original = new File(['abc'], 'source.csv', { type: 'text/csv' })
+    expect(workspace.chooseFile(original)).toBe(true)
+    workspace.selection.value = { encoding: 'UTF-8', delimiter: ',', sheetIndex: null, headerRow: 1 }
+    session.value = { ...structuredClone(session.value!), csrf_token: 'refreshed-unit-csrf' }
+    expect(workspace.file.value).toBe(original)
+    expect(workspace.policy.value).not.toBeNull()
+    expect(workspace.selection.value).toEqual({ encoding: 'UTF-8', delimiter: ',', sheetIndex: null, headerRow: 1 })
+    expect(transport).toHaveBeenCalledTimes(1)
+  })
+  it('keeps an uncertain original upload and its exact retry across an equivalent session refresh', async () => {
+    const { workspace, transport } = await workflow(() => { throw new TypeError('synthetic lost response') })
+    const original = new File(['abc'], 'source.csv', { type: 'text/csv' })
+    workspace.chooseFile(original); await workspace.upload()
+    const attempt = workspace.uploadAttempt.value!
+    expect(attempt.state).toBe('UNCERTAIN')
+    session.value = { ...structuredClone(session.value!), csrf_token: 'refreshed-unit-csrf' }
+    expect(workspace.uploadAttempt.value?.key).toBe(attempt.key)
+    expect(workspace.file.value).toBe(original)
+    expect(workspace.hasUnresolved.value).toBe(true)
+    await workspace.upload()
+    const posts = transport.mock.calls.filter(([, options]) => options?.method === 'POST')
+    expect(posts).toHaveLength(2)
+    expect(posts[1]![1]?.headers).toMatchObject({ 'Idempotency-Key': attempt.key })
+    expect(await ((posts[1]![1]!.body as FormData).get('file') as File).text()).toBe('abc')
+  })
   it('keeps original File, multipart declaration, hash and key through uncertainty, then uses only GET after 202', async () => {
     let writes = 0, readable = false
     const { workspace, transport } = await workflow((url, options) => {

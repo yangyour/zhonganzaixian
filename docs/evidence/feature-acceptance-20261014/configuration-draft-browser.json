@@ -1,0 +1,8 @@
+{
+  "checks": [
+    "spa-back-prompts-for-unsaved-revision",
+    "cancel-retains-reason-and-current-page"
+  ],
+  "business_writes": false,
+  "pass": true
+}

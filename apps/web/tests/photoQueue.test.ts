@@ -22,6 +22,35 @@ beforeEach(() => {
 afterEach(() => { for (const item of queues.splice(0)) item.dispose(); session.value = null; vi.restoreAllMocks() })
 
 describe('durable photo upload state in the current page', () => {
+  it('keeps original upload bytes, preview and key when a session refresh returns the same authorization scope', async () => {
+    const transport = vi.fn(async () => { throw new TypeError('unit lost upload response') })
+    const result = queue(transport), original = selected(result)
+    await result.upload(1); const first = result.rows.value[0]!, key = first.attempt!.key, preview = first.previewUrl
+    session.value = { ...structuredClone(session.value!), csrf_token: 'unit-refreshed-csrf' }
+    expect(result.rows.value).toHaveLength(1); expect(result.rows.value[0]!.file).toBe(original)
+    expect(result.rows.value[0]!.previewUrl).toBe(preview); expect(result.rows.value[0]!.status).toBe('UNCERTAIN')
+    expect(URL.revokeObjectURL).not.toHaveBeenCalled(); expect(result.policy.value).toEqual(policy)
+    await result.upload(1); expect(transport).toHaveBeenCalledTimes(2)
+    expect(result.rows.value[0]!.attempt!.key).toBe(key); expect(result.rows.value[0]!.attempt!.file).toBe(original)
+  })
+  it('same-scope session refresh does not abort an in-flight upload or lose its later acceptance', async () => {
+    let finish!: (response: Response) => void, signal: AbortSignal | undefined
+    const transport = vi.fn(async (url: RequestInfo | URL, options?: RequestInit) => {
+      if (url === '/api/v1/files') { signal = options?.signal as AbortSignal; return new Promise<Response>(resolve => { finish = resolve }) }
+      return failure(503)
+    })
+    const result = queue(transport); selected(result); const pending = result.upload(1)
+    session.value = structuredClone(session.value!)
+    expect(signal?.aborted).toBe(false); expect(result.rows.value[0]!.uploading).toBe(true)
+    finish(json({ operation_id: operationId, status: 'PENDING' }, 202)); await pending
+    await vi.waitFor(() => expect(result.rows.value[0]?.reading).toBe(false))
+    expect(result.rows.value[0]!.operationId).toBe(operationId); expect(result.rows.value[0]!.attempt!.state).toBe('accepted')
+  })
+  it('permission epoch revocation clears selected bytes synchronously and releases the preview', () => {
+    const result = queue(vi.fn()); selected(result); const preview = result.rows.value[0]!.previewUrl
+    session.value = { ...session.value!, permission_version: session.value!.permission_version + 1, capabilities: [] }
+    expect(result.rows.value).toEqual([]); expect(result.policy.value).toBeNull(); expect(URL.revokeObjectURL).toHaveBeenCalledWith(preview)
+  })
   it('treats a malformed successful acceptance as uncertain and retains the same original upload request', async () => {
     const transport = vi.fn(async (_url: RequestInfo | URL, _options?: RequestInit) => json(null, 202))
     const result = queue(transport), original = selected(result)

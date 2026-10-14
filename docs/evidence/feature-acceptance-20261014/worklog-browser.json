@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "close-detail-keeps-draft",
+    "route-leave-cancel-preserves-ticket-page",
+    "switch-ticket-cancel-keeps-original-draft",
+    "switch-ticket-confirm-clears-only-after-transition"
+  ],
+  "viewports": [
+    1440,
+    390
+  ],
+  "page_errors": [],
+  "business_writes": [],
+  "pass": true
+}

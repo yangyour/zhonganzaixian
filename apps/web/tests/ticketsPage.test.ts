@@ -26,3 +26,28 @@ it('tenant change clears old list, detail and retained comments even without par
 it('permission epoch reset aborts pending reads and discards old payload and error', async () => {const mock=request();let finish!:(v:unknown)=>void;mock.mockImplementationOnce(()=>new Promise(r=>{finish=r}));mount();await settle();contextGeneration.value++;await settle();finish(page());await settle();expect(state.rows).toEqual([]);expect(state.error).toBeNull();expect(state.loading).toBe(false);expect(mock.mock.calls[0]![1]!.signal!.aborted).toBe(true)})
 it('filter and page size are captured before delayed HTTP completion', async () => {const mock=request();mount();await settle();let finish!:(v:unknown)=>void;mock.mockImplementationOnce(()=>new Promise(r=>{finish=r}));mocks.query.category='其他';await settle();finish(page());await settle();expect(state.rows).toEqual([]);expect(state.error.code).toBe('INVALID_TICKET_READ_RESPONSE')})
 it('unmount aborts list and detail without any automatic writes', async () => {const mock=vi.spyOn(api,'request').mockImplementation(()=>new Promise(()=>{}));mocks.query.ticket_id=id(10);mount();await settle();const calls=[...mock.mock.calls];app!.unmount();app=undefined;expect(calls.length).toBe(2);expect(calls.every(([,options])=>options?.signal?.aborted)).toBe(true);expect(calls.every(([,options])=>!options?.body&&!options?.method)).toBe(true)})
+it('cancelled worklog switch retains the original target and restores its collapsed editor', async () => {
+  request(); session.value!.capabilities.push('worklogs:read_own'); mount(); await settle()
+  state.ticket=ticket(); await state.openWorklogs(); state.worklogOpen=false
+  const canLeave=vi.fn().mockResolvedValue(false); state.worklogWorkspace={canLeave}; state.ticket=ticket(11)
+  await state.openWorklogs(); expect(canLeave).toHaveBeenCalledWith('切换报障登记')
+  expect(state.worklogTarget.id).toBe(id(10)); expect(state.worklogOpen).toBe(true)
+})
+it('worklog target changes only after approval and the same target reopens without confirmation', async () => {
+  request(); session.value!.capabilities.push('worklogs:read_own'); mount(); await settle()
+  state.ticket=ticket(); await state.openWorklogs()
+  const canLeave=vi.fn().mockResolvedValue(true); state.worklogWorkspace={canLeave}; state.worklogOpen=false
+  await state.openWorklogs(); expect(canLeave).not.toHaveBeenCalled(); expect(state.worklogOpen).toBe(true)
+  let approve!:(value:boolean)=>void; canLeave.mockImplementationOnce(()=>new Promise(r=>{approve=r})); state.ticket=ticket(11)
+  const switching=state.openWorklogs(); expect(state.worklogTarget.id).toBe(id(10)); approve(true); await switching
+  expect(state.worklogTarget.id).toBe(id(11)); expect(state.worklogOpen).toBe(true)
+})
+it.each(['context', 'detail'])('late worklog confirmation cannot restore an obsolete %s target', async changed => {
+  request(); session.value!.capabilities.push('worklogs:read_own'); mount(); await settle()
+  state.ticket=ticket(); await state.openWorklogs(); state.worklogOpen=false
+  let approve!:(value:boolean)=>void; state.worklogWorkspace={canLeave:()=>new Promise(r=>{approve=r})}; state.ticket=ticket(11)
+  const switching=state.openWorklogs()
+  if(changed==='context')contextGeneration.value++; else state.ticket=ticket(12)
+  await settle(); approve(true); await switching
+  expect(state.worklogTarget?.id??null).toBe(changed==='context'?null:id(10)); expect(state.worklogOpen).toBe(false)
+})

@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "partial-report-retained-after-hiding",
+    "cancel-navigation-preserves-report",
+    "explicit-discard-allows-navigation"
+  ],
+  "viewport": 390,
+  "business_writes": false,
+  "pass": true
+}

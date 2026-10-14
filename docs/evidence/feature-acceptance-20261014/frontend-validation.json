@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-14",
+  "build_id": "00b719213e5b81fcecee6fdf4aa4e47b99c7f39f2582188f4f8434f49830e344",
+  "web_tests": {
+    "files": 137,
+    "passed": 2030,
+    "failed": 0
+  },
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "policy_tests": 7,
+  "contract_tests": 134,
+  "initial_full_run": {
+    "passed": 2029,
+    "failed": 1,
+    "reason": "Legacy source-string guard assertion required inline callbacks; updated for named canLeave/mayLeave and retained behavior tests"
+  },
+  "browser": {
+    "page_viewports": 56,
+    "initial_page_errors": 0,
+    "worklog_checks": [
+      "close-detail-keeps-draft",
+      "route-leave-cancel-preserves-ticket-page",
+      "switch-ticket-cancel-keeps-original-draft",
+      "switch-ticket-confirm-clears-only-after-transition"
+    ],
+    "import_checks": [
+      "selected-file-retained-after-asset-detail-open-close-and-session-recheck",
+      "route-cancel-retains-file",
+      "route-confirm-allows-transition"
+    ],
+    "configuration": "PASS: SPA back cancellation retains proposal",
+    "report": "PASS: mobile partial draft cancellation and explicit discard",
+    "candidate_origin": "http://127.0.0.1:15174"
+  },
+  "deployed": false,
+  "credentials_recorded": false
+}

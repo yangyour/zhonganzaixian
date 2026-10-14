@@ -1,0 +1,9 @@
+{
+  "checks": [
+    "selected-file-retained-after-asset-detail-open-close-and-session-recheck",
+    "route-cancel-retains-file",
+    "route-confirm-allows-transition"
+  ],
+  "performed_business_write": false,
+  "pass": true
+}

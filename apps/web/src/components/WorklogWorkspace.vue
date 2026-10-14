@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ElTableColumn } from 'element-plus'
+import { ElMessageBox, ElTableColumn } from 'element-plus'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { feedback as ElMessage } from '../utils/feedback'
@@ -18,37 +18,60 @@ const workspace = createWorklogWorkspace(api, value => { state.value = value })
 const permitted = computed(() => Boolean(session.value && props.ticket?.tenant_id === session.value.tenant.id && can('worklogs:read_own') && !switchingTenant.value))
 const writable = computed(() => permitted.value && can('worklogs:write_own'))
 const unresolved = computed(() => state.value.busy === 'write' || state.value.attempt?.state === 'uncertain')
-const locked = computed(() => !writable.value || Boolean(state.value.busy) || unresolved.value)
+const confirming = ref(false)
+let disposed = false
+const locked = computed(() => !writable.value || Boolean(state.value.busy) || unresolved.value || confirming.value)
 const kind = ref<WorklogKind | ''>(''), startedAt = ref(''), endedAt = ref(''), note = ref(''), editingId = ref(''), editingVersion = ref<number | null>(null), validation = ref('')
+const formSnapshot = computed(() => JSON.stringify([kind.value, startedAt.value, endedAt.value, note.value]))
+const formBaseline = ref(formSnapshot.value)
+const dirty = computed(() => formSnapshot.value !== formBaseline.value)
 const labels: Record<WorklogKind, string> = { REMOTE: '远程处理', ONSITE: '现场处理', INSPECTION: '巡检', COMMUTE: '通勤' }
-function clearForm() { kind.value = ''; startedAt.value = ''; endedAt.value = ''; note.value = ''; editingId.value = ''; editingVersion.value = null; validation.value = '' }
+function clearForm() { kind.value = ''; startedAt.value = ''; endedAt.value = ''; note.value = ''; editingId.value = ''; editingVersion.value = null; validation.value = ''; formBaseline.value = formSnapshot.value }
 function input(): WorklogInput { return { kind: kind.value as WorklogKind, started_at: startedAt.value.trim(), ended_at: endedAt.value.trim(), note: note.value === '' ? null : note.value } }
 const elapsed = computed(() => { try { const facts = input(); validateWorklogInput(facts); return worklogInstant(facts.ended_at) - worklogInstant(facts.started_at) } catch { return null } })
 const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, permitted.value, writable.value, props.ticket?.id]))
-watch(contextKey, () => { clearForm(); const current = session.value; workspace.reset(permitted.value && current && props.ticket ? { tenantId: current.tenant.id, ticketId: props.ticket.id, actorId: current.user.id, permissionVersion: current.permission_version, canWrite: writable.value } : null); if (open.value && permitted.value) void workspace.refresh() }, { immediate: true })
+watch(contextKey, () => { clearForm(); confirming.value = false; const current = session.value; workspace.reset(permitted.value && current && props.ticket ? { tenantId: current.tenant.id, ticketId: props.ticket.id, actorId: current.user.id, permissionVersion: current.permission_version, canWrite: writable.value } : null); if (open.value && permitted.value) void workspace.refresh() }, { immediate: true, flush: 'sync' })
 watch(open, value => { if (value && permitted.value && !state.value.page && !state.value.busy) void workspace.refresh() })
 async function editSelected() {
   const selected = state.value.selected
   if (locked.value || !selected) return
+  const turn = contextKey.value
+  if (!await canLeave('替换当前工时输入') || turn !== contextKey.value || locked.value) return
   // Re-read before establishing the edit baseline; never change an unresolved original command.
   if (!await workspace.show(selected.id)) return
   const current = state.value.selected
-  if (!current) return
+  if (disposed || turn !== contextKey.value || !current || current.id !== selected.id) return
   kind.value = current.kind; startedAt.value = current.started_at; endedAt.value = current.ended_at; note.value = current.note ?? ''; editingId.value = current.id; editingVersion.value = current.version; validation.value = ''
+  formBaseline.value = formSnapshot.value
 }
 async function save() {
   if (locked.value) return
+  const turn = contextKey.value
   if (!state.value.parentVersion || editingId.value && (state.value.selected?.id !== editingId.value || state.value.selected?.version !== editingVersion.value)) { validation.value = '请先刷新列表，并重新读取需要修改的本人记录'; return }
-  try { const facts = input(); validateWorklogInput(facts); validation.value = ''; if (await workspace.submit(facts, editingId.value && editingVersion.value ? { id: editingId.value, version: editingVersion.value } : null)) clearForm() }
-  catch (error) { validation.value = error instanceof Error ? error.message : '请检查实填字段' }
+  try { const facts = input(); validateWorklogInput(facts); validation.value = ''; if (await workspace.submit(facts, editingId.value && editingVersion.value ? { id: editingId.value, version: editingVersion.value } : null) && !disposed && turn === contextKey.value) clearForm() }
+  catch (error) { if (!disposed && turn === contextKey.value) validation.value = error instanceof Error ? error.message : '请检查实填字段' }
 }
-async function retryOriginal() { if (await workspace.retry()) clearForm() }
-function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved()) { event.preventDefault(); event.returnValue = '' } }
+async function retryOriginal() { const turn = contextKey.value; if (await workspace.retry() && !disposed && turn === contextKey.value) clearForm() }
+async function canLeave(action = '离开本页、切换租户或退出') {
+  if (disposed || confirming.value) return false
+  if (workspace.unresolved()) { ElMessage.warning('工时保存结果尚未确认，请先使用原请求重试，再切换登记、离开本页、切换租户或退出'); return false }
+  if (!dirty.value) return true
+  const turn = contextKey.value, snapshot = formSnapshot.value
+  confirming.value = true
+  try {
+    await ElMessageBox.confirm(`${action}将清除尚未保存的工时输入，是否继续？`, '工时输入尚未保存', { confirmButtonText: '放弃输入并继续', cancelButtonText: '继续编辑', type: 'warning' })
+    // Approval alone must not erase a draft: another guard or the transition itself may still fail.
+    return !disposed && turn === contextKey.value && snapshot === formSnapshot.value && !workspace.unresolved()
+  } catch { return false }
+  finally { if (!disposed && turn === contextKey.value) confirming.value = false }
+}
+async function resetForm() { if (!locked.value && await canLeave('清空表单并改为新增')) clearForm() }
+function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved() || dirty.value) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
-onBeforeRouteLeave(() => { if (!workspace.unresolved()) return true; ElMessage.warning('工时保存结果尚未确认，请先使用原请求重试，再离开本页'); return false })
-const unregisterContextGuard = contextTransitionGuards.register(() => { if (!workspace.unresolved()) return true; ElMessage.warning('工时保存结果尚未确认，请先处理原请求再切换租户或退出'); return false })
-onUnmounted(() => { unregisterContextGuard(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
-defineExpose({ hasUnresolved: workspace.unresolved })
+onBeforeRouteLeave(() => canLeave())
+const unregisterContextGuard = contextTransitionGuards.register(() => canLeave())
+onUnmounted(() => { unregisterContextGuard(); disposed = true; workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
+defineExpose({ hasUnresolved: workspace.unresolved, canLeave })
 </script>
 
 <template>
@@ -87,11 +110,11 @@ defineExpose({ hasUnresolved: workspace.unresolved })
           <p class="field-help">明确输入日期、秒与Z或±HH:MM时区，最多3位毫秒；不会自动使用当前时间。相同起止表示明确实填0，缺值不会补0或4小时。</p>
           <el-form-item label="原始备注（可留空，最多2000字符）"><el-input v-model="note" type="textarea" :rows="3" :disabled="locked" aria-label="实填工时备注" /></el-form-item>
           <p v-if="elapsed !== null">起止物理差：{{ elapsed / 1000 }} 秒。未计费取整，未换算成本。</p><p v-if="validation" role="alert" class="worklog-validation">{{ validation }}</p>
-          <div class="worklog-actions"><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.parentVersion">{{ editingId ? '确认追加修改修订' : '保存本人工时' }}</el-button><el-button :disabled="locked" @click="clearForm">清空表单 / 改为新增</el-button></div>
+          <div class="worklog-actions"><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.parentVersion">{{ editingId ? '确认追加修改修订' : '保存本人工时' }}</el-button><el-button :disabled="locked" @click="resetForm">清空表单 / 改为新增</el-button></div>
         </el-form>
       </section>
     </template>
-    <template #footer><el-button @click="open = false">暂时收起</el-button><span class="field-help">收起不会取消已发送的保存，未确认请求保留在当前页面。</span></template>
+    <template #footer><el-button @click="open = false">暂时收起</el-button><span class="field-help">收起会保留未保存输入和未确认请求；切换登记或离开前会检查未保存内容。</span></template>
   </el-drawer>
 </template>
 

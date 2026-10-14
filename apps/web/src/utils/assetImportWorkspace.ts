@@ -226,7 +226,10 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
     if (busy.value || attempt.value?.state !== 'CONFLICT' || !attempt.value.compared) return false
     attempt.value = null; fields.value = {}; return true
   }
-  const stop = watch(() => [contextGeneration.value, session.value], clear, { flush: 'sync' })
+  // A navigation refresh replaces the session object even when its authority is unchanged.
+  // Keep original File/key/body state unless a scope or effective access value actually changes.
+  const stop = watch([contextGeneration, () => session.value?.tenant.id, () => session.value?.user.id,
+    () => session.value?.user.role, () => session.value?.permission_version, () => session.value?.account_version, permitted], clear, { flush: 'sync' })
   function dispose() { stop(); clear() }
   return { file: readonly(file), format: readonly(format), source: readonly(source), artifact: readonly(artifact), operation: readonly(operation), policy: readonly(policy), policyLoading: readonly(policyLoading), policyError, permitted, busy: readonly(busy), error, uploadError, parseError, mappingError, selectionMessage, fields, selection, mappingDraft,
     uploadAttempt: readonly(uploadAttempt), parseAttempt: readonly(parseAttempt), mappingAttempt: readonly(mappingAttempt), hasUnresolved, canReset, isParsed, selectionLocked, mappingLocked, chooseFile, upload, parse, saveMapping, refresh, reviseConflict, loadPolicy, reset, dispose }

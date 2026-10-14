@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { writeFailureUncertain } from '../utils/writeFailure'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
-import { ElRadio, ElRadioGroup } from 'element-plus'
+import { onBeforeRouteLeave } from 'vue-router'
+import { ElMessageBox, ElRadio, ElRadioGroup } from 'element-plus'
 import { feedback as ElMessage } from '../utils/feedback'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import { reportContextUnresolved } from '../utils/reportContextGuard'
@@ -44,11 +45,18 @@ const photos = createPhotoQueue()
 const registeredTicket = ref<RegisteredTicket | null>(null)
 const appender = createPhotoAppender(registeredTicket, photos)
 const uncertain = computed(() => attempt.value?.state === 'uncertain')
-const locked = computed(() => submitting.value || uncertain.value || Boolean(acceptedOperationId.value))
-const busy = computed(() => submitting.value || operationLoading.value || appender.busy.value)
+const confirming = ref(false)
+let disposed = false
+const locked = computed(() => submitting.value || uncertain.value || Boolean(acceptedOperationId.value) || confirming.value)
+const busy = computed(() => submitting.value || operationLoading.value || appender.busy.value || confirming.value)
 const unresolvedPhotos = computed(() => photos.rows.value.some(row => !registeredTicket.value?.attachments.some(photo => photo.id === row.record?.id)))
+const formSnapshot = computed(() => JSON.stringify(form))
+const dirty = computed(() => !complete.value && Object.values(form).some(value => value !== ''))
+const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version, permitted.value]))
+function hasUnresolved() { return reportContextUnresolved({ submitting: submitting.value, uncertain: uncertain.value, accepted: Boolean(acceptedOperationId.value), complete: complete.value, appending: appender.busy.value || appender.reading.value, appendUncertain: appender.uncertain.value, unresolvedPhotos: unresolvedPhotos.value }) }
 
 function reset() {
+  confirming.value = false
   assetsController?.abort(); reportController?.abort(); operationController?.abort()
   ++assetsGeneration; ++writeGeneration; ++operationGeneration
   Object.assign(form, emptyReportForm()); fieldErrors.value = {}; assets.value = []; assetsLoading.value = false; assetsError.value = null; assetsHasMore.value = false
@@ -62,9 +70,26 @@ watch(() => props.modelValue, value => {
     if (!photos.policy.value) void photos.loadPolicy()
   } else { assetsController?.abort(); ++assetsGeneration; assetsLoading.value = false }
 })
-watch(() => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version], () => { reset(); open.value = false }, { flush: 'sync' })
-const unregisterContextGuard = contextTransitionGuards.register(() => { if (!reportContextUnresolved({ submitting: submitting.value, uncertain: uncertain.value, accepted: Boolean(acceptedOperationId.value), complete: complete.value, appending: appender.busy.value, appendUncertain: appender.uncertain.value, unresolvedPhotos: unresolvedPhotos.value })) return true; ElMessage.warning('报障登记或照片尚未处理完，请先回读、使用原请求重试或移除可撤回的本地照片，再切换租户或退出'); return false })
-onUnmounted(() => { unregisterContextGuard(); reset(); photos.dispose(); appender.dispose() })
+// Re-reading the same authorized session must preserve entered fields and the original registration request.
+watch(contextKey, () => { reset(); open.value = false }, { flush: 'sync' })
+async function canLeave() {
+  if (disposed || confirming.value) return false
+  if (hasUnresolved()) { ElMessage.warning('报障登记或照片尚未处理完，请先回读、使用原请求重试或移除可撤回的本地照片，再离开页面、切换租户或退出'); return false }
+  if (!dirty.value) return true
+  const turn = contextKey.value, snapshot = formSnapshot.value
+  confirming.value = true
+  try {
+    await ElMessageBox.confirm('离开将清除尚未保存的报障输入，是否继续？', '报障输入尚未保存', { confirmButtonText: '放弃输入并继续', cancelButtonText: '继续编辑', type: 'warning' })
+    // Do not reset here: another route/context guard or the transition itself may still refuse.
+    return !disposed && turn === contextKey.value && snapshot === formSnapshot.value && !hasUnresolved()
+  } catch { return false }
+  finally { if (!disposed && turn === contextKey.value) confirming.value = false }
+}
+function beforeUnload(event: BeforeUnloadEvent) { if (hasUnresolved() || dirty.value) { event.preventDefault(); event.returnValue = '' } }
+window.addEventListener('beforeunload', beforeUnload)
+onBeforeRouteLeave(() => canLeave())
+const unregisterContextGuard = contextTransitionGuards.register(() => canLeave())
+onUnmounted(() => { unregisterContextGuard(); disposed = true; window.removeEventListener('beforeunload', beforeUnload); reset(); photos.dispose(); appender.dispose() })
 watch(appender.comparison, value => { if (value && registeredTicket.value) emit('registered', registeredTicket.value.id) })
 async function loadAssets() {
   if (!can('assets:read')) { assets.value = []; return }
@@ -99,7 +124,7 @@ async function readRegistration() {
   finally { if (generation === operationGeneration && writeContext === writeGeneration) operationLoading.value = false }
 }
 async function submitReport() {
-  if (!permitted.value || submitting.value || acceptedOperationId.value) return
+  if (disposed || confirming.value || !permitted.value || submitting.value || acceptedOperationId.value) return
   try {
     const body = uncertain.value && attempt.value ? attempt.value.body : { ...parseCustomerReport(form, assets.value.map(item => item.id)), attachment_ids: photos.readyIds() }
     attempt.value = prepareReportAttempt(attempt.value, body); fieldErrors.value = {}

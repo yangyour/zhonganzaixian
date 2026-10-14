@@ -15,7 +15,8 @@ export function createPhotoAppender(ticket: Ref<RegisteredTicket | null>, queue:
   const uncertain = computed(() => attempt.value?.state === 'uncertain')
   const readyCount = computed(() => queue.readyIds(ticket.value?.id).filter(id => !ticket.value?.attachments.some(photo => photo.id.toLowerCase() === id)).length)
   function reset() { ++generation; controller?.abort(); attempt.value = null; busy.value = false; reading.value = false; error.value = null; conflict.value = false; comparison.value = '' }
-  const stopContextWatch = watch(() => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version], reset, { flush: 'sync' })
+  // Normal session revalidation must not erase an append command whose outcome is unknown.
+  const stopContextWatch = watch([() => contextGeneration.value, () => session.value?.tenant.id, () => session.value?.user.id, () => session.value?.user.role, () => session.value?.permission_version], reset, { flush: 'sync' })
   function validate(result: RegisteredTicket, id: string) {
     if (!result || result.id !== id || result.tenant_id !== session.value?.tenant.id || result.reporter_id !== session.value?.user.id || !Number.isSafeInteger(result.version) || result.version < 1 || !Array.isArray(result.attachments)) throw new ApiError(200, 'INVALID_ATTACHMENT_RESULT', '追加结果与当前登记不一致，请保留照片并查询结果', '—')
   }

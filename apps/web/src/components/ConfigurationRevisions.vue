@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ElTableColumn } from 'element-plus'
+import { ElMessageBox, ElTableColumn } from 'element-plus'
 import { computed, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
@@ -18,7 +18,7 @@ import ApiErrorNotice from './ApiErrorNotice.vue'
 const props = defineProps<{ modelValue: boolean; configuration: Configuration | null }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean]; changed: [] }>()
 const open = computed({ get: () => props.modelValue, set: value => emit('update:modelValue', value) })
-const writer = computed(() => session.value?.user.role === 'padmin' && can('configurations:write'))
+const writer = computed(() => session.value?.user.role === 'padmin' && can('configurations:write') && !switchingTenant.value)
 const mayCreate = computed(() => writer.value && props.configuration?.contract_value_kind !== 'fixed_constraint')
 const kind = computed(() => props.configuration ? editorKind(props.configuration) : 'text')
 const rows = ref<ConfigurationRevision[]>([])
@@ -52,6 +52,12 @@ const actionValidation = ref('')
 const actionError = ref<unknown>(null)
 const acting = computed(() => commandState.value.busy && commandState.value.attempt?.action !== 'create')
 const writing = computed(() => creating.value || acting.value)
+const unsaved = computed(() => commandState.value.attempt?.state !== 'accepted' && Boolean(
+  createOpen.value && (form.proposed !== '' || form.reason !== '' || form.evidence_refs.some(item => item.reference !== '' || item.title !== '' || item.sha256 !== ''))
+  || actionOpen.value && (actionComment.value !== '' || reviewDecision.value !== '')))
+let disposed = false, confirmingLeave = false
+const leaveContextKey = () => JSON.stringify([props.configuration?.key, contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.account_version, writer.value, switchingTenant.value])
+const leaveInputKey = () => JSON.stringify([createOpen.value, form, actionType.value, actionExpectedVersion.value, actionComment.value, reviewDecision.value])
 function canCloseForReadPanel() { return !createOpen.value && !actionOpen.value && !unresolved.value }
 defineExpose({ canCloseForReadPanel, hasUnresolved: commands.unresolved })
 function currentContext(): RevisionWriteContext | null { const value = session.value; return value && props.configuration ? { tenantId: value.tenant.id, actorId: value.user.id, permissionVersion: value.permission_version, configurationKey: props.configuration.key } : null }
@@ -71,16 +77,28 @@ function reset() {
   Object.assign(form, { proposed: '', reason: '', evidence_refs: [] })
   actionType.value = null; actionComment.value = ''; reviewDecision.value = ''; actionError.value = null; actionValidation.value = ''
 }
-watch(() => [props.configuration?.key, contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, writer.value], () => {
+watch([() => props.configuration?.key, contextGeneration, () => session.value?.tenant.id, () => session.value?.user.id,
+  () => session.value?.user.role, () => session.value?.permission_version, () => session.value?.account_version, writer, switchingTenant], () => {
   reset(); if (props.modelValue && props.configuration && !switchingTenant.value) void loadList()
-}, { immediate: true })
+}, { immediate: true, flush: 'sync' })
 watch(() => props.modelValue, value => { if (value && props.configuration && !switchingTenant.value) void loadList() })
-function mayLeave() { if (!commands.unresolved()) return true; ElMessage.warning('配置原请求结果尚未确认，请先使用原请求重试'); return false }
+async function mayLeave() {
+  if (commands.unresolved()) { ElMessage.warning('配置原请求结果尚未确认，请先使用原请求重试'); return false }
+  if (!unsaved.value) return true
+  if (disposed || confirmingLeave) return false
+  const scope = leaveContextKey(), input = leaveInputKey()
+  confirmingLeave = true
+  try {
+    await ElMessageBox.confirm('离开将舍弃尚未保存的修订提案、证据输入或审核意见。', '未发送的配置输入', { type: 'warning', confirmButtonText: '舍弃并继续', cancelButtonText: '保留输入' })
+    // Do not clear here: another navigation/context guard may reject the transition.
+    return !disposed && !commands.unresolved() && scope === leaveContextKey() && input === leaveInputKey()
+  } catch { return false } finally { confirmingLeave = false }
+}
 const unregisterContextGuard = contextTransitionGuards.register(mayLeave)
 onBeforeRouteLeave(mayLeave)
-function beforeUnload(event: BeforeUnloadEvent) { if (commands.unresolved()) { event.preventDefault(); event.returnValue = '' } }
+function beforeUnload(event: BeforeUnloadEvent) { if (commands.unresolved() || unsaved.value) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
-onUnmounted(() => { unregisterContextGuard(); window.removeEventListener('beforeunload', beforeUnload); reset(); commands.dispose() })
+onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEventListener('beforeunload', beforeUnload); reset(); commands.dispose() })
 watch(detailOpen, value => {
   if (value || unresolved.value) return
   detailController?.abort(); ++detailGeneration

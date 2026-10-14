@@ -90,7 +90,9 @@ const unregisterDraftGuard = contextTransitionGuards.register(leaveDraftContext)
 onBeforeRouteLeave(leaveDraftContext)
 function draftBeforeUnload(event: BeforeUnloadEvent) { if (draftWriter.unresolved() || draftChanged.value) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', draftBeforeUnload)
-watch(() => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, can('configurations:write'), switchingTenant.value], () => { const value = session.value; draftWriter.reset(value && value.user.role === 'padmin' && can('configurations:write') && !switchingTenant.value ? { tenantId: value.tenant.id, actorId: value.user.id, permissionVersion: value.permission_version } : null); editing.value = null; proposed.value = ''; initialProposed.value = ''; validationError.value = '' }, { immediate: true })
+watch([contextGeneration, () => session.value?.tenant.id, () => session.value?.user.id, () => session.value?.user.role,
+  () => session.value?.permission_version, () => session.value?.account_version, () => can('configurations:write'), switchingTenant],
+() => { const value = session.value; draftWriter.reset(value && value.user.role === 'padmin' && can('configurations:write') && !switchingTenant.value ? { tenantId: value.tenant.id, actorId: value.user.id, permissionVersion: value.permission_version } : null); editing.value = null; proposed.value = ''; initialProposed.value = ''; validationError.value = '' }, { immediate: true, flush: 'sync' })
 onUnmounted(() => { unregisterDraftGuard(); window.removeEventListener('beforeunload', draftBeforeUnload); draftWriter.dispose() })
 const publishing = ref<Configuration | null>(null)
 const publishOpen = computed({ get: () => Boolean(publishing.value), set: value => { if (!value) publishing.value = null } })

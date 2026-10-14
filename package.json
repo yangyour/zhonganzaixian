@@ -12,7 +12,7 @@
     "contract:check": "node tools/build-api-contract.mjs --check"
   },
   "devDependencies": {
-    "ajv": "8.17.1",
+    "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
     "playwright": "1.62.1"
   }

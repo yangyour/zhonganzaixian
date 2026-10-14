@@ -448,6 +448,7 @@
         "docs/evidence/niko-export-page-worker-chain-20261004.json",
         "docs/evidence/niko-export-progress-20261004.json",
         "docs/export-inbox.md",
+        "docs/export-message-recovery-20261014.md",
         "docs/export-preparation-worker.md",
         "docs/test-server-acceptance-20261005.md"
       ],
@@ -1454,6 +1455,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "2509674c868c43bff4d6f75227c9a494c51686ffa0a708bc7fa0f3a342068c14"
+    "doc/development/07_合同逐项开发追踪.md": "5e2cb94699e34568df9c31b2a712bad73527cbea127c38dc5e4f2995206b80c4"
   }
 }

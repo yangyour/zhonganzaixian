@@ -1,0 +1,115 @@
+{
+  "environment": "lan-test-20261008",
+  "source_base": "2fd42c8",
+  "checks": {
+    "regressions_reproduced_before_fix": 3,
+    "targeted_frontend": 49,
+    "all_frontend": 1935,
+    "contract": 133,
+    "release_and_policy": 16,
+    "typecheck_and_build": true
+  },
+  "browser": {
+    "page_errors": [],
+    "requests": [
+      {
+        "method": "GET",
+        "path": "/api/v1/my-export-messages",
+        "query": "?page_size=20&unread_only=false"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/asset-export-jobs/86bc39af-056c-4119-8ba1-8265cddf77fa/content-grants",
+        "query": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/asset-export-jobs/bc317094-ff6f-42be-98c3-9de3b5672baf/content-grants",
+        "query": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/asset-export-jobs/bc317094-ff6f-42be-98c3-9de3b5672baf/content-grants",
+        "query": null
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/my-export-messages",
+        "query": "?page_size=20&unread_only=false"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/my-export-messages",
+        "query": "?page_size=20&unread_only=false"
+      }
+    ],
+    "actual_download_sha256": "ad441883a9931591eeb045bcb2a408b32d0ca2cfb8fbe05f74f9272c4f358efa",
+    "in_place_renewal": true,
+    "actual_download": true,
+    "original_and_new_expiry_shown": true,
+    "pending_grant_blocks_refresh": true,
+    "pending_grant_blocks_navigation": true,
+    "committed_lost_response_recovered": true,
+    "identical_get_retry": true,
+    "original_messages_unchanged": true,
+    "desktop_overflow": false,
+    "mobile_overflow": false,
+    "mobile_download_sha256": "8df8ae7a9d84b9a006e24cda38da4557d4d7e1cf7ef0f5caa8ba3ba20e8ef804",
+    "public_build_before": "152c843bbc981d04c1ebc4801bee500d5ca4cb02ce9dde64f306532657848fd0"
+  },
+  "selected_message_count": 2,
+  "original_message_row_hashes_unchanged": true,
+  "new_grant_audit_rows_per_selected_message": 1,
+  "database_observations": {
+    "before": {
+      "message": {
+        "bc317094-ff6f-42be-98c3-9de3b5672baf": "a3c5b706246f79aae4a2c354e4ca0c8cfeb08403a969d0728ff33c5b335ceca1",
+        "86bc39af-056c-4119-8ba1-8265cddf77fa": "70a0d3511e0a2521f3866a1608fdc86eac9b95f3a05d6d9afcff3ec7d248d7d0"
+      },
+      "grant_audit": {
+        "86bc39af-056c-4119-8ba1-8265cddf77fa": 0,
+        "bc317094-ff6f-42be-98c3-9de3b5672baf": 0
+      }
+    },
+    "after": {
+      "message": {
+        "bc317094-ff6f-42be-98c3-9de3b5672baf": "a3c5b706246f79aae4a2c354e4ca0c8cfeb08403a969d0728ff33c5b335ceca1",
+        "86bc39af-056c-4119-8ba1-8265cddf77fa": "70a0d3511e0a2521f3866a1608fdc86eac9b95f3a05d6d9afcff3ec7d248d7d0"
+      },
+      "grant_audit": {
+        "86bc39af-056c-4119-8ba1-8265cddf77fa": 1,
+        "bc317094-ff6f-42be-98c3-9de3b5672baf": 1
+      }
+    }
+  },
+  "web_build_id": "a7a145fcb5aca0e7ac486ccc4666d1d07c7703779cf6f402befd63d1b5bf3448",
+  "web_file_count": 86,
+  "verification_logs": {
+    "export-recovery-red.log": {
+      "sha256": "94cc879174501417e19a337d4a8f2c3c627f92634fc2cff69915ad362fdb3b30",
+      "bytes": 2339
+    },
+    "export-recovery-focused-final.log": {
+      "sha256": "3ea8c8efafe877a2650836c76ce2d4c77b90a70a633dbd1359edeb608fada355",
+      "bytes": 395
+    },
+    "export-recovery-web-all.log": {
+      "sha256": "ce8af7b83a48c5b8eaad8eb9e3748aad7800423aff7e9b8f5d06aae442e0572a",
+      "bytes": 546955
+    },
+    "export-recovery-build.log": {
+      "sha256": "4f19dcd9a901096eff3da665bc3a47977dee87d07f5ab042927edb8a48d33eea",
+      "bytes": 10573
+    },
+    "export-recovery-contracts-release.log": {
+      "sha256": "4f5ebf247b3573e92999232dac51a599ad90967a42c2fca96955441750e5745a",
+      "bytes": 34224
+    }
+  },
+  "new_backend_code": false,
+  "migrations_executed": 0,
+  "real_21_message_browser_pagination_tested": false,
+  "new_natural_15_minute_wait_performed": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "credentials_output": false
+}

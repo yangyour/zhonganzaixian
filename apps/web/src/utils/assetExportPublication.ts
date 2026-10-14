@@ -17,7 +17,7 @@ export function readExportPublication(value:unknown,c:AssetExportContext,id:stri
  if(value.download_grant_available&&(!value.publication_enabled||value.status!=='PUBLISHED'))throw invalid()
  return structuredClone(value) as unknown as ExportPublication
 }
-export function readExportGrant(value:unknown,p:ExportPublication):ExportGrant{
+export function readExportGrant(value:unknown,p:Pick<ExportPublication,'job_id'|'status'|'size_bytes'|'file_sha256'>):ExportGrant{
  if(!exportExact(value,['job_id','content_url','expires_at','size_bytes','file_sha256'])||value.job_id!==p.job_id||p.status!=='PUBLISHED'||value.size_bytes!==p.size_bytes||value.file_sha256!==p.file_sha256||typeof value.content_url!=='string')throw invalid()
  const prefix=`/api/v1/asset-export-jobs/${p.job_id}/content?grant=`
  if(!value.content_url.startsWith(prefix))throw invalid()

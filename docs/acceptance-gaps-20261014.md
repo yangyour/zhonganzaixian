@@ -1,5 +1,7 @@
 # 现有功能验收差距与阻塞清单
 
+最新排查补记（2026-10-14）：导出消息原地续领、原页重试、慢响应期限及校验缓存遗漏已修复，见[本轮清单](export-message-recovery-20261014.md)。原B01的防火墙密码过期阻塞已由08:02 UTC的[密码更新后真实首值](evidence/firewall-password-updated-read-20261014.json)解除；本轮核对该最新记录，未再次探测设备。单次CPU/内存读取及TEST_INSECURE不等于持续采集或正式可信TLS。下文旧检查基线不能继续作为B01当前阻塞状态。
+
 后续开发更新（2026-10-14）：已补齐M3-7中已准备文件的MinIO显式发布、15分钟签名链接与授权下载，见[发布下载实施记录](asset-export-publication.md)。下文保留检查基线的原始差距；后续又补齐[后台自动准备与进度刷新](asset-export-automatic-preparation.md)；又补齐[本人导出消息与已读](export-inbox.md)；自动发布和正式整项验收仍待，不将局部完成改写为128项通过。
 
 检查日期：2026-10-14（Asia/Hong_Kong）。检查基线：`cb0119bc54ad797992034797fb7fcd6691c57fb5`，分支 `handoff/cloud-20261001-photos`，实际公开API契约0.46.0，测试库V30。

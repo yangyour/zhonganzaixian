@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-14导出消息遗漏修复继续复用实际API/PG/MinIO。原地续领与未知授权恢复已验证，原消息完整行不变，每个原请求只记一条授权审计；本轮无新基础组件、后端改动或迁移。预览由SSH回环转发实际API，未用本机组件替代。见[范围和证据](../export-message-recovery-20261014.md)。
+
 2026-10-14用户更新防火墙密码后，原Java客户端已实际登录并读取版本AF8.0.106.4646、CPU 12%、内存58%，正常注销；此前PASSWORD_EXPIRED门禁已解除。新密码仅记录在Git忽略的私有凭据文件。本次为真实单次首值，持续采集/历史/页面继续实现，证书仍为显式TEST_INSECURE。见[密码更新后首值](../evidence/firewall-password-updated-read-20261014.json)。
 
 2026-10-14已将临时证书跳过实现为SCP/AF实际Java客户端的TEST_INSECURE配置，94Java及3工具用例通过；同JVM严格→测试→严格真实验证完成，例外仅两个固定地址。SCP认证成功但ACCESS_DENIED，AF登录成功但PASSWORD_EXPIRED，均未伪造资源指标或启动后台轮询；只发布独立检查工件，无API/Web重启或数据库迁移，当前API0.48/V31保持。见[实现及证据](../device-test-tls-mode.md)。

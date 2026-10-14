@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-14导出消息恢复前端已部署。只切换Web静态版本；切换窗口的全部已观测其他容器实例/镜像/启动时间/重启计数保持。本轮无API/Worker重启或数据库迁移，既有基础监控GET200，续领真实XLSX通过；[部署快照](../evidence/export-message-recovery-deployment-20261014.json)与[清理后既有组件检查](../evidence/export-message-recovery-components-final-20261014.json)分别留证，不代替另一批设备采集验收。
+
 2026-10-14导出消息遗漏修复继续复用实际API/PG/MinIO。原地续领与未知授权恢复已验证，原消息完整行不变，每个原请求只记一条授权审计；本轮无新基础组件、后端改动或迁移。预览由SSH回环转发实际API，未用本机组件替代。见[范围和证据](../export-message-recovery-20261014.md)。
 
 2026-10-14用户更新防火墙密码后，原Java客户端已实际登录并读取版本AF8.0.106.4646、CPU 12%、内存58%，正常注销；此前PASSWORD_EXPIRED门禁已解除。新密码仅记录在Git忽略的私有凭据文件。本次为真实单次首值，持续采集/历史/页面继续实现，证书仍为显式TEST_INSECURE。见[密码更新后首值](../evidence/firewall-password-updated-read-20261014.json)。

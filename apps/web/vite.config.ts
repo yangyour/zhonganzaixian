@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => {
   const sameOriginProxy = { target, changeOrigin: false }
   return {
     plugins: [vue()],
+    build: { manifest: true, sourcemap: false },
     server: {
       host: '127.0.0.1', port: 5173, strictPort: true,
       proxy: { '/api': sameOriginProxy, '/oauth2': sameOriginProxy, '/login/oauth2': sameOriginProxy, '/auth': sameOriginProxy },

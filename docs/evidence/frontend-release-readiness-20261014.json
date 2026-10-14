@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-14",
+  "scope": "frontend release preparation; no deployment",
+  "source_baseline": "171cbb5 plus release gate changes",
+  "environment": "lan-test-20261008 via pinned SSH to original loopback API",
+  "web_tests": {
+    "files": 123,
+    "passed": 1880,
+    "failed": 0,
+    "scope": "isolated owned snapshot"
+  },
+  "contract_tests": {
+    "passed": 130,
+    "failed": 0
+  },
+  "artifact_gate_tests": {
+    "passed": 9,
+    "failed": 0
+  },
+  "typecheck": "PASSED",
+  "production_build": "PASSED",
+  "artifact_manifest_check": "PASSED",
+  "build_id": "c2b5a407b6094c7bc83087672027a3bebbc7ef7fbd6d0781e96d8f98a10328e2",
+  "artifact_file_count": 83,
+  "bootstrap_gzip_bytes": 169446,
+  "technical_budget_bytes": 262144,
+  "local_archive": "frontend-release-web-c2b5a407.zip",
+  "archive_sha256": "80bde984a51b996512b25e45a9a2aae390471426157470d831f1dfa132d279ef",
+  "components": {
+    "all_12_containers_running": true,
+    "ready": true,
+    "schema_version": 30,
+    "production_ready": false
+  },
+  "static_policy": {
+    "environment": "lan-test-20261008",
+    "nginx_version": "nginx/1.31.6",
+    "candidate_static_policy_syntax": "PASSED",
+    "service_reloaded": false,
+    "configuration_applied": false,
+    "cache_headers": {
+      "html": {
+        "status": 200,
+        "cache_control": null
+      },
+      "hashed_js": {
+        "status": 200,
+        "cache_control": "max-age=3600"
+      },
+      "missing_asset": {
+        "status": 404,
+        "cache_control": null
+      }
+    }
+  },
+  "browser_checks": [
+    "blocked actual main JS then explicit recovery",
+    "blocked actual anonymous login chunk then explicit recovery",
+    "JavaScript disabled recovery text",
+    "blocked audit chunk keeps assets and title",
+    "unsaved editor cancels reload and retains value",
+    "explicit discard and reload recovers",
+    "own test session logout yields 401 and explanatory login",
+    "protected old page cleared",
+    "successful reauthentication returns to authorized audit page",
+    "controlled Vue runtime exception shows no raw error and recovers"
+  ],
+  "browser_write_scope": "local test account login and own-session logout only; no business records created",
+  "screenshots": "Git-ignored .local/frontend-release-qa",
+  "viewport_widths": [
+    320,
+    390
+  ],
+  "physical_mobile_device": false,
+  "service_reloaded": false,
+  "deployed": false,
+  "production_approval": false
+}

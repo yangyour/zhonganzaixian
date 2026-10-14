@@ -41,3 +41,6 @@ python tools/inspect-lan-test-server.py
 ```
 
 该入口只读取SSH固定主机键、项目owner、12个容器、真实版本、迁移历史及服务器ready。可用`--output <脱敏报告路径>`保存结果，不输出环境文件或凭据。服务重启、迁移或命名空间变更必须针对已核对的本项目对象单独执行；不得对旧服务器或无关服务操作。
+
+
+2026-10-14前端发布准备：Web构建新增静态产物完整性/大小门禁及release-manifest.json。候选[静态缓存片段](web-static-locations.conf)须替换原静态location块，保留API/认证反代，不可直接与原块重复include。需要Nginx≥1.29.3以合并继承安全头；本项目1.31.6语法已验证，尚未应用。上传后用`node tools/verify-web-release.mjs --dist <候选web目录> --check --expected-build-id <已记录值>`只读核对，不能在服务器上重新生成清单冒充构建原摘要。完整流程与回退见[第二轮上线准备](../../docs/frontend-release-readiness-20261014.md)。

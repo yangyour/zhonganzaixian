@@ -20,6 +20,9 @@ PORTS = (22, 80, 443)
 TIMEOUT_SECONDS = 2
 PRIVATE_NETWORKS = tuple(ipaddress.ip_network(x) for x in
                          ('10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'))
+# 2026-10-14 direct user correction. This is one exact device/address exception,
+# not a private-range classification or permission to probe neighbouring addresses.
+APPROVED_NON_PRIVATE_TARGETS = frozenset({('sangfor-firewall', ipaddress.IPv4Address('192.169.11.1'))})
 
 
 def timestamp():
@@ -45,8 +48,9 @@ def validate_manifest(value):
         if not re.fullmatch(r'[a-z][a-z0-9-]{0,63}', device['key']):
             raise ValueError('Invalid device key')
         address = ipaddress.IPv4Address(device['ip'])
-        if not any(address in network for network in PRIVATE_NETWORKS):
-            raise ValueError('Only explicitly listed private IPv4 targets are supported')
+        if (not any(address in network for network in PRIVATE_NETWORKS)
+                and (device['key'], address) not in APPROVED_NON_PRIVATE_TARGETS):
+            raise ValueError('Target is outside private ranges and the explicit device allowlist')
         if device['key'] in keys or str(address) in addresses:
             raise ValueError('Duplicate device key or IP')
         keys.add(device['key'])

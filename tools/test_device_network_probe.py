@@ -26,7 +26,7 @@ def manifest():
 class ManifestTests(unittest.TestCase):
     def test_four_user_targets_and_models_preserved(self):
         value = probe.validate_manifest(manifest())
-        self.assertEqual(['192.168.11.1', '192.168.1.170', '192.168.1.2', '192.168.1.125'],
+        self.assertEqual(['192.169.11.1', '192.168.1.170', '192.168.1.2', '192.168.1.125'],
                          [d['ip'] for d in value['devices']])
         self.assertEqual('aRS6300-50Q-EI-24X', value['devices'][3]['model'])
 
@@ -35,6 +35,15 @@ class ManifestTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 probe.probe_manifest({'devices': []})
             network.assert_not_called()
+
+    def test_corrected_firewall_exception_cannot_expand_to_other_devices_or_addresses(self):
+        for key, ip in [('sangfor-firewall', '192.169.11.2'), ('other-device', '192.169.11.1'),
+                        ('sangfor-firewall', '192.169.11.0/24'), ('sangfor-firewall', '192.169.1.1')]:
+            with self.subTest(key=key, ip=ip):
+                value = manifest()
+                value['devices'][0].update(key=key, ip=ip)
+                with self.assertRaises(ValueError):
+                    probe.validate_manifest(value)
 
     def test_unapproved_destination_shapes_rejected(self):
         for ip in ('8.8.8.8', '127.0.0.1', '169.254.169.254', '224.0.0.1', '::1',

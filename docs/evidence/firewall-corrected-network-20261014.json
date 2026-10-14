@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-14T02:18:14.995978+00:00",
+  "environment": "lan-test-20261008",
+  "host": "192.168.1.215",
+  "read_only": true,
+  "credentials_output": false,
+  "manifest_sha256": "6f6dbdfbdbb4df313c9d41c05e6305de586d36d41826e16e6b8237cbaccd1c36",
+  "vantage_points": {
+    "test_server": {
+      "status": "COMPLETED",
+      "probe": {
+        "schema_version": 1,
+        "environment": "lan-test-20261008",
+        "completed_at": "2026-10-14T02:18:19.338748+00:00",
+        "read_only": true,
+        "ports_checked": [
+          22,
+          80,
+          443
+        ],
+        "tcp_timeout_seconds": 2,
+        "devices": [
+          {
+            "key": "sangfor-firewall",
+            "device_type": "防火墙",
+            "brand": "深信服",
+            "model": "AF-1000-B1800",
+            "ip": "192.169.11.1",
+            "started_at": "2026-10-14T02:18:16.296411+00:00",
+            "completed_at": "2026-10-14T02:18:19.335494+00:00",
+            "route": {
+              "state": "FOUND",
+              "dst": "192.169.11.1",
+              "gateway": "192.168.1.2",
+              "dev": "ens18",
+              "prefsrc": "192.168.1.215"
+            },
+            "icmp": {
+              "state": "REPLY",
+              "sent": 2,
+              "received": 2,
+              "average_rtt_ms": 0.245
+            },
+            "tcp": [
+              {
+                "port": 22,
+                "state": "TIMEOUT",
+                "elapsed_ms": 2004
+              },
+              {
+                "port": 80,
+                "state": "OPEN",
+                "elapsed_ms": 1
+              },
+              {
+                "port": 443,
+                "state": "OPEN",
+                "elapsed_ms": 1
+              }
+            ],
+            "network_observation": "RESPONSE_OBSERVED",
+            "device_identity_verified": false,
+            "monitoring_ready": false,
+            "monitoring_status": "CONFIG_PENDING",
+            "unknown_reason": "READ_ONLY_CREDENTIALS_AND_VERIFIED_MAPPING_REQUIRED",
+            "device_health": null,
+            "snmp": {
+              "status": "NOT_ATTEMPTED",
+              "reason": "CREDENTIALS_NOT_CONFIGURED"
+            },
+            "firmware": null,
+            "sys_object_id": null,
+            "template_ref": null
+          }
+        ]
+      }
+    },
+    "zabbix_network_namespace": {
+      "status": "COMPLETED",
+      "probe": {
+        "schema_version": 1,
+        "environment": "lan-test-20261008",
+        "completed_at": "2026-10-14T02:18:22.793504+00:00",
+        "read_only": true,
+        "ports_checked": [
+          22,
+          80,
+          443
+        ],
+        "tcp_timeout_seconds": 2,
+        "devices": [
+          {
+            "key": "sangfor-firewall",
+            "device_type": "防火墙",
+            "brand": "深信服",
+            "model": "AF-1000-B1800",
+            "ip": "192.169.11.1",
+            "started_at": "2026-10-14T02:18:19.727926+00:00",
+            "completed_at": "2026-10-14T02:18:22.790846+00:00",
+            "route": {
+              "state": "FOUND",
+              "dst": "192.169.11.1",
+              "gateway": "172.18.0.1",
+              "dev": "eth0",
+              "prefsrc": "172.18.0.6"
+            },
+            "icmp": {
+              "state": "REPLY",
+              "sent": 2,
+              "received": 2,
+              "average_rtt_ms": 0.362
+            },
+            "tcp": [
+              {
+                "port": 22,
+                "state": "TIMEOUT",
+                "elapsed_ms": 2005
+              },
+              {
+                "port": 80,
+                "state": "OPEN",
+                "elapsed_ms": 1
+              },
+              {
+                "port": 443,
+                "state": "OPEN",
+                "elapsed_ms": 1
+              }
+            ],
+            "network_observation": "RESPONSE_OBSERVED",
+            "device_identity_verified": false,
+            "monitoring_ready": false,
+            "monitoring_status": "CONFIG_PENDING",
+            "unknown_reason": "READ_ONLY_CREDENTIALS_AND_VERIFIED_MAPPING_REQUIRED",
+            "device_health": null,
+            "snmp": {
+              "status": "NOT_ATTEMPTED",
+              "reason": "CREDENTIALS_NOT_CONFIGURED"
+            },
+            "firmware": null,
+            "sys_object_id": null,
+            "template_ref": null
+          }
+        ]
+      },
+      "collector": {
+        "name": "/mop-lan-zabbix-server",
+        "id": "303bbd1f5767a733137de772945fc46506143d0933d036f3412cad85d125ae66",
+        "image": "sha256:415452211dea59cd4ea3346f2c2b38403660408273c672ebf91603353ce1073f",
+        "pid": 83707,
+        "started_at": "2026-10-08T12:18:48.248721584Z"
+      },
+      "execution_context": "host Python and ping in collector network namespace; not Zabbix item execution"
+    }
+  },
+  "monitoring_ready": false,
+  "mop_business_monitoring": "CONFIG_PENDING",
+  "formal_contract_acceptance": "NOT_RUN",
+  "probe_source_sha256": "d024a3b7f6b33e99c2b6ddb4336b08ae5e86109ec8a935aff668340e5420484a",
+  "completed_at": "2026-10-14T02:18:22.871753+00:00",
+  "network_exit_status": 0
+}

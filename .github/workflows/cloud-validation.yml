@@ -221,6 +221,10 @@ jobs:
         run: |
           npm ci --registry=https://registry.npmjs.org --replace-registry-host=always --ignore-scripts --no-audit --no-fund
           npm ci --prefix apps/web --registry=https://registry.npmjs.org --replace-registry-host=always --ignore-scripts --no-audit --no-fund
+      - name: Audit known high and critical dependency advisories
+        run: |
+          npm audit --audit-level=high --registry=https://registry.npmjs.org
+          npm --prefix apps/web audit --audit-level=high --registry=https://registry.npmjs.org
       - name: Verify the actual API contract
         run: |
           npm run contract:check

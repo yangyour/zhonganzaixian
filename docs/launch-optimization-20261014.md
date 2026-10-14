@@ -28,3 +28,10 @@
 2026-10-14向npm官方注册表执行包含开发依赖的完整审计：根工程Ajv有1项中危；前端工具链合计4项（Vitest传递影响重复计入包级统计，不能解释为4个独立线上可利用漏洞），涉及Vitest/mocker、Tinypool和source-map-js。原npmmirror审计接口返回NOT_IMPLEMENTED，不能登记为零；改用官方审计服务后才取得有效结果。
 
 根工程Ajv从8.17.1固定更新为8.20.0，130项契约与生成一致性检查通过，官方复审0项。对应[Ajv公告](https://github.com/advisories/GHSA-2g4f-4pwh-qvx6)，具体影响需要$data等前提，未宣称已观测到利用。前端依赖修复及全量验证继续记录于后续章节。
+
+
+前端最终固定Vitest/mocker 4.1.11，保持Vite7.3.6、Vue3.5.43等主业务依赖；锁定source-map-js1.2.2，旧Tinypool随测试框架迁移移除。1899项回归与类型/构建通过，根工程和前端完整官方审计均为0项（本次公告数据库范围内，不是无漏洞证明）。修复依据：[Vitest公告](https://github.com/vitest-dev/vitest/security/advisories/GHSA-82fw-gwwq-j7x9)、[Tinypool调用选项](https://github.com/advisories/GHSA-85c8-ppgw-ccpr)、[source-map-js公告](https://github.com/advisories/GHSA-68fv-2mgg-jv7q)。
+
+安装曾被npm10.9.4的[optional peer解析缺陷](https://github.com/npm/cli/issues/9787)阻塞，使用临时`npx npm@11.19.0`在隔离目录更新锁文件，未修改全局npm、未使用force或legacy-peer-deps。npm11.19.0官方Node范围支持本机22.22.1。生成锁后，npm10.9.4普通`npm ci --ignore-scripts`在干净目录和工作区均成功；17个变更包的SRI逐项与npm官方精确版本元数据匹配。镜像仅用于获取依赖，审计与摘要比对使用官方注册表。后续锁文件更新可使用同一临时npm11命令，普通CI继续按锁安装。
+
+新增CI高危/严重已知公告门禁：审计不可用时失败，不能把网络/镜像错误当作0项；本次中危也已消除。[脱敏修复证据](evidence/npm-security-remediation-20261014.json)与[依赖清单](evidence/npm-components.json)已同步，客户许可审批状态未变更。

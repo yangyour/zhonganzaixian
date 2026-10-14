@@ -1,5 +1,9 @@
 # MOP 实施状态
 
+## 2026-10-14 已公告npm依赖修复
+
+Vitest/mocker固定4.1.11、source-map-js1.2.2、Ajv8.20.0，旧Tinypool移除；17个变更包SRI已对照官方元数据。根工程和前端完整npm官方复审均0项。npm11临时生成锁，npm10干净ci成功，无强制/legacy-peer依赖豁免；新框架下1899前端、130契约、类型与构建通过。CI补高危/严重公告门禁。见[标准与限制](launch-optimization-20261014.md)及[证据](evidence/npm-security-remediation-20261014.json)。
+
 ## 2026-10-14 历史页面恢复与授权缓存
 
 后退缓存恢复前同步隐藏旧业务页和弹层，新读会话后才开放；离线保持隐藏、显式重试，不重发写入。客户端JSON/图片请求no-store，连续401保留最初失效说明。真实Edge persisted=true已验证正常、离线、输入保留、原服务器会话失效路径；隔离全量1899测试、类型和构建通过。见[上线优化第三轮](launch-optimization-20261014.md)。未部署，正式生产/合同门禁保持。

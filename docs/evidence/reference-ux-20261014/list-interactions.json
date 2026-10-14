@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-14",
+  "environment": "lan-test-20261008",
+  "frontend": "local production bundle",
+  "checks": [
+    "asset status shortcut keeps unsubmitted keyword separate",
+    "asset explicit Enter applies query and shows recoverable empty state",
+    "asset detail return preserves applied search context",
+    "asset next and previous pages preserve unsubmitted draft",
+    "ticket search empty state clear action restores real records",
+    "ticket detail return retains applied search",
+    "offline read failure is distinct from empty results and refresh recovers real data"
+  ],
+  "unit_checks": 41,
+  "ime_coverage": "Synthetic composition/keyCode 229 events in Vue component tests; physical IME not tested",
+  "test_harness_note": "Initial clear assertion ran before asynchronous route completion; repeated after URL settlement and passed.",
+  "page_errors": [],
+  "business_writes": [],
+  "credentials_recorded": false
+}

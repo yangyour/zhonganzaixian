@@ -20,6 +20,12 @@ test('preserves blob previews and self-camera use required by the report-photo f
 test('requires child cache locations to inherit the security headers', () => {
   assert.throws(() => verifyWebPolicy(source.replace('add_header_inherit merge;', '')), /SECURITY_HEADERS_NOT_INHERITED/)
 })
+
+test('canonical gateway security headers suppress upstream copies on authenticated downloads', () => {
+  for (const name of ['Content-Security-Policy', 'X-Content-Type-Options', 'Referrer-Policy', 'X-Frame-Options', 'Permissions-Policy']) {
+    assert.throws(() => verifyWebPolicy(source.replace(`proxy_hide_header ${name};`, '')), /UPSTREAM_SECURITY_HEADER_DUPLICATION/)
+  }
+})
 test('requires static compression without adding authenticated JSON to compressed types', () => {
   assert.throws(() => verifyWebPolicy(source.replace('gzip on;', 'gzip off;')), /STATIC_COMPRESSION/)
   assert.throws(() => verifyWebPolicy(source.replace('gzip_types text/css application/javascript;', 'gzip_types text/css application/javascript application/json;')), /STATIC_COMPRESSION/)

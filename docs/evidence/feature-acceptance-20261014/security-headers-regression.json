@@ -1,0 +1,716 @@
+{
+  "date": "2026-10-14",
+  "environment": "lan-test-20261008",
+  "api_version": "0.49.0",
+  "defect": "Upstream and gateway both added X-Content-Type-Options",
+  "before": {
+    "case": {
+      "id": "R08",
+      "title": "授权下载、真实XLSX筛选内容与签名防篡改",
+      "started_at": "2026-10-14T10:47:24.874Z",
+      "request_start": 97,
+      "status": "FAIL",
+      "error_type": "AssertionError",
+      "reason": "Expected values to be strictly equal:",
+      "request_count": 3,
+      "finished_at": "2026-10-14T10:47:25.048Z"
+    },
+    "observed_header": "nosniff, nosniff",
+    "downloaded_bytes": 5068,
+    "download_sha256_matched": true
+  },
+  "after": {
+    "cases": [
+      {
+        "id": "R06",
+        "title": "台账导出受理、筛选快照与后台实际准备",
+        "started_at": "2026-10-14T10:52:35.404Z",
+        "request_start": 59,
+        "status": "PASS",
+        "request_count": 10,
+        "finished_at": "2026-10-14T10:52:36.888Z"
+      },
+      {
+        "id": "R07",
+        "title": "MinIO显式发布、原回执与发布终态",
+        "started_at": "2026-10-14T10:52:36.888Z",
+        "request_start": 69,
+        "status": "PASS",
+        "request_count": 24,
+        "finished_at": "2026-10-14T10:53:08.439Z"
+      },
+      {
+        "id": "R08",
+        "title": "授权下载、真实XLSX筛选内容与签名防篡改",
+        "started_at": "2026-10-14T10:53:08.439Z",
+        "request_start": 93,
+        "status": "PASS",
+        "request_count": 7,
+        "finished_at": "2026-10-14T10:53:08.819Z"
+      },
+      {
+        "id": "R09",
+        "title": "本人导出消息、未读筛选与首次已读幂等",
+        "started_at": "2026-10-14T10:53:08.825Z",
+        "request_start": 100,
+        "status": "PASS",
+        "request_count": 8,
+        "finished_at": "2026-10-14T10:53:09.245Z"
+      },
+      {
+        "id": "R10",
+        "title": "本轮资料与导出的成功审计不因重放重复",
+        "started_at": "2026-10-14T10:53:09.245Z",
+        "request_start": 108,
+        "status": "PASS",
+        "request_count": 7,
+        "finished_at": "2026-10-14T10:53:09.580Z"
+      }
+    ],
+    "requests": [
+      {
+        "case": "R06",
+        "role": "msp",
+        "method": "GET",
+        "path": "/assets",
+        "status": 200,
+        "trace_id": "6c99b64b-b59c-41b7-8f0d-fcd2d6706c6f",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R06",
+        "role": "msp",
+        "method": "GET",
+        "path": "/assets/{id}/manual-metadata",
+        "status": 200,
+        "trace_id": "fef137b6-94b5-43e2-ba35-a8044185afde",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R06",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs",
+        "status": 202,
+        "trace_id": "cacbb9be-a166-4d8b-816c-f58d2102d06f",
+        "expected_status": 202,
+        "contract_valid": true
+      },
+      {
+        "case": "R06",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs",
+        "status": 202,
+        "trace_id": "e12ec835-a8db-4b0d-9516-787333dd797f",
+        "expected_status": 202,
+        "contract_valid": true
+      },
+      {
+        "case": "R06",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs",
+        "status": 409,
+        "trace_id": "a256b1a8-0396-4dda-95b7-98004078bd03",
+        "code": "IDEMPOTENCY_CONFLICT",
+        "expected_status": 409,
+        "contract_valid": true
+      },
+      {
+        "case": "R06",
+        "role": "viewerA",
+        "method": "POST",
+        "path": "/asset-export-jobs",
+        "status": 403,
+        "trace_id": "4e34a731-43be-423e-a767-ebf2a4b9f19b",
+        "code": "ACTION_FORBIDDEN",
+        "expected_status": 403,
+        "contract_valid": true
+      },
+      {
+        "case": "R06",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs",
+        "status": 403,
+        "trace_id": "5f510d2c-8602-4913-8dda-1800ed5104db",
+        "code": "CSRF_INVALID",
+        "expected_status": 403,
+        "contract_valid": true
+      },
+      {
+        "case": "R06",
+        "role": "padmin",
+        "method": "GET",
+        "path": "/asset-export-jobs/{id}",
+        "status": 404,
+        "trace_id": "598c23f6-ad02-476d-8795-2a5dd35804f2",
+        "code": "OBJECT_NOT_FOUND",
+        "expected_status": 404,
+        "contract_valid": true
+      },
+      {
+        "case": "R06",
+        "role": "msp",
+        "method": "GET",
+        "path": "/asset-export-jobs/{id}",
+        "status": 200,
+        "trace_id": "1ab5669d-b037-426f-86d0-81e957fc0052",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R06",
+        "role": "msp",
+        "method": "GET",
+        "path": "/asset-export-jobs/{id}",
+        "status": 200,
+        "trace_id": "438bb0bb-eed3-4a03-b8dc-0e58feb5595a",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "GET",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 200,
+        "trace_id": "cf2f2e66-9a3f-4fee-b893-f52c9e012bb9",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/content-grants",
+        "status": 409,
+        "trace_id": "f2516833-f1d7-494d-a3ae-b8341d67557f",
+        "code": "EXPORT_NOT_PUBLISHED",
+        "expected_status": 409,
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 403,
+        "trace_id": "a52edd26-bfe0-4768-9565-86d224b31a39",
+        "code": "CSRF_INVALID",
+        "expected_status": 403,
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "padmin",
+        "method": "GET",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 404,
+        "trace_id": "5979c6c0-d28e-40bc-b043-8bf696da815a",
+        "code": "OBJECT_NOT_FOUND",
+        "expected_status": 404,
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "9a02ff3b-8286-486e-a009-aef81dd58644",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "7f40db28-9079-410d-88d2-2a9d70f4d9f4",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "a74d4d75-7b07-4a2c-8df8-6227c00e6475",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "48161a0c-9862-4b4b-ab61-f314e36a764e",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "520a01b5-f8cc-4c70-af18-f5b827e5ec0e",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "285b9814-2666-4cdb-8346-b8e7afe6e241",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "11bca42a-609b-45b7-a5e5-f7a0dc31911e",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "99d9454a-4166-4993-a3e3-9c4d73dc7d3f",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "8cc59d76-4c05-4199-9c0a-5ee270857f9d",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "4e4ba674-061b-4b08-bb21-b26eaa17ebb8",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "b6bd7c3c-322c-4909-954d-d48afc048bc2",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "fa8818e8-047b-4f09-ae51-baefe892d118",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "90a50925-ca06-4c1b-895b-50d3f7142883",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "276d3a06-1a20-4395-9c0a-b3c16122a96c",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 409,
+        "trace_id": "6aa017a9-219e-4e41-85c0-a0da4ef1ae6a",
+        "code": "EXPORT_PREPARATION_ACTIVE",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 200,
+        "trace_id": "10492560-8710-4023-8667-be4ceeb4cf7d",
+        "expected_status": [
+          200,
+          409
+        ],
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 200,
+        "trace_id": "c7f33c39-b5d5-4f20-8d5d-47552b53ac9d",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "GET",
+        "path": "/asset-export-jobs/{id}/publication",
+        "status": 200,
+        "trace_id": "81687e6f-53ec-480b-8bfb-f99cb2c37ab9",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "GET",
+        "path": "/asset-export-jobs/{id}",
+        "status": 200,
+        "trace_id": "0683bd61-4b8f-409c-8e86-583a26a2c2f6",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R07",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs",
+        "status": 202,
+        "trace_id": "3aec821d-1bd4-4199-b580-6d91a64554e1",
+        "expected_status": 202,
+        "contract_valid": true
+      },
+      {
+        "case": "R08",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/content-grants",
+        "status": 200,
+        "trace_id": "a63e50e7-375f-45f5-99e5-d6efe2aecb61",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R08",
+        "role": "msp",
+        "method": "POST",
+        "path": "/asset-export-jobs/{id}/content-grants",
+        "status": 200,
+        "trace_id": "c85cb913-1f2e-49ac-a247-142d448f4005",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R08",
+        "role": "msp",
+        "method": "GET",
+        "path": "[AUTHORIZED FILE CONTENT]",
+        "status": 200,
+        "expected_status": 200,
+        "bytes": 5068
+      },
+      {
+        "case": "R08",
+        "role": "padmin",
+        "method": "GET",
+        "path": "[AUTHORIZED FILE CONTENT]",
+        "status": 404,
+        "expected_status": 404,
+        "bytes": 133
+      },
+      {
+        "case": "R08",
+        "role": "viewerB",
+        "method": "GET",
+        "path": "[AUTHORIZED FILE CONTENT]",
+        "status": 403,
+        "expected_status": 403,
+        "bytes": 158
+      },
+      {
+        "case": "R08",
+        "role": "msp",
+        "method": "GET",
+        "path": "[AUTHORIZED FILE CONTENT]",
+        "status": 404,
+        "expected_status": 404,
+        "bytes": 176
+      },
+      {
+        "case": "R08",
+        "role": "msp",
+        "method": "GET",
+        "path": "/my-export-messages",
+        "status": 200,
+        "trace_id": "5e4e8530-8a11-44cb-89b4-cc57238aa9e1",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R09",
+        "role": "msp",
+        "method": "GET",
+        "path": "/my-export-messages",
+        "status": 200,
+        "trace_id": "8b1a1cd2-2e5d-44b9-a21f-1b7e5c1ddff5",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R09",
+        "role": "msp",
+        "method": "POST",
+        "path": "/my-export-messages/{id}/read",
+        "status": 403,
+        "trace_id": "4b833811-9fce-401a-9980-8fdd8b5a3b14",
+        "code": "CSRF_INVALID",
+        "expected_status": 403,
+        "contract_valid": true
+      },
+      {
+        "case": "R09",
+        "role": "padmin",
+        "method": "POST",
+        "path": "/my-export-messages/{id}/read",
+        "status": 404,
+        "trace_id": "fa7d1b30-f477-4a7a-8225-3a39683c73a9",
+        "code": "OBJECT_NOT_FOUND",
+        "expected_status": 404,
+        "contract_valid": true
+      },
+      {
+        "case": "R09",
+        "role": "viewerA",
+        "method": "GET",
+        "path": "/my-export-messages",
+        "status": 403,
+        "trace_id": "8b7e49b8-e1da-45ca-b180-2be8ae563c96",
+        "code": "ACTION_FORBIDDEN",
+        "expected_status": 403,
+        "contract_valid": true
+      },
+      {
+        "case": "R09",
+        "role": "msp",
+        "method": "POST",
+        "path": "/my-export-messages/{id}/read",
+        "status": 200,
+        "trace_id": "af7147fc-a0a1-467a-8473-232127cdd2dd",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R09",
+        "role": "msp",
+        "method": "POST",
+        "path": "/my-export-messages/{id}/read",
+        "status": 200,
+        "trace_id": "babedb6c-6d42-428b-b8cf-c3a7599fd49a",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R09",
+        "role": "msp",
+        "method": "GET",
+        "path": "/my-export-messages",
+        "status": 200,
+        "trace_id": "c045f825-5837-439b-ba4c-6c27d902807c",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R09",
+        "role": "msp",
+        "method": "GET",
+        "path": "/my-export-messages",
+        "status": 200,
+        "trace_id": "5dd57f97-4f44-4c21-8d51-57c0e1cdd71f",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R10",
+        "role": "padmin",
+        "method": "GET",
+        "path": "/audit/records",
+        "status": 200,
+        "trace_id": "817eda75-8bde-487f-845d-c46dcaebefa0",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R10",
+        "role": "padmin",
+        "method": "GET",
+        "path": "/audit/records",
+        "status": 200,
+        "trace_id": "5f5c0593-9745-413b-a55b-c7e9817d887b",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R10",
+        "role": "padmin",
+        "method": "GET",
+        "path": "/audit/records",
+        "status": 200,
+        "trace_id": "fcc3240c-1c0c-4b6e-8e68-0cf6ca82ceac",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R10",
+        "role": "padmin",
+        "method": "GET",
+        "path": "/audit/records",
+        "status": 200,
+        "trace_id": "240f5591-da53-429d-8f92-426b576db8ee",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R10",
+        "role": "padmin",
+        "method": "GET",
+        "path": "/audit/records",
+        "status": 200,
+        "trace_id": "fab6c5ca-54a6-4a4a-a79a-5af225b68c02",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R10",
+        "role": "padmin",
+        "method": "GET",
+        "path": "/audit/records",
+        "status": 200,
+        "trace_id": "1159b829-4820-438e-bb5b-c0befcc3e918",
+        "expected_status": 200,
+        "contract_valid": true
+      },
+      {
+        "case": "R10",
+        "role": "padmin",
+        "method": "GET",
+        "path": "/audit/records",
+        "status": 200,
+        "trace_id": "90ada10a-b637-4f5b-baf6-f86739c9e9e4",
+        "expected_status": 200,
+        "contract_valid": true
+      }
+    ],
+    "download": {
+      "case": "R08",
+      "name": "resource-export-download",
+      "id": "9ce7c682-cced-4550-8183-5d7520d41f23",
+      "sha256": "0fa34e7f926c506cba174b9a95e666ee1e7d5a3b958d3473151e5ee299918757",
+      "size": 5068,
+      "columns": 16,
+      "rows": 1,
+      "formula_cells": 0,
+      "natural_expiration_retested": false
+    },
+    "asserted_header": "nosniff"
+  },
+  "policy_tests": 7,
+  "credentials_recorded": false
+}

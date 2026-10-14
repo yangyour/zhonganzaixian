@@ -24,6 +24,9 @@ export function verifyWebPolicy(source) {
     if (headers[name] !== value) throw Error('MISSING_SECURITY_HEADER')
   }
   if (!source.includes('add_header_inherit merge;')) throw Error('SECURITY_HEADERS_NOT_INHERITED')
+  for (const name of Object.keys(headers)) {
+    if (!new RegExp('^proxy_hide_header ' + name + ';$', 'm').test(source)) throw Error('UPSTREAM_SECURITY_HEADER_DUPLICATION')
+  }
   if (!/^gzip on;$/m.test(source) || !/^gzip_vary on;$/m.test(source) || !/^gzip_types text\/css application\/javascript;$/m.test(source)) throw Error('STATIC_COMPRESSION_POLICY_CHANGED')
   return { status: 'PASSED', headers: Object.keys(headers), scope: 'candidate-policy-only', inline_styles: 'required_by_element_plus', hsts: 'requires_verified_https_deployment' }
 }

@@ -1,0 +1,91 @@
+{
+  "status": "PASSED",
+  "checks": [
+    {
+      "route": "/asset-export-jobs",
+      "width": 1440,
+      "tables": 1
+    },
+    {
+      "route": "/asset-export-jobs",
+      "width": 390,
+      "tables": 1
+    },
+    {
+      "route": "/my-export-messages",
+      "width": 1440,
+      "tables": 1
+    },
+    {
+      "route": "/my-export-messages",
+      "width": 390,
+      "tables": 1
+    },
+    {
+      "route": "/my-worklogs",
+      "width": 1440,
+      "tables": 0
+    },
+    {
+      "route": "/my-worklogs",
+      "width": 390,
+      "tables": 0
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "width": 1440,
+      "tables": 1
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "width": 390,
+      "tables": 1
+    },
+    {
+      "route": "/change-notice-drafts",
+      "width": 1440,
+      "tables": 1
+    },
+    {
+      "route": "/change-notice-drafts",
+      "width": 390,
+      "tables": 1
+    },
+    {
+      "route": "/contact-imports",
+      "width": 1440,
+      "tables": 0
+    },
+    {
+      "route": "/contact-imports",
+      "width": 390,
+      "tables": 0
+    },
+    {
+      "route": "/inspection-source-collections",
+      "width": 1440,
+      "tables": 1
+    },
+    {
+      "route": "/inspection-source-collections",
+      "width": 390,
+      "tables": 1
+    },
+    {
+      "route": "/network-monitoring",
+      "width": 1440,
+      "tables": 1
+    },
+    {
+      "route": "/network-monitoring",
+      "width": 390,
+      "tables": 1
+    },
+    {
+      "name": "real-cpu-history-from-table"
+    }
+  ],
+  "page_errors": [],
+  "business_writes": 0,
+  "credentials_output": false
+}

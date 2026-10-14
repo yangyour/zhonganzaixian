@@ -1,0 +1,14 @@
+{
+  "status": "PASSED",
+  "checks": [
+    "/operational-comparison desktop/mobile",
+    "/capacity-estimates desktop/mobile",
+    "/sla-scenarios desktop/mobile",
+    "/threshold-diagnostics desktop/mobile",
+    "/contact-import-preview desktop/mobile",
+    "real-readonly-calculation-and-stale-result-clear"
+  ],
+  "page_errors": [],
+  "persistent_business_writes": 0,
+  "credentials_output": false
+}

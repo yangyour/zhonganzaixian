@@ -1,0 +1,163 @@
+{
+  "origin": "http://192.168.1.215:10010",
+  "build_id": "cd30e352ee9fb8bf34a9bca960cdb1439cacf690411d90a27aaddcde003d8c29",
+  "views": [
+    {
+      "path": "/tickets",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "path": "/tickets",
+      "width": 390,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 390,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 390,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "path": "/asset-export-jobs",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "path": "/asset-export-jobs",
+      "width": 390,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "path": "/my-export-messages",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "path": "/my-export-messages",
+      "width": 390,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 390,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "width": 390,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 390,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 390,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 390,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 390,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "path": "/configurations",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "pass": true
+    },
+    {
+      "path": "/configurations",
+      "width": 390,
+      "scrollWidth": 390,
+      "pass": true
+    },
+    {
+      "path": "/my-worklogs",
+      "width": 1440,
+      "pass": true
+    },
+    {
+      "path": "/my-worklogs",
+      "width": 390,
+      "pass": true
+    }
+  ],
+  "page_errors": [],
+  "non_login_writes": [],
+  "passed": true
+}

@@ -45,3 +45,13 @@
 复查修正了总览栅格覆盖、备份长名称挤列、导入首屏未读取，以及手工来源页头/服务页标签/副标题缺少共用样式的问题。主体版2040项前端测试通过；最后共用CSS补齐后，类型/构建/发布门禁和受影响26个视口组合复验通过。初次4项旧DOM断言与监控来源/TLS说明遗漏已修正，真实数据读取不变。
 
 图片为各次候选接入真实测试API的截图，发布时间与完整页面矩阵独立记录，不把截图当作后端业务完成证据。
+
+## 测试站已更新
+
+30个页面主体按4个功能组提交推送，最后补齐共用页头、标签和副标题。最终源码 `a2c6875`，静态构建 `cd30e352ee9fb8bf34a9bca960cdb1439cacf690411d90a27aaddcde003d8c29` 已发布到指定测试站，89个静态文件SHA256一致。仅切换项目Web目录；API、数据库、Worker及其他13个服务的实例/镜像/启动时间/重启计数一致，无迁移和新增组件，ready=true，production_ready=false保持。
+
+主体版公开入口65个页面/视口组合通过，资产蜂巢/全页详情、导入作业首屏和真实CPU历史再次操作通过；最后共用CSS版本对受影响26组合复验通过，页面异常0、非登录写入0。没有把UI还原声明为完整合同业务已实现。
+
+核对入口：[逐页原型对照](evidence/function-prototype-20261014/comparison.html)、[30页截图总览](evidence/function-prototype-20261014/overview.html)、[逐页截图映射](evidence/function-prototype-20261014/page-reference-map.json)、[机器结果](evidence/function-prototype-20261014/result.json)、[最终部署](evidence/function-prototype-20261014/frontend-deployment.json)、[公开完整矩阵](evidence/function-prototype-20261014/public-browser.json)、[最终公共样式复验](evidence/function-prototype-20261014/public-polish-browser.json)。
+
+启动/构建方式不变：`npm --prefix apps/web run dev` 使用已配置真实API；`npm --prefix apps/web run build` 包含类型及发布门禁；`npm --prefix apps/web test` 为前端测试。接口契约保持API0.49.0，本轮未新增接口或业务规则。

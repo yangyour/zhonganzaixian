@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-14",
+  "source_commit": "a2c6875052977632e3ed5b65fa294520bf31052a",
+  "build_id": "cd30e352ee9fb8bf34a9bca960cdb1439cacf690411d90a27aaddcde003d8c29",
+  "scope": {
+    "business_pages": 29,
+    "login_pages": 1,
+    "extra_states": [
+      "asset-hive",
+      "full-asset-detail-eight-sections",
+      "mobile-user-editor",
+      "mobile-role-editor"
+    ],
+    "navigation_reorganization": false,
+    "backend_or_api_changes": false
+  },
+  "tests": {
+    "web_files": 137,
+    "web_passed": 2040,
+    "typecheck": "PASS",
+    "production_build": "PASS",
+    "release_policy": "PASS"
+  },
+  "browser": {
+    "candidate_viewports": 65,
+    "public_main_viewports": 65,
+    "final_css_affected_viewports": 26,
+    "final_page_errors": [],
+    "non_login_writes": [],
+    "interactions": [
+      "asset-list-grid-query-empty-reset-full-detail-eight-tabs",
+      "network-list-local-filter-card-switch-real-cpu-history",
+      "mobile-user-role-editor-open-close-with-visible-controls",
+      "backup-page-local-search-reset-and-real-record-selection"
+    ],
+    "published_interactions": [
+      "published-assets-hive-full-detail-tabs",
+      "published-contact-import-list-loads-with-header",
+      "published-monitoring-list-resource-history"
+    ]
+  },
+  "references": {
+    "pages": 30,
+    "source": "zabbix-msp-prototype app.css + enterprise.css",
+    "data_scope": "Prototype demo data remains reference only; actual application uses designated test APIs"
+  },
+  "deployment": {
+    "public_origin": "http://192.168.1.215:10010",
+    "ready": true,
+    "other_13_services_unchanged": true,
+    "new_components": 0,
+    "new_migrations": 0
+  },
+  "limitations": [
+    "No numerical pixel-fidelity percentage claimed",
+    "Implementation pages without an exact prototype counterpart use the mapped comparable layout",
+    "Missing data remains unknown and unimplemented business actions remain gated",
+    "Physical mobile devices and full 128-item contract acceptance are outside this UI restoration"
+  ]
+}

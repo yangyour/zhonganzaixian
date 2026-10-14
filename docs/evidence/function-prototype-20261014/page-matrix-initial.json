@@ -1,0 +1,454 @@
+{
+  "views": [
+    {
+      "path": "/account",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "我的账号",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/account",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "我的账号",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/identity/users",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "用户与成员授权",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/identity/users",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "用户与成员授权",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/identity/roles",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "角色与权限",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/identity/roles",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "角色与权限",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/identity/settings",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "身份认证设置",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/identity/settings",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "身份认证设置",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/dashboard",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "运营总览",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/dashboard",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "运营总览",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/assets",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "资产管理",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/assets",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "资产管理",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "基础网络监控",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "基础网络监控",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "手工来源事件登记 虚构星湾 A（测试环境）",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "手工来源事件登记 虚构星湾 A（测试环境）",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/tickets",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "报障与受理 虚构星湾 A（测试环境）",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/tickets",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "报障与受理 虚构星湾 A（测试环境）",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "我的通知偏好请求 虚构星湾 A（测试环境）",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "我的通知偏好请求 虚构星湾 A（测试环境）",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/my-export-messages",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "我的导出消息 虚构星湾 A（测试环境）",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/my-export-messages",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "我的导出消息 虚构星湾 A（测试环境）",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/asset-export-jobs",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "台账导出准备 虚构星湾 A（测试环境）",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/asset-export-jobs",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "台账导出准备 虚构星湾 A（测试环境）",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "SLA 显式对照 虚构星湾 A（测试环境）",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "SLA 显式对照 虚构星湾 A（测试环境）",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/configurations",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "配置确认登记",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/configurations",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "配置确认登记",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/threshold-diagnostics",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "阈值候选诊断",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/threshold-diagnostics",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "阈值候选诊断",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/contact-imports",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "联系人批量新建与作业",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/contact-imports",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "联系人批量新建与作业",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/contact-import-preview",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "联系人导入格式预览",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/contact-import-preview",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "联系人导入格式预览",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "巡检模板候选",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "巡检模板候选",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "每日备份计划草稿",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "每日备份计划草稿",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "变更报备草稿",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "变更报备草稿",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "巡检来源集合草稿",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "巡检来源集合草稿",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "人工巡检执行单",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "人工巡检执行单",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/customer-contacts",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "客户联系人",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/customer-contacts",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "客户联系人",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/operational-comparison",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "经营样本与人力对照",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/operational-comparison",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "经营样本与人力对照",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/capacity-estimates",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "容量与 Proxy 缓冲估算",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/capacity-estimates",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "容量与 Proxy 缓冲估算",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/capability-catalog",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "代码能力声明核对",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/capability-catalog",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "代码能力声明核对",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/tenant-inventory",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "租户登记资源",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/tenant-inventory",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "租户登记资源",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/audit",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "审计检索与区间校验",
+      "api_errors": 0,
+      "pass": true
+    },
+    {
+      "path": "/audit",
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "审计检索与区间校验",
+      "api_errors": 0,
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "writes": []
+}

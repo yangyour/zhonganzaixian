@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-14 功能页原型还原最终Web版本 `a2c6875` 已切换，89个静态文件摘要一致；沿用原安全头配置，API与其他13服务实例/镜像/启动时间/重启计数未变，ready=true，无新组件或迁移。实际页面继续连接指定测试API；本轮未重新盘点组件版本。见[最终发布](../evidence/function-prototype-20261014/frontend-deployment.json)。
+
 2026-10-14 逐功能验收及前端修复发布后再次盘点：14项目服务运行，PG17.9/V31、ready=true、production_ready=false；只更新项目Web安全头和静态目录，两次切换均核对其他13服务实例/镜像/启动时间/重启数一致，无新增组件或迁移。真实Worker、MinIO、监控和业务API参与45个已实现子场景验收。见[最终组件](../evidence/feature-acceptance-20261014/components-after.json)与[验收报告](../feature-acceptance-20261014.md)。
 
 2026-10-14 功能验收修复项目网关重复安全响应头：原Nginx镜像中语法检查通过，只切换Web配置；API及其他13服务实例/镜像/启动时间/重启计数一致，无数据库迁移，ready=true。Web静态目录保持原版。见[部署记录](../evidence/feature-acceptance-20261014/security-headers-deployment.json)。

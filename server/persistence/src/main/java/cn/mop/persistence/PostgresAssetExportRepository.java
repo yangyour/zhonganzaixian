@@ -9,7 +9,7 @@ import java.time.*;
 import java.util.*;
 
 /** Durable accepted commands and original receipts. No public API, worker, store or download side effects. */
-public final class PostgresAssetExportRepository implements AssetExportJobRepository {
+public final class PostgresAssetExportRepository implements AssetExportJobRepository,AssetExportPublicationRepository {
     private static final System.Logger LOG=System.getLogger(PostgresAssetExportRepository.class.getName());
     private final DataSource source;private final PostgresPlatformRepository platform;
     private static final String COLUMNS="id,tenant_id,created_by,permission_version,accepted_role,command_bytes,input_sha256,state,version,created_at,updated_at";
@@ -37,6 +37,70 @@ public final class PostgresAssetExportRepository implements AssetExportJobReposi
         }catch(SQLException failure){throw unavailable(failure);}
     }
     @Override public Job get(Access a,String id){String canonical=uuid(id);return readonly(a,(c,role)->read(c,a,role,canonical));}
+    @Override public void authorizePublication(Access a,String id){
+        Connection c=platform.idempotentCommandConnection();trace(a);
+        try{String role=authorize(c,a,true);read(c,a,role,uuid(id));}catch(SQLException failure){throw unavailable(failure);}
+    }
+    @Override public Publication publication(Access a,String id){String canonical=uuid(id);return readonly(a,(c,role)->published(c,a,role,canonical));}
+    @Override public Publication publicationInCommand(Access a,String id){
+        Connection c=platform.idempotentCommandConnection();trace(a);
+        try{return published(c,a,authorize(c,a,true),uuid(id));}catch(SQLException failure){throw unavailable(failure);}
+    }
+    @Override public Publication publish(Access a,String id,long expectedVersion,String expectedSha256,VerifiedWriter writer){
+        Connection c=platform.idempotentCommandConnection();trace(a);String canonical=uuid(id);
+        if(expectedVersion<1||expectedVersion>9007199254740989L||expectedSha256==null||!expectedSha256.matches("[0-9a-f]{64}")||writer==null)throw invalid();
+        try{
+            String role=authorize(c,a,true);
+            // Establish object scope before acquiring its lock. The lock and membership check stay in the caller's idempotent transaction.
+            read(c,a,role,canonical);
+            try(var s=statement(c,"SELECT id FROM public.mop_asset_export_job WHERE tenant_id=?::uuid AND created_by=?::uuid AND id=?::uuid FOR UPDATE")){
+                s.setString(1,a.tenantId());s.setString(2,a.actorId());s.setString(3,canonical);try(var r=s.executeQuery()){if(!r.next())throw missing();}
+            }
+            Publication before=published(c,a,role,canonical);Job job=before.job();
+            if(job.version()!=expectedVersion)throw new DomainException(409,"VERSION_CONFLICT","导出准备版本已变化，请刷新后重新核对");
+            if(before.prepared()==null||!Set.of(AssetExportJobState.State.RUNNING,AssetExportJobState.State.RECONCILING_STORAGE).contains(job.state()))throw new DomainException(409,"EXPORT_NOT_PREPARED","该作业尚无可发布的准备文件");
+            if(!before.prepared().fileSha256().equals(expectedSha256))throw new DomainException(409,"EXPORT_PREPARED_MISMATCH","所确认的文件摘要与准备文件不同");
+            int fence;Instant lease;
+            try(var s=statement(c,"SELECT fencing_token,lease_until FROM public.mop_asset_export_job WHERE id=?::uuid")){s.setString(1,canonical);try(var r=s.executeQuery()){if(!r.next())throw corrupt();fence=r.getInt(1);lease=time(r,"lease_until");}}
+            Instant now=clock(c);
+            // Do not take an active preparation worker's lease. Publication is a separate explicit operation.
+            if(lease==null||now.isBefore(lease))throw new DomainException(409,"EXPORT_PREPARATION_ACTIVE","文件仍在处理中，请稍后刷新再发布");
+            if(fence>=AssetExportJobState.MAX_ATTEMPTS)throw new DomainException(409,"EXPORT_ATTEMPT_LIMIT","导出处理记录达到技术上限，请核查原作业");
+            Instant until=now.plusSeconds(300);String worker="publication-"+UUID.randomUUID();
+            try(var s=statement(c,"UPDATE public.mop_asset_export_job SET state='RECONCILING_STORAGE',fencing_token=fencing_token+1,lease_owner=?,lease_started_at=?,lease_until=?,version=version+1,updated_at=? WHERE id=?::uuid AND version=?")){
+                s.setString(1,worker);instant(s,2,now);instant(s,3,until);instant(s,4,now);s.setString(5,canonical);s.setLong(6,expectedVersion);if(s.executeUpdate()!=1)throw leaseLost();
+            }
+            AssetExportPreparedFile file;
+            try(var s=statement(c,"SELECT command_bytes,input_sha256,file_bytes FROM public.mop_asset_export_job WHERE id=?::uuid AND tenant_id=?::uuid")){
+                s.setString(1,canonical);s.setString(2,a.tenantId());try(var r=s.executeQuery()){if(!r.next())throw corrupt();
+                    var command=AssetExportCommandCodec.decodeBound(r.getBytes(1),new AssetExportJobState.Access(UUID.fromString(a.tenantId()),UUID.fromString(a.actorId()),a.permissionVersion(),role,true),r.getString(2));
+                    file=AssetExportPreparedFile.restore(command,before.prepared(),r.getBytes(3));
+                }
+            }
+            // Object identity is deterministic. A rollback/unknown result can only reconcile the same immutable bytes, never overwrite.
+            writer.store("asset-exports/"+a.tenantId()+"/"+canonical,file);
+            authorize(c,a,true);Instant stored=clock(c);if(!stored.isBefore(until))throw leaseLost();
+            try(var s=statement(c,"UPDATE public.mop_asset_export_job SET state='SUCCEEDED',object_id=id,stored_at=?,version=version+1,updated_at=? WHERE id=?::uuid AND version=? AND fencing_token=? AND lease_owner=?")){
+                instant(s,1,stored);instant(s,2,stored);s.setString(3,canonical);s.setLong(4,expectedVersion+1);s.setInt(5,fence+1);s.setString(6,worker);if(s.executeUpdate()!=1)throw leaseLost();
+            }
+            platform.audit(a.actorId(),a.tenantId(),"asset_export.publish","asset_export",canonical,"SUCCEEDED","MINIO_IMMUTABLE_BYTES_READBACK_VERIFIED",a.traceId());
+            return published(c,a,role,canonical);
+        }catch(SQLException failure){throw unavailable(failure);}
+    }
+    private static Publication published(Connection c,Access a,String role,String id)throws SQLException{
+        Job job=read(c,a,role,id);
+        try(var s=statement(c,"SELECT file_sha256,file_size,selection_sha256,row_count,generated_at,object_id,stored_at FROM public.mop_asset_export_job WHERE tenant_id=?::uuid AND created_by=?::uuid AND id=?::uuid")){
+            s.setString(1,a.tenantId());s.setString(2,a.actorId());s.setString(3,id);try(var r=s.executeQuery()){
+                if(!r.next())throw corrupt();AssetExportJobState.Encoding encoding=null;
+                if(r.getString("file_sha256")!=null)encoding=new AssetExportJobState.Encoding(r.getString("selection_sha256"),r.getString("file_sha256"),r.getLong("file_size"),r.getInt("row_count"),time(r,"generated_at"));
+                else if(r.getObject("file_size")!=null||r.getString("selection_sha256")!=null||r.getObject("row_count")!=null||r.getObject("generated_at")!=null)throw corrupt();
+                String object=r.getString("object_id");Instant stored=time(r,"stored_at");
+                boolean success=job.state()==AssetExportJobState.State.SUCCEEDED;
+                if(success&&(encoding==null||!id.equals(object)||stored==null||stored.isBefore(encoding.generatedAt())||stored.isAfter(job.updatedAt()))||!success&&(object!=null||stored!=null))throw corrupt();
+                return new Publication(job,encoding,object,stored,clock(c));
+            }
+        }
+    }
     @Override public Progress progress(Access a,String id){
         String canonical=uuid(id);
         return readonly(a,(c,role)->{

@@ -9,6 +9,8 @@ import {createAssetExportWorkspace,emptyAssetExportState,type AssetExportState} 
 import {assetExportInput,type AssetExportFilters} from '../utils/assetExportJobs'
 import {displayTime} from '../utils/display'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import AssetExportPublicationPanel from '../components/AssetExportPublicationPanel.vue'
+const publicationPanel=ref<InstanceType<typeof AssetExportPublicationPanel>|null>(null)
 const fresh=()=>({type:'',status:'',siteAny:true,site:'',queryAny:true,query:''})
 const form=reactive(fresh()),acknowledge=ref(false),dirty=ref(false),confirming=ref(false),validation=ref('')
 const state=shallowRef<AssetExportState>(emptyAssetExportState()),workspace=createAssetExportWorkspace(api,s=>{state.value=s})
@@ -28,8 +30,8 @@ watch(contextKey,()=>{Object.assign(form,fresh());acknowledge.value=false;dirty.
 async function submit(){if(disposed||!permitted.value||locked.value||!acknowledge.value)return false;validation.value='';try{assetExportInput(filters())}catch{validation.value='筛选未通过：请核对类型、状态和文本长度；没有受理';return false}return workspace.submit(filters())}
 async function retry(){if(disposed||!permitted.value||busy.value)return false;return workspace.retry()}
 async function browse(next=false){if(disposed||!permitted.value||busy.value)return false;return workspace.list(next)}
-async function select(id:string){if(disposed||!permitted.value||busy.value)return false;return workspace.select(id)}
-async function discard(){if(workspace.unresolved()){ElMessage.warning('原请求正在提交或结果未知，必须先用原请求恢复；普通刷新不能确认');return false}if(confirming.value)return false;if(!dirty.value&&!state.value.attempt)return true;const turn=contextKey.value;confirming.value=true;try{await ElMessageBox.confirm('已受理作业会保留在服务器；继续将清除本页筛选草稿与原收据显示，确认继续？','离开当前准备请求',{confirmButtonText:'清除并继续',cancelButtonText:'留在本页',type:'warning'});return!disposed&&turn===contextKey.value&&!workspace.unresolved()}catch{return false}finally{if(!disposed&&turn===contextKey.value)confirming.value=false}}
+async function select(id:string){if(disposed||!permitted.value||busy.value||publicationPanel.value&&!publicationPanel.value.mayLeave())return false;return workspace.select(id)}
+async function discard(){if(publicationPanel.value&&!publicationPanel.value.mayLeave())return false;if(workspace.unresolved()){ElMessage.warning('原请求正在提交或结果未知，必须先用原请求恢复；普通刷新不能确认');return false}if(confirming.value)return false;if(!dirty.value&&!state.value.attempt)return true;const turn=contextKey.value;confirming.value=true;try{await ElMessageBox.confirm('已受理作业会保留在服务器；继续将清除本页筛选草稿与原收据显示，确认继续？','离开当前准备请求',{confirmButtonText:'清除并继续',cancelButtonText:'留在本页',type:'warning'});return!disposed&&turn===contextKey.value&&!workspace.unresolved()}catch{return false}finally{if(!disposed&&turn===contextKey.value)confirming.value=false}}
 async function beginNew(){const turn=contextKey.value;if(disposed||!permitted.value||busy.value||!await discard()||turn!==contextKey.value||!workspace.begin())return false;Object.assign(form,fresh());acknowledge.value=false;dirty.value=false;validation.value='';return true}
 function unlockRejected(){if(disposed||!permitted.value||busy.value||state.value.attempt?.state!=='rejected'||!workspace.begin())return false;acknowledge.value=false;dirty.value=true;return true}
 onBeforeRouteLeave(discard);const unregister=contextTransitionGuards.register(discard)
@@ -43,7 +45,7 @@ defineExpose({form,state,acknowledge,locked,filters,change,changeAck,submit,retr
 </script>
 <template>
  <section class="export-page"><div class="page-heading"><div><p class="eyebrow">台账 / 内部本人作业</p><h1>台账导出准备</h1><p>明确筛选 → 耐久受理 → 独立查看进度</p></div></div>
- <el-alert type="warning" :closable="false" show-icon title="这里只受理准备请求；OSS发布、下载和通知尚未开放，不保证立即执行或可下载" />
+ <el-alert type="warning" :closable="false" show-icon title="先准备台账文件，再明确发布并取得下载链接；站内信通知尚未接通" />
  <p v-if="!permitted" class="panel">当前身份没有内部导出准备权限，或租户正在切换；未展示旧数据</p>
  <template v-else>
   <form class="panel export-form" @submit.prevent="submit"><h2>1. 核对本次筛选</h2><p>只选择当前租户台账；全部“不限”会选择全部匹配记录。1000行、16MiB文件是技术保护，超限拒绝，不静默截断</p>
@@ -64,8 +66,8 @@ defineExpose({form,state,acknowledge,locked,filters,change,changeAck,submit,retr
    <template v-else><p>本页 {{state.page.items.length}} 条 · {{state.paged?'续页':'第一页'}}，不是全部作业数量；仅当前创建人和受理权限版本</p><p v-if="!state.page.items.length">当前范围没有作业，不代表整个租户没有导出</p><ul class="job-cards"><li v-for="job in state.page.items" :key="job.id"><h3>{{statusText(job.status)}}</h3><small>{{job.id}} · v{{job.version}}</small><p>{{displayTime(job.created_at)}}（Asia/Shanghai）</p><p>筛选文本 {{valueText(job.filters.query)}}</p><button type="button" :disabled="busy" @click="select(job.id)">读取当前进度</button></li></ul><button type="button" :disabled="busy||!state.page.has_more" @click="browse(true)">下一页本人作业</button></template>
   </section>
   <section v-if="state.selected" class="panel current-export"><h2>4. 独立回读的当前进度</h2><h3>{{statusText(state.selected.status)}}</h3><p>{{state.selected.id}} · v{{state.selected.version}} · 已登记领取 {{state.selected.attempts}} 次</p><p>更新时间 {{displayTime(state.selected.updated_at)}}（Asia/Shanghai）；Worker在线未知</p><p>类型 {{valueText(state.selected.filters.type)}} · 状态 {{valueText(state.selected.filters.status)}}</p><p>站点 {{valueText(state.selected.filters.site_id)}} · 文本 {{valueText(state.selected.filters.query)}}</p>
-   <p v-if="!state.selected.prepared" class="no-preparation">没有准备描述，行数与文件大小未知；不显示为0行成功</p><div v-else class="prepared-descriptor"><h3>已保存的准备描述，不是可下载文件</h3><p>{{state.selected.prepared.row_count}} 行{{state.selected.prepared.row_count===0?'（明确空结果）':''}} · {{state.selected.prepared.size_bytes}} 字节</p><p>生成 {{displayTime(state.selected.prepared.generated_at)}}（Asia/Shanghai）</p><small>文件SHA256 {{state.selected.prepared.file_sha256}}</small><small>筛选SHA256 {{state.selected.prepared.selection_sha256}}</small></div>
-   <p v-if="state.selected.error_code" class="warning" role="alert">{{errorText(state.selected.error_code)}}；失败不删除原请求或已准备描述</p><p class="warning">OSS尚未由本次读取核验；发布未实现，下载未授权。没有下载或自动恢复入口</p>
+   <p v-if="!state.selected.prepared" class="no-preparation">没有准备描述，行数与文件大小未知；不显示为0行成功</p><div v-else class="prepared-descriptor"><h3>已保存的文件准备信息</h3><p>{{state.selected.prepared.row_count}} 行{{state.selected.prepared.row_count===0?'（明确空结果）':''}} · {{state.selected.prepared.size_bytes}} 字节</p><p>生成 {{displayTime(state.selected.prepared.generated_at)}}（Asia/Shanghai）</p><small>文件SHA256 {{state.selected.prepared.file_sha256}}</small><small>筛选SHA256 {{state.selected.prepared.selection_sha256}}</small></div>
+   <p v-if="state.selected.error_code" class="warning" role="alert">{{errorText(state.selected.error_code)}}；失败不删除原请求或已准备描述</p><AssetExportPublicationPanel ref="publicationPanel" :job-id="state.selected.id" :job-version="state.selected.version" @changed="select(state.selected!.id)" />
   </section>
  </template></section>
 </template>

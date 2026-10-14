@@ -17,6 +17,26 @@ const validates = (name, value) => {
   return check(value);
 };
 const id = (digit) => `${digit.repeat(8)}-${digit.repeat(4)}-4${digit.repeat(3)}-8${digit.repeat(3)}-${digit.repeat(12)}`;
+test('导出发布必须显式确认文件摘要和当前版本，原准备受理仍独立',()=>{
+  const input={expected_version:2,file_sha256:'a'.repeat(64),action:'PUBLISH_PREPARED_FILE'};
+  assert.ok(validates('AssetExportPublishInput',input));
+  for(const patch of [{expected_version:0},{action:'PUBLISH_ALL'},{file_sha256:'bad'},{tenant_id:id('1')}])assert.equal(validates('AssetExportPublishInput',{...input,...patch}),false);
+  assert.equal(contract.paths['/asset-export-jobs/{id}/publication'].post['x-mop-current-membership-before-replay'],true);
+  assert.ok(contract.paths['/asset-export-jobs/{id}/content-grants'].post.parameters.some(x=>x.name==='X-CSRF-Token'));
+});
+test('导出发布读回不把未准备、未发布或关闭配置伪装成可下载',()=>{
+  const p={job_id:id('1'),tenant_id:id('2'),created_by:id('3'),permission_version:1,version:2,status:'NOT_PUBLISHED',prepared:true,file_sha256:'a'.repeat(64),size_bytes:20,row_count:0,stored_at:null,observed_at:'2026-10-14T00:00:00Z',publication_enabled:true,download_grant_available:false,notification_sent:false,source:'postgresql'};
+  assert.ok(validates('AssetExportPublication',p));
+  for(const patch of [{prepared:false},{status:'PUBLISHED'},{download_grant_available:true},{notification_sent:true}])assert.equal(validates('AssetExportPublication',{...p,...patch}),false);
+  assert.ok(validates('AssetExportPublication',{...p,status:'PUBLISHED',stored_at:p.observed_at,download_grant_available:true}));
+  assert.equal(validates('AssetExportPublication',{...p,status:'PUBLISHED',stored_at:p.observed_at,publication_enabled:false,download_grant_available:true}),false);
+});
+test('导出链接仅允许平台路径，下载使用二次授权及附件类型',()=>{
+  const data={job_id:id('1'),content_url:`/api/v1/asset-export-jobs/${id('1')}/content?grant=1791936900000.${'a'.repeat(43)}`,expires_at:'2026-10-14T00:15:00Z',size_bytes:20,file_sha256:'a'.repeat(64)};
+  assert.ok(validates('AssetExportDownloadGrantResult',{data,trace_id:'test'}));
+  assert.equal(validates('AssetExportDownloadGrantResult',{data:{...data,content_url:'https://example.test/object'},trace_id:'test'}),false);
+  const op=contract.paths['/asset-export-jobs/{id}/content'].get;assert.equal(op['x-mop-store-before-and-after-authorization'],true);assert.ok(op.responses[200].content['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
+});
 const timestamp = '2026-10-01T05:00:00.000Z';
 const facts = { purpose: 'customer_report_photo', scan_status: 'UNSCANNED', retention_until: null, production_approval: 'UNVERIFIED', policy_source: 'USER_DEVELOPMENT_DIRECTION' };
 const photo = {
@@ -208,7 +228,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.46.0');
+  assert.equal(contract.info.version, '0.47.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];

@@ -7,7 +7,7 @@ import java.util.function.Function;
 /** Operator configuration only. API callers cannot select endpoints, buckets or credentials. */
 public record MinioStorageSettings(String endpoint, String bucket, String accessKey, String secretKey,
                                    String region, Scope scope) {
-    public enum Scope { PHOTOS, IMPORTS }
+    public enum Scope { PHOTOS, IMPORTS, EXPORTS }
     public MinioStorageSettings {
         Objects.requireNonNull(scope);
         try {
@@ -26,6 +26,9 @@ public record MinioStorageSettings(String endpoint, String bucket, String access
         Objects.requireNonNull(env); Objects.requireNonNull(scope);
         if (!"true".equalsIgnoreCase(env.apply("OBJECT_STORAGE_ENABLED"))
                 || !"minio".equals(env.apply("OBJECT_STORAGE_PROVIDER"))) throw invalid();
+        if (scope == Scope.EXPORTS) return new MinioStorageSettings(env.apply("OBJECT_STORAGE_ENDPOINT"),
+                env.apply("OBJECT_STORAGE_EXPORT_BUCKET"), env.apply("OBJECT_STORAGE_EXPORT_ACCESS_KEY"),
+                env.apply("OBJECT_STORAGE_EXPORT_SECRET_KEY"), env.apply("OBJECT_STORAGE_REGION"), scope);
         String capability = scope == Scope.PHOTOS ? "PHOTO" : "IMPORT";
         String legacy = scope == Scope.PHOTOS ? "MOP_S3_" : "MOP_IMPORT_S3_";
         return new MinioStorageSettings(first(env,"OBJECT_STORAGE_ENDPOINT",legacy+"ENDPOINT"),

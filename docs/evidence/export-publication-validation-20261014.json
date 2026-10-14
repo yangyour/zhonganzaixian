@@ -1,0 +1,409 @@
+{
+  "verified_at": "2026-10-14T04:37:18.049820+00:00",
+  "environment": "lan-test-20261008",
+  "api_version": "0.47.0",
+  "schema_version": 30,
+  "new_migrations": 0,
+  "candidate_api_sha256": "05386891e23728b23f004d9e0e22ca01cb8d8669b3181050f2986b93ddd3103f",
+  "public_site_deployment": "RECORDED_SEPARATELY_AFTER_DEPLOYMENT",
+  "java_tests_by_class": {
+    "PostgresAssetExportRepositoryIntegrationTest": {
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PostgresAssetExportPrepareIntegrationTest": {
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PostgresAssetExportPublicationIntegrationTest": {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "MinioAssetExportRemoteTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "MinioAssetExportStoreTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "MinioStorageSettingsTest": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "AssetExportDownloadGrantTest": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "AssetExportJobControllerTest": {
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "AssetExportPublicationControllerTest": {
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "AssetExportJobStateTest": {
+      "tests": 31,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "unique_related_java_tests": 127,
+  "actual_postgresql_tests": 47,
+  "actual_minio_tests": 3,
+  "isolated_related_java_tests": 77,
+  "http_checks": [
+    {
+      "label": "csrf_padmin",
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "label": "login_padmin",
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "label": "csrf_msp",
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "label": "login_msp",
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "label": "csrf_tadmin",
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "label": "login_tadmin",
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "label": "csrf_viewerA",
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "label": "login_viewerA",
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "label": "csrf_viewerB",
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "label": "login_viewerB",
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "label": "csrf_reviewer",
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "label": "login_reviewer",
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "label": "source_asset_scope",
+      "path": "/assets",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "label": "create_scoped_fake_asset",
+      "path": "/assets",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "label": "accept_preparation",
+      "path": "/asset-export-jobs",
+      "method": "POST",
+      "status": 202
+    },
+    {
+      "label": "queued_not_published",
+      "path": "/asset-export-jobs/{id}/publication",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "label": "prepared_not_published",
+      "path": "/asset-export-jobs/{id}/publication",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "label": "csrf_missing_rejected",
+      "path": "/asset-export-jobs/{id}/publication",
+      "method": "POST",
+      "status": 403
+    },
+    {
+      "label": "customer_cannot_publish",
+      "path": "/asset-export-jobs/{id}/publication",
+      "method": "POST",
+      "status": 403
+    },
+    {
+      "label": "other_creator_hidden",
+      "path": "/asset-export-jobs/{id}/publication",
+      "method": "GET",
+      "status": 404
+    },
+    {
+      "label": "scope_override_rejected",
+      "path": "/asset-export-jobs/{id}/publication",
+      "method": "POST",
+      "status": 400
+    },
+    {
+      "label": "active_preparation_not_stolen",
+      "path": "/asset-export-jobs/{id}/publication",
+      "method": "POST",
+      "status": 409
+    },
+    {
+      "label": "publish",
+      "path": "/asset-export-jobs/{id}/publication",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "label": "same_publish_key_original_receipt",
+      "path": "/asset-export-jobs/{id}/publication",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "label": "new_key_stale_version_rejected",
+      "path": "/asset-export-jobs/{id}/publication",
+      "method": "POST",
+      "status": 409
+    },
+    {
+      "label": "first_grant",
+      "path": "/asset-export-jobs/{id}/content-grants",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "label": "same_grant_key_does_not_extend_expiry",
+      "path": "/asset-export-jobs/{id}/content-grants",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "label": "real_signed_download",
+      "path": "/asset-export-jobs/{id}/content",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "label": "tampered_signature_rejected",
+      "path": "/asset-export-jobs/{id}/content",
+      "method": "GET",
+      "status": 404
+    },
+    {
+      "label": "missing_grant_rejected",
+      "path": "/asset-export-jobs/{id}/content",
+      "method": "GET",
+      "status": 400
+    },
+    {
+      "label": "duplicate_grant_rejected",
+      "path": "/asset-export-jobs/{id}/content",
+      "method": "GET",
+      "status": 400
+    },
+    {
+      "label": "customer_download_rejected",
+      "path": "/asset-export-jobs/{id}/content",
+      "method": "GET",
+      "status": 403
+    },
+    {
+      "label": "other_creator_download_hidden",
+      "path": "/asset-export-jobs/{id}/content",
+      "method": "GET",
+      "status": 404
+    },
+    {
+      "label": "anonymous_download_rejected",
+      "path": "/asset-export-jobs/{id}/content",
+      "method": "GET",
+      "status": 401
+    },
+    {
+      "label": "grant_body_scope_override_rejected",
+      "path": "/asset-export-jobs/{id}/content-grants",
+      "method": "POST",
+      "status": 400
+    },
+    {
+      "label": "expiry_fresh_csrf",
+      "method": "GET",
+      "path": "/api/v1/auth/csrf",
+      "status": 200
+    },
+    {
+      "label": "expiry_same_owner_login",
+      "method": "POST",
+      "path": "/api/v1/auth/local/login",
+      "status": 200
+    },
+    {
+      "label": "unaltered_original_link_after_real_900_seconds",
+      "method": "GET",
+      "path": "/api/v1/asset-export-jobs/{id}/content",
+      "status": 404
+    },
+    {
+      "label": "switch_only_verification_session",
+      "method": "POST",
+      "path": "/api/v1/session/tenant",
+      "status": 200
+    },
+    {
+      "label": "cross_tenant_publication_hidden",
+      "method": "GET",
+      "path": "/api/v1/asset-export-jobs/{id}/publication",
+      "status": 404
+    },
+    {
+      "label": "cross_tenant_content_hidden",
+      "method": "GET",
+      "path": "/api/v1/asset-export-jobs/{id}/content",
+      "status": 404
+    },
+    {
+      "label": "restore_only_verification_session",
+      "method": "POST",
+      "path": "/api/v1/session/tenant",
+      "status": 200
+    }
+  ],
+  "http_check_count": 42,
+  "natural_expiry": {
+    "verified_at": "2026-10-14T04:27:11.680283+00:00",
+    "original_expires_at": "2026-10-14T04:25:19.969Z",
+    "elapsed_seconds_since_issue": 1011.711,
+    "http_status": 404,
+    "unaltered_original_link": true,
+    "server_clock_changed": false
+  },
+  "xlsx": {
+    "data_rows": 1,
+    "columns": 16,
+    "size_bytes": 4957,
+    "sha256": "5a596e1dfe3071bff0ebdf8d5163062855d4173362e1164ab6362fb6c607337c",
+    "actual_worker": true,
+    "stored_in_minio": true,
+    "http_download_verified": true,
+    "scope": "ONE_EXPLICITLY_NAMED_SYNTHETIC_ASSET"
+  },
+  "namespace": {
+    "environment": "lan-test-20261008",
+    "bucket": "mop-test-asset-exports",
+    "project_ownership_verified": true,
+    "restricted_operations_denied": [
+      "delete",
+      "outside_prefix",
+      "other_bucket"
+    ],
+    "existing_buckets_policies_unchanged": true,
+    "credentials_output": false
+  },
+  "contracts": {
+    "tests": 130,
+    "passed": 130,
+    "generated_consistent": true
+  },
+  "frontend": {
+    "full_tests": 1851,
+    "passed": 1851,
+    "files": 117,
+    "typecheck": true,
+    "build": true,
+    "browser": "Microsoft Edge 155.0.4283.45",
+    "desktop_width": 1440,
+    "mobile_width": 390,
+    "mobile_document_width": 390,
+    "page_errors_observed": 0,
+    "actual_desktop_and_mobile_download": true,
+    "actual_committed_publication_response_dropped_and_original_request_recovered": true,
+    "actual_grant_response_dropped_and_original_request_recovered": true,
+    "uncertain_navigation_blocked": true,
+    "physical_phone_or_wechat_tested": false
+  },
+  "not_completed": [
+    "automatic_preparation_scheduling",
+    "in_app_notification_delivery",
+    "full_M3_7_acceptance",
+    "all_128_contract_requirements",
+    "process_crash_during_real_object_store_io"
+  ],
+  "failures_retained": [
+    "PowerShell Maven argument splitting before tests",
+    "SDK boxed length compilation",
+    "test Access ambiguous import",
+    "Spring publication repository injection ambiguity; corrected with Qualifier and context test",
+    "obsolete preparation-only UI assertions updated",
+    "browser selectors mistook menuitems for links or did not paginate to owned job; corrected using observed visible controls",
+    "obsolete two-menu source assertions and jsdom file URL paths updated"
+  ],
+  "private_log_sha256": {
+    "export-publication-related-tests-r2.log": "023c0933f645be75a345087503510567a6cd3cc41d1b7f2e7f745ce1eae556f8",
+    "export-publication-regression.log": "a197712d09460cc3d11a9d4285b2bf2c37cd0f11c27132c989608a1371ec84bb",
+    "export-publication-wiring-tests.log": "317e357c3d6f97b1aed209ebbfecf56efa720f833de07faafdc1f3fc848f3929",
+    "export-publication-contract-tests-final.log": "98dbdb57d750819fe20507639f7db9a50a853bdb6fa83346a6a4ebcd3b1c6554",
+    "horizontal-menu-web-full-final.log": "8cf49dc8c22a31eda984d4118eda348f079155350135268cd98a822c26f06767",
+    "horizontal-menu-focused-final.log": "8cbaf29aea68907f1dafe90c5819c1864689600e3da66aff0dde4937660a667a",
+    "horizontal-menu-build-release.log": "8b5ac5125c8c5bd3a3d58df6b17c70ac248092900eea6f1470e0f1c6f19b47af"
+  },
+  "credentials_output": false,
+  "formal_contract_acceptance": "NOT_RUN"
+}

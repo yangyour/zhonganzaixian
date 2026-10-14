@@ -431,8 +431,10 @@
       "local_references": [
         "docs/asset-export-job-state.md",
         "docs/asset-export-jobs.md",
+        "docs/asset-export-publication.md",
         "docs/asset-export-snapshot.md",
         "docs/asset-ledger-export-encoding.md",
+        "docs/evidence/export-publication-validation-20261014.json",
         "docs/evidence/niko-export-api-20261004.json",
         "docs/evidence/niko-export-client-20261004.json",
         "docs/evidence/niko-export-page-20261004.json",
@@ -1443,6 +1445,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "d99ad73f1cea7adf13ecdd5b70d2708fe0da993e85df5499f34384beacb6b7b2"
+    "doc/development/07_合同逐项开发追踪.md": "edfe7d2b48434c113c421eca05e3ec8d505d44c759a968cc7f591b0c653e72c8"
   }
 }

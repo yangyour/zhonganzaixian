@@ -151,7 +151,7 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
 </script>
 <template>
   <section>
-    <div class="page-heading"><div><span class="eyebrow">RESOURCE / ASSETS</span><h1>资产管理</h1><p>管理当前租户的资产台账，查看来源与接入状态。</p></div><div class="assets-heading-actions"><PermissionGate capability="assets:write"><el-button type="primary" @click="openCreate">＋ 创建资产草稿</el-button><el-button v-if="metadataAllowed" plain @click="metadataQueryOpen = true">手工资料筛选</el-button><PermissionGate capability="asset_dates:read"><el-button plain @click="dateQueryOpen = true">维保与超期日期筛选</el-button></PermissionGate><el-button v-if="importAllowed" plain @click="importOpen = true">导入资产来源</el-button></PermissionGate></div></div>
+    <div class="page-heading"><div><h1>资产管理</h1><p>管理当前租户的资产台账，查看来源与接入状态。</p></div><div class="assets-heading-actions"><PermissionGate capability="assets:write"><el-button type="primary" @click="openCreate">＋ 创建资产草稿</el-button><el-button v-if="metadataAllowed" plain @click="metadataQueryOpen = true">手工资料筛选</el-button><PermissionGate capability="asset_dates:read"><el-button plain @click="dateQueryOpen = true">维保与超期日期筛选</el-button></PermissionGate><el-button v-if="importAllowed" plain @click="importOpen = true">导入资产来源</el-button></PermissionGate></div></div>
     <div class="scope-card"><div><span class="small-label">当前租户</span><strong>{{ session?.tenant.name }}</strong></div><div><span class="small-label">本页资产</span><strong>{{ loading || error ? '—' : rows.length }} <small>个</small></strong></div><div class="scope-explanation"><span class="scope-dot" /><span>测试数据和手动草稿尚未接入真实采集，采样时间和指标暂缺；状态“未知”不表示设备正常。</span></div></div>
     <div class="panel">
       <el-form class="filter-form" :inline="true" @submit.prevent="applyFilters">

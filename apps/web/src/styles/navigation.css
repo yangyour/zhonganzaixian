@@ -1,20 +1,53 @@
-.horizontal-shell .main-layout{margin-left:0;width:100%;min-width:0}
-.horizontal-shell .app-header{position:sticky;top:0;z-index:30;background:#fff;box-shadow:0 2px 8px #1e4f8308}
-.horizontal-shell .topbar{min-height:72px;padding:12px 30px;border-bottom:1px solid #edf2f8;gap:20px}
-.horizontal-shell .topbar .brand{height:auto;padding:0;border:0;flex-shrink:0;gap:11px;min-height:44px}
-.horizontal-shell .topbar-controls{flex-wrap:wrap;justify-content:flex-end;gap:14px;min-width:0}
-.horizontal-shell .topbar-controls .el-button{min-height:36px}
-.module-navigation{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;padding:0 18px;background:#fff;border-bottom:1px solid #e6edf6}
-.module-menu.el-menu--horizontal{--el-menu-horizontal-height:50px;width:max-content;min-width:100%;border:0!important;gap:6px}
-.module-menu.el-menu--horizontal>.el-sub-menu>.el-sub-menu__title{font-size:14px;font-weight:550;padding-left:18px;padding-right:36px;min-height:48px;color:#50657e;border-bottom-width:3px}
-.module-menu.el-menu--horizontal>.el-sub-menu.is-active>.el-sub-menu__title{color:#2878e8;background:#f6f9ff}
-.module-menu .el-sub-menu__title:focus-visible{outline:2px solid #2878e8;outline-offset:-4px}
-.module-submenu-popper .el-menu{min-width:208px;max-height:min(60vh,440px);overflow-y:auto;padding:6px}
-.module-submenu-popper .el-menu-item{min-height:44px;border-radius:5px;padding:0 14px!important}
-.module-submenu-popper .el-menu-item.is-active{background:#edf4ff}
-.horizontal-shell .page-context{padding:11px 30px;background:#f9fbfd;border-bottom:1px solid #eaf0f7}
-.horizontal-shell .page-context .el-breadcrumb{line-height:1.6;white-space:normal}
-.horizontal-shell .content{max-width:1800px;width:100%;margin:0 auto}
-@media(min-width:1500px){.horizontal-shell .topbar{padding-left:40px;padding-right:40px}.horizontal-shell .module-navigation{padding-left:28px;padding-right:28px}.horizontal-shell .page-context{padding-left:40px;padding-right:40px}}
-@media(max-width:900px){.horizontal-shell .topbar{padding:10px 20px;flex-wrap:wrap;gap:8px 16px}.horizontal-shell .topbar-controls{gap:8px}.horizontal-shell .topbar .brand strong{font-size:14px}.horizontal-shell .page-context{padding:9px 20px}}
-@media(max-width:600px){.horizontal-shell .topbar{padding:10px 16px;min-height:0}.horizontal-shell .topbar .brand{min-height:40px}.horizontal-shell .topbar .brand-mark{width:30px;height:30px;font-size:21px}.horizontal-shell .topbar-controls{width:100%;justify-content:flex-start;gap:6px 8px}.horizontal-shell .identity{display:none}.horizontal-shell .topbar-controls>.el-button{min-height:44px}.horizontal-shell .identity strong{max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.horizontal-shell .tenant-select{width:136px!important}.horizontal-shell .tenant-name{max-width:136px}.horizontal-shell .module-navigation{padding:0 8px}.module-menu.el-menu--horizontal{--el-menu-horizontal-height:46px;gap:0}.module-menu.el-menu--horizontal>.el-sub-menu>.el-sub-menu__title{font-size:13px;padding-left:13px;padding-right:28px;min-height:44px}.module-menu .el-sub-menu__icon-arrow{right:10px}.horizontal-shell .page-context{padding:8px 16px}.horizontal-shell .environment-strip{font-size:10px}}
+/* Existing horizontal navigation, with one compact context row. */
+.horizontal-shell .main-layout { margin-left: 0; width: 100%; min-width: 0; }
+.horizontal-shell .app-header { position: sticky; top: 0; z-index: 30; background: #fff; border-bottom: 1px solid var(--mop-border); }
+.horizontal-shell .topbar { min-height: 72px; padding: 12px 32px; border-bottom: 1px solid #edf2f8; gap: 20px; }
+.horizontal-shell .topbar .brand { height: auto; padding: 0; border: 0; flex-shrink: 0; gap: 11px; min-height: 44px; }
+.horizontal-shell .brand-mark { box-shadow: none; background: var(--el-color-primary); }
+.horizontal-shell .brand small { font-size: 11px; }
+.horizontal-shell .topbar-controls { flex-wrap: wrap; justify-content: flex-end; gap: 12px; min-width: 0; }
+.horizontal-shell .topbar-controls .el-button { min-height: 36px; }
+.horizontal-shell .tenant-select .el-select__wrapper { border: 1px solid var(--mop-border); background: #fff; }
+.module-navigation { width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; padding: 0 20px; background: #fff; border-bottom: 1px solid var(--mop-border); }
+.module-menu.el-menu--horizontal { --el-menu-horizontal-height: 48px; width: max-content; min-width: 100%; border: 0 !important; gap: 8px; }
+.module-menu.el-menu--horizontal > .el-sub-menu > .el-sub-menu__title { font-size: 14px; font-weight: 550; padding-left: 16px; padding-right: 34px; min-height: 48px; color: #425871; border-bottom-width: 2px; }
+.module-menu.el-menu--horizontal > .el-sub-menu.is-active > .el-sub-menu__title { color: var(--el-color-primary); background: #f1f6fd; }
+.module-menu .el-sub-menu__title:focus-visible { outline: 2px solid var(--mop-focus); outline-offset: -4px; }
+.module-submenu-popper .el-menu { min-width: 220px; max-height: min(60vh,440px); overflow-y: auto; padding: 6px; }
+.module-submenu-popper .el-menu-item { min-height: 44px; border-radius: 6px; padding: 0 14px !important; }
+.module-submenu-popper .el-menu-item.is-active { background: #edf4ff; font-weight: 600; }
+.horizontal-shell .page-context { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 20px; padding: 10px 32px; background: #f8fafc; }
+.horizontal-shell .page-context .el-breadcrumb { line-height: 1.6; white-space: normal; }
+.environment-label { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; line-height: 1.6; color: #64748b; }
+.environment-label .environment-indicator { width: 6px; height: 6px; background: #a36b19; }
+.horizontal-shell .content { max-width: 1800px; width: 100%; margin: 0 auto; padding: 28px 32px 32px; }
+@media (min-width: 1500px) {
+  .horizontal-shell .topbar, .horizontal-shell .page-context { padding-inline: 40px; }
+  .horizontal-shell .module-navigation { padding-inline: 28px; }
+  .horizontal-shell .content { padding-inline: 40px; }
+}
+@media (max-width: 1000px) {
+  .horizontal-shell .topbar { padding: 10px 20px; flex-wrap: wrap; gap: 8px 16px; }
+  .horizontal-shell .topbar-controls { gap: 8px; }
+  .horizontal-shell .topbar .brand strong { font-size: 14px; }
+  .horizontal-shell .page-context { padding: 10px 20px; }
+  .horizontal-shell .content { padding: 24px 20px; }
+}
+@media (max-width: 760px) {
+  .horizontal-shell .app-header { position: static; }
+  .horizontal-shell .topbar { padding: 12px 16px; min-height: 0; }
+  .horizontal-shell .topbar .brand { min-height: 40px; }
+  .horizontal-shell .topbar .brand-mark { width: 32px; height: 32px; font-size: 21px; }
+  .horizontal-shell .topbar-controls { width: 100%; justify-content: flex-start; gap: 6px 8px; }
+  .horizontal-shell .identity { display: none; }
+  .horizontal-shell .topbar-controls > .el-button { min-height: 44px; }
+  .horizontal-shell .tenant-select { width: 136px !important; }
+  .horizontal-shell .tenant-name { max-width: 136px; }
+  .horizontal-shell .module-navigation { padding: 0 8px; }
+  .module-menu.el-menu--horizontal { --el-menu-horizontal-height: 46px; gap: 0; }
+  .module-menu.el-menu--horizontal > .el-sub-menu > .el-sub-menu__title { font-size: 13px; padding-left: 13px; padding-right: 28px; min-height: 44px; }
+  .module-menu .el-sub-menu__icon-arrow { right: 10px; }
+  .horizontal-shell .page-context { padding: 10px 16px; gap: 5px; }
+  .environment-label { width: 100%; font-size: 11px; }
+  .horizontal-shell .content { padding: 20px 16px 28px; }
+}

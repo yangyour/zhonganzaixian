@@ -7,7 +7,7 @@ import LoginPage from '../src/pages/LoginPage.vue'
 import { api, ApiError } from '../src/api/client'
 import type { AuthOptions } from '../src/api/types'
 
-vi.mock('vue-router', () => ({ useRoute: () => ({ query: {} }) }))
+vi.mock('vue-router', () => ({ useRoute: () => ({ query: {} }), useRouter: () => ({ getRoutes: () => [] }) }))
 
 const options: AuthOptions = { mode: 'remote_test', identity_source: 'project_local', local_enabled: true, sso_enabled: false, login_url: null }
 let app: App | undefined, host: HTMLElement

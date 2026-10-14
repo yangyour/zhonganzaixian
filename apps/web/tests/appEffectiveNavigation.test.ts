@@ -4,7 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { createApp, defineComponent, h, nextTick, type App as VueApp } from 'vue'
 import type { Session } from '../src/api/types'
 const navigation = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn(async () => undefined), resolve: vi.fn(({ name }: { name: string }) => ({ href: '/' + name })), getRoutes: vi.fn() }))
-vi.mock('vue-router', async importOriginal => ({ ...await importOriginal<typeof import('vue-router')>(), useRouter: () => navigation, useRoute: () => ({ name: 'access-unavailable', fullPath: '/access-unavailable', meta: { group: '账号', title: '暂无业务权限' }, query: {} }) }))
+vi.mock('vue-router', async importOriginal => ({ ...await importOriginal<typeof import('vue-router')>(), useRouter: () => navigation, useRoute: () => ({ name: 'access-unavailable', path: '/access-unavailable', fullPath: '/access-unavailable', matched: [{}], meta: { group: '账号', title: '暂无业务权限' }, query: {} }) }))
 vi.mock('../src/components/GlobalSearch.vue', () => ({ default: { render: () => null } }))
 import App from '../src/App.vue'
 import { forgetSession, session } from '../src/stores/session'

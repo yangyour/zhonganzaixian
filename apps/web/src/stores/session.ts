@@ -7,15 +7,20 @@ import { routeAllowed } from '../utils/routeAccess'
 export const session = shallowRef<Session | null>(null)
 export const switchingTenant = ref(false)
 export const contextGeneration = ref(0)
+export const sessionExpired = ref(false)
+export const loginReturnPath = ref<string | null>(null)
 let initialized = false
 let contextActionPending = false
 let initialization: Promise<void> | null = null
 export const can = (capability: string) => routeAllowed({ capability }, session.value)
 export const maySwitchTenant = computed(() => Array.isArray(session.value?.allowed_tenants) && session.value.allowed_tenants.length > 1)
 function installSession(value: Session) { session.value = value; api.setCsrfToken(value.csrf_token); initialized = true }
-export function forgetSession() {
+export function forgetSession(expiry?: { reason: 'expired'; path: string }) {
   contextGeneration.value = api.invalidateContext()
   api.setCsrfToken(null); session.value = null; initialized = true
+  sessionExpired.value = expiry?.reason === 'expired'
+  const path = expiry?.path.split(/[?#]/)[0] ?? ''
+  loginReturnPath.value = path.trim() === path && /^\/[a-zA-Z0-9/-]*$/.test(path) && !path.includes('//') ? path : null
 }
 export async function initializeSession() {
   if (initialized) return

@@ -56,7 +56,9 @@ router.beforeEach(async to => {
   if (to.name === 'not-found' && landing === 'access-unavailable') return { name: landing }
   if (!['login','access-unavailable','account','not-found'].includes(String(to.name)) && !routeAllowed(to.meta, session.value)) return { name: landing }
 
-  document.title = `${String(to.meta.title || '管理端')} · MOP`
 })
-router.afterEach(() => { navigating.value = false })
+router.afterEach((to, _from, failure) => {
+  navigating.value = false
+  if (!failure) document.title = `${String(to.meta.title || '管理端')} · MOP`
+})
 router.onError(cause => { navigating.value = false; navigationError.value = cause })

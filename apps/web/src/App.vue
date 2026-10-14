@@ -13,8 +13,9 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import './styles/identity.css'
 import './styles/experience.css'
 import ConnectionNotice from './components/ConnectionNotice.vue'
-import { navigating, navigationError, navigationTarget } from './stores/navigation'
+import { navigating, navigationError, navigationTarget, resourceLoadFailed } from './stores/navigation'
 import { feedback } from './utils/feedback'
+import PageRecoveryNotice from './components/PageRecoveryNotice.vue'
 const route = useRoute()
 const router = useRouter()
 const homeRoute = computed(() => landingRoute(session.value, router.getRoutes()))
@@ -62,7 +63,12 @@ async function endSession() {
   <ConnectionNotice />
   <div class="navigation-progress" :class="{ active: navigating }" aria-hidden="true" />
   <span class="sr-only" role="status">{{ navigating ? '正在打开页面…' : '' }}</span>
-  <router-view v-if="!session" />
+  <template v-if="!session">
+    <PageRecoveryNotice />
+    <ApiErrorNotice v-if="navigationError && !resourceLoadFailed" class="anonymous-navigation-error" :error="navigationError" title="页面暂时未能打开" :retrying="navigating" retry-label="重试打开页面" @retry="retryNavigation" />
+    <section v-if="!route.matched.length && !navigationError && !resourceLoadFailed" class="startup-panel" role="status">正在读取登录状态，请稍候…</section>
+    <router-view />
+  </template>
   <div v-else class="app-shell horizontal-shell">
     <a class="skip-link" href="#main-content">跳过导航，进入主要内容</a>
     <div class="main-layout">
@@ -85,7 +91,8 @@ async function endSession() {
       </div>
       <div class="environment-strip"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '项目测试环境 · 非生产 · 厂商指标待接入' : '历史单元测试夹具 · 不用于联调验收' }}</div>
       <main id="main-content" class="content" tabindex="-1">
-        <ApiErrorNotice :error="navigationError" title="页面暂时未能打开" guidance="当前页面已保留。请检查连接后重试；已提交的操作请先核对结果。" :retrying="navigating" retry-label="重试打开页面" @retry="retryNavigation" />
+        <PageRecoveryNotice />
+        <ApiErrorNotice v-if="!resourceLoadFailed" :error="navigationError" title="页面暂时未能打开" guidance="当前页面已保留。请检查连接后重试；已提交的操作请先核对结果。" :retrying="navigating" retry-label="重试打开页面" @retry="retryNavigation" />
         <ApiErrorNotice :error="error" />
         <div v-if="switchingTenant" class="switching-panel"><el-skeleton :rows="5" animated /><p>正在切换租户，请稍候…</p></div>
         <router-view v-else :key="pageKey" />

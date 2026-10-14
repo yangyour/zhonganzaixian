@@ -1,5 +1,13 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="light"><title>MOP · 网络运维管理</title></head>
-  <body><div id="app"></div><script type="module" src="/src/main.ts"></script></body>
+  <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="light"><link rel="stylesheet" href="/startup.css"><title>MOP · 网络运维管理</title></head>
+  <body>
+    <section id="app-startup" class="startup-panel" aria-labelledby="startup-title">
+      <h1 id="startup-title">正在打开 MOP</h1>
+      <p id="startup-message" role="status">正在加载页面。若长时间没有响应，请检查网络后重新加载。</p>
+      <noscript>此平台需要 JavaScript。请启用后重新加载页面。</noscript>
+      <a href="">重新加载页面</a>
+    </section>
+    <div id="app"></div><script type="module" src="/src/bootstrap.ts"></script>
+  </body>
 </html>

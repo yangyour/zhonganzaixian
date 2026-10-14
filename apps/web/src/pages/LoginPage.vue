@@ -2,11 +2,14 @@
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { ElAlert, ElButton, ElDivider, ElForm, ElFormItem, ElInput, ElTag, type InputInstance } from 'element-plus'
 import { Hide, Lock, User, View } from '@element-plus/icons-vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { api, ApiError, isCancelled } from '../api/client'
 import type { AuthOptions, Session } from '../api/types'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import loginBackground from '../assets/login-datacenter.png'
+import { sessionExpired, loginReturnPath } from '../stores/session'
+import { loginDestination } from '../utils/loginDestination'
+const router = useRouter()
 const route = useRoute(), options = ref<AuthOptions | null>(null), loading = ref(true), submitting = ref(false), error = ref<unknown>(null)
 const username = ref(''), password = ref(''), help = ref(false), controller = new AbortController()
 const usernameInput = ref<InputInstance | null>(null), passwordInput = ref<InputInstance | null>(null), errorNotice = ref<HTMLElement | null>(null)
@@ -53,7 +56,7 @@ async function localLogin() {
     const current = await api.request<Session>('/auth/local/login', { method: 'POST', body: { username: username.value.trim(), password: password.value }, signal: controller.signal })
     if (controller.signal.aborted) return
     if (current.identity_source !== 'project_local' || !current.user?.id || !Array.isArray(current.capabilities)) throw new ApiError(200, 'INVALID_RESPONSE', '暂时无法确认登录状态，请重新登录。', '—')
-    password.value = ''; window.location.assign(current.password_change_required ? '/account' : current.capabilities.includes('assets:read') ? '/assets' : '/account')
+    password.value = ''; window.location.assign(loginDestination(current, loginReturnPath.value, router.getRoutes()))
   } catch (cause) {
     if (!controller.signal.aborted && !isCancelled(cause)) {
       error.value = cause
@@ -87,6 +90,7 @@ function updateCapsLock(event: KeyboardEvent | Event) {
     <section class="login-card" aria-labelledby="login-title">
       <h1 id="login-title">登录 MOP</h1>
       <p class="login-progress" role="status">{{ loading ? '正在连接登录服务…' : submitting ? loginMethod === 'unified' ? '正在打开统一认证页面，请稍候。' : '正在核对账号信息，请稍候。' : '' }}</p>
+      <el-alert v-if="sessionExpired" class="page-note" role="status" title="登录状态已失效，请重新登录。登录后请先核对刚才未确认的提交结果。" type="warning" :closable="false" show-icon />
       <el-alert v-if="oidcFailure" :title="oidcFailure" type="error" :closable="false" show-icon class="page-note" />
       <div v-if="error" ref="errorNotice" class="login-error" tabindex="-1" aria-label="登录未完成">
         <ApiErrorNotice :error="error" :title="errorTitle" :guidance="errorGuidance"><el-button v-if="!options" size="small" :loading="loading" @click="loadOptions">重新连接</el-button></ApiErrorNotice>

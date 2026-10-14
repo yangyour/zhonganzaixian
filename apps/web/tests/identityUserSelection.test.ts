@@ -26,6 +26,18 @@ beforeEach(() => { session.value = structuredClone(auth); switchingTenant.value 
 }) })
 afterEach(() => { app?.unmount(); app = undefined; host?.remove(); session.value = null; vi.restoreAllMocks() })
 function complete(n: number) { pending.get(`/identity/users/${id(n)}/memberships`)!.resolve({ items: [] }); pending.get(`/identity/users/${id(n)}/external-identities`)!.resolve({ items: [] }) }
+it('closes a clean account editor without issuing a mutation', async () => {
+ await mount(); button('新建用户').click(); await settle(); expect(host.querySelector('section.identity-form')).not.toBeNull()
+ button('关闭编辑').click(); await settle(); expect(host.querySelector('section.identity-form')).toBeNull()
+ expect(vi.mocked(api.request).mock.calls.every(([, options]) => !options?.method)).toBe(true)
+})
+it('keeps unsaved input when closing is cancelled and closes only after explicit discard', async () => {
+ await mount(); button('新建用户').click(); await settle(); const field=nameField(); field.value='保留未保存名称'; field.dispatchEvent(new Event('input',{bubbles:true})); await settle()
+ const confirm=vi.spyOn(ElMessageBox,'confirm').mockRejectedValueOnce(new Error('cancel')).mockImplementationOnce(() => Promise.resolve('confirm') as never)
+ button('关闭编辑').click(); await settle(); expect(nameField().value).toBe('保留未保存名称'); expect(confirm).toHaveBeenCalledTimes(1)
+ button('关闭编辑').click(); await settle(); expect(host.querySelector('section.identity-form')).toBeNull(); expect(confirm).toHaveBeenCalledTimes(2)
+ expect(vi.mocked(api.request).mock.calls.every(([, options]) => !options?.method)).toBe(true)
+})
 it('new-user selection cannot be overwritten by a prior user detail response', async () => {
  await mount(); button('管理账号', 0).click(); await settle(); button('新建用户').click(); await settle(); expect(nameField().value).toBe('')
  complete(3); await settle(); expect(nameField().value).toBe(''); expect(host.querySelector('section.identity-form h2')?.textContent).toBe('新建用户')

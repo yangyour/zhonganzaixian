@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import '../styles/adminPrototype.css'
 import { ElTableColumn as ElementTableColumn } from 'element-plus'
 import { computed, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
 import { api } from '../api/client'
@@ -49,14 +50,16 @@ const proofTitle = computed(() => state.value.proof?.status === 'VALID' ? '所�
 onUnmounted(() => workspace.dispose())
 </script>
 <template>
-  <section class="audit-page">
+  <section class="audit-page admin-prototype">
     <div class="page-heading"><div><span class="eyebrow">ADMINISTRATION / AUDIT</span><h1>审计检索与区间校验</h1><p>当前租户授权日志，筛选使用精确值；分页与校验分别保留各自快照边界。</p></div><el-button :loading="state.loading" :disabled="!permitted" @click="refresh">刷新已应用筛选</el-button></div>
-    <el-alert class="page-note" type="info" :closable="false" title="日志保存在项目PostgreSQL。生产留存仍待确认；本页不提供修改、删除或重签名。hash链没有外部可信锚，不等同于WORM或防特权整链重写证明。" />
+    <details class="admin-explainer"><summary>当前租户审计 · 生产留存待确认 · 区间校验不等同于外部可信证明</summary><p>日志保存在项目PostgreSQL。生产留存仍待确认；本页不提供修改、删除或重签名。hash链没有外部可信锚，不等同于WORM或防特权整链重写证明。</p></details>
     <el-empty v-if="!permitted" description="当前身份没有本租户审计权限" />
     <template v-else>
+      <div class="admin-stats"><div class="admin-stat"><span>本页审计记录</span><strong>{{ state.page?.items.length ?? '—' }}</strong><small>当前筛选 · 非历史总数</small></div><div class="admin-stat"><span>查询快照序号上界</span><strong>{{ state.page?.snapshot_sequence ?? '—' }}</strong><small>后续分页沿用已固定上界</small></div><div class="admin-stat"><span>区间校验</span><strong>{{ state.proof ? state.proof.status : '未校验' }}</strong><small>列表与校验独立快照</small></div><div class="admin-stat"><span>本次已校验记录</span><strong>{{ state.proof?.verified_records ?? '—' }}</strong><small>部分区间不代表整链证明</small></div></div>
       <div class="panel">
         <el-form label-position="top" class="audit-filter-grid" @submit.prevent="search">
-          <el-form-item v-for="field in fields" :key="field.key" :label="field.label"><el-input v-model="draft[field.key]" clearable :aria-label="field.label" :placeholder="field.placeholder" /></el-form-item>
+          <el-form-item v-for="field in fields.slice(0, 3)" :key="field.key" :label="field.label"><el-input v-model="draft[field.key]" clearable :aria-label="field.label" :placeholder="field.placeholder" /></el-form-item>
+          <details class="audit-advanced"><summary>更多筛选 · 对象、请求与时间范围</summary><div class="audit-advanced-grid"><el-form-item v-for="field in fields.slice(3)" :key="field.key" :label="field.label"><el-input v-model="draft[field.key]" clearable :aria-label="field.label" :placeholder="field.placeholder" /></el-form-item></div></details>
           <el-form-item label="每页条数"><el-select v-model="pageSize" aria-label="审计每页条数"><el-option v-for="size in [10, 15, 25, 50, 100]" :key="size" :value="size" :label="`${size}条`" /></el-select></el-form-item>
           <div class="audit-actions"><el-button type="primary" native-type="submit" :loading="state.loading">查询并回到第一页</el-button><el-button @click="resetFilters">清空筛选</el-button></div>
         </el-form>
@@ -75,7 +78,7 @@ onUnmounted(() => workspace.dispose())
         <div class="table-footer audit-pagination"><span>{{ state.paged ? '后续页' : '第一页' }} · 本页 {{ state.page?.items.length ?? '—' }} 条 · 序号上界 {{ state.page?.snapshot_sequence ?? '—' }}</span><div class="audit-actions"><el-button :disabled="state.loading || !state.paged" @click="refresh">返回第一页</el-button><el-button :disabled="state.loading || !state.page?.has_more || unapplied" @click="nextPage">下一页</el-button></div></div>
         <p class="field-help">新追加日志不会进入已固定上界的后续页，刷新第一页才能查看。列表仅校验每条本地摘要，不据此宣称整链完整。</p>
       </div>
-      <section class="panel audit-proof-panel">
+      <details class="panel audit-proof-panel" :open="!!state.proof || state.verifying || !!state.proofError"><summary>只读区间校验 · 展开选择序号范围</summary><div class="admin-card-body">
         <h2>只读区间校验</h2><p>校验范围是当前租户完整审计链的序号区间，不受上方筛选条件裁剪；每批最多1000条，包含首尾。</p>
         <el-form label-position="top" class="audit-range-form" @submit.prevent="verifyRange"><el-form-item label="开始序号"><el-input v-model="from" inputmode="numeric" aria-label="审计校验开始序号" /></el-form-item><el-form-item label="结束序号（可留空）"><el-input v-model="to" inputmode="numeric" aria-label="审计校验结束序号" placeholder="留空取本批最多1000条" /></el-form-item><el-button type="primary" native-type="submit" :loading="state.verifying">校验此区间（只读）</el-button></el-form>
         <p v-if="rangeError" role="alert" class="audit-warning">{{ rangeError }}</p><ApiErrorNotice :error="state.proofError" />
@@ -84,12 +87,15 @@ onUnmounted(() => workspace.dispose())
           <el-descriptions :column="1" border class="audit-proof-details"><el-descriptions-item label="当次快照时间">{{ state.proof.checked_at }}</el-descriptions-item><el-descriptions-item label="快照尾序号">{{ state.proof.snapshot_sequence }}</el-descriptions-item><el-descriptions-item label="本次区间">{{ state.proof.from_sequence ?? '无' }} → {{ state.proof.to_sequence ?? '无' }}</el-descriptions-item><el-descriptions-item label="已验证记录数">{{ state.proof.verified_records }}</el-descriptions-item><el-descriptions-item label="校验失败">{{ state.proof.failure }}<span v-if="state.proof.failure_sequence !== null"> · #{{ state.proof.failure_sequence }}</span></el-descriptions-item><el-descriptions-item label="本次是否覆盖快照整链">{{ state.proof.whole_snapshot_chain_checked ? '是，仅此快照且无外部可信锚' : '否，不将部分区间或空记录当作整链证明' }}</el-descriptions-item><el-descriptions-item label="本地前驱摘要"><span class="audit-hash">{{ state.proof.anchor_hash ?? '未取得' }}</span></el-descriptions-item><el-descriptions-item label="本批末尾摘要"><span class="audit-hash">{{ state.proof.final_hash ?? '未取得' }}</span></el-descriptions-item></el-descriptions>
           <el-button :disabled="state.verifying || state.proof.status !== 'VALID' || !state.proof.next_from_sequence" @click="verifyNext">明确校验后续一批</el-button><p class="field-help">每次点击产生独立只读快照，不自动循环，也不把多次快照拼成一个整链证明。校验失败不会自动修复。</p>
         </template>
-      </section>
+      </div></details>
       <el-dialog :model-value="Boolean(selected)" title="审计记录摘要" width="650px" class="audit-record-dialog" @update:model-value="toggleRecord"><template v-if="selected"><p>#{{ selected.sequence }} · {{ selected.action }}</p><p class="audit-hash">记录ID：{{ selected.id }}</p><p class="audit-hash">操作者ID：{{ selected.actor_id ?? '未认证主体' }}</p><p class="audit-hash">前驱：{{ selected.previous_hash }}</p><p class="audit-hash">本条：{{ selected.entry_hash }}</p><p>已将本条序号填入校验表单，需关闭后明确点击校验；查看摘要不会自动发起校验或写动作。</p></template><template #footer><el-button @click="selected = null">关闭</el-button></template></el-dialog>
     </template>
   </section>
 </template>
 <style>
+.admin-prototype.audit-page .el-table .cell{overflow-wrap:anywhere;word-break:break-word;white-space:normal}.admin-prototype.audit-page .el-table .trace-value{white-space:normal;word-break:break-all}.admin-prototype.audit-page .el-table .cell-sub{max-width:100%;overflow-wrap:anywhere}.admin-prototype.audit-page .el-table .el-tag{height:auto;min-height:24px;white-space:normal}.admin-prototype.audit-page .el-table .el-tag__content{white-space:normal;overflow-wrap:anywhere}
+.admin-prototype .audit-filter-grid{grid-template-columns:repeat(3,minmax(0,1fr));padding:16px 18px 0;gap:0 14px}.admin-prototype .audit-filter-grid .el-form-item{margin-bottom:12px}.audit-advanced{grid-column:1/-1;padding:0 0 12px}.audit-advanced-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 14px;margin-top:12px}.admin-prototype .audit-filter-grid>.audit-actions{grid-column:2/-1;justify-content:flex-end}.admin-prototype .panel>.field-help,.admin-prototype .panel>.audit-warning{padding:0 18px}.admin-prototype .audit-proof-panel{margin-top:16px;border-radius:5px}.admin-prototype .audit-proof-panel>summary{padding:15px 18px;color:#3d5b7f;font-size:13px}.admin-prototype .audit-proof-panel[open]>summary{border-bottom:1px solid #e7edf5}@media(max-width:800px){.admin-prototype .audit-filter-grid,.audit-advanced-grid{grid-template-columns:1fr}.admin-prototype .audit-filter-grid>.audit-actions{grid-column:auto;justify-content:flex-start;margin-bottom:14px}}
+
 .audit-filter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px}.audit-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.audit-filter-grid .el-select{width:100%}.audit-warning{color:var(--el-color-warning-dark-2)}.audit-proof-panel{margin-top:24px}.audit-range-form{display:flex;gap:16px;flex-wrap:wrap;align-items:center}.audit-range-form .el-form-item{flex:1;min-width:180px}.audit-proof-details{margin:16px 0}.audit-hash{font-family:monospace;overflow-wrap:anywhere}.audit-record-dialog{max-width:calc(100vw - 24px)}
 @media(max-width:650px){.audit-filter-grid{grid-template-columns:minmax(0,1fr)}.audit-page .el-button{min-height:44px;height:auto;white-space:normal}.audit-page .el-input__wrapper,.audit-page .el-select__wrapper{min-height:44px}.audit-pagination{align-items:flex-start;flex-direction:column;gap:8px}.audit-range-form{display:block}.audit-proof-details .el-descriptions__label{width:110px}.audit-proof-details .el-descriptions__content{overflow-wrap:anywhere}}
 </style>

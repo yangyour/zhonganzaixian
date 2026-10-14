@@ -392,3 +392,5 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 既有niko PG17.11/KC26.2.4/V25不变，普通拥有者守卫重启到固定工件14ebbdd17037c706ee9094f0a8e70fc1e36f1727046dcedc98b8caa0a52a8872；56旧表在6OIDC新登录前完整行等值，无DDL/新账号/凭据/端口/代理。47真实HTTP含旧接口7次合成数据准备写入，新/my/worklogs只GET；成功查询审计序号不变。3父登记/3本人工时/4修订留存，父状态/SLA仍未知；不是团队或经营口径。原服务器与OSS未操作，真实浏览器未验。详见docs/evidence/niko-own-worklog-api-20261004.json。
 
 2026-10-14 长文本界面与列表打磨复用 lan-test-20261008 真实API，本机回环生产前端预览；实际ready接口HTTP200、ready=true、production_ready=false。没有新增基础组件或依赖、迁移、服务重启、业务写入及替代响应。本轮组件版本未重新盘点，不沿用历史版本冒充本轮证据，功能和UI证据见[长文本交互](../reference-ux-textareas-20261014.md)。
+
+2026-10-14 reference-ux前端已按用户授权发布到lan-test-20261008。14个项目服务运行；Web切换之外13服务ID/镜像/启动时间/重启计数保持一致，API、Worker和基础组件均未更新，无迁移。公开91静态文件摘要一致，真实入口11项检查/12个页面视口、ready=true验证通过，production_ready=false保留。见[最终快照](../evidence/reference-ux-20261014/components-final.json)及[部署](../evidence/reference-ux-20261014/frontend-deployment.json)。

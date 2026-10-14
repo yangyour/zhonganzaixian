@@ -1,0 +1,97 @@
+{
+  "verified_at": "2026-10-14T14:16:28.895Z",
+  "environment": "lan-test-20261008",
+  "public_origin": "http://192.168.1.215:10010",
+  "source_commit": "84d5af6138262bf6861eda70ffc034d9a16a36bd",
+  "web_build_id": "8ce6a4d31dba161f253e0b284ba5a286cb9f1ad2c1263394b1c4aaa5e72940a2",
+  "public_asset_hash_checks": 91,
+  "checks": [
+    "public manifest and all 91 assets match verified build with CSP",
+    "public project login and real asset list",
+    "status shortcut preserves unsubmitted keyword",
+    "query empty state and individual filter removal restore real list",
+    "wide table buttons and Home End keyboard reach boundaries",
+    "asset detail return preserves search",
+    "ticket query empty and restore actions",
+    "eight public mobile and narrow page views fit with readable member columns",
+    "public customer report textarea grows shrinks and cancel retains input",
+    "report footer remains visible at 390 and 320 widths",
+    "public read failure stays distinct from empty and explicit refresh recovers"
+  ],
+  "views": [
+    {
+      "path": "/assets",
+      "width": 390,
+      "screenshot": "assets-390.png"
+    },
+    {
+      "path": "/tickets",
+      "width": 390,
+      "screenshot": "tickets-390.png"
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 390,
+      "screenshot": "network-monitoring-390.png"
+    },
+    {
+      "path": "/configurations",
+      "width": 390,
+      "screenshot": "configurations-390.png"
+    },
+    {
+      "path": "/identity/users",
+      "width": 390,
+      "screenshot": "identity-users-390.png"
+    },
+    {
+      "path": "/assets",
+      "width": 320,
+      "screenshot": "assets-320.png"
+    },
+    {
+      "path": "/configurations",
+      "width": 320,
+      "screenshot": "configurations-320.png"
+    },
+    {
+      "path": "/identity/users",
+      "width": 320,
+      "screenshot": "identity-users-320.png"
+    },
+    {
+      "path": "/assets",
+      "width": 1440,
+      "screenshot": "assets-1440.png"
+    },
+    {
+      "path": "/tickets",
+      "width": 1440,
+      "screenshot": "tickets-1440.png"
+    },
+    {
+      "path": "/configurations",
+      "width": 1440,
+      "screenshot": "configurations-1440.png"
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 1440,
+      "screenshot": "network-monitoring-1440.png"
+    }
+  ],
+  "page_errors": [],
+  "non_login_business_writes": [],
+  "readiness": {
+    "status": 200,
+    "ready": true,
+    "production_ready": false
+  },
+  "test_notes": [
+    "Initial Enter while a prior list query was pending was repeated after stable list state.",
+    "Refresh locator initially used visible text instead of its explicit accessibility label; corrected selector passed.",
+    "Early screenshots containing asset or device-option loading states were replaced after actual data settled.",
+    "Physical phone and physical IME not tested."
+  ],
+  "credentials_output": false
+}

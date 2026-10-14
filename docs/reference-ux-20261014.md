@@ -36,4 +36,16 @@ API 路径、DTO、租户授权、CSRF、幂等、乐观锁、审计、数据库
 
 功能分别留证提交：[长文本与弹窗](reference-ux-textareas-20261014.md)、[列表查询](reference-ux-lists-20261014.md)、本记录的宽表与阅读样式。机器记录见[validation.json](evidence/reference-ux-20261014/validation.json)。代表图：[最终台账](evidence/reference-ux-20261014/final-assets-desktop.png)、[手机宽表](evidence/reference-ux-20261014/asset-table-navigation-mobile.png)、[320px长条件](evidence/reference-ux-20261014/asset-long-filter-320.png)。
 
-交付为本地源码/正式构建及GitHub功能提交。本机既有预览入口 `http://127.0.0.1:15174` 继续读取当前 `apps/web/dist` 并连接指定测试API，需要已有项目测试账号。本轮未切换测试站Web发布目录，没有迁移、共享服务变更或生产部署。当前浏览器验收会话结束时关闭；既有预览进程保留供用户查看。
+首次交付为本地源码/正式构建及GitHub功能提交。本机既有预览入口 `http://127.0.0.1:15174` 继续读取当前 `apps/web/dist` 并连接指定测试API，需要已有项目测试账号。首次交付未切换测试站Web发布目录；用户后续明确授权的部署见下节。浏览器验收会话结束时关闭，既有预览进程保留。
+
+## 已部署到指定测试环境
+
+2026-10-14 用户明确要求“部署到测试环境”后，已将前端源码 `84d5af6` 对应的上述构建部署至 [测试入口](http://192.168.1.215:10010)。发布目录 `/opt/mop-lan-test/releases/reference-ux-84d5af613826`；92个上传文件摘要全部核对（91个构建文件及发布清单），公开入口再次逐一核对91个构建文件SHA256和清单构建标识，CSP响应头保留。
+
+仅更新 `WEB_RELEASE_DIR` 并重建项目Web容器，未发布API、Worker或数据库迁移。发布前、发布后及最终快照中，其他13个项目服务的容器实例、镜像、启动时间、重启次数和运行状态完全一致，14个项目服务均运行；ready=true、production_ready=false。组件版本没有因本轮前端部署升级。
+
+实际测试入口完成11项检查与12个页面/视口组合，覆盖登录、真实列表、草稿与状态筛选隔离、空结果恢复、单项清除、详情往返、宽表键盘/按钮、手机报障自动高度与底部按钮、成员列宽、断网后显式刷新。页面异常0、已观察的非登录业务写入0。未提交报障、修改客户规则或将视口仿真算作物理手机验收。截图中的初始加载态与选择器等待失败分别复核并重拍/复验，不算业务失败或首次全部通过。
+
+证据：[发布及前后服务快照](evidence/reference-ux-20261014/frontend-deployment.json)、[测试入口浏览器](evidence/reference-ux-20261014/deployed-browser.json)、[最终服务核对](evidence/reference-ux-20261014/components-final.json)、[已部署台账](evidence/reference-ux-20261014/deployed/assets-desktop.png)、[320px报障表单](evidence/reference-ux-20261014/deployed/report-320.png)。
+
+上一版 `/opt/mop-lan-test/releases/function-prototype-a2c687505297` 保留；回退元信息位于服务器私有目录 `/opt/mop-lan-test/private/reference-ux-84d5af613826`。如需回退，先核对当前Web仍为本轮版本，只恢复 `WEB_RELEASE_DIR` 后以 `--no-deps --pull never web` 启动Web，核对旧构建标识、ready和其他服务状态；不得整份覆盖其他并发更新的环境配置。此次没有触发回退，保留回退材料不等于执行了故障演练。

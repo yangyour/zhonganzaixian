@@ -49,7 +49,7 @@ defineExpose({form,state,acknowledge,locked,filters,change,changeAck,submit,retr
  <el-alert type="warning" :closable="false" show-icon title="先准备台账文件，再明确发布并取得下载链接；站内信通知尚未接通" />
  <p v-if="!permitted" class="panel">当前身份没有内部导出准备权限，或租户正在切换；未展示旧数据</p>
  <template v-else>
-  <form class="panel export-form" @submit.prevent="submit"><h2>1. 核对本次筛选</h2><p>只选择当前租户台账；全部“不限”会选择全部匹配记录。1000行、16MiB文件是技术保护，超限拒绝，不静默截断</p>
+  <form v-form-feedback class="panel export-form" @submit.prevent="submit"><h2>1. 核对本次筛选</h2><p>只选择当前租户台账；全部“不限”会选择全部匹配记录。1000行、16MiB文件是技术保护，超限拒绝，不静默截断</p>
    <fieldset :disabled="locked"><legend>明确的四项条件</legend><div class="filter-grid">
     <label>类型<select aria-label="导出设备类型" :value="form.type" @change="change('type',inputValue($event))"><option value="">不限</option><option v-for="(label,key) in typeLabels" :key="key" :value="key">{{label}}</option></select></label>
     <label>状态<select aria-label="导出设备状态" :value="form.status" @change="change('status',inputValue($event))"><option value="">不限</option><option v-for="(label,key) in statusLabels" :key="key" :value="key">{{label}}</option></select></label>

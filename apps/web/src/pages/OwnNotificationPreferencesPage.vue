@@ -53,7 +53,7 @@ defineExpose({form,state,baseline,editing,dirty,acknowledge,locked,change,toggle
    <p v-if="!state.current">{{state.busy==='read'?'正在读取，是否已有请求未知':state.error?'读取未通过，是否已有请求未知':'尚未读取，是否已有请求未知'}}</p>
    <template v-else><p v-if="!state.current.exists" class="no-preference">当前本人没有已保存请求；没有自动创建默认偏好</p><div v-else-if="state.current.current"><h3>当前版本 v{{state.current.current.version}}</h3><p>{{displayTime(state.current.current.updated_at)}}（Asia/Shanghai）</p><OwnPreferenceFacts :value="state.current.current" /></div><button v-if="writable" type="button" :disabled="busy||workspace.unresolved()" @click="startEditing">{{state.current.exists?'以当前版本开始编辑':'开始新建本人请求草稿'}}</button><p v-else>当前只有读取权限</p></template>
   </section>
-  <form v-if="editing" class="panel preference-form" @submit.prevent="submit"><h2>2. 核对本次请求</h2><p>本次基于 {{baseline?'v'+baseline.version:'尚不存在的本人草稿（v0）'}}；刷新不会悄悄替换编辑基线，版本变化时须重新核对</p>
+  <form v-form-feedback v-if="editing" class="panel preference-form" @submit.prevent="submit"><h2>2. 核对本次请求</h2><p>本次基于 {{baseline?'v'+baseline.version:'尚不存在的本人草稿（v0）'}}；刷新不会悄悄替换编辑基线，版本变化时须重新核对</p>
    <fieldset :disabled="locked"><legend>本人明确请求，允许保留未知</legend><div class="form-grid">
     <label>请求等级<select aria-label="请求通知等级" :value="form.level" @change="change('level',value($event))"><option value="">未知，未指定</option><option value="P1_ONLY">仅P1</option><option value="P1_P2">P1与P2</option><option value="ALL">全部等级</option></select></label>
     <label>渠道请求状态<select aria-label="渠道请求状态" :value="form.channelsMode" @change="change('channelsMode',value($event))"><option value="unknown">未知（null）</option><option value="explicit">明确选择，允许空集合</option></select></label>

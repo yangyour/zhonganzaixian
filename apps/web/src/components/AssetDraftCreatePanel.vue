@@ -46,7 +46,7 @@ defineExpose({state,form,acknowledge,change,ack,submit,retry,editRejected,canLea
   <p class="draft-boundary">仅创建当前租户的手工资产草稿，不自动接入监控。站点须已登记，服务器会重新核验归属</p>
   <p v-if="!permitted" role="alert">当前会话无资产创建权限，或正在切换租户；原范围表单已清除</p>
   <template v-else>
-   <form @submit.prevent="submit"><fieldset :disabled="locked"><legend>明确资产资料</legend>
+   <form v-form-feedback @submit.prevent="submit"><fieldset :disabled="locked"><legend>明确资产资料</legend>
     <label>资产名称<input aria-label="资产名称" :value="form.name" maxlength="100" required @input="change('name',value($event))" /></label>
     <label>设备类型<select aria-label="设备类型" :value="form.type" @change="change('type',value($event))"><option v-for="type in assetTypes" :key="type.value" :value="type.value">{{type.label}}</option></select></label>
     <label>管理 IP<input aria-label="管理 IP" :value="form.management_ip" maxlength="45" required placeholder="IPv4 或 IPv6 字面量" @input="change('management_ip',value($event))" /></label>

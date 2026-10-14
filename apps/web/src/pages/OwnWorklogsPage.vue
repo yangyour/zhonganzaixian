@@ -34,7 +34,7 @@ defineExpose({form,state,dirty,filters,apply,clearFilters,refresh,next,show,more
  <el-alert type="warning" :closable="false" show-icon title="这些是自述记录；缺记录不默认0小时，成本与默认工时待配置。此页只读，不修改工单或工时" />
  <p v-if="!permitted" class="panel no-access">当前没有本人记录读取权限，或租户正在切换；未展示旧数据</p>
  <template v-else>
-  <form class="panel own-filters" @submit.prevent="apply"><h2>明确筛选条件</h2><p>全部留空读取本人记录，不默认本月。时间范围筛选“记录开始时刻”：下界含、上界不含，跨界记录的完整时长不裁剪</p>
+  <form v-form-feedback class="panel own-filters" @submit.prevent="apply"><h2>明确筛选条件</h2><p>全部留空读取本人记录，不默认本月。时间范围筛选“记录开始时刻”：下界含、上界不含，跨界记录的完整时长不裁剪</p>
    <div class="filter-grid"><label>可选工单UUID<input v-model="form.ticket" aria-label="本人工时工单筛选" maxlength="36" placeholder="留空不限工单，不接受他人或租户覆盖" /></label><label>实填类型<select v-model="form.kind" aria-label="本人工时类型筛选"><option value="">全部明确类型</option><option v-for="(label,key) in labels" :key="key" :value="key">{{label}}</option></select></label><label>记录开始下界（含）<input v-model="form.from" aria-label="本人工时开始下界" maxlength="35" placeholder="例如 2026-10-01T00:00:00+08:00" /></label><label>记录开始上界（不含）<input v-model="form.before" aria-label="本人工时开始上界" maxlength="35" placeholder="需与下界同时填写，且严格晚于下界" /></label></div><p class="hint">明确Z/offset与秒，小数最多3位；查询按同一时刻归一化UTC，展示使用Asia/Shanghai</p>
    <p v-if="dirty" class="query-dirty" aria-live="polite">条件已修改，旧结果已清除；请明确应用后读取</p><p v-if="validation" class="validation" role="alert">{{validation}}</p><div class="actions"><button type="submit" :disabled="Boolean(state.busy)">应用条件并读取</button><button type="button" :disabled="Boolean(state.busy)" @click="clearFilters">清除条件并读取</button><button type="button" :disabled="dirty||Boolean(state.busy)||!state.filters" @click="refresh">重新读取已应用条件</button></div>
   </form>

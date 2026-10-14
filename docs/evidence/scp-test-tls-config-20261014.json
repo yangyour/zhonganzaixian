@@ -1,0 +1,1 @@
+{"configuration_status":"CONFIG_PENDING","target":"https://192.168.1.179","api_profile":"JANUS_20180725","enabled":false,"blockers":["DISABLED","MOP_AND_SCP_SCOPE_PENDING"],"integration_ready":false,"http_requests_sent":0,"credentials_output":false,"tls_trust_verified":false,"source_identity_verified":false,"tls_mode":"TEST_INSECURE","certificate_verification_enabled":false}

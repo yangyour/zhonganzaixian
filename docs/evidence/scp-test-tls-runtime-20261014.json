@@ -1,0 +1,34 @@
+{
+  "checked_at": "2026-10-14T07:48:54.254765156Z",
+  "target": "https://192.168.1.179",
+  "device": "scp",
+  "strict_before": {
+    "authenticated": false,
+    "state": "TLS_NOT_VERIFIED"
+  },
+  "selected_mode": {
+    "tls_mode": "TEST_INSECURE",
+    "certificate_verification_enabled": false,
+    "tls_trust_verified": false,
+    "authenticated": true,
+    "protected_read_verified": false,
+    "resource_metrics_verified": false,
+    "state": "ACCESS_DENIED"
+  },
+  "strict_after": {
+    "authenticated": false,
+    "state": "TLS_NOT_VERIFIED"
+  },
+  "integration_ready": false,
+  "background_collection_enabled": false,
+  "resource_writes": 0,
+  "credentials_output": false,
+  "environment": "lan-test-20261008",
+  "source": "designated_test_server",
+  "artifact_sha256": "878e30b2a98ce11097e9ff0fe5d20ec1ef81047189d674c6e99bc947f9665a2f",
+  "artifact_release": "/opt/mop-lan-test/releases/device-tls-878e30b2a98c",
+  "checker_exit_code": 2,
+  "application_restarted": false,
+  "database_migrations": 0,
+  "verified_at": "2026-10-14T07:48:56.410834+00:00"
+}

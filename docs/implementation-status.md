@@ -1,5 +1,7 @@
 # MOP 实施状态
 
+2026-10-14已将临时证书跳过实现为SCP/AF实际Java客户端的TEST_INSECURE配置，94Java及3工具用例通过；同JVM严格→测试→严格真实验证完成，例外仅两个固定地址。SCP认证成功但ACCESS_DENIED，AF登录成功但PASSWORD_EXPIRED，均未伪造资源指标或启动后台轮询；只发布独立检查工件，无API/Web重启或数据库迁移，当前API0.48/V31保持。见[实现及证据](device-test-tls-mode.md)。
+
 ## 2026-10-14 导出消息与安全基线已部署
 
 590a76e已在10010入口部署API/Web，13服务/V31就绪，其他11服务生命周期不变。79Java、1919前端、133契约、16发布/安全策略检查通过；56候选HTTP、候选重启、真实918秒自然到期及公开桌面/390px实际下载留证。CSP/安全头、HTML no-cache及静态gzip也已在公开入口验证，未宣称HTTPS或生产就绪。见[功能和剩余门禁](export-inbox.md)、[部署证据](evidence/export-inbox-deployment-20261014.json)。

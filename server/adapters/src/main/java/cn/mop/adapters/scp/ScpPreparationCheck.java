@@ -14,6 +14,7 @@ public final class ScpPreparationCheck {
         report.put("target",settings.baseUrl.toString());report.put("api_profile","JANUS_20180725");report.put("enabled",settings.enabled);
         report.put("blockers",problems);report.put("integration_ready",false);report.put("http_requests_sent",0);
         report.put("credentials_output",false);report.put("tls_trust_verified",false);report.put("source_identity_verified",false);
+        report.put("tls_mode",settings.tls.name());report.put("certificate_verification_enabled",settings.tls!=ScpSettings.Tls.TEST_INSECURE);
         return Collections.unmodifiableMap(report);
     }
     public static void main(String[] args){

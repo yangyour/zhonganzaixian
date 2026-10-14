@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-14已将临时证书跳过实现为SCP/AF实际Java客户端的TEST_INSECURE配置，94Java及3工具用例通过；同JVM严格→测试→严格真实验证完成，例外仅两个固定地址。SCP认证成功但ACCESS_DENIED，AF登录成功但PASSWORD_EXPIRED，均未伪造资源指标或启动后台轮询；只发布独立检查工件，无API/Web重启或数据库迁移，当前API0.48/V31保持。见[实现及证据](../device-test-tls-mode.md)。
+
 2026-10-14导出消息API0.48/Web已部署，V31/0启动迁移。13服务在候选及本机验证进程清理后就绪；除API/Web外11服务镜像/启动时间/重启计数不变，复用PG/MinIO及原队列。Web安全头/静态gzip已生效，HTTPS/Secure Cookie与生产就绪仍未据此完成。见[最终盘点](../evidence/export-inbox-components-final-20261014.json)和[部署](../evidence/export-inbox-deployment-20261014.json)。
 
 ## 2026-10-14 导出消息复用与V31

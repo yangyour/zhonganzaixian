@@ -8,7 +8,7 @@ import java.util.function.Function;
 /** Explicit private configuration references. Reading/validating this object performs no I/O. */
 public final class ScpSettings {
     public enum Auth {PASSWORD,EC2}
-    public enum Tls {SYSTEM,CA_FILE}
+    public enum Tls {SYSTEM,CA_FILE,TEST_INSECURE}
     public final URI baseUrl;
     public final boolean enabled;
     public final String tenantId,assetId,poolId,projectId,region,service,usernameRef,passwordRef,accessKeyRef,secretKeyRef,caFileRef,publicKeyApi;
@@ -24,6 +24,7 @@ public final class ScpSettings {
         for(String value:Arrays.asList(region,service))if(value!=null&&!value.matches("[a-z0-9-]{1,64}"))throw ScpProtocol.fail("INVALID_EC2_SCOPE");
         String mode=optional(root,"auth_mode");auth=mode==null?null:Auth.valueOf(mode);
         tls=Tls.valueOf(ScpProtocol.requiredText(root,"tls_mode",20));
+        if(tls==Tls.TEST_INSECURE&&!Set.of("https://192.168.1.179","https://192.168.1.179:443").contains(baseUrl.toString()))throw ScpProtocol.fail("TEST_TLS_TARGET_NOT_APPROVED");
         usernameRef=reference(root,"username_ref");passwordRef=reference(root,"password_ref");accessKeyRef=reference(root,"access_key_ref");secretKeyRef=reference(root,"secret_key_ref");caFileRef=reference(root,"ca_file_ref");
         publicKeyApi=optional(root,"public_key_api");if(publicKeyApi!=null&&!Set.of("V1","V2").contains(publicKeyApi))throw ScpProtocol.fail("INVALID_PUBLIC_KEY_API");
         JsonNode legacy=root.get("legacy_cookie_required");if(!legacy.isNull()&&!legacy.isBoolean())throw ScpProtocol.fail("INVALID_COOKIE_POLICY");legacyCookieRequired=legacy.isNull()?null:legacy.booleanValue();
@@ -38,9 +39,14 @@ public final class ScpSettings {
         }catch(ScpProtocol.Failure failure){throw failure;}catch(Exception failure){throw ScpProtocol.fail("INVALID_CONFIGURATION");}
     }
     public List<String> problems(Function<String,String> resolver){
+        List<String> problems=new ArrayList<>(connectionProblems(resolver));
+        if(tenantId==null||assetId==null||poolId==null||projectId==null)problems.add("MOP_AND_SCP_SCOPE_PENDING");
+        return List.copyOf(problems);
+    }
+    /** Connection diagnostics do not invent a resource scope or permit resource-page reads. */
+    public List<String> connectionProblems(Function<String,String> resolver){
         List<String> problems=new ArrayList<>();
         if(!enabled)problems.add("DISABLED");
-        if(tenantId==null||assetId==null||poolId==null||projectId==null)problems.add("MOP_AND_SCP_SCOPE_PENDING");
         if(auth==null){problems.add("AUTH_MODE_PENDING");problems.add("READ_ONLY_CREDENTIALS_PENDING");}
         if(auth==Auth.PASSWORD){if(!present(usernameRef,resolver)||!present(passwordRef,resolver))problems.add("READ_ONLY_CREDENTIALS_PENDING");if(publicKeyApi==null)problems.add("PUBLIC_KEY_API_VERSION_PENDING");}
         if(auth==Auth.EC2){if(!present(accessKeyRef,resolver)||!present(secretKeyRef,resolver))problems.add("READ_ONLY_CREDENTIALS_PENDING");if(region==null||service==null)problems.add("EC2_SIGNING_SCOPE_PENDING");}

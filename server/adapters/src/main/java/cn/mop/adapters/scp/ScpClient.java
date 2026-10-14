@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.function.Function;
 
 /** Internal adapter only. Construction does not authenticate or start a polling worker. */
-public final class ScpClient {
+public final class ScpClient implements AutoCloseable {
     public record Response(int status,String contentType,byte[] bytes){
         public Response{bytes=bytes.clone();}public byte[] bytes(){return bytes.clone();}
         @Override public String toString(){return "ScpResponse[status="+status+", body redacted]";}
@@ -17,17 +17,27 @@ public final class ScpClient {
     private final ScpProtocol.Scope scope;private ScpAuthentication.Token token;private Instant retryAfter=Instant.MIN;
     private final String legacyCookie="aCMPAuthToken="+UUID.randomUUID().toString().replace("-","");
     public static ScpClient configured(ScpSettings settings,Function<String,String> secrets){
-        requireConfigured(settings,secrets);
+        return configured(settings,secrets,false);
+    }
+    public static ScpClient configuredForConnectionCheck(ScpSettings settings,Function<String,String> secrets){
+        return configured(settings,secrets,true);
+    }
+    private static ScpClient configured(ScpSettings settings,Function<String,String> secrets,boolean connectionOnly){
+        requireConfigured(settings,secrets,connectionOnly);
         try{
             Path ca=settings.tls==ScpSettings.Tls.CA_FILE?Path.of(secret(secrets,settings.caFileRef)):null;
-            return new ScpClient(settings,secrets,new ScpHttpsTransport(settings.baseUrl,ca),Clock.systemUTC());
+            return new ScpClient(settings,secrets,new ScpHttpsTransport(settings.baseUrl,settings.tls,ca),Clock.systemUTC(),connectionOnly);
         }catch(ScpProtocol.Failure failure){throw failure;}catch(Exception failure){throw ScpProtocol.fail("PRIVATE_CONFIGURATION_UNAVAILABLE");}
     }
     /** Injected exchange is for isolated protocol tests or another separately verified transport. */
     public ScpClient(ScpSettings settings,Function<String,String> secrets,Exchange exchange,Clock clock){
-        requireConfigured(settings,secrets);this.settings=settings;this.secrets=secrets;this.exchange=Objects.requireNonNull(exchange);this.clock=Objects.requireNonNull(clock);scope=new ScpProtocol.Scope(settings.poolId,settings.projectId);
+        this(settings,secrets,exchange,clock,false);
     }
-    private static void requireConfigured(ScpSettings settings,Function<String,String> secrets){if(settings==null||secrets==null||!settings.problems(secrets).isEmpty())throw ScpProtocol.fail("CONFIG_PENDING");}
+    private ScpClient(ScpSettings settings,Function<String,String> secrets,Exchange exchange,Clock clock,boolean connectionOnly){
+        requireConfigured(settings,secrets,connectionOnly);this.settings=settings;this.secrets=secrets;this.exchange=Objects.requireNonNull(exchange);this.clock=Objects.requireNonNull(clock);
+        scope=connectionOnly?null:new ScpProtocol.Scope(settings.poolId,settings.projectId);
+    }
+    private static void requireConfigured(ScpSettings settings,Function<String,String> secrets,boolean connectionOnly){if(settings==null||secrets==null||!(connectionOnly?settings.connectionProblems(secrets):settings.problems(secrets)).isEmpty())throw ScpProtocol.fail("CONFIG_PENDING");}
     private static String secret(Function<String,String> resolver,String ref){try{String value=ref==null?null:resolver.apply(ref);if(value==null||value.isEmpty())throw ScpProtocol.fail("CREDENTIAL_UNAVAILABLE");return value;}catch(Exception failure){throw ScpProtocol.fail("CREDENTIAL_UNAVAILABLE");}}
     private JsonNode exchange(ScpProtocol.Request request,Map<String,String> headers){
         try{var response=exchange.execute(request,Map.copyOf(headers));return ScpProtocol.envelope(response.status(),response.contentType(),response.bytes());}
@@ -63,10 +73,14 @@ public final class ScpClient {
         }
     }
     public Map<String,String> version(){JsonNode data=read(ScpProtocol.version());return Map.of("build_version",ScpProtocol.requiredText(data,"build_version",256));}
-    public Map<String,String> resourcePool(){return ScpProtocol.decodePool(read(ScpProtocol.pool(scope)),scope);}
+    public Map<String,String> resourcePool(){requireScope();return ScpProtocol.decodePool(read(ScpProtocol.pool(scope)),scope);}
     public ScpProtocol.Page page(ScpProtocol.Kind kind,int pageNumber,int pageSize){
+        requireScope();
         var request=ScpProtocol.page(kind,scope,pageNumber,pageSize);
         return ScpProtocol.decodePage(read(request),kind,scope,pageNumber,pageSize,clock.instant());
     }
+    private void requireScope(){if(scope==null)throw ScpProtocol.fail("MOP_AND_SCP_SCOPE_PENDING");}
+    public synchronized boolean passwordAuthenticationVerified(){return token!=null&&token.usableAt(clock.instant());}
+    public void close(){synchronized(this){token=null;}if(exchange instanceof AutoCloseable closeable)try{closeable.close();}catch(Exception ignored){}}
     @Override public String toString(){return "ScpClient[private settings, secrets and session redacted]";}
 }

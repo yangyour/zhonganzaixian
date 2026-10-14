@@ -1,5 +1,7 @@
 # SCP接口配置准备
 
+2026-10-14已新增可显式选择的TEST_INSECURE及指定服务器实际Java检查入口，见[运行说明](../device-api/README.md)和[验证结果](../../docs/device-test-tls-mode.md)。下文2026-10-12的未提供凭据/仅严格TLS属于原准备阶段；当前密码认证成功，但资源读取仍因权限不足被拒绝。
+
 用户指定SCP管理地址`https://192.168.1.179`；原HCI设备`192.168.1.170`继续使用已有IP基础监控。2026-10-12用户确认专用只读凭据尚未申请，当前仅准备接口和配置，**默认关闭、不登录、不自动启用轮询或发布到运行站点**。
 
 将本目录`connection.example.json`复制到Git忽略的`deploy/private/scp-connection.json`。本机已保存一份disabled配置，沿用既有HCI测试资产的MOP租户/资产引用；SCP资源池/项目ID、认证方式及版本策略均保持null，没有把设备资料图片里的登录信息当作SCP专用只读凭据。
@@ -16,7 +18,7 @@
 |region / service|EC2签名范围，须明确填写；文档不同示例有不同service名，不擅自选默认值|
 |legacy_cookie_required|明确的版本兼容策略；文档6.3.70起无需Cookie，实际版本未知时保留null|
 |public_key_api|密码模式选择V1或V2；V1适用文档6.3.0起，V2适用6.8.0起，真实包裹格式仍须现场核对|
-|tls_mode / ca_file_ref|SYSTEM使用JVM信任；CA_FILE从环境变量所引用的绝对PEM证书文件建立独立信任库。仍验证主机名/IP，不能配置关闭证书校验|
+|tls_mode / ca_file_ref|SYSTEM使用JVM信任；CA_FILE从环境变量所引用的绝对PEM证书文件建立独立信任库。两者仍验证主机名/IP；新增TEST_INSECURE为用户明确授权的测试模式，仅允许192.168.1.179:443，详见下文|
 
 引用名只接受`MOP_SCP_`前缀的明确大写环境变量名。示例中的`MOP_SCP_USERNAME/PASSWORD/ACCESS_KEY/SECRET_KEY/CA_FILE`是引用，不是实际秘密。CA_FILE不满足证书主机名/IP要求时仍会失败，不能仅凭拿到证书就宣布TLS验证完成。
 

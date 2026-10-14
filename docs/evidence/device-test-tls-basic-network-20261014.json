@@ -1,0 +1,271 @@
+{
+  "environment": "lan-test-20261008",
+  "verified_at": "2026-10-14T07:45:23.596155+00:00",
+  "reader_visible_hosts": 4,
+  "fresh_items": 24,
+  "unchanged_existing_host_item_ids": true,
+  "existing_reader_permission_changed": false,
+  "devices": [
+    {
+      "ip": "192.169.11.1",
+      "items": [
+        {
+          "itemid": "50759",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963900",
+          "lastvalue": "1"
+        },
+        {
+          "itemid": "50760",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963900",
+          "lastvalue": "0"
+        },
+        {
+          "itemid": "50761",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963900",
+          "lastvalue": "0.00031266666666666666"
+        },
+        {
+          "itemid": "50762",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963905",
+          "lastvalue": "0"
+        },
+        {
+          "itemid": "50763",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963903",
+          "lastvalue": "1"
+        },
+        {
+          "itemid": "50764",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963904",
+          "lastvalue": "1"
+        }
+      ]
+    },
+    {
+      "ip": "192.168.1.170",
+      "items": [
+        {
+          "itemid": "50741",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963900",
+          "lastvalue": "1"
+        },
+        {
+          "itemid": "50742",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963900",
+          "lastvalue": "0"
+        },
+        {
+          "itemid": "50743",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963900",
+          "lastvalue": "0.0001"
+        },
+        {
+          "itemid": "50744",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963884",
+          "lastvalue": "1"
+        },
+        {
+          "itemid": "50745",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963885",
+          "lastvalue": "1"
+        },
+        {
+          "itemid": "50746",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963886",
+          "lastvalue": "1"
+        }
+      ]
+    },
+    {
+      "ip": "192.168.1.2",
+      "items": [
+        {
+          "itemid": "50747",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963900",
+          "lastvalue": "1"
+        },
+        {
+          "itemid": "50748",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963900",
+          "lastvalue": "0"
+        },
+        {
+          "itemid": "50749",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963900",
+          "lastvalue": "0.0001"
+        },
+        {
+          "itemid": "50750",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963890",
+          "lastvalue": "1"
+        },
+        {
+          "itemid": "50751",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963891",
+          "lastvalue": "1"
+        },
+        {
+          "itemid": "50752",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963892",
+          "lastvalue": "1"
+        }
+      ]
+    },
+    {
+      "ip": "192.168.1.125",
+      "items": [
+        {
+          "itemid": "50753",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963900",
+          "lastvalue": "1"
+        },
+        {
+          "itemid": "50754",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963900",
+          "lastvalue": "0"
+        },
+        {
+          "itemid": "50755",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963900",
+          "lastvalue": "0.0002823333333333334"
+        },
+        {
+          "itemid": "50756",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963896",
+          "lastvalue": "0"
+        },
+        {
+          "itemid": "50757",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963897",
+          "lastvalue": "0"
+        },
+        {
+          "itemid": "50758",
+          "status": "0",
+          "delay": "60s",
+          "history": "7d",
+          "trends": "0",
+          "state": "0",
+          "lastclock": "1791963898",
+          "lastvalue": "1"
+        }
+      ]
+    }
+  ],
+  "passed": true
+}

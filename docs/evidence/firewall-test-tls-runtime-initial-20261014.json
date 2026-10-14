@@ -1,0 +1,35 @@
+{
+  "checked_at": "2026-10-14T07:37:58.226829936Z",
+  "target": "https://192.169.11.1",
+  "device": "firewall",
+  "strict_before": {
+    "authenticated": false,
+    "state": "TLS_NOT_VERIFIED"
+  },
+  "selected_mode": {
+    "tls_mode": "TEST_INSECURE",
+    "certificate_verification_enabled": false,
+    "tls_trust_verified": false,
+    "authenticated": true,
+    "protected_read_verified": false,
+    "resource_metrics_verified": false,
+    "state": "PASSWORD_EXPIRED",
+    "logout_verified": true
+  },
+  "strict_after": {
+    "authenticated": false,
+    "state": "TLS_NOT_VERIFIED"
+  },
+  "integration_ready": false,
+  "background_collection_enabled": false,
+  "resource_writes": 0,
+  "credentials_output": false,
+  "environment": "lan-test-20261008",
+  "source": "designated_test_server",
+  "artifact_sha256": "538c4740e3297e34905191432732eba5765c24aa8bb23ac7aae33e16986b59cc",
+  "artifact_release": "/opt/mop-lan-test/releases/device-tls-538c4740e329",
+  "checker_exit_code": 2,
+  "application_restarted": false,
+  "database_migrations": 0,
+  "verified_at": "2026-10-14T07:37:59.329120+00:00"
+}

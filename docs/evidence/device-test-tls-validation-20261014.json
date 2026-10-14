@@ -1,0 +1,35 @@
+{
+  "verified_at": "2026-10-14T07:50:43.744534+00:00",
+  "environment": "lan-test-20261008",
+  "artifact_sha256": "878e30b2a98ce11097e9ff0fe5d20ec1ef81047189d674c6e99bc947f9665a2f",
+  "java_related_tests": 94,
+  "java_new_tests_included": 27,
+  "private_config_tool_tests": 3,
+  "existing_contract_tests": 133,
+  "api_contract": "0.48.0",
+  "contract_generation_consistent": true,
+  "live_mode_sequence_per_device": [
+    "SYSTEM",
+    "TEST_INSECURE",
+    "SYSTEM"
+  ],
+  "live_devices": 2,
+  "authentication_success_in_test_mode": true,
+  "strict_modes_still_reject_untrusted_tls": true,
+  "protected_resource_reads_verified": false,
+  "current_blockers": {
+    "scp": "ACCESS_DENIED",
+    "firewall": "PASSWORD_EXPIRED"
+  },
+  "fresh_basic_network_items": 24,
+  "unchanged_existing_services": 13,
+  "schema_version": 31,
+  "database_migrations": 0,
+  "main_api_restarted": false,
+  "web_changed": false,
+  "new_background_collector_enabled": false,
+  "implementation_verification_passed": true,
+  "formal_contract_acceptance": "NOT_RUN",
+  "production_ready": false,
+  "temporary_check_jobs_use_auto_remove": true
+}

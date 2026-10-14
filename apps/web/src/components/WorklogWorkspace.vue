@@ -10,6 +10,7 @@ import { createWorklogWorkspace, emptyWorklogState, validateWorklogInput, worklo
 import ApiErrorNotice from './ApiErrorNotice.vue'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import AppTable from './AppTable.vue'
+import AutoTextarea from './AutoTextarea.vue'
 const props = defineProps<{ modelValue: boolean; ticket: RegisteredTicket | null }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
 const open = computed({ get: () => props.modelValue, set: value => emit('update:modelValue', value) })
@@ -108,7 +109,7 @@ defineExpose({ hasUnresolved: workspace.unresolved, canLeave })
           <el-form-item label="实际开始时间（含秒和时区）"><el-input v-model="startedAt" :disabled="locked" aria-label="实填开始时间" placeholder="例如 2026-10-02T09:00:00+08:00" /></el-form-item>
           <el-form-item label="实际结束时间（含秒和时区）"><el-input v-model="endedAt" :disabled="locked" aria-label="实填结束时间" placeholder="例如 2026-10-02T10:30:00+08:00" /></el-form-item>
           <p class="field-help">明确输入日期、秒与Z或±HH:MM时区，最多3位毫秒；不会自动使用当前时间。相同起止表示明确实填0，缺值不会补0或4小时。</p>
-          <el-form-item label="原始备注（可留空，最多2000字符）"><el-input v-model="note" type="textarea" :rows="3" :disabled="locked" aria-label="实填工时备注" /></el-form-item>
+          <el-form-item label="原始备注（可留空，最多2000字符）"><AutoTextarea v-model="note" :min-rows="4" :max-rows="10" :disabled="locked" aria-label="实填工时备注" /></el-form-item>
           <p v-if="elapsed !== null">起止物理差：{{ elapsed / 1000 }} 秒。未计费取整，未换算成本。</p><p v-if="validation" role="alert" class="worklog-validation">{{ validation }}</p>
           <div class="worklog-actions"><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.parentVersion">{{ editingId ? '确认追加修改修订' : '保存本人工时' }}</el-button><el-button :disabled="locked" @click="resetForm">清空表单 / 改为新增</el-button></div>
         </el-form>

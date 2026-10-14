@@ -12,6 +12,7 @@ import { can, contextGeneration, session } from '../stores/session'
 import { displayTime } from '../utils/display'
 import { emptyReportForm, impactScopeLabel, isTicketUuid, parseCustomerReport, prepareReportAttempt, ReportValidationError, ticketCategories, urgencyLabel, type ReportSubmissionAttempt } from '../utils/ticket'
 import ApiErrorNotice from './ApiErrorNotice.vue'
+import AutoTextarea from './AutoTextarea.vue'
 import ReportPhotoPanel from './ReportPhotoPanel.vue'
 import { createPhotoQueue } from '../utils/photoQueue'
 import { createPhotoAppender } from '../utils/photoAttachments'
@@ -168,7 +169,7 @@ async function submitReport() {
       <el-form-item label="关联设备" :error="fieldErrors.asset_id"><el-select v-model="form.asset_id" filterable placeholder="不确定" :loading="assetsLoading" aria-label="关联设备"><el-option label="不确定" value="" /><el-option v-for="asset in assets" :key="asset.id" :label="asset.name" :value="asset.id" /></el-select><span class="field-help">{{ assetsLoading ? '正在加载当前可见设备，可先选择“不确定”。' : assetsError ? '设备列表加载失败，可选择“不确定”继续登记。' : assetsHasMore ? '仅显示当前可见设备的首个列表页，未找到时请选择“不确定”。' : '只可选择当前可见设备，无法判断时选择“不确定”。' }}</span></el-form-item>
       <ApiErrorNotice :error="assetsError"><el-button size="small" :disabled="locked" @click="loadAssets">重试设备查询</el-button></ApiErrorNotice>
       <el-form-item label="影响范围" :error="fieldErrors.impact_scope"><el-radio-group v-model="form.impact_scope" class="ticket-choice-group" aria-label="影响范围"><el-radio v-for="(label, value) in impactScopeLabel" :key="value" :value="value">{{ label }}</el-radio></el-radio-group></el-form-item>
-      <el-form-item label="描述（必填，最多 3000 个字符）" :error="fieldErrors.description"><el-input v-model="form.description" type="textarea" :rows="4" placeholder="描述发生时间、现象和影响，请勿填写密码或其他秘密" aria-label="报障描述" /></el-form-item>
+      <el-form-item label="描述（必填，最多 3000 个字符）" :error="fieldErrors.description"><AutoTextarea v-model="form.description" placeholder="描述发生时间、现象和影响，请勿填写密码或其他秘密" aria-label="报障描述" /></el-form-item>
       <el-form-item label="标题（可不填）" :error="fieldErrors.title"><el-input v-model="form.title" placeholder="不填时按故障分类与设备生成" aria-label="报障标题" /></el-form-item>
       <div class="ticket-contact-fields"><el-form-item label="联系人" :error="fieldErrors.contact_name"><el-input v-model="form.contact_name" placeholder="本次报障联系人" aria-label="报障联系人" /></el-form-item><el-form-item label="联系电话" :error="fieldErrors.contact_phone"><el-input v-model="form.contact_phone" type="tel" placeholder="例如：+86 138 0000 0000" aria-label="报障联系电话" /></el-form-item></div>
       <p class="field-help">联系方式仅作为填报信息，尚未核验与账号的绑定关系。</p>
@@ -183,6 +184,13 @@ async function submitReport() {
 </template>
 
 <style>
+.ticket-report-dialog.el-dialog{display:flex;flex-direction:column;max-height:calc(100vh - 48px);max-height:calc(100dvh - 48px);margin-top:24px!important;margin-bottom:24px;overflow:hidden}
+.ticket-report-dialog>.el-dialog__header,.ticket-report-dialog>.el-dialog__footer{flex:none;min-width:0}
+.ticket-report-dialog>.el-dialog__body{flex:1 1 auto;min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;scroll-padding-block:16px}
+.ticket-report-dialog>.el-dialog__body :is(input,textarea,select,button,[tabindex]){scroll-margin-block:16px}
+.ticket-report-dialog>.el-dialog__footer{border-top:1px solid var(--el-border-color-lighter);margin-top:16px;padding-top:16px}
+.ticket-report-dialog .el-dialog__footer .el-button{max-width:100%;height:auto;white-space:normal}
 .ticket-form-intro{font-size:12px;color:#61718a}.ticket-report-dialog .api-error{margin-top:16px}.ticket-contact-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}.ticket-choice-group{display:flex;flex-wrap:wrap;gap:0 18px}.ticket-choice-group .el-radio{margin-right:0;min-height:36px}.ticket-operation-summary{margin-top:18px;padding:15px;border:1px solid #d9e9ff;background:#f5f9ff;border-radius:6px;font-size:12px}.ticket-operation-summary p{margin:8px 0}.ticket-report-form>.field-help{margin-top:-10px;margin-bottom:20px}
+@media(max-width:760px){.ticket-report-dialog.el-dialog{max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);margin-top:12px!important;margin-bottom:12px}}
 @media(max-width:760px){.ticket-contact-fields{grid-template-columns:1fr;gap:0}.ticket-report-dialog .el-dialog__footer{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px}.ticket-report-dialog .el-dialog__footer .el-button{margin-left:0;min-height:44px}.ticket-report-form .el-input__wrapper,.ticket-report-form .el-select__wrapper{min-height:44px}.ticket-choice-group .el-radio{min-height:44px}}
 </style>

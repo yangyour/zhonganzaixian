@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-14",
+  "environment": "lan-test-20261008",
+  "frontend": "local production bundle",
+  "backend": "existing designated test API",
+  "checks": [
+    "mobile report textarea expands, caps with internal scroll and shrinks",
+    "mobile report footer stays visible while long content scrolls",
+    "cancel and reopen retains report draft",
+    "320px report dialog footer and form fit viewport",
+    "MSP worklog textarea expands shrinks and reflows on mobile",
+    "worklog collapse and reopen preserves unsaved text"
+  ],
+  "unit_tests": {
+    "targeted_initial": 54,
+    "after_dialog_css": 31
+  },
+  "typecheck": "PASS",
+  "business_submission": "NOT_PERFORMED",
+  "physical_device": "NOT_TESTED",
+  "credentials_recorded": false
+}

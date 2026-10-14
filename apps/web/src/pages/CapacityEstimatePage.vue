@@ -34,32 +34,33 @@ const bufferMissing: Record<string, string> = Object.fromEntries([...bufferField
 <template>
   <CapacityScenarioPanel ref="scenarios" :calculation="input()" />
   <section class="capacity-page">
-    <div class="page-heading"><div><span class="eyebrow">EXPLICIT ESTIMATES</span><h1>容量与 Proxy 缓冲估算</h1><p>平台管理员 · 显式输入 · 只读数学工具</p></div></div>
-    <el-alert type="warning" :closable="false" title="估算不是实测容量、采购规格或PoC验收">所有系数须明确输入，不自动填入80/128字节、5000NVPS或余量示例。模型版本和池上限未核验；只读估算不保存场景；可单独明确保存不可变方案草稿，不改变监控、资源池或租户配额。</el-alert>
+    <div class="page-heading"><div><h1>容量与 Proxy 缓冲估算</h1><p>根据明确的规模与模型参数估算资源需求。</p></div><span class="workbench-status">手工估算 · 非实测容量</span></div>
+<details class="page-guidance"><summary>估算口径与保存说明</summary>    <el-alert type="warning" :closable="false" title="估算不是实测容量、采购规格或PoC验收">所有系数须明确输入，不自动填入80/128字节、5000NVPS或余量示例。模型版本和池上限未核验；只读估算不保存场景；可单独明确保存不可变方案草稿，不改变监控、资源池或租户配额。</el-alert>
     <p class="capacity-help">空白表示未知（null），不会当成零。输入修改立即清除旧结果，离开或切换租户后清空；不会自动计算。数量和小数始终以十进制字符串传输，避免大整数精度丢失。</p>
-    <el-empty v-if="!permitted" description="当前身份没有平台容量估算权限" />
+</details>
+      <el-empty v-if="!permitted" description="当前身份没有平台容量估算权限" />
     <template v-else>
       <ApiErrorNotice :error="state.error" />
       <div class="capacity-actions"><el-button v-if="can('capacity_scenarios:write')" @click="scenarios?.prepare()">以当前输入准备保存方案</el-button><el-button v-if="can('capacity_scenarios:read')" @click="scenarios?.browse()">只读查看已保存方案</el-button></div>
-      <el-form label-position="top" @submit.prevent="calculate">
+      <div class="workbench-layout"><el-form class="workbench-form" label-position="top" @submit.prevent="calculate">
         <section class="capacity-input-section"><h2>八项容量输入</h2><div class="capacity-fields"><el-form-item v-for="field in fields" :key="field.key" :label="field.label"><el-input v-model="draft.inputs[field.key]" :aria-label="field.label" inputmode="decimal" placeholder="未知留空，明确0请填写0" /><span class="field-help">{{ field.help }}</span></el-form-item></div></section>
         <section class="capacity-input-section"><h2>明确的模型系数</h2><p class="capacity-help">原型示例不是运行默认，也不能证明客户批准或实测单池能力。</p><div class="capacity-fields"><el-form-item v-for="field in modelFields" :key="field.key" :label="field.label"><el-input v-model="draft.model[field.key]" :aria-label="field.label" placeholder="未知留空" /><span class="field-help">{{ field.help }}</span></el-form-item></div></section>
         <section class="capacity-input-section"><h2>Proxy 缓冲独立试算</h2><el-checkbox v-model="draft.includeBuffer" aria-label="明确启用Proxy缓冲输入">明确提供缓冲计算输入</el-checkbox><p class="capacity-help">站点NVPS × 最长断网秒数 × 每值空间 × 余量倍率。与容量模型的“1+额外余量比例”不同；倍率直接相乘。</p><div v-if="draft.includeBuffer" class="capacity-fields"><el-form-item v-for="field in bufferFields" :key="field.key" :label="field.label"><el-input v-model="draft.proxy_buffer[field.key]" :aria-label="field.label" inputmode="decimal" placeholder="未知留空" /><span class="field-help">{{ field.help }}</span></el-form-item></div></section>
         <div class="capacity-actions"><el-button type="primary" native-type="submit" :loading="state.busy" :disabled="state.busy">只读估算</el-button><el-button @click="clearDraft">清空输入与结果</el-button></div>
       </el-form>
-      <section v-if="state.result" class="capacity-results" aria-live="polite">
+      <section class="workbench-result" aria-live="polite"><h2>估算结果</h2><div v-if="!state.result" class="workbench-empty"><strong>{{state.busy ? '正在估算…' : '等待估算'}}</strong><p>填写容量和模型参数后点击“只读估算”。</p></div><div v-else class="capacity-results">
         <h2>{{ state.result.status === 'ESTIMATED' ? '显式容量估算结果' : '容量输入尚不完整' }}</h2><p class="capacity-help">公式 {{ state.result.formula_version }} · 模型标签 {{ state.result.model_version ?? '未知' }} · 精度 DECIMAL128，最终一次舍入</p>
         <p v-if="state.result.missing_inputs.length">待明确：{{ state.result.missing_inputs.map(k => missingLabels[k] || k).join('、') }}</p>
-        <div class="capacity-output-grid"><article v-for="field in outputs" :key="field.key"><h3>{{ field.label }}</h3><strong>{{ state.result.outputs?.[field.key] ?? '未知' }}</strong><small>{{ field.unit }}</small></article></div>
+        <div class="record-table result-table"><table><thead><tr><th>指标</th><th>估算值</th><th>单位</th></tr></thead><tbody><tr v-for="field in outputs" :key="field.key"><td>{{field.label}}</td><td>{{state.result.outputs?.[field.key] ?? '未知'}}</td><td>{{field.unit}}</td></tr></tbody></table></div>
         <h3>Proxy缓冲：{{ state.result.proxy_buffer.status === 'ESTIMATED' ? '显式估算' : '输入未完整' }}</h3><p v-if="state.result.proxy_buffer.missing_inputs.length">待明确：{{ state.result.proxy_buffer.missing_inputs.map(k => bufferMissing[k] || k).join('、') }}</p><p class="capacity-buffer-value">{{ state.result.proxy_buffer.estimated_bytes ?? '未知' }} <small>bytes</small></p>
         <el-alert v-if="state.result.proxy_buffer.margin_factor_below_one" type="warning" :closable="false" title="缓冲倍率小于1，结果小于基础需求；未自动把它解释成额外余量，也不能视为容量足够" />
         <p class="capacity-help">主备两份只是数学估算，不证明HA、Proxy接管或断网无丢失。每值空间来源未核验，实际容量和获准池限仍未知。</p>
-      </section>
-      <CapacityGrowthPanel :calculation="input()" />
-      <section class="capacity-boundaries"><h2>仍待真实验收</h2><p>PoC目标：12,500NVPS持续24小时，2倍峰值30分钟；本工具没有执行该压测。已提供独立草稿保存与未核验基准引用；显式增长对照已提供，实际基准验证及PoC仍待完成。当前主页面输入不会自动保存，只有确认成功的方案回执才代表已写入。</p></section>
+      </div></section></div>
+      <details class="page-guidance"><summary>增长对照</summary><CapacityGrowthPanel :calculation="input()" /></details>
+      <details class="page-guidance"><summary>验证范围</summary><p>PoC目标：12,500NVPS持续24小时，2倍峰值30分钟；本工具没有执行该压测。已提供独立草稿保存与未核验基准引用；显式增长对照已提供，实际基准验证及PoC仍待完成。当前主页面输入不会自动保存，只有确认成功的方案回执才代表已写入。</p></details>
     </template>
   </section>
 </template>
 <style scoped>
-.capacity-page{max-width:1200px}.capacity-help{line-height:1.65;color:#526176}.capacity-input-section,.capacity-results,.capacity-boundaries{margin:20px 0;padding:20px;border:1px solid #dce4ee;border-radius:12px;background:white;overflow-wrap:anywhere}.capacity-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px}.capacity-fields .el-form-item{min-width:0}.capacity-fields .field-help{display:block;width:100%;margin-top:5px}.capacity-actions{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}.capacity-output-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.capacity-output-grid article{padding:16px;border:1px solid #dce4ee;border-radius:8px;min-width:0}.capacity-output-grid h3{font-size:14px;color:#526176;margin:0 0 10px}.capacity-output-grid strong,.capacity-buffer-value{font-family:monospace;font-size:19px;overflow-wrap:anywhere}.capacity-output-grid small{display:block;margin-top:8px;color:#526176}.capacity-buffer-value small{font-family:inherit;font-size:13px}@media(max-width:700px){.capacity-fields,.capacity-output-grid{grid-template-columns:1fr}.capacity-input-section,.capacity-results,.capacity-boundaries{padding:14px}.capacity-actions .el-button{min-height:44px}.capacity-page :deep(.el-input__wrapper){min-height:44px}}
+.capacity-page{min-width:0}.capacity-help{font-size:13px;line-height:1.7;color:#596d84}.capacity-input-section{padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid var(--mop-border)}.capacity-input-section h2{font-size:16px}.capacity-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px}.capacity-fields .el-form-item{min-width:0}.field-help{font-size:12px}.capacity-actions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.result-table table{min-width:0;table-layout:fixed}.result-table th,.result-table td{padding:10px}.result-table td{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.capacity-results h2{font-size:15px}.capacity-results h3{font-size:14px;margin-top:22px}.capacity-buffer-value{font-size:20px;overflow-wrap:anywhere}.capacity-buffer-value small{font-size:12px}.capacity-page>.page-guidance{margin-top:20px}@media(max-width:700px){.capacity-fields{grid-template-columns:1fr}.capacity-actions .el-button{min-height:44px}}
 </style>

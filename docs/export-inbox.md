@@ -1,5 +1,7 @@
 # 本人导出消息
 
+已以`590a76e`部署至[指定测试站](http://192.168.1.215:10010)。仅更新API/Web，准备队列及其余10服务的镜像、启动时间和重启计数不变；13服务在候选API、本机转发及浏览器关闭后仍运行且ready=true，V31，production_ready=false。公开页面实际完成新请求自动准备、确认发布、消息出现、首次已读及同摘要16列/1行XLSX下载；旧消息自然过期后仍可见。新Web配置已应用CSP、安全头、HTML no-cache、哈希资源immutable与静态gzip；认证JSON不压缩并保持no-store，未知资源404，基础监控200。见[部署与公开链路](evidence/export-inbox-deployment-20261014.json)、[最终组件](evidence/export-inbox-components-final-20261014.json)及[公开页面](evidence/export-inbox-ui-20261014/desktop-public-inbox.png)。
+
 2026-10-14，API契约0.48.0，指定测试环境lan-test-20261008，PostgreSQL17.9/V31及既有MinIO。新增“我的导出消息”：用户明确发布文件成功后，在同一数据库事务内保存一条本人消息；可查看未读、标记已读和下载。准备请求仍为PREPARE_ONLY_NO_PUBLICATION，历史发布不补发，外部渠道未派发。
 
 ## 已实现与边界

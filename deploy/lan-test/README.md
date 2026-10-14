@@ -1,5 +1,7 @@
 # LAN测试部署模板
 
+2026-10-14最新运行版本：导出消息API0.48/V31、常驻准备队列和顶部横排模块；仍为13服务。`WEB_CONFIG_FILE`指向新不可变Nginx配置，CSP/缓存/静态gzip已实际应用。部署仅更新API/Web，不修改基础RELEASE_DIR和其他Worker版本；[完整记录及回退](../../docs/export-inbox.md)。
+
 API0.48新增[本人导出消息](../../docs/export-inbox.md)：先使用独立CLI显式`--apply-export-inbox`并复核V31，随后仅在API私有env开启`MOP_EXPORT_INBOX_ENABLED=true`；准备Worker不需要此开关或签名密钥。V1—V31冻结，不在应用启动时迁移，旧发布不补发。
 
 2026-10-14自动准备应用已部署，当前含可选覆盖服务共13个常驻容器；只读检查须加`--include-export-queue`。保留原固定UTC启用时间，沿用API0.47/V30；发布详情与回退见[本次记录](../../docs/asset-export-automatic-preparation.md)。

@@ -436,6 +436,7 @@
         "docs/asset-export-publication.md",
         "docs/asset-export-snapshot.md",
         "docs/asset-ledger-export-encoding.md",
+        "docs/evidence/export-inbox-deployment-20261014.json",
         "docs/evidence/export-inbox-validation-20261014.json",
         "docs/evidence/export-publication-validation-20261014.json",
         "docs/evidence/export-queue-deployment-20261014.json",
@@ -1451,6 +1452,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "35c1de4da934d6d8ba3a9e473f1467c82e6533c434dd5f9491bd707fc59368de"
+    "doc/development/07_合同逐项开发追踪.md": "9f027957bd995f1e91d21321982c3f5ce381c5b97ffcf9d25aac3cd84cd65a19"
   }
 }

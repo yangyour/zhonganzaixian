@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-14导出消息API0.48/Web已部署，V31/0启动迁移。13服务在候选及本机验证进程清理后就绪；除API/Web外11服务镜像/启动时间/重启计数不变，复用PG/MinIO及原队列。Web安全头/静态gzip已生效，HTTPS/Secure Cookie与生产就绪仍未据此完成。见[最终盘点](../evidence/export-inbox-components-final-20261014.json)和[部署](../evidence/export-inbox-deployment-20261014.json)。
+
 ## 2026-10-14 导出消息复用与V31
 
 复用当前PG17.9和MinIO，不新建基础组件或账号。V31增加本项目本人导出消息表及受限ACL，API开关默认关闭；候选显式启用后ready包含真实结构保护。原68表65表摘要保持，另3表存在并发写入，不声称全表等值。真实MinIO/56HTTP和仅自有候选API重启已验证；共享13服务未因候选验证重启。缺失的自动发布、外部渠道和正式性能仍分别登记，见[消息说明](../export-inbox.md)及[迁移](../evidence/export-inbox-migration-20261014.json)。

@@ -1,0 +1,1576 @@
+{
+  "verified_at": "2026-10-14T03:19:00.184101+00:00",
+  "display_timezone": "Asia/Hong_Kong",
+  "source_commit": "cb0119bc54ad797992034797fb7fcd6691c57fb5",
+  "scope": "CONTRACT_GAP_REVIEW_WITH_STATIC_CHECKS_AND_READ_ONLY_TEST_ENVIRONMENT_STATUS",
+  "formal_acceptance_executed": false,
+  "formal_contract_status_changed": false,
+  "business_source_modified": false,
+  "database_migrations_executed": 0,
+  "services_modified": 0,
+  "device_authentication_retested": false,
+  "requirement_count": 128,
+  "review_disposition_counts": {
+    "差距": 119,
+    "口径待确认": 1,
+    "待验": 2,
+    "范围待确认": 6
+  },
+  "declared_formal_acceptance_status_counts": {
+    "NOT_RUN": 128
+  },
+  "rows_with_progress_notes": 56,
+  "rows_without_progress_notes": 72,
+  "contract_index": {
+    "command": "py -3 tools/contract_progress.py --check",
+    "exit_code": 0,
+    "consistent": true
+  },
+  "contract_index_unit_tests": {
+    "reported": 17,
+    "passed": 16,
+    "skipped": 1,
+    "failures": 0,
+    "skip_test": "test_symlink_outside_repository_is_rejected_before_read",
+    "skip_reason": "Windows host lacks symlink creation privilege; host policy is unchanged"
+  },
+  "api_contract": {
+    "version": "0.46.0",
+    "generated_consistent": true,
+    "tests": 127,
+    "passed": 127,
+    "failed": 0
+  },
+  "web_first_full_run": {
+    "command": "npm --prefix apps/web test",
+    "tests": 1838,
+    "passed": 1837,
+    "failed": 1,
+    "failure_file": "apps/web/tests/routerEffectiveAccess.test.ts",
+    "failure_case": "a contacts-only session reaches its permitted page from the login path",
+    "failure": "Test timed out in 5000ms",
+    "build_ran_during_same_time_window": true,
+    "root_cause_proven": false
+  },
+  "web_targeted_rerun": {
+    "command": "npm --prefix apps/web test -- tests/routerEffectiveAccess.test.ts",
+    "tests": 9,
+    "passed": 9,
+    "failed": 0
+  },
+  "web_full_rerun": {
+    "command": "npm --prefix apps/web test -- --maxWorkers=2 --minWorkers=1",
+    "files": 116,
+    "tests": 1838,
+    "passed": 1838,
+    "failed": 0,
+    "timeout_threshold_changed": false,
+    "source_or_test_modified": false
+  },
+  "web_build": {
+    "command": "npm --prefix apps/web run build",
+    "typecheck_passed": true,
+    "build_passed": true,
+    "deployed": false
+  },
+  "java_and_business_integration_tests": "NOT_RUN_THIS_REVIEW",
+  "real_browser_tests": "NOT_RUN_THIS_REVIEW",
+  "performance_and_disaster_recovery_tests": "NOT_RUN_THIS_REVIEW",
+  "live_components_evidence": "docs/evidence/acceptance-review-components-20261014.json",
+  "initial_local_powershell_http": {
+    "evidence": "docs/evidence/acceptance-review-health-20261014.json",
+    "result": "CLIENT_SOCKET_PERMISSION_FAILURE",
+    "server_outage_inferred": false
+  },
+  "python_direct_http": {
+    "evidence": "docs/evidence/acceptance-review-http-20261014.json",
+    "paths": {
+      "/api/v1/health/live": 200,
+      "/api/v1/health/ready": 200,
+      "/login": 200
+    },
+    "business_authentication_or_writes": false
+  },
+  "logs": {
+    "contract": {
+      "private_local_log": ".local/acceptance-review-contract-20261014.log",
+      "sha256": "4d733311f571b49d169be15044068f0bfacdf90c8a72fabe5971a077ab8bf06e"
+    },
+    "web": {
+      "private_local_log": ".local/acceptance-review-web-20261014.log",
+      "sha256": "7217fecb6b6b4e615c40abdca7831deffd37897e4af7baf7ba48847480bda0ad"
+    },
+    "web-focused": {
+      "private_local_log": ".local/acceptance-review-web-focused-20261014.log",
+      "sha256": "1b60ac12de4c7f675a9c46adce05a2b49ebbce7f98bc354f4762ed31cc92c6af"
+    },
+    "web-rerun": {
+      "private_local_log": ".local/acceptance-review-web-rerun-20261014.log",
+      "sha256": "656909ed95d2d003af8e4717eac78de10cca707aa636255c3683164d0ecc852e"
+    },
+    "build": {
+      "private_local_log": ".local/acceptance-review-build-20261014.log",
+      "sha256": "add22ba2007b60cc8a7a275cd44c82fe36020e8ba97737e30acf29832a522d28"
+    }
+  },
+  "source_sha256": {
+    "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
+    "doc/development/07_合同逐项开发追踪.md": "d99ad73f1cea7adf13ecdd5b70d2708fe0da993e85df5499f34384beacb6b7b2",
+    "doc/development/04_客户待确认事项与全局设置.md": "f4e652d0c33de520495a2d87639109c362039f3cde3e927cc0a708e84531e964",
+    "contracts/local-api.openapi.json": "6bd56d58146d64f05643b15fbafa76d785864a2cbbb226570fe5bcbe370e2859",
+    "apps/web/src/router.ts": "075914a45047c5ddc6c0d36cf289d75777d39cf2a5319ef0bcb26bceb6fceb9d",
+    "server/domain/src/main/java/cn/mop/domain/dashboard/DashboardAvailabilitySnapshot.java": "c0d74773b43a14527e47354d82f041c966845cae7b28b461ac1846cdc71eef35",
+    "server/api/src/main/java/cn/mop/api/PlatformController.java": "b1d28e3ca9615817ad1952aef03956389d9e5d4938ded336fc11342bd58e6ed8",
+    "server/api/src/main/java/cn/mop/api/AssetImportPolicy.java": "c4240ba26b0c43d62f4e5a2ce66141897ae540e7a330ee28425fbf4a249d4ab6",
+    "server/api/src/main/java/cn/mop/api/AssetExportJobController.java": "8aa59ab4f02bf3f7e7e3a84dff1553b03a38c57742000e972e095e7576143854"
+  },
+  "requirement_review": [
+    {
+      "id": "M1-1",
+      "contract_title": "运营总览首页",
+      "tc_id": "TC-M1-1",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B09",
+        "B10",
+        "B11"
+      ]
+    },
+    {
+      "id": "M1-2",
+      "contract_title": "告警趋势图",
+      "tc_id": "TC-M1-2",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05"
+      ]
+    },
+    {
+      "id": "M1-3",
+      "contract_title": "服务健康概览",
+      "tc_id": "TC-M1-3",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B06",
+        "B10"
+      ]
+    },
+    {
+      "id": "M1-4",
+      "contract_title": "故障时间线（近24小时）",
+      "tc_id": "TC-M1-4",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B10"
+      ]
+    },
+    {
+      "id": "M1-5",
+      "contract_title": "最近事件列表",
+      "tc_id": "TC-M1-5",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05"
+      ]
+    },
+    {
+      "id": "M1-6",
+      "contract_title": "待处理工单列表",
+      "tc_id": "TC-M1-6",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B10"
+      ]
+    },
+    {
+      "id": "M1-7",
+      "contract_title": "租户视图切换",
+      "tc_id": "TC-M1-7",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "口径待确认",
+      "blocker_ids": [
+        "B19",
+        "B20"
+      ]
+    },
+    {
+      "id": "M1-8",
+      "contract_title": "全局搜索与通知铃铛",
+      "tc_id": "TC-M1-8",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B11"
+      ]
+    },
+    {
+      "id": "M1-9",
+      "contract_title": "刷新与时间范围控件",
+      "tc_id": "TC-M1-9",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B20"
+      ]
+    },
+    {
+      "id": "M1-10",
+      "contract_title": "资源占用Top5",
+      "tc_id": "TC-M1-10",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B01",
+        "B02",
+        "B03",
+        "B04",
+        "B05"
+      ]
+    },
+    {
+      "id": "M1-11",
+      "contract_title": "首页版面管理",
+      "tc_id": "TC-M1-11",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "待验",
+      "blocker_ids": [
+        "B20"
+      ]
+    },
+    {
+      "id": "M2-1",
+      "contract_title": "租户列表",
+      "tc_id": "TC-M2-1",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B07",
+        "B20"
+      ]
+    },
+    {
+      "id": "M2-2",
+      "contract_title": "新建租户",
+      "tc_id": "TC-M2-2",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B07",
+        "B16"
+      ]
+    },
+    {
+      "id": "M2-3",
+      "contract_title": "配额管理",
+      "tc_id": "TC-M2-3",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B06",
+        "B07"
+      ]
+    },
+    {
+      "id": "M2-4",
+      "contract_title": "隔离模式三档",
+      "tc_id": "TC-M2-4",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B07",
+        "B16"
+      ]
+    },
+    {
+      "id": "M2-5",
+      "contract_title": "六层隔离约束与验证",
+      "tc_id": "TC-M2-5",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B07",
+        "B16",
+        "B20"
+      ]
+    },
+    {
+      "id": "M2-6",
+      "contract_title": "角色定义与权限矩阵",
+      "tc_id": "TC-M2-6",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B19",
+        "B20"
+      ]
+    },
+    {
+      "id": "M2-7",
+      "contract_title": "菜单与操作权限",
+      "tc_id": "TC-M2-7",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B13",
+        "B19",
+        "B20"
+      ]
+    },
+    {
+      "id": "M2-8",
+      "contract_title": "成员管理",
+      "tc_id": "TC-M2-8",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B11",
+        "B19"
+      ]
+    },
+    {
+      "id": "M2-9",
+      "contract_title": "客户联系人管理",
+      "tc_id": "TC-M2-9",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B11",
+        "B19"
+      ]
+    },
+    {
+      "id": "M2-10",
+      "contract_title": "服务档位管理与变更留痕",
+      "tc_id": "TC-M2-10",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B06",
+        "B09",
+        "B10"
+      ]
+    },
+    {
+      "id": "M2-11",
+      "contract_title": "设备数量上限控制",
+      "tc_id": "TC-M2-11",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B07"
+      ]
+    },
+    {
+      "id": "M2-12",
+      "contract_title": "审计日志",
+      "tc_id": "TC-M2-12",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B17",
+        "B20"
+      ]
+    },
+    {
+      "id": "M2-13",
+      "contract_title": "数据保留与删除",
+      "tc_id": "TC-M2-13",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B14",
+        "B17"
+      ]
+    },
+    {
+      "id": "M2-14",
+      "contract_title": "身份认证与组织",
+      "tc_id": "TC-M2-14",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B19"
+      ]
+    },
+    {
+      "id": "M3-1",
+      "contract_title": "资产列表",
+      "tc_id": "TC-M3-1",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B07"
+      ]
+    },
+    {
+      "id": "M3-2",
+      "contract_title": "资产列表字段",
+      "tc_id": "TC-M3-2",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "待验",
+      "blocker_ids": [
+        "B20"
+      ]
+    },
+    {
+      "id": "M3-3",
+      "contract_title": "资产详情",
+      "tc_id": "TC-M3-3",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B07",
+        "B12"
+      ]
+    },
+    {
+      "id": "M3-4",
+      "contract_title": "资产接入向导（5步）",
+      "tc_id": "TC-M3-4",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B01",
+        "B02",
+        "B03",
+        "B04",
+        "B06",
+        "B07"
+      ]
+    },
+    {
+      "id": "M3-5",
+      "contract_title": "设备信息维护",
+      "tc_id": "TC-M3-5",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B07"
+      ]
+    },
+    {
+      "id": "M3-6",
+      "contract_title": "Excel批量导入",
+      "tc_id": "TC-M3-6",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B07",
+        "B08",
+        "B18"
+      ]
+    },
+    {
+      "id": "M3-7",
+      "contract_title": "台账导出",
+      "tc_id": "TC-M3-7",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B08"
+      ]
+    },
+    {
+      "id": "M3-8",
+      "contract_title": "凭据加密托管",
+      "tc_id": "TC-M3-8",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B07",
+        "B17"
+      ]
+    },
+    {
+      "id": "M3-9",
+      "contract_title": "设备依赖关系配置",
+      "tc_id": "TC-M3-9",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B06"
+      ]
+    },
+    {
+      "id": "M3-10",
+      "contract_title": "维保到期管理",
+      "tc_id": "TC-M3-10",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B11"
+      ]
+    },
+    {
+      "id": "M3-11",
+      "contract_title": "资产退役与迁移",
+      "tc_id": "TC-M3-11",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B07",
+        "B17"
+      ]
+    },
+    {
+      "id": "M3-12",
+      "contract_title": "设备来源与发现方式",
+      "tc_id": "TC-M3-12",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B07"
+      ]
+    },
+    {
+      "id": "M4-1",
+      "contract_title": "设备状态监控",
+      "tc_id": "TC-M4-1",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B06"
+      ]
+    },
+    {
+      "id": "M4-2",
+      "contract_title": "资源监控（按设备类型）",
+      "tc_id": "TC-M4-2",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B01",
+        "B02",
+        "B03",
+        "B04",
+        "B05",
+        "B06"
+      ]
+    },
+    {
+      "id": "M4-3",
+      "contract_title": "流量监控",
+      "tc_id": "TC-M4-3",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B04",
+        "B05",
+        "B06"
+      ]
+    },
+    {
+      "id": "M4-4",
+      "contract_title": "线路质量监控",
+      "tc_id": "TC-M4-4",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B04",
+        "B05",
+        "B10"
+      ]
+    },
+    {
+      "id": "M4-5",
+      "contract_title": "告警阈值分级与受控宏",
+      "tc_id": "TC-M4-5",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B06"
+      ]
+    },
+    {
+      "id": "M4-6",
+      "contract_title": "触发规则管理",
+      "tc_id": "TC-M4-6",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B06"
+      ]
+    },
+    {
+      "id": "M4-7",
+      "contract_title": "告警防抖",
+      "tc_id": "TC-M4-7",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B06",
+        "B11"
+      ]
+    },
+    {
+      "id": "M4-8",
+      "contract_title": "重复告警合并",
+      "tc_id": "TC-M4-8",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05"
+      ]
+    },
+    {
+      "id": "M4-9",
+      "contract_title": "告警抑制（依赖）",
+      "tc_id": "TC-M4-9",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B10",
+        "B11"
+      ]
+    },
+    {
+      "id": "M4-10",
+      "contract_title": "维护窗口静默",
+      "tc_id": "TC-M4-10",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B06",
+        "B10",
+        "B11"
+      ]
+    },
+    {
+      "id": "M4-11",
+      "contract_title": "恢复通知与复核",
+      "tc_id": "TC-M4-11",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B09"
+      ]
+    },
+    {
+      "id": "M4-12",
+      "contract_title": "监控模板与灰度治理",
+      "tc_id": "TC-M4-12",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B06"
+      ]
+    },
+    {
+      "id": "M4-13",
+      "contract_title": "通知渠道管理",
+      "tc_id": "TC-M4-13",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B11",
+        "B17"
+      ]
+    },
+    {
+      "id": "M4-14",
+      "contract_title": "事件中心与事件详情",
+      "tc_id": "TC-M4-14",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05"
+      ]
+    },
+    {
+      "id": "M4-15",
+      "contract_title": "Proxy与站点管理",
+      "tc_id": "TC-M4-15",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B04",
+        "B05",
+        "B16"
+      ]
+    },
+    {
+      "id": "M4-16",
+      "contract_title": "监控资源池管理（平台管理员）",
+      "tc_id": "TC-M4-16",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B16",
+        "B18"
+      ]
+    },
+    {
+      "id": "M4-17",
+      "contract_title": "设备配置变更监控",
+      "tc_id": "TC-M4-17",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B12"
+      ]
+    },
+    {
+      "id": "M4-18",
+      "contract_title": "监控对象与阈值基线（必须补齐项）",
+      "tc_id": "TC-M4-18",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B01",
+        "B02",
+        "B03",
+        "B04",
+        "B05",
+        "B06",
+        "B07"
+      ]
+    },
+    {
+      "id": "M4-19",
+      "contract_title": "多品牌OID映射机制",
+      "tc_id": "TC-M4-19",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B04",
+        "B05",
+        "B06"
+      ]
+    },
+    {
+      "id": "M5-1",
+      "contract_title": "工单列表",
+      "tc_id": "TC-M5-1",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B10"
+      ]
+    },
+    {
+      "id": "M5-2",
+      "contract_title": "三方状态职责分离",
+      "tc_id": "TC-M5-2",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B09"
+      ]
+    },
+    {
+      "id": "M5-3",
+      "contract_title": "工单状态与同步状态",
+      "tc_id": "TC-M5-3",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09"
+      ]
+    },
+    {
+      "id": "M5-4",
+      "contract_title": "告警自动建单与规则配置",
+      "tc_id": "TC-M5-4",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B09"
+      ]
+    },
+    {
+      "id": "M5-5",
+      "contract_title": "客户自助报障表单",
+      "tc_id": "TC-M5-5",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B10",
+        "B11",
+        "B20"
+      ]
+    },
+    {
+      "id": "M5-6",
+      "contract_title": "手工登记事件",
+      "tc_id": "TC-M5-6",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B09"
+      ]
+    },
+    {
+      "id": "M5-7",
+      "contract_title": "处置记录与评论",
+      "tc_id": "TC-M5-7",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B09",
+        "B20"
+      ]
+    },
+    {
+      "id": "M5-8",
+      "contract_title": "SLA计时口径",
+      "tc_id": "TC-M5-8",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B10"
+      ]
+    },
+    {
+      "id": "M5-9",
+      "contract_title": "SLA报表",
+      "tc_id": "TC-M5-9",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B09",
+        "B10"
+      ]
+    },
+    {
+      "id": "M5-10",
+      "contract_title": "月报快照与合同对账",
+      "tc_id": "TC-M5-10",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B10",
+        "B14"
+      ]
+    },
+    {
+      "id": "M5-11",
+      "contract_title": "SLA报表导出",
+      "tc_id": "TC-M5-11",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B08",
+        "B14"
+      ]
+    },
+    {
+      "id": "M5-12",
+      "contract_title": "值班看板",
+      "tc_id": "TC-M5-12",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B10",
+        "B11"
+      ]
+    },
+    {
+      "id": "M5-13",
+      "contract_title": "升级策略与值班规则",
+      "tc_id": "TC-M5-13",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B11"
+      ]
+    },
+    {
+      "id": "M5-14",
+      "contract_title": "工单转派与改派",
+      "tc_id": "TC-M5-14",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B10",
+        "B19"
+      ]
+    },
+    {
+      "id": "M5-15",
+      "contract_title": "客户确认关单（一期核心信任机制）",
+      "tc_id": "TC-M5-15",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B11",
+        "B19"
+      ]
+    },
+    {
+      "id": "M5-16",
+      "contract_title": "超时自动关单",
+      "tc_id": "TC-M5-16",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B11",
+        "B14"
+      ]
+    },
+    {
+      "id": "M5-17",
+      "contract_title": "工单重开",
+      "tc_id": "TC-M5-17",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B10",
+        "B11"
+      ]
+    },
+    {
+      "id": "M5-18",
+      "contract_title": "超时提醒与催办",
+      "tc_id": "TC-M5-18",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B10",
+        "B11"
+      ]
+    },
+    {
+      "id": "M5-19",
+      "contract_title": "SLA未达标与补偿计算",
+      "tc_id": "TC-M5-19",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B10"
+      ]
+    },
+    {
+      "id": "M5-20",
+      "contract_title": "SLA时钟引擎（底座能力）",
+      "tc_id": "TC-M5-20",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B10"
+      ]
+    },
+    {
+      "id": "M5-21",
+      "contract_title": "工时记录",
+      "tc_id": "TC-M5-21",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B15"
+      ]
+    },
+    {
+      "id": "M6-1",
+      "contract_title": "定时备份计划",
+      "tc_id": "TC-M6-1",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B07",
+        "B12"
+      ]
+    },
+    {
+      "id": "M6-2",
+      "contract_title": "备份结果查询与差异比对",
+      "tc_id": "TC-M6-2",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B12"
+      ]
+    },
+    {
+      "id": "M6-3",
+      "contract_title": "版本历史与回滚参考",
+      "tc_id": "TC-M6-3",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B12",
+        "B17"
+      ]
+    },
+    {
+      "id": "M6-4",
+      "contract_title": "备份失败自动建单",
+      "tc_id": "TC-M6-4",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B12"
+      ]
+    },
+    {
+      "id": "M6-5",
+      "contract_title": "恢复演练记录",
+      "tc_id": "TC-M6-5",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B12",
+        "B20"
+      ]
+    },
+    {
+      "id": "M6-6",
+      "contract_title": "客户侧只读查看",
+      "tc_id": "TC-M6-6",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B12",
+        "B19"
+      ]
+    },
+    {
+      "id": "M6-7",
+      "contract_title": "变更检测与报备联动",
+      "tc_id": "TC-M6-7",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B06",
+        "B09",
+        "B12"
+      ]
+    },
+    {
+      "id": "M7-0",
+      "contract_title": "远程处置总纲与技术约束",
+      "tc_id": "TC-M7-0",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "范围待确认",
+      "blocker_ids": [
+        "B13"
+      ]
+    },
+    {
+      "id": "M7-1",
+      "contract_title": "受控自动化执行流程（可选增强）",
+      "tc_id": "TC-M7-1",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "范围待确认",
+      "blocker_ids": [
+        "B13"
+      ]
+    },
+    {
+      "id": "M7-2",
+      "contract_title": "操作风险分级策略",
+      "tc_id": "TC-M7-2",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "范围待确认",
+      "blocker_ids": [
+        "B13"
+      ]
+    },
+    {
+      "id": "M7-3",
+      "contract_title": "读写操作审批",
+      "tc_id": "TC-M7-3",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "范围待确认",
+      "blocker_ids": [
+        "B13",
+        "B19"
+      ]
+    },
+    {
+      "id": "M7-4",
+      "contract_title": "执行记录与输出归档",
+      "tc_id": "TC-M7-4",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "范围待确认",
+      "blocker_ids": [
+        "B13",
+        "B17"
+      ]
+    },
+    {
+      "id": "M7-5",
+      "contract_title": "审计要求（通用）",
+      "tc_id": "TC-M7-5",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B13",
+        "B17"
+      ]
+    },
+    {
+      "id": "M7-6",
+      "contract_title": "交互式远程连接（本期主线）",
+      "tc_id": "TC-M7-6",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B13",
+        "B19"
+      ]
+    },
+    {
+      "id": "M7-7",
+      "contract_title": "设备授权清单",
+      "tc_id": "TC-M7-7",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B13",
+        "B19"
+      ]
+    },
+    {
+      "id": "M7-8",
+      "contract_title": "会话录屏",
+      "tc_id": "TC-M7-8",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B13",
+        "B17"
+      ]
+    },
+    {
+      "id": "M7-9",
+      "contract_title": "命令日志与高危命令拦截",
+      "tc_id": "TC-M7-9",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B13",
+        "B17",
+        "B18"
+      ]
+    },
+    {
+      "id": "M8-1",
+      "contract_title": "通知渠道对接",
+      "tc_id": "TC-M8-1",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B11",
+        "B17"
+      ]
+    },
+    {
+      "id": "M8-2",
+      "contract_title": "渠道×级别矩阵",
+      "tc_id": "TC-M8-2",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B06",
+        "B11"
+      ]
+    },
+    {
+      "id": "M8-3",
+      "contract_title": "送达记录与死信管理",
+      "tc_id": "TC-M8-3",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B11",
+        "B18"
+      ]
+    },
+    {
+      "id": "M8-4",
+      "contract_title": "企业微信门户与免密登录",
+      "tc_id": "TC-M8-4",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B11",
+        "B19"
+      ]
+    },
+    {
+      "id": "M8-5",
+      "contract_title": "设备概况（客户视角）",
+      "tc_id": "TC-M8-5",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B11"
+      ]
+    },
+    {
+      "id": "M8-6",
+      "contract_title": "拍照报障",
+      "tc_id": "TC-M8-6",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B10",
+        "B11",
+        "B20"
+      ]
+    },
+    {
+      "id": "M8-7",
+      "contract_title": "工单进度查询",
+      "tc_id": "TC-M8-7",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B11"
+      ]
+    },
+    {
+      "id": "M8-8",
+      "contract_title": "确认关单与重开（移动端）",
+      "tc_id": "TC-M8-8",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B11"
+      ]
+    },
+    {
+      "id": "M8-9",
+      "contract_title": "报告中心",
+      "tc_id": "TC-M8-9",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B14"
+      ]
+    },
+    {
+      "id": "M8-10",
+      "contract_title": "通知偏好设置",
+      "tc_id": "TC-M8-10",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B06",
+        "B11"
+      ]
+    },
+    {
+      "id": "M8-11",
+      "contract_title": "分级推送落地",
+      "tc_id": "TC-M8-11",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B11",
+        "B18"
+      ]
+    },
+    {
+      "id": "M8-12",
+      "contract_title": "门户通用要求",
+      "tc_id": "TC-M8-12",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B11",
+        "B18",
+        "B20"
+      ]
+    },
+    {
+      "id": "M9-1",
+      "contract_title": "报表计算口径（所有报告的统一数据源）",
+      "tc_id": "TC-M9-1",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B09",
+        "B10",
+        "B14"
+      ]
+    },
+    {
+      "id": "M9-2",
+      "contract_title": "月报快照与冻结",
+      "tc_id": "TC-M9-2",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B14"
+      ]
+    },
+    {
+      "id": "M9-3",
+      "contract_title": "老板版月报（1页，核心交付物）",
+      "tc_id": "TC-M9-3",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B10",
+        "B14",
+        "B18"
+      ]
+    },
+    {
+      "id": "M9-4",
+      "contract_title": "完整版月报（6章）",
+      "tc_id": "TC-M9-4",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B09",
+        "B14"
+      ]
+    },
+    {
+      "id": "M9-5",
+      "contract_title": "报告推送与阅读记录",
+      "tc_id": "TC-M9-5",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B11",
+        "B14"
+      ]
+    },
+    {
+      "id": "M9-6",
+      "contract_title": "网络健康体检报告（售前转化工具）",
+      "tc_id": "TC-M9-6",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B14",
+        "B15"
+      ]
+    },
+    {
+      "id": "M9-7",
+      "contract_title": "季度巡检报告",
+      "tc_id": "TC-M9-7",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B14"
+      ]
+    },
+    {
+      "id": "M9-8",
+      "contract_title": "年度复盘报告（标注优先级，可二期交付）",
+      "tc_id": "TC-M9-8",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "范围待确认",
+      "blocker_ids": [
+        "B14",
+        "B18"
+      ]
+    },
+    {
+      "id": "M9-9",
+      "contract_title": "报告通用规则（验收硬约束）",
+      "tc_id": "TC-M9-9",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B14"
+      ]
+    },
+    {
+      "id": "M10-1",
+      "contract_title": "SLA达成率",
+      "tc_id": "TC-M10-1",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B10",
+        "B14",
+        "B15"
+      ]
+    },
+    {
+      "id": "M10-2",
+      "contract_title": "告警确认及时率",
+      "tc_id": "TC-M10-2",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B15"
+      ]
+    },
+    {
+      "id": "M10-3",
+      "contract_title": "远程处置率",
+      "tc_id": "TC-M10-3",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B09",
+        "B13",
+        "B15"
+      ]
+    },
+    {
+      "id": "M10-4",
+      "contract_title": "客户毛利统计",
+      "tc_id": "TC-M10-4",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B14",
+        "B15"
+      ]
+    },
+    {
+      "id": "M10-5",
+      "contract_title": "人员服务能力",
+      "tc_id": "TC-M10-5",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B08",
+        "B15"
+      ]
+    },
+    {
+      "id": "M10-6",
+      "contract_title": "运营计量看板",
+      "tc_id": "TC-M10-6",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B15"
+      ]
+    },
+    {
+      "id": "M10-7",
+      "contract_title": "容量估算模型（平台管理员）",
+      "tc_id": "TC-M10-7",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B15",
+        "B18"
+      ]
+    },
+    {
+      "id": "M10-8",
+      "contract_title": "平台健康与SLO（平台管理员）",
+      "tc_id": "TC-M10-8",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B11",
+        "B16",
+        "B18"
+      ]
+    },
+    {
+      "id": "M10-9",
+      "contract_title": "时间维度与导出",
+      "tc_id": "TC-M10-9",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B08",
+        "B15"
+      ]
+    },
+    {
+      "id": "M10-10",
+      "contract_title": "单人可管客户数",
+      "tc_id": "TC-M10-10",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B08",
+        "B15"
+      ]
+    },
+    {
+      "id": "M10-11",
+      "contract_title": "跳档触发提示",
+      "tc_id": "TC-M10-11",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B07",
+        "B11",
+        "B15"
+      ]
+    },
+    {
+      "id": "M10-12",
+      "contract_title": "八项经营指标口径定义",
+      "tc_id": "TC-M10-12",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B05",
+        "B09",
+        "B10",
+        "B14",
+        "B15"
+      ]
+    },
+    {
+      "id": "M10-13",
+      "contract_title": "前置依赖：工时字段",
+      "tc_id": "TC-M10-13",
+      "formal_status": "NOT_RUN",
+      "review_disposition": "差距",
+      "blocker_ids": [
+        "B15"
+      ]
+    }
+  ],
+  "secrets_included": false,
+  "completion_percentage_computed": false
+}

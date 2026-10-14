@@ -1,0 +1,178 @@
+{
+  "verified_at": "2026-10-14T03:07:56.223304+00:00",
+  "source": "local_python_direct",
+  "read_only": true,
+  "authenticated_business_tests": false,
+  "checks": [
+    {
+      "path": "/api/v1/health/live",
+      "http_status": 200,
+      "data": {
+        "status": "UP",
+        "mode": "remote_test",
+        "source": "postgresql"
+      }
+    },
+    {
+      "path": "/api/v1/health/ready",
+      "http_status": 200,
+      "data": {
+        "status": "READY_REMOTE_TEST",
+        "ready": true,
+        "mode": "remote_test",
+        "source": "postgresql",
+        "durable": true,
+        "production_ready": false,
+        "own_notification_preferences": {
+          "schema_access_ready": true,
+          "configuration_status": "CONFIG_PENDING",
+          "effective": false,
+          "receiver_binding_status": "NOT_VERIFIED",
+          "notification_dispatched": false
+        },
+        "asset_exports": {
+          "schema_access_ready": true,
+          "mode": "PREPARE_ONLY_NO_PUBLICATION",
+          "worker_liveness": null,
+          "publication_status": "NOT_IMPLEMENTED",
+          "download_allowed": false
+        },
+        "change_notice_drafts": {
+          "schema_access_ready": true,
+          "approval_status": null,
+          "automatic_p3_decision": null,
+          "approval_workflow_status": "CONFIG_PENDING",
+          "matching_policy_status": "CONFIG_PENDING",
+          "effective": false,
+          "device_execution_allowed": false,
+          "alert_suppression_allowed": false
+        },
+        "backup_plan_drafts": {
+          "schema_access_ready": true,
+          "effective": false,
+          "device_execution_allowed": false,
+          "credential_verification": "NOT_VERIFIED",
+          "scheduler_running": null
+        },
+        "inspection_source_collections": {
+          "schema_access_ready": true,
+          "verification_status": "SELF_REPORTED_UNVERIFIED",
+          "generation_status": "CONFIG_PENDING",
+          "formal_report_generatable": false,
+          "report_published": false
+        },
+        "inspection_worksheets": {
+          "schema_access_ready": true,
+          "verification_status": "SELF_REPORTED_UNVERIFIED",
+          "evidence_binding_status": "NOT_IMPLEMENTED",
+          "publication_status": "NOT_IMPLEMENTED",
+          "report_published": false,
+          "active_scan_performed": false
+        },
+        "inspection_templates": {
+          "schema_access_ready": true,
+          "approval_status": "UNVERIFIED",
+          "publication_status": "NOT_IMPLEMENTED",
+          "report_published": false,
+          "active_scan_performed": false
+        },
+        "contact_imports": {
+          "schema_access_ready": true,
+          "worker_liveness": null,
+          "notification_dispatched": false,
+          "identity_binding_created": false
+        },
+        "customer_contacts": {
+          "schema_access_ready": true,
+          "notification_dispatched": false,
+          "channel_verification": "NOT_VERIFIED",
+          "identity_binding_created": false
+        },
+        "capacity_scenarios": {
+          "schema_access_ready": true,
+          "effective": false,
+          "measurement_verified": false,
+          "poc_executed": false
+        },
+        "manual_recovery": {
+          "schema_access_ready": true,
+          "source": "HUMAN_CONFIRMATION",
+          "monitoring_recovery_applicable": false,
+          "ticket_state_changed": false,
+          "sla_changed": false
+        },
+        "manual_incidents": {
+          "schema_access_ready": true,
+          "source_state": "MANUAL",
+          "registration_status": "REGISTERED_ONLY",
+          "monitoring_recovery_applicable": false,
+          "ticket_automatically_created": false
+        },
+        "working_calendars": {
+          "schema_access_ready": true,
+          "effective": false,
+          "customer_confirmation": "UNVERIFIED"
+        },
+        "photos": {
+          "enabled": true,
+          "ready": true,
+          "policy_ready": true,
+          "schema_ready": true,
+          "storage_ready": true,
+          "policy_source": "USER_DEVELOPMENT_DIRECTION",
+          "reasons": []
+        },
+        "asset_imports": {
+          "enabled": true,
+          "ready": true,
+          "policy_ready": true,
+          "schema_ready": true,
+          "storage_ready": true,
+          "worker_activity": "NOT_PROBED",
+          "business_status": "CONFIG_PENDING",
+          "can_import": false,
+          "reasons": []
+        },
+        "asset_reads": {
+          "unicode_search_ready": true,
+          "pagination": "BOUNDED_POSTGRESQL_KEYSET"
+        },
+        "ticket_comments": {
+          "schema_access_ready": true,
+          "visibility": "REPORTER_AND_INTERNAL",
+          "internal_identity_exposed": false,
+          "itsm_applied": false
+        },
+        "internal_notes": {
+          "schema_access_ready": true,
+          "visibility": "INTERNAL",
+          "ticket_state_changed": false,
+          "sla_changed": false
+        },
+        "asset_manual_metadata": {
+          "schema_access_ready": true,
+          "scope": "INTERNAL_MANUAL_DRAFT",
+          "monitoring_applied": false,
+          "cmdb_applied": false
+        },
+        "worklogs": {
+          "ready": true,
+          "schema_access_ready": true,
+          "financial_status": "CONFIG_PENDING"
+        },
+        "asset_dependencies": {
+          "ready": true,
+          "schema_access_ready": true,
+          "configuration_status": "CONFIG_PENDING",
+          "monitoring_applied": false,
+          "effective_rules": null
+        }
+      }
+    },
+    {
+      "path": "/login",
+      "http_status": 200,
+      "data": null
+    }
+  ]
+}

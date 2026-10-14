@@ -1,0 +1,22 @@
+{
+  "verified_at": "2026-10-14T03:06:04.6605690Z",
+  "checks": [
+    {
+      "url": "http://192.168.1.215:10010/api/v1/health/live",
+      "error_type": "HttpRequestException",
+      "http_status": null
+    },
+    {
+      "url": "http://192.168.1.215:10010/api/v1/health/ready",
+      "error_type": "HttpRequestException",
+      "http_status": null
+    },
+    {
+      "url": "http://192.168.1.215:10010/login",
+      "error_type": "HttpRequestException",
+      "http_status": null
+    }
+  ],
+  "read_only": true,
+  "authenticated_business_tests": false
+}

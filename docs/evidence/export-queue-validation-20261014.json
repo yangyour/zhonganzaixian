@@ -281,8 +281,9 @@
     },
     "acceptance_posts": 1,
     "initial_publication_panel_staleness_found_and_fixed": true,
-    "mobile_layout_verified": false,
-    "physical_device_verified": false
+    "mobile_layout_verified": true,
+    "physical_device_verified": false,
+    "final_public_deployment": "export-queue-deployment-20261014.json"
   },
   "checks": {
     "web": 1886,

@@ -1,5 +1,7 @@
 # LAN测试部署模板
 
+2026-10-14自动准备应用已部署，当前含可选覆盖服务共13个常驻容器；只读检查须加`--include-export-queue`。保留原固定UTC启用时间，沿用API0.47/V30；发布详情与回退见[本次记录](../../docs/asset-export-automatic-preparation.md)。
+
 2026-10-14当前测试站已部署API0.47及顶部横排模块导航。台账准备可显式启用[常驻自动队列](../../docs/asset-export-automatic-preparation.md)，原单作业Worker继续保留；文件发布/900秒签名下载另行由已授权创建人在页面确认，见[导出发布配置与限制](../../docs/asset-export-publication.md)。启用时将独立导出桶/账号、`MOP_EXPORT_PUBLICATION_ENABLED`、`MOP_EXPORT_DOWNLOAD_SIGNING_KEY`仅写入API私有env；不把签名密钥给准备Worker，不自动发布历史作业，不重启存储/数据库等无关服务。
 
 2026-10-12基础网络监控已接入MOP，见[运行参数与验收](../../docs/basic-network-monitoring.md)。API私有env显式启用MOP_NETWORK_MONITORING_ENABLED，提供回环Zabbix端点、受限只读token及固定资产绑定JSON。部署分别指定API_RELEASE_DIR和WEB_RELEASE_DIR；后者缺省沿用RELEASE_DIR。先在不可变新版本目录校验工件SHA256，再仅更新本项目api/web，保留旧私有env及版本引用以便回退。不得修改已在使用的静态文件目录或重启无关组件。

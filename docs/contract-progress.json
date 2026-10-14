@@ -437,6 +437,7 @@
         "docs/asset-export-snapshot.md",
         "docs/asset-ledger-export-encoding.md",
         "docs/evidence/export-publication-validation-20261014.json",
+        "docs/evidence/export-queue-deployment-20261014.json",
         "docs/evidence/export-queue-validation-20261014.json",
         "docs/evidence/niko-export-api-20261004.json",
         "docs/evidence/niko-export-client-20261004.json",
@@ -1448,6 +1449,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "f973ba9886d7c1784b0143c33532a745e9f092f783fc1ecbaca6ecf10191fda2"
+    "doc/development/07_合同逐项开发追踪.md": "65faea0c8165be83273d70ddeadc8dd32e38d7e0d6ec6b4e8fb45f4215d1c3a5"
   }
 }

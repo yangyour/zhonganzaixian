@@ -1,0 +1,267 @@
+{
+  "source_commit": "15148425ed486a094aae1671ddf667cbcee8748d",
+  "release": "/opt/mop-lan-test/releases/15148425ed48-export-auto",
+  "worker_sha256": "9a79b550b0b7f3ba04ab851d741e3b5406ea46781455f6867b30dd1ec7825148",
+  "web_build_id": "a9735c14cf41ec4af674e808e8cc8d9cf4f04a51e95f80c5e64a2ddf73b30c62",
+  "cutoff_utc": "2026-10-14T05:38:28.480Z",
+  "before": {
+    "mop-lan-postgres": {
+      "id": "3aebabee32b1812ff37aeb84341a7d67e736941d2bd0d82bbb7192919bea8a97",
+      "image": "sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641",
+      "started_at": "2026-10-08T12:15:32.354957313Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-minio": {
+      "id": "e347d1402ead939abe1121094ed0d963ba07f8f88464819c46449757022104d7",
+      "image": "sha256:a16cad481969d7ddb6fcd2f1c58284af3d1266190b9bedc3ef0801aeb05a93a9",
+      "started_at": "2026-10-08T12:15:32.354248163Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-redis": {
+      "id": "cd68b313f967a54df7f8d5c59c9fe3146f9c261372683205822c71f3d64b24f3",
+      "image": "sha256:abbc5faf6f23b6835d3c357530e96c841e02cb66bd0e426573ef5acb434f597f",
+      "started_at": "2026-10-08T12:15:32.349268223Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-rabbitmq": {
+      "id": "9b8cc8ece2a07ae354f88e7f919f157a03d424ca160cd51217375cd76a0a443d",
+      "image": "sha256:e3b55503d81b67c93a2914a7473e59bbd53d5f4560c421e06015ed64a3034c9e",
+      "started_at": "2026-10-08T12:15:32.356127727Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-api": {
+      "id": "1d10761ed569dd4f7b3f8f5be5f9fdc03da249580ff1cf0e0f51b9feac1d6b01",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-14T04:44:12.880125609Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-photo-worker": {
+      "id": "286c6c5b1630d8e93981f2252a6f2aaa0e886794bde0b2ad5138765171da4f94",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-08T13:04:19.411672776Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-import-worker": {
+      "id": "2b1411eac481d2a63f158206fa1a0cdf5c26c5cce1f8a4b2af9e1fb43352bede",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-08T13:04:19.399831379Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-contact-worker": {
+      "id": "b403f019bc6169a4bc1adb1d42c6dfece1fa6204d72c129dfef006273b4e0368",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-08T12:18:48.262492182Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-web": {
+      "id": "5e9a8b04d0bade0663493ab7d5f7be63078d9f8b0a9aa5cb07ed5d20d1940ee4",
+      "image": "sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2",
+      "started_at": "2026-10-14T04:44:12.881183294Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-server": {
+      "id": "303bbd1f5767a733137de772945fc46506143d0933d036f3412cad85d125ae66",
+      "image": "sha256:415452211dea59cd4ea3346f2c2b38403660408273c672ebf91603353ce1073f",
+      "started_at": "2026-10-08T12:18:48.248721584Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-web": {
+      "id": "61bb1692e7da5a54e4dcf51c3cf8965d9ae1d45a735cb1bf865d9627833d2c0e",
+      "image": "sha256:cd216a9968b62eb6fddd789872b9e8eb4d064539ef40b6356dd2d8c1588a3f91",
+      "started_at": "2026-10-08T12:21:37.244174288Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-agent": {
+      "id": "008118b2bd32f4da65bc766614c305973fcead8b2cc0e5cdf4c88880b9eb454b",
+      "image": "sha256:ba55e6d146d0f0bc550da82b29b22134655db6e31d2c9eae9b1d15f659ad86cd",
+      "started_at": "2026-10-08T12:18:48.243454374Z",
+      "restart_count": 0,
+      "running": true
+    }
+  },
+  "after": {
+    "mop-lan-postgres": {
+      "id": "3aebabee32b1812ff37aeb84341a7d67e736941d2bd0d82bbb7192919bea8a97",
+      "image": "sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641",
+      "started_at": "2026-10-08T12:15:32.354957313Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-minio": {
+      "id": "e347d1402ead939abe1121094ed0d963ba07f8f88464819c46449757022104d7",
+      "image": "sha256:a16cad481969d7ddb6fcd2f1c58284af3d1266190b9bedc3ef0801aeb05a93a9",
+      "started_at": "2026-10-08T12:15:32.354248163Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-redis": {
+      "id": "cd68b313f967a54df7f8d5c59c9fe3146f9c261372683205822c71f3d64b24f3",
+      "image": "sha256:abbc5faf6f23b6835d3c357530e96c841e02cb66bd0e426573ef5acb434f597f",
+      "started_at": "2026-10-08T12:15:32.349268223Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-rabbitmq": {
+      "id": "9b8cc8ece2a07ae354f88e7f919f157a03d424ca160cd51217375cd76a0a443d",
+      "image": "sha256:e3b55503d81b67c93a2914a7473e59bbd53d5f4560c421e06015ed64a3034c9e",
+      "started_at": "2026-10-08T12:15:32.356127727Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-api": {
+      "id": "1d10761ed569dd4f7b3f8f5be5f9fdc03da249580ff1cf0e0f51b9feac1d6b01",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-14T04:44:12.880125609Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-photo-worker": {
+      "id": "286c6c5b1630d8e93981f2252a6f2aaa0e886794bde0b2ad5138765171da4f94",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-08T13:04:19.411672776Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-import-worker": {
+      "id": "2b1411eac481d2a63f158206fa1a0cdf5c26c5cce1f8a4b2af9e1fb43352bede",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-08T13:04:19.399831379Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-contact-worker": {
+      "id": "b403f019bc6169a4bc1adb1d42c6dfece1fa6204d72c129dfef006273b4e0368",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-08T12:18:48.262492182Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-web": {
+      "id": "ff109eb13797a7fca31c6e3d05afd2ace0c0b0acde7caac4feb56611d68c2f08",
+      "image": "sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2",
+      "started_at": "2026-10-14T06:09:58.224548439Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-server": {
+      "id": "303bbd1f5767a733137de772945fc46506143d0933d036f3412cad85d125ae66",
+      "image": "sha256:415452211dea59cd4ea3346f2c2b38403660408273c672ebf91603353ce1073f",
+      "started_at": "2026-10-08T12:18:48.248721584Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-web": {
+      "id": "61bb1692e7da5a54e4dcf51c3cf8965d9ae1d45a735cb1bf865d9627833d2c0e",
+      "image": "sha256:cd216a9968b62eb6fddd789872b9e8eb4d064539ef40b6356dd2d8c1588a3f91",
+      "started_at": "2026-10-08T12:21:37.244174288Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-agent": {
+      "id": "008118b2bd32f4da65bc766614c305973fcead8b2cc0e5cdf4c88880b9eb454b",
+      "image": "sha256:ba55e6d146d0f0bc550da82b29b22134655db6e31d2c9eae9b1d15f659ad86cd",
+      "started_at": "2026-10-08T12:18:48.243454374Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-export-preparation-worker": {
+      "id": "51f660c08421415507e58ba6c92c686c71a38b9c0be3956bb709cbfcf88de0e6",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-14T06:09:58.223553341Z",
+      "restart_count": 0,
+      "running": true
+    }
+  },
+  "existing_11_unchanged": true,
+  "switched_at": "2026-10-14T06:10:00.524961+00:00",
+  "switch_completed": true,
+  "initial_failure": "SFTP standard rename cannot replace existing file; original env and live containers unchanged. Resume uses POSIX atomic rename after expected hash verification.",
+  "environment": "lan-test-20261008",
+  "public_origin": "http://192.168.1.215:10010",
+  "api_unchanged": true,
+  "schema_version": 30,
+  "migrations_executed": 0,
+  "pre_cutoff_job_still_unchanged": true,
+  "download_xlsx_rows": 1,
+  "download_xlsx_columns": 16,
+  "ui": {
+    "requests": [
+      {
+        "method": "POST",
+        "path": "/api/v1/asset-export-jobs"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/asset-export-jobs/858f9c56-acc5-4065-a0de-1ccadefd5b31"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/asset-export-jobs/858f9c56-acc5-4065-a0de-1ccadefd5b31/publication"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/asset-export-jobs/858f9c56-acc5-4065-a0de-1ccadefd5b31"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/asset-export-jobs/858f9c56-acc5-4065-a0de-1ccadefd5b31/publication"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/asset-export-jobs/858f9c56-acc5-4065-a0de-1ccadefd5b31/publication"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/asset-export-jobs/858f9c56-acc5-4065-a0de-1ccadefd5b31"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/asset-export-jobs/858f9c56-acc5-4065-a0de-1ccadefd5b31/publication"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/asset-export-jobs/858f9c56-acc5-4065-a0de-1ccadefd5b31/content-grants"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/asset-export-jobs/858f9c56-acc5-4065-a0de-1ccadefd5b31/content"
+      }
+    ],
+    "page_errors": [],
+    "job_id": "858f9c56-acc5-4065-a0de-1ccadefd5b31",
+    "prepared": null,
+    "prepared_text": "已保存的文件准备信息\n\n1 行 · 4962 字节\n\n生成 2026/10/14 14:10:44（Asia/Shanghai）\n\n文件SHA256 fe04029c9eb56e47a81bbf3b86257066f1bb5514bb8ee688bb0fc930f6df1e8a\n筛选SHA256 17e77b574b8743d8a9106e2acb87235786f8a8541b74cc0845839dfe47eaddab",
+    "automatic_prepared": true,
+    "publication_current": true,
+    "prepared_poll_gets": 2,
+    "mobile_overflow": false,
+    "refresh_toggle_works": true,
+    "stops_polling_when_prepared": true,
+    "explicit_publication": true,
+    "actual_download_sha256": "fe04029c9eb56e47a81bbf3b86257066f1bb5514bb8ee688bb0fc930f6df1e8a",
+    "download_size": 4962,
+    "explicit_download": true,
+    "ready": true,
+    "production_ready": false,
+    "public_build_id": "a9735c14cf41ec4af674e808e8cc8d9cf4f04a51e95f80c5e64a2ddf73b30c62",
+    "existing_network_monitor_http": 200
+  },
+  "formal_contract_acceptance": "NOT_RUN",
+  "production_ready": false,
+  "credentials_output": false,
+  "local_forwarding_cleanup": "Owned browser, Vite 5176, API 21810 and component tunnels 21900/25439/22020 stopped; 13 services independently ready afterward",
+  "cache_policy_changed": false,
+  "initial_resume_helper_restarted": "Only owned helper stopped during slow redundant SFTP JAR read before mutation; server-side SHA verification used on same release.",
+  "final_component_evidence": "export-queue-components-final-20261014.json"
+}

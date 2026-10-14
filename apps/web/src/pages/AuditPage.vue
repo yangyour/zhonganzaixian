@@ -50,8 +50,8 @@ onUnmounted(() => workspace.dispose())
 </script>
 <template>
   <section class="audit-page">
-    <div class="page-heading"><div><span class="eyebrow">ADMINISTRATION / AUDIT</span><h1>审计检索与区间校验</h1><p>当前租户授权日志，筛选使用精确值；分页与校验分别保留各自快照边界。</p></div><el-button :loading="state.loading" :disabled="!permitted" @click="refresh">刷新已应用筛选</el-button></div>
-    <el-alert class="page-note" type="info" :closable="false" title="日志保存在项目PostgreSQL。生产留存仍待确认；本页不提供修改、删除或重签名。hash链没有外部可信锚，不等同于WORM或防特权整链重写证明。" />
+    <div class="page-heading"><div><h1>审计检索与区间校验</h1><p>当前租户授权日志，筛选使用精确值；分页与校验分别保留各自快照边界。</p></div><el-button :loading="state.loading" :disabled="!permitted" @click="refresh">刷新已应用筛选</el-button></div>
+    <details class="page-guidance"><summary>使用范围与说明</summary><el-alert class="page-note" type="info" :closable="false" title="日志保存在项目PostgreSQL。生产留存仍待确认；本页不提供修改、删除或重签名。hash链没有外部可信锚，不等同于WORM或防特权整链重写证明。" /></details>
     <el-empty v-if="!permitted" description="当前身份没有本租户审计权限" />
     <template v-else>
       <div class="panel">
@@ -75,7 +75,7 @@ onUnmounted(() => workspace.dispose())
         <div class="table-footer audit-pagination"><span>{{ state.paged ? '后续页' : '第一页' }} · 本页 {{ state.page?.items.length ?? '—' }} 条 · 序号上界 {{ state.page?.snapshot_sequence ?? '—' }}</span><div class="audit-actions"><el-button :disabled="state.loading || !state.paged" @click="refresh">返回第一页</el-button><el-button :disabled="state.loading || !state.page?.has_more || unapplied" @click="nextPage">下一页</el-button></div></div>
         <p class="field-help">新追加日志不会进入已固定上界的后续页，刷新第一页才能查看。列表仅校验每条本地摘要，不据此宣称整链完整。</p>
       </div>
-      <section class="panel audit-proof-panel">
+      <details class="panel audit-proof-panel"><summary>校验审计链</summary>
         <h2>只读区间校验</h2><p>校验范围是当前租户完整审计链的序号区间，不受上方筛选条件裁剪；每批最多1000条，包含首尾。</p>
         <el-form label-position="top" class="audit-range-form" @submit.prevent="verifyRange"><el-form-item label="开始序号"><el-input v-model="from" inputmode="numeric" aria-label="审计校验开始序号" /></el-form-item><el-form-item label="结束序号（可留空）"><el-input v-model="to" inputmode="numeric" aria-label="审计校验结束序号" placeholder="留空取本批最多1000条" /></el-form-item><el-button type="primary" native-type="submit" :loading="state.verifying">校验此区间（只读）</el-button></el-form>
         <p v-if="rangeError" role="alert" class="audit-warning">{{ rangeError }}</p><ApiErrorNotice :error="state.proofError" />
@@ -84,7 +84,7 @@ onUnmounted(() => workspace.dispose())
           <el-descriptions :column="1" border class="audit-proof-details"><el-descriptions-item label="当次快照时间">{{ state.proof.checked_at }}</el-descriptions-item><el-descriptions-item label="快照尾序号">{{ state.proof.snapshot_sequence }}</el-descriptions-item><el-descriptions-item label="本次区间">{{ state.proof.from_sequence ?? '无' }} → {{ state.proof.to_sequence ?? '无' }}</el-descriptions-item><el-descriptions-item label="已验证记录数">{{ state.proof.verified_records }}</el-descriptions-item><el-descriptions-item label="校验失败">{{ state.proof.failure }}<span v-if="state.proof.failure_sequence !== null"> · #{{ state.proof.failure_sequence }}</span></el-descriptions-item><el-descriptions-item label="本次是否覆盖快照整链">{{ state.proof.whole_snapshot_chain_checked ? '是，仅此快照且无外部可信锚' : '否，不将部分区间或空记录当作整链证明' }}</el-descriptions-item><el-descriptions-item label="本地前驱摘要"><span class="audit-hash">{{ state.proof.anchor_hash ?? '未取得' }}</span></el-descriptions-item><el-descriptions-item label="本批末尾摘要"><span class="audit-hash">{{ state.proof.final_hash ?? '未取得' }}</span></el-descriptions-item></el-descriptions>
           <el-button :disabled="state.verifying || state.proof.status !== 'VALID' || !state.proof.next_from_sequence" @click="verifyNext">明确校验后续一批</el-button><p class="field-help">每次点击产生独立只读快照，不自动循环，也不把多次快照拼成一个整链证明。校验失败不会自动修复。</p>
         </template>
-      </section>
+      </details>
       <el-dialog :model-value="Boolean(selected)" title="审计记录摘要" width="650px" class="audit-record-dialog" @update:model-value="toggleRecord"><template v-if="selected"><p>#{{ selected.sequence }} · {{ selected.action }}</p><p class="audit-hash">记录ID：{{ selected.id }}</p><p class="audit-hash">操作者ID：{{ selected.actor_id ?? '未认证主体' }}</p><p class="audit-hash">前驱：{{ selected.previous_hash }}</p><p class="audit-hash">本条：{{ selected.entry_hash }}</p><p>已将本条序号填入校验表单，需关闭后明确点击校验；查看摘要不会自动发起校验或写动作。</p></template><template #footer><el-button @click="selected = null">关闭</el-button></template></el-dialog>
     </template>
   </section>

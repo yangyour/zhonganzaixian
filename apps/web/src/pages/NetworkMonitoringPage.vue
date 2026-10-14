@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWorkspaceReveal } from '../utils/useWorkspaceReveal'
 import {computed,onMounted,onUnmounted,ref,watch} from 'vue'
 import {api,isCancelled} from '../api/client'
 import {can,session,switchingTenant,contextGeneration} from '../stores/session'
@@ -55,10 +56,11 @@ const time=(value:string|null)=>value?new Date(value).toLocaleString('zh-CN',{ti
 function display(d:import('../utils/networkMonitoring').Device,m:Metric){const recorded=d.metrics[m].recorded_at;const estimated=Date.parse(snapshot.value!.generated_at)+now.value-loadedAt.value;return sampleText(d,m,expired.value||recorded!==null&&estimated-Date.parse(recorded)>180000)}
 function resourceText(id:string,m:ResourceMetric){const entry=resources.value[id];if(!entry)return resourceErrors.value[id]?'暂不可用':'读取中…';const v=entry.data;if(expired.value||now.value-entry.loaded>90000||v.received_at!==null&&Date.parse(v.generated_at)+now.value-entry.loaded-Date.parse(v.received_at)>180000)return '数据过期';if(v.state!=='FRESH')return ({STALE:'数据过期',NO_DATA:'等待采样',COLLECTOR_ERROR:'采集异常',CLOCK_SKEW:'时钟异常'} as const)[v.state];return `${Number(v.metrics[m].value).toFixed(1)}%`}
 function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)return '';if(v.reason==='PASSWORD_EXPIRED')return '设备密码已过期';if(v.reason==='ACCESS_DENIED')return '设备读取权限不足';if(v.reason==='VERSION_CHANGED')return '设备版本变化，待核验';return v.state==='FRESH'?'来源：防火墙 API':'资源采集未就绪'}
+useWorkspaceReveal(() => selected.value, '.network-history')
 </script>
 <template>
   <section class="network-page">
-    <header class="network-heading"><div><p class="eyebrow">NETWORK MONITORING</p><h1>基础网络监控</h1><p>持续查看设备连通性、延迟、丢包和端口状态</p></div><el-button :loading="loading" :disabled="!permitted" @click="refresh">刷新监控</el-button></header>
+    <header class="network-heading"><div><h1>基础网络监控</h1><p>持续查看设备连通性、延迟、丢包和端口状态</p></div><el-button :loading="loading" :disabled="!permitted" @click="refresh">刷新监控</el-button></header>
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前没有资产读取权限" />
     <template v-else>
       <div class="network-context"><span>每 60 秒采集 · 页面每 30 秒刷新</span><span>资源指标按设备接入 · 告警规则待确认</span></div>

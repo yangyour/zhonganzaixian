@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-14逐页前端整改候选继续通过本机回环静态预览转发指定LAN测试API，未另建数据库、缓存或队列。本批仅提交前端、测试与记录，无后端/SQL/组件配置变更，未部署；零授权合成身份验证后已停用用户与角色。见[整改与验证边界](../frontend-page-refinement-20261014.md)。
+
 2026-10-14 Impeccable UI完善继续复用指定LAN测试API及基础组件；本机仅静态预览与请求转发，不启动数据库/缓存替身。Impeccable仅作开发工具，无服务器新增组件。见[验证及发布记录](../impeccable-ui-polish-20261014.md)。
 
 2026-10-14导出消息恢复前端已部署。只切换Web静态版本；切换窗口的全部已观测其他容器实例/镜像/启动时间/重启计数保持。本轮无API/Worker重启或数据库迁移，既有基础监控GET200，续领真实XLSX通过；[部署快照](../evidence/export-message-recovery-deployment-20261014.json)与[清理后既有组件检查](../evidence/export-message-recovery-components-final-20261014.json)分别留证，不代替另一批设备采集验收。

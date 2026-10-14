@@ -23,7 +23,7 @@ onUnmounted(reader.dispose)
   <ManualIncidentEditor ref="editor" v-model="editorOpen" @saved="afterSaved" />
   <section class="manual-incidents-page">
     <header><h1>手工来源事件登记</h1><p>电话、现场等外部来源的明确登记事实 · 当前授权租户内部可见</p></header>
-    <el-alert type="warning" :closable="false" show-icon title="仅完成登记，内容为自述、未经独立核验。监控正常不会让手工记录自动恢复；正式处置、工单关联和SLA尚未完成。" />
+    <details class="page-guidance"><summary>使用范围与说明</summary><el-alert type="warning" :closable="false" show-icon title="仅完成登记，内容为自述、未经独立核验。监控正常不会让手工记录自动恢复；正式处置、工单关联和SLA尚未完成。" /></details>
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前读取权限不可用，原范围数据已清除" />
     <template v-else>
       <div class="manual-actions"><el-button v-if="can('manual_incidents:write')" :disabled="state.busy" type="primary" @click="editor?.prepare()">新建手工登记</el-button><el-button :loading="state.busy" @click="reader.list()">刷新第一页（只读）</el-button><el-button :disabled="state.busy || !state.page?.has_more" @click="reader.list(true)">下一页</el-button><span>{{ state.paged ? '后续页' : '第一页' }} · 每页15条 · 翻页按各次读取快照</span></div>

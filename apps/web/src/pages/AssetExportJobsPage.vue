@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWorkspaceReveal } from '../utils/useWorkspaceReveal'
 import {computed,onMounted,onUnmounted,reactive,ref,shallowRef,watch} from 'vue'
 import {onBeforeRouteLeave} from 'vue-router'
 import { ElMessageBox } from 'element-plus'
@@ -48,13 +49,14 @@ const statusText=(s:string)=>({QUEUED:'排队中，执行尚未确认',RUNNING:'
 const valueText=(v:string|null)=>v===null?'不限（null）':v===''?'明确空字符串':v
 const errorText=(s:string)=>({AUTHORIZATION_CHANGED:'原受理授权已变化',SOURCE_UNAVAILABLE:'来源不可用',INPUT_LIMIT:'输入超过技术边界',ENCODING_FAILED:'文件编码失败',CONFIRMED_STORAGE_REJECTION:'存储已明确拒绝'}[s]??'未知错误')
 defineExpose({form,state,acknowledge,locked,autoRefresh,pollPreparation,filters,change,changeAck,submit,retry,browse,select,beginNew,unlockRejected,discard,hasUnresolved:workspace.unresolved})
+useWorkspaceReveal(() => state.value.selected?.id, '.current-export')
 </script>
 <template>
- <section class="export-page"><div class="page-heading"><div><p class="eyebrow">台账 / 内部本人作业</p><h1>台账导出准备</h1><p>明确筛选 → 耐久受理 → 独立查看进度</p></div></div>
- <el-alert type="info" :closable="false" show-icon title="新请求由后台自动准备文件；发布和下载仍需分别确认，发布后可查看我的导出消息" />
+ <section class="export-page"><div class="page-heading"><div><h1>台账导出准备</h1><p>明确筛选 → 耐久受理 → 独立查看进度</p></div></div>
+ <details class="page-guidance"><summary>使用范围与说明</summary><el-alert type="info" :closable="false" show-icon title="新请求由后台自动准备文件；发布和下载仍需分别确认，发布后可查看我的导出消息" /></details>
  <p v-if="!permitted" class="panel">当前身份没有内部导出准备权限，或租户正在切换；未展示旧数据</p>
  <template v-else>
-  <form v-form-feedback class="panel export-form" @submit.prevent="submit"><h2>1. 核对本次筛选</h2><p>只选择当前租户台账；全部“不限”会选择全部匹配记录。1000行、16MiB文件是技术保护，超限拒绝，不静默截断</p>
+  <details class="page-editor"><summary>新建导出请求</summary><form v-form-feedback class="panel export-form" @submit.prevent="submit"><h2>核对本次筛选</h2><p>只选择当前租户台账；全部“不限”会选择全部匹配记录。1000行、16MiB文件是技术保护，超限拒绝，不静默截断</p>
    <fieldset :disabled="locked"><legend>明确的四项条件</legend><div class="filter-grid">
     <label>类型<select aria-label="导出设备类型" :value="form.type" @change="change('type',inputValue($event))"><option value="">不限</option><option v-for="(label,key) in typeLabels" :key="key" :value="key">{{label}}</option></select></label>
     <label>状态<select aria-label="导出设备状态" :value="form.status" @change="change('status',inputValue($event))"><option value="">不限</option><option v-for="(label,key) in statusLabels" :key="key" :value="key">{{label}}</option></select></label>
@@ -62,16 +64,16 @@ defineExpose({form,state,acknowledge,locked,autoRefresh,pollPreparation,filters,
     <div><label class="check"><input type="checkbox" aria-label="导出文本不限" :checked="form.queryAny" @change="change('queryAny',checked($event))" />文本不限（null）</label><label>明确检索文本<input aria-label="导出检索文本" :disabled="form.queryAny" :value="form.query" maxlength="100" @input="change('query',inputValue($event))" /></label></div>
    </div><p class="hint">取消“不限”后，空输入会保留为空字符串；不会自动trim、补月份或改变筛选。状态筛选不证明当前监控健康</p><label class="check acknowledge"><input type="checkbox" aria-label="确认仅准备不发布" :checked="acknowledge" @change="changeAck(checked($event))" />我已核对条件，理解本次只受理准备请求，不发布或下载</label></fieldset>
    <p v-if="validation" role="alert" class="warning">{{validation}}</p><div class="actions"><button type="submit" :disabled="locked||!acknowledge">受理本次准备请求</button><button type="button" :disabled="busy||workspace.unresolved()" @click="beginNew">清除并准备新请求</button></div>
-  </form>
+  </form></details>
   <ApiErrorNotice :error="state.error" />
-  <section v-if="state.attempt" class="panel original-request"><h2>2. 本页原请求</h2><p>状态：{{state.attempt.state==='uncertain'?'结果未知，不能当作失败重建':state.attempt.state==='accepted'?'已收到原受理回执':'本次明确被拒绝，可显式返回修改'}}</p><p v-if="originalFilters">原类型 {{valueText(originalFilters.type)}} · 原状态 {{valueText(originalFilters.status)}}</p><p v-if="originalFilters">原站点 {{valueText(originalFilters.site_id)}} · 原文本 {{valueText(originalFilters.query)}}</p><p>普通刷新只读取当前状态，不能确认原POST；未知时保留完全相同的原请求恢复</p>
+  <section v-if="state.attempt" class="panel original-request"><h2>本页原请求</h2><p>状态：{{state.attempt.state==='uncertain'?'结果未知，不能当作失败重建':state.attempt.state==='accepted'?'已收到原受理回执':'本次明确被拒绝，可显式返回修改'}}</p><p v-if="originalFilters">原类型 {{valueText(originalFilters.type)}} · 原状态 {{valueText(originalFilters.status)}}</p><p v-if="originalFilters">原站点 {{valueText(originalFilters.site_id)}} · 原文本 {{valueText(originalFilters.query)}}</p><p>普通刷新只读取当前状态，不能确认原POST；未知时保留完全相同的原请求恢复</p>
    <button v-if="state.attempt.state==='uncertain'" type="button" :disabled="busy" @click="retry">重试完全相同原请求</button><button v-if="state.attempt.state==='rejected'" type="button" :disabled="busy" @click="unlockRejected">明确返回修改筛选</button>
    <div v-if="state.receipt" class="original-receipt"><h3>原受理回执：QUEUED / v0</h3><p>{{state.receipt.job_id}} · 仅排队，不是文件完成</p><button type="button" :disabled="busy" @click="select(state.receipt.job_id)">独立读取该作业当前进度</button></div>
   </section>
-  <section class="panel export-list"><div class="actions"><h2>3. 我的作业</h2><button type="button" :disabled="busy" @click="browse()">只读刷新第一页</button></div><p v-if="!state.page">{{state.busy==='read'?'正在读取，数量未知':state.error?'读取未通过，数量未知':'尚未读取，数量未知'}}</p>
+  <section class="panel export-list"><div class="actions"><h2>我的作业</h2><button type="button" :disabled="busy" @click="browse()">只读刷新第一页</button></div><p v-if="!state.page">{{state.busy==='read'?'正在读取，数量未知':state.error?'读取未通过，数量未知':'尚未读取，数量未知'}}</p>
    <template v-else><p>本页 {{state.page.items.length}} 条 · {{state.paged?'续页':'第一页'}}，不是全部作业数量；仅当前创建人和受理权限版本</p><p v-if="!state.page.items.length">当前范围没有作业，不代表整个租户没有导出</p><div class="record-table job-records" role="region" tabindex="0" aria-label="记录列表，可横向滚动"><table><thead><tr><th>状态</th><th>受理时间</th><th>筛选文本</th><th>版本</th><th>操作</th></tr></thead><tbody><tr v-for="job in state.page.items" :key="job.id" ><td><strong>{{statusText(job.status)}}</strong><details><summary>作业标识</summary>{{job.id}}</details></td><td>{{displayTime(job.created_at)}}</td><td>{{valueText(job.filters.query)}}</td><td>v{{job.version}}</td><td><button type="button" :disabled="busy" @click="select(job.id)">读取当前进度</button></td></tr></tbody></table></div><button type="button" :disabled="busy||!state.page.has_more" @click="browse(true)">下一页本人作业</button></template>
   </section>
-  <section v-if="state.selected" class="panel current-export" :aria-busy="state.busy==='read'"><h2>4. 独立回读的当前进度</h2><label class="check"><input v-model="autoRefresh" type="checkbox" aria-label="自动刷新准备进度" />自动刷新准备进度</label><p class="hint">每2秒查看未完成的准备请求；切到后台、完成准备或读取失败后暂停。历史请求可能需要管理员处理。</p><h3>{{statusText(state.selected.status)}}</h3><p>{{state.selected.id}} · v{{state.selected.version}} · 已登记领取 {{state.selected.attempts}} 次</p><p>更新时间 {{displayTime(state.selected.updated_at)}}（Asia/Shanghai）；Worker在线未知</p><p>类型 {{valueText(state.selected.filters.type)}} · 状态 {{valueText(state.selected.filters.status)}}</p><p>站点 {{valueText(state.selected.filters.site_id)}} · 文本 {{valueText(state.selected.filters.query)}}</p>
+  <section v-if="state.selected" class="panel current-export" :aria-busy="state.busy==='read'"><h2>独立回读的当前进度</h2><label class="check"><input v-model="autoRefresh" type="checkbox" aria-label="自动刷新准备进度" />自动刷新准备进度</label><p class="hint">每2秒查看未完成的准备请求；切到后台、完成准备或读取失败后暂停。历史请求可能需要管理员处理。</p><h3>{{statusText(state.selected.status)}}</h3><p>{{state.selected.id}} · v{{state.selected.version}} · 已登记领取 {{state.selected.attempts}} 次</p><p>更新时间 {{displayTime(state.selected.updated_at)}}（Asia/Shanghai）；Worker在线未知</p><p>类型 {{valueText(state.selected.filters.type)}} · 状态 {{valueText(state.selected.filters.status)}}</p><p>站点 {{valueText(state.selected.filters.site_id)}} · 文本 {{valueText(state.selected.filters.query)}}</p>
    <p v-if="!state.selected.prepared" class="no-preparation">没有准备描述，行数与文件大小未知；不显示为0行成功</p><div v-else class="prepared-descriptor"><h3>已保存的文件准备信息</h3><p>{{state.selected.prepared.row_count}} 行{{state.selected.prepared.row_count===0?'（明确空结果）':''}} · {{state.selected.prepared.size_bytes}} 字节</p><p>生成 {{displayTime(state.selected.prepared.generated_at)}}（Asia/Shanghai）</p><small>文件SHA256 {{state.selected.prepared.file_sha256}}</small><small>筛选SHA256 {{state.selected.prepared.selection_sha256}}</small></div>
    <p v-if="state.selected.error_code" class="warning" role="alert">{{errorText(state.selected.error_code)}}；失败不删除原请求或已准备描述</p><AssetExportPublicationPanel :key="state.selected.id+':'+state.selected.version" ref="publicationPanel" :job-id="state.selected.id" :job-version="state.selected.version" @changed="select(state.selected!.id)" />
   </section>

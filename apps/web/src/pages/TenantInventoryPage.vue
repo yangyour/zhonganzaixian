@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWorkspaceReveal } from '../utils/useWorkspaceReveal'
 import {computed,onBeforeUnmount,ref,shallowRef,watch} from 'vue'
 import {api} from '../api/client'
 import {session,contextGeneration,switchingTenant,can} from '../stores/session'
@@ -10,18 +11,19 @@ const permitted=computed(()=>session.value?.user.role==='padmin'&&can('tenants:r
 watch(()=>[session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,contextGeneration.value,permitted.value],()=>{const s=session.value;selectedId.value=null;reader.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role}:null);if(permitted.value)void reader.refresh()},{immediate:true,flush:'sync'})
 onBeforeUnmount(()=>reader.dispose())
 const selected=computed(()=>state.value.page?.items.find(row=>row.id===selectedId.value)??null)
+useWorkspaceReveal(() => selectedId.value, '.inventory-detail')
 </script>
 <template>
  <section class="tenant-inventory-page">
-  <div class="page-heading"><div><span class="eyebrow">M2 / RECORDED INVENTORY</span><h1>租户登记资源</h1><p>仅展示本人在目标租户有平台管理员成员关系的记录</p></div><el-button :disabled="!permitted" :loading="state.busy" @click="reader.refresh()">重新读取第一页</el-button></div>
-  <el-alert type="warning" title="登记数量不等于监控、配额或接入完成" :closable="false">运行状态、资源池、Item/NVPS、配额、保留期、ITSM和网络拓扑尚无已验证来源，保留未知；不显示虚构进度条、不新建租户或开通身份。</el-alert>
+  <div class="page-heading"><div><h1>租户登记资源</h1><p>仅展示本人在目标租户有平台管理员成员关系的记录</p></div><el-button :disabled="!permitted" :loading="state.busy" @click="reader.refresh()">重新读取第一页</el-button></div>
+  <details class="page-guidance"><summary>使用范围与说明</summary><el-alert type="warning" title="登记数量不等于监控、配额或接入完成" :closable="false">运行状态、资源池、Item/NVPS、配额、保留期、ITSM和网络拓扑尚无已验证来源，保留未知；不显示虚构进度条、不新建租户或开通身份。</el-alert></details>
   <ApiErrorNotice :error="state.error"/>
   <p v-if="!permitted">当前成员无租户登记资源读取权限</p>
   <el-skeleton v-else-if="state.busy" :rows="6" animated/>
   <template v-else-if="state.page">
    <p class="scope-note">每次读取重新授权；本次 {{state.page.items.length}} 条，不是平台总数。分页之间数据可能变化；创建时间按北京时间显示，详情保留UTC原值。</p>
-   <div class="inventory-scroll" tabindex="0" role="region" aria-label="租户登记资源12列表格，可横向滚动">
-    <table><caption>本次授权范围内的登记快照</caption><thead><tr><th v-for="column in tenantInventoryColumns" :key="column.key" scope="col">{{column.label}}</th></tr></thead><tbody><tr v-for="row in state.page.items" :key="row.id"><td v-for="column in tenantInventoryColumns" :key="column.key"><button v-if="column.key==='name'" class="tenant-name" @click="selectedId=row.id">{{row.name}}</button><span v-else>{{tenantInventoryCell(row,column.key).text}}</span><small>{{tenantInventoryCell(row,column.key).detail}}</small></td></tr><tr v-if="!state.page.items.length"><td :colspan="tenantInventoryColumns.length">本页无授权登记记录；不表示平台没有租户</td></tr></tbody></table>
+   <div class="record-table inventory-scroll" tabindex="0" role="region" aria-label="租户登记资源12列表格，可横向滚动">
+    <table><caption>本次授权范围内的登记快照</caption><thead><tr><th v-for="column in tenantInventoryColumns" :key="column.key" scope="col">{{column.label}}</th></tr></thead><tbody><tr v-for="row in state.page.items" :key="row.id"><td v-for="column in tenantInventoryColumns" :key="column.key"><button v-if="column.key==='name'" class="tenant-name" @click="selectedId=row.id">{{row.name}}</button><span v-else :title="tenantInventoryCell(row,column.key).detail">{{tenantInventoryCell(row,column.key).text}}</span></td></tr><tr v-if="!state.page.items.length"><td :colspan="tenantInventoryColumns.length">本页无授权登记记录；不表示平台没有租户</td></tr></tbody></table>
    </div>
   </template>
   <div v-if="permitted" class="inventory-pagination"><el-button :disabled="state.busy||!state.canPrevious" @click="reader.previous()">上一页</el-button><span>{{state.paged?'后续页':'第一页'}} · 每页15条</span><el-button :disabled="state.busy||!state.page?.has_more" @click="reader.next()">下一页</el-button></div>

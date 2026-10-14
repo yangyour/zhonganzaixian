@@ -42,7 +42,7 @@ async function refresh() {
 }
 async function edit(role?: ProjectRole, copy = false) {
   const owner = scope.value
-  if (editor.busy() || !can('roles:read') || switchingTenant.value || !await editor.leave() || owner !== scope.value) return
+  if (loading.value || !data.value || editor.busy() || !can('roles:read') || switchingTenant.value || !await editor.leave() || owner !== scope.value) return
   if ((!role || copy) && !can('roles:write')) return
   editor.clear(); selected.value = role && !copy ? role : null
   Object.assign(form, { name: role ? role.name + (copy ? ' 副本' : '') : '', description: role?.description ?? '', base_role: role?.base_role ?? 'viewer', enabled: role?.enabled ?? true, permissions: [...(role?.permissions ?? [])] })
@@ -54,7 +54,7 @@ async function closeEditor(done?: () => void) { const owner = scope.value; if (e
 </script>
 <template>
   <section class="identity-page" v-loading="loading">
-    <div class="page-heading"><div><h1>角色与权限</h1><p>按租户分配角色；角色权限变更会在后续请求中立即核验。</p></div><el-button v-if="can('roles:write')" type="primary" :disabled="editor.busy()" @click="edit()">新建角色</el-button></div>
+    <div class="page-heading"><div><h1>角色与权限</h1><p>按租户分配角色；角色权限变更会在后续请求中立即核验。</p></div><el-button v-if="can('roles:write')" type="primary" :disabled="editor.busy() || loading || !data" @click="edit()">新建角色</el-button></div>
     <p v-if="!can('roles:read')">当前会话无角色读取权限。</p>
     <el-button v-if="can('roles:read')" :disabled="editor.busy() || switchingTenant" @click="refresh">刷新角色列表</el-button>
     <ApiErrorNotice v-if="!opened" :error="error"><el-button @click="refresh">重新读取</el-button></ApiErrorNotice><IdentityCommandNotice v-if="!opened" :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />

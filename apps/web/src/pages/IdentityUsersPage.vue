@@ -41,7 +41,7 @@ async function detail(user: ProjectUser, turn: number) {
   memberships.value = members.items; bindings.value = ids.items
   Object.assign(form, { username: user.username || '', display_name: user.display_name, active: user.active, password: '', role_id: user.role_id, member_active: user.member_active, issuer: '', subject: '' })
 }
-async function edit(user?: ProjectUser) { const owner = scope.value; if (!canRead() || (!user && (!can('users:write') || !can('roles:read'))) || editor.busy() || !await editor.leave() || owner !== scope.value) return; const turn = ++readGeneration; loading.value = false; detailLoading.value = !!user; editor.clear(); selected.value = user ?? null; opened.value = true; tab.value = 'profile'; memberships.value = []; bindings.value = []; extraTenant.value = ''; extraRoles.value = null; extraRole.value = ''; extraActive.value = true; editor.dirty.value = false; form.password = ''; error.value = null
+async function edit(user?: ProjectUser) { const owner = scope.value; if (!canRead() || (!user && (!can('users:write') || !can('roles:read') || loading.value || !roles.value)) || editor.busy() || !await editor.leave() || owner !== scope.value) return; const turn = ++readGeneration; loading.value = false; detailLoading.value = !!user; editor.clear(); selected.value = user ?? null; opened.value = true; tab.value = 'profile'; memberships.value = []; bindings.value = []; extraTenant.value = ''; extraRoles.value = null; extraRole.value = ''; extraActive.value = true; editor.dirty.value = false; form.password = ''; error.value = null
   if (user) { try { await detail(user, turn) } catch (e) { if (turn === readGeneration && !isCancelled(e)) { error.value = e; opened.value = false } } finally { if (turn === readGeneration) detailLoading.value = false } }
   else Object.assign(form, { username: '', display_name: '', password: '', active: true, role_id: roles.value?.items.find(r => r.enabled && r.base_role === 'viewer')?.id || '', member_active: true })
 }
@@ -69,7 +69,7 @@ async function closeEditor(done?: () => void) {
 }
 </script>
 <template><section class="identity-page" v-loading="loading">
-  <div class="page-heading"><div><h1>用户与成员授权</h1><p>管理当前租户的账号、成员角色及统一身份绑定。</p></div><el-button v-if="can('users:write') && can('roles:read')" type="primary" :disabled="editor.busy()" @click="edit()">新建用户</el-button></div>
+  <div class="page-heading"><div><h1>用户与成员授权</h1><p>管理当前租户的账号、成员角色及统一身份绑定。</p></div><el-button v-if="can('users:write') && can('roles:read')" type="primary" :disabled="editor.busy() || loading || !roles" @click="edit()">新建用户</el-button></div>
   <p v-if="!can('users:read')">当前会话无用户读取权限。</p>
   <ApiErrorNotice v-if="!opened" :error="error"><el-button @click="search">重新读取</el-button></ApiErrorNotice><IdentityCommandNotice v-if="!opened" :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />
   <form v-form-feedback class="identity-form identity-toolbar" @submit.prevent="search"><label>搜索账号或姓名<input v-model="query" maxlength="100" /></label><label class="check"><input v-model="includeInactive" type="checkbox" />包含停用记录</label><el-button native-type="submit" :disabled="editor.busy()">查询</el-button></form>

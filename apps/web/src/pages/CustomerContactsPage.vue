@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useWorkspaceReveal } from '../utils/useWorkspaceReveal'
 import { computed, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
@@ -45,11 +46,13 @@ function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved() || 
 window.addEventListener('beforeunload', beforeUnload)
 onUnmounted(() => { unregister(); workspace.dispose(); clearEditor(); window.removeEventListener('beforeunload', beforeUnload) })
 defineExpose({ prepareCreate, prepareFrom, browse, hasUnresolved: workspace.unresolved })
+useWorkspaceReveal(() => state.value.selected?.id, '.contact-current')
+useWorkspaceReveal(() => mode.value, '.contact-editor')
 </script>
 <template>
  <section class="contacts-page">
-  <div class="page-heading"><div><span class="eyebrow">CUSTOMER CONTACTS</span><h1>客户联系人</h1><p>当前授权租户 · 自述联系资料 · 历史可追溯</p></div></div>
-  <el-alert type="warning" :closable="false" title="联系角色不是账号权限，启用不等于可送达">资料和渠道尚未核验；维护联系人不会创建账号或授予权限。通知路由仍待确认，本页不发送通知。每个租户必须保留至少一名启用决策人。</el-alert>
+  <div class="page-heading"><div><h1>客户联系人</h1><p>当前授权租户 · 自述联系资料 · 历史可追溯</p></div></div>
+  <details class="page-guidance"><summary>使用范围与说明</summary><el-alert type="warning" :closable="false" title="联系角色不是账号权限，启用不等于可送达">资料和渠道尚未核验；维护联系人不会创建账号或授予权限。通知路由仍待确认，本页不发送通知。每个租户必须保留至少一名启用决策人。</el-alert></details>
   <el-empty v-if="!permitted" description="当前身份没有联系人读取权限" />
   <template v-else>
    <section v-if="state.attempt" class="request-status" aria-live="polite">
@@ -71,9 +74,9 @@ defineExpose({ prepareCreate, prepareFrom, browse, hasUnresolved: workspace.unre
     </div>
     <p class="contact-help">本次查询筛选：{{ state.query || '全部姓名' }} / {{ state.view }}。每页15条，每次查询是当前快照；刷新不会确认原写入或自动提交。</p>
     <p v-if="state.busy === 'read'" role="status">正在只读查询…</p>
-    <div v-if="state.page" class="table-scroll" role="region" tabindex="0" aria-label="联系人列表，可横向滚动"><table class="contact-table"><thead><tr><th scope="col">姓名 / 版本</th><th scope="col">联系角色</th><th scope="col">状态</th><th scope="col">联系资料</th><th scope="col">操作</th></tr></thead><tbody><tr v-for="row in state.page.items" :key="row.id"><td><span class="verbatim">{{ row.name }}</span><small>v{{ row.version }} · {{ displayTime(row.updated_at) }}</small></td><td>{{ row.roles.map(r => contactRoleLabels[r]).join('、') }}</td><td>{{ row.archived ? '已归档' : row.enabled ? '启用 / 未核验渠道' : '已停用' }}</td><td>{{ row.mobile ?? '手机号未提供' }}<br>{{ row.email ?? '邮箱未提供' }}</td><td><div class="contact-actions"><el-button :disabled="Boolean(state.busy)" data-action="select" :data-contact-id="row.id" @click="select(row.id)">查看</el-button><el-button v-if="writable" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="prepareFrom(row)">{{ row.archived ? '准备恢复' : '准备修改' }}</el-button><el-button v-if="writable && !row.archived" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="archiveContact(row)">归档停用</el-button></div></td></tr></tbody></table><el-empty v-if="state.page.items.length === 0" description="当前筛选没有记录" /></div>
+    <div v-if="state.page" class="record-table table-scroll" role="region" tabindex="0" aria-label="联系人列表，可横向滚动"><table class="contact-table"><thead><tr><th scope="col">姓名 / 版本</th><th scope="col">联系角色</th><th scope="col">状态</th><th scope="col">联系资料</th><th scope="col">操作</th></tr></thead><tbody><tr v-for="row in state.page.items" :key="row.id"><td><span class="verbatim">{{ row.name }}</span><small>v{{ row.version }} · {{ displayTime(row.updated_at) }}</small></td><td>{{ row.roles.map(r => contactRoleLabels[r]).join('、') }}</td><td>{{ row.archived ? '已归档' : row.enabled ? '启用 / 未核验渠道' : '已停用' }}</td><td>{{ row.mobile ?? '手机号未提供' }}<br>{{ row.email ?? '邮箱未提供' }}</td><td><div class="contact-actions"><el-button :disabled="Boolean(state.busy)" data-action="select" :data-contact-id="row.id" @click="select(row.id)">查看</el-button><el-button v-if="writable" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="prepareFrom(row)">{{ row.archived ? '准备恢复' : '准备修改' }}</el-button><el-button v-if="writable && !row.archived" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="archiveContact(row)">归档停用</el-button></div></td></tr></tbody></table><el-empty v-if="state.page.items.length === 0" description="当前筛选没有记录" /></div>
    </section>
-   <section v-if="mode" class="contact-section">
+   <section v-if="mode" class="contact-section contact-editor">
     <h2>{{ mode === 'CREATE' ? '准备新建联系人' : mode === 'RESTORE' ? '准备恢复（不会自动启用）' : '准备修改联系人' }}</h2><p v-if="baseline" class="contact-help contact-long">固定编辑基线：{{ baseline.id }} / v{{ baseline.version }}。只读刷新不会更换该版本或合并输入。</p>
     <el-form label-position="top" @submit.prevent="save">
      <div class="contact-fields">
@@ -91,7 +94,7 @@ defineExpose({ prepareCreate, prepareFrom, browse, hasUnresolved: workspace.unre
     </el-form>
    </section>
    <section v-if="state.receipt" class="contact-section receipt"><h2>原请求收据（不是当前最新事实）</h2><p>{{ contactActionLabels[state.receipt.action] }} · v{{ state.receipt.version }} · {{ displayTime(state.receipt.recorded_at) }}</p><p class="contact-long">{{ state.receipt.id }}</p><CustomerContactFacts :facts="state.receipt" /><el-button :disabled="Boolean(state.busy)" @click="select(state.receipt.id)">只读回读当前记录</el-button></section>
-   <section v-if="state.selected" class="contact-section"><h2>当前只读事实</h2><p class="contact-help">以下是最近一次只读查询快照，不是实时订阅；其他会话修改后请刷新。时间为记录更新时间。</p><p>{{ state.selected.archived ? '已归档' : '未归档' }} · v{{ state.selected.version }} · {{ displayTime(state.selected.updated_at) }}</p><p class="contact-long">{{ state.selected.id }}</p><CustomerContactFacts :facts="state.selected" /><div class="contact-actions"><el-button :disabled="Boolean(state.busy)" @click="select(state.selected.id)">只读刷新本记录</el-button><el-button :disabled="Boolean(state.busy)" @click="history(state.selected.id)">只读查看历史</el-button><el-button v-if="writable" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="prepareFrom(state.selected)">{{ state.selected.archived ? '按这些事实准备恢复' : '按这些事实重新准备修改' }}</el-button><el-button v-if="writable && !state.selected.archived" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="archiveContact(state.selected)">归档停用</el-button></div></section>
+   <section v-if="state.selected" class="contact-section contact-current"><h2>当前只读事实</h2><p class="contact-help">以下是最近一次只读查询快照，不是实时订阅；其他会话修改后请刷新。时间为记录更新时间。</p><p>{{ state.selected.archived ? '已归档' : '未归档' }} · v{{ state.selected.version }} · {{ displayTime(state.selected.updated_at) }}</p><p class="contact-long">{{ state.selected.id }}</p><CustomerContactFacts :facts="state.selected" /><div class="contact-actions"><el-button :disabled="Boolean(state.busy)" @click="select(state.selected.id)">只读刷新本记录</el-button><el-button :disabled="Boolean(state.busy)" @click="history(state.selected.id)">只读查看历史</el-button><el-button v-if="writable" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="prepareFrom(state.selected)">{{ state.selected.archived ? '按这些事实准备恢复' : '按这些事实重新准备修改' }}</el-button><el-button v-if="writable && !state.selected.archived" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="archiveContact(state.selected)">归档停用</el-button></div></section>
    <section v-if="state.history" class="contact-section"><h2>不可变修订历史</h2><p class="contact-long">联系人 {{ state.history.contact_id }}</p><details v-for="revision in state.history.items" :key="revision.version"><summary>v{{ revision.version }} · {{ contactActionLabels[revision.action] }} · {{ displayTime(revision.recorded_at) }}</summary><CustomerContactFacts :facts="revision" /></details><el-button :disabled="Boolean(state.busy) || !state.history.has_more" @click="history(state.history.contact_id,true)">下一页历史</el-button></section>
    <p class="contact-help">本页为单条维护；批量新建请使用独立作业页面，没有通知派发入口。主动离开/切租户/退出会保护未保存输入和未知请求；强制会话失效仍会清空受保护数据。</p>
   </template>

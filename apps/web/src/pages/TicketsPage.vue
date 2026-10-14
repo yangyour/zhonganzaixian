@@ -180,9 +180,9 @@ onUnmounted(() => { unregisterContextGuard(); resetContext(); detailPhotos.dispo
 
 <template>
   <section class="tickets-page">
-    <div class="page-heading"><div><span class="eyebrow">SERVICE / CUSTOMER REPORTS</span><h1>报障与受理</h1><p>{{ customerView ? '查看本人报障登记，填写故障现象与联系方式。' : '只读查看当前授权租户的报障登记。' }}</p></div><el-button v-if="mayReport" type="primary" @click="createOpen = true">填写报障信息</el-button></div>
+    <div class="page-heading"><div><h1>报障与受理</h1><p>{{ customerView ? '查看本人报障登记，填写故障现象与联系方式。' : '只读查看当前授权租户的报障登记。' }}</p></div><el-button v-if="mayReport" type="primary" @click="createOpen = true">填写报障信息</el-button></div>
     <div class="scope-card"><div><span class="small-label">当前租户</span><strong>{{ session?.tenant.name }}</strong></div><div><span class="small-label">本页登记</span><strong>{{ loading || error ? '—' : rows.length }} <small>项</small></strong></div><div class="scope-explanation">{{ customerView ? '客户仅查看本人记录。联系方式尚未核验，紧急程度仅供参考。' : '内部人员只读查看当前租户记录；本页不提供接单或解决动作。' }}</div></div>
-    <el-alert class="page-note" type="warning" :closable="false" show-icon title="一期已选择本平台为工单权威。当前报障可登记与查询；正式状态、SLA 时限和处理资格规则仍待落实。" />
+    <details class="page-guidance"><summary>使用范围与说明</summary><el-alert class="page-note" type="warning" :closable="false" show-icon title="一期已选择本平台为工单权威。当前报障可登记与查询；正式状态、SLA 时限和处理资格规则仍待落实。" /></details>
     <el-alert v-if="acceptedOperationId" class="page-note" type="info" :closable="false" show-icon title="报障已耐久登记，正式工单规则待确认。登记结果以详情回读为准，不重复提交或推断为外部建单成功。" />
     <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />
     <div class="panel">

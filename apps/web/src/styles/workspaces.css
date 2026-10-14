@@ -1,5 +1,8 @@
 /* Task-oriented lists and workbenches, shared by the business pages. */
 .record-table { width: 100%; overflow: auto; background: #fff; border: 1px solid var(--mop-border); border-radius: 8px; }
+.dashboard-status { min-width: 0; max-width: 100%; }
+.workspace-reveal { scroll-margin-block-start: 180px; }
+.workspace-reveal :is(h2,h3)[tabindex="-1"]:focus { outline: none; }
 .record-table table { width: 100%; min-width: 720px; border-collapse: collapse; table-layout: auto; font-size: 13px; }
 .record-table th { background: #f5f7fa; color: #526176; font-weight: 600; text-align: left; white-space: nowrap; padding: 12px 16px; }
 .record-table td { padding: 12px 16px; border-top: 1px solid #e8edf3; vertical-align: middle; line-height: 1.65; max-width: 340px; overflow-wrap: anywhere; }
@@ -41,14 +44,43 @@
 .identity-editor .identity-form form + form { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--mop-border); }
 .identity-editor .el-tabs__header { margin-bottom: 22px; }
 .identity-editor .identity-form p { font-size: 13px; line-height: 1.75; }
+.page-editor { margin: 18px 0; padding: 0; border: 1px solid var(--mop-border); border-radius: 8px; background: #fff; }
+.page-editor > summary, details.collection-editor > summary, details.source-picker > summary, details.import-panel > summary, details.audit-proof-panel > summary, details.lookup > summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--el-color-primary); min-height: 44px; padding: 12px 16px; }
+.page-editor > .panel { margin-top: 0 !important; border: 0; }
+details.collection-editor:not([open]), details.source-picker:not([open]), details.import-panel:not([open]), details.audit-proof-panel:not([open]), details.lookup:not([open]) { padding: 0 !important; }
+details.lookup { margin: 12px 0; }
+details.lookup > summary { padding-inline: 0; font-weight: 400; font-size: 13px; }
+details.lookup[open] > label { display: inline-grid; width: min(380px,100%); margin-right: 12px; }
+.settings-workspace { max-width: 1100px; margin-inline: 0; }
+.settings-workspace > .identity-card { padding: 22px; }
+.settings-workspace > .identity-form fieldset { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.settings-workspace > .identity-form fieldset > :is(p,button) { grid-column: 1 / -1; }
+.record-table .el-button { min-height: 32px; }
+.record-table .el-button.is-link { padding-inline: 2px; }
+#main-content .page-heading { margin-bottom: 20px; }
+#main-content .page-heading p { max-width: 75ch; }
+#main-content .record-table :is(h2,h3,p) { font-size: 13px; margin: 4px 0; }
+.record-table .actions { gap: 8px; margin: 0; }
+.record-table .actions > button { font-size: 13px; }
+#main-content .audit-filter-grid, #main-content .own-worklogs-page .filter-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+#main-content .audit-filter-grid .el-form-item { margin-bottom: 12px; }
+#main-content .inventory-scroll button.tenant-name { max-width: none; white-space: normal; overflow: visible; text-overflow: clip; border: 0; padding: 0; background: transparent; }
+.settings-workspace > .identity-card p { margin-block: 8px; }
+.content .el-empty__image { width: 64px !important; }
+.content .el-empty { padding: 28px 16px; }
 @media (max-width: 1000px) {
+  #main-content .audit-filter-grid, #main-content .own-worklogs-page .filter-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .workbench-layout { grid-template-columns: 1fr; }
   .workbench-result { position: static; }
 }
 @media (max-width: 760px) {
+  #main-content .audit-filter-grid, #main-content .own-worklogs-page .filter-grid { grid-template-columns: 1fr; }
   .record-table table { min-width: 660px; }
   .record-table th, .record-table td { padding: 10px 12px; }
   .identity-toolbar label:first-child { flex-basis: 100%; }
+  .settings-workspace > .identity-form fieldset { grid-template-columns: 1fr; }
+  .workspace-reveal { scroll-margin-block-start: 20px; }
+  .record-table .el-button { min-height: 44px; }
   .workbench-form, .workbench-result { padding: 18px; }
   .page-guidance > summary { min-height: 44px; }
 }

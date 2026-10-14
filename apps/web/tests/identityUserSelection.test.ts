@@ -93,3 +93,17 @@ it('a changed allowed-tenant set also invalidates the open membership context', 
  session.value = { ...session.value!, allowed_tenants: [{ id: id(1), name: '当前' }] }; await settle()
  expect(host.querySelector('section.identity-form')).toBeNull(); expect(host.textContent).not.toContain('合成用户3')
 })
+
+it('drawer cancellation keeps unsaved input and confirmed close preserves list filters',async()=>{
+ await mount();const query=host.querySelector('.identity-toolbar input') as HTMLInputElement;query.value='合成';query.dispatchEvent(new Event('input',{bubbles:true}));await settle()
+ button('新建用户').click();await settle();nameField().value='尚未保存';nameField().dispatchEvent(new Event('input',{bubbles:true}));await settle()
+ const confirm=vi.spyOn(ElMessageBox,'confirm').mockRejectedValue('cancel');button('关闭账号管理').click();await settle();expect(nameField().value).toBe('尚未保存');expect(query.value).toBe('合成')
+ confirm.mockResolvedValue('confirm' as never);button('关闭账号管理').click();await settle();expect(host.querySelector('section.identity-form')).toBeNull();expect(query.value).toBe('合成');expect(host.querySelectorAll('.record-table tbody tr')).toHaveLength(2)
+})
+
+it('keeps new-user creation unavailable until the role choices have loaded',async()=>{
+ const roles=deferred(),request=vi.mocked(api.request),original=request.getMockImplementation()!
+ request.mockImplementation((path,options)=>path==='/identity/roles'?roles.promise as never:original(path,options))
+ await mount();expect(button('新建用户').disabled).toBe(true);expect(host.querySelector('section.identity-form')).toBeNull()
+ roles.resolve({items:[],tenant_id:id(1),permission_catalog:{entries:[],dimensions:[]}});await settle();expect(button('新建用户').disabled).toBe(false)
+})

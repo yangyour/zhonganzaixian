@@ -14,13 +14,13 @@ function printReview(){if(permitted.value&&state.value.current&&!state.value.bus
 </script>
 <template>
  <section class="capability-catalog-page">
-  <div class="page-heading"><div><span class="eyebrow">Q09 / TECHNICAL REVIEW</span><h1>代码能力声明核对</h1><p>四类角色 · 五个合同资源维度 · 当前代码目录</p></div><div class="catalog-actions non-print"><el-button :loading="state.busy" @click="reader.refresh()">重新读取</el-button><el-button :disabled="!state.current||state.busy" @click="printReview">打印核对页</el-button></div></div>
-  <el-alert title="不是双方签字的有效权限矩阵" type="warning" :closable="false">此页只说明当前代码中声明了哪些能力，不包含实际人员授权，也不能用于判定具体对象是否可访问。不会创建角色、修改权限或发布配置。</el-alert>
+  <div class="page-heading"><div><h1>代码能力声明核对</h1><p>四类角色 · 五个合同资源维度 · 当前代码目录</p></div><div class="catalog-actions non-print"><el-button :loading="state.busy" @click="reader.refresh()">重新读取</el-button><el-button :disabled="!state.current||state.busy" @click="printReview">打印核对页</el-button></div></div>
+  <details class="page-guidance"><summary>使用范围与说明</summary><el-alert title="不是双方签字的有效权限矩阵" type="warning" :closable="false">此页只说明当前代码中声明了哪些能力，不包含实际人员授权，也不能用于判定具体对象是否可访问。不会创建角色、修改权限或发布配置。</el-alert></details>
   <ApiErrorNotice :error="state.error"/>
   <el-skeleton v-if="state.busy" :rows="6" animated/>
   <template v-if="state.current">
    <div class="catalog-facts"><p>目录范围：代码声明，不是当前租户人员绑定</p><p>当前 {{state.current.entry_count}} 项能力声明 · 项目角色运行：{{state.current.configuration_driven_authorization ? '已接入项目权限' : '未启用'}} · 客户批准：未核验</p><p>生效客户矩阵：未知（null） · 客户/供应商签字：未收集</p><p class="catalog-hash">声明映射SHA256：{{state.current.declaration_hash}}</p><p>摘要只校验能力ID、维度与声明向量，不是签字、审批证据或授权令牌。</p></div>
-   <h2>五维目录</h2><ul class="catalog-dimensions"><li v-for="dimension in state.current.dimensions" :key="dimension.id"><strong>{{dimension.label}}</strong>：{{dimension.capability_ids.length}} 项声明<span v-if="!dimension.capability_ids.length">；当前无声明条目，不代表该业务维度已完成或不存在</span></li></ul>
+   <details class="page-guidance"><summary>五维目录</summary><ul class="catalog-dimensions"><li v-for="dimension in state.current.dimensions" :key="dimension.id"><strong>{{dimension.label}}</strong>：{{dimension.capability_ids.length}} 项声明<span v-if="!dimension.capability_ids.length">；当前无声明条目，不代表该业务维度已完成或不存在</span></li></ul></details>
    <p>“已声明/未声明”仅为代码目录事实，不替代当前成员、租户、资源关系与各接口独立守卫。Q09岗位映射、审批回避/替补和实际人员范围仍待双方确认。</p>
    <div class="catalog-table-wrap" role="region" tabindex="0" aria-label="能力声明表，可横向滚动"><table class="catalog-table"><caption>当前代码声明目录（非生效权限配置）</caption><thead><tr><th scope="col">能力与说明</th><th scope="col">资源维度</th><th v-for="role in state.current.roles" :key="role.id" scope="col">{{role.label}}<small>{{role.id}}</small></th></tr></thead><tbody><tr v-for="entry in state.current.entries" :key="entry.id"><th scope="row">{{entry.label}}<small>{{entry.id}}</small></th><td>{{entry.dimension_ids.map(dimensionLabel).join('、')}}</td><td v-for="role in state.current.roles" :key="role.id"><span :class="entry.declared_by_role[role.id]?'declared':'undeclared'">{{entry.declared_by_role[role.id]?'已声明':'未声明'}}</span></td></tr></tbody></table></div>
    <p class="catalog-footer">配置登记键：{{state.current.configuration_key}} · CONFIG_PENDING。项目自定义角色在授权范围内生效；客户正式岗位矩阵、双方签字和合同验收仍需单独确认。</p>

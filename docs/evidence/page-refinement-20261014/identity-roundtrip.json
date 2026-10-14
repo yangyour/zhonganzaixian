@@ -1,0 +1,16 @@
+{
+  "status": "PASSED",
+  "created_zero_grant_role": true,
+  "created_synthetic_user": true,
+  "access_unavailable_verified": true,
+  "cleanup_user_disabled": true,
+  "cleanup_role_disabled": true,
+  "credentials_output": false,
+  "role_enabled_on_api": true,
+  "role_choice": {
+    "count": 5,
+    "expected_present": true,
+    "disabled": false,
+    "fieldset_disabled": false
+  }
+}

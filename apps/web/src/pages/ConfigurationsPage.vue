@@ -171,7 +171,7 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
 </script>
 <template>
   <section>
-    <div class="page-heading"><div><span class="eyebrow">ADMINISTRATION / CONFIGURATION</span><h1>配置确认登记</h1><p>统一记录合同值、客户待确认项与建议草稿。测试环境草稿均未发布为运行配置。</p></div><el-button :loading="loading" @click="load">刷新登记表</el-button></div>
+    <div class="page-heading"><div><h1>配置确认登记</h1><p>统一记录合同值、客户待确认项与建议草稿。测试环境草稿均未发布为运行配置。</p></div><el-button :loading="loading" @click="load">刷新登记表</el-button></div>
     <div class="calendar-entry"><el-button :disabled="!can('configurations:read') || switchingTenant" @click="calendarOpen = true">工作日历草稿查询与试算</el-button></div>
     <WorkingCalendarReader v-model="calendarOpen" />
     <el-alert v-if="draftState.receipt" type="success" :closable="false" :title="'设计登记原请求已确认：' + draftState.receipt.key + ' · v' + draftState.receipt.version + '；只是旧建议草稿，未生效'" />

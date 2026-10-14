@@ -29,7 +29,7 @@ defineExpose({state,autoRefresh,refresh,changeWindow})
 <template>
  <section class="dashboard-page" :aria-busy="state.busy">
   <header class="dashboard-heading"><div><h1>运营总览</h1><p>{{session?.tenant.name}} · 北京时间（Asia/Shanghai）</p></div><span class="availability-badge">监控指标未接入</span></header>
-  <p class="dashboard-boundary" role="note">这里仅核对当前授权与数据库观察时间。未知指标不表示正常、零事件或送达成功；首页尚未完成正式监控验收</p>
+  <details class="page-guidance"><summary>统计范围与数据说明</summary><p class="dashboard-boundary" role="note">这里仅核对当前授权与数据库观察时间。未知指标不表示正常、零事件或送达成功；首页尚未完成正式监控验收</p></details>
   <p v-if="!permitted" role="alert">当前会话不可读取运营总览，或正在切换租户；已清除原范围数据</p>
   <template v-else>
    <div class="dashboard-controls">
@@ -43,9 +43,7 @@ defineExpose({state,autoRefresh,refresh,changeWindow})
    <div class="dashboard-kpis" aria-label="六项固定运营指标">
     <article v-for="(card,index) in kpis" :key="card.id" class="kpi-card" :data-kpi="card.id"><h2>{{card.title}}</h2><strong class="unknown-value">{{noDataText}}</strong><p>{{card.hint}}</p><details v-if="state.current" class="metric-reason"><summary>查看未接入原因</summary><small>{{state.current.kpis[index]?.unavailable_reason}}</small></details></article>
    </div>
-   <div class="dashboard-panels">
-    <article v-for="(panel,index) in panels" :key="panel.id" class="dashboard-panel" :data-panel="panel.id"><header><h2>{{panel.title}}</h2><span>未采集</span></header><p v-if="state.current?.panels[index]?.period" class="panel-period">{{displayTime(state.current.panels[index]!.period!.from)}} 至 {{displayTime(state.current.panels[index]!.period!.to)}}</p><div class="unavailable-panel"><strong>{{noDataText}}</strong><p>{{panel.hint}}</p><details v-if="state.current" class="metric-reason"><summary>查看未接入原因</summary><small>{{state.current.panels[index]?.unavailable_reason}}</small></details></div></article>
-   </div>
+   <section class="dashboard-status"><h2>数据状态</h2><div class="record-table" role="region" tabindex="0" aria-label="运营数据状态列表"><table><thead><tr><th>数据项</th><th>当前状态</th><th>说明</th></tr></thead><tbody><tr v-for="(panel,index) in panels" :key="panel.id" :data-panel="panel.id"><td><strong>{{panel.title}}</strong><span v-if="state.current?.panels[index]?.period" class="row-secondary">{{displayTime(state.current.panels[index]!.period!.from)}} 至 {{displayTime(state.current.panels[index]!.period!.to)}}</span></td><td>{{noDataText}}<span class="row-secondary">未采集</span></td><td>{{panel.hint}}<details v-if="state.current" class="metric-reason"><summary>查看未接入原因</summary><small>{{state.current.panels[index]?.unavailable_reason}}</small></details></td></tr></tbody></table></div></section>
    <footer class="dashboard-footnote">布局与顺序固定，不提供拖拽、隐藏或保存布局。刷新只发起GET，不新增工单、收据或监控样本</footer>
   </template>
  </section>
@@ -120,4 +118,5 @@ defineExpose({state,autoRefresh,refresh,changeWindow})
   .kpi-card:nth-child(n) { border-right: 0; border-bottom: 1px solid var(--mop-border); }
   .kpi-card:last-child { border-bottom: 0; }
 }
+.dashboard-status h2{font-size:17px;margin:0 0 14px}.dashboard-status .record-table table{min-width:700px}
 </style>

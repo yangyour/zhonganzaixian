@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { revealWorkspace } from '../utils/useWorkspaceReveal'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
@@ -21,7 +22,7 @@ const busy = computed(() => state.value.busy !== null || previewState.value.busy
 const locked = computed(() => busy.value || state.value.attempt !== null)
 const readyToSubmit = computed(() => permitted.value && !locked.value && previewState.value.result !== null && previewState.value.result.invalid_rows === 0 && (previewState.value.result.identical_rows === 0 || acknowledge.value))
 function stopTracking() { ++trackingEpoch; if (timer !== null) clearTimeout(timer); timer = null; tracking.value = null }
-watch(contextKey, () => { stopTracking(); confirming.value = false; acknowledge.value = false; const s = session.value, context = s && permitted.value ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version, role: s.user.role, canRead: true, canWrite: true } : null; workspace.reset(context); preview.reset(context) }, { immediate: true, flush: 'sync' })
+watch(contextKey, () => { stopTracking(); confirming.value = false; acknowledge.value = false; const s = session.value, context = s && permitted.value ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version, role: s.user.role, canRead: true, canWrite: true } : null; workspace.reset(context); preview.reset(context); if (context) void workspace.list() }, { immediate: true, flush: 'sync' })
 function change(text: string) { if (!locked.value && permitted.value) { acknowledge.value = false; preview.change(text) } }
 function changeAck(value: boolean) { if (!locked.value && permitted.value && typeof value === 'boolean') acknowledge.value = value }
 async function checkFormat() { if (!locked.value && permitted.value && previewState.value.text) return preview.preview(); return false }
@@ -43,7 +44,7 @@ async function discard() {
 async function beginNew() { const turn = contextKey.value; if (!permitted.value || busy.value || !await discard() || turn !== contextKey.value) return false; if (!workspace.begin()) return false; stopTracking(); acknowledge.value = false; preview.change(''); return true }
 async function unlockRejected() { if (!permitted.value || busy.value || state.value.attempt?.state !== 'rejected') return false; return workspace.begin() }
 async function browse(next = false) { if (!permitted.value || busy.value) return false; stopTracking(); return workspace.list(next) }
-async function select(id: string) { if (!permitted.value || busy.value) return false; stopTracking(); return workspace.select(id) }
+async function select(id: string) { if (!permitted.value || busy.value) return false; stopTracking(); const loaded = await workspace.select(id); if (loaded) await revealWorkspace('.import-current'); return loaded }
 async function track(id: string) {
  if (!permitted.value || busy.value) return false
  stopTracking(); tracking.value = id; const turn = trackingEpoch, context = contextKey.value
@@ -62,11 +63,11 @@ defineExpose({ change, changeAck, checkFormat, submit, retry, beginNew, unlockRe
 </script>
 <template>
  <section class="contact-import-page">
-  <div class="page-heading"><div><span class="eyebrow">CREATE-ONLY CONTACT IMPORT</span><h1>联系人批量新建与作业</h1><p>明确资料 · 整批受理 · 独立回读结果</p></div><router-link to="/customer-contacts">返回联系人管理</router-link></div>
-  <el-alert type="warning" :closable="false" title="只新建自述联系人，不合并、不授予身份、不派发通知">本页接收完整JSON，不提供CSV/XLSX文件解析。格式预览不是导入许可；每次受理和后台执行都核验当前授权。单批1–100行为技术上限，非合同配额。Worker在线状态未知，受理不保证即时完成。</el-alert>
+  <div class="page-heading"><div><h1>联系人批量新建与作业</h1><p>明确资料 · 整批受理 · 独立回读结果</p></div><router-link to="/customer-contacts">返回联系人管理</router-link></div>
+  <details class="page-guidance"><summary>使用范围与说明</summary><el-alert type="warning" :closable="false" title="只新建自述联系人，不合并、不授予身份、不派发通知">本页接收完整JSON，不提供CSV/XLSX文件解析。格式预览不是导入许可；每次受理和后台执行都核验当前授权。单批1–100行为技术上限，非合同配额。Worker在线状态未知，受理不保证即时完成。</el-alert></details>
   <el-empty v-if="!permitted" description="当前身份没有联系人批量新建权限" />
   <template v-else>
-   <section class="import-panel"><h2>1. 核对明确输入</h2>
+   <details class="import-panel"><summary>新建联系人导入</summary><h2>核对明确输入</h2>
     <p>每行完整8字段；未知填写null，enabled必须明确true或false。角色仅是联系人标签，不是账号权限；优先级偏好与静音资料不等于已生效通知规则。</p>
     <details><summary>查看示例（不自动填入或发送）</summary><pre>{{ example }}</pre><p>角色：REPORTER、DECISION_MAKER、TECHNICAL_CONTACT。preferred_priorities为P1–P4数组，null未知、[]明确为空。quiet_window为null或完整enabled/start/end；启用窗口用不同HH:mm，可跨午夜，时区Asia/Shanghai。</p></details>
     <el-input type="textarea" :rows="12" :model-value="previewState.text" :disabled="locked" aria-label="批量新建联系人原始JSON" placeholder="粘贴明确资料；不要包含密码、token或API密钥" @update:model-value="change($event)" />
@@ -75,16 +76,16 @@ defineExpose({ change, changeAck, checkFormat, submit, retry, beginNew, unlockRe
     <ApiErrorNotice :error="previewState.error" />
     <div v-if="previewState.result" aria-live="polite"><p>服务端格式通过 {{ previewState.result.valid_rows }} 行；无效 {{ previewState.result.invalid_rows }} 行；完全相同行 {{ previewState.result.identical_rows }} 行</p><p>can_import=false仅表示预览不授予写入许可，实际写入须下面的独立受理动作。</p><ol><li v-for="row in previewState.result.rows" :key="row.row_number">第{{ row.row_number }}行：{{ row.status === 'INVALID' ? '字段错误，请修正原文' : '格式通过 / 未核验' }}<span v-if="row.identical_to_row !== null">；与第{{ row.identical_to_row }}行完全相同</span></li></ol></div>
     <el-checkbox :model-value="acknowledge" :disabled="locked" aria-label="确认相同行分别新建" @update:model-value="changeAck($event)">如有字段完全相同行，我确认每行分别新建，绝不自动合并或跳过</el-checkbox>
-    <h2>2. 显式受理整批</h2><el-button type="primary" :disabled="!readyToSubmit" :loading="state.busy === 'write' || confirming" @click="submit">确认并受理新建作业</el-button>
-   </section>
+    <h2>显式受理整批</h2><el-button type="primary" :disabled="!readyToSubmit" :loading="state.busy === 'write' || confirming" @click="submit">确认并受理新建作业</el-button>
+   </details>
    <ApiErrorNotice :error="state.error" />
    <section v-if="state.attempt?.state === 'uncertain'" class="import-panel uncertain" role="alert"><h2>原请求结果未知</h2><p>请求可能已经受理。输入与幂等键已在当前页面锁定；不要重新建批次。普通GET刷新不确认原POST，403重试也不表示之前未执行。</p><el-button :disabled="busy" :loading="state.busy === 'write'" @click="retry">完全相同原请求恢复</el-button><p>强制会话失效会清空本页私有输入；恢复身份后先查“我的导入作业”，不要直接重复提交。</p></section>
    <section v-if="state.attempt?.state === 'rejected'" class="import-panel"><h2>本次受理被明确拒绝</h2><p>可保留输入解锁并重新核对，未自动改写或重试。</p><el-button :disabled="busy" @click="unlockRejected">保留输入并解锁</el-button></section>
    <section v-if="state.receipt" class="import-panel" aria-live="polite"><h2>原始202受理回执（不是当前处理结果）</h2><p>作业 {{ state.receipt.operation_id }} · 原始状态 PENDING</p><p>此回执不会随后台完成改写。请独立读取当前作业。</p><div class="actions"><el-button :disabled="busy" @click="select(state.receipt.operation_id)">回读本批当前结果</el-button><el-button :disabled="busy || tracking !== null" @click="track(state.receipt.operation_id)">自动刷新本批进度</el-button></div></section>
-   <section class="import-panel"><h2>3. 我的导入作业</h2><p>仅当前创建者与当前租户；另一个管理员不能查看你的作业。手动查询，不自动创建或补写。</p><div class="actions"><el-button :disabled="busy" @click="browse(false)">刷新第一页</el-button><el-button :disabled="busy || !state.page?.has_more" @click="browse(true)">下一页</el-button><el-button v-if="tracking" @click="stopTracking">停止自动刷新</el-button></div><p v-if="tracking" role="status">每2秒只读刷新目标作业；终态、查询失败、上下文改变或离开页面时停止。不会自动重试受理。</p>
-    <div v-if="state.page" class="record-table jobs" role="region" tabindex="0" aria-label="记录列表，可横向滚动"><table><thead><tr><th>状态</th><th>处理步骤</th><th>行数</th><th>受理时间</th><th>操作</th></tr></thead><tbody><tr v-for="job in state.page.items" :key="job.id" ><td><strong>{{statusText(job.status)}}</strong><details><summary>作业信息</summary><p>{{job.id}} · 版本{{job.version}} · 尝试{{job.attempts}}次</p></details></td><td>{{stepText(job.step)}}</td><td>{{job.row_count}}</td><td>{{job.created_at}}</td><td><el-button :disabled="busy" @click="select(job.id)">查看当前结果</el-button></td></tr></tbody></table></div><p v-if="state.page && state.page.items.length === 0">此页没有可见作业</p><p v-if="state.page && !state.page.has_more">已到当前查询末页</p>
+   <section class="import-panel"><h2>我的导入作业</h2><p>仅当前创建者与当前租户；另一个管理员不能查看你的作业。进入页面读取当前作业，不自动创建或补写。</p><div class="actions"><el-button :disabled="busy" @click="browse(false)">刷新第一页</el-button><el-button :disabled="busy || !state.page?.has_more" @click="browse(true)">下一页</el-button><el-button v-if="tracking" @click="stopTracking">停止自动刷新</el-button></div><p v-if="tracking" role="status">每2秒只读刷新目标作业；终态、查询失败、上下文改变或离开页面时停止。不会自动重试受理。</p>
+    <p v-if="!state.page" role="status">{{state.busy==='read'?'正在读取导入作业…':state.error?'读取未完成，作业数量未知':'尚未读取作业'}}</p><div v-if="state.page" class="record-table jobs" role="region" tabindex="0" aria-label="记录列表，可横向滚动"><table><thead><tr><th>状态</th><th>处理步骤</th><th>行数</th><th>受理时间</th><th>操作</th></tr></thead><tbody><tr v-for="job in state.page.items" :key="job.id" ><td><strong>{{statusText(job.status)}}</strong><details><summary>作业信息</summary><p>{{job.id}} · 版本{{job.version}} · 尝试{{job.attempts}}次</p></details></td><td>{{stepText(job.step)}}</td><td>{{job.row_count}}</td><td>{{job.created_at}}</td><td><el-button :disabled="busy" @click="select(job.id)">查看当前结果</el-button></td></tr></tbody></table></div><p v-if="state.page && state.page.items.length === 0">此页没有可见作业</p><p v-if="state.page && !state.page.has_more">已到当前查询末页</p>
    </section>
-   <section v-if="state.selected" class="import-panel" aria-live="polite"><h2>当前作业结果</h2><p>{{ state.selected.id }}</p><h3>{{ statusText(state.selected.status) }} · {{ stepText(state.selected.step) }}</h3><p>受理{{ state.selected.row_count }}行 · 完成{{ state.selected.completed_rows === null ? '未知 / 未完成' : state.selected.completed_rows }}行 · 尝试{{ state.selected.attempts }}次 · 版本{{ state.selected.version }}</p><p>Worker在线：未知；本页不派发通知、不核验渠道、不创建账号权限。</p><p v-if="state.selected.next_attempt_at">下一可领取时间 {{ state.selected.next_attempt_at }}（不是完成承诺）</p><p v-if="state.selected.error" role="alert">{{ state.selected.error.code }}：{{ state.selected.error.message }}</p><div class="actions"><el-button :disabled="busy" @click="select(state.selected.id)">只读刷新当前作业</el-button><el-button v-if="!['SUCCEEDED', 'FAILED'].includes(state.selected.status)" :disabled="busy || tracking !== null" @click="track(state.selected.id)">自动刷新当前作业</el-button></div>
+   <section v-if="state.selected" class="import-panel import-current" aria-live="polite"><h2>当前作业结果</h2><p>{{ state.selected.id }}</p><h3>{{ statusText(state.selected.status) }} · {{ stepText(state.selected.step) }}</h3><p>受理{{ state.selected.row_count }}行 · 完成{{ state.selected.completed_rows === null ? '未知 / 未完成' : state.selected.completed_rows }}行 · 尝试{{ state.selected.attempts }}次 · 版本{{ state.selected.version }}</p><p>Worker在线：未知；本页不派发通知、不核验渠道、不创建账号权限。</p><p v-if="state.selected.next_attempt_at">下一可领取时间 {{ state.selected.next_attempt_at }}（不是完成承诺）</p><p v-if="state.selected.error" role="alert">{{ state.selected.error.code }}：{{ state.selected.error.message }}</p><div class="actions"><el-button :disabled="busy" @click="select(state.selected.id)">只读刷新当前作业</el-button><el-button v-if="!['SUCCEEDED', 'FAILED'].includes(state.selected.status)" :disabled="busy || tracking !== null" @click="track(state.selected.id)">自动刷新当前作业</el-button></div>
     <p v-if="state.selected.status === 'FAILED'">本作业已终结，不能原作业重试；排查并修正原因后才能明确受理新批次。原202回执仍然只证明当时受理。</p><p v-if="state.selected.status === 'SUCCEEDED'">整批联系人已创建，下列链接事实固定为v1；之后的修订或归档需从联系人管理另读。</p><ol><li v-for="result in state.selected.results" :key="result.row_number">第{{ result.row_number }}行 → 联系人 {{ result.contact_id }} / 原修订 v{{ result.contact_version }}</li></ol>
    </section>
   </template>

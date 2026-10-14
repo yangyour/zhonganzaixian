@@ -15,5 +15,10 @@ export function addFirewallResourcesContract(c){
   const asset={name:'assetId',in:'path',required:true,schema:uuid}
   c.paths['/network-monitoring/{assetId}/resources']={get:action('readFirewallResources','FirewallResourceResult',[asset])}
   c.paths['/network-monitoring/{assetId}/resources/history']={get:action('readFirewallResourceHistory','FirewallResourceHistoryResult',[asset,{name:'metric',in:'query',schema:{enum:['cpu','memory'],default:'cpu'}},{name:'window',in:'query',schema:{enum:['HOUR_1','HOURS_24'],default:'HOUR_1'}}])}
+  for (const path of ['/network-monitoring/{assetId}/resources','/network-monitoring/{assetId}/resources/history']) {
+    for (const [status, response] of Object.entries(c.paths[path].get.responses)) {
+      if (status !== '200') response.content = { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+    }
+  }
   c.info.version='0.49.0'
 }

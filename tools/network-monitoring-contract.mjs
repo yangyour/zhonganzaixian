@@ -15,5 +15,10 @@ export function addNetworkMonitoringContract(contract) {
     {name:'assetId',in:'path',required:true,schema:uuid},
     {name:'metric',in:'query',schema:{enum:metricNames,default:'latency'}},
     {name:'window',in:'query',schema:{enum:['HOUR_1','HOURS_24'],default:'HOUR_1'}}])}
+  for (const path of ['/network-monitoring','/network-monitoring/{assetId}/history']) {
+    for (const [status, response] of Object.entries(contract.paths[path].get.responses)) {
+      if (status !== '200') response.content = { 'application/json': { schema: ref('Error') } }
+    }
+  }
   contract.info.version='0.46.0'
 }

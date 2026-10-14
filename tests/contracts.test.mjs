@@ -17,6 +17,14 @@ const validates = (name, value) => {
   return check(value);
 };
 const id = (digit) => `${digit.repeat(8)}-${digit.repeat(4)}-4${digit.repeat(3)}-8${digit.repeat(3)}-${digit.repeat(12)}`;
+
+test('监控查询的越权、参数和依赖失败声明统一错误信封，不能只有描述', () => {
+  for (const path of ['/network-monitoring', '/network-monitoring/{assetId}/history', '/network-monitoring/{assetId}/resources', '/network-monitoring/{assetId}/resources/history']) {
+    for (const status of ['400','401','403','404','422','503']) {
+      assert.equal(contract.paths[path].get.responses[status].content?.['application/json']?.schema?.$ref, '#/components/schemas/Error', path + ':' + status);
+    }
+  }
+});
 test('导出发布必须显式确认文件摘要和当前版本，原准备受理仍独立',()=>{
   const input={expected_version:2,file_sha256:'a'.repeat(64),action:'PUBLISH_PREPARED_FILE'};
   assert.ok(validates('AssetExportPublishInput',input));

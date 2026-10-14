@@ -27496,22 +27496,64 @@
             }
           },
           "400": {
-            "description": "Unknown/duplicate query or invalid metric/window"
+            "description": "Unknown/duplicate query or invalid metric/window",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Expired or changed membership"
+            "description": "Expired or changed membership",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Missing assets:read"
+            "description": "Missing assets:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Unbound, wrong IP or cross-tenant asset"
+            "description": "Unbound, wrong IP or cross-tenant asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "422": {
-            "description": "History exceeds 2000 points; no truncation"
+            "description": "History exceeds 2000 points; no truncation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "503": {
-            "description": "Not configured, provider unavailable, mapping drift or malformed source; no fallback"
+            "description": "Not configured, provider unavailable, mapping drift or malformed source; no fallback",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -27573,22 +27615,64 @@
             }
           },
           "400": {
-            "description": "Unknown/duplicate query or invalid metric/window"
+            "description": "Unknown/duplicate query or invalid metric/window",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Expired or changed membership"
+            "description": "Expired or changed membership",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Missing assets:read"
+            "description": "Missing assets:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Unbound, wrong IP or cross-tenant asset"
+            "description": "Unbound, wrong IP or cross-tenant asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "422": {
-            "description": "History exceeds 2000 points; no truncation"
+            "description": "History exceeds 2000 points; no truncation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "503": {
-            "description": "Not configured, provider unavailable, mapping drift or malformed source; no fallback"
+            "description": "Not configured, provider unavailable, mapping drift or malformed source; no fallback",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -28584,22 +28668,64 @@
             }
           },
           "400": {
-            "description": "Invalid or duplicate query"
+            "description": "Invalid or duplicate query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Session or membership changed"
+            "description": "Session or membership changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Missing assets:read"
+            "description": "Missing assets:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Wrong tenant, IP, or no explicit resource binding"
+            "description": "Wrong tenant, IP, or no explicit resource binding",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "422": {
-            "description": "History exceeds 2000 points"
+            "description": "History exceeds 2000 points",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "503": {
-            "description": "Provider/configuration unavailable; no fallback"
+            "description": "Provider/configuration unavailable; no fallback",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -28657,22 +28783,64 @@
             }
           },
           "400": {
-            "description": "Invalid or duplicate query"
+            "description": "Invalid or duplicate query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Session or membership changed"
+            "description": "Session or membership changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Missing assets:read"
+            "description": "Missing assets:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Wrong tenant, IP, or no explicit resource binding"
+            "description": "Wrong tenant, IP, or no explicit resource binding",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "422": {
-            "description": "History exceeds 2000 points"
+            "description": "History exceeds 2000 points",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           },
           "503": {
-            "description": "Provider/configuration unavailable; no fallback"
+            "description": "Provider/configuration unavailable; no fallback",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }

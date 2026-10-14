@@ -388,7 +388,8 @@
         "docs/device-credential-verification-20261014.md",
         "docs/device-network-preflight.md",
         "docs/device-test-tls-mode.md",
-        "docs/firewall-basic-integration-20261014.md"
+        "docs/firewall-basic-integration-20261014.md",
+        "docs/firewall-resource-monitoring.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -535,6 +536,7 @@
         "docs/evidence/niko-monitoring-object-mapping-20261007.json",
         "docs/evidence/niko-zabbix-numeric-history-20261005.json",
         "docs/firewall-basic-integration-20261014.md",
+        "docs/firewall-resource-monitoring.md",
         "docs/metric-series-projection.md",
         "docs/monitoring-object-mapping.md",
         "docs/scp-connector-preparation.md"
@@ -1456,6 +1458,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "0be243f23da468956ab4e8b51bdc5ff79feb104350d18fd2ab3b8d0bbb323495"
+    "doc/development/07_合同逐项开发追踪.md": "4bce6d5c859891e759697c4630509aabaf9b0e36b2a70b2c6c518b66660e96e6"
   }
 }

@@ -1,0 +1,9 @@
+import {expect,it} from 'vitest'
+import {historySegments,readResources,readResourceHistory,type ResourceSnapshot,type ResourceHistory} from '../src/utils/networkMonitoring'
+import {resource,resourceHistory} from './firewallResourceFixtures'
+it('accepts measured percentages without inventing source time or certificate trust',()=>{const r=resource();expect(readResources(r,r.asset_id).metrics.cpu.value).toBe('12.50');expect(r.source_sampled_at).toBeNull();expect(r.tls_trust_verified).toBe(false)})
+it('requires null values for failed or stale collection',()=>{const r=resource();r.state='COLLECTOR_ERROR';r.reason='PASSWORD_EXPIRED';expect(()=>readResources(r,r.asset_id)).toThrow();r.metrics.cpu.value=r.metrics.memory.value=null;expect(readResources(r,r.asset_id)).toBe(r)})
+it('rejects wrong assets, IP, units and out-of-range values',()=>{const r=resource();expect(()=>readResources(r,'other')).toThrow();r.metrics.cpu.value='101';expect(()=>readResources(r,r.asset_id)).toThrow();r.metrics.cpu.value='12';r.management_ip='192.169.11.2';expect(()=>readResources(r,r.asset_id)).toThrow()})
+it('rejects allegedly fresh data outside the collection age window',()=>{const r=resource();r.received_at='2026-10-12T07:56:00Z';expect(()=>readResources(r,r.asset_id)).toThrow();r.received_at='2026-10-12T08:01:00Z';expect(()=>readResources(r,r.asset_id)).toThrow()})
+it('binds history to source asset metric and time window',()=>{const h=resourceHistory();expect(readResourceHistory(h,h.asset_id,'cpu','HOUR_1')).toBe(h);expect(()=>readResourceHistory(h,h.asset_id,'memory','HOUR_1')).toThrow();expect(()=>readResourceHistory(h,h.asset_id,'cpu','HOURS_24')).toThrow()})
+it('draws legitimate zero and breaks at a missing minute with percent scale',()=>{const parts=historySegments(resourceHistory());expect(parts).toHaveLength(2);expect(parts[0]!.dots[0]!.y).toBe(154);expect(parts[0]!.dots[1]!.y).toBe(89);expect(parts[1]!.dots[0]!.y).toBe(24)})

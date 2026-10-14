@@ -1,0 +1,59 @@
+{
+  "environment": "lan-test-20261008",
+  "verified_at": "2026-10-14T08:11:31.016721+00:00",
+  "apply": false,
+  "group_id": null,
+  "host_id": null,
+  "items": [
+    {
+      "metric": "cpu",
+      "key_": "mop.af.cpu[192.169.11.1]",
+      "type": "2",
+      "value_type": "0",
+      "units": "%",
+      "history": "7d",
+      "trends": "0",
+      "delay": "0",
+      "status": "0",
+      "trapper_hosts": "127.0.0.1,172.18.0.1,172.18.0.8",
+      "itemid": null
+    },
+    {
+      "metric": "memory",
+      "key_": "mop.af.memory[192.169.11.1]",
+      "type": "2",
+      "value_type": "0",
+      "units": "%",
+      "history": "7d",
+      "trends": "0",
+      "delay": "0",
+      "status": "0",
+      "trapper_hosts": "127.0.0.1,172.18.0.1,172.18.0.8",
+      "itemid": null
+    },
+    {
+      "metric": "state",
+      "key_": "mop.af.state[192.169.11.1]",
+      "type": "2",
+      "value_type": "1",
+      "units": "",
+      "history": "7d",
+      "trends": "0",
+      "delay": "0",
+      "status": "0",
+      "trapper_hosts": "127.0.0.1,172.18.0.1,172.18.0.8",
+      "itemid": null
+    }
+  ],
+  "reader_methods": [
+    "host.get",
+    "item.get",
+    "history.get"
+  ],
+  "writer_methods": [
+    "history.push"
+  ],
+  "device_writes": 0,
+  "alert_rules_created": false,
+  "credentials_output": false
+}

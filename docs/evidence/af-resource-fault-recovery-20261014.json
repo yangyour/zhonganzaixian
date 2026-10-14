@@ -1,0 +1,60 @@
+{
+  "environment": "lan-test-20261008",
+  "verified_at": "2026-10-14T08:30:19.925065+00:00",
+  "fault_injection": "only owned project collector status item; no device mutation",
+  "failure_snapshot": {
+    "asset_id": "8a8b5f47-5bd4-4abd-8f39-8d6f43794299",
+    "management_ip": "192.169.11.1",
+    "generated_at": "2026-10-14T08:29:56.892597627Z",
+    "state": "COLLECTOR_ERROR",
+    "reason": "SOURCE_UNAVAILABLE",
+    "metrics": {
+      "cpu": {
+        "value": null,
+        "unit": "%"
+      },
+      "memory": {
+        "value": null,
+        "unit": "%"
+      }
+    },
+    "received_at": "2026-10-14T08:29:55Z",
+    "source_sampled_at": null,
+    "source": "SANGFOR_AF_API",
+    "timestamp_meaning": "COLLECTOR_RECEIPT_TIME",
+    "sample_interval_seconds": 60,
+    "freshness_seconds": 180,
+    "tls_mode": "TEST_INSECURE",
+    "tls_trust_verified": false,
+    "alert_rule_status": "CONFIG_PENDING"
+  },
+  "recovered_snapshot": {
+    "asset_id": "8a8b5f47-5bd4-4abd-8f39-8d6f43794299",
+    "management_ip": "192.169.11.1",
+    "generated_at": "2026-10-14T08:30:19.303750686Z",
+    "state": "FRESH",
+    "reason": null,
+    "metrics": {
+      "cpu": {
+        "value": "14",
+        "unit": "%"
+      },
+      "memory": {
+        "value": "59",
+        "unit": "%"
+      }
+    },
+    "received_at": "2026-10-14T08:30:18Z",
+    "source_sampled_at": null,
+    "source": "SANGFOR_AF_API",
+    "timestamp_meaning": "COLLECTOR_RECEIPT_TIME",
+    "sample_interval_seconds": 60,
+    "freshness_seconds": 180,
+    "tls_mode": "TEST_INSECURE",
+    "tls_trust_verified": false,
+    "alert_rule_status": "CONFIG_PENDING"
+  },
+  "ready_failed_closed": true,
+  "real_worker_restored_samples": true,
+  "passed": true
+}

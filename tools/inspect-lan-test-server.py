@@ -14,7 +14,7 @@ NAMES = ('postgres', 'minio', 'redis', 'rabbitmq', 'api', 'photo-worker',
          'import-worker', 'contact-worker', 'web', 'zabbix-server', 'zabbix-web', 'zabbix-agent')
 
 
-def inspect(output: Path | None = None, include_export_queue: bool = False) -> dict:
+def inspect(output: Path | None = None, include_export_queue: bool = False, include_af_collector: bool = False) -> dict:
     cfg = json.loads((ROOT / 'deploy/private/lan-test-connection.json').read_text(encoding='utf-8-sig'))
     if cfg['environment'] != 'lan-test-20261008' or cfg['host'] != '192.168.1.215':
         raise ValueError('Unexpected deployment destination')
@@ -49,7 +49,7 @@ def inspect(output: Path | None = None, include_export_queue: bool = False) -> d
             raise ValueError('Project ownership mismatch')
         containers = {}
         storage_providers = {}
-        selected_names = NAMES + (('export-preparation-worker',) if include_export_queue else ())
+        selected_names = NAMES + (('export-preparation-worker',) if include_export_queue else ()) + (('af-collector',) if include_af_collector else ())
         for suffix in selected_names:
             name = 'mop-lan-'+suffix
             item = json.loads(run(['docker', 'inspect', name], True))[0]
@@ -92,6 +92,7 @@ def inspect(output: Path | None = None, include_export_queue: bool = False) -> d
             'selected_container_count': len(containers),
             'all_selected_containers_running': all(x['Running'] for x in containers.values()),
             'export_preparation_queue_included': include_export_queue,
+            'af_collector_included': include_af_collector,
             'ready': readiness.get('ready') is True, 'mode': readiness.get('mode'),
             'durable': readiness.get('durable'), 'photos_ready': readiness['photos']['ready'],
             'asset_source_storage_ready': readiness['asset_imports']['ready'],
@@ -109,9 +110,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', type=Path)
     parser.add_argument('--include-export-queue', action='store_true')
+    parser.add_argument('--include-af-collector', action='store_true')
     args = parser.parse_args()
     try:
-        report = inspect(args.output, args.include_export_queue)
+        report = inspect(args.output, args.include_export_queue, args.include_af_collector)
         print(json.dumps({k: report[k] for k in ('environment', 'ssh_authenticated', 'all_12_containers_running', 'selected_container_count', 'all_selected_containers_running', 'ready', 'schema_version', 'production_ready')}))
         raise SystemExit(0 if report['all_selected_containers_running'] and report['ready'] else 1)
     except Exception as failure:

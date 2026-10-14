@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-14T09:21:36.906387+00:00",
+  "environment": "lan-test-20261008",
+  "live_releases": {
+    "mop-lan-api": {
+      "started_at": "2026-10-14T08:37:49.434242995Z",
+      "mounts": [
+        {
+          "source": "/opt/mop-lan-test/releases/af-resource-api-de918c6e6825",
+          "destination": "/app"
+        }
+      ]
+    },
+    "mop-lan-web": {
+      "started_at": "2026-10-14T09:06:22.267994162Z",
+      "mounts": [
+        {
+          "source": "/opt/mop-lan-test/releases/impeccable-d8d95f57271a/web",
+          "destination": "/usr/share/nginx/html"
+        }
+      ]
+    },
+    "mop-lan-af-collector": {
+      "started_at": "2026-10-14T08:32:05.075706152Z",
+      "mounts": [
+        {
+          "source": "/opt/mop-lan-test/releases/af-collector-de918c6e6825",
+          "destination": "/app"
+        }
+      ]
+    }
+  },
+  "web_build_id": "cb37dda2da380742715e23d469143d0a0bf9f4d730ef142dd35af705d5e99141",
+  "concurrent_ui_release_preserved": true,
+  "all_14_monitoring_browser_checks_repeated_after_ui_release": true,
+  "passed": true
+}

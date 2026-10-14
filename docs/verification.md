@@ -1,5 +1,7 @@
 # 本地、云端与指定测试环境验证记录
 
+2026-10-14防火墙新密码已私有记录并验证，CPU/内存持续采集、真实历史及桌面/手机监控页已上线。API0.49新增当前值/历史读取，复用既有Zabbix历史库和独立最小权限身份；67Java、1944Web、133契约、候选与公开入口各40HTTP及14浏览器检查通过。测试站14服务就绪、PG17.9/V31，无迁移；仅项目API/Web更新并新增采集Worker。SCP/其他指标及正式告警仍待，详见[完整交付与证据](firewall-resource-monitoring.md)。
+
 2026-10-14用户更新防火墙密码后，原Java客户端已实际登录并读取版本AF8.0.106.4646、CPU 12%、内存58%，正常注销；此前PASSWORD_EXPIRED门禁已解除。新密码仅记录在Git忽略的私有凭据文件。本次为真实单次首值，持续采集/历史/页面继续实现，证书仍为显式TEST_INSECURE。见[密码更新后首值](evidence/firewall-password-updated-read-20261014.json)。
 
 2026-10-14已将临时证书跳过实现为SCP/AF实际Java客户端的TEST_INSECURE配置，94Java及3工具用例通过；同JVM严格→测试→严格真实验证完成，例外仅两个固定地址。SCP认证成功但ACCESS_DENIED，AF登录成功但PASSWORD_EXPIRED，均未伪造资源指标或启动后台轮询；只发布独立检查工件，无API/Web重启或数据库迁移，当前API0.48/V31保持。见[实现及证据](device-test-tls-mode.md)。

@@ -1,0 +1,94 @@
+{
+  "verified_at": "2026-10-14T09:21:26.000Z",
+  "environment": "lan-test-20261008",
+  "public_url": "http://192.168.1.215:10010/network-monitoring",
+  "browser": "Edge 155.0.4283.45",
+  "live_web_build_id": "cb37dda2da380742715e23d469143d0a0bf9f4d730ef142dd35af705d5e99141",
+  "concurrent_ui_release_preserved": true,
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "physical_mobile_test": false,
+  "checks": [
+    {
+      "name": "four-devices-and-live-resources",
+      "passed": true
+    },
+    {
+      "name": "cpu-HOUR_1",
+      "passed": true,
+      "points": 61
+    },
+    {
+      "name": "cpu-HOURS_24",
+      "passed": true,
+      "points": 63
+    },
+    {
+      "name": "memory-HOURS_24",
+      "passed": true,
+      "points": 63
+    },
+    {
+      "name": "memory-HOUR_1",
+      "passed": true,
+      "points": 61
+    },
+    {
+      "name": "switch-to-basic-device-resets-resource-mode",
+      "passed": true
+    },
+    {
+      "name": "refresh-retains-device-selection",
+      "passed": true
+    },
+    {
+      "name": "browser-only-error-clears-old-values",
+      "passed": true
+    },
+    {
+      "name": "real-resource-values-return-after-error",
+      "passed": true
+    },
+    {
+      "name": "mobile-navigation-and-resource-card",
+      "passed": true
+    },
+    {
+      "name": "mobile-cpu-history",
+      "passed": true
+    },
+    {
+      "name": "mobile-controls-no-horizontal-overflow",
+      "passed": true
+    },
+    {
+      "name": "other-tenant-empty-no-resource-values",
+      "passed": true
+    },
+    {
+      "name": "desktop-no-horizontal-overflow",
+      "passed": true
+    }
+  ],
+  "actual_checks": 14,
+  "page_errors": [],
+  "screenshots": [
+    "desktop-history.png",
+    "desktop-resources.png",
+    "mobile-history.png",
+    "mobile-resources.png",
+    "other-tenant-empty.png"
+  ],
+  "browser_failure_injection": "resource response override in this browser only; real server fault recovery recorded separately",
+  "visual_review": "Latest deployed UI: reviewed current values, history controls/graphs, receipt time, TLS notice, mobile layout and other-tenant empty state; no unexpected horizontal clipping.",
+  "tool_recovery": "Legacy navigation selector corrected to existing Resources and Monitoring group.",
+  "passed": true
+}

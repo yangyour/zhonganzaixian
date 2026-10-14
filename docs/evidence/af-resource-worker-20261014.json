@@ -1,0 +1,18 @@
+{
+  "verified_at": "2026-10-14T08:17:16.726666+00:00",
+  "environment": "lan-test-20261008",
+  "worker": "mop-lan-af-collector",
+  "release": "/opt/mop-lan-test/releases/af-collector-b7f35d5c33da",
+  "artifact_sha256": "b7f35d5c33da28aad1f1d8da75b5f61778052b0e26f2eb270c4d58d418f99b7c",
+  "health": {
+    "tls_mode": "TEST_INSECURE",
+    "state": "PUBLISH_UNAVAILABLE",
+    "at": "2026-10-14T08:16:33.428865319Z"
+  },
+  "unchanged_existing_services": 13,
+  "new_infrastructure_components": 0,
+  "new_project_workers": 1,
+  "database_migrations": 0,
+  "device_writes": 0,
+  "ready": false
+}

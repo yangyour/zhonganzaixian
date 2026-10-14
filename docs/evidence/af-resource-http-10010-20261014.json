@@ -1,0 +1,278 @@
+{
+  "environment": "lan-test-20261008",
+  "port": 10010,
+  "verified_at": "2026-10-14T08:39:37.172383+00:00",
+  "http_checks": 40,
+  "checks": [
+    {
+      "path": "/health/ready",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources",
+      "method": "GET",
+      "expected": 401,
+      "actual": 401
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=cpu&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=cpu&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=memory&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=memory&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=icmp&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/resources",
+      "method": "GET",
+      "expected": 404,
+      "actual": 404
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=icmp&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/resources",
+      "method": "GET",
+      "expected": 404,
+      "actual": 404
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=icmp&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/resources",
+      "method": "GET",
+      "expected": 404,
+      "actual": 404
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=icmp&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources?itemid=1",
+      "method": "GET",
+      "expected": 400,
+      "actual": 400
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources?tenant_id=other",
+      "method": "GET",
+      "expected": 400,
+      "actual": 400
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources?ip=192.169.11.2",
+      "method": "GET",
+      "expected": 400,
+      "actual": 400
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=state",
+      "method": "GET",
+      "expected": 400,
+      "actual": 400
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=cpu&metric=memory",
+      "method": "GET",
+      "expected": 400,
+      "actual": 400
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?window=OTHER",
+      "method": "GET",
+      "expected": 400,
+      "actual": 400
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=memory&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=memory&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history?metric=memory&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources",
+      "method": "GET",
+      "expected": 404,
+      "actual": 404
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/resources/history",
+      "method": "GET",
+      "expected": 404,
+      "actual": 404
+    }
+  ],
+  "firewall_resources": {
+    "asset_id": "8a8b5f47-5bd4-4abd-8f39-8d6f43794299",
+    "management_ip": "192.169.11.1",
+    "generated_at": "2026-10-14T08:39:27.547144358Z",
+    "state": "FRESH",
+    "reason": null,
+    "metrics": {
+      "cpu": {
+        "value": "11",
+        "unit": "%"
+      },
+      "memory": {
+        "value": "58",
+        "unit": "%"
+      }
+    },
+    "received_at": "2026-10-14T08:39:07Z",
+    "source_sampled_at": null,
+    "source": "SANGFOR_AF_API",
+    "timestamp_meaning": "COLLECTOR_RECEIPT_TIME",
+    "sample_interval_seconds": 60,
+    "freshness_seconds": 180,
+    "tls_mode": "TEST_INSECURE",
+    "tls_trust_verified": false,
+    "alert_rule_status": "CONFIG_PENDING"
+  },
+  "minimum_resource_history_points": 24,
+  "cross_tenant_resource_and_history_404": true,
+  "artifact_sha256": "de918c6e6825f9ba3e741fc7d0a45259248cee556f0ea4c56e03f0f9163d8e23",
+  "passed": true
+}

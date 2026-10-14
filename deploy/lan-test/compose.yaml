@@ -60,6 +60,21 @@ services:
     volumes: ["${API_RELEASE_DIR:-${RELEASE_DIR}}:/app:ro"]
     command: [java, -XX:MaxRAMPercentage=60.0, -jar, /app/api.jar]
     mem_limit: 1536m
+  af-collector:
+    <<: *application
+    profiles: [af-monitoring]
+    container_name: mop-lan-af-collector
+    env_file: [./private/af-collector.env]
+    volumes: ["${AF_RELEASE_DIR:-${RELEASE_DIR}}:/app:ro"]
+    command: [java, -Xmx192m, -Dloader.main=cn.mop.adapters.af.AfCollectorMain, -cp, /app/api.jar, org.springframework.boot.loader.launch.PropertiesLauncher]
+    mem_limit: 384m
+    pids_limit: 96
+    healthcheck:
+      test: [CMD, java, -Dloader.main=cn.mop.adapters.af.AfCollectorMain, -cp, /app/api.jar, org.springframework.boot.loader.launch.PropertiesLauncher, --health]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
   photo-worker:
     <<: *application
     container_name: mop-lan-photo-worker

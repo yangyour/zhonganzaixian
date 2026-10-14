@@ -1,0 +1,28 @@
+{
+  "environment": "lan-test-20261008",
+  "verified_at": "2026-10-14T08:33:30.639615+00:00",
+  "roles": [
+    {
+      "role_name": "MOP AF API reader 20261014",
+      "api_mode": "1",
+      "methods": [
+        "host.get",
+        "item.get",
+        "history.get"
+      ]
+    },
+    {
+      "role_name": "MOP AF API writer 20261014",
+      "api_mode": "1",
+      "methods": [
+        "history.push"
+      ]
+    }
+  ],
+  "reader_visible_hosts": 1,
+  "reader_push_denied": true,
+  "writer_unlisted_read_denied": true,
+  "negative_push_used_nonexistent_item": true,
+  "original_basic_reader_hosts": 4,
+  "passed": true
+}

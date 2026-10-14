@@ -162,7 +162,7 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
         <el-form-item class="filter-actions"><el-button type="primary" native-type="submit" :disabled="loading">查询</el-button><el-button :disabled="loading" @click="resetFilters">重置</el-button><el-button :loading="loading" @click="loadAssets">刷新</el-button></el-form-item>
       </el-form>
       <ApiErrorNotice :error="error" guidance="请点击“重试”重新加载当前列表。"><el-button size="small" @click="loadAssets">重试</el-button></ApiErrorNotice>
-      <AppTable :rows="rows" :loading="loading" :empty-text="error ? '数据加载失败，请重试' : '当前筛选下没有资产'">
+      <AppTable :error="error" :rows="rows" :loading="loading" :empty-text="error ? '数据加载失败，请重试' : '当前筛选下没有资产'">
         <el-table-column v-for="column in assetLedgerColumns" :key="column.key" :label="column.label" :min-width="column.minWidth" :fixed="column.key === 'actions' ? 'right' : undefined">
           <template #default="{ row }">
             <el-button v-if="column.key === 'name' || column.key === 'actions'" link type="primary" :class="{ 'asset-link': column.key === 'name' }" @click="openDetail(row.id)">{{ assetLedgerCell(row, column.key).text }}</el-button>

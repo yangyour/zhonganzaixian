@@ -63,7 +63,7 @@ onUnmounted(() => workspace.dispose())
         <p class="field-help">时间使用含秒的UTC Z格式，最多3位毫秒；范围为开始包含、结束不包含。留空即不增加对应筛选，不代表没有历史记录。</p>
         <p v-if="unapplied" class="audit-warning">筛选输入尚未应用，请点击查询；下一页暂不可用。</p>
         <ApiErrorNotice :error="state.error"><el-button size="small" @click="refresh">重读已应用筛选</el-button></ApiErrorNotice>
-        <AppTable :rows="state.page?.items || []" :loading="state.loading" :empty-text="state.page ? '本页没有匹配的授权记录' : '审计记录尚未成功读取'">
+        <AppTable :error="state.error" :rows="state.page?.items || []" :loading="state.loading" :empty-text="state.page ? '本页没有匹配的授权记录' : '审计记录尚未成功读取'">
           <el-table-column label="序号 / 时间（北京）" min-width="190"><template #default="{ row }"><strong>#{{ row.sequence }}</strong><span class="cell-sub">{{ displayTime(row.occurred_at) }}</span></template></el-table-column>
           <el-table-column prop="actor_name" label="操作者" min-width="130" />
           <el-table-column prop="action" label="动作" min-width="190" />

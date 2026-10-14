@@ -28,7 +28,7 @@ async function visit(kind:'assets'|'tickets',id:string){if(navigating.value)retu
   <el-alert v-if="navigationError" :title="navigationError" type="warning" :closable="false"/>
   <el-skeleton v-if="state.busy" :rows="4" animated/>
   <template v-if="state.result">
-   <p class="search-observed">查询时间：{{displayTime(state.result.observed_at)}} · 仅含当前租户已接入且有权查看的数据</p>
+   <p class="search-observed" role="status" aria-live="polite">查询时间：{{displayTime(state.result.observed_at)}} · 仅含当前租户已接入且有权查看的数据</p>
    <section class="search-group"><h3>资产 <small>最多5条</small></h3><p v-if="!state.result.groups[0].returned">没有找到可查看的匹配资产，请尝试其他关键词。</p><ul v-else><li v-for="hit in state.result.groups[0].items" :key="hit.id"><el-button link :disabled="navigating" @click="visit('assets',hit.id)">{{hit.name}}</el-button><span>{{typeLabel(hit.type)}} · 资产记录</span></li></ul><p v-if="state.result.groups[0].has_more">还有更多匹配资产，可到资产管理页继续查询。</p></section>
    <section class="search-group unavailable"><h3>事件 <small>最多4条</small></h3><p>事件来源尚未接入，暂时无法查询，也无法判断是否有事件。</p></section>
    <section class="search-group"><h3>工单（当前仅报障登记） <small>最多3条</small></h3><p>{{state.result.groups[2].source_scope==='OWN_REPORT_REGISTRATIONS'?'仅搜索本人提交的报障登记':'搜索当前租户内有权查看的报障登记'}}</p><p v-if="!state.result.groups[2].returned">没有找到可查看的匹配报障，请尝试其他关键词。</p><ul v-else><li v-for="hit in state.result.groups[2].items" :key="hit.id"><el-button link :disabled="navigating" @click="visit('tickets',hit.id)">{{hit.title}}</el-button><span>{{hit.receipt_no}} · 已登记，正式处理状态待确认</span></li></ul><p v-if="state.result.groups[2].has_more">还有更多匹配登记，可到报障与受理页继续查询。</p></section>

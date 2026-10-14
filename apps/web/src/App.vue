@@ -11,6 +11,10 @@ import ApiErrorNotice from './components/ApiErrorNotice.vue'
 import GlobalSearch from './components/GlobalSearch.vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import './styles/identity.css'
+import './styles/experience.css'
+import ConnectionNotice from './components/ConnectionNotice.vue'
+import { navigating, navigationError, navigationTarget } from './stores/navigation'
+import { feedback } from './utils/feedback'
 const route = useRoute()
 const router = useRouter()
 const homeRoute = computed(() => landingRoute(session.value, router.getRoutes()))
@@ -19,6 +23,18 @@ const leaving = ref(false)
 const tenantTransition = ref(false)
 const pageKey = computed(() => `${session.value?.tenant.id}:${session.value?.permission_version}:${contextGeneration.value}`)
 watch(() => route.fullPath, () => { error.value = null })
+watch(() => route.path, async (path, previous) => {
+  if (path === previous) return
+  await nextTick()
+  const heading = document.querySelector<HTMLElement>('#main-content h1')
+  if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); window.scrollTo({ top: 0 }) }
+})
+watch(pageKey, () => { feedback.closeAll(); navigationError.value = null })
+async function retryNavigation() {
+  if (navigating.value) return
+  try { await router.push(navigationTarget.value || route.fullPath) }
+  catch (cause) { navigationError.value = cause }
+}
 async function changeTenant(value: unknown) {
   error.value = null
   tenantTransition.value = true
@@ -43,8 +59,12 @@ async function endSession() {
 </script>
 <template>
   <el-config-provider :locale="zhCn">
+  <ConnectionNotice />
+  <div class="navigation-progress" :class="{ active: navigating }" aria-hidden="true" />
+  <span class="sr-only" role="status">{{ navigating ? '正在打开页面…' : '' }}</span>
   <router-view v-if="!session" />
   <div v-else class="app-shell horizontal-shell">
+    <a class="skip-link" href="#main-content">跳过导航，进入主要内容</a>
     <div class="main-layout">
       <div class="app-header">
       <header class="topbar">
@@ -64,12 +84,13 @@ async function endSession() {
       <div class="page-context"><el-breadcrumb separator="/"><el-breadcrumb-item>MOP</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.group }}</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.title }}</el-breadcrumb-item></el-breadcrumb></div>
       </div>
       <div class="environment-strip"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '项目测试环境 · 非生产 · 厂商指标待接入' : '历史单元测试夹具 · 不用于联调验收' }}</div>
-      <main class="content">
+      <main id="main-content" class="content" tabindex="-1">
+        <ApiErrorNotice :error="navigationError" title="页面暂时未能打开" guidance="当前页面已保留。请检查连接后重试；已提交的操作请先核对结果。" :retrying="navigating" retry-label="重试打开页面" @retry="retryNavigation" />
         <ApiErrorNotice :error="error" />
         <div v-if="switchingTenant" class="switching-panel"><el-skeleton :rows="5" animated /><p>正在切换租户，请稍候…</p></div>
         <router-view v-else :key="pageKey" />
       </main>
-      <footer class="app-footer">MOP 测试版 V0.1 <span>资产草稿 · 配置登记 · 报障登记 · 审计</span></footer>
+      <footer class="app-footer">MOP 运维托管平台 <span>项目测试环境 · 业务状态以实际回执为准</span></footer>
     </div>
   </div>
   </el-config-provider>

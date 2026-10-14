@@ -72,7 +72,7 @@ function display(d:import('../utils/networkMonitoring').Device,m:Metric){const r
           <p v-if="!history.points.length" class="network-empty">该时间窗口尚无采样记录。</p>
           <svg v-else class="history-chart" viewBox="0 0 720 180" role="img" :aria-label="`${metric}历史采样，空窗不连线`"><path d="M16 20V154H704" stroke="#cedbe8" fill="none"/><g v-for="(segment,i) in segments" :key="i"><polyline :points="segment.line" fill="none" stroke="#1667b9" stroke-width="2"/><circle v-for="(p,j) in segment.dots" :key="j" :cx="p.x" :cy="p.y" r="2.5" fill="#1667b9"/></g></svg>
           <p v-if="metric==='latency'" class="history-caption">延迟为回应包的平均值；无回应返回的零值不画成正常延迟，请结合 ICMP 响应和丢包查看。</p>
-          <div class="history-table"><table><thead><tr><th>最近采样时间</th><th>原始值 {{history.unit}}</th></tr></thead><tbody><tr v-for="p in history.points.slice(-12).reverse()" :key="p.recorded_at"><td>{{time(p.recorded_at)}}</td><td>{{p.value}}</td></tr></tbody></table></div>
+          <div class="history-table" role="region" tabindex="0" aria-label="历史采样表，可横向滚动"><table><thead><tr><th scope="col">最近采样时间</th><th scope="col">原始值 {{history.unit}}</th></tr></thead><tbody><tr v-for="p in history.points.slice(-12).reverse()" :key="p.recorded_at"><td>{{time(p.recorded_at)}}</td><td>{{p.value}}</td></tr></tbody></table></div>
         </template>
       </section>
     </template>

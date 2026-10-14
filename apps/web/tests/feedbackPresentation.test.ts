@@ -72,3 +72,9 @@ it('switches from loading to the real empty state only after loading finishes', 
   expect(host.querySelector('.table-frame')?.getAttribute('aria-busy')).toBe('false')
   expect(host.textContent).toContain('没有匹配资产')
 })
+it('does not represent a failed table read as an empty collection', async () => {
+  await mount(AppTable, { rows: [], loading: false, error: new Error('unavailable'), emptyText: '没有匹配资产' })
+  expect(host.textContent).toContain('读取未完成')
+  expect(host.textContent).not.toContain('没有匹配资产')
+  expect(host.querySelector('.table-frame')?.getAttribute('tabindex')).toBe('0')
+})

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { initializeSession, refreshProjectSession, session } from './stores/session'
 import { landingRoute, routeAllowed } from './utils/routeAccess'
+import { navigating, navigationError, navigationTarget } from './stores/navigation'
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -36,20 +37,26 @@ export const router = createRouter({
     { path: '/capability-catalog', name: 'capability-catalog', component: () => import('./pages/CapabilityCatalogPage.vue'), meta: { title: '代码能力声明核对', group: '管理', capability: 'configurations:read' } },
     { path: '/tenant-inventory', name: 'tenant-inventory', component: () => import('./pages/TenantInventoryPage.vue'), meta: { title: '租户登记资源', group: '管理', role: 'padmin', capability: 'tenants:read_inventory' } },
     { path: '/audit', name: 'audit', component: () => import('./pages/AuditPage.vue'), meta: { title: '审计日志', group: '管理', capability: 'audit:read' } },
-    { path: '/:pathMatch(.*)*', redirect: '/assets' },
+    { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('./pages/NotFoundPage.vue'), meta: { title: '页面未找到', group: '导航' } },
   ],
 })
 router.beforeEach(async to => {
+  navigating.value = true
+  navigationTarget.value = to.fullPath
+  navigationError.value = null
   try { await initializeSession() }
   catch { if (to.name !== 'login') return { name: 'login' } }
   if (!session.value && to.name !== 'login') return { name: 'login' }
   if (to.name !== 'login' && ['project_local','oidc'].includes(session.value?.identity_source ?? '')) {
-    try { await refreshProjectSession() } catch { if (!session.value) return { name: 'login' }; return false }
+    try { await refreshProjectSession() } catch (cause) { if (!session.value) return { name: 'login' }; navigationError.value = cause; return false }
   }
   const landing = session.value?.password_change_required ? 'account' : landingRoute(session.value, router.getRoutes())
   if (session.value?.password_change_required && to.name !== 'account') return { name: 'account' }
   if (session.value && (to.name === 'login' || to.name === 'access-unavailable' && landing !== 'access-unavailable')) return { name: landing }
-  if (!['login','access-unavailable','account'].includes(String(to.name)) && !routeAllowed(to.meta, session.value)) return { name: landing }
+  if (to.name === 'not-found' && landing === 'access-unavailable') return { name: landing }
+  if (!['login','access-unavailable','account','not-found'].includes(String(to.name)) && !routeAllowed(to.meta, session.value)) return { name: landing }
 
   document.title = `${String(to.meta.title || '管理端')} · MOP`
 })
+router.afterEach(() => { navigating.value = false })
+router.onError(cause => { navigating.value = false; navigationError.value = cause })

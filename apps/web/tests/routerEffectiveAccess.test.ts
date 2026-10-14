@@ -27,6 +27,11 @@ it('root and unknown paths settle without infinite redirects for an empty grant 
   await router.push('/'); expect(router.currentRoute.value.name).toBe('access-unavailable')
   await router.push('/not-a-real-route'); expect(router.currentRoute.value.name).toBe('access-unavailable')
 })
+it('explains an unknown address to an authorized member instead of silently replacing it', async () => {
+  session.value = auth(['assets:read']); await router.push('/missing-page')
+  expect(router.currentRoute.value.name).toBe('not-found')
+  expect(document.title).toContain('页面未找到')
+})
 it('an anonymous visitor cannot use the informational route to establish a session', async () => {
   forgetSession(); await router.push('/access-unavailable?check=1'); expect(router.currentRoute.value.name).toBe('login'); expect(session.value).toBeNull()
 })

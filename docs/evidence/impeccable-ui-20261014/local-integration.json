@@ -1,0 +1,13 @@
+{
+  "integrated_ui_files": [
+    "apps/web/src/App.vue",
+    "apps/web/src/components/AppTable.vue",
+    "apps/web/src/pages/AssetsPage.vue",
+    "apps/web/src/pages/DashboardPage.vue",
+    "apps/web/src/styles/experience.css",
+    "apps/web/src/styles/navigation.css"
+  ],
+  "other_changed_files_preserved": 41,
+  "latest_environment_copy_preserved": true,
+  "credentials_output": false
+}

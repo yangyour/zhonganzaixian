@@ -1,0 +1,185 @@
+{
+  "environment": "lan-test-20261008",
+  "base": "http://192.168.1.215:10010",
+  "phase": "deployed",
+  "checks": [
+    "project-local-login",
+    "six-horizontal-modules",
+    "real-api-empty-state",
+    "filter-reset",
+    "asset-detail-read-close",
+    "compact-mobile-summary",
+    "mobile-action-targets",
+    "create-disabled-without-input",
+    "global-search-live-api",
+    "horizontal-menu-navigation",
+    "fixed-kpis-and-panels",
+    "unknown-preserved",
+    "reason-disclosure",
+    "auto-refresh-pause",
+    "current-monitoring-schema-1440",
+    "current-monitoring-schema-390",
+    "keyboard-focus-visible"
+  ],
+  "viewports": [
+    {
+      "name": "assets-desktop",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1440,
+      "heading": "资产管理"
+    },
+    {
+      "name": "assets-mobile",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "heading": "资产管理"
+    },
+    {
+      "name": "create-mobile",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "heading": "资产管理"
+    },
+    {
+      "name": "dashboard-desktop",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1440,
+      "heading": "运营总览"
+    },
+    {
+      "name": "dashboard-1024",
+      "width": 1024,
+      "height": 844,
+      "scrollWidth": 1024,
+      "heading": "运营总览"
+    },
+    {
+      "name": "dashboard-720",
+      "width": 720,
+      "height": 844,
+      "scrollWidth": 720,
+      "heading": "运营总览"
+    },
+    {
+      "name": "dashboard-390",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "heading": "运营总览"
+    },
+    {
+      "name": "dashboard-320",
+      "width": 320,
+      "height": 844,
+      "scrollWidth": 320,
+      "heading": "运营总览"
+    },
+    {
+      "name": "/assets-1440",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1440,
+      "heading": "资产管理"
+    },
+    {
+      "name": "/assets-390",
+      "width": 390,
+      "height": 1000,
+      "scrollWidth": 390,
+      "heading": "资产管理"
+    },
+    {
+      "name": "/tickets-1440",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1440,
+      "heading": "报障与受理"
+    },
+    {
+      "name": "/tickets-390",
+      "width": 390,
+      "height": 1000,
+      "scrollWidth": 390,
+      "heading": "报障与受理"
+    },
+    {
+      "name": "/my-export-messages-1440",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1440,
+      "heading": "我的导出消息"
+    },
+    {
+      "name": "/my-export-messages-390",
+      "width": 390,
+      "height": 1000,
+      "scrollWidth": 390,
+      "heading": "我的导出消息"
+    },
+    {
+      "name": "/identity/users-1440",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1440,
+      "heading": "用户与成员授权"
+    },
+    {
+      "name": "/identity/users-390",
+      "width": 390,
+      "height": 1000,
+      "scrollWidth": 390,
+      "heading": "用户与成员授权"
+    },
+    {
+      "name": "/network-monitoring-1440",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1440,
+      "heading": "基础网络监控"
+    },
+    {
+      "name": "/network-monitoring-390",
+      "width": 390,
+      "height": 1000,
+      "scrollWidth": 390,
+      "heading": "基础网络监控"
+    },
+    {
+      "name": "/configurations-1440",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1440,
+      "heading": "配置确认登记"
+    },
+    {
+      "name": "/configurations-390",
+      "width": 390,
+      "height": 1000,
+      "scrollWidth": 390,
+      "heading": "配置确认登记"
+    },
+    {
+      "name": "assets-320",
+      "width": 320,
+      "height": 740,
+      "scrollWidth": 320,
+      "heading": "资产管理"
+    },
+    {
+      "name": "assets-200-percent-equivalent",
+      "width": 720,
+      "height": 500,
+      "scrollWidth": 720,
+      "heading": "资产管理"
+    }
+  ],
+  "page_errors": [],
+  "unexpected_writes": [],
+  "credentials_output": false,
+  "status": "PASSED",
+  "completed_at": "2026-10-14T08:59:59.032Z"
+}

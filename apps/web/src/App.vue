@@ -89,7 +89,7 @@ async function endSession() {
         </div>
       </header>
       <HorizontalModuleNavigation />
-      <div class="page-context"><el-breadcrumb separator="/"><el-breadcrumb-item>MOP</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.group }}</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.title }}</el-breadcrumb-item></el-breadcrumb><span class="environment-label"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '项目测试环境 · 非生产 · 厂商指标待接入' : '历史单元测试夹具 · 不用于联调验收' }}</span></div>
+      <div class="page-context"><el-breadcrumb separator="/"><el-breadcrumb-item>MOP</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.group }}</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.title }}</el-breadcrumb-item></el-breadcrumb><span class="environment-label"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '项目测试环境 · 非生产 · 监控指标逐项接入' : '历史单元测试夹具 · 不用于联调验收' }}</span></div>
       </div>
       <main id="main-content" class="content" tabindex="-1">
         <PageRecoveryNotice />

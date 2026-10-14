@@ -39,3 +39,15 @@
 源码与验证结果先提交推送，随后只切换 Web 发布目录。既有安全响应头/Nginx配置、API 0.49、13个其他正式项目服务保持；完整部署结果另记 deployment.json。
 
 第一次切换前的并发保护发现线上 Web 已再次更新，操作在修改环境配置前停止。核对差异仅为监控四设备同排布局，将该已部署 CSS 同步后，15 项针对性检查和正式构建再次通过；真实浏览器核对四设备同排、12条CPU历史、390px资源面板无溢出。最终构建 ID：5753d9a5425a19a0428b167f6e4b8d7f38ea1484a574a095cb5bb365eb8afa5c。
+
+## 已完成测试站部署
+
+2026-10-14 已将优化版部署到 http://192.168.1.215:10010 。87 个静态文件摘要核对一致，服务 ready=true；API、采集器及其他13个正式服务的实例、镜像、启动时间、重启计数完全相同。无数据库迁移或新基础组件；旧目录和私有回退配置保留。
+
+公开入口复验17项操作/22个页面与视口组合通过，控制台页面异常0、非登录业务写入0。四设备同排、真实CPU历史12条和390px资源面板通过。见 [deployment.json](evidence/impeccable-ui-20261014/deployment.json)、[公开浏览器结果](evidence/impeccable-ui-20261014/deployed.json)及[监控回归](evidence/impeccable-ui-20261014/deployed-monitor.json)。
+
+最终保留原工作区更新的环境文案“监控指标逐项接入”，10项壳层权限/导航检查与构建通过，文案版构建ID为 cb37dda2da380742715e23d469143d0a0bf9f4d730ef142dd35af705d5e99141。核心UI改动已安全合回原开发工作区，其余41个变更文件摘要保持不变。文案版发布及最终源码提交另以最后部署记录为准。
+
+回退：核对当前 WEB_RELEASE_DIR 与 deployment.json 一致后，仅将该键恢复为 previous_web_release，保留其他env键；执行 `docker compose up -d --no-deps --pull never web`，核对公开release-manifest与ready。不要整份覆盖其他并发更新的配置。
+
+本次是测试环境 UI 发布，不改变首页未知指标、未接入能力和正式合同验收门禁，production_ready=false 保留。

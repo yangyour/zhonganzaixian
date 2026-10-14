@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-14导出与横排菜单已在原10010入口部署（代码fd1e8f1/API0.47/V30）：仅API/Web更新，其他10服务镜像/启动时间/重启次数未变化。独立导出MinIO已启用，发布就绪true；候选API和本机测试转发关闭后12服务仍运行、ready=true、production_ready=false。详见[部署证据](../evidence/export-navigation-deployment-20261014.json)与[最终只读盘点](../evidence/export-navigation-components-final-20261014.json)。
+
 ## 2026-10-14 导出发布专用存储
 
 复用既有MinIO，在本项目内新增归属标签明确的 `mop-test-asset-exports` 桶和独立受限账号；原照片/导入账号及策略未改。3项真实MinIO验证原字节、并发不覆盖、5MiB以上条件上传；实际Delete、前缀外写、其他桶读取均拒绝。凭据和下载签名密钥仅私有配置，发布启用时独立探测；无存储回退或新基础服务，PG仍V30/0迁移。用途为已准备台账文件发布/授权读取，不代表站内信、自动准备或其他报告已交付。当前支持MinIO，OSS发布保留候选、未接入。见[功能与配置](../asset-export-publication.md)。

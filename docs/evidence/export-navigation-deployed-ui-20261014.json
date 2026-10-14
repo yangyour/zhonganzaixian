@@ -1,0 +1,36 @@
+{
+  "public_origin": "http://192.168.1.215:10010",
+  "project_login": true,
+  "modules": [
+    {
+      "title": "资源与监控",
+      "y": 72
+    },
+    {
+      "title": "工单与服务",
+      "y": 72
+    },
+    {
+      "title": "备份与巡检",
+      "y": 72
+    },
+    {
+      "title": "客户与租户",
+      "y": 72
+    },
+    {
+      "title": "经营与容量",
+      "y": 72
+    },
+    {
+      "title": "系统管理",
+      "y": 72
+    }
+  ],
+  "sidebar_count": 0,
+  "export_menu_navigation": true,
+  "production_assets": true,
+  "verified_at": "2026-10-14T04:50:52.880782+00:00",
+  "source_commit": "fd1e8f16135dba93d16906a9a1b1f8046c774269",
+  "credentials_output": false
+}

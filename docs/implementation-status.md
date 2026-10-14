@@ -1,5 +1,9 @@
 # MOP 实施状态
 
+## 2026-10-14 测试站更新与复核
+
+导出发布/下载与顶部横排模块已部署到192.168.1.215:10010，应用代码fd1e8f1、API0.47/V30。公开入口9HTTP再次验证真实下载、原链接过期404与既有网络监控；部署后真实浏览器登录/横排/下拉导航通过。仅更新API和Web，其他10服务未变化，0迁移；清理候选API及本机转发后12服务仍ready，production_ready=false。见[部署](evidence/export-navigation-deployment-20261014.json)、[公开HTTP](evidence/export-navigation-public-http-20261014.json)和[最终组件](evidence/export-navigation-components-final-20261014.json)。自动准备调度、站内信及全合同验收仍待。
+
 ## 2026-10-14 顶部横排模块菜单
 
 按用户要求移除左侧长菜单，改为顶部六组模块横排和点击下拉；桌面/手机共用路由权限过滤，窄屏只滚动菜单行。原功能入口保留，未确认导出动作仍阻止导航，取消导航后高亮回到实际路由。1851Web、类型/构建通过；Edge1440px/390px、模块下拉、真实观察者未授权DOM为0及页面无横向溢出已验证。见[排版与边界](horizontal-module-navigation-20261014.md)及[浏览器证据](evidence/horizontal-menu-browser-20261014.json)。

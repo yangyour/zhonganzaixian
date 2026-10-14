@@ -1,0 +1,71 @@
+{
+  "verified_at": "2026-10-14T04:46:32.522215+00:00",
+  "environment": "lan-test-20261008",
+  "public_origin": "http://192.168.1.215:10010",
+  "source_commit": "fd1e8f16135dba93d16906a9a1b1f8046c774269",
+  "checks": [
+    {
+      "label": "deployed_live",
+      "method": "GET",
+      "path": "/api/v1/health/live",
+      "status": 200
+    },
+    {
+      "label": "deployed_ready",
+      "method": "GET",
+      "path": "/api/v1/health/ready",
+      "status": 200
+    },
+    {
+      "label": "deployed_csrf",
+      "method": "GET",
+      "path": "/api/v1/auth/csrf",
+      "status": 200
+    },
+    {
+      "label": "deployed_project_login",
+      "method": "POST",
+      "path": "/api/v1/auth/local/login",
+      "status": 200
+    },
+    {
+      "label": "deployed_publication_preserved",
+      "method": "GET",
+      "path": "/api/v1/asset-export-jobs/{id}/publication",
+      "status": 200
+    },
+    {
+      "label": "deployed_new_signed_grant",
+      "method": "POST",
+      "path": "/api/v1/asset-export-jobs/{id}/content-grants",
+      "status": 200
+    },
+    {
+      "label": "deployed_actual_download",
+      "method": "GET",
+      "path": "/api/v1/asset-export-jobs/{id}/content",
+      "status": 200
+    },
+    {
+      "label": "deployed_original_expired_link_rejected",
+      "method": "GET",
+      "path": "/api/v1/asset-export-jobs/{id}/content",
+      "status": 404
+    },
+    {
+      "label": "existing_network_monitoring_readable",
+      "method": "GET",
+      "path": "/api/v1/network-monitoring",
+      "status": 200
+    }
+  ],
+  "http_checks": 9,
+  "ready": true,
+  "export_publication_ready": true,
+  "actual_download_sha256": "5a596e1dfe3071bff0ebdf8d5163062855d4173362e1164ab6362fb6c607337c",
+  "size_bytes": 4957,
+  "original_expired_link_404": true,
+  "existing_network_monitoring_readable": true,
+  "credentials_output": false,
+  "new_device_logins": 0
+}

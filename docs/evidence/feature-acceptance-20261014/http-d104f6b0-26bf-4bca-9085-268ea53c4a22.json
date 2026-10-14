@@ -1,0 +1,1176 @@
+{
+  "run_id": "d104f6b0-26bf-4bca-9085-268ea53c4a22",
+  "started_at": "2026-10-14T10:55:30.678Z",
+  "environment": "lan-test-20261008",
+  "api_version": "0.49.0",
+  "scope": "Implemented feature checks; not full contract or production approval",
+  "cases": [
+    {
+      "id": "ENV",
+      "title": "环境、当前API与既有测试身份",
+      "started_at": "2026-10-14T10:55:30.679Z",
+      "request_start": 0,
+      "status": "PASS",
+      "request_count": 13,
+      "finished_at": "2026-10-14T10:55:32.821Z"
+    },
+    {
+      "id": "C01",
+      "title": "配置登记读取、有效性诊断与待确认边界",
+      "started_at": "2026-10-14T10:55:32.823Z",
+      "request_start": 13,
+      "status": "PASS",
+      "request_count": 6,
+      "finished_at": "2026-10-14T10:55:33.234Z"
+    },
+    {
+      "id": "C02",
+      "title": "独立配置修订提交、审批门禁、撤回及原配置保护",
+      "started_at": "2026-10-14T10:55:33.234Z",
+      "request_start": 19,
+      "status": "PASS",
+      "request_count": 18,
+      "finished_at": "2026-10-14T10:55:34.328Z"
+    },
+    {
+      "id": "C03",
+      "title": "阈值候选诊断、冲突识别与未知值保护",
+      "started_at": "2026-10-14T10:55:34.328Z",
+      "request_start": 37,
+      "status": "PASS",
+      "request_count": 7,
+      "finished_at": "2026-10-14T10:55:34.639Z"
+    },
+    {
+      "id": "C04",
+      "title": "独立工作日历草稿、版本历史与显式时间试算",
+      "started_at": "2026-10-14T10:55:34.640Z",
+      "request_start": 44,
+      "status": "PASS",
+      "request_count": 15,
+      "finished_at": "2026-10-14T10:55:35.368Z"
+    },
+    {
+      "id": "C05",
+      "title": "容量与缓冲显式估算、精确大数与未知值",
+      "started_at": "2026-10-14T10:55:35.368Z",
+      "request_start": 59,
+      "status": "PASS",
+      "request_count": 7,
+      "finished_at": "2026-10-14T10:55:35.710Z"
+    },
+    {
+      "id": "C06",
+      "title": "独立容量方案草稿、原回执与未核验快照",
+      "started_at": "2026-10-14T10:55:35.710Z",
+      "request_start": 66,
+      "status": "PASS",
+      "request_count": 7,
+      "finished_at": "2026-10-14T10:55:36.085Z"
+    },
+    {
+      "id": "C07",
+      "title": "经营样本中位数、人力对照及空样本边界",
+      "started_at": "2026-10-14T10:55:36.086Z",
+      "request_start": 73,
+      "status": "PASS",
+      "request_count": 9,
+      "finished_at": "2026-10-14T10:55:36.499Z"
+    },
+    {
+      "id": "C08",
+      "title": "原配置/原草稿完整保留及本轮对象审计核对",
+      "started_at": "2026-10-14T10:55:36.499Z",
+      "request_start": 82,
+      "status": "PASS",
+      "request_count": 11,
+      "finished_at": "2026-10-14T10:55:37.034Z"
+    }
+  ],
+  "requests": [
+    {
+      "case": "ENV",
+      "role": "anonymous",
+      "method": "GET",
+      "path": "/health/ready",
+      "status": 200,
+      "trace_id": "ecc2388b-8271-4945-8209-a6a184c8e616",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "7a3ce703-2be1-4c46-a36d-a0f4e5a91017",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "6404eb26-1182-496b-9287-333d7931054f",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "msp",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "d6f87dc8-f4e9-419e-b3de-1789dcb0d44b",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "msp",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "cec6e352-72bb-417f-a919-df22638d18e7",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "tadmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "b2bee011-01e9-4a57-bb20-20301479b6a4",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "tadmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "6095c8c4-bdf0-405a-817f-cd6e5c79202b",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "5d840b3c-f595-4283-9670-f14dd9c5b354",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerA",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "a502de8d-b1e5-4b6d-be25-6db20e48409b",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerB",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "197b721f-7f4f-4fbc-adc3-f67e15b1e075",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerB",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "9899411b-9866-45bc-b78c-3b731bd4117b",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "reviewer",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "e3153e0b-6ff8-45b0-8c33-3c48a943e2ac",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "e60fd359-e1b4-4312-82cf-f4e75092c0f9",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C01",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/configurations",
+      "status": 200,
+      "trace_id": "f723dfdf-59d3-474e-8027-3fc933ecefb3",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C01",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/settings/effective",
+      "status": 200,
+      "trace_id": "10e343ea-0017-4a33-b086-9737cc5a6560",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C01",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/configurations",
+      "status": 403,
+      "trace_id": "78fe5fde-14c2-431a-8146-40ff6ed0dfec",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C01",
+      "role": "msp",
+      "method": "GET",
+      "path": "/settings/effective",
+      "status": 403,
+      "trace_id": "7db740ed-a4a2-4973-884e-0a777d9d4fc4",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C01",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/settings/effective",
+      "status": 400,
+      "trace_id": "111aed4b-087e-4eef-a1c0-03b80194eae7",
+      "code": "VALIDATION_ERROR",
+      "expected_status": 400,
+      "contract_valid": true
+    },
+    {
+      "case": "C01",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/settings/effective",
+      "status": 400,
+      "trace_id": "42a47549-1056-4369-b99f-e333bd90b997",
+      "code": "VALIDATION_ERROR",
+      "expected_status": 400,
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/configurations/{key}/revisions",
+      "status": 200,
+      "trace_id": "7422e407-3a8c-4ee9-8b97-693e02f6c29d",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/configurations",
+      "status": 200,
+      "trace_id": "a0a79530-7bf0-449f-b634-545a4cb75760",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "viewerA",
+      "method": "POST",
+      "path": "/configurations/{key}/revisions",
+      "status": 403,
+      "trace_id": "d40219ce-a5ff-4236-bbc1-79d9d6cfa004",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/{key}/revisions",
+      "status": 403,
+      "trace_id": "5fe19744-2a3a-47a6-aa1f-449170a7e081",
+      "code": "CSRF_INVALID",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/{key}/revisions",
+      "status": 200,
+      "trace_id": "04b03a31-98f3-442b-9ace-4a441d496e47",
+      "expected_status": 200,
+      "returned_id": "45f907bb-3d70-49a5-bac1-7aa3740e3080",
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/{key}/revisions",
+      "status": 200,
+      "trace_id": "8cd96890-b784-478e-bfab-6cbd248b5451",
+      "expected_status": 200,
+      "returned_id": "45f907bb-3d70-49a5-bac1-7aa3740e3080",
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/{key}/revisions",
+      "status": 409,
+      "trace_id": "f6c2a9c1-75b1-4acd-864f-56fb661c5f9a",
+      "code": "IDEMPOTENCY_CONFLICT",
+      "expected_status": 409,
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/{id}/submit",
+      "status": 403,
+      "trace_id": "2674732d-c8b6-44b6-ba8e-800df49fc0e1",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/{id}/submit",
+      "status": 200,
+      "trace_id": "cc8023d2-bb0c-4ada-9ab7-e187623a082b",
+      "expected_status": 200,
+      "returned_id": "45f907bb-3d70-49a5-bac1-7aa3740e3080",
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/{id}/submit",
+      "status": 200,
+      "trace_id": "933e8c70-c0ab-4cb9-a99f-f6a5d46762ed",
+      "expected_status": 200,
+      "returned_id": "45f907bb-3d70-49a5-bac1-7aa3740e3080",
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/{id}/review",
+      "status": 403,
+      "trace_id": "b79c0377-c45f-481e-8b52-4cc55cb73e88",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/{id}/review",
+      "status": 409,
+      "trace_id": "79ccf38d-d913-4aa5-b74a-67d994bff58a",
+      "code": "VERSION_CONFLICT",
+      "expected_status": 409,
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "reviewer",
+      "method": "GET",
+      "path": "/configuration-revisions/{id}",
+      "status": 200,
+      "trace_id": "68ff8ead-f19b-4f4a-b21b-9c2a7c4f2494",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/configuration-revisions/{id}",
+      "status": 200,
+      "trace_id": "8c83855e-8be1-41e1-83d7-7a1cb5df4c2f",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/{id}/withdraw",
+      "status": 200,
+      "trace_id": "d97bfd4d-50a5-4128-9ee5-00617674938a",
+      "expected_status": 200,
+      "returned_id": "45f907bb-3d70-49a5-bac1-7aa3740e3080",
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/{id}/withdraw",
+      "status": 200,
+      "trace_id": "665c0433-0167-4bb3-a694-f90e92004b0c",
+      "expected_status": 200,
+      "returned_id": "45f907bb-3d70-49a5-bac1-7aa3740e3080",
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/configurations/{key}/revisions",
+      "status": 200,
+      "trace_id": "c3a7d2a6-f4a6-4372-a1cf-272257c9fad0",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C02",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/configurations",
+      "status": 200,
+      "trace_id": "44533767-a401-49c5-9c0b-9cd944231ebc",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C03",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/monitoring/threshold-diagnostics",
+      "status": 200,
+      "trace_id": "1acb90d3-85e7-4285-b787-540b65e56e6c",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C03",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/monitoring/threshold-diagnostics",
+      "status": 200,
+      "trace_id": "e6ef84ba-a42e-43f6-8795-d874a5d26904",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C03",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/monitoring/threshold-diagnostics",
+      "status": 200,
+      "trace_id": "45643ded-4b42-45ea-a2af-d6238e115e55",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C03",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/monitoring/threshold-diagnostics",
+      "status": 200,
+      "trace_id": "974a1fe2-fbeb-4d2e-a64f-575c1fe3755a",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C03",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/monitoring/threshold-diagnostics",
+      "status": 403,
+      "trace_id": "89470436-298c-450d-9277-1238a38f0bbe",
+      "code": "CSRF_INVALID",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C03",
+      "role": "msp",
+      "method": "POST",
+      "path": "/monitoring/threshold-diagnostics",
+      "status": 403,
+      "trace_id": "ae757a32-3359-437d-9a83-d72c0ba24608",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C03",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/monitoring/threshold-diagnostics",
+      "status": 400,
+      "trace_id": "46be7b2c-c82b-4309-8dbc-79d4fd02b066",
+      "code": "VALIDATION_ERROR",
+      "expected_status": 400,
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "msp",
+      "method": "POST",
+      "path": "/working-calendars",
+      "status": 403,
+      "trace_id": "56855de6-d8b2-4dfc-ac5e-4c08a745707f",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/working-calendars",
+      "status": 403,
+      "trace_id": "166aa854-098b-4106-ae23-7f758fd2d983",
+      "code": "CSRF_INVALID",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/working-calendars",
+      "status": 200,
+      "trace_id": "132059e6-daf0-4ba5-aa41-90907b5c7ee8",
+      "expected_status": 200,
+      "returned_id": "7b54d963-247d-45aa-95a7-800c2fe25e40",
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/working-calendars",
+      "status": 200,
+      "trace_id": "73a16065-952b-4953-8dd0-77f4b3a994ca",
+      "expected_status": 200,
+      "returned_id": "7b54d963-247d-45aa-95a7-800c2fe25e40",
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/working-calendars/{id}/preview",
+      "status": 200,
+      "trace_id": "60530995-ed45-4835-8bb1-27d0480071df",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/working-calendars/{id}/preview",
+      "status": 200,
+      "trace_id": "db037412-96fa-489f-a9f3-1225ea88271f",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/working-calendars/{id}/preview",
+      "status": 200,
+      "trace_id": "20b14135-b814-4d6f-8240-06d1c07d605d",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/working-calendars/{id}/preview",
+      "status": 200,
+      "trace_id": "abd2fc2a-2a75-46c5-beb1-19479c0bfd65",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/working-calendars/{id}/history",
+      "status": 200,
+      "trace_id": "fb3e10c8-7bd5-4dbe-8064-7f5f6f1b03f9",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "padmin",
+      "method": "PATCH",
+      "path": "/working-calendars/{id}",
+      "status": 200,
+      "trace_id": "9fd6326e-1579-4b58-8647-be7351cd7aa7",
+      "expected_status": 200,
+      "returned_id": "7b54d963-247d-45aa-95a7-800c2fe25e40",
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "padmin",
+      "method": "PATCH",
+      "path": "/working-calendars/{id}",
+      "status": 200,
+      "trace_id": "90806fcc-c65c-40f8-9db6-58d1817b2bae",
+      "expected_status": 200,
+      "returned_id": "7b54d963-247d-45aa-95a7-800c2fe25e40",
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "padmin",
+      "method": "PATCH",
+      "path": "/working-calendars/{id}",
+      "status": 409,
+      "trace_id": "69043c84-1e93-4d76-a2d8-44c58b128f8d",
+      "code": "VERSION_CONFLICT",
+      "expected_status": 409,
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/working-calendars/{id}/preview",
+      "status": 409,
+      "trace_id": "35e640dc-9385-44c4-8bff-e4125aaf93f1",
+      "code": "VERSION_CONFLICT",
+      "expected_status": 409,
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/working-calendars/{id}/history",
+      "status": 200,
+      "trace_id": "f4f057cb-4a19-45a0-a6d8-d600cd46ac1e",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C04",
+      "role": "tadmin",
+      "method": "GET",
+      "path": "/working-calendars/{id}",
+      "status": 403,
+      "trace_id": "c72f1b95-abc1-4d66-9797-ae6b61f0d07e",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C05",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/capacity/estimates",
+      "status": 200,
+      "trace_id": "fc816eb2-5d0f-4f94-80f4-906123e1e6f7",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C05",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/capacity/estimates",
+      "status": 200,
+      "trace_id": "99d1054c-917e-4f96-a05b-7d13ad82e88c",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C05",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/capacity/estimates",
+      "status": 200,
+      "trace_id": "f3eaf269-2396-4c2b-a7fe-15740a326cec",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C05",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/capacity/estimates",
+      "status": 200,
+      "trace_id": "bec8e8cf-c25e-4285-806d-ab30ffe77622",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C05",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/capacity/estimates",
+      "status": 403,
+      "trace_id": "ea1901f3-b73b-4206-9d13-6fe82d82d08a",
+      "code": "CSRF_INVALID",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C05",
+      "role": "viewerA",
+      "method": "POST",
+      "path": "/capacity/estimates",
+      "status": 403,
+      "trace_id": "c9775b20-6123-4d3f-a988-8ebb22c5ccdd",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C05",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/capacity/estimates",
+      "status": 400,
+      "trace_id": "9e8a6652-4cc9-4a9e-be1a-07284b5e2499",
+      "code": "VALIDATION_ERROR",
+      "expected_status": 400,
+      "contract_valid": true
+    },
+    {
+      "case": "C06",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/capacity/scenarios",
+      "status": 200,
+      "trace_id": "9a75a76b-e189-436b-a661-8082ceefc7a4",
+      "expected_status": 200,
+      "returned_id": "3b6719bc-212c-41fd-97e5-85c0dc211d92",
+      "contract_valid": true
+    },
+    {
+      "case": "C06",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/capacity/scenarios",
+      "status": 200,
+      "trace_id": "5e1ad444-f7d3-45c7-b54d-9f0888756389",
+      "expected_status": 200,
+      "returned_id": "3b6719bc-212c-41fd-97e5-85c0dc211d92",
+      "contract_valid": true
+    },
+    {
+      "case": "C06",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/capacity/scenarios",
+      "status": 409,
+      "trace_id": "6f0ea3f5-756a-4ee5-ab4d-5308b603b8d5",
+      "code": "IDEMPOTENCY_CONFLICT",
+      "expected_status": 409,
+      "contract_valid": true
+    },
+    {
+      "case": "C06",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/capacity/scenarios/{id}",
+      "status": 200,
+      "trace_id": "58195956-bce9-4f71-be8a-9f616e21a8f7",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C06",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/capacity/scenarios",
+      "status": 200,
+      "trace_id": "e86ac639-c416-4849-859d-5fc19f3d9824",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C06",
+      "role": "msp",
+      "method": "GET",
+      "path": "/capacity/scenarios/{id}",
+      "status": 403,
+      "trace_id": "40fa419a-878e-4f92-ae45-a4c811c0edb0",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C06",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/capacity/scenarios",
+      "status": 403,
+      "trace_id": "b48edc14-236d-4d58-8e5a-55a7c7f9429d",
+      "code": "CSRF_INVALID",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C07",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/operations/explicit-comparisons",
+      "status": 200,
+      "trace_id": "37ee8f69-ce52-4a4e-8f33-a32a71556ee7",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C07",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/operations/explicit-comparisons",
+      "status": 200,
+      "trace_id": "0be8d767-b19c-4c9b-8de5-82e80920ba59",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C07",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/operations/explicit-comparisons",
+      "status": 200,
+      "trace_id": "768e871f-d802-47c8-a140-a57fe0af4c5c",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C07",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/operations/explicit-comparisons",
+      "status": 200,
+      "trace_id": "8ca19e28-9868-41d2-9736-7cb58aa2ecad",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C07",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/operations/explicit-comparisons",
+      "status": 200,
+      "trace_id": "03f5e88b-7262-4371-8fdf-118c4a8b45b2",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C07",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/operations/explicit-comparisons",
+      "status": 200,
+      "trace_id": "7db83790-4d46-4eaf-85f2-6a00bbd2b6d7",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C07",
+      "role": "msp",
+      "method": "POST",
+      "path": "/operations/explicit-comparisons",
+      "status": 403,
+      "trace_id": "42d41ba4-de44-4613-87f0-f2b729732139",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C07",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/operations/explicit-comparisons",
+      "status": 403,
+      "trace_id": "79785381-a27e-4b3f-84c6-3face09fea3b",
+      "code": "CSRF_INVALID",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "C07",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/operations/explicit-comparisons",
+      "status": 400,
+      "trace_id": "6b7882b9-dee7-433d-a75f-485ff33eb469",
+      "code": "VALIDATION_ERROR",
+      "expected_status": 400,
+      "contract_valid": true
+    },
+    {
+      "case": "C08",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/configurations",
+      "status": 200,
+      "trace_id": "5fa04a4e-7940-466f-8248-560b1e8a8cf4",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C08",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/configuration-revisions/{id}",
+      "status": 200,
+      "trace_id": "fd7bb582-910a-4bf1-95f7-098188e88985",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C08",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/configurations/{key}/revisions",
+      "status": 200,
+      "trace_id": "6a30f6b6-fc11-4df4-b2fe-b1cc42de0464",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C08",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/audit/records",
+      "status": 200,
+      "trace_id": "ed83fac0-674a-4026-928a-277ccb40b39b",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C08",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/audit/records",
+      "status": 200,
+      "trace_id": "1bbb5a83-b483-47f7-aacd-fbf1a0b6d2a4",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C08",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/audit/records",
+      "status": 200,
+      "trace_id": "2b2c5da9-456f-4acc-9e10-2298b617f1f2",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C08",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/audit/records",
+      "status": 200,
+      "trace_id": "a0fb9b28-d3fe-4663-85ca-88a736764fb0",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C08",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/working-calendars/{id}",
+      "status": 200,
+      "trace_id": "37cc8fb3-38a4-4fd7-bafc-f760dd4171f8",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C08",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/audit/records",
+      "status": 200,
+      "trace_id": "004ad692-9c2f-4a55-a2ee-615925e55d8f",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C08",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/audit/records",
+      "status": 200,
+      "trace_id": "4875400d-24c6-4a91-81cc-5e3a0ea98dcc",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "C08",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/audit/records",
+      "status": 200,
+      "trace_id": "8dbd083d-87d6-4593-a1eb-46f69560f6d4",
+      "expected_status": 200,
+      "contract_valid": true
+    }
+  ],
+  "artifacts": [
+    {
+      "case": "C01",
+      "name": "configuration-registry",
+      "entry_count": 185,
+      "original_items_sha256": "3fc975c13b2fed28084a1be90ef56beb8cb45752315dff2e1884ba2b0a28b15f",
+      "diagnostic_key": "acceptance.requirement_priority",
+      "effective_status": "CONFIG_PENDING",
+      "runtime_publication_tested": false
+    },
+    {
+      "case": "C02",
+      "name": "configuration-owned-revision",
+      "id": "45f907bb-3d70-49a5-bac1-7aa3740e3080",
+      "key": "asset.ip_scope",
+      "status": "DRAFT",
+      "version": 1
+    },
+    {
+      "case": "C02",
+      "name": "configuration-owned-revision-cleanup",
+      "id": "45f907bb-3d70-49a5-bac1-7aa3740e3080",
+      "status": "WITHDRAWN",
+      "version": 3,
+      "successful_approval_executed": false
+    },
+    {
+      "case": "C03",
+      "name": "configuration-threshold-diagnostic",
+      "consistent": true,
+      "conflict_preserved": true,
+      "unknown_preserved": true,
+      "exact_decimal": true,
+      "writes_performed": false
+    },
+    {
+      "case": "C04",
+      "name": "configuration-owned-calendar",
+      "id": "7b54d963-247d-45aa-95a7-800c2fe25e40",
+      "version": 1,
+      "effective": false
+    },
+    {
+      "case": "C04",
+      "name": "configuration-calendar-result",
+      "id": "7b54d963-247d-45aa-95a7-800c2fe25e40",
+      "version": 2,
+      "effective": false,
+      "history_count": 2,
+      "original_working_window_count": 2,
+      "merged_consumed_count": 1,
+      "retained_as_synthetic_draft": true
+    },
+    {
+      "case": "C05",
+      "name": "configuration-capacity-math",
+      "independent_hand_calculation": true,
+      "exact_large_integer": true,
+      "unknown_not_zero": true,
+      "scenario_saved": false,
+      "production_capacity_verified": false,
+      "poc_executed": false
+    },
+    {
+      "case": "C06",
+      "name": "configuration-owned-capacity",
+      "id": "3b6719bc-212c-41fd-97e5-85c0dc211d92",
+      "version": 1,
+      "effective": false
+    },
+    {
+      "case": "C06",
+      "name": "configuration-capacity-draft-result",
+      "id": "3b6719bc-212c-41fd-97e5-85c0dc211d92",
+      "version": 1,
+      "effective": false,
+      "actual_benchmark_attached": false,
+      "retained_as_synthetic_draft": true
+    },
+    {
+      "case": "C07",
+      "name": "configuration-operational-comparison",
+      "exact_median_and_fte": true,
+      "unknown_sample_preserved": true,
+      "zero_fte_undefined": true,
+      "exact_large_integer": true,
+      "formal_metrics_available": false,
+      "business_writes": 0
+    },
+    {
+      "case": "C08",
+      "name": "configuration-preservation",
+      "original_items_sha256": "3fc975c13b2fed28084a1be90ef56beb8cb45752315dff2e1884ba2b0a28b15f",
+      "final_items_sha256": "3fc975c13b2fed28084a1be90ef56beb8cb45752315dff2e1884ba2b0a28b15f",
+      "original_registry_and_drafts_unchanged": true,
+      "own_revision_withdrawn": true,
+      "calendar_id": "7b54d963-247d-45aa-95a7-800c2fe25e40",
+      "capacity_id": "3b6719bc-212c-41fd-97e5-85c0dc211d92",
+      "runtime_configuration_published": false
+    }
+  ],
+  "cleanup": [],
+  "credentials_recorded": false,
+  "readiness": {
+    "ready": true,
+    "durable": true,
+    "production_ready": false
+  },
+  "finished_at": "2026-10-14T10:55:37.035Z",
+  "summary": {
+    "PASS": 9,
+    "FAIL": 0,
+    "BLOCKED": 0
+  },
+  "updated_at": "2026-10-14T10:55:37.035Z"
+}

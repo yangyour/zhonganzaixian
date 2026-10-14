@@ -1,0 +1,186 @@
+{
+  "run_id": "881ec434-fed8-4e86-a4a7-6f881e99e695",
+  "started_at": "2026-10-14T11:08:13.651Z",
+  "environment": "lan-test-20261008",
+  "api_version": "0.49.0",
+  "scope": "Implemented feature checks; not full contract or production approval",
+  "cases": [
+    {
+      "id": "ENV",
+      "title": "环境、当前API与既有测试身份",
+      "started_at": "2026-10-14T11:08:13.652Z",
+      "request_start": 0,
+      "status": "PASS",
+      "request_count": 13,
+      "finished_at": "2026-10-14T11:08:15.765Z"
+    },
+    {
+      "id": "EXPORT-LIFETIME",
+      "title": "自然到期后的消息状态与显式续领",
+      "started_at": "2026-10-14T11:08:15.765Z",
+      "request_start": 13,
+      "status": "FAIL",
+      "error_type": "TypeError",
+      "reason": "Assertion failed; inspect the recorded step and response code",
+      "request_count": 1,
+      "finished_at": "2026-10-14T11:08:15.819Z"
+    }
+  ],
+  "requests": [
+    {
+      "case": "ENV",
+      "role": "anonymous",
+      "method": "GET",
+      "path": "/health/ready",
+      "status": 200,
+      "trace_id": "4fa0c4a0-302d-48fe-83fd-848f1a61d580",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "28713bc5-1576-4191-aacf-dced48977063",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "1e9ee547-6890-4be2-827f-e91f729c41be",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "msp",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "2160d9cd-2789-4fde-a241-167a59465615",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "msp",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "8fd2e9b9-1c33-49ec-93ca-9f60ae5a2572",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "tadmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "1518f31a-85c8-462a-9418-a2a06e2093c6",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "tadmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "8c623f17-f1ac-472a-9402-16d7b09f6e28",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "5c05d0bb-42b5-4305-8e80-420ea8b15478",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerA",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "b1e809bb-119b-4a48-8454-2c2e32280708",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerB",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "e2eb8448-6a83-434e-90dc-8b10b091f031",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerB",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "ee8e805f-6aa9-4453-a08d-04cf28bf4fea",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "reviewer",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "8930d7f1-8800-4775-a56e-3b51a452b0a8",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "4aec91f9-e9a5-46de-b39a-38d86935d953",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "EXPORT-LIFETIME",
+      "role": "msp",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200,
+      "trace_id": "27c4e96c-9120-44bf-9543-8e25fd90c4cb",
+      "expected_status": 200,
+      "contract_valid": true
+    }
+  ],
+  "artifacts": [],
+  "cleanup": [],
+  "credentials_recorded": false,
+  "readiness": {
+    "ready": true,
+    "durable": true,
+    "production_ready": false
+  },
+  "finished_at": "2026-10-14T11:08:15.819Z",
+  "summary": {
+    "PASS": 1,
+    "FAIL": 1,
+    "BLOCKED": 0
+  },
+  "updated_at": "2026-10-14T11:08:15.819Z"
+}

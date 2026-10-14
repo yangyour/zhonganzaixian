@@ -1,0 +1,492 @@
+{
+  "date": "2026-10-14",
+  "environment": "lan-test-20261008",
+  "api_version": "0.49.0",
+  "schema_version": 31,
+  "business_cases": 45,
+  "business_passed": 45,
+  "formal_contract_requirements": 128,
+  "formal_contract_status": "NOT_RUN",
+  "production_ready": false,
+  "tests": {
+    "web": 2030,
+    "web_files": 137,
+    "contracts": 134,
+    "security_policy": 7,
+    "typecheck": "PASS",
+    "build": "PASS"
+  },
+  "browser": {
+    "admin_route_viewports": 56,
+    "msp_route_viewports": 2,
+    "guard_scenarios": 4,
+    "page_errors": 0,
+    "non_login_writes": 0
+  },
+  "deployment": {
+    "source_commit": "fac7387ecf3eefcf24541358bd3d12a275ca5261",
+    "build_id": "00b719213e5b81fcecee6fdf4aa4e47b99c7f39f2582188f4f8434f49830e344",
+    "ready": true,
+    "other_13_services_unchanged": true
+  },
+  "http_requests_including_retries_and_setups": 765,
+  "cases": [
+    {
+      "id": "C01",
+      "title": "配置登记读取、有效性诊断与待确认边界",
+      "started_at": "2026-10-14T10:55:32.823Z",
+      "request_start": 13,
+      "status": "PASS",
+      "request_count": 6,
+      "finished_at": "2026-10-14T10:55:33.234Z",
+      "evidence": "http-d104f6b0-26bf-4bca-9085-268ea53c4a22.json"
+    },
+    {
+      "id": "C02",
+      "title": "独立配置修订提交、审批门禁、撤回及原配置保护",
+      "started_at": "2026-10-14T10:55:33.234Z",
+      "request_start": 19,
+      "status": "PASS",
+      "request_count": 18,
+      "finished_at": "2026-10-14T10:55:34.328Z",
+      "evidence": "http-d104f6b0-26bf-4bca-9085-268ea53c4a22.json"
+    },
+    {
+      "id": "C03",
+      "title": "阈值候选诊断、冲突识别与未知值保护",
+      "started_at": "2026-10-14T10:55:34.328Z",
+      "request_start": 37,
+      "status": "PASS",
+      "request_count": 7,
+      "finished_at": "2026-10-14T10:55:34.639Z",
+      "evidence": "http-d104f6b0-26bf-4bca-9085-268ea53c4a22.json"
+    },
+    {
+      "id": "C04",
+      "title": "独立工作日历草稿、版本历史与显式时间试算",
+      "started_at": "2026-10-14T10:55:34.640Z",
+      "request_start": 44,
+      "status": "PASS",
+      "request_count": 15,
+      "finished_at": "2026-10-14T10:55:35.368Z",
+      "evidence": "http-d104f6b0-26bf-4bca-9085-268ea53c4a22.json"
+    },
+    {
+      "id": "C05",
+      "title": "容量与缓冲显式估算、精确大数与未知值",
+      "started_at": "2026-10-14T10:55:35.368Z",
+      "request_start": 59,
+      "status": "PASS",
+      "request_count": 7,
+      "finished_at": "2026-10-14T10:55:35.710Z",
+      "evidence": "http-d104f6b0-26bf-4bca-9085-268ea53c4a22.json"
+    },
+    {
+      "id": "C06",
+      "title": "独立容量方案草稿、原回执与未核验快照",
+      "started_at": "2026-10-14T10:55:35.710Z",
+      "request_start": 66,
+      "status": "PASS",
+      "request_count": 7,
+      "finished_at": "2026-10-14T10:55:36.085Z",
+      "evidence": "http-d104f6b0-26bf-4bca-9085-268ea53c4a22.json"
+    },
+    {
+      "id": "C07",
+      "title": "经营样本中位数、人力对照及空样本边界",
+      "started_at": "2026-10-14T10:55:36.086Z",
+      "request_start": 73,
+      "status": "PASS",
+      "request_count": 9,
+      "finished_at": "2026-10-14T10:55:36.499Z",
+      "evidence": "http-d104f6b0-26bf-4bca-9085-268ea53c4a22.json"
+    },
+    {
+      "id": "C08",
+      "title": "原配置/原草稿完整保留及本轮对象审计核对",
+      "started_at": "2026-10-14T10:55:36.499Z",
+      "request_start": 82,
+      "status": "PASS",
+      "request_count": 11,
+      "finished_at": "2026-10-14T10:55:37.034Z",
+      "evidence": "http-d104f6b0-26bf-4bca-9085-268ea53c4a22.json"
+    },
+    {
+      "id": "IAM-01",
+      "title": "项目登录、账号读取、未设置策略与匿名/越权保护",
+      "started_at": "2026-10-14T10:43:53.464Z",
+      "request_start": 13,
+      "status": "PASS",
+      "request_count": 6,
+      "finished_at": "2026-10-14T10:43:53.751Z",
+      "evidence": "http-26c8adce-9e22-4e79-8d2f-c8ba7b3b87ef.json"
+    },
+    {
+      "id": "IAM-02",
+      "title": "独立角色与用户创建、同请求重试与冲突",
+      "started_at": "2026-10-14T10:43:53.751Z",
+      "request_start": 19,
+      "status": "PASS",
+      "request_count": 4,
+      "finished_at": "2026-10-14T10:43:54.101Z",
+      "evidence": "http-26c8adce-9e22-4e79-8d2f-c8ba7b3b87ef.json"
+    },
+    {
+      "id": "IAM-03",
+      "title": "权限裁剪与实时撤权",
+      "started_at": "2026-10-14T10:43:54.106Z",
+      "request_start": 23,
+      "status": "PASS",
+      "request_count": 8,
+      "finished_at": "2026-10-14T10:43:54.632Z",
+      "evidence": "http-26c8adce-9e22-4e79-8d2f-c8ba7b3b87ef.json"
+    },
+    {
+      "id": "IAM-04",
+      "title": "重置密码、撤销会话与禁用账号",
+      "started_at": "2026-10-14T10:43:54.632Z",
+      "request_start": 31,
+      "status": "PASS",
+      "request_count": 12,
+      "finished_at": "2026-10-14T10:43:55.830Z",
+      "evidence": "http-26c8adce-9e22-4e79-8d2f-c8ba7b3b87ef.json"
+    },
+    {
+      "id": "INTAKE-01",
+      "title": "联系人耐久导入受理、原回执和创建者隔离",
+      "started_at": "2026-10-14T10:53:12.647Z",
+      "request_start": 172,
+      "status": "PASS",
+      "request_count": 11,
+      "finished_at": "2026-10-14T10:53:13.201Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "INTAKE-02",
+      "title": "联系人Worker真实完成、逐行读取与原受理回执不改写",
+      "started_at": "2026-10-14T10:53:13.202Z",
+      "request_start": 183,
+      "status": "PASS",
+      "request_count": 8,
+      "finished_at": "2026-10-14T10:53:15.856Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "INTAKE-03",
+      "title": "照片原图耐久上传、Worker存储及原请求重放",
+      "started_at": "2026-10-14T10:53:15.862Z",
+      "request_start": 191,
+      "status": "PASS",
+      "request_count": 11,
+      "finished_at": "2026-10-14T10:53:18.013Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "INTAKE-04",
+      "title": "照片原图授权读取、字节摘要与非所有者隔离",
+      "started_at": "2026-10-14T10:53:18.013Z",
+      "request_start": 202,
+      "status": "PASS",
+      "request_count": 12,
+      "finished_at": "2026-10-14T10:53:18.668Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "INTAKE-05",
+      "title": "资产CSV原始来源受理、真实存储与创建者隔离",
+      "started_at": "2026-10-14T10:53:18.672Z",
+      "request_start": 214,
+      "status": "PASS",
+      "request_count": 10,
+      "finished_at": "2026-10-14T10:53:20.753Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "INTAKE-06",
+      "title": "CSV显式解析、15列映射与原始预览保存",
+      "started_at": "2026-10-14T10:53:20.754Z",
+      "request_start": 224,
+      "status": "PASS",
+      "request_count": 10,
+      "finished_at": "2026-10-14T10:53:22.055Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "R01",
+      "title": "资产草稿创建、幂等、权限和CSRF",
+      "started_at": "2026-10-14T10:52:33.082Z",
+      "request_start": 13,
+      "status": "PASS",
+      "request_count": 7,
+      "finished_at": "2026-10-14T10:52:33.426Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "R02",
+      "title": "资产列表、详情、字面筛选与跨租户隔离",
+      "started_at": "2026-10-14T10:52:33.426Z",
+      "request_start": 20,
+      "status": "PASS",
+      "request_count": 9,
+      "finished_at": "2026-10-14T10:52:33.838Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "R03",
+      "title": "设备资料维护、不可变历史与乐观锁",
+      "started_at": "2026-10-14T10:52:33.838Z",
+      "request_start": 29,
+      "status": "PASS",
+      "request_count": 13,
+      "finished_at": "2026-10-14T10:52:34.513Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "R04",
+      "title": "维保声明、日期判断与未核验边界",
+      "started_at": "2026-10-14T10:52:34.514Z",
+      "request_start": 42,
+      "status": "PASS",
+      "request_count": 8,
+      "finished_at": "2026-10-14T10:52:34.963Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "R05",
+      "title": "设备依赖草稿、幂等、防环与越权拒绝",
+      "started_at": "2026-10-14T10:52:34.963Z",
+      "request_start": 50,
+      "status": "PASS",
+      "request_count": 9,
+      "finished_at": "2026-10-14T10:52:35.404Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "R06",
+      "title": "台账导出受理、筛选快照与后台实际准备",
+      "started_at": "2026-10-14T10:52:35.404Z",
+      "request_start": 59,
+      "status": "PASS",
+      "request_count": 10,
+      "finished_at": "2026-10-14T10:52:36.888Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "R07",
+      "title": "MinIO显式发布、原回执与发布终态",
+      "started_at": "2026-10-14T10:52:36.888Z",
+      "request_start": 69,
+      "status": "PASS",
+      "request_count": 24,
+      "finished_at": "2026-10-14T10:53:08.439Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "R08",
+      "title": "授权下载、真实XLSX筛选内容与签名防篡改",
+      "started_at": "2026-10-14T10:53:08.439Z",
+      "request_start": 93,
+      "status": "PASS",
+      "request_count": 7,
+      "finished_at": "2026-10-14T10:53:08.819Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "R09",
+      "title": "本人导出消息、未读筛选与首次已读幂等",
+      "started_at": "2026-10-14T10:53:08.825Z",
+      "request_start": 100,
+      "status": "PASS",
+      "request_count": 8,
+      "finished_at": "2026-10-14T10:53:09.245Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "R10",
+      "title": "本轮资料与导出的成功审计不因重放重复",
+      "started_at": "2026-10-14T10:53:09.245Z",
+      "request_start": 108,
+      "status": "PASS",
+      "request_count": 7,
+      "finished_at": "2026-10-14T10:53:09.580Z",
+      "evidence": "http-2f80511d-a8d1-44cc-99e3-391cd70ca8a3.json"
+    },
+    {
+      "id": "READ-01",
+      "title": "租户登记、权限能力与本人设置的真实读取",
+      "started_at": "2026-10-14T10:59:46.860Z",
+      "request_start": 13,
+      "status": "PASS",
+      "request_count": 8,
+      "finished_at": "2026-10-14T10:59:47.276Z",
+      "evidence": "http-7b741526-2c0d-4d35-92ed-4b53e62217b6.json"
+    },
+    {
+      "id": "READ-02",
+      "title": "总览三种范围、六指标与六面板保持未知",
+      "started_at": "2026-10-14T10:59:47.276Z",
+      "request_start": 21,
+      "status": "PASS",
+      "request_count": 4,
+      "finished_at": "2026-10-14T10:59:47.487Z",
+      "evidence": "http-7b741526-2c0d-4d35-92ed-4b53e62217b6.json"
+    },
+    {
+      "id": "READ-03",
+      "title": "全局搜索与审计筛选、错误输入拒绝",
+      "started_at": "2026-10-14T10:59:47.487Z",
+      "request_start": 25,
+      "status": "PASS",
+      "request_count": 6,
+      "finished_at": "2026-10-14T10:59:47.862Z",
+      "evidence": "http-7b741526-2c0d-4d35-92ed-4b53e62217b6.json"
+    },
+    {
+      "id": "READ-04",
+      "title": "四设备基础监控与真实历史、跨租户隔离",
+      "started_at": "2026-10-14T10:59:47.862Z",
+      "request_start": 31,
+      "status": "PASS",
+      "request_count": 14,
+      "finished_at": "2026-10-14T10:59:50.097Z",
+      "evidence": "http-7b741526-2c0d-4d35-92ed-4b53e62217b6.json"
+    },
+    {
+      "id": "SVC-01",
+      "title": "报障耐久登记、原请求重放和租户隔离",
+      "started_at": "2026-10-14T10:47:25.831Z",
+      "request_start": 115,
+      "status": "PASS",
+      "request_count": 13,
+      "finished_at": "2026-10-14T10:47:26.511Z",
+      "evidence": "http-4ceea13c-fadc-4528-b443-9d50b2cc3b72.json"
+    },
+    {
+      "id": "SVC-02",
+      "title": "客户评论追加、内部备注隔离与幂等",
+      "started_at": "2026-10-14T10:47:26.511Z",
+      "request_start": 128,
+      "status": "PASS",
+      "request_count": 10,
+      "finished_at": "2026-10-14T10:47:27.022Z",
+      "evidence": "http-4ceea13c-fadc-4528-b443-9d50b2cc3b72.json"
+    },
+    {
+      "id": "SVC-03",
+      "title": "不可变内部备注与客户不可见",
+      "started_at": "2026-10-14T10:47:27.023Z",
+      "request_start": 138,
+      "status": "PASS",
+      "request_count": 10,
+      "finished_at": "2026-10-14T10:47:27.527Z",
+      "evidence": "http-4ceea13c-fadc-4528-b443-9d50b2cc3b72.json"
+    },
+    {
+      "id": "SVC-04",
+      "title": "本人工时新增、零时长修订、历史和越权保护",
+      "started_at": "2026-10-14T10:47:27.527Z",
+      "request_start": 148,
+      "status": "PASS",
+      "request_count": 12,
+      "finished_at": "2026-10-14T10:47:28.136Z",
+      "evidence": "http-4ceea13c-fadc-4528-b443-9d50b2cc3b72.json"
+    },
+    {
+      "id": "SVC-05",
+      "title": "联系人格式预览保留错误行且不写入",
+      "started_at": "2026-10-14T10:47:28.142Z",
+      "request_start": 160,
+      "status": "PASS",
+      "request_count": 3,
+      "finished_at": "2026-10-14T10:47:28.300Z",
+      "evidence": "http-4ceea13c-fadc-4528-b443-9d50b2cc3b72.json"
+    },
+    {
+      "id": "SVC-06",
+      "title": "联系人新增、修订、原回执、归档与恢复",
+      "started_at": "2026-10-14T10:47:28.300Z",
+      "request_start": 163,
+      "status": "PASS",
+      "request_count": 12,
+      "finished_at": "2026-10-14T10:47:28.947Z",
+      "evidence": "http-4ceea13c-fadc-4528-b443-9d50b2cc3b72.json"
+    },
+    {
+      "id": "SVC-07",
+      "title": "备份计划草稿修订、幂等与归档恢复",
+      "started_at": "2026-10-14T10:47:28.947Z",
+      "request_start": 175,
+      "status": "PASS",
+      "request_count": 11,
+      "finished_at": "2026-10-14T10:47:29.549Z",
+      "evidence": "http-4ceea13c-fadc-4528-b443-9d50b2cc3b72.json"
+    },
+    {
+      "id": "SVC-08",
+      "title": "变更报备草稿绑定、修订与审批边界",
+      "started_at": "2026-10-14T10:47:29.550Z",
+      "request_start": 186,
+      "status": "PASS",
+      "request_count": 9,
+      "finished_at": "2026-10-14T10:47:30.068Z",
+      "evidence": "http-4ceea13c-fadc-4528-b443-9d50b2cc3b72.json"
+    },
+    {
+      "id": "SVC-09",
+      "title": "巡检模板候选、原文和空值保留",
+      "started_at": "2026-10-14T10:47:30.069Z",
+      "request_start": 195,
+      "status": "PASS",
+      "request_count": 6,
+      "finished_at": "2026-10-14T10:47:30.375Z",
+      "evidence": "http-4ceea13c-fadc-4528-b443-9d50b2cc3b72.json"
+    },
+    {
+      "id": "SVC-10",
+      "title": "人工巡检执行单、冻结模板和不可变来源修订",
+      "started_at": "2026-10-14T10:47:30.376Z",
+      "request_start": 201,
+      "status": "PASS",
+      "request_count": 10,
+      "finished_at": "2026-10-14T10:47:30.974Z",
+      "evidence": "http-4ceea13c-fadc-4528-b443-9d50b2cc3b72.json"
+    },
+    {
+      "id": "SVC-11",
+      "title": "巡检来源集合显式冻结、摘要冲突和报告未发布",
+      "started_at": "2026-10-14T10:47:30.979Z",
+      "request_start": 211,
+      "status": "PASS",
+      "request_count": 6,
+      "finished_at": "2026-10-14T10:47:31.341Z",
+      "evidence": "http-4ceea13c-fadc-4528-b443-9d50b2cc3b72.json"
+    },
+    {
+      "id": "SVC-12",
+      "title": "SLA显式场景只读对照、未知值和排除规则",
+      "started_at": "2026-10-14T10:47:31.341Z",
+      "request_start": 217,
+      "status": "PASS",
+      "request_count": 4,
+      "finished_at": "2026-10-14T10:47:31.552Z",
+      "evidence": "http-4ceea13c-fadc-4528-b443-9d50b2cc3b72.json"
+    },
+    {
+      "id": "SVC-13",
+      "title": "来源归档后巡检集合仍保持原修订",
+      "started_at": "2026-10-14T10:47:32.388Z",
+      "request_start": 236,
+      "status": "PASS",
+      "request_count": 1,
+      "finished_at": "2026-10-14T10:47:32.440Z",
+      "evidence": "http-4ceea13c-fadc-4528-b443-9d50b2cc3b72.json"
+    }
+  ],
+  "limitations": [
+    "PASS applies only to specified implemented subfeatures, not complete contract items",
+    "No formal monitoring/ITSM/SLA/notification/backup/remote/reporting acceptance",
+    "Synthetic project evidence retained; eligible contacts, roles and mutable drafts retired or withdrawn",
+    "Original expiry status and renewal tested; original expired signed URL was not retained for a repeated request"
+  ],
+  "credentials_recorded": false
+}

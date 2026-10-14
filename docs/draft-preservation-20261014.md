@@ -20,3 +20,5 @@
 证据：[最终构建与测试](evidence/feature-acceptance-20261014/frontend-validation.json)、[工时](evidence/feature-acceptance-20261014/worklog-browser.json)、[导入](evidence/feature-acceptance-20261014/import-draft-browser.json)、[配置](evidence/feature-acceptance-20261014/configuration-draft-browser.json)、[手机报障](evidence/feature-acceptance-20261014/report-draft-browser.json)。
 
 本文件创建时完成的是源码与候选页面复验；测试站发布结果另记前端部署证据，不将本地构建当作已部署。
+
+后续已以 `fac7387` 发布到指定测试站，86个静态文件SHA256一致，其他13服务不变。公开页面56个视口组合及4项核心输入保留流程复验通过。见[部署](evidence/feature-acceptance-20261014/frontend-deployment.json)与[实际页面](evidence/feature-acceptance-20261014/frontend-public-browser.json)。

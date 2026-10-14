@@ -1,0 +1,234 @@
+{
+  "run_id": "755d295d-efcd-4837-a709-be1c2a1274da",
+  "started_at": "2026-10-14T11:08:34.796Z",
+  "environment": "lan-test-20261008",
+  "api_version": "0.49.0",
+  "scope": "Implemented feature checks; not full contract or production approval",
+  "cases": [
+    {
+      "id": "ENV",
+      "title": "环境、当前API与既有测试身份",
+      "started_at": "2026-10-14T11:08:34.797Z",
+      "request_start": 0,
+      "status": "PASS",
+      "request_count": 13,
+      "finished_at": "2026-10-14T11:08:36.869Z"
+    },
+    {
+      "id": "EXPORT-LIFETIME",
+      "title": "自然到期后的消息状态与显式续领",
+      "started_at": "2026-10-14T11:08:36.869Z",
+      "request_start": 13,
+      "status": "PASS",
+      "request_count": 5,
+      "finished_at": "2026-10-14T11:08:37.155Z"
+    }
+  ],
+  "requests": [
+    {
+      "case": "ENV",
+      "role": "anonymous",
+      "method": "GET",
+      "path": "/health/ready",
+      "status": 200,
+      "trace_id": "574e6360-a260-42fa-a219-d998e3c1d36d",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "ad68ffd0-a1df-49f8-bb95-17ba3e6edbed",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "f85d1e58-17a0-46c7-af3b-8f2c6bbb30cb",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "msp",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "364a79cd-5ddc-4381-ad53-ae49b8c98678",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "msp",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "44cf05bf-80fc-46ef-97b0-6be294270c48",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "tadmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "2181d6bb-9044-4af8-9630-17ede3dba22d",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "tadmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "38e68225-c81f-46ca-965a-3a457f0279b9",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "611365ff-7c2c-4501-a535-705759236345",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerA",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "74fd2857-5785-4fa3-9745-3872ee8949f7",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerB",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "76f4b589-4407-400a-856b-884a722997d7",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerB",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "e0bd3a24-e38e-458c-8b03-0795b76c0fa3",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "reviewer",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "a21b4693-abd7-4fa4-99b3-adae644a1d01",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "2ff4c16d-1547-48f9-9b08-a2c73b6188ff",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "EXPORT-LIFETIME",
+      "role": "msp",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200,
+      "trace_id": "5b24c88b-ccaa-4372-bac6-9a9d5d1c14f6",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "EXPORT-LIFETIME",
+      "role": "msp",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "trace_id": "3b180d49-19f0-4d28-9563-33222d3dd0f7",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "EXPORT-LIFETIME",
+      "role": "msp",
+      "method": "POST",
+      "path": "/asset-export-jobs/{id}/content-grants",
+      "status": 200,
+      "trace_id": "925cb73c-e59f-4109-bb10-f829fb38b918",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "EXPORT-LIFETIME",
+      "role": "msp",
+      "method": "GET",
+      "path": "[AUTHORIZED FILE CONTENT]",
+      "status": 200,
+      "expected_status": 200,
+      "bytes": 5068
+    },
+    {
+      "case": "EXPORT-LIFETIME",
+      "role": "msp",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "trace_id": "88ec6f04-14cb-413b-8ec1-050a05116332",
+      "expected_status": 200,
+      "contract_valid": true
+    }
+  ],
+  "artifacts": [
+    {
+      "case": "EXPORT-LIFETIME",
+      "name": "natural-expiry-renewal",
+      "job_id": "5a97a2b7-7c9d-4770-bd40-1c0188d5baa8",
+      "original_expired": true,
+      "original_expiry": "2026-10-14T11:02:24.918Z",
+      "original_message_unchanged": true,
+      "renewed_download_sha256": "f9a4c9ae075323fe129ef1bc58d1b7851c8a02eea7270ce6cff931794612ba9f",
+      "original_expired_url_download_retested": false
+    }
+  ],
+  "cleanup": [],
+  "credentials_recorded": false,
+  "readiness": {
+    "ready": true,
+    "durable": true,
+    "production_ready": false
+  },
+  "finished_at": "2026-10-14T11:08:37.156Z",
+  "summary": {
+    "PASS": 2,
+    "FAIL": 0,
+    "BLOCKED": 0
+  },
+  "updated_at": "2026-10-14T11:08:37.156Z"
+}

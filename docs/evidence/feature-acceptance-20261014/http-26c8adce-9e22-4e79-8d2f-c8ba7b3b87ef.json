@@ -1,0 +1,599 @@
+{
+  "run_id": "26c8adce-9e22-4e79-8d2f-c8ba7b3b87ef",
+  "started_at": "2026-10-14T10:43:51.124Z",
+  "environment": "lan-test-20261008",
+  "api_version": "0.49.0",
+  "scope": "Implemented feature checks; not full contract or production approval",
+  "cases": [
+    {
+      "id": "ENV",
+      "title": "环境、当前API与既有测试身份",
+      "started_at": "2026-10-14T10:43:51.125Z",
+      "request_start": 0,
+      "status": "PASS",
+      "request_count": 13,
+      "finished_at": "2026-10-14T10:43:53.461Z"
+    },
+    {
+      "id": "IAM-01",
+      "title": "项目登录、账号读取、未设置策略与匿名/越权保护",
+      "started_at": "2026-10-14T10:43:53.464Z",
+      "request_start": 13,
+      "status": "PASS",
+      "request_count": 6,
+      "finished_at": "2026-10-14T10:43:53.751Z"
+    },
+    {
+      "id": "IAM-02",
+      "title": "独立角色与用户创建、同请求重试与冲突",
+      "started_at": "2026-10-14T10:43:53.751Z",
+      "request_start": 19,
+      "status": "PASS",
+      "request_count": 4,
+      "finished_at": "2026-10-14T10:43:54.101Z"
+    },
+    {
+      "id": "IAM-03",
+      "title": "权限裁剪与实时撤权",
+      "started_at": "2026-10-14T10:43:54.106Z",
+      "request_start": 23,
+      "status": "PASS",
+      "request_count": 8,
+      "finished_at": "2026-10-14T10:43:54.632Z"
+    },
+    {
+      "id": "IAM-04",
+      "title": "重置密码、撤销会话与禁用账号",
+      "started_at": "2026-10-14T10:43:54.632Z",
+      "request_start": 31,
+      "status": "PASS",
+      "request_count": 12,
+      "finished_at": "2026-10-14T10:43:55.830Z"
+    },
+    {
+      "id": "IAM-CLEANUP",
+      "title": "仅停用本轮虚构账号和角色，策略保持原值",
+      "started_at": "2026-10-14T10:43:55.830Z",
+      "request_start": 43,
+      "status": "PASS",
+      "request_count": 7,
+      "finished_at": "2026-10-14T10:43:56.345Z"
+    }
+  ],
+  "requests": [
+    {
+      "case": "ENV",
+      "role": "anonymous",
+      "method": "GET",
+      "path": "/health/ready",
+      "status": 200,
+      "trace_id": "4bdd74d8-6fac-44c1-98cd-70c729352410",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "4602b5ec-9afa-4bff-91ec-6dcee5eb2b76",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "907444e5-f622-4e85-818b-4171b2ad39a7",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "msp",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "30dd79c4-752b-4eb9-a139-280a26476f97",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "msp",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "3d115577-c62b-4b1c-8d72-7c01e0bb3d5a",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "tadmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "4a01ec73-ab64-404c-bed2-736fa0a7ea7d",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "tadmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "f2c5426a-ffc1-42b3-9d04-1a4e6c77bd77",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "aea24ac5-24f3-4021-9a3a-fd99481d4c57",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerA",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "611528da-e23e-4b4e-9e17-f3833f14b9cb",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerB",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "009e4be5-d7e7-45a2-ba19-8dc468fcc4fd",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "viewerB",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "2d4e0452-84e3-4aa1-924d-d422b86d9dfd",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "reviewer",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "82d55e95-0b5a-41e2-962d-96d16c87ee21",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "ENV",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "71b89c22-6a82-4948-b7ab-aade5e60ee6d",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-01",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/auth/options",
+      "status": 200,
+      "trace_id": "edb809f8-b9ad-4868-b1ba-6fa99043c885",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-01",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/identity/policy",
+      "status": 200,
+      "trace_id": "2dc4b12c-94f6-4cc6-b728-5b96d6138dd9",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-01",
+      "role": "anonymous",
+      "method": "GET",
+      "path": "/identity/users",
+      "status": 401,
+      "trace_id": "0624ff9e-e166-456f-8be9-b69cbf1f0dd1",
+      "code": "SESSION_EXPIRED",
+      "expected_status": 401,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-01",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/identity/users",
+      "status": 403,
+      "trace_id": "0f64e9bf-237a-4d78-8368-72c14d98e0be",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-01",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/identity/users/{id}",
+      "status": 404,
+      "trace_id": "613da11a-ab95-44e3-922b-2e3b239281d6",
+      "code": "NOT_FOUND",
+      "expected_status": 404,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-01",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/identity/roles",
+      "status": 403,
+      "trace_id": "9a629af2-f694-4904-a9a8-f83aa0992030",
+      "code": "CSRF_INVALID",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-02",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/identity/roles",
+      "status": 200,
+      "trace_id": "1614119a-01ab-4ffb-87f8-db1af5014e34",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-02",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/identity/users",
+      "status": 200,
+      "trace_id": "4891f037-709b-42cc-a35d-6ba22c80f59c",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-02",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/identity/users",
+      "status": 200,
+      "trace_id": "99f56ae7-26a1-4405-8c5d-0c1c094dd25c",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-02",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/identity/users",
+      "status": 409,
+      "trace_id": "ea6d9162-eb0e-4248-8746-6c5490cffab8",
+      "code": "IDEMPOTENCY_CONFLICT",
+      "expected_status": 409,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-03",
+      "role": "synthetic-viewer",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "d7fa1f66-b852-4dfd-813c-1caa2ae64c86",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-03",
+      "role": "synthetic-viewer",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "01407a56-2419-4387-9e7d-aecdc2c50933",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-03",
+      "role": "synthetic-viewer",
+      "method": "GET",
+      "path": "/assets",
+      "status": 200,
+      "trace_id": "346980a6-87ee-4c5a-83cb-7a0cea367579",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-03",
+      "role": "synthetic-viewer",
+      "method": "GET",
+      "path": "/identity/roles",
+      "status": 403,
+      "trace_id": "5481d444-d08e-4d63-a98b-8889eae5bf14",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-03",
+      "role": "padmin",
+      "method": "PATCH",
+      "path": "/identity/roles/{id}",
+      "status": 200,
+      "trace_id": "a57b0068-7ea1-4956-9f29-67dd4c71304f",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-03",
+      "role": "synthetic-viewer",
+      "method": "GET",
+      "path": "/assets",
+      "status": 403,
+      "trace_id": "aefdc0ca-11c7-4571-ba7b-924ea3ab7d67",
+      "code": "ACTION_FORBIDDEN",
+      "expected_status": 403,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-03",
+      "role": "synthetic-viewer",
+      "method": "GET",
+      "path": "/session",
+      "status": 200,
+      "trace_id": "ef7db704-8a59-4a83-8d9d-e0912c0e2acc",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-03",
+      "role": "padmin",
+      "method": "PATCH",
+      "path": "/identity/roles/{id}",
+      "status": 409,
+      "trace_id": "31a060c3-124b-4710-b876-ee5a9d0b7630",
+      "code": "VERSION_CONFLICT",
+      "expected_status": 409,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-04",
+      "role": "synthetic-before-reset",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "94e73cbf-1c23-4beb-b907-02f887f8b46f",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-04",
+      "role": "synthetic-before-reset",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "c0a1e488-2972-4330-ae56-24db93f0e933",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-04",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/identity/users/{id}",
+      "status": 200,
+      "trace_id": "c5e90479-a846-46c8-8775-f6724feb737a",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-04",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/identity/users/{id}/password",
+      "status": 200,
+      "trace_id": "f3f1c1b9-7ad0-4439-aeb4-25691b776bba",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-04",
+      "role": "synthetic-before-reset",
+      "method": "GET",
+      "path": "/session",
+      "status": 401,
+      "trace_id": "357f245c-6a74-4fb7-93b1-989e251a79cd",
+      "code": "SESSION_EXPIRED",
+      "expected_status": 401,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-04",
+      "role": "synthetic-old-password",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "747d3988-4546-4c11-9aac-82fa12daf883",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-04",
+      "role": "synthetic-old-password",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 401,
+      "trace_id": "af8b0fc8-fd5e-4ada-92a0-f511610c8fe4",
+      "code": "LOGIN_FAILED",
+      "expected_status": 401,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-04",
+      "role": "synthetic-after-reset",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "7f0c7f3e-ada7-4724-88a7-03ca97ee3a0c",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-04",
+      "role": "synthetic-after-reset",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "trace_id": "4c6f516e-3304-408a-a20b-9e4439be89c4",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-04",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/identity/users/{id}",
+      "status": 200,
+      "trace_id": "256c1493-dfcf-40e6-a072-ae445d6a6689",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-04",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/identity/users/{id}/revoke-sessions",
+      "status": 200,
+      "trace_id": "bfa87a03-a05f-4762-8912-f38f6c61272b",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-04",
+      "role": "synthetic-after-reset",
+      "method": "GET",
+      "path": "/session",
+      "status": 401,
+      "trace_id": "463f13c0-8a57-47ad-870c-596bac7f5389",
+      "code": "SESSION_EXPIRED",
+      "expected_status": 401,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-CLEANUP",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/identity/users/{id}",
+      "status": 200,
+      "trace_id": "c9e08d69-2f7c-4453-8242-c85c0a063ee9",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-CLEANUP",
+      "role": "padmin",
+      "method": "PATCH",
+      "path": "/identity/users/{id}",
+      "status": 200,
+      "trace_id": "d1b5c192-2ddd-4976-b506-47ebe3d38518",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-CLEANUP",
+      "role": "synthetic-disabled",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "trace_id": "09a4c1b6-8cef-4a2c-94aa-bf6575497657",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-CLEANUP",
+      "role": "synthetic-disabled",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 401,
+      "trace_id": "8489ded2-063d-483d-9cc5-50c73c78fd1b",
+      "code": "LOGIN_FAILED",
+      "expected_status": 401,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-CLEANUP",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/identity/roles",
+      "status": 200,
+      "trace_id": "f49b18e3-f722-4dcf-b118-1ea02fd38114",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-CLEANUP",
+      "role": "padmin",
+      "method": "PATCH",
+      "path": "/identity/roles/{id}",
+      "status": 200,
+      "trace_id": "4469a832-b385-4186-8a0c-cde03f1044bb",
+      "expected_status": 200,
+      "contract_valid": true
+    },
+    {
+      "case": "IAM-CLEANUP",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/identity/policy",
+      "status": 200,
+      "trace_id": "c495b28e-4bc8-4ebe-8542-51999d26e60e",
+      "expected_status": 200,
+      "contract_valid": true
+    }
+  ],
+  "artifacts": [
+    {
+      "case": "IAM-02",
+      "name": "synthetic_identity",
+      "user_id": "ea23907e-d75d-4aa6-8437-744b9a8c49e0",
+      "role_id": "0f774c00-0be0-469b-b54f-8f2f437f2cdb"
+    }
+  ],
+  "cleanup": [],
+  "credentials_recorded": false,
+  "readiness": {
+    "ready": true,
+    "durable": true,
+    "production_ready": false
+  },
+  "finished_at": "2026-10-14T10:43:56.345Z",
+  "summary": {
+    "PASS": 6,
+    "FAIL": 0,
+    "BLOCKED": 0
+  },
+  "updated_at": "2026-10-14T10:43:56.345Z"
+}

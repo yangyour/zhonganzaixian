@@ -51,3 +51,9 @@
 回退：核对当前 WEB_RELEASE_DIR 与 deployment.json 一致后，仅将该键恢复为 previous_web_release，保留其他env键；执行 `docker compose up -d --no-deps --pull never web`，核对公开release-manifest与ready。不要整份覆盖其他并发更新的配置。
 
 本次是测试环境 UI 发布，不改变首页未知指标、未接入能力和正式合同验收门禁，production_ready=false 保留。
+
+## 最终发布与源码接续
+
+文案版已发布，目录 `/opt/mop-lan-test/releases/impeccable-d8d95f57271a`，构建 `cb37dda2da380742715e23d469143d0a0bf9f4d730ef142dd35af705d5e99141`。公开页面已核对最新环境说明、桌面/手机台账、总览、CSP和ready；0页面脚本异常。完整交互矩阵在此前相同UI代码版本通过，最终仅环境说明文字不同，采用针对性复验，未冒充重新执行完整矩阵。
+
+原开发分支已推送UI提交 `7f92e91`，本轮优化和最新环境说明已在原工作区保留；防火墙业务未提交改动没有被覆盖或混入UI提交。可复核 [最终浏览器结果](evidence/impeccable-ui-20261014/final-smoke.json)、[最终桌面](evidence/impeccable-ui-20261014/final-assets-desktop.png)、[最终手机](evidence/impeccable-ui-20261014/final-assets-mobile.png)。

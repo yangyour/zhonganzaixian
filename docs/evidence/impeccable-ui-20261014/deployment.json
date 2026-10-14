@@ -1,12 +1,12 @@
 {
-  "verified_at": "2026-10-14T08:57:45.717980+00:00",
+  "verified_at": "2026-10-14T09:06:23.246333+00:00",
   "environment": "lan-test-20261008",
-  "source_commit": "68f8ff868db04dd2bfcb1062897e36926c91caca",
+  "source_commit": "d8d95f57271ab5cc37d4c7321c02a0aab071b440",
   "public_origin": "http://192.168.1.215:10010",
-  "web_release": "/opt/mop-lan-test/releases/impeccable-68f8ff868db0",
-  "previous_web_release": "/opt/mop-lan-test/releases/af-resource-web-11cd63cd7fac",
+  "web_release": "/opt/mop-lan-test/releases/impeccable-d8d95f57271a",
+  "previous_web_release": "/opt/mop-lan-test/releases/impeccable-68f8ff868db0",
   "web_config": "/opt/mop-lan-test/releases/590a76e39d93-export-inbox/nginx.conf",
-  "web_build_id": "5753d9a5425a19a0428b167f6e4b8d7f38ea1484a574a095cb5bb365eb8afa5c",
+  "web_build_id": "cb37dda2da380742715e23d469143d0a0bf9f4d730ef142dd35af705d5e99141",
   "files_verified": 87,
   "ready": true,
   "production_ready": false,
@@ -200,6 +200,9 @@
   "api_release": "/opt/mop-lan-test/releases/af-resource-api-de918c6e6825",
   "new_migrations": 0,
   "new_components": 0,
-  "rollback_directory": "/opt/mop-lan-test/private/impeccable-68f8ff868db0",
-  "credentials_output": false
+  "rollback_directory": "/opt/mop-lan-test/private/impeccable-d8d95f57271a",
+  "credentials_output": false,
+  "primary_ui_commit": "7f92e91",
+  "prior_full_ui_matrix_build_id": "5753d9a5425a19a0428b167f6e4b8d7f38ea1484a574a095cb5bb365eb8afa5c",
+  "final_copy_smoke": "final-smoke.json"
 }

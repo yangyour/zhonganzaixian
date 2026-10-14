@@ -1,0 +1,19 @@
+{
+  "source": "pbakaus/impeccable",
+  "source_revision": "2f98774f86bc05563876643db37e6c37c322850f",
+  "engine": "0.1.14",
+  "exit_code": 2,
+  "findings": [
+    {
+      "antipattern": "side-tab",
+      "name": "Side-tab accent border",
+      "description": "Thick colored border on one side of a card \u2014 the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+      "severity": "warning",
+      "category": "slop",
+      "file": "apps/web/src/styles/experience.css",
+      "line": 91,
+      "snippet": "border-left: 3px solid #b43746"
+    }
+  ],
+  "disposition": "Existing form-error semantic indicator preserved; not a decorative card stripe."
+}

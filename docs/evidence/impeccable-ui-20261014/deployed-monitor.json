@@ -1,0 +1,10 @@
+{
+  "status": "PASSED",
+  "base": "http://192.168.1.215:10010",
+  "devices": 4,
+  "desktop_same_row": true,
+  "cpu_history_rows": 12,
+  "mobile_no_overflow": true,
+  "page_errors": [],
+  "credentials_output": false
+}

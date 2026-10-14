@@ -1,0 +1,17 @@
+{
+  "source": "Existing deployed firewall frontend, read from primary worktree without modification",
+  "source_files_sha256": {
+    "apps/web/src/pages/NetworkMonitoringPage.vue": "83ada5503b71eb93c0f2ce2fda6c93591410d7203c0043d660a71f9e4288cfa5",
+    "apps/web/src/utils/networkMonitoring.ts": "83a7190e2aa2db78ec9f8c0f2a240e4a96255a9710ce967e9d9d2e7a3bebab98",
+    "apps/web/tests/networkMonitoringPage.test.ts": "6fb7288b6e1369eb3430db70d64e74063dcc1c52cf96874e3fd4236505d70076",
+    "apps/web/tests/firewallResourceFixtures.ts": "d9939100690ac721ff1181f5c61cfec60b50f4eb2e98a62b63260d3da1e79985",
+    "apps/web/tests/firewallResources.test.ts": "96a579fe2e8ca4e2a1bfd9b8060e23476fb2911cac595dc19bb26b713aace95c"
+  },
+  "frontend_checks": 1944,
+  "typecheck_build": true,
+  "current_api_contract": "0.49.0",
+  "new_backend_implementation": false,
+  "new_migrations": 0,
+  "latest_deployed_grid_preserved": true,
+  "monitor_followup_checks": 15
+}

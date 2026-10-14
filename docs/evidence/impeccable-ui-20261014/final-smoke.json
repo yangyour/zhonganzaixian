@@ -1,0 +1,11 @@
+{
+  "status": "PASSED",
+  "build_id": "cb37dda2da380742715e23d469143d0a0bf9f4d730ef142dd35af705d5e99141",
+  "environment_label_verified": true,
+  "csp_preserved": true,
+  "desktop_mobile_smoke": true,
+  "ready": true,
+  "production_ready": false,
+  "page_errors": [],
+  "credentials_output": false
+}

@@ -4,7 +4,9 @@ import { useRoute, useRouter, isNavigationFailure, NavigationFailureType } from 
 import { can, session, contextGeneration, switchingTenant, maySwitchTenant, switchTenant, logout } from './stores/session'
 import { isCancelled } from './api/client'
 import { roleLabel } from './utils/display'
-import { landingRoute, navigationGroupVisible } from './utils/routeAccess'
+import { landingRoute } from './utils/routeAccess'
+import HorizontalModuleNavigation from './components/HorizontalModuleNavigation.vue'
+import './styles/navigation.css'
 import ApiErrorNotice from './components/ApiErrorNotice.vue'
 import GlobalSearch from './components/GlobalSearch.vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
@@ -12,14 +14,11 @@ import './styles/identity.css'
 const route = useRoute()
 const router = useRouter()
 const homeRoute = computed(() => landingRoute(session.value, router.getRoutes()))
-const managementVisible = computed(() => navigationGroupVisible(session.value, router.getRoutes(), ['管理']))
-const resourceVisible = computed(() => navigationGroupVisible(session.value, router.getRoutes(), ['资源', '服务']))
-const navigationOpen = ref(false)
 const error = ref<unknown>(null)
 const leaving = ref(false)
 const tenantTransition = ref(false)
 const pageKey = computed(() => `${session.value?.tenant.id}:${session.value?.permission_version}:${contextGeneration.value}`)
-watch(() => route.fullPath, () => { navigationOpen.value = false; error.value = null })
+watch(() => route.fullPath, () => { error.value = null })
 async function changeTenant(value: unknown) {
   error.value = null
   tenantTransition.value = true
@@ -45,49 +44,11 @@ async function endSession() {
 <template>
   <el-config-provider :locale="zhCn">
   <router-view v-if="!session" />
-  <div v-else class="app-shell">
-    <aside class="sidebar">
-      <a class="brand" :href="router.resolve({ name: homeRoute }).href" @click.prevent="router.push({ name: homeRoute })"><span class="brand-mark">M</span><span><strong>MOP 运维托管</strong><small>网络设备管理平台</small></span></a>
-      <div v-if="resourceVisible" class="nav-heading">资源</div>
-      <el-menu v-if="resourceVisible" :default-active="String(route.name)" class="side-menu" @select="router.push({ name: $event })">
-        <el-menu-item v-if="can('dashboard:read')" index="dashboard">运营总览</el-menu-item>
-        <el-menu-item v-if="can('assets:read')" index="assets"><span class="nav-symbol">▤</span>资产管理</el-menu-item>
-        <el-menu-item v-if="can('assets:read')" index="network-monitoring"><span class="nav-symbol">◉</span>基础网络监控</el-menu-item>
-        <el-menu-item v-if="can('manual_incidents:read')" index="manual-incidents"><span class="nav-symbol">◇</span>手工来源登记</el-menu-item>
-        <el-menu-item v-if="can('sla_scenarios:read')" index="sla-scenarios">SLA 显式对照</el-menu-item>
-        <el-menu-item v-if="can('tickets:read')" index="tickets"><span class="nav-symbol">▣</span>报障与受理</el-menu-item>
-        <el-menu-item v-if="can('notification_preferences:read_own')" index="my-notification-preferences">我的通知偏好请求</el-menu-item>
-        <el-menu-item v-if="session && ['padmin','msp'].includes(session.user.role) && can('assets:read')" index="asset-export-jobs">台账导出准备</el-menu-item>
-        <el-menu-item v-if="session?.user.role === 'msp' && can('worklogs:read_own')" index="my-worklogs">我的实填工时</el-menu-item>
-      </el-menu>
-<template v-if="managementVisible">
-        <div class="nav-heading">管理</div>
-        <el-menu :default-active="String(route.name)" class="side-menu" @select="router.push({ name: $event })">
-          <el-menu-item v-if="can('users:read')" index="identity-users">用户与成员授权</el-menu-item>
-          <el-menu-item v-if="can('roles:read')" index="identity-roles">角色与权限</el-menu-item>
-          <el-menu-item v-if="can('roles:read')" index="identity-settings">身份认证设置</el-menu-item>
-          <el-menu-item v-if="can('configurations:read')" index="configurations"><span class="nav-symbol">⚙</span>配置确认登记</el-menu-item>
-          <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_templates:read')" index="inspection-templates">巡检模板候选</el-menu-item>
-          <el-menu-item v-if="session?.user.role === 'padmin' && can('backup_plan_drafts:read')" index="backup-plan-drafts">每日备份计划草稿</el-menu-item>
-          <el-menu-item v-if="session?.user.role === 'padmin' && can('change_notice_drafts:read')" index="change-notice-drafts">变更报备草稿</el-menu-item>
-          <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_source_collections:read')" index="inspection-source-collections">巡检来源集合草稿</el-menu-item>
-          <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_worksheets:read')" index="inspection-worksheets">人工巡检执行单</el-menu-item>
-          <el-menu-item v-if="can('contacts:read')" index="customer-contacts">客户联系人</el-menu-item>
-          <el-menu-item v-if="can('contacts:write')" index="contact-imports">联系人批量新建</el-menu-item>
-          <el-menu-item v-if="can('configurations:read')" index="threshold-diagnostics">阈值候选诊断</el-menu-item>
-        <el-menu-item v-if="can('operations:compare_explicit')" index="operational-comparison">经营样本与人力对照</el-menu-item>
-        <el-menu-item v-if="can('capacity:estimate')" index="capacity-estimates">容量与缓冲估算</el-menu-item>
-          <el-menu-item v-if="can('configurations:read')" index="capability-catalog">代码能力声明核对</el-menu-item>
-          <el-menu-item v-if="session?.user.role === 'padmin' && can('tenants:read_inventory')" index="tenant-inventory">租户登记资源</el-menu-item>
-          <el-menu-item v-if="can('audit:read')" index="audit"><span class="nav-symbol">≡</span>审计日志</el-menu-item>
-        </el-menu>
-      </template>
-      <div class="sidebar-foot"><span class="small-label">共享测试环境</span><p>资产、报障与账号管理</p><small>监控采集和正式环境认证方式待确认</small></div>
-    </aside>
+  <div v-else class="app-shell horizontal-shell">
     <div class="main-layout">
+      <div class="app-header">
       <header class="topbar">
-        <el-button class="mobile-menu" aria-label="打开导航" @click="navigationOpen = true">☰</el-button>
-        <el-breadcrumb separator="/"><el-breadcrumb-item>MOP</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.group }}</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.title }}</el-breadcrumb-item></el-breadcrumb>
+        <a class="brand" :href="router.resolve({ name: homeRoute }).href" @click.prevent="router.push({ name: homeRoute })"><span class="brand-mark">M</span><span><strong>MOP 运维托管</strong><small>网络设备管理平台</small></span></a>
         <div class="topbar-controls">
           <GlobalSearch v-if="can('search:read')" />
           <el-select v-if="maySwitchTenant" :model-value="session.tenant.id" :disabled="switchingTenant || tenantTransition" class="tenant-select" aria-label="切换租户" @change="changeTenant">
@@ -99,6 +60,9 @@ async function endSession() {
           <el-button text :loading="leaving" @click="endSession">退出</el-button>
         </div>
       </header>
+      <HorizontalModuleNavigation />
+      <div class="page-context"><el-breadcrumb separator="/"><el-breadcrumb-item>MOP</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.group }}</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.title }}</el-breadcrumb-item></el-breadcrumb></div>
+      </div>
       <div class="environment-strip"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '项目测试环境 · 非生产 · 厂商指标待接入' : '历史单元测试夹具 · 不用于联调验收' }}</div>
       <main class="content">
         <ApiErrorNotice :error="error" />
@@ -107,37 +71,6 @@ async function endSession() {
       </main>
       <footer class="app-footer">MOP 测试版 V0.1 <span>资产草稿 · 配置登记 · 报障登记 · 审计</span></footer>
     </div>
-    <el-drawer v-model="navigationOpen" title="MOP 导航" direction="ltr" size="260px">
-      <el-menu :default-active="String(route.name)" @select="router.push({ name: $event })">
-        <el-menu-item v-if="can('dashboard:read')" index="dashboard">运营总览</el-menu-item>
-        <el-menu-item v-if="can('assets:read')" index="assets">资产管理</el-menu-item>
-        <el-menu-item v-if="can('assets:read')" index="network-monitoring">基础网络监控</el-menu-item>
-        <el-menu-item v-if="can('users:read')" index="identity-users">用户与成员授权</el-menu-item>
-        <el-menu-item v-if="can('roles:read')" index="identity-roles">角色与权限</el-menu-item>
-        <el-menu-item v-if="can('roles:read')" index="identity-settings">身份认证设置</el-menu-item>
-        <el-menu-item v-if="['project_local','oidc'].includes(session.identity_source)" index="account">我的账号</el-menu-item>
-        <el-menu-item v-if="can('manual_incidents:read')" index="manual-incidents">手工来源登记</el-menu-item>
-        <el-menu-item v-if="can('sla_scenarios:read')" index="sla-scenarios">SLA 显式对照</el-menu-item>
-        <el-menu-item v-if="can('tickets:read')" index="tickets">报障与受理</el-menu-item>
-        <el-menu-item v-if="can('notification_preferences:read_own')" index="my-notification-preferences">我的通知偏好请求</el-menu-item>
-        <el-menu-item v-if="session && ['padmin','msp'].includes(session.user.role) && can('assets:read')" index="asset-export-jobs">台账导出准备</el-menu-item>
-        <el-menu-item v-if="session?.user.role === 'msp' && can('worklogs:read_own')" index="my-worklogs">我的实填工时</el-menu-item>
-        <el-menu-item v-if="can('configurations:read')" index="configurations">配置确认登记</el-menu-item>
-        <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_templates:read')" index="inspection-templates">巡检模板候选</el-menu-item>
-          <el-menu-item v-if="session?.user.role === 'padmin' && can('backup_plan_drafts:read')" index="backup-plan-drafts">每日备份计划草稿</el-menu-item>
-          <el-menu-item v-if="session?.user.role === 'padmin' && can('change_notice_drafts:read')" index="change-notice-drafts">变更报备草稿</el-menu-item>
-          <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_source_collections:read')" index="inspection-source-collections">巡检来源集合草稿</el-menu-item>
-          <el-menu-item v-if="session?.user.role === 'padmin' && can('inspection_worksheets:read')" index="inspection-worksheets">人工巡检执行单</el-menu-item>
-          <el-menu-item v-if="can('contacts:read')" index="customer-contacts">客户联系人</el-menu-item>
-          <el-menu-item v-if="can('contacts:write')" index="contact-imports">联系人批量新建</el-menu-item>
-          <el-menu-item v-if="can('configurations:read')" index="threshold-diagnostics">阈值候选诊断</el-menu-item>
-        <el-menu-item v-if="can('operations:compare_explicit')" index="operational-comparison">经营样本与人力对照</el-menu-item>
-        <el-menu-item v-if="can('capacity:estimate')" index="capacity-estimates">容量与缓冲估算</el-menu-item>
-          <el-menu-item v-if="can('configurations:read')" index="capability-catalog">代码能力声明核对</el-menu-item>
-          <el-menu-item v-if="session?.user.role === 'padmin' && can('tenants:read_inventory')" index="tenant-inventory">租户登记资源</el-menu-item>
-          <el-menu-item v-if="can('audit:read')" index="audit">审计日志</el-menu-item>
-      </el-menu>
-    </el-drawer>
   </div>
   </el-config-provider>
 </template>

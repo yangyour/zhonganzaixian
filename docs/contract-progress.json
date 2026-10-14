@@ -267,6 +267,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/horizontal-module-navigation-20261014.md",
         "docs/project-identity-acceptance-20261005.md"
       ],
       "external_references_unchecked": 0,
@@ -1445,6 +1446,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "edfe7d2b48434c113c421eca05e3ec8d505d44c759a968cc7f591b0c653e72c8"
+    "doc/development/07_合同逐项开发追踪.md": "1be445c372886e67e4d82386fde94f08d9c65573f4a45ce6982e41eeebb0b571"
   }
 }

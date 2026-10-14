@@ -1,0 +1,34 @@
+{
+  "browser": "155.0.4283.45",
+  "desktop_width": 1440,
+  "mobile_width": 390,
+  "mobile_document_width": 390,
+  "desktop_module_count": 6,
+  "desktop_module_top": 72,
+  "no_sidebar": true,
+  "viewer_denied_menuitem_counts": {
+    "exports": 0,
+    "identity": 0,
+    "system": 0
+  },
+  "ordinary_module_navigation": true,
+  "uncertain_command_navigation_blocked": true,
+  "grant_replay_original_key_body": true,
+  "desktop_and_mobile_download_sha_matches": true,
+  "page_errors": [],
+  "screenshots": [
+    "horizontal-menu-desktop.png",
+    "horizontal-menu-mobile-final.png",
+    "horizontal-menu-mobile-dropdown-final.png",
+    "horizontal-menu-viewer.png",
+    "desktop-download-final.png",
+    "mobile-download-final.png"
+  ],
+  "verified_at": "2026-10-14T04:42:21.218134+00:00",
+  "environment": "local_candidate_web_with_designated_real_api",
+  "frontend_tests": 1851,
+  "typecheck_passed": true,
+  "build_passed": true,
+  "physical_mobile_device": false,
+  "contract_acceptance": "NOT_RUN"
+}

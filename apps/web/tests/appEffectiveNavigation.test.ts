@@ -26,17 +26,17 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); app = undefined; host.remove(); forgetSession(); vi.restoreAllMocks() })
 function mount() {
   app = createApp(App)
-  for (const name of ['ElConfigProvider', 'ElMenu', 'ElMenuItem', 'ElDrawer', 'ElBreadcrumb', 'ElBreadcrumbItem', 'ElSelect', 'ElOption', 'ElSkeleton', 'ElAlert', 'RouterView']) {
-    app.component(name, defineComponent({ inheritAttrs: false, setup(_, { attrs, slots }) { return () => h('div', { index: attrs.index, class: attrs.class }, slots.default?.()) } }))
+  for (const name of ['ElConfigProvider', 'ElMenu', 'ElMenuItem', 'ElSubMenu', 'ElDrawer', 'ElBreadcrumb', 'ElBreadcrumbItem', 'ElSelect', 'ElOption', 'ElSkeleton', 'ElAlert', 'RouterView']) {
+    app.component(name, defineComponent({ inheritAttrs: false, setup(_, { attrs, slots }) { return () => h('div', { index: attrs.index, class: attrs.class, 'data-mode': attrs.mode }, [slots.title?.(), slots.default?.()]) } }))
   }
   app.component('ElButton', defineComponent({ inheritAttrs: false, setup(_, { attrs, slots }) { return () => h('button', { onClick: attrs.onClick as () => void, 'aria-label': attrs['aria-label'] as string }, slots.default?.()) } }))
   app.mount(host)
 }
 it.each(adminEntries)('shows the independent %s management entry without config/audit grants', async (grant, name) => {
   session.value = auth([grant], name === 'customer-contacts' || name === 'contact-imports' ? 'tadmin' : 'padmin'); mount(); await nextTick()
-  expect(host.querySelectorAll(`[index="${name}"]`)).toHaveLength(2)
+  expect(host.querySelectorAll(`[index="${name}"]`)).toHaveLength(1)
   expect(host.querySelectorAll('[index="assets"]')).toHaveLength(0)
-  expect(host.textContent).toContain('管理')
+  expect(host.querySelector('.module-navigation [data-mode="horizontal"]')).not.toBeNull()
   expect(host.querySelector('a.brand')?.getAttribute('href')).toBe('/' + name)
 })
 it('an empty capability set shows no business items and has a stable brand destination', async () => {
@@ -45,8 +45,8 @@ it('an empty capability set shows no business items and has a stable brand desti
   expect(host.querySelector('a.brand')?.getAttribute('href')).toBe('/access-unavailable')
   expect([...host.querySelectorAll('button')].some(button => button.textContent === '退出')).toBe(true)
 })
-it('removing permissions hides both copies immediately', async () => {
-  session.value = auth(['contacts:read']); mount(); await nextTick(); expect(host.querySelectorAll('[index="customer-contacts"]')).toHaveLength(2)
+it('removing permissions hides the shared responsive navigation immediately', async () => {
+  session.value = auth(['contacts:read']); mount(); await nextTick(); expect(host.querySelectorAll('[index="customer-contacts"]')).toHaveLength(1)
   session.value = auth([]); await nextTick(); expect(host.querySelectorAll('[index="customer-contacts"]')).toHaveLength(0)
 })
 it('a wrong base role cannot display a selected administrator-only entry', async () => {

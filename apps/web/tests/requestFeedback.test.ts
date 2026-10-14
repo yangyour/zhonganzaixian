@@ -4,6 +4,12 @@ import { errorPresentation } from '../src/utils/errorPresentation'
 
 afterEach(() => vi.useRealTimers())
 describe('bounded requests and reliable failure feedback', () => {
+  it('bypasses HTTP cache for both protected JSON and binary reads', async () => {
+    const transport = vi.fn().mockResolvedValueOnce(new Response(JSON.stringify({ data: {} }))).mockResolvedValueOnce(new Response('image bytes'))
+    const client = new ApiClient(transport)
+    await client.request('/session'); await client.requestBlob('/files/x/content')
+    expect(transport.mock.calls.map(call => call[1].cache)).toEqual(['no-store', 'no-store'])
+  })
   it('times out an uncooperative write without automatic retry or success', async () => {
     vi.useFakeTimers()
     const transport = vi.fn(() => new Promise<Response>(() => {})), client = new ApiClient(transport)

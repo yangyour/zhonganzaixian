@@ -16,6 +16,7 @@ import ConnectionNotice from './components/ConnectionNotice.vue'
 import { navigating, navigationError, navigationTarget, resourceLoadFailed } from './stores/navigation'
 import { feedback } from './utils/feedback'
 import PageRecoveryNotice from './components/PageRecoveryNotice.vue'
+import SessionResumeNotice from './components/SessionResumeNotice.vue'
 const route = useRoute()
 const router = useRouter()
 const homeRoute = computed(() => landingRoute(session.value, router.getRoutes()))
@@ -60,6 +61,7 @@ async function endSession() {
 </script>
 <template>
   <el-config-provider :locale="zhCn">
+  <SessionResumeNotice />
   <ConnectionNotice />
   <div class="navigation-progress" :class="{ active: navigating }" aria-hidden="true" />
   <span class="sr-only" role="status">{{ navigating ? '正在打开页面…' : '' }}</span>

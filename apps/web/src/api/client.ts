@@ -94,7 +94,7 @@ export class ApiClient {
       const body = options.body === undefined ? undefined : multipart ? options.body as FormData : JSON.stringify(options.body)
       if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
       const response = await cancellable(this.transport(this.base + path, {
-        method, headers, credentials: 'same-origin', redirect: 'error', signal: controller.signal,
+        method, headers, credentials: 'same-origin', cache: 'no-store', redirect: 'error', signal: controller.signal,
         body,
       }), controller.signal)
       if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
@@ -136,7 +136,7 @@ export class ApiClient {
     const timeout = setTimeout(() => { timedOut = true; controller.abort() }, Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 120000)
     try {
       if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
-      const response = await cancellable(this.transport(this.base + path, { headers: { Accept: 'image/jpeg, image/png' }, credentials: 'same-origin', redirect: 'error', signal: controller.signal }), controller.signal)
+      const response = await cancellable(this.transport(this.base + path, { headers: { Accept: 'image/jpeg, image/png' }, credentials: 'same-origin', cache: 'no-store', redirect: 'error', signal: controller.signal }), controller.signal)
       if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
       if (!response.ok) {
         let failure: FailureEnvelope = {}

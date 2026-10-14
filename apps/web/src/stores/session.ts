@@ -22,6 +22,11 @@ export function forgetSession(expiry?: { reason: 'expired'; path: string }) {
   const path = expiry?.path.split(/[?#]/)[0] ?? ''
   loginReturnPath.value = path.trim() === path && /^\/[a-zA-Z0-9/-]*$/.test(path) && !path.includes('//') ? path : null
 }
+/** Later anonymous 401s must not erase the original expiry explanation or safe return page. */
+export function rejectUnauthorizedSession(path: string) {
+  const expiry = session.value ? { reason: 'expired' as const, path } : sessionExpired.value ? { reason: 'expired' as const, path: loginReturnPath.value ?? '' } : undefined
+  forgetSession(expiry)
+}
 export async function initializeSession() {
   if (initialized) return
   if (!initialization) initialization = api.request<Session>('/session').then(installSession).catch(error => {
@@ -41,6 +46,13 @@ export async function refreshProjectSession() {
     installSession(value)
   }).finally(() => { refreshing = null })
   await refreshing
+}
+/** Finish any pre-freeze read, then issue a new no-store read after restoration. */
+export async function revalidateSessionAfterRestore() {
+  if (refreshing) { try { await refreshing } catch { /* A new read still decides availability. */ } }
+  if (!session.value) return
+  if (switchingTenant.value || !['project_local', 'oidc'].includes(session.value.identity_source)) throw new ApiError(0, 'SESSION_RECHECK_PENDING', '当前会话切换或来源尚未确认，请稍后重新核对', '—')
+  await refreshProjectSession()
 }
 export interface TenantViewTransition { fromTenantId: string | null; toTenantId: string; originalReceiptConfirmed: boolean }
 export class TenantViewSynchronizationError extends ApiError {

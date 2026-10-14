@@ -51,7 +51,7 @@ defineExpose({form,state,acknowledge,locked,autoRefresh,pollPreparation,filters,
 </script>
 <template>
  <section class="export-page"><div class="page-heading"><div><p class="eyebrow">台账 / 内部本人作业</p><h1>台账导出准备</h1><p>明确筛选 → 耐久受理 → 独立查看进度</p></div></div>
- <el-alert type="info" :closable="false" show-icon title="新请求由后台自动准备文件；发布和下载仍需分别确认。站内信通知尚未接通" />
+ <el-alert type="info" :closable="false" show-icon title="新请求由后台自动准备文件；发布和下载仍需分别确认，发布后可查看我的导出消息" />
  <p v-if="!permitted" class="panel">当前身份没有内部导出准备权限，或租户正在切换；未展示旧数据</p>
  <template v-else>
   <form v-form-feedback class="panel export-form" @submit.prevent="submit"><h2>1. 核对本次筛选</h2><p>只选择当前租户台账；全部“不限”会选择全部匹配记录。1000行、16MiB文件是技术保护，超限拒绝，不静默截断</p>

@@ -1,5 +1,9 @@
 # 指定测试环境组件清单
 
+## 2026-10-14 导出消息复用与V31
+
+复用当前PG17.9和MinIO，不新建基础组件或账号。V31增加本项目本人导出消息表及受限ACL，API开关默认关闭；候选显式启用后ready包含真实结构保护。原68表65表摘要保持，另3表存在并发写入，不声称全表等值。真实MinIO/56HTTP和仅自有候选API重启已验证；共享13服务未因候选验证重启。缺失的自动发布、外部渠道和正式性能仍分别登记，见[消息说明](../export-inbox.md)及[迁移](../evidence/export-inbox-migration-20261014.json)。
+
 2026-10-14 上线优化第三轮最终只读复核包含导出队列：13服务运行、V31、ready=true、production_ready=false。候选安全头/静态gzip配置在既有Nginx1.31.6语法验证通过，临时文件移除，未reload或迁移。当前站主JS在gzip请求下仍无Content-Encoding；候选尚未生效。前期本轮V30/12项检查与后期V31/13项分别留证，环境升级属于其他并行任务。见[总证据](../evidence/launch-optimization-validation-20261014.json)。
 
 ## 2026-10-14 导出自动准备应用

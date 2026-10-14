@@ -228,7 +228,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.47.0');
+  assert.equal(contract.info.version, '0.48.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -881,3 +881,8 @@ test('API控制器源码不得从业务类别重新扩张有效权限集合',()=
     assert.equal(source.includes('Capabilities.forRole('),false,file);
   }
 });
+
+const inboxMessageSample=()=>({job_id:id('1'),tenant_id:id('2'),recipient_id:id('3'),permission_version:1,published_version:4,file_sha256:'a'.repeat(64),size_bytes:100,row_count:1,issued_at:'2026-10-14T06:00:00Z',expires_at:'2026-10-14T06:15:00Z',version:0,read_at:null,content_url:`/api/v1/asset-export-jobs/${id('1')}/content?grant=1791958500000.${'a'.repeat(43)}`,link_status:'AVAILABLE',source:'postgresql'});
+test('导出消息区分未读、已读与链接到期，不把过期消息删除',()=>{const message=inboxMessageSample();assert.ok(validates('ExportInboxMessage',message));assert.equal(validates('ExportInboxMessage',{...message,version:1}),false);assert.ok(validates('ExportInboxMessage',{...message,version:1,read_at:message.issued_at}));assert.equal(validates('ExportInboxMessage',{...message,link_status:'EXPIRED'}),false);assert.ok(validates('ExportInboxMessage',{...message,link_status:'EXPIRED',content_url:null}));});
+test('站内消息只读列表与显式已读接口保持当前授权和CSRF幂等',()=>{const read=contract.paths['/my-export-messages/{id}/read'].post;assert.equal(read['x-mop-current-membership-before-replay'],true);assert.ok(read.parameters.some(p=>p.name==='X-CSRF-Token'));assert.deepEqual(Object.keys(contract.paths['/my-export-messages']),['get']);assert.deepEqual(contract.paths['/my-export-messages'].get['x-mop-capabilities'],['assets:read']);assert.ok(validates('ExportInboxReadInput',{expected_version:0}));assert.equal(validates('ExportInboxReadInput',{expected_version:0,read_at:null}),false);assert.equal(validates('ExportInboxReadInput',{expected_version:2}),false);});
+test('消息游标末页必须明确结束且签名链接只能指向本站下载接口',()=>{const result={data:{items:[inboxMessageSample()],has_more:false,next_before_issued_at:null,next_before_id:null,unread_count:1,observed_at:'2026-10-14T06:00:01Z'},trace_id:'synthetic'};assert.ok(validates('ExportInboxPageResult',result));assert.equal(validates('ExportInboxPageResult',{...result,data:{...result.data,next_before_id:id('1')}}),false);assert.equal(validates('ExportInboxMessage',{...inboxMessageSample(),content_url:'https://example.invalid/download'}),false);});

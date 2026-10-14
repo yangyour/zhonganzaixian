@@ -17,6 +17,7 @@ import static cn.mop.api.ApiResponse.*;
 @RestController @RequestMapping("/api/v1/asset-export-jobs") @Profile("remote_test")
 public final class AssetExportPublicationController {
     private final PlatformRepository platform;private final AssetExportPublicationRepository publications;private final AssetExportPublicationSupport support;
+    @org.springframework.beans.factory.annotation.Autowired(required=false) ExportInboxSupport inbox=ExportInboxSupport.disabled();
     public AssetExportPublicationController(PlatformRepository platform,@org.springframework.beans.factory.annotation.Qualifier("assetExportPublicationRepository") AssetExportPublicationRepository publications,AssetExportPublicationSupport support){this.platform=platform;this.publications=publications;this.support=support;}
     @GetMapping("/{id}/publication") Object get(@PathVariable String id,HttpServletRequest r){Access a=access(r);noQuery(r);return success(dto(checked(publications.publication(a,uuid(id)),a,id)),r);}
     @PostMapping(value="/{id}/publication",consumes=MediaType.APPLICATION_JSON_VALUE)
@@ -25,11 +26,11 @@ public final class AssetExportPublicationController {
         fields(body,Set.of("expected_version","file_sha256","action"));
         if(!body.path("expected_version").isIntegralNumber()||!body.path("expected_version").canConvertToLong()||body.path("expected_version").longValue()<1||body.path("expected_version").longValue()>9007199254740989L
             ||!body.path("file_sha256").isTextual()||!body.path("file_sha256").textValue().matches("[0-9a-f]{64}")||!"PUBLISH_PREPARED_FILE".equals(body.path("action").asText()))throw invalid();
-        long version=body.path("expected_version").longValue();String sha=body.path("file_sha256").textValue();support.requireConfigured();
+        long version=body.path("expected_version").longValue();String sha=body.path("file_sha256").textValue();support.requireConfigured();inbox.beforePublication();
         Object result=platform.idempotentAuthorized(a.actorId(),a.tenantId(),r.getMethod()+" "+route(r),key(r),hash(version+"\n"+sha+"\nPUBLISH_PREPARED_FILE"),a.permissionVersion(),
             ()->publications.authorizePublication(a,canonical),()->{
                 Publication p=publications.publish(a,canonical,version,sha,(object,file)->support.store().storeImmutable(object,file.bytes(),file.encoding().fileSha256()));
-                checked(p,a,canonical);if(!p.published())throw unavailable();return dto(p);
+                checked(p,a,canonical);if(!p.published())throw unavailable();inbox.record(a,p);return dto(p);
             });return success(result,r);
     }
     @PostMapping(value="/{id}/content-grants",consumes=MediaType.APPLICATION_JSON_VALUE)

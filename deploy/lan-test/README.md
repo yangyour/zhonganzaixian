@@ -1,5 +1,7 @@
 # LAN测试部署模板
 
+API0.48新增[本人导出消息](../../docs/export-inbox.md)：先使用独立CLI显式`--apply-export-inbox`并复核V31，随后仅在API私有env开启`MOP_EXPORT_INBOX_ENABLED=true`；准备Worker不需要此开关或签名密钥。V1—V31冻结，不在应用启动时迁移，旧发布不补发。
+
 2026-10-14自动准备应用已部署，当前含可选覆盖服务共13个常驻容器；只读检查须加`--include-export-queue`。保留原固定UTC启用时间，沿用API0.47/V30；发布详情与回退见[本次记录](../../docs/asset-export-automatic-preparation.md)。
 
 2026-10-14当前测试站已部署API0.47及顶部横排模块导航。台账准备可显式启用[常驻自动队列](../../docs/asset-export-automatic-preparation.md)，原单作业Worker继续保留；文件发布/900秒签名下载另行由已授权创建人在页面确认，见[导出发布配置与限制](../../docs/asset-export-publication.md)。启用时将独立导出桶/账号、`MOP_EXPORT_PUBLICATION_ENABLED`、`MOP_EXPORT_DOWNLOAD_SIGNING_KEY`仅写入API私有env；不把签名密钥给准备Worker，不自动发布历史作业，不重启存储/数据库等无关服务。
@@ -53,3 +55,5 @@ python tools/inspect-lan-test-server.py
 
 
 上线优化第三轮补充：静态片段还包含CSP/安全头与仅静态HTML/JS/CSS的gzip设置；合并时替换现有同名头、gzip和location配置，避免重复。保留照片blob预览及self相机权限，Element Plus仅样式保留inline兼容。当前测试站仍未应用这些候选，本轮只做nginx -t和本地真实API浏览器验证。发布后必须核对实际CSP、Content-Encoding、Vary及Secure Cookie/TLS，不仅检查文件存在。标准矩阵和证据见[上线优化第三轮](../../docs/launch-optimization-20261014.md)。
+
+本次Web配置支持独立`WEB_CONFIG_FILE`，缺省仍为原`RELEASE_DIR/nginx.conf`。安全头/缓存/静态gzip候选应合入新不可变完整配置，保留API反代及同源头；先`nginx -t`后仅重建api/web。不要为切换Nginx而改动基础RELEASE_DIR或其他Worker引用。

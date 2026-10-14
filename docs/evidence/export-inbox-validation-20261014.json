@@ -1,0 +1,1012 @@
+{
+  "environment": "lan-test-20261008",
+  "api_version": "0.48.0",
+  "schema_version": 31,
+  "candidate_api_sha256": "cb71d1f9f789c80ca72bb87e88ebdf7de1813a1706696e693eee6463b2f23c31",
+  "http_checks": [
+    {
+      "label": "csrf",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "login_padmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "candidate_ready",
+      "method": "GET",
+      "path": "/health/ready",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "anonymous_inbox",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 401,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "csrf",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "login_viewerA",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "viewer_denied",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 403,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "accept_0",
+      "method": "POST",
+      "path": "/asset-export-jobs",
+      "status": 202,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "accept_1",
+      "method": "POST",
+      "path": "/asset-export-jobs",
+      "status": 202,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "accept_2",
+      "method": "POST",
+      "path": "/asset-export-jobs",
+      "status": 202,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "preparation_progress",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "preparation_progress",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "preparation_progress",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "preparation_progress",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "preparation_progress",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "preparation_progress",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "preparation_progress",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "publish_csrf_required",
+      "method": "POST",
+      "path": "/asset-export-jobs/{id}/publication",
+      "status": 403,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "wrong_digest_no_message",
+      "method": "POST",
+      "path": "/asset-export-jobs/{id}/publication",
+      "status": 409,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "publish_0",
+      "method": "POST",
+      "path": "/asset-export-jobs/{id}/publication",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_actual_download",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}/content",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "publish_1",
+      "method": "POST",
+      "path": "/asset-export-jobs/{id}/publication",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_actual_download",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}/content",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "publish_2",
+      "method": "POST",
+      "path": "/asset-export-jobs/{id}/publication",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_actual_download",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}/content",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "publication_original_receipt",
+      "method": "POST",
+      "path": "/asset-export-jobs/{id}/publication",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "csrf",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "login_msp",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "other_recipient_404",
+      "method": "POST",
+      "path": "/my-export-messages/{id}/read",
+      "status": 404,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "csrf",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "login_padmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "switch_other_tenant",
+      "method": "POST",
+      "path": "/session/tenant",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "cross_tenant_404",
+      "method": "POST",
+      "path": "/my-export-messages/{id}/read",
+      "status": 404,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "read_csrf_required",
+      "method": "POST",
+      "path": "/my-export-messages/{id}/read",
+      "status": 403,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "concurrent_same_key_read",
+      "method": "POST",
+      "path": "/my-export-messages/{id}/read",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "concurrent_same_key_read",
+      "method": "POST",
+      "path": "/my-export-messages/{id}/read",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "stale_read_version",
+      "method": "POST",
+      "path": "/my-export-messages/{id}/read",
+      "status": 409,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "csrf",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "login_padmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "inbox_read",
+      "method": "GET",
+      "path": "/my-export-messages",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "original_read_receipt_after_restart",
+      "method": "POST",
+      "path": "/my-export-messages/{id}/read",
+      "status": 200,
+      "cache_control": "no-store"
+    },
+    {
+      "label": "same_original_link_after_restart",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}/content",
+      "status": 200,
+      "cache_control": "no-store"
+    }
+  ],
+  "http_check_count": 56,
+  "workbooks": {
+    "rows": [
+      1,
+      0,
+      1
+    ],
+    "columns": 16,
+    "actual_minio_downloads_verified": true
+  },
+  "concurrent_same_key_read_audit_count": 1,
+  "candidate_restart_retained_message_read_and_original_link": true,
+  "browser": {
+    "errors": [],
+    "requests": [
+      {
+        "method": "GET",
+        "path": "/api/v1/my-export-messages"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/my-export-messages"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/my-export-messages/bc317094-ff6f-42be-98c3-9de3b5672baf/read"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/my-export-messages"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/my-export-messages/3cc7882a-f2aa-49b0-81c1-89b419e1bace/read"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/my-export-messages/3cc7882a-f2aa-49b0-81c1-89b419e1bace/read"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/my-export-messages"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/my-export-messages"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/my-export-messages"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/my-export-messages"
+      }
+    ],
+    "desktop_overflow": false,
+    "initial_messages": 3,
+    "initial_read_only": true,
+    "unread_filter_count": 2,
+    "explicit_mark_and_filter": true,
+    "committed_response_loss_recovered": true,
+    "original_key_and_body_retained": true,
+    "navigation_blocked_while_unknown": true,
+    "failed_read_not_empty": true,
+    "mobile_overflow": false,
+    "download_sha256": "8df8ae7a9d84b9a006e24cda38da4557d4d7e1cf7ef0f5caa8ba3ba20e8ef804",
+    "mobile_actual_download": true,
+    "download_bytes": 4961
+  },
+  "java": [
+    {
+      "class": "PostgresExportInboxIntegrationTest",
+      "tests": 9,
+      "real_postgresql": true,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "class": "TestSchemaMigrationTest",
+      "tests": 39,
+      "real_postgresql": false,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "class": "AssetExportDownloadGrantTest",
+      "tests": 6,
+      "real_postgresql": false,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "class": "AssetExportPublicationControllerTest",
+      "tests": 16,
+      "real_postgresql": false,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "class": "ExportInboxControllerTest",
+      "tests": 9,
+      "real_postgresql": false,
+      "failures": 0,
+      "skipped": 0
+    }
+  ],
+  "java_total": 79,
+  "pre_security_merge_web_tests": 1917,
+  "final_security_merge_web_tests": 1919,
+  "contract_tests": 133,
+  "formal_contract_acceptance": "NOT_RUN",
+  "external_delivery": false,
+  "production_ready": false,
+  "credentials_output": false,
+  "final_security_merge_base": "15e7931",
+  "release_and_policy_tests": 16,
+  "typecheck_and_build": true,
+  "isolated_dependencies": "npm ci using committed root/web locks in a separate source snapshot",
+  "web_manifest": {
+    "schema": 1,
+    "scope": "static-artifacts-only",
+    "build_id": "152c843bbc981d04c1ebc4801bee500d5ca4cb02ce9dde64f306532657848fd0",
+    "bootstrap_gzip_bytes": 170561,
+    "bootstrap_budget_bytes": 262144,
+    "bootstrap_css_gzip_bytes": 54693,
+    "bootstrap_css_budget_bytes": 98304,
+    "file_count": 86,
+    "files": [
+      {
+        "path": ".vite/manifest.json",
+        "bytes": 19813,
+        "sha256": "5456839b90958cdff6e2e0ac6d78832e873ce4d8a5881d4e76859de27260803b"
+      },
+      {
+        "path": "assets/AccessUnavailablePage-Dh-hpLSj.css",
+        "bytes": 242,
+        "sha256": "d862442d0b931946e1f9345f8be489aab30a3c77deba9d1dc87f2c693236881d"
+      },
+      {
+        "path": "assets/AccessUnavailablePage-Du9doM0p.js",
+        "bytes": 911,
+        "sha256": "4a26968ce2829ffa46e59640b78181504753001207916392175bf69ef40d9674"
+      },
+      {
+        "path": "assets/AccountPage-CzijC-3W.js",
+        "bytes": 4611,
+        "sha256": "d67d81f8f708f20b2cd53514b8b8be7c49629749486fb470eac2deb1decef650"
+      },
+      {
+        "path": "assets/AppTable-BnwHUERz.css",
+        "bytes": 164,
+        "sha256": "9b9515b58c5d79dab1e38a9caf6c0f62652c5f00d002211422280c9b91e09312"
+      },
+      {
+        "path": "assets/AppTable-DXD-AyVM.js",
+        "bytes": 78932,
+        "sha256": "30cb531c2c8a884d018d099b755356c676e470789756503470c94e986fefdc1b"
+      },
+      {
+        "path": "assets/assetExportJobs-CIaWW8Zs.js",
+        "bytes": 4814,
+        "sha256": "932127872d1bf4a32775144fb2df9d30523e7c18b07d624769243735d77fc4e2"
+      },
+      {
+        "path": "assets/AssetExportJobsPage-DGdswnal.js",
+        "bytes": 25342,
+        "sha256": "0d77f8d9f9dd6cff773a08d65fc00ee345d778a098e97dd351c2d64d762f56a3"
+      },
+      {
+        "path": "assets/AssetExportJobsPage-dnuoigNi.css",
+        "bytes": 3087,
+        "sha256": "dcfdd9319686e14a179ea5031edc365a064fbac1dcbb40aaf71a0e9abc374b68"
+      },
+      {
+        "path": "assets/AssetsPage-CjfaXpQy.js",
+        "bytes": 164775,
+        "sha256": "d683c68f10dfaf82819d4bc5bbb6fe8f1a053cbd2ac51215305e3c15ad979272"
+      },
+      {
+        "path": "assets/AssetsPage-DpeoacFk.css",
+        "bytes": 12392,
+        "sha256": "7d7195ff5dc4a8980e85d8aa8214432bcfcefb33634db29325afcb685c068d4c"
+      },
+      {
+        "path": "assets/AuditPage-rExspNJS.js",
+        "bytes": 18888,
+        "sha256": "a62498d1a590856dccf91aba2e12a34b254d05b3fa3e2cdb10e36df173369368"
+      },
+      {
+        "path": "assets/AuditPage-z78QRbd5.css",
+        "bytes": 1019,
+        "sha256": "ad07b7a6dde80dd6585eb085f2375bb56fb42e80a3c6492f79d02d78b1c5aeca"
+      },
+      {
+        "path": "assets/BackupPlanDraftsPage-D5t8oK9x.css",
+        "bytes": 5902,
+        "sha256": "176d5a4b97f1be733dd5bc699aecfcfc560f5247b85826194d27e3197f4c32e4"
+      },
+      {
+        "path": "assets/BackupPlanDraftsPage-yUqnxVCZ.js",
+        "bytes": 35382,
+        "sha256": "f92647cc0a72ead99039027c94c96ba7ca270d2c98d66bef66dc565671373f9b"
+      },
+      {
+        "path": "assets/CapabilityCatalogPage-8LPDRQAE.css",
+        "bytes": 2285,
+        "sha256": "bd60de14983ba55993e361cedb9533850d0c73a934e735d064185a6811c9ed63"
+      },
+      {
+        "path": "assets/CapabilityCatalogPage-oXW2js7s.js",
+        "bytes": 9139,
+        "sha256": "910ff7b737cc80b1afc26ccac34ccc6b9893181bd11f57daad22aac0fce6dd2c"
+      },
+      {
+        "path": "assets/CapacityEstimatePage-C9JJeMPz.css",
+        "bytes": 4087,
+        "sha256": "9b2bb5c666b0ab8f848df997ca9efa2902eded6f2c7274f0bac1306f08249c76"
+      },
+      {
+        "path": "assets/CapacityEstimatePage-nQj-FSV8.js",
+        "bytes": 36909,
+        "sha256": "f3853d677c8ee54a776ae6f2ba334210ac18d992b9e12111b193f7c2b9872afb"
+      },
+      {
+        "path": "assets/capacityEstimateWorkspace-CSBvVD2A.js",
+        "bytes": 5878,
+        "sha256": "ebb8399f04a1aef3d8d3058a06a6234e3f5156bf2f7229c3742ecc96f93355a7"
+      },
+      {
+        "path": "assets/ChangeNoticeDraftsPage-D9ihde9c.js",
+        "bytes": 37629,
+        "sha256": "67cafd3479ea8c7ad04529be40e1df05295d2fb2f1259f5a133961528db2473a"
+      },
+      {
+        "path": "assets/ChangeNoticeDraftsPage-KwitBnZO.css",
+        "bytes": 6043,
+        "sha256": "37ae49889e57d5b1b393fb2bb344adc6491c264cd2573360c454d14d2c2c913f"
+      },
+      {
+        "path": "assets/ConfigurationsPage-BC-Mi2iz.js",
+        "bytes": 111483,
+        "sha256": "b59486995a6c3b3ce43f295723f358b0457f5056cc6b05db1ae270727b8b05b3"
+      },
+      {
+        "path": "assets/ConfigurationsPage-BvbVVD3t.css",
+        "bytes": 7153,
+        "sha256": "78fad8d426ac344cc5cd98397847f2ba2a863fb3b9697950c276b66ae5b8e871"
+      },
+      {
+        "path": "assets/ContactImportPreviewPage-CQFOlY4s.css",
+        "bytes": 1101,
+        "sha256": "1e4efcf92e0f095875d85bab4b59efb171bf9d4c900ae5266fc16e747715c956"
+      },
+      {
+        "path": "assets/ContactImportPreviewPage-D1uyjEcp.js",
+        "bytes": 6481,
+        "sha256": "0a2fecad06966cf5854dec3eea1b71184fba8d8895c4c0dcebeddca1cb76153a"
+      },
+      {
+        "path": "assets/contactImportPreviewWorkspace-ccDovP8e.js",
+        "bytes": 4309,
+        "sha256": "ae288bd3df61beb8939b493bdc44c87ad4b833fe78e98888083f5344bd5744c9"
+      },
+      {
+        "path": "assets/ContactImportsPage-BOHAtMcu.css",
+        "bytes": 1141,
+        "sha256": "d1972d02392eb8830244755d8f5c965dab911952c60527a4e3ecda7762171dc3"
+      },
+      {
+        "path": "assets/ContactImportsPage-CIipp01M.js",
+        "bytes": 21859,
+        "sha256": "2b4ebf3b97d49e409898f1fa61874c9b773149ce8614a3524cb7865379d61ad9"
+      },
+      {
+        "path": "assets/CustomerContactFacts-CdaEYvUj.js",
+        "bytes": 1537,
+        "sha256": "c9516e77f8703218f06c654fb362fecc448809265f12436249c863b916564050"
+      },
+      {
+        "path": "assets/CustomerContactFacts-CGRL1lkX.css",
+        "bytes": 435,
+        "sha256": "71ea600aeb33d316cac3b84cfeb0cafb3f1bf30e5290e9b2533f7d324ddb0f94"
+      },
+      {
+        "path": "assets/CustomerContactsPage-B-zn11Ii.js",
+        "bytes": 19626,
+        "sha256": "69d81bf515ec8fd087b01cc22eb7bfaa89fd5a7600a695b2f211d9c76082349e"
+      },
+      {
+        "path": "assets/CustomerContactsPage-DioSaStH.css",
+        "bytes": 2000,
+        "sha256": "a6f91544c33b7c38be510072d6a5f00a58ea1c68846f9c40cdc51825fa34ec75"
+      },
+      {
+        "path": "assets/customerContactWorkspace-BJ76Df3F.js",
+        "bytes": 10166,
+        "sha256": "027994eb8b306bd290cd66eba94faca30501b9bc89fd1742728178612b32df8f"
+      },
+      {
+        "path": "assets/DashboardPage-BHkLXS8K.css",
+        "bytes": 3728,
+        "sha256": "3229ae27aa4dcb8705614062a44daf44901571e00f3c6c0f1ed36be65af12ed8"
+      },
+      {
+        "path": "assets/DashboardPage-olyBSmlB.js",
+        "bytes": 12087,
+        "sha256": "36374e3cfb0686bd69d105dd533d7b59e7c54128a685158988298fd602f01b61"
+      },
+      {
+        "path": "assets/ExportInboxPage-CeZ8cLKU.css",
+        "bytes": 1636,
+        "sha256": "03bc301f93cafdad81c1c2cdc393b81f9360ac362ee3f97efd48830ee5c34b66"
+      },
+      {
+        "path": "assets/ExportInboxPage-uXvZ74_-.js",
+        "bytes": 10013,
+        "sha256": "61e3481ee4bd6f6df458e3f22022c12e394492f9e2e3b715aecb6778f722d8fb"
+      },
+      {
+        "path": "assets/IdentityCommandNotice.vue_vue_type_script_setup_true_lang-BI2C4wra.js",
+        "bytes": 7370,
+        "sha256": "bbf4ef777a6a12e185efe1c4c3377c5deb7a2d8f4801d0d74bdc917ebe5341c8"
+      },
+      {
+        "path": "assets/IdentityRolesPage-uJNvhdLG.js",
+        "bytes": 6566,
+        "sha256": "544d9846cc12c7ecaaee257b3bb98d00fa0c9616711d85ae7ac273d1c637a57f"
+      },
+      {
+        "path": "assets/IdentitySettingsPage-_R_h8DcT.js",
+        "bytes": 4915,
+        "sha256": "8f2620571e264b77bedab55559c30844293912c1d3e20161fd669c326271ec6f"
+      },
+      {
+        "path": "assets/IdentityUsersPage-Dle7yXRb.js",
+        "bytes": 16691,
+        "sha256": "8f9c5d9f307361835f35b27ea197801e9c7ad7d18107ac175d1dbbf5069afdaa"
+      },
+      {
+        "path": "assets/index-B2seAgcS.js",
+        "bytes": 11365,
+        "sha256": "6d1fcda298d4ba6200d7a143368dea7b03451900086e2f5a995728971d17d519"
+      },
+      {
+        "path": "assets/index-DEm5Y3E5.js",
+        "bytes": 2857,
+        "sha256": "507edc9e9b6c483276671e379a5ee13139dcc42e4913bd39af4e433605b433c9"
+      },
+      {
+        "path": "assets/InspectionSourceCollectionsPage-BqD5_UUx.js",
+        "bytes": 31730,
+        "sha256": "c0b1fdec115c88c7ef0c69dcd69195c3827f1c937b673fb1957a99218d4673d1"
+      },
+      {
+        "path": "assets/InspectionSourceCollectionsPage-C6OeaCsF.css",
+        "bytes": 4910,
+        "sha256": "bb5040daabc24d75e26f3c96aa4c60c8177ca4c60513e3d5afbd7902852d9d08"
+      },
+      {
+        "path": "assets/inspectionTemplates-DO1E3eYX.js",
+        "bytes": 6343,
+        "sha256": "666d8f99c656a04680cf373052543dea56a8089905d923dee164538157b8c48e"
+      },
+      {
+        "path": "assets/InspectionTemplatesPage-CPws9j4U.js",
+        "bytes": 24296,
+        "sha256": "f6210e6ab2167eac79797cc5d8114c090bcbb966d87cbc47a81de1cda0858728"
+      },
+      {
+        "path": "assets/InspectionTemplatesPage-D-pY8XsZ.css",
+        "bytes": 4959,
+        "sha256": "cce102e5a98ddb3922795924ee31b7e0c4f9198758bfc8f3e204feddd481736e"
+      },
+      {
+        "path": "assets/InspectionWorksheetFacts-C0kg85cJ.js",
+        "bytes": 6087,
+        "sha256": "5ed4e8012dc1111c99b01f19bfe254a2319d220bc5825c60cae5c6ad85814005"
+      },
+      {
+        "path": "assets/InspectionWorksheetFacts-iN6TFiEM.css",
+        "bytes": 1035,
+        "sha256": "15c1a8e2dcd1884ff32363079028653d9039eac87266570003125ae6deb61181"
+      },
+      {
+        "path": "assets/inspectionWorksheetForm-DnmyNmnk.js",
+        "bytes": 1400,
+        "sha256": "276f77e40bf39a113a8d827442c0ec8b808c019c8edcb0d826ce1f8dbeb1e2b0"
+      },
+      {
+        "path": "assets/inspectionWorksheets-DJqCGfcr.js",
+        "bytes": 9511,
+        "sha256": "fcf081b81f6f7ed9817c7f1eba94425de62bd8fdd73f9e8724bd58b1c6442a76"
+      },
+      {
+        "path": "assets/InspectionWorksheetsPage-B38Ptxbx.css",
+        "bytes": 4701,
+        "sha256": "5f1b1f7e3aeba59851c414722c51a178b3e7e0fa53a8e5173917116349e4a54e"
+      },
+      {
+        "path": "assets/InspectionWorksheetsPage-VIYP6cQD.js",
+        "bytes": 31869,
+        "sha256": "5afdc6d8f2c87b3e23f28f2352ebcd4df688bd5977e681896e3d4d1e0d06e289"
+      },
+      {
+        "path": "assets/internalNoteWorkspace-lkQ-XEli.js",
+        "bytes": 5359,
+        "sha256": "225901d38ad748986729cfb128277c6b2f61acab2c22f6c28a69b96a54020c36"
+      },
+      {
+        "path": "assets/login-datacenter-B_6deBca.png",
+        "bytes": 1913591,
+        "sha256": "d54f65cd93a1cdff11ac49e54e5ed84a1cb38b7752abcfb98ae7e47db0d03780"
+      },
+      {
+        "path": "assets/LoginPage-BOcPexBU.css",
+        "bytes": 5521,
+        "sha256": "09ef8e558902f89f49192d23349baff2fa85266f577572b01534d0100cdcd400"
+      },
+      {
+        "path": "assets/LoginPage-DkKqc2kz.js",
+        "bytes": 9651,
+        "sha256": "9f4a3e4a6ea9b3ca82c77f249bde833ca6275aea5987dfe4946890784eadf475"
+      },
+      {
+        "path": "assets/main-CoshxnzF.css",
+        "bytes": 388064,
+        "sha256": "7208f76e8dd39851d495b78a7c0bcf84a4033190c4ec0c53748a90ec2a06452e"
+      },
+      {
+        "path": "assets/main-QXlx15wf.js",
+        "bytes": 473912,
+        "sha256": "ca6221cc02c142cb94c166bc17f483be6ae9bb4133a6f5dfd4995b144f837817"
+      },
+      {
+        "path": "assets/ManualIncidentsPage-BNSQoZ-f.css",
+        "bytes": 3966,
+        "sha256": "be6d616c68121c4caaf60f7b388ab656e95f5b104104ef0429219af232b5dc21"
+      },
+      {
+        "path": "assets/ManualIncidentsPage-DItI9koN.js",
+        "bytes": 38072,
+        "sha256": "413fb61a7c7bd495972e3900e6a9a359a1e7eba17d7fa22a5e3a3c6d3bcfca37"
+      },
+      {
+        "path": "assets/NetworkMonitoringPage-DT7Cd2Eq.js",
+        "bytes": 10608,
+        "sha256": "33191b20e84462d8c4bf587a25c02b2d6a67ee8070c1f07f738a085fe1d2b949"
+      },
+      {
+        "path": "assets/NetworkMonitoringPage-HtOJyJxE.css",
+        "bytes": 3907,
+        "sha256": "6e0d41cb93122ea88f160f06f9b8cb60f45f75a2eb7a84b6079b583502b1370c"
+      },
+      {
+        "path": "assets/NotFoundPage-8hVIMDZH.js",
+        "bytes": 760,
+        "sha256": "9fa4f885abec3b3574f033c18d04656d4ebd8c3f7386e99adae0dc79b214b8e7"
+      },
+      {
+        "path": "assets/OperationalComparisonPage-c4Q8x5ko.js",
+        "bytes": 11376,
+        "sha256": "c9f2bba0b710a8b980a78d7a8ecec0c8ca54675de3536173883f696df1a0ecbf"
+      },
+      {
+        "path": "assets/OperationalComparisonPage-DwEeuGZQ.css",
+        "bytes": 1041,
+        "sha256": "a10a4306a0b81e4a05d6f867b9730bad65ade47fa61d9ac59b0e0e971b706bf3"
+      },
+      {
+        "path": "assets/OwnNotificationPreferencesPage-C3JHwLA2.css",
+        "bytes": 2930,
+        "sha256": "b31512648ba3bc88ccfbc19b94da3e937e6e3c102001698668e0db482ec93028"
+      },
+      {
+        "path": "assets/OwnNotificationPreferencesPage-DeOVCtQs.js",
+        "bytes": 26068,
+        "sha256": "1580a91099b60ee1cdb5e80136107c92077fc5a454551e45a361e624a1899476"
+      },
+      {
+        "path": "assets/OwnWorklogsPage-D5THgs4x.js",
+        "bytes": 16788,
+        "sha256": "4cd5a43cbb6e44d691b1c451cef327cf8df78e5d3a90909df6d47effff86cf2d"
+      },
+      {
+        "path": "assets/OwnWorklogsPage-DLYMRHa0.css",
+        "bytes": 2914,
+        "sha256": "6ba8a95b54d8fcffacda0ebaef579000b3c73c15e896b234ca04286e64dd74ef"
+      },
+      {
+        "path": "assets/PermissionGate.vue_vue_type_script_setup_true_lang-DyU_iKup.js",
+        "bytes": 282,
+        "sha256": "58763e260db43c5891a346cb608add4e6151b7ed3075e258b5985743d358314f"
+      },
+      {
+        "path": "assets/SlaScenariosPage-CM9YRdaL.js",
+        "bytes": 14707,
+        "sha256": "fbd23032e84a426ac2ecc8575a822d3a6ad1604b5631fbb55de02bd2d4fcefd6"
+      },
+      {
+        "path": "assets/SlaScenariosPage-CmgDzOSH.css",
+        "bytes": 1544,
+        "sha256": "390562ece9615d00fdfcb20ca64ddf4b36a9c773afe75c458466898e76731d7f"
+      },
+      {
+        "path": "assets/TenantInventoryPage-BZKa03Gd.css",
+        "bytes": 1919,
+        "sha256": "1a54e9e43118fa3f2926d64da957e3dacbc6a4b334e1c62adfcb8c0d83b48e4f"
+      },
+      {
+        "path": "assets/TenantInventoryPage-DwFPwzCI.js",
+        "bytes": 8651,
+        "sha256": "ee265cf1a303dc10e5ee73851559911bba4f0ae9db28bd37447c10fd428a2955"
+      },
+      {
+        "path": "assets/ThresholdDiagnosticsPage-BbNSQvvd.js",
+        "bytes": 15827,
+        "sha256": "acfb2e7a723dcc3077c4ecfb4e6a45aca48dfc6622628badfef76dd0956b0e6a"
+      },
+      {
+        "path": "assets/ThresholdDiagnosticsPage-DODC_92A.css",
+        "bytes": 1302,
+        "sha256": "34499d3c43632ca8bebbe923ad13f2d2c89d327607a5ed8f06cdadc942b8cb99"
+      },
+      {
+        "path": "assets/ticket-CgrlBYqG.js",
+        "bytes": 9681,
+        "sha256": "013f2c82c84ba386f8202e95e065be37ac934ad0799f8c6d00b3cd03256504ab"
+      },
+      {
+        "path": "assets/TicketsPage-CddWR5MU.css",
+        "bytes": 7104,
+        "sha256": "ac582a9898c31e73cd66f30302f6361c395c8fb98629fd90c206692a98d5890c"
+      },
+      {
+        "path": "assets/TicketsPage-CfEEwWGS.js",
+        "bytes": 91799,
+        "sha256": "472c23113d6e2fa15ae5146dcb2c897e4df0cd75a1b80fa84ac04bc15357b8c0"
+      },
+      {
+        "path": "assets/writeFailure-DPwQNyEo.js",
+        "bytes": 159,
+        "sha256": "d34e2f49b3042e5babf44d2bd44706adcb47c923ff551567d7fdae33e9a21085"
+      },
+      {
+        "path": "index.html",
+        "bytes": 854,
+        "sha256": "803431dd1a5cc3733a58bc28af1e73680a27aac08a9b1d1b13a7df9968178444"
+      },
+      {
+        "path": "startup.css",
+        "bytes": 638,
+        "sha256": "9750d1c4bfa7317fb1cbdc8357de0184b5f157306fe18f24e6f0e59d2ffd649c"
+      },
+      {
+        "path": "third-party-notices/noble-hashes-2.4.0-LICENSE.txt",
+        "bytes": 1109,
+        "sha256": "4f221aee6e072336700c408c68ab3b96a3fc09f6aebe6f48f1bd99e5ef13faec"
+      }
+    ]
+  },
+  "natural_expiry": {
+    "observations": [
+      {
+        "observed_at": "2026-10-14T07:08:03.925Z",
+        "original_expires_at": "2026-10-14T07:08:58.686Z",
+        "remaining_seconds": 54.761
+      },
+      {
+        "observed_at": "2026-10-14T07:09:17.520Z",
+        "original_expires_at": "2026-10-14T07:08:58.686Z",
+        "remaining_seconds": -18.834
+      }
+    ],
+    "completed": true,
+    "checks": [
+      {
+        "label": "csrf",
+        "status": 200
+      },
+      {
+        "label": "login",
+        "status": 200
+      },
+      {
+        "label": "read_original_messages",
+        "status": 200
+      },
+      {
+        "label": "unchanged_original_link_naturally_expired",
+        "status": 404
+      },
+      {
+        "label": "explicit_new_grant",
+        "status": 200
+      },
+      {
+        "label": "renewed_explicit_link_download",
+        "status": 200
+      },
+      {
+        "label": "original_message_still_expired",
+        "status": 200
+      }
+    ],
+    "elapsed_seconds": 918.834,
+    "old_message_retained": true,
+    "original_unchanged_link_404": true,
+    "explicit_new_grant_downloaded_same_bytes": true,
+    "renewal_did_not_change_original_message": true
+  },
+  "candidate_nginx_complete_config_valid": true
+}

@@ -48,7 +48,8 @@ defineExpose({unresolved:()=>workspace.unresolved()||confirming.value,mayLeave})
   </template>
   <button type="button" :disabled="state.busy||confirming" @click="refresh">刷新发布状态</button>
   <p v-if="state.grant" class="download"><a :href="state.grant.content_url" referrerpolicy="no-referrer">下载台账 XLSX</a><br />有效至 {{displayTime(state.grant.expires_at)}}。过期后可重新申请链接。</p>
-  <p class="hint">文件不会自动下载；站内信通知尚未接通。</p>
+  <RouterLink to="/my-export-messages">查看我的导出消息</RouterLink>
+  <p class="hint">文件不会自动下载。启用导出消息后，发布结果会保存到本人收件箱。</p>
  </section>
 </template>
 <style scoped>

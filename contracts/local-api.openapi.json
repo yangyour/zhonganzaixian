@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.47.0",
+    "version": "0.48.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -27732,7 +27732,7 @@
       },
       "post": {
         "operationId": "publishPreparedExport",
-        "summary": "显式同步发布既有异步作业文件；等待原准备租约结束，条件PUT并核验原字节，成功与审计/幂等回执同事务。未知结果可用原请求核查，不自动重传新内容",
+        "summary": "显式同步发布既有异步作业文件；等待原准备租约结束，条件PUT并核验原字节，成功与审计/幂等回执同事务。未知结果可用原请求核查，不自动重传新内容；显式启用导出消息后，同事务保存本人固定900秒原有效期的站内消息；消息失败则数据库发布/审计/受理回执一起回滚，未知存储仍核查原对象",
         "parameters": [
           {
             "name": "id",
@@ -28217,6 +28217,340 @@
         "x-mop-current-membership-recheck": true,
         "x-mop-download-audited": true,
         "x-mop-store-before-and-after-authorization": true
+      }
+    },
+    "/my-export-messages": {
+      "get": {
+        "operationId": "listOwnExportMessages",
+        "summary": "读取本人已发布文件消息及未读数；不标记已读，不生成新有效期，不补发历史发布",
+        "x-mop-roles": [
+          "padmin",
+          "msp"
+        ],
+        "x-mop-capabilities": [
+          "assets:read"
+        ],
+        "x-mop-object-scope": "CURRENT_RECIPIENT_TENANT",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "responses": {
+          "200": {
+            "description": "Cache-Control:no-store；仅本人消息，不代表外部送达",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportInboxPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "before_issued_at",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unread_only",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        ],
+        "x-mop-cursor": "Paired before_issued_at and before_id; descending immutable publication time/job id"
+      }
+    },
+    "/my-export-messages/{id}/read": {
+      "post": {
+        "operationId": "markOwnExportMessageRead",
+        "summary": "显式登记首次已读；当前授权、CSRF、幂等、CAS和审计同事务，重放返回原时间，不续期下载",
+        "x-mop-roles": [
+          "padmin",
+          "msp"
+        ],
+        "x-mop-capabilities": [
+          "assets:read"
+        ],
+        "x-mop-object-scope": "CURRENT_RECIPIENT_TENANT",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "responses": {
+          "200": {
+            "description": "Cache-Control:no-store；仅本人消息，不代表外部送达",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportInboxReadResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "越权对象404；未启用422；依赖不可用或未知写入结果503，保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportInboxReadInput"
+              }
+            }
+          }
+        },
+        "x-mop-current-membership-before-replay": true
       }
     }
   },
@@ -29219,6 +29553,37 @@
                   "configured",
                   "provider",
                   "reasons"
+                ],
+                "additionalProperties": false
+              },
+              "export_inbox": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "ready": {
+                    "type": "boolean"
+                  },
+                  "reasons": {
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "EXPORT_INBOX_DISABLED",
+                        "EXPORT_INBOX_CONFIG_INVALID",
+                        "EXPORT_INBOX_STRUCTURE_OR_GUARDS_UNAVAILABLE"
+                      ]
+                    }
+                  },
+                  "external_delivery": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "enabled",
+                  "ready",
+                  "reasons",
+                  "external_delivery"
                 ],
                 "additionalProperties": false
               }
@@ -55179,7 +55544,8 @@
             "type": "boolean"
           },
           "notification_sent": {
-            "const": false
+            "const": false,
+            "description": "旧送达确认字段保持false；不表示站内收件箱是否有消息。当前站内消息与显式已读分别由my-export-messages查询；未声称外部渠道或终端送达。"
           },
           "source": {
             "const": "postgresql"
@@ -55374,6 +55740,313 @@
             ],
             "additionalProperties": false,
             "x-mop-binding": "URL job, current actor/tenant/permission version, published version and file digest; HMAC; expiry from database clock, 900 seconds; same-key replay never extends expiry"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ExportInboxMessage": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recipient_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "permission_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "published_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "file_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 16777216
+          },
+          "row_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "issued_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "content_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^/api/v1/asset-export-jobs/[0-9a-f-]{36}/content\\?grant=[1-9][0-9]{0,15}\\.[A-Za-z0-9_-]{43}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "link_status": {
+            "enum": [
+              "AVAILABLE",
+              "EXPIRED"
+            ]
+          },
+          "source": {
+            "const": "postgresql"
+          }
+        },
+        "required": [
+          "job_id",
+          "tenant_id",
+          "recipient_id",
+          "permission_version",
+          "published_version",
+          "file_sha256",
+          "size_bytes",
+          "row_count",
+          "issued_at",
+          "expires_at",
+          "version",
+          "read_at",
+          "content_url",
+          "link_status",
+          "source"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "version": {
+                  "const": 0
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "read_at": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "read_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "link_status": {
+                  "const": "EXPIRED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "content_url": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "content_url": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "x-mop-binding": "Current tenant, recipient, permission version, original published version/digest; expires_at=issued_at+900 seconds; listing and marking read never renew expiry. Availability is not a read or external-channel delivery receipt."
+      },
+      "ExportInboxPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ExportInboxMessage"
+                },
+                "maxItems": 50
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_before_issued_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "next_before_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unread_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "items",
+              "has_more",
+              "next_before_issued_at",
+              "next_before_id",
+              "unread_count",
+              "observed_at"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "has_more": {
+                      "const": false
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "next_before_issued_at": {
+                      "type": "null"
+                    },
+                    "next_before_id": {
+                      "type": "null"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "next_before_issued_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "next_before_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "items": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ExportInboxReadInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "enum": [
+              0,
+              1
+            ]
+          }
+        },
+        "required": [
+          "expected_version"
+        ],
+        "additionalProperties": false
+      },
+      "ExportInboxReadResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "job_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "version": {
+                "const": 1
+              },
+              "read_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "job_id",
+              "version",
+              "read_at"
+            ],
+            "additionalProperties": false
           },
           "trace_id": {
             "type": "string"

@@ -1,5 +1,9 @@
 # MOP 实施状态
 
+## 2026-10-14 本人导出消息
+
+发布结果与本人站内消息同事务保存，固定900秒原链接、未读筛选、不可改写首次已读和原请求恢复已实现。79 Java（9真实PG）、56候选HTTP、候选API重启及真实桌面/390px下载通过；V31显式1次、重复/只读0次。尚不自动发布历史/准备作业，不声明外部渠道送达或完整验收，见[范围和运行](export-inbox.md)及[实际证据](evidence/export-inbox-validation-20261014.json)。
+
 ## 2026-10-14 安全策略、首屏与整体上线矩阵
 
 按OWASP ASVS/CSP、WCAG和web.dev补齐历史缓存授权复核、安全响应头候选、登录图预加载及CSS预算；28业务页CSP兼容，受控内联脚本阻止、blob预览和真实后退恢复已验证。当前工作区1899前端/130契约/16发布安全测试、类型与构建通过；根/前端完整npm官方复审0项。当前站大JS未gzip的问题已形成静态压缩候选并过Nginx语法；未部署。最后只读盘点13服务/V31就绪，生产就绪仍false；HTTPS/Secure Cookie、真实用户p75和完整合同验收显式保留。见[整体标准矩阵](launch-optimization-20261014.md)及[总证据](evidence/launch-optimization-validation-20261014.json)。

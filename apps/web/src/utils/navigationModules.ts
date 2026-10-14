@@ -4,7 +4,7 @@ export interface NavigationItem {name:string;title:string}
 export interface NavigationModule {id:string;title:string;items:NavigationItem[]}
 const modules:NavigationModule[]=[
  {id:'resources',title:'资源与监控',items:[['dashboard','运营总览'],['assets','资产管理'],['network-monitoring','基础网络监控'],['threshold-diagnostics','阈值候选诊断']].map(([name,title])=>({name:name!,title:title!}))},
- {id:'service',title:'工单与服务',items:[['tickets','报障与受理'],['manual-incidents','手工来源登记'],['sla-scenarios','SLA 显式对照'],['asset-export-jobs','台账导出'],['my-worklogs','我的实填工时'],['my-notification-preferences','我的通知偏好请求']].map(([name,title])=>({name:name!,title:title!}))},
+ {id:'service',title:'工单与服务',items:[['tickets','报障与受理'],['manual-incidents','手工来源登记'],['sla-scenarios','SLA 显式对照'],['asset-export-jobs','台账导出'],['my-export-messages','我的导出消息'],['my-worklogs','我的实填工时'],['my-notification-preferences','我的通知偏好请求']].map(([name,title])=>({name:name!,title:title!}))},
  {id:'maintenance',title:'备份与巡检',items:[['backup-plan-drafts','每日备份计划草稿'],['change-notice-drafts','变更报备草稿'],['inspection-templates','巡检模板候选'],['inspection-worksheets','人工巡检执行单'],['inspection-source-collections','巡检来源集合草稿']].map(([name,title])=>({name:name!,title:title!}))},
  {id:'customers',title:'客户与租户',items:[['tenant-inventory','租户登记资源'],['customer-contacts','客户联系人'],['contact-imports','联系人批量新建']].map(([name,title])=>({name:name!,title:title!}))},
  {id:'operations',title:'经营与容量',items:[['operational-comparison','经营样本与人力对照'],['capacity-estimates','容量与缓冲估算']].map(([name,title])=>({name:name!,title:title!}))},

@@ -1,0 +1,600 @@
+{
+  "environment": "lan-test-20261008",
+  "jar_sha256": "1a84987142eafb22786e04e557836f1d078aa935b7f6a1446e513e44809cd008",
+  "started_at": "2026-10-14T06:31:48.095115+00:00",
+  "before": {
+    "mop_local_account": {
+      "rows": 8,
+      "rows_sha256": "bbb1a14a591f2696b987b3e218bd35d62645248e49663debc604bd71d3eb53ed"
+    },
+    "mop_role_capability_limit": {
+      "rows": 81,
+      "rows_sha256": "e1ff88323373ac89a62affe19b1882e48adbf2746444486e71cfa8dc6a98467d"
+    },
+    "mop_asset_export_attempt": {
+      "rows": 103,
+      "rows_sha256": "0b603e5b77db197b77c2cb88dcc6e25a350049fa4e193a7627171e5e1b0c1f25"
+    },
+    "mop_ticket": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_manual_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_capacity_scenario_draft": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_customer_contact_revision": {
+      "rows": 3,
+      "rows_sha256": "91b0a589762dcdaefd7357dd30bc17dd71667977c51a0f3834872891edda13c5"
+    },
+    "mop_asset_import_source": {
+      "rows": 2,
+      "rows_sha256": "b87cdfcbebda905123216682122b6f34e5f0ca65fe03f6663d61e7d96d10b643"
+    },
+    "mop_inspection_template_item": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_file": {
+      "rows": 2,
+      "rows_sha256": "30afcbce0076b71f9100981db7b9e8905b86a20781b5c0d2150738da4154f655"
+    },
+    "mop_change_notice_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_manual_incident_registration": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_external_identity_binding": {
+      "rows": 1,
+      "rows_sha256": "59821bde70b11580a1c1f45e29a9baffee1a37cc6f3b63b7094ed2918efe95d5"
+    },
+    "mop_backup_plan_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset": {
+      "rows": 42,
+      "rows_sha256": "484f58316aeb2e83982e8157c33a5bc4e40b133ee1edb9ab90e382fbaad48874"
+    },
+    "mop_operation": {
+      "rows": 2,
+      "rows_sha256": "b676df42c8d14842798b7aebe8b7c43637d1af1df907cc145bfedb2d15d7f181"
+    },
+    "mop_inspection_source_collection": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_contact_import_job": {
+      "rows": 2,
+      "rows_sha256": "e4c2ce55074e6100670adf3ebc8f95602c9eb23f6e92f8c1ef3d13cbaaf20b8a"
+    },
+    "mop_configuration_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_user": {
+      "rows": 8,
+      "rows_sha256": "43e8e82d409383f3225a97fe2787666225bc3f3bd369150d177acea88301bc20"
+    },
+    "mop_project_role": {
+      "rows": 10,
+      "rows_sha256": "a9a990e8453924c666fa3bb815849272e3e7698e707dd3e033958bc534c0c438"
+    },
+    "mop_notification_preference_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_template_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_export_job": {
+      "rows": 112,
+      "rows_sha256": "ceecd2ca8ef804090310b1ac72ae6f7b8047008bcc8b4a63b3bdc8e1662bc897"
+    },
+    "mop_asset_import_mapping": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_import_artifact": {
+      "rows": 2,
+      "rows_sha256": "0874aaf43425a1f933efe236c817fd6c57c6c266f3a32996b842d853d83a4397"
+    },
+    "mop_worklog_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_working_calendar_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_manual_recovery_confirmation": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_worksheet": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_ticket_comment": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_import_job": {
+      "rows": 4,
+      "rows_sha256": "26fd3e7714f26e0b6c0f37744e4f07483e0ee48a54e67a8b134f49a8355b5b3c"
+    },
+    "mop_ticket_internal_note": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_local_password_history": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_outbox": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_dependency_edge": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_monitoring_quarantine": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_worksheet_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_site": {
+      "rows": 2,
+      "rows_sha256": "5d2f9833f15e0a201294c094e1958253ec3a79f9466777befb83d651b3ab9c1b"
+    },
+    "mop_raw_monitoring_event": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_photo_job": {
+      "rows": 2,
+      "rows_sha256": "b9491d44c7622fb10c3c36029471e3e3ec7a5dfa9a49e9722641adca8d7e354a"
+    },
+    "mop_idempotency": {
+      "rows": 168,
+      "rows_sha256": "2e4a5f478954466534df8e1f592eb4f1a3af7384cd1b30dc68d3ae42e154eaf1"
+    },
+    "mop_asset_import_operation": {
+      "rows": 4,
+      "rows_sha256": "17808469ba00d33f20e46df657dfbd5990111aff19642f043b9ee949ceb4c5c3"
+    },
+    "mop_configuration": {
+      "rows": 185,
+      "rows_sha256": "2b42f7079894933fe8fc17494def5e134633a878f2d93ca61bd96b21d91ee040"
+    },
+    "mop_tenant": {
+      "rows": 2,
+      "rows_sha256": "5776ad3b3fada3eeb11b8def7409b8953a71f1027436f435b86dc19dac164ae2"
+    },
+    "mop_inspection_source_collection_item": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_dependency_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_membership": {
+      "rows": 11,
+      "rows_sha256": "9db453d14d1e3a1a5cff872d25ae29df89a63fb42d82c4ab848348a08972de91"
+    },
+    "mop_worklog": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_file_grant": {
+      "rows": 3,
+      "rows_sha256": "7dd6e90256bdd2a36c7f278a1f44edf6069c4cfcf1e9cd8ca7028ed161e09e6c"
+    },
+    "mop_ticket_history": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_notification_preference_draft": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_template": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_customer_contact": {
+      "rows": 2,
+      "rows_sha256": "20b633edf1f56d77c622f337cdddb946eacd724409c63699412b44c695ead3b5"
+    },
+    "mop_contact_import_result": {
+      "rows": 1,
+      "rows_sha256": "10aef6154af4686c926810e702fb0d53931e1093e3d541cd0597a880030c13f1"
+    },
+    "mop_configuration_revision_history": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_change_notice_draft": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_backup_plan_draft": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_change_notice_asset": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_backup_plan_target": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_working_calendar_draft": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_member_role_assignment": {
+      "rows": 2,
+      "rows_sha256": "0ff5424f7f33ce2f6e3ab8c0368106bd0629a51b1be7fec96a8d96a4980c897a"
+    },
+    "mop_asset_manual_details": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_identity_policy": {
+      "rows": 1,
+      "rows_sha256": "0858d365b8bdfd3020a0802486099aca4106a9a75745883a6b7c4042e68dfb74"
+    },
+    "mop_identity_security": {
+      "rows": 8,
+      "rows_sha256": "60e67a0176714c295c089cf158d27b5a7e20f44e696bd3a84a4a9fde0233e048"
+    },
+    "mop_asset_dependency_graph": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_audit": {
+      "rows": 638,
+      "rows_sha256": "492fb6a23b5ac252ec488b772204d9ff16f66fec9c7f4e1de5da32965bab3fea"
+    },
+    "mop_contact_tenant_guard": {
+      "rows": 1,
+      "rows_sha256": "66cca5b33ded1c48f2ab3978bdf8a115cd1b9c4e2b6b28ecef18331f3bf4d17e"
+    }
+  },
+  "after": {
+    "mop_local_account": {
+      "rows": 8,
+      "rows_sha256": "fcdfcac59e5b718601ef4054ca7899fd8bef3309fe86c059458ce56b4d91d72d"
+    },
+    "mop_role_capability_limit": {
+      "rows": 81,
+      "rows_sha256": "e1ff88323373ac89a62affe19b1882e48adbf2746444486e71cfa8dc6a98467d"
+    },
+    "mop_asset_export_attempt": {
+      "rows": 103,
+      "rows_sha256": "0b603e5b77db197b77c2cb88dcc6e25a350049fa4e193a7627171e5e1b0c1f25"
+    },
+    "mop_ticket": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_manual_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_capacity_scenario_draft": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_customer_contact_revision": {
+      "rows": 3,
+      "rows_sha256": "91b0a589762dcdaefd7357dd30bc17dd71667977c51a0f3834872891edda13c5"
+    },
+    "mop_asset_import_source": {
+      "rows": 2,
+      "rows_sha256": "b87cdfcbebda905123216682122b6f34e5f0ca65fe03f6663d61e7d96d10b643"
+    },
+    "mop_inspection_template_item": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_file": {
+      "rows": 2,
+      "rows_sha256": "30afcbce0076b71f9100981db7b9e8905b86a20781b5c0d2150738da4154f655"
+    },
+    "mop_change_notice_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_manual_incident_registration": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_external_identity_binding": {
+      "rows": 1,
+      "rows_sha256": "59821bde70b11580a1c1f45e29a9baffee1a37cc6f3b63b7094ed2918efe95d5"
+    },
+    "mop_backup_plan_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset": {
+      "rows": 42,
+      "rows_sha256": "484f58316aeb2e83982e8157c33a5bc4e40b133ee1edb9ab90e382fbaad48874"
+    },
+    "mop_operation": {
+      "rows": 2,
+      "rows_sha256": "b676df42c8d14842798b7aebe8b7c43637d1af1df907cc145bfedb2d15d7f181"
+    },
+    "mop_inspection_source_collection": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_contact_import_job": {
+      "rows": 2,
+      "rows_sha256": "e4c2ce55074e6100670adf3ebc8f95602c9eb23f6e92f8c1ef3d13cbaaf20b8a"
+    },
+    "mop_configuration_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_user": {
+      "rows": 8,
+      "rows_sha256": "43e8e82d409383f3225a97fe2787666225bc3f3bd369150d177acea88301bc20"
+    },
+    "mop_project_role": {
+      "rows": 10,
+      "rows_sha256": "a9a990e8453924c666fa3bb815849272e3e7698e707dd3e033958bc534c0c438"
+    },
+    "mop_notification_preference_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_template_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_export_job": {
+      "rows": 112,
+      "rows_sha256": "ceecd2ca8ef804090310b1ac72ae6f7b8047008bcc8b4a63b3bdc8e1662bc897"
+    },
+    "mop_asset_import_mapping": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_import_artifact": {
+      "rows": 2,
+      "rows_sha256": "0874aaf43425a1f933efe236c817fd6c57c6c266f3a32996b842d853d83a4397"
+    },
+    "mop_worklog_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_working_calendar_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_manual_recovery_confirmation": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_worksheet": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_ticket_comment": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_import_job": {
+      "rows": 4,
+      "rows_sha256": "26fd3e7714f26e0b6c0f37744e4f07483e0ee48a54e67a8b134f49a8355b5b3c"
+    },
+    "mop_ticket_internal_note": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_local_password_history": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_outbox": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_dependency_edge": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_monitoring_quarantine": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_worksheet_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_site": {
+      "rows": 2,
+      "rows_sha256": "5d2f9833f15e0a201294c094e1958253ec3a79f9466777befb83d651b3ab9c1b"
+    },
+    "mop_raw_monitoring_event": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_photo_job": {
+      "rows": 2,
+      "rows_sha256": "b9491d44c7622fb10c3c36029471e3e3ec7a5dfa9a49e9722641adca8d7e354a"
+    },
+    "mop_idempotency": {
+      "rows": 169,
+      "rows_sha256": "3df437bca5d36c63401cae0fa09863594506f8ef92adb6faef5100ff0d6ab08a"
+    },
+    "mop_asset_import_operation": {
+      "rows": 4,
+      "rows_sha256": "17808469ba00d33f20e46df657dfbd5990111aff19642f043b9ee949ceb4c5c3"
+    },
+    "mop_configuration": {
+      "rows": 185,
+      "rows_sha256": "2b42f7079894933fe8fc17494def5e134633a878f2d93ca61bd96b21d91ee040"
+    },
+    "mop_tenant": {
+      "rows": 2,
+      "rows_sha256": "5776ad3b3fada3eeb11b8def7409b8953a71f1027436f435b86dc19dac164ae2"
+    },
+    "mop_export_inbox": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_source_collection_item": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_asset_dependency_revision": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_membership": {
+      "rows": 11,
+      "rows_sha256": "9db453d14d1e3a1a5cff872d25ae29df89a63fb42d82c4ab848348a08972de91"
+    },
+    "mop_worklog": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_file_grant": {
+      "rows": 3,
+      "rows_sha256": "7dd6e90256bdd2a36c7f278a1f44edf6069c4cfcf1e9cd8ca7028ed161e09e6c"
+    },
+    "mop_ticket_history": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_notification_preference_draft": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_inspection_template": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_customer_contact": {
+      "rows": 2,
+      "rows_sha256": "20b633edf1f56d77c622f337cdddb946eacd724409c63699412b44c695ead3b5"
+    },
+    "mop_contact_import_result": {
+      "rows": 1,
+      "rows_sha256": "10aef6154af4686c926810e702fb0d53931e1093e3d541cd0597a880030c13f1"
+    },
+    "mop_configuration_revision_history": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_change_notice_draft": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_backup_plan_draft": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_change_notice_asset": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_backup_plan_target": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_working_calendar_draft": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_member_role_assignment": {
+      "rows": 2,
+      "rows_sha256": "0ff5424f7f33ce2f6e3ab8c0368106bd0629a51b1be7fec96a8d96a4980c897a"
+    },
+    "mop_asset_manual_details": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_identity_policy": {
+      "rows": 1,
+      "rows_sha256": "0858d365b8bdfd3020a0802486099aca4106a9a75745883a6b7c4042e68dfb74"
+    },
+    "mop_identity_security": {
+      "rows": 8,
+      "rows_sha256": "60e67a0176714c295c089cf158d27b5a7e20f44e696bd3a84a4a9fde0233e048"
+    },
+    "mop_asset_dependency_graph": {
+      "rows": 0,
+      "rows_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "mop_contact_tenant_guard": {
+      "rows": 1,
+      "rows_sha256": "66cca5b33ded1c48f2ab3978bdf8a115cd1b9c4e2b6b28ecef18331f3bf4d17e"
+    },
+    "mop_audit": {
+      "rows": 642,
+      "rows_sha256": "8e55b0e243b5efc53d8cc96c08c71e201393baa73d3a74693499eccccd06b2af"
+    }
+  },
+  "changed_existing_tables": [
+    "mop_local_account",
+    "mop_idempotency",
+    "mop_audit"
+  ],
+  "attempts": [
+    {
+      "mode": "--check",
+      "exit": 0,
+      "summary": [
+        "MOP_SCHEMA status=MONITORING_QUARANTINE_APPLIED mode=READ_ONLY_CHECK migrations_executed=0 baseline=V1_V29_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+      ]
+    },
+    {
+      "mode": "--apply-export-inbox",
+      "exit": 0,
+      "summary": [
+        "MOP_SCHEMA status=EXPORT_INBOX_APPLIED mode=APPLY_EXPORT_INBOX migrations_executed=1 baseline=V1_V30_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+      ]
+    },
+    {
+      "mode": "--apply-export-inbox",
+      "exit": 0,
+      "summary": [
+        "MOP_SCHEMA status=EXPORT_INBOX_APPLIED mode=APPLY_EXPORT_INBOX migrations_executed=0 baseline=V1_V30_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+      ]
+    },
+    {
+      "mode": "--check",
+      "exit": 0,
+      "summary": [
+        "MOP_SCHEMA status=EXPORT_INBOX_APPLIED mode=READ_ONLY_CHECK migrations_executed=0 baseline=V1_V30_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+      ]
+    }
+  ],
+  "completed": true,
+  "verified_at": "2026-10-14T06:34:33.032046+00:00",
+  "sql_sha256": "60ae717f032c61fd7cbed98a0ffd15d9df514c501d143ecadc337e8f56a388dc",
+  "schema_version": 31,
+  "existing_tables": 68,
+  "unchanged_existing_tables": 65,
+  "no_backfill": true,
+  "credentials_output": false
+}

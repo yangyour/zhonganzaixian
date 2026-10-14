@@ -2,7 +2,7 @@
 
 已部署至[指定测试站](http://192.168.1.215:10010)，源码`1514842`。新增常驻准备Worker并更新Web，原API和其余10服务的镜像/启动时间/重启次数保持；13服务在关闭本机转发后仍运行且ready=true，V30/0迁移，production_ready=false。公开页面实际验证自动1行16列XLSX、进度停止轮询、390px布局、显式发布及4962字节下载摘要一致，既有监控仍200。见[部署与公开链路](evidence/export-queue-deployment-20261014.json)、[最终组件](evidence/export-queue-components-final-20261014.json)、[桌面](evidence/export-queue-ui-20261014/desktop-live-prepared.png)及[手机宽度下载](evidence/export-queue-ui-20261014/mobile-live-download.png)。
 
-2026-10-14补齐M3-7的后台文件准备及页面进度。API受理后，独立常驻Worker读取指定测试库并保存实际XLSX；页面自动读取当前状态。发布、900秒签名下载仍分别确认，站内信未接通，M3-7正式验收保持NOT_RUN。
+2026-10-14补齐M3-7的后台文件准备及页面进度。API受理后，独立常驻Worker读取指定测试库并保存实际XLSX；页面自动读取当前状态。发布、900秒签名下载仍分别确认，[本人导出消息](export-inbox.md)已另行补齐，M3-7正式验收保持NOT_RUN。
 
 ## 处理边界
 
@@ -34,4 +34,4 @@
 
 启用后以`tools/inspect-lan-test-server.py --include-export-queue`检查13个选定服务；无此参数继续检查原12服务。容器运行不证明业务成功，仍需新建明确虚构的本人请求，核对实际准备及下载结果。回退仅停止该项目自动队列并恢复旧Web引用，保留所有请求、原文件、审计和私有启用时间；需要处理的既有任务可按原单作业守卫显式核对，不删除数据或退回fixture。
 
-站内信、正式自动发布/送达闭环、批准数据规模下性能及完整TC仍待。生产OSS不是当前MinIO联调的已验能力。
+正式自动发布及外部渠道送达闭环、批准数据规模下性能及完整TC仍待。生产OSS不是当前MinIO联调的已验能力。

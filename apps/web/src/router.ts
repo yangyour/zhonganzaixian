@@ -19,6 +19,7 @@ export const router = createRouter({
     { path: '/manual-incidents', name: 'manual-incidents', component: () => import('./pages/ManualIncidentsPage.vue'), meta: { title: '手工来源登记', group: '服务', capability: 'manual_incidents:read' } },
     { path: '/tickets', name: 'tickets', component: () => import('./pages/TicketsPage.vue'), meta: { title: '报障与受理', group: '服务', capability: 'tickets:read' } },
     { path: '/my-notification-preferences', name: 'my-notification-preferences', component: () => import('./pages/OwnNotificationPreferencesPage.vue'), meta: { title: '我的通知偏好请求', group: '服务', capability: 'notification_preferences:read_own' } },
+    { path: '/my-export-messages', name: 'my-export-messages', component: () => import('./pages/ExportInboxPage.vue'), meta: { title: '我的导出消息', group: '服务', roles: ['padmin','msp'], capability: 'assets:read' } },
     { path: '/asset-export-jobs', name: 'asset-export-jobs', component: () => import('./pages/AssetExportJobsPage.vue'), meta: { title: '台账导出准备', group: '服务', roles: ['padmin','msp'], capability: 'assets:read' } },
     { path: '/my-worklogs', name: 'my-worklogs', component: () => import('./pages/OwnWorklogsPage.vue'), meta: { title: '我的实填工时', group: '服务', role: 'msp', capability: 'worklogs:read_own' } },
     { path: '/sla-scenarios', name: 'sla-scenarios', component: () => import('./pages/SlaScenariosPage.vue'), meta: { title: 'SLA 显式对照', group: '服务', capability: 'sla_scenarios:read' } },

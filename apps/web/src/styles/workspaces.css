@@ -1,0 +1,54 @@
+/* Task-oriented lists and workbenches, shared by the business pages. */
+.record-table { width: 100%; overflow: auto; background: #fff; border: 1px solid var(--mop-border); border-radius: 8px; }
+.record-table table { width: 100%; min-width: 720px; border-collapse: collapse; table-layout: auto; font-size: 13px; }
+.record-table th { background: #f5f7fa; color: #526176; font-weight: 600; text-align: left; white-space: nowrap; padding: 12px 16px; }
+.record-table td { padding: 12px 16px; border-top: 1px solid #e8edf3; vertical-align: middle; line-height: 1.65; max-width: 340px; overflow-wrap: anywhere; }
+.record-table tbody tr:hover { background: #f8fbff; }
+.record-table td > strong { font-size: 14px; font-weight: 600; }
+.record-table td .row-secondary { display: block; font-size: 12px; color: #63758b; margin-top: 3px; }
+.record-table td .row-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 140px; }
+.record-table td .row-actions .el-button { margin-left: 0; }
+.record-table .table-message { text-align: center; padding: 28px; color: #63758b; }
+.record-table details { font-size: 12px; }
+.record-table details p { margin: 6px 0; }
+.list-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 16px 0; }
+.list-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 14px 0; font-size: 13px; color: #63758b; }
+.list-footer .identity-actions { margin: 0; }
+.page-guidance { margin: 0 0 18px; color: #596d84; font-size: 13px; line-height: 1.7; }
+.page-guidance > summary { cursor: pointer; width: fit-content; padding: 8px 0; min-height: 36px; color: #526176; }
+.page-guidance[open] { padding: 0 16px 14px; background: #f8fafc; border: 1px solid var(--mop-border); border-radius: 8px; }
+.page-guidance .el-alert { margin: 8px 0; }
+.page-guidance > p:last-child { margin-bottom: 0; }
+.workbench-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr); gap: 24px; align-items: start; }
+.workbench-layout > * { min-width: 0; }
+.workbench-form, .workbench-result { background: #fff; border: 1px solid var(--mop-border); border-radius: 8px; padding: 24px; }
+.workbench-result { position: sticky; top: 180px; }
+.workbench-form h2, .workbench-result h2 { font-size: 17px; margin: 0 0 18px; }
+.workbench-form h3 { font-size: 14px; margin: 20px 0 10px; }
+.workbench-empty { padding: 32px 12px; text-align: center; color: #63758b; }
+.workbench-empty strong { display: block; font-size: 16px; color: #40536b; margin-bottom: 8px; }
+.workbench-empty p { margin: 0; font-size: 13px; }
+.workbench-status { color: #805111; font-size: 12px; white-space: nowrap; padding: 5px 9px; border-radius: 5px; background: #fff4df; align-self: center; }
+.identity-page { max-width: none; }
+.identity-toolbar { margin-bottom: 16px; }
+.identity-toolbar label:first-child { flex: 0 1 360px; }
+.identity-toolbar label.check { flex: 0 0 auto; min-width: 0; }
+.identity-editor .identity-card { margin: 0; padding: 0; border: 0; background: transparent; }
+.identity-editor .identity-form { max-width: none; }
+.identity-editor .identity-form h2 { font-size: 20px; margin-bottom: 18px; overflow-wrap: anywhere; }
+.identity-editor .identity-form fieldset { gap: 18px; }
+.identity-editor .permission-grid { grid-template-columns: 1fr; }
+.identity-editor .identity-form form + form { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--mop-border); }
+.identity-editor .el-tabs__header { margin-bottom: 22px; }
+.identity-editor .identity-form p { font-size: 13px; line-height: 1.75; }
+@media (max-width: 1000px) {
+  .workbench-layout { grid-template-columns: 1fr; }
+  .workbench-result { position: static; }
+}
+@media (max-width: 760px) {
+  .record-table table { min-width: 660px; }
+  .record-table th, .record-table td { padding: 10px 12px; }
+  .identity-toolbar label:first-child { flex-basis: 100%; }
+  .workbench-form, .workbench-result { padding: 18px; }
+  .page-guidance > summary { min-height: 44px; }
+}

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ElDrawer } from 'element-plus'
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { api, isCancelled } from '../api/client'
 import { can, session, contextGeneration, switchingTenant } from '../stores/session'
@@ -49,19 +50,25 @@ async function edit(role?: ProjectRole, copy = false) {
 }
 function category() { form.permissions = []; editor.dirty.value = true }
 async function save() { if (!opened.value || !can('roles:write') || !can('roles:read') || switchingTenant.value || selected.value?.builtin) return; const role = selected.value; if (await editor.save(role ? `/identity/roles/${role.id}` : '/identity/roles', role ? 'PATCH' : 'POST', { expected_version: role?.version ?? 0, name: form.name, description: form.description || null, base_role: form.base_role, enabled: form.enabled, permissions: [...form.permissions] })) opened.value = false }
+async function closeEditor(done?: () => void) { const owner = scope.value; if (editor.busy() || !await editor.leave() || owner !== scope.value) return; opened.value = false; selected.value = null; editor.clear(); done?.() }
 </script>
 <template>
   <section class="identity-page" v-loading="loading">
     <div class="page-heading"><div><h1>角色与权限</h1><p>按租户分配角色；角色权限变更会在后续请求中立即核验。</p></div><el-button v-if="can('roles:write')" type="primary" :disabled="editor.busy()" @click="edit()">新建角色</el-button></div>
     <p v-if="!can('roles:read')">当前会话无角色读取权限。</p>
     <el-button v-if="can('roles:read')" :disabled="editor.busy() || switchingTenant" @click="refresh">刷新角色列表</el-button>
-    <ApiErrorNotice :error="error"><el-button @click="refresh">重新读取</el-button></ApiErrorNotice><IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />
-    <div class="identity-cards"><article v-for="role in data?.items" :key="role.id" class="identity-card"><h2>{{ role.name }}</h2><p>{{ role.description || '未填写说明' }}</p><p>{{ baseRoleLabels[role.base_role] }} · {{ role.permissions.length }} 项权限 · {{ role.assigned_members }} 位成员</p><el-tag :type="role.enabled ? 'success' : 'info'">{{ role.enabled ? '启用' : '停用' }}</el-tag> <el-tag v-if="role.builtin" type="info">内置角色</el-tag><div class="identity-actions"><el-button @click="edit(role)">{{ can('roles:write') && !role.builtin ? '查看 / 编辑' : '查看权限' }}</el-button><el-button v-if="can('roles:write')" @click="edit(role, true)">复制为新角色</el-button></div></article></div>
+    <ApiErrorNotice v-if="!opened" :error="error"><el-button @click="refresh">重新读取</el-button></ApiErrorNotice><IdentityCommandNotice v-if="!opened" :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />
+    <div class="record-table" role="region" tabindex="0" aria-label="角色列表，可横向滚动"><table><thead><tr><th>角色名称</th><th>业务类别</th><th>权限数</th><th>成员数</th><th>状态</th><th>操作</th></tr></thead><tbody>
+      <tr v-for="role in data?.items" :key="role.id"><td><strong>{{ role.name }}</strong><span class="row-secondary">{{ role.description || '未填写说明' }}</span></td><td>{{ baseRoleLabels[role.base_role] }}<span v-if="role.builtin" class="row-secondary">内置角色</span></td><td>{{ role.permissions.length }}</td><td>{{ role.assigned_members }}</td><td><el-tag :type="role.enabled ? 'success' : 'info'">{{ role.enabled ? '启用' : '停用' }}</el-tag></td><td><div class="row-actions"><el-button link type="primary" :disabled="editor.busy()" @click="edit(role)">{{ can('roles:write') && !role.builtin ? '查看 / 编辑' : '查看权限' }}</el-button><el-button v-if="can('roles:write')" link :disabled="editor.busy()" @click="edit(role, true)">复制为新角色</el-button></div></td></tr>
+      <tr v-if="data && !data.items.length"><td colspan="6" class="table-message">暂无角色。</td></tr></tbody></table></div>
+    <ElDrawer :model-value="opened" title="角色设置" size="680px" class="identity-editor" :before-close="closeEditor" :close-on-click-modal="false" :close-on-press-escape="!editor.busy()" :show-close="!editor.busy()" destroy-on-close>
+    <ApiErrorNotice :error="error" /><IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />
     <form v-form-feedback v-if="opened" class="identity-card identity-form" @submit.prevent="save" @input="editor.dirty.value = true" @change="editor.dirty.value = true">
       <h2>{{ selected ? selected.name : '新建自定义角色' }}</h2><p v-if="selected?.builtin">内置角色保留基线，可复制后修改权限。</p>
       <fieldset :disabled="editor.busy() || !can('roles:write') || selected?.builtin"><label>角色名称<input v-model="form.name" required maxlength="100" /></label><label>说明<textarea v-model="form.description" maxlength="1000" /></label><label>基础业务类别<select v-model="form.base_role" :disabled="!!selected" @change="category"><option v-for="(label, id) in baseRoleLabels" :key="id" :value="id">{{ label }}</option></select></label><label class="check"><input v-model="form.enabled" type="checkbox" />启用角色</label>
       <div v-for="dimension in data?.permission_catalog.dimensions" :key="dimension.id"><h3>{{ dimension.label }}</h3><div class="permission-grid"><label v-for="entry in available.filter(x => x.dimension_ids.includes(dimension.id))" :key="entry.id" class="check"><input v-model="form.permissions" type="checkbox" :value="entry.id" /><span>{{ entry.label }}<small>{{ entry.id }}</small></span></label></div></div>
       <el-button v-if="can('roles:write') && !selected?.builtin" native-type="submit" type="primary" :loading="command.state === 'sending'">保存角色</el-button></fieldset>
     </form>
+    <template #footer><el-button :disabled="editor.busy()" @click="closeEditor()">关闭角色设置</el-button></template></ElDrawer>
   </section>
 </template>

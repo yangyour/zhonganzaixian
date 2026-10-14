@@ -91,6 +91,10 @@ async function closeEditor() { const owner = scope.value; if (editor.busy() || !
   </section>
 </section></template>
 <style scoped>
+.admin-member{min-width:240px}
+.admin-table :is(th,td){min-width:120px}
+.admin-table :is(th,td):nth-child(3){min-width:180px}
+.admin-table td:nth-child(2){min-width:180px;max-width:300px;overflow-wrap:anywhere}
 .admin-editor-title h2{min-width:0;overflow-wrap:anywhere}.admin-editor-title>.el-button{flex-shrink:0}.admin-member>div{min-width:0;overflow-wrap:anywhere}
 @media(max-width:650px){.admin-prototype.identity-page .admin-editor-panel{inset:0;width:100%;height:100dvh;max-height:100dvh;padding:0 16px 20px;z-index:1000}.admin-prototype.identity-page .admin-editor-title{top:0;margin-bottom:16px;padding:14px 0;min-height:72px}.admin-prototype.identity-page .admin-editor-title>.el-button{min-height:44px;min-width:88px;margin-left:0}}
 </style>

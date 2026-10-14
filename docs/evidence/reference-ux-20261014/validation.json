@@ -1,0 +1,211 @@
+{
+  "date": "2026-10-14",
+  "environment": "lan-test-20261008",
+  "delivery": "local-production-preview; no test-server deployment",
+  "preview": "http://127.0.0.1:15174",
+  "build_id": "8ce6a4d31dba161f253e0b284ba5a286cb9f1ad2c1263394b1c4aaa5e72940a2",
+  "tests": {
+    "web": 2058,
+    "web_files": 140,
+    "contracts": 134,
+    "contract_generation": "PASS",
+    "typecheck": "PASS",
+    "production_build": "PASS",
+    "table_targeted": 25
+  },
+  "readiness": {
+    "http_status": 200,
+    "ready": true,
+    "production_ready": false
+  },
+  "checks": [
+    "mobile report textarea expands, caps with internal scroll and shrinks",
+    "mobile report footer stays visible while long content scrolls",
+    "cancel and reopen retains report draft",
+    "320px report dialog footer and form fit viewport",
+    "MSP worklog textarea expands shrinks and reflows on mobile",
+    "worklog collapse and reopen preserves unsaved text",
+    "asset status shortcut keeps unsubmitted keyword separate",
+    "asset explicit Enter applies query and shows recoverable empty state",
+    "single chip removal preserves other applied filters and clear restores list (after route settlement)",
+    "asset detail return preserves applied search context",
+    "wide table buttons and Home/End move real table and respect boundaries",
+    "table remains usable after sidebar collapse and expansion",
+    "asset next and previous pages preserve unsubmitted draft",
+    "ticket search empty state clear action restores real records",
+    "ticket detail return retains applied search",
+    "offline read failure is distinct from empty results and refresh recovers real data",
+    "mobile applied chips and horizontal table controls are usable",
+    "320px long applied filter wraps without page overflow",
+    "narrow identity table keeps readable columns and horizontal scrolling"
+  ],
+  "views": [
+    {
+      "path": "/assets",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "screenshot": "assets-1440.png"
+    },
+    {
+      "path": "/tickets",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "screenshot": "tickets-1440.png"
+    },
+    {
+      "path": "/dashboard",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "screenshot": "dashboard-1440.png"
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "screenshot": "network-monitoring-1440.png"
+    },
+    {
+      "path": "/configurations",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "screenshot": "configurations-1440.png"
+    },
+    {
+      "path": "/audit",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "screenshot": "audit-1440.png"
+    },
+    {
+      "path": "/identity/users",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "screenshot": "identity-users-1440.png"
+    },
+    {
+      "path": "/customer-contacts",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "screenshot": "customer-contacts-1440.png"
+    },
+    {
+      "path": "/assets",
+      "width": 390,
+      "scrollWidth": 390,
+      "screenshot": "assets-390.png"
+    },
+    {
+      "path": "/tickets",
+      "width": 390,
+      "scrollWidth": 390,
+      "screenshot": "tickets-390.png"
+    },
+    {
+      "path": "/dashboard",
+      "width": 390,
+      "scrollWidth": 390,
+      "screenshot": "dashboard-390.png"
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 390,
+      "scrollWidth": 390,
+      "screenshot": "network-monitoring-390.png"
+    },
+    {
+      "path": "/configurations",
+      "width": 390,
+      "scrollWidth": 390,
+      "screenshot": "configurations-390.png"
+    },
+    {
+      "path": "/audit",
+      "width": 390,
+      "scrollWidth": 390,
+      "screenshot": "audit-390.png"
+    },
+    {
+      "path": "/identity/users",
+      "width": 390,
+      "scrollWidth": 390,
+      "screenshot": "identity-users-390.png"
+    },
+    {
+      "path": "/customer-contacts",
+      "width": 390,
+      "scrollWidth": 390,
+      "screenshot": "customer-contacts-390.png"
+    },
+    {
+      "path": "/assets",
+      "width": 320,
+      "scrollWidth": 320,
+      "screenshot": "assets-320.png"
+    },
+    {
+      "path": "/tickets",
+      "width": 320,
+      "scrollWidth": 320,
+      "screenshot": "tickets-320.png"
+    },
+    {
+      "path": "/configurations",
+      "width": 320,
+      "scrollWidth": 320,
+      "screenshot": "configurations-320.png"
+    },
+    {
+      "path": "/dashboard",
+      "width": 320,
+      "scrollWidth": 320,
+      "screenshot": "dashboard-320.png"
+    }
+  ],
+  "table_views": [
+    {
+      "path": "/assets",
+      "width": 390,
+      "screenshot": "assets-table-390.png"
+    },
+    {
+      "path": "/tickets",
+      "width": 390,
+      "screenshot": "tickets-table-390.png"
+    },
+    {
+      "path": "/audit",
+      "width": 390,
+      "screenshot": "audit-table-390.png"
+    },
+    {
+      "path": "/identity/users",
+      "width": 390,
+      "screenshot": "identity-users-table-390.png"
+    },
+    {
+      "path": "/customer-contacts",
+      "width": 390,
+      "screenshot": "customer-contacts-table-390.png"
+    },
+    {
+      "path": "/configurations",
+      "width": 390,
+      "screenshot": "configurations-table-390.png"
+    },
+    {
+      "path": "/identity/users",
+      "width": 320,
+      "screenshot": "identity-users-table-320.png"
+    }
+  ],
+  "page_errors": [],
+  "business_writes": [],
+  "notes": [
+    "Unit tests use isolated UI substitutes and synthetic layout measurements; browser uses existing real designated API.",
+    "IME composition coverage is synthetic; physical phone and physical IME not tested.",
+    "Early visual captures caught startup state and were replaced after stable network and rendered-page checks.",
+    "A clear assertion ran before route settlement; an Enter was attempted while the prior query was still loading. Both were repeated after proper state settlement.",
+    "Final CSS corrections were reviewed on affected configuration and identity pages; unaffected earlier screenshots remain evidence for their checked layout."
+  ],
+  "credentials_recorded": false
+}

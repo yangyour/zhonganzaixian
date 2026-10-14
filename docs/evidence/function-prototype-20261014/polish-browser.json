@@ -1,0 +1,161 @@
+{
+  "reason": "Complete shared service header, subtitle and tab patterns after contact-sheet review",
+  "views": [
+    {
+      "path": "/tickets",
+      "width": 1440,
+      "pass": true,
+      "scrollWidth": 1440
+    },
+    {
+      "path": "/tickets",
+      "width": 390,
+      "pass": true,
+      "scrollWidth": 390
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 1440,
+      "pass": true,
+      "scrollWidth": 1440
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 390,
+      "pass": true,
+      "scrollWidth": 390
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 1440,
+      "pass": true,
+      "scrollWidth": 1440
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 390,
+      "pass": true,
+      "scrollWidth": 390
+    },
+    {
+      "path": "/asset-export-jobs",
+      "width": 1440,
+      "pass": true,
+      "scrollWidth": 1440
+    },
+    {
+      "path": "/asset-export-jobs",
+      "width": 390,
+      "pass": true,
+      "scrollWidth": 390
+    },
+    {
+      "path": "/my-export-messages",
+      "width": 1440,
+      "pass": true,
+      "scrollWidth": 1440
+    },
+    {
+      "path": "/my-export-messages",
+      "width": 390,
+      "pass": true,
+      "scrollWidth": 390
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 1440,
+      "pass": true,
+      "scrollWidth": 1440
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 390,
+      "pass": true,
+      "scrollWidth": 390
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "width": 1440,
+      "pass": true,
+      "scrollWidth": 1440
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "width": 390,
+      "pass": true,
+      "scrollWidth": 390
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 1440,
+      "pass": true,
+      "scrollWidth": 1440
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 390,
+      "pass": true,
+      "scrollWidth": 390
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 1440,
+      "pass": true,
+      "scrollWidth": 1440
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 390,
+      "pass": true,
+      "scrollWidth": 390
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 1440,
+      "pass": true,
+      "scrollWidth": 1440
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 390,
+      "pass": true,
+      "scrollWidth": 390
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 1440,
+      "pass": true,
+      "scrollWidth": 1440
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 390,
+      "pass": true,
+      "scrollWidth": 390
+    },
+    {
+      "path": "/configurations",
+      "width": 1440,
+      "pass": true,
+      "scrollWidth": 1440
+    },
+    {
+      "path": "/configurations",
+      "width": 390,
+      "pass": true,
+      "scrollWidth": 390
+    },
+    {
+      "path": "/my-worklogs",
+      "width": 1440,
+      "pass": true
+    },
+    {
+      "path": "/my-worklogs",
+      "width": 390,
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "non_login_writes": []
+}

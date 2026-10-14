@@ -85,3 +85,11 @@
 @media(max-width:1000px){.prototype-shell .dashboard-page .dashboard-panels>.dashboard-panel[data-panel],.prototype-shell .dashboard-page .dashboard-panels>.dashboard-severity{grid-row:auto;grid-column:auto}.prototype-shell .dashboard-page .dashboard-panels>.dashboard-panel[data-panel=ALERT_TREND],.prototype-shell .dashboard-page .dashboard-panels>.dashboard-panel[data-panel=SERVICE_HEALTH]{grid-column:1/-1}}
 @media(max-width:760px){.prototype-shell .dashboard-page .dashboard-panels>.dashboard-panel[data-panel],.prototype-shell .dashboard-page .dashboard-panels>.dashboard-severity{grid-column:1}}
 .prototype-shell .dashboard-page .kpi-card p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
+/* Complete the shared service patterns used outside the legacy page-heading class. */
+.prototype-shell .proto-page-head{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:62px;padding:10px 16px;margin:0 0 10px;background:#fff;border:1px solid #e4ebf5;border-radius:3px}
+.prototype-shell .proto-page-head h1{font-size:16px;line-height:1.6;font-weight:600;margin:0}.prototype-shell .proto-page-head p{font-size:12px;color:#7c8da3;line-height:1.7;margin:4px 0 0}.proto-page-head>.el-button{flex-shrink:0}
+.proto-sub{display:block;font-size:11px;color:#8191a7;line-height:1.7;margin-top:3px;overflow-wrap:anywhere}
+.prototype-shell #main-content button.proto-link:not([class*="el-"]){border:0;background:transparent;color:#2878f5;padding:2px 0;min-height:28px;font-size:12px;line-height:1.6;text-align:left}
+.prototype-shell #main-content :is(.feature-tabs,.proto-tabs)>:is(button,a,span):not([class*="el-"]){flex-shrink:0;padding:10px 0;min-height:44px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:#7c8ca2;font-size:12px;line-height:1.7}
+.prototype-shell #main-content :is(.feature-tabs,.proto-tabs)>.active:not([class*="el-"]){border-bottom-color:#2878f5;color:#2878f5}
+@media(max-width:760px){.prototype-shell .proto-page-head{flex-wrap:wrap;align-items:flex-start}.prototype-shell #main-content button.proto-link:not([class*="el-"]){min-height:44px}}

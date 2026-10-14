@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { feedback as ElMessage } from '../utils/feedback'
 import { api } from '../api/client'
 import type { Asset } from '../api/types'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'

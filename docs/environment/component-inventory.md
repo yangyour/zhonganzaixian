@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-14 全站交互打磨前再次执行固定主机信任只读盘点：12 服务运行、schema V30、ready=true、production_ready=false；本轮无组件安装/迁移/配置变更。前端浏览器使用本地构建和指定站真实 API；Vite 经 Nginx 反代登录因同源检查拒绝，采用已有本地静态工件浏览器覆盖方式保留服务同源校验，不放宽 CSRF。
+
 2026-10-14导出与横排菜单已在原10010入口部署（代码fd1e8f1/API0.47/V30）：仅API/Web更新，其他10服务镜像/启动时间/重启次数未变化。独立导出MinIO已启用，发布就绪true；候选API和本机测试转发关闭后12服务仍运行、ready=true、production_ready=false。详见[部署证据](../evidence/export-navigation-deployment-20261014.json)与[最终只读盘点](../evidence/export-navigation-components-final-20261014.json)。
 
 ## 2026-10-14 导出发布专用存储

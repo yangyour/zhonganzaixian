@@ -1,5 +1,9 @@
 # MOP 实施状态
 
+## 2026-10-14 全站响应与反馈统一
+
+27 处页面/组件统一持久警告、成功提示、重复合并与纯文本呈现；API 增加有界等待、取消、异常信封校验和保留网关 HTTP 状态；读取错误提供显式重试。1860 项 Web 回归、新增 2 项反馈策略及类型/生产构建通过。首次无限并行测试有 1 项路由测试超时，限制 4 workers 后全量通过。不是业务验收或部署声明。见[规范和 QA](frontend-polish-20261014.md)。
+
 ## 2026-10-14 测试站更新与复核
 
 导出发布/下载与顶部横排模块已部署到192.168.1.215:10010，应用代码fd1e8f1、API0.47/V30。公开入口9HTTP再次验证真实下载、原链接过期404与既有网络监控；部署后真实浏览器登录/横排/下拉导航通过。仅更新API和Web，其他10服务未变化，0迁移；清理候选API及本机转发后12服务仍ready，production_ready=false。见[部署](evidence/export-navigation-deployment-20261014.json)、[公开HTTP](evidence/export-navigation-public-http-20261014.json)和[最终组件](evidence/export-navigation-components-final-20261014.json)。自动准备调度、站内信及全合同验收仍待。

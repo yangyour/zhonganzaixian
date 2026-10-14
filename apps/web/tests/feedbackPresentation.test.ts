@@ -17,6 +17,12 @@ async function mount(component: Component, props: Record<string, unknown>) {
   app.directive('loading', {}); app.mount(host); await nextTick()
 }
 afterEach(() => { app?.unmount(); host?.remove() })
+it('provides an explicit read retry only when the caller supplies one', async () => {
+  const retry = vi.fn()
+  await mount(ApiErrorNotice, { error: new ApiError(503, 'HTTP_503', 'unavailable', 'trace'), onRetry: retry })
+  expect(host.querySelector('button')?.textContent).toContain('重新读取')
+  host.querySelector('button')!.click(); expect(retry).toHaveBeenCalledOnce()
+})
 it('keeps troubleshooting information collapsed and omits a missing trace number', async () => {
   await mount(ApiErrorNotice, { error: new ApiError(0, 'NETWORK_ERROR', 'technical network message', '—') })
   expect(host.querySelector('.el-alert__title')?.textContent).toBe('未能收到服务响应，请检查网络连接')

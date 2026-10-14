@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { writeFailureUncertain } from '../utils/writeFailure'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
-import { ElRadio, ElRadioGroup, ElMessage } from 'element-plus'
+import { ElRadio, ElRadioGroup } from 'element-plus'
+import { feedback as ElMessage } from '../utils/feedback'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import { reportContextUnresolved } from '../utils/reportContextGuard'
 import { api, ApiError, isCancelled } from '../api/client'

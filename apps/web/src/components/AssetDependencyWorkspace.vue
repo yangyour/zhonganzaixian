@@ -2,7 +2,7 @@
 import { ElTableColumn } from 'element-plus'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { feedback as ElMessage } from '../utils/feedback'
 import { api, ApiError, isCancelled } from '../api/client'
 import type { Asset, AssetPage } from '../api/types'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'

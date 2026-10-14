@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ElTableColumn } from 'element-plus'
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import { feedback as ElMessage } from '../utils/feedback'
 import { onBeforeRouteLeave } from 'vue-router'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import { createConfigurationDraftWriter, emptyConfigurationDraftState, type ConfigurationDraftState } from '../utils/configurationDraftWriter'

@@ -52,4 +52,8 @@ describe('bounded requests and reliable failure feedback', () => {
     const assertion = expect(client.requestBlob('/files/x/content', { timeoutMs: 100 })).rejects.toMatchObject({ code: 'REQUEST_TIMEOUT' })
     await vi.advanceTimersByTimeAsync(100); await assertion
   })
+  it('uses the same failure normalization for binary reads', async () => {
+    const client = new ApiClient(vi.fn(async () => new Response(JSON.stringify({ error: { message: [], details: 'malformed' } }), { status: 403 })))
+    await expect(client.requestBlob('/files/x/content')).rejects.toMatchObject({ status: 403, code: 'HTTP_403', details: [] })
+  })
 })

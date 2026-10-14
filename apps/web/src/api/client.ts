@@ -27,7 +27,7 @@ function cancellable<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
     if (signal.aborted) cancel()
   })
 }
-function failure(response: Response, candidate: unknown): ApiError {
+function httpFailure(response: Response, candidate: unknown): ApiError {
   const object = candidate && typeof candidate === 'object' && !Array.isArray(candidate) ? candidate as FailureEnvelope : {}
   const error = object.error
   return new ApiError(response.status, typeof error?.code === 'string' && error.code ? error.code : `HTTP_${response.status}`,
@@ -102,8 +102,8 @@ export class ApiClient {
       if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
       let envelope: Envelope<T> & FailureEnvelope
       try { envelope = raw ? JSON.parse(raw) : {} }
-      catch { if (!response.ok) throw failure(response, null); throw new ApiError(response.status, 'INVALID_RESPONSE', '服务端返回格式异常', response.headers.get('X-Trace-Id') || '—') }
-      if (!response.ok) throw failure(response, envelope)
+      catch { if (!response.ok) throw httpFailure(response, null); throw new ApiError(response.status, 'INVALID_RESPONSE', '服务端返回格式异常', response.headers.get('X-Trace-Id') || '—') }
+      if (!response.ok) throw httpFailure(response, envelope)
       if (!envelope || typeof envelope !== 'object' || Array.isArray(envelope)) throw new ApiError(response.status, 'INVALID_RESPONSE', '接口响应信封异常', response.headers.get('X-Trace-Id') || '—')
       const traceId = typeof envelope.trace_id === 'string' ? envelope.trace_id : response.headers.get('X-Trace-Id') || '—'
       if (envelope.error) throw new ApiError(response.status, 'INVALID_RESPONSE', '响应同时包含错误，暂时无法确认结果', traceId)
@@ -142,7 +142,7 @@ export class ApiClient {
         let failure: FailureEnvelope = {}
         try { const candidate: unknown = await cancellable(response.json(), controller.signal); if (candidate && typeof candidate === 'object' && !Array.isArray(candidate)) failure = candidate as FailureEnvelope } catch { /* Retain the HTTP failure when error content is malformed. */ }
         if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()
-        throw new ApiError(response.status, failure.error?.code || `HTTP_${response.status}`, failure.error?.message || '图片读取失败，请重新申请查看', failure.trace_id || response.headers.get('X-Trace-Id') || '—', failure.error?.details || [])
+        throw httpFailure(response, failure)
       }
       const result = await cancellable(response.blob(), controller.signal)
       if (generation !== this.generation || controller.signal.aborted) throw new StaleRequestError()

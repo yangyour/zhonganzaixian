@@ -1,0 +1,590 @@
+{
+  "date": "2026-10-14",
+  "environment": "lan-test-20261008 via pinned SSH; local isolated production bundle",
+  "browser": "155.0.4283.45",
+  "api_data": "real designated API; no fixtures",
+  "views": [
+    {
+      "route": "/account",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/identity/users",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/identity/roles",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/identity/settings",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/dashboard",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/assets",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/network-monitoring",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/manual-incidents",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/tickets",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/my-notification-preferences",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/asset-export-jobs",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/sla-scenarios",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/configurations",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/threshold-diagnostics",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/contact-imports",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/contact-import-preview",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/inspection-templates",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/change-notice-drafts",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/inspection-source-collections",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/inspection-worksheets",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/customer-contacts",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/operational-comparison",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/capacity-estimates",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/capability-catalog",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/tenant-inventory",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    },
+    {
+      "route": "/audit",
+      "width": 320,
+      "scroll": 320,
+      "apiErrors": 0,
+      "focusOutline": "none"
+    }
+  ],
+  "earlier_desktop_mobile": [
+    {
+      "route": "/account",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/identity/users",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/identity/roles",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/identity/settings",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/dashboard",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/assets",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/network-monitoring",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/manual-incidents",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/tickets",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/my-notification-preferences",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/asset-export-jobs",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/sla-scenarios",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/configurations",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/threshold-diagnostics",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/contact-imports",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/contact-import-preview",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/inspection-templates",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/change-notice-drafts",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/inspection-source-collections",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/inspection-worksheets",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/customer-contacts",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/operational-comparison",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/capacity-estimates",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/capability-catalog",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/tenant-inventory",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/audit",
+      "width": 390,
+      "scroll": 390,
+      "api_error_count": 0
+    },
+    {
+      "route": "/account",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/identity/users",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/identity/roles",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/identity/settings",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/dashboard",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/assets",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/network-monitoring",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/manual-incidents",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/tickets",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/my-notification-preferences",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/asset-export-jobs",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/sla-scenarios",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/configurations",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/threshold-diagnostics",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/contact-imports",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/contact-import-preview",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/inspection-templates",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/change-notice-drafts",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/inspection-source-collections",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/inspection-worksheets",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/customer-contacts",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/operational-comparison",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/capacity-estimates",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/capability-catalog",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/tenant-inventory",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    },
+    {
+      "route": "/audit",
+      "width": 1440,
+      "scroll": 1440,
+      "api_error_count": 0
+    }
+  ],
+  "roles": [
+    "padmin",
+    "msp",
+    "viewerA"
+  ],
+  "behaviors": [
+    "real login",
+    "filter empty and reset",
+    "asset detail",
+    "cancel preserves input",
+    "native form Chinese validation and focus",
+    "offline warning and recovery",
+    "search",
+    "404 recovery",
+    "keyboard skip link",
+    "MSP own worklogs",
+    "viewer has no create/admin menu"
+  ],
+  "production_form": {
+    "errors": 3,
+    "first_field": "资产名称",
+    "keyboard_within_dialog": true
+  },
+  "screenshots": "local ignored .local/ui-polish; all test data only",
+  "web_tests": {
+    "files": 121,
+    "passed": 1870,
+    "failed": 0,
+    "scope": "isolated task snapshot"
+  },
+  "contract_tests": {
+    "passed": 130,
+    "failed": 0
+  },
+  "contract_generation": "passed",
+  "typecheck": "passed",
+  "build": "passed",
+  "physical_mobile_device": false,
+  "wcag_certification": false,
+  "server_deployment": false,
+  "isolated_frontend_source_sha256": "84d295a46443c5f0720d3df72970c0ab09deb4df2a8e60227dda7e6a20ee6d12",
+  "build_index_sha256": "a3889adc1fc038e567b14af82d756dbf4f465e8a7614e18c319e2c853468d213",
+  "final_changes": [
+    "binary failure normalization",
+    "collapsed technical metric reasons",
+    "audit form spacing",
+    "320px header controls"
+  ],
+  "total_business_routes_checked": 28,
+  "metric_reason_toggle": "verified with browser click",
+  "component_check": {
+    "environment": "lan-test-20261008",
+    "all_12_containers_running": true,
+    "ready": true,
+    "schema_version": 30,
+    "production_ready": false,
+    "versions": {
+      "docker": "29.1.3",
+      "postgresql": "17.9 (Debian 17.9-1.pgdg12+1)",
+      "redis": "Redis server v=7.4.9 sha=00000000:0 malloc=jemalloc-5.3.0 bits=64 build=b4acab9aea09546d",
+      "minio": "minio version RELEASE.2025-09-07T16-13-09Z (commit-id=07c3a429bfed433e49018cb0f78a52145d4bedeb)",
+      "zabbix": "zabbix_server (Zabbix) 7.0.31",
+      "java": "openjdk 17.0.20.1 2026-08-18",
+      "nginx": "nginx version: nginx/1.31.6",
+      "rabbitmq": "4.3.2"
+    }
+  }
+}

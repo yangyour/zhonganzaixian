@@ -1,0 +1,352 @@
+{
+  "verified_at": "2026-10-14T05:38:54.486027+00:00",
+  "environment": "lan-test-20261008",
+  "postgresql": "17.9",
+  "schema_version": 30,
+  "api_version": "0.47.0",
+  "candidate_worker_sha256": "92290045271a375c1ee8af691bd55751df19f3a135ee4e1f531aa534966a4226",
+  "cutoff_utc": "2026-10-14T05:38:28.480Z",
+  "http_checks": [
+    {
+      "label": "csrf",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200
+    },
+    {
+      "label": "login",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200
+    },
+    {
+      "label": "scope_reference",
+      "method": "GET",
+      "path": "/assets",
+      "status": 200
+    },
+    {
+      "label": "create_fake_asset",
+      "method": "POST",
+      "path": "/assets",
+      "status": 200
+    },
+    {
+      "label": "old_before_cutover",
+      "method": "POST",
+      "path": "/asset-export-jobs",
+      "status": 202
+    },
+    {
+      "label": "first_automatic",
+      "method": "POST",
+      "path": "/asset-export-jobs",
+      "status": 202
+    },
+    {
+      "label": "empty_automatic",
+      "method": "POST",
+      "path": "/asset-export-jobs",
+      "status": 202
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "recovery_after_claim",
+      "method": "POST",
+      "path": "/asset-export-jobs",
+      "status": 202
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "read_owned_job",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}",
+      "status": 200
+    },
+    {
+      "label": "original_202_receipt_preserved",
+      "method": "POST",
+      "path": "/asset-export-jobs",
+      "status": 202
+    },
+    {
+      "label": "not_implicitly_published",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}/publication",
+      "status": 200
+    },
+    {
+      "label": "explicit_publish",
+      "method": "POST",
+      "path": "/asset-export-jobs/{id}/publication",
+      "status": 200
+    },
+    {
+      "label": "explicit_grant",
+      "method": "POST",
+      "path": "/asset-export-jobs/{id}/content-grants",
+      "status": 200
+    },
+    {
+      "label": "actual_download",
+      "method": "GET",
+      "path": "/asset-export-jobs/{id}/content",
+      "status": 200
+    }
+  ],
+  "http_check_count": 38,
+  "workbooks": [
+    {
+      "sha256": "169ae1994f1792e2c6bbe84bdd305a5038e6db4922a82defd334494bd999a2eb",
+      "size": 4961,
+      "data_rows": 1,
+      "columns": 16
+    },
+    {
+      "sha256": "c67ba8b01061bda047e41fad275e713053fbdb41e0ee0357225bf720a5d111a7",
+      "size": 4816,
+      "data_rows": 0,
+      "columns": 16
+    },
+    {
+      "sha256": "ed9f07a84b9d8fdfcc4e0c9739dc66f8e1df649c93f20f11ba2af5e98857f0d8",
+      "size": 4961,
+      "data_rows": 1,
+      "columns": 16
+    }
+  ],
+  "completed": true,
+  "recovery": {
+    "point": "committed claim before encoding in owned probe process",
+    "probe_exit": 137,
+    "next_fence": 2,
+    "encoding_transaction_kill_tested": false
+  },
+  "preserved": {
+    "pre_cutoff_job_row_hash": true,
+    "prepared_files_and_attempts": true,
+    "original_202_receipt_queued_v0": true
+  },
+  "explicit_publication_and_actual_download_verified": true,
+  "browser": {
+    "engine": "Edge",
+    "transport": "local Vite through pinned SSH to actual API",
+    "desktop": {
+      "automatic_preparation_visible": true,
+      "publication_panel_current": true,
+      "stops_polling_when_prepared": true,
+      "page_errors": []
+    },
+    "acceptance_posts": 1,
+    "initial_publication_panel_staleness_found_and_fixed": true,
+    "mobile_layout_verified": false,
+    "physical_device_verified": false
+  },
+  "checks": {
+    "web": 1886,
+    "contract": 130,
+    "static_release_gate": 9,
+    "typecheck_and_build": true,
+    "java": [
+      {
+        "class": "PostgresAssetExportPrepareIntegrationTest",
+        "tests": 19,
+        "real_postgresql": true,
+        "failures": 0,
+        "skipped": 0
+      },
+      {
+        "class": "PostgresExportPreparationQueueIntegrationTest",
+        "tests": 9,
+        "real_postgresql": true,
+        "failures": 0,
+        "skipped": 0
+      },
+      {
+        "class": "AssetExportPreparationProcessorTest",
+        "tests": 10,
+        "real_postgresql": false,
+        "failures": 0,
+        "skipped": 0
+      },
+      {
+        "class": "ExportPreparationQueueDispatchTest",
+        "tests": 3,
+        "real_postgresql": false,
+        "failures": 0,
+        "skipped": 0
+      },
+      {
+        "class": "ExportPreparationQueueTest",
+        "tests": 11,
+        "real_postgresql": false,
+        "failures": 0,
+        "skipped": 0
+      },
+      {
+        "class": "ExportPreparationWorkerRuntimeTest",
+        "tests": 5,
+        "real_postgresql": false,
+        "failures": 0,
+        "skipped": 0
+      },
+      {
+        "class": "ExportPreparationWorkerSettingsTest",
+        "tests": 10,
+        "real_postgresql": false,
+        "failures": 0,
+        "skipped": 0
+      }
+    ],
+    "java_total": 67
+  },
+  "formal_contract_acceptance": "NOT_RUN",
+  "notification_delivery_implemented": false,
+  "production_ready": false,
+  "credentials_output": false,
+  "failures_retained": "private logs retain initial obsolete test assertions, proxy same-origin refusal, UI panel staleness and browser harness failures",
+  "final_worker_sha256": "9a79b550b0b7f3ba04ab851d741e3b5406ea46781455f6867b30dd1ec7825148",
+  "final_worker_change_from_process_proof": "Adds explicit source readiness to every queue dependency probe; final actual deployment checked separately"
+}

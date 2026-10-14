@@ -1,5 +1,7 @@
 # 台账导出：显式发布与授权下载
 
+2026-10-14后续增加[后台自动准备与进度刷新](asset-export-automatic-preparation.md)。准备与本页显式发布/下载继续分开；下文12服务及单作业证据是前一批部署快照。
+
 2026-10-14，实际API 0.47.0，指定内网测试环境 `lan-test-20261008`，PostgreSQL17.9/V30、既有MinIO。此功能补齐M3-7的“已准备文件→对象存储核验→当前用户签名链接→实际下载”子链。原准备请求仍明确为 `PREPARE_ONLY_NO_PUBLICATION`，不会因为部署新版而自动上传历史任务或向客户发信。
 
 已与横排菜单一起部署至[指定测试站](http://192.168.1.215:10010)，应用代码基线 `fd1e8f1`。公开入口另完成9次HTTP复核，实际下载摘要保持、原过期链接404、既有基础监控可读；API/Web之外10个服务的镜像/启动时间/重启次数不变。候选API、本机验证隧道和开发服务器已清理，服务端12服务仍运行且发布能力ready。部署、公开入口与最终组件证据分别见[部署记录](evidence/export-navigation-deployment-20261014.json)、[公开HTTP](evidence/export-navigation-public-http-20261014.json)、[最终组件](evidence/export-navigation-components-final-20261014.json)。

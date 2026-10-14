@@ -1,5 +1,9 @@
 # 指定测试环境组件清单
 
+## 2026-10-14 导出自动准备应用
+
+复用既有PostgreSQL17.9/V30、受限mop_test_runtime和Java镜像；新增独立项目应用export-preparation-worker，不引入数据库/队列/缓存/监控组件。Worker无存储/迁移/身份源秘密，仅准备真实XLSX。候选进程验证38次HTTP和领取后中断接管，常驻发布后的13服务结果另见部署记录。缺失的站内信送达链仍阻塞M3-7完整闭环，候选为既有通知设计下的耐久站内消息，尚未交付；不能把MinIO或队列在线记为通知成功。见[功能边界](../asset-export-automatic-preparation.md)。
+
 2026-10-14 前端上线准备第二轮再次经固定主机信任只读盘点：12服务运行，schema V30、ready=true、production_ready=false。真实浏览器通过SSH回环API验证恢复和自身会话结束/重登录；无基础组件安装、生命周期修改或迁移。
 
 2026-10-14 全站交互打磨前再次执行固定主机信任只读盘点：12 服务运行、schema V30、ready=true、production_ready=false；本轮无组件安装/迁移/配置变更。前端浏览器使用本地构建和指定站真实 API；Vite 经 Nginx 反代登录因同源检查拒绝，静态覆盖又遇到浏览器私网访问限制，最终采用固定主机信任 SSH 隧道直连服务回环 API，保留同源校验，不放宽 CSRF。

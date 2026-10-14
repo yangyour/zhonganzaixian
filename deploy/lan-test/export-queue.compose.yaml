@@ -1,0 +1,20 @@
+# Opt-in project application overlay. Does not install or replace any shared component.
+name: mop-lan-test
+services:
+  export-preparation-worker:
+    image: ${JAVA_IMAGE:?reuse the verified existing Java image}
+    container_name: mop-lan-export-preparation-worker
+    network_mode: host
+    restart: unless-stopped
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:rw,nosuid,size=256m"]
+    volumes: ["${EXPORT_QUEUE_RELEASE_DIR:?verified immutable export worker release required}:/app:ro"]
+    env_file: [./private/export-queue.env]
+    command: [java, -XX:MaxRAMPercentage=60.0, -jar, /app/export-worker.jar, --run-queue-without-publication]
+    mem_limit: 512m
+    stop_grace_period: 40s
+    labels: {mop.project: mop-lan-test, mop.role: export-preparation-queue}
+    logging: {driver: json-file, options: {max-size: 10m, max-file: "3"}}

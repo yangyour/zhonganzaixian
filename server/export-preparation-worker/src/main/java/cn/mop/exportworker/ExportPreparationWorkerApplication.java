@@ -13,7 +13,7 @@ public final class ExportPreparationWorkerApplication {
     private ExportPreparationWorkerApplication(){}
     public static void main(String[] args){
         int exit;
-        try{var settings=ExportPreparationWorkerSettings.from(args,System::getenv);var mapper=mapper();Map<String,Object> result=run(settings,mapper);System.out.println(mapper.writeValueAsString(result));exit="NOT_CLAIMED".equals(result.get("status"))?3:0;}
+        try{if(args!=null&&args.length==1&&"--run-queue-without-publication".equals(args[0])){ExportPreparationQueueApplication.run(ExportPreparationQueueSettings.from(args,System::getenv));exit=0;}else{var settings=ExportPreparationWorkerSettings.from(args,System::getenv);var mapper=mapper();Map<String,Object> result=run(settings,mapper);System.out.println(mapper.writeValueAsString(result));exit="NOT_CLAIMED".equals(result.get("status"))?3:0;}}
         catch(Exception failure){System.out.println("{\"status\":\"FAILED\",\"error_code\":\""+safeCode(failure)+"\",\"details\":\"REDACTED\"}");exit=1;}
         if(exit!=0)System.exit(exit);
     }

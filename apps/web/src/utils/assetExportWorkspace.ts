@@ -12,14 +12,14 @@ export function createAssetExportWorkspace(client:Pick<ApiClient,'request'>,noti
  function checkKnown(job:AssetExportSummary){const old=known.get(job.id),current=exportSummary(job);if(old){for(const key of ['tenant_id','created_by','accepted_permission_version','accepted_role','input_sha256','filters','created_at'] as const)if(!exportEquals(old[key],current[key]))throw exportBad();if(current.version<old.version||exportTime(current.updated_at)<exportTime(old.updated_at)||(current.version===old.version||['SUCCEEDED','FAILED'].includes(old.status))&&!exportEquals(old,current))throw exportBad()}}
  function remember(job:AssetExportSummary){known.set(job.id,structuredClone(exportSummary(job)));if(known.size>512){const id=known.keys().next().value!;known.delete(id);details.delete(id)}}
  function checkDetails(job:AssetExportDetail){const old=details.get(job.id);if(old&&(job.attempts<old.attempts||old.prepared!==null&&!exportEquals(old.prepared,job.prepared)||(job.version===old.version||['SUCCEEDED','FAILED'].includes(old.status))&&!exportEquals(old,job)))throw exportBad();if(state.receipt?.job_id===job.id&&state.attempt&&!exportEquals(job.filters,JSON.parse(state.attempt.payload).filters))throw exportBad()}
- async function read(id?:string,next=false){
+ async function read(id?:string,next=false,preserveSelected=false){
   if(!scope||disposed||state.busy)return false
   const before=next&&state.page?.has_more?{time:state.page.next_before_created_at!,id:state.page.next_before_id!}:undefined;if(next&&!before)return false
   if(id!==undefined&&!exportUuid(id)){state.selected=null;state.error=exportBad();emit();return false}
-  const turn=++epoch,context={...scope},controller=new AbortController();abort=controller;state={...state,busy:'read',selected:null,...(id?{}:{page:null,paged:next}),error:null};emit()
+  const turn=++epoch,context={...scope},controller=new AbortController();abort=controller;state={...state,busy:'read',selected:preserveSelected&&state.selected?.id===id?state.selected:null,...(id?{}:{page:null,paged:next}),error:null};emit()
   try{const query=new URLSearchParams({page_size:'15'});if(before){query.set('before_created_at',before.time);query.set('before_id',before.id)}const raw=await client.request<unknown>(id?'/asset-export-jobs/'+id:'/asset-export-jobs?'+query,{signal:controller.signal});if(turn!==epoch||disposed||controller.signal.aborted)return false
    if(id){const job=readExportDetail(raw,context,id);checkKnown(job);checkDetails(job);remember(job);details.set(job.id,structuredClone(job));state.selected=job}else{const page=readExportPage(raw,context,before);page.items.forEach(checkKnown);page.items.forEach(remember);state.page=page}return true
-  }catch(error){if(turn===epoch&&!disposed&&!isCancelled(error))state.error=error;return false}finally{if(turn===epoch&&!disposed){state.busy=null;abort=null;emit()}}
+  }catch(error){if(turn===epoch&&!disposed&&!isCancelled(error)){state.selected=null;state.error=error}return false}finally{if(turn===epoch&&!disposed){state.busy=null;abort=null;emit()}}
  }
  async function send(attempt:Attempt,retry:boolean){
   if(!scope||disposed||state.busy)return false
@@ -28,5 +28,5 @@ export function createAssetExportWorkspace(client:Pick<ApiClient,'request'>,noti
   }catch(error){if(turn===epoch&&!disposed){state.error=error;state.attempt={...attempt,state:writeFailureUncertain(retry,error)?'uncertain':'rejected'}}return false}finally{if(turn===epoch&&!disposed){state.busy=null;abort=null;emit()}}
  }
  async function submit(filters:unknown){if(!scope||disposed||state.busy||state.attempt)return false;try{const input=assetExportInput(filters),key=newKey();if(typeof key!=='string'||key.length<1||key.length>128||/[^A-Za-z0-9._:-]/.test(key))throw exportBad();return send({path:'/asset-export-jobs',payload:JSON.stringify(input),key,state:'uncertain'},false)}catch(error){state.error=error;emit();return false}}
- emit();return{reset,state:snapshot,unresolved,submit,list:(next=false)=>read(undefined,next),select:(id:string)=>read(id),retry:()=>state.attempt?.state==='uncertain'?send(state.attempt,true):Promise.resolve(false),begin:()=>{if(!scope||disposed||state.busy||unresolved())return false;state={...state,receipt:null,attempt:null,error:null};emit();return true},dispose:()=>{disposed=true;reset(null)}}
+ emit();return{reset,state:snapshot,unresolved,submit,list:(next=false)=>read(undefined,next),select:(id:string)=>read(id),refreshSelected:()=>state.selected?read(state.selected.id,false,true):Promise.resolve(false),retry:()=>state.attempt?.state==='uncertain'?send(state.attempt,true):Promise.resolve(false),begin:()=>{if(!scope||disposed||state.busy||unresolved())return false;state={...state,receipt:null,attempt:null,error:null};emit();return true},dispose:()=>{disposed=true;reset(null)}}
 }

@@ -1,6 +1,6 @@
 # LAN测试部署模板
 
-2026-10-14当前测试站已部署API0.47及顶部横排模块导航。台账准备仍须显式运行下方单作业Worker；文件发布/900秒签名下载另行由已授权创建人在页面确认，见[导出发布配置与限制](../../docs/asset-export-publication.md)。启用时将独立导出桶/账号、`MOP_EXPORT_PUBLICATION_ENABLED`、`MOP_EXPORT_DOWNLOAD_SIGNING_KEY`仅写入API私有env；不把签名密钥给准备Worker，不自动发布历史作业，不重启存储/数据库等无关服务。
+2026-10-14当前测试站已部署API0.47及顶部横排模块导航。台账准备可显式启用[常驻自动队列](../../docs/asset-export-automatic-preparation.md)，原单作业Worker继续保留；文件发布/900秒签名下载另行由已授权创建人在页面确认，见[导出发布配置与限制](../../docs/asset-export-publication.md)。启用时将独立导出桶/账号、`MOP_EXPORT_PUBLICATION_ENABLED`、`MOP_EXPORT_DOWNLOAD_SIGNING_KEY`仅写入API私有env；不把签名密钥给准备Worker，不自动发布历史作业，不重启存储/数据库等无关服务。
 
 2026-10-12基础网络监控已接入MOP，见[运行参数与验收](../../docs/basic-network-monitoring.md)。API私有env显式启用MOP_NETWORK_MONITORING_ENABLED，提供回环Zabbix端点、受限只读token及固定资产绑定JSON。部署分别指定API_RELEASE_DIR和WEB_RELEASE_DIR；后者缺省沿用RELEASE_DIR。先在不可变新版本目录校验工件SHA256，再仅更新本项目api/web，保留旧私有env及版本引用以便回退。不得修改已在使用的静态文件目录或重启无关组件。
 
@@ -44,3 +44,7 @@ python tools/inspect-lan-test-server.py
 
 
 2026-10-14前端发布准备：Web构建新增静态产物完整性/大小门禁及release-manifest.json。候选[静态缓存片段](web-static-locations.conf)须替换原静态location块，保留API/认证反代，不可直接与原块重复include。需要Nginx≥1.29.3以合并继承安全头；本项目1.31.6语法已验证，尚未应用。上传后用`node tools/verify-web-release.mjs --dist <候选web目录> --check --expected-build-id <已记录值>`只读核对，不能在服务器上重新生成清单冒充构建原摘要。完整流程与回退见[第二轮上线准备](../../docs/frontend-release-readiness-20261014.md)。
+
+## 自动准备应用覆盖配置
+
+独立`export-queue.compose.yaml`只增加本项目准备Worker，使用私有`export-queue.env`和已核验`EXPORT_QUEUE_RELEASE_DIR`。开启时固定UTC启用时间、受限PG角色与技术租期；重启保留同一启用时间。先使用两个Compose文件执行`config --quiet`，再`up -d --no-deps export-preparation-worker`，不要重新启动基础组件。验证用`python tools/inspect-lan-test-server.py --include-export-queue`，同时提交新虚构请求核对实际XLSX。不开覆盖文件时原12服务模板与单任务入口保持可用。

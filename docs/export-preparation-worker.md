@@ -1,5 +1,7 @@
 # 独立、单任务、仅准备文件的导出Worker
 
+2026-10-14新增独立显式开启的常驻自动准备模式，见[自动准备与固定启用时间](asset-export-automatic-preparation.md)。以下“只处理一个job”的说明继续适用于原`--prepare-one-without-publication`入口及对应历史证据；不再概括新队列模式。两个模式均不发布、下载或通知。
+
 ## 范围
 
 `server/export-preparation-worker` 生成独立 `mop-export-preparation-worker-0.1.0-SNAPSHOT.jar`。入口是 `cn.mop.exportworker.ExportPreparationWorkerApplication`，不启动Spring上下文/Web服务器/Flyway，也不构造存储或通知客户端；包内不包含原photo/import/contact Worker和mop-adapters/MinIO依赖。API/原Worker包不因此增加POI运行依赖。

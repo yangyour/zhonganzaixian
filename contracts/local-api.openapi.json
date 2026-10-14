@@ -22923,7 +22923,7 @@
     "/asset-export-jobs": {
       "post": {
         "operationId": "acceptAssetExportPreparation",
-        "summary": "明确仅准备模式：202只受理QUEUED，既有单任务Worker另行启动，未开放发布或下载",
+        "summary": "明确仅准备模式：202返回原QUEUED收据；显式启用的专用队列可准备启用时间之后的API请求，不自动发布、授权下载或通知",
         "parameters": [
           {
             "name": "Idempotency-Key",

@@ -14,7 +14,7 @@ NAMES = ('postgres', 'minio', 'redis', 'rabbitmq', 'api', 'photo-worker',
          'import-worker', 'contact-worker', 'web', 'zabbix-server', 'zabbix-web', 'zabbix-agent')
 
 
-def inspect(output: Path | None = None) -> dict:
+def inspect(output: Path | None = None, include_export_queue: bool = False) -> dict:
     cfg = json.loads((ROOT / 'deploy/private/lan-test-connection.json').read_text(encoding='utf-8-sig'))
     if cfg['environment'] != 'lan-test-20261008' or cfg['host'] != '192.168.1.215':
         raise ValueError('Unexpected deployment destination')
@@ -49,7 +49,8 @@ def inspect(output: Path | None = None) -> dict:
             raise ValueError('Project ownership mismatch')
         containers = {}
         storage_providers = {}
-        for suffix in NAMES:
+        selected_names = NAMES + (('export-preparation-worker',) if include_export_queue else ())
+        for suffix in selected_names:
             name = 'mop-lan-'+suffix
             item = json.loads(run(['docker', 'inspect', name], True))[0]
             if item['Config']['Labels'].get('mop.project') != 'mop-lan-test':
@@ -87,7 +88,10 @@ def inspect(output: Path | None = None) -> dict:
             'zabbix_origin': 'http://'+cfg['host']+':10020',
             'containers': containers, 'versions': versions, 'schema_version': schema_count,
             'storage_providers': storage_providers,
-            'all_12_containers_running': all(x['Running'] for x in containers.values()),
+            'all_12_containers_running': all(containers['mop-lan-'+name]['Running'] for name in NAMES),
+            'selected_container_count': len(containers),
+            'all_selected_containers_running': all(x['Running'] for x in containers.values()),
+            'export_preparation_queue_included': include_export_queue,
             'ready': readiness.get('ready') is True, 'mode': readiness.get('mode'),
             'durable': readiness.get('durable'), 'photos_ready': readiness['photos']['ready'],
             'asset_source_storage_ready': readiness['asset_imports']['ready'],
@@ -104,11 +108,12 @@ def inspect(output: Path | None = None) -> dict:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--include-export-queue', action='store_true')
     args = parser.parse_args()
     try:
-        report = inspect(args.output)
-        print(json.dumps({k: report[k] for k in ('environment', 'ssh_authenticated', 'all_12_containers_running', 'ready', 'schema_version', 'production_ready')}))
-        raise SystemExit(0 if report['all_12_containers_running'] and report['ready'] else 1)
+        report = inspect(args.output, args.include_export_queue)
+        print(json.dumps({k: report[k] for k in ('environment', 'ssh_authenticated', 'all_12_containers_running', 'selected_container_count', 'all_selected_containers_running', 'ready', 'schema_version', 'production_ready')}))
+        raise SystemExit(0 if report['all_selected_containers_running'] and report['ready'] else 1)
     except Exception as failure:
         print(json.dumps({'status': 'FAILED', 'exception': type(failure).__name__, 'details': 'omitted'}))
         raise SystemExit(1)

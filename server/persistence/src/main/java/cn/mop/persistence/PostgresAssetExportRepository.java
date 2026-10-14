@@ -9,7 +9,7 @@ import java.time.*;
 import java.util.*;
 
 /** Durable accepted commands and original receipts. No public API, worker, store or download side effects. */
-public final class PostgresAssetExportRepository implements AssetExportJobRepository,AssetExportPublicationRepository {
+public final class PostgresAssetExportRepository implements AssetExportJobRepository,AssetExportPublicationRepository,AssetExportPreparationQueue {
     private static final System.Logger LOG=System.getLogger(PostgresAssetExportRepository.class.getName());
     private final DataSource source;private final PostgresPlatformRepository platform;
     private static final String COLUMNS="id,tenant_id,created_by,permission_version,accepted_role,command_bytes,input_sha256,state,version,created_at,updated_at";
@@ -140,13 +140,21 @@ public final class PostgresAssetExportRepository implements AssetExportJobReposi
     @Override public Optional<Claim> claim(String jobId,String worker,Duration lease){return claimMatching(uuid(jobId),worker,lease);}
     @Override public Optional<Claim> claimNext(String worker,Duration lease){return claimMatching(null,worker,lease);}
     private Optional<Claim> claimMatching(String target,String worker,Duration lease){
+        return claimMatching(target,worker,lease,null);
+    }
+    @Override public Optional<Claim> claimNextUnprepared(String worker,Duration lease,Instant acceptedAfter){
+        if(acceptedAfter==null||acceptedAfter.getNano()%1000000!=0||acceptedAfter.isBefore(Instant.parse("0001-01-01T00:00:00Z"))||acceptedAfter.isAfter(Instant.parse("9999-12-31T23:59:59.999Z")))throw invalid();
+        return claimMatching(null,worker,lease,acceptedAfter);
+    }
+    private Optional<Claim> claimMatching(String target,String worker,Duration lease,Instant acceptedAfter){
         if(worker==null||!worker.matches("[A-Za-z0-9._:-]{1,64}"))throw invalid();AssetExportJobState.validateLease(lease);
         return platform.exportJobTransaction(()->{
             Connection c=platform.exportCommandConnection();
             try{
                 String id=null,tenant=null,actor=null,role=null,trace=null,hash=null;long permission=0,version=0;int fence=0;boolean prepared=false;byte[] bytes=null;
-                try(var s=statement(c,"SELECT "+COLUMNS+",trace_id,fencing_token,(file_bytes IS NOT NULL) AS prepared FROM public.mop_asset_export_job WHERE (state='QUEUED' OR (state IN ('RUNNING','RECONCILING_STORAGE') AND lease_until<=clock_timestamp()))"+(target==null?" AND fencing_token<1000":" AND id=?::uuid")+" ORDER BY COALESCE(lease_until,created_at),created_at,id LIMIT 1 FOR UPDATE SKIP LOCKED")){
+                try(var s=statement(c,"SELECT "+COLUMNS+",trace_id,fencing_token,(file_bytes IS NOT NULL) AS prepared FROM public.mop_asset_export_job WHERE (state='QUEUED' OR (state IN ('RUNNING','RECONCILING_STORAGE') AND lease_until<=clock_timestamp()))"+(target==null?" AND fencing_token<1000":" AND id=?::uuid")+(acceptedAfter==null?"":" AND file_bytes IS NULL AND created_at>=? AND EXISTS (SELECT 1 FROM public.mop_idempotency receipt WHERE receipt.actor_id=mop_asset_export_job.created_by AND receipt.tenant_id=mop_asset_export_job.tenant_id AND receipt.route='POST /api/v1/asset-export-jobs' AND receipt.response_json->>'job_id'=mop_asset_export_job.id::text AND receipt.response_json->>'mode'='PREPARE_ONLY_NO_PUBLICATION')")+" ORDER BY COALESCE(lease_until,created_at),created_at,id LIMIT 1 FOR UPDATE SKIP LOCKED")){
                     if(target!=null)s.setString(1,target);
+                    if(acceptedAfter!=null)instant(s,target==null?1:2,acceptedAfter);
                     try(var r=s.executeQuery()){if(r.next()){id=r.getString("id");tenant=r.getString("tenant_id");actor=r.getString("created_by");role=r.getString("accepted_role");permission=r.getLong("permission_version");version=r.getLong("version");fence=r.getInt("fencing_token");prepared=r.getBoolean("prepared");trace=r.getString("trace_id");hash=r.getString("input_sha256");bytes=r.getBytes("command_bytes");}}
                 }
                 if(id==null)return Optional.empty();
@@ -171,6 +179,21 @@ public final class PostgresAssetExportRepository implements AssetExportJobReposi
         });
     }
     private static Instant clock(Connection c)throws SQLException{try(var s=statement(c,"SELECT clock_timestamp()::timestamptz(3)");var r=s.executeQuery()){if(!r.next())throw corrupt();return r.getObject(1,OffsetDateTime.class).toInstant();}}
+    @Override public void rejectPreparationInputLimit(Claim claim){
+        validateClaim(claim);
+        platform.exportJobTransaction(()->{
+            Connection c=platform.exportCommandConnection();
+            try{
+                Locked row=locked(c,claim);Instant now=checkLeaseAndAuthorization(c,row,claim);
+                if(row.encoding()!=null||row.state()!=AssetExportJobState.State.RUNNING||row.version()!=claim.version())throw new DomainException(409,"EXPORT_PREPARATION_CHANGED","File preparation changed; cannot replace a prepared or uncertain storage result with an input failure");
+                if(row.version()>=9007199254740991L)throw leaseLost();
+                try(var s=statement(c,"UPDATE public.mop_asset_export_job SET state='FAILED',error_code='INPUT_LIMIT',version=version+1,updated_at=? WHERE id=?::uuid AND version=? AND fencing_token=? AND lease_owner=?")){
+                    instant(s,1,now);s.setString(2,row.id());s.setLong(3,row.version());s.setInt(4,row.fence());s.setString(5,row.worker());if(s.executeUpdate()!=1)throw leaseLost();
+                }
+                var a=row.command().acceptedAccess();platform.audit(a.actorId().toString(),a.tenantId().toString(),"asset_export.preparation_limit","asset_export",row.id(),"FAILED","CONFIRMED_TECHNICAL_INPUT_LIMIT_NO_FILE_PREPARED",row.trace());return null;
+            }catch(SQLException failure){throw unavailable(failure);}
+        });
+    }
     private static void instant(PreparedStatement s,int index,Instant value)throws SQLException{s.setObject(index,OffsetDateTime.ofInstant(value,ZoneOffset.UTC));}
     private record Locked(String id,AssetExportJobState.Command command,String trace,AssetExportJobState.State state,long version,int fence,String worker,Instant createdAt,Instant updatedAt,Instant leaseStarted,Instant leaseUntil,AssetExportJobState.Encoding encoding){}
     @Override public Work loadWork(Claim claim){

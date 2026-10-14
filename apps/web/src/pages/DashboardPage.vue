@@ -28,96 +28,129 @@ defineExpose({state,autoRefresh,refresh,changeWindow})
 
 <template>
  <section class="dashboard-page" :aria-busy="state.busy">
-  <header class="dashboard-heading"><div><h1>运营总览</h1><p>{{session?.tenant.name}} · 北京时间（Asia/Shanghai）</p></div><span class="availability-badge">监控指标未接入</span></header>
-  <p class="dashboard-boundary" role="note">这里仅核对当前授权与数据库观察时间。未知指标不表示正常、零事件或送达成功；首页尚未完成正式监控验收</p>
+  <header class="dashboard-heading"><div><h1>运营总览 <span class="tenant-badge">{{session?.tenant.name}}</span></h1><p>服务健康、事件与履约概览 · 北京时间（Asia/Shanghai）</p></div><span class="availability-badge"><span aria-hidden="true" />监控指标未接入</span></header>
+  <p class="dashboard-boundary" role="note"><span class="boundary-icon" aria-hidden="true">i</span><span>这里仅核对当前授权与数据库观察时间。未知指标不表示正常、零事件或送达成功；首页尚未完成正式监控验收</span></p>
   <p v-if="!permitted" role="alert">当前会话不可读取运营总览，或正在切换租户；已清除原范围数据</p>
   <template v-else>
+   <div class="dashboard-toolbar">
    <div class="dashboard-controls">
     <label>告警趋势范围 <select aria-label="告警趋势范围" :value="state.window" @change="chooseWindow"><option value="HOURS_24">最近24小时</option><option value="DAYS_7">最近7天</option><option value="DAYS_30">最近30天</option></select></label>
     <button type="button" :disabled="state.busy" @click="refresh">{{state.busy?'读取中…':'刷新授权状态'}}</button>
     <label class="auto-refresh"><input v-model="autoRefresh" type="checkbox" aria-label="每30秒自动只读刷新" />每30秒只读刷新</label>
    </div>
    <p class="read-status" role="status" aria-live="polite">{{state.busy?'正在读取当前授权范围':state.error?'当前读取失败，未沿用旧数据':state.current?'授权与时间投影已读取；指标仍未知':'尚未读取'}} · {{autoRefresh?'后台标签页暂停自动刷新':'自动刷新已暂停'}}</p>
+   </div>
    <ApiErrorNotice :error="state.error" :retrying="state.busy" @retry="refresh" />
-   <p v-if="state.current" class="observation" data-testid="observation">数据库观察时间：{{displayTime(state.current.generated_at)}}（未核验时钟同步，不是指标采样时间）<br />本月起点：{{displayTime(state.current.month_start)}}<span v-if="state.current.month_window_empty"> · 正好处于月初，累计区间为空</span></p>
    <div class="dashboard-kpis" aria-label="六项固定运营指标">
-    <article v-for="(card,index) in kpis" :key="card.id" class="kpi-card" :data-kpi="card.id"><h2>{{card.title}}</h2><strong class="unknown-value">{{noDataText}}</strong><p>{{card.hint}}</p><details v-if="state.current" class="metric-reason"><summary>查看未接入原因</summary><small>{{state.current.kpis[index]?.unavailable_reason}}</small></details></article>
+    <article v-for="(card,index) in kpis" :key="card.id" class="kpi-card" :data-kpi="card.id"><h2>{{card.title}}<span class="metric-indicator" aria-hidden="true" /></h2><strong class="unknown-value" :class="{'reading-value':!state.current}">{{noDataText}}</strong><p>{{card.hint}}</p><details v-if="state.current" class="metric-reason"><summary>查看未接入原因</summary><small>{{state.current.kpis[index]?.unavailable_reason}}</small></details></article>
    </div>
    <div class="dashboard-panels">
-    <article v-for="(panel,index) in panels" :key="panel.id" class="dashboard-panel" :data-panel="panel.id"><header><h2>{{panel.title}}</h2><span>未采集</span></header><p v-if="state.current?.panels[index]?.period" class="panel-period">{{displayTime(state.current.panels[index]!.period!.from)}} 至 {{displayTime(state.current.panels[index]!.period!.to)}}</p><div class="unavailable-panel"><strong>{{noDataText}}</strong><p>{{panel.hint}}</p><details v-if="state.current" class="metric-reason"><summary>查看未接入原因</summary><small>{{state.current.panels[index]?.unavailable_reason}}</small></details></div></article>
+    <article v-for="(panel,index) in panels" :key="panel.id" class="dashboard-panel" :data-panel="panel.id"><header><h2>{{panel.title}}</h2><span class="panel-status">未采集</span></header><div class="unavailable-panel"><span class="panel-empty-icon" aria-hidden="true"><i /></span><strong>{{noDataText}}</strong><p>{{panel.hint}}</p></div><details v-if="state.current" class="metric-reason panel-reason"><summary>查看未接入原因与统计范围</summary><div class="panel-reason-content"><small>{{state.current.panels[index]?.unavailable_reason}}</small><p v-if="state.current.panels[index]?.period" class="panel-period">统计范围：{{displayTime(state.current.panels[index]!.period!.from)}} 至 {{displayTime(state.current.panels[index]!.period!.to)}}</p></div></details></article>
    </div>
-   <footer class="dashboard-footnote">布局与顺序固定，不提供拖拽、隐藏或保存布局。刷新只发起GET，不新增工单、收据或监控样本</footer>
+   <details class="dashboard-explanation"><summary>数据口径与读取说明</summary><div><p v-if="state.current" class="observation" data-testid="observation">数据库观察时间：{{displayTime(state.current.generated_at)}}（未核验时钟同步，不是指标采样时间）<br />本月起点：{{displayTime(state.current.month_start)}}<span v-if="state.current.month_window_empty"> · 正好处于月初，累计区间为空</span></p><p class="dashboard-footnote">布局与顺序固定，不提供拖拽、隐藏或保存布局。刷新只发起GET，不新增工单、收据或监控样本</p></div></details>
   </template>
  </section>
 </template>
 
 <style scoped>
-.dashboard-page { display: grid; gap: 20px; min-width: 0; }
-.dashboard-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-.dashboard-heading h1 { margin: 0 0 8px; font-size: 26px; line-height: 1.4; color: var(--mop-text); }
-.dashboard-heading p { margin: 0; color: var(--mop-muted); font-size: 14px; }
-.availability-badge { padding: 6px 10px; border: 1px solid #dce5ef; border-radius: 6px; background: #fff; color: #596d84; white-space: nowrap; font-size: 12px; }
-.dashboard-boundary { margin: 0; padding: 12px 16px; border: 1px solid #ead4a9; border-radius: 8px; background: #fff8e8; line-height: 1.7; color: #684917; font-size: 13px; }
-.dashboard-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-.dashboard-controls label { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--mop-muted); }
-.dashboard-controls select, .dashboard-controls button { min-height:44px; padding: 8px 12px; border: 1px solid #b7c6d5; border-radius: 7px; background: #fff; color: var(--mop-text); font: inherit; }
-.dashboard-controls button { cursor: pointer; }
+.dashboard-page { display: grid; gap: 12px; min-width: 0; }
+.dashboard-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 18px; border: 1px solid var(--mop-border); border-radius: var(--mop-radius,4px); background: #fff; }
+.dashboard-heading h1 { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 0 0 5px; font-size: 18px; font-weight: 600; line-height: 1.5; color: var(--mop-text); }
+.dashboard-heading p { margin: 0; color: var(--mop-muted); font-size: 12px; line-height: 1.6; }
+.tenant-badge { max-width: 100%; padding: 2px 8px; border: 1px solid #dceafd; border-radius: 3px; background: #f0f7ff; color: #286cbf; font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
+.availability-badge { display: inline-flex; align-items: center; gap: 7px; padding: 5px 9px; border: 1px solid #e0e7ee; border-radius: 3px; background: #f8fafc; color: var(--mop-muted); white-space: nowrap; font-size: 12px; }
+.availability-badge > span { width: 6px; height: 6px; border-radius: 50%; background: #94a3b8; flex: none; }
+.dashboard-boundary { display: flex; align-items: flex-start; gap: 9px; margin: 0; padding: 10px 14px; border: 1px solid #eadfc8; border-radius: var(--mop-radius,4px); background: #fffcf5; line-height: 1.7; color: #786039; font-size: 12px; }
+.boundary-icon { display: inline-grid; place-items: center; flex: none; width: 15px; height: 15px; margin-top: 3px; border: 1px solid currentColor; border-radius: 50%; font-size: 10px; font-weight: 600; line-height: 1; }
+.dashboard-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; padding: 2px 0; }
+.dashboard-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.dashboard-controls label { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--mop-muted); }
+.dashboard-controls select, .dashboard-controls button { min-height: 34px; padding: 6px 10px; border: 1px solid var(--mop-border); border-radius: var(--mop-radius,4px); background: #fff; color: var(--mop-text); font: inherit; font-size: 12px; }
+.dashboard-controls button { cursor: pointer; white-space: nowrap; }
 .dashboard-controls button:disabled { cursor: wait; }
-.dashboard-controls input { width: 18px; height: 18px; }
-.auto-refresh { min-height: 44px; }
-.dashboard-controls :focus-visible { outline: 3px solid var(--mop-focus); outline-offset: 3px; }
-.read-status, .observation { margin: 0; color: var(--mop-muted); line-height: 1.7; font-size: 12px; }
-.observation { padding-bottom: 16px; border-bottom: 1px solid var(--mop-border); }
-.dashboard-kpis { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); border: 1px solid var(--mop-border); border-radius: 12px; background: #fff; overflow: hidden; }
-.kpi-card { min-width: 0; padding: 20px; border-right: 1px solid var(--mop-border); border-bottom: 1px solid var(--mop-border); }
-.kpi-card:nth-child(3n) { border-right: 0; }
-.kpi-card:nth-last-child(-n+3) { border-bottom: 0; }
-.kpi-card h2 { font-size: 14px; font-weight: 600; margin: 0; line-height: 1.5; color: var(--mop-text); }
-.unknown-value { display: block; margin: 12px 0 8px; color: #596d84; font-size: 22px; line-height: 1.4; }
-.kpi-card p { color: var(--mop-muted); font-size: 12px; line-height: 1.7; margin: 0 0 8px; }
+.dashboard-controls input { width: 15px; height: 15px; margin: 0; }
+.auto-refresh { min-height: 34px; }
+.dashboard-controls :focus-visible, .dashboard-page summary:focus-visible { outline: 2px solid var(--mop-focus); outline-offset: 3px; }
+.read-status, .observation { margin: 0; color: var(--mop-muted); line-height: 1.7; font-size: 11px; }
+.read-status { flex: 1 1 280px; text-align: right; }
+.dashboard-kpis { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+.kpi-card { display: flex; flex-direction: column; min-width: 0; padding: 14px 15px 8px; border: 1px solid var(--mop-border); border-radius: var(--mop-radius,4px); background: #fff; }
+.kpi-card h2 { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; font-size: 12px; font-weight: 400; margin: 0; line-height: 1.6; color: var(--mop-muted); }
+.metric-indicator { flex: none; width: 8px; height: 8px; margin-top: 5px; border: 1px solid #afbed0; border-radius: 50%; }
+.unknown-value { display: block; margin: 10px 0 6px; color: #526881; font-size: 24px; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
+.unknown-value.reading-value { font-size: 16px; }
+.kpi-card p { flex: 1; color: var(--mop-muted); font-size: 11px; line-height: 1.7; margin: 0 0 5px; }
 .metric-reason { color: var(--mop-muted); font-size: 12px; }
-.metric-reason summary { cursor: pointer; min-height: 32px; line-height: 1.5; padding-block: 7px; }
+.metric-reason summary { cursor: pointer; min-height: 32px; line-height: 1.5; padding-block: 7px; font-size: 11px; }
 .metric-reason summary:hover { color: var(--el-color-primary); }
 .dashboard-page small { display: block; overflow-wrap: anywhere; color: var(--mop-muted); font-size: 12px; line-height: 1.6; }
-.dashboard-panels { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
-.dashboard-panel { min-width: 0; border: 1px solid var(--mop-border); border-radius: 12px; background: #fff; }
-.dashboard-panel:first-child { grid-column: 1 / -1; }
-.dashboard-panel header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--mop-border); }
-.dashboard-panel h2 { font-size: 15px; margin: 0; color: var(--mop-text); }
-.dashboard-panel header span { color: var(--mop-muted); font-size: 12px; }
-.panel-period { padding: 12px 20px 0; margin: 0; font-size: 12px; line-height: 1.7; color: var(--mop-muted); }
-.unavailable-panel { padding: 24px 20px; text-align: left; color: var(--mop-muted); }
-.unavailable-panel > strong { font-size: 15px; font-weight: 500; }
-.unavailable-panel p { line-height: 1.7; font-size: 13px; margin: 8px 0; }
-.dashboard-footnote { font-size: 12px; line-height: 1.7; color: var(--mop-muted); }
+.dashboard-panels { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 12px; align-items: start; }
+.dashboard-panel { display: flex; flex-direction: column; align-self: stretch; grid-column: span 3; min-width: 0; border: 1px solid var(--mop-border); border-radius: var(--mop-radius,4px); background: #fff; overflow: hidden; }
+.dashboard-panel:first-child { grid-column: span 4; }
+.dashboard-panel:nth-child(2) { grid-column: span 2; }
+.dashboard-panel header { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 48px; padding: 11px 16px; border-bottom: 1px solid var(--mop-border); background: linear-gradient(90deg,#f7faff,#fff); }
+.dashboard-panel h2 { font-size: 13px; font-weight: 500; margin: 0; line-height: 1.6; color: var(--mop-text); }
+.panel-status { flex: none; padding: 1px 7px; border: 1px solid #e4eaf1; border-radius: 3px; background: #f8fafc; color: var(--mop-muted); font-size: 11px; }
+.unavailable-panel { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; min-height: 166px; padding: 24px 20px 20px; text-align: center; color: var(--mop-muted); }
+.unavailable-panel > strong { margin-top: 15px; font-size: 14px; font-weight: 500; line-height: 1.6; overflow-wrap: anywhere; }
+.unavailable-panel p { max-width: 420px; line-height: 1.7; font-size: 12px; margin: 6px 0 0; }
+.panel-empty-icon { display: block; position: relative; width: 34px; height: 26px; border: 1.5px solid #9eb6d1; border-radius: 3px; background: #f7faff; }
+.panel-empty-icon::before, .panel-empty-icon::after, .panel-empty-icon i { content: ''; position: absolute; display: block; }
+.panel-empty-icon::before { width: 1px; height: 6px; background: #9eb6d1; bottom: -7px; left: 15px; }
+.panel-empty-icon::after { width: 16px; height: 1px; background: #9eb6d1; bottom: -8px; left: 7px; }
+.panel-empty-icon i { width: 7px; height: 7px; left: 12px; top: 8px; border: 1px solid #c0cfe0; border-radius: 50%; }
+.dashboard-panel[data-panel="SERVICE_HEALTH"] .panel-empty-icon { width: 30px; height: 30px; border-radius: 50%; }
+.dashboard-panel[data-panel="SERVICE_HEALTH"] .panel-empty-icon::before { top: 7px; bottom: auto; left: 13px; height: 13px; }
+.dashboard-panel[data-panel="SERVICE_HEALTH"] .panel-empty-icon::after { top: 13px; bottom: auto; left: 7px; width: 13px; }
+.dashboard-panel[data-panel="SERVICE_HEALTH"] .panel-empty-icon i { display: none; }
+.dashboard-panel[data-panel="FAULT_TIMELINE"] .panel-empty-icon { width: 30px; height: 30px; border-radius: 50%; }
+.dashboard-panel[data-panel="FAULT_TIMELINE"] .panel-empty-icon::before { top: 6px; bottom: auto; left: 13px; height: 9px; }
+.dashboard-panel[data-panel="FAULT_TIMELINE"] .panel-empty-icon::after { top: 14px; bottom: auto; left: 13px; width: 7px; transform: rotate(30deg); transform-origin: left center; }
+.dashboard-panel[data-panel="FAULT_TIMELINE"] .panel-empty-icon i { display: none; }
+.dashboard-panel[data-panel="RECENT_EVENTS"] .panel-empty-icon, .dashboard-panel[data-panel="PENDING_TICKETS"] .panel-empty-icon { width: 27px; height: 32px; }
+.dashboard-panel[data-panel="RECENT_EVENTS"] .panel-empty-icon::before, .dashboard-panel[data-panel="PENDING_TICKETS"] .panel-empty-icon::before { left: 6px; top: 10px; bottom: auto; width: 12px; height: 1px; }
+.dashboard-panel[data-panel="RECENT_EVENTS"] .panel-empty-icon::after, .dashboard-panel[data-panel="PENDING_TICKETS"] .panel-empty-icon::after { left: 6px; top: 17px; bottom: auto; width: 9px; }
+.dashboard-panel[data-panel="RECENT_EVENTS"] .panel-empty-icon i, .dashboard-panel[data-panel="PENDING_TICKETS"] .panel-empty-icon i { display: none; }
+.dashboard-panel[data-panel="RESOURCE_TOP5"] .panel-empty-icon { width: 32px; height: 29px; }
+.dashboard-panel[data-panel="RESOURCE_TOP5"] .panel-empty-icon::before { left: 0; top: 12px; bottom: auto; width: 29px; height: 1px; }
+.dashboard-panel[data-panel="RESOURCE_TOP5"] .panel-empty-icon::after { left: 5px; top: 6px; bottom: auto; width: 4px; }
+.dashboard-panel[data-panel="RESOURCE_TOP5"] .panel-empty-icon i { left: 5px; top: 19px; width: 4px; height: 1px; background: #9eb6d1; border: 0; }
+.panel-reason { border-top: 1px solid #eef2f7; background: #fcfdff; }
+.panel-reason summary { padding: 9px 16px; }
+.panel-reason-content { padding: 0 16px 12px; }
+.panel-period { margin: 7px 0 0; font-size: 11px; line-height: 1.7; color: var(--mop-muted); }
+.dashboard-explanation { padding: 0 14px; border: 1px solid var(--mop-border); border-radius: var(--mop-radius,4px); background: #fff; color: var(--mop-muted); font-size: 12px; }
+.dashboard-explanation > summary { min-height: 38px; padding: 9px 0; cursor: pointer; line-height: 1.6; }
+.dashboard-explanation > div { padding: 0 0 12px; }
+.dashboard-footnote { margin: 7px 0 0; font-size: 11px; line-height: 1.7; color: var(--mop-muted); }
 @media (min-width: 1280px) {
   .dashboard-kpis { grid-template-columns: repeat(6,minmax(0,1fr)); }
-  .kpi-card { padding: 18px; border-bottom: 0; }
-  .kpi-card:nth-child(3n) { border-right: 1px solid var(--mop-border); }
-  .kpi-card:last-child { border-right: 0; }
+  .kpi-card h2 { min-height: 38px; }
+}
+@media (max-width: 1000px) {
+  .read-status { flex-basis: 100%; text-align: left; }
+  .dashboard-panel:first-child, .dashboard-panel:nth-child(2) { grid-column: span 3; }
 }
 @media(max-width:760px) {
-  .dashboard-page { gap: 16px; }
-  .dashboard-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
-  .dashboard-heading h1 { font-size: 23px; }
+  .dashboard-page { gap: 10px; }
+  .dashboard-heading { align-items: flex-start; flex-wrap: wrap; gap: 10px; padding: 14px; }
+  .dashboard-heading h1 { font-size: 18px; }
   .dashboard-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .kpi-card { padding: 16px; }
-  .kpi-card:nth-child(3n) { border-right: 1px solid var(--mop-border); }
-  .kpi-card:nth-child(2n) { border-right: 0; }
-  .kpi-card:nth-last-child(3) { border-bottom: 1px solid var(--mop-border); }
+  .kpi-card { padding: 13px 12px 5px; }
   .dashboard-panels { grid-template-columns: 1fr; }
-  .dashboard-panel:first-child { grid-column: auto; }
-  .dashboard-controls { align-items: stretch; }
-  .dashboard-controls label { flex-wrap: wrap; }
+  .dashboard-panel, .dashboard-panel:first-child, .dashboard-panel:nth-child(2) { grid-column: auto; }
+  .dashboard-controls { align-items: stretch; gap: 6px 10px; }
+  .dashboard-controls label { flex-wrap: wrap; font-size: 12px; }
+  .dashboard-controls select, .dashboard-controls button, .auto-refresh { min-height:44px; }
   .dashboard-controls select { max-width: 100%; }
-  .metric-reason summary { min-height: 44px; padding-block: 12px; }
-  .dashboard-panel header, .unavailable-panel { padding: 16px; }
-  .panel-period { padding-inline: 16px; }
+  .dashboard-controls input { width: 18px; height: 18px; }
+  .metric-reason summary, .dashboard-explanation > summary { min-height:44px; padding-block: 12px; }
+  .unavailable-panel { min-height: 160px; padding-inline: 16px; }
   .availability-badge { white-space: normal; }
 }
 @media (max-width: 360px) {
   .dashboard-kpis { grid-template-columns: 1fr; }
-  .kpi-card:nth-child(n) { border-right: 0; border-bottom: 1px solid var(--mop-border); }
-  .kpi-card:last-child { border-bottom: 0; }
+  .dashboard-controls { width: 100%; }
+  .dashboard-controls > label:first-child { width: 100%; }
 }
 </style>

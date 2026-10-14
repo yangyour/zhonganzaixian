@@ -6,6 +6,7 @@ import { can,contextGeneration,session,switchingTenant } from '../stores/session
 import { createGlobalSearchWorkspace,searchDestination,shouldFocusGlobalSearch,type SearchState } from '../utils/globalSearchWorkspace'
 import { displayTime,typeLabel } from '../utils/display'
 import ApiErrorNotice from './ApiErrorNotice.vue'
+import { Search } from '@element-plus/icons-vue'
 const router=useRouter(),route=useRoute(),open=ref(false),navigating=ref(false),navigationError=ref(''),input=ref<{focus:()=>void}|null>(null)
 const state=shallowRef<SearchState>({query:'',result:null,busy:false,error:null})
 const workspace=createGlobalSearchWorkspace(api,value=>{state.value=value})
@@ -20,7 +21,7 @@ onBeforeUnmount(()=>{window.removeEventListener('keydown',shortcut);workspace.di
 async function visit(kind:'assets'|'tickets',id:string){if(navigating.value)return;navigating.value=true;navigationError.value='';try{const failure=await router.push(searchDestination(kind,id));if(isNavigationFailure(failure)&&!isNavigationFailure(failure,NavigationFailureType.duplicated))navigationError.value='跳转未完成，搜索结果已保留，请先处理当前页面的提示';else open.value=false}catch{navigationError.value='跳转失败，搜索结果已保留'}finally{navigating.value=false}}
 </script>
 <template>
- <el-button v-if="permitted" class="global-search-trigger" aria-label="打开全局搜索，快捷键斜杠" @click="show">搜索 <kbd>/</kbd></el-button>
+ <el-button v-if="permitted" class="global-search-trigger" aria-label="打开全局搜索，快捷键斜杠" @click="show"><Search class="search-trigger-icon" aria-hidden="true" /><span>搜索<span class="search-trigger-hint">资产 / 报障记录</span></span><kbd>/</kbd></el-button>
  <el-dialog v-model="open" title="搜索当前租户" width="680px" class="global-search-dialog" :close-on-click-modal="false" :close-on-press-escape="!navigating" :show-close="!navigating" @opened="input?.focus()">
   <el-form @submit.prevent="workspace.search()"><el-form-item><el-input ref="input" :model-value="state.query" :disabled="navigating" clearable aria-label="当前租户搜索词" placeholder="资产名称 / 报障标题 / 受理编号" @update:model-value="workspace.change(String($event))"/></el-form-item><el-button native-type="submit" type="primary" :loading="state.busy" :disabled="navigating">搜索</el-button></el-form>
   <p class="search-boundary">目前可搜索有权查看的资产和报障登记。事件、自动化脚本和通知提醒尚未接入，暂时无法判断是否有相关告警。修改关键词会清除旧结果，请重新搜索。</p>

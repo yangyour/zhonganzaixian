@@ -1,0 +1,322 @@
+{
+  "date": "2026-10-14",
+  "environment": "lan-test-20261008",
+  "candidate_origin": "http://127.0.0.1:15174",
+  "build_id": "864354569fafda46001d8e7798ec07772c2664806cff34f7e7f216d8bf0a7f51",
+  "validation_scope": "local production build against designated LAN test APIs",
+  "deployed": false,
+  "tests": {
+    "web": 1957,
+    "web_files": 130,
+    "contracts": 133,
+    "typecheck": "PASSED",
+    "production_build": "PASSED",
+    "static_release_and_policy": "PASSED"
+  },
+  "checks": [
+    "six-modules-and-active-sidebar",
+    "sidebar-collapse-expand-accessible",
+    "real-api-filter-empty-and-reset",
+    "asset-detail-read-close",
+    "module-switch-and-contextual-menu",
+    "dashboard-fixed-unknown-and-disclosure",
+    "dashboard-window-refresh-and-pause",
+    "mobile-menu-open-navigate-close",
+    "mobile-create-open-close-without-write",
+    "global-search-real-api",
+    "offline-read-failure-clears-rows-and-recovers",
+    "table-horizontal-scroll",
+    "real-monitor-cpu-history-12-rows",
+    "account-return-to-first-module",
+    "offline-banner-visible-below-header",
+    "contact-preview-retains-customer-module"
+  ],
+  "page_viewports": [
+    {
+      "name": "create-mobile",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "mainX": 0,
+      "mainWidth": 390
+    },
+    {
+      "name": "assets-1440",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "mainX": 200,
+      "mainWidth": 1240
+    },
+    {
+      "name": "assets-390",
+      "width": 390,
+      "height": 900,
+      "scrollWidth": 390,
+      "mainX": 0,
+      "mainWidth": 390
+    },
+    {
+      "name": "dashboard-1440",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "mainX": 200,
+      "mainWidth": 1240
+    },
+    {
+      "name": "dashboard-390",
+      "width": 390,
+      "height": 900,
+      "scrollWidth": 390,
+      "mainX": 0,
+      "mainWidth": 390
+    },
+    {
+      "name": "network-monitoring-1440",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "mainX": 200,
+      "mainWidth": 1240
+    },
+    {
+      "name": "network-monitoring-390",
+      "width": 390,
+      "height": 900,
+      "scrollWidth": 390,
+      "mainX": 0,
+      "mainWidth": 390
+    },
+    {
+      "name": "tickets-1440",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "mainX": 200,
+      "mainWidth": 1240
+    },
+    {
+      "name": "tickets-390",
+      "width": 390,
+      "height": 900,
+      "scrollWidth": 390,
+      "mainX": 0,
+      "mainWidth": 390
+    },
+    {
+      "name": "configurations-1440",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "mainX": 200,
+      "mainWidth": 1240
+    },
+    {
+      "name": "configurations-390",
+      "width": 390,
+      "height": 900,
+      "scrollWidth": 390,
+      "mainX": 0,
+      "mainWidth": 390
+    },
+    {
+      "name": "identity-users-1440",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "mainX": 200,
+      "mainWidth": 1240
+    },
+    {
+      "name": "identity-users-390",
+      "width": 390,
+      "height": 900,
+      "scrollWidth": 390,
+      "mainX": 0,
+      "mainWidth": 390
+    },
+    {
+      "name": "my-export-messages-1440",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "mainX": 200,
+      "mainWidth": 1240
+    },
+    {
+      "name": "my-export-messages-390",
+      "width": 390,
+      "height": 900,
+      "scrollWidth": 390,
+      "mainX": 0,
+      "mainWidth": 390
+    },
+    {
+      "name": "account-1440",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "mainX": 200,
+      "mainWidth": 1240
+    },
+    {
+      "name": "account-390",
+      "width": 390,
+      "height": 900,
+      "scrollWidth": 390,
+      "mainX": 0,
+      "mainWidth": 390
+    },
+    {
+      "name": "assets-1024",
+      "width": 1024,
+      "height": 844,
+      "scrollWidth": 1024,
+      "mainX": 200,
+      "mainWidth": 824
+    },
+    {
+      "name": "dashboard-1024",
+      "width": 1024,
+      "height": 844,
+      "scrollWidth": 1024,
+      "mainX": 200,
+      "mainWidth": 824
+    },
+    {
+      "name": "assets-720",
+      "width": 720,
+      "height": 844,
+      "scrollWidth": 720,
+      "mainX": 0,
+      "mainWidth": 720
+    },
+    {
+      "name": "dashboard-720",
+      "width": 720,
+      "height": 844,
+      "scrollWidth": 720,
+      "mainX": 0,
+      "mainWidth": 720
+    },
+    {
+      "name": "assets-320",
+      "width": 320,
+      "height": 844,
+      "scrollWidth": 320,
+      "mainX": 0,
+      "mainWidth": 320
+    },
+    {
+      "name": "dashboard-320",
+      "width": 320,
+      "height": 844,
+      "scrollWidth": 320,
+      "mainX": 0,
+      "mainWidth": 320
+    }
+  ],
+  "api_pages": [
+    {
+      "path": "/assets",
+      "width": 1440,
+      "apiErrors": 0
+    },
+    {
+      "path": "/assets",
+      "width": 390,
+      "apiErrors": 0
+    },
+    {
+      "path": "/dashboard",
+      "width": 1440,
+      "apiErrors": 0
+    },
+    {
+      "path": "/dashboard",
+      "width": 390,
+      "apiErrors": 0
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 1440,
+      "apiErrors": 0
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 390,
+      "apiErrors": 0
+    },
+    {
+      "path": "/tickets",
+      "width": 1440,
+      "apiErrors": 0
+    },
+    {
+      "path": "/tickets",
+      "width": 390,
+      "apiErrors": 0
+    },
+    {
+      "path": "/configurations",
+      "width": 1440,
+      "apiErrors": 0
+    },
+    {
+      "path": "/configurations",
+      "width": 390,
+      "apiErrors": 0
+    },
+    {
+      "path": "/identity/users",
+      "width": 1440,
+      "apiErrors": 0
+    },
+    {
+      "path": "/identity/users",
+      "width": 390,
+      "apiErrors": 0
+    },
+    {
+      "path": "/my-export-messages",
+      "width": 1440,
+      "apiErrors": 0
+    },
+    {
+      "path": "/my-export-messages",
+      "width": 390,
+      "apiErrors": 0
+    },
+    {
+      "path": "/account",
+      "width": 1440,
+      "apiErrors": 0
+    },
+    {
+      "path": "/account",
+      "width": 390,
+      "apiErrors": 0
+    }
+  ],
+  "page_errors": [],
+  "non_login_writes": [],
+  "readiness": {
+    "http_status": 200,
+    "ready": true,
+    "mode": "remote_test",
+    "production_ready": false,
+    "component_versions": "not re-probed in this UI-only change"
+  },
+  "secrets_recorded": false,
+  "limitations": [
+    "Browser viewport emulation, not physical mobile devices",
+    "No test-site deployment or complete contract acceptance",
+    "Existing API contracts and customer confirmation gates unchanged"
+  ],
+  "qa_corrections": [
+    "Waited for route completion before checking headings",
+    "Waited for two animation frames before viewport measurement",
+    "Fixed account return, contact preview context and offline notice overlap and repeated affected checks"
+  ]
+}

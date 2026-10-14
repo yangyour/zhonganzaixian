@@ -22,6 +22,8 @@ import AssetMetadataQuery from '../components/AssetMetadataQuery.vue'
 import AssetDateAssessmentPanel from '../components/AssetDateAssessmentPanel.vue'
 import AssetDateQuery from '../components/AssetDateQuery.vue'
 import { assetLedgerColumns, assetLedgerCell } from '../utils/assetLedgerColumns'
+import { Connection, Switch, Lock, Position, SetUp, Box } from '@element-plus/icons-vue'
+const deviceIcons = { router: Connection, switch: Switch, firewall: Lock, ap: Position, wireless_controller: SetUp, other: Box }
 const ElTableColumn = ElementTableColumn<Asset>
 const route = useRoute()
 const router = useRouter()
@@ -165,9 +167,11 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
       <AppTable :error="error" :rows="rows" :loading="loading" :empty-text="error ? '数据加载失败，请重试' : '当前筛选下没有资产'">
         <el-table-column v-for="column in assetLedgerColumns" :key="column.key" :label="column.label" :min-width="column.minWidth" :fixed="column.key === 'actions' ? 'right' : undefined">
           <template #default="{ row }">
-            <el-button v-if="column.key === 'name' || column.key === 'actions'" link type="primary" :class="{ 'asset-link': column.key === 'name' }" @click="openDetail(row.id)">{{ assetLedgerCell(row, column.key).text }}</el-button>
+              <div v-if="column.key === 'name'" class="asset-identity-cell"><span class="asset-type-symbol" :class="'asset-type-' + row.type" aria-hidden="true"><component :is="deviceIcons[row.type] || Box" /></span><div><el-button link type="primary" class="asset-link" @click="openDetail(row.id)">{{ assetLedgerCell(row, column.key).text }}</el-button><span class="cell-sub">{{ assetLedgerCell(row, column.key).detail }}</span></div></div>
+              <el-button v-else-if="column.key === 'actions'" link type="primary" @click="openDetail(row.id)">{{ assetLedgerCell(row, column.key).text }}</el-button>
+              <span v-else-if="column.key === 'availability' || column.key === 'sync'" class="ledger-state" :class="{ 'ledger-state-pending': column.key === 'sync' }">{{ assetLedgerCell(row, column.key).text }}</span>
             <span v-else>{{ assetLedgerCell(row, column.key).text }}</span>
-            <span v-if="assetLedgerCell(row, column.key).detail" class="cell-sub">{{ assetLedgerCell(row, column.key).detail }}</span>
+              <span v-if="column.key !== 'name' && assetLedgerCell(row, column.key).detail" class="cell-sub">{{ assetLedgerCell(row, column.key).detail }}</span>
           </template>
         </el-table-column>
       </AppTable>

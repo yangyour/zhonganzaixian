@@ -2,6 +2,8 @@ import type {Session} from '../api/types'
 import {routeAllowed,type AccessRoute} from './routeAccess'
 export interface NavigationItem {name:string;title:string}
 export interface NavigationModule {id:string;title:string;items:NavigationItem[]}
+/** Detail-only routes retain the context of their existing, permission-filtered entry. */
+export function navigationEntryName(name: unknown): unknown { return name === 'contact-import-preview' ? 'contact-imports' : name }
 const modules:NavigationModule[]=[
  {id:'resources',title:'资源与监控',items:[['dashboard','运营总览'],['assets','资产管理'],['network-monitoring','基础网络监控'],['threshold-diagnostics','阈值候选诊断']].map(([name,title])=>({name:name!,title:title!}))},
  {id:'service',title:'工单与服务',items:[['tickets','报障与受理'],['manual-incidents','手工来源登记'],['sla-scenarios','SLA 显式对照'],['asset-export-jobs','台账导出'],['my-export-messages','我的导出消息'],['my-worklogs','我的实填工时'],['my-notification-preferences','我的通知偏好请求']].map(([name,title])=>({name:name!,title:title!}))},

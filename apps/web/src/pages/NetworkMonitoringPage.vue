@@ -8,6 +8,10 @@ const snapshot=ref<NetworkSnapshot|null>(null),history=ref<NetworkHistory|Resour
 const resources=ref<Record<string,{data:ResourceSnapshot;loaded:number}>>({}),resourceErrors=ref<Record<string,boolean>>({})
 const error=ref<unknown>(null),historyError=ref<unknown>(null),loading=ref(false),historyLoading=ref(false)
 const selected=ref(''),metric=ref<HistoryMetric>('latency'),window=ref<'HOUR_1'|'HOURS_24'>('HOUR_1')
+const monitorView=ref<'list'|'cards'>('list'),deviceQuery=ref('')
+const filteredDevices=computed(()=>snapshot.value?.devices.filter(device=>`${device.name} ${device.management_ip} ${device.brand} ${device.model}`.toLocaleLowerCase().includes(deviceQuery.value.trim().toLocaleLowerCase()))??[])
+const reachableCount=computed(()=>snapshot.value?.devices.filter(device=>display(device,'icmp')==='可达').length??0)
+const resourceCount=computed(()=>snapshot.value?.devices.filter(device=>device.vendor_metrics_status==='PARTIAL_API').length??0)
 const selectedHasResources=computed(()=>snapshot.value?.devices.some(d=>d.asset_id===selected.value&&d.vendor_metrics_status==='PARTIAL_API')??false)
 const now=ref(performance.now()),loadedAt=ref(0)
 const expired=computed(()=>!!snapshot.value&&now.value-loadedAt.value>90000)
@@ -58,16 +62,18 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
 </script>
 <template>
   <section class="network-page">
-    <header class="network-heading"><div><p class="eyebrow">NETWORK MONITORING</p><h1>基础网络监控</h1><p>持续查看设备连通性、延迟、丢包和端口状态</p></div><el-button :loading="loading" :disabled="!permitted" @click="refresh">刷新监控</el-button></header>
+    <header class="network-heading"><div><div class="title-with-context"><h1>基础网络监控</h1><span class="context-badge">{{session?.tenant.name}}</span></div><details class="boundary-details"><summary>页面说明</summary><p>持续查看明确绑定设备的连通性、延迟、丢包和端口状态；IP可达不代表设备身份或正式服务健康。</p></details></div><el-button :loading="loading" :disabled="!permitted" @click="refresh">刷新监控</el-button></header>
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前没有资产读取权限" />
     <template v-else>
-      <div class="network-context"><span>每 60 秒采集 · 页面每 30 秒刷新</span><span>资源指标按设备接入 · 告警规则待确认</span></div>
+      <div class="feature-summary network-summary"><article><span>绑定设备</span><strong>{{snapshot?snapshot.devices.length:'—'}}</strong><small>当前租户明确授权范围</small></article><article class="success"><span>ICMP 可达</span><strong>{{snapshot&&!expired?reachableCount:'—'}}</strong><small>仅表示本次 IP 探测结果</small></article><article><span>资源采集已接入</span><strong>{{snapshot?resourceCount:'—'}}</strong><small>CPU / 内存逐设备接入</small></article><article><span>监控刷新</span><strong>30 <small>秒</small></strong><small>后台暂停 · 采集间隔60秒</small></article></div>
       <ApiErrorNotice v-if="error" :error="error" @retry="refresh" />
       <el-alert v-if="expired" title="页面数据已过期，请刷新后查看最新状态" type="warning" :closable="false" />
       <p v-if="loading&&!snapshot" role="status">正在读取监控数据…</p>
       <p v-if="snapshot&&!snapshot.devices.length" class="network-empty">当前租户尚未绑定基础监控设备。</p>
-      <div v-if="snapshot" class="network-grid">
-        <article v-for="d in snapshot.devices" :key="d.asset_id" class="device-card" :class="{chosen:selected===d.asset_id}">
+      <section class="panel network-device-workspace"><div class="network-list-toolbar"><div class="network-view-tabs" aria-label="监控显示方式"><button type="button" :class="{active:monitorView==='list'}" :aria-pressed="monitorView==='list'" @click="monitorView='list'">设备列表</button><button type="button" :class="{active:monitorView==='cards'}" :aria-pressed="monitorView==='cards'" @click="monitorView='cards'">监控卡片</button></div><input v-model="deviceQuery" aria-label="搜索监控设备" placeholder="搜索设备 / IP / 型号" /><span>告警规则待确认</span></div>
+      <div v-if="monitorView==='list'" class="proto-table-wrap"><table class="proto-table network-device-table"><thead><tr><th>设备 / 型号</th><th>管理 IP</th><th>连通性</th><th>响应延迟</th><th>丢包率</th><th>CPU / 内存</th><th>最近记录</th><th>操作</th></tr></thead><tbody><tr v-for="d in filteredDevices" :key="d.asset_id" class="network-device-row" :class="{chosen:selected===d.asset_id}"><td><strong>{{d.name}}</strong><small>{{d.brand}} {{d.model}}</small></td><td class="mono">{{d.management_ip}}</td><td><span class="network-badge" :class="{reachable:display(d,'icmp')==='可达'}">{{display(d,'icmp')}}</span></td><td>{{display(d,'latency')}}</td><td>{{display(d,'loss')}}</td><td><template v-if="d.vendor_metrics_status==='PARTIAL_API'"><button type="button" class="resource-inline-link" aria-label="CPU 历史" @click="selectResource(d.asset_id,'cpu')">CPU {{resourceText(d.asset_id,'cpu')}}</button><button type="button" class="resource-inline-link" aria-label="内存历史" @click="selectResource(d.asset_id,'memory')">内存 {{resourceText(d.asset_id,'memory')}}</button><small v-if="resources[d.asset_id]?.data.state!=='FRESH'" class="network-resource-reason">{{resourceReason(d.asset_id)}}</small><small v-if="resources[d.asset_id]?.data.tls_mode==='TEST_INSECURE'" class="tls-note">测试模式：已临时跳过证书校验</small></template><span v-else class="muted">— <small>未接入</small></span></td><td><small>{{time(d.metrics.icmp.recorded_at)}}</small></td><td><el-button link type="primary" @click="selectDevice(d.asset_id)">查看历史</el-button></td></tr><tr v-if="!filteredDevices.length"><td colspan="8" class="proto-empty">{{loading?'正在读取监控设备…':snapshot?'当前筛选下没有设备':'监控数据尚未读取成功'}}</td></tr></tbody></table></div>
+      <div v-else-if="snapshot" class="network-grid">
+        <article v-for="d in filteredDevices" :key="d.asset_id" class="device-card" :class="{chosen:selected===d.asset_id}">
           <div class="device-head"><span class="network-badge" :class="{reachable:display(d,'icmp')==='可达'}">{{display(d,'icmp')}}</span><small>IP 基础探测</small></div>
           <h2>{{d.name}}</h2><p class="device-model">{{d.brand}} {{d.model}}</p><p class="device-ip">{{d.management_ip}}</p>
           <div class="network-stats"><div><span>平均响应</span><strong>{{display(d,'latency')}}</strong></div><div><span>本次丢包</span><strong>{{display(d,'loss')}}</strong></div></div>
@@ -80,6 +86,7 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
           <el-button :type="selected===d.asset_id?'primary':'default'" @click="selectDevice(d.asset_id)">查看历史 · {{d.management_ip}}</el-button>
         </article>
       </div>
+      <div class="network-table-footer"><span>已显示 {{filteredDevices.length}} 台 / 当前绑定 {{snapshot?.devices.length??'—'}} 台</span><span>不接受外部 hostid / itemid，不跨租户读取</span></div></section>
       <section class="network-history">
         <div class="history-heading"><div><h2>采样历史</h2><p>选择设备后查看。缺失采样会留空，不补零、不延续旧值。</p></div><div class="history-controls"><label>指标<select v-model="metric"><option value="latency">响应延迟</option><option value="loss">丢包率</option><option value="icmp">ICMP响应</option><option value="tcp_22">TCP 22</option><option value="tcp_80">TCP 80</option><option value="tcp_443">TCP 443</option><template v-if="selectedHasResources"><option value="cpu">CPU 使用率</option><option value="memory">内存使用率</option></template></select></label><label>时间<select v-model="window"><option value="HOUR_1">最近1小时</option><option value="HOURS_24">最近24小时</option></select></label></div></div>
         <p v-if="!selected" class="network-empty">请选择上方一台设备查看历史。</p>

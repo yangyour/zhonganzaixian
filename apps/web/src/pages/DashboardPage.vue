@@ -8,6 +8,7 @@ import {displayTime} from '../utils/display'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 
 const state=shallowRef<DashboardState>(emptyDashboardState()),autoRefresh=ref(true)
+const topMetric = ref('CPU')
 const workspace=createDashboardWorkspace(api,next=>{state.value=next})
 let disposed=false,timer:ReturnType<typeof setInterval>|null=null
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&['viewer','tadmin','msp','padmin'].includes(session.value.user.role)&&can('dashboard:read')&&!switchingTenant.value))
@@ -28,24 +29,20 @@ defineExpose({state,autoRefresh,refresh,changeWindow})
 
 <template>
  <section class="dashboard-page" :aria-busy="state.busy">
-  <header class="dashboard-heading"><div><h1>运营总览 <span class="tenant-badge">{{session?.tenant.name}}</span></h1><p>服务健康、事件与履约概览 · 北京时间（Asia/Shanghai）</p></div><span class="availability-badge"><span aria-hidden="true" />监控指标未接入</span></header>
-  <p class="dashboard-boundary" role="note"><span class="boundary-icon" aria-hidden="true">i</span><span>这里仅核对当前授权与数据库观察时间。未知指标不表示正常、零事件或送达成功；首页尚未完成正式监控验收</span></p>
+  <header class="dashboard-heading"><div><div class="title-with-context"><h1>运营总览</h1><span class="tenant-badge">{{session?.tenant.name}}</span><span class="availability-badge"><span aria-hidden="true" />监控指标未接入</span></div><details class="boundary-details"><summary>页面说明</summary><p>服务健康、事件与履约概览 · 北京时间（Asia/Shanghai）。这里仅核对当前授权与数据库观察时间。未知指标不表示正常、零事件或送达成功；首页尚未完成正式监控验收。</p></details></div><div class="dashboard-header-actions">   <label class="dashboard-range-select">范围 <select aria-label="告警趋势范围" :value="state.window" @change="chooseWindow"><option value="HOURS_24">最近24小时</option><option value="DAYS_7">最近7天</option><option value="DAYS_30">最近30天</option></select></label><div class="dashboard-ranges" aria-label="告警趋势快捷范围"><button v-for="range in [{id:'HOURS_24',label:'24小时'},{id:'DAYS_7',label:'7天'},{id:'DAYS_30',label:'30天'}]" :key="range.id" type="button" :aria-pressed="state.window===range.id" :class="{active:state.window===range.id}" :disabled="!permitted||state.busy" @click="changeWindow(range.id)">{{range.label}}</button></div><div class="dashboard-controls"><button type="button" :disabled="state.busy||!permitted" @click="refresh">{{state.busy?'读取中…':'刷新授权状态'}}</button></div></div></header>
   <p v-if="!permitted" role="alert">当前会话不可读取运营总览，或正在切换租户；已清除原范围数据</p>
   <template v-else>
-   <div class="dashboard-toolbar">
-   <div class="dashboard-controls">
-    <label>告警趋势范围 <select aria-label="告警趋势范围" :value="state.window" @change="chooseWindow"><option value="HOURS_24">最近24小时</option><option value="DAYS_7">最近7天</option><option value="DAYS_30">最近30天</option></select></label>
-    <button type="button" :disabled="state.busy" @click="refresh">{{state.busy?'读取中…':'刷新授权状态'}}</button>
-    <label class="auto-refresh"><input v-model="autoRefresh" type="checkbox" aria-label="每30秒自动只读刷新" />每30秒只读刷新</label>
-   </div>
-   <p class="read-status" role="status" aria-live="polite">{{state.busy?'正在读取当前授权范围':state.error?'当前读取失败，未沿用旧数据':state.current?'授权与时间投影已读取；指标仍未知':'尚未读取'}} · {{autoRefresh?'后台标签页暂停自动刷新':'自动刷新已暂停'}}</p>
-   </div>
    <ApiErrorNotice :error="state.error" :retrying="state.busy" @retry="refresh" />
    <div class="dashboard-kpis" aria-label="六项固定运营指标">
-    <article v-for="(card,index) in kpis" :key="card.id" class="kpi-card" :data-kpi="card.id"><h2>{{card.title}}<span class="metric-indicator" aria-hidden="true" /></h2><strong class="unknown-value" :class="{'reading-value':!state.current}">{{noDataText}}</strong><p>{{card.hint}}</p><details v-if="state.current" class="metric-reason"><summary>查看未接入原因</summary><small>{{state.current.kpis[index]?.unavailable_reason}}</small></details></article>
+    <article v-for="(card,index) in kpis" :key="card.id" class="kpi-card" :data-kpi="card.id"><h2>{{card.title}}<span class="metric-indicator" aria-hidden="true" /></h2><strong class="unknown-value" :class="{'reading-value':!state.current}">{{noDataText}}</strong><p :title="card.hint">{{card.hint}}</p><details v-if="state.current" class="metric-reason"><summary>查看未接入原因</summary><small>{{state.current.kpis[index]?.unavailable_reason}}</small></details></article>
    </div>
    <div class="dashboard-panels">
-    <article v-for="(panel,index) in panels" :key="panel.id" class="dashboard-panel" :data-panel="panel.id"><header><h2>{{panel.title}}</h2><span class="panel-status">未采集</span></header><div class="unavailable-panel"><span class="panel-empty-icon" aria-hidden="true"><i /></span><strong>{{noDataText}}</strong><p>{{panel.hint}}</p></div><details v-if="state.current" class="metric-reason panel-reason"><summary>查看未接入原因与统计范围</summary><div class="panel-reason-content"><small>{{state.current.panels[index]?.unavailable_reason}}</small><p v-if="state.current.panels[index]?.period" class="panel-period">统计范围：{{displayTime(state.current.panels[index]!.period!.from)}} 至 {{displayTime(state.current.panels[index]!.period!.to)}}</p></div></details></article>
+    <template v-for="(panel,index) in panels" :key="panel.id"><article class="dashboard-panel" :data-panel="panel.id"><header><h2>{{panel.title}}</h2><div v-if="panel.id==='RESOURCE_TOP5'" class="dashboard-top-switch" aria-label="资源排行指标"><button v-for="name in ['CPU','内存','磁盘']" :key="name" type="button" :class="{active:topMetric===name}" :aria-pressed="topMetric===name" @click="topMetric=name">{{name}}</button></div><span v-else class="panel-status">未采集</span></header><div class="unavailable-panel"><span class="panel-empty-icon" aria-hidden="true"><i /></span><strong>{{noDataText}}</strong><p>{{ panel.id==='RESOURCE_TOP5' ? `尚未取得${topMetric}采样，无法生成排行` : panel.hint }}</p></div><details v-if="state.current" class="metric-reason panel-reason"><summary>查看未接入原因与统计范围</summary><div class="panel-reason-content"><small>{{state.current.panels[index]?.unavailable_reason}}</small><p v-if="state.current.panels[index]?.period" class="panel-period">统计范围：{{displayTime(state.current.panels[index]!.period!.from)}} 至 {{displayTime(state.current.panels[index]!.period!.to)}}</p></div></details></article><aside v-if="index===0" class="dashboard-severity"><header><h2>当前问题按严重级别</h2><span>事件源待接入</span></header><div class="severity-content"><div class="unknown-donut"><strong>—</strong><span>问题数量未知</span></div><ul><li v-for="level in ['灾难','严重','一般','警告','信息']" :key="level"><i />{{level}}<b>—</b><span>未知</span></li></ul></div></aside></template>
+   </div>
+   <div class="dashboard-toolbar">
+
+   <label class="auto-refresh"><input v-model="autoRefresh" type="checkbox" aria-label="每30秒自动只读刷新" />每30秒只读刷新</label>
+   <p class="read-status" role="status" aria-live="polite">{{state.busy?'正在读取当前授权范围':state.error?'当前读取失败，未沿用旧数据':state.current?'授权与时间投影已读取；指标仍未知':'尚未读取'}} · {{autoRefresh?'后台标签页暂停自动刷新':'自动刷新已暂停'}}</p>
    </div>
    <details class="dashboard-explanation"><summary>数据口径与读取说明</summary><div><p v-if="state.current" class="observation" data-testid="observation">数据库观察时间：{{displayTime(state.current.generated_at)}}（未核验时钟同步，不是指标采样时间）<br />本月起点：{{displayTime(state.current.month_start)}}<span v-if="state.current.month_window_empty"> · 正好处于月初，累计区间为空</span></p><p class="dashboard-footnote">布局与顺序固定，不提供拖拽、隐藏或保存布局。刷新只发起GET，不新增工单、收据或监控样本</p></div></details>
   </template>

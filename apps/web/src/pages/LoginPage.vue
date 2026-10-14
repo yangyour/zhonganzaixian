@@ -80,15 +80,15 @@ function updateCapsLock(event: KeyboardEvent | Event) {
 }
 </script>
 <template>
-  <div class="login-screen">
+  <div class="login-screen prototype-login">
     <img class="login-background" :src="loginBackground" alt="" aria-hidden="true" fetchpriority="high" />
-    <header class="login-header">
+    <section class="login-story"><header class="login-header">
       <div class="login-brand"><span class="brand-mark">M</span>MOP 运维托管</div>
       <el-tag class="login-environment" type="info" effect="plain">测试环境</el-tag>
-    </header>
+    </header><div class="login-story-content"><h2>让运维信息清晰可见，<br />让每一步操作有据可查</h2><p>在统一的运维门户中查看资产、跟进登记与维护资料。按租户和角色提供所需入口，未确认的数据始终明确展示。</p><div class="login-feature-grid"><article><h3>统一资源视图</h3><p>资产台账、设备采样与资料修订集中查看。</p></article><article><h3>清楚的处理记录</h3><p>报障、评论、工时及历史记录保持可追溯。</p></article><article><h3>明确的访问范围</h3><p>按照当前租户与角色授予操作和查看权限。</p></article><article><h3>可信的数据状态</h3><p>草稿、待确认与未知状态分别呈现。</p></article></div></div><p class="login-story-footer">MOP 运维托管平台 · 项目测试环境</p></section>
     <main class="login-main">
     <section class="login-card" aria-labelledby="login-title">
-      <h1 id="login-title">登录 MOP</h1>
+      <h1 id="login-title">登录到运维门户</h1><p class="login-intro">使用项目账号登录，访问已授权的运维工作区。</p>
       <p class="login-progress" role="status">{{ loading ? '正在连接登录服务…' : submitting ? loginMethod === 'unified' ? '正在打开统一认证页面，请稍候。' : '正在核对账号信息，请稍候。' : '' }}</p>
       <el-alert v-if="sessionExpired" class="page-note" role="status" title="登录状态已失效，请重新登录。登录后请先核对刚才未确认的提交结果。" type="warning" :closable="false" show-icon />
       <el-alert v-if="oidcFailure" :title="oidcFailure" type="error" :closable="false" show-icon class="page-note" />
@@ -154,4 +154,16 @@ function updateCapsLock(event: KeyboardEvent | Event) {
 @media(max-width:760px){.login-header{padding:24px;gap:10px}.login-brand{font-size:16px;gap:10px}.login-brand .brand-mark{width:34px;height:34px;font-size:22px;border-radius:9px}.login-environment{padding:0 9px;font-size:11px}.login-main{align-items:center;justify-content:center;padding:24px 20px 64px}.login-card{width:400px;padding:32px 28px;border-radius:18px}.login-card h1{font-size:25px;margin-bottom:26px}.login-background{object-position:27% center}.login-screen::before{background:#0c203b40}}
 @media(max-width:360px){.login-header{padding:20px 16px}.login-brand{font-size:15px}.login-main{padding:16px 16px 40px}.login-card{padding:28px 22px}.login-environment{font-size:10px;padding:0 7px}}
 @media(prefers-reduced-motion:reduce){.local-login-form :deep(.el-input__wrapper){transition:none}}
+</style>
+<style scoped>
+.prototype-login{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);background:#f5f9ff;min-height:100vh;min-height:100svh}
+.prototype-login::before,.prototype-login .login-background{display:none}
+.login-story{position:relative;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(155deg,#101b36,#213e86 70%,#265de0);color:white;padding:56px 8.5%;min-height:100vh;min-height:100svh}
+.login-story::after{content:'';position:absolute;width:600px;height:600px;right:-210px;bottom:-170px;border:80px solid #8cb0ff12;border-radius:50%;pointer-events:none}
+.prototype-login .login-header{padding:0;align-items:flex-start}.prototype-login .login-brand{font-size:17px;letter-spacing:0}.prototype-login .login-brand .brand-mark{border-radius:3px;background:linear-gradient(135deg,#91d8e8,#2878f5);box-shadow:none}.prototype-login .login-environment{border-radius:3px;font-size:10px}
+.login-story-content{margin-top:32px;position:relative;z-index:1}.login-story-content h2{font-size:34px;line-height:1.4;font-weight:650;margin:0 0 12px;letter-spacing:-.3px}.login-story-content>p{font-size:14px;line-height:1.9;color:#d7e3ff;max-width:540px;margin:0}
+.login-feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:36px}.login-feature-grid article{background:#ffffff12;border:1px solid #ffffff25;border-radius:10px;padding:16px;min-height:96px}.login-feature-grid h3{font-size:13px;margin:0 0 6px}.login-feature-grid p{font-size:12px;line-height:1.8;color:#dce6ff;margin:0}.login-story-footer{position:relative;z-index:1;margin-top:auto;padding-top:50px;color:#9bb3e7;font-size:11px}
+.prototype-login .login-main{justify-content:center;padding:40px}.prototype-login .login-card{width:420px;padding:32px;border:1px solid #e2eaf5;border-radius:16px;box-shadow:0 8px 26px #235a9b08;background:#fff}.prototype-login .login-card h1{font-size:22px;margin:0 0 4px;font-weight:600;letter-spacing:0}.login-intro{font-size:12px;color:#8593a6;line-height:1.8;margin-bottom:26px}.prototype-login .login-field{margin-bottom:18px}.prototype-login .local-login-form :deep(.el-form-item__label){font-size:12px;margin-bottom:5px}.prototype-login .local-login-form :deep(.el-input__wrapper){min-height:40px;border-radius:4px}.prototype-login .local-login-form :deep(.el-input__inner){height:38px;font-size:13px}.prototype-login .login-submit{height:40px;border-radius:3px;font-size:13px;box-shadow:none}.prototype-login .password-toggle{min-height:36px}.prototype-login .login-progress{font-size:12px}
+@media(max-width:1100px){.login-story{padding:40px 7%}.login-story-content h2{font-size:28px}.login-feature-grid{grid-template-columns:1fr;margin-top:24px;gap:10px}.login-feature-grid article{min-height:0;padding:12px 14px}.prototype-login .login-main{padding:24px}}
+@media(max-width:760px){.prototype-login{display:block}.login-story{min-height:0;padding:24px}.login-story-content{margin-top:22px}.login-story-content h2{font-size:25px}.login-story-content>p{font-size:12px}.login-feature-grid,.login-story-footer{display:none}.prototype-login .login-main{padding:24px 16px 40px}.prototype-login .login-card{padding:26px 24px;border-radius:12px}.prototype-login .local-login-form :deep(.el-input__wrapper),.prototype-login .login-submit{min-height:44px}.prototype-login .local-login-form :deep(.el-input__inner){height:42px}}
 </style>

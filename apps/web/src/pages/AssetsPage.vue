@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { feedback as ElMessage } from '../utils/feedback'
 import { api, isCancelled } from '../api/client'
 import type { Asset, AssetPage } from '../api/types'
-import { contextGeneration, session } from '../stores/session'
+import { can, contextGeneration, session } from '../stores/session'
 import { assetTypes, displayTime, typeLabel, sourceLabel } from '../utils/display'
 import AppTable from '../components/AppTable.vue'
 import AssetStateFacts from '../components/AssetStateFacts.vue'
@@ -22,7 +22,7 @@ import AssetMetadataQuery from '../components/AssetMetadataQuery.vue'
 import AssetDateAssessmentPanel from '../components/AssetDateAssessmentPanel.vue'
 import AssetDateQuery from '../components/AssetDateQuery.vue'
 import { assetLedgerColumns, assetLedgerCell } from '../utils/assetLedgerColumns'
-import { Connection, Switch, Lock, Position, SetUp, Box } from '@element-plus/icons-vue'
+import { Connection, Switch, Lock, Position, SetUp, Box, Grid, List, Download, Upload, Plus, Search, Refresh, ArrowLeft } from '@element-plus/icons-vue'
 const deviceIcons = { router: Connection, switch: Switch, firewall: Lock, ap: Position, wireless_controller: SetUp, other: Box }
 const ElTableColumn = ElementTableColumn<Asset>
 const route = useRoute()
@@ -32,6 +32,21 @@ const queryString = (key: string) => typeof route.query[key] === 'string' ? rout
 const pageSize = computed(() => pageSizes.includes(Number(queryString('page_size'))) ? Number(queryString('page_size')) : 15)
 const filters = reactive({ q: '', status: '', type: '', site_id: '' })
 const rows = ref<Asset[]>([])
+const assetView = ref<'list' | 'grid'>('list')
+const detailTab = ref('overview')
+const detailTabs = [{ id: 'overview', label: '概览' }, { id: 'items', label: '监控项' }, { id: 'triggers', label: '触发器' }, { id: 'events', label: '问题与事件' }, { id: 'charts', label: '图表' }, { id: 'inventory', label: '资产清单' }, { id: 'configuration', label: '监控配置' }, { id: 'relations', label: '关联' }]
+const statusFilters = [{ value: '', label: '全部' }, { value: 'ok', label: '正常' }, { value: 'problem', label: '有问题' }, { value: 'unknown', label: '未知' }, { value: 'maintenance', label: '维护中' }, { value: 'disabled', label: '已停用' }]
+const pageMetrics = computed(() => [
+  { label: '本页资产', value: rows.value.length, detail: `${new Set(rows.value.map(item => item.type)).size} 种类型 · ${new Set(rows.value.map(item => item.site_id)).size} 个站点`, tone: '' },
+  { label: '正常', value: rows.value.filter(item => item.status === 'ok').length, detail: '当前页明确正常的记录', tone: 'success' },
+  { label: '有问题', value: rows.value.filter(item => item.status === 'problem').length, detail: '当前页明确异常的记录', tone: 'danger' },
+  { label: '未知', value: rows.value.filter(item => item.status === 'unknown').length, detail: '数据缺失 ≠ 正常', tone: 'warning' },
+  { label: '维护中', value: rows.value.filter(item => item.status === 'maintenance').length, detail: '仅按登记状态统计', tone: '' },
+  { label: '待接入', value: rows.value.filter(item => item.sync_state === 'PENDING_ONBOARDING').length, detail: '尚未确认监控配置生效', tone: 'warning' },
+])
+const exportAllowed = computed(() => ['msp', 'padmin'].includes(session.value?.user.role || '') && can('assets:read'))
+function filterStatus(value: string) { filters.status = value; applyFilters() }
+watch(() => queryString('asset_id'), () => { detailTab.value = 'overview' })
 const nextCursor = ref<string | null>(null)
 const hasMore = ref(false)
 const cursorHistory = ref<string[]>([])
@@ -152,45 +167,52 @@ async function createdAsset(created: Asset) {
 onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
 </script>
 <template>
-  <section>
-    <div class="page-heading"><div><h1>资产管理</h1><p>管理当前租户的资产台账，查看来源与接入状态。</p></div><div class="assets-heading-actions"><PermissionGate capability="assets:write"><el-button type="primary" @click="openCreate">＋ 创建资产草稿</el-button><el-button v-if="metadataAllowed" plain @click="metadataQueryOpen = true">手工资料筛选</el-button><PermissionGate capability="asset_dates:read"><el-button plain @click="dateQueryOpen = true">维保与超期日期筛选</el-button></PermissionGate><el-button v-if="importAllowed" plain @click="importOpen = true">导入资产来源</el-button></PermissionGate></div></div>
-    <div class="scope-card"><div><span class="small-label">当前租户</span><strong>{{ session?.tenant.name }}</strong></div><div><span class="small-label">本页资产</span><strong>{{ loading || error ? '—' : rows.length }} <small>个</small></strong></div><div class="scope-explanation"><span class="scope-dot" /><span>测试数据和手动草稿尚未接入真实采集，采样时间和指标暂缺；状态“未知”不表示设备正常。</span></div></div>
+  <section class="assets-prototype-page">
+    <div v-show="!detailOpen" class="asset-list-workspace">
+    <div class="page-heading"><div class="asset-page-title"><div class="title-with-context"><h1>资产管理</h1><span class="context-badge">{{ session?.tenant.name }}</span><small>当前页 {{ loading || error ? '—' : rows.length }} 个资产</small></div><details class="boundary-details"><summary>页面说明</summary><p>按当前授权与筛选读取资产台账。下方统计仅覆盖当前页；缺失的监控数据不会作为正常或零值。正式接入仍需通过检查。</p></details></div><div class="assets-heading-actions"><div class="asset-view-switch" aria-label="资产显示方式"><button type="button" :class="{ active: assetView === 'list' }" :aria-pressed="assetView === 'list'" @click="assetView = 'list'"><List />列表</button><button type="button" :class="{ active: assetView === 'grid' }" :aria-pressed="assetView === 'grid'" @click="assetView = 'grid'"><Grid />蜂巢</button></div><el-button v-if="exportAllowed" :icon="Download" @click="router.push('/asset-export-jobs')">导出</el-button><PermissionGate capability="assets:write"><el-button v-if="importAllowed" :icon="Upload" @click="importOpen = true">导入</el-button><el-button type="primary" :icon="Plus" @click="openCreate">创建资产草稿</el-button></PermissionGate></div></div>
+    <div class="scope-card feature-summary assets-kpis" aria-label="当前页资产统计"><div v-for="metric in pageMetrics" :key="metric.label" :class="metric.tone"><span class="small-label">{{ metric.label }}</span><strong>{{ loading || error ? '—' : metric.value }}</strong><small>{{ loading || error ? '等待当前页数据' : metric.detail }}</small></div></div>
     <div class="panel">
-      <el-form class="filter-form" :inline="true" @submit.prevent="applyFilters">
-        <el-form-item label="搜索"><el-input v-model="filters.q" clearable placeholder="资产名称 / 管理 IP" aria-label="搜索资产" /></el-form-item>
-        <el-form-item label="汇总状态"><el-select v-model="filters.status" clearable placeholder="全部状态" aria-label="资产状态"><el-option label="正常" value="ok" /><el-option label="有问题" value="problem" /><el-option label="未知" value="unknown" /><el-option label="维护中" value="maintenance" /><el-option label="已停用" value="disabled" /></el-select></el-form-item>
-        <el-form-item label="类型"><el-select v-model="filters.type" clearable placeholder="全部类型" aria-label="设备类型"><el-option v-for="type in assetTypes" :key="type.value" :label="type.label" :value="type.value" /></el-select></el-form-item>
-        <el-form-item label="站点"><el-input v-model="filters.site_id" clearable placeholder="站点 ID" aria-label="站点 ID" /></el-form-item>
-        <el-form-item class="filter-actions"><el-button type="primary" native-type="submit" :disabled="loading">查询</el-button><el-button :disabled="loading" @click="resetFilters">重置</el-button><el-button :loading="loading" @click="loadAssets">刷新</el-button></el-form-item>
+      <el-form class="asset-toolbar" :inline="true" @submit.prevent="applyFilters">
+        <el-input v-model="filters.q" :prefix-icon="Search" clearable placeholder="搜索名称 / 管理 IP" aria-label="搜索资产" class="asset-search" />
+        <div class="asset-status-chips" aria-label="按资产状态筛选"><button v-for="item in statusFilters" :key="item.value" type="button" :disabled="loading" :class="{ active: queryString('status') === item.value }" :aria-pressed="queryString('status') === item.value" @click="filterStatus(item.value)">{{ item.label }}</button></div>
+        <div class="asset-select-filters"><el-select v-model="filters.type" clearable placeholder="全部类型" aria-label="设备类型"><el-option v-for="type in assetTypes" :key="type.value" :label="type.label" :value="type.value" /></el-select><el-input v-model="filters.site_id" clearable placeholder="全部站点 / 站点 ID" aria-label="站点 ID" /><el-button type="primary" native-type="submit" :disabled="loading">查询</el-button><el-button :disabled="loading" @click="resetFilters">重置</el-button><el-button :icon="Refresh" :loading="loading" aria-label="刷新资产列表" @click="loadAssets">刷新</el-button></div>
+        <div v-if="metadataAllowed" class="asset-extended-filters"><span>更多筛选</span><el-button text @click="metadataQueryOpen = true">设备资料</el-button><PermissionGate capability="asset_dates:read"><el-button text @click="dateQueryOpen = true">维保与超期日期</el-button></PermissionGate><span class="asset-table-scope">统计范围：当前查询的本页记录</span></div>
       </el-form>
       <ApiErrorNotice :error="error" guidance="请点击“重试”重新加载当前列表。"><el-button size="small" @click="loadAssets">重试</el-button></ApiErrorNotice>
-      <AppTable :error="error" :rows="rows" :loading="loading" :empty-text="error ? '数据加载失败，请重试' : '当前筛选下没有资产'">
+      <AppTable v-if="assetView === 'list'" :error="error" :rows="rows" :loading="loading" :empty-text="error ? '数据加载失败，请重试' : '当前筛选下没有资产'">
         <el-table-column v-for="column in assetLedgerColumns" :key="column.key" :label="column.label" :min-width="column.minWidth" :fixed="column.key === 'actions' ? 'right' : undefined">
           <template #default="{ row }">
-              <div v-if="column.key === 'name'" class="asset-identity-cell"><span class="asset-type-symbol" :class="'asset-type-' + row.type" aria-hidden="true"><component :is="deviceIcons[row.type] || Box" /></span><div><el-button link type="primary" class="asset-link" @click="openDetail(row.id)">{{ assetLedgerCell(row, column.key).text }}</el-button><span class="cell-sub">{{ assetLedgerCell(row, column.key).detail }}</span></div></div>
+              <div v-if="column.key === 'name'" class="asset-identity-cell"><span class="asset-type-symbol" :class="'asset-type-' + row.type" aria-hidden="true"><component :is="deviceIcons[row.type] || Box" /></span><div><el-button link type="primary" class="asset-link" @click="openDetail(row.id)">{{ assetLedgerCell(row, column.key).text }}</el-button><span class="cell-sub mono">{{ row.management_ip || '—' }}</span></div></div>
               <el-button v-else-if="column.key === 'actions'" link type="primary" @click="openDetail(row.id)">{{ assetLedgerCell(row, column.key).text }}</el-button>
               <span v-else-if="column.key === 'availability' || column.key === 'sync'" class="ledger-state" :class="{ 'ledger-state-pending': column.key === 'sync' }">{{ assetLedgerCell(row, column.key).text }}</span>
             <span v-else>{{ assetLedgerCell(row, column.key).text }}</span>
-              <span v-if="column.key !== 'name' && assetLedgerCell(row, column.key).detail" class="cell-sub">{{ assetLedgerCell(row, column.key).detail }}</span>
+              <span v-if="column.key !== 'name' && assetLedgerCell(row, column.key).detail && !['cpu','memory','business','problems','owner'].includes(column.key)" class="cell-sub">{{ assetLedgerCell(row, column.key).detail }}</span>
           </template>
         </el-table-column>
       </AppTable>
-      <p class="muted asset-ledger-explanation">台账按约定顺序展示12列，可左右滚动查看。Proxy、所属业务系统、CPU、内存、当前问题数和负责人暂未提供，以“—”显示；这不表示数值为零、设备正常或尚未配置。手工资料需在对应页面按权限查看。</p>
+      <div v-else class="asset-honeycomb-region" :aria-busy="loading"><el-skeleton v-if="loading" :rows="5" animated /><div v-else-if="rows.length" class="asset-honeycomb"><button v-for="item in rows" :key="item.id" type="button" class="asset-tile" :class="'asset-tile-' + item.status" @click="openDetail(item.id)"><span class="tile-top"><component :is="deviceIcons[item.type] || Box" /><span>{{ typeLabel(item.type) }}</span></span><strong>{{ item.name }}</strong><span class="mono">{{ item.management_ip }}</span><span>{{ item.site_name || item.site_id }}</span><div><b>{{ assetLedgerCell(item, 'availability').text }}</b><small>{{ assetLedgerCell(item, 'sync').text }}</small></div></button></div><el-empty v-else :description="error ? '读取未完成，请按上方提示重试' : '当前筛选下没有资产'" /></div>
+      <details class="asset-ledger-explanation boundary-details"><summary>数据范围与缺失说明</summary><p>台账按约定顺序展示12列，可左右滚动查看。Proxy、所属业务系统、CPU、内存、当前问题数和负责人暂未提供，以“—”显示；这不表示数值为零、设备正常或尚未配置。手工资料需在对应页面按权限查看。</p></details>
       <div class="table-footer"><span>仅显示当前租户内有权查看的资产 · 本页 {{ loading || error ? '—' : rows.length }} 条</span><div class="cursor-pagination"><el-select :model-value="pageSize" :disabled="loading" aria-label="每页条数" @change="resizePage"><el-option v-for="size in pageSizes" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button v-if="queryString('cursor') && !cursorHistory.length" :disabled="loading" @click="firstPage">返回首页</el-button><el-button v-else :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
     </div>
-    <el-drawer v-model="detailOpen" title="资产详情" size="560px" class="asset-drawer" destroy-on-close>
+    </div>
+    <section v-if="detailOpen" class="asset-detail-workspace asset-drawer" aria-label="资产详情">
+      <div class="asset-detail-top"><el-button :icon="ArrowLeft" text @click="detailOpen = false">返回资产列表</el-button><span>资产管理 / 资产详情</span><el-button :loading="detailLoading" @click="refreshDetail">只读刷新</el-button></div>
       <ApiErrorNotice :error="detailError" />
       <el-skeleton v-if="detailLoading" :rows="8" animated />
-      <template v-if="asset"><div class="detail-title"><span class="eyebrow">{{ typeLabel(asset.type) }}</span><h2>{{ asset.name }}</h2></div><AssetStateFacts :asset="asset" /><el-alert type="info" :closable="false" show-icon :title="asset.unknown_reason || '当前未取得真实采集数据，不能判断为正常。'" />
+      <template v-if="asset"><header class="asset-detail-hero"><div class="asset-hero-title"><span class="asset-type-symbol"><component :is="deviceIcons[asset.type] || Box" /></span><div><div class="title-with-context"><h1>{{ asset.name }}</h1><span class="ledger-state">{{ assetLedgerCell(asset, 'availability').text }}</span><span class="ledger-state ledger-state-pending">{{ assetLedgerCell(asset, 'sync').text }}</span></div><p>{{ asset.management_ip }} · {{ typeLabel(asset.type) }} · {{ session?.tenant.name }} / {{ asset.site_name || asset.site_id }}</p></div></div><div class="asset-hero-actions"><PermissionGate capability="assets:write"><el-button v-if="metadataAllowed" @click="openMetadata">资料维护</el-button><el-button v-if="metadataAllowed" @click="openWarranty">维保资料</el-button></PermissionGate><el-button @click="openDependencies">查看依赖</el-button><el-button v-if="can('assets:read')" @click="router.push('/network-monitoring')">查看网络监控</el-button></div><div class="asset-facts-grid"><div><small>资产标识</small><strong class="mono" :title="asset.id">{{ asset.id }}</strong></div><div><small>所属站点</small><strong>{{ asset.site_name || asset.site_id }}</strong></div><div><small>资料来源</small><strong>{{ sourceLabel(asset.source) }}</strong></div><div><small>生命周期</small><strong>{{ asset.lifecycle_status === 'DRAFT' ? '草稿' : asset.lifecycle_status }}</strong></div><div><small>最近采样</small><strong>{{ assetLedgerCell(asset, 'sampled').text }}</strong></div><div><small>登记版本</small><strong>v{{ asset.version }}</strong></div></div></header>
+      <div class="asset-detail-body panel"><nav class="asset-detail-tabs" aria-label="资产详情分区"><button v-for="tab in detailTabs" :key="tab.id" type="button" :class="{ active: detailTab === tab.id }" :aria-pressed="detailTab === tab.id" @click="detailTab = tab.id">{{ tab.label }}</button></nav>
+      <div v-if="detailTab === 'overview'" class="asset-overview"><div class="panel-heading"><h2>关键指标</h2><span>当前资产 · 尚未取得指标采样</span></div><div class="asset-gauges"><article v-for="name in ['CPU 使用率','内存使用率','根分区使用率','负载（1m）']" :key="name"><h3>{{ name }}</h3><div class="unknown-gauge" aria-hidden="true" /><strong>未知</strong><small>等待真实采样</small></article></div><div class="asset-small-metrics"><div v-for="name in ['网络入 / 出','磁盘 IOPS 读 / 写','进程 / 僵尸','TCP 连接数']" :key="name"><small>{{ name }}</small><strong>—</strong><span>未接入</span></div></div><div class="asset-overview-panels"><section><div class="panel-heading"><h3>采样与来源</h3></div><AssetStateFacts :asset="asset" /><SampleFreshness :clock="detailClock" :sampled-at="asset.sampled_at" :context-key="`${asset.tenant_id}:${asset.id}`" /></section><section><div class="panel-heading"><h3>当前问题</h3><span>未知</span></div><div class="prototype-inline-empty"><Connection /><strong>事件来源尚未接入</strong><span>暂无可判断的问题数量，不表示没有故障。</span></div></section></div><p class="asset-unknown-note">{{ asset.unknown_reason || '当前未取得真实采集数据，不能判断为正常。' }}</p></div>
+      <div v-else-if="detailTab === 'inventory'" class="asset-inventory-panel">
         <el-descriptions :column="1" border class="asset-descriptions"><el-descriptions-item label="资产 ID"><span class="mono">{{ asset.id }}</span></el-descriptions-item><el-descriptions-item label="所属租户">{{ asset.tenant_id }}</el-descriptions-item><el-descriptions-item label="管理 IP"><span class="mono">{{ asset.management_ip }}</span></el-descriptions-item><el-descriptions-item label="站点">{{ asset.site_name || asset.site_id }}</el-descriptions-item><el-descriptions-item label="生命周期">{{ asset.lifecycle_status === 'DRAFT' ? '草稿' : asset.lifecycle_status }}</el-descriptions-item><el-descriptions-item label="来源">{{ sourceLabel(asset.source) }}</el-descriptions-item><el-descriptions-item label="采样时间">{{ assetLedgerCell(asset, 'sampled').text }}<span v-if="assetLedgerCell(asset, 'sampled').detail" class="cell-sub">{{ assetLedgerCell(asset, 'sampled').detail }}</span></el-descriptions-item><el-descriptions-item label="版本">v{{ asset.version }}</el-descriptions-item><el-descriptions-item label="创建时间">{{ displayTime(asset.created_at) }}</el-descriptions-item><el-descriptions-item label="更新时间">{{ displayTime(asset.updated_at) }}</el-descriptions-item></el-descriptions>
-        <SampleFreshness :clock="detailClock" :sampled-at="asset.sampled_at" :context-key="`${asset.tenant_id}:${asset.id}`" />
         <div v-if="metadataAllowed" class="detail-section"><h3>手工草稿资料</h3><p class="muted">内部维护明确资料并留存前后历史；管理IP、CMDB和监控配置不变。</p><PermissionGate capability="assets:write"><el-button @click="openMetadata">查看资料与修订历史</el-button><el-button @click="openWarranty">维护维保日期与供应商</el-button></PermissionGate></div>
         <AssetDateAssessmentPanel v-if="metadataAllowed" :asset="asset" />
-        <div class="detail-section"><h3>依赖草稿</h3><p class="muted">按完整租户图保存人工依赖提案，监控抑制尚未生效。</p><el-button @click="openDependencies">查看或追加依赖草稿</el-button></div>
-        <div class="detail-section"><h3>监控接入</h3><p class="muted">测试环境数据已持久保存；生产隔离、监控组件许可与阈值依赖 Q02 / Q03 / Q06。完成客户确认前，草稿不能发布到真实监控。</p><PermissionGate capability="assets:write"><el-button type="primary" plain :loading="onboarding" @click="requestOnboarding">检查接入条件</el-button></PermissionGate></div>
+      </div>
+        <div v-else-if="detailTab === 'relations'" class="asset-inventory-panel"><div class="panel-heading"><h3>设备关联与依赖</h3><span>人工草稿</span></div><div class="prototype-inline-empty"><Connection /><strong>查看当前资产的依赖草稿</strong><span>按完整租户图保存提案，尚未作为监控抑制规则生效。</span><el-button type="primary" @click="openDependencies">查看或追加依赖草稿</el-button></div></div>
+        <div v-else-if="detailTab === 'configuration'" class="asset-inventory-panel"><div class="panel-heading"><h3>监控接入</h3><span>待确认</span></div><p class="muted">生产隔离、监控组件许可与阈值依赖 Q02 / Q03 / Q06。完成客户确认前，草稿不能发布到真实监控。</p><PermissionGate capability="assets:write"><el-button type="primary" :loading="onboarding" @click="requestOnboarding">检查接入条件</el-button></PermissionGate></div>
+        <div v-else class="prototype-inline-empty asset-tab-empty"><Connection /><strong>{{ detailTabs.find(tab => tab.id === detailTab)?.label }}尚未接入</strong><span>此资产还没有可读取的对应数据，状态保持未知。</span><el-button @click="detailTab = 'configuration'">查看接入条件</el-button></div>
+      </div>
       </template>
-      <template #footer><el-button class="asset-time-refresh" :loading="detailLoading" :disabled="detailLoading" @click="refreshDetail">只读刷新</el-button><el-button @click="detailOpen = false">关闭</el-button></template>
-    </el-drawer>
+    </section>
     <el-dialog v-model="createOpen" title="创建资产草稿" width="520px" class="responsive-dialog" :close-on-click-modal="false" :before-close="beforeCloseCreate" destroy-on-close>
       <AssetDraftCreatePanel ref="createPanel" :sites="availableSites" @created="createdAsset" @close="createOpen = false" />
     </el-dialog>

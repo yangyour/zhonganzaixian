@@ -19,6 +19,7 @@ import PageRecoveryNotice from './components/PageRecoveryNotice.vue'
 import SessionResumeNotice from './components/SessionResumeNotice.vue'
 import { Fold, Expand, Menu } from '@element-plus/icons-vue'
 import './styles/prototype.css'
+import './styles/functional-prototype.css'
 const route = useRoute()
 const router = useRouter()
 const homeRoute = computed(() => landingRoute(session.value, router.getRoutes()))

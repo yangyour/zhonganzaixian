@@ -1,0 +1,156 @@
+{
+  "reference": "repository zabbix-msp-prototype app.css + enterprise.css",
+  "note": "原型含演示数据；部分实现页面采用同类页面布局参考，业务范围和字段以实际接口为准。",
+  "pages": [
+    {
+      "title": "资产管理",
+      "path": "/assets",
+      "reference": "assets"
+    },
+    {
+      "title": "运营总览",
+      "path": "/dashboard",
+      "reference": "dashboard"
+    },
+    {
+      "title": "网络监控",
+      "path": "/network-monitoring",
+      "reference": "platform-health"
+    },
+    {
+      "title": "报障与受理",
+      "path": "/tickets",
+      "reference": "tickets"
+    },
+    {
+      "title": "手工来源登记",
+      "path": "/manual-incidents",
+      "reference": "incidents"
+    },
+    {
+      "title": "SLA对照",
+      "path": "/sla-scenarios",
+      "reference": "sla"
+    },
+    {
+      "title": "台账导出",
+      "path": "/asset-export-jobs",
+      "reference": "reports"
+    },
+    {
+      "title": "导出消息",
+      "path": "/my-export-messages",
+      "reference": "reports"
+    },
+    {
+      "title": "本人工时",
+      "path": "/my-worklogs",
+      "reference": "tickets"
+    },
+    {
+      "title": "通知偏好",
+      "path": "/my-notification-preferences",
+      "reference": "notifications"
+    },
+    {
+      "title": "备份计划",
+      "path": "/backup-plan-drafts",
+      "reference": "backups"
+    },
+    {
+      "title": "变更报备",
+      "path": "/change-notice-drafts",
+      "reference": "backups"
+    },
+    {
+      "title": "巡检模板",
+      "path": "/inspection-templates",
+      "reference": "templates"
+    },
+    {
+      "title": "巡检执行单",
+      "path": "/inspection-worksheets",
+      "reference": "reports"
+    },
+    {
+      "title": "巡检来源集合",
+      "path": "/inspection-source-collections",
+      "reference": "reports"
+    },
+    {
+      "title": "租户登记",
+      "path": "/tenant-inventory",
+      "reference": "tenants"
+    },
+    {
+      "title": "联系人",
+      "path": "/customer-contacts",
+      "reference": "tenants"
+    },
+    {
+      "title": "联系人导入",
+      "path": "/contact-imports",
+      "reference": "onboarding"
+    },
+    {
+      "title": "导入预览",
+      "path": "/contact-import-preview",
+      "reference": "onboarding"
+    },
+    {
+      "title": "经营对照",
+      "path": "/operational-comparison",
+      "reference": "operations"
+    },
+    {
+      "title": "容量估算",
+      "path": "/capacity-estimates",
+      "reference": "capacity"
+    },
+    {
+      "title": "用户管理",
+      "path": "/identity/users",
+      "reference": "members"
+    },
+    {
+      "title": "角色权限",
+      "path": "/identity/roles",
+      "reference": "members"
+    },
+    {
+      "title": "身份设置",
+      "path": "/identity/settings",
+      "reference": "members"
+    },
+    {
+      "title": "我的账号",
+      "path": "/account",
+      "reference": "members"
+    },
+    {
+      "title": "配置确认",
+      "path": "/configurations",
+      "reference": "templates"
+    },
+    {
+      "title": "阈值诊断",
+      "path": "/threshold-diagnostics",
+      "reference": "alert-rules"
+    },
+    {
+      "title": "能力目录",
+      "path": "/capability-catalog",
+      "reference": "members"
+    },
+    {
+      "title": "审计日志",
+      "path": "/audit",
+      "reference": "audit"
+    },
+    {
+      "title": "登录",
+      "path": "/login",
+      "reference": "login"
+    }
+  ]
+}

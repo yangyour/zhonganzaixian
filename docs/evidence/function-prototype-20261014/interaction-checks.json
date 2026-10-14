@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "asset-list-grid-query-empty-reset-full-detail-eight-tabs",
+    "network-list-local-filter-card-switch-real-cpu-history",
+    "mobile-user-role-editor-open-close-with-visible-controls",
+    "backup-page-local-search-reset-and-real-record-selection"
+  ],
+  "errors": [],
+  "non_login_writes": []
+}

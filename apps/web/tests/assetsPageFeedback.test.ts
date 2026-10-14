@@ -54,7 +54,7 @@ function button(text: string): HTMLButtonElement {
 }
 function expectCount(value: '—' | '0' | '1') {
   const count = [...host.querySelectorAll('.scope-card > div')].find(item => item.textContent?.includes('本页资产'))
-  expect(count?.querySelector('strong')?.textContent?.trim()).toBe(`${value} 个`)
+  expect(count?.querySelector('strong')?.textContent?.trim()).toBe(value)
   expect(host.querySelector('.table-footer > span')?.textContent).toContain(`本页 ${value} 条`)
 }
 beforeEach(() => {
@@ -88,7 +88,7 @@ it('queries unchanged filters again and blocks repeated submit while the query i
   expect(request.mock.calls[1]?.[0]).toBe(request.mock.calls[0]?.[0])
   expect(button('查询').disabled).toBe(true); expect(button('重置').disabled).toBe(true)
   button('查询').click()
-  host.querySelector('form.filter-form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+  host.querySelector('form.asset-toolbar')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
   await settle(); expect(request).toHaveBeenCalledTimes(2)
   pending.resolve(page()); await settle(); expect(button('查询').disabled).toBe(false)
   button('查询').click(); await settle(); expect(request).toHaveBeenCalledTimes(3)

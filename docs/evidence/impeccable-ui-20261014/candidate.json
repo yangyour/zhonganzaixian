@@ -17,6 +17,8 @@
     "unknown-preserved",
     "reason-disclosure",
     "auto-refresh-pause",
+    "current-monitoring-schema-1440",
+    "current-monitoring-schema-390",
     "keyboard-focus-visible"
   ],
   "viewports": [
@@ -179,5 +181,5 @@
   "unexpected_writes": [],
   "credentials_output": false,
   "status": "PASSED",
-  "completed_at": "2026-10-14T08:40:04.988Z"
+  "completed_at": "2026-10-14T08:52:30.564Z"
 }

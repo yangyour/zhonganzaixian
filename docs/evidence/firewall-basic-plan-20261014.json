@@ -1,0 +1,221 @@
+{
+  "environment": "lan-test-20261008",
+  "scope": "mop-lan-basic-network-20261012",
+  "provider_version": "7.0.31",
+  "apply": false,
+  "sample_interval_seconds": 60,
+  "test_history_days": 7,
+  "notification_rules_created": false,
+  "device_login_performed": false,
+  "devices": [
+    {
+      "key": "sangfor-firewall",
+      "device_type": "防火墙",
+      "brand": "深信服",
+      "model": "AF-1000-B1800",
+      "ip": "192.169.11.1",
+      "provider_host_id": null,
+      "items": [
+        {
+          "metric": "icmp",
+          "key_": "icmpping[192.169.11.1,3,200,56,1000]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": null
+        },
+        {
+          "metric": "loss",
+          "key_": "icmppingloss[192.169.11.1,3,200,56,1000]",
+          "value_type": 0,
+          "units": "%",
+          "provider_item_id": null
+        },
+        {
+          "metric": "latency",
+          "key_": "icmppingsec[192.169.11.1,3,200,56,1000,avg]",
+          "value_type": 0,
+          "units": "s",
+          "provider_item_id": null
+        },
+        {
+          "metric": "tcp_22",
+          "key_": "net.tcp.service[tcp,192.169.11.1,22]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": null
+        },
+        {
+          "metric": "tcp_80",
+          "key_": "net.tcp.service[tcp,192.169.11.1,80]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": null
+        },
+        {
+          "metric": "tcp_443",
+          "key_": "net.tcp.service[tcp,192.169.11.1,443]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": null
+        }
+      ]
+    },
+    {
+      "key": "sangfor-hci",
+      "device_type": "超融合",
+      "brand": "深信服",
+      "model": "aServer-P-2200",
+      "ip": "192.168.1.170",
+      "provider_host_id": "10684",
+      "items": [
+        {
+          "metric": "icmp",
+          "key_": "icmpping[192.168.1.170,3,200,56,1000]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": "50741"
+        },
+        {
+          "metric": "loss",
+          "key_": "icmppingloss[192.168.1.170,3,200,56,1000]",
+          "value_type": 0,
+          "units": "%",
+          "provider_item_id": "50742"
+        },
+        {
+          "metric": "latency",
+          "key_": "icmppingsec[192.168.1.170,3,200,56,1000,avg]",
+          "value_type": 0,
+          "units": "s",
+          "provider_item_id": "50743"
+        },
+        {
+          "metric": "tcp_22",
+          "key_": "net.tcp.service[tcp,192.168.1.170,22]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": "50744"
+        },
+        {
+          "metric": "tcp_80",
+          "key_": "net.tcp.service[tcp,192.168.1.170,80]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": "50745"
+        },
+        {
+          "metric": "tcp_443",
+          "key_": "net.tcp.service[tcp,192.168.1.170,443]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": "50746"
+        }
+      ]
+    },
+    {
+      "key": "huawei-switch",
+      "device_type": "交换机",
+      "brand": "华为",
+      "model": "S5731-S24P4X",
+      "ip": "192.168.1.2",
+      "provider_host_id": "10685",
+      "items": [
+        {
+          "metric": "icmp",
+          "key_": "icmpping[192.168.1.2,3,200,56,1000]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": "50747"
+        },
+        {
+          "metric": "loss",
+          "key_": "icmppingloss[192.168.1.2,3,200,56,1000]",
+          "value_type": 0,
+          "units": "%",
+          "provider_item_id": "50748"
+        },
+        {
+          "metric": "latency",
+          "key_": "icmppingsec[192.168.1.2,3,200,56,1000,avg]",
+          "value_type": 0,
+          "units": "s",
+          "provider_item_id": "50749"
+        },
+        {
+          "metric": "tcp_22",
+          "key_": "net.tcp.service[tcp,192.168.1.2,22]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": "50750"
+        },
+        {
+          "metric": "tcp_80",
+          "key_": "net.tcp.service[tcp,192.168.1.2,80]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": "50751"
+        },
+        {
+          "metric": "tcp_443",
+          "key_": "net.tcp.service[tcp,192.168.1.2,443]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": "50752"
+        }
+      ]
+    },
+    {
+      "key": "sundray-switch",
+      "device_type": "交换机",
+      "brand": "信锐",
+      "model": "aRS6300-50Q-EI-24X",
+      "ip": "192.168.1.125",
+      "provider_host_id": "10686",
+      "items": [
+        {
+          "metric": "icmp",
+          "key_": "icmpping[192.168.1.125,3,200,56,1000]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": "50753"
+        },
+        {
+          "metric": "loss",
+          "key_": "icmppingloss[192.168.1.125,3,200,56,1000]",
+          "value_type": 0,
+          "units": "%",
+          "provider_item_id": "50754"
+        },
+        {
+          "metric": "latency",
+          "key_": "icmppingsec[192.168.1.125,3,200,56,1000,avg]",
+          "value_type": 0,
+          "units": "s",
+          "provider_item_id": "50755"
+        },
+        {
+          "metric": "tcp_22",
+          "key_": "net.tcp.service[tcp,192.168.1.125,22]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": "50756"
+        },
+        {
+          "metric": "tcp_80",
+          "key_": "net.tcp.service[tcp,192.168.1.125,80]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": "50757"
+        },
+        {
+          "metric": "tcp_443",
+          "key_": "net.tcp.service[tcp,192.168.1.125,443]",
+          "value_type": 3,
+          "units": "",
+          "provider_item_id": "50758"
+        }
+      ]
+    }
+  ],
+  "verified_at": "2026-10-14T02:26:35.313865+00:00"
+}

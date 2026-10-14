@@ -35,9 +35,10 @@ public class NetworkMonitoringService {
             for(JsonNode node:root){
                 if(!fields(node,Set.of("tenant_id","asset_id","ip","brand","model","host_id","items")))throw unavailable();
                 String tenant=text(node,"tenant_id"),asset=text(node,"asset_id"),ip=text(node,"ip"),host=text(node,"host_id");
-                if(!uuid(tenant)||!uuid(asset)||!assets.add(asset)||!id(host)||!hosts.add(host)||!privateIp(ip))throw unavailable();
+                if(!uuid(tenant)||!uuid(asset)||!assets.add(asset)||!id(host)||!hosts.add(host))throw unavailable();
                 String brand=text(node,"brand"),model=text(node,"model");
                 if(brand.isBlank()||model.isBlank()||brand.length()>100||model.length()>100)throw unavailable();
+                if(!approvedTarget(ip,brand,model))throw unavailable();
                 if(!fields(node.get("items"),Set.copyOf(METRICS)))throw unavailable();
                 Map<String,String> mapping=new LinkedHashMap<>();
                 for(String metric:METRICS){String item=text(node.get("items"),metric);if(!id(item)||!items.add(item))throw unavailable();mapping.put(metric,item);}
@@ -57,6 +58,10 @@ public class NetworkMonitoringService {
         if(value==null||!value.matches("(?:0|[1-9][0-9]{0,2})(?:\\.(?:0|[1-9][0-9]{0,2})){3}"))return false;
         int[] p=Arrays.stream(value.split("\\.")).mapToInt(Integer::parseInt).toArray();
         return Arrays.stream(p).allMatch(n->n<=255)&&(p[0]==10||p[0]==192&&p[1]==168||p[0]==172&&p[1]>=16&&p[1]<=31);
+    }
+    /** User's 2026-10-14 correction permits one specific non-RFC1918 device, not a network range. */
+    static boolean approvedTarget(String ip,String brand,String model){
+        return privateIp(ip)||("192.169.11.1".equals(ip)&&"深信服".equals(brand)&&"AF-1000-B1800".equals(model));
     }
     static String key(Binding b,String metric){
         return switch(metric){case "icmp"->"icmpping["+b.ip()+",3,200,56,1000]";

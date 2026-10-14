@@ -1,0 +1,111 @@
+{
+  "verified_at": "2026-10-14T02:41:59.355Z",
+  "environment": "lan-test-20261008",
+  "public_url": "http://192.168.1.215:10010/network-monitoring",
+  "browser": "Edge 155.0.4283.45",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "physical_mobile_test": false,
+  "checks": [
+    {
+      "name": "desktop-four-devices",
+      "passed": true
+    },
+    {
+      "name": "firewall-one-hour-history",
+      "passed": true
+    },
+    {
+      "name": "firewall-24-hour-history",
+      "passed": true
+    },
+    {
+      "name": "firewall-metric-loss",
+      "passed": true
+    },
+    {
+      "name": "firewall-metric-icmp",
+      "passed": true
+    },
+    {
+      "name": "firewall-metric-tcp_22",
+      "passed": true
+    },
+    {
+      "name": "firewall-metric-tcp_80",
+      "passed": true
+    },
+    {
+      "name": "firewall-metric-tcp_443",
+      "passed": true
+    },
+    {
+      "name": "firewall-metric-latency",
+      "passed": true
+    },
+    {
+      "name": "refresh-preserves-selection",
+      "passed": true
+    },
+    {
+      "name": "device-switch-clears-selection",
+      "passed": true
+    },
+    {
+      "name": "mobile-navigation-four-devices",
+      "passed": true
+    },
+    {
+      "name": "mobile-firewall-history",
+      "passed": true
+    },
+    {
+      "name": "mobile-no-horizontal-clipping",
+      "passed": true
+    },
+    {
+      "name": "other-tenant-empty",
+      "passed": true
+    },
+    {
+      "name": "desktop-no-horizontal-clipping",
+      "passed": true
+    }
+  ],
+  "mobile_fit": {
+    "width": 390,
+    "scrollWidth": 390,
+    "controls": [
+      {
+        "left": 33,
+        "right": 189
+      },
+      {
+        "left": 201,
+        "right": 357
+      }
+    ]
+  },
+  "screenshots": [
+    "desktop-firewall.png",
+    "desktop-history.png",
+    "desktop-initial.png",
+    "mobile-firewall.png",
+    "mobile-history.png",
+    "mobile-initial.png",
+    "other-tenant-empty.png"
+  ],
+  "visual_review": "No unexpected horizontal clipping, overlapping controls or unreadable firewall data observed; page and history table intentionally scroll.",
+  "page_error_count": 0,
+  "tool_recovery": "Initial mobile navigation locator used visible icon instead of aria-label; timed out, restarted session and verified using accessible name.",
+  "firewall_authenticated_api_tested": false,
+  "passed": true
+}

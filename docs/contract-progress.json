@@ -384,7 +384,8 @@
       "has_progress_note": true,
       "local_references": [
         "docs/basic-network-monitoring.md",
-        "docs/device-network-preflight.md"
+        "docs/device-network-preflight.md",
+        "docs/firewall-basic-integration-20261014.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -518,6 +519,7 @@
         "docs/evidence/niko-metric-series-core-20261005.json",
         "docs/evidence/niko-monitoring-object-mapping-20261007.json",
         "docs/evidence/niko-zabbix-numeric-history-20261005.json",
+        "docs/firewall-basic-integration-20261014.md",
         "docs/metric-series-projection.md",
         "docs/monitoring-object-mapping.md",
         "docs/scp-connector-preparation.md"
@@ -1439,6 +1441,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "96bc0ea89347dfbecaef6210ea5e2404af3d60c6063fd3c26bfef8157079634b"
+    "doc/development/07_合同逐项开发追踪.md": "cbe4d242a2032beb568773c85dd28f83319f36a99bb94e0665a167686aeafb41"
   }
 }

@@ -1,0 +1,52 @@
+{
+  "verified_at": "2026-10-14T02:29:00.919677+00:00",
+  "source": "designated_test_server",
+  "target": "192.169.11.1",
+  "namespace": "public",
+  "checks": [
+    {
+      "path": "/api/v1/namespaces/public/systemversion",
+      "strict": {
+        "status": "TLS_NOT_VERIFIED",
+        "verify_code": 20,
+        "tls_verified": false
+      },
+      "temporary_unverified": {
+        "status": "HTTP_RESPONSE",
+        "http_status": 200,
+        "content_type": "application/octet-stream",
+        "tls_verified": false,
+        "provider_codes": [
+          1003
+        ],
+        "json_object": true
+      },
+      "assessment": "AUTHENTICATION_REQUIRED"
+    },
+    {
+      "path": "/api/v1/namespaces/public/keepalive",
+      "strict": {
+        "status": "TLS_NOT_VERIFIED",
+        "verify_code": 20,
+        "tls_verified": false
+      },
+      "temporary_unverified": {
+        "status": "HTTP_RESPONSE",
+        "http_status": 200,
+        "content_type": "application/octet-stream",
+        "tls_verified": false,
+        "provider_codes": [
+          1003
+        ],
+        "json_object": true
+      },
+      "assessment": "AUTHENTICATION_REQUIRED"
+    }
+  ],
+  "credentials_sent": false,
+  "authentication_attempted": false,
+  "resource_writes": 0,
+  "tls_exception_scope": "THIS_CREDENTIAL_FREE_PROBE_ONLY",
+  "environment": "lan-test-20261008",
+  "firewall_api_ready": false
+}

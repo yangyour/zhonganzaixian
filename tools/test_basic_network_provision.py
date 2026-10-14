@@ -38,5 +38,12 @@ class ProvisionTest(unittest.TestCase):
         api=MagicMock();api.rpc.return_value='8.0.0'
         with self.assertRaises(ValueError):module.provision(api,[D],True)
         self.assertEqual(1,api.rpc.call_count)
+    def test_firewall_inclusion_preserves_three_existing_targets_and_corrected_address(self):
+        import json
+        inventory=json.loads((Path(__file__).resolve().parents[1]/'deploy/lan-test/devices.json').read_text(encoding='utf-8'))
+        selected=[d for d in inventory['devices'] if d['key'] in module.KEYS]
+        self.assertEqual(tuple(d['key'] for d in selected),module.KEYS)
+        self.assertEqual('192.169.11.1',selected[0]['ip'])
+        self.assertEqual(24,sum(len(module.metric_plan(d['ip'])) for d in selected))
 
 if __name__=='__main__':unittest.main()

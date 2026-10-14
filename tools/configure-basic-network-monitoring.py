@@ -1,4 +1,4 @@
-"""Explicitly provision the three user-approved basic network test targets.
+"""Explicitly provision the user-approved basic network test targets.
 
 Default is read-only planning. --apply creates only this dedicated group's
 hosts/items. It does not install services, touch devices, or create alert rules.
@@ -13,7 +13,7 @@ from lan_monitoring_zabbix import LanZabbix, ROOT
 
 SCOPE = 'mop-lan-basic-network-20261012'
 GROUP = 'MOP LAN basic network test 20261012'
-KEYS = ('sangfor-hci', 'huawei-switch', 'sundray-switch')
+KEYS = ('sangfor-firewall', 'sangfor-hci', 'huawei-switch', 'sundray-switch')
 OWNER = 'MOP explicit IP-only network test; vendor identity unverified; no notification rules.'
 
 
@@ -86,7 +86,7 @@ def main():
         manifest = validate_manifest(json.loads((ROOT / 'deploy/lan-test/devices.json').read_text(encoding='utf-8')))
         devices = [d for d in manifest['devices'] if d['key'] in KEYS]
         if tuple(d['key'] for d in devices) != KEYS:
-            raise ValueError('Expected exactly three selected targets')
+            raise ValueError('Expected exactly the selected device keys in inventory order')
         api = LanZabbix()
         api.login_admin()
         report = provision(api, devices, args.apply)

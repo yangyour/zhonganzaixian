@@ -1,0 +1,676 @@
+{
+  "environment": "lan-test-20261008",
+  "port": 18012,
+  "verified_at": "2026-10-14T02:36:03.480956+00:00",
+  "http_checks": 76,
+  "transport_failures": [],
+  "checks": [
+    {
+      "path": "/health/ready",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring",
+      "method": "GET",
+      "expected": 401,
+      "actual": 401
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=icmp&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=icmp&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=loss&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=loss&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=latency&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=latency&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=tcp_22&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=tcp_22&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=tcp_80&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=tcp_80&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=tcp_443&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=tcp_443&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=icmp&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=icmp&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=loss&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=loss&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=latency&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=latency&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=tcp_22&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=tcp_22&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=tcp_80&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=tcp_80&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=tcp_443&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history?metric=tcp_443&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=icmp&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=icmp&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=loss&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=loss&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=latency&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=latency&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=tcp_22&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=tcp_22&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=tcp_80&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=tcp_80&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=tcp_443&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history?metric=tcp_443&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=icmp&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=icmp&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=loss&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=loss&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=latency&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=latency&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=tcp_22&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=tcp_22&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=tcp_80&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=tcp_80&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=tcp_443&window=HOUR_1",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history?metric=tcp_443&window=HOURS_24",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring?tenant_id=x",
+      "method": "GET",
+      "expected": 400,
+      "actual": 400
+    },
+    {
+      "path": "/network-monitoring?ip=127.0.0.1",
+      "method": "GET",
+      "expected": 400,
+      "actual": 400
+    },
+    {
+      "path": "/network-monitoring?itemid=1",
+      "method": "GET",
+      "expected": 400,
+      "actual": 400
+    },
+    {
+      "path": "/network-monitoring?window=HOUR_1",
+      "method": "GET",
+      "expected": 400,
+      "actual": 400
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=cpu",
+      "method": "GET",
+      "expected": 400,
+      "actual": 400
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history?metric=icmp&metric=loss",
+      "method": "GET",
+      "expected": 400,
+      "actual": 400
+    },
+    {
+      "path": "/network-monitoring/55000000-0000-4000-8000-000000000099/history",
+      "method": "GET",
+      "expected": 404,
+      "actual": 404
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring",
+      "method": "GET",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "path": "/network-monitoring/90cdb296-c3c6-47fb-bf1e-1e82761226e3/history",
+      "method": "GET",
+      "expected": 404,
+      "actual": 404
+    },
+    {
+      "path": "/network-monitoring/9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45/history",
+      "method": "GET",
+      "expected": 404,
+      "actual": 404
+    },
+    {
+      "path": "/network-monitoring/b409d0cf-a8ef-4f8a-bf93-176444421ddd/history",
+      "method": "GET",
+      "expected": 404,
+      "actual": 404
+    },
+    {
+      "path": "/network-monitoring/8a8b5f47-5bd4-4abd-8f39-8d6f43794299/history",
+      "method": "GET",
+      "expected": 404,
+      "actual": 404
+    }
+  ],
+  "devices": [
+    {
+      "asset_id": "90cdb296-c3c6-47fb-bf1e-1e82761226e3",
+      "name": "IP基础测试 · 深信服超融合",
+      "management_ip": "192.168.1.170",
+      "brand": "深信服",
+      "model": "aServer-P-2200",
+      "network_state": "REACHABLE",
+      "metrics": {
+        "icmp": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:35:00Z"
+        },
+        "loss": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "%",
+          "recorded_at": "2026-10-14T02:35:00Z"
+        },
+        "latency": {
+          "state": "FRESH",
+          "value": "0.00011733333333333333",
+          "unit": "s",
+          "recorded_at": "2026-10-14T02:35:00Z"
+        },
+        "tcp_22": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:34:44Z"
+        },
+        "tcp_80": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:34:45Z"
+        },
+        "tcp_443": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:34:46Z"
+        }
+      },
+      "sample_interval_seconds": 60,
+      "freshness_seconds": 180,
+      "vendor_metrics_status": "DOCUMENTATION_PENDING",
+      "device_identity_verified": false,
+      "alert_rule_status": "CONFIG_PENDING"
+    },
+    {
+      "asset_id": "9b9f03bd-0f3c-4a2f-b9e1-5dd003f2ab45",
+      "name": "IP基础测试 · 华为交换机",
+      "management_ip": "192.168.1.2",
+      "brand": "华为",
+      "model": "S5731-S24P4X",
+      "network_state": "REACHABLE",
+      "metrics": {
+        "icmp": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:35:00Z"
+        },
+        "loss": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "%",
+          "recorded_at": "2026-10-14T02:35:00Z"
+        },
+        "latency": {
+          "state": "FRESH",
+          "value": "0.0001",
+          "unit": "s",
+          "recorded_at": "2026-10-14T02:35:00Z"
+        },
+        "tcp_22": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:34:50Z"
+        },
+        "tcp_80": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:34:51Z"
+        },
+        "tcp_443": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:34:52Z"
+        }
+      },
+      "sample_interval_seconds": 60,
+      "freshness_seconds": 180,
+      "vendor_metrics_status": "DOCUMENTATION_PENDING",
+      "device_identity_verified": false,
+      "alert_rule_status": "CONFIG_PENDING"
+    },
+    {
+      "asset_id": "b409d0cf-a8ef-4f8a-bf93-176444421ddd",
+      "name": "IP基础测试 · 信锐交换机",
+      "management_ip": "192.168.1.125",
+      "brand": "信锐",
+      "model": "aRS6300-50Q-EI-24X",
+      "network_state": "REACHABLE",
+      "metrics": {
+        "icmp": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:35:00Z"
+        },
+        "loss": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "%",
+          "recorded_at": "2026-10-14T02:35:00Z"
+        },
+        "latency": {
+          "state": "FRESH",
+          "value": "0.000306",
+          "unit": "s",
+          "recorded_at": "2026-10-14T02:35:00Z"
+        },
+        "tcp_22": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:34:56Z"
+        },
+        "tcp_80": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:34:57Z"
+        },
+        "tcp_443": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:34:58Z"
+        }
+      },
+      "sample_interval_seconds": 60,
+      "freshness_seconds": 180,
+      "vendor_metrics_status": "DOCUMENTATION_PENDING",
+      "device_identity_verified": false,
+      "alert_rule_status": "CONFIG_PENDING"
+    },
+    {
+      "asset_id": "8a8b5f47-5bd4-4abd-8f39-8d6f43794299",
+      "name": "IP基础测试 · 深信服防火墙",
+      "management_ip": "192.169.11.1",
+      "brand": "深信服",
+      "model": "AF-1000-B1800",
+      "network_state": "REACHABLE",
+      "metrics": {
+        "icmp": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:35:00Z"
+        },
+        "loss": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "%",
+          "recorded_at": "2026-10-14T02:35:00Z"
+        },
+        "latency": {
+          "state": "FRESH",
+          "value": "0.0002656666666666667",
+          "unit": "s",
+          "recorded_at": "2026-10-14T02:35:00Z"
+        },
+        "tcp_22": {
+          "state": "FRESH",
+          "value": "0",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:35:05Z"
+        },
+        "tcp_80": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:35:03Z"
+        },
+        "tcp_443": {
+          "state": "FRESH",
+          "value": "1",
+          "unit": "",
+          "recorded_at": "2026-10-14T02:35:04Z"
+        }
+      },
+      "sample_interval_seconds": 60,
+      "freshness_seconds": 180,
+      "vendor_metrics_status": "DOCUMENTATION_PENDING",
+      "device_identity_verified": false,
+      "alert_rule_status": "CONFIG_PENDING"
+    }
+  ],
+  "actual_history_windows": 48,
+  "minimum_history_points": 9,
+  "artifact_sha256": "01f570956fe5f9f8b6fb455816a34c67280b8330e7b846967c067a07849028a1",
+  "credentials_output": false,
+  "passed": true
+}

@@ -1,5 +1,7 @@
 # 导出消息遗漏排查与修复
 
+已以`eb15359`部署至[指定测试站](http://192.168.1.215:10010/my-export-messages)。本次仅切换Web；API、Worker及其他已观测服务在切换窗口内实例/镜像/启动时间/重启次数不变，0迁移。公开页面另验证了明确0行/16列XLSX续领下载、原消息不变和同GET恢复，监控读取200；临时浏览器、5178预览及21812转发已关闭。见[部署证据](evidence/export-message-recovery-deployment-20261014.json)、[最终组件复核](evidence/export-message-recovery-components-final-20261014.json)及[公开手机页面](evidence/export-message-recovery-ui-20261014/mobile-public-renewal.png)。
+
 检查基线为4dc17ee，后续合入2fd42c8的设备验证记录。本轮检查本人导出消息、链接授权、读取失败恢复及前端状态校验；没有重跑128项完整合同验收。后端继续使用现有接口，本轮不改Java、SQL或签发规则。
 
 |编号|遗漏与影响|修复与状态|

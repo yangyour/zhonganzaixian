@@ -1,0 +1,19 @@
+{
+  "verified_at": "2026-10-14T02:04:15.712086+00:00",
+  "environment": "lan-test-20261008",
+  "stage": "version",
+  "target": "192.168.1.179",
+  "http_status": 401,
+  "tls_certificate_verification": false,
+  "temporary_bypass_user_authorized": true,
+  "read_only": true,
+  "resource_writes": 0,
+  "credential_values_output": false,
+  "envelope_fields": [
+    "message",
+    "code",
+    "data"
+  ],
+  "provider_code": 401,
+  "error_kind": "PROVIDER_REJECTED"
+}

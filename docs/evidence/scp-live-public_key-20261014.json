@@ -1,0 +1,19 @@
+{
+  "verified_at": "2026-10-14T02:07:24.908978+00:00",
+  "environment": "lan-test-20261008",
+  "stage": "public_key",
+  "target": "192.168.1.179",
+  "http_status": 200,
+  "source_date": "Wed, 14 Oct 2026 02:06:05 GMT",
+  "tls_certificate_verification": false,
+  "temporary_bypass_user_authorized": true,
+  "read_only": true,
+  "resource_writes": 0,
+  "credential_values_output": false,
+  "envelope_fields": [
+    "message",
+    "code",
+    "data"
+  ],
+  "provider_code": 0
+}

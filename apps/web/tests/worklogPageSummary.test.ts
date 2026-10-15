@@ -1,0 +1,9 @@
+import { expect, it } from 'vitest'
+import { summarizeWorklogPage, formatWorklogDuration } from '../src/utils/worklogPageSummary'
+import { row, id } from './ownWorklog.fixture'
+it('distinguishes unread empty and explicit zero duration',()=>{expect(summarizeWorklogPage(null)).toBeNull();expect(summarizeWorklogPage([])?.totalMillis).toBeNull();expect(summarizeWorklogPage([row({elapsed_millis:0})])?.totalMillis).toBe(0n);expect(formatWorklogDuration(null)).toBe('本页无记录');expect(formatWorklogDuration(0n)).toBe('0 小时 0 分 0 秒')})
+it('keeps complete overlapping intervals additive and counts unique referenced tickets',()=>{const summary=summarizeWorklogPage([row(),row({id:id(5),kind:'ONSITE'}),row({id:id(6),ticket_id:id(7),kind:'ONSITE'})])!;expect(summary.totalMillis).toBe(147n*3600000n);expect(summary.ticketCount).toBe(2);expect(summary.kindCount).toBe(2);expect(summary.groups.find(g=>g.kind==='ONSITE')?.millis).toBe(98n*3600000n)})
+it('sums without losing precision beyond the number safe range',()=>{const summary=summarizeWorklogPage([row({elapsed_millis:Number.MAX_SAFE_INTEGER}),row({id:id(5),elapsed_millis:Number.MAX_SAFE_INTEGER})])!;expect(summary.totalMillis).toBe(18014398509481982n)})
+it('formats hours beyond one day and preserves fractional seconds exactly',()=>{expect(formatWorklogDuration(176461007n)).toBe('49 小时 1 分 1.007 秒');expect(formatWorklogDuration(1n)).toBe('0 小时 0 分 0.001 秒')})
+it('does not accept invalid duration values as zero',()=>{for(const value of [-1,NaN,Infinity,0.5,Number.MAX_SAFE_INTEGER+1])expect(()=>summarizeWorklogPage([row({elapsed_millis:value})])).toThrow()})
+it('does not mutate source rows or retain the previous page in a new summary',()=>{const rows=[row()];const before=structuredClone(rows);summarizeWorklogPage(rows);expect(rows).toEqual(before);expect(summarizeWorklogPage([row({elapsed_millis:1})])?.totalMillis).toBe(1n)})

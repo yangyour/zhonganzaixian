@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-15",
+  "origin": "http://192.168.1.215:10010",
+  "build_id": "bf0548dfea548779de7566db13b2981fdddee942e5490556563f2dee95682420",
+  "checks": [
+    {
+      "path": "/network-monitoring",
+      "viewport": 390,
+      "errors": 0,
+      "overflow": false
+    },
+    {
+      "path": "/dashboard",
+      "viewport": 390,
+      "errors": 0,
+      "overflow": false
+    },
+    {
+      "path": "/configurations",
+      "viewport": 390,
+      "errors": 0,
+      "overflow": false
+    }
+  ],
+  "catalog_count": 185,
+  "policy_interval_seconds": 30,
+  "policy_source": "RUNTIME_PUBLICATION",
+  "policy_version": 8,
+  "management_scope": "CURRENT_TENANT",
+  "production_approved": false,
+  "credentials_recorded": false
+}

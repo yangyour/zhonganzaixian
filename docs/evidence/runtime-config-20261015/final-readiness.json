@@ -1,0 +1,10 @@
+{
+  "verified_at": "2026-10-15T05:21:14.301Z",
+  "ready": true,
+  "production_ready": false,
+  "runtime_configurations": {
+    "schema_access_ready": true,
+    "scope": "CURRENT_TENANT",
+    "customer_confirmation_status": "UNVERIFIED"
+  }
+}

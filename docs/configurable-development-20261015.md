@@ -42,3 +42,14 @@
 兼容说明：旧NetworkMonitoringSnapshot.refresh_seconds字段保留合同默认30；当前页面以新策略接口为准。旧设计登记诊断不充当运行来源。配置管理层与此监控消费已实现，不把其他尚未接线的业务模块、真实设备执行、通知送达、正式工单/SLA或生产批准标为完成。
 
 证据：[28次HTTP](evidence/runtime-config-20261015/http-9eef1397-f032-4904-8283-da41b0928242.json)、[实际周期与界面](evidence/runtime-config-20261015/monitoring-consumer-browser.json)。
+
+
+## 测试站发布与当前交付边界
+
+2026-10-15已发布API0.51/V32及运行配置页面。API与页面主体源码为be5a3b4，发布API SHA256为a8f983bd450482c424e19a73a6cd327c214ccb5dc9623c8b05e953d82d77add7；API/Web切换时其他12个服务的实例、镜像、启动时刻和重启计数保持一致，原API私有环境及Web安全配置未改，API启动不执行迁移。随后622f78f补充每个可编辑配置键的“业务采用”说明，只更新Web，API及其余13服务未变；最终Web构建为edbbce71e3ad210484583fdcca29e341a69ae0f7164946e19a6ef7c26e6d5b0d，101文件校验一致。
+
+公开入口已实际验证185项目录、监控配置当前发布v8/30秒、总览/网络监控/原配置页手机读取无错误或横向溢出，以及配置值与业务采用的明确区别。候选API已停止并移除其私有环境文件；主站独立运行，ready=true、production_ready=false。
+
+本轮完成配置管理、发布和监控刷新消费这一层。其余键具备版本管理与有效值回读，并不表示完整工单、正式SLA、通知送达、备份设备执行、报告发布等业务已全部实现；页面已明确标识尚无消费方，不能以“已配置/已发布”代替其开发和验收。后续按配置驱动继续补齐业务，未填写客户值不作为停止代码开发的理由。
+
+证据：[API/Web发布](evidence/runtime-config-20261015/deployment.json)、[最后Web发布](evidence/runtime-config-20261015/frontend-deployment.json)、[公开入口](evidence/runtime-config-20261015/public-browser.json)、[业务采用边界](evidence/runtime-config-20261015/public-consumer-boundary.json)、[最终就绪](evidence/runtime-config-20261015/final-readiness.json)。

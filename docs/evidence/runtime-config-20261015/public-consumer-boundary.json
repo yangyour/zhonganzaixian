@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-15",
+  "web_build_id": "edbbce71e3ad210484583fdcca29e341a69ae0f7164946e19a6ef7c26e6d5b0d",
+  "monitoring_consumer_implemented": true,
+  "other_editable_keys_do_not_claim_business_consumption": true,
+  "scope": "management readiness is separate from business completion",
+  "credentials_recorded": false
+}

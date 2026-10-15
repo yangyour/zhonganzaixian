@@ -1,0 +1,205 @@
+{
+  "verified_at": "2026-10-15T05:14:38.972045+00:00",
+  "environment": "lan-test-20261008",
+  "source_commit": "622f78f683eddb4b6a33c6233901d1bc3f0cf240",
+  "public_origin": "http://192.168.1.215:10010",
+  "web_release": "/opt/mop-lan-test/releases/runtime-config-622f78f683ed",
+  "previous_web_release": "/opt/mop-lan-test/releases/runtime-center-web-be5a3b4a2bcb",
+  "web_config": "/opt/mop-lan-test/releases/acceptance-headers-113c28381fc7/nginx.conf",
+  "web_build_id": "edbbce71e3ad210484583fdcca29e341a69ae0f7164946e19a6ef7c26e6d5b0d",
+  "files_verified": 101,
+  "ready": true,
+  "production_ready": false,
+  "other_13_services_unchanged": true,
+  "before": {
+    "mop-lan-postgres": {
+      "id": "3aebabee32b1812ff37aeb84341a7d67e736941d2bd0d82bbb7192919bea8a97",
+      "image": "sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641",
+      "started_at": "2026-10-08T12:15:32.354957313Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-minio": {
+      "id": "e347d1402ead939abe1121094ed0d963ba07f8f88464819c46449757022104d7",
+      "image": "sha256:a16cad481969d7ddb6fcd2f1c58284af3d1266190b9bedc3ef0801aeb05a93a9",
+      "started_at": "2026-10-08T12:15:32.354248163Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-redis": {
+      "id": "cd68b313f967a54df7f8d5c59c9fe3146f9c261372683205822c71f3d64b24f3",
+      "image": "sha256:abbc5faf6f23b6835d3c357530e96c841e02cb66bd0e426573ef5acb434f597f",
+      "started_at": "2026-10-08T12:15:32.349268223Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-rabbitmq": {
+      "id": "9b8cc8ece2a07ae354f88e7f919f157a03d424ca160cd51217375cd76a0a443d",
+      "image": "sha256:e3b55503d81b67c93a2914a7473e59bbd53d5f4560c421e06015ed64a3034c9e",
+      "started_at": "2026-10-08T12:15:32.356127727Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-api": {
+      "id": "1627bf8728ad18b19a39dff69d639deccfea67259a37441c2763131a512d365c",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-15T05:03:30.56542246Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-photo-worker": {
+      "id": "286c6c5b1630d8e93981f2252a6f2aaa0e886794bde0b2ad5138765171da4f94",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-08T13:04:19.411672776Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-import-worker": {
+      "id": "2b1411eac481d2a63f158206fa1a0cdf5c26c5cce1f8a4b2af9e1fb43352bede",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-08T13:04:19.399831379Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-contact-worker": {
+      "id": "b403f019bc6169a4bc1adb1d42c6dfece1fa6204d72c129dfef006273b4e0368",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-08T12:18:48.262492182Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-server": {
+      "id": "303bbd1f5767a733137de772945fc46506143d0933d036f3412cad85d125ae66",
+      "image": "sha256:415452211dea59cd4ea3346f2c2b38403660408273c672ebf91603353ce1073f",
+      "started_at": "2026-10-08T12:18:48.248721584Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-web": {
+      "id": "61bb1692e7da5a54e4dcf51c3cf8965d9ae1d45a735cb1bf865d9627833d2c0e",
+      "image": "sha256:cd216a9968b62eb6fddd789872b9e8eb4d064539ef40b6356dd2d8c1588a3f91",
+      "started_at": "2026-10-08T12:21:37.244174288Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-agent": {
+      "id": "008118b2bd32f4da65bc766614c305973fcead8b2cc0e5cdf4c88880b9eb454b",
+      "image": "sha256:ba55e6d146d0f0bc550da82b29b22134655db6e31d2c9eae9b1d15f659ad86cd",
+      "started_at": "2026-10-08T12:18:48.243454374Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-export-preparation-worker": {
+      "id": "51f660c08421415507e58ba6c92c686c71a38b9c0be3956bb709cbfcf88de0e6",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-14T06:09:58.223553341Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-af-collector": {
+      "id": "698963d88b2383d34451b5cb5d5dcc44ee37c96300f66cb09f7565a896bd19d2",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-14T08:32:05.075706152Z",
+      "restart_count": 0,
+      "running": true
+    }
+  },
+  "after": {
+    "mop-lan-postgres": {
+      "id": "3aebabee32b1812ff37aeb84341a7d67e736941d2bd0d82bbb7192919bea8a97",
+      "image": "sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641",
+      "started_at": "2026-10-08T12:15:32.354957313Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-minio": {
+      "id": "e347d1402ead939abe1121094ed0d963ba07f8f88464819c46449757022104d7",
+      "image": "sha256:a16cad481969d7ddb6fcd2f1c58284af3d1266190b9bedc3ef0801aeb05a93a9",
+      "started_at": "2026-10-08T12:15:32.354248163Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-redis": {
+      "id": "cd68b313f967a54df7f8d5c59c9fe3146f9c261372683205822c71f3d64b24f3",
+      "image": "sha256:abbc5faf6f23b6835d3c357530e96c841e02cb66bd0e426573ef5acb434f597f",
+      "started_at": "2026-10-08T12:15:32.349268223Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-rabbitmq": {
+      "id": "9b8cc8ece2a07ae354f88e7f919f157a03d424ca160cd51217375cd76a0a443d",
+      "image": "sha256:e3b55503d81b67c93a2914a7473e59bbd53d5f4560c421e06015ed64a3034c9e",
+      "started_at": "2026-10-08T12:15:32.356127727Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-api": {
+      "id": "1627bf8728ad18b19a39dff69d639deccfea67259a37441c2763131a512d365c",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-15T05:03:30.56542246Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-photo-worker": {
+      "id": "286c6c5b1630d8e93981f2252a6f2aaa0e886794bde0b2ad5138765171da4f94",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-08T13:04:19.411672776Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-import-worker": {
+      "id": "2b1411eac481d2a63f158206fa1a0cdf5c26c5cce1f8a4b2af9e1fb43352bede",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-08T13:04:19.399831379Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-contact-worker": {
+      "id": "b403f019bc6169a4bc1adb1d42c6dfece1fa6204d72c129dfef006273b4e0368",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-08T12:18:48.262492182Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-server": {
+      "id": "303bbd1f5767a733137de772945fc46506143d0933d036f3412cad85d125ae66",
+      "image": "sha256:415452211dea59cd4ea3346f2c2b38403660408273c672ebf91603353ce1073f",
+      "started_at": "2026-10-08T12:18:48.248721584Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-web": {
+      "id": "61bb1692e7da5a54e4dcf51c3cf8965d9ae1d45a735cb1bf865d9627833d2c0e",
+      "image": "sha256:cd216a9968b62eb6fddd789872b9e8eb4d064539ef40b6356dd2d8c1588a3f91",
+      "started_at": "2026-10-08T12:21:37.244174288Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-agent": {
+      "id": "008118b2bd32f4da65bc766614c305973fcead8b2cc0e5cdf4c88880b9eb454b",
+      "image": "sha256:ba55e6d146d0f0bc550da82b29b22134655db6e31d2c9eae9b1d15f659ad86cd",
+      "started_at": "2026-10-08T12:18:48.243454374Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-export-preparation-worker": {
+      "id": "51f660c08421415507e58ba6c92c686c71a38b9c0be3956bb709cbfcf88de0e6",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-14T06:09:58.223553341Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-af-collector": {
+      "id": "698963d88b2383d34451b5cb5d5dcc44ee37c96300f66cb09f7565a896bd19d2",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-14T08:32:05.075706152Z",
+      "restart_count": 0,
+      "running": true
+    }
+  },
+  "api_release": "/opt/mop-lan-test/releases/runtime-config-a8f983bd4504",
+  "new_migrations": 0,
+  "new_components": 0,
+  "rollback_directory": "/opt/mop-lan-test/private/runtime-config-622f78f683ed",
+  "credentials_output": false
+}

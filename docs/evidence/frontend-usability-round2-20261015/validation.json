@@ -1,0 +1,49 @@
+{
+  "verified_at": "2026-10-15T01:54:11.499Z",
+  "environment": "lan-test-20261008",
+  "base_commit": "be594d4",
+  "validated_source_sha256": {
+    "apps/web/src/App.vue": "d2e9989e2b6813942c8db56bd95c53dcca6e77660db49f2adcbebe0e6d008ef2",
+    "apps/web/src/components/SidebarNavigation.vue": "db2e98070dbeed6f8b2cd4cf6f17c4cff96ddf8c5eb773d3defc57d96692885d",
+    "apps/web/src/components/HorizontalModuleNavigation.vue": "67d77c31067558f6dc1e3d2ca90fa87ba0744f26185a9a452ddcf3f3005b17a3",
+    "apps/web/src/utils/linkNavigation.ts": "453c43ddd37441c4fdec29e2abc9412e7de89d8c95af662c561ef8e608420351",
+    "apps/web/src/components/ConnectionNotice.vue": "9cb12586f768d0ecbb053529f68ef16397e5be95b596e6059ecee373a1dc90d1"
+  },
+  "frontend": {
+    "files": 144,
+    "tests": 2116,
+    "status": "PASS",
+    "pool": "threads",
+    "workers": 2
+  },
+  "contracts": {
+    "tests": 134,
+    "generation_check": "PASS"
+  },
+  "targeted": {
+    "navigation": 41,
+    "connection": 7
+  },
+  "browser_checks": {
+    "navigation": 10,
+    "connection": 9
+  },
+  "build": "PASS",
+  "typecheck": "PASS",
+  "build_id": "714785e5ea5cdb7b3d2f947832cbd916adbe53554e48b2106849f016acacae26",
+  "browser": "155.0.4283.45",
+  "page_errors": [],
+  "business_writes": 0,
+  "readiness": {
+    "ready": true,
+    "production_ready": false
+  },
+  "server_deployed_by_this_round": false,
+  "preview": "http://127.0.0.1:15175",
+  "remaining": [
+    "physical Mac modifiers",
+    "physical mobile and network interruption",
+    "screen reader and full WCAG audit",
+    "production or full contract acceptance"
+  ]
+}

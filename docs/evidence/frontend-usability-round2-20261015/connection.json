@@ -1,0 +1,54 @@
+{
+  "verified_at": "2026-10-15T01:52:40.037Z",
+  "environment": "lan-test-20261008",
+  "source_base": "be594d4",
+  "build_id": "714785e5ea5cdb7b3d2f947832cbd916adbe53554e48b2106849f016acacae26",
+  "browser": "155.0.4283.45",
+  "checks": [
+    "browser offline hint is visible",
+    "offline and online transitions issue no API request",
+    "explicit refresh while offline presents actual request error",
+    "online notification neither clears API error nor retries the request",
+    "user-triggered refresh reads real API and recovers list",
+    "recovery hint fits and toggles by keyboard without losing focus at 390",
+    "recovery hint fits and toggles by keyboard without losing focus at 320",
+    "network transitions preserve focused unsaved asset input and issue no request",
+    "existing cancel-leave guard still preserves draft"
+  ],
+  "viewports": [
+    {
+      "width": 390,
+      "left": 10,
+      "right": 364.66668701171875,
+      "top": 216,
+      "bottom": 361.8020935058594,
+      "headerBottom": 216,
+      "height": 844,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "left": 10,
+      "right": 294.66668701171875,
+      "top": 216,
+      "bottom": 383.8958435058594,
+      "headerBottom": 216,
+      "height": 720,
+      "overflow": false
+    }
+  ],
+  "unit_tests": 7,
+  "frontend_tests": 2116,
+  "frontend_files": 144,
+  "contract_tests": 134,
+  "typecheck": "PASS",
+  "build": "PASS",
+  "business_writes": [],
+  "page_errors": [],
+  "network_simulation": "Playwright browser offline toggle; actual API retry after reconnect; no fake API response",
+  "limitations": [
+    "not physical network failure or mobile device",
+    "no automatic post-reconnect request is triggered by this notice",
+    "network status is not service readiness or write success"
+  ]
+}

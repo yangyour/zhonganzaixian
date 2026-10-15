@@ -1,0 +1,958 @@
+{
+  "verified_at": "2026-10-15T02:37:54.435Z",
+  "base": "0d1e72b",
+  "dialog_geometry": [
+    {
+      "label": "asset create",
+      "width": 1440,
+      "height": 900,
+      "availableWidth": 1440,
+      "box": {
+        "x": 460,
+        "y": 24,
+        "width": 520,
+        "height": 702.4791870117188,
+        "top": 24,
+        "right": 980,
+        "bottom": 726.4791870117188,
+        "left": 460
+      },
+      "header": {
+        "x": 484,
+        "y": 48,
+        "width": 472,
+        "height": 46.79166793823242,
+        "top": 48,
+        "right": 956,
+        "bottom": 94.79166793823242,
+        "left": 484
+      },
+      "body": {
+        "height": 608,
+        "scrollHeight": 608
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false
+    },
+    {
+      "label": "asset create",
+      "width": 1024,
+      "height": 768,
+      "availableWidth": 1024,
+      "box": {
+        "x": 252,
+        "y": 24,
+        "width": 520,
+        "height": 702.4791870117188,
+        "top": 24,
+        "right": 772,
+        "bottom": 726.4791870117188,
+        "left": 252
+      },
+      "header": {
+        "x": 276,
+        "y": 48,
+        "width": 472,
+        "height": 46.79166793823242,
+        "top": 48,
+        "right": 748,
+        "bottom": 94.79166793823242,
+        "left": 276
+      },
+      "body": {
+        "height": 608,
+        "scrollHeight": 608
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false
+    },
+    {
+      "label": "asset create",
+      "width": 600,
+      "height": 800,
+      "availableWidth": 600,
+      "box": {
+        "x": 12,
+        "y": 12,
+        "width": 576,
+        "height": 678.4791870117188,
+        "top": 12,
+        "right": 588,
+        "bottom": 690.4791870117188,
+        "left": 12
+      },
+      "header": {
+        "x": 28,
+        "y": 28,
+        "width": 544,
+        "height": 46.79166793823242,
+        "top": 28,
+        "right": 572,
+        "bottom": 74.79166793823242,
+        "left": 28
+      },
+      "body": {
+        "height": 600,
+        "scrollHeight": 600
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false
+    },
+    {
+      "label": "asset create",
+      "width": 390,
+      "height": 844,
+      "availableWidth": 390,
+      "box": {
+        "x": 12,
+        "y": 12,
+        "width": 366,
+        "height": 699.2708740234375,
+        "top": 12,
+        "right": 378,
+        "bottom": 711.2708740234375,
+        "left": 12
+      },
+      "header": {
+        "x": 28,
+        "y": 28,
+        "width": 334,
+        "height": 46.79166793823242,
+        "top": 28,
+        "right": 362,
+        "bottom": 74.79166793823242,
+        "left": 28
+      },
+      "body": {
+        "height": 620,
+        "scrollHeight": 620
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false
+    },
+    {
+      "label": "asset create",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 320,
+      "box": {
+        "x": 12,
+        "y": 12,
+        "width": 296,
+        "height": 696,
+        "top": 12,
+        "right": 308,
+        "bottom": 708,
+        "left": 12
+      },
+      "header": {
+        "x": 28,
+        "y": 28,
+        "width": 264,
+        "height": 46.79166793823242,
+        "top": 28,
+        "right": 292,
+        "bottom": 74.79166793823242,
+        "left": 28
+      },
+      "body": {
+        "height": 617,
+        "scrollHeight": 644
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false
+    },
+    {
+      "label": "asset create",
+      "width": 844,
+      "height": 390,
+      "availableWidth": 844,
+      "box": {
+        "x": 162,
+        "y": 12,
+        "width": 520,
+        "height": 366,
+        "top": 12,
+        "right": 682,
+        "bottom": 378,
+        "left": 162
+      },
+      "header": {
+        "x": 178,
+        "y": 28,
+        "width": 488,
+        "height": 46.79166793823242,
+        "top": 28,
+        "right": 666,
+        "bottom": 74.79166793823242,
+        "left": 178
+      },
+      "body": {
+        "height": 287,
+        "scrollHeight": 608
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false
+    },
+    {
+      "label": "asset create",
+      "width": 1280,
+      "height": 500,
+      "availableWidth": 1280,
+      "box": {
+        "x": 380,
+        "y": 12,
+        "width": 520,
+        "height": 476,
+        "top": 12,
+        "right": 900,
+        "bottom": 488,
+        "left": 380
+      },
+      "header": {
+        "x": 396,
+        "y": 28,
+        "width": 488,
+        "height": 46.79166793823242,
+        "top": 28,
+        "right": 884,
+        "bottom": 74.79166793823242,
+        "left": 396
+      },
+      "body": {
+        "height": 397,
+        "scrollHeight": 608
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false
+    },
+    {
+      "label": "asset validation errors",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 320,
+      "box": {
+        "x": 12,
+        "y": 12,
+        "width": 296,
+        "height": 696,
+        "top": 12,
+        "right": 308,
+        "bottom": 708,
+        "left": 12
+      },
+      "header": {
+        "x": 28,
+        "y": 28,
+        "width": 264,
+        "height": 46.79166793823242,
+        "top": 28,
+        "right": 292,
+        "bottom": 74.79166793823242,
+        "left": 28
+      },
+      "body": {
+        "height": 617,
+        "scrollHeight": 927
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false
+    },
+    {
+      "label": "error link focused field",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 320,
+      "box": {
+        "x": 12,
+        "y": 12,
+        "width": 296,
+        "height": 696,
+        "top": 12,
+        "right": 308,
+        "bottom": 708,
+        "left": 12
+      },
+      "header": {
+        "x": 28,
+        "y": 28,
+        "width": 264,
+        "height": 46.79166793823242,
+        "top": 28,
+        "right": 292,
+        "bottom": 74.79166793823242,
+        "left": 28
+      },
+      "body": {
+        "height": 617,
+        "scrollHeight": 927
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false
+    },
+    {
+      "label": "leave confirmation",
+      "rect": {
+        "x": 28,
+        "y": 272,
+        "width": 264,
+        "height": 176,
+        "top": 272,
+        "right": 292,
+        "bottom": 448,
+        "left": 28
+      },
+      "width": 320,
+      "height": 720,
+      "buttons": [
+        {
+          "x": 78.33333587646484,
+          "y": 386,
+          "width": 83.33333587646484,
+          "height": 44,
+          "top": 386,
+          "right": 161.6666717529297,
+          "bottom": 430,
+          "left": 78.33333587646484
+        },
+        {
+          "x": 177.6666717529297,
+          "y": 386,
+          "width": 96.33333587646484,
+          "height": 44,
+          "top": 386,
+          "right": 274.00000762939453,
+          "bottom": 430,
+          "left": 177.6666717529297
+        }
+      ]
+    },
+    {
+      "label": "leave confirmation",
+      "rect": {
+        "x": 28,
+        "y": 123,
+        "width": 788,
+        "height": 144,
+        "top": 123,
+        "right": 816,
+        "bottom": 267,
+        "left": 28
+      },
+      "width": 844,
+      "height": 390,
+      "buttons": [
+        {
+          "x": 610.3333740234375,
+          "y": 213,
+          "width": 83.33333587646484,
+          "height": 36,
+          "top": 213,
+          "right": 693.6667098999023,
+          "bottom": 249,
+          "left": 610.3333740234375
+        },
+        {
+          "x": 701.6666870117188,
+          "y": 213,
+          "width": 96.33333587646484,
+          "height": 36,
+          "top": 213,
+          "right": 798.0000228881836,
+          "bottom": 249,
+          "left": 701.6666870117188
+        }
+      ]
+    },
+    {
+      "label": "customer report",
+      "width": 1440,
+      "height": 900,
+      "availableWidth": 1440,
+      "box": {
+        "x": 395,
+        "y": 24,
+        "width": 650,
+        "height": 852,
+        "top": 24,
+        "right": 1045,
+        "bottom": 876,
+        "left": 395
+      },
+      "header": {
+        "x": 419,
+        "y": 48,
+        "width": 602,
+        "height": 46.79166793823242,
+        "top": 48,
+        "right": 1021,
+        "bottom": 94.79166793823242,
+        "left": 419
+      },
+      "body": {
+        "height": 693,
+        "scrollHeight": 985
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false,
+      "footer": {
+        "x": 419,
+        "y": 803.3333740234375,
+        "width": 602,
+        "height": 48.6666259765625
+      }
+    },
+    {
+      "label": "customer report",
+      "width": 390,
+      "height": 844,
+      "availableWidth": 390,
+      "box": {
+        "x": 12,
+        "y": 12,
+        "width": 366,
+        "height": 820,
+        "top": 12,
+        "right": 378,
+        "bottom": 832,
+        "left": 12
+      },
+      "header": {
+        "x": 32,
+        "y": 32,
+        "width": 326,
+        "height": 46.79166793823242,
+        "top": 32,
+        "right": 358,
+        "bottom": 78.79166793823242,
+        "left": 32
+      },
+      "body": {
+        "height": 657,
+        "scrollHeight": 1312
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false,
+      "footer": {
+        "x": 32,
+        "y": 751.3333740234375,
+        "width": 326,
+        "height": 60.6666259765625
+      }
+    },
+    {
+      "label": "customer report",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 320,
+      "box": {
+        "x": 12,
+        "y": 12,
+        "width": 296,
+        "height": 696,
+        "top": 12,
+        "right": 308,
+        "bottom": 708,
+        "left": 12
+      },
+      "header": {
+        "x": 32,
+        "y": 32,
+        "width": 256,
+        "height": 46.79166793823242,
+        "top": 32,
+        "right": 288,
+        "bottom": 78.79166793823242,
+        "left": 32
+      },
+      "body": {
+        "height": 533,
+        "scrollHeight": 1406
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false,
+      "footer": {
+        "x": 32,
+        "y": 627.3333740234375,
+        "width": 256,
+        "height": 60.6666259765625
+      }
+    },
+    {
+      "label": "customer report",
+      "width": 844,
+      "height": 390,
+      "availableWidth": 844,
+      "box": {
+        "x": 97,
+        "y": 24,
+        "width": 650,
+        "height": 342,
+        "top": 24,
+        "right": 747,
+        "bottom": 366,
+        "left": 97
+      },
+      "header": {
+        "x": 121,
+        "y": 48,
+        "width": 602,
+        "height": 46.79166793823242,
+        "top": 48,
+        "right": 723,
+        "bottom": 94.79166793823242,
+        "left": 121
+      },
+      "body": {
+        "height": 183,
+        "scrollHeight": 985
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false,
+      "footer": {
+        "x": 121,
+        "y": 293.3333435058594,
+        "width": 602,
+        "height": 48.666656494140625
+      }
+    },
+    {
+      "label": "long report description",
+      "width": 844,
+      "height": 390,
+      "availableWidth": 844,
+      "box": {
+        "x": 97,
+        "y": 24,
+        "width": 650,
+        "height": 342,
+        "top": 24,
+        "right": 747,
+        "bottom": 366,
+        "left": 97
+      },
+      "header": {
+        "x": 121,
+        "y": 48,
+        "width": 602,
+        "height": 46.79166793823242,
+        "top": 48,
+        "right": 723,
+        "bottom": 94.79166793823242,
+        "left": 121
+      },
+      "body": {
+        "height": 183,
+        "scrollHeight": 1105
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false
+    },
+    {
+      "label": "search results",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 320,
+      "box": {
+        "x": 12,
+        "y": 12,
+        "width": 296,
+        "height": 696,
+        "top": 12,
+        "right": 308,
+        "bottom": 708,
+        "left": 12
+      },
+      "header": {
+        "x": 30,
+        "y": 30,
+        "width": 260,
+        "height": 48.26041793823242,
+        "top": 30,
+        "right": 290,
+        "bottom": 78.26041793823242,
+        "left": 30
+      },
+      "body": {
+        "height": 552,
+        "scrollHeight": 788
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false
+    },
+    {
+      "label": "search results",
+      "width": 844,
+      "height": 390,
+      "availableWidth": 844,
+      "box": {
+        "x": 82,
+        "y": 24,
+        "width": 680,
+        "height": 342,
+        "top": 24,
+        "right": 762,
+        "bottom": 366,
+        "left": 82
+      },
+      "header": {
+        "x": 106,
+        "y": 48,
+        "width": 632,
+        "height": 48.26041793823242,
+        "top": 48,
+        "right": 738,
+        "bottom": 96.26041793823242,
+        "left": 106
+      },
+      "body": {
+        "height": 194,
+        "scrollHeight": 626
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false
+    },
+    {
+      "label": "search results",
+      "width": 1440,
+      "height": 900,
+      "availableWidth": 1440,
+      "box": {
+        "x": 380,
+        "y": 24,
+        "width": 680,
+        "height": 774.2604370117188,
+        "top": 24,
+        "right": 1060,
+        "bottom": 798.2604370117188,
+        "left": 380
+      },
+      "header": {
+        "x": 404,
+        "y": 48,
+        "width": 632,
+        "height": 48.26041793823242,
+        "top": 48,
+        "right": 1036,
+        "bottom": 96.26041793823242,
+        "left": 404
+      },
+      "body": {
+        "height": 626,
+        "scrollHeight": 626
+      },
+      "closeVisible": true,
+      "outerScroll": false,
+      "overflow": false
+    }
+  ],
+  "drawers": [
+    {
+      "label": "导入资产来源",
+      "width": 1440,
+      "height": 900,
+      "availableWidth": 1440,
+      "box": {
+        "x": 500,
+        "y": 0,
+        "width": 940,
+        "height": 900,
+        "top": 0,
+        "right": 1440,
+        "bottom": 900,
+        "left": 500
+      },
+      "bodyWidth": 940,
+      "bodyScrollWidth": 940,
+      "closeVisible": true
+    },
+    {
+      "label": "导入资产来源",
+      "width": 761,
+      "height": 800,
+      "availableWidth": 761,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "width": 761.3333740234375,
+        "height": 800,
+        "top": 0,
+        "right": 761.3333740234375,
+        "bottom": 800,
+        "left": 0
+      },
+      "bodyWidth": 761,
+      "bodyScrollWidth": 761,
+      "closeVisible": true
+    },
+    {
+      "label": "导入资产来源",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 320,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 720,
+        "top": 0,
+        "right": 320,
+        "bottom": 720,
+        "left": 0
+      },
+      "bodyWidth": 305,
+      "bodyScrollWidth": 305,
+      "closeVisible": true,
+      "corrected": true
+    },
+    {
+      "label": "导入资产来源",
+      "width": 844,
+      "height": 390,
+      "availableWidth": 844,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 0
+      },
+      "bodyWidth": 829,
+      "bodyScrollWidth": 829,
+      "closeVisible": true
+    },
+    {
+      "label": "手工资料筛选（内部附加视图）",
+      "width": 1440,
+      "height": 900,
+      "availableWidth": 1440,
+      "box": {
+        "x": 340,
+        "y": 0,
+        "width": 1100,
+        "height": 900,
+        "top": 0,
+        "right": 1440,
+        "bottom": 900,
+        "left": 340
+      },
+      "bodyWidth": 1085,
+      "bodyScrollWidth": 1085,
+      "closeVisible": true
+    },
+    {
+      "label": "手工资料筛选（内部附加视图）",
+      "width": 761,
+      "height": 800,
+      "availableWidth": 761,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "width": 761.3333740234375,
+        "height": 800,
+        "top": 0,
+        "right": 761.3333740234375,
+        "bottom": 800,
+        "left": 0
+      },
+      "bodyWidth": 746,
+      "bodyScrollWidth": 746,
+      "closeVisible": true
+    },
+    {
+      "label": "手工资料筛选（内部附加视图）",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 320,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 720,
+        "top": 0,
+        "right": 320,
+        "bottom": 720,
+        "left": 0
+      },
+      "bodyWidth": 305,
+      "bodyScrollWidth": 305,
+      "closeVisible": true
+    },
+    {
+      "label": "手工资料筛选（内部附加视图）",
+      "width": 844,
+      "height": 390,
+      "availableWidth": 844,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 0
+      },
+      "bodyWidth": 829,
+      "bodyScrollWidth": 829,
+      "closeVisible": true
+    },
+    {
+      "label": "维保与超期日期筛选",
+      "width": 1440,
+      "height": 900,
+      "availableWidth": 1440,
+      "box": {
+        "x": 380,
+        "y": 0,
+        "width": 1060,
+        "height": 900,
+        "top": 0,
+        "right": 1440,
+        "bottom": 900,
+        "left": 380
+      },
+      "bodyWidth": 1060,
+      "bodyScrollWidth": 1060,
+      "closeVisible": true
+    },
+    {
+      "label": "维保与超期日期筛选",
+      "width": 761,
+      "height": 800,
+      "availableWidth": 761,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "width": 761.3333740234375,
+        "height": 800,
+        "top": 0,
+        "right": 761.3333740234375,
+        "bottom": 800,
+        "left": 0
+      },
+      "bodyWidth": 761,
+      "bodyScrollWidth": 761,
+      "closeVisible": true
+    },
+    {
+      "label": "维保与超期日期筛选",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 320,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 720,
+        "top": 0,
+        "right": 320,
+        "bottom": 720,
+        "left": 0
+      },
+      "bodyWidth": 305,
+      "bodyScrollWidth": 305,
+      "closeVisible": true
+    },
+    {
+      "label": "维保与超期日期筛选",
+      "width": 844,
+      "height": 390,
+      "availableWidth": 844,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "width": 844,
+        "height": 390,
+        "top": 0,
+        "right": 844,
+        "bottom": 390,
+        "left": 0
+      },
+      "bodyWidth": 829,
+      "bodyScrollWidth": 829,
+      "closeVisible": true
+    }
+  ],
+  "final_refinements": {
+    "file_input": {
+      "width": 305,
+      "scrollWidth": 305
+    },
+    "error_focus": {
+      "outlineOffset": "-2.66667px",
+      "outlineStyle": "solid"
+    },
+    "confirmation_boxes": [
+      {
+        "rect": {
+          "x": 28,
+          "y": 272,
+          "width": 264,
+          "height": 176,
+          "top": 272,
+          "right": 292,
+          "bottom": 448,
+          "left": 28
+        },
+        "width": 320,
+        "height": 720
+      },
+      {
+        "rect": {
+          "x": 212,
+          "y": 123,
+          "width": 420,
+          "height": 144,
+          "top": 123,
+          "right": 632,
+          "bottom": 267,
+          "left": 212
+        },
+        "width": 844,
+        "height": 390
+      },
+      {
+        "rect": {
+          "x": 510,
+          "y": 372,
+          "width": 420,
+          "height": 156,
+          "top": 372,
+          "right": 930,
+          "bottom": 528,
+          "left": 510
+        },
+        "width": 1440,
+        "height": 900
+      }
+    ]
+  },
+  "iterations": [
+    "bounded generic dialogs and preserved existing search/report layouts",
+    "clamped confirmation width and inset error-summary focus",
+    "file input caused 320px drawer overflow; corrected and rechecked",
+    "repainted after focus/scroll settled; header bounds and hit testing verified"
+  ],
+  "business_writes": [],
+  "page_errors": []
+}

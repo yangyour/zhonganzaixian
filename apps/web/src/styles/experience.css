@@ -93,6 +93,7 @@ html.mop-resume-paused .session-resume-panel{display:grid;position:fixed;inset:0
 .content>.page-recovery{width:100%;margin:0 0 20px}.page-recovery h2{font-size:20px;margin-bottom:12px}.page-recovery p{font-size:14px;margin-bottom:12px}.page-recovery .recovery-blocked{margin:12px 0 0}.anonymous-navigation-error{max-width:680px;margin:24px auto}
 .form-error-summary { flex-basis: 100%; grid-column: 1 / -1; padding: 12px 14px; border-left: 3px solid #b43746; border-radius: 4px; background: #fff0f2; color: #962d3b; font-size: 14px; line-height: 1.7; }
 .form-error-summary:focus { outline: 3px solid var(--mop-focus); outline-offset: 3px; }
+.el-dialog .form-error-summary:focus { outline-offset: -3px; }
 .form-error-summary h3 { margin: 0 0 6px; font-size: 16px; line-height: 1.6; }
 .form-error-summary ul { margin: 0; padding-left: 22px; }
 .form-error-summary a { display: inline-flex; align-items: center; min-height: 32px; color: #962d3b; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
@@ -102,9 +103,24 @@ html.mop-resume-paused .session-resume-panel{display:grid;position:fixed;inset:0
 .el-message { max-width: min(680px, calc(100vw - 32px)); align-items: flex-start; padding: 14px 42px 14px 18px; box-shadow: 0 8px 28px #173b6020; }
 .el-message__content { font-size: 14px; line-height: 1.75; overflow-wrap: anywhere; }
 .el-message__closeBtn { width: 32px; height: 32px; display: grid; place-items: center; right: 6px; top: 50%; }
-.el-message-box { max-width: calc(100vw - 32px); padding: 24px; border-radius: 12px; }
+.el-message-box { display: inline-flex; flex-direction: column; width: var(--el-messagebox-width, 420px); max-width: calc(100% - 24px); max-height: calc(100dvh - 24px); padding: 24px; border-radius: 12px; }
+.el-message-box__content { min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.el-message-box__header, .el-message-box__btns { flex-shrink: 0; }
+.el-message-box__btns .el-button { height: auto; white-space: normal; }
 .el-message-box__message { line-height: 1.8; overflow-wrap: anywhere; }
 .el-dialog { max-width: calc(100vw - 32px); border-radius: 14px; }
+/* Keep the title and dismissal controls available while long forms scroll inside. */
+.el-dialog:not(.is-fullscreen):not(.global-search-dialog):not(.ticket-report-dialog) { display: flex; flex-direction: column; max-width: calc(100% - 32px); max-height: calc(100dvh - 48px); margin-top: 24px !important; margin-bottom: 24px; }
+.el-dialog:not(.is-fullscreen) > .el-dialog__body { flex: 1 1 auto; min-height: 0; min-width: 0; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; scroll-padding-block: 16px; }
+.el-dialog:not(.is-fullscreen) > :is(.el-dialog__header, .el-dialog__footer) { flex-shrink: 0; min-width: 0; }
+.el-dialog:not(.is-fullscreen) > .el-dialog__body :is(input, textarea, select, button, [tabindex]) { scroll-margin-block: 16px; }
+.el-dialog__title { overflow-wrap: anywhere; }
+.el-dialog__footer .el-button { max-width: 100%; height: auto; white-space: normal; }
+.el-dialog__body input[type="file"], .el-drawer__body input[type="file"] { width: 100%; max-width: 100%; min-width: 0; }
+@media (max-width: 760px), (max-height: 600px) {
+  .el-dialog:not(.is-fullscreen):not(.global-search-dialog):not(.ticket-report-dialog) { max-width: calc(100% - 24px); max-height: calc(100dvh - 24px); margin-top: 12px !important; margin-bottom: 12px; padding: 16px; }
+  .el-message-box { padding: 18px; }
+}
 .el-dialog__title, .el-drawer__title { font-size: 18px; color: #25364c; }
 .el-dialog__headerbtn, .el-drawer__close-btn { min-width: 36px; min-height: 36px; }
 .el-dialog__body { overflow-wrap: anywhere; }

@@ -1,0 +1,79 @@
+{
+  "verified_at": "2026-10-15T02:39:16.825Z",
+  "environment": "lan-test-20261008",
+  "source_base": "0d1e72b",
+  "validated_source_sha256": {
+    "apps/web/src/styles/navigation.css": "a88bf420302c59c5f6c8b95af594189c72f64a5426c2fc11af521336dd3ad64f",
+    "apps/web/src/styles/functional-prototype.css": "4ceb532848c491fef24f63264233f5b0359ed21272fb22c54da02b4b11cd7dab",
+    "apps/web/src/styles/experience.css": "2c329d0e8cd5b421056af0dee2a0a5ec962bb96ac5be2a56d0923cc738b8cec9",
+    "apps/web/src/components/HorizontalModuleNavigation.vue": "f9f63622650ab181d796791c995dce12f201074431b190d2239628958c07f800"
+  },
+  "line_ending_sync_after_content_equality": [
+    "apps/web/src/styles/navigation.css",
+    "apps/web/src/styles/functional-prototype.css"
+  ],
+  "frontend": {
+    "files": 148,
+    "tests": 2145,
+    "status": "PASS",
+    "scope": "shared dialog changes; later width/focus/file-input refinements verified in browser"
+  },
+  "contracts": {
+    "tests": 134,
+    "generation_check": "PASS"
+  },
+  "build": "PASS",
+  "typecheck": "PASS",
+  "build_id": "18954ac5e127747963dab41a16d3d9530b20e289046821ae27889dd8815a28fc",
+  "browser": "155.0.4283.45",
+  "page_matrix": {
+    "pages": 31,
+    "combinations": 279,
+    "widths": [
+      320,
+      390,
+      600,
+      760,
+      761,
+      1024,
+      1280,
+      1440,
+      1920
+    ],
+    "ordinary_page_overflow": 0,
+    "outside_controls": 0,
+    "clipped_button_labels": 0,
+    "toolbar_overlaps": 0
+  },
+  "interaction_checks": {
+    "dialog_states": 19,
+    "drawer_states": 12,
+    "text_spacing_cases": 4,
+    "short_viewports": [
+      "844x390",
+      "1280x500"
+    ],
+    "breakpoints": [
+      "760/761",
+      "1024/1025"
+    ]
+  },
+  "page_errors": [],
+  "business_writes": 0,
+  "readiness": {
+    "ready": true,
+    "production_ready": false
+  },
+  "server_deployed_by_this_round": false,
+  "preview": "http://127.0.0.1:15175",
+  "limitations": [
+    "physical mobile device not tested",
+    "native 200 percent browser zoom not verified; keyboard attempt did not change scale",
+    "not full WCAG certification or contract-wide business acceptance"
+  ],
+  "final_targeted_tests": {
+    "files": 6,
+    "tests": 60,
+    "status": "PASS"
+  }
+}

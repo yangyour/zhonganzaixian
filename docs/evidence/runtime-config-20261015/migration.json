@@ -1,0 +1,34 @@
+{
+  "environment": "lan-test-20261008",
+  "before": [
+    "{\"table\" : \"registry\", \"rows\" : 185, \"hash\" : \"9bc9a958de06e5e8512643598808f97c\"}",
+    "{\"table\" : \"revisions\", \"rows\" : 1, \"hash\" : \"46c8495ff4e93c454b7ba94cd3217875\"}",
+    "PostgreSQL 17.9 (Debian 17.9-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit"
+  ],
+  "runs": [
+    {
+      "mode": "--apply-runtime-configuration",
+      "exit": 0,
+      "summary": "MOP_SCHEMA status=RUNTIME_CONFIGURATION_APPLIED mode=APPLY_RUNTIME_CONFIGURATION migrations_executed=1 baseline=V1_V31_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "mode": "--apply-runtime-configuration",
+      "exit": 0,
+      "summary": "MOP_SCHEMA status=RUNTIME_CONFIGURATION_APPLIED mode=APPLY_RUNTIME_CONFIGURATION migrations_executed=0 baseline=V1_V31_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "mode": "--check",
+      "exit": 0,
+      "summary": "MOP_SCHEMA status=RUNTIME_CONFIGURATION_APPLIED mode=READ_ONLY_CHECK migrations_executed=0 baseline=V1_V31_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    }
+  ],
+  "credentials_recorded": false,
+  "after": [
+    "{\"table\" : \"registry\", \"rows\" : 185, \"hash\" : \"9bc9a958de06e5e8512643598808f97c\"}",
+    "{\"table\" : \"revisions\", \"rows\" : 1, \"hash\" : \"46c8495ff4e93c454b7ba94cd3217875\"}",
+    "PostgreSQL 17.9 (Debian 17.9-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit"
+  ],
+  "configuration_tables_unchanged": true,
+  "sql_sha256": "657c0d50e47b3da715265a563af857287337fc923774fd98b4a6b40b8cad0c82",
+  "verified_at": "2026-10-15T03:01:06.379677+00:00"
+}

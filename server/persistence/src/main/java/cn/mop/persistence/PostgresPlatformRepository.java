@@ -84,6 +84,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     Connection importCommandConnection(){Connection active=transaction.get();if(active==null||!Boolean.TRUE.equals(idempotentCommandScope.get())&&!Boolean.TRUE.equals(importJobScope.get()))throw new IllegalStateException("Import writes require a protected command or job transaction");return active;}
     /** Scoped owned-record writes require the caller's idempotent command, never a worker or unrelated transaction. */
     Connection idempotentCommandConnection(){Connection active=transaction.get();if(active==null||!Boolean.TRUE.equals(idempotentCommandScope.get()))throw new IllegalStateException("Owned-record writes require an idempotent command transaction");return active;}
+    Connection existingCommandConnection(){return Boolean.TRUE.equals(idempotentCommandScope.get())?transaction.get():null;}
     void requireStandaloneRead(){if(transaction.get()!=null)throw new IllegalStateException("Export selection requires a standalone readonly snapshot");}
     <T>T exportJobTransaction(Supplier<T> work){if(transaction.get()!=null)throw new IllegalStateException("Export worker requires an independent transaction");return inTransaction(()->scoped(exportJobScope,work));}
     Connection exportCommandConnection(){Connection c=transaction.get();if(c==null||!Boolean.TRUE.equals(exportJobScope.get()))throw new IllegalStateException("Export worker transaction required");return c;}

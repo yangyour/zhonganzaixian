@@ -1,0 +1,18 @@
+package cn.mop.domain.configuration;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+
+/** Authorized, durable publication log; a test publication is not customer production approval. */
+public interface RuntimeConfigurationRepository {
+    record Access(String tenantId, String actorId, long permissionVersion, String traceId) {}
+    record Command(long expectedVersion, String action, String revisionId, Long revisionVersion,
+                   String targetReleaseId, String activation, Instant effectiveAt, Instant expiresAt, String reason) {}
+    Map<String,Object> read(Access access, String key);
+    List<Map<String,Object>> history(Access access, String key, long beforeVersion);
+    Map<String,Object> release(Access access, String key, String id);
+    void authorizeCommand(Access access, String key);
+    Map<String,Object> publish(Access access, String key, Command command, String definitionHash);
+    List<String> readinessProblems();
+}

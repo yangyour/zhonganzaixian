@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-15",
+  "stage": "development-preview-with-designated-api",
+  "asset_scope": "selected-asset-only",
+  "checks": [
+    "real overview",
+    "6 basic + 2 resource items",
+    "CPU history",
+    "actual closed-port observation",
+    "unpublished alert configuration status",
+    "mobile 390 history controls",
+    "no document overflow"
+  ],
+  "business_writes": 0,
+  "credentials_recorded": false
+}

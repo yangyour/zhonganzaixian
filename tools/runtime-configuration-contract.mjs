@@ -16,5 +16,8 @@ export function addRuntimeConfigurationContract(contract) {
  schemas.ReadinessResult.properties.data.properties.runtime_configurations=obj({schema_access_ready:{type:'boolean'},scope:{const:'CURRENT_TENANT'},customer_confirmation_status:{const:'UNVERIFIED'}});
  schemas.ReadinessResult.properties.data.required.push('runtime_configurations');
  for(const path of ['/settings/effective','/configurations/{key}/publish'])for(const operation of Object.values(contract.paths[path])){operation.deprecated=true;operation.description='历史设计登记兼容接口；实际运行值与发布使用/runtime-configurations。'+(operation.description||'')}
- contract.info.version='0.50.0';
+ schemas.MonitoringRefreshPolicy=env(obj({tenant_id:uuid,actor_id:uuid,permission_version:{...number,minimum:1},configuration_key:{const:'monitor.page_refresh_sec'},interval_seconds:{type:['integer','null'],minimum:1,maximum:3600},auto_refresh_enabled:{type:'boolean'},source:{enum:['CONTRACT_DEFAULT','RUNTIME_PUBLICATION','RUNTIME_BLOCKED']},reason:{enum:[null,'DISABLED','EXPIRED','DEFINITION_CHANGED','INVALID_VALUE']},publication_id:{...uuid,type:['string','null']},publication_version:{...number,type:['integer','null'],minimum:1},checked_at:time,expires_at:{...time,type:['string','null']},definition_hash:{type:'string',pattern:'^[0-9a-f]{64}$'},production_approved:{const:false}}));
+ contract.paths['/network-monitoring/refresh-policy']={get:{operationId:'readMonitoringRefreshPolicy','x-mop-read-only':true,'x-mop-capability':'assets:read',description:'只读取当前用户/租户的监控页面刷新设置；不暴露其他配置或发布人。无配置采用合同30秒；已禁用、过期、定义变化和无效值暂停自动数据刷新；数据库失败503，不返回默认替代。',responses:response(ref('MonitoringRefreshPolicy'))}};
+ schemas.NetworkMonitoringSnapshot.properties.refresh_seconds.description='历史客户端的合同默认值30秒；当前页面实际周期由/network-monitoring/refresh-policy决定。';
+ contract.info.version='0.51.0';
 }

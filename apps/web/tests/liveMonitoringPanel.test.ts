@@ -4,7 +4,7 @@ import { createApp, h, nextTick, reactive, type App } from 'vue'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { ElAlert } from 'element-plus'
 import Panel from '../src/components/LiveMonitoringPanel.vue'
-import { api } from '../src/api/client'
+import { api, ApiError } from '../src/api/client'
 import { session, switchingTenant } from '../src/stores/session'
 import type { Session } from '../src/api/types'
 import { snapshot, sampleDevice, history } from './networkMonitoringFixtures'
@@ -23,3 +23,6 @@ it('only current fresh resources are ranked and test certificate status stays vi
 it('checks show actual closed port observations without calling them formal incidents',async()=>{const raw=snapshot();raw.devices[0]!.metrics.tcp_22.value='0';vi.spyOn(api,'request').mockResolvedValue(raw);mount({mode:'events',assetId:sampleDevice().asset_id});await settle();expect(host.textContent).toContain('未建立连接');expect(host.textContent).toContain('不自动生成正式事件');expect(host.querySelectorAll('.live-table tbody tr')).toHaveLength(1)})
 it('permission removal synchronously removes all prior samples',async()=>{const req=vi.spyOn(api,'request').mockResolvedValue(snapshot());mount();await settle();session.value={...auth,capabilities:[]};await settle();expect(host.textContent).not.toContain('虚构测试设备');expect(host.textContent).toContain('没有资产读取权限');expect(req).toHaveBeenCalledTimes(1)})
 it('paused auto refresh still expires displayed samples after 90 seconds',async()=>{vi.useFakeTimers();const req=vi.spyOn(api,'request').mockResolvedValue(snapshot());mount({autoRefresh:false});await settle();await vi.advanceTimersByTimeAsync(91000);await settle();expect(req).toHaveBeenCalledTimes(1);expect(host.textContent).toContain('数据过期');expect([...host.querySelectorAll('.live-stats strong')].map(x=>x.textContent)).toEqual(['1','0','0','1'])})
+
+// Policy transport is tested separately; these component checks isolate existing sample workflows.
+vi.mock('../src/utils/monitoringRefreshPolicy',async()=>{const {ref}=await import('vue');return {refreshPermissionRejected:(e:unknown)=>e instanceof ApiError&&[401,403].includes(e.status),useMonitoringRefreshPolicy:()=>({intervalSeconds:ref(30),label:ref('isolated unit policy'),error:ref(null),refresh:vi.fn()})}})

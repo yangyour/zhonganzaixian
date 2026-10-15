@@ -47,7 +47,7 @@ defineExpose({state,autoRefresh,refresh,changeWindow})
    </details>
    <div class="dashboard-toolbar">
 
-   <label class="auto-refresh"><input v-model="autoRefresh" type="checkbox" aria-label="每30秒自动只读刷新" />每30秒只读刷新</label>
+   <label class="auto-refresh"><input v-model="autoRefresh" type="checkbox" aria-label="启用监控自动刷新" />启用监控自动刷新（周期以运行配置为准）</label>
    <p class="read-status" role="status" aria-live="polite">{{state.busy?'正在读取当前授权范围':state.error?'当前读取失败，未沿用旧数据':state.current?'授权与时间投影已读取；指标仍未知':'尚未读取'}} · {{autoRefresh?'后台标签页暂停自动刷新':'自动刷新已暂停'}}</p>
    </div>
    <details class="dashboard-explanation"><summary>数据口径与读取说明</summary><div><p v-if="state.current" class="observation" data-testid="observation">数据库观察时间：{{displayTime(state.current.generated_at)}}（未核验时钟同步，不是指标采样时间）<br />本月起点：{{displayTime(state.current.month_start)}}<span v-if="state.current.month_window_empty"> · 正好处于月初，累计区间为空</span></p><p class="dashboard-footnote">布局与顺序固定，不提供拖拽、隐藏或保存布局。刷新只发起GET，不新增工单、收据或监控样本</p></div></details>

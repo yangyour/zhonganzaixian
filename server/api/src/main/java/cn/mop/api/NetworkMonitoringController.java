@@ -13,7 +13,9 @@ public class NetworkMonitoringController {
     private final PlatformRepository platform;
     private final NetworkMonitoringService service;
     @org.springframework.beans.factory.annotation.Autowired(required=false) FirewallResourceService resources;
+    @org.springframework.beans.factory.annotation.Autowired(required=false) MonitoringRefreshPolicy refreshPolicy;
     public NetworkMonitoringController(PlatformRepository platform,NetworkMonitoringService service){this.platform=platform;this.service=service;}
+    @GetMapping("/refresh-policy") Object refreshPolicy(HttpServletRequest request){Membership access=access(request);query(request,Set.of());if(refreshPolicy==null)throw new DomainException(503,"UPSTREAM_UNAVAILABLE","运行刷新配置读取器未就绪");var result=refreshPolicy.read(access,trace(request));recheck(access,request);return success(result,request);}
     @GetMapping Object list(HttpServletRequest request){
         Membership access=access(request);query(request,Set.of());
         List<Map<String,Object>> result=new ArrayList<>();

@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-15",
+  "stage": "candidate API with designated real PostgreSQL and Zabbix",
+  "checks": [
+    "approved 15-second value published through actual UI",
+    "network page reads runtime policy",
+    "actual consecutive GET network snapshots observed",
+    "restore original 30-second interval through explicit approved publication",
+    "390px policy display"
+  ],
+  "observed_interval_seconds": 14.989,
+  "restored_interval_seconds": 30,
+  "source_collection_interval_changed": false,
+  "credentials_recorded": false
+}

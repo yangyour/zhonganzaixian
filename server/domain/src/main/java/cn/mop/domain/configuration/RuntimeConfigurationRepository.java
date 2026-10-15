@@ -10,6 +10,8 @@ public interface RuntimeConfigurationRepository {
     record Command(long expectedVersion, String action, String revisionId, Long revisionVersion,
                    String targetReleaseId, String activation, Instant effectiveAt, Instant expiresAt, String reason) {}
     Map<String,Object> read(Access access, String key);
+    /** Fixed public-monitoring key only; callers cannot choose another configuration or capability. */
+    Map<String,Object> monitoringRefresh(Access access);
     List<Map<String,Object>> history(Access access, String key, long beforeVersion);
     Map<String,Object> release(Access access, String key, String id);
     void authorizeCommand(Access access, String key);

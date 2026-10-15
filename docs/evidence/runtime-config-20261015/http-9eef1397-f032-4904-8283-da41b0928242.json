@@ -1,0 +1,258 @@
+{
+  "run_id": "9eef1397-f032-4904-8283-da41b0928242",
+  "base": "http://127.0.0.1:21815",
+  "started_at": "2026-10-15T04:28:36.667Z",
+  "requests": [
+    {
+      "label": "anonymous policy denied",
+      "role": "anonymous",
+      "method": "GET",
+      "path": "/network-monitoring/refresh-policy",
+      "status": 401,
+      "code": "SESSION_EXPIRED"
+    },
+    {
+      "label": "csrf",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "login",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "csrf",
+      "role": "reviewer",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "login",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "csrf",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "login",
+      "role": "viewerA",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "asset reader cannot access general settings",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/runtime-configurations/monitor.page_refresh_sec",
+      "status": 403,
+      "code": "ACTION_FORBIDDEN"
+    },
+    {
+      "label": "catalog for refresh definition",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/catalog",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "unsupported refresh interval rejected",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/monitor.page_refresh_sec/validate",
+      "status": 400,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "label": "refresh current before",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/monitor.page_refresh_sec",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "viewer reads authorized policy",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/network-monitoring/refresh-policy",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "forged tenant query denied",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/network-monitoring/refresh-policy",
+      "status": 400,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "label": "create refresh proposal",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/monitor.page_refresh_sec/revisions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "submit refresh proposal",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/2bfb7b1b-c029-455f-bff2-682c2d2a540e/submit",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "review refresh proposal",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/2bfb7b1b-c029-455f-bff2-682c2d2a540e/review",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "publish fifteen-second policy",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/monitor.page_refresh_sec/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "viewer consumes published interval",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/network-monitoring/refresh-policy",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "disable data auto-refresh",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/monitor.page_refresh_sec/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "viewer reads explicit disabled policy",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/network-monitoring/refresh-policy",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "restore through explicit rollback",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/monitor.page_refresh_sec/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read rollback policy",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/network-monitoring/refresh-policy",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "create refresh proposal",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/monitor.page_refresh_sec/revisions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "submit refresh proposal",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/8996666d-6973-4e3b-b1a2-73eb57904f5c/submit",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "review refresh proposal",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/8996666d-6973-4e3b-b1a2-73eb57904f5c/review",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "restore original contract interval explicitly",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/monitor.page_refresh_sec/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "late original publication receipt replay",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/monitor.page_refresh_sec/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read final restored interval",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/network-monitoring/refresh-policy",
+      "status": 200,
+      "code": null
+    }
+  ],
+  "checks": [
+    {
+      "label": "policy binds viewer tenant and actor without publisher identity",
+      "status": "PASS"
+    },
+    {
+      "label": "business consumer applies fifteen seconds from the exact publication",
+      "status": "PASS"
+    },
+    {
+      "label": "disabled policy pauses without silently using thirty",
+      "status": "PASS"
+    },
+    {
+      "label": "rollback changes the business consumer back to fifteen",
+      "status": "PASS"
+    },
+    {
+      "label": "late replay does not reapply old values",
+      "status": "PASS"
+    }
+  ],
+  "credentials_recorded": false,
+  "status": "PASS",
+  "kind": "monitoring-refresh-consumer",
+  "finished_at": "2026-10-15T04:28:39.280Z",
+  "cleanup": "Explicit reviewed test publication restores 30-second original contract interval; no collector/source settings changed"
+}

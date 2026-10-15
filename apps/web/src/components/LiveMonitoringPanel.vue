@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { api } from '../api/client'
+import { useMonitoringRefreshPolicy, refreshPermissionRejected } from '../utils/monitoringRefreshPolicy'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createLiveMonitoringWorkspace, liveMetricText, liveResourceValue, type LiveMonitoringState } from '../utils/liveMonitoringWorkspace'
 import { historySegments, metricNames, type Device, type Metric, type HistoryMetric } from '../utils/networkMonitoring'
@@ -9,8 +10,10 @@ import ApiErrorNotice from './ApiErrorNotice.vue'
 const props = withDefaults(defineProps<{ assetId?: string; mode?: 'overview' | 'items' | 'charts' | 'events' | 'triggers'; autoRefresh?: boolean }>(), { mode: 'overview', autoRefresh: true })
 const state = shallowRef<LiveMonitoringState>({ snapshot: null, resources: {}, resourceErrors: {}, loadedAt: 0, busy: false, error: null, history: null, historyBusy: false, historyError: null })
 const workspace = createLiveMonitoringWorkspace(api, value => { state.value = value })
+let lastRefresh = 0
 const now = ref(performance.now()), selected = ref(''), metric = ref<HistoryMetric>('latency'), window = ref<'HOUR_1' | 'HOURS_24'>('HOUR_1'), rankMetric = ref<'cpu' | 'memory'>('cpu')
 const permitted = computed(() => session.value?.mode === 'remote_test' && can('assets:read') && !switchingTenant.value)
+const {intervalSeconds:refreshInterval,label:refreshPolicyLabel,error:refreshPolicyError,refresh:refreshPolicy}=useMonitoringRefreshPolicy(permitted)
 const devices = computed(() => state.value.snapshot?.devices ?? [])
 const names: Record<HistoryMetric, string> = { icmp: 'ICMP 连通性', latency: '响应延迟', loss: '丢包率', tcp_22: 'TCP 22', tcp_80: 'TCP 80', tcp_443: 'TCP 443', cpu: 'CPU 使用率', memory: '内存使用率' }
 const text = (device: Device, name: Metric) => liveMetricText(state.value, device, name, now.value)
@@ -34,17 +37,18 @@ const availableMetrics = computed(() => [...metricNames, ...(selectedDevice.valu
 const segments = computed(() => state.value.history ? historySegments(state.value.history) : [])
 const historyMaximum = computed(() => { const value = state.value.history; if (!value) return 0; return ['loss','cpu','memory'].includes(value.metric) ? 100 : value.metric === 'latency' ? Math.max(...value.points.map(p => Number(p.value)), 0.001) : 1 })
 async function loadHistory() { if (selected.value) await workspace.history(selected.value, metric.value, window.value); else workspace.clearHistory() }
-async function refresh() { if (await workspace.load()) { now.value = performance.now(); if (selected.value && !devices.value.some(d => d.asset_id === selected.value)) selected.value = ''; else if (selected.value) await loadHistory() } }
+async function refresh() { lastRefresh=performance.now(); if (await workspace.load()) { now.value = performance.now(); if (selected.value && !devices.value.some(d => d.asset_id === selected.value)) selected.value = ''; else if (selected.value) await loadHistory() } }
 function inspect(id: string, name: HistoryMetric = 'latency') { selected.value = id; metric.value = name }
 watch(() => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, permitted.value, props.assetId], () => {
   selected.value = ''; metric.value = 'latency'; window.value = 'HOUR_1'
   const s = session.value; workspace.reset(s && permitted.value ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version, assetId: props.assetId } : null)
   if (permitted.value) void refresh()
 }, { immediate: true, flush: 'sync' })
+watch(refreshPolicyError,cause=>{if(refreshPermissionRejected(cause)){selected.value='';const s=session.value;workspace.reset(s&&permitted.value?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,assetId:props.assetId}:null)}},{flush:'sync'})
 watch([selected, metric, window], () => { if (!availableMetrics.value.includes(metric.value)) metric.value = 'latency'; else void loadHistory() })
-let timer: ReturnType<typeof setInterval> | undefined, ticks = 0
-function visible() { now.value = performance.now(); if (!document.hidden && props.autoRefresh) void refresh() }
-onMounted(() => { timer = setInterval(() => { now.value = performance.now(); if (++ticks % 30 === 0 && !document.hidden && props.autoRefresh) void refresh() }, 1000); document.addEventListener('visibilitychange', visible) })
+let timer: ReturnType<typeof setInterval> | undefined
+function visible() { now.value = performance.now(); if (!document.hidden && props.autoRefresh && refreshInterval.value!==null) void refresh() }
+onMounted(() => { timer = setInterval(() => { now.value = performance.now(); if (refreshInterval.value!==null&&now.value-lastRefresh>=refreshInterval.value*1000&&!document.hidden&&props.autoRefresh) void refresh() }, 1000); document.addEventListener('visibilitychange', visible) })
 onUnmounted(() => { clearInterval(timer); document.removeEventListener('visibilitychange', visible); workspace.dispose() })
 </script>
 <template>
@@ -52,6 +56,7 @@ onUnmounted(() => { clearInterval(timer); document.removeEventListener('visibili
   <div class="live-heading"><div><h2>{{ mode === 'events' ? '当前采集检查' : mode === 'triggers' ? '告警接入状态' : '设备监控' }}</h2><p>{{ assetId ? '当前资产的实际绑定与采样' : '当前租户明确绑定的设备 · 不代表全部资产' }}</p></div><button type="button" :disabled="state.busy || !permitted" @click="refresh">{{ state.busy ? '读取中…' : '刷新监控数据' }}</button></div>
   <p v-if="!permitted" role="status">当前账号没有资产读取权限。</p>
   <template v-else>
+   <p class="live-footnote" aria-label="监控自动刷新设置">{{refreshPolicyLabel}} · 设置每30秒重新核对</p><ApiErrorNotice :error="refreshPolicyError" @retry="refreshPolicy"/>
    <ApiErrorNotice :error="state.error" :retrying="state.busy" @retry="refresh" />
    <p v-if="!state.snapshot" class="live-empty">{{ state.busy ? '正在读取设备绑定与监控采样…' : state.error ? '本次读取失败，请重试。' : '尚未读取监控数据。' }}</p>
    <template v-else>

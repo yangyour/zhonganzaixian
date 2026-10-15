@@ -2,6 +2,7 @@
 // No provider/device invocation; no cookies, credentials or complete request bodies are evidence.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { randomUUID } from 'node:crypto'
 import assert from 'node:assert/strict'
 import Ajv from 'ajv/dist/2020.js'
@@ -25,7 +26,7 @@ class Client{
   const payload=await response.json();evidence.requests.push({label,role:this.label,method,path:path.split('?')[0],status:response.status,code:payload.error?.code??null});save()
   if(response.status!==expected)throw Error(label+': expected '+expected+', got '+response.status+' '+(payload.error?.code??''))
   if(expected>=400)assert.ok(ajv.getSchema('urn:mop:runtime-config#/components/schemas/Error')(payload),'error envelope')
-  if(expected===200&&path.startsWith('/runtime-configurations')){
+  if(expected===200&&(path.startsWith('/runtime-configurations')||path.split('?')[0]==='/network-monitoring/refresh-policy')){
    const pathname=path.split('?')[0],routeKey=spec.paths[pathname]?pathname:pathname.replace(/^\/runtime-configurations\/[^/]+/,'/runtime-configurations/{key}')
    const schema=spec.paths[routeKey][method.toLowerCase()].responses['200'].content['application/json'].schema
    const qualify=v=>Array.isArray(v)?v.map(qualify):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,k==='$ref'&&x.startsWith('#/')?'urn:mop:runtime-config'+x:qualify(x)])):v
@@ -40,6 +41,7 @@ let definitionHash='';
 const command=(expected,revision,patch={})=>({expected_version:expected,expected_definition_hash:definitionHash,action:'PUBLISH',revision_id:revision.id,revision_version:revision.version,target_release_id:null,activation:'IMMEDIATE',effective_at:null,expires_at:null,reason:'SYNTHETIC_RUNTIME_CONFIG '+runId,...patch})
 const current=()=>admin.call('read current','/runtime-configurations/'+key)
 async function proposal(value){const r=await admin.call('create proposal','/configurations/'+key+'/revisions','POST',{proposed_value:value,reason:'SYNTHETIC_RUNTIME_CONFIG '+runId,evidence_refs:[{reference:'document-ref:synthetic-runtime-'+runId,title:'Explicit synthetic test; no customer production approval',sha256:'a'.repeat(64)}]});const s=await admin.call('submit proposal','/configuration-revisions/'+r.id+'/submit','POST',{expected_version:r.version});await admin.call('self review refused','/configuration-revisions/'+r.id+'/review','POST',{expected_version:s.version,decision:'approve',comment:'synthetic'},403);return reviewer.call('independent review','/configuration-revisions/'+r.id+'/review','POST',{expected_version:s.version,decision:'approve',comment:'SYNTHETIC_RUNTIME_CONFIG '+runId})}
+if(import.meta.url===pathToFileURL(resolve(process.argv[1]||'')).href){
 try{
  const ready=await anonymous.call('readiness','/health/ready');check('real PG and runtime publication schema ready',ready.ready&&ready.durable&&ready.runtime_configurations?.schema_access_ready&&ready.production_ready===false)
  await anonymous.call('anonymous catalog refused','/runtime-configurations/catalog','GET',undefined,401)
@@ -70,3 +72,6 @@ try{
  const afterRegistry=(await admin.call('registry after','/configurations')).items.find(x=>x.key===key);assert.deepEqual(afterRegistry,beforeRegistry);check('design registry and customer decision remain unchanged',true)
  evidence.finished_at=new Date().toISOString();evidence.status='PASS';evidence.cleanup='Synthetic test runtime key explicitly disabled; proposals and immutable history retained';save();console.log(JSON.stringify({status:evidence.status,requests:evidence.requests.length,checks:evidence.checks.length,run_id:runId}))
 }catch(error){evidence.status='FAILED';evidence.failure={type:error.name,message:error.message?.slice(0,180)};save();console.error(JSON.stringify(evidence.failure));process.exitCode=1}
+
+}
+export { Client, evidence, save, check, base };

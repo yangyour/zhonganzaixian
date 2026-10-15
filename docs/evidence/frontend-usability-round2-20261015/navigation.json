@@ -1,0 +1,77 @@
+{
+  "verified_at": "2026-10-15T01:46:55.873Z",
+  "environment": "lan-test-20261008",
+  "source_base": "be594d4",
+  "build_id": "96656d741ceb6702af8a35564bcce6862b382e6cebde609ec506f7dff798046d",
+  "browser": "155.0.4283.45",
+  "checks": [
+    {
+      "new_tab": "/network-monitoring",
+      "gesture": {
+        "modifiers": [
+          "Control"
+        ]
+      },
+      "current_page_preserved": true
+    },
+    {
+      "new_tab": "/tenant-inventory",
+      "gesture": {
+        "modifiers": [
+          "Control"
+        ]
+      },
+      "current_page_preserved": true
+    },
+    {
+      "new_tab": "/assets",
+      "gesture": {
+        "button": "middle"
+      },
+      "current_page_preserved": true
+    },
+    "Enter retains guarded current-tab navigation",
+    "current mobile page closes and returns focus at 390",
+    "Escape returns focus at 390",
+    "successful mobile navigation focuses heading at 390",
+    "current mobile page closes and returns focus at 320",
+    "Escape returns focus at 320",
+    "successful mobile navigation focuses heading at 320"
+  ],
+  "viewports": [
+    {
+      "width": 390,
+      "left": 0,
+      "right": 300,
+      "bottom": 844,
+      "height": 844,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "left": 0,
+      "right": 272,
+      "bottom": 720,
+      "height": 720,
+      "overflow": false
+    }
+  ],
+  "unit_tests": 41,
+  "typecheck": "PASS",
+  "build": "PASS",
+  "business_writes": [],
+  "page_errors": [],
+  "baseline": {
+    "control_click_stole_current_page": true,
+    "same_page_menu_stayed_open": true,
+    "mobile_target_heading_already_correct": true
+  },
+  "iterations": [
+    "corrected test fixture index signature during typecheck",
+    "waited for initial read and drawer slide animation before assertions"
+  ],
+  "limitations": [
+    "Meta and Shift behavior unit tested on Windows; physical Mac not tested",
+    "live write guards not bypassed or submitted"
+  ]
+}

@@ -5,6 +5,7 @@ import { can, session, contextGeneration, switchingTenant, maySwitchTenant, swit
 import { isCancelled } from './api/client'
 import { roleLabel } from './utils/display'
 import { landingRoute } from './utils/routeAccess'
+import { navigateFromLink } from './utils/linkNavigation'
 import HorizontalModuleNavigation from './components/HorizontalModuleNavigation.vue'
 import './styles/navigation.css'
 import ApiErrorNotice from './components/ApiErrorNotice.vue'
@@ -79,7 +80,7 @@ async function endSession() {
   <div v-else class="app-shell horizontal-shell prototype-shell" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
     <a class="skip-link" href="#main-content">跳过导航，进入主要内容</a>
       <header class="topbar">
-        <a class="brand" :href="router.resolve({ name: homeRoute }).href" @click.prevent="router.push({ name: homeRoute })"><span class="brand-mark">M</span><span><strong>MOP 运维托管</strong><small>网络设备管理平台</small></span></a>
+        <a class="brand" :href="router.resolve({ name: homeRoute }).href" @click="navigateFromLink($event, () => router.push({ name: homeRoute }))"><span class="brand-mark">M</span><span><strong>MOP 运维托管</strong><small>网络设备管理平台</small></span></a>
         <HorizontalModuleNavigation v-model:mobile-open="mobileNavigationOpen" :collapsed="sidebarCollapsed" />
         <div class="topbar-controls">
           <div class="identity"><span class="avatar">{{ session.user.display_name.slice(0, 1) }}</span><div><strong>{{ session.user.display_name }}</strong><small>{{ roleLabel[session.user.role] }}</small></div></div>

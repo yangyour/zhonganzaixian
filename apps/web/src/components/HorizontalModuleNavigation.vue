@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
-import { useRoute, useRouter, isNavigationFailure } from 'vue-router'
+import { useRoute, useRouter, isNavigationFailure, NavigationFailureType } from 'vue-router'
 import { session, contextGeneration, switchingTenant } from '../stores/session'
 import { navigationError, navigationTarget } from '../stores/navigation'
 import { visibleNavigationModules, navigationEntryName, type NavigationModule } from '../utils/navigationModules'
 import NavigationIcon from './NavigationIcon.vue'
 import SidebarNavigation from './SidebarNavigation.vue'
+import { navigateFromLink } from '../utils/linkNavigation'
 defineProps<{ collapsed?: boolean }>()
 const mobileOpen = defineModel<boolean>('mobileOpen', { default: false })
 const router = useRouter(), route = useRoute(), moduleNav = ref<HTMLElement>()
@@ -28,7 +29,7 @@ async function navigate(name: string) {
   if (!modules.value.some(module => module.items.some(item => item.name === name))) return
   try {
     const failure = await router.push({ name })
-    if (!isNavigationFailure(failure)) mobileOpen.value = false
+    if (!isNavigationFailure(failure) || isNavigationFailure(failure, NavigationFailureType.duplicated)) mobileOpen.value = false
   } catch (error) {
     navigationTarget.value = router.resolve({ name }).href
     navigationError.value = error
@@ -42,7 +43,7 @@ function selectModule(module: NavigationModule) {
 </script>
 <template>
   <nav v-if="modules.length" ref="moduleNav" class="module-navigation" aria-label="模块导航">
-    <a v-for="module in modules" :key="module.id" :href="router.resolve({ name: module.items[0]!.name }).href" class="primary-nav-link" :class="{ active: module.id === activeModule?.id }" :aria-current="module.id === activeModule?.id ? 'true' : undefined" @click.prevent="selectModule(module)">
+    <a v-for="module in modules" :key="module.id" :href="router.resolve({ name: module.items[0]!.name }).href" class="primary-nav-link" :class="{ active: module.id === activeModule?.id }" :aria-current="module.id === activeModule?.id ? 'true' : undefined" @click="navigateFromLink($event, () => selectModule(module))">
       <span class="module-icon" :class="'module-' + module.id"><NavigationIcon :name="module.id" /></span><span>{{ module.title }}</span>
     </a>
   </nav>

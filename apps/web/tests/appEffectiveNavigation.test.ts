@@ -180,3 +180,37 @@ it('a successful mobile page selection updates the active route and closes the m
   expect(activePage()).toBe('dashboard')
   expect(mobileDrawer()).toBeNull()
 })
+
+it.each(['sidebar', 'module', 'brand'] as const)('keeps modified %s links native without navigating the current page', async surface => {
+  session.value = auth(['assets:read', 'dashboard:read', 'contacts:read']); await mount('assets')
+  const link = surface === 'sidebar' ? sidebarLink('dashboard')! : surface === 'module' ? moduleLink('customer-contacts') : host.querySelector<HTMLAnchorElement>('a.brand')!
+  const push = vi.spyOn(router, 'push')
+  for (const modifier of ['ctrlKey', 'metaKey', 'shiftKey']) {
+    let intercepted: boolean | undefined
+    link.addEventListener('click', event => { intercepted = event.defaultPrevented; event.preventDefault() }, { once: true })
+    link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, [modifier]: true }))
+    await settle()
+    expect(intercepted).toBe(false)
+    expect(push).not.toHaveBeenCalled()
+    expect(router.currentRoute.value.name).toBe('assets')
+  }
+})
+
+it('modified activation of the current mobile module does not open or close its drawer', async () => {
+  mobile = true; session.value = auth(['assets:read', 'dashboard:read']); await mount('assets')
+  const link = moduleLink('dashboard'), push = vi.spyOn(router, 'push')
+  link.addEventListener('click', event => event.preventDefault(), { once: true })
+  link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, ctrlKey: true }))
+  await settle()
+  expect(mobileDrawer()).toBeNull()
+  expect(push).not.toHaveBeenCalled()
+})
+
+it('selecting the current page in the mobile drawer closes it without changing the route', async () => {
+  mobile = true; session.value = auth(['assets:read', 'dashboard:read']); await mount('assets')
+  moduleLink('dashboard').click(); await settle()
+  mobileDrawer()!.querySelector<HTMLAnchorElement>('[data-page="assets"]')!.click()
+  await vi.waitFor(() => expect(mobileDrawer()).toBeNull())
+  expect(router.currentRoute.value.name).toBe('assets')
+  expect(activePage()).toBe('assets')
+})

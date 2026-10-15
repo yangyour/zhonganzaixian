@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-15",
+  "origin": "http://192.168.1.215:10010",
+  "build_id": "05c344ac6e1beac7d5c67f48846d5baa6b9ca6f1859c9e04af47b77a73cb66ab",
+  "verified": [
+    "dashboard real 4 device counts",
+    "memory history actual source",
+    "2 actual registrations",
+    "registration detail link",
+    "8 actual firewall items",
+    "asset CPU history",
+    "desktop and mobile"
+  ],
+  "engineerChecks": [
+    {
+      "path": "/my-worklogs",
+      "width": 1440,
+      "heading": "我的实填工时 虚构星湾 A（测试环境）",
+      "overflow": false
+    },
+    {
+      "path": "/my-worklogs",
+      "width": 390,
+      "heading": "我的实填工时 虚构星湾 A（测试环境）",
+      "overflow": false
+    }
+  ],
+  "business_writes": 0,
+  "credentials_recorded": false
+}

@@ -1,0 +1,402 @@
+{
+  "date": "2026-10-15",
+  "stage": "development-preview-with-designated-api",
+  "checks": [
+    {
+      "path": "/assets",
+      "width": 1440,
+      "heading": "资产管理",
+      "loaded_path": "/assets",
+      "overflow": false
+    },
+    {
+      "path": "/assets",
+      "width": 390,
+      "heading": "资产管理",
+      "loaded_path": "/assets",
+      "overflow": false
+    },
+    {
+      "path": "/dashboard",
+      "width": 1440,
+      "heading": "运营总览",
+      "loaded_path": "/dashboard",
+      "overflow": false
+    },
+    {
+      "path": "/dashboard",
+      "width": 390,
+      "heading": "运营总览",
+      "loaded_path": "/dashboard",
+      "overflow": false
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 1440,
+      "heading": "基础网络监控",
+      "loaded_path": "/network-monitoring",
+      "overflow": false
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 390,
+      "heading": "基础网络监控",
+      "loaded_path": "/network-monitoring",
+      "overflow": false
+    },
+    {
+      "path": "/tickets",
+      "width": 1440,
+      "heading": "报障与受理 虚构星湾 A（测试环境）",
+      "loaded_path": "/tickets",
+      "overflow": false
+    },
+    {
+      "path": "/tickets",
+      "width": 390,
+      "heading": "报障与受理 虚构星湾 A（测试环境）",
+      "loaded_path": "/tickets",
+      "overflow": false
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 1440,
+      "heading": "手工来源事件登记 虚构星湾 A（测试环境）",
+      "loaded_path": "/manual-incidents",
+      "overflow": false
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 390,
+      "heading": "手工来源事件登记 虚构星湾 A（测试环境）",
+      "loaded_path": "/manual-incidents",
+      "overflow": false
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 1440,
+      "heading": "SLA 显式对照 虚构星湾 A（测试环境）",
+      "loaded_path": "/sla-scenarios",
+      "overflow": false
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 390,
+      "heading": "SLA 显式对照 虚构星湾 A（测试环境）",
+      "loaded_path": "/sla-scenarios",
+      "overflow": false
+    },
+    {
+      "path": "/asset-export-jobs",
+      "width": 1440,
+      "heading": "台账导出准备 虚构星湾 A（测试环境）",
+      "loaded_path": "/asset-export-jobs",
+      "overflow": false
+    },
+    {
+      "path": "/asset-export-jobs",
+      "width": 390,
+      "heading": "台账导出准备 虚构星湾 A（测试环境）",
+      "loaded_path": "/asset-export-jobs",
+      "overflow": false
+    },
+    {
+      "path": "/my-export-messages",
+      "width": 1440,
+      "heading": "我的导出消息 虚构星湾 A（测试环境）",
+      "loaded_path": "/my-export-messages",
+      "overflow": false
+    },
+    {
+      "path": "/my-export-messages",
+      "width": 390,
+      "heading": "我的导出消息 虚构星湾 A（测试环境）",
+      "loaded_path": "/my-export-messages",
+      "overflow": false
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 1440,
+      "heading": "我的通知偏好请求 虚构星湾 A（测试环境）",
+      "loaded_path": "/my-notification-preferences",
+      "overflow": false
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 390,
+      "heading": "我的通知偏好请求 虚构星湾 A（测试环境）",
+      "loaded_path": "/my-notification-preferences",
+      "overflow": false
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "width": 1440,
+      "heading": "每日备份计划草稿",
+      "loaded_path": "/backup-plan-drafts",
+      "overflow": false
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "width": 390,
+      "heading": "每日备份计划草稿",
+      "loaded_path": "/backup-plan-drafts",
+      "overflow": false
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 1440,
+      "heading": "变更报备草稿",
+      "loaded_path": "/change-notice-drafts",
+      "overflow": false
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 390,
+      "heading": "变更报备草稿",
+      "loaded_path": "/change-notice-drafts",
+      "overflow": false
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 1440,
+      "heading": "巡检模板候选",
+      "loaded_path": "/inspection-templates",
+      "overflow": false
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 390,
+      "heading": "巡检模板候选",
+      "loaded_path": "/inspection-templates",
+      "overflow": false
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 1440,
+      "heading": "人工巡检执行单",
+      "loaded_path": "/inspection-worksheets",
+      "overflow": false
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 390,
+      "heading": "人工巡检执行单",
+      "loaded_path": "/inspection-worksheets",
+      "overflow": false
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 1440,
+      "heading": "巡检来源集合草稿",
+      "loaded_path": "/inspection-source-collections",
+      "overflow": false
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 390,
+      "heading": "巡检来源集合草稿",
+      "loaded_path": "/inspection-source-collections",
+      "overflow": false
+    },
+    {
+      "path": "/tenant-inventory",
+      "width": 1440,
+      "heading": "租户登记资源",
+      "loaded_path": "/tenant-inventory",
+      "overflow": false
+    },
+    {
+      "path": "/tenant-inventory",
+      "width": 390,
+      "heading": "租户登记资源",
+      "loaded_path": "/tenant-inventory",
+      "overflow": false
+    },
+    {
+      "path": "/customer-contacts",
+      "width": 1440,
+      "heading": "客户联系人",
+      "loaded_path": "/customer-contacts",
+      "overflow": false
+    },
+    {
+      "path": "/customer-contacts",
+      "width": 390,
+      "heading": "客户联系人",
+      "loaded_path": "/customer-contacts",
+      "overflow": false
+    },
+    {
+      "path": "/contact-imports",
+      "width": 1440,
+      "heading": "联系人批量新建与作业",
+      "loaded_path": "/contact-imports",
+      "overflow": false
+    },
+    {
+      "path": "/contact-imports",
+      "width": 390,
+      "heading": "联系人批量新建与作业",
+      "loaded_path": "/contact-imports",
+      "overflow": false
+    },
+    {
+      "path": "/contact-import-preview",
+      "width": 1440,
+      "heading": "联系人导入格式预览",
+      "loaded_path": "/contact-import-preview",
+      "overflow": false
+    },
+    {
+      "path": "/contact-import-preview",
+      "width": 390,
+      "heading": "联系人导入格式预览",
+      "loaded_path": "/contact-import-preview",
+      "overflow": false
+    },
+    {
+      "path": "/operational-comparison",
+      "width": 1440,
+      "heading": "经营样本与人力对照",
+      "loaded_path": "/operational-comparison",
+      "overflow": false
+    },
+    {
+      "path": "/operational-comparison",
+      "width": 390,
+      "heading": "经营样本与人力对照",
+      "loaded_path": "/operational-comparison",
+      "overflow": false
+    },
+    {
+      "path": "/capacity-estimates",
+      "width": 1440,
+      "heading": "容量与 Proxy 缓冲估算",
+      "loaded_path": "/capacity-estimates",
+      "overflow": false
+    },
+    {
+      "path": "/capacity-estimates",
+      "width": 390,
+      "heading": "容量与 Proxy 缓冲估算",
+      "loaded_path": "/capacity-estimates",
+      "overflow": false
+    },
+    {
+      "path": "/identity/users",
+      "width": 1440,
+      "heading": "用户与成员授权",
+      "loaded_path": "/identity/users",
+      "overflow": false
+    },
+    {
+      "path": "/identity/users",
+      "width": 390,
+      "heading": "用户与成员授权",
+      "loaded_path": "/identity/users",
+      "overflow": false
+    },
+    {
+      "path": "/identity/roles",
+      "width": 1440,
+      "heading": "角色与权限",
+      "loaded_path": "/identity/roles",
+      "overflow": false
+    },
+    {
+      "path": "/identity/roles",
+      "width": 390,
+      "heading": "角色与权限",
+      "loaded_path": "/identity/roles",
+      "overflow": false
+    },
+    {
+      "path": "/identity/settings",
+      "width": 1440,
+      "heading": "身份认证设置",
+      "loaded_path": "/identity/settings",
+      "overflow": false
+    },
+    {
+      "path": "/identity/settings",
+      "width": 390,
+      "heading": "身份认证设置",
+      "loaded_path": "/identity/settings",
+      "overflow": false
+    },
+    {
+      "path": "/account",
+      "width": 1440,
+      "heading": "我的账号",
+      "loaded_path": "/account",
+      "overflow": false
+    },
+    {
+      "path": "/account",
+      "width": 390,
+      "heading": "我的账号",
+      "loaded_path": "/account",
+      "overflow": false
+    },
+    {
+      "path": "/configurations",
+      "width": 1440,
+      "heading": "配置确认登记",
+      "loaded_path": "/configurations",
+      "overflow": false
+    },
+    {
+      "path": "/configurations",
+      "width": 390,
+      "heading": "配置确认登记",
+      "loaded_path": "/configurations",
+      "overflow": false
+    },
+    {
+      "path": "/threshold-diagnostics",
+      "width": 1440,
+      "heading": "阈值候选诊断",
+      "loaded_path": "/threshold-diagnostics",
+      "overflow": false
+    },
+    {
+      "path": "/threshold-diagnostics",
+      "width": 390,
+      "heading": "阈值候选诊断",
+      "loaded_path": "/threshold-diagnostics",
+      "overflow": false
+    },
+    {
+      "path": "/capability-catalog",
+      "width": 1440,
+      "heading": "代码能力声明核对",
+      "loaded_path": "/capability-catalog",
+      "overflow": false
+    },
+    {
+      "path": "/capability-catalog",
+      "width": 390,
+      "heading": "代码能力声明核对",
+      "loaded_path": "/capability-catalog",
+      "overflow": false
+    },
+    {
+      "path": "/audit",
+      "width": 1440,
+      "heading": "审计检索与区间校验",
+      "loaded_path": "/audit",
+      "overflow": false
+    },
+    {
+      "path": "/audit",
+      "width": 390,
+      "heading": "审计检索与区间校验",
+      "loaded_path": "/audit",
+      "overflow": false
+    }
+  ],
+  "pageErrors": [],
+  "failedGets": [],
+  "scope": "page entry, authorized read and viewport fit; not complete business acceptance",
+  "credentials_recorded": false
+}

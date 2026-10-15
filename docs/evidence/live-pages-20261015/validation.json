@@ -1,0 +1,17 @@
+{
+  "verified_at": "2026-10-15T01:43:49.168409+00:00",
+  "source_commit": "f7c7ad2372e5e9fcc61a3f366e82a66764d90396",
+  "web_test_files": 144,
+  "web_tests_passed": 2099,
+  "contract_tests_passed": 134,
+  "failed": 0,
+  "typecheck": "PASSED",
+  "production_bundle": "PASSED",
+  "release_gate": "PASSED",
+  "policy_gate": "PASSED",
+  "contract_generation": "PASSED",
+  "build_id": "05c344ac6e1beac7d5c67f48846d5baa6b9ca6f1859c9e04af47b77a73cb66ab",
+  "web_test_log_sha256": "da78f86feb821f8326a988d9ce55f0e494477875b9d1748e86d2fe7f8d3a7c90",
+  "contract_test_log_sha256": "b73fd75aeab50a0a323bd56fbb90437c24e26877f3e3c4b386e6b6727b4a6f6c",
+  "scope": "Frontend and contract checks; not full production business acceptance"
+}

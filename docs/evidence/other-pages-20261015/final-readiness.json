@@ -1,0 +1,9 @@
+{
+  "verified_at": "2026-10-15T02:05:41.608Z",
+  "ready": true,
+  "production_ready": false,
+  "owned_helper_ports_closed": [
+    5185,
+    18019
+  ]
+}

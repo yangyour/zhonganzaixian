@@ -1,0 +1,165 @@
+{
+  "date": "2026-10-15",
+  "origin": "http://192.168.1.215:10010",
+  "build_id": "33c78dfaa1865cae5a313ad7ef390b3eb71c2dbb3372681d0d9bd09a32d16446",
+  "matrix": [
+    {
+      "path": "/backup-plan-drafts",
+      "width": 1440,
+      "heading": "每日备份计划草稿",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "width": 390,
+      "heading": "每日备份计划草稿",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 1440,
+      "heading": "变更报备草稿",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 390,
+      "heading": "变更报备草稿",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 1440,
+      "heading": "巡检模板候选",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 390,
+      "heading": "巡检模板候选",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 1440,
+      "heading": "人工巡检执行单",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 390,
+      "heading": "人工巡检执行单",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 1440,
+      "heading": "巡检来源集合草稿",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 390,
+      "heading": "巡检来源集合草稿",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 1440,
+      "heading": "手工来源事件登记 虚构星湾 A（测试环境）",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 390,
+      "heading": "手工来源事件登记 虚构星湾 A（测试环境）",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 1440,
+      "heading": "我的通知偏好请求 虚构星湾 A（测试环境）",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 390,
+      "heading": "我的通知偏好请求 虚构星湾 A（测试环境）",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 1440,
+      "heading": "SLA 显式对照 虚构星湾 A（测试环境）",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 390,
+      "heading": "SLA 显式对照 虚构星湾 A（测试环境）",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/capacity-estimates",
+      "width": 1440,
+      "heading": "容量与 Proxy 缓冲估算",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/capacity-estimates",
+      "width": 390,
+      "heading": "容量与 Proxy 缓冲估算",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/operational-comparison",
+      "width": 1440,
+      "heading": "经营样本与人力对照",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/operational-comparison",
+      "width": 390,
+      "heading": "经营样本与人力对照",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/my-worklogs",
+      "width": 1440,
+      "heading": "我的实填工时 虚构星湾 A（测试环境）",
+      "overflow": false,
+      "apiError": 0
+    },
+    {
+      "path": "/my-worklogs",
+      "width": 390,
+      "heading": "我的实填工时 虚构星湾 A（测试环境）",
+      "overflow": false,
+      "apiError": 0
+    }
+  ],
+  "pageErrors": [],
+  "business_mutations": 0,
+  "calculation_posts": "explicit read-only comparison, not saved",
+  "credentials_recorded": false
+}

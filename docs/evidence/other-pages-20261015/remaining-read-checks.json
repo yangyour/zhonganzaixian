@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-15",
+  "checks": [
+    {
+      "path": "/configurations",
+      "heading": "配置确认登记",
+      "readError": 0,
+      "rows": 185
+    },
+    {
+      "path": "/tenant-inventory",
+      "heading": "租户登记资源",
+      "readError": 0,
+      "rows": 2
+    },
+    {
+      "path": "/audit",
+      "heading": "审计检索与区间校验",
+      "readError": 0,
+      "rows": 15
+    }
+  ],
+  "note": "Read-only review of existing actual interfaces; pending business values remain null",
+  "business_mutations": 0
+}

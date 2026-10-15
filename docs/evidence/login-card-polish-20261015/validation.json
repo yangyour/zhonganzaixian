@@ -342,7 +342,7 @@
       }
     }
   ],
-  "page_errors": [],
+  "page_errors": null,
   "auth_operations": [
     "login",
     "own session logout"
@@ -353,5 +353,6 @@
     "darkened placeholder for contrast on filled controls"
   ],
   "server_deployed_by_this_round": false,
-  "preview": "http://127.0.0.1:15175/login"
+  "preview": "http://127.0.0.1:15175/login",
+  "page_error_monitoring": "Not collected as a separate event stream in this focused run; no zero-error claim."
 }

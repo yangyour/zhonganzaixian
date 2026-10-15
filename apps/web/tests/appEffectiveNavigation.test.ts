@@ -22,7 +22,7 @@ let app: VueApp | undefined, host: HTMLElement, router: Router, mobile: boolean
 
 beforeEach(() => {
   vi.clearAllMocks(); forgetSession(); switchingTenant.value = false; navigationError.value = null; navigationTarget.value = ''; mobile = false
-  vi.stubGlobal('matchMedia', vi.fn((query: string) => ({ matches: mobile && query === '(max-width: 760px)', media: query, addEventListener: vi.fn(), removeEventListener: vi.fn() })))
+  vi.stubGlobal('matchMedia', vi.fn((query: string) => ({ matches: mobile && query === '(max-width: 1024px)', media: query, addEventListener: vi.fn(), removeEventListener: vi.fn() })))
   vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined)
   host = document.createElement('div'); document.body.append(host)
   router = createRouter({ history: createMemoryHistory(), routes: [

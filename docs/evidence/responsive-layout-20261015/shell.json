@@ -1,0 +1,2111 @@
+{
+  "base": "ec88c08",
+  "records": [
+    {
+      "path": "/assets",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 305,
+      "documentWidth": 305,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.assets-kpis",
+          "columns": 2,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 10,
+              "y": 482.38543701171875,
+              "width": 137.33334350585938,
+              "height": 124.11458587646484,
+              "right": 147.33334350585938,
+              "bottom": 606.5000228881836
+            },
+            {
+              "x": 157.33334350585938,
+              "y": 482.38543701171875,
+              "width": 137.33334350585938,
+              "height": 124.11458587646484,
+              "right": 294.66668701171875,
+              "bottom": 606.5000228881836
+            },
+            {
+              "x": 10,
+              "y": 616.5,
+              "width": 137.33334350585938,
+              "height": 124.11458587646484,
+              "right": 147.33334350585938,
+              "bottom": 740.6145858764648
+            },
+            {
+              "x": 157.33334350585938,
+              "y": 616.5,
+              "width": 137.33334350585938,
+              "height": 124.11458587646484,
+              "right": 294.66668701171875,
+              "bottom": 740.6145858764648
+            },
+            {
+              "x": 10,
+              "y": 750.6146240234375,
+              "width": 137.33334350585938,
+              "height": 124.11458587646484,
+              "right": 147.33334350585938,
+              "bottom": 874.7292098999023
+            },
+            {
+              "x": 157.33334350585938,
+              "y": 750.6146240234375,
+              "width": 137.33334350585938,
+              "height": 124.11458587646484,
+              "right": 294.66668701171875,
+              "bottom": 874.7292098999023
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 26,
+        "y": 226,
+        "width": 72,
+        "height": 27.89583396911621,
+        "right": 98,
+        "bottom": 253.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/assets",
+      "width": 390,
+      "height": 844,
+      "availableWidth": 375,
+      "documentWidth": 375,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.assets-kpis",
+          "columns": 2,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 10,
+              "y": 458.5625,
+              "width": 172.33334350585938,
+              "height": 104.32292175292969,
+              "right": 182.33334350585938,
+              "bottom": 562.8854217529297
+            },
+            {
+              "x": 192.33334350585938,
+              "y": 458.5625,
+              "width": 172.33334350585938,
+              "height": 104.32292175292969,
+              "right": 364.66668701171875,
+              "bottom": 562.8854217529297
+            },
+            {
+              "x": 10,
+              "y": 572.8854370117188,
+              "width": 172.33334350585938,
+              "height": 104.32292175292969,
+              "right": 182.33334350585938,
+              "bottom": 677.2083587646484
+            },
+            {
+              "x": 192.33334350585938,
+              "y": 572.8854370117188,
+              "width": 172.33334350585938,
+              "height": 104.32292175292969,
+              "right": 364.66668701171875,
+              "bottom": 677.2083587646484
+            },
+            {
+              "x": 10,
+              "y": 687.2083740234375,
+              "width": 172.33334350585938,
+              "height": 104.32292175292969,
+              "right": 182.33334350585938,
+              "bottom": 791.5312957763672
+            },
+            {
+              "x": 192.33334350585938,
+              "y": 687.2083740234375,
+              "width": 172.33334350585938,
+              "height": 104.32292175292969,
+              "right": 364.66668701171875,
+              "bottom": 791.5312957763672
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 26,
+        "y": 226,
+        "width": 72,
+        "height": 27.89583396911621,
+        "right": 98,
+        "bottom": 253.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/assets",
+      "width": 600,
+      "height": 800,
+      "availableWidth": 585,
+      "documentWidth": 585,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.assets-kpis",
+          "columns": 2,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 10,
+              "y": 406.5625,
+              "width": 277.3333435058594,
+              "height": 104.32292175292969,
+              "right": 287.3333435058594,
+              "bottom": 510.8854217529297
+            },
+            {
+              "x": 297.3333435058594,
+              "y": 406.5625,
+              "width": 277.3333435058594,
+              "height": 104.32292175292969,
+              "right": 574.6666870117188,
+              "bottom": 510.8854217529297
+            },
+            {
+              "x": 10,
+              "y": 520.8854370117188,
+              "width": 277.3333435058594,
+              "height": 104.32292175292969,
+              "right": 287.3333435058594,
+              "bottom": 625.2083587646484
+            },
+            {
+              "x": 297.3333435058594,
+              "y": 520.8854370117188,
+              "width": 277.3333435058594,
+              "height": 104.32292175292969,
+              "right": 574.6666870117188,
+              "bottom": 625.2083587646484
+            },
+            {
+              "x": 10,
+              "y": 635.2083740234375,
+              "width": 277.3333435058594,
+              "height": 104.32292175292969,
+              "right": 287.3333435058594,
+              "bottom": 739.5312957763672
+            },
+            {
+              "x": 297.3333435058594,
+              "y": 635.2083740234375,
+              "width": 277.3333435058594,
+              "height": 104.32292175292969,
+              "right": 574.6666870117188,
+              "bottom": 739.5312957763672
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 26,
+        "y": 226,
+        "width": 72,
+        "height": 27.89583396911621,
+        "right": 98,
+        "bottom": 253.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/assets",
+      "width": 760,
+      "height": 800,
+      "availableWidth": 745,
+      "documentWidth": 745,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.assets-kpis",
+          "columns": 2,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 10,
+              "y": 406.5625,
+              "width": 357.3333435058594,
+              "height": 104.32292175292969,
+              "right": 367.3333435058594,
+              "bottom": 510.8854217529297
+            },
+            {
+              "x": 377.3333435058594,
+              "y": 406.5625,
+              "width": 357.3333435058594,
+              "height": 104.32292175292969,
+              "right": 734.6666870117188,
+              "bottom": 510.8854217529297
+            },
+            {
+              "x": 10,
+              "y": 520.8854370117188,
+              "width": 357.3333435058594,
+              "height": 104.32292175292969,
+              "right": 367.3333435058594,
+              "bottom": 625.2083587646484
+            },
+            {
+              "x": 377.3333435058594,
+              "y": 520.8854370117188,
+              "width": 357.3333435058594,
+              "height": 104.32292175292969,
+              "right": 734.6666870117188,
+              "bottom": 625.2083587646484
+            },
+            {
+              "x": 10,
+              "y": 635.2083740234375,
+              "width": 357.3333435058594,
+              "height": 104.32292175292969,
+              "right": 367.3333435058594,
+              "bottom": 739.5312957763672
+            },
+            {
+              "x": 377.3333435058594,
+              "y": 635.2083740234375,
+              "width": 357.3333435058594,
+              "height": 104.32292175292969,
+              "right": 734.6666870117188,
+              "bottom": 739.5312957763672
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 26,
+        "y": 226,
+        "width": 72,
+        "height": 27.89583396911621,
+        "right": 98,
+        "bottom": 253.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/assets",
+      "width": 761,
+      "height": 800,
+      "availableWidth": 746,
+      "documentWidth": 746,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.assets-kpis",
+          "columns": 3,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 12,
+              "y": 240.6875,
+              "width": 234,
+              "height": 104.32292175292969,
+              "right": 246,
+              "bottom": 345.0104217529297
+            },
+            {
+              "x": 256,
+              "y": 240.6875,
+              "width": 234,
+              "height": 104.32292175292969,
+              "right": 490,
+              "bottom": 345.0104217529297
+            },
+            {
+              "x": 500,
+              "y": 240.6875,
+              "width": 234,
+              "height": 104.32292175292969,
+              "right": 734,
+              "bottom": 345.0104217529297
+            },
+            {
+              "x": 12,
+              "y": 355.01043701171875,
+              "width": 234,
+              "height": 104.32292175292969,
+              "right": 246,
+              "bottom": 459.33335876464844
+            },
+            {
+              "x": 256,
+              "y": 355.01043701171875,
+              "width": 234,
+              "height": 104.32292175292969,
+              "right": 490,
+              "bottom": 459.33335876464844
+            },
+            {
+              "x": 500,
+              "y": 355.01043701171875,
+              "width": 234,
+              "height": 104.32292175292969,
+              "right": 734,
+              "bottom": 459.33335876464844
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 28,
+        "y": 122,
+        "width": 72,
+        "height": 27.89583396911621,
+        "right": 100,
+        "bottom": 149.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/assets",
+      "width": 1024,
+      "height": 768,
+      "availableWidth": 1009,
+      "documentWidth": 1009,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.assets-kpis",
+          "columns": 3,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 12,
+              "y": 193.2604217529297,
+              "width": 321.5520935058594,
+              "height": 104.32292175292969,
+              "right": 333.5520935058594,
+              "bottom": 297.5833435058594
+            },
+            {
+              "x": 343.5520935058594,
+              "y": 193.2604217529297,
+              "width": 321.5520935058594,
+              "height": 104.32292175292969,
+              "right": 665.1041870117188,
+              "bottom": 297.5833435058594
+            },
+            {
+              "x": 675.1041870117188,
+              "y": 193.2604217529297,
+              "width": 321.5625,
+              "height": 104.32292175292969,
+              "right": 996.6666870117188,
+              "bottom": 297.5833435058594
+            },
+            {
+              "x": 12,
+              "y": 307.5833435058594,
+              "width": 321.5520935058594,
+              "height": 104.32292175292969,
+              "right": 333.5520935058594,
+              "bottom": 411.90626525878906
+            },
+            {
+              "x": 343.5520935058594,
+              "y": 307.5833435058594,
+              "width": 321.5520935058594,
+              "height": 104.32292175292969,
+              "right": 665.1041870117188,
+              "bottom": 411.90626525878906
+            },
+            {
+              "x": 675.1041870117188,
+              "y": 307.5833435058594,
+              "width": 321.5625,
+              "height": 104.32292175292969,
+              "right": 996.6666870117188,
+              "bottom": 411.90626525878906
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 28,
+        "y": 122,
+        "width": 72,
+        "height": 27.89583396911621,
+        "right": 100,
+        "bottom": 149.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/assets",
+      "width": 1280,
+      "height": 720,
+      "availableWidth": 1265,
+      "documentWidth": 1265,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.assets-kpis",
+          "columns": 6,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 212,
+              "y": 189.2604217529297,
+              "width": 165.1041717529297,
+              "height": 104.32292175292969,
+              "right": 377.1041717529297,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 387.10418701171875,
+              "y": 189.2604217529297,
+              "width": 165.11459350585938,
+              "height": 104.32292175292969,
+              "right": 552.2187805175781,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 562.21875,
+              "y": 189.2604217529297,
+              "width": 165.11459350585938,
+              "height": 104.32292175292969,
+              "right": 727.3333435058594,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 737.3333740234375,
+              "y": 189.2604217529297,
+              "width": 165.1041717529297,
+              "height": 104.32292175292969,
+              "right": 902.4375457763672,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 912.4375,
+              "y": 189.2604217529297,
+              "width": 165.11459350585938,
+              "height": 104.32292175292969,
+              "right": 1077.5520935058594,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 1087.5521240234375,
+              "y": 189.2604217529297,
+              "width": 165.11459350585938,
+              "height": 104.32292175292969,
+              "right": 1252.6667175292969,
+              "bottom": 293.5833435058594
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 228,
+        "y": 118,
+        "width": 72,
+        "height": 27.89583396911621,
+        "right": 300,
+        "bottom": 145.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/assets",
+      "width": 1440,
+      "height": 900,
+      "availableWidth": 1425,
+      "documentWidth": 1425,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.assets-kpis",
+          "columns": 6,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 212,
+              "y": 189.2604217529297,
+              "width": 191.77084350585938,
+              "height": 104.32292175292969,
+              "right": 403.7708435058594,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 413.7708435058594,
+              "y": 189.2604217529297,
+              "width": 191.78125,
+              "height": 104.32292175292969,
+              "right": 605.5520935058594,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 615.5521240234375,
+              "y": 189.2604217529297,
+              "width": 191.77084350585938,
+              "height": 104.32292175292969,
+              "right": 807.3229675292969,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 817.3229370117188,
+              "y": 189.2604217529297,
+              "width": 191.78125,
+              "height": 104.32292175292969,
+              "right": 1009.1041870117188,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 1019.1041870117188,
+              "y": 189.2604217529297,
+              "width": 191.78125,
+              "height": 104.32292175292969,
+              "right": 1210.8854370117188,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 1220.885498046875,
+              "y": 189.2604217529297,
+              "width": 191.77084350585938,
+              "height": 104.32292175292969,
+              "right": 1412.6563415527344,
+              "bottom": 293.5833435058594
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 228,
+        "y": 118,
+        "width": 72,
+        "height": 27.89583396911621,
+        "right": 300,
+        "bottom": 145.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/assets",
+      "width": 1920,
+      "height": 1080,
+      "availableWidth": 1905,
+      "documentWidth": 1905,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.assets-kpis",
+          "columns": 6,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 212,
+              "y": 189.2604217529297,
+              "width": 271.7708435058594,
+              "height": 104.32292175292969,
+              "right": 483.7708435058594,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 493.7708435058594,
+              "y": 189.2604217529297,
+              "width": 271.78125,
+              "height": 104.32292175292969,
+              "right": 765.5520935058594,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 775.5521240234375,
+              "y": 189.2604217529297,
+              "width": 271.7708435058594,
+              "height": 104.32292175292969,
+              "right": 1047.3229675292969,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 1057.322998046875,
+              "y": 189.2604217529297,
+              "width": 271.78125,
+              "height": 104.32292175292969,
+              "right": 1329.104248046875,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 1339.104248046875,
+              "y": 189.2604217529297,
+              "width": 271.78125,
+              "height": 104.32292175292969,
+              "right": 1610.885498046875,
+              "bottom": 293.5833435058594
+            },
+            {
+              "x": 1620.885498046875,
+              "y": 189.2604217529297,
+              "width": 271.7708435058594,
+              "height": 104.32292175292969,
+              "right": 1892.6563415527344,
+              "bottom": 293.5833435058594
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 228,
+        "y": 118,
+        "width": 72,
+        "height": 27.89583396911621,
+        "right": 300,
+        "bottom": 145.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/configurations",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 305,
+      "documentWidth": 305,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.configuration-summary",
+          "columns": 2,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 10,
+              "y": 375.35418701171875,
+              "width": 136.33334350585938,
+              "height": 81.03125,
+              "right": 146.33334350585938,
+              "bottom": 456.38543701171875
+            },
+            {
+              "x": 158.33334350585938,
+              "y": 375.35418701171875,
+              "width": 136.33334350585938,
+              "height": 81.03125,
+              "right": 294.66668701171875,
+              "bottom": 456.38543701171875
+            },
+            {
+              "x": 10,
+              "y": 468.38543701171875,
+              "width": 136.33334350585938,
+              "height": 108.09375,
+              "right": 146.33334350585938,
+              "bottom": 576.4791870117188
+            },
+            {
+              "x": 158.33334350585938,
+              "y": 468.38543701171875,
+              "width": 136.33334350585938,
+              "height": 108.09375,
+              "right": 294.66668701171875,
+              "bottom": 576.4791870117188
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 26,
+        "y": 226,
+        "width": 252.6666717529297,
+        "height": 27.89583396911621,
+        "right": 278.6666717529297,
+        "bottom": 253.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/configurations",
+      "width": 390,
+      "height": 844,
+      "availableWidth": 375,
+      "documentWidth": 375,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.configuration-summary",
+          "columns": 2,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 10,
+              "y": 375.35418701171875,
+              "width": 171.33334350585938,
+              "height": 81.03125,
+              "right": 181.33334350585938,
+              "bottom": 456.38543701171875
+            },
+            {
+              "x": 193.33334350585938,
+              "y": 375.35418701171875,
+              "width": 171.33334350585938,
+              "height": 81.03125,
+              "right": 364.66668701171875,
+              "bottom": 456.38543701171875
+            },
+            {
+              "x": 10,
+              "y": 468.38543701171875,
+              "width": 171.33334350585938,
+              "height": 108.09375,
+              "right": 181.33334350585938,
+              "bottom": 576.4791870117188
+            },
+            {
+              "x": 193.33334350585938,
+              "y": 468.38543701171875,
+              "width": 171.33334350585938,
+              "height": 108.09375,
+              "right": 364.66668701171875,
+              "bottom": 576.4791870117188
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 26,
+        "y": 226,
+        "width": 322.66668701171875,
+        "height": 27.89583396911621,
+        "right": 348.66668701171875,
+        "bottom": 253.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/configurations",
+      "width": 600,
+      "height": 800,
+      "availableWidth": 585,
+      "documentWidth": 585,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.configuration-summary",
+          "columns": 2,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 10,
+              "y": 354.9583435058594,
+              "width": 276.3333435058594,
+              "height": 81.03125,
+              "right": 286.3333435058594,
+              "bottom": 435.9895935058594
+            },
+            {
+              "x": 298.3333435058594,
+              "y": 354.9583435058594,
+              "width": 276.3333435058594,
+              "height": 81.03125,
+              "right": 574.6666870117188,
+              "bottom": 435.9895935058594
+            },
+            {
+              "x": 10,
+              "y": 447.9895935058594,
+              "width": 276.3333435058594,
+              "height": 108.09375,
+              "right": 286.3333435058594,
+              "bottom": 556.0833435058594
+            },
+            {
+              "x": 298.3333435058594,
+              "y": 447.9895935058594,
+              "width": 276.3333435058594,
+              "height": 108.09375,
+              "right": 574.6666870117188,
+              "bottom": 556.0833435058594
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 26,
+        "y": 226,
+        "width": 432,
+        "height": 27.89583396911621,
+        "right": 458,
+        "bottom": 253.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/configurations",
+      "width": 760,
+      "height": 800,
+      "availableWidth": 745,
+      "documentWidth": 745,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.configuration-summary",
+          "columns": 2,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 10,
+              "y": 298.9583435058594,
+              "width": 356.3333435058594,
+              "height": 81.03125,
+              "right": 366.3333435058594,
+              "bottom": 379.9895935058594
+            },
+            {
+              "x": 378.3333435058594,
+              "y": 298.9583435058594,
+              "width": 356.3333435058594,
+              "height": 81.03125,
+              "right": 734.6666870117188,
+              "bottom": 379.9895935058594
+            },
+            {
+              "x": 10,
+              "y": 391.9895935058594,
+              "width": 356.3333435058594,
+              "height": 108.09375,
+              "right": 366.3333435058594,
+              "bottom": 500.0833435058594
+            },
+            {
+              "x": 378.3333435058594,
+              "y": 391.9895935058594,
+              "width": 356.3333435058594,
+              "height": 108.09375,
+              "right": 734.6666870117188,
+              "bottom": 500.0833435058594
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 26,
+        "y": 226,
+        "width": 432,
+        "height": 27.89583396911621,
+        "right": 458,
+        "bottom": 253.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/configurations",
+      "width": 761,
+      "height": 800,
+      "availableWidth": 746,
+      "documentWidth": 746,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.configuration-summary",
+          "columns": 4,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 12,
+              "y": 194.95834350585938,
+              "width": 171.5,
+              "height": 108.09375,
+              "right": 183.5,
+              "bottom": 303.0520935058594
+            },
+            {
+              "x": 195.5,
+              "y": 194.95834350585938,
+              "width": 171.5,
+              "height": 108.09375,
+              "right": 367,
+              "bottom": 303.0520935058594
+            },
+            {
+              "x": 379,
+              "y": 194.95834350585938,
+              "width": 171.5,
+              "height": 108.09375,
+              "right": 550.5,
+              "bottom": 303.0520935058594
+            },
+            {
+              "x": 562.5,
+              "y": 194.95834350585938,
+              "width": 171.5,
+              "height": 108.09375,
+              "right": 734,
+              "bottom": 303.0520935058594
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 28,
+        "y": 122,
+        "width": 432,
+        "height": 27.89583396911621,
+        "right": 460,
+        "bottom": 149.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/configurations",
+      "width": 1024,
+      "height": 768,
+      "availableWidth": 1009,
+      "documentWidth": 1009,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.configuration-summary",
+          "columns": 4,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 12,
+              "y": 194.95834350585938,
+              "width": 237.1666717529297,
+              "height": 108.09375,
+              "right": 249.1666717529297,
+              "bottom": 303.0520935058594
+            },
+            {
+              "x": 261.16668701171875,
+              "y": 194.95834350585938,
+              "width": 237.1666717529297,
+              "height": 108.09375,
+              "right": 498.33335876464844,
+              "bottom": 303.0520935058594
+            },
+            {
+              "x": 510.3333435058594,
+              "y": 194.95834350585938,
+              "width": 237.1666717529297,
+              "height": 108.09375,
+              "right": 747.5000152587891,
+              "bottom": 303.0520935058594
+            },
+            {
+              "x": 759.5,
+              "y": 194.95834350585938,
+              "width": 237.1666717529297,
+              "height": 108.09375,
+              "right": 996.6666717529297,
+              "bottom": 303.0520935058594
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 28,
+        "y": 122,
+        "width": 432,
+        "height": 27.89583396911621,
+        "right": 460,
+        "bottom": 149.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/configurations",
+      "width": 1280,
+      "height": 720,
+      "availableWidth": 1265,
+      "documentWidth": 1265,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.configuration-summary",
+          "columns": 4,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 212,
+              "y": 190.95834350585938,
+              "width": 251.1666717529297,
+              "height": 108.09375,
+              "right": 463.1666717529297,
+              "bottom": 299.0520935058594
+            },
+            {
+              "x": 475.16668701171875,
+              "y": 190.95834350585938,
+              "width": 251.1666717529297,
+              "height": 108.09375,
+              "right": 726.3333587646484,
+              "bottom": 299.0520935058594
+            },
+            {
+              "x": 738.3333740234375,
+              "y": 190.95834350585938,
+              "width": 251.1666717529297,
+              "height": 108.09375,
+              "right": 989.5000457763672,
+              "bottom": 299.0520935058594
+            },
+            {
+              "x": 1001.5,
+              "y": 190.95834350585938,
+              "width": 251.1666717529297,
+              "height": 108.09375,
+              "right": 1252.6666717529297,
+              "bottom": 299.0520935058594
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 228,
+        "y": 118,
+        "width": 432,
+        "height": 27.89583396911621,
+        "right": 660,
+        "bottom": 145.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/configurations",
+      "width": 1440,
+      "height": 900,
+      "availableWidth": 1425,
+      "documentWidth": 1425,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.configuration-summary",
+          "columns": 4,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 212,
+              "y": 190.95834350585938,
+              "width": 291.16668701171875,
+              "height": 108.09375,
+              "right": 503.16668701171875,
+              "bottom": 299.0520935058594
+            },
+            {
+              "x": 515.1666870117188,
+              "y": 190.95834350585938,
+              "width": 291.16668701171875,
+              "height": 108.09375,
+              "right": 806.3333740234375,
+              "bottom": 299.0520935058594
+            },
+            {
+              "x": 818.3333740234375,
+              "y": 190.95834350585938,
+              "width": 291.16668701171875,
+              "height": 108.09375,
+              "right": 1109.5000610351562,
+              "bottom": 299.0520935058594
+            },
+            {
+              "x": 1121.5,
+              "y": 190.95834350585938,
+              "width": 291.16668701171875,
+              "height": 108.09375,
+              "right": 1412.6666870117188,
+              "bottom": 299.0520935058594
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 228,
+        "y": 118,
+        "width": 432,
+        "height": 27.89583396911621,
+        "right": 660,
+        "bottom": 145.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/configurations",
+      "width": 1920,
+      "height": 1080,
+      "availableWidth": 1905,
+      "documentWidth": 1905,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [
+        {
+          "element": "div.scope-card.feature-summary.configuration-summary",
+          "columns": 4,
+          "unevenRows": [],
+          "cards": [
+            {
+              "x": 212,
+              "y": 190.95834350585938,
+              "width": 411.16668701171875,
+              "height": 108.09375,
+              "right": 623.1666870117188,
+              "bottom": 299.0520935058594
+            },
+            {
+              "x": 635.1666870117188,
+              "y": 190.95834350585938,
+              "width": 411.16668701171875,
+              "height": 108.09375,
+              "right": 1046.3333740234375,
+              "bottom": 299.0520935058594
+            },
+            {
+              "x": 1058.3333740234375,
+              "y": 190.95834350585938,
+              "width": 411.16668701171875,
+              "height": 108.09375,
+              "right": 1469.5000610351562,
+              "bottom": 299.0520935058594
+            },
+            {
+              "x": 1481.5,
+              "y": 190.95834350585938,
+              "width": 411.16668701171875,
+              "height": 108.09375,
+              "right": 1892.6666870117188,
+              "bottom": 299.0520935058594
+            }
+          ]
+        }
+      ],
+      "heading": {
+        "x": 228,
+        "y": 118,
+        "width": 432,
+        "height": 27.89583396911621,
+        "right": 660,
+        "bottom": 145.8958339691162
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/dashboard",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 305,
+      "documentWidth": 305,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 26.666667938232422,
+        "y": 226.92709350585938,
+        "width": 64.40625,
+        "height": 24,
+        "right": 91.07291793823242,
+        "bottom": 250.92709350585938
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/dashboard",
+      "width": 390,
+      "height": 844,
+      "availableWidth": 375,
+      "documentWidth": 375,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 26.666667938232422,
+        "y": 226.92709350585938,
+        "width": 64.40625,
+        "height": 24,
+        "right": 91.07291793823242,
+        "bottom": 250.92709350585938
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/dashboard",
+      "width": 600,
+      "height": 800,
+      "availableWidth": 585,
+      "documentWidth": 585,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 26.666667938232422,
+        "y": 226.92709350585938,
+        "width": 64.40625,
+        "height": 24,
+        "right": 91.07291793823242,
+        "bottom": 250.92709350585938
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/dashboard",
+      "width": 760,
+      "height": 800,
+      "availableWidth": 745,
+      "documentWidth": 745,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 26.666667938232422,
+        "y": 226.92709350585938,
+        "width": 64.40625,
+        "height": 24,
+        "right": 91.07291793823242,
+        "bottom": 250.92709350585938
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/dashboard",
+      "width": 761,
+      "height": 800,
+      "availableWidth": 746,
+      "documentWidth": 746,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 28.666667938232422,
+        "y": 125.38542175292969,
+        "width": 64.40625,
+        "height": 24,
+        "right": 93.07291793823242,
+        "bottom": 149.3854217529297
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/dashboard",
+      "width": 1024,
+      "height": 768,
+      "availableWidth": 1009,
+      "documentWidth": 1009,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 28.666667938232422,
+        "y": 122.92708587646484,
+        "width": 64.40625,
+        "height": 24,
+        "right": 93.07291793823242,
+        "bottom": 146.92708587646484
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/dashboard",
+      "width": 1280,
+      "height": 720,
+      "availableWidth": 1265,
+      "documentWidth": 1265,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 228.6666717529297,
+        "y": 118.92708587646484,
+        "width": 64.40625,
+        "height": 24,
+        "right": 293.0729217529297,
+        "bottom": 142.92708587646484
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/dashboard",
+      "width": 1440,
+      "height": 900,
+      "availableWidth": 1425,
+      "documentWidth": 1425,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 228.6666717529297,
+        "y": 118.92708587646484,
+        "width": 64.40625,
+        "height": 24,
+        "right": 293.0729217529297,
+        "bottom": 142.92708587646484
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/dashboard",
+      "width": 1920,
+      "height": 1080,
+      "availableWidth": 1905,
+      "documentWidth": 1905,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 228.6666717529297,
+        "y": 118.92708587646484,
+        "width": 64.40625,
+        "height": 24,
+        "right": 293.0729217529297,
+        "bottom": 142.92708587646484
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 305,
+      "documentWidth": 305,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 24,
+        "y": 230,
+        "width": 108.60417175292969,
+        "height": 27,
+        "right": 132.6041717529297,
+        "bottom": 257
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 390,
+      "height": 844,
+      "availableWidth": 375,
+      "documentWidth": 375,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 24,
+        "y": 230,
+        "width": 108.60417175292969,
+        "height": 27,
+        "right": 132.6041717529297,
+        "bottom": 257
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 600,
+      "height": 800,
+      "availableWidth": 585,
+      "documentWidth": 585,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 24,
+        "y": 230,
+        "width": 108.60417175292969,
+        "height": 27,
+        "right": 132.6041717529297,
+        "bottom": 257
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 760,
+      "height": 800,
+      "availableWidth": 745,
+      "documentWidth": 745,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 24,
+        "y": 230,
+        "width": 108.60417175292969,
+        "height": 27,
+        "right": 132.6041717529297,
+        "bottom": 257
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 761,
+      "height": 800,
+      "availableWidth": 746,
+      "documentWidth": 746,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 28,
+        "y": 126.9375,
+        "width": 108.60417175292969,
+        "height": 27,
+        "right": 136.6041717529297,
+        "bottom": 153.9375
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 1024,
+      "height": 768,
+      "availableWidth": 1009,
+      "documentWidth": 1009,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 28,
+        "y": 126,
+        "width": 108.60417175292969,
+        "height": 27,
+        "right": 136.6041717529297,
+        "bottom": 153
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 1280,
+      "height": 720,
+      "availableWidth": 1265,
+      "documentWidth": 1265,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 228,
+        "y": 122,
+        "width": 108.60417175292969,
+        "height": 27,
+        "right": 336.6041717529297,
+        "bottom": 149
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 1440,
+      "height": 900,
+      "availableWidth": 1425,
+      "documentWidth": 1425,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 228,
+        "y": 122,
+        "width": 108.60417175292969,
+        "height": 27,
+        "right": 336.6041717529297,
+        "bottom": 149
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/network-monitoring",
+      "width": 1920,
+      "height": 1080,
+      "availableWidth": 1905,
+      "documentWidth": 1905,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 348.3333435058594,
+        "y": 122,
+        "width": 108.60417175292969,
+        "height": 27,
+        "right": 456.93751525878906,
+        "bottom": 149
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/tickets",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 305,
+      "documentWidth": 305,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 26.666667938232422,
+        "y": 226.6666717529297,
+        "width": 233.6979217529297,
+        "height": 28.791667938232422,
+        "right": 260.3645896911621,
+        "bottom": 255.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/tickets",
+      "width": 390,
+      "height": 844,
+      "availableWidth": 375,
+      "documentWidth": 375,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 26.666667938232422,
+        "y": 226.6666717529297,
+        "width": 233.6979217529297,
+        "height": 28.791667938232422,
+        "right": 260.3645896911621,
+        "bottom": 255.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/tickets",
+      "width": 600,
+      "height": 800,
+      "availableWidth": 585,
+      "documentWidth": 585,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 26.666667938232422,
+        "y": 226.6666717529297,
+        "width": 233.6979217529297,
+        "height": 28.791667938232422,
+        "right": 260.3645896911621,
+        "bottom": 255.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/tickets",
+      "width": 760,
+      "height": 800,
+      "availableWidth": 745,
+      "documentWidth": 745,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 26.666667938232422,
+        "y": 226.6666717529297,
+        "width": 233.6979217529297,
+        "height": 28.791667938232422,
+        "right": 260.3645896911621,
+        "bottom": 255.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/tickets",
+      "width": 761,
+      "height": 800,
+      "availableWidth": 746,
+      "documentWidth": 746,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 28.666667938232422,
+        "y": 122.66667175292969,
+        "width": 233.6979217529297,
+        "height": 28.791667938232422,
+        "right": 262.3645896911621,
+        "bottom": 151.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/tickets",
+      "width": 1024,
+      "height": 768,
+      "availableWidth": 1009,
+      "documentWidth": 1009,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 28.666667938232422,
+        "y": 122.66667175292969,
+        "width": 233.6979217529297,
+        "height": 28.791667938232422,
+        "right": 262.3645896911621,
+        "bottom": 151.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/tickets",
+      "width": 1280,
+      "height": 720,
+      "availableWidth": 1265,
+      "documentWidth": 1265,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 228.6666717529297,
+        "y": 118.66667175292969,
+        "width": 233.6979217529297,
+        "height": 28.791667938232422,
+        "right": 462.3645935058594,
+        "bottom": 147.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/tickets",
+      "width": 1440,
+      "height": 900,
+      "availableWidth": 1440,
+      "documentWidth": 1440,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 228.6666717529297,
+        "y": 118.66667175292969,
+        "width": 233.6979217529297,
+        "height": 28.791667938232422,
+        "right": 462.3645935058594,
+        "bottom": 147.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/tickets",
+      "width": 1920,
+      "height": 1080,
+      "availableWidth": 1920,
+      "documentWidth": 1920,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 228.6666717529297,
+        "y": 118.66667175292969,
+        "width": 233.6979217529297,
+        "height": 28.791667938232422,
+        "right": 462.3645935058594,
+        "bottom": 147.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/audit",
+      "width": 320,
+      "height": 720,
+      "availableWidth": 305,
+      "documentWidth": 305,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 25.666667938232422,
+        "y": 231.6666717529297,
+        "width": 253.33334350585938,
+        "height": 24.791667938232422,
+        "right": 279.0000114440918,
+        "bottom": 256.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/audit",
+      "width": 390,
+      "height": 844,
+      "availableWidth": 375,
+      "documentWidth": 375,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 25.666667938232422,
+        "y": 231.6666717529297,
+        "width": 323.3333435058594,
+        "height": 24.791667938232422,
+        "right": 349.0000114440918,
+        "bottom": 256.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/audit",
+      "width": 600,
+      "height": 800,
+      "availableWidth": 585,
+      "documentWidth": 585,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 25.666667938232422,
+        "y": 231.6666717529297,
+        "width": 396,
+        "height": 24.791667938232422,
+        "right": 421.6666679382324,
+        "bottom": 256.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/audit",
+      "width": 760,
+      "height": 800,
+      "availableWidth": 745,
+      "documentWidth": 745,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 28.666667938232422,
+        "y": 228.6666717529297,
+        "width": 396,
+        "height": 24.791667938232422,
+        "right": 424.6666679382324,
+        "bottom": 253.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/audit",
+      "width": 761,
+      "height": 800,
+      "availableWidth": 746,
+      "documentWidth": 746,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 30.666667938232422,
+        "y": 127.10417175292969,
+        "width": 396,
+        "height": 24.791667938232422,
+        "right": 426.6666679382324,
+        "bottom": 151.8958396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/audit",
+      "width": 1024,
+      "height": 768,
+      "availableWidth": 1009,
+      "documentWidth": 1009,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 30.666667938232422,
+        "y": 124.66667175292969,
+        "width": 396,
+        "height": 24.791667938232422,
+        "right": 426.6666679382324,
+        "bottom": 149.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/audit",
+      "width": 1280,
+      "height": 720,
+      "availableWidth": 1265,
+      "documentWidth": 1265,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 230.6666717529297,
+        "y": 120.66667175292969,
+        "width": 396,
+        "height": 24.791667938232422,
+        "right": 626.6666717529297,
+        "bottom": 145.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/audit",
+      "width": 1440,
+      "height": 900,
+      "availableWidth": 1425,
+      "documentWidth": 1425,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 230.6666717529297,
+        "y": 120.66667175292969,
+        "width": 396,
+        "height": 24.791667938232422,
+        "right": 626.6666717529297,
+        "bottom": 145.4583396911621
+      },
+      "apiErrorVisible": false
+    },
+    {
+      "path": "/audit",
+      "width": 1920,
+      "height": 1080,
+      "availableWidth": 1905,
+      "documentWidth": 1905,
+      "pageOverflow": false,
+      "outsideControls": [],
+      "clippedButtonLabels": [],
+      "wrappedButtons": [],
+      "overlaps": [],
+      "overflowElements": [],
+      "cardAlignment": [],
+      "heading": {
+        "x": 230.6666717529297,
+        "y": 120.66667175292969,
+        "width": 396,
+        "height": 24.791667938232422,
+        "right": 626.6666717529297,
+        "bottom": 145.4583396911621
+      },
+      "apiErrorVisible": false
+    }
+  ]
+}

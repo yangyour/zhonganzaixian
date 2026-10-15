@@ -1,0 +1,16 @@
+{
+  "verified_at": "2026-10-15T02:15:42.170Z",
+  "build_id": "a1579bacb084577601ac8ae88c02d68055047ae4a2a65f0a7edb58ec84a42464",
+  "tests": 41,
+  "checks": [
+    "1024 uses drawer navigation and full content width",
+    "active module opens drawer at tablet width",
+    "1025 closes drawer and restores visible desktop focus",
+    "desktop sidebar collapse triggers content reflow",
+    "760/761 and 390 resize preserve aligned cards",
+    "returning to desktop preserves collapsed preference"
+  ],
+  "page_errors": [],
+  "business_writes": [],
+  "prior_layout_matrix": "shell.json"
+}

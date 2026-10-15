@@ -58,6 +58,12 @@
 @media (min-width: 1600px) { .primary-nav-link { padding-inline: 20px; font-size: 14px; } }
 @media (max-width: 1250px) { .horizontal-shell .identity > div { display: none; }.horizontal-shell .topbar { gap: 8px; }.horizontal-shell .topbar-controls { padding-left: 8px; gap: 4px; }.primary-nav-link { padding-inline: 10px; }.context-controls { gap: 8px; } }
 @media (max-width: 980px) { .horizontal-shell .topbar .brand { flex-basis: 164px; }.horizontal-shell .brand strong { font-size: 13px; }.horizontal-shell .brand small { font-size: 9px; }.horizontal-shell .page-context { flex-wrap: wrap; gap: 8px; }.horizontal-shell .identity { display: none; }.horizontal-shell .tenant-select { width: 145px !important; }.environment-label { font-size: 10px; } }
+/* A permanent sidebar leaves too little working space on tablets and small windows. */
+@media (max-width: 1024px) {
+  .horizontal-shell, .horizontal-shell.sidebar-collapsed { --workspace-sidebar-width: 0px; }
+  .workspace-sidebar, .desktop-sidebar-toggle { display: none; }
+  .mobile-sidebar-toggle { display: grid; width: 40px; height: 40px; }
+}
 @media (max-width: 760px) {
   .horizontal-shell { --workspace-sidebar-width: 0px; --workspace-header-height: 102px; }
   .horizontal-shell.sidebar-collapsed { --workspace-sidebar-width: 0px; }

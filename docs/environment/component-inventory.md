@@ -394,3 +394,6 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 2026-10-14 长文本界面与列表打磨复用 lan-test-20261008 真实API，本机回环生产前端预览；实际ready接口HTTP200、ready=true、production_ready=false。没有新增基础组件或依赖、迁移、服务重启、业务写入及替代响应。本轮组件版本未重新盘点，不沿用历史版本冒充本轮证据，功能和UI证据见[长文本交互](../reference-ux-textareas-20261014.md)。
 
 2026-10-14 reference-ux前端已按用户授权发布到lan-test-20261008。14个项目服务运行；Web切换之外13服务ID/镜像/启动时间/重启计数保持一致，API、Worker和基础组件均未更新，无迁移。公开91静态文件摘要一致，真实入口11项检查/12个页面视口、ready=true验证通过，production_ready=false保留。见[最终快照](../evidence/reference-ux-20261014/components-final.json)及[部署](../evidence/reference-ux-20261014/frontend-deployment.json)。
+# 2026-10-15 前端验收规范复用盘点
+
+通过既有固定主机密钥SSH只读盘点指定LAN测试环境：14个项目服务运行，PostgreSQL17.9、Nginx1.31.6、Redis7.4.9、RabbitMQ4.3.2、MinIO RELEASE.2025-09-07T16-13-09Z、Zabbix7.0.31。API ready=true、production_ready=false。本轮本地前端经回环预览访问既有项目API；无新增组件、迁移、服务生命周期或全局配置变更。组件在线不表示业务/生产验收。见[盘点证据](../evidence/frontend-acceptance-20261015/components.json)。

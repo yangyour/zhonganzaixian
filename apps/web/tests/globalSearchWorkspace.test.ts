@@ -26,7 +26,16 @@ describe('minimal grouped search workspace',()=>{
  it('disposal cancels requests and invalid context makes no query',async()=>{const {workspace,client}=setup();workspace.dispose();workspace.reset(context);workspace.change('literal');expect(await workspace.search()).toBe(false);expect(client.request).not.toHaveBeenCalled();const second=setup();second.workspace.reset({...context,role:'unknown'});second.workspace.change('literal');expect(await second.workspace.search()).toBe(false)})
  it('state copies cannot mutate displayed authorized data',async()=>{const {workspace}=setup();await workspace.search();workspace.state().result!.groups[0].items[0]!.name='changed';expect(workspace.state().result!.groups[0].items[0]!.name).toBe('literal')})
  it('destinations are only typed in-app asset or ticket IDs',()=>{expect(searchDestination('assets',id(3))).toEqual({name:'assets',query:{asset_id:id(3)}});expect(searchDestination('tickets',id(4))).toEqual({name:'tickets',query:{ticket_id:id(4)}});expect(()=>searchDestination('assets','https://example.com')).toThrow();expect(()=>searchDestination('scripts' as 'assets',id(3))).toThrow()})
- it('slash focuses only outside editable elements and ignores IME or modifiers',()=>{expect(shouldFocusGlobalSearch({key:'/',target:{tagName:'BUTTON'}})).toBe(true);for(const target of [{tagName:'INPUT'},{tagName:'textarea'},{tagName:'SELECT'},{isContentEditable:true}])expect(shouldFocusGlobalSearch({key:'/',target})).toBe(false);for(const flag of ['ctrlKey','altKey','metaKey','repeat','isComposing','defaultPrevented'])expect(shouldFocusGlobalSearch({key:'/',[flag]:true})).toBe(false);expect(shouldFocusGlobalSearch({key:'a'})).toBe(false)})
+ it('requires Control or Meta K and never consumes a bare character shortcut',()=>{
+  expect(shouldFocusGlobalSearch({key:'k',ctrlKey:true})).toBe(true)
+  expect(shouldFocusGlobalSearch({key:'K',metaKey:true})).toBe(true)
+  for(const key of ['/','k','a'])expect(shouldFocusGlobalSearch({key})).toBe(false)
+  expect(shouldFocusGlobalSearch({key:'k',ctrlKey:true,metaKey:true})).toBe(false)
+ })
+ it('keeps editing, IME and already-handled keyboard input in its original control',()=>{
+  for(const target of [{tagName:'INPUT'},{tagName:'textarea'},{tagName:'SELECT'},{isContentEditable:true},{closest:()=>({})}])expect(shouldFocusGlobalSearch({key:'k',ctrlKey:true,target})).toBe(false)
+  for(const flag of ['altKey','shiftKey','repeat','isComposing','defaultPrevented'])expect(shouldFocusGlobalSearch({key:'k',ctrlKey:true,[flag]:true})).toBe(false)
+ })
  it('full groups may expose overflow but never a fabricated total',()=>{const r=result();r.groups[0].items=Array.from({length:5},(_,i)=>asset(20+i));r.groups[0].returned=5;r.groups[0].has_more=true;expect(readGroupedSearch(r,context,'literal').groups[0].has_more).toBe(true);expect(()=>readGroupedSearch({...r,total:100},context,'literal')).toThrow()})
  it('header and dialog wiring handles dismissal cleanup failed navigation and responsive UI',()=>{const source=readFileSync(new URL('../src/components/GlobalSearch.vue',import.meta.url),'utf8');for(const text of ['没有找到可查看的匹配资产','事件、自动化脚本和通知提醒尚未接入','本搜索不执行脚本','window.removeEventListener',"flush:'sync'",'NavigationFailureType.duplicated',':close-on-press-escape="!navigating"','关闭并清除搜索','@media(max-width:700px)','min-height:44px'])expect(source).toContain(text);expect(readFileSync(new URL('../src/App.vue',import.meta.url),'utf8')).toContain('<GlobalSearch v-if="can(\'search:read\')" />')})
 })

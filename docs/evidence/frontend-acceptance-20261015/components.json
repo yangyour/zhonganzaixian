@@ -1,0 +1,20 @@
+{
+  "verified_at": "2026-10-15T01:21:38.207Z",
+  "environment": "lan-test-20261008",
+  "probe": "read-only SSH with existing fixed host key; version commands and project docker ps",
+  "running_project_services": 14,
+  "versions": {
+    "postgresql": "17.9",
+    "nginx": "1.31.6",
+    "redis": "7.4.9",
+    "rabbitmq": "4.3.2",
+    "minio": "RELEASE.2025-09-07T16-13-09Z",
+    "zabbix": "7.0.31"
+  },
+  "ready": true,
+  "production_ready": false,
+  "new_components": 0,
+  "service_mutations": 0,
+  "business_mutations": 0,
+  "credentials_recorded": false
+}

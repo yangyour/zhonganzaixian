@@ -29,10 +29,11 @@ export function readGroupedSearch(v:unknown,context:SearchContext,query:string):
  });return copy(v) as unknown as GroupedSearch
 }
 export function searchDestination(kind:'assets'|'tickets',id:string){if(!['assets','tickets'].includes(kind)||!uuid.test(id))throw bad();return kind==='assets'?{name:'assets',query:{asset_id:id}}:{name:'tickets',query:{ticket_id:id}}}
-export function shouldFocusGlobalSearch(event:{key:string;ctrlKey?:boolean;altKey?:boolean;metaKey?:boolean;repeat?:boolean;isComposing?:boolean;defaultPrevented?:boolean;target?:unknown}):boolean{
- if(event.key!=='/'||event.ctrlKey||event.altKey||event.metaKey||event.repeat||event.isComposing||event.defaultPrevented)return false
- const target=event.target as {tagName?:string;isContentEditable?:boolean}|null
- return !target?.isContentEditable&&!['INPUT','TEXTAREA','SELECT'].includes(typeof target?.tagName==='string'?target.tagName.toUpperCase():'')
+export function shouldFocusGlobalSearch(event:{key:string;ctrlKey?:boolean;altKey?:boolean;metaKey?:boolean;shiftKey?:boolean;repeat?:boolean;isComposing?:boolean;defaultPrevented?:boolean;target?:unknown}):boolean{
+ // WCAG 2.1.4: use a non-character modifier instead of an always-on bare slash.
+ if(event.key.toLowerCase()!=='k'||!(event.ctrlKey||event.metaKey)||event.ctrlKey&&event.metaKey||event.altKey||event.shiftKey||event.repeat||event.isComposing||event.defaultPrevented)return false
+ const target=event.target as {tagName?:string;isContentEditable?:boolean;closest?:(selector:string)=>unknown}|null
+ return !target?.isContentEditable&&!['INPUT','TEXTAREA','SELECT'].includes(typeof target?.tagName==='string'?target.tagName.toUpperCase():'')&&!target?.closest?.('[contenteditable]:not([contenteditable="false"]), [role="textbox"], [role="dialog"], [role="alertdialog"], [aria-modal="true"]')
 }
 export function createGlobalSearchWorkspace(client:Pick<ApiClient,'request'>,notify:(state:SearchState)=>void){
  let context:SearchContext|null=null,generation=0,controller:AbortController|null=null,disposed=false

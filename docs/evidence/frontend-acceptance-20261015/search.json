@@ -1,0 +1,65 @@
+{
+  "verified_at": "2026-10-15T01:22:28.148Z",
+  "environment": "lan-test-20261008",
+  "build_id": "f34e50f681d8ca0634d4264afe533cef22fc005dc251b40d30d3f1ff81625d14",
+  "browser": "155.0.4283.45",
+  "checks": [
+    "bare slash does not open search",
+    "Control K opens and focuses search",
+    "real API no-match result preserves partial-source boundaries",
+    "Tab and Shift Tab remain in search modal after focus settling",
+    "Escape restores search trigger focus",
+    "existing dialog keeps shortcut priority",
+    "slash remains editable text",
+    "search controls clickable and dialog fits four viewport sizes",
+    "final build keyboard open, Tab, Shift Tab, Escape and focus return"
+  ],
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 760,
+      "top": 24,
+      "bottom": 736,
+      "footerBottom": 712,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "height": 800,
+      "top": 24,
+      "bottom": 776,
+      "footerBottom": 752,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "top": 12,
+      "bottom": 832,
+      "footerBottom": 814,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "height": 720,
+      "top": 12,
+      "bottom": 708,
+      "footerBottom": 690,
+      "overflow": false
+    }
+  ],
+  "page_errors": [],
+  "business_writes": [],
+  "unit_tests": 27,
+  "build": "PASS",
+  "iterations": [
+    "waited for Element Plus focus transitions before assertions",
+    "fixed header stacking by append-to-body",
+    "fixed mobile margin rule overriding dialog bounds"
+  ],
+  "limitations": [
+    "physical IME and device not tested",
+    "Meta K predicate unit tested on Windows; physical Mac not tested",
+    "not a production or full WCAG certification"
+  ]
+}

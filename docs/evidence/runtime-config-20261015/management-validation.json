@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-15",
+  "web_passed": 2157,
+  "java_reported": 2756,
+  "java_executed": 1874,
+  "java_skipped": 882,
+  "java_failed": 0,
+  "designated_postgres_tests": 6,
+  "contract_passed": 134,
+  "http_requests": 40,
+  "http_run_id": "e7de0e01-89bb-44ba-9950-d60c03684398",
+  "candidate_only": true,
+  "production_approved": false
+}

@@ -1,3 +1,4 @@
+import { addRuntimeConfigurationContract } from './runtime-configuration-contract.mjs';
 import { addExportInboxContract } from './export-inbox-contract.mjs';
 import { addFirewallResourcesContract } from './firewall-resources-contract.mjs';
 import { addProjectIdentityContract } from './project-identity-contract.mjs';
@@ -918,6 +919,7 @@ addNetworkMonitoringContract(contract);
 addExportPublicationContract(contract);
 addExportInboxContract(contract);
 addFirewallResourcesContract(contract);
+addRuntimeConfigurationContract(contract);
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

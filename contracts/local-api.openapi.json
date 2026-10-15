@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.49.0",
+    "version": "0.50.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -3606,7 +3606,7 @@
           "key"
         ],
         "x-mop-reject-duplicate-query-keys": true,
-        "description": "拒绝额外或重复query，客户端不能提供tenant、对象scope、precedence或核验事实。未知key404、无权403、失效会话401、PG不可用503。授权、登记版本及本租户最多5条近期提案来自一个只读REPEATABLE READ快照；后续提交在下一请求可见。近期提案不是选中的有效版本，APPROVED也未发布。运行定义、发布及客户核验能力明确NOT_IMPLEMENTED/null，不以空集合冒充已接入；不返回原值、旧草稿、提案、意见或资料正文。",
+        "description": "历史设计登记兼容接口；实际运行值与发布使用/runtime-configurations。拒绝额外或重复query，客户端不能提供tenant、对象scope、precedence或核验事实。未知key404、无权403、失效会话401、PG不可用503。授权、登记版本及本租户最多5条近期提案来自一个只读REPEATABLE READ快照；后续提交在下一请求可见。近期提案不是选中的有效版本，APPROVED也未发布。运行定义、发布及客户核验能力明确NOT_IMPLEMENTED/null，不以空集合冒充已接入；不返回原值、旧草稿、提案、意见或资料正文。",
         "responses": {
           "200": {
             "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
@@ -3738,7 +3738,8 @@
               }
             }
           }
-        }
+        },
+        "deprecated": true
       }
     },
     "/configurations/{key}/draft": {
@@ -4111,7 +4112,9 @@
               }
             }
           }
-        }
+        },
+        "deprecated": true,
+        "description": "历史设计登记兼容接口；实际运行值与发布使用/runtime-configurations。"
       }
     },
     "/configurations/{key}/revisions": {
@@ -28844,6 +28847,625 @@
           }
         }
       }
+    },
+    "/runtime-configurations/catalog": {
+      "get": {
+        "operationId": "runtimeConfigurationCatalog",
+        "responses": {
+          "200": {
+            "description": "真实配置目录或运行发布记录；测试发布不等于客户生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuntimeConfigurationCatalog"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/runtime-configurations/{key}": {
+      "get": {
+        "operationId": "readRuntimeConfiguration",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "真实配置目录或运行发布记录；测试发布不等于客户生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuntimeConfigurationCurrent"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/runtime-configurations/{key}/history": {
+      "get": {
+        "operationId": "runtimeConfigurationHistory",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "before_version",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740990
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "真实配置目录或运行发布记录；测试发布不等于客户生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "maxItems": 25,
+                          "items": {
+                            "$ref": "#/components/schemas/RuntimeConfigurationRelease"
+                          }
+                        },
+                        "page_size": {
+                          "const": 25
+                        },
+                        "source": {
+                          "const": "postgresql"
+                        }
+                      },
+                      "required": [
+                        "items",
+                        "page_size",
+                        "source"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "trace_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "trace_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/runtime-configurations/{key}/validate": {
+      "post": {
+        "operationId": "validateRuntimeConfiguration",
+        "x-mop-read-only": true,
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "value": {}
+                },
+                "required": [
+                  "value"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "真实配置目录或运行发布记录；测试发布不等于客户生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "configuration_key": {
+                          "type": "string"
+                        },
+                        "valid": {
+                          "const": true
+                        },
+                        "definition_hash": {
+                          "type": "string"
+                        },
+                        "saved": {
+                          "const": false
+                        }
+                      },
+                      "required": [
+                        "configuration_key",
+                        "valid",
+                        "definition_hash",
+                        "saved"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "trace_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "trace_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/runtime-configurations/{key}/releases": {
+      "post": {
+        "operationId": "publishRuntimeConfiguration",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuntimeConfigurationCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "真实配置目录或运行发布记录；测试发布不等于客户生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RuntimeConfigurationRelease"
+                    },
+                    "trace_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "trace_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -29878,6 +30500,26 @@
                   "external_delivery"
                 ],
                 "additionalProperties": false
+              },
+              "runtime_configurations": {
+                "type": "object",
+                "properties": {
+                  "schema_access_ready": {
+                    "type": "boolean"
+                  },
+                  "scope": {
+                    "const": "CURRENT_TENANT"
+                  },
+                  "customer_confirmation_status": {
+                    "const": "UNVERIFIED"
+                  }
+                },
+                "required": [
+                  "schema_access_ready",
+                  "scope",
+                  "customer_confirmation_status"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -29907,7 +30549,8 @@
               "capacity_scenarios",
               "customer_contacts",
               "asset_exports",
-              "own_notification_preferences"
+              "own_notification_preferences",
+              "runtime_configurations"
             ],
             "additionalProperties": false
           },
@@ -56662,6 +57305,431 @@
         "required": [
           "data",
           "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "RuntimeConfigurationRelease": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "configuration_key": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "action": {
+            "enum": [
+              "PUBLISH",
+              "ROLLBACK",
+              "DISABLE"
+            ]
+          },
+          "revision_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "revision_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "target_release_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "value": {},
+          "definition_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "environment": {
+            "const": "remote_test"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT"
+          },
+          "effective_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "published_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "published_permission_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "customer_confirmation_status": {
+            "const": "UNVERIFIED"
+          },
+          "production_approved": {
+            "const": false
+          },
+          "source": {
+            "const": "postgresql"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "configuration_key",
+          "version",
+          "action",
+          "revision_id",
+          "revision_version",
+          "target_release_id",
+          "value",
+          "definition_hash",
+          "environment",
+          "scope",
+          "effective_at",
+          "expires_at",
+          "published_by",
+          "published_permission_version",
+          "published_at",
+          "reason",
+          "customer_confirmation_status",
+          "production_approved",
+          "source"
+        ],
+        "additionalProperties": false
+      },
+      "RuntimeConfigurationCurrent": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "configuration_key": {
+                "type": "string"
+              },
+              "environment": {
+                "const": "remote_test"
+              },
+              "scope": {
+                "const": "CURRENT_TENANT"
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "latest_version": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              "definition_hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "status": {
+                "enum": [
+                  "UNCONFIGURED",
+                  "SCHEDULED",
+                  "ACTIVE",
+                  "DISABLED",
+                  "EXPIRED",
+                  "DEFINITION_CHANGED"
+                ]
+              },
+              "effective_value": {},
+              "selected_release": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/RuntimeConfigurationRelease"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "customer_confirmation_status": {
+                "const": "UNVERIFIED"
+              },
+              "production_approved": {
+                "const": false
+              }
+            },
+            "required": [
+              "tenant_id",
+              "configuration_key",
+              "environment",
+              "scope",
+              "observed_at",
+              "latest_version",
+              "definition_hash",
+              "status",
+              "effective_value",
+              "selected_release",
+              "source",
+              "customer_confirmation_status",
+              "production_approved"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "RuntimeConfigurationDefinition": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "integer",
+              "number",
+              "boolean",
+              "string",
+              "object",
+              "array"
+            ]
+          },
+          "scope": {
+            "type": "string"
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "allowed_range": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "contract_value_kind": {
+            "type": "string"
+          },
+          "question_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "editable": {
+            "type": "boolean"
+          },
+          "schema_version": {
+            "const": 1
+          },
+          "definition_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "schema": {
+            "type": "object"
+          },
+          "registered_value": {},
+          "runtime_scope": {
+            "const": "CURRENT_TENANT"
+          },
+          "customer_confirmation_status": {
+            "const": "UNVERIFIED"
+          }
+        },
+        "required": [
+          "key",
+          "description",
+          "type",
+          "scope",
+          "unit",
+          "allowed_range",
+          "contract_value_kind",
+          "question_ids",
+          "source",
+          "editable",
+          "schema_version",
+          "definition_hash",
+          "schema",
+          "registered_value",
+          "runtime_scope",
+          "customer_confirmation_status"
+        ],
+        "additionalProperties": false
+      },
+      "RuntimeConfigurationCatalog": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RuntimeConfigurationDefinition"
+                }
+              },
+              "question_count": {
+                "const": 31
+              },
+              "source": {
+                "const": "code_catalog"
+              },
+              "scope": {
+                "const": "CURRENT_TENANT"
+              },
+              "production_approved": {
+                "const": false
+              }
+            },
+            "required": [
+              "items",
+              "question_count",
+              "source",
+              "scope",
+              "production_approved"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "RuntimeConfigurationCommand": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "expected_definition_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "action": {
+            "enum": [
+              "PUBLISH",
+              "ROLLBACK",
+              "DISABLE"
+            ]
+          },
+          "revision_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "revision_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "target_release_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "activation": {
+            "enum": [
+              "IMMEDIATE",
+              "SCHEDULED"
+            ]
+          },
+          "effective_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "expected_version",
+          "expected_definition_hash",
+          "action",
+          "revision_id",
+          "revision_version",
+          "target_release_id",
+          "activation",
+          "effective_at",
+          "expires_at",
+          "reason"
         ],
         "additionalProperties": false
       }

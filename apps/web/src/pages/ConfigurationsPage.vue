@@ -94,21 +94,6 @@ watch([contextGeneration, () => session.value?.tenant.id, () => session.value?.u
   () => session.value?.permission_version, () => session.value?.account_version, () => can('configurations:write'), switchingTenant],
 () => { const value = session.value; draftWriter.reset(value && value.user.role === 'padmin' && can('configurations:write') && !switchingTenant.value ? { tenantId: value.tenant.id, actorId: value.user.id, permissionVersion: value.permission_version } : null); editing.value = null; proposed.value = ''; initialProposed.value = ''; validationError.value = '' }, { immediate: true, flush: 'sync' })
 onUnmounted(() => { unregisterDraftGuard(); window.removeEventListener('beforeunload', draftBeforeUnload); draftWriter.dispose() })
-const publishing = ref<Configuration | null>(null)
-const publishOpen = computed({ get: () => Boolean(publishing.value), set: value => { if (!value) publishing.value = null } })
-const publishError = ref<unknown>(null)
-const checking = ref(false)
-function openPublish(item: Configuration) { closeDiagnostic(); publishing.value = item; publishError.value = null }
-async function publish() {
-  if (!publishing.value) return
-  checking.value = true; publishError.value = null
-  try {
-    await api.request(`/configurations/${encodeURIComponent(publishing.value.key)}/publish`, { method: 'POST', body: { expected_version: publishing.value.version }, signal: controller.signal })
-    // This local API currently always blocks publication. If the contract changes, re-read facts.
-    await load(); publishing.value = null
-  } catch (cause) { if (!isCancelled(cause)) publishError.value = cause }
-  finally { checking.value = false }
-}
 const showConflict = computed(() => editError.value instanceof ApiError && editError.value.status === 409)
 const revisionsOpen = ref(false)
 const revisionConfiguration = ref<Configuration | null>(null)
@@ -156,7 +141,7 @@ const diagnosticPermitted = computed(() => session.value?.user.role === 'padmin'
 const diagnosticContext = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version, can('configurations:read'), switchingTenant.value]))
 function closeDiagnostic() { ++diagnosticOpenGeneration; diagnosticOpen.value = false; diagnosticKey.value = '' }
 function hasPendingWritePanel() {
-  return Boolean(editing.value || publishing.value || saving.value || checking.value
+  return Boolean(editing.value || saving.value
     || (revisionsOpen.value && (!revisionPanel.value || !revisionPanel.value.canCloseForReadPanel())))
 }
 async function openDiagnostic(item: Configuration) {
@@ -177,8 +162,8 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
 
     <WorkingCalendarReader v-model="calendarOpen" />
     <el-alert v-if="draftState.receipt" type="success" :closable="false" :title="'设计登记原请求已确认：' + draftState.receipt.key + ' · v' + draftState.receipt.version + '；只是旧建议草稿，未生效'" />
-    <div class="scope-card feature-summary configuration-summary"><div><span class="small-label">登记项</span><strong>{{ countsUnknown ? '—' : rows.length }} <small>项</small></strong></div><div><span class="small-label">待客户确认</span><strong>{{ countsUnknown ? '—' : pendingCount }} <small>项</small></strong></div><div><span class="small-label">草稿版本</span><strong>{{ countsUnknown ? '—' : draftCount }} <small>项</small></strong></div><div><span class="small-label">运行配置</span><strong class="configuration-pending-label">未启用</strong><small>待确认项保留 null</small></div></div>
-    <el-alert class="page-note" type="warning" :closable="false" show-icon title="配置修订支持证据引用与内部审批；证据未核验，客户确认与外部下发仍待接入，内部审批通过后尚未生效。" />
+    <div class="scope-card feature-summary configuration-summary"><div><span class="small-label">登记项</span><strong>{{ countsUnknown ? '—' : rows.length }} <small>项</small></strong></div><div><span class="small-label">待客户确认</span><strong>{{ countsUnknown ? '—' : pendingCount }} <small>项</small></strong></div><div><span class="small-label">草稿版本</span><strong>{{ countsUnknown ? '—' : draftCount }} <small>项</small></strong></div><div><span class="small-label">运行发布</span><router-link to="/runtime-configurations">查看当前租户配置</router-link><small>与原设计登记独立保存</small></div></div>
+    <el-alert class="page-note" type="warning" :closable="false" show-icon title="此页维护设计登记和内部提案；实际运行发布、回滚与有效值请进入运行配置与发布。客户生产确认和外部执行单独核验。" />
     <div class="panel configuration-register"><nav class="feature-tabs" aria-label="配置工作区"><button type="button" :class="{active:!filters.pending_only}" @click="filters.pending_only=false">全部登记</button><button type="button" :class="{active:filters.pending_only}" @click="filters.pending_only=true">待客户确认 <span>{{ countsUnknown ? '—' : pendingCount }}</span></button><router-link to="/threshold-diagnostics">阈值候选诊断</router-link><button type="button" :disabled="!can('configurations:read') || switchingTenant" @click="calendarOpen=true">工作日历草稿查询与试算</button></nav><div class="panel-heading configuration-register-heading"><h2>配置登记与修订</h2><span>已登记内容 / 建议草稿 / 生效值分别核对</span></div><ApiErrorNotice :error="error"><el-button size="small" @click="load">重试</el-button></ApiErrorNotice>
       <el-form class="configuration-filters" label-position="top" @submit.prevent>
         <el-form-item label="配置键（config_key）"><el-input v-model="filters.config_key" clearable placeholder="按配置键查找" aria-label="筛选配置键" /></el-form-item>
@@ -192,12 +177,12 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
       <AppTable :error="error" :rows="filteredRows" :loading="loading" row-key="key" :empty-text="error ? '登记表加载失败，请重试' : rows.length ? '暂无符合筛选条件的登记项' : '暂无配置登记项'">
       <el-table-column label="配置项" min-width="210"><template #default="{ row }"><strong class="configuration-name">{{ configurationMetadataLabel(row.description, '配置描述') }}</strong><span class="cell-sub mono">{{ row.key }}</span></template></el-table-column>
       <el-table-column label="登记作用域 / 类型" min-width="120"><template #default="{ row }">{{ configurationMetadataLabel(row.scope, '作用域') }}<span class="cell-sub">{{ configurationMetadataLabel(row.type, '类型') }}<template v-if="row.unit !== null && row.unit !== undefined"> · {{ configurationMetadataLabel(row.unit, '单位') }}</template> · 非影响对象清单</span></template></el-table-column>
-      <el-table-column label="登记 / 合同值" min-width="130"><template #default="{ row }"><span :class="{ muted: row.registered_value === null }">{{ displayValue(row.registered_value) }}</span><span class="cell-sub">{{ configurationMetadataLabel(row.source, '来源') }} · 未运行激活</span></template></el-table-column>
+      <el-table-column label="登记 / 合同值" min-width="130"><template #default="{ row }"><span :class="{ muted: row.registered_value === null }">{{ displayValue(row.registered_value) }}</span><span class="cell-sub">{{ configurationMetadataLabel(row.source, '来源') }} · 设计登记来源</span></template></el-table-column>
       <el-table-column label="确认状态" min-width="130"><template #default="{ row }"><el-tag :type="row.decision_status === 'pending' ? 'warning' : 'info'">{{ row.decision_status === 'pending' ? '待客户确认' : row.decision_status === 'contract_fixed' ? '合同有据' : row.decision_status === 'confirmed' ? '已确认' : configurationMetadataLabel(row.decision_status, '确认状态') }}</el-tag><span class="cell-sub">{{ configurationQuestionsLabel(row.question_ids) }}</span></template></el-table-column>
       <el-table-column label="建议草稿 / 版本" min-width="150"><template #default="{ row }"><span>{{ row.draft_value === null || row.draft_value === undefined ? '尚未填写' : displayValue(row.draft_value) }}</span><span class="cell-sub">v{{ row.version }} · {{ row.lifecycle_status === 'DRAFT' ? '草稿' : configurationMetadataLabel(row.lifecycle_status, '草稿状态') }}</span></template></el-table-column>
-      <el-table-column label="运行生效值" min-width="115"><template #default="{ row }"><span>{{ row.effective_value === undefined ? '生效值未知' : row.effective_value === null ? '尚未生效' : displayValue(row.effective_value) }}</span><span class="cell-sub">以接口生效值为准</span></template></el-table-column>
+      <el-table-column label="运行值 / 发布" min-width="130"><template #default="{ row }"><router-link :to="{path:'/runtime-configurations',query:{key:row.key}}">读取当前运行值</router-link><span class="cell-sub">独立版本与生效时间</span></template></el-table-column>
       <!-- @vue-generic {Configuration} -->
-      <el-table-column label="操作" min-width="230" fixed="right"><template #default="{ row }"><div class="configuration-row-actions"><el-button v-if="diagnosticPermitted" type="primary" link class="configuration-diagnostic-link" @click="openDiagnostic(row)">有效性诊断</el-button><el-button type="primary" link @click="openComparison(row)">建议差异</el-button><el-button type="primary" link @click="openRevisions(row)">修订与审批</el-button><PermissionGate capability="configurations:write"><el-button type="primary" link :disabled="row.contract_value_kind === 'fixed_constraint'" @click="openDraft(row)">{{ row.contract_value_kind === 'fixed_constraint' ? '固定约束' : '编辑草稿' }}</el-button><el-button type="primary" link @click="openPublish(row)">发布检查</el-button></PermissionGate></div></template></el-table-column>
+      <el-table-column label="操作" min-width="230" fixed="right"><template #default="{ row }"><div class="configuration-row-actions"><el-button v-if="diagnosticPermitted" type="primary" link class="configuration-diagnostic-link" @click="openDiagnostic(row)">登记来源诊断</el-button><el-button type="primary" link @click="openComparison(row)">建议差异</el-button><el-button type="primary" link @click="openRevisions(row)">修订与审批</el-button><PermissionGate capability="configurations:write"><el-button type="primary" link :disabled="row.contract_value_kind === 'fixed_constraint'" @click="openDraft(row)">{{ row.contract_value_kind === 'fixed_constraint' ? '固定约束' : '编辑草稿' }}</el-button><router-link :to="{path:'/runtime-configurations',query:{key:row.key}}">运行发布</router-link></PermissionGate></div></template></el-table-column>
     </AppTable><div class="table-footer"><span>客户确认结论与生产许可按文档登记；测试环境草稿不构成正式确认。</span></div></div>
     <ConfigurationRevisions ref="revisionPanel" v-model="revisionsOpen" :configuration="revisionConfiguration" @changed="load" />
     <ConfigurationDiagnosticPanel v-model="diagnosticOpen" :configuration-key="diagnosticKey" />
@@ -209,7 +194,7 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
       <template v-else-if="comparisonSnapshot && comparison">
         <div class="config-dialog-context"><strong>{{ configurationMetadataLabel(comparisonSnapshot.configuration.description, '配置描述') }}</strong><p>登记版本 v{{ comparisonSnapshot.configuration.version }} · {{ comparison.decisionStatus === 'pending' ? '待客户确认' : comparison.decisionStatus === 'contract_fixed' ? '合同有据' : comparison.decisionStatus === 'confirmed' ? '已确认' : configurationMetadataLabel(comparison.decisionStatus, '确认状态') }}</p><p>关联确认：{{ configurationQuestionsLabel(comparisonSnapshot.configuration.question_ids) }}</p></div>
         <el-form label-position="top" class="configuration-comparison-selector"><el-form-item label="选择已保存建议来源"><el-select v-model="proposalSelection" aria-label="选择差异比较建议来源"><el-option value="draft" :disabled="!hasDraft" :label="hasDraft ? `登记建议草稿 · v${comparisonSnapshot.configuration.version}` : '登记建议草稿 · 尚未填写'" /><el-option v-for="revision in comparisonSnapshot.revisions" :key="revision.id" :value="revision.id" :label="`${revisionStatusLabel[revision.workflow_status]} · v${revision.version} · ${revision.id}`" /></el-select></el-form-item></el-form>
-        <p v-if="selectedRevision" class="field-help">修订 {{ selectedRevision.id }} · {{ revisionStatusLabel[selectedRevision.workflow_status] }}。客户证据未核验（{{ comparison.confirmationStatus }}）；内部审批通过仍未生效，未构成发布许可。</p>
+        <p v-if="selectedRevision" class="field-help">修订 {{ selectedRevision.id }} · {{ revisionStatusLabel[selectedRevision.workflow_status] }}。客户证据未核验（{{ comparison.confirmationStatus }}）；内部审批不等于运行发布；实际生效版本请在运行配置中心查询。</p>
         <el-descriptions :column="1" border class="configuration-comparison-facts">
           <el-descriptions-item label="登记作用域">{{ comparison.registeredScope }}</el-descriptions-item>
           <el-descriptions-item label="登记 / 合同值"><pre>{{ comparisonValue(comparison.registeredValue) }}</pre></el-descriptions-item>
@@ -239,10 +224,7 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
         </el-form-item><p v-if="editing.allowed_range !== null" class="field-help">登记范围：{{ displayValue(editing.allowed_range) }} · 范围待正式规则核验</p><p v-if="editing.notes !== null && editing.notes !== undefined" class="field-help">{{ configurationMetadataLabel(editing.notes, '登记说明') }}</p></el-form>
       </template><template #footer><el-button :disabled="draftUnresolved" @click="editingOpen = false">取消</el-button><el-button type="primary" :loading="saving" :disabled="draftLocked" @click="saveDraft">保存草稿</el-button></template>
     </el-dialog>
-    <el-dialog v-model="publishOpen" title="配置发布条件" width="520px" class="responsive-dialog" :close-on-click-modal="!checking" :show-close="!checking" destroy-on-close>
-      <template v-if="publishing"><div class="config-dialog-context"><strong>{{ configurationMetadataLabel(publishing.description, '配置描述') }}</strong><span class="mono">{{ publishing.key }}</span></div><el-alert type="warning" :closable="false" show-icon title="发布等待客户确认与审批。服务端将检查门禁，未满足条件时返回 CONFIG_PENDING。" /><p class="muted">关联确认：{{ configurationQuestionsLabel(publishing.question_ids) }}<br>发布条件：{{ configurationMetadataLabel(publishing.activation_gate, '发布条件') }}</p><ApiErrorNotice :error="publishError" /></template>
-      <template #footer><el-button :disabled="checking" @click="publishOpen = false">关闭</el-button><el-button type="primary" plain :loading="checking" @click="publish">检查发布门禁</el-button></template>
-    </el-dialog>
+
   </section>
 </template>
 

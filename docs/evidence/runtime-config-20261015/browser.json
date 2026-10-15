@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-15",
+  "scope": "candidate API on designated PostgreSQL",
+  "checks": [
+    "185 item catalog searchable by key and Q number",
+    "proposal created using hash of explicit synthetic basis",
+    "creator submitted",
+    "different reviewer approved",
+    "candidate validated against current definition hash",
+    "explicit publish and independent ACTIVE readback",
+    "real server commit followed by dropped HTTP response",
+    "old effective value cleared while request uncertain",
+    "key switching blocked while uncertain",
+    "same frozen idempotency key replay returned committed release",
+    "independent DISABLED readback",
+    "390px no document overflow"
+  ],
+  "committed_release_id": "4d24d65e-995b-494e-8139-0a2b2916c4ec",
+  "recovered_version": 17,
+  "customer_confirmation": "UNVERIFIED",
+  "production_approved": false,
+  "credentials_recorded": false
+}

@@ -32,22 +32,23 @@ onUnmounted(() => reader.reset())
 </script>
 
 <template>
-  <el-drawer v-model="open" title="配置有效性诊断" size="760px" class="configuration-diagnostic-drawer" destroy-on-close>
+  <el-drawer v-model="open" title="设计登记与提案诊断" size="760px" class="configuration-diagnostic-drawer" destroy-on-close>
     <p class="configuration-diagnostic-key mono">{{ configurationKey }}</p>
-    <p class="field-help">当前租户：{{ session?.tenant.name }}。本次只查询登记与提案的元数据，运行配置和客户核验尚待接入。</p>
+    <p class="field-help">当前租户：{{ session?.tenant.name }}。本次只查询原设计登记与提案元数据，不能据此判断当前运行状态。</p>
+    <router-link :to="{path:'/runtime-configurations',query:{key:configurationKey}}">查看此配置的运行值、发布与回滚</router-link>
     <ApiErrorNotice :error="error"><el-button size="small" :disabled="loading" @click="load">重新查询诊断</el-button></ApiErrorNotice>
     <el-skeleton v-if="loading" :rows="8" animated />
     <template v-else-if="diagnostic">
-      <el-alert type="warning" :closable="false" show-icon title="尚未生效 · CONFIG_PENDING。内部审批通过仍未发布为运行配置。" />
+      <el-alert type="warning" :closable="false" show-icon title="设计登记与运行发布分别保存；当前生效状态请查询运行配置中心。" />
       <el-descriptions :column="1" border class="configuration-diagnostic-facts">
-        <el-descriptions-item label="运行生效值">未设 · null</el-descriptions-item>
+        <el-descriptions-item label="来源用途">原设计登记诊断，不作为运行生效值</el-descriptions-item>
         <el-descriptions-item label="诊断租户"><span class="mono">{{ diagnostic.context.tenant_id }}</span></el-descriptions-item>
         <el-descriptions-item label="来源读取时间">{{ displayTime(diagnostic.observed_at) }}</el-descriptions-item>
         <el-descriptions-item label="关联Q编号">{{ diagnosticQuestions(diagnostic.question_ids) }}</el-descriptions-item>
       </el-descriptions>
       <div class="detail-section">
         <h3>设计登记目录</h3>
-        <p class="field-help">登记版本与描述来自设计目录，运行定义及解析作用域仍未知。</p>
+        <p class="field-help">登记版本与描述来自原设计目录；运行定义与当前租户发布版本在运行配置中心核对。</p>
         <el-descriptions :column="1" border class="configuration-diagnostic-facts">
           <el-descriptions-item label="来源">设计登记 · DESIGN_REGISTRY</el-descriptions-item>
           <el-descriptions-item label="登记版本">v{{ diagnostic.registry.version }}</el-descriptions-item>
@@ -60,17 +61,9 @@ onUnmounted(() => reader.reset())
         </el-descriptions>
       </div>
       <div class="detail-section">
-        <h3>运行与客户核验来源</h3>
-        <el-descriptions :column="1" border class="configuration-diagnostic-facts">
-          <el-descriptions-item label="运行定义">尚未接入 · NOT_IMPLEMENTED<br>定义版本、允许层级、优先次序和已解析作用域均未提供。</el-descriptions-item>
-          <el-descriptions-item label="发布来源">尚未接入 · NOT_IMPLEMENTED<br>发布记录、修订引用、发布时间及发布授权/生产许可核验均未知。</el-descriptions-item>
-          <el-descriptions-item label="客户核验">尚未接入 · NOT_IMPLEMENTED<br>本配置是否必须核验、客户结论、核验资格与真实性均未知。</el-descriptions-item>
-        </el-descriptions>
-      </div>
-      <div class="detail-section">
-        <h3>未生效原因</h3>
+        <h3>设计登记的来源说明</h3>
         <ul class="configuration-diagnostic-reasons">
-          <li v-for="(reason, index) in diagnostic.reasons" :key="`${reason.code}:${reason.source_id}:${index}`">
+          <li v-for="(reason, index) in diagnostic.reasons.filter(r => !['RUNTIME_DEFINITION_SOURCE_UNAVAILABLE','PUBLICATION_SOURCE_UNAVAILABLE'].includes(r.code))" :key="`${reason.code}:${reason.source_id}:${index}`">
             <strong>{{ configurationDiagnosticReasonLabel[reason.code] }}</strong>
             <span class="mono">{{ reason.code }}</span>
             <p>{{ configurationDiagnosticSourceLabel[reason.source_kind] }} · {{ reason.source_id === null ? '来源标识未提供' : reason.source_id }} · {{ reason.source_version === null ? '版本未提供' : `v${reason.source_version}` }}</p>
@@ -79,12 +72,12 @@ onUnmounted(() => reader.reset())
       </div>
       <div class="detail-section">
         <h3>当前租户近期提案</h3>
-        <p class="field-help">仅展示最近最多5项内部提案记录，每项仍未发布或生效。证据引用属于输入记录，真实性和资格尚未核验。</p>
+        <p class="field-help">仅展示最近最多5项内部提案记录；是否已发布须查询运行历史。证据引用属于输入记录，真实性和资格尚未核验。</p>
         <p v-if="diagnostic.recent_proposals.truncated" class="field-help">仅列最近5项；还有未显示的提案记录。</p>
         <p v-if="!diagnostic.recent_proposals.items.length" class="muted">本次回读没有近期提案。</p>
         <AppTable v-else :rows="diagnostic.recent_proposals.items" row-key="id">
           <el-table-column label="内部提案 / 版本" min-width="230"><template #default="{ row }"><span class="mono">{{ row.id }}</span><span class="cell-sub">v{{ row.version }} · INTERNAL_REVISION</span></template></el-table-column>
-          <el-table-column label="内部流程" min-width="200"><template #default="{ row }">{{ revisionStatusLabel[row.workflow_status as keyof typeof revisionStatusLabel] }}<span class="cell-sub">尚未发布 · 未生效</span></template></el-table-column>
+          <el-table-column label="内部流程" min-width="200"><template #default="{ row }">{{ revisionStatusLabel[row.workflow_status as keyof typeof revisionStatusLabel] }}<span class="cell-sub">运行发布另行查询</span></template></el-table-column>
           <el-table-column label="证据输入" min-width="190"><template #default="{ row }">{{ row.evidence_reference_count === null ? '引用数量未知' : `${row.evidence_reference_count} 项引用` }}<span class="cell-sub">仅引用输入 · REFERENCE_ONLY</span><span class="cell-sub">客户未核验 · UNVERIFIED</span></template></el-table-column>
         </AppTable>
       </div>

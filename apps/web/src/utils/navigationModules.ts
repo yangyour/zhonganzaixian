@@ -10,7 +10,7 @@ const modules:NavigationModule[]=[
  {id:'maintenance',title:'备份与巡检',items:[['backup-plan-drafts','每日备份计划草稿'],['change-notice-drafts','变更报备草稿'],['inspection-templates','巡检模板候选'],['inspection-worksheets','人工巡检执行单'],['inspection-source-collections','巡检来源集合草稿']].map(([name,title])=>({name:name!,title:title!}))},
  {id:'customers',title:'客户与租户',items:[['tenant-inventory','租户登记资源'],['customer-contacts','客户联系人'],['contact-imports','联系人批量新建']].map(([name,title])=>({name:name!,title:title!}))},
  {id:'operations',title:'经营与容量',items:[['operational-comparison','经营样本与人力对照'],['capacity-estimates','容量与缓冲估算']].map(([name,title])=>({name:name!,title:title!}))},
- {id:'settings',title:'系统管理',items:[['identity-users','用户与成员授权'],['identity-roles','角色与权限'],['identity-settings','身份认证设置'],['configurations','配置确认登记'],['capability-catalog','代码能力声明核对'],['audit','审计日志']].map(([name,title])=>({name:name!,title:title!}))},
+ {id:'settings',title:'系统管理',items:[['identity-users','用户与成员授权'],['identity-roles','角色与权限'],['identity-settings','身份认证设置'],['runtime-configurations','运行配置与发布'],['configurations','配置确认登记'],['capability-catalog','代码能力声明核对'],['audit','审计日志']].map(([name,title])=>({name:name!,title:title!}))},
 ]
 /** One responsive navigation, using the same route gates as direct navigation. Unknown routes stay hidden. */
 export function visibleNavigationModules(current:Session|null,routes:readonly AccessRoute[]):NavigationModule[]{

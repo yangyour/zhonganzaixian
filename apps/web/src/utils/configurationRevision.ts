@@ -48,6 +48,6 @@ export function revisionActions(revision: Pick<ConfigurationRevision, 'created_b
   }
 }
 export const revisionStatusLabel: Record<ConfigurationRevisionStatus, string> = {
-  DRAFT: '提案草稿', IN_REVIEW: '等待内部审批', APPROVED: '内部审批通过，尚未生效', REJECTED: '内部审批驳回', WITHDRAWN: '已撤回',
+  DRAFT: '提案草稿', IN_REVIEW: '等待内部审批', APPROVED: '内部审批通过', REJECTED: '内部审批驳回', WITHDRAWN: '已撤回',
 }
 export const revisionActionLabel = { CREATE: '创建提案', SUBMIT: '提交审批', APPROVE: '内部审批通过', REJECT: '内部审批驳回', WITHDRAW: '撤回提案' }

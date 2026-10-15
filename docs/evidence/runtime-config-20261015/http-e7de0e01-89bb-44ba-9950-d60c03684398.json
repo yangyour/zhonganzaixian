@@ -1,0 +1,373 @@
+{
+  "run_id": "e7de0e01-89bb-44ba-9950-d60c03684398",
+  "base": "http://127.0.0.1:21815",
+  "started_at": "2026-10-15T03:51:14.537Z",
+  "requests": [
+    {
+      "label": "readiness",
+      "role": "anonymous",
+      "method": "GET",
+      "path": "/health/ready",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "anonymous catalog refused",
+      "role": "anonymous",
+      "method": "GET",
+      "path": "/runtime-configurations/catalog",
+      "status": 401,
+      "code": "SESSION_EXPIRED"
+    },
+    {
+      "label": "csrf",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "login",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "csrf",
+      "role": "reviewer",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "login",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "csrf",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "login",
+      "role": "viewerA",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "viewer catalog refused",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/runtime-configurations/catalog",
+      "status": 403,
+      "code": "ACTION_FORBIDDEN"
+    },
+    {
+      "label": "catalog",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/catalog",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "extra tenant query refused",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/scope.extensions",
+      "status": 400,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "label": "unknown configuration hidden",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/not.registered",
+      "status": 404,
+      "code": "OBJECT_NOT_FOUND"
+    },
+    {
+      "label": "invalid scalar bound",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/monitor.page_refresh_sec/validate",
+      "status": 400,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "label": "invalid enum",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/monitor.sample_interval_sec/validate",
+      "status": 400,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "label": "forbidden secret",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/notification.provider_credentials/validate",
+      "status": 400,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "label": "missing csrf",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/scope.extensions/validate",
+      "status": 403,
+      "code": "CSRF_INVALID"
+    },
+    {
+      "label": "read current",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/scope.extensions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "registry before",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/configurations",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "create proposal",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/scope.extensions/revisions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "submit proposal",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/043e28f2-dc40-4666-ad5b-269e629152f1/submit",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "self review refused",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/043e28f2-dc40-4666-ad5b-269e629152f1/review",
+      "status": 403,
+      "code": "ACTION_FORBIDDEN"
+    },
+    {
+      "label": "independent review",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/043e28f2-dc40-4666-ad5b-269e629152f1/review",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "candidate validate",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/scope.extensions/validate",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "changed definition refused",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/scope.extensions/releases",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "label": "publish",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/scope.extensions/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "replay original publication",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/scope.extensions/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "same key different payload refused",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/scope.extensions/releases",
+      "status": 409,
+      "code": "IDEMPOTENCY_CONFLICT"
+    },
+    {
+      "label": "stale publication version refused",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/scope.extensions/releases",
+      "status": 409,
+      "code": "VERSION_CONFLICT"
+    },
+    {
+      "label": "read current",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/scope.extensions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "create proposal",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/scope.extensions/revisions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "submit proposal",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/8af57d2f-0045-499a-99a2-0e2746ab7e5a/submit",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "self review refused",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/8af57d2f-0045-499a-99a2-0e2746ab7e5a/review",
+      "status": 403,
+      "code": "ACTION_FORBIDDEN"
+    },
+    {
+      "label": "independent review",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/8af57d2f-0045-499a-99a2-0e2746ab7e5a/review",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "second publication",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/scope.extensions/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "rollback as new immutable version",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/scope.extensions/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "forged publisher refused",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/scope.extensions/releases",
+      "status": 400,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "label": "disable",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/scope.extensions/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/scope.extensions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "history",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/scope.extensions/history",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "registry after",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/configurations",
+      "status": 200,
+      "code": null
+    }
+  ],
+  "checks": [
+    {
+      "label": "real PG and runtime publication schema ready",
+      "status": "PASS"
+    },
+    {
+      "label": "185 definitions cover all 31 questions",
+      "status": "PASS"
+    },
+    {
+      "label": "pending decisions stay null",
+      "status": "PASS"
+    },
+    {
+      "label": "release is immutable test scope with distinct proposal",
+      "status": "PASS"
+    },
+    {
+      "label": "replay returns original receipt",
+      "status": "PASS"
+    },
+    {
+      "label": "effective value reflects published false without fallback",
+      "status": "PASS"
+    },
+    {
+      "label": "rollback preserves source and creates a later version",
+      "status": "PASS"
+    },
+    {
+      "label": "disabled never resurrects an old value",
+      "status": "PASS"
+    },
+    {
+      "label": "publication history retains original values",
+      "status": "PASS"
+    },
+    {
+      "label": "design registry and customer decision remain unchanged",
+      "status": "PASS"
+    }
+  ],
+  "credentials_recorded": false,
+  "finished_at": "2026-10-15T03:51:18.190Z",
+  "status": "PASS",
+  "cleanup": "Synthetic test runtime key explicitly disabled; proposals and immutable history retained"
+}

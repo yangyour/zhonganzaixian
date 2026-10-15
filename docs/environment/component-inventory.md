@@ -432,3 +432,7 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 # 2026-10-15 登录页精简与背景资源
 
 继续复用指定LAN测试API，真实项目账号登录及退出本人会话验证通过；只读盘点14个项目服务运行，ready=true、production_ready=false。本轮只改登录页样式、装饰背景与预加载，不增加基础组件，不执行迁移或服务变更。生成背景作为本地静态WebP资源发布，不接入第三方运行时图片服务。见[登录页记录](../login-redesign-20261015.md)。
+
+## 2026-10-15 工单详情参考图联调
+
+复用指定 lan-test-20261008 的真实工单/内部备注/客户评论/本人工时 API 与 PostgreSQL 17.9（V32），只读盘点 14 个项目容器运行、ready=true、production_ready=false。新增一个明确标记的虚构报障及其测试记录，无组件安装、迁移、服务重启或全局设置修改。本地仅构建和预览 Web；浏览器转发原始真实 API 响应，非 fixture 联调。正式流程/团队工时等属于尚未实现的业务接口，不登记为数据库故障或已完成能力。[组件证据](../evidence/ticket-detail-reference-20261015/components.json) · [运行与边界](../ticket-detail-reference-20261015.md)。

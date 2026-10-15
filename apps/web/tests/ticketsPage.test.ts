@@ -33,6 +33,22 @@ it('cancelled worklog switch retains the original target and restores its collap
   await state.openWorklogs(); expect(canLeave).toHaveBeenCalledWith('切换报障登记')
   expect(state.worklogTarget.id).toBe(id(10)); expect(state.worklogOpen).toBe(true)
 })
+it('keeps detail visible while close navigation is pending and does not send duplicate navigation', async () => {
+  request(); mocks.query.ticket_id=id(10); mount(); await settle()
+  let finish!:()=>void; mocks.replace.mockImplementation(()=>new Promise<void>(resolve=>{finish=resolve}))
+  const closing=state.closeDetail(); await state.closeDetail()
+  expect(state.detailClosing).toBe(true); expect(state.detailOpen).toBe(true); expect(mocks.replace).toHaveBeenCalledTimes(1)
+  delete mocks.query.ticket_id; finish(); await closing; await settle()
+  expect(state.detailClosing).toBe(false); expect(state.detailOpen).toBe(false)
+})
+it('retains a reachable detail when closing navigation fails and permits retry', async () => {
+  request(); mocks.query.ticket_id=id(10); mount(); await settle()
+  mocks.replace.mockRejectedValueOnce(new Error('synthetic navigation failure'))
+  await state.closeDetail(); expect(state.detailOpen).toBe(true); expect(state.detailClosing).toBe(false)
+  expect(state.detailError.message).toBe('synthetic navigation failure')
+  mocks.replace.mockImplementationOnce(async()=>{delete mocks.query.ticket_id})
+  await state.closeDetail(); await settle(); expect(state.detailOpen).toBe(false)
+})
 it('worklog target changes only after approval and the same target reopens without confirmation', async () => {
   request(); session.value!.capabilities.push('worklogs:read_own'); mount(); await settle()
   state.ticket=ticket(); await state.openWorklogs()

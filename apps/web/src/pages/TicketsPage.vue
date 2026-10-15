@@ -2,7 +2,6 @@
 import { ElTableColumn } from 'element-plus'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
-import { ElTimeline, ElTimelineItem } from 'element-plus'
 import { feedback as ElMessage } from '../utils/feedback'
 import { api, isCancelled } from '../api/client'
 import type { RegisteredTicket } from '../api/types'
@@ -15,6 +14,7 @@ import AppliedFilters from '../components/AppliedFilters.vue'
 import { createSearchCompositionGuard, syncFilterDraft } from '../utils/listSearch'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import TicketReportForm from '../components/TicketReportForm.vue'
+import TicketDetailOverview from '../components/TicketDetailOverview.vue'
 import WorklogWorkspace from '../components/WorklogWorkspace.vue'
 import InternalNoteWorkspace from '../components/InternalNoteWorkspace.vue'
 import TicketCommentWorkspace from '../components/TicketCommentWorkspace.vue'
@@ -94,10 +94,20 @@ function nextPage() { if (!nextCursor.value) return; cursorHistory.value.push(qu
 function previousPage() { const cursor = cursorHistory.value.pop(); void router.replace({ query: { ...route.query, cursor: cursor || undefined } }) }
 function firstPage() { cursorHistory.value = []; void router.replace({ query: { ...route.query, cursor: undefined } }) }
 
-const detailOpen = computed({ get: () => Boolean(queryString('ticket_id')), set: value => { if (!value) void router.replace({ query: { ...route.query, ticket_id: undefined } }) } })
+const detailClosing = ref(false)
+const detailOpen = computed({ get: () => Boolean(queryString('ticket_id')), set: value => { if (!value) void closeDetail() } })
+async function closeDetail() {
+  if (detailClosing.value || !queryString('ticket_id')) return
+  detailClosing.value = true
+  try { await router.replace({ query: { ...route.query, ticket_id: undefined } }) }
+  catch (cause) { detailError.value = cause }
+  finally { detailClosing.value = false }
+}
 const ticket = ref<RegisteredTicket | null>(null)
 const detailError = ref<unknown>(null)
 const detailLoading = ref(false)
+const detailRefreshKey = ref(0)
+function refreshOverview(id: string) { if (ticket.value?.id === id) detailRefreshKey.value++ }
 const operationRead = ref<ReportOperationReadState>({ status: 'idle' })
 const registrationOperation = computed(() => operationRead.value.status === 'ready' ? operationRead.value.operation : null)
 const operationReader = createReportOperationReader({
@@ -237,23 +247,17 @@ onUnmounted(() => { unregisterContextGuard(); window.removeEventListener('before
       <div class="table-footer"><span>{{ customerView ? '仅本人登记' : '当前租户只读' }} · 本页 {{ loading || error || !loaded ? '—' : rows.length }} 条</span><div class="cursor-pagination ticket-pagination"><el-select :model-value="pageSize" :disabled="loading" aria-label="报障每页条数" @change="resizePage"><el-option v-for="size in pageSizes.filter(size => size <= pageSizeLimit)" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button v-if="queryString('cursor') && !cursorHistory.length" :disabled="loading" @click="firstPage">返回首页</el-button><el-button v-else :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
     </div>
     <TicketReportForm v-if="mayReport" v-model="createOpen" @accepted="recordAcceptance" @registered="showRegistered" />
-    <TicketCommentWorkspace ref="commentWorkspace" v-model="commentOpen" :ticket="commentTarget" />
+    <TicketCommentWorkspace ref="commentWorkspace" v-model="commentOpen" :ticket="commentTarget" @saved="refreshOverview" />
     <el-button v-if="commentTarget && commentTarget.tenant_id === session?.tenant.id && (!customerView || commentTarget.reporter_id === session?.user.id) && can('ticket_comments:read')" class="retained-worklog-button" @click="commentOpen = true">恢复“{{ commentTarget.receipt_no }}”的客户可见评论面板</el-button>
-    <InternalNoteWorkspace ref="noteWorkspace" v-model="noteOpen" :ticket="noteTarget" />
+    <InternalNoteWorkspace ref="noteWorkspace" v-model="noteOpen" :ticket="noteTarget" @saved="refreshOverview" />
     <el-button v-if="noteTarget && noteTarget.tenant_id === session?.tenant.id && can('ticket_notes:read_internal')" class="retained-worklog-button" @click="noteOpen = true">恢复“{{ noteTarget.receipt_no }}”的内部备注面板</el-button>
-    <WorklogWorkspace ref="worklogWorkspace" v-model="worklogOpen" :ticket="worklogTarget" />
+    <WorklogWorkspace ref="worklogWorkspace" v-model="worklogOpen" :ticket="worklogTarget" @saved="refreshOverview" />
     <el-button v-if="worklogTarget && can('worklogs:read_own')" class="retained-worklog-button" @click="worklogOpen = true">恢复“{{ worklogTarget.receipt_no }}”的本人工时面板</el-button>
-    <el-drawer v-model="detailOpen" title="报障登记详情" size="820px" class="ticket-detail-drawer" destroy-on-close>
+    <el-drawer :key="queryString('ticket_id')" v-model="detailOpen" title="工单详情" size="100%" class="ticket-detail-drawer" :with-header="false" :before-close="closeDetail" destroy-on-close>
       <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />
       <ApiErrorNotice :error="detailError"><el-button size="small" @click="loadDetail()">重试详情查询</el-button></ApiErrorNotice>
       <el-skeleton v-if="detailLoading" :rows="9" animated />
-      <template v-if="ticket">
-        <div class="detail-title"><span class="eyebrow">报障登记</span><h2>{{ ticket.title }}</h2><el-tag type="info">已登记 · 正式工单规则待确认</el-tag><p class="ticket-receipt mono">{{ ticket.receipt_no }}</p></div>
-        <el-alert type="warning" :closable="false" show-icon title="本平台为一期工单权威；正式处理状态与时限尚未设定，不能据登记时间推断响应或恢复承诺。" />
-        <section class="ticket-detail-summary"><div><span>故障分类</span><strong>{{ ticket.category }}</strong></div><div><span>关联设备</span><strong>{{ ticket.asset_name || '不确定' }}</strong></div><div><span>影响范围</span><strong>{{ impactScopeLabel[ticket.impact_scope] }}</strong></div><div><span>紧急程度</span><strong>{{ urgencyLabel[ticket.urgency] }}</strong></div><div><span>正式工单状态</span><strong>{{ ticket.state === null ? '— · 未设' : ticket.state }}</strong></div><div><span>优先级</span><strong>{{ ticket.priority === null ? '— · 未设' : ticket.priority }}</strong></div><div><span>响应截止</span><strong>{{ ticket.response_due_at === null ? '— · 未设' : displayTime(ticket.response_due_at) }}</strong></div><div><span>恢复截止</span><strong>{{ ticket.recovery_due_at === null ? '— · 未设' : displayTime(ticket.recovery_due_at) }}</strong></div></section>
-        <div class="ticket-detail-actions"><el-button v-if="can('ticket_comments:read')" @click="openComments">查看或追加客户可见评论</el-button><el-button v-if="can('ticket_notes:read_internal')" @click="openInternalNotes">打开内部备注</el-button><el-button v-if="can('worklogs:read_own')" type="primary" @click="openWorklogs">打开本人工时</el-button></div>
-        <section class="detail-section"><h3>问题描述</h3><p class="ticket-description">{{ ticket.description }}</p></section>
-        <section class="detail-section"><h3>联系人与登记信息</h3><div class="ticket-detail-summary"><div><span>联系人</span><strong>{{ ticket.contact_name }}</strong></div><div><span>联系电话</span><strong>{{ ticket.contact_phone }}</strong></div><div><span>提交时间</span><strong>{{ displayTime(ticket.created_at) }}</strong></div><div><span>更新时间</span><strong>{{ displayTime(ticket.updated_at) }}</strong></div></div><p class="muted">联系信息尚未核验账号绑定关系 · 登记来源：客户报障 · 工单权威：本平台，正式规则待确认</p></section>
+      <TicketDetailOverview v-if="ticket" :ticket="ticket" :refresh-key="detailRefreshKey" @close="closeDetail" @notes="openInternalNotes" @comments="openComments" @worklogs="openWorklogs">
         <div class="detail-section ticket-registration-operation" aria-label="登记操作回读">
           <h3>登记操作</h3>
           <p class="muted">仅查询本次登记操作。查询失败不会撤销已登记报障，不据等待时间推断处理进度。</p>
@@ -268,18 +272,16 @@ onUnmounted(() => { unregisterContextGuard(); window.removeEventListener('before
           </el-descriptions>
           <el-button :loading="operationRead.status === 'loading'" @click="readRegistrationOperation">{{ operationRead.status === 'error' ? '重新查询登记操作' : '刷新登记操作' }}</el-button>
         </div>
-        <div class="detail-section"><h3>登记记录</h3><el-timeline class="ticket-history"><el-timeline-item v-for="(item, index) in ticket.history" :key="`${item.occurred_at}:${index}`" :timestamp="displayTime(item.occurred_at)" placement="top"><strong>{{ item.action === 'ADD_ATTACHMENTS' ? '报障照片已追加' : '报障已登记' }}</strong><p>{{ item.action === 'ADD_ATTACHMENTS' ? '仅追加附件引用；原报障正文与联系信息保留。' : '正式工单规则待确认，尚无处理阶段记录。' }}</p><p v-if="!customerView" class="mono">操作主体：{{ item.actor_id }} · v{{ item.version }}</p></el-timeline-item></el-timeline></div>
         <ReportPhotoPanel :queue="detailPhotos" :existing="ticket.attachments" :selectable="matchingPhotoTarget && detailAppender.permitted.value" :show-selections="matchingPhotoTarget" :disabled="detailLoading" :appender="matchingPhotoTarget ? detailAppender : undefined" />
-        <div class="detail-section"><h3>后续处理</h3><p class="muted">接单、处置与客户确认将在后续功能按实际规则落实。</p></div>
         <el-descriptions v-if="!customerView" :column="1" border class="asset-descriptions"><el-descriptions-item label="记录 ID"><span class="mono">{{ ticket.id }}</span></el-descriptions-item><el-descriptions-item label="租户 ID"><span class="mono">{{ ticket.tenant_id }}</span></el-descriptions-item><el-descriptions-item label="报障人 ID"><span class="mono">{{ ticket.reporter_id }}</span></el-descriptions-item><el-descriptions-item label="登记操作 ID"><span class="mono">{{ ticket.operation_id }}</span></el-descriptions-item><el-descriptions-item label="版本">v{{ ticket.version }}</el-descriptions-item><el-descriptions-item label="外部同步">不适用 · 未创建外部工单</el-descriptions-item></el-descriptions>
-      </template>
-      <template #footer><el-button :loading="detailLoading" :disabled="detailAppender.busy.value || detailAppender.reading.value" @click="loadDetail()">刷新详情</el-button><el-button @click="detailOpen = false">关闭</el-button></template>
+      </TicketDetailOverview>
+      <template #footer><el-button :loading="detailLoading" :disabled="detailClosing || detailAppender.busy.value || detailAppender.reading.value" @click="loadDetail()">刷新详情</el-button><el-button :loading="detailClosing" @click="closeDetail">关闭</el-button></template>
     </el-drawer>
   </section>
 </template>
 
 <style>
-.retained-worklog-button{margin-top:12px;max-width:100%;height:auto;min-height:44px;white-space:normal;overflow-wrap:anywhere}.ticket-detail-drawer{max-width:100vw}.ticket-receipt{margin:16px 0 0;color:#61718a}.ticket-description{white-space:pre-wrap;overflow-wrap:anywhere}.ticket-history{padding-left:4px;margin-top:20px}.ticket-history p{font-size:12px;margin:8px 0}.ticket-detail-drawer .detail-section p{font-size:12px}
+.retained-worklog-button{margin-top:12px;max-width:100%;height:auto;min-height:44px;white-space:normal;overflow-wrap:anywhere}.ticket-detail-drawer{max-width:100vw;background:#f1f5fa}.ticket-detail-drawer .el-drawer__body{padding:24px 28px}.ticket-detail-drawer .el-drawer__footer{padding:10px 24px;background:white;border-top:1px solid #dce5f1}.ticket-detail-drawer .ticket-registration-operation{background:#fff}.ticket-receipt{margin:16px 0 0;color:#61718a}.ticket-description{white-space:pre-wrap;overflow-wrap:anywhere}.ticket-history{padding-left:4px;margin-top:20px}.ticket-history p{font-size:12px;margin:8px 0}.ticket-detail-drawer .detail-section p{font-size:12px}
 @media(max-width:760px){.tickets-page .page-heading .el-button{min-height:44px}.tickets-page .ticket-detail-link{min-height:44px}.ticket-pagination .el-button{min-height:44px}.ticket-pagination .el-select__wrapper{min-height:44px}.ticket-filter-form .el-input__wrapper,.ticket-filter-form .el-select__wrapper,.ticket-filter-form .el-button{min-height:44px}.ticket-detail-drawer .el-drawer__footer .el-button{min-height:44px}}
 @media(max-width:760px){.ticket-registration-operation .el-button{min-height:44px}}
 .tickets-page .ticket-register-panel{padding:0;margin-top:12px;overflow:hidden}.tickets-page .ticket-register-panel .filter-form{padding:14px 18px 0;margin:0}.tickets-page .ticket-register-panel .table-footer{padding:12px 18px}.ticket-detail-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 28px;padding:20px 0}.ticket-detail-summary>div{display:grid;grid-template-columns:100px minmax(0,1fr);gap:12px;font-size:12px}.ticket-detail-summary span{color:#8a96a4}.ticket-detail-summary strong{font-weight:400;overflow-wrap:anywhere}.ticket-detail-actions{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid #edf1f7;border-bottom:1px solid #edf1f7;padding:14px 0}.ticket-detail-drawer .detail-section{margin-top:22px}.ticket-detail-drawer .detail-section h3{font-size:14px;font-weight:500;border-left:3px solid #2d79f6;padding-left:10px}.ticket-detail-drawer .detail-title h2{font-size:20px}.ticket-detail-drawer .ticket-registration-operation .asset-descriptions{margin-bottom:14px}@media(max-width:760px){.ticket-detail-summary{grid-template-columns:1fr}.ticket-detail-actions .el-button{min-height:44px;margin-left:0}}
@@ -290,4 +292,8 @@ onUnmounted(() => { unregisterContextGuard(); window.removeEventListener('before
 .ticket-filter-form :deep(.filter-actions .el-form-item__content){gap:8px}
 .ticket-filter-form :deep(.filter-actions .el-button){margin-left:0}
 @media(max-width:760px){.tickets-page .ticket-filter-form{grid-template-columns:minmax(0,1fr)}.ticket-filter-form :deep(.el-form-item){grid-column:auto;width:100%}.ticket-filter-form :deep(.el-input),.ticket-filter-form :deep(.el-select){width:100%}.ticket-filter-form :deep(.filter-actions .el-button){flex:1}.ticket-pagination{flex-wrap:wrap;max-width:100%}}
+</style>
+
+<style>
+@media(max-width:760px){.ticket-detail-drawer .el-drawer__body{padding:12px}.ticket-detail-drawer .el-drawer__footer{padding:8px 12px}}
 </style>

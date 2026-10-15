@@ -12,10 +12,11 @@ import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import AppTable from './AppTable.vue'
 import AutoTextarea from './AutoTextarea.vue'
 const props = defineProps<{ modelValue: boolean; ticket: RegisteredTicket | null }>()
-const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
+const emit = defineEmits<{ 'update:modelValue': [value: boolean]; saved: [ticketId: string] }>()
 const open = computed({ get: () => props.modelValue, set: value => emit('update:modelValue', value) })
 const state = shallowRef<WorklogState>(emptyWorklogState())
 const workspace = createWorklogWorkspace(api, value => { state.value = value })
+watch(() => state.value.receipt ? `${state.value.receipt.id}:${state.value.receipt.version}` : '', key => { if (key && state.value.receipt) emit('saved', state.value.receipt.ticket_id) })
 const permitted = computed(() => Boolean(session.value && props.ticket?.tenant_id === session.value.tenant.id && can('worklogs:read_own') && !switchingTenant.value))
 const writable = computed(() => permitted.value && can('worklogs:write_own'))
 const unresolved = computed(() => state.value.busy === 'write' || state.value.attempt?.state === 'uncertain')

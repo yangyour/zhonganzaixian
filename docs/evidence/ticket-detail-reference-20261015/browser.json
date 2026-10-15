@@ -1,0 +1,1429 @@
+{
+  "status": "PASS",
+  "verified_at": "2026-10-15T06:20:41.771Z",
+  "environment": "lan-test-20261008",
+  "component_versions_file": "components.json",
+  "browser": "Microsoft Edge 155.0.4283.45",
+  "static_build_id": "210f673d36986ba15fc3951407348f73fa0f0c1a3a9afd892d28a2b7430aa681",
+  "scope": "local production static build with faithful real designated API forwarding; not deployed",
+  "synthetic_ticket_id": "0dd9c162-4113-4738-bec4-c8086eb4d32d",
+  "created_test_records": {
+    "ticket": 1,
+    "internal_note": 1,
+    "customer_comment": 1,
+    "own_worklogs": 3
+  },
+  "layoutChecks": [
+    {
+      "width": 1920,
+      "height": 945,
+      "documentWidth": 1920,
+      "bodyWidth": 1465,
+      "bodyScrollWidth": 1465,
+      "footerVisible": true,
+      "basicBottom": 781.484375,
+      "rightBottom": 781.484375
+    },
+    {
+      "width": 1440,
+      "height": 1000,
+      "documentWidth": 1440,
+      "bodyWidth": 1440,
+      "bodyScrollWidth": 1440,
+      "footerVisible": true,
+      "basicBottom": 836.484375,
+      "rightBottom": 836.484375
+    },
+    {
+      "width": 1024,
+      "height": 900,
+      "documentWidth": 1024,
+      "bodyWidth": 1024,
+      "bodyScrollWidth": 1024,
+      "footerVisible": true,
+      "basicBottom": 1154.25,
+      "rightBottom": 1154.25
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "documentWidth": 768,
+      "bodyWidth": 768,
+      "bodyScrollWidth": 768,
+      "footerVisible": true,
+      "basicBottom": 915.421875,
+      "rightBottom": 1860.796875
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "bodyScrollWidth": 390,
+      "footerVisible": true,
+      "basicBottom": 1217.53125,
+      "rightBottom": 2300.234375
+    },
+    {
+      "width": 320,
+      "height": 844,
+      "documentWidth": 320,
+      "bodyWidth": 320,
+      "bodyScrollWidth": 320,
+      "footerVisible": true,
+      "basicBottom": 1311.578125,
+      "rightBottom": 2437.984375
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "documentWidth": 844,
+      "bodyWidth": 844,
+      "bodyScrollWidth": 844,
+      "footerVisible": true,
+      "basicBottom": 837.375,
+      "rightBottom": 1804.59375
+    }
+  ],
+  "navigationChecks": [
+    {
+      "cycle": 1,
+      "closed": true
+    },
+    {
+      "cycle": 2,
+      "closed": true
+    },
+    {
+      "cycle": 3,
+      "closed": true
+    }
+  ],
+  "navigationFailureCheck": {
+    "queryRetained": true,
+    "detailStillVisible": true
+  },
+  "faultChecks": {
+    "oldTotalCleared": true,
+    "unread": true,
+    "exportDisabled": true,
+    "otherRecordsRemain": true
+  },
+  "customerChecks": {
+    "noInternalRequests": true,
+    "noInternalContent": true,
+    "commentVisible": true,
+    "noInternalWriteButton": true
+  },
+  "exportChecks": {
+    "maskedPhone": true,
+    "sum72Minutes": true,
+    "scopeOwn": true,
+    "note": true,
+    "comment": true
+  },
+  "finalChecks": {
+    "writesConfirmed": true,
+    "stateNotInvented": true,
+    "ready": true,
+    "readRecovered": true,
+    "noPageExceptions": true,
+    "allViewportsFit": true
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/options",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/csrf",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/local/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/assets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/internal-notes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200
+    }
+  ],
+  "setup_requests": [
+    {
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "code": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "code": null
+    },
+    {
+      "method": "POST",
+      "path": "/tickets",
+      "status": 202,
+      "code": null
+    },
+    {
+      "method": "GET",
+      "path": "/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200,
+      "code": null
+    },
+    {
+      "method": "GET",
+      "path": "/session",
+      "status": 200,
+      "code": null
+    },
+    {
+      "method": "GET",
+      "path": "/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200,
+      "code": null
+    },
+    {
+      "method": "POST",
+      "path": "/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200,
+      "code": null
+    },
+    {
+      "method": "POST",
+      "path": "/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/worklogs",
+      "status": 200,
+      "code": null
+    },
+    {
+      "method": "GET",
+      "path": "/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200,
+      "code": null
+    },
+    {
+      "method": "GET",
+      "path": "/health/ready",
+      "status": 200,
+      "code": null
+    }
+  ],
+  "customer_requests": [
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/files/policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/files/policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/session",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/files/policy",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/operations/9a0c9524-3769-4dff-8964-d8d4b486cbbe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets/0dd9c162-4113-4738-bec4-c8086eb4d32d/comments",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tickets",
+      "status": 200
+    }
+  ],
+  "fixture_responses_used": false,
+  "credentials_recorded": false,
+  "physical_phone": "NOT_RUN",
+  "production_acceptance": "NOT_RUN",
+  "formal_workflow": "NOT_IMPLEMENTED"
+}

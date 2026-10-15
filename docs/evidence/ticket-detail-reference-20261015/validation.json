@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "verified_at": "2026-10-15T06:21:46.660Z",
+  "base_commit": "ac8dae9",
+  "node": "v22.22.1",
+  "frontend": {
+    "files": 155,
+    "passed": 2194,
+    "new_tests": 12
+  },
+  "contracts": {
+    "passed": 135,
+    "generated_contract_check": "PASS"
+  },
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "static_integrity": "PASS",
+  "policy_check": "PASS",
+  "build_id": "210f673d36986ba15fc3951407348f73fa0f0c1a3a9afd892d28a2b7430aa681",
+  "deployed": false,
+  "credentials_recorded": false
+}

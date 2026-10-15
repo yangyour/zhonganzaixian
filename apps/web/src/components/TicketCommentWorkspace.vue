@@ -10,10 +10,11 @@ import { displayTime } from '../utils/display'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 const props = defineProps<{ modelValue: boolean; ticket: RegisteredTicket | null }>()
-const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
+const emit = defineEmits<{ 'update:modelValue': [value: boolean]; saved: [ticketId: string] }>()
 const open = computed({ get: () => props.modelValue, set: value => emit('update:modelValue', value) })
 const state = shallowRef<CommentState>(emptyCommentState())
 const workspace = createTicketCommentWorkspace(api, value => { state.value = value })
+watch(() => state.value.receipt ? state.value.receipt.id : '', key => { if (key && state.value.receipt) emit('saved', state.value.receipt.ticket_id) })
 const permitted = computed(() => Boolean(session.value && props.ticket?.tenant_id === session.value.tenant.id && ['msp', 'padmin', 'viewer', 'tadmin'].includes(session.value.user.role) && (!['viewer', 'tadmin'].includes(session.value.user.role) || props.ticket?.reporter_id === session.value.user.id) && can('ticket_comments:read') && !switchingTenant.value))
 const authorKind = computed<'REPORTER' | 'ENGINEER'>(() => session.value && ['viewer', 'tadmin'].includes(session.value.user.role) ? 'REPORTER' : 'ENGINEER')
 const writable = computed(() => permitted.value && can('ticket_comments:write'))

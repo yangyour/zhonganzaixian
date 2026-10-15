@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-15",
+  "environment": "lan-test-20261008",
+  "stage": "development-preview-with-designated-api",
+  "browser": "155.0.4283.45",
+  "viewports": [
+    1440,
+    390
+  ],
+  "bound_devices": 4,
+  "checks": [
+    "actual ICMP/latency/loss",
+    "actual firewall CPU/memory",
+    "CPU/memory ranking switch",
+    "explicit device and metric history",
+    "1h/24h history",
+    "raw samples table",
+    "injected request failure clears old values",
+    "retry recovers actual data",
+    "no document horizontal overflow at 390"
+  ],
+  "ready": true,
+  "production_ready": false,
+  "credentials_recorded": false
+}

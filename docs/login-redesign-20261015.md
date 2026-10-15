@@ -33,6 +33,16 @@
 
 证据：[桌面](evidence/login-redesign-20261015/login-desktop.png)、[手机](evidence/login-redesign-20261015/login-mobile.png)、[错误与帮助](evidence/login-redesign-20261015/login-errors-help-320.png)、[图片失败降级](evidence/login-redesign-20261015/login-image-fallback.png)、[机器记录](evidence/login-redesign-20261015/validation.json)。
 
+## 截图区域二次精修（2026-10-15）
+
+用户针对登录卡片截图要求继续改善样式。本次只精修卡片：较小的账号登录标题、低强调的环境标签、浅灰填充输入框、统一圆角/字重/间距、移除重复前置图标，找回入口与密码标签同排。密码标签使用独立label关联原输入ID，避免将按钮嵌入label；保留密码显隐、错误描述、提交、SSO及会话逻辑。背景继续使用上一版生成资源。
+
+QA：默认/聚焦/错误/帮助状态，标签点击聚焦、Tab顺序、密码显隐；320/390/768/1024/1440/1920及844×390；相关认证回归与构建。在已提交 `b7a8bc8` 的隔离基线上验证，不混入同期运行配置功能。
+
+18项相关测试、类型与生产构建门禁通过，7组视口无横向溢出和标签/找回入口重叠，320px错误与帮助状态仍可操作。找回入口初版DOM位置会打断账号→密码的Tab顺序，已改为网格视觉定位，并实测Tab直达密码、点击密码标签聚焦对应输入。密码显隐、真实登录200、退出本人测试会话后清空表单通过。背景与API未修改，没有业务实体提交。
+
+本轮构建 `c73097a9275d42a64d39b129523ef26bc0ca9b678859afe2d3ab244282bebc35`。见[卡片近景](evidence/login-card-polish-20261015/card-desktop.png)、[手机](evidence/login-card-polish-20261015/login-390.png)、[错误与帮助](evidence/login-card-polish-20261015/card-error-help-320.png)、[验证记录](evidence/login-card-polish-20261015/validation.json)。代码提交推送，本轮未部署测试服务器。
+
 ## 生成提示词
 
 Use case: stylized-concept. Asset type: full-bleed background image for a minimal enterprise network operations management system login page. Create a refined, quiet 3D architectural illustration, wide landscape 16:9, high resolution. A small, carefully composed group of abstract server-rack forms and network infrastructure modules sits in the left third and lower-left, made of matte porcelain-white and very pale ice-blue glass with subtle cobalt-blue edge accents. A few thin elegant network connection lines flow gently along the lower left, suggesting connected infrastructure without a dense web. Soft daylight, restrained shadows, clean professional engineering aesthetic, generous negative space. The right 55 percent must remain a calm almost-white blue-tinted open field for a real HTML login form to be placed later, no baked-in card. Smooth transition between illustration and empty area, no harsh dividing line, no busy details behind the future form. Colors should fit an existing light blue business dashboard: off-white, mist blue, small accents near #2165c5. Avoid dark cyberpunk, neon, glowing grids, dramatic lighting, stock-photo people, shields, padlocks, globes, floating badges, dashboard panels, UI controls, decorative typography. Absolutely no text, letters, numbers, logos or watermark. This is a background illustration only, not a screenshot or UI mockup.

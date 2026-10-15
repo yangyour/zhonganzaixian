@@ -26,7 +26,7 @@ onUnmounted(reader.dispose)
     <el-alert type="warning" :closable="false" show-icon title="仅完成登记，内容为自述、未经独立核验。监控正常不会让手工记录自动恢复；正式处置、工单关联和SLA尚未完成。" />
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前读取权限不可用，原范围数据已清除" />
     <template v-else>
-      <div class="proto-kpis"><div><span>本页手工登记</span><b>{{ state.page ? state.page.items.length : '—' }}</b><small>当前读取页，非全部数量</small></div><div><span>当前恢复状态</span><b>待回读</b><small>在登记详情独立查询</small></div><div><span>正式工单</span><b>待接入</b><small>登记不会自动建单</small></div><div><span>SLA 时限</span><b>未知</b><small>正式规则尚未落实</small></div></div>
+      <div class="proto-kpis"><div><span>本页手工登记</span><b>{{ state.page ? state.page.items.length : '—' }}</b><small>当前读取页，非全部数量</small></div><div><span>本页涉及资产</span><b>{{ state.page ? new Set(state.page.items.map(row => row.asset_id)).size : '—' }}</b><small>按资产标识去重，非库存总量</small></div><div><span>本页严重 / 灾难</span><b>{{ state.page ? state.page.items.filter(row => ['high','disaster'].includes(row.severity)).length : '—' }}</b><small>人工登记等级，非正式告警级别</small></div><div><span>当前登记详情</span><b>{{ state.selected ? '已选择' : '未选择' }}</b><small>恢复事实在详情内独立读取</small></div></div>
       <div class="manual-workspace" :class="{ 'has-selection': state.selected }"><div class="proto-panel manual-registers">
       <div class="proto-section-head"><h2>全部手工登记</h2><el-button :loading="state.busy" @click="reader.list()">刷新第一页（只读）</el-button></div>
       <ApiErrorNotice :error="state.error" />

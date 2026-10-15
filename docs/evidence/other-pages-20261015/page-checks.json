@@ -1,0 +1,128 @@
+{
+  "date": "2026-10-15",
+  "environment": "lan-test-20261008",
+  "stage": "development-preview-with-designated-api",
+  "matrix": [
+    {
+      "path": "/backup-plan-drafts",
+      "width": 1440,
+      "stats": "本页备份计划\n1\n当前已读取记录，非总体数量\n本页未归档\n0\n仅记录状态，不表示批准或生效\n当前所选版本\n—\n按明确版本读取\n缺少凭据引用\n1\n仅本页；有引用也不表示验证通过",
+      "overflow": false
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "width": 390,
+      "stats": "本页备份计划\n1\n当前已读取记录，非总体数量\n本页未归档\n0\n仅记录状态，不表示批准或生效\n当前所选版本\n—\n按明确版本读取\n缺少凭据引用\n1\n仅本页；有引用也不表示验证通过",
+      "overflow": false
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 1440,
+      "stats": "本页变更报备\n1\n当前已读取记录，非总体数量\n本页未归档\n0\n仅记录状态，不表示批准或生效\n当前所选版本\n—\n按明确版本读取\n未填结束时间\n0\n本页报备；未知时间不自动补齐",
+      "overflow": false
+    },
+    {
+      "path": "/change-notice-drafts",
+      "width": 390,
+      "stats": "本页变更报备\n1\n当前已读取记录，非总体数量\n本页未归档\n0\n仅记录状态，不表示批准或生效\n当前所选版本\n—\n按明确版本读取\n未填结束时间\n0\n本页报备；未知时间不自动补齐",
+      "overflow": false
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 1440,
+      "stats": "本页巡检模板\n0\n当前已读取记录，非总体数量\n本页未归档\n0\n仅记录状态，不表示批准或生效\n当前所选版本\n—\n按明确版本读取\n本页检查项合计\n0\n逐模板累加，非已执行检查数",
+      "overflow": false
+    },
+    {
+      "path": "/inspection-templates",
+      "width": 390,
+      "stats": "本页巡检模板\n0\n当前已读取记录，非总体数量\n本页未归档\n0\n仅记录状态，不表示批准或生效\n当前所选版本\n—\n按明确版本读取\n本页检查项合计\n0\n逐模板累加，非已执行检查数",
+      "overflow": false
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 1440,
+      "stats": "本页巡检执行单\n0\n当前已读取记录，非总体数量\n本页未归档\n0\n仅记录状态，不表示批准或生效\n当前所选版本\n—\n按明确版本读取\n本页未答检查项\n0\n逐执行单累加，未填写不算正常",
+      "overflow": false
+    },
+    {
+      "path": "/inspection-worksheets",
+      "width": 390,
+      "stats": "本页巡检执行单\n0\n当前已读取记录，非总体数量\n本页未归档\n0\n仅记录状态，不表示批准或生效\n当前所选版本\n—\n按明确版本读取\n本页未答检查项\n0\n逐执行单累加，未填写不算正常",
+      "overflow": false
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 1440,
+      "stats": "本页来源集合\n1\n当前已读取草稿，非报告总量\n正在选择来源\n0\n明确执行单修订\n涉及已选资产\n0\n非租户库存数量\n本页已存来源修订\n1\n逐集合累加，非报告或去重来源数",
+      "overflow": false
+    },
+    {
+      "path": "/inspection-source-collections",
+      "width": 390,
+      "stats": "本页来源集合\n1\n当前已读取草稿，非报告总量\n正在选择来源\n0\n明确执行单修订\n涉及已选资产\n0\n非租户库存数量\n本页已存来源修订\n1\n逐集合累加，非报告或去重来源数",
+      "overflow": false
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 1440,
+      "stats": "本页手工登记\n0\n当前读取页，非全部数量\n本页涉及资产\n0\n按资产标识去重，非库存总量\n本页严重 / 灾难\n0\n人工登记等级，非正式告警级别\n当前登记详情\n未选择\n恢复事实在详情内独立读取",
+      "overflow": false
+    },
+    {
+      "path": "/manual-incidents",
+      "width": 390,
+      "stats": "本页手工登记\n0\n当前读取页，非全部数量\n本页涉及资产\n0\n按资产标识去重，非库存总量\n本页严重 / 灾难\n0\n人工登记等级，非正式告警级别\n当前登记详情\n未选择\n恢复事实在详情内独立读取",
+      "overflow": false
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 1440,
+      "stats": "本人请求\n尚未创建\n当前租户本人草稿\n已保存版本\n—\n来自当前回读，非未提交输入\n请求渠道数\n—\n明确空集合为0；不表示已接通\n静音请求\n—\nAsia/Shanghai · 仅请求，未生效",
+      "overflow": false
+    },
+    {
+      "path": "/my-notification-preferences",
+      "width": 390,
+      "stats": "本人请求\n尚未创建\n当前租户本人草稿\n已保存版本\n—\n来自当前回读，非未提交输入\n请求渠道数\n—\n明确空集合为0；不表示已接通\n静音请求\n—\nAsia/Shanghai · 仅请求，未生效",
+      "overflow": false
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 1440,
+      "stats": "输入总体声明\n未声明\n仅用户输入，不代表项目全集\n假设输入场景\n0\n仅当前页面输入\n场景内达标 / 未达标\n—\n明确计算后显示\n本次对照状态\n未计算\n以服务端本次返回为准",
+      "overflow": false
+    },
+    {
+      "path": "/sla-scenarios",
+      "width": 390,
+      "stats": "输入总体声明\n未声明\n仅用户输入，不代表项目全集\n假设输入场景\n0\n仅当前页面输入\n场景内达标 / 未达标\n—\n明确计算后显示\n本次对照状态\n未计算\n以服务端本次返回为准",
+      "overflow": false
+    },
+    {
+      "path": "/capacity-estimates",
+      "width": 1440,
+      "stats": "平均 NVPS\n—\n值 / 秒 · 显式模型估算\n单节点容量\n—\nbytes · 历史 + 趋势 + 余量\n有效监控项\n—\n数量未知时不按零处理\n模型状态\n待明确\n不是已测吞吐或采购规格",
+      "overflow": false
+    },
+    {
+      "path": "/capacity-estimates",
+      "width": 390,
+      "stats": "平均 NVPS\n—\n值 / 秒 · 显式模型估算\n单节点容量\n—\nbytes · 历史 + 趋势 + 余量\n有效监控项\n—\n数量未知时不按零处理\n模型状态\n待明确\n不是已测吞吐或采购规格",
+      "overflow": false
+    }
+  ],
+  "pageErrors": [],
+  "extra_checks": [
+    "worklogs exact zero and empty filter",
+    "operations unknown/bigint/101 rows/manual staffing/read-only POST",
+    "operations failure clears visualization",
+    "archived template 2 items",
+    "archived worksheet 1 record",
+    "SLA explicit empty denominator",
+    "capacity explicit model echo",
+    "own viewer notification request read"
+  ],
+  "business_mutations": 0,
+  "credentials_recorded": false
+}

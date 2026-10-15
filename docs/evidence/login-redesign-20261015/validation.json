@@ -1,0 +1,362 @@
+{
+  "verified_at": "2026-10-15T02:59:51.857Z",
+  "source_base": "5a5f142",
+  "environment": "lan-test-20261008",
+  "validated_source_sha256": {
+    "apps/web/src/pages/LoginPage.vue": "f761ec0a00e8f5cf0a92d223431b6d0187f4f89407237f896cdc9f581ffc4597",
+    "apps/web/src/bootstrap.ts": "6fbd0f79b362dc33062b756edc5f45434c99315ab9e3fd71a6ce4deb588140fe",
+    "apps/web/src/assets/login-infrastructure-20261015.webp": "fb1338c385e7fba87b9bc0747cd7d0b122df4e28909b26d96066c95e6ab9160f"
+  },
+  "asset": {
+    "tool": "built-in image_gen",
+    "path": "apps/web/src/assets/login-infrastructure-20261015.webp",
+    "width": 1672,
+    "height": 941,
+    "bytes": 60498,
+    "source_png_bytes": 1616814,
+    "conversion": "WebP quality 88, same dimensions, no crop or redraw"
+  },
+  "tests": {
+    "files": 3,
+    "tests": 18,
+    "status": "PASS"
+  },
+  "build": "PASS",
+  "typecheck": "PASS",
+  "build_id": "a5d6f83974465a5d8195837da395bf2fa16d366d2a5832e196b6c38db304c02a",
+  "browser": "155.0.4283.45",
+  "checks": [
+    "nine viewports fit; short window permits vertical scrolling; generated background and preload match",
+    "empty login focuses account; inline errors and minimal password-help remain usable at 320",
+    "password toggle remains usable; help is explicitly expandable",
+    "designated API login returns 200 and reaches authorized workspace",
+    "test session logout returns to an empty login form",
+    "background request failure leaves login form and validation usable",
+    "failed decorative image is hidden, with no broken-image icon"
+  ],
+  "layouts": [
+    {
+      "width": 320,
+      "height": 720,
+      "clientWidth": 320,
+      "scrollWidth": 320,
+      "scrollHeight": 720,
+      "card": {
+        "x": 16,
+        "y": 193.1354217529297,
+        "width": 288,
+        "height": 393.71875,
+        "top": 193.1354217529297,
+        "right": 304,
+        "bottom": 586.8541717529297,
+        "left": 16
+      },
+      "submit": {
+        "x": 38.66666793823242,
+        "y": 510.1875,
+        "width": 242.6666717529297,
+        "height": 48,
+        "top": 510.1875,
+        "right": 281.3333396911621,
+        "bottom": 558.1875,
+        "left": 38.66666793823242
+      },
+      "background": {
+        "loaded": true,
+        "display": "block",
+        "width": 1672,
+        "height": 941
+      },
+      "preloadMatches": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "card": {
+        "x": 16,
+        "y": 255.1354217529297,
+        "width": 358,
+        "height": 393.71875,
+        "top": 255.1354217529297,
+        "right": 374,
+        "bottom": 648.8541717529297,
+        "left": 16
+      },
+      "submit": {
+        "x": 40.66666793823242,
+        "y": 572.1875,
+        "width": 308.66668701171875,
+        "height": 48,
+        "top": 572.1875,
+        "right": 349.3333549499512,
+        "bottom": 620.1875,
+        "left": 40.66666793823242
+      },
+      "background": {
+        "loaded": true,
+        "display": "block",
+        "width": 1672,
+        "height": 941
+      },
+      "preloadMatches": true
+    },
+    {
+      "width": 600,
+      "height": 800,
+      "clientWidth": 600,
+      "scrollWidth": 600,
+      "scrollHeight": 800,
+      "card": {
+        "x": 95,
+        "y": 208.0104217529297,
+        "width": 410,
+        "height": 431.97918701171875,
+        "top": 208.0104217529297,
+        "right": 505,
+        "bottom": 639.9896087646484,
+        "left": 95
+      },
+      "submit": {
+        "x": 133.6666717529297,
+        "y": 553.3229370117188,
+        "width": 332.66668701171875,
+        "height": 48,
+        "top": 553.3229370117188,
+        "right": 466.33335876464844,
+        "bottom": 601.3229370117188,
+        "left": 133.6666717529297
+      },
+      "background": {
+        "loaded": true,
+        "display": "block",
+        "width": 1672,
+        "height": 941
+      },
+      "preloadMatches": true
+    },
+    {
+      "width": 768,
+      "height": 800,
+      "clientWidth": 768,
+      "scrollWidth": 768,
+      "scrollHeight": 800,
+      "card": {
+        "x": 179,
+        "y": 211.0104217529297,
+        "width": 410,
+        "height": 425.97918701171875,
+        "top": 211.0104217529297,
+        "right": 589,
+        "bottom": 636.9896087646484,
+        "left": 179
+      },
+      "submit": {
+        "x": 217.6666717529297,
+        "y": 550.3229370117188,
+        "width": 332.66668701171875,
+        "height": 48,
+        "top": 550.3229370117188,
+        "right": 550.3333587646484,
+        "bottom": 598.3229370117188,
+        "left": 217.6666717529297
+      },
+      "background": {
+        "loaded": true,
+        "display": "block",
+        "width": 1672,
+        "height": 941
+      },
+      "preloadMatches": true
+    },
+    {
+      "width": 900,
+      "height": 800,
+      "clientWidth": 900,
+      "scrollWidth": 900,
+      "scrollHeight": 800,
+      "card": {
+        "x": 245,
+        "y": 212.5729217529297,
+        "width": 410,
+        "height": 422.85418701171875,
+        "top": 212.5729217529297,
+        "right": 655,
+        "bottom": 635.4271087646484,
+        "left": 245
+      },
+      "submit": {
+        "x": 283.66668701171875,
+        "y": 548.7604370117188,
+        "width": 332.66668701171875,
+        "height": 48,
+        "top": 548.7604370117188,
+        "right": 616.3333740234375,
+        "bottom": 596.7604370117188,
+        "left": 283.66668701171875
+      },
+      "background": {
+        "loaded": true,
+        "display": "block",
+        "width": 1672,
+        "height": 941
+      },
+      "preloadMatches": true
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "clientWidth": 1024,
+      "scrollWidth": 1024,
+      "scrollHeight": 768,
+      "card": {
+        "x": 562.8021240234375,
+        "y": 185.15625,
+        "width": 410,
+        "height": 421.6770935058594,
+        "top": 185.15625,
+        "right": 972.8021240234375,
+        "bottom": 606.8333435058594,
+        "left": 562.8021240234375
+      },
+      "submit": {
+        "x": 601.46875,
+        "y": 520.1666870117188,
+        "width": 332.66668701171875,
+        "height": 48,
+        "top": 520.1666870117188,
+        "right": 934.1354370117188,
+        "bottom": 568.1666870117188,
+        "left": 601.46875
+      },
+      "background": {
+        "loaded": true,
+        "display": "block",
+        "width": 1672,
+        "height": 941
+      },
+      "preloadMatches": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "clientWidth": 1440,
+      "scrollWidth": 1440,
+      "scrollHeight": 900,
+      "card": {
+        "x": 900.40625,
+        "y": 251.23959350585938,
+        "width": 410,
+        "height": 421.5208435058594,
+        "top": 251.23959350585938,
+        "right": 1310.40625,
+        "bottom": 672.7604370117188,
+        "left": 900.40625
+      },
+      "submit": {
+        "x": 939.0729370117188,
+        "y": 586.09375,
+        "width": 332.66668701171875,
+        "height": 48,
+        "top": 586.09375,
+        "right": 1271.7396240234375,
+        "bottom": 634.09375,
+        "left": 939.0729370117188
+      },
+      "background": {
+        "loaded": true,
+        "display": "block",
+        "width": 1672,
+        "height": 941
+      },
+      "preloadMatches": true
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "clientWidth": 1920,
+      "scrollWidth": 1920,
+      "scrollHeight": 1080,
+      "card": {
+        "x": 1337.2083740234375,
+        "y": 341.2395935058594,
+        "width": 410,
+        "height": 421.5208435058594,
+        "top": 341.2395935058594,
+        "right": 1747.2083740234375,
+        "bottom": 762.7604370117188,
+        "left": 1337.2083740234375
+      },
+      "submit": {
+        "x": 1375.875,
+        "y": 676.09375,
+        "width": 332.66668701171875,
+        "height": 48,
+        "top": 676.09375,
+        "right": 1708.5416870117188,
+        "bottom": 724.09375,
+        "left": 1375.875
+      },
+      "background": {
+        "loaded": true,
+        "display": "block",
+        "width": 1672,
+        "height": 941
+      },
+      "preloadMatches": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "clientWidth": 829,
+      "scrollWidth": 829,
+      "scrollHeight": 529,
+      "card": {
+        "x": 209.33334350585938,
+        "y": 84,
+        "width": 410,
+        "height": 421.5208435058594,
+        "top": 84,
+        "right": 619.3333435058594,
+        "bottom": 505.5208435058594,
+        "left": 209.33334350585938
+      },
+      "submit": {
+        "x": 248,
+        "y": 418.85418701171875,
+        "width": 332.66668701171875,
+        "height": 48,
+        "top": 418.85418701171875,
+        "right": 580.6666870117188,
+        "bottom": 466.85418701171875,
+        "left": 248
+      },
+      "background": {
+        "loaded": true,
+        "display": "block",
+        "width": 1672,
+        "height": 941
+      },
+      "preloadMatches": true
+    }
+  ],
+  "page_errors": [],
+  "business_writes": [],
+  "auth_operations": [
+    "project-local login returned 200",
+    "logout of own test session"
+  ],
+  "readiness": {
+    "ready": true,
+    "production_ready": false
+  },
+  "server_deployed_by_this_round": false,
+  "preview": "http://127.0.0.1:15175/login",
+  "limitations": [
+    "physical mobile and native zoom not tested",
+    "SSO branches unit tested, not a live OIDC-provider acceptance",
+    "no production or full contract acceptance"
+  ]
+}

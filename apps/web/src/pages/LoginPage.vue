@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
-import { ElAlert, ElButton, ElDivider, ElForm, ElFormItem, ElInput, ElTag, type InputInstance } from 'element-plus'
+import { ElAlert, ElButton, ElDivider, ElForm, ElFormItem, ElInput, type InputInstance } from 'element-plus'
 import { Hide, Lock, User, View } from '@element-plus/icons-vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api, ApiError, isCancelled } from '../api/client'
 import type { AuthOptions, Session } from '../api/types'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
-import loginBackground from '../assets/login-datacenter.png'
+import loginBackground from '../assets/login-infrastructure-20261015.webp'
 import { sessionExpired, loginReturnPath } from '../stores/session'
 import { loginDestination } from '../utils/loginDestination'
 const router = useRouter()
@@ -14,6 +14,7 @@ const route = useRoute(), options = ref<AuthOptions | null>(null), loading = ref
 const username = ref(''), password = ref(''), help = ref(false), controller = new AbortController()
 const usernameInput = ref<InputInstance | null>(null), passwordInput = ref<InputInstance | null>(null), errorNotice = ref<HTMLElement | null>(null)
 const usernameError = ref(''), passwordError = ref(''), passwordVisible = ref(false), capsLock = ref(false)
+const backgroundFailed = ref(false)
 const loginMethod = ref<'local' | 'unified' | null>(null)
 const passwordDescription = computed(() => [passwordError.value ? 'login-password-error' : '', capsLock.value ? 'login-caps-lock' : ''].filter(Boolean).join(' ') || undefined)
 const oidcFailure = computed(() => route.query.auth_error ? '统一认证登录未完成，请重试或使用项目账号。' : '')
@@ -80,15 +81,14 @@ function updateCapsLock(event: KeyboardEvent | Event) {
 }
 </script>
 <template>
-  <div class="login-screen prototype-login">
-    <img class="login-background" :src="loginBackground" alt="" aria-hidden="true" fetchpriority="high" />
-    <section class="login-story"><header class="login-header">
-      <div class="login-brand"><span class="brand-mark">M</span>MOP 运维托管</div>
-      <el-tag class="login-environment" type="info" effect="plain">测试环境</el-tag>
-    </header><div class="login-story-content"><h2>让运维信息清晰可见，<br />让每一步操作有据可查</h2><p>在统一的运维门户中查看资产、跟进登记与维护资料。按租户和角色提供所需入口，未确认的数据始终明确展示。</p><div class="login-feature-grid"><article><h3>统一资源视图</h3><p>资产台账、设备采样与资料修订集中查看。</p></article><article><h3>清楚的处理记录</h3><p>报障、评论、工时及历史记录保持可追溯。</p></article><article><h3>明确的访问范围</h3><p>按照当前租户与角色授予操作和查看权限。</p></article><article><h3>可信的数据状态</h3><p>草稿、待确认与未知状态分别呈现。</p></article></div></div><p class="login-story-footer">MOP 运维托管平台 · 项目测试环境</p></section>
+  <div class="login-screen">
+    <img v-show="!backgroundFailed" class="login-background" :src="loginBackground" alt="" aria-hidden="true" fetchpriority="high" decoding="async" width="1672" height="941" @error="backgroundFailed = true" />
+    <header class="login-header">
+      <div class="login-brand"><span class="brand-mark" aria-hidden="true">M</span><span>MOP 运维托管</span></div>
+    </header>
     <main class="login-main">
     <section class="login-card" aria-labelledby="login-title">
-      <h1 id="login-title">登录到运维门户</h1><p class="login-intro">使用项目账号登录，访问已授权的运维工作区。</p>
+      <div class="login-card-heading"><h1 id="login-title">登录</h1><span v-if="options?.mode === 'remote_test'" class="login-environment">测试环境</span></div>
       <p class="login-progress" role="status">{{ loading ? '正在连接登录服务…' : submitting ? loginMethod === 'unified' ? '正在打开统一认证页面，请稍候。' : '正在核对账号信息，请稍候。' : '' }}</p>
       <el-alert v-if="sessionExpired" class="page-note" role="status" title="登录状态已失效，请重新登录。登录后请先核对刚才未确认的提交结果。" type="warning" :closable="false" show-icon />
       <el-alert v-if="oidcFailure" :title="oidcFailure" type="error" :closable="false" show-icon class="page-note" />
@@ -104,11 +104,11 @@ function updateCapsLock(event: KeyboardEvent | Event) {
           <el-input id="login-password" ref="passwordInput" v-model="password" :prefix-icon="Lock" placeholder="请输入密码" aria-label="登录密码" :type="passwordVisible ? 'text' : 'password'" autocomplete="current-password" maxlength="1024" required :validate-event="false" :disabled="submitting" :aria-invalid="passwordError ? true : undefined" :aria-describedby="passwordDescription" @input="passwordError = ''" @keydown="updateCapsLock" @keyup="updateCapsLock" @blur="capsLock = false">
             <template #suffix><el-button native-type="button" text size="small" class="password-toggle" :icon="passwordVisible ? Hide : View" :title="passwordVisible ? '隐藏密码' : '显示密码'" :aria-label="passwordVisible ? '隐藏密码' : '显示密码'" :aria-pressed="passwordVisible" aria-controls="login-password" :disabled="submitting" @click="passwordVisible = !passwordVisible" /></template>
           </el-input>
-          <el-button native-type="button" link type="primary" class="password-help" :aria-expanded="help" aria-controls="login-password-help" @click="help = !help">{{ help ? '收起找回说明' : '忘记密码？' }}</el-button>
           <template #error><p id="login-password-error" class="login-field-error" role="alert">{{ passwordError }}</p></template>
         </el-form-item>
+        <div class="login-actions"><el-button native-type="button" link type="primary" class="password-help" :aria-expanded="help" aria-controls="login-password-help" @click="help = !help">{{ help ? '收起找回说明' : '忘记密码？' }}</el-button></div>
         <el-alert v-if="capsLock" id="login-caps-lock" class="login-caps-lock" role="status" title="大写锁定已开启，请留意密码的大小写。" type="warning" :closable="false" show-icon />
-        <el-alert v-if="help" id="login-password-help" class="login-help" title="请联系项目管理员重置密码。目前还不能通过邮件或短信找回。" type="info" :closable="false" show-icon />
+        <el-alert v-if="help" id="login-password-help" class="login-help" title="请联系项目管理员重置密码。" type="info" :closable="false" show-icon />
         <el-button native-type="submit" type="primary" size="large" :loading="loginMethod === 'local'" :disabled="submitting" class="login-submit">{{ loginMethod === 'local' ? '正在登录…' : '登录' }}</el-button>
       </el-form>
       <el-divider v-if="options?.local_enabled && options.sso_enabled && options.login_url" class="login-alternative">或</el-divider>
@@ -120,50 +120,62 @@ function updateCapsLock(event: KeyboardEvent | Event) {
   </div>
 </template>
 <style scoped>
-.login-screen{position:relative;isolation:isolate;display:flex;flex-direction:column;min-height:100vh;min-height:100svh;background:#10243b}
-.login-background{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center}
-.login-screen::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,transparent 35%,#0b1c2e16 65%,#0b1c2e38)}
-.login-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:32px clamp(24px,4.5vw,72px);color:#fff}
-.login-brand{display:flex;align-items:center;gap:12px;font-size:19px;font-weight:600;letter-spacing:.3px}
-.login-brand .brand-mark{width:40px;height:40px;border-radius:11px;font-size:25px;background:#2878e8;box-shadow:0 4px 16px #0002}
-.login-environment{--el-tag-text-color:#dce8f7;--el-tag-bg-color:#ffffff0d;--el-tag-border-color:#ffffff30;height:28px;padding:0 12px;border-radius:20px;font-size:12px}
-.login-main{flex:1;display:flex;align-items:center;justify-content:flex-end;padding:28px clamp(48px,9vw,160px) 100px;min-width:0}
-.login-card{--el-font-size-base:14px;--el-border-radius-base:9px;--el-color-primary:#256ce4;width:420px;max-width:100%;min-width:0;padding:42px;background:#fffffffa;border:1px solid #fff;border-radius:20px;box-shadow:0 24px 80px #04102338}
-.login-card h1{margin:0 0 30px;font-size:28px;line-height:1.35;font-weight:650;letter-spacing:-.5px;color:#162b47}
-.local-login-form{margin:0;display:flex;flex-direction:column}
-.login-field{min-width:0;margin-bottom:24px}
-.local-login-form :deep(.el-form-item__label){display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:500;line-height:24px;padding:0;margin:0 0 9px;color:#34465d}
-.local-login-form :deep(.el-input__wrapper){min-height:50px;padding:0 14px;background:#fff;box-shadow:0 0 0 1px #d4deea inset;border-radius:9px;transition:box-shadow .18s}
-.local-login-form :deep(.el-input__wrapper:hover){box-shadow:0 0 0 1px #9bb0cc inset}
-.local-login-form :deep(.el-input__wrapper.is-focus){box-shadow:0 0 0 2px #256ce4 inset}
-.local-login-form :deep(.el-form-item.is-error .el-input__wrapper){box-shadow:0 0 0 1px #c4424e inset}
-.local-login-form :deep(.el-input__inner){height:48px;color:#243750;font-size:15px}
-.local-login-form :deep(.el-input__prefix){font-size:17px;color:#8394ac}.local-login-form :deep(.el-input__inner::placeholder){font-size:14px;color:#8999ad}
-.local-login-form :deep(.el-input.is-disabled .el-input__wrapper){background:#f3f6fa}
-.password-toggle{min-height:42px;min-width:44px;margin-right:-7px;padding:0 8px;color:#617891;border-radius:6px;font-size:18px}
-.login-submit{width:100%;height:50px;margin:4px 0 0;font-size:15px;font-weight:500;border-radius:9px}
-.login-submit.el-button--primary{box-shadow:0 5px 12px #256ce421}
-.password-help{position:absolute;right:0;top:-37px;height:32px;min-height:32px;margin:0!important;padding:0 2px;font-size:12px;font-weight:400}
-.login-field-error{width:100%;margin:7px 0 0;color:#ba3543;font-size:12px;line-height:1.6}
-.login-progress{margin:0 0 18px;color:#536b86;font-size:13px;line-height:1.7}
-.login-progress:empty{margin:0}
-.login-caps-lock,.login-help{margin-bottom:18px}.login-alternative{margin:26px 0 22px}.login-alternative :deep(.el-divider__text){background:#fefefe;color:#8796a8;font-size:12px}
-.login-card :deep(.el-alert){border-radius:9px;padding:12px 14px}.login-card :deep(.el-alert__title){font-size:12px!important;line-height:1.65!important}.login-card :deep(.el-alert__icon){font-size:16px;width:16px}
-.login-error{border-radius:9px}.password-toggle:focus-visible,.password-help:focus-visible,.login-error:focus-visible{outline:2px solid #256ce4;outline-offset:3px}
-@media(max-width:1100px){.login-main{padding-right:6vw;padding-left:6vw}.login-card{width:400px;padding:36px}.login-background{object-position:42% center}}
-@media(max-width:760px){.login-header{padding:24px;gap:10px}.login-brand{font-size:16px;gap:10px}.login-brand .brand-mark{width:34px;height:34px;font-size:22px;border-radius:9px}.login-environment{padding:0 9px;font-size:11px}.login-main{align-items:center;justify-content:center;padding:24px 20px 64px}.login-card{width:400px;padding:32px 28px;border-radius:18px}.login-card h1{font-size:25px;margin-bottom:26px}.login-background{object-position:27% center}.login-screen::before{background:#0c203b40}}
-@media(max-width:360px){.login-header{padding:20px 16px}.login-brand{font-size:15px}.login-main{padding:16px 16px 40px}.login-card{padding:28px 22px}.login-environment{font-size:10px;padding:0 7px}}
-@media(prefers-reduced-motion:reduce){.local-login-form :deep(.el-input__wrapper){transition:none}}
-</style>
-<style scoped>
-.prototype-login{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);background:#f5f9ff;min-height:100vh;min-height:100svh}
-.prototype-login::before,.prototype-login .login-background{display:none}
-.login-story{position:relative;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(155deg,#101b36,#213e86 70%,#265de0);color:white;padding:56px 8.5%;min-height:100vh;min-height:100svh}
-.login-story::after{content:'';position:absolute;width:600px;height:600px;right:-210px;bottom:-170px;border:80px solid #8cb0ff12;border-radius:50%;pointer-events:none}
-.prototype-login .login-header{padding:0;align-items:flex-start}.prototype-login .login-brand{font-size:17px;letter-spacing:0}.prototype-login .login-brand .brand-mark{border-radius:3px;background:linear-gradient(135deg,#91d8e8,#2878f5);box-shadow:none}.prototype-login .login-environment{border-radius:3px;font-size:10px}
-.login-story-content{margin-top:32px;position:relative;z-index:1}.login-story-content h2{font-size:34px;line-height:1.4;font-weight:650;margin:0 0 12px;letter-spacing:-.3px}.login-story-content>p{font-size:14px;line-height:1.9;color:#d7e3ff;max-width:540px;margin:0}
-.login-feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:36px}.login-feature-grid article{background:#ffffff12;border:1px solid #ffffff25;border-radius:10px;padding:16px;min-height:96px}.login-feature-grid h3{font-size:13px;margin:0 0 6px}.login-feature-grid p{font-size:12px;line-height:1.8;color:#dce6ff;margin:0}.login-story-footer{position:relative;z-index:1;margin-top:auto;padding-top:50px;color:#9bb3e7;font-size:11px}
-.prototype-login .login-main{justify-content:center;padding:40px}.prototype-login .login-card{width:420px;padding:32px;border:1px solid #e2eaf5;border-radius:16px;box-shadow:0 8px 26px #235a9b08;background:#fff}.prototype-login .login-card h1{font-size:22px;margin:0 0 4px;font-weight:600;letter-spacing:0}.login-intro{font-size:12px;color:#8593a6;line-height:1.8;margin-bottom:26px}.prototype-login .login-field{margin-bottom:18px}.prototype-login .local-login-form :deep(.el-form-item__label){font-size:12px;margin-bottom:5px}.prototype-login .local-login-form :deep(.el-input__wrapper){min-height:40px;border-radius:4px}.prototype-login .local-login-form :deep(.el-input__inner){height:38px;font-size:13px}.prototype-login .login-submit{height:40px;border-radius:3px;font-size:13px;box-shadow:none}.prototype-login .password-toggle{min-height:36px}.prototype-login .login-progress{font-size:12px}
-@media(max-width:1100px){.login-story{padding:40px 7%}.login-story-content h2{font-size:28px}.login-feature-grid{grid-template-columns:1fr;margin-top:24px;gap:10px}.login-feature-grid article{min-height:0;padding:12px 14px}.prototype-login .login-main{padding:24px}}
-@media(max-width:760px){.prototype-login{display:block}.login-story{min-height:0;padding:24px}.login-story-content{margin-top:22px}.login-story-content h2{font-size:25px}.login-story-content>p{font-size:12px}.login-feature-grid,.login-story-footer{display:none}.prototype-login .login-main{padding:24px 16px 40px}.prototype-login .login-card{padding:26px 24px;border-radius:12px}.prototype-login .local-login-form :deep(.el-input__wrapper),.prototype-login .login-submit{min-height:44px}.prototype-login .local-login-form :deep(.el-input__inner){height:42px}}
+.login-screen { position: relative; isolation: isolate; display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh; background: #edf5fc; color: #20354e; }
+.login-background { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; object-position: center; pointer-events: none; }
+.login-header { display: flex; align-items: center; padding: 32px clamp(24px, 4.5vw, 80px); }
+.login-brand { display: inline-flex; align-items: center; gap: 11px; font-size: 18px; font-weight: 600; line-height: 1.5; }
+.login-brand .brand-mark { display: grid; place-items: center; flex-shrink: 0; width: 34px; height: 36px; border-radius: 8px; background: #2165c5; color: #fff; font-size: 23px; font-weight: 600; }
+.login-main { flex: 1; display: flex; align-items: center; justify-content: flex-end; min-width: 0; padding: 24px clamp(40px, 9vw, 180px) 100px; }
+.login-card { --el-color-primary: #2165c5; width: 410px; max-width: 100%; min-width: 0; padding: 38px; border: 1px solid #dce7f2; border-radius: 16px; background: #fffffff5; box-shadow: 0 20px 64px #244c7a12; }
+.login-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 30px; }
+.login-card h1 { margin: 0; color: #20354e; font-size: 26px; line-height: 1.4; font-weight: 600; letter-spacing: 0; }
+.login-environment { color: #60738b; font-size: 12px; line-height: 1.5; white-space: nowrap; }
+.local-login-form { display: flex; flex-direction: column; margin: 0; }
+.login-field { min-width: 0; margin-bottom: 21px; }
+.password-field { margin-bottom: 0; }
+.local-login-form :deep(.el-form-item__label) { height: auto; margin: 0 0 8px; padding: 0; color: #344b66; font-size: 14px; font-weight: 500; line-height: 1.6; }
+.local-login-form :deep(.el-input__wrapper) { min-height: 48px; padding: 0 13px; border-radius: 8px; background: #fff; box-shadow: 0 0 0 1px #bacbdd inset; transition: box-shadow .15s; }
+.local-login-form :deep(.el-input__wrapper:hover) { box-shadow: 0 0 0 1px #7c96b3 inset; }
+.local-login-form :deep(.el-input__wrapper.is-focus) { box-shadow: 0 0 0 2px #2165c5 inset; }
+.local-login-form :deep(.el-form-item.is-error .el-input__wrapper) { box-shadow: 0 0 0 1px #b43746 inset; }
+.local-login-form :deep(.el-input__inner) { height: 46px; color: #263b54; font-size: 15px; }
+.local-login-form :deep(.el-input__inner::placeholder) { color: #62738a; font-size: 14px; }
+.local-login-form :deep(.el-input__prefix) { color: #71869f; font-size: 17px; }
+.local-login-form :deep(.el-input.is-disabled .el-input__wrapper) { background: #f1f5f9; }
+.password-toggle { min-width: 44px; min-height: 44px; margin-right: -9px; padding: 0 8px; border-radius: 6px; color: #536c89; font-size: 18px; }
+.login-actions { display: flex; justify-content: flex-end; margin: 5px 0 15px; }
+.password-help { min-height: 32px; height: auto; margin: 0 !important; padding: 3px 0; font-size: 13px; line-height: 1.5; }
+.login-submit { width: 100%; min-height: 48px; height: auto; margin: 0; padding: 12px 16px; border-radius: 8px; font-size: 15px; font-weight: 500; white-space: normal; }
+.login-field-error { width: 100%; margin: 7px 0 0; color: #a52e40; font-size: 12px; line-height: 1.6; }
+.login-progress { margin: 0 0 18px; color: #536b86; font-size: 13px; line-height: 1.7; }
+.login-progress:empty { margin: 0; }
+.login-caps-lock, .login-help { margin-bottom: 18px; }
+.login-alternative { margin: 24px 0; }
+.login-alternative :deep(.el-divider__text) { background: #fff; color: #62738a; font-size: 12px; }
+.login-card :deep(.el-alert) { border-radius: 8px; padding: 11px 12px; }
+.login-card :deep(.el-alert__title) { font-size: 12px !important; line-height: 1.65 !important; }
+.login-card :deep(.el-alert__icon) { width: 16px; font-size: 16px; }
+.login-error { border-radius: 8px; }
+.password-toggle:focus-visible, .password-help:focus-visible, .login-error:focus-visible { outline: 3px solid #2165c5; outline-offset: 3px; }
+@media (max-width: 1100px) { .login-main { padding-inline: 5vw; } }
+@media (max-width: 900px) {
+  .login-main { justify-content: center; padding: 24px 24px 64px; }
+  .login-header { padding: 26px 28px; }
+  .login-background { object-position: 35% center; }
+}
+@media (max-width: 540px) {
+  .login-screen::before { content: ''; position: absolute; inset: 0; z-index: -1; background: #edf5fc55; pointer-events: none; }
+  .login-header { padding: 24px 20px; }
+  .login-brand { font-size: 17px; }
+  .login-main { padding: 16px 16px 40px; }
+  .login-background { object-position: 24% center; }
+  .login-card { padding: 28px 24px; border-radius: 14px; background: #fffffffa; }
+  .login-card-heading { margin-bottom: 25px; }
+  .login-card h1 { font-size: 24px; }
+  .password-help { min-height: 44px; }
+  .login-actions { margin: 0 0 8px; }
+}
+@media (max-width: 360px) { .login-card { padding-inline: 22px; } .login-header { padding-inline: 18px; } }
+@media (max-height: 600px) { .login-header { padding-block: 18px; } .login-main { padding-top: 12px; padding-bottom: 24px; } }
+@media (prefers-reduced-motion: reduce) { .local-login-form :deep(.el-input__wrapper) { transition: none; } }
 </style>

@@ -1,6 +1,6 @@
 // The static recovery panel remains readable even if the application bundle cannot load.
 import { preloadLoginBackground } from './utils/preloadLoginBackground'
-preloadLoginBackground(document, window.location.pathname, new URL('./assets/login-datacenter.png', import.meta.url).href)
+preloadLoginBackground(document, window.location.pathname, new URL('./assets/login-infrastructure-20261015.webp', import.meta.url).href)
 void import('./main').then(() => document.getElementById('app-startup')?.remove()).catch(() => {
   const title = document.getElementById('startup-title')
   const message = document.getElementById('startup-message')

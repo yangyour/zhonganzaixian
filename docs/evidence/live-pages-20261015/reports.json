@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-15",
+  "stage": "development-preview-with-designated-api",
+  "records": 2,
+  "checks": [
+    "real tenant registrations",
+    "next page correctly disabled for two rows",
+    "detail navigation",
+    "ticket loaded-page statistics",
+    "390px no document overflow",
+    "injected GET failure removes old rows",
+    "explicit retry returns actual records"
+  ],
+  "pagination_cursor": "isolated unit coverage; no real continuation with current two rows",
+  "business_writes": 0,
+  "credentials_recorded": false
+}

@@ -7,6 +7,7 @@ import {validDashboardWindow,type DashboardWindow} from '../utils/dashboardAvail
 import {displayTime} from '../utils/display'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import LiveMonitoringPanel from '../components/LiveMonitoringPanel.vue'
+import DashboardReportsPanel from '../components/DashboardReportsPanel.vue'
 
 const state=shallowRef<DashboardState>(emptyDashboardState()),autoRefresh=ref(true)
 const topMetric = ref('CPU')
@@ -34,6 +35,7 @@ defineExpose({state,autoRefresh,refresh,changeWindow})
   <p v-if="!permitted" role="alert">当前会话不可读取运营总览，或正在切换租户；已清除原范围数据</p>
   <template v-else>
    <LiveMonitoringPanel v-if="can('assets:read')" :auto-refresh="autoRefresh" />
+   <DashboardReportsPanel v-if="can('tickets:read')" />
    <details class="formal-dashboard-status"><summary>正式运营指标与接入进度</summary><div class="dashboard-header-actions">   <label class="dashboard-range-select">正式指标范围 <select aria-label="告警趋势范围" :value="state.window" @change="chooseWindow"><option value="HOURS_24">最近24小时</option><option value="DAYS_7">最近7天</option><option value="DAYS_30">最近30天</option></select></label><div class="dashboard-ranges" aria-label="告警趋势快捷范围"><button v-for="range in [{id:'HOURS_24',label:'24小时'},{id:'DAYS_7',label:'7天'},{id:'DAYS_30',label:'30天'}]" :key="range.id" type="button" :aria-pressed="state.window===range.id" :class="{active:state.window===range.id}" :disabled="!permitted||state.busy" @click="changeWindow(range.id)">{{range.label}}</button></div><div class="dashboard-controls"><button type="button" :disabled="state.busy||!permitted" @click="refresh">{{state.busy?'读取中…':'刷新统计状态'}}</button></div></div><p>以下统计依赖正式事件、工单、服务区间与送达回执。设备采样单独展示，不换算为合同服务指标。</p>
    <ApiErrorNotice :error="state.error" :retrying="state.busy" @retry="refresh" />
    <div class="dashboard-kpis" aria-label="六项固定运营指标">

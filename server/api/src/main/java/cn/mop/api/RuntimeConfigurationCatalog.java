@@ -29,6 +29,14 @@ public final class RuntimeConfigurationCatalog {
         if(type.equals("integer")){BigDecimal safe=new BigDecimal("9007199254740990");if(!s.containsKey("maximum")||new BigDecimal(s.get("maximum").toString()).compareTo(safe)>0)s.put("maximum",safe);s.put("x-technical-number-limit",true);}
         if("monitor.sample_interval_sec".equals(key))s.put("enum",List.of(30,60,120,300));
         if("monitor.page_refresh_sec".equals(key)){s.put("minimum",1);s.put("maximum",3600);s.put("x-technical-consumer-range",true);}
+        // The registry describes these three keys in one sentence. Apply each key's own unit,
+        // not every bound from that shared sentence (bytes > 0, ratio 0..1, multiplier >= 1).
+        if(Set.of("capacity.bytes_per_value","capacity.trend_ratio","capacity.headroom").contains(key)){
+            s.remove("minimum");s.remove("maximum");s.remove("exclusiveMinimum");
+            if("capacity.bytes_per_value".equals(key))s.put("exclusiveMinimum",0);
+            if("capacity.trend_ratio".equals(key)){s.put("minimum",0);s.put("maximum",1);}
+            if("capacity.headroom".equals(key))s.put("minimum",1);
+        }
         if(Set.of("oncall.handoff_local_time","backup.default_local_time").contains(key))s.put("pattern","^(?:[01][0-9]|2[0-3]):[0-5][0-9]$");
         if("itsm.local_authority_mode".equals(key))s.put("enum",List.of("MOP","EXTERNAL"));
         if("itsm.retry_backoff_sec".equals(key)){s.put("minItems",5);s.put("maxItems",5);s.put("items",Map.of("type","integer","minimum",1));}

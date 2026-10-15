@@ -15,9 +15,9 @@ public final class PostgresRuntimeConfigurationRepository implements RuntimeConf
     public PostgresRuntimeConfigurationRepository(DataSource source,PostgresPlatformRepository platform,ObjectMapper mapper){this.source=source;this.platform=platform;this.mapper=mapper;}
     private static final String SELECT="SELECT * FROM public.mop_runtime_configuration_release WHERE tenant_id=?::uuid AND configuration_key=?";
     @FunctionalInterface private interface Read<T>{T run(Connection c)throws SQLException;}
-    private <T>T read(Access access,Read<T> work){return read(access,true,work);}
-    private void readAccess(Connection c,Access a,boolean management)throws SQLException{if(management)authorize(c,a,false);else PostgresAuthorization.require(c,a.actorId(),a.tenantId(),a.permissionVersion(),"assets:read");}
-    private <T>T read(Access access,boolean management,Read<T> work){
+    private <T>T read(Access access,Read<T> work){return read(access,null,work);}
+    private void readAccess(Connection c,Access a,String capability)throws SQLException{if(capability==null)authorize(c,a,false);else PostgresAuthorization.require(c,a.actorId(),a.tenantId(),a.permissionVersion(),capability);}
+    private <T>T read(Access access,String management,Read<T> work){
         Connection command=platform.existingCommandConnection();if(command!=null)try{readAccess(command,access,management);return work.run(command);}catch(SQLException e){throw unavailable();}
         try(Connection c=source.getConnection()){
             c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);c.setAutoCommit(false);
@@ -25,8 +25,10 @@ public final class PostgresRuntimeConfigurationRepository implements RuntimeConf
         }catch(SQLException e){throw unavailable();}
     }
     @Override public Map<String,Object> read(Access a,String key){return read(a,c->current(c,a,key));}
-    @Override public Map<String,Object> monitoringRefresh(Access a){return read(a,false,c->current(c,a,"monitor.page_refresh_sec"));}
-    private Map<String,Object> current(Connection c,Access a,String key)throws SQLException{registry(c,key);Instant now=now(c);long latest=latest(c,a.tenantId(),key);Map<String,Object> selected=null;
+    @Override public Map<String,Object> monitoringRefresh(Access a){return read(a,"assets:read",c->current(c,a,"monitor.page_refresh_sec"));}
+    @Override public List<Map<String,Object>> capacityInputs(Access a){return read(a,"capacity:estimate",c->{Instant observed=now(c);List<Map<String,Object>> result=new ArrayList<>();for(String key:CAPACITY_KEYS)result.add(current(c,a,key,observed));return result;});}
+    private Map<String,Object> current(Connection c,Access a,String key)throws SQLException{return current(c,a,key,now(c));}
+    private Map<String,Object> current(Connection c,Access a,String key,Instant now)throws SQLException{registry(c,key);long latest=latest(c,a.tenantId(),key);Map<String,Object> selected=null;
         try(var s=c.prepareStatement(SELECT+" AND effective_at<=? ORDER BY version DESC LIMIT 1")){s.setString(1,a.tenantId());s.setString(2,key);s.setObject(3,OffsetDateTime.ofInstant(now,ZoneOffset.UTC));try(var r=s.executeQuery()){if(r.next())selected=dto(r);}}
         String status=selected==null?(latest==0?"UNCONFIGURED":"SCHEDULED"):"DISABLE".equals(selected.get("action"))?"DISABLED":selected.get("expires_at")!=null&&!now.isBefore(Instant.parse((String)selected.get("expires_at")))?"EXPIRED":"ACTIVE";
         var result=map("tenant_id",a.tenantId(),"configuration_key",key,"environment","remote_test","scope","CURRENT_TENANT","observed_at",now.toString(),"latest_version",latest,"status",status,"effective_value",status.equals("ACTIVE")?selected.get("value"):null,"selected_release",selected,"source","postgresql","customer_confirmation_status","UNVERIFIED","production_approved",false);

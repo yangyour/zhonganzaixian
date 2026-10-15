@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.51.0",
+    "version": "0.52.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -29556,6 +29556,96 @@
           }
         }
       }
+    },
+    "/capacity/runtime-inputs": {
+      "get": {
+        "operationId": "readCapacityRuntimeInputs",
+        "x-mop-read-only": true,
+        "x-mop-capability": "capacity:estimate",
+        "description": "当前授权平台管理员读取固定7项配置。同一PG快照及观察时刻，普通用户拒绝；无发布无默认。有效容量倍率减1成为额外余量比例；当前模型只接受1—2倍和32位保留天数，超限返回INCOMPATIBLE_MODEL及null输入。页面明确导入后是显式估算输入快照，不修改采集、删除策略或资源。",
+        "responses": {
+          "200": {
+            "description": "真实配置目录或运行发布记录；测试发布不等于客户生产批准",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CapacityRuntimeInputs"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "授权、版本、校验或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -57922,6 +58012,158 @@
               "expires_at",
               "definition_hash",
               "production_approved"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "CapacityRuntimeInputItem": {
+        "type": "object",
+        "properties": {
+          "configuration_key": {
+            "enum": [
+              "monitor.sample_interval_sec",
+              "retention.history_days",
+              "retention.trend_days",
+              "capacity.bytes_per_value",
+              "capacity.trend_ratio",
+              "capacity.headroom",
+              "capacity.proxy_outage_sec"
+            ]
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "UNCONFIGURED",
+              "SCHEDULED",
+              "DISABLED",
+              "EXPIRED",
+              "DEFINITION_CHANGED",
+              "INVALID_VALUE",
+              "INCOMPATIBLE_MODEL"
+            ]
+          },
+          "value": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "input_value": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "definition_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "publication_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "publication_version": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "configuration_key",
+          "status",
+          "value",
+          "input_value",
+          "unit",
+          "definition_hash",
+          "publication_id",
+          "publication_version",
+          "expires_at"
+        ],
+        "additionalProperties": false
+      },
+      "CapacityRuntimeInputs": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "actor_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "permission_version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "checked_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "items": {
+                "type": "array",
+                "minItems": 7,
+                "maxItems": 7,
+                "items": {
+                  "$ref": "#/components/schemas/CapacityRuntimeInputItem"
+                }
+              },
+              "scope": {
+                "const": "CURRENT_TENANT_CAPACITY_INPUTS"
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "customer_confirmation_status": {
+                "const": "UNVERIFIED"
+              },
+              "production_approved": {
+                "const": false
+              },
+              "measurement_verified": {
+                "const": false
+              }
+            },
+            "required": [
+              "tenant_id",
+              "actor_id",
+              "permission_version",
+              "checked_at",
+              "items",
+              "scope",
+              "source",
+              "customer_confirmation_status",
+              "production_approved",
+              "measurement_verified"
             ],
             "additionalProperties": false
           },

@@ -1,0 +1,22 @@
+{
+  "verified_at": "2026-10-15T05:40:32.672Z",
+  "environment": "candidate API and designated PostgreSQL",
+  "checks": {
+    "seven_configuration_values_imported": true,
+    "explicit_zero_preserved": true,
+    "multiplier_1_2_converted_to_ratio_0_2": true,
+    "actual_calculation": {
+      "nvps": "100",
+      "single_node_bytes": "119439360000",
+      "proxy_buffer_bytes": "55296000"
+    },
+    "edit_clears_result": true,
+    "disabled_keys_clear_inputs": true,
+    "desktop_overflow": false,
+    "mobile_overflow": false,
+    "browser_errors": []
+  },
+  "synthetic_configuration_cleanup": "all seven keys explicitly disabled after browser checks",
+  "production_approved": false,
+  "measurement_verified": false
+}

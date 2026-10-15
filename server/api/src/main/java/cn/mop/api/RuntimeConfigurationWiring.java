@@ -9,5 +9,6 @@ import org.springframework.context.annotation.*;
 public class RuntimeConfigurationWiring {
     @Bean RuntimeConfigurationCatalog runtimeConfigurationCatalog(ObjectMapper mapper){return new RuntimeConfigurationCatalog(mapper);}
     @Bean MonitoringRefreshPolicy monitoringRefreshPolicy(RuntimeConfigurationRepository repository,RuntimeConfigurationCatalog catalog){return new MonitoringRefreshPolicy(repository,catalog);}
+    @Bean CapacityRuntimeInputs capacityRuntimeInputs(RuntimeConfigurationRepository repository,RuntimeConfigurationCatalog catalog,ObjectMapper mapper){return new CapacityRuntimeInputs(repository,catalog,mapper);}
     @Bean RuntimeConfigurationRepository runtimeConfigurationRepository(DataSource source,PlatformRepository platform,ObjectMapper mapper){if(!(platform instanceof PostgresPlatformRepository p))throw new IllegalStateException("Runtime configuration requires designated PostgreSQL");return new PostgresRuntimeConfigurationRepository(source,p,mapper);}
 }

@@ -1,0 +1,564 @@
+{
+  "run_id": "ec8cdb7a-23cb-4e25-ae4a-86599ac335d4",
+  "base": "http://127.0.0.1:21815",
+  "started_at": "2026-10-15T05:35:08.806Z",
+  "requests": [
+    {
+      "label": "csrf",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "login",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "csrf",
+      "role": "reviewer",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "login",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "csrf",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "login",
+      "role": "viewerA",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "ordinary viewer forbidden",
+      "role": "viewerA",
+      "method": "GET",
+      "path": "/capacity/runtime-inputs",
+      "status": 403,
+      "code": "ACTION_FORBIDDEN"
+    },
+    {
+      "label": "tenant override rejected",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/capacity/runtime-inputs",
+      "status": 400,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "label": "read current monitor.sample_interval_sec",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/monitor.sample_interval_sec",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current retention.history_days",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/retention.history_days",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current retention.trend_days",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/retention.trend_days",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.bytes_per_value",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.trend_ratio",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.trend_ratio",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.headroom",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.headroom",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.proxy_outage_sec",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.proxy_outage_sec",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "validate monitor.sample_interval_sec",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/monitor.sample_interval_sec/validate",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "create synthetic proposal monitor.sample_interval_sec",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/monitor.sample_interval_sec/revisions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "submit monitor.sample_interval_sec",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/b0326fb5-6f97-4e8b-a28b-0f079e23a7da/submit",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "independent review monitor.sample_interval_sec",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/b0326fb5-6f97-4e8b-a28b-0f079e23a7da/review",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current monitor.sample_interval_sec",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/monitor.sample_interval_sec",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "PUBLISH monitor.sample_interval_sec",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/monitor.sample_interval_sec/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "validate retention.history_days",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/retention.history_days/validate",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "create synthetic proposal retention.history_days",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/retention.history_days/revisions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "submit retention.history_days",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/b0fb027f-55f6-4f7b-82dc-ce7d386adbec/submit",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "independent review retention.history_days",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/b0fb027f-55f6-4f7b-82dc-ce7d386adbec/review",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current retention.history_days",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/retention.history_days",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "PUBLISH retention.history_days",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/retention.history_days/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "validate retention.trend_days",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/retention.trend_days/validate",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "create synthetic proposal retention.trend_days",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/retention.trend_days/revisions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "submit retention.trend_days",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/67ede0a0-22d0-43c4-b961-7fa4a54040a8/submit",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "independent review retention.trend_days",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/67ede0a0-22d0-43c4-b961-7fa4a54040a8/review",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current retention.trend_days",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/retention.trend_days",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "PUBLISH retention.trend_days",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/retention.trend_days/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "validate capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.bytes_per_value/validate",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "create synthetic proposal capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/capacity.bytes_per_value/revisions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "submit capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/b82b07e3-80e9-4d3e-a53a-63e10a990f54/submit",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "independent review capacity.bytes_per_value",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/b82b07e3-80e9-4d3e-a53a-63e10a990f54/review",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.bytes_per_value",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "PUBLISH capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.bytes_per_value/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "validate capacity.trend_ratio",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.trend_ratio/validate",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "create synthetic proposal capacity.trend_ratio",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/capacity.trend_ratio/revisions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "submit capacity.trend_ratio",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/91f146dd-6a35-4391-a056-992eebb803dd/submit",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "independent review capacity.trend_ratio",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/91f146dd-6a35-4391-a056-992eebb803dd/review",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.trend_ratio",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.trend_ratio",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "PUBLISH capacity.trend_ratio",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.trend_ratio/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "validate capacity.headroom",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.headroom/validate",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "create synthetic proposal capacity.headroom",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/capacity.headroom/revisions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "submit capacity.headroom",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/ef68617d-9236-4b1f-ba85-a8034ed8d8f3/submit",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "independent review capacity.headroom",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/ef68617d-9236-4b1f-ba85-a8034ed8d8f3/review",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.headroom",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.headroom",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "PUBLISH capacity.headroom",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.headroom/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "validate capacity.proxy_outage_sec",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.proxy_outage_sec/validate",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "create synthetic proposal capacity.proxy_outage_sec",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/capacity.proxy_outage_sec/revisions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "submit capacity.proxy_outage_sec",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/ec0665c2-5f9d-46be-a7a2-5a5cc25f8004/submit",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "independent review capacity.proxy_outage_sec",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/ec0665c2-5f9d-46be-a7a2-5a5cc25f8004/review",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.proxy_outage_sec",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.proxy_outage_sec",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "PUBLISH capacity.proxy_outage_sec",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.proxy_outage_sec/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read seven published inputs",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/capacity/runtime-inputs",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "calculate using imported configuration",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/capacity/estimates",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.bytes_per_value",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "DISABLE capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.bytes_per_value/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "disabled bytes do not fall back",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/capacity/runtime-inputs",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "create synthetic proposal capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configurations/capacity.bytes_per_value/revisions",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "submit capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/configuration-revisions/a818679a-ac26-4c66-9062-5406346491a5/submit",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "independent review capacity.bytes_per_value",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/configuration-revisions/a818679a-ac26-4c66-9062-5406346491a5/review",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.bytes_per_value",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "PUBLISH capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.bytes_per_value/releases",
+      "status": 200,
+      "code": null
+    }
+  ],
+  "checks": [
+    {
+      "label": "real imported values preserve zero and convert factor exactly",
+      "status": "PASS"
+    },
+    {
+      "label": "publisher and unrelated keys absent",
+      "status": "PASS"
+    },
+    {
+      "label": "real calculator uses exact published numbers",
+      "status": "PASS"
+    },
+    {
+      "label": "disabled input clears both main and buffer source",
+      "status": "PASS"
+    }
+  ],
+  "credentials_recorded": false,
+  "status": "PASS",
+  "cleanup": "Seven synthetic numeric inputs temporarily active for browser checks; run --cleanup after browser verification"
+}

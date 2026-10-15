@@ -12,6 +12,9 @@ public interface RuntimeConfigurationRepository {
     Map<String,Object> read(Access access, String key);
     /** Fixed public-monitoring key only; callers cannot choose another configuration or capability. */
     Map<String,Object> monitoringRefresh(Access access);
+    /** Bounded capacity inputs read with capacity permission in one database snapshot and at one instant. */
+    List<String> CAPACITY_KEYS = List.of("monitor.sample_interval_sec", "retention.history_days", "retention.trend_days", "capacity.bytes_per_value", "capacity.trend_ratio", "capacity.headroom", "capacity.proxy_outage_sec");
+    List<Map<String,Object>> capacityInputs(Access access);
     List<Map<String,Object>> history(Access access, String key, long beforeVersion);
     Map<String,Object> release(Access access, String key, String id);
     void authorizeCommand(Access access, String key);

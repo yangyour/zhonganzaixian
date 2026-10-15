@@ -1,0 +1,9 @@
+SYNTHETIC CAPACITY RUNTIME INPUT TEST ONLY
+This file is authored by the development test, not the customer.
+It does not confirm a production policy, measured capacity or procurement approval.
+Designated test tenant only. Inputs are sample interval 60 seconds, history 90 days,
+trend 365 days, 128 bytes per value, trend ratio 0, headroom multiplier 1.2,
+and maximum outage 3600 seconds. Explicit estimator workload: 10 hosts,
+600 items per host, trend row 80 bytes, pool NVPS limit 5000,
+buffer workload 100 NVPS and buffer multiplier 1.2.
+Runtime values must be explicitly disabled after browser checks.

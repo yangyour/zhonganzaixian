@@ -1,0 +1,224 @@
+{
+  "run_id": "e48a4425-4b33-4020-a477-1f139280d47d",
+  "base": "http://127.0.0.1:21815",
+  "started_at": "2026-10-15T05:39:55.501Z",
+  "requests": [
+    {
+      "label": "csrf",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "login",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "csrf",
+      "role": "reviewer",
+      "method": "GET",
+      "path": "/auth/csrf",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "login",
+      "role": "reviewer",
+      "method": "POST",
+      "path": "/auth/local/login",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current monitor.sample_interval_sec",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/monitor.sample_interval_sec",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current monitor.sample_interval_sec",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/monitor.sample_interval_sec",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "DISABLE monitor.sample_interval_sec",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/monitor.sample_interval_sec/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current retention.history_days",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/retention.history_days",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current retention.history_days",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/retention.history_days",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "DISABLE retention.history_days",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/retention.history_days/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current retention.trend_days",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/retention.trend_days",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current retention.trend_days",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/retention.trend_days",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "DISABLE retention.trend_days",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/retention.trend_days/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.bytes_per_value",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.bytes_per_value",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "DISABLE capacity.bytes_per_value",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.bytes_per_value/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.trend_ratio",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.trend_ratio",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.trend_ratio",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.trend_ratio",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "DISABLE capacity.trend_ratio",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.trend_ratio/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.headroom",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.headroom",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.headroom",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.headroom",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "DISABLE capacity.headroom",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.headroom/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.proxy_outage_sec",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.proxy_outage_sec",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "read current capacity.proxy_outage_sec",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/runtime-configurations/capacity.proxy_outage_sec",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "DISABLE capacity.proxy_outage_sec",
+      "role": "padmin",
+      "method": "POST",
+      "path": "/runtime-configurations/capacity.proxy_outage_sec/releases",
+      "status": 200,
+      "code": null
+    },
+    {
+      "label": "no synthetic values remain applicable",
+      "role": "padmin",
+      "method": "GET",
+      "path": "/capacity/runtime-inputs",
+      "status": 200,
+      "code": null
+    }
+  ],
+  "checks": [
+    {
+      "label": "all seven synthetic values explicitly disabled",
+      "status": "PASS"
+    }
+  ],
+  "credentials_recorded": false,
+  "status": "PASS",
+  "cleanup": "All seven synthetic test keys disabled; immutable history retained"
+}

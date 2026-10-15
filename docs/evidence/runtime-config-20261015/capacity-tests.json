@@ -1,0 +1,31 @@
+{
+  "web_full": {
+    "passed": 2182,
+    "failed": 0,
+    "files": 153
+  },
+  "java_related": {
+    "executed": 21,
+    "failed": 0,
+    "skipped": 0
+  },
+  "designated_postgresql": {
+    "version": "17.9",
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0
+  },
+  "java_migration_policy": {
+    "passed": 40
+  },
+  "api_contracts": {
+    "passed": 135,
+    "generation_consistent": true
+  },
+  "candidate_http_requests": 67,
+  "cleanup_http_requests": 26,
+  "api_artifact_sha256": "f4c3f96c787bfbfe395203a4bc7272445245d05f5c11f623955dfd59b3a69526",
+  "customer_confirmation": "UNVERIFIED",
+  "production_approved": false,
+  "existing_migrations_changed": false
+}

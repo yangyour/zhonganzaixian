@@ -26,7 +26,7 @@ class Client{
   const payload=await response.json();evidence.requests.push({label,role:this.label,method,path:path.split('?')[0],status:response.status,code:payload.error?.code??null});save()
   if(response.status!==expected)throw Error(label+': expected '+expected+', got '+response.status+' '+(payload.error?.code??''))
   if(expected>=400)assert.ok(ajv.getSchema('urn:mop:runtime-config#/components/schemas/Error')(payload),'error envelope')
-  if(expected===200&&(path.startsWith('/runtime-configurations')||path.split('?')[0]==='/network-monitoring/refresh-policy')){
+  if(expected===200&&(path.startsWith('/runtime-configurations')||['/network-monitoring/refresh-policy','/capacity/runtime-inputs'].includes(path.split('?')[0]))){
    const pathname=path.split('?')[0],routeKey=spec.paths[pathname]?pathname:pathname.replace(/^\/runtime-configurations\/[^/]+/,'/runtime-configurations/{key}')
    const schema=spec.paths[routeKey][method.toLowerCase()].responses['200'].content['application/json'].schema
    const qualify=v=>Array.isArray(v)?v.map(qualify):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,k==='$ref'&&x.startsWith('#/')?'urn:mop:runtime-config'+x:qualify(x)])):v

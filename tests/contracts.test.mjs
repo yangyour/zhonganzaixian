@@ -18,6 +18,14 @@ const validates = (name, value) => {
 };
 const id = (digit) => `${digit.repeat(8)}-${digit.repeat(4)}-4${digit.repeat(3)}-8${digit.repeat(3)}-${digit.repeat(12)}`;
 
+test('容量运行参数只暴露固定七项及版本来源，未知和未验证不冒充实测',()=>{
+  const op=contract.paths['/capacity/runtime-inputs'].get;assert.equal(op['x-mop-capability'],'capacity:estimate');assert.equal(op['x-mop-read-only'],true);
+  const keys=['monitor.sample_interval_sec','retention.history_days','retention.trend_days','capacity.bytes_per_value','capacity.trend_ratio','capacity.headroom','capacity.proxy_outage_sec'];
+  const data={tenant_id:id('1'),actor_id:id('2'),permission_version:1,checked_at:'2026-10-15T00:00:00Z',items:keys.map(configuration_key=>({configuration_key,status:'UNCONFIGURED',value:null,input_value:null,unit:'test',definition_hash:'a'.repeat(64),publication_id:null,publication_version:null,expires_at:null})),scope:'CURRENT_TENANT_CAPACITY_INPUTS',source:'postgresql',customer_confirmation_status:'UNVERIFIED',production_approved:false,measurement_verified:false};
+  assert.ok(validates('CapacityRuntimeInputs',{data,trace_id:'synthetic'}));
+  for(const patch of [{measurement_verified:true},{items:data.items.slice(1)},{items:[{...data.items[0],published_by:id('3')},...data.items.slice(1)]},{source:'fixture'}])assert.equal(validates('CapacityRuntimeInputs',{data:{...data,...patch},trace_id:'synthetic'}),false);
+});
+
 test('监控查询的越权、参数和依赖失败声明统一错误信封，不能只有描述', () => {
   for (const path of ['/network-monitoring', '/network-monitoring/{assetId}/history', '/network-monitoring/{assetId}/resources', '/network-monitoring/{assetId}/resources/history']) {
     for (const status of ['400','401','403','404','422','503']) {
@@ -237,7 +245,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.51.0');
+  assert.equal(contract.info.version, '0.52.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];

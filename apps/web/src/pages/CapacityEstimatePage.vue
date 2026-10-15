@@ -6,6 +6,8 @@ import { createCapacityWorkspace, emptyCapacityInput, type CapacityState, type C
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import CapacityScenarioPanel from '../components/CapacityScenarioPanel.vue'
 import CapacityGrowthPanel from '../components/CapacityGrowthPanel.vue'
+import CapacityRuntimeInputsPanel from '../components/CapacityRuntimeInputsPanel.vue'
+import type { capacityImportedValues } from '../utils/capacityRuntimeInputs'
 const scenarios = ref<InstanceType<typeof CapacityScenarioPanel> | null>(null)
 const fields = [
   { key: 'hosts', label: '主机数', help: '非负整数' }, { key: 'items_per_host', label: '每台有效监控项数', help: '非负整数' },
@@ -19,13 +21,16 @@ const outputs: { key: keyof CapacityOutputs; label: string; unit: string }[] = [
 const draft = reactive({ inputs: Object.fromEntries(fields.map(f => [f.key, ''])) as Record<typeof fields[number]['key'], string>, model: Object.fromEntries(modelFields.map(f => [f.key, ''])) as Record<typeof modelFields[number]['key'], string>, proxy_buffer: Object.fromEntries(bufferFields.map(f => [f.key, ''])) as Record<typeof bufferFields[number]['key'], string>, includeBuffer: false })
 const state = shallowRef<CapacityState>({ input: emptyCapacityInput(), result: null, busy: false, error: null })
 const workspace = createCapacityWorkspace(api, value => { state.value = value })
+const importedAt = ref<string | null>(null)
 const permitted = computed(() => session.value?.user.role === 'padmin' && can('capacity:estimate') && !switchingTenant.value)
 const nullable = (v: string) => v === '' ? null : v
 const days = (v: string) => v === '' ? null : /^(0|[1-9][0-9]{0,9})$/.test(v) ? Number(v) : v
 function input() { return { inputs: Object.fromEntries(fields.map(f => [f.key, ['history_days', 'trend_days'].includes(f.key) ? days(draft.inputs[f.key]) : nullable(draft.inputs[f.key])])), model: Object.fromEntries(modelFields.map(f => [f.key, nullable(draft.model[f.key])])), proxy_buffer: draft.includeBuffer ? Object.fromEntries(bufferFields.map(f => [f.key, nullable(draft.proxy_buffer[f.key])])) : null } }
 function clearDraft() { for (const f of fields) draft.inputs[f.key] = ''; for (const f of modelFields) draft.model[f.key] = ''; for (const f of bufferFields) draft.proxy_buffer[f.key] = ''; draft.includeBuffer = false; workspace.change(input()) }
-watch(() => [session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, contextGeneration.value, permitted.value], () => { const s = session.value; workspace.reset(s && permitted.value ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version, role: s.user.role, canEstimate: true } : null); clearDraft() }, { immediate: true, flush: 'sync' })
-watch(draft, () => workspace.change(input()), { deep: true, flush: 'sync' })
+const authorizationKey = computed(() => JSON.stringify([session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, contextGeneration.value, permitted.value]))
+watch(authorizationKey, () => { const s = session.value; workspace.reset(s && permitted.value ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version, role: s.user.role, canEstimate: true } : null); clearDraft(); importedAt.value = null }, { immediate: true, flush: 'sync' })
+watch(draft, () => { workspace.change(input()); importedAt.value = null }, { deep: true, flush: 'sync' })
+function importRuntime(values: ReturnType<typeof capacityImportedValues>, checkedAt: string) { if (!permitted.value) return; Object.assign(draft.inputs, values.inputs); Object.assign(draft.proxy_buffer, values.buffer); workspace.change(input()); importedAt.value = checkedAt }
 async function calculate() { if (!permitted.value || state.value.busy) return; workspace.change(input()); await workspace.calculate() }
 onBeforeUnmount(() => workspace.dispose())
 const missingLabels: Record<string, string> = Object.fromEntries([...fields.map(f => [f.key, f.label]), ...modelFields.map(f => ['model.' + f.key, f.label]), ['inputs', '容量输入组'], ['model', '模型参数组']])
@@ -39,6 +44,8 @@ const bufferMissing: Record<string, string> = Object.fromEntries([...bufferField
     <template v-else>
       <div class="feature-summary"><article><span>平均 NVPS</span><strong>{{ state.result?.outputs?.nvps ?? '—' }}</strong><small>值 / 秒 · 显式模型估算</small></article><article><span>单节点容量</span><strong>{{ state.result?.outputs?.single_node_bytes ?? '—' }}</strong><small>bytes · 历史 + 趋势 + 余量</small></article><article><span>有效监控项</span><strong>{{ state.result?.outputs?.total_items ?? '—' }}</strong><small>数量未知时不按零处理</small></article><article><span>模型状态</span><strong class="summary-status">{{ state.result?.status === 'ESTIMATED' ? '已估算' : '待明确' }}</strong><small>不是已测吞吐或采购规格</small></article></div>
       <ApiErrorNotice :error="state.error" />
+      <CapacityRuntimeInputsPanel @apply="importRuntime" />
+      <p v-if="importedAt" role="status" class="capacity-help">已填入 {{importedAt}} 读取的参数快照。修改任意输入后按修改后的显式参数计算。</p>
       <div class="capacity-layout">
         <div class="capacity-main">
           <el-form label-position="top" @submit.prevent="calculate">

@@ -1,9 +1,9 @@
 import type { ObjectDirective } from 'vue'
 
 type Field = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-type FieldNotice = { note: HTMLElement; describedBy: string | null; invalid: string | null }
+type FieldNotice = { note: HTMLElement; item: HTMLLIElement; link: HTMLAnchorElement; describedBy: string | null; invalid: string | null; originalId: string | null; generatedId: string | null }
 let nextId = 0
-const disposers = new WeakMap<HTMLFormElement, () => void>()
+const controllers = new WeakMap<HTMLFormElement, { dispose: () => void; refresh: () => void }>()
 function isField(value: EventTarget | null): value is Field {
   return value instanceof HTMLInputElement || value instanceof HTMLTextAreaElement || value instanceof HTMLSelectElement
 }
@@ -20,32 +20,70 @@ export function constraintMessage(field: Field): string {
   return field.validationMessage || '请检查此项。'
 }
 
+function fieldLabel(field: Field, fallback: string): string {
+  const labelledBy = field.getAttribute('aria-labelledby')?.split(/\s+/).map(id => document.getElementById(id)?.textContent || '').join(' ').trim()
+  if (labelledBy) return labelledBy
+  if (field.getAttribute('aria-label')?.trim()) return field.getAttribute('aria-label')!.trim()
+  const label = field.labels?.[0]?.cloneNode(true) as HTMLElement | undefined
+  // Never put input values, select options or our own error into the field name.
+  label?.querySelectorAll('input, textarea, select, button, .form-field-error, .field-help').forEach(node => node.remove())
+  return label?.textContent?.replace(/\s+/g, ' ').trim() || fallback
+}
+
 /** Presents existing HTML constraints; does not add business rules or submit/replay writes. */
 export const formFeedback: ObjectDirective<HTMLFormElement> = {
   mounted(form) {
     const notices = new Map<Field, FieldNotice>()
-    const summary = document.createElement('p')
-    summary.className = 'form-error-summary'; summary.setAttribute('role', 'alert')
+    const summary = document.createElement('div')
+    const title = document.createElement('h3'), list = document.createElement('ul')
+    title.id = `mop-error-summary-${++nextId}`
+    summary.className = 'form-error-summary'; summary.setAttribute('role', 'alert'); summary.tabIndex = -1
+    summary.setAttribute('aria-labelledby', title.id); summary.append(title, list)
     let queued = false, active = true
     function updateSummary() {
-      for (const [field] of notices) if (!form.contains(field)) clear(field)
+      for (const [field] of notices) if (!form.contains(field) || !field.willValidate || field.validity.valid) clear(field)
       if (!notices.size) { summary.remove(); return }
-      summary.textContent = `有 ${notices.size} 项内容需要检查，请修改标记的字段后再提交。`
+      const heading = `有 ${notices.size} 项内容需要检查`
+      if (title.textContent !== heading) title.textContent = heading
+      const ordered = [...form.elements].filter((field): field is Field => isField(field) && notices.has(field))
+      ordered.forEach((field, index) => {
+        const entry = notices.get(field)!
+        entry.note.textContent = constraintMessage(field)
+        const text = `${fieldLabel(field, `第 ${index + 1} 项`)}：${constraintMessage(field)}`
+        if (entry.link.textContent !== text) entry.link.textContent = text
+        entry.link.href = `#${encodeURIComponent(field.id)}`
+        if (list.children[index] !== entry.item) list.insertBefore(entry.item, list.children[index] || null)
+      })
       if (!summary.isConnected) form.prepend(summary)
     }
     function clear(field: Field) {
       const entry = notices.get(field)
       if (!entry) return
-      entry.note.remove(); field.classList.remove('mop-field-invalid')
-      if (entry.describedBy === null) field.removeAttribute('aria-describedby'); else field.setAttribute('aria-describedby', entry.describedBy)
+      entry.note.remove(); entry.item.remove(); field.classList.remove('mop-field-invalid')
+      const descriptions = (field.getAttribute('aria-describedby') || '').split(/\s+/).filter(id => id && id !== entry.note.id).join(' ')
+      if (descriptions) field.setAttribute('aria-describedby', descriptions)
+      else if (entry.describedBy === null) field.removeAttribute('aria-describedby')
+      else field.setAttribute('aria-describedby', entry.describedBy)
       if (entry.invalid === null) field.removeAttribute('aria-invalid'); else field.setAttribute('aria-invalid', entry.invalid)
+      if (entry.generatedId && field.id === entry.generatedId) {
+        if (entry.originalId === null) field.removeAttribute('id'); else field.id = entry.originalId
+      }
       notices.delete(field)
     }
     function mark(field: Field) {
       if (!notices.has(field)) {
         const note = document.createElement('span')
         note.id = `mop-field-error-${++nextId}`; note.className = 'form-field-error'
-        notices.set(field, { note, describedBy: field.getAttribute('aria-describedby'), invalid: field.getAttribute('aria-invalid') })
+        const originalId = field.getAttribute('id'), generatedId = field.id ? null : `mop-invalid-field-${nextId}`
+        if (generatedId) field.id = generatedId
+        const item = document.createElement('li'), link = document.createElement('a')
+        item.append(link)
+        link.addEventListener('click', event => {
+          event.preventDefault()
+          if (!form.contains(field) || !field.willValidate) { updateSummary(); return }
+          field.focus({ preventScroll: true }); field.scrollIntoView?.({ block: 'center' })
+        })
+        notices.set(field, { note, item, link, describedBy: field.getAttribute('aria-describedby'), invalid: field.getAttribute('aria-invalid'), originalId, generatedId })
         field.insertAdjacentElement('afterend', note)
         field.setAttribute('aria-describedby', [field.getAttribute('aria-describedby'), note.id].filter(Boolean).join(' '))
       }
@@ -61,8 +99,7 @@ export const formFeedback: ObjectDirective<HTMLFormElement> = {
         queued = false
         if (!active) return
         updateSummary()
-        const first = [...form.elements].find(field => isField(field) && notices.has(field)) as Field | undefined
-        first?.focus()
+        if (notices.size) { summary.focus({ preventScroll: true }); summary.scrollIntoView?.({ block: 'nearest' }) }
       })
     }
     function input(event: Event) {
@@ -74,10 +111,11 @@ export const formFeedback: ObjectDirective<HTMLFormElement> = {
     form.addEventListener('input', input); form.addEventListener('change', input)
     form.addEventListener('reset', reset)
     function reset() { for (const [field] of notices) clear(field); updateSummary() }
-    disposers.set(form, () => {
+    controllers.set(form, { refresh: updateSummary, dispose: () => {
       active = false; reset(); form.removeEventListener('invalid', invalid, true)
       form.removeEventListener('input', input); form.removeEventListener('change', input); form.removeEventListener('reset', reset)
-    })
+    } })
   },
-  beforeUnmount(form) { disposers.get(form)?.(); disposers.delete(form) },
+  updated(form) { controllers.get(form)?.refresh() },
+  beforeUnmount(form) { controllers.get(form)?.dispose(); controllers.delete(form) },
 }

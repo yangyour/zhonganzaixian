@@ -1,0 +1,51 @@
+{
+  "verified_at": "2026-10-15T01:29:11.290Z",
+  "environment": "lan-test-20261008",
+  "base_commit": "2304e7d",
+  "isolated_build_id": "6d43d8fe377077485313c196ac2572d20b1d40d91077b0ca6446d5dd3667aac2",
+  "browser": "155.0.4283.45",
+  "checks": [
+    "invalid native submit focuses named summary with three field links and zero writes",
+    "390 and 320 fit; clicking summary scrolls and focuses the correct field without changing route",
+    "correction removes only corresponding errors and never submits automatically",
+    "keyboard Tab then Enter activates error link",
+    "cancel leaving retains input and existing unsaved-change guard"
+  ],
+  "viewports": [
+    {
+      "width": 390,
+      "top": 120.125,
+      "bottom": 307.71875,
+      "right": 350.3333339691162,
+      "left": 24.33333396911621,
+      "height": 844,
+      "documentOverflow": false
+    },
+    {
+      "width": 320,
+      "top": 138.95834350585938,
+      "bottom": 326.5520935058594,
+      "right": 280.3333339691162,
+      "left": 24.33333396911621,
+      "height": 720,
+      "documentOverflow": false
+    }
+  ],
+  "page_errors": [],
+  "business_writes": [],
+  "targeted_tests": 10,
+  "frontend_tests": 2071,
+  "frontend_files": 141,
+  "contract_tests": 134,
+  "typecheck": "PASS",
+  "build": "PASS",
+  "iterations": [
+    "default fork worker failed to start; same assertions passed in thread pool",
+    "scoped duplicate site label to the intended dialog"
+  ],
+  "limitations": [
+    "DOM unit tests are not component integration evidence",
+    "physical screen reader and mobile device not tested",
+    "no business write or production acceptance"
+  ]
+}

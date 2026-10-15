@@ -89,6 +89,11 @@ html.mop-resume-paused .session-resume-panel{display:grid;position:fixed;inset:0
 .page-recovery{width:min(720px,calc(100% - 32px));margin:20px auto;padding:22px;background:#fff7e8;border:1px solid #ddbd83;border-radius:10px;color:#624716;overflow-wrap:anywhere}
 .content>.page-recovery{width:100%;margin:0 0 20px}.page-recovery h2{font-size:20px;margin-bottom:12px}.page-recovery p{font-size:14px;margin-bottom:12px}.page-recovery .recovery-blocked{margin:12px 0 0}.anonymous-navigation-error{max-width:680px;margin:24px auto}
 .form-error-summary { flex-basis: 100%; grid-column: 1 / -1; padding: 12px 14px; border-left: 3px solid #b43746; border-radius: 4px; background: #fff0f2; color: #962d3b; font-size: 14px; line-height: 1.7; }
+.form-error-summary:focus { outline: 3px solid var(--mop-focus); outline-offset: 3px; }
+.form-error-summary h3 { margin: 0 0 6px; font-size: 16px; line-height: 1.6; }
+.form-error-summary ul { margin: 0; padding-left: 22px; }
+.form-error-summary a { display: inline-flex; align-items: center; min-height: 32px; color: #962d3b; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+@media(max-width:760px) { .form-error-summary a { min-height: 44px; } }
 .form-field-error { display: block; flex-basis: 100%; color: #a52e40; font-size: 13px; font-weight: 400; line-height: 1.6; margin-top: 4px; }
 .mop-field-invalid { border-color: #b43746 !important; box-shadow: 0 0 0 1px #b43746; }
 .el-message { max-width: min(680px, calc(100vw - 32px)); align-items: flex-start; padding: 14px 42px 14px 18px; box-shadow: 0 8px 28px #173b6020; }

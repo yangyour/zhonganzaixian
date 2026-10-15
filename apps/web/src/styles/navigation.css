@@ -31,7 +31,7 @@
 .secondary-navigation a { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 11px 14px; font-size: 13px; line-height: 1.7; color: #526174; border-radius: 10px; }
 .secondary-navigation .navigation-icon { color: #7b9fc4; }
 .secondary-navigation a:hover { background: #f0f7ff; color: #236ce0; }
-.secondary-navigation a.active { color: #fff; background: linear-gradient(105deg,#286eed,#6b9ffc); }
+.secondary-navigation a.active { color: #fff; background: linear-gradient(105deg,#1d5cb8,#2b69bd); }
 .secondary-navigation a.active .navigation-icon { color: #fff; }
 .workspace-sidebar-foot { display: flex; align-items: flex-start; gap: 8px; flex-shrink: 0; margin: 0 16px; padding: 16px 0; border-top: 1px solid #edf2f8; font-size: 11px; color: #71849a; }
 .workspace-sidebar-foot .environment-indicator { margin-top: 5px; background: #b07a2b; }

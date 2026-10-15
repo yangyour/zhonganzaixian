@@ -1,0 +1,74 @@
+{
+  "verified_at": "2026-10-15T01:34:43.357Z",
+  "environment": "lan-test-20261008",
+  "isolated_build_id": "4c47e9cdb2e600cab3989d8d11f1c1c024b84a582cb334c7998dd9cb7aa51d96",
+  "before": {
+    "navigation_light_endpoint": 2.63,
+    "primary_default": 4.12,
+    "primary_hover": 2.66
+  },
+  "samples": [
+    {
+      "label": "search trigger",
+      "fg": "rgb(83, 103, 127)",
+      "bg": "rgb(245, 249, 255)",
+      "ratio": 5.5
+    },
+    {
+      "label": "selected navigation gradient endpoint",
+      "fg": "rgb(255, 255, 255)",
+      "bg": "rgb(29, 92, 184)",
+      "ratio": 6.41
+    },
+    {
+      "label": "selected navigation gradient endpoint",
+      "fg": "rgb(255, 255, 255)",
+      "bg": "rgb(43, 105, 189)",
+      "ratio": 5.44
+    },
+    {
+      "label": "primary default",
+      "fg": "rgb(255, 255, 255)",
+      "bg": "rgb(33, 101, 197)",
+      "ratio": 5.63
+    },
+    {
+      "label": "primary hover",
+      "fg": "rgb(255, 255, 255)",
+      "bg": "rgb(25, 87, 174)",
+      "ratio": 6.96
+    },
+    {
+      "label": "primary keyboard focus",
+      "fg": "rgb(255, 255, 255)",
+      "bg": "rgb(33, 101, 197)",
+      "ratio": 5.63
+    },
+    {
+      "label": "search metadata",
+      "fg": "rgb(89, 109, 132)",
+      "bg": "rgb(255, 255, 255)",
+      "ratio": 5.32
+    }
+  ],
+  "focus": {
+    "focused": true,
+    "fg": "rgb(255, 255, 255)",
+    "bg": "rgb(33, 101, 197)",
+    "outlineColor": "rgb(27, 96, 189)",
+    "outlineWidth": "2.66667px",
+    "devicePixelRatio": 1.0000000298023224,
+    "declared_outline_css_px": 3,
+    "contrast_with_white": 6.08
+  },
+  "mobile_dialog": {
+    "top": 12,
+    "bottom": 708,
+    "height": 720
+  },
+  "browser": "155.0.4283.45",
+  "business_writes": [],
+  "page_errors": [],
+  "scope": "targeted computed sRGB color pairs; not a full-site WCAG audit",
+  "build": "PASS"
+}

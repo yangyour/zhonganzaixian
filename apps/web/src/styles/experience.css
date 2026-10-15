@@ -24,6 +24,7 @@ body { line-height: 1.6; }
 .horizontal-shell :is(input, textarea) { caret-color: var(--el-color-primary); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible { outline: 3px solid var(--mop-focus); outline-offset: 3px; }
+.el-button:focus-visible { outline: 3px solid var(--mop-focus); outline-offset: 3px; }
 :where(input, select, textarea, button, [tabindex]) { scroll-margin-block: 190px 40px; }
 .skip-link { position: fixed; left: 20px; top: -100px; z-index: 4000; padding: 12px 20px; border-radius: 8px; background: #163a64; color: #fff; }
 .skip-link:focus { top: 12px; }
@@ -56,7 +57,9 @@ body { line-height: 1.6; }
 .el-button.is-link, .el-button.is-text { min-width: 28px; min-height: 32px; white-space: normal; line-height: 1.5; }
 .el-button--small { min-height: 32px; }
 .horizontal-shell .el-button { font-weight: 500; }
-.horizontal-shell .el-button--primary:not(.is-link):not(.is-text):not(.is-plain) { --el-button-hover-bg-color: #1957ae; --el-button-hover-border-color: #1957ae; }
+/* Dialogs teleport outside the shell and need the same readable enabled states. */
+.el-button--primary:not(.is-link):not(.is-text):not(.is-plain) { --el-button-hover-bg-color: #1957ae; --el-button-hover-border-color: #1957ae; }
+.el-button--primary.is-link { --el-button-hover-link-text-color: #1957ae; }
 .el-button + .el-button { margin-left: 8px; }
 .el-input__wrapper, .el-select__wrapper { min-height: 36px; }
 .el-checkbox { min-height: 36px; height: auto; white-space: normal; }

@@ -7,7 +7,7 @@
   --mop-surface-muted: #f7faff;
   --mop-radius: 4px;
   --mop-focus: #1b60bd;
-  --el-color-primary: #2878f5;
+  --el-color-primary: #2165c5;
   --el-color-primary-light-3: #689ff8;
   --el-color-primary-light-5: #93bbfa;
   --el-color-primary-light-7: #bfd7fc;
@@ -56,7 +56,7 @@
 .prototype-shell .table-empty { min-height: 240px; gap: 16px; }
 .prototype-shell .empty-symbol { position: relative; width: 82px; height: 70px; border-radius: 5px; border-color: #d6e6f8; background: linear-gradient(145deg,#f4f9ff,#e8f2ff); color: #84a8d5; box-shadow: 8px 8px 0 #f6f9fe; }
 .prototype-shell .empty-symbol svg { width: 34px; height: 34px; }
-.prototype-shell .global-search-trigger { color: #74849a; background: transparent; border-color: transparent; min-height: 32px; padding: 4px 10px; margin: 0; font-size: 12px; }
+.prototype-shell .global-search-trigger { color: #53677f; background: transparent; border-color: transparent; min-height: 32px; padding: 4px 10px; margin: 0; font-size: 12px; }
 .prototype-shell .global-search-trigger:hover { background: #fff; border-color: #dce6f3; }
 .prototype-shell .identity-page { max-width: none; }
 .prototype-shell .identity-card { border-radius: 4px; padding: 18px; }

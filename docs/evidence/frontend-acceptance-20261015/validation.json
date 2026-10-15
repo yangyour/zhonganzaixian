@@ -1,0 +1,66 @@
+{
+  "verified_at": "2026-10-15T01:35:57.704Z",
+  "environment": "lan-test-20261008",
+  "isolated_base": "2304e7d",
+  "validated_source_sha256": {
+    "apps/web/src/components/GlobalSearch.vue": "bd6ae4ea05f65c4271bc85ad714d92721bedb76c360d7a13878ba9668588d324",
+    "apps/web/src/utils/globalSearchWorkspace.ts": "370c4c803b111357980004d67ffd0e76fa9cfdb1e462e64a8d147b43b1c2a320",
+    "apps/web/src/directives/formFeedback.ts": "45a78ac4fad51a561980b7829a55d0b32ba9ea3b40ef2f0a2004644788a238fd",
+    "apps/web/src/styles/prototype.css": "2de4324731e5721bb56aa392ebf9e0292c4fc3a8d779ecf2428757ec371ccb9e",
+    "apps/web/src/styles/navigation.css": "1c60c75fc420804c05b63570420b2dc003dfc67c27fc8e4cce1db5a882933eb5",
+    "apps/web/src/styles/experience.css": "35dcebf97280acf8cfc5f573f43015ded1471bcd8f0f58ec55a8f0de442bf9f4"
+  },
+  "frontend": {
+    "files": 141,
+    "tests": 2071,
+    "status": "PASS",
+    "pool": "threads",
+    "workers": 2
+  },
+  "contracts": {
+    "tests": 134,
+    "generation_check": "PASS"
+  },
+  "final_affected_tests": {
+    "files": 4,
+    "tests": 60,
+    "status": "PASS"
+  },
+  "typecheck": "PASS",
+  "build": "PASS",
+  "build_id": "4c47e9cdb2e600cab3989d8d11f1c1c024b84a582cb334c7998dd9cb7aa51d96",
+  "browser": "155.0.4283.45",
+  "page_errors": [],
+  "business_writes": 0,
+  "server_deployed": false,
+  "production_ready": false,
+  "visual_review": {
+    "search": [
+      "1440x760",
+      "768x800",
+      "390x844",
+      "320x720"
+    ],
+    "form": [
+      "1440x760",
+      "390x844",
+      "320x720"
+    ],
+    "contrast_pairs": 7,
+    "defects_checked": [
+      "navigation overlay interference",
+      "dialog title and close-button clipping",
+      "horizontal overflow",
+      "field-link focus and scrolling",
+      "text and keyboard-focus contrast"
+    ]
+  },
+  "remaining": [
+    "full WCAG and screen reader audit",
+    "physical mobile and IME",
+    "native 200 percent zoom",
+    "real-user Web Vitals p75",
+    "contract-wide business acceptance"
+  ],
+  "preview": "http://127.0.0.1:15175"
+}

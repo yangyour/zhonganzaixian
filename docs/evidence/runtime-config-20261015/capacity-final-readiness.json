@@ -1,0 +1,14 @@
+{
+  "verified_at": "2026-10-15T05:46:57.876Z",
+  "ready": true,
+  "production_ready": false,
+  "runtime_configurations": {
+    "schema_access_ready": true,
+    "scope": "CURRENT_TENANT",
+    "customer_confirmation_status": "UNVERIFIED"
+  },
+  "local_test_helpers_stopped": true,
+  "candidate_api_removed": true,
+  "secret_values_recorded": false,
+  "probe": "Node HTTP after PowerShell socket access denied"
+}

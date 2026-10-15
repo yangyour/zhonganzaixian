@@ -65,3 +65,6 @@
 验证：2182项前端全量通过；21项相关Java检查、8项指定PG检查、40项迁移策略检查、135项契约通过，V1—V32未变。67次真实HTTP覆盖独立复核、发布读取、权限/参数拒绝、零值、倍率转换、实际计算及禁用；浏览器实际导入后得到NVPS100、单节点119439360000 bytes、缓冲55296000 bytes，修改输入清除旧结果，390px无整页溢出/浏览器错误。7项临时测试配置已全部显式禁用，26次清理请求留证；客户值及生产批准未填写。
 
 证据：[实际HTTP](evidence/runtime-config-20261015/http-7092d81a-2fe2-4796-9394-51029c8ebf07.json)、[测试配置清理](evidence/runtime-config-20261015/http-e48a4425-4b33-4020-a477-1f139280d47d.json)、[浏览器](evidence/runtime-config-20261015/capacity-runtime-browser.json)、[明确测试依据](evidence/runtime-config-20261015/capacity-synthetic-basis.txt)。配置业务采用说明已扩展这7项；其他尚未实现的业务消费者继续明确登记，不因多一个估算入口而标为完整工单/SLA/通知/设备执行完成。
+
+
+API0.52与容量界面已按01391a70022bce6f8e1e269882f57e3c2bb670df发布到指定测试站。API SHA256为f4c3f96c787bfbfe395203a4bc7272445245d05f5c11f623955dfd59b3a69526，Web构建为f03e27a74780f3df12188d2c0c7ddd25690151c5e7549f7ddd20b96d8bc8b43b。其余12服务实例、镜像、启动时刻及重启数保持不变，API私有环境/Web安全配置未改，无启动迁移。公开入口核验7项已禁用测试配置与容量采用说明、390px无整页溢出、浏览器错误0；候选API/私有候选环境文件及本机临时代理、Vite均已清理，主站独立ready=true、production_ready=false。见[部署](evidence/runtime-config-20261015/capacity-deployment.json)、[公开入口](evidence/runtime-config-20261015/capacity-public-browser.json)、[清理后就绪](evidence/runtime-config-20261015/capacity-final-readiness.json)。

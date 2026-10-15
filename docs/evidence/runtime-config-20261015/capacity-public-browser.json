@@ -1,0 +1,13 @@
+{
+  "verified_at": "2026-10-15T05:45:41.488Z",
+  "origin": "http://192.168.1.215:10010",
+  "web_build_id": "f03e27a74780f3df12188d2c0c7ddd25690151c5e7549f7ddd20b96d8bc8b43b",
+  "capacity_keys": 7,
+  "all_synthetic_keys_disabled": true,
+  "capacity_consumer_label_verified": true,
+  "mobile_width": 390,
+  "document_overflow": false,
+  "browser_errors": [],
+  "ready": true,
+  "production_ready": false
+}

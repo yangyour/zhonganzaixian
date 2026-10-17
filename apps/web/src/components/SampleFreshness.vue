@@ -30,17 +30,17 @@ const estimate = computed(() => invalidated.value ? null : estimateSampleAge(pro
 const responseDate = computed(() => props.clock?.status === 'OBSERVED' && isUtcInstant(props.clock.date_iso) ? props.clock.date_iso : '未取得可用响应时间')
 const sampleDate = computed(() => props.sampledAt === null ? '未取得采样' : isUtcInstant(props.sampledAt) ? props.sampledAt : '采样时间无效')
 const ageText = computed(() => {
-  if (!estimate.value) return '页面或上下文已变化，请只读刷新后重新估计'
+  if (!estimate.value) return '页面或上下文已切换，请刷新页面后重新估算'
   const value = estimate.value
   if (value.status === 'ESTIMATED') return `约 ${BigInt(value.min_age_ms!) / 1000n}—${(BigInt(value.max_age_ms!) + 999n) / 1000n} 秒（估计范围）`
-  return ({ NO_SAMPLE: '无法估计：未取得采样', INVALID_SAMPLE: '无法估计：采样时间无效', CLOCK_UNAVAILABLE: '无法估计：响应时钟不可用', CLOCK_REGRESSED: '页面计时基准已变化，请只读刷新', SAMPLE_AFTER_CLOCK_ESTIMATE: '采样时间晚于响应时钟估计，待核对' } as const)[value.status]
+  return ({ NO_SAMPLE: '无法估计：未取得采样', INVALID_SAMPLE: '无法估计：采样时间无效', CLOCK_UNAVAILABLE: '无法估计：响应时钟不可用', CLOCK_REGRESSED: '页面计时基准已变化，请刷新页面', SAMPLE_AFTER_CLOCK_ESTIMATE: '采样时间晚于响应时钟估计，待核对' } as const)[value.status]
 })
 </script>
 <template>
   <section class="sample-freshness" aria-label="采样与读取时间">
     <h3>采样与读取时间</h3>
     <dl><div><dt>本次响应 Date（UTC，秒级）</dt><dd data-testid="response-date">{{ responseDate }}</dd></div><div><dt>原采样时间（UTC）</dt><dd data-testid="sample-date">{{ sampleDate }}</dd></div><div><dt>样本年龄估计</dt><dd data-testid="sample-age">{{ ageText }}</dd></div></dl>
-    <p class="sample-freshness-note">刷新只读取现有记录，不代表新增采样。响应时钟准确性未核验，年龄估计不用于判断设备正常或SLA达标。</p>
+    <p class="sample-freshness-note">刷新操作仅读取最新已存记录，不触发设备即时重采；样本时效估算仅供运维参考，不作为设备可用性或 SLA 判定依据。</p>
   </section>
 </template>
 <style scoped>

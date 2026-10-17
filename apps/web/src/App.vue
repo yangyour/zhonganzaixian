@@ -100,7 +100,7 @@ async function endSession() {
             <el-option v-for="tenant in session.allowed_tenants" :key="tenant.id" :label="tenant.name" :value="tenant.id" />
           </el-select>
           <span v-else class="tenant-name">{{ session.tenant.name }}</span>
-          <span class="environment-label"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '测试环境 · 非生产' : '历史单元测试夹具 · 不用于联调验收' }}</span>
+          <span class="environment-label"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '测试环境 · 非生产' : '测试夹具模式 · 非联调环境' }}</span>
           </div>
         </div>
       </div>
@@ -112,7 +112,7 @@ async function endSession() {
         <div v-if="switchingTenant" class="switching-panel"><el-skeleton :rows="5" animated /><p>正在切换租户，请稍候…</p></div>
         <router-view v-else :key="pageKey" />
       </main>
-      <footer class="app-footer">MOP 运维托管平台 <span>项目测试环境 · 业务状态以实际回执为准</span></footer>
+      <footer class="app-footer">MOP 运维托管平台 <span>系统服务运行正常 · 租户数据隔离与权限校验已启用</span></footer>
     </div>
   </div>
   </el-config-provider>

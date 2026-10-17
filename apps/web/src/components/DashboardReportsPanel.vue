@@ -35,11 +35,11 @@ onUnmounted(()=>{alive=false;reset()})
   <ApiErrorNotice :error="error" :retrying="busy" @retry="retry" />
   <p v-if="!page" role="status">{{ busy ? '正在读取实际登记…' : error ? '登记读取失败，未显示旧列表。' : '尚未读取登记。' }}</p>
   <template v-else>
-   <div class="report-table-wrap" tabindex="0" role="region" aria-label="报障登记列表"><table><thead><tr><th>登记号 / 标题</th><th>分类</th><th>关联资产</th><th>紧急程度</th><th>登记时间</th><th>详情</th></tr></thead><tbody><tr v-for="row in page.items" :key="row.id"><td><strong>{{ row.receipt_no }}</strong><span>{{ row.title }}</span></td><td>{{ row.category }}</td><td>{{ row.asset_name ?? '未关联资产' }}</td><td>{{ row.urgency === 'urgent' ? '很急（报障人自述）' : '一般' }}</td><td>{{ displayTime(row.created_at) }}</td><td><router-link :to="{ path:'/tickets',query:{ticket_id:row.id} }" :aria-label="'查看登记'+row.receipt_no">查看</router-link></td></tr></tbody></table></div>
+   <div class="report-table-wrap" tabindex="0" role="region" aria-label="报障登记列表"><table><thead><tr><th>登记号 / 标题</th><th>分类</th><th>关联资产</th><th>紧急程度</th><th>登记时间</th><th>详情</th></tr></thead><tbody><tr v-for="row in page.items" :key="row.id"><td><strong>{{ row.receipt_no }}</strong><span>{{ row.title }}</span></td><td>{{ row.category }}</td><td>{{ row.asset_name ?? '未关联资产' }}</td><td>{{ row.urgency === 'urgent' ? '紧急（用户提报）' : '一般' }}</td><td>{{ displayTime(row.created_at) }}</td><td><router-link :to="{ path:'/tickets',query:{ticket_id:row.id} }" :aria-label="'查看登记'+row.receipt_no">查看</router-link></td></tr></tbody></table></div>
    <p v-if="!page.items.length">当前授权范围没有报障登记。</p>
    <div class="report-pagination"><span>第 {{ number }} 页 · 本页 {{ page.items.length }} 条{{ page.has_more ? ' · 还有更多记录' : '' }}</span><button :disabled="busy || !cursor" @click="load('',1)">返回第一页</button><button :disabled="busy || !page.has_more" @click="load(page!.next_cursor!,number+1)">下一页登记</button></div>
   </template>
-  <p class="report-boundary">登记表示报障已保存。派单、响应时限、解决与客户确认仍以正式处理流程为准，不把登记数算作待处理工单数。</p>
+  <p class="report-boundary">登记表示报障已保存。派单、响应时限、解决与客户确认仍以正式处理流程为准，不把登记数算作待处理工单数。运营周期报表导出（待开通）：报表统计周期、季度归属口径及导出模板版式（配置项 Q02 / Q04 / Q09）待业务确认，完成确认后开放导出。</p>
  </section>
 </template>
 <style scoped>

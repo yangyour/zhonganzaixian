@@ -77,50 +77,68 @@ defineExpose({ hasUnresolved: workspace.unresolved, canLeave })
 </script>
 
 <template>
-  <el-drawer v-model="open" title="我的实填工时" size="900px" class="worklog-drawer" :close-on-click-modal="false">
+  <el-drawer v-model="open" title="工时填报与记录（人工填报）" size="900px" class="worklog-drawer" :close-on-click-modal="false">
     <p v-if="ticket"><strong>{{ ticket.title }}</strong><span class="worklog-id">{{ ticket.receipt_no }} · {{ ticket.id }}</span></p>
-    <el-alert type="info" :closable="false" title="仅记录本人实际填写的起止时间，未做考勤核验。默认工时、成本和毛利待确认；不改变报障状态或SLA。" />
+    <el-alert type="info" :closable="false" title="记录工程师实际作业起止时间（跨日记录按原始时段保存，不自动拆分；计费核算以商务结算规则为准）。" />
     <el-empty v-if="!permitted" description="当前身份或租户没有本人工时权限，请重新打开详情" />
     <template v-else>
-      <div class="worklog-actions"><el-button :loading="state.busy === 'read'" :disabled="state.busy === 'write'" @click="workspace.refresh()">刷新第一页（只读）</el-button><el-button :disabled="Boolean(state.busy) || !state.page?.has_more" @click="workspace.refresh(true)">下一页</el-button><span>{{ state.paged ? '后续页' : '第一页' }} · 每页15条 · 仅本人</span></div>
+      <div class="worklog-actions"><el-button :loading="state.busy === 'read'" :disabled="state.busy === 'write'" @click="workspace.refresh()">刷新列表</el-button><el-button :disabled="Boolean(state.busy) || !state.page?.has_more" @click="workspace.refresh(true)">下一页</el-button><span>{{ state.paged ? '后续页' : '第一页' }} · 每页15条 · 人工填报</span></div>
       <ApiErrorNotice :error="state.error" />
-      <el-alert v-if="state.attempt?.state === 'uncertain'" type="warning" :closable="false" title="保存结果尚未确认。原内容、版本和幂等键已保留；刷新只查询，不会自动重发。请勿刷新浏览器或关闭页面。" />
-      <el-button v-if="state.attempt?.state === 'uncertain'" type="warning" :disabled="Boolean(state.busy) || !writable" @click="retryOriginal">使用原请求重试</el-button>
-      <el-alert v-if="state.attempt?.state === 'rejected'" type="warning" :closable="false" title="本次请求被拒绝。请刷新并检查当前版本，再明确提交；不会自动覆盖。" />
-      <el-alert v-if="state.receipt" type="success" :closable="false" :title="`最近确认保存：${state.receipt.id} · v${state.receipt.version}；这是该次请求回执，当前记录以重新读取为准`" />
-      <AppTable :rows="state.page?.items || []" :loading="state.busy === 'read'" :empty-text="state.page ? '本页暂无本人实填工时，不表示默认工时为0' : '工时尚未成功读取'">
+      <el-alert v-if="state.attempt?.state === 'uncertain'" type="warning" :closable="false" title="提交结果待确认：系统已锁定当前填写内容，请先刷新列表核对是否已生效，或点击“重试提交”继续处理。" />
+      <el-button v-if="state.attempt?.state === 'uncertain'" type="warning" :disabled="Boolean(state.busy) || !writable" @click="retryOriginal">重试提交</el-button>
+      <el-alert v-if="state.attempt?.state === 'rejected'" type="warning" :closable="false" title="本次提交未通过：请刷新列表并核对当前记录版本后再重新提交。" />
+      <el-alert v-if="state.receipt" type="success" :closable="false" :title="`工时记录已保存（记录编号：${state.receipt.id} · v${state.receipt.version}）`" />
+      <AppTable :rows="state.page?.items || []" :loading="state.busy === 'read'" :empty-text="state.page ? '当前页暂无本人工时记录' : '正在加载或尚未读取工时记录'">
         <el-table-column label="类型" min-width="100"><template #default="{ row }">{{ labels[row.kind as WorklogKind] }}</template></el-table-column>
         <el-table-column label="实际起止（UTC）" min-width="240"><template #default="{ row }"><span class="worklog-id">{{ row.started_at }}<br>{{ row.ended_at }}</span></template></el-table-column>
-        <el-table-column label="物理时长（秒）" min-width="140"><template #default="{ row }">{{ row.elapsed_millis / 1000 }}</template></el-table-column>
-        <el-table-column label="备注 / 版本" min-width="180"><template #default="{ row }"><span class="worklog-note">{{ row.note ?? '未填写备注' }}</span><span class="worklog-id">v{{ row.version }}</span></template></el-table-column>
-        <el-table-column label="操作" width="115" fixed="right"><template #default="{ row }"><el-button link type="primary" :disabled="Boolean(state.busy)" @click="workspace.show(row.id)">读取及历史</el-button></template></el-table-column>
+        <el-table-column label="作业时长（秒）" min-width="140"><template #default="{ row }">{{ row.elapsed_millis / 1000 }}</template></el-table-column>
+        <el-table-column label="工作描述 / 版本" min-width="180"><template #default="{ row }"><span class="worklog-note">{{ row.note ?? '未填写' }}</span><span class="worklog-id">v{{ row.version }} · 人工填报</span></template></el-table-column>
+        <el-table-column label="操作" width="115" fixed="right"><template #default="{ row }"><el-button link type="primary" :disabled="Boolean(state.busy)" @click="workspace.show(row.id)">详情与历史</el-button></template></el-table-column>
       </AppTable>
       <section v-if="state.selected" class="worklog-section">
-        <h3>本人记录 v{{ state.selected.version }}</h3><p class="worklog-id">{{ state.selected.id }}</p>
-        <p>{{ labels[state.selected.kind] }} · {{ state.selected.started_at }} → {{ state.selected.ended_at }}</p><p class="worklog-note">{{ state.selected.note ?? '未填写备注' }}</p>
-        <el-button :disabled="locked" @click="editSelected">以当前版本修改</el-button>
-        <h4>不可变修订历史</h4><p class="field-help">新修改追加修订，历史保留。每页最多15条，以下仅为已读取页。</p>
-        <ul class="worklog-history"><li v-for="revision in state.history?.items || []" :key="revision.version"><strong>v{{ revision.version }} · {{ revision.action === 'CREATE' ? '创建' : '修改' }} · {{ labels[revision.kind] }}</strong><span class="worklog-id">{{ revision.started_at }} → {{ revision.ended_at }} · {{ revision.elapsed_millis / 1000 }} 秒</span><p class="worklog-note">{{ revision.note ?? '未填写备注' }}</p></li></ul>
-        <el-button :disabled="Boolean(state.busy) || !state.history?.has_more" @click="workspace.show(state.selected!.id, true)">更早修订</el-button>
+        <h3>工时记录详情 v{{ state.selected.version }}</h3><p class="worklog-id">{{ state.selected.id }}</p>
+        <p>{{ labels[state.selected.kind] }} · {{ state.selected.started_at }} → {{ state.selected.ended_at }}</p><p class="worklog-note">{{ state.selected.note ?? '未填写' }}</p>
+        <el-button :disabled="locked" @click="editSelected">按当前版本修改</el-button>
+        <h4>修订历史记录</h4><p class="field-help">每次修改均保留完整修订轨迹（每页最多展示 15 条）。</p>
+        <ul class="worklog-history"><li v-for="revision in state.history?.items || []" :key="revision.version"><strong>v{{ revision.version }} · {{ revision.action === 'CREATE' ? '创建' : '修改' }} · {{ labels[revision.kind] }}</strong><span class="worklog-id">{{ revision.started_at }} → {{ revision.ended_at }} · {{ revision.elapsed_millis / 1000 }} 秒</span><p class="worklog-note">{{ revision.note ?? '未填写' }}</p></li></ul>
+        <el-button :disabled="Boolean(state.busy) || !state.history?.has_more" @click="workspace.show(state.selected!.id, true)">加载更早修订</el-button>
       </section>
       <section v-if="writable" class="worklog-section">
-        <h3>{{ editingId ? '修改本人记录' : '新增本人实填工时' }}</h3><p v-if="editingId" class="worklog-id">{{ editingId }} · 修改保留原记录身份及所有历史</p>
+        <h3>{{ editingId ? '修改工时记录' : '新增工时记录' }}</h3><p v-if="editingId" class="worklog-id">{{ editingId }} · 修改后将生成新版本并保留历史记录</p>
         <el-form label-position="top" @submit.prevent="save">
-          <el-form-item label="工作类型（必须明确选择）"><el-select v-model="kind" :disabled="locked" aria-label="实填工时类型" placeholder="请选择类型"><el-option v-for="(label, value) in labels" :key="value" :label="label" :value="value" /></el-select></el-form-item>
+          <el-form-item label="工作类型"><el-select v-model="kind" :disabled="locked" aria-label="实填工时类型" placeholder="请选择工作类型"><el-option v-for="(label, value) in labels" :key="value" :label="label" :value="value" /></el-select></el-form-item>
           <el-form-item label="实际开始时间（含秒和时区）"><el-input v-model="startedAt" :disabled="locked" aria-label="实填开始时间" placeholder="例如 2026-10-02T09:00:00+08:00" /></el-form-item>
           <el-form-item label="实际结束时间（含秒和时区）"><el-input v-model="endedAt" :disabled="locked" aria-label="实填结束时间" placeholder="例如 2026-10-02T10:30:00+08:00" /></el-form-item>
-          <p class="field-help">明确输入日期、秒与Z或±HH:MM时区，最多3位毫秒；不会自动使用当前时间。相同起止表示明确实填0，缺值不会补0或4小时。</p>
-          <el-form-item label="原始备注（可留空，最多2000字符）"><AutoTextarea v-model="note" :min-rows="4" :max-rows="10" :disabled="locked" aria-label="实填工时备注" /></el-form-item>
-          <p v-if="elapsed !== null">起止物理差：{{ elapsed / 1000 }} 秒。未计费取整，未换算成本。</p><p v-if="validation" role="alert" class="worklog-validation">{{ validation }}</p>
-          <div class="worklog-actions"><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.parentVersion">{{ editingId ? '确认追加修改修订' : '保存本人工时' }}</el-button><el-button :disabled="locked" @click="resetForm">清空表单 / 改为新增</el-button></div>
+          <p class="field-help">请填写含日期、秒与时区偏移（Z 或 ±HH:MM）的完整时间；记录工程师实际作业起止时间（跨日记录按原始时段保存，不自动拆分；计费核算以商务结算规则为准）。</p>
+          <el-form-item label="工作描述（选填，最多 2000 字符）"><AutoTextarea v-model="note" :min-rows="4" :max-rows="10" :disabled="locked" aria-label="实填工时备注" /></el-form-item>
+          <p v-if="elapsed !== null">本次填报时长：{{ elapsed / 1000 }} 秒（人工填报）。</p><p v-if="validation" role="alert" class="worklog-validation">{{ validation }}</p>
+          <div class="worklog-actions"><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.parentVersion">{{ editingId ? '保存修改' : '保存工时记录' }}</el-button><el-button :disabled="locked" @click="resetForm">清空表单 / 改为新增</el-button></div>
         </el-form>
       </section>
     </template>
-    <template #footer><el-button @click="open = false">暂时收起</el-button><span class="field-help">收起会保留未保存输入和未确认请求；切换登记或离开前会检查未保存内容。</span></template>
+    <template #footer><el-button @click="open = false">暂时收起</el-button><span class="field-help">收起面板将保留当前未保存输入与待确认请求。</span></template>
   </el-drawer>
 </template>
 
-<style>
-.worklog-drawer{max-width:100vw}.worklog-drawer .el-alert{margin-bottom:12px}.worklog-id{display:block;font-size:12px;color:var(--el-text-color-secondary);overflow-wrap:anywhere}.worklog-note{white-space:pre-wrap;overflow-wrap:anywhere}.worklog-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0}.worklog-section{border-top:1px solid var(--el-border-color);padding-top:12px;margin-top:24px}.worklog-section .el-select{width:100%}.worklog-validation{color:var(--el-color-danger)}.worklog-history{padding-left:20px}.worklog-history li{margin:16px 0}.worklog-history p{margin:4px 0}
-@media(max-width:600px){.worklog-drawer .el-drawer__body{padding:14px}.worklog-drawer .el-button{min-height:44px;height:auto;white-space:normal}.worklog-drawer .el-input__wrapper,.worklog-drawer .el-select__wrapper{min-height:44px}.worklog-actions>span{width:100%}.worklog-drawer .el-drawer__footer .field-help{display:block;margin-top:8px}.worklog-section p{overflow-wrap:anywhere}}
+<style scoped>
+:deep(.worklog-drawer){max-width:100vw}
+:deep(.worklog-drawer .el-alert){margin-bottom:12px}
+.worklog-id{display:block;font-size:12px;color:var(--el-text-color-secondary);overflow-wrap:anywhere}
+.worklog-note{white-space:pre-wrap;overflow-wrap:anywhere}
+.worklog-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0}
+.worklog-section{border-top:1px solid var(--el-border-color);padding-top:12px;margin-top:24px}
+.worklog-section :deep(.el-select){width:100%}
+.worklog-validation{color:var(--el-color-danger)}
+.worklog-history{padding-left:20px}
+.worklog-history li{margin:16px 0}
+.worklog-history p{margin:4px 0}
+@media(max-width:600px){
+  :deep(.worklog-drawer .el-drawer__body){padding:14px}
+  :deep(.worklog-drawer .el-button){min-height:44px;height:auto;white-space:normal}
+  :deep(.worklog-drawer .el-input__wrapper),:deep(.worklog-drawer .el-select__wrapper){min-height:44px}
+  .worklog-actions>span{width:100%}
+  :deep(.worklog-drawer .el-drawer__footer .field-help){display:block;margin-top:8px}
+  .worklog-section p{overflow-wrap:anywhere}
+}
 </style>
+

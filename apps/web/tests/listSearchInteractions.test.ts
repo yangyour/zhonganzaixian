@@ -44,7 +44,7 @@ const asset: Asset = {
 const assetPage = (items = [asset], more = false): AssetPage => ({ items, next_cursor: more ? 'unit-next' : null, has_more: more })
 const cases = [
   { path: '/assets', component: AssetsPage, label: '搜索资产', form: 'form.asset-toolbar', emptyButton: '清空筛选，查看全部资产', page: (empty = false, more = false) => assetPage(empty ? [] : [asset], more) },
-  { path: '/tickets', component: TicketsPage, label: '搜索报障登记', form: 'form.ticket-filter-form', emptyButton: '清空筛选，查看全部登记', page: (empty = false, more = false) => ticketPage(empty ? [] : more ? Array.from({ length: 15 }, (_, index) => ticket(10 + index)) : [ticket()], more) },
+  { path: '/tickets', component: TicketsPage, label: '搜索报障登记', form: 'form.ticket-filter-form', emptyButton: '清空筛选，查看全部工单', page: (empty = false, more = false) => ticketPage(empty ? [] : more ? Array.from({ length: 15 }, (_, index) => ticket(10 + index)) : [ticket()], more) },
 ]
 let app: App | undefined, host: HTMLElement, router: Router
 async function settle() { for (let i = 0; i < 8; i++) { await Promise.resolve(); await nextTick() } }

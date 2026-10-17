@@ -158,13 +158,13 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
 </script>
 <template>
   <section class="configuration-page">
-    <div class="page-heading"><div><span class="eyebrow">ADMINISTRATION / CONFIGURATION</span><h1>配置确认登记</h1><p>统一记录合同值、客户待确认项与建议草稿。测试环境草稿均未发布为运行配置。</p></div><el-button :loading="loading" @click="load">刷新登记表</el-button></div>
+    <div class="page-heading"><div><span class="eyebrow">ADMINISTRATION / CONFIGURATION</span><h1>配置项登记</h1><p>集中管理平台合同基线参数、客户待确认项与配置修订提案 · 待确认参数在完成审批发布前暂不参与生产计算</p></div><el-button :loading="loading" @click="load">刷新登记表</el-button></div>
 
     <WorkingCalendarReader v-model="calendarOpen" />
-    <el-alert v-if="draftState.receipt" type="success" :closable="false" :title="'设计登记原请求已确认：' + draftState.receipt.key + ' · v' + draftState.receipt.version + '；只是旧建议草稿，未生效'" />
-    <div class="scope-card feature-summary configuration-summary"><div><span class="small-label">登记项</span><strong>{{ countsUnknown ? '—' : rows.length }} <small>项</small></strong></div><div><span class="small-label">待客户确认</span><strong>{{ countsUnknown ? '—' : pendingCount }} <small>项</small></strong></div><div><span class="small-label">草稿版本</span><strong>{{ countsUnknown ? '—' : draftCount }} <small>项</small></strong></div><div><span class="small-label">运行发布</span><router-link to="/runtime-configurations">查看当前租户配置</router-link><small>与原设计登记独立保存</small></div></div>
-    <el-alert class="page-note" type="warning" :closable="false" show-icon title="此页维护设计登记和内部提案；实际运行发布、回滚与有效值请进入运行配置与发布。客户生产确认和外部执行单独核验。" />
-    <div class="panel configuration-register"><nav class="feature-tabs" aria-label="配置工作区"><button type="button" :class="{active:!filters.pending_only}" @click="filters.pending_only=false">全部登记</button><button type="button" :class="{active:filters.pending_only}" @click="filters.pending_only=true">待客户确认 <span>{{ countsUnknown ? '—' : pendingCount }}</span></button><router-link to="/threshold-diagnostics">阈值候选诊断</router-link><button type="button" :disabled="!can('configurations:read') || switchingTenant" @click="calendarOpen=true">工作日历草稿查询与试算</button></nav><div class="panel-heading configuration-register-heading"><h2>配置登记与修订</h2><span>已登记内容 / 建议草稿 / 生效值分别核对</span></div><ApiErrorNotice :error="error"><el-button size="small" @click="load">重试</el-button></ApiErrorNotice>
+    <el-alert v-if="draftState.receipt" type="success" :closable="false" :title="'配置建议草稿已保存：' + draftState.receipt.key + ' · v' + draftState.receipt.version + '（草稿状态，暂未发布生效）'" />
+    <div class="scope-card feature-summary configuration-summary"><div><span class="small-label">登记项</span><strong>{{ countsUnknown ? '—' : rows.length }} <small>项</small></strong></div><div><span class="small-label">待客户确认</span><strong>{{ countsUnknown ? '—' : pendingCount }} <small>项</small></strong></div><div><span class="small-label">草稿版本</span><strong>{{ countsUnknown ? '—' : draftCount }} <small>项</small></strong></div><div><span class="small-label">运行发布</span><router-link to="/runtime-configurations">查看当前租户配置</router-link><small>与设计基线登记独立管理</small></div></div>
+    <el-alert class="page-note" type="warning" :closable="false" show-icon title="本页用于维护配置基线登记与内部修订提案；运行参数发布、版本回滚及当前生效值请前往“运行配置与发布”模块管理。" />
+    <div class="panel configuration-register"><nav class="feature-tabs" aria-label="配置工作区"><button type="button" :class="{active:!filters.pending_only}" @click="filters.pending_only=false">全部登记</button><button type="button" :class="{active:filters.pending_only}" @click="filters.pending_only=true">待客户确认 <span>{{ countsUnknown ? '—' : pendingCount }}</span></button><router-link to="/threshold-diagnostics">告警阈值诊断</router-link><button type="button" :disabled="!can('configurations:read') || switchingTenant" @click="calendarOpen=true">工作日历查询与试算</button></nav><div class="panel-heading configuration-register-heading"><h2>配置登记与修订</h2><span>登记基线 / 建议草稿 / 运行生效值对照</span></div><ApiErrorNotice :error="error"><el-button size="small" @click="load">重试</el-button></ApiErrorNotice>
       <el-form class="configuration-filters" label-position="top" @submit.prevent>
         <el-form-item label="配置键（config_key）"><el-input v-model="filters.config_key" clearable placeholder="按配置键查找" aria-label="筛选配置键" /></el-form-item>
         <el-form-item label="关联确认 Q 编号"><el-select v-model="filters.question_id" clearable filterable placeholder="全部 Q 编号" aria-label="筛选关联确认 Q 编号"><el-option v-for="question in questions" :key="question" :value="question" :label="question" /></el-select></el-form-item>
@@ -172,56 +172,56 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
         <el-form-item label="确认状态"><el-checkbox v-model="filters.pending_only" aria-label="仅显示待客户确认">仅待客户确认</el-checkbox></el-form-item>
         <el-button @click="resetFilters">重置筛选</el-button>
       </el-form>
-      <p class="configuration-filter-count" aria-live="polite">{{ countsUnknown ? '登记项数量等待读取' : `匹配 ${filteredRows.length} / ${rows.length} 项登记配置` }} · 在本次读取的登记表内组合筛选。</p>
+      <p class="configuration-filter-count" aria-live="polite">{{ countsUnknown ? '正在加载配置登记项…' : `匹配 ${filteredRows.length} / ${rows.length} 项登记配置` }} · 支持在当前已加载列表内组合筛选。</p>
       <p v-if="!countsUnknown && questionIssues.cannotConfirmMatch" class="configuration-filter-warning" role="status">当前其他筛选下：{{ questionIssues.missing }} 项 Q 信息缺失，{{ questionIssues.invalid }} 项格式异常。{{ filters.question_id ? '这些行无法确认与所选 Q 匹配；清除 Q 筛选后可查看并查询诊断。' : '这些行仍保留供查看和诊断；Q 筛选无法确认它们的关联。' }}</p>
       <AppTable :error="error" :rows="filteredRows" :loading="loading" row-key="key" :empty-text="error ? '登记表加载失败，请重试' : rows.length ? '暂无符合筛选条件的登记项' : '暂无配置登记项'">
       <el-table-column label="配置项" min-width="210"><template #default="{ row }"><strong class="configuration-name">{{ configurationMetadataLabel(row.description, '配置描述') }}</strong><span class="cell-sub mono">{{ row.key }}</span></template></el-table-column>
-      <el-table-column label="登记作用域 / 类型" min-width="120"><template #default="{ row }">{{ configurationMetadataLabel(row.scope, '作用域') }}<span class="cell-sub">{{ configurationMetadataLabel(row.type, '类型') }}<template v-if="row.unit !== null && row.unit !== undefined"> · {{ configurationMetadataLabel(row.unit, '单位') }}</template> · 非影响对象清单</span></template></el-table-column>
-      <el-table-column label="登记 / 合同值" min-width="130"><template #default="{ row }"><span :class="{ muted: row.registered_value === null }">{{ displayValue(row.registered_value) }}</span><span class="cell-sub">{{ configurationMetadataLabel(row.source, '来源') }} · 设计登记来源</span></template></el-table-column>
+      <el-table-column label="登记作用域 / 类型" min-width="120"><template #default="{ row }">{{ configurationMetadataLabel(row.scope, '作用域') }}<span class="cell-sub">{{ configurationMetadataLabel(row.type, '类型') }}<template v-if="row.unit !== null && row.unit !== undefined"> · {{ configurationMetadataLabel(row.unit, '单位') }}</template></span></template></el-table-column>
+      <el-table-column label="登记 / 合同值" min-width="130"><template #default="{ row }"><span :class="{ muted: row.registered_value === null }">{{ displayValue(row.registered_value) }}</span><span class="cell-sub">{{ configurationMetadataLabel(row.source, '来源') }} · 基线来源</span></template></el-table-column>
       <el-table-column label="确认状态" min-width="130"><template #default="{ row }"><el-tag :type="row.decision_status === 'pending' ? 'warning' : 'info'">{{ row.decision_status === 'pending' ? '待客户确认' : row.decision_status === 'contract_fixed' ? '合同有据' : row.decision_status === 'confirmed' ? '已确认' : configurationMetadataLabel(row.decision_status, '确认状态') }}</el-tag><span class="cell-sub">{{ configurationQuestionsLabel(row.question_ids) }}</span></template></el-table-column>
       <el-table-column label="建议草稿 / 版本" min-width="150"><template #default="{ row }"><span>{{ row.draft_value === null || row.draft_value === undefined ? '尚未填写' : displayValue(row.draft_value) }}</span><span class="cell-sub">v{{ row.version }} · {{ row.lifecycle_status === 'DRAFT' ? '草稿' : configurationMetadataLabel(row.lifecycle_status, '草稿状态') }}</span></template></el-table-column>
       <el-table-column label="运行值 / 发布" min-width="130"><template #default="{ row }"><router-link :to="{path:'/runtime-configurations',query:{key:row.key}}">读取当前运行值</router-link><span class="cell-sub">独立版本与生效时间</span></template></el-table-column>
       <!-- @vue-generic {Configuration} -->
       <el-table-column label="操作" min-width="230" fixed="right"><template #default="{ row }"><div class="configuration-row-actions"><el-button v-if="diagnosticPermitted" type="primary" link class="configuration-diagnostic-link" @click="openDiagnostic(row)">登记来源诊断</el-button><el-button type="primary" link @click="openComparison(row)">建议差异</el-button><el-button type="primary" link @click="openRevisions(row)">修订与审批</el-button><PermissionGate capability="configurations:write"><el-button type="primary" link :disabled="row.contract_value_kind === 'fixed_constraint'" @click="openDraft(row)">{{ row.contract_value_kind === 'fixed_constraint' ? '固定约束' : '编辑草稿' }}</el-button><router-link :to="{path:'/runtime-configurations',query:{key:row.key}}">运行发布</router-link></PermissionGate></div></template></el-table-column>
-    </AppTable><div class="table-footer"><span>客户确认结论与生产许可按文档登记；测试环境草稿不构成正式确认。</span></div></div>
+    </AppTable><div class="table-footer"><span>客户确认结论与生产发布许可按正式审批文档登记管理。</span></div></div>
     <ConfigurationRevisions ref="revisionPanel" v-model="revisionsOpen" :configuration="revisionConfiguration" @changed="load" />
     <ConfigurationDiagnosticPanel v-model="diagnosticOpen" :configuration-key="diagnosticKey" />
     <el-drawer v-model="comparisonOpen" title="登记值与建议值差异" size="820px" class="configuration-comparison-drawer" destroy-on-close>
       <p class="mono configuration-comparison-key">{{ comparisonKey }}</p>
-      <el-alert type="info" :closable="false" show-icon title="比较本次接口回读的登记值与已保存建议。差异不代表发布、生效或客户确认。" />
+      <el-alert type="info" :closable="false" show-icon title="对比当前配置项的登记基线值与已保存建议值（仅作差异核对，实际生效状态以运行配置中心为准）。" />
       <ApiErrorNotice :error="comparisonError"><el-button size="small" @click="loadComparison">重试读取</el-button></ApiErrorNotice>
       <el-skeleton v-if="comparisonLoading" :rows="7" animated class="configuration-comparison-loading" />
       <template v-else-if="comparisonSnapshot && comparison">
         <div class="config-dialog-context"><strong>{{ configurationMetadataLabel(comparisonSnapshot.configuration.description, '配置描述') }}</strong><p>登记版本 v{{ comparisonSnapshot.configuration.version }} · {{ comparison.decisionStatus === 'pending' ? '待客户确认' : comparison.decisionStatus === 'contract_fixed' ? '合同有据' : comparison.decisionStatus === 'confirmed' ? '已确认' : configurationMetadataLabel(comparison.decisionStatus, '确认状态') }}</p><p>关联确认：{{ configurationQuestionsLabel(comparisonSnapshot.configuration.question_ids) }}</p></div>
         <el-form label-position="top" class="configuration-comparison-selector"><el-form-item label="选择已保存建议来源"><el-select v-model="proposalSelection" aria-label="选择差异比较建议来源"><el-option value="draft" :disabled="!hasDraft" :label="hasDraft ? `登记建议草稿 · v${comparisonSnapshot.configuration.version}` : '登记建议草稿 · 尚未填写'" /><el-option v-for="revision in comparisonSnapshot.revisions" :key="revision.id" :value="revision.id" :label="`${revisionStatusLabel[revision.workflow_status]} · v${revision.version} · ${revision.id}`" /></el-select></el-form-item></el-form>
-        <p v-if="selectedRevision" class="field-help">修订 {{ selectedRevision.id }} · {{ revisionStatusLabel[selectedRevision.workflow_status] }}。客户证据未核验（{{ comparison.confirmationStatus }}）；内部审批不等于运行发布；实际生效版本请在运行配置中心查询。</p>
+        <p v-if="selectedRevision" class="field-help">修订 {{ selectedRevision.id }} · {{ revisionStatusLabel[selectedRevision.workflow_status] }}。客户确认状态：{{ comparison.confirmationStatus }}；内部审批通过后需在运行配置中心执行发布。</p>
         <el-descriptions :column="1" border class="configuration-comparison-facts">
           <el-descriptions-item label="登记作用域">{{ comparison.registeredScope }}</el-descriptions-item>
           <el-descriptions-item label="登记 / 合同值"><pre>{{ comparisonValue(comparison.registeredValue) }}</pre></el-descriptions-item>
           <el-descriptions-item label="建议值"><pre>{{ comparison.proposalAvailable ? comparisonValue(comparison.proposedValue) : '尚未填写建议值' }}</pre></el-descriptions-item>
-          <el-descriptions-item label="运行生效值"><pre>{{ comparison.effectiveValue === undefined ? '接口未提供生效值（未知）' : comparison.effectiveValue === null ? '尚未生效（null）' : comparisonValue(comparison.effectiveValue) }}</pre></el-descriptions-item>
-          <el-descriptions-item label="实际影响对象">未知 · 接口尚未返回受影响租户、模板、路由的对象清单或数量。登记作用域是配置目录信息。</el-descriptions-item>
+          <el-descriptions-item label="运行生效值"><pre>{{ comparison.effectiveValue === undefined ? '接口暂未提供生效值' : comparison.effectiveValue === null ? '暂未生效' : comparisonValue(comparison.effectiveValue) }}</pre></el-descriptions-item>
+          <el-descriptions-item label="关联影响范围">待盘点 · 接口暂未返回受影响租户、模板或路由明细（登记作用域代表配置目录归属层级）。</el-descriptions-item>
         </el-descriptions>
-        <div class="detail-section"><h3>登记值 → 建议值</h3><p class="field-help">路径使用 JSON Pointer；数组按位置比较。字段不存在与 null、0、false 分别显示。</p>
+        <div class="detail-section"><h3>登记值 → 建议值</h3><p class="field-help">字段路径采用 JSON Pointer 格式，数组按索引位置逐项对比。</p>
           <el-empty v-if="!comparison.proposalAvailable" description="尚无已保存建议，无法比较" :image-size="70" />
-          <el-empty v-else-if="!comparison.differences.length" description="建议值与登记值一致；仍未因此发布或生效" :image-size="70" />
+          <el-empty v-else-if="!comparison.differences.length" description="建议值与登记基线值一致（暂未发布生效）" :image-size="70" />
           <AppTable v-else :rows="comparison.differences" row-key="path"><el-table-column label="字段路径 / 变化" min-width="160"><template #default="{ row }"><span class="mono">{{ row.path || '根值（整个值）' }}</span><span class="cell-sub">{{ row.kind === 'added' ? '新增字段' : row.kind === 'removed' ? '移除字段' : '值改变' }}</span></template></el-table-column><el-table-column label="登记值" min-width="180"><template #default="{ row }"><pre class="configuration-difference-value">{{ comparisonValue(row.before, row.before_present) }}</pre></template></el-table-column><el-table-column label="建议值" min-width="180"><template #default="{ row }"><pre class="configuration-difference-value">{{ comparisonValue(row.after, row.after_present) }}</pre></template></el-table-column></AppTable>
         </div>
       </template>
       <template #footer><el-button :loading="comparisonLoading" @click="loadComparison">回读登记与修订</el-button><el-button @click="comparisonOpen = false">关闭</el-button></template>
     </el-drawer>
-    <el-dialog v-model="editingOpen" title="编辑旧设计登记建议草稿（非租户运行配置）" width="560px" class="responsive-dialog" :close-on-click-modal="!draftUnresolved" :close-on-press-escape="!draftUnresolved" :show-close="!draftUnresolved" destroy-on-close>
+    <el-dialog v-model="editingOpen" title="编辑配置建议草稿（未发布生效）" width="560px" class="responsive-dialog" :close-on-click-modal="!draftUnresolved" :close-on-press-escape="!draftUnresolved" :show-close="!draftUnresolved" destroy-on-close>
       <template v-if="editing"><div class="config-dialog-context"><strong>{{ configurationMetadataLabel(editing.description, '配置描述') }}</strong><span class="mono">{{ editing.key }}</span><p>当前版本 v{{ editing.version }} · 登记值：{{ displayValue(editing.registered_value) }}</p><p>运行生效：{{ editing.effective_value === null ? '尚未启用' : displayValue(editing.effective_value) }}</p><p>关联确认：{{ configurationQuestionsLabel(editing.question_ids) }}</p></div>
-        <el-alert type="info" :closable="false" title="这里只修改旧设计登记建议草稿，独立于当前租户提案与审批；不会修改原登记值、客户确认或运行生效配置。" show-icon />
+        <el-alert type="info" :closable="false" title="在此维护配置建议草稿（与租户修订提案及运行生效配置独立存储，不影响当前生产运行状态）。" show-icon />
         <ApiErrorNotice :error="editError" />
-        <el-alert v-if="draftUnresolved" type="warning" :closable="false" title="原body/key/配置键/版本已保留，结果未确认。只读刷新不重试、不重定基准，请勿刷新浏览器。" />
-        <div class="calendar-actions"><el-button :disabled="saving" @click="draftWriter.refresh()">只读核对最新登记</el-button><el-button v-if="draftUnresolved" type="warning" :disabled="Boolean(draftState.busy)" @click="retryDraft">使用原设计草稿请求重试</el-button><el-button v-if="!draftUnresolved" :disabled="Boolean(draftState.busy)" @click="rebaseDraft">明确采用新基准，保留填写值</el-button></div>
-        <p v-if="draftState.lastRead">最近只读所见v{{ draftState.lastRead.version }} · 已存旧建议：{{ displayValue(draftState.lastRead.draft_value) }}；当前填写与固定基准不自动替换</p>
-        <p v-if="showConflict" class="field-help">版本已变化，建议值仍保留在表单。请只读核对差异，再明确采用新基准；系统不会自动覆盖或重发。</p>
+        <el-alert v-if="draftUnresolved" type="warning" :closable="false" title="提交结果待确认：系统已锁定当前草稿内容与基准版本，请先核对最新状态或点击“重试提交”继续处理。" />
+        <div class="calendar-actions"><el-button :disabled="saving" @click="draftWriter.refresh()">刷新最新登记</el-button><el-button v-if="draftUnresolved" type="warning" :disabled="Boolean(draftState.busy)" @click="retryDraft">重试提交</el-button><el-button v-if="!draftUnresolved" :disabled="Boolean(draftState.busy)" @click="rebaseDraft">采用最新基准并保留填写值</el-button></div>
+        <p v-if="draftState.lastRead">最新回读版本 v{{ draftState.lastRead.version }} · 已存草稿值：{{ displayValue(draftState.lastRead.draft_value) }}（当前表单输入与编辑基准保持不变）</p>
+        <p v-if="showConflict" class="field-help">服务端版本已更新，当前填写的建议值已保留。请先刷新核对版本差异，再点击“采用最新基准并保留填写值”。</p>
         <el-form :disabled="draftLocked" class="dialog-form" label-position="top" @submit.prevent="saveDraft"><el-form-item :label="`建议值${editing.unit !== null && editing.unit !== undefined ? `（${configurationMetadataLabel(editing.unit, '单位')}）` : ''}`" :error="validationError">
-          <el-select v-if="kind === 'boolean'" v-model="proposed" placeholder="请选择；未选择不等于否"><el-option label="是（true）" :value="true" /><el-option label="否（false）" :value="false" /></el-select>
-          <el-input v-else v-model="proposed" :type="kind === 'json' ? 'textarea' : 'text'" :rows="kind === 'json' ? 7 : 1" :placeholder="kind === 'number' ? '请输入数字，本批校验登记类型' : kind === 'json' ? '请输入 JSON，保持字段类型与结构' : '请输入建议值'" />
-        </el-form-item><p v-if="editing.allowed_range !== null" class="field-help">登记范围：{{ displayValue(editing.allowed_range) }} · 范围待正式规则核验</p><p v-if="editing.notes !== null && editing.notes !== undefined" class="field-help">{{ configurationMetadataLabel(editing.notes, '登记说明') }}</p></el-form>
+          <el-select v-if="kind === 'boolean'" v-model="proposed" placeholder="请选择布尔值"><el-option label="是（true）" :value="true" /><el-option label="否（false）" :value="false" /></el-select>
+          <el-input v-else v-model="proposed" :type="kind === 'json' ? 'textarea' : 'text'" :rows="kind === 'json' ? 7 : 1" :placeholder="kind === 'number' ? '请输入数值' : kind === 'json' ? '请输入合法 JSON 结构' : '请输入建议值'" />
+        </el-form-item><p v-if="editing.allowed_range !== null" class="field-help">取值范围：{{ displayValue(editing.allowed_range) }}</p><p v-if="editing.notes !== null && editing.notes !== undefined" class="field-help">{{ configurationMetadataLabel(editing.notes, '登记说明') }}</p></el-form>
       </template><template #footer><el-button :disabled="draftUnresolved" @click="editingOpen = false">取消</el-button><el-button type="primary" :loading="saving" :disabled="draftLocked" @click="saveDraft">保存草稿</el-button></template>
     </el-dialog>
 
@@ -229,22 +229,36 @@ watch(diagnosticContext, closeDiagnostic, { flush: 'sync' })
 </template>
 
 <style>
-.configuration-filters{display:grid;grid-template-columns:minmax(180px,1.5fr) minmax(130px,1fr) minmax(150px,1fr) minmax(150px,1fr) auto;align-items:end;gap:12px;padding:18px 20px 0}
+.configuration-register{overflow:hidden}
+.configuration-register-heading{padding:16px 20px 0}
+.configuration-register-heading h2{margin:0;font-size:15px}
+.configuration-register .feature-tabs{padding:0 20px}
+.configuration-register .feature-tabs button{appearance:none;background:transparent;border:0;cursor:pointer;min-height:46px;padding:0 16px;font:inherit;font-size:13px;color:#6e8099;border-bottom:2px solid transparent}
+.configuration-register .feature-tabs button.active{color:#3974b8;border-bottom-color:#3974b8}
+.configuration-register .feature-tabs button span{font-size:11px;background:#eef4fc;border-radius:3px;padding:2px 5px;margin-left:5px}
+.configuration-summary.scope-card{border:0;background:transparent;padding:0;gap:12px}
+.configuration-summary.scope-card>div{padding:15px 18px;background:#fff;border:1px solid #e4eaf2;border-radius:6px}
+.configuration-summary.scope-card .configuration-pending-label{font-size:20px}
+.configuration-summary.scope-card small{font-size:11px;color:#8a97a8}
+.configuration-filters{display:grid;grid-template-columns:minmax(180px,1.5fr) minmax(130px,1fr) minmax(150px,1fr) minmax(150px,1fr) auto;align-items:end;gap:12px;padding:12px 20px 0}
 .configuration-filters .el-form-item{margin-bottom:0}
 .configuration-filters .el-select{width:100%}
 .configuration-filters>.el-button{margin-bottom:1px}
-.configuration-filter-count{font-size:12px;color:#64748b;margin:14px 20px 18px}
+.configuration-filter-count{font-size:12px;color:#64748b;margin:10px 20px 14px}
 .configuration-filter-warning{font-size:12px;color:#8d611e;margin:0 20px 18px;overflow-wrap:anywhere}
 .configuration-comparison-drawer{max-width:100vw}
 .configuration-comparison-key{overflow-wrap:anywhere;font-size:12px;margin:0 0 16px}
 .configuration-diagnostic-link{min-height:36px}
-.configuration-row-actions{display:flex;flex-wrap:wrap;gap:6px 12px}.configuration-row-actions .el-button+.el-button{margin-left:0}
+.configuration-row-actions{display:flex;flex-wrap:wrap;gap:2px 10px}
+.configuration-row-actions .el-button+.el-button{margin-left:0}
+.configuration-page .configuration-row-actions .el-button{font-size:12px;min-height:28px}
+.configuration-register .cell-sub{font-size:11px}
+.configuration-register .configuration-name{font-size:13px;font-weight:500}
 .configuration-comparison-loading{margin-top:24px}
 .configuration-comparison-selector .el-select{width:100%}
 .configuration-comparison-facts pre,.configuration-difference-value{white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--el-font-family);font-size:12px;line-height:1.6;margin:0}
 .configuration-comparison-facts .el-descriptions__label{width:125px}
 @media(max-width:900px){.configuration-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.configuration-filters>.el-button{justify-self:start}}
+@media(max-width:650px){.configuration-register .feature-tabs{padding:0 8px;overflow-x:auto}.configuration-register .feature-tabs button{white-space:nowrap}.configuration-register-heading{padding:14px 14px 0}.configuration-page .configuration-row-actions .el-button{min-height:36px}}
 @media(max-width:480px){.configuration-filters{grid-template-columns:minmax(0,1fr);padding:16px 14px 0}.configuration-filter-count{margin:14px}.configuration-comparison-facts .el-descriptions__label{width:100px}.configuration-comparison-drawer .el-drawer__footer{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}.configuration-comparison-drawer .el-drawer__footer .el-button{margin-left:0}.configuration-diagnostic-link{min-height:44px}}
-
-.configuration-register{overflow:hidden}.configuration-register-heading{padding:16px 20px 0}.configuration-register-heading h2{margin:0;font-size:15px}.configuration-register .feature-tabs{padding:0 20px}.configuration-register .feature-tabs button{appearance:none;background:transparent;border:0;cursor:pointer;min-height:46px;padding:0 16px;font:inherit;font-size:13px;color:#6e8099;border-bottom:2px solid transparent}.configuration-register .feature-tabs button.active{color:#3974b8;border-bottom-color:#3974b8}.configuration-register .feature-tabs button span{font-size:11px;background:#eef4fc;border-radius:3px;padding:2px 5px;margin-left:5px}.configuration-summary.scope-card{border:0;background:transparent;padding:0;gap:12px}.configuration-summary.scope-card>div{padding:15px 18px;background:#fff;border:1px solid #e4eaf2;border-radius:6px}.configuration-summary.scope-card .configuration-pending-label{font-size:20px}.configuration-summary.scope-card small{font-size:11px;color:#8a97a8}.configuration-page .configuration-row-actions{gap:2px 10px}.configuration-page .configuration-row-actions .el-button{font-size:12px;min-height:28px}.configuration-page .configuration-filters{padding-top:12px}.configuration-register .configuration-filter-count{margin:10px 20px 14px}.configuration-register .cell-sub{font-size:11px}.configuration-register .configuration-name{font-size:13px;font-weight:500}@media(max-width:650px){.configuration-register .feature-tabs{padding:0 8px;overflow-x:auto}.configuration-register .feature-tabs button{white-space:nowrap}.configuration-register-heading{padding:14px 14px 0}.configuration-page .configuration-row-actions .el-button{min-height:36px}}
 </style>

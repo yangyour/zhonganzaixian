@@ -191,9 +191,9 @@ async function performAction() {
 </script>
 
 <template>
-  <section v-if="unresolved" class="revision-original-request" role="status"><el-alert type="warning" :closable="false" title="配置保存/审批结果尚未确认，原body、目标、版本和幂等键已保留；刷新只读，不得修改后重发。" /><el-button type="warning" :disabled="commandState.busy || !writer" @click="retryOriginal">使用原配置请求重试</el-button></section>
-  <el-alert v-if="commandState.receipt" type="success" :closable="false" :title="'最近原请求确认：' + commandState.receipt.id + ' · v' + commandState.receipt.version + '；内部状态不代表生效'" />
   <el-drawer v-model="open" title="修订与审批" size="820px" class="configuration-revisions-drawer" :close-on-click-modal="!unresolved" :close-on-press-escape="!unresolved" :show-close="!unresolved" destroy-on-close>
+    <section v-if="unresolved" class="revision-original-request" role="status"><el-alert type="warning" :closable="false" title="配置保存/审批结果尚未确认，系统已锁定原请求参数、版本号与幂等键；请点击重试恢复处理，切勿修改后重复发送。" /><el-button type="warning" :disabled="commandState.busy || !writer" @click="retryOriginal">使用原配置请求重试</el-button></section>
+    <el-alert v-if="commandState.receipt" type="success" :closable="false" :title="'操作回执已确认：' + commandState.receipt.id + ' · v' + commandState.receipt.version + '（内部提案状态，待运行配置中心发布后生效）'" />
     <template v-if="configuration">
       <div class="config-dialog-context"><strong>{{ configuration.description }}</strong><span class="mono">{{ configuration.key }}</span><p>当前租户：{{ session?.tenant.name }} · 登记值：{{ displayValue(configuration.registered_value) }}</p></div>
       <el-alert type="info" :closable="false" show-icon title="提案与原草稿独立保存；内部审批通过后须到运行配置中心明确发布，客户生产确认另行核验。" />
@@ -202,7 +202,7 @@ async function performAction() {
       <ApiErrorNotice :error="listError"><el-button size="small" @click="loadList">重试</el-button></ApiErrorNotice>
       <AppTable :rows="rows" :loading="listLoading" :empty-text="listError ? '修订加载失败，请重试' : '本租户尚无此配置的修订提案'">
         <el-table-column label="提案 / 建议值" min-width="200"><template #default="{ row }"><el-button type="primary" link class="asset-link" @click="openDetail(row.id)">{{ displayValue(row.proposed_value) }}</el-button><span class="cell-sub mono">{{ row.id }}</span><span class="cell-sub">{{ row.reason }}</span></template></el-table-column>
-        <el-table-column label="流程状态" min-width="190"><template #default="{ row }"><el-tag :type="statusType(row.workflow_status)">{{ revisionStatusLabel[row.workflow_status as keyof typeof revisionStatusLabel] }}</el-tag><span class="cell-sub">证据未核验 · v{{ row.version }}</span></template></el-table-column>
+        <el-table-column label="流程状态" min-width="190"><template #default="{ row }"><el-tag :type="statusType(row.workflow_status)">{{ revisionStatusLabel[row.workflow_status as keyof typeof revisionStatusLabel] }}</el-tag><span class="cell-sub">证据待核验 · v{{ row.version }}</span></template></el-table-column>
         <el-table-column label="创建人 / 创建时间" min-width="180"><template #default="{ row }"><span class="mono">{{ row.created_by }}</span><span class="cell-sub">{{ displayTime(row.created_at) }}</span></template></el-table-column>
         <el-table-column label="操作" width="90" fixed="right"><template #default="{ row }"><el-button type="primary" link @click="openDetail(row.id)">查看详情</el-button></template></el-table-column>
       </AppTable>
@@ -215,15 +215,15 @@ async function performAction() {
     <el-skeleton v-if="detailLoading" :rows="10" animated />
     <template v-if="detail">
       <div class="detail-title"><span class="eyebrow">本租户配置修订</span><h2>{{ configuration?.description || detail.configuration_key }}</h2><el-tag :type="statusType(detail.workflow_status)">{{ revisionStatusLabel[detail.workflow_status] }}</el-tag></div>
-      <el-alert type="warning" :closable="false" show-icon title="证据未核验（UNVERIFIED）。仅登记外部书面资料引用和内容哈希，不核验资料真实性，不产生客户确认。" />
+      <el-alert type="warning" :closable="false" show-icon title="外部书面证据待核验（UNVERIFIED）：系统登记外部资料引用标识与 SHA-256 摘要，正式客户确认状态以线下签署结果为准。" />
       <el-descriptions :column="1" border class="asset-descriptions">
         <el-descriptions-item label="修订 ID"><span class="mono">{{ detail.id }}</span></el-descriptions-item>
         <el-descriptions-item label="所属租户"><span class="mono">{{ detail.tenant_id }}</span></el-descriptions-item>
         <el-descriptions-item label="配置项"><span class="mono">{{ detail.configuration_key }}</span></el-descriptions-item>
         <el-descriptions-item label="建议值"><span class="revision-text">{{ displayValue(detail.proposed_value) }}</span></el-descriptions-item>
         <el-descriptions-item label="修订理由"><span class="revision-text">{{ detail.reason }}</span></el-descriptions-item>
-        <el-descriptions-item label="生效值">尚未生效 · {{ displayValue(detail.effective_value) }}</el-descriptions-item>
-        <el-descriptions-item label="登记结论">{{ detail.decision_status === 'pending' ? '待客户确认' : '合同有据' }} · 证据未核验</el-descriptions-item>
+        <el-descriptions-item label="生效值">暂未生效 · {{ displayValue(detail.effective_value) }}</el-descriptions-item>
+        <el-descriptions-item label="登记结论">{{ detail.decision_status === 'pending' ? '待客户确认' : '合同有据' }} · 证据待核验</el-descriptions-item>
         <el-descriptions-item label="版本 / 来源">v{{ detail.version }} · {{ detail.source }}</el-descriptions-item>
         <el-descriptions-item label="创建人"><span class="mono">{{ detail.created_by }}</span></el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ displayTime(detail.created_at) }}</el-descriptions-item>
@@ -240,14 +240,14 @@ async function performAction() {
   </el-drawer>
 
   <el-dialog v-model="createOpen" title="创建配置修订提案" width="650px" class="responsive-dialog configuration-revision-dialog" append-to-body :close-on-click-modal="!unresolved" :close-on-press-escape="!unresolved" :show-close="!unresolved" destroy-on-close>
-    <div v-if="configuration" class="config-dialog-context"><strong>{{ configuration.description }}</strong><span class="mono">{{ configuration.key }}</span><p>当前登记值：{{ displayValue(configuration.registered_value) }} · 待确认值继续保留 null。</p></div>
-    <el-alert type="info" :closable="false" show-icon title="仅登记外部书面资料引用与内容哈希。本页不上传附件、不核验文档真实性、不产生客户确认；原草稿不会被修改。" />
+    <div v-if="configuration" class="config-dialog-context"><strong>{{ configuration.description }}</strong><span class="mono">{{ configuration.key }}</span><p>当前登记值：{{ displayValue(configuration.registered_value) }}（待确认项保持未生效状态）。</p></div>
+    <el-alert type="info" :closable="false" show-icon title="登记外部书面依据引用与内容 SHA-256 摘要（独立于原建议草稿保存，审批通过后可在运行配置中心发布）。" />
     <ApiErrorNotice :error="createError" />
     <el-alert v-if="unresolved" type="warning" :closable="false" title="原请求未确认，输入与版本已锁定。可只读回查，但不会自动重发。" /><el-button v-if="unresolved" type="warning" :disabled="commandState.busy || !writer" @click="retryOriginal">使用原配置请求重试</el-button>
     <el-form :disabled="unresolved" label-position="top" class="dialog-form" @submit.prevent="createRevision">
       <el-form-item :label="`建议值${configuration?.unit ? `（${configuration.unit}）` : ''}`" :error="fieldErrors.proposed">
-        <el-select v-if="kind === 'boolean'" v-model="form.proposed" placeholder="请选择；未选择不等于否" aria-label="修订建议值"><el-option label="是（true）" :value="true" /><el-option label="否（false）" :value="false" /></el-select>
-        <el-input v-else v-model="form.proposed" :type="kind === 'json' ? 'textarea' : 'text'" :rows="kind === 'json' ? 5 : 1" :placeholder="kind === 'number' ? '请填写数字；空值不能作为 0 保存' : kind === 'json' ? '请填写 JSON；建议值不能为 null' : '请填写建议值'" aria-label="修订建议值" />
+        <el-select v-if="kind === 'boolean'" v-model="form.proposed" placeholder="请选择布尔值" aria-label="修订建议值"><el-option label="是（true）" :value="true" /><el-option label="否（false）" :value="false" /></el-select>
+        <el-input v-else v-model="form.proposed" :type="kind === 'json' ? 'textarea' : 'text'" :rows="kind === 'json' ? 5 : 1" :placeholder="kind === 'number' ? '请填写有效数字' : kind === 'json' ? '请填写合法 JSON 格式内容' : '请填写建议值'" aria-label="修订建议值" />
       </el-form-item>
       <el-form-item label="修订理由（1–500 个字符）" :error="fieldErrors.reason"><el-input v-model="form.reason" type="textarea" :rows="3" placeholder="说明修改依据与目的，请勿填写密码或 token" aria-label="修订理由" /></el-form-item>
       <div class="revision-evidence-heading"><h3>证据引用（1–5 项）</h3><el-button size="small" :disabled="form.evidence_refs.length >= 5 || unresolved" @click="form.evidence_refs.push(blankEvidence())">添加证据引用</el-button></div>

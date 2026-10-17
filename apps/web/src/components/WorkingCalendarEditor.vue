@@ -72,14 +72,14 @@ defineExpose({ prepare, hasUnresolved: writer.unresolved })
         <el-checkbox v-model="form.windowsDeclared" :disabled="locked">我明确提供下列已知窗口列表（也可以明确为空）</el-checkbox>
         <div v-for="item in visibleWindows" :key="item.index" class="calendar-window-editor"><strong>窗口 {{ item.index + 1 }}</strong><el-input v-model="item.window.start" :disabled="locked" :aria-label="'窗口' + (item.index + 1) + '起点'" placeholder="显式带时区起点" /><el-input v-model="item.window.end" :disabled="locked" :aria-label="'窗口' + (item.index + 1) + '终点'" placeholder="显式带时区终点" /><el-button :disabled="locked" @click="removeWindow(item.index)">移除未提交窗口</el-button></div>
         <div class="calendar-actions"><el-button :disabled="locked || form.windows.length >= 1000" @click="addWindow">新增空白窗口</el-button><span>共{{ form.windows.length }} / 1000（技术上限） · 每页20行</span><el-button :disabled="windowPage <= 1" @click="windowPage--">上一组窗口</el-button><el-button :disabled="windowPage * 20 >= form.windows.length" @click="windowPage++">下一组窗口</el-button></div>
-        <el-form-item label="可选说明（空输入保存null，最多2000字符）"><el-input v-model="form.note" type="textarea" :rows="4" :disabled="locked" aria-label="日历草稿说明" placeholder="不要输入密码、token或运行配置凭据" /></el-form-item>
-        <p v-if="validation" role="alert" class="calendar-error">{{ validation }}</p><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked">明确保存未生效草稿</el-button>
+        <el-form-item label="备注说明（选填，最多 2000 字符）"><el-input v-model="form.note" type="textarea" :rows="4" :disabled="locked" aria-label="日历草稿说明" placeholder="请输入排班或节假日覆盖说明（请勿填写密码或凭据）" /></el-form-item>
+        <p v-if="validation" role="alert" class="calendar-error">{{ validation }}</p><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked">保存日历草稿</el-button>
       </el-form>
     </template>
     <template #footer><el-button @click="open = false">暂时收起，保留本页编辑</el-button><p class="field-help">收起不撤销已发送请求。未确认结果必须使用原请求处理，不自动写入</p></template>
   </el-drawer>
 </template>
 <style>
-.calendar-editor{max-width:100vw}.calendar-editor .el-alert{margin:12px 0}.calendar-time-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.calendar-window-editor{display:grid;grid-template-columns:90px 1fr 1fr auto;gap:8px;align-items:center;margin:12px 0}.calendar-editor .el-checkbox{height:auto;white-space:normal;margin:12px 0}.calendar-editor .el-select{width:100%}.calendar-editor .el-input__inner{font-family:inherit}
+.calendar-editor{max-width:100vw}.calendar-editor .el-alert{margin:12px 0}.calendar-time-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.calendar-window-editor{display:grid;grid-template-columns:90px 1fr 1fr auto;gap:8px;align-items:center;margin:12px 0}.calendar-editor .el-checkbox{height:auto;white-space:normal;margin:12px 0}.calendar-editor .el-select{width:100%}.calendar-editor .el-input__inner{font-family:inherit}.calendar-error{color:var(--el-color-danger)}
 @media(max-width:600px){.calendar-editor .el-drawer__body{padding:14px}.calendar-time-grid,.calendar-window-editor{grid-template-columns:1fr}.calendar-editor .el-button{min-height:44px;height:auto;white-space:normal}.calendar-editor .el-input__inner,.calendar-editor .el-textarea__inner{font-size:16px}}
 </style>

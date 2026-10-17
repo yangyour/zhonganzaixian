@@ -13,18 +13,18 @@ watch(onlyUnknown, () => { offset.value = 0 }, { flush: 'sync' })
 <template>
  <div class="sample-panels">
   <section class="sample-panel" aria-label="本次耗时样本分布"><div class="panel-heading"><h2>本次样本分布</h2><span>毫秒 · {{ result ? '已回读输入' : '等待计算' }}</span></div>
-   <p v-if="!result">{{ busy ? '正在取得服务端对照结果…' : '输入样本并点击“只读对照”后查看分布。' }}</p>
-   <p v-else-if="!distribution">本次明确未提供样本，分布未知。</p>
+   <p v-if="!result">{{ busy ? '正在获取服务端测算结果…' : '录入样本并点击“只读对照”后查看区间分布。' }}</p>
+   <p v-else-if="!distribution">本次未提供耗时样本，暂无分布数据。</p>
    <template v-else><div class="sample-counts"><span>已知 <b>{{ distribution.known }}</b></span><span>未知 <b>{{ distribution.unknown }}</b></span><span>总数 <b>{{ distribution.rows.length }}</b></span></div>
-    <p v-if="!distribution.rows.length">本次明确提供空集合，没有样本可绘制。</p>
-    <p v-else-if="!distribution.known">全部样本未知，没有可绘制的已知值。</p>
+    <p v-if="!distribution.rows.length">本次样本集为空，暂无可绘制的分布区间。</p>
+    <p v-else-if="!distribution.known">当前样本全部为未知项（?），暂无可绘制的已知数值。</p>
     <ul v-else class="sample-bars"><li v-for="bin in distribution.bins" :key="bin.from"><span>{{ bin.from === bin.to ? bin.from : bin.from + ' — ' + bin.to }} ms</span><meter min="0" :max="distribution.known" :value="bin.count" :aria-label="bin.from+'到'+bin.to+'毫秒样本数'"/><b>{{ bin.count }} 条</b></li></ul>
-    <p v-if="distribution.unknown" class="sample-warning">{{ distribution.unknown }} 个未知项单独保留；条形仅分组已知样本，不能用已知子集替代整组中位数。</p>
-    <p class="sample-note">最多5个等宽整数区间，重复值与明确0保留。样本没有时间顺序，分布不表示工单响应趋势。</p>
-    <details v-if="distribution.rows.length"><summary>核对原始输入顺序（{{ distribution.rows.length }} 条）</summary><label class="sample-filter"><input v-model="onlyUnknown" type="checkbox" aria-label="只看未知样本"/>只看未知项</label><div class="sample-table-wrap"><table><thead><tr><th>输入序号</th><th>耗时 / 毫秒</th></tr></thead><tbody><tr v-for="row in rows" :key="row.index"><td>{{ row.index }}</td><td>{{ row.value ?? '未知（?）' }}</td></tr></tbody></table></div><p v-if="!rows.length">当前筛选没有样本。</p><div class="sample-pagination"><span>{{ filtered.length ? offset+1 : 0 }}—{{ Math.min(offset+50,filtered.length) }} / {{ filtered.length }}</span><button type="button" :disabled="offset===0" @click="offset=Math.max(0,offset-50)">上一页样本</button><button type="button" :disabled="offset+50>=filtered.length" @click="offset+=50">下一页样本</button></div></details>
+    <p v-if="distribution.unknown" class="sample-warning">{{ distribution.unknown }} 个未知项单独保留；条形图仅对已知数值分组展示，不以已知子集替代整体样本中位数。</p>
+    <p class="sample-note">按最多 5 个等宽整数区间统计分布（保留重复值与 0 值，仅反映数值分布特征）。</p>
+    <details v-if="distribution.rows.length"><summary>核对原始输入顺序（{{ distribution.rows.length }} 条）</summary><label class="sample-filter"><input v-model="onlyUnknown" type="checkbox" aria-label="只看未知样本"/>只看未知项</label><div class="sample-table-wrap"><table><thead><tr><th>输入序号</th><th>耗时 / 毫秒</th></tr></thead><tbody><tr v-for="row in rows" :key="row.index"><td>{{ row.index }}</td><td>{{ row.value ?? '待确认（?）' }}</td></tr></tbody></table></div><p v-if="!rows.length">当前筛选没有样本。</p><div class="sample-pagination"><span>{{ filtered.length ? offset+1 : 0 }}—{{ Math.min(offset+50,filtered.length) }} / {{ filtered.length }}</span><button type="button" :disabled="offset===0" @click="offset=Math.max(0,offset-50)">上一页样本</button><button type="button" :disabled="offset+50>=filtered.length" @click="offset+=50">下一页样本</button></div></details>
    </template>
   </section>
-  <section class="sample-panel" aria-label="本次人力输入"><div class="panel-heading"><h2>明确人力输入</h2><span>{{ result ? '本次回读' : '等待计算' }}</span></div><p v-if="!result">计算后核对本次提交的人力与租户数。</p><p v-else-if="!result.input.staffing">本次未提供人力组，不推断人数或实际覆盖范围。</p><template v-else><dl class="sample-staffing"><div><dt>活跃租户数</dt><dd>{{ result.input.staffing.active_tenants ?? '未填写' }}</dd></div><div><dt>月度值守 FTE</dt><dd>{{ result.input.staffing.on_call_fte ?? '未填写' }}</dd></div><div><dt>月度二线 FTE</dt><dd>{{ result.input.staffing.second_line_fte ?? '未填写' }}</dd></div><div><dt>服务端 FTE 合计</dt><dd>{{ result.staffing.explicit_total_fte ?? '尚不能计算' }}</dd></div><div><dt>服务端租户数 / FTE</dt><dd>{{ result.staffing.tenants_per_fte ?? '尚不能计算' }}</dd></div></dl><p class="sample-note">只反映明确提交的月度输入；不代表已核验出勤、平台租户总量或财务指标。</p></template></section>
+  <section class="sample-panel" aria-label="本次人力输入"><div class="panel-heading"><h2>本次人力参数回读</h2><span>{{ result ? '本次回读' : '等待计算' }}</span></div><p v-if="!result">执行对照计算后在此核对本次提交的人力与租户数参数。</p><p v-else-if="!result.input.staffing">本次未启用人力参数组。</p><template v-else><dl class="sample-staffing"><div><dt>活跃租户数</dt><dd>{{ result.input.staffing.active_tenants ?? '未填写' }}</dd></div><div><dt>月度值守 FTE</dt><dd>{{ result.input.staffing.on_call_fte ?? '未填写' }}</dd></div><div><dt>月度二线 FTE</dt><dd>{{ result.input.staffing.second_line_fte ?? '未填写' }}</dd></div><div><dt>服务端 FTE 合计</dt><dd>{{ result.staffing.explicit_total_fte ?? '尚不能计算' }}</dd></div><div><dt>服务端租户数 / FTE</dt><dd>{{ result.staffing.tenants_per_fte ?? '尚不能计算' }}</dd></div></dl><p class="sample-note">以上为本次提交的月度测算参数回读，仅供资源配比评估参考。</p></template></section>
  </div>
 </template>
 <style scoped>

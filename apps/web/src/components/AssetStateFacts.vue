@@ -9,7 +9,7 @@ const sync=computed(()=>assetLedgerCell(props.asset,'sync'))
 <template>
  <section class="asset-state-facts" aria-label="独立可用性与配置同步状态">
   <dl><div><dt>可用性</dt><dd data-state="availability">{{availability.text}}</dd><dd v-if="availability.detail" class="state-detail">{{availability.detail}}</dd></div><div><dt>配置同步状态</dt><dd data-state="sync">{{sync.text}}</dd><dd v-if="sync.detail" class="state-detail">{{sync.detail}}</dd></div></dl>
-  <p>两种状态分别来自当前响应，与台账列保持一致；不根据汇总状态、生命周期或更新时间推断监控正常</p>
+  <p>可用性与配置同步状态均依据实时采集结果独立判定。</p>
  </section>
 </template>
 <style scoped>

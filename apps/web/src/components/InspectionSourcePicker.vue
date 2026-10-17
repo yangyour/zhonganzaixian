@@ -14,17 +14,17 @@ const duplicate=computed(()=>Boolean(currentCandidate.value&&props.selectedKeys.
 watch(()=>JSON.stringify(props.context),()=>{worksheetId.value='';version.value='';validation.value='';reader.reset(props.context)},{immediate:true,flush:'sync'})
 watch([worksheetId,version],()=>{validation.value='';reader.reset(props.context);emit('dirty',Boolean(worksheetId.value||version.value))},{flush:'sync'})
 watch(()=>props.disabled,disabled=>{if(disabled)reader.reset(props.context)},{flush:'sync'})
-async function load(){if(props.disabled||!props.context)return false;const selected=target();if(!selected){reader.reset(props.context);validation.value='请输入执行单UUID和明确正整数修订号；不会自动查最新版本';return false}validation.value='';return reader.load(selected)}
+async function load(){if(props.disabled||!props.context)return false;const selected=target();if(!selected){reader.reset(props.context);validation.value='请输入巡检执行单 UUID 与正整数修订版本号';return false}validation.value='';return reader.load(selected)}
 function add(){const source=currentCandidate.value;if(props.disabled||!props.context||!source||duplicate.value||props.selectedKeys.length>=1000)return false;emit('add',structuredClone(source));worksheetId.value='';version.value='';reader.reset(props.context);return true}
 onUnmounted(()=>reader.dispose())
 </script>
 <template>
  <section class="explicit-source-picker" aria-label="明确巡检修订选择">
-  <h3>1. 指定并核对来源修订</h3><p>从执行单或修订历史取得ID和版本，必须手动选择；不自动查最新版本，不按设备合并。</p>
-  <form v-form-feedback @submit.prevent="load"><fieldset :disabled="disabled||!context"><div class="source-inputs"><label>执行单ID<input v-model="worksheetId" aria-label="集合来源执行单ID" autocomplete="off" spellcheck="false" /></label><label>明确修订号<input v-model="version" aria-label="集合来源明确修订号" inputmode="numeric" autocomplete="off" /></label></div><button type="submit" :disabled="state.busy">读取并核对这一修订</button></fieldset></form>
-  <p v-if="validation" class="warning" role="alert">{{ validation }}</p><ApiErrorNotice :error="state.error" /><p v-if="state.busy" role="status">正在核对模板、执行单和完整来源摘要；旧内容已清除</p>
-  <section v-if="currentCandidate" class="verified-candidate"><h4>{{ currentCandidate.asset_name }} · 执行单 v{{ currentCandidate.version }}</h4><p>三层摘要一致性已核对，人工事实仍未核验 · {{ currentCandidate.archived?'所选修订已归档':'所选修订未归档' }}</p><p class="hash">{{ currentCandidate.source_snapshot_sha256 }}</p><details><summary>核对来源人工内容</summary><InspectionWorksheetFacts :value="currentCandidate" /></details><p v-if="duplicate" class="warning">这一执行单修订已在明确选择中，不会重复添加</p><button type="button" :disabled="disabled||duplicate||selectedKeys.length>=1000" @click="add">加入明确选择</button></section>
-  <p v-else-if="!state.busy&&!state.error&&!validation" class="hint">尚无可加入的已核对来源；修改ID或版本会清除旧核对结果</p>
+  <h3>1. 指定并核对来源修订</h3><p>从巡检执行单或修订记录中获取 ID 与版本号进行关联（按指定版本精确绑定，不自动合并同设备记录）。</p>
+  <form v-form-feedback @submit.prevent="load"><fieldset :disabled="disabled||!context"><div class="source-inputs"><label>执行单ID<input v-model="worksheetId" aria-label="集合来源执行单ID" autocomplete="off" spellcheck="false" /></label><label>修订版本号<input v-model="version" aria-label="集合来源明确修订号" inputmode="numeric" autocomplete="off" /></label></div><button type="submit" :disabled="state.busy">读取并核对版本</button></fieldset></form>
+  <p v-if="validation" class="warning" role="alert">{{ validation }}</p><ApiErrorNotice :error="state.error" /><p v-if="state.busy" role="status">正在校验模板、执行单及来源快照摘要…</p>
+  <section v-if="currentCandidate" class="verified-candidate"><h4>{{ currentCandidate.asset_name }} · 执行单 v{{ currentCandidate.version }}</h4><p>模板、执行单与快照摘要一致性校验通过 · {{ currentCandidate.archived?'所选修订已归档':'所选修订未归档' }}</p><p class="hash">{{ currentCandidate.source_snapshot_sha256 }}</p><details><summary>查看该版本填报明细</summary><InspectionWorksheetFacts :value="currentCandidate" /></details><p v-if="duplicate" class="warning">该执行单修订版本已添加至列表，请勿重复选择</p><button type="button" :disabled="disabled||duplicate||selectedKeys.length>=1000" @click="add">添加至集合</button></section>
+  <p v-else-if="!state.busy&&!state.error&&!validation" class="hint">请先输入执行单 ID 与版本号并完成读取核对</p>
  </section>
 </template>
 <style scoped>

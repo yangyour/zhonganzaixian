@@ -25,17 +25,17 @@ export function ticketDetailText(ticket: RegisteredTicket, tenantName: string, a
   const summary = summarizeWorklogPage(worklogs)
   return [
     '工单详情 · 当前可见信息', `导出时间：${exportedAt}`, `登记编号：${ticket.receipt_no}`, `标题：${ticket.title}`,
-    `客户：${tenantName}`, `创建时间：${displayTime(ticket.created_at)}`, `设备：${ticket.asset_name || (ticket.asset_id ? '已关联，名称未提供' : '未关联')}`,
-    `问题类型：${ticket.category}`, `影响范围：${impactScopeLabel[ticket.impact_scope]}`, `紧急程度：${urgencyLabel[ticket.urgency]}`,
-    `联系人：${ticket.contact_name}`, `联系方式：${maskedContact(ticket.contact_phone)}`, '正式状态 / 优先级 / SLA：未配置',
+    `客户：${tenantName}`, `创建时间：${displayTime(ticket.created_at)}`, `设备：${ticket.asset_name || (ticket.asset_id ? '已关联（名称暂未提供）' : '未关联')}`,
+    `问题类型：${ticket.category}`, `影响范围：${impactScopeLabel[ticket.impact_scope]}`, `紧急程度：${urgencyLabel[ticket.urgency]}（人工登记）`,
+    `联系人：${ticket.contact_name}`, `联系方式：${maskedContact(ticket.contact_phone)}`, '正式状态 / 优先级 / SLA：暂未提供',
     '', '问题描述', ticket.description, '', `处理进展（${activityScope}）`,
     ...activities.flatMap(item => [`${displayTime(item.time)} · ${item.title}${item.author ? ' · ' + item.author : ''}`, item.text, '']),
-    `处理工时（${worklogScope}）`, '工时为人工填报的时间区间，相加不扣除重叠；不代表核定工时或费用。',
+    `处理工时（${worklogScope}）`, '记录工程师实际作业起止时间（跨日记录按原始时段保存，不自动拆分；计费核算以商务结算规则为准）。',
     ...(worklogs === null ? ['工时未读取或无权限，不能视为零。'] : worklogs.flatMap(item => [
       `${worklogKindLabels[item.kind]} · ${displayTime(item.started_at)} — ${displayTime(item.ended_at)} · ${formatWorklogDuration(BigInt(item.elapsed_millis))}`,
       item.note || '未填写工作描述',
     ])),
     `本页累计：${summary ? formatWorklogDuration(summary.totalMillis) : '未读取'}`,
-    '', '备注和评论不改变正式处理阶段；本文件只包含上述读取范围，不是完整工单归档或验收证明。',
+    '', '当前已完成故障受理入库；工单分派流转与 SLA 考核计时将在 ITSM 流程启用后自动关联。本文件仅包含上述读取范围，不是完整工单归档或验收证明。',
   ].join('\n')
 }

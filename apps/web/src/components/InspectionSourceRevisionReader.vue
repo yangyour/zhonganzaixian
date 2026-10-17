@@ -15,12 +15,12 @@ onUnmounted(()=>reader.dispose())
 <template>
  <section class="source-revision-reader" aria-label="明确版本来源追溯" :aria-busy="state.busy">
   <div class="source-heading"><h2>来源追溯 · 指定 v{{ target.version }}</h2><button type="button" @click="emit('close')">关闭来源追溯</button></div>
-  <p class="source-id">执行单：{{ target.worksheetId }}</p><p class="source-warning">只读核对所选版本，不替代当前草稿或原请求回执。摘要一致不代表真实巡检、附件授权或报告已发布。</p>
+  <p class="source-id">执行单：{{ target.worksheetId }}</p><p class="source-warning">核对所选历史修订版本快照（不影响当前编辑草稿；摘要校验用于确认记录完整性）。</p>
   <button type="button" :disabled="state.busy||!context" @click="reader.load(target)">重新读取所选版本</button>
-  <p v-if="state.busy" role="status">正在读取并核对完整模板、执行单和来源摘要，暂不显示旧内容</p>
+  <p v-if="state.busy" role="status">正在读取并校验模板、执行单及来源快照摘要…</p>
   <ApiErrorNotice :error="state.error" />
-  <template v-if="state.data"><p class="source-verification">模板 / 执行单 / 完整来源 SHA256 已一致性核对；人工事实仍未核验</p><dl class="source-meta"><div><dt>所选修订状态</dt><dd>{{ state.data.archived?'该修订已归档':'该修订未归档' }} · {{ state.data.action }}</dd></div><div><dt>原创建人 / 创建时间</dt><dd>{{ state.data.created_by }}<small>{{ displayTime(state.data.created_at) }}</small></dd></div><div><dt>本修订记录人 / 记录时间</dt><dd>{{ state.data.recorded_by }}<small>{{ displayTime(state.data.recorded_at) }}</small></dd></div></dl><p class="source-hash">完整来源 SHA256：{{ state.data.source_snapshot_sha256 }}</p><InspectionWorksheetFacts :value="state.data" /></template>
-  <p v-else-if="!state.busy&&!state.error" class="source-warning">尚无已核对的来源；不会自动读取最新版本</p>
+  <template v-if="state.data"><p class="source-verification">模板、执行单与完整来源 SHA256 已一致性核对（人工填报内容待复核）</p><dl class="source-meta"><div><dt>所选修订状态</dt><dd>{{ state.data.archived?'该修订已归档':'该修订未归档' }} · {{ state.data.action }}</dd></div><div><dt>原创建人 / 创建时间</dt><dd>{{ state.data.created_by }}<small>{{ displayTime(state.data.created_at) }}</small></dd></div><div><dt>本修订记录人 / 记录时间</dt><dd>{{ state.data.recorded_by }}<small>{{ displayTime(state.data.recorded_at) }}</small></dd></div></dl><p class="source-hash">完整来源 SHA256：{{ state.data.source_snapshot_sha256 }}</p><InspectionWorksheetFacts :value="state.data" /></template>
+  <p v-else-if="!state.busy&&!state.error" class="source-warning">暂未加载修订版本记录</p>
  </section>
 </template>
 <style scoped>

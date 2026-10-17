@@ -29,8 +29,8 @@ onUnmounted(() => { controller?.abort(); ++generation; for (const url of urls) U
 <template>
   <section class="asset-template-download">
     <el-button :disabled="!permitted" :loading="busy" @click="download">下载标准15列空模板</el-button>
-    <p class="field-help">只有合同表头，没有样例资产或默认业务规则。备注必须填写；下载不会替换当前原文件、自动解析或导入，也不需要OSS连接。</p>
-    <p v-if="saved" role="status" class="field-help">模板长度和SHA256已核对，已交给浏览器下载；尚未填写或导入任何资产。</p>
+    <p class="field-help">包含平台标准 15 列资产台账表头，填写导入数据时请确保“备注”列完整填写。</p>
+    <p v-if="saved" role="status" class="field-help">标准模板完整性校验通过（SHA-256），已开始浏览器下载。</p>
     <ApiErrorNotice :error="error" />
   </section>
 </template>

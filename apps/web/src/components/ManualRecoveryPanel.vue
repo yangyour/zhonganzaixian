@@ -34,29 +34,29 @@ onUnmounted(() => { unregisterContextGuard(); workspace.dispose(); window.remove
 defineExpose({ prepare, hasUnresolved: workspace.unresolved })
 </script>
 <template>
-  <el-drawer v-model="open" title="当前人工恢复 · 独立确认记录" size="800px" class="manual-recovery-panel" :close-on-click-modal="false">
-    <el-alert type="warning" :closable="false" title="此处单独读取当前人工恢复。原登记快照不被修改；确认仍为自述证据，不改监控状态、正式处置、工单状态或SLA。" />
+  <el-drawer v-model="open" title="人工恢复确认记录" size="800px" class="manual-recovery-panel" :close-on-click-modal="false">
+    <el-alert type="warning" :closable="false" title="独立维护手工事件的恢复确认记录；原登记快照保持不变，确认记录不直接变更自动监控状态或正式工单状态。" />
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前授权已失效，原范围内容已清除" />
     <template v-else>
-      <h3 v-if="state.parent" class="recovery-original">{{ state.parent.title }}</h3><p v-if="state.parent" class="recovery-id">固定手工事件：{{ state.parent.id }}</p>
+      <h3 v-if="state.parent" class="recovery-original">{{ state.parent.title }}</h3><p v-if="state.parent" class="recovery-id">关联手工事件：{{ state.parent.id }}（原登记时恢复状态保持不变）</p>
       <ApiErrorNotice :error="state.error" />
-      <div class="recovery-actions"><el-button :disabled="Boolean(state.busy) || !state.parent" @click="workspace.refresh()">只读查询当前人工恢复</el-button><el-button v-if="state.attempt?.state === 'uncertain'" type="warning" :disabled="Boolean(state.busy)" @click="retry">使用完全相同原确认请求重试</el-button><el-button v-if="state.attempt?.state === 'rejected' && state.parent" :disabled="Boolean(state.busy)" @click="prepare(state.parent)">重新读取并明确准备</el-button></div>
+      <div class="recovery-actions"><el-button :disabled="Boolean(state.busy) || !state.parent" @click="workspace.refresh()">刷新恢复状态</el-button><el-button v-if="state.attempt?.state === 'uncertain'" type="warning" :disabled="Boolean(state.busy)" @click="retry">使用完全相同原确认请求重试</el-button><el-button v-if="state.attempt?.state === 'rejected' && state.parent" :disabled="Boolean(state.busy)" @click="prepare(state.parent)">重新加载并填写</el-button></div>
       <el-alert v-if="state.attempt?.state === 'uncertain'" type="warning" :closable="false" title="原请求结果尚未确认。内容、事件、版本和幂等键保留；即使只读发现已有确认，也不能自动冒充本次请求成功，请处理原请求。" />
-      <el-alert v-if="state.attempt?.state === 'rejected'" type="warning" :closable="false" title="本次请求被拒绝，未自动重试。请只读核对当前确认；已有证据不能覆盖或创建第二份。" />
-      <el-alert v-if="state.receipt" type="success" :closable="false" :title="'已核验原确认回执：' + state.receipt.confirmation?.id + '；不代表正式结单'" />
+      <el-alert v-if="state.attempt?.state === 'rejected'" type="warning" :closable="false" title="本次提交未通过。请先刷新核对当前恢复确认记录，已生成的确认记录不可覆盖或重复创建。" />
+      <el-alert v-if="state.receipt" type="success" :closable="false" :title="'已核验原确认回执：' + state.receipt.confirmation?.id + ' · 人工恢复已记录'" />
       <p v-if="!state.current" class="field-help">当前人工恢复尚未成功读取，不能据此认定“未恢复”或“未确认”{{ state.receipt ? '；已确认成功的原回执仍保留，不要另建重复请求' : '' }}</p>
-      <section v-else-if="state.current.version === 1 && state.current.confirmation" class="recovery-evidence"><h3>已有人工作出的恢复确认</h3><p>来源：人工确认 · 核验属性：自述（SELF_REPORTED），不是监控自动判断</p><p v-if="state.attempt?.state === 'uncertain'">以下是当前读取到的证据，不等同于已取得原请求回执</p><dl><dt>确认人ID</dt><dd>{{ state.current.confirmation.confirmed_by }}</dd><dt>技术记录时间</dt><dd>{{ displayTime(state.current.confirmation.recorded_at) }}</dd><dt>人工提供的实际恢复时间</dt><dd>{{ state.current.confirmation.reported_recovered_at ? displayTime(state.current.confirmation.reported_recovered_at) : '未知（null），不以技术记录时间补齐' }}</dd><dt>原始说明</dt><dd class="recovery-original">{{ state.current.confirmation.note }}</dd><dt>原文SHA256</dt><dd>{{ state.current.confirmation.note_sha256 }}</dd></dl><p>原登记/监控/正式处置/工单/SLA未改变。此证据不可覆盖，更正与撤回入口尚未提供。</p></section>
+      <section v-else-if="state.current.version === 1 && state.current.confirmation" class="recovery-evidence"><h3>人工恢复确认详情</h3><p>记录来源：工程师人工核验确认（独立于监控自动判定）</p><p v-if="state.attempt?.state === 'uncertain'">以下是当前读取到的确认记录，原提交回执仍待重试核验</p><dl><dt>确认人ID</dt><dd>{{ state.current.confirmation.confirmed_by }}</dd><dt>记录归档时间</dt><dd>{{ displayTime(state.current.confirmation.recorded_at) }}</dd><dt>实际恢复时间</dt><dd>{{ state.current.confirmation.reported_recovered_at ? displayTime(state.current.confirmation.reported_recovered_at) : '未填写（不以记录归档时间自动补齐）' }}</dd><dt>恢复核验说明</dt><dd class="recovery-original">{{ state.current.confirmation.note }}</dd><dt>内容校验指纹 (SHA-256)</dt><dd>{{ state.current.confirmation.note_sha256 }}</dd></dl><p>人工恢复确认记录归档后不可覆盖或篡改。</p></section>
       <template v-else>
-        <p>当前已读取：尚无独立人工确认（技术版本0）。这不表示监控判断为故障或正常。</p>
+        <p>当前状态：尚无人工恢复确认记录（版本 0）。</p>
         <el-form v-if="can('manual_recovery:confirm')" label-position="top" @submit.prevent="save">
-          <el-form-item label="人工确认说明（1至2000字符，保留原文）"><el-input v-model="note" type="textarea" :rows="5" :disabled="locked" aria-label="人工恢复说明" placeholder="说明人工核验依据，不要输入密码或token" /></el-form-item>
-          <el-form-item label="人工提供的恢复发生时间（可留空保持未知；须带时区及秒）"><el-input v-model="recoveredAt" :disabled="locked" aria-label="人工恢复发生时间" placeholder="不默认当前时间，例如2026-10-03T09:00:00+08:00" /></el-form-item>
+          <el-form-item label="人工恢复核验说明（1–2000 字符）"><el-input v-model="note" type="textarea" :rows="5" :disabled="locked" aria-label="人工恢复说明" placeholder="请填写现场或人工核验恢复的依据，请勿输入账号密码或敏感凭据" /></el-form-item>
+          <el-form-item label="实际恢复时间（选填，需包含时区与秒）"><el-input v-model="recoveredAt" :disabled="locked" aria-label="人工恢复发生时间" placeholder="留空表示暂不指定，例如 2026-10-03T09:00:00+08:00" /></el-form-item>
           <el-checkbox v-model="humanConfirmed" :disabled="locked">我已通过人工方式核验，并明确确认该手工事件已恢复；监控正常不作为自动确认</el-checkbox>
-          <p v-if="validation" role="alert" class="recovery-error">{{ validation }}</p><div class="recovery-actions"><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !humanConfirmed">明确记录首次人工恢复确认</el-button></div>
+          <p v-if="validation" role="alert" class="recovery-error">{{ validation }}</p><div class="recovery-actions"><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !humanConfirmed">提交人工恢复确认</el-button></div>
         </el-form>
       </template>
     </template>
-    <template #footer><el-button @click="open = false">暂时收起，保留原请求与输入</el-button><p class="field-help">收起不撤销已发送请求；强制会话失效仍清除受保护上下文。</p></template>
+    <template #footer><el-button @click="open = false">暂时收起，保留原请求与输入</el-button><p class="field-help">收起窗口不会中断已发送的请求；会话失效将清除未提交内容。</p></template>
   </el-drawer>
 </template>
 <style>

@@ -36,36 +36,36 @@ onUnmounted(() => { unregister(); workspace.dispose(); window.removeEventListene
 defineExpose({ hasUnresolved: workspace.unresolved })
 </script>
 <template>
-  <el-drawer v-model="open" title="维保资料维护与历史" size="820px" class="warranty-drawer" :close-on-click-modal="false">
+  <el-drawer v-model="open" title="维保档案维护与修订历史" size="820px" class="warranty-drawer" :close-on-click-modal="false">
     <p v-if="asset"><strong>{{ asset.name }}</strong><span class="warranty-id">{{ asset.id }}</span></p>
-    <el-alert type="info" :closable="false" title="人工填报的起始日、到期日、供应商和超期日。供应商与维保覆盖未核验；保存不会生成隐患、发送通知或改变监控。" />
+    <el-alert type="info" :closable="false" title="维护手工台账设备的维保起始日、维保到期日、维保供应商与超期服役日期（人工维护档案，选填项留空记为未填写）。" />
     <el-empty v-if="!permitted" description="当前身份或租户没有内部维保资料维护权限" />
     <template v-else>
-      <div class="warranty-actions"><el-button :loading="state.busy === 'read'" :disabled="state.busy === 'write'" @click="workspace.refresh()">只读刷新资料与历史</el-button><span>不重发保存，不替换表单基准</span></div>
+      <div class="warranty-actions"><el-button :loading="state.busy === 'read'" :disabled="state.busy === 'write'" @click="workspace.refresh()">刷新维保资料与历史</el-button><span>刷新操作仅读取最新记录，不会覆盖当前编辑草稿</span></div>
       <ApiErrorNotice :error="state.error" />
-      <el-alert v-if="state.attempt?.state === 'uncertain'" type="warning" :closable="false" title="保存结果未知，原对象、内容、版本与幂等键已保留。不要刷新浏览器；只读查询到新值也不能确认原请求。" />
+      <el-alert v-if="state.attempt?.state === 'uncertain'" type="warning" :closable="false" title="保存结果待确认：当前提交内容与版本参数已锁定，请点击“使用原请求重试”继续处理，请勿刷新浏览器。" />
       <el-button v-if="state.attempt?.state === 'uncertain'" type="warning" :disabled="Boolean(state.busy)" @click="retryOriginal">使用原请求重试</el-button>
-      <el-alert v-if="state.attempt?.state === 'rejected'" type="warning" :closable="false" title="本次请求已拒绝；重新读取并明确选择编辑版本，不自动覆盖" />
-      <el-alert v-if="state.receipt" type="success" :closable="false" :title="`原请求确认回执：v${state.receipt.asset.version}。此为该次结果，当前版本以新回读为准`" />
+      <el-alert v-if="state.attempt?.state === 'rejected'" type="warning" :closable="false" title="提交未通过：请刷新最新记录并重新选择编辑基准版本。" />
+      <el-alert v-if="state.receipt" type="success" :closable="false" :title="`维保资料已保存（资产版本 v${state.receipt.asset.version}）`" />
       <section v-if="state.current" class="warranty-section">
         <h3>当前资产 v{{ state.current.asset.version }} · 资料版本 {{ state.current.metadata_version ?? '尚无' }}</h3>
         <p class="warranty-id">管理IP {{ state.current.asset.management_ip }} · 站点 {{ state.current.asset.site_id }}</p>
         <el-alert v-for="reason in state.current.edit_blockers" :key="reason" type="warning" :closable="false" :title="blockers[reason] || reason" />
-        <p>{{ state.current.warranty_details === null ? '尚未登记补充维保资料' : '已明确登记补充资料；空值表示未知' }}</p>
-        <dl class="warranty-facts"><dt>维保起始日</dt><dd>{{ state.current.warranty_details?.warranty_start ?? '未知' }}</dd><dt>维保到期日</dt><dd>{{ state.current.metadata?.warranty_expiry ?? '未知' }}</dd><dt>供应商（未核验）</dt><dd>{{ state.current.warranty_details?.warranty_supplier ?? '未知' }}</dd><dt>超期服役日期</dt><dd>{{ state.current.metadata?.overdue_service_date ?? '未知' }}</dd><dt>资产资料备注</dt><dd>{{ state.current.metadata?.note ?? '尚无' }}</dd></dl>
+        <p>{{ state.current.warranty_details === null ? '暂未登记补充维保资料' : '已登记补充维保资料（未填写项显示为未填写）' }}</p>
+        <dl class="warranty-facts"><dt>维保起始日</dt><dd>{{ state.current.warranty_details?.warranty_start ?? '未填写' }}</dd><dt>维保到期日</dt><dd>{{ state.current.metadata?.warranty_expiry ?? '未填写' }}</dd><dt>维保供应商</dt><dd>{{ state.current.warranty_details?.warranty_supplier ?? '未填写' }}</dd><dt>超期服役日期</dt><dd>{{ state.current.metadata?.overdue_service_date ?? '未填写' }}</dd><dt>资产资料备注</dt><dd>{{ state.current.metadata?.note ?? '尚无' }}</dd></dl>
         <el-button type="primary" plain :disabled="locked || !state.current.can_edit" @click="beginEdit">以当前版本编辑维保</el-button>
       </section>
       <section v-if="baseline !== null" class="warranty-section">
-        <h3>明确编辑基准 v{{ baseline }}</h3><el-alert v-if="state.current && state.current.asset.version !== baseline" type="warning" :closable="false" title="当前版本已变化，表单保持原内容；须重新选择编辑基准" />
-        <el-form label-position="top" @submit.prevent="save"><div class="warranty-grid"><el-form-item v-for="date in dates" :key="date.key" :label="date.label"><el-input v-model="form[date.key]" :disabled="locked" :aria-label="date.label" placeholder="YYYY-MM-DD；未知留空" /></el-form-item><el-form-item label="供应商（可选，最多200 Unicode字符）"><el-input v-model="form.warranty_supplier" :disabled="locked" aria-label="维保供应商" placeholder="人工填写；未知留空，不填凭据" /></el-form-item></div>
-          <p class="field-help">起始和到期都已知时，起始不能晚于到期。留空将明确保存null，不补当前日期或默认供应商。其他基础资料保留。</p>
+        <h3>编辑基准版本 v{{ baseline }}</h3><el-alert v-if="state.current && state.current.asset.version !== baseline" type="warning" :closable="false" title="当前版本已变化，表单保持原内容；须重新选择编辑基准" />
+        <el-form label-position="top" @submit.prevent="save"><div class="warranty-grid"><el-form-item v-for="date in dates" :key="date.key" :label="date.label"><el-input v-model="form[date.key]" :disabled="locked" :aria-label="date.label" placeholder="YYYY-MM-DD，选填" /></el-form-item><el-form-item label="维保供应商（可选，最多 200 字符）"><el-input v-model="form.warranty_supplier" :disabled="locked" aria-label="维保供应商" placeholder="输入维保服务供应商名称，选填" /></el-form-item></div>
+          <p class="field-help">同时填写维保起始日与到期日时，起始日不得晚于到期日；选填项留空记为未填写，其余扩展资料保持不变。</p>
           <el-form-item label="资产资料备注（必填，最多2000字符）"><el-input v-model="form.note" type="textarea" :rows="3" :disabled="locked" aria-label="维保维护的资产资料备注" /></el-form-item><p class="field-help">已预填当前资料备注；修改此处会明确替换资产资料备注，原文保留在历史中。</p>
           <p v-if="validation" role="alert" class="warranty-validation">{{ validation }}</p><div class="warranty-actions"><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.current?.can_edit || state.current.asset.version !== baseline">确认保存维保资料修订</el-button><el-button :disabled="locked" @click="clearForm">放弃未发送编辑</el-button></div>
         </el-form>
       </section>
-      <section v-if="state.history" class="warranty-section"><h3>共享资产资料修订历史</h3><p class="field-help">包含基础资料与维保维护；当前一页最多15条，不是仅维保变更或正式季度导出。</p><el-empty v-if="!state.history.items.length" description="尚无资料历史" /><details v-for="revision in state.history.items" :key="revision.asset_version" class="warranty-history"><summary>v{{ revision.asset_version }} · {{ revision.recorded_at }}</summary><p class="warranty-id">操作者 {{ revision.actor_id }}</p><p>补充资料：{{ revision.before.warranty_details === null ? '未登记' : '明确登记' }} → {{ revision.warranty_details === null ? '未登记' : '明确登记' }}</p><dl class="warranty-facts"><dt>起始日</dt><dd>{{ revision.before.warranty_details?.warranty_start ?? '未知' }} → {{ revision.warranty_details?.warranty_start ?? '未知' }}</dd><dt>到期日</dt><dd>{{ revision.before.metadata?.warranty_expiry ?? '未知' }} → {{ revision.metadata.warranty_expiry ?? '未知' }}</dd><dt>供应商（未核验）</dt><dd>{{ revision.before.warranty_details?.warranty_supplier ?? '未知' }} → {{ revision.warranty_details?.warranty_supplier ?? '未知' }}</dd><dt>超期服役日</dt><dd>{{ revision.before.metadata?.overdue_service_date ?? '未知' }} → {{ revision.metadata.overdue_service_date ?? '未知' }}</dd><dt>资产资料备注</dt><dd>{{ revision.before.metadata?.note ?? '尚无' }} → {{ revision.metadata.note }}</dd></dl></details><el-button :disabled="Boolean(state.busy) || !state.history.has_more" @click="workspace.refresh(true)">更早资料修订</el-button></section>
+      <section v-if="state.history" class="warranty-section"><h3>共享资产资料修订历史</h3><p class="field-help">展示基础扩展资料与维保档案的合并修订记录（每页 15 条，按版本倒序排列）。</p><el-empty v-if="!state.history.items.length" description="尚无资料历史" /><details v-for="revision in state.history.items" :key="revision.asset_version" class="warranty-history"><summary>v{{ revision.asset_version }} · {{ revision.recorded_at }}</summary><p class="warranty-id">操作者 {{ revision.actor_id }}</p><p>补充资料：{{ revision.before.warranty_details === null ? '未登记' : '已登记' }} → {{ revision.warranty_details === null ? '未登记' : '已登记' }}</p><dl class="warranty-facts"><dt>起始日</dt><dd>{{ revision.before.warranty_details?.warranty_start ?? '未填写' }} → {{ revision.warranty_details?.warranty_start ?? '未填写' }}</dd><dt>到期日</dt><dd>{{ revision.before.metadata?.warranty_expiry ?? '未填写' }} → {{ revision.metadata.warranty_expiry ?? '未填写' }}</dd><dt>维保供应商</dt><dd>{{ revision.before.warranty_details?.warranty_supplier ?? '未填写' }} → {{ revision.warranty_details?.warranty_supplier ?? '未填写' }}</dd><dt>超期服役日</dt><dd>{{ revision.before.metadata?.overdue_service_date ?? '未填写' }} → {{ revision.metadata.overdue_service_date ?? '未填写' }}</dd><dt>资产资料备注</dt><dd>{{ revision.before.metadata?.note ?? '尚无' }} → {{ revision.metadata.note }}</dd></dl></details><el-button :disabled="Boolean(state.busy) || !state.history.has_more" @click="workspace.refresh(true)">更早资料修订</el-button></section>
     </template>
-    <template #footer><el-button @click="open = false">暂时收起</el-button><span class="field-help">收起取消迟到读取，但不会取消已发送保存或丢弃未确认请求</span></template>
+    <template #footer><el-button @click="open = false">暂时收起</el-button><span class="field-help">收起面板不会中断正在执行的保存请求；待确认请求将保留在当前会话中</span></template>
   </el-drawer>
 </template>
 <style>

@@ -18,7 +18,7 @@ const questionIds = computed(() => [...new Set(value.value.details.flatMap(detai
     <details class="error-details" :key="`${value.code}:${value.traceId}:${value.message}`">
       <summary>查看排查信息</summary>
       <p class="trace">错误代码：{{ value.code }}</p>
-      <p v-if="traceId" class="trace">排查编号：{{ traceId }}</p>
+      <p v-if="traceId" class="trace">排查编号（请求追踪号）：{{ traceId }}</p>
       <p v-if="title !== value.message">{{ value.message }}</p>
     </details>
   </el-alert>

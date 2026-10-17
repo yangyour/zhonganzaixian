@@ -26,30 +26,42 @@ defineExpose({ change: workspace.change, preview: workspace.preview, clearInput,
 </script>
 <template>
  <section class="preview-page admin-prototype">
-  <div class="page-heading"><div><span class="eyebrow">CONTACT FORMAT PREVIEW</span><h1>联系人导入格式预览</h1><p>只读诊断 · 逐行核对 · 不保存联系人</p></div><router-link to="/customer-contacts">返回联系人</router-link></div>
-  <el-alert type="warning" :closable="false" title="格式通过仍不可导入">当前只检查显式JSON资料，不解析CSV/XLSX文件、不查询现有联系人、不检查最后决策人、不创建导入作业或派发通知。不能把本页结果当导入许可。</el-alert>
+  <div class="page-heading"><div><span class="eyebrow">CONTACT FORMAT PREVIEW</span><h1>联系人导入格式预览</h1><p>在线校验批量导入 JSON 数据结构与字段格式 · 仅作诊断预览，不直接写入数据库</p></div><router-link to="/customer-contacts">返回联系人</router-link></div>
+  <el-alert type="warning" :closable="false" title="本页仅执行字段格式预检，不直接执行导入入库">支持校验标准 JSON 数据结构与字段合法性；如需正式提交批量导入任务，请前往“批量新建与作业”页面操作。</el-alert>
   <nav class="admin-tabs" aria-label="联系人工作区"><router-link to="/customer-contacts">联系人列表</router-link><router-link to="/contact-imports">批量新建与作业</router-link><span class="active">导入格式预览</span></nav>
-  <ol class="admin-stepbar"><li class="active"><strong>01 原始资料</strong><small>完整8字段 · 未知显式null</small></li><li :class="{active: !!state.result}"><strong>02 服务端诊断</strong><small>逐行校验与相同行提示</small></li><li><strong>03 独立批量受理</strong><small>需进入批量新建页面</small></li></ol>
+  <ol class="admin-stepbar"><li class="active"><strong>01 粘贴 JSON 数据</strong><small>包含完整 8 个标准字段</small></li><li :class="{active: !!state.result}"><strong>02 服务端格式诊断</strong><small>逐行校验与重复行提示</small></li><li><strong>03 正式批量导入</strong><small>前往批量新建页面提交</small></li></ol>
   <el-empty v-if="!permitted" description="当前身份没有联系人预览权限" />
   <template v-else>
    <section class="preview-input admin-card">
-    <div class="admin-card-head"><h2>原始JSON资料</h2><span class="muted">只读格式检查 · 不保存</span></div><div class="admin-card-body"><p>根对象只含rows；1–100条是单次技术上限，不是合同配额。每条需完整提供姓名、角色、手机、邮箱、企微userid、级别偏好、静音组、启用状态这8个字段，未知显式null；enabled必须明确true或false。</p>
-    <details><summary>查看明确标记的格式示例（不会自动填入或发送）</summary><pre>{{ example }}</pre><p>角色：REPORTER、DECISION_MAKER、TECHNICAL_CONTACT；偏好为P1–P4数组，null表示未知，[]表示明确空。静音组为null，或完整enabled/start/end；启用窗口要求HH:mm且两端不同，时区Asia/Shanghai。</p></details>
-    <el-input type="textarea" :rows="14" :model-value="state.text" aria-label="联系人预览原始JSON" placeholder="在此粘贴明确资料；不要填入密码、token或API密钥" @update:model-value="workspace.change($event)" />
-    <p class="preview-help">最多512KiB、5层、8000个JSON token；拒绝重复键和非规范安全整数（含小数、指数及负零），业务字段不使用数值类型。编辑立即清除旧结果；不会自动预览、保存或合并相同行。</p>
+    <div class="admin-card-head"><h2>待校验 JSON 数据</h2><span class="muted">格式诊断 · 不保存</span></div><div class="admin-card-body"><p>根对象须包含 <code>rows</code> 数组（单次上限 1–100 条）。每条记录需提供姓名、角色、手机、邮箱、企微 UserID、级别偏好、静音配置、启用状态共 8 个字段（选填项显式填 <code>null</code>）。</p>
+    <details><summary>查看标准 JSON 格式示例</summary><pre>{{ example }}</pre><p>支持角色：REPORTER、DECISION_MAKER、TECHNICAL_CONTACT；级别偏好：P1–P4 数组（null 表示未指定，[] 表示空集合）；免打扰配置：null 或完整 enabled/start/end（Asia/Shanghai 时区）。</p></details>
+    <el-input type="textarea" :rows="14" :model-value="state.text" aria-label="联系人预览原始JSON" placeholder="请粘贴待校验的联系人 JSON 数据（请勿填入密码、Token 或密钥）" @update:model-value="workspace.change($event)" />
+    <p class="preview-help">支持最大 512KiB、5 层嵌套；修改文本后自动清空上一次诊断结果。</p>
     <div class="preview-actions"><el-button type="primary" :disabled="state.busy || !state.text" :loading="state.busy" @click="workspace.preview()">只读检查格式</el-button><el-button :disabled="!state.text" @click="clearInput">清除输入与结果</el-button></div>
    </div></section>
    <ApiErrorNotice :error="state.error" />
    <section v-if="state.result" class="preview-results" aria-live="polite">
-    <h2>服务端格式诊断</h2><div class="admin-stats"><div class="admin-stat"><span>格式通过</span><strong>{{ state.result.valid_rows }}</strong><small>渠道仍未核验</small></div><div class="admin-stat"><span>字段错误</span><strong>{{ state.result.invalid_rows }}</strong><small>请按原始行号修正</small></div><div class="admin-stat"><span>完全相同行警告</span><strong>{{ state.result.identical_rows }}</strong><small>未自动跳过或合并</small></div><div class="admin-stat"><span>写入许可</span><strong>未授予</strong><small>本页只提供格式诊断</small></div></div><p class="preview-help">所有原始行号均保留。格式通过不代表渠道核验、现有记录去重或正式客户身份；相同行只警告，不自动跳过或覆盖。</p>
-    <ol class="preview-rows"><li v-for="row in state.result.rows" :key="row.row_number"><h3>第{{ row.row_number }}行：{{ row.status === 'FORMAT_VALID' ? '格式通过 / 未核验' : '字段错误 / 未写入' }}</h3><p v-if="row.status === 'INVALID'">请核对8个字段是否完整、类型/角色集合/手机号邮箱/启用状态/静音起止是否合法；无效行原文不回显，请在上方原始输入按行序修正。</p><p v-if="row.identical_to_row !== null" class="duplicate-warning">字段与第{{ row.identical_to_row }}行完全相同，仍保留本行；请自行核对，不认定为同一人。</p><details v-if="row.contact"><summary>查看本行格式事实</summary><CustomerContactFacts :facts="row.contact" /></details></li></ol>
-    <el-alert type="info" :closable="false" title="本页结果不保存，批量新建需独立受理">can_import=false；现有联系人、最后决策人和真实通知送达均未验证。本页没有批量写入按钮。</el-alert><p><router-link to="/contact-imports">打开批量新建与我的作业（需重新明确输入）</router-link></p>
+    <h2>服务端格式诊断结果</h2><div class="admin-stats"><div class="admin-stat"><span>格式通过</span><strong>{{ state.result.valid_rows }}</strong><small>字段符合规范</small></div><div class="admin-stat"><span>字段错误</span><strong>{{ state.result.invalid_rows }}</strong><small>请按行号修正</small></div><div class="admin-stat"><span>重复行提示</span><strong>{{ state.result.identical_rows }}</strong><small>字段完全相同</small></div><div class="admin-stat"><span>入库状态</span><strong>仅预览</strong><small>未执行数据写入</small></div></div><p class="preview-help">以下按原始行号展示校验结果；重复行仅作提示，导入时不会自动跳过或覆盖。</p>
+    <ol class="preview-rows"><li v-for="row in state.result.rows" :key="row.row_number"><h3>第{{ row.row_number }}行：{{ row.status === 'FORMAT_VALID' ? '格式通过' : '字段格式错误' }}</h3><p v-if="row.status === 'INVALID'">请核对该行 8 个标准字段是否完整，以及角色、手机号、邮箱、启用状态与免打扰时段格式是否合法。</p><p v-if="row.identical_to_row !== null" class="duplicate-warning">该行字段与第{{ row.identical_to_row }}行完全相同，请核对是否需要保留。</p><details v-if="row.contact"><summary>查看本行解析预览</summary><CustomerContactFacts :facts="row.contact" /></details></li></ol>
+    <el-alert type="info" :closable="false" title="本页预览结果不直接入库">can_import=false；本页没有批量写入按钮，如需正式导入请前往批量新建页面提交作业。</el-alert><p><router-link to="/contact-imports">前往批量新建与作业页面</router-link></p>
    </section>
   </template>
  </section>
 </template>
 <style scoped>
-.admin-prototype .preview-input{padding:0;border-radius:5px}.admin-prototype .preview-results{border-radius:5px;margin:16px 0}.admin-prototype .preview-rows>li{display:block;border:1px solid #e4eaf2;padding:14px 16px;margin-bottom:10px;border-radius:4px}.admin-prototype .preview-rows h3{margin-bottom:6px}
-
-.preview-page{max-width:1100px;line-height:1.7}.preview-input,.preview-results{margin:20px 0;padding:22px;border:1px solid #dce4ee;border-radius:12px;background:white;overflow-wrap:anywhere}.preview-help{color:#526176}.preview-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}.preview-actions .el-button{margin-left:0}.preview-rows{list-style:none;padding:0}.preview-rows>li{padding:16px 0;border-bottom:1px solid #e1e7ef}.duplicate-warning{color:#805000}pre{white-space:pre-wrap;overflow-wrap:anywhere}.preview-page summary{cursor:pointer}.preview-page details{margin:12px 0}.preview-page :deep(textarea){font-family:monospace}@media(max-width:700px){.preview-input,.preview-results{padding:14px}.preview-page .el-button{min-height:44px}.page-heading{align-items:flex-start;gap:12px;flex-direction:column}}
+.preview-page{max-width:1100px;line-height:1.7}
+.preview-input,.preview-results{margin:16px 0;padding:22px;border:1px solid #dce4ee;border-radius:5px;background:#fff;overflow-wrap:anywhere}
+.admin-prototype .preview-input{padding:0}
+.preview-help{color:#526176}
+.preview-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+.preview-actions .el-button{margin-left:0}
+.preview-rows{list-style:none;padding:0}
+.preview-rows>li{display:block;border:1px solid #e4eaf2;padding:14px 16px;margin-bottom:10px;border-radius:4px}
+.preview-rows h3{margin-bottom:6px}
+.duplicate-warning{color:#805000}
+pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.preview-page summary{cursor:pointer}
+.preview-page details{margin:12px 0}
+.preview-page :deep(textarea){font-family:monospace}
+@media(max-width:700px){.preview-input,.preview-results{padding:14px}.preview-page .el-button{min-height:44px}.page-heading{align-items:flex-start;gap:12px;flex-direction:column}}
 </style>

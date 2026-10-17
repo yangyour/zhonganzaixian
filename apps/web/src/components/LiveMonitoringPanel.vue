@@ -53,7 +53,7 @@ onUnmounted(() => { clearInterval(timer); document.removeEventListener('visibili
 </script>
 <template>
  <section class="live-monitoring" :aria-busy="state.busy" aria-label="实际设备监控">
-  <div class="live-heading"><div><h2>{{ mode === 'events' ? '当前采集检查' : mode === 'triggers' ? '告警接入状态' : '设备监控' }}</h2><p>{{ assetId ? '当前资产的实际绑定与采样' : '当前租户明确绑定的设备 · 不代表全部资产' }}</p></div><button type="button" :disabled="state.busy || !permitted" @click="refresh">{{ state.busy ? '读取中…' : '刷新监控数据' }}</button></div>
+  <div class="live-heading"><div><h2>{{ mode === 'events' ? '当前采集检查' : mode === 'triggers' ? '告警接入状态' : '设备监控' }}</h2><p>{{ assetId ? '当前资产的实际绑定与采样 · 展示当前已采集的最新监控快照（手动刷新）；无采样数据时显示为“未采集”。' : '当前租户明确绑定的设备 · 展示当前已采集的最新监控快照（手动刷新）；无采样数据时显示为“未采集”。' }}</p></div><button type="button" :disabled="state.busy || !permitted" @click="refresh">{{ state.busy ? '读取中…' : '刷新监控数据' }}</button></div>
   <p v-if="!permitted" role="status">当前账号没有资产读取权限。</p>
   <template v-else>
    <p class="live-footnote" aria-label="监控自动刷新设置">{{refreshPolicyLabel}} · 设置每30秒重新核对</p><ApiErrorNotice :error="refreshPolicyError" @retry="refreshPolicy"/>

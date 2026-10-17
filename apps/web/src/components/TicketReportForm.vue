@@ -157,40 +157,54 @@ async function submitReport() {
 </script>
 
 <template>
-  <el-dialog v-model="open" title="填写报障信息" width="650px" class="responsive-dialog ticket-report-dialog" :close-on-click-modal="!busy && !uncertain" :close-on-press-escape="!busy" :show-close="!busy" destroy-on-close>
-    <p class="ticket-form-intro">报障人取自当前登录账号，登记在 {{ session?.tenant.name }}。正式处理状态、优先级和时限尚待规则落实。</p>
-    <el-alert v-if="acceptedOperationId" type="info" :closable="false" show-icon title="报障已耐久登记，正式工单规则待确认。只查询登记结果，不再重复提交。" />
-    <el-alert v-else-if="uncertain" type="warning" :closable="false" show-icon title="提交结果暂不确定。已保留原内容与同一个请求标识，请手动使用原请求重试，避免重复登记。" />
-    <ApiErrorNotice :error="submitError" pending-message="本次填写内容已保留，登记结果以服务端回读为准。" />
+  <el-dialog v-model="open" title="故障申报登记" width="650px" class="responsive-dialog ticket-report-dialog" :close-on-click-modal="!busy && !uncertain" :close-on-press-escape="!busy" :show-close="!busy" destroy-on-close>
+    <p class="ticket-form-intro">申报人：当前登录账号（所属租户：{{ session?.tenant.name }}）。当前已完成故障受理入库配置；工单分派流转与 SLA 考核计时将在 ITSM 流程启用后自动关联。</p>
+    <el-alert v-if="acceptedOperationId" type="info" :closable="false" show-icon title="故障申报已受理，系统正在生成正式工单，可点击下方按钮刷新处理进度。" />
+    <el-alert v-else-if="uncertain" type="warning" :closable="false" show-icon title="提交结果待确认：系统已锁定当前填写内容，请先刷新列表核对是否已生效，或点击“重试提交”继续处理。" />
+    <ApiErrorNotice :error="submitError" pending-message="系统已锁定当前填写内容，登记结果以服务端回读为准。" />
     <ApiErrorNotice :error="operationError" />
-    <div v-if="operation" class="ticket-operation-summary"><strong>已登记 · 正式工单规则待确认</strong><p>{{ operation.error.message }}</p><p>待确认事项：{{ operation.error.question_ids.join(' / ') }}</p><p>登记时间：{{ displayTime(operation.created_at) }}</p></div>
+    <div v-if="operation" class="ticket-operation-summary"><strong>已受理入库 · 待关联 ITSM 流程</strong><p>{{ operation.error.message }}</p><p>关联配置项：{{ operation.error.question_ids.join(' / ') }}</p><p>受理时间：{{ displayTime(operation.created_at) }}</p></div>
     <el-form :disabled="locked" label-position="top" class="dialog-form ticket-report-form" @submit.prevent="submitReport">
       <el-form-item label="故障分类" :error="fieldErrors.category"><el-select v-model="form.category" placeholder="请选择故障分类" aria-label="故障分类"><el-option v-for="category in ticketCategories" :key="category" :label="category" :value="category" /></el-select></el-form-item>
-      <el-form-item label="关联设备" :error="fieldErrors.asset_id"><el-select v-model="form.asset_id" filterable placeholder="不确定" :loading="assetsLoading" aria-label="关联设备"><el-option label="不确定" value="" /><el-option v-for="asset in assets" :key="asset.id" :label="asset.name" :value="asset.id" /></el-select><span class="field-help">{{ assetsLoading ? '正在加载当前可见设备，可先选择“不确定”。' : assetsError ? '设备列表加载失败，可选择“不确定”继续登记。' : assetsHasMore ? '仅显示当前可见设备的首个列表页，未找到时请选择“不确定”。' : '只可选择当前可见设备，无法判断时选择“不确定”。' }}</span></el-form-item>
+      <el-form-item label="关联设备" :error="fieldErrors.asset_id"><el-select v-model="form.asset_id" filterable placeholder="不确定" :loading="assetsLoading" aria-label="关联设备"><el-option label="不确定" value="" /><el-option v-for="asset in assets" :key="asset.id" :label="asset.name" :value="asset.id" /></el-select><span class="field-help">{{ assetsLoading ? '正在加载当前可见设备，可先选择“不确定”。' : assetsError ? '设备列表加载失败，可选择“不确定”继续申报。' : assetsHasMore ? '展示当前可见设备首页列表，如未找到目标设备可选择“不确定”。' : '请选择故障关联设备，若无法确认可选择“不确定”。' }}</span></el-form-item>
       <ApiErrorNotice :error="assetsError"><el-button size="small" :disabled="locked" @click="loadAssets">重试设备查询</el-button></ApiErrorNotice>
       <el-form-item label="影响范围" :error="fieldErrors.impact_scope"><el-radio-group v-model="form.impact_scope" class="ticket-choice-group" aria-label="影响范围"><el-radio v-for="(label, value) in impactScopeLabel" :key="value" :value="value">{{ label }}</el-radio></el-radio-group></el-form-item>
-      <el-form-item label="描述（必填，最多 3000 个字符）" :error="fieldErrors.description"><AutoTextarea v-model="form.description" placeholder="描述发生时间、现象和影响，请勿填写密码或其他秘密" aria-label="报障描述" /></el-form-item>
-      <el-form-item label="标题（可不填）" :error="fieldErrors.title"><el-input v-model="form.title" placeholder="不填时按故障分类与设备生成" aria-label="报障标题" /></el-form-item>
-      <div class="ticket-contact-fields"><el-form-item label="联系人" :error="fieldErrors.contact_name"><el-input v-model="form.contact_name" placeholder="本次报障联系人" aria-label="报障联系人" /></el-form-item><el-form-item label="联系电话" :error="fieldErrors.contact_phone"><el-input v-model="form.contact_phone" type="tel" placeholder="例如：+86 138 0000 0000" aria-label="报障联系电话" /></el-form-item></div>
-      <p class="field-help">联系方式仅作为填报信息，尚未核验与账号的绑定关系。</p>
-      <el-form-item label="紧急程度（仅供参考）" :error="fieldErrors.urgency"><el-radio-group v-model="form.urgency" class="ticket-choice-group" aria-label="紧急程度"><el-radio v-for="(label, value) in urgencyLabel" :key="value" :value="value">{{ label }}</el-radio></el-radio-group></el-form-item>
-      <p class="field-help">同一设备、同分类的短时间重复提交可能返回已有记录。请核对回读详情；已有描述与联系信息不会被覆盖。</p>
+      <el-form-item label="描述（必填，最多 3000 个字符）" :error="fieldErrors.description"><AutoTextarea v-model="form.description" placeholder="请描述故障发生时间、具体现象与受影响业务，请勿填写密码或密钥信息" aria-label="报障描述" /></el-form-item>
+      <el-form-item label="标题（选填）" :error="fieldErrors.title"><el-input v-model="form.title" placeholder="留空时系统将按故障分类与关联设备自动生成" aria-label="报障标题" /></el-form-item>
+      <div class="ticket-contact-fields"><el-form-item label="联系人" :error="fieldErrors.contact_name"><el-input v-model="form.contact_name" placeholder="本次故障申报联系人" aria-label="报障联系人" /></el-form-item><el-form-item label="联系电话" :error="fieldErrors.contact_phone"><el-input v-model="form.contact_phone" type="tel" placeholder="例如：+86 138 0000 0000" aria-label="报障联系电话" /></el-form-item></div>
+      <p class="field-help">请填写现场或业务联系人信息，以便工程师及时核实故障现象。</p>
+      <el-form-item label="紧急程度（填报参考）" :error="fieldErrors.urgency"><el-radio-group v-model="form.urgency" class="ticket-choice-group" aria-label="紧急程度"><el-radio v-for="(label, value) in urgencyLabel" :key="value" :value="value">{{ label }}</el-radio></el-radio-group></el-form-item>
+      <p class="field-help">同一设备、同一分类在短时间内重复提报时将关联既有工单记录，不会覆盖已保存的故障描述与联系方式。</p>
     </el-form>
-    <el-alert v-if="registeredTicket" type="info" :closable="false" :title="`已回读登记 ${registeredTicket.receipt_no} · v${registeredTicket.version}。正文和联系方式以详情为准，重复报障不会覆盖已有内容。`" />
+    <el-alert v-if="registeredTicket" type="success" :closable="false" :title="`工单已生成（单号：${registeredTicket.receipt_no} · v${registeredTicket.version}），可查看工单详情或继续关联现场照片。`" />
     <ReportPhotoPanel :queue="photos" :existing="registeredTicket?.attachments || []" :disabled="submitting || uncertain" :appender="registeredTicket ? appender : undefined" />
-    <p v-if="acceptedOperationId && !registeredTicket" class="field-help">报障已受理。请查询登记结果后追加照片，图片处理失败不会取消报障。</p>
-    <template #footer><el-button :disabled="busy" @click="open = false">{{ uncertain || acceptedOperationId ? '关闭并保留本次填写' : '取消' }}</el-button><el-button v-if="acceptedOperationId" type="primary" :loading="operationLoading" :disabled="submitting" @click="readRegistration">重新查询登记结果</el-button><el-button v-else type="primary" :loading="submitting" :disabled="!permitted" @click="submitReport">{{ uncertain ? '使用原请求重试' : '提交报障登记' }}</el-button></template>
+    <p v-if="acceptedOperationId && !registeredTicket" class="field-help">故障申报已受理，请先刷新处理进度，待正式工单生成后即可追加现场照片。</p>
+    <template #footer><el-button :disabled="busy" @click="open = false">{{ uncertain || acceptedOperationId ? '关闭窗口（保留当前内容）' : '取消' }}</el-button><el-button v-if="acceptedOperationId" type="primary" :loading="operationLoading" :disabled="submitting" @click="readRegistration">刷新处理进度</el-button><el-button v-else type="primary" :loading="submitting" :disabled="!permitted" @click="submitReport">{{ uncertain ? '重试提交' : '提交故障申报' }}</el-button></template>
   </el-dialog>
 </template>
 
-<style>
-.ticket-report-dialog.el-dialog{display:flex;flex-direction:column;max-height:calc(100vh - 48px);max-height:calc(100dvh - 48px);margin-top:24px!important;margin-bottom:24px;overflow:hidden}
-.ticket-report-dialog>.el-dialog__header,.ticket-report-dialog>.el-dialog__footer{flex:none;min-width:0}
-.ticket-report-dialog>.el-dialog__body{flex:1 1 auto;min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;scroll-padding-block:16px}
-.ticket-report-dialog>.el-dialog__body :is(input,textarea,select,button,[tabindex]){scroll-margin-block:16px}
-.ticket-report-dialog>.el-dialog__footer{border-top:1px solid var(--el-border-color-lighter);margin-top:16px;padding-top:16px}
-.ticket-report-dialog .el-dialog__footer .el-button{max-width:100%;height:auto;white-space:normal}
-.ticket-form-intro{font-size:12px;color:#61718a}.ticket-report-dialog .api-error{margin-top:16px}.ticket-contact-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}.ticket-choice-group{display:flex;flex-wrap:wrap;gap:0 18px}.ticket-choice-group .el-radio{margin-right:0;min-height:36px}.ticket-operation-summary{margin-top:18px;padding:15px;border:1px solid #d9e9ff;background:#f5f9ff;border-radius:6px;font-size:12px}.ticket-operation-summary p{margin:8px 0}.ticket-report-form>.field-help{margin-top:-10px;margin-bottom:20px}
-@media(max-width:760px){.ticket-report-dialog.el-dialog{max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);margin-top:12px!important;margin-bottom:12px}}
-@media(max-width:760px){.ticket-contact-fields{grid-template-columns:1fr;gap:0}.ticket-report-dialog .el-dialog__footer{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px}.ticket-report-dialog .el-dialog__footer .el-button{margin-left:0;min-height:44px}.ticket-report-form .el-input__wrapper,.ticket-report-form .el-select__wrapper{min-height:44px}.ticket-choice-group .el-radio{min-height:44px}}
+<style scoped>
+:deep(.ticket-report-dialog.el-dialog){display:flex;flex-direction:column;max-height:calc(100vh - 48px);max-height:calc(100dvh - 48px);margin-top:24px!important;margin-bottom:24px;overflow:hidden}
+:deep(.ticket-report-dialog>.el-dialog__header),:deep(.ticket-report-dialog>.el-dialog__footer){flex:none;min-width:0}
+:deep(.ticket-report-dialog>.el-dialog__body){flex:1 1 auto;min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;scroll-padding-block:16px}
+:deep(.ticket-report-dialog>.el-dialog__body :is(input,textarea,select,button,[tabindex])){scroll-margin-block:16px}
+:deep(.ticket-report-dialog>.el-dialog__footer){border-top:1px solid var(--el-border-color-lighter);margin-top:16px;padding-top:16px}
+:deep(.ticket-report-dialog .el-dialog__footer .el-button){max-width:100%;height:auto;white-space:normal}
+.ticket-form-intro{font-size:12px;color:#61718a}
+:deep(.ticket-report-dialog .api-error){margin-top:16px}
+.ticket-contact-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ticket-choice-group{display:flex;flex-wrap:wrap;gap:0 18px}
+.ticket-choice-group :deep(.el-radio){margin-right:0;min-height:36px}
+.ticket-operation-summary{margin-top:18px;padding:15px;border:1px solid #d9e9ff;background:#f5f9ff;border-radius:6px;font-size:12px}
+.ticket-operation-summary p{margin:8px 0}
+.ticket-report-form>.field-help{margin-top:-10px;margin-bottom:20px}
+@media(max-width:760px){
+  :deep(.ticket-report-dialog.el-dialog){max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);margin-top:12px!important;margin-bottom:12px}
+  .ticket-contact-fields{grid-template-columns:1fr;gap:0}
+  :deep(.ticket-report-dialog .el-dialog__footer){display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px}
+  :deep(.ticket-report-dialog .el-dialog__footer .el-button){margin-left:0;min-height:44px}
+  .ticket-report-form :deep(.el-input__wrapper),.ticket-report-form :deep(.el-select__wrapper){min-height:44px}
+  .ticket-choice-group :deep(.el-radio){min-height:44px}
+}
 </style>
+

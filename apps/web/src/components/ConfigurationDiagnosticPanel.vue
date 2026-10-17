@@ -32,23 +32,23 @@ onUnmounted(() => reader.reset())
 </script>
 
 <template>
-  <el-drawer v-model="open" title="设计登记与提案诊断" size="760px" class="configuration-diagnostic-drawer" destroy-on-close>
+  <el-drawer v-model="open" title="配置登记来源与提案诊断" size="760px" class="configuration-diagnostic-drawer" destroy-on-close>
     <p class="configuration-diagnostic-key mono">{{ configurationKey }}</p>
-    <p class="field-help">当前租户：{{ session?.tenant.name }}。本次只查询原设计登记与提案元数据，不能据此判断当前运行状态。</p>
+    <p class="field-help">当前租户：{{ session?.tenant.name }}。展示当前配置项的设计登记目录属性与近期修订提案记录。</p>
     <router-link :to="{path:'/runtime-configurations',query:{key:configurationKey}}">查看此配置的运行值、发布与回滚</router-link>
     <ApiErrorNotice :error="error"><el-button size="small" :disabled="loading" @click="load">重新查询诊断</el-button></ApiErrorNotice>
     <el-skeleton v-if="loading" :rows="8" animated />
     <template v-else-if="diagnostic">
-      <el-alert type="warning" :closable="false" show-icon title="设计登记与运行发布分别保存；当前生效状态请查询运行配置中心。" />
+      <el-alert type="warning" :closable="false" show-icon title="配置基线登记与运行发布独立存储；当前生效状态请前往运行配置中心核对。" />
       <el-descriptions :column="1" border class="configuration-diagnostic-facts">
-        <el-descriptions-item label="来源用途">原设计登记诊断，不作为运行生效值</el-descriptions-item>
+        <el-descriptions-item label="来源用途">设计基线登记诊断（不代表当前运行生效值）</el-descriptions-item>
         <el-descriptions-item label="诊断租户"><span class="mono">{{ diagnostic.context.tenant_id }}</span></el-descriptions-item>
         <el-descriptions-item label="来源读取时间">{{ displayTime(diagnostic.observed_at) }}</el-descriptions-item>
         <el-descriptions-item label="关联Q编号">{{ diagnosticQuestions(diagnostic.question_ids) }}</el-descriptions-item>
       </el-descriptions>
       <div class="detail-section">
         <h3>设计登记目录</h3>
-        <p class="field-help">登记版本与描述来自原设计目录；运行定义与当前租户发布版本在运行配置中心核对。</p>
+        <p class="field-help">登记版本与描述来自平台设计基线目录；运行定义与当前租户发布版本请在运行配置中心核对。</p>
         <el-descriptions :column="1" border class="configuration-diagnostic-facts">
           <el-descriptions-item label="来源">设计登记 · DESIGN_REGISTRY</el-descriptions-item>
           <el-descriptions-item label="登记版本">v{{ diagnostic.registry.version }}</el-descriptions-item>
@@ -72,13 +72,13 @@ onUnmounted(() => reader.reset())
       </div>
       <div class="detail-section">
         <h3>当前租户近期提案</h3>
-        <p class="field-help">仅展示最近最多5项内部提案记录；是否已发布须查询运行历史。证据引用属于输入记录，真实性和资格尚未核验。</p>
-        <p v-if="diagnostic.recent_proposals.truncated" class="field-help">仅列最近5项；还有未显示的提案记录。</p>
-        <p v-if="!diagnostic.recent_proposals.items.length" class="muted">本次回读没有近期提案。</p>
+        <p class="field-help">展示最近最多 5 条内部修订提案记录；实际发布状态请前往运行配置中心查询。</p>
+        <p v-if="diagnostic.recent_proposals.truncated" class="field-help">仅列出最近 5 条提案记录，更多记录请在“修订与审批”中查看。</p>
+        <p v-if="!diagnostic.recent_proposals.items.length" class="muted">当前配置暂无近期修订提案。</p>
         <AppTable v-else :rows="diagnostic.recent_proposals.items" row-key="id">
           <el-table-column label="内部提案 / 版本" min-width="230"><template #default="{ row }"><span class="mono">{{ row.id }}</span><span class="cell-sub">v{{ row.version }} · INTERNAL_REVISION</span></template></el-table-column>
           <el-table-column label="内部流程" min-width="200"><template #default="{ row }">{{ revisionStatusLabel[row.workflow_status as keyof typeof revisionStatusLabel] }}<span class="cell-sub">运行发布另行查询</span></template></el-table-column>
-          <el-table-column label="证据输入" min-width="190"><template #default="{ row }">{{ row.evidence_reference_count === null ? '引用数量未知' : `${row.evidence_reference_count} 项引用` }}<span class="cell-sub">仅引用输入 · REFERENCE_ONLY</span><span class="cell-sub">客户未核验 · UNVERIFIED</span></template></el-table-column>
+          <el-table-column label="证据输入" min-width="190"><template #default="{ row }">{{ row.evidence_reference_count === null ? '引用数量未知' : `${row.evidence_reference_count} 项引用` }}<span class="cell-sub">书面引用 · REFERENCE_ONLY</span><span class="cell-sub">待客户核验 · UNVERIFIED</span></template></el-table-column>
         </AppTable>
       </div>
     </template>

@@ -71,7 +71,7 @@ const stages = ['工单发起', '工单受理', '原因定位', '解决方案', 
     </header>
     <p v-if="downloadError" role="alert">{{ downloadError }}</p>
     <section class="ticket-stage-card" aria-label="工单阶段">
-      <ol class="ticket-stage-list"><li v-for="(stage, index) in stages" :key="stage" :class="{ recorded: index === 0 }"><span class="ticket-stage-number" aria-hidden="true">{{ index === 0 ? '✓' : index + 1 }}</span><span>{{ stage }}<small>{{ index === 0 ? '报障已登记' : '阶段未提供' }}</small></span></li></ol>
+      <ol class="ticket-stage-list"><li v-for="(stage, index) in stages" :key="stage" :class="{ recorded: index === 0 }"><span class="ticket-stage-number" aria-hidden="true">{{ index === 0 ? '✓' : index + 1 }}</span><span>{{ stage }}<small>{{ index === 0 ? '已受理入库' : '暂未提供' }}</small></span></li></ol>
     </section>
 
     <div class="ticket-overview-grid">
@@ -81,15 +81,15 @@ const stages = ['工单发起', '工单受理', '原因定位', '解决方案', 
           <dl class="ticket-basic-fields">
             <div><dt>登记编号</dt><dd class="mono">{{ ticket.receipt_no }}</dd></div>
             <div><dt>工单标题</dt><dd>{{ ticket.title }}</dd></div>
-            <div><dt>告警编号</dt><dd class="ticket-muted">当前接口未提供</dd></div>
+            <div><dt>告警编号</dt><dd class="ticket-muted">暂未提供</dd></div>
             <div><dt>客户名称</dt><dd>{{ session?.tenant.name }}</dd></div>
-            <div><dt>渠道名称</dt><dd class="ticket-muted">当前接口未提供</dd></div>
+            <div><dt>渠道名称</dt><dd class="ticket-muted">人工登记</dd></div>
             <div><dt>客户联系人</dt><dd>{{ ticket.contact_name }}</dd></div>
             <div><dt>客户联系方式</dt><dd class="ticket-contact">{{ showPhone ? ticket.contact_phone : maskedContact(ticket.contact_phone) }}<button type="button" :aria-pressed="showPhone" @click="showPhone = !showPhone">{{ showPhone ? '隐藏' : '显示' }}</button></dd></div>
-            <div><dt>关联设备</dt><dd>{{ ticket.asset_name || (ticket.asset_id ? '已关联，名称未提供' : '未关联') }}</dd></div>
+            <div><dt>关联设备</dt><dd>{{ ticket.asset_name || (ticket.asset_id ? '已关联（名称暂未提供）' : '未关联') }}</dd></div>
             <div><dt>问题类型</dt><dd><span class="ticket-category">{{ ticket.category }}</span></dd></div>
-            <div><dt>业务影响</dt><dd><span :class="['ticket-impact', { urgent: ticket.urgency === 'urgent' }]">{{ impactScopeLabel[ticket.impact_scope] }}</span><small>{{ urgencyLabel[ticket.urgency] }} · 报障人自述，非正式优先级</small></dd></div>
-            <div><dt>优先级 / SLA</dt><dd class="ticket-muted">未配置</dd></div>
+            <div><dt>业务影响</dt><dd><span :class="['ticket-impact', { urgent: ticket.urgency === 'urgent' }]">{{ impactScopeLabel[ticket.impact_scope] }}</span><small>{{ urgencyLabel[ticket.urgency] }} · 人工登记</small></dd></div>
+            <div><dt>优先级 / SLA</dt><dd class="ticket-muted">暂未提供</dd></div>
             <div class="ticket-description-field"><dt>问题描述</dt><dd><p>{{ ticket.description }}</p></dd></div>
           </dl>
         </div>
@@ -101,7 +101,7 @@ const stages = ['工单发起', '工单受理', '原因定位', '解决方案', 
           <div class="ticket-progress-content">
             <ApiErrorNotice v-if="canNotes" :error="notes.error"><el-button size="small" @click="noteReader.refresh()">重试内部记录</el-button></ApiErrorNotice>
             <ApiErrorNotice v-if="canComments" :error="comments.error"><el-button size="small" @click="commentReader.refresh()">重试客户沟通</el-button></ApiErrorNotice>
-            <p v-if="loadingActivity" class="ticket-muted" role="status">正在读取记录，不代表没有动态。</p>
+            <p v-if="loadingActivity" class="ticket-muted" role="status">正在读取处理进展记录…</p>
             <ol class="ticket-activity-list"><li v-for="item in activity" :key="item.id"><time :datetime="item.time">{{ displayTime(item.time) }}</time><div :class="['ticket-activity-title', item.kind]">{{ item.title }}<small v-if="item.author">{{ item.author }}</small></div><p>{{ item.text }}</p></li></ol>
           </div>
           <footer class="ticket-card-links"><span>{{ activityScope }}<template v-if="notes.page?.has_more || comments.page?.has_more"> · 更早记录请查看全部</template></span><div><el-button v-if="canNotes" link type="primary" @click="emit('notes')">全部内部记录</el-button><el-button v-if="canComments" link type="primary" @click="emit('comments')">客户沟通</el-button><el-button link type="primary" :disabled="loadingActivity" @click="refresh">刷新动态</el-button></div></footer>
@@ -122,15 +122,15 @@ const stages = ['工单发起', '工单受理', '原因定位', '解决方案', 
           </div>
           <footer v-if="canWorklogs" class="ticket-hours-footer">
             <div class="ticket-hours-total"><span>本页累计：<strong>{{ summary ? formatWorklogDuration(summary.totalMillis) : '— · 尚未读取' }}</strong></span><span v-if="summary?.count">处理 {{ formatWorklogDuration(handling) }} · 路程 {{ formatWorklogDuration(commute) }}</span></div>
-            <p>{{ worklogScope }}；实填区间相加，不扣除重叠，不代表核定工时或费用。</p>
+            <p>{{ worklogScope }}；按实际填报时段汇总，计费核算以商务结算规则为准。</p>
             <div class="ticket-hours-pagination"><el-button v-if="worklogs.paged" size="small" :disabled="Boolean(worklogs.busy)" @click="worklogReader.refresh()">返回第一页</el-button><el-button v-if="worklogs.page?.has_more" size="small" :disabled="Boolean(worklogs.busy)" @click="worklogReader.refresh(true)">下一页</el-button><el-button size="small" type="primary" plain @click="emit('worklogs')">{{ can('worklogs:write_own') ? '填报 / 管理本人工时' : '查看本人工时' }}</el-button></div>
           </footer>
         </section>
       </div>
     </div>
-    <footer class="ticket-overview-bottom"><span>转派、挂起与协助申请待正式流程接入。</span><div class="ticket-overview-actions"><el-button disabled title="挂起状态与SLA暂停规则尚未接入">挂起</el-button><el-button disabled title="协助申请与分派规则尚未接入">申请协助</el-button><el-button v-if="canNotes && can('ticket_notes:write_internal')" type="primary" @click="emit('notes')">新增处理记录</el-button><el-button v-else-if="canComments && can('ticket_comments:write')" type="primary" @click="emit('comments')">追加沟通记录</el-button><el-button @click="emit('close')">返回列表</el-button></div></footer>
+    <footer class="ticket-overview-bottom"><span>当前已完成故障受理入库；工单分派流转与 SLA 考核计时将在 ITSM 流程启用后自动关联。</span><div class="ticket-overview-actions"><el-button disabled title="挂起状态与SLA暂停规则尚未接入">挂起</el-button><el-button disabled title="协助申请与分派规则尚未接入">申请协助</el-button><el-button v-if="canNotes && can('ticket_notes:write_internal')" type="primary" @click="emit('notes')">新增处理记录</el-button><el-button v-else-if="canComments && can('ticket_comments:write')" type="primary" @click="emit('comments')">追加沟通记录</el-button><el-button @click="emit('close')">返回列表</el-button></div></footer>
     <section class="ticket-detail-card ticket-supporting-card"><details><summary>报障照片与登记凭证 <span>查看附件、登记操作与记录标识</span></summary><div class="ticket-supporting-content"><slot /></div></details></section>
-    <p class="ticket-record-explanation">正式处理状态与 SLA 时限尚未配置；备注、沟通和工时记录不会自动推进阶段。</p>
+    <p class="ticket-record-explanation">当前已完成故障受理入库；工单分派流转与 SLA 考核计时将在 ITSM 流程启用后自动关联。</p>
     <p v-if="canNotes" class="ticket-record-explanation">新增处理记录保存为仅内部可见的备注；需要客户查看的内容请使用“客户沟通”。</p>
   </div>
   <p v-else role="status">当前身份或租户无法查看此工单，请返回列表重新查询。</p>

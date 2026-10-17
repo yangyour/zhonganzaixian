@@ -21,7 +21,7 @@ onUnmounted(() => { window.removeEventListener('offline', update); window.remove
   </div>
 </template>
 <style scoped>
-.connection-notice:has(p){position:static;overflow-wrap:anywhere}
+.connection-notice:has(p){position:static;margin:0 0 12px;padding:10px 14px;border:1px solid #e7c37c;border-radius:4px;background:#fff4da;color:#6e4815;overflow-wrap:anywhere}
 .connection-notice.reconnected:has(p){background:#eff6ff;border-color:#bed3ea;color:#245580}
 .connection-recovered summary{cursor:pointer;min-height:32px;padding:4px 0;font-size:14px;line-height:1.7}
 .connection-recovered summary span{margin-left:12px;font-size:12px;text-decoration:underline;text-underline-offset:3px}

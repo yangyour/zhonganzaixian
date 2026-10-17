@@ -34,30 +34,30 @@ onUnmounted(() => { unregisterContextGuard(); writer.dispose(); window.removeEve
 defineExpose({ prepare, hasUnresolved: writer.unresolved })
 </script>
 <template>
-  <el-drawer v-model="open" title="登记手工来源事件" size="820px" class="manual-incident-editor" :close-on-click-modal="false">
-    <el-alert type="warning" :closable="false" title="仅登记电话、现场等手工来源事实；不自动建单、不补优先级/SLA，也不根据监控正常自动恢复。请勿输入密码或token。" />
+  <el-drawer v-model="open" title="新建手工事件登记" size="820px" class="manual-incident-editor" :close-on-click-modal="false">
+    <el-alert type="warning" :closable="false" title="用于登记电话报障或现场巡检发现的异常事件；记录与自动监控告警独立存放，请勿输入账号密码或敏感凭据。" />
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前授权已失效，原范围输入已清除" />
     <template v-else>
       <ApiErrorNotice :error="state.error" />
-      <el-alert v-if="state.attempt?.state === 'uncertain'" type="warning" :closable="false" title="提交结果尚未确认。原内容、关联资产、版本和幂等键已保留，请勿刷新浏览器；只读查询不会自动重发。" />
-      <el-alert v-if="state.attempt?.state === 'rejected'" type="warning" :closable="false" title="请求被拒绝，未自动重试。当前输入保留，请核对关联资产后明确采用基准，再提交新请求。" />
-      <div class="manual-actions"><el-button v-if="state.asset" :disabled="Boolean(state.busy)" @click="writer.refreshAsset()">只读刷新关联资产</el-button><el-button v-if="state.attempt?.state === 'uncertain'" type="warning" :disabled="Boolean(state.busy)" @click="retry">使用完全相同原请求重试</el-button><el-button v-if="state.editing && state.asset && !writer.unresolved()" :disabled="Boolean(state.busy)" @click="adopt">读取并明确采用最新资产基准</el-button></div>
-      <p v-if="state.asset">固定关联基准：{{ state.asset.name }} · v{{ state.asset.version }}<small class="manual-asset-id">{{ state.asset.id }}</small></p>
-      <p v-if="state.lastAssetRead">最近只读所见：{{ state.lastAssetRead.name }} · v{{ state.lastAssetRead.version }}。刷新不替换固定基准</p>
-      <el-alert v-if="state.asset && state.lastAssetRead && state.asset.version !== state.lastAssetRead.version" type="warning" :closable="false" title="已发现资产新版本，旧基准的新提交已阻止。原请求重试仍使用原内容；不得自动改版本重发。" />
-      <el-alert v-if="state.receipt" type="success" :closable="false" :title="'确认登记回执：' + state.receipt.id + ' · 手工来源 · 仅登记，自述未核验'" />
-      <p v-if="state.receipt">{{ state.verifiedReceipt ? '详情已只读核对，原登记一致' : '已有确认成功回执，后续详情尚未成功核对；不要新建重复登记' }}<el-button text :disabled="Boolean(state.busy)" @click="writer.refreshReceipt()">只读核对原登记</el-button></p>
+      <el-alert v-if="state.attempt?.state === 'uncertain'" type="warning" :closable="false" title="提交结果待确认：系统已锁定当前填写内容、关联资产版本与幂等标识，请点击“使用完全相同原请求重试”继续处理。" />
+      <el-alert v-if="state.attempt?.state === 'rejected'" type="warning" :closable="false" title="提交未通过，表单内容已保留。请核对关联资产版本并采用最新基准后重新提交。" />
+      <div class="manual-actions"><el-button v-if="state.asset" :disabled="Boolean(state.busy)" @click="writer.refreshAsset()">刷新关联资产</el-button><el-button v-if="state.attempt?.state === 'uncertain'" type="warning" :disabled="Boolean(state.busy)" @click="retry">使用完全相同原请求重试</el-button><el-button v-if="state.editing && state.asset && !writer.unresolved()" :disabled="Boolean(state.busy)" @click="adopt">采用最新资产版本</el-button></div>
+      <p v-if="state.asset">当前关联资产：{{ state.asset.name }} · v{{ state.asset.version }}<small class="manual-asset-id">{{ state.asset.id }}</small></p>
+      <p v-if="state.lastAssetRead">最新读取版本：{{ state.lastAssetRead.name }} · v{{ state.lastAssetRead.version }}（刷新不会自动替换已选版本基准）</p>
+      <el-alert v-if="state.asset && state.lastAssetRead && state.asset.version !== state.lastAssetRead.version" type="warning" :closable="false" title="检测到关联资产版本已更新，请先点击“采用最新资产版本”确认后再提交。" />
+      <el-alert v-if="state.receipt" type="success" :closable="false" :title="'登记成功回执：' + state.receipt.id + ' · 人工登记记录'" />
+      <p v-if="state.receipt">{{ state.verifiedReceipt ? '已核对登记记录，数据一致' : '已收到登记回执，可点击右侧按钮核对详情，请勿重复新建' }}<el-button text :disabled="Boolean(state.busy)" @click="writer.refreshReceipt()">核对登记记录</el-button></p>
       <el-form v-if="state.editing" label-position="top" @submit.prevent="save">
-        <el-form-item label="原始标题（1至200字符，保留原文与空格）"><el-input v-model="form.title" :disabled="locked" aria-label="手工事件原始标题" /></el-form-item>
-        <el-form-item label="明确严重级别（不默认、不等同工单优先级）"><el-select v-model="form.severity" :disabled="locked" placeholder="尚未选择" aria-label="手工事件严重级别"><el-option v-for="(label, value) in manualSeverityLabels" :key="value" :value="value" :label="label" /></el-select></el-form-item>
-        <h3>关联资产（当前授权租户）</h3><p class="field-help">按名称或管理地址查询，只列真实读取结果。选择时重新读取资产，固定其所见版本；不会沿用监控状态作为事件状态。</p>
-        <div class="manual-asset-search"><el-input v-model="query" :disabled="locked" aria-label="手工登记关联资产搜索" placeholder="名称或管理地址，可留空" /><el-button :disabled="locked || query.length > 100" @click="writer.search(query)">只读查询资产</el-button><el-button :disabled="locked || !state.nextAssetCursor || query !== state.assetSearch" @click="writer.search(query, true)">下一页资产</el-button></div>
-        <p v-if="!state.choices" class="field-help">候选资产尚未成功读取，不能视为没有可选资产</p><p v-else-if="!state.choices.length">本页没有匹配资产</p>
-        <div class="manual-asset-options"><button v-for="item in state.choices || []" :key="item.id" type="button" :disabled="locked" :aria-pressed="state.asset?.id === item.id" @click="writer.choose(item.id)"><strong>{{ item.name }}</strong><span>v{{ item.version }} · 点击后重新核对</span><small>{{ item.id }}</small></button></div>
-        <p v-if="validation" role="alert" class="manual-validation">{{ validation }}</p><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.asset || !state.lastAssetRead">明确提交手工登记</el-button>
+        <el-form-item label="事件标题（1–200 字符）"><el-input v-model="form.title" :disabled="locked" aria-label="手工事件原始标题" /></el-form-item>
+        <el-form-item label="严重级别"><el-select v-model="form.severity" :disabled="locked" placeholder="请选择严重级别" aria-label="手工事件严重级别"><el-option v-for="(label, value) in manualSeverityLabels" :key="value" :value="value" :label="label" /></el-select></el-form-item>
+        <h3>关联资产（当前租户）</h3><p class="field-help">支持按资产名称或管理地址检索，选择后将锁定当前资产版本快照。</p>
+        <div class="manual-asset-search"><el-input v-model="query" :disabled="locked" aria-label="手工登记关联资产搜索" placeholder="输入资产名称或管理地址检索" /><el-button :disabled="locked || query.length > 100" @click="writer.search(query)">查询资产</el-button><el-button :disabled="locked || !state.nextAssetCursor || query !== state.assetSearch" @click="writer.search(query, true)">下一页</el-button></div>
+        <p v-if="!state.choices" class="field-help">候选资产尚未成功读取，不能视为没有可选资产</p><p v-else-if="!state.choices.length">当前条件下无匹配资产</p>
+        <div class="manual-asset-options"><button v-for="item in state.choices || []" :key="item.id" type="button" :disabled="locked" :aria-pressed="state.asset?.id === item.id" @click="writer.choose(item.id)"><strong>{{ item.name }}</strong><span>v{{ item.version }} · 点击关联并核对版本</span><small>{{ item.id }}</small></button></div>
+        <p v-if="validation" role="alert" class="manual-validation">{{ validation }}</p><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.asset || !state.lastAssetRead">提交手工登记</el-button>
       </el-form>
     </template>
-    <template #footer><el-button @click="open = false">暂时收起，保留本页内容</el-button><p class="field-help">收起不撤销已发送请求；未确认结果须处理原请求。强制会话失效会清除受保护上下文。</p></template>
+    <template #footer><el-button @click="open = false">暂时收起，保留本页内容</el-button><p class="field-help">收起窗口不会中断已发起的提交请求；切换租户或会话失效将清空未提交草稿。</p></template>
   </el-drawer>
 </template>
 <style>

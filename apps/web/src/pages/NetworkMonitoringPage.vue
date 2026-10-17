@@ -67,7 +67,7 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
 <template>
   <section class="network-page">
     <p v-if="permitted" class="network-policy" aria-label="监控自动刷新设置">{{refreshPolicyLabel}} · 设置每30秒重新核对</p><ApiErrorNotice v-if="permitted" :error="refreshPolicyError" @retry="refreshPolicy"/>
-    <header class="network-heading"><div><div class="title-with-context"><h1>基础网络监控</h1><span class="context-badge">{{session?.tenant.name}}</span></div><details class="boundary-details"><summary>页面说明</summary><p>持续查看明确绑定设备的连通性、延迟、丢包和端口状态；IP可达不代表设备身份或正式服务健康。</p></details></div><el-button :loading="loading" :disabled="!permitted" @click="refresh">刷新监控</el-button></header>
+    <header class="network-heading"><div><div class="title-with-context"><h1>基础网络监控</h1><span class="context-badge">{{session?.tenant.name}}</span></div><details class="boundary-details"><summary>页面说明</summary><p>实时展示已绑定网络设备的连通性、响应延迟、丢包率及端口状态（当前页统计）。未采集指标显示为“待采集”，不计入正常或零值统计；人工录入或预置台账资产暂未开通实时采集，无监控时序指标。</p></details></div><el-button :loading="loading" :disabled="!permitted" @click="refresh">刷新监控</el-button></header>
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前没有资产读取权限" />
     <template v-else>
       <div class="feature-summary network-summary"><article><span>绑定设备</span><strong>{{snapshot?snapshot.devices.length:'—'}}</strong><small>当前租户明确授权范围</small></article><article class="success"><span>ICMP 可达</span><strong>{{snapshot&&!expired?reachableCount:'—'}}</strong><small>仅表示本次 IP 探测结果</small></article><article><span>资源采集已接入</span><strong>{{snapshot?resourceCount:'—'}}</strong><small>CPU / 内存逐设备接入</small></article><article><span>监控刷新</span><strong>{{refreshInterval??'暂停'}} <small v-if="refreshInterval!==null">秒</small></strong><small>后台暂停 · 采集间隔60秒</small></article></div>
@@ -76,7 +76,7 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
       <p v-if="loading&&!snapshot" role="status">正在读取监控数据…</p>
       <p v-if="snapshot&&!snapshot.devices.length" class="network-empty">当前租户尚未绑定基础监控设备。</p>
       <section class="panel network-device-workspace"><div class="network-list-toolbar"><div class="network-view-tabs" aria-label="监控显示方式"><button type="button" :class="{active:monitorView==='list'}" :aria-pressed="monitorView==='list'" @click="monitorView='list'">设备列表</button><button type="button" :class="{active:monitorView==='cards'}" :aria-pressed="monitorView==='cards'" @click="monitorView='cards'">监控卡片</button></div><input v-model="deviceQuery" aria-label="搜索监控设备" placeholder="搜索设备 / IP / 型号" /><span>告警规则待确认</span></div>
-      <div v-if="monitorView==='list'" class="proto-table-wrap"><table class="proto-table network-device-table"><thead><tr><th>设备 / 型号</th><th>管理 IP</th><th>连通性</th><th>响应延迟</th><th>丢包率</th><th>CPU / 内存</th><th>最近记录</th><th>操作</th></tr></thead><tbody><tr v-for="d in filteredDevices" :key="d.asset_id" class="network-device-row" :class="{chosen:selected===d.asset_id}"><td><strong>{{d.name}}</strong><small>{{d.brand}} {{d.model}}</small></td><td class="mono">{{d.management_ip}}</td><td><span class="network-badge" :class="{reachable:display(d,'icmp')==='可达'}">{{display(d,'icmp')}}</span></td><td>{{display(d,'latency')}}</td><td>{{display(d,'loss')}}</td><td><template v-if="d.vendor_metrics_status==='PARTIAL_API'"><button type="button" class="resource-inline-link" aria-label="CPU 历史" @click="selectResource(d.asset_id,'cpu')">CPU {{resourceText(d.asset_id,'cpu')}}</button><button type="button" class="resource-inline-link" aria-label="内存历史" @click="selectResource(d.asset_id,'memory')">内存 {{resourceText(d.asset_id,'memory')}}</button><small v-if="resources[d.asset_id]?.data.state!=='FRESH'" class="network-resource-reason">{{resourceReason(d.asset_id)}}</small><small v-if="resources[d.asset_id]?.data.tls_mode==='TEST_INSECURE'" class="tls-note">测试模式：已临时跳过证书校验</small></template><span v-else class="muted">— <small>未接入</small></span></td><td><small>{{time(d.metrics.icmp.recorded_at)}}</small></td><td><el-button link type="primary" @click="selectDevice(d.asset_id)">查看历史</el-button></td></tr><tr v-if="!filteredDevices.length"><td colspan="8" class="proto-empty">{{loading?'正在读取监控设备…':snapshot?'当前筛选下没有设备':'监控数据尚未读取成功'}}</td></tr></tbody></table></div>
+      <div v-if="monitorView==='list'" class="proto-table-wrap"><table class="proto-table network-device-table"><thead><tr><th>设备 / 型号</th><th>管理 IP</th><th>连通性</th><th>响应延迟</th><th>丢包率</th><th>CPU / 内存</th><th>最近记录</th><th>操作</th></tr></thead><tbody><tr v-for="d in filteredDevices" :key="d.asset_id" class="network-device-row" :class="{chosen:selected===d.asset_id}"><td><strong>{{d.name}}</strong><small>{{d.brand}} {{d.model}}</small></td><td class="mono">{{d.management_ip}}</td><td><span class="network-badge" :class="{reachable:display(d,'icmp')==='可达'}">{{display(d,'icmp')}}</span></td><td>{{display(d,'latency')}}</td><td>{{display(d,'loss')}}</td><td><template v-if="d.vendor_metrics_status==='PARTIAL_API'"><button type="button" class="resource-inline-link" aria-label="CPU 历史" @click="selectResource(d.asset_id,'cpu')">CPU {{resourceText(d.asset_id,'cpu')}}</button><button type="button" class="resource-inline-link" aria-label="内存历史" @click="selectResource(d.asset_id,'memory')">内存 {{resourceText(d.asset_id,'memory')}}</button><small v-if="resources[d.asset_id]?.data.state!=='FRESH'" class="network-resource-reason">{{resourceReason(d.asset_id)}}</small><small v-if="resources[d.asset_id]?.data.tls_mode==='TEST_INSECURE'" class="tls-note">测试模式：已临时跳过证书校验</small></template><span v-else class="muted">— <small>待采集</small></span></td><td><small>{{time(d.metrics.icmp.recorded_at)}}</small></td><td><el-button link type="primary" @click="selectDevice(d.asset_id)">查看历史</el-button></td></tr><tr v-if="!filteredDevices.length"><td colspan="8" class="proto-empty">{{loading?'正在读取监控设备…':snapshot?'当前筛选下没有设备':'监控数据尚未读取成功'}}</td></tr></tbody></table></div>
       <div v-else-if="snapshot" class="network-grid">
         <article v-for="d in filteredDevices" :key="d.asset_id" class="device-card" :class="{chosen:selected===d.asset_id}">
           <div class="device-head"><span class="network-badge" :class="{reachable:display(d,'icmp')==='可达'}">{{display(d,'icmp')}}</span><small>IP 基础探测</small></div>
@@ -91,7 +91,7 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
           <el-button :type="selected===d.asset_id?'primary':'default'" @click="selectDevice(d.asset_id)">查看历史 · {{d.management_ip}}</el-button>
         </article>
       </div>
-      <div class="network-table-footer"><span>已显示 {{filteredDevices.length}} 台 / 当前绑定 {{snapshot?.devices.length??'—'}} 台</span><span>不接受外部 hostid / itemid，不跨租户读取</span></div></section>
+      <div class="network-table-footer"><span>当前页统计：已显示 {{filteredDevices.length}} 台 / 当前绑定 {{snapshot?.devices.length??'—'}} 台</span><span>仅读取当前租户授权绑定设备</span></div></section>
       <section class="network-history">
         <div class="history-heading"><div><h2>采样历史</h2><p>选择设备后查看。缺失采样会留空，不补零、不延续旧值。</p></div><div class="history-controls"><label>指标<select v-model="metric"><option value="latency">响应延迟</option><option value="loss">丢包率</option><option value="icmp">ICMP响应</option><option value="tcp_22">TCP 22</option><option value="tcp_80">TCP 80</option><option value="tcp_443">TCP 443</option><template v-if="selectedHasResources"><option value="cpu">CPU 使用率</option><option value="memory">内存使用率</option></template></select></label><label>时间<select v-model="window"><option value="HOUR_1">最近1小时</option><option value="HOURS_24">最近24小时</option></select></label></div></div>
         <p v-if="!selected" class="network-empty">请选择上方一台设备查看历史。</p>
@@ -110,10 +110,59 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
   </section>
 </template>
 <style scoped>
-.resource-panel{border-top:1px solid #e3eaf2;margin-top:16px;padding-top:16px}.resource-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}.resource-stats span{font-size:12px;color:#64748b;display:block}.resource-stats strong{display:block;font-size:21px;color:#244260;margin:7px 0 10px}.resource-panel p{font-size:11px;color:#64748b;line-height:1.6;margin:8px 0 0;overflow-wrap:anywhere}.resource-panel .tls-note{color:#92610c}
-.network-page{max-width:1440px;margin:auto;color:#20334c}.network-heading,.history-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:22px}.network-heading h1{font-size:28px;margin:5px 0 8px}.network-heading p,.history-heading p{color:#64748b;margin:0;font-size:14px}.network-heading .eyebrow{font-size:11px;letter-spacing:2px;color:#3972a6}.network-context{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;background:#edf4fb;padding:12px 16px;border-radius:10px;margin:18px 0;font-size:13px;color:#486580}.network-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;gap:18px;margin:20px 0}.device-card,.network-history{border:1px solid #dce5ee;border-radius:14px;background:white;padding:22px;min-width:0}.device-card.chosen{border-color:#438dcf;box-shadow:0 0 0 1px #438dcf}.device-head{display:flex;justify-content:space-between;align-items:center}.device-head small{color:#7a899b}.network-badge{padding:5px 10px;border-radius:20px;background:#fff2dc;color:#8d6222;font-size:12px}.network-badge.reachable{background:#e9f5ef;color:#24724e}.device-card h2{font-size:18px;margin:20px 0 8px;overflow-wrap:anywhere}.device-model,.sample-time{font-size:12px;color:#64748b;overflow-wrap:anywhere}.device-ip{font-size:20px;font-variant-numeric:tabular-nums;margin:14px 0}.network-stats{display:grid;grid-template-columns:1fr 1fr;padding:16px 0;border-top:1px solid #edf1f5;border-bottom:1px solid #edf1f5;gap:10px}.network-stats span{display:block;font-size:12px;color:#718298}.network-stats strong{display:block;font-size:18px;margin-top:8px;overflow-wrap:anywhere}.network-ports{display:grid;grid-template-columns:1fr 1fr;row-gap:10px;font-size:13px}.network-ports dt{color:#73859a}.network-ports dd{margin:0;text-align:right}.sample-time{margin:18px 0}.device-card .el-button{width:100%;font-size:12px}.network-history h2{font-size:19px;margin:0 0 8px}.history-controls{display:flex;gap:12px}.history-controls label{font-size:12px;color:#52667d;display:grid;gap:5px}.history-controls select{padding:8px;border:1px solid #d4dfe9;border-radius:6px;background:white;color:#244260}.network-empty{padding:30px;text-align:center;color:#7b8da3;background:#f7f9fc;border-radius:8px;font-size:14px}.history-chart{width:100%;max-height:260px;background:#f8fbff;border-radius:8px}.history-caption{color:#6c7e92;font-size:12px;line-height:1.7}.history-table{overflow:auto}.history-table table{border-collapse:collapse;width:100%;font-size:13px}.history-table th,.history-table td{text-align:left;border-bottom:1px solid #edf1f5;padding:9px 12px}.history-table th{color:#64748b;background:#f7f9fc}@media(max-width:1350px){.network-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.network-grid{grid-template-columns:1fr}.network-heading,.history-heading{align-items:flex-start;flex-direction:column}.device-card,.network-history{padding:16px}.network-heading h1{font-size:24px}.history-controls{width:100%}.history-controls label{flex:1}.history-controls select{width:100%}}
-</style>
-
-<style scoped>
-.network-policy{font-size:12px;line-height:1.7;background:#edf5ff;color:#315b87;padding:9px 12px;border:1px solid #d9e7f7;border-radius:5px;margin:0 0 12px}
+.network-page{max-width:1440px;margin:auto;color:#20334c;min-width:0}
+.network-policy{font-size:12px;line-height:1.7;background:#edf5ff;color:#315b87;padding:9px 12px;border:1px solid #d9e7f7;border-radius:6px;margin:0 0 12px}
+.network-heading,.history-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:18px}
+.network-heading h1{font-size:22px;margin:0}
+.network-heading p,.history-heading p{color:#64748b;margin:4px 0 0;font-size:13px;line-height:1.6}
+.boundary-details{margin-top:6px;font-size:12px;color:#64748b}
+.boundary-details summary{cursor:pointer;font-weight:500;color:#475569}
+.network-device-workspace{padding:16px;margin:16px 0;border:1px solid #dce5ee;border-radius:10px;background:#fff;min-width:0}
+.network-list-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+.network-view-tabs{display:inline-flex;gap:6px}
+.network-view-tabs button{min-height:34px;padding:6px 12px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:#334155;font-size:12px;cursor:pointer}
+.network-view-tabs button.active{background:#eff6ff;border-color:#3b82f6;color:#1d4ed8;font-weight:500}
+.network-list-toolbar input{min-height:34px;padding:6px 12px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;min-width:220px}
+.network-list-toolbar span{font-size:12px;color:#64748b}
+.resource-inline-link{display:inline-block;margin:2px 6px 2px 0;padding:3px 8px;border:1px solid #d0dfef;border-radius:4px;background:#f8fbff;color:#1d5fa7;font-size:12px;cursor:pointer}
+.network-resource-reason{display:block;font-size:11px;color:#64748b;margin-top:4px}
+.tls-note{display:block;font-size:11px;color:#92610c;margin-top:4px}
+.network-table-footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid #edf1f5;font-size:12px;color:#64748b}
+.resource-panel{border-top:1px solid #e3eaf2;margin-top:16px;padding-top:16px}
+.resource-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.resource-stats span{font-size:12px;color:#64748b;display:block}
+.resource-stats strong{display:block;font-size:21px;color:#244260;margin:7px 0 10px}
+.resource-panel p{font-size:11px;color:#64748b;line-height:1.6;margin:8px 0 0;overflow-wrap:anywhere}
+.resource-panel .tls-note{color:#92610c}
+.network-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;gap:18px;margin:20px 0}
+.device-card,.network-history{border:1px solid #dce5ee;border-radius:10px;background:white;padding:20px;min-width:0}
+.device-card.chosen,.network-device-row.chosen{border-color:#438dcf;background:#f8fbff}
+.device-head{display:flex;justify-content:space-between;align-items:center}
+.device-head small{color:#7a899b}
+.network-badge{display:inline-block;padding:4px 10px;border-radius:20px;background:#fff2dc;color:#8d6222;font-size:12px}
+.network-badge.reachable{background:#e9f5ef;color:#24724e}
+.device-card h2{font-size:18px;margin:16px 0 8px;overflow-wrap:anywhere}
+.device-model,.sample-time{font-size:12px;color:#64748b;overflow-wrap:anywhere}
+.device-ip{font-size:20px;font-variant-numeric:tabular-nums;margin:14px 0}
+.network-stats{display:grid;grid-template-columns:1fr 1fr;padding:16px 0;border-top:1px solid #edf1f5;border-bottom:1px solid #edf1f5;gap:10px}
+.network-stats span{display:block;font-size:12px;color:#718298}
+.network-stats strong{display:block;font-size:18px;margin-top:8px;overflow-wrap:anywhere}
+.network-ports{display:grid;grid-template-columns:1fr 1fr;row-gap:10px;font-size:13px}
+.network-ports dt{color:#73859a}
+.network-ports dd{margin:0;text-align:right}
+.sample-time{margin:16px 0}
+.device-card .el-button{width:100%;font-size:12px}
+.network-history h2{font-size:18px;margin:0 0 6px}
+.history-controls{display:flex;gap:12px}
+.history-controls label{font-size:12px;color:#52667d;display:grid;gap:5px}
+.history-controls select{padding:8px;border:1px solid #d4dfe9;border-radius:6px;background:white;color:#244260}
+.network-empty{padding:30px;text-align:center;color:#7b8da3;background:#f7f9fc;border-radius:8px;font-size:14px}
+.history-chart{width:100%;max-height:260px;background:#f8fbff;border-radius:8px}
+.history-caption{color:#6c7e92;font-size:12px;line-height:1.7}
+.history-table{overflow:auto}
+.history-table table{border-collapse:collapse;width:100%;font-size:13px}
+.history-table th,.history-table td{text-align:left;border-bottom:1px solid #edf1f5;padding:9px 12px}
+.history-table th{color:#64748b;background:#f7f9fc}
+@media(max-width:1350px){.network-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.network-grid{grid-template-columns:1fr}.network-heading,.history-heading{align-items:flex-start;flex-direction:column}.device-card,.network-history,.network-device-workspace{padding:14px}.network-heading h1{font-size:20px}.history-controls{width:100%}.history-controls label{flex:1}.history-controls select,.network-list-toolbar input{width:100%}.network-view-tabs button,.network-list-toolbar input{min-height:44px}}
 </style>

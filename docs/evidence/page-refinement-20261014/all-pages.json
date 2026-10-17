@@ -1,0 +1,635 @@
+{
+  "phase": "candidate",
+  "status": "PASSED",
+  "pages": [
+    {
+      "route": "/login",
+      "role": "anonymous",
+      "viewports": [
+        1440
+      ],
+      "status": "PASSED"
+    },
+    {
+      "route": "/account",
+      "file": "AccountPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "我的账号",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "我的账号",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/identity/users",
+      "file": "IdentityUsersPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "用户与成员授权",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "用户与成员授权",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/identity/roles",
+      "file": "IdentityRolesPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "角色与权限",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "角色与权限",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/identity/settings",
+      "file": "IdentitySettingsPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "身份认证设置",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "身份认证设置",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/dashboard",
+      "file": "DashboardPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "运营总览",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "运营总览",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/assets",
+      "file": "AssetsPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "资产管理",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "资产管理",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/network-monitoring",
+      "file": "NetworkMonitoringPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "基础网络监控",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "基础网络监控",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/manual-incidents",
+      "file": "ManualIncidentsPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "手工来源事件登记",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "手工来源事件登记",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/tickets",
+      "file": "TicketsPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "报障与受理",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "报障与受理",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/my-notification-preferences",
+      "file": "OwnNotificationPreferencesPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "我的通知偏好请求",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "我的通知偏好请求",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/my-export-messages",
+      "file": "ExportInboxPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "我的导出消息",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "我的导出消息",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/asset-export-jobs",
+      "file": "AssetExportJobsPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "台账导出准备",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "台账导出准备",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/my-worklogs",
+      "file": "OwnWorklogsPage.vue",
+      "role": "msp",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "我的实填工时",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "我的实填工时",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/sla-scenarios",
+      "file": "SlaScenariosPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "SLA 显式对照",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "SLA 显式对照",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/configurations",
+      "file": "ConfigurationsPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "配置确认登记",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "配置确认登记",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/threshold-diagnostics",
+      "file": "ThresholdDiagnosticsPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "阈值候选诊断",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "阈值候选诊断",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/contact-imports",
+      "file": "ContactImportsPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "联系人批量新建与作业",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "联系人批量新建与作业",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/contact-import-preview",
+      "file": "ContactImportPreviewPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "联系人导入格式预览",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "联系人导入格式预览",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/inspection-templates",
+      "file": "InspectionTemplatesPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "巡检模板候选",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "巡检模板候选",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/backup-plan-drafts",
+      "file": "BackupPlanDraftsPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "每日备份计划草稿",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "每日备份计划草稿",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/change-notice-drafts",
+      "file": "ChangeNoticeDraftsPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "变更报备草稿",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "变更报备草稿",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/inspection-source-collections",
+      "file": "InspectionSourceCollectionsPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "巡检来源集合草稿",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "巡检来源集合草稿",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/inspection-worksheets",
+      "file": "InspectionWorksheetsPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "人工巡检执行单",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "人工巡检执行单",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/customer-contacts",
+      "file": "CustomerContactsPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "客户联系人",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "客户联系人",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/operational-comparison",
+      "file": "OperationalComparisonPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "经营样本与人力对照",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "经营样本与人力对照",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/capacity-estimates",
+      "file": "CapacityEstimatePage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "容量与 Proxy 缓冲估算",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "容量与 Proxy 缓冲估算",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/capability-catalog",
+      "file": "CapabilityCatalogPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "代码能力声明核对",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "代码能力声明核对",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/tenant-inventory",
+      "file": "TenantInventoryPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "租户登记资源",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "租户登记资源",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/audit",
+      "file": "AuditPage.vue",
+      "role": "padmin",
+      "viewports": [
+        {
+          "width": 1440,
+          "scrollWidth": 1440,
+          "heading": "审计检索与区间校验",
+          "apiErrors": 0
+        },
+        {
+          "width": 390,
+          "scrollWidth": 390,
+          "heading": "审计检索与区间校验",
+          "apiErrors": 0
+        }
+      ],
+      "status": "PASSED",
+      "issues": []
+    },
+    {
+      "route": "/ui-page-not-found-check",
+      "role": "padmin",
+      "viewports": [
+        390
+      ],
+      "status": "PASSED"
+    }
+  ],
+  "page_errors": [],
+  "unexpected_writes": [],
+  "credentials_output": false,
+  "completed_at": "2026-10-14T10:19:26.513Z"
+}

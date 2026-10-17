@@ -1,0 +1,12 @@
+{
+  "status": "PASSED",
+  "checks": [
+    "users-table",
+    "account-drawer",
+    "mobile-editor-close",
+    "roles-table-readonly-drawer"
+  ],
+  "page_errors": [],
+  "business_writes": 0,
+  "credentials_output": false
+}

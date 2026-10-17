@@ -1,0 +1,13 @@
+{
+  "status": "FAILED",
+  "created_zero_grant_role": true,
+  "created_synthetic_user": false,
+  "access_unavailable_verified": false,
+  "cleanup_user_disabled": false,
+  "cleanup_role_disabled": true,
+  "credentials_output": false,
+  "failure": {
+    "stage": "create-synthetic-user",
+    "error": "TimeoutError"
+  }
+}

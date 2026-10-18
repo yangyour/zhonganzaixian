@@ -1,5 +1,9 @@
 # MOP 实施状态
 
+## 2026-10-18 D07/D11/D16工单通知意图与站内消息持久化及真实验证
+
+在指定远程测试库（PG17.9 `mop_test`）经项目SSH隧道追加V34（`mop_notification_intent`、`mop_notification_message`及来源/人数/接收人资格/首次已读守卫），一次应用（`migrations_executed=1`）、重复应用（`migrations_executed=0`）与只读结构权限核验通过。新增`TicketNotificationPlanner`、持久化中继与读取/首次已读接口（API0.54.0：`/api/v1/my/notifications`、`POST /api/v1/my/notifications/{id}/read`、`/api/v1/notification-intents`）及前端`TicketNotificationsPage.vue`。未确认的Q09/Q15接收人规则保留`pending_reasons`（如`Q15_ONCALL_QUEUE_RECIPIENTS`、`Q15_ESCALATION_CHAIN`、`Q09_SERVICE_MANAGER_ROLE`），外部渠道保持`NOT_CONFIGURED`（`Q14_CHANNEL_MATRIX`、`Q18_PROVIDER_CREDENTIALS`），客户消息屏蔽内部处理人。真实PG测试`PostgresTicketNotificationIntegrationTest`（2项）与`PostgresTicketWorkflowIntegrationTest`（2项）通过；迁移策略41项、通知规划/控制器17项、API全量1845项、契约135项、前端156文件/2204项及生产构建通过。外部企微/短信/语音/邮件派发、测试站发布切换与128项正式合同验收仍NOT_RUN；证据见[ticket-notification-intents-20261018.json](evidence/ticket-notification-intents-20261018.json)。
+
 ## 2026-10-18 D07工单持久化与真实测试环境验证
 
 在指定远程测试库通过项目SSH隧道按冻结顺序应用V29—V33，V33新增只追加工单处理事件、outbox和耐久时钟任务，V33一次应用/重复0次/只读结构权限核验通过。D07真实PG测试完成2项：完整处理链、客户投影、版本冲突、跨租户404、事件与outbox同事务；单元/控制器/配置策略共58项通过，完整API测试1828项通过，Web类型检查、生产构建和135项契约测试通过。企业微信外部送达、API/Web发布切换和完整合同验收仍未完成；证据见[ticket-workflow-integration-20261018.json](evidence/ticket-workflow-integration-20261018.json)与[ticket-workflow-final-validation-20261018.json](evidence/ticket-workflow-final-validation-20261018.json)。

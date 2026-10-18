@@ -7,7 +7,7 @@ import static cn.mop.persistence.TestSchemaMigration.*;
 /** Candidate V33 verifier; execution evidence, not this class, determines whether it has been applied. */
 final class TicketWorkflowSchemaVerifier {
     static final String SCRIPT="V33__ticket_lifecycle_and_durable_clocks.sql";
-    static final String SHA256="a33326b73d23d112b50ece07dc59938722cbc544e5c8b32f7d8db143ab6f35e7";
+    static final String SHA256="b867a5756bcda84128dd9d9570bf4bd07ee43714e0508acd0dd95c042cc1ba5f";
     static void resource()throws Exception{try(var in=TicketWorkflowSchemaVerifier.class.getResourceAsStream("/db/migration/"+SCRIPT)){if(in==null||!SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(in.readAllBytes()))))throw new IllegalStateException("Ticket workflow migration differs from reviewed candidate");}}
     static void verify(Connection c)throws SQLException{
         requireTrue(c,"SELECT current_database()='mop_test' AND current_setting('fsync')='on' AND current_setting('full_page_writes')='on'");

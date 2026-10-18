@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { ElTable, ElTableColumn } from 'element-plus'
 import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 import { api } from '../api/client'
 import { can, contextGeneration, session } from '../stores/session'

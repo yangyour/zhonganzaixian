@@ -24,16 +24,27 @@ SLA按明确优先级/档位/参数冻结，工作时段推进复用已有区间
 
 HTTP控制器、前端页面、迁移和持久层均已完成对应代码检查，但未启动发布站切换或企业微信真实送达；D07合同整体状态仍NOT_RUN。
 
+## D07/D11/D16：工单通知意图与本人站内通知已验证（V34 / API 0.54.0）
+
+针对D07工单生命周期与SLA节点产生的`mop_ticket_workflow_outbox`事件，新增V34 `mop_notification_intent`与`mop_notification_message`、领域规划器`TicketNotificationPlanner`、PostgreSQL中继/查询/首次已读仓储、API控制器`TicketNotificationController`及前端`TicketNotificationsPage.vue`。
+
+- 仅已明确归属的报障人、当前负责人及协办人生成站内通知；Q09服务经理角色、Q15值班队列与升级链未确认前记录在`pending_reasons`，不猜测接收人。
+- 外部渠道（企业微信、短信、语音、邮件）因Q14渠道矩阵与Q18凭据未配置固定标记为`NOT_CONFIGURED`，不伪造已送达回执。
+- 数据库触发器强制校验outbox来源、延迟约束校验意图`recipient_count`与实际站内消息行数一致、校验接收人成员/角色/报障人资格，并限制站内消息仅允许首次已读更新（`version 0→1`）。
+- 远程PG17.9 `mop_test`完成V34首次迁移、重复0次及只读检查；`PostgresTicketNotificationIntegrationTest`（2项）、`TestSchemaMigrationTest`（41项）、`TicketNotificationPlannerTest`（9项）、`TicketNotificationControllerTest`（8项）、`server/api`全量（1845项）、OpenAPI契约（135项）及Web全量测试（156文件/2204项）与构建通过。证据见[ticket-notification-intents-20261018.json](evidence/ticket-notification-intents-20261018.json)。
+
 ## 当前环境阻塞
 
-读取Git忽略的既有LAN连接配置时，LAN测试站SSH握手失败（SSHException / banner未取得，尚未进入认证）；随后独立端口检查SSH读取超时，10010可建TCP但ready/live读取RemoteDisconnected。原指定测试服务器随后恢复并通过项目SSH隧道完成V29—V33与PG真实测试；LAN站点的当前版本/HTTP/浏览器证据仍未取得。未安装本机替代组件、未修改远端服务配置。
+读取Git忽略的既有LAN连接配置时，LAN测试站SSH握手失败（SSHException / banner未取得，尚未进入认证）；随后独立端口检查SSH读取超时，10010可建TCP但ready/live读取RemoteDisconnected。原指定测试服务器随后恢复并通过项目SSH隧道完成V29—V34与PG真实测试；LAN站点的当前版本/HTTP/浏览器证据仍未取得。未安装本机替代组件、未修改远端服务配置。
 
 ## 模块接续台账
 
 |Notion模块|本轮状态|尚需完成/复核|
 |---|---|---|
-|D07 工单闭环|状态/SLA冻结核心已验证，持久层接续中|正式动作、客户资格、时钟耐久任务、API/UI/真实验证|
-|D11 通知与企微|已核对设计，未声称派发完成|Outbox、持久派发/回执、凭据引用与客户真实配置|
+|D07 工单闭环|V33状态机/事件/Outbox/时钟任务及API/UI/真实PG已验证|测试站部署切换、正式SLA/客户规则确认与合同TC|
+|D11 通知与企微|V34工单通知意图与本人站内通知（API0.54/Web/真实PG）已验证|Q14/Q15/Q18确认后外部企微/短信/语音派发、死信与H5门户|
+|D16 SLA与值班|工单级SLA快照与提醒意图已接通|服务档位与变更历史、正式SLA报表/补偿、值班看板与升级链|
+|D15 告警事件链|V29/V30原始与隔离存储已有|归并/防抖/抑制/维护窗口、事件处置状态机与自动建单|
 |D05 采集|已有AF持续采集证据；当前连通性未确认|SCP授权与资源能力、采集故障恢复|
 |D10 变更|已核对设计|审批/窗口配置/运行匹配，不把审批当设备执行|
 |D09 巡检|已核对设计|模板发布、执行证据、报告生成与冻结|

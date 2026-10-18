@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.53.0",
+    "version": "0.54.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -31444,6 +31444,357 @@
         "x-mop-capability": "ticket_notes:write_internal",
         "x-mop-returns": "202_or_durable_receipt"
       }
+    },
+    "/my/notifications": {
+      "get": {
+        "operationId": "listOwnTicketNotifications",
+        "summary": "读取本人在当前租户的工单站内通知；不代表外部渠道已推送或送达",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "x-mop-external-dispatch": "NOT_CONFIGURED",
+        "responses": {
+          "200": {
+            "description": "读取本人在当前租户的工单站内通知；不代表外部渠道已推送或送达",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketNotificationPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "unread_only",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "before_created_at",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/my/notifications/{id}/read": {
+      "post": {
+        "operationId": "markOwnTicketNotificationRead",
+        "summary": "记录本人首次阅读时间；已读后不可覆盖，跨租户或他人通知统一404",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "x-mop-external-dispatch": "NOT_CONFIGURED",
+        "responses": {
+          "200": {
+            "description": "记录本人首次阅读时间；已读后不可覆盖，跨租户或他人通知统一404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketNotificationReadResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketNotificationRead"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/notification-intents": {
+      "get": {
+        "operationId": "listNotificationIntents",
+        "summary": "读取当前租户通知意图台账；接收对象依赖Q09/Q15未确认规则时显示待确认，外部渠道受Q14/Q18阻塞",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "x-mop-external-dispatch": "NOT_CONFIGURED",
+        "responses": {
+          "200": {
+            "description": "读取当前租户通知意图台账；接收对象依赖Q09/Q15未确认规则时显示待确认，外部渠道受Q14/Q18阻塞",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationIntentPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "通知授权、范围、版本或真实依赖错误；未知写入结果保留原幂等请求",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "name": "before_created_at",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "ticket_notes:read_internal"
+      }
     }
   },
   "components": {
@@ -60864,6 +61215,529 @@
           "note",
           "reason_code",
           "retain_previous_as_collaborator"
+        ],
+        "additionalProperties": false
+      },
+      "TicketNotification": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticket_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "audience": {
+            "enum": [
+              "CUSTOMER",
+              "INTERNAL"
+            ]
+          },
+          "event_type": {
+            "type": "string",
+            "pattern": "^ticket\\.[a-z0-9_]{1,64}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "channel": {
+            "const": "IN_APP"
+          },
+          "source": {
+            "const": "postgresql"
+          }
+        },
+        "required": [
+          "id",
+          "ticket_id",
+          "audience",
+          "event_type",
+          "title",
+          "body",
+          "created_at",
+          "version",
+          "read_at",
+          "channel",
+          "source"
+        ],
+        "additionalProperties": false
+      },
+      "TicketNotificationPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "ticket_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "audience": {
+                      "enum": [
+                        "CUSTOMER",
+                        "INTERNAL"
+                      ]
+                    },
+                    "event_type": {
+                      "type": "string",
+                      "pattern": "^ticket\\.[a-z0-9_]{1,64}$"
+                    },
+                    "title": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 160
+                    },
+                    "body": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 600
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "version": {
+                      "enum": [
+                        0,
+                        1
+                      ]
+                    },
+                    "read_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "channel": {
+                      "const": "IN_APP"
+                    },
+                    "source": {
+                      "const": "postgresql"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "ticket_id",
+                    "audience",
+                    "event_type",
+                    "title",
+                    "body",
+                    "created_at",
+                    "version",
+                    "read_at",
+                    "channel",
+                    "source"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 50
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_before_created_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "next_before_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "unread_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "external_dispatch": {
+                "const": "NOT_CONFIGURED"
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "items",
+              "has_more",
+              "next_before_created_at",
+              "next_before_id",
+              "unread_count",
+              "observed_at",
+              "external_dispatch",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "TicketNotificationRead": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "enum": [
+              0,
+              1
+            ]
+          }
+        },
+        "required": [
+          "expected_version"
+        ],
+        "additionalProperties": false
+      },
+      "TicketNotificationReadResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "version": {
+                "const": 1
+              },
+              "read_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "id",
+              "version",
+              "read_at"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "NotificationIntent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticket_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "receipt_no": {
+            "type": "string"
+          },
+          "event_type": {
+            "type": "string",
+            "pattern": "^ticket\\.[a-z0-9_]{1,64}$"
+          },
+          "phase": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]{0,63}$"
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "enum": [
+                  "P1",
+                  "P2",
+                  "P3"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recipient_status": {
+            "enum": [
+              "COMPLETE",
+              "PARTIAL",
+              "PENDING_RULE"
+            ]
+          },
+          "recipient_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "pending_reasons": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "enum": [
+                "Q15_ONCALL_QUEUE_RECIPIENTS",
+                "Q15_ESCALATION_CHAIN",
+                "Q09_SERVICE_MANAGER_ROLE",
+                "UNMAPPED_EVENT_TYPE",
+                "RECIPIENT_INACTIVE"
+              ]
+            }
+          },
+          "external_dispatch": {
+            "const": "NOT_CONFIGURED"
+          },
+          "external_blockers": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "type": "string"
+            },
+            "contains": {
+              "const": "Q14_CHANNEL_MATRIX"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "ticket_id",
+          "receipt_no",
+          "event_type",
+          "phase",
+          "priority",
+          "recipient_status",
+          "recipient_count",
+          "pending_reasons",
+          "external_dispatch",
+          "external_blockers",
+          "created_at"
+        ],
+        "additionalProperties": false
+      },
+      "NotificationIntentPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "ticket_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "receipt_no": {
+                      "type": "string"
+                    },
+                    "event_type": {
+                      "type": "string",
+                      "pattern": "^ticket\\.[a-z0-9_]{1,64}$"
+                    },
+                    "phase": {
+                      "type": "string",
+                      "pattern": "^[A-Z][A-Z0-9_]{0,63}$"
+                    },
+                    "priority": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            "P1",
+                            "P2",
+                            "P3"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "recipient_status": {
+                      "enum": [
+                        "COMPLETE",
+                        "PARTIAL",
+                        "PENDING_RULE"
+                      ]
+                    },
+                    "recipient_count": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "pending_reasons": {
+                      "type": "array",
+                      "maxItems": 16,
+                      "items": {
+                        "enum": [
+                          "Q15_ONCALL_QUEUE_RECIPIENTS",
+                          "Q15_ESCALATION_CHAIN",
+                          "Q09_SERVICE_MANAGER_ROLE",
+                          "UNMAPPED_EVENT_TYPE",
+                          "RECIPIENT_INACTIVE"
+                        ]
+                      }
+                    },
+                    "external_dispatch": {
+                      "const": "NOT_CONFIGURED"
+                    },
+                    "external_blockers": {
+                      "type": "array",
+                      "maxItems": 16,
+                      "items": {
+                        "type": "string"
+                      },
+                      "contains": {
+                        "const": "Q14_CHANNEL_MATRIX"
+                      }
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "ticket_id",
+                    "receipt_no",
+                    "event_type",
+                    "phase",
+                    "priority",
+                    "recipient_status",
+                    "recipient_count",
+                    "pending_reasons",
+                    "external_dispatch",
+                    "external_blockers",
+                    "created_at"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 100
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_before_created_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "next_before_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "items",
+              "has_more",
+              "next_before_created_at",
+              "next_before_id",
+              "observed_at",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
         ],
         "additionalProperties": false
       }

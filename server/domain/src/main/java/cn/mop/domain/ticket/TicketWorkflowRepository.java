@@ -11,6 +11,7 @@ public interface TicketWorkflowRepository {
     }
     void authorizeCommand(Access access,String ticketId,boolean customerAction);
     Map<String,Object> read(Access access,String ticketId);
+    default Map<String,Object> readSla(Access access,String ticketId,CustomerConfirmationWindow.Tier currentTenantTier){throw new UnsupportedOperationException();}
     List<Map<String,Object>> list(Access access,Query query);
     List<Map<String,Object>> events(Access access,String ticketId,long beforeVersion,int limit);
     List<Map<String,Object>> assignees(Access access);

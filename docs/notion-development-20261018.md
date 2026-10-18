@@ -33,9 +33,17 @@ HTTP控制器、前端页面、迁移和持久层均已完成对应代码检查�
 - 数据库触发器强制校验outbox来源、延迟约束校验意图`recipient_count`与实际站内消息行数一致、校验接收人成员/角色/报障人资格，并限制站内消息仅允许首次已读更新（`version 0→1`）。
 - 远程PG17.9 `mop_test`完成V34首次迁移、重复0次及只读检查；`PostgresTicketNotificationIntegrationTest`（2项）、`TestSchemaMigrationTest`（41项）、`TicketNotificationPlannerTest`（9项）、`TicketNotificationControllerTest`（8项）、`server/api`全量（1845项）、OpenAPI契约（135项）及Web全量测试（156文件/2204项）与构建通过。证据见[ticket-notification-intents-20261018.json](evidence/ticket-notification-intents-20261018.json)。
 
+## D16：租户服务档位、只追加变更台账与工单冻结SLA时钟核验已验证（V35 / API 0.55.0）
+
+针对合同M2-10、M5-8、M5-18、M5-20，新增V35 `mop_service_tier`与`mop_service_tier_change`、领域模型`ServiceTierRepository`与`TicketSlaClockEvaluation`、PostgreSQL仓储`PostgresServiceTierRepository`、API控制器`ServiceTierController`（`GET /api/v1/service-tiers`、`POST /api/v1/service-tiers/changes`）、工单SLA时钟核验接口`GET /api/v1/tickets/{id}/sla`及前端`ServiceTiersPage.vue`。
+
+- 档位快照与变更历史由延迟约束触发器强制同事务成对写入，变更历史只追加、禁止UPDATE/DELETE；可用性目标从`sla.tier_availability_target`运行配置解析，停用配置时不回退默认值。
+- 20项SLA时钟边界测试（`TicketSlaClockBoundaryTest`）覆盖23:50跨夜、节假日、跨月、待客户确认暂停、50%/80%/100%阈值、P3次日口径（Q08）、重开策略待确认（Q27）及档位变更后在途工单不追溯。
+- 远程PG17.9 `mop_test`完成V35迁移验证与`PostgresServiceTierIntegrationTest`（2项）：验证3张在途工单在租户档位从BASIC连续变更为STANDARD、ADVANCED后，原响应/恢复截止时间与提醒任务完全不变。`server/api`全量（1871项）、OpenAPI契约（136项）及Web全量（157文件/2210项）与构建通过。证据见[service-tiers-and-sla-clocks-20261018.json](evidence/service-tiers-and-sla-clocks-20261018.json)。
+
 ## 当前环境阻塞
 
-读取Git忽略的既有LAN连接配置时，LAN测试站SSH握手失败（SSHException / banner未取得，尚未进入认证）；随后独立端口检查SSH读取超时，10010可建TCP但ready/live读取RemoteDisconnected。原指定测试服务器随后恢复并通过项目SSH隧道完成V29—V34与PG真实测试；LAN站点的当前版本/HTTP/浏览器证据仍未取得。未安装本机替代组件、未修改远端服务配置。
+读取Git忽略的既有LAN连接配置时，LAN测试站SSH握手失败（SSHException / banner未取得，尚未进入认证）；随后独立端口检查SSH读取超时，10010可建TCP但ready/live读取RemoteDisconnected。原指定测试服务器随后恢复并通过项目SSH隧道完成V29—V35与PG真实测试；LAN站点的当前版本/HTTP/浏览器证据仍未取得。未安装本机替代组件、未修改远端服务配置。
 
 ## 模块接续台账
 
@@ -43,7 +51,7 @@ HTTP控制器、前端页面、迁移和持久层均已完成对应代码检查�
 |---|---|---|
 |D07 工单闭环|V33状态机/事件/Outbox/时钟任务及API/UI/真实PG已验证|测试站部署切换、正式SLA/客户规则确认与合同TC|
 |D11 通知与企微|V34工单通知意图与本人站内通知（API0.54/Web/真实PG）已验证|Q14/Q15/Q18确认后外部企微/短信/语音派发、死信与H5门户|
-|D16 SLA与值班|工单级SLA快照与提醒意图已接通|服务档位与变更历史、正式SLA报表/补偿、值班看板与升级链|
+|D16 SLA与值班|V35服务档位快照、只追加变更历史与工单SLA冻结时钟核验（API0.55/Web/真实PG）已验证|正式SLA报表/补偿（Q26）、值班看板与升级链（Q15）|
 |D15 告警事件链|V29/V30原始与隔离存储已有|归并/防抖/抑制/维护窗口、事件处置状态机与自动建单|
 |D05 采集|已有AF持续采集证据；当前连通性未确认|SCP授权与资源能力、采集故障恢复|
 |D10 变更|已核对设计|审批/窗口配置/运行匹配，不把审批当设备执行|
@@ -53,3 +61,4 @@ HTTP控制器、前端页面、迁移和持久层均已完成对应代码检查�
 |D12 报告|已核对设计|真实同源指标、不可变报告、H5/PDF、阅读与推送|
 |D13 堡垒机|组件/客户路线未验证|审批控制、适配接口、录屏可用性与真实联调|
 |D14 上线|未验收|128项TC、TLS/隔离/备份恢复及生产批准|
+

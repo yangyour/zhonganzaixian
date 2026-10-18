@@ -30,7 +30,7 @@ export function addTicketWorkflowContract(contract) {
     TicketWorkflowEvent: event,
     TicketWorkflowEventsResult: envelope(object({ items: { type: 'array', items: event, maxItems: 100 }, has_more: { type: 'boolean' }, next_before_version: nullable({ type: 'integer', minimum: 1 }), source: { const: 'postgresql' } })),
     TicketWorkflowPageResult: envelope(object({ items: { type: 'array', items: workflow, maxItems: 100 }, has_more: { type: 'boolean' }, next_cursor: nullable({ type: 'string' }), source: { const: 'postgresql' } })),
-    TicketWorkflowActivate: object({ expected_version: { const: 0 }, priority: { enum: ['P1', 'P2', 'P3'] }, service_tier: { enum: ['BASIC', 'STANDARD', 'ADVANCED'] }, reason: { type: 'string', minLength: 1, maxLength: 3000 } }),
+    TicketWorkflowActivate: object({ expected_version: { const: 0 }, priority: { enum: ['P1', 'P2', 'P3'] }, service_tier: nullable({ enum: ['BASIC', 'STANDARD', 'ADVANCED'] }), reason: { type: 'string', minLength: 1, maxLength: 3000 } }),
     TicketWorkflowAction: object({ expected_version: { type: 'integer', minimum: 1, maximum: 9007199254740990 }, note: { type: 'string', maxLength: 3000 } }),
     TicketWorkflowReassign: object({ expected_version: { type: 'integer', minimum: 1, maximum: 9007199254740990 }, assignee_id: uuid, note: { type: 'string', minLength: 1, maxLength: 3000 }, reason_code: { type: 'string', pattern: '^[A-Z][A-Z0-9_]{0,63}$' }, retain_previous_as_collaborator: { type: 'boolean' } }),
   })

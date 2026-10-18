@@ -25,6 +25,7 @@ export const router = createRouter({
     { path: '/asset-export-jobs', name: 'asset-export-jobs', component: () => import('./pages/AssetExportJobsPage.vue'), meta: { title: '台账导出', group: '服务', roles: ['padmin','msp'], capability: 'assets:read' } },
     { path: '/my-worklogs', name: 'my-worklogs', component: () => import('./pages/OwnWorklogsPage.vue'), meta: { title: '我的工时记录', group: '服务', role: 'msp', capability: 'worklogs:read_own' } },
     { path: '/sla-scenarios', name: 'sla-scenarios', component: () => import('./pages/SlaScenariosPage.vue'), meta: { title: 'SLA 场景测算', group: '服务', capability: 'sla_scenarios:read' } },
+    { path: '/service-tiers', name: 'service-tiers', component: () => import('./pages/ServiceTiersPage.vue'), meta: { title: '服务档位与SLA台账', group: '服务', roles: ['padmin','msp'], capability: 'sla_scenarios:read' } },
     { path: '/runtime-configurations', name: 'runtime-configurations', component: () => import('./pages/RuntimeConfigurationsPage.vue'), meta: { title: '运行配置与发布', group: '管理', role: 'padmin', capability: 'configurations:read' } },
     { path: '/configurations', name: 'configurations', component: () => import('./pages/ConfigurationsPage.vue'), meta: { title: '配置项登记', group: '管理', capability: 'configurations:read' } },
     { path: '/threshold-diagnostics', name: 'threshold-diagnostics', component: () => import('./pages/ThresholdDiagnosticsPage.vue'), meta: { title: '告警阈值诊断', group: '管理', capability: 'configurations:read' } },

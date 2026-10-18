@@ -245,7 +245,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.54.0');
+  assert.equal(contract.info.version, '0.55.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -903,3 +903,68 @@ const inboxMessageSample=()=>({job_id:id('1'),tenant_id:id('2'),recipient_id:id(
 test('导出消息区分未读、已读与链接到期，不把过期消息删除',()=>{const message=inboxMessageSample();assert.ok(validates('ExportInboxMessage',message));assert.equal(validates('ExportInboxMessage',{...message,version:1}),false);assert.ok(validates('ExportInboxMessage',{...message,version:1,read_at:message.issued_at}));assert.equal(validates('ExportInboxMessage',{...message,link_status:'EXPIRED'}),false);assert.ok(validates('ExportInboxMessage',{...message,link_status:'EXPIRED',content_url:null}));});
 test('站内消息只读列表与显式已读接口保持当前授权和CSRF幂等',()=>{const read=contract.paths['/my-export-messages/{id}/read'].post;assert.equal(read['x-mop-current-membership-before-replay'],true);assert.ok(read.parameters.some(p=>p.name==='X-CSRF-Token'));assert.deepEqual(Object.keys(contract.paths['/my-export-messages']),['get']);assert.deepEqual(contract.paths['/my-export-messages'].get['x-mop-capabilities'],['assets:read']);assert.ok(validates('ExportInboxReadInput',{expected_version:0}));assert.equal(validates('ExportInboxReadInput',{expected_version:0,read_at:null}),false);assert.equal(validates('ExportInboxReadInput',{expected_version:2}),false);});
 test('消息游标末页必须明确结束且签名链接只能指向本站下载接口',()=>{const result={data:{items:[inboxMessageSample()],has_more:false,next_before_issued_at:null,next_before_id:null,unread_count:1,observed_at:'2026-10-14T06:00:01Z'},trace_id:'synthetic'};assert.ok(validates('ExportInboxPageResult',result));assert.equal(validates('ExportInboxPageResult',{...result,data:{...result.data,next_before_id:id('1')}}),false);assert.equal(validates('ExportInboxMessage',{...inboxMessageSample(),content_url:'https://example.invalid/download'}),false);});
+
+test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
+  assert.equal(contract.info.version, '0.55.0');
+  const tierGet = contract.paths['/service-tiers'].get;
+  const tierPost = contract.paths['/service-tiers/changes'].post;
+  const slaGet = contract.paths['/tickets/{id}/sla'].get;
+  assert.deepEqual(tierGet['x-mop-roles'], ['msp', 'padmin']);
+  assert.equal(tierGet['x-mop-capability'], 'sla_scenarios:read');
+  assert.deepEqual(tierPost['x-mop-roles'], ['padmin']);
+  assert.equal(tierPost['x-mop-capability'], 'configurations:write');
+  assert.equal(slaGet['x-mop-capability'], 'tickets:read');
+
+  const snap = {
+    tenant_id: id('1'), version: 2, tier: 'ADVANCED', availability_target: 99.99,
+    contract_device_count: 120, billing_cycle: 'MONTHLY', monthly_fee_fen: 2500000,
+    effective_mode: 'IMMEDIATE', effective_from: '2026-10-18T08:00:00Z',
+    updated_by: id('2'), updated_at: '2026-10-18T08:00:00Z', customer_approval_status: 'UNVERIFIED',
+  };
+  assert.ok(validates('ServiceTierSnapshot', snap));
+  assert.equal(validates('ServiceTierSnapshot', { ...snap, customer_approval_status: 'APPROVED' }), false);
+
+  const change = {
+    id: id('9'), tenant_id: id('1'), version: 2, previous_version: 1,
+    from_tier: 'STANDARD', to_tier: 'ADVANCED', availability_target: 99.99,
+    contract_device_count: 120, billing_cycle: 'MONTHLY', monthly_fee_fen: 2500000,
+    effective_mode: 'IMMEDIATE', effective_from: '2026-10-18T08:00:00Z',
+    reason: 'SYNTHETIC_TIER_UPGRADE', approved_by: id('2'), changed_at: '2026-10-18T08:00:00Z',
+    customer_approval_status: 'UNVERIFIED',
+  };
+  assert.ok(validates('ServiceTierChange', change));
+  assert.ok(validates('ServiceTierPageResult', {
+    data: {
+      tenant_id: id('1'), current: snap, items: [change], has_more: false, next_before_version: null,
+      observed_at: '2026-10-18T08:00:01Z', customer_approval_status: 'UNVERIFIED',
+      in_flight_ticket_retroactive: false, source: 'postgresql',
+    },
+    trace_id: 'synthetic',
+  }));
+  assert.equal(validates('ServiceTierPageResult', {
+    data: {
+      tenant_id: id('1'), current: snap, items: [change], has_more: false, next_before_version: null,
+      observed_at: '2026-10-18T08:00:01Z', customer_approval_status: 'UNVERIFIED',
+      in_flight_ticket_retroactive: true, source: 'postgresql',
+    },
+    trace_id: 'synthetic',
+  }), false);
+
+  const clock = {
+    name: 'RESPONSE', due_at: '2026-10-18T08:10:00Z', completed_at: '2026-10-18T08:04:00Z',
+    paused: false, breached: false, status: 'MET', missing_reason: null,
+    thresholds: { p50_at: '2026-10-18T08:05:00Z', p80_at: '2026-10-18T08:08:00Z', p100_at: '2026-10-18T08:10:00Z' },
+    working_windows_count: 0,
+  };
+  const sla = {
+    ticket_id: id('7'), tenant_id: id('1'), receipt_no: 'MOP-20261018-0001', registration_created_at: '2026-10-18T08:00:00Z',
+    workflow_version: 3, state: 'RESOLVED', priority: 'P1', frozen_service_tier: 'STANDARD', current_tenant_service_tier: 'ADVANCED',
+    tier_changed_since_open: true, response_clock: clock,
+    recovery_clock: { ...clock, name: 'RECOVERY', due_at: '2026-10-18T10:00:00Z', completed_at: '2026-10-18T09:00:00Z', paused: true, status: 'PAUSED_FOR_CUSTOMER_CONFIRM' },
+    clock_tasks: [{ clock_key: 'response:50', kind: 'SLA', due_at: '2026-10-18T08:05:00Z', outcome: 'EMITTED', completed_at: '2026-10-18T08:05:01Z' }],
+    sla_missing: {}, sla_references: [], reopen_count: 0, reopen_policy_status: 'NOT_REOPENED',
+    metric_version: 'D16_TICKET_SLA_CLOCK_V1', observed_at: '2026-10-18T09:10:00Z', source: 'postgresql',
+  };
+  assert.ok(validates('TicketSlaInspectionResult', { data: sla, trace_id: 'synthetic' }));
+});
+

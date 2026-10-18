@@ -1,12 +1,14 @@
 package cn.mop.api;
 
 import cn.mop.domain.*;
+import cn.mop.domain.sla.ServiceTierRepository;
 import cn.mop.domain.ticket.*;
 import cn.mop.domain.ticket.TicketWorkflowRepository.*;
 import cn.mop.domain.ticket.TicketLifecycle.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -26,10 +28,17 @@ public final class TicketWorkflowController {
     private final PlatformRepository platform;
     private final TicketWorkflowRepository workflow;
     private final TicketWorkflowRepository.SlaProvider policy;
+    private final ServiceTierRepository serviceTiers;
     private final ObjectMapper mapper;
     private final byte[] cursorSecret=new byte[32];
-    public TicketWorkflowController(PlatformRepository platform,TicketWorkflowRepository workflow,TicketRuntimePolicy policy,ObjectMapper mapper){this.platform=platform;this.workflow=workflow;this.policy=policy;this.mapper=mapper;new SecureRandom().nextBytes(cursorSecret);}
+    public TicketWorkflowController(PlatformRepository platform,TicketWorkflowRepository workflow,TicketRuntimePolicy policy,ObjectMapper mapper){this(platform,workflow,policy,mapper,null);}
+    @Autowired public TicketWorkflowController(PlatformRepository platform,TicketWorkflowRepository workflow,TicketRuntimePolicy policy,ObjectMapper mapper,@Autowired(required=false) ServiceTierRepository serviceTiers){this.platform=platform;this.workflow=workflow;this.policy=policy;this.serviceTiers=serviceTiers;this.mapper=mapper;new SecureRandom().nextBytes(cursorSecret);}
     @GetMapping("/tickets/{id}/workflow") Object get(@PathVariable String id,HttpServletRequest request){Access a=access(request,"tickets:read");query(request,Set.of());return success(workflow.read(a,uuid(id)),request);}
+    @GetMapping("/tickets/{id}/sla") Object sla(@PathVariable String id,HttpServletRequest request){
+        Access a=access(request,"tickets:read");query(request,Set.of());String ticket=uuid(id);
+        CustomerConfirmationWindow.Tier currentTier=serviceTiers==null?null:serviceTiers.current(new ServiceTierRepository.Access(a.tenantId(),a.actorId(),a.permissionVersion(),a.traceId())).map(ServiceTierRepository.Snapshot::tier).orElse(null);
+        return success(workflow.readSla(a,ticket,currentTier),request);
+    }
     @GetMapping("/ticket-workflows/assignees") Object assignees(HttpServletRequest request){Access a=access(request,"ticket_notes:write_internal");query(request,Set.of());return success(map("items",workflow.assignees(a),"source","postgresql"),request);}
     @GetMapping("/tickets/{id}/events") Object events(@PathVariable String id,HttpServletRequest request){
         Access a=access(request,"tickets:read");var q=query(request,Set.of("before_version","limit"));int size=limit(q);long before=q.containsKey("before_version")?positive(q.get("before_version")):MAX;
@@ -50,8 +59,16 @@ public final class TicketWorkflowController {
     @PostMapping(value="/tickets/{id}/activate",consumes=MediaType.APPLICATION_JSON_VALUE) Object activate(@PathVariable String id,HttpServletRequest request){
         Access a=access(request,"ticket_notes:write_internal");query(request,Set.of());String ticket=uuid(id);JsonNode body=body(request);fields(body,Set.of("expected_version","priority","service_tier","reason"));
         long expected=version(body,true);String priority=text(body,"priority",2),reason=text(body,"reason",3000);if(!Set.of("P1","P2","P3").contains(priority))throw invalid();
-        CustomerConfirmationWindow.Tier tier;try{tier=CustomerConfirmationWindow.Tier.valueOf(text(body,"service_tier",10));}catch(Exception e){throw invalid();}
-        Object result=command(a,ticket,body,request,false,()->workflow.activate(a,ticket,expected,priority,tier,reason,policy));return success(result,request);
+        JsonNode rawTier=body.get("service_tier");
+        CustomerConfirmationWindow.Tier explicitTier=null;
+        if(rawTier!=null&&!rawTier.isNull()){try{explicitTier=CustomerConfirmationWindow.Tier.valueOf(text(body,"service_tier",10));}catch(Exception e){throw invalid();}}
+        final CustomerConfirmationWindow.Tier chosenTier=explicitTier;
+        Object result=command(a,ticket,body,request,false,()->{
+            CustomerConfirmationWindow.Tier tier=chosenTier!=null?chosenTier:(serviceTiers==null?null:serviceTiers.current(new ServiceTierRepository.Access(a.tenantId(),a.actorId(),a.permissionVersion(),a.traceId())).map(ServiceTierRepository.Snapshot::tier).orElse(null));
+            if(tier==null)throw new DomainException(422,"SERVICE_TIER_UNCONFIGURED","当前租户尚未登记服务档位，请先配置或显式指定服务档位");
+            return workflow.activate(a,ticket,expected,priority,tier,reason,policy);
+        });
+        return success(result,request);
     }
     @PostMapping(value="/tickets/{id}/{action:accept|reassign|start|resolve|close|reopen|cancel}",consumes=MediaType.APPLICATION_JSON_VALUE)
     Object action(@PathVariable String id,@PathVariable String action,HttpServletRequest request){

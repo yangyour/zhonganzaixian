@@ -28,4 +28,19 @@ class TicketWorkflowControllerTest {
     @Test void listRejectsUnboundedDuplicateAndSpoofedQuery(){for(String key:List.of("tenant_id","reporter","from","unknown")){var r=request("list","");r.addParameter(key,"value");assertEquals(400,assertThrows(DomainException.class,()->controller.list(r)).status);}var r=request("list","");r.addParameter("limit","101");assertEquals(400,assertThrows(DomainException.class,()->controller.list(r)).status);var dup=request("list","");dup.addParameter("limit",new String[]{"25","50"});assertEquals(400,assertThrows(DomainException.class,()->controller.list(dup)).status);}
     @Test void customersCannotFilterInternalAssignee(){role("viewer");var r=request("list","");r.addParameter("assignee",ACTOR);assertEquals(403,assertThrows(DomainException.class,()->controller.list(r)).status);}
     @Test void changedPermissionInvalidSessionFailsBeforeWrites(){when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.empty());assertEquals(401,assertThrows(DomainException.class,()->controller.action(TICKET,"accept",request("accept","{\"expected_version\":1}"))).status);verifyNoInteractions(workflow);}
+    @Test void slaInspectionPassesCurrentTenantServiceTierAndActivateCanFallbackToConfiguredTier(){
+        var tiers=mock(cn.mop.domain.sla.ServiceTierRepository.class);
+        var withTiers=new TicketWorkflowController(platform,workflow,policy,mapper,tiers);
+        when(tiers.current(any())).thenReturn(Optional.of(new cn.mop.domain.sla.ServiceTierRepository.Snapshot(
+            TENANT,2L,CustomerConfirmationWindow.Tier.ADVANCED,new java.math.BigDecimal("99.99"),50,
+            cn.mop.domain.sla.ServiceTierRepository.BillingCycle.MONTHLY,100000L,
+            cn.mop.domain.sla.ServiceTierRepository.EffectiveMode.IMMEDIATE,java.time.Instant.parse("2026-10-18T00:00:00Z"),
+            ACTOR,java.time.Instant.parse("2026-10-18T00:00:00Z"),"UNVERIFIED")));
+        var slaReq=new MockHttpServletRequest("GET","/api/v1/tickets/"+TICKET+"/sla");
+        slaReq.setUserPrincipal(()->ACTOR);slaReq.getSession().setAttribute("mop.tenant_id",TENANT);slaReq.setAttribute("mop.trace_id","trace");
+        withTiers.sla(TICKET,slaReq);
+        verify(workflow).readSla(new TicketWorkflowRepository.Access(TENANT,ACTOR,7,"trace"),TICKET,CustomerConfirmationWindow.Tier.ADVANCED);
+        withTiers.activate(TICKET,request("activate","{\"expected_version\":0,\"priority\":\"P2\",\"service_tier\":null,\"reason\":\"SYNTHETIC_FALLBACK\"}"));
+        verify(workflow).activate(any(),eq(TICKET),eq(0L),eq("P2"),eq(CustomerConfirmationWindow.Tier.ADVANCED),eq("SYNTHETIC_FALLBACK"),eq(policy));
+    }
 }

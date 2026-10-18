@@ -87,12 +87,12 @@ onUnmounted(() => { unregister();workspace.dispose();listGeneration++;readGenera
 
 <template>
   <section class="workflow-page">
-    <div class="page-heading"><div><h2>工单处理</h2><p>接单、协同处理、客户确认与历史追溯。</p></div><el-button @click="router.push('/tickets')">查看报障台账</el-button></div>
+    <div class="page-heading proto-page-head"><div><h1>工单处理 <span class="proto-badge">{{ session?.tenant.name }}</span></h1><p>接单、协同处理、客户确认与历史追溯</p></div><el-button @click="router.push('/tickets')">查看报障台账</el-button></div>
     <section v-if="ticketId" class="panel workflow-detail" aria-label="工单处理详情">
       <div class="workflow-toolbar"><h3>{{ state.current?.title || '当前工单' }}</h3><el-button :disabled="state.busy" @click="workspace.refresh(); loadRelated()">刷新状态</el-button></div>
       <ApiErrorNotice :error="state.error" />
-      <el-alert v-if="state.uncertain" type="warning" :closable="false" title="提交结果尚未确认。当前操作已保留，请重试原请求；读取到其他状态不代表本次操作已确认。" />
-      <el-button v-if="state.uncertain" type="warning" :disabled="state.busy" @click="retry">重试原请求</el-button>
+      <el-alert v-if="state.uncertain" type="warning" :closable="false" title="提交结果尚未确认，当前填写内容已保留，请点击下方按钮重试提交。" />
+      <el-button v-if="state.uncertain" type="warning" :disabled="state.busy" @click="retry">重试提交</el-button>
       <p v-if="state.receiptVersion !== null" class="field-help">提交回执版本 v{{ state.receiptVersion }}，下方状态以重新读取的结果为准。</p>
       <template v-if="state.current">
         <div class="workflow-facts">
@@ -107,10 +107,10 @@ onUnmounted(() => { unregister();workspace.dispose();listGeneration++;readGenera
         <p v-if="state.current.resolution_note" class="workflow-note"><strong>解决说明：</strong>{{ state.current.resolution_note }}</p>
         <el-form v-if="actions.length" label-position="top" @submit.prevent>
           <div v-if="actions.includes('activate')" class="workflow-fields">
-            <el-form-item label="优先级（明确选择）"><el-select v-model="priority" :disabled="locked" placeholder="选择优先级"><el-option v-for="p in ['P1','P2','P3']" :key="p" :label="p" :value="p" /></el-select></el-form-item>
+            <el-form-item label="优先级"><el-select v-model="priority" :disabled="locked" placeholder="选择优先级"><el-option v-for="p in ['P1','P2','P3']" :key="p" :label="p" :value="p" /></el-select></el-form-item>
             <el-form-item label="本次采用的服务档位"><el-select v-model="tier" :disabled="locked" placeholder="选择服务档位"><el-option label="基础" value="BASIC"/><el-option label="标准" value="STANDARD"/><el-option label="进阶" value="ADVANCED"/></el-select></el-form-item>
           </div>
-          <p v-if="actions.includes('activate')" class="field-help">建立流程时冻结所选档位和当前可用 SLA 规则，计时起点仍为原报障登记时间。此选择不代表客户已批准生产规则。</p>
+          <p v-if="actions.includes('activate')" class="field-help">建立流程时锁定所选服务档位与当前 SLA 规则，首次响应与恢复时限按工单报障登记时间起算。</p>
           <el-form-item label="操作说明（解决说明至少20字；确认、重开及撤销请说明原因）"><el-input v-model="note" type="textarea" :rows="3" :disabled="locked" maxlength="3000" aria-label="工单操作说明" /></el-form-item>
           <div v-if="actions.includes('reassign')" class="workflow-fields">
             <el-form-item label="转派给"><el-select v-model="assignee" :disabled="locked" placeholder="选择当前租户有权处理的人员"><el-option v-for="person in candidates" :key="person.id" :value="person.id" :label="person.display_name" /></el-select></el-form-item>
@@ -135,5 +135,5 @@ onUnmounted(() => { unregister();workspace.dispose();listGeneration++;readGenera
 </template>
 
 <style scoped>
-.workflow-detail{margin-bottom:20px}.workflow-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0}.workflow-toolbar h3{margin-right:auto}.workflow-facts,.workflow-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.workflow-facts{margin:20px 0}.workflow-facts>div{display:flex;flex-direction:column;gap:7px}.workflow-facts span,.field-help{color:#64748b;font-size:13px}.workflow-facts strong{font-size:14px;font-weight:500;overflow-wrap:anywhere}.workflow-note,.workflow-history p{white-space:pre-wrap;overflow-wrap:anywhere}.workflow-history{padding-left:20px}.workflow-history li{margin-bottom:16px}.workflow-page :deep(.el-select){min-width:170px}.workflow-page :deep(.el-table){width:100%}@media(max-width:700px){.workflow-facts,.workflow-fields{grid-template-columns:1fr}.workflow-page :deep(.el-button){min-height:44px}.workflow-page :deep(.el-form--inline .el-form-item){display:block;margin-right:0}.workflow-page :deep(.el-select){width:100%;min-width:0}}
+.workflow-detail{margin-bottom:20px}.workflow-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0}.workflow-toolbar h3{margin-right:auto}.workflow-facts,.workflow-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.workflow-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.workflow-facts{margin:16px 0}.workflow-facts>div{display:flex;flex-direction:column;gap:6px;padding:12px 14px;background:#f8fbff;border:1px solid #e6edf5;border-radius:6px}.workflow-facts span,.field-help{color:#64748b;font-size:12px}.workflow-facts strong{font-size:14px;font-weight:600;color:#1e293b;overflow-wrap:anywhere}.workflow-note,.workflow-history p{white-space:pre-wrap;overflow-wrap:anywhere}.workflow-history{padding-left:20px}.workflow-history li{margin-bottom:16px}.workflow-page :deep(.el-select){min-width:170px}.workflow-page :deep(.el-table){width:100%}@media(max-width:900px){.workflow-facts{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.workflow-facts,.workflow-fields{grid-template-columns:1fr}.workflow-page :deep(.el-button){min-height:44px}.workflow-page :deep(.el-form--inline .el-form-item){display:block;margin-right:0}.workflow-page :deep(.el-select){width:100%;min-width:0}}
 </style>

@@ -1,5 +1,9 @@
 # MOP 实施状态
 
+## 2026-10-18 D16服务档位快照、只追加变更台账与工单冻结SLA时钟真实验证
+
+在指定远程测试库（PG17.9 `mop_test`）经项目SSH隧道追加V35（`mop_service_tier`、`mop_service_tier_change`及头部/变更同步触发器与不可变守卫），一次应用（`migrations_executed=1`）、重复应用（`migrations_executed=0`）与只读结构权限核验通过。新增`ServiceTierRepository`、`TicketSlaClockEvaluation`、API控制器（API0.55.0：`GET /api/v1/service-tiers`、`POST /api/v1/service-tiers/changes`、`GET /api/v1/tickets/{id}/sla`及开单租户档位回退）和前端`ServiceTiersPage.vue`。覆盖M2-10/M5-8/M5-18/M5-20核心要求：20项跨工作日/节假日/夜间/暂停/次日口径/档位变更边界用例通过；真实PG集成测试`PostgresServiceTierIntegrationTest`（2项）验证3张在途工单（OPEN/ACCEPTED/RESOLVED）在租户档位从BASIC变更为STANDARD及ADVANCED后，原冻结SLA截止时间与50%/80%/100%提醒阈值保持不变，变更历史只追加且禁止直接UPDATE/DELETE或单表独立写入；重开策略（Q27）与基础/标准档P3次日口径（Q08）未确认前显式标记待确认，不硬编码默认值。迁移策略41项、API全量1871项、契约136项、前端157文件/2210项及生产构建通过。SLA月报/补偿（Q26）、值班看板与升级链（Q15）及128项正式合同验收仍待继续；证据见[service-tiers-and-sla-clocks-20261018.json](evidence/service-tiers-and-sla-clocks-20261018.json)。
+
 ## 2026-10-18 D07/D11/D16工单通知意图与站内消息持久化及真实验证
 
 在指定远程测试库（PG17.9 `mop_test`）经项目SSH隧道追加V34（`mop_notification_intent`、`mop_notification_message`及来源/人数/接收人资格/首次已读守卫），一次应用（`migrations_executed=1`）、重复应用（`migrations_executed=0`）与只读结构权限核验通过。新增`TicketNotificationPlanner`、持久化中继与读取/首次已读接口（API0.54.0：`/api/v1/my/notifications`、`POST /api/v1/my/notifications/{id}/read`、`/api/v1/notification-intents`）及前端`TicketNotificationsPage.vue`。未确认的Q09/Q15接收人规则保留`pending_reasons`（如`Q15_ONCALL_QUEUE_RECIPIENTS`、`Q15_ESCALATION_CHAIN`、`Q09_SERVICE_MANAGER_ROLE`），外部渠道保持`NOT_CONFIGURED`（`Q14_CHANNEL_MATRIX`、`Q18_PROVIDER_CREDENTIALS`），客户消息屏蔽内部处理人。真实PG测试`PostgresTicketNotificationIntegrationTest`（2项）与`PostgresTicketWorkflowIntegrationTest`（2项）通过；迁移策略41项、通知规划/控制器17项、API全量1845项、契约135项、前端156文件/2204项及生产构建通过。外部企微/短信/语音/邮件派发、测试站发布切换与128项正式合同验收仍NOT_RUN；证据见[ticket-notification-intents-20261018.json](evidence/ticket-notification-intents-20261018.json)。

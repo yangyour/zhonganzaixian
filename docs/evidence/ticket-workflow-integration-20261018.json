@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-18",
+  "environment": "designated_remote_test_over_project_ssh_tunnel",
+  "database": "mop_test",
+  "postgres_version": "17.9",
+  "migration_status": {
+    "from": "V28",
+    "applied": ["V29", "V30", "V31", "V32", "V33"],
+    "successful_migration_count": 33,
+    "duplicate_migrations": 0,
+    "read_only_recheck": "TICKET_WORKFLOW_APPLIED"
+  },
+  "v33_sha256": "a33326b73d23d112b50ece07dc59938722cbc544e5c8b32f7d8db143ab6f35e7",
+  "integration_tests": {
+    "class": "PostgresTicketWorkflowIntegrationTest",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "workflow_path": ["OPEN", "ACCEPTED", "IN_PROGRESS", "RESOLVED", "CLOSED", "IN_PROGRESS"],
+    "customer_projection_hides_internal_assignment": true,
+    "stale_version_rejected": true,
+    "cross_tenant_read_rejected": true,
+    "append_only_event_and_outbox_verified": true
+  },
+  "synthetic_data": true,
+  "external_wecom_delivery": "NOT_RUN",
+  "production_approved": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "credentials_output": false
+}

@@ -1,5 +1,9 @@
 # MOP 实施状态
 
+## 2026-10-18 D07工单持久化与真实测试环境验证
+
+在指定远程测试库通过项目SSH隧道按冻结顺序应用V29—V33，V33新增只追加工单处理事件、outbox和耐久时钟任务，V33一次应用/重复0次/只读结构权限核验通过。D07真实PG测试完成2项：完整处理链、客户投影、版本冲突、跨租户404、事件与outbox同事务；单元/控制器/配置策略共58项通过，完整API测试1828项通过，Web类型检查、生产构建和135项契约测试通过。企业微信外部送达、API/Web发布切换和完整合同验收仍未完成；证据见[ticket-workflow-integration-20261018.json](evidence/ticket-workflow-integration-20261018.json)与[ticket-workflow-final-validation-20261018.json](evidence/ticket-workflow-final-validation-20261018.json)。
+
 ## 2026-10-18 Notion接续与D07状态/SLA核心
 
 已读取用户更新的Notion总索引及十个子页，核对与现有合同/安全/冻结迁移的差异。新增工单状态转换、转派冻结、客户确认/72小时重开和工作时长SLA节点核心，34项隔离Java检查通过；指定LAN SSH/HTTP协议读取失败，PG/HTTP/UI及完整合同仍NOT_RUN。持久层和页面继续实现，不能将纯核心当作正式闭环完成。见[接续台账与证据](notion-development-20261018.md)。

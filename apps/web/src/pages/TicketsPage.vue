@@ -257,6 +257,7 @@ onUnmounted(() => { unregisterContextGuard(); window.removeEventListener('before
       <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />
       <ApiErrorNotice :error="detailError"><el-button size="small" @click="loadDetail()">重试详情查询</el-button></ApiErrorNotice>
       <el-skeleton v-if="detailLoading" :rows="9" animated />
+      <el-button v-if="ticket && (can('ticket_notes:write_internal') || can('tickets:report'))" type="primary" @click="router.push({ path: '/ticket-workflows', query: { ticket_id: ticket.id } })">进入工单处理与客户确认</el-button>
       <TicketDetailOverview v-if="ticket" :ticket="ticket" :refresh-key="detailRefreshKey" @close="closeDetail" @notes="openInternalNotes" @comments="openComments" @worklogs="openWorklogs">
         <div class="detail-section ticket-registration-operation" aria-label="登记操作回读">
           <h3>受理进度与流程状态</h3>

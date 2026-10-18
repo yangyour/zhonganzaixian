@@ -21,6 +21,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     private final ThreadLocal<Boolean> idempotentCommandScope = new ThreadLocal<>();
     private final ThreadLocal<Boolean> importJobScope = new ThreadLocal<>();
     private final ThreadLocal<Boolean> exportJobScope = new ThreadLocal<>();
+    private final ThreadLocal<Boolean> ticketClockScope = new ThreadLocal<>();
     public PostgresPlatformRepository(DataSource dataSource,ObjectMapper mapper){this.dataSource=dataSource;this.mapper=mapper;}
     @Override public RepositoryMetadata metadata(){return new RepositoryMetadata("remote_test","postgresql",true,"test_oidc");}
     @Override public boolean dependencyReady(){
@@ -85,6 +86,8 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     /** Scoped owned-record writes require the caller's idempotent command, never a worker or unrelated transaction. */
     Connection idempotentCommandConnection(){Connection active=transaction.get();if(active==null||!Boolean.TRUE.equals(idempotentCommandScope.get()))throw new IllegalStateException("Owned-record writes require an idempotent command transaction");return active;}
     Connection existingCommandConnection(){return Boolean.TRUE.equals(idempotentCommandScope.get())?transaction.get():null;}
+    <T>T ticketClockTransaction(Supplier<T> work){if(transaction.get()!=null)throw new IllegalStateException("Ticket clock requires an independent transaction");return inTransaction(()->scoped(ticketClockScope,work));}
+    Connection ticketClockConnection(){if(!Boolean.TRUE.equals(ticketClockScope.get())||transaction.get()==null)throw new IllegalStateException("Ticket clock transaction required");return transaction.get();}
     void requireStandaloneRead(){if(transaction.get()!=null)throw new IllegalStateException("Export selection requires a standalone readonly snapshot");}
     <T>T exportJobTransaction(Supplier<T> work){if(transaction.get()!=null)throw new IllegalStateException("Export worker requires an independent transaction");return inTransaction(()->scoped(exportJobScope,work));}
     Connection exportCommandConnection(){Connection c=transaction.get();if(c==null||!Boolean.TRUE.equals(exportJobScope.get()))throw new IllegalStateException("Export worker transaction required");return c;}

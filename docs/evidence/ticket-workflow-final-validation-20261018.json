@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-18",
+  "api_java_tests": {"tests": 1828, "failures": 0, "errors": 0, "skipped": 35},
+  "targeted_ticket_tests": {"tests": 58, "failures": 0, "errors": 0, "skipped": 0},
+  "real_postgres_ticket_tests": {"tests": 2, "failures": 0, "errors": 0, "skipped": 0},
+  "web_typecheck": "PASSED",
+  "web_build": {"status": "PASSED", "files": 105, "build_id": "0fb7a04dd2f4edfb50174b9f5e9cc6c8f184539092f865f7af6077cf51a030dd"},
+  "contract_tests": {"tests": 135, "failures": 0, "errors": 0},
+  "api_contract_version": "0.53.0",
+  "external_wecom_delivery": "NOT_RUN",
+  "formal_contract_acceptance": "NOT_RUN",
+  "production_approved": false,
+  "credentials_output": false
+}

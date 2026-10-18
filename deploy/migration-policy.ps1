@@ -2,7 +2,7 @@
 function Get-MopMigrationMode {
     param([switch]$ApplyPhotos, [switch]$ApplyAssetImports, [string]$ApplyFeature)
     $features = @{
-        'export-inbox' = '--apply-export-inbox'; 'runtime-configuration' = '--apply-runtime-configuration'
+        'ticket-workflow' = '--apply-ticket-workflow'; 'export-inbox' = '--apply-export-inbox'; 'runtime-configuration' = '--apply-runtime-configuration'
         'asset-dependencies' = '--apply-asset-dependencies'; 'worklogs' = '--apply-worklogs'
         'asset-metadata' = '--apply-asset-metadata'; 'internal-notes' = '--apply-internal-notes'
         'ticket-comments' = '--apply-ticket-comments'; 'working-calendars' = '--apply-working-calendars'
@@ -40,6 +40,8 @@ function Assert-MopMigrationResources {
         }
     }
     if ($expected.Count -ne 32) { throw '冻结迁移必须完整覆盖 V1–V32。' }
+    # V33 is an explicitly reviewed candidate; this does not claim remote execution.
+    $expected['V33__ticket_lifecycle_and_durable_clocks.sql'] = 'a33326b73d23d112b50ece07dc59938722cbc544e5c8b32f7d8db143ab6f35e7'
     foreach ($directory in @((Join-Path $ProjectRoot 'server/persistence/src/main/resources/db/migration'), (Join-Path $PersistenceClasses 'db/migration'))) {
         $files = @(Get-ChildItem -LiteralPath $directory -File -ErrorAction Stop)
         if ($files.Count -ne $expected.Count) { throw '源码或构建迁移集合与冻结清单不一致。' }

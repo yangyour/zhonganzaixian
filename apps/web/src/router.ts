@@ -18,6 +18,7 @@ export const router = createRouter({
     { path: '/network-monitoring', name: 'network-monitoring', component: () => import('./pages/NetworkMonitoringPage.vue'), meta: { title: '基础网络监控', group: '资源', capability: 'assets:read' } },
     { path: '/manual-incidents', name: 'manual-incidents', component: () => import('./pages/ManualIncidentsPage.vue'), meta: { title: '手工故障登记', group: '服务', capability: 'manual_incidents:read' } },
     { path: '/tickets', name: 'tickets', component: () => import('./pages/TicketsPage.vue'), meta: { title: '报障与受理', group: '服务', capability: 'tickets:read' } },
+    { path: '/ticket-workflows', name: 'ticket-workflows', component: () => import('./pages/TicketWorkflowsPage.vue'), meta: { title: '工单处理', group: '服务', capability: 'tickets:read' } },
     { path: '/my-notification-preferences', name: 'my-notification-preferences', component: () => import('./pages/OwnNotificationPreferencesPage.vue'), meta: { title: '通知偏好设置', group: '服务', capability: 'notification_preferences:read_own' } },
     { path: '/my-export-messages', name: 'my-export-messages', component: () => import('./pages/ExportInboxPage.vue'), meta: { title: '我的导出消息', group: '服务', roles: ['padmin','msp'], capability: 'assets:read' } },
     { path: '/asset-export-jobs', name: 'asset-export-jobs', component: () => import('./pages/AssetExportJobsPage.vue'), meta: { title: '台账导出', group: '服务', roles: ['padmin','msp'], capability: 'assets:read' } },

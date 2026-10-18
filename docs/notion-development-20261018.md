@@ -20,11 +20,13 @@ SLA按明确优先级/档位/参数冻结，工作时段推进复用已有区间
 
 验证：`mvn -B -ntp -o -pl server/api -am '-Dtest=TicketLifecycleTest' '-Dsurefire.failIfNoSpecifiedTests=false' test`，34用例、0失败、0错误、0跳过；覆盖完整路径、跨角色拒绝、CAS、转派冻结、20码点、72小时边界、确认到期、缺配置不关单、重复确认周期、工作周末时钟、取消和时间倒退。首次命令因PowerShell未引用点号参数失败，引用后执行成功；未把首次命令失败当业务失败。
 
-这只是核心算法验证，不是HTTP/数据库/UI或D07整体验收。后续持久化、接口、页面和真实联调按实际进展追加，本项合同状态仍NOT_RUN。
+随后追加V33并完成指定测试服务器真实持久化验证：V29—V32从原V28按冻结迁移顺序补齐，V33一次应用、重复0次、只读结构/权限核验通过。`PostgresTicketWorkflowIntegrationTest`使用项目测试命名空间的合成报障，真实验证OPEN→ACCEPTED→IN_PROGRESS→RESOLVED→CLOSED→IN_PROGRESS、客户投影隐藏负责人、旧版本409、跨租户404、只追加事件和通知待办；2项通过。证据见[ticket-workflow-integration-20261018.json](evidence/ticket-workflow-integration-20261018.json)。
+
+HTTP控制器、前端页面、迁移和持久层均已完成对应代码检查，但未启动发布站切换或企业微信真实送达；D07合同整体状态仍NOT_RUN。
 
 ## 当前环境阻塞
 
-读取Git忽略的既有LAN连接配置，只读盘点SSH握手失败（SSHException / banner未取得，尚未进入认证）；随后独立端口检查SSH读取超时，10010可建TCP但ready/live读取RemoteDisconnected。未取得当前组件版本/服务就绪证据，不能沿用10月15日状态声称今日可用。未安装本机替代组件、未修改远端服务、未执行迁移。继续不依赖远端的实现，待指定环境恢复后补真实迁移/PG/HTTP/浏览器证据。
+读取Git忽略的既有LAN连接配置时，LAN测试站SSH握手失败（SSHException / banner未取得，尚未进入认证）；随后独立端口检查SSH读取超时，10010可建TCP但ready/live读取RemoteDisconnected。原指定测试服务器随后恢复并通过项目SSH隧道完成V29—V33与PG真实测试；LAN站点的当前版本/HTTP/浏览器证据仍未取得。未安装本机替代组件、未修改远端服务配置。
 
 ## 模块接续台账
 

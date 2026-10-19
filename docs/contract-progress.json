@@ -1117,6 +1117,7 @@
       "local_references": [
         "docs/email-integration-20261019.md",
         "docs/evidence/email-http-ui-20261019.json",
+        "docs/evidence/email-live-20261019.json",
         "docs/evidence/email-persistence-20261019.json"
       ],
       "external_references_unchecked": 0,
@@ -1462,6 +1463,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "d7c787a79b9ce947d831fec0df0db98b9dbe1f4dd9f788d356f581cc7243ad55"
+    "doc/development/07_合同逐项开发追踪.md": "c39850f44a010d940dc9d399695573eca62429fb31f5f48d38e765753427716b"
   }
 }

@@ -1,0 +1,254 @@
+{
+  "observed_at": "2026-10-19T07:28:10.595878+00:00",
+  "environment": "lan-test-20261008",
+  "checks": [
+    {
+      "name": "http://192.168.1.215:10010/api/v1/health/ready",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 ready",
+      "passed": true,
+      "production_ready": false
+    },
+    {
+      "name": "http://192.168.1.215:10010 login HTML",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 header Content-Security-Policy",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 header X-Content-Type-Options",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 header Referrer-Policy",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 header X-Frame-Options",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 header Permissions-Policy",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 release manifest",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 manifest no-cache",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010 missing JS",
+      "passed": true,
+      "http_status": 404
+    },
+    {
+      "name": "http://192.168.1.215:10010 verification file",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010/api/v1/auth/options",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 login option",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010/api/v1/auth/csrf",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010/api/v1/auth/local/login",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 project login",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010/api/v1/wecom/status",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 manual enabled auto disabled",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010/api/v1/wecom/bindings",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 preserved member binding",
+      "passed": true
+    },
+    {
+      "name": "http://192.168.1.215:10010/api/v1/wecom/deliveries",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010/api/v1/auth/csrf",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://192.168.1.215:10010 IP callback origin guard",
+      "passed": true,
+      "http_status": 503
+    },
+    {
+      "name": "http://192.168.1.215:10010 send without CSRF rejected",
+      "passed": true,
+      "http_status": 403
+    },
+    {
+      "name": "http://mop.all-online.com.cn/api/v1/health/ready",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn ready",
+      "passed": true,
+      "production_ready": false
+    },
+    {
+      "name": "http://mop.all-online.com.cn login HTML",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn header Content-Security-Policy",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn header X-Content-Type-Options",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn header Referrer-Policy",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn header X-Frame-Options",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn header Permissions-Policy",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn release manifest",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn manifest no-cache",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn missing JS",
+      "passed": true,
+      "http_status": 404
+    },
+    {
+      "name": "http://mop.all-online.com.cn verification file",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn/api/v1/auth/options",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn login option",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn/api/v1/auth/csrf",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn/api/v1/auth/local/login",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn project login",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn/api/v1/wecom/status",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn manual enabled auto disabled",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn/api/v1/wecom/bindings",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn preserved member binding",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn/api/v1/wecom/deliveries",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn/api/v1/auth/csrf",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn/api/v1/auth/wecom/start",
+      "passed": true,
+      "http_status": 200
+    },
+    {
+      "name": "http://mop.all-online.com.cn fixed callback and provider",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn browser correlation",
+      "passed": true
+    },
+    {
+      "name": "http://mop.all-online.com.cn send without CSRF rejected",
+      "passed": true,
+      "http_status": 403
+    },
+    {
+      "name": "matching served Web builds",
+      "passed": true
+    }
+  ],
+  "messages_sent": 0,
+  "real_scan_callback": "DEFERRED_BY_USER",
+  "credentials_recorded": false,
+  "build_ids": {
+    "http://192.168.1.215:10010": "4903314ce8ce4a6ba737d13dfe4701b8e6af1852fbed3add7ddef9db6aa209b5",
+    "http://mop.all-online.com.cn": "4903314ce8ce4a6ba737d13dfe4701b8e6af1852fbed3add7ddef9db6aa209b5"
+  },
+  "delivery_row_counts": {
+    "http://192.168.1.215:10010": 1,
+    "http://mop.all-online.com.cn": 1
+  },
+  "status": "PASSED"
+}

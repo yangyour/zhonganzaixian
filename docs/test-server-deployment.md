@@ -1,5 +1,7 @@
 # 指定服务器验收部署
 
+2026-10-19最新发布：开发分支 `feat/d07-ticket-lifecycle` / `34a183e` 已通过统一脚本更新至指定LAN测试站，API0.58/V38、7应用统一版本、14服务真实就绪，7基础组件未重启，IP及业务域名53项HTTP检查通过。企业微信登录和人工通知启用，自动业务通知关闭，本次未发送消息。见[本次发布记录](test-environment-update-20261019.md)；下文旧日期版本保留为历史。
+
 当前LAN环境的日常拉取、构建、更新与回退见[统一操作流程](test-environment-update.md)。使用 `tools/update-lan-test-server.py`，保留既有组件与独立私有配置，不在应用启动时迁移。
 
 2026-10-19已为 `mop.all-online.com.cn` 发布用户提供的域名校验文件；HTTP根路径读取返回纯文本200并与附件逐字节相同，原文件纳入前端public资源。企业微信后台最终验证尚未观察，HTTPS另有证书过期问题，见[域名校验发布记录](domain-verification-20261019.md)。

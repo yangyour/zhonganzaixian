@@ -1,0 +1,44 @@
+{
+  "environment": "dot-disposable-pg-20261019",
+  "postgresql": "17.9 ICU76.1",
+  "validation_completed_at_utc": "2026-10-19T06:54:32Z",
+  "migration": {
+    "version": 38,
+    "sha256": "a24085a280ff822da932904c20cb3189fd813ef1d6ddc2f5458723ba48025756",
+    "frozen": true,
+    "first_authorized_application_at_utc": "2026-10-19T06:44:28.980258Z",
+    "fresh_database_first_apply_count": 1,
+    "repeat_apply_count": 0,
+    "readonly_apply_count": 0,
+    "existing_tables_compared": 89,
+    "existing_tables_unchanged": true,
+    "expected_registry_addition": "change_notice.approver_policy=null,pending"
+  },
+  "final_real_postgresql_tests": {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "passed": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "isolated_contract_tests": {
+    "passed": 7,
+    "scope": "Parser/resource/immutability/schema-attestation checks; not substituted for PostgreSQL"
+  },
+  "validation_history": [
+    "Initial 17 real PostgreSQL cases passed.",
+    "Expanded 21-case run:20 passed,1 test fixture error. PostgreSQL JDBC rejects non-ISO DateStyle and closed the connection; rollback masked the original exception. Failed log retained.",
+    "Fixture corrected to ISO, DMY with Asia/Shanghai and original-exception preservation; unchanged CHECK-tamper assertions. Final21 passed."
+  ],
+  "validated_source_sha256": {
+    "server/persistence/src/main/resources/db/migration/V38__immutable_change_notice_approval_events.sql": "a24085a280ff822da932904c20cb3189fd813ef1d6ddc2f5458723ba48025756",
+    "server/persistence/src/main/java/cn/mop/persistence/ChangeNoticeApprovalSchemaVerifier.java": "2ec5aec845553d02cd5f531c4d003d8d27a7c34d07d49318f6aa9fbeff4aca9c",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresChangeNoticeApprovalIntegrationTest.java": "b2a00fb235e38e7fcdc354caea4f70b1dbc644152c6f558e63d111b1332eefe5"
+  },
+  "cleanup": "Disposable PostgreSQL and test services cleaned after validation; original designated server untouched.",
+  "boundaries": [
+    "Internal revision approval is not runtime activation, alert suppression, device execution, automatic P3 or customer production approval.",
+    "API/UI tests belong to their separate integration evidence.",
+    "V1\u2013V37 migration bytes unchanged."
+  ]
+}

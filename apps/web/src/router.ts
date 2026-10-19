@@ -12,6 +12,8 @@ export const router = createRouter({
     { path: '/account', name: 'account', component: () => import('./pages/AccountPage.vue'), meta: { title: '我的账号', group: '账号' } },
     { path: '/identity/users', name: 'identity-users', component: () => import('./pages/IdentityUsersPage.vue'), meta: { title: '用户与成员授权', group: '管理', capability: 'users:read' } },
     { path: '/identity/roles', name: 'identity-roles', component: () => import('./pages/IdentityRolesPage.vue'), meta: { title: '角色与权限', group: '管理', capability: 'roles:read' } },
+    { path: '/wecom', name: 'wecom', component: () => import('./pages/WeComPage.vue'), meta: { title: '企业微信', group: '管理', capability: 'users:read' } },
+    { path: '/email', name: 'email', component: () => import('./pages/EmailPage.vue'), meta: { title: '邮件通知', group: '管理', capability: 'users:read' } },
     { path: '/identity/settings', name: 'identity-settings', component: () => import('./pages/IdentitySettingsPage.vue'), meta: { title: '身份认证设置', group: '管理', capability: 'roles:read' } },
     { path: '/dashboard', name: 'dashboard', component: () => import('./pages/DashboardPage.vue'), meta: { title: '运营总览', group: '资源', capability: 'dashboard:read' } },
     { path: '/assets', name: 'assets', component: () => import('./pages/AssetsPage.vue'), meta: { title: '资产管理', group: '资源', capability: 'assets:read' } },
@@ -55,7 +57,7 @@ router.beforeEach(async to => {
   try { await initializeSession() }
   catch { if (to.name !== 'login') return { name: 'login' } }
   if (!session.value && to.name !== 'login') return { name: 'login' }
-  if (to.name !== 'login' && ['project_local','oidc'].includes(session.value?.identity_source ?? '')) {
+  if (to.name !== 'login' && ['project_local','oidc','wecom'].includes(session.value?.identity_source ?? '')) {
     try { await refreshProjectSession() } catch (cause) { if (!session.value) return { name: 'login' }; navigationError.value = cause; return false }
   }
   const landing = session.value?.password_change_required ? 'account' : landingRoute(session.value, router.getRoutes())

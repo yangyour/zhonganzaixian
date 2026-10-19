@@ -1,0 +1,13 @@
+{
+  "mop_change_notice_approval_event_check": "CHECK (((((action)::text = 'SUBMIT'::text) AND ((from_state)::text = 'DRAFT'::text) AND ((to_state)::text = 'IN_REVIEW'::text) AND (version = 2)) OR (((action)::text = 'WITHDRAW'::text) AND ((((from_state)::text = 'DRAFT'::text) AND (version = 2)) OR (((from_state)::text = 'IN_REVIEW'::text) AND (version = 3))) AND ((to_state)::text = 'WITHDRAWN'::text)) OR (((action)::text = 'APPROVE'::text) AND ((from_state)::text = 'IN_REVIEW'::text) AND ((to_state)::text = 'APPROVED'::text) AND (version = 3)) OR (((action)::text = 'REJECT'::text) AND ((from_state)::text = 'IN_REVIEW'::text) AND ((to_state)::text = 'REJECTED'::text) AND (version = 3))))",
+  "mop_change_notice_approval_event_check1": "CHECK ((((action)::text = ANY ((ARRAY['APPROVE'::character varying, 'REJECT'::character varying])::text[])) = (review_policy_release_id IS NOT NULL)))",
+  "mop_change_notice_approval_event_check2": "CHECK ((((action)::text <> 'REJECT'::text) OR (note IS NOT NULL)))",
+  "mop_change_notice_approval_event_note_check": "CHECK (((note IS NULL) OR (((char_length((note)::text) >= 1) AND (char_length((note)::text) <= 2000)) AND ((note)::text !~ '^[\t-\r\u001c- \u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]*$'::text) AND ((note)::text !~ '[\u0001-\b\u000b\f\u000e-\u001f\u007f-\u009f]'::text))))",
+  "mop_change_notice_approval_event_version_check": "CHECK (((version >= 2) AND (version <= 3)))",
+  "mop_change_notice_approval_event_effective_check": "CHECK ((NOT effective))",
+  "mop_change_notice_approval_event_occurred_at_check": "CHECK (((occurred_at >= '0001-01-01 00:00:00+00'::timestamp with time zone) AND (occurred_at <= '9999-12-31 15:59:59.999+00'::timestamp with time zone)))",
+  "mop_change_notice_approval_event_content_sha256_check": "CHECK (((content_sha256)::text ~ '^[0-9a-f]{64}$'::text))",
+  "mop_change_notice_approval_event_permission_version_check": "CHECK ((permission_version > 0))",
+  "mop_change_notice_approval_even_alert_suppression_allowed_check": "CHECK ((NOT alert_suppression_allowed))",
+  "mop_change_notice_approval_event_device_execution_allowed_check": "CHECK ((NOT device_execution_allowed))"
+}

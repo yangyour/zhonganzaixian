@@ -1,5 +1,17 @@
 # MOP 实施状态
 
+## 2026-10-19 D11邮件通道接入与JiangFaMing收件绑定
+
+邮件管理页面、SMTP465严格TLS客户端、当前租户明确收件绑定、固定测试受理、本人站内通知明确转发及一次尝试耐久台账已实现，API契约0.59.0。指定LAN PG17.9已独立应用V39一次、重复/只读0次，92张既有业务表摘要保持；6项真实PG、26项邮件隔离、全量Java2221实际执行/919跳过、Web2228、契约140、部署保护20及生产构建通过。实际Java SMTP认证及页面连接检查通过，按用户明确选择绑定JiangFaMing且启用；桌面/手机及实际权限拒绝检查均留证。测试站API/Web已更新至804a3d8，服务器出口SMTP及25项实际HTTP通过，14服务运行，其余12项生命周期不变，0启动迁移，本机验证进程已停止。尚未发送邮件，实际投递/正式回执与完整D11、128项验收分别保留NOT_RUN，自动业务通知关闭。见[运行与验收记录](email-integration-20261019.md)。
+
+## 2026-10-19 华为 S5731 MIB 核对及 SNMP 只读诊断
+
+按用户提供的本地 MIB 和明确授权的文档示例，对 192.168.1.2 从指定服务器及既有 Zabbix 网络命名空间完成只读 SNMP v2c 诊断；两处均 `UDP_PORT_UNREACHABLE`，未读到身份、固件或资源首值，详细采集仍阻塞，不能标 DONE。新增固定目标诊断工具，核对 65 份 MIB 的来源指纹并复用现有解析器准备七项未发布候选；修正 uptime 秒单位及光功率 0.01 缩放，保留索引/无效值/速率等实际接入缺口。55 Python（新增20）和46 Java（新增5）隔离测试通过；原14服务/PG17.9 V38不变，没有 API 契约、迁移、部署、Zabbix 对象或设备配置变更。见[联调与边界](huawei-snmp-integration-20261019.md)。
+
+## 2026-10-19 测试站统一更新与可重复运维流程
+
+已交付 `tools/update-lan-test-server.py` 和[操作手册](test-environment-update.md)，覆盖当前上游分支fast-forward、完整测试/构建、不可变工件及SQL字节检查、项目归属/部署锁、候选真实就绪、仅应用切换、部分失败自动回退和活动事务显式恢复。17项隔离保护通过；真实运行已将7项应用更新至 `34a183e`，14服务就绪、V38历史不变、7基础组件生命周期不变。企业微信登录/人工通知按用户选择启用，自动业务通知关闭；IP及业务域名53项HTTP检查通过，本次消息发送0次。Java2189实际执行/913跳过、Web2224及契约138分别记录，不将跳过测试或本次发布计为完整合同验收。见[执行与留证](test-environment-update-20261019.md)。
+
 ## 2026-10-18 D15监控事件中心、去重归并(×N)、降噪漏斗、维护窗口SLA双确认、隔离区处置与自动建单补偿真实验证
 
 在指定远程测试库（PG17.9 `mop_test`）经项目SSH隧道追加V37（`mop_monitoring_event`、`mop_monitoring_event_member`、`mop_event_noise_record`、`mop_maintenance_window`、`mop_monitoring_quarantine_decision`、`mop_autoticket_attempt`及只追加/不可变守卫），一次应用（`migrations_executed=1`）、重复应用（`migrations_executed=0`）与只读结构权限核验（`MONITORING_EVENT_CENTER_APPLIED`）通过。新增`MonitoringEventPipeline`、`MonitoringEventCenterRepository`、PostgreSQL仓储`PostgresMonitoringEventCenterRepository`、API控制器`MonitoringEventCenterController`（API0.57.0：`GET/POST /api/v1/events`、`GET /api/v1/events/{id}`、`POST /api/v1/events/{id}/actions`、`GET /api/v1/events/noise-funnel`、`POST /api/v1/maintenance-windows`、`POST /api/v1/maintenance-windows/{id}/actions`、`POST /api/v1/monitoring-quarantine/{id}/decisions`、`POST /api/v1/autoticket-attempts/{id}/manual-create`）及前端`MonitoringEventsPage.vue`（`/monitoring-events`）。覆盖M1-2/M4-7..M4-11/M4-14/M5-4核心要求：真实PG集成测试`PostgresMonitoringEventCenterIntegrationTest`（2项）验证5分钟同指纹去重合并（`occurrence_count=5`及抽屉5条原始成员）、10分钟闪断≥3次静默30分钟、拓扑依赖抑制、监控状态（`PROBLEM/RECOVERED`）与人工处理状态（`NEW/ACKNOWLEDGED/IN_PROGRESS/RESOLVED/CLOSED`）正交独立且首次确认时间`first_ack_at`固化不可篡改、2分钟内自愈取消通知及三类通知空状态文案、维护窗口SLA排除须平台管理员二次确认后才计入排除时长、V30隔离区追加式人工绑定资产回灌或丢弃决策、自动建单指数退避（30s/120s/600s×3）连续5次失败转人工补建工单；Q14与Q29未确认前保持`CONFIG_PENDING_Q14`与`CONFIG_PENDING_Q29`。迁移策略41项、领域与控制器7项、契约138项、前端159文件/2218项及生产构建通过。证据见[monitoring-event-center-20261018.json](evidence/monitoring-event-center-20261018.json)。

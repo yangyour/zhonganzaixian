@@ -30,6 +30,8 @@ public class SessionService {
     private final HttpSessionCsrfTokenRepository csrfRepository;
     private final ObjectProvider<OidcClientInitiatedLogoutSuccessHandler> oidcLogout;
     private final ObjectProvider<ProjectIdentityService> projectIdentity;
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    private WeComService weCom;
     private record Access(FixtureUser user,Tenant tenant,Membership membership,List<String> capabilities){}
     public SessionService(PlatformRepository repository,ObjectMapper mapper,SecurityContextRepository contexts,HttpSessionCsrfTokenRepository csrfRepository,ObjectProvider<OidcClientInitiatedLogoutSuccessHandler> oidcLogout){
         this(repository,mapper,contexts,csrfRepository,oidcLogout,null);
@@ -39,7 +41,7 @@ public class SessionService {
         this.repository=repository;this.mapper=mapper;this.contexts=contexts;this.csrfRepository=csrfRepository;this.oidcLogout=oidcLogout;this.projectIdentity=projectIdentity;
     }
     public Map<String,Object> authOptions(){
-        if(projectIdentity!=null&&projectIdentity.getIfAvailable()!=null)return projectIdentity.getIfAvailable().options();
+        if(projectIdentity!=null&&projectIdentity.getIfAvailable()!=null){var result=projectIdentity.getIfAvailable().options();result.put("wecom_enabled",weCom!=null&&weCom.loginEnabled());result.put("wecom_start_url",weCom!=null&&weCom.loginEnabled()?"/api/v1/auth/wecom/start":null);return result;}
         boolean remote=repository.metadata().mode().equals("remote_test");
         return map("mode",repository.metadata().mode(),"identity_source",repository.metadata().identitySource(),"login_url",remote?"/oauth2/authorization/mop":null);
     }

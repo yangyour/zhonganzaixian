@@ -1,0 +1,9 @@
+{
+  "snapshot_commit": "7d687ba1e4ce46dc26c9ff29b28d3aaf146e5f3e",
+  "snapshot_path": "/tmp/dot-upstream39-snapshot",
+  "captured_at_utc": "2026-10-19T08:15:42.847485+00:00",
+  "api_jar_sha256": "88e5138ffba1bfd85dbb2f26e5e51326548bf05f8236f399a71ca0ff8dd4d1e1",
+  "git_clean_verified": true,
+  "upstream_baseline": "e739027",
+  "wecom_outbound_enabled": false
+}

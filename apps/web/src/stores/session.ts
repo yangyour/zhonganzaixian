@@ -38,7 +38,7 @@ export async function initializeSession() {
 let refreshing: Promise<void> | null = null
 /** Re-read effective grants on navigation; a changed epoch disposes old page commands and data. */
 export async function refreshProjectSession() {
-  if (!session.value || !['project_local','oidc'].includes(session.value.identity_source) || switchingTenant.value) return
+  if (!session.value || !['project_local','oidc','wecom'].includes(session.value.identity_source) || switchingTenant.value) return
   if (!refreshing) refreshing = api.request<Session>('/session').then(value => {
     const previous = session.value
     if (!previous) return
@@ -51,7 +51,7 @@ export async function refreshProjectSession() {
 export async function revalidateSessionAfterRestore() {
   if (refreshing) { try { await refreshing } catch { /* A new read still decides availability. */ } }
   if (!session.value) return
-  if (switchingTenant.value || !['project_local', 'oidc'].includes(session.value.identity_source)) throw new ApiError(0, 'SESSION_RECHECK_PENDING', '当前会话切换或来源尚未确认，请稍后重新核对', '—')
+  if (switchingTenant.value || !['project_local', 'oidc', 'wecom'].includes(session.value.identity_source)) throw new ApiError(0, 'SESSION_RECHECK_PENDING', '当前会话切换或来源尚未确认，请稍后重新核对', '—')
   await refreshProjectSession()
 }
 export interface TenantViewTransition { fromTenantId: string | null; toTenantId: string; originalReceiptConfirmed: boolean }

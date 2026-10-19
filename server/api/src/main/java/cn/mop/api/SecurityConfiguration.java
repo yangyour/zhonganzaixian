@@ -45,7 +45,7 @@ public class SecurityConfiguration {
     }
     SecurityFilterChain testSecurity(HttpSecurity http,ObjectMapper mapper,PlatformRepository repository,SecurityContextRepository contexts,HttpSessionCsrfTokenRepository csrf,TestOidcConfiguration oidc,ClientRegistrationRepository clients,SessionService sessions) throws Exception {
         common(http,mapper,repository,contexts,csrf);
-        http.authorizeHttpRequests(auth->auth.requestMatchers("/api/v1/health/live","/api/v1/health/ready","/api/v1/auth/options","/api/v1/auth/csrf","/api/v1/auth/local/login","/oauth2/**","/login/oauth2/**","/auth/logout").permitAll()
+        http.authorizeHttpRequests(auth->auth.requestMatchers("/api/v1/health/live","/api/v1/health/ready","/api/v1/auth/options","/api/v1/auth/csrf","/api/v1/auth/local/login","/api/v1/auth/wecom/options","/api/v1/auth/wecom/start","/api/v1/auth/wecom/callback","/oauth2/**","/login/oauth2/**","/auth/logout").permitAll()
             .requestMatchers("/api/v1/fixture/**").denyAll().anyRequest().authenticated());
         if(oidc==null||clients==null)return http.build();
         var resolver=new DefaultOAuth2AuthorizationRequestResolver(clients,"/oauth2/authorization");

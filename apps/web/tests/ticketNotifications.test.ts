@@ -49,9 +49,9 @@ describe('ticket in-app notifications',()=>{
   let resolveRead!:(v:unknown)=>void;x.request.mockReturnValue(new Promise(r=>{resolveRead=r}));const pending=x.w.list(false);const signal=x.request.mock.calls[0]![1].signal;x.w.reset(null);resolveRead(page());expect(await pending).toBe(false);expect(signal.aborted).toBe(true);expect(x.w.state().page).toBeNull()
   const y=setup(internal);y.request.mockResolvedValue(intents());expect(await y.w.intents()).toBe(true);expect(y.request).toHaveBeenCalledWith('/notification-intents?page_size=25')
  })
- it('route, menu and page disclose that external channels are not configured',()=>{
+ it('route, menu and page separate explicit WeCom delivery from automatic channel policy',()=>{
   const router=readFileSync(resolve('src/router.ts'),'utf8'),nav=readFileSync(resolve('src/utils/navigationModules.ts'),'utf8'),source=readFileSync(resolve('src/pages/TicketNotificationsPage.vue'),'utf8')
   expect(router).toContain("path: '/ticket-notifications'");expect(router).toMatch(/ticket-notifications.*capability: 'tickets:read'/);expect(nav).toContain("['ticket-notifications','工单通知']")
-  expect(source).toContain('Q14');expect(source).toContain('Q18');expect(source).toContain('不代表已推送或已送达')
+  expect(source).toContain('WeComNotificationAction');expect(source).toContain('自动业务通知尚未启用');expect(source).toContain('服务器受理与实际收到分别记录')
  })
 })

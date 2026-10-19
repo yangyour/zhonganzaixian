@@ -1,5 +1,23 @@
 # 指定测试环境组件清单
 
+2026-10-19邮件通道：复用用户明确提供的腾讯企业邮箱SMTP465服务，本机实际Java客户端及指定LAN候选/正式API均已通过加密/主机名/证书校验与账号认证；本机IMAP993此前仅连接验证，本次不读取邮件。持久化继续复用指定LAN PG17.9，独立新增项目V39、6项真实PG通过，未启动本机数据库/队列或邮件替代服务。API/Web已更新至804a3d8，14服务运行，其他12项实例/镜像/启动时间/重启数保持一致；候选已清理，25项正式入口HTTP通过，本机验证进程已停止。用途为固定测试与本人通知明确转发，自动业务通知关闭；本机口令保持DPAPI加密，Linux采用0400、UID10001只读秘密文件，容器环境不含口令。实际邮件发送/投递尚未执行，不登记为完整渠道送达成功。见[邮件接入记录](../email-integration-20261019.md)、[正式组件/HTTP复核](../evidence/email-live-20261019.json)。
+
+2026-10-19实际SNMP团体字已由用户提供并仅更新Git忽略私有文件，解除凭据未提供项；指定服务器及原Zabbix网络命名空间各一次身份GET仍`TIMEOUT_NO_RESPONSE`，没有身份/资源样本，monitoring_ready=false。当前需核对设备团体权限/视图/ACL、监听配置及收发统计/响应路径，状态`SNMP_NO_RESPONSE`；v2c已启用、目标IP属于Vlanif192且up/up以用户上轮截图为证。没有批准替代、其他凭据尝试或设备配置写入。见[实际参数复测](../evidence/huawei-snmp-actual-credential-probe-20261019.json)。
+
+2026-10-19华为v2c/地址确认后再次复测：用户CLI截图已确认Polling v2c启用、192.168.1.2/24属于Vlanif192且up/up，解除这两项待确认；原私有示例凭据从服务器/既有Zabbix网络命名空间各一个GET仍超时，状态`SNMP_NO_RESPONSE`、monitoring_ready=false。实际只读团体字、视图/ACL及SNMP监听/收发计数未核验，仍影响身份、固件及详细指标首值/持续历史；无批准替代、未试其他团体字或执行设备写入。见[本次证据](../evidence/huawei-snmp-v2c-enabled-probe-20261019.json)和[观察来源](../evidence/huawei-snmp-v2c-enabled-observations-20261019.json)。
+
+2026-10-19华为配置截图后复测：同一192.168.1.2/UDP161、私有示例参数，在指定服务器/原Zabbix网络命名空间均超时 `TIMEOUT_NO_RESPONSE`，与早一轮errno111拒绝分别保留。用途为只读设备身份/指标；影响为身份、固件、首值和持续历史仍不可用，monitoring_ready=false。待设备侧应用并核对Polling v2c、Vlanif192是否拥有目标IP、只读团体/视图与来源ACL；无替代组件或安装/设备写入。状态`SNMP_NO_RESPONSE`，不是已接通。见[最新诊断](../evidence/huawei-snmp-after-ui-screenshot-20261019.json)和[截图分析](../huawei-snmp-integration-20261019.md)。
+
+## 2026-10-19 华为 MIB 与 SNMP 示例只读联调
+
+固定主机信任复核指定 LAN 环境，前后 14 服务运行、PG17.9/V38、Zabbix7.0.31、原应用 ready=true。华为 192.168.1.2 在服务器/现有采集网络命名空间均 ICMP 2/2、TCP22/80/443 开放，但使用用户授权文档示例发送 SNMP v2c GET 时两处均 errno111/`UDP_PORT_UNREACHABLE`；未取得身份/固件/指标，设备 monitoring_ready=false。用途为厂商资源、接口与光功率采集，影响为首值/历史/恢复/页面接线仍未验收；解除条件是设备侧核对 SNMP 代理、UDP161、协议/只读视图及来源 ACL，并提供实际只读参数。无批准替代组件，不改成本机监控或 fixture；服务器缺 snmpget/snmpwalk，仅使用一次性有限 UDP 诊断，不安装/重启服务或修改设备。MIB 为社区镜像，七项修正候选保持未发布/未核验。见[联调记录](../huawei-snmp-integration-20261019.md)、[最终诊断](../evidence/huawei-snmp-example-probe-final-20261019.json)。
+
+2026-10-19测试站统一更新：固定主机信任SSH核对后，复用指定LAN PG17.9/V38、MinIO、Redis7.4.9、RabbitMQ4.3.2与Zabbix7.0.31；API/Web及5项Worker更新到 `34a183e`，14服务就绪，7基础组件ID/镜像/启动时间/重启次数全部不变，0迁移。企业微信由服务器现有受信任出口直接读取，凭证仅私有文件只读挂载；登录和人工通知启用，自动业务通知关闭。本次无组件安装/升级、无测试发送；HTTPS证书及真实扫码仍保留独立状态。见[发布记录](../test-environment-update-20261019.md)、[组件证据](../evidence/test-environment-update-components-20261019.json)。
+
+2026-10-19企业微信消息联调：本地API复用指定LAN PG17.9（V38）与已有服务器出口，实际应用与成员校验、耐久发送和用户接收确认均已完成。新增的是本地业务进程及SSH转发，不是基础组件；原共享服务未安装、替换或重启。应用页面/登录代码在本地验证，公网原站点未切换。扫码登录结果与完整D11验收单列，见[开发记录](../wecom-development-20261019.md)及[实际接收证据](../evidence/wecom-http-20261019.json)。
+
+2026-10-19企业微信接入复核：指定LAN服务器固定主机信任SSH恢复可用，项目归属已核对；实际PG17.9、当前V32。本机直连企微应用/成员接口返回60020（出口IP未受信任），指定LAN出口及同客户端经SSH隧道读取成功，应用启用、指定成员已激活。复用该服务器现有出口与PG，不安装新组件，不修改共享端口或配置。通知发送与登录完成情况分别见[企业微信开发记录](../wecom-development-20261019.md)，本次仅客户端只读联调通过。
+
 2026-10-18恢复后复核：原指定测试服务器通过项目SSH隧道可用，PG17.9、mop_test及迁移V33结构/权限核验通过；V29—V33均按显式迁移入口执行。LAN测试站此前独立连接失败状态仍保留，不与本次原服务器证据合并。D07持久化测试使用项目合成数据，未改变共享组件配置或其他租户数据。
 
 2026-10-18本地接续探测：指定LAN SSH握手失败（未取得banner、未进入认证），复核SSH读取超时；10010端口可建立TCP，但ready/live读取RemoteDisconnected。用途为新工单结构/PG及HTTP集成验证；影响为当前版本/就绪未能盘点，真实迁移和联调未执行。既有组件仍为首选，没有批准替代组件，也未启动本机DB/缓存/队列。状态`CONNECTIVITY_BLOCKED`，保留旧证据的原日期，不把10月15日成功当作今日成功。详见[本轮记录](../notion-development-20261018.md)。

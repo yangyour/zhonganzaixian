@@ -1,0 +1,11 @@
+import {describe,it,expect} from 'vitest'
+import {emailStatusLabels} from '../src/utils/email'
+import {validateIdentityWrite,createIdentityCommand} from '../src/utils/projectIdentity'
+import {ApiError} from '../src/api/client'
+const id='55000000-0000-4000-8000-000000000001'
+describe('Email command response and recovery safety',()=>{
+ it('keeps accepted distinct from actual receipt and unknown explicit',()=>{expect(emailStatusLabels.ACCEPTED).toBe('邮件服务器已受理');expect(emailStatusLabels.UNKNOWN).toContain('待核对')})
+ it('rejects substituted account, mailbox and revision in binding receipts',()=>{const body={expected_version:0,email:'recipient@example.test',active:true};const result={id,user_id:id,email:body.email,active:true,version:1};expect(()=>validateIdentityWrite('/email/bindings/'+id,body,result)).not.toThrow();for(const patch of [{user_id:'other'},{email:'other@example.test'},{version:8}])expect(()=>validateIdentityWrite('/email/bindings/'+id,body,{...result,...patch})).toThrow()})
+ it('rejects unearned delivered status, substituted notification source and leaked secret',()=>{const body={expected_version:0},raw={id,status:'QUEUED',version:0,source_message_id:id};expect(()=>validateIdentityWrite('/my/notifications/'+id+'/email',body,raw)).not.toThrow();for(const patch of [{status:'DELIVERED'},{source_message_id:'other'},{password:'secret'}])expect(()=>validateIdentityWrite('/my/notifications/'+id+'/email',body,{...raw,...patch})).toThrow();expect(()=>validateIdentityWrite('/email/test-messages',body,{...raw,source_message_id:null})).not.toThrow()})
+ it('replays the same original request after lost response without making a new send',async()=>{const keys:string[]=[];let attempts=0;const client={request:async(_path:string,options:any)=>{keys.push(options.idempotencyKey);if(attempts++===0)throw new ApiError(0,'NETWORK_ERROR','lost','synthetic');return {id,status:'QUEUED',version:0,source_message_id:null}}};const command=createIdentityCommand(client as any,()=>{},()=> 'synthetic-email-key');expect(await command.submit('/email/test-messages','POST',{expected_version:0})).toBe(false);expect(command.unresolved()).toBe(true);expect(await command.retry()).toBe(true);expect(keys).toEqual(['synthetic-email-key','synthetic-email-key'])})
+})

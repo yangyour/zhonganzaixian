@@ -1,0 +1,201 @@
+{
+  "review_date": "2026-10-19",
+  "date_timezone": "America/New_York",
+  "review_type": "STATIC_SOURCE_CONTRACT_AND_HISTORICAL_EVIDENCE",
+  "head": "5907d779f1bb044d8daeb731ac8ed0b5bb368df5",
+  "branch": "feat/d07-ticket-lifecycle",
+  "api_contract_version": "0.58.0",
+  "overall_result": "PARTIALLY_CONFORMS_NOT_COMPLETE",
+  "source_scope": "Local working files including existing uncommitted changes; not a deployed version claim",
+  "implementation_changes_by_this_review": 0,
+  "live_environment_checks": "NOT_RUN",
+  "unit_integration_browser_tests": "NOT_RUN",
+  "credentials_read": false,
+  "historical_evidence_is_current_live_validation": false,
+  "planned_management_paths": [
+    {
+      "path": "/credentials",
+      "present": false
+    },
+    {
+      "path": "/monitoring/templates",
+      "present": false
+    },
+    {
+      "path": "/template-releases",
+      "present": false
+    },
+    {
+      "path": "/monitoring/pools",
+      "present": false
+    },
+    {
+      "path": "/sites",
+      "present": false
+    },
+    {
+      "path": "/proxies",
+      "present": false
+    }
+  ],
+  "monitoring_read_paths": [
+    "/network-monitoring",
+    "/network-monitoring/{assetId}/history",
+    "/network-monitoring/{assetId}/resources",
+    "/network-monitoring/{assetId}/resources/history",
+    "/network-monitoring/refresh-policy"
+  ],
+  "configuration_registry": [
+    {
+      "key": "monitor.page_refresh_sec",
+      "type": "integer",
+      "value": 30,
+      "scope": "平台"
+    },
+    {
+      "key": "monitor.sample_interval_sec",
+      "type": "integer",
+      "value": null,
+      "scope": "模板/设备"
+    },
+    {
+      "key": "device.oid_mapping",
+      "type": "object",
+      "value": null,
+      "scope": "厂商/型号"
+    },
+    {
+      "key": "device.firmware",
+      "type": "object",
+      "value": null,
+      "scope": "厂商/型号"
+    }
+  ],
+  "relative_links_checked": 29,
+  "checks": [
+    {
+      "name": "documented monitoring GET endpoints exist",
+      "passed": true
+    },
+    {
+      "name": "six planned management endpoint paths absent",
+      "passed": true
+    },
+    {
+      "name": "OID mapping registration is null",
+      "passed": true
+    },
+    {
+      "name": "firmware registration is null",
+      "passed": true
+    },
+    {
+      "name": "mapping candidate explicitly not effective",
+      "passed": true
+    },
+    {
+      "name": "mapping candidate explicitly not source verified",
+      "passed": true
+    },
+    {
+      "name": "AF collector 60 second schedule present",
+      "passed": true
+    },
+    {
+      "name": "AF resource alert rules pending",
+      "passed": true
+    },
+    {
+      "name": "private directory has zero tracked files",
+      "passed": true
+    },
+    {
+      "name": "private connection file ignored",
+      "passed": true
+    },
+    {
+      "name": "new document relative links resolve",
+      "passed": true
+    }
+  ],
+  "files": [
+    {
+      "path": "contracts/local-api.openapi.json",
+      "sha256": "c929f0f810158c57db88c0c3412ced4fa7d06c0accffd37ff22ed3e90574a37a"
+    },
+    {
+      "path": "contracts/config-baseline.json",
+      "sha256": "2401f37ae5bd67e8cd944baecab9b137677bb02aa7ab6e8f49e69df6d7831e19"
+    },
+    {
+      "path": "server/api/src/main/java/cn/mop/api/NetworkMonitoringConfiguration.java",
+      "sha256": "d3ad7bb36e001b336596196dae087c79960bfe0e67f677ba133129cdf6769b94"
+    },
+    {
+      "path": "server/api/src/main/java/cn/mop/api/NetworkMonitoringController.java",
+      "sha256": "0003773b4c7a53914d8f651e239a317ce93a71a0aa97477f1afa4e564bd969d5"
+    },
+    {
+      "path": "server/api/src/main/java/cn/mop/api/NetworkMonitoringService.java",
+      "sha256": "04f4eb74c93c456278d0160fc4ff1213c4c7b00f766ce882e3616d6b175892d2"
+    },
+    {
+      "path": "server/api/src/main/java/cn/mop/api/FirewallResourceConfiguration.java",
+      "sha256": "fddd08c66fd13aea8fc828e643f5057947d2ea1d2211e9f312b53cb99fc1c981"
+    },
+    {
+      "path": "server/api/src/main/java/cn/mop/api/FirewallResourceService.java",
+      "sha256": "5b6a019aab36d9c277192aff61257b0b0fd0fc5e694b4360b3b1348d95dcd7df"
+    },
+    {
+      "path": "server/api/src/main/java/cn/mop/api/RuntimeConfigurationCatalog.java",
+      "sha256": "679fbaa16178f765e1355ce7a87c98a5c8328e6a31f8d38faaa922811b3c7940"
+    },
+    {
+      "path": "server/adapters/src/main/java/cn/mop/adapters/af/AfClient.java",
+      "sha256": "13e85b0e18b50f7306bc5a44e407c2e8f4a21c586992c1b20ed76cce487a35bf"
+    },
+    {
+      "path": "server/adapters/src/main/java/cn/mop/adapters/af/AfCollectorMain.java",
+      "sha256": "6f6e001c08d682b984d264582d390c7eaa6f5040a512a6da04662d86b81c358e"
+    },
+    {
+      "path": "server/adapters/src/main/java/cn/mop/adapters/scp/ScpClient.java",
+      "sha256": "20534fd793af2ecdac8af3eb7b3ee02fd720c08b479a18af38371b882f48d84b"
+    },
+    {
+      "path": "server/adapters/src/main/java/cn/mop/adapters/monitoring/DeviceConnectionCheck.java",
+      "sha256": "ff79b617b874d61b7f2f95ef4fe9e4def4b41ee2c6a3205848b546de62cffde2"
+    },
+    {
+      "path": "server/adapters/src/main/java/cn/mop/adapters/monitoring/VendorMappingYaml.java",
+      "sha256": "99ba3ae0088bc2668ba5466b7e16e2ac95a8a5b3d65842df20da0cf9fd1ce588"
+    },
+    {
+      "path": "server/domain/src/main/java/cn/mop/domain/monitoring/VendorMappingCandidate.java",
+      "sha256": "de7f2456dae8333fa7831462215975bcc832c96575da1474d4235ad34cc91ee7"
+    },
+    {
+      "path": "apps/web/src/pages/RuntimeConfigurationsPage.vue",
+      "sha256": "16d41355e2ab930535494d87c4eefb0e66b4772b5c227384918f632bb136a6ab"
+    },
+    {
+      "path": "docs/evidence/af-resource-http-10010-20261014.json",
+      "sha256": "82e849ba5a8a1bb52ae5a82660d37b261b9e55a467c9b7b4e2eb81757da81de9"
+    },
+    {
+      "path": "docs/evidence/af-resource-fault-recovery-20261014.json",
+      "sha256": "c1501cfb4b583f3068c266dbbf03525a95ab1877a0d9bffb8e3203c46cedea7a"
+    },
+    {
+      "path": "docs/evidence/scp-password-verification-20261014.json",
+      "sha256": "db36212571248439fc6bdf860de2ed67ec97b94b2ec889bc69a747613024fe75"
+    }
+  ],
+  "limitations": [
+    "No device authentication or SNMP requests",
+    "No current server or component version probe",
+    "No deployment, migration or configuration changes",
+    "No all-contract or production acceptance claim"
+  ]
+}

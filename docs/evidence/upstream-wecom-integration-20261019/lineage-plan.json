@@ -1,0 +1,27 @@
+{
+  "status": "PASS_COMPLETED_CLEANED",
+  "upstream_commit": "e739027",
+  "lineage": "new fresh database, not migration-number rewrite on an existing database",
+  "historical_approval_v38": {
+    "original_sql_sha256": "a24085a280ff822da932904c20cb3189fd813ef1d6ddc2f5458723ba48025756",
+    "applied_only_to_disposable_local_clusters": true,
+    "never_shared_or_deployed": true,
+    "previous_api_and_pg_shutdown_confirmed": true,
+    "previous_cluster_directories_removed": true,
+    "historical_evidence_unchanged": "/workspace/shared/dot-local-test-evidence-20261019"
+  },
+  "new_expected_lineage": {
+    "V1_V38": "exact e739027 upstream bytes",
+    "V38": "wecom_bindings_deliveries_and_login_state",
+    "V39": "byte-identical approval SQL; new fresh cluster only",
+    "V40": "not authorized or included in this prepared run"
+  },
+  "safety": {
+    "real_wecom_delivery": false,
+    "wecom_login_or_qr": false,
+    "provider_credentials_loaded": false,
+    "existing_databases_reused": false
+  },
+  "approval_required_before_start": "parent approved compiled snapshot, final API artifact checksum, explicit GO",
+  "completed_at_utc": "2026-10-19T08:18:57.405524+00:00"
+}

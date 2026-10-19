@@ -1,0 +1,14 @@
+{
+  "scope": "D10 approval API isolated controller and Spring MVC/security tests",
+  "environment": "dot-cloud-isolated-no-external-services",
+  "base": "c552b70",
+  "dependencies": ["f89c6fc", "d810855"],
+  "java_tests": { "status": "PASS", "tests": 31, "failures": 0, "errors": 0, "skipped": 0, "classes": { "ChangeNoticeApprovalControllerTest": 12, "ChangeNoticeApprovalHttpSecurityTest": 5, "ChangeNoticeApprovalTest": 14 } },
+  "contract_module_test": { "status": "PASS", "tests": 1 },
+  "external_database": "NOT_RUN",
+  "migration_application": "NOT_RUN",
+  "real_oidc": "NOT_RUN",
+  "browser": "NOT_RUN",
+  "production_acceptance": "NOT_RUN",
+  "notes": "Repository mocks exercise HTTP parsing, CSRF, current membership, authorized idempotency callbacks, and sanitized errors. Approval never grants execution/activation/suppression. Initial test pass attempt found a test-stubbing error; corrected doAnswer replay stub and reran all listed tests successfully. Shared generated OpenAPI integration remains parent-owned."
+}

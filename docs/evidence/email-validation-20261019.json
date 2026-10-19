@@ -1,0 +1,33 @@
+{
+  "verified_at": "2026-10-19T08:25:30.932780+00:00",
+  "environment": "designated LAN PG17.9/V39; actual Tencent SMTP; local Java17",
+  "java_full": {
+    "reported": 3140,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 919,
+    "executed": 2221
+  },
+  "email_isolated_tests": 26,
+  "designated_pg_tests_executed_separately": 6,
+  "web_tests": 2228,
+  "api_contract_tests": 140,
+  "deployment_guard_tests": 20,
+  "web_typecheck": true,
+  "web_production_build": true,
+  "static_manifest_check": true,
+  "contract_generator_consistent": true,
+  "existing_contract_values_preserved": true,
+  "source_files_verified": 1582,
+  "prospective_repository_files_secret_scanned": 3281,
+  "actual_java_smtp_probe": {
+    "ready": true,
+    "smtp_authenticated": true,
+    "certificate_verification": true,
+    "messages_sent": 0
+  },
+  "actual_smtp_submission_tested": false,
+  "end_to_end_delivery_tested": false,
+  "messages_sent": 0,
+  "formal_contract_complete": false
+}

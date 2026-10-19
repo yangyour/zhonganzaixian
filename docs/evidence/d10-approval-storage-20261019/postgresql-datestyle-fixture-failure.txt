@@ -1,0 +1,115 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] MOP local development baseline                                     [pom]
+[INFO] mop-domain                                                         [jar]
+[INFO] mop-persistence                                                    [jar]
+[INFO] 
+[INFO] ------------------------< cn.mop:mop-platform >-------------------------
+[INFO] Building MOP local development baseline 0.1.0-SNAPSHOT             [1/3]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] -------------------------< cn.mop:mop-domain >--------------------------
+[INFO] Building mop-domain 0.1.0-SNAPSHOT                                 [2/3]
+[INFO]   from server/domain/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ mop-domain ---
+[INFO] skip non existing resourceDirectory /tmp/dot-v38-validation/server/domain/src/main/resources
+[INFO] skip non existing resourceDirectory /tmp/dot-v38-validation/server/domain/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ mop-domain ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 138 source files with javac [debug parameters release 17] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ mop-domain ---
+[INFO] skip non existing resourceDirectory /tmp/dot-v38-validation/server/domain/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ mop-domain ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug parameters release 17] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ mop-domain ---
+[INFO] 
+[INFO] -----------------------< cn.mop:mop-persistence >-----------------------
+[INFO] Building mop-persistence 0.1.0-SNAPSHOT                            [3/3]
+[INFO]   from server/persistence/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ mop-persistence ---
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] Copying 38 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ mop-persistence ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 62 source files with javac [debug parameters release 17] to target/classes
+[INFO] /tmp/dot-v38-validation/server/persistence/src/main/java/cn/mop/persistence/PostgresPlatformRepository.java: Some input files use or override a deprecated API.
+[INFO] /tmp/dot-v38-validation/server/persistence/src/main/java/cn/mop/persistence/PostgresPlatformRepository.java: Recompile with -Xlint:deprecation for details.
+[INFO] /tmp/dot-v38-validation/server/persistence/src/main/java/cn/mop/persistence/FixtureRepository.java: Some input files use unchecked or unsafe operations.
+[INFO] /tmp/dot-v38-validation/server/persistence/src/main/java/cn/mop/persistence/FixtureRepository.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ mop-persistence ---
+[INFO] skip non existing resourceDirectory /tmp/dot-v38-validation/server/persistence/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ mop-persistence ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 89 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] /tmp/dot-v38-validation/server/persistence/src/test/java/cn/mop/persistence/PostgresAssetImportIntegrationTest.java: Some input files use unchecked or unsafe operations.
+[INFO] /tmp/dot-v38-validation/server/persistence/src/test/java/cn/mop/persistence/PostgresAssetImportIntegrationTest.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ mop-persistence ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running cn.mop.persistence.PostgresChangeNoticeApprovalIntegrationTest
+SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+[ERROR] Tests run: 21, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 4.627 s <<< FAILURE! -- in cn.mop.persistence.PostgresChangeNoticeApprovalIntegrationTest
+[ERROR] cn.mop.persistence.PostgresChangeNoticeApprovalIntegrationTest.verifierRejectsSameCountWeakenedCheckAndRollbackRestoresSchema -- Time elapsed: 0.015 s <<< ERROR!
+org.postgresql.util.PSQLException: This connection has been closed.
+	at org.postgresql.jdbc.PgConnection.checkClosed(PgConnection.java:1026)
+	at org.postgresql.jdbc.PgConnection.rollback(PgConnection.java:1033)
+	at cn.mop.persistence.PostgresChangeNoticeApprovalIntegrationTest.verifierRejectsSameCountWeakenedCheckAndRollbackRestoresSchema(PostgresChangeNoticeApprovalIntegrationTest.java:212)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   PostgresChangeNoticeApprovalIntegrationTest.verifierRejectsSameCountWeakenedCheckAndRollbackRestoresSchema:212 » PSQL This connection has been closed.
+[INFO] 
+[ERROR] Tests run: 21, Failures: 0, Errors: 1, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for MOP local development baseline 0.1.0-SNAPSHOT:
+[INFO] 
+[INFO] MOP local development baseline ..................... SUCCESS [  0.001 s]
+[INFO] mop-domain ......................................... SUCCESS [  3.452 s]
+[INFO] mop-persistence .................................... FAILURE [ 10.962 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  14.727 s
+[INFO] Finished at: 2026-10-19T02:50:17-04:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.6:test (default-test) on project mop-persistence: 
+[ERROR] 
+[ERROR] See /tmp/dot-v38-validation/server/persistence/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :mop-persistence

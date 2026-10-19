@@ -1,0 +1,34 @@
+{
+  "result": "PASS",
+  "source_commit": "7d687ba1e4ce46dc26c9ff29b28d3aaf146e5f3e",
+  "postgresql": "17.9 ICU 76.1",
+  "postgres_endpoint": "127.0.0.1:25432",
+  "api_endpoint": "127.0.0.1:28080",
+  "fresh_database": true,
+  "upstream_frozen_migrations_verified": 38,
+  "total_unique_migrations": 39,
+  "approval_pg_tests": {
+    "passed": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "actual_api_http_checks": 43,
+  "prior_table_fingerprints_unchanged": 92,
+  "wecom_schema_apply_repeat_check": [
+    1,
+    0,
+    0
+  ],
+  "approval_schema_apply_repeat_check": [
+    1,
+    0,
+    0
+  ],
+  "real_wecom_outbound_tested": false,
+  "wecom_flags_enabled": false,
+  "api_stopped": true,
+  "postgres_stopped": true,
+  "private_cluster_and_credentials_removed": true,
+  "historical_evidence_modified": false
+}

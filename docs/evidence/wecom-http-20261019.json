@@ -1,0 +1,102 @@
+{
+  "observed_at": "2026-10-19T06:42:28.989941+00:00",
+  "environment": "local-api-and-designated-lan-components",
+  "checks": [
+    {
+      "name": "login_csrf",
+      "http_status": 200,
+      "expected": 200
+    },
+    {
+      "name": "admin_local_login",
+      "http_status": 200,
+      "expected": 200
+    },
+    {
+      "name": "live_application_check",
+      "http_status": 200,
+      "expected": 200
+    },
+    {
+      "name": "role_catalog",
+      "http_status": 200,
+      "expected": 200
+    },
+    {
+      "name": "new_username_check",
+      "http_status": 200,
+      "expected": 200
+    },
+    {
+      "name": "create_requested_padmin_account",
+      "http_status": 200,
+      "expected": 200
+    },
+    {
+      "name": "bind_verified_member",
+      "http_status": 200,
+      "expected": 200
+    },
+    {
+      "name": "missing_csrf_rejected",
+      "http_status": 403,
+      "expected": 403
+    },
+    {
+      "name": "recipient_override_rejected",
+      "http_status": 400,
+      "expected": 400
+    },
+    {
+      "name": "authorized_test_enqueued",
+      "http_status": 202,
+      "expected": 202
+    },
+    {
+      "name": "test_idempotent_replay",
+      "http_status": 202,
+      "expected": 202
+    },
+    {
+      "name": "delivery_read",
+      "http_status": 200,
+      "expected": 200
+    },
+    {
+      "name": "delivery_read",
+      "http_status": 200,
+      "expected": 200
+    }
+  ],
+  "application_ready": true,
+  "account": {
+    "username": "JiangFaMing",
+    "role": "padmin",
+    "binding_active": true,
+    "binding_version": 1
+  },
+  "same_delivery_on_replay": true,
+  "delivery": {
+    "id": "fd7d3842-a9ac-40fb-8f14-7b29901024df",
+    "kind": "TEST",
+    "status": "ACCEPTED",
+    "version": 2,
+    "error_code": null,
+    "provider_code": 0,
+    "created_at": "2026-10-19T06:42:39.833Z",
+    "started_at": "2026-10-19T06:42:43.064Z",
+    "finished_at": "2026-10-19T06:42:43.740Z",
+    "provider_message_id_present": true
+  },
+  "actual_recipient_confirmation": "CONFIRMED_BY_USER",
+  "actual_oauth_scan": "DEFERRED_BY_USER",
+  "provider_login_page": "VERIFIED_REAL_APPLICATION_QR",
+  "recipient_confirmation_evidence": {
+    "source": "user_message_and_screenshot",
+    "application_name": "MOP运维服务门户",
+    "test_message_matches_authorized_text": true,
+    "recorded_at": "2026-10-19T06:49:49.299629+00:00",
+    "provider_status_unchanged": "ACCEPTED",
+    "automated_delivered_receipt_observed": false
+  }
+}

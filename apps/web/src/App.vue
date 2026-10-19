@@ -84,7 +84,7 @@ async function endSession() {
         <HorizontalModuleNavigation v-model:mobile-open="mobileNavigationOpen" :collapsed="sidebarCollapsed" />
         <div class="topbar-controls">
           <div class="identity"><span class="avatar">{{ session.user.display_name.slice(0, 1) }}</span><div><strong>{{ session.user.display_name }}</strong><small>{{ roleLabel[session.user.role] }}</small></div></div>
-          <el-button v-if="['project_local','oidc'].includes(session.identity_source)" text class="account-button" @click="router.push('/account')">我的账号</el-button>
+          <el-button v-if="['project_local','oidc','wecom'].includes(session.identity_source)" text class="account-button" @click="router.push('/account')">我的账号</el-button>
           <el-button text :loading="leaving" @click="endSession">退出</el-button>
         </div>
       </header>

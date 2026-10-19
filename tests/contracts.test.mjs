@@ -135,7 +135,7 @@ test('所有业务写接口明确要求幂等及CSRF，remote_test不存在fixtu
       if (!['post', 'put', 'patch', 'delete'].includes(method)) continue;
       const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons', '/contacts/import-preview', '/monitoring/threshold-diagnostics', '/runtime-configurations/{key}/validate'].includes(path);
       if (readonlyPreview) assert.equal(operation['x-mop-read-only'], true);
-      for (const name of readonlyPreview || path === '/auth/local/login' ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
+      for (const name of readonlyPreview || ['/auth/local/login','/auth/wecom/start'].includes(path) ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
         assert.ok(operation.parameters.some((p) => p.in === 'header' && p.name === name && p.required), `${method} ${path} ${name}`);
       }
     }
@@ -217,9 +217,11 @@ test('就绪成功不能把已启用但缺schema或存储的照片能力写成RE
   const photos = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, policy_source: 'USER_DEVELOPMENT_DIRECTION', reasons: [] };
   const data = { own_notification_preferences:{schema_access_ready:true,configuration_status:"CONFIG_PENDING",effective:false,receiver_binding_status:"NOT_VERIFIED",notification_dispatched:false}, asset_exports:{schema_access_ready:true,mode:"PREPARE_ONLY_NO_PUBLICATION",worker_liveness:null,publication_status:"NOT_IMPLEMENTED",download_allowed:false}, change_notice_drafts: {schema_access_ready:true,approval_status:null,automatic_p3_decision:null,approval_workflow_status:"CONFIG_PENDING",matching_policy_status:"CONFIG_PENDING",effective:false,device_execution_allowed:false,alert_suppression_allowed:false}, backup_plan_drafts: {schema_access_ready:true,effective:false,device_execution_allowed:false,credential_verification:"NOT_VERIFIED",scheduler_running:null}, inspection_source_collections: { schema_access_ready: true, verification_status: 'SELF_REPORTED_UNVERIFIED', generation_status: 'CONFIG_PENDING', formal_report_generatable: false, report_published: false }, inspection_worksheets: { schema_access_ready: true, verification_status: 'SELF_REPORTED_UNVERIFIED', evidence_binding_status: 'NOT_IMPLEMENTED', publication_status: 'NOT_IMPLEMENTED', report_published: false, active_scan_performed: false }, contact_imports: { schema_access_ready: true, worker_liveness: null, notification_dispatched: false, identity_binding_created: false }, inspection_templates: { schema_access_ready: true, approval_status: 'UNVERIFIED', publication_status: 'NOT_IMPLEMENTED', report_published: false, active_scan_performed: false }, customer_contacts: { schema_access_ready: true, notification_dispatched: false, channel_verification: 'NOT_VERIFIED', identity_binding_created: false }, status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, capacity_scenarios: { schema_access_ready: true, effective: false, measurement_verified: false, poc_executed: false }, working_calendars: { schema_access_ready: true, effective: false, customer_confirmation: 'UNVERIFIED' }, manual_incidents: { schema_access_ready: true, source_state: 'MANUAL', registration_status: 'REGISTERED_ONLY', monitoring_recovery_applicable: false, ticket_automatically_created: false }, manual_recovery: { schema_access_ready: true, source: 'HUMAN_CONFIRMATION', monitoring_recovery_applicable: false, ticket_state_changed: false, sla_changed: false }, photos, asset_reads: { unicode_search_ready: true, pagination: 'BOUNDED_POSTGRESQL_KEYSET' }, ticket_comments: { schema_access_ready: true, visibility: 'REPORTER_AND_INTERNAL', internal_identity_exposed: false, itsm_applied: false }, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
   data.runtime_configurations = { schema_access_ready: true, scope: 'CURRENT_TENANT', customer_confirmation_status: 'UNVERIFIED' };
+  data.change_notice_approvals = { schema_access_ready: true, record_source: 'REVISION_REVIEW_ONLY', effective: false, device_execution_allowed: false, alert_suppression_allowed: false };
   assert.equal(validates('ReadinessResult', { data, trace_id: 'MOP-FAKE-readiness' }), true);
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('ReadinessResult', { data: { ...data, photos: { ...photos, [key]: false } }, trace_id: 'MOP-FAKE-readiness' }), false);
   assert.equal(validates('ReadinessResult', { data: { ...data, production_ready: true }, trace_id: 'MOP-FAKE-readiness' }), false);
+  assert.equal(validates('ReadinessResult', { data: { ...data, change_notice_approvals: { ...data.change_notice_approvals, effective: true } }, trace_id: 'MOP-FAKE-readiness' }), false);
 });
 
 const importColumns = ['NAME', 'TYPE', 'ADDRESS', 'BRAND', 'MODEL', 'SERIAL_NUMBER', 'SITE', 'LOCATION', 'OWNER', 'BUSINESS', 'PURCHASE_DATE', 'WARRANTY_EXPIRY', 'OVERDUE_SERVICE_DATE', 'COLLECTION_METHOD', 'NOTE'];
@@ -245,7 +247,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.57.0');
+  assert.equal(contract.info.version, '0.60.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -905,7 +907,7 @@ test('站内消息只读列表与显式已读接口保持当前授权和CSRF幂�
 test('消息游标末页必须明确结束且签名链接只能指向本站下载接口',()=>{const result={data:{items:[inboxMessageSample()],has_more:false,next_before_issued_at:null,next_before_id:null,unread_count:1,observed_at:'2026-10-14T06:00:01Z'},trace_id:'synthetic'};assert.ok(validates('ExportInboxPageResult',result));assert.equal(validates('ExportInboxPageResult',{...result,data:{...result.data,next_before_id:id('1')}}),false);assert.equal(validates('ExportInboxMessage',{...inboxMessageSample(),content_url:'https://example.invalid/download'}),false);});
 
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.57.0');
+  assert.equal(contract.info.version, '0.60.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/sla'].get;
@@ -969,7 +971,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.57.0');
+  assert.equal(contract.info.version, '0.60.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1040,7 +1042,7 @@ test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26�
 });
 
 test('监控事件中心、降噪漏斗、维护窗口、隔离区人工决策与自动建单契约保持Q14/Q29待确认约束（D15/M1-2/M4-7..M4-11/M4-14/M5-4）', () => {
-  assert.equal(contract.info.version, '0.57.0');
+  assert.equal(contract.info.version, '0.60.0');
   assert.equal(contract.paths['/events'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/events'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/events/{id}'].get['x-mop-capability'], 'tickets:read');
@@ -1089,3 +1091,23 @@ test('监控事件中心、降噪漏斗、维护窗口、隔离区人工决策�
 
 
 
+
+
+test('变更报备审批契约绑定修订并保留未生效边界', () => {
+  const base = '/change-notice-drafts/{id}/revisions/{draft_revision}/approval';
+  assert.ok(contract.paths[base].get);
+  assert.ok(contract.paths[base + '/history'].get);
+  const action = contract.paths[base + '/actions'].post;
+  assert.equal(action['x-mop-idempotent-replay-reauthorization'], true);
+  assert.equal(action['x-mop-review-policy'], 'change_notice.approver_policy');
+  const snapshot = contract.components.schemas.ChangeNoticeApprovalSnapshot;
+  assert.equal(snapshot.properties.effective.const, false);
+  assert.equal(snapshot.properties.device_execution_allowed.const, false);
+  assert.equal(snapshot.properties.alert_suppression_allowed.const, false);
+  assert.ok(snapshot.required.includes('allowed_actions'));
+  const input = contract.components.schemas.ChangeNoticeApprovalAction;
+  assert.equal(input.additionalProperties, false);
+  assert.equal(validates('ChangeNoticeApprovalAction', { expected_version: 2, action: 'REJECT', note: null }), false);
+  assert.equal(validates('ChangeNoticeApprovalAction', { expected_version: 2, action: 'APPROVE', note: null }), true);
+  assert.equal(validates('ChangeNoticeApprovalAction', { expected_version: 2, action: 'APPROVE', note: null, actor_id: 'fake' }), false);
+});

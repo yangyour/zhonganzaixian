@@ -1,0 +1,79 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] MOP local development baseline                                     [pom]
+[INFO] mop-domain                                                         [jar]
+[INFO] mop-persistence                                                    [jar]
+[INFO] 
+[INFO] ------------------------< cn.mop:mop-platform >-------------------------
+[INFO] Building MOP local development baseline 0.1.0-SNAPSHOT             [1/3]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] -------------------------< cn.mop:mop-domain >--------------------------
+[INFO] Building mop-domain 0.1.0-SNAPSHOT                                 [2/3]
+[INFO]   from server/domain/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ mop-domain ---
+[INFO] skip non existing resourceDirectory /tmp/dot-v38-validation/server/domain/src/main/resources
+[INFO] skip non existing resourceDirectory /tmp/dot-v38-validation/server/domain/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ mop-domain ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ mop-domain ---
+[INFO] skip non existing resourceDirectory /tmp/dot-v38-validation/server/domain/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ mop-domain ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ mop-domain ---
+[INFO] 
+[INFO] -----------------------< cn.mop:mop-persistence >-----------------------
+[INFO] Building mop-persistence 0.1.0-SNAPSHOT                            [3/3]
+[INFO]   from server/persistence/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ mop-persistence ---
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] Copying 38 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ mop-persistence ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ mop-persistence ---
+[INFO] skip non existing resourceDirectory /tmp/dot-v38-validation/server/persistence/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ mop-persistence ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ mop-persistence ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running cn.mop.persistence.PostgresChangeNoticeApprovalIntegrationTest
+SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+[INFO] Tests run: 21, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.069 s -- in cn.mop.persistence.PostgresChangeNoticeApprovalIntegrationTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 21, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for MOP local development baseline 0.1.0-SNAPSHOT:
+[INFO] 
+[INFO] MOP local development baseline ..................... SUCCESS [  0.001 s]
+[INFO] mop-domain ......................................... SUCCESS [  0.423 s]
+[INFO] mop-persistence .................................... SUCCESS [  4.719 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  5.467 s
+[INFO] Finished at: 2026-10-19T02:54:32-04:00
+[INFO] ------------------------------------------------------------------------

@@ -1,5 +1,9 @@
 # LAN测试部署模板
 
+2026-10-19最新运行版本：`34a183e` / API0.58 / V38，7项应用由统一脚本更新，14服务真实就绪，7基础组件生命周期不变。企业微信登录及人工通知已启用，自动业务通知关闭；53项HTTP检查通过，本次未发送消息。活动覆盖路径见服务器 `active-update.json`，详见[实际执行记录](../../docs/test-environment-update-20261019.md)。下文旧日期版本为历史。
+
+日常更新统一使用[测试环境更新与回退流程](../../docs/test-environment-update.md)及 `tools/update-lan-test-server.py`。它拉取当前跟踪分支、执行测试与构建、逐文件校验不可变版本、候选API真实就绪检查、仅更新既有应用并保存回退事务；首次部署与旧临时脚本不再作为日常更新入口。实际执行结果以当次脱敏证据为准。
+
 2026-10-14最新运行版本：导出消息API0.48/V31、常驻准备队列和顶部横排模块；仍为13服务。`WEB_CONFIG_FILE`指向新不可变Nginx配置，CSP/缓存/静态gzip已实际应用。部署仅更新API/Web，不修改基础RELEASE_DIR和其他Worker版本；[完整记录及回退](../../docs/export-inbox.md)。
 
 API0.48新增[本人导出消息](../../docs/export-inbox.md)：先使用独立CLI显式`--apply-export-inbox`并复核V31，随后仅在API私有env开启`MOP_EXPORT_INBOX_ENABLED=true`；准备Worker不需要此开关或签名密钥。V1—V31冻结，不在应用启动时迁移，旧发布不补发。

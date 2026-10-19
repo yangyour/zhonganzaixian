@@ -50,6 +50,9 @@ if (-not (Test-Path -LiteralPath $rawEventVerifierClass) -or (Get-Item -LiteralP
 $quarantineVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/MonitoringQuarantineSchemaVerifier.java'
 $quarantineVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/MonitoringQuarantineSchemaVerifier.class'
 if (-not (Test-Path -LiteralPath $quarantineVerifierClass) -or (Get-Item -LiteralPath $quarantineVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $quarantineVerifierSource).LastWriteTimeUtc) { throw '监控隔离核验器缺失或早于源码；先重新编译。' }
+$changeApprovalVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/ChangeNoticeApprovalSchemaVerifier.java'
+$changeApprovalVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/ChangeNoticeApprovalSchemaVerifier.class'
+if (-not (Test-Path -LiteralPath $changeApprovalVerifierClass) -or (Get-Item -LiteralPath $changeApprovalVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $changeApprovalVerifierSource).LastWriteTimeUtc) { throw '报备审批核验器缺失或早于源码；先重新编译。' }
 Assert-MopMigrationResources -ProjectRoot $projectRoot -PersistenceClasses $persistenceClasses
 $dependencies = (Get-Content -Raw -LiteralPath $classpathFile).Trim()
 if (-not $dependencies -or $dependencies.Contains("`n") -or $dependencies.Contains("`r")) { throw '迁移 classpath 无效。' }

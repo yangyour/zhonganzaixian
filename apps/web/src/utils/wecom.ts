@@ -1,0 +1,9 @@
+export interface WeComBinding { id:string;user_id:string;display_name?:string;wecom_user_id:string;active:boolean;version:number;verified_at:string;updated_at:string }
+export interface WeComDelivery { id:string;tenant_id:string;actor_id:string;source_message_id:string|null;recipient:string;kind:'TEST'|'NOTIFICATION';status:'QUEUED'|'PROCESSING'|'ACCEPTED'|'FAILED'|'UNKNOWN'|'CANCELLED';version:number;provider_message_id:string|null;error_code:string|null;provider_code:number|null;created_at:string;started_at:string|null;finished_at:string|null }
+export interface WeComStatus { enabled:boolean;tenant_id:string;corp_id:string;agent_id:number;secret_configured:boolean;test_user_id:string|null;login_enabled:boolean;callback_url:string|null;dispatch_enabled:boolean;automatic_notifications_enabled:boolean;last_check:{ready:boolean;reason:string|null;application_name?:string;checked_at?:string} }
+export const wecomStatusLabels:Record<WeComDelivery['status'],string>={QUEUED:'等待发送',PROCESSING:'正在请求企业微信',ACCEPTED:'企业微信已受理',FAILED:'发送失败',UNKNOWN:'发送结果待核对',CANCELLED:'已取消发送'}
+export const wecomErrorLabels:Record<string,string>={WECOM_TRUSTED_IP_REQUIRED:'请求出口 IP 尚未列入应用可信 IP',WECOM_CREDENTIAL_REJECTED:'应用凭据不可用',WECOM_PERMISSION_DENIED:'应用权限不足',WECOM_MEMBER_UNAVAILABLE:'成员不存在或不可访问',WECOM_RECIPIENT_REJECTED:'企业微信拒绝了接收人',AUTHORIZATION_OR_BINDING_CHANGED:'发送前权限或成员绑定已变化',PROCESS_INTERRUPTED_OUTCOME_UNKNOWN:'发送进程中断，需核对实际接收情况',WECOM_NETWORK_OR_RESPONSE_UNAVAILABLE:'网络或接口响应未能确认'}
+export function safeWeComAuthorizationUrl(value:unknown):value is string {
+ if(typeof value!=='string')return false
+ try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password&&!u.port&&((u.hostname==='login.work.weixin.qq.com'&&u.pathname==='/wwlogin/sso/login')||(u.hostname==='open.weixin.qq.com'&&u.pathname==='/connect/oauth2/authorize'))}catch{return false}
+}

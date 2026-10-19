@@ -1,0 +1,15 @@
+{
+  "status": "PASS_COMPLETED_CLEANED",
+  "upstream_commit": "b72c3cff2f030812926f4dee9944262a47205d7d",
+  "upstream_frozen_versions": 39,
+  "approval_version": 40,
+  "approval_sha256": "a24085a280ff822da932904c20cb3189fd813ef1d6ddc2f5458723ba48025756",
+  "old_v39_database_removed": true,
+  "historical_evidence_untouched": true,
+  "external_provider_environment": "allowlist only; WeCom and Email disabled",
+  "services_started": true,
+  "requires": "compiled snapshot checksum and root GO",
+  "completed_at_utc": "2026-10-19T10:35:27.084079+00:00",
+  "services_currently_running": false,
+  "prerequisites_satisfied": true
+}

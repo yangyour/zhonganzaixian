@@ -13,7 +13,7 @@ public final class RuntimeConfigurationCatalog {
     public RuntimeConfigurationCatalog(ObjectMapper mapper){this.mapper=mapper;try(var input=getClass().getResourceAsStream("/config-baseline.json")){
         if(input==null)throw new IllegalStateException("Configuration catalog missing");
         for(JsonNode row:mapper.readTree(input).path("settings")){Map<String,Object> entry=mapper.convertValue(row,LinkedHashMap.class);String key=(String)entry.get("key");if(entries.put(key,entry)!=null)throw new IllegalStateException("Duplicate configuration key");}
-        if(entries.size()!=185)throw new IllegalStateException("Unexpected configuration catalog");
+        if(entries.size()!=186)throw new IllegalStateException("Unexpected configuration catalog");
     }catch(Exception e){throw new IllegalStateException("Configuration catalog unavailable",e);}}
     public Map<String,Object> entry(String key){var e=entries.get(key);if(e==null)throw new DomainException(404,"OBJECT_NOT_FOUND","配置键不存在或不可见");return e;}
     public List<Map<String,Object>> definitions(){return entries.keySet().stream().map(this::definition).toList();}
@@ -40,9 +40,18 @@ public final class RuntimeConfigurationCatalog {
         if(Set.of("oncall.handoff_local_time","backup.default_local_time").contains(key))s.put("pattern","^(?:[01][0-9]|2[0-3]):[0-5][0-9]$");
         if("itsm.local_authority_mode".equals(key))s.put("enum",List.of("MOP","EXTERNAL"));
         if("itsm.retry_backoff_sec".equals(key)){s.put("minItems",5);s.put("maxItems",5);s.put("items",Map.of("type","integer","minimum",1));}
+        if("change_notice.approver_policy".equals(key)) {
+            s.put("additionalProperties",false);s.put("required",List.of("reviewer_user_ids"));
+            s.put("properties",Map.of("reviewer_user_ids",Map.of("type","array","minItems",1,"maxItems",1000,"uniqueItems",true,"items",Map.of("type","string","format","uuid","pattern","^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"))));
+        }
         s.put("description",range);s.put("x-max-depth",12);s.put("x-max-container-items",1000);s.put("x-number-precision","SAFE_INTEGERS");return s;
     }
     public void validate(String key,JsonNode value){if(value!=null&&!value.isNull())depth(value,0);ConfigurationValueValidator.validate(entry(key),value);Map<String,Object> s=schema(key);
+        if("change_notice.approver_policy".equals(key)) {
+            if(!value.isObject()||value.size()!=1||!value.has("reviewer_user_ids"))throw invalid("审批人配置只接受reviewer_user_ids");
+            JsonNode ids=value.get("reviewer_user_ids");if(!ids.isArray()||ids.size()<1||ids.size()>1000)throw invalid("审批人必须为1至1000个明确用户UUID");
+            Set<String> seen=new HashSet<>();for(JsonNode id:ids)if(!id.isTextual()||!id.textValue().matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")||!seen.add(id.textValue()))throw invalid("审批人UUID必须规范且不重复");
+        }
         if(s.containsKey("enum")&&((List<?>)s.get("enum")).stream().noneMatch(v->mapper.valueToTree(v).equals(value)))throw invalid("值不在明确允许的枚举范围内");
         if(s.containsKey("pattern")&&!value.asText().matches((String)s.get("pattern")))throw invalid("字符串为空或不符合登记格式");
         if(value.isNumber()){BigDecimal n=value.decimalValue();if(s.containsKey("minimum")&&n.compareTo(new BigDecimal(s.get("minimum").toString()))<0||s.containsKey("exclusiveMinimum")&&n.compareTo(BigDecimal.ZERO)<=0||s.containsKey("maximum")&&n.compareTo(new BigDecimal(s.get("maximum").toString()))>0)throw invalid("数值超出登记范围");}

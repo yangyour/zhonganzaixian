@@ -1,0 +1,116 @@
+{
+  "name": "cn.mop.persistence.PostgresChangeNoticeApprovalIntegrationTest",
+  "time": "5.324",
+  "tests": "21",
+  "errors": "0",
+  "skipped": "0",
+  "failures": "0",
+  "flakes": "0",
+  "cases": [
+    {
+      "name": "databaseReplacesCallerBackdateAndFutureWithAuthoritativeReviewTime",
+      "seconds": "0.239",
+      "result": "REVIEW"
+    },
+    {
+      "name": "replayAndCasAreProtected",
+      "seconds": "0.117",
+      "result": "PASS"
+    },
+    {
+      "name": "unprotectedWritesAreRejected",
+      "seconds": "0.023",
+      "result": "PASS"
+    },
+    {
+      "name": "failedCallerRollsBackEventAuditAndReceipt",
+      "seconds": "0.044",
+      "result": "PASS"
+    },
+    {
+      "name": "viewNeverOffersActionsForArchivedOrSupersededRevision",
+      "seconds": "0.055",
+      "result": "PASS"
+    },
+    {
+      "name": "malformedPolicyBlocksRepositoryAndDirectSql",
+      "seconds": "0.173",
+      "result": "PASS"
+    },
+    {
+      "name": "expiredNewestReleaseDoesNotResurrectOlderAuthority",
+      "seconds": "2.125",
+      "result": "PASS"
+    },
+    {
+      "name": "verifierRejectsSameCountWeakenedCheckAndRollbackRestoresSchema",
+      "seconds": "0.063",
+      "result": "PASS"
+    },
+    {
+      "name": "changedOrArchivedHeadBlocksStaleApprovalAndDirectSql",
+      "seconds": "0.088",
+      "result": "PASS"
+    },
+    {
+      "name": "draftEditWinsAgainstWaitingReview",
+      "seconds": "0.207",
+      "result": "PASS"
+    },
+    {
+      "name": "sqlRuntimeCannotRewriteDeleteOrForgeBinding",
+      "seconds": "0.05",
+      "result": "PASS"
+    },
+    {
+      "name": "viewFailsClosedForMissingCurrentPolicy",
+      "seconds": "0.093",
+      "result": "PASS"
+    },
+    {
+      "name": "scheduledOnlyPolicyDoesNotRestoreDisabledAuthority",
+      "seconds": "0.14",
+      "result": "PASS"
+    },
+    {
+      "name": "membershipRevocationWinsAgainstWaitingReview",
+      "seconds": "0.216",
+      "result": "PASS"
+    },
+    {
+      "name": "disabledPolicyBlocksReviewAndReceiptReplay",
+      "seconds": "0.092",
+      "result": "PASS"
+    },
+    {
+      "name": "policyDisableWinsAgainstWaitingReview",
+      "seconds": "0.255",
+      "result": "PASS"
+    },
+    {
+      "name": "selfReviewOtherApplicantAndStaleMembershipAreRejected",
+      "seconds": "0.056",
+      "result": "PASS"
+    },
+    {
+      "name": "viewDerivesCurrentActionsAndDoesNotAppendAuditOrReceipts",
+      "seconds": "0.086",
+      "result": "PASS"
+    },
+    {
+      "name": "exactRevisionApprovalSurvivesRepositoryRecreationWithoutActivating",
+      "seconds": "0.099",
+      "result": "PASS"
+    },
+    {
+      "name": "serverDefaultTimestampIsMillisecondAlignedAndNeverRoundsIntoFuture",
+      "seconds": "0.126",
+      "result": "PASS"
+    },
+    {
+      "name": "concurrentDifferentKeysWithSameExpectedVersionHaveOneWinner",
+      "seconds": "0.038",
+      "result": "PASS"
+    }
+  ]
+}

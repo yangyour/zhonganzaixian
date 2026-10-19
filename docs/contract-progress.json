@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 56,
-  "rows_without_progress_notes": 72,
+  "rows_with_progress_notes": 57,
+  "rows_without_progress_notes": 71,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -65,7 +65,7 @@
     },
     "M8": {
       "requirements": 12,
-      "rows_with_progress_notes": 2,
+      "rows_with_progress_notes": 3,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 12
       }
@@ -1006,6 +1006,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/change-notice-approval-flow.md",
         "docs/change-notice-drafts.md",
         "docs/evidence/niko-change-notice-api-20261004.json",
         "docs/evidence/niko-change-notice-client-20261004.json",
@@ -1113,8 +1114,13 @@
       "id": "M8-1",
       "title": "通知渠道对接",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/email-integration-20261019.md",
+        "docs/evidence/email-http-ui-20261019.json",
+        "docs/evidence/email-live-20261019.json",
+        "docs/evidence/email-persistence-20261019.json"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1458,6 +1464,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "58a3429b6bcf72f17f005974172b9b5f095482839450feb0b678bf815648809d"
+    "doc/development/07_合同逐项开发追踪.md": "5608cdb851e2b8cbd6c2ec773c29abd581ea8c098b4a5f60e9204582a873dcd1"
   }
 }

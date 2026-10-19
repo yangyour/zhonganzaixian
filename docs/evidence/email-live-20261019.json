@@ -1,0 +1,176 @@
+{
+  "verified_at": "2026-10-19T08:30:15.748091+00:00",
+  "environment": "lan-test-20261008",
+  "origin": "http://192.168.1.215:10010",
+  "source_commit": "804a3d87c41bde0303384d5a261d28e8d75d21cc",
+  "checks": [
+    {
+      "name": "padmin_csrf",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "padmin_login",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "padmin_session",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "email_status",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "email_real_smtp_auth_check",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "email_bindings",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "real_readiness",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "preserved_wecom_login",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "csrf_blocks_send",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "name": "arbitrary_recipient_rejected",
+      "status": 400,
+      "expected": 400
+    },
+    {
+      "name": "missing_idempotency_key",
+      "status": 400,
+      "expected": 400
+    },
+    {
+      "name": "anonymous_cannot_read",
+      "status": 401,
+      "expected": 401
+    },
+    {
+      "name": "viewerA_csrf",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "viewerA_login",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "viewerA_session",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "viewer_cannot_manage",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "name": "padmin_csrf",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "padmin_login",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "padmin_session",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "independent_tenant_switch",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "other_tenant_is_404",
+      "status": 404,
+      "expected": 404
+    },
+    {
+      "name": "email_delivery_ledger",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "mail_page",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "web_manifest",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "name": "actual_email_page_asset",
+      "status": 200,
+      "expected": 200
+    }
+  ],
+  "smtp_authenticated_from_designated_server": true,
+  "ready": true,
+  "services_running": 14,
+  "schema_version": 39,
+  "changed_services": [
+    "api",
+    "web"
+  ],
+  "protected_services_unchanged": 12,
+  "candidates_removed": true,
+  "local_api_and_tunnel_stopped": true,
+  "binding": {
+    "id": "85a85d00-89bb-46a6-aa6b-746cfc653469",
+    "user_id": "8a91f5b3-2ca4-4cc0-8484-bd3885ac36a9",
+    "display_name": "JiangFaMing",
+    "email": "jiangfm@all-online.com.cn",
+    "active": true,
+    "version": 3,
+    "updated_at": "2026-10-19T08:18:25.887Z"
+  },
+  "secret_mounts": [
+    {
+      "target": "/run/secrets/mop-email.json",
+      "read_only": true,
+      "mode": "0400",
+      "uid": 10001,
+      "gid": 10001
+    },
+    {
+      "target": "/run/secrets/mop-email-password",
+      "read_only": true,
+      "mode": "0400",
+      "uid": 10001,
+      "gid": 10001
+    }
+  ],
+  "password_in_container_environment": false,
+  "automatic_business_notifications_enabled": false,
+  "provider_delivery_rows": 0,
+  "messages_sent": 0,
+  "actual_smtp_submission_tested": false,
+  "end_to_end_delivery_tested": false,
+  "wecom_login_preserved": true
+}

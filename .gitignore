@@ -13,3 +13,6 @@ deploy/private/
 **/__pycache__/
 *.pyc
 zabbix-msp-prototype/tests/.knowledge-qa/
+
+# Also ignore local dependency-directory symlinks used by isolated worktrees.
+node_modules

@@ -13,6 +13,8 @@ import {worksheetAssetChoices,type WorksheetAssetChoices} from '../utils/inspect
 import {displayTime} from '../utils/display'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import ChangeNoticeFacts from '../components/ChangeNoticeFacts.vue'
+import ChangeNoticeApprovalPanel from '../components/ChangeNoticeApprovalPanel.vue'
+const approvalPanel=ref<InstanceType<typeof ChangeNoticeApprovalPanel>|null>(null)
 const actions={CREATE:'新建',UPDATE:'修订',ARCHIVE:'归档',RESTORE:'恢复'}
 const mode=ref<'CREATE'|'UPDATE'|null>(null),baseline=shallowRef<ChangeNoticeDetail|null>(null),initial=ref(''),validation=ref(''),expandedVersion=ref<number|null>(null),lookupId=ref('')
 const form=reactive({summary:'',plannedStart:'',plannedEnd:null as string|null,ticketRef:''})
@@ -24,7 +26,7 @@ const state=shallowRef<ChangeNoticeState>(emptyChangeNoticeState()),workspace=cr
 const displayedRows=computed(()=>{const rows=state.value.page?.items??[],query=pageQuery.value.trim().toLocaleLowerCase();return query?rows.filter(r=>[r.id,r.applicant_id].join(' ').toLocaleLowerCase().includes(query)):rows})
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&session.value.user.role==='padmin'&&can('change_notice_drafts:read')&&!switchingTenant.value))
 const writable=computed(()=>permitted.value&&can('change_notice_drafts:write')),canChooseAssets=computed(()=>writable.value&&can('assets:read'))
-const locked=computed(()=>!writable.value||Boolean(state.value.busy)||Boolean(state.value.attempt)||assetBusy.value)
+const locked=computed(()=>!writable.value||Boolean(state.value.busy)||Boolean(state.value.attempt)||assetBusy.value||Boolean(approvalPanel.value?.unresolved()))
 const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value,writable.value,canChooseAssets.value]))
 function context():ChangeNoticeContext|null{const s=session.value;return s&&permitted.value?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true,canWrite:writable.value}:null}
 function payload(){return{expected_version:baseline.value?.version??0,change_summary:form.summary,asset_ids:targets.value.map(t=>t.id),planned_start_at:form.plannedStart,planned_end_at:form.plannedEnd,ticket_id:form.ticketRef===''?null:form.ticketRef.toLowerCase()}}
@@ -36,7 +38,7 @@ function clearEditor(){mode.value=null;baseline.value=null;initial.value='';vali
 watch(contextKey,()=>{workspace.reset(disposed?null:context());clearEditor();lookupId.value='';pageQuery.value='';if(permitted.value&&!disposed)void workspace.list()},{immediate:true,flush:'sync'})
 watch(assetQuery,()=>{assetAbort?.abort();assetAbort=null;++assetEpoch;assetBusy.value=false;assets.value=null;checkedAssets.value=[];assetError.value=null},{flush:'sync'})
 async function discard(){if(!unsaved.value)return true;try{await ElMessageBox.confirm('将替换尚未成功保存的报备输入和候选选择；不会自动合并到新版本。是否继续？','保留未保存输入',{confirmButtonText:'确认替换',cancelButtonText:'保留输入',type:'warning'});return true}catch{return false}}
-function canPrepare(){if(disposed||!writable.value||state.value.busy||assetBusy.value)return false;if(workspace.unresolved()){ElMessage.warning('原请求结果未知，请按原请求重试，不能替换命令');return false}return true}
+function canPrepare(){if(disposed||!writable.value||state.value.busy||assetBusy.value)return false;if(workspace.unresolved()||approvalPanel.value?.unresolved()){ElMessage.warning('原请求结果未知，请按原请求重试，不能替换命令');return false}return true}
 async function prepareCreate(){if(!canPrepare())return false;const turn=contextKey.value;if(!await discard()||disposed||turn!==contextKey.value||!writable.value||!workspace.begin())return false;clearEditor();mode.value='CREATE';initial.value=JSON.stringify(payload());return true}
 async function prepareFrom(row:ChangeNoticeDetail){if(!canPrepare()||row.archived)return false;const turn=contextKey.value,target=structuredClone(row);if(!await discard()||disposed||turn!==contextKey.value||!writable.value||!workspace.begin())return false;clearEditor();baseline.value=target;mode.value='UPDATE';targets.value=target.asset_ids.map(id=>({id,name:null}));Object.assign(form,{summary:target.change_summary,plannedStart:target.planned_start_at,plannedEnd:target.planned_end_at,ticketRef:target.ticket_id??''});initial.value=JSON.stringify(payload());return true}
 async function loadAssets(next=false){
@@ -61,13 +63,13 @@ async function retry(){const turn=contextKey.value;const success=await workspace
 async function lifecycle(row:ChangeNoticeDetail,action:'ARCHIVE'|'RESTORE'){
  if(!canPrepare()||row.archived!==(action==='RESTORE'))return false;const turn=contextKey.value,target=structuredClone(row);if(!await discard()||disposed||turn!==contextKey.value)return false
  try{await ElMessageBox.confirm((action==='ARCHIVE'?'归档':'原样恢复')+'报备 '+target.id+' 并保留全部历史；不会批准、执行或抑制告警。是否继续？',action==='ARCHIVE'?'确认归档草稿':'确认原样恢复草稿',{confirmButtonText:action==='ARCHIVE'?'归档并保留历史':'原样恢复且未审核',cancelButtonText:'取消',type:'warning'})}catch{return false}
- if(disposed||turn!==contextKey.value||!writable.value||!workspace.begin())return false;clearEditor();const success=await workspace.submit(action,{expected_version:target.version},target);if(success&&!disposed&&turn===contextKey.value)ElMessage.success(action==='ARCHIVE'?'已归档并保留历史':'已原样恢复，仍未审核');return success
+ if(disposed||turn!==contextKey.value||!writable.value||approvalPanel.value?.unresolved()||!workspace.begin())return false;clearEditor();const success=await workspace.submit(action,{expected_version:target.version},target);if(success&&!disposed&&turn===contextKey.value)ElMessage.success(action==='ARCHIVE'?'已归档并保留历史':'已原样恢复，仍未审核');return success
 }
 function unlockRejected(){if(state.value.attempt?.state!=='rejected'||!workspace.begin())return false;validation.value='已保留输入并解锁。版本未自动更新；冲突时先回读，再明确按当前版本重新准备';return true}
 async function closeEditor(){if(workspace.unresolved()){ElMessage.warning('结果未知，不能关闭并丢失原请求');return false}const turn=contextKey.value;if(!await discard()||disposed||turn!==contextKey.value||state.value.busy)return false;if(state.value.attempt?.state==='rejected'&&!workspace.begin())return false;clearEditor();return true}
-async function mayLeave(){if(workspace.unresolved()){ElMessage.warning('先确认原请求结果；普通刷新不能替代原请求重试');return false}const turn=contextKey.value;return await discard()&&!disposed&&turn===contextKey.value}
+async function mayLeave(){if(workspace.unresolved()||approvalPanel.value?.unresolved()){ElMessage.warning('先确认原请求结果；普通刷新不能替代原请求重试');return false}const turn=contextKey.value;return await discard()&&(!approvalPanel.value||await approvalPanel.value.mayLeave())&&!disposed&&turn===contextKey.value}
 onBeforeRouteLeave(mayLeave);const unregister=contextTransitionGuards.register(mayLeave)
-function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()||unsaved.value){event.preventDefault();event.returnValue=''}}
+function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()||unsaved.value||approvalPanel.value?.unresolved()||approvalPanel.value?.hasUnsaved()){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
 onUnmounted(()=>{disposed=true;unregister();workspace.dispose();clearEditor();window.removeEventListener('beforeunload',beforeUnload)})
 defineExpose({prepareCreate,prepareFrom,loadAssets,addChecked,removeTarget,moveTarget,setEndKnown,browse,select,history,save,retry,lifecycle,unlockRejected,closeEditor,payload,form,targets,assetQuery,checkedAssets,assets,state,hasUnresolved:workspace.unresolved})
@@ -97,6 +99,7 @@ defineExpose({prepareCreate,prepareFrom,loadAssets,addChecked,removeTarget,moveT
     <p v-if="validation" class="validation" role="alert">{{validation}}</p><div class="actions editor-footer"><button class="primary-button" type="submit" :disabled="locked">{{mode==='CREATE'?'保存新报备草稿':'保存新草稿修订'}}</button><button type="button" :disabled="Boolean(state.busy)" @click="closeEditor">关闭输入</button></div>
    </form><section v-if="state.selected" class="panel current-plan"><h2>当前回读：{{state.selected.id}}</h2><p>{{state.selected.id}} · {{state.selected.archived?'已归档':'未审核草稿'}} · v{{state.selected.version}}</p><div class="actions"><button v-if="writable&&!state.selected.archived" type="button" :disabled="Boolean(state.busy)||assetBusy||workspace.unresolved()" @click="prepareFrom(state.selected)">按当前版本编辑</button><button v-if="writable" type="button" :disabled="Boolean(state.busy)||assetBusy||workspace.unresolved()" @click="lifecycle(state.selected,state.selected.archived?'RESTORE':'ARCHIVE')">{{state.selected.archived?'原样恢复且未审核':'归档并保留历史'}}</button><button type="button" :disabled="Boolean(state.busy)" @click="history(state.selected.id)">读取草稿历史</button></div><ChangeNoticeFacts :value="state.selected" /></section><section v-if="!mode&&!state.selected" class="workspace-guide"><h2>变更报备工作区</h2><div class="guide-empty"><strong>—</strong>选择记录查看完整内容</div><ol><li>在列表中核对变更报备与版本</li><li>按明确来源准备草稿</li><li>保存后回读确认原请求</li></ol><p>未审核草稿；批准、生效及实际执行状态分别核验。</p></section></aside></div>
 
+   <ChangeNoticeApprovalPanel ref="approvalPanel" :candidate="state.selected??state.receipt" :context="context()" :context-key="contextKey" :blocked="workspace.unresolved()" />
    <section v-if="state.history" class="panel plan-history"><h2>不可变修订历史</h2><article v-for="r in state.history.items" :key="r.version"><div class="actions"><h3>v{{r.version}} · {{actions[r.action]}} · {{r.notice_id}}</h3><button type="button" :aria-expanded="expandedVersion===r.version" @click="expandedVersion=expandedVersion===r.version?null:r.version">{{expandedVersion===r.version?'收起该版提案':'展开该版提案'}}</button></div><p>{{displayTime(r.recorded_at)}} · {{r.asset_count}}个目标 · 未审核</p><ChangeNoticeFacts v-if="expandedVersion===r.version" :value="r" /></article><div class="actions"><button type="button" :disabled="Boolean(state.busy)" @click="history(state.history.notice_id)">读取最新历史</button><button type="button" :disabled="Boolean(state.busy)||!state.history.has_more" @click="history(state.history.notice_id,true)">更早草稿历史</button></div></section>
   </template>
  </section>

@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-19T07:44:07.113798+00:00",
+  "environment": "lan-test-20261008",
+  "host": "192.168.1.215",
+  "read_only": true,
+  "credentials_output": false,
+  "manifest_sha256": "6cb2fb95b9d3f99040d814485ee10d53821d599aee34331fb339d8cfde3f83ae",
+  "vantage_points": {
+    "test_server": {
+      "status": "COMPLETED",
+      "probe": {
+        "schema_version": 1,
+        "environment": "lan-test-20261008",
+        "completed_at": "2026-10-19T07:44:08.889518+00:00",
+        "read_only": true,
+        "ports_checked": [
+          22,
+          80,
+          443
+        ],
+        "tcp_timeout_seconds": 2,
+        "devices": [
+          {
+            "key": "huawei-switch",
+            "device_type": "交换机",
+            "brand": "华为",
+            "model": "S5731-S24P4X",
+            "ip": "192.168.1.2",
+            "started_at": "2026-10-19T07:44:07.846246+00:00",
+            "completed_at": "2026-10-19T07:44:08.886931+00:00",
+            "route": {
+              "state": "FOUND",
+              "dst": "192.168.1.2",
+              "dev": "ens18",
+              "prefsrc": "192.168.1.215"
+            },
+            "icmp": {
+              "state": "REPLY",
+              "sent": 2,
+              "received": 2,
+              "average_rtt_ms": 0.109
+            },
+            "tcp": [
+              {
+                "port": 22,
+                "state": "OPEN",
+                "elapsed_ms": 3
+              },
+              {
+                "port": 80,
+                "state": "OPEN",
+                "elapsed_ms": 2
+              },
+              {
+                "port": 443,
+                "state": "OPEN",
+                "elapsed_ms": 2
+              }
+            ],
+            "network_observation": "RESPONSE_OBSERVED",
+            "device_identity_verified": false,
+            "monitoring_ready": false,
+            "monitoring_status": "CONFIG_PENDING",
+            "unknown_reason": "READ_ONLY_CREDENTIALS_AND_VERIFIED_MAPPING_REQUIRED",
+            "device_health": null,
+            "snmp": {
+              "status": "NOT_ATTEMPTED",
+              "reason": "CREDENTIALS_NOT_CONFIGURED"
+            },
+            "firmware": null,
+            "sys_object_id": null,
+            "template_ref": null
+          }
+        ]
+      }
+    },
+    "zabbix_network_namespace": {
+      "status": "COMPLETED",
+      "probe": {
+        "schema_version": 1,
+        "environment": "lan-test-20261008",
+        "completed_at": "2026-10-19T07:44:10.308664+00:00",
+        "read_only": true,
+        "ports_checked": [
+          22,
+          80,
+          443
+        ],
+        "tcp_timeout_seconds": 2,
+        "devices": [
+          {
+            "key": "huawei-switch",
+            "device_type": "交换机",
+            "brand": "华为",
+            "model": "S5731-S24P4X",
+            "ip": "192.168.1.2",
+            "started_at": "2026-10-19T07:44:09.238194+00:00",
+            "completed_at": "2026-10-19T07:44:10.306028+00:00",
+            "route": {
+              "state": "FOUND",
+              "dst": "192.168.1.2",
+              "gateway": "172.18.0.1",
+              "dev": "eth0",
+              "prefsrc": "172.18.0.6"
+            },
+            "icmp": {
+              "state": "REPLY",
+              "sent": 2,
+              "received": 2,
+              "average_rtt_ms": 0.127
+            },
+            "tcp": [
+              {
+                "port": 22,
+                "state": "OPEN",
+                "elapsed_ms": 11
+              },
+              {
+                "port": 80,
+                "state": "OPEN",
+                "elapsed_ms": 3
+              },
+              {
+                "port": 443,
+                "state": "OPEN",
+                "elapsed_ms": 3
+              }
+            ],
+            "network_observation": "RESPONSE_OBSERVED",
+            "device_identity_verified": false,
+            "monitoring_ready": false,
+            "monitoring_status": "CONFIG_PENDING",
+            "unknown_reason": "READ_ONLY_CREDENTIALS_AND_VERIFIED_MAPPING_REQUIRED",
+            "device_health": null,
+            "snmp": {
+              "status": "NOT_ATTEMPTED",
+              "reason": "CREDENTIALS_NOT_CONFIGURED"
+            },
+            "firmware": null,
+            "sys_object_id": null,
+            "template_ref": null
+          }
+        ]
+      },
+      "collector": {
+        "name": "/mop-lan-zabbix-server",
+        "id": "303bbd1f5767a733137de772945fc46506143d0933d036f3412cad85d125ae66",
+        "image": "sha256:415452211dea59cd4ea3346f2c2b38403660408273c672ebf91603353ce1073f",
+        "pid": 83707,
+        "started_at": "2026-10-08T12:18:48.248721584Z"
+      },
+      "execution_context": "host Python and ping in collector network namespace; not Zabbix item execution"
+    }
+  },
+  "monitoring_ready": false,
+  "mop_business_monitoring": "CONFIG_PENDING",
+  "formal_contract_acceptance": "NOT_RUN",
+  "probe_source_sha256": "d024a3b7f6b33e99c2b6ddb4336b08ae5e86109ec8a935aff668340e5420484a",
+  "completed_at": "2026-10-19T07:44:10.250187+00:00",
+  "network_exit_status": 0
+}

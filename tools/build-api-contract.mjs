@@ -1,3 +1,6 @@
+import { addWeComContract } from './wecom-contract.mjs';
+import { addEmailContract } from './email-contract.mjs';
+import { addChangeNoticeApprovalContract } from './change-notice-approval-contract.mjs';
 import { addRuntimeConfigurationContract } from './runtime-configuration-contract.mjs';
 import { addTicketWorkflowContract } from './ticket-workflow-contract.mjs';
 import { addTicketNotificationContract } from './ticket-notification-contract.mjs';
@@ -930,6 +933,11 @@ addTicketNotificationContract(contract);
 addServiceTierContract(contract);
 addOnCallEscalationContract(contract);
 addMonitoringEventCenterContract(contract);
+addWeComContract(contract);
+addEmailContract(contract);
+addChangeNoticeApprovalContract(contract);
+// Combined upstream WeCom/email and approval additive contract.
+contract.info.version = '0.60.0';
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

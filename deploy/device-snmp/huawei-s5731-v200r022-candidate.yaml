@@ -1,0 +1,74 @@
+# Unpublished local-MIB candidate. No device compatibility or active collection claim.
+# OIDs are table columns: append verified entPhysicalIndex / ifIndex at runtime.
+# Bounds below are syntax/range bounds, not customer alert thresholds.
+# Provenance, source hashes and missing index/sentinel handling: docs/huawei-snmp-integration-20261019.md
+schema_version: '1'
+revision: 'huawei-s5731-local-mib-20261019-v1'
+rollback_revision: null
+brand: 'Huawei'
+model: 'S5731-S24P4X (declared, unverified)'
+firmware: 'V200R022C00SPC500 (declared, unverified)'
+metrics:
+  - id: cpu
+    oid: '1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5'
+    type: GAUGE
+    source_unit: '%'
+    target_unit: '%'
+    scale: '1'
+    offset: '0'
+    minimum: '0'
+    maximum: '100'
+  - id: memory
+    oid: '1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7'
+    type: GAUGE
+    source_unit: '%'
+    target_unit: '%'
+    scale: '1'
+    offset: '0'
+    minimum: '0'
+    maximum: '100'
+  - id: entity_uptime
+    oid: '1.3.6.1.4.1.2011.5.25.31.1.1.1.1.10'
+    type: GAUGE
+    source_unit: 's'
+    target_unit: 's'
+    scale: '1'
+    offset: '0'
+    minimum: '0'
+    maximum: '2147483647'
+  - id: optical_rx_power
+    oid: '1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8'
+    type: GAUGE
+    source_unit: '0.01 dBm'
+    target_unit: 'dBm'
+    scale: '0.01'
+    offset: '0'
+    minimum: '-21474836.48'
+    maximum: '21474836.47'
+  - id: optical_tx_power
+    oid: '1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9'
+    type: GAUGE
+    source_unit: '0.01 dBm'
+    target_unit: 'dBm'
+    scale: '0.01'
+    offset: '0'
+    minimum: '-21474836.48'
+    maximum: '21474836.47'
+  - id: if_hc_in_octets
+    oid: '1.3.6.1.2.1.31.1.1.1.6'
+    type: COUNTER
+    source_unit: 'bytes'
+    target_unit: 'bytes'
+    scale: '1'
+    offset: '0'
+    minimum: '0'
+    maximum: '18446744073709551615'
+  - id: if_hc_out_octets
+    oid: '1.3.6.1.2.1.31.1.1.1.10'
+    type: COUNTER
+    source_unit: 'bytes'
+    target_unit: 'bytes'
+    scale: '1'
+    offset: '0'
+    minimum: '0'
+    maximum: '18446744073709551615'

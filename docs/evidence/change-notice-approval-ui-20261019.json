@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-19",
+  "feature": "D10 exact-revision approval UI",
+  "environment": "dot cloud isolated UI worktree",
+  "node": "22.23.3",
+  "initial_node24_checks": "PASSED; superseded by final Node22 checks",
+  "web_unit": {"status": "PASSED", "files": 163, "tests": 2244, "command": "npm test", "synthetic": true},
+  "feature_new_unit_tests": 26,
+  "web_build": {"status": "PASSED", "command": "npm run build", "includes": ["vue-tsc", "vite", "verify-web-release", "verify-web-policy"]},
+  "browser_layout": {
+    "status": "NOT_RUN",
+    "planned_widths": [390, 1440],
+    "fixture": "apps/web/qa/change-notice-approval.fixture.html",
+    "runner": "tools/check-change-notice-approval-layout.mjs",
+    "chromium_version": "154.0.8037.57",
+    "blocker": "Chromium launch failed at socket() with Operation not permitted in sandbox. Escalated launch failed before browser start at bwrap read-only mount setup. No alternate route or security change attempted.",
+    "own_vite_stopped": true,
+    "screenshots": []
+  },
+  "real_api_postgresql_q09_integration": "NOT_RUN in UI branch",
+  "customer_production_approval": "NOT_RUN",
+  "device_execution": false,
+  "alert_suppression": false,
+  "automatic_p3_decision": null,
+  "push_merge_deploy": "NOT_RUN"
+}

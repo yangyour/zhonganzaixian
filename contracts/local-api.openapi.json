@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.57.0",
+    "version": "0.60.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -551,6 +551,19 @@
                             },
                             "sso_protocol": {
                               "const": "OIDC"
+                            },
+                            "wecom_enabled": {
+                              "type": "boolean"
+                            },
+                            "wecom_start_url": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "enum": [
+                                "/api/v1/auth/wecom/start",
+                                null
+                              ]
                             }
                           },
                           "required": [
@@ -34495,6 +34508,3038 @@
         ],
         "x-mop-capability": "ticket_notes:write_internal"
       }
+    },
+    "/wecom/status": {
+      "get": {
+        "operationId": "getWeComStatus",
+        "summary": "读取本租户企业微信配置状态与脱敏检查结果",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "responses": {
+          "200": {
+            "description": "读取本租户企业微信配置状态与脱敏检查结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeComStatusResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:read"
+      }
+    },
+    "/wecom/check": {
+      "post": {
+        "operationId": "checkWeComApplication",
+        "summary": "检查真实应用与持久化依赖，记录脱敏审计",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "responses": {
+          "200": {
+            "description": "检查真实应用与持久化依赖，记录脱敏审计",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeComCheckResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:write"
+      }
+    },
+    "/wecom/bindings": {
+      "get": {
+        "operationId": "listWeComBindings",
+        "summary": "读取本租户显式账号绑定",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "responses": {
+          "200": {
+            "description": "读取本租户显式账号绑定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeComBindingPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:read"
+      }
+    },
+    "/wecom/bindings/{userId}": {
+      "put": {
+        "operationId": "setWeComBinding",
+        "summary": "核验成员后显式绑定或停用；停用推进认证版本撤销会话",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "responses": {
+          "200": {
+            "description": "核验成员后显式绑定或停用；停用推进认证版本撤销会话",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeComBindingResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WeComBindingInput"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:write",
+        "x-mop-cross-tenant": "404",
+        "x-mop-user-global-scope-required": true
+      }
+    },
+    "/wecom/test-messages": {
+      "post": {
+        "operationId": "enqueueWeComTest",
+        "summary": "受理一条向服务端明确配置成员发送的固定测试消息；耐久入队不等于送达",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "responses": {
+          "202": {
+            "description": "受理一条向服务端明确配置成员发送的固定测试消息；耐久入队不等于送达",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeComDeliveryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WeComEnqueueInput"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:write"
+      }
+    },
+    "/my/notifications/{id}/wecom": {
+      "post": {
+        "operationId": "enqueueOwnWeComNotification",
+        "summary": "将本人站内通知发送给本人已绑定成员；来源与绑定组合永久去重",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "responses": {
+          "202": {
+            "description": "将本人站内通知发送给本人已绑定成员；来源与绑定组合永久去重",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeComDeliveryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WeComEnqueueInput"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "tickets:read",
+        "x-mop-cross-tenant": "404"
+      }
+    },
+    "/wecom/deliveries": {
+      "get": {
+        "operationId": "listWeComDeliveries",
+        "summary": "本人发送记录；拥有users:read者可读当前租户台账",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "responses": {
+          "200": {
+            "description": "本人发送记录；拥有users:read者可读当前租户台账",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeComDeliveryPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/wecom/deliveries/{id}": {
+      "get": {
+        "operationId": "getWeComDelivery",
+        "summary": "读取已受理、失败、取消或未知状态；未知不自动重发",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "responses": {
+          "200": {
+            "description": "读取已受理、失败、取消或未知状态；未知不自动重发",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeComDeliveryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/auth/wecom/options": {
+      "get": {
+        "operationId": "getWeComLoginOptions",
+        "summary": "读取企业微信登录是否启用",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "responses": {
+          "200": {
+            "description": "读取企业微信登录是否启用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeComLoginOptionsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/auth/wecom/start": {
+      "post": {
+        "operationId": "startWeComLogin",
+        "summary": "发起登录；独立Lax关联Cookie与数据库哈希绑定，5分钟内单次使用",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "responses": {
+          "200": {
+            "description": "发起登录；独立Lax关联Cookie与数据库哈希绑定，5分钟内单次使用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeComLoginStartResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、会话、租户授权、版本、供应商或持久化依赖错误；不回显原始供应商诊断与秘密",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WeComLoginStartInput"
+              }
+            }
+          }
+        },
+        "security": [],
+        "x-mop-authorization-initiation": true
+      }
+    },
+    "/auth/wecom/callback": {
+      "get": {
+        "operationId": "completeWeComLogin",
+        "summary": "消费一次性登录关联，验证企业成员与显式绑定，建立现有权限会话；不自动创建或匹配用户",
+        "security": [],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{43}$"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "成功返回本站/assets，失败返回本站/login及有限错误码",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/email/status": {
+      "get": {
+        "operationId": "getEmailStatus",
+        "summary": "读取当前租户邮件通道状态与脱敏检查结果",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "读取当前租户邮件通道状态与脱敏检查结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailStatusResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:read"
+      }
+    },
+    "/email/check": {
+      "post": {
+        "operationId": "checkEmailConnection",
+        "summary": "检查实际SMTP加密认证和持久化依赖；不发送邮件",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "检查实际SMTP加密认证和持久化依赖；不发送邮件",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailCheckResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:write"
+      }
+    },
+    "/email/bindings": {
+      "get": {
+        "operationId": "listEmailBindings",
+        "summary": "读取管理员明确配置的本租户收件地址",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "读取管理员明确配置的本租户收件地址",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailBindingPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:read"
+      }
+    },
+    "/email/bindings/{userId}": {
+      "put": {
+        "operationId": "setEmailBinding",
+        "summary": "按版本绑定或停用白名单收件地址；该绑定不是邮箱归属验证",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "按版本绑定或停用白名单收件地址；该绑定不是邮箱归属验证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailBindingResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailBindingInput"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:write",
+        "x-mop-user-global-scope-required": true
+      }
+    },
+    "/my/email-binding": {
+      "get": {
+        "operationId": "getOwnEmailBinding",
+        "summary": "读取当前本人邮箱绑定；未配置返回null",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "读取当前本人邮箱绑定；未配置返回null",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnEmailBindingResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/email/test-messages": {
+      "post": {
+        "operationId": "enqueueEmailTest",
+        "summary": "向服务端固定测试收件人发送固定测试内容；先耐久入队",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "202": {
+            "description": "向服务端固定测试收件人发送固定测试内容；先耐久入队",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeliveryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailEnqueueInput"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:write"
+      }
+    },
+    "/my/notifications/{id}/email": {
+      "post": {
+        "operationId": "enqueueOwnEmailNotification",
+        "summary": "明确转发本站本人通知到本人绑定邮箱；来源与绑定永久去重",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "202": {
+            "description": "明确转发本站本人通知到本人绑定邮箱；来源与绑定永久去重",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeliveryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailEnqueueInput"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/email/deliveries": {
+      "get": {
+        "operationId": "listEmailDeliveries",
+        "summary": "本人记录；users:read可读本租户当前发件账号的台账",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "本人记录；users:read可读本租户当前发件账号的台账",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeliveryPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/email/deliveries/{id}": {
+      "get": {
+        "operationId": "getEmailDelivery",
+        "summary": "读取SMTP提交结果；ACCEPTED不是DELIVERED，UNKNOWN不自动重发",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "读取SMTP提交结果；ACCEPTED不是DELIVERED，UNKNOWN不自动重发",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeliveryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/change-notice-drafts/{id}/revisions/{draft_revision}/approval": {
+      "get": {
+        "operationId": "getChangeNoticeApproval",
+        "summary": "Review an exact draft revision; approval is not activation, device execution, automatic P3 or suppression",
+        "x-mop-capability": "change_notice_drafts:read",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "x-mop-runtime-activation": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          },
+          {
+            "name": "draft_revision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740990
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Immutable revision review evidence",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeNoticeApprovalResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/change-notice-drafts/{id}/revisions/{draft_revision}/approval/history": {
+      "get": {
+        "operationId": "getChangeNoticeApprovalHistory",
+        "summary": "Review an exact draft revision; approval is not activation, device execution, automatic P3 or suppression",
+        "x-mop-capability": "change_notice_drafts:read",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "x-mop-runtime-activation": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          },
+          {
+            "name": "draft_revision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740990
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                20
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_version",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 9007199254740990
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Immutable revision review evidence",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeNoticeApprovalHistoryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/change-notice-drafts/{id}/revisions/{draft_revision}/approval/actions": {
+      "post": {
+        "operationId": "transitionChangeNoticeApproval",
+        "summary": "Review an exact draft revision; approval is not activation, device execution, automatic P3 or suppression",
+        "x-mop-capability": "change_notice_drafts:write",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "x-mop-runtime-activation": false,
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          },
+          {
+            "name": "draft_revision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740990
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Immutable revision review evidence",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeNoticeApprovalResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Sanitized authorization, stale revision/version, configuration, body or dependency failure. Unknown outcome: preserve original idempotency key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-review-policy": "change_notice.approver_policy",
+        "x-mop-idempotent-replay-reauthorization": true,
+        "x-mop-max-body-bytes": 16384,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeNoticeApprovalAction"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -35549,6 +38594,34 @@
                   "customer_confirmation_status"
                 ],
                 "additionalProperties": false
+              },
+              "change_notice_approvals": {
+                "type": "object",
+                "properties": {
+                  "schema_access_ready": {
+                    "type": "boolean"
+                  },
+                  "record_source": {
+                    "const": "REVISION_REVIEW_ONLY"
+                  },
+                  "effective": {
+                    "const": false
+                  },
+                  "device_execution_allowed": {
+                    "const": false
+                  },
+                  "alert_suppression_allowed": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "schema_access_ready",
+                  "record_source",
+                  "effective",
+                  "device_execution_allowed",
+                  "alert_suppression_allowed"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -35579,7 +38652,8 @@
               "customer_contacts",
               "asset_exports",
               "own_notification_preferences",
-              "runtime_configurations"
+              "runtime_configurations",
+              "change_notice_approvals"
             ],
             "additionalProperties": false
           },
@@ -35688,7 +38762,8 @@
                 "enum": [
                   "test_oidc",
                   "project_local",
-                  "oidc"
+                  "oidc",
+                  "wecom"
                 ]
               },
               "account_version": {
@@ -68502,6 +71577,2199 @@
           "last_error",
           "updated_by",
           "updated_at"
+        ],
+        "additionalProperties": false
+      },
+      "WeComDelivery": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_message_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recipient": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "kind": {
+            "enum": [
+              "TEST",
+              "NOTIFICATION"
+            ]
+          },
+          "status": {
+            "enum": [
+              "QUEUED",
+              "PROCESSING",
+              "ACCEPTED",
+              "FAILED",
+              "UNKNOWN",
+              "CANCELLED"
+            ]
+          },
+          "version": {
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          },
+          "provider_message_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provider_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "actor_id",
+          "source_message_id",
+          "recipient",
+          "kind",
+          "status",
+          "version",
+          "provider_message_id",
+          "error_code",
+          "provider_code",
+          "created_at",
+          "started_at",
+          "finished_at"
+        ],
+        "additionalProperties": false
+      },
+      "WeComDeliveryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "actor_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "source_message_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "recipient": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "kind": {
+                "enum": [
+                  "TEST",
+                  "NOTIFICATION"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "QUEUED",
+                  "PROCESSING",
+                  "ACCEPTED",
+                  "FAILED",
+                  "UNKNOWN",
+                  "CANCELLED"
+                ]
+              },
+              "version": {
+                "enum": [
+                  0,
+                  1,
+                  2
+                ]
+              },
+              "provider_message_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "error_code": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "provider_code": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "started_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "finished_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "tenant_id",
+              "actor_id",
+              "source_message_id",
+              "recipient",
+              "kind",
+              "status",
+              "version",
+              "provider_message_id",
+              "error_code",
+              "provider_code",
+              "created_at",
+              "started_at",
+              "finished_at"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "WeComDeliveryPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "tenant_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "actor_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "source_message_id": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "recipient": {
+                      "type": "string",
+                      "maxLength": 64
+                    },
+                    "kind": {
+                      "enum": [
+                        "TEST",
+                        "NOTIFICATION"
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "QUEUED",
+                        "PROCESSING",
+                        "ACCEPTED",
+                        "FAILED",
+                        "UNKNOWN",
+                        "CANCELLED"
+                      ]
+                    },
+                    "version": {
+                      "enum": [
+                        0,
+                        1,
+                        2
+                      ]
+                    },
+                    "provider_message_id": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error_code": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "provider_code": {
+                      "anyOf": [
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "started_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "finished_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "tenant_id",
+                    "actor_id",
+                    "source_message_id",
+                    "recipient",
+                    "kind",
+                    "status",
+                    "version",
+                    "provider_message_id",
+                    "error_code",
+                    "provider_code",
+                    "created_at",
+                    "started_at",
+                    "finished_at"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 100
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "items",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "WeComBindingResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "user_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "wecom_user_id": {
+                "type": "string"
+              },
+              "active": {
+                "type": "boolean"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "verified_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "id",
+              "user_id",
+              "wecom_user_id",
+              "active",
+              "version",
+              "verified_at",
+              "updated_at"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "WeComBindingPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "wecom_user_id": {
+                      "type": "string"
+                    },
+                    "active": {
+                      "type": "boolean"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740991
+                    },
+                    "verified_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "display_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "user_id",
+                    "wecom_user_id",
+                    "active",
+                    "version",
+                    "verified_at",
+                    "updated_at",
+                    "display_name"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 200
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "items",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "WeComCheckResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "ready": {
+                "type": "boolean"
+              },
+              "reason": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "application_name": {
+                "type": "string"
+              },
+              "provider_code": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "checked_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "ready",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "WeComStatusResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "const": true
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "corp_id": {
+                "type": "string"
+              },
+              "agent_id": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "secret_configured": {
+                "const": true
+              },
+              "test_user_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "login_enabled": {
+                "type": "boolean"
+              },
+              "callback_url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dispatch_enabled": {
+                "type": "boolean"
+              },
+              "automatic_notifications_enabled": {
+                "const": false
+              },
+              "last_check": {
+                "type": "object",
+                "properties": {
+                  "ready": {
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "application_name": {
+                    "type": "string"
+                  },
+                  "provider_code": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "checked_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "ready",
+                  "reason"
+                ],
+                "additionalProperties": false
+              },
+              "source": {
+                "const": "configured_provider"
+              }
+            },
+            "required": [
+              "enabled",
+              "tenant_id",
+              "corp_id",
+              "agent_id",
+              "secret_configured",
+              "test_user_id",
+              "login_enabled",
+              "callback_url",
+              "dispatch_enabled",
+              "automatic_notifications_enabled",
+              "last_check",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "WeComBindingInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "wecom_user_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.@-]{1,64}$"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expected_version",
+          "wecom_user_id",
+          "active"
+        ],
+        "additionalProperties": false
+      },
+      "WeComEnqueueInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "const": 0
+          }
+        },
+        "required": [
+          "expected_version"
+        ],
+        "additionalProperties": false
+      },
+      "WeComLoginStartInput": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "enum": [
+              "web",
+              "work"
+            ]
+          }
+        },
+        "required": [
+          "mode"
+        ],
+        "additionalProperties": false
+      },
+      "WeComLoginStartResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "authorization_url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "expires_in": {
+                "const": 300
+              }
+            },
+            "required": [
+              "authorization_url",
+              "expires_in"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "WeComLoginOptionsResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "start_url": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "/api/v1/auth/wecom/start",
+                  null
+                ]
+              }
+            },
+            "required": [
+              "enabled",
+              "start_url"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailDelivery": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_message_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sender": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "recipient": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "kind": {
+            "enum": [
+              "TEST",
+              "NOTIFICATION"
+            ]
+          },
+          "status": {
+            "enum": [
+              "QUEUED",
+              "PROCESSING",
+              "ACCEPTED",
+              "FAILED",
+              "UNKNOWN",
+              "CANCELLED"
+            ]
+          },
+          "version": {
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          },
+          "message_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "smtp_code": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 200,
+                "maximum": 599
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "actor_id",
+          "source_message_id",
+          "sender",
+          "recipient",
+          "kind",
+          "status",
+          "version",
+          "message_id",
+          "error_code",
+          "smtp_code",
+          "created_at",
+          "started_at",
+          "finished_at"
+        ],
+        "additionalProperties": false
+      },
+      "EmailDeliveryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "actor_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "source_message_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "sender": {
+                "type": "string",
+                "format": "email",
+                "maxLength": 254
+              },
+              "recipient": {
+                "type": "string",
+                "format": "email",
+                "maxLength": 254
+              },
+              "kind": {
+                "enum": [
+                  "TEST",
+                  "NOTIFICATION"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "QUEUED",
+                  "PROCESSING",
+                  "ACCEPTED",
+                  "FAILED",
+                  "UNKNOWN",
+                  "CANCELLED"
+                ]
+              },
+              "version": {
+                "enum": [
+                  0,
+                  1,
+                  2
+                ]
+              },
+              "message_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "error_code": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "smtp_code": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 200,
+                    "maximum": 599
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "started_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "finished_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "tenant_id",
+              "actor_id",
+              "source_message_id",
+              "sender",
+              "recipient",
+              "kind",
+              "status",
+              "version",
+              "message_id",
+              "error_code",
+              "smtp_code",
+              "created_at",
+              "started_at",
+              "finished_at"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailDeliveryPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "tenant_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "actor_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "source_message_id": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "sender": {
+                      "type": "string",
+                      "format": "email",
+                      "maxLength": 254
+                    },
+                    "recipient": {
+                      "type": "string",
+                      "format": "email",
+                      "maxLength": 254
+                    },
+                    "kind": {
+                      "enum": [
+                        "TEST",
+                        "NOTIFICATION"
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "QUEUED",
+                        "PROCESSING",
+                        "ACCEPTED",
+                        "FAILED",
+                        "UNKNOWN",
+                        "CANCELLED"
+                      ]
+                    },
+                    "version": {
+                      "enum": [
+                        0,
+                        1,
+                        2
+                      ]
+                    },
+                    "message_id": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error_code": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "smtp_code": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 200,
+                          "maximum": 599
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "started_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "finished_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "tenant_id",
+                    "actor_id",
+                    "source_message_id",
+                    "sender",
+                    "recipient",
+                    "kind",
+                    "status",
+                    "version",
+                    "message_id",
+                    "error_code",
+                    "smtp_code",
+                    "created_at",
+                    "started_at",
+                    "finished_at"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 100
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "items",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailBindingResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "user_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "maxLength": 254
+              },
+              "active": {
+                "type": "boolean"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "id",
+              "user_id",
+              "email",
+              "active",
+              "version",
+              "updated_at"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailBindingPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "maxLength": 254
+                    },
+                    "active": {
+                      "type": "boolean"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740991
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "display_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "user_id",
+                    "email",
+                    "active",
+                    "version",
+                    "updated_at",
+                    "display_name"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 200
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "items",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "OwnEmailBindingResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "owner_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "binding": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 254
+                      },
+                      "active": {
+                        "type": "boolean"
+                      },
+                      "version": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "email",
+                      "active",
+                      "version"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "owner_id",
+              "binding",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailStatusResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "const": true
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "sender": {
+                "type": "string",
+                "format": "email",
+                "maxLength": 254
+              },
+              "sender_name": {
+                "type": "string"
+              },
+              "smtp_host": {
+                "type": "string"
+              },
+              "smtp_port": {
+                "const": 465
+              },
+              "tls_mode": {
+                "const": "IMPLICIT_TLS"
+              },
+              "certificate_verification": {
+                "const": true
+              },
+              "secret_configured": {
+                "const": true
+              },
+              "allowed_recipients": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "email",
+                  "maxLength": 254
+                },
+                "minItems": 1,
+                "maxItems": 100
+              },
+              "test_recipient": {
+                "type": "string",
+                "format": "email",
+                "maxLength": 254
+              },
+              "dispatch_enabled": {
+                "type": "boolean"
+              },
+              "automatic_notifications_enabled": {
+                "const": false
+              },
+              "receipt_query_supported": {
+                "const": false
+              },
+              "last_check": {
+                "type": "object",
+                "properties": {
+                  "ready": {
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "smtp_authenticated": {
+                    "type": "boolean"
+                  },
+                  "checked_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "ready",
+                  "reason"
+                ],
+                "additionalProperties": false
+              },
+              "source": {
+                "const": "configured_provider"
+              }
+            },
+            "required": [
+              "enabled",
+              "tenant_id",
+              "sender",
+              "sender_name",
+              "smtp_host",
+              "smtp_port",
+              "tls_mode",
+              "certificate_verification",
+              "secret_configured",
+              "allowed_recipients",
+              "test_recipient",
+              "dispatch_enabled",
+              "automatic_notifications_enabled",
+              "receipt_query_supported",
+              "last_check",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailCheckResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "ready": {
+                "type": "boolean"
+              },
+              "reason": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "smtp_authenticated": {
+                "type": "boolean"
+              },
+              "checked_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "ready",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailBindingInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expected_version",
+          "email",
+          "active"
+        ],
+        "additionalProperties": false
+      },
+      "EmailEnqueueInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "const": 0
+          }
+        },
+        "required": [
+          "expected_version"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeNoticeApprovalSnapshot": {
+        "type": "object",
+        "properties": {
+          "notice_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "draft_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "allowed_actions": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 4,
+            "items": {
+              "enum": [
+                "SUBMIT",
+                "WITHDRAW",
+                "APPROVE",
+                "REJECT"
+              ]
+            },
+            "description": "GET: current server-authorized actions. Mutation receipts: empty; reload GET after success."
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "state": {
+            "enum": [
+              "DRAFT",
+              "IN_REVIEW",
+              "APPROVED",
+              "REJECTED",
+              "WITHDRAWN"
+            ]
+          },
+          "applicant_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "change_summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "asset_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            }
+          },
+          "ticket_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "planned_start_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "planned_end_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timezone": {
+            "const": "Asia/Shanghai"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reviewer_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "review_policy_release_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "decision_note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000,
+                "description": "Nonblank valid Unicode text, maximum 2000 code points; preserved without trimming. REJECT requires non-null."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "effective": {
+            "const": false
+          },
+          "device_execution_allowed": {
+            "const": false
+          },
+          "alert_suppression_allowed": {
+            "const": false
+          },
+          "automatic_p3_decision": {
+            "type": "null"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "record_source": {
+            "const": "REVISION_REVIEW_ONLY"
+          }
+        },
+        "required": [
+          "notice_id",
+          "draft_revision",
+          "content_sha256",
+          "version",
+          "allowed_actions",
+          "tenant_id",
+          "state",
+          "applicant_id",
+          "change_summary",
+          "asset_ids",
+          "ticket_id",
+          "planned_start_at",
+          "planned_end_at",
+          "timezone",
+          "created_at",
+          "submitted_at",
+          "reviewer_id",
+          "decided_at",
+          "review_policy_release_id",
+          "decision_note",
+          "updated_at",
+          "effective",
+          "device_execution_allowed",
+          "alert_suppression_allowed",
+          "automatic_p3_decision",
+          "source",
+          "record_source"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeNoticeApprovalEvent": {
+        "type": "object",
+        "properties": {
+          "notice_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "draft_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "from_state": {
+            "enum": [
+              "DRAFT",
+              "IN_REVIEW",
+              "APPROVED",
+              "REJECTED",
+              "WITHDRAWN"
+            ]
+          },
+          "to_state": {
+            "enum": [
+              "DRAFT",
+              "IN_REVIEW",
+              "APPROVED",
+              "REJECTED",
+              "WITHDRAWN"
+            ]
+          },
+          "action": {
+            "enum": [
+              "SUBMIT",
+              "WITHDRAW",
+              "APPROVE",
+              "REJECT"
+            ]
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "permission_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "review_policy_release_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000,
+                "description": "Nonblank valid Unicode text, maximum 2000 code points; preserved without trimming. REJECT requires non-null."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "effective": {
+            "const": false
+          },
+          "device_execution_allowed": {
+            "const": false
+          },
+          "alert_suppression_allowed": {
+            "const": false
+          },
+          "automatic_p3_decision": {
+            "type": "null"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "record_source": {
+            "const": "REVISION_REVIEW_ONLY"
+          }
+        },
+        "required": [
+          "notice_id",
+          "draft_revision",
+          "content_sha256",
+          "version",
+          "from_state",
+          "to_state",
+          "action",
+          "actor_id",
+          "permission_version",
+          "review_policy_release_id",
+          "note",
+          "occurred_at",
+          "effective",
+          "device_execution_allowed",
+          "alert_suppression_allowed",
+          "automatic_p3_decision",
+          "source",
+          "record_source"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeNoticeApprovalAction": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740989
+          },
+          "action": {
+            "enum": [
+              "SUBMIT",
+              "WITHDRAW",
+              "APPROVE",
+              "REJECT"
+            ]
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000,
+                "description": "Nonblank valid Unicode text, maximum 2000 code points; preserved without trimming. REJECT requires non-null."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "expected_version",
+          "action",
+          "note"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "REJECT"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "note": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ChangeNoticeApprovalResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ChangeNoticeApprovalSnapshot"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeNoticeApprovalHistoryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              "notice_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+              },
+              "draft_revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "items": {
+                "type": "array",
+                "maxItems": 20,
+                "items": {
+                  "$ref": "#/components/schemas/ChangeNoticeApprovalEvent"
+                }
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_before_version": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 9007199254740990
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "page_size_limit": {
+                "const": 20
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "notice_id",
+              "draft_revision",
+              "items",
+              "has_more",
+              "next_before_version",
+              "page_size_limit",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
         ],
         "additionalProperties": false
       }

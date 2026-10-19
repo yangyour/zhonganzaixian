@@ -245,7 +245,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.55.0');
+  assert.equal(contract.info.version, '0.56.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -905,7 +905,7 @@ test('站内消息只读列表与显式已读接口保持当前授权和CSRF幂�
 test('消息游标末页必须明确结束且签名链接只能指向本站下载接口',()=>{const result={data:{items:[inboxMessageSample()],has_more:false,next_before_issued_at:null,next_before_id:null,unread_count:1,observed_at:'2026-10-14T06:00:01Z'},trace_id:'synthetic'};assert.ok(validates('ExportInboxPageResult',result));assert.equal(validates('ExportInboxPageResult',{...result,data:{...result.data,next_before_id:id('1')}}),false);assert.equal(validates('ExportInboxMessage',{...inboxMessageSample(),content_url:'https://example.invalid/download'}),false);});
 
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.55.0');
+  assert.equal(contract.info.version, '0.56.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/sla'].get;
@@ -967,4 +967,76 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
   };
   assert.ok(validates('TicketSlaInspectionResult', { data: sla, trace_id: 'synthetic' }));
 });
+
+test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
+  assert.equal(contract.info.version, '0.56.0');
+  assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
+  assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
+  assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
+  assert.equal(contract.paths['/escalation-policies'].patch['x-mop-capability'], 'configurations:write');
+  assert.equal(contract.paths['/oncall/escalations'].post['x-mop-capability'], 'ticket_notes:write_internal');
+  assert.equal(contract.paths['/sla/reports'].get['x-mop-capability'], 'sla_scenarios:read');
+  assert.equal(contract.paths['/sla/monthly-results'].post['x-mop-capability'], 'ticket_notes:write_internal');
+
+  const board = {
+    tenant_id: id('1'),
+    kpis: {
+      unacknowledged_count: 2, critical_count: 1, in_progress_count: 3,
+      pending_review_count: 1, recovered_today_count: 4, mtta_p50_sec: 210, mtta_target_sec: 900,
+    },
+    queue: [{
+      ticket_id: id('7'), priority: 'P1', state: 'OPEN', tier_snapshot: 'STANDARD',
+      assignee_user_id: id('2'), created_at: '2026-10-18T10:00:00Z',
+      response_due_at: '2026-10-18T10:10:00Z', recovery_due_at: '2026-10-18T12:00:00Z',
+      countdown_remaining_sec: 300, countdown_progress_pct: 0.5, breached: false,
+      current_escalation_step: 1, next_escalation_step: 2, next_escalation_target_role: 'L2_ONCALL',
+    }],
+    rosters: [{
+      id: id('3'), tenant_id: id('1'), version: 1, shift_date: '2026-10-18', shift_code: 'DAY',
+      handoff_local_time: '18:00', primary_oncall_user_id: id('2'), backup_oncall_user_id: id('4'),
+      note: 'SYNTHETIC_DAY_ROSTER', roster_policy_status: 'CONFIG_PENDING_Q15',
+      updated_by: id('2'), updated_at: '2026-10-18T08:00:00Z',
+    }],
+    handoffs: [{
+      id: id('5'), tenant_id: id('1'), roster_id: id('3'), outgoing_user_id: id('2'), incoming_user_id: id('4'),
+      handoff_local_time: '18:00', unacknowledged_count: 2, in_progress_count: 3, pending_review_count: 1,
+      note: 'SYNTHETIC_HANDOFF', handed_off_at: '2026-10-18T10:00:00Z',
+    }],
+    policies: [{
+      tenant_id: id('1'), tier: 'STANDARD', version: 1, unanswered_escalate_count: 2,
+      unanswered_retry_interval_sec: null,
+      steps: [
+        { step_order: 1, trigger_condition: 'IMMEDIATE', wait_minutes: 0, target_role: 'L1_ONCALL' },
+        { step_order: 2, trigger_condition: 'UNACKNOWLEDGED', wait_minutes: 15, target_role: 'L2_ONCALL' },
+      ],
+      policy_status: 'CONFIG_PENDING_Q15', updated_by: id('2'), updated_at: '2026-10-18T08:00:00Z', persisted: true,
+    }],
+    step_runs: [{
+      id: id('6'), tenant_id: id('1'), ticket_id: id('7'), tier: 'STANDARD', policy_version: 1,
+      step_order: 1, trigger_condition: 'PHONE_UNANSWERED', wait_minutes: 0, target_role: 'L1_ONCALL',
+      unanswered_phone_count: 2, escalated_to_step: 2, escalated_target_role: 'L2_ONCALL',
+      sms_notice_status: 'INTENT_RECORDED_PENDING_GATEWAY', sms_notice_summary: '电话连续2次未接听自动升级并登记短信记录',
+      recorded_by: id('2'), recorded_at: '2026-10-18T10:05:00Z',
+    }],
+    auto_refresh_sec: 15, handoff_local_time: '18:00', roster_policy_status: 'CONFIG_PENDING_Q15',
+    observed_at: '2026-10-18T10:05:00Z', source: 'postgresql',
+  };
+  assert.ok(validates('OnCallBoardResult', { data: board, trace_id: 'synthetic' }));
+  assert.equal(validates('OnCallBoardResult', { data: { ...board, handoff_local_time: '09:00' }, trace_id: 'synthetic' }), false);
+
+  const latency = { sample_count: 3, unrecovered_count: 0, mean_sec: 180, p50_sec: 180, p95_sec: 240 };
+  const evalObj = {
+    tier_snapshot: 'STANDARD', total_ticket_count: 10, applicable_count: 8, met_count: 6,
+    not_met_count: 2, unresolved_count: 1, not_applicable_count: 1,
+    achievement_numerator: 6, achievement_denominator: 8, achievement_rate_pct: 75,
+    compensation_ratio: 0.2, monthly_fee_fen: 2000000, compensation_amount_fen: null,
+    compensation_status: 'CONFIG_PENDING_Q26', candidate_fixed_ratio_fen: 400000,
+    candidate_shortfall_weighted_fen: 100000,
+    formula_version: 'D16_SLA_AVAILABILITY_AND_COMPENSATION_V1', items: [],
+  };
+  assert.ok(validates('SlaMonthlyEvaluation', evalObj));
+  assert.equal(validates('SlaMonthlyEvaluation', { ...evalObj, compensation_amount_fen: 400000 }), false);
+  assert.ok(validates('SlaLatencyStats', latency));
+});
+
 

@@ -2,7 +2,7 @@
 function Get-MopMigrationMode {
     param([switch]$ApplyPhotos, [switch]$ApplyAssetImports, [string]$ApplyFeature)
     $features = @{
-        'service-tiers' = '--apply-service-tiers'; 'notification-intents' = '--apply-notification-intents'; 'ticket-workflow' = '--apply-ticket-workflow'; 'export-inbox' = '--apply-export-inbox'; 'runtime-configuration' = '--apply-runtime-configuration'
+        'oncall-escalation' = '--apply-oncall-escalation'; 'service-tiers' = '--apply-service-tiers'; 'notification-intents' = '--apply-notification-intents'; 'ticket-workflow' = '--apply-ticket-workflow'; 'export-inbox' = '--apply-export-inbox'; 'runtime-configuration' = '--apply-runtime-configuration'
         'asset-dependencies' = '--apply-asset-dependencies'; 'worklogs' = '--apply-worklogs'
         'asset-metadata' = '--apply-asset-metadata'; 'internal-notes' = '--apply-internal-notes'
         'ticket-comments' = '--apply-ticket-comments'; 'working-calendars' = '--apply-working-calendars'
@@ -46,6 +46,8 @@ function Assert-MopMigrationResources {
     $expected['V34__ticket_notification_intents.sql'] = '7951a0abb91fd94ae6ba3a1b5769e32780b23b08720e2bd17851c64f256cdb51'
     # V35 is an explicitly reviewed candidate for tenant service tiers and append-only change history.
     $expected['V35__service_tiers_and_change_history.sql'] = 'f8bf2639d6ebb467a0d515147307ceb2e13c425b2337cbad69c88eee91330ed0'
+    # V36 is an explicitly reviewed candidate for on-call roster/handoffs, escalation policies/runs and SLA monthly results.
+    $expected['V36__oncall_escalation_and_sla_monthly_results.sql'] = '52f43d3f5eb43967ac8ff895da9b5503d2e1e83fc29d52adea2ce6076ab7c0cb'
     foreach ($directory in @((Join-Path $ProjectRoot 'server/persistence/src/main/resources/db/migration'), (Join-Path $PersistenceClasses 'db/migration'))) {
         $files = @(Get-ChildItem -LiteralPath $directory -File -ErrorAction Stop)
         if ($files.Count -ne $expected.Count) { throw '源码或构建迁移集合与冻结清单不一致。' }

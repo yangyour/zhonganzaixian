@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-18",
+  "environment": "designated_remote_test_over_project_ssh_tunnel",
+  "database": "mop_test",
+  "postgres_version": "17.9",
+  "migration_status": {
+    "from": "V35",
+    "applied": ["V36"],
+    "successful_migration_count": 36,
+    "duplicate_migrations": 0,
+    "read_only_recheck": "ONCALL_ESCALATION_APPLIED"
+  },
+  "v36_sha256": "52f43d3f5eb43967ac8ff895da9b5503d2e1e83fc29d52adea2ce6076ab7c0cb",
+  "integration_tests": {
+    "PostgresOnCallEscalationIntegrationTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "m5_9_sla_report_overview_and_unknown_interval_isolation": true,
+      "m5_10_monthly_result_freeze_and_immutability_verified": true,
+      "m5_12_oncall_board_and_append_only_handoff_counts": true,
+      "m5_13_escalation_policy_modification_and_two_unanswered_calls_sms_intent": true,
+      "m5_19_overlapping_downtime_union_and_compensation_candidate_formulas": true,
+      "db_guards_reject_append_only_mutation_and_frozen_monthly_overwrite": true
+    }
+  },
+  "unit_and_controller_tests": {
+    "TestSchemaMigrationTest": {"tests": 41, "failures": 0, "errors": 0},
+    "OnCallEscalationControllerTest": {"tests": 4, "failures": 0, "errors": 0},
+    "api_java_suite": {"tests": 1875, "failures": 0, "errors": 0, "skipped": 35}
+  },
+  "web_validation": {
+    "test_files": 158,
+    "tests": 2216,
+    "failures": 0,
+    "typecheck": "PASSED",
+    "build": {
+      "status": "PASSED",
+      "files": 118,
+      "build_id": "ef0b1dad23f266eedc863904daf6023b2f5dcfc28d5c5bb2753da2c17c19b0e7"
+    }
+  },
+  "contract_tests": {
+    "tests": 137,
+    "failures": 0,
+    "errors": 0,
+    "api_contract_version": "0.56.0"
+  },
+  "synthetic_data": true,
+  "pending_customer_rules_preserved": ["Q05", "Q08", "Q15", "Q26", "Q27"],
+  "production_approved": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "credentials_output": false
+}

@@ -1,0 +1,457 @@
+<script setup lang="ts">
+import {computed,onUnmounted,ref,shallowRef,watch} from 'vue'
+import {onBeforeRouteLeave} from 'vue-router'
+import {api} from '../api/client'
+import {can,contextGeneration,session,switchingTenant} from '../stores/session'
+import {contextTransitionGuards} from '../utils/contextTransitionGuard'
+import {
+ createOnCallBoardWorkspace,emptyOnCallBoardState,formatCountdown,formatDurationSec,
+ policyTierLabels,shiftCodeLabels,targetRoleLabels,triggerConditionLabels,
+ type EscalationStep,type OnCallBoardState,type PolicyTierCode,type ShiftCode,type TargetRole,type TriggerCondition
+} from '../utils/onCallBoard'
+import {tierLabels} from '../utils/serviceTiers'
+import {displayTime} from '../utils/display'
+import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+
+const state=shallowRef<OnCallBoardState>(emptyOnCallBoardState())
+const workspace=createOnCallBoardWorkspace(api,s=>{state.value=s})
+const internal=computed(()=>['padmin','msp'].includes(session.value?.user.role??''))
+const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&internal.value&&can('tickets:read')&&!switchingTenant.value))
+const canWriteInternal=computed(()=>Boolean(permitted.value&&can('ticket_notes:write_internal')))
+const canWriteConfig=computed(()=>Boolean(permitted.value&&session.value?.user.role==='padmin'&&can('configurations:write')))
+
+const tab=ref<'queue'|'roster'|'policy'>('queue')
+const blocked=ref(false)
+
+// Roster form
+const shiftDate=ref('2026-10-18')
+const shiftCode=ref<ShiftCode>('DAY')
+const primaryUserId=ref('')
+const backupUserId=ref('')
+const rosterNote=ref('')
+
+// Handoff form
+const handoffRosterId=ref('')
+const incomingUserId=ref('')
+const handoffNote=ref('')
+
+// Escalation trigger form
+const escTicketId=ref('')
+const escTier=ref<PolicyTierCode>('STANDARD')
+const escStepOrder=ref(1)
+const escTrigger=ref<TriggerCondition>('PHONE_UNANSWERED')
+const escUnansweredCount=ref(2)
+
+// Policy editor form
+const editPolicyTier=ref<PolicyTierCode>('STANDARD')
+const editUnansweredCount=ref(2)
+const editStep2Wait=ref(15)
+const editStep2Role=ref<TargetRole>('L2_ONCALL')
+
+const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,permitted.value,canWriteInternal.value,canWriteConfig.value]))
+const locked=computed(()=>!!state.value.busy||workspace.unresolved())
+
+let refreshTimer:ReturnType<typeof setInterval>|null=null
+function clearRefreshTimer(){if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}}
+function startRefreshTimer(){
+ clearRefreshTimer()
+ if(!permitted.value)return
+ refreshTimer=setInterval(()=>{if(permitted.value&&!locked.value)void workspace.load()},15000)
+}
+
+watch(context,()=>{
+ const s=session.value
+ tab.value='queue'
+ workspace.reset(permitted.value&&s?{
+  tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,
+  canWriteInternal:canWriteInternal.value,canWriteConfig:canWriteConfig.value
+ }:null)
+ if(permitted.value){
+  void workspace.load()
+  startRefreshTimer()
+ }else{
+  clearRefreshTimer()
+ }
+},{immediate:true,flush:'sync'})
+
+async function submitRoster(){
+ const existing=state.value.board?.rosters.find(r=>r.shift_date===shiftDate.value&&r.shift_code===shiftCode.value)
+ const ok=await workspace.submitRoster({
+  expected_version:existing?.version??0,
+  shift_date:shiftDate.value,
+  shift_code:shiftCode.value,
+  primary_oncall_user_id:primaryUserId.value.trim(),
+  backup_oncall_user_id:backupUserId.value.trim()||null,
+  note:rosterNote.value.trim()||null
+ })
+ if(ok)rosterNote.value=''
+}
+
+async function submitHandoff(){
+ const ok=await workspace.submitHandoff({
+  roster_id:handoffRosterId.value.trim()||null,
+  incoming_user_id:incomingUserId.value.trim(),
+  note:handoffNote.value.trim()
+ })
+ if(ok)handoffNote.value=''
+}
+
+async function submitEscalation(){
+ await workspace.submitEscalation({
+  ticket_id:escTicketId.value.trim(),
+  tier:escTier.value,
+  step_order:escStepOrder.value,
+  trigger_condition:escTrigger.value,
+  unanswered_phone_count:escUnansweredCount.value
+ })
+}
+
+async function submitPolicyUpdate(){
+ const current=state.value.board?.policies.find(p=>p.tier===editPolicyTier.value)
+ const expected=current?.persisted?current.version:0
+ const baseSteps:EscalationStep[]=current?.steps.length?current.steps.map((s,idx)=>idx===1?{...s,wait_minutes:editStep2Wait.value,target_role:editStep2Role.value}:{...s}):[
+  {step_order:1,trigger_condition:'IMMEDIATE',wait_minutes:0,target_role:'L1_ONCALL'},
+  {step_order:2,trigger_condition:'UNACKNOWLEDGED',wait_minutes:editStep2Wait.value,target_role:editStep2Role.value}
+ ]
+ await workspace.submitPolicyUpdate({
+  tier:editPolicyTier.value,
+  expected_version:expected,
+  unanswered_escalate_count:editUnansweredCount.value,
+  steps:baseSteps
+ })
+}
+
+function mayLeave(){if(workspace.unresolved()){blocked.value=true;return false}return true}
+onBeforeRouteLeave(mayLeave)
+const unregister=contextTransitionGuards.register(mayLeave)
+onUnmounted(()=>{clearRefreshTimer();unregister();workspace.dispose()})
+defineExpose({state,workspace,mayLeave})
+</script>
+<template>
+ <section class="oncall-board">
+  <div class="page-heading proto-page-head">
+   <div>
+    <h1>值班看板与升级链管理 <span class="proto-badge">{{ session?.tenant.name }}</span></h1>
+    <p>15s 自动刷新值班队列、18:00 交接班只追加台账及四套可配置升级链（M5-12 / M5-13）。</p>
+   </div>
+   <RouterLink to="/sla-reports" class="back">SLA 月报与赔付</RouterLink>
+  </div>
+  <p class="panel" v-if="!permitted">当前身份无权访问内部值班看板，或正在切换租户。</p>
+  <template v-else>
+   <p class="proto-scope-note">
+    本看板每 15s 自动刷新工单 SLA 倒计时队列，交接班固定于每日 18:00 固化未确认、进行中、待复核工单计数（M5-12）。电话连续 2 次未接听将自动升级至下一级并登记短信告知记录（M5-13）；详细排班轮换细则与重呼叫间隔保持待客户确认（CONFIG_PENDING_Q15）。
+   </p>
+   <div class="proto-kpis" v-if="state.board">
+    <div>
+     <span>待确认告警/工单</span>
+     <b>{{ state.board.kpis.unacknowledged_count }}</b>
+     <small>OPEN 状态</small>
+    </div>
+    <div>
+     <span>紧急告警/工单</span>
+     <b>{{ state.board.kpis.critical_count }}</b>
+     <small>P1 / P2 在途</small>
+    </div>
+    <div>
+     <span>进行中工单</span>
+     <b>{{ state.board.kpis.in_progress_count }}</b>
+     <small>ACCEPTED / IN_PROGRESS</small>
+    </div>
+    <div>
+     <span>待复核工单</span>
+     <b>{{ state.board.kpis.pending_review_count }}</b>
+     <small>RESOLVED 待确认</small>
+    </div>
+    <div>
+     <span>今日已恢复</span>
+     <b>{{ state.board.kpis.recovered_today_count }}</b>
+     <small>Asia/Shanghai 今日</small>
+    </div>
+    <div>
+     <span>当班 MTTA (P50)</span>
+     <b>{{ formatDurationSec(state.board.kpis.mtta_p50_sec) }}</b>
+     <small>目标 ≤ {{ formatDurationSec(state.board.kpis.mtta_target_sec) }}</small>
+    </div>
+   </div>
+
+   <div class="proto-panel workspace">
+    <div class="proto-toolbar">
+     <div class="proto-tabs" aria-label="值班看板视图">
+      <button type="button" :class="{active:tab==='queue'}" :aria-pressed="tab==='queue'" :disabled="locked" @click="tab='queue'">倒计时队列与升级执行</button>
+      <button type="button" :class="{active:tab==='roster'}" :aria-pressed="tab==='roster'" :disabled="locked" @click="tab='roster'">当班排班与 18:00 交接班</button>
+      <button type="button" :class="{active:tab==='policy'}" :aria-pressed="tab==='policy'" :disabled="locked" @click="tab='policy'">四套升级策略配置</button>
+     </div>
+     <button type="button" :disabled="locked" @click="workspace.load()">立即刷新 (15s)</button>
+    </div>
+
+    <ApiErrorNotice :error="state.error" />
+    <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">值班或升级操作提交结果尚未确认，请点击重试。</p>
+    <button v-if="state.attempt&&!state.busy" type="button" @click="workspace.retry()">重试上次提交</button>
+    <p v-if="state.busy" role="status" aria-live="polite">{{ state.busy==='write'?'正在提交值班/升级记录…':'正在同步值班看板…' }}</p>
+
+    <template v-if="tab==='queue'">
+     <div class="table-wrap" v-if="state.board?.queue.length">
+      <table class="proto-table">
+       <thead>
+        <tr>
+         <th>工单 ID</th>
+         <th>优先级 / 档位</th>
+         <th>状态</th>
+         <th>SLA 倒计时</th>
+         <th>超时进度</th>
+         <th>当前升级步</th>
+         <th>下一升级目标</th>
+        </tr>
+       </thead>
+       <tbody>
+        <tr v-for="item in state.board.queue" :key="item.ticket_id">
+         <td><code>{{ item.ticket_id }}</code></td>
+         <td>{{ item.priority }} · {{ tierLabels[item.tier_snapshot] }}</td>
+         <td>{{ item.state }}</td>
+         <td :class="{danger:item.breached}">{{ formatCountdown(item.countdown_remaining_sec) }}</td>
+         <td>{{ item.countdown_progress_pct!==null?`${(item.countdown_progress_pct*100).toFixed(1)}%`:'—' }}</td>
+         <td>第 {{ item.current_escalation_step }} 步</td>
+         <td>{{ item.next_escalation_target_role?`第 ${item.next_escalation_step} 步 · ${targetRoleLabels[item.next_escalation_target_role]}`:'已达末级' }}</td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+     <p v-else class="empty">当前租户暂无在途工单。</p>
+
+     <form v-if="canWriteInternal" class="action-form" @submit.prevent="submitEscalation">
+      <h2>登记升级执行 / 电话未接听升级（M5-12 / M5-13）</h2>
+      <div class="form-grid">
+       <label>工单 UUID
+        <input type="text" v-model="escTicketId" :disabled="locked" required placeholder="输入在途工单 UUID" />
+       </label>
+       <label>适用升级链
+        <select v-model="escTier" :disabled="locked">
+         <option value="BASIC">基础版升级链</option>
+         <option value="STANDARD">标准版升级链</option>
+         <option value="ADVANCED">进阶版升级链</option>
+         <option value="FALLBACK">未配置档位兜底链</option>
+        </select>
+       </label>
+       <label>当前步骤序号
+        <input type="number" min="1" max="8" v-model.number="escStepOrder" :disabled="locked" />
+       </label>
+       <label>触发条件
+        <select v-model="escTrigger" :disabled="locked">
+         <option value="PHONE_UNANSWERED">电话连续未接听</option>
+         <option value="COUNTDOWN_ZERO">SLA倒计时归零</option>
+         <option value="UNACKNOWLEDGED">超时未确认</option>
+         <option value="UNRESOLVED">超时未恢复</option>
+        </select>
+       </label>
+       <label>连续未接听次数
+        <input type="number" min="0" max="10" v-model.number="escUnansweredCount" :disabled="locked" />
+       </label>
+      </div>
+      <button type="submit" class="primary" :disabled="locked||!escTicketId.trim()">执行升级并记录短信告知</button>
+     </form>
+
+     <div class="table-wrap" v-if="state.board?.step_runs.length">
+      <h3>最近升级执行与短信告知流水</h3>
+      <table class="proto-table">
+       <thead>
+        <tr>
+         <th>记录时间</th>
+         <th>工单 ID</th>
+         <th>档位 / 策略版本</th>
+         <th>触发条件</th>
+         <th>未接听次数</th>
+         <th>升级结果</th>
+         <th>短信告知状态</th>
+        </tr>
+       </thead>
+       <tbody>
+        <tr v-for="run in state.board.step_runs" :key="run.id">
+         <td>{{ displayTime(run.recorded_at) }}</td>
+         <td><code>{{ run.ticket_id }}</code></td>
+         <td>{{ policyTierLabels[run.tier] }} (v{{ run.policy_version }})</td>
+         <td>{{ triggerConditionLabels[run.trigger_condition] }}</td>
+         <td>{{ run.unanswered_phone_count }}</td>
+         <td>{{ run.escalated_to_step&&run.escalated_target_role?`升级至第 ${run.escalated_to_step} 步 (${targetRoleLabels[run.escalated_target_role]})`:'保持当前步骤' }}</td>
+         <td>{{ run.sms_notice_summary||run.sms_notice_status }}</td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+    </template>
+
+    <template v-else-if="tab==='roster'">
+     <div class="split-forms" v-if="canWriteInternal">
+      <form class="action-form" @submit.prevent="submitRoster">
+       <h2>登记/更新当班主备排班（CONFIG_PENDING_Q15）</h2>
+       <div class="form-grid">
+        <label>值班日期
+         <input type="date" v-model="shiftDate" :disabled="locked" required />
+        </label>
+        <label>班次
+         <select v-model="shiftCode" :disabled="locked">
+          <option value="DAY">白班（09:00-18:00）</option>
+          <option value="NIGHT">夜班（18:00-次日09:00）</option>
+          <option value="FULL_DAY">全天值班（24h）</option>
+         </select>
+        </label>
+        <label>主班工程师 UUID
+         <input type="text" v-model="primaryUserId" :disabled="locked" required placeholder="主值班内部成员 UUID" />
+        </label>
+        <label>备班工程师 UUID（可选）
+         <input type="text" v-model="backupUserId" :disabled="locked" placeholder="备值班内部成员 UUID" />
+        </label>
+        <label class="full">排班备注
+         <input type="text" v-model="rosterNote" :disabled="locked" maxlength="500" placeholder="可选排班说明" />
+        </label>
+       </div>
+       <button type="submit" class="primary" :disabled="locked||!primaryUserId.trim()">保存当班排班</button>
+      </form>
+
+      <form class="action-form" @submit.prevent="submitHandoff">
+       <h2>登记 18:00 交接班记录（只追加台账）</h2>
+       <div class="form-grid">
+        <label>关联排班 ID（可选）
+         <input type="text" v-model="handoffRosterId" :disabled="locked" placeholder="排班记录 UUID" />
+        </label>
+        <label>接班工程师 UUID
+         <input type="text" v-model="incomingUserId" :disabled="locked" required placeholder="不能与当前交班人相同" />
+        </label>
+        <label class="full">交接班摘要说明
+         <textarea v-model="handoffNote" :disabled="locked" rows="2" maxlength="1000" required placeholder="填写 18:00 交接重点事项"></textarea>
+        </label>
+       </div>
+       <button type="submit" class="primary" :disabled="locked||!incomingUserId.trim()||!handoffNote.trim()">固化 18:00 交接班快照</button>
+      </form>
+     </div>
+
+     <div class="table-wrap" v-if="state.board?.rosters.length">
+      <h3>当班主备排班列表</h3>
+      <table class="proto-table">
+       <thead>
+        <tr>
+         <th>日期 / 班次</th>
+         <th>交接时刻</th>
+         <th>主值班人</th>
+         <th>备值班人</th>
+         <th>版本</th>
+         <th>策略状态</th>
+        </tr>
+       </thead>
+       <tbody>
+        <tr v-for="r in state.board.rosters" :key="r.id">
+         <td>{{ r.shift_date }} · {{ shiftCodeLabels[r.shift_code] }}</td>
+         <td>{{ r.handoff_local_time }}</td>
+         <td><code>{{ r.primary_oncall_user_id }}</code></td>
+         <td><code>{{ r.backup_oncall_user_id||'未设置' }}</code></td>
+         <td>v{{ r.version }}</td>
+         <td>{{ r.roster_policy_status }}</td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+
+     <div class="table-wrap" v-if="state.board?.handoffs.length">
+      <h3>18:00 交接班只追加历史台账</h3>
+      <table class="proto-table">
+       <thead>
+        <tr>
+         <th>交接时间</th>
+         <th>交班人 → 接班人</th>
+         <th>未确认</th>
+         <th>进行中</th>
+         <th>待复核</th>
+         <th>交接摘要</th>
+        </tr>
+       </thead>
+       <tbody>
+        <tr v-for="h in state.board.handoffs" :key="h.id">
+         <td>{{ displayTime(h.handed_off_at) }} ({{ h.handoff_local_time }})</td>
+         <td><code>{{ h.outgoing_user_id }}</code> → <code>{{ h.incoming_user_id }}</code></td>
+         <td>{{ h.unacknowledged_count }}</td>
+         <td>{{ h.in_progress_count }}</td>
+         <td>{{ h.pending_review_count }}</td>
+         <td>{{ h.note }}</td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+    </template>
+
+    <template v-else>
+     <div class="table-wrap" v-if="state.board?.policies.length">
+      <table class="proto-table">
+       <thead>
+        <tr>
+         <th>升级链档位</th>
+         <th>版本</th>
+         <th>未接听升级阈值</th>
+         <th>重呼叫间隔</th>
+         <th>升级步骤明细</th>
+        </tr>
+       </thead>
+       <tbody>
+        <tr v-for="p in state.board.policies" :key="p.tier">
+         <td>{{ policyTierLabels[p.tier] }}</td>
+         <td>{{ p.persisted?`v${p.version}`:'默认模板 (v0)' }}</td>
+         <td>连续 {{ p.unanswered_escalate_count }} 次未接听</td>
+         <td>待确认 ({{ p.policy_status }})</td>
+         <td>
+          <span v-for="s in p.steps" :key="s.step_order" class="step-pill">
+           #{{ s.step_order }} {{ triggerConditionLabels[s.trigger_condition] }} ({{ s.wait_minutes }}m) → {{ targetRoleLabels[s.target_role] }}
+          </span>
+         </td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+
+     <form v-if="canWriteConfig" class="action-form" @submit.prevent="submitPolicyUpdate">
+      <h2>调整档位升级链参数（padmin 专属，M5-13）</h2>
+      <div class="form-grid">
+       <label>目标档位
+        <select v-model="editPolicyTier" :disabled="locked">
+         <option value="BASIC">基础版升级链</option>
+         <option value="STANDARD">标准版升级链</option>
+         <option value="ADVANCED">进阶版升级链</option>
+         <option value="FALLBACK">未配置档位兜底链</option>
+        </select>
+       </label>
+       <label>电话连续未接听升级次数
+        <input type="number" min="1" max="10" v-model.number="editUnansweredCount" :disabled="locked" />
+       </label>
+       <label>第 2 步等待分钟数
+        <input type="number" min="0" max="10080" v-model.number="editStep2Wait" :disabled="locked" />
+       </label>
+       <label>第 2 步升级目标角色
+        <select v-model="editStep2Role" :disabled="locked">
+         <option value="L2_ONCALL">二线值班专家</option>
+         <option value="DUTY_LEAD">值班主管</option>
+         <option value="SERVICE_MANAGER">服务经理</option>
+         <option value="CUSTOMER_ADMIN">客户管理员</option>
+         <option value="DECISION_MAKER">决策人</option>
+        </select>
+       </label>
+      </div>
+      <button type="submit" class="primary" :disabled="locked">保存升级策略链</button>
+     </form>
+    </template>
+   </div>
+  </template>
+ </section>
+</template>
+<style scoped>
+.oncall-board{display:grid;gap:16px}
+.workspace{display:grid;gap:16px}
+.action-form{display:grid;gap:12px;padding:16px;border:1px solid var(--border,#d0d7de);border-radius:8px;background:var(--surface-subtle,#f8fafc)}
+.split-forms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.form-grid label{display:grid;gap:6px;font-weight:600}
+.form-grid label.full{grid-column:1/-1}
+.table-wrap{max-width:100%;overflow:auto}
+.step-pill{display:inline-block;margin:2px 6px 2px 0;padding:2px 8px;border-radius:12px;background:#eef2ff;font-size:12px}
+.danger{color:#b91c1c;font-weight:700}
+button,input,select,textarea,.back{min-height:44px}
+@media(max-width:760px){
+ .split-forms,.form-grid{grid-template-columns:1fr}
+}
+</style>

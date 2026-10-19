@@ -2,6 +2,7 @@ import { addRuntimeConfigurationContract } from './runtime-configuration-contrac
 import { addTicketWorkflowContract } from './ticket-workflow-contract.mjs';
 import { addTicketNotificationContract } from './ticket-notification-contract.mjs';
 import { addServiceTierContract } from './service-tier-contract.mjs';
+import { addOnCallEscalationContract } from './oncall-escalation-contract.mjs';
 import { addExportInboxContract } from './export-inbox-contract.mjs';
 import { addFirewallResourcesContract } from './firewall-resources-contract.mjs';
 import { addProjectIdentityContract } from './project-identity-contract.mjs';
@@ -926,6 +927,7 @@ addRuntimeConfigurationContract(contract);
 addTicketWorkflowContract(contract);
 addTicketNotificationContract(contract);
 addServiceTierContract(contract);
+addOnCallEscalationContract(contract);
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

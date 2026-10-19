@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.55.0",
+    "version": "0.56.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -32166,6 +32166,1135 @@
         ],
         "x-mop-capability": "tickets:read"
       }
+    },
+    "/oncall/board": {
+      "get": {
+        "operationId": "getOnCallBoard",
+        "summary": "读取值班看板6项KPI、15s自动刷新工单倒计时队列、18:00交接班台账与升级链配置（M5-12/M5-13）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "读取值班看板6项KPI、15s自动刷新工单倒计时队列、18:00交接班台账与升级链配置（M5-12/M5-13）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnCallBoardResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          }
+        ],
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/oncall/rosters": {
+      "post": {
+        "operationId": "upsertOnCallRoster",
+        "summary": "登记或更新当班主备值班排班（乐观锁CAS，排班细则状态CONFIG_PENDING_Q15）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "登记或更新当班主备值班排班（乐观锁CAS，排班细则状态CONFIG_PENDING_Q15）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnCallRosterResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnCallRosterUpsertInput"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "ticket_notes:write_internal"
+      }
+    },
+    "/oncall/handoffs": {
+      "post": {
+        "operationId": "recordOnCallHandoff",
+        "summary": "登记18:00只追加交接班记录，自动固化当前未确认、进行中、待复核工单计数（M5-12）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "登记18:00只追加交接班记录，自动固化当前未确认、进行中、待复核工单计数（M5-12）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnCallHandoffResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnCallHandoffInput"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "ticket_notes:write_internal"
+      }
+    },
+    "/escalation-policies": {
+      "get": {
+        "operationId": "listEscalationPolicies",
+        "summary": "读取基础/标准/进阶/兜底升级策略链（M5-13）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "读取基础/标准/进阶/兜底升级策略链（M5-13）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EscalationPolicyListResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "tickets:read"
+      },
+      "patch": {
+        "operationId": "updateEscalationPolicy",
+        "summary": "修改指定档位升级链步骤与连续未接听阈值（M5-13，重呼叫间隔保持CONFIG_PENDING_Q15）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "修改指定档位升级链步骤与连续未接听阈值（M5-13，重呼叫间隔保持CONFIG_PENDING_Q15）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EscalationPolicyResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EscalationPolicyUpdateInput"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-capability": "configurations:write"
+      }
+    },
+    "/oncall/escalations": {
+      "post": {
+        "operationId": "triggerOnCallEscalation",
+        "summary": "触发倒计时归零或电话连续2次未接听自动升级并登记短信告知记录（M5-12/M5-13）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "触发倒计时归零或电话连续2次未接听自动升级并登记短信告知记录（M5-12/M5-13）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EscalationStepRunResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EscalationTriggerInput"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "ticket_notes:write_internal"
+      }
+    },
+    "/sla/reports": {
+      "get": {
+        "operationId": "getSlaReport",
+        "summary": "读取月度SLA报表、MTTA/MTTR(P50/P95)、未知区间单独隔离与赔付候选结果（M5-9/M5-10/M5-19）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "读取月度SLA报表、MTTA/MTTR(P50/P95)、未知区间单独隔离与赔付候选结果（M5-9/M5-10/M5-19）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlaReportResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+            }
+          }
+        ],
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "sla_scenarios:read"
+      }
+    },
+    "/sla/reports/{serviceId}/details": {
+      "get": {
+        "operationId": "getSlaServiceDetails",
+        "summary": "读取指定服务节点时间区间合并/排除/未知隔离明细与逐工单SLA判定（M5-9/M5-10/M5-19）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "读取指定服务节点时间区间合并/排除/未知隔离明细与逐工单SLA判定（M5-9/M5-10/M5-19）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlaServiceDetailResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+            }
+          }
+        ],
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "sla_scenarios:read"
+      }
+    },
+    "/sla/monthly-results": {
+      "post": {
+        "operationId": "evaluateSlaMonthlyResult",
+        "summary": "生成或冻结月度SLA达标与赔付快照（已冻结快照不可覆盖，正式赔付金额保持CONFIG_PENDING_Q26）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "生成或冻结月度SLA达标与赔付快照（已冻结快照不可覆盖，正式赔付金额保持CONFIG_PENDING_Q26）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlaMonthlyResultEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "值班看板、交接班、升级链或SLA月报授权、版本、参数或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SlaMonthlyResultInput"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "ticket_notes:write_internal"
+      }
     }
   },
   "components": {
@@ -62876,6 +64005,1909 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/TicketSlaInspection"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "OnCallBoardKpis": {
+        "type": "object",
+        "properties": {
+          "unacknowledged_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "critical_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "in_progress_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "pending_review_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "recovered_today_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "mtta_p50_sec": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mtta_target_sec": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          }
+        },
+        "required": [
+          "unacknowledged_count",
+          "critical_count",
+          "in_progress_count",
+          "pending_review_count",
+          "recovered_today_count",
+          "mtta_p50_sec",
+          "mtta_target_sec"
+        ],
+        "additionalProperties": false
+      },
+      "OnCallQueueItem": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "priority": {
+            "enum": [
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "state": {
+            "enum": [
+              "OPEN",
+              "ACCEPTED",
+              "IN_PROGRESS",
+              "RESOLVED",
+              "CLOSED",
+              "CANCELLED",
+              "REOPENED"
+            ]
+          },
+          "tier_snapshot": {
+            "enum": [
+              "BASIC",
+              "STANDARD",
+              "ADVANCED"
+            ]
+          },
+          "assignee_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "response_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recovery_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "countdown_remaining_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "countdown_progress_pct": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "breached": {
+            "type": "boolean"
+          },
+          "current_escalation_step": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8
+          },
+          "next_escalation_step": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "next_escalation_target_role": {
+            "anyOf": [
+              {
+                "enum": [
+                  "L1_ONCALL",
+                  "L2_ONCALL",
+                  "DUTY_LEAD",
+                  "CUSTOMER_ADMIN",
+                  "SERVICE_MANAGER",
+                  "DECISION_MAKER"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "ticket_id",
+          "priority",
+          "state",
+          "tier_snapshot",
+          "assignee_user_id",
+          "created_at",
+          "response_due_at",
+          "recovery_due_at",
+          "countdown_remaining_sec",
+          "countdown_progress_pct",
+          "breached",
+          "current_escalation_step",
+          "next_escalation_step",
+          "next_escalation_target_role"
+        ],
+        "additionalProperties": false
+      },
+      "OnCallRosterEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "shift_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "shift_code": {
+            "enum": [
+              "DAY",
+              "NIGHT",
+              "FULL_DAY"
+            ]
+          },
+          "handoff_local_time": {
+            "const": "18:00"
+          },
+          "primary_oncall_user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "backup_oncall_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "roster_policy_status": {
+            "const": "CONFIG_PENDING_Q15"
+          },
+          "updated_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "version",
+          "shift_date",
+          "shift_code",
+          "handoff_local_time",
+          "primary_oncall_user_id",
+          "backup_oncall_user_id",
+          "note",
+          "roster_policy_status",
+          "updated_by",
+          "updated_at"
+        ],
+        "additionalProperties": false
+      },
+      "OnCallRosterUpsertInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "shift_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "shift_code": {
+            "enum": [
+              "DAY",
+              "NIGHT",
+              "FULL_DAY"
+            ]
+          },
+          "primary_oncall_user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "backup_oncall_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "expected_version",
+          "shift_date",
+          "shift_code",
+          "primary_oncall_user_id",
+          "backup_oncall_user_id",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "OnCallRosterResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/OnCallRosterEntry"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "OnCallHandoffEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "roster_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "outgoing_user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "incoming_user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "handoff_local_time": {
+            "const": "18:00"
+          },
+          "unacknowledged_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "in_progress_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "pending_review_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "handed_off_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "roster_id",
+          "outgoing_user_id",
+          "incoming_user_id",
+          "handoff_local_time",
+          "unacknowledged_count",
+          "in_progress_count",
+          "pending_review_count",
+          "note",
+          "handed_off_at"
+        ],
+        "additionalProperties": false
+      },
+      "OnCallHandoffInput": {
+        "type": "object",
+        "properties": {
+          "roster_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "incoming_user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "roster_id",
+          "incoming_user_id",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "OnCallHandoffResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/OnCallHandoffEntry"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EscalationStep": {
+        "type": "object",
+        "properties": {
+          "step_order": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8
+          },
+          "trigger_condition": {
+            "enum": [
+              "IMMEDIATE",
+              "UNACKNOWLEDGED",
+              "UNRESOLVED",
+              "COUNTDOWN_ZERO",
+              "PHONE_UNANSWERED"
+            ]
+          },
+          "wait_minutes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10080
+          },
+          "target_role": {
+            "enum": [
+              "L1_ONCALL",
+              "L2_ONCALL",
+              "DUTY_LEAD",
+              "CUSTOMER_ADMIN",
+              "SERVICE_MANAGER",
+              "DECISION_MAKER"
+            ]
+          }
+        },
+        "required": [
+          "step_order",
+          "trigger_condition",
+          "wait_minutes",
+          "target_role"
+        ],
+        "additionalProperties": false
+      },
+      "EscalationPolicy": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tier": {
+            "enum": [
+              "BASIC",
+              "STANDARD",
+              "ADVANCED",
+              "FALLBACK"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "unanswered_escalate_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "unanswered_retry_interval_sec": {
+            "type": "null"
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/components/schemas/EscalationStep"
+            }
+          },
+          "policy_status": {
+            "const": "CONFIG_PENDING_Q15"
+          },
+          "updated_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "persisted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "tenant_id",
+          "tier",
+          "version",
+          "unanswered_escalate_count",
+          "unanswered_retry_interval_sec",
+          "steps",
+          "policy_status",
+          "updated_by",
+          "updated_at",
+          "persisted"
+        ],
+        "additionalProperties": false
+      },
+      "EscalationPolicyUpdateInput": {
+        "type": "object",
+        "properties": {
+          "tier": {
+            "enum": [
+              "BASIC",
+              "STANDARD",
+              "ADVANCED",
+              "FALLBACK"
+            ]
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "unanswered_escalate_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/components/schemas/EscalationStep"
+            }
+          }
+        },
+        "required": [
+          "tier",
+          "expected_version",
+          "unanswered_escalate_count",
+          "steps"
+        ],
+        "additionalProperties": false
+      },
+      "EscalationPolicyResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/EscalationPolicy"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EscalationPolicyListResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 8,
+                "items": {
+                  "$ref": "#/components/schemas/EscalationPolicy"
+                }
+              },
+              "policy_status": {
+                "const": "CONFIG_PENDING_Q15"
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "items",
+              "policy_status",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EscalationStepRun": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticket_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tier": {
+            "enum": [
+              "BASIC",
+              "STANDARD",
+              "ADVANCED",
+              "FALLBACK"
+            ]
+          },
+          "policy_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "step_order": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8
+          },
+          "trigger_condition": {
+            "enum": [
+              "IMMEDIATE",
+              "UNACKNOWLEDGED",
+              "UNRESOLVED",
+              "COUNTDOWN_ZERO",
+              "PHONE_UNANSWERED"
+            ]
+          },
+          "wait_minutes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10080
+          },
+          "target_role": {
+            "enum": [
+              "L1_ONCALL",
+              "L2_ONCALL",
+              "DUTY_LEAD",
+              "CUSTOMER_ADMIN",
+              "SERVICE_MANAGER",
+              "DECISION_MAKER"
+            ]
+          },
+          "unanswered_phone_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "escalated_to_step": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 8
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "escalated_target_role": {
+            "anyOf": [
+              {
+                "enum": [
+                  "L1_ONCALL",
+                  "L2_ONCALL",
+                  "DUTY_LEAD",
+                  "CUSTOMER_ADMIN",
+                  "SERVICE_MANAGER",
+                  "DECISION_MAKER"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sms_notice_status": {
+            "enum": [
+              "NOT_REQUIRED",
+              "INTENT_RECORDED_PENDING_GATEWAY"
+            ]
+          },
+          "sms_notice_summary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recorded_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "ticket_id",
+          "tier",
+          "policy_version",
+          "step_order",
+          "trigger_condition",
+          "wait_minutes",
+          "target_role",
+          "unanswered_phone_count",
+          "escalated_to_step",
+          "escalated_target_role",
+          "sms_notice_status",
+          "sms_notice_summary",
+          "recorded_by",
+          "recorded_at"
+        ],
+        "additionalProperties": false
+      },
+      "EscalationTriggerInput": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tier": {
+            "enum": [
+              "BASIC",
+              "STANDARD",
+              "ADVANCED",
+              "FALLBACK"
+            ]
+          },
+          "step_order": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8
+          },
+          "trigger_condition": {
+            "enum": [
+              "IMMEDIATE",
+              "UNACKNOWLEDGED",
+              "UNRESOLVED",
+              "COUNTDOWN_ZERO",
+              "PHONE_UNANSWERED"
+            ]
+          },
+          "unanswered_phone_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          }
+        },
+        "required": [
+          "ticket_id",
+          "tier",
+          "step_order",
+          "trigger_condition",
+          "unanswered_phone_count"
+        ],
+        "additionalProperties": false
+      },
+      "EscalationStepRunResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/EscalationStepRun"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "OnCallBoardResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "kpis": {
+                "$ref": "#/components/schemas/OnCallBoardKpis"
+              },
+              "queue": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "$ref": "#/components/schemas/OnCallQueueItem"
+                }
+              },
+              "rosters": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "$ref": "#/components/schemas/OnCallRosterEntry"
+                }
+              },
+              "handoffs": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "$ref": "#/components/schemas/OnCallHandoffEntry"
+                }
+              },
+              "policies": {
+                "type": "array",
+                "maxItems": 8,
+                "items": {
+                  "$ref": "#/components/schemas/EscalationPolicy"
+                }
+              },
+              "step_runs": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "$ref": "#/components/schemas/EscalationStepRun"
+                }
+              },
+              "auto_refresh_sec": {
+                "const": 15
+              },
+              "handoff_local_time": {
+                "const": "18:00"
+              },
+              "roster_policy_status": {
+                "const": "CONFIG_PENDING_Q15"
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "kpis",
+              "queue",
+              "rosters",
+              "handoffs",
+              "policies",
+              "step_runs",
+              "auto_refresh_sec",
+              "handoff_local_time",
+              "roster_policy_status",
+              "observed_at",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "SlaLatencyStats": {
+        "type": "object",
+        "properties": {
+          "sample_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unrecovered_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "mean_sec": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "p50_sec": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "p95_sec": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "sample_count",
+          "unrecovered_count",
+          "mean_sec",
+          "p50_sec",
+          "p95_sec"
+        ],
+        "additionalProperties": false
+      },
+      "SlaExplainedInterval": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "AGREED_SERVICE",
+              "APPROVED_EXCLUSION",
+              "UNAVAILABLE_UNION",
+              "UNKNOWN_ISOLATED"
+            ]
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "duration_sec": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "explanation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "kind",
+          "start",
+          "end",
+          "duration_sec",
+          "explanation"
+        ],
+        "additionalProperties": false
+      },
+      "SlaServiceRow": {
+        "type": "object",
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "service_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "target_pct": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "agreed_service_sec": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "approved_exclusion_sec": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "effective_service_sec": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "unavailable_union_sec": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "unknown_interval_sec": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "known_available_sec": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "verified_availability_pct": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "upper_bound_availability_pct": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "incident_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "mtta": {
+            "$ref": "#/components/schemas/SlaLatencyStats"
+          },
+          "mttr": {
+            "$ref": "#/components/schemas/SlaLatencyStats"
+          },
+          "unrecovered_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "enum": [
+              "MET",
+              "AT_RISK",
+              "BREACHED",
+              "UNKNOWN_PENDING_Q08"
+            ]
+          },
+          "unknown_policy_status": {
+            "enum": [
+              "NONE",
+              "ISOLATED_PENDING_Q08"
+            ]
+          },
+          "interval_details": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "$ref": "#/components/schemas/SlaExplainedInterval"
+            }
+          }
+        },
+        "required": [
+          "service_id",
+          "service_name",
+          "target_pct",
+          "agreed_service_sec",
+          "approved_exclusion_sec",
+          "effective_service_sec",
+          "unavailable_union_sec",
+          "unknown_interval_sec",
+          "known_available_sec",
+          "verified_availability_pct",
+          "upper_bound_availability_pct",
+          "incident_count",
+          "mtta",
+          "mttr",
+          "unrecovered_count",
+          "status",
+          "unknown_policy_status",
+          "interval_details"
+        ],
+        "additionalProperties": false
+      },
+      "SlaTicketJudgment": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "priority": {
+            "enum": [
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "tier_snapshot": {
+            "enum": [
+              "BASIC",
+              "STANDARD",
+              "ADVANCED"
+            ]
+          },
+          "applicable": {
+            "type": "boolean"
+          },
+          "outcome": {
+            "enum": [
+              "MET",
+              "NOT_MET",
+              "UNRESOLVED",
+              "NOT_APPLICABLE"
+            ]
+          },
+          "response_check": {
+            "enum": [
+              "MET",
+              "NOT_MET",
+              "UNRESOLVED",
+              "NOT_APPLICABLE"
+            ]
+          },
+          "recovery_check": {
+            "enum": [
+              "MET",
+              "NOT_MET",
+              "UNRESOLVED",
+              "NOT_APPLICABLE"
+            ]
+          },
+          "response_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "response_actual_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recovery_due_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recovery_actual_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "ticket_id",
+          "priority",
+          "tier_snapshot",
+          "applicable",
+          "outcome",
+          "response_check",
+          "recovery_check",
+          "response_due_at",
+          "response_actual_at",
+          "recovery_due_at",
+          "recovery_actual_at",
+          "reasons"
+        ],
+        "additionalProperties": false
+      },
+      "SlaMonthlyEvaluation": {
+        "type": "object",
+        "properties": {
+          "tier_snapshot": {
+            "enum": [
+              "BASIC",
+              "STANDARD",
+              "ADVANCED"
+            ]
+          },
+          "total_ticket_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "applicable_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "met_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "not_met_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unresolved_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "not_applicable_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "achievement_numerator": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "achievement_denominator": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "achievement_rate_pct": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compensation_ratio": {
+            "enum": [
+              0.1,
+              0.2,
+              0.3
+            ]
+          },
+          "monthly_fee_fen": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compensation_amount_fen": {
+            "type": "null"
+          },
+          "compensation_status": {
+            "const": "CONFIG_PENDING_Q26"
+          },
+          "candidate_fixed_ratio_fen": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "candidate_shortfall_weighted_fen": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "formula_version": {
+            "const": "D16_SLA_AVAILABILITY_AND_COMPENSATION_V1"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 2000,
+            "items": {
+              "$ref": "#/components/schemas/SlaTicketJudgment"
+            }
+          }
+        },
+        "required": [
+          "tier_snapshot",
+          "total_ticket_count",
+          "applicable_count",
+          "met_count",
+          "not_met_count",
+          "unresolved_count",
+          "not_applicable_count",
+          "achievement_numerator",
+          "achievement_denominator",
+          "achievement_rate_pct",
+          "compensation_ratio",
+          "monthly_fee_fen",
+          "compensation_amount_fen",
+          "compensation_status",
+          "candidate_fixed_ratio_fen",
+          "candidate_shortfall_weighted_fen",
+          "formula_version",
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "SlaMonthlyResultRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "report_month": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "tier_snapshot": {
+            "enum": [
+              "BASIC",
+              "STANDARD",
+              "ADVANCED"
+            ]
+          },
+          "total_ticket_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "applicable_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "met_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "not_met_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unresolved_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "not_applicable_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "achievement_numerator": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "achievement_denominator": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "achievement_rate_pct": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compensation_ratio": {
+            "enum": [
+              0.1,
+              0.2,
+              0.3
+            ]
+          },
+          "monthly_fee_fen": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compensation_amount_fen": {
+            "type": "null"
+          },
+          "compensation_status": {
+            "const": "CONFIG_PENDING_Q26"
+          },
+          "candidate_fixed_ratio_fen": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "candidate_shortfall_weighted_fen": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740990
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "formula_version": {
+            "const": "D16_SLA_AVAILABILITY_AND_COMPENSATION_V1"
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 2000,
+            "items": {
+              "$ref": "#/components/schemas/SlaTicketJudgment"
+            }
+          },
+          "frozen": {
+            "type": "boolean"
+          },
+          "frozen_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evaluated_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "evaluated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "report_month",
+          "version",
+          "tier_snapshot",
+          "total_ticket_count",
+          "applicable_count",
+          "met_count",
+          "not_met_count",
+          "unresolved_count",
+          "not_applicable_count",
+          "achievement_numerator",
+          "achievement_denominator",
+          "achievement_rate_pct",
+          "compensation_ratio",
+          "monthly_fee_fen",
+          "compensation_amount_fen",
+          "compensation_status",
+          "candidate_fixed_ratio_fen",
+          "candidate_shortfall_weighted_fen",
+          "formula_version",
+          "items",
+          "frozen",
+          "frozen_at",
+          "evaluated_by",
+          "evaluated_at"
+        ],
+        "additionalProperties": false
+      },
+      "SlaMonthlyResultInput": {
+        "type": "object",
+        "properties": {
+          "report_month": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "freeze": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "report_month",
+          "expected_version",
+          "freeze"
+        ],
+        "additionalProperties": false
+      },
+      "SlaMonthlyResultEnvelope": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/SlaMonthlyResultRecord"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "SlaReportResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "period": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+              },
+              "current_tier": {
+                "enum": [
+                  "BASIC",
+                  "STANDARD",
+                  "ADVANCED"
+                ]
+              },
+              "target_availability_pct": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "kpis": {
+                "type": "object",
+                "properties": {
+                  "mean_verified_availability_pct": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "unavailable_union_total_sec": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740990
+                  },
+                  "mtta": {
+                    "$ref": "#/components/schemas/SlaLatencyStats"
+                  },
+                  "mttr": {
+                    "$ref": "#/components/schemas/SlaLatencyStats"
+                  },
+                  "unrecovered_total_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "unknown_interval_total_sec": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740990
+                  }
+                },
+                "required": [
+                  "mean_verified_availability_pct",
+                  "unavailable_union_total_sec",
+                  "mtta",
+                  "mttr",
+                  "unrecovered_total_count",
+                  "unknown_interval_total_sec"
+                ],
+                "additionalProperties": false
+              },
+              "services": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 20,
+                "items": {
+                  "$ref": "#/components/schemas/SlaServiceRow"
+                }
+              },
+              "monthly_result": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/SlaMonthlyResultRecord"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "live_monthly_evaluation": {
+                "$ref": "#/components/schemas/SlaMonthlyEvaluation"
+              },
+              "formula_version": {
+                "const": "D16_SLA_AVAILABILITY_AND_COMPENSATION_V1"
+              },
+              "timezone": {
+                "const": "Asia/Shanghai"
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "period",
+              "current_tier",
+              "target_availability_pct",
+              "kpis",
+              "services",
+              "monthly_result",
+              "live_monthly_evaluation",
+              "formula_version",
+              "timezone",
+              "observed_at",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "SlaServiceDetailResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "period": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+              },
+              "service": {
+                "$ref": "#/components/schemas/SlaServiceRow"
+              },
+              "interval_details": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "$ref": "#/components/schemas/SlaExplainedInterval"
+                }
+              },
+              "ticket_judgments": {
+                "type": "array",
+                "maxItems": 2000,
+                "items": {
+                  "$ref": "#/components/schemas/SlaTicketJudgment"
+                }
+              },
+              "formula_version": {
+                "const": "D16_SLA_AVAILABILITY_AND_COMPENSATION_V1"
+              },
+              "timezone": {
+                "const": "Asia/Shanghai"
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "period",
+              "service",
+              "interval_details",
+              "ticket_judgments",
+              "formula_version",
+              "timezone",
+              "observed_at",
+              "source"
+            ],
+            "additionalProperties": false
           },
           "trace_id": {
             "type": "string"

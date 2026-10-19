@@ -75,7 +75,9 @@ class PostgresRawMonitoringEventIntegrationTest {
     }
     @Test void verifierRejectsWeakenedCheckWithSameCount()throws Exception{rejectsCatalogDrift("ALTER TABLE public.mop_raw_monitoring_event DROP CONSTRAINT mop_raw_monitoring_event_payload_check; ALTER TABLE public.mop_raw_monitoring_event ADD CONSTRAINT mop_raw_monitoring_event_payload_check CHECK(true)");}
     @Test void verifierRejectsTamperedGeneratedExpression()throws Exception{rejectsCatalogDrift("ALTER TABLE public.mop_raw_monitoring_event ALTER COLUMN content_fingerprint SET EXPRESSION AS (public.mop_raw_event_fingerprint(pool_id,source_event_id,source_phase,tenant_id,asset_id,occurred_epoch_second,occurred_nano,payload)||'tampered')");}
-    @Test void verifierRejectsUnloggedStorage()throws Exception{rejectsCatalogDrift("ALTER TABLE public.mop_raw_monitoring_event SET UNLOGGED");}
+    // V37 adds a logged FK dependent. Downgrade that test fixture first in the same
+    // rollback-only transaction so this test reaches the target verifier, not PostgreSQL's FK guard.
+    @Test void verifierRejectsUnloggedStorage()throws Exception{rejectsCatalogDrift("ALTER TABLE IF EXISTS public.mop_monitoring_event_member SET UNLOGGED; ALTER TABLE public.mop_raw_monitoring_event SET UNLOGGED");}
     @Test void storageForcesSynchronousCommitEvenIfPoolSessionIsAsync()throws Exception{
         var observed=new java.util.concurrent.atomic.AtomicInteger();
         javax.sql.DataSource source=(javax.sql.DataSource)java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),new Class<?>[]{javax.sql.DataSource.class},(p,m,a)->{

@@ -1,0 +1,562 @@
+[
+  {
+    "name": "cn.mop.persistence.configuration.PostgresConfigurationDiagnosticReaderTest",
+    "tests": "14",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.013"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresAssetDependencyIntegrationTest",
+    "tests": "9",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.204"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresAssetDependencySchemaIntegrationTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.106"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresAssetExportClaimIntegrationTest",
+    "tests": "11",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "1.253"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresAssetExportPrepareIntegrationTest",
+    "tests": "19",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "10.431"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresAssetExportPublicationIntegrationTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "18.358"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresAssetExportRepositoryIntegrationTest",
+    "tests": "20",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.251"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresAssetExportSchemaIntegrationTest",
+    "tests": "16",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "1.214"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresAssetImportIntegrationTest",
+    "tests": "18",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.52"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresAssetImportRepositoryTest",
+    "tests": "9",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.05"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresAssetMetadataSchemaIntegrationTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.237"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresAssetReadIntegrationTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.141"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresAuditChainIntegrationTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.071"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresAuditReaderIntegrationTest",
+    "tests": "7",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.142"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresBackupPlanDraftIntegrationTest",
+    "tests": "21",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.454"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresBackupPlanSchemaIntegrationTest",
+    "tests": "19",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.098"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresManualAssetMetadataIntegrationTest",
+    "tests": "26",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.58"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresCapacityScenarioIntegrationTest",
+    "tests": "15",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.312"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresCapacityScenarioSchemaIntegrationTest",
+    "tests": "12",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.094"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresChangeNoticeDraftIntegrationTest",
+    "tests": "24",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.513"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresChangeNoticeSchemaIntegrationTest",
+    "tests": "21",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.142"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresConfigurationDiagnosticIntegrationTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.214"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresConfigurationRevisionIntegrationTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.196"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresContactImportIntegrationTest",
+    "tests": "20",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "6.617"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresContactImportSchemaIntegrationTest",
+    "tests": "13",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.142"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresCustomerContactIntegrationTest",
+    "tests": "25",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "1.567"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresCustomerContactSchemaIntegrationTest",
+    "tests": "12",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.15"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresCustomerReportIntegrationTest",
+    "tests": "10",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.27"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresDashboardAvailabilityIntegrationTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.096"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresExportInboxIntegrationTest",
+    "tests": "9",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "35.389"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresExportPreparationQueueIntegrationTest",
+    "tests": "9",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "5.346"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresExportSnapshotIntegrationTest",
+    "tests": "11",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.144"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresGlobalSearchIntegrationTest",
+    "tests": "9",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.215"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresInspectionWorksheetIntegrationTest",
+    "tests": "21",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.796"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresInspectionSourceCaptureIntegrationTest",
+    "tests": "13",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "2.257"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresInspectionSourceCollectionRepositoryIntegrationTest",
+    "tests": "18",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.654"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresInspectionSourceCollectionSchemaIntegrationTest",
+    "tests": "17",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.58"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresInspectionTemplateIntegrationTest",
+    "tests": "19",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.473"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresInspectionTemplateSchemaIntegrationTest",
+    "tests": "14",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.076"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresInspectionWorksheetSchemaIntegrationTest",
+    "tests": "18",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.158"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresInternalNoteSchemaIntegrationTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.042"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresInternalTicketNoteIntegrationTest",
+    "tests": "12",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.244"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresManualIncidentIntegrationTest",
+    "tests": "14",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.265"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresManualIncidentSchemaIntegrationTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.046"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresManualRecoveryIntegrationTest",
+    "tests": "14",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.232"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresManualRecoverySchemaIntegrationTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.051"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresManualWarrantyIntegrationTest",
+    "tests": "12",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.308"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresManualWarrantySchemaIntegrationTest",
+    "tests": "10",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.263"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresMonitoringEventCenterIntegrationTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.216"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresMonitoringQuarantineIntegrationTest",
+    "tests": "26",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.474"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresMonitoringStorageCoordinatorIntegrationTest",
+    "tests": "14",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.18"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresNotificationPreferenceSchemaIntegrationTest",
+    "tests": "22",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.142"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresOnCallEscalationIntegrationTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.182"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresOwnNotificationPreferenceIntegrationTest",
+    "tests": "26",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.383"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresOwnWorklogReaderIntegrationTest",
+    "tests": "12",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.398"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresPhotoIntegrationTest",
+    "tests": "24",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.837"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresRawMonitoringEventIntegrationTest",
+    "tests": "26",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.512"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresRepositoryIntegrationTest",
+    "tests": "5",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.099"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresRuntimeConfigurationIntegrationTest",
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "20.314"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresSafetyTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.018"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresServiceTierIntegrationTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.182"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresTenantInventoryIntegrationTest",
+    "tests": "7",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.076"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresTicketCommentIntegrationTest",
+    "tests": "16",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.41"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresTicketCommentSchemaIntegrationTest",
+    "tests": "7",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.056"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresTicketNotificationIntegrationTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.178"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresTicketWorkflowIntegrationTest",
+    "tests": "2",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.181"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresWorkingCalendarIntegrationTest",
+    "tests": "14",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.392"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresWorkingCalendarSchemaIntegrationTest",
+    "tests": "10",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.102"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresWorklogIntegrationTest",
+    "tests": "12",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.722"
+  },
+  {
+    "name": "cn.mop.persistence.PostgresWorklogSchemaIntegrationTest",
+    "tests": "6",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.425"
+  }
+]

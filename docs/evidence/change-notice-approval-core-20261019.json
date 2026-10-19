@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-19",
+  "base_commit": "6f5558aef3605de2898a80b76fef73c841ae2f95",
+  "branch": "dot/d10-change-approval-20261019",
+  "environment": "dot-cloud",
+  "compiler": "Temurin JDK 21.0.12.1 javac --release 17",
+  "secondary_compiler": "Eclipse ECJ 3.40.0 -17",
+  "runner": "JUnit Platform Console Standalone 1.11.4",
+  "test_classes": ["ChangeNoticeApprovalTest", "ChangeNoticeMatcherTest", "ChangeNoticeDraftTest", "TicketLifecycleTest"],
+  "new_test_invocations": 14,
+  "tests": {"found": 85, "successful": 85, "failed": 0, "skipped": 0},
+  "full_maven_build": "BLOCKED_JVM_MAVEN_CENTRAL_DNS",
+  "database_http_browser": "NOT_RUN",
+  "migration_execution_count": 0,
+  "external_dispatch_count": 0,
+  "production_ready": false,
+  "contract_acceptance": "NOT_RUN"
+}

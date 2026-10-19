@@ -1,0 +1,48 @@
+{
+  "recorded_at": "2026-10-19T08:13:20.000555+00:00",
+  "observation_source": "user supplied screenshots; not device SSH access or authenticated SNMP",
+  "polling": {
+    "v1": "enable",
+    "v2c": "enable",
+    "v3": "disable"
+  },
+  "trap": {
+    "v1": "disable",
+    "v2c": "disable",
+    "v3": "disable"
+  },
+  "target_interface": {
+    "name": "Vlanif192",
+    "address": "192.168.1.2/24",
+    "physical": "up",
+    "protocol": "up"
+  },
+  "earlier_web_snmp_source_interface": "Vlanif192",
+  "snmp_source_binding_cli_verified": false,
+  "actual_read_only_community_verified": false,
+  "source_images": [
+    {
+      "name": "codex-clipboard-70af5a79-baed-46d7-83ae-376741b6a94a.png",
+      "sha256": "0fa82d264b95fa244b98b8c6b876da171e86be8eff2b44b1b96d634312885454"
+    },
+    {
+      "name": "codex-clipboard-2d9e0c4f-cc62-4a38-a770-57f5e52b9a7e.png",
+      "sha256": "354d9bc6f393d3b273a8c116c814712d73d7cd569b5f034fde9ea2364341904c"
+    },
+    {
+      "name": "codex-clipboard-8d54d2dd-189e-431a-bfbd-8c054d24f4e6.png",
+      "sha256": "795a9d677e2d31798b4646e855fa99c6dd7be70efc5830194bf8bb45336f4490"
+    }
+  ],
+  "live_probe_reference": "docs/evidence/huawei-snmp-v2c-enabled-probe-20261019.json",
+  "live_result": "TIMEOUT_NO_RESPONSE",
+  "monitoring_ready": false,
+  "resource_samples": 0,
+  "remaining_checks": [
+    "configured read-only community matches private probe credential",
+    "community MIB view covers requested OIDs",
+    "community/global source ACL and SNMP listener configuration",
+    "device receive/auth/decode/response counters and response path"
+  ],
+  "secrets_output": false
+}

@@ -1,5 +1,13 @@
 # 华为 S5731 MIB 核对与只读 SNMP 联调
 
+## v2c 与目标接口确认后的复测（2026-10-19）
+
+用户最新三张 CLI 截图确认 Polling v1/v2c=enable、v3=disable，Vlanif192 的地址为192.168.1.2/24、Physical/Protocol 均up；不再将“v2c未开启”或“目标IP不属于Vlanif192”作为当前阻塞。此证据来自用户截图，未通过设备SSH或SNMP验证身份/固件；实际生效的SNMP源接口命令仍只有较早网页证据，不能扩写为完整配置已核验。截图指纹与提取事实见[观察记录](evidence/huawei-snmp-v2c-enabled-observations-20261019.json)。
+
+仍用原私有文档示例参数，指定服务器与既有Zabbix网络命名空间各发一个只读GET，二者均2秒`TIMEOUT_NO_RESPONSE`，没有GETNEXT或资源首值。见[本次真实复测](evidence/huawei-snmp-v2c-enabled-probe-20261019.json)。设备monitoring_ready=false；当前需要核对实际只读团体字是否匹配、团体MIB视图与ACL、SNMP监听及请求/响应路径。没有试探其他团体字或改变设备配置。已向用户确认实际团体字与示例的一致性，秘密仍只走私有配置。
+
+设备侧下一步只读检查可使用`display snmp-agent statistics`，查看接收总数、团体名未知/权限错误、ASN.1或BER解码错误、GetRequest/GetResponse等计数；累计值不单独证明本次请求，需对比受控探测前后变化。另可用`display current-configuration | include snmp-agent.*protocol`核对源接口和协议监听命令，不要求输出含秘密的完整配置。统计语义参照[华为SNMP命令说明](https://info.support.huawei.com/enterprise/zh/doc/EDOC1100459421/dab469bd)；不依据其它版本说明宣称现场所有命令/能力已执行。Trap关闭与主动GET的统计分别保留，本轮不要求开启Trap。
+
 ## 截图后复测更新（2026-10-19）
 
 用户补充的命令行截图显示拍摄时 Polling 的 v1/v2c/v3 全为 disable；网页截图显示代理 ON、v1/v2c 勾选、源接口选择 Vlanif192，且有“应用”按钮。截图先后及是否应用未知，不能推定网页显示已代表当前运行状态，也不能仅凭 Vlanif192 名称推定其 IP 为 192.168.1.2。依据华为源接口命令说明，SNMP 绑定后仅在对应接口地址接收/响应请求，应先核对目标 IP 的归属接口和当前启用版本。

@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-19华为v2c/地址确认后再次复测：用户CLI截图已确认Polling v2c启用、192.168.1.2/24属于Vlanif192且up/up，解除这两项待确认；原私有示例凭据从服务器/既有Zabbix网络命名空间各一个GET仍超时，状态`SNMP_NO_RESPONSE`、monitoring_ready=false。实际只读团体字、视图/ACL及SNMP监听/收发计数未核验，仍影响身份、固件及详细指标首值/持续历史；无批准替代、未试其他团体字或执行设备写入。见[本次证据](../evidence/huawei-snmp-v2c-enabled-probe-20261019.json)和[观察来源](../evidence/huawei-snmp-v2c-enabled-observations-20261019.json)。
+
 2026-10-19华为配置截图后复测：同一192.168.1.2/UDP161、私有示例参数，在指定服务器/原Zabbix网络命名空间均超时 `TIMEOUT_NO_RESPONSE`，与早一轮errno111拒绝分别保留。用途为只读设备身份/指标；影响为身份、固件、首值和持续历史仍不可用，monitoring_ready=false。待设备侧应用并核对Polling v2c、Vlanif192是否拥有目标IP、只读团体/视图与来源ACL；无替代组件或安装/设备写入。状态`SNMP_NO_RESPONSE`，不是已接通。见[最新诊断](../evidence/huawei-snmp-after-ui-screenshot-20261019.json)和[截图分析](../huawei-snmp-integration-20261019.md)。
 
 ## 2026-10-19 华为 MIB 与 SNMP 示例只读联调

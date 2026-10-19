@@ -2,6 +2,8 @@
 
 本次针对用户提供的 `mop.all-online.com.cn` 和原始 `WW_verify_iFfTEbx1uklTpULT.txt` 完成站点静态文件发布。校验文件本身需要公开访问，不包含服务器登录凭据；服务器连接资料继续仅从 Git 忽略的私有配置读取。
 
+用户随后提供的 CorpID、AgentId 和 UserID 已归档至[企业微信应用接入资料](wecom-integration-20261019.md)，Secret 单独保存在本机私有配置。资料收集与域名文件发布不等同于应用接口联调完成。
+
 ## 实施与验证
 
 - 发布前访问 HTTP 根路径下的同名文件，返回 200，但响应是 854 字节的 MOP 首页 HTML，不能视为校验成功。

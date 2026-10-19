@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-19",
+  "environment": "dot-cloud",
+  "base_commit": "d7822ff252cac12236f788d084cdcce1aab75d03",
+  "scope": "D10 M6-7 M4-17 pure change-notice matching core",
+  "compiler": "Eclipse ECJ 3.40.0, target Java 17",
+  "runtime": "OpenJDK 21.0.12.1",
+  "runner": "JUnit Platform Console Standalone 1.11.4",
+  "test_classes": ["ChangeNoticeMatcherTest", "ChangeNoticeDraftTest", "TicketLifecycleTest"],
+  "tests": {"found": 71, "started": 71, "successful": 71, "failed": 0, "skipped": 0},
+  "full_maven_build": "BLOCKED_JVM_MAVEN_CENTRAL_DNS",
+  "postgres_integration": "NOT_RUN_PRIVATE_CONNECTION_UNAVAILABLE",
+  "http_browser_validation": "NOT_RUN_NO_ENDPOINT_CHANGES",
+  "migration_execution_count": 0,
+  "external_dispatch_count": 0,
+  "production_ready": false,
+  "contract_acceptance": "NOT_RUN"
+}

@@ -83,13 +83,13 @@ watch([() => props.configuration?.key, contextGeneration, () => session.value?.t
 }, { immediate: true, flush: 'sync' })
 watch(() => props.modelValue, value => { if (value && props.configuration && !switchingTenant.value) void loadList() })
 async function mayLeave() {
-  if (commands.unresolved()) { ElMessage.warning('配置原请求结果尚未确认，请先使用原请求重试'); return false }
+  if (commands.unresolved()) { ElMessage.warning('配置提交结果尚未确认，请先完成重试核对'); return false }
   if (!unsaved.value) return true
   if (disposed || confirmingLeave) return false
   const scope = leaveContextKey(), input = leaveInputKey()
   confirmingLeave = true
   try {
-    await ElMessageBox.confirm('离开将舍弃尚未保存的修订提案、证据输入或审核意见。', '未发送的配置输入', { type: 'warning', confirmButtonText: '舍弃并继续', cancelButtonText: '保留输入' })
+    await ElMessageBox.confirm('离开将清除尚未保存的修订提案、证据引用或审核意见，是否继续？', '内容尚未保存', { type: 'warning', confirmButtonText: '放弃并离开', cancelButtonText: '继续编辑' })
     // Do not clear here: another navigation/context guard may reject the transition.
     return !disposed && !commands.unresolved() && scope === leaveContextKey() && input === leaveInputKey()
   } catch { return false } finally { confirmingLeave = false }
@@ -115,7 +115,7 @@ async function loadList() {
   listLoading.value = true; listError.value = null; rows.value = []
   try {
     const result = await api.request<{ items: ConfigurationRevision[] }>(`/configurations/${encodeURIComponent(key)}/revisions`, { signal: controller.signal })
-    if (generation === listGeneration) { if (!Array.isArray(result.items)) throw new Error('修订列表回读异常'); rows.value = result.items.map(value => readConfigurationRevision(value, context)) }
+    if (generation === listGeneration) { if (!Array.isArray(result.items)) throw new Error('修订列表读取异常'); rows.value = result.items.map(value => readConfigurationRevision(value, context)) }
   } catch (cause) { if (!isCancelled(cause) && generation === listGeneration) listError.value = cause }
   finally { if (generation === listGeneration) listLoading.value = false }
 }
@@ -128,12 +128,12 @@ async function loadDetail(id = detailId.value): Promise<boolean> {
   try {
     const result = await api.request<ConfigurationRevision>(`/configuration-revisions/${encodeURIComponent(id)}`, { signal: controller.signal })
     if (generation !== detailGeneration) return false
-    const value = readConfigurationRevision(result, context); if (value.id !== id) throw new Error('修订目标回读不匹配'); detail.value = value
+    const value = readConfigurationRevision(result, context); if (value.id !== id) throw new Error('修订目标不匹配'); detail.value = value
     return true
   } catch (cause) { if (!isCancelled(cause) && generation === detailGeneration) detailError.value = cause; return false }
   finally { if (generation === detailGeneration) detailLoading.value = false }
 }
-function openDetail(id: string) { if (unresolved.value && id !== detailId.value) { ElMessage.warning('请先处理原配置请求，不能更换目标'); return } detailId.value = id; detailOpen.value = true; void loadDetail(id) }
+function openDetail(id: string) { if (unresolved.value && id !== detailId.value) { ElMessage.warning('当前请求结果尚未确认，请先完成重试核对后再切换记录'); return } detailId.value = id; detailOpen.value = true; void loadDetail(id) }
 function openCreate() {
   if (!mayCreate.value || !commands.prepare()) return
   Object.assign(form, { proposed: '', reason: '', evidence_refs: [blankEvidence()] })
@@ -143,7 +143,7 @@ async function accepted() {
   const receipt = commandState.value.receipt, generation = writeGeneration
   if (!receipt) return
   createOpen.value = false; actionType.value = null; detailId.value = receipt.id; detailOpen.value = true; detail.value = receipt
-  ElMessage.success('配置原请求已确认；仅内部提案或审批，仍未生效')
+  ElMessage.success('操作已保存（当前为内部提案/审批记录，需在运行配置中心发布后生效）')
   await loadDetail(receipt.id); if (generation !== writeGeneration) return
   await loadList(); if (generation === writeGeneration) emit('changed')
 }
@@ -175,7 +175,7 @@ async function refreshActionVersion() {
 }
 async function performAction() {
   if (!detail.value || !actionType.value || !actionAllowed.value || unresolved.value || actionConflict.value) return
-  if (detail.value.version !== actionExpectedVersion.value) { actionError.value = new ApiError(409, 'VERSION_CONFLICT', '只读发现新版本，请明确核对并重新准备动作', '—'); return }
+  if (detail.value.version !== actionExpectedVersion.value) { actionError.value = new ApiError(409, 'VERSION_CONFLICT', '修订记录版本已更新，请先刷新核对最新版本后再操作', '—'); return }
   const type = actionType.value, body: Record<string, unknown> = { expected_version: actionExpectedVersion.value }
   actionValidation.value = ''
   try {
@@ -192,11 +192,11 @@ async function performAction() {
 
 <template>
   <el-drawer v-model="open" title="修订与审批" size="820px" class="configuration-revisions-drawer" :close-on-click-modal="!unresolved" :close-on-press-escape="!unresolved" :show-close="!unresolved" destroy-on-close>
-    <section v-if="unresolved" class="revision-original-request" role="status"><el-alert type="warning" :closable="false" title="配置保存/审批结果尚未确认，系统已锁定原请求参数、版本号与幂等键；请点击重试恢复处理，切勿修改后重复发送。" /><el-button type="warning" :disabled="commandState.busy || !writer" @click="retryOriginal">使用原配置请求重试</el-button></section>
-    <el-alert v-if="commandState.receipt" type="success" :closable="false" :title="'操作回执已确认：' + commandState.receipt.id + ' · v' + commandState.receipt.version + '（内部提案状态，待运行配置中心发布后生效）'" />
+    <section v-if="unresolved" class="revision-original-request" role="status"><el-alert type="warning" :closable="false" title="提交结果待确认：系统已锁定当前提交内容与版本，请直接点击下方按钮重试确认结果，避免重复新建提交。" /><el-button type="warning" :disabled="commandState.busy || !writer" @click="retryOriginal">重试提交</el-button></section>
+    <el-alert v-if="commandState.receipt" type="success" :closable="false" :title="'已保存修订记录：' + commandState.receipt.id + ' · v' + commandState.receipt.version + '（待前往运行配置中心发布后生效）'" />
     <template v-if="configuration">
       <div class="config-dialog-context"><strong>{{ configuration.description }}</strong><span class="mono">{{ configuration.key }}</span><p>当前租户：{{ session?.tenant.name }} · 登记值：{{ displayValue(configuration.registered_value) }}</p></div>
-      <el-alert type="info" :closable="false" show-icon title="提案与原草稿独立保存；内部审批通过后须到运行配置中心明确发布，客户生产确认另行核验。" />
+      <el-alert type="info" :closable="false" show-icon title="修订提案与草稿独立保存；内部审批通过后需前往运行配置中心发布生效，客户生产环境确认状态另行核验。" />
       <div class="revision-toolbar"><span class="muted">当前租户修订 · {{ listLoading ? '加载中' : `${rows.length} 项` }}</span><div><el-button :loading="listLoading" :disabled="unresolved" @click="loadList">刷新修订</el-button><el-button v-if="mayCreate" type="primary" :disabled="unresolved" @click="openCreate">创建修订提案</el-button></div></div>
       <el-alert v-if="configuration.contract_value_kind === 'fixed_constraint'" type="warning" :closable="false" title="合同固定约束不接受修订提案。" class="page-note" />
       <ApiErrorNotice :error="listError"><el-button size="small" @click="loadList">重试</el-button></ApiErrorNotice>
@@ -211,7 +211,7 @@ async function performAction() {
   </el-drawer>
 
   <el-drawer v-model="detailOpen" title="修订详情与审批记录" size="680px" class="configuration-revision-detail" append-to-body :close-on-click-modal="!unresolved" :close-on-press-escape="!unresolved" :show-close="!unresolved" destroy-on-close>
-    <ApiErrorNotice :error="detailError"><el-button size="small" @click="loadDetail()">重新回读详情</el-button></ApiErrorNotice>
+    <ApiErrorNotice :error="detailError"><el-button size="small" @click="loadDetail()">重新加载详情</el-button></ApiErrorNotice>
     <el-skeleton v-if="detailLoading" :rows="10" animated />
     <template v-if="detail">
       <div class="detail-title"><span class="eyebrow">本租户配置修订</span><h2>{{ configuration?.description || detail.configuration_key }}</h2><el-tag :type="statusType(detail.workflow_status)">{{ revisionStatusLabel[detail.workflow_status] }}</el-tag></div>
@@ -233,17 +233,17 @@ async function performAction() {
         <el-descriptions-item label="审核意见"><span class="revision-text">{{ detail.review_comment || '—' }}</span></el-descriptions-item>
       </el-descriptions>
       <div class="detail-section"><h3>证据引用</h3><div v-for="(item, index) in detail.evidence_refs" :key="`${item.reference}:${index}`" class="evidence-card"><strong>{{ index + 1 }}. {{ item.title }}</strong><span class="mono">{{ item.reference }}</span><span class="small-label">SHA-256</span><span class="mono">{{ item.sha256 }}</span></div></div>
-      <div class="detail-section"><h3>内部审批</h3><p v-if="actions.waitingForReviewer" class="field-help">等待另一位平台管理员审批。创建者不能审核自己的提案。</p><p v-else-if="detail.workflow_status === 'APPROVED'" class="field-help">内部审批通过，本提案本身未生效。可到运行配置中心明确发布测试运行版本；客户生产确认与外部执行另行核验。</p><p v-else-if="detail.workflow_status === 'REJECTED' || detail.workflow_status === 'WITHDRAWN'" class="field-help">此提案流程已结束。如需调整，请创建新修订提案。</p><p v-else class="field-help">提交、撤回仅限创建者；审核仅限另一位有写权限的平台管理员。以服务端授权与版本校验为准。</p><div class="revision-action-buttons"><el-button v-if="actions.submit" type="primary" :disabled="unresolved" @click="openAction('submit')">提交内部审批</el-button><el-button v-if="actions.review" type="primary" :disabled="unresolved" @click="openAction('review')">审核提案</el-button><el-button v-if="actions.withdraw" type="danger" plain :disabled="unresolved" @click="openAction('withdraw')">撤回提案</el-button></div></div>
+      <div class="detail-section"><h3>内部审批</h3><p v-if="actions.waitingForReviewer" class="field-help">等待另一位平台管理员审批。创建者不能审核自己的提案。</p><p v-else-if="detail.workflow_status === 'APPROVED'" class="field-help">内部审批已通过（当前提案尚未直接生效，请前往运行配置中心发布运行版本；客户生产确认状态另行核验）。</p><p v-else-if="detail.workflow_status === 'REJECTED' || detail.workflow_status === 'WITHDRAWN'" class="field-help">此提案流程已结束。如需调整，请创建新修订提案。</p><p v-else class="field-help">提案仅支持由创建人提交或撤回，并由另一位平台管理员执行双人复核审批。</p><div class="revision-action-buttons"><el-button v-if="actions.submit" type="primary" :disabled="unresolved" @click="openAction('submit')">提交内部审批</el-button><el-button v-if="actions.review" type="primary" :disabled="unresolved" @click="openAction('review')">审核提案</el-button><el-button v-if="actions.withdraw" type="danger" plain :disabled="unresolved" @click="openAction('withdraw')">撤回提案</el-button></div></div>
       <div class="detail-section"><h3>流程历史</h3><el-empty v-if="!detail.history.length" description="暂无流程历史" :image-size="60" /><el-timeline v-else class="revision-history"><el-timeline-item v-for="(item, index) in detail.history" :key="`${item.occurred_at}:${index}`" :timestamp="displayTime(item.occurred_at)" placement="top"><strong>{{ revisionActionLabel[item.action] }}</strong><p class="mono">{{ item.actor_id }}</p><p>{{ item.from_status ? revisionStatusLabel[item.from_status] : '新提案' }} → {{ revisionStatusLabel[item.to_status] }}</p><p v-if="item.comment" class="revision-text">{{ item.comment }}</p></el-timeline-item></el-timeline></div>
     </template>
-    <template #footer><el-button :disabled="writing || detailLoading" @click="loadDetail()">回读最新详情</el-button><el-button :disabled="unresolved" @click="detailOpen = false">关闭详情</el-button></template>
+    <template #footer><el-button :disabled="writing || detailLoading" @click="loadDetail()">刷新详情</el-button><el-button :disabled="unresolved" @click="detailOpen = false">关闭详情</el-button></template>
   </el-drawer>
 
   <el-dialog v-model="createOpen" title="创建配置修订提案" width="650px" class="responsive-dialog configuration-revision-dialog" append-to-body :close-on-click-modal="!unresolved" :close-on-press-escape="!unresolved" :show-close="!unresolved" destroy-on-close>
     <div v-if="configuration" class="config-dialog-context"><strong>{{ configuration.description }}</strong><span class="mono">{{ configuration.key }}</span><p>当前登记值：{{ displayValue(configuration.registered_value) }}（待确认项保持未生效状态）。</p></div>
     <el-alert type="info" :closable="false" show-icon title="登记外部书面依据引用与内容 SHA-256 摘要（独立于原建议草稿保存，审批通过后可在运行配置中心发布）。" />
     <ApiErrorNotice :error="createError" />
-    <el-alert v-if="unresolved" type="warning" :closable="false" title="原请求未确认，输入与版本已锁定。可只读回查，但不会自动重发。" /><el-button v-if="unresolved" type="warning" :disabled="commandState.busy || !writer" @click="retryOriginal">使用原配置请求重试</el-button>
+    <el-alert v-if="unresolved" type="warning" :closable="false" title="提交结果待确认，当前填写内容与版本已锁定，请点击重试提交确认结果。" /><el-button v-if="unresolved" type="warning" :disabled="commandState.busy || !writer" @click="retryOriginal">重试提交</el-button>
     <el-form :disabled="unresolved" label-position="top" class="dialog-form" @submit.prevent="createRevision">
       <el-form-item :label="`建议值${configuration?.unit ? `（${configuration.unit}）` : ''}`" :error="fieldErrors.proposed">
         <el-select v-if="kind === 'boolean'" v-model="form.proposed" placeholder="请选择布尔值" aria-label="修订建议值"><el-option label="是（true）" :value="true" /><el-option label="否（false）" :value="false" /></el-select>
@@ -254,7 +254,7 @@ async function performAction() {
       <p v-if="fieldErrors.evidence_refs" class="revision-validation" role="alert">{{ fieldErrors.evidence_refs }}</p>
       <div v-for="(item, index) in form.evidence_refs" :key="index" class="evidence-form-card">
         <div class="revision-evidence-heading"><strong>证据 {{ index + 1 }}</strong><el-button type="danger" link :disabled="form.evidence_refs.length <= 1 || unresolved" :aria-label="`移除证据 ${index + 1}`" @click="form.evidence_refs.splice(index, 1)">移除</el-button></div>
-        <el-form-item label="资料引用" :error="fieldErrors[`evidence_refs.${index}.reference`]"><el-input v-model="item.reference" placeholder="document-ref:书面资料的ASCII标识" :aria-label="`证据 ${index + 1} 资料引用`" /><span class="field-help">仅 document-ref: 后接字母、数字、点、下划线、冒号或短横线，总长不超过 160。不得填写 URL、磁盘路径或秘密。</span></el-form-item>
+        <el-form-item label="资料引用" :error="fieldErrors[`evidence_refs.${index}.reference`]"><el-input v-model="item.reference" placeholder="document-ref:书面资料的ASCII标识" :aria-label="`证据 ${index + 1} 资料引用`" /><span class="field-help">格式为 document-ref: 后接字母、数字、点、下划线、冒号或短横线（不超过 160 字符）。请勿填写 URL、本地路径或密钥信息。</span></el-form-item>
         <el-form-item label="证据标题（1–200 个字符）" :error="fieldErrors[`evidence_refs.${index}.title`]"><el-input v-model="item.title" placeholder="外部书面资料的标题" :aria-label="`证据 ${index + 1} 标题`" /></el-form-item>
         <el-form-item label="内容 SHA-256（64 位十六进制）" :error="fieldErrors[`evidence_refs.${index}.sha256`]"><el-input v-model="item.sha256" placeholder="填写对应文档内容的 SHA-256" :aria-label="`证据 ${index + 1} 内容哈希`" /></el-form-item>
       </div>
@@ -263,12 +263,12 @@ async function performAction() {
   </el-dialog>
 
   <el-dialog v-model="actionOpen" :title="actionTitle" width="540px" class="responsive-dialog" append-to-body :close-on-click-modal="!unresolved" :close-on-press-escape="!unresolved" :show-close="!unresolved" destroy-on-close>
-    <p class="field-help">提交版本 v{{ actionExpectedVersion }} · 当前回读版本 {{ detail ? `v${detail.version}` : '等待回读' }}</p>
+    <p class="field-help">操作基准版本 v{{ actionExpectedVersion }} · 当前最新版本 {{ detail ? `v${detail.version}` : '读取中…' }}</p>
     <el-alert v-if="actionType === 'submit'" type="info" :closable="false" show-icon title="提交后等待另一位平台管理员内部审批；证据仍未核验，配置尚未生效。" />
-    <el-alert v-if="actionType === 'review'" type="warning" :closable="false" show-icon title="审核仅记录内部意见。通过后可在运行配置中心准备测试发布；不表示客户已确认或允许生产发布。" />
+    <el-alert v-if="actionType === 'review'" type="warning" :closable="false" show-icon title="审核结果仅作为内部复核记录；审批通过后可前往运行配置中心发布测试运行版本，客户生产环境确认另行核验。" />
     <ApiErrorNotice :error="actionError" />
-    <el-alert v-if="unresolved" type="warning" :closable="false" title="原请求未确认，输入与版本已锁定。可只读回查，但不会自动重发。" /><el-button v-if="unresolved" type="warning" :disabled="commandState.busy || !writer" @click="retryOriginal">使用原配置请求重试</el-button>
-    <template v-if="actionConflict"><p class="field-help">版本已变化，已保留你的填写内容。请主动回读最新修订并核对状态、证据与版本，再决定是否提交；系统不会自动覆盖。</p><el-button :loading="detailLoading" @click="refreshActionVersion">回读最新版本，保留填写内容</el-button></template>
+    <el-alert v-if="unresolved" type="warning" :closable="false" title="提交结果待确认，当前填写内容与版本已锁定，请点击重试提交确认结果。" /><el-button v-if="unresolved" type="warning" :disabled="commandState.busy || !writer" @click="retryOriginal">重试提交</el-button>
+    <template v-if="actionConflict"><p class="field-help">当前修订版本已更新，系统已保留您填写的意见。请先加载最新版本并核对变更内容后，再决定是否继续提交。</p><el-button :loading="detailLoading" @click="refreshActionVersion">加载最新版本（保留已填内容）</el-button></template>
     <ApiErrorNotice :error="detailError" />
     <el-alert v-if="detail && !actionAllowed" type="warning" :closable="false" title="当前修订状态或授权不允许此动作，请关闭并查看最新详情。" />
     <el-form :disabled="unresolved" class="dialog-form" label-position="top" @submit.prevent="performAction">
@@ -276,12 +276,16 @@ async function performAction() {
       <el-form-item v-if="actionType === 'review' || actionType === 'withdraw'" :label="actionType === 'review' ? '审核意见（必填，1–500 个字符）' : '撤回理由（必填，1–500 个字符）'" :error="actionValidation"><el-input v-model="actionComment" type="textarea" :rows="4" :aria-label="actionType === 'review' ? '审核意见' : '撤回理由'" placeholder="请说明理由，请勿填写密码或 token" /></el-form-item>
       <p v-else-if="actionValidation" class="revision-validation" role="alert">{{ actionValidation }}</p>
     </el-form>
-    <template #footer><el-button :disabled="unresolved" @click="actionOpen = false">取消</el-button><el-button type="primary" :loading="acting" :disabled="unresolved || !actionAllowed || actionConflict || detailLoading" @click="performAction">{{ actionType === 'review' ? '记录内部审核' : actionType === 'withdraw' ? '确认撤回' : '提交内部审批' }}</el-button></template>
+    <template #footer><el-button :disabled="unresolved" @click="actionOpen = false">取消</el-button><el-button type="primary" :loading="acting" :disabled="unresolved || !actionAllowed || actionConflict || detailLoading" @click="performAction">{{ actionType === 'review' ? '提交审核结论' : actionType === 'withdraw' ? '确认撤回' : '提交内部审批' }}</el-button></template>
   </el-dialog>
 </template>
 
 <style>
 .configuration-revisions-drawer,.configuration-revision-detail{max-width:100vw}
+.revision-original-request{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:14px}
+.config-dialog-context{padding:12px 14px;background:#f6f9fc;border:1px solid #e5edf5;border-radius:6px;margin-bottom:14px;font-size:12px}
+.config-dialog-context strong{display:block;font-size:13px;margin-bottom:4px}
+.config-dialog-context p{margin:6px 0 0;color:#52667f}
 .revision-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 18px;font-size:12px}
 .revision-toolbar>div,.revision-action-buttons{display:flex;flex-wrap:wrap;gap:8px}
 .revision-toolbar .el-button,.revision-action-buttons .el-button{margin-left:0}

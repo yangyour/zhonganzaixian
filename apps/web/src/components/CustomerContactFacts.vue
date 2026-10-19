@@ -16,5 +16,5 @@ defineProps<{ facts: ContactFacts }>()
  </dl>
 </template>
 <style scoped>
-.contact-facts{display:grid;grid-template-columns:minmax(110px,1fr) minmax(0,3fr);gap:8px 16px;margin:12px 0}.contact-facts dt{color:#526176}.contact-facts dd{margin:0;overflow-wrap:anywhere}.verbatim{white-space:pre-wrap}@media(max-width:700px){.contact-facts{grid-template-columns:1fr;gap:4px}.contact-facts dd{margin-bottom:8px}}
+.contact-facts{display:grid;grid-template-columns:minmax(110px,1fr) minmax(0,3fr);gap:8px 16px;margin:12px 0;font-variant-numeric:tabular-nums}.contact-facts dt{color:#526176;padding:4px 0}.contact-facts dd{margin:0;padding:4px 0;overflow-wrap:anywhere;border-bottom:1px solid #f0f4f9}.verbatim{white-space:pre-wrap}@media(max-width:700px){.contact-facts{grid-template-columns:1fr;gap:4px}.contact-facts dd{margin-bottom:8px}}
 </style>

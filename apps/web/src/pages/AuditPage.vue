@@ -51,7 +51,7 @@ onUnmounted(() => workspace.dispose())
 </script>
 <template>
   <section class="audit-page admin-prototype">
-    <div class="page-heading"><div><span class="eyebrow">ADMINISTRATION / AUDIT</span><h1>审计检索与区间校验</h1><p>检索当前租户已授权审计日志（支持精确匹配筛选）· 列表分页与链式摘要校验各自保持独立快照边界。</p></div><el-button :loading="state.loading" :disabled="!permitted" @click="refresh">刷新已应用筛选</el-button></div>
+    <div class="page-heading"><div><h1>审计检索与区间校验</h1><p>按当前租户检索操作审计记录（支持精确条件匹配），并提供基于哈希链的区间连续性校验。</p></div><el-button :loading="state.loading" :disabled="!permitted" @click="refresh">刷新列表</el-button></div>
     <details class="admin-explainer"><summary>审计日志存证说明 · 链式哈希摘要校验范围</summary><p>审计日志以只读追加方式持久化存储，不支持修改、删除或重签名。区间校验用于核对数据库快照内相邻记录的哈希链连续性（长期归档与外部可信时间戳锚点按平台合规策略配置）。</p></details>
     <el-empty v-if="!permitted" description="当前身份没有本租户审计权限" />
     <template v-else>
@@ -61,11 +61,11 @@ onUnmounted(() => workspace.dispose())
           <el-form-item v-for="field in fields.slice(0, 3)" :key="field.key" :label="field.label"><el-input v-model="draft[field.key]" clearable :aria-label="field.label" :placeholder="field.placeholder" /></el-form-item>
           <details class="audit-advanced"><summary>更多筛选 · 对象、请求与时间范围</summary><div class="audit-advanced-grid"><el-form-item v-for="field in fields.slice(3)" :key="field.key" :label="field.label"><el-input v-model="draft[field.key]" clearable :aria-label="field.label" :placeholder="field.placeholder" /></el-form-item></div></details>
           <el-form-item label="每页条数"><el-select v-model="pageSize" aria-label="审计每页条数"><el-option v-for="size in [10, 15, 25, 50, 100]" :key="size" :value="size" :label="`${size}条`" /></el-select></el-form-item>
-          <div class="audit-actions"><el-button type="primary" native-type="submit" :loading="state.loading">查询并回到第一页</el-button><el-button @click="resetFilters">清空筛选</el-button></div>
+          <div class="audit-actions"><el-button type="primary" native-type="submit" :loading="state.loading">查询</el-button><el-button @click="resetFilters">重置</el-button></div>
         </el-form>
         <p class="field-help">时间格式采用含秒的 UTC ISO-8601（Z）标准，支持最多 3 位毫秒；时间区间为左闭右开（含开始时间、不含结束时间）。</p>
-        <p v-if="unapplied" class="audit-warning">筛选条件已修改但尚未应用，请点击“查询并回到第一页”生效。</p>
-        <ApiErrorNotice :error="state.error"><el-button size="small" @click="refresh">重读已应用筛选</el-button></ApiErrorNotice>
+        <p v-if="unapplied" class="audit-warning">筛选条件已修改但尚未应用，请点击“查询”生效。</p>
+        <ApiErrorNotice :error="state.error"><el-button size="small" @click="refresh">重新加载</el-button></ApiErrorNotice>
         <AppTable :error="state.error" :rows="state.page?.items || []" :loading="state.loading" :empty-text="state.page ? '本页没有匹配的授权记录' : '审计记录尚未成功读取'">
           <el-table-column label="序号 / 时间（北京）" min-width="190"><template #default="{ row }"><strong>#{{ row.sequence }}</strong><span class="cell-sub">{{ displayTime(row.occurred_at) }}</span></template></el-table-column>
           <el-table-column prop="actor_name" label="操作者" min-width="130" />
@@ -80,15 +80,15 @@ onUnmounted(() => workspace.dispose())
       </div>
       <details class="panel audit-proof-panel" :open="!!state.proof || state.verifying || !!state.proofError"><summary>哈希链区间校验 · 展开设置起止序号</summary><div class="admin-card-body">
         <h2>哈希链区间校验</h2><p>针对当前租户完整审计链的指定序号区间执行连续性核验（不受上方列表筛选条件影响，单批上限 1000 条，包含起止序号）。</p>
-        <el-form label-position="top" class="audit-range-form" @submit.prevent="verifyRange"><el-form-item label="开始序号"><el-input v-model="from" inputmode="numeric" aria-label="审计校验开始序号" /></el-form-item><el-form-item label="结束序号（可留空）"><el-input v-model="to" inputmode="numeric" aria-label="审计校验结束序号" placeholder="留空取本批最多1000条" /></el-form-item><el-button type="primary" native-type="submit" :loading="state.verifying">校验此区间（只读）</el-button></el-form>
+        <el-form label-position="top" class="audit-range-form" @submit.prevent="verifyRange"><el-form-item label="开始序号"><el-input v-model="from" inputmode="numeric" aria-label="审计校验开始序号" /></el-form-item><el-form-item label="结束序号（可留空）"><el-input v-model="to" inputmode="numeric" aria-label="审计校验结束序号" placeholder="留空取本批最多1000条" /></el-form-item><el-button type="primary" native-type="submit" :loading="state.verifying">校验区间</el-button></el-form>
         <p v-if="rangeError" role="alert" class="audit-warning">{{ rangeError }}</p><ApiErrorNotice :error="state.proofError" />
         <template v-if="state.proof">
           <el-alert :type="state.proof.status === 'VALID' ? 'success' : state.proof.status === 'INVALID' ? 'error' : 'info'" :closable="false" :title="proofTitle" />
           <el-descriptions :column="1" border class="audit-proof-details"><el-descriptions-item label="当次快照时间">{{ state.proof.checked_at }}</el-descriptions-item><el-descriptions-item label="快照尾序号">{{ state.proof.snapshot_sequence }}</el-descriptions-item><el-descriptions-item label="本次区间">{{ state.proof.from_sequence ?? '无' }} → {{ state.proof.to_sequence ?? '无' }}</el-descriptions-item><el-descriptions-item label="已验证记录数">{{ state.proof.verified_records }}</el-descriptions-item><el-descriptions-item label="校验失败">{{ state.proof.failure }}<span v-if="state.proof.failure_sequence !== null"> · #{{ state.proof.failure_sequence }}</span></el-descriptions-item><el-descriptions-item label="本次是否覆盖快照整链">{{ state.proof.whole_snapshot_chain_checked ? '是（覆盖当前数据库快照全链）' : '否（当前为指定子区间核验）' }}</el-descriptions-item><el-descriptions-item label="本地前驱摘要"><span class="audit-hash">{{ state.proof.anchor_hash ?? '未取得' }}</span></el-descriptions-item><el-descriptions-item label="本批末尾摘要"><span class="audit-hash">{{ state.proof.final_hash ?? '未取得' }}</span></el-descriptions-item></el-descriptions>
-          <el-button :disabled="state.verifying || state.proof.status !== 'VALID' || !state.proof.next_from_sequence" @click="verifyNext">明确校验后续一批</el-button><p class="field-help">每次核验基于当前读取快照独立执行，支持按批次顺延核对后续区间。</p>
+          <el-button :disabled="state.verifying || state.proof.status !== 'VALID' || !state.proof.next_from_sequence" @click="verifyNext">校验下一批</el-button><p class="field-help">每次核验基于当前读取快照独立执行，支持按批次顺延核对后续区间。</p>
         </template>
       </div></details>
-      <el-dialog :model-value="Boolean(selected)" title="审计记录摘要" width="650px" class="audit-record-dialog" @update:model-value="toggleRecord"><template v-if="selected"><p>#{{ selected.sequence }} · {{ selected.action }}</p><p class="audit-hash">记录ID：{{ selected.id }}</p><p class="audit-hash">操作者ID：{{ selected.actor_id ?? '未认证主体' }}</p><p class="audit-hash">前驱：{{ selected.previous_hash }}</p><p class="audit-hash">本条：{{ selected.entry_hash }}</p><p>已将当前记录序号同步至下方区间校验表单，关闭弹窗后可点击“校验此区间”执行核验。</p></template><template #footer><el-button @click="selected = null">关闭</el-button></template></el-dialog>
+      <el-dialog :model-value="Boolean(selected)" title="审计记录摘要" width="650px" class="audit-record-dialog" @update:model-value="toggleRecord"><template v-if="selected"><p>#{{ selected.sequence }} · {{ selected.action }}</p><p class="audit-hash">记录ID：{{ selected.id }}</p><p class="audit-hash">操作者ID：{{ selected.actor_id ?? '未认证主体' }}</p><p class="audit-hash">前驱：{{ selected.previous_hash }}</p><p class="audit-hash">本条：{{ selected.entry_hash }}</p><p>已将当前记录序号同步至下方区间校验表单，关闭弹窗后可点击“校验区间”执行核验。</p></template><template #footer><el-button @click="selected = null">关闭</el-button></template></el-dialog>
     </template>
   </section>
 </template>

@@ -38,11 +38,11 @@ const ageText = computed(() => {
 </script>
 <template>
   <section class="sample-freshness" aria-label="采样与读取时间">
-    <h3>采样与读取时间</h3>
-    <dl><div><dt>本次响应 Date（UTC，秒级）</dt><dd data-testid="response-date">{{ responseDate }}</dd></div><div><dt>原采样时间（UTC）</dt><dd data-testid="sample-date">{{ sampleDate }}</dd></div><div><dt>样本年龄估计</dt><dd data-testid="sample-age">{{ ageText }}</dd></div></dl>
-    <p class="sample-freshness-note">刷新操作仅读取最新已存记录，不触发设备即时重采；样本时效估算仅供运维参考，不作为设备可用性或 SLA 判定依据。</p>
+    <h3>采样时效与读取基准</h3>
+    <dl><div><dt>服务端响应时间（UTC）</dt><dd data-testid="response-date">{{ responseDate }}</dd></div><div><dt>原始采样时间（UTC）</dt><dd data-testid="sample-date">{{ sampleDate }}</dd></div><div><dt>样本时效估算</dt><dd data-testid="sample-age">{{ ageText }}</dd></div></dl>
+    <p class="sample-freshness-note">注：刷新仅读取服务端最新已存记录，不触发设备即时重采；样本时效估算仅供运维参考，不作为 SLA 判定依据。</p>
   </section>
 </template>
 <style scoped>
-.sample-freshness{margin-top:16px;padding:12px;border:1px solid var(--el-border-color-light);border-radius:8px;background:var(--el-fill-color-light);min-width:0}.sample-freshness h3{font-size:14px;margin:0 0 10px}.sample-freshness dl{margin:0;display:grid;gap:10px}.sample-freshness dt{font-size:12px;color:var(--el-text-color-secondary)}.sample-freshness dd{margin:3px 0 0;font-size:13px;overflow-wrap:anywhere}.sample-freshness-note{font-size:12px;line-height:1.6;color:var(--el-text-color-secondary);margin:12px 0 0}
+.sample-freshness{margin-top:16px;padding:14px;border:1px solid var(--el-border-color-light,#e2e8f0);border-radius:8px;background:var(--el-fill-color-light,#f8fafc);min-width:0}.sample-freshness h3{font-size:14px;font-weight:600;color:#1e293b;margin:0 0 10px}.sample-freshness dl{margin:0;display:grid;gap:8px}.sample-freshness dl div{padding:8px 10px;background:#fff;border:1px solid var(--el-border-color-lighter,#edf2f7);border-radius:6px}.sample-freshness dt{font-size:12px;color:var(--el-text-color-secondary,#64748b)}.sample-freshness dd{margin:4px 0 0;font-size:13px;font-weight:500;color:#334155;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.sample-freshness-note{font-size:12px;line-height:1.6;color:var(--el-text-color-secondary,#64748b);margin:12px 0 0}
 </style>

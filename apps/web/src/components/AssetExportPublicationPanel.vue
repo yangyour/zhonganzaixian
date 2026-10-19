@@ -34,16 +34,16 @@ defineExpose({unresolved:()=>workspace.unresolved()||confirming.value,mayLeave})
   <p>准备文件与发布文件分开确认。下载链接仅限当前账号使用，15分钟后失效。</p>
   <ApiErrorNotice :error="state.error" />
   <p v-if="state.busy" role="status">正在处理，请稍候…</p>
-  <p v-if="state.attempt&&!state.busy" role="alert">上一次请求结果未确认。请恢复原请求，避免重复操作。</p>
-  <button v-if="state.attempt&&!state.busy" type="button" @click="recover">恢复原请求</button>
+  <p v-if="state.attempt&&!state.busy" role="alert">上一次请求结果未确认，请点击下方按钮重试。</p>
+  <button v-if="state.attempt&&!state.busy" type="button" @click="recover">重试提交</button>
   <template v-if="state.current">
    <p v-if="!state.current.publication_enabled">当前环境尚未启用文件发布。</p>
    <p v-else-if="!state.current.prepared">文件还未准备好，请稍后刷新。</p>
    <p v-else-if="state.current.status==='PUBLISHED'">文件已发布，可申请下载链接。{{state.current.row_count}} 行 · {{state.current.size_bytes}} 字节</p>
    <p v-else>文件已准备好，尚未发布。{{state.current.row_count}} 行 · {{state.current.size_bytes}} 字节</p>
    <div class="actions">
-    <button v-if="state.current.publication_enabled&&state.current.prepared&&state.current.status==='NOT_PUBLISHED'" type="button" :disabled="state.busy||!!state.attempt||confirming" @click="publish">发布已准备文件</button>
-    <button v-if="state.current.download_grant_available" type="button" :disabled="state.busy||!!state.attempt||confirming" @click="workspace.grant()">取得下载链接</button>
+    <button v-if="state.current.publication_enabled&&state.current.prepared&&state.current.status==='NOT_PUBLISHED'" type="button" :disabled="state.busy||!!state.attempt||confirming" @click="publish">发布导出文件</button>
+    <button v-if="state.current.download_grant_available" type="button" :disabled="state.busy||!!state.attempt||confirming" @click="workspace.grant()">获取下载链接</button>
    </div>
   </template>
   <button type="button" :disabled="state.busy||confirming" @click="refresh">刷新发布状态</button>

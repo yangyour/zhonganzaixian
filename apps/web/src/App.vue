@@ -100,7 +100,7 @@ async function endSession() {
             <el-option v-for="tenant in session.allowed_tenants" :key="tenant.id" :label="tenant.name" :value="tenant.id" />
           </el-select>
           <span v-else class="tenant-name">{{ session.tenant.name }}</span>
-          <span class="environment-label"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '测试环境 · 非生产' : '测试夹具模式 · 非联调环境' }}</span>
+          <span class="environment-label"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '测试环境' : '本地演示模式' }}</span>
           </div>
         </div>
       </div>

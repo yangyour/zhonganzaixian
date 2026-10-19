@@ -35,13 +35,13 @@ defineExpose({state,workspace,mayLeave})
      <div class="proto-tabs" aria-label="通知视图">
       <button type="button" :class="{active:tab==='mine'&&!state.unreadOnly}" :aria-pressed="tab==='mine'&&!state.unreadOnly" :disabled="locked" @click="tab='mine';workspace.list(false)">全部通知</button>
       <button type="button" :class="{active:tab==='mine'&&state.unreadOnly}" :aria-pressed="tab==='mine'&&state.unreadOnly" :disabled="locked" @click="tab='mine';workspace.list(true)">未读通知</button>
-      <button v-if="ledgerAllowed" type="button" :class="{active:tab==='ledger'}" :aria-pressed="tab==='ledger'" @click="openLedger">通知意图台账</button>
+      <button v-if="ledgerAllowed" type="button" :class="{active:tab==='ledger'}" :aria-pressed="tab==='ledger'" @click="openLedger">通知派发台账</button>
      </div>
      <button type="button" :disabled="tab==='mine'?locked:state.intentBusy" @click="tab==='mine'?workspace.list():workspace.intents()">刷新</button>
     </div>
     <template v-if="tab==='mine'">
      <ApiErrorNotice :error="state.error" />
-     <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">标记已读的结果尚未确认，请先恢复原请求。</p><button v-if="state.attempt&&!state.busy" type="button" @click="recover">恢复原已读请求</button>
+     <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">标记已读结果尚未确认，请点击下方按钮重试。</p><button v-if="state.attempt&&!state.busy" type="button" @click="recover">重试标记已读</button>
      <p v-if="state.receipt" role="status">已读状态已记录：{{ displayTime(state.receipt.read_at) }}。</p>
      <p v-if="state.busy" role="status" aria-live="polite">{{ state.busy==='write'?'正在记录已读状态…':'正在读取通知…' }}</p>
      <p v-if="!state.page&&!state.busy">{{ state.error?'读取未完成，通知数量未知。':'尚未读取通知。' }}</p>
@@ -59,12 +59,12 @@ defineExpose({state,workspace,mayLeave})
      </template>
     </template>
     <template v-else>
-     <p class="proto-scope-note">每条工单处理事实生成一条通知意图。“待确认规则”表示接收对象依赖客户尚未确认的值班、升级或角色规则，系统不会自行指定接收人。</p>
+     <p class="proto-scope-note">每条工单处理事件生成一条通知派发记录。“待确认规则”表示接收对象依赖尚未配置的值班、升级或角色规则，系统不会自动指定默认接收人。</p>
      <ApiErrorNotice :error="state.intentError" />
-     <p v-if="state.intentBusy" role="status">正在读取通知意图…</p>
+     <p v-if="state.intentBusy" role="status">正在读取通知派发记录…</p>
      <div v-if="state.intents" class="proto-table-wrap"><table class="proto-table"><thead><tr><th>工单</th><th>事件</th><th>优先级</th><th>接收对象</th><th>待确认事项</th><th>外部渠道</th><th>生成时间</th></tr></thead><tbody>
       <tr v-for="i in state.intents.items" :key="i.id"><td>{{ i.receipt_no }}</td><td>{{ eventLabel(i.event_type) }}</td><td>{{ i.priority ?? '—' }}</td><td>{{ i.recipient_status==='COMPLETE'?`已生成 ${i.recipient_count} 条`:i.recipient_status==='PARTIAL'?`部分生成 ${i.recipient_count} 条`:'待确认规则' }}</td><td><span v-if="!i.pending_reasons.length">—</span><span v-for="r in i.pending_reasons" :key="r" class="reason">{{ pendingReasonLabels[r] ?? r }}</span></td><td><span v-for="b in i.external_blockers" :key="b" class="reason">{{ blockerLabels[b] ?? b }}</span></td><td>{{ displayTime(i.created_at) }}</td></tr>
-     </tbody></table><p v-if="!state.intents.items.length" class="panel">尚无通知意图。</p></div>
+     </tbody></table><p v-if="!state.intents.items.length" class="panel">尚无通知派发记录。</p></div>
      <button v-if="state.intents" type="button" :disabled="state.intentBusy||!state.intents.has_more" @click="workspace.intents(true)">下一页</button>
     </template>
    </div>

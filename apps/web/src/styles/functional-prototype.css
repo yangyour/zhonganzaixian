@@ -97,5 +97,13 @@
 @media(max-width:760px){.prototype-shell .proto-page-head{flex-wrap:wrap;align-items:flex-start}.prototype-shell #main-content button.proto-link:not([class*="el-"]){min-height:44px}}
 
 /* Balanced KPI rows and readable action labels around tablet and phone widths. */
+.proto-table tbody tr{transition:background-color .12s ease}.proto-table td{font-variant-numeric:tabular-nums}
+.feature-summary>*,.proto-kpis>*{transition:border-color .15s ease,box-shadow .15s ease}.feature-summary>*:hover,.proto-kpis>*:hover{border-color:#d4e2f4}
+.boundary-details summary{transition:color .15s ease}.boundary-details summary:hover{color:#2878f5}
+.prototype-shell #main-content :is(.feature-tabs,.proto-tabs)>:is(button,a):hover:not(.active){color:#345580}
+.prototype-shell #main-content :is(.asset-status-chips,.asset-view-switch,.dashboard-ranges) button:not([class*="el-"]){transition:background-color .15s ease,color .15s ease}
+.prototype-shell #main-content :is(.asset-status-chips,.asset-view-switch,.dashboard-ranges) button:not([class*="el-"]):hover:not(.active):not(:disabled){background:#eef5ff;color:#2878f5}
+.prototype-shell #main-content .asset-tile{transition:border-color .15s ease,background-color .15s ease,box-shadow .15s ease}.prototype-shell #main-content .asset-tile:hover{box-shadow:0 2px 8px #1e4f8312}
+.prototype-shell #main-content button.proto-link:not([class*="el-"]):hover:not(:disabled){text-decoration:underline;text-underline-offset:3px}
 @media(min-width:761px) and (max-width:1200px){.prototype-shell .assets-prototype-page .assets-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:480px){.prototype-shell .assets-heading-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.prototype-shell .assets-heading-actions>.el-button--primary{grid-column:1/-1}}

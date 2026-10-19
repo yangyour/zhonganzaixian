@@ -61,14 +61,14 @@ defineExpose({state,workspace,mayLeave})
   <div class="page-heading proto-page-head">
    <div>
     <h1>服务档位与 SLA 时钟台账 <span class="proto-badge">{{ session?.tenant.name }}</span></h1>
-    <p>管理当前租户服务档位快照、只追加档位变更历史，并核验在途工单冻结 SLA 时钟（M2-10 / M5-8 / M5-18 / M5-20）。</p>
+    <p>管理当前租户服务档位配置与变更台账，并核验在途工单的开单冻结 SLA 时钟（M2-10 / M5-8 / M5-18 / M5-20）。</p>
    </div>
    <RouterLink to="/sla-scenarios" class="back">SLA 场景测算</RouterLink>
   </div>
   <p class="panel" v-if="!permitted">当前身份无权访问内部服务档位与 SLA 时钟台账，或正在切换租户。</p>
   <template v-else>
    <p class="proto-scope-note">
-    在途工单 SLA 快照只在开单时冻结，后续修改租户服务档位不会追溯更改已开单工单的响应或恢复截止时间（M2-10 / M5-20）。客户正式商务审批状态保持未核验（UNVERIFIED）；重开续算策略（Q27）与基础/标准档 P3 次日口径（Q08）按已发布运行配置执行。
+    在途工单的 SLA 目标在开单时自动冻结，后续调整租户服务档位不会追溯变更既有工单的响应与恢复截止时间（M2-10 / M5-20）。线下商务审批状态为待核验（UNVERIFIED）；工单重开计时策略（Q27）及基础/标准档 P3 次日口径（Q08）按当前已发布运行配置执行。
    </p>
    <div class="proto-kpis">
     <div>
@@ -104,12 +104,12 @@ defineExpose({state,workspace,mayLeave})
 
     <template v-if="tab==='ledger'">
      <ApiErrorNotice :error="state.error" />
-     <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">服务档位变更结果尚未确认，请使用原幂等键重试。</p>
+     <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">服务档位变更提交结果尚未确认，请点击下方按钮重试。</p>
      <button v-if="state.attempt&&!state.busy" type="button" @click="workspace.retry()">重试提交变更</button>
      <p v-if="state.busy" role="status" aria-live="polite">{{ state.busy==='write'?'正在提交服务档位变更…':'正在读取服务档位台账…' }}</p>
 
      <form v-if="canWrite&&state.page" class="tier-form" @submit.prevent="submitChange">
-      <h2>登记服务档位变更（仅平台管理员 · 只追加）</h2>
+      <h2>登记服务档位变更</h2>
       <div class="form-grid">
        <label>目标档位
         <select v-model="toTier" :disabled="locked">
@@ -125,24 +125,24 @@ defineExpose({state,workspace,mayLeave})
         </select>
        </label>
        <label>合同设备数（可选）
-        <input v-model="deviceCount" type="number" min="0" max="1000000" placeholder="未填保留 null" :disabled="locked" />
+        <input v-model="deviceCount" type="number" min="0" max="1000000" placeholder="选填，未填则暂不登记" :disabled="locked" />
        </label>
        <label>计费周期（可选）
         <select v-model="billingCycle" :disabled="locked">
-         <option value="">未指定（null）</option>
+         <option value="">暂不指定</option>
          <option value="MONTHLY">按月</option>
          <option value="QUARTERLY">按季</option>
          <option value="YEARLY">按年</option>
         </select>
        </label>
        <label>月度服务费（分，可选）
-        <input v-model="monthlyFeeFen" type="number" min="0" placeholder="未填保留 null" :disabled="locked" />
+        <input v-model="monthlyFeeFen" type="number" min="0" placeholder="选填，单位：分" :disabled="locked" />
        </label>
        <label class="wide">变更原因（必填）
-        <input v-model="reason" type="text" maxlength="1000" required placeholder="说明档位调整依据；记录后不可修改或删除" :disabled="locked" />
+        <input v-model="reason" type="text" maxlength="1000" required placeholder="请说明档位调整依据；保存后作为历史台账留存" :disabled="locked" />
        </label>
       </div>
-      <button type="submit" :disabled="locked||!reason.trim()">记录档位变更（期望版本 v{{ state.page.current?.version ?? 0 }}）</button>
+      <button type="submit" class="tier-submit-btn" :disabled="locked||!reason.trim()">保存档位变更（当前版本 v{{ state.page.current?.version ?? 0 }}）</button>
      </form>
 
      <template v-if="state.page">
@@ -175,7 +175,7 @@ defineExpose({state,workspace,mayLeave})
       <label>工单 ID（UUID）
        <input v-model="ticketIdInput" type="text" placeholder="输入工单 UUID 核验开单冻结 SLA 时钟" />
       </label>
-      <button type="submit" :disabled="state.slaBusy||!ticketIdInput.trim()">核验 SLA 时钟</button>
+      <button type="submit" class="tier-submit-btn" :disabled="state.slaBusy||!ticketIdInput.trim()">核验 SLA 时钟</button>
      </form>
      <p v-if="state.slaBusy" role="status">正在读取工单 SLA 时钟…</p>
      <div v-if="state.slaInspection" class="sla-detail">
@@ -215,5 +215,5 @@ defineExpose({state,workspace,mayLeave})
  </section>
 </template>
 <style scoped>
-.service-tiers{min-width:0}.service-tiers .panel{padding:20px;margin:16px 0}.workspace{margin-top:12px}.workspace>p,.workspace>button{margin:12px 18px;font-size:12px}.service-tiers .proto-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0 18px}.service-tiers button,.back{display:inline-flex;align-items:center;min-height:32px;padding:6px 10px;font-size:12px;border:1px solid #cbd7e5;border-radius:3px;background:#fff;color:#245a85;font-family:inherit;cursor:pointer}.service-tiers button:disabled{opacity:.5;cursor:not-allowed}.service-tiers .proto-tabs{display:flex;gap:24px}.service-tiers .proto-tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;min-height:48px;padding:0 4px;background:none;color:#5f6b78}.service-tiers .proto-tabs button.active{border-bottom-color:#2d79f6;color:#1f5fc8}.tier-form,.sla-search,.sla-detail{margin:16px 18px;padding:14px;border:1px solid #e2e8f0;border-radius:4px;background:#f8fafc}.tier-form h2{margin:0 0 12px;font-size:14px}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px}.form-grid label,.sla-search label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#334155}.form-grid label.wide{grid-column:1/-1}.form-grid input,.form-grid select,.sla-search input{min-height:32px;padding:4px 8px;border:1px solid #cbd7e5;border-radius:3px;font-size:12px}.sla-search{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}.sla-search label{flex:1;min-width:260px}.metric-footer{margin-top:10px;font-size:12px;color:#64748b}
+.service-tiers{min-width:0}.service-tiers .panel{padding:20px;margin:16px 0}.workspace{margin-top:12px}.workspace>p,.workspace>button{margin:12px 18px;font-size:12px}.service-tiers .proto-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0 18px}.service-tiers button,.back{display:inline-flex;align-items:center;min-height:32px;padding:6px 12px;font-size:12px;border:1px solid #cbd7e5;border-radius:4px;background:#fff;color:#245a85;font-family:inherit;cursor:pointer;text-decoration:none;transition:background-color .15s,border-color .15s,color .15s}.service-tiers button:not(:disabled):hover,.back:hover{border-color:#94b8e8;background:#f4f8ff;color:#1d4ed8}.service-tiers button.tier-submit-btn{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:500}.service-tiers button.tier-submit-btn:not(:disabled):hover{background:#1d4ed8;border-color:#1d4ed8;color:#fff}.service-tiers button:disabled{opacity:.5;cursor:not-allowed}.service-tiers .proto-tabs{display:flex;gap:24px}.service-tiers .proto-tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;min-height:48px;padding:0 4px;background:none;color:#5f6b78}.service-tiers .proto-tabs button:not(:disabled):hover{background:none;color:#1f5fc8}.service-tiers .proto-tabs button.active{border-bottom-color:#2d79f6;color:#1f5fc8;font-weight:600}.tier-form,.sla-search,.sla-detail{margin:16px 18px;padding:16px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc}.tier-form h2{margin:0 0 12px;font-size:14px;color:#1e293b}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px}.form-grid label,.sla-search label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:#334155}.form-grid label.wide{grid-column:1/-1}.form-grid input,.form-grid select,.sla-search input{min-height:34px;padding:4px 10px;border:1px solid #cbd7e5;border-radius:4px;background:#fff;font-size:12px;transition:border-color .15s,box-shadow .15s}.form-grid input:focus,.form-grid select:focus,.sla-search input:focus{outline:none;border-color:#2d79f6;box-shadow:0 0 0 2px rgba(45,121,246,.12)}.sla-search{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}.sla-search label{flex:1;min-width:260px}.metric-footer{margin-top:10px;font-size:12px;color:#64748b}
 </style>

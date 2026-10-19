@@ -24,19 +24,19 @@ async function visit(kind:'assets'|'tickets',id:string){if(navigating.value)retu
  <el-button v-if="permitted" class="global-search-trigger" aria-label="打开全局搜索，快捷键 Control K 或 Command K" aria-keyshortcuts="Control+k Meta+k" title="搜索当前租户（Ctrl+K / ⌘K）" @click="show"><Search class="search-trigger-icon" aria-hidden="true" /><span>搜索<span class="search-trigger-hint">资产 / 报障记录</span></span><kbd aria-hidden="true">Ctrl / ⌘ K</kbd></el-button>
  <el-dialog v-model="open" title="搜索当前租户" width="680px" class="global-search-dialog" append-to-body :close-on-click-modal="false" :close-on-press-escape="!navigating" :show-close="!navigating" @opened="input?.focus()">
   <el-form class="global-search-form" @submit.prevent="workspace.search()"><el-form-item><el-input ref="input" :model-value="state.query" :disabled="navigating" clearable aria-label="当前租户搜索词" placeholder="资产名称 / 报障标题 / 受理编号" @update:model-value="workspace.change(String($event))"/></el-form-item><el-button native-type="submit" type="primary" :loading="state.busy" :disabled="navigating">搜索</el-button></el-form>
-  <p class="search-boundary">检索范围限于当前租户已授权资源（支持资产与报障登记）；事件、自动化脚本和通知提醒尚未接入，修改关键词后请重新搜索。</p>
+  <p class="search-boundary">检索范围限于当前租户已授权资源（支持资产与报障记录）；修改关键词后请重新搜索。</p>
   <ApiErrorNotice :error="state.error"/>
   <el-alert v-if="navigationError" :title="navigationError" type="warning" :closable="false"/>
   <el-skeleton v-if="state.busy" :rows="4" animated/>
   <template v-if="state.result">
-   <p class="search-observed" role="status" aria-live="polite">查询时间：{{displayTime(state.result.observed_at)}} · 仅含当前租户已接入且有权查看的数据</p>
-   <section class="search-group"><h3>资产 <small>最多5条</small></h3><p v-if="!state.result.groups[0].returned">没有找到可查看的匹配资产，请尝试其他关键词。</p><ul v-else><li v-for="hit in state.result.groups[0].items" :key="hit.id"><el-button link :disabled="navigating" @click="visit('assets',hit.id)">{{hit.name}}</el-button><span>{{typeLabel(hit.type)}} · 资产记录</span></li></ul><p v-if="state.result.groups[0].has_more">还有更多匹配资产，可到资产管理页继续查询。</p></section>
-   <section class="search-group unavailable"><h3>事件 <small>最多4条</small></h3><p>事件来源尚未接入，暂时无法查询，也无法判断是否有事件。</p></section>
-   <section class="search-group"><h3>工单（当前仅报障登记） <small>最多3条</small></h3><p>{{state.result.groups[2].source_scope==='OWN_REPORT_REGISTRATIONS'?'仅搜索本人提交的报障登记':'搜索当前租户内有权查看的报障登记'}}</p><p v-if="!state.result.groups[2].returned">没有找到可查看的匹配报障，请尝试其他关键词。</p><ul v-else><li v-for="hit in state.result.groups[2].items" :key="hit.id"><el-button link :disabled="navigating" @click="visit('tickets',hit.id)">{{hit.title}}</el-button><span>{{hit.receipt_no}} · 已登记，正式处理状态待确认</span></li></ul><p v-if="state.result.groups[2].has_more">还有更多匹配登记，可到报障与受理页继续查询。</p></section>
-   <section class="search-group unavailable"><h3>自动化脚本 <small>最多3条</small></h3><p>脚本来源尚未接入，暂时无法查询。本搜索不执行脚本。</p></section>
+   <p class="search-observed" role="status" aria-live="polite">查询时间：{{displayTime(state.result.observed_at)}} · 当前租户授权数据范围</p>
+   <section class="search-group"><h3>资产 <small>最多5条</small></h3><p v-if="!state.result.groups[0].returned">未找到匹配的资产，请尝试其他关键词。</p><ul v-else><li v-for="hit in state.result.groups[0].items" :key="hit.id"><el-button link :disabled="navigating" @click="visit('assets',hit.id)">{{hit.name}}</el-button><span>{{typeLabel(hit.type)}} · 资产记录</span></li></ul><p v-if="state.result.groups[0].has_more">还有更多匹配资产，可前往资产管理页继续查询。</p></section>
+   <section class="search-group unavailable"><h3>事件 <small>最多4条</small></h3><p>统一事件全文检索待接入，请前往监控大盘或手工事件与恢复页面查看。</p></section>
+   <section class="search-group"><h3>报障与工单 <small>最多3条</small></h3><p>{{state.result.groups[2].source_scope==='OWN_REPORT_REGISTRATIONS'?'仅检索本人提交的报障记录':'检索当前租户内有权查看的报障记录'}}</p><p v-if="!state.result.groups[2].returned">未找到匹配的报障记录，请尝试其他关键词。</p><ul v-else><li v-for="hit in state.result.groups[2].items" :key="hit.id"><el-button link :disabled="navigating" @click="visit('tickets',hit.id)">{{hit.title}}</el-button><span>{{hit.receipt_no}} · 已受理登记</span></li></ul><p v-if="state.result.groups[2].has_more">还有更多匹配记录，可前往报障与受理页继续查询。</p></section>
+   <section class="search-group unavailable"><h3>自动化脚本 <small>最多3条</small></h3><p>自动化脚本检索待接入。</p></section>
   </template>
-  <p v-else-if="!state.busy&&!state.error">输入资产名称、报障标题或受理编号，点击“搜索”或按 Enter 查看结果。</p>
-  <template #footer><el-button :disabled="navigating" @click="open=false">关闭并清除搜索</el-button></template>
+  <p v-else-if="!state.busy&&!state.error">输入资产名称、报障标题或受理编号，按 Enter 开始搜索。</p>
+  <template #footer><el-button :disabled="navigating" @click="open=false">关闭</el-button></template>
  </el-dialog>
 </template>
 <style scoped>

@@ -15,7 +15,7 @@ const total = (key: 'registered_asset_count' | 'registered_site_count' | 'active
 </script>
 <template>
  <section class="tenant-inventory-page admin-prototype">
-  <div class="page-heading"><div><span class="eyebrow">M2 / RECORDED INVENTORY</span><h1>租户资源台账</h1><p>展示当前账号具备平台管理员授权的租户基础档案与已登记资源规模</p></div><el-button :disabled="!permitted" :loading="state.busy" @click="reader.refresh()">重新读取第一页</el-button></div>
+  <div class="page-heading"><div><h1>租户资源台账</h1><p>展示当前账号具备平台管理员授权的租户基础档案与已登记资源规模</p></div><el-button :disabled="!permitted" :loading="state.busy" @click="reader.refresh()">重新读取第一页</el-button></div>
   <el-alert type="info" title="台账统计范围说明" :closable="false">本页汇总各租户已登记的资产、站点与有效成员数量（含台账草稿）；资源池隔离参数、监控项配额（Item / NVPS）、数据保留期、ITSM 对接及网络拓扑状态待采集源与策略确认后接入展示。</el-alert>
   <ApiErrorNotice :error="state.error"/>
   <p v-if="!permitted">当前成员无租户登记资源读取权限</p>

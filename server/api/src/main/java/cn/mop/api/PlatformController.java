@@ -51,6 +51,8 @@ public class PlatformController {
     @org.springframework.beans.factory.annotation.Autowired(required=false)
     private cn.mop.domain.notification.TicketNotificationRepository ticketNotifications;
     @org.springframework.beans.factory.annotation.Autowired(required=false)
+    private WeComService weCom;
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
     private cn.mop.domain.sla.ServiceTierRepository serviceTiers;
     @org.springframework.beans.factory.annotation.Autowired(required=false)
     private cn.mop.domain.sla.OnCallEscalationRepository onCallEscalations;
@@ -64,6 +66,7 @@ public class PlatformController {
     public PlatformController(PlatformRepository repository,ObjectMapper mapper,ObjectProvider<TestOidcConfiguration.OidcDependencyProbe> identityProbe,ObjectProvider<PhotoConfiguration.PhotoDependencyProbe> photoProbe,ObjectProvider<AssetImportConfiguration.ImportDependencyProbe> importProbe,ObjectProvider<ProjectIdentityService> projectIdentity){this.repository=repository;this.mapper=mapper;this.identityProbe=identityProbe;this.photoProbe=photoProbe;this.importProbe=importProbe;this.projectIdentity=projectIdentity;new SecureRandom().nextBytes(cursorSecret);}
     @GetMapping("/health/live") Object live(HttpServletRequest request){return success(map("status","UP","mode",repository.metadata().mode(),"source",repository.metadata().source()),request);}
     @GetMapping("/health/ready") Object ready(HttpServletRequest request){
+        if(weCom!=null){var status=weCom.check();if(!Boolean.TRUE.equals(status.get("ready")))throw new DomainException(503,"UPSTREAM_UNAVAILABLE","已启用的企业微信依赖未就绪",List.of(map("component","wecom","status",status)));}
         if(monitoringEventCenter!=null&&!monitoringEventCenter.readinessProblems().isEmpty())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","已启用的监控事件中心结构未就绪",List.of(map("component","monitoring_event_center","reasons",monitoringEventCenter.readinessProblems())));
         if(onCallEscalations!=null&&!onCallEscalations.readinessProblems().isEmpty())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","已启用的值班与升级结构未就绪",List.of(map("component","oncall_escalation","reasons",onCallEscalations.readinessProblems())));
         if(serviceTiers!=null&&!serviceTiers.readinessProblems().isEmpty())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","已启用的服务档位结构未就绪",List.of(map("component","service_tier","reasons",serviceTiers.readinessProblems())));

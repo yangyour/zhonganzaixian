@@ -8,6 +8,7 @@ import base64
 import hashlib
 import json
 import select
+import socket
 import socketserver
 import threading
 from pathlib import Path
@@ -38,6 +39,7 @@ def handler(transport, proxy):
         def handle(self):
             channel = None
             try:
+                self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                 self.request.settimeout(20)
                 if proxy:
                     data = bytearray()

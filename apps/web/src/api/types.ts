@@ -1,7 +1,7 @@
 export type Role = 'viewer' | 'tadmin' | 'msp' | 'padmin'
 export type RuntimeMode = 'remote_test' | 'local_fixture'
 export interface PlatformUser { id: string; display_name: string; role: Role }
-export interface AuthOptions { mode: RuntimeMode; identity_source: string; login_url: string | null; local_enabled?: boolean; sso_enabled?: boolean; local_login_url?: string; csrf_url?: string; sso_protocol?: string }
+export interface AuthOptions { mode: RuntimeMode; identity_source: string; login_url: string | null; local_enabled?: boolean; sso_enabled?: boolean; local_login_url?: string; csrf_url?: string; sso_protocol?: string; wecom_enabled?: boolean; wecom_start_url?: string | null }
 export interface LogoutResult { logged_out: boolean; redirect_url: string | null }
 export interface Tenant { id: string; name: string }
 export interface Session {

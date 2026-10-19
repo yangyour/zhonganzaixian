@@ -1,0 +1,54 @@
+{
+  "observed_at": "2026-10-19T06:59:23.335365+00:00",
+  "environment": "local-api-designated-lan",
+  "checks": [
+    {
+      "check": "current_application_ledger",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "check": "current_binding",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "check": "tenant_override_rejected",
+      "status": 400,
+      "expected": 400
+    },
+    {
+      "check": "unknown_object_404",
+      "status": 404,
+      "expected": 404
+    },
+    {
+      "check": "real_readiness",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "check": "mismatched_callback_origin_rejected",
+      "status": 503,
+      "expected": 503
+    },
+    {
+      "check": "viewer_admin_read_denied",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "check": "viewer_test_send_denied",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "check": "viewer_other_delivery_hidden",
+      "status": 404,
+      "expected": 404
+    }
+  ],
+  "secrets_in_responses": false,
+  "additional_messages_sent": 0,
+  "configured_application_records_only": true
+}

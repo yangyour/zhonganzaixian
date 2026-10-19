@@ -39,7 +39,7 @@ export function addProjectIdentityContract(contract) {
   }
   Object.assign(contract.components.schemas,schemas)
   const session=contract.components.schemas.SessionResult.properties.data
-  session.properties.identity_source={enum:['test_oidc','project_local','oidc']}
+  session.properties.identity_source={enum:['test_oidc','project_local','oidc','wecom']}
   session.properties.account_version=v;session.properties.password_change_required=b
   session['x-mop-local-session']='Project authentication revision is checked on every request; effective capabilities come from stored tenant roles.'
   const originalOptions=contract.paths['/auth/options'].get.responses['200'].content['application/json'].schema

@@ -21,6 +21,10 @@ export function validateIdentityWrite(path: string, input: unknown, raw: unknown
   const hasSecret = (value: unknown): boolean => Array.isArray(value) ? value.some(hasSecret) : record(value) ? Object.entries(value).some(([key, item]) => ['password', 'password_hash', 'current_password', 'new_password', 'client_secret', 'access_token', 'refresh_token', 'id_token', 'csrf_token'].includes(key) || hasSecret(item)) : false
   if (hasSecret(raw)) throw bad()
   const parts = path.split('/').filter(Boolean)
+  if (path === '/wecom/check') { if (typeof raw.ready !== 'boolean') throw bad(); return }
+  if (path.startsWith('/wecom/bindings/')) { if (raw.user_id !== parts[2] || raw.wecom_user_id?.toString().toLowerCase() !== String(input.wecom_user_id).toLowerCase() || raw.active !== input.active || !version(raw.version) || ![Number(input.expected_version), Number(input.expected_version) + 1].includes(Number(raw.version))) throw bad(); return }
+  if (path === '/wecom/test-messages' || /^\/my\/notifications\/[0-9a-f-]+\/wecom$/.test(path)) { if (typeof raw.id !== 'string' || !uuid.test(raw.id) || !['QUEUED','PROCESSING','ACCEPTED','FAILED','UNKNOWN','CANCELLED'].includes(String(raw.status)) || !Number.isSafeInteger(raw.version) || Number(raw.version) < 0 || Number(raw.version) > 2) throw bad(); return }
+
   if (path === '/account/password') { if (raw.password_changed !== true || raw.reauthenticate !== true) throw bad(); return }
   if (path.endsWith('/password')) { if (raw.password_reset !== true || raw.sessions_revoked !== true || raw.user_id !== parts[2]) throw bad(); return }
   if (path.endsWith('/unlock')) { if (raw.unlocked !== true || raw.user_id !== parts[2]) throw bad(); return }

@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 56,
-  "rows_without_progress_notes": 72,
+  "rows_with_progress_notes": 57,
+  "rows_without_progress_notes": 71,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -65,7 +65,7 @@
     },
     "M8": {
       "requirements": 12,
-      "rows_with_progress_notes": 2,
+      "rows_with_progress_notes": 3,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 12
       }
@@ -1113,8 +1113,12 @@
       "id": "M8-1",
       "title": "通知渠道对接",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/email-integration-20261019.md",
+        "docs/evidence/email-http-ui-20261019.json",
+        "docs/evidence/email-persistence-20261019.json"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1458,6 +1462,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "4bce6d5c859891e759697c4630509aabaf9b0e36b2a70b2c6c518b66660e96e6"
+    "doc/development/07_合同逐项开发追踪.md": "d7c787a79b9ce947d831fec0df0db98b9dbe1f4dd9f788d356f581cc7243ad55"
   }
 }

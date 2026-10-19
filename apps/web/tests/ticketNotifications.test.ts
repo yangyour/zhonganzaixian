@@ -52,6 +52,6 @@ describe('ticket in-app notifications',()=>{
  it('route, menu and page separate explicit WeCom delivery from automatic channel policy',()=>{
   const router=readFileSync(resolve('src/router.ts'),'utf8'),nav=readFileSync(resolve('src/utils/navigationModules.ts'),'utf8'),source=readFileSync(resolve('src/pages/TicketNotificationsPage.vue'),'utf8')
   expect(router).toContain("path: '/ticket-notifications'");expect(router).toMatch(/ticket-notifications.*capability: 'tickets:read'/);expect(nav).toContain("['ticket-notifications','工单通知']")
-  expect(source).toContain('WeComNotificationAction');expect(source).toContain('自动渠道策略仍按配置生效');expect(source).toContain('接口受理与实际收到分别记录')
+  expect(source).toContain('WeComNotificationAction');expect(source).toContain('自动业务通知尚未启用');expect(source).toContain('服务器受理与实际收到分别记录')
  })
 })

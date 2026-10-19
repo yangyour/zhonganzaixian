@@ -1,0 +1,62 @@
+{
+  "checked_at": "2026-10-19T08:20:27.606Z",
+  "environment": "local API with designated LAN PostgreSQL 17.9/V39 and actual Tencent SMTP",
+  "desktop": {
+    "width": 1440,
+    "height": 1000,
+    "connection_check": true,
+    "confirmation_cancelled": true
+  },
+  "mobile": {
+    "width": 390,
+    "height": 844,
+    "document_overflow": false,
+    "confirmation_cancelled": true
+  },
+  "binding": {
+    "user": "JiangFaMing",
+    "user_id": "8a91f5b3-2ca4-4cc0-8484-bd3885ac36a9",
+    "email": "jiangfm@all-online.com.cn",
+    "active": true,
+    "version": 3,
+    "explicit_user_authorization": true,
+    "toggle_cycle_verified": true
+  },
+  "checks": [
+    {
+      "name": "no_csrf",
+      "status": 403,
+      "code": "CSRF_INVALID"
+    },
+    {
+      "name": "arbitrary_recipient",
+      "status": 400,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "no_idempotency_key",
+      "status": 400,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "query_override",
+      "status": 400,
+      "code": "VALIDATION_ERROR"
+    },
+    {
+      "name": "no_session",
+      "status": 401
+    },
+    {
+      "name": "viewer_admin_status",
+      "status": 403
+    },
+    {
+      "name": "other_tenant_email_status",
+      "status": 404
+    }
+  ],
+  "current_sender_delivery_count": 0,
+  "messages_sent": 0,
+  "end_to_end_delivery_tested": false
+}

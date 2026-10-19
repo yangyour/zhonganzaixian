@@ -54,6 +54,12 @@ py -3 tools/update-lan-test-server.py update `
 
 当前域名 HTTP80 转发到 LAN10010，而原 Nginx 固定将所有请求声明为 IP:10010。首次启用会在新的 Nginx 文件中增加固定域名白名单映射，分别保留 IP 与域名的 Host/端口；不透传任意 Host 或客户转发头。API启用框架转发头处理以保持同源和回调校验。原安全头与静态策略保留，先经真实语法检查再切换。现有 HTTPS 证书过期问题单列，未关闭证书验证；本工具当前仅支持显式 HTTP80 测试回调，TLS 入口调整需单独审核。
 
+## 首次启用邮件人工通知（2026-10-19）
+
+邮件配置与已验证口令仅从本机Git忽略的 `deploy/private/email-runtime.json` 和当前Windows用户的 `mail-credential.dpapi` 读取。先按独立迁移流程应用V39并核验，再使用 `--enable-email-manual --email-tenant-id <现有项目测试租户UUID>`；可同时使用 `--only-api-web` 只更新API和Web，保留其余应用与基础组件生命周期。绑定和测试发送不是部署动作，工具不会发邮件；本次JiangFaMing绑定已经按用户明确选择在同一项目PG保存。
+
+新增邮件配置和口令分为两个0400、归UID10001的只读秘密挂载，不进入工件或Compose明文环境。首次启用前检查当前租户＋发件账号的待发送台账，存在积压则停止；候选API强制关闭邮件和企业微信的发送分发。常规后续更新保留原配置，无需再次传启用参数；已启用时重复传首次参数会拒绝。详细字段和独立验收范围见[邮件接入说明](email-integration-20261019.md)。
+
 ## 状态、证据及再次执行
 
 ```powershell

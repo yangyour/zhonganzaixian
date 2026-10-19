@@ -9,6 +9,7 @@ import base64
 import datetime as dt
 import hashlib
 import io
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -169,6 +170,45 @@ def pending_deliveries(server, tenant, corp, agent):
                            '-U', 'postgres', '-d', 'mop_test', '-c', sql], True).strip())
 
 
+def pending_email_deliveries(server, tenant, sender):
+    require(str(uuid.UUID(tenant)) == tenant and isinstance(sender, str)
+            and len(sender) <= 254 and re.fullmatch(r"[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+", sender),
+            'Invalid email delivery scope')
+    sql = ("BEGIN READ ONLY; SELECT count(*) FROM mop_email_delivery WHERE tenant_id='" + tenant
+           + "'::uuid AND sender='" + sender.replace("'", "''") + "' AND status IN ('QUEUED','PROCESSING'); COMMIT;")
+    return int(server.run(['docker', 'exec', 'mop-lan-postgres', 'psql', '-X', '-qAt', '-v', 'ON_ERROR_STOP=1',
+                           '-U', 'postgres', '-d', 'mop_test', '-c', sql], True).strip())
+
+
+def candidate_environment(api_env):
+    return dict(api_env, SERVER_PORT='18039', SERVER_ADDRESS='127.0.0.1',
+                MOP_WECOM_DISPATCH_ENABLED='false', MOP_EMAIL_DISPATCH_ENABLED='false')
+
+
+def configure_email(server, desired, private, tenant):
+    require(tenant and str(uuid.UUID(tenant)) == tenant, 'Explicit canonical email tenant required')
+    env = desired['services']['api']['environment']
+    require(env.get('MOP_EMAIL_ENABLED', 'false') != 'true', 'Email is already enabled; preserve its existing configuration without this flag')
+    config = json.loads((ROOT / 'deploy/private/email-runtime.json').read_text(encoding='utf-8-sig'))
+    require(pending_email_deliveries(server, tenant, config['sender']) == 0,
+            'Pending email deliveries require operator review before enabling manual dispatch')
+    require('password' not in config and 'password_file' not in config, 'Local email settings must use the encrypted credential reference')
+    spec = importlib.util.spec_from_file_location('deployment_email_private', ROOT / 'tools/email_private.py')
+    helper = importlib.util.module_from_spec(spec); spec.loader.exec_module(helper)
+    password = helper.windows_password(ROOT / 'deploy/private/mail-credential.dpapi')
+    require(password and '\n' not in password and '\r' not in password, 'Invalid private email credential')
+    for name, target, content in [('email-password', '/run/secrets/mop-email-password', password),
+                                  ('email.json', '/run/secrets/mop-email.json', json.dumps({**config, 'password_file': '/run/secrets/mop-email-password'}))]:
+        source = private + '/' + name
+        server.write(source, content)
+        server.run(['chown', '10001:10001', source], True)
+        server.run(['chmod', '400', source], True)
+        desired['services']['api']['volumes'].append({'type': 'bind', 'source': source, 'target': target, 'read_only': True})
+    env.pop('MOP_EMAIL_PASSWORD', None)
+    env.update({'MOP_EMAIL_ENABLED': 'true', 'MOP_EMAIL_TENANT_ID': tenant,
+                'MOP_EMAIL_CONFIG_FILE': '/run/secrets/mop-email.json', 'MOP_EMAIL_DISPATCH_ENABLED': 'true'})
+
+
 def overlay(items, release=None, revision=None):
     result = {'services': {}}
     for item in items:
@@ -188,7 +228,7 @@ def overlay(items, release=None, revision=None):
         env = environment(item)
         # Rollback to pre-integration applications also clears newly introduced switches.
         if not release:
-            for key in ('MOP_WECOM_ENABLED', 'MOP_WECOM_LOGIN_ENABLED', 'MOP_WECOM_DISPATCH_ENABLED'):
+            for key in ('MOP_WECOM_ENABLED', 'MOP_WECOM_LOGIN_ENABLED', 'MOP_WECOM_DISPATCH_ENABLED', 'MOP_EMAIL_ENABLED', 'MOP_EMAIL_DISPATCH_ENABLED'):
                 env.setdefault(key, 'false')
         result['services'][name] = {'image': item['Image'], 'pull_policy': 'never',
                                     'volumes': mounts, 'environment': env, 'labels': labels}
@@ -322,6 +362,7 @@ def deploy(args, branch, revision, folder):
         server.run(['mkdir', lock]); locked = True
         server.write(lock + '/owner.json', json.dumps({'run_id': run_id, 'revision': revision}))
         all_before = server.containers(); items = choose(all_before)
+        if getattr(args, 'only_api_web', False): items = [x for x in items if x['Config']['Labels']['com.docker.compose.service'] in ('api', 'web')]
         server.selected = [x['Config']['Labels']['com.docker.compose.service'] for x in items]
         names = [x['Name'].lstrip('/') for x in items]
         protected = metadata(all_before, names)
@@ -349,6 +390,7 @@ def deploy(args, branch, revision, folder):
         rollback = overlay(items)
         desired = overlay(items, release, revision)
         api_env = desired['services']['api']['environment']
+        if getattr(args, 'enable_email_manual', False): configure_email(server, desired, private, args.email_tenant_id)
         nginx_item = next(x for x in items if x['Name'] == '/mop-lan-web')
         nginx_mount = next(x for x in nginx_item['Mounts'] if x['Destination'] == '/etc/nginx/nginx.conf')
         nginx = server.read(nginx_mount['Source'])
@@ -400,7 +442,7 @@ def deploy(args, branch, revision, folder):
                     '-v', release+'/nginx.conf:/etc/nginx/nginx.conf:ro', '-v', release+'/web:/usr/share/nginx/html:ro',
                     nginx_item['Image'], 'nginx', '-t'], True)
         require(not server.run(['ss', '-lntH', 'sport = :18039']).strip(), 'Candidate API loopback port is occupied')
-        candidate_env = dict(api_env, SERVER_PORT='18039', SERVER_ADDRESS='127.0.0.1', MOP_WECOM_DISPATCH_ENABLED='false')
+        candidate_env = candidate_environment(api_env)
         require(all('\n' not in v and '\r' not in v for v in candidate_env.values()), 'Multiline application environment is unsupported')
         server.write(private + '/candidate.env', ''.join(k+'='+v+'\n' for k,v in candidate_env.items()))
         command = ['docker', 'create', '--name', candidate, '--network', 'host', '--read-only', '--user', '10001:10001',
@@ -424,6 +466,7 @@ def deploy(args, branch, revision, folder):
             actual = server.containers()
             require(metadata(actual, names) == protected, 'Unrelated component lifecycle changed')
             for item in choose(actual):
+                if item['Config']['Labels']['com.docker.compose.service'] not in server.selected: continue
                 require(item['Config']['Labels'].get('mop.source.commit') == revision, 'Application revision label mismatch')
                 target = '/usr/share/nginx/html' if item['Name'] == '/mop-lan-web' else '/app'
                 expected = release + '/web' if target == '/usr/share/nginx/html' else release
@@ -452,6 +495,7 @@ def deploy(args, branch, revision, folder):
                   'protected_containers': protected, 'protected_container_lifecycle_unchanged': True,
                   'private_base_configuration_unchanged': True, 'ready': status['ready'],
                   'production_ready': status.get('production_ready'), 'wecom_manual_enabled_this_run': args.enable_wecom_manual,
+                  'email_manual_enabled_this_run': getattr(args, 'enable_email_manual', False),
                   'automatic_business_notifications_enabled': False, 'deployment_test_messages_sent': 0,
                   'formal_contract_acceptance': 'NOT_COMPLETED', 'credentials_recorded': False}
         (folder / 'result.json').write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')
@@ -502,6 +546,9 @@ def main():
     parser.add_argument('--wecom-tenant-id')
     parser.add_argument('--wecom-callback', default='')
     parser.add_argument('--allow-http-wecom-callback', action='store_true')
+    parser.add_argument('--enable-email-manual', action='store_true', help='Enable explicit user-requested email delivery using private secret files; does not send a test')
+    parser.add_argument('--email-tenant-id')
+    parser.add_argument('--only-api-web', action='store_true', help='Update only API and Web; preserve every other existing application and component lifecycle')
     args = parser.parse_args()
     try:
         if args.action == 'restore':

@@ -1,0 +1,547 @@
+{
+  "checked_at": "2026-10-19T07:54:25.717061+00:00",
+  "environment": "lan-test-20261008",
+  "project": "mop-lan-test",
+  "pinned_ssh_host_verified": true,
+  "postgres_version": "PostgreSQL 17.9 (Debian 17.9-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit",
+  "schema_history": [
+    {
+      "installed_rank": 1,
+      "version": "1",
+      "script": "V1__remote_test_platform.sql",
+      "checksum": -1484181377,
+      "success": true
+    },
+    {
+      "installed_rank": 2,
+      "version": "2",
+      "script": "V2__tenant_configuration_revisions.sql",
+      "checksum": 1161094071,
+      "success": true
+    },
+    {
+      "installed_rank": 3,
+      "version": "3",
+      "script": "V3__configuration_review_test_identity.sql",
+      "checksum": -1273598682,
+      "success": true
+    },
+    {
+      "installed_rank": 4,
+      "version": "4",
+      "script": "V4__durable_customer_report_registration.sql",
+      "checksum": 1369050258,
+      "success": true
+    },
+    {
+      "installed_rank": 5,
+      "version": "5",
+      "script": "V5__durable_report_photos.sql",
+      "checksum": 1887903094,
+      "success": true
+    },
+    {
+      "installed_rank": 6,
+      "version": "6",
+      "script": "V6__asset_import_sources_and_mapping.sql",
+      "checksum": -636230002,
+      "success": true
+    },
+    {
+      "installed_rank": 7,
+      "version": "7",
+      "script": "V7__asset_dependency_draft_revisions.sql",
+      "checksum": -545292092,
+      "success": true
+    },
+    {
+      "installed_rank": 8,
+      "version": "8",
+      "script": "V8__manual_worklog_revisions.sql",
+      "checksum": 1211360336,
+      "success": true
+    },
+    {
+      "installed_rank": 9,
+      "version": "9",
+      "script": "V9__manual_asset_metadata_revisions.sql",
+      "checksum": -340432871,
+      "success": true
+    },
+    {
+      "installed_rank": 10,
+      "version": "10",
+      "script": "V10__immutable_internal_ticket_notes.sql",
+      "checksum": -896663071,
+      "success": true
+    },
+    {
+      "installed_rank": 11,
+      "version": "11",
+      "script": "V11__immutable_ticket_comments.sql",
+      "checksum": -1655668462,
+      "success": true
+    },
+    {
+      "installed_rank": 12,
+      "version": "12",
+      "script": "V12__unpublished_working_calendar_drafts.sql",
+      "checksum": -2068183288,
+      "success": true
+    },
+    {
+      "installed_rank": 13,
+      "version": "13",
+      "script": "V13__immutable_manual_incident_registrations.sql",
+      "checksum": 1030816869,
+      "success": true
+    },
+    {
+      "installed_rank": 14,
+      "version": "14",
+      "script": "V14__immutable_manual_recovery_confirmations.sql",
+      "checksum": -30124348,
+      "success": true
+    },
+    {
+      "installed_rank": 15,
+      "version": "15",
+      "script": "V15__manual_warranty_details.sql",
+      "checksum": 836542553,
+      "success": true
+    },
+    {
+      "installed_rank": 16,
+      "version": "16",
+      "script": "V16__immutable_capacity_scenario_drafts.sql",
+      "checksum": 1367595086,
+      "success": true
+    },
+    {
+      "installed_rank": 17,
+      "version": "17",
+      "script": "V17__customer_contact_revisions.sql",
+      "checksum": 2031946591,
+      "success": true
+    },
+    {
+      "installed_rank": 18,
+      "version": "18",
+      "script": "V18__durable_contact_import_jobs.sql",
+      "checksum": -1130281417,
+      "success": true
+    },
+    {
+      "installed_rank": 19,
+      "version": "19",
+      "script": "V19__contact_import_generated_hash_guard.sql",
+      "checksum": -268577672,
+      "success": true
+    },
+    {
+      "installed_rank": 20,
+      "version": "20",
+      "script": "V20__durable_asset_export_jobs.sql",
+      "checksum": -319450001,
+      "success": true
+    },
+    {
+      "installed_rank": 21,
+      "version": "21",
+      "script": "V21__inspection_template_revisions.sql",
+      "checksum": 951051044,
+      "success": true
+    },
+    {
+      "installed_rank": 22,
+      "version": "22",
+      "script": "V22__manual_inspection_worksheet_drafts.sql",
+      "checksum": -650061710,
+      "success": true
+    },
+    {
+      "installed_rank": 23,
+      "version": "23",
+      "script": "V23__immutable_inspection_source_collections.sql",
+      "checksum": 1321810212,
+      "success": true
+    },
+    {
+      "installed_rank": 24,
+      "version": "24",
+      "script": "V24__unpublished_backup_plan_drafts.sql",
+      "checksum": -424372040,
+      "success": true
+    },
+    {
+      "installed_rank": 25,
+      "version": "25",
+      "script": "V25__unreviewed_change_notice_drafts.sql",
+      "checksum": 552033867,
+      "success": true
+    },
+    {
+      "installed_rank": 26,
+      "version": "26",
+      "script": "V26__own_notification_preference_drafts.sql",
+      "checksum": -324766275,
+      "success": true
+    },
+    {
+      "installed_rank": 27,
+      "version": "27",
+      "script": "V27__project_identity_and_roles.sql",
+      "checksum": 511191109,
+      "success": true
+    },
+    {
+      "installed_rank": 28,
+      "version": "28",
+      "script": "V28__identity_inventory_and_password_formats.sql",
+      "checksum": 1559449245,
+      "success": true
+    },
+    {
+      "installed_rank": 29,
+      "version": "29",
+      "script": "V29__immutable_raw_monitoring_events.sql",
+      "checksum": -1977882733,
+      "success": true
+    },
+    {
+      "installed_rank": 30,
+      "version": "30",
+      "script": "V30__immutable_monitoring_quarantine.sql",
+      "checksum": 2028775275,
+      "success": true
+    },
+    {
+      "installed_rank": 31,
+      "version": "31",
+      "script": "V31__own_export_inbox.sql",
+      "checksum": -486321876,
+      "success": true
+    },
+    {
+      "installed_rank": 32,
+      "version": "32",
+      "script": "V32__runtime_configuration_publications.sql",
+      "checksum": -606158601,
+      "success": true
+    },
+    {
+      "installed_rank": 33,
+      "version": "33",
+      "script": "V33__ticket_lifecycle_and_durable_clocks.sql",
+      "checksum": -2063474061,
+      "success": true
+    },
+    {
+      "installed_rank": 34,
+      "version": "34",
+      "script": "V34__ticket_notification_intents.sql",
+      "checksum": -1167997960,
+      "success": true
+    },
+    {
+      "installed_rank": 35,
+      "version": "35",
+      "script": "V35__service_tiers_and_change_history.sql",
+      "checksum": -1509422434,
+      "success": true
+    },
+    {
+      "installed_rank": 36,
+      "version": "36",
+      "script": "V36__oncall_escalation_and_sla_monthly_results.sql",
+      "checksum": -131315136,
+      "success": true
+    },
+    {
+      "installed_rank": 37,
+      "version": "37",
+      "script": "V37__monitoring_events_noise_funnel_and_maintenance_windows.sql",
+      "checksum": 125697472,
+      "success": true
+    },
+    {
+      "installed_rank": 38,
+      "version": "38",
+      "script": "V38__wecom_bindings_deliveries_and_login_state.sql",
+      "checksum": 845758090,
+      "success": true
+    }
+  ],
+  "components": {
+    "mop-lan-web": {
+      "id": "efe5912977774d40850726f670d69246cd3f0214d92ced42ce4c48974c1a21cb",
+      "image": "sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2",
+      "started_at": "2026-10-19T07:27:43.401828754Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-api": {
+      "id": "6c83dffa7a7e77cb72ed1742e593c24bb5dd4af19aa95c0c0b2aa64dcce7e617",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-19T07:27:43.409212615Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-af-collector": {
+      "id": "057fd1947b31591091d8592deb7d997069e23ffcda2571265959ae207cc6e4ab",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-19T07:27:43.408291561Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-contact-worker": {
+      "id": "ccf42e45598df625918703f65a2a7c8681d2ab1a91491a16c79dd460a63755d5",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-19T07:27:43.412475754Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-photo-worker": {
+      "id": "469479318e150f4871faaacb823663dd0a975cf3382947193a5832c49be1181f",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-19T07:27:43.396579756Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-import-worker": {
+      "id": "71dfced6185fbcb39522f580fccd78707d5f024088f4c5b8db6f72e2ae1cf0f7",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-19T07:27:43.393082464Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-export-preparation-worker": {
+      "id": "7f2d15889e88f157af6b5ff5289cac577f268ceae2d2b3dcee6f11a1193b2023",
+      "image": "sha256:207ecae0b2b104dfc6dfa763d1e9cd2041cb344800a180e24cb1a28ed533ff90",
+      "started_at": "2026-10-19T07:27:43.410979144Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-web": {
+      "id": "61bb1692e7da5a54e4dcf51c3cf8965d9ae1d45a735cb1bf865d9627833d2c0e",
+      "image": "sha256:cd216a9968b62eb6fddd789872b9e8eb4d064539ef40b6356dd2d8c1588a3f91",
+      "started_at": "2026-10-08T12:21:37.244174288Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-agent": {
+      "id": "008118b2bd32f4da65bc766614c305973fcead8b2cc0e5cdf4c88880b9eb454b",
+      "image": "sha256:ba55e6d146d0f0bc550da82b29b22134655db6e31d2c9eae9b1d15f659ad86cd",
+      "started_at": "2026-10-08T12:18:48.243454374Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-zabbix-server": {
+      "id": "303bbd1f5767a733137de772945fc46506143d0933d036f3412cad85d125ae66",
+      "image": "sha256:415452211dea59cd4ea3346f2c2b38403660408273c672ebf91603353ce1073f",
+      "started_at": "2026-10-08T12:18:48.248721584Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-postgres": {
+      "id": "3aebabee32b1812ff37aeb84341a7d67e736941d2bd0d82bbb7192919bea8a97",
+      "image": "sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641",
+      "started_at": "2026-10-08T12:15:32.354957313Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-rabbitmq": {
+      "id": "9b8cc8ece2a07ae354f88e7f919f157a03d424ca160cd51217375cd76a0a443d",
+      "image": "sha256:e3b55503d81b67c93a2914a7473e59bbd53d5f4560c421e06015ed64a3034c9e",
+      "started_at": "2026-10-08T12:15:32.356127727Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-minio": {
+      "id": "e347d1402ead939abe1121094ed0d963ba07f8f88464819c46449757022104d7",
+      "image": "sha256:a16cad481969d7ddb6fcd2f1c58284af3d1266190b9bedc3ef0801aeb05a93a9",
+      "started_at": "2026-10-08T12:15:32.354248163Z",
+      "restart_count": 0,
+      "running": true
+    },
+    "mop-lan-redis": {
+      "id": "cd68b313f967a54df7f8d5c59c9fe3146f9c261372683205822c71f3d64b24f3",
+      "image": "sha256:abbc5faf6f23b6835d3c357530e96c841e02cb66bd0e426573ef5acb434f597f",
+      "started_at": "2026-10-08T12:15:32.349268223Z",
+      "restart_count": 0,
+      "running": true
+    }
+  },
+  "ready": {
+    "status": "READY_REMOTE_TEST",
+    "ready": true,
+    "mode": "remote_test",
+    "source": "postgresql",
+    "durable": true,
+    "production_ready": false,
+    "runtime_configurations": {
+      "schema_access_ready": true,
+      "scope": "CURRENT_TENANT",
+      "customer_confirmation_status": "UNVERIFIED"
+    },
+    "export_publication": {
+      "enabled": true,
+      "ready": true,
+      "configured": true,
+      "provider": "minio",
+      "reasons": []
+    },
+    "export_inbox": {
+      "enabled": true,
+      "ready": true,
+      "reasons": [],
+      "external_delivery": false
+    },
+    "own_notification_preferences": {
+      "schema_access_ready": true,
+      "configuration_status": "CONFIG_PENDING",
+      "effective": false,
+      "receiver_binding_status": "NOT_VERIFIED",
+      "notification_dispatched": false
+    },
+    "asset_exports": {
+      "schema_access_ready": true,
+      "mode": "PREPARE_ONLY_NO_PUBLICATION",
+      "worker_liveness": null,
+      "publication_status": "NOT_IMPLEMENTED",
+      "download_allowed": false
+    },
+    "change_notice_drafts": {
+      "schema_access_ready": true,
+      "approval_status": null,
+      "automatic_p3_decision": null,
+      "approval_workflow_status": "CONFIG_PENDING",
+      "matching_policy_status": "CONFIG_PENDING",
+      "effective": false,
+      "device_execution_allowed": false,
+      "alert_suppression_allowed": false
+    },
+    "backup_plan_drafts": {
+      "schema_access_ready": true,
+      "effective": false,
+      "device_execution_allowed": false,
+      "credential_verification": "NOT_VERIFIED",
+      "scheduler_running": null
+    },
+    "inspection_source_collections": {
+      "schema_access_ready": true,
+      "verification_status": "SELF_REPORTED_UNVERIFIED",
+      "generation_status": "CONFIG_PENDING",
+      "formal_report_generatable": false,
+      "report_published": false
+    },
+    "inspection_worksheets": {
+      "schema_access_ready": true,
+      "verification_status": "SELF_REPORTED_UNVERIFIED",
+      "evidence_binding_status": "NOT_IMPLEMENTED",
+      "publication_status": "NOT_IMPLEMENTED",
+      "report_published": false,
+      "active_scan_performed": false
+    },
+    "inspection_templates": {
+      "schema_access_ready": true,
+      "approval_status": "UNVERIFIED",
+      "publication_status": "NOT_IMPLEMENTED",
+      "report_published": false,
+      "active_scan_performed": false
+    },
+    "contact_imports": {
+      "schema_access_ready": true,
+      "worker_liveness": null,
+      "notification_dispatched": false,
+      "identity_binding_created": false
+    },
+    "customer_contacts": {
+      "schema_access_ready": true,
+      "notification_dispatched": false,
+      "channel_verification": "NOT_VERIFIED",
+      "identity_binding_created": false
+    },
+    "capacity_scenarios": {
+      "schema_access_ready": true,
+      "effective": false,
+      "measurement_verified": false,
+      "poc_executed": false
+    },
+    "manual_recovery": {
+      "schema_access_ready": true,
+      "source": "HUMAN_CONFIRMATION",
+      "monitoring_recovery_applicable": false,
+      "ticket_state_changed": false,
+      "sla_changed": false
+    },
+    "manual_incidents": {
+      "schema_access_ready": true,
+      "source_state": "MANUAL",
+      "registration_status": "REGISTERED_ONLY",
+      "monitoring_recovery_applicable": false,
+      "ticket_automatically_created": false
+    },
+    "working_calendars": {
+      "schema_access_ready": true,
+      "effective": false,
+      "customer_confirmation": "UNVERIFIED"
+    },
+    "photos": {
+      "enabled": true,
+      "ready": true,
+      "policy_ready": true,
+      "schema_ready": true,
+      "storage_ready": true,
+      "policy_source": "USER_DEVELOPMENT_DIRECTION",
+      "reasons": []
+    },
+    "asset_imports": {
+      "enabled": true,
+      "ready": true,
+      "policy_ready": true,
+      "schema_ready": true,
+      "storage_ready": true,
+      "worker_activity": "NOT_PROBED",
+      "business_status": "CONFIG_PENDING",
+      "can_import": false,
+      "reasons": []
+    },
+    "asset_reads": {
+      "unicode_search_ready": true,
+      "pagination": "BOUNDED_POSTGRESQL_KEYSET"
+    },
+    "ticket_comments": {
+      "schema_access_ready": true,
+      "visibility": "REPORTER_AND_INTERNAL",
+      "internal_identity_exposed": false,
+      "itsm_applied": false
+    },
+    "internal_notes": {
+      "schema_access_ready": true,
+      "visibility": "INTERNAL",
+      "ticket_state_changed": false,
+      "sla_changed": false
+    },
+    "asset_manual_metadata": {
+      "schema_access_ready": true,
+      "scope": "INTERNAL_MANUAL_DRAFT",
+      "monitoring_applied": false,
+      "cmdb_applied": false
+    },
+    "worklogs": {
+      "ready": true,
+      "schema_access_ready": true,
+      "financial_status": "CONFIG_PENDING"
+    },
+    "asset_dependencies": {
+      "ready": true,
+      "schema_access_ready": true,
+      "configuration_status": "CONFIG_PENDING",
+      "monitoring_applied": false,
+      "effective_rules": null
+    }
+  },
+  "mutations_performed": false,
+  "messages_sent": 0
+}

@@ -1,5 +1,9 @@
 # MOP 项目全局开发要求
 
+## V39邮件通道结构冻结（2026-10-19）
+
+指定LAN PG17.9项目库已独立显式应用V39一次，重复与只读复核均0次，SHA256为3d1b4cd557b6c367b2a36e9f49a2154d8a925a8afe249c103cd59373f32a6dea。V1—V39保持字节冻结，后续SQL修正新增V40或更高。新增管理员明确邮箱绑定及一次SMTP提交台账，ACCEPTED不表示DELIVERED，UNKNOWN不自动重发；口令不进数据库。用户明确选择把既有企业邮箱绑定至JiangFaMing，已保存且启用；该授权不扩大为实际邮件发送或自动业务通知。见docs/email-integration-20261019.md及对应真实PG/HTTP证据。
+
 ## V38企业微信接入结构冻结（2026-10-19）
 
 指定LAN PG17.9项目库已显式应用V38一次，重复执行及只读复核0迁移；SHA256为32dc38c2dab0ad385f79e9e7c886c456c06664f8b740c496a8af7bf2d9e9c0fb。V1—V38保持字节冻结，后续SQL修正新增V39或更高。企业微信绑定、耐久发送台账与一次性登录关联独立于供应商送达、用户扫码及完整D11验收；数据库只存身份标识和状态摘要，不存Secret/access_token。见docs/evidence/wecom-migration-20261019.json。新建JiangFaMing及padmin角色、绑定和一条测试消息均来自本次用户明确要求；该授权不扩展为任意业务群发。

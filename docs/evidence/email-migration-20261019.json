@@ -1,0 +1,40 @@
+{
+  "verified_at": "2026-10-19T08:07:36.239303+00:00",
+  "environment": "lan-test-20261008",
+  "postgres_version": "17.9",
+  "scope": "EXPLICIT_PROJECT_EMAIL_V39_ONLY",
+  "migration_sha256": "3d1b4cd557b6c367b2a36e9f49a2154d8a925a8afe249c103cd59373f32a6dea",
+  "results": [
+    {
+      "stage": "apply",
+      "exit_code": 0,
+      "summary": "MOP_SCHEMA status=EMAIL_INTEGRATION_APPLIED mode=APPLY_EMAIL_INTEGRATION migrations_executed=1 baseline=V1_V38_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH",
+      "migrations_executed": 1
+    },
+    {
+      "stage": "repeat",
+      "exit_code": 0,
+      "summary": "MOP_SCHEMA status=EMAIL_INTEGRATION_APPLIED mode=APPLY_EMAIL_INTEGRATION migrations_executed=0 baseline=V1_V38_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH",
+      "migrations_executed": 0
+    },
+    {
+      "stage": "readonly",
+      "exit_code": 0,
+      "summary": "MOP_SCHEMA status=EMAIL_INTEGRATION_APPLIED mode=READ_ONLY_CHECK migrations_executed=0 baseline=V1_V38_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH",
+      "migrations_executed": 0
+    }
+  ],
+  "prior_schema_history_unchanged": true,
+  "legacy_table_count": 93,
+  "changed_legacy_tables": [
+    "flyway_schema_history"
+  ],
+  "private_backup_created": true,
+  "private_backup_bytes": 3441639,
+  "private_backup_sha256": "f2d7c4175833b651d2ba6910ebbbf77b8ef7f74f25ad1dfbe87c144047e9e4f1",
+  "restore_drill_run": false,
+  "messages_sent": 0,
+  "infrastructure_installed_or_restarted": false,
+  "legacy_business_table_count": 92,
+  "legacy_business_tables_unchanged": true
+}

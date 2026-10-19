@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.58.0",
+    "version": "0.59.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -35929,6 +35929,1163 @@
           }
         }
       }
+    },
+    "/email/status": {
+      "get": {
+        "operationId": "getEmailStatus",
+        "summary": "读取当前租户邮件通道状态与脱敏检查结果",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "读取当前租户邮件通道状态与脱敏检查结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailStatusResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:read"
+      }
+    },
+    "/email/check": {
+      "post": {
+        "operationId": "checkEmailConnection",
+        "summary": "检查实际SMTP加密认证和持久化依赖；不发送邮件",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "检查实际SMTP加密认证和持久化依赖；不发送邮件",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailCheckResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:write"
+      }
+    },
+    "/email/bindings": {
+      "get": {
+        "operationId": "listEmailBindings",
+        "summary": "读取管理员明确配置的本租户收件地址",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "读取管理员明确配置的本租户收件地址",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailBindingPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:read"
+      }
+    },
+    "/email/bindings/{userId}": {
+      "put": {
+        "operationId": "setEmailBinding",
+        "summary": "按版本绑定或停用白名单收件地址；该绑定不是邮箱归属验证",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "按版本绑定或停用白名单收件地址；该绑定不是邮箱归属验证",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailBindingResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailBindingInput"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:write",
+        "x-mop-user-global-scope-required": true
+      }
+    },
+    "/my/email-binding": {
+      "get": {
+        "operationId": "getOwnEmailBinding",
+        "summary": "读取当前本人邮箱绑定；未配置返回null",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "读取当前本人邮箱绑定；未配置返回null",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnEmailBindingResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/email/test-messages": {
+      "post": {
+        "operationId": "enqueueEmailTest",
+        "summary": "向服务端固定测试收件人发送固定测试内容；先耐久入队",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "202": {
+            "description": "向服务端固定测试收件人发送固定测试内容；先耐久入队",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeliveryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailEnqueueInput"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "users:write"
+      }
+    },
+    "/my/notifications/{id}/email": {
+      "post": {
+        "operationId": "enqueueOwnEmailNotification",
+        "summary": "明确转发本站本人通知到本人绑定邮箱；来源与绑定永久去重",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "202": {
+            "description": "明确转发本站本人通知到本人绑定邮箱；来源与绑定永久去重",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeliveryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailEnqueueInput"
+              }
+            }
+          }
+        },
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/email/deliveries": {
+      "get": {
+        "operationId": "listEmailDeliveries",
+        "summary": "本人记录；users:read可读本租户当前发件账号的台账",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "本人记录；users:read可读本租户当前发件账号的台账",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeliveryPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/email/deliveries/{id}": {
+      "get": {
+        "operationId": "getEmailDelivery",
+        "summary": "读取SMTP提交结果；ACCEPTED不是DELIVERED，UNKNOWN不自动重发",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-credentials-output": false,
+        "x-mop-cross-tenant": "404",
+        "responses": {
+          "200": {
+            "description": "读取SMTP提交结果；ACCEPTED不是DELIVERED，UNKNOWN不自动重发",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeliveryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "参数、当前租户授权、版本、邮件或持久化依赖错误；秘密与原始供应商诊断不输出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-capability": "tickets:read"
+      }
     }
   },
   "components": {
@@ -70786,6 +71943,859 @@
         "required": [
           "data",
           "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailDelivery": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_message_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sender": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "recipient": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "kind": {
+            "enum": [
+              "TEST",
+              "NOTIFICATION"
+            ]
+          },
+          "status": {
+            "enum": [
+              "QUEUED",
+              "PROCESSING",
+              "ACCEPTED",
+              "FAILED",
+              "UNKNOWN",
+              "CANCELLED"
+            ]
+          },
+          "version": {
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          },
+          "message_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "smtp_code": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 200,
+                "maximum": 599
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "actor_id",
+          "source_message_id",
+          "sender",
+          "recipient",
+          "kind",
+          "status",
+          "version",
+          "message_id",
+          "error_code",
+          "smtp_code",
+          "created_at",
+          "started_at",
+          "finished_at"
+        ],
+        "additionalProperties": false
+      },
+      "EmailDeliveryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "actor_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "source_message_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "sender": {
+                "type": "string",
+                "format": "email",
+                "maxLength": 254
+              },
+              "recipient": {
+                "type": "string",
+                "format": "email",
+                "maxLength": 254
+              },
+              "kind": {
+                "enum": [
+                  "TEST",
+                  "NOTIFICATION"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "QUEUED",
+                  "PROCESSING",
+                  "ACCEPTED",
+                  "FAILED",
+                  "UNKNOWN",
+                  "CANCELLED"
+                ]
+              },
+              "version": {
+                "enum": [
+                  0,
+                  1,
+                  2
+                ]
+              },
+              "message_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "error_code": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "smtp_code": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 200,
+                    "maximum": 599
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "started_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "finished_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "tenant_id",
+              "actor_id",
+              "source_message_id",
+              "sender",
+              "recipient",
+              "kind",
+              "status",
+              "version",
+              "message_id",
+              "error_code",
+              "smtp_code",
+              "created_at",
+              "started_at",
+              "finished_at"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailDeliveryPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "tenant_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "actor_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "source_message_id": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "sender": {
+                      "type": "string",
+                      "format": "email",
+                      "maxLength": 254
+                    },
+                    "recipient": {
+                      "type": "string",
+                      "format": "email",
+                      "maxLength": 254
+                    },
+                    "kind": {
+                      "enum": [
+                        "TEST",
+                        "NOTIFICATION"
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "QUEUED",
+                        "PROCESSING",
+                        "ACCEPTED",
+                        "FAILED",
+                        "UNKNOWN",
+                        "CANCELLED"
+                      ]
+                    },
+                    "version": {
+                      "enum": [
+                        0,
+                        1,
+                        2
+                      ]
+                    },
+                    "message_id": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error_code": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "smtp_code": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 200,
+                          "maximum": 599
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "started_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "finished_at": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "tenant_id",
+                    "actor_id",
+                    "source_message_id",
+                    "sender",
+                    "recipient",
+                    "kind",
+                    "status",
+                    "version",
+                    "message_id",
+                    "error_code",
+                    "smtp_code",
+                    "created_at",
+                    "started_at",
+                    "finished_at"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 100
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "items",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailBindingResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "user_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "maxLength": 254
+              },
+              "active": {
+                "type": "boolean"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "id",
+              "user_id",
+              "email",
+              "active",
+              "version",
+              "updated_at"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailBindingPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "user_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "maxLength": 254
+                    },
+                    "active": {
+                      "type": "boolean"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740991
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "display_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "user_id",
+                    "email",
+                    "active",
+                    "version",
+                    "updated_at",
+                    "display_name"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 200
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "items",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "OwnEmailBindingResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "owner_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "binding": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid"
+                      },
+                      "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 254
+                      },
+                      "active": {
+                        "type": "boolean"
+                      },
+                      "version": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "email",
+                      "active",
+                      "version"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "owner_id",
+              "binding",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailStatusResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "const": true
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "sender": {
+                "type": "string",
+                "format": "email",
+                "maxLength": 254
+              },
+              "sender_name": {
+                "type": "string"
+              },
+              "smtp_host": {
+                "type": "string"
+              },
+              "smtp_port": {
+                "const": 465
+              },
+              "tls_mode": {
+                "const": "IMPLICIT_TLS"
+              },
+              "certificate_verification": {
+                "const": true
+              },
+              "secret_configured": {
+                "const": true
+              },
+              "allowed_recipients": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "email",
+                  "maxLength": 254
+                },
+                "minItems": 1,
+                "maxItems": 100
+              },
+              "test_recipient": {
+                "type": "string",
+                "format": "email",
+                "maxLength": 254
+              },
+              "dispatch_enabled": {
+                "type": "boolean"
+              },
+              "automatic_notifications_enabled": {
+                "const": false
+              },
+              "receipt_query_supported": {
+                "const": false
+              },
+              "last_check": {
+                "type": "object",
+                "properties": {
+                  "ready": {
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "smtp_authenticated": {
+                    "type": "boolean"
+                  },
+                  "checked_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "ready",
+                  "reason"
+                ],
+                "additionalProperties": false
+              },
+              "source": {
+                "const": "configured_provider"
+              }
+            },
+            "required": [
+              "enabled",
+              "tenant_id",
+              "sender",
+              "sender_name",
+              "smtp_host",
+              "smtp_port",
+              "tls_mode",
+              "certificate_verification",
+              "secret_configured",
+              "allowed_recipients",
+              "test_recipient",
+              "dispatch_enabled",
+              "automatic_notifications_enabled",
+              "receipt_query_supported",
+              "last_check",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailCheckResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "ready": {
+                "type": "boolean"
+              },
+              "reason": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "smtp_authenticated": {
+                "type": "boolean"
+              },
+              "checked_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "ready",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "EmailBindingInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expected_version",
+          "email",
+          "active"
+        ],
+        "additionalProperties": false
+      },
+      "EmailEnqueueInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "const": 0
+          }
+        },
+        "required": [
+          "expected_version"
         ],
         "additionalProperties": false
       }

@@ -18,6 +18,28 @@ def application(name='api'):
 
 
 class DeploymentTests(unittest.TestCase):
+    def test_candidate_disables_both_external_dispatchers_without_changing_source(self):
+        original={'MOP_EMAIL_DISPATCH_ENABLED':'true','MOP_WECOM_DISPATCH_ENABLED':'true','UNIT_SECRET':'synthetic'}
+        candidate=update.candidate_environment(original)
+        self.assertEqual(candidate['MOP_EMAIL_DISPATCH_ENABLED'],'false')
+        self.assertEqual(candidate['MOP_WECOM_DISPATCH_ENABLED'],'false')
+        self.assertEqual(original['MOP_EMAIL_DISPATCH_ENABLED'],'true')
+        self.assertEqual(candidate['UNIT_SECRET'],'synthetic')
+
+    def test_email_pending_guard_matches_tenant_and_sender_and_escapes_literal_quote(self):
+        server=Mock();server.run.return_value='0\n'
+        self.assertEqual(update.pending_email_deliveries(server,'55000000-0000-4000-8000-000000000001',"o'hara@example.test"),0)
+        query=server.run.call_args.args[0][-1]
+        self.assertIn("AND sender='o''hara@example.test'",query)
+        self.assertIn("status IN ('QUEUED','PROCESSING')",query)
+        self.assertTrue(query.startswith('BEGIN READ ONLY;'))
+
+    def test_email_pending_guard_rejects_injected_scope_before_network(self):
+        server=Mock()
+        for sender in ["a@example.test' OR true",'Name <a@example.test>','a@example.test\r\nBcc:other']:
+            with self.assertRaises(RuntimeError):update.pending_email_deliveries(server,'55000000-0000-4000-8000-000000000001',sender)
+        server.run.assert_not_called()
+
     def test_partial_up_failure_restores_old_applications_and_checks_ready(self):
         server = Mock(selected=['api', 'web'])
         server.compose.side_effect = [None, RuntimeError('partial recreation'), None, None]
@@ -65,6 +87,7 @@ class DeploymentTests(unittest.TestCase):
     def test_rollback_clears_new_integration_switch_and_restores_mount(self):
         rollback = update.overlay([application()])['services']['api']
         self.assertEqual(rollback['environment']['MOP_WECOM_ENABLED'], 'false')
+        self.assertEqual(rollback['environment']['MOP_EMAIL_ENABLED'], 'false')
         self.assertEqual(rollback['volumes'][0]['source'], update.REMOTE+'/releases/old')
         self.assertEqual(rollback['labels']['mop.source.commit'], '')
 

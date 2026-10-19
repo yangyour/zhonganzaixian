@@ -8,6 +8,7 @@ import {blockerLabels,createNotificationWorkspace,emptyNotificationState,eventLa
 import {displayTime} from '../utils/display'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import WeComNotificationAction from '../components/WeComNotificationAction.vue'
+import EmailNotificationAction from '../components/EmailNotificationAction.vue'
 const state=shallowRef<NotificationState>(emptyNotificationState()),workspace=createNotificationWorkspace(api,s=>{state.value=s})
 const internal=computed(()=>['padmin','msp'].includes(session.value?.user.role??''))
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&can('tickets:read')&&!switchingTenant.value))
@@ -29,7 +30,7 @@ defineExpose({state,workspace,mayLeave})
   <div class="page-heading proto-page-head"><div><h1>工单通知 <span class="proto-badge">{{ session?.tenant.name }}</span></h1><p>工单受理、处理、确认与 SLA 节点的站内通知记录；仅显示发给本人账号的通知。</p></div><RouterLink to="/ticket-workflows" class="back">工单处理</RouterLink></div>
   <p class="panel" v-if="!permitted">当前身份没有工单通知权限，或正在切换租户。</p>
   <template v-else>
-   <p class="proto-scope-note external">企业微信接入启用且账号完成绑定后，可将本站通知发送给本人。自动渠道策略仍按配置生效；接口受理与实际收到分别记录。</p>
+   <p class="proto-scope-note external">邮件或企业微信接入启用且账号完成绑定后，可将本站通知发送给本人。自动业务通知尚未启用；服务器受理与实际收到分别记录。</p>
    <div class="proto-kpis"><div><span>未读通知</span><b>{{ state.page ? state.page.unread_count : '—' }}</b><small>当前租户本人</small></div><div><span>本页通知</span><b>{{ state.page ? state.page.items.length : '—' }}</b><small>按时间倒序</small></div><div><span>通知渠道</span><b>站内</b><small>自动派发未启用</small></div></div>
    <div class="proto-panel workspace">
     <div class="proto-toolbar">
@@ -54,6 +55,7 @@ defineExpose({state,workspace,mayLeave})
         <div class="message-head"><span class="proto-badge">{{ eventLabel(m.event_type) }}</span><strong>{{ m.title }}</strong></div>
         <p class="body">{{ m.body }}</p>
         <WeComNotificationAction :message-id="m.id"/>
+        <EmailNotificationAction :message-id="m.id"/>
         <div class="meta"><span>{{ displayTime(m.created_at) }}</span><span>{{ m.read_at?`已读于 ${displayTime(m.read_at)}`:'未读' }}</span><RouterLink :to="{path:'/ticket-workflows',query:{ticket:m.ticket_id}}">查看工单</RouterLink><button v-if="!m.read_at" type="button" :disabled="locked" @click="workspace.mark(m.id)">标记已读</button></div>
        </li>
       </ul>

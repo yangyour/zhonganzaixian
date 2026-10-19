@@ -29,3 +29,4 @@ logging:
   level:
     org.springframework.security: WARN
     com.aliyun.oss: 'OFF'
+    org.eclipse.angus.mail: 'OFF'

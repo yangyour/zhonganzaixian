@@ -1,5 +1,7 @@
 # 指定测试环境组件清单
 
+2026-10-19华为配置截图后复测：同一192.168.1.2/UDP161、私有示例参数，在指定服务器/原Zabbix网络命名空间均超时 `TIMEOUT_NO_RESPONSE`，与早一轮errno111拒绝分别保留。用途为只读设备身份/指标；影响为身份、固件、首值和持续历史仍不可用，monitoring_ready=false。待设备侧应用并核对Polling v2c、Vlanif192是否拥有目标IP、只读团体/视图与来源ACL；无替代组件或安装/设备写入。状态`SNMP_NO_RESPONSE`，不是已接通。见[最新诊断](../evidence/huawei-snmp-after-ui-screenshot-20261019.json)和[截图分析](../huawei-snmp-integration-20261019.md)。
+
 ## 2026-10-19 华为 MIB 与 SNMP 示例只读联调
 
 固定主机信任复核指定 LAN 环境，前后 14 服务运行、PG17.9/V38、Zabbix7.0.31、原应用 ready=true。华为 192.168.1.2 在服务器/现有采集网络命名空间均 ICMP 2/2、TCP22/80/443 开放，但使用用户授权文档示例发送 SNMP v2c GET 时两处均 errno111/`UDP_PORT_UNREACHABLE`；未取得身份/固件/指标，设备 monitoring_ready=false。用途为厂商资源、接口与光功率采集，影响为首值/历史/恢复/页面接线仍未验收；解除条件是设备侧核对 SNMP 代理、UDP161、协议/只读视图及来源 ACL，并提供实际只读参数。无批准替代组件，不改成本机监控或 fixture；服务器缺 snmpget/snmpwalk，仅使用一次性有限 UDP 诊断，不安装/重启服务或修改设备。MIB 为社区镜像，七项修正候选保持未发布/未核验。见[联调记录](../huawei-snmp-integration-20261019.md)、[最终诊断](../evidence/huawei-snmp-example-probe-final-20261019.json)。

@@ -1,5 +1,13 @@
 # 华为 S5731 MIB 核对与只读 SNMP 联调
 
+## 截图后复测更新（2026-10-19）
+
+用户补充的命令行截图显示拍摄时 Polling 的 v1/v2c/v3 全为 disable；网页截图显示代理 ON、v1/v2c 勾选、源接口选择 Vlanif192，且有“应用”按钮。截图先后及是否应用未知，不能推定网页显示已代表当前运行状态，也不能仅凭 Vlanif192 名称推定其 IP 为 192.168.1.2。依据华为源接口命令说明，SNMP 绑定后仅在对应接口地址接收/响应请求，应先核对目标 IP 的归属接口和当前启用版本。
+
+保持原有固定目标、私有示例参数和只读范围复测：指定服务器与 Zabbix 网络命名空间均为 `TIMEOUT_NO_RESPONSE`（每处2秒、一个GET、没有GETNEXT），不同于先前 errno111 的端口拒绝。超时不能证明端口已开放、代理已经开启或认证已经通过；接口绑定、团体字/只读视图、ACL及路径丢弃均未排除。当前设备 monitoring_ready=false，首值/历史仍未取得，当前阻塞状态为 `SNMP_NO_RESPONSE`。最新证据见[截图后复测](evidence/huawei-snmp-after-ui-screenshot-20261019.json)；下文端口拒绝记录保留原时点，不作为本次最新返回结果。
+
+下一步设备侧先点击网页“应用”并重新查询 `display snmp-agent sys-info version`、`display ip interface brief`，确认 Polling v2c 和192.168.1.2归属接口后，再核对只读团体及来源授权。本轮未远程操作网页或更改交换机配置。技术参照：[华为 SNMP 命令说明](https://info.support.huawei.com/enterprise/zh/doc/EDOC1100459421/dab469bd)，其中源接口绑定及版本查询的语义用于排查，不据此声明设备实际固件已核验。
+
 2026-10-19，用户提供本地 `../doc/doc/华为S5731-MIB库-V200R022`，并明确要求“你帮我查看，按文档实例测试”。本轮据此仅对清单内 `192.168.1.2:161/UDP` 使用文档示例的 SNMP v2c 参数做只读诊断。示例参数单独保存在 Git 忽略的 `deploy/private/huawei-snmp.json`，不是已核验的设备真实凭据；本记录不复制团体字。
 
 **结论：设备基础网络可达，但两个采集来源均得到 UDP 161 不可达/拒绝，尚未读到设备身份或任何 SNMP 指标。** 状态 `UDP_PORT_UNREACHABLE`，设备 `monitoring_ready=false`。不能凭端口错误判定团体字正确或错误，也不能把 ICMP/TCP 成功、MIB 核对或候选解析成功作为 SNMP 接入完成。

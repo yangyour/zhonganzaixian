@@ -32,6 +32,36 @@ Copy-Item -Path (Join-Path $root 'tools/niko-test/frozen-*.json') -Destination $
 Copy-Item -Path (Join-Path $root 'tools/niko-test/candidate-inspection-quarterly-report-migration.json') -Destination $manifests
 function Check-Resources { Assert-MopMigrationResources -ProjectRoot $fixture -PersistenceClasses $classes }
 Check-Resources; $checks++
+# The registered V41 must pass above. Replacing it with a correctly hashed V42
+# keeps the resource count at 41, so only the reviewed version bound can reject it.
+$reportManifest = Join-Path $manifests 'candidate-inspection-quarterly-report-migration.json'
+$originalReportManifest = [IO.File]::ReadAllBytes($reportManifest)
+$reportFile = 'V41__immutable_inspection_quarterly_reports.sql'
+foreach ($unreviewedFile in @('V42__unreviewed.sql', 'V40__duplicate_version.sql')) {
+    $replacement = ([Text.Encoding]::UTF8.GetString($originalReportManifest)).Replace($reportFile, $unreviewedFile)
+    [IO.File]::WriteAllText($reportManifest, $replacement)
+    foreach ($directory in @($source,$compiled)) {
+        Move-Item -LiteralPath (Join-Path $directory $reportFile) -Destination (Join-Path $directory $unreviewedFile)
+    }
+    Require-Rejected { Check-Resources }; $checks++
+    foreach ($directory in @($source,$compiled)) {
+        Move-Item -LiteralPath (Join-Path $directory $unreviewedFile) -Destination (Join-Path $directory $reportFile)
+    }
+    [IO.File]::WriteAllBytes($reportManifest, $originalReportManifest)
+    Check-Resources; $checks++
+}
+# A new manifest is not self-registering: an unlisted V42 is still rejected even
+# when its SQL and matching hash are supplied in both source and compiled trees.
+$unlistedManifest = Join-Path $manifests 'candidate-unreviewed-migration.json'
+$unlistedFile = 'V42__unreviewed.sql'
+foreach ($directory in @($source,$compiled)) {
+    Copy-Item -LiteralPath (Join-Path $directory $reportFile) -Destination (Join-Path $directory $unlistedFile)
+}
+[IO.File]::WriteAllText($unlistedManifest, ([Text.Encoding]::UTF8.GetString($originalReportManifest)).Replace($reportFile, $unlistedFile))
+Require-Rejected { Check-Resources }; $checks++
+foreach ($directory in @($source,$compiled)) { Remove-Item -LiteralPath (Join-Path $directory $unlistedFile) }
+Remove-Item -LiteralPath $unlistedManifest
+Check-Resources; $checks++
 foreach ($file in @('V19__contact_import_generated_hash_guard.sql','V20__durable_asset_export_jobs.sql','V21__inspection_template_revisions.sql','V22__manual_inspection_worksheet_drafts.sql','V23__immutable_inspection_source_collections.sql','V24__unpublished_backup_plan_drafts.sql','V25__unreviewed_change_notice_drafts.sql','V26__own_notification_preference_drafts.sql','V27__project_identity_and_roles.sql','V28__identity_inventory_and_password_formats.sql','V29__immutable_raw_monitoring_events.sql','V30__immutable_monitoring_quarantine.sql','V31__own_export_inbox.sql','V32__runtime_configuration_publications.sql','V33__ticket_lifecycle_and_durable_clocks.sql','V34__ticket_notification_intents.sql','V35__service_tiers_and_change_history.sql','V36__oncall_escalation_and_sla_monthly_results.sql','V37__monitoring_events_noise_funnel_and_maintenance_windows.sql','V38__wecom_bindings_deliveries_and_login_state.sql','V39__email_bindings_and_delivery_ledger.sql','V40__immutable_change_notice_approval_events.sql','V41__immutable_inspection_quarterly_reports.sql')) {
 $original = [IO.File]::ReadAllBytes((Join-Path $source $file))
 foreach ($directory in @($source,$compiled)) {

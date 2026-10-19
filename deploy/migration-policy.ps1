@@ -34,12 +34,12 @@ function Assert-MopMigrationResources {
         foreach ($entry in $manifest.sha256.PSObject.Properties) {
             if ($entry.Name -cnotmatch '^V([1-9][0-9]?)__[a-z0-9_]+\.sql$' -or $entry.Value -cnotmatch '^[a-f0-9]{64}$') { throw '冻结清单条目无效。' }
             $version = [int]([regex]::Match($entry.Name, '^V([0-9]+)__').Groups[1].Value)
-            if ($version -gt 40 -or $versions.ContainsKey($version) -or $expected.ContainsKey($entry.Name)) { throw '冻结迁移版本重复或超出已审核范围。' }
+            if ($version -gt 41 -or $versions.ContainsKey($version) -or $expected.ContainsKey($entry.Name)) { throw '冻结迁移版本重复或超出已审核范围。' }
             $versions[$version] = $true
             $expected[$entry.Name] = $entry.Value
         }
     }
-    if ($expected.Count -ne 40) { throw '冻结迁移必须完整覆盖 V1–V40。' }
+    if ($expected.Count -ne 41) { throw '冻结迁移必须完整覆盖 V1–V41。' }
     foreach ($directory in @((Join-Path $ProjectRoot 'server/persistence/src/main/resources/db/migration'), (Join-Path $PersistenceClasses 'db/migration'))) {
         $files = @(Get-ChildItem -LiteralPath $directory -File -ErrorAction Stop)
         if ($files.Count -ne $expected.Count) { throw '源码或构建迁移集合与冻结清单不一致。' }

@@ -97,6 +97,12 @@ class MigrationManifestParityTest(unittest.TestCase):
    for name in names:
     values=json.loads((ROOT/'tools/niko-test'/name).read_text())['sha256'];self.assertTrue(set(values).isdisjoint(expected));expected.update(values)
    self.assertEqual(actual,expected);self.assertEqual(set(range(1,42)),{int(name.split('__')[0][1:]) for name in expected})
+   if entrypoint.endswith('.ps1'):
+    # Manifest parity alone misses a stale runtime upper bound or expected count.
+    maximum=re.findall(r'\$version -gt ([0-9]+)',text)
+    count=re.findall(r'\$expected\.Count -ne ([0-9]+)',text)
+    self.assertEqual([str(max(int(name.split('__')[0][1:]) for name in expected))],maximum)
+    self.assertEqual([str(len(expected))],count)
  def test_source_and_compiled_resource_mismatch_fails_before_private_config(self):
   import shutil
   for case in ['extra_compiled','missing_source','modified_compiled']:

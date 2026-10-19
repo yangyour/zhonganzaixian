@@ -1,0 +1,38 @@
+D09 quarterly report aggregation core — isolated pure computation evidence
+Date: 2026-10-19 UTC
+Base: 6f5558a
+Environment: dot cloud computer; no user computer or cloud task
+Java: OpenJDK Temurin 21.0.12.1+1-LTS
+External services: none
+
+Compilation (exit 0):
+/tmp/dot-tools/jdk/bin/javac --release 17 -encoding UTF-8 -d /tmp/d09-report-classes -cp /tmp/dot-tools/junit-platform-console-standalone.jar server/domain/src/main/java/cn/mop/domain/DomainException.java server/domain/src/main/java/cn/mop/domain/inspection/*.java server/api/src/test/java/cn/mop/api/InspectionQuarterlyReportTest.java server/api/src/test/java/cn/mop/api/InspectionSourceManifestTest.java server/api/src/test/java/cn/mop/api/InspectionWorksheetContentTest.java server/api/src/test/java/cn/mop/api/InspectionTemplateTest.java
+
+Tests (exit 0):
+/tmp/dot-tools/jdk/bin/java -jar /tmp/dot-tools/junit-platform-console-standalone.jar execute --class-path /tmp/d09-report-classes --scan-class-path --details summary
+
+Initial compiler attempt: failed due to ambiguous Summary type in the new test; corrected to InspectionQuarterlyReport.Summary, recompiled all listed sources successfully. Initial zero-test output is not success evidence.
+No Maven/reactor, PG, OSS, HTTP, browser, customer approval or publication validation is claimed.
+
+Canonical golden: independently calculated with Python hashlib.sha256 and struct.pack('>i', ...) length-prefixed UTF-8, empty tenant manifest 7b000000-0000-4000-8000-000000000001, period 2026/Q3, test-config-v1/UTC/REQUIRE_SINGLE_SOURCE/EXCLUDE/test-metric-v1/test-template-v1/COMPLETE_EXPLICIT_SELECTION.
+Envelope bytes: 243
+SHA-256: 013abf13f75a607a3f05c06b51c0a6cf5d677d57f003c17c91dab3ffb6684a54
+
+JUnit output:
+
+Thanks for using JUnit! Support its development at https://junit.org/sponsoring
+
+
+Test run finished after 432 ms
+[         7 containers found      ]
+[         0 containers skipped    ]
+[         7 containers started    ]
+[         0 containers aborted    ]
+[         7 containers successful ]
+[         0 containers failed     ]
+[        78 tests found           ]
+[         0 tests skipped         ]
+[        78 tests started         ]
+[         0 tests aborted         ]
+[        78 tests successful      ]
+[         0 tests failed          ]

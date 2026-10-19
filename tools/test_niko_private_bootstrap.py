@@ -96,7 +96,26 @@ class MigrationManifestParityTest(unittest.TestCase):
    text=(ROOT/entrypoint).read_text();names=re.findall(r"frozen-[a-z-]+\.json",text);self.assertEqual(len(names),len(set(names)));expected={}
    for name in names:
     values=json.loads((ROOT/'tools/niko-test'/name).read_text())['sha256'];self.assertTrue(set(values).isdisjoint(expected));expected.update(values)
-   self.assertEqual(actual,expected);self.assertEqual(set(range(1,31)),{int(name.split('__')[0][1:]) for name in expected})
+   self.assertEqual(actual,expected);self.assertEqual(set(range(1,38)),{int(name.split('__')[0][1:]) for name in expected})
+ def test_source_and_compiled_resource_mismatch_fails_before_private_config(self):
+  import shutil
+  for case in ['extra_compiled','missing_source','modified_compiled']:
+   with self.subTest(case=case),tempfile.TemporaryDirectory() as directory:
+    root=Path(directory);manifest_dir=root/'tools/niko-test';manifest_dir.mkdir(parents=True)
+    for source in (ROOT/'tools/niko-test').glob('frozen-*.json'):shutil.copyfile(source,manifest_dir/source.name)
+    source_dir=root/'server/persistence/src/main/resources/db/migration'
+    compiled_dir=root/'server/persistence/target/classes/db/migration'
+    shutil.copytree(ROOT/'server/persistence/src/main/resources/db/migration',source_dir)
+    shutil.copytree(source_dir,compiled_dir)
+    sample='V37__monitoring_events_noise_funnel_and_maintenance_windows.sql'
+    if case=='extra_compiled':(compiled_dir/'V99__unreviewed.sql').write_text('SELECT 1;')
+    elif case=='missing_source':(source_dir/sample).unlink()
+    else:(compiled_dir/sample).write_text('SELECT 1;')
+    result=subprocess.run([sys.executable,str(ROOT/'tools/niko-test/run-migration.py'),'--check'],cwd=root,capture_output=True,text=True)
+    self.assertNotEqual(0,result.returncode)
+    self.assertIn('no database action',result.stderr)
+    self.assertNotIn('runtime.json',result.stderr)
+    self.assertFalse((root/'.local').exists())
  def test_python_admitted_modes_exactly_match_java_cli_features(self):
   import ast,re
   tree=ast.parse((ROOT/'tools/niko-test/run-migration.py').read_text())
@@ -106,7 +125,7 @@ class MigrationManifestParityTest(unittest.TestCase):
   expected=set(re.findall(r'"(--apply-[a-z-]+)"\.equals\(args\[0\]\)',java))|{'--check','--initialize-new-niko-database'}
   self.assertEqual(len(modes),len(set(modes)));self.assertEqual(expected,set(modes))
  def test_identity_modes_are_admitted_before_frozen_resource_checks(self):
-  for mode in ['--apply-project-identity','--apply-identity-compatibility','--apply-raw-monitoring-events','--apply-monitoring-quarantine']:
+  for mode in ['--apply-project-identity','--apply-identity-compatibility','--apply-raw-monitoring-events','--apply-monitoring-quarantine','--apply-export-inbox','--apply-runtime-configuration','--apply-ticket-workflow','--apply-notification-intents','--apply-service-tiers','--apply-oncall-escalation','--apply-monitoring-event-center']:
    with self.subTest(mode=mode),tempfile.TemporaryDirectory() as d:
     result=subprocess.run([sys.executable,str(ROOT/'tools/niko-test/run-migration.py'),mode],cwd=d,capture_output=True,text=True)
     self.assertNotEqual(0,result.returncode)

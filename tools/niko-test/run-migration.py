@@ -1,6 +1,6 @@
 from pathlib import Path
 import json,os,subprocess,sys,hashlib
-MODES=('--initialize-new-niko-database','--check','--apply-photos','--apply-asset-imports','--apply-asset-dependencies','--apply-worklogs','--apply-asset-metadata','--apply-internal-notes','--apply-ticket-comments','--apply-working-calendars','--apply-manual-incidents','--apply-manual-recoveries','--apply-manual-warranty','--apply-capacity-scenarios','--apply-customer-contacts','--apply-contact-imports','--apply-contact-import-fix','--apply-asset-exports','--apply-inspection-templates','--apply-inspection-worksheets','--apply-inspection-source-collections','--apply-backup-plan-drafts','--apply-change-notice-drafts','--apply-notification-preference-drafts','--apply-project-identity','--apply-identity-compatibility','--apply-raw-monitoring-events','--apply-monitoring-quarantine')
+MODES=('--initialize-new-niko-database','--check','--apply-photos','--apply-asset-imports','--apply-asset-dependencies','--apply-worklogs','--apply-asset-metadata','--apply-internal-notes','--apply-ticket-comments','--apply-working-calendars','--apply-manual-incidents','--apply-manual-recoveries','--apply-manual-warranty','--apply-capacity-scenarios','--apply-customer-contacts','--apply-contact-imports','--apply-contact-import-fix','--apply-asset-exports','--apply-inspection-templates','--apply-inspection-worksheets','--apply-inspection-source-collections','--apply-backup-plan-drafts','--apply-change-notice-drafts','--apply-notification-preference-drafts','--apply-project-identity','--apply-identity-compatibility','--apply-raw-monitoring-events','--apply-monitoring-quarantine','--apply-export-inbox','--apply-runtime-configuration','--apply-ticket-workflow','--apply-notification-intents','--apply-service-tiers','--apply-oncall-escalation','--apply-monitoring-event-center')
 if len(sys.argv)!=2 or sys.argv[1] not in MODES:raise SystemExit('Explicit migration mode required')
 root=Path.cwd()
 manifest=json.loads((root/'tools/niko-test/frozen-migrations.json').read_text())['sha256']
@@ -28,6 +28,15 @@ manifest.update(json.loads((root/'tools/niko-test/frozen-project-identity-migrat
 manifest.update(json.loads((root/'tools/niko-test/frozen-identity-compatibility-migration.json').read_text())['sha256'])
 manifest.update(json.loads((root/'tools/niko-test/frozen-raw-monitoring-event-migration.json').read_text())['sha256'])
 manifest.update(json.loads((root/'tools/niko-test/frozen-monitoring-quarantine-migration.json').read_text())['sha256'])
+manifest.update(json.loads((root/'tools/niko-test/frozen-export-inbox-migration.json').read_text())['sha256'])
+manifest.update(json.loads((root/'tools/niko-test/frozen-runtime-configuration-migration.json').read_text())['sha256'])
+manifest.update(json.loads((root/'tools/niko-test/frozen-ticket-workflow-migration.json').read_text())['sha256'])
+manifest.update(json.loads((root/'tools/niko-test/frozen-ticket-notification-migration.json').read_text())['sha256'])
+manifest.update(json.loads((root/'tools/niko-test/frozen-service-tier-migration.json').read_text())['sha256'])
+manifest.update(json.loads((root/'tools/niko-test/frozen-oncall-escalation-migration.json').read_text())['sha256'])
+manifest.update(json.loads((root/'tools/niko-test/frozen-monitoring-event-center-migration.json').read_text())['sha256'])
+for directory in ['server/persistence/src/main/resources/db/migration','server/persistence/target/classes/db/migration']:
+ if {p.name for p in (root/directory).iterdir() if p.is_file()} != set(manifest):raise SystemExit('Migration resource set mismatch; no database action')
 for name,expected in manifest.items():
  source=root/'server/persistence/src/main/resources/db/migration'/name
  compiled=root/'server/persistence/target/classes/db/migration'/name
@@ -38,6 +47,6 @@ java=root.parent/'mop-toolchain/jdk-17.0.20.1+1/bin';cp=os.pathsep.join([str(roo
 if sys.argv[1:] == ['--initialize-new-niko-database']:
  subprocess.run([str(java/'javac'),'-cp',cp,'-d',str(root/'.local/niko-test'),str(root/'tools/niko-test/NikoSchemaBootstrap.java')],check=True,env=env)
  args=[str(java/'java'),'-cp',cp,'NikoSchemaBootstrap']+sys.argv[1:]
-elif sys.argv[1:] in [['--apply-monitoring-quarantine'],['--apply-raw-monitoring-events'],['--check'],['--apply-photos'],['--apply-asset-imports'],['--apply-asset-dependencies'],['--apply-worklogs'],['--apply-asset-metadata'],['--apply-internal-notes'],['--apply-ticket-comments'],['--apply-working-calendars'],['--apply-manual-incidents'],['--apply-manual-recoveries'],['--apply-manual-warranty'],['--apply-capacity-scenarios'],['--apply-customer-contacts'],['--apply-contact-imports'],['--apply-contact-import-fix'],['--apply-asset-exports'],['--apply-inspection-templates'],['--apply-inspection-worksheets'],['--apply-inspection-source-collections'],['--apply-backup-plan-drafts'],['--apply-change-notice-drafts'],['--apply-notification-preference-drafts'],['--apply-project-identity'],['--apply-identity-compatibility']]:args=[str(java/'java'),'-cp',cp,'cn.mop.persistence.TestSchemaMigration']+sys.argv[1:]
+elif sys.argv[1] in MODES:args=[str(java/'java'),'-cp',cp,'cn.mop.persistence.TestSchemaMigration']+sys.argv[1:]
 else:raise SystemExit('Explicit migration mode required')
 raise SystemExit(subprocess.run(args,env=env).returncode)

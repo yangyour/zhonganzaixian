@@ -26,7 +26,7 @@ function Assert-MopMigrationResources {
     $manifests = @('frozen-migrations.json', 'frozen-dependency-migration.json', 'frozen-worklog-migration.json',
         'frozen-asset-metadata-migration.json', 'frozen-internal-note-migration.json', 'frozen-ticket-comment-migration.json',
         'frozen-working-calendar-migration.json', 'frozen-manual-incident-migration.json',
-        'frozen-manual-recovery-migration.json', 'frozen-manual-warranty-migration.json', 'frozen-capacity-scenario-migration.json', 'frozen-customer-contact-migration.json', 'frozen-contact-import-migration.json', 'frozen-contact-import-fix-migration.json', 'frozen-asset-export-migration.json', 'frozen-inspection-template-migration.json', 'frozen-inspection-worksheet-migration.json', 'frozen-inspection-source-collection-migration.json', 'frozen-backup-plan-migration.json', 'frozen-change-notice-migration.json', 'frozen-notification-preference-migration.json', 'frozen-project-identity-migration.json', 'frozen-identity-compatibility-migration.json', 'frozen-raw-monitoring-event-migration.json', 'frozen-monitoring-quarantine-migration.json', 'frozen-export-inbox-migration.json', 'frozen-runtime-configuration-migration.json')
+        'frozen-manual-recovery-migration.json', 'frozen-manual-warranty-migration.json', 'frozen-capacity-scenario-migration.json', 'frozen-customer-contact-migration.json', 'frozen-contact-import-migration.json', 'frozen-contact-import-fix-migration.json', 'frozen-asset-export-migration.json', 'frozen-inspection-template-migration.json', 'frozen-inspection-worksheet-migration.json', 'frozen-inspection-source-collection-migration.json', 'frozen-backup-plan-migration.json', 'frozen-change-notice-migration.json', 'frozen-notification-preference-migration.json', 'frozen-project-identity-migration.json', 'frozen-identity-compatibility-migration.json', 'frozen-raw-monitoring-event-migration.json', 'frozen-monitoring-quarantine-migration.json', 'frozen-export-inbox-migration.json', 'frozen-runtime-configuration-migration.json', 'frozen-ticket-workflow-migration.json', 'frozen-ticket-notification-migration.json', 'frozen-service-tier-migration.json', 'frozen-oncall-escalation-migration.json', 'frozen-monitoring-event-center-migration.json')
     $expected = @{}
     $versions = @{}
     foreach ($file in $manifests) {
@@ -34,22 +34,12 @@ function Assert-MopMigrationResources {
         foreach ($entry in $manifest.sha256.PSObject.Properties) {
             if ($entry.Name -cnotmatch '^V([1-9][0-9]?)__[a-z0-9_]+\.sql$' -or $entry.Value -cnotmatch '^[a-f0-9]{64}$') { throw '冻结清单条目无效。' }
             $version = [int]([regex]::Match($entry.Name, '^V([0-9]+)__').Groups[1].Value)
-            if ($version -gt 32 -or $versions.ContainsKey($version) -or $expected.ContainsKey($entry.Name)) { throw '冻结迁移版本重复或超出已审核范围。' }
+            if ($version -gt 37 -or $versions.ContainsKey($version) -or $expected.ContainsKey($entry.Name)) { throw '冻结迁移版本重复或超出已审核范围。' }
             $versions[$version] = $true
             $expected[$entry.Name] = $entry.Value
         }
     }
-    if ($expected.Count -ne 32) { throw '冻结迁移必须完整覆盖 V1–V32。' }
-    # V33 is an explicitly reviewed candidate; this does not claim remote execution.
-    $expected['V33__ticket_lifecycle_and_durable_clocks.sql'] = 'b867a5756bcda84128dd9d9570bf4bd07ee43714e0508acd0dd95c042cc1ba5f'
-    # V34 is an explicitly reviewed candidate for in-app ticket notifications; still applied only on explicit request.
-    $expected['V34__ticket_notification_intents.sql'] = '7951a0abb91fd94ae6ba3a1b5769e32780b23b08720e2bd17851c64f256cdb51'
-    # V35 is an explicitly reviewed candidate for tenant service tiers and append-only change history.
-    $expected['V35__service_tiers_and_change_history.sql'] = 'f8bf2639d6ebb467a0d515147307ceb2e13c425b2337cbad69c88eee91330ed0'
-    # V36 is an explicitly reviewed candidate for on-call roster/handoffs, escalation policies/runs and SLA monthly results.
-    $expected['V36__oncall_escalation_and_sla_monthly_results.sql'] = '52f43d3f5eb43967ac8ff895da9b5503d2e1e83fc29d52adea2ce6076ab7c0cb'
-    # V37 is an explicitly reviewed candidate for monitoring event center, noise funnel, maintenance windows, quarantine decisions and auto-ticket attempts.
-    $expected['V37__monitoring_events_noise_funnel_and_maintenance_windows.sql'] = 'f6f9cc88bcbc4dcbaf1a76a849aa78ed2cf7af91e7fd9b5c80dbde4d9b9ab351'
+    if ($expected.Count -ne 37) { throw '冻结迁移必须完整覆盖 V1–V37。' }
     foreach ($directory in @((Join-Path $ProjectRoot 'server/persistence/src/main/resources/db/migration'), (Join-Path $PersistenceClasses 'db/migration'))) {
         $files = @(Get-ChildItem -LiteralPath $directory -File -ErrorAction Stop)
         if ($files.Count -ne $expected.Count) { throw '源码或构建迁移集合与冻结清单不一致。' }

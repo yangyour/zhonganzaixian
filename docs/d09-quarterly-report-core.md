@@ -40,3 +40,8 @@
 ## 验证
 
 见 `docs/evidence/d09-report-core-20261019/validation.txt`。23 个新增纯核心测试和 55 个已有巡检测试，共 78 个通过，0 失败、0 跳过。首次编译发现测试中两个 `Summary` 静态导入重名，已显式限定类型后重新完整编译；首次零测试输出不计为通过。此处没有完整 Maven、真实 PG/OSS、HTTP/UI 或客户验收通过的声明。
+
+
+## 后续已验证切片：V41 报告草稿持久化与 API
+
+以上保留纯计算核心首次交付的历史边界。2026-10-19 后续 V41 切片已完成只追加冻结快照、API 0.61 及页面实现，并在 dot 自有临时真实 PG/API 环境通过 16 报告 PG、21 审批 PG、43 审批 HTTP 与 90 报告 HTTP 检查。配置仍为 REQUEST_DRAFT_NOT_APPROVED，六项缺失值保留 null，不冒充已发布客户规则；浏览器视觉、正式发布、证据访问与 OSS/PDF 管线仍未验。见 [V41 API 与边界](inspection-quarterly-report-api-v41.md)及[真实验证记录](evidence/inspection-quarterly-report-v41-20261019/README.md)。

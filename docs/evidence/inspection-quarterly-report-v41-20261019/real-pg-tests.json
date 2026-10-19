@@ -1,0 +1,14 @@
+{
+  "PostgresInspectionQuarterlyReportIntegrationTest": {
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "PostgresChangeNoticeApprovalIntegrationTest": {
+    "tests": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

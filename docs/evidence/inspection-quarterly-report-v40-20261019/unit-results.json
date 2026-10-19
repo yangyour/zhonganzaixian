@@ -1,0 +1,34 @@
+{
+  "environment": "dot-own-cloud-isolated-worktree",
+  "date": "2026-10-19",
+  "base": "504d57b3da29242a22e50c9fb6286ef4682a9d52",
+  "integration_fix": "7d687ba1e4ce46dc26c9ff29b28d3aaf146e5f3e",
+  "scope": "D09 quarterly draft API and V40 candidate on upstream WeCom lineage",
+  "java_reactor": {
+    "tests": 3246,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 949,
+    "passed": 2297
+  },
+  "contract_tests": {
+    "passed": 141,
+    "failed": 0
+  },
+  "python_migration_policy_tests": {
+    "passed": 34,
+    "failed": 0
+  },
+  "powershell_policy_tests": "NOT_RUN_PWSH_UNAVAILABLE",
+  "postgres": "NOT_RUN_PENDING_PARENT_REVIEW",
+  "real_http": "NOT_RUN_PENDING_PARENT_REVIEW",
+  "mock_mvc_security_tests": 6,
+  "controller_tests": 16,
+  "migration_status": "UNAPPLIED_CANDIDATE",
+  "migration_sha256": "54b9bd1d0995a248191e8f8f7dafe35fafd7d4ec15699a2ca8a49a7a025c7aa2",
+  "ui": "SEPARATE_WORKER",
+  "customer_approval": false,
+  "production_acceptance": false,
+  "package_build": "PASS",
+  "cross_language_ui_fixture_check": "PASS_REPORTED_BY_FRONTEND_WORKER"
+}

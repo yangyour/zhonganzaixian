@@ -458,3 +458,8 @@ niko自身Chromium154.0.8037.57配Playwright1.62.1、chromiumSandbox=true仍在�
 ## 2026-10-15 工单详情参考图联调
 
 复用指定 lan-test-20261008 的真实工单/内部备注/客户评论/本人工时 API 与 PostgreSQL 17.9（V32），只读盘点 14 个项目容器运行、ready=true、production_ready=false。新增一个明确标记的虚构报障及其测试记录，无组件安装、迁移、服务重启或全局设置修改。本地仅构建和预览 Web；浏览器转发原始真实 API 响应，非 fixture 联调。正式流程/团队工时等属于尚未实现的业务接口，不登记为数据库故障或已完成能力。[组件证据](../evidence/ticket-detail-reference-20261015/components.json) · [运行与边界](../ticket-detail-reference-20261015.md)。
+
+
+## 2026-10-19 V41 自有云端季度报告隔离验证
+
+本轮使用用户授权的 dot 自有可丢弃 PostgreSQL 17.9 / ICU 76.1，仅监听回环；API 使用项目本地临时合成身份，Email/WeCom 禁用，不继承供应商秘密。未访问用户电脑或原指定服务器。首次 V41 应用及 JDBC DateStyle 测试设置失败原样保留；修正测试为 ISO, DMY 后另建全新数据库，独立 V1–V41、报告 apply/repeat/check=1/0/0、16 报告 PG +21 审批 PG、43 审批 HTTP +90 报告 HTTP 全部通过。两次临时数据库和凭据均已清理，成功场景 API 已停止；未向外发送消息。当前不是常驻环境，不表示原服务器迁移、浏览器视觉、OSS/PDF 或生产批准完成。见 [V41 独立验证](../evidence/inspection-quarterly-report-v41-20261019/README.md)。

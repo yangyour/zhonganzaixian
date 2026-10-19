@@ -1,5 +1,11 @@
 # MOP 项目全局开发要求
 
+## V41 季度报告草稿结构冻结（2026-10-19，自有云端隔离验证）
+
+V41 于 2026-10-19 10:45:33.711883 UTC 在 dot 自有可丢弃 PostgreSQL 17.9 / ICU 76.1 库首次独立显式应用，SHA256 为 54b9bd1d0995a248191e8f8f7dafe35fafd7d4ec15699a2ca8a49a7a025c7aa2；从该时刻起 V1–V41 全部字节冻结，后续 SQL 修正必须新增 V42 或更高。首轮一项 JDBC DateStyle 测试设置错误及其迁移证据保留，没有改写已执行 SQL。仅将测试改为驱动支持的非默认 ISO, DMY 后，全新第二生命周期于 10:50:25.069237 UTC 验证同一 SQL：应用 1、重复 0、只读 0，结构漂移测试后再只读 0。
+
+95 张旧业务表中 92 张完整行指纹不变；另外三表仅按设计增加 2 项 padmin 权限上限、更新 2 个内置 padmin 角色并推进 4 个成员权限版本，其余字段不变。16 项真实报告 PG、21 项审批 PG、43 项审批 HTTP 及 90 项报告 HTTP 检查通过；API/PG、临时库及凭据已清理。Email/WeCom 禁用，未操作用户电脑或原服务器，未发送外部消息。报告固定 DRAFT/未发布，正式规则、浏览器视觉、OSS/PDF 发布与客户生产验收未因此完成。API/Worker 不自动迁移。详见 docs/evidence/inspection-quarterly-report-v41-20261019/summary.json。
+
 ## V39邮件通道结构冻结（2026-10-19）
 
 指定LAN PG17.9项目库已独立显式应用V39一次，重复与只读复核均0次，SHA256为3d1b4cd557b6c367b2a36e9f49a2154d8a925a8afe249c103cd59373f32a6dea。V1—V39保持字节冻结，后续SQL修正新增V40或更高。新增管理员明确邮箱绑定及一次SMTP提交台账，ACCEPTED不表示DELIVERED，UNKNOWN不自动重发；口令不进数据库。用户明确选择把既有企业邮箱绑定至JiangFaMing，已保存且启用；该授权不扩大为实际邮件发送或自动业务通知。见docs/email-integration-20261019.md及对应真实PG/HTTP证据。

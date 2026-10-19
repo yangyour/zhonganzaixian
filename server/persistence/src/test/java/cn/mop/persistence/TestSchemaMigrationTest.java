@@ -16,6 +16,21 @@ class TestSchemaMigrationTest {
   EmailSchemaVerifier.resource();
  }
 
+ @Test void reportCapabilitiesAreVersionAwareAndPadminOnly(){
+  var legacy=ProjectIdentitySchemaVerifier.expectedCapabilities("padmin",true,false);
+  assertFalse(legacy.contains("inspection_quarterly_reports:read"));assertFalse(legacy.contains("inspection_quarterly_reports:write"));
+  var current=ProjectIdentitySchemaVerifier.expectedCapabilities("padmin",true,true);
+  assertTrue(current.containsAll(List.of("inspection_quarterly_reports:read","inspection_quarterly_reports:write")));
+  assertEquals(legacy.size()+2,current.size());
+  for(String role:List.of("viewer","tadmin","msp"))assertEquals(ProjectIdentitySchemaVerifier.expectedCapabilities(role,true,false),ProjectIdentitySchemaVerifier.expectedCapabilities(role,true,true));
+ }
+ @Test void quarterlyReportsRequireExplicitOrderedV41Mode()throws Exception {
+  assertEquals(TestSchemaMigration.Mode.APPLY_INSPECTION_QUARTERLY_REPORTS,TestSchemaMigration.requestedMode(new String[]{"--apply-inspection-quarterly-reports"}));
+  assertTrue(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_INSPECTION_QUARTERLY_REPORTS,TestSchemaMigration.Plan.CHANGE_NOTICE_APPROVAL_APPLIED));
+  assertFalse(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_INSPECTION_QUARTERLY_REPORTS,TestSchemaMigration.Plan.INSPECTION_QUARTERLY_REPORTS_APPLIED));
+  assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_INSPECTION_QUARTERLY_REPORTS,TestSchemaMigration.Plan.WECOM_INTEGRATION_APPLIED));
+  InspectionQuarterlyReportSchemaVerifier.resource();
+ }
  @Test void wecomRequiresExplicitV38AfterCompletePriorHistory()throws Exception{
   assertEquals(TestSchemaMigration.Mode.APPLY_WECOM_INTEGRATION,TestSchemaMigration.requestedMode(new String[]{"--apply-wecom-integration"}));
   assertTrue(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.APPLY_WECOM_INTEGRATION,TestSchemaMigration.Plan.MONITORING_EVENT_CENTER_APPLIED));
@@ -97,7 +112,7 @@ class TestSchemaMigrationTest {
         assertFalse(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.READ_ONLY_CHECK,TestSchemaMigration.Plan.PROJECT_IDENTITY_APPLIED));
         ProjectIdentitySchemaVerifier.resource();
     }
-    private static final List<String> SCRIPTS=List.of("V1__remote_test_platform.sql","V2__tenant_configuration_revisions.sql","V3__configuration_review_test_identity.sql","V4__durable_customer_report_registration.sql","V5__durable_report_photos.sql","V6__asset_import_sources_and_mapping.sql","V7__asset_dependency_draft_revisions.sql","V8__manual_worklog_revisions.sql","V9__manual_asset_metadata_revisions.sql","V10__immutable_internal_ticket_notes.sql","V11__immutable_ticket_comments.sql","V12__unpublished_working_calendar_drafts.sql","V13__immutable_manual_incident_registrations.sql","V14__immutable_manual_recovery_confirmations.sql","V15__manual_warranty_details.sql","V16__immutable_capacity_scenario_drafts.sql","V17__customer_contact_revisions.sql","V18__durable_contact_import_jobs.sql","V19__contact_import_generated_hash_guard.sql","V20__durable_asset_export_jobs.sql","V21__inspection_template_revisions.sql","V22__manual_inspection_worksheet_drafts.sql","V23__immutable_inspection_source_collections.sql","V24__unpublished_backup_plan_drafts.sql","V25__unreviewed_change_notice_drafts.sql","V26__own_notification_preference_drafts.sql","V27__project_identity_and_roles.sql","V28__identity_inventory_and_password_formats.sql","V29__immutable_raw_monitoring_events.sql","V30__immutable_monitoring_quarantine.sql","V31__own_export_inbox.sql","V32__runtime_configuration_publications.sql","V33__ticket_lifecycle_and_durable_clocks.sql","V34__ticket_notification_intents.sql","V35__service_tiers_and_change_history.sql","V36__oncall_escalation_and_sla_monthly_results.sql","V37__monitoring_events_noise_funnel_and_maintenance_windows.sql","V38__wecom_bindings_deliveries_and_login_state.sql","V39__email_bindings_and_delivery_ledger.sql","V40__immutable_change_notice_approval_events.sql");
+    private static final List<String> SCRIPTS=List.of("V1__remote_test_platform.sql","V2__tenant_configuration_revisions.sql","V3__configuration_review_test_identity.sql","V4__durable_customer_report_registration.sql","V5__durable_report_photos.sql","V6__asset_import_sources_and_mapping.sql","V7__asset_dependency_draft_revisions.sql","V8__manual_worklog_revisions.sql","V9__manual_asset_metadata_revisions.sql","V10__immutable_internal_ticket_notes.sql","V11__immutable_ticket_comments.sql","V12__unpublished_working_calendar_drafts.sql","V13__immutable_manual_incident_registrations.sql","V14__immutable_manual_recovery_confirmations.sql","V15__manual_warranty_details.sql","V16__immutable_capacity_scenario_drafts.sql","V17__customer_contact_revisions.sql","V18__durable_contact_import_jobs.sql","V19__contact_import_generated_hash_guard.sql","V20__durable_asset_export_jobs.sql","V21__inspection_template_revisions.sql","V22__manual_inspection_worksheet_drafts.sql","V23__immutable_inspection_source_collections.sql","V24__unpublished_backup_plan_drafts.sql","V25__unreviewed_change_notice_drafts.sql","V26__own_notification_preference_drafts.sql","V27__project_identity_and_roles.sql","V28__identity_inventory_and_password_formats.sql","V29__immutable_raw_monitoring_events.sql","V30__immutable_monitoring_quarantine.sql","V31__own_export_inbox.sql","V32__runtime_configuration_publications.sql","V33__ticket_lifecycle_and_durable_clocks.sql","V34__ticket_notification_intents.sql","V35__service_tiers_and_change_history.sql","V36__oncall_escalation_and_sla_monthly_results.sql","V37__monitoring_events_noise_funnel_and_maintenance_windows.sql","V38__wecom_bindings_deliveries_and_login_state.sql","V39__email_bindings_and_delivery_ledger.sql","V40__immutable_change_notice_approval_events.sql","V41__immutable_inspection_quarterly_reports.sql");
     private static List<TestSchemaMigration.Entry> entries(boolean photosApplied,boolean importsApplied) {
         return entries(photosApplied,importsApplied,false);
     }

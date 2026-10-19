@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.60.0",
+    "version": "0.61.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -37540,6 +37540,391 @@
           }
         }
       }
+    },
+    "/inspection-quarterly-reports": {
+      "get": {
+        "operationId": "listInspectionQuarterlyReports",
+        "summary": "Immutable quarterly DRAFT bound to exact frozen source and explicit unapproved configuration",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-capability": "inspection_quarterly_reports:read",
+        "responses": {
+          "200": {
+            "description": "Draft snapshot only, not publication or customer approval",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionQuarterlyReportPageResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                20
+              ],
+              "default": 15
+            }
+          },
+          {
+            "name": "before_recorded_at",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-document-projection": "METADATA_ONLY"
+      },
+      "post": {
+        "operationId": "createInspectionQuarterlyReport",
+        "summary": "Immutable quarterly DRAFT bound to exact frozen source and explicit unapproved configuration",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-capability": "inspection_quarterly_reports:write",
+        "responses": {
+          "200": {
+            "description": "Draft snapshot only, not publication or customer approval",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionQuarterlyReportSummaryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-mop-additional-capabilities": [
+          "inspection_source_collections:read"
+        ],
+        "x-mop-idempotent-replay-reauthorization": true,
+        "x-mop-max-body-bytes": 16384,
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionQuarterlyReportCreate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inspection-quarterly-reports/{id}": {
+      "get": {
+        "operationId": "getInspectionQuarterlyReport",
+        "summary": "Immutable quarterly DRAFT bound to exact frozen source and explicit unapproved configuration",
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-current-membership-recheck": true,
+        "x-mop-capability": "inspection_quarterly_reports:read",
+        "responses": {
+          "200": {
+            "description": "Draft snapshot only, not publication or customer approval",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionQuarterlyReportDetailResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Input, authorization, exact-source hash conflict or unavailable storage; never silently replaces source.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-document-projection": "FROZEN_INPUT_OUTPUT"
+      }
     }
   },
   "components": {
@@ -38622,6 +39007,38 @@
                   "alert_suppression_allowed"
                 ],
                 "additionalProperties": false
+              },
+              "inspection_quarterly_reports": {
+                "type": "object",
+                "properties": {
+                  "schema_access_ready": {
+                    "type": "boolean"
+                  },
+                  "configuration_source": {
+                    "const": "REQUEST_DRAFT_NOT_APPROVED"
+                  },
+                  "generation_status": {
+                    "const": "DRAFT"
+                  },
+                  "report_published": {
+                    "const": false
+                  },
+                  "report_publishable": {
+                    "const": false
+                  },
+                  "evidence_access_granted": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "schema_access_ready",
+                  "configuration_source",
+                  "generation_status",
+                  "report_published",
+                  "report_publishable",
+                  "evidence_access_granted"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -38653,7 +39070,8 @@
               "asset_exports",
               "own_notification_preferences",
               "runtime_configurations",
-              "change_notice_approvals"
+              "change_notice_approvals",
+              "inspection_quarterly_reports"
             ],
             "additionalProperties": false
           },
@@ -73759,6 +74177,1423 @@
               "has_more",
               "next_before_version",
               "page_size_limit",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionQuarterlyReportConfiguration": {
+        "type": "object",
+        "properties": {
+          "revision": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "time_zone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "duplicate_rule": {
+            "anyOf": [
+              {
+                "enum": [
+                  "REQUIRE_SINGLE_SOURCE",
+                  "LATEST_REPORTED_PERFORMED_AT"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "archived_rule": {
+            "anyOf": [
+              {
+                "enum": [
+                  "INCLUDE",
+                  "EXCLUDE"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metric_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "report_template_version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "revision",
+          "time_zone",
+          "duplicate_rule",
+          "archived_rule",
+          "metric_version",
+          "report_template_version"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionQuarterlyReportCreate": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "const": 0
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "source_collection_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_source_document_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "expected_source_manifest_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "year": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9998
+          },
+          "quarter": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "configuration": {
+            "type": "object",
+            "properties": {
+              "revision": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "time_zone": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "duplicate_rule": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "REQUIRE_SINGLE_SOURCE",
+                      "LATEST_REPORTED_PERFORMED_AT"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "archived_rule": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "INCLUDE",
+                      "EXCLUDE"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "metric_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "report_template_version": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "revision",
+              "time_zone",
+              "duplicate_rule",
+              "archived_rule",
+              "metric_version",
+              "report_template_version"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "expected_version",
+          "label",
+          "source_collection_id",
+          "expected_source_document_sha256",
+          "expected_source_manifest_sha256",
+          "year",
+          "quarter",
+          "configuration"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionQuarterlyReportSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "const": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "source_collection_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_document_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_manifest_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "year": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9998
+          },
+          "quarter": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "report_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "document_format": {
+            "const": "MOP_INSPECTION_QUARTERLY_DOCUMENT_V1"
+          },
+          "document_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "projection": {
+            "const": "METADATA_ONLY"
+          },
+          "configuration_source": {
+            "const": "REQUEST_DRAFT_NOT_APPROVED"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_PADMIN"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "generation_status": {
+            "const": "DRAFT"
+          },
+          "report_published": {
+            "const": false
+          },
+          "report_publishable": {
+            "const": false
+          },
+          "evidence_access_granted": {
+            "const": false
+          },
+          "tenant_asset_population": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "created_by",
+          "recorded_at",
+          "version",
+          "label",
+          "source_collection_id",
+          "source_document_sha256",
+          "source_manifest_sha256",
+          "year",
+          "quarter",
+          "report_sha256",
+          "document_format",
+          "document_sha256",
+          "projection",
+          "configuration_source",
+          "scope",
+          "source",
+          "generation_status",
+          "report_published",
+          "report_publishable",
+          "evidence_access_granted",
+          "tenant_asset_population"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionQuarterlyReportFrozenDocument": {
+        "type": "object",
+        "properties": {
+          "format": {
+            "const": "MOP_INSPECTION_QUARTERLY_DOCUMENT_V1"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_collection_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_document_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_manifest_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "report_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "configuration_source": {
+            "const": "REQUEST_DRAFT_NOT_APPROVED"
+          },
+          "configuration": {
+            "type": "object",
+            "properties": {
+              "revision": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "timeZone": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "duplicateRule": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "REQUIRE_SINGLE_SOURCE",
+                      "LATEST_REPORTED_PERFORMED_AT"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "archivedRule": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "INCLUDE",
+                      "EXCLUDE"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "metricVersion": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "reportTemplateVersion": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "revision",
+              "timeZone",
+              "duplicateRule",
+              "archivedRule",
+              "metricVersion",
+              "reportTemplateVersion"
+            ],
+            "additionalProperties": false
+          },
+          "year": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9998
+          },
+          "quarter": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "completeness": {
+            "const": "COMPLETE_EXPLICIT_SELECTION"
+          },
+          "source_document": {
+            "type": "object",
+            "properties": {
+              "format": {
+                "const": "MOP_INSPECTION_SOURCE_DOCUMENT_V1"
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "manifest_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "sources": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "worksheet_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740990
+                    },
+                    "created_by": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "recorded_by": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "recorded_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "action": {
+                      "enum": [
+                        "CREATE",
+                        "UPDATE",
+                        "ARCHIVE",
+                        "RESTORE"
+                      ]
+                    },
+                    "archived": {
+                      "type": "boolean"
+                    },
+                    "source_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "content": {
+                      "type": "object",
+                      "properties": {
+                        "asset_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "asset_name": {
+                          "type": "string"
+                        },
+                        "reported_performed_at": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "content_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "template": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "version": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740990
+                            },
+                            "device_type": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "content_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "key": {
+                                    "type": "string"
+                                  },
+                                  "section": {
+                                    "type": "string"
+                                  },
+                                  "label": {
+                                    "type": "string"
+                                  },
+                                  "instruction": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "key",
+                                  "section",
+                                  "label",
+                                  "instruction"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "maxItems": 100
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "version",
+                            "device_type",
+                            "name",
+                            "content_sha256",
+                            "items"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "observations": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "result": {
+                                "enum": [
+                                  "NORMAL",
+                                  "ATTENTION",
+                                  "REQUIRES_ACTION"
+                                ]
+                              },
+                              "note": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "evidence_ids": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "maxItems": 10
+                              }
+                            },
+                            "required": [
+                              "key",
+                              "result",
+                              "note",
+                              "evidence_ids"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "maxItems": 100
+                        }
+                      },
+                      "required": [
+                        "asset_id",
+                        "asset_name",
+                        "reported_performed_at",
+                        "content_sha256",
+                        "template",
+                        "observations"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "worksheet_id",
+                    "version",
+                    "created_by",
+                    "created_at",
+                    "recorded_by",
+                    "recorded_at",
+                    "action",
+                    "archived",
+                    "source_sha256",
+                    "content"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 1000
+              }
+            },
+            "required": [
+              "format",
+              "tenant_id",
+              "manifest_sha256",
+              "sources"
+            ],
+            "additionalProperties": false
+          },
+          "output": {
+            "type": "object",
+            "properties": {
+              "generation_status": {
+                "const": "DRAFT"
+              },
+              "report_published": {
+                "const": false
+              },
+              "report_publishable": {
+                "const": false
+              },
+              "evidence_access_granted": {
+                "const": false
+              },
+              "tenant_asset_population": {
+                "type": "null"
+              },
+              "summary": {
+                "type": "object",
+                "properties": {
+                  "capturedAssets": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "selectedAssets": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "unresolvedAssets": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "totalItems": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "answered": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "normal": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "attention": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "requiresAction": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "unanswered": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "capturedAssets",
+                  "selectedAssets",
+                  "unresolvedAssets",
+                  "totalItems",
+                  "answered",
+                  "normal",
+                  "attention",
+                  "requiresAction",
+                  "unanswered"
+                ],
+                "additionalProperties": false
+              },
+              "pending_reasons": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "TIME_ZONE_MISSING",
+                    "DUPLICATE_RULE_MISSING",
+                    "ARCHIVE_RULE_MISSING",
+                    "METRIC_VERSION_MISSING",
+                    "REPORT_TEMPLATE_VERSION_MISSING",
+                    "CONFIG_REVISION_MISSING",
+                    "SOURCE_SET_UNKNOWN",
+                    "SOURCE_SET_INCOMPLETE",
+                    "EMPTY_SELECTION",
+                    "UNRESOLVED_ASSET_SELECTION",
+                    "UNANSWERED_ITEMS",
+                    "SELF_REPORTED_SOURCES_UNVERIFIED",
+                    "TEMPLATE_APPROVAL_UNVERIFIED",
+                    "EVIDENCE_REFERENCES_UNVERIFIED",
+                    "PUBLICATION_PIPELINE_NOT_CONNECTED"
+                  ]
+                },
+                "maxItems": 16
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "asset_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "enum": [
+                        "SELECTED",
+                        "NO_SOURCE_IN_PERIOD",
+                        "CONFIG_PENDING",
+                        "SOURCE_TIME_UNKNOWN",
+                        "ARCHIVE_POLICY_PENDING",
+                        "MULTIPLE_SOURCES",
+                        "LATEST_TIME_TIED"
+                      ]
+                    },
+                    "asset_name": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "summary": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "answered": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "normal": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "attention": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "requiresAction": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "unanswered": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          },
+                          "required": [
+                            "total",
+                            "answered",
+                            "normal",
+                            "attention",
+                            "requiresAction",
+                            "unanswered"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "item": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "section": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "instruction": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "key",
+                              "section",
+                              "label",
+                              "instruction"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "observation": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "result": {
+                                    "enum": [
+                                      "NORMAL",
+                                      "ATTENTION",
+                                      "REQUIRES_ACTION"
+                                    ]
+                                  },
+                                  "note": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "evidenceIds": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    },
+                                    "maxItems": 10
+                                  }
+                                },
+                                "required": [
+                                  "result",
+                                  "note",
+                                  "evidenceIds"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "item",
+                          "observation"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "maxItems": 100
+                    },
+                    "selected": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "worksheetId": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "version": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740990
+                            },
+                            "snapshotSha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "contentSha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "worksheetId",
+                            "version",
+                            "snapshotSha256",
+                            "contentSha256"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "candidates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "worksheetId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "version": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 9007199254740990
+                          },
+                          "snapshotSha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "contentSha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "worksheetId",
+                          "version",
+                          "snapshotSha256",
+                          "contentSha256"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "maxItems": 1000
+                    }
+                  },
+                  "required": [
+                    "asset_id",
+                    "status",
+                    "asset_name",
+                    "summary",
+                    "items",
+                    "selected",
+                    "candidates"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 1000
+              },
+              "findings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "assetId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "source": {
+                      "type": "object",
+                      "properties": {
+                        "worksheetId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740990
+                        },
+                        "snapshotSha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "contentSha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": [
+                        "worksheetId",
+                        "version",
+                        "snapshotSha256",
+                        "contentSha256"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "item": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string"
+                        },
+                        "section": {
+                          "type": "string"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "instruction": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "section",
+                        "label",
+                        "instruction"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "observation": {
+                      "type": "object",
+                      "properties": {
+                        "result": {
+                          "enum": [
+                            "NORMAL",
+                            "ATTENTION",
+                            "REQUIRES_ACTION"
+                          ]
+                        },
+                        "note": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "evidenceIds": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "maxItems": 10
+                        }
+                      },
+                      "required": [
+                        "result",
+                        "note",
+                        "evidenceIds"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "assetId",
+                    "source",
+                    "item",
+                    "observation"
+                  ],
+                  "additionalProperties": false
+                },
+                "maxItems": 100000
+              }
+            },
+            "required": [
+              "generation_status",
+              "report_published",
+              "report_publishable",
+              "evidence_access_granted",
+              "tenant_asset_population",
+              "summary",
+              "pending_reasons",
+              "rows",
+              "findings"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "format",
+          "tenant_id",
+          "source_collection_id",
+          "source_document_sha256",
+          "source_manifest_sha256",
+          "report_sha256",
+          "configuration_source",
+          "configuration",
+          "year",
+          "quarter",
+          "completeness",
+          "source_document",
+          "output"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionQuarterlyReportDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "const": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "source_collection_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_document_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_manifest_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "year": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9998
+          },
+          "quarter": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "report_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "document_format": {
+            "const": "MOP_INSPECTION_QUARTERLY_DOCUMENT_V1"
+          },
+          "document_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "projection": {
+            "const": "FROZEN_INPUT_OUTPUT"
+          },
+          "configuration_source": {
+            "const": "REQUEST_DRAFT_NOT_APPROVED"
+          },
+          "scope": {
+            "const": "CURRENT_TENANT_PADMIN"
+          },
+          "source": {
+            "const": "postgresql"
+          },
+          "generation_status": {
+            "const": "DRAFT"
+          },
+          "report_published": {
+            "const": false
+          },
+          "report_publishable": {
+            "const": false
+          },
+          "evidence_access_granted": {
+            "const": false
+          },
+          "tenant_asset_population": {
+            "type": "null"
+          },
+          "document_integrity": {
+            "const": "VERIFIED_SERVER_SIDE"
+          },
+          "frozen_document": {
+            "$ref": "#/components/schemas/InspectionQuarterlyReportFrozenDocument"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "created_by",
+          "recorded_at",
+          "version",
+          "label",
+          "source_collection_id",
+          "source_document_sha256",
+          "source_manifest_sha256",
+          "year",
+          "quarter",
+          "report_sha256",
+          "document_format",
+          "document_sha256",
+          "projection",
+          "configuration_source",
+          "scope",
+          "source",
+          "generation_status",
+          "report_published",
+          "report_publishable",
+          "evidence_access_granted",
+          "tenant_asset_population",
+          "document_integrity",
+          "frozen_document"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionQuarterlyReportSummaryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/InspectionQuarterlyReportSummary"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionQuarterlyReportDetailResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/InspectionQuarterlyReportDetail"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "InspectionQuarterlyReportPageResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/InspectionQuarterlyReportSummary"
+                },
+                "maxItems": 20
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_before_recorded_at": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "next_before_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "page_size_limit": {
+                "const": 20
+              },
+              "scope": {
+                "const": "CURRENT_TENANT_PADMIN"
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "items",
+              "has_more",
+              "next_before_recorded_at",
+              "next_before_id",
+              "page_size_limit",
+              "scope",
               "source"
             ],
             "additionalProperties": false

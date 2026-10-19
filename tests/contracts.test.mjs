@@ -217,6 +217,7 @@ test('就绪成功不能把已启用但缺schema或存储的照片能力写成RE
   const photos = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, policy_source: 'USER_DEVELOPMENT_DIRECTION', reasons: [] };
   const data = { own_notification_preferences:{schema_access_ready:true,configuration_status:"CONFIG_PENDING",effective:false,receiver_binding_status:"NOT_VERIFIED",notification_dispatched:false}, asset_exports:{schema_access_ready:true,mode:"PREPARE_ONLY_NO_PUBLICATION",worker_liveness:null,publication_status:"NOT_IMPLEMENTED",download_allowed:false}, change_notice_drafts: {schema_access_ready:true,approval_status:null,automatic_p3_decision:null,approval_workflow_status:"CONFIG_PENDING",matching_policy_status:"CONFIG_PENDING",effective:false,device_execution_allowed:false,alert_suppression_allowed:false}, backup_plan_drafts: {schema_access_ready:true,effective:false,device_execution_allowed:false,credential_verification:"NOT_VERIFIED",scheduler_running:null}, inspection_source_collections: { schema_access_ready: true, verification_status: 'SELF_REPORTED_UNVERIFIED', generation_status: 'CONFIG_PENDING', formal_report_generatable: false, report_published: false }, inspection_worksheets: { schema_access_ready: true, verification_status: 'SELF_REPORTED_UNVERIFIED', evidence_binding_status: 'NOT_IMPLEMENTED', publication_status: 'NOT_IMPLEMENTED', report_published: false, active_scan_performed: false }, contact_imports: { schema_access_ready: true, worker_liveness: null, notification_dispatched: false, identity_binding_created: false }, inspection_templates: { schema_access_ready: true, approval_status: 'UNVERIFIED', publication_status: 'NOT_IMPLEMENTED', report_published: false, active_scan_performed: false }, customer_contacts: { schema_access_ready: true, notification_dispatched: false, channel_verification: 'NOT_VERIFIED', identity_binding_created: false }, status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, capacity_scenarios: { schema_access_ready: true, effective: false, measurement_verified: false, poc_executed: false }, working_calendars: { schema_access_ready: true, effective: false, customer_confirmation: 'UNVERIFIED' }, manual_incidents: { schema_access_ready: true, source_state: 'MANUAL', registration_status: 'REGISTERED_ONLY', monitoring_recovery_applicable: false, ticket_automatically_created: false }, manual_recovery: { schema_access_ready: true, source: 'HUMAN_CONFIRMATION', monitoring_recovery_applicable: false, ticket_state_changed: false, sla_changed: false }, photos, asset_reads: { unicode_search_ready: true, pagination: 'BOUNDED_POSTGRESQL_KEYSET' }, ticket_comments: { schema_access_ready: true, visibility: 'REPORTER_AND_INTERNAL', internal_identity_exposed: false, itsm_applied: false }, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
   data.runtime_configurations = { schema_access_ready: true, scope: 'CURRENT_TENANT', customer_confirmation_status: 'UNVERIFIED' };
+  data.inspection_quarterly_reports = { schema_access_ready:true, configuration_source:'REQUEST_DRAFT_NOT_APPROVED', generation_status:'DRAFT', report_published:false, report_publishable:false, evidence_access_granted:false };
   data.change_notice_approvals = { schema_access_ready: true, record_source: 'REVISION_REVIEW_ONLY', effective: false, device_execution_allowed: false, alert_suppression_allowed: false };
   assert.equal(validates('ReadinessResult', { data, trace_id: 'MOP-FAKE-readiness' }), true);
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('ReadinessResult', { data: { ...data, photos: { ...photos, [key]: false } }, trace_id: 'MOP-FAKE-readiness' }), false);
@@ -247,7 +248,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.60.0');
+  assert.equal(contract.info.version, '0.61.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -907,7 +908,7 @@ test('站内消息只读列表与显式已读接口保持当前授权和CSRF幂�
 test('消息游标末页必须明确结束且签名链接只能指向本站下载接口',()=>{const result={data:{items:[inboxMessageSample()],has_more:false,next_before_issued_at:null,next_before_id:null,unread_count:1,observed_at:'2026-10-14T06:00:01Z'},trace_id:'synthetic'};assert.ok(validates('ExportInboxPageResult',result));assert.equal(validates('ExportInboxPageResult',{...result,data:{...result.data,next_before_id:id('1')}}),false);assert.equal(validates('ExportInboxMessage',{...inboxMessageSample(),content_url:'https://example.invalid/download'}),false);});
 
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.60.0');
+  assert.equal(contract.info.version, '0.61.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/sla'].get;
@@ -971,7 +972,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.60.0');
+  assert.equal(contract.info.version, '0.61.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1042,7 +1043,7 @@ test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26�
 });
 
 test('监控事件中心、降噪漏斗、维护窗口、隔离区人工决策与自动建单契约保持Q14/Q29待确认约束（D15/M1-2/M4-7..M4-11/M4-14/M5-4）', () => {
-  assert.equal(contract.info.version, '0.60.0');
+  assert.equal(contract.info.version, '0.61.0');
   assert.equal(contract.paths['/events'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/events'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/events/{id}'].get['x-mop-capability'], 'tickets:read');
@@ -1110,4 +1111,24 @@ test('变更报备审批契约绑定修订并保留未生效边界', () => {
   assert.equal(validates('ChangeNoticeApprovalAction', { expected_version: 2, action: 'REJECT', note: null }), false);
   assert.equal(validates('ChangeNoticeApprovalAction', { expected_version: 2, action: 'APPROVE', note: null }), true);
   assert.equal(validates('ChangeNoticeApprovalAction', { expected_version: 2, action: 'APPROVE', note: null, actor_id: 'fake' }), false);
+});
+
+test('D09 report draft contract requires explicit frozen source and nullable unapproved configuration',()=>{
+  const configuration={revision:null,time_zone:null,duplicate_rule:null,archived_rule:null,metric_version:null,report_template_version:null};
+  const input={expected_version:0,label:'SYNTHETIC_DRAFT',source_collection_id:id('1'),expected_source_document_sha256:'a'.repeat(64),expected_source_manifest_sha256:'b'.repeat(64),year:2026,quarter:4,configuration};
+  assert.equal(validates('InspectionQuarterlyReportCreate',input),true);
+  for(const patch of [{summary:{}},{tenant_id:id('2')},{quarter:5},{expected_version:1},{configuration:{...configuration,duplicate_rule:'GUESS_LATEST'}},{configuration:{}}])assert.equal(validates('InspectionQuarterlyReportCreate',{...input,...patch}),false);
+  const post=contract.paths['/inspection-quarterly-reports'].post;
+  assert.deepEqual(post['x-mop-roles'],['padmin']);assert.equal(post['x-mop-capability'],'inspection_quarterly_reports:write');assert.equal(post['x-mop-idempotent-replay-reauthorization'],true);
+  assert.equal(contract.components.schemas.InspectionQuarterlyReportDetail.properties.projection.const,'FROZEN_INPUT_OUTPUT');
+  assert.equal(contract.components.schemas.InspectionQuarterlyReportFrozenDocument.properties.output.properties.report_published.const,false);
+});
+
+test('D09 Java-produced frozen details match the exact full input/output contract',()=>{
+  for(const name of ['pending','selected']){
+    const value=read(`../fixtures/inspection-quarterly-report/${name}.json`);
+    assert.equal(validates('InspectionQuarterlyReportDetailResult',value),true,JSON.stringify(ajv.getSchema('urn:mop:actual-api#/components/schemas/InspectionQuarterlyReportDetailResult').errors));
+    assert.equal(createHash('sha256').update(JSON.stringify(value.data.frozen_document),'utf8').digest('hex'),value.data.document_sha256);
+    const forged=structuredClone(value);forged.data.frozen_document.output.report_published=true;assert.equal(validates('InspectionQuarterlyReportDetailResult',forged),false);
+  }
 });

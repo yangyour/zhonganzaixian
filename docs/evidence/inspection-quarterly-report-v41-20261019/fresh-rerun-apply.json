@@ -1,0 +1,6 @@
+{
+  "sha256": "54b9bd1d0995a248191e8f8f7dafe35fafd7d4ec15699a2ca8a49a7a025c7aa2",
+  "applied_at_utc": "2026-10-19T10:50:25.069237+00:00",
+  "environment": "dot-report-v41-fresh-pg",
+  "snapshot_commit": "0a8c584fe7c716f31f69b01df28bb84493a6fffc"
+}

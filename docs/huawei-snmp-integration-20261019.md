@@ -1,5 +1,11 @@
 # 华为 S5731 MIB 核对与只读 SNMP 联调
 
+## 实际团体字替换后的复测（2026-10-19）
+
+用户已明确提供实际团体字。仅更新Git忽略的`deploy/private/huawei-snmp.json`，不在源码、文档或报告中记录其值；本轮不再使用原文档示例。保持SNMP v2c、192.168.1.2:161及固定主机信任，从指定服务器和既有Zabbix网络命名空间各发一个身份GET，均为2秒`TIMEOUT_NO_RESPONSE`，没有GETNEXT、身份或资源首值。诊断源SHA256核对一致，真实只读证据见[实际参数复测](evidence/huawei-snmp-actual-credential-probe-20261019.json)。
+
+“实际团体字尚未提供”已解除，但设备上的团体权限、MIB视图/ACL及SNMP监听配置仍未核验；不能由无应答推断团体字错误或正确。结合上轮用户截图，Polling v2c启用与目标IP归属Vlanif192/up/up保持已确认。设备monitoring_ready=false。下一步读取设备SNMP统计及协议配置，区分收包、认证/权限/编码拒绝和响应路径；未尝试其他秘密、修改监听/ACL、运行SET或安装替代组件。
+
 ## v2c 与目标接口确认后的复测（2026-10-19）
 
 用户最新三张 CLI 截图确认 Polling v1/v2c=enable、v3=disable，Vlanif192 的地址为192.168.1.2/24、Physical/Protocol 均up；不再将“v2c未开启”或“目标IP不属于Vlanif192”作为当前阻塞。此证据来自用户截图，未通过设备SSH或SNMP验证身份/固件；实际生效的SNMP源接口命令仍只有较早网页证据，不能扩写为完整配置已核验。截图指纹与提取事实见[观察记录](evidence/huawei-snmp-v2c-enabled-observations-20261019.json)。

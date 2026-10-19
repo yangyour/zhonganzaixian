@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.56.0",
+    "version": "0.57.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -33295,6 +33295,1206 @@
         ],
         "x-mop-capability": "ticket_notes:write_internal"
       }
+    },
+    "/events": {
+      "get": {
+        "operationId": "getMonitoringEventWorkspace",
+        "summary": "读取监控事件中心主事件流、降噪漏斗、维护窗口、隔离区与自动建单补偿列表（D15/M4-7..M4-11/M4-14/M5-4）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "读取监控事件中心主事件流、降噪漏斗、维护窗口、隔离区与自动建单补偿列表（D15/M4-7..M4-11/M4-14/M5-4）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringEventWorkspaceResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "window",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "24h",
+                "7d",
+                "30d"
+              ]
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          }
+        ],
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "tickets:read"
+      },
+      "post": {
+        "operationId": "ingestMonitoringEvent",
+        "summary": "归一化接入监控事件：5分钟指纹去重合并×N、闪断静默、依赖拓扑抑制、维护窗口静默、2分钟自愈取消通知与自动建单指数退避（M4-7..M4-11/M5-4）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "归一化接入监控事件：5分钟指纹去重合并×N、闪断静默、依赖拓扑抑制、维护窗口静默、2分钟自愈取消通知与自动建单指数退避（M4-7..M4-11/M5-4）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringEventSummaryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{8,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitoringIngestEventInput"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "ticket_notes:write_internal"
+      }
+    },
+    "/events/{id}": {
+      "get": {
+        "operationId": "getMonitoringEventDetail",
+        "summary": "读取监控事件抽屉详情：原始合并成员列表、降噪分层轨迹与通知空状态精确解释（M4-7/M4-14）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "读取监控事件抽屉详情：原始合并成员列表、降噪分层轨迹与通知空状态精确解释（M4-7/M4-14）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringEventDetailResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/events/{id}/actions": {
+      "post": {
+        "operationId": "transitionMonitoringEvent",
+        "summary": "执行事件人工处理状态流转（确认固化first_ack_at、开始处理、解决、关闭；监控状态与处理状态正交独立，M4-9）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "执行事件人工处理状态流转（确认固化first_ack_at、开始处理、解决、关闭；监控状态与处理状态正交独立，M4-9）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringEventSummaryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{8,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitoringTransitionEventInput"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "ticket_notes:write_internal"
+      }
+    },
+    "/events/noise-funnel": {
+      "get": {
+        "operationId": "getMonitoringNoiseFunnel",
+        "summary": "按24h/7d/30d窗口统计告警降噪漏斗6层计数（原始到达/去重合并/闪断静默/依赖抑制/维护期静默/有效告警，M4-11）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "按24h/7d/30d窗口统计告警降噪漏斗6层计数（原始到达/去重合并/闪断静默/依赖抑制/维护期静默/有效告警，M4-11）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringNoiseFunnelResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "window",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "24h",
+                "7d",
+                "30d"
+              ]
+            }
+          }
+        ],
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "tickets:read"
+      }
+    },
+    "/maintenance-windows": {
+      "post": {
+        "operationId": "createMaintenanceWindow",
+        "summary": "创建计划维护窗口（默认sla_exclusion_confirmed=false，未获平台管理员二次确认前不计入SLA排除时长，M4-10）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "创建计划维护窗口（默认sla_exclusion_confirmed=false，未获平台管理员二次确认前不计入SLA排除时长，M4-10）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaintenanceWindowResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{8,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMaintenanceWindowInput"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "ticket_notes:write_internal"
+      }
+    },
+    "/maintenance-windows/{id}/actions": {
+      "post": {
+        "operationId": "updateMaintenanceWindow",
+        "summary": "延长、提前结束、取消维护窗口或由平台管理员二次确认SLA排除生效（M4-10）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "延长、提前结束、取消维护窗口或由平台管理员二次确认SLA排除生效（M4-10）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaintenanceWindowResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{8,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMaintenanceWindowInput"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "ticket_notes:write_internal"
+      }
+    },
+    "/monitoring-quarantine/{id}/decisions": {
+      "post": {
+        "operationId": "resolveMonitoringQuarantine",
+        "summary": "人工处置监控隔离区记录（绑定当前租户资产回灌事件流或明确原因丢弃；追加式账本不修改V30隔离原表，M1-2）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "人工处置监控隔离区记录（绑定当前租户资产回灌事件流或明确原因丢弃；追加式账本不修改V30隔离原表，M1-2）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonitoringQuarantineDecisionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{8,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MonitoringQuarantineDecisionInput"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "ticket_notes:write_internal"
+      }
+    },
+    "/autoticket-attempts/{id}/manual-create": {
+      "post": {
+        "operationId": "manualCreateAutoTicket",
+        "summary": "对连续5次自动建单重试耗尽进入隔离态的事件执行一键人工补建工单（M5-4）",
+        "x-mop-current-membership-recheck": true,
+        "x-mop-source": "postgresql",
+        "responses": {
+          "200": {
+            "description": "对连续5次自动建单重试耗尽进入隔离态的事件执行一键人工补建工单（M5-4）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutoTicketAttemptResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "监控事件中心、降噪漏斗、维护窗口、隔离区人工决策或自动建单补偿授权/版本/参数/依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{8,128}$"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManualAutoTicketInput"
+              }
+            }
+          }
+        },
+        "x-mop-roles": [
+          "msp",
+          "padmin"
+        ],
+        "x-mop-capability": "ticket_notes:write_internal"
+      }
     }
   },
   "components": {
@@ -65916,6 +67116,1392 @@
         "required": [
           "data",
           "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringEventSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "asset_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "rule_code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "rule_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "severity": {
+            "enum": [
+              "DISASTER",
+              "HIGH",
+              "AVERAGE",
+              "WARNING",
+              "INFO"
+            ]
+          },
+          "severity_rank": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "fingerprint": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "occurrence_count": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "flap_flip_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "flap_silenced_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "monitor_state": {
+            "enum": [
+              "PROBLEM",
+              "RECOVERED"
+            ]
+          },
+          "handling_state": {
+            "enum": [
+              "NEW",
+              "ACKNOWLEDGED",
+              "IN_PROGRESS",
+              "RESOLVED",
+              "CLOSED"
+            ]
+          },
+          "suppression_state": {
+            "enum": [
+              "NONE",
+              "FLAP_SILENCED",
+              "DEPENDENCY_SUPPRESSED",
+              "MAINTENANCE_SILENCED"
+            ]
+          },
+          "suppression_reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "notification_empty_state": {
+            "enum": [
+              "NORMAL_DISPATCH_ELIGIBLE",
+              "SILENCED_NO_NOTIFICATION",
+              "RECOVERED_within_2MIN_CANCELLED",
+              "BELOW_SUBSCRIPTION_LEVEL_UNSENT"
+            ]
+          },
+          "notification_empty_state_label": {
+            "enum": [
+              "符合外发条件（按已启用渠道投递）",
+              "已被静默规则抑制，未发送通知",
+              "2分钟内自动恢复，通知已取消",
+              "低于客户通知订阅级别，未发送"
+            ]
+          },
+          "sla_unknown_marked": {
+            "type": "boolean"
+          },
+          "review_policy_status": {
+            "const": "CONFIG_PENDING_Q29"
+          },
+          "problem_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "recovered_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "first_ack_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "closed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "root_cause_note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ticket_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updated_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "asset_id",
+          "version",
+          "rule_code",
+          "rule_name",
+          "severity",
+          "severity_rank",
+          "fingerprint",
+          "occurrence_count",
+          "flap_flip_count",
+          "flap_silenced_until",
+          "monitor_state",
+          "handling_state",
+          "suppression_state",
+          "suppression_reason",
+          "notification_empty_state",
+          "notification_empty_state_label",
+          "sla_unknown_marked",
+          "review_policy_status",
+          "problem_at",
+          "last_occurred_at",
+          "recovered_at",
+          "first_ack_at",
+          "resolved_at",
+          "closed_at",
+          "root_cause_note",
+          "ticket_id",
+          "updated_by",
+          "updated_at"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringEventSummaryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MonitoringEventSummary"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringEventMember": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "event_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "raw_event_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sequence_no": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "source_event_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "source_phase": {
+            "enum": [
+              "PROBLEM",
+              "RECOVERED"
+            ]
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "merged_within_window": {
+            "type": "boolean"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "event_id",
+          "raw_event_id",
+          "sequence_no",
+          "source_event_id",
+          "source_phase",
+          "occurred_at",
+          "merged_within_window",
+          "recorded_at"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringNoiseRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "event_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "layer": {
+            "enum": [
+              "RAW_INTAKE",
+              "MERGED_DEDUPLICATED",
+              "FLAP_SILENCED",
+              "DEPENDENCY_SUPPRESSED",
+              "MAINTENANCE_SILENCED",
+              "EFFECTIVE_ALERT"
+            ]
+          },
+          "detail": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "event_id",
+          "layer",
+          "detail",
+          "recorded_at"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringNoiseFunnel": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "window": {
+            "enum": [
+              "24h",
+              "7d",
+              "30d"
+            ]
+          },
+          "raw_intake_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "merged_deduplicated_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "flap_silenced_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "dependency_suppressed_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "maintenance_silenced_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "effective_alert_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "tenant_id",
+          "window",
+          "raw_intake_count",
+          "merged_deduplicated_count",
+          "flap_silenced_count",
+          "dependency_suppressed_count",
+          "maintenance_silenced_count",
+          "effective_alert_count",
+          "observed_at"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringNoiseFunnelResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MonitoringNoiseFunnel"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "MaintenanceWindowEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "asset_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "silence_mode": {
+            "enum": [
+              "SUPPRESS_NOTIFY",
+              "SILENCE_ALL_EXCEPT_DISASTER"
+            ]
+          },
+          "status": {
+            "enum": [
+              "SCHEDULED",
+              "ACTIVE",
+              "ENDED",
+              "CANCELLED"
+            ]
+          },
+          "sla_exclusion_requested": {
+            "type": "boolean"
+          },
+          "sla_exclusion_confirmed": {
+            "type": "boolean"
+          },
+          "sla_exclusion_confirmed_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sla_exclusion_confirmed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "updated_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "version",
+          "name",
+          "asset_id",
+          "starts_at",
+          "ends_at",
+          "silence_mode",
+          "status",
+          "sla_exclusion_requested",
+          "sla_exclusion_confirmed",
+          "sla_exclusion_confirmed_by",
+          "sla_exclusion_confirmed_at",
+          "reason",
+          "created_by",
+          "updated_by",
+          "updated_at"
+        ],
+        "additionalProperties": false
+      },
+      "MaintenanceWindowResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MaintenanceWindowEntry"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringQuarantineItem": {
+        "type": "object",
+        "properties": {
+          "quarantine_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "pool_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_event_id": {
+            "type": "string"
+          },
+          "source_phase": {
+            "enum": [
+              "PROBLEM",
+              "RECOVERY"
+            ]
+          },
+          "claimed_tenant_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "claimed_asset_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "quarantine_reason": {
+            "type": "string"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "received_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "quarantine_status": {
+            "type": "string"
+          },
+          "decision": {
+            "anyOf": [
+              {
+                "enum": [
+                  "BOUND",
+                  "DISCARDED"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bound_asset_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "result_event_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "decision_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "decided_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "quarantine_id",
+          "pool_id",
+          "source_event_id",
+          "source_phase",
+          "claimed_tenant_id",
+          "claimed_asset_id",
+          "quarantine_reason",
+          "occurred_at",
+          "received_at",
+          "quarantine_status",
+          "decision",
+          "bound_asset_id",
+          "result_event_id",
+          "decision_reason",
+          "decided_by",
+          "decided_at"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringQuarantineDecisionResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MonitoringQuarantineItem"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "AutoTicketAttemptEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "event_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "attempt_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "max_retries": {
+            "const": 5
+          },
+          "backoff_schedule_sec": {
+            "const": "30,120,600,600,600"
+          },
+          "status": {
+            "enum": [
+              "NOT_REQUIRED",
+              "RETRY_SCHEDULED",
+              "CREATED",
+              "QUARANTINED_MANUAL_REQUIRED",
+              "MANUAL_CREATED"
+            ]
+          },
+          "mapped_priority": {
+            "enum": [
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ]
+          },
+          "mapping_policy_status": {
+            "const": "CONFIG_PENDING_Q14"
+          },
+          "ticket_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "next_retry_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updated_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "event_id",
+          "version",
+          "attempt_count",
+          "max_retries",
+          "backoff_schedule_sec",
+          "status",
+          "mapped_priority",
+          "mapping_policy_status",
+          "ticket_id",
+          "next_retry_at",
+          "last_error",
+          "updated_by",
+          "updated_at"
+        ],
+        "additionalProperties": false
+      },
+      "AutoTicketAttemptResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AutoTicketAttemptEntry"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringIngestEventInput": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rule_code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "rule_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "severity": {
+            "enum": [
+              "DISASTER",
+              "HIGH",
+              "AVERAGE",
+              "WARNING",
+              "INFO"
+            ]
+          },
+          "source_phase": {
+            "enum": [
+              "PROBLEM",
+              "RECOVERED"
+            ]
+          },
+          "source_event_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "flap_flip_count_in_10m": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "subscription_min_severity": {
+            "anyOf": [
+              {
+                "enum": [
+                  "DISASTER",
+                  "HIGH",
+                  "AVERAGE",
+                  "WARNING",
+                  "INFO"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "simulate_autoticket_failures": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "asset_id",
+          "rule_code",
+          "rule_name",
+          "severity",
+          "source_phase",
+          "source_event_id",
+          "occurred_at",
+          "flap_flip_count_in_10m",
+          "subscription_min_severity",
+          "simulate_autoticket_failures"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringTransitionEventInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "action": {
+            "enum": [
+              "ACKNOWLEDGE",
+              "START_PROGRESS",
+              "RESOLVE",
+              "CLOSE"
+            ]
+          },
+          "root_cause_note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "expected_version",
+          "action",
+          "root_cause_note"
+        ],
+        "additionalProperties": false
+      },
+      "CreateMaintenanceWindowInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "asset_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "silence_mode": {
+            "enum": [
+              "SUPPRESS_NOTIFY",
+              "SILENCE_ALL_EXCEPT_DISASTER"
+            ]
+          },
+          "sla_exclusion_requested": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "name",
+          "asset_id",
+          "starts_at",
+          "ends_at",
+          "silence_mode",
+          "sla_exclusion_requested",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateMaintenanceWindowInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "action": {
+            "enum": [
+              "EXTEND",
+              "END_EARLY",
+              "CANCEL",
+              "CONFIRM_SLA_EXCLUSION"
+            ]
+          },
+          "new_ends_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "expected_version",
+          "action",
+          "new_ends_at"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringQuarantineDecisionInput": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "enum": [
+              "BOUND",
+              "DISCARDED"
+            ]
+          },
+          "bound_asset_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "decision",
+          "bound_asset_id",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "ManualAutoTicketInput": {
+        "type": "object",
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "expected_version",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringEventWorkspaceResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "events": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "$ref": "#/components/schemas/MonitoringEventSummary"
+                }
+              },
+              "noise_funnel": {
+                "$ref": "#/components/schemas/MonitoringNoiseFunnel"
+              },
+              "maintenance_windows": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "$ref": "#/components/schemas/MaintenanceWindowEntry"
+                }
+              },
+              "quarantine_items": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "$ref": "#/components/schemas/MonitoringQuarantineItem"
+                }
+              },
+              "autoticket_attempts": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "$ref": "#/components/schemas/AutoTicketAttemptEntry"
+                }
+              },
+              "review_policy_status": {
+                "const": "CONFIG_PENDING_Q29"
+              },
+              "mapping_policy_status": {
+                "const": "CONFIG_PENDING_Q14"
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "tenant_id",
+              "events",
+              "noise_funnel",
+              "maintenance_windows",
+              "quarantine_items",
+              "autoticket_attempts",
+              "review_policy_status",
+              "mapping_policy_status",
+              "observed_at",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringEventDetailResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "$ref": "#/components/schemas/MonitoringEventSummary"
+              },
+              "members": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "$ref": "#/components/schemas/MonitoringEventMember"
+                }
+              },
+              "noise_records": {
+                "type": "array",
+                "maxItems": 200,
+                "items": {
+                  "$ref": "#/components/schemas/MonitoringNoiseRecord"
+                }
+              },
+              "autoticket_attempt": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/MonitoringAutoTicketAttemptRef"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "const": "postgresql"
+              }
+            },
+            "required": [
+              "event",
+              "members",
+              "noise_records",
+              "autoticket_attempt",
+              "observed_at",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "MonitoringAutoTicketAttemptRef": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "event_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "attempt_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "max_retries": {
+            "const": 5
+          },
+          "backoff_schedule_sec": {
+            "const": "30,120,600,600,600"
+          },
+          "status": {
+            "enum": [
+              "NOT_REQUIRED",
+              "RETRY_SCHEDULED",
+              "CREATED",
+              "QUARANTINED_MANUAL_REQUIRED",
+              "MANUAL_CREATED"
+            ]
+          },
+          "mapped_priority": {
+            "enum": [
+              "P1",
+              "P2",
+              "P3",
+              "P4"
+            ]
+          },
+          "mapping_policy_status": {
+            "const": "CONFIG_PENDING_Q14"
+          },
+          "ticket_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "next_retry_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updated_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "event_id",
+          "version",
+          "attempt_count",
+          "max_retries",
+          "backoff_schedule_sec",
+          "status",
+          "mapped_priority",
+          "mapping_policy_status",
+          "ticket_id",
+          "next_retry_at",
+          "last_error",
+          "updated_by",
+          "updated_at"
         ],
         "additionalProperties": false
       }

@@ -16,6 +16,7 @@ export const router = createRouter({
     { path: '/dashboard', name: 'dashboard', component: () => import('./pages/DashboardPage.vue'), meta: { title: '运营总览', group: '资源', capability: 'dashboard:read' } },
     { path: '/assets', name: 'assets', component: () => import('./pages/AssetsPage.vue'), meta: { title: '资产管理', group: '资源', capability: 'assets:read' } },
     { path: '/network-monitoring', name: 'network-monitoring', component: () => import('./pages/NetworkMonitoringPage.vue'), meta: { title: '基础网络监控', group: '资源', capability: 'assets:read' } },
+    { path: '/monitoring-events', name: 'monitoring-events', component: () => import('./pages/MonitoringEventsPage.vue'), meta: { title: '监控事件中心与降噪', group: '资源', roles: ['padmin','msp'], capability: 'tickets:read' } },
     { path: '/manual-incidents', name: 'manual-incidents', component: () => import('./pages/ManualIncidentsPage.vue'), meta: { title: '手工故障登记', group: '服务', capability: 'manual_incidents:read' } },
     { path: '/tickets', name: 'tickets', component: () => import('./pages/TicketsPage.vue'), meta: { title: '报障与受理', group: '服务', capability: 'tickets:read' } },
     { path: '/ticket-workflows', name: 'ticket-workflows', component: () => import('./pages/TicketWorkflowsPage.vue'), meta: { title: '工单处理', group: '服务', capability: 'tickets:read' } },

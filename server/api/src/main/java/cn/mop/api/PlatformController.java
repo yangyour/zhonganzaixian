@@ -54,6 +54,8 @@ public class PlatformController {
     private cn.mop.domain.sla.ServiceTierRepository serviceTiers;
     @org.springframework.beans.factory.annotation.Autowired(required=false)
     private cn.mop.domain.sla.OnCallEscalationRepository onCallEscalations;
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    private cn.mop.domain.monitoring.MonitoringEventCenterRepository monitoringEventCenter;
     private final byte[] cursorSecret=new byte[32];
     private static final Set<String> TYPES=Set.of("router","switch","firewall","ap","wireless_controller","other");
     private record Access(FixtureUser user,Tenant tenant,Membership membership,List<String> capabilities){}
@@ -62,6 +64,7 @@ public class PlatformController {
     public PlatformController(PlatformRepository repository,ObjectMapper mapper,ObjectProvider<TestOidcConfiguration.OidcDependencyProbe> identityProbe,ObjectProvider<PhotoConfiguration.PhotoDependencyProbe> photoProbe,ObjectProvider<AssetImportConfiguration.ImportDependencyProbe> importProbe,ObjectProvider<ProjectIdentityService> projectIdentity){this.repository=repository;this.mapper=mapper;this.identityProbe=identityProbe;this.photoProbe=photoProbe;this.importProbe=importProbe;this.projectIdentity=projectIdentity;new SecureRandom().nextBytes(cursorSecret);}
     @GetMapping("/health/live") Object live(HttpServletRequest request){return success(map("status","UP","mode",repository.metadata().mode(),"source",repository.metadata().source()),request);}
     @GetMapping("/health/ready") Object ready(HttpServletRequest request){
+        if(monitoringEventCenter!=null&&!monitoringEventCenter.readinessProblems().isEmpty())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","已启用的监控事件中心结构未就绪",List.of(map("component","monitoring_event_center","reasons",monitoringEventCenter.readinessProblems())));
         if(onCallEscalations!=null&&!onCallEscalations.readinessProblems().isEmpty())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","已启用的值班与升级结构未就绪",List.of(map("component","oncall_escalation","reasons",onCallEscalations.readinessProblems())));
         if(serviceTiers!=null&&!serviceTiers.readinessProblems().isEmpty())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","已启用的服务档位结构未就绪",List.of(map("component","service_tier","reasons",serviceTiers.readinessProblems())));
         if(ticketNotifications!=null&&!ticketNotifications.readinessProblems().isEmpty())throw new DomainException(503,"UPSTREAM_UNAVAILABLE","已启用的工单站内通知结构未就绪",List.of(map("component","ticket_notification","reasons",ticketNotifications.readinessProblems())));

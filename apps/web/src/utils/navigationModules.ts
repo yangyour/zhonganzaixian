@@ -5,7 +5,7 @@ export interface NavigationModule {id:string;title:string;items:NavigationItem[]
 /** Detail-only routes retain the context of their existing, permission-filtered entry. */
 export function navigationEntryName(name: unknown): unknown { return name === 'contact-import-preview' ? 'contact-imports' : name }
 const modules:NavigationModule[]=[
- {id:'resources',title:'资源与监控',items:[['dashboard','运营总览'],['assets','资产管理'],['network-monitoring','基础网络监控'],['threshold-diagnostics','告警阈值诊断']].map(([name,title])=>({name:name!,title:title!}))},
+ {id:'resources',title:'资源与监控',items:[['dashboard','运营总览'],['assets','资产管理'],['network-monitoring','基础网络监控'],['monitoring-events','监控事件中心与降噪'],['threshold-diagnostics','告警阈值诊断']].map(([name,title])=>({name:name!,title:title!}))},
  {id:'service',title:'工单与服务',items:[['tickets','报障与受理'],['ticket-workflows','工单处理'],['ticket-notifications','工单通知'],['oncall-board','值班看板与升级链'],['manual-incidents','手工故障登记'],['sla-scenarios','SLA 场景测算'],['service-tiers','服务档位与SLA台账'],['sla-reports','SLA月报与赔付'],['asset-export-jobs','台账导出'],['my-export-messages','我的导出消息'],['my-worklogs','我的工时记录'],['my-notification-preferences','通知偏好设置']].map(([name,title])=>({name:name!,title:title!}))},
  {id:'maintenance',title:'备份与巡检',items:[['backup-plan-drafts','备份计划草稿'],['change-notice-drafts','变更报备草稿'],['inspection-templates','巡检模板管理'],['inspection-worksheets','人工巡检工单'],['inspection-source-collections','巡检来源集合']].map(([name,title])=>({name:name!,title:title!}))},
  {id:'customers',title:'客户与租户',items:[['tenant-inventory','租户资源台账'],['customer-contacts','客户联系人'],['contact-imports','联系人批量导入']].map(([name,title])=>({name:name!,title:title!}))},

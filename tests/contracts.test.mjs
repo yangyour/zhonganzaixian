@@ -245,7 +245,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.56.0');
+  assert.equal(contract.info.version, '0.57.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -905,7 +905,7 @@ test('站内消息只读列表与显式已读接口保持当前授权和CSRF幂�
 test('消息游标末页必须明确结束且签名链接只能指向本站下载接口',()=>{const result={data:{items:[inboxMessageSample()],has_more:false,next_before_issued_at:null,next_before_id:null,unread_count:1,observed_at:'2026-10-14T06:00:01Z'},trace_id:'synthetic'};assert.ok(validates('ExportInboxPageResult',result));assert.equal(validates('ExportInboxPageResult',{...result,data:{...result.data,next_before_id:id('1')}}),false);assert.equal(validates('ExportInboxMessage',{...inboxMessageSample(),content_url:'https://example.invalid/download'}),false);});
 
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.56.0');
+  assert.equal(contract.info.version, '0.57.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/sla'].get;
@@ -969,7 +969,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.56.0');
+  assert.equal(contract.info.version, '0.57.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1038,5 +1038,54 @@ test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26�
   assert.equal(validates('SlaMonthlyEvaluation', { ...evalObj, compensation_amount_fen: 400000 }), false);
   assert.ok(validates('SlaLatencyStats', latency));
 });
+
+test('监控事件中心、降噪漏斗、维护窗口、隔离区人工决策与自动建单契约保持Q14/Q29待确认约束（D15/M1-2/M4-7..M4-11/M4-14/M5-4）', () => {
+  assert.equal(contract.info.version, '0.57.0');
+  assert.equal(contract.paths['/events'].get['x-mop-capability'], 'tickets:read');
+  assert.equal(contract.paths['/events'].post['x-mop-capability'], 'ticket_notes:write_internal');
+  assert.equal(contract.paths['/events/{id}'].get['x-mop-capability'], 'tickets:read');
+  assert.equal(contract.paths['/events/{id}/actions'].post['x-mop-capability'], 'ticket_notes:write_internal');
+  assert.equal(contract.paths['/events/noise-funnel'].get['x-mop-capability'], 'tickets:read');
+  assert.equal(contract.paths['/maintenance-windows'].post['x-mop-capability'], 'ticket_notes:write_internal');
+  assert.equal(contract.paths['/maintenance-windows/{id}/actions'].post['x-mop-capability'], 'ticket_notes:write_internal');
+  assert.equal(contract.paths['/monitoring-quarantine/{id}/decisions'].post['x-mop-capability'], 'ticket_notes:write_internal');
+  assert.equal(contract.paths['/autoticket-attempts/{id}/manual-create'].post['x-mop-capability'], 'ticket_notes:write_internal');
+
+  const eventSummary = {
+    id: id('7'), tenant_id: id('1'), asset_id: id('2'), version: 2,
+    rule_code: 'LINK_DOWN', rule_name: '核心上联端口中断', severity: 'DISASTER', severity_rank: 5,
+    fingerprint: `FP_V1|${id('1')}|${id('2')}|LINK_DOWN`, occurrence_count: 5,
+    flap_flip_count: 0, flap_silenced_until: null,
+    monitor_state: 'RECOVERED', handling_state: 'IN_PROGRESS',
+    suppression_state: 'NONE', suppression_reason: null,
+    notification_empty_state: 'RECOVERED_within_2MIN_CANCELLED',
+    notification_empty_state_label: '2分钟内自动恢复，通知已取消',
+    sla_unknown_marked: false, review_policy_status: 'CONFIG_PENDING_Q29',
+    problem_at: '2026-10-18T10:00:00Z', last_occurred_at: '2026-10-18T10:01:30Z',
+    recovered_at: '2026-10-18T10:01:30Z', first_ack_at: '2026-10-18T10:00:45Z',
+    resolved_at: null, closed_at: null, root_cause_note: null, ticket_id: null,
+    updated_by: id('3'), updated_at: '2026-10-18T10:01:30Z',
+  };
+  assert.ok(validates('MonitoringEventSummary', eventSummary));
+  assert.equal(validates('MonitoringEventSummary', { ...eventSummary, review_policy_status: 'CONFIRMED' }), false);
+
+  const funnel = {
+    tenant_id: id('1'), window: '24h', raw_intake_count: 10, merged_deduplicated_count: 4,
+    flap_silenced_count: 1, dependency_suppressed_count: 1, maintenance_silenced_count: 1,
+    effective_alert_count: 3, observed_at: '2026-10-18T10:05:00Z',
+  };
+  assert.ok(validates('MonitoringNoiseFunnel', funnel));
+
+  const attempt = {
+    id: id('8'), tenant_id: id('1'), event_id: id('7'), version: 1,
+    attempt_count: 5, max_retries: 5, backoff_schedule_sec: '30,120,600,600,600',
+    status: 'QUARANTINED_MANUAL_REQUIRED', mapped_priority: 'P1', mapping_policy_status: 'CONFIG_PENDING_Q14',
+    ticket_id: null, next_retry_at: null, last_error: '连续5次自动建单重试失败',
+    updated_by: id('3'), updated_at: '2026-10-18T10:05:00Z',
+  };
+  assert.ok(validates('AutoTicketAttemptEntry', attempt));
+  assert.equal(validates('AutoTicketAttemptEntry', { ...attempt, mapping_policy_status: 'CONFIRMED' }), false);
+});
+
 
 

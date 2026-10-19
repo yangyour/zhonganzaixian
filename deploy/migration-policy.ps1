@@ -2,7 +2,7 @@
 function Get-MopMigrationMode {
     param([switch]$ApplyPhotos, [switch]$ApplyAssetImports, [string]$ApplyFeature)
     $features = @{
-        'oncall-escalation' = '--apply-oncall-escalation'; 'service-tiers' = '--apply-service-tiers'; 'notification-intents' = '--apply-notification-intents'; 'ticket-workflow' = '--apply-ticket-workflow'; 'export-inbox' = '--apply-export-inbox'; 'runtime-configuration' = '--apply-runtime-configuration'
+        'monitoring-event-center' = '--apply-monitoring-event-center'; 'oncall-escalation' = '--apply-oncall-escalation'; 'service-tiers' = '--apply-service-tiers'; 'notification-intents' = '--apply-notification-intents'; 'ticket-workflow' = '--apply-ticket-workflow'; 'export-inbox' = '--apply-export-inbox'; 'runtime-configuration' = '--apply-runtime-configuration'
         'asset-dependencies' = '--apply-asset-dependencies'; 'worklogs' = '--apply-worklogs'
         'asset-metadata' = '--apply-asset-metadata'; 'internal-notes' = '--apply-internal-notes'
         'ticket-comments' = '--apply-ticket-comments'; 'working-calendars' = '--apply-working-calendars'
@@ -48,6 +48,8 @@ function Assert-MopMigrationResources {
     $expected['V35__service_tiers_and_change_history.sql'] = 'f8bf2639d6ebb467a0d515147307ceb2e13c425b2337cbad69c88eee91330ed0'
     # V36 is an explicitly reviewed candidate for on-call roster/handoffs, escalation policies/runs and SLA monthly results.
     $expected['V36__oncall_escalation_and_sla_monthly_results.sql'] = '52f43d3f5eb43967ac8ff895da9b5503d2e1e83fc29d52adea2ce6076ab7c0cb'
+    # V37 is an explicitly reviewed candidate for monitoring event center, noise funnel, maintenance windows, quarantine decisions and auto-ticket attempts.
+    $expected['V37__monitoring_events_noise_funnel_and_maintenance_windows.sql'] = 'f6f9cc88bcbc4dcbaf1a76a849aa78ed2cf7af91e7fd9b5c80dbde4d9b9ab351'
     foreach ($directory in @((Join-Path $ProjectRoot 'server/persistence/src/main/resources/db/migration'), (Join-Path $PersistenceClasses 'db/migration'))) {
         $files = @(Get-ChildItem -LiteralPath $directory -File -ErrorAction Stop)
         if ($files.Count -ne $expected.Count) { throw '源码或构建迁移集合与冻结清单不一致。' }

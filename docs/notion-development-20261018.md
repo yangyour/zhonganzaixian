@@ -49,9 +49,19 @@ HTTP控制器、前端页面、迁移和持久层均已完成对应代码检查�
 - SLA报表与服务明细按并集算法去重并发故障时长，将未知/隔离采集区间单独展示而不冒充正常；月度SLA结果支持按冻结档位与工单样本计算达标率，支持月结冻结（`frozen=true`后由DB触发器与仓储双重拒绝修改/覆盖），在Q26服务费抵扣基数未确认前固定`compensation_amount_fen=null`与`CONFIG_PENDING_Q26`，同时提供候选A（固定比例）与候选B（按未达标缺口比例）参考值。
 - 远程PG17.9 `mop_test`完成V36迁移验证与`PostgresOnCallEscalationIntegrationTest`（2项）；`server/api`全量（1875项）、OpenAPI契约（137项）及Web全量（158文件/2216项）与构建通过。证据见[oncall-escalation-and-sla-reports-20261018.json](evidence/oncall-escalation-and-sla-reports-20261018.json)。
 
+## D15：监控事件中心、去重归并(×N)、降噪漏斗、维护窗口、隔离区人工决策与自动建单补偿已验证（V37 / API 0.57.0）
+
+针对合同M1-2、M4-7、M4-8、M4-9、M4-10、M4-11、M4-14、M5-4，新增V37六张表（`mop_monitoring_event`、`mop_monitoring_event_member`、`mop_event_noise_record`、`mop_maintenance_window`、`mop_monitoring_quarantine_decision`、`mop_autoticket_attempt`）、领域模型`MonitoringEventPipeline`与`MonitoringEventCenterRepository`、PostgreSQL仓储`PostgresMonitoringEventCenterRepository`、API控制器`MonitoringEventCenterController`及前端`MonitoringEventsPage.vue`（`/monitoring-events`）。
+
+- 5分钟同指纹去重合并：`occurrence_count`递增（`×N`角标），保留每次原始成员在抽屉明细回溯；10分钟内状态翻转≥3次自动触发30分钟闪断静默；结合资产依赖拓扑识别上游活跃故障并标记`DEPENDENCY_SUPPRESSED`。
+- 监控状态（`PROBLEM/RECOVERED`）与人工处理状态（`NEW/ACKNOWLEDGED/IN_PROGRESS/RESOLVED/CLOSED`）正交独立：设备自动恢复仅更新`monitor_state=RECOVERED`，不自动关闭进行中的人工处置；2分钟内自愈自动取消待发通知并显示“2分钟内自动恢复，通知已取消”；首次确认时间`first_ack_at`由DB触发器与领域模型双重保护不可篡改。
+- 计划维护窗口支持延长、提前结束、取消；申请SLA排除时默认`sla_exclusion_confirmed=false`，仅在`padmin`显式执行二次确认后才可计入SLA排除区间。
+- V30隔离区采用追加式决策表`mop_monitoring_quarantine_decision`（不修改V30不可变原表），支持绑定当前租户资产回灌事件中心或明确原因丢弃；自动建单支持5次指数退避重试（`30,120,600,600,600`秒），耗尽后进入`QUARANTINED_MANUAL_REQUIRED`并支持值班人员一键人工补建工单。Q14与Q29未确认前保持`CONFIG_PENDING_Q14`与`CONFIG_PENDING_Q29`。
+- 远程PG17.9 `mop_test`完成V37迁移验证与`PostgresMonitoringEventCenterIntegrationTest`（2项）；`TestSchemaMigrationTest`（41项）、`MonitoringEventPipelineTest`（5项）、`MonitoringEventCenterControllerTest`（2项）、OpenAPI契约（138项）及Web全量（159文件/2218项）与构建通过。证据见[monitoring-event-center-20261018.json](evidence/monitoring-event-center-20261018.json)。
+
 ## 当前环境阻塞
 
-读取Git忽略的既有LAN连接配置时，LAN测试站SSH握手失败（SSHException / banner未取得，尚未进入认证）；随后独立端口检查SSH读取超时，10010可建TCP但ready/live读取RemoteDisconnected。原指定测试服务器随后恢复并通过项目SSH隧道完成V29—V36与PG真实测试；LAN站点的当前版本/HTTP/浏览器证据仍未取得。未安装本机替代组件、未修改远端服务配置。
+读取Git忽略的既有LAN连接配置时，LAN测试站SSH握手失败（SSHException / banner未取得，尚未进入认证）；随后独立端口检查SSH读取超时，10010可建TCP但ready/live读取RemoteDisconnected。原指定测试服务器随后恢复并通过项目SSH隧道完成V29—V37与PG真实测试；LAN站点的当前版本/HTTP/浏览器证据仍未取得。未安装本机替代组件、未修改远端服务配置。
 
 ## 模块接续台账
 
@@ -60,7 +70,7 @@ HTTP控制器、前端页面、迁移和持久层均已完成对应代码检查�
 |D07 工单闭环|V33状态机/事件/Outbox/时钟任务及API/UI/真实PG已验证|测试站部署切换、正式SLA/客户规则确认与合同TC|
 |D11 通知与企微|V34工单通知意图与本人站内通知（API0.54/Web/真实PG）已验证|Q14/Q15/Q18确认后外部企微/短信/语音派发、死信与H5门户|
 |D16 SLA与值班|V35服务档位/SLA时钟与V36值班看板/升级链/SLA月报冻结（API0.56/Web/真实PG）已验证|Q05/Q08/Q15/Q26/Q27客户正式口径确认与测试站发布切换|
-|D15 告警事件链|V29/V30原始与隔离存储已有|归并/防抖/抑制/维护窗口、事件处置状态机与自动建单|
+|D15 告警事件链|V37监控事件中心/去重×N/降噪漏斗/维护窗口/隔离区决策/自动建单补偿（API0.57/Web/真实PG）已验证|Q14/Q20/Q29客户正式确认、Zabbix实时Webhook桥接与测试站发布切换|
 |D05 采集|已有AF持续采集证据；当前连通性未确认|SCP授权与资源能力、采集故障恢复|
 |D10 变更|已核对设计|审批/窗口配置/运行匹配，不把审批当设备执行|
 |D09 巡检|已核对设计|模板发布、执行证据、报告生成与冻结|
@@ -69,5 +79,6 @@ HTTP控制器、前端页面、迁移和持久层均已完成对应代码检查�
 |D12 报告|已核对设计|真实同源指标、不可变报告、H5/PDF、阅读与推送|
 |D13 堡垒机|组件/客户路线未验证|审批控制、适配接口、录屏可用性与真实联调|
 |D14 上线|未验收|128项TC、TLS/隔离/备份恢复及生产批准|
+
 
 

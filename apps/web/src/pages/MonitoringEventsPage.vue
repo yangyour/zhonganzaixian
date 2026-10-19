@@ -2,39 +2,57 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { api } from '../api/client'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
-import { session } from '../stores/session'
+import { session, switchingTenant, contextGeneration } from '../stores/session'
+import { onBeforeRouteLeave } from 'vue-router'
+import { contextTransitionGuards } from '../utils/contextTransitionGuard'
+import { exportUuid } from '../utils/assetExportJobs'
+import { utcInstantNanos } from '../utils/utcInstant'
 import {
   createMonitoringEventWorkspace,
+  canTransition,
+  validMaintenanceTime,
   emptyMonitoringEventCenterState,
   type FunnelWindow,
   type MonitoringEventCenterState,
 } from '../utils/monitoringEvents'
 
 const state = ref<MonitoringEventCenterState>(emptyMonitoringEventCenterState())
-const workspace = createMonitoringEventWorkspace(api, next => { state.value = next })
+const workspace = createMonitoringEventWorkspace(api, next => {
+  if (state.value.attempt && !next.attempt && !next.error) clearDrafts()
+  state.value = next
+})
 
-const canWrite = computed(() => Boolean(session.value?.capabilities.includes('ticket_notes:write_internal')))
-const canAdminConfirm = computed(() => session.value?.user.role === 'padmin' && canWrite.value)
-
-const rootCauseNote = ref('')
-const quarantineAssetId = ref('')
-const quarantineReason = ref('')
-const manualTicketReason = ref('')
+const canRead = computed(() => Boolean(session.value?.mode === 'remote_test' && ['msp', 'padmin'].includes(session.value.user.role) && session.value.capabilities.includes('tickets:read') && !switchingTenant.value))
+const canWrite = computed(() => canRead.value && Boolean(session.value?.capabilities.includes('ticket_notes:write_internal')))
+const canAdminConfirm = computed(() => canRead.value && session.value?.user.role === 'padmin' && Boolean(session.value?.capabilities.includes('configurations:write')))
+const locked = computed(() => state.value.busy !== null || state.value.attempt !== null)
+const rootCauseNotes = ref<Record<string, string>>({})
+const quarantineAssets = ref<Record<string, string>>({})
+const quarantineReasons = ref<Record<string, string>>({})
+const manualTicketReasons = ref<Record<string, string>>({})
+const windowEnds = ref<Record<string, string>>({})
+function clearDrafts() { rootCauseNotes.value = {}; quarantineAssets.value = {}; quarantineReasons.value = {}; manualTicketReasons.value = {}; windowEnds.value = {} }
+const validReason = (s: string | undefined) => Boolean(s?.trim() && Array.from(s).length <= 500)
+const validManualReason = (s: string | undefined) => validReason(s) && Array.from(s!.trim()).length <= 492
+function validExtension(id: string, endsAt: string) { const next = utcInstantNanos(windowEnds.value[id]), previous = utcInstantNanos(endsAt); return validMaintenanceTime(windowEnds.value[id]) && next !== null && previous !== null && next > previous }
 
 watch(
-  () => [session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, canWrite.value, canAdminConfirm.value] as const,
-  ([tenantId, actorId, permissionVersion, write, admin]) => {
-    if (!tenantId || !actorId || typeof permissionVersion !== 'number') {
-      workspace.reset(null)
-      return
-    }
-    workspace.reset({ tenantId, actorId, permissionVersion, canWriteInternal: write, canAdminConfirm: admin })
-    void workspace.load('24h')
+  () => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.user.role, canRead.value, canWrite.value, canAdminConfirm.value] as const,
+  () => {
+    clearDrafts()
+    const s = session.value
+    workspace.reset(s && canRead.value ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version, canWriteInternal: canWrite.value, canAdminConfirm: canAdminConfirm.value } : null)
+    if (canRead.value) void workspace.load('24h')
   },
-  { immediate: true },
+  { immediate: true, flush: 'sync' },
 )
 
-onBeforeUnmount(() => workspace.dispose())
+function mayLeave() { return !workspace.unresolved() }
+onBeforeRouteLeave(mayLeave)
+const unregister = contextTransitionGuards.register(mayLeave)
+function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved()) { event.preventDefault(); event.returnValue = '' } }
+window.addEventListener('beforeunload', beforeUnload)
+onBeforeUnmount(() => { unregister(); window.removeEventListener('beforeunload', beforeUnload); workspace.dispose() })
 
 function switchWindow(w: FunnelWindow) {
   void workspace.load(w)
@@ -47,19 +65,21 @@ function switchWindow(w: FunnelWindow) {
       <div>
         <h1 id="monitoring-events-title">监控事件中心与降噪漏斗</h1>
         <p class="muted">
-          5分钟同指纹去重合并（×N）、闪断10m≥3次静默30m、拓扑上游故障抑制、维护窗口SLA排除双确认、隔离区人工处置与自动建单补偿（Q14/Q29保持CONFIG_PENDING）。
+          5分钟同指纹去重合并（×N）、闪断10m≥3次静默5m、拓扑上游故障抑制、维护窗口SLA排除双确认、隔离区人工处置与自动建单补偿（Q14/Q29按服务端返回状态展示）。
         </p>
       </div>
       <div class="actions">
-        <button type="button" :disabled="state.busy !== null" @click="switchWindow('24h')">24h 漏斗</button>
-        <button type="button" :disabled="state.busy !== null" @click="switchWindow('7d')">7d 漏斗</button>
-        <button type="button" :disabled="state.busy !== null" @click="switchWindow('30d')">30d 漏斗</button>
+        <button type="button" :disabled="!canRead || locked" @click="switchWindow('24h')">24h 漏斗</button>
+        <button type="button" :disabled="!canRead || locked" @click="switchWindow('7d')">7d 漏斗</button>
+        <button type="button" :disabled="!canRead || locked" @click="switchWindow('30d')">30d 漏斗</button>
       </div>
     </header>
 
+    <p v-if="!canRead" role="status">当前没有监控事件读取权限，或正在切换租户。</p>
     <div v-if="state.error" class="alert alert-error" role="alert">
       <ApiErrorNotice :error="state.error" />
-      <button v-if="state.attempt" type="button" @click="workspace.retry()">原幂等键重试</button>
+      <p v-if="state.attempt">原操作结果尚未确认。输入、刷新和离开已锁定，请用原请求重试核对。</p>
+      <button v-if="state.attempt" type="button" :disabled="state.busy !== null" @click="workspace.retry()">原请求与幂等键重试</button>
     </div>
 
     <div v-if="state.workspace" class="workspace-grid">
@@ -68,7 +88,7 @@ function switchWindow(w: FunnelWindow) {
         <ul class="kpi-list">
           <li>原始到达：<strong>{{ state.workspace.noise_funnel.raw_intake_count }}</strong></li>
           <li>去重合并（5m窗口）：<strong>{{ state.workspace.noise_funnel.merged_deduplicated_count }}</strong></li>
-          <li>闪断静默（10m≥3次→30m）：<strong>{{ state.workspace.noise_funnel.flap_silenced_count }}</strong></li>
+          <li>闪断静默（10m≥3次→5m）：<strong>{{ state.workspace.noise_funnel.flap_silenced_count }}</strong></li>
           <li>拓扑依赖抑制：<strong>{{ state.workspace.noise_funnel.dependency_suppressed_count }}</strong></li>
           <li>维护期静默：<strong>{{ state.workspace.noise_funnel.maintenance_silenced_count }}</strong></li>
           <li>有效告警：<strong>{{ state.workspace.noise_funnel.effective_alert_count }}</strong></li>
@@ -101,21 +121,27 @@ function switchWindow(w: FunnelWindow) {
               <td>{{ ev.suppression_state }} <small v-if="ev.suppression_reason">({{ ev.suppression_reason }})</small></td>
               <td>{{ ev.notification_empty_state_label }}</td>
               <td>
-                <button type="button" @click="workspace.loadEventDetail(ev.id)">查看抽屉</button>
+                <button type="button" :disabled="locked" @click="workspace.loadEventDetail(ev.id)">查看抽屉</button>
                 <button
-                  v-if="canWrite && ev.handling_state === 'NEW'"
+                  v-if="canWrite && canTransition(ev, 'ACKNOWLEDGE')"
+                  :disabled="locked"
                   type="button"
                   @click="workspace.submitTransition(ev.id, { expected_version: ev.version, action: 'ACKNOWLEDGE', root_cause_note: null })"
                 >
                   确认 (固化first_ack_at)
                 </button>
-                <button
-                  v-if="canWrite && ev.handling_state !== 'RESOLVED' && ev.handling_state !== 'CLOSED'"
-                  type="button"
-                  @click="workspace.submitTransition(ev.id, { expected_version: ev.version, action: 'RESOLVE', root_cause_note: rootCauseNote || '已定位根因并处理' })"
-                >
-                  解决
-                </button>
+                <button v-if="canWrite && canTransition(ev, 'START')" type="button" :disabled="locked"
+                  @click="workspace.submitTransition(ev.id, { expected_version: ev.version, action: 'START', root_cause_note: null })">开始处理</button>
+                <button v-if="canWrite && canTransition(ev, 'MARK_PENDING_REVIEW')" type="button" :disabled="locked"
+                  @click="workspace.submitTransition(ev.id, { expected_version: ev.version, action: 'MARK_PENDING_REVIEW', root_cause_note: null })">转为待复核</button>
+                <template v-if="canWrite && ev.handling_state === 'PENDING_REVIEW'">
+                  <label :for="`root-cause-${ev.id}`">人工复核根因（至少5个字符，最多500个字符）</label>
+                  <textarea :id="`root-cause-${ev.id}`" v-model="rootCauseNotes[ev.id]" :disabled="locked" :aria-label="`${ev.rule_name}根因说明`" />
+                  <button type="button" :disabled="locked || !canTransition(ev, 'RESOLVE', rootCauseNotes[ev.id] ?? null)"
+                    @click="workspace.submitTransition(ev.id, { expected_version: ev.version, action: 'RESOLVE', root_cause_note: rootCauseNotes[ev.id] ?? null })">确认解决</button>
+                </template>
+                <button v-if="canWrite && canTransition(ev, 'CLOSE')" type="button" :disabled="locked"
+                  @click="workspace.submitTransition(ev.id, { expected_version: ev.version, action: 'CLOSE', root_cause_note: null })">关闭事件</button>
               </td>
             </tr>
           </tbody>
@@ -140,14 +166,21 @@ function switchWindow(w: FunnelWindow) {
           <li v-for="w in state.workspace.maintenance_windows" :key="w.id">
             <strong>{{ w.name }}</strong> ({{ w.starts_at }} ~ {{ w.ends_at }}) · 状态：{{ w.status }}
             · SLA排除申请：{{ w.sla_exclusion_requested ? '是' : '否' }}
-            · 管理员确认：<strong>{{ w.sla_exclusion_confirmed ? '已确认生效' : '未确认（不计入SLA排除）' }}</strong>
+            · 管理员确认：<strong>{{ w.sla_exclusion_confirmed ? '已记录管理员确认' : '未记录管理员确认' }}</strong>
             <button
               v-if="canAdminConfirm && w.sla_exclusion_requested && !w.sla_exclusion_confirmed"
+              :disabled="locked"
               type="button"
               @click="workspace.submitWindowAction(w.id, { expected_version: w.version, action: 'CONFIRM_SLA_EXCLUSION', new_ends_at: null })"
             >
               管理员确认SLA排除
             </button>
+            <template v-if="canWrite && (w.status === 'ACTIVE' || w.status === 'SCHEDULED')">
+              <label :for="`window-end-${w.id}`">延长至（UTC，含Z，最多毫秒精度）</label>
+              <input :id="`window-end-${w.id}`" v-model="windowEnds[w.id]" :disabled="locked" />
+              <button type="button" :disabled="locked || !validExtension(w.id, w.ends_at)" @click="workspace.submitWindowAction(w.id, { expected_version: w.version, action: 'EXTEND', new_ends_at: windowEnds[w.id] ?? null })">延长维护</button>
+              <button type="button" :disabled="locked" @click="workspace.submitWindowAction(w.id, { expected_version: w.version, action: 'END', new_ends_at: null })">结束维护</button>
+            </template>
           </li>
         </ul>
       </section>
@@ -157,26 +190,28 @@ function switchWindow(w: FunnelWindow) {
         <ul>
           <li v-for="q in state.workspace.quarantine_items" :key="q.quarantine_id">
             隔离事件 {{ q.source_event_id }} ({{ q.quarantine_reason }}) · 处置：{{ q.decision ?? '待人工决策' }}
-            <button
-              v-if="canWrite && !q.decision && quarantineAssetId && quarantineReason"
-              type="button"
-              @click="workspace.submitQuarantineDecision(q.quarantine_id, { decision: 'BOUND', bound_asset_id: quarantineAssetId, reason: quarantineReason })"
-            >
-              绑定资产并回灌
-            </button>
+            <template v-if="canWrite && !q.decision">
+              <label :for="`quarantine-asset-${q.quarantine_id}`">核验后绑定的资产UUID</label>
+              <input :id="`quarantine-asset-${q.quarantine_id}`" v-model="quarantineAssets[q.quarantine_id]" :disabled="locked" />
+              <label :for="`quarantine-reason-${q.quarantine_id}`">人工处置原因</label>
+              <textarea :id="`quarantine-reason-${q.quarantine_id}`" v-model="quarantineReasons[q.quarantine_id]" :disabled="locked" />
+              <button type="button" :disabled="locked || !exportUuid(quarantineAssets[q.quarantine_id]) || !validReason(quarantineReasons[q.quarantine_id])"
+                @click="workspace.submitQuarantineDecision(q.quarantine_id, { decision: 'BIND_ASSET', bound_asset_id: quarantineAssets[q.quarantine_id] ?? null, reason: quarantineReasons[q.quarantine_id] ?? '' })">绑定资产并回灌</button>
+              <button type="button" :disabled="locked || !validReason(quarantineReasons[q.quarantine_id])"
+                @click="workspace.submitQuarantineDecision(q.quarantine_id, { decision: 'DISCARD', bound_asset_id: null, reason: quarantineReasons[q.quarantine_id] ?? '' })">丢弃隔离事件</button>
+            </template>
           </li>
         </ul>
         <ul>
           <li v-for="a in state.workspace.autoticket_attempts" :key="a.id">
             事件 {{ a.event_id }} · 重试 {{ a.attempt_count }}/{{ a.max_retries }} ({{ a.backoff_schedule_sec }}s)
             · 状态：<strong>{{ a.status }}</strong> · 映射策略：{{ a.mapping_policy_status }}
-            <button
-              v-if="canWrite && a.status === 'QUARANTINED_MANUAL_REQUIRED'"
-              type="button"
-              @click="workspace.submitManualAutoTicket(a.id, { expected_version: a.version, reason: manualTicketReason || '值班人工一键补建工单' })"
-            >
-              一键人工补建工单
-            </button>
+            <template v-if="canWrite && (a.status === 'QUARANTINED_MANUAL_REQUIRED' || a.status === 'RETRY_SCHEDULED')">
+              <label :for="`manual-ticket-reason-${a.id}`">人工补建原因（最多492个字符）</label>
+              <textarea :id="`manual-ticket-reason-${a.id}`" v-model="manualTicketReasons[a.id]" :disabled="locked" />
+              <button type="button" :disabled="locked || !validManualReason(manualTicketReasons[a.id])"
+                @click="workspace.submitManualAutoTicket(a.id, { expected_version: a.version, reason: manualTicketReasons[a.id] ?? '' })">人工补建工单</button>
+            </template>
           </li>
         </ul>
       </section>

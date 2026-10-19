@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.61.0",
+    "version": "0.62.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -33425,7 +33425,7 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 100,
+              "maximum": 50,
               "default": 25
             }
           }
@@ -33434,16 +33434,23 @@
           "msp",
           "padmin"
         ],
-        "x-mop-capability": "tickets:read"
-      },
+        "x-mop-capability": "tickets:read",
+        "x-mop-allowed-query-keys": [
+          "window",
+          "page_size"
+        ],
+        "x-mop-reject-duplicate-query-keys": true
+      }
+    },
+    "/events/ingest": {
       "post": {
         "operationId": "ingestMonitoringEvent",
-        "summary": "归一化接入监控事件：5分钟指纹去重合并×N、闪断静默、依赖拓扑抑制、维护窗口静默、2分钟自愈取消通知与自动建单指数退避（M4-7..M4-11/M5-4）",
+        "summary": "归一化接入监控事件：5分钟指纹去重合并×N、闪断静默、依赖拓扑抑制、维护窗口静默与自动建单重试记录（M4-7..M4-11/M5-4）",
         "x-mop-current-membership-recheck": true,
         "x-mop-source": "postgresql",
         "responses": {
           "200": {
-            "description": "归一化接入监控事件：5分钟指纹去重合并×N、闪断静默、依赖拓扑抑制、维护窗口静默、2分钟自愈取消通知与自动建单指数退避（M4-7..M4-11/M5-4）",
+            "description": "归一化接入监控事件：5分钟指纹去重合并×N、闪断静默、依赖拓扑抑制、维护窗口静默与自动建单重试记录（M4-7..M4-11/M5-4）",
             "content": {
               "application/json": {
                 "schema": {
@@ -33566,7 +33573,8 @@
           "msp",
           "padmin"
         ],
-        "x-mop-capability": "ticket_notes:write_internal"
+        "x-mop-capability": "ticket_notes:write_internal",
+        "x-mop-idempotent-replay-reauthorization": true
       }
     },
     "/events/{id}": {
@@ -33674,7 +33682,8 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
             }
           }
         ],
@@ -33685,7 +33694,7 @@
         "x-mop-capability": "tickets:read"
       }
     },
-    "/events/{id}/actions": {
+    "/events/{id}/transitions": {
       "post": {
         "operationId": "transitionMonitoringEvent",
         "summary": "执行事件人工处理状态流转（确认固化first_ack_at、开始处理、解决、关闭；监控状态与处理状态正交独立，M4-9）",
@@ -33790,7 +33799,8 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
             }
           },
           {
@@ -33825,7 +33835,8 @@
           "msp",
           "padmin"
         ],
-        "x-mop-capability": "ticket_notes:write_internal"
+        "x-mop-capability": "ticket_notes:write_internal",
+        "x-mop-idempotent-replay-reauthorization": true
       }
     },
     "/events/noise-funnel": {
@@ -34077,18 +34088,19 @@
           "msp",
           "padmin"
         ],
-        "x-mop-capability": "ticket_notes:write_internal"
+        "x-mop-capability": "ticket_notes:write_internal",
+        "x-mop-idempotent-replay-reauthorization": true
       }
     },
     "/maintenance-windows/{id}/actions": {
       "post": {
         "operationId": "updateMaintenanceWindow",
-        "summary": "延长、提前结束、取消维护窗口或由平台管理员二次确认SLA排除生效（M4-10）",
+        "summary": "延长、结束维护窗口或由平台管理员二次确认SLA排除生效（M4-10）",
         "x-mop-current-membership-recheck": true,
         "x-mop-source": "postgresql",
         "responses": {
           "200": {
-            "description": "延长、提前结束、取消维护窗口或由平台管理员二次确认SLA排除生效（M4-10）",
+            "description": "延长、结束维护窗口或由平台管理员二次确认SLA排除生效（M4-10）",
             "content": {
               "application/json": {
                 "schema": {
@@ -34185,7 +34197,8 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
             }
           },
           {
@@ -34216,14 +34229,37 @@
             }
           }
         },
+        "x-mop-action-authorization": {
+          "EXTEND": {
+            "roles": [
+              "msp",
+              "padmin"
+            ],
+            "capability": "ticket_notes:write_internal"
+          },
+          "END": {
+            "roles": [
+              "msp",
+              "padmin"
+            ],
+            "capability": "ticket_notes:write_internal"
+          },
+          "CONFIRM_SLA_EXCLUSION": {
+            "roles": [
+              "padmin"
+            ],
+            "capability": "configurations:write"
+          }
+        },
         "x-mop-roles": [
           "msp",
           "padmin"
         ],
-        "x-mop-capability": "ticket_notes:write_internal"
+        "description": "授权按action分支检查：CONFIRM_SLA_EXCLUSION要求当前padmin及configurations:write，其他动作要求内部角色及ticket_notes:write_internal；幂等重放前重验同一动作权限。",
+        "x-mop-idempotent-replay-reauthorization": true
       }
     },
-    "/monitoring-quarantine/{id}/decisions": {
+    "/monitoring/quarantine/{id}/decisions": {
       "post": {
         "operationId": "resolveMonitoringQuarantine",
         "summary": "人工处置监控隔离区记录（绑定当前租户资产回灌事件流或明确原因丢弃；追加式账本不修改V30隔离原表，M1-2）",
@@ -34328,7 +34364,8 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
             }
           },
           {
@@ -34363,7 +34400,8 @@
           "msp",
           "padmin"
         ],
-        "x-mop-capability": "ticket_notes:write_internal"
+        "x-mop-capability": "ticket_notes:write_internal",
+        "x-mop-idempotent-replay-reauthorization": true
       }
     },
     "/autoticket-attempts/{id}/manual-create": {
@@ -34471,7 +34509,8 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "format": "uuid",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
             }
           },
           {
@@ -34506,7 +34545,8 @@
           "msp",
           "padmin"
         ],
-        "x-mop-capability": "ticket_notes:write_internal"
+        "x-mop-capability": "ticket_notes:write_internal",
+        "x-mop-idempotent-replay-reauthorization": true
       }
     },
     "/wecom/status": {
@@ -70617,20 +70657,23 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "tenant_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "asset_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "version": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 9007199254740990
+            "maximum": 9007199254740991
           },
           "rule_code": {
             "type": "string",
@@ -70640,7 +70683,7 @@
           "rule_name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 160
+            "maxLength": 128
           },
           "severity": {
             "enum": [
@@ -70658,8 +70701,8 @@
           },
           "fingerprint": {
             "type": "string",
-            "minLength": 1,
-            "maxLength": 256
+            "minLength": 5,
+            "maxLength": 160
           },
           "occurrence_count": {
             "type": "integer",
@@ -70691,6 +70734,7 @@
               "NEW",
               "ACKNOWLEDGED",
               "IN_PROGRESS",
+              "PENDING_REVIEW",
               "RESOLVED",
               "CLOSED"
             ]
@@ -70700,7 +70744,8 @@
               "NONE",
               "FLAP_SILENCED",
               "DEPENDENCY_SUPPRESSED",
-              "MAINTENANCE_SILENCED"
+              "MAINTENANCE_SILENCED",
+              "INFO_DEFAULT_SILENT"
             ]
           },
           "suppression_reason": {
@@ -70708,7 +70753,7 @@
               {
                 "type": "string",
                 "minLength": 1,
-                "maxLength": 500
+                "maxLength": 256
               },
               {
                 "type": "null"
@@ -70718,24 +70763,30 @@
           "notification_empty_state": {
             "enum": [
               "NORMAL_DISPATCH_ELIGIBLE",
-              "SILENCED_NO_NOTIFICATION",
-              "RECOVERED_within_2MIN_CANCELLED",
-              "BELOW_SUBSCRIPTION_LEVEL_UNSENT"
+              "DEPENDENCY_SUPPRESSED_NO_NOTIFY",
+              "MAINTENANCE_WINDOW_SUPPRESSED",
+              "FLAP_SILENCED_NO_NOTIFY",
+              "INFO_LEVEL_NO_NOTIFY"
             ]
           },
           "notification_empty_state_label": {
             "enum": [
-              "符合外发条件（按已启用渠道投递）",
-              "已被静默规则抑制，未发送通知",
-              "2分钟内自动恢复，通知已取消",
-              "低于客户通知订阅级别，未发送"
+              "符合派发条件（外部渠道待Q14/Q18配置）",
+              "依赖抑制：未发送通知",
+              "维护窗口：通知已抑制",
+              "抖动静默：5分钟内不再重复通知",
+              "无通知记录（信息级默认不通知）"
             ]
           },
           "sla_unknown_marked": {
             "type": "boolean"
           },
           "review_policy_status": {
-            "const": "CONFIG_PENDING_Q29"
+            "enum": [
+              "CONFIG_PENDING_Q29",
+              "PUBLISHED_Q29"
+            ],
+            "description": "当前运行写入固定CONFIG_PENDING_Q29；结构保留PUBLISHED_Q29，不表示本次已发布或客户已确认"
           },
           "problem_at": {
             "type": "string",
@@ -70794,7 +70845,7 @@
               {
                 "type": "string",
                 "minLength": 1,
-                "maxLength": 1000
+                "maxLength": 500
               },
               {
                 "type": "null"
@@ -70805,7 +70856,8 @@
             "anyOf": [
               {
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               {
                 "type": "null"
@@ -70814,7 +70866,8 @@
           },
           "updated_by": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "updated_at": {
             "type": "string",
@@ -70853,7 +70906,89 @@
           "updated_by",
           "updated_at"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "notification_empty_state": {
+                  "const": "NORMAL_DISPATCH_ELIGIBLE"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "notification_empty_state_label": {
+                  "const": "符合派发条件（外部渠道待Q14/Q18配置）"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "notification_empty_state": {
+                  "const": "DEPENDENCY_SUPPRESSED_NO_NOTIFY"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "notification_empty_state_label": {
+                  "const": "依赖抑制：未发送通知"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "notification_empty_state": {
+                  "const": "MAINTENANCE_WINDOW_SUPPRESSED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "notification_empty_state_label": {
+                  "const": "维护窗口：通知已抑制"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "notification_empty_state": {
+                  "const": "FLAP_SILENCED_NO_NOTIFY"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "notification_empty_state_label": {
+                  "const": "抖动静默：5分钟内不再重复通知"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "notification_empty_state": {
+                  "const": "INFO_LEVEL_NO_NOTIFY"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "notification_empty_state_label": {
+                  "const": "无通知记录（信息级默认不通知）"
+                }
+              }
+            }
+          }
+        ]
       },
       "MonitoringEventSummaryResult": {
         "type": "object",
@@ -70876,21 +71011,25 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "tenant_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "event_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "raw_event_id": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               {
                 "type": "null"
@@ -70904,7 +71043,7 @@
           "source_event_id": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 128
+            "maxLength": 256
           },
           "source_phase": {
             "enum": [
@@ -70943,30 +71082,26 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "tenant_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "event_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "layer": {
             "enum": [
               "RAW_INTAKE",
-              "MERGED_DEDUPLICATED",
-              "FLAP_SILENCED",
-              "DEPENDENCY_SUPPRESSED",
-              "MAINTENANCE_SILENCED",
+              "MERGE",
+              "FLAP",
+              "DEPENDENCY",
+              "MAINTENANCE",
               "EFFECTIVE_ALERT"
             ]
           },
@@ -70995,7 +71130,8 @@
         "properties": {
           "tenant_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "window": {
             "enum": [
@@ -71006,33 +71142,27 @@
           },
           "raw_intake_count": {
             "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740990
+            "minimum": 0
           },
           "merged_deduplicated_count": {
             "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740990
+            "minimum": 0
           },
           "flap_silenced_count": {
             "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740990
+            "minimum": 0
           },
           "dependency_suppressed_count": {
             "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740990
+            "minimum": 0
           },
           "maintenance_silenced_count": {
             "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740990
+            "minimum": 0
           },
           "effective_alert_count": {
             "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740990
+            "minimum": 0
           },
           "observed_at": {
             "type": "string",
@@ -71073,32 +71203,28 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "tenant_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "version": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 9007199254740990
+            "maximum": 9007199254740991
           },
           "name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 120
+            "maxLength": 128
           },
           "asset_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "starts_at": {
             "type": "string",
@@ -71111,7 +71237,7 @@
           "silence_mode": {
             "enum": [
               "SUPPRESS_NOTIFY",
-              "SILENCE_ALL_EXCEPT_DISASTER"
+              "PAUSE_COLLECTION"
             ]
           },
           "status": {
@@ -71132,7 +71258,8 @@
             "anyOf": [
               {
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               {
                 "type": "null"
@@ -71157,11 +71284,13 @@
           },
           "created_by": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "updated_by": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "updated_at": {
             "type": "string",
@@ -71210,26 +71339,31 @@
         "properties": {
           "quarantine_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "pool_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "source_event_id": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
           },
           "source_phase": {
             "enum": [
               "PROBLEM",
-              "RECOVERY"
+              "RECOVERED"
             ]
           },
           "claimed_tenant_id": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               {
                 "type": "null"
@@ -71240,7 +71374,8 @@
             "anyOf": [
               {
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               {
                 "type": "null"
@@ -71248,7 +71383,11 @@
             ]
           },
           "quarantine_reason": {
-            "type": "string"
+            "enum": [
+              "UNKNOWN_MAPPING",
+              "CROSS_TENANT_CLAIM",
+              "SOURCE_KEY_CONFLICT"
+            ]
           },
           "occurred_at": {
             "type": "string",
@@ -71259,14 +71398,14 @@
             "format": "date-time"
           },
           "quarantine_status": {
-            "type": "string"
+            "const": "HELD_UNVERIFIED"
           },
           "decision": {
             "anyOf": [
               {
                 "enum": [
-                  "BOUND",
-                  "DISCARDED"
+                  "BIND_ASSET",
+                  "DISCARD"
                 ]
               },
               {
@@ -71278,7 +71417,8 @@
             "anyOf": [
               {
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               {
                 "type": "null"
@@ -71289,7 +71429,8 @@
             "anyOf": [
               {
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               {
                 "type": "null"
@@ -71299,7 +71440,9 @@
           "decision_reason": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
               },
               {
                 "type": "null"
@@ -71310,7 +71453,8 @@
             "anyOf": [
               {
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               {
                 "type": "null"
@@ -71370,24 +71514,28 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "tenant_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "event_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "version": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 9007199254740990
+            "maximum": 9007199254740991
           },
           "attempt_count": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 1,
+            "maximum": 6
           },
           "max_retries": {
             "const": 5
@@ -71397,29 +71545,40 @@
           },
           "status": {
             "enum": [
-              "NOT_REQUIRED",
+              "SUCCEEDED",
               "RETRY_SCHEDULED",
-              "CREATED",
               "QUARANTINED_MANUAL_REQUIRED",
-              "MANUAL_CREATED"
+              "MANUAL_CREATED",
+              "SUPPRESSED_SKIPPED"
             ]
           },
           "mapped_priority": {
-            "enum": [
-              "P1",
-              "P2",
-              "P3",
-              "P4"
+            "anyOf": [
+              {
+                "enum": [
+                  "P1",
+                  "P2",
+                  "P3"
+                ]
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "mapping_policy_status": {
-            "const": "CONFIG_PENDING_Q14"
+            "enum": [
+              "CONFIG_PENDING_Q14",
+              "PUBLISHED_Q14"
+            ],
+            "description": "当前运行写入固定CONFIG_PENDING_Q14；结构保留PUBLISHED_Q14，不表示本次已发布或客户已确认"
           },
           "ticket_id": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               {
                 "type": "null"
@@ -71440,7 +71599,9 @@
           "last_error": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
               },
               {
                 "type": "null"
@@ -71449,7 +71610,8 @@
           },
           "updated_by": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "updated_at": {
             "type": "string",
@@ -71496,7 +71658,8 @@
         "properties": {
           "asset_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "rule_code": {
             "type": "string",
@@ -71506,7 +71669,7 @@
           "rule_name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 160
+            "maxLength": 128
           },
           "severity": {
             "enum": [
@@ -71526,35 +71689,21 @@
           "source_event_id": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 128
+            "maxLength": 256
           },
           "occurred_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "flap_flip_count_in_10m": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "subscription_min_severity": {
             "anyOf": [
               {
-                "enum": [
-                  "DISASTER",
-                  "HIGH",
-                  "AVERAGE",
-                  "WARNING",
-                  "INFO"
-                ]
+                "type": "string",
+                "format": "date-time"
               },
               {
                 "type": "null"
               }
             ]
           },
-          "simulate_autoticket_failures": {
-            "type": "integer",
-            "minimum": 0
+          "simulate_autoticket_failure": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -71565,9 +71714,7 @@
           "source_phase",
           "source_event_id",
           "occurred_at",
-          "flap_flip_count_in_10m",
-          "subscription_min_severity",
-          "simulate_autoticket_failures"
+          "simulate_autoticket_failure"
         ],
         "additionalProperties": false
       },
@@ -71577,12 +71724,13 @@
           "expected_version": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 9007199254740990
+            "maximum": 9007199254740991
           },
           "action": {
             "enum": [
               "ACKNOWLEDGE",
-              "START_PROGRESS",
+              "START",
+              "MARK_PENDING_REVIEW",
               "RESOLVE",
               "CLOSE"
             ]
@@ -71592,7 +71740,7 @@
               {
                 "type": "string",
                 "minLength": 1,
-                "maxLength": 1000
+                "maxLength": 500
               },
               {
                 "type": "null"
@@ -71605,7 +71753,8 @@
           "action",
           "root_cause_note"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "标准动作名；状态机由当前事件状态校验。RESOLVE要求PENDING_REVIEW及trim后不少于5个UTF-16代码单元的根因说明；不能以监控恢复代替人工复核。"
       },
       "CreateMaintenanceWindowInput": {
         "type": "object",
@@ -71613,18 +71762,12 @@
           "name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 120
+            "maxLength": 128
           },
           "asset_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "starts_at": {
             "type": "string",
@@ -71637,7 +71780,7 @@
           "silence_mode": {
             "enum": [
               "SUPPRESS_NOTIFY",
-              "SILENCE_ALL_EXCEPT_DISASTER"
+              "PAUSE_COLLECTION"
             ]
           },
           "sla_exclusion_requested": {
@@ -71666,13 +71809,12 @@
           "expected_version": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 9007199254740990
+            "maximum": 9007199254740991
           },
           "action": {
             "enum": [
               "EXTEND",
-              "END_EARLY",
-              "CANCEL",
+              "END",
               "CONFIRM_SLA_EXCLUSION"
             ]
           },
@@ -71693,22 +71835,42 @@
           "action",
           "new_ends_at"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "EXTEND"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "new_ends_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        ]
       },
       "MonitoringQuarantineDecisionInput": {
         "type": "object",
         "properties": {
           "decision": {
             "enum": [
-              "BOUND",
-              "DISCARDED"
+              "BIND_ASSET",
+              "DISCARD"
             ]
           },
           "bound_asset_id": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               {
                 "type": "null"
@@ -71726,7 +71888,43 @@
           "bound_asset_id",
           "reason"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "decision": {
+                  "const": "BIND_ASSET"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "bound_asset_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "decision": {
+                  "const": "DISCARD"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "bound_asset_id": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
       },
       "ManualAutoTicketInput": {
         "type": "object",
@@ -71734,12 +71932,13 @@
           "expected_version": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 9007199254740990
+            "maximum": 9007199254740991
           },
           "reason": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 500
+            "maxLength": 492,
+            "description": "发送前trim；最多492个Unicode代码点，为既有last_error中的“人工补建成功: ”前缀预留8个代码点，避免超过冻结varchar(500)。这是安全请求上限，不表示后端解析器已改为492。"
           }
         },
         "required": [
@@ -71756,11 +71955,12 @@
             "properties": {
               "tenant_id": {
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               "events": {
                 "type": "array",
-                "maxItems": 100,
+                "maxItems": 50,
                 "items": {
                   "$ref": "#/components/schemas/MonitoringEventSummary"
                 }
@@ -71770,30 +71970,24 @@
               },
               "maintenance_windows": {
                 "type": "array",
-                "maxItems": 100,
+                "maxItems": 50,
                 "items": {
                   "$ref": "#/components/schemas/MaintenanceWindowEntry"
                 }
               },
               "quarantine_items": {
                 "type": "array",
-                "maxItems": 100,
+                "maxItems": 50,
                 "items": {
                   "$ref": "#/components/schemas/MonitoringQuarantineItem"
                 }
               },
               "autoticket_attempts": {
                 "type": "array",
-                "maxItems": 100,
+                "maxItems": 50,
                 "items": {
                   "$ref": "#/components/schemas/AutoTicketAttemptEntry"
                 }
-              },
-              "review_policy_status": {
-                "const": "CONFIG_PENDING_Q29"
-              },
-              "mapping_policy_status": {
-                "const": "CONFIG_PENDING_Q14"
               },
               "observed_at": {
                 "type": "string",
@@ -71810,8 +72004,6 @@
               "maintenance_windows",
               "quarantine_items",
               "autoticket_attempts",
-              "review_policy_status",
-              "mapping_policy_status",
               "observed_at",
               "source"
             ],
@@ -71838,14 +72030,12 @@
               },
               "members": {
                 "type": "array",
-                "maxItems": 200,
                 "items": {
                   "$ref": "#/components/schemas/MonitoringEventMember"
                 }
               },
               "noise_records": {
                 "type": "array",
-                "maxItems": 200,
                 "items": {
                   "$ref": "#/components/schemas/MonitoringNoiseRecord"
                 }
@@ -71893,24 +72083,28 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "tenant_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "event_id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "version": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 9007199254740990
+            "maximum": 9007199254740991
           },
           "attempt_count": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 1,
+            "maximum": 6
           },
           "max_retries": {
             "const": 5
@@ -71920,29 +72114,40 @@
           },
           "status": {
             "enum": [
-              "NOT_REQUIRED",
+              "SUCCEEDED",
               "RETRY_SCHEDULED",
-              "CREATED",
               "QUARANTINED_MANUAL_REQUIRED",
-              "MANUAL_CREATED"
+              "MANUAL_CREATED",
+              "SUPPRESSED_SKIPPED"
             ]
           },
           "mapped_priority": {
-            "enum": [
-              "P1",
-              "P2",
-              "P3",
-              "P4"
+            "anyOf": [
+              {
+                "enum": [
+                  "P1",
+                  "P2",
+                  "P3"
+                ]
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "mapping_policy_status": {
-            "const": "CONFIG_PENDING_Q14"
+            "enum": [
+              "CONFIG_PENDING_Q14",
+              "PUBLISHED_Q14"
+            ],
+            "description": "当前运行写入固定CONFIG_PENDING_Q14；结构保留PUBLISHED_Q14，不表示本次已发布或客户已确认"
           },
           "ticket_id": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
               },
               {
                 "type": "null"
@@ -71963,7 +72168,9 @@
           "last_error": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
               },
               {
                 "type": "null"
@@ -71972,7 +72179,8 @@
           },
           "updated_by": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
           },
           "updated_at": {
             "type": "string",

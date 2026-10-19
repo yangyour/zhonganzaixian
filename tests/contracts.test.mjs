@@ -248,7 +248,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.61.0');
+  assert.equal(contract.info.version, '0.62.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -908,7 +908,7 @@ test('站内消息只读列表与显式已读接口保持当前授权和CSRF幂�
 test('消息游标末页必须明确结束且签名链接只能指向本站下载接口',()=>{const result={data:{items:[inboxMessageSample()],has_more:false,next_before_issued_at:null,next_before_id:null,unread_count:1,observed_at:'2026-10-14T06:00:01Z'},trace_id:'synthetic'};assert.ok(validates('ExportInboxPageResult',result));assert.equal(validates('ExportInboxPageResult',{...result,data:{...result.data,next_before_id:id('1')}}),false);assert.equal(validates('ExportInboxMessage',{...inboxMessageSample(),content_url:'https://example.invalid/download'}),false);});
 
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.61.0');
+  assert.equal(contract.info.version, '0.62.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/sla'].get;
@@ -972,7 +972,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.61.0');
+  assert.equal(contract.info.version, '0.62.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1042,58 +1042,6 @@ test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26�
   assert.ok(validates('SlaLatencyStats', latency));
 });
 
-test('监控事件中心、降噪漏斗、维护窗口、隔离区人工决策与自动建单契约保持Q14/Q29待确认约束（D15/M1-2/M4-7..M4-11/M4-14/M5-4）', () => {
-  assert.equal(contract.info.version, '0.61.0');
-  assert.equal(contract.paths['/events'].get['x-mop-capability'], 'tickets:read');
-  assert.equal(contract.paths['/events'].post['x-mop-capability'], 'ticket_notes:write_internal');
-  assert.equal(contract.paths['/events/{id}'].get['x-mop-capability'], 'tickets:read');
-  assert.equal(contract.paths['/events/{id}/actions'].post['x-mop-capability'], 'ticket_notes:write_internal');
-  assert.equal(contract.paths['/events/noise-funnel'].get['x-mop-capability'], 'tickets:read');
-  assert.equal(contract.paths['/maintenance-windows'].post['x-mop-capability'], 'ticket_notes:write_internal');
-  assert.equal(contract.paths['/maintenance-windows/{id}/actions'].post['x-mop-capability'], 'ticket_notes:write_internal');
-  assert.equal(contract.paths['/monitoring-quarantine/{id}/decisions'].post['x-mop-capability'], 'ticket_notes:write_internal');
-  assert.equal(contract.paths['/autoticket-attempts/{id}/manual-create'].post['x-mop-capability'], 'ticket_notes:write_internal');
-
-  const eventSummary = {
-    id: id('7'), tenant_id: id('1'), asset_id: id('2'), version: 2,
-    rule_code: 'LINK_DOWN', rule_name: '核心上联端口中断', severity: 'DISASTER', severity_rank: 5,
-    fingerprint: `FP_V1|${id('1')}|${id('2')}|LINK_DOWN`, occurrence_count: 5,
-    flap_flip_count: 0, flap_silenced_until: null,
-    monitor_state: 'RECOVERED', handling_state: 'IN_PROGRESS',
-    suppression_state: 'NONE', suppression_reason: null,
-    notification_empty_state: 'RECOVERED_within_2MIN_CANCELLED',
-    notification_empty_state_label: '2分钟内自动恢复，通知已取消',
-    sla_unknown_marked: false, review_policy_status: 'CONFIG_PENDING_Q29',
-    problem_at: '2026-10-18T10:00:00Z', last_occurred_at: '2026-10-18T10:01:30Z',
-    recovered_at: '2026-10-18T10:01:30Z', first_ack_at: '2026-10-18T10:00:45Z',
-    resolved_at: null, closed_at: null, root_cause_note: null, ticket_id: null,
-    updated_by: id('3'), updated_at: '2026-10-18T10:01:30Z',
-  };
-  assert.ok(validates('MonitoringEventSummary', eventSummary));
-  assert.equal(validates('MonitoringEventSummary', { ...eventSummary, review_policy_status: 'CONFIRMED' }), false);
-
-  const funnel = {
-    tenant_id: id('1'), window: '24h', raw_intake_count: 10, merged_deduplicated_count: 4,
-    flap_silenced_count: 1, dependency_suppressed_count: 1, maintenance_silenced_count: 1,
-    effective_alert_count: 3, observed_at: '2026-10-18T10:05:00Z',
-  };
-  assert.ok(validates('MonitoringNoiseFunnel', funnel));
-
-  const attempt = {
-    id: id('8'), tenant_id: id('1'), event_id: id('7'), version: 1,
-    attempt_count: 5, max_retries: 5, backoff_schedule_sec: '30,120,600,600,600',
-    status: 'QUARANTINED_MANUAL_REQUIRED', mapped_priority: 'P1', mapping_policy_status: 'CONFIG_PENDING_Q14',
-    ticket_id: null, next_retry_at: null, last_error: '连续5次自动建单重试失败',
-    updated_by: id('3'), updated_at: '2026-10-18T10:05:00Z',
-  };
-  assert.ok(validates('AutoTicketAttemptEntry', attempt));
-  assert.equal(validates('AutoTicketAttemptEntry', { ...attempt, mapping_policy_status: 'CONFIRMED' }), false);
-});
-
-
-
-
-
 test('变更报备审批契约绑定修订并保留未生效边界', () => {
   const base = '/change-notice-drafts/{id}/revisions/{draft_revision}/approval';
   assert.ok(contract.paths[base].get);
@@ -1131,4 +1079,126 @@ test('D09 Java-produced frozen details match the exact full input/output contrac
     assert.equal(createHash('sha256').update(JSON.stringify(value.data.frozen_document),'utf8').digest('hex'),value.data.document_sha256);
     const forged=structuredClone(value);forged.data.frozen_document.output.report_published=true;assert.equal(validates('InspectionQuarterlyReportDetailResult',forged),false);
   }
+});
+
+test('D15 actual MVC fixture envelopes and write exchanges validate against published routes', () => {
+  const fixture = read('../fixtures/monitoring-event-center-controller.json');
+  const check = (schema, value, label) => {
+    assert.equal(validates(schema, value), true, `${label}: ${JSON.stringify(ajv.getSchema(`urn:mop:actual-api#/components/schemas/${schema}`).errors)}`);
+  };
+  check('MonitoringEventWorkspaceResult', fixture.workspace, 'workspace');
+  check('MonitoringEventDetailResult', fixture.detail, 'detail');
+  check('MonitoringNoiseFunnelResult', fixture.noise_funnel, 'noise funnel');
+  assert.ok(fixture.exchanges.length >= 9, 'all actual read/write routes need a controller-produced exchange');
+  const matched = new Set();
+  for (const exchange of fixture.exchanges) {
+    const path = new URL(exchange.path, 'https://synthetic.invalid').pathname.replace(/^\/api\/v1/, '').replace(/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(?=\/|$)/g, '/{id}');
+    const method = exchange.method.toLowerCase();
+    const operation = contract.paths[path]?.[method];
+    assert.ok(operation, `fixture ${exchange.name}: ${method} ${path} missing from contract`);
+    assert.equal(operation.responses[200].content['application/json'].schema.$ref, `#/components/schemas/${exchange.response_schema}`);
+    check(exchange.response_schema, exchange.response, exchange.name);
+    if (method === 'post') {
+      assert.equal(operation.requestBody.content['application/json'].schema.$ref, `#/components/schemas/${exchange.request_schema}`);
+      check(exchange.request_schema, exchange.request, exchange.name + ' request');
+      assert.equal(operation['x-mop-idempotent-replay-reauthorization'], true);
+      assert.deepEqual(operation.parameters.filter(x => x.in === 'header').map(x => x.name), ['Idempotency-Key', 'X-CSRF-Token']);
+    }
+    matched.add(`${method} ${path}`);
+  }
+  for (const route of ['get /events', 'get /events/{id}', 'get /events/noise-funnel', 'post /events/ingest', 'post /events/{id}/transitions', 'post /maintenance-windows', 'post /maintenance-windows/{id}/actions', 'post /monitoring/quarantine/{id}/decisions', 'post /autoticket-attempts/{id}/manual-create']) assert.ok(matched.has(route), route);
+});
+
+test('D15 workspace has the actual eight fields and no invented global policy statuses', () => {
+  const fixture = read('../fixtures/monitoring-event-center-controller.json');
+  const fields = ['tenant_id', 'events', 'noise_funnel', 'maintenance_windows', 'quarantine_items', 'autoticket_attempts', 'observed_at', 'source'];
+  assert.deepEqual(Object.keys(fixture.workspace.data).sort(), [...fields].sort());
+  assert.deepEqual([...contract.components.schemas.MonitoringEventWorkspaceResult.properties.data.required].sort(), [...fields].sort());
+  for (const key of ['review_policy_status', 'mapping_policy_status']) {
+    const bad = structuredClone(fixture.workspace); bad.data[key] = 'CONFIG_PENDING';
+    assert.equal(validates('MonitoringEventWorkspaceResult', bad), false);
+  }
+  for (const key of fields) {
+    const bad = structuredClone(fixture.workspace); delete bad.data[key];
+    assert.equal(validates('MonitoringEventWorkspaceResult', bad), false, key);
+  }
+  assert.equal(contract.paths['/events'].post, undefined);
+  assert.equal(contract.paths['/events/{id}/actions'], undefined);
+  assert.equal(contract.paths['/monitoring-quarantine/{id}/decisions'], undefined);
+  const size = contract.paths['/events'].get.parameters.find(x => x.name === 'page_size').schema;
+  assert.deepEqual(size, { type: 'integer', minimum: 1, maximum: 50, default: 25 });
+  assert.equal(contract.components.schemas.MonitoringEventDetailResult.properties.data.properties.members.maxItems, undefined);
+  assert.equal(contract.components.schemas.MonitoringEventDetailResult.properties.data.properties.noise_records.maxItems, undefined);
+});
+
+test('D15 all production domain enums and exact notification labels are accepted without legacy invented states', () => {
+  const fixture = read('../fixtures/monitoring-event-center-controller.json');
+  const summary = contract.components.schemas.MonitoringEventSummary.properties;
+  const pairs = [[summary.severity.enum, fixture.enums.severity], [summary.monitor_state.enum, fixture.enums.monitor_state], [summary.handling_state.enum, fixture.enums.handling_state], [summary.suppression_state.enum, fixture.enums.suppression_state], [summary.notification_empty_state.enum, fixture.enums.notification_empty_state], [contract.components.schemas.MonitoringNoiseRecord.properties.layer.enum, fixture.enums.noise_layer], [contract.components.schemas.AutoTicketAttemptEntry.properties.status.enum, fixture.enums.autoticket_status]];
+  for (const [declared, actual] of pairs) assert.deepEqual([...declared].sort(), [...actual].sort());
+  for (const event of fixture.workspace.data.events) assert.equal(validates('MonitoringEventSummary', event), true);
+  const event = fixture.workspace.data.events[0];
+  for (const patch of [{ notification_empty_state: 'RECOVERED_within_2MIN_CANCELLED' }, { notification_empty_state: 'SILENCED_NO_NOTIFICATION' }, { notification_empty_state: 'BELOW_SUBSCRIPTION_LEVEL_UNSENT' }, { notification_empty_state_label: '符合外发条件（按已启用渠道投递）' }, { review_policy_status: 'CONFIRMED' }, { root_cause_note: 'x'.repeat(501) }, { rule_name: 'x'.repeat(129) }]) assert.equal(validates('MonitoringEventSummary', { ...event, ...patch }), false);
+  const anotherLabel = fixture.workspace.data.events.find(x => x.notification_empty_state !== event.notification_empty_state).notification_empty_state_label;
+  assert.equal(validates('MonitoringEventSummary', { ...event, notification_empty_state_label: anotherLabel }), false, 'enum membership alone cannot validate a mismatched label');
+  const attempt = fixture.workspace.data.autoticket_attempts[0];
+  for (const patch of [{ status: 'CREATED' }, { status: 'NOT_REQUIRED' }, { mapped_priority: 'P4' }, { attempt_count: 0 }, { attempt_count: 7 }, { mapping_policy_status: 'CONFIRMED' }]) assert.equal(validates('AutoTicketAttemptEntry', { ...attempt, ...patch }), false);
+  assert.ok(fixture.workspace.data.autoticket_attempts.some(x => x.mapped_priority === null));
+});
+
+test('D15 request actions and exact fields follow controller/domain boundaries', () => {
+  const fixture = read('../fixtures/monitoring-event-center-controller.json');
+  const request = schema => fixture.exchanges.find(x => x.request_schema === schema).request;
+  const ingest = request('MonitoringIngestEventInput');
+  assert.deepEqual(Object.keys(ingest).sort(), ['asset_id', 'rule_code', 'rule_name', 'severity', 'source_phase', 'source_event_id', 'occurred_at', 'simulate_autoticket_failure'].sort());
+  assert.equal(validates('MonitoringIngestEventInput', { ...ingest, occurred_at: null }), true);
+  for (const patch of [{ simulate_autoticket_failure: 1 }, { simulate_autoticket_failures: 1 }, { subscription_min_severity: 'HIGH' }, { flap_flip_count_in_10m: 3 }, { rule_name: 'x'.repeat(129) }, { source_event_id: 'x'.repeat(257) }, { source_phase: 'RECOVERY' }]) assert.equal(validates('MonitoringIngestEventInput', { ...ingest, ...patch }), false);
+  const transition = request('MonitoringTransitionEventInput');
+  for (const action of ['ACKNOWLEDGE', 'START', 'MARK_PENDING_REVIEW', 'RESOLVE', 'CLOSE']) assert.equal(validates('MonitoringTransitionEventInput', { ...transition, action, root_cause_note: 'synthetic root cause' }), true);
+  assert.equal(validates('MonitoringTransitionEventInput', { ...transition, action: 'START_PROGRESS' }), false);
+  const supplementaryRootCause = '😀😀x';
+  assert.equal(supplementaryRootCause.length, 5, 'RESOLVE minimum follows Java UTF-16 units');
+  assert.equal([...supplementaryRootCause].length, 3, 'JSON Schema length counts Unicode code points');
+  assert.equal(validates('MonitoringTransitionEventInput', { ...transition, action: 'RESOLVE', root_cause_note: supplementaryRootCause }), true);
+  assert.match(contract.components.schemas.MonitoringTransitionEventInput.description, /5个UTF-16/);
+  for (const expected_version of [0, -1, 1.5, '1', 9007199254740992]) assert.equal(validates('MonitoringTransitionEventInput', { ...transition, expected_version }), false);
+  assert.equal(validates('MonitoringTransitionEventInput', { ...transition, expected_version: 9007199254740991 }), true);
+  const create = request('CreateMaintenanceWindowInput');
+  for (const silence_mode of ['SUPPRESS_NOTIFY', 'PAUSE_COLLECTION']) assert.equal(validates('CreateMaintenanceWindowInput', { ...create, silence_mode }), true);
+  for (const patch of [{ asset_id: null }, { name: 'x'.repeat(129) }, { silence_mode: 'SILENCE_ALL_EXCEPT_DISASTER' }]) assert.equal(validates('CreateMaintenanceWindowInput', { ...create, ...patch }), false);
+  const update = request('UpdateMaintenanceWindowInput');
+  for (const action of ['EXTEND', 'END', 'CONFIRM_SLA_EXCLUSION']) assert.equal(validates('UpdateMaintenanceWindowInput', { ...update, action, new_ends_at: '2026-10-19T14:00:00Z' }), true);
+  for (const action of ['END_EARLY', 'CANCEL']) assert.equal(validates('UpdateMaintenanceWindowInput', { ...update, action }), false);
+  assert.equal(validates('UpdateMaintenanceWindowInput', { ...update, action: 'EXTEND', new_ends_at: null }), false);
+  assert.deepEqual(contract.paths['/maintenance-windows/{id}/actions'].post['x-mop-action-authorization'].CONFIRM_SLA_EXCLUSION, { roles: ['padmin'], capability: 'configurations:write' });
+  const decision = request('MonitoringQuarantineDecisionInput');
+  assert.equal(validates('MonitoringQuarantineDecisionInput', { ...decision, decision: 'BIND_ASSET', bound_asset_id: id('2') }), true);
+  assert.equal(validates('MonitoringQuarantineDecisionInput', { ...decision, decision: 'DISCARD', bound_asset_id: null }), true);
+  for (const patch of [{ decision: 'BOUND' }, { decision: 'DISCARDED' }, { decision: 'BIND_ASSET', bound_asset_id: null }, { decision: 'DISCARD', bound_asset_id: id('2') }]) assert.equal(validates('MonitoringQuarantineDecisionInput', { ...decision, ...patch }), false);
+});
+
+
+test('D15 manual-ticket reason reserves the actual persistence prefix without narrowing unrelated notes', () => {
+  const fixture = read('../fixtures/monitoring-event-center-controller.json');
+  const request = schema => fixture.exchanges.find(x => x.request_schema === schema).request;
+  const manual = request('ManualAutoTicketInput');
+  const prefix = '人工补建成功: ';
+  assert.equal([...prefix].length, 8);
+  assert.equal(contract.components.schemas.ManualAutoTicketInput.properties.reason.maxLength, 492);
+  for (const character of ['x', '根', '😀']) {
+    const safe = character.repeat(492);
+    assert.equal([...safe].length, 492);
+    assert.equal([...(prefix + safe)].length, 500);
+    assert.equal(validates('ManualAutoTicketInput', { ...manual, reason: safe }), true);
+    for (const count of [493, 500, 501]) assert.equal(validates('ManualAutoTicketInput', { ...manual, reason: character.repeat(count) }), false, `${character} × ${count}`);
+  }
+  assert.equal(validates('ManualAutoTicketInput', { ...manual, reason: '' }), false);
+  for (const [schema, field] of [['CreateMaintenanceWindowInput', 'reason'], ['MonitoringQuarantineDecisionInput', 'reason'], ['MonitoringTransitionEventInput', 'root_cause_note']]) {
+    const input = request(schema);
+    assert.equal(validates(schema, { ...input, [field]: '😀'.repeat(500) }), true, schema);
+    assert.equal(validates(schema, { ...input, [field]: '😀'.repeat(501) }), false, schema);
+  }
+  const attempt = fixture.exchanges.find(x => x.request_schema === 'ManualAutoTicketInput').response.data;
+  assert.equal(validates('AutoTicketAttemptEntry', { ...attempt, last_error: prefix + '😀'.repeat(492) }), true);
+  assert.equal(validates('AutoTicketAttemptEntry', { ...attempt, last_error: prefix + '😀'.repeat(493) }), false);
 });

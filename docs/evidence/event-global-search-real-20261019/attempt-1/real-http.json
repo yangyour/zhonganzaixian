@@ -1,0 +1,21 @@
+{
+  "result": "FAIL",
+  "environment": "dot-event-search-fresh-pg",
+  "api_jar_sha256": "db33d6d1d368a1d652847794e6f7fcc13b55ea48e8b8b9bf15c5bafb9fdcb803",
+  "real_postgresql": true,
+  "project_local_auth": true,
+  "external_services_configured": false,
+  "checks": [],
+  "assertions": {},
+  "failure_type": "AssertionError",
+  "failure_stage": "synthetic project identity bootstrap failed",
+  "failure_frames": [
+    {
+      "file": "event_http_checks.py",
+      "function": "run",
+      "line": 59
+    }
+  ],
+  "api_cleanup": "complete",
+  "http_check_count": 0
+}

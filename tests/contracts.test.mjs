@@ -248,7 +248,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.62.0');
+  assert.equal(contract.info.version, '0.63.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -594,7 +594,7 @@ test('日期列表只读分页绑定三字段游标和当前服务端参考日',
 test('全局搜索固定5/4/3/3分组且未接入来源不是空集或零计数', () => {
   const supported = (kind, limit, scope, fields) => ({ kind, status: 'AVAILABLE', limit, returned: 0, has_more: false, items: [], source_scope: scope, matched_fields: fields, reason: null });
   const unsupported = (kind, limit) => ({ kind, status: 'NOT_IMPLEMENTED', limit, returned: null, has_more: null, items: null, source_scope: null, matched_fields: null, reason: 'SOURCE_NOT_IMPLEMENTED' });
-  const value = { query: 'Ä%_', tenant_id: id('1'), observed_at: timestamp, scope: 'CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH', coverage: 'PARTIAL', coverage_reason: 'EVENT_AND_AUTOMATION_SOURCES_NOT_IMPLEMENTED', query_semantics: 'LITERAL_UNICODE_CASE_INSENSITIVE', snapshot_consistency: 'ONE_READONLY_TRANSACTION', source: 'postgresql_supported_groups', notification_bell_status: 'NOT_IMPLEMENTED', groups: [supported('assets', 5, 'CURRENT_TENANT', ['name']), unsupported('events', 4), supported('tickets', 3, 'OWN_REPORT_REGISTRATIONS', ['title', 'receipt_no']), unsupported('automation_scripts', 3)] };
+  const value = { query: 'Ä%_', tenant_id: id('1'), observed_at: timestamp, scope: 'CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH', coverage: 'PARTIAL', coverage_reason: 'AUTOMATION_SOURCE_NOT_IMPLEMENTED_AND_EVENT_NOT_AUTHORIZED', query_semantics: 'LITERAL_UNICODE_CASE_INSENSITIVE', snapshot_consistency: 'ONE_READONLY_TRANSACTION', source: 'postgresql_supported_groups', notification_bell_status: 'NOT_IMPLEMENTED', groups: [supported('assets', 5, 'CURRENT_TENANT', ['name']), { ...unsupported('events', 4), status: 'NOT_AUTHORIZED', reason: 'INTERNAL_EVENT_READ_REQUIRED' }, supported('tickets', 3, 'OWN_REPORT_REGISTRATIONS', ['title', 'receipt_no']), unsupported('automation_scripts', 3)] };
   assert.equal(validates('GroupedSearch', value), true);
   for (const patch of [{ coverage: 'COMPLETE' }, { notification_bell_status: 'READY' }, { groups: value.groups.slice(0, 3) }, { query: '' }]) assert.equal(validates('GroupedSearch', { ...value, ...patch }), false);
   for (const patch of [{ items: [] }, { returned: 0 }, { has_more: false }]) { const copy = structuredClone(value); Object.assign(copy.groups[1], patch); assert.equal(validates('GroupedSearch', copy), false); }
@@ -908,7 +908,7 @@ test('站内消息只读列表与显式已读接口保持当前授权和CSRF幂�
 test('消息游标末页必须明确结束且签名链接只能指向本站下载接口',()=>{const result={data:{items:[inboxMessageSample()],has_more:false,next_before_issued_at:null,next_before_id:null,unread_count:1,observed_at:'2026-10-14T06:00:01Z'},trace_id:'synthetic'};assert.ok(validates('ExportInboxPageResult',result));assert.equal(validates('ExportInboxPageResult',{...result,data:{...result.data,next_before_id:id('1')}}),false);assert.equal(validates('ExportInboxMessage',{...inboxMessageSample(),content_url:'https://example.invalid/download'}),false);});
 
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.62.0');
+  assert.equal(contract.info.version, '0.63.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/sla'].get;
@@ -972,7 +972,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.62.0');
+  assert.equal(contract.info.version, '0.63.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1201,4 +1201,44 @@ test('D15 manual-ticket reason reserves the actual persistence prefix without na
   const attempt = fixture.exchanges.find(x => x.request_schema === 'ManualAutoTicketInput').response.data;
   assert.equal(validates('AutoTicketAttemptEntry', { ...attempt, last_error: prefix + '😀'.repeat(492) }), true);
   assert.equal(validates('AutoTicketAttemptEntry', { ...attempt, last_error: prefix + '😀'.repeat(493) }), false);
+});
+
+test('真实控制器全局搜索夹具覆盖角色、数量、合法状态并保持事件最小投影', () => {
+  const fixture = read('../fixtures/global-search-controller.json');
+  assert.equal(fixture.fixture_kind, 'SYNTHETIC_PRODUCTION_CONTROLLER_JSON');
+  assert.equal(fixture.database_evidence, false);
+  const storedText = fixture.exchanges.find(e => e.name === 'stored_rule_control_text').response.data.groups[1].items[0];
+  assert.equal(storedText.rule_name, 'Link\nDown'); assert.equal(storedText.rule_code, 'LINK\tRULE');
+  const observedSeverity = new Set(), observedMonitor = new Set(), observedHandling = new Set();
+  for (const example of fixture.exchanges) {
+    assert.equal(validates(example.response_schema, example.response), true, example.name);
+    const group = example.response.data.groups[1];
+    for (const event of group.items ?? []) {
+      observedSeverity.add(event.severity); observedMonitor.add(event.monitor_state); observedHandling.add(event.handling_state);
+      assert.equal(validates('SearchEventHit', event), true);
+      for (const key of ['root_cause_note', 'updated_by', 'fingerprint', 'raw_payload', 'management_ip', 'quarantine_id', 'asset_id', 'ticket_id', 'description']) {
+        assert.equal(validates('SearchEventHit', { ...event, [key]: 'private' }), false, key);
+      }
+      for (const patch of [{ resource_kind: 'ASSET_RECORD' }, { occurrence_count: 0 }, { version: 0 }, { severity: 'OK' }, { monitor_state: 'NORMAL' }, { handling_state: 'OPEN' }, { rule_code: 'x'.repeat(65) }, { rule_name: 'x'.repeat(129) }, { last_occurred_at: 'not-a-time' }]) assert.equal(validates('SearchEventHit', { ...event, ...patch }), false);
+    }
+  }
+  assert.deepEqual([...observedSeverity].sort(), ['AVERAGE', 'DISASTER', 'HIGH', 'INFO', 'WARNING']);
+  assert.deepEqual([...observedMonitor].sort(), ['PROBLEM', 'RECOVERED']);
+  assert.deepEqual([...observedHandling].sort(), ['ACKNOWLEDGED', 'CLOSED', 'IN_PROGRESS', 'NEW', 'PENDING_REVIEW', 'RESOLVED']);
+});
+test('事件搜索可见性、覆盖原因、报障范围一致，拒绝伪造空集、溢出和旧占位状态', () => {
+  const fixture = read('../fixtures/global-search-controller.json');
+  const internal = fixture.exchanges.find(e => e.name === 'role_msp').response.data;
+  const customer = fixture.exchanges.find(e => e.name === 'role_viewer').response.data;
+  for (const value of [internal, customer]) {
+    const mismatch = structuredClone(value); mismatch.coverage_reason = value === internal ? customer.coverage_reason : internal.coverage_reason;
+    assert.equal(validates('GroupedSearch', mismatch), false);
+    const old = structuredClone(value); old.groups[1].status = 'NOT_IMPLEMENTED'; assert.equal(validates('GroupedSearch', old), false);
+  }
+  for (const patch of [{ items: [] }, { returned: 0 }, { has_more: false }, { source_scope: 'CURRENT_TENANT_INTERNAL' }]) {
+    const mutated = structuredClone(customer); Object.assign(mutated.groups[1], patch); assert.equal(validates('GroupedSearch', mutated), false);
+  }
+  for (const patch of [{ has_more: true }, { returned: 4 }, { matched_fields: ['root_cause_note'] }, { limit: 5 }]) {
+    const mutated = structuredClone(internal); Object.assign(mutated.groups[1], patch); assert.equal(validates('GroupedSearch', mutated), false);
+  }
 });

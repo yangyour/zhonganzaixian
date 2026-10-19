@@ -1,0 +1,1220 @@
+{
+  "result": "PASS",
+  "environment": "dot-event-search-fresh-pg",
+  "api_jar_sha256": "db33d6d1d368a1d652847794e6f7fcc13b55ea48e8b8b9bf15c5bafb9fdcb803",
+  "real_postgresql": true,
+  "project_local_auth": true,
+  "external_services_configured": false,
+  "checks": [
+    {
+      "case": "/health/live",
+      "actor": "anonymous",
+      "path": "/health/live",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "/health/ready",
+      "actor": "anonymous",
+      "path": "/health/ready",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "project_auth_options",
+      "actor": "anonymous",
+      "path": "/auth/options",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "unauthenticated_search",
+      "actor": "anonymous",
+      "path": "/search?q=ESHTTP-0ea4963b67",
+      "method": "GET",
+      "status": 401,
+      "expected_status": 401,
+      "error_code": "SESSION_EXPIRED",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "unauthenticated_detail",
+      "actor": "anonymous",
+      "path": "/events/bcc72ef0-3757-40a9-bd68-5c4ebc559cd9",
+      "method": "GET",
+      "status": 401,
+      "expected_status": 401,
+      "error_code": "SESSION_EXPIRED",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "login_without_csrf",
+      "actor": "anonymous",
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 403,
+      "expected_status": 403,
+      "error_code": "CSRF_INVALID",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_csrf",
+      "actor": "padmin",
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_login",
+      "actor": "padmin",
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_csrf",
+      "actor": "msp",
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_login",
+      "actor": "msp",
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tadmin_csrf",
+      "actor": "tadmin",
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tadmin_login",
+      "actor": "tadmin",
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_csrf",
+      "actor": "viewerA",
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_login",
+      "actor": "viewerA",
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerB_csrf",
+      "actor": "viewerB",
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerB_login",
+      "actor": "viewerB",
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tenant_switch_without_csrf",
+      "actor": "padmin",
+      "path": "/session/tenant",
+      "method": "POST",
+      "status": 403,
+      "expected_status": 403,
+      "error_code": "CSRF_INVALID",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_cap_overflow",
+      "actor": "padmin",
+      "path": "/search?q=ESHTTP-0ea4963b67-CAP",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 4,
+        "has_more": true,
+        "ids": [
+          "b7aecd0a-dbb4-4c7c-8af6-33b6932c7e0e",
+          "9495e5e0-9879-48ff-8b35-2a25352d3831",
+          "8e18de75-30cb-466e-96bd-c45f091b11aa",
+          "62522790-1047-4d63-af07-91c980623e2c"
+        ]
+      }
+    },
+    {
+      "case": "padmin_deterministic_repeat",
+      "actor": "padmin",
+      "path": "/search?q=ESHTTP-0ea4963b67-CAP",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 4,
+        "has_more": true,
+        "ids": [
+          "b7aecd0a-dbb4-4c7c-8af6-33b6932c7e0e",
+          "9495e5e0-9879-48ff-8b35-2a25352d3831",
+          "8e18de75-30cb-466e-96bd-c45f091b11aa",
+          "62522790-1047-4d63-af07-91c980623e2c"
+        ]
+      }
+    },
+    {
+      "case": "padmin_exact_four",
+      "actor": "padmin",
+      "path": "/search?q=ESHTTP-0ea4963b67-ExactFour",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 4,
+        "has_more": false,
+        "ids": [
+          "2c8c8744-8672-4a4e-8cef-6020eae8d4ce",
+          "8b84e774-cd14-4ed3-9689-4dba5dbb0f18",
+          "e00babf2-dafc-4ca6-88d8-03dd8b894dcd",
+          "e5e64e26-bca1-4655-95c7-78907a0347bc"
+        ]
+      }
+    },
+    {
+      "case": "padmin_literal_name",
+      "actor": "padmin",
+      "path": "/search?q=eshttp-0ea4963b67-%E4%BA%8B%E4%BB%B6%C3%A4%25_%5C",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 1,
+        "has_more": false,
+        "ids": [
+          "4749985e-db09-4977-8f0a-2ac375b370d4"
+        ]
+      }
+    },
+    {
+      "case": "padmin_literal_rule_code",
+      "actor": "padmin",
+      "path": "/search?q=eshttp-0ea4963b67-%E8%A7%84%E5%88%99%C3%A4%25_%5C",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 1,
+        "has_more": false,
+        "ids": [
+          "9c0954bf-0ac3-4738-a031-e7701b007e52"
+        ]
+      }
+    },
+    {
+      "case": "padmin_literal_percent",
+      "actor": "padmin",
+      "path": "/search?q=ESHTTP-0ea4963b67-%E4%BA%8B%E4%BB%B6%C3%84%25",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 1,
+        "has_more": false,
+        "ids": [
+          "4749985e-db09-4977-8f0a-2ac375b370d4"
+        ]
+      }
+    },
+    {
+      "case": "padmin_literal_underscore",
+      "actor": "padmin",
+      "path": "/search?q=ESHTTP-0ea4963b67-%E4%BA%8B%E4%BB%B6%C3%84%25_",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 1,
+        "has_more": false,
+        "ids": [
+          "4749985e-db09-4977-8f0a-2ac375b370d4"
+        ]
+      }
+    },
+    {
+      "case": "padmin_literal_backslash",
+      "actor": "padmin",
+      "path": "/search?q=ESHTTP-0ea4963b67-%E4%BA%8B%E4%BB%B6%C3%84%25_%5C",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 1,
+        "has_more": false,
+        "ids": [
+          "4749985e-db09-4977-8f0a-2ac375b370d4"
+        ]
+      }
+    },
+    {
+      "case": "padmin_injection",
+      "actor": "padmin",
+      "path": "/search?q=ESHTTP-0ea4963b67%27%20OR%20%271%27%3D%271",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 0,
+        "has_more": false,
+        "ids": []
+      }
+    },
+    {
+      "case": "padmin_private_fields",
+      "actor": "padmin",
+      "path": "/search?q=PRIVATE-680052cd94b04950ae452cc1c7626a37",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 0,
+        "has_more": false,
+        "ids": []
+      }
+    },
+    {
+      "case": "padmin_missing",
+      "actor": "padmin",
+      "path": "/search?q=ESHTTP-0ea4963b67-ABSENT",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 0,
+        "has_more": false,
+        "ids": []
+      }
+    },
+    {
+      "case": "padmin_archive_search",
+      "actor": "padmin",
+      "path": "/search?q=ESHTTP-0ea4963b67-ARCHIVE",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 1,
+        "has_more": false,
+        "ids": [
+          "bcc72ef0-3757-40a9-bd68-5c4ebc559cd9"
+        ]
+      }
+    },
+    {
+      "case": "padmin_latest25",
+      "actor": "padmin",
+      "path": "/events",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_direct_archive_detail",
+      "actor": "padmin",
+      "path": "/events/bcc72ef0-3757-40a9-bd68-5c4ebc559cd9",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_cap_overflow",
+      "actor": "msp",
+      "path": "/search?q=ESHTTP-0ea4963b67-CAP",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 4,
+        "has_more": true,
+        "ids": [
+          "b7aecd0a-dbb4-4c7c-8af6-33b6932c7e0e",
+          "9495e5e0-9879-48ff-8b35-2a25352d3831",
+          "8e18de75-30cb-466e-96bd-c45f091b11aa",
+          "62522790-1047-4d63-af07-91c980623e2c"
+        ]
+      }
+    },
+    {
+      "case": "msp_deterministic_repeat",
+      "actor": "msp",
+      "path": "/search?q=ESHTTP-0ea4963b67-CAP",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 4,
+        "has_more": true,
+        "ids": [
+          "b7aecd0a-dbb4-4c7c-8af6-33b6932c7e0e",
+          "9495e5e0-9879-48ff-8b35-2a25352d3831",
+          "8e18de75-30cb-466e-96bd-c45f091b11aa",
+          "62522790-1047-4d63-af07-91c980623e2c"
+        ]
+      }
+    },
+    {
+      "case": "msp_exact_four",
+      "actor": "msp",
+      "path": "/search?q=ESHTTP-0ea4963b67-ExactFour",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 4,
+        "has_more": false,
+        "ids": [
+          "2c8c8744-8672-4a4e-8cef-6020eae8d4ce",
+          "8b84e774-cd14-4ed3-9689-4dba5dbb0f18",
+          "e00babf2-dafc-4ca6-88d8-03dd8b894dcd",
+          "e5e64e26-bca1-4655-95c7-78907a0347bc"
+        ]
+      }
+    },
+    {
+      "case": "msp_literal_name",
+      "actor": "msp",
+      "path": "/search?q=eshttp-0ea4963b67-%E4%BA%8B%E4%BB%B6%C3%A4%25_%5C",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 1,
+        "has_more": false,
+        "ids": [
+          "4749985e-db09-4977-8f0a-2ac375b370d4"
+        ]
+      }
+    },
+    {
+      "case": "msp_literal_rule_code",
+      "actor": "msp",
+      "path": "/search?q=eshttp-0ea4963b67-%E8%A7%84%E5%88%99%C3%A4%25_%5C",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 1,
+        "has_more": false,
+        "ids": [
+          "9c0954bf-0ac3-4738-a031-e7701b007e52"
+        ]
+      }
+    },
+    {
+      "case": "msp_literal_percent",
+      "actor": "msp",
+      "path": "/search?q=ESHTTP-0ea4963b67-%E4%BA%8B%E4%BB%B6%C3%84%25",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 1,
+        "has_more": false,
+        "ids": [
+          "4749985e-db09-4977-8f0a-2ac375b370d4"
+        ]
+      }
+    },
+    {
+      "case": "msp_literal_underscore",
+      "actor": "msp",
+      "path": "/search?q=ESHTTP-0ea4963b67-%E4%BA%8B%E4%BB%B6%C3%84%25_",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 1,
+        "has_more": false,
+        "ids": [
+          "4749985e-db09-4977-8f0a-2ac375b370d4"
+        ]
+      }
+    },
+    {
+      "case": "msp_literal_backslash",
+      "actor": "msp",
+      "path": "/search?q=ESHTTP-0ea4963b67-%E4%BA%8B%E4%BB%B6%C3%84%25_%5C",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 1,
+        "has_more": false,
+        "ids": [
+          "4749985e-db09-4977-8f0a-2ac375b370d4"
+        ]
+      }
+    },
+    {
+      "case": "msp_injection",
+      "actor": "msp",
+      "path": "/search?q=ESHTTP-0ea4963b67%27%20OR%20%271%27%3D%271",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 0,
+        "has_more": false,
+        "ids": []
+      }
+    },
+    {
+      "case": "msp_private_fields",
+      "actor": "msp",
+      "path": "/search?q=PRIVATE-680052cd94b04950ae452cc1c7626a37",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 0,
+        "has_more": false,
+        "ids": []
+      }
+    },
+    {
+      "case": "msp_missing",
+      "actor": "msp",
+      "path": "/search?q=ESHTTP-0ea4963b67-ABSENT",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 0,
+        "has_more": false,
+        "ids": []
+      }
+    },
+    {
+      "case": "msp_archive_search",
+      "actor": "msp",
+      "path": "/search?q=ESHTTP-0ea4963b67-ARCHIVE",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 1,
+        "has_more": false,
+        "ids": [
+          "bcc72ef0-3757-40a9-bd68-5c4ebc559cd9"
+        ]
+      }
+    },
+    {
+      "case": "msp_latest25",
+      "actor": "msp",
+      "path": "/events",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_direct_archive_detail",
+      "actor": "msp",
+      "path": "/events/bcc72ef0-3757-40a9-bd68-5c4ebc559cd9",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_event_group_authoritatively_denied",
+      "actor": "viewerA",
+      "path": "/search?q=ESHTTP-0ea4963b67",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "NOT_AUTHORIZED",
+        "returned": null,
+        "has_more": null,
+        "ids": null
+      }
+    },
+    {
+      "case": "tadmin_event_group_authoritatively_denied",
+      "actor": "tadmin",
+      "path": "/search?q=ESHTTP-0ea4963b67",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "NOT_AUTHORIZED",
+        "returned": null,
+        "has_more": null,
+        "ids": null
+      }
+    },
+    {
+      "case": "foreign_customer_event_group_denied",
+      "actor": "viewerB",
+      "path": "/search?q=ESHTTP-0ea4963b67",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "NOT_AUTHORIZED",
+        "returned": null,
+        "has_more": null,
+        "ids": null
+      }
+    },
+    {
+      "case": "viewerA_direct_event_detail_denied",
+      "actor": "viewerA",
+      "path": "/events/bcc72ef0-3757-40a9-bd68-5c4ebc559cd9",
+      "method": "GET",
+      "status": 403,
+      "expected_status": 403,
+      "error_code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tadmin_direct_event_detail_denied",
+      "actor": "tadmin",
+      "path": "/events/bcc72ef0-3757-40a9-bd68-5c4ebc559cd9",
+      "method": "GET",
+      "status": 403,
+      "expected_status": 403,
+      "error_code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerB_direct_event_detail_denied",
+      "actor": "viewerB",
+      "path": "/events/bcc72ef0-3757-40a9-bd68-5c4ebc559cd9",
+      "method": "GET",
+      "status": 403,
+      "expected_status": 403,
+      "error_code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "cross_tenant_event_detail_is_404",
+      "actor": "padmin",
+      "path": "/events/1d732046-ee76-47fc-b6db-bcdeadf2ca7d",
+      "method": "GET",
+      "status": 404,
+      "expected_status": 404,
+      "error_code": "RESOURCE_NOT_FOUND",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "authorized_switch_to_tenant_b",
+      "actor": "padmin",
+      "path": "/session/tenant",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tenant_b_only",
+      "actor": "padmin",
+      "path": "/search?q=ESHTTP-0ea4963b67-CAP",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 1,
+        "has_more": false,
+        "ids": [
+          "1d732046-ee76-47fc-b6db-bcdeadf2ca7d"
+        ]
+      }
+    },
+    {
+      "case": "tenant_b_cannot_open_tenant_a_detail",
+      "actor": "padmin",
+      "path": "/events/bcc72ef0-3757-40a9-bd68-5c4ebc559cd9",
+      "method": "GET",
+      "status": 404,
+      "expected_status": 404,
+      "error_code": "RESOURCE_NOT_FOUND",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tenant_b_direct_own_detail",
+      "actor": "padmin",
+      "path": "/events/1d732046-ee76-47fc-b6db-bcdeadf2ca7d",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "switch_back_to_tenant_a",
+      "actor": "padmin",
+      "path": "/session/tenant",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "query_reject_duplicate",
+      "actor": "padmin",
+      "path": "/search?q=x&q=y",
+      "method": "GET",
+      "status": 400,
+      "expected_status": 400,
+      "error_code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "query_reject_limit_override",
+      "actor": "padmin",
+      "path": "/search?q=x&limit=100",
+      "method": "GET",
+      "status": 400,
+      "expected_status": 400,
+      "error_code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "query_reject_tenant_override",
+      "actor": "padmin",
+      "path": "/search?q=x&tenant_id=55000000-0000-4000-8000-000000000002",
+      "method": "GET",
+      "status": 400,
+      "expected_status": 400,
+      "error_code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "query_reject_empty",
+      "actor": "padmin",
+      "path": "/search?q=",
+      "method": "GET",
+      "status": 400,
+      "expected_status": 400,
+      "error_code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "query_reject_blank",
+      "actor": "padmin",
+      "path": "/search?q=%20%20",
+      "method": "GET",
+      "status": 400,
+      "expected_status": 400,
+      "error_code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "query_reject_control",
+      "actor": "padmin",
+      "path": "/search?q=%0A",
+      "method": "GET",
+      "status": 400,
+      "expected_status": 400,
+      "error_code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "query_reject_long",
+      "actor": "padmin",
+      "path": "/search?q=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "method": "GET",
+      "status": 400,
+      "expected_status": 400,
+      "error_code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "query_reject_missing",
+      "actor": "padmin",
+      "path": "/search",
+      "method": "GET",
+      "status": 400,
+      "expected_status": 400,
+      "error_code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "detail_reject_query_override",
+      "actor": "padmin",
+      "path": "/events/bcc72ef0-3757-40a9-bd68-5c4ebc559cd9?tenant_id=55000000-0000-4000-8000-000000000002",
+      "method": "GET",
+      "status": 400,
+      "expected_status": 400,
+      "error_code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "current_custom_role_grants",
+      "actor": "msp",
+      "path": "/search?q=ESHTTP-0ea4963b67-CAP",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 4,
+        "has_more": true,
+        "ids": [
+          "b7aecd0a-dbb4-4c7c-8af6-33b6932c7e0e",
+          "9495e5e0-9879-48ff-8b35-2a25352d3831",
+          "8e18de75-30cb-466e-96bd-c45f091b11aa",
+          "62522790-1047-4d63-af07-91c980623e2c"
+        ]
+      }
+    },
+    {
+      "case": "same_session_tickets_read_revoked_search",
+      "actor": "msp",
+      "path": "/search?q=ESHTTP-0ea4963b67",
+      "method": "GET",
+      "status": 403,
+      "expected_status": 403,
+      "error_code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "same_session_tickets_read_revoked_detail",
+      "actor": "msp",
+      "path": "/events/bcc72ef0-3757-40a9-bd68-5c4ebc559cd9",
+      "method": "GET",
+      "status": 403,
+      "expected_status": 403,
+      "error_code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "same_session_permission_restored",
+      "actor": "msp",
+      "path": "/search?q=ESHTTP-0ea4963b67-CAP",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null,
+      "cache_control": "no-store",
+      "event_result": {
+        "status": "AVAILABLE",
+        "returned": 4,
+        "has_more": true,
+        "ids": [
+          "b7aecd0a-dbb4-4c7c-8af6-33b6932c7e0e",
+          "9495e5e0-9879-48ff-8b35-2a25352d3831",
+          "8e18de75-30cb-466e-96bd-c45f091b11aa",
+          "62522790-1047-4d63-af07-91c980623e2c"
+        ]
+      }
+    },
+    {
+      "case": "same_session_membership_revoked_search",
+      "actor": "msp",
+      "path": "/search?q=ESHTTP-0ea4963b67",
+      "method": "GET",
+      "status": 401,
+      "expected_status": 401,
+      "error_code": "SESSION_EXPIRED",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "same_session_membership_revoked_detail",
+      "actor": "msp",
+      "path": "/events/bcc72ef0-3757-40a9-bd68-5c4ebc559cd9",
+      "method": "GET",
+      "status": 401,
+      "expected_status": 401,
+      "error_code": "SESSION_EXPIRED",
+      "cache_control": "no-store"
+    }
+  ],
+  "assertions": {
+    "successful_search_and_detail_read_only": {
+      "all_tables_compared": 97,
+      "changed_tables": [],
+      "before": {
+        "flyway_schema_history": "41|256d53c4e0cf93388461e06f3d49d223",
+        "mop_asset": "76|28ec8f1c0343e9383b3072f31319852d",
+        "mop_asset_dependency_edge": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_dependency_graph": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_dependency_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_export_attempt": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_export_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_import_artifact": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_import_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_import_mapping": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_import_operation": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_import_source": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_manual_details": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_manual_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_audit": "54|90e813c41de22e3a07b6c8dd05654f07",
+        "mop_autoticket_attempt": "2|d836fc6acd43da01b37b57f9d19a8b2d",
+        "mop_backup_plan_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_backup_plan_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_backup_plan_target": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_capacity_scenario_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_change_notice_approval_event": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_change_notice_asset": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_change_notice_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_change_notice_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_configuration": "186|5aa06a32b9d2278e69c7f3adc5692122",
+        "mop_configuration_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_configuration_revision_history": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_contact_import_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_contact_import_result": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_contact_tenant_guard": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_customer_contact": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_customer_contact_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_email_binding": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_email_delivery": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_escalation_policy": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_escalation_step_run": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_event_noise_record": "3|d673b38add5d384572c703dba6dce4e3",
+        "mop_export_inbox": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_external_identity_binding": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_file": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_file_grant": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_idempotency": "45|4930caee5708b39fc675337e2012be3d",
+        "mop_identity_policy": "1|a7491f91037b0502347f74b8d9c92531",
+        "mop_identity_security": "17|acd925e913a03000a767e1fb50b2e1b2",
+        "mop_inspection_quarterly_report": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_source_collection": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_source_collection_item": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_template": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_template_item": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_template_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_worksheet": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_worksheet_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_local_account": "6|09b934146c3fef01af18bb606260a479",
+        "mop_local_password_history": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_maintenance_window": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_manual_incident_registration": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_manual_recovery_confirmation": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_member_role_assignment": "4|bef549db0ea788dcae3018ab223c7195",
+        "mop_membership": "24|fd5dea811f982e345c4519b62f85a6b1",
+        "mop_monitoring_event": "124|087def3dd07f28332d2ecb9692f106de",
+        "mop_monitoring_event_member": "3|d8485ddc072d1b36029ad614a6089e3c",
+        "mop_monitoring_quarantine": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_monitoring_quarantine_decision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_notification_intent": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_notification_message": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_notification_preference_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_notification_preference_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_oncall_handoff": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_oncall_roster": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_operation": "18|30ac66391cd9362c68ecdd9a6b6cff1e",
+        "mop_outbox": "18|919d44fe4780f7b72152baf051e5a901",
+        "mop_photo_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_project_role": "12|d107459eb07afa18d48cbabc9bab9ff2",
+        "mop_raw_monitoring_event": "2|77ce3ea70c0ea3b0d5220861e7b10b8b",
+        "mop_role_capability_limit": "83|3e940af1fa4721b0f3b5ac9988763272",
+        "mop_runtime_configuration_release": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_service_tier": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_service_tier_change": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_site": "2|0714d9dc424a7ecb55e54997e29b80d6",
+        "mop_sla_monthly_result": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_tenant": "2|1ad5af761028bbf489cba54485ffed96",
+        "mop_ticket": "18|07e9ad7a7bfb229c2d908e44f93c204f",
+        "mop_ticket_comment": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_ticket_history": "18|d5a721517ea515a522e9dde26add7577",
+        "mop_ticket_internal_note": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_ticket_workflow_clock": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_ticket_workflow_clock_receipt": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_ticket_workflow_event": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_ticket_workflow_outbox": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_user": "17|fa0828c6005c10d235acb584997e09a2",
+        "mop_wecom_binding": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_wecom_delivery": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_wecom_login_state": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_working_calendar_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_working_calendar_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_worklog": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_worklog_revision": "0|d41d8cd98f00b204e9800998ecf8427e"
+      },
+      "after": {
+        "flyway_schema_history": "41|256d53c4e0cf93388461e06f3d49d223",
+        "mop_asset": "76|28ec8f1c0343e9383b3072f31319852d",
+        "mop_asset_dependency_edge": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_dependency_graph": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_dependency_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_export_attempt": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_export_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_import_artifact": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_import_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_import_mapping": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_import_operation": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_import_source": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_manual_details": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_asset_manual_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_audit": "54|90e813c41de22e3a07b6c8dd05654f07",
+        "mop_autoticket_attempt": "2|d836fc6acd43da01b37b57f9d19a8b2d",
+        "mop_backup_plan_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_backup_plan_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_backup_plan_target": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_capacity_scenario_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_change_notice_approval_event": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_change_notice_asset": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_change_notice_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_change_notice_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_configuration": "186|5aa06a32b9d2278e69c7f3adc5692122",
+        "mop_configuration_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_configuration_revision_history": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_contact_import_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_contact_import_result": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_contact_tenant_guard": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_customer_contact": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_customer_contact_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_email_binding": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_email_delivery": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_escalation_policy": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_escalation_step_run": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_event_noise_record": "3|d673b38add5d384572c703dba6dce4e3",
+        "mop_export_inbox": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_external_identity_binding": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_file": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_file_grant": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_idempotency": "45|4930caee5708b39fc675337e2012be3d",
+        "mop_identity_policy": "1|a7491f91037b0502347f74b8d9c92531",
+        "mop_identity_security": "17|acd925e913a03000a767e1fb50b2e1b2",
+        "mop_inspection_quarterly_report": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_source_collection": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_source_collection_item": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_template": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_template_item": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_template_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_worksheet": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_inspection_worksheet_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_local_account": "6|09b934146c3fef01af18bb606260a479",
+        "mop_local_password_history": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_maintenance_window": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_manual_incident_registration": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_manual_recovery_confirmation": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_member_role_assignment": "4|bef549db0ea788dcae3018ab223c7195",
+        "mop_membership": "24|fd5dea811f982e345c4519b62f85a6b1",
+        "mop_monitoring_event": "124|087def3dd07f28332d2ecb9692f106de",
+        "mop_monitoring_event_member": "3|d8485ddc072d1b36029ad614a6089e3c",
+        "mop_monitoring_quarantine": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_monitoring_quarantine_decision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_notification_intent": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_notification_message": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_notification_preference_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_notification_preference_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_oncall_handoff": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_oncall_roster": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_operation": "18|30ac66391cd9362c68ecdd9a6b6cff1e",
+        "mop_outbox": "18|919d44fe4780f7b72152baf051e5a901",
+        "mop_photo_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_project_role": "12|d107459eb07afa18d48cbabc9bab9ff2",
+        "mop_raw_monitoring_event": "2|77ce3ea70c0ea3b0d5220861e7b10b8b",
+        "mop_role_capability_limit": "83|3e940af1fa4721b0f3b5ac9988763272",
+        "mop_runtime_configuration_release": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_service_tier": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_service_tier_change": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_site": "2|0714d9dc424a7ecb55e54997e29b80d6",
+        "mop_sla_monthly_result": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_tenant": "2|1ad5af761028bbf489cba54485ffed96",
+        "mop_ticket": "18|07e9ad7a7bfb229c2d908e44f93c204f",
+        "mop_ticket_comment": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_ticket_history": "18|d5a721517ea515a522e9dde26add7577",
+        "mop_ticket_internal_note": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_ticket_workflow_clock": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_ticket_workflow_clock_receipt": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_ticket_workflow_event": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_ticket_workflow_outbox": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_user": "17|fa0828c6005c10d235acb584997e09a2",
+        "mop_wecom_binding": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_wecom_delivery": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_wecom_login_state": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_working_calendar_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_working_calendar_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_worklog": "0|d41d8cd98f00b204e9800998ecf8427e",
+        "mop_worklog_revision": "0|d41d8cd98f00b204e9800998ecf8427e"
+      }
+    },
+    "minimal_event_projection_exact_fields": [
+      "handling_state",
+      "id",
+      "last_occurred_at",
+      "monitor_state",
+      "occurrence_count",
+      "resource_kind",
+      "rule_code",
+      "rule_name",
+      "severity",
+      "tenant_id",
+      "version"
+    ],
+    "tenant_isolation": true,
+    "custom_current_capabilities_and_immediate_revocation": true,
+    "direct_detail_outside_latest25": true,
+    "literal_unicode_case_insensitive_and_no_wildcard_expansion": true,
+    "four_hit_limit_overflow_and_tie_order": true,
+    "no_search_private_field_match_or_projection": true,
+    "denied_request_audits_not_in_readonly_window": true
+  },
+  "identity_bootstrap": {
+    "inserted": 6,
+    "verified_existing": 0,
+    "passwords_output": false
+  },
+  "synthetic_fixtures": {
+    "events": 45,
+    "tenants": 2,
+    "fixed_timestamp_tie_count": 6,
+    "newer_rows_than_archive": 43,
+    "private_sentinels": [
+      "fingerprint",
+      "root_cause_note",
+      "source_event_id",
+      "noise_detail"
+    ],
+    "source": "disposable synthetic SQL fixtures; no device polling"
+  },
+  "api_cleanup": "complete",
+  "http_check_count": 72
+}

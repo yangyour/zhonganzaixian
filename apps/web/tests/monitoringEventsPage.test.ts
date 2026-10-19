@@ -8,8 +8,8 @@ import type { Session } from '../src/api/types'
 import { contextTransitionGuards } from '../src/utils/contextTransitionGuard'
 import { context, sampleWorkspace } from './monitoringEventControllerFixtures'
 
-const routeGuard = vi.hoisted(() => ({ leave: undefined as undefined | (() => boolean) }))
-vi.mock('vue-router', async original => ({ ...await original<typeof import('vue-router')>(), onBeforeRouteLeave: (guard: () => boolean) => { routeGuard.leave = guard } }))
+const routeGuard = vi.hoisted(() => ({ leave: undefined as undefined | (() => boolean), update: undefined as undefined | (() => boolean) }))
+vi.mock('vue-router', async original => ({ ...await original<typeof import('vue-router')>(), onBeforeRouteLeave: (guard: () => boolean) => { routeGuard.leave = guard }, onBeforeRouteUpdate: (guard: () => boolean) => { routeGuard.update = guard }, useRoute: () => ({ query: {} }), useRouter: () => ({ push: vi.fn() }) }))
 const auth: Session = {
   user: { id: context.actorId, display_name: '合成测试管理员', role: 'padmin' },
   tenant: { id: context.tenantId, name: '合成测试租户' }, allowed_tenants: [],
@@ -137,7 +137,7 @@ describe('D15 page permissions and interrupted flows', () => {
     button('确认解决').click(); await settle()
     expect(request.mock.calls.filter(([, o]) => o?.method === 'POST')).toHaveLength(1)
     expect(button('24h 漏斗').disabled).toBe(true); expect((document.getElementById(`root-cause-${e.id}`) as HTMLTextAreaElement).disabled).toBe(true)
-    expect(routeGuard.leave?.()).toBe(false); expect(await contextTransitionGuards.approve()).toBe(false)
+    expect(routeGuard.leave?.()).toBe(false); expect(routeGuard.update?.()).toBe(false); expect(await contextTransitionGuards.approve()).toBe(false)
     const unload = new Event('beforeunload', { cancelable: true }); window.dispatchEvent(unload); expect(unload.defaultPrevented).toBe(true)
     const original = request.mock.calls.find(([, o]) => o?.method === 'POST')!
     button('原请求与幂等键重试').click(); await settle()

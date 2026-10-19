@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.62.0",
+    "version": "0.63.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -11350,7 +11350,7 @@
     "/search": {
       "get": {
         "operationId": "searchCurrentTenantGroups",
-        "summary": "当前租户分组搜索；未接入事件/脚本保持未知",
+        "summary": "当前租户资产、内部监控事件和报障登记分组搜索",
         "parameters": [
           {
             "name": "q",
@@ -11372,7 +11372,7 @@
           "padmin"
         ],
         "x-mop-reject-duplicate-query-keys": true,
-        "description": "只接受一次q，禁止空白和控制字符，不接受身份/limit/来源覆盖。真实PG同一只读事务核验当前user/成员/权限并搜索资产名称及报障登记标题/编号；客户含tadmin仅本人登记，内部限当前租户。固定分组5/4/3/3；未接入事件/脚本items、returned、has_more均null，不冒充空集。无联系方式/IP/正文/内部备注，未实现铃铛，不执行自动化或通知。",
+        "description": "只接受一次q，禁止空白和控制字符，不接受身份/limit/来源覆盖。真实PG同一REPEATABLE READ只读事务核验当前user/成员/权限并搜索资产名称、监控事件规则名称/代码及报障登记标题/编号；必须具备有效search:read、assets:read、tickets:read。事件仅msp/padmin可见，与详情权限一致，按last_occurred_at DESC,id DESC取5返4；viewer/tadmin事件组NOT_AUTHORIZED且items、returned、has_more均null，报障仍仅本人。固定分组5/4/3/3；脚本NOT_IMPLEMENTED且items、returned、has_more均null，不冒充空集。无联系方式/IP/正文/内部备注，未实现铃铛，不执行自动化或通知。",
         "responses": {
           "200": {
             "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
@@ -41562,6 +41562,86 @@
         ],
         "additionalProperties": false
       },
+      "SearchEventHit": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rule_code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "rule_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "severity": {
+            "enum": [
+              "DISASTER",
+              "HIGH",
+              "AVERAGE",
+              "WARNING",
+              "INFO"
+            ]
+          },
+          "monitor_state": {
+            "enum": [
+              "PROBLEM",
+              "RECOVERED"
+            ]
+          },
+          "handling_state": {
+            "enum": [
+              "NEW",
+              "ACKNOWLEDGED",
+              "IN_PROGRESS",
+              "PENDING_REVIEW",
+              "RESOLVED",
+              "CLOSED"
+            ]
+          },
+          "occurrence_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "last_occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+          },
+          "resource_kind": {
+            "const": "MONITORING_EVENT"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "rule_code",
+          "rule_name",
+          "version",
+          "severity",
+          "monitor_state",
+          "handling_state",
+          "occurrence_count",
+          "last_occurred_at",
+          "resource_kind"
+        ],
+        "additionalProperties": false
+      },
       "SearchTicketHit": {
         "type": "object",
         "properties": {
@@ -41633,7 +41713,10 @@
             "const": "PARTIAL"
           },
           "coverage_reason": {
-            "const": "EVENT_AND_AUTOMATION_SOURCES_NOT_IMPLEMENTED"
+            "enum": [
+              "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+              "AUTOMATION_SOURCE_NOT_IMPLEMENTED_AND_EVENT_NOT_AUTHORIZED"
+            ]
           },
           "query_semantics": {
             "const": "LITERAL_UNICODE_CASE_INSENSITIVE"
@@ -41834,48 +41917,251 @@
                 ]
               },
               {
-                "type": "object",
-                "properties": {
-                  "kind": {
-                    "const": "events"
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "events"
+                      },
+                      "status": {
+                        "const": "AVAILABLE"
+                      },
+                      "limit": {
+                        "const": 4
+                      },
+                      "returned": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 4
+                      },
+                      "has_more": {
+                        "type": "boolean"
+                      },
+                      "items": {
+                        "type": "array",
+                        "maxItems": 4,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "tenant_id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "rule_code": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 64
+                            },
+                            "rule_name": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 128
+                            },
+                            "version": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740991
+                            },
+                            "severity": {
+                              "enum": [
+                                "DISASTER",
+                                "HIGH",
+                                "AVERAGE",
+                                "WARNING",
+                                "INFO"
+                              ]
+                            },
+                            "monitor_state": {
+                              "enum": [
+                                "PROBLEM",
+                                "RECOVERED"
+                              ]
+                            },
+                            "handling_state": {
+                              "enum": [
+                                "NEW",
+                                "ACKNOWLEDGED",
+                                "IN_PROGRESS",
+                                "PENDING_REVIEW",
+                                "RESOLVED",
+                                "CLOSED"
+                              ]
+                            },
+                            "occurrence_count": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 2147483647
+                            },
+                            "last_occurred_at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "显式Z/offset、秒及至多3位小数；UTC范围0001..9999，输出规范化UTC"
+                            },
+                            "resource_kind": {
+                              "const": "MONITORING_EVENT"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "tenant_id",
+                            "rule_code",
+                            "rule_name",
+                            "version",
+                            "severity",
+                            "monitor_state",
+                            "handling_state",
+                            "occurrence_count",
+                            "last_occurred_at",
+                            "resource_kind"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "source_scope": {
+                        "const": "CURRENT_TENANT_INTERNAL"
+                      },
+                      "matched_fields": {
+                        "const": [
+                          "rule_name",
+                          "rule_code"
+                        ]
+                      },
+                      "reason": {
+                        "type": "null"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "status",
+                      "limit",
+                      "returned",
+                      "has_more",
+                      "items",
+                      "source_scope",
+                      "matched_fields",
+                      "reason"
+                    ],
+                    "additionalProperties": false,
+                    "oneOf": [
+                      {
+                        "properties": {
+                          "returned": {
+                            "const": 0
+                          },
+                          "items": {
+                            "minItems": 0,
+                            "maxItems": 0
+                          },
+                          "has_more": {
+                            "const": false
+                          }
+                        }
+                      },
+                      {
+                        "properties": {
+                          "returned": {
+                            "const": 1
+                          },
+                          "items": {
+                            "minItems": 1,
+                            "maxItems": 1
+                          },
+                          "has_more": {
+                            "const": false
+                          }
+                        }
+                      },
+                      {
+                        "properties": {
+                          "returned": {
+                            "const": 2
+                          },
+                          "items": {
+                            "minItems": 2,
+                            "maxItems": 2
+                          },
+                          "has_more": {
+                            "const": false
+                          }
+                        }
+                      },
+                      {
+                        "properties": {
+                          "returned": {
+                            "const": 3
+                          },
+                          "items": {
+                            "minItems": 3,
+                            "maxItems": 3
+                          },
+                          "has_more": {
+                            "const": false
+                          }
+                        }
+                      },
+                      {
+                        "properties": {
+                          "returned": {
+                            "const": 4
+                          },
+                          "items": {
+                            "minItems": 4,
+                            "maxItems": 4
+                          }
+                        }
+                      }
+                    ]
                   },
-                  "status": {
-                    "const": "NOT_IMPLEMENTED"
-                  },
-                  "limit": {
-                    "const": 4
-                  },
-                  "returned": {
-                    "type": "null"
-                  },
-                  "has_more": {
-                    "type": "null"
-                  },
-                  "items": {
-                    "type": "null"
-                  },
-                  "source_scope": {
-                    "type": "null"
-                  },
-                  "matched_fields": {
-                    "type": "null"
-                  },
-                  "reason": {
-                    "const": "SOURCE_NOT_IMPLEMENTED"
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "events"
+                      },
+                      "status": {
+                        "const": "NOT_AUTHORIZED"
+                      },
+                      "limit": {
+                        "const": 4
+                      },
+                      "returned": {
+                        "type": "null"
+                      },
+                      "has_more": {
+                        "type": "null"
+                      },
+                      "items": {
+                        "type": "null"
+                      },
+                      "source_scope": {
+                        "type": "null"
+                      },
+                      "matched_fields": {
+                        "type": "null"
+                      },
+                      "reason": {
+                        "const": "INTERNAL_EVENT_READ_REQUIRED"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "status",
+                      "limit",
+                      "returned",
+                      "has_more",
+                      "items",
+                      "source_scope",
+                      "matched_fields",
+                      "reason"
+                    ],
+                    "additionalProperties": false
                   }
-                },
-                "required": [
-                  "kind",
-                  "status",
-                  "limit",
-                  "returned",
-                  "has_more",
-                  "items",
-                  "source_scope",
-                  "matched_fields",
-                  "reason"
-                ],
-                "additionalProperties": false
+                ]
               },
               {
                 "type": "object",
@@ -42093,7 +42379,61 @@
           "notification_bell_status",
           "groups"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "coverage_reason": {
+                "const": "AUTOMATION_SOURCE_NOT_IMPLEMENTED"
+              },
+              "groups": {
+                "prefixItems": [
+                  {},
+                  {
+                    "properties": {
+                      "status": {
+                        "const": "AVAILABLE"
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "source_scope": {
+                        "const": "CURRENT_TENANT_INTERNAL"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "properties": {
+              "coverage_reason": {
+                "const": "AUTOMATION_SOURCE_NOT_IMPLEMENTED_AND_EVENT_NOT_AUTHORIZED"
+              },
+              "groups": {
+                "prefixItems": [
+                  {},
+                  {
+                    "properties": {
+                      "status": {
+                        "const": "NOT_AUTHORIZED"
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "source_scope": {
+                        "const": "OWN_REPORT_REGISTRATIONS"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
       },
       "GroupedSearchResult": {
         "type": "object",

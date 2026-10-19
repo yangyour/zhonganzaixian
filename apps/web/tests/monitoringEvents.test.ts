@@ -106,6 +106,38 @@ describe('D15 guarded reads and transitions', () => {
     expect(request.mock.calls.map(([path]) => path)).toEqual(['/events?window=24h&page_size=25', `/events/${id}`])
     expect(request.mock.calls.every(([, options]) => options?.signal instanceof AbortSignal && !options.method && !options.body)).toBe(true)
   })
+  it('runs list and detail reads independently and keeps the detail across list refresh failure', async () => {
+    const { workspace: w, request } = clientFor(), list = deferred<unknown>(), detail = deferred<unknown>()
+    request.mockReturnValueOnce(list.promise).mockReturnValueOnce(detail.promise)
+    const loading = w.load(), id = controllerFixture.detail.data.event.id, selecting = w.selectEventDetail(id)
+    expect(w.state()).toMatchObject({ workspaceBusy: true, detailBusy: true, busy: 'read', detailId: id })
+    detail.resolve(sampleDetail()); expect(await selecting).toBe(true)
+    expect(w.state()).toMatchObject({ workspaceBusy: true, detailBusy: false, busy: 'read' })
+    list.resolve(sampleWorkspace()); expect(await loading).toBe(true); expect(w.state().detail?.event.id).toBe(id)
+    request.mockRejectedValueOnce(new ApiError(503, 'UPSTREAM_UNAVAILABLE', 'offline', 't'))
+    expect(await w.load()).toBe(false); expect(w.state().workspace).toBeNull(); expect(w.state().detail?.event.id).toBe(id)
+  })
+  it.each(['late success', 'late invalid response', 'late failure'])('preserves newer B detail against A %s despite ignored abort', async kind => {
+    const { workspace: w, request } = clientFor(), a = deferred<unknown>(), b = deferred<unknown>()
+    request.mockReturnValueOnce(a.promise).mockReturnValueOnce(b.promise)
+    const id = controllerFixture.detail.data.event.id, first = w.selectEventDetail(id), signal = request.mock.calls[0]![1]!.signal!
+    const second = w.selectEventDetail(OTHER), newer = sampleDetail().data
+    newer.event.id = OTHER; newer.members.forEach(x => x.event_id = OTHER); newer.noise_records.forEach(x => x.event_id = OTHER); if (newer.autoticket_attempt) newer.autoticket_attempt.event_id = OTHER
+    b.resolve(newer); expect(await second).toBe(true); expect(signal.aborted).toBe(true)
+    a.resolve(kind === 'late success' ? sampleDetail() : kind === 'late invalid response' ? {} : Promise.reject(new ApiError(404, 'NOT_FOUND', 'gone', 't')))
+    expect(await first).toBe(false); expect(w.state().detail?.event.id).toBe(OTHER); expect(w.state().detailError).toBeNull(); expect(w.state().busy).toBeNull()
+  })
+  it('closing or invalidating detail cancels only its request and never suppresses the independent list', async () => {
+    for (const value of [undefined, null, '', ['same', 'same'], '../bad']) {
+      const { workspace: w, request } = clientFor(), list = deferred<unknown>(), detail = deferred<unknown>()
+      request.mockReturnValueOnce(list.promise).mockReturnValueOnce(detail.promise)
+      const loading = w.load(), reading = w.loadEventDetail(controllerFixture.detail.data.event.id)
+      const listSignal = request.mock.calls[0]![1]!.signal!, detailSignal = request.mock.calls[1]![1]!.signal!
+      await w.selectEventDetail(value); expect(detailSignal.aborted).toBe(true); expect(listSignal.aborted).toBe(false)
+      list.resolve(sampleWorkspace()); detail.resolve(sampleDetail()); expect(await loading).toBe(true); expect(await reading).toBe(false)
+      expect(w.state().detail).toBeNull(); expect(w.state().workspace).not.toBeNull(); expect(Boolean(w.state().detailError)).toBe(value !== undefined)
+    }
+  })
   it('clears stale data on failed refresh and rejects wrong requested funnel', async () => {
     const { workspace: w, request } = clientFor(); await w.load()
     request.mockRejectedValueOnce(new ApiError(503, 'UPSTREAM_UNAVAILABLE', 'offline', 't'))
@@ -210,6 +242,7 @@ describe('D15 interrupted commands', () => {
     expect(first?.path).toBe(`/events/${data.events[0]!.id}/transitions`)
     expect(first?.body).toEqual(resolveInput); expect(first?.key).toBe(KEY)
     expect(await w.load()).toBe(false); expect(await w.loadEventDetail(data.events[0]!.id)).toBe(false)
+    expect(await w.selectEventDetail(OTHER)).toBe(false); expect(await w.selectEventDetail(undefined)).toBe(false); expect(w.clearEventDetail()).toBe(false); expect(w.state().attempt).toEqual(first)
     expect(await w.submitTransition(data.events[0]!.id, resolveInput)).toBe(false)
     await Promise.resolve(); expect(request).toHaveBeenCalledTimes(2)
     request.mockRejectedValueOnce(new ApiError(403, 'ACTION_FORBIDDEN', 'denied replay', 't'))

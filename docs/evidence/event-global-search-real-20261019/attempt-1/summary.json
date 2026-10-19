@@ -1,0 +1,13 @@
+{
+  "run_result": "HARNESS_BOOTSTRAP_FAILED",
+  "real_pg_tests": "PASS: 32/32, zero failure/error/skip",
+  "http_feature_tests": "NOT_RUN",
+  "http_requests": 0,
+  "cause": "Harness supplied five identities; explicit repository bootstrap requires exactly six existing acceptance identities. Fixed harness only by including the existing reviewer in bootstrap. HTTP actors remain five.",
+  "approved_source_and_artifacts_changed": false,
+  "sql_changed": false,
+  "api_started": false,
+  "postgresql_stopped": true,
+  "temporary_database_and_credentials_removed": true,
+  "retry": "New disposable database and full migration/32 PG/72 HTTP lifecycle"
+}

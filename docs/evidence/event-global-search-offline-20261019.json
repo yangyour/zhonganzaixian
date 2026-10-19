@@ -1,0 +1,66 @@
+{
+  "verified_at": "2026-10-19T11:23:59.285752+00:00",
+  "environment": "dot-cloud-offline",
+  "base_commit": "b21bb8c699f62d33cd7ec6ad5b00a3bd278995dc",
+  "api_version": "0.63.0",
+  "java": {
+    "runner": "Maven 3.9.9, installed Temurin JDK21, --release17, offline cached dependencies, explicit Mockito javaagent",
+    "total": 3428,
+    "executed": 2449,
+    "skipped": 979,
+    "failures": 0,
+    "errors": 0,
+    "scope": "all nine Maven reactor modules; external-service gates not enabled"
+  },
+  "focused_search_tests": {
+    "tests": 33,
+    "failures": 0,
+    "errors": 0,
+    "includes_actual_mvc_filter_chain": 13
+  },
+  "node_contracts": {
+    "tests": 149,
+    "passed": 149,
+    "failed": 0,
+    "contract_generation_check": true
+  },
+  "controller_fixture": {
+    "path": "fixtures/global-search-controller.json",
+    "sha256": "e5c9c7245edad7932383c2b1acd90385b4d8477b4a596f203d3c5e4d1bf0fd28",
+    "exchanges": 15,
+    "kind": "SYNTHETIC_PRODUCTION_CONTROLLER_JSON",
+    "database_evidence": false
+  },
+  "changed_routes": [
+    "/search"
+  ],
+  "changed_schemas": [
+    "GroupedSearch",
+    "SearchEventHit"
+  ],
+  "frozen_sql_count": 41,
+  "all_frozen_sql_unchanged_from_base": true,
+  "migration_started": false,
+  "services_started": false,
+  "original_server_accessed": false,
+  "user_computer_used": false,
+  "external_notification_sent": false,
+  "real_pg": {
+    "new_gated_tests": 23,
+    "gate": "MOP_RUN_EVENT_GLOBAL_SEARCH_TESTS=true",
+    "status": "NOT_RUN_IN_THIS_RECORD"
+  },
+  "remaining": [
+    "Root-coordinated real PostgreSQL and HTTP validation",
+    "Integrated frontend/browser checks",
+    "Automation script search and notification bell remain NOT_IMPLEMENTED",
+    "Large-scale query performance and production/customer acceptance not claimed"
+  ],
+  "fixture_refresh": {
+    "verified_at": "2026-10-19T11:28:32.594309+00:00",
+    "reason": "Positive real MVC coverage for stored rule name newline and rule code tab; query validation unchanged",
+    "focused_java_tests": 33,
+    "node_contract_tests": 149,
+    "production_backend_changed": false
+  }
+}

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { api } from '../api/client'
+import { api, ApiError } from '../api/client'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import { session, switchingTenant, contextGeneration } from '../stores/session'
-import { onBeforeRouteLeave } from 'vue-router'
+import { isNavigationFailure, NavigationFailureType, onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import { exportUuid } from '../utils/assetExportJobs'
 import { utcInstantNanos } from '../utils/utcInstant'
@@ -16,12 +16,14 @@ import {
   type MonitoringEventCenterState,
 } from '../utils/monitoringEvents'
 
+const route = useRoute(), router = useRouter(), navigating = ref(false), navigationError = ref('')
 const state = ref<MonitoringEventCenterState>(emptyMonitoringEventCenterState())
 const workspace = createMonitoringEventWorkspace(api, next => {
   if (state.value.attempt && !next.attempt && !next.error) clearDrafts()
   state.value = next
 })
 
+const capabilityScope = computed(() => JSON.stringify([...new Set(session.value?.capabilities ?? [])].sort()))
 const canRead = computed(() => Boolean(session.value?.mode === 'remote_test' && ['msp', 'padmin'].includes(session.value.user.role) && session.value.capabilities.includes('tickets:read') && !switchingTenant.value))
 const canWrite = computed(() => canRead.value && Boolean(session.value?.capabilities.includes('ticket_notes:write_internal')))
 const canAdminConfirm = computed(() => canRead.value && session.value?.user.role === 'padmin' && Boolean(session.value?.capabilities.includes('configurations:write')))
@@ -36,23 +38,38 @@ const validReason = (s: string | undefined) => Boolean(s?.trim() && Array.from(s
 const validManualReason = (s: string | undefined) => validReason(s) && Array.from(s!.trim()).length <= 492
 function validExtension(id: string, endsAt: string) { const next = utcInstantNanos(windowEnds.value[id]), previous = utcInstantNanos(endsAt); return validMaintenanceTime(windowEnds.value[id]) && next !== null && previous !== null && next > previous }
 
+// Compare context fields, not array identity: navigation re-reads an equivalent session before route-update guards.
 watch(
-  () => [contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.user.role, canRead.value, canWrite.value, canAdminConfirm.value] as const,
+  [() => contextGeneration.value, () => session.value?.tenant.id, () => session.value?.user.id, () => session.value?.permission_version, () => session.value?.user.role, () => capabilityScope.value, () => canRead.value, () => canWrite.value, () => canAdminConfirm.value],
   () => {
     clearDrafts()
     const s = session.value
     workspace.reset(s && canRead.value ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version, canWriteInternal: canWrite.value, canAdminConfirm: canAdminConfirm.value } : null)
-    if (canRead.value) void workspace.load('24h')
+    if (canRead.value) { void workspace.load('24h'); void workspace.selectEventDetail(route.query.event_id) }
   },
   { immediate: true, flush: 'sync' },
 )
 
+watch(() => route.query.event_id, value => { navigationError.value = ''; if (canRead.value) void workspace.selectEventDetail(value) }, { flush: 'sync' })
+
 function mayLeave() { return !workspace.unresolved() }
 onBeforeRouteLeave(mayLeave)
+onBeforeRouteUpdate(mayLeave)
 const unregister = contextTransitionGuards.register(mayLeave)
 function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved()) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
 onBeforeUnmount(() => { unregister(); window.removeEventListener('beforeunload', beforeUnload); workspace.dispose() })
+
+async function selectEvent(id?: string) {
+  if (!canRead.value || workspace.unresolved() || navigating.value || id !== undefined && !exportUuid(id)) return
+  navigating.value = true; navigationError.value = ''
+  const query = { ...route.query }; if (id === undefined) delete query.event_id; else query.event_id = id
+  try {
+    const failure = await router.push({ name: 'monitoring-events', query })
+    if (isNavigationFailure(failure) && !isNavigationFailure(failure, NavigationFailureType.duplicated)) navigationError.value = '事件切换未完成，请先处理当前操作。'
+  } catch { navigationError.value = '事件切换失败，请重试。' }
+  finally { navigating.value = false }
+}
 
 function switchWindow(w: FunnelWindow) {
   void workspace.load(w)
@@ -82,6 +99,25 @@ function switchWindow(w: FunnelWindow) {
       <button v-if="state.attempt" type="button" :disabled="state.busy !== null" @click="workspace.retry()">原请求与幂等键重试</button>
     </div>
 
+    <p v-if="navigationError" role="alert">{{ navigationError }}</p>
+    <section v-if="canRead && (state.detailId || state.detailError)" class="card event-detail" aria-label="监控事件详情" :aria-busy="state.detailBusy">
+      <div class="actions"><button type="button" :disabled="state.busy === 'write' || state.attempt !== null || navigating" @click="selectEvent()">关闭事件详情</button></div>
+      <p v-if="state.detailBusy" role="status">正在读取所选事件详情…</p>
+      <div v-if="state.detailError" role="alert">
+        <p v-if="state.detailError instanceof ApiError && state.detailError.status === 404">事件不存在或当前无权查看。</p>
+        <ApiErrorNotice :error="state.detailError" />
+        <button v-if="state.detailId" type="button" :disabled="locked" @click="workspace.loadEventDetail(state.detailId)">重新读取事件详情</button>
+      </div>
+      <aside v-if="state.detail" aria-label="监控事件详情抽屉">
+        <h2>事件详情抽屉：{{ state.detail.event.rule_name }} (×{{ state.detail.event.occurrence_count }})</h2>
+        <p>规则代码：{{ state.detail.event.rule_code }} · 级别：{{ state.detail.event.severity }} · 监控状态：{{ state.detail.event.monitor_state }} · 人工处理状态：{{ state.detail.event.handling_state }}</p>
+        <p>首次确认时间 (first_ack_at)：{{ state.detail.event.first_ack_at ?? '未确认' }} | 复盘门槛状态：{{ state.detail.event.review_policy_status }}</p>
+        <p>通知状态说明：<strong>{{ state.detail.event.notification_empty_state_label }}</strong></p>
+        <h3>合并的原始事件成员（{{ state.detail.members.length }} 条）</h3>
+        <ul><li v-for="m in state.detail.members" :key="m.id">#{{ m.sequence_no }} · {{ m.source_event_id }} · {{ m.source_phase }} · {{ m.occurred_at }}</li></ul>
+      </aside>
+    </section>
+    <p v-if="state.workspaceBusy" role="status">正在读取最新事件流与降噪漏斗…</p>
     <div v-if="state.workspace" class="workspace-grid">
       <section class="card" aria-label="告警降噪漏斗">
         <h2>告警降噪漏斗（{{ state.workspace.noise_funnel.window }}）</h2>
@@ -97,6 +133,7 @@ function switchWindow(w: FunnelWindow) {
 
       <section class="card" aria-label="监控事件主列表">
         <h2>监控事件流（监控状态与处理状态正交独立）</h2>
+        <p>此列表最多显示最新25条；搜索命中的事件可独立读取详情。</p>
         <table>
           <thead>
             <tr>
@@ -121,7 +158,7 @@ function switchWindow(w: FunnelWindow) {
               <td>{{ ev.suppression_state }} <small v-if="ev.suppression_reason">({{ ev.suppression_reason }})</small></td>
               <td>{{ ev.notification_empty_state_label }}</td>
               <td>
-                <button type="button" :disabled="locked" @click="workspace.loadEventDetail(ev.id)">查看抽屉</button>
+                <button type="button" :disabled="state.busy === 'write' || state.attempt !== null || navigating" @click="selectEvent(ev.id)">查看抽屉</button>
                 <button
                   v-if="canWrite && canTransition(ev, 'ACKNOWLEDGE')"
                   :disabled="locked"
@@ -147,18 +184,6 @@ function switchWindow(w: FunnelWindow) {
           </tbody>
         </table>
       </section>
-
-      <aside v-if="state.detail" class="card" aria-label="监控事件详情抽屉">
-        <h2>事件详情抽屉：{{ state.detail.event.rule_name }} (×{{ state.detail.event.occurrence_count }})</h2>
-        <p>首次确认时间 (first_ack_at)：{{ state.detail.event.first_ack_at ?? '未确认' }} | 复盘门槛状态：{{ state.detail.event.review_policy_status }}</p>
-        <p>通知状态说明：<strong>{{ state.detail.event.notification_empty_state_label }}</strong></p>
-        <h3>合并的原始事件成员（{{ state.detail.members.length }} 条）</h3>
-        <ul>
-          <li v-for="m in state.detail.members" :key="m.id">
-            #{{ m.sequence_no }} · {{ m.source_event_id }} · {{ m.source_phase }} · {{ m.occurred_at }}
-          </li>
-        </ul>
-      </aside>
 
       <section class="card" aria-label="计划维护窗口">
         <h2>计划维护窗口与 SLA 排除确认</h2>

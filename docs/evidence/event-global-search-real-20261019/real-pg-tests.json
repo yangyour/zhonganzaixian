@@ -1,0 +1,21 @@
+{
+  "expected": {
+    "PostgresGlobalSearchIntegrationTest": 9,
+    "PostgresEventGlobalSearchIntegrationTest": 23
+  },
+  "results": {
+    "PostgresEventGlobalSearchIntegrationTest": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PostgresGlobalSearchIntegrationTest": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "process_exit": 0
+}

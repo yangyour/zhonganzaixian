@@ -1,4 +1,4 @@
-import {type RequestOptions} from '../api/client'
+import {ApiError,type RequestOptions} from '../api/client'
 import {createRequestId} from './browserCrypto'
 import {exportExact,exportInteger,exportUuid} from './assetExportJobs'
 import {writeFailureUncertain} from './writeFailure'
@@ -113,6 +113,10 @@ type WriteAttempt={path:string;method:'POST';key:string;body:Record<string,unkno
 export interface MonitoringEventCenterState {
  workspace:MonitoringEventWorkspacePayload|null;
  detail:MonitoringEventDetailPayload|null;
+ detailId:string|null;
+ detailError:unknown;
+ workspaceBusy:boolean;
+ detailBusy:boolean;
  window:FunnelWindow;
  busy:'read'|'write'|null;
  error:unknown;
@@ -120,7 +124,7 @@ export interface MonitoringEventCenterState {
 }
 
 export const emptyMonitoringEventCenterState=():MonitoringEventCenterState=>({
- workspace:null,detail:null,window:'24h',busy:null,error:null,attempt:null
+ workspace:null,detail:null,detailId:null,detailError:null,workspaceBusy:false,detailBusy:false,window:'24h',busy:null,error:null,attempt:null
 })
 
 const EVENT_KEYS=[
@@ -272,48 +276,69 @@ export function createMonitoringEventWorkspace(
  changed:(s:MonitoringEventCenterState)=>void,
  newKey=createRequestId
 ){
- let state=emptyMonitoringEventCenterState(),context:MonitoringEventContext|null=null,epoch=0,abort:AbortController|null=null,disposed=false
- const snapshot=()=>({...structuredClone({...state,error:null}),error:state.error}),emit=()=>changed(snapshot())
+ let state=emptyMonitoringEventCenterState(),context:MonitoringEventContext|null=null,epoch=0,disposed=false
+ let workspaceTurn=0,detailTurn=0,workspaceAbort:AbortController|null=null,detailAbort:AbortController|null=null
+ const snapshot=()=>({...structuredClone({...state,error:null,detailError:null}),error:state.error,detailError:state.detailError}),emit=()=>changed(snapshot())
+ const reading=()=>state.workspaceBusy||state.detailBusy?'read' as const:null
+ const unresolved=()=>Boolean(state.busy==='write'||state.attempt)
+ function cancelReads(){workspaceTurn++;detailTurn++;workspaceAbort?.abort();detailAbort?.abort();workspaceAbort=null;detailAbort=null}
 
  function reset(next:MonitoringEventContext|null){
-  epoch++;abort?.abort();abort=null
+  epoch++;cancelReads()
   context=!disposed&&validContext(next)?{...next}:null
   state=emptyMonitoringEventCenterState();emit()
  }
 
  async function load(window:FunnelWindow=state.window){
-  if(disposed||!context||state.busy||state.attempt||!oneOf(window,['24h','7d','30d']))return false
-  const turn=++epoch,scope={...context},controller=new AbortController();abort=controller
-  state={...state,window,workspace:null,detail:null,busy:'read',error:null};emit()
+  if(disposed||!context||unresolved()||!oneOf(window,['24h','7d','30d']))return false
+  workspaceAbort?.abort()
+  const turn=++workspaceTurn,currentEpoch=epoch,scope={...context},controller=new AbortController();workspaceAbort=controller
+  state={...state,window,workspace:null,workspaceBusy:true,busy:'read',error:null};emit()
   try{
    const raw=await client.request(`/events?window=${encodeURIComponent(window)}&page_size=25`,{signal:controller.signal})
-   if(disposed||turn!==epoch)return false
+   if(disposed||currentEpoch!==epoch||turn!==workspaceTurn)return false
    const workspace=readMonitoringWorkspace(raw,scope)
    if(workspace.noise_funnel.window!==window)throw bad()
-   abort=null;state={...state,workspace,busy:null,error:null};emit()
+   workspaceAbort=null;state={...state,workspace,workspaceBusy:false,error:null};state.busy=reading();emit()
    return true
   }catch(error){
-   if(disposed||turn!==epoch)return false
-   abort=null;state={...state,busy:null,error};emit()
+   if(disposed||currentEpoch!==epoch||turn!==workspaceTurn)return false
+   workspaceAbort=null;state={...state,workspaceBusy:false,error};state.busy=reading();emit()
    return false
   }
  }
 
+ function clearEventDetail(error:unknown=null){
+  if(disposed||unresolved())return false
+  detailTurn++;detailAbort?.abort();detailAbort=null
+  state={...state,detail:null,detailId:null,detailError:error,detailBusy:false};state.busy=reading();emit()
+  return true
+ }
+
  async function loadEventDetail(eventId:string){
-  if(disposed||!context||state.busy||state.attempt||!exportUuid(eventId))return false
-  const turn=++epoch,scope={...context},controller=new AbortController();abort=controller
-  state={...state,detail:null,busy:'read',error:null};emit()
+  if(disposed||!context||unresolved()||!exportUuid(eventId))return false
+  detailAbort?.abort()
+  const turn=++detailTurn,currentEpoch=epoch,scope={...context},controller=new AbortController();detailAbort=controller
+  state={...state,detail:null,detailId:eventId,detailError:null,detailBusy:true,busy:'read'};emit()
   try{
-   const raw=await client.request(`/events/${encodeURIComponent(eventId)}`,{signal:controller.signal})
-   if(disposed||turn!==epoch)return false
+   const raw=await client.request(`/events/${eventId}`,{signal:controller.signal})
+   if(disposed||currentEpoch!==epoch||turn!==detailTurn)return false
    const detail=readMonitoringEventDetail(raw,scope,eventId)
-   abort=null;state={...state,detail,busy:null,error:null};emit()
+   detailAbort=null;state={...state,detail,detailBusy:false,detailError:null};state.busy=reading();emit()
    return true
   }catch(error){
-   if(disposed||turn!==epoch)return false
-   abort=null;state={...state,busy:null,error};emit()
+   if(disposed||currentEpoch!==epoch||turn!==detailTurn)return false
+   detailAbort=null;state={...state,detailBusy:false,detailError:error};state.busy=reading();emit()
    return false
   }
+ }
+
+ // URL values are untrusted: absent is clear, while null/arrays/noncanonical IDs are invalid.
+ async function selectEventDetail(value:unknown){
+  if(disposed||!context||unresolved())return false
+  if(value===undefined)return clearEventDetail()
+  if(!exportUuid(value))return clearEventDetail(new ApiError(400,'INVALID_EVENT_LINK','事件链接需包含唯一且规范的事件UUID','—'))
+  return loadEventDetail(value)
  }
 
  async function send(attempt:WriteAttempt,retry=false){
@@ -323,8 +348,10 @@ export function createMonitoringEventWorkspace(
    const raw=await client.request(attempt.path,{method:attempt.method,idempotencyKey:attempt.key,body:structuredClone(attempt.body)})
    if(disposed||turn!==epoch||!scope)return false
    readWriteReceipt(raw,scope,attempt)
+   const detailId=state.detailId
    state={...state,workspace:null,detail:null,busy:null,error:null,attempt:null};emit()
-   return await load(state.window)
+   const loaded=await Promise.all([load(state.window),...(detailId?[loadEventDetail(detailId)]:[])])
+   return loaded.every(Boolean)
   }catch(error){
    if(disposed||turn!==epoch)return false
    const keep=writeFailureUncertain(retry,error)
@@ -373,9 +400,9 @@ export function createMonitoringEventWorkspace(
  }
 
  return{
-  state:snapshot,reset,load,loadEventDetail,submitTransition,submitMaintenanceWindow,
+  state:snapshot,reset,load,loadEventDetail,selectEventDetail,clearEventDetail,submitTransition,submitMaintenanceWindow,
   submitWindowAction,submitQuarantineDecision,submitManualAutoTicket,retry,
-  unresolved:()=>Boolean(state.busy==='write'||state.attempt),
-  dispose(){disposed=true;epoch++;abort?.abort();abort=null}
+  unresolved,
+  dispose(){disposed=true;epoch++;cancelReads()}
  }
 }

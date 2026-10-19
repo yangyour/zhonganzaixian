@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-19",
+  "scope": "D11_WECOM_SINGLE_ATTEMPT_ADAPTER_AND_SUBMISSION_RESULT",
+  "environment": "dot-cloud-isolated-worktree",
+  "validation": "ISOLATED_JAVAC_JUNIT_NOT_COMPONENT_ACCEPTANCE",
+  "javaCompiler": "JDK 21 javac --release 17",
+  "dependencies": {"jackson-core": "2.21.4", "jackson-databind": "2.21.4", "jackson-annotations": "2.21"},
+  "tests": {"newAdapter": 53, "newResult": 7, "existingReceiptRegression": 24, "total": 84, "passed": 84, "failed": 0, "skipped": 0},
+  "productionClasses": ["ChannelSubmissionResult", "WeComMessageClient", "WeComHttpsTransport"],
+  "realMessagesSent": 0,
+  "credentialsRead": false,
+  "tokenAcquisitionPerformed": false,
+  "databaseMigrations": 0,
+  "fullMavenRegression": "NOT_RUN",
+  "realProviderCompatibility": "NOT_RUN",
+  "contractAcceptance": "NOT_RUN",
+  "remaining": ["durable delivery worker and result storage", "token lifecycle", "verified recipient bindings and effective routing", "authenticated delivery evidence", "channel configuration API and UI", "real component and end-to-end acceptance"]
+}

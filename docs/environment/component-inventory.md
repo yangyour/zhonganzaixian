@@ -1,5 +1,9 @@
 # 指定测试环境组件清单
 
+## 2026-10-19 华为 MIB 与 SNMP 示例只读联调
+
+固定主机信任复核指定 LAN 环境，前后 14 服务运行、PG17.9/V38、Zabbix7.0.31、原应用 ready=true。华为 192.168.1.2 在服务器/现有采集网络命名空间均 ICMP 2/2、TCP22/80/443 开放，但使用用户授权文档示例发送 SNMP v2c GET 时两处均 errno111/`UDP_PORT_UNREACHABLE`；未取得身份/固件/指标，设备 monitoring_ready=false。用途为厂商资源、接口与光功率采集，影响为首值/历史/恢复/页面接线仍未验收；解除条件是设备侧核对 SNMP 代理、UDP161、协议/只读视图及来源 ACL，并提供实际只读参数。无批准替代组件，不改成本机监控或 fixture；服务器缺 snmpget/snmpwalk，仅使用一次性有限 UDP 诊断，不安装/重启服务或修改设备。MIB 为社区镜像，七项修正候选保持未发布/未核验。见[联调记录](../huawei-snmp-integration-20261019.md)、[最终诊断](../evidence/huawei-snmp-example-probe-final-20261019.json)。
+
 2026-10-19测试站统一更新：固定主机信任SSH核对后，复用指定LAN PG17.9/V38、MinIO、Redis7.4.9、RabbitMQ4.3.2与Zabbix7.0.31；API/Web及5项Worker更新到 `34a183e`，14服务就绪，7基础组件ID/镜像/启动时间/重启次数全部不变，0迁移。企业微信由服务器现有受信任出口直接读取，凭证仅私有文件只读挂载；登录和人工通知启用，自动业务通知关闭。本次无组件安装/升级、无测试发送；HTTPS证书及真实扫码仍保留独立状态。见[发布记录](../test-environment-update-20261019.md)、[组件证据](../evidence/test-environment-update-components-20261019.json)。
 
 2026-10-19企业微信消息联调：本地API复用指定LAN PG17.9（V38）与已有服务器出口，实际应用与成员校验、耐久发送和用户接收确认均已完成。新增的是本地业务进程及SSH转发，不是基础组件；原共享服务未安装、替换或重启。应用页面/登录代码在本地验证，公网原站点未切换。扫码登录结果与完整D11验收单列，见[开发记录](../wecom-development-20261019.md)及[实际接收证据](../evidence/wecom-http-20261019.json)。

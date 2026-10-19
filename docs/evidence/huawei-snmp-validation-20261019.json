@@ -1,0 +1,35 @@
+{
+  "verified_at": "2026-10-19T07:47:30.905762+00:00",
+  "python": {
+    "run": 55,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "success": true,
+    "pattern": "test*probe*.py",
+    "new_huawei_tests": 20
+  },
+  "java": [
+    {
+      "name": "cn.mop.api.HuaweiS5731MappingCandidateTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "cn.mop.api.VendorMappingYamlTest",
+      "tests": "41",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "initial_check_issues": [
+    "PowerShell comma argument needed quoting; no Java tests ran on first invocation",
+    "Initial positive-overflow test omitted BER sign padding and encoded valid negative Integer32; corrected test vector, final regression passed"
+  ],
+  "external_component_test_claim": false,
+  "device_integration_status": "UDP_PORT_UNREACHABLE",
+  "formal_contract_acceptance": "NOT_RUN"
+}

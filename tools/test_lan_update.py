@@ -1,8 +1,6 @@
 """Deployment failure-path tests. No private files, SSH connections or components."""
 import importlib.util
-import json
 from pathlib import Path
-import tempfile
 import unittest
 from unittest.mock import Mock, patch
 
@@ -114,6 +112,26 @@ class DeploymentTests(unittest.TestCase):
             for path in ['/opt/other/transaction.json', update.REMOTE+'/private/update-../../transaction.json']:
                 with self.assertRaises(RuntimeError): update.restore(path)
             server.assert_not_called()
+
+    def test_pending_guard_matches_exact_dispatch_scope(self):
+        server = Mock(); server.run.return_value = '0\n'
+        self.assertEqual(update.pending_deliveries(server, '55000000-0000-4000-8000-000000000001', 'wwSYNTHETIC01', 123), 0)
+        sql = server.run.call_args.args[0][-1]
+        self.assertIn("tenant_id='55000000-0000-4000-8000-000000000001'::uuid", sql)
+        self.assertIn("AND corp_id='wwSYNTHETIC01' AND agent_id=123", sql)
+        self.assertIn("AND status IN ('QUEUED','PROCESSING')", sql)
+        self.assertTrue(sql.startswith('BEGIN READ ONLY;'))
+
+    def test_invalid_dispatch_scope_rejected_before_database(self):
+        server = Mock()
+        for corp, agent in [("wwinvalid' OR true", 123), ('wwSYNTHETIC01', True), ('wwSYNTHETIC01', -1)]:
+            with self.assertRaises(RuntimeError):
+                update.pending_deliveries(server, '55000000-0000-4000-8000-000000000001', corp, agent)
+        server.run.assert_not_called()
+
+    def test_compose_snapshot_preserves_literal_dollar_credentials(self):
+        text = update.compose_json({'services': {'api': {'environment': {'UNIT_PASSWORD': 'test${HOME}$value$'}}}})
+        self.assertIn('test$${HOME}$$value$$', text)
 
 
 if __name__ == '__main__': unittest.main()

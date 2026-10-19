@@ -151,6 +151,24 @@ def environment(item):
     return dict(entry.split('=', 1) for entry in item['Config']['Env'])
 
 
+def compose_json(value):
+    # Compose interpolates even JSON string values. Preserve literal dollars in
+    # existing runtime passwords/tokens instead of interpreting them as variables.
+    return json.dumps(value).replace('$', '$$')
+
+
+def pending_deliveries(server, tenant, corp, agent):
+    require(str(uuid.UUID(tenant)) == tenant and re.fullmatch(r'ww[A-Za-z0-9]{8,64}', corp)
+            and type(agent) is int and agent > 0, 'Invalid WeCom delivery scope')
+    # Match exactly the scope used by PostgresWeComRepository.claim. Other
+    # synthetic apps/tenants must neither block this app nor be dispatched by it.
+    sql = ("BEGIN READ ONLY; SELECT count(*) FROM mop_wecom_delivery WHERE tenant_id='" + tenant
+           + "'::uuid AND corp_id='" + corp + "' AND agent_id=" + str(agent)
+           + " AND status IN ('QUEUED','PROCESSING'); COMMIT;")
+    return int(server.run(['docker', 'exec', 'mop-lan-postgres', 'psql', '-X', '-qAt', '-v', 'ON_ERROR_STOP=1',
+                           '-U', 'postgres', '-d', 'mop_test', '-c', sql], True).strip())
+
+
 def overlay(items, release=None, revision=None):
     result = {'services': {}}
     for item in items:
@@ -340,10 +358,8 @@ def deploy(args, branch, revision, folder):
             callback_parts(args.wecom_callback, args.allow_http_wecom_callback)
             wecom = json.loads((ROOT / 'deploy/private/wecom-app.json').read_text(encoding='utf-8-sig'))
             # Refuse to activate an existing send backlog. No deployment step enqueues or sends a message.
-            sql = "BEGIN READ ONLY; SELECT count(*) FROM mop_wecom_delivery WHERE status IN ('QUEUED','PROCESSING'); COMMIT;"
-            count = server.run(['docker', 'exec', 'mop-lan-postgres', 'psql', '-X', '-qAt', '-v', 'ON_ERROR_STOP=1',
-                                '-U', 'postgres', '-d', 'mop_test', '-c', sql], True).strip()
-            require(count == '0', 'Pending WeCom deliveries require operator review before enabling manual dispatch')
+            require(pending_deliveries(server, args.wecom_tenant_id, wecom['corp_id'], wecom['agent_id']) == 0,
+                    'Pending WeCom deliveries require operator review before enabling manual dispatch')
             require(api_env.get('MOP_WECOM_ENABLED', 'false') != 'true', 'WeCom is already enabled; preserve its existing configuration without this flag')
             nginx = domain_nginx(nginx, args.wecom_callback, args.allow_http_wecom_callback)
             secret_path = private + '/wecom.json'
@@ -371,8 +387,8 @@ def deploy(args, branch, revision, folder):
         server.run(['mkdir', release + '/.local'])
         server.run(['sha256sum', '--check', '--status'], data=''.join(sha+'  '+release+'/'+name+'\n' for name, sha in hashes.items()))
         server.write(release + '/manifest.json', json.dumps({'source_commit': revision, 'files': hashes}), 0o644)
-        server.write(private + '/rollback.json', json.dumps(rollback))
-        server.write(private + '/deploy.json', json.dumps(desired))
+        server.write(private + '/rollback.json', compose_json(rollback))
+        server.write(private + '/deploy.json', compose_json(desired))
         recovery = {'environment': ENVIRONMENT, 'source_commit': revision, 'run_id': run_id, 'services': server.selected,
                     'base_files': base, 'compose_file': private + '/deploy.json', 'rollback_file': private + '/rollback.json',
                     'previous_active': json.loads(active) if code == 0 else None, 'release': release, 'schema': history}
@@ -409,6 +425,10 @@ def deploy(args, branch, revision, folder):
             require(metadata(actual, names) == protected, 'Unrelated component lifecycle changed')
             for item in choose(actual):
                 require(item['Config']['Labels'].get('mop.source.commit') == revision, 'Application revision label mismatch')
+                target = '/usr/share/nginx/html' if item['Name'] == '/mop-lan-web' else '/app'
+                expected = release + '/web' if target == '/usr/share/nginx/html' else release
+                require(any(m['Destination'] == target and m['Source'] == expected and not m['RW'] for m in item['Mounts']),
+                        'Application immutable release mount mismatch')
                 require(item['RestartCount'] == 0, 'Updated application restarted unexpectedly')
                 require(item['State'].get('Health', {}).get('Status', 'healthy') != 'unhealthy', 'Application health is unhealthy')
             served = json.loads(server.run(['curl', '--fail', '--silent', 'http://127.0.0.1:10010/release-manifest.json']))

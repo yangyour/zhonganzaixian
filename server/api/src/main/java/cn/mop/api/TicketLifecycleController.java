@@ -41,10 +41,23 @@ public final class TicketLifecycleController {
         var e=entry.get();var p=e.clock();
         return success(map("clock",map("tenant_id",e.tenantId(),"ticket_id",e.ticketId(),"tier",e.tier(),"priority",e.priority(),
                 "observed_at",p.observedAt(),"lifecycle_version",p.lifecycleVersion(),"configuration_reference",p.configurationReference(),
+                "calculation_policy_reference",e.policyReference(),"clock_policy",e.clockPolicy(),
                 "response",clockDto(p.response()),"recovery",clockDto(p.recovery()),"paused_at",p.pausedAt(),
                 "completed_pauses",p.completedPauses().stream().map(i->map("start",i.start(),"end",i.end())).toList(),
                 "reminders_delivered",false,"production_approved",false),"status","PROJECTED","source","postgresql","production_approved",false),request);
     }
+    Object slaPolicy(String ticketId,HttpServletRequest request){
+        Membership member=member(request,"tickets:read");query(request,Set.of());var view=repository.slaPolicy(access(member,request),uuid(ticketId));recheck(member,request,"tickets:read");return success(policyDto(view),request);
+    }
+    Object bindSlaPolicy(String ticketId,HttpServletRequest request){
+        Membership member=member(request,"tickets:lifecycle_write");query(request,Set.of());Access a=access(member,request);String ticket=uuid(ticketId);JsonNode input=body(request);
+        if(input==null||!input.isObject()||input.size()!=3||!input.has("expected_lifecycle_version")||!input.has("release_id")||!input.has("release_version")||!input.get("release_id").isTextual())throw invalid();
+        long expected=positiveVersion(input.get("expected_lifecycle_version")),version=positiveVersion(input.get("release_version"));String release=uuid(input.get("release_id").textValue());
+        String key=request.getHeader("Idempotency-Key");if(key==null||!key.matches("[A-Za-z0-9._:-]{1,128}"))throw invalid();
+        Object result=platform.idempotentAuthorized(a.actorId(),a.tenantId(),request.getMethod()+" "+route(request),key,hash(input),a.permissionVersion(),()->repository.authorizeCurrentAccess(a,ticket,false),()->policyDto(repository.bindSlaPolicy(a,ticket,expected,release,version)));return success(result,request);
+    }
+    private static long positiveVersion(JsonNode n){if(n==null||!n.isIntegralNumber()||!n.canConvertToLong()||n.longValue()<1||n.longValue()>MAX_VERSION)throw invalid();return n.longValue();}
+    private static Map<String,Object> policyDto(PolicyBinding v){return map("tenant_id",v.tenantId(),"ticket_id",v.ticketId(),"lifecycle_version",v.lifecycleVersion(),"status",v.status(),"release_id",v.releaseId(),"release_version",v.releaseVersion(),"clock_policy",v.clockPolicy(),"bound_at",v.boundAt(),"reference",v.reference(),"missing",v.missing(),"source","postgresql","production_approved",false);}
     private static Map<String,Object> clockDto(cn.mop.domain.sla.SlaClockState.Clock c){
         return map("status",c.status().name(),"deadline",c.deadline(),"stopped_at",c.stoppedAt(),
                 "elapsed_ms",c.elapsed()==null?null:c.elapsed().toMillis(),"budget_ms",c.budget()==null?null:c.budget().toMillis(),"breached",c.breached(),"missing",c.missing());

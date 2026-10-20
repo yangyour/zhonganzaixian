@@ -13,7 +13,10 @@ public interface TicketLifecycleRepository {
     }
     record Action(TicketLifecycle.Action action,long expectedVersion,String reason,
                   String expectedSolutionHash,String assigneeId,boolean keepPriorAssignee) {}
-    record SlaEntry(String tenantId,String ticketId,String tier,String priority,cn.mop.domain.sla.SlaClockState.Projection clock) {}
+    record SlaEntry(String tenantId,String ticketId,String tier,String priority,String policyReference,String clockPolicy,cn.mop.domain.sla.SlaClockState.Projection clock) {}
+    record PolicyBinding(String tenantId,String ticketId,long lifecycleVersion,String status,String releaseId,Long releaseVersion,String clockPolicy,Instant boundAt,String reference,String missing) {}
+    PolicyBinding slaPolicy(Access access,String ticketId);
+    PolicyBinding bindSlaPolicy(Access access,String ticketId,long expectedVersion,String releaseId,long releaseVersion);
     Optional<SlaEntry> sla(Access access,String ticketId);
     Optional<Entry> get(Access access,String ticketId);
     Optional<TicketResolutionSnapshot> solution(Access access,String ticketId,String expectedHash);

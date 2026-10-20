@@ -39,7 +39,7 @@ class TicketLifecycleHttpSecurityTest {
     static class Configuration implements WebMvcConfigurer {
         @Bean PlatformRepository platform(){return mock(PlatformRepository.class);}
         @Bean TicketLifecycleRepository repository(){return mock(TicketLifecycleRepository.class);}
-        @Bean ObjectMapper mapper(){return new ObjectMapper();}
+        @Bean ObjectMapper mapper(){return new ObjectMapper().findAndRegisterModules().disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);}
         @Bean TicketSlaController slaController(TicketLifecycleController controller){return new TicketSlaController(controller);}
         @Bean TicketLifecycleController controller(PlatformRepository platform,TicketLifecycleRepository repository,ObjectMapper mapper){return new TicketLifecycleController(platform,repository,mapper);}
         @Override public void configureMessageConverters(List<HttpMessageConverter<?>> converters){converters.add(new MappingJackson2HttpMessageConverter(mapper()));}
@@ -81,5 +81,15 @@ class TicketLifecycleHttpSecurityTest {
         when(repository.sla(any(),any())).thenReturn(Optional.empty());
         mvc.perform(scoped(get("/api/v1/tickets/"+TICKET+"/sla"))).andExpect(status().isOk()).andExpect(jsonPath("$.data.status").value("NOT_STARTED")).andExpect(jsonPath("$.data.production_approved").value(false));
         mvc.perform(get("/api/v1/tickets/"+TICKET+"/sla")).andExpect(status().isUnauthorized());
+    }
+    @Test void policyBindingRequiresCsrfAndCannotAcceptRawPolicy()throws Exception{
+        String path="/api/v1/tickets/"+TICKET+"/sla/policy-binding";
+        mvc.perform(scoped(post(path)).contentType("application/json").content("{}")).andExpect(status().isForbidden()).andExpect(jsonPath("$.error.code").value("CSRF_INVALID"));
+        mvc.perform(scoped(post(path)).with(csrf().asHeader()).contentType("application/json").content("{\"expected_lifecycle_version\":1,\"release_id\":\""+TICKET+"\",\"release_version\":1,\"clock_policy\":\"override\"}")).andExpect(status().isBadRequest());
+        verifyNoInteractions(repository);
+    }
+    @Test void customerCannotBindEvenWithCsrf()throws Exception{
+        when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",7,true,List.of("tickets:read","tickets:customer_decide"))));
+        mvc.perform(scoped(post("/api/v1/tickets/"+TICKET+"/sla/policy-binding")).with(csrf().asHeader()).contentType("application/json").content("{}")).andExpect(status().isForbidden());verifyNoInteractions(repository);
     }
 }

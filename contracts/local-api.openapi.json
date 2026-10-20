@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.55.0",
+    "version": "0.56.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -31400,6 +31400,256 @@
           }
         }
       }
+    },
+    "/tickets/{ticketId}/sla/policy-binding": {
+      "get": {
+        "operationId": "getTicketSlaPolicyBinding",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "tickets:read"
+        ],
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketSlaPolicyBindingResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "bindTicketSlaPolicy",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expected_lifecycle_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740990
+                  },
+                  "release_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "release_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740990
+                  }
+                },
+                "required": [
+                  "expected_lifecycle_version",
+                  "release_id",
+                  "release_version"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-mop-capabilities": [
+          "tickets:lifecycle_write"
+        ],
+        "description": "V35显式迁移后，仅为缺失Q27的工单一次绑定当前已生效发布；不可替换既有冻结口径或修改开单快照，绑定和审计同事务。",
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketSlaPolicyBindingResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -60320,6 +60570,20 @@
             "type": "string",
             "pattern": "^sha256:[0-9a-f]{64}$"
           },
+          "calculation_policy_reference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 256
+          },
+          "clock_policy": {
+            "enum": [
+              null,
+              "EXCLUDE_CONFIRMED_PAUSES",
+              "INCLUDE_ALL_ELAPSED_TIME"
+            ]
+          },
           "response": {
             "$ref": "#/components/schemas/TicketSlaClock"
           },
@@ -60370,6 +60634,8 @@
           "observed_at",
           "lifecycle_version",
           "configuration_reference",
+          "calculation_policy_reference",
+          "clock_policy",
           "response",
           "recovery",
           "paused_at",
@@ -60411,6 +60677,108 @@
             "required": [
               "clock",
               "status",
+              "source",
+              "production_approved"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "TicketSlaPolicyBindingResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "ticket_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "lifecycle_version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "status": {
+                "enum": [
+                  "OPENING_FROZEN",
+                  "BOUND",
+                  "AVAILABLE",
+                  "CONFIG_PENDING"
+                ]
+              },
+              "release_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "release_version": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "clock_policy": {
+                "enum": [
+                  null,
+                  "EXCLUDE_CONFIRMED_PAUSES",
+                  "INCLUDE_ALL_ELAPSED_TIME"
+                ]
+              },
+              "bound_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "reference": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 256
+              },
+              "missing": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "production_approved": {
+                "const": false
+              }
+            },
+            "required": [
+              "tenant_id",
+              "ticket_id",
+              "lifecycle_version",
+              "status",
+              "release_id",
+              "release_version",
+              "clock_policy",
+              "bound_at",
+              "reference",
+              "missing",
               "source",
               "production_approved"
             ],

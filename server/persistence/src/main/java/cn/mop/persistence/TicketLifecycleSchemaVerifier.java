@@ -30,6 +30,7 @@ final class TicketLifecycleSchemaVerifier {
         requireTrue(c,"SELECT count(*)=1 AND bool_and(tgenabled='O' AND tgname='mop_ticket_resolution_immutable' AND tgtype=27 AND tgfoid='public.mop_ticket_resolution_immutable()'::regprocedure) FROM pg_trigger WHERE tgrelid='public.mop_ticket_resolution_snapshot'::regclass AND NOT tgisinternal");
         requireTrue(c,"SELECT count(*)=(CASE WHEN to_regclass('public.mop_ticket_autoclose_job') IS NULL THEN 1 ELSE 3 END) FROM pg_trigger WHERE tgrelid='public.mop_ticket_lifecycle_revision'::regclass AND NOT tgisinternal");
         try(var statement=c.createStatement();var rows=statement.executeQuery("SELECT to_regclass('public.mop_ticket_autoclose_job') IS NOT NULL")){rows.next();if(rows.getBoolean(1))TicketAutoCloseSchemaVerifier.lifecycleExtras(c);}
+        try(var statement=c.createStatement();var rows=statement.executeQuery("SELECT to_regclass('public.mop_ticket_sla_policy_binding') IS NOT NULL")){rows.next();if(rows.getBoolean(1))TicketSlaPolicyBindingSchemaVerifier.verify(c);}
         function(c,"mop_ticket_lifecycle_guard","a9f6f99f4aa4760d0d8d6fa7c76ba95fa4e89a02e919b46935900edf151bd6b3");
         function(c,"mop_ticket_resolution_immutable","bcb49a5acc0097b3cc5d71dbb8b3bbdb3c168ddf76a421bfabcfe478e30fdf87");
     }

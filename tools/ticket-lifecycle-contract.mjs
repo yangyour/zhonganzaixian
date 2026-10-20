@@ -90,7 +90,7 @@ export function addTicketLifecycleContract(contract) {
     breached: { type: ['boolean','null'] }, missing: { type: ['string','null'] } });
   schemas.TicketSlaProjection = object({ tenant_id: uuid, ticket_id: uuid, tier: { enum: ['BASIC','STANDARD','ADVANCED'] },
     priority: { enum: ['P1','P2','P3'] }, observed_at: { type: 'string', format: 'date-time' }, lifecycle_version: version,
-    configuration_reference: { type: 'string', pattern: '^sha256:[0-9a-f]{64}$' }, response: ref('TicketSlaClock'), recovery: ref('TicketSlaClock'), paused_at: time,
+    configuration_reference: { type: 'string', pattern: '^sha256:[0-9a-f]{64}$' }, calculation_policy_reference: { type: ['string','null'], maxLength: 256 }, clock_policy: { enum: [null,'EXCLUDE_CONFIRMED_PAUSES','INCLUDE_ALL_ELAPSED_TIME'] }, response: ref('TicketSlaClock'), recovery: ref('TicketSlaClock'), paused_at: time,
     completed_pauses: { type: 'array', maxItems: 10000, items: object({ start: { type: 'string', format: 'date-time' }, end: { type: 'string', format: 'date-time' } }) },
     reminders_delivered: { const: false }, production_approved: { const: false } });
   schemas.TicketSlaResult = envelope(object({ clock: { anyOf: [ref('TicketSlaProjection'), { type: 'null' }] },
@@ -99,5 +99,17 @@ export function addTicketLifecycleContract(contract) {
     'x-mop-capabilities': ['tickets:read'], 'x-mop-read-only': true,
     description: '仅服务端基于不可变开单配置和完整历史投影，最多10000版本。未发布Q27时重开恢复时钟待配置，不默认续算。无提醒送达或生产批准声明。',
     responses: responses(ref('TicketSlaResult')) } };
-  contract.info.version = '0.55.0';
+  schemas.TicketSlaPolicyBindingResult = envelope(object({ tenant_id: uuid, ticket_id: uuid, lifecycle_version: version,
+    status: { enum: ['OPENING_FROZEN','BOUND','AVAILABLE','CONFIG_PENDING'] },
+    release_id: { ...uuid, type: ['string','null'] }, release_version: { ...version, type: ['integer','null'] },
+    clock_policy: { enum: [null,'EXCLUDE_CONFIRMED_PAUSES','INCLUDE_ALL_ELAPSED_TIME'] }, bound_at: time,
+    reference: { type: ['string','null'], maxLength: 256 }, missing: { type: ['string','null'] }, source: { const: 'postgresql' }, production_approved: { const: false } }));
+  contract.paths['/tickets/{ticketId}/sla/policy-binding'] = {
+    get: { operationId: 'getTicketSlaPolicyBinding', parameters: [ticket], 'x-mop-capabilities': ['tickets:read'], responses: responses(ref('TicketSlaPolicyBindingResult')) },
+    post: { operationId: 'bindTicketSlaPolicy', parameters: [ticket,parameter('Idempotency-Key','header',{type:'string',pattern:'^[A-Za-z0-9._:-]{1,128}$'}),parameter('X-CSRF-Token','header',string)],
+      requestBody: { required: true, content: { 'application/json': { schema: object({ expected_lifecycle_version: version, release_id: uuid, release_version: version }) } } },
+      'x-mop-capabilities': ['tickets:lifecycle_write'], description: 'V35显式迁移后，仅为缺失Q27的工单一次绑定当前已生效发布；不可替换既有冻结口径或修改开单快照，绑定和审计同事务。',
+      responses: responses(ref('TicketSlaPolicyBindingResult')) }
+  };
+  contract.info.version = '0.56.0';
 }

@@ -10,6 +10,7 @@ import { displayTime } from '../utils/display'
 import { feedback } from '../utils/feedback'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 import TicketSlaPanel from './TicketSlaPanel.vue'
+const slaPanel=ref<InstanceType<typeof TicketSlaPanel>|null>(null)
 const props = defineProps<{ ticket: RegisteredTicket; refreshKey: number }>()
 const openingPriority = ref(''), openingAcknowledged = ref(false)
 const state = shallowRef(emptyLifecycleState()), selected = ref<LifecycleAction | ''>(''), reason = ref(''), assignee = ref(''), keep = ref(false), acknowledged = ref(false), validation = ref('')
@@ -22,21 +23,22 @@ const scope = computed<LifecycleContext | null>(() => {
 const actions = computed(() => lifecycleActions(state.value.snapshot, scope.value))
 const missingConfiguration = computed(() => state.value.error instanceof ApiError && state.value.error.code === 'CONFIG_PENDING'
   ? state.value.error.details.flatMap(item => typeof item.configuration_key === 'string' && /^[a-z][a-z0-9_.]{0,99}$/.test(item.configuration_key) ? [item.configuration_key] : []) : [])
-const locked = computed(() => Boolean(state.value.busy) || state.value.attempt?.state === 'uncertain')
+const locked = computed(() => Boolean(state.value.busy) || state.value.attempt?.state === 'uncertain' || slaPanel.value?.hasUnresolved() === true)
 const needsReason = computed(() => selected.value && !['accept','resume','confirm'].includes(selected.value))
 const contextKey = computed(() => JSON.stringify([contextGeneration.value, scope.value]))
 function clear() { openingPriority.value = ''; openingAcknowledged.value = false; selected.value = ''; reason.value = ''; assignee.value = ''; keep.value = false; acknowledged.value = false; validation.value = '' }
 watch(contextKey, () => { clear(); workspace.reset(scope.value); if (scope.value) void workspace.refresh() }, { immediate: true, flush: 'sync' })
-watch(() => props.refreshKey, () => { if (!workspace.unresolved()) void workspace.refresh() })
+watch(() => props.refreshKey, () => { if (!workspace.unresolved() && !slaPanel.value?.hasUnresolved()) void workspace.refresh() })
 watch(openingPriority, () => { openingAcknowledged.value = false })
 watch(selected, () => { acknowledged.value = false; validation.value = '' })
+watch(() => JSON.stringify([state.value.snapshot?.version, state.value.snapshot?.solution_snapshot_hash]), () => { acknowledged.value = false; selected.value = '' })
 async function start() { if (!locked.value && openingAcknowledged.value && await workspace.start(openingPriority.value)) clear() }
 async function submit() {
   if (!selected.value || locked.value || !acknowledged.value) return
   try { validation.value = ''; if (await workspace.submit(selected.value, reason.value, assignee.value, keep.value)) clear() }
   catch (error) { validation.value = error instanceof Error ? error.message : '请检查动作输入' }
 }
-function canLeave() { if (!workspace.unresolved()) return true; feedback.warning('工单动作结果尚未确认，请先使用原请求重试'); return false }
+function canLeave() { if (slaPanel.value?.canLeave() === false) return false; if (!workspace.unresolved()) return true; feedback.warning('工单动作结果尚未确认，请先使用原请求重试'); return false }
 function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved()) { event.preventDefault(); event.returnValue = '' } }
 const unregister = contextTransitionGuards.register(canLeave)
 onBeforeRouteLeave(canLeave)
@@ -69,7 +71,7 @@ defineExpose({ canLeave })
         <el-button v-if="selected" type="primary" :disabled="locked || !acknowledged" @click="submit">{{ lifecycleActionLabels[selected] }}</el-button>
       </div>
     </template>
-    <TicketSlaPanel v-if="state.snapshot" :ticket="ticket" :expected-version="state.snapshot.version" />
+    <TicketSlaPanel ref="slaPanel" v-if="state.snapshot" :ticket="ticket" :expected-version="state.snapshot.version" />
     <div v-if="state.attempt?.state === 'uncertain'" role="alert"><p>请求结果尚不确定。请勿另建请求，使用相同请求号重试；刷新状态不等于确认原请求结果。</p><el-button :disabled="Boolean(state.busy)" @click="workspace.retry()">原请求重试</el-button></div>
     <p v-if="state.attempt?.state === 'accepted'" role="status">动作已受理；以刷新后的持久状态为准。</p>
   </section>

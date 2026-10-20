@@ -924,6 +924,7 @@
       "has_progress_note": true,
       "local_references": [
         "docs/sla-clock-core-20261020.md",
+        "docs/ticket-sla-policy-binding-20261020.md",
         "docs/ticket-sla-projection-20261020.md",
         "docs/working-calendar-drafts.md"
       ],
@@ -1469,6 +1470,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "790929449d89110b6a7cc99814200be0d6751779f8ed6618778cb6ed238a5815"
+    "doc/development/07_合同逐项开发追踪.md": "503308eed722bef3fc8eebeeb340a51efe354b315249f46f5426a88bd1a8253f"
   }
 }

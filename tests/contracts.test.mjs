@@ -245,7 +245,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.55.0');
+  assert.equal(contract.info.version, '0.56.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -935,3 +935,5 @@ test('开单必须明确优先级，客户端不能覆盖租户档位、SLA时�
 })
 
 test('SLA服务端投影包含未知口径而不声称通知送达',()=>{const path=contract.paths['/tickets/{ticketId}/sla'];assert.equal(path.get['x-mop-read-only'],true);assert.equal(path.post,undefined);const s=contract.components.schemas.TicketSlaProjection;assert.equal(s.properties.reminders_delivered.const,false);assert.equal(s.properties.production_approved.const,false);assert.ok(contract.components.schemas.TicketSlaClock.properties.status.enum.includes('CONFIG_PENDING'));});
+
+test('补充SLA口径只能绑定明确发布版本，不接收策略或身份覆盖',()=>{const op=contract.paths['/tickets/{ticketId}/sla/policy-binding'].post;assert.ok(op.parameters.some(x=>x.name==='X-CSRF-Token'));const schema=op.requestBody.content['application/json'].schema;assert.equal(schema.additionalProperties,false);assert.deepEqual(Object.keys(schema.properties),['expected_lifecycle_version','release_id','release_version']);assert.equal(contract.components.schemas.TicketSlaPolicyBindingResult.properties.data.properties.production_approved.const,false);});

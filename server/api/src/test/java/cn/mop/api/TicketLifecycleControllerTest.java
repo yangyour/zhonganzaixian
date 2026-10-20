@@ -107,4 +107,10 @@ class TicketLifecycleControllerTest {
         var request=request("tickets:read");request.addParameter("observed_at","2099-01-01T00:00:00Z");
         assertThrows(DomainException.class,()->controller.sla(TICKET,request));verifyNoInteractions(repository);
     }
+    @Test void bindingRechecksResourceBeforeCallingRepository()throws Exception{
+        var request=request("tickets:lifecycle_write");request.setContent(("{\"expected_lifecycle_version\":1,\"release_id\":\""+ACTOR+"\",\"release_version\":2}").getBytes(StandardCharsets.UTF_8));
+        when(platform.idempotentAuthorized(anyString(),anyString(),anyString(),anyString(),anyString(),anyLong(),any(),any())).thenAnswer(i->{i.<Runnable>getArgument(6).run();return i.<Supplier<Object>>getArgument(7).get();});
+        when(repository.bindSlaPolicy(any(),eq(TICKET),eq(1L),eq(ACTOR),eq(2L))).thenReturn(new TicketLifecycleRepository.PolicyBinding(TENANT,TICKET,1,"BOUND",ACTOR,2L,"EXCLUDE_CONFIRMED_PAUSES",Instant.parse("2026-10-20T00:00:00Z"),"binding:"+TICKET+":"+ACTOR+":2",null));
+        assertNotNull(controller.bindSlaPolicy(TICKET,request));var order=inOrder(repository);order.verify(repository).authorizeCurrentAccess(any(),eq(TICKET),eq(false));order.verify(repository).bindSlaPolicy(any(),eq(TICKET),eq(1L),eq(ACTOR),eq(2L));
+    }
 }

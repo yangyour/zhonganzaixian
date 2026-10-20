@@ -10,7 +10,7 @@ import type { Session } from '../src/api/types'
 let app:App|undefined,host:HTMLElement,state:any,props:any
 const auth:Session={user:{id:id(2),role:'msp',display_name:'Synthetic'},tenant:{id:id(1),name:'Synthetic'},allowed_tenants:[],capabilities:['tickets:read'],permission_version:7,csrf_token:'SYNTHETIC_NOT_CREDENTIAL',mode:'remote_test',identity_source:'project_local'}
 const clock={status:'RUNNING',deadline:'2026-10-20T01:00:00Z',stopped_at:null,elapsed_ms:1000,budget_ms:60000,breached:false,missing:null}
-const result=()=>({status:'PROJECTED',source:'postgresql',production_approved:false,clock:{tenant_id:id(1),ticket_id:id(10),tier:'STANDARD',priority:'P1',observed_at:'2026-10-20T00:00:01Z',lifecycle_version:2,configuration_reference:'sha256:'+'a'.repeat(64),response:{...clock},recovery:{...clock},paused_at:null,completed_pauses:[],reminders_delivered:false,production_approved:false}})
+const result=()=>({status:'PROJECTED',source:'postgresql',production_approved:false,clock:{tenant_id:id(1),ticket_id:id(10),tier:'STANDARD',priority:'P1',observed_at:'2026-10-20T00:00:01Z',lifecycle_version:2,configuration_reference:'sha256:'+'a'.repeat(64),calculation_policy_reference:null,clock_policy:null,response:{...clock},recovery:{...clock},paused_at:null,completed_pauses:[],reminders_delivered:false,production_approved:false}})
 async function settle(){for(let i=0;i<10;i++){await Promise.resolve();await nextTick()}}
 function mount(){host=document.createElement('div');document.body.append(host);app=createApp({...TicketSlaPanel,render:()=>null},props);state=(app.mount(host).$ as any).setupState}
 beforeEach(()=>{session.value=structuredClone(auth);contextGeneration.value=0;props=reactive({ticket:ticket(),expectedVersion:2})})

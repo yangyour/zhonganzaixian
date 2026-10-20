@@ -1,0 +1,9 @@
+{
+  "status": "REVIEWED_CANDIDATE_NOT_APPLIED",
+  "sha256": {
+    "V35__ticket_sla_policy_bindings.sql": "f249f843c35eb547da719036db3f35d0168f89cb971a85ddf084191a3c632600"
+  },
+  "function_body_sha256": {
+    "mop_ticket_sla_policy_binding_guard": "0cee59c28e4afabe595b2def10c2bfb2669f3157948a89f9a73a0c0fa758fa44"
+  }
+}

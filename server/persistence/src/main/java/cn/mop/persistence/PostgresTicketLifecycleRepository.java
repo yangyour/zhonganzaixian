@@ -44,13 +44,24 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
                 }
             }
             if(history.size()!=e.snapshot().version())throw unavailable();
-            cn.mop.domain.sla.SlaClockCalculator.ReopenPolicy policy=null;
-            try{JsonNode raw=mapper.readTree(e.openingSnapshotJson()).path("sla_opening").path("configuration_inputs").path("sla.reopen_and_mttr_policy").path("value").path("clock_policy");
-                if(raw.isTextual())try{policy=cn.mop.domain.sla.SlaClockCalculator.ReopenPolicy.valueOf(raw.textValue());}catch(IllegalArgumentException unsupported){/* Unknown policy remains pending; never default. */}
-            }catch(java.io.IOException invalid){throw unavailable();}
+            var binding=new PostgresTicketSlaPolicyBindings(mapper).view(c,a,e);
+            boolean bound=Set.of("BOUND","OPENING_FROZEN").contains(binding.status());
+            var policy=bound?cn.mop.domain.sla.SlaClockCalculator.ReopenPolicy.valueOf(binding.clockPolicy()):null;
             var projection=cn.mop.domain.sla.SlaClockState.project(opening.opening(),history,observed,policy);
-            return Optional.of(new SlaEntry(a.tenantId(),ticket,opening.opening().tier().name(),opening.opening().priority().name(),projection));
+            return Optional.of(new SlaEntry(a.tenantId(),ticket,opening.opening().tier().name(),opening.opening().priority().name(),bound?binding.reference():null,bound?binding.clockPolicy():null,projection));
         }catch(IllegalArgumentException corrupt){throw unavailable();}});
+    }
+    @Override public PolicyBinding slaPolicy(Access a,String ticket){
+        uuid(ticket);return read(a,ticket,c->new PostgresTicketSlaPolicyBindings(mapper).view(c,a,latest(c,a,ticket).orElseThrow(PostgresTicketLifecycleRepository::missing)));
+    }
+    @Override public PolicyBinding bindSlaPolicy(Access a,String ticket,long expectedVersion,String release,long releaseVersion){
+        requireEnabled();uuid(ticket);uuid(release);if(expectedVersion<1||expectedVersion>9007199254740990L||releaseVersion<1||releaseVersion>9007199254740990L)throw invalid();
+        Connection c=platform.idempotentCommandConnection();try{
+            var actor=authorize(c,a,ticket,"tickets:lifecycle_write");if(!Capabilities.internal(actor.role()))throw forbidden();lock(c,a,ticket);
+            Entry e=latest(c,a,ticket).orElseThrow(PostgresTicketLifecycleRepository::missing);if(e.snapshot().version()!=expectedVersion)throw conflict();
+            var binding=new PostgresTicketSlaPolicyBindings(mapper).bind(c,a,e,release,releaseVersion);
+            platform.audit(a.actorId(),a.tenantId(),"ticket.sla.policy.bind","ticket",ticket,"SUCCEEDED","MISSING_Q27_BOUND_WITHOUT_CHANGING_OPENING",a.traceId());return binding;
+        }catch(SQLException failure){throw unavailable();}
     }
     @Override public Optional<Entry> get(Access a,String ticket){
         uuid(ticket);return read(a,ticket,c->latest(c,a,ticket));
@@ -83,7 +94,9 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
         if(priority==null||!Set.of("P1","P2","P3").contains(priority))throw invalid();
         try{
             Membership actor=authorize(c,a,ticket,"tickets:lifecycle_write");if(!Capabilities.internal(actor.role()))throw forbidden();
-            lock(c,a,ticket);if(latest(c,a,ticket).isPresent())throw conflict();Instant openedAt=now(c);
+            lock(c,a,ticket);if(latest(c,a,ticket).isPresent())throw conflict();
+            for(String key:new java.util.TreeSet<>(TicketOpeningConfiguration.KEYS))try(var guard=c.prepareStatement("SELECT pg_advisory_xact_lock(hashtextextended(?,0))")){guard.setQueryTimeout(10);guard.setString(1,"mop.runtime.configuration|"+a.tenantId()+"|"+key);guard.execute();}
+            Instant openedAt=now(c);
             var values=new LinkedHashMap<String,TicketOpeningConfiguration.Value>();
             for(String key:TicketOpeningConfiguration.KEYS){
                 try(var statement=c.prepareStatement("SELECT registry_json FROM public.mop_configuration WHERE key=?")){

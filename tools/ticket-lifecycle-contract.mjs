@@ -54,6 +54,14 @@ export function addTicketLifecycleContract(contract) {
     ticket, parameter('page_size', 'query', { type: 'integer', enum: [10, 15, 25, 50, 100], default: 15 }, false),
     parameter('before_version', 'query', { ...version, maximum: 9007199254740991 }, false),
   ], 'x-mop-capabilities': ['tickets:read'], responses: responses(ref('TicketLifecycleHistoryResult')) } };
+  contract.paths[root].post = {
+    operationId: 'startTicketLifecycle',
+    parameters: [ticket, parameter('Idempotency-Key', 'header', { type: 'string', pattern: '^[A-Za-z0-9._:-]{1,128}$' }), parameter('X-CSRF-Token', 'header', string)],
+    requestBody: { required: true, content: { 'application/json': { schema: object({ expected_version: { const: 0 }, priority: { enum: ['P1','P2','P3'] } }) } } },
+    'x-mop-capabilities': ['tickets:lifecycle_write'],
+    description: '授权内部工程师明确分类优先级；租户档位、日历及预算仅从同一数据库事务的生效配置读取。未知/失效/缺少配置返回CONFIG_PENDING，不使用默认值。仅创建测试生命周期，非生产批准。',
+    responses: responses(ref('TicketLifecycleResult')),
+  };
   const reason = { type: 'string', minLength: 1, maxLength: 16000 };
   const bodies = {
     accept: { expected_version: version },
@@ -76,5 +84,5 @@ export function addTicketLifecycleContract(contract) {
       responses: responses(ref('TicketLifecycleResult')),
     } };
   }
-  contract.info.version = '0.53.0';
+  contract.info.version = '0.54.0';
 }

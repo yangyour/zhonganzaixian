@@ -41,3 +41,18 @@ it('detail close, same-route navigation and refresh retain uncertain lifecycle r
   expect(panel).toContain("window.addEventListener('beforeunload', beforeUnload)")
   expect(panel).not.toContain('v-html')
 })
+it('starts only after a known empty read with explicit priority and zero version', async () => {
+  let current: LifecycleSnapshot | null=null;const h=harness((p,o)=>{if(o?.method)current=snapshot();return envelope(current)})
+  expect(await h.workspace.start('P1')).toBe(false);await h.workspace.refresh();expect(await h.workspace.start('')).toBe(false)
+  expect(await h.workspace.start('P2')).toBe(true);const write=h.request.mock.calls.find(([,o])=>o?.method)!
+  expect(write[0]).toBe(`/tickets/${scope.ticketId}/lifecycle`);expect(write[1]).toMatchObject({body:{expected_version:0,priority:'P2'},idempotencyKey:'stable-request'})
+})
+it('customer cannot initialize or override the tenant plan',async()=>{const h=harness(()=>envelope(null));h.workspace.reset({...scope,customer:true});await h.workspace.refresh();expect(await h.workspace.start('P1')).toBe(false);expect(h.request).toHaveBeenCalledTimes(1)})
+it('opening dependency error remains explicit and does not invent a lifecycle',async()=>{const h=harness((p,o)=>{if(o?.method)throw new ApiError(422,'CONFIG_PENDING','tenant.plan missing','test');return envelope(null)});await h.workspace.refresh();expect(await h.workspace.start('P1')).toBe(false);expect(h.workspace.state().snapshot).toBeNull();expect(h.workspace.state().error).toBeInstanceOf(ApiError);expect(h.workspace.unresolved()).toBe(false)})
+it('customer reopen accepts the server transition back to IN_PROGRESS, distinct from not-resolved',async()=>{
+  let current=snapshot({state:'CLOSED',version:3,resolved_at:'2026-10-20T00:00:00Z',closed_at:'2026-10-20T00:00:00Z',close_mode:'customer_confirm',solution_snapshot_hash:'a'.repeat(64)})
+  const solution={tenant_id:id(1),ticket_id:id(2),lifecycle_version:2,resolved_at:current.resolved_at,ticket_summary:'故障',solution:'这是一段用于测试的二十字以上解决方案说明，请客户核对。',snapshot_hash:'a'.repeat(64),engineer_label:'工程师',source:'postgresql',production_approved:false}
+  const h=harness((p,o)=>{if(p.includes('/solution?'))return solution;if(o?.method)current={...current,version:4,state:'IN_PROGRESS',closed_at:null,close_mode:null,reopen_count:1};return envelope(current)})
+  h.workspace.reset({...scope,customer:true});await h.workspace.refresh();expect(await h.workspace.submit('reopen','故障再次出现')).toBe(true);expect(h.workspace.unresolved()).toBe(false);expect(h.workspace.state().snapshot?.state).toBe('IN_PROGRESS')
+})
+it('transfer receipt must name the requested engineer, not merely increment version',async()=>{const h=harness((p,o)=>envelope(o?.method?snapshot({version:2,assigned_engineer_id:id(9),assignee_label:'工程师'}):snapshot()));await h.workspace.refresh();expect(await h.workspace.submit('transfer','转交处理',id(4))).toBe(false);expect(h.workspace.unresolved()).toBe(true)})

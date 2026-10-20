@@ -68,6 +68,18 @@ public final class TicketLifecycleController {
                 "has_more",more,"next_before_version",more?items.get(items.size()-1).snapshot().version():null,
                 "source","postgresql","production_approved",false),request);
     }
+    @PostMapping(consumes=MediaType.APPLICATION_JSON_VALUE)
+    Object start(@PathVariable String ticketId,HttpServletRequest request){
+        Membership member=member(request,"tickets:lifecycle_write");Access a=access(member,request);query(request,Set.of());String ticket=uuid(ticketId);
+        JsonNode input=body(request);
+        if(input==null||!input.isObject()||input.size()!=2||!input.path("expected_version").isIntegralNumber()
+                ||!input.path("expected_version").canConvertToInt()||input.path("expected_version").intValue()!=0
+                ||!input.path("priority").isTextual()||!Set.of("P1","P2","P3").contains(input.path("priority").textValue()))throw invalid();
+        String key=request.getHeader("Idempotency-Key");if(key==null||!key.matches("[A-Za-z0-9._:-]{1,128}"))throw invalid();
+        Object value=platform.idempotentAuthorized(a.actorId(),a.tenantId(),request.getMethod()+" "+route(request),key,hash(input),a.permissionVersion(),
+                ()->repository.authorizeCurrentAccess(a,ticket,false),()->result(repository.startConfigured(a,ticket,input.get("priority").textValue()),true));
+        return success(value,request);
+    }
     @PostMapping(value="/actions/{action}",consumes=MediaType.APPLICATION_JSON_VALUE)
     Object request(@PathVariable String ticketId,@PathVariable String action,HttpServletRequest request){
         member(request,capability(action));return write(ticketId,action,body(request),request);

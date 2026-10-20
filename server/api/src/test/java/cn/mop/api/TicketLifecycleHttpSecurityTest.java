@@ -71,4 +71,9 @@ class TicketLifecycleHttpSecurityTest {
         when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",7,true,List.of("tickets:read","tickets:customer_decide"))));
         mvc.perform(scoped(post(ROOT+"/actions/accept")).with(csrf().asHeader()).contentType("application/json").content("{\"expected_version\":1}")).andExpect(status().isForbidden());verifyNoInteractions(repository);
     }
+    @Test void openingRequiresCsrfAndNeverAcceptsClientDeadline()throws Exception{
+        mvc.perform(scoped(post(ROOT)).contentType("application/json").content("{\"expected_version\":0,\"priority\":\"P1\"}")).andExpect(status().isForbidden()).andExpect(jsonPath("$.error.code").value("CSRF_INVALID"));
+        mvc.perform(scoped(post(ROOT)).with(csrf().asHeader()).header("Idempotency-Key","opening-test").contentType("application/json").content("{\"expected_version\":0,\"priority\":\"P1\",\"response_due_at\":\"2026-10-21T00:00:00Z\"}")).andExpect(status().isBadRequest());
+        verifyNoInteractions(repository);
+    }
 }

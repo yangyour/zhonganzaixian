@@ -1,0 +1,30 @@
+{
+  "purpose": "configuration_shape_only_not_a_runtime_publication",
+  "environment": "remote_test",
+  "production_approved": false,
+  "feature_environment": { "MOP_TICKET_LIFECYCLE_ENABLED": "false" },
+  "missing_dependencies": {
+    "SPRING_DATASOURCE_URL": null,
+    "database_credentials_reference": null,
+    "V33_explicit_migration_evidence": null,
+    "tickets_lifecycle_write_grant": null,
+    "tickets_customer_decide_grant": null
+  },
+  "runtime_publications": {
+    "tenant.plan": null,
+    "ticket.customer_confirm_timeout_hours": null,
+    "sla.p1_response_min": null,
+    "sla.p2_response_min": null,
+    "sla.p3_response_min": null,
+    "sla.p1_recover_min": null,
+    "sla.p2_recover_min": null,
+    "sla.advanced_p3_recover_min": null,
+    "sla.tenant_work_calendar": null,
+    "sla.basic_standard_p3_next_day": null
+  },
+  "fixed_contract_keys_read_only": [
+    "ticket.solution_min_chars",
+    "ticket.reopen_window_hours",
+    "ticket.reopen_manager_threshold"
+  ]
+}

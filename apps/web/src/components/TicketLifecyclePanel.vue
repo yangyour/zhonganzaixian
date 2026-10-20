@@ -2,7 +2,7 @@
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import type { RegisteredTicket } from '../api/types'
-import { api } from '../api/client'
+import { api, ApiError } from '../api/client'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createTicketLifecycleWorkspace, emptyLifecycleState, lifecycleActions, lifecycleLabels, lifecycleActionLabels, type LifecycleAction, type LifecycleContext } from '../utils/ticketLifecycleWorkspace'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
@@ -10,6 +10,7 @@ import { displayTime } from '../utils/display'
 import { feedback } from '../utils/feedback'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 const props = defineProps<{ ticket: RegisteredTicket; refreshKey: number }>()
+const openingPriority = ref(''), openingAcknowledged = ref(false)
 const state = shallowRef(emptyLifecycleState()), selected = ref<LifecycleAction | ''>(''), reason = ref(''), assignee = ref(''), keep = ref(false), acknowledged = ref(false), validation = ref('')
 const workspace = createTicketLifecycleWorkspace(api, value => { state.value = value })
 const scope = computed<LifecycleContext | null>(() => {
@@ -18,13 +19,17 @@ const scope = computed<LifecycleContext | null>(() => {
   return { tenantId: s.tenant.id, ticketId: props.ticket.id, actorId: s.user.id, permissionVersion: s.permission_version, customer, canWrite: can(customer ? 'tickets:customer_decide' : 'tickets:lifecycle_write') }
 })
 const actions = computed(() => lifecycleActions(state.value.snapshot, scope.value))
+const missingConfiguration = computed(() => state.value.error instanceof ApiError && state.value.error.code === 'CONFIG_PENDING'
+  ? state.value.error.details.flatMap(item => typeof item.configuration_key === 'string' && /^[a-z][a-z0-9_.]{0,99}$/.test(item.configuration_key) ? [item.configuration_key] : []) : [])
 const locked = computed(() => Boolean(state.value.busy) || state.value.attempt?.state === 'uncertain')
 const needsReason = computed(() => selected.value && !['accept','resume','confirm'].includes(selected.value))
 const contextKey = computed(() => JSON.stringify([contextGeneration.value, scope.value]))
-function clear() { selected.value = ''; reason.value = ''; assignee.value = ''; keep.value = false; acknowledged.value = false; validation.value = '' }
+function clear() { openingPriority.value = ''; openingAcknowledged.value = false; selected.value = ''; reason.value = ''; assignee.value = ''; keep.value = false; acknowledged.value = false; validation.value = '' }
 watch(contextKey, () => { clear(); workspace.reset(scope.value); if (scope.value) void workspace.refresh() }, { immediate: true, flush: 'sync' })
 watch(() => props.refreshKey, () => { if (!workspace.unresolved()) void workspace.refresh() })
+watch(openingPriority, () => { openingAcknowledged.value = false })
 watch(selected, () => { acknowledged.value = false; validation.value = '' })
+async function start() { if (!locked.value && openingAcknowledged.value && await workspace.start(openingPriority.value)) clear() }
 async function submit() {
   if (!selected.value || locked.value || !acknowledged.value) return
   try { validation.value = ''; if (await workspace.submit(selected.value, reason.value, assignee.value, keep.value)) clear() }
@@ -42,9 +47,14 @@ defineExpose({ canLeave })
   <section v-if="scope" class="lifecycle-panel" aria-label="工单生命周期">
     <header><h3>工单流转</h3><el-button :disabled="locked" @click="workspace.refresh()">刷新状态</el-button></header>
     <p class="notice">测试流程：通知发送、SLA 暂停及升级 Worker 尚未接入，不代表生产批准或考核完成。</p>
-    <ApiErrorNotice v-if="state.error" :error="state.error" />
+    <ApiErrorNotice v-if="state.error" :error="state.error"><p v-if="missingConfiguration.length">需补全或重新发布的配置：{{ missingConfiguration.join('、') }}。请由有权限的管理员核对配置内容及生效状态。</p></ApiErrorNotice>
     <p v-if="state.busy === 'read'" role="status">正在读取当前状态与解决方案…</p>
-    <p v-else-if="state.loaded && !state.snapshot" role="status">此登记尚未创建生命周期。需先补齐服务端开单配置；本页不会推断档位、优先级或截止时间。</p>
+    <p v-else-if="state.loaded && !state.snapshot" role="status">此登记尚未创建生命周期。需有服务端生效配置及开单权限；本页不会推断档位、优先级或截止时间。</p>
+    <div v-if="state.loaded && !state.snapshot && !scope.customer && scope.canWrite" class="action-form">
+      <label>确认优先级<select v-model="openingPriority" :disabled="locked"><option value="">请选择，不默认映射报障紧急程度</option><option value="P1">P1</option><option value="P2">P2</option><option value="P3">P3</option></select></label>
+      <el-checkbox v-model="openingAcknowledged" :disabled="locked || !openingPriority">已核对优先级；使用当前已生效的租户配置创建生命周期快照</el-checkbox>
+      <el-button type="primary" :disabled="locked || !openingPriority || !openingAcknowledged" @click="start">创建生命周期</el-button>
+    </div>
     <template v-if="state.snapshot">
       <p><strong>{{ lifecycleLabels[state.snapshot.state] }}</strong> · 版本 {{ state.snapshot.version }} · 重开 {{ state.snapshot.reopen_count }} 次</p>
       <p>响应截止：{{ displayTime(state.snapshot.response_due_at) }}；恢复截止：{{ displayTime(state.snapshot.recovery_due_at) }}。此处为开单快照，并非暂停调整后的实时考核结果。</p>

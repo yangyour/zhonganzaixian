@@ -8,7 +8,7 @@ export type LifecycleStatus = 'NEW' | 'IN_PROGRESS' | 'WAITING_VENDOR' | 'PENDIN
 export interface LifecycleContext { tenantId: string; ticketId: string; actorId: string; permissionVersion: number; customer: boolean; canWrite: boolean }
 export interface LifecycleSnapshot { tenant_id: string; ticket_id: string; version: number; state: LifecycleStatus; reopen_count: number; occurred_at: string; resolved_at: string | null; closed_at: string | null; response_due_at: string | null; recovery_due_at: string | null; solution_snapshot_hash: string | null; close_mode: 'customer_confirm' | 'timeout_auto' | null; assignee_label: '工程师' | null; assigned_engineer_id: string | null; production_approved: false; notification_status: 'NOT_INTEGRATED'; sla_clock_status: 'NOT_INTEGRATED' }
 export interface LifecycleSolution { tenant_id: string; ticket_id: string; lifecycle_version: number; resolved_at: string; ticket_summary: string; solution: string; snapshot_hash: string; engineer_label: '工程师'; source: 'postgresql'; production_approved: false }
-interface Attempt { action: LifecycleAction; key: string; payload: string; state: 'uncertain' | 'accepted' | 'rejected' }
+interface Attempt { action: LifecycleAction | 'start'; key: string; payload: string; state: 'uncertain' | 'accepted' | 'rejected' }
 export interface LifecycleWorkspaceState { snapshot: LifecycleSnapshot | null; solution: LifecycleSolution | null; loaded: boolean; busy: 'read' | 'write' | null; error: unknown; attempt: Attempt | null }
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const hash = /^[0-9a-f]{64}$/
@@ -67,12 +67,12 @@ export function createTicketLifecycleWorkspace(client: Pick<ApiClient,'request'>
     const c = { ...context }, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort
     state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
     try {
-      const body = JSON.parse(attempt.payload) as { expected_version: number }
-      const s = readLifecycle(await client.request<unknown>(path(c) + '/actions/' + attempt.action, { method: 'POST', body, idempotencyKey: attempt.key, signal: abort.signal }), c)
+      const body = JSON.parse(attempt.payload) as { expected_version: number; assignee_id?: string }
+      const s = readLifecycle(await client.request<unknown>(path(c) + (attempt.action === 'start' ? '' : '/actions/' + attempt.action), { method: 'POST', body, idempotencyKey: attempt.key, signal: abort.signal }), c)
       if (turn !== epoch || abort.signal.aborted) return false
       if (!s || s.version !== body.expected_version + 1) throw invalid()
-      const target = { accept: 'IN_PROGRESS', transfer: null, 'wait-for-vendor': 'WAITING_VENDOR', resume: 'IN_PROGRESS', 'submit-resolution': 'PENDING_CUSTOMER', confirm: 'CLOSED', 'not-resolved': 'REOPENED', reopen: 'REOPENED' }[attempt.action]
-      if (target && s.state !== target) throw invalid()
+      const target = { start: 'NEW', accept: 'IN_PROGRESS', transfer: null, 'wait-for-vendor': 'WAITING_VENDOR', resume: 'IN_PROGRESS', 'submit-resolution': 'PENDING_CUSTOMER', confirm: 'CLOSED', 'not-resolved': 'REOPENED', reopen: 'IN_PROGRESS' }[attempt.action]
+      if (target && s.state !== target || attempt.action === 'confirm' && s.close_mode !== 'customer_confirm' || attempt.action === 'transfer' && s.assigned_engineer_id !== body.assignee_id) throw invalid()
       state = { ...state, snapshot: s, solution: null, busy: null, attempt: { ...attempt, state: 'accepted' } }; emit(); await refresh(); return true
     } catch (error) {
       if (turn !== epoch) return false
@@ -95,5 +95,9 @@ export function createTicketLifecycleWorkspace(client: Pick<ApiClient,'request'>
     if (action === 'transfer') { if (!uuid.test(assigneeId)) throw new Error('请选择有效工程师'); body.assignee_id = assigneeId; body.keep_prior_assignee = keepPriorAssignee }
     return send({ action, key: key(), payload: JSON.stringify(body), state: 'uncertain' })
   }
-  emit(); return { reset, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => detachedWorkspaceState(state) }
+  async function start(priority: string) {
+    if (!context?.canWrite || context.customer || state.busy || unresolved() || !state.loaded || state.snapshot || !['P1','P2','P3'].includes(priority)) return false
+    return send({ action: 'start', key: key(), payload: JSON.stringify({ expected_version: 0, priority }), state: 'uncertain' })
+  }
+  emit(); return { reset, refresh, submit, start, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => detachedWorkspaceState(state) }
 }

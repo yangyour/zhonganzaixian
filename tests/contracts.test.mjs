@@ -245,7 +245,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.53.0');
+  assert.equal(contract.info.version, '0.54.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -927,3 +927,9 @@ test('工单生命周期读回不声称通知、SLA或生产审批已完成',()=
   assert.equal(s.properties.sla_clock_status.const,'NOT_INTEGRATED');
   assert.equal(s.properties.opening_snapshot,undefined);
 });
+test('开单必须明确优先级，客户端不能覆盖租户档位、SLA时间或规则',()=>{
+  const op=contract.paths['/tickets/{ticketId}/lifecycle'].post, validate=ajv.compile(op.requestBody.content['application/json'].schema)
+  assert.equal(validate({expected_version:0,priority:'P1'}),true)
+  for(const patch of [{expected_version:1},{priority:'P4'},{service_tier:'ADVANCED'},{response_due_at:'2026-10-20T00:00:00Z'}])assert.equal(validate({expected_version:0,priority:'P1',...patch}),false)
+  assert.deepEqual(op['x-mop-capabilities'],['tickets:lifecycle_write']);assert.ok(op.responses['422'])
+})

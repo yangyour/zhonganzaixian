@@ -84,6 +84,17 @@ class TicketLifecycleControllerTest {
     @Test void solutionReadRequiresBoundHashBeforeAccess(){
         var request=request("tickets:read");assertThrows(DomainException.class,()->controller.solution(TICKET,request));verifyNoInteractions(repository);
     }
+    @Test void openingReadsConfigurationInRepositoryAndDoesNotAcceptClientRules(){
+        var request=request("tickets:lifecycle_write");request.setContent("{\"expected_version\":0,\"priority\":\"P1\",\"service_tier\":\"ADVANCED\"}".getBytes(StandardCharsets.UTF_8));
+        assertThrows(DomainException.class,()->controller.start(TICKET,request));verifyNoInteractions(repository);
+    }
+    @Test void openingBindsZeroVersionAndFreshResourceAuthorization(){
+        var request=request("tickets:lifecycle_write");request.setRequestURI("/api/v1/tickets/"+TICKET+"/lifecycle");request.setContent("{\"expected_version\":0,\"priority\":\"P2\"}".getBytes(StandardCharsets.UTF_8));
+        when(platform.idempotentAuthorized(anyString(),anyString(),anyString(),anyString(),anyString(),anyLong(),any(),any()))
+            .thenAnswer(invocation->{invocation.<Runnable>getArgument(6).run();return invocation.<Supplier<Object>>getArgument(7).get();});
+        when(repository.startConfigured(any(),eq(TICKET),eq("P2"))).thenReturn(entry());controller.start(TICKET,request);
+        var order=inOrder(repository);order.verify(repository).authorizeCurrentAccess(any(),eq(TICKET),eq(false));order.verify(repository).startConfigured(any(),eq(TICKET),eq("P2"));
+    }
     private TicketLifecycleRepository.Entry entry(){
         var now=Instant.parse("2026-10-20T00:00:00Z");
         return new TicketLifecycleRepository.Entry(TICKET,new TicketLifecycle.Snapshot(TENANT,TicketLifecycle.State.NEW,1,0,now,null,null,null,null,now.plusSeconds(60),now.plusSeconds(120)),ACTOR,List.of(),"{\"private\":true}");

@@ -29,6 +29,7 @@ class PostgresTicketLifecycleBoundaryTest {
         assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.get(ACCESS,TICKET)).code);
         assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.solution(ACCESS,TICKET,"a".repeat(64))).code);
         assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.start(ACCESS,TICKET,null,null,null)).code);
+        assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.startConfigured(ACCESS,TICKET,"P1")).code);
         assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.act(ACCESS,TICKET,null)).code);
         assertEquals(java.util.List.of("TICKET_LIFECYCLE_DISABLED"),r.readinessProblems());
         assertEquals(0,connections.get());
@@ -36,6 +37,7 @@ class PostgresTicketLifecycleBoundaryTest {
     @Test void writesCannotEscapeAnOwnedIdempotentCommandTransaction(){
         var r=repository(true);
         assertThrows(IllegalStateException.class,()->r.start(ACCESS,TICKET,"{}",null,null));
+        assertThrows(IllegalStateException.class,()->r.startConfigured(ACCESS,TICKET,"P1"));
         assertThrows(IllegalStateException.class,()->r.act(ACCESS,TICKET,new Action(TicketLifecycle.Action.ACCEPT,1,null,null,null,false)));
         assertEquals(0,connections.get());
     }

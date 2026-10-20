@@ -17,6 +17,7 @@ public interface TicketLifecycleRepository {
     Optional<TicketResolutionSnapshot> solution(Access access,String ticketId,String expectedHash);
     List<Entry> history(Access access,String ticketId,long beforeVersion,int pageSize);
     void authorizeCurrentAccess(Access access,String ticketId,boolean customerAction);
+    Entry startConfigured(Access access,String ticketId,String priority);
     Entry start(Access access,String ticketId,String openingSnapshotJson,Instant responseDueAt,Instant recoveryDueAt);
     Entry act(Access access,String ticketId,Action action);
     List<String> readinessProblems();

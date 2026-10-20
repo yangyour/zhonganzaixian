@@ -59,6 +59,39 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
         try{authorize(c,a,ticket,customer?"tickets:customer_decide":"tickets:lifecycle_write");}
         catch(SQLException e){throw unavailable();}
     }
+    @Override public Entry startConfigured(Access a,String ticket,String priority){
+        requireEnabled();uuid(ticket);Connection c=platform.idempotentCommandConnection();
+        if(priority==null||!Set.of("P1","P2","P3").contains(priority))throw invalid();
+        try{
+            Membership actor=authorize(c,a,ticket,"tickets:lifecycle_write");if(!Capabilities.internal(actor.role()))throw forbidden();
+            lock(c,a,ticket);if(latest(c,a,ticket).isPresent())throw conflict();Instant openedAt=now(c);
+            var values=new LinkedHashMap<String,TicketOpeningConfiguration.Value>();
+            for(String key:TicketOpeningConfiguration.KEYS){
+                try(var statement=c.prepareStatement("SELECT registry_json FROM public.mop_configuration WHERE key=?")){
+                    statement.setQueryTimeout(10);statement.setString(1,key);
+                    try(var r=statement.executeQuery()){
+                        if(!r.next())continue;JsonNode registry=mapper.readTree(r.getString(1));
+                        if("fixed_constraint".equals(registry.path("contract_value_kind").asText())){
+                            values.put(key,new TicketOpeningConfiguration.Value(registry.get("value"),"fixed-contract:"+key));continue;
+                        }
+                    }
+                }
+                try(var statement=c.prepareStatement("SELECT id,version,action,value_json,expires_at FROM public.mop_runtime_configuration_release WHERE tenant_id=?::uuid AND configuration_key=? AND effective_at<=? ORDER BY version DESC LIMIT 1")){
+                    statement.setQueryTimeout(10);statement.setString(1,a.tenantId());statement.setString(2,key);statement.setObject(3,utc(openedAt));
+                    try(var r=statement.executeQuery()){
+                        if(!r.next()||"DISABLE".equals(r.getString("action")))continue;
+                        Instant expiry=instant(r,"expires_at");if(expiry!=null&&!openedAt.isBefore(expiry))continue;
+                        values.put(key,new TicketOpeningConfiguration.Value(mapper.readTree(r.getString("value_json")),r.getString("id")+":"+r.getLong("version")));
+                    }
+                }
+            }
+            var plan=new TicketOpeningConfiguration(values,mapper).resolve(openedAt,priority);
+            if(plan.json().getBytes(java.nio.charset.StandardCharsets.UTF_8).length>900000)throw new DomainException(422,"CONFIG_PENDING","开单配置快照超出技术预算");
+            var snapshot=new TicketLifecycle.Snapshot(a.tenantId(),TicketLifecycle.State.NEW,1,0,openedAt,null,null,null,null,plan.responseDue(),plan.recoveryDue());
+            var result=new Entry(ticket,snapshot,null,List.of(),plan.json());append(c,a,result,"CREATE",null);
+            platform.audit(a.actorId(),a.tenantId(),"ticket.lifecycle.create","ticket",ticket,"SUCCEEDED","TEST_PUBLISHED_CONFIGURATION_OPENING",a.traceId());return result;
+        }catch(SQLException|java.io.IOException e){throw unavailable();}
+    }
     @Override public Entry start(Access a,String ticket,String json,Instant responseDue,Instant recoveryDue){
         requireEnabled();Connection c=platform.idempotentCommandConnection();
         JsonNode configuration=configuration(json);
@@ -191,9 +224,9 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
     private static String reporter(Connection c,Access a,String ticket)throws SQLException{return ticketField(c,a,ticket,"reporter_id");}
     private JsonNode configuration(String json){
         try{
-            if(json==null||json.length()>16_384)throw invalid();JsonNode n=mapper.readTree(json);if(n==null||!n.isObject())throw invalid();
+            if(json==null||json.length()>1_048_576)throw invalid();JsonNode n=mapper.readTree(json);if(n==null||!n.isObject())throw invalid();
             Set<String> allowed=Set.of("enabled","configuration_release_ref","service_tier","priority","solution_min_chars",
-                    "confirmation_timeout_hours","reopen_window_hours","manager_threshold");
+                    "confirmation_timeout_hours","reopen_window_hours","manager_threshold","sla_opening");
             var names=n.fieldNames();while(names.hasNext())if(!allowed.contains(names.next()))throw invalid();
             if(n.hasNonNull("service_tier")&&(!n.get("service_tier").isTextual()
                     ||!Set.of("BASIC","STANDARD","ADVANCED").contains(n.get("service_tier").textValue())))throw invalid();

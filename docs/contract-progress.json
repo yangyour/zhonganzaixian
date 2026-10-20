@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 57,
-  "rows_without_progress_notes": 71,
+  "rows_with_progress_notes": 58,
+  "rows_without_progress_notes": 70,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -44,7 +44,7 @@
     },
     "M5": {
       "requirements": 21,
-      "rows_with_progress_notes": 11,
+      "rows_with_progress_notes": 12,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 21
       }
@@ -894,8 +894,10 @@
       "id": "M5-18",
       "title": "超时提醒与催办",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/sla-clock-core-20261020.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -916,6 +918,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/sla-clock-core-20261020.md",
         "docs/working-calendar-drafts.md"
       ],
       "external_references_unchecked": 0,
@@ -1460,6 +1463,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "f29840b2124e85aa69d288b89a09fb11b4ca282d1d88379a32ed9934686ce580"
+    "doc/development/07_合同逐项开发追踪.md": "ffdfc1746573479971880c5871cf03a71e32439f8885f2bbaf7a3bbe0a366192"
   }
 }

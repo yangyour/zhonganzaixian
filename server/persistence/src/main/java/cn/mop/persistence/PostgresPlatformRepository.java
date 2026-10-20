@@ -21,6 +21,7 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     private final ThreadLocal<Boolean> idempotentCommandScope = new ThreadLocal<>();
     private final ThreadLocal<Boolean> importJobScope = new ThreadLocal<>();
     private final ThreadLocal<Boolean> exportJobScope = new ThreadLocal<>();
+    private final ThreadLocal<Boolean> ticketJobScope = new ThreadLocal<>();
     public PostgresPlatformRepository(DataSource dataSource,ObjectMapper mapper){this.dataSource=dataSource;this.mapper=mapper;}
     @Override public RepositoryMetadata metadata(){return new RepositoryMetadata("remote_test","postgresql",true,"test_oidc");}
     @Override public boolean dependencyReady(){
@@ -88,6 +89,9 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     void requireStandaloneRead(){if(transaction.get()!=null)throw new IllegalStateException("Export selection requires a standalone readonly snapshot");}
     <T>T exportJobTransaction(Supplier<T> work){if(transaction.get()!=null)throw new IllegalStateException("Export worker requires an independent transaction");return inTransaction(()->scoped(exportJobScope,work));}
     Connection exportCommandConnection(){Connection c=transaction.get();if(c==null||!Boolean.TRUE.equals(exportJobScope.get()))throw new IllegalStateException("Export worker transaction required");return c;}
+    <T>T ticketJobTransaction(Supplier<T> work){if(transaction.get()!=null)throw new IllegalStateException("Ticket worker requires an independent transaction");return inTransaction(()->scoped(ticketJobScope,work));}
+    Connection ticketJobConnection(){Connection c=transaction.get();if(c==null||!Boolean.TRUE.equals(ticketJobScope.get()))throw new IllegalStateException("Ticket worker transaction required");return c;}
+    void auditTicketWorker(String tenant,String ticket,String result,String reason,String trace){ticketJobConnection();auditActor(null,"系统工单任务",tenant,"ticket.lifecycle.autoclose","ticket",ticket,result,reason,trace);}
     private static <T>T scoped(ThreadLocal<Boolean> scope,Supplier<T> work){Boolean previous=scope.get();scope.set(true);try{return work.get();}finally{if(previous==null)scope.remove();else scope.set(previous);}}
     private void lock(String scope){connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT pg_advisory_xact_lock(hashtextextended(?,0))")){statement.setString(1,scope);statement.execute();return null;}});}
     private static DomainException unavailable(){return new DomainException(503,"UPSTREAM_UNAVAILABLE","测试环境 PostgreSQL 不可用，未受理请求");}
@@ -572,9 +576,10 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         try{finishPhoto(job,worker,outcome);}catch(LostPhotoLease stale){/* The newer lease owns all database writes. */}
         return true;
     }
-    @Override public void audit(String actor,String tenant,String action,String resourceType,String resourceId,String result,String reason,String trace){inTransaction(()->{
+    @Override public void audit(String actor,String tenant,String action,String resourceType,String resourceId,String result,String reason,String trace){auditActor(actor,null,tenant,action,resourceType,resourceId,result,reason,trace);}
+    private void auditActor(String actor,String actorLabel,String tenant,String action,String resourceType,String resourceId,String result,String reason,String trace){inTransaction(()->{
         String namespace=tenant==null?"platform":tenant;lock("audit|"+namespace);
-        Map<String,Object> row=new LinkedHashMap<>();row.put("id",UUID.randomUUID().toString());row.put("occurred_at",Instant.now().truncatedTo(ChronoUnit.MILLIS).toString());row.put("actor_id",actor);row.put("actor_name",actor==null?"未认证主体":user(actor).map(FixtureUser::displayName).orElse("未认证主体"));row.put("tenant_id",tenant);row.put("action",action);row.put("resource_type",resourceType);row.put("resource_id",resourceId);row.put("result",result);row.put("reason",reason);row.put("trace_id",trace);row.put("source","postgresql");
+        Map<String,Object> row=new LinkedHashMap<>();row.put("id",UUID.randomUUID().toString());row.put("occurred_at",Instant.now().truncatedTo(ChronoUnit.MILLIS).toString());row.put("actor_id",actor);row.put("actor_name",actorLabel!=null?actorLabel:actor==null?"未认证主体":user(actor).map(FixtureUser::displayName).orElse("未认证主体"));row.put("tenant_id",tenant);row.put("action",action);row.put("resource_type",resourceType);row.put("resource_id",resourceId);row.put("result",result);row.put("reason",reason);row.put("trace_id",trace);row.put("source","postgresql");
         Object[] previous=connection(connection->{try(PreparedStatement statement=connection.prepareStatement("SELECT sequence,entry_hash FROM public.mop_audit WHERE namespace=? ORDER BY sequence DESC LIMIT 1")){statement.setString(1,namespace);try(ResultSet rows=statement.executeQuery()){return rows.next()?new Object[]{rows.getLong(1),rows.getString(2)}:new Object[]{0L,"0".repeat(64)};}}});
         long sequence=(Long)previous[0]+1;String prev=previous[1].toString();row.put("sequence",sequence);row.put("previous_hash",prev);String entryHash=digest(prev+mapper.valueToTree(new TreeMap<>(row)).toString());row.put("entry_hash",entryHash);
         connection(connection->{try(PreparedStatement statement=connection.prepareStatement("INSERT INTO public.mop_audit(id,namespace,tenant_id,sequence,previous_hash,entry_hash,payload) VALUES (?::uuid,?,?::uuid,?,?,?,?::jsonb)")){statement.setString(1,row.get("id").toString());statement.setString(2,namespace);statement.setString(3,tenant);statement.setLong(4,sequence);statement.setString(5,prev);statement.setString(6,entryHash);statement.setString(7,mapper.valueToTree(row).toString());statement.executeUpdate();return null;}});return null;

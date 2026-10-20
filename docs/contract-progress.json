@@ -867,7 +867,8 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
-        "docs/evidence/dot-ticket-action-guards-20261002.json"
+        "docs/evidence/dot-ticket-action-guards-20261002.json",
+        "docs/ticket-autoclose-worker-20261020.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1467,6 +1468,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "ede0a055b6eed34b65a648ba910a69bc691bc71fa10826bbe080d02f8e2e12de"
+    "doc/development/07_合同逐项开发追踪.md": "d0a79789c1680fa96103c2580d2c0e710d45dc2b056a2ff8f1e3dd1f823a88bc"
   }
 }

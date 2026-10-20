@@ -1,0 +1,11 @@
+{
+  "status": "REVIEWED_CANDIDATE_NOT_APPLIED",
+  "sha256": {
+    "V34__ticket_autoclose_jobs.sql": "0b3bf01db63bcae757c4b80ba9f10979c342ae95dd339121ce91a979553e47e4"
+  },
+  "function_body_sha256": {
+    "mop_ticket_autoclose_guard": "82d4ec56a5eada4c9d3eee3a9441889dd7ca1007f517243dde74c07c5e0f4f4f",
+    "mop_ticket_autoclose_revision_guard": "b370818b8f76143c5ec7a38c7bb0073c2a1f1407a5b01999e4d21810513c19bb",
+    "mop_ticket_autoclose_enqueue": "aa1dcfb4a1f519de4ff35e8c8cb433594b8373b0b622d428a09783d4f2c7b3a5"
+  }
+}

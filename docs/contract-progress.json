@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 56,
-  "rows_without_progress_notes": 72,
+  "rows_with_progress_notes": 57,
+  "rows_without_progress_notes": 71,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -44,7 +44,7 @@
     },
     "M5": {
       "requirements": 21,
-      "rows_with_progress_notes": 10,
+      "rows_with_progress_notes": 11,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 21
       }
@@ -742,8 +742,10 @@
       "id": "M5-3",
       "title": "工单状态与同步状态",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/ticket-lifecycle-core-20261020.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1458,6 +1460,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "58a3429b6bcf72f17f005974172b9b5f095482839450feb0b678bf815648809d"
+    "doc/development/07_合同逐项开发追踪.md": "f29840b2124e85aa69d288b89a09fb11b4ca282d1d88379a32ed9934686ce580"
   }
 }

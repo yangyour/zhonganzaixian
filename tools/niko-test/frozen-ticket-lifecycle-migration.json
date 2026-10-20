@@ -1,0 +1,10 @@
+{
+  "status": "REVIEWED_CANDIDATE_NOT_APPLIED",
+  "sha256": {
+    "V33__ticket_lifecycle_revisions.sql": "d916c5651f0a29ec4787f93ddf74a3d3f794c866e878089c698eb3401e4e9cef"
+  },
+  "function_body_sha256": {
+    "mop_ticket_resolution_immutable": "bcb49a5acc0097b3cc5d71dbb8b3bbdb3c168ddf76a421bfabcfe478e30fdf87",
+    "mop_ticket_lifecycle_guard": "a9f6f99f4aa4760d0d8d6fa7c76ba95fa4e89a02e919b46935900edf151bd6b3"
+  }
+}

@@ -29,9 +29,10 @@ public final class ProjectIdentitySchemaVerifier {
         requireTrue(c,"SELECT NOT has_table_privilege('mop_test_runtime','public.mop_local_account','DELETE') AND NOT has_column_privilege('mop_test_runtime','public.mop_local_account','username','UPDATE') AND NOT has_table_privilege('mop_test_runtime','public.mop_role_capability_limit','INSERT') AND NOT has_table_privilege('mop_test_runtime','public.mop_role_capability_limit','UPDATE')");
         requireTrue(c,"SELECT count(*)=1 FROM public.mop_identity_policy WHERE singleton");
         for(var entry:FUNCTIONS.entrySet())requireTrue(c,"SELECT NOT p.prosecdef AND p.proowner=(SELECT oid FROM pg_roles WHERE rolname='mop_test_migrator') AND encode(sha256(convert_to(p.prosrc,'UTF8')),'hex')=? AND p.proconfig=ARRAY['search_path=pg_catalog'] AND has_function_privilege('mop_test_runtime',p.oid,'EXECUTE') AND NOT EXISTS(SELECT 1 FROM aclexplode(COALESCE(p.proacl,acldefault('f',p.proowner))) a WHERE a.grantee=0) FROM pg_proc p WHERE p.oid=to_regprocedure('public.'||?)",entry.getValue(),entry.getKey());
+        boolean lifecycleCapability;try(var q=c.createStatement();var rows=q.executeQuery("SELECT to_regclass('public.mop_ticket_lifecycle_revision') IS NOT NULL")){rows.next();lifecycleCapability=rows.getBoolean(1);}
         for(String role:List.of("viewer","tadmin","msp","padmin")){
             var actual=new TreeSet<String>();try(var q=c.prepareStatement("SELECT capability FROM public.mop_role_capability_limit WHERE base_role=?")){q.setString(1,role);try(var r=q.executeQuery()){while(r.next())actual.add(r.getString(1));}}
-            var expected=new TreeSet<>(cn.mop.domain.Capabilities.forRole(role));if(!inventoryCapability)expected.remove("tenants:read_inventory");
+            var expected=new TreeSet<>(cn.mop.domain.Capabilities.forRole(role));if(!inventoryCapability)expected.remove("tenants:read_inventory");if(!lifecycleCapability){expected.remove("tickets:lifecycle_write");expected.remove("tickets:customer_decide");}
             if(!actual.equals(expected))throw new IllegalStateException("Role capability limit differs from reviewed code");
         }
         requireTrue(c,"SELECT NOT EXISTS(SELECT 1 FROM public.mop_tenant t WHERE (SELECT count(*) FROM public.mop_project_role r WHERE r.tenant_id=t.id AND r.builtin)<>4)");

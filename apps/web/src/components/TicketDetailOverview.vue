@@ -11,7 +11,12 @@ import { formatWorklogDuration, summarizeWorklogPage, worklogKindLabels } from '
 import { displayTime } from '../utils/display'
 import { impactScopeLabel, urgencyLabel } from '../utils/ticket'
 import ApiErrorNotice from './ApiErrorNotice.vue'
+import TicketLifecyclePanel from './TicketLifecyclePanel.vue'
 
+const lifecyclePanel = ref<InstanceType<typeof TicketLifecyclePanel> | null>(null)
+function canLeave() { return lifecyclePanel.value?.canLeave() !== false }
+function closeOverview() { if (canLeave()) emit('close') }
+defineExpose({ canLeave })
 const props = defineProps<{ ticket: RegisteredTicket; refreshKey: number }>()
 const emit = defineEmits<{ close: []; notes: []; comments: []; worklogs: [] }>()
 const notes = shallowRef<NoteState>(emptyNoteState()), comments = shallowRef<CommentState>(emptyCommentState()), worklogs = shallowRef<WorklogState>(emptyWorklogState())
@@ -64,7 +69,7 @@ const stages = ['工单发起', '工单受理', '原因定位', '解决方案', 
 
 <template>
   <div v-if="permitted" class="ticket-overview">
-    <nav class="ticket-breadcrumb" aria-label="工单详情路径"><button type="button" @click="emit('close')">工单中心</button><span aria-hidden="true">/</span><span>报障与受理</span><span aria-hidden="true">/</span><strong>工单详情</strong></nav>
+    <nav class="ticket-breadcrumb" aria-label="工单详情路径"><button type="button" @click="closeOverview">工单中心</button><span aria-hidden="true">/</span><span>报障与受理</span><span aria-hidden="true">/</span><strong>工单详情</strong></nav>
     <header class="ticket-overview-heading">
       <div class="ticket-heading-title"><h2>工单详情</h2><span class="ticket-registration-badge"><span aria-hidden="true">●</span> 已登记</span><span class="ticket-heading-receipt">{{ ticket.receipt_no }}</span></div>
       <div class="ticket-overview-actions"><el-button :disabled="!exportReady" @click="exportDetail">导出详情</el-button><el-button disabled title="正式流转与处理资格尚未接入">转派</el-button><el-button v-if="canNotes && can('ticket_notes:write_internal')" type="primary" @click="emit('notes')">新增处理记录</el-button><el-button v-else-if="canComments && can('ticket_comments:write')" type="primary" @click="emit('comments')">追加沟通记录</el-button></div>
@@ -128,9 +133,10 @@ const stages = ['工单发起', '工单受理', '原因定位', '解决方案', 
         </section>
       </div>
     </div>
-    <footer class="ticket-overview-bottom"><span>当前已完成故障受理入库；工单分派流转与 SLA 考核计时将在 ITSM 流程启用后自动关联。</span><div class="ticket-overview-actions"><el-button disabled title="挂起状态与SLA暂停规则尚未接入">挂起</el-button><el-button disabled title="协助申请与分派规则尚未接入">申请协助</el-button><el-button v-if="canNotes && can('ticket_notes:write_internal')" type="primary" @click="emit('notes')">新增处理记录</el-button><el-button v-else-if="canComments && can('ticket_comments:write')" type="primary" @click="emit('comments')">追加沟通记录</el-button><el-button @click="emit('close')">返回列表</el-button></div></footer>
+    <TicketLifecyclePanel ref="lifecyclePanel" :ticket="ticket" :refresh-key="refreshKey" />
+    <footer class="ticket-overview-bottom"><span>登记凭证与生命周期分别展示；流转状态以“工单流转”读回为准，外部同步与 SLA 考核尚未完成接线。</span><div class="ticket-overview-actions"><el-button disabled title="挂起状态与SLA暂停规则尚未接入">挂起</el-button><el-button disabled title="协助申请与分派规则尚未接入">申请协助</el-button><el-button v-if="canNotes && can('ticket_notes:write_internal')" type="primary" @click="emit('notes')">新增处理记录</el-button><el-button v-else-if="canComments && can('ticket_comments:write')" type="primary" @click="emit('comments')">追加沟通记录</el-button><el-button @click="closeOverview">返回列表</el-button></div></footer>
     <section class="ticket-detail-card ticket-supporting-card"><details><summary>报障照片与登记凭证 <span>查看附件、登记操作与记录标识</span></summary><div class="ticket-supporting-content"><slot /></div></details></section>
-    <p class="ticket-record-explanation">当前已完成故障受理入库；工单分派流转与 SLA 考核计时将在 ITSM 流程启用后自动关联。</p>
+    <p class="ticket-record-explanation">登记凭证与生命周期分别展示；流转状态以“工单流转”读回为准，外部同步与 SLA 考核尚未完成接线。</p>
     <p v-if="canNotes" class="ticket-record-explanation">新增处理记录保存为仅内部可见的备注；需要客户查看的内容请使用“客户沟通”。</p>
   </div>
   <p v-else role="status">当前身份或租户无法查看此工单，请返回列表重新查询。</p>

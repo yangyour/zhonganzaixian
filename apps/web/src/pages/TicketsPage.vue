@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ElTableColumn } from 'element-plus'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
-import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 import { feedback as ElMessage } from '../utils/feedback'
 import { api, isCancelled } from '../api/client'
 import type { RegisteredTicket } from '../api/types'
@@ -94,10 +94,12 @@ function nextPage() { if (!nextCursor.value) return; cursorHistory.value.push(qu
 function previousPage() { const cursor = cursorHistory.value.pop(); void router.replace({ query: { ...route.query, cursor: cursor || undefined } }) }
 function firstPage() { cursorHistory.value = []; void router.replace({ query: { ...route.query, cursor: undefined } }) }
 
+const detailOverview = ref<InstanceType<typeof TicketDetailOverview> | null>(null)
+onBeforeRouteUpdate(() => detailOverview.value?.canLeave() !== false)
 const detailClosing = ref(false)
 const detailOpen = computed({ get: () => Boolean(queryString('ticket_id')), set: value => { if (!value) void closeDetail() } })
 async function closeDetail() {
-  if (detailClosing.value || !queryString('ticket_id')) return
+  if (detailClosing.value || !queryString('ticket_id') || detailOverview.value?.canLeave() === false) return
   detailClosing.value = true
   try { await router.replace({ query: { ...route.query, ticket_id: undefined } }) }
   catch (cause) { detailError.value = cause }
@@ -129,6 +131,7 @@ let detailController: AbortController | undefined
 let detailGeneration = 0
 watch(() => queryString('ticket_id'), id => { void loadDetail(id) }, { immediate: true })
 async function loadDetail(id = queryString('ticket_id')) {
+  if (detailOverview.value?.canLeave() === false) return
   detailController?.abort(); const controller = new AbortController(); detailController = controller
   const generation = ++detailGeneration, context = readContext()
   photoWorkspace.visit(id)
@@ -257,7 +260,7 @@ onUnmounted(() => { unregisterContextGuard(); window.removeEventListener('before
       <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />
       <ApiErrorNotice :error="detailError"><el-button size="small" @click="loadDetail()">重试详情查询</el-button></ApiErrorNotice>
       <el-skeleton v-if="detailLoading" :rows="9" animated />
-      <TicketDetailOverview v-if="ticket" :ticket="ticket" :refresh-key="detailRefreshKey" @close="closeDetail" @notes="openInternalNotes" @comments="openComments" @worklogs="openWorklogs">
+      <TicketDetailOverview ref="detailOverview" v-if="ticket" :ticket="ticket" :refresh-key="detailRefreshKey" @close="closeDetail" @notes="openInternalNotes" @comments="openComments" @worklogs="openWorklogs">
         <div class="detail-section ticket-registration-operation" aria-label="登记操作回读">
           <h3>受理进度与流程状态</h3>
           <p class="muted">查询本次故障申报的后台入库与流程关联进度。</p>

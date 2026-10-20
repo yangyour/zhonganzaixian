@@ -3,8 +3,8 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { createApp, nextTick, reactive, type App } from 'vue'
 import { context, id, page, ticket } from './ticketReader.fixture'
-const mocks = vi.hoisted(() => ({ query: {} as Record<string,string>, replace: vi.fn() }))
-vi.mock('vue-router', () => ({ useRoute: () => ({ query: mocks.query }), useRouter: () => ({ replace: mocks.replace }), onBeforeRouteLeave: vi.fn() }))
+const mocks = vi.hoisted(() => ({ query: {} as Record<string,string>, replace: vi.fn(), updateGuard: vi.fn() }))
+vi.mock('vue-router', () => ({ useRoute: () => ({ query: mocks.query }), useRouter: () => ({ replace: mocks.replace }), onBeforeRouteLeave: vi.fn(), onBeforeRouteUpdate: mocks.updateGuard }))
 import TicketsPage from '../src/pages/TicketsPage.vue'
 import { api, ApiError } from '../src/api/client'
 import { session, contextGeneration } from '../src/stores/session'
@@ -66,4 +66,10 @@ it.each(['context', 'detail'])('late worklog confirmation cannot restore an obso
   if(changed==='context')contextGeneration.value++; else state.ticket=ticket(12)
   await settle(); approve(true); await switching
   expect(state.worklogTarget?.id??null).toBe(changed==='context'?null:id(10)); expect(state.worklogOpen).toBe(false)
+})
+it('uncertain lifecycle blocks detail close and refresh without discarding the active ticket', async () => {
+  const mock=request();mocks.query.ticket_id=id(10);mount();await settle()
+  state.detailOverview={canLeave:()=>false};const before=state.ticket;const calls=mock.mock.calls.length
+  await state.closeDetail();await state.loadDetail();expect(mocks.replace).not.toHaveBeenCalled();expect(state.ticket).toEqual(before);expect(mock).toHaveBeenCalledTimes(calls)
+  const guard=mocks.updateGuard.mock.calls.at(-1)![0] as () => boolean;expect(guard()).toBe(false)
 })

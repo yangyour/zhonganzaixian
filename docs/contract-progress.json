@@ -746,7 +746,8 @@
       "local_references": [
         "docs/ticket-lifecycle-api-20261020.md",
         "docs/ticket-lifecycle-core-20261020.md",
-        "docs/ticket-lifecycle-storage-20261020.md"
+        "docs/ticket-lifecycle-storage-20261020.md",
+        "docs/ticket-lifecycle-ui-20261020.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1465,6 +1466,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "46759eed2b642c843903caf2218c32f7bbfe2ec2e721bf9d7c6bf00fb5092c9b"
+    "doc/development/07_合同逐项开发追踪.md": "91d7d955a1b9e0552d477bfca4f4125af5ac35f1d6fe00b1013dc16d7d08eca4"
   }
 }

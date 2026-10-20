@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.UUID;
+import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TicketResolutionSnapshotTest {
@@ -68,5 +69,30 @@ class TicketResolutionSnapshotTest {
         assertEquals(413,assertThrows(DomainException.class,()->
             new TicketResolutionSnapshot(TENANT,TICKET,7,ENGINEER,TIME,base.ticketSummary(),fits+"x")).status);
         assertThrows(DomainException.class,()->new TicketResolutionSnapshot(TENANT,TICKET,7,ENGINEER,TIME,"summary","字".repeat(30_000)));
+    }
+    @Test void strictReadbackRoundTripsAndChecksExpectedHash() {
+        var source=sample();
+        assertEquals(source,TicketResolutionSnapshot.read(source.canonicalBytes(),source.sha256()));
+        assertThrows(DomainException.class,()->TicketResolutionSnapshot.read(source.canonicalBytes(),"b".repeat(64)));
+        assertThrows(DomainException.class,()->TicketResolutionSnapshot.read(source.canonicalBytes(),null));
+    }
+    @Test void everyTruncationAndTrailingContentIsRejected() {
+        var source=sample();byte[] bytes=source.canonicalBytes();
+        for(int i=0;i<bytes.length;i++){
+            byte[] truncated=Arrays.copyOf(bytes,i);
+            assertThrows(DomainException.class,()->TicketResolutionSnapshot.read(truncated,source.sha256()),"length "+i);
+        }
+        assertThrows(DomainException.class,()->TicketResolutionSnapshot.read(Arrays.copyOf(bytes,bytes.length+1),source.sha256()));
+        assertThrows(DomainException.class,()->TicketResolutionSnapshot.read(null,source.sha256()));
+        assertThrows(DomainException.class,()->TicketResolutionSnapshot.read(new byte[65_537],source.sha256()));
+    }
+    @Test void rejectsNegativeOversizeAndMalformedUtf8FieldLengths() {
+        var source=sample();
+        for(int length:new int[]{-1,Integer.MAX_VALUE,65_537}){
+            byte[] bytes=source.canonicalBytes();ByteBuffer.wrap(bytes).putInt(length);
+            assertThrows(DomainException.class,()->TicketResolutionSnapshot.read(bytes,source.sha256()));
+        }
+        byte[] bytes=source.canonicalBytes();bytes[4]=(byte)0xff;
+        assertThrows(DomainException.class,()->TicketResolutionSnapshot.read(bytes,source.sha256()));
     }
 }

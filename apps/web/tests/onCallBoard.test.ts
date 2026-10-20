@@ -2,6 +2,7 @@ import {describe,it,expect,vi} from 'vitest'
 import {readFileSync} from 'node:fs'
 import {resolve} from 'node:path'
 import {ApiError} from '../src/api/client'
+import customerSlaWire from '../../../fixtures/customer-sla-controller.json'
 import {
  createOnCallBoardWorkspace,createSlaReportWorkspace,formatCountdown,formatDurationSec,formatFenToYuan,
  readOnCallBoard,readSlaReport,readSlaServiceDetail,type OnCallContext
@@ -19,6 +20,18 @@ const at='2026-10-18T10:00:00Z'
 
 const padminScope:OnCallContext={tenantId:tenant,actorId:actor,permissionVersion:4,canWriteInternal:true,canWriteConfig:true}
 const mspScope:OnCallContext={...padminScope,canWriteConfig:false}
+
+it('accepts actual Java controller SLA responses including unknown coverage and retained frozen monthly records',()=>{
+ const scope={...padminScope,tenantId:customerSlaWire.report.tenant_id}
+ const report=readSlaReport(customerSlaWire.report,scope,'2026-10')
+ expect(report.kpis.mean_verified_availability_pct).toBeNull()
+ expect(report.services[0]?.verified_availability_pct).toBeNull()
+ expect(report.services[0]?.status).toBe('INSUFFICIENT_SAMPLES')
+ expect(readSlaServiceDetail(customerSlaWire.detail,scope,'2026-10','CORE_NETWORK').service.service_id).toBe('CORE_NETWORK')
+ const historical=structuredClone(customerSlaWire.report)
+ historical.monthly_result.formula_version='contract-m5-9-m5-19-v1'
+ expect(readSlaReport(historical,scope,'2026-10').monthly_result?.formula_version).toBe('contract-m5-9-m5-19-v1')
+})
 
 const boardPayload=(patch:Record<string,unknown>={})=>({
  tenant_id:tenant,
@@ -71,9 +84,9 @@ const serviceRow=(patch:Record<string,unknown>={})=>({
  incident_count:2,
  mtta:{sample_count:2,unrecovered_count:0,mean_sec:240,p50_sec:240,p95_sec:300},
  mttr:{sample_count:2,unrecovered_count:0,mean_sec:1800,p50_sec:1800,p95_sec:2400},
- unrecovered_count:0,status:'UNKNOWN_PENDING_Q08',unknown_policy_status:'ISOLATED_PENDING_Q08',
+ unrecovered_count:0,status:'UNKNOWN_INTERVAL_PENDING',unknown_policy_status:'UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR',
  interval_details:[{
-  kind:'UNKNOWN_ISOLATED',start:'2026-10-18T04:00:00Z',end:'2026-10-18T04:30:00Z',
+  kind:'UNKNOWN_DATA_GAP',start:'2026-10-18T04:00:00Z',end:'2026-10-18T04:30:00Z',
   duration_sec:1800,explanation:'监控缺失或P3次日口径未决未知区间（1800s，单独隔离不默认视为可用，待Q08确认）'
  }],...patch
 })
@@ -85,7 +98,7 @@ const monthlyEval=(patch:Record<string,unknown>={})=>({
  compensation_ratio:0.2,monthly_fee_fen:2000000,compensation_amount_fen:null,
  compensation_status:'CONFIG_PENDING_Q26',candidate_fixed_ratio_fen:400000,
  candidate_shortfall_weighted_fen:100000,
- formula_version:'D16_SLA_AVAILABILITY_AND_COMPENSATION_V1',items:[],...patch
+ formula_version:'customer-20261020-availability-v2',items:[],...patch
 })
 
 const reportPayload=(patch:Record<string,unknown>={})=>({
@@ -102,7 +115,7 @@ const reportPayload=(patch:Record<string,unknown>={})=>({
   ...monthlyEval(),frozen:true,frozen_at:at,evaluated_by:actor,evaluated_at:at
  },
  live_monthly_evaluation:monthlyEval(),
- formula_version:'D16_SLA_AVAILABILITY_AND_COMPENSATION_V1',timezone:'Asia/Shanghai',
+ formula_version:'customer-20261020-availability-v2',timezone:'Asia/Shanghai',
  observed_at:at,source:'postgresql',...patch
 })
 
@@ -172,7 +185,7 @@ describe('on-call board, 18:00 handoff, escalation policies and SLA monthly repo
   const detailPayload={
    tenant_id:tenant,period:'2026-10',service:serviceRow(),
    interval_details:serviceRow().interval_details,ticket_judgments:[],
-   formula_version:'D16_SLA_AVAILABILITY_AND_COMPENSATION_V1',timezone:'Asia/Shanghai',
+   formula_version:'customer-20261020-availability-v2',timezone:'Asia/Shanghai',
    observed_at:at,source:'postgresql'
   }
   expect(readSlaServiceDetail(detailPayload,mspScope,'2026-10','CORE_NETWORK').service.service_id).toBe('CORE_NETWORK')

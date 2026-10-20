@@ -97,7 +97,7 @@ onUnmounted(() => { unregister();workspace.dispose();listGeneration++;readGenera
       <template v-if="state.current">
         <div class="workflow-facts">
           <div><span>当前状态</span><strong>{{ state.current.state ? workflowLabels[state.current.state] : '尚未建立处理流程' }}</strong></div>
-          <div><span>优先级 / 服务档位</span><strong>{{ state.current.priority || '未指定' }} / {{ ({ BASIC:'基础',STANDARD:'标准',ADVANCED:'进阶' } as Record<string,string>)[state.current.service_tier || ''] || '未指定' }}</strong></div>
+          <div><span>优先级 / 服务档位</span><strong>{{ state.current.priority || '未指定' }} / {{ ({ BASIC:'基础',STANDARD:'标准',ADVANCED:'高级' } as Record<string,string>)[state.current.service_tier || ''] || '未指定' }}</strong></div>
           <div><span>首次响应截止</span><strong>{{ displayTime(state.current.response_due_at) }}</strong></div>
           <div><span>恢复截止</span><strong>{{ displayTime(state.current.recovery_due_at) }}</strong></div>
           <div><span>客户确认截止</span><strong>{{ displayTime(state.current.confirm_due_at) }}</strong></div>
@@ -108,7 +108,7 @@ onUnmounted(() => { unregister();workspace.dispose();listGeneration++;readGenera
         <el-form v-if="actions.length" label-position="top" @submit.prevent>
           <div v-if="actions.includes('activate')" class="workflow-fields">
             <el-form-item label="优先级"><el-select v-model="priority" :disabled="locked" placeholder="选择优先级"><el-option v-for="p in ['P1','P2','P3']" :key="p" :label="p" :value="p" /></el-select></el-form-item>
-            <el-form-item label="本次采用的服务档位"><el-select v-model="tier" :disabled="locked" placeholder="选择服务档位"><el-option label="基础" value="BASIC"/><el-option label="标准" value="STANDARD"/><el-option label="进阶" value="ADVANCED"/></el-select></el-form-item>
+            <el-form-item label="本次采用的服务档位"><el-select v-model="tier" :disabled="locked" placeholder="选择服务档位"><el-option label="基础" value="BASIC"/><el-option label="标准" value="STANDARD"/><el-option label="高级" value="ADVANCED"/></el-select></el-form-item>
           </div>
           <p v-if="actions.includes('activate')" class="field-help">建立流程时锁定所选服务档位与当前 SLA 规则，首次响应与恢复时限按工单报障登记时间起算。</p>
           <el-form-item label="操作说明（解决说明至少20字；确认、重开及撤销请说明原因）"><el-input v-model="note" type="textarea" :rows="3" :disabled="locked" maxlength="3000" aria-label="工单操作说明" /></el-form-item>

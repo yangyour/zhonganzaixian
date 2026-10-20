@@ -56,14 +56,14 @@ defineExpose({state,workspace,mayLeave})
   <div class="page-heading proto-page-head">
    <div>
     <h1>SLA 月度报表与赔付试算 <span class="proto-badge">{{ session?.tenant.name }}</span></h1>
-    <p>不可用区间去重合并、未知区间单独隔离（Q08）、MTTA/MTTR(P50/P95) 统计及月度 SLA 达标与赔付快照（M5-9 / M5-10 / M5-19）。</p>
+    <p>按资产核对监控故障区间与批准维护排除。未知区间同时从可用率分子和分母扣除，有效覆盖不足90%显示样本不足；客户报障和手工登记不充作可用性观测。</p>
    </div>
    <RouterLink to="/oncall-board" class="back">值班看板</RouterLink>
   </div>
   <p class="panel" v-if="!permitted">当前身份无权访问内部 SLA 月报与赔付台账，或正在切换租户。</p>
   <template v-else>
    <p class="proto-scope-note">
-    本报表严格执行重叠故障区间并集去重与批准豁免窗口剔除；监控数据缺失或 P3 次日未决区间单独隔离为未知区间，绝不默认折算为 100% 正常可用（M5-9 / Q08）。月度赔付比例按档位固定（基础 10% / 标准 20% / 进阶 30%），正式赔付金额在客户确认 Q26 口径前保持 CONFIG_PENDING_Q26（null），并同时展示固定比例与按未达标占比两套候选试算值（M5-19）。已冻结月度快照禁止覆盖（M5-10）。
+    按资产计算监控故障并集与批准维护排除；未知时段同时从分子分母剔除，覆盖不足90%不判定达标。月度补偿采用固定档位比例（基础10% / 标准20% / 高级30%）并四舍五入到元，不采用未达标占比连乘。正式金额待试运行期、费用月份档位和对账审批齐备，仍为null；已冻结月度快照保留原公式，不覆盖历史。
    </p>
 
    <div class="proto-toolbar">
@@ -85,7 +85,7 @@ defineExpose({state,workspace,mayLeave})
      <div>
       <span>已核验可用性均值</span>
       <b>{{ state.report.kpis.mean_verified_availability_pct!==null?`${state.report.kpis.mean_verified_availability_pct}%`:'待配置' }}</b>
-      <small>目标 {{ state.report.target_availability_pct }}% ({{ tierLabels[state.report.current_tier] }})</small>
+      <small>目标 {{ state.report.target_availability_pct===null?'未配置':`${state.report.target_availability_pct}%` }} ({{ state.report.current_tier? tierLabels[state.report.current_tier]:'未配置' }})</small>
      </div>
      <div>
       <span>不可用并集总时长</span>
@@ -115,7 +115,7 @@ defineExpose({state,workspace,mayLeave})
       <table class="proto-table">
        <thead>
         <tr>
-         <th>服务名称</th>
+         <th>资产监控对象</th>
          <th>目标可用性</th>
          <th>已核验可用性</th>
          <th>可用性上限（含未知）</th>
@@ -129,7 +129,7 @@ defineExpose({state,workspace,mayLeave})
        <tbody>
         <tr v-for="svc in state.report.services" :key="svc.service_id">
          <td>{{ svc.service_name }} (<code>{{ svc.service_id }}</code>)</td>
-         <td>{{ svc.target_pct }}%</td>
+         <td>{{ svc.target_pct===null?'未配置':`${svc.target_pct}%` }}</td>
          <td>{{ svc.verified_availability_pct!==null?`${svc.verified_availability_pct}%`:'—' }}</td>
          <td>{{ svc.upper_bound_availability_pct!==null?`${svc.upper_bound_availability_pct}%`:'—' }}</td>
          <td>{{ formatDurationSec(svc.unavailable_union_sec) }}</td>
@@ -180,10 +180,10 @@ defineExpose({state,workspace,mayLeave})
        <h3>实时达标评估 ({{ state.report.period }})</h3>
        <p>适用工单：<b>{{ state.report.live_monthly_evaluation.applicable_count }}</b> / 总工单 {{ state.report.live_monthly_evaluation.total_ticket_count }}（豁免不适用 {{ state.report.live_monthly_evaluation.not_applicable_count }}，未决 {{ state.report.live_monthly_evaluation.unresolved_count }}）</p>
        <p>达标率：<b>{{ state.report.live_monthly_evaluation.achievement_rate_pct!==null?`${state.report.live_monthly_evaluation.achievement_rate_pct}% (${state.report.live_monthly_evaluation.met_count}/${state.report.live_monthly_evaluation.applicable_count})`:'暂无适用工单' }}</b></p>
-       <p>档位赔付上限比例：<b>{{ (state.report.live_monthly_evaluation.compensation_ratio*100).toFixed(0) }}%</b> · 月服务费基数：{{ formatFenToYuan(state.report.live_monthly_evaluation.monthly_fee_fen) }}</p>
+       <p>档位赔付上限比例：<b>{{ state.report.live_monthly_evaluation.compensation_ratio===null?'未配置':`${(state.report.live_monthly_evaluation.compensation_ratio*100).toFixed(0)}%` }}</b> · 月服务费基数：{{ formatFenToYuan(state.report.live_monthly_evaluation.monthly_fee_fen) }}</p>
        <p>正式生效赔付额：<b>待确认 ({{ state.report.live_monthly_evaluation.compensation_status }})</b></p>
        <p>候选一（固定档位比例）：<b>{{ formatFenToYuan(state.report.live_monthly_evaluation.candidate_fixed_ratio_fen) }}</b></p>
-       <p>候选二（按未达标工单占比折算）：<b>{{ formatFenToYuan(state.report.live_monthly_evaluation.candidate_shortfall_weighted_fen) }}</b></p>
+       <p>按客户新规范，固定档位比例金额四舍五入到元；不采用未达标工单占比连乘。正式补偿仍需核对试运行期、费用月份档位与对账审批。</p>
       </div>
 
       <div class="eval-card">

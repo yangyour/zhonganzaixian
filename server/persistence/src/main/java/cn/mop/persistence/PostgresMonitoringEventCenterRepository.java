@@ -447,8 +447,13 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
                         throw new DomainException(400, "VALIDATION_ERROR", "延长维护窗口的结束时间必须晚于原结束时间");
                     nextEndsAt = cmd.newEndsAt();
                 }
-                case "END" -> nextStatus = "ENDED";
+                case "END" -> {
+                    nextStatus = now.isAfter(current.startsAt()) ? "ENDED" : "CANCELLED";
+                    if (now.isAfter(current.startsAt()) && now.isBefore(current.endsAt())) nextEndsAt=now;
+                }
                 case "CONFIRM_SLA_EXCLUSION" -> {
+                    if (current.createdBy().equals(a.actorId()))
+                        throw new DomainException(403,"SLA_EXCLUSION_SELF_APPROVAL","SLA排除审批人不得为申请人本人");
                     if (!current.slaExclusionRequested())
                         throw new DomainException(422, "SLA_EXCLUSION_NOT_REQUESTED", "该维护窗口未申请SLA排除，不可确认");
                     nextConfirmed = true;

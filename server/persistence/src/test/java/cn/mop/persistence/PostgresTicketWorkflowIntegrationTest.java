@@ -75,6 +75,10 @@ class PostgresTicketWorkflowIntegrationTest {
         assertEquals("RESOLVED",workflow.read(customer,ticket).get("state"));
         var events=new PostgresMonitoringEventCenterRepository(pool,platform);
         var a=new cn.mop.domain.monitoring.MonitoringEventCenterRepository.Access(TENANT,msp,mspVersion,"SYNTHETIC_REVIEW_GATE");
+        var sla=workflow.readSla(customer,ticket,Tier.STANDARD);
+        var recoveryClock=(Map<?,?>)sla.get("recovery_clock");
+        assertEquals(events.eventDetail(a,eventId).event().recoveredAt().toString(),recoveryClock.get("completed_at"));
+        assertEquals("MET",recoveryClock.get("status"));
         platform.idempotentAuthorized(msp,TENANT,"POST /integration/review-gate/event/"+eventId,UUID.randomUUID().toString(),"f".repeat(64),mspVersion,()->events.authorizeWrite(a),
             ()->events.transitionEvent(a,new cn.mop.domain.monitoring.MonitoringEventCenterRepository.TransitionEventCommand(eventId,1,"RESOLVE","已人工确认故障根因并完成设备修复，复测业务网络连续稳定正常")));
         assertEquals("CLOSED",customerCommand(customer,ticket,"POST /integration/review-gate/close-reviewed/",()->workflow.transition(customer,ticket,new Command(Action.CLOSE,4,null,"确认已解决",null,false))).get("state"));

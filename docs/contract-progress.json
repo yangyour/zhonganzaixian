@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 57,
-  "rows_without_progress_notes": 71,
+  "rows_with_progress_notes": 59,
+  "rows_without_progress_notes": 69,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -37,14 +37,14 @@
     },
     "M4": {
       "requirements": 19,
-      "rows_with_progress_notes": 9,
+      "rows_with_progress_notes": 10,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 19
       }
     },
     "M5": {
       "requirements": 21,
-      "rows_with_progress_notes": 10,
+      "rows_with_progress_notes": 11,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 21
       }
@@ -602,6 +602,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/customer-policy-optimization-20261020.md",
         "docs/evidence/niko-monitoring-storage-coordinator-20261007.json",
         "docs/monitoring-storage-coordinator.md"
       ],
@@ -630,8 +631,10 @@
       "id": "M4-11",
       "title": "恢复通知与复核",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/customer-policy-optimization-20261020.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -805,8 +808,10 @@
       "id": "M5-9",
       "title": "SLA报表",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/customer-policy-optimization-20261020.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -903,6 +908,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/customer-policy-optimization-20261020.md",
         "docs/sla-compliance-scenarios.md"
       ],
       "external_references_unchecked": 0,
@@ -1464,6 +1470,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "5608cdb851e2b8cbd6c2ec773c29abd581ea8c098b4a5f60e9204582a873dcd1"
+    "doc/development/07_合同逐项开发追踪.md": "8a1c3414809937f37d2cbf2faa50fa9f6b313782215f0254b38b6a3ef6832e35"
   }
 }

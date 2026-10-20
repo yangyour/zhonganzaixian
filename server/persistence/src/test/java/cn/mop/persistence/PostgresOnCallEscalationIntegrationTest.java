@@ -57,6 +57,20 @@ class PostgresOnCallEscalationIntegrationTest {
         return new TicketWorkflowRepository.Access(TENANT, actor, version, UUID.randomUUID().toString());
     }
 
+    @Test void customerPolicyReportsAssetEvidenceWithoutInventingHealthySamples() {
+        var report=oncall.slaReport(ocAccess(msp,mspVersion),YearMonth.now(ZoneId.of("Asia/Shanghai")).toString());
+        assertTrue(report.services().stream().allMatch(row->row.serviceId().startsWith("ASSET_")));
+        for(var row:report.services()){
+            // Public duration fields truncate each union to whole seconds; decisions use exact milliseconds.
+            assertTrue(Math.abs(row.agreedServiceSec()-row.approvedExclusionSec()-row.unknownIntervalSec()-row.effectiveServiceSec())<=2);
+            assertTrue(Math.abs(row.knownAvailableSec()+row.unavailableUnionSec()-row.effectiveServiceSec())<=1);
+            if(row.unknownIntervalSec()>0&&row.effectiveServiceSec()*10<(row.agreedServiceSec()-row.approvedExclusionSec())*9)
+                assertNull(row.verifiedAvailabilityPct());
+        }
+        assertEquals("customer-20261020-availability-v2",report.formulaVersion());
+        assertNull(report.liveMonthlyEvaluation().candidateShortfallWeightedFen());
+    }
+
     static String registerAndOpenTicket() {
         String key = "oncall-it-" + UUID.randomUUID(), text = "SYNTHETIC_D16_ONCALL_" + UUID.randomUUID();
         var report = new CustomerReport("D16 oncall ticket", text, "其他", "individual", "Synthetic reporter", "13800138000", "normal", null);
@@ -141,7 +155,7 @@ class PostgresOnCallEscalationIntegrationTest {
         String currentPeriod = YearMonth.now(ZoneId.of("Asia/Shanghai")).toString();
         SlaReportView report = oncall.slaReport(mspAcc, currentPeriod);
         assertEquals(TENANT, report.tenantId());
-        assertEquals(2, report.services().size());
+        assertTrue(report.services().stream().allMatch(row->row.serviceId().startsWith("ASSET_")));
         assertTrue(report.liveMonthlyEvaluation().totalTicketCount() >= 1);
 
         // Pick an un-frozen historical month or evaluate and verify DB guards

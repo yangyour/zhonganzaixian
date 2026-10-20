@@ -47,7 +47,7 @@ const slaPayload=(patch:Record<string,unknown>={})=>({
  },
  clock_tasks:[{clock_key:'response:50',kind:'SLA',due_at:'2026-10-18T08:05:00Z',outcome:'EMITTED',completed_at:'2026-10-18T08:05:01Z'}],
  sla_missing:{},sla_references:[],reopen_count:0,reopen_policy_status:'NOT_REOPENED',
- metric_version:'D16_TICKET_SLA_CLOCK_V1',observed_at:observed,source:'postgresql',...patch
+ metric_version:'SLA_CLOCK_V2',observed_at:observed,source:'postgresql',...patch
 })
 
 function setup(scope=padminScope){
@@ -56,6 +56,14 @@ function setup(scope=padminScope){
  w.reset(scope)
  return{w,request,key}
 }
+
+it('accepts a genuinely unknown SLA breach result when the rule is not configured',()=>{
+ const payload=slaPayload()
+ payload.recovery_clock={...payload.recovery_clock,due_at:null,completed_at:null,breached:null,status:'PENDING_CONFIG'} as any
+ const result=readTicketSlaInspection(payload,padminScope,ticket)
+ expect(result.recovery_clock?.breached).toBeNull()
+ expect(result.recovery_clock?.status).toBe('PENDING_CONFIG')
+})
 
 describe('service tiers and ticket SLA clock inspection',()=>{
  it('validates service tier snapshot, append-only change page and non-retroactive flag',()=>{
@@ -119,7 +127,7 @@ describe('service tiers and ticket SLA clock inspection',()=>{
    contract_device_count:null,billing_cycle:null,monthly_fee_fen:null,reason:'DENIED'
   })).toBe(false)
   expect(await x.w.inspectTicketSla(ticket)).toBe(true)
-  expect(x.w.state().slaInspection?.metric_version).toBe('D16_TICKET_SLA_CLOCK_V1')
+  expect(x.w.state().slaInspection?.metric_version).toBe('SLA_CLOCK_V2')
  })
 
  it('wires route, navigation and explicit M2-10 / Q27 / Q08 disclosures',()=>{

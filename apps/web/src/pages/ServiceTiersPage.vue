@@ -115,7 +115,7 @@ defineExpose({state,workspace,mayLeave})
         <select v-model="toTier" :disabled="locked">
          <option value="BASIC">基础版（5×8 工作日历）</option>
          <option value="STANDARD">标准版（7×24 全天）</option>
-         <option value="ADVANCED">进阶版（7×24 高优保障）</option>
+         <option value="ADVANCED">高级版（7×24 高优保障）</option>
         </select>
        </label>
        <label>生效方式

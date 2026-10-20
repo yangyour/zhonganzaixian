@@ -45,3 +45,5 @@ BA-04/BA-05 单列书面同意条件；全部目录项的部署状态为 `NOT_AC
 在工程根目录运行 `python tools/extract-customer-monitoring-docs.py doc/customer/2026-10-20 --check`，校验原文SHA和全部派生文件。该命令只读取文档；不执行宏，不联网，不访问组件。
 
 实施和测试证据接续于 `docs/customer-policy-optimization-20261020.md`。此文件不将234项目录、局部代码或单元测试标为全部128项合同完成。
+
+结构化时限/档位/补偿候选及两项用户裁决见[配置候选](../../../contracts/customer-policy-20261020.json)。候选状态是未运行发布，`effective_value=null`；基础档P3的具体工作日截止时刻原文未明确，候选保留null。

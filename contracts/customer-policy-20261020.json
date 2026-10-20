@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "source_directory": "doc/customer/2026-10-20",
+  "state": "DOCUMENT_BASELINE_AND_USER_DECISIONS_NOT_RUNTIME_RELEASE",
+  "effective_value": null,
+  "automatic_notifications_enabled": false,
+  "user_decisions": [
+    {
+      "key": "sla.monitoring_recovery_clock_stop",
+      "value": "MONITORING_T2_AFTER_OBSERVATION_CONFIRMED",
+      "confirmed_date": "2026-10-20",
+      "source": "DIRECT_USER_REPLY",
+      "document_conflict_refs": ["document-1:B13.R4", "document-1:B82.R4", "document-1:B113.R8"]
+    },
+    {
+      "key": "notification.p2_dispatch_delay_seconds",
+      "value": 0,
+      "confirmed_date": "2026-10-20",
+      "source": "DIRECT_USER_REPLY",
+      "automatic_ticket_delay_seconds": 0,
+      "provider_dispatch_authorized": false,
+      "document_conflict_refs": ["document-1:B39.R7", "document-1:B41.R3"]
+    }
+  ],
+  "document_candidates": {
+    "source_refs": ["document-1:B79", "document-1:B80"],
+    "tier_labels": {"BASIC": "基础档", "STANDARD": "标准档", "ADVANCED": "高级档"},
+    "response_minutes": {
+      "P1": {"BASIC": 30, "STANDARD": 10, "ADVANCED": 5},
+      "P2": {"BASIC": 60, "STANDARD": 30, "ADVANCED": 20},
+      "P3": {"BASIC": 240, "STANDARD": 120, "ADVANCED": 60}
+    },
+    "recovery": {
+      "P1": {"BASIC": {"duration_minutes": 240}, "STANDARD": {"duration_minutes": 120}, "ADVANCED": {"duration_minutes": 60}},
+      "P2": {"BASIC": {"day_kind": "CALENDAR", "day_offset": 1, "deadline": "18:00"}, "STANDARD": {"duration_minutes": 240}, "ADVANCED": {"duration_minutes": 120}},
+      "P3": {"BASIC": {"day_kind": "WORKING", "day_offset": 3, "deadline": null}, "STANDARD": {"day_kind": "CALENDAR", "day_offset": 1, "deadline": "18:00"}, "ADVANCED": {"day_kind": "CALENDAR", "day_offset": 0, "deadline": "24:00"}}
+    },
+    "customer_confirmation_hours": {"BASIC": 48, "STANDARD": 48, "ADVANCED": 24},
+    "availability_target_percent": {"BASIC": 99.5, "STANDARD": 99.9, "ADVANCED": 99.99},
+    "compensation_ratio": {"BASIC": 0.1, "STANDARD": 0.2, "ADVANCED": 0.3},
+    "compensation_rounding": {"currency": "CNY", "unit": "YUAN", "mode": "HALF_UP", "formula": "MONTHLY_FEE_TIMES_FIXED_TIER_RATIO"},
+    "trial_period_days": 30,
+    "minimum_sample_coverage_percent": 90,
+    "availability_timezone": "Asia/Shanghai",
+    "unknown_interval_policy": "EXCLUDE_FROM_NUMERATOR_AND_DENOMINATOR",
+    "recovery_observation_default_seconds": 300,
+    "flapping_observation_seconds": 900,
+    "minimum_review_code_points": 20,
+    "runtime_published": false
+  },
+  "remaining_document_confirmations": {
+    "recovery_sla": {"source_ref": "document-1:B117", "count": 7},
+    "monitoring_catalog": {"source_ref": "document-2:B75", "count": 17},
+    "note": "原表所有待确认项保留。候选表不替代档位发布、服务日历、采样证据、试运行起点、费用月份快照或结算审批。"
+  }
+}

@@ -87,11 +87,14 @@ public final class TicketLifecycle {
     public record ClockNotice(String key,String eventType,Instant dueAt,int cycle) {}
     /** Due facts only. The repository uniquely persists each key before any delivery attempt. */
     public static List<ClockNotice> dueNotices(Snapshot s,Instant now) {
+        return dueNotices(s,now,false,null);
+    }
+    public static List<ClockNotice> dueNotices(Snapshot s,Instant now,boolean hasMonitoringEvents,Instant confirmedRecoveryAt) {
         if(now==null||now.isBefore(s.updatedAt()))throw invalid();TicketSlaSnapshot.time(now);
         if(s.state()==State.CANCELLED)return List.of();
         var result=new ArrayList<ClockNotice>();
         for(String clock:List.of("response","recovery")) {
-            Instant completed=clock.equals("response")?s.acceptedAt():s.resolvedAt();
+            Instant completed=clock.equals("response")?s.acceptedAt():hasMonitoringEvents?confirmedRecoveryAt:s.resolvedAt();
             for(int percent:List.of(50,80,100)) {
                 Instant due=s.sla().threshold(clock,percent);
                 if(due!=null&&!now.isBefore(due)&&(completed==null||completed.isAfter(due)))

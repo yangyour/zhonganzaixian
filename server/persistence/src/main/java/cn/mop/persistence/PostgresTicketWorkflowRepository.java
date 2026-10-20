@@ -43,7 +43,8 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
                 "workflow_version",0L,"state",null,"priority",null,"frozen_service_tier",null,"current_tenant_service_tier",currentTenantTier==null?null:currentTenantTier.name(),
                 "tier_changed_since_open",false,"response_clock",null,"recovery_clock",null,"clock_tasks",List.of(),"sla_missing",Map.of(),"sla_references",List.of(),
                 "reopen_count",0,"reopen_policy_status","NOT_REOPENED","metric_version",TicketSlaClockEvaluation.METRIC_VERSION,"observed_at",observed.toString(),"source","postgresql");
-            var eval=TicketSlaClockEvaluation.evaluate(event.snapshot(),currentTenantTier,observed);
+            var recovery=monitoringRecovery(c,a.tenantId(),ticket);
+            var eval=TicketSlaClockEvaluation.evaluate(event.snapshot(),currentTenantTier,observed,recovery.linked(),recovery.recoveredAt());
             var tasks=new ArrayList<Map<String,Object>>();
             if(!customer)try(var s=statement(c,"SELECT j.clock_key,j.kind,j.due_at,r.outcome,r.completed_at FROM public.mop_ticket_workflow_clock j LEFT JOIN public.mop_ticket_workflow_clock_receipt r ON r.task_id=j.id AND r.tenant_id=j.tenant_id WHERE j.tenant_id=?::uuid AND j.ticket_id=?::uuid ORDER BY j.due_at,j.clock_key")){
                 s.setString(1,a.tenantId());s.setString(2,ticket);try(var r=s.executeQuery()){while(r.next())tasks.add(map("clock_key",r.getString(1),"kind",r.getString(2),"due_at",time(r,"due_at").toString(),"outcome",r.getString(4),"completed_at",r.getObject(5)==null?null:time(r,"completed_at").toString()));}
@@ -157,7 +158,8 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
                         platform.audit(null,tenant,"ticket.workflow.auto_close","ticket",job.ticket(),"SUCCEEDED","SYSTEM_DURABLE_CONFIRMATION_CLOCK","ticket-clock-"+job.id());outcome="AUTO_CLOSED";
                     }
                 }else if(!job.kind().equals("AUTO_CLOSE")){
-                    Optional<ClockNotice> notice=TicketLifecycle.dueNotices(current.snapshot(),at).stream().filter(n->n.key().equals(job.key())).findFirst();
+                    var recovery=monitoringRecovery(c,tenant,job.ticket());
+                    Optional<ClockNotice> notice=TicketLifecycle.dueNotices(current.snapshot(),at,recovery.linked(),recovery.recoveredAt()).stream().filter(n->n.key().equals(job.key())).findFirst();
                     if(notice.isPresent()){outbox(c,tenant,job.ticket(),current,"clock:"+job.key(),notice.get().eventType(),at);outcome="EMITTED";}
                 }
                 try(var s=statement(c,"INSERT INTO public.mop_ticket_workflow_clock_receipt(task_id,tenant_id,outcome,completed_at) VALUES(?::uuid,?::uuid,?,?)")){s.setString(1,job.id());s.setString(2,tenant);s.setString(3,outcome);instant(s,4,at);s.executeUpdate();}processed++;
@@ -192,6 +194,12 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
     private static boolean linkedEventsReviewed(Connection c,String tenant,String ticket)throws SQLException{
         try(var s=statement(c,"SELECT NOT EXISTS(SELECT 1 FROM public.mop_monitoring_event WHERE tenant_id=?::uuid AND ticket_id=?::uuid AND (monitor_state<>'RECOVERED' OR handling_state NOT IN ('RESOLVED','CLOSED')))")){
             s.setString(1,tenant);s.setString(2,ticket);try(var r=s.executeQuery()){r.next();return r.getBoolean(1);}
+        }
+    }
+    record MonitoringRecovery(boolean linked,Instant recoveredAt){}
+    static MonitoringRecovery monitoringRecovery(Connection c,String tenant,String ticket)throws SQLException{
+        try(var s=statement(c,"SELECT count(*)>0,CASE WHEN bool_and(monitor_state='RECOVERED' AND recovered_at IS NOT NULL) THEN max(recovered_at) ELSE NULL END FROM public.mop_monitoring_event WHERE tenant_id=?::uuid AND ticket_id=?::uuid")){
+            s.setString(1,tenant);s.setString(2,ticket);try(var r=s.executeQuery()){r.next();return new MonitoringRecovery(r.getBoolean(1),r.getObject(2)==null?null:r.getObject(2,OffsetDateTime.class).toInstant());}
         }
     }
     private static boolean lock(Connection c,String tenant,String ticket,boolean attempt)throws SQLException{

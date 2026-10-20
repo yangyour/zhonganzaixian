@@ -404,83 +404,61 @@ public final class PostgresOnCallEscalationRepository implements OnCallEscalatio
             Instant effectiveEnd = observed.isBefore(monthEnd) && observed.isAfter(monthStart) ? observed : monthEnd;
             Interval agreedWindow = new Interval(monthStart, effectiveEnd.isAfter(monthStart) ? effectiveEnd : monthEnd);
 
-            Tier currentTier = Tier.STANDARD;
-            BigDecimal targetPct = new BigDecimal("99.90");
+            Tier currentTier = null;
+            BigDecimal targetPct = null;
             Long monthlyFeeFen = null;
-            try (var s = statement(c, "SELECT tier,availability_target,monthly_fee_fen FROM public.mop_service_tier WHERE tenant_id=?::uuid")) {
-                s.setString(1, a.tenantId());
-                try (var r = s.executeQuery()) {
-                    if (r.next()) {
-                        currentTier = Tier.valueOf(r.getString("tier"));
-                        BigDecimal t = r.getBigDecimal("availability_target");
-                        if (t != null) targetPct = t;
-                        long f = r.getLong("monthly_fee_fen");
-                        if (!r.wasNull()) monthlyFeeFen = f;
-                    }
-                }
+            try (var q = statement(c,"SELECT tier,availability_target,monthly_fee_fen FROM public.mop_service_tier WHERE tenant_id=?::uuid")) {
+                q.setString(1,a.tenantId());try(var r=q.executeQuery()){if(r.next()){
+                    currentTier=Tier.valueOf(r.getString(1));targetPct=r.getBigDecimal(2);long fee=r.getLong(3);if(!r.wasNull())monthlyFeeFen=fee;
+                }}
             }
-
-            List<TicketSample> samples = loadMonthTicketSamples(c, a.tenantId(), monthStart, monthEnd);
-            List<Interval> coreUnavailable = new ArrayList<>();
-            List<Interval> coreUnknown = new ArrayList<>();
-            List<Interval> securityUnavailable = new ArrayList<>();
-            for (TicketSample t : samples) {
-                Instant start = t.createdAt().isBefore(agreedWindow.start()) ? agreedWindow.start() : t.createdAt();
-                Instant rawEnd = t.recoveryActualAt() != null ? t.recoveryActualAt() : agreedWindow.end();
-                Instant end = rawEnd.isAfter(agreedWindow.end()) ? agreedWindow.end() : rawEnd;
-                if (start.isBefore(end)) {
-                    if (t.priority() == Priority.P1 || t.priority() == Priority.P2) {
-                        coreUnavailable.add(new Interval(start, end));
-                    } else if (t.recoveryDueAt() == null) {
-                        // Unresolved P3 next-day or missing data gap is isolated as an unknown interval (M5-9 / Q05 / Q08).
-                        Instant gapEnd = start.plusSeconds(3600).isBefore(agreedWindow.end()) ? start.plusSeconds(3600) : agreedWindow.end();
-                        if (start.isBefore(gapEnd)) coreUnknown.add(new Interval(start, gapEnd));
-                    } else {
-                        securityUnavailable.add(new Interval(start, end));
-                    }
-                }
+            List<TicketSample> samples=loadMonthTicketSamples(c,a.tenantId(),monthStart,monthEnd);
+            var assets=new LinkedHashMap<String,String>();
+            try(var q=statement(c,"SELECT id::text,name FROM public.mop_asset WHERE tenant_id=?::uuid ORDER BY id LIMIT 1001")){
+                q.setString(1,a.tenantId());try(var r=q.executeQuery()){while(r.next())assets.put(r.getString(1),r.getString(2));}
             }
-            try (var s = statement(c, "SELECT received_epoch_second,received_nano FROM public.mop_monitoring_quarantine WHERE claimed_tenant_id=?::uuid AND received_epoch_second>=? AND received_epoch_second<?")) {
-                s.setString(1, a.tenantId());
-                s.setLong(2, monthStart.getEpochSecond());
-                s.setLong(3, monthEnd.getEpochSecond());
-                try (var r = s.executeQuery()) {
-                    while (r.next()) {
-                        Instant qAt = Instant.ofEpochSecond(r.getLong("received_epoch_second"), r.getInt("received_nano"));
-                        Instant qStart = qAt.isBefore(agreedWindow.start()) ? agreedWindow.start() : qAt;
-                        Instant qEnd = qStart.plusSeconds(1800).isBefore(agreedWindow.end()) ? qStart.plusSeconds(1800) : agreedWindow.end();
-                        if (qStart.isBefore(qEnd)) coreUnknown.add(new Interval(qStart, qEnd));
-                    }
-                }
+            if(assets.size()>1000)throw new DomainException(422,"SLA_REPORT_LIMIT","当前资产数量超过单次核算上限，未截断结果或冻结快照");
+            var unavailable=new HashMap<String,List<Interval>>();var exclusions=new HashMap<String,List<Interval>>();
+            var unknown=new HashMap<String,List<Interval>>();
+            var assetTickets=new HashMap<String,Set<String>>();
+            // Only monitoring events contribute unavailability. Customer/manual ticket duration is not a monitor signal.
+            try(var q=statement(c,"SELECT asset_id::text,problem_at,recovered_at,ticket_id::text,sla_unknown_marked FROM public.mop_monitoring_event WHERE tenant_id=?::uuid AND problem_at<? AND (recovered_at IS NULL OR recovered_at>?) ORDER BY problem_at,id LIMIT 10001")){
+                q.setString(1,a.tenantId());instant(q,2,agreedWindow.end());instant(q,3,monthStart);
+                try(var r=q.executeQuery()){int count=0;while(r.next()){
+                    if(++count>10000)throw new DomainException(422,"SLA_REPORT_LIMIT","监控事件超过单次核算上限，未截断结果");
+                    String asset=r.getString(1);Instant from=time(r,"problem_at"),to=nullableTime(r,"recovered_at");
+                    if(to==null||to.isAfter(agreedWindow.end()))to=agreedWindow.end();
+                    if(from.isBefore(to))(r.getBoolean(5)?unknown:unavailable).computeIfAbsent(asset,k->new ArrayList<>()).add(new Interval(from,to));
+                    if(r.getString(4)!=null)assetTickets.computeIfAbsent(asset,k->new HashSet<>()).add(r.getString(4));
+                }}
             }
-
-            ServiceRow coreService = SlaAvailabilityAndCompensation.evaluateService(
-                "CORE_NETWORK", "核心网络互联服务", targetPct, agreedWindow, List.of(), coreUnavailable, coreUnknown, samples
-            );
-            ServiceRow securityService = SlaAvailabilityAndCompensation.evaluateService(
-                "SECURITY_BOUNDARY", "安全边界防护服务", targetPct, agreedWindow, List.of(), securityUnavailable, List.of(),
-                samples.stream().filter(t -> t.priority() == Priority.P2 || t.priority() == Priority.P3).toList()
-            );
-            List<ServiceRow> services = List.of(coreService, securityService);
-
-            BigDecimal meanAvail = null;
-            if (coreService.verifiedAvailabilityPct() != null && securityService.verifiedAvailabilityPct() != null) {
-                meanAvail = coreService.verifiedAvailabilityPct().add(securityService.verifiedAvailabilityPct())
-                    .divide(BigDecimal.valueOf(2), 4, RoundingMode.HALF_UP);
-            } else if (coreService.verifiedAvailabilityPct() != null) {
-                meanAvail = coreService.verifiedAvailabilityPct();
+            try(var q=statement(c,"SELECT asset_id::text,starts_at,ends_at FROM public.mop_maintenance_window WHERE tenant_id=?::uuid AND sla_exclusion_confirmed AND status<>'CANCELLED' AND starts_at<? AND ends_at>? ORDER BY starts_at,id LIMIT 10001")){
+                q.setString(1,a.tenantId());instant(q,2,agreedWindow.end());instant(q,3,monthStart);
+                try(var r=q.executeQuery()){int count=0;while(r.next()){
+                    if(++count>10000)throw new DomainException(422,"SLA_REPORT_LIMIT","维护排除区间超过单次核算上限，未截断结果");
+                    exclusions.computeIfAbsent(r.getString(1),k->new ArrayList<>()).add(new Interval(time(r,"starts_at"),time(r,"ends_at")));
+                }}
             }
-
-            long totalUnavail = coreService.unavailableUnionSec() + securityService.unavailableUnionSec();
-            long totalUnknown = coreService.unknownIntervalSec() + securityService.unknownIntervalSec();
-            MonthlyEvaluation liveEval = SlaAvailabilityAndCompensation.evaluateMonthly(currentTier, monthlyFeeFen, samples);
-            Optional<MonthlyResultRecord> persistedResult = loadMonthlyResult(c, a.tenantId(), period);
-
-            return new SlaReportView(
-                a.tenantId(), period, currentTier, targetPct, meanAvail, totalUnavail,
-                coreService.mtta(), coreService.mttr(), coreService.unrecoveredCount(), totalUnknown,
-                services, persistedResult, liveEval, SlaAvailabilityAndCompensation.FORMULA_VERSION, observed
-            );
+            List<ServiceRow> services=new ArrayList<>();
+            for(var asset:assets.entrySet()){
+                Set<String> ids=assetTickets.getOrDefault(asset.getKey(),Set.of());
+                services.add(SlaAvailabilityAndCompensation.evaluateService("ASSET_"+asset.getKey(),asset.getValue(),targetPct,agreedWindow,
+                    exclusions.getOrDefault(asset.getKey(),List.of()),unavailable.getOrDefault(asset.getKey(),List.of()),unknown.getOrDefault(asset.getKey(),List.of()),
+                    samples.stream().filter(t->ids.contains(t.ticketId())).toList(),List.of()));
+            }
+            BigDecimal meanAvail=null;
+            if(!services.isEmpty()&&services.stream().allMatch(v->v.verifiedAvailabilityPct()!=null))
+                meanAvail=services.stream().map(ServiceRow::verifiedAvailabilityPct).reduce(BigDecimal.ZERO,BigDecimal::add).divide(BigDecimal.valueOf(services.size()),4,RoundingMode.HALF_UP);
+            long totalUnavailable=services.stream().mapToLong(ServiceRow::unavailableUnionSec).sum();
+            long totalUnknown=services.stream().mapToLong(ServiceRow::unknownIntervalSec).sum();
+            List<TicketSample> monitoredSamples=samples.stream().filter(t->assetTickets.values().stream().anyMatch(ids->ids.contains(t.ticketId()))).toList();
+            List<Long> responseTimes=new ArrayList<>(),recoveryTimes=new ArrayList<>();int unrecovered=0;
+            for(var t:monitoredSamples){if(t.responseActualAt()!=null&&!t.responseActualAt().isBefore(t.createdAt()))responseTimes.add(Duration.between(t.createdAt(),t.responseActualAt()).toSeconds());
+                if(t.recoveryActualAt()!=null&&!t.recoveryActualAt().isBefore(t.createdAt()))recoveryTimes.add(Duration.between(t.createdAt(),t.recoveryActualAt()).toSeconds());else unrecovered++;}
+            MonthlyEvaluation liveEval=SlaAvailabilityAndCompensation.evaluateMonthly(currentTier,monthlyFeeFen,samples);
+            return new SlaReportView(a.tenantId(),period,currentTier,targetPct,meanAvail,totalUnavailable,
+                SlaAvailabilityAndCompensation.computeLatency(responseTimes,0),SlaAvailabilityAndCompensation.computeLatency(recoveryTimes,unrecovered),unrecovered,totalUnknown,
+                List.copyOf(services),loadMonthlyResult(c,a.tenantId(),period),liveEval,SlaAvailabilityAndCompensation.FORMULA_VERSION,observed);
         });
     }
 
@@ -503,7 +481,7 @@ public final class PostgresOnCallEscalationRepository implements OnCallEscalatio
             Instant monthStart = ym.atDay(1).atStartOfDay(SHANGHAI).toInstant();
             Instant monthEnd = ym.plusMonths(1).atDay(1).atStartOfDay(SHANGHAI).toInstant();
 
-            Tier currentTier = Tier.STANDARD;
+            Tier currentTier = null;
             Long monthlyFeeFen = null;
             try (var s = statement(c, "SELECT tier,monthly_fee_fen FROM public.mop_service_tier WHERE tenant_id=?::uuid")) {
                 s.setString(1, a.tenantId());
@@ -516,6 +494,7 @@ public final class PostgresOnCallEscalationRepository implements OnCallEscalatio
                 }
             }
 
+            if(currentTier==null)throw new DomainException(422,"SERVICE_TIER_UNCONFIGURED","当前租户未登记服务档位，不能默认核算");
             List<TicketSample> samples = loadMonthTicketSamples(c, a.tenantId(), monthStart, monthEnd);
             MonthlyEvaluation eval = SlaAvailabilityAndCompensation.evaluateMonthly(currentTier, monthlyFeeFen, samples);
             long nextVersion = currentVersion + 1;
@@ -604,13 +583,15 @@ public final class PostgresOnCallEscalationRepository implements OnCallEscalatio
         var list = new ArrayList<TicketSample>();
         try (var s = statement(c, "SELECT t.id::text AS ticket_id, t.created_at, e.snapshot::text AS snapshot "
             + "FROM public.mop_ticket t JOIN LATERAL (SELECT snapshot FROM public.mop_ticket_workflow_event WHERE tenant_id=t.tenant_id AND ticket_id=t.id ORDER BY version DESC LIMIT 1) e ON true "
-            + "WHERE t.tenant_id=?::uuid AND t.created_at>=? AND t.created_at<? ORDER BY t.created_at ASC, t.id ASC LIMIT 2000")) {
+            + "WHERE t.tenant_id=?::uuid AND t.created_at<? AND (e.snapshot->>'resolvedAt' IS NULL OR (e.snapshot->>'resolvedAt')::timestamptz>=?) AND e.snapshot->>'state'<>'CANCELLED' ORDER BY t.created_at ASC, t.id ASC LIMIT 2001")) {
             s.setString(1, tenant);
-            instant(s, 2, monthStart);
-            instant(s, 3, monthEnd);
+            instant(s, 2, monthEnd);
+            instant(s, 3, monthStart);
             try (var r = s.executeQuery()) {
                 while (r.next()) {
+                    if(list.size()>=2000)throw new DomainException(422,"SLA_REPORT_LIMIT","工单样本超过2000条，未截断结果或冻结快照");
                     TicketLifecycle.Snapshot snap = decodeSnapshot(r.getString("snapshot"));
+                    var recovery=PostgresTicketWorkflowRepository.monitoringRecovery(c,tenant,r.getString("ticket_id"));
                     list.add(new TicketSample(
                         r.getString("ticket_id"),
                         Priority.valueOf(snap.sla().priority()),
@@ -621,7 +602,7 @@ public final class PostgresOnCallEscalationRepository implements OnCallEscalatio
                         snap.sla().responseDueAt(),
                         snap.acceptedAt(),
                         snap.sla().recoveryDueAt(),
-                        snap.resolvedAt()
+                        recovery.linked()?recovery.recoveredAt():snap.resolvedAt()
                     ));
                 }
             }
@@ -664,6 +645,10 @@ public final class PostgresOnCallEscalationRepository implements OnCallEscalatio
                     fixedCandidate = BigDecimal.valueOf(fee).multiply(ratio).setScale(0, RoundingMode.HALF_UP).longValue();
                     shortfallCandidate = BigDecimal.valueOf(fee).multiply(ratio).multiply(BigDecimal.valueOf(applicable - met))
                         .divide(BigDecimal.valueOf(applicable), 0, RoundingMode.HALF_UP).longValue();
+                }
+                if(SlaAvailabilityAndCompensation.FORMULA_VERSION.equals(r.getString("formula_version"))){
+                    if(fixedCandidate!=null)fixedCandidate=BigDecimal.valueOf(fee).multiply(ratio).divide(BigDecimal.valueOf(100),0,RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).longValueExact();
+                    shortfallCandidate=null;
                 }
                 return Optional.of(new MonthlyResultRecord(
                     r.getString("id"),

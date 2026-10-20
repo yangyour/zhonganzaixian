@@ -228,7 +228,7 @@ defineExpose({state,workspace,mayLeave})
         <select v-model="escTier" :disabled="locked">
          <option value="BASIC">基础版升级链</option>
          <option value="STANDARD">标准版升级链</option>
-         <option value="ADVANCED">进阶版升级链</option>
+         <option value="ADVANCED">高级版升级链</option>
          <option value="FALLBACK">未配置档位兜底链</option>
         </select>
        </label>
@@ -412,7 +412,7 @@ defineExpose({state,workspace,mayLeave})
         <select v-model="editPolicyTier" :disabled="locked">
          <option value="BASIC">基础版升级链</option>
          <option value="STANDARD">标准版升级链</option>
-         <option value="ADVANCED">进阶版升级链</option>
+         <option value="ADVANCED">高级版升级链</option>
          <option value="FALLBACK">未配置档位兜底链</option>
         </select>
        </label>

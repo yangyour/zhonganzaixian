@@ -184,7 +184,7 @@ public final class OnCallEscalationController {
         return success(map(
             "tenant_id", v.tenantId(),
             "period", v.period(),
-            "current_tier", v.currentTier().name(),
+            "current_tier", v.currentTier()==null?null:v.currentTier().name(),
             "target_availability_pct", v.targetAvailabilityPct(),
             "kpis", map(
                 "mean_verified_availability_pct", v.meanVerifiedAvailabilityPct(),
@@ -406,7 +406,7 @@ public final class OnCallEscalationController {
 
     private static Map<String, Object> monthlyEvalDto(MonthlyEvaluation m) {
         return map(
-            "tier_snapshot", m.tierSnapshot().name(),
+            "tier_snapshot", m.tierSnapshot()==null?null:m.tierSnapshot().name(),
             "total_ticket_count", m.totalTicketCount(),
             "applicable_count", m.applicableCount(),
             "met_count", m.metCount(),

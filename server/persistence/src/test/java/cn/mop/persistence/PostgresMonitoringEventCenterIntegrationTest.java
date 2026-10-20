@@ -157,6 +157,20 @@ class PostgresMonitoringEventCenterIntegrationTest {
             ()->events.ingestEvent(a,new IngestEventCommand(assetA,rule,"SYNTHETIC_CUSTOMER_POLICY",Severity.INFO,phase,rule+"-"+suffix,time,false)));
     }
 
+    @Test void maintenanceExclusionCannotBeSelfApprovedAndEndingStopsTheInterval() {
+        var a=access(padmin,padminVersion);Instant now=Instant.now();
+        MaintenanceWindow window=(MaintenanceWindow)platform.idempotentAuthorized(padmin,TENANT,"POST /integration/mw-self/"+UUID.randomUUID(),
+            UUID.randomUUID().toString(),"b".repeat(64),padminVersion,()->events.authorizeWrite(a),
+            ()->events.createMaintenanceWindow(a,new CreateMaintenanceWindowCommand("SYNTHETIC_SELF_APPROVAL_GUARD",assetA,now.minusSeconds(60),now.plusSeconds(3600),"SUPPRESS_NOTIFY",true,"SYNTHETIC_CUSTOMER_POLICY_TEST")));
+        assertEquals(403,assertThrows(DomainException.class,()->platform.idempotentAuthorized(padmin,TENANT,"POST /integration/mw-self-confirm/"+window.id(),
+            UUID.randomUUID().toString(),"c".repeat(64),padminVersion,()->events.authorizeAdminWrite(a),
+            ()->events.updateMaintenanceWindow(a,new UpdateMaintenanceWindowCommand(window.id(),window.version(),"CONFIRM_SLA_EXCLUSION",null)))).status);
+        MaintenanceWindow ended=(MaintenanceWindow)platform.idempotentAuthorized(padmin,TENANT,"POST /integration/mw-self-end/"+window.id(),
+            UUID.randomUUID().toString(),"d".repeat(64),padminVersion,()->events.authorizeWrite(a),
+            ()->events.updateMaintenanceWindow(a,new UpdateMaintenanceWindowCommand(window.id(),window.version(),"END",null)));
+        assertFalse(ended.slaExclusionConfirmed());assertTrue(ended.endsAt().isBefore(window.endsAt()));assertEquals("ENDED",ended.status());
+    }
+
     @Test void maintenanceWindowSlaExclusionQuarantineBindAndAutoTicketFiveRetries_M4_10_M4_14_M5_4() throws SQLException {
         var mspAcc = access(msp, mspVersion);
         var adminAcc = access(padmin, padminVersion);

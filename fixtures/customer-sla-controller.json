@@ -1,0 +1,172 @@
+{
+  "report" : {
+    "tenant_id" : "66000000-0000-4000-8000-000000000001",
+    "period" : "2026-10",
+    "current_tier" : null,
+    "target_availability_pct" : null,
+    "kpis" : {
+      "mean_verified_availability_pct" : null,
+      "unavailable_union_total_sec" : 0,
+      "mtta" : {
+        "sample_count" : 0,
+        "unrecovered_count" : 0,
+        "mean_sec" : null,
+        "p50_sec" : null,
+        "p95_sec" : null
+      },
+      "mttr" : {
+        "sample_count" : 0,
+        "unrecovered_count" : 0,
+        "mean_sec" : null,
+        "p50_sec" : null,
+        "p95_sec" : null
+      },
+      "unrecovered_total_count" : 0,
+      "unknown_interval_total_sec" : 86400
+    },
+    "services" : [ {
+      "service_id" : "CORE_NETWORK",
+      "service_name" : "核心网络互联服务",
+      "target_pct" : 99.9,
+      "agreed_service_sec" : 86400,
+      "approved_exclusion_sec" : 0,
+      "effective_service_sec" : 0,
+      "unavailable_union_sec" : 0,
+      "unknown_interval_sec" : 86400,
+      "known_available_sec" : 0,
+      "verified_availability_pct" : null,
+      "upper_bound_availability_pct" : null,
+      "incident_count" : 0,
+      "mtta" : {
+        "sample_count" : 0,
+        "unrecovered_count" : 0,
+        "mean_sec" : null,
+        "p50_sec" : null,
+        "p95_sec" : null
+      },
+      "mttr" : {
+        "sample_count" : 0,
+        "unrecovered_count" : 0,
+        "mean_sec" : null,
+        "p50_sec" : null,
+        "p95_sec" : null
+      },
+      "unrecovered_count" : 0,
+      "status" : "INSUFFICIENT_SAMPLES",
+      "unknown_policy_status" : "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+      "interval_details" : [ {
+        "kind" : "UNKNOWN_DATA_GAP",
+        "start" : "2026-10-01T00:00:00Z",
+        "end" : "2026-10-02T00:00:00Z",
+        "duration_sec" : 86400,
+        "explanation" : "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+      } ]
+    } ],
+    "monthly_result" : {
+      "id" : "66000000-0000-4000-8000-000000000061",
+      "tenant_id" : "66000000-0000-4000-8000-000000000001",
+      "report_month" : "2026-10",
+      "version" : 1,
+      "tier_snapshot" : "STANDARD",
+      "total_ticket_count" : 10,
+      "applicable_count" : 10,
+      "met_count" : 7,
+      "not_met_count" : 3,
+      "unresolved_count" : 0,
+      "not_applicable_count" : 0,
+      "achievement_numerator" : 7,
+      "achievement_denominator" : 10,
+      "achievement_rate_pct" : 7E+1,
+      "compensation_ratio" : 0.2,
+      "monthly_fee_fen" : 1000000,
+      "compensation_amount_fen" : null,
+      "compensation_status" : "CONFIG_PENDING_Q26",
+      "candidate_fixed_ratio_fen" : 200000,
+      "candidate_shortfall_weighted_fen" : null,
+      "formula_version" : "customer-20261020-availability-v2",
+      "items" : [ ],
+      "frozen" : true,
+      "frozen_at" : "2026-10-18T10:00:00Z",
+      "evaluated_by" : "66000000-0000-4000-8000-000000000011",
+      "evaluated_at" : "2026-10-18T10:00:00Z"
+    },
+    "live_monthly_evaluation" : {
+      "tier_snapshot" : null,
+      "total_ticket_count" : 0,
+      "applicable_count" : 0,
+      "met_count" : 0,
+      "not_met_count" : 0,
+      "unresolved_count" : 0,
+      "not_applicable_count" : 0,
+      "achievement_numerator" : null,
+      "achievement_denominator" : null,
+      "achievement_rate_pct" : null,
+      "compensation_ratio" : null,
+      "monthly_fee_fen" : null,
+      "compensation_amount_fen" : null,
+      "compensation_status" : "CONFIG_PENDING_Q26",
+      "candidate_fixed_ratio_fen" : null,
+      "candidate_shortfall_weighted_fen" : null,
+      "formula_version" : "customer-20261020-availability-v2",
+      "items" : [ ]
+    },
+    "formula_version" : "customer-20261020-availability-v2",
+    "timezone" : "Asia/Shanghai",
+    "observed_at" : "2026-10-18T10:00:00Z",
+    "source" : "postgresql"
+  },
+  "detail" : {
+    "tenant_id" : "66000000-0000-4000-8000-000000000001",
+    "period" : "2026-10",
+    "service" : {
+      "service_id" : "CORE_NETWORK",
+      "service_name" : "核心网络互联服务",
+      "target_pct" : 99.9,
+      "agreed_service_sec" : 86400,
+      "approved_exclusion_sec" : 0,
+      "effective_service_sec" : 0,
+      "unavailable_union_sec" : 0,
+      "unknown_interval_sec" : 86400,
+      "known_available_sec" : 0,
+      "verified_availability_pct" : null,
+      "upper_bound_availability_pct" : null,
+      "incident_count" : 0,
+      "mtta" : {
+        "sample_count" : 0,
+        "unrecovered_count" : 0,
+        "mean_sec" : null,
+        "p50_sec" : null,
+        "p95_sec" : null
+      },
+      "mttr" : {
+        "sample_count" : 0,
+        "unrecovered_count" : 0,
+        "mean_sec" : null,
+        "p50_sec" : null,
+        "p95_sec" : null
+      },
+      "unrecovered_count" : 0,
+      "status" : "INSUFFICIENT_SAMPLES",
+      "unknown_policy_status" : "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+      "interval_details" : [ {
+        "kind" : "UNKNOWN_DATA_GAP",
+        "start" : "2026-10-01T00:00:00Z",
+        "end" : "2026-10-02T00:00:00Z",
+        "duration_sec" : 86400,
+        "explanation" : "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+      } ]
+    },
+    "interval_details" : [ {
+      "kind" : "UNKNOWN_DATA_GAP",
+      "start" : "2026-10-01T00:00:00Z",
+      "end" : "2026-10-02T00:00:00Z",
+      "duration_sec" : 86400,
+      "explanation" : "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+    } ],
+    "ticket_judgments" : [ ],
+    "formula_version" : "customer-20261020-availability-v2",
+    "timezone" : "Asia/Shanghai",
+    "observed_at" : "2026-10-18T10:00:00Z",
+    "source" : "postgresql"
+  }
+}

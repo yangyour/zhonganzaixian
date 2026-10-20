@@ -231,4 +231,22 @@ class TicketSlaClockBoundaryTest {
         Instant decLate = Instant.parse("2026-12-31T20:00:00Z");
         assertEquals(Instant.parse("2027-01-31T16:00:00Z"), ServiceTierRepository.resolveEffectiveFrom(decLate, EffectiveMode.NEXT_MONTH_FIRST_DAY));
     }
+
+    @Test void confirmedMonitoringRecoveryStopsAtT2WhileReviewAndCustomerConfirmationRemainOpen() {
+        Instant start=Instant.parse("2026-10-20T01:00:00Z"),t2=start.plusSeconds(1500),observed=start.plusSeconds(7200);
+        Snapshot s=TicketLifecycle.open(TicketSlaSnapshot.freeze("P1",Tier.ADVANCED,start,Duration.ofMinutes(5),Duration.ofHours(1),null,24L,null,List.of(),Map.of()),start);
+        var operator=new Operator("engineer",true,false,false);
+        s=TicketLifecycle.apply(s,new Command(Action.ACCEPT,1,null,null,null,false),operator,start.plusSeconds(180)).snapshot();
+        s=TicketLifecycle.apply(s,new Command(Action.START,2,null,null,null,false),operator,start.plusSeconds(200)).snapshot();
+        var eval=TicketSlaClockEvaluation.evaluate(s,Tier.ADVANCED,observed,true,t2);
+        assertEquals(State.IN_PROGRESS,eval.workflowState());
+        assertEquals(t2,eval.recoveryClock().completedAt());
+        assertEquals("MET",eval.recoveryClock().status());
+        assertFalse(eval.recoveryClock().breached());
+        assertEquals(start.plusSeconds(3600),eval.recoveryClock().dueAt());
+        assertTrue(TicketLifecycle.dueNotices(s,observed,true,t2).stream().noneMatch(n->n.key().startsWith("recovery:")));
+        var recurring=TicketSlaClockEvaluation.evaluate(s,Tier.ADVANCED,observed,true,null);
+        assertEquals("BREACHED",recurring.recoveryClock().status());
+        assertEquals(eval.recoveryClock().dueAt(),recurring.recoveryClock().dueAt());
+    }
 }

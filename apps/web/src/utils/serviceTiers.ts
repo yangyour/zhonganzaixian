@@ -31,7 +31,7 @@ export interface ServiceTierChangeInput {
 }
 export interface TicketSlaClockStatus {
  name:'RESPONSE'|'RECOVERY';due_at:string|null;completed_at:string|null;
- paused:boolean;breached:boolean;
+ paused:boolean;breached:boolean|null;
  status:'PENDING_CONFIG'|'RUNNING'|'PAUSED_FOR_CUSTOMER_CONFIRM'|'MET'|'BREACHED'|'CANCELLED';
  missing_reason:string|null;
  thresholds:{p50_at:string|null;p80_at:string|null;p100_at:string|null};
@@ -46,7 +46,7 @@ export interface TicketSlaInspection {
  clock_tasks:{clock_key:string;kind:string;due_at:string;outcome:string|null;completed_at:string|null}[];
  sla_missing:Record<string,string>;sla_references:unknown[];
  reopen_count:number;reopen_policy_status:'NOT_REOPENED'|'PENDING_Q27';
- metric_version:'D16_TICKET_SLA_CLOCK_V1';observed_at:string;source:'postgresql'
+ metric_version:'SLA_CLOCK_V2';observed_at:string;source:'postgresql'
 }
 export interface ServiceTierContext {tenantId:string;actorId:string;permissionVersion:number;canWrite:boolean}
 type Attempt={key:string;body:ServiceTierChangeInput&{expected_version:number}}
@@ -58,7 +58,7 @@ export const emptyServiceTierState=():ServiceTierState=>({
  page:null,busy:null,error:null,attempt:null,slaInspection:null,slaBusy:false,slaError:null
 })
 export const TIER_PAGE_SIZE=25
-export const tierLabels:Record<ServiceTierCode,string>={BASIC:'基础版（5×8 工作日历）',STANDARD:'标准版（7×24 全天）',ADVANCED:'进阶版（7×24 高优保障）'}
+export const tierLabels:Record<ServiceTierCode,string>={BASIC:'基础版（5×8 工作日历）',STANDARD:'标准版（7×24 全天）',ADVANCED:'高级版（7×24 高优保障）'}
 export const effectiveModeLabels:Record<EffectiveMode,string>={IMMEDIATE:'立即生效',NEXT_MONTH_FIRST_DAY:'次月 1 日 00:00 生效'}
 export const billingCycleLabels:Record<BillingCycle,string>={MONTHLY:'按月',QUARTERLY:'按季',YEARLY:'按年'}
 export const clockStatusLabels:Record<TicketSlaClockStatus['status'],string>={
@@ -116,7 +116,7 @@ export function readServiceTierPage(value:unknown,scope:ServiceTierContext,befor
 
 function readClock(raw:unknown,expectedName:'RESPONSE'|'RECOVERY'):TicketSlaClockStatus{
  if(!exportExact(raw,['name','due_at','completed_at','paused','breached','status','missing_reason','thresholds','working_windows_count']))throw invalid()
- if(raw.name!==expectedName||typeof raw.paused!=='boolean'||typeof raw.breached!=='boolean'||!['PENDING_CONFIG','RUNNING','PAUSED_FOR_CUSTOMER_CONFIRM','MET','BREACHED','CANCELLED'].includes(raw.status as string))throw invalid()
+ if(raw.name!==expectedName||typeof raw.paused!=='boolean'||(raw.breached!==null&&typeof raw.breached!=='boolean')||!['PENDING_CONFIG','RUNNING','PAUSED_FOR_CUSTOMER_CONFIRM','MET','BREACHED','CANCELLED'].includes(raw.status as string))throw invalid()
  if(!(raw.due_at===null||exportTime(raw.due_at)>=0)||!(raw.completed_at===null||exportTime(raw.completed_at)>=0)||!(raw.missing_reason===null||typeof raw.missing_reason==='string'))throw invalid()
  if(!exportExact(raw.thresholds,['p50_at','p80_at','p100_at'])||!exportInteger(raw.working_windows_count,0,1000))throw invalid()
  for(const k of ['p50_at','p80_at','p100_at'] as const){const v=raw.thresholds[k];if(!(v===null||exportTime(v)>=0))throw invalid()}
@@ -125,7 +125,7 @@ function readClock(raw:unknown,expectedName:'RESPONSE'|'RECOVERY'):TicketSlaCloc
 
 export function readTicketSlaInspection(value:unknown,scope:ServiceTierContext,expectedTicketId:string):TicketSlaInspection{
  if(!validContext(scope)||!exportExact(value,['ticket_id','tenant_id','receipt_no','registration_created_at','workflow_version','state','priority','frozen_service_tier','current_tenant_service_tier','tier_changed_since_open','response_clock','recovery_clock','clock_tasks','sla_missing','sla_references','reopen_count','reopen_policy_status','metric_version','observed_at','source']))throw invalid()
- if(value.ticket_id!==expectedTicketId||value.tenant_id!==scope.tenantId||typeof value.receipt_no!=='string'||!value.receipt_no.trim()||!exportInteger(value.workflow_version,0)||typeof value.tier_changed_since_open!=='boolean'||!exportInteger(value.reopen_count,0)||!['NOT_REOPENED','PENDING_Q27'].includes(value.reopen_policy_status as string)||value.metric_version!=='D16_TICKET_SLA_CLOCK_V1'||value.source!=='postgresql')throw invalid()
+ if(value.ticket_id!==expectedTicketId||value.tenant_id!==scope.tenantId||typeof value.receipt_no!=='string'||!value.receipt_no.trim()||!exportInteger(value.workflow_version,0)||typeof value.tier_changed_since_open!=='boolean'||!exportInteger(value.reopen_count,0)||!['NOT_REOPENED','PENDING_Q27'].includes(value.reopen_policy_status as string)||value.metric_version!=='SLA_CLOCK_V2'||value.source!=='postgresql')throw invalid()
  exportTime(value.registration_created_at);exportTime(value.observed_at)
  if(value.workflow_version===0){
   if(value.frozen_service_tier!==null||value.response_clock!==null||value.recovery_clock!==null||value.tier_changed_since_open!==false)throw invalid()

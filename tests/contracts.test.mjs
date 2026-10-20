@@ -248,7 +248,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.64.0');
+  assert.equal(contract.info.version, '0.65.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -908,7 +908,7 @@ test('站内消息只读列表与显式已读接口保持当前授权和CSRF幂�
 test('消息游标末页必须明确结束且签名链接只能指向本站下载接口',()=>{const result={data:{items:[inboxMessageSample()],has_more:false,next_before_issued_at:null,next_before_id:null,unread_count:1,observed_at:'2026-10-14T06:00:01Z'},trace_id:'synthetic'};assert.ok(validates('ExportInboxPageResult',result));assert.equal(validates('ExportInboxPageResult',{...result,data:{...result.data,next_before_id:id('1')}}),false);assert.equal(validates('ExportInboxMessage',{...inboxMessageSample(),content_url:'https://example.invalid/download'}),false);});
 
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.64.0');
+  assert.equal(contract.info.version, '0.65.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/sla'].get;
@@ -966,13 +966,13 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
     recovery_clock: { ...clock, name: 'RECOVERY', due_at: '2026-10-18T10:00:00Z', completed_at: '2026-10-18T09:00:00Z', paused: true, status: 'PAUSED_FOR_CUSTOMER_CONFIRM' },
     clock_tasks: [{ clock_key: 'response:50', kind: 'SLA', due_at: '2026-10-18T08:05:00Z', outcome: 'EMITTED', completed_at: '2026-10-18T08:05:01Z' }],
     sla_missing: {}, sla_references: [], reopen_count: 0, reopen_policy_status: 'NOT_REOPENED',
-    metric_version: 'D16_TICKET_SLA_CLOCK_V1', observed_at: '2026-10-18T09:10:00Z', source: 'postgresql',
+    metric_version: 'SLA_CLOCK_V2', observed_at: '2026-10-18T09:10:00Z', source: 'postgresql',
   };
   assert.ok(validates('TicketSlaInspectionResult', { data: sla, trace_id: 'synthetic' }));
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.64.0');
+  assert.equal(contract.info.version, '0.65.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1035,7 +1035,7 @@ test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26�
     compensation_ratio: 0.2, monthly_fee_fen: 2000000, compensation_amount_fen: null,
     compensation_status: 'CONFIG_PENDING_Q26', candidate_fixed_ratio_fen: 400000,
     candidate_shortfall_weighted_fen: 100000,
-    formula_version: 'D16_SLA_AVAILABILITY_AND_COMPENSATION_V1', items: [],
+    formula_version: 'customer-20261020-availability-v2', items: [],
   };
   assert.ok(validates('SlaMonthlyEvaluation', evalObj));
   assert.equal(validates('SlaMonthlyEvaluation', { ...evalObj, compensation_amount_fen: 400000 }), false);
@@ -1059,6 +1059,15 @@ test('变更报备审批契约绑定修订并保留未生效边界', () => {
   assert.equal(validates('ChangeNoticeApprovalAction', { expected_version: 2, action: 'REJECT', note: null }), false);
   assert.equal(validates('ChangeNoticeApprovalAction', { expected_version: 2, action: 'APPROVE', note: null }), true);
   assert.equal(validates('ChangeNoticeApprovalAction', { expected_version: 2, action: 'APPROVE', note: null, actor_id: 'fake' }), false);
+});
+
+test('customer SLA contract accepts the actual Java controller availability and detail payloads',()=>{
+  const actual=read('../fixtures/customer-sla-controller.json');
+  assert.equal(validates('SlaReportResult',{data:actual.report,trace_id:'synthetic-customer-sla'}),true);
+  assert.equal(validates('SlaServiceDetailResult',{data:actual.detail,trace_id:'synthetic-customer-sla'}),true);
+  const historical=structuredClone(actual.report);
+  historical.monthly_result.formula_version='contract-m5-9-m5-19-v1';
+  assert.equal(validates('SlaReportResult',{data:historical,trace_id:'synthetic-historical-sla'}),true);
 });
 
 test('D09 report draft contract requires explicit frozen source and nullable unapproved configuration',()=>{

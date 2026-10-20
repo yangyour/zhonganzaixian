@@ -71,19 +71,18 @@ class OnCallEscalationControllerTest {
 
         ServiceRow row = SlaAvailabilityAndCompensation.evaluateService(
             "CORE_NETWORK", "核心网络互联服务", new BigDecimal("99.90"),
-            window, List.of(exclusion), List.of(unavailable), List.of(unknownGap), List.of()
+            window, List.of(exclusion), List.of(unavailable), List.of(unknownGap), List.of(), List.of(window)
         );
         assertEquals(86400L, row.agreedServiceSec());
         assertEquals(7200L, row.approvedExclusionSec());
-        assertEquals(79200L, row.effectiveServiceSec());
+        assertEquals(72000L, row.effectiveServiceSec());
         assertEquals(3600L, row.unavailableUnionSec());
         assertEquals(7200L, row.unknownIntervalSec());
         // Known available strictly excludes BOTH unavailable (3600s) AND unknown (7200s): 79200 - 3600 - 7200 = 68400s
         assertEquals(68400L, row.knownAvailableSec());
-        assertTrue(row.verifiedAvailabilityPct().compareTo(row.upperBoundAvailabilityPct()) < 0);
-        assertEquals(new BigDecimal("86.3636"), row.verifiedAvailabilityPct());
-        assertEquals(new BigDecimal("95.4545"), row.upperBoundAvailabilityPct());
-        assertEquals("CONFIG_PENDING_Q05_UNKNOWN_NOT_COUNTED_AVAILABLE", row.unknownPolicyStatus());
+        assertEquals(new BigDecimal("95.0000"), row.verifiedAvailabilityPct());
+        assertNull(row.upperBoundAvailabilityPct());
+        assertEquals("UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR", row.unknownPolicyStatus());
         assertTrue(row.intervalDetails().stream().anyMatch(d -> "UNKNOWN_DATA_GAP".equals(d.kind()) && d.explanation().contains("不默认视为可用")));
     }
 
@@ -123,7 +122,7 @@ class OnCallEscalationControllerTest {
         assertEquals("CONFIG_PENDING_Q26", eval.compensationStatus());
         // Candidate formulas for 1,000,000 fen monthly fee at 20% ratio and 30% shortfall:
         assertEquals(200_000L, eval.candidateFixedRatioFen());
-        assertEquals(60_000L, eval.candidateShortfallWeightedFen());
+        assertNull(eval.candidateShortfallWeightedFen());
         assertEquals(10, eval.items().size());
         assertEquals(3, eval.items().stream().filter(j -> "NOT_MET".equals(j.outcome())).count());
     }
@@ -178,20 +177,20 @@ class OnCallEscalationControllerTest {
     }
 
     @Test
-    void slaReportAndMonthlyResultEndpointsAndCustomerRoleForbidden() {
+    void slaReportAndMonthlyResultEndpointsAndCustomerRoleForbidden() throws Exception {
         Interval window = new Interval(Instant.parse("2026-10-01T00:00:00Z"), Instant.parse("2026-10-02T00:00:00Z"));
         ServiceRow core = SlaAvailabilityAndCompensation.evaluateService(
             "CORE_NETWORK", "核心网络互联服务", new BigDecimal("99.90"), window, List.of(), List.of(), List.of(), List.of()
         );
-        MonthlyEvaluation eval = SlaAvailabilityAndCompensation.evaluateMonthly(Tier.STANDARD, 1_000_000L, List.of());
+        MonthlyEvaluation eval = SlaAvailabilityAndCompensation.evaluateMonthly(null, null, List.of());
         MonthlyResultRecord rec = new MonthlyResultRecord(
             MONTHLY_ID, TENANT, "2026-10", 1L, Tier.STANDARD, 10, 10, 7, 3, 0, 0, 7, 10,
             new BigDecimal("70.00"), new BigDecimal("0.20"), 1_000_000L, null, "CONFIG_PENDING_Q26",
-            200_000L, 60_000L, SlaAvailabilityAndCompensation.FORMULA_VERSION, List.of(), true, AT, ACTOR, AT
+            200_000L, null, SlaAvailabilityAndCompensation.FORMULA_VERSION, List.of(), true, AT, ACTOR, AT
         );
         SlaReportView reportView = new SlaReportView(
-            TENANT, "2026-10", Tier.STANDARD, new BigDecimal("99.90"), new BigDecimal("100.0000"),
-            0L, core.mtta(), core.mttr(), 0, 0L, List.of(core), Optional.of(rec), eval,
+            TENANT, "2026-10", null, null, null,
+            0L, core.mtta(), core.mttr(), 0, core.unknownIntervalSec(), List.of(core), Optional.of(rec), eval,
             SlaAvailabilityAndCompensation.FORMULA_VERSION, AT
         );
         when(repository.slaReport(any(), eq("2026-10"))).thenReturn(reportView);
@@ -204,6 +203,13 @@ class OnCallEscalationControllerTest {
         var detReq = request("GET", "/sla/reports/CORE_NETWORK/details", "");
         detReq.addParameter("period", "2026-10");
         var detRes = data(controller.slaReportDetails("CORE_NETWORK", detReq));
+        var json=new com.fasterxml.jackson.databind.ObjectMapper();
+        var document=json.valueToTree(Map.of("report",repRes,"detail",detRes));
+        var root=java.nio.file.Path.of("").toAbsolutePath();
+        while(!java.nio.file.Files.isDirectory(root.resolve("contracts")))root=root.getParent();
+        var fixture=root.resolve("fixtures/customer-sla-controller.json");
+        if(Boolean.getBoolean("mop.customerSlaFixtures"))java.nio.file.Files.writeString(fixture,json.writerWithDefaultPrettyPrinter().writeValueAsString(document)+"\n");
+        assertEquals(json.readTree(java.nio.file.Files.readString(fixture)),json.readTree(json.writeValueAsString(document)));
         assertEquals("CORE_NETWORK", ((Map<?, ?>) detRes.get("service")).get("service_id"));
         assertEquals(404, assertThrows(DomainException.class, () -> controller.slaReportDetails("UNKNOWN_SVC", detReq)).status);
 

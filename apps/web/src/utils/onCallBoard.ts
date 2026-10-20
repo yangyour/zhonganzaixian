@@ -56,53 +56,53 @@ export interface SlaLatencyStats {
  sample_count:number;unrecovered_count:number;mean_sec:number|null;p50_sec:number|null;p95_sec:number|null
 }
 export interface SlaExplainedInterval {
- kind:'AGREED_SERVICE'|'APPROVED_EXCLUSION'|'UNAVAILABLE_UNION'|'UNKNOWN_ISOLATED';
+ kind:'KNOWN_AVAILABLE'|'APPROVED_EXCLUSION'|'UNAVAILABLE_UNION'|'UNKNOWN_DATA_GAP';
  start:string;end:string;duration_sec:number;explanation:string
 }
 export interface SlaServiceRow {
- service_id:string;service_name:string;target_pct:number;agreed_service_sec:number;
+ service_id:string;service_name:string;target_pct:number|null;agreed_service_sec:number;
  approved_exclusion_sec:number;effective_service_sec:number;unavailable_union_sec:number;
  unknown_interval_sec:number;known_available_sec:number;verified_availability_pct:number|null;
  upper_bound_availability_pct:number|null;incident_count:number;mtta:SlaLatencyStats;mttr:SlaLatencyStats;
- unrecovered_count:number;status:'MET'|'AT_RISK'|'BREACHED'|'UNKNOWN_PENDING_Q08';
- unknown_policy_status:'NONE'|'ISOLATED_PENDING_Q08';interval_details:SlaExplainedInterval[]
+ unrecovered_count:number;status:'MET'|'NOT_MET'|'INSUFFICIENT_SAMPLES'|'UNKNOWN_INTERVAL_PENDING';
+ unknown_policy_status:'NO_UNKNOWN_GAPS'|'UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR';interval_details:SlaExplainedInterval[]
 }
 export interface SlaTicketJudgment {
- ticket_id:string;priority:'P1'|'P2'|'P3';tier_snapshot:ServiceTierCode;applicable:boolean;
+ ticket_id:string;priority:'P1'|'P2'|'P3';tier_snapshot:ServiceTierCode;applicable:boolean|null;
  outcome:'MET'|'NOT_MET'|'UNRESOLVED'|'NOT_APPLICABLE';
- response_check:'MET'|'NOT_MET'|'UNRESOLVED'|'NOT_APPLICABLE';
- recovery_check:'MET'|'NOT_MET'|'UNRESOLVED'|'NOT_APPLICABLE';
+ response_check:'MET'|'NOT_MET'|'UNKNOWN';
+ recovery_check:'MET'|'NOT_MET'|'UNKNOWN';
  response_due_at:string|null;response_actual_at:string|null;
  recovery_due_at:string|null;recovery_actual_at:string|null;reasons:string[]
 }
 export interface SlaMonthlyEvaluation {
- tier_snapshot:ServiceTierCode;total_ticket_count:number;applicable_count:number;met_count:number;
+ tier_snapshot:ServiceTierCode|null;total_ticket_count:number;applicable_count:number;met_count:number;
  not_met_count:number;unresolved_count:number;not_applicable_count:number;
  achievement_numerator:number|null;achievement_denominator:number|null;achievement_rate_pct:number|null;
- compensation_ratio:0.1|0.2|0.3;monthly_fee_fen:number|null;compensation_amount_fen:null;
+ compensation_ratio:0.1|0.2|0.3|null;monthly_fee_fen:number|null;compensation_amount_fen:null;
  compensation_status:'CONFIG_PENDING_Q26';candidate_fixed_ratio_fen:number|null;
  candidate_shortfall_weighted_fen:number|null;
- formula_version:'D16_SLA_AVAILABILITY_AND_COMPENSATION_V1';items:SlaTicketJudgment[]
+ formula_version:'customer-20261020-availability-v2'|'contract-m5-9-m5-19-v1';items:SlaTicketJudgment[]
 }
 export interface SlaMonthlyResultRecord extends SlaMonthlyEvaluation {
  id:string;tenant_id:string;report_month:string;version:number;
  frozen:boolean;frozen_at:string|null;evaluated_by:string;evaluated_at:string
 }
 export interface SlaReportPayload {
- tenant_id:string;period:string;current_tier:ServiceTierCode;target_availability_pct:number;
+ tenant_id:string;period:string;current_tier:ServiceTierCode|null;target_availability_pct:number|null;
  kpis:{
   mean_verified_availability_pct:number|null;unavailable_union_total_sec:number;
   mtta:SlaLatencyStats;mttr:SlaLatencyStats;unrecovered_total_count:number;unknown_interval_total_sec:number
  };
  services:SlaServiceRow[];monthly_result:SlaMonthlyResultRecord|null;
  live_monthly_evaluation:SlaMonthlyEvaluation;
- formula_version:'D16_SLA_AVAILABILITY_AND_COMPENSATION_V1';timezone:'Asia/Shanghai';
+ formula_version:'customer-20261020-availability-v2';timezone:'Asia/Shanghai';
  observed_at:string;source:'postgresql'
 }
 export interface SlaServiceDetailPayload {
  tenant_id:string;period:string;service:SlaServiceRow;
  interval_details:SlaExplainedInterval[];ticket_judgments:SlaTicketJudgment[];
- formula_version:'D16_SLA_AVAILABILITY_AND_COMPENSATION_V1';timezone:'Asia/Shanghai';
+ formula_version:'customer-20261020-availability-v2';timezone:'Asia/Shanghai';
  observed_at:string;source:'postgresql'
 }
 
@@ -121,7 +121,7 @@ export const emptyOnCallBoardState=():OnCallBoardState=>({board:null,busy:null,e
 export const emptySlaReportState=():SlaReportState=>({report:null,detail:null,busy:null,error:null,attempt:null})
 
 export const shiftCodeLabels:Record<ShiftCode,string>={DAY:'白班（09:00-18:00）',NIGHT:'夜班（18:00-次日09:00）',FULL_DAY:'全天值班（24h）'}
-export const policyTierLabels:Record<PolicyTierCode,string>={BASIC:'基础版升级链',STANDARD:'标准版升级链',ADVANCED:'进阶版升级链',FALLBACK:'未配置档位兜底链'}
+export const policyTierLabels:Record<PolicyTierCode,string>={BASIC:'基础版升级链',STANDARD:'标准版升级链',ADVANCED:'高级版升级链',FALLBACK:'未配置档位兜底链'}
 export const triggerConditionLabels:Record<TriggerCondition,string>={
  IMMEDIATE:'立即通知',UNACKNOWLEDGED:'超时未确认',UNRESOLVED:'超时未恢复',
  COUNTDOWN_ZERO:'SLA倒计时归零',PHONE_UNANSWERED:'电话连续未接听'
@@ -131,7 +131,7 @@ export const targetRoleLabels:Record<TargetRole,string>={
  CUSTOMER_ADMIN:'客户管理员',SERVICE_MANAGER:'服务经理',DECISION_MAKER:'决策人'
 }
 export const serviceStatusLabels:Record<SlaServiceRow['status'],string>={
- MET:'达标',AT_RISK:'风险预警',BREACHED:'未达标',UNKNOWN_PENDING_Q08:'含未知区间（待Q08确认）'
+ MET:'达标',NOT_MET:'未达标',INSUFFICIENT_SAMPLES:'样本不足或目标未配置',UNKNOWN_INTERVAL_PENDING:'含未知区间'
 }
 
 export function formatCountdown(sec:number|null):string{
@@ -188,18 +188,18 @@ export function readOnCallBoard(raw:unknown,scope:OnCallContext):OnCallBoardPayl
 }
 
 function validateMonthlyEvaluation(raw:Record<string,unknown>){
- if(!isTier(raw.tier_snapshot)||raw.compensation_amount_fen!==null||raw.compensation_status!=='CONFIG_PENDING_Q26'||raw.formula_version!=='D16_SLA_AVAILABILITY_AND_COMPENSATION_V1'||!Array.isArray(raw.items))throw invalid()
- if(![0.1,0.2,0.3].includes(raw.compensation_ratio as number))throw invalid()
+ if((raw.tier_snapshot!==null&&!isTier(raw.tier_snapshot))||raw.compensation_amount_fen!==null||raw.compensation_status!=='CONFIG_PENDING_Q26'||!['customer-20261020-availability-v2','contract-m5-9-m5-19-v1'].includes(raw.formula_version as string)||!Array.isArray(raw.items))throw invalid()
+ if(raw.tier_snapshot===null?raw.compensation_ratio!==null:![0.1,0.2,0.3].includes(raw.compensation_ratio as number))throw invalid()
 }
 
 export function readSlaReport(raw:unknown,scope:OnCallContext,expectedPeriod:string):SlaReportPayload{
  if(!validContext(scope)||!exportExact(raw,['tenant_id','period','current_tier','target_availability_pct','kpis','services','monthly_result','live_monthly_evaluation','formula_version','timezone','observed_at','source']))throw invalid()
- if(raw.tenant_id!==scope.tenantId||raw.period!==expectedPeriod||!isTier(raw.current_tier)||raw.formula_version!=='D16_SLA_AVAILABILITY_AND_COMPENSATION_V1'||raw.timezone!=='Asia/Shanghai'||raw.source!=='postgresql')throw invalid()
+ if(raw.tenant_id!==scope.tenantId||raw.period!==expectedPeriod||(raw.current_tier!==null&&!isTier(raw.current_tier))||raw.formula_version!=='customer-20261020-availability-v2'||raw.timezone!=='Asia/Shanghai'||raw.source!=='postgresql')throw invalid()
  exportTime(raw.observed_at)
- if(!Array.isArray(raw.services)||raw.services.length<1)throw invalid()
+ if(!Array.isArray(raw.services)||raw.services.length>1000)throw invalid()
  for(const s of raw.services){
   if(!exportExact(s,['service_id','service_name','target_pct','agreed_service_sec','approved_exclusion_sec','effective_service_sec','unavailable_union_sec','unknown_interval_sec','known_available_sec','verified_availability_pct','upper_bound_availability_pct','incident_count','mtta','mttr','unrecovered_count','status','unknown_policy_status','interval_details']))throw invalid()
-  if((s.unknown_interval_sec as number)>0&&s.unknown_policy_status!=='ISOLATED_PENDING_Q08')throw invalid()
+  if((s.unknown_interval_sec as number)>0&&s.unknown_policy_status!=='UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR')throw invalid()
  }
  if(!exportExact(raw.live_monthly_evaluation,['tier_snapshot','total_ticket_count','applicable_count','met_count','not_met_count','unresolved_count','not_applicable_count','achievement_numerator','achievement_denominator','achievement_rate_pct','compensation_ratio','monthly_fee_fen','compensation_amount_fen','compensation_status','candidate_fixed_ratio_fen','candidate_shortfall_weighted_fen','formula_version','items']))throw invalid()
  validateMonthlyEvaluation(raw.live_monthly_evaluation)
@@ -213,7 +213,7 @@ export function readSlaReport(raw:unknown,scope:OnCallContext,expectedPeriod:str
 
 export function readSlaServiceDetail(raw:unknown,scope:OnCallContext,expectedPeriod:string,expectedServiceId:string):SlaServiceDetailPayload{
  if(!validContext(scope)||!exportExact(raw,['tenant_id','period','service','interval_details','ticket_judgments','formula_version','timezone','observed_at','source']))throw invalid()
- if(raw.tenant_id!==scope.tenantId||raw.period!==expectedPeriod||raw.formula_version!=='D16_SLA_AVAILABILITY_AND_COMPENSATION_V1'||raw.timezone!=='Asia/Shanghai'||raw.source!=='postgresql')throw invalid()
+ if(raw.tenant_id!==scope.tenantId||raw.period!==expectedPeriod||raw.formula_version!=='customer-20261020-availability-v2'||raw.timezone!=='Asia/Shanghai'||raw.source!=='postgresql')throw invalid()
  exportTime(raw.observed_at)
  const svc=raw.service as Record<string,unknown>
  if(!svc||svc.service_id!==expectedServiceId||!Array.isArray(raw.interval_details)||!Array.isArray(raw.ticket_judgments))throw invalid()

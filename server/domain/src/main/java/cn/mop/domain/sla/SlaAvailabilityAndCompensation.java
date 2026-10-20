@@ -17,7 +17,7 @@ import java.util.*;
  * official compensation amount remains null while Q26 formula/rounding is unconfirmed.
  */
 public final class SlaAvailabilityAndCompensation {
-    public static final String FORMULA_VERSION = "contract-m5-9-m5-19-v1";
+    public static final String FORMULA_VERSION = "customer-20261020-availability-v2";
     private SlaAvailabilityAndCompensation() {}
 
     public enum ServiceStatus { MET, NOT_MET, INSUFFICIENT_SAMPLES, UNKNOWN_INTERVAL_PENDING }
@@ -126,8 +126,7 @@ public final class SlaAvailabilityAndCompensation {
         List<TicketJudgment> items
     ) {
         public MonthlyEvaluation {
-            Objects.requireNonNull(tierSnapshot, "tierSnapshot");
-            Objects.requireNonNull(compensationRatio, "compensationRatio");
+            if ((tierSnapshot == null) != (compensationRatio == null)) throw invalid();
             Objects.requireNonNull(compensationStatus, "compensationStatus");
             Objects.requireNonNull(formulaVersion, "formulaVersion");
             items = List.copyOf(items);
@@ -144,28 +143,46 @@ public final class SlaAvailabilityAndCompensation {
         Collection<Interval> unknownIntervals,
         List<TicketSample> tickets
     ) {
+        return evaluateService(serviceId,serviceName,targetPct,agreedWindow,approvedExclusions,
+            unavailableIntervals,unknownIntervals,tickets,List.of());
+    }
+
+    /** Coverage must come from observed sampling intervals, never from the absence of tickets. */
+    public static ServiceRow evaluateService(String serviceId,String serviceName,BigDecimal targetPct,Interval agreedWindow,
+        Collection<Interval> approvedExclusions,Collection<Interval> unavailableIntervals,Collection<Interval> unknownIntervals,
+        List<TicketSample> tickets,Collection<Interval> observedCoverage) {
         if (serviceId == null || serviceId.isBlank() || serviceName == null || serviceName.isBlank() || agreedWindow == null)
             throw invalid();
         List<Interval> clippedExclusions = IntervalSets.clip(approvedExclusions == null ? List.of() : approvedExclusions, agreedWindow);
         List<Interval> effectiveWindows = IntervalSets.subtract(List.of(agreedWindow), clippedExclusions);
-        List<Interval> clippedUnavailable = IntervalSets.intersection(unavailableIntervals == null ? List.of() : unavailableIntervals, effectiveWindows);
-        List<Interval> remainingAfterUnavailable = IntervalSets.subtract(effectiveWindows, clippedUnavailable);
-        List<Interval> clippedUnknown = IntervalSets.intersection(unknownIntervals == null ? List.of() : unknownIntervals, remainingAfterUnavailable);
-        List<Interval> knownAvailable = IntervalSets.subtract(remainingAfterUnavailable, clippedUnknown);
+        var coverage = new ArrayList<Interval>(observedCoverage == null ? List.of() : observedCoverage);
+        // A confirmed PROBLEM interval is known unavailable evidence, not evidence that any other time was healthy.
+        coverage.addAll(unavailableIntervals == null ? List.of() : unavailableIntervals);
+        var unknown = new ArrayList<Interval>(unknownIntervals == null ? List.of() : unknownIntervals);
+        unknown.addAll(IntervalSets.subtract(effectiveWindows,coverage));
+        List<Interval> clippedUnknown = IntervalSets.intersection(unknown,effectiveWindows);
+        List<Interval> knownWindows = IntervalSets.subtract(effectiveWindows,clippedUnknown);
+        List<Interval> clippedUnavailable = IntervalSets.intersection(unavailableIntervals == null ? List.of() : unavailableIntervals,knownWindows);
+        List<Interval> knownAvailable = IntervalSets.subtract(knownWindows,clippedUnavailable);
 
         long agreedSec = IntervalSets.duration(List.of(agreedWindow)).toSeconds();
         long exclusionSec = IntervalSets.duration(clippedExclusions).toSeconds();
-        long effectiveSec = IntervalSets.duration(effectiveWindows).toSeconds();
+        long effectiveSec = IntervalSets.duration(knownWindows).toSeconds();
         long unavailableSec = IntervalSets.duration(clippedUnavailable).toSeconds();
         long unknownSec = IntervalSets.duration(clippedUnknown).toSeconds();
         long knownAvailableSec = IntervalSets.duration(knownAvailable).toSeconds();
 
         BigDecimal verifiedPct = null;
         BigDecimal upperBoundPct = null;
-        if (effectiveSec > 0) {
-            // Verified availability strictly excludes both unavailable union AND unknown intervals from the numerator (M5-9).
-            verifiedPct = BigDecimal.valueOf(knownAvailableSec * 100.0 / effectiveSec).setScale(4, RoundingMode.HALF_UP);
-            upperBoundPct = BigDecimal.valueOf((effectiveSec - unavailableSec) * 100.0 / effectiveSec).setScale(4, RoundingMode.HALF_UP);
+        long serviceMillis=IntervalSets.duration(effectiveWindows).toMillis();
+        long effectiveMillis=IntervalSets.duration(knownWindows).toMillis();
+        long availableMillis=IntervalSets.duration(knownAvailable).toMillis();
+        boolean sufficientCoverage = serviceMillis > 0 && BigDecimal.valueOf(effectiveMillis).multiply(BigDecimal.TEN)
+            .compareTo(BigDecimal.valueOf(serviceMillis).multiply(BigDecimal.valueOf(9))) >= 0;
+        if (effectiveMillis > 0 && sufficientCoverage) {
+            verifiedPct = BigDecimal.valueOf(availableMillis).multiply(BigDecimal.valueOf(100))
+                .divide(BigDecimal.valueOf(effectiveMillis),4,RoundingMode.HALF_UP);
+            upperBoundPct = clippedUnknown.isEmpty() ? verifiedPct : null;
         }
 
         List<Long> mttaSamples = new ArrayList<>();
@@ -186,15 +203,8 @@ public final class SlaAvailabilityAndCompensation {
         LatencyStats mttr = computeLatency(mttrSamples, unrecovered);
 
         ServiceStatus status;
-        if (effectiveSec <= 0 || (safeTickets.isEmpty() && unavailableSec == 0 && unknownSec == 0)) {
+        if (effectiveMillis <= 0 || !sufficientCoverage) {
             status = ServiceStatus.INSUFFICIENT_SAMPLES;
-        } else if (unknownSec > 0) {
-            // Unknown intervals are never silently counted as available; if verifiedPct < targetPct, mark NOT_MET, else UNKNOWN_INTERVAL_PENDING.
-            if (targetPct != null && verifiedPct != null && verifiedPct.compareTo(targetPct) < 0) {
-                status = ServiceStatus.NOT_MET;
-            } else {
-                status = ServiceStatus.UNKNOWN_INTERVAL_PENDING;
-            }
         } else if (targetPct != null && verifiedPct != null) {
             status = verifiedPct.compareTo(targetPct) >= 0 ? ServiceStatus.MET : ServiceStatus.NOT_MET;
         } else {
@@ -215,7 +225,7 @@ public final class SlaAvailabilityAndCompensation {
         for (Interval i : clippedUnknown) {
             long sec = Duration.between(i.start(), i.end()).toSeconds();
             if (sec > 0) details.add(new ExplainedInterval("UNKNOWN_DATA_GAP", i.start(), i.end(), sec,
-                "无数据/未知区间（单独列示，不默认视为可用，已从已核实可用时长中剔除）"));
+                "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"));
         }
         for (Interval i : knownAvailable) {
             long sec = Duration.between(i.start(), i.end()).toSeconds();
@@ -240,7 +250,7 @@ public final class SlaAvailabilityAndCompensation {
             mttr,
             unrecovered,
             status,
-            unknownSec > 0 ? "CONFIG_PENDING_Q05_UNKNOWN_NOT_COUNTED_AVAILABLE" : "NO_UNKNOWN_GAPS",
+            !clippedUnknown.isEmpty() ? "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR" : "NO_UNKNOWN_GAPS",
             details
         );
     }
@@ -270,8 +280,8 @@ public final class SlaAvailabilityAndCompensation {
     }
 
     public static MonthlyEvaluation evaluateMonthly(Tier tierSnapshot, Long monthlyFeeFen, List<TicketSample> samples) {
-        if (tierSnapshot == null || samples == null || samples.size() > SlaComplianceScenario.MAX_TICKETS) throw invalid();
-        BigDecimal ratio = switch (tierSnapshot) {
+        if (samples == null || samples.size() > SlaComplianceScenario.MAX_TICKETS) throw invalid();
+        BigDecimal ratio = tierSnapshot == null ? null : switch (tierSnapshot) {
             case BASIC -> new BigDecimal("0.10");
             case STANDARD -> new BigDecimal("0.20");
             case ADVANCED -> new BigDecimal("0.30");
@@ -325,13 +335,10 @@ public final class SlaAvailabilityAndCompensation {
 
         Long fixedCandidate = null;
         Long shortfallCandidate = null;
-        if (monthlyFeeFen != null && monthlyFeeFen > 0 && applicable > 0 && notMet > 0) {
-            fixedCandidate = BigDecimal.valueOf(monthlyFeeFen).multiply(ratio).setScale(0, RoundingMode.HALF_UP).longValue();
-            shortfallCandidate = BigDecimal.valueOf(monthlyFeeFen)
-                .multiply(ratio)
-                .multiply(BigDecimal.valueOf(applicable - met))
-                .divide(BigDecimal.valueOf(applicable), 0, RoundingMode.HALF_UP)
-                .longValue();
+        if (ratio != null && monthlyFeeFen != null && monthlyFeeFen > 0 && applicable > 0 && notMet > 0) {
+            fixedCandidate = BigDecimal.valueOf(monthlyFeeFen).multiply(ratio)
+                .divide(BigDecimal.valueOf(100),0,RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).longValueExact();
+            // Customer specification 5.5 explicitly rejects shortfall-weighted compensation.
         }
         return new MonthlyEvaluation(
             tierSnapshot,

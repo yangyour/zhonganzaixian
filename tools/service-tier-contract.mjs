@@ -34,7 +34,7 @@ export function addServiceTierContract(contract) {
   })
   const clockStatus = object({
     name: { enum: ['RESPONSE', 'RECOVERY'] }, due_at: nullable(time), completed_at: nullable(time),
-    paused: { type: 'boolean' }, breached: { type: 'boolean' },
+    paused: { type: 'boolean' }, breached: nullable({ type: 'boolean' }),
     status: { enum: ['PENDING_CONFIG', 'RUNNING', 'PAUSED_FOR_CUSTOMER_CONFIRM', 'MET', 'BREACHED', 'CANCELLED'] },
     missing_reason: nullable({ type: 'string' }),
     thresholds: object({ p50_at: nullable(time), p80_at: nullable(time), p100_at: nullable(time) }),
@@ -51,7 +51,7 @@ export function addServiceTierContract(contract) {
     clock_tasks: { type: 'array', maxItems: 64, items: object({ clock_key: { type: 'string' }, kind: { type: 'string' }, due_at: time, outcome: nullable({ type: 'string' }), completed_at: nullable(time) }) },
     sla_missing: { type: 'object', additionalProperties: { type: 'string' } }, sla_references: { type: 'array', maxItems: 20 },
     reopen_count: { type: 'integer', minimum: 0 }, reopen_policy_status: { enum: ['NOT_REOPENED', 'PENDING_Q27'] },
-    metric_version: { const: 'D16_TICKET_SLA_CLOCK_V1' }, observed_at: time, source: { const: 'postgresql' },
+    metric_version: { const: 'SLA_CLOCK_V2' }, observed_at: time, source: { const: 'postgresql' },
   })
 
   Object.assign(contract.components.schemas, {

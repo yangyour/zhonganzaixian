@@ -1,0 +1,17 @@
+{
+  "received_date": "2026-10-20",
+  "sources": [
+    {
+      "name": "告警恢复规则与SLA工单流程口径规范.docx",
+      "sha256": "adcb5fb9b9bc0423cb4013fbe710c3b916606c1c55c055927d8dcd376bfd403c",
+      "bytes": 105999,
+      "extraction": "document-1.json"
+    },
+    {
+      "name": "运维托管平台_监控项清单_V1.2(1).docx",
+      "sha256": "c00bbfd53adc5f949e25b09645927fb1bf6e6e2f529d7f68c68f99df9660488c",
+      "bytes": 154955,
+      "extraction": "document-2.json"
+    }
+  ]
+}

@@ -118,6 +118,8 @@ public final class MonitoringEventCenterController {
         long expected = version(b.get("expected_version"));
         String action = text(b.get("action"), 32);
         String rootCause = b.get("root_cause_note").isNull() ? null : text(b.get("root_cause_note"), 500);
+        if ("RESOLVE".equals(action) && (rootCause == null || rootCause.strip().codePointCount(0,rootCause.strip().length()) < MonitoringEventPipeline.MIN_REVIEW_CODE_POINTS))
+            throw new DomainException(400,"VALIDATION_ERROR","人工复核必须填写至少20个字符的根因与处置说明");
         TransitionEventCommand cmd = new TransitionEventCommand(eventId, expected, action, rootCause);
         String key = idempotencyKey(r);
         String digest = digest("EVENT_TRANSITION_V1\n" + eventId + "\n" + expected + "\n" + action + "\n" + rootCause);

@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @EnabledIfEnvironmentVariable(named="MOP_RUN_TICKET_WORKFLOW_TESTS",matches="true")
 class PostgresTicketWorkflowIntegrationTest {
     static HikariDataSource pool; static PostgresPlatformRepository platform; static PostgresTicketWorkflowRepository workflow;
-    static final ObjectMapper mapper=new ObjectMapper(); static final String TENANT="55000000-0000-4000-8000-000000000001";
+    static final ObjectMapper mapper=new ObjectMapper().findAndRegisterModules(); static final String TENANT="55000000-0000-4000-8000-000000000001";
     static String viewer,msp; static long viewerVersion,mspVersion;
     @BeforeAll static void connect(){
         var cfg=new HikariConfig();cfg.setJdbcUrl(System.getenv("SPRING_DATASOURCE_URL"));cfg.setUsername("mop_test_runtime");cfg.setPassword(System.getenv("SPRING_DATASOURCE_PASSWORD"));cfg.setMaximumPoolSize(6);pool=new HikariDataSource(cfg);
@@ -56,4 +56,27 @@ class PostgresTicketWorkflowIntegrationTest {
         assertEquals(1,count("SELECT count(*) FROM public.mop_ticket_workflow_event WHERE tenant_id=?::uuid AND ticket_id=?::uuid",TENANT,ticket));
     }
     static int count(String sql,String... args){try(Connection c=pool.getConnection();var s=c.prepareStatement(sql)){for(int i=0;i<args.length;i++)s.setString(i+1,args[i]);try(var r=s.executeQuery()){r.next();return r.getInt(1);}}catch(SQLException e){throw new AssertionError(e);}}
+
+    static Map<String,Object> customerCommand(TicketWorkflowRepository.Access a,String ticket,String route,java.util.function.Supplier<? extends Map<String,Object>> work){return (Map<String,Object>)platform.idempotentAuthorized(a.actorId(),a.tenantId(),route+ticket,UUID.randomUUID().toString(),"b".repeat(64),a.permissionVersion(),()->workflow.authorizeCommand(a,ticket,true),()->work.get());}
+
+    @Test void customerCloseWaitsForLinkedMonitoringReview() throws SQLException {
+        String ticket=register(),eventId=UUID.randomUUID().toString();var internal=access(msp,mspVersion);var customer=access(viewer,viewerVersion);
+        command(internal,ticket,"POST /integration/review-gate/open/",()->workflow.activate(internal,ticket,0,"P1",Tier.STANDARD,"SYNTHETIC_REVIEW_GATE",(a,p,t,start)->policy(start)));
+        command(internal,ticket,"POST /integration/review-gate/accept/",()->workflow.transition(internal,ticket,new Command(Action.ACCEPT,1,null,null,null,false)));
+        command(internal,ticket,"POST /integration/review-gate/start/",()->workflow.transition(internal,ticket,new Command(Action.START,2,null,null,null,false)));
+        command(internal,ticket,"POST /integration/review-gate/resolve/",()->workflow.transition(internal,ticket,new Command(Action.RESOLVE,3,null,"已完成故障定位与修复并确认网络稳定，现请客户核对业务恢复情况。",null,false)));
+        try(Connection c=pool.getConnection();var s=c.prepareStatement(
+            "INSERT INTO public.mop_monitoring_event(id,tenant_id,asset_id,version,rule_code,rule_name,severity,severity_rank,fingerprint,occurrence_count,monitor_state,handling_state,suppression_state,notification_empty_state,problem_at,last_occurred_at,recovered_at,ticket_id,updated_by,updated_at) "+
+            "SELECT ?::uuid,?::uuid,id,1,'SYNTH_REVIEW_GATE','SYNTHETIC_REVIEW_GATE','INFO',1,?,1,'RECOVERED','PENDING_REVIEW','NONE','NORMAL_DISPATCH_ELIGIBLE',date_trunc('milliseconds',now()),date_trunc('milliseconds',now()),date_trunc('milliseconds',now()),?::uuid,?::uuid,date_trunc('milliseconds',now()) FROM public.mop_asset WHERE tenant_id=?::uuid ORDER BY id LIMIT 1")){
+            s.setString(1,eventId);s.setString(2,TENANT);s.setString(3,"SYNTH_REVIEW_"+eventId);s.setString(4,ticket);s.setString(5,msp);s.setString(6,TENANT);assertEquals(1,s.executeUpdate());
+        }
+        var failure=assertThrows(DomainException.class,()->customerCommand(customer,ticket,"POST /integration/review-gate/close/",()->workflow.transition(customer,ticket,new Command(Action.CLOSE,4,null,"确认已解决",null,false))));
+        assertEquals(422,failure.status);
+        assertEquals("RESOLVED",workflow.read(customer,ticket).get("state"));
+        var events=new PostgresMonitoringEventCenterRepository(pool,platform);
+        var a=new cn.mop.domain.monitoring.MonitoringEventCenterRepository.Access(TENANT,msp,mspVersion,"SYNTHETIC_REVIEW_GATE");
+        platform.idempotentAuthorized(msp,TENANT,"POST /integration/review-gate/event/"+eventId,UUID.randomUUID().toString(),"f".repeat(64),mspVersion,()->events.authorizeWrite(a),
+            ()->events.transitionEvent(a,new cn.mop.domain.monitoring.MonitoringEventCenterRepository.TransitionEventCommand(eventId,1,"RESOLVE","已人工确认故障根因并完成设备修复，复测业务网络连续稳定正常")));
+        assertEquals("CLOSED",customerCommand(customer,ticket,"POST /integration/review-gate/close-reviewed/",()->workflow.transition(customer,ticket,new Command(Action.CLOSE,4,null,"确认已解决",null,false))).get("state"));
+    }
 }

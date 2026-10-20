@@ -133,7 +133,22 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
         Instant now = now(c);
         Instant occurred = cmd.occurredAt() != null ? cmd.occurredAt() : now;
 
+        // Collector redelivery is independent of the HTTP idempotency key.
+        try (var s = statement(c, "SELECT e.id::text FROM public.mop_monitoring_event e JOIN public.mop_monitoring_event_member m ON m.tenant_id=e.tenant_id AND m.event_id=e.id WHERE e.tenant_id=?::uuid AND e.fingerprint=? AND m.source_event_id=? AND m.source_phase=? ORDER BY m.recorded_at DESC LIMIT 1")) {
+            s.setString(1, a.tenantId()); s.setString(2, fp); s.setString(3, cmd.sourceEventId().trim()); s.setString(4, cmd.sourcePhase().name());
+            try (var r = s.executeQuery()) {
+                if (r.next()) return findEvent(c, a.tenantId(), r.getString(1)).orElseThrow(PostgresMonitoringEventCenterRepository::unavailable);
+            }
+        }
         Optional<EventSummary> latestOpen = findLatestOpenEventByFingerprint(c, a.tenantId(), fp);
+        if (latestOpen.isPresent() && occurred.isBefore(latestOpen.get().lastOccurredAt()))
+            throw new DomainException(422, "EVENT_SIGNAL_OUT_OF_ORDER", "较早监控信号不能覆盖较新的状态，请核对来源时间");
+        if (latestOpen.isEmpty() && cmd.sourcePhase() == MonitorState.RECOVERED)
+            throw new DomainException(422, "RECOVERY_WITHOUT_PROBLEM", "恢复信号缺少当前租户同设备同规则的故障事件");
+        if (latestOpen.isPresent() && latestOpen.get().monitorState() == MonitorState.RECOVERED
+            && cmd.sourcePhase() == MonitorState.RECOVERED) return latestOpen.get();
+        if (latestOpen.isPresent() && latestOpen.get().ticketId() != null)
+            lock(c, "mop.ticket.workflow|" + a.tenantId() + "|" + latestOpen.get().ticketId());
         String upstreamProblemAsset = findActiveUpstreamProblemAsset(c, a.tenantId(), cmd.assetId());
         Optional<MaintenanceWindow> activeMw = findActiveMaintenanceWindow(c, a.tenantId(), cmd.assetId(), occurred);
 
@@ -143,12 +158,13 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
         FlapDecision flapDecision;
         SuppressionDecision suppression;
 
-        if (latestOpen.isPresent() && MonitoringEventPipeline.shouldMergeWithinWindow(
-            latestOpen.get().lastOccurredAt(), occurred, latestOpen.get().handlingState())) {
+        if (latestOpen.isPresent() && (latestOpen.get().monitorState() == MonitorState.PROBLEM
+            || cmd.sourcePhase() == MonitorState.RECOVERED
+            || MonitoringEventPipeline.shouldMergeWithinWindow(latestOpen.get().lastOccurredAt(), occurred, latestOpen.get().handlingState()))) {
             EventSummary prev = latestOpen.get();
             eventId = prev.id();
             nextSeq = prev.occurrenceCount() + 1;
-            merged = true;
+            merged = MonitoringEventPipeline.shouldMergeWithinWindow(prev.lastOccurredAt(), occurred, prev.handlingState());
             boolean phaseFlipped = prev.monitorState() != cmd.sourcePhase();
             flapDecision = MonitoringEventPipeline.evaluateFlap(
                 prev.flapFlipCount(), phaseFlipped, prev.lastOccurredAt(), occurred, prev.flapSilencedUntil()
@@ -157,7 +173,8 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
                 cmd.severity(), flapDecision.flapTriggered(), upstreamProblemAsset, activeMw.map(MaintenanceWindow::name).orElse(null)
             );
             HandlingState nextHandling = MonitoringEventPipeline.nextHandlingStateOnSignal(prev.handlingState(), cmd.sourcePhase());
-            Instant recoveredAt = cmd.sourcePhase() == MonitorState.RECOVERED ? occurred : prev.recoveredAt();
+            Instant recoveredAt = cmd.sourcePhase() == MonitorState.RECOVERED
+                ? (prev.monitorState() == MonitorState.RECOVERED ? prev.recoveredAt() : occurred) : null;
             long nextVersion = prev.version() + 1;
 
             try (var s = statement(c, "UPDATE public.mop_monitoring_event SET version=?,occurrence_count=?,flap_flip_count=?,flap_silenced_until=?,monitor_state=?,handling_state=?,suppression_state=?,suppression_reason=?,notification_empty_state=?,sla_unknown_marked=?,last_occurred_at=?,recovered_at=?,updated_by=?::uuid,updated_at=? WHERE tenant_id=?::uuid AND id=?::uuid AND version=?")) {
@@ -236,7 +253,7 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
         if (suppression.primaryNoiseLayer() != NoiseLayer.EFFECTIVE_ALERT) {
             appendNoiseRecord(c, a.tenantId(), eventId, suppression.primaryNoiseLayer(),
                 suppression.suppressionReason() != null ? suppression.suppressionReason() : suppression.primaryNoiseLayer().name(), now);
-        } else if (!merged) {
+        } else if (nextSeq == 1 && cmd.sourcePhase() == MonitorState.PROBLEM) {
             appendNoiseRecord(c, a.tenantId(), eventId, NoiseLayer.EFFECTIVE_ALERT, "通过归并/防抖/依赖/维护窗口过滤，生成有效告警事件", now);
         }
 
@@ -324,6 +341,8 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
             lock(c, "mop.monitoring_event_id|" + a.tenantId() + "|" + cmd.eventId());
             EventSummary current = findEvent(c, a.tenantId(), cmd.eventId())
                 .orElseThrow(() -> new DomainException(404, "RESOURCE_NOT_FOUND", "当前租户下不存在该监控事件"));
+            if (current.ticketId() != null)
+                lock(c, "mop.ticket.workflow|" + a.tenantId() + "|" + current.ticketId());
             if (current.version() != cmd.expectedVersion())
                 throw new DomainException(409, "VERSION_CONFLICT", "监控事件版本已变化，请刷新后重试");
 

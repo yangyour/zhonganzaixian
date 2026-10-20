@@ -172,7 +172,7 @@ function switchWindow(w: FunnelWindow) {
                 <button v-if="canWrite && canTransition(ev, 'MARK_PENDING_REVIEW')" type="button" :disabled="locked"
                   @click="workspace.submitTransition(ev.id, { expected_version: ev.version, action: 'MARK_PENDING_REVIEW', root_cause_note: null })">转为待复核</button>
                 <template v-if="canWrite && ev.handling_state === 'PENDING_REVIEW'">
-                  <label :for="`root-cause-${ev.id}`">人工复核根因（至少5个字符，最多500个字符）</label>
+                  <label :for="`root-cause-${ev.id}`">人工复核根因与处置说明（至少20个字符，最多500个字符）</label>
                   <textarea :id="`root-cause-${ev.id}`" v-model="rootCauseNotes[ev.id]" :disabled="locked" :aria-label="`${ev.rule_name}根因说明`" />
                   <button type="button" :disabled="locked || !canTransition(ev, 'RESOLVE', rootCauseNotes[ev.id] ?? null)"
                     @click="workspace.submitTransition(ev.id, { expected_version: ev.version, action: 'RESOLVE', root_cause_note: rootCauseNotes[ev.id] ?? null })">确认解决</button>

@@ -106,6 +106,8 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
             boolean customer=Set.of(Action.CLOSE,Action.REOPEN).contains(command.action());String role=member(c,a,customer?"tickets:report":"ticket_notes:write_internal",true);
             Parent p=parent(c,a,ticket,role,true);lock(c,a.tenantId(),ticket,false);Event current=latest(c,a.tenantId(),ticket);if(current==null)throw new DomainException(422,"WORKFLOW_NOT_OPEN","请先明确优先级和服务档位建立正式工单");
             if(command.action()==Action.REASSIGN)assignee(c,a.tenantId(),command.assigneeId());
+            if(command.action()==Action.CLOSE&&!linkedEventsReviewed(c,a.tenantId(),ticket))
+                throw new DomainException(422,"LINKED_EVENTS_UNREVIEWED","关联监控事件尚未恢复并完成人工复核，不能关闭工单");
             Operator who=new Operator(a.actorId(),Capabilities.internal(role),role.equals("padmin"),customer&&Capabilities.customer(role)&&a.actorId().equals(p.reporter()));
             Transition change=TicketLifecycle.apply(current.snapshot(),command,who,now(c));
             Event event=append(c,a.tenantId(),ticket,a.actorId(),command.action().name(),change.snapshot(),map("note",command.note(),"reason_code",command.reasonCode(),"previous_assignee_id",current.snapshot().assigneeId(),"new_assignee_id",change.snapshot().assigneeId(),"retain_previous",command.retainPrevious()),change.effects());
@@ -147,6 +149,8 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
                 try(var s=statement(c,"SELECT 1 FROM public.mop_ticket_workflow_clock_receipt WHERE task_id=?::uuid")){s.setString(1,job.id());try(var r=s.executeQuery()){if(r.next())continue;}}
                 Event current=latest(c,tenant,job.ticket());if(current==null)throw unavailable();Instant at=now(c);String outcome="OBSOLETE";
                 if(job.kind().equals("AUTO_CLOSE")&&job.cycle()==current.snapshot().confirmationCycle()){
+                    // Keep the durable task pending; a later review must be able to unblock it.
+                    if(!linkedEventsReviewed(c,tenant,job.ticket()))continue;
                     var change=TicketLifecycle.autoClose(current.snapshot(),at);
                     if(change.isPresent()){
                         append(c,tenant,job.ticket(),null,"AUTO_CLOSE",change.get().snapshot(),map("clock_task_id",job.id(),"note",null),change.get().effects());
@@ -184,6 +188,11 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
     }
     private Event latest(Connection c,String tenant,String ticket)throws SQLException{
         try(var s=statement(c,"SELECT id::text,snapshot,snapshot_hash FROM public.mop_ticket_workflow_event WHERE tenant_id=?::uuid AND ticket_id=?::uuid ORDER BY version DESC LIMIT 1")){s.setString(1,tenant);s.setString(2,ticket);try(var r=s.executeQuery()){return r.next()?new Event(r.getString(1),decode(r.getString(2)),r.getString(3)):null;}}
+    }
+    private static boolean linkedEventsReviewed(Connection c,String tenant,String ticket)throws SQLException{
+        try(var s=statement(c,"SELECT NOT EXISTS(SELECT 1 FROM public.mop_monitoring_event WHERE tenant_id=?::uuid AND ticket_id=?::uuid AND (monitor_state<>'RECOVERED' OR handling_state NOT IN ('RESOLVED','CLOSED')))")){
+            s.setString(1,tenant);s.setString(2,ticket);try(var r=s.executeQuery()){r.next();return r.getBoolean(1);}
+        }
     }
     private static boolean lock(Connection c,String tenant,String ticket,boolean attempt)throws SQLException{
         try(var s=statement(c,"SELECT "+(attempt?"pg_try_advisory_xact_lock":"pg_advisory_xact_lock")+"(hashtextextended(?,0))")){s.setString(1,"mop.ticket.workflow|"+tenant+"|"+ticket);try(var r=s.executeQuery()){r.next();return !attempt||r.getBoolean(1);}}

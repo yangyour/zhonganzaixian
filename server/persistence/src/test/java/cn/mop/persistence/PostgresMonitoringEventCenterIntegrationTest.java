@@ -120,7 +120,7 @@ class PostgresMonitoringEventCenterIntegrationTest {
         EventSummary resolved = (EventSummary) platform.idempotentAuthorized(
             msp, TENANT, "POST /integration/events/resolve/" + eventId, UUID.randomUUID().toString(), "e".repeat(64), mspVersion,
             () -> events.authorizeWrite(mspAcc),
-            () -> events.transitionEvent(mspAcc, new TransitionEventCommand(eventId, r2.version(), "RESOLVE", "人工复核确认上联光模块抖动已固定修复")));
+            () -> events.transitionEvent(mspAcc, new TransitionEventCommand(eventId, r2.version(), "RESOLVE", "人工复核确认上联光模块抖动原因并已固定修复，复测网络连接稳定")));
         assertEquals(HandlingState.RESOLVED, resolved.handlingState());
 
         EventSummary closed = (EventSummary) platform.idempotentAuthorized(
@@ -128,6 +128,33 @@ class PostgresMonitoringEventCenterIntegrationTest {
             () -> events.authorizeWrite(mspAcc),
             () -> events.transitionEvent(mspAcc, new TransitionEventCommand(eventId, resolved.version(), "CLOSE", null)));
         assertEquals(HandlingState.CLOSED, closed.handlingState());
+    }
+
+    @Test void longProblemKeepsIdentityAndLateRecoveryClosesTheSameSignalOnly() {
+        var a = access(msp, mspVersion);
+        String rule = "SYNTH_LONG_" + UUID.randomUUID().toString().substring(0,8);
+        Instant start = Instant.now().minusSeconds(1800);
+        EventSummary first = ingest(a,rule,MonitorState.PROBLEM,"first",start);
+        EventSummary repeated = ingest(a,rule,MonitorState.PROBLEM,"repeat",start.plusSeconds(600));
+        assertEquals(first.id(), repeated.id());
+        EventSummary recovered = ingest(a,rule,MonitorState.RECOVERED,"recovery",start.plusSeconds(1200));
+        assertEquals(first.id(), recovered.id());
+        assertEquals(MonitorState.RECOVERED, recovered.monitorState());
+        assertEquals(HandlingState.PENDING_REVIEW,recovered.handlingState());
+        assertNull(recovered.closedAt());
+        EventSummary replay = ingest(a,rule,MonitorState.RECOVERED,"recovery",start.plusSeconds(1200));
+        assertEquals(recovered.version(),replay.version());
+        assertEquals(3,events.eventDetail(a,first.id()).members().size());
+        assertEquals(422,assertThrows(DomainException.class,()->ingest(a,rule,MonitorState.PROBLEM,"late",start.plusSeconds(1000))).status);
+        assertEquals(400,assertThrows(DomainException.class,()->platform.idempotentAuthorized(
+            msp,TENANT,"POST /integration/review-short/"+first.id(),UUID.randomUUID().toString(),"a".repeat(64),mspVersion,
+            ()->events.authorizeWrite(a),()->events.transitionEvent(a,new TransitionEventCommand(first.id(),recovered.version(),"RESOLVE","字".repeat(19))))).status);
+    }
+
+    static EventSummary ingest(Access a,String rule,MonitorState phase,String suffix,Instant time) {
+        return (EventSummary)platform.idempotentAuthorized(a.actorId(),a.tenantId(),"POST /integration/customer-policy/"+rule+"/"+suffix,
+            UUID.randomUUID().toString(),"c".repeat(64),a.permissionVersion(),()->events.authorizeWrite(a),
+            ()->events.ingestEvent(a,new IngestEventCommand(assetA,rule,"SYNTHETIC_CUSTOMER_POLICY",Severity.INFO,phase,rule+"-"+suffix,time,false)));
     }
 
     @Test void maintenanceWindowSlaExclusionQuarantineBindAndAutoTicketFiveRetries_M4_10_M4_14_M5_4() throws SQLException {

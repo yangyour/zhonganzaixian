@@ -30,6 +30,7 @@ public final class MonitoringEventPipeline {
     public static final long FLAP_SILENCE_SEC = 300L;
     public static final long TICKET_DEDUPE_WINDOW_SEC = 1800L;
     public static final int AUTOCREATE_RETRY_MAX = 5;
+    public static final int MIN_REVIEW_CODE_POINTS = 20;
     public static final List<Long> AUTOCREATE_BACKOFF_SEC = List.of(30L, 120L, 600L, 600L, 600L);
 
     private MonitoringEventPipeline() {}
@@ -221,18 +222,24 @@ public final class MonitoringEventPipeline {
                 yield HandlingState.IN_PROGRESS;
             }
             case "MARK_PENDING_REVIEW" -> {
+                if (monitorState != MonitorState.RECOVERED)
+                    throw new DomainException(422, "EVENT_NOT_RECOVERED", "监控尚未恢复，不能人工标记待复核");
                 if (current == HandlingState.RESOLVED)
                     throw new DomainException(422, "INVALID_EVENT_STATE_TRANSITION", "已解决事件不可退回待复核");
                 yield HandlingState.PENDING_REVIEW;
             }
             case "RESOLVE" -> {
+                if (monitorState != MonitorState.RECOVERED)
+                    throw new DomainException(422, "EVENT_NOT_RECOVERED", "监控尚未恢复，不能确认解决");
                 if (current != HandlingState.PENDING_REVIEW)
                     throw new DomainException(422, "INVALID_EVENT_STATE_TRANSITION", "告警恢复后须先处于待复核(PENDING_REVIEW)并经人工确认根因才可进入已解决(M4-11)");
-                if (rootCauseNote == null || rootCauseNote.trim().length() < 5)
-                    throw new DomainException(400, "VALIDATION_ERROR", "人工复核确认解决必须填写不少于5个字符的根因说明(M4-11)");
+                if (rootCauseNote == null || rootCauseNote.strip().codePointCount(0, rootCauseNote.strip().length()) < MIN_REVIEW_CODE_POINTS)
+                    throw new DomainException(400, "VALIDATION_ERROR", "人工复核必须填写至少20个字符的根因与处置说明");
                 yield HandlingState.RESOLVED;
             }
             case "CLOSE" -> {
+                if (monitorState != MonitorState.RECOVERED)
+                    throw new DomainException(422, "EVENT_NOT_RECOVERED", "监控尚未恢复，不能关闭事件");
                 if (current != HandlingState.RESOLVED)
                     throw new DomainException(422, "INVALID_EVENT_STATE_TRANSITION", "仅已解决(RESOLVED)的监控事件允许关闭(CLOSE)");
                 yield HandlingState.CLOSED;

@@ -67,11 +67,23 @@ class MonitoringEventPipelineTest {
             MonitoringEventPipeline.transitionHandlingState(HandlingState.PENDING_REVIEW, MonitorState.RECOVERED, "RESOLVE", "短")).status);
 
         HandlingState resolved = MonitoringEventPipeline.transitionHandlingState(
-            HandlingState.PENDING_REVIEW, MonitorState.RECOVERED, "RESOLVE", "主干光纤尾纤松动已紧固恢复"
+            HandlingState.PENDING_REVIEW, MonitorState.RECOVERED, "RESOLVE", "已核对主干光纤尾纤松动原因并完成紧固，观察网络恢复稳定"
         );
         assertEquals(HandlingState.RESOLVED, resolved);
         assertEquals(HandlingState.CLOSED,
             MonitoringEventPipeline.transitionHandlingState(resolved, MonitorState.RECOVERED, "CLOSE", null));
+    }
+
+    @Test void customerReviewNeedsTwentyCodePointsAndActualRecovery() {
+        assertEquals(400, assertThrows(DomainException.class, () ->
+            MonitoringEventPipeline.transitionHandlingState(HandlingState.PENDING_REVIEW, MonitorState.RECOVERED, "RESOLVE", "字".repeat(19))).status);
+        assertEquals(400, assertThrows(DomainException.class, () ->
+            MonitoringEventPipeline.transitionHandlingState(HandlingState.PENDING_REVIEW, MonitorState.RECOVERED, "RESOLVE", "😀".repeat(10))).status);
+        assertEquals(HandlingState.RESOLVED, MonitoringEventPipeline.transitionHandlingState(
+            HandlingState.PENDING_REVIEW, MonitorState.RECOVERED, "RESOLVE", "字".repeat(20)));
+        for (String action : new String[]{"MARK_PENDING_REVIEW", "RESOLVE", "CLOSE"})
+            assertEquals(422, assertThrows(DomainException.class, () ->
+                MonitoringEventPipeline.transitionHandlingState(HandlingState.PENDING_REVIEW, MonitorState.PROBLEM, action, "字".repeat(20))).status);
     }
 
     @Test void autoTicketRetryBackoffFollows30s2m10mAndQuarantinesAtAttemptFive_M5_4() {

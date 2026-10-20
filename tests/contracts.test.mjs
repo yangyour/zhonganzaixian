@@ -248,7 +248,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.63.0');
+  assert.equal(contract.info.version, '0.64.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -908,7 +908,7 @@ test('站内消息只读列表与显式已读接口保持当前授权和CSRF幂�
 test('消息游标末页必须明确结束且签名链接只能指向本站下载接口',()=>{const result={data:{items:[inboxMessageSample()],has_more:false,next_before_issued_at:null,next_before_id:null,unread_count:1,observed_at:'2026-10-14T06:00:01Z'},trace_id:'synthetic'};assert.ok(validates('ExportInboxPageResult',result));assert.equal(validates('ExportInboxPageResult',{...result,data:{...result.data,next_before_id:id('1')}}),false);assert.equal(validates('ExportInboxMessage',{...inboxMessageSample(),content_url:'https://example.invalid/download'}),false);});
 
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.63.0');
+  assert.equal(contract.info.version, '0.64.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/sla'].get;
@@ -972,7 +972,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.63.0');
+  assert.equal(contract.info.version, '0.64.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1154,13 +1154,14 @@ test('D15 request actions and exact fields follow controller/domain boundaries',
   assert.equal(validates('MonitoringIngestEventInput', { ...ingest, occurred_at: null }), true);
   for (const patch of [{ simulate_autoticket_failure: 1 }, { simulate_autoticket_failures: 1 }, { subscription_min_severity: 'HIGH' }, { flap_flip_count_in_10m: 3 }, { rule_name: 'x'.repeat(129) }, { source_event_id: 'x'.repeat(257) }, { source_phase: 'RECOVERY' }]) assert.equal(validates('MonitoringIngestEventInput', { ...ingest, ...patch }), false);
   const transition = request('MonitoringTransitionEventInput');
-  for (const action of ['ACKNOWLEDGE', 'START', 'MARK_PENDING_REVIEW', 'RESOLVE', 'CLOSE']) assert.equal(validates('MonitoringTransitionEventInput', { ...transition, action, root_cause_note: 'synthetic root cause' }), true);
+  for (const action of ['ACKNOWLEDGE', 'START', 'MARK_PENDING_REVIEW', 'RESOLVE', 'CLOSE']) assert.equal(validates('MonitoringTransitionEventInput', { ...transition, action, root_cause_note: 'synthetic root cause and verified repair' }), true);
   assert.equal(validates('MonitoringTransitionEventInput', { ...transition, action: 'START_PROGRESS' }), false);
   const supplementaryRootCause = '😀😀x';
   assert.equal(supplementaryRootCause.length, 5, 'RESOLVE minimum follows Java UTF-16 units');
   assert.equal([...supplementaryRootCause].length, 3, 'JSON Schema length counts Unicode code points');
-  assert.equal(validates('MonitoringTransitionEventInput', { ...transition, action: 'RESOLVE', root_cause_note: supplementaryRootCause }), true);
-  assert.match(contract.components.schemas.MonitoringTransitionEventInput.description, /5个UTF-16/);
+  assert.equal(validates('MonitoringTransitionEventInput', { ...transition, action: 'RESOLVE', root_cause_note: supplementaryRootCause }), false);
+  assert.equal(validates('MonitoringTransitionEventInput', { ...transition, action: 'RESOLVE', root_cause_note: '字'.repeat(20) }), true);
+  assert.match(contract.components.schemas.MonitoringTransitionEventInput.description, /20个Unicode/);
   for (const expected_version of [0, -1, 1.5, '1', 9007199254740992]) assert.equal(validates('MonitoringTransitionEventInput', { ...transition, expected_version }), false);
   assert.equal(validates('MonitoringTransitionEventInput', { ...transition, expected_version: 9007199254740991 }), true);
   const create = request('CreateMaintenanceWindowInput');

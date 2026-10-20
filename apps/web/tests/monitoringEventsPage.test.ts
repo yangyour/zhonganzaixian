@@ -48,15 +48,15 @@ describe('D15 event page uses controller states and explicit human inputs', () =
     expect(request).toHaveBeenCalledTimes(1)
     expect(request.mock.calls[0]![0]).toBe('/events?window=24h&page_size=25')
   })
-  it('requires at least five entered root-cause characters and sends the selected version exactly', async () => {
+  it('requires at least twenty entered root-cause characters and sends the selected version exactly', async () => {
     const { data, request } = ready(), e = data.events.find(e => e.handling_state === 'PENDING_REVIEW')!
     mount(); await settle()
     await input(`root-cause-${e.id}`, '很短'); expect(button('确认解决').disabled).toBe(true)
-    await input(`root-cause-${e.id}`, '人工复核光模块故障原因'); expect(button('确认解决').disabled).toBe(false)
+    await input(`root-cause-${e.id}`, '人工复核光模块故障原因并完成更换，持续观察确认网络恢复稳定'); expect(button('确认解决').disabled).toBe(false)
     button('确认解决').click(); await settle()
     const post = request.mock.calls.find(([, o]) => o?.method === 'POST')!
     expect(post[0]).toBe(`/events/${e.id}/transitions`)
-    expect(post[1]?.body).toEqual({ expected_version: e.version, action: 'RESOLVE', root_cause_note: '人工复核光模块故障原因' })
+    expect(post[1]?.body).toEqual({ expected_version: e.version, action: 'RESOLVE', root_cause_note: '人工复核光模块故障原因并完成更换，持续观察确认网络恢复稳定' })
     expect(post[1]?.idempotencyKey).toBeTruthy()
     expect(host.textContent).toContain('原操作结果尚未确认')
   })
@@ -70,7 +70,7 @@ describe('D15 event page uses controller states and explicit human inputs', () =
     expect(request).toHaveBeenCalledTimes(1)
   })
   it.each(['START', 'MARK_PENDING_REVIEW', 'CLOSE'] as const)('sends actual %s transition token from an explicit click', async action => {
-    const { request } = ready(); mount(); await settle()
+    const { data, request } = ready(); if(action==='MARK_PENDING_REVIEW'){const e=data.events.find(e=>e.handling_state==='IN_PROGRESS')!;e.monitor_state='RECOVERED';e.recovered_at=e.last_occurred_at} mount(); await settle()
     button({ START: '开始处理', MARK_PENDING_REVIEW: '转为待复核', CLOSE: '关闭事件' }[action]).click(); await settle()
     const post = request.mock.calls.find(([, o]) => o?.method === 'POST')!
     expect(post[0]).toMatch(/^\/events\/[^/]+\/transitions$/)
@@ -133,7 +133,7 @@ describe('D15 page permissions and interrupted flows', () => {
   })
   it('locks read/write controls, voluntary route/context transitions and beforeunload while a result is unknown', async () => {
     const { data, request } = ready(), e = data.events.find(e => e.handling_state === 'PENDING_REVIEW')!
-    mount(); await settle(); await input(`root-cause-${e.id}`, '明确人工复核确认根因')
+    mount(); await settle(); await input(`root-cause-${e.id}`, '明确人工复核设备故障根因并完成修复，持续观察确认网络恢复稳定')
     button('确认解决').click(); await settle()
     expect(request.mock.calls.filter(([, o]) => o?.method === 'POST')).toHaveLength(1)
     expect(button('24h 漏斗').disabled).toBe(true); expect((document.getElementById(`root-cause-${e.id}`) as HTMLTextAreaElement).disabled).toBe(true)

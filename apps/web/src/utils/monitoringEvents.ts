@@ -245,9 +245,9 @@ export function canTransition(event:MonitoringEventSummary,action:EventTransitio
  switch(action){
   case 'ACKNOWLEDGE':return event.handling_state==='NEW'
   case 'START':return oneOf(event.handling_state,['NEW','ACKNOWLEDGED'])
-  case 'MARK_PENDING_REVIEW':return event.handling_state!=='RESOLVED'&&event.handling_state!=='PENDING_REVIEW'
-  case 'RESOLVE':return event.handling_state==='PENDING_REVIEW'&&text(note)&&note.trim().length>=5
-  case 'CLOSE':return event.handling_state==='RESOLVED'
+  case 'MARK_PENDING_REVIEW':return event.monitor_state==='RECOVERED'&&event.handling_state!=='RESOLVED'&&event.handling_state!=='PENDING_REVIEW'
+  case 'RESOLVE':return event.monitor_state==='RECOVERED'&&event.handling_state==='PENDING_REVIEW'&&text(note)&&Array.from(note.trim()).length>=20
+  case 'CLOSE':return event.monitor_state==='RECOVERED'&&event.handling_state==='RESOLVED'
   default:return false
  }
 }

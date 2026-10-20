@@ -419,7 +419,7 @@ class MonitoringEventCenterHttpContractTest {
             object("asset_id", ASSET, "rule_code", "SYNTHETIC_RULE_0", "rule_name", "合成监控规则 0", "severity", "DISASTER", "source_phase", "PROBLEM", "source_event_id", "synthetic-source-2", "occurred_at", null, "simulate_autoticket_failure", true),
             new IngestEventCommand(ASSET, "SYNTHETIC_RULE_0", "合成监控规则 0", Severity.DISASTER, MonitorState.PROBLEM, "synthetic-source-2", null, true)));
         for (String action : List.of("ACKNOWLEDGE", "START", "MARK_PENDING_REVIEW", "RESOLVE", "CLOSE")) {
-            String note = action.equals("RESOLVE") ? "合成测试人工确认根因" : null;
+            String note = action.equals("RESOLVE") ? "合成测试人工确认设备故障根因并完成修复，复测网络连接稳定" : null;
             examples.add(new WriteCase(action.toLowerCase(Locale.ROOT), EVENT_PATH + "/transitions", "transition", ACTOR, "MonitoringTransitionEventInput", "MonitoringEventSummaryResult",
                 object("expected_version", 1, "action", action, "root_cause_note", note), new TransitionEventCommand(EVENT, 1, action, note)));
         }

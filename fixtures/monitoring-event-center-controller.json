@@ -1041,7 +1041,7 @@
     "request" : {
       "action" : "RESOLVE",
       "expected_version" : 1,
-      "root_cause_note" : "合成测试人工确认根因"
+      "root_cause_note" : "合成测试人工确认设备故障根因并完成修复，复测网络连接稳定"
     },
     "request_schema" : "MonitoringTransitionEventInput",
     "response" : {
@@ -1063,7 +1063,7 @@
         "recovered_at" : "2026-10-18T12:00:00Z",
         "resolved_at" : "2026-10-18T12:00:00Z",
         "review_policy_status" : "CONFIG_PENDING_Q29",
-        "root_cause_note" : "合成测试人工确认根因",
+        "root_cause_note" : "合成测试人工确认设备故障根因并完成修复，复测网络连接稳定",
         "rule_code" : "SYNTHETIC_RULE_0",
         "rule_name" : "合成监控规则 0",
         "severity" : "DISASTER",

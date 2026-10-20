@@ -8,10 +8,10 @@ import { controllerFixture, context, sampleDetail, sampleWorkspace } from './mon
 
 const OTHER = 'ffffffff-ffff-4fff-8fff-ffffffffffff'
 const KEY = 'd15-original-request-0001'
-const resolveInput = { expected_version: 1, action: 'RESOLVE' as const, root_cause_note: '人工核验线路恢复原因' }
+const resolveInput = { expected_version: 1, action: 'RESOLVE' as const, root_cause_note: '人工核验线路故障根因并完成修复，连续观察业务网络恢复稳定' }
 function pendingWorkspace() {
   const data = sampleWorkspace(), e = data.events[0]!
-  e.handling_state = 'PENDING_REVIEW'; e.version = 1
+  e.handling_state = 'PENDING_REVIEW'; e.monitor_state = 'RECOVERED'; e.recovered_at=e.last_occurred_at; e.version = 1
   return data
 }
 function deferred<T>() { let resolve!: (v: T) => void; const promise = new Promise<T>(r => { resolve = r }); return { promise, resolve } }
@@ -172,9 +172,9 @@ describe('D15 guarded reads and transitions', () => {
     expect(request).toHaveBeenCalledTimes(2); expect(w.state().workspace).toBeNull()
     expect(w.state().attempt).toBeNull(); expect(await w.retry()).toBe(false)
   })
-  it('requires an explicitly entered >=5 character root cause and legal PENDING_REVIEW state', async () => {
+  it('requires an explicitly entered >=20 character root cause and legal PENDING_REVIEW state', async () => {
     const { workspace: w, request, data } = clientFor(); await w.load()
-    for (const note of [null, '', '    ', '短说明', 'a'.repeat(501)]) {
+    for (const note of [null, '', '    ', '短说明', '字'.repeat(19), '😀'.repeat(10), 'a'.repeat(501)]) {
       expect(await w.submitTransition(data.events[0]!.id, { ...resolveInput, root_cause_note: note })).toBe(false)
     }
     for (const state of ['NEW', 'ACKNOWLEDGED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'] as const) {

@@ -199,6 +199,10 @@ export function addMonitoringEventCenterContract(contract) {
     action: { enum: ['ACKNOWLEDGE', 'START', 'MARK_PENDING_REVIEW', 'RESOLVE', 'CLOSE'] },
     root_cause_note: nullable({ type: 'string', minLength: 1, maxLength: 500 }),
   })
+  transitionEventInput.allOf = [{
+    if: { properties: { action: { const: 'RESOLVE' } }, required: ['action'] },
+    then: { properties: { root_cause_note: { type: 'string', minLength: 20, maxLength: 500 } } },
+  }]
 
   const createMaintenanceWindowInput = object({
     name: { type: 'string', minLength: 1, maxLength: 128 },
@@ -229,7 +233,7 @@ export function addMonitoringEventCenterContract(contract) {
   updateMaintenanceWindowInput.allOf = [
     { if: { properties: { action: { const: 'EXTEND' } } }, then: { properties: { new_ends_at: time } } },
   ]
-  transitionEventInput.description = '标准动作名；状态机由当前事件状态校验。RESOLVE要求PENDING_REVIEW及trim后不少于5个UTF-16代码单元的根因说明；不能以监控恢复代替人工复核。'
+  transitionEventInput.description = '标准动作名；状态机由当前事件状态校验。RESOLVE要求PENDING_REVIEW及trim后不少于20个Unicode码点的根因说明；不能以监控恢复代替人工复核。'
 
   const manualAutoTicketInput = object({
     expected_version: versionPos,

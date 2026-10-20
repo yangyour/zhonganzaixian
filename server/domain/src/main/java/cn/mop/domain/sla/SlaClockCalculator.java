@@ -110,6 +110,6 @@ public final class SlaClockCalculator {
             return pending("DEADLINE_OUT_OF_RANGE");
         }
     }
-    private static Deadline calculated(Instant at) { return new Deadline(Status.CALCULATED, at, null); }
+    private static Deadline calculated(Instant at) { if(at.isBefore(Instant.parse("0001-01-01T00:00:00Z"))||at.isAfter(Instant.parse("9999-12-31T23:59:59.999Z")))return pending("DEADLINE_OUT_OF_RANGE");return new Deadline(Status.CALCULATED, at, null); }
     private static Deadline pending(String reason) { return new Deadline(Status.UNRESOLVED, null, reason); }
 }

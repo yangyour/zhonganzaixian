@@ -40,6 +40,7 @@ class TicketLifecycleHttpSecurityTest {
         @Bean PlatformRepository platform(){return mock(PlatformRepository.class);}
         @Bean TicketLifecycleRepository repository(){return mock(TicketLifecycleRepository.class);}
         @Bean ObjectMapper mapper(){return new ObjectMapper();}
+        @Bean TicketSlaController slaController(TicketLifecycleController controller){return new TicketSlaController(controller);}
         @Bean TicketLifecycleController controller(PlatformRepository platform,TicketLifecycleRepository repository,ObjectMapper mapper){return new TicketLifecycleController(platform,repository,mapper);}
         @Override public void configureMessageConverters(List<HttpMessageConverter<?>> converters){converters.add(new MappingJackson2HttpMessageConverter(mapper()));}
     }
@@ -75,5 +76,10 @@ class TicketLifecycleHttpSecurityTest {
         mvc.perform(scoped(post(ROOT)).contentType("application/json").content("{\"expected_version\":0,\"priority\":\"P1\"}")).andExpect(status().isForbidden()).andExpect(jsonPath("$.error.code").value("CSRF_INVALID"));
         mvc.perform(scoped(post(ROOT)).with(csrf().asHeader()).header("Idempotency-Key","opening-test").contentType("application/json").content("{\"expected_version\":0,\"priority\":\"P1\",\"response_due_at\":\"2026-10-21T00:00:00Z\"}")).andExpect(status().isBadRequest());
         verifyNoInteractions(repository);
+    }
+    @Test void slaRouteUsesReadAuthorizationAndNeverClaimsDelivery()throws Exception{
+        when(repository.sla(any(),any())).thenReturn(Optional.empty());
+        mvc.perform(scoped(get("/api/v1/tickets/"+TICKET+"/sla"))).andExpect(status().isOk()).andExpect(jsonPath("$.data.status").value("NOT_STARTED")).andExpect(jsonPath("$.data.production_approved").value(false));
+        mvc.perform(get("/api/v1/tickets/"+TICKET+"/sla")).andExpect(status().isUnauthorized());
     }
 }

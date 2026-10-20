@@ -33,4 +33,12 @@ class TicketOpeningConfigurationTest {
     @Test void fractionalMillisecondsAndNegativeDurationsArePending(){for(Object minutes:List.of(-1,0,0.000001)){var v=values();put(v,"sla.p1_response_min",Map.of("标准",minutes));assertThrows(DomainException.class,()->resolve(v,"P1"));}}
     @Test void unknownCalendarFieldsCannotPretendKnownHolidays(){var v=values();put(v,"tenant.plan","基础");put(v,"sla.tenant_work_calendar",Map.of("weekday_default","9-18"));assertThrows(DomainException.class,()->resolve(v,"P1"));}
     @Test void missingSourceReferenceIsNotPublished(){var v=values();v.put("tenant.plan",new TicketOpeningConfiguration.Value(mapper.valueToTree("标准"),null));assertThrows(DomainException.class,()->resolve(v,"P1"));}
+    @Test void frozenOpeningRestoresWithoutAnyCurrentConfiguration()throws Exception{
+        var plan=resolve(values(),"P1");var restored=TicketOpeningConfiguration.restore(plan.json(),mapper);assertEquals(plan.opening(),restored.opening());assertEquals(plan.json(),restored.json());
+    }
+    @Test void tamperedOpeningBudgetCannotBecomeClockEvidence()throws Exception{
+        var n=(com.fasterxml.jackson.databind.node.ObjectNode)mapper.readTree(resolve(values(),"P1").json());((com.fasterxml.jackson.databind.node.ObjectNode)n.get("sla_opening")).put("response_budget_ms",1);
+        assertThrows(IllegalArgumentException.class,()->TicketOpeningConfiguration.restore(n.toString(),mapper));
+    }
+    @Test void missingLegacyOpeningDoesNotInventSla(){assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->TicketOpeningConfiguration.restore("{}",mapper)).code);}
 }

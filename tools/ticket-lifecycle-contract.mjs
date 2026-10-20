@@ -84,5 +84,20 @@ export function addTicketLifecycleContract(contract) {
       responses: responses(ref('TicketLifecycleResult')),
     } };
   }
-  contract.info.version = '0.54.0';
+  const nullableMillis = { type: ['integer','null'], minimum: 0, maximum: 9007199254740990 };
+  schemas.TicketSlaClock = object({ status: { enum: ['RUNNING','PAUSED','COMPLETED','CONFIG_PENDING'] },
+    deadline: time, stopped_at: time, elapsed_ms: nullableMillis, budget_ms: nullableMillis,
+    breached: { type: ['boolean','null'] }, missing: { type: ['string','null'] } });
+  schemas.TicketSlaProjection = object({ tenant_id: uuid, ticket_id: uuid, tier: { enum: ['BASIC','STANDARD','ADVANCED'] },
+    priority: { enum: ['P1','P2','P3'] }, observed_at: { type: 'string', format: 'date-time' }, lifecycle_version: version,
+    configuration_reference: { type: 'string', pattern: '^sha256:[0-9a-f]{64}$' }, response: ref('TicketSlaClock'), recovery: ref('TicketSlaClock'), paused_at: time,
+    completed_pauses: { type: 'array', maxItems: 10000, items: object({ start: { type: 'string', format: 'date-time' }, end: { type: 'string', format: 'date-time' } }) },
+    reminders_delivered: { const: false }, production_approved: { const: false } });
+  schemas.TicketSlaResult = envelope(object({ clock: { anyOf: [ref('TicketSlaProjection'), { type: 'null' }] },
+    status: { enum: ['NOT_STARTED','PROJECTED'] }, source: { const: 'postgresql' }, production_approved: { const: false } }));
+  contract.paths['/tickets/{ticketId}/sla'] = { get: { operationId: 'getTicketSlaProjection', parameters: [ticket],
+    'x-mop-capabilities': ['tickets:read'], 'x-mop-read-only': true,
+    description: '仅服务端基于不可变开单配置和完整历史投影，最多10000版本。未发布Q27时重开恢复时钟待配置，不默认续算。无提醒送达或生产批准声明。',
+    responses: responses(ref('TicketSlaResult')) } };
+  contract.info.version = '0.55.0';
 }

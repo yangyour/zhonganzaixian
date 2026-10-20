@@ -34,6 +34,21 @@ public final class TicketLifecycleController {
     public TicketLifecycleController(PlatformRepository platform,TicketLifecycleRepository repository,ObjectMapper mapper){
         this.platform=platform;this.repository=repository;this.mapper=mapper;
     }
+    Object sla(String ticketId,HttpServletRequest request){
+        Membership member=member(request,"tickets:read");query(request,Set.of());
+        var entry=repository.sla(access(member,request),uuid(ticketId));recheck(member,request,"tickets:read");
+        if(entry.isEmpty())return success(map("clock",null,"status","NOT_STARTED","source","postgresql","production_approved",false),request);
+        var e=entry.get();var p=e.clock();
+        return success(map("clock",map("tenant_id",e.tenantId(),"ticket_id",e.ticketId(),"tier",e.tier(),"priority",e.priority(),
+                "observed_at",p.observedAt(),"lifecycle_version",p.lifecycleVersion(),"configuration_reference",p.configurationReference(),
+                "response",clockDto(p.response()),"recovery",clockDto(p.recovery()),"paused_at",p.pausedAt(),
+                "completed_pauses",p.completedPauses().stream().map(i->map("start",i.start(),"end",i.end())).toList(),
+                "reminders_delivered",false,"production_approved",false),"status","PROJECTED","source","postgresql","production_approved",false),request);
+    }
+    private static Map<String,Object> clockDto(cn.mop.domain.sla.SlaClockState.Clock c){
+        return map("status",c.status().name(),"deadline",c.deadline(),"stopped_at",c.stoppedAt(),
+                "elapsed_ms",c.elapsed()==null?null:c.elapsed().toMillis(),"budget_ms",c.budget()==null?null:c.budget().toMillis(),"breached",c.breached(),"missing",c.missing());
+    }
     @GetMapping Object get(@PathVariable String ticketId,HttpServletRequest request){
         Membership member=member(request,"tickets:read");Access a=access(member,request);query(request,Set.of());
         Optional<Entry> value=repository.get(a,uuid(ticketId));recheck(member,request,"tickets:read");

@@ -99,4 +99,12 @@ class TicketLifecycleControllerTest {
         var now=Instant.parse("2026-10-20T00:00:00Z");
         return new TicketLifecycleRepository.Entry(TICKET,new TicketLifecycle.Snapshot(TENANT,TicketLifecycle.State.NEW,1,0,now,null,null,null,null,now.plusSeconds(60),now.plusSeconds(120)),ACTOR,List.of(),"{\"private\":true}");
     }
+    @Test void slaRequiresCurrentReadPermissionAndHasNoWriteSideEffect(){
+        var request=request("tickets:read");when(repository.sla(any(),eq(TICKET))).thenReturn(Optional.empty());
+        assertNotNull(controller.sla(TICKET,request));verify(repository).sla(any(),eq(TICKET));verifyNoMoreInteractions(repository);
+    }
+    @Test void slaRejectsCallerSuppliedObservationOrTenant(){
+        var request=request("tickets:read");request.addParameter("observed_at","2099-01-01T00:00:00Z");
+        assertThrows(DomainException.class,()->controller.sla(TICKET,request));verifyNoInteractions(repository);
+    }
 }

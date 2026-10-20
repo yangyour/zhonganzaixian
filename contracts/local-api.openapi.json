@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.54.0",
+    "version": "0.55.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -31297,6 +31297,109 @@
           }
         }
       }
+    },
+    "/tickets/{ticketId}/sla": {
+      "get": {
+        "operationId": "getTicketSlaProjection",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "tickets:read"
+        ],
+        "x-mop-read-only": true,
+        "description": "仅服务端基于不可变开单配置和完整历史投影，最多10000版本。未发布Q27时重开恢复时钟待配置，不默认续算。无提醒送达或生产批准声明。",
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketSlaResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -60099,6 +60202,215 @@
               "solution",
               "snapshot_hash",
               "engineer_label",
+              "source",
+              "production_approved"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "TicketSlaClock": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "enum": [
+              "RUNNING",
+              "PAUSED",
+              "COMPLETED",
+              "CONFIG_PENDING"
+            ]
+          },
+          "deadline": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "stopped_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "elapsed_ms": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "budget_ms": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 9007199254740990
+          },
+          "breached": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "missing": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "deadline",
+          "stopped_at",
+          "elapsed_ms",
+          "budget_ms",
+          "breached",
+          "missing"
+        ],
+        "additionalProperties": false
+      },
+      "TicketSlaProjection": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticket_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tier": {
+            "enum": [
+              "BASIC",
+              "STANDARD",
+              "ADVANCED"
+            ]
+          },
+          "priority": {
+            "enum": [
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lifecycle_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "configuration_reference": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "response": {
+            "$ref": "#/components/schemas/TicketSlaClock"
+          },
+          "recovery": {
+            "$ref": "#/components/schemas/TicketSlaClock"
+          },
+          "paused_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "completed_pauses": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "start": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "end": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "start",
+                "end"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "reminders_delivered": {
+            "const": false
+          },
+          "production_approved": {
+            "const": false
+          }
+        },
+        "required": [
+          "tenant_id",
+          "ticket_id",
+          "tier",
+          "priority",
+          "observed_at",
+          "lifecycle_version",
+          "configuration_reference",
+          "response",
+          "recovery",
+          "paused_at",
+          "completed_pauses",
+          "reminders_delivered",
+          "production_approved"
+        ],
+        "additionalProperties": false
+      },
+      "TicketSlaResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "clock": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/TicketSlaProjection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "status": {
+                "enum": [
+                  "NOT_STARTED",
+                  "PROJECTED"
+                ]
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "production_approved": {
+                "const": false
+              }
+            },
+            "required": [
+              "clock",
+              "status",
               "source",
               "production_approved"
             ],

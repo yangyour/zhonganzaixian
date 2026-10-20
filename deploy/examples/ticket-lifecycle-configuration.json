@@ -2,7 +2,9 @@
   "purpose": "configuration_shape_only_not_a_runtime_publication",
   "environment": "remote_test",
   "production_approved": false,
-  "feature_environment": { "MOP_TICKET_LIFECYCLE_ENABLED": "false" },
+  "feature_environment": {
+    "MOP_TICKET_LIFECYCLE_ENABLED": "false"
+  },
   "missing_dependencies": {
     "SPRING_DATASOURCE_URL": null,
     "database_credentials_reference": null,
@@ -20,7 +22,8 @@
     "sla.p2_recover_min": null,
     "sla.advanced_p3_recover_min": null,
     "sla.tenant_work_calendar": null,
-    "sla.basic_standard_p3_next_day": null
+    "sla.basic_standard_p3_next_day": null,
+    "sla.reopen_and_mttr_policy": null
   },
   "fixed_contract_keys_read_only": [
     "ticket.solution_min_chars",

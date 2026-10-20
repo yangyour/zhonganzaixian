@@ -14,9 +14,9 @@ import java.util.*;
 final class TicketOpeningConfiguration {
     static final List<String> KEYS=List.of("tenant.plan","ticket.solution_min_chars","ticket.customer_confirm_timeout_hours",
             "ticket.reopen_window_hours","ticket.reopen_manager_threshold","sla.p1_response_min","sla.p2_response_min","sla.p3_response_min",
-            "sla.p1_recover_min","sla.p2_recover_min","sla.advanced_p3_recover_min","sla.tenant_work_calendar","sla.basic_standard_p3_next_day");
+            "sla.p1_recover_min","sla.p2_recover_min","sla.advanced_p3_recover_min","sla.tenant_work_calendar","sla.basic_standard_p3_next_day","sla.reopen_and_mttr_policy");
     record Value(JsonNode value,String reference) {}
-    record Plan(String json,Instant responseDue,Instant recoveryDue) {}
+    record Plan(String json,Instant responseDue,Instant recoveryDue,SlaClockCalculator.OpeningSnapshot opening) {}
     private final Map<String,Value> values;
     private final ObjectMapper mapper;
     TicketOpeningConfiguration(Map<String,Value> values,ObjectMapper mapper){this.values=Map.copyOf(values);this.mapper=mapper;}
@@ -57,7 +57,18 @@ final class TicketOpeningConfiguration {
         if(recovery==null)clock.putNull("recovery_budget_ms");else clock.put("recovery_budget_ms",recovery.toMillis());
         if(nextDeadline==null)clock.putNull("next_day_deadline");else clock.put("next_day_deadline",nextDeadline.toString());
         clock.set("configuration_inputs",sources);
-        try{return new Plan(mapper.writeValueAsString(snapshot),calculated.response().at(),calculated.recovery().at());}catch(Exception e){throw new IllegalStateException("Opening snapshot encoding unavailable",e);}
+        try{return new Plan(mapper.writeValueAsString(snapshot),calculated.response().at(),calculated.recovery().at(),input);}catch(Exception e){throw new IllegalStateException("Opening snapshot encoding unavailable",e);}
+    }
+    static Plan restore(String json,ObjectMapper mapper){
+        try{
+            JsonNode snapshot=mapper.readTree(json),clock=snapshot.path("sla_opening"),sources=clock.path("configuration_inputs");
+            if(!clock.isObject()||!sources.isObject())throw pending("sla_opening","IMMUTABLE_OPENING_SNAPSHOT_MISSING");
+            var values=new LinkedHashMap<String,Value>();var fields=sources.fields();
+            while(fields.hasNext()){var field=fields.next();if(!KEYS.contains(field.getKey()))throw new IllegalArgumentException("Unknown opening configuration key");JsonNode value=field.getValue();exact(value,Set.of("value","reference"),field.getKey());values.put(field.getKey(),new Value(value.get("value"),text(value.get("reference"),field.getKey())));}
+            Instant opened=instant(clock.get("opened_at"),"sla_opening.opened_at");
+            Plan rebuilt=new TicketOpeningConfiguration(values,mapper).resolve(opened,text(snapshot.get("priority"),"priority"));
+            if(!mapper.readTree(rebuilt.json()).equals(snapshot))throw new IllegalArgumentException("Opening snapshot integrity mismatch");return rebuilt;
+        }catch(java.io.IOException e){throw new IllegalArgumentException("Opening snapshot cannot be decoded",e);}
     }
     private JsonNode required(String key){Value v=values.get(key);if(v==null||v.value()==null||v.value().isNull()||v.reference()==null||v.reference().isBlank())throw pending(key,"ACTIVE_PUBLICATION_REQUIRED");return v.value();}
     private JsonNode tierValue(String key,String label){JsonNode n=required(key);if(!n.isObject()||!n.has(label))throw pending(key,"TIER_VALUE_MISSING");return n.get(label);}

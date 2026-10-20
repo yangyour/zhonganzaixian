@@ -33,6 +33,25 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
             catch(SQLException|RuntimeException e){c.rollback();throw e;}
         }catch(SQLException e){throw unavailable();}
     }
+    @Override public Optional<SlaEntry> sla(Access a,String ticket){
+        uuid(ticket);return read(a,ticket,c->{try{
+            Optional<Entry> current=latest(c,a,ticket);if(current.isEmpty())return Optional.empty();Entry e=current.get();
+            if(e.snapshot().version()>10000)throw new DomainException(422,"CONFIG_PENDING","工单历史超出在线投影技术预算",List.of(Map.of("reason","HISTORY_BUDGET_EXCEEDED")));
+            var opening=TicketOpeningConfiguration.restore(e.openingSnapshotJson(),mapper);Instant observed=now(c);var history=new ArrayList<TicketLifecycle.Snapshot>();
+            try(var statement=c.prepareStatement("SELECT tenant_id,state,version,reopen_count,occurred_at,resolved_at,closed_at,solution_snapshot_hash,close_mode,response_due_at,recovery_due_at FROM public.mop_ticket_lifecycle_revision WHERE tenant_id=?::uuid AND ticket_id=?::uuid ORDER BY version LIMIT 10001")){
+                statement.setQueryTimeout(10);statement.setString(1,a.tenantId());statement.setString(2,ticket);try(var r=statement.executeQuery()){
+                    while(r.next())history.add(new TicketLifecycle.Snapshot(r.getString("tenant_id"),TicketLifecycle.State.valueOf(r.getString("state")),r.getLong("version"),r.getInt("reopen_count"),instant(r,"occurred_at"),instant(r,"resolved_at"),instant(r,"closed_at"),r.getString("solution_snapshot_hash"),r.getString("close_mode")==null?null:TicketLifecycle.CloseMode.valueOf(r.getString("close_mode")),instant(r,"response_due_at"),instant(r,"recovery_due_at")));
+                }
+            }
+            if(history.size()!=e.snapshot().version())throw unavailable();
+            cn.mop.domain.sla.SlaClockCalculator.ReopenPolicy policy=null;
+            try{JsonNode raw=mapper.readTree(e.openingSnapshotJson()).path("sla_opening").path("configuration_inputs").path("sla.reopen_and_mttr_policy").path("value").path("clock_policy");
+                if(raw.isTextual())try{policy=cn.mop.domain.sla.SlaClockCalculator.ReopenPolicy.valueOf(raw.textValue());}catch(IllegalArgumentException unsupported){/* Unknown policy remains pending; never default. */}
+            }catch(java.io.IOException invalid){throw unavailable();}
+            var projection=cn.mop.domain.sla.SlaClockState.project(opening.opening(),history,observed,policy);
+            return Optional.of(new SlaEntry(a.tenantId(),ticket,opening.opening().tier().name(),opening.opening().priority().name(),projection));
+        }catch(IllegalArgumentException corrupt){throw unavailable();}});
+    }
     @Override public Optional<Entry> get(Access a,String ticket){
         uuid(ticket);return read(a,ticket,c->latest(c,a,ticket));
     }

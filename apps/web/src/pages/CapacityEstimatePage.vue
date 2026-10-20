@@ -44,7 +44,7 @@ const bufferMissing: Record<string, string> = Object.fromEntries([...bufferField
     <template v-else>
       <div class="feature-summary"><article><span>平均 NVPS</span><strong>{{ state.result?.outputs?.nvps ?? '—' }}</strong><small>值 / 秒 · 模型估算值</small></article><article><span>单节点容量</span><strong>{{ state.result?.outputs?.single_node_bytes ?? '—' }}</strong><small>bytes · 历史 + 趋势 + 余量</small></article><article><span>有效监控项</span><strong>{{ state.result?.outputs?.total_items ?? '—' }}</strong><small>数量未知时不按零处理</small></article><article><span>模型状态</span><strong class="summary-status">{{ state.result?.status === 'ESTIMATED' ? '已估算' : '待明确' }}</strong><small>供容量规划参考</small></article></div>
       <ApiErrorNotice :error="state.error" />
-      <CapacityRuntimeInputsPanel @apply="importRuntime" />
+      <CapacityRuntimeInputsPanel :current="{inputs:draft.inputs,buffer:draft.proxy_buffer}" @apply="importRuntime" />
       <p v-if="importedAt" role="status" class="capacity-help">已填入 {{importedAt}} 读取的参数快照。修改任意输入后按修改后的显式参数计算。</p>
       <div class="capacity-layout">
         <div class="capacity-main">
@@ -75,3 +75,4 @@ const bufferMissing: Record<string, string> = Object.fromEntries([...bufferField
 .capacity-model-readback{font-size:13px}.capacity-model-readback>div{display:flex;gap:16px;justify-content:space-between;border-bottom:1px solid #e3eaf2;padding:12px 0}.capacity-model-readback dt{color:#60758b}.capacity-model-readback dd{margin:0;overflow-wrap:anywhere;min-width:0;text-align:right}
 @media(max-width:1300px){.capacity-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.model-fields{grid-template-columns:1fr}.model-fields .el-form-item{margin-bottom:4px}}@media(max-width:900px){.capacity-layout{grid-template-columns:1fr}.capacity-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.capacity-results{grid-column:1/-1}.capacity-output-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:600px){.capacity-fields,.capacity-side{grid-template-columns:1fr}.capacity-output-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.capacity-input-section,.capacity-results{padding:14px}.capacity-actions .el-button{min-height:44px}}
 </style>
+

@@ -45,3 +45,21 @@ export function capacityImportedValues(snapshot:CapacityRuntimeInputs){
  snapshot.items.forEach((item,i)=>{const f=capacityRuntimeFields[i]!,v=item.status==='ACTIVE'?item.input_value??'':'';if(f.target==='outage_seconds')buffer.outage_seconds=v;else inputs[f.target]=v;if(f.target==='bytes_per_value')buffer.bytes_per_value=v})
  return {inputs,buffer}
 }
+
+export interface CapacityImportDraft {
+ inputs: Record<string,string>
+ buffer: Record<string,string>
+}
+/** Compare strings without rounding user input; this preview never mutates the draft. */
+export function capacityImportChanges(snapshot:CapacityRuntimeInputs,current:CapacityImportDraft){
+ const replacement=capacityImportedValues(snapshot)
+ return capacityRuntimeFields.flatMap(field=>{
+  const targets:('inputs'|'buffer')[]=field.target==='outage_seconds'?['buffer']:field.target==='bytes_per_value'?['inputs','buffer']:['inputs']
+  return targets.map(group=>{
+   const before=current[group][field.target]??''
+   const after=replacement[group][field.target]??''
+   return {key:`${group}.${field.target}`,label:`${group==='buffer'?'Proxy 缓冲 · ':''}${field.label}`,before,after,changed:before!==after,cleared:before!==''&&after===''}
+  })
+ })
+}
+

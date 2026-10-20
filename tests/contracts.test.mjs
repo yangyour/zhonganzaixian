@@ -245,7 +245,7 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.52.0');
+  assert.equal(contract.info.version, '0.53.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -903,3 +903,27 @@ const inboxMessageSample=()=>({job_id:id('1'),tenant_id:id('2'),recipient_id:id(
 test('导出消息区分未读、已读与链接到期，不把过期消息删除',()=>{const message=inboxMessageSample();assert.ok(validates('ExportInboxMessage',message));assert.equal(validates('ExportInboxMessage',{...message,version:1}),false);assert.ok(validates('ExportInboxMessage',{...message,version:1,read_at:message.issued_at}));assert.equal(validates('ExportInboxMessage',{...message,link_status:'EXPIRED'}),false);assert.ok(validates('ExportInboxMessage',{...message,link_status:'EXPIRED',content_url:null}));});
 test('站内消息只读列表与显式已读接口保持当前授权和CSRF幂等',()=>{const read=contract.paths['/my-export-messages/{id}/read'].post;assert.equal(read['x-mop-current-membership-before-replay'],true);assert.ok(read.parameters.some(p=>p.name==='X-CSRF-Token'));assert.deepEqual(Object.keys(contract.paths['/my-export-messages']),['get']);assert.deepEqual(contract.paths['/my-export-messages'].get['x-mop-capabilities'],['assets:read']);assert.ok(validates('ExportInboxReadInput',{expected_version:0}));assert.equal(validates('ExportInboxReadInput',{expected_version:0,read_at:null}),false);assert.equal(validates('ExportInboxReadInput',{expected_version:2}),false);});
 test('消息游标末页必须明确结束且签名链接只能指向本站下载接口',()=>{const result={data:{items:[inboxMessageSample()],has_more:false,next_before_issued_at:null,next_before_id:null,unread_count:1,observed_at:'2026-10-14T06:00:01Z'},trace_id:'synthetic'};assert.ok(validates('ExportInboxPageResult',result));assert.equal(validates('ExportInboxPageResult',{...result,data:{...result.data,next_before_id:id('1')}}),false);assert.equal(validates('ExportInboxMessage',{...inboxMessageSample(),content_url:'https://example.invalid/download'}),false);});
+
+
+test('工单生命周期动作只接收版本及动作输入，不接收身份和开单规则', () => {
+  const root='/tickets/{ticketId}/lifecycle';
+  for(const name of ['accept','transfer','wait-for-vendor','resume','submit-resolution','confirm','not-resolved','reopen']) {
+    const op=contract.paths[root+'/actions/'+name].post;
+    assert.ok(op.parameters.some(p=>p.name==='Idempotency-Key'));
+    assert.ok(op.parameters.some(p=>p.name==='X-CSRF-Token'));
+    const schema=op.requestBody.content['application/json'].schema;
+    const validate=ajv.compile(schema);
+    assert.equal(validate({expected_version:1,tenant_id:id('1')}),false);
+    assert.equal(schema.additionalProperties,false);
+    assert.equal(schema.properties.expected_version.maximum,9007199254740990);
+  }
+  assert.equal(contract.paths[root+'/actions/auto-close'],undefined);
+  assert.equal(contract.paths[root+'/start'],undefined);
+});
+test('工单生命周期读回不声称通知、SLA或生产审批已完成',()=>{
+  const s=contract.components.schemas.TicketLifecycleSnapshot;
+  assert.equal(s.properties.production_approved.const,false);
+  assert.equal(s.properties.notification_status.const,'NOT_INTEGRATED');
+  assert.equal(s.properties.sla_clock_status.const,'NOT_INTEGRATED');
+  assert.equal(s.properties.opening_snapshot,undefined);
+});

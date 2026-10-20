@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.52.0",
+    "version": "0.53.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -29646,6 +29646,1513 @@
           }
         }
       }
+    },
+    "/tickets/{ticketId}/lifecycle": {
+      "get": {
+        "operationId": "getTicketLifecycle",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "tickets:read"
+        ],
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLifecycleResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}/lifecycle/solution": {
+      "get": {
+        "operationId": "getTicketLifecycleSolution",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "expected_hash",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "required": true
+          }
+        ],
+        "x-mop-capabilities": [
+          "tickets:read"
+        ],
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLifecycleSolutionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}/lifecycle/history": {
+      "get": {
+        "operationId": "getTicketLifecycleHistory",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                10,
+                15,
+                25,
+                50,
+                100
+              ],
+              "default": 15
+            },
+            "required": false
+          },
+          {
+            "name": "before_version",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "required": false
+          }
+        ],
+        "x-mop-capabilities": [
+          "tickets:read"
+        ],
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLifecycleHistoryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}/lifecycle/actions/accept": {
+      "post": {
+        "operationId": "ticketLifecycleAccept",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expected_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740990
+                  }
+                },
+                "required": [
+                  "expected_version"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-mop-capabilities": [
+          "tickets:lifecycle_write"
+        ],
+        "description": "默认关闭，需MOP_TICKET_LIFECYCLE_ENABLED、显式授权及V33；原请求重放前重新核对当前权限和工单关系。客户仅本人报障，客户DTO不暴露工程师标识。无自动关单用户入口。",
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLifecycleResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}/lifecycle/actions/transfer": {
+      "post": {
+        "operationId": "ticketLifecycleTransfer",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expected_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740990
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 16000
+                  },
+                  "assignee_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "keep_prior_assignee": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "expected_version",
+                  "reason",
+                  "assignee_id",
+                  "keep_prior_assignee"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-mop-capabilities": [
+          "tickets:lifecycle_write"
+        ],
+        "description": "默认关闭，需MOP_TICKET_LIFECYCLE_ENABLED、显式授权及V33；原请求重放前重新核对当前权限和工单关系。客户仅本人报障，客户DTO不暴露工程师标识。无自动关单用户入口。",
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLifecycleResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}/lifecycle/actions/wait-for-vendor": {
+      "post": {
+        "operationId": "ticketLifecycleWaitForVendor",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expected_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740990
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 16000
+                  }
+                },
+                "required": [
+                  "expected_version",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-mop-capabilities": [
+          "tickets:lifecycle_write"
+        ],
+        "description": "默认关闭，需MOP_TICKET_LIFECYCLE_ENABLED、显式授权及V33；原请求重放前重新核对当前权限和工单关系。客户仅本人报障，客户DTO不暴露工程师标识。无自动关单用户入口。",
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLifecycleResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}/lifecycle/actions/resume": {
+      "post": {
+        "operationId": "ticketLifecycleResume",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expected_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740990
+                  }
+                },
+                "required": [
+                  "expected_version"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-mop-capabilities": [
+          "tickets:lifecycle_write"
+        ],
+        "description": "默认关闭，需MOP_TICKET_LIFECYCLE_ENABLED、显式授权及V33；原请求重放前重新核对当前权限和工单关系。客户仅本人报障，客户DTO不暴露工程师标识。无自动关单用户入口。",
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLifecycleResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}/lifecycle/actions/submit-resolution": {
+      "post": {
+        "operationId": "ticketLifecycleSubmitResolution",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expected_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740990
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 16000
+                  }
+                },
+                "required": [
+                  "expected_version",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-mop-capabilities": [
+          "tickets:lifecycle_write"
+        ],
+        "description": "默认关闭，需MOP_TICKET_LIFECYCLE_ENABLED、显式授权及V33；原请求重放前重新核对当前权限和工单关系。客户仅本人报障，客户DTO不暴露工程师标识。无自动关单用户入口。",
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLifecycleResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}/lifecycle/actions/confirm": {
+      "post": {
+        "operationId": "ticketLifecycleConfirm",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expected_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740990
+                  },
+                  "expected_solution_hash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "expected_version",
+                  "expected_solution_hash"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-mop-capabilities": [
+          "tickets:customer_decide"
+        ],
+        "description": "默认关闭，需MOP_TICKET_LIFECYCLE_ENABLED、显式授权及V33；原请求重放前重新核对当前权限和工单关系。客户仅本人报障，客户DTO不暴露工程师标识。无自动关单用户入口。",
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLifecycleResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}/lifecycle/actions/not-resolved": {
+      "post": {
+        "operationId": "ticketLifecycleNotResolved",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expected_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740990
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 16000
+                  },
+                  "expected_solution_hash": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "required": [
+                  "expected_version",
+                  "reason",
+                  "expected_solution_hash"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-mop-capabilities": [
+          "tickets:customer_decide"
+        ],
+        "description": "默认关闭，需MOP_TICKET_LIFECYCLE_ENABLED、显式授权及V33；原请求重放前重新核对当前权限和工单关系。客户仅本人报障，客户DTO不暴露工程师标识。无自动关单用户入口。",
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLifecycleResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tickets/{ticketId}/lifecycle/actions/reopen": {
+      "post": {
+        "operationId": "ticketLifecycleReopen",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+            },
+            "required": true
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expected_version": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740990
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 16000
+                  }
+                },
+                "required": [
+                  "expected_version",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-mop-capabilities": [
+          "tickets:customer_decide"
+        ],
+        "description": "默认关闭，需MOP_TICKET_LIFECYCLE_ENABLED、显式授权及V33；原请求重放前重新核对当前权限和工单关系。客户仅本人报障，客户DTO不暴露工程师标识。无自动关单用户入口。",
+        "responses": {
+          "200": {
+            "description": "当前租户持久状态；不代表通知或SLA Worker已完成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketLifecycleResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、权限、版本、未配置或真实依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -58164,6 +59671,292 @@
               "customer_confirmation_status",
               "production_approved",
               "measurement_verified"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "TicketLifecycleSnapshot": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticket_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "state": {
+            "enum": [
+              "NEW",
+              "IN_PROGRESS",
+              "WAITING_VENDOR",
+              "PENDING_CUSTOMER",
+              "RESOLVED",
+              "CLOSED",
+              "REOPENED"
+            ]
+          },
+          "reopen_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolved_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "closed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "response_due_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "recovery_due_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "solution_snapshot_hash": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "close_mode": {
+            "enum": [
+              null,
+              "customer_confirm",
+              "timeout_auto"
+            ]
+          },
+          "assignee_label": {
+            "enum": [
+              null,
+              "工程师"
+            ]
+          },
+          "assigned_engineer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "production_approved": {
+            "const": false
+          },
+          "notification_status": {
+            "const": "NOT_INTEGRATED"
+          },
+          "sla_clock_status": {
+            "const": "NOT_INTEGRATED"
+          }
+        },
+        "required": [
+          "tenant_id",
+          "ticket_id",
+          "version",
+          "state",
+          "reopen_count",
+          "occurred_at",
+          "resolved_at",
+          "closed_at",
+          "response_due_at",
+          "recovery_due_at",
+          "solution_snapshot_hash",
+          "close_mode",
+          "assignee_label",
+          "assigned_engineer_id",
+          "production_approved",
+          "notification_status",
+          "sla_clock_status"
+        ],
+        "additionalProperties": false
+      },
+      "TicketLifecycleResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "lifecycle": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/TicketLifecycleSnapshot"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "status": {
+                "enum": [
+                  "NOT_STARTED",
+                  "TEST_LIFECYCLE"
+                ]
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "production_approved": {
+                "const": false
+              }
+            },
+            "required": [
+              "lifecycle",
+              "status",
+              "source",
+              "production_approved"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "TicketLifecycleHistoryResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "maxItems": 100,
+                "items": {
+                  "$ref": "#/components/schemas/TicketLifecycleSnapshot"
+                }
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_before_version": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "production_approved": {
+                "const": false
+              }
+            },
+            "required": [
+              "items",
+              "has_more",
+              "next_before_version",
+              "source",
+              "production_approved"
+            ],
+            "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "TicketLifecycleSolutionResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "ticket_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "lifecycle_version": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740990
+              },
+              "resolved_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "ticket_summary": {
+                "type": "string"
+              },
+              "solution": {
+                "type": "string",
+                "minLength": 20
+              },
+              "snapshot_hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "engineer_label": {
+                "const": "工程师"
+              },
+              "source": {
+                "const": "postgresql"
+              },
+              "production_approved": {
+                "const": false
+              }
+            },
+            "required": [
+              "tenant_id",
+              "ticket_id",
+              "lifecycle_version",
+              "resolved_at",
+              "ticket_summary",
+              "solution",
+              "snapshot_hash",
+              "engineer_label",
+              "source",
+              "production_approved"
             ],
             "additionalProperties": false
           },

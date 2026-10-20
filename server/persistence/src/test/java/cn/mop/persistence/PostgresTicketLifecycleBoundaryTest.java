@@ -27,6 +27,7 @@ class PostgresTicketLifecycleBoundaryTest {
     @Test void disabledDependencyDoesNotOpenDatabaseOrPretendSuccess(){
         var r=repository(false);
         assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.get(ACCESS,TICKET)).code);
+        assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.solution(ACCESS,TICKET,"a".repeat(64))).code);
         assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.start(ACCESS,TICKET,null,null,null)).code);
         assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.act(ACCESS,TICKET,null)).code);
         assertEquals(java.util.List.of("TICKET_LIFECYCLE_DISABLED"),r.readinessProblems());

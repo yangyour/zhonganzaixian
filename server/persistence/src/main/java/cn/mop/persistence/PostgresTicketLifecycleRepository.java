@@ -36,6 +36,15 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
     @Override public Optional<Entry> get(Access a,String ticket){
         uuid(ticket);return read(a,ticket,c->latest(c,a,ticket));
     }
+    @Override public Optional<TicketResolutionSnapshot> solution(Access a,String ticket,String expectedHash){
+        uuid(ticket);if(expectedHash==null||!expectedHash.matches("[0-9a-f]{64}"))throw invalid();
+        return read(a,ticket,c->{
+            Entry e=latest(c,a,ticket).orElseThrow(PostgresTicketLifecycleRepository::missing);
+            if(!expectedHash.equals(e.snapshot().solutionSnapshotHash()))
+                throw new DomainException(409,"SOLUTION_SNAPSHOT_CONFLICT","解决方案已变化，请重新读取");
+            return Optional.ofNullable(verifyResolution(c,a,e));
+        });
+    }
     @Override public List<Entry> history(Access a,String ticket,long before,int size){
         uuid(ticket);if(before<1||size<1||size>101)throw invalid();
         return read(a,ticket,c->{var result=new ArrayList<Entry>();
@@ -133,8 +142,8 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
             }
         }
     }
-    private static void verifyResolution(Connection c,Access a,Entry e)throws SQLException{
-        String hash=e.snapshot().solutionSnapshotHash();if(hash==null)return;
+    private static TicketResolutionSnapshot verifyResolution(Connection c,Access a,Entry e)throws SQLException{
+        String hash=e.snapshot().solutionSnapshotHash();if(hash==null)return null;
         try(var s=c.prepareStatement("SELECT lifecycle_version,engineer_id::text,resolved_at,document FROM public.mop_ticket_resolution_snapshot WHERE tenant_id=?::uuid AND ticket_id=?::uuid AND document_sha256=?")){
             s.setQueryTimeout(10);s.setString(1,a.tenantId());s.setString(2,e.ticketId());s.setString(3,hash);
             try(var r=s.executeQuery()){
@@ -147,6 +156,7 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
                         ||!frozen.engineerId().toString().equals(r.getString("engineer_id"))
                         ||!frozen.resolvedAt().equals(instant(r,"resolved_at"))
                         ||!frozen.resolvedAt().equals(e.snapshot().resolvedAt()))throw unavailable();
+                return frozen;
             }
         }
     }

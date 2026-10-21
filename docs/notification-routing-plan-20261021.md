@@ -36,3 +36,7 @@ notification-routing-dependencies.json 已按六类渠道分别列出适配器�
 这份文件仅为待补清单，不是可被直接发布的运行配置；禁止粘贴密钥、手机号或邮箱。后续应由对应的正式发布/绑定流程提供受验证引用，而非编辑示例文件启动真实发送。新增3项模板约束测试，完整工具回归52项通过。
 
 配置模板3项检查已接入 cloud-validation.yml 的独立 CI 步骤，不仅依赖本地手工运行；不增加外部访问或真实发送权限。
+
+## 提交与合并记录
+
+本步提交链：9850501（路由计划）→0b49cd0（显式Q14冲突口径）→4e956c2（六渠道依赖清单）→04f3a89（CI模板保护）。最终头 [04f3a89e2dccb030dfa842ff65851781ca053117](https://github.com/yangyour/zhonganzaixian/commit/04f3a89e2dccb030dfa842ff65851781ca053117) 的 [分支CI 39530051439](https://github.com/yangyour/zhonganzaixian/actions/runs/39530051439)四组检查全部通过。2026-10-21 01:58 UTC以expected_sha保护快进main并再次读引用核验；没有强制推送、部署或外部消息发送。[主分支CI 39530392090](https://github.com/yangyour/zhonganzaixian/actions/runs/39530392090)也已全部通过；当前代码批次的分支与合并后验证均闭环。

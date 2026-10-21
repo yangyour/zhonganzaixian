@@ -11,6 +11,7 @@ import {
 import {tierLabels} from '../utils/serviceTiers'
 import {displayTime} from '../utils/display'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import {slaServiceReviewExport,downloadSlaServiceReview} from '../utils/slaServiceReviewExport'
 
 const state=shallowRef<SlaReportState>(emptySlaReportState())
 const workspace=createSlaReportWorkspace(api,s=>{state.value=s})
@@ -22,11 +23,12 @@ const canWriteConfig=computed(()=>Boolean(permitted.value&&session.value?.user.r
 const periodInput=ref('')
 const freezeSnapshot=ref(false)
 watch(periodInput,()=>{freezeSnapshot.value=false},{flush:'sync'})
+const exporting=ref(false),exportStatus=ref(''),exportError=shallowRef<unknown>(null);let exportTurn=0
 const blocked=ref(false),readStatus=ref(''),queryButton=ref<HTMLButtonElement|null>(null),detailHeading=ref<HTMLElement|null>(null)
 let readTurn=0,readOrigin:HTMLButtonElement|null=null
 
 const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,permitted.value,canWriteInternal.value,canWriteConfig.value]))
-const locked=computed(()=>!!state.value.busy||workspace.unresolved())
+const locked=computed(()=>!!state.value.busy||workspace.unresolved()||exporting.value)
 
 watch(context,()=>{
  readTurn++;readOrigin=null;readStatus.value='';blocked.value=false
@@ -38,6 +40,19 @@ watch(context,()=>{
  periodInput.value='';freezeSnapshot.value=false
 },{immediate:true,flush:'sync'})
 
+watch([context,periodInput,()=>state.value.report],()=>{exportTurn++;exporting.value=false;exportStatus.value='';exportError.value=null},{flush:'sync'})
+async function exportServices(){
+ const s=session.value,report=state.value.report
+ if(!s||!permitted.value||locked.value||!report||periodInput.value!==report.period)return false
+ const key=context.value,turn=++exportTurn;exporting.value=true;exportStatus.value='';exportError.value=null
+ const current=()=>turn===exportTurn&&key===context.value&&permitted.value&&state.value.report===report&&periodInput.value===report.period&&!state.value.busy&&!workspace.unresolved()
+ try{await nextTick();if(!current())return false
+  const file=slaServiceReviewExport(report,{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,canWriteInternal:canWriteInternal.value,canWriteConfig:canWriteConfig.value},report.period)
+  if(!current()||!downloadSlaServiceReview(file,current))return false
+  if(current())exportStatus.value=`已生成 ${file.period} 的 ${file.serviceCount} 条已加载服务核对清单并请求下载；是否保存由浏览器确认。不是正式报告或账单。`
+  return true
+ }catch(error){if(current())exportError.value=error;return false}finally{if(turn===exportTurn)exporting.value=false}
+}
 async function queryReport(){
  if(locked.value)return false
  const turn=++readTurn,key=context.value;readOrigin=queryButton.value;readStatus.value=''
@@ -79,8 +94,8 @@ onBeforeRouteLeave(mayLeave)
 const unregister=contextTransitionGuards.register(mayLeave)
 function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
-onUnmounted(()=>{readTurn++;readOrigin=null;unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
-defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyEvaluation,queryReport,readDetail,cancelRead,readStatus})
+onUnmounted(()=>{exportTurn++;exporting.value=false;readTurn++;readOrigin=null;unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
+defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyEvaluation,queryReport,readDetail,cancelRead,readStatus,exportServices,exportStatus})
 </script>
 <template>
  <section class="sla-reports">
@@ -107,7 +122,7 @@ defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyE
    </div>
 
    <p v-if="!periodInput">请明确选择统计月份；不会自动查询或保存预设月份。</p>
-   <p v-if="state.report&&periodInput!==state.report.period" role="status">月份输入已改变。当前显示仍为 {{state.report.period}}，请先查询新月份；不能跨期保存。</p>
+   <p v-if="state.report&&periodInput!==state.report.period" role="status">月份输入已改变。当前显示仍为 {{state.report.period}}，请先查询新月份；不能跨期保存或导出。</p>
    <p v-if="state.receipt" role="status">已核对原保存回执：{{state.receipt.report_month}} · v{{state.receipt.version}} · {{state.receipt.frozen?'已冻结':'未冻结'}}。回读失败不代表保存失败，不自动重复提交。</p>
    <ApiErrorNotice :error="state.error" />
    <p v-if="readStatus" role="status">{{readStatus}}</p>
@@ -117,6 +132,7 @@ defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyE
    <p v-if="state.busy" role="status" aria-live="polite">{{ state.busy==='write'?'正在保存/冻结月度 SLA 快照…':'正在计算 SLA 月报…' }}</p>
 
    <template v-if="state.report">
+    <div class="review-export"><button type="button" :disabled="locked||periodInput!==state.report.period" aria-describedby="sla-review-export-note" @click="exportServices">{{exporting?'正在生成服务核对 CSV…':'导出当前服务核对 CSV'}}</button><p id="sla-review-export-note">仅导出当前已加载的 {{state.report.services.length}} 条服务可用性及观察时间；不包含赔付金额、工单明细或冻结快照，不是正式报告或账单。下载不会保存或冻结月报。</p><ApiErrorNotice :error="exportError" /><p v-if="exportStatus" role="status">{{exportStatus}}</p></div>
     <div class="proto-kpis">
      <div>
       <span>已核验可用性均值</span>
@@ -277,6 +293,7 @@ defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyE
  </section>
 </template>
 <style scoped>
+.review-export{margin:16px 0;min-width:0}.review-export button{min-height:44px;max-width:100%;white-space:normal}.review-export p{line-height:1.7;overflow-wrap:anywhere}.review-export button:focus-visible{outline:3px solid #176bb5;outline-offset:3px}
 .sla-reports{display:grid;gap:16px}
 .workspace{display:grid;gap:16px}
 .period-bar{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}

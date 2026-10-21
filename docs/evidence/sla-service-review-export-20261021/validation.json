@@ -1,0 +1,24 @@
+{
+  "scope": "LOCAL_REVIEW_CSV_NOT_FINANCIAL_OR_PUBLISHED_REPORT",
+  "new_tests": 24,
+  "vitest": {
+    "passed": 3379,
+    "files": 224,
+    "failed": 0
+  },
+  "contract_tests_passed": 173,
+  "api_contract": "PASS_UNCHANGED_0.76",
+  "build_id": "b52bf00e959eab140a6032ddfc85db4fdef0a75504de4ace06202496ae22e5e4",
+  "browser_download": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "spreadsheet_manual_open": "NOT_RUN",
+  "formal_acceptance": "128_NOT_RUN",
+  "backend_code_changed": false,
+  "source_sha256": {
+    "apps/web/src/utils/slaServiceReviewExport.ts": "843cdbf636f08015b2752fc3761c4da943f956438437af2407126a597b58d291",
+    "apps/web/src/pages/SlaReportsPage.vue": "8485fd5c99aa30eee9a1398a1bcf693afdb11017924adfac3b85e87574daa984",
+    "apps/web/tests/slaServiceReviewExport.test.ts": "6e974a6988776d6245dbd73c8f6502bc7945ad9ccc1b484b6a80dbe252f6460e",
+    "apps/web/tests/slaReportsPage.test.ts": "dd718addd23fe85e372ab81b7e1bf212d4c1080a1d9df11a25c19cb11f5fc470"
+  },
+  "earlier_typecheck_failure": "Test spy instance was inferred as {}; narrowed the known HTMLAnchorElement instance in the test only. Production checks unchanged. Final full tests and build passed.",
+  "download_boundary": "Blob/anchor click unit simulation does not prove a browser saved a file. Vite HTTP smoke does not execute browser JavaScript."
+}

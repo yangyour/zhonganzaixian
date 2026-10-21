@@ -1,0 +1,16 @@
+{
+  "base_commit": "818ed683093b83239280aaa3ca796120fb793c0e",
+  "typecheck": "PASS",
+  "playwright_discovery": {
+    "status": "PASS",
+    "total": 19,
+    "new": 10
+  },
+  "browser_execution": "NOT_RUN_EXISTING_ENVIRONMENT_BLOCKER",
+  "api_transport": "SYNTHETIC_INTERCEPTED",
+  "source_sha256": {
+    "apps/web/qa/operations.fixture.html": "b8ca96c8a5c22c7acc24d71146424b85eceef1dec7e43afaaa1b2f2172069fe5",
+    "apps/web/qa/operations.fixture.ts": "033a505270a9851863a751f278262350a6a7585c264ba8cc4ac87b45db2cd1f0",
+    "apps/web/qa/browser/operations.pw.ts": "581b862393716bad8c42c411a229fbf2ad99a1cb1723f334a9bcc2d481b561ba"
+  }
+}

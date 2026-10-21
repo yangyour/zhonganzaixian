@@ -1,0 +1,21 @@
+{
+  "base_commit": "fec92f5fb689f763588495cd06f1b56bfeb0e4eb",
+  "scope": "RECENT_EVENTS_HOME_READ_ONLY",
+  "web_tests": {
+    "passed": 2597,
+    "files": 187
+  },
+  "new_component_tests": 13,
+  "typecheck": "PASS",
+  "build_static_gates": "PASS",
+  "build_id": "12b6dd27053b4c6a69c11059fbff034bc9dfcfdf9daca17082ea6832294f0534",
+  "browser_visual_axe": "NOT_RUN_ENVIRONMENT_BLOCKED",
+  "new_real_http": "NOT_RUN",
+  "backend_and_migrations": "UNCHANGED",
+  "source_sha256": {
+    "apps/web/src/components/DashboardEventsPanel.vue": "123ba4ebf8913269cf47a9ba8f713cfd24901f374483424a5c71c66c54ed9b6c",
+    "apps/web/src/pages/DashboardPage.vue": "e44943c4667afd62d5e254bcda9093e8b3aab235f4fa87e3660c9df483b4a493",
+    "apps/web/tests/dashboardEventsPanel.test.ts": "7ef0e4a56f5365814ec2ddc29f52595a75c37255855ef1e31e10b8f7e2152952",
+    "apps/web/tests/dashboardPage.test.ts": "76ec58729a354bd176a3276ce94a1d06f0845da9c53cc8284c24025d0b9b18a9"
+  }
+}

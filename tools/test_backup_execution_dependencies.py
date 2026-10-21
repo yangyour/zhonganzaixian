@@ -25,6 +25,14 @@ class BackupExecutionDependenciesTest(unittest.TestCase):
             self.assertIsNone(d[key])
         self.assertIs(d['backup_execution_enabled'],False)
 
+    def test_atomic_registration_keeps_authorization_and_collection_proof_unconfigured(self):
+        d=json.loads((ROOT/'deploy/examples/backup-execution-dependencies.json').read_text())
+        for key in ['backup_version_registration_authorizer_reference','backup_collection_completion_evidence_verifier_reference','backup_version_registration_binding_reference']:
+            self.assertIn(key,d)
+            self.assertIsNone(d[key])
+        self.assertIs(d['backup_execution_enabled'],False)
+        self.assertIs(d['production_approved'],False)
+
     def test_all_runtime_slots_are_existing_unpublished_keys(self):
         d=json.loads((ROOT/'deploy/examples/backup-execution-dependencies.json').read_text())
         keys={s['key'] for s in json.loads((ROOT/'contracts/config-baseline.json').read_text())['settings']}

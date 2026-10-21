@@ -26,6 +26,9 @@ if (-not (Test-Path -LiteralPath $backupRunVerifierClass) -or (Get-Item -Literal
 $backupArchiveVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/BackupArchiveSchemaVerifier.java'
 $backupArchiveVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/BackupArchiveSchemaVerifier.class'
 if (-not (Test-Path -LiteralPath $backupArchiveVerifierClass) -or (Get-Item -LiteralPath $backupArchiveVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $backupArchiveVerifierSource).LastWriteTimeUtc) { throw '备份结构核验器缺失或早于源码；先重新编译。' }
+$backupVersionVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/BackupVersionSchemaVerifier.java'
+$backupVersionVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/BackupVersionSchemaVerifier.class'
+if (-not (Test-Path -LiteralPath $backupVersionVerifierClass) -or (Get-Item -LiteralPath $backupVersionVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $backupVersionVerifierSource).LastWriteTimeUtc) { throw '备份结构核验器缺失或早于源码；先重新编译。' }
 $ticketLifecycleVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/TicketLifecycleSchemaVerifier.java'
 $ticketLifecycleVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/TicketLifecycleSchemaVerifier.class'
 if (-not (Test-Path -LiteralPath $ticketLifecycleVerifierClass) -or (Get-Item -LiteralPath $ticketLifecycleVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $ticketLifecycleVerifierSource).LastWriteTimeUtc) { throw '工单生命周期结构核验器缺失或早于源码；先重新编译。' }

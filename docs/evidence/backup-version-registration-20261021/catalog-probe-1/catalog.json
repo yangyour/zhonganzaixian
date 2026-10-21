@@ -1,0 +1,193 @@
+{
+  "tables": [
+    {
+      "name": "mop_backup_version_registration",
+      "indexes": [
+        "CREATE UNIQUE INDEX mop_backup_version_registration_pkey ON public.mop_backup_version_registration USING btree (tenant_id, version_id)",
+        "CREATE UNIQUE INDEX mop_backup_version_registration_tenant_id_command_id_key ON public.mop_backup_version_registration USING btree (tenant_id, command_id)",
+        "CREATE UNIQUE INDEX mop_backup_version_registrati_tenant_id_run_id_attempt_numb_key ON public.mop_backup_version_registration USING btree (tenant_id, run_id, attempt_number)",
+        "CREATE INDEX mop_backup_version_asset_history ON public.mop_backup_version_registration USING btree (tenant_id, asset_id, registered_at DESC, version_id DESC)"
+      ],
+      "constraints": [
+        {
+          "name": "mop_backup_version_complete_guard",
+          "type": "t",
+          "sha256": "698fc09045e7267eeb19c5b09473ec8c40f237145be8c1cbd97b9dde2451ddc1",
+          "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "name": "mop_backup_version_registrat_archive_verification_referen_check",
+          "type": "c",
+          "sha256": "068e030c56fee61934e1fa319382f0bad3847a1985a16c9e354f19dcd2ca3993",
+          "definition": "CHECK (((archive_verification_reference)::text ~ '^sha256:[0-9a-f]{64}$'::text))"
+        },
+        {
+          "name": "mop_backup_version_registrati_device_execution_authorized_check",
+          "type": "c",
+          "sha256": "d5e6bc5ed36e54306c3d17a2bca2398f6dbd343a8ad022a3a93c33e7af3a4cb8",
+          "definition": "CHECK ((NOT device_execution_authorized))"
+        },
+        {
+          "name": "mop_backup_version_registrati_tenant_id_run_id_attempt_numb_key",
+          "type": "u",
+          "sha256": "5f8d8a0a0dd04e83ae387ee4a929047c233c61be653d57c7bdfe11ef37144682",
+          "definition": "UNIQUE (tenant_id, run_id, attempt_number)"
+        },
+        {
+          "name": "mop_backup_version_registrati_tenant_id_run_id_completed_r_fkey",
+          "type": "f",
+          "sha256": "c3fb0e7be8106a3202ec3951f5839608e9e56512350bf0758df2ae2dac475cbc",
+          "definition": "FOREIGN KEY (tenant_id, run_id, completed_run_version) REFERENCES mop_backup_run_event(tenant_id, run_id, version) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "name": "mop_backup_version_registrati_tenant_id_run_id_expected_ru_fkey",
+          "type": "f",
+          "sha256": "5034b0b477d488045dba95f632eb8759b3055aa711d3dc43979c55ddf511fda6",
+          "definition": "FOREIGN KEY (tenant_id, run_id, expected_run_version) REFERENCES mop_backup_run_event(tenant_id, run_id, version)"
+        },
+        {
+          "name": "mop_backup_version_registrati_tenant_id_version_id_archive_fkey",
+          "type": "f",
+          "sha256": "d89f914489d3e4a0338d5859a716f676f8d788cf6c347e1dab06ecb3ed42638c",
+          "definition": "FOREIGN KEY (tenant_id, version_id, archive_event_version) REFERENCES mop_backup_archive_event(tenant_id, version_id, event_version)"
+        },
+        {
+          "name": "mop_backup_version_registration_archive_event_version_check",
+          "type": "c",
+          "sha256": "2263f48878fd5618c28be6694641ac7d5903f86c935a1aee66772b019c016f9b",
+          "definition": "CHECK (((archive_event_version >= 1) AND (archive_event_version <= '9007199254740991'::bigint)))"
+        },
+        {
+          "name": "mop_backup_version_registration_attempt_number_check",
+          "type": "c",
+          "sha256": "3e7fe4ff9a56206a2d45588e45fe8c510fbfd7bc9df259de23b299165d8bbf18",
+          "definition": "CHECK (((attempt_number >= 1) AND (attempt_number <= 3)))"
+        },
+        {
+          "name": "mop_backup_version_registration_check",
+          "type": "c",
+          "sha256": "b3fbaf5e949b494b9bd0ba40c906cd60174a095341921befbc05d2e497bed66d",
+          "definition": "CHECK ((completed_run_version = (expected_run_version + 1)))"
+        },
+        {
+          "name": "mop_backup_version_registration_check1",
+          "type": "c",
+          "sha256": "20b8393b1b123e89e804ce6cc77ad36cee6f6cc68d47b0685024d359364bc335",
+          "definition": "CHECK (((registered_at >= object_observed_at) AND (registered_at <= '9999-12-31 23:59:59.999+00'::timestamp with time zone)))"
+        },
+        {
+          "name": "mop_backup_version_registration_command_sha256_check",
+          "type": "c",
+          "sha256": "ba235625a1ad8d49af48b47a355c308c92dcaab6b61905a1e976630e384abdf5",
+          "definition": "CHECK (((command_sha256)::text ~ '^[0-9a-f]{64}$'::text))"
+        },
+        {
+          "name": "mop_backup_version_registration_envelope_bytes_check",
+          "type": "c",
+          "sha256": "babbf5c844f126a9d0e2d8bcbfa98d9e68bcc417d946888cc2526df463b4e2c8",
+          "definition": "CHECK (((envelope_bytes >= 247) AND (envelope_bytes <= 16787456)))"
+        },
+        {
+          "name": "mop_backup_version_registration_envelope_sha256_check",
+          "type": "c",
+          "sha256": "9488fd858dd8fb1e4692b8a7f2942c9eebe2a6a7d0ced67e1689b9373f2c265f",
+          "definition": "CHECK (((envelope_sha256)::text ~ '^[0-9a-f]{64}$'::text))"
+        },
+        {
+          "name": "mop_backup_version_registration_execution_reference_check",
+          "type": "c",
+          "sha256": "1dc4119cdf9d72871e5e0235d532c7091fdf39f6769045bfcfe54222d20f7d1e",
+          "definition": "CHECK (((execution_reference)::text ~ '^sha256:[0-9a-f]{64}$'::text))"
+        },
+        {
+          "name": "mop_backup_version_registration_expected_run_version_check",
+          "type": "c",
+          "sha256": "b9379e1801be05034110378131334661f98e804206b1cd78352a4c6eae2faf60",
+          "definition": "CHECK (((expected_run_version >= 1) AND (expected_run_version <= '9007199254740990'::bigint)))"
+        },
+        {
+          "name": "mop_backup_version_registration_fencing_token_check",
+          "type": "c",
+          "sha256": "36593d24b189fba813f25b2d136ddf481795a4f4499b7b4192eb195a7b45cb04",
+          "definition": "CHECK (((fencing_token >= 1) AND (fencing_token <= '9007199254740991'::bigint)))"
+        },
+        {
+          "name": "mop_backup_version_registration_key_reference_check",
+          "type": "c",
+          "sha256": "05b6943bd2fc86e66dc8ecb9b60d2b24e9958d8a2b2ba41b6ceb3b6488e796fb",
+          "definition": "CHECK (((key_reference)::text ~ '^kms-key-ref:[A-Za-z0-9._-]{1,128}$'::text))"
+        },
+        {
+          "name": "mop_backup_version_registration_lease_owner_check",
+          "type": "c",
+          "sha256": "ae954e245f0c860dcd646d0b2851c8088271f581437fd80b1e0c3be8236e5195",
+          "definition": "CHECK (((length((lease_owner)::text) > 0) AND ((lease_owner)::text !~ '[^A-Za-z0-9._:-]'::text)))"
+        },
+        {
+          "name": "mop_backup_version_registration_object_observed_at_check",
+          "type": "c",
+          "sha256": "dfeef8000b2b383b92c0e662b879db0aa562fdf7a284d129b67cfe9d1a8fcb87",
+          "definition": "CHECK (((object_observed_at >= '0001-01-01 00:00:00+00'::timestamp with time zone) AND (object_observed_at <= '9999-12-31 23:59:59.999+00'::timestamp with time zone)))"
+        },
+        {
+          "name": "mop_backup_version_registration_object_recheck_reference_check",
+          "type": "c",
+          "sha256": "b1633e374388aa92044a1117e3d274ec45a5fe8b28a050bfb05ece52d3ee1c47",
+          "definition": "CHECK (((object_recheck_reference)::text ~ '^sha256:[0-9a-f]{64}$'::text))"
+        },
+        {
+          "name": "mop_backup_version_registration_pkey",
+          "type": "p",
+          "sha256": "d11400c65db23e28679b3aa52f233de6d775e1eb45e7933fb641651ffcf1e5d4",
+          "definition": "PRIMARY KEY (tenant_id, version_id)"
+        },
+        {
+          "name": "mop_backup_version_registration_record_source_check",
+          "type": "c",
+          "sha256": "40231fbe7eb1d738c299164545d2b67af06b9b7821d6e4369403e9654f2ff0ab",
+          "definition": "CHECK (((record_source)::text = 'INTERNAL_BACKUP_VERSION_REGISTRATION'::text))"
+        },
+        {
+          "name": "mop_backup_version_registration_recovery_verified_check",
+          "type": "c",
+          "sha256": "ce83ba6859fe7fb00e41daef64500d714fb3f49f73fe1376094222f11102554b",
+          "definition": "CHECK ((NOT recovery_verified))"
+        },
+        {
+          "name": "mop_backup_version_registration_retention_verified_check",
+          "type": "c",
+          "sha256": "54620ea3808d87fda5cdb36053bd74d590112e4636a392ec52a7dbce66e1ada6",
+          "definition": "CHECK ((NOT retention_verified))"
+        },
+        {
+          "name": "mop_backup_version_registration_tenant_id_asset_id_fkey",
+          "type": "f",
+          "sha256": "402424bf77655e614f9f7e61bffc21fab99c463d5990e04d07c3bd440bf2b094",
+          "definition": "FOREIGN KEY (tenant_id, asset_id) REFERENCES mop_asset(tenant_id, id)"
+        },
+        {
+          "name": "mop_backup_version_registration_tenant_id_command_id_key",
+          "type": "u",
+          "sha256": "bf606fb60edbc83eafa9136366009a69ac18a74fb9c02fb17a41ebbaa024cb08",
+          "definition": "UNIQUE (tenant_id, command_id)"
+        },
+        {
+          "name": "mop_backup_version_registration_tenant_id_version_id_fkey",
+          "type": "f",
+          "sha256": "ef506907b6e21c12d81f86ffa86cc0b0d9be3e8e80de5974e80eb0e336eda08a",
+          "definition": "FOREIGN KEY (tenant_id, version_id) REFERENCES mop_backup_archive_submission(tenant_id, version_id)"
+        },
+        {
+          "name": "mop_backup_version_registration_trace_id_check",
+          "type": "c",
+          "sha256": "f4b0fb98c5e3cc64ae24933ef1236fd9d362b4ade2c42a9f7139929a42917c45",
+          "definition": "CHECK (((length((trace_id)::text) > 0) AND ((trace_id)::text !~ '[^A-Za-z0-9._:-]'::text)))"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "mop_backup_version_complete_guard": "ee23c9ca476143858a85c9cbdd1112f6512e1b04ff6f2e17de9c04b6ba84c9fd",
+    "mop_backup_version_registration_guard": "320787f3212703d7d63e9b2e1f3a6c8d4ccba1af6de769abc00d68c3fb1989f1"
+  }
+}

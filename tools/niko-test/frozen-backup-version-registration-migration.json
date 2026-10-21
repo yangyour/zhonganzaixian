@@ -1,0 +1,12 @@
+{
+  "status": "APPLIED_FROZEN",
+  "description": "V49 successfully committed by explicit Flyway CLI on disposable PostgreSQL 17.11. SQL bytes are immutable. Registration/replay/rollback assertions are recorded separately.",
+  "sha256": {
+    "V49__atomic_backup_version_registration.sql": "67e196ea9e9b6a9586fbae9cf47a040f34bf975e02033793a8d96fc0d60dbf60"
+  },
+  "guard_body_sha256": {
+    "mop_backup_version_complete_guard": "ee23c9ca476143858a85c9cbdd1112f6512e1b04ff6f2e17de9c04b6ba84c9fd",
+    "mop_backup_version_registration_guard": "320787f3212703d7d63e9b2e1f3a6c8d4ccba1af6de769abc00d68c3fb1989f1"
+  },
+  "first_apply_evidence": "docs/evidence/backup-version-registration-20261021/flyway-attempt-1/v49-application.json"
+}

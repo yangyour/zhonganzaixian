@@ -49,5 +49,8 @@
   "archive_staging_authorizer_reference": null,
   "archive_no_dispatch_proof_verifier_reference": null,
   "archive_original_object_verifier_reference": null,
-  "encrypted_staging_capacity_and_retention_reference": null
+  "encrypted_staging_capacity_and_retention_reference": null,
+  "backup_version_registration_authorizer_reference": null,
+  "backup_collection_completion_evidence_verifier_reference": null,
+  "backup_version_registration_binding_reference": null
 }

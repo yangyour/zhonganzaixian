@@ -1,0 +1,8 @@
+{
+  "result": "PASS",
+  "tier_command_receipts": 2,
+  "ticket_sla_inspections": 1,
+  "scope": "ACTUAL_HTTP_PAYLOAD_REPLAY_PRODUCTION_TYPESCRIPT_WORKSPACE",
+  "browser": false,
+  "transport": "RECORDED_HTTP_NOT_LIVE_FRONTEND_TRANSPORT"
+}

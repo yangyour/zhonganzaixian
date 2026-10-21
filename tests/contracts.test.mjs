@@ -1326,3 +1326,12 @@ test('actual isolated on-call HTTP responses match 30-second schema and original
   assert.ok(validates('SlaMonthlyResultEnvelope', { data: captured.monthly.response, trace_id: 'synthetic-actual-http' }));
   assert.ok(validates('SlaReportResult', { data: captured.monthly.after, trace_id: 'synthetic-actual-http' }));
 });
+
+test('actual isolated service-tier zero/null fees and frozen SLA responses match contracts', () => {
+  const captured = read('../fixtures/service-tier-http-synthetic-20261021.json');
+  for (const exchange of captured.exchanges) {
+    assert.ok(validates('ServiceTierResult', { data: exchange.response, trace_id: 'synthetic-actual-http' }));
+    assert.ok(validates('ServiceTierPageResult', { data: exchange.after, trace_id: 'synthetic-actual-http' }));
+  }
+  assert.ok(validates('TicketSlaInspectionResult', { data: captured.inspection, trace_id: 'synthetic-actual-http' }));
+});

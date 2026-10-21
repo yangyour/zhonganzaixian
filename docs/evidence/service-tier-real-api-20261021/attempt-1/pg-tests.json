@@ -1,0 +1,14 @@
+{
+  "exit": 0,
+  "cases": [
+    {
+      "name": "dbGuardsRejectHistoryMutationDeleteAndUnsynchronizedWrites()",
+      "passed": true
+    },
+    {
+      "name": "tierChangesAreAppendOnlyAndThreeInFlightTicketsKeepFrozenSlaDeadlines_M2_10()",
+      "passed": true
+    }
+  ],
+  "expected": 2
+}

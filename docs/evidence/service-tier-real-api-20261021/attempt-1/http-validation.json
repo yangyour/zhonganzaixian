@@ -1,0 +1,200 @@
+{
+  "scope": "REAL_LOOPBACK_HTTP_SYNTHETIC_ACCOUNTS",
+  "checks": [
+    {
+      "case": "anonymous_tiers",
+      "actor": "anonymous",
+      "status": 401,
+      "expected": 401,
+      "code": "SESSION_EXPIRED",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_csrf",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_login",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_switch",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_csrf",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_login",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_switch",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_csrf",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_login",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_switch",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "customer_tiers_forbidden",
+      "actor": "viewerA",
+      "status": 403,
+      "expected": 403,
+      "code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tiers_before",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_tier_change_forbidden",
+      "actor": "msp",
+      "status": 403,
+      "expected": 403,
+      "code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tier_change_0",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tier_replay_0",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tier_readback_0",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tier_change_1",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tier_replay_1",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tier_readback_1",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "stale_version",
+      "actor": "padmin",
+      "status": 409,
+      "expected": 409,
+      "code": "VERSION_CONFLICT",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "invalid_fee_fractional",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "invalid_fee_scientific_text",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tiers_after_rejections",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "ticket_sla_frozen",
+      "actor": "msp",
+      "status": 503,
+      "expected": 200,
+      "code": "UPSTREAM_UNAVAILABLE",
+      "cache_control": "no-store"
+    }
+  ],
+  "result": "FAILED",
+  "provider_sends": false,
+  "api_stopped": true
+}

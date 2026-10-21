@@ -23,7 +23,7 @@ class PostgresServiceTierIntegrationTest {
     static PostgresPlatformRepository platform;
     static PostgresServiceTierRepository tiers;
     static PostgresTicketWorkflowRepository workflow;
-    static final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+    static final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules().setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE);
     static final String TENANT = "55000000-0000-4000-8000-000000000001";
     static String padmin, msp, viewer;
     static long padminVersion, mspVersion, viewerVersion;

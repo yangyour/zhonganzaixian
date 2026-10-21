@@ -1,0 +1,31 @@
+{
+  "base_commit": "296cac7960ab5b935eb894d5a85b47dbeb3b3fc7",
+  "result": "PASS",
+  "real_pg_tests": 2,
+  "http_checks": 24,
+  "actual_http_production_ts_replay_cases": 3,
+  "replay_transport": "CAPTURE_REPLAY_NOT_LIVE_BROWSER",
+  "java_verify": {
+    "tests": 3783,
+    "skipped": 996,
+    "failures": 0,
+    "errors": 0,
+    "executed": 2787
+  },
+  "web_tests": 2669,
+  "contract_tests": 162,
+  "python_tests": 111,
+  "typecheck_build_static": "PASS",
+  "build_id": "dcbdb547a3d50df65ba01b281cd52067550dd51514ee5d0a6058c3cda54eedff",
+  "browser_axe": "NOT_RUN",
+  "migrations": "UNCHANGED_V1_V45",
+  "temporary_environments_cleaned": true,
+  "harness_preflight": "Initial esbuild arrow-function type assertion syntax was corrected before HTTP phase; not a product test pass.",
+  "source_sha256": {
+    "server/persistence/src/main/java/cn/mop/persistence/PostgresTicketWorkflowRepository.java": "871a1870fd9d4ffb2bf6075fbc1aa5c3eda42f486b4bb2ef64dd932c7599cc93",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresServiceTierIntegrationTest.java": "b7721e1ffe7f350de4ae2daad538a73844f13f006d9c1fa7b3254f57c12e0e74",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresWorkflowSnapshotMapperTest.java": "ad101d3ae8fdd93a757359f338a7cef105ca161ff4148b669b95e53287b3b153",
+    "apps/web/tests/serviceTierActualHttp.test.ts": "19bf9f5627bffc4558f5bf0e17dcab5bdb1d7ea0431d9a0880517083bcb523f5",
+    "fixtures/service-tier-http-synthetic-20261021.json": "097213b6d8d08644d0bd58fb51716bc06e347a8dfadb70715298535489b440df"
+  }
+}

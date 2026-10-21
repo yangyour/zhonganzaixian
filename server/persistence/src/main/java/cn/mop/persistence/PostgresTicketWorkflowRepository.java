@@ -21,7 +21,12 @@ public final class PostgresTicketWorkflowRepository implements TicketWorkflowRep
     private record Event(String id,Snapshot snapshot,String hash) {}
     @FunctionalInterface private interface Work<T>{T run(Connection c)throws SQLException;}
     public PostgresTicketWorkflowRepository(DataSource source,PostgresPlatformRepository platform,ObjectMapper mapper){
-        this.source=source;this.platform=platform;this.mapper=mapper.copy().findAndRegisterModules().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        this.source=source;this.platform=platform;this.mapper=snapshotMapper(mapper);
+    }
+    // V33 immutable JSON/SQL guards use camelCase. HTTP naming preferences must never alter stored snapshots.
+    static ObjectMapper snapshotMapper(ObjectMapper supplied){
+        return supplied.copy().setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE)
+            .findAndRegisterModules().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
     private <T>T read(Access a,Work<T> work){
         try(Connection c=source.getConnection()){

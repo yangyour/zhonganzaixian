@@ -1,0 +1,6 @@
+{
+  "stage": "business_and_http",
+  "error_type": "AssertionError",
+  "detail": "('ticket_sla_frozen', 503, 200, 'UPSTREAM_UNAVAILABLE')",
+  "production_approved": false
+}

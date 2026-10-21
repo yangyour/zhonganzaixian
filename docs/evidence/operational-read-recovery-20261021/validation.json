@@ -1,0 +1,23 @@
+{
+  "scope": "EXPLICIT_OPERATIONAL_COMPARISON_UI_NOT_FORMAL_METRICS",
+  "new_tests": 14,
+  "vitest": {
+    "passed": 3452,
+    "files": 230,
+    "failed": 0
+  },
+  "contract_tests_passed": 173,
+  "api_contract": "PASS_UNCHANGED_0.76",
+  "build_id": "bf12c150cdc14d8678a7b962f48a7a13f87c346232da0750bcb841269211d6fd",
+  "browser_matrix": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "browser_specs_discovered_only": 59,
+  "formal_acceptance": "128_NOT_RUN",
+  "backend_changed": false,
+  "source_sha256": {
+    "apps/web/src/utils/operationalComparisonWorkspace.ts": "9a35fbf22398f021ee932a637c4328069b917e65a51da77281841570ab7a95dd",
+    "apps/web/src/pages/OperationalComparisonPage.vue": "01261f6ad7c71480895e00372926225b16d8d9117e520acd10202c0490dc7cf9",
+    "apps/web/tests/operationalComparisonWorkspace.test.ts": "e4871b96a1609f8d7c02f500960b44f8961d09d9e239f08da3a639b01d2d634d",
+    "apps/web/tests/operationalUsability.test.ts": "008657e415ce2f1cb0c280ac960b1ffee376b997749359adee61e1f5193439c2"
+  },
+  "input_boundary": "Oversize raw text retained; no maxlength truncation; rejected before network; no subset arithmetic"
+}

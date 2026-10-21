@@ -40,7 +40,20 @@ export function createOperationalWorkspace(client: Pick<ApiClient, 'request'>, n
     state: snapshot,
     reset(scope: OperationalContext | null) { clear(); context = !disposed && scope?.role === 'padmin' && scope.canCompare === true && uuid.test(scope.tenantId) && uuid.test(scope.actorId) && Number.isSafeInteger(scope.permissionVersion) && scope.permissionVersion > 0 ? { ...scope } : null; state.input = emptyOperationalInput(); emit() },
     change(input: unknown) { if (disposed) return; clear(); state.input = copy(input); emit() },
-    async calculate() { if (disposed || !context || state.busy) return false; clear(); const turn = generation, scope = { ...context }; controller = new AbortController(); state.busy = true; emit(); try { const input = readOperationalInput(state.input); const value = await client.request('/operations/explicit-comparisons', { method: 'POST', body: input, signal: controller.signal }); if (turn !== generation || disposed) return false; state.result = readOperationalResult(value, scope, input); return true } catch (error) { if (turn === generation && !disposed && !isCancelled(error)) state.error = error; return false } finally { if (turn === generation && !disposed) { state.busy = false; controller = null; emit() } } },
+    cancel() { if (disposed) return; clear(); emit() },
+    async calculate() {
+      if (disposed || !context || state.busy) return false
+      clear(); const turn = generation, scope = { ...context }, abort = new AbortController(); controller = abort
+      const current = () => turn === generation && !disposed && !abort.signal.aborted
+      try {
+        const input = readOperationalInput(state.input); state.busy = true; emit()
+        if (!current()) return false
+        const value = await client.request('/operations/explicit-comparisons', { method: 'POST', body: input, signal: abort.signal })
+        if (!current()) return false
+        state.result = readOperationalResult(value, scope, input); return true
+      } catch (error) { if (current() && !isCancelled(error)) state.error = error; return false }
+      finally { if (current()) { state.busy = false; controller = null; emit() } }
+    },
     dispose() { clear(); disposed = true; context = null; state.input = emptyOperationalInput(); emit() },
   }
 }

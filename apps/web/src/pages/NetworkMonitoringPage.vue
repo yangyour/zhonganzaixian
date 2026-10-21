@@ -9,7 +9,7 @@ const snapshot=ref<NetworkSnapshot|null>(null),history=ref<NetworkHistory|Resour
 const resources=ref<Record<string,{data:ResourceSnapshot;loaded:number}>>({}),resourceErrors=ref<Record<string,boolean>>({})
 const error=ref<unknown>(null),historyError=ref<unknown>(null),loading=ref(false),historyLoading=ref(false)
 const selected=ref(''),metric=ref<HistoryMetric>('latency'),window=ref<'HOUR_1'|'HOURS_24'>('HOUR_1')
-const monitorView=ref<'list'|'cards'>('list'),deviceQuery=ref('')
+const monitorView=ref<'list'|'cards'>('list'),deviceQuery=ref(''),autoPaused=ref(false)
 const filteredDevices=computed(()=>snapshot.value?.devices.filter(device=>`${device.name} ${device.management_ip} ${device.brand} ${device.model}`.toLocaleLowerCase().includes(deviceQuery.value.trim().toLocaleLowerCase()))??[])
 const reachableCount=computed(()=>snapshot.value?.devices.filter(device=>display(device,'icmp')==='可达').length??0)
 const resourceCount=computed(()=>snapshot.value?.devices.filter(device=>device.vendor_metrics_status==='PARTIAL_API').length??0)
@@ -20,7 +20,13 @@ const permitted=computed(()=>!switchingTenant.value&&can('assets:read'))
 const {intervalSeconds:refreshInterval,label:refreshPolicyLabel,error:refreshPolicyError,refresh:refreshPolicy}=useMonitoringRefreshPolicy(permitted)
 const segments=computed(()=>history.value?historySegments(history.value):[])
 let alive=true,sequence=0,detailSequence=0,controller:AbortController|null=null,detailController:AbortController|null=null,timer:ReturnType<typeof setInterval>|null=null,lastRefresh=0
-function reset(){sequence++;detailSequence++;controller?.abort();detailController?.abort();snapshot.value=null;history.value=null;resources.value={};resourceErrors.value={};error.value=null;historyError.value=null;selected.value='';loading.value=false;historyLoading.value=false}
+function reset(){sequence++;detailSequence++;controller?.abort();detailController?.abort();snapshot.value=null;history.value=null;resources.value={};resourceErrors.value={};error.value=null;historyError.value=null;selected.value='';deviceQuery.value='';loading.value=false;historyLoading.value=false}
+function toggleAutomatic(){
+ if(!permitted.value)return
+ autoPaused.value=!autoPaused.value
+ if(autoPaused.value){sequence++;detailSequence++;controller?.abort();detailController?.abort();controller=null;detailController=null;loading.value=false;historyLoading.value=false}
+ else if(refreshInterval.value!==null)void refresh()
+}
 function selectDevice(id:string){if((metric.value==='cpu'||metric.value==='memory')&&!snapshot.value?.devices.some(d=>d.asset_id===id&&d.vendor_metrics_status==='PARTIAL_API'))metric.value='latency';selected.value=id}
 function selectResource(id:string,m:ResourceMetric){selected.value=id;metric.value=m}
 async function loadResources(value:NetworkSnapshot,seq:number,tenant:string,signal:AbortSignal){
@@ -53,24 +59,24 @@ async function loadHistory(){
   }catch(cause){if(alive&&seq===detailSequence&&!isCancelled(cause))historyError.value=cause}
   finally{if(alive&&seq===detailSequence)historyLoading.value=false}
 }
-watch([()=>session.value?.tenant.id,()=>session.value?.permission_version,contextGeneration,permitted],()=>{reset();if(permitted.value)void refresh()},{immediate:true,flush:'sync'})
+watch([()=>session.value?.tenant.id,()=>session.value?.user.id,()=>session.value?.user.role,()=>session.value?.mode,()=>session.value?.permission_version,contextGeneration,permitted],()=>{reset();if(permitted.value)void refresh()},{immediate:true,flush:'sync'})
 watch([selected,metric,window],()=>void loadHistory())
 watch(refreshPolicyError,cause=>{if(refreshPermissionRejected(cause))reset()},{flush:'sync'})
-function visible(){now.value=performance.now();if(!document.hidden&&refreshInterval.value!==null)void refresh()}
-onMounted(()=>{timer=setInterval(()=>{now.value=performance.now();if(refreshInterval.value!==null&&now.value-lastRefresh>=refreshInterval.value*1000&&!document.hidden)void refresh()},1000);document.addEventListener('visibilitychange',visible)})
+function visible(){now.value=performance.now();if(!document.hidden&&!autoPaused.value&&refreshInterval.value!==null)void refresh()}
+onMounted(()=>{timer=setInterval(()=>{now.value=performance.now();if(!autoPaused.value&&refreshInterval.value!==null&&now.value-lastRefresh>=refreshInterval.value*1000&&!document.hidden)void refresh()},1000);document.addEventListener('visibilitychange',visible)})
 onUnmounted(()=>{alive=false;reset();if(timer)clearInterval(timer);document.removeEventListener('visibilitychange',visible)})
 const time=(value:string|null)=>value?new Date(value).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}):'未取得'
 function display(d:import('../utils/networkMonitoring').Device,m:Metric){const recorded=d.metrics[m].recorded_at;const estimated=Date.parse(snapshot.value!.generated_at)+now.value-loadedAt.value;return sampleText(d,m,expired.value||recorded!==null&&estimated-Date.parse(recorded)>180000)}
-function resourceText(id:string,m:ResourceMetric){const entry=resources.value[id];if(!entry)return resourceErrors.value[id]?'暂不可用':'读取中…';const v=entry.data;if(expired.value||now.value-entry.loaded>90000||v.received_at!==null&&Date.parse(v.generated_at)+now.value-entry.loaded-Date.parse(v.received_at)>180000)return '数据过期';if(v.state!=='FRESH')return ({STALE:'数据过期',NO_DATA:'等待采样',COLLECTOR_ERROR:'采集异常',CLOCK_SKEW:'时钟异常'} as const)[v.state];return `${Number(v.metrics[m].value).toFixed(1)}%`}
+function resourceText(id:string,m:ResourceMetric){const entry=resources.value[id];if(!entry)return resourceErrors.value[id]?'暂不可用':autoPaused.value?'尚未取得（自动刷新已暂停）':'读取中…';const v=entry.data;if(expired.value||now.value-entry.loaded>90000||v.received_at!==null&&Date.parse(v.generated_at)+now.value-entry.loaded-Date.parse(v.received_at)>180000)return '数据过期';if(v.state!=='FRESH')return ({STALE:'数据过期',NO_DATA:'等待采样',COLLECTOR_ERROR:'采集异常',CLOCK_SKEW:'时钟异常'} as const)[v.state];return `${Number(v.metrics[m].value).toFixed(1)}%`}
 function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)return '';if(v.reason==='PASSWORD_EXPIRED')return '设备密码已过期';if(v.reason==='ACCESS_DENIED')return '设备读取权限不足';if(v.reason==='VERSION_CHANGED')return '设备版本变化，待核验';return v.state==='FRESH'?'来源：防火墙 API':'资源采集未就绪'}
 </script>
 <template>
   <section class="network-page">
     <p v-if="permitted" class="network-policy" aria-label="监控自动刷新设置">{{refreshPolicyLabel}} · 设置每30秒重新核对</p><ApiErrorNotice v-if="permitted" :error="refreshPolicyError" @retry="refreshPolicy"/>
-    <header class="network-heading"><div><div class="title-with-context"><h1>基础网络监控</h1><span class="context-badge">{{session?.tenant.name}}</span></div><details class="boundary-details"><summary>监控范围与口径说明</summary><p>实时展示当前租户已绑定网络设备的连通性、响应延迟、丢包率及常用端口状态。未采集指标标记为“待采集”，不计入正常率或零值统计；仅完成台账登记但未绑定采集器的资产暂无实时时序数据。</p></details></div><el-button :loading="loading" :disabled="!permitted" @click="refresh">刷新监控</el-button></header>
+    <header class="network-heading"><div><div class="title-with-context"><h1>基础网络监控</h1><span class="context-badge">{{session?.tenant.name}}</span></div><details class="boundary-details"><summary>监控范围与口径说明</summary><p>实时展示当前租户已绑定网络设备的连通性、响应延迟、丢包率及常用端口状态。未采集指标标记为“待采集”，不计入正常率或零值统计；仅完成台账登记但未绑定采集器的资产暂无实时时序数据。</p></details></div><div class="network-refresh-actions"><button v-if="permitted" type="button" @click="toggleAutomatic">{{autoPaused?'恢复自动刷新':'暂停自动刷新'}}</button><el-button :loading="loading" :disabled="!permitted" @click="refresh">刷新监控</el-button></div></header><p v-if="permitted" class="network-refresh-state" role="status">{{autoPaused?'已暂停本页自动刷新并取消在途数据读取；仍可手动刷新或选择历史。':refreshInterval===null?'自动刷新等待有效配置；可手动刷新。':'按有效配置自动刷新，查看历史时可暂停。'}}暂停不会停止后台采集，也不会延长数据有效期；配置授权仍独立核对。</p>
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前没有资产读取权限" />
     <template v-else>
-      <div class="feature-summary network-summary"><article><span>绑定设备</span><strong>{{snapshot?snapshot.devices.length:'—'}}</strong><small>当前租户已绑定范围</small></article><article class="success"><span>ICMP 可达</span><strong>{{snapshot&&!expired?reachableCount:'—'}}</strong><small>最近一次 ICMP 探测可达</small></article><article><span>资源采集已接入</span><strong>{{snapshot?resourceCount:'—'}}</strong><small>支持 CPU 与内存指标采集</small></article><article><span>监控刷新</span><strong>{{refreshInterval??'暂停'}} <small v-if="refreshInterval!==null">秒</small></strong><small>后台暂停 · 采集间隔60秒</small></article></div>
+      <div class="feature-summary network-summary"><article><span>绑定设备</span><strong>{{snapshot?snapshot.devices.length:'—'}}</strong><small>当前租户已绑定范围</small></article><article class="success"><span>ICMP 可达</span><strong>{{snapshot&&!expired?reachableCount:'—'}}</strong><small>最近一次 ICMP 探测可达</small></article><article><span>资源采集已接入</span><strong>{{snapshot?resourceCount:'—'}}</strong><small>支持 CPU 与内存指标采集</small></article><article><span>监控刷新</span><strong>{{autoPaused?'暂停':refreshInterval??'暂停'}} <small v-if="!autoPaused&&refreshInterval!==null">秒</small></strong><small>后台暂停 · 采集间隔60秒</small></article></div>
       <ApiErrorNotice v-if="error" :error="error" @retry="refresh" />
       <el-alert v-if="expired" title="页面数据已过期，请刷新后查看最新状态" type="warning" :closable="false" />
       <p v-if="loading&&!snapshot" role="status">正在读取监控数据…</p>
@@ -95,7 +101,7 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
       <section class="network-history">
         <div class="history-heading"><div><h2>采样历史</h2><p>选择设备与指标后展示历史趋势；采样间断处留空断开，不补零或沿用旧值。</p></div><div class="history-controls"><label>指标<select v-model="metric"><option value="latency">响应延迟</option><option value="loss">丢包率</option><option value="icmp">ICMP响应</option><option value="tcp_22">TCP 22</option><option value="tcp_80">TCP 80</option><option value="tcp_443">TCP 443</option><template v-if="selectedHasResources"><option value="cpu">CPU 使用率</option><option value="memory">内存使用率</option></template></select></label><label>时间<select v-model="window"><option value="HOUR_1">最近1小时</option><option value="HOURS_24">最近24小时</option></select></label></div></div>
         <p v-if="!selected" class="network-empty">请选择上方一台设备以查看历史采样趋势。</p>
-        <p v-if="historyLoading" role="status">正在读取历史采样…</p>
+        <p v-if="historyLoading" role="status">正在读取历史采样…</p><p v-else-if="selected&&!history&&!historyError">历史尚未取得；可重新选择指标或点击手动刷新，不表示没有采样。</p>
         <ApiErrorNotice v-if="historyError" :error="historyError" @retry="loadHistory" />
         <template v-if="history">
           <p class="history-caption">共 {{history.points.length}} 个采样点 · {{time(history.from)}} — {{time(history.to)}} · 单位：{{history.unit||'状态值 (0/1)'}}</p>
@@ -176,4 +182,5 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
 .history-table tbody tr:hover{background:#f8fbff}
 @media(max-width:1350px){.network-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.network-grid{grid-template-columns:1fr}.network-heading,.history-heading{align-items:flex-start;flex-direction:column}.device-card,.network-history,.network-device-workspace{padding:14px}.network-heading h1{font-size:20px}.history-controls{width:100%}.history-controls label{flex:1}.history-controls select,.network-list-toolbar input{width:100%}.network-view-tabs button,.network-list-toolbar input{min-height:44px}}
+.network-refresh-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.network-refresh-actions button{min-height:44px;padding:8px 12px;border:1px solid #8293a6;border-radius:4px;background:white;color:#24374a;font:inherit;cursor:pointer}.network-refresh-actions :focus-visible{outline:3px solid #176bb5;outline-offset:3px}.network-refresh-state{color:#46566c;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
 </style>

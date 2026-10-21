@@ -73,3 +73,5 @@ qa/browser/my-tasks.pw.ts新增6项四视口、键盘详情、固定负责人、
 ## 2026-10-21 内部人员原生选择器
 
 排班/交接使用fieldset/legend、关联label的原生select/input，同名人员通过角色及UUID区分，支持手动值、原生有效性与明确错误说明。读取失败/取消不清空表单，旧范围子组件事件被拒绝。逻辑/DOM与隔离API检查分层记录，真实浏览器/axe/视觉仍NOT_RUN，见[人员选择证据](oncall-member-picker-20261021.md)。
+
+[备份草稿候选设备恢复](backup-asset-recovery-20261021.md)补充原查询/游标重试、独立取消、焦点回归与异步确认期间原始输入保护的合成DOM证据；真实浏览器仍NOT_RUN，不据此声明WCAG全面通过。

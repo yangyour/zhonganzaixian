@@ -1,6 +1,14 @@
 # 工程验证工作流
 
-[cloud-validation.yml](../.github/workflows/cloud-validation.yml)在push和pull_request时定义三个独立GitHub-hosted检查：JDK17执行四个纯Java脚本；JDK17/Maven3.9.x以严格制品校验完成reactor `verify`；Node22完成契约、前端单测、类型检查和构建。官方actions按已核验的完整commit固定，权限仅contents:read，checkout不保留凭据。
+## 2026-10-21 按用户要求移除 Cloud validation
+
+用户明确要求删除 `Cloud validation` 工作流。本次移除 `.github/workflows/cloud-validation.yml`，同时移除仅用于校验该文件中 Maven 安装步骤的 `tools/test_ci_maven_pin.py`，避免本地测试继续读取已删除文件。对应 GitHub Actions 工作流停用，以阻止仍保留旧配置的其他分支再次触发它。`Private tracked source recovery` 工作流保持原样，业务测试源码和本地验证工具继续保留。
+
+本次验证范围为删除文件及引用检查、其他工作流字节一致性与 `git diff --check`；不执行应用、数据库、迁移、部署或外部组件联调。删除工作流不构成业务测试或合同验收通过。下文保留历史配置与验证证据，均对应各自原始提交。
+
+## 历史配置与验证记录
+
+[历史 cloud-validation.yml](https://github.com/yangyour/zhonganzaixian/blob/b9ee49d249b16a2e7be0fe6310d07f2bbd13371e/.github/workflows/cloud-validation.yml)在push和pull_request时定义三个独立GitHub-hosted检查：JDK17执行四个纯Java脚本；JDK17/Maven3.9.x以严格制品校验完成reactor `verify`；Node22完成契约、前端单测、类型检查和构建。官方actions按已核验的完整commit固定，权限仅contents:read，checkout不保留凭据。
 
 远端测试开关固定false，历史整套fixture不启用；不启动应用、数据库或其他服务，不执行迁移或部署。Surefire摘要读取实际XML，缺失/零结果为NOT_RUN，全部跳过为SKIPPED；禁用套件被执行，或Maven成功却零测试执行，均使检查失败。跳过的PG/MinIO测试不表示指定服务器联调通过。
 

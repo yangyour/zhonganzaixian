@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "catalog_version": "customer-cmdb-v1-20261021",
+  "enabled": false,
+  "production_approved": false,
+  "tenant_scope_reference": null,
+  "runtime_publication_reference": null,
+  "legacy_asset_type_crosswalk_reference": null,
+  "asset_identity_mapping_reference": null,
+  "site_and_service_reference_resolver": null,
+  "owner_membership_resolver": null,
+  "credential_reference_provider": null,
+  "published_monitoring_template_catalog": null,
+  "fw_adc_monitoring_type_reference": null,
+  "import_ssh_collection_resolution": null,
+  "import_note_requiredness_resolution": null,
+  "l2_count_discrepancy_resolution": null,
+  "ap_billing_contract_mode_reference": null,
+  "asset_lifecycle_transition_policy_reference": null
+}

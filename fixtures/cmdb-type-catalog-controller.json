@@ -1,0 +1,1108 @@
+{
+  "trace_id" : "unavailable",
+  "data" : {
+    "tenant_id" : "64000000-0000-4000-8000-000000000002",
+    "catalog_version" : "customer-cmdb-v1-20261021",
+    "catalog_hash" : "f0816e44f53a33888c6514378bbd17332b5e0ae35d20512156dc79ba7fbb3108",
+    "scope" : "REFERENCE_ONLY_NOT_ASSET_DATA",
+    "primary_types" : [ {
+      "code" : "SW",
+      "label" : "交换机"
+    }, {
+      "code" : "RT",
+      "label" : "路由器与出口网关"
+    }, {
+      "code" : "FW",
+      "label" : "安全与网关设备"
+    }, {
+      "code" : "WL",
+      "label" : "无线设备"
+    }, {
+      "code" : "SV",
+      "label" : "服务器"
+    }, {
+      "code" : "HC",
+      "label" : "超融合平台"
+    }, {
+      "code" : "VD",
+      "label" : "桌面云平台"
+    }, {
+      "code" : "ST",
+      "label" : "存储设备（集中式）"
+    }, {
+      "code" : "DS",
+      "label" : "分布式存储"
+    } ],
+    "subtypes" : [ {
+      "code" : "sw_core",
+      "label" : "核心／汇聚交换机",
+      "parent" : "SW",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 2
+    }, {
+      "code" : "sw_access",
+      "label" : "接入交换机",
+      "parent" : "SW",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 3
+    }, {
+      "code" : "rt_gateway",
+      "label" : "路由器／出口网关",
+      "parent" : "RT",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 4
+    }, {
+      "code" : "fw_ngfw",
+      "label" : "防火墙／安全网关",
+      "parent" : "FW",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 5
+    }, {
+      "code" : "fw_ips",
+      "label" : "IPS／IDS／WAF",
+      "parent" : "FW",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 6
+    }, {
+      "code" : "fw_audit",
+      "label" : "上网行为管理／审计",
+      "parent" : "FW",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 7
+    }, {
+      "code" : "fw_adc",
+      "label" : "负载均衡／应用交付",
+      "parent" : "FW",
+      "monitoring_mapping_resolved" : false,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 8
+    }, {
+      "code" : "wl_ac",
+      "label" : "无线 AC 控制器",
+      "parent" : "WL",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 9
+    }, {
+      "code" : "wl_ap",
+      "label" : "无线 AP",
+      "parent" : "WL",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 10
+    }, {
+      "code" : "sv_physical",
+      "label" : "通用物理服务器",
+      "parent" : "SV",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 11
+    }, {
+      "code" : "sv_vm",
+      "label" : "虚拟机",
+      "parent" : "SV",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 12
+    }, {
+      "code" : "hc_node",
+      "label" : "超融合节点",
+      "parent" : "HC",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 13
+    }, {
+      "code" : "vd_host",
+      "label" : "桌面云服务器",
+      "parent" : "VD",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 14
+    }, {
+      "code" : "st_san",
+      "label" : "集中式存储 SAN",
+      "parent" : "ST",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 15
+    }, {
+      "code" : "st_nas",
+      "label" : "集中式存储 NAS",
+      "parent" : "ST",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 16
+    }, {
+      "code" : "ds_node",
+      "label" : "分布式存储节点",
+      "parent" : "DS",
+      "monitoring_mapping_resolved" : true,
+      "source_sheet" : "02_CI类型_L2子类型",
+      "source_row" : 17
+    } ],
+    "attributes" : [ {
+      "code" : "ci_id",
+      "label" : "CI 主键",
+      "group" : "核心标识",
+      "data_type" : "string(26)",
+      "required_note" : "是",
+      "derived" : true,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 2
+    }, {
+      "code" : "asset_no",
+      "label" : "资产编号",
+      "group" : "核心标识",
+      "data_type" : "string(32)",
+      "required_note" : "是",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 3
+    }, {
+      "code" : "device_name",
+      "label" : "设备名称",
+      "group" : "核心标识",
+      "data_type" : "string(64)",
+      "required_note" : "是",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 4
+    }, {
+      "code" : "device_type",
+      "label" : "设备类型（L1）",
+      "group" : "核心标识",
+      "data_type" : "enum(9)",
+      "required_note" : "是",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 5
+    }, {
+      "code" : "device_subtype",
+      "label" : "设备子类型（L2）",
+      "group" : "核心标识",
+      "data_type" : "enum(15)",
+      "required_note" : "进入服务前必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 6
+    }, {
+      "code" : "primary_ip",
+      "label" : "管理 IP 或域名",
+      "group" : "核心标识",
+      "data_type" : "string(64)",
+      "required_note" : "是",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 7
+    }, {
+      "code" : "site_id",
+      "label" : "站点",
+      "group" : "核心标识",
+      "data_type" : "ref(SITE)",
+      "required_note" : "是",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 8
+    }, {
+      "code" : "owner_id",
+      "label" : "负责人",
+      "group" : "核心标识",
+      "data_type" : "ref(PERSON)",
+      "required_note" : "是",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 9
+    }, {
+      "code" : "lifecycle_state",
+      "label" : "生命周期状态",
+      "group" : "核心标识",
+      "data_type" : "enum(8)",
+      "required_note" : "是",
+      "derived" : true,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 10
+    }, {
+      "code" : "tenant_id",
+      "label" : "租户",
+      "group" : "核心标识",
+      "data_type" : "ref(TENANT)",
+      "required_note" : "是",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 11
+    }, {
+      "code" : "collect_method",
+      "label" : "采集方式",
+      "group" : "核心标识",
+      "data_type" : "enum(5)",
+      "required_note" : "进入服务前必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 12
+    }, {
+      "code" : "service_id",
+      "label" : "SLA 服务",
+      "group" : "核心标识",
+      "data_type" : "ref(SERVICE)",
+      "required_note" : "进入服务前必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 13
+    }, {
+      "code" : "hostname",
+      "label" : "主机名",
+      "group" : "硬件与固件",
+      "data_type" : "string(64)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 14
+    }, {
+      "code" : "serial_no",
+      "label" : "序列号",
+      "group" : "硬件与固件",
+      "data_type" : "string(64)",
+      "required_note" : "网络与服务器类必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 15
+    }, {
+      "code" : "vendor",
+      "label" : "品牌",
+      "group" : "硬件与固件",
+      "data_type" : "string(32)",
+      "required_note" : "是",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 16
+    }, {
+      "code" : "model",
+      "label" : "型号",
+      "group" : "硬件与固件",
+      "data_type" : "string(64)",
+      "required_note" : "是",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 17
+    }, {
+      "code" : "firmware_version",
+      "label" : "固件／OS 版本",
+      "group" : "硬件与固件",
+      "data_type" : "string(32)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 18
+    }, {
+      "code" : "hardware_spec",
+      "label" : "硬件规格概要",
+      "group" : "硬件与固件",
+      "data_type" : "json",
+      "required_note" : "服务器类必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 19
+    }, {
+      "code" : "port_count",
+      "label" : "物理端口数",
+      "group" : "硬件与固件",
+      "data_type" : "int",
+      "required_note" : "网络类必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 20
+    }, {
+      "code" : "location_id",
+      "label" : "机房／机柜",
+      "group" : "位置与归属",
+      "data_type" : "ref(LOCATION)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 21
+    }, {
+      "code" : "rack_no",
+      "label" : "机柜号",
+      "group" : "位置与归属",
+      "data_type" : "string(16)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 22
+    }, {
+      "code" : "rack_unit",
+      "label" : "U 位",
+      "group" : "位置与归属",
+      "data_type" : "string(16)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 23
+    }, {
+      "code" : "biz_app_id",
+      "label" : "所属业务系统",
+      "group" : "位置与归属",
+      "data_type" : "ref(BIZAPP)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 24
+    }, {
+      "code" : "department",
+      "label" : "使用部门",
+      "group" : "位置与归属",
+      "data_type" : "string(64)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 25
+    }, {
+      "code" : "purchase_date",
+      "label" : "采购日期",
+      "group" : "财务与维保",
+      "data_type" : "date",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 26
+    }, {
+      "code" : "maint_start",
+      "label" : "维保起始日",
+      "group" : "财务与维保",
+      "data_type" : "date",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 27
+    }, {
+      "code" : "maint_expire",
+      "label" : "维保到期日",
+      "group" : "财务与维保",
+      "data_type" : "date",
+      "required_note" : "硬件类必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 28
+    }, {
+      "code" : "maint_vendor",
+      "label" : "维保供应商",
+      "group" : "财务与维保",
+      "data_type" : "string(64)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 29
+    }, {
+      "code" : "eol_date",
+      "label" : "超期服役日期",
+      "group" : "财务与维保",
+      "data_type" : "date",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 30
+    }, {
+      "code" : "warranty_type",
+      "label" : "维保类型",
+      "group" : "财务与维保",
+      "data_type" : "enum",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 31
+    }, {
+      "code" : "alt_ips",
+      "label" : "附加地址",
+      "group" : "采集与接入",
+      "data_type" : "string(256)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 32
+    }, {
+      "code" : "proxy_id",
+      "label" : "采集代理",
+      "group" : "采集与接入",
+      "data_type" : "ref(PROXY)",
+      "required_note" : "进入服务前必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 33
+    }, {
+      "code" : "credential_ref",
+      "label" : "凭据引用",
+      "group" : "采集与接入",
+      "data_type" : "string(64)",
+      "required_note" : "进入服务前必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 34
+    }, {
+      "code" : "template_group",
+      "label" : "模板分组",
+      "group" : "采集与接入",
+      "data_type" : "string(64)",
+      "required_note" : "进入服务前必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 35
+    }, {
+      "code" : "sample_interval",
+      "label" : "采样周期",
+      "group" : "采集与接入",
+      "data_type" : "enum(4)",
+      "required_note" : "进入服务前必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 36
+    }, {
+      "code" : "last_collect_at",
+      "label" : "最近采集时间",
+      "group" : "采集与接入",
+      "data_type" : "datetime",
+      "required_note" : "否",
+      "derived" : true,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 37
+    }, {
+      "code" : "sync_state",
+      "label" : "采集同步状态",
+      "group" : "状态",
+      "data_type" : "enum(4)",
+      "required_note" : "是",
+      "derived" : true,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 38
+    }, {
+      "code" : "health_state",
+      "label" : "运行健康状态",
+      "group" : "状态",
+      "data_type" : "enum(4)",
+      "required_note" : "是",
+      "derived" : true,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 39
+    }, {
+      "code" : "last_sync_at",
+      "label" : "最近同步时间",
+      "group" : "状态",
+      "data_type" : "datetime",
+      "required_note" : "否",
+      "derived" : true,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 40
+    }, {
+      "code" : "decommission_date",
+      "label" : "退役日期",
+      "group" : "状态",
+      "data_type" : "date",
+      "required_note" : "退役时必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 41
+    }, {
+      "code" : "replaced_by_ci",
+      "label" : "替代设备",
+      "group" : "状态",
+      "data_type" : "ref(DEVICE)",
+      "required_note" : "迁移时必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 42
+    }, {
+      "code" : "billable",
+      "label" : "是否计费",
+      "group" : "计费",
+      "data_type" : "enum(3)",
+      "required_note" : "是",
+      "derived" : true,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 43
+    }, {
+      "code" : "billing_weight",
+      "label" : "计费系数",
+      "group" : "计费",
+      "data_type" : "decimal(3,1)",
+      "required_note" : "是",
+      "derived" : true,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 44
+    }, {
+      "code" : "billing_units",
+      "label" : "折算台数",
+      "group" : "计费",
+      "data_type" : "decimal(6,2)",
+      "required_note" : "是",
+      "derived" : true,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 45
+    }, {
+      "code" : "ap_billing_mode",
+      "label" : "AP 计费模式",
+      "group" : "计费",
+      "data_type" : "enum(2)",
+      "required_note" : "无线类必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 46
+    }, {
+      "code" : "contract_id",
+      "label" : "服务合同",
+      "group" : "计费",
+      "data_type" : "ref(CONTRACT)",
+      "required_note" : "是",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 47
+    }, {
+      "code" : "is_core",
+      "label" : "是否核心节点",
+      "group" : "安全与合规",
+      "data_type" : "bool",
+      "required_note" : "是",
+      "derived" : true,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 48
+    }, {
+      "code" : "security_zone",
+      "label" : "安全域",
+      "group" : "安全与合规",
+      "data_type" : "enum",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 49
+    }, {
+      "code" : "compliance_tag",
+      "label" : "合规标记",
+      "group" : "安全与合规",
+      "data_type" : "string(128)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 50
+    }, {
+      "code" : "log_retention",
+      "label" : "日志保留天数",
+      "group" : "安全与合规",
+      "data_type" : "int",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 51
+    }, {
+      "code" : "tags",
+      "label" : "标签",
+      "group" : "通用扩展",
+      "data_type" : "string(256)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 52
+    }, {
+      "code" : "source",
+      "label" : "数据来源",
+      "group" : "通用扩展",
+      "data_type" : "enum(4)",
+      "required_note" : "是",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 53
+    }, {
+      "code" : "external_id",
+      "label" : "外部系统 ID",
+      "group" : "通用扩展",
+      "data_type" : "string(64)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 54
+    }, {
+      "code" : "discovery_source",
+      "label" : "发现方式",
+      "group" : "通用扩展",
+      "data_type" : "enum",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 55
+    }, {
+      "code" : "first_seen_at",
+      "label" : "首次出现时间",
+      "group" : "通用扩展",
+      "data_type" : "datetime",
+      "required_note" : "否",
+      "derived" : true,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 56
+    }, {
+      "code" : "note",
+      "label" : "备注",
+      "group" : "通用扩展",
+      "data_type" : "string(512)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 57
+    }, {
+      "code" : "config_backup_at",
+      "label" : "最近备份时间",
+      "group" : "通用扩展",
+      "data_type" : "datetime",
+      "required_note" : "否",
+      "derived" : true,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 58
+    }, {
+      "code" : "config_backup_ok",
+      "label" : "恢复演练结果",
+      "group" : "通用扩展",
+      "data_type" : "bool",
+      "required_note" : "否",
+      "derived" : true,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 59
+    }, {
+      "code" : "routing_protocol",
+      "label" : "路由协议",
+      "group" : "类型扩展-网络",
+      "data_type" : "enum",
+      "required_note" : "网络类必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 60
+    }, {
+      "code" : "nat_enabled",
+      "label" : "启用 NAT",
+      "group" : "类型扩展-网络",
+      "data_type" : "bool",
+      "required_note" : "出口类必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 61
+    }, {
+      "code" : "stack_group",
+      "label" : "堆叠组标识",
+      "group" : "类型扩展-网络",
+      "data_type" : "string(32)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 62
+    }, {
+      "code" : "redundancy_mode",
+      "label" : "冗余模式",
+      "group" : "类型扩展-网络",
+      "data_type" : "enum",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 63
+    }, {
+      "code" : "ac_ci_id",
+      "label" : "归属 AC",
+      "group" : "类型扩展-无线",
+      "data_type" : "ref(DEVICE)",
+      "required_note" : "AP必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 64
+    }, {
+      "code" : "ap_managed_count",
+      "label" : "AP 纳管数",
+      "group" : "类型扩展-无线",
+      "data_type" : "int",
+      "required_note" : "AC必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 65
+    }, {
+      "code" : "os_type",
+      "label" : "操作系统类型",
+      "group" : "类型扩展-服务器",
+      "data_type" : "enum",
+      "required_note" : "服务器类必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 66
+    }, {
+      "code" : "os_version",
+      "label" : "操作系统版本",
+      "group" : "类型扩展-服务器",
+      "data_type" : "string(32)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 67
+    }, {
+      "code" : "cpu_cores",
+      "label" : "CPU 核数",
+      "group" : "类型扩展-服务器",
+      "data_type" : "int",
+      "required_note" : "服务器类必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 68
+    }, {
+      "code" : "mem_gb",
+      "label" : "内存 GB",
+      "group" : "类型扩展-服务器",
+      "data_type" : "int",
+      "required_note" : "服务器类必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 69
+    }, {
+      "code" : "disk_total_gb",
+      "label" : "磁盘总量 GB",
+      "group" : "类型扩展-服务器",
+      "data_type" : "int",
+      "required_note" : "服务器类必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 70
+    }, {
+      "code" : "raid_level",
+      "label" : "RAID 级别",
+      "group" : "类型扩展-服务器",
+      "data_type" : "enum",
+      "required_note" : "服务器类必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 71
+    }, {
+      "code" : "bmc_ip",
+      "label" : "带外管理地址",
+      "group" : "类型扩展-服务器",
+      "data_type" : "string(64)",
+      "required_note" : "否",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 72
+    }, {
+      "code" : "bond_mode",
+      "label" : "网卡 Bond 模式",
+      "group" : "类型扩展-服务器",
+      "data_type" : "enum",
+      "required_note" : "服务器类必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 73
+    }, {
+      "code" : "host_ci_id",
+      "label" : "宿主设备",
+      "group" : "类型扩展-虚机",
+      "data_type" : "ref(DEVICE)",
+      "required_note" : "虚机必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 74
+    }, {
+      "code" : "vcpu",
+      "label" : "vCPU 数",
+      "group" : "类型扩展-虚机",
+      "data_type" : "int",
+      "required_note" : "虚机必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 75
+    }, {
+      "code" : "vmem_gb",
+      "label" : "虚拟内存 GB",
+      "group" : "类型扩展-虚机",
+      "data_type" : "int",
+      "required_note" : "虚机必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 76
+    }, {
+      "code" : "vdisk_gb",
+      "label" : "虚拟磁盘 GB",
+      "group" : "类型扩展-虚机",
+      "data_type" : "int",
+      "required_note" : "虚机必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 77
+    }, {
+      "code" : "guest_agent_installed",
+      "label" : "已装 Guest Agent",
+      "group" : "类型扩展-虚机",
+      "data_type" : "bool",
+      "required_note" : "虚机必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 78
+    }, {
+      "code" : "cluster_ci_id",
+      "label" : "所属集群",
+      "group" : "类型扩展-超融合",
+      "data_type" : "ref(DEVICE)",
+      "required_note" : "超融合必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 79
+    }, {
+      "code" : "node_role",
+      "label" : "节点角色",
+      "group" : "类型扩展-超融合",
+      "data_type" : "enum",
+      "required_note" : "超融合必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 80
+    }, {
+      "code" : "cluster_node_count",
+      "label" : "集群节点数",
+      "group" : "类型扩展-超融合",
+      "data_type" : "int",
+      "required_note" : "超融合必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 81
+    }, {
+      "code" : "virt_platform",
+      "label" : "虚拟化平台",
+      "group" : "类型扩展-超融合",
+      "data_type" : "enum",
+      "required_note" : "超融合必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 82
+    }, {
+      "code" : "storage_pool_total_gb",
+      "label" : "存储池总量 GB",
+      "group" : "类型扩展-超融合",
+      "data_type" : "int",
+      "required_note" : "超融合必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 83
+    }, {
+      "code" : "desktop_count",
+      "label" : "桌面数",
+      "group" : "类型扩展-桌面云",
+      "data_type" : "int",
+      "required_note" : "桌面云必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 84
+    }, {
+      "code" : "desktop_pool_count",
+      "label" : "桌面池数",
+      "group" : "类型扩展-桌面云",
+      "data_type" : "int",
+      "required_note" : "桌面云必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 85
+    }, {
+      "code" : "broker_type",
+      "label" : "连接代理类型",
+      "group" : "类型扩展-桌面云",
+      "data_type" : "string(32)",
+      "required_note" : "桌面云必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 86
+    }, {
+      "code" : "hypervisor_ci_id",
+      "label" : "底层虚拟化集群",
+      "group" : "类型扩展-桌面云",
+      "data_type" : "ref(DEVICE)",
+      "required_note" : "桌面云必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 87
+    }, {
+      "code" : "storage_form",
+      "label" : "存储形态",
+      "group" : "类型扩展-存储",
+      "data_type" : "enum",
+      "required_note" : "存储必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 88
+    }, {
+      "code" : "controller_count",
+      "label" : "控制器数",
+      "group" : "类型扩展-存储",
+      "data_type" : "int",
+      "required_note" : "存储必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 89
+    }, {
+      "code" : "raw_capacity_tb",
+      "label" : "裸容量 TB",
+      "group" : "类型扩展-存储",
+      "data_type" : "decimal",
+      "required_note" : "存储必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 90
+    }, {
+      "code" : "lun_count",
+      "label" : "LUN／卷数",
+      "group" : "类型扩展-存储",
+      "data_type" : "int",
+      "required_note" : "存储必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 91
+    }, {
+      "code" : "fc_port_count",
+      "label" : "FC 端口数",
+      "group" : "类型扩展-存储",
+      "data_type" : "int",
+      "required_note" : "SAN必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 92
+    }, {
+      "code" : "cluster_id",
+      "label" : "集群标识",
+      "group" : "类型扩展-分布式",
+      "data_type" : "string(32)",
+      "required_note" : "分布式必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 93
+    }, {
+      "code" : "osd_count",
+      "label" : "OSD 数",
+      "group" : "类型扩展-分布式",
+      "data_type" : "int",
+      "required_note" : "分布式必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 94
+    }, {
+      "code" : "mon_count",
+      "label" : "MON 数",
+      "group" : "类型扩展-分布式",
+      "data_type" : "int",
+      "required_note" : "分布式必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 95
+    }, {
+      "code" : "replica_policy",
+      "label" : "副本策略",
+      "group" : "类型扩展-分布式",
+      "data_type" : "string(32)",
+      "required_note" : "分布式必填",
+      "derived" : false,
+      "source_sheet" : "04_属性字典",
+      "source_row" : 96
+    } ],
+    "collection_methods" : [ {
+      "code" : "agent_active",
+      "label" : "Agent2 主动"
+    }, {
+      "code" : "agent_passive",
+      "label" : "Agent2 被动"
+    }, {
+      "code" : "snmpv3",
+      "label" : "SNMPv3"
+    }, {
+      "code" : "http",
+      "label" : "HTTP／Web 场景"
+    }, {
+      "code" : "sender",
+      "label" : "Sender／Trapper"
+    } ],
+    "state_dimensions" : [ {
+      "field" : "lifecycle_state",
+      "values" : [ {
+        "code" : "planned",
+        "label" : "规划中"
+      }, {
+        "code" : "procured",
+        "label" : "已采购在库"
+      }, {
+        "code" : "onboarding",
+        "label" : "接入中"
+      }, {
+        "code" : "in_service",
+        "label" : "在用"
+      }, {
+        "code" : "maintenance",
+        "label" : "维护中"
+      }, {
+        "code" : "suspended",
+        "label" : "停用"
+      }, {
+        "code" : "retired",
+        "label" : "已退役"
+      }, {
+        "code" : "disposed",
+        "label" : "已报废"
+      } ]
+    }, {
+      "field" : "sync_state",
+      "values" : [ {
+        "code" : "synced",
+        "label" : "已同步"
+      }, {
+        "code" : "syncing",
+        "label" : "同步中"
+      }, {
+        "code" : "failed",
+        "label" : "同步失败"
+      }, {
+        "code" : "drifted",
+        "label" : "配置漂移"
+      } ]
+    }, {
+      "field" : "health_state",
+      "values" : [ {
+        "code" : "normal",
+        "label" : "正常"
+      }, {
+        "code" : "problem",
+        "label" : "有问题"
+      }, {
+        "code" : "unknown",
+        "label" : "未知"
+      }, {
+        "code" : "maintenance",
+        "label" : "维护中"
+      } ]
+    }, {
+      "field" : "billable",
+      "values" : [ {
+        "code" : "yes",
+        "label" : "计入"
+      }, {
+        "code" : "no",
+        "label" : "不计入"
+      }, {
+        "code" : "addon",
+        "label" : "加购"
+      } ]
+    } ],
+    "unresolved" : [ {
+      "code" : "L2_COUNT_CONFLICT",
+      "resolution" : null
+    }, {
+      "code" : "MONITORING_TYPE_MAPPING_PENDING",
+      "resolution" : null
+    }, {
+      "code" : "IMPORT_COLLECTION_METHOD_CONFLICT",
+      "resolution" : null
+    }, {
+      "code" : "NOTE_REQUIREDNESS_CONFLICT",
+      "resolution" : null
+    } ],
+    "runtime_publication" : false,
+    "asset_mutations" : false,
+    "production_approved" : false
+  }
+}

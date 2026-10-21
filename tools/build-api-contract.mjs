@@ -1,3 +1,4 @@
+import { addCmdbTypeCatalogContract } from './cmdb-type-catalog-contract.mjs';
 import { addTicketLifecycleContract } from './ticket-lifecycle-contract.mjs';
 import { addInspectionQuarterlyReportContract } from './inspection-quarterly-report-contract.mjs';
 import { addWeComContract } from './wecom-contract.mjs';
@@ -947,7 +948,8 @@ addEmailContract(contract);
 addChangeNoticeApprovalContract(contract);
 // Combined upstream WeCom/email, approval and quarterly report additive contract.
 addInspectionQuarterlyReportContract(contract);
-contract.info.version = '0.66.0';
+addCmdbTypeCatalogContract(contract);
+contract.info.version = '0.67.0';
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

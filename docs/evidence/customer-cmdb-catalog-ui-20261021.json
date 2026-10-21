@@ -1,0 +1,53 @@
+{
+  "scope": "CMDB_READONLY_API_AND_UI_SLICE",
+  "backend": {
+    "tests": 3741,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 983,
+    "executed": 2758
+  },
+  "backend_build": "PASS",
+  "new_controller_tests": 11,
+  "new_web_tests": 15,
+  "web": {
+    "tests": 2530,
+    "files": 181,
+    "result": "PASS",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "static_release_and_policy_checks": "PASS"
+  },
+  "contracts": {
+    "tests": 158,
+    "result": "PASS",
+    "openapi_version": "0.67.0",
+    "fixture": "fixtures/cmdb-type-catalog-controller.json",
+    "fixture_origin": "Actual controller method with synthetic authenticated membership; not live database or HTTP"
+  },
+  "python": {
+    "tests": 108,
+    "result": "PASS"
+  },
+  "preview": {
+    "scope": "STATIC_PREVIEW_NOT_BROWSER_OR_API_INTEGRATION",
+    "root_status": 200,
+    "assets_page_status": 200,
+    "assets_page_bytes": 185731,
+    "compiled_catalog_panel_present": true,
+    "served_asset_matches_build": true
+  },
+  "api_startup": {
+    "result": "BLOCKED_FAIL_CLOSED",
+    "exit_code": 1,
+    "missing_setting": "SPRING_DATASOURCE_URL"
+  },
+  "browser_visual_and_live_api": "NOT_RUN",
+  "database_migrations": false,
+  "asset_writes": false,
+  "runtime_publication": false,
+  "account_or_role_changes": false,
+  "provider_sends": false,
+  "production_approved": false,
+  "formal_acceptance": "NOT_RUN"
+}

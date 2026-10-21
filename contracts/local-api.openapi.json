@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.66.0",
+    "version": "0.67.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -40072,6 +40072,69 @@
         ],
         "x-mop-document-projection": "FROZEN_INPUT_OUTPUT"
       }
+    },
+    "/cmdb/type-catalog": {
+      "get": {
+        "operationId": "readCustomerCmdbTypeCatalog",
+        "summary": "读取客户 CMDB 类型、属性及待确认差异；不是资产数据或运行发布",
+        "parameters": [],
+        "x-mop-capabilities": [
+          "assets:read"
+        ],
+        "x-mop-read-only": true,
+        "responses": {
+          "200": {
+            "description": "当前会话租户绑定的只读参考目录",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CmdbTypeCatalogResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "输入、会话、权限或资源不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "输入、会话、权限或资源不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "输入、会话、权限或资源不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "输入、会话、权限或资源不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -79110,6 +79173,458 @@
               "source"
             ],
             "additionalProperties": false
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "CmdbTypeCatalog": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "catalog_version": {
+            "const": "customer-cmdb-v1-20261021"
+          },
+          "catalog_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "scope": {
+            "const": "REFERENCE_ONLY_NOT_ASSET_DATA"
+          },
+          "primary_types": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "enum": [
+                    "SW",
+                    "RT",
+                    "FW",
+                    "WL",
+                    "SV",
+                    "HC",
+                    "VD",
+                    "ST",
+                    "DS"
+                  ]
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                }
+              },
+              "required": [
+                "code",
+                "label"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 9,
+            "maxItems": 9
+          },
+          "subtypes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "enum": [
+                    "sw_core",
+                    "sw_access",
+                    "rt_gateway",
+                    "fw_ngfw",
+                    "fw_ips",
+                    "fw_audit",
+                    "fw_adc",
+                    "wl_ac",
+                    "wl_ap",
+                    "sv_physical",
+                    "sv_vm",
+                    "hc_node",
+                    "vd_host",
+                    "st_san",
+                    "st_nas",
+                    "ds_node"
+                  ]
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "parent": {
+                  "enum": [
+                    "SW",
+                    "RT",
+                    "FW",
+                    "WL",
+                    "SV",
+                    "HC",
+                    "VD",
+                    "ST",
+                    "DS"
+                  ]
+                },
+                "monitoring_mapping_resolved": {
+                  "type": "boolean"
+                },
+                "source_sheet": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "source_row": {
+                  "type": "integer",
+                  "minimum": 2,
+                  "maximum": 999
+                }
+              },
+              "required": [
+                "code",
+                "label",
+                "parent",
+                "monitoring_mapping_resolved",
+                "source_sheet",
+                "source_row"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 16,
+            "maxItems": 16
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,63}$"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "group": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "data_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "required_note": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "derived": {
+                  "type": "boolean"
+                },
+                "source_sheet": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "source_row": {
+                  "type": "integer",
+                  "minimum": 2,
+                  "maximum": 999
+                }
+              },
+              "required": [
+                "code",
+                "label",
+                "group",
+                "data_type",
+                "required_note",
+                "derived",
+                "source_sheet",
+                "source_row"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 95,
+            "maxItems": 95
+          },
+          "collection_methods": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "enum": [
+                    "agent_active",
+                    "agent_passive",
+                    "snmpv3",
+                    "http",
+                    "sender"
+                  ]
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                }
+              },
+              "required": [
+                "code",
+                "label"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 5,
+            "maxItems": 5
+          },
+          "state_dimensions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "const": "lifecycle_state"
+                    },
+                    "values": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "enum": [
+                              "planned",
+                              "procured",
+                              "onboarding",
+                              "in_service",
+                              "maintenance",
+                              "suspended",
+                              "retired",
+                              "disposed"
+                            ]
+                          },
+                          "label": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "label"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 8,
+                      "maxItems": 8
+                    }
+                  },
+                  "required": [
+                    "field",
+                    "values"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "const": "sync_state"
+                    },
+                    "values": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "enum": [
+                              "synced",
+                              "syncing",
+                              "failed",
+                              "drifted"
+                            ]
+                          },
+                          "label": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "label"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 4,
+                      "maxItems": 4
+                    }
+                  },
+                  "required": [
+                    "field",
+                    "values"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "const": "health_state"
+                    },
+                    "values": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "enum": [
+                              "normal",
+                              "problem",
+                              "unknown",
+                              "maintenance"
+                            ]
+                          },
+                          "label": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "label"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 4,
+                      "maxItems": 4
+                    }
+                  },
+                  "required": [
+                    "field",
+                    "values"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "const": "billable"
+                    },
+                    "values": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "enum": [
+                              "yes",
+                              "no",
+                              "addon"
+                            ]
+                          },
+                          "label": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "label"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    }
+                  },
+                  "required": [
+                    "field",
+                    "values"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "unresolved": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "enum": [
+                    "L2_COUNT_CONFLICT",
+                    "MONITORING_TYPE_MAPPING_PENDING",
+                    "IMPORT_COLLECTION_METHOD_CONFLICT",
+                    "NOTE_REQUIREDNESS_CONFLICT"
+                  ]
+                },
+                "resolution": {
+                  "type": "null"
+                }
+              },
+              "required": [
+                "code",
+                "resolution"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "runtime_publication": {
+            "const": false
+          },
+          "asset_mutations": {
+            "const": false
+          },
+          "production_approved": {
+            "const": false
+          }
+        },
+        "required": [
+          "tenant_id",
+          "catalog_version",
+          "catalog_hash",
+          "scope",
+          "primary_types",
+          "subtypes",
+          "attributes",
+          "collection_methods",
+          "state_dimensions",
+          "unresolved",
+          "runtime_publication",
+          "asset_mutations",
+          "production_approved"
+        ],
+        "additionalProperties": false
+      },
+      "CmdbTypeCatalogResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CmdbTypeCatalog"
           },
           "trace_id": {
             "type": "string"

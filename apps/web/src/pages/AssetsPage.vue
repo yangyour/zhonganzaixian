@@ -18,6 +18,7 @@ import type { HttpClockObservation } from '../utils/httpResponseClock'
 import PermissionGate from '../components/PermissionGate.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import AssetImportWorkspace from '../components/AssetImportWorkspace.vue'
+import CmdbTypeCatalogPanel from '../components/CmdbTypeCatalogPanel.vue'
 import AssetDependencyWorkspace from '../components/AssetDependencyWorkspace.vue'
 import AssetMetadataWorkspace from '../components/AssetMetadataWorkspace.vue'
 import ManualWarrantyWorkspace from '../components/ManualWarrantyWorkspace.vue'
@@ -202,6 +203,7 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
         <div class="asset-select-filters"><el-select v-model="filters.type" clearable placeholder="全部类型" aria-label="设备类型"><el-option v-for="type in assetTypes" :key="type.value" :label="type.label" :value="type.value" /></el-select><el-input v-model="filters.site_id" clearable placeholder="全部站点 / 站点 ID" aria-label="站点 ID" enterkeyhint="search" /><el-button type="primary" native-type="submit" :disabled="loading">查询</el-button><el-button :disabled="loading" @click="resetFilters">重置</el-button><el-button :icon="Refresh" :loading="loading" aria-label="刷新已应用的资产筛选" title="仅刷新已应用条件，保留未提交输入" @click="loadAssets">刷新</el-button></div>
         <div v-if="metadataAllowed" class="asset-extended-filters"><span class="extended-filter-label">高级检索</span><el-button text bg size="small" @click="metadataQueryOpen = true">扩展资料检索</el-button><PermissionGate capability="asset_dates:read"><el-button text bg size="small" @click="dateQueryOpen = true">维保与超期筛查</el-button></PermissionGate><span class="asset-table-scope">统计范围：本页记录</span></div>
       </el-form>
+      <CmdbTypeCatalogPanel />
       <AppliedFilters :items="filterItems" :pending="pendingFilters" :loading="loading" :failed="Boolean(error)" :loaded="loaded" :count="rows.length" @remove="removeFilter" @clear="resetFilters" />
       <ApiErrorNotice :error="error" guidance="请点击“重试”重新加载当前列表。"><el-button size="small" @click="loadAssets">重试</el-button></ApiErrorNotice>
       <AppTable v-if="assetView === 'list'" :error="error" :rows="rows" :loading="loading" :empty-text="error ? '列表加载失败，请点击重试' : !loaded ? '正在读取资产列表…' : filterItems.length ? '未找到匹配资产，可调整或清空筛选条件' : '当前授权范围内暂无资产'">

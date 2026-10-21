@@ -101,13 +101,13 @@ describe('service tiers and ticket SLA clock inspection',()=>{
   x.request
    .mockResolvedValueOnce(page())
    .mockRejectedValueOnce(new ApiError(503,'UPSTREAM_UNAVAILABLE','timeout','t'))
-   .mockResolvedValueOnce(snapshot({version:3,tier:'BASIC'}))
-   .mockResolvedValueOnce(page([changeRow({version:3,previous_version:2,from_tier:'ADVANCED',to_tier:'BASIC'})],{current:snapshot({version:3,tier:'BASIC'})}))
+   .mockResolvedValueOnce(snapshot({version:3,tier:'BASIC',effective_mode:'NEXT_MONTH_FIRST_DAY',contract_device_count:80,monthly_fee_fen:1500000}))
+   .mockResolvedValueOnce(page([changeRow({version:3,previous_version:2,from_tier:'ADVANCED',to_tier:'BASIC'})],{current:snapshot({version:3,tier:'BASIC',effective_mode:'NEXT_MONTH_FIRST_DAY',contract_device_count:80,monthly_fee_fen:1500000})}))
   await x.w.load(false)
   expect(await x.w.submitChange({
    to_tier:'BASIC',effective_mode:'NEXT_MONTH_FIRST_DAY',
    contract_device_count:80,billing_cycle:'MONTHLY',monthly_fee_fen:1500000,reason:'SYNTHETIC_DOWNGRADE'
-  })).toBe(false)
+  },2)).toBe(false)
   expect(x.w.unresolved()).toBe(true)
   expect(await x.w.retry()).toBe(true)
   expect(x.w.unresolved()).toBe(false)
@@ -125,7 +125,7 @@ describe('service tiers and ticket SLA clock inspection',()=>{
   expect(await x.w.submitChange({
    to_tier:'BASIC',effective_mode:'IMMEDIATE',
    contract_device_count:null,billing_cycle:null,monthly_fee_fen:null,reason:'DENIED'
-  })).toBe(false)
+  },2)).toBe(false)
   expect(await x.w.inspectTicketSla(ticket)).toBe(true)
   expect(x.w.state().slaInspection?.metric_version).toBe('SLA_CLOCK_V2')
  })
@@ -141,3 +141,13 @@ describe('service tiers and ticket SLA clock inspection',()=>{
   expect(pageSource).toContain('UNVERIFIED')
  })
 })
+
+it.each(['1.2','1e3','-1','12abc','Infinity','9007199254740992'])('rejects malformed numeric text %s instead of truncating or null fallback',async value=>{const {parseOptionalTierInteger}=await import('../src/utils/serviceTiers');expect(()=>parseOptionalTierInteger(value,Number.MAX_SAFE_INTEGER-1)).toThrow()})
+it('keeps blank unknown distinct from exact integer zero and enforces safe technical bounds',async()=>{const {parseOptionalTierInteger}=await import('../src/utils/serviceTiers');expect(parseOptionalTierInteger('',1000000)).toBeNull();expect(parseOptionalTierInteger('0',1000000)).toBe(0);expect(parseOptionalTierInteger('00025',1000000)).toBe(25);expect(parseOptionalTierInteger('9007199254740990',Number.MAX_SAFE_INTEGER-1)).toBe(9007199254740990);expect(()=>parseOptionalTierInteger('1000001',1000000)).toThrow()})
+const tierCommand={to_tier:'BASIC' as const,effective_mode:'NEXT_MONTH_FIRST_DAY' as const,contract_device_count:80,billing_cycle:'MONTHLY' as const,monthly_fee_fen:1500000,reason:'SYNTHETIC_DOWNGRADE'}
+const tierReceipt=()=>snapshot({version:3,tier:'BASIC',effective_mode:'NEXT_MONTH_FIRST_DAY',contract_device_count:80,monthly_fee_fen:1500000})
+it.each([{tier:'STANDARD'},{updated_by:'55000000-0000-4000-8000-000000000099'},{effective_mode:'IMMEDIATE'},{contract_device_count:79},{billing_cycle:null},{monthly_fee_fen:1499999}])('mismatched original tier receipt stays unknown: %j',async patch=>{const x=setup();x.request.mockResolvedValueOnce(page()).mockResolvedValueOnce({...tierReceipt(),...patch}).mockResolvedValueOnce(tierReceipt()).mockResolvedValueOnce(page());await x.w.load();expect(await x.w.submitChange(tierCommand,2)).toBe(false);expect(x.w.unresolved()).toBe(true);expect(await x.w.retry()).toBe(true);expect(x.key).toHaveBeenCalledTimes(1);expect(x.request.mock.calls[1]![1].body).toEqual(x.request.mock.calls[2]![1].body)})
+it('rejects stale prepared version or invalid numeric values before writing',async()=>{const x=setup();x.request.mockResolvedValueOnce(page());await x.w.load();expect(await x.w.submitChange(tierCommand,1)).toBe(false);expect(await x.w.submitChange({...tierCommand,monthly_fee_fen:1.2},2)).toBe(false);expect(await x.w.submitChange({...tierCommand,contract_device_count:1000001},2)).toBe(false);expect(x.key).not.toHaveBeenCalled()})
+it('retains verified receipt when readback fails and does not repeat accepted write',async()=>{const x=setup();x.request.mockResolvedValueOnce(page()).mockResolvedValueOnce(tierReceipt()).mockRejectedValueOnce(new Error('offline'));await x.w.load();expect(await x.w.submitChange(tierCommand,2)).toBe(true);expect(x.w.state().receipt).toEqual(tierReceipt());expect(x.w.state().page).toBeNull();expect(x.w.unresolved()).toBe(false);expect(await x.w.retry()).toBe(false)})
+it('scope reset aborts ticket SLA reads and rejects late old result',async()=>{let finish!:(v:unknown)=>void;const x=setup();x.request.mockImplementationOnce(()=>new Promise(r=>finish=r));const pending=x.w.inspectTicketSla(ticket);x.w.reset(null);expect(x.request.mock.calls[0]![1].signal.aborted).toBe(true);finish(slaPayload());expect(await pending).toBe(false);expect(x.w.state().slaInspection).toBeNull()})
+it('confirmed-write readback cannot signal success after scope reset',async()=>{let finish!:(v:unknown)=>void;const x=setup();x.request.mockResolvedValueOnce(page()).mockResolvedValueOnce(tierReceipt()).mockImplementationOnce(()=>new Promise(r=>finish=r));await x.w.load();const pending=x.w.submitChange(tierCommand,2);await vi.waitFor(()=>expect(x.request).toHaveBeenCalledTimes(3));x.w.reset(null);finish(page());expect(await pending).toBe(false);expect(x.w.state().receipt).toBeNull()})

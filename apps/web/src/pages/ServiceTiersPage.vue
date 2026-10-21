@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import {computed,onUnmounted,ref,shallowRef,watch} from 'vue'
+import {ElMessageBox} from 'element-plus'
 import {onBeforeRouteLeave} from 'vue-router'
 import {api} from '../api/client'
 import {can,contextGeneration,session,switchingTenant} from '../stores/session'
 import {contextTransitionGuards} from '../utils/contextTransitionGuard'
 import {
  billingCycleLabels,clockStatusLabels,createServiceTierWorkspace,effectiveModeLabels,
- emptyServiceTierState,tierLabels,type BillingCycle,type EffectiveMode,type ServiceTierCode,type ServiceTierState
+ emptyServiceTierState,tierLabels,parseOptionalTierInteger,type BillingCycle,type EffectiveMode,type ServiceTierCode,type ServiceTierState
 } from '../utils/serviceTiers'
 import {displayTime} from '../utils/display'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
@@ -17,8 +18,8 @@ const internal=computed(()=>['padmin','msp'].includes(session.value?.user.role??
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&internal.value&&can('sla_scenarios:read')&&!switchingTenant.value))
 const canWrite=computed(()=>Boolean(permitted.value&&session.value?.user.role==='padmin'&&can('configurations:write')))
 const tab=ref<'ledger'|'sla'>('ledger')
-const toTier=ref<ServiceTierCode>('STANDARD')
-const effectiveMode=ref<EffectiveMode>('IMMEDIATE')
+const toTier=ref<ServiceTierCode|''>('')
+const effectiveMode=ref<EffectiveMode|''>('')
 const deviceCount=ref<string>('')
 const billingCycle=ref<BillingCycle|''>('')
 const monthlyFeeFen=ref<string>('')
@@ -26,35 +27,41 @@ const reason=ref('')
 const ticketIdInput=ref('')
 const blocked=ref(false)
 
-const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,permitted.value,canWrite.value]))
+const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value,canWrite.value]))
 const locked=computed(()=>!!state.value.busy||workspace.unresolved())
 
+const preparedVersion=ref<number|null>(null),validation=ref(''),baseline=ref('')
+const formSignature=()=>JSON.stringify([toTier.value,effectiveMode.value,deviceCount.value,billingCycle.value,monthlyFeeFen.value,reason.value])
+const dirty=computed(()=>preparedVersion.value!==null&&formSignature()!==baseline.value)
+const formLocked=computed(()=>locked.value||preparedVersion.value===null)
+const sourceChanged=computed(()=>preparedVersion.value!==null&&state.value.page!==null&&preparedVersion.value!==(state.value.page.current?.version??0))
+function clearForm(){preparedVersion.value=null;toTier.value='';effectiveMode.value='';deviceCount.value='';billingCycle.value='';monthlyFeeFen.value='';reason.value='';validation.value='';baseline.value=formSignature()}
+async function confirmDiscard(){if(!dirty.value)return true;try{await ElMessageBox.confirm('丢弃尚未保存的档位、费用和变更原因？已保存记录不受影响。','保留档位输入',{confirmButtonText:'丢弃输入',cancelButtonText:'继续编辑',type:'warning'});return true}catch{return false}}
+async function prepareChange(){if(!canWrite.value||locked.value||!state.value.page)return false;const turn=context.value;if(!await confirmDiscard()||turn!==context.value||!state.value.page)return false;const current=state.value.page.current;preparedVersion.value=current?.version??0;toTier.value=current?.tier??'';effectiveMode.value=current?.effective_mode??'';deviceCount.value=current?.contract_device_count===null||!current?'':String(current.contract_device_count);billingCycle.value=current?.billing_cycle??'';monthlyFeeFen.value=current?.monthly_fee_fen===null||!current?'':String(current.monthly_fee_fen);reason.value='';validation.value='';baseline.value=formSignature();return true}
+async function recover(){if(await workspace.retry())clearForm()}
 watch(context,()=>{
  const s=session.value
- tab.value='ledger'
+ tab.value='ledger';clearForm();ticketIdInput.value='';blocked.value=false
  workspace.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,canWrite:canWrite.value}:null)
  if(permitted.value)void workspace.load(false)
 },{immediate:true,flush:'sync'})
 
 async function submitChange(){
- const devices=deviceCount.value.trim()===''?null:Number.parseInt(deviceCount.value.trim(),10)
- const fee=monthlyFeeFen.value.trim()===''?null:Number.parseInt(monthlyFeeFen.value.trim(),10)
- const ok=await workspace.submitChange({
-  to_tier:toTier.value,
-  effective_mode:effectiveMode.value,
-  contract_device_count:devices!==null&&Number.isFinite(devices)?devices:null,
-  billing_cycle:billingCycle.value===''?null:billingCycle.value,
-  monthly_fee_fen:fee!==null&&Number.isFinite(fee)?fee:null,
-  reason:reason.value
- })
- if(ok)reason.value=''
+ if(formLocked.value||!toTier.value||!effectiveMode.value||preparedVersion.value===null)return false
+ validation.value=''
+ let devices:number|null,fee:number|null
+ try{devices=parseOptionalTierInteger(deviceCount.value,1000000);fee=parseOptionalTierInteger(monthlyFeeFen.value,Number.MAX_SAFE_INTEGER-1)}catch(error){validation.value=error instanceof Error?error.message:'数字格式无效';return false}
+ const ok=await workspace.submitChange({to_tier:toTier.value,effective_mode:effectiveMode.value,contract_device_count:devices,billing_cycle:billingCycle.value===''?null:billingCycle.value,monthly_fee_fen:fee,reason:reason.value},preparedVersion.value)
+ if(ok)clearForm();return ok
 }
 
-function mayLeave(){if(workspace.unresolved()){blocked.value=true;return false}return true}
+async function mayLeave(){if(workspace.unresolved()){blocked.value=true;return false}const turn=context.value;return await confirmDiscard()&&turn===context.value}
 onBeforeRouteLeave(mayLeave)
 const unregister=contextTransitionGuards.register(mayLeave)
-onUnmounted(()=>{unregister();workspace.dispose()})
-defineExpose({state,workspace,mayLeave})
+function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()||dirty.value){event.preventDefault();event.returnValue=''}}
+window.addEventListener('beforeunload',beforeUnload)
+onUnmounted(()=>{unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
+defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,preparedVersion,validation,dirty,toTier,effectiveMode,deviceCount,billingCycle,monthlyFeeFen,reason,ticketIdInput})
 </script>
 <template>
  <section class="service-tiers">
@@ -72,19 +79,19 @@ defineExpose({state,workspace,mayLeave})
    </p>
    <div class="proto-kpis">
     <div>
-     <span>当前档位</span>
-     <b>{{ state.page?.current ? tierLabels[state.page.current.tier] : '未登记' }}</b>
+     <span>最新登记档位</span>
+     <b>{{ state.page?.current ? tierLabels[state.page.current.tier] : state.page?'未登记':'尚未读取或读取失败' }}</b>
      <small>版本 {{ state.page?.current ? `v${state.page.current.version}` : '—' }}</small>
     </div>
     <div>
      <span>可用性目标</span>
-     <b>{{ state.page?.current?.availability_target != null ? `${state.page.current.availability_target}%` : '待配置' }}</b>
+     <b>{{ state.page?.current?.availability_target != null ? `${state.page.current.availability_target}%` : state.page?'待配置':'未知' }}</b>
      <small>来自 sla.tier_availability_target</small>
     </div>
     <div>
      <span>生效方式</span>
      <b>{{ state.page?.current ? effectiveModeLabels[state.page.current.effective_mode] : '—' }}</b>
-     <small>{{ state.page?.current ? displayTime(state.page.current.effective_from) : '尚未设置' }}</small>
+     <small>{{ state.page?.current ? displayTime(state.page.current.effective_from) : state.page?'尚未设置':'未知' }}</small>
     </div>
     <div>
      <span>在途工单追溯</span>
@@ -105,30 +112,34 @@ defineExpose({state,workspace,mayLeave})
     <template v-if="tab==='ledger'">
      <ApiErrorNotice :error="state.error" />
      <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">服务档位变更提交结果尚未确认，请点击下方按钮重试。</p>
-     <button v-if="state.attempt&&!state.busy" type="button" @click="workspace.retry()">重试提交变更</button>
+     <button v-if="state.attempt&&!state.busy" type="button" @click="recover">重试提交变更</button>
      <p v-if="state.busy" role="status" aria-live="polite">{{ state.busy==='write'?'正在提交服务档位变更…':'正在读取服务档位台账…' }}</p>
 
+     <p v-if="state.receipt" role="status">原保存回执已核对：v{{state.receipt.version}}，商务审批仍待核验。回读失败不代表保存失败，不自动重复提交。</p>
+     <button v-if="canWrite&&state.page" type="button" :disabled="locked" @click="prepareChange">按当前快照准备变更</button>
+     <p v-if="sourceChanged" role="alert">当前版本已变化，请重新准备并核对变更；旧输入未自动覆盖。</p>
+     <p v-if="validation" role="alert">{{validation}}</p>
      <form v-if="canWrite&&state.page" class="tier-form" @submit.prevent="submitChange">
-      <h2>登记服务档位变更</h2>
+      <h2>登记服务档位变更</h2><p>先准备明确源版本。数字只接受十进制非负整数，空白保留为 null，不自动补金额或合同设备数。</p>
       <div class="form-grid">
        <label>目标档位
-        <select v-model="toTier" :disabled="locked">
+        <select v-model="toTier" :disabled="formLocked" required><option value="">明确选择目标档位</option>
          <option value="BASIC">基础版（5×8 工作日历）</option>
          <option value="STANDARD">标准版（7×24 全天）</option>
          <option value="ADVANCED">高级版（7×24 高优保障）</option>
         </select>
        </label>
        <label>生效方式
-        <select v-model="effectiveMode" :disabled="locked">
+        <select v-model="effectiveMode" :disabled="formLocked" required><option value="">明确选择生效方式</option>
          <option value="IMMEDIATE">立即生效</option>
          <option value="NEXT_MONTH_FIRST_DAY">次月 1 日 00:00 生效（Asia/Shanghai）</option>
         </select>
        </label>
        <label>合同设备数（可选）
-        <input v-model="deviceCount" type="number" min="0" max="1000000" placeholder="选填，未填则暂不登记" :disabled="locked" />
+        <input v-model="deviceCount" type="text" inputmode="numeric" aria-label="合同设备数" placeholder="选填，未填则暂不登记" :disabled="formLocked" />
        </label>
        <label>计费周期（可选）
-        <select v-model="billingCycle" :disabled="locked">
+        <select v-model="billingCycle" :disabled="formLocked">
          <option value="">暂不指定</option>
          <option value="MONTHLY">按月</option>
          <option value="QUARTERLY">按季</option>
@@ -136,17 +147,17 @@ defineExpose({state,workspace,mayLeave})
         </select>
        </label>
        <label>月度服务费（分，可选）
-        <input v-model="monthlyFeeFen" type="number" min="0" placeholder="选填，单位：分" :disabled="locked" />
+        <input v-model="monthlyFeeFen" type="text" inputmode="numeric" aria-label="月度服务费（分）" placeholder="选填，单位：分" :disabled="formLocked" />
        </label>
        <label class="wide">变更原因（必填）
-        <input v-model="reason" type="text" maxlength="1000" required placeholder="请说明档位调整依据；保存后作为历史台账留存" :disabled="locked" />
+        <input v-model="reason" type="text" maxlength="1000" required placeholder="请说明档位调整依据；保存后作为历史台账留存" :disabled="formLocked" />
        </label>
       </div>
-      <button type="submit" class="tier-submit-btn" :disabled="locked||!reason.trim()">保存档位变更（当前版本 v{{ state.page.current?.version ?? 0 }}）</button>
+      <button type="submit" class="tier-submit-btn" :disabled="formLocked||sourceChanged||!reason.trim()">保存档位变更（源版本 v{{ preparedVersion??'未准备' }}）</button>
      </form>
 
      <template v-if="state.page">
-      <div class="proto-table-wrap">
+      <div class="proto-table-wrap" tabindex="0" role="region" aria-label="服务档位变更历史，可横向滚动">
        <table class="proto-table">
         <thead>
          <tr><th>版本</th><th>原档位 → 新档位</th><th>可用性目标</th><th>生效方式 / 时间</th><th>合同设备数 / 周期</th><th>变更原因</th><th>记录时间</th></tr>
@@ -165,6 +176,7 @@ defineExpose({state,workspace,mayLeave})
        </table>
        <p v-if="!state.page.items.length" class="panel">当前租户尚无服务档位变更记录。</p>
       </div>
+      <button type="button" :disabled="locked" @click="workspace.load(false)">返回第一页</button>
       <button type="button" :disabled="locked||!state.page.has_more" @click="workspace.load(true)">下一页</button>
      </template>
     </template>

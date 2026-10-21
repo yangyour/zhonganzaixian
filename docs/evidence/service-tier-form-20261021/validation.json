@@ -1,0 +1,19 @@
+{
+  "base_commit": "fee3e505f9960ab8c17128c781f9a071b2ac1346",
+  "scope": "SERVICE_TIER_FORM_NUMERIC_AND_ORIGINAL_REQUEST_PROTECTION",
+  "web_tests": 2666,
+  "new_tests": 25,
+  "focused_tests": 32,
+  "contract_tests": 161,
+  "typecheck_build_static_gates": "PASS",
+  "build_id": "dcbdb547a3d50df65ba01b281cd52067550dd51514ee5d0a6058c3cda54eedff",
+  "new_real_http": "NOT_RUN",
+  "browser_axe": "NOT_RUN_ENVIRONMENT_BLOCKED",
+  "backend_migrations": "UNCHANGED",
+  "source_sha256": {
+    "apps/web/src/utils/serviceTiers.ts": "bbb7ed4f32b78ec98f642df405baafca462dbddde106e08643dd54cbe92c3703",
+    "apps/web/src/pages/ServiceTiersPage.vue": "1a8bf46844b4aae648f3170bbe93287d27408bb3c8d7567d19921055dc28f373",
+    "apps/web/tests/serviceTiers.test.ts": "8658e2533db0de1a9e658bdd4fc7b73e1839471e3996b5455e52629a55cef508",
+    "apps/web/tests/serviceTiersPage.test.ts": "48e1c4878aa83ec27cbd1c17c3ae93341993a03fa3e8765bc943d067b08a0ecc"
+  }
+}

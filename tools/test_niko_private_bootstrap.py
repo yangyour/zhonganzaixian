@@ -96,7 +96,7 @@ class MigrationManifestParityTest(unittest.TestCase):
    text=(ROOT/entrypoint).read_text();names=re.findall(r"(?:frozen|candidate)-[a-z-]+\.json",text);self.assertEqual(len(names),len(set(names)));expected={}
    for name in names:
     values=json.loads((ROOT/'tools/niko-test'/name).read_text())['sha256'];self.assertTrue(set(values).isdisjoint(expected));expected.update(values)
-   self.assertEqual(actual,expected);self.assertEqual(set(range(1,48)),{int(name.split('__')[0][1:]) for name in expected})
+   self.assertEqual(actual,expected);self.assertEqual(set(range(1,49)),{int(name.split('__')[0][1:]) for name in expected})
    if entrypoint.endswith('.ps1'):
     # Manifest parity alone misses a stale runtime upper bound or expected count.
     maximum=re.findall(r'\$version -gt ([0-9]+)',text)
@@ -137,7 +137,7 @@ class MigrationManifestParityTest(unittest.TestCase):
   expected=set(re.findall(r'"(--apply-[a-z-]+)"\.equals\(args\[0\]\)',java))|{'--check','--initialize-new-niko-database'}
   self.assertEqual(len(modes),len(set(modes)));self.assertEqual(expected,set(modes))
  def test_identity_modes_are_admitted_before_frozen_resource_checks(self):
-  for mode in ['--apply-project-identity','--apply-identity-compatibility','--apply-raw-monitoring-events','--apply-monitoring-quarantine','--apply-export-inbox','--apply-runtime-configuration','--apply-ticket-workflow','--apply-notification-intents','--apply-service-tiers','--apply-oncall-escalation','--apply-monitoring-event-center','--apply-change-notice-approval','--apply-inspection-quarterly-reports','--apply-ticket-lifecycle','--apply-ticket-autoclose','--apply-ticket-sla-policy','--apply-sla-reminders','--apply-backup-device-coordination','--apply-backup-run-journal']:
+  for mode in ['--apply-project-identity','--apply-identity-compatibility','--apply-raw-monitoring-events','--apply-monitoring-quarantine','--apply-export-inbox','--apply-runtime-configuration','--apply-ticket-workflow','--apply-notification-intents','--apply-service-tiers','--apply-oncall-escalation','--apply-monitoring-event-center','--apply-change-notice-approval','--apply-inspection-quarterly-reports','--apply-ticket-lifecycle','--apply-ticket-autoclose','--apply-ticket-sla-policy','--apply-sla-reminders','--apply-backup-device-coordination','--apply-backup-run-journal','--apply-backup-archive-staging']:
    with self.subTest(mode=mode),tempfile.TemporaryDirectory() as d:
     result=subprocess.run([sys.executable,str(ROOT/'tools/niko-test/run-migration.py'),mode],cwd=d,capture_output=True,text=True)
     self.assertNotEqual(0,result.returncode)
@@ -200,13 +200,15 @@ class BackupRunMigrationEntrypointTest(unittest.TestCase):
   self.assertEqual(len(entries),len({key for key,_ in entries}))
   features=dict(entries)
   self.assertEqual('--apply-backup-run-journal',features['backup-run-journal'])
+  self.assertEqual('--apply-backup-archive-staging',features['backup-archive-staging'])
   self.assertEqual('--apply-backup-device-coordination',features['backup-device-coordination'])
 
  def test_windows_backup_verifiers_must_be_fresh(self):
   windows=(ROOT/'deploy/migrate-test-schema.ps1').read_text()
-  for name in ['BackupDeviceLeaseSchemaVerifier','BackupRunSchemaVerifier']:
+  for name in ['BackupDeviceLeaseSchemaVerifier','BackupRunSchemaVerifier','BackupArchiveSchemaVerifier']:
    self.assertIn(name+'.java',windows)
    self.assertIn(name+'.class',windows)
   self.assertIn('$backupRunVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $backupRunVerifierSource).LastWriteTimeUtc',windows)
+  self.assertIn('$backupArchiveVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $backupArchiveVerifierSource).LastWriteTimeUtc',windows)
 
 if __name__=='__main__':unittest.main()

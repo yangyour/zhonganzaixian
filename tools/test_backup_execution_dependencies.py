@@ -18,6 +18,13 @@ class BackupExecutionDependenciesTest(unittest.TestCase):
             self.assertIsNone(d[key])
         self.assertIs(d['backup_execution_enabled'],False)
 
+    def test_archive_staging_requires_explicit_proofs_and_capacity_policy(self):
+        d=json.loads((ROOT/'deploy/examples/backup-execution-dependencies.json').read_text())
+        for key in ['archive_staging_authorizer_reference','archive_no_dispatch_proof_verifier_reference','archive_original_object_verifier_reference','encrypted_staging_capacity_and_retention_reference']:
+            self.assertIn(key,d)
+            self.assertIsNone(d[key])
+        self.assertIs(d['backup_execution_enabled'],False)
+
     def test_all_runtime_slots_are_existing_unpublished_keys(self):
         d=json.loads((ROOT/'deploy/examples/backup-execution-dependencies.json').read_text())
         keys={s['key'] for s in json.loads((ROOT/'contracts/config-baseline.json').read_text())['settings']}

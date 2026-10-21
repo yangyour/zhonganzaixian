@@ -1,0 +1,252 @@
+{
+  "tables": [
+    {
+      "name": "mop_backup_archive_event",
+      "indexes": [
+        "CREATE UNIQUE INDEX mop_backup_archive_event_pkey ON public.mop_backup_archive_event USING btree (tenant_id, version_id, event_version)",
+        "CREATE UNIQUE INDEX mop_backup_archive_event_tenant_id_version_id_command_id_key ON public.mop_backup_archive_event USING btree (tenant_id, version_id, command_id)",
+        "CREATE UNIQUE INDEX mop_backup_archive_dispatch_once ON public.mop_backup_archive_event USING btree (tenant_id, dispatch_id) WHERE ((action)::text = 'START_STORE'::text)"
+      ],
+      "constraints": [
+        {
+          "name": "mop_backup_archive_event_action_check",
+          "type": "c",
+          "sha256": "d04fdb7775b3c8caaf428cde41fe22a9c6784b46bc9db1a47252612b2e7c7257",
+          "definition": "CHECK (((action)::text = ANY ((ARRAY['STAGE'::character varying, 'START_STORE'::character varying, 'MARK_UNCONFIRMED'::character varying, 'CONFIRM_NO_DISPATCH'::character varying, 'VERIFY_OBJECT'::character varying])::text[])))"
+        },
+        {
+          "name": "mop_backup_archive_event_check",
+          "type": "c",
+          "sha256": "f6a43bf86f9f2a37a76368150ca363f9e45981ccbb61f36a44cfd39ddc639630",
+          "definition": "CHECK ((((dispatch_count = 0) AND (dispatch_id IS NULL) AND (dispatch_owner IS NULL)) OR ((dispatch_count > 0) AND (dispatch_id IS NOT NULL) AND (dispatch_owner IS NOT NULL) AND (length((dispatch_owner)::text) > 0) AND ((dispatch_owner)::text !~ '[^A-Za-z0-9._:-]'::text))))"
+        },
+        {
+          "name": "mop_backup_archive_event_check1",
+          "type": "c",
+          "sha256": "e25da12e9fc3b6eb80def6768ec73034cf520a7a4667efd15f14ddfa71ab8366",
+          "definition": "CHECK (((((action)::text = 'STAGE'::text) AND ((phase)::text = 'STAGED'::text) AND (event_version = 0) AND (dispatch_count = 0)) OR (((action)::text = 'START_STORE'::text) AND ((phase)::text = 'STORE_STARTED'::text) AND (event_version > 0) AND (dispatch_count > 0)) OR (((action)::text = 'MARK_UNCONFIRMED'::text) AND ((phase)::text = 'VERIFY_REQUIRED'::text) AND (event_version > 0) AND (dispatch_count > 0)) OR (((action)::text = 'CONFIRM_NO_DISPATCH'::text) AND ((phase)::text = 'STAGED'::text) AND (event_version > 0) AND (dispatch_count > 0)) OR (((action)::text = 'VERIFY_OBJECT'::text) AND ((phase)::text = 'VERIFIED'::text) AND (event_version > 0))))"
+        },
+        {
+          "name": "mop_backup_archive_event_check2",
+          "type": "c",
+          "sha256": "670492a6d16426b490e09f3648e37fdf40ae347a2a6cfa3501376939da7f7f52",
+          "definition": "CHECK (((((action)::text = ANY ((ARRAY['CONFIRM_NO_DISPATCH'::character varying, 'VERIFY_OBJECT'::character varying])::text[])) AND (evidence_reference IS NOT NULL) AND ((evidence_reference)::text ~ '^sha256:[0-9a-f]{64}$'::text)) OR (((action)::text <> ALL ((ARRAY['CONFIRM_NO_DISPATCH'::character varying, 'VERIFY_OBJECT'::character varying])::text[])) AND (evidence_reference IS NULL))))"
+        },
+        {
+          "name": "mop_backup_archive_event_command_sha256_check",
+          "type": "c",
+          "sha256": "ba235625a1ad8d49af48b47a355c308c92dcaab6b61905a1e976630e384abdf5",
+          "definition": "CHECK (((command_sha256)::text ~ '^[0-9a-f]{64}$'::text))"
+        },
+        {
+          "name": "mop_backup_archive_event_device_execution_authorized_check",
+          "type": "c",
+          "sha256": "d5e6bc5ed36e54306c3d17a2bca2398f6dbd343a8ad022a3a93c33e7af3a4cb8",
+          "definition": "CHECK ((NOT device_execution_authorized))"
+        },
+        {
+          "name": "mop_backup_archive_event_dispatch_count_check",
+          "type": "c",
+          "sha256": "1c27cfaafce04a2acafda767ee971680fc67f74ff97ea7de20fffb4a11251ca7",
+          "definition": "CHECK (((dispatch_count >= 0) AND (dispatch_count <= '9007199254740991'::bigint)))"
+        },
+        {
+          "name": "mop_backup_archive_event_event_version_check",
+          "type": "c",
+          "sha256": "efeb218e664ec730c246fd47f2c65b782272694a175c118669782618716f49d4",
+          "definition": "CHECK (((event_version >= 0) AND (event_version <= '9007199254740991'::bigint)))"
+        },
+        {
+          "name": "mop_backup_archive_event_observed_at_check",
+          "type": "c",
+          "sha256": "c4dfa85a787bd45b6048d36b44775e58faa37c66cd6d82f242ca0148b52ba229",
+          "definition": "CHECK (((observed_at >= '0001-01-01 00:00:00+00'::timestamp with time zone) AND (observed_at <= '9999-12-31 23:59:59.999+00'::timestamp with time zone)))"
+        },
+        {
+          "name": "mop_backup_archive_event_phase_check",
+          "type": "c",
+          "sha256": "f86be8071488c7d38b1ddf800144e39052c9301926359fd05a78dbb2b56cbe7e",
+          "definition": "CHECK (((phase)::text = ANY ((ARRAY['STAGED'::character varying, 'STORE_STARTED'::character varying, 'VERIFY_REQUIRED'::character varying, 'VERIFIED'::character varying])::text[])))"
+        },
+        {
+          "name": "mop_backup_archive_event_pkey",
+          "type": "p",
+          "sha256": "8f3b80940483a712cc2cf78ffa58e8fd7c91be0e2f9b72aff5d6f4a981ee6fd1",
+          "definition": "PRIMARY KEY (tenant_id, version_id, event_version)"
+        },
+        {
+          "name": "mop_backup_archive_event_record_source_check",
+          "type": "c",
+          "sha256": "5c3f073f885f122045d9952845ecee04e48276db394dac5e2d0a5c4ecdc8cb00",
+          "definition": "CHECK (((record_source)::text = 'INTERNAL_BACKUP_ARCHIVE_JOURNAL'::text))"
+        },
+        {
+          "name": "mop_backup_archive_event_tenant_id_version_id_command_id_key",
+          "type": "u",
+          "sha256": "7d1f553d7c29c28115af94cfd5473204ce813c6e2b1b841556b1a9999182784d",
+          "definition": "UNIQUE (tenant_id, version_id, command_id)"
+        },
+        {
+          "name": "mop_backup_archive_event_tenant_id_version_id_fkey",
+          "type": "f",
+          "sha256": "ef506907b6e21c12d81f86ffa86cc0b0d9be3e8e80de5974e80eb0e336eda08a",
+          "definition": "FOREIGN KEY (tenant_id, version_id) REFERENCES mop_backup_archive_submission(tenant_id, version_id)"
+        },
+        {
+          "name": "mop_backup_archive_event_trace_id_check",
+          "type": "c",
+          "sha256": "f4b0fb98c5e3cc64ae24933ef1236fd9d362b4ade2c42a9f7139929a42917c45",
+          "definition": "CHECK (((length((trace_id)::text) > 0) AND ((trace_id)::text !~ '[^A-Za-z0-9._:-]'::text)))"
+        },
+        {
+          "name": "mop_backup_archive_event_version_registered_check",
+          "type": "c",
+          "sha256": "eade5a5bc8a47a8bc3de1427fa7e355f11b1d7db1f2c3f471ba80db9d0fb1fa6",
+          "definition": "CHECK ((NOT version_registered))"
+        }
+      ]
+    },
+    {
+      "name": "mop_backup_archive_submission",
+      "indexes": [
+        "CREATE UNIQUE INDEX mop_backup_archive_submission_pkey ON public.mop_backup_archive_submission USING btree (tenant_id, version_id)",
+        "CREATE UNIQUE INDEX mop_backup_archive_submission_tenant_id_submission_id_key ON public.mop_backup_archive_submission USING btree (tenant_id, submission_id)",
+        "CREATE UNIQUE INDEX mop_backup_archive_submission_tenant_id_run_id_attempt_numb_key ON public.mop_backup_archive_submission USING btree (tenant_id, run_id, attempt_number)",
+        "CREATE INDEX mop_backup_archive_submission_asset ON public.mop_backup_archive_submission USING btree (tenant_id, asset_id, recorded_at DESC, version_id DESC)"
+      ],
+      "constraints": [
+        {
+          "name": "mop_backup_archive_submission_attempt_number_check",
+          "type": "c",
+          "sha256": "3e7fe4ff9a56206a2d45588e45fe8c510fbfd7bc9df259de23b299165d8bbf18",
+          "definition": "CHECK (((attempt_number >= 1) AND (attempt_number <= 3)))"
+        },
+        {
+          "name": "mop_backup_archive_submission_check",
+          "type": "c",
+          "sha256": "b8ff12142fc7ce75b6f3367b5abe415b4e8c90fe8bf6762bb1f94bcb8306c7e9",
+          "definition": "CHECK ((((envelope_sha256)::text ~ '^[0-9a-f]{64}$'::text) AND (encode(sha256(encoded_envelope), 'hex'::text) = (envelope_sha256)::text)))"
+        },
+        {
+          "name": "mop_backup_archive_submission_check1",
+          "type": "c",
+          "sha256": "05e7de8fa767f00fd770c1aeab594cfbf5ca48b460948baa5f660d2414eb5923",
+          "definition": "CHECK ((((envelope_bytes >= 247) AND (envelope_bytes <= 16787456)) AND (envelope_bytes = octet_length(encoded_envelope))))"
+        },
+        {
+          "name": "mop_backup_archive_submission_check2",
+          "type": "c",
+          "sha256": "742a1509563c5a4b94917141f2ec120bc2aa88723a3de5fe0736258f6735eaf5",
+          "definition": "CHECK ((SUBSTRING(encoded_envelope FROM 1 FOR 195) = ((((((((((((int2send((24)::smallint) || convert_to('MOP_BACKUP_AES256_GCM_V1'::text, 'UTF8'::name)) || int2send((11)::smallint)) || convert_to('AES-256-GCM'::text, 'UTF8'::name)) || int2send((36)::smallint)) || convert_to((tenant_id)::text, 'UTF8'::name)) || int2send((36)::smallint)) || convert_to((asset_id)::text, 'UTF8'::name)) || int2send((36)::smallint)) || convert_to((run_id)::text, 'UTF8'::name)) || int4send(attempt_number)) || int2send((36)::smallint)) || convert_to((version_id)::text, 'UTF8'::name))))"
+        },
+        {
+          "name": "mop_backup_archive_submission_check3",
+          "type": "c",
+          "sha256": "f6d72adf51b9ea1591653c7dd022a4753b58d47f883db8a05f75b68cbc6fd683",
+          "definition": "CHECK ((SUBSTRING(encoded_envelope FROM 196 FOR (2 + octet_length((key_reference)::text))) = (int2send((octet_length((key_reference)::text))::smallint) || convert_to((key_reference)::text, 'UTF8'::name))))"
+        },
+        {
+          "name": "mop_backup_archive_submission_complete_guard",
+          "type": "t",
+          "sha256": "698fc09045e7267eeb19c5b09473ec8c40f237145be8c1cbd97b9dde2451ddc1",
+          "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "name": "mop_backup_archive_submission_device_execution_authorized_check",
+          "type": "c",
+          "sha256": "d5e6bc5ed36e54306c3d17a2bca2398f6dbd343a8ad022a3a93c33e7af3a4cb8",
+          "definition": "CHECK ((NOT device_execution_authorized))"
+        },
+        {
+          "name": "mop_backup_archive_submission_encryption_algorithm_check",
+          "type": "c",
+          "sha256": "75d4d3bdad768c05688962d91f854f069f3cf717d20822f6e5b40295b0b64625",
+          "definition": "CHECK (((encryption_algorithm)::text = 'AES-256-GCM'::text))"
+        },
+        {
+          "name": "mop_backup_archive_submission_envelope_format_check",
+          "type": "c",
+          "sha256": "8e6e58ad7a82acdea24a87cdc64b16ea6e7db5245bdada24586b2329c01cb9b4",
+          "definition": "CHECK (((envelope_format)::text = 'MOP_BACKUP_AES256_GCM_V1'::text))"
+        },
+        {
+          "name": "mop_backup_archive_submission_key_reference_check",
+          "type": "c",
+          "sha256": "05b6943bd2fc86e66dc8ecb9b60d2b24e9958d8a2b2ba41b6ceb3b6488e796fb",
+          "definition": "CHECK (((key_reference)::text ~ '^kms-key-ref:[A-Za-z0-9._-]{1,128}$'::text))"
+        },
+        {
+          "name": "mop_backup_archive_submission_pkey",
+          "type": "p",
+          "sha256": "d11400c65db23e28679b3aa52f233de6d775e1eb45e7933fb641651ffcf1e5d4",
+          "definition": "PRIMARY KEY (tenant_id, version_id)"
+        },
+        {
+          "name": "mop_backup_archive_submission_record_source_check",
+          "type": "c",
+          "sha256": "ae19628784cc7184074fbb880de30e24c961d124927b6738dddbff025eb7eb6d",
+          "definition": "CHECK (((record_source)::text = 'INTERNAL_BACKUP_ARCHIVE_STAGING'::text))"
+        },
+        {
+          "name": "mop_backup_archive_submission_recorded_at_check",
+          "type": "c",
+          "sha256": "03e64fe781185389b309b9483affb45e644aa7a948a2bd2684f56445e24d92e4",
+          "definition": "CHECK (((recorded_at >= '0001-01-01 00:00:00+00'::timestamp with time zone) AND (recorded_at <= '9999-12-31 23:59:59.999+00'::timestamp with time zone)))"
+        },
+        {
+          "name": "mop_backup_archive_submission_run_version_check",
+          "type": "c",
+          "sha256": "62e50a36d04abc6a93e8e481a68c4938ad3e7a5f078b23a064385877159e8bbb",
+          "definition": "CHECK (((run_version >= 1) AND (run_version <= '9007199254740991'::bigint)))"
+        },
+        {
+          "name": "mop_backup_archive_submission_storage_verified_check",
+          "type": "c",
+          "sha256": "e45d411180ede013acc42986bb9dc62f3891b297f052d1eae967146b4a69ea88",
+          "definition": "CHECK ((NOT storage_verified))"
+        },
+        {
+          "name": "mop_backup_archive_submission_submission_sha256_check",
+          "type": "c",
+          "sha256": "d1519f848fc26c9bb6fc296323e015bf2bc6b120afb96e0533a7fb2e09a62a6a",
+          "definition": "CHECK (((submission_sha256)::text ~ '^[0-9a-f]{64}$'::text))"
+        },
+        {
+          "name": "mop_backup_archive_submission_tenant_id_asset_id_fkey",
+          "type": "f",
+          "sha256": "402424bf77655e614f9f7e61bffc21fab99c463d5990e04d07c3bd440bf2b094",
+          "definition": "FOREIGN KEY (tenant_id, asset_id) REFERENCES mop_asset(tenant_id, id)"
+        },
+        {
+          "name": "mop_backup_archive_submission_tenant_id_run_id_attempt_numb_key",
+          "type": "u",
+          "sha256": "5f8d8a0a0dd04e83ae387ee4a929047c233c61be653d57c7bdfe11ef37144682",
+          "definition": "UNIQUE (tenant_id, run_id, attempt_number)"
+        },
+        {
+          "name": "mop_backup_archive_submission_tenant_id_run_id_run_version_fkey",
+          "type": "f",
+          "sha256": "f354d2b7a16639f35d9eb66f646c973c3c21c0d6f4d7d8aad196c8999fb937dc",
+          "definition": "FOREIGN KEY (tenant_id, run_id, run_version) REFERENCES mop_backup_run_event(tenant_id, run_id, version)"
+        },
+        {
+          "name": "mop_backup_archive_submission_tenant_id_submission_id_key",
+          "type": "u",
+          "sha256": "51534a884c0f9b9272a9e11a2b1c082c0885b15d0e02cb7eeabd346be7dc5d89",
+          "definition": "UNIQUE (tenant_id, submission_id)"
+        },
+        {
+          "name": "mop_backup_archive_submission_version_registered_check",
+          "type": "c",
+          "sha256": "eade5a5bc8a47a8bc3de1427fa7e355f11b1d7db1f2c3f471ba80db9d0fb1fa6",
+          "definition": "CHECK ((NOT version_registered))"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "mop_backup_archive_event_guard": "f5e6eb1c3e2147b17df5d45a98708aa02d05dfb7c692034a654630babd35907e",
+    "mop_backup_archive_submission_guard": "6806783752bf4e2aa13c3e677125ae21f27091019737b078b6af2c268c847684",
+    "mop_backup_archive_submission_complete_guard": "06121bf5569b03198d16210e293cf3f23a5cc49f18d08ea816f1d139c194c68e"
+  }
+}

@@ -45,3 +45,5 @@ OSS在桶版本控制Enabled或Suspended时忽略x-oss-forbid-overwrite，因此
 新增archive授权器及不可变桶治理两个null引用，backup_execution_enabled/production_approved仍false；现有test-only OSS设置与前缀未放宽。没有Spring自动装配、后台派发、真实端点/凭据绑定或生产归档。
 
 数据库版本元数据、原信封的耐久任务/幂等身份、Worker、KMS绑定、规范化索引、保留和恢复访问控制仍待开发或接入。用户不能仅填示例配置就宣称链路启用。V1–V47未改，没有新增业务API、DDL、浏览器或正式TC通过项。
+
+后续进展：[V48原加密信封与派发事实持久化](backup-archive-staging-20261021.md)已实现；上段原信封耐久任务缺口由该切片补充，版本登记、消费者及真实依赖仍未完成。

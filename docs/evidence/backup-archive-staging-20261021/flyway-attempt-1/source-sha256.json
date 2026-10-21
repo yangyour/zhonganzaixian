@@ -1,0 +1,6 @@
+{
+  "server/persistence/src/main/java/cn/mop/persistence/PostgresBackupArchiveRepository.java": "43d0d259e8e23d1daf5af904d45a1f4ba00f52f7619d9e0e65ab01bedc70f484",
+  "server/persistence/src/main/java/cn/mop/persistence/BackupArchiveSchemaVerifier.java": "6643f9fc124afdc803920a6418bde8e98d654bed4f2dd9616cadd4eb4758ea25",
+  "server/persistence/src/main/java/cn/mop/persistence/TestSchemaMigration.java": "13c64dc1ae531f164c078666725d02a4e15dddfd6f8f268eaeaac3a82b29cbed",
+  "server/persistence/src/main/resources/db/migration/V48__durable_backup_archive_staging.sql": "3dcb7d51572b6bad4d655e7814ba9d8b1d3f312b7ea23ad4a8753d1355e310da"
+}

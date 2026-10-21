@@ -1,0 +1,40 @@
+{
+  "scope": "DISPOSABLE_SYNTHETIC_STAGING_NOT_PRODUCTION",
+  "java_full_verify": {
+    "tests": 4015,
+    "executed_passed": 2996,
+    "skipped": 1019,
+    "failures": 0,
+    "errors": 0
+  },
+  "new_ordinary_tests": 19,
+  "postgres_repository_assertions": 48,
+  "postgres_schema_assertions": 9,
+  "opt_in_database_tests_default_skipped": 2,
+  "python_tests_passed": 126,
+  "node_contract_tests_passed": 173,
+  "independent_crypto_vector": "PASS",
+  "dependency_shapes_valid": true,
+  "api_contract_changed": false,
+  "frontend_changed": false,
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "formal_contract_cases_passed_added": 0,
+  "powershell_native_execution": "NOT_RUN_NO_PWSH",
+  "real_kms": "NOT_RUN",
+  "real_object_store": "NOT_RUN",
+  "physical_crash_recovery": "NOT_RUN",
+  "device_execution": false,
+  "production_approved": false,
+  "known_test_setup_corrections": [
+    "Standalone test fixture initially lacked PGSimpleDataSource import; compilation corrected before database startup.",
+    "Python frozen-version coverage expectation advanced from V47 to V48; rerun passed."
+  ],
+  "database_cleanup": {
+    "loopback_only": true,
+    "provider_sends": false,
+    "temporary_credentials_only": true,
+    "postgresql_stopped": true,
+    "temporary_database_and_credentials_removed": true,
+    "result": "PASS"
+  }
+}

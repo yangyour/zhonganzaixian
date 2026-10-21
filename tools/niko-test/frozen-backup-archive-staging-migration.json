@@ -1,0 +1,13 @@
+{
+  "status": "APPLIED_FROZEN",
+  "description": "V48 successfully applied by explicit Flyway CLI to disposable PostgreSQL 17.11; SQL bytes are now immutable. Repository integration evidence is recorded separately.",
+  "sha256": {
+    "V48__durable_backup_archive_staging.sql": "3dcb7d51572b6bad4d655e7814ba9d8b1d3f312b7ea23ad4a8753d1355e310da"
+  },
+  "guard_body_sha256": {
+    "mop_backup_archive_event_guard": "f5e6eb1c3e2147b17df5d45a98708aa02d05dfb7c692034a654630babd35907e",
+    "mop_backup_archive_submission_guard": "6806783752bf4e2aa13c3e677125ae21f27091019737b078b6af2c268c847684",
+    "mop_backup_archive_submission_complete_guard": "06121bf5569b03198d16210e293cf3f23a5cc49f18d08ea816f1d139c194c68e"
+  },
+  "first_apply_evidence": "docs/evidence/backup-archive-staging-20261021/flyway-attempt-1/v48-application.json"
+}

@@ -45,5 +45,9 @@
   "approved_kms_key_version_reference": null,
   "backup_plaintext_size_limit_reference": null,
   "backup_archive_access_authorizer_reference": null,
-  "approved_immutable_bucket_governance_reference": null
+  "approved_immutable_bucket_governance_reference": null,
+  "archive_staging_authorizer_reference": null,
+  "archive_no_dispatch_proof_verifier_reference": null,
+  "archive_original_object_verifier_reference": null,
+  "encrypted_staging_capacity_and_retention_reference": null
 }

@@ -1,6 +1,7 @@
 package cn.mop.adapters.backup;
 
 import cn.mop.domain.DomainException;
+import cn.mop.domain.backup.BackupArchivePayload;
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -10,9 +11,9 @@ import java.util.*;
 
 /** Bounded JCE envelope primitive only. No provider defaults, storage, SSH, download grant or production wiring. */
 public final class BackupEnvelopeEncryption {
- public static final String FORMAT="MOP_BACKUP_AES256_GCM_V1",ALGORITHM="AES-256-GCM";
- public static final int MAX_PLAINTEXT_BYTES=16*1024*1024,MAX_WRAPPED_KEY_BYTES=8192,NONCE_BYTES=12,TAG_BYTES=16;
- public static final int MAX_ENVELOPE_BYTES=MAX_PLAINTEXT_BYTES+MAX_WRAPPED_KEY_BYTES+2048;
+ public static final String FORMAT=BackupArchivePayload.FORMAT,ALGORITHM=BackupArchivePayload.ALGORITHM;
+ public static final int MAX_PLAINTEXT_BYTES=BackupArchivePayload.MAX_PLAINTEXT_BYTES,MAX_WRAPPED_KEY_BYTES=BackupArchivePayload.MAX_WRAPPED_KEY_BYTES,NONCE_BYTES=BackupArchivePayload.NONCE_BYTES,TAG_BYTES=BackupArchivePayload.TAG_BYTES;
+ public static final int MAX_ENVELOPE_BYTES=BackupArchivePayload.MAX_ENVELOPE_BYTES;
  public record Access(UUID tenantId,UUID actorId,long permissionVersion){public Access{if(tenantId==null||actorId==null||permissionVersion<1||permissionVersion>9007199254740991L)throw invalid();}}
  public record Scope(UUID tenantId,UUID assetId,UUID runId,int attemptNumber,UUID versionId){public Scope{if(tenantId==null||assetId==null||runId==null||versionId==null||attemptNumber<1||attemptNumber>3)throw invalid();}}
  public enum Operation{ENCRYPT,DECRYPT}

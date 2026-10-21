@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {computed,nextTick,onUnmounted,ref,shallowRef,watch,type DeepReadonly} from 'vue'
+import {sourceCmdbFindingExport,downloadCmdbFindings} from '../utils/cmdbFindingExport'
 import {api,isCancelled} from '../api/client'
 import type {AssetImportSource} from '../api/assetImportTypes'
 import {session,contextGeneration,can,switchingTenant} from '../stores/session'
@@ -8,12 +9,13 @@ import {CMDB_IMPORT_COLUMNS} from '../utils/cmdbImportPreflight'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 const props=defineProps<{source:DeepReadonly<AssetImportSource>}>()
 const readButton=ref<{ $el:HTMLButtonElement }>(),nameButton=ref<{ $el:HTMLButtonElement }>(),summary=ref<HTMLElement>(),databaseMode=ref(false)
-async function cancel(){clear();await nextTick();(databaseMode.value?nameButton:readButton).value?.$el.focus()}
+async function cancel(){clear();const turn=epoch;await nextTick();if(turn===epoch&&permitted.value)(databaseMode.value?nameButton:readButton).value?.$el.focus()}
 const result=shallowRef<SourcePreflight|null>(null),error=shallowRef<unknown>(null),busy=ref(false),page=ref(0)
 const permitted=computed(()=>session.value?.mode==='remote_test'&&can('assets:write')&&!switchingTenant.value&&session.value.tenant.id===props.source.tenant_id&&session.value.user.id===props.source.created_by)
 const key=computed(()=>JSON.stringify([contextGeneration.value,session.value?.user.id,session.value?.tenant.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,permitted.value,props.source.id,props.source.version,props.source.parse_status,props.source.parsed_artifact?.parse_hash]))
+const exportError=ref(''),exportStatus=ref('')
 let epoch=0,controller:AbortController|undefined
-function clear(){++epoch;controller?.abort();busy.value=false;error.value=null;result.value=null;page.value=0}
+function clear(){++epoch;exportError.value='';exportStatus.value='';controller?.abort();busy.value=false;error.value=null;result.value=null;page.value=0}
 async function check(database=false){
  if(!permitted.value||busy.value||props.source.parse_status!=='PARSED')return
  clear();databaseMode.value=database;const turn=epoch,source=JSON.parse(JSON.stringify(props.source)) as AssetImportSource;controller=new AbortController();const signal=controller.signal;busy.value=true
@@ -21,6 +23,7 @@ async function check(database=false){
  catch(cause){if(turn===epoch&&!isCancelled(cause))error.value=cause}
  finally{if(turn===epoch)busy.value=false}
 }
+function exportFindings(){if(!permitted.value||busy.value||!result.value)return;exportError.value='';exportStatus.value='';try{const verified=readCmdbSourcePreflight(result.value,props.source,databaseMode.value),file=sourceCmdbFindingExport(verified);downloadCmdbFindings(file);exportStatus.value=`已发起全部 ${file.findingCount} 项问题清单下载，不受分页限制；不代表已保存或允许入库。`}catch(e){exportError.value=e instanceof Error?e.message:'下载未完成，可重试。'}}
 watch(key,clear,{flush:'sync'});onUnmounted(clear)
 </script>
 <template>
@@ -32,6 +35,7 @@ watch(key,clear,{flush:'sync'});onUnmounted(clear)
   <template v-if="result"><p ref="summary" tabindex="-1" role="status">{{result.records}} 条记录，{{result.error_rows}} 条含错误，{{result.warning_rows}} 条含警告。来源版本 {{result.source_version}}。</p>
    <p v-if="result.database_checks==='EXACT_ASSET_NAMES_ONLY'">已检查当前租户库内资产名称原文是否相同，不裁剪空白、不转换大小写、不自动合并。结果仅反映本次读取快照，不预留名称。</p>
    <p>尚不能入库：{{result.database_checks==='NOT_RUN'?'数据库去重、':''}}配额、站点与负责人引用、IP 去重策略及正式发布检查未执行。Excel 数值日期保留原始日期基准，不自动猜测。</p>
+   <el-button @click="exportFindings">导出全部服务端问题 CSV</el-button><p>清单绑定本次来源版本与解析摘要，不重新查询数据库，不含原始单元格或完整源文件；不是可导入模板。</p><p v-if="exportStatus" role="status">{{exportStatus}}</p><p v-if="exportError" role="alert">{{exportError}}</p>
    <p v-if="!result.findings.length">本次有限检查未发现问题，不代表完整预检或导入通过。</p>
    <div v-else class="source-preflight-scroll" tabindex="0" role="region" aria-label="服务端逐行校验问题，可滚动查看"><table><caption>服务端来源问题，每页 25 项</caption><thead><tr><th scope="col">记录 / 源行</th><th scope="col">列</th><th scope="col">级别</th><th scope="col">说明</th></tr></thead><tbody><tr v-for="(item,index) in result.findings.slice(page*25,(page+1)*25)" :key="`${page}-${index}`"><td>{{item.record}} / {{item.source_row}}</td><td>{{CMDB_IMPORT_COLUMNS[item.column]?.label}}</td><td>{{item.level==='ERROR'?'错误':'警告'}}</td><td>{{item.message}}</td></tr></tbody></table></div>
    <nav v-if="result.findings.length>25" aria-label="服务端校验分页"><el-button :disabled="page===0" @click="page--">上一页</el-button><span>第 {{page+1}} / {{Math.ceil(result.findings.length/25)}} 页</span><el-button :disabled="(page+1)*25>=result.findings.length" @click="page++">下一页</el-button></nav>

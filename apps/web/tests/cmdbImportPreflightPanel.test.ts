@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import * as findingExport from '../src/utils/cmdbFindingExport'
 import {afterEach,expect,it,vi} from 'vitest'
 import {createApp,nextTick,type App} from 'vue'
 import Papa from 'papaparse'
@@ -45,3 +46,5 @@ it('clearing a completed result returns keyboard focus to file selection',async(
  mount();await choose(file(csv()));Array.from(host.querySelectorAll('button')).find(b=>b.textContent==='清除本地预检')!.click();await settle()
  expect(state.result).toBeNull();expect(document.activeElement).toBe(host.querySelector('input'))
 })
+it('exports all issues independently of filter/page with no raw cells and retains result on failure',async()=>{const download=vi.spyOn(findingExport,'downloadCmdbFindings').mockImplementation(()=>{});mount();await choose(file(csv()));const original=state.result;state.filter='WARNING';state.page=1;state.exportFindings();expect(download).toHaveBeenCalledOnce();expect(download.mock.calls[0]![0].findingCount).toBe(original.findings.length);expect(download.mock.calls[0]![0].csv).not.toContain('合成设备');expect(state.exportStatus).toContain('全部');download.mockImplementation(()=>{throw Error('合成下载失败')});state.exportFindings();expect(state.exportError).toContain('合成下载失败');expect(state.result).toBe(original);state.clear();state.exportFindings();expect(download).toHaveBeenCalledTimes(2);expect(state.exportStatus).toBe('')})
+it('clearing during record focus transition prevents stale focus and rejects invalid record selection',async()=>{mount();await choose(file(csv()));await state.locate(0);expect(state.selected).toBeNull();await state.locate(999);expect(state.selected).toBeNull();const pending=state.locate(2);state.clear();await pending;await settle();expect(state.selected).toBeNull();expect(host.querySelector('.preflight-detail')).toBeNull()})

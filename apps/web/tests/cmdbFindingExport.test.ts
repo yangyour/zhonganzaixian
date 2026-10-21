@@ -1,0 +1,19 @@
+import {it,expect} from 'vitest'
+import Papa from 'papaparse'
+import {localCmdbFindingExport,sourceCmdbFindingExport} from '../src/utils/cmdbFindingExport'
+import {preflightCmdbCsv,CMDB_IMPORT_COLUMNS} from '../src/utils/cmdbImportPreflight'
+import {readCmdbTypeCatalog} from '../src/utils/cmdbTypeCatalog'
+import catalogWire from '../../../fixtures/cmdb-type-catalog-controller.json'
+import {response} from './fixtures/cmdbSource'
+const catalog=readCmdbTypeCatalog(catalogWire.data,catalogWire.data.tenant_id)
+function local(){const row=Array<string>(33).fill('');row[0]='PRIVATE_RAW_CELL_NOT_EXPORTED';row[1]='SW';row[2]='192.0.2.1';return preflightCmdbCsv(Papa.unparse([CMDB_IMPORT_COLUMNS.map(c=>c.label),row]),catalog)}
+const parse=(csv:string)=>Papa.parse<Record<string,string>>(csv,{header:true,skipEmptyLines:true})
+it('local export has metadata and all findings, never original values or invented physical row',()=>{const value=local(),out=localCmdbFindingExport(value),p=parse(out.csv);expect(p.errors).toEqual([]);expect(out.csv.startsWith('\ufeff')).toBe(true);expect(p.data[0]!.row_type).toBe('SUMMARY');expect(p.data[0]!.can_import).toBe('false');expect(p.data[0]!.check_scope).toBe('LOCAL_CSV_DICTIONARY_ONLY');expect(p.data[1]!.source_row).toBe('');expect(p.data[1]!.logical_record).toBe('2');expect(p.data).toHaveLength(value.findings.length+1);expect(out.csv).not.toContain('PRIVATE_RAW_CELL_NOT_EXPORTED')})
+it('zero findings still exports non-authorizing summary without fake normal row',()=>{const v=local();v.findings=[];v.errorRows=0;v.warningRows=0;const out=localCmdbFindingExport(v),p=parse(out.csv);expect(p.data).toHaveLength(1);expect(out.findingCount).toBe(0);expect(p.data[0]!.message).toContain('不是导入许可');expect(p.data[0]!.database_checks).toBe('NOT_RUN')})
+it('server export binds the actual version, scope and parse hash without current data lookup',()=>{const out=sourceCmdbFindingExport(response.data as any),p=parse(out.csv);expect(p.data[0]!.source_id).toBe(response.data.source_id);expect(p.data[0]!.source_version).toBe(String(response.data.source_version));expect(p.data[0]!.parse_hash).toBe(response.data.parse_hash);expect(out.findingCount).toBe(response.data.findings.length)})
+it.each(['=SUM(1,2)',' +CMD','\t@RISK','-1+2','\r=HYPERLINK("https://invalid")'])('formula-like diagnostic text %j is neutralized independently of CSV quotes',message=>{const v=local();v.findings[0]!.message=message;expect(parse(localCmdbFindingExport(v).csv).data[1]!.message).toBe("'"+message)})
+it('quoted multiline Unicode diagnostic survives CSV escaping',()=>{const v=local(),message='合成😀,"说明"\n下一行';v.findings[0]!.message=message;expect(parse(localCmdbFindingExport(v).csv).data[1]!.message).toBe(message)})
+it.each(['\u0000','\ud800','\u0001'])('unsupported control or surrogate %j fails rather than replacing bytes',value=>{const v=local();v.findings[0]!.message=value;expect(()=>localCmdbFindingExport(v)).toThrow()})
+it('inconsistent summary, out-of-range positions and import permission claims reject',()=>{for(const patch of [{errorRows:1},{canImport:true},{databaseChecks:'EXACT_ASSET_NAMES_ONLY'}])expect(()=>localCmdbFindingExport({...local(),...patch} as any)).toThrow();const v=local();v.findings[0]!.record=99;expect(()=>localCmdbFindingExport(v)).toThrow();v.findings[0]!.record=2;v.findings[0]!.column=33;expect(()=>localCmdbFindingExport(v)).toThrow()})
+it('server identity and mixed check-scope claims reject',()=>{for(const patch of [{source_version:0},{parse_hash:'x'},{tenant_id:'wrong'},{database_checks:'EXACT_ASSET_NAMES_ONLY'},{production_approved:true}])expect(()=>sourceCmdbFindingExport({...response.data,...patch} as any)).toThrow()})
+it('large diagnostics refuse an oversized export rather than truncate',()=>{const v=local();v.findings=Array.from({length:50000},()=>({...v.findings[0]!,message:'合成问题'.repeat(100)}));expect(()=>localCmdbFindingExport(v)).toThrow('8 MiB')})

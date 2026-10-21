@@ -1,0 +1,71 @@
+{
+  "base_commit": "38bd6048e6924c5b7e5b86fe1a16b8539ef48f41",
+  "result": "PASS_UNIT_DOM_BUILD_STATIC",
+  "web_tests": 3226,
+  "web_files": 218,
+  "new_tests": 22,
+  "contract_tests": 173,
+  "build_id": "d9dabd649463951d07681e643940a9e192fea269c67907299b10eaba1ad8490c",
+  "bootstrap_gzip_bytes": 179732,
+  "backend_or_api_changed": false,
+  "additional_http_for_export": 0,
+  "exports_full_finding_set_not_current_page": true,
+  "raw_cells_exported": false,
+  "import_authorized": false,
+  "empty_finding_set": "SUMMARY_WITH_NON_AUTHORIZATION_BOUNDARY",
+  "formula_risk_text": "PREFIX_APOSTROPHE_AND_CSV_QUOTING",
+  "file_limit_bytes": 8388608,
+  "oversize_behavior": "REJECT_NOT_TRUNCATE",
+  "temporary_blob_cleanup": "DOM_TESTED_SUCCESS_AND_CLICK_FAILURE",
+  "identity_and_source_version_guard": "REVALIDATE_EXISTING_RESULT_NO_NEW_DATABASE_READ",
+  "browser_download_and_axe": "NOT_RUN",
+  "browser_scripts_discovered": 53,
+  "formal_acceptance": {
+    "total": 128,
+    "NOT_RUN": 128
+  },
+  "source_sha256": {
+    "apps/web/src/utils/cmdbFindingExport.ts": "5e79e19c7b584a0402325e86141be792175e90da4eadb8848e6af86d2962f9e6",
+    "apps/web/src/components/CmdbImportPreflightPanel.vue": "503967df570180ade7736856664a7db2795c1fa712e0053f52957749084a822d",
+    "apps/web/src/components/CmdbSourcePreflightPanel.vue": "0f0262a3f5a4d19150a2aa24c8bfc3b40861dfe851be9a32cab58f6bf4189654",
+    "apps/web/tests/cmdbFindingExport.test.ts": "85bff953b130c97929e84859893378b18c3e387a229cd34f188369b68da6dba2",
+    "apps/web/tests/cmdbFindingDownload.test.ts": "752978ad781d33c90b5fd51f84a1cf785e423763f0c965a72074011cd30bd8b3",
+    "apps/web/tests/cmdbImportPreflightPanel.test.ts": "4fa04403d8a61d3302286218ffec43d9bf6a294963d7df53b0bfa8f08d109c93",
+    "apps/web/tests/cmdbSourcePreflightPanel.test.ts": "acfb6ad518765a8680c881cbe20d5d8fa3117eaf40e371bb382d6a31bcaf25a4",
+    "apps/web/qa/browser/cmdb-catalog.pw.ts": "92e7d59aedcdf3220b52f9091ab208954e537f009f60d2ef3c515a31a489f98a",
+    "apps/web/qa/browser/cmdb-name.pw.ts": "19bacb6b836f85384759e13225f074408e176636151a767af40d0ff2234da193"
+  },
+  "new_browser_scripts": 2,
+  "browser_scripts_executed": 0,
+  "frontend_service_smoke": {
+    "scope": "LOOPBACK_VITE_HTTP_SMOKE_NOT_BROWSER_OR_API_ACCEPTANCE",
+    "host": "127.0.0.1",
+    "port": 28130,
+    "checks": [
+      {
+        "path": "/qa/cmdb-catalog.fixture.html",
+        "status": 200,
+        "expected_marker_present": true
+      },
+      {
+        "path": "/qa/cmdb-name.fixture.html",
+        "status": 200,
+        "expected_marker_present": true
+      },
+      {
+        "path": "/src/utils/cmdbFindingExport.ts",
+        "status": 200,
+        "expected_marker_present": true
+      },
+      {
+        "path": "/qa/quarterly-pdf.fixture.html",
+        "status": 200,
+        "expected_marker_present": true
+      }
+    ],
+    "vite_stopped": true,
+    "browser_js_executed": false,
+    "api_or_database_executed": false,
+    "command": "npm --prefix apps/web run dev -- --host 127.0.0.1 --port 28130 --strictPort"
+  }
+}

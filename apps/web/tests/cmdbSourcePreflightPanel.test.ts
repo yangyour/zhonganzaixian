@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import * as findingExport from '../src/utils/cmdbFindingExport'
 import {afterEach,beforeEach,it,expect,vi} from 'vitest'
 import {createApp,reactive,nextTick,type App} from 'vue'
 import Panel from '../src/components/CmdbSourcePreflightPanel.vue'
@@ -37,3 +38,5 @@ it('actual synthetic HTTP source and diagnostic render with bound owner scope',a
  session.value={...session.value!,user:{...session.value!.user,id:source.created_by},tenant:{id:source.tenant_id,name:'Synthetic'}};await settle();await state.check(true)
  expect(host.textContent).toContain('4 条记录，1 条含错误');expect(host.textContent).toContain('不预留名称');expect(host.textContent).not.toContain('SYNTHETIC_FOREIGN_ONLY')
 })
+it('exports complete checked result without new GET and clears access after source change',async()=>{const request=vi.spyOn(api,'request').mockResolvedValue(response.data),download=vi.spyOn(findingExport,'downloadCmdbFindings').mockImplementation(()=>{});mount();await state.check();state.page=2;state.exportFindings();expect(download).toHaveBeenCalledOnce();expect(download.mock.calls[0]![0].findingCount).toBe(response.data.findings.length);expect(request).toHaveBeenCalledTimes(1);source.version++;state.exportFindings();expect(download).toHaveBeenCalledOnce();expect(state.exportStatus).toBe('')})
+it('export error retains the checked result and never implies import or asset writes',async()=>{vi.spyOn(api,'request').mockResolvedValue(named());const download=vi.spyOn(findingExport,'downloadCmdbFindings').mockImplementation(()=>{throw Error('合成下载失败')});mount();await state.check(true);state.exportFindings();expect(state.exportError).toContain('合成下载失败');expect(state.result.database_checks).toBe('EXACT_ASSET_NAMES_ONLY');download.mockImplementation(()=>{});state.exportFindings();expect(state.exportStatus).toContain('不代表已保存或允许入库');expect(state.exportError).toBe('')})

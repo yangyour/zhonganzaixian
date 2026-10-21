@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test'
+import Papa from 'papaparse'
 import AxeBuilder from '@axe-core/playwright'
 import {readFileSync} from 'node:fs'
 const capture=JSON.parse(readFileSync(new URL('../../../../fixtures/cmdb-name-http-synthetic-20261021.json',import.meta.url),'utf8'))
@@ -25,4 +26,10 @@ test('CMDB name cancellation restores focus; revoked scope hides protected resul
  await page.goto(url);const button=page.getByRole('button',{name:'检查字典与库内重名'});await button.click();await page.getByRole('button',{name:'取消读取校验'}).click();await expect(button).toBeFocused()
  await button.click();await page.getByRole('button',{name:'模拟撤销权限'}).click();await expect(page.getByRole('region',{name:'服务端 CMDB 来源校验'})).toHaveCount(0)
  await page.waitForTimeout(500);await expect(page.getByText('条记录，',{exact:false})).toHaveCount(0)
+})
+test('source issue CSV binds current snapshot without another network check',async({page})=>{
+ let reads=0;const writes:string[]=[];page.on('request',r=>{if(!['GET','HEAD'].includes(r.method()))writes.push(r.url())});await page.route(endpoint,route=>{reads++;return route.fulfill({json:{data:capture.name_check,trace_id:'synthetic'}})})
+ await page.goto(url);await page.getByRole('button',{name:'检查字典与库内重名'}).click();const button=page.getByRole('button',{name:'导出全部服务端问题 CSV'});await expect(button).toBeVisible();const pending=page.waitForEvent('download');await button.click();const download=await pending;expect(await download.failure()).toBeNull();expect(download.suggestedFilename()).toBe('cmdb-source-findings.csv');const path=await download.path();expect(path).not.toBeNull()
+ const parsed=Papa.parse<Record<string,string>>(readFileSync(path!,'utf8'),{header:true,skipEmptyLines:true});expect(parsed.errors).toEqual([]);expect(parsed.data).toHaveLength(capture.name_check.findings.length+1);expect(parsed.data[0]!.source_id).toBe(capture.name_check.source_id);expect(parsed.data[0]!.parse_hash).toBe(capture.name_check.parse_hash);expect(parsed.data[0]!.database_checks).toBe('EXACT_ASSET_NAMES_ONLY');expect(parsed.data[0]!.can_import).toBe('false');expect(reads).toBe(1);expect(writes).toEqual([])
+ await page.getByRole('button',{name:'模拟撤销权限'}).click();await expect(button).toHaveCount(0)
 })

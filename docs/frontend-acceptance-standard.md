@@ -53,3 +53,7 @@ qa/browser/observation-window.pw.ts增加7项，覆盖四视口键盘/回流/axe
 ## 2026-10-21 首页工作流脚本
 
 qa/browser/dashboard-workflows.pw.ts增加6项：320/390/768/1440四视口状态筛选、键盘链接、滚动、axe，以及取消焦点和撤销权限。共32项脚本可发现，仍不是已执行通过；真实浏览器/axe继续NOT_RUN。原生DOM、生产读取器与11份实际HTTP响应回放分别记录，不合并为浏览器验收。
+
+## 当前浏览器脚本与新增恢复切片汇总
+
+在上述历史记录之后，CMDB库内重名、导入来源恢复和[PDF草稿验收矩阵](report-pdf-browser-acceptance-20261021.md)已补；再加上CMDB问题CSV导出的2项规格，共53项/7文件可发现，全部仍NOT_RUN。SLA月报、通知、备份草稿的原页恢复/取消与[CMDB问题导出](cmdb-finding-export-20261021.md)分别保留DOM及构建证据，不计作浏览器通过。128项正式TC均未改标完成。

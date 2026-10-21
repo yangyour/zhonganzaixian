@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test'
+import Papa from 'papaparse'
 import AxeBuilder from '@axe-core/playwright'
 import {readFileSync} from 'node:fs'
 const fixture=JSON.parse(readFileSync(new URL('../../../../fixtures/cmdb-type-catalog-controller.json',import.meta.url),'utf8'))
@@ -79,6 +80,16 @@ test('server source preflight shows scope-bound result without a write request',
  let reads=0
  await page.route('**/api/v1/assets/import-sources/*/cmdb-preflight',async route=>{reads++;expect(route.request().method()).toBe('GET');await route.fulfill({json:sourceFixture})})
  await page.goto(url);await page.getByRole('button',{name:'读取服务端校验结果'}).click()
- await expect(page.getByText('本次有限字典检查未发现问题，不代表完整预检或导入通过。')).toBeVisible();expect(reads).toBe(1)
+ await expect(page.getByText('本次有限检查未发现问题，不代表完整预检或导入通过。')).toBeVisible();expect(reads).toBe(1)
  await page.getByRole('button',{name:'模拟撤销权限'}).click();await expect(page.getByRole('button',{name:'读取服务端校验结果'})).toHaveCount(0)
+})
+test('local issue CSV includes every issue despite filter and excludes source cells',async({page})=>{
+ const columns=JSON.parse(readFileSync(new URL('../../src/generated/cmdbImportSchema.json',import.meta.url),'utf8')).columns
+ const row=Array<string>(33).fill('');row[0]='PRIVATE_SOURCE_VALUE_NOT_EXPORTED';row[1]='SW';row[2]='192.0.2.1';row[16]='fw_adc';row[13]='SSH'
+ const writes:string[]=[];page.on('request',r=>{if(!['GET','HEAD'].includes(r.method()))writes.push(r.url())})
+ await page.route(endpoint,route=>route.fulfill({json:fixture}));await page.goto(url);await page.getByRole('button',{name:'查看 CMDB 类型字典'}).click()
+ await page.getByLabel('选择待检查的 CSV').setInputFiles({name:'synthetic.csv',mimeType:'text/csv',buffer:Buffer.from(Papa.unparse([columns.map((c:{label:string})=>c.label),row]))})
+ await page.getByLabel('筛选检查结果').selectOption('WARNING');const pending=page.waitForEvent('download');const exportButton=page.getByRole('button',{name:'导出全部预检问题 CSV'});await exportButton.focus();await page.keyboard.press('Enter');const download=await pending
+ expect(download.suggestedFilename()).toBe('cmdb-local-findings.csv');expect(await download.failure()).toBeNull();const path=await download.path();expect(path).not.toBeNull();const csv=readFileSync(path!,'utf8'),parsed=Papa.parse<Record<string,string>>(csv,{header:true,skipEmptyLines:true});expect(parsed.errors).toEqual([]);expect(parsed.data[0]!.can_import).toBe('false');expect(parsed.data.some(r=>r.level==='ERROR')).toBe(true);expect(parsed.data.some(r=>r.level==='WARNING')).toBe(true);expect(csv).not.toContain(row[0]);expect(writes).toEqual([])
+ await page.getByRole('button',{name:'清除本地预检'}).click();await expect(exportButton).toHaveCount(0)
 })

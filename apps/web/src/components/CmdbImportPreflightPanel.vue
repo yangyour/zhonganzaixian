@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import {computed,nextTick,onUnmounted,ref,shallowRef,watch} from 'vue'
+import {localCmdbFindingExport,downloadCmdbFindings} from '../utils/cmdbFindingExport'
 import type {CmdbTypeCatalog} from '../utils/cmdbTypeCatalog'
 import {CMDB_IMPORT_COLUMNS,CMDB_MAX_FILE_BYTES,cmdbBlankCsv,preflightCmdbCsv,type CmdbPreflight} from '../utils/cmdbImportPreflight'
 const props=defineProps<{catalog:CmdbTypeCatalog}>()
 const result=shallowRef<CmdbPreflight|null>(null),error=ref(''),busy=ref(false),filename=ref(''),selected=ref<number|null>(null),page=ref(0),filter=ref('ALL')
 const fileInput=ref<HTMLInputElement>(),summary=ref<HTMLElement>(),detail=ref<HTMLElement>()
-const urls=new Set<string>();let epoch=0
+const exportError=ref(''),exportStatus=ref('')
+const urls=new Set<string>();let epoch=0,alive=true
 const issues=computed(()=>result.value?.findings.filter(f=>filter.value==='ALL'||f.level===filter.value)??[])
 const pageIssues=computed(()=>issues.value.slice(page.value*25,(page.value+1)*25))
 const selectedValues=computed(()=>selected.value===null?null:result.value?.rows[selected.value-2]??null)
-function clear(){epoch++;result.value=null;error.value='';filename.value='';busy.value=false;selected.value=null;page.value=0;filter.value='ALL';if(fileInput.value)fileInput.value.value=''}
-async function reset(){clear();await nextTick();fileInput.value?.focus()}
+function clear(){epoch++;exportError.value='';exportStatus.value='';result.value=null;error.value='';filename.value='';busy.value=false;selected.value=null;page.value=0;filter.value='ALL';if(fileInput.value)fileInput.value.value=''}
+async function reset(){clear();const turn=epoch;await nextTick();if(alive&&turn===epoch)fileInput.value?.focus()}
 async function choose(event:Event){
  const file=(event.target as HTMLInputElement).files?.[0];if(!file)return
  clear();const current=epoch;busy.value=true
@@ -21,9 +23,10 @@ async function choose(event:Event){
   let text:string;try{text=new TextDecoder('utf-8',{fatal:true}).decode(bytes)}catch{throw new Error('文件不是有效 UTF-8，请重新导出，不自动猜测编码。')}
   result.value=preflightCmdbCsv(text,props.catalog);filename.value=file.name
  }catch(cause){if(current===epoch)error.value=cause instanceof Error?cause.message:'读取未完成，请重新选择文件。'}
- finally{if(current===epoch){busy.value=false;await nextTick();summary.value?.focus()}}
+ finally{if(current===epoch){busy.value=false;await nextTick();if(alive&&current===epoch)summary.value?.focus()}}
 }
-async function locate(record:number){selected.value=record;await nextTick();detail.value?.focus()}
+async function locate(record:number){if(!alive||!result.value||!Number.isInteger(record)||record<2||record>result.value.records+1)return;const turn=epoch;selected.value=record;await nextTick();if(alive&&turn===epoch&&selected.value===record)detail.value?.focus()}
+function exportFindings(){if(!result.value||busy.value)return;exportError.value='';exportStatus.value='';try{const file=localCmdbFindingExport(result.value);downloadCmdbFindings(file);exportStatus.value=`已发起全部 ${file.findingCount} 项问题清单下载，不受当前筛选或分页限制；不代表已保存或允许入库。`}catch(e){exportError.value=e instanceof Error?e.message:'下载未完成，可重试。'}}
 function download(){
  const url=URL.createObjectURL(new Blob([cmdbBlankCsv()],{type:'text/csv;charset=utf-8'}));urls.add(url)
  const link=document.createElement('a');link.href=url;link.download='CMDB-33列-本地预检模板.csv';document.body.append(link);link.click();link.remove()
@@ -31,7 +34,7 @@ function download(){
 }
 watch(()=>[props.catalog.tenant_id,props.catalog.catalog_hash],clear,{flush:'sync'})
 watch(filter,()=>{page.value=0})
-onUnmounted(()=>{clear();for(const url of urls)URL.revokeObjectURL(url);urls.clear()})
+onUnmounted(()=>{alive=false;clear();for(const url of urls)URL.revokeObjectURL(url);urls.clear()})
 </script>
 <template>
  <section class="cmdb-preflight" aria-label="CMDB 导入本地预检">
@@ -46,6 +49,7 @@ onUnmounted(()=>{clear();for(const url of urls)URL.revokeObjectURL(url);urls.cle
    </template>
   </div>
   <template v-if="result">
+   <el-button @click="exportFindings">导出全部预检问题 CSV</el-button><p>只导出问题位置、检查范围和统计，不含原始单元格；表格公式风险文字会加单引号，不能回传作为导入文件。</p><p v-if="exportStatus" role="status">{{exportStatus}}</p><p v-if="exportError" role="alert">{{exportError}}</p>
    <label>筛选检查结果 <select v-model="filter"><option value="ALL">全部问题</option><option value="ERROR">错误</option><option value="WARNING">警告</option></select></label>
    <p v-if="!issues.length" role="status">当前筛选没有问题记录；其他未执行检查仍需完成。</p>
    <div v-else class="preflight-scroll" role="region" aria-label="逐行问题，可横向滚动" tabindex="0"><table><caption>数据记录定位（表头为第 1 条；带换行的引号单元格仍属于同一记录）</caption><thead><tr><th scope="col">记录</th><th scope="col">列</th><th scope="col">级别</th><th scope="col">原因与建议</th><th scope="col">操作</th></tr></thead><tbody><tr v-for="(item,index) in pageIssues" :key="`${page}-${index}`"><td>{{item.record}}</td><td>{{item.column===null?'整条记录':CMDB_IMPORT_COLUMNS[item.column]?.label}}</td><td>{{item.level==='ERROR'?'错误':'警告'}}</td><td>{{item.message}}</td><td><el-button :aria-label="`查看第 ${item.record} 条记录，${item.column===null?'整条记录':CMDB_IMPORT_COLUMNS[item.column]?.label}`" @click="locate(item.record)">查看原值</el-button></td></tr></tbody></table></div>

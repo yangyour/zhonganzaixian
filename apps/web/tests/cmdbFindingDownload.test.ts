@@ -1,0 +1,9 @@
+// @vitest-environment jsdom
+import {it,expect,vi,afterEach} from 'vitest'
+import {downloadCmdbFindings,CMDB_FINDING_EXPORT_MAX_BYTES,type CmdbFindingExport} from '../src/utils/cmdbFindingExport'
+const file=():CmdbFindingExport=>({csv:'\ufeff"row_type"\r\n"SUMMARY"\r\n',filename:'cmdb-local-findings.csv',findingCount:0})
+afterEach(()=>{vi.useRealTimers();vi.restoreAllMocks();vi.unstubAllGlobals()})
+function setup(){vi.useFakeTimers();const create=vi.fn((_blob:Blob)=> 'blob:synthetic-cmdb-findings'),revoke=vi.fn();vi.stubGlobal('URL',{createObjectURL:create,revokeObjectURL:revoke});return{create,revoke}}
+it('initiates an inert CSV download and revokes its short-lived object URL',async()=>{const x=setup();let name='',href='';vi.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(function(this:HTMLAnchorElement){name=this.download;href=this.href});downloadCmdbFindings(file());expect(name).toBe('cmdb-local-findings.csv');expect(href).toBe('blob:synthetic-cmdb-findings');expect(x.create.mock.calls[0]![0].type).toBe('text/csv;charset=utf-8');expect(document.querySelector('a')).toBeNull();await vi.advanceTimersByTimeAsync(1001);expect(x.revoke).toHaveBeenCalledWith(href)})
+it('failed browser click still removes link and revokes URL',async()=>{const x=setup();vi.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(()=>{throw Error('blocked')});expect(()=>downloadCmdbFindings(file())).toThrow('blocked');expect(document.querySelector('a')).toBeNull();await vi.advanceTimersByTimeAsync(1001);expect(x.revoke).toHaveBeenCalledOnce()})
+it('unexpected filename, missing schema and oversized bytes never create an object URL',()=>{const x=setup();for(const f of [{...file(),filename:'../../other.csv'},{...file(),csv:'bad'},{...file(),csv:file().csv+'a'.repeat(CMDB_FINDING_EXPORT_MAX_BYTES)}])expect(()=>downloadCmdbFindings(f as CmdbFindingExport)).toThrow();expect(x.create).not.toHaveBeenCalled()})

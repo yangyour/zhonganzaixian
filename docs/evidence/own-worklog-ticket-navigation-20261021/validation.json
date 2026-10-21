@@ -1,0 +1,30 @@
+{
+  "result": "PASS_PERMISSION_GATED_WORKLOG_TO_REGISTERED_TICKET_NAVIGATION",
+  "new_tests": 12,
+  "focused_tests_passed": 37,
+  "vitest": {
+    "files_passed": 247,
+    "tests_passed": 3873
+  },
+  "node_contract_tests_passed": 173,
+  "api_contract_check": "PASS_UNCHANGED",
+  "typecheck": "PASS",
+  "production_build": {
+    "build_id": "833a4767b0389fa1e40bb99119fbb2aeb31f70210a60c784aa69d57110c0fc30",
+    "file_count": 141,
+    "bootstrap_gzip_bytes": 179979,
+    "bootstrap_css_gzip_bytes": 62537,
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/pages/OwnWorklogsPage.vue": "1b152d50634444fe841fc2086336243207cca8816f8e19c74eea930605f65804",
+    "apps/web/tests/ownWorklogTicketNavigation.test.ts": "7e76b04bb149e1017c130a4ed7567f63a5a4771137266a3762ce10412fbfb325"
+  },
+  "real_target_vue_component_verified": true,
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "worklog_writes": 0,
+  "formal_acceptance_passes_added": 0
+}

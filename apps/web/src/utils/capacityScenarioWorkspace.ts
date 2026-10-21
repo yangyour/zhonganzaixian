@@ -8,6 +8,7 @@ export interface BenchmarkReference { reference: string; title: string; sha256: 
 export interface ScenarioInput { expected_version: 0; label: string; note: string; calculation: CapacityInput; benchmark_reference: BenchmarkReference | null }
 export interface CapacityScenario extends Omit<ScenarioInput, 'expected_version'> { id: string; tenant_id: string; created_by: string; recorded_at: string; version: 1; calculation_sha256: string; snapshot_sha256: string; benchmark_verification: 'NOT_PROVIDED' | 'REFERENCE_ONLY_UNVERIFIED'; snapshot: { capacity_formula_version: 'contract-m10-7-capacity-v1'; buffer_formula_version: 'contract-m4-15-buffer-v1'; status: CapacityResult['status']; model_version: string | null; missing_inputs: string[]; outputs: CapacityResult['outputs']; proxy_buffer: Omit<CapacityResult['proxy_buffer'], 'formula_version'> }; decimal_encoding: 'BASE10_STRINGS'; decimal_precision: 'DECIMAL128'; lifecycle_status: 'DRAFT'; model_approval_status: 'UNVERIFIED'; measurement_verification: 'UNVERIFIED'; production_capacity_verified: false; approved_pool_nvps_limit: null; measured_capacity: null; poc_status: 'NOT_RUN'; effective: false; immutable: true; source: 'postgresql'; record_source: 'EXPLICIT_CAPACITY_DRAFT' }
 export interface ScenarioPage { items: CapacityScenario[]; has_more: boolean; next_before_recorded_at: string | null; next_before_id: string | null; source: 'postgresql'; scope: 'CURRENT_TENANT_CAPACITY_DRAFTS'; page_size_limit: 100; pagination_consistency: 'CURRENT_REQUEST_SNAPSHOT_ONLY' }
+interface ScenarioRead { query: string; before?: { time: string; id: string }; id?: string }
 interface Attempt { payload: string; key: string; state: 'uncertain' | 'accepted' | 'rejected' }
 export interface ScenarioState { page: ScenarioPage | null; selected: CapacityScenario | null; receipt: CapacityScenario | null; attempt: Attempt | null; query: string; paged: boolean; busy: 'read' | 'write' | null; error: unknown }
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
@@ -37,23 +38,44 @@ export function readScenarioPage(v: unknown, context: ScenarioContext, before?: 
 }
 export const emptyScenarioState = (): ScenarioState => ({ page: null, selected: null, receipt: null, attempt: null, query: '', paged: false, busy: null, error: null })
 export function createScenarioWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: ScenarioState) => void, newKey: () => string = () => createRequestId()) {
-  let context: ScenarioContext | null = null, state = emptyScenarioState(), epoch = 0, disposed = false, abort: AbortController | undefined
+  let context: ScenarioContext | null = null, state = emptyScenarioState(), epoch = 0, disposed = false, abort: AbortController | undefined, lastRead: ScenarioRead | null = null, readRetryable = false
   const snapshot = () => ({ ...copy({ ...state, error: null }), error: state.error }), emit = () => changed(snapshot()), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
-  function reset(next: ScenarioContext | null) { abort?.abort(); epoch++; context = !disposed && next && next.role === 'padmin' && next.canRead && uuid.test(next.actorId) && uuid.test(next.tenantId) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion > 0 ? { ...next } : null; state = emptyScenarioState(); emit() }
+  function reset(next: ScenarioContext | null) { abort?.abort(); abort = undefined; lastRead = null; readRetryable = false; epoch++; context = !disposed && next && next.role === 'padmin' && next.canRead && uuid.test(next.actorId) && uuid.test(next.tenantId) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion > 0 ? { ...next } : null; state = emptyScenarioState(); emit() }
   async function read(query: string, next = false, id?: string) {
     if (!context || state.busy) return false
     if (typeof query !== 'string' || Array.from(query).length > 100 || /[\u0000-\u001f\u007f-\u009f\ud800-\udfff]/u.test(query) || id && !uuid.test(id)) throw bad()
     const before = next && state.page?.has_more && query === state.query ? { time: state.page.next_before_recorded_at!, id: state.page.next_before_id! } : undefined; if (next && !before) return false
-    const turn = ++epoch, scope = { ...context }, controller = new AbortController(); abort = controller; state = { ...state, busy: 'read', error: null, ...(id ? { selected: null } : { page: null, selected: null, query, paged: next }) }; emit()
-    try { if (turn !== epoch || controller.signal.aborted || disposed) return false; const params = new URLSearchParams({ page_size: '15', label_query: query }); if (before) { params.set('before_recorded_at', before.time); params.set('before_id', before.id) } const value = await client.request<unknown>(id ? '/capacity/scenarios/' + id : '/capacity/scenarios?' + params, { signal: controller.signal }); if (turn !== epoch || controller.signal.aborted) return false
-      if (id) { const selected = readCapacityScenario(value, scope); if (selected.id !== id || state.receipt?.id === id && !equal(state.receipt, selected)) throw bad(); state.selected = selected } else state.page = readScenarioPage(value, scope, before); return true
-    } catch (error) { if (turn === epoch && !isCancelled(error)) state.error = error; return false } finally { if (turn === epoch) { state.busy = null; emit() } }
+    return readRequest({ query, ...(before ? { before } : {}), ...(id ? { id } : {}) })
+  }
+  async function readRequest(request: ScenarioRead) {
+    if (disposed || !context || state.busy) return false
+    const { query, before, id } = copy(request)
+    lastRead = copy(request); readRetryable = false
+    const turn = ++epoch, scope = { ...context }, controller = new AbortController(); abort = controller
+    state = { ...state, busy: 'read', error: null, ...(id ? { selected: null } : { page: null, selected: null, query, paged: Boolean(before) }) }; emit()
+    try {
+      if (turn !== epoch || controller.signal.aborted || disposed) return false
+      const params = new URLSearchParams({ page_size: '15', label_query: query })
+      if (before) { params.set('before_recorded_at', before.time); params.set('before_id', before.id) }
+      const value = await client.request<unknown>(id ? '/capacity/scenarios/' + id : '/capacity/scenarios?' + params, { signal: controller.signal })
+      if (turn !== epoch || controller.signal.aborted || disposed) return false
+      if (id) { const selected = readCapacityScenario(value, scope); if (selected.id !== id || state.receipt?.id === id && !equal(state.receipt, selected)) throw bad(); state.selected = selected }
+      else state.page = readScenarioPage(value, scope, before)
+      return true
+    } catch (error) { if (turn === epoch && !disposed && !isCancelled(error)) { state.error = error; readRetryable = true } return false }
+    finally { if (turn === epoch && !disposed) { state.busy = null; abort = undefined; emit() } }
+  }
+  function cancelRead() {
+    if (disposed || state.busy !== 'read') return false
+    epoch++; abort?.abort(); abort = undefined; readRetryable = lastRead !== null
+    state = { ...state, busy: null, error: null }; emit(); return true
   }
   async function send(attempt: Attempt, retry = false) {
     if (!context?.canWrite || state.busy) return false
+    lastRead = null; readRetryable = false
     const turn = ++epoch, scope = { ...context }, controller = new AbortController(); abort = controller; state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
     try { if (turn !== epoch || controller.signal.aborted || disposed) return false; const payload = readScenarioInput(JSON.parse(attempt.payload)); const raw = await client.request<unknown>('/capacity/scenarios', { method: 'POST', body: payload, idempotencyKey: attempt.key, signal: controller.signal }); if (turn !== epoch || controller.signal.aborted) return false; const receipt = readCapacityScenario(raw, scope); if (receipt.created_by !== scope.actorId || !equal({ expected_version: 0, label: receipt.label, note: receipt.note, calculation: receipt.calculation, benchmark_reference: receipt.benchmark_reference }, payload)) throw bad(); state = { ...state, receipt, selected: receipt, attempt: { ...attempt, state: 'accepted' } }; return true
     } catch (error) { if (turn === epoch) { const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_'); state = { ...state, error, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } } } return false } finally { if (turn === epoch) { state.busy = null; emit() } }
   }
-  emit(); return { reset, list: (query = '', next = false) => read(query, next), select: (id: string) => read(state.query, false, id), submit: (input: unknown) => { if (disposed || !context?.canWrite || state.busy || state.attempt) return Promise.resolve(false); const turn = epoch, payload = JSON.stringify(readScenarioInput(input)), key = newKey(); if (turn !== epoch || disposed) return Promise.resolve(false); return send({ payload, key, state: 'uncertain' }) }, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), begin: () => { if (!context?.canWrite || state.busy || unresolved()) return false; state = { ...state, attempt: null, receipt: null, error: null }; emit(); return true }, unresolved, state: snapshot, dispose: () => { disposed = true; reset(null) } }
+  emit(); return { reset, cancelRead, canRetryRead: () => !disposed && readRetryable && lastRead !== null && !state.busy, retryRead: () => readRetryable && lastRead ? readRequest(copy(lastRead)) : Promise.resolve(false), list: (query = '', next = false) => read(query, next), select: (id: string) => read(state.query, false, id), submit: (input: unknown) => { if (disposed || !context?.canWrite || state.busy || state.attempt) return Promise.resolve(false); const turn = epoch, payload = JSON.stringify(readScenarioInput(input)), key = newKey(); if (turn !== epoch || disposed) return Promise.resolve(false); return send({ payload, key, state: 'uncertain' }) }, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), begin: () => { if (!context?.canWrite || state.busy || unresolved()) return false; lastRead = null; readRetryable = false; state = { ...state, attempt: null, receipt: null, error: null }; emit(); return true }, unresolved, state: snapshot, dispose: () => { disposed = true; reset(null) } }
 }

@@ -1,0 +1,22 @@
+{
+  "scope": "SCENARIO_ORIGINAL_READ_RECOVERY_NOT_WRITE_CONFIRMATION",
+  "new_tests": 11,
+  "vitest": {
+    "passed": 3410,
+    "files": 226,
+    "failed": 0
+  },
+  "contract_tests_passed": 173,
+  "api_contract": "PASS_UNCHANGED_0.76",
+  "build_id": "c4bc6223072278530743de12ca7cd0583ba6f61a1eed7bd8bf834a75670f5452",
+  "browser_matrix": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "formal_acceptance": "128_NOT_RUN",
+  "backend_changed": false,
+  "source_sha256": {
+    "apps/web/src/utils/capacityScenarioWorkspace.ts": "d4c28135e939717bfbf5a402ef6489cc7ffe16a590ffaddd4ff34b13446f1e49",
+    "apps/web/src/components/CapacityScenarioPanel.vue": "2c3a036a2596cb14b50294b8660ec24450b84b3131f8de98bfbc9502e7de3984",
+    "apps/web/tests/capacityScenarioWorkspace.test.ts": "02b18e79f1d6ae9477538a1894f4e1b601ea6b93e1dfb820f1f963b2dce6e229",
+    "apps/web/tests/capacityScenarioRecoveryPage.test.ts": "1290a39685a2261816ca91e6e807dc0f5e34d289738e1236b881d39c03727bb0"
+  },
+  "dom_boundary": "Actual Vue/Element controls with simplified drawer; not browser focus-trap, axe or viewport acceptance"
+}

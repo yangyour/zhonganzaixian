@@ -1,3 +1,4 @@
+import {validateOnCallBoardDetails,validateOnCallRoster,validateOnCallHandoff,validateOnCallPolicy,validateOnCallStepRun} from './onCallPayloadIntegrity'
 import {ApiError,type RequestOptions} from '../api/client'
 import {createRequestId} from './browserCrypto'
 import {exportExact,exportInteger,exportTime,exportUuid,exportEquals} from './assetExportJobs'
@@ -160,32 +161,13 @@ const invalid=()=>new ApiError(0,'INVALID_ONCALL_OR_SLA_PAYLOAD','值班看板�
 const validContext=(c:OnCallContext|null):c is OnCallContext=>
  Boolean(c&&exportUuid(c.tenantId)&&exportUuid(c.actorId)&&exportInteger(c.permissionVersion,1)&&typeof c.canWriteInternal==='boolean'&&typeof c.canWriteConfig==='boolean')
 const isTier=(v:unknown):v is ServiceTierCode=>v==='BASIC'||v==='STANDARD'||v==='ADVANCED'
-const isPolicyTier=(v:unknown):v is PolicyTierCode=>isTier(v)||v==='FALLBACK'
-const isShift=(v:unknown):v is ShiftCode=>v==='DAY'||v==='NIGHT'||v==='FULL_DAY'
-const isTrigger=(v:unknown):v is TriggerCondition=>['IMMEDIATE','UNACKNOWLEDGED','UNRESOLVED','COUNTDOWN_ZERO','PHONE_UNANSWERED'].includes(v as string)
 const isTargetRole=(v:unknown):v is TargetRole=>['L1_ONCALL','L2_ONCALL','DUTY_LEAD','CUSTOMER_ADMIN','SERVICE_MANAGER','DECISION_MAKER'].includes(v as string)
 
-export function readOnCallBoard(raw:unknown,scope:OnCallContext):OnCallBoardPayload{
+export function readOnCallBoard(raw:unknown,scope:OnCallContext,maxRows=100):OnCallBoardPayload{
  if(!validContext(scope)||!exportExact(raw,['tenant_id','kpis','queue','rosters','handoffs','policies','step_runs','auto_refresh_sec','handoff_local_time','roster_policy_status','observed_at','source']))throw invalid()
  if(raw.tenant_id!==scope.tenantId||raw.auto_refresh_sec!==30||raw.handoff_local_time!=='18:00'||raw.roster_policy_status!=='CONFIG_PENDING_Q15'||raw.source!=='postgresql')throw invalid()
  exportTime(raw.observed_at)
- if(!exportExact(raw.kpis,['unacknowledged_count','critical_count','in_progress_count','pending_review_count','recovered_today_count','mtta_p50_sec','mtta_target_sec']))throw invalid()
- if(!Array.isArray(raw.queue)||!Array.isArray(raw.rosters)||!Array.isArray(raw.handoffs)||!Array.isArray(raw.policies)||!Array.isArray(raw.step_runs))throw invalid()
- for(const r of raw.rosters){
-  if(!exportExact(r,['id','tenant_id','version','shift_date','shift_code','handoff_local_time','primary_oncall_user_id','backup_oncall_user_id','note','roster_policy_status','updated_by','updated_at']))throw invalid()
-  if(r.tenant_id!==scope.tenantId||!isShift(r.shift_code)||r.handoff_local_time!=='18:00'||r.roster_policy_status!=='CONFIG_PENDING_Q15')throw invalid()
- }
- for(const h of raw.handoffs){
-  if(!exportExact(h,['id','tenant_id','roster_id','outgoing_user_id','incoming_user_id','handoff_local_time','unacknowledged_count','in_progress_count','pending_review_count','note','handed_off_at']))throw invalid()
-  if(h.tenant_id!==scope.tenantId||h.handoff_local_time!=='18:00'||h.outgoing_user_id===h.incoming_user_id)throw invalid()
- }
- for(const p of raw.policies){
-  if(!exportExact(p,['tenant_id','tier','version','unanswered_escalate_count','unanswered_retry_interval_sec','steps','policy_status','updated_by','updated_at','persisted']))throw invalid()
-  if(p.tenant_id!==scope.tenantId||!isPolicyTier(p.tier)||p.unanswered_retry_interval_sec!==null||p.policy_status!=='CONFIG_PENDING_Q15'||!Array.isArray(p.steps)||p.steps.length<1||p.steps.length>8)throw invalid()
-  for(const s of p.steps){
-   if(!exportExact(s,['step_order','trigger_condition','wait_minutes','target_role'])||!isTrigger(s.trigger_condition)||!isTargetRole(s.target_role))throw invalid()
-  }
- }
+ validateOnCallBoardDetails(raw,scope.tenantId,maxRows)
  return structuredClone(raw) as unknown as OnCallBoardPayload
 }
 
@@ -236,18 +218,21 @@ function readOnCallReceipt(raw:unknown,scope:OnCallContext,attempt:WriteAttempt)
  const stamp=(key:string)=>{exportTime(r[key]);return r[key] as string}
  const identity=()=>{if(!exportUuid(r.id))throw invalid();return r.id as string}
  if(attempt.path==='/oncall/rosters'){
+  validateOnCallRoster(raw,scope.tenantId)
   check(['id','tenant_id','version','shift_date','shift_code','handoff_local_time','primary_oncall_user_id','backup_oncall_user_id','note','roster_policy_status','updated_by','updated_at'])
   same(['shift_date','shift_code','primary_oncall_user_id','backup_oncall_user_id','note'])
   if(!exportInteger(r.version,1)||r.version!==Number(b.expected_version)+1||r.updated_by!==scope.actorId||r.handoff_local_time!=='18:00'||r.roster_policy_status!=='CONFIG_PENDING_Q15')throw invalid()
   return {path:attempt.path,identity:identity(),version:r.version as number,recordedAt:stamp('updated_at')}
  }
  if(attempt.path==='/oncall/handoffs'){
+  validateOnCallHandoff(raw,scope.tenantId)
   check(['id','tenant_id','roster_id','outgoing_user_id','incoming_user_id','handoff_local_time','unacknowledged_count','in_progress_count','pending_review_count','note','handed_off_at'])
   same(['roster_id','incoming_user_id','note'])
   if(r.outgoing_user_id!==scope.actorId||r.outgoing_user_id===r.incoming_user_id||r.handoff_local_time!=='18:00'||!['unacknowledged_count','in_progress_count','pending_review_count'].every(k=>exportInteger(r[k])))throw invalid()
   return {path:attempt.path,identity:identity(),version:null,recordedAt:stamp('handed_off_at')}
  }
  if(attempt.path==='/escalation-policies'){
+  validateOnCallPolicy(raw,scope.tenantId)
   check(['tenant_id','tier','version','unanswered_escalate_count','unanswered_retry_interval_sec','steps','policy_status','updated_by','updated_at','persisted'])
   same(['tier','unanswered_escalate_count'])
   const requested=b.steps as EscalationStep[]
@@ -255,6 +240,7 @@ function readOnCallReceipt(raw:unknown,scope:OnCallContext,attempt:WriteAttempt)
   return {path:attempt.path,identity:String(r.tier),version:r.version as number,recordedAt:stamp('updated_at')}
  }
  if(attempt.path==='/oncall/escalations'){
+  validateOnCallStepRun(raw,scope.tenantId)
   check(['id','tenant_id','ticket_id','tier','policy_version','step_order','trigger_condition','wait_minutes','target_role','unanswered_phone_count','escalated_to_step','escalated_target_role','sms_notice_status','sms_notice_summary','recorded_by','recorded_at'])
   same(['ticket_id','tier','step_order','trigger_condition','unanswered_phone_count'])
   if(r.recorded_by!==scope.actorId||!exportInteger(r.policy_version)||!exportInteger(r.wait_minutes,0,10080)||!isTargetRole(r.target_role)||r.escalated_to_step!==null&&!exportInteger(r.escalated_to_step,1,8)||r.escalated_target_role!==null&&!isTargetRole(r.escalated_target_role)||!['NOT_REQUIRED','INTENT_RECORDED_PENDING_GATEWAY'].includes(r.sms_notice_status as string)||r.sms_notice_summary!==null&&typeof r.sms_notice_summary!=='string')throw invalid()
@@ -275,7 +261,7 @@ export function createOnCallBoardWorkspace(client:{request<T>(path:string,option
    if(disposed||turn!==epoch||controller.signal.aborted)return false
    const raw=await client.request('/oncall/board?page_size=25',{signal:controller.signal})
    if(disposed||turn!==epoch)return false
-   const board=readOnCallBoard(raw,scope)
+   const board=readOnCallBoard(raw,scope,25)
    abort=null;state={...state,board,busy:null,error:null,readFailed:false};emit()
    return !disposed&&turn===epoch
   }catch(error){

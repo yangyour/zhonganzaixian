@@ -1,0 +1,32 @@
+{
+  "result": "PASS_LOGIC_DOM_BUILD_HTTP",
+  "new_tests": 68,
+  "vitest": {
+    "files_passed": 231,
+    "tests_passed": 3544
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 140,
+    "bootstrap_gzip_bytes": 179968,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "206474cf96345183d57711c1a4f2fae31e91507abf08f92e72e7ab5ac36731ff",
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/utils/onCallBoard.ts": "cabac4a8ee29a2b9ccff551858098552a3b5f3b6323661a96aa631faf077c7ca",
+    "apps/web/src/utils/onCallPayloadIntegrity.ts": "fc382e25d21ef21f851bd916ce016aa883a292deb46fcf544abed5f600b8c921",
+    "apps/web/tests/onCallPayloadIntegrity.test.ts": "1174c348591711b214c55fbfff8ab4f77664b75c9ada43d9ecb4f7f4fdfd3cb4",
+    "apps/web/tests/onCallBoardPage.test.ts": "2c7325caa19c8e006a75a2e5670f3515752f70813e2b3b04a2299583a74fd965"
+  },
+  "actual_previous_http_capture_replayed": "fixtures/oncall-http-synthetic-20261021.json",
+  "new_api_or_database_execution": false,
+  "api_contract_changed": false,
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "actual_viewports": "NOT_RUN",
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0
+}

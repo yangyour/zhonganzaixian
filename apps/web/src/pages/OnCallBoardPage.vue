@@ -8,7 +8,7 @@ import {contextTransitionGuards} from '../utils/contextTransitionGuard'
 import {
  createOnCallBoardWorkspace,emptyOnCallBoardState,formatCountdown,formatDurationSec,
  policyTierLabels,shiftCodeLabels,targetRoleLabels,triggerConditionLabels,
- type EscalationStep,type EscalationPolicy,type OnCallBoardState,type PolicyTierCode,type ShiftCode,type TargetRole,type TriggerCondition
+ type OnCallQueueItem,type EscalationStepRun,type EscalationStep,type EscalationPolicy,type OnCallBoardState,type PolicyTierCode,type ShiftCode,type TargetRole,type TriggerCondition
 } from '../utils/onCallBoard'
 import {tierLabels} from '../utils/serviceTiers'
 import {displayTime} from '../utils/display'
@@ -69,6 +69,11 @@ function draftSnapshot(){return JSON.stringify([shiftDate.value,shiftCode.value,
 async function recover(){const turn=context.value,draft=draftSnapshot();if(await workspace.retry()&&turn===context.value&&draft===draftSnapshot())clearConfirmed(state.value.receipt?.path)}
 async function refreshBoard(){if(locked.value)return false;const turn=++readTurn,key=context.value;readStatus.value='';const ok=await workspace.load();if(turn===readTurn&&key===context.value&&ok)readStatus.value='已读取当前看板快照；未提交排班、交接或升级。';return ok}
 async function cancelRead(){if(!workspace.cancelRead())return false;refreshPaused.value=true;const turn=++readTurn,key=context.value;readStatus.value='已取消读取并暂停自动刷新；迟到结果不会显示，已保存回执不受影响。';await nextTick();if(turn===readTurn&&key===context.value&&!refreshButton.value?.disabled)refreshButton.value?.focus();return true}
+function openWorkflow(row:OnCallQueueItem|EscalationStepRun,event:MouseEvent,navigate:(event?:MouseEvent)=>unknown){
+ const board=state.value.board
+ if(!permitted.value||locked.value||!board||![...board.queue,...board.step_runs].some(current=>current===row)){event.preventDefault();return false}
+ return navigate(event)
+}
 function toggleRefresh(){refreshPaused.value=!refreshPaused.value;readStatus.value=refreshPaused.value?'自动刷新已暂停，可手动读取。':'已恢复30秒刷新；填写表单、操作未确认、读取失败或页面隐藏时仍会暂停。'}
 let refreshTimer:ReturnType<typeof setInterval>|null=null
 function clearRefreshTimer(){if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}}
@@ -154,7 +159,7 @@ const unregister=contextTransitionGuards.register(mayLeave)
 function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()||dirty.value){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
 onUnmounted(()=>{clearRefreshTimer();unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
-defineExpose({state,workspace,refreshPaused,refreshBoard,cancelRead,toggleRefresh,discardPolicy,mayLeave,dirty,shiftDate,primaryUserId,backupUserId,rosterNote,handoffRosterId,incomingUserId,handoffNote,escTicketId,editStep2Wait,submitRoster,preparedPolicy,preparePolicy,submitPolicyUpdate,editPolicyTier,editUnansweredCount,editStep2Role})
+defineExpose({state,workspace,openWorkflow,refreshPaused,refreshBoard,cancelRead,toggleRefresh,discardPolicy,mayLeave,dirty,shiftDate,primaryUserId,backupUserId,rosterNote,handoffRosterId,incomingUserId,handoffNote,escTicketId,editStep2Wait,submitRoster,preparedPolicy,preparePolicy,submitPolicyUpdate,editPolicyTier,editUnansweredCount,editStep2Role})
 </script>
 <template>
  <section class="oncall-board" :aria-busy="!!state.busy">
@@ -226,6 +231,7 @@ defineExpose({state,workspace,refreshPaused,refreshBoard,cancelRead,toggleRefres
     <p v-if="state.busy" role="status" aria-live="polite">{{ state.busy==='write'?'正在提交值班/升级记录…':'正在同步值班看板…' }}</p>
 
     <template v-if="tab==='queue'">
+     <p class="proto-scope-note">点击工单入口可查看六态工作流并按当前权限办理；历史升级记录不代表当前工单状态。打开详情不会自动接单、升级或发送短信。</p>
      <div class="table-wrap" tabindex="0" role="region" aria-label="倒计时队列，可横向滚动" v-if="state.board?.queue.length">
       <table class="proto-table"><caption>倒计时队列</caption>
        <thead>
@@ -241,7 +247,7 @@ defineExpose({state,workspace,refreshPaused,refreshBoard,cancelRead,toggleRefres
        </thead>
        <tbody>
         <tr v-for="item in state.board.queue" :key="item.ticket_id">
-         <td><code>{{ item.ticket_id }}</code></td>
+         <td><RouterLink v-if="!locked" :to="{path:'/ticket-workflows',query:{ticket_id:item.ticket_id}}" custom v-slot="{href,navigate}"><a class="workflow-link" :href="href" :aria-label="'查看并办理工单 '+item.ticket_id" @click="openWorkflow(item,$event,navigate)">查看并办理<code>{{item.ticket_id}}</code></a></RouterLink><code v-else>{{item.ticket_id}}</code></td>
          <td>{{ item.priority }} · {{ tierLabels[item.tier_snapshot] }}</td>
          <td>{{ item.state }}</td>
          <td :class="{danger:item.breached}">{{ formatCountdown(item.countdown_remaining_sec) }}</td>
@@ -303,7 +309,7 @@ defineExpose({state,workspace,refreshPaused,refreshBoard,cancelRead,toggleRefres
        <tbody>
         <tr v-for="run in state.board.step_runs" :key="run.id">
          <td>{{ displayTime(run.recorded_at) }}</td>
-         <td><code>{{ run.ticket_id }}</code></td>
+         <td><RouterLink v-if="!locked" :to="{path:'/ticket-workflows',query:{ticket_id:run.ticket_id}}" custom v-slot="{href,navigate}"><a class="workflow-link" :href="href" :aria-label="'查看升级记录对应工单 '+run.ticket_id" @click="openWorkflow(run,$event,navigate)">查看对应工单<code>{{run.ticket_id}}</code></a></RouterLink><code v-else>{{run.ticket_id}}</code></td>
          <td>{{ policyTierLabels[run.tier] }} (v{{ run.policy_version }})</td>
          <td>{{ triggerConditionLabels[run.trigger_condition] }}</td>
          <td>{{ run.unanswered_phone_count }}</td>
@@ -485,7 +491,8 @@ defineExpose({state,workspace,refreshPaused,refreshBoard,cancelRead,toggleRefres
 .form-grid label{display:grid;gap:6px;font-weight:600}
 .form-grid label.full{grid-column:1/-1}
 .table-wrap{max-width:100%;overflow:auto}
-.table-wrap:focus-visible,button:focus-visible,.back:focus-visible{outline:3px solid #2563eb;outline-offset:3px}
+.table-wrap:focus-visible,button:focus-visible,.back:focus-visible,.workflow-link:focus-visible{outline:3px solid #2563eb;outline-offset:3px}
+.workflow-link{display:inline-flex;flex-direction:column;justify-content:center;gap:4px;min-height:44px;min-width:44px;color:#164e91;text-decoration:underline;overflow-wrap:anywhere}
 caption{text-align:left;font-weight:700;padding:8px 0}
 .step-pill{display:inline-block;margin:2px 6px 2px 0;padding:2px 8px;border-radius:12px;background:#eef2ff;font-size:12px}
 .danger{color:#b91c1c;font-weight:700}

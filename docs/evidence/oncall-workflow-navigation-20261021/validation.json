@@ -1,0 +1,31 @@
+{
+  "result": "PASS_SYNTHETIC_DOM_ROUTER_BUILD_HTTP",
+  "new_tests": 9,
+  "vitest": {
+    "files_passed": 232,
+    "tests_passed": 3553
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 140,
+    "bootstrap_gzip_bytes": 179948,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "5420611413f85ee95a38779addf247bad15846babded765540123ca6d4fa0d66",
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/pages/OnCallBoardPage.vue": "59eda05e59b2cc28c633fd5e2775d8969333af5106b26f88160de60fafabefb4",
+    "apps/web/tests/onCallWorkflowNavigation.test.ts": "5df116be19cf6f46f2344b550c881e376dfce302b41d6eb12acda2bda6566a9c"
+  },
+  "real_vue_router": true,
+  "real_workflow_component_case": true,
+  "api_responses": "SYNTHETIC_MOCKS_NOT_NEW_API_EXECUTION",
+  "element_plus_tables": "TEST_STUBS_IN_WORKFLOW_COMPONENT_CASE",
+  "api_contract_changed": false,
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0
+}

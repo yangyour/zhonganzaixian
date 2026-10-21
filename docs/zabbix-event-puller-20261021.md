@@ -33,3 +33,5 @@ event-pull-dependencies.json列出资源池、已批准来源连接、既有只�
 ## CI阻塞
 
 当前主分支上一提交b9ee49d的合并后CI39533390995在任务启动前失败，重试一次仍失败；具体错误等待用户提供。此批会保存到独立分支，但远端检查未恢复前不合并。没有改变CI门槛或跳过检查来伪造通过。
+
+候选已提交为[5aa8e179c4d4917ab0dc717fb42624155293320a](https://github.com/yangyour/zhonganzaixian/commit/5aa8e179c4d4917ab0dc717fb42624155293320a)，分支dot/zabbix-event-puller-20261021；[运行39534254538](https://github.com/yangyour/zhonganzaixian/actions/runs/39534254538)四个任务也全部在启动测试前失败（steps=0，持续2～4秒）。未合并，不重复重试；等待用户提供Actions错误说明后再恢复验证和合并。

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.71.0",
+    "version": "0.72.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -40423,6 +40423,115 @@
           }
         }
       }
+    },
+    "/monitoring/observation-window-diagnostics": {
+      "post": {
+        "operationId": "analyzeExplicitObservationWindow",
+        "summary": "只读诊断显式采样点跨度，不确认物理恢复、不保存或发布规则",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObservationWindowInput"
+              }
+            }
+          }
+        },
+        "x-mop-read-only": true,
+        "x-mop-roles": [
+          "padmin"
+        ],
+        "x-mop-capability": "configurations:read",
+        "x-mop-max-body-bytes": 524288,
+        "x-mop-max-json-depth": 5,
+        "x-mop-max-json-tokens": 16000,
+        "x-mop-reject-duplicate-json-keys": true,
+        "x-mop-success-writes-audit-or-receipts": false,
+        "description": "先重新核对当前成员授权，再解析显式输入；全部查询参数/租户/规则/授权覆盖拒绝。最多1000严格递增、不晚于observed_at的毫秒UTC样本，不截断。null保持未知，负持续为CONFLICT；已观察跨度不外推到观察时刻，不声称样本间连续物理恢复。诊断不访问监控提供方或规则发布；失败仍按统一安全策略审计。",
+        "responses": {
+          "200": {
+            "description": "候选观察结果，不是恢复确认",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationWindowDiagnosticResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "权限、输入、技术上限或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "权限、输入、技术上限或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "权限、输入、技术上限或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "权限、输入、技术上限或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "权限、输入、技术上限或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "权限、输入、技术上限或依赖错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -80217,6 +80326,520 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/CmdbSourcePreflight"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "ObservationWindowSample": {
+        "type": "object",
+        "properties": {
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]{1,3})?Z$"
+          },
+          "state": {
+            "enum": [
+              "KNOWN",
+              "UNKNOWN",
+              "COLLECTOR_ERROR"
+            ]
+          },
+          "value": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$",
+            "not": {
+              "type": "string",
+              "pattern": "^-0(?:\\.0+)?$"
+            }
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 32
+          }
+        },
+        "required": [
+          "recorded_at",
+          "state",
+          "value",
+          "unit"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "state": {
+                  "const": "KNOWN"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$",
+                  "not": {
+                    "type": "string",
+                    "pattern": "^-0(?:\\.0+)?$"
+                  }
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "value": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ObservationWindowInput": {
+        "type": "object",
+        "properties": {
+          "condition": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ThresholdCandidateCondition"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "hold_seconds": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$",
+            "not": {
+              "type": "string",
+              "pattern": "^-0(?:\\.0+)?$"
+            }
+          },
+          "max_gap_seconds": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^-?(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$",
+            "not": {
+              "type": "string",
+              "pattern": "^-0(?:\\.0+)?$"
+            }
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]{1,3})?Z$"
+          },
+          "samples": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "$ref": "#/components/schemas/ObservationWindowSample"
+            }
+          }
+        },
+        "required": [
+          "condition",
+          "hold_seconds",
+          "max_gap_seconds",
+          "observed_at",
+          "samples"
+        ],
+        "additionalProperties": false
+      },
+      "ObservationWindowDiagnostic": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "actor_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "permission_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740990
+          },
+          "source": {
+            "const": "EXPLICIT_INPUT"
+          },
+          "scope": {
+            "const": "EXPLICIT_CANDIDATE_SAMPLES_ONLY"
+          },
+          "analysis_version": {
+            "const": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/ObservationWindowInput"
+          },
+          "status": {
+            "enum": [
+              "CONFIG_PENDING",
+              "CONFLICT",
+              "NO_SAMPLES",
+              "STALE_LATEST",
+              "UNKNOWN_LATEST",
+              "NO_CURRENT_MATCH",
+              "MATCHING_SPAN_NOT_REACHED",
+              "MATCHING_SPAN_REACHED"
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "uniqueItems": true,
+            "maxItems": 6,
+            "items": {
+              "enum": [
+                "CONDITION_INCOMPLETE",
+                "HOLD_MISSING",
+                "MAX_GAP_MISSING",
+                "NEGATIVE_HOLD",
+                "NEGATIVE_MAX_GAP",
+                "UNIT_MISMATCH"
+              ]
+            }
+          },
+          "latest_sample_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]{1,3})?Z$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "matching_span_started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]{1,3})?Z$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "matching_sample_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "observed_span_seconds": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "candidate_span_reached": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "continuity_claim": {
+            "const": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF"
+          },
+          "customer_confirmation": {
+            "const": "UNVERIFIED"
+          },
+          "physical_range_check": {
+            "const": "NOT_RUN"
+          },
+          "publishable": {
+            "const": false
+          },
+          "effective_rule": {
+            "type": "null"
+          },
+          "units_converted": {
+            "const": false
+          },
+          "monitoring_applied": {
+            "const": false
+          },
+          "event_state_updated": {
+            "const": false
+          },
+          "recovery_confirmed": {
+            "const": false
+          },
+          "writes_performed": {
+            "const": false
+          },
+          "tenant_authorization": {
+            "const": "CURRENT_MEMBERSHIP_VERIFIED"
+          }
+        },
+        "required": [
+          "tenant_id",
+          "actor_id",
+          "permission_version",
+          "source",
+          "scope",
+          "analysis_version",
+          "inputs",
+          "status",
+          "reasons",
+          "latest_sample_at",
+          "matching_span_started_at",
+          "matching_sample_count",
+          "observed_span_seconds",
+          "candidate_span_reached",
+          "continuity_claim",
+          "customer_confirmation",
+          "physical_range_check",
+          "publishable",
+          "effective_rule",
+          "units_converted",
+          "monitoring_applied",
+          "event_state_updated",
+          "recovery_confirmed",
+          "writes_performed",
+          "tenant_authorization"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "CONFIG_PENDING",
+                    "CONFLICT"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "matching_span_started_at": {
+                  "type": "null"
+                },
+                "matching_sample_count": {
+                  "type": "null"
+                },
+                "observed_span_seconds": {
+                  "type": "null"
+                },
+                "candidate_span_reached": {
+                  "type": "null"
+                },
+                "reasons": {
+                  "minItems": 1
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "reasons": {
+                  "maxItems": 0
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "NO_SAMPLES",
+                    "STALE_LATEST",
+                    "UNKNOWN_LATEST"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "matching_span_started_at": {
+                  "type": "null"
+                },
+                "matching_sample_count": {
+                  "type": "null"
+                },
+                "observed_span_seconds": {
+                  "type": "null"
+                },
+                "candidate_span_reached": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "NO_SAMPLES"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "latest_sample_at": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "STALE_LATEST",
+                    "UNKNOWN_LATEST",
+                    "NO_CURRENT_MATCH",
+                    "MATCHING_SPAN_NOT_REACHED",
+                    "MATCHING_SPAN_REACHED"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "latest_sample_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]{1,3})?Z$"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "NO_CURRENT_MATCH"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "matching_span_started_at": {
+                  "type": "null"
+                },
+                "matching_sample_count": {
+                  "const": 0
+                },
+                "observed_span_seconds": {
+                  "const": "0"
+                },
+                "candidate_span_reached": {
+                  "const": false
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "MATCHING_SPAN_NOT_REACHED",
+                    "MATCHING_SPAN_REACHED"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "matching_span_started_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]{1,3})?Z$"
+                },
+                "matching_sample_count": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000
+                },
+                "observed_span_seconds": {
+                  "type": "string",
+                  "pattern": "^(?:0|[1-9][0-9]{0,39})(?:\\.[0-9]{1,40})?$"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "MATCHING_SPAN_REACHED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "candidate_span_reached": {
+                  "const": true
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "MATCHING_SPAN_NOT_REACHED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "candidate_span_reached": {
+                  "const": false
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ObservationWindowDiagnosticResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ObservationWindowDiagnostic"
           },
           "trace_id": {
             "type": "string"

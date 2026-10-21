@@ -25,3 +25,17 @@
 24项纯测试覆盖精确比较/开闭边界、亚毫秒阈值不舍入、跨度等号、采样断点、未知与错误、无样本、陈旧、尾部不外推、显式0、单位、时钟、不可变及1000条上限。初次测试导入两个同名Status/Result通配类型导致编译失败，已改明确类型导入；随后无效单位的异常类型未统一也由测试发现，现统一为400验证错误。失败均未计为通过。
 
 本切片尚无HTTP端点、页面或实际采样源；下一步接受保护的只读诊断与前端恢复流程。API0.71.0/V1–V45不变；不是监控恢复观察窗的生产激活或M4完整验收。具体回归汇总见evidence/observation-window-core-20261021.json。
+
+## 受保护只读 API（API 0.72.0）
+
+新增POST /api/v1/monitoring/observation-window-diagnostics，仅remote_test当前授权padmin和configurations:read可用；重新读取成员，验证用户/租户/有效状态/权限版本，先授权后解析，仍要求CSRF。没有新增角色授权或幂等写入。
+
+输入精确5字段：condition、hold_seconds、max_gap_seconds、observed_at、samples；样本精确recorded_at/state/value/unit。条件可显式null或部分未定；已知样本值/单位必需，未知/错误值null。十进制必须字符串，拒绝数字、指数、负零；UTC严格解析拒绝24点/闰秒归一化。成功原样回显输入及精确结果，绑定当前tenant/actor/permission_version。
+
+512KiB、5层JSON、16000 tokens、1000样本是拒绝而非截断的技术上限。重复键、尾随文档、全部query、租户/规则/授权覆盖拒绝。no-store/no-referrer；不读取监控供应商、规则库或客户批准资料。成功诊断不写审计/收据/规则/事件；拒绝保留统一安全审计。
+
+15项新增控制器边界测试通过。新临时PG/API38项HTTP全部预期：匿名/非管理员/CSRF拦截、14组候选场景、另一已授权租户及9组无效输入；15份成功捕获覆盖8种状态，均通过OpenAPI严格校验。成功调用前后105表指纹不变；拒绝只有mop_audit变化，0规则保存/事件更新。临时进程、数据库和凭据已清理。
+
+初次契约回归提示新POST未列入“明确只读例外”；依据实际零写入实现与实库验证，仅增加该精确路径，保留全部其他业务写入的幂等/CSRF门禁。没有放宽通用规则。
+
+当前前端入口仍待接续，不把HTTP接口当作已完成页面。证据见evidence/observation-window-api-20261021/validation.json；V1–V45不变、正式TC仍NOT_RUN。

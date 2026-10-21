@@ -1,0 +1,1085 @@
+{
+  "captures": [
+    {
+      "case": "exact_boundary",
+      "input": {
+        "condition": {
+          "comparison": "LE",
+          "threshold": "5.000",
+          "unit": "%"
+        },
+        "hold_seconds": "60",
+        "max_gap_seconds": "60",
+        "observed_at": "2026-10-21T00:01:00.000Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:00:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          },
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LE",
+            "threshold": "5.000",
+            "unit": "%"
+          },
+          "hold_seconds": "60",
+          "max_gap_seconds": "60",
+          "observed_at": "2026-10-21T00:01:00.000Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:00:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            },
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            }
+          ]
+        },
+        "status": "MATCHING_SPAN_REACHED",
+        "reasons": [],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": "2026-10-21T00:00:00Z",
+        "matching_sample_count": 2,
+        "observed_span_seconds": "60.000",
+        "candidate_span_reached": true,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "not_reached",
+      "input": {
+        "condition": {
+          "comparison": "LE",
+          "threshold": "5.000",
+          "unit": "%"
+        },
+        "hold_seconds": "60.00000000000000001",
+        "max_gap_seconds": "60",
+        "observed_at": "2026-10-21T00:01:00.000Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:00:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          },
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LE",
+            "threshold": "5.000",
+            "unit": "%"
+          },
+          "hold_seconds": "60.00000000000000001",
+          "max_gap_seconds": "60",
+          "observed_at": "2026-10-21T00:01:00.000Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:00:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            },
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            }
+          ]
+        },
+        "status": "MATCHING_SPAN_NOT_REACHED",
+        "reasons": [],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": "2026-10-21T00:00:00Z",
+        "matching_sample_count": 2,
+        "observed_span_seconds": "60.000",
+        "candidate_span_reached": false,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "gap_reset",
+      "input": {
+        "condition": {
+          "comparison": "LE",
+          "threshold": "5.000",
+          "unit": "%"
+        },
+        "hold_seconds": "60",
+        "max_gap_seconds": "59",
+        "observed_at": "2026-10-21T00:01:00.000Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:00:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          },
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LE",
+            "threshold": "5.000",
+            "unit": "%"
+          },
+          "hold_seconds": "60",
+          "max_gap_seconds": "59",
+          "observed_at": "2026-10-21T00:01:00.000Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:00:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            },
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            }
+          ]
+        },
+        "status": "MATCHING_SPAN_NOT_REACHED",
+        "reasons": [],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": "2026-10-21T00:01:00Z",
+        "matching_sample_count": 1,
+        "observed_span_seconds": "0.000",
+        "candidate_span_reached": false,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "unknown_latest",
+      "input": {
+        "condition": {
+          "comparison": "LE",
+          "threshold": "5.000",
+          "unit": "%"
+        },
+        "hold_seconds": "60",
+        "max_gap_seconds": "60",
+        "observed_at": "2026-10-21T00:01:00.000Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:00:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          },
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "UNKNOWN",
+            "value": null,
+            "unit": "%"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LE",
+            "threshold": "5.000",
+            "unit": "%"
+          },
+          "hold_seconds": "60",
+          "max_gap_seconds": "60",
+          "observed_at": "2026-10-21T00:01:00.000Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:00:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            },
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "UNKNOWN",
+              "value": null,
+              "unit": "%"
+            }
+          ]
+        },
+        "status": "UNKNOWN_LATEST",
+        "reasons": [],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": null,
+        "matching_sample_count": null,
+        "observed_span_seconds": null,
+        "candidate_span_reached": null,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "collector_error",
+      "input": {
+        "condition": {
+          "comparison": "LE",
+          "threshold": "5.000",
+          "unit": "%"
+        },
+        "hold_seconds": "60",
+        "max_gap_seconds": "60",
+        "observed_at": "2026-10-21T00:01:00.000Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "COLLECTOR_ERROR",
+            "value": null,
+            "unit": null
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LE",
+            "threshold": "5.000",
+            "unit": "%"
+          },
+          "hold_seconds": "60",
+          "max_gap_seconds": "60",
+          "observed_at": "2026-10-21T00:01:00.000Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "COLLECTOR_ERROR",
+              "value": null,
+              "unit": null
+            }
+          ]
+        },
+        "status": "UNKNOWN_LATEST",
+        "reasons": [],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": null,
+        "matching_sample_count": null,
+        "observed_span_seconds": null,
+        "candidate_span_reached": null,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "stale_latest",
+      "input": {
+        "condition": {
+          "comparison": "LE",
+          "threshold": "5.000",
+          "unit": "%"
+        },
+        "hold_seconds": "60",
+        "max_gap_seconds": "60",
+        "observed_at": "2026-10-21T00:02:00.001Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:00:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          },
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LE",
+            "threshold": "5.000",
+            "unit": "%"
+          },
+          "hold_seconds": "60",
+          "max_gap_seconds": "60",
+          "observed_at": "2026-10-21T00:02:00.001Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:00:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            },
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            }
+          ]
+        },
+        "status": "STALE_LATEST",
+        "reasons": [],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": null,
+        "matching_sample_count": null,
+        "observed_span_seconds": null,
+        "candidate_span_reached": null,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "no_match",
+      "input": {
+        "condition": {
+          "comparison": "LE",
+          "threshold": "5.000",
+          "unit": "%"
+        },
+        "hold_seconds": "60",
+        "max_gap_seconds": "60",
+        "observed_at": "2026-10-21T00:01:00.000Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "KNOWN",
+            "value": "6",
+            "unit": "%"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LE",
+            "threshold": "5.000",
+            "unit": "%"
+          },
+          "hold_seconds": "60",
+          "max_gap_seconds": "60",
+          "observed_at": "2026-10-21T00:01:00.000Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "KNOWN",
+              "value": "6",
+              "unit": "%"
+            }
+          ]
+        },
+        "status": "NO_CURRENT_MATCH",
+        "reasons": [],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": null,
+        "matching_sample_count": 0,
+        "observed_span_seconds": "0",
+        "candidate_span_reached": false,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "empty",
+      "input": {
+        "condition": {
+          "comparison": "LE",
+          "threshold": "5.000",
+          "unit": "%"
+        },
+        "hold_seconds": "60",
+        "max_gap_seconds": "60",
+        "observed_at": "2026-10-21T00:01:00.000Z",
+        "samples": []
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LE",
+            "threshold": "5.000",
+            "unit": "%"
+          },
+          "hold_seconds": "60",
+          "max_gap_seconds": "60",
+          "observed_at": "2026-10-21T00:01:00.000Z",
+          "samples": []
+        },
+        "status": "NO_SAMPLES",
+        "reasons": [],
+        "latest_sample_at": null,
+        "matching_span_started_at": null,
+        "matching_sample_count": null,
+        "observed_span_seconds": null,
+        "candidate_span_reached": null,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "pending",
+      "input": {
+        "condition": null,
+        "hold_seconds": null,
+        "max_gap_seconds": null,
+        "observed_at": "2026-10-21T00:01:00.000Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:00:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          },
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": null,
+          "hold_seconds": null,
+          "max_gap_seconds": null,
+          "observed_at": "2026-10-21T00:01:00.000Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:00:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            },
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            }
+          ]
+        },
+        "status": "CONFIG_PENDING",
+        "reasons": [
+          "CONDITION_INCOMPLETE",
+          "HOLD_MISSING",
+          "MAX_GAP_MISSING"
+        ],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": null,
+        "matching_sample_count": null,
+        "observed_span_seconds": null,
+        "candidate_span_reached": null,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "negative_hold",
+      "input": {
+        "condition": {
+          "comparison": "LE",
+          "threshold": "5.000",
+          "unit": "%"
+        },
+        "hold_seconds": "-1",
+        "max_gap_seconds": "60",
+        "observed_at": "2026-10-21T00:01:00.000Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:00:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          },
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LE",
+            "threshold": "5.000",
+            "unit": "%"
+          },
+          "hold_seconds": "-1",
+          "max_gap_seconds": "60",
+          "observed_at": "2026-10-21T00:01:00.000Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:00:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            },
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            }
+          ]
+        },
+        "status": "CONFLICT",
+        "reasons": [
+          "NEGATIVE_HOLD"
+        ],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": null,
+        "matching_sample_count": null,
+        "observed_span_seconds": null,
+        "candidate_span_reached": null,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "units_conflict",
+      "input": {
+        "condition": {
+          "comparison": "LE",
+          "threshold": "5.000",
+          "unit": "%"
+        },
+        "hold_seconds": "60",
+        "max_gap_seconds": "60",
+        "observed_at": "2026-10-21T00:01:00.000Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "ratio"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LE",
+            "threshold": "5.000",
+            "unit": "%"
+          },
+          "hold_seconds": "60",
+          "max_gap_seconds": "60",
+          "observed_at": "2026-10-21T00:01:00.000Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "ratio"
+            }
+          ]
+        },
+        "status": "CONFLICT",
+        "reasons": [
+          "UNIT_MISMATCH"
+        ],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": null,
+        "matching_sample_count": null,
+        "observed_span_seconds": null,
+        "candidate_span_reached": null,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "zero_explicit",
+      "input": {
+        "condition": {
+          "comparison": "LE",
+          "threshold": "5.000",
+          "unit": "%"
+        },
+        "hold_seconds": "0",
+        "max_gap_seconds": "0",
+        "observed_at": "2026-10-21T00:01:00.000Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LE",
+            "threshold": "5.000",
+            "unit": "%"
+          },
+          "hold_seconds": "0",
+          "max_gap_seconds": "0",
+          "observed_at": "2026-10-21T00:01:00.000Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            }
+          ]
+        },
+        "status": "MATCHING_SPAN_REACHED",
+        "reasons": [],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": "2026-10-21T00:01:00Z",
+        "matching_sample_count": 1,
+        "observed_span_seconds": "0.000",
+        "candidate_span_reached": true,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "no_tail_extrapolation",
+      "input": {
+        "condition": {
+          "comparison": "LE",
+          "threshold": "5.000",
+          "unit": "%"
+        },
+        "hold_seconds": "120",
+        "max_gap_seconds": "120",
+        "observed_at": "2026-10-21T00:02:00Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:00:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          },
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LE",
+            "threshold": "5.000",
+            "unit": "%"
+          },
+          "hold_seconds": "120",
+          "max_gap_seconds": "120",
+          "observed_at": "2026-10-21T00:02:00Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:00:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            },
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            }
+          ]
+        },
+        "status": "MATCHING_SPAN_NOT_REACHED",
+        "reasons": [],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": "2026-10-21T00:00:00Z",
+        "matching_sample_count": 2,
+        "observed_span_seconds": "60.000",
+        "candidate_span_reached": false,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "precise_comparison",
+      "input": {
+        "condition": {
+          "comparison": "LT",
+          "threshold": "1.00000000000000001",
+          "unit": "%"
+        },
+        "hold_seconds": "60",
+        "max_gap_seconds": "60",
+        "observed_at": "2026-10-21T00:01:00.000Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:00:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          },
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LT",
+            "threshold": "1.00000000000000001",
+            "unit": "%"
+          },
+          "hold_seconds": "60",
+          "max_gap_seconds": "60",
+          "observed_at": "2026-10-21T00:01:00.000Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:00:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            },
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            }
+          ]
+        },
+        "status": "MATCHING_SPAN_REACHED",
+        "reasons": [],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": "2026-10-21T00:00:00Z",
+        "matching_sample_count": 2,
+        "observed_span_seconds": "60.000",
+        "candidate_span_reached": true,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    },
+    {
+      "case": "other_tenant",
+      "input": {
+        "condition": {
+          "comparison": "LE",
+          "threshold": "5.000",
+          "unit": "%"
+        },
+        "hold_seconds": "60",
+        "max_gap_seconds": "60",
+        "observed_at": "2026-10-21T00:01:00.000Z",
+        "samples": [
+          {
+            "recorded_at": "2026-10-21T00:00:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          },
+          {
+            "recorded_at": "2026-10-21T00:01:00Z",
+            "state": "KNOWN",
+            "value": "1",
+            "unit": "%"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000002",
+        "actor_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "permission_version": 3,
+        "source": "EXPLICIT_INPUT",
+        "scope": "EXPLICIT_CANDIDATE_SAMPLES_ONLY",
+        "analysis_version": "EXPLICIT_MATCHING_OBSERVED_SPAN_V1",
+        "inputs": {
+          "condition": {
+            "comparison": "LE",
+            "threshold": "5.000",
+            "unit": "%"
+          },
+          "hold_seconds": "60",
+          "max_gap_seconds": "60",
+          "observed_at": "2026-10-21T00:01:00.000Z",
+          "samples": [
+            {
+              "recorded_at": "2026-10-21T00:00:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            },
+            {
+              "recorded_at": "2026-10-21T00:01:00Z",
+              "state": "KNOWN",
+              "value": "1",
+              "unit": "%"
+            }
+          ]
+        },
+        "status": "MATCHING_SPAN_REACHED",
+        "reasons": [],
+        "latest_sample_at": "2026-10-21T00:01:00Z",
+        "matching_span_started_at": "2026-10-21T00:00:00Z",
+        "matching_sample_count": 2,
+        "observed_span_seconds": "60.000",
+        "candidate_span_reached": true,
+        "continuity_claim": "OBSERVED_POINTS_ONLY_NOT_CONTINUOUS_PHYSICAL_PROOF",
+        "customer_confirmation": "UNVERIFIED",
+        "physical_range_check": "NOT_RUN",
+        "publishable": false,
+        "effective_rule": null,
+        "units_converted": false,
+        "monitoring_applied": false,
+        "event_state_updated": false,
+        "recovery_confirmed": false,
+        "writes_performed": false,
+        "tenant_authorization": "CURRENT_MEMBERSHIP_VERIFIED"
+      }
+    }
+  ]
+}

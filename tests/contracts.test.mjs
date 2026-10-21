@@ -133,7 +133,7 @@ test('所有业务写接口明确要求幂等及CSRF，remote_test不存在fixtu
   for (const [path, methods] of Object.entries(contract.paths)) {
     for (const [method, operation] of Object.entries(methods)) {
       if (!['post', 'put', 'patch', 'delete'].includes(method)) continue;
-      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons', '/contacts/import-preview', '/monitoring/threshold-diagnostics', '/runtime-configurations/{key}/validate'].includes(path);
+      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons', '/contacts/import-preview', '/monitoring/threshold-diagnostics', '/monitoring/observation-window-diagnostics', '/runtime-configurations/{key}/validate'].includes(path);
       if (readonlyPreview) assert.equal(operation['x-mop-read-only'], true);
       for (const name of readonlyPreview || ['/auth/local/login','/auth/wecom/start'].includes(path) ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
         assert.ok(operation.parameters.some((p) => p.in === 'header' && p.name === name && p.required), `${method} ${path} ${name}`);
@@ -248,8 +248,8 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.71.0');
-  assert.equal(contract.info.version, '0.71.0');
+  assert.equal(contract.info.version, '0.72.0');
+  assert.equal(contract.info.version, '0.72.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -944,7 +944,7 @@ test('补充SLA口径只能绑定明确发布版本，不接收策略或身份�
 
 test('SLA提醒记录不等于路由或送达，读取无业务写入',()=>{const p=contract.paths['/tickets/{ticketId}/sla/reminders'];assert.equal(p.get['x-mop-read-only'],true);assert.equal(p.post,undefined);const s=contract.components.schemas.TicketSlaReminder;assert.equal(s.properties.notification_status.const,'NOT_ROUTED');assert.equal(s.properties.delivered.const,false);assert.deepEqual(s.properties.progress.enum,[0.5,0.8,1]);});
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.71.0');
+  assert.equal(contract.info.version, '0.72.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/workflow/sla'].get;
@@ -1008,7 +1008,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.71.0');
+  assert.equal(contract.info.version, '0.72.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1349,4 +1349,23 @@ test('actual runtime catalog and unpublished current read retain all registered 
   assert.equal(captured.current.latest_version,0);
   assert.equal(captured.current.effective_value,null);
   assert.equal(captured.current.production_approved,false);
+});
+
+
+test('observation window diagnostic requires explicit bounded samples and never authorizes recovery',()=>{
+ const input={condition:{comparison:'LE',threshold:'5',unit:'%'},hold_seconds:null,max_gap_seconds:null,observed_at:'2026-10-21T00:00:00Z',samples:[]};
+ assert.ok(validates('ObservationWindowInput',input));
+ for(const time of ['2026-10-21T24:00:00Z','2026-10-21T23:59:60Z','2026-02-30T00:00:00Z'])assert.equal(validates('ObservationWindowInput',{...input,observed_at:time}),false);
+ assert.equal(validates('ObservationWindowInput',{...input,tenant_id:'override'}),false);
+ assert.equal(validates('ObservationWindowInput',{...input,hold_seconds:0}),false);
+ assert.equal(validates('ObservationWindowSample',{recorded_at:input.observed_at,state:'UNKNOWN',value:'0',unit:'%'}),false);
+ assert.ok(validates('ObservationWindowSample',{recorded_at:input.observed_at,state:'UNKNOWN',value:null,unit:'%'}));
+});
+
+test('actual isolated observation-window HTTP results cover all statuses without publication authority',()=>{
+ const capture=read('../fixtures/observation-window-http-synthetic-20261021.json');assert.equal(capture.captures.length,15);
+ assert.equal(new Set(capture.captures.map(v=>v.response.status)).size,8);
+ for(const item of capture.captures){assert.ok(validates('ObservationWindowInput',item.input),item.case);assert.ok(validates('ObservationWindowDiagnosticResult',{data:item.response,trace_id:'actual-synthetic-http'}),item.case);for(const flag of ['publishable','monitoring_applied','event_state_updated','recovery_confirmed','writes_performed'])assert.equal(validates('ObservationWindowDiagnostic',{...item.response,[flag]:true}),false);}
+ const met=capture.captures.find(v=>v.case==='exact_boundary').response;assert.equal(validates('ObservationWindowDiagnostic',{...met,candidate_span_reached:null}),false);assert.equal(validates('ObservationWindowDiagnostic',{...met,matching_sample_count:0}),false);
+ const empty=capture.captures.find(v=>v.case==='empty').response;assert.equal(validates('ObservationWindowDiagnostic',{...empty,candidate_span_reached:false}),false);
 });

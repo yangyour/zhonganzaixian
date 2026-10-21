@@ -1,0 +1,315 @@
+{
+  "scope": "REAL_LOOPBACK_HTTP_SYNTHETIC_ACCOUNTS",
+  "checks": [
+    {
+      "case": "anonymous_diagnostic",
+      "actor": "anonymous",
+      "status": 401,
+      "expected": 401,
+      "code": "SESSION_EXPIRED",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_csrf",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_login",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_switch",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_csrf",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_login",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_switch",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_csrf",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_login",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_switch",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_diagnostic_forbidden",
+      "actor": "msp",
+      "status": 403,
+      "expected": 403,
+      "code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "customer_diagnostic_forbidden",
+      "actor": "viewerA",
+      "status": 403,
+      "expected": 403,
+      "code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "missing_csrf_forbidden",
+      "actor": "padmin",
+      "status": 403,
+      "expected": 403,
+      "code": "CSRF_INVALID",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "exact_boundary",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "not_reached",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "gap_reset",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "unknown_latest",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "collector_error",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "stale_latest",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "no_match",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "empty",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "pending",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "negative_hold",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "units_conflict",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "zero_explicit",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "no_tail_extrapolation",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "precise_comparison",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "switch_authorized_tenant_b",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "explicit_other_authorized_tenant",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tenant_override",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "numeric_not_string",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "negative_zero",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "exponent_string",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "normalized_midnight",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "unknown_with_value",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "duplicate_times",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "future_sample",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "query_override",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    }
+  ],
+  "result": "PASS",
+  "provider_sends": false,
+  "successful_diagnostics_fingerprints_unchanged": true,
+  "rejected_diagnostics_only_security_audit_changed": true,
+  "rules_saved_or_events_changed": 0,
+  "api_stopped": true
+}

@@ -1,0 +1,35 @@
+{
+  "base_commit": "e2163ea22c30e369cd0de9ad4197a9208449bb41",
+  "result": "PASS",
+  "api_contract": "0.72.0",
+  "java_verify": {
+    "tests": 3834,
+    "skipped": 996,
+    "failures": 0,
+    "errors": 0,
+    "executed": 2838
+  },
+  "new_controller_tests": 15,
+  "contract_tests": 167,
+  "python_tests": 120,
+  "actual_http_checks": 38,
+  "successful_capture_vectors": 15,
+  "distinct_result_statuses": 8,
+  "successful_diagnostics_all_table_fingerprints_unchanged": true,
+  "rejected_diagnostics_only_security_audit_changed": true,
+  "rules_saved_or_events_changed": 0,
+  "temporary_environments_cleaned": true,
+  "migrations": "UNCHANGED_V1_V45",
+  "frontend": "NOT_YET_IMPLEMENTED_FOR_THIS_ENDPOINT",
+  "browser_axe": "NOT_RUN",
+  "formal_tc_not_run": 128,
+  "source_sha256": {
+    "server/api/src/main/java/cn/mop/api/ObservationWindowDiagnosticController.java": "a1171050a7d23c8b4c8ba01086e9106ed6977f023dd6fede1d0c87bb0d011369",
+    "server/api/src/test/java/cn/mop/api/ObservationWindowDiagnosticControllerTest.java": "0ccdc2358ce3c3ab5105a563ef95146e56e9c675c381559478d737c8a228e8b5",
+    "tools/observation-window-contract.mjs": "00ac365cb8ddc83b3a7312076f4df7c4fe6267dcaab905b63f3879644e571637",
+    "tools/build-api-contract.mjs": "0eb6caef98af7cd4fb3effb0688bcdae34654e49f6423f17b9df482feab0ec4c",
+    "contracts/local-api.openapi.json": "f2518feed6cb3c2113b44020b9f01b016d7473a04ed9ba87fd2827aebf1786f1",
+    "tests/contracts.test.mjs": "cda73214849b2752f399c09a610f93c7cb2c61a9b8d15743d32db813dc74ec83",
+    "fixtures/observation-window-http-synthetic-20261021.json": "a59902eb98426ef848f8bb5dd959dbac2528795ed1334abb268ed4d21f3f0b7e"
+  }
+}

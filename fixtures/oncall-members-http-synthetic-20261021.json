@@ -1,0 +1,29 @@
+{
+  "scope": "ACTUAL_LOOPBACK_HTTP_SYNTHETIC_DATABASE",
+  "response": {
+    "items": [
+      {
+        "id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "display_name": "平台管理员（测试身份）",
+        "role": "padmin"
+      },
+      {
+        "id": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "display_name": "服务工程师（测试身份）",
+        "role": "msp"
+      },
+      {
+        "id": "531ed5c5-3142-334e-00f5-f160879c9f7b",
+        "display_name": "配置复核管理员（测试身份）",
+        "role": "padmin"
+      }
+    ],
+    "source": "postgresql"
+  },
+  "context": {
+    "tenantId": "55000000-0000-4000-8000-000000000001",
+    "actorId": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+    "permissionVersion": 3
+  },
+  "synthetic_only": true
+}

@@ -13,9 +13,14 @@ import {
 import {tierLabels} from '../utils/serviceTiers'
 import {displayTime} from '../utils/display'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import OnCallMemberPicker from '../components/OnCallMemberPicker.vue'
+import {createOnCallMemberCandidates,emptyOnCallMemberState} from '../utils/onCallMemberCandidates'
 
 const state=shallowRef<OnCallBoardState>(emptyOnCallBoardState())
 const workspace=createOnCallBoardWorkspace(api,s=>{state.value=s})
+const members=shallowRef(emptyOnCallMemberState()),memberButton=ref<HTMLButtonElement|null>(null),memberStatus=ref('')
+const memberWorkspace=createOnCallMemberCandidates(api,s=>{members.value=s})
+let memberTurn=0
 const internal=computed(()=>['padmin','msp'].includes(session.value?.user.role??''))
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&internal.value&&can('tickets:read')&&!switchingTenant.value))
 const canWriteInternal=computed(()=>Boolean(permitted.value&&can('ticket_notes:write_internal')))
@@ -69,6 +74,9 @@ function draftSnapshot(){return JSON.stringify([shiftDate.value,shiftCode.value,
 async function recover(){const turn=context.value,draft=draftSnapshot();if(await workspace.retry()&&turn===context.value&&draft===draftSnapshot())clearConfirmed(state.value.receipt?.path)}
 async function refreshBoard(){if(locked.value)return false;const turn=++readTurn,key=context.value;readStatus.value='';const ok=await workspace.load();if(turn===readTurn&&key===context.value&&ok)readStatus.value='已读取当前看板快照；未提交排班、交接或升级。';return ok}
 async function cancelRead(){if(!workspace.cancelRead())return false;refreshPaused.value=true;const turn=++readTurn,key=context.value;readStatus.value='已取消读取并暂停自动刷新；迟到结果不会显示，已保存回执不受影响。';await nextTick();if(turn===readTurn&&key===context.value&&!refreshButton.value?.disabled)refreshButton.value?.focus();return true}
+function setMember(field:'primary'|'backup'|'incoming',value:string,key:string){if(key!==context.value||!canWriteInternal.value||locked.value)return false;if(field==='primary')primaryUserId.value=value;else if(field==='backup')backupUserId.value=value;else incomingUserId.value=value;return true}
+async function loadMembers(){if(!canWriteInternal.value||locked.value||members.value.busy)return false;const turn=++memberTurn,key=context.value;memberStatus.value='';const ok=await memberWorkspace.load();if(turn===memberTurn&&key===context.value&&ok)memberStatus.value=`已读取${members.value.items.length}名当前候选，未替换任何已填人员。`;return ok}
+async function cancelMembers(){if(!memberWorkspace.cancel())return false;const turn=++memberTurn,key=context.value;memberStatus.value='已取消候选读取，当前人员输入保留。';await nextTick();if(turn===memberTurn&&key===context.value&&!memberButton.value?.disabled)memberButton.value?.focus();return true}
 function openWorkflow(row:OnCallQueueItem|EscalationStepRun,event:MouseEvent,navigate:(event?:MouseEvent)=>unknown){
  const board=state.value.board
  if(!permitted.value||locked.value||!board||![...board.queue,...board.step_runs].some(current=>current===row)){event.preventDefault();return false}
@@ -80,12 +88,13 @@ function clearRefreshTimer(){if(refreshTimer){clearInterval(refreshTimer);refres
 function startRefreshTimer(){
  clearRefreshTimer()
  if(!permitted.value)return
- refreshTimer=setInterval(()=>{if(permitted.value&&!refreshPaused.value&&!state.value.error&&!locked.value&&!dirty.value&&!document.hidden&&!document.activeElement?.closest('form,.table-wrap,.proto-tabs'))void workspace.load()},30000)
+ refreshTimer=setInterval(()=>{if(permitted.value&&!refreshPaused.value&&!members.value.busy&&!state.value.error&&!locked.value&&!dirty.value&&!document.hidden&&!document.activeElement?.closest('form,.table-wrap,.proto-tabs'))void workspace.load()},30000)
 }
 
 watch(context,()=>{
- readTurn++;readStatus.value=''
+ readTurn++;readStatus.value='';memberTurn++;memberStatus.value=''
  const s=session.value
+ memberWorkspace.reset(canWriteInternal.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version}:null)
  tab.value='queue';clearDrafts()
  workspace.reset(permitted.value&&s?{
   tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,
@@ -158,8 +167,8 @@ onBeforeRouteLeave(mayLeave)
 const unregister=contextTransitionGuards.register(mayLeave)
 function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()||dirty.value){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
-onUnmounted(()=>{clearRefreshTimer();unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
-defineExpose({state,workspace,openWorkflow,refreshPaused,refreshBoard,cancelRead,toggleRefresh,discardPolicy,mayLeave,dirty,shiftDate,primaryUserId,backupUserId,rosterNote,handoffRosterId,incomingUserId,handoffNote,escTicketId,editStep2Wait,submitRoster,preparedPolicy,preparePolicy,submitPolicyUpdate,editPolicyTier,editUnansweredCount,editStep2Role})
+onUnmounted(()=>{memberTurn++;memberWorkspace.dispose();clearRefreshTimer();unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
+defineExpose({state,workspace,members,loadMembers,cancelMembers,openWorkflow,refreshPaused,refreshBoard,cancelRead,toggleRefresh,discardPolicy,mayLeave,dirty,shiftDate,primaryUserId,backupUserId,rosterNote,handoffRosterId,incomingUserId,handoffNote,escTicketId,editStep2Wait,submitRoster,preparedPolicy,preparePolicy,submitPolicyUpdate,editPolicyTier,editUnansweredCount,editStep2Role})
 </script>
 <template>
  <section class="oncall-board" :aria-busy="!!state.busy">
@@ -322,6 +331,16 @@ defineExpose({state,workspace,openWorkflow,refreshPaused,refreshBoard,cancelRead
     </template>
 
     <template v-else-if="tab==='roster'">
+     <section v-if="canWriteInternal" class="member-tools" aria-label="内部候选人员" :aria-busy="members.busy">
+      <h2>排班与接班人员选择</h2>
+      <p>候选来自当前租户的活跃内部工单处理人员；接口最多返回100人，超限报错而不截断。未出现不代表人员不存在或无排班资格，可按已知UUID填写，保存时重新核验。</p>
+      <button ref="memberButton" type="button" :disabled="locked||members.busy" @click="loadMembers">{{members.error?'重试读取内部候选人员':'读取内部候选人员'}}</button>
+      <button v-if="members.busy" type="button" @click="cancelMembers">取消候选读取</button>
+      <p v-if="members.busy" role="status">正在读取候选人员；可以继续填写UUID，未自动选择人员。</p>
+      <p v-if="memberStatus" role="status">{{memberStatus}}</p>
+      <ApiErrorNotice :error="members.error" />
+      <p v-if="members.loaded&&!members.items.length" role="status">本次没有返回候选；这不是租户全部人员清单。</p>
+     </section>
      <div class="split-forms" v-if="canWriteInternal">
       <form class="action-form" @submit.prevent="submitRoster">
        <h2>登记/更新当班主备排班（CONFIG_PENDING_Q15）</h2>
@@ -336,12 +355,8 @@ defineExpose({state,workspace,openWorkflow,refreshPaused,refreshBoard,cancelRead
           <option value="FULL_DAY">全天值班（24h）</option>
          </select>
         </label>
-        <label>主班工程师 UUID
-         <input type="text" v-model="primaryUserId" :disabled="locked" required placeholder="主值班内部成员 UUID" />
-        </label>
-        <label>备班工程师 UUID（可选）
-         <input type="text" v-model="backupUserId" :disabled="locked" placeholder="备值班内部成员 UUID" />
-        </label>
+        <OnCallMemberPicker :model-value="primaryUserId" :scope-key="context" @update:model-value="(value,key)=>setMember('primary',value,key)" id-prefix="roster-primary" label="主班工程师" :items="members.items" :busy="members.busy" :locked="locked" required />
+        <OnCallMemberPicker :model-value="backupUserId" :scope-key="context" @update:model-value="(value,key)=>setMember('backup',value,key)" id-prefix="roster-backup" label="备班工程师" :items="members.items" :busy="members.busy" :locked="locked" :excluded-id="primaryUserId" />
         <label class="full">排班备注
          <input type="text" v-model="rosterNote" :disabled="locked" maxlength="500" placeholder="可选排班说明" />
         </label>
@@ -355,9 +370,7 @@ defineExpose({state,workspace,openWorkflow,refreshPaused,refreshBoard,cancelRead
         <label>关联排班 ID（可选）
          <input type="text" v-model="handoffRosterId" :disabled="locked" placeholder="排班记录 UUID" />
         </label>
-        <label>接班工程师 UUID
-         <input type="text" v-model="incomingUserId" :disabled="locked" required placeholder="不能与当前交班人相同" />
-        </label>
+        <OnCallMemberPicker :model-value="incomingUserId" :scope-key="context" @update:model-value="(value,key)=>setMember('incoming',value,key)" id-prefix="handoff-incoming" label="接班工程师" :items="members.items" :busy="members.busy" :locked="locked" :excluded-id="session?.user.id" required />
         <label class="full">交接班摘要说明
          <textarea v-model="handoffNote" :disabled="locked" rows="2" maxlength="1000" required placeholder="填写 18:00 交接重点事项"></textarea>
         </label>
@@ -485,6 +498,7 @@ defineExpose({state,workspace,openWorkflow,refreshPaused,refreshBoard,cancelRead
 <style scoped>
 .oncall-board{display:grid;gap:16px}
 .workspace{display:grid;gap:16px}
+.member-tools{border:1px solid #8495aa;padding:12px;border-radius:5px}.member-tools p{line-height:1.6;overflow-wrap:anywhere}.member-tools button{margin-right:8px}
 .action-form{display:grid;gap:12px;padding:16px;border:1px solid var(--border,#d0d7de);border-radius:8px;background:var(--surface-subtle,#f8fafc)}
 .split-forms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}

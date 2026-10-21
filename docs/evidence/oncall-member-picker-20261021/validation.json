@@ -1,0 +1,50 @@
+{
+  "result": "PASS_LOGIC_DOM_REAL_LOOPBACK_API_BUILD",
+  "new_tests": 31,
+  "vitest": {
+    "files_passed": 235,
+    "tests_passed": 3584
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS_AFTER_TYPED_TEST_MATRIX_FIX",
+  "production_build": {
+    "status": "PASSED",
+    "files": 140,
+    "bootstrap_gzip_bytes": 179959,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "df606840b2dc3898d4845744630a308094ad0244c8eaeda13878b05179d0958c",
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/pages/OnCallBoardPage.vue": "4bc4df8693e79a1300aed849c8797c70e3b7000e2b4d8a84cba7ca98fe30e3da",
+    "apps/web/src/components/OnCallMemberPicker.vue": "bd7068d72066b993db996d8f5f46c328c140fa2e6697bc45db40402d6cce56c6",
+    "apps/web/src/utils/onCallMemberCandidates.ts": "2b69b6c4f59a6968afe532ee0e79b6a25ac16d9759aa4d537a9c62eaacd9ccc5",
+    "apps/web/tests/onCallMemberCandidates.test.ts": "280a3d7015806465c37160921b4cc1aab98d4e754d5f90e01b0c840b08df51d3",
+    "apps/web/tests/onCallMemberPicker.test.ts": "705535508252c878fbb330b110cc557145c76f7eca90d7e4687f7e23806aaec5",
+    "apps/web/tests/onCallMemberPage.test.ts": "27d096f2775916e8d14834767827d1f10e71fdb9a1de08634c7bce8e185123ed",
+    "fixtures/oncall-members-http-synthetic-20261021.json": "e92b6333d97108c5f9ec89bc54de445298c86867bed8a300ed5e8bb4dba76527"
+  },
+  "real_api_http_checks": 16,
+  "real_api_login_tenant_checks_included": 9,
+  "protected_business_tables_unchanged": 26,
+  "frozen_migrations_validated": 48,
+  "repeat_readonly_table_count": 109,
+  "over_limit_seed": "101_DISPOSABLE_SYNTHETIC_USERS_NO_LOCAL_LOGIN_ACCOUNTS",
+  "api_contract_changed": false,
+  "database_schema_changed": false,
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "actual_viewports": "NOT_RUN",
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0,
+  "environment_restarted_after_all_temporary_services_cleaned": true,
+  "temporary_service_cleanup": {
+    "loopback_only": true,
+    "provider_sends": false,
+    "temporary_credentials_only": true,
+    "postgresql_stopped": true,
+    "temporary_database_and_credentials_removed": true,
+    "result": "PASS"
+  },
+  "api_stopped": true
+}

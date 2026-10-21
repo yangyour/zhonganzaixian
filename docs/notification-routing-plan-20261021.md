@@ -40,3 +40,5 @@ notification-routing-dependencies.json 已按六类渠道分别列出适配器�
 ## 提交与合并记录
 
 本步提交链：9850501（路由计划）→0b49cd0（显式Q14冲突口径）→4e956c2（六渠道依赖清单）→04f3a89（CI模板保护）。最终头 [04f3a89e2dccb030dfa842ff65851781ca053117](https://github.com/yangyour/zhonganzaixian/commit/04f3a89e2dccb030dfa842ff65851781ca053117) 的 [分支CI 39530051439](https://github.com/yangyour/zhonganzaixian/actions/runs/39530051439)四组检查全部通过。2026-10-21 01:58 UTC以expected_sha保护快进main并再次读引用核验；没有强制推送、部署或外部消息发送。[主分支CI 39530392090](https://github.com/yangyour/zhonganzaixian/actions/runs/39530392090)也已全部通过；当前代码批次的分支与合并后验证均闭环。
+
+记录提交 b925403 的分支CI39530739302与合并后main CI39531164835也已成功；仅补记文档，不改变功能验收边界。

@@ -1,0 +1,24 @@
+{
+  "result": "SPECIFICATIONS_PREPARED_NOT_BROWSER_EXECUTED",
+  "new_browser_specifications": 15,
+  "discovered_total": 74,
+  "discovered_files": 9,
+  "browser_execution": "NOT_RUN_EXISTING_SANDBOX_BLOCKER_NOT_RETRIED",
+  "axe": "NOT_RUN",
+  "screenshots_created": false,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "production_build_id": "c82bb283bf167f6b18e7ca8f770cd9d398b0eaf323c74a75c8e49a7061889caf",
+  "production_artifacts_unchanged": true,
+  "qa_entry_or_synthetic_credentials_in_dist": false,
+  "source_sha256": {
+    "apps/web/qa/export-preference-recovery.fixture.html": "50493e6d10abbbea5823c35826b3dc07ee4ec3512b00722a74311508adc64156",
+    "apps/web/qa/export-preference-recovery.fixture.ts": "3f439699fc45074ccba369a9b77fb2665ad3d4ae6c613b630b633acdee27dc3c",
+    "apps/web/qa/browser/export-preference-recovery.pw.ts": "fd9fbeee55926c205b46b7613d604ca7ef82fbbdc3651d7dfbc7d75d0c9f580a"
+  },
+  "unit_tests_this_slice": "NOT_RERUN_QA_ONLY_NO_PRODUCT_CODE_CHANGE",
+  "latest_separate_unit_evidence": "../own-preference-read-recovery-20261021/validation.json",
+  "api_or_database_executed": false,
+  "real_downloads": 0,
+  "formal_acceptance_passes_added": 0
+}

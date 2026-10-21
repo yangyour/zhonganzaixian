@@ -1,0 +1,35 @@
+{
+  "result": "PASS_READ_RECOVERY_TIMERS_JSDOM_BUILD_HTTP",
+  "new_tests": 15,
+  "vitest": {
+    "files_passed": 238,
+    "tests_passed": 3692
+  },
+  "focused_tests_passed": 113,
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 140,
+    "bootstrap_gzip_bytes": 179965,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "2dfbdbb92e4cdc0b087763087e0610001e8f32d0aec516f10a85342eb6441d49",
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/utils/contactImportWorkspace.ts": "f9d1ce662bc03b7349187ae236d88f7bcb01f97d8043ea92bec2a27b29ae5252",
+    "apps/web/src/utils/contactImportPreviewWorkspace.ts": "e080e3fc651eed393afbcbcdd6aa0ca2c3be93efe6a9bbe160f19aef5bbf2006",
+    "apps/web/src/pages/ContactImportsPage.vue": "f6a638d51499c20b565ceac7e47c7b28192054b00157b2244980a1b0f676f3f7",
+    "apps/web/src/pages/ContactImportPreviewPage.vue": "9d9fb42d5cd7211d545ceba1483c803c5fe3a25aaad85960f142da800f6acfe8",
+    "apps/web/tests/contactImportWorkspace.test.ts": "93f627993b0a3ac950dd572dcab8e5053ccf1619b7275b8ad6b42d80aa445ede",
+    "apps/web/tests/contactImportPreviewWorkspace.test.ts": "af34dfe5a6dd2e70adecff63a836cfd6b4b649e080694613fbbde8a4c67c0fb3",
+    "apps/web/tests/contactImportsPage.test.ts": "e67e83dbda4dd33fc096fb2d658fd1c666faa114e24d8d3b16b0d24e193f3836",
+    "apps/web/tests/contactPreviewConfirmationDom.test.ts": "554e0693c25459e0b6efa96bba804a61af13a6b80192d936c8e077efd728fcf6"
+  },
+  "api_contract_changed": false,
+  "api_or_database_executed": false,
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0
+}

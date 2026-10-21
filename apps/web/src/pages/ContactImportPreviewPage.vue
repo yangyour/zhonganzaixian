@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import '../styles/adminPrototype.css'
-import { computed, onUnmounted, shallowRef, watch } from 'vue'
+import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import { api } from '../api/client'
@@ -8,10 +8,13 @@ import { can, contextGeneration, session, switchingTenant } from '../stores/sess
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import { createContactPreviewWorkspace, type ContactPreviewState } from '../utils/contactImportPreviewWorkspace'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
 import CustomerContactFacts from '../components/CustomerContactFacts.vue'
 let disposed = false
+const previewScope = ref(0)
 const state = shallowRef<ContactPreviewState>({ text: '', result: null, busy: false, error: null })
 const workspace = createContactPreviewWorkspace(api, value => { state.value = value })
+watch(() => state.value.text, () => { previewScope.value++ }, {flush:'sync'})
 const permitted = computed(() => Boolean(session.value && ['padmin', 'tadmin'].includes(session.value.user.role) && can('contacts:read') && can('contacts:write') && !switchingTenant.value))
 const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.account_version, session.value?.user.role, permitted.value]))
 watch(contextKey, () => { const s = session.value; workspace.reset(s && permitted.value ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version, role: s.user.role, canRead: true, canWrite: true } : null) }, { immediate: true, flush: 'sync' })
@@ -40,7 +43,7 @@ defineExpose({ change: workspace.change, preview: workspace.preview, clearInput,
     <p class="preview-help">支持最大 512KiB、5 层嵌套；修改文本后自动清空上一次诊断结果。</p>
     <div class="preview-actions"><el-button type="primary" :disabled="state.busy || !state.text" :loading="state.busy" @click="workspace.preview()">校验数据格式</el-button><el-button :disabled="!state.text" @click="clearInput">清空内容</el-button></div>
    </div></section>
-   <ApiErrorNotice :error="state.error" />
+   <ApiErrorNotice :error="state.error" /><ReadRecoveryActions :busy="state.busy?'read':null" :can-retry="workspace.canRetryRead()" :scope-key="contextKey+':'+previewScope" :cancel="workspace.cancelRead" :retry="workspace.retryRead" label="格式预览" /><p class="preview-help">取消只停止等待本次只读格式诊断；本页不受理或撤销导入作业。</p>
    <section v-if="state.result" class="preview-results" aria-live="polite">
     <h2>服务端格式诊断结果</h2><div class="admin-stats"><div class="admin-stat"><span>格式通过</span><strong>{{ state.result.valid_rows }}</strong><small>字段符合规范</small></div><div class="admin-stat"><span>字段错误</span><strong>{{ state.result.invalid_rows }}</strong><small>请按行号修正</small></div><div class="admin-stat"><span>重复行提示</span><strong>{{ state.result.identical_rows }}</strong><small>字段完全相同</small></div><div class="admin-stat"><span>入库状态</span><strong>仅预览</strong><small>未执行数据写入</small></div></div><p class="preview-help">以下按原始行号展示校验结果；重复行仅作提示，导入时不会自动跳过或覆盖。</p>
     <ol class="preview-rows"><li v-for="row in state.result.rows" :key="row.row_number"><h3>第{{ row.row_number }}行：{{ row.status === 'FORMAT_VALID' ? '格式通过' : '字段格式错误' }}</h3><p v-if="row.status === 'INVALID'">请核对该行 8 个标准字段是否完整，以及角色、手机号、邮箱、启用状态与免打扰时段格式是否合法。</p><p v-if="row.identical_to_row !== null" class="duplicate-warning">该行字段与第{{ row.identical_to_row }}行完全相同，请核对是否需要保留。</p><details v-if="row.contact"><summary>查看本行解析预览</summary><CustomerContactFacts :facts="row.contact" /></details></li></ol>

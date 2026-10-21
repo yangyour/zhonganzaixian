@@ -43,13 +43,17 @@ export function readContactPreviewResult(raw: unknown, tenant: string, input: { 
 }
 export function createContactPreviewWorkspace(client: Pick<ApiClient, 'request'>, notify: (state: ContactPreviewState) => void) {
  let scope: ContactContext | null = null, generation = 0, abort: AbortController | null = null, disposed = false, state: ContactPreviewState = { text: '', result: null, busy: false, error: null }
+ let lastRead: string | null = null, readRetryable = false
  const snapshot = () => ({ ...state, result: state.result ? copy(state.result) : null }), emit = () => notify(snapshot())
- function clear() { ++generation; abort?.abort(); abort = null; state = { ...state, result: null, busy: false, error: null } }
+ function clear() { lastRead = null; readRetryable = false; ++generation; abort?.abort(); abort = null; state = { ...state, result: null, busy: false, error: null } }
+ async function preview() { if (!scope || disposed || state.busy) return false; clear(); const turn = generation, originalText = state.text, context = { ...scope }, controller = new AbortController(); abort = controller; state.busy = true; emit(); let dispatched = false; try { if (turn !== generation || disposed || controller.signal.aborted) return false; const input = parseContactPreviewText(originalText); lastRead = originalText; dispatched = true; const raw = await client.request('/contacts/import-preview', { method: 'POST', body: input, signal: controller.signal }); if (turn !== generation || disposed || controller.signal.aborted) return false; state.result = readContactPreviewResult(raw, context.tenantId, input); return true } catch (error) { if (turn === generation && !disposed && !isCancelled(error)) { state.error = error; readRetryable = dispatched } return false } finally { if (turn === generation && !disposed) { state.busy = false; abort = null; emit() } } }
+ function cancelRead() { if (disposed || !state.busy) return false; ++generation; abort?.abort(); abort = null; state = {...state, result: null, busy: false, error: null}; readRetryable = lastRead !== null; emit(); return true }
  return {
   state: snapshot,
   reset(context: ContactContext | null) { clear(); scope = !disposed && context && ['padmin', 'tadmin'].includes(context.role) && context.canRead === true && context.canWrite === true && typeof context.tenantId === 'string' && typeof context.actorId === 'string' && uuid.test(context.tenantId) && uuid.test(context.actorId) && Number.isSafeInteger(context.permissionVersion) && context.permissionVersion > 0 ? { ...context } : null; state.text = ''; emit() },
   change(text: string) { if (disposed) return; clear(); state.text = text; emit() },
-  async preview() { if (!scope || disposed || state.busy) return false; clear(); const turn = generation, originalText = state.text, context = { ...scope }, controller = new AbortController(); abort = controller; state.busy = true; emit(); try { if (turn !== generation || disposed || controller.signal.aborted) return false; const input = parseContactPreviewText(originalText); const raw = await client.request('/contacts/import-preview', { method: 'POST', body: input, signal: controller.signal }); if (turn !== generation || disposed || controller.signal.aborted) return false; state.result = readContactPreviewResult(raw, context.tenantId, input); return true } catch (error) { if (turn === generation && !disposed && !isCancelled(error)) state.error = error; return false } finally { if (turn === generation && !disposed) { state.busy = false; abort = null; emit() } } },
+  preview,
+  cancelRead, canRetryRead: () => !disposed && readRetryable && lastRead !== null && lastRead === state.text && !state.busy, retryRead: () => readRetryable && lastRead !== null && lastRead === state.text ? preview() : Promise.resolve(false),
   dispose() { clear(); disposed = true; scope = null; state.text = ''; emit() },
  }
 }

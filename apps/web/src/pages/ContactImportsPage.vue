@@ -10,10 +10,14 @@ import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import { createContactPreviewWorkspace, type ContactPreviewState } from '../utils/contactImportPreviewWorkspace'
 import { createContactImportWorkspace, emptyContactImportState, type ContactImportState } from '../utils/contactImportWorkspace'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
 const previewState = shallowRef<ContactPreviewState>({ text: '', result: null, busy: false, error: null })
 const state = shallowRef<ContactImportState>(emptyContactImportState())
 const preview = createContactPreviewWorkspace(api, value => { previewState.value = value })
 const workspace = createContactImportWorkspace(api, value => { state.value = value })
+const previewScope = ref(0)
+watch(() => previewState.value.text, () => { previewScope.value++ }, {flush:'sync'})
+const readScope = ref(0)
 const acknowledge = ref(false), confirming = ref(false), tracking = ref<string | null>(null)
 let timer: ReturnType<typeof setTimeout> | null = null, trackingEpoch = 0, disposed = false
 const permitted = computed(() => Boolean(session.value && ['padmin', 'tadmin'].includes(session.value.user.role) && can('contacts:read') && can('contacts:write') && !switchingTenant.value))
@@ -42,10 +46,13 @@ async function discard() {
  confirming.value = true
  try { await ElMessageBox.confirm(state.value.receipt ? '已受理作业保留在服务器，可从“我的导入作业”回读。离开会清除本页原输入与回执显示，确认继续？' : '输入与格式预览尚未持久化，离开将清除；确认放弃？', '保留本页输入', { confirmButtonText: '清除并继续', cancelButtonText: '保留输入', type: 'warning' }); return !disposed && turn === contextKey.value && input === previewState.value.text && ack === acknowledge.value && !workspace.unresolved() } catch { return false } finally { if (turn === contextKey.value && !disposed) confirming.value = false }
 }
-async function beginNew() { const turn = contextKey.value, input = previewState.value.text, ack = acknowledge.value; if (disposed || !permitted.value || busy.value || !await discard() || disposed || turn !== contextKey.value || input !== previewState.value.text || ack !== acknowledge.value) return false; if (!workspace.begin()) return false; stopTracking(); acknowledge.value = false; preview.change(''); return true }
+async function beginNew() { const turn = contextKey.value, input = previewState.value.text, ack = acknowledge.value; if (disposed || !permitted.value || busy.value || !await discard() || disposed || turn !== contextKey.value || input !== previewState.value.text || ack !== acknowledge.value) return false; if (!workspace.begin()) return false; readScope.value++; stopTracking(); acknowledge.value = false; preview.change(''); return true }
 async function unlockRejected() { if (!permitted.value || busy.value || state.value.attempt?.state !== 'rejected') return false; return workspace.begin() }
 async function browse(next = false) { if (!permitted.value || busy.value) return false; stopTracking(); return workspace.list(next) }
 async function select(id: string) { if (!permitted.value || busy.value) return false; stopTracking(); return workspace.select(id) }
+function cancelJobRead() { if (!workspace.cancelRead()) return false; stopTracking(); return true }
+async function retryJobRead() { if (!permitted.value || busy.value) return false; stopTracking(); return workspace.retryRead() }
+async function retryFormatRead() { if (locked.value || !permitted.value) return false; return preview.retryRead() }
 async function track(id: string) {
  if (!permitted.value || busy.value) return false
  stopTracking(); tracking.value = id; const turn = trackingEpoch, context = contextKey.value
@@ -60,7 +67,7 @@ onUnmounted(() => { disposed = true; stopTracking(); unregister(); workspace.dis
 const statusText = (status: string) => ({ PENDING: '待处理', RUNNING: '处理租约中（在线未知）', SUCCEEDED: '整批已新建', FAILED: '整批未执行 / 失败' }[status] ?? '未知')
 const stepText = (step: string) => ({ QUEUED: '已入队', RETRY_WAIT: '依赖失败，等待重试', APPLYING: '领取后处理', APPLIED: '全部行原子完成', AUTHORIZATION_REVOKED: '受理权限已失效', PAYLOAD_INVALID: '耐久载荷核对失败', LAST_ENABLED_DECISION_MAKER: '租户启用决策人约束未满足' }[step] ?? '未知')
 const example = JSON.stringify({ rows: [{ name: '格式示例，请替换为明确资料', roles: ['REPORTER'], mobile: null, email: null, wecom_user_id: null, preferred_priorities: null, quiet_window: null, enabled: false }] }, null, 2)
-defineExpose({ change, changeAck, checkFormat, submit, retry, beginNew, unlockRejected, browse, select, track, stopTracking, hasUnresolved: workspace.unresolved, state, previewState, acknowledge, tracking })
+defineExpose({ cancelJobRead, retryJobRead, retryFormatRead, change, changeAck, checkFormat, submit, retry, beginNew, unlockRejected, browse, select, track, stopTracking, hasUnresolved: workspace.unresolved, state, previewState, acknowledge, tracking })
 </script>
 <template>
  <section class="contact-import-page admin-prototype">
@@ -76,12 +83,12 @@ defineExpose({ change, changeAck, checkFormat, submit, retry, beginNew, unlockRe
     <el-input type="textarea" :rows="12" :model-value="previewState.text" :disabled="locked" aria-label="批量新建联系人原始JSON" placeholder="请粘贴符合规范的联系人 JSON 数据（请勿包含密码、Token 或密钥）" @update:model-value="change($event)" />
     <p class="help">支持单次最多 512KiB、5 层嵌套；修改文本后需重新执行格式校验。</p>
     <div class="actions"><el-button :disabled="locked || !previewState.text" :loading="previewState.busy" @click="checkFormat">校验数据格式</el-button><el-button :disabled="busy || workspace.unresolved()" @click="beginNew">重置输入</el-button></div>
-    <ApiErrorNotice :error="previewState.error" />
+    <ApiErrorNotice :error="previewState.error" /><ReadRecoveryActions :busy="previewState.busy?'read':state.busy==='write'?'write':null" :can-retry="!locked&&preview.canRetryRead()" :scope-key="contextKey+':'+previewScope" :cancel="preview.cancelRead" :retry="retryFormatRead" label="格式预览" />
     <div v-if="previewState.result" aria-live="polite"><p>格式校验通过 {{ previewState.result.valid_rows }} 行；字段错误 {{ previewState.result.invalid_rows }} 行；完全相同行 {{ previewState.result.identical_rows }} 行</p><p>can_import=false 表示格式预览本身不执行入库，实际导入请点击下方按钮提交作业。</p><ol><li v-for="row in previewState.result.rows" :key="row.row_number">第{{ row.row_number }}行：{{ row.status === 'INVALID' ? '字段格式有误，请修正' : '格式校验通过' }}<span v-if="row.identical_to_row !== null">；与第{{ row.identical_to_row }}行完全相同</span></li></ol></div>
     <el-checkbox :model-value="acknowledge" :disabled="locked" aria-label="确认相同行分别新建" @update:model-value="changeAck($event)">如有字段完全相同行，我确认每行分别新建，绝不自动合并或跳过</el-checkbox>
     <h2>2. 提交批量导入作业</h2><el-button type="primary" :disabled="!readyToSubmit" :loading="state.busy === 'write' || confirming" @click="submit">提交导入作业</el-button>
    </section></details>
-   <ApiErrorNotice :error="state.error" />
+   <ApiErrorNotice :error="state.error" /><ReadRecoveryActions :busy="state.busy" :can-retry="!busy&&workspace.canRetryRead()" :scope-key="contextKey+':'+readScope" :cancel="cancelJobRead" :retry="retryJobRead" label="导入作业" /><p class="help">取消读取或停止刷新不撤销已受理作业，也不确认未知受理请求；原页重试不会自动恢复定时刷新。</p>
    <section v-if="state.attempt?.state === 'uncertain'" class="import-panel uncertain" role="alert"><h2>导入请求结果待确认</h2><p>当前批次可能已被服务端受理，系统已锁定输入内容与幂等键。请先点击下方按钮恢复原请求结果，请勿重复新建批次。</p><el-button :disabled="busy" :loading="state.busy === 'write'" @click="retry">重试提交</el-button><p>若会话失效，重新登录后请先在“我的导入作业”中核对是否已生成任务。</p></section>
    <section v-if="state.attempt?.state === 'rejected'" class="import-panel"><h2>本次导入受理未通过</h2><p>已保留当前输入内容，可点击下方按钮解锁后重新核对。</p><el-button :disabled="busy" @click="unlockRejected">保留输入并解锁</el-button></section>
    <section v-if="state.receipt" class="import-panel" aria-live="polite"><h2>原始202受理回执（不是当前处理结果）</h2><p>作业 {{ state.receipt.operation_id }} · 初始状态 PENDING</p><p>该回执仅代表任务已入队受理，请点击下方按钮查询最新执行进度。</p><div class="actions"><el-button :disabled="busy" @click="select(state.receipt.operation_id)">查看当前进度</el-button><el-button :disabled="busy || tracking !== null" @click="track(state.receipt.operation_id)">自动刷新进度</el-button></div></section>

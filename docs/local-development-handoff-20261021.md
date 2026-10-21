@@ -27,3 +27,7 @@
 ## 后续整合
 
 历史分叉的逐项解决方案和验证边界见 [分支整合记录](branch-integration-20261021.md)。新候选不代表数据库已迁移或正式验收完成。
+
+## 最新状态
+
+历史开发已通过 b5c1bd0b2039871bfcec109ec01a43d97ff196ae 合入 main，核对时其余 28 个分支头均已包含在 main 历史中。随后 CMDB 来源目录、只读 API/UI 及 V1–V45 冻结证据继续提交 main。真实 PostgreSQL/HTTP 本轮结果见 [验证记录](real-business-validation-20261021.md)；未恢复 Cloud validation，后续保持本地验证后及时提交 main。

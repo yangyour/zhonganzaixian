@@ -1,0 +1,114 @@
+{
+  "exit": 0,
+  "expected": {
+    "PostgresTicketWorkflowIntegrationTest": 3,
+    "PostgresTicketNotificationIntegrationTest": 2,
+    "PostgresServiceTierIntegrationTest": 2,
+    "PostgresOnCallEscalationIntegrationTest": 3,
+    "PostgresWorkflowAuthorityIntegrationTest": 4
+  },
+  "results": {
+    "PostgresWorkflowAuthorityIntegrationTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PostgresTicketNotificationIntegrationTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PostgresTicketWorkflowIntegrationTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PostgresOnCallEscalationIntegrationTest": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PostgresServiceTierIntegrationTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "cases": [
+    {
+      "class": "PostgresWorkflowAuthorityIntegrationTest",
+      "test": "simultaneousCreationHasExactlyOneWinnerAndNoSplitHistory()",
+      "passed": true
+    },
+    {
+      "class": "PostgresTicketNotificationIntegrationTest",
+      "test": "guardsRejectForgedOrMutatedRecords()",
+      "passed": true
+    },
+    {
+      "class": "PostgresTicketWorkflowIntegrationTest",
+      "test": "customerCloseWaitsForLinkedMonitoringReview()",
+      "passed": true
+    },
+    {
+      "class": "PostgresOnCallEscalationIntegrationTest",
+      "test": "onCallBoardHandoffCountsEscalationPolicyModificationAndTwoUnansweredCalls_M5_12_M5_13()",
+      "passed": true
+    },
+    {
+      "class": "PostgresWorkflowAuthorityIntegrationTest",
+      "test": "runtimeCannotPreclaimOrRewriteAuthorityDirectly()",
+      "passed": true
+    },
+    {
+      "class": "PostgresServiceTierIntegrationTest",
+      "test": "tierChangesAreAppendOnlyAndThreeInFlightTicketsKeepFrozenSlaDeadlines_M2_10()",
+      "passed": true
+    },
+    {
+      "class": "PostgresTicketWorkflowIntegrationTest",
+      "test": "durableLifecyclePersistsAppendOnlyEventsOutboxAndCustomerProjection()",
+      "passed": true
+    },
+    {
+      "class": "PostgresWorkflowAuthorityIntegrationTest",
+      "test": "revisionTicketCannotAlsoBecomeLegacyTicket()",
+      "passed": true
+    },
+    {
+      "class": "PostgresOnCallEscalationIntegrationTest",
+      "test": "slaReportMonthlyResultFreezeAndImmutabilityGuards_M5_9_M5_10_M5_19()",
+      "passed": true
+    },
+    {
+      "class": "PostgresServiceTierIntegrationTest",
+      "test": "dbGuardsRejectHistoryMutationDeleteAndUnsynchronizedWrites()",
+      "passed": true
+    },
+    {
+      "class": "PostgresOnCallEscalationIntegrationTest",
+      "test": "customerPolicyReportsAssetEvidenceWithoutInventingHealthySamples()",
+      "passed": true
+    },
+    {
+      "class": "PostgresTicketWorkflowIntegrationTest",
+      "test": "staleVersionAndCrossTenantAreRejectedWithoutAppending()",
+      "passed": true
+    },
+    {
+      "class": "PostgresWorkflowAuthorityIntegrationTest",
+      "test": "legacyTicketCannotAlsoBecomeRevisionTicket()",
+      "passed": true
+    },
+    {
+      "class": "PostgresTicketNotificationIntegrationTest",
+      "test": "outboxFactsBecomeIntentsAndRecipientOwnedMessagesExactlyOnce()",
+      "passed": true
+    }
+  ]
+}

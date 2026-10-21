@@ -52,7 +52,8 @@ class PostgresTicketWorkflowIntegrationTest {
     @Test void staleVersionAndCrossTenantAreRejectedWithoutAppending(){
         String ticket=register();var internal=access(msp,mspVersion);command(internal,ticket,"POST /integration/workflow/activate-cas/",()->workflow.activate(internal,ticket,0,"P1",Tier.STANDARD,"SYNTHETIC_D07_CAS",(a,p,t,start)->policy(start)));
         assertEquals(409,assertThrows(DomainException.class,()->platform.idempotentAuthorized(internal.actorId(),internal.tenantId(),"POST /integration/workflow/stale/"+ticket,UUID.randomUUID().toString(),"e".repeat(64),internal.permissionVersion(),()->workflow.authorizeCommand(internal,ticket,false),()->workflow.transition(internal,ticket,new WorkflowLifecycle.Command(Action.ACCEPT,2,null,"stale",null,false)))).status);
-        var foreign=new TicketWorkflowRepository.Access("55000000-0000-4000-8000-000000000002",msp,mspVersion,UUID.randomUUID().toString());assertEquals(404,assertThrows(DomainException.class,()->workflow.read(foreign,ticket)).status);
+        String foreignTenant="55000000-0000-4000-8000-000000000002";long foreignVersion=platform.membership(msp,foreignTenant).orElseThrow().permissionVersion();
+        var foreign=new TicketWorkflowRepository.Access(foreignTenant,msp,foreignVersion,UUID.randomUUID().toString());assertEquals(404,assertThrows(DomainException.class,()->workflow.read(foreign,ticket)).status);
         assertEquals(1,count("SELECT count(*) FROM public.mop_ticket_workflow_event WHERE tenant_id=?::uuid AND ticket_id=?::uuid",TENANT,ticket));
     }
     static int count(String sql,String... args){try(Connection c=pool.getConnection();var s=c.prepareStatement(sql)){for(int i=0;i<args.length;i++)s.setString(i+1,args[i]);try(var r=s.executeQuery()){r.next();return r.getInt(1);}}catch(SQLException e){throw new AssertionError(e);}}

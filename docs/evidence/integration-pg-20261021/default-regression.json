@@ -1,0 +1,9 @@
+{
+  "tests": 3745,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 987,
+  "executed": 2758,
+  "result": "PASS",
+  "scope": "Default Maven verify; gated integration tests skipped here and run separately in attempt-3"
+}

@@ -1,0 +1,15 @@
+{
+  "observed_at_utc": "2026-10-21T05:27:07.410342+00:00",
+  "sha256": {
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresTicketWorkflowIntegrationTest.java": "4796dce240de793ed47923a15b28791c02479313f6104be29abb3102331efcc3",
+    "server/persistence/target/test-classes/cn/mop/persistence/PostgresTicketWorkflowIntegrationTest.class": "b7186aa106020830e07260744e93ce9478432c9f7e444684cc7283ef1f510fec",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresTicketNotificationIntegrationTest.java": "611bf5f990f2a28c4abeac8e1bff23487bab3d5910b4c12b49bee2273220580a",
+    "server/persistence/target/test-classes/cn/mop/persistence/PostgresTicketNotificationIntegrationTest.class": "f78e017086efd35cd1bd28a7506201b1593e333dc5c1987f02d63d87733777b2",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresServiceTierIntegrationTest.java": "f8be6a7cf18415bd04c7d2363e7dcc94d16805c9a0f5be40f572123ccc03c246",
+    "server/persistence/target/test-classes/cn/mop/persistence/PostgresServiceTierIntegrationTest.class": "96385847718ad27c71a6b8c85a188eb7c83c20371e2641179dbfcaa6c52ed4fa",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresOnCallEscalationIntegrationTest.java": "f436fa6e8d0b4a681fc2cdcec34a269c9e0e24d796ab9907052f706f784e56b9",
+    "server/persistence/target/test-classes/cn/mop/persistence/PostgresOnCallEscalationIntegrationTest.class": "da07f7285603e16f334429a8d37a72c3d6ff96d1c8867ecb5bc4a645f573fa08",
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresWorkflowAuthorityIntegrationTest.java": "c12e69a99376ccb38af4057c35ac890a0b5f404ec5442bedb3b57bb2e2fa0087",
+    "server/persistence/target/test-classes/cn/mop/persistence/PostgresWorkflowAuthorityIntegrationTest.class": "473921e4f1aac37144a899cbd841d1b295313e089b81c3cee676786d898df672"
+  }
+}

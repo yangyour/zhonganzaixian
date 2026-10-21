@@ -1,0 +1,4 @@
+import {it,expect} from 'vitest'
+import {parseRuntimeUtc} from '../src/utils/runtimeConfigurationInput'
+it.each(['2026-02-30T08:00:00Z','2026-02-29T08:00:00Z','2026-04-31T08:00:00Z','2026-10-15T24:00:00Z','0000-01-01T00:00:00Z','2026-10-15T08:00:00+08:00','2026-10-15','2026-10-15T08:00:00.1234Z',' 2026-10-15T08:00:00Z',''])('rejects impossible or ambiguous UTC input %s',value=>expect(()=>parseRuntimeUtc(value)).toThrow())
+it('normalizes only valid precision and preserves real leap days and boundary years',()=>{expect(parseRuntimeUtc('2024-02-29T08:00:00Z')).toBe('2024-02-29T08:00:00.000Z');expect(parseRuntimeUtc('0001-01-01T00:00:00.1Z')).toBe('0001-01-01T00:00:00.100Z');expect(parseRuntimeUtc('9999-12-31T23:59:59.999Z')).toBe('9999-12-31T23:59:59.999Z');expect(parseRuntimeUtc('',true)).toBeNull();expect(()=>parseRuntimeUtc(' ',true)).toThrow()})

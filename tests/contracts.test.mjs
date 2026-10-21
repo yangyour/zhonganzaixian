@@ -1341,3 +1341,12 @@ test('actual backup calendar candidates and Shanghai historical gap match strict
   assert.equal(captured.captures.length,3);
   for (const item of captured.captures) assert.ok(validates('BackupPlanSchedulePreviewResult', {data:item.response,trace_id:'synthetic-actual-http'}));
 });
+
+test('actual runtime catalog and unpublished current read retain all registered keys and no production approval', () => {
+  const captured = read('../fixtures/runtime-catalog-http-synthetic-20261021.json');
+  assert.ok(validates('RuntimeConfigurationCatalog', {data:captured.catalog,trace_id:'synthetic-actual-http'}));
+  assert.deepEqual(captured.catalog.items.map(r=>r.key).sort(),read('../contracts/config-baseline.json').settings.map(r=>r.key).sort());
+  assert.equal(captured.current.latest_version,0);
+  assert.equal(captured.current.effective_value,null);
+  assert.equal(captured.current.production_approved,false);
+});

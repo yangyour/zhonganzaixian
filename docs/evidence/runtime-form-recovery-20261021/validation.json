@@ -1,0 +1,28 @@
+{
+  "base_commit": "2278d9c975972fb81ffd62d74a76834cf19226a9",
+  "result": "PASS",
+  "api_contract": "UNCHANGED_0.71.0",
+  "web_tests": 2730,
+  "web_files": 198,
+  "new_web_tests": 25,
+  "contract_tests": 165,
+  "typecheck_build_static": "PASS",
+  "build_id": "f43e8c47ca98172e7dcdcf196977b8c70238051df76de6b3adfe1a7b97ceafde",
+  "actual_http_checks": 17,
+  "actual_http_production_page_replay": "PASS_JSDOM_NOT_BROWSER",
+  "runtime_catalog_keys": 186,
+  "configuration_publications_created": 0,
+  "migrations": "UNCHANGED_V1_V45",
+  "backend_code": "UNCHANGED",
+  "browser_axe": "NOT_RUN",
+  "formal_tc_not_run": 128,
+  "temporary_environments_cleaned": true,
+  "source_sha256": {
+    "apps/web/src/pages/RuntimeConfigurationsPage.vue": "b3045b2181025fdd3c14329152d8d14c4e60be435f9c4ae78035159a1928be02",
+    "apps/web/src/utils/runtimeConfigurationInput.ts": "38a745cf95bdb54c0f314c64c3ad6737df3eeba8852d5d95f35de585d8ec03fc",
+    "apps/web/tests/runtimeConfigurationInput.test.ts": "6238527f62f5c322fb853aaa672213e712d1e8381f004f6369c2f472391a3010",
+    "apps/web/tests/runtimeConfigurationsPage.test.ts": "18bff12e92370d04cf357263b5be627015ae889c82d1ce16037a03df0c3ca367",
+    "fixtures/runtime-catalog-http-synthetic-20261021.json": "1f45ca89becf8e92107109c7831a3a290d8e67c763bce4f4d37b59c2cbd7acf8",
+    "tests/contracts.test.mjs": "28e5c96b6fc003f7446ce14b428ea33df697736b50bd49d4e5cbc466fd8f8ff2"
+  }
+}

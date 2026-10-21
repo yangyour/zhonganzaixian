@@ -1,0 +1,29 @@
+{
+  "purpose": "dependency_shape_only_not_a_runtime_publication",
+  "backup_execution_enabled": false,
+  "production_approved": false,
+  "tenant_id": null,
+  "approved_plan_publication_reference": null,
+  "verified_target_authorization_reference": null,
+  "ssh_adapter_reference": null,
+  "existing_credential_binding_reference": null,
+  "verified_host_key_trust_reference": null,
+  "encrypted_storage_binding_reference": null,
+  "kms_key_reference": null,
+  "retention_approval_reference": null,
+  "failure_ticket_mapping_reference": null,
+  "recovery_drill_approval_reference": null,
+  "runtime_publications": {
+    "backup.default_local_time": null,
+    "backup.retry_count": null,
+    "backup.retry_interval_min": null,
+    "backup.recent_version_count": null,
+    "backup.min_retention_months": null,
+    "backup.failure_ticket_count": null,
+    "backup.failure_count_semantics": null,
+    "backup.commands": null,
+    "backup.noise_filter": null,
+    "backup.change_window": null
+  },
+  "notes": "Unresolved dependency references only. Do not paste passwords, private keys, executable commands or provider endpoints. This file does not publish a plan, trust a host key, authorize SSH, create a run, grant storage access, approve retention deletion or send notifications. Calendar preview is not next execution time."
+}

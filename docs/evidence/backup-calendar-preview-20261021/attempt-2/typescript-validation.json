@@ -1,0 +1,5 @@
+{
+  "result": "PASS",
+  "readers": 3,
+  "scope": "ACTUAL_SYNTHETIC_HTTP_PAYLOADS_NOT_BROWSER"
+}

@@ -1,0 +1,25 @@
+// @vitest-environment jsdom
+import {createApp,nextTick,reactive,h,type App} from 'vue'
+import {ElAlert,ElButton} from 'element-plus'
+import {beforeEach,afterEach,it,expect,vi} from 'vitest'
+import Panel from '../src/components/BackupSchedulePreview.vue'
+import {api,ApiError} from '../src/api/client'
+import {session,switchingTenant,contextGeneration} from '../src/stores/session'
+import type {Session} from '../src/api/types'
+import {row,scope} from './backupPlan.fixture'
+import {preview} from './backupSchedulePreview.fixture'
+let app:App|undefined,host:HTMLElement,props:ReturnType<typeof reactive<{plan:ReturnType<typeof row>}>>
+const auth:Session={user:{id:scope.actorId,role:'padmin',display_name:'测试'},tenant:{id:scope.tenantId,name:'测试'},allowed_tenants:[],capabilities:['backup_plan_drafts:read'],permission_version:7,csrf_token:'SYNTHETIC',mode:'remote_test',identity_source:'synthetic-unit-only'}
+async function settle(){for(let i=0;i<10;i++){await Promise.resolve();await nextTick()}}
+function button(name:string){return [...host.querySelectorAll('button')].find(b=>b.textContent?.trim()===name)!}
+async function mount(){host=document.createElement('div');document.body.append(host);props=reactive({plan:row()});app=createApp({render:()=>h(Panel,{plan:props.plan})});app.component('ElAlert',ElAlert);app.component('ElButton',ElButton);app.mount(host);await settle()}
+async function enter(){const input=host.querySelector('input')!;input.value='2026-10-22';input.dispatchEvent(new Event('input'));await settle()}
+beforeEach(()=>{session.value=structuredClone(auth);switchingTenant.value=false;contextGeneration.value=0})
+afterEach(()=>{app?.unmount();app=undefined;host?.remove();vi.restoreAllMocks();session.value=null})
+it('starts blank and never reads until an explicit date; submits only GET with bound version',async()=>{const req=vi.spyOn(api,'request').mockResolvedValue(preview());await mount();expect(req).not.toHaveBeenCalled();expect(button('预览指定日期').disabled).toBe(true);await enter();button('预览指定日期').click();await settle();expect(req.mock.calls[0]?.[0]).toBe(`/backup-plan-drafts/${row().id}/schedule-preview?date=2026-10-22&expected_version=1`);expect(req.mock.calls[0]?.[1]?.method).toBe('GET');expect(host.textContent).toContain('UTC 候选时间：2026-10-21T18:00:00Z');expect(host.textContent).toContain('已创建任务：否')})
+it('cancellation aborts ignores late results and restores date focus',async()=>{let finish!:(v:unknown)=>void;const req=vi.spyOn(api,'request').mockImplementation(()=>new Promise(r=>finish=r));await mount();await enter();button('预览指定日期').click();await settle();expect(button('预览中…').disabled).toBe(true);button('取消预览').click();await settle();expect(req.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);expect(document.activeElement).toBe(host.querySelector('input'));finish(preview());await settle();expect(host.textContent).not.toContain('UTC 候选时间')})
+it.each(['tenant','permission','role','generation','unmount'])('clears and rejects late response after %s change',async kind=>{let finish!:(v:unknown)=>void;const req=vi.spyOn(api,'request').mockImplementation(()=>new Promise(r=>finish=r));await mount();await enter();button('预览指定日期').click();await settle();if(kind==='tenant')session.value=null;if(kind==='permission')session.value={...auth,capabilities:[]};if(kind==='role')session.value={...auth,user:{...auth.user,role:'msp'}};if(kind==='generation')contextGeneration.value++;if(kind==='unmount'){app!.unmount();app=undefined}await settle();expect(req.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);finish(preview());await settle();expect(host.textContent).not.toContain('UTC 候选时间')})
+it('failed reread removes the old preview and does not retry a new version',async()=>{const req=vi.spyOn(api,'request').mockResolvedValueOnce(preview()).mockRejectedValue(new ApiError(409,'VERSION_CONFLICT','冲突','test'));await mount();await enter();button('预览指定日期').click();await settle();button('预览指定日期').click();await settle();expect(host.textContent).not.toContain('UTC 候选时间');expect(host.textContent).toContain('先重新读取计划');expect(req).toHaveBeenCalledTimes(2)})
+it('changing date aborts and removes old response',async()=>{vi.spyOn(api,'request').mockResolvedValue(preview());await mount();await enter();button('预览指定日期').click();await settle();const input=host.querySelector('input')!;input.value='2026-10-23';input.dispatchEvent(new Event('input'));await settle();expect(host.textContent).not.toContain('UTC 候选时间')})
+
+it('plan version change aborts and requires a new explicit date',async()=>{let finish!:(v:unknown)=>void;const req=vi.spyOn(api,'request').mockImplementation(()=>new Promise(r=>finish=r));await mount();await enter();button('预览指定日期').click();await settle();props.plan=row(2);await settle();expect(req.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);expect(host.querySelector('input')!.value).toBe('');finish(preview());await settle();expect(host.textContent).not.toContain('UTC 候选时间')})

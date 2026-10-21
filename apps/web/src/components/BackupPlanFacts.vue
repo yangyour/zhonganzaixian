@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {computed,ref,watch} from 'vue'
 import type {BackupPlanDetail,BackupPlanRevision} from '../utils/backupPlanDrafts'
+import BackupSchedulePreview from './BackupSchedulePreview.vue'
 import {displayTime} from '../utils/display'
 const props=defineProps<{value:BackupPlanDetail|BackupPlanRevision}>()
 const targetPage=ref(0),pages=computed(()=>Math.ceil(props.value.target_asset_ids.length/10)),targets=computed(()=>props.value.target_asset_ids.slice(targetPage.value*10,targetPage.value*10+10))
@@ -12,6 +13,7 @@ watch(()=>('id' in props.value?props.value.id:props.value.plan_id)+'/'+props.val
   <h3>关联目标设备 · {{value.target_count}} 台</h3><p>当前租户设备引用（设备在线状态与备份连通性待启用后校验）</p>
   <ol :start="targetPage*10+1" class="target-references"><li v-for="id in targets" :key="id">{{id}}</li></ol>
   <div v-if="pages>1" class="target-pages"><button type="button" :disabled="targetPage===0" @click="targetPage--">上一组目标</button><span>第{{targetPage+1}} / {{pages}}组 · 每组10个</span><button type="button" :disabled="targetPage+1>=pages" @click="targetPage++">下一组目标</button></div>
+  <BackupSchedulePreview v-if="'id' in value" :plan="value" />
   <h3>备注说明</h3><p v-if="value.note===null">未填写</p><p v-else-if="value.note===''">无备注（置空）</p><template v-else><pre>{{value.note}}</pre></template>
  </div>
 </template>

@@ -1,0 +1,218 @@
+{
+  "scope": "REAL_LOOPBACK_HTTP_SYNTHETIC_ACCOUNTS",
+  "checks": [
+    {
+      "case": "anonymous_preview",
+      "actor": "anonymous",
+      "status": 401,
+      "expected": 401,
+      "code": "SESSION_EXPIRED",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_csrf",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_login",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_switch",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_csrf",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_login",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_switch",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_csrf",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_login",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_switch",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "create_unpublished_plan",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "explicit_calendar_candidate",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_preview_forbidden",
+      "actor": "msp",
+      "status": 403,
+      "expected": 403,
+      "code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "customer_preview_forbidden",
+      "actor": "viewerA",
+      "status": 403,
+      "expected": 403,
+      "code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "stale_version",
+      "actor": "padmin",
+      "status": 409,
+      "expected": 409,
+      "code": "VERSION_CONFLICT",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "missing_date",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "missing_version",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "invalid_day",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "year_zero",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "utc_underflow",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "duplicate_date",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tenant_override",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "foreign_plan_hidden",
+      "actor": "padmin",
+      "status": 404,
+      "expected": 404,
+      "code": "OBJECT_NOT_FOUND",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "archive_plan",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "archived_calendar_only",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "historical_gap_no_candidate",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    }
+  ],
+  "result": "PASS",
+  "provider_sends": false,
+  "successful_gets_all_table_fingerprints_unchanged": true,
+  "rejected_gets_only_security_audit_changed": true,
+  "api_stopped": true
+}

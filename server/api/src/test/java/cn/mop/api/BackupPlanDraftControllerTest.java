@@ -42,4 +42,24 @@ class BackupPlanDraftControllerTest {
     @Test void bodyByteAndTokenLimitsAre413WithoutTruncation(){var r=request("POST");r.setContent(new byte[BackupPlanDraftController.MAX_BODY_BYTES+1]);assertEquals(413,assertThrows(DomainException.class,()->BackupPlanDraftController.body(r)).status);var token=request("POST");token.setContent(("["+"null,".repeat(4000)+"null]").getBytes(StandardCharsets.UTF_8));assertEquals(413,assertThrows(DomainException.class,()->BackupPlanDraftController.body(token)).status);var streamed=new MockHttpServletRequest(){@Override public long getContentLengthLong(){return -1;}};streamed.setContent(new byte[BackupPlanDraftController.MAX_BODY_BYTES+1]);assertEquals(413,assertThrows(DomainException.class,()->BackupPlanDraftController.body(streamed)).status);}
     @Test void validRawBodyKeepsNullAndWhitespace(){var n=input().put("note"," \n\t😀 ");var r=request("POST");r.setContent(n.toString().getBytes(StandardCharsets.UTF_8));assertEquals(n,BackupPlanDraftController.body(r));var fresh=request("POST");fresh.setContent(n.toString().getBytes(StandardCharsets.UTF_8));assertEquals(" \n\t😀 ",data(controller.create(fresh)).get("note"));}
     @Test void opaqueCredentialReferenceRemainsUnverifiedAndDoesNotExposeASecretField(){var n=input().put("credential_ref",OTHER);var out=data(controller.write(null,"CREATE",n,request("POST")));assertEquals(OTHER,out.get("credential_ref"));assertEquals("NOT_VERIFIED_BY_THIS_MODEL",out.get("credential_verification"));assertFalse(out.containsKey("password"));assertEquals("CONTRACT_CONFIGURABLE_DEFAULT_NOT_EFFECTIVE",out.get("retry_policy_source"));}
+    @Test void schedulePreviewBindsExplicitDateVersionAndKeepsExecutionDisabled(){
+        when(plans.get(access(),ID)).thenReturn(row(1,false,draft()));var r=request("GET");r.addParameter("date","2026-10-22");r.addParameter("expected_version","1");
+        var out=data(controller.schedulePreview(ID,r));assertEquals("2026-10-21T18:00:00Z",out.get("candidate_instant"));assertEquals("2026-10-22T02:00",out.get("requested_local_date_time"));
+        assertEquals("UNPUBLISHED_CALENDAR_CANDIDATE",out.get("resolution"));for(String key:List.of("enabled","effective","creates_run","execution_authorized"))assertEquals(false,out.get(key));assertNull(out.get("next_execution_at"));assertNull(out.get("missed_run_policy"));verify(plans).get(access(),ID);verifyNoMoreInteractions(plans);
+    }
+    @Test void schedulePreviewRejectsStaleVersionWithoutChoosingLatest(){
+        when(plans.get(access(),ID)).thenReturn(row(2,false,draft()));var r=request("GET");r.addParameter("date","2026-10-22");r.addParameter("expected_version","1");assertEquals(409,assertThrows(DomainException.class,()->controller.schedulePreview(ID,r)).status);
+    }
+    @Test void schedulePreviewRequiresCanonicalDateAndBothParameters(){
+        for(String date:List.of("2026-02-30","0000-01-01","2026-1-1","today","2026-10-22T00:00:00Z")){var r=request("GET");r.addParameter("date",date);r.addParameter("expected_version","1");assertEquals(400,assertThrows(DomainException.class,()->controller.schedulePreview(ID,r)).status);}
+        var absent=request("GET");assertEquals(400,assertThrows(DomainException.class,()->controller.schedulePreview(ID,absent)).status);verifyNoInteractions(plans);
+    }
+    @Test void schedulePreviewRejectsOverridesDuplicatesAndForeignProjection(){
+        var r=request("GET");r.addParameter("date","2026-10-22");r.addParameter("expected_version","1");r.addParameter("tenant_id",OTHER);assertThrows(DomainException.class,()->controller.schedulePreview(ID,r));
+        var duplicate=request("GET");duplicate.addParameter("date","2026-10-22","2026-10-23");duplicate.addParameter("expected_version","1");assertThrows(DomainException.class,()->controller.schedulePreview(ID,duplicate));
+        var valid=request("GET");valid.addParameter("date","2026-10-22");valid.addParameter("expected_version","1");var t=Instant.parse("2026-10-04T08:00:00Z");when(plans.get(access(),ID)).thenReturn(new Snapshot(ID,OTHER,1,draft(),false,ACTOR,t,t,t));assertEquals(503,assertThrows(DomainException.class,()->controller.schedulePreview(ID,valid)).status);
+    }
+    @Test void archivedPreviewIsCalendarOnlyAndHeadersArePrivate(){
+        when(plans.get(access(),ID)).thenReturn(row(2,true,draft()));var r=request("GET");r.addParameter("date","2026-10-22");r.addParameter("expected_version","2");var out=data(controller.schedulePreview(ID,r));assertEquals(true,out.get("archived"));assertEquals(false,out.get("creates_run"));var response=new org.springframework.mock.web.MockHttpServletResponse();controller.privateHeaders(response);assertEquals("no-store",response.getHeader("Cache-Control"));assertEquals("no-referrer",response.getHeader("Referrer-Policy"));
+    }
 }

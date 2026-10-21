@@ -1,0 +1,90 @@
+{
+  "exit": 0,
+  "cases": [
+    {
+      "name": "unprotectedWritesAndIndependentReadInsideCommandAreRejected()",
+      "passed": true
+    },
+    {
+      "name": "stableBoundedPagesAndHistoryCursorDoNotDuplicate()",
+      "passed": true
+    },
+    {
+      "name": "authorizationCallbackPrecedesCachedReceipt()",
+      "passed": true
+    },
+    {
+      "name": "sameKeyReplaysOriginalReceiptWithoutAnotherRevision()",
+      "passed": true
+    },
+    {
+      "name": "successfulReadonlyQueriesDoNotAppendAuditOrReceipt()",
+      "passed": true
+    },
+    {
+      "name": "staleExpectedVersionCannotOverwriteHistory()",
+      "passed": true
+    },
+    {
+      "name": "actualAuditSqlFailureRollsBackEverything()",
+      "passed": true
+    },
+    {
+      "name": "crossTenantPlansAndTargetsReturn404()",
+      "passed": true
+    },
+    {
+      "name": "currentMembershipAndPermissionVersionAreRequired()",
+      "passed": true
+    },
+    {
+      "name": "concurrentOriginalKeyProducesOneCommitAndOneAudit()",
+      "passed": true
+    },
+    {
+      "name": "realCreateRoundTripKeepsUnverifiedIntentOrderedTargetsAndNoActivation()",
+      "passed": true
+    },
+    {
+      "name": "concurrentDifferentKeysWithSameExpectedVersionHaveOneWinner()",
+      "passed": true
+    },
+    {
+      "name": "actualTargetForeignKeyFailureRollsBackEverything()",
+      "passed": true
+    },
+    {
+      "name": "archiveRestorePreserveDefinitionAndStayDisabled()",
+      "passed": true
+    },
+    {
+      "name": "originalReplayAfterArchiveKeepsOriginalUnarchivedReceipt()",
+      "passed": true
+    },
+    {
+      "name": "callerFailureRollsBackAllFiveTables()",
+      "passed": true
+    },
+    {
+      "name": "missingTargetsOrMismatchedDraftTenantDoNotCreateHead()",
+      "passed": true
+    },
+    {
+      "name": "changedBodySameKeyIsConflictBeforeMutation()",
+      "passed": true
+    },
+    {
+      "name": "corruptedEnabledReadFailsClosedWithoutChangingRealDatabase()",
+      "passed": true
+    },
+    {
+      "name": "invalidPaginationAndVersionFailBeforeMutation()",
+      "passed": true
+    },
+    {
+      "name": "updateAndHistoryRetainOriginalBytesAndActor()",
+      "passed": true
+    }
+  ],
+  "expected": 21
+}

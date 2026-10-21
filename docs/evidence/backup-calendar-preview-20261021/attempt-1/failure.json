@@ -1,0 +1,6 @@
+{
+  "stage": "business_and_http",
+  "error_type": "AssertionError",
+  "detail": "Calendar GET modified database rows",
+  "production_approved": false
+}

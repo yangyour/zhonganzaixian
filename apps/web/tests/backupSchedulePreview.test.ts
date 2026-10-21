@@ -1,0 +1,9 @@
+import {it,expect} from 'vitest'
+import {validPreviewDate,readBackupSchedulePreview} from '../src/utils/backupSchedulePreview'
+import {row} from './backupPlan.fixture'
+import {preview} from './backupSchedulePreview.fixture'
+it('accepts explicit leap and year boundaries without today default',()=>{for(const date of ['0001-01-01','2024-02-29','9999-12-31'])expect(validPreviewDate(date)).toBe(true);for(const date of ['','0000-01-01','2026-02-29','2026-2-01','today','2026-10-22T00:00'])expect(validPreviewDate(date)).toBe(false)})
+it('reads an exact version-bound non-executing calendar preview',()=>{const raw=preview(),result=readBackupSchedulePreview(raw,row(),'2026-10-22');raw.candidate_instant='changed';expect(result.candidate_instant).toBe('2026-10-21T18:00:00Z')})
+it.each(['plan_id','tenant_id','version','archived','requested_date','daily_local_time','timezone','requested_local_date_time','requested_enabled','enabled','effective','creates_run','execution_authorized','next_execution_at','missed_run_policy','scope','source','projection'])('rejects altered %s',key=>{expect(()=>readBackupSchedulePreview({...preview(),[key]:'WRONG'},row(),'2026-10-22')).toThrow()})
+it('rejects extra missing malformed and invented candidates',()=>{for(const raw of [null,[],{...preview(),extra:1},{...preview(),candidate_instant:null},{...preview(),candidate_instant:'2026-02-30T00:00:00Z'},{...preview(),resolution:'LOCAL_TIME_GAP'},{...preview(),resolution:'NEXT_RUN'}])expect(()=>readBackupSchedulePreview(raw,row(),'2026-10-22')).toThrow();const raw:any=preview();delete raw.enabled;expect(()=>readBackupSchedulePreview(raw,row(),'2026-10-22')).toThrow()})
+it.each(['LOCAL_TIME_GAP','LOCAL_TIME_OVERLAP'])('keeps %s unresolved',resolution=>{expect(readBackupSchedulePreview({...preview(),resolution,candidate_instant:null},row(),'2026-10-22').candidate_instant).toBeNull()})

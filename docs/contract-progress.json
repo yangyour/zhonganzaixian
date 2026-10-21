@@ -973,6 +973,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/backup-calendar-preview-20261021.md",
         "docs/backup-plan-drafts.md",
         "docs/backup-run-state.md",
         "docs/test-server-acceptance-20261005.md"
@@ -1500,6 +1501,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "000a26a5eaa9ce2087b0fc7a3e0828793f9dc01515921670183733810e63ec67"
+    "doc/development/07_合同逐项开发追踪.md": "d810638ef4125294bccf1764608545060d371f16a05f7875563a97509af6b687"
   }
 }

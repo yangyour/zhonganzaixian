@@ -6,11 +6,14 @@ import cn.mop.domain.worklog.ManualWorklog;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import java.security.MessageDigest;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.DateTimeException;
 import java.util.*;
 import static cn.mop.api.ApiResponse.*;
 /** Draft-only route, deliberately separate from executable /backups/plans and /backups/runs. */
@@ -22,6 +25,22 @@ public final class BackupPlanDraftController {
     private static final ObjectMapper INPUT=new ObjectMapper(JsonFactory.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION).streamReadConstraints(StreamReadConstraints.builder().maxNestingDepth(4).maxStringLength(16000).maxNumberLength(16).build()).build()).enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
     private final PlatformRepository platform;private final BackupPlanDraftRepository plans;
     public BackupPlanDraftController(PlatformRepository platform,BackupPlanDraftRepository plans){this.platform=platform;this.plans=plans;}
+    @ModelAttribute void privateHeaders(HttpServletResponse response){response.setHeader("Cache-Control","no-store");response.setHeader("Referrer-Policy","no-referrer");}
+    @GetMapping("/{id}/schedule-preview") Object schedulePreview(@PathVariable String id,HttpServletRequest request){
+        var a=access(request,false);var q=query(request,Set.of("date","expected_version"));
+        if(!q.keySet().equals(Set.of("date","expected_version"))||!q.get("date").matches("(?!0000)[0-9]{4}-[0-9]{2}-[0-9]{2}"))throw invalid();
+        LocalDate date;try{date=LocalDate.parse(q.get("date"));}catch(DateTimeException failure){throw invalid();}
+        long expected=version(q.get("expected_version"));String key=uuid(id);var plan=plans.get(a,key);
+        if(plan==null||!key.equals(plan.id())||!a.tenantId().equals(plan.tenantId())||!a.tenantId().equals(plan.draft().tenantId().toString()))throw new DomainException(503,"UPSTREAM_UNAVAILABLE","备份草稿读取范围未通过核对");
+        if(plan.version()!=expected)throw new DomainException(409,"VERSION_CONFLICT","计划版本已变化，请重新读取计划后预览；未创建任何任务");
+        var occurrence=plan.draft().previewDate(date);
+        return success(map("plan_id",key,"tenant_id",a.tenantId(),"version",plan.version(),"archived",plan.archived(),
+            "requested_date",date.toString(),"daily_local_time",plan.draft().dailyLocalTime(),"timezone",occurrence.timezone(),
+            "requested_local_date_time",occurrence.requestedLocalDateTime().toString(),"candidate_instant",occurrence.candidateInstant()==null?null:occurrence.candidateInstant().toString(),
+            "resolution",occurrence.resolution(),"requested_enabled",plan.draft().requestedEnabled(),"enabled",false,"effective",false,
+            "creates_run",false,"execution_authorized",false,"next_execution_at",null,"missed_run_policy",null,
+            "scope","CURRENT_TENANT_PADMIN","source","postgresql","projection","UNPUBLISHED_CALENDAR_PREVIEW"),request);
+    }
     @GetMapping Object list(HttpServletRequest request){var a=access(request,false);var q=query(request,Set.of("page_size","before_created_at","before_id"));int size=pageSize(q);if(q.containsKey("before_created_at")!=q.containsKey("before_id"))throw invalid();Instant before=q.containsKey("before_created_at")?ManualWorklog.parseInstant(q.get("before_created_at")):null;String id=q.containsKey("before_id")?uuid(q.get("before_id")):null;var rows=plans.list(a,size+1,before,id);boolean more=rows.size()>size;var items=rows.subList(0,Math.min(size,rows.size()));Snapshot last=more?items.get(items.size()-1):null;return success(map("tenant_id",a.tenantId(),"items",items.stream().map(BackupPlanDraftController::summaryDto).toList(),"has_more",more,"next_before_created_at",last==null?null:last.createdAt().toString(),"next_before_id",last==null?null:last.id(),"scope","CURRENT_TENANT_PADMIN","source","postgresql","page_size_limit",20),request);}
     @GetMapping("/{id}") Object get(@PathVariable String id,HttpServletRequest request){var a=access(request,false);query(request,Set.of());return success(dto(plans.get(a,uuid(id))),request);}
     @GetMapping("/{id}/history") Object history(@PathVariable String id,HttpServletRequest request){var a=access(request,false);var q=query(request,Set.of("page_size","before_version"));int size=pageSize(q);String key=uuid(id);Long before=q.containsKey("before_version")?version(q.get("before_version")):null;var rows=plans.history(a,key,size+1,before);boolean more=rows.size()>size;var items=rows.subList(0,Math.min(size,rows.size()));return success(map("tenant_id",a.tenantId(),"plan_id",key,"items",items.stream().map(BackupPlanDraftController::revisionDto).toList(),"has_more",more,"next_before_version",more?items.get(items.size()-1).version():null,"scope","CURRENT_TENANT_PADMIN","source","postgresql","page_size_limit",20),request);}

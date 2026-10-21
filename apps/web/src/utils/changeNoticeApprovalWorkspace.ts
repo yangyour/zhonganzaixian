@@ -12,10 +12,13 @@ const path=(t:ChangeNoticeDetail)=>`/change-notice-drafts/${t.id}/revisions/${t.
 const sameSnapshot=(a:ApprovalSnapshot,b:ApprovalSnapshot)=>Object.keys(a).filter(k=>k!=='allowed_actions').every(k=>JSON.stringify(a[k as keyof ApprovalSnapshot])===JSON.stringify(b[k as keyof ApprovalSnapshot]))
 export function createApprovalWorkspace(client:Pick<ApiClient,'request'>,changed:(s:ApprovalWorkspaceState)=>void,newKey=()=>createRequestId()){
  let context:ChangeNoticeContext|null=null,state=emptyApprovalState(),epoch=0,abort:AbortController|null=null,disposed=false,latest:ApprovalSnapshot|null=null
+ type ReadRequest={history:boolean;before?:number;boundary?:ApprovalHistory['items'][number];target:ChangeNoticeDetail}
+ let lastRead:ReadRequest|null=null,readRetryable=false
  const snapshot=()=>detachedWorkspaceState(state),emit=()=>changed(snapshot()),unresolved=()=>state.busy==='write'||state.attempt?.state==='uncertain'
- function reset(c:ChangeNoticeContext|null){abort?.abort();abort=null;++epoch;context=!disposed&&validApprovalContext(c)?{...c}:null;state=emptyApprovalState();latest=null;emit()}
+ function reset(c:ChangeNoticeContext|null){lastRead=null;readRetryable=false;abort?.abort();abort=null;++epoch;context=!disposed&&validApprovalContext(c)?{...c}:null;state=emptyApprovalState();latest=null;emit()}
  async function pin(input:ChangeNoticeDetail){
   if(!context||disposed||state.busy||unresolved())return false
+  lastRead=null;readRetryable=false
   const turn=++epoch,scope={...context};state=emptyApprovalState();latest=null;emit()
   try{const target=await readChangeNoticeDetail(input,scope);if(turn!==epoch||disposed)return false;state.target=target;emit();return read(false)}catch(error){if(turn===epoch&&!disposed){state.error=error;emit()}return false}
  }
@@ -23,10 +26,18 @@ export function createApprovalWorkspace(client:Pick<ApiClient,'request'>,changed
   if(!context||!state.target||disposed||state.busy)return false
   const before=history&&next&&state.history?.has_more?state.history.next_before_version!:undefined
   if(next&&before===undefined)return false
-  const boundary=before?state.history!.items.at(-1):undefined,target=structuredClone(state.target),scope={...context},turn=++epoch,controller=new AbortController();abort=controller
+  return readRequest({history,before,boundary:before?state.history!.items.at(-1):undefined,target:structuredClone(state.target)})
+ }
+ async function readRequest(request:ReadRequest){
+  if(!context||!state.target||disposed||state.busy)return false
+  const {history,before,boundary,target}=request
+  if(target.id!==state.target.id||target.version!==state.target.version||target.content_sha256!==state.target.content_sha256)return false
+  lastRead=structuredClone(request);readRetryable=false
+  const scope={...context},turn=++epoch,controller=new AbortController();abort=controller
   state={...state,busy:'read',error:null,...(history?{history:null}:{current:null})};emit()
   try{
    const url=path(target)+(history?'/history?page_size=15'+(before?'&before_version='+before:''):'')
+   if(turn!==epoch||disposed||controller.signal.aborted)return false
    const raw=await client.request<unknown>(url,{signal:controller.signal});if(turn!==epoch||disposed||controller.signal.aborted)return false
    if(history){
     const rows=readApprovalHistory(raw,scope,target,before),first=rows.items[0]
@@ -40,15 +51,17 @@ export function createApprovalWorkspace(client:Pick<ApiClient,'request'>,changed
     state.current=row;latest=row
    }
    return true
-  }catch(error){if(turn===epoch&&!disposed&&!isCancelled(error))state.error=error;return false}
+  }catch(error){if(turn===epoch&&!disposed&&!isCancelled(error)){state.error=error;readRetryable=true}return false}
   finally{if(turn===epoch&&!disposed){state.busy=null;abort=null;emit()}}
  }
  function prepare(){
   if(!context?.canWrite||disposed||state.busy||unresolved()||!state.current||!state.current.allowed_actions.length)return false
+  lastRead=null;readRetryable=false
   state={...state,baseline:structuredClone(state.current),attempt:null,receipt:null,error:null};emit();return true
  }
  async function send(input:ApprovalAttempt,retry:boolean){
   if(!context?.canWrite||!state.target||disposed||state.busy)return false
+  lastRead=null;readRetryable=false
   const attempt=structuredClone(input),target=structuredClone(state.target),scope={...context},turn=++epoch,controller=new AbortController();abort=controller;let dispatched=false
   state={...state,attempt:{...attempt,state:'uncertain'},busy:'write',error:null};emit()
   try{
@@ -73,5 +86,6 @@ export function createApprovalWorkspace(client:Pick<ApiClient,'request'>,changed
    return send({path:path(state.target)+'/actions',payload:JSON.stringify(command),key,baseline:structuredClone(state.baseline),state:'uncertain'},false)
   }catch(error){state.error=error;emit();return Promise.resolve(false)}
  }
- emit();return{reset,pin,prepare,submit,unresolved,state:snapshot,refresh:()=>read(false),history:(next=false)=>read(true,next),retry:()=>state.attempt?.state==='uncertain'?send(state.attempt,true):Promise.resolve(false),dispose:()=>{disposed=true;reset(null)}}
+ function cancelRead(){if(disposed||state.busy!=='read')return false;epoch++;abort?.abort();abort=null;readRetryable=lastRead!==null;state={...state,busy:null,error:null};emit();return true}
+ emit();return{reset,pin,prepare,cancelRead,canRetryRead:()=>!disposed&&readRetryable&&lastRead!==null&&!state.busy,retryRead:()=>readRetryable&&lastRead?readRequest(structuredClone(lastRead)):Promise.resolve(false),submit,unresolved,state:snapshot,refresh:()=>read(false),history:(next=false)=>read(true,next),retry:()=>state.attempt?.state==='uncertain'?send(state.attempt,true):Promise.resolve(false),dispose:()=>{disposed=true;reset(null)}}
 }

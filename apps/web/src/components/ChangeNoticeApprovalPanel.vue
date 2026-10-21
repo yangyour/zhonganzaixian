@@ -7,6 +7,7 @@ import {createApprovalWorkspace,emptyApprovalState,type ApprovalWorkspaceState} 
 import type {ApprovalAction,ApprovalStatus} from '../utils/changeNoticeApproval'
 import {displayTime} from '../utils/display'
 import ApiErrorNotice from './ApiErrorNotice.vue'
+import ReadRecoveryActions from './ReadRecoveryActions.vue'
 const props=defineProps<{candidate:ChangeNoticeDetail|null;context:ChangeNoticeContext|null;contextKey:string;blocked?:boolean}>()
 const state=shallowRef<ApprovalWorkspaceState>(emptyApprovalState()),note=ref(''),targetPage=ref(0)
 const workspace=createApprovalWorkspace(api,s=>{state.value=s})
@@ -40,7 +41,7 @@ defineExpose({pin,prepare,submit,mayLeave,unresolved:workspace.unresolved,hasUns
   <p v-if="changedTarget" role="status">草稿选择已变化；这里仍固定在原草稿修订，未自动切换审批对象。</p>
   <p v-if="newerDraft" role="alert">已知草稿存在更新修订，原修订审批动作已停用。请核对后明确读取新修订，旧审批不自动沿用。</p>
   <p v-if="blocked" role="status">草稿原请求尚未确认，审批动作暂时锁定；请先确认草稿请求结果。</p>
-  <ApiErrorNotice :error="state.error" />
+  <ApiErrorNotice :error="state.error" /><ReadRecoveryActions label="审批" :busy="state.busy" :can-retry="workspace.canRetryRead()" :scope-key="contextKey" :cancel="workspace.cancelRead" :retry="workspace.retryRead" />
   <template v-if="state.target">
    <p class="approval-identity">固定对象 {{state.target.id}} · 草稿修订 v{{state.target.version}}<br />内容摘要 {{state.target.content_sha256}}</p>
    <div class="approval-actions"><button type="button" :disabled="Boolean(state.busy)" @click="workspace.refresh">刷新此修订审批</button><button type="button" :disabled="Boolean(state.busy)" @click="workspace.history(false)">读取此修订审批历史</button></div>

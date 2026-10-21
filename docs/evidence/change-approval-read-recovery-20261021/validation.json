@@ -1,0 +1,31 @@
+{
+  "scope": "NATIVE_DOM_AND_WORKSPACE_NOT_BROWSER_ACCEPTANCE",
+  "new_tests": 10,
+  "focused": {
+    "passed": 31,
+    "files": 3
+  },
+  "vitest": {
+    "passed": 3302,
+    "files": 222,
+    "failed": 0
+  },
+  "contract_tests_passed": 173,
+  "api_contract": "PASS_UNCHANGED_0.76",
+  "production_build_id": "6da533115ad5736606ace6b343e359e8c3aa27176e4a399b052f37e0f7ad2e94",
+  "browser": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "formal_acceptance": "128_NOT_RUN",
+  "backend_code_changed": false,
+  "source_sha256": {
+    "apps/web/src/utils/changeNoticeApprovalWorkspace.ts": "efbd732407889fec9e128390a2f0722b3a202bfcd97e8999da1b707f76c53419",
+    "apps/web/src/components/ChangeNoticeApprovalPanel.vue": "58fcb2902b67c252da7fc1b3a5848be0b5cda4e136f076e3109226d3dbe5f705",
+    "apps/web/tests/changeNoticeApprovalWorkspace.test.ts": "92bb3c50ddab3f5768bf80ff3e4603c9f96e9b5b8adf2fedfa124b09f6901df9",
+    "apps/web/tests/changeNoticeApprovalPanel.test.ts": "96d2e6c11f6a5a625733e1758b0cfc1a24a156e0203a1785c5d65cb92d20a8bc"
+  },
+  "initial_test_failure": {
+    "failed": 1,
+    "passed": 30,
+    "cause": "New fixture incorrectly invented repeated SUBMIT after WITHDRAW and approval versions up to 17. Existing finite-state validator correctly rejected it.",
+    "correction": "Keep production state machine unchanged; test valid versions 3 and 2, fixed revision recovery and known decision consistency."
+  }
+}

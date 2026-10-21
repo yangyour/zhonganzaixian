@@ -1,0 +1,21 @@
+{
+  "base_commit": "536617743a3e8c8e7d594a6ab01cb3ad5e1c7209",
+  "scope": "SLA_EXPLICIT_MONTH_AND_ORIGINAL_RECEIPT",
+  "web_tests": {
+    "passed": 2619,
+    "files": 190
+  },
+  "new_tests": 16,
+  "typecheck": "PASS",
+  "build_static_gates": "PASS",
+  "build_id": "257edbd7c570ddca15d93ff19b000e84edba6909e8a045a129b39fab3982f7d0",
+  "browser_visual_axe": "NOT_RUN_ENVIRONMENT_BLOCKED",
+  "new_real_http": "NOT_RUN",
+  "backend_and_migrations": "UNCHANGED",
+  "source_sha256": {
+    "apps/web/src/utils/onCallBoard.ts": "98dbb1f3b3017b7a93b0d2c526420cfb20371212d0fea817b6a20716e6555041",
+    "apps/web/src/pages/SlaReportsPage.vue": "5bfd4d2ac51b53baccc72471602a98f423ed8e8381654ff29835dd8490e8b742",
+    "apps/web/tests/slaReportRecovery.test.ts": "bdb29d1c427211bb8a2eb2666240b8590345e6f73ddbd34b69d66c5eaf43cfe8",
+    "apps/web/tests/slaReportsPage.test.ts": "4d55293a7edf1476c18fe24ac07b229fc8f24fa6b0e1e1c19879455e09e27d5d"
+  }
+}

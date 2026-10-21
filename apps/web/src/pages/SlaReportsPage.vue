@@ -19,11 +19,12 @@ const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&intern
 const canWriteInternal=computed(()=>Boolean(permitted.value&&can('ticket_notes:write_internal')))
 const canWriteConfig=computed(()=>Boolean(permitted.value&&session.value?.user.role==='padmin'&&can('configurations:write')))
 
-const periodInput=ref('2026-10')
+const periodInput=ref('')
 const freezeSnapshot=ref(false)
+watch(periodInput,()=>{freezeSnapshot.value=false},{flush:'sync'})
 const blocked=ref(false)
 
-const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,permitted.value,canWriteInternal.value,canWriteConfig.value]))
+const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value,canWriteInternal.value,canWriteConfig.value]))
 const locked=computed(()=>!!state.value.busy||workspace.unresolved())
 
 watch(context,()=>{
@@ -32,11 +33,12 @@ watch(context,()=>{
   tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,
   canWriteInternal:canWriteInternal.value,canWriteConfig:canWriteConfig.value
  }:null)
- if(permitted.value)void workspace.load(periodInput.value)
+ periodInput.value='';freezeSnapshot.value=false
 },{immediate:true,flush:'sync'})
 
 async function submitMonthlyEvaluation(){
- const existing=state.value.report?.monthly_result
+ if(!state.value.report||periodInput.value!==state.value.report.period)return false
+ const existing=state.value.report.monthly_result
  const ok=await workspace.submitMonthlyResult({
   report_month:periodInput.value,
   expected_version:existing?.version??0,
@@ -48,8 +50,10 @@ async function submitMonthlyEvaluation(){
 function mayLeave(){if(workspace.unresolved()){blocked.value=true;return false}return true}
 onBeforeRouteLeave(mayLeave)
 const unregister=contextTransitionGuards.register(mayLeave)
-onUnmounted(()=>{unregister();workspace.dispose()})
-defineExpose({state,workspace,mayLeave})
+function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()){event.preventDefault();event.returnValue=''}}
+window.addEventListener('beforeunload',beforeUnload)
+onUnmounted(()=>{unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
+defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyEvaluation})
 </script>
 <template>
  <section class="sla-reports">
@@ -75,6 +79,9 @@ defineExpose({state,workspace,mayLeave})
     </form>
    </div>
 
+   <p v-if="!periodInput">请明确选择统计月份；不会自动查询或保存预设月份。</p>
+   <p v-if="state.report&&periodInput!==state.report.period" role="status">月份输入已改变。当前显示仍为 {{state.report.period}}，请先查询新月份；不能跨期保存。</p>
+   <p v-if="state.receipt" role="status">已核对原保存回执：{{state.receipt.report_month}} · v{{state.receipt.version}} · {{state.receipt.frozen?'已冻结':'未冻结'}}。回读失败不代表保存失败，不自动重复提交。</p>
    <ApiErrorNotice :error="state.error" />
    <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">月度 SLA 快照提交结果尚未确认，请点击重试。</p>
    <button v-if="state.attempt&&!state.busy" type="button" @click="workspace.retry()">重试提交月度快照</button>
@@ -198,10 +205,10 @@ defineExpose({state,workspace,mayLeave})
 
        <form v-if="canWriteInternal&&!state.report.monthly_result?.frozen" class="freeze-form" @submit.prevent="submitMonthlyEvaluation">
         <label class="checkbox-label">
-         <input type="checkbox" v-model="freezeSnapshot" :disabled="locked" />
+         <input type="checkbox" v-model="freezeSnapshot" :disabled="locked||periodInput!==state.report.period" />
          同时冻结本月度 SLA 快照（冻结后不可覆盖，M5-10）
         </label>
-        <button type="submit" class="primary" :disabled="locked">
+        <button type="submit" class="primary" :disabled="locked||periodInput!==state.report.period">
          {{ state.report.monthly_result?'更新月度 SLA 快照':'生成月度 SLA 快照' }}
         </button>
        </form>

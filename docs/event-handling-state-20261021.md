@@ -25,4 +25,4 @@
 
 ## 提交与合并
 
-[9114ca5985fe627d4f329f11e9e0adc845ef8728](https://github.com/yangyour/zhonganzaixian/commit/9114ca5985fe627d4f329f11e9e0adc845ef8728)的[分支CI39532670636](https://github.com/yangyour/zhonganzaixian/actions/runs/39532670636)全部通过；2026-10-21 02:25 UTC以expected_sha保护快进main并读取确认。主分支CI继续跟进，未执行真实事件流程或生产验收。
+[9114ca5985fe627d4f329f11e9e0adc845ef8728](https://github.com/yangyour/zhonganzaixian/commit/9114ca5985fe627d4f329f11e9e0adc845ef8728)的[分支CI39532670636](https://github.com/yangyour/zhonganzaixian/actions/runs/39532670636)全部通过；2026-10-21 02:25 UTC以expected_sha保护快进main并读取确认。[主分支CI39532954272](https://github.com/yangyour/zhonganzaixian/actions/runs/39532954272)也已全部通过；未执行真实事件流程或生产验收。

@@ -666,7 +666,8 @@
         "docs/evidence/niko-monitoring-object-mapping-20261007.json",
         "docs/evidence/niko-monitoring-storage-coordinator-20261007.json",
         "docs/monitoring-object-mapping.md",
-        "docs/monitoring-storage-coordinator.md"
+        "docs/monitoring-storage-coordinator.md",
+        "docs/zabbix-event-puller-20261021.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1478,6 +1479,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "7989f7a406a470d9ebb9c3ae4ab1987bc00dd77fdde7e67172b320ab7a203207"
+    "doc/development/07_合同逐项开发追踪.md": "86f3daa47bad6e17ee452c1d3dd98ed567851deabc093e443ea85ff13f29f52c"
   }
 }

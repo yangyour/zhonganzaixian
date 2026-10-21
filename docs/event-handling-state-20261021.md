@@ -22,3 +22,7 @@
 ## 验证
 
 20项定向测试覆盖人工六态、恢复不自动关闭、缺口径/缺人工确认/缺根因拒绝、恢复前不可解决、完整重复/冲突、跨范围404、版本/时间边界、相反阶段同刻、反复故障待策略、首次时间不覆盖、终态、脱敏和不可变快照。最终代码完整Maven verify通过：2280项执行、897项环境跳过，0失败/错误；52项Python与追踪一致性检查通过。本批未改前端或HTTP契约，不把既有前端结果当作本轮重跑。无真实数据库、Zabbix或登录浏览器验收，128项正式验收仍NOT_RUN。
+
+## 提交与合并
+
+[9114ca5985fe627d4f329f11e9e0adc845ef8728](https://github.com/yangyour/zhonganzaixian/commit/9114ca5985fe627d4f329f11e9e0adc845ef8728)的[分支CI39532670636](https://github.com/yangyour/zhonganzaixian/actions/runs/39532670636)全部通过；2026-10-21 02:25 UTC以expected_sha保护快进main并读取确认。主分支CI继续跟进，未执行真实事件流程或生产验收。

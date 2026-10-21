@@ -56,8 +56,8 @@ public final class ZabbixReadClient {
             if(bytes==null||bytes.length==0||bytes.length>MAX_BYTES)throw new ReadFailure("RESPONSE_SIZE_REJECTED");
             JsonNode root=JSON.readTree(bytes);
             if(root.has("error"))throw new ReadFailure("PROVIDER_API_REJECTED");
-            if(!root.isObject()||root.size()!=3||!root.path("jsonrpc").asText().equals("2.0")
-                ||!root.path("id").isIntegralNumber()||root.path("id").longValue()!=id||!root.path("result").isArray())throw new ReadFailure("ENVELOPE_REJECTED");
+            if(!root.isObject()||root.size()!=3||(!root.path("jsonrpc").isTextual()||!root.path("jsonrpc").textValue().equals("2.0"))
+                ||!root.path("id").isIntegralNumber()||!root.path("id").canConvertToLong()||root.path("id").longValue()!=id||!root.path("result").isArray())throw new ReadFailure("ENVELOPE_REJECTED");
             return root.get("result");
         }catch(ReadFailure failure){throw failure;}catch(Exception failure){throw new ReadFailure("JSON_REJECTED");}
     }

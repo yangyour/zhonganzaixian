@@ -34,5 +34,9 @@
     "backup.min_retention_months",
     "backup.failure_ticket_count",
     "backup.drill_warning_days"
-  ]
+  ],
+  "device_coordination_policy_reference": null,
+  "trusted_clock_and_journal_reference": null,
+  "expired_execution_stop_verifier_reference": null,
+  "physical_fencing_or_stop_protocol_reference": null
 }

@@ -11,6 +11,13 @@ class BackupExecutionDependenciesTest(unittest.TestCase):
         self.assertIs(d['production_approved'],False)
         for k,v in d.items():
             if k.endswith('_reference') or k=='tenant_id': self.assertIsNone(v,k)
+    def test_device_coordination_and_reconciliation_have_no_guessed_configuration(self):
+        d=json.loads((ROOT/'deploy/examples/backup-execution-dependencies.json').read_text())
+        for key in ['device_coordination_policy_reference','trusted_clock_and_journal_reference','expired_execution_stop_verifier_reference','physical_fencing_or_stop_protocol_reference']:
+            self.assertIn(key,d)
+            self.assertIsNone(d[key])
+        self.assertIs(d['backup_execution_enabled'],False)
+
     def test_all_runtime_slots_are_existing_unpublished_keys(self):
         d=json.loads((ROOT/'deploy/examples/backup-execution-dependencies.json').read_text())
         keys={s['key'] for s in json.loads((ROOT/'contracts/config-baseline.json').read_text())['settings']}

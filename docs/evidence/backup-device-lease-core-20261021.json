@@ -1,0 +1,40 @@
+{
+  "base_commit": "ef09a45674bb197457003b15cfb32bc0c82f175f",
+  "result": "PASS_DOMAIN_AND_FULL_LOCAL_JAVA_NO_DISTRIBUTED_LOCK_CLAIM",
+  "new_java_tests": 16,
+  "java_total": 3913,
+  "java_executed": 2900,
+  "java_environment_skipped": 1013,
+  "java_failures": 0,
+  "java_errors": 0,
+  "python_tests": 121,
+  "contract_tests": 173,
+  "api_version": "0.76.0_UNCHANGED",
+  "sql_migrations_changed": false,
+  "frozen_migrations_1_through_45_unchanged": true,
+  "actual_pg_or_device_lock_test_executed": false,
+  "device_calls": 0,
+  "spring_runtime_bean_added": false,
+  "duration_default": null,
+  "technical_duration_range_millis": [
+    1,
+    300000
+  ],
+  "expired_takeover_allowed": false,
+  "expired_renew_or_release_allowed": false,
+  "coordination_is_device_authorization": false,
+  "rehydration_proves_full_history": false,
+  "dependency_references": "FOUR_ADDITIONAL_NULL_SLOTS_NOT_RUNTIME_PUBLICATIONS",
+  "frontend_reexecuted_this_step": false,
+  "browser_and_formal_128_TC": "NOT_RUN",
+  "prior_failures": [
+    "Initial test directory did not exist",
+    "JUnit test placed in dependency-free domain module; moved to existing API test module without adding a domain dependency"
+  ],
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/backup/BackupDeviceLeaseState.java": "5b0b10494bd1510ed17c05f956e27ecb45f9b6264822ddec9914ac361562af52",
+    "server/api/src/test/java/cn/mop/domain/backup/BackupDeviceLeaseStateTest.java": "1493151f09f67ea16e1c2ef8232ed71b6568b8a70d9bfb57dc440b528861ec74",
+    "deploy/examples/backup-execution-dependencies.json": "d88f084653877d73bed1d6a47f69c1e6f3bcf5c5324f65751c0b210b73370f88",
+    "tools/test_backup_execution_dependencies.py": "fe8e84896c563531c8fc7a399a86c9db6806ba9fe3f0bc99f5d047dbd8cf56f6"
+  }
+}

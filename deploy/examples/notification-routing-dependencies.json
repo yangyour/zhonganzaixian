@@ -3,13 +3,25 @@
   "production_approved": false,
   "notification_routing_enabled": false,
   "runtime_publications": {
+    "notification.severity_priority_mapping": null,
+    "notification.matrix_precedence": null,
+    "notification.provider_credentials": null,
+    "notification.sms_month_quota": null,
+    "notification.voice_concurrency": null,
+    "notification.price": null,
     "oncall.roster_and_escalation_chain": null,
     "oncall.unanswered_retry_interval_sec": null
   },
-  "provider_adapter": null,
-  "provider_credentials_reference": null,
-  "receipt_verification_configuration_reference": null,
+  "effective_preference_publication_reference": null,
   "approved_recipient_mapping_reference": null,
   "channel_and_budget_configuration_reference": null,
-  "notes": "SLA intents remain NOT_ROUTED. This file does not configure or enable a provider, create credentials, select recipients or authorize paid sends."
+  "channels": {
+    "EMAIL": {"provider_adapter": null, "provider_credentials_reference": null, "approved_endpoint_reference": null, "receipt_verification_configuration_reference": null, "retry_budget_reference": null},
+    "SMS": {"provider_adapter": null, "provider_credentials_reference": null, "approved_endpoint_reference": null, "receipt_verification_configuration_reference": null, "retry_budget_reference": null},
+    "DINGTALK": {"provider_adapter": null, "provider_credentials_reference": null, "approved_endpoint_reference": null, "receipt_verification_configuration_reference": null, "retry_budget_reference": null},
+    "WECHAT_WORK": {"provider_adapter": null, "provider_credentials_reference": null, "approved_endpoint_reference": null, "receipt_verification_configuration_reference": null, "retry_budget_reference": null},
+    "WEBHOOK": {"provider_adapter": null, "provider_credentials_reference": null, "approved_endpoint_reference": null, "receipt_verification_configuration_reference": null, "retry_budget_reference": null},
+    "VOICE": {"provider_adapter": null, "provider_credentials_reference": null, "approved_endpoint_reference": null, "receipt_verification_configuration_reference": null, "retry_budget_reference": null}
+  },
+  "notes": "Dependency checklist only. Null is unresolved, never disabled or unlimited. Do not paste secrets or recipient addresses. Values must come from separately authorized publications and verified bindings. This file neither activates routing nor authorizes provider calls or paid sends."
 }

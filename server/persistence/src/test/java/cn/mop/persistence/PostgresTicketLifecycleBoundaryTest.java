@@ -28,6 +28,7 @@ class PostgresTicketLifecycleBoundaryTest {
         var r=repository(false);
         assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.get(ACCESS,TICKET)).code);
         assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.sla(ACCESS,TICKET)).code);
+        assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.reminders(ACCESS,TICKET)).code);
         assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.solution(ACCESS,TICKET,"a".repeat(64))).code);
         assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.start(ACCESS,TICKET,null,null,null)).code);
         assertEquals("CONFIG_PENDING",assertThrows(DomainException.class,()->r.startConfigured(ACCESS,TICKET,"P1")).code);

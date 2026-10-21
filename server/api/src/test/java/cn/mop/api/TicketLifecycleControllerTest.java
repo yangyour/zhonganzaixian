@@ -113,4 +113,11 @@ class TicketLifecycleControllerTest {
         when(repository.bindSlaPolicy(any(),eq(TICKET),eq(1L),eq(ACTOR),eq(2L))).thenReturn(new TicketLifecycleRepository.PolicyBinding(TENANT,TICKET,1,"BOUND",ACTOR,2L,"EXCLUDE_CONFIRMED_PAUSES",Instant.parse("2026-10-20T00:00:00Z"),"binding:"+TICKET+":"+ACTOR+":2",null));
         assertNotNull(controller.bindSlaPolicy(TICKET,request));var order=inOrder(repository);order.verify(repository).authorizeCurrentAccess(any(),eq(TICKET),eq(false));order.verify(repository).bindSlaPolicy(any(),eq(TICKET),eq(1L),eq(ACTOR),eq(2L));
     }
+    @Test void reminderReadCannotTriggerNotificationSending(){
+        var request=request("tickets:read");when(repository.reminders(any(),eq(TICKET))).thenReturn(new TicketLifecycleRepository.ReminderPage(TENANT,TICKET,1,"PENDING",null,null,List.of()));
+        assertNotNull(controller.reminders(TICKET,request));verify(repository).reminders(any(),eq(TICKET));verifyNoMoreInteractions(repository);
+    }
+    @Test void reminderReadRejectsScopeAndActionQueryOverrides(){
+        var request=request("tickets:read");request.addParameter("send","true");assertThrows(DomainException.class,()->controller.reminders(TICKET,request));verifyNoInteractions(repository);
+    }
 }

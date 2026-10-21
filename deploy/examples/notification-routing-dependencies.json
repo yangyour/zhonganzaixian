@@ -1,0 +1,15 @@
+{
+  "purpose": "dependency_shape_only_not_a_runtime_publication",
+  "production_approved": false,
+  "notification_routing_enabled": false,
+  "runtime_publications": {
+    "oncall.roster_and_escalation_chain": null,
+    "oncall.unanswered_retry_interval_sec": null
+  },
+  "provider_adapter": null,
+  "provider_credentials_reference": null,
+  "receipt_verification_configuration_reference": null,
+  "approved_recipient_mapping_reference": null,
+  "channel_and_budget_configuration_reference": null,
+  "notes": "SLA intents remain NOT_ROUTED. This file does not configure or enable a provider, create credentials, select recipients or authorize paid sends."
+}

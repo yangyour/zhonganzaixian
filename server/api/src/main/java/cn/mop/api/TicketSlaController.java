@@ -10,4 +10,5 @@ public final class TicketSlaController {
     @GetMapping("/policy-binding") Object policy(@PathVariable String ticketId,HttpServletRequest request){return lifecycle.slaPolicy(ticketId,request);}
     @PostMapping(value="/policy-binding",consumes="application/json") Object bind(@PathVariable String ticketId,HttpServletRequest request){return lifecycle.bindSlaPolicy(ticketId,request);}
     @GetMapping Object get(@PathVariable String ticketId,HttpServletRequest request){return lifecycle.sla(ticketId,request);}
+    @GetMapping("/reminders") Object reminders(@PathVariable String ticketId,HttpServletRequest request){return lifecycle.reminders(ticketId,request);}
 }

@@ -15,6 +15,9 @@ public interface TicketLifecycleRepository {
                   String expectedSolutionHash,String assigneeId,boolean keepPriorAssignee) {}
     record SlaEntry(String tenantId,String ticketId,String tier,String priority,String policyReference,String clockPolicy,cn.mop.domain.sla.SlaClockState.Projection clock) {}
     record PolicyBinding(String tenantId,String ticketId,long lifecycleVersion,String status,String releaseId,Long releaseVersion,String clockPolicy,Instant boundAt,String reference,String missing) {}
+    record Reminder(String intentId,String clock,java.math.BigDecimal progress,long lifecycleVersion,Instant observedAt,long elapsedMillis,long budgetMillis,String configurationReference,String policyReference) {}
+    record ReminderPage(String tenantId,String ticketId,long lifecycleVersion,String scanState,String lastOutcome,Instant lastScanAt,List<Reminder> items){public ReminderPage{items=List.copyOf(items);}}
+    ReminderPage reminders(Access access,String ticketId);
     PolicyBinding slaPolicy(Access access,String ticketId);
     PolicyBinding bindSlaPolicy(Access access,String ticketId,long expectedVersion,String releaseId,long releaseVersion);
     Optional<SlaEntry> sla(Access access,String ticketId);

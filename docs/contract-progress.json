@@ -901,7 +901,8 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
-        "docs/sla-clock-core-20261020.md"
+        "docs/sla-clock-core-20261020.md",
+        "docs/sla-reminder-intents-20261020.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1145,7 +1146,8 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
-        "docs/notification-receipt-state.md"
+        "docs/notification-receipt-state.md",
+        "docs/sla-reminder-intents-20261020.md"
       ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
@@ -1470,6 +1472,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "503308eed722bef3fc8eebeeb340a51efe354b315249f46f5426a88bd1a8253f"
+    "doc/development/07_合同逐项开发追踪.md": "84a7afdd346649f58459d577d1bf839c102ac58bf3e3dca446e17812a9078b41"
   }
 }

@@ -34,6 +34,14 @@ public final class TicketLifecycleController {
     public TicketLifecycleController(PlatformRepository platform,TicketLifecycleRepository repository,ObjectMapper mapper){
         this.platform=platform;this.repository=repository;this.mapper=mapper;
     }
+    Object reminders(String ticketId,HttpServletRequest request){
+        Membership member=member(request,"tickets:read");query(request,Set.of());
+        var page=repository.reminders(access(member,request),uuid(ticketId));recheck(member,request,"tickets:read");
+        return success(map("tenant_id",page.tenantId(),"ticket_id",page.ticketId(),"lifecycle_version",page.lifecycleVersion(),
+                "scan_state",page.scanState(),"last_outcome",page.lastOutcome(),"last_scan_at",page.lastScanAt(),"items",page.items().stream().map(r->map("intent_id",r.intentId(),"clock",r.clock(),"progress",r.progress(),"lifecycle_version",r.lifecycleVersion(),
+                "observed_at",r.observedAt(),"elapsed_ms",r.elapsedMillis(),"budget_ms",r.budgetMillis(),"configuration_reference",r.configurationReference(),"policy_reference",r.policyReference(),
+                "escalation_required",r.progress().compareTo(java.math.BigDecimal.ONE)==0,"notification_status","NOT_ROUTED","delivered",false)).toList(),"source","postgresql","production_approved",false),request);
+    }
     Object sla(String ticketId,HttpServletRequest request){
         Membership member=member(request,"tickets:read");query(request,Set.of());
         var entry=repository.sla(access(member,request),uuid(ticketId));recheck(member,request,"tickets:read");

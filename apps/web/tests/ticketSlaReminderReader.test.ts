@@ -1,0 +1,17 @@
+import { expect,it } from 'vitest'
+import { readSlaReminders } from '../src/utils/ticketSlaReminderReader'
+const id=(n:number)=>`10000000-0000-0000-0000-${String(n).padStart(12,'0')}`
+const scope={tenantId:id(1),ticketId:id(2),expectedVersion:3}
+const item=(n=1,progress=0.5)=>({intent_id:id(n+10),clock:'RESPONSE',progress,lifecycle_version:2,observed_at:'2026-10-20T00:00:00Z',elapsed_ms:80,budget_ms:100,configuration_reference:'sha256:'+'a'.repeat(64),policy_reference:null as string|null,escalation_required:progress===1,notification_status:'NOT_ROUTED',delivered:false})
+const page=()=>({tenant_id:id(1),ticket_id:id(2),lifecycle_version:3,scan_state:'PENDING',last_outcome:null as string|null,last_scan_at:null as string|null,items:[] as ReturnType<typeof item>[],source:'postgresql',production_approved:false})
+it('empty queue evidence does not fabricate delivery or a scan time',()=>{const p=readSlaReminders(page(),scope);expect(p.items).toEqual([]);expect(p.last_scan_at).toBeNull()})
+it('reads detached sorted recorded nodes',()=>{const p=page();p.items=[item(1,0.5),item(2,0.8)];const result=readSlaReminders(p,scope);p.items[0]!.delivered=true;expect(result.items[0]!.delivered).toBe(false)})
+it('rejects cross tenant, ticket and stale parent versions',()=>{for(const patch of [{tenant_id:id(9)},{ticket_id:id(9)},{lifecycle_version:2}])expect(()=>readSlaReminders({...page(),...patch},scope)).toThrow()})
+it('cannot promote intention to routed or delivered',()=>{for(const patch of [{delivered:true},{notification_status:'DELIVERED'},{recipient:'someone'}]){const p=page();p.items=[{...item(),...patch}];expect(()=>readSlaReminders(p,scope)).toThrow()}})
+it('duplicate node or intent identities fail closed',()=>{for(const items of [[item(1),item(2)],[item(1,0.5),item(1,0.8)]]){const p=page();p.items=items;expect(()=>readSlaReminders(p,scope)).toThrow()}})
+it('only contractual progress nodes are accepted',()=>{const p=page();p.items=[item(1,0.7)];expect(()=>readSlaReminders(p,scope)).toThrow()})
+it('node needs exact elapsed budget evidence and supported safe integers',()=>{const p=page();p.items=[{...item(1,0.8),elapsed_ms:79}];expect(()=>readSlaReminders(p,scope)).toThrow();p.items[0]!.elapsed_ms=Number.MAX_SAFE_INTEGER+1;expect(()=>readSlaReminders(p,scope)).toThrow()})
+it('100 percent is escalation required, not escalation completed',()=>{const p=page();p.items=[{...item(1,1),elapsed_ms:100}];expect(readSlaReminders(p,scope).items[0]!.escalation_required).toBe(true);p.items[0]!.escalation_required=false;expect(()=>readSlaReminders(p,scope)).toThrow()})
+it('policy references cannot cross a ticket',()=>{const p=page();p.items=[{...item(),policy_reference:`binding:${id(9)}:${id(5)}:1`}];expect(()=>readSlaReminders(p,scope)).toThrow();p.items[0]!.policy_reference=`binding:${id(2)}:${id(5)}:1`;expect(readSlaReminders(p,scope).items).toHaveLength(1)})
+it('blocked scan needs explicit recorded failure metadata',()=>{const p=page();p.scan_state='BLOCKED_ATTEMPTS';expect(()=>readSlaReminders(p,scope)).toThrow();p.last_outcome='ATTEMPT_LIMIT_REACHED';p.last_scan_at='2026-10-20T00:00:00Z';expect(readSlaReminders(p,scope).scan_state).toBe('BLOCKED_ATTEMPTS')})
+it('invalid timestamps and incomplete item arrays are not treated as empty',()=>{const p=page();p.items=[{...item(),observed_at:'2026-02-30T00:00:00Z'}];expect(()=>readSlaReminders(p,scope)).toThrow();expect(()=>readSlaReminders({...page(),items:null},scope)).toThrow()})

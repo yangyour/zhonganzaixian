@@ -1,0 +1,12 @@
+{
+  "status": "REVIEWED_CANDIDATE_NOT_APPLIED",
+  "sha256": {
+    "V36__sla_reminder_intents.sql": "4e7777452028205fd9a968f7c4b4d491ddcdd216bf9e2295d0a98335dec855c5"
+  },
+  "function_body_sha256": {
+    "mop_ticket_sla_scan_guard": "e8c99694579b193c81ba8e1e720579a2dfcfbd4eeedba0a523883ea430c0ed1d",
+    "mop_ticket_sla_scan_enqueue": "3bb6e9a9faa63517e2215623aaa7284fa7eff70c8e93b3dcfa2c9825cecb064b",
+    "mop_ticket_sla_reminder_guard": "b24bf84fc0d35779817999a0e8846f6238ed6dd0bc4ed07d7b54f72b7cd26461",
+    "mop_notification_intent_guard": "041bca670b91b8b7f88c11b6b23b87b23cecd2cefb5666617d3d210de1dc9ce1"
+  }
+}

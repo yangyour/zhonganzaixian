@@ -111,5 +111,14 @@ export function addTicketLifecycleContract(contract) {
       'x-mop-capabilities': ['tickets:lifecycle_write'], description: 'V35显式迁移后，仅为缺失Q27的工单一次绑定当前已生效发布；不可替换既有冻结口径或修改开单快照，绑定和审计同事务。',
       responses: responses(ref('TicketSlaPolicyBindingResult')) }
   };
-  contract.info.version = '0.56.0';
+  schemas.TicketSlaReminder = object({ intent_id: uuid, clock: { enum: ['RESPONSE','RECOVERY'] }, progress: { enum: [0.5,0.8,1] },
+    lifecycle_version: version, observed_at: { type: 'string', format: 'date-time' }, elapsed_ms: { type: 'integer', minimum: 0, maximum: 9007199254740990 },
+    budget_ms: { type: 'integer', minimum: 1, maximum: 9007199254740990 }, configuration_reference: { type: 'string', pattern: '^sha256:[0-9a-f]{64}$' },
+    policy_reference: { type: ['string','null'], maxLength: 256 }, escalation_required: { type: 'boolean' }, notification_status: { const: 'NOT_ROUTED' }, delivered: { const: false } });
+  schemas.TicketSlaReminderResult = envelope(object({ tenant_id: uuid, ticket_id: uuid, lifecycle_version: version,
+    scan_state: { enum: ['PENDING','LEASED','IDLE','BLOCKED_ATTEMPTS'] }, last_outcome: { enum: [null,'CONFIG_PENDING','INTENTS_RECORDED_NOT_DELIVERED','NO_DUE_NODE','ATTEMPT_LIMIT_REACHED'] }, last_scan_at: time,
+    items: { type: 'array', maxItems: 6, items: ref('TicketSlaReminder') }, source: { const: 'postgresql' }, production_approved: { const: false } }));
+  contract.paths['/tickets/{ticketId}/sla/reminders'] = { get: { operationId: 'getTicketSlaReminders', parameters: [ticket],
+    'x-mop-capabilities': ['tickets:read'], 'x-mop-read-only': true, description: 'V36持久提醒/意图记录，不代表供应商受理或送达。队列状态不证明Worker在线；没有记录不等于未过阈值。', responses: responses(ref('TicketSlaReminderResult')) } };
+  contract.info.version = '0.57.0';
 }

@@ -7,6 +7,7 @@ import { readTicketSla, type TicketSlaProjection } from '../utils/ticketSlaReade
 import { displayTime } from '../utils/display'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 import TicketSlaPolicyPanel from './TicketSlaPolicyPanel.vue'
+import TicketSlaReminderPanel from './TicketSlaReminderPanel.vue'
 const policyPanel=ref<InstanceType<typeof TicketSlaPolicyPanel>|null>(null)
 defineExpose({canLeave:()=>policyPanel.value?.canLeave()!==false,hasUnresolved:()=>policyPanel.value?.hasUnresolved()===true})
 const props=defineProps<{ ticket: RegisteredTicket; expectedVersion: number }>()
@@ -37,6 +38,7 @@ const duration=(ms:number|null)=>ms===null?'待配置':`${(ms/60000).toFixed(2)}
       <div class="clocks"><article v-for="kind in (['response','recovery'] as const)" :key="kind"><strong>{{ kind==='response'?'响应':'恢复' }}：{{ labels[value[kind].status] }}</strong><p v-if="value[kind].missing">待补配置 / 数据：{{ value[kind].missing }}</p><template v-else><p>有效已用 {{ duration(value[kind].elapsed_ms) }} / 预算 {{ duration(value[kind].budget_ms) }}</p><p>截止：{{ displayTime(value[kind].deadline) }}</p><p v-if="value[kind].stopped_at">停止于 {{ displayTime(value[kind].stopped_at) }}</p><p :class="{breached:value[kind].breached}" role="status">{{ value[kind].breached?'服务端判定：已超时':'服务端判定：尚未超时' }}</p></template></article></div>
       <p v-if="value.paused_at">本轮暂停于 {{ displayTime(value.paused_at) }}</p><p>已结束暂停区间 {{ value.completed_pauses.length }} 段；口径引用 {{ value.configuration_reference }}</p><p v-if="value.calculation_policy_reference">重开口径引用：{{ value.calculation_policy_reference }}</p><small>此结果不代表提醒送达、月度结算或生产批准。</small>
     </template>
+    <TicketSlaReminderPanel :ticket="ticket" :expected-version="expectedVersion" />
     <TicketSlaPolicyPanel ref="policyPanel" :ticket="ticket" :expected-version="expectedVersion" @bound="refresh" />
   </section>
 </template>

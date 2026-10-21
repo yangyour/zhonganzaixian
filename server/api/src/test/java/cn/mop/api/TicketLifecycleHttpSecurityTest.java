@@ -92,4 +92,10 @@ class TicketLifecycleHttpSecurityTest {
         when(platform.membership(ACTOR,TENANT)).thenReturn(Optional.of(new Membership(ACTOR,TENANT,"viewer",7,true,List.of("tickets:read","tickets:customer_decide"))));
         mvc.perform(scoped(post("/api/v1/tickets/"+TICKET+"/sla/policy-binding")).with(csrf().asHeader()).contentType("application/json").content("{}")).andExpect(status().isForbidden());verifyNoInteractions(repository);
     }
+    @Test void remindersAreAuthenticatedReadOnlyAndDoNotClaimDelivery()throws Exception{
+        when(repository.reminders(any(),any())).thenReturn(new TicketLifecycleRepository.ReminderPage(TENANT,TICKET,1,"PENDING",null,null,List.of()));
+        mvc.perform(scoped(get("/api/v1/tickets/"+TICKET+"/sla/reminders"))).andExpect(status().isOk()).andExpect(jsonPath("$.data.scan_state").value("PENDING")).andExpect(jsonPath("$.data.items").isEmpty());
+        mvc.perform(get("/api/v1/tickets/"+TICKET+"/sla/reminders")).andExpect(status().isUnauthorized());
+        mvc.perform(scoped(post("/api/v1/tickets/"+TICKET+"/sla/reminders")).with(csrf().asHeader())).andExpect(status().isMethodNotAllowed());
+    }
 }

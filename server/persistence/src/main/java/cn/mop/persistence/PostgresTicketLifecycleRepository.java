@@ -34,7 +34,16 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
         }catch(SQLException e){throw unavailable();}
     }
     @Override public Optional<SlaEntry> sla(Access a,String ticket){
-        uuid(ticket);return read(a,ticket,c->{try{
+        uuid(ticket);return read(a,ticket,c->projectSla(c,a,ticket));
+    }
+    /** Caller must already hold a verified ticket-scoped SLA job lease and the ticket lock. */
+    SlaEntry projectForWorker(String tenant,String ticket,long version){
+        requireEnabled();uuid(tenant);uuid(ticket);Connection c=platform.ticketJobConnection();
+        try{var result=projectSla(c,new Access(null,tenant,0,"sla-worker"),ticket).orElseThrow(PostgresTicketLifecycleRepository::missing);
+            if(result.clock().lifecycleVersion()!=version)throw conflict();return result;
+        }catch(SQLException failure){throw unavailable();}
+    }
+    private Optional<SlaEntry> projectSla(Connection c,Access a,String ticket)throws SQLException{try{
             Optional<Entry> current=latest(c,a,ticket);if(current.isEmpty())return Optional.empty();Entry e=current.get();
             if(e.snapshot().version()>10000)throw new DomainException(422,"CONFIG_PENDING","工单历史超出在线投影技术预算",List.of(Map.of("reason","HISTORY_BUDGET_EXCEEDED")));
             var opening=TicketOpeningConfiguration.restore(e.openingSnapshotJson(),mapper);Instant observed=now(c);var history=new ArrayList<TicketLifecycle.Snapshot>();
@@ -49,7 +58,29 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
             var policy=bound?cn.mop.domain.sla.SlaClockCalculator.ReopenPolicy.valueOf(binding.clockPolicy()):null;
             var projection=cn.mop.domain.sla.SlaClockState.project(opening.opening(),history,observed,policy);
             return Optional.of(new SlaEntry(a.tenantId(),ticket,opening.opening().tier().name(),opening.opening().priority().name(),bound?binding.reference():null,bound?binding.clockPolicy():null,projection));
-        }catch(IllegalArgumentException corrupt){throw unavailable();}});
+        }catch(IllegalArgumentException corrupt){throw unavailable();}
+    }
+    @Override public ReminderPage reminders(Access a,String ticket){
+        uuid(ticket);return read(a,ticket,c->{
+            Entry current=latest(c,a,ticket).orElseThrow(PostgresTicketLifecycleRepository::missing);
+            try(var s=c.createStatement();var r=s.executeQuery("SELECT to_regclass('public.mop_ticket_sla_reminder') IS NOT NULL")){r.next();if(!r.getBoolean(1))throw new DomainException(422,"CONFIG_PENDING","提醒队列结构尚未应用",List.of(Map.of("reason","V36_REQUIRED")));}
+            var items=new ArrayList<Reminder>();
+            try(var s=c.prepareStatement("SELECT r.*,i.ticket_id AS intent_ticket,i.kind,i.created_at AS intent_created_at FROM public.mop_ticket_sla_reminder r LEFT JOIN public.mop_notification_intent i ON i.id=r.intent_id AND i.tenant_id=r.tenant_id WHERE r.tenant_id=?::uuid AND r.ticket_id=?::uuid ORDER BY CASE r.clock WHEN 'RESPONSE' THEN 0 ELSE 1 END,r.progress LIMIT 7")){
+                s.setQueryTimeout(10);s.setString(1,a.tenantId());s.setString(2,ticket);try(var rows=s.executeQuery()){
+                    while(rows.next()){
+                        if(!ticket.equals(rows.getString("intent_ticket"))||!"SLA_PROGRESS".equals(rows.getString("kind"))||rows.getLong("lifecycle_version")>current.snapshot().version()||!instant(rows,"observed_at").equals(instant(rows,"intent_created_at")))throw unavailable();
+                        items.add(new Reminder(rows.getString("intent_id"),rows.getString("clock"),rows.getBigDecimal("progress"),rows.getLong("lifecycle_version"),instant(rows,"observed_at"),rows.getLong("elapsed_ms"),rows.getLong("budget_ms"),rows.getString("configuration_reference"),rows.getString("policy_reference")));
+                    }
+                }
+            }
+            if(items.size()>6)throw unavailable();
+            try(var s=c.prepareStatement("SELECT lifecycle_version,status,last_outcome,observed_at FROM public.mop_ticket_sla_scan_job WHERE tenant_id=?::uuid AND ticket_id=?::uuid")){
+                s.setQueryTimeout(10);s.setString(1,a.tenantId());s.setString(2,ticket);try(var r=s.executeQuery()){
+                    if(!r.next()||r.getLong("lifecycle_version")!=current.snapshot().version())throw unavailable();
+                    return new ReminderPage(a.tenantId(),ticket,current.snapshot().version(),r.getString("status"),r.getString("last_outcome"),instant(r,"observed_at"),items);
+                }
+            }
+        });
     }
     @Override public PolicyBinding slaPolicy(Access a,String ticket){
         uuid(ticket);return read(a,ticket,c->new PostgresTicketSlaPolicyBindings(mapper).view(c,a,latest(c,a,ticket).orElseThrow(PostgresTicketLifecycleRepository::missing)));

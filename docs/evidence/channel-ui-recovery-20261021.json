@@ -1,0 +1,21 @@
+{
+  "base_commit": "b7eba400e0d286360d347669e9c443c3542037ec",
+  "result": "PASS_UNIT_DOM_BUILD",
+  "web_tests": 2842,
+  "web_files": 202,
+  "new_web_tests": 27,
+  "contract_tests": 167,
+  "typecheck_build_static": "PASS",
+  "build_id": "6530a6ba0faf5ab77666dc98b917ab9622b9a94c2c4ad3d51b3c6e7a87595cb1",
+  "browser_axe": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "live_provider_connections": "NOT_RUN",
+  "real_messages_sent": 0,
+  "real_bindings_changed": 0,
+  "backend_and_migrations": "UNCHANGED_NOT_RERUN",
+  "formal_tc_not_run": 128,
+  "source_sha256": {
+    "apps/web/src/pages/EmailPage.vue": "06b067fc65067badae8b4d94a67c78955cddc2f35b4ecb3a8f50641ba54250c2",
+    "apps/web/src/pages/WeComPage.vue": "13c13dfed0a291cb9bb526466a12396c196a3c413ecb2d348b5926a1637303a8",
+    "apps/web/tests/channelPages.test.ts": "a8889f0533c52df9bd651307cc8203ae05e1ef1bf2067f4efdfa48cd034cb159"
+  }
+}

@@ -11,7 +11,7 @@ import ApiErrorNotice from './ApiErrorNotice.vue'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import AppTable from './AppTable.vue'
 import AutoTextarea from './AutoTextarea.vue'
-const props = defineProps<{ modelValue: boolean; ticket: RegisteredTicket | null }>()
+const props = defineProps<{ modelValue: boolean; ticket: RegisteredTicket | null; guardedByParent?: boolean }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean]; saved: [ticketId: string] }>()
 const open = computed({ get: () => props.modelValue, set: value => emit('update:modelValue', value) })
 const state = shallowRef<WorklogState>(emptyWorklogState())
@@ -31,7 +31,7 @@ const labels: Record<WorklogKind, string> = { REMOTE: '远程处理', ONSITE: '�
 function clearForm() { kind.value = ''; startedAt.value = ''; endedAt.value = ''; note.value = ''; editingId.value = ''; editingVersion.value = null; validation.value = ''; formBaseline.value = formSnapshot.value }
 function input(): WorklogInput { return { kind: kind.value as WorklogKind, started_at: startedAt.value.trim(), ended_at: endedAt.value.trim(), note: note.value === '' ? null : note.value } }
 const elapsed = computed(() => { try { const facts = input(); validateWorklogInput(facts); return worklogInstant(facts.ended_at) - worklogInstant(facts.started_at) } catch { return null } })
-const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, permitted.value, writable.value, props.ticket?.id]))
+const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.account_version, session.value?.user.role, permitted.value, writable.value, props.ticket?.id]))
 watch(contextKey, () => { clearForm(); confirming.value = false; const current = session.value; workspace.reset(permitted.value && current && props.ticket ? { tenantId: current.tenant.id, ticketId: props.ticket.id, actorId: current.user.id, permissionVersion: current.permission_version, canWrite: writable.value } : null); if (open.value && permitted.value) void workspace.refresh() }, { immediate: true, flush: 'sync' })
 watch(open, value => { if (value && permitted.value && !state.value.page && !state.value.busy) void workspace.refresh() })
 async function editSelected() {
@@ -70,10 +70,11 @@ async function canLeave(action = '离开本页、切换租户或退出') {
 async function resetForm() { if (!locked.value && await canLeave('清空表单并改为新增')) clearForm() }
 function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved() || dirty.value) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
-onBeforeRouteLeave(() => canLeave())
-const unregisterContextGuard = contextTransitionGuards.register(() => canLeave())
+function inputSnapshot(){return JSON.stringify([contextKey.value,formSnapshot.value,editingId.value,editingVersion.value,workspace.unresolved()])}
+onBeforeRouteLeave(() => props.guardedByParent ? true : canLeave())
+const unregisterContextGuard = contextTransitionGuards.register(() => props.guardedByParent ? true : canLeave(),inputSnapshot)
 onUnmounted(() => { unregisterContextGuard(); disposed = true; workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
-defineExpose({ hasUnresolved: workspace.unresolved, canLeave })
+defineExpose({ hasUnresolved: workspace.unresolved, canLeave, inputSnapshot })
 </script>
 
 <template>

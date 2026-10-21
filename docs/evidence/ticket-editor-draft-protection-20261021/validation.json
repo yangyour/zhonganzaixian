@@ -1,0 +1,52 @@
+{
+  "result": "PASS_COMPOSITE_TICKET_EDITOR_DRAFT_GUARDS",
+  "new_tests": 27,
+  "new_test_layers": {
+    "guard_manager": 4,
+    "real_setup_router_with_null_visual_renders": 19,
+    "real_drawer_native_dom": 4
+  },
+  "focused_tests_passed": 103,
+  "vitest": {
+    "files_passed": 248,
+    "tests_passed": 3900
+  },
+  "node_contract_tests_passed": 173,
+  "api_contract_check": "PASS_UNCHANGED",
+  "typecheck": "PASS",
+  "production_build": {
+    "build_id": "d3ed62eaa454b1ab88cbf154a4f60de033fda884302a47c3161a09fe926505a8",
+    "file_count": 141,
+    "bootstrap_gzip_bytes": 180060,
+    "bootstrap_css_gzip_bytes": 62537,
+    "scope": "static-artifacts-only"
+  },
+  "initial_failures": [
+    {
+      "later_route_guard_case": 1,
+      "fixed": "Install per-navigation resolve recheck after approval, clear on completion/cancellation/error"
+    },
+    {
+      "legacy_source_wiring_assertions": 4,
+      "fixed": "Preserve attribute ordering, explicit tenant/logout wording and callback registration form; assertions unchanged"
+    }
+  ],
+  "source_sha256": {
+    "apps/web/src/components/InternalNoteWorkspace.vue": "98663688f3852ebb88ff86dc4a66078e9643f1a1808f1063f33d05e20c5c880c",
+    "apps/web/src/components/TicketCommentWorkspace.vue": "e3ec46360096e7d056a8864f16643701511b4def4641001690a5647e952ddd3b",
+    "apps/web/src/components/WorklogWorkspace.vue": "7f7aa8c04a6f6d933248371781d9628e686c4e127d13bb2ec9434eddacf7a6fc",
+    "apps/web/src/pages/TicketsPage.vue": "9ad506bcca083e7fd7c07ddaa662f590fa797ee2995e451ac81cfaa620228e43",
+    "apps/web/src/utils/contextTransitionGuard.ts": "b48ab4f39247e1e87854a5f801998ee990d96027ec2ddd66e81a56e15b1ec95c",
+    "apps/web/tests/contextTransitionGuard.test.ts": "0bd35423350eb8b0632f57809066fc7ef2c12c50fd5f8b1cb6b8d4fcb962d935",
+    "apps/web/tests/ticketsPage.test.ts": "96d4f4779b7efeec9bb4ad92eaad78eea54b5b0ff48ecace3a955d686fc109d3",
+    "apps/web/tests/ticketsWorklogNavigation.test.ts": "ad17778726d5725633834f5b3ae0e980b50ea737502c29514c8db4bfa55cb668",
+    "apps/web/tests/ticketEditorDraftProtection.test.ts": "b88c3420abf467a944422078b249e02f6ec06bb9f5fd7df29ef8e56a57467d2b"
+  },
+  "modal_confirmation": "EXPLICITLY_STUBBED_IN_TESTS_NOT_BROWSER_FOCUS_QA",
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_comment_note_or_worklog_writes": 0,
+  "formal_acceptance_passes_added": 0
+}

@@ -155,17 +155,21 @@ function discardRetainedPhotos() {
 }
 const commentOpen = ref(false), commentTarget = ref<RegisteredTicket | null>(null)
 const commentWorkspace = ref<InstanceType<typeof TicketCommentWorkspace> | null>(null)
-function openComments() {
+async function openComments() {
   if (!ticket.value || !can('ticket_comments:read')) return
-  if (commentTarget.value?.id !== ticket.value.id && commentWorkspace.value?.hasUnresolved()) { ElMessage.warning('上一条工单的客户沟通尚未确认，请先返回原面板完成重试'); commentOpen.value = true; return }
-  commentTarget.value = ticket.value; commentOpen.value = true
+  const target=ticket.value,previous=commentTarget.value,generation=contextGeneration.value
+  if(previous?.id!==target.id&&commentWorkspace.value&&!await commentWorkspace.value.canLeave('切换工单')){if(generation===contextGeneration.value&&commentTarget.value===previous)commentOpen.value=true;return}
+  if(generation!==contextGeneration.value||ticket.value!==target||commentTarget.value!==previous||!can('ticket_comments:read')||target.tenant_id!==session.value?.tenant.id)return
+  commentTarget.value=target;commentOpen.value=true
 }
 const noteOpen = ref(false), noteTarget = ref<RegisteredTicket | null>(null)
 const noteWorkspace = ref<InstanceType<typeof InternalNoteWorkspace> | null>(null)
-function openInternalNotes() {
+async function openInternalNotes() {
   if (!ticket.value || !can('ticket_notes:read_internal')) return
-  if (noteTarget.value?.id !== ticket.value.id && noteWorkspace.value?.hasUnresolved()) { ElMessage.warning('上一条工单的内部备注尚未确认，请先返回原面板完成重试'); noteOpen.value = true; return }
-  noteTarget.value = ticket.value; noteOpen.value = true
+  const target=ticket.value,previous=noteTarget.value,generation=contextGeneration.value
+  if(previous?.id!==target.id&&noteWorkspace.value&&!await noteWorkspace.value.canLeave('切换工单')){if(generation===contextGeneration.value&&noteTarget.value===previous)noteOpen.value=true;return}
+  if(generation!==contextGeneration.value||ticket.value!==target||noteTarget.value!==previous||!can('ticket_notes:read_internal')||target.tenant_id!==session.value?.tenant.id)return
+  noteTarget.value=target;noteOpen.value=true
 }
 const worklogOpen = ref(false), worklogTarget = ref<RegisteredTicket | null>(null)
 const worklogWorkspace = ref<InstanceType<typeof WorklogWorkspace> | null>(null)
@@ -217,13 +221,21 @@ function resetContext() {
 }
 // Navigation re-reads /session and replaces its object even when scope is unchanged.
 // Watch each scope value so that a normal query change cannot discard retained editors or commands.
-watch([() => contextGeneration.value, () => session.value?.tenant.id, () => session.value?.user.id, () => session.value?.user.role, () => session.value?.permission_version], resetContext, { flush: 'sync' })
+watch([() => contextGeneration.value, () => session.value?.tenant.id, () => session.value?.user.id, () => session.value?.user.role, () => session.value?.permission_version, () => session.value?.account_version], resetContext, { flush: 'sync' })
 function canLeavePhotos() { if (!photoWorkspace.unresolved.value) return true; ElMessage.warning('当前还有未处理完的现场照片或关联请求，请先返回原工单处理后再离开'); return false }
 function beforeUnload(event: BeforeUnloadEvent) { if (photoWorkspace.unresolved.value) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
-onBeforeRouteLeave(() => canLeavePhotos())
-const unregisterContextGuard = contextTransitionGuards.register(() => canLeavePhotos())
-onUnmounted(() => { unregisterContextGuard(); window.removeEventListener('beforeunload', beforeUnload); resetContext(); detailPhotos.dispose(); photoWorkspace.dispose() })
+function editorSnapshot(){return JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,noteTarget.value?.id,commentTarget.value?.id,worklogTarget.value?.id,noteWorkspace.value?.inputSnapshot(),commentWorkspace.value?.inputSnapshot(),worklogWorkspace.value?.inputSnapshot(),photoWorkspace.unresolved.value])}
+function editorsUnresolved(){return [noteWorkspace.value,commentWorkspace.value,worklogWorkspace.value].some(editor=>editor?.hasUnresolved())}
+async function canLeaveEditors(){const before=editorSnapshot();if(!canLeavePhotos())return false;if(editorsUnresolved()){ElMessage.warning('当前工单仍有提交结果未确认，请先返回原面板恢复原请求');return false}for(const editor of [noteWorkspace.value,commentWorkspace.value,worklogWorkspace.value])if(editor&&!await editor.canLeave('离开页面、切换租户或退出'))return false;return before===editorSnapshot()&&!editorsUnresolved()&&canLeavePhotos()}
+let routeApproval:string|null=null,routeApprovalEpoch=0,unregisterRouteResolve:(()=>void)|undefined
+onBeforeRouteLeave(async()=>{const turn=++routeApprovalEpoch,before=editorSnapshot();routeApproval=null;unregisterRouteResolve?.();unregisterRouteResolve=undefined;if(!await canLeaveEditors()||turn!==routeApprovalEpoch||before!==editorSnapshot())return false;routeApproval=before;unregisterRouteResolve=router.beforeResolve(()=>turn===routeApprovalEpoch&&routeApproval===before&&before===editorSnapshot()&&!editorsUnresolved()&&canLeavePhotos());return true})
+// Recheck after other route guards and async destination loading; an earlier approval cannot erase newer input.
+function clearRouteApproval(){unregisterRouteResolve?.();unregisterRouteResolve=undefined;routeApproval=null;routeApprovalEpoch++}
+const unregisterAfterRoute=router.afterEach(clearRouteApproval)
+const unregisterRouteError=router.onError(clearRouteApproval)
+const unregisterContextGuard=contextTransitionGuards.register(() => canLeaveEditors(), editorSnapshot)
+onUnmounted(() => { unregisterContextGuard(); unregisterRouteResolve?.(); unregisterAfterRoute(); unregisterRouteError(); window.removeEventListener('beforeunload', beforeUnload); resetContext(); detailPhotos.dispose(); photoWorkspace.dispose() })
 </script>
 
 <template>
@@ -250,11 +262,11 @@ onUnmounted(() => { unregisterContextGuard(); window.removeEventListener('before
       <div class="table-footer"><span>本页 {{ loading || error || !loaded ? '—' : rows.length }} 条记录</span><div class="cursor-pagination ticket-pagination"><el-select :model-value="pageSize" :disabled="loading" aria-label="报障每页条数" @change="resizePage"><el-option v-for="size in pageSizes.filter(size => size <= pageSizeLimit)" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button v-if="queryString('cursor') && !cursorHistory.length" :disabled="loading" @click="firstPage">返回首页</el-button><el-button v-else :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
     </div>
     <TicketReportForm v-if="mayReport" v-model="createOpen" @accepted="recordAcceptance" @registered="showRegistered" />
-    <TicketCommentWorkspace ref="commentWorkspace" v-model="commentOpen" :ticket="commentTarget" @saved="refreshOverview" />
+    <TicketCommentWorkspace ref="commentWorkspace" :guarded-by-parent="true" v-model="commentOpen" :ticket="commentTarget" @saved="refreshOverview" />
     <el-button v-if="commentTarget && commentTarget.tenant_id === session?.tenant.id && (!customerView || commentTarget.reporter_id === session?.user.id) && can('ticket_comments:read')" class="retained-worklog-button" @click="commentOpen = true">恢复“{{ commentTarget.receipt_no }}”的客户沟通面板</el-button>
-    <InternalNoteWorkspace ref="noteWorkspace" v-model="noteOpen" :ticket="noteTarget" @saved="refreshOverview" />
+    <InternalNoteWorkspace ref="noteWorkspace" :guarded-by-parent="true" v-model="noteOpen" :ticket="noteTarget" @saved="refreshOverview" />
     <el-button v-if="noteTarget && noteTarget.tenant_id === session?.tenant.id && can('ticket_notes:read_internal')" class="retained-worklog-button" @click="noteOpen = true">恢复“{{ noteTarget.receipt_no }}”的内部备注面板</el-button>
-    <WorklogWorkspace ref="worklogWorkspace" v-model="worklogOpen" :ticket="worklogTarget" @saved="refreshOverview" />
+    <WorklogWorkspace ref="worklogWorkspace" :guarded-by-parent="true" v-model="worklogOpen" :ticket="worklogTarget" @saved="refreshOverview" />
     <el-button v-if="worklogTarget && can('worklogs:read_own')" class="retained-worklog-button" @click="worklogOpen = true">恢复“{{ worklogTarget.receipt_no }}”的工时填报面板</el-button>
     <el-drawer :key="queryString('ticket_id')" v-model="detailOpen" title="工单详情" size="100%" class="ticket-detail-drawer" :with-header="false" :before-close="closeDetail" destroy-on-close>
       <RetainedPhotoNotice v-if="retainedPhotos" :target-id="photoTargetId" :ticket="appendTicket" :count="detailPhotos.rows.value.length" :can-discard="photoWorkspace.canDiscard.value" @resume="openDetail(photoTargetId)" @discard="discardRetainedPhotos" />

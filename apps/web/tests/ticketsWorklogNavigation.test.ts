@@ -20,7 +20,7 @@ async function mount() {
   const worklog = { ...WorklogWorkspace, render: () => null } as unknown as Component
   const routedPage = { ...TicketsPage, render() {
     pageState = (getCurrentInstance() as unknown as { setupState: any }).setupState
-    return h(worklog, { modelValue: pageState.worklogOpen, ticket: pageState.worklogTarget, 'onUpdate:modelValue': (value: boolean) => { pageState.worklogOpen = value }, ref: (vm: any) => { pageState.worklogWorkspace = vm; if (vm) worklogState = vm.$.setupState } })
+    return h(worklog, { guardedByParent: true, modelValue: pageState.worklogOpen, ticket: pageState.worklogTarget, 'onUpdate:modelValue': (value: boolean) => { pageState.worklogOpen = value }, ref: (vm: any) => { pageState.worklogWorkspace = vm; if (vm) worklogState = vm.$.setupState } })
   } } as unknown as Component
   const router = createRouter({ history: createMemoryHistory(), routes: [{ path: '/tickets', component: routedPage }, { path: '/dashboard', component: { render: () => null } }] })
   router.beforeEach(() => refreshProjectSession())

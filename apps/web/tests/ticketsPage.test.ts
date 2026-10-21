@@ -4,7 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { createApp, nextTick, reactive, type App } from 'vue'
 import { context, id, page, ticket } from './ticketReader.fixture'
 const mocks = vi.hoisted(() => ({ query: {} as Record<string,string>, replace: vi.fn(), updateGuard: vi.fn() }))
-vi.mock('vue-router', () => ({ useRoute: () => ({ query: mocks.query }), useRouter: () => ({ replace: mocks.replace }), onBeforeRouteLeave: vi.fn(), onBeforeRouteUpdate: mocks.updateGuard }))
+vi.mock('vue-router', () => ({ useRoute: () => ({ query: mocks.query }), useRouter: () => ({ replace: mocks.replace, beforeResolve: () => () => {}, afterEach: () => () => {}, onError: () => () => {} }), onBeforeRouteLeave: vi.fn(), onBeforeRouteUpdate: mocks.updateGuard }))
 import TicketsPage from '../src/pages/TicketsPage.vue'
 import { api, ApiError } from '../src/api/client'
 import { session, contextGeneration } from '../src/stores/session'

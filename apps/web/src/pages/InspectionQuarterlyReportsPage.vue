@@ -27,7 +27,7 @@ const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.va
 function context():ReportContext|null{const s=session.value;return s&&permitted.value?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true,canWrite:writable.value}:null}
 const previewButton=ref<HTMLButtonElement|null>(null),pdfButton=ref<HTMLButtonElement|null>(null),previewMode=ref<'html'|'pdf'>('html')
 const previewBusy=ref(false),previewError=ref(''),previewStatus=ref('')
-let previewAbort:AbortController|null=null,previewTurn=0
+let disposed=false,previewAbort:AbortController|null=null,previewTurn=0
 function cancelPreview(){previewTurn++;previewAbort?.abort();previewAbort=null;previewBusy.value=false;previewError.value='';previewStatus.value=''}
 watch(()=>[contextKey.value,state.value.selected?.id,state.value.selected?.document_sha256],cancelPreview,{flush:'sync'})
 async function cancelPreviewByUser(){if(!previewBusy.value)return;cancelPreview();const turn=previewTurn,key=contextKey.value;previewStatus.value='已取消，本次未发起下载。';await nextTick();if(turn!==previewTurn||key!==contextKey.value)return;(previewMode.value==='pdf'?pdfButton:previewButton).value?.focus()}
@@ -69,15 +69,16 @@ function payload(){const s=sourceState.value.selected;if(!s||s.id!==sourceId.val
 async function save(){if(locked.value)return false;validation.value='';let p;try{p=payload()}catch{validation.value='核对来源集合后，填写非空标签、1–9998年和1–4季度；所有待确认配置保持空值。';return false}const turn=contextKey.value,ok=await workspace.submit(p);if(ok&&turn===contextKey.value)feedback.success('原季度草稿保存回执已确认，冻结输入输出请单独回读');return ok}
 async function retry(){return workspace.retry()}
 function unlockRejected(){if(state.value.attempt?.state!=='rejected'||!workspace.begin())return false;validation.value='原请求已拒绝；保留明确来源与配置，修改后手动保存';return true}
-async function discard(){if(!dirty.value)return true;try{await ElMessageBox.confirm('清除未保存的期次、配置与来源集合选择？已保存报告不会改变。','保留季度草稿输入',{confirmButtonText:'清除未保存输入',cancelButtonText:'保留输入',type:'warning'});return true}catch{return false}}
-async function begin(){if(workspace.unresolved()||state.value.busy||sourceState.value.busy)return false;const turn=contextKey.value;if(!await discard()||turn!==contextKey.value||!workspace.begin())return false;clearForm();return true}
+function formSnapshot(){const source=sourceState.value.selected;return JSON.stringify([label.value,year.value,quarter.value,sourceId.value,configuration.value,source?[source.id,source.document_sha256,source.source_manifest_sha256]:null])}
+async function discard(){const turn=contextKey.value,input=formSnapshot();if(dirty.value){try{await ElMessageBox.confirm('清除未保存的期次、配置与来源集合选择？已保存报告不会改变。','保留季度草稿输入',{confirmButtonText:'清除未保存输入',cancelButtonText:'保留输入',type:'warning'})}catch{return false}}else await Promise.resolve();return !disposed&&turn===contextKey.value&&input===formSnapshot()&&!workspace.unresolved()}
+async function begin(){if(disposed||workspace.unresolved()||state.value.busy||sourceState.value.busy)return false;const turn=contextKey.value,input=formSnapshot();if(!await discard()||disposed||turn!==contextKey.value||input!==formSnapshot()||sourceState.value.busy||!writable.value||!workspace.begin())return false;clearForm();return true}
 async function select(id:string){rowPage.value=0;expanded.value='';sourceExpanded.value='';return workspace.select(id)}
 async function browse(next=false){rowPage.value=0;expanded.value='';sourceExpanded.value='';return workspace.list(next)}
-async function mayLeave(){if(workspace.unresolved()){feedback.warning('先用完全相同原请求恢复结果；列表刷新不能确认是否已保存');return false}const turn=contextKey.value;return await discard()&&turn===contextKey.value}
+async function mayLeave(){if(workspace.unresolved()){feedback.warning('先用完全相同原请求恢复结果；列表刷新不能确认是否已保存');return false}const turn=contextKey.value,input=formSnapshot();return await discard()&&!disposed&&turn===contextKey.value&&input===formSnapshot()&&!workspace.unresolved()}
 onBeforeRouteLeave(mayLeave);const unregister=contextTransitionGuards.register(mayLeave)
 function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()||dirty.value){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
-onUnmounted(()=>{cancelPreview();unregister();workspace.dispose();sourceReader.dispose();window.removeEventListener('beforeunload',beforeUnload)})
+onUnmounted(()=>{disposed=true;cancelPreview();unregister();workspace.dispose();sourceReader.dispose();window.removeEventListener('beforeunload',beforeUnload)})
 defineExpose({downloadPreview,downloadPdfPreview,cancelPreview,previewBusy,previewError,previewStatus,state,sourceState,label,year,quarter,sourceId,configuration,validation,save,retry,begin,unlockRejected,readSource,payload,select,browse,hasUnresolved:workspace.unresolved})
 </script>
 <template>

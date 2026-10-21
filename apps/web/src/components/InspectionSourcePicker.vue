@@ -16,6 +16,8 @@ watch([worksheetId,version],()=>{validation.value='';reader.reset(props.context)
 watch(()=>props.disabled,disabled=>{if(disabled)reader.reset(props.context)},{flush:'sync'})
 async function load(){if(props.disabled||!props.context)return false;const selected=target();if(!selected){reader.reset(props.context);validation.value='请输入巡检执行单 UUID 与正整数修订版本号';return false}validation.value='';return reader.load(selected)}
 function add(){const source=currentCandidate.value;if(props.disabled||!props.context||!source||duplicate.value||props.selectedKeys.length>=1000)return false;emit('add',structuredClone(source));worksheetId.value='';version.value='';reader.reset(props.context);return true}
+function inputSnapshot(){return JSON.stringify([worksheetId.value,version.value])}
+defineExpose({inputSnapshot})
 onUnmounted(()=>reader.dispose())
 </script>
 <template>

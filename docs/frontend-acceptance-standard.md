@@ -89,3 +89,5 @@ qa/browser/my-tasks.pw.ts新增6项四视口、键盘详情、固定负责人、
 [巡检确认与来源冻结](inspection-confirm-protection-20261021.md)覆盖原始输入、有序检查项、候选ID/版本/摘要及异步来源重读，不能只按版本号判断来源一致。
 
 [执行单来源读取恢复](worksheet-source-recovery-20261021.md)将候选原页读取和新单来源核对区分记录；恢复核对必须继续匹配原输入，不能用旧确认覆盖后续编辑。
+
+[集合与季度草稿确认保护](report-confirm-protection-20261021.md)要求嵌套编辑器保留原始输入快照；dirty从true到true不能作为“输入未变化”的证据。

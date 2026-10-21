@@ -1,0 +1,32 @@
+{
+  "result": "PASS_NESTED_INPUT_CONFIRMATION_JSDOM_BUILD_HTTP",
+  "new_tests": 18,
+  "vitest": {
+    "files_passed": 238,
+    "tests_passed": 3740
+  },
+  "focused_tests_passed": 81,
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 140,
+    "bootstrap_gzip_bytes": 179969,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "caf0abd9977dd598c60160aefb05305936a1a65a7469171b458de99eaeb57efc",
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/pages/InspectionSourceCollectionsPage.vue": "9df4e9174f56c083b8650726100484529ab7b35e7fd7b9a1c9d495505d644378",
+    "apps/web/src/pages/InspectionQuarterlyReportsPage.vue": "aa49409cd359e7a523133c50aed4da6ebd1b6347188f1c52786b96e933adb696",
+    "apps/web/src/components/InspectionSourcePicker.vue": "8f2ee25b0c43693d03ef8c2354ad9efa2a35999070a6f9bc7a2ec9579cab308a",
+    "apps/web/tests/inspectionSourceCollectionsPage.test.ts": "78313f75f168c52182a839c08bf8f46cf3ca0d51ce97dfff78a462286915c6a5",
+    "apps/web/tests/inspectionQuarterlyReportsPage.test.ts": "3917cff1c7803fc167cf47b5e3f94f232a4861de4417892423940852e4cce039"
+  },
+  "api_contract_changed": false,
+  "api_or_database_executed": false,
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0
+}

@@ -2,6 +2,10 @@ package cn.mop.adapters.oss;
 
 import cn.mop.domain.DomainException;
 import cn.mop.domain.PhotoObjectStore;
+import cn.mop.adapters.backup.BackupEnvelopeArchive;
+import cn.mop.adapters.backup.BackupEnvelopeEncryption;
+import cn.mop.adapters.backup.BackupEnvelopeEncryption.Envelope;
+import cn.mop.adapters.backup.BackupEnvelopeEncryption.Scope;
 import cn.mop.domain.assetimport.source.AssetImportObjectStore;
 import cn.mop.domain.assetimport.source.ImportFormat;
 import cn.mop.domain.assetimport.source.ImportLimits;
@@ -74,6 +78,29 @@ public final class OssProjectStore implements AutoCloseable {
             }
             public byte[] read(String key,long size,String hash){return readVerified("asset-import-sources",key,size,hash,ImportLimits.MAX_SOURCE_BYTES);}
             public void close(){OssProjectStore.this.close();}
+    }
+    /** Not auto-wired: only the authorized archive coordinator should call this encrypted-envelope view. */
+    public BackupView backups(){return new BackupView();}
+    public final class BackupView implements BackupEnvelopeArchive.ObjectStore,AutoCloseable {
+        public boolean ready(){return OssProjectStore.this.ready();}
+        public void storeImmutable(Envelope envelope){
+            Objects.requireNonNull(envelope);String key=backupKey(envelope.scope());byte[] bytes=envelope.encoded();
+            write("backup-envelopes",key,bytes,"application/octet-stream",envelope.sha256(),BackupEnvelopeEncryption.MAX_ENVELOPE_BYTES,Map.of("envelope-format",envelope.format(),"encryption-algorithm",envelope.algorithm()));
+            // A successful PUT/read is insufficient if privacy/versioning prerequisites changed.
+            backupPrivacy(key);
+        }
+        public byte[] read(Scope scope,long size,String hash){
+            String key=backupKey(scope);expected(size,hash,BackupEnvelopeEncryption.MAX_ENVELOPE_BYTES);
+            backupPrivacy(key);byte[] bytes=readVerified("backup-envelopes",key,size,hash,BackupEnvelopeEncryption.MAX_ENVELOPE_BYTES);backupPrivacy(key);return bytes;
+        }
+        public void close(){OssProjectStore.this.close();}
+    }
+    private static String backupKey(Scope scope){Objects.requireNonNull(scope);return "backup-envelopes/"+scope.tenantId()+"/"+scope.versionId();}
+    private void backupPrivacy(String key){
+        String physical=objectKey("backup-envelopes",key);
+        try{requireBucketSafety();ObjectAcl acl=client.getObjectAcl(settings.bucket(),physical);
+            if(acl==null||acl.getVersionId()!=null||!Set.of(ObjectPermission.Private,ObjectPermission.Default).contains(acl.getPermission()))throw unavailable();
+        }catch(DomainException safe){throw safe;}catch(Exception rejected){safeLog(rejected);throw unavailable();}
     }
     private String objectKey(String namespace,String key) {
         if(key==null||!key.matches(namespace+"/"+UUID+"/"+UUID))throw new IllegalArgumentException("Invalid project object key");

@@ -12,7 +12,7 @@ import java.util.*;
 public final class BackupEnvelopeEncryption {
  public static final String FORMAT="MOP_BACKUP_AES256_GCM_V1",ALGORITHM="AES-256-GCM";
  public static final int MAX_PLAINTEXT_BYTES=16*1024*1024,MAX_WRAPPED_KEY_BYTES=8192,NONCE_BYTES=12,TAG_BYTES=16;
- private static final int MAX_ENVELOPE_BYTES=MAX_PLAINTEXT_BYTES+MAX_WRAPPED_KEY_BYTES+2048;
+ public static final int MAX_ENVELOPE_BYTES=MAX_PLAINTEXT_BYTES+MAX_WRAPPED_KEY_BYTES+2048;
  public record Access(UUID tenantId,UUID actorId,long permissionVersion){public Access{if(tenantId==null||actorId==null||permissionVersion<1||permissionVersion>9007199254740991L)throw invalid();}}
  public record Scope(UUID tenantId,UUID assetId,UUID runId,int attemptNumber,UUID versionId){public Scope{if(tenantId==null||assetId==null||runId==null||versionId==null||attemptNumber<1||attemptNumber>3)throw invalid();}}
  public enum Operation{ENCRYPT,DECRYPT}

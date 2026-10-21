@@ -1,0 +1,22 @@
+{
+  "scope": "REAL_SDK_LOOPBACK_HTTP_SYNTHETIC_PROTOCOL_EMULATOR_NOT_REAL_OSS",
+  "result": "PASS",
+  "junit_tests_executed": 1,
+  "check_groups": [
+    "PASS SDK_HTTP_ENCRYPTED_PUT_AND_AUTHENTICATED_READBACK",
+    "PASS SDK_HTTP_IDENTICAL_REPLAY_NO_SECOND_PUT",
+    "PASS SDK_HTTP_CONFLICT_NEVER_OVERWRITES",
+    "PASS SDK_HTTP_LOST_PUT_RESPONSE_READONLY_RECONCILIATION",
+    "PASS SDK_HTTP_PUBLIC_OBJECT_REJECTED_BEFORE_CONTENT_READ",
+    "PASS SDK_HTTP_VERSIONED_BUCKET_NO_KEY_UNWRAP_OR_PUT",
+    "PASS SDK_HTTP_CHANGED_BUCKET_PREREQUISITE_NO_SUCCESS_RECEIPT",
+    "PASS SDK_HTTP_TAMPERED_OBJECT_NOT_ACCEPTED_OR_REPAIRED"
+  ],
+  "real_oss": false,
+  "real_kms": false,
+  "production_credentials": false,
+  "server_and_client_closed": true,
+  "synthetic_in_memory_objects_cleared": true,
+  "command_environment": "MOP_RUN_BACKUP_ARCHIVE_HTTP_TESTS=true",
+  "selected_test": "BackupArchiveLoopbackHttpTest"
+}

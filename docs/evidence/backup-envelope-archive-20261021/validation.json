@@ -1,0 +1,34 @@
+{
+  "scope": "OBJECT_BYTES_AND_AEAD_READBACK_NOT_VERSION_REGISTRATION_OR_DURABILITY",
+  "java": {
+    "reported": 3994,
+    "executed": 2977,
+    "skipped": 1017,
+    "failures": 0,
+    "errors": 0,
+    "new_unit_tests": 11,
+    "new_http_test_default_skip": 1,
+    "pdf_font_tests_enabled": true
+  },
+  "python_tests_passed": 125,
+  "contract_tests_passed": 173,
+  "api_contract": "PASS_UNCHANGED_0.76",
+  "loopback_http_check_groups_passed": 8,
+  "real_cloud_or_kms": "NOT_RUN",
+  "new_database_migrations": false,
+  "source_sha256": {
+    "server/adapters/src/main/java/cn/mop/adapters/backup/BackupEnvelopeArchive.java": "2ea96bc5d3d04c5a58c1cf01b4014b3a8adef6833ff8f605635d6f698abdeef4",
+    "server/adapters/src/main/java/cn/mop/adapters/backup/BackupEnvelopeEncryption.java": "483257105556e07c8ce0c2d78e92a746d21582373bc98787b67cea8ac18693c7",
+    "server/adapters/src/main/java/cn/mop/adapters/oss/OssProjectStore.java": "9660e37a7b498208d8d5ab34d1a8877ebe7d8688e88520b507d556fc791abcdc",
+    "server/api/src/test/java/cn/mop/adapters/backup/BackupArchiveFixture.java": "ee41336e029530e97406932b1027ad835b85837a7e792cbb670b74a7ca835875",
+    "server/api/src/test/java/cn/mop/adapters/backup/BackupEnvelopeArchiveTest.java": "77870ea52033759f2d6610136c939564bc5895eeba31ec9c183cb5d940af7012",
+    "server/api/src/test/java/cn/mop/adapters/oss/BackupArchiveLoopbackHttpTest.java": "eb385e651a67e07ad740859c6eac4606c3a900d89368364ba8c8f16b5451044d",
+    "deploy/examples/backup-execution-dependencies.json": "8a436a129e705549060ed31df150591062a1cc55919639a255cf20c833b5915a",
+    "tools/test_dependency_template_check.py": "2d86e991a7ba8975ab605771a03925e6547840f8dc7314fa388d649a6837b789"
+  },
+  "production_enabled": false,
+  "runtime_wiring": "NONE",
+  "formal_acceptance": "128_NOT_RUN",
+  "browser": "NOT_RUN",
+  "early_attempt": "Test compilation failed before server start because OSS interface has no setRegion; corrected test to official builder.region, then all HTTP checks passed. Production TLS/endpoint constraints unchanged."
+}

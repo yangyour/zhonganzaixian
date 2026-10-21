@@ -43,5 +43,7 @@
   "fresh_data_key_provider_reference": null,
   "crypto_access_authorizer_reference": null,
   "approved_kms_key_version_reference": null,
-  "backup_plaintext_size_limit_reference": null
+  "backup_plaintext_size_limit_reference": null,
+  "backup_archive_access_authorizer_reference": null,
+  "approved_immutable_bucket_governance_reference": null
 }

@@ -39,4 +39,9 @@ class DependencyTemplateCheckTest(unittest.TestCase):
         for key in ['approved_envelope_encryption_profile_reference','fresh_data_key_provider_reference','crypto_access_authorizer_reference','approved_kms_key_version_reference','backup_plaintext_size_limit_reference']:
             self.assertIn(key,d);self.assertIsNone(d[key])
         self.assertFalse(d['backup_execution_enabled']);self.assertFalse(check_template('backup-execution',d,self.settings)['ready'])
+    def test_backup_archive_requires_separate_authorization_and_bucket_governance(self):
+        d=json.loads((ROOT/'deploy/examples/backup-execution-dependencies.json').read_text())
+        for key in ['backup_archive_access_authorizer_reference','approved_immutable_bucket_governance_reference']:
+            self.assertIn(key,d);self.assertIsNone(d[key])
+        self.assertFalse(d['backup_execution_enabled']);self.assertFalse(d['production_approved'])
 if __name__=='__main__': unittest.main()

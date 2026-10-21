@@ -1,0 +1,36 @@
+{
+  "base_commit": "4ef9758682237a19269efb00ace6916f5f63e25e",
+  "result": "PASS_UNIT_DOM_BUILD_STATIC",
+  "web_tests": 3239,
+  "web_files": 219,
+  "new_tests": 13,
+  "contract_tests": 173,
+  "build_id": "53b85f637e17f4c60749aa78e284b1caea4ee8135d2df229cf5fef31aae6aaf5",
+  "bootstrap_gzip_bytes": 179741,
+  "backend_api_or_migrations_changed": false,
+  "actual_http_reexecuted": false,
+  "list_retry": "EXACT_APPLIED_FILTERS_SIZE_SNAPSHOT_AND_BEFORE",
+  "proof_retry": "EXACT_FROM_TO_NEW_DATABASE_SNAPSHOT",
+  "independent_read_cancellation": true,
+  "duplicate_inflight_reads": "SUPPRESSED_SAME_QUERY_REPLACEMENT_ALLOWED_FOR_NEW_QUERY",
+  "immutable_retry_targets": true,
+  "dispose_permanent": true,
+  "audit_records_mutated": 0,
+  "filter_time_precision": "EXISTING_MAX_3_FRACTIONAL_DIGITS_UNCHANGED",
+  "prior_test_failures": [
+    "Nanosecond input assumption rejected by existing millisecond filter constraint; unsupported change withdrawn",
+    "Initial DOM fixture lacked ElementPlus table context; explicit table-column stand-in added; no browser layout claim"
+  ],
+  "dom_scope": "NATIVE_VUE_CONTROLS_WITH_ELEMENT_PLUS_TABLE_AND_FORM_STAND_INS",
+  "browser_and_axe": "NOT_RUN",
+  "formal_acceptance": {
+    "total": 128,
+    "NOT_RUN": 128
+  },
+  "source_sha256": {
+    "apps/web/src/utils/auditWorkspace.ts": "d1b051ffdba326b784234129ad61998f14e664ef276dbc5baeaaf7f6b56d209d",
+    "apps/web/src/pages/AuditPage.vue": "31bdbabdcdc954de3ed8ec820592bb1a7e2bc7baedd443f4bdc671e7ff2d8803",
+    "apps/web/tests/auditWorkspace.test.ts": "1d9977a08522f3973345b9909fdb97669e01e29ce9b22d066bc59b5b565155ed",
+    "apps/web/tests/auditPageRecovery.test.ts": "93f4d05f31e086606f8db0caefda4a9ab42fcc625e470de13bbc52a79777015e"
+  }
+}

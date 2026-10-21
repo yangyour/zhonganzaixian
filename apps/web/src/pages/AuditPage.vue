@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import '../styles/adminPrototype.css'
 import { ElTableColumn as ElementTableColumn } from 'element-plus'
-import { computed, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
 import { api } from '../api/client'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { displayTime } from '../utils/display'
@@ -12,6 +12,8 @@ const ElTableColumn = ElementTableColumn<AuditRecord>
 const state = shallowRef<AuditState>(emptyAuditState())
 const workspace = createAuditWorkspace(api, value => { state.value = value })
 const draft = reactive({ actor_id: '', action: '', result: '', resource_type: '', resource_id: '', trace_id: '', occurred_from: '', occurred_before: '' })
+const listStatus=ref(''),proofStatus=ref(''),listNotice=ref<HTMLElement|null>(null),proofNotice=ref<HTMLElement|null>(null)
+let focusEpoch=0
 const pageSize = ref(15), from = ref('1'), to = ref(''), selected = ref<AuditRecord | null>(null), rangeError = ref('')
 const permitted = computed(() => Boolean(session.value && can('audit:read') && !switchingTenant.value))
 const fields: { key: keyof typeof draft; label: string; placeholder: string }[] = [
@@ -22,19 +24,21 @@ const fields: { key: keyof typeof draft; label: string; placeholder: string }[] 
 ]
 function filters(): AuditFilters { return Object.fromEntries(Object.entries(draft).filter(([, value]) => value !== '')) }
 const unapplied = computed(() => JSON.stringify(filters()) !== JSON.stringify(state.value.filters) || pageSize.value !== state.value.pageSize)
-const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, permitted.value]))
+const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.account_version,session.value?.user.role,session.value?.mode,permitted.value]))
 watch(contextKey, () => {
+  focusEpoch++;listStatus.value='';proofStatus.value=''
   for (const field of fields) draft[field.key] = ''
   pageSize.value = 15; from.value = '1'; to.value = ''; selected.value = null; rangeError.value = ''
   const current = session.value
   workspace.reset(permitted.value && current ? { tenantId: current.tenant.id, actorId: current.user.id, permissionVersion: current.permission_version } : null)
   if (permitted.value) void workspace.load()
 }, { immediate: true, flush: 'sync' })
-async function search() { selected.value = null; await workspace.load(filters(), pageSize.value) }
+async function search() {focusEpoch++;listStatus.value='';selected.value = null; await workspace.load(filters(), pageSize.value) }
 function resetFilters() { for (const field of fields) draft[field.key] = ''; pageSize.value = 15; void search() }
-async function refresh() { selected.value = null; await workspace.load() }
-async function nextPage() { if (unapplied.value) return; selected.value = null; await workspace.next() }
+async function refresh() {focusEpoch++;listStatus.value='';selected.value = null; await workspace.load() }
+async function nextPage() { if (unapplied.value) return;focusEpoch++;listStatus.value='';selected.value = null; await workspace.next() }
 async function verifyRange() {
+  focusEpoch++;proofStatus.value=''
   rangeError.value = ''
   if (!/^[1-9][0-9]{0,15}$/.test(from.value) || to.value !== '' && !/^[1-9][0-9]{0,15}$/.test(to.value)) { rangeError.value = '起止序号必须为安全正整数，结束可留空由服务器限定本批范围'; await workspace.verify(Number.NaN); return }
   await workspace.verify(Number(from.value), to.value === '' ? null : Number(to.value))
@@ -42,12 +46,17 @@ async function verifyRange() {
 async function verifyNext() {
   const next = state.value.proof?.next_from_sequence
   if (!next || state.value.proof?.status !== 'VALID') return
-  from.value = String(next); to.value = ''; rangeError.value = ''; await workspace.verifyNext()
+  focusEpoch++;proofStatus.value='';from.value = String(next); to.value = ''; rangeError.value = ''; await workspace.verifyNext()
 }
 function toggleRecord(value: boolean) { if (!value) selected.value = null }
 function chooseRecordRange(row: AuditRecord) { from.value = String(row.sequence); to.value = String(row.sequence); rangeError.value = ''; selected.value = { ...row } }
 const proofTitle = computed(() => state.value.proof?.status === 'VALID' ? '所选区间在本次数据库快照中校验一致' : state.value.proof?.status === 'INVALID' ? '区间校验未通过，请保留证据并排查' : '当前快照区间暂无记录，未生成校验结果')
-onUnmounted(() => workspace.dispose())
+async function retryList(){focusEpoch++;listStatus.value='';selected.value=null;return workspace.retryList()}
+async function retryProof(){focusEpoch++;proofStatus.value='';rangeError.value='';return workspace.retryProof()}
+async function cancelList(){if(!workspace.cancelList())return false;const turn=++focusEpoch;selected.value=null;listStatus.value='已取消列表读取；可重试原查询参数，续页仍使用原快照上界。';await nextTick();if(turn===focusEpoch)listNotice.value?.focus();return true}
+async function cancelProof(){if(!workspace.cancelProof())return false;const turn=++focusEpoch;proofStatus.value='已取消区间校验等待；没有修改审计记录。重试相同序号参数仍是一次新的数据库快照核验。';await nextTick();if(turn===focusEpoch)proofNotice.value?.focus();return true}
+onUnmounted(() => {focusEpoch++;workspace.dispose()})
+defineExpose({state,workspace,draft,pageSize,from,to,search,refresh,nextPage,verifyRange,verifyNext,retryList,retryProof,cancelList,cancelProof,listStatus,proofStatus})
 </script>
 <template>
   <section class="audit-page admin-prototype">
@@ -65,7 +74,7 @@ onUnmounted(() => workspace.dispose())
         </el-form>
         <p class="field-help">时间格式采用含秒的 UTC ISO-8601（Z）标准，支持最多 3 位毫秒；时间区间为左闭右开（含开始时间、不含结束时间）。</p>
         <p v-if="unapplied" class="audit-warning">筛选条件已修改但尚未应用，请点击“查询”生效。</p>
-        <ApiErrorNotice :error="state.error"><el-button size="small" @click="refresh">重新加载</el-button></ApiErrorNotice>
+        <ApiErrorNotice :error="state.error" /><p v-if="workspace.listRetryTarget()">原读取目标：{{workspace.listRetryTarget()?.next?'续页':'第一页'}}，快照上界 {{workspace.listRetryTarget()?.bound?.snapshot??'首次读取未取得，重试重新取得'}}，页长 {{workspace.listRetryTarget()?.size}}；重试保留已应用条件，不采用未查询的新输入。</p><el-button v-if="workspace.canRetryList()" @click="retryList">重试原审计页</el-button><el-button v-if="state.loading" @click="cancelList">取消审计列表读取</el-button><p v-if="listStatus" ref="listNotice" tabindex="-1" role="status">{{listStatus}}</p>
         <AppTable :error="state.error" :rows="state.page?.items || []" :loading="state.loading" :empty-text="state.page ? '本页没有匹配的授权记录' : '审计记录尚未成功读取'">
           <el-table-column label="序号 / 时间（北京）" min-width="190"><template #default="{ row }"><strong>#{{ row.sequence }}</strong><span class="cell-sub">{{ displayTime(row.occurred_at) }}</span></template></el-table-column>
           <el-table-column prop="actor_name" label="操作者" min-width="130" />
@@ -78,10 +87,10 @@ onUnmounted(() => workspace.dispose())
         <div class="table-footer audit-pagination"><span>{{ state.paged ? '后续页' : '第一页' }} · 本页 {{ state.page?.items.length ?? '—' }} 条 · 序号上界 {{ state.page?.snapshot_sequence ?? '—' }}</span><div class="audit-actions"><el-button :disabled="state.loading || !state.paged" @click="refresh">返回第一页</el-button><el-button :disabled="state.loading || !state.page?.has_more || unapplied" @click="nextPage">下一页</el-button></div></div>
         <p class="field-help">翻页过程中新写入的审计记录归入最新序号之后，点击“返回第一页”或刷新可加载最新快照。</p>
       </div>
-      <details class="panel audit-proof-panel" :open="!!state.proof || state.verifying || !!state.proofError"><summary>哈希链区间校验 · 展开设置起止序号</summary><div class="admin-card-body">
+      <details class="panel audit-proof-panel" :open="!!state.proof || state.verifying || !!state.proofError || !!proofStatus"><summary>哈希链区间校验 · 展开设置起止序号</summary><div class="admin-card-body">
         <h2>哈希链区间校验</h2><p>针对当前租户完整审计链的指定序号区间执行连续性核验（不受上方列表筛选条件影响，单批上限 1000 条，包含起止序号）。</p>
         <el-form label-position="top" class="audit-range-form" @submit.prevent="verifyRange"><el-form-item label="开始序号"><el-input v-model="from" inputmode="numeric" aria-label="审计校验开始序号" /></el-form-item><el-form-item label="结束序号（可留空）"><el-input v-model="to" inputmode="numeric" aria-label="审计校验结束序号" placeholder="留空取本批最多1000条" /></el-form-item><el-button type="primary" native-type="submit" :loading="state.verifying">校验区间</el-button></el-form>
-        <p v-if="rangeError" role="alert" class="audit-warning">{{ rangeError }}</p><ApiErrorNotice :error="state.proofError" />
+        <p v-if="rangeError" role="alert" class="audit-warning">{{ rangeError }}</p><ApiErrorNotice :error="state.proofError" /><p v-if="workspace.proofRetryTarget()">原校验参数：开始 {{workspace.proofRetryTarget()?.from}}，结束 {{workspace.proofRetryTarget()?.to??'由服务器限定本批'}}；重试不采用尚未提交的新序号。</p><el-button v-if="workspace.canRetryProof()" @click="retryProof">重试原校验参数</el-button><el-button v-if="state.verifying" @click="cancelProof">取消区间校验等待</el-button><p v-if="proofStatus" ref="proofNotice" tabindex="-1" role="status">{{proofStatus}}</p>
         <template v-if="state.proof">
           <el-alert :type="state.proof.status === 'VALID' ? 'success' : state.proof.status === 'INVALID' ? 'error' : 'info'" :closable="false" :title="proofTitle" />
           <el-descriptions :column="1" border class="audit-proof-details"><el-descriptions-item label="当次快照时间">{{ state.proof.checked_at }}</el-descriptions-item><el-descriptions-item label="快照尾序号">{{ state.proof.snapshot_sequence }}</el-descriptions-item><el-descriptions-item label="本次区间">{{ state.proof.from_sequence ?? '无' }} → {{ state.proof.to_sequence ?? '无' }}</el-descriptions-item><el-descriptions-item label="已验证记录数">{{ state.proof.verified_records }}</el-descriptions-item><el-descriptions-item label="校验失败">{{ state.proof.failure }}<span v-if="state.proof.failure_sequence !== null"> · #{{ state.proof.failure_sequence }}</span></el-descriptions-item><el-descriptions-item label="本次是否覆盖快照整链">{{ state.proof.whole_snapshot_chain_checked ? '是（覆盖当前数据库快照全链）' : '否（当前为指定子区间核验）' }}</el-descriptions-item><el-descriptions-item label="本地前驱摘要"><span class="audit-hash">{{ state.proof.anchor_hash ?? '未取得' }}</span></el-descriptions-item><el-descriptions-item label="本批末尾摘要"><span class="audit-hash">{{ state.proof.final_hash ?? '未取得' }}</span></el-descriptions-item></el-descriptions>

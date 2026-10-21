@@ -60,35 +60,48 @@ export function validateAuditFilters(value: AuditFilters): AuditFilters {
 export const emptyAuditState = (): AuditState => ({ page: null, filters: {}, pageSize: 15, paged: false, loading: false, error: null, proof: null, verifying: false, proofError: null })
 export function createAuditWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: AuditState) => void) {
   let scope: AuditContext | null = null, state = emptyAuditState(), listGeneration = 0, proofGeneration = 0, listAbort: AbortController | undefined, proofAbort: AbortController | undefined
+  let disposed=false,lastList:{filters:AuditFilters;size:number;next:boolean;bound?:{snapshot:number;before:number}}|null=null,lastProof:{from:number;to:number|null}|null=null,listRetryable=false,proofRetryable=false
   const emit = () => changed(detachedWorkspaceState(state))
-  function reset(next: AuditContext | null) { listAbort?.abort(); proofAbort?.abort(); ++listGeneration; ++proofGeneration; scope = next && [next.tenantId, next.actorId].every(id => uuid.test(id)) && sequence(next.permissionVersion) ? { ...next } : null; state = emptyAuditState(); if (next && !scope) state.error = invalid(); emit() }
+  function reset(next: AuditContext | null) { lastList=null;lastProof=null;listRetryable=false;proofRetryable=false;listAbort?.abort(); proofAbort?.abort(); ++listGeneration; ++proofGeneration; scope = !disposed && next && [next.tenantId, next.actorId].every(id => uuid.test(id)) && sequence(next.permissionVersion) ? { ...next } : null; state = emptyAuditState(); if (!disposed && next && !scope) state.error = invalid(); emit() }
   async function load(filters: AuditFilters = state.filters, size = state.pageSize, next = false) {
-    if (!scope || next && (!state.page?.has_more || state.loading)) return false
-    const context = { ...scope }, generation = ++listGeneration, prior = state.page; listAbort?.abort(); const abort = new AbortController(); listAbort = abort
-    state = { ...state, page: null, loading: true, error: null, paged: next }; emit()
-    try {
-      if (!next) { const validated = validateAuditFilters(filters); if (![10, 15, 25, 50, 100].includes(size)) throw new Error('请选择允许的单页条数'); state = { ...state, filters: copy(validated), pageSize: size } }
-      const params = new URLSearchParams({ ...state.filters, page_size: String(state.pageSize) }); const bound = next ? { snapshot: prior!.snapshot_sequence, before: prior!.next_before_sequence! } : undefined
-      if (bound) { params.set('snapshot_sequence', String(bound.snapshot)); params.set('before_sequence', String(bound.before)) }
-      const raw = await client.request<unknown>('/audit/records?' + params, { signal: abort.signal })
-      if (generation !== listGeneration || abort.signal.aborted) return false
-      state = { ...state, page: readAuditPage(raw, context, state.pageSize, bound) }; return true
-    } catch (error) { if (generation === listGeneration && !isCancelled(error)) state = { ...state, error }; return false }
-    finally { if (generation === listGeneration) { state = { ...state, loading: false }; emit() } }
+    if(disposed||!scope||next&&(!state.page?.has_more||state.loading))return false
+    const bound=next?{snapshot:state.page!.snapshot_sequence,before:state.page!.next_before_sequence!}:undefined
+    return readList(next?state.filters:filters,next?state.pageSize:size,next,bound)
+  }
+  async function readList(filters:AuditFilters,size:number,next:boolean,bound?:{snapshot:number;before:number}){
+    if(disposed||!scope)return false
+    if(state.loading&&lastList&&lastList.size===size&&lastList.next===next&&JSON.stringify(lastList.bound)===JSON.stringify(bound)&&Object.keys(filters).length===Object.keys(lastList.filters).length&&Object.entries(filters).every(([key,value])=>lastList!.filters[key as keyof AuditFilters]===value))return false
+    const context={...scope},generation=++listGeneration;listAbort?.abort();const abort=new AbortController();listAbort=abort;lastList=null;listRetryable=false
+    state={...state,page:null,loading:true,error:null,paged:next};emit()
+    try{
+      if(disposed||generation!==listGeneration||abort.signal.aborted)return false
+      const validated=validateAuditFilters(filters);if(![10,15,25,50,100].includes(size))throw new Error('请选择允许的单页条数')
+      state={...state,filters:copy(validated),pageSize:size};lastList={filters:copy(validated),size,next,bound:bound?{...bound}:undefined}
+      const params=new URLSearchParams({...validated,page_size:String(size)});if(bound){params.set('snapshot_sequence',String(bound.snapshot));params.set('before_sequence',String(bound.before))}
+      const raw=await client.request<unknown>('/audit/records?'+params,{signal:abort.signal})
+      if(disposed||generation!==listGeneration||abort.signal.aborted)return false
+      state={...state,page:readAuditPage(raw,context,size,bound)};return true
+    }catch(error){if(generation===listGeneration&&!disposed&&!isCancelled(error)){state={...state,error};listRetryable=lastList!==null}return false}
+    finally{if(generation===listGeneration&&!disposed){listAbort=undefined;state={...state,loading:false};emit()}}
   }
   async function verify(from = 1, to: number | null = null) {
-    if (!scope) return false
+    if (disposed||!scope||state.verifying&&lastProof?.from===from&&lastProof.to===to) return false
+    lastProof=null;proofRetryable=false
     const generation = ++proofGeneration; proofAbort?.abort(); const abort = new AbortController(); proofAbort = abort
     state = { ...state, proof: null, verifying: true, proofError: null }; emit()
     try {
+      if(disposed||generation!==proofGeneration||abort.signal.aborted)return false
       if (!sequence(from) || to !== null && (!sequence(to) || to < from || to - from >= 1000)) throw new Error('校验区间必须是安全正整数，包含首尾最多1000条')
+      lastProof={from,to}
       const params = new URLSearchParams({ from_sequence: String(from) }); if (to !== null) params.set('to_sequence', String(to))
       const raw = await client.request<unknown>('/audit/integrity?' + params, { signal: abort.signal })
-      if (generation !== proofGeneration || abort.signal.aborted) return false
+      if (disposed || generation !== proofGeneration || abort.signal.aborted) return false
       state = { ...state, proof: readAuditProof(raw, from, to) }; return true
-    } catch (error) { if (generation === proofGeneration && !isCancelled(error)) state = { ...state, proofError: error }; return false }
-    finally { if (generation === proofGeneration) { state = { ...state, verifying: false }; emit() } }
+    } catch (error) { if (generation === proofGeneration && !disposed && !isCancelled(error)){state = { ...state, proofError: error };proofRetryable=lastProof!==null} return false }
+    finally { if (generation === proofGeneration && !disposed) {proofAbort=undefined;state = { ...state, verifying: false }; emit() } }
   }
+  function cancelList(){if(disposed||!state.loading)return false;listGeneration++;listAbort?.abort();listAbort=undefined;listRetryable=lastList!==null;state={...state,loading:false,error:null};emit();return true}
+  function cancelProof(){if(disposed||!state.verifying)return false;proofGeneration++;proofAbort?.abort();proofAbort=undefined;proofRetryable=lastProof!==null;state={...state,verifying:false,proofError:null};emit();return true}
   emit()
-  return { reset, load, next: () => load(state.filters, state.pageSize, true), verify, verifyNext: () => state.proof?.status === 'VALID' && state.proof.next_from_sequence && !state.verifying ? verify(state.proof.next_from_sequence) : Promise.resolve(false), state: () => detachedWorkspaceState(state), dispose: () => reset(null) }
+  return { reset, load,cancelList,cancelProof,listRetryTarget:()=>!disposed&&listRetryable&&lastList?copy(lastList):null,proofRetryTarget:()=>!disposed&&proofRetryable&&lastProof?{...lastProof}:null,canRetryList:()=>!disposed&&listRetryable&&lastList!==null&&!state.loading,canRetryProof:()=>!disposed&&proofRetryable&&lastProof!==null&&!state.verifying,retryList:()=>listRetryable&&lastList&&!state.loading?readList(copy(lastList.filters),lastList.size,lastList.next,lastList.bound):Promise.resolve(false),retryProof:()=>proofRetryable&&lastProof&&!state.verifying?verify(lastProof.from,lastProof.to):Promise.resolve(false), next: () => load(state.filters, state.pageSize, true), verify, verifyNext: () => state.proof?.status === 'VALID' && state.proof.next_from_sequence && !state.verifying ? verify(state.proof.next_from_sequence) : Promise.resolve(false), state: () => detachedWorkspaceState(state), dispose: () => {disposed=true;reset(null)} }
 }

@@ -419,6 +419,7 @@
       "has_progress_note": true,
       "local_references": [
         "docs/cmdb-import-preflight-20261021.md",
+        "docs/cmdb-source-preflight-20261021.md",
         "docs/customer-cmdb-dictionary-20261021.md",
         "docs/evidence/dot-import-refresh-20261002.json",
         "docs/evidence/dot-import-template-download-20261002.json",
@@ -1494,6 +1495,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "0e3c18238976db99d74d3d816c3dedc5cf821e69b65f15b83b868e069bff624d"
+    "doc/development/07_合同逐项开发追踪.md": "64db3036fb1a25a4dece620621d31ae0b676d2b3ba6b05b0af18b6f74a5f46cf"
   }
 }

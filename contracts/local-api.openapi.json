@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.67.0",
+    "version": "0.68.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -40135,6 +40135,109 @@
           }
         }
       }
+    },
+    "/assets/import-sources/{id}/cmdb-preflight": {
+      "get": {
+        "operationId": "checkDurableCmdbImportSource",
+        "summary": "只读检查当前创建者的已解析来源与客户33列字典，不执行数据库校验或入库",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-capabilities": [
+          "assets:write"
+        ],
+        "x-mop-read-only": true,
+        "responses": {
+          "200": {
+            "description": "来源版本/解析摘要绑定的字典校验",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CmdbSourcePreflightResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "来源、权限或输入不满足检查条件",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "来源、权限或输入不满足检查条件",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "来源、权限或输入不满足检查条件",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "来源、权限或输入不满足检查条件",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "来源、权限或输入不满足检查条件",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "来源、权限或输入不满足检查条件",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "来源、权限或输入不满足检查条件",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -79625,6 +79728,162 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/CmdbTypeCatalog"
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "data",
+          "trace_id"
+        ],
+        "additionalProperties": false
+      },
+      "CmdbSourcePreflight": {
+        "type": "object",
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "parse_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "catalog_version": {
+            "const": "customer-cmdb-v1-20261021"
+          },
+          "scope": {
+            "const": "SOURCE_DICTIONARY_ONLY"
+          },
+          "status": {
+            "enum": [
+              "ERROR",
+              "CONFIG_PENDING"
+            ]
+          },
+          "records": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          },
+          "error_rows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 500
+          },
+          "warning_rows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 500
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 50000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "record": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000000000
+                },
+                "source_row": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 1000000000
+                },
+                "column": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 32
+                },
+                "level": {
+                  "enum": [
+                    "ERROR",
+                    "WARNING"
+                  ]
+                },
+                "code": {
+                  "enum": [
+                    "SOURCE_CELL_ERROR",
+                    "WHITESPACE",
+                    "REQUIRED",
+                    "TYPE_NOT_ALLOWED",
+                    "SUBTYPE_BEFORE_SERVICE",
+                    "SUBTYPE_NOT_ALLOWED",
+                    "SUBTYPE_PARENT_MISMATCH",
+                    "MAPPING_PENDING",
+                    "COLLECTION_PENDING",
+                    "EXCEL_DATE_POLICY_PENDING",
+                    "DATE_FORMAT_PENDING",
+                    "DATE_INVALID",
+                    "EXACT_DUPLICATE_IN_SOURCE"
+                  ]
+                },
+                "message": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                }
+              },
+              "required": [
+                "record",
+                "source_row",
+                "column",
+                "level",
+                "code",
+                "message"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "database_checks": {
+            "const": "NOT_RUN"
+          },
+          "can_import": {
+            "const": false
+          },
+          "asset_mutations": {
+            "const": false
+          },
+          "production_approved": {
+            "const": false
+          }
+        },
+        "required": [
+          "tenant_id",
+          "source_id",
+          "source_version",
+          "parse_hash",
+          "catalog_version",
+          "scope",
+          "status",
+          "records",
+          "error_rows",
+          "warning_rows",
+          "findings",
+          "database_checks",
+          "can_import",
+          "asset_mutations",
+          "production_approved"
+        ],
+        "additionalProperties": false
+      },
+      "CmdbSourcePreflightResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CmdbSourcePreflight"
           },
           "trace_id": {
             "type": "string"

@@ -1,0 +1,35 @@
+{
+  "base_commit": "6301202c73f63a665536a82819492ea6635888af",
+  "scope": "CMDB_DURABLE_SOURCE_DICTIONARY_CHECK_NOT_IMPORT",
+  "backend": {
+    "tests": 3761,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 987,
+    "executed": 2774
+  },
+  "web_tests": 2565,
+  "web_files": 185,
+  "contracts": 159,
+  "typecheck": "PASS",
+  "build": "PASS",
+  "static_release_and_policy": "PASS",
+  "real_pg_regression_tests": 14,
+  "real_http_requests": 29,
+  "new_source_http_cases": 7,
+  "browser_scripts_discovered": 9,
+  "browser_and_axe": "NOT_RUN_ENVIRONMENT_SOCKET_RESTRICTION",
+  "storage_adapter": "ISOLATED_MEMORY_TEST_DOUBLE",
+  "source_parser": "REAL_IN_PROCESS_NOT_INDEPENDENT_WORKER",
+  "can_import": false,
+  "sql_changes": false,
+  "cleanup": {
+    "loopback_only": true,
+    "provider_sends": false,
+    "temporary_credentials_only": true,
+    "postgresql_stopped": true,
+    "temporary_database_and_credentials_removed": true,
+    "result": "PASS"
+  },
+  "production_approved": false
+}

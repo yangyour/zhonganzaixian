@@ -1,0 +1,20 @@
+{
+  "trace_id" : "unavailable",
+  "data" : {
+    "tenant_id" : "64000000-0000-4000-8000-000000000002",
+    "source_id" : "64000000-0000-4000-8000-000000000003",
+    "source_version" : 3,
+    "parse_hash" : "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "catalog_version" : "customer-cmdb-v1-20261021",
+    "scope" : "SOURCE_DICTIONARY_ONLY",
+    "status" : "CONFIG_PENDING",
+    "records" : 1,
+    "error_rows" : 0,
+    "warning_rows" : 0,
+    "findings" : [ ],
+    "database_checks" : "NOT_RUN",
+    "can_import" : false,
+    "asset_mutations" : false,
+    "production_approved" : false
+  }
+}

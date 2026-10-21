@@ -73,3 +73,12 @@ test('33-column local preflight locates invalid rows without uploading the file'
  await page.getByRole('button',{name:'清除本地预检'}).click()
  await expect(page.getByText('合成 CSV 设备',{exact:true})).toHaveCount(0)
 })
+
+test('server source preflight shows scope-bound result without a write request',async({page})=>{
+ const sourceFixture=JSON.parse(readFileSync(new URL('../../../../fixtures/cmdb-source-preflight-controller.json',import.meta.url),'utf8'))
+ let reads=0
+ await page.route('**/api/v1/assets/import-sources/*/cmdb-preflight',async route=>{reads++;expect(route.request().method()).toBe('GET');await route.fulfill({json:sourceFixture})})
+ await page.goto(url);await page.getByRole('button',{name:'读取服务端校验结果'}).click()
+ await expect(page.getByText('本次有限字典检查未发现问题，不代表完整预检或导入通过。')).toBeVisible();expect(reads).toBe(1)
+ await page.getByRole('button',{name:'模拟撤销权限'}).click();await expect(page.getByRole('button',{name:'读取服务端校验结果'})).toHaveCount(0)
+})

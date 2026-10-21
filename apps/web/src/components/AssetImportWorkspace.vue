@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ElMessageBox, ElTableColumn } from 'element-plus'
 import AssetImportTemplateDownload from './AssetImportTemplateDownload.vue'
+import CmdbSourcePreflightPanel from './CmdbSourcePreflightPanel.vue'
 import { computed, onUnmounted, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { feedback as ElMessage } from '../utils/feedback'
@@ -130,6 +131,7 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
         </AppTable>
       </section>
 
+      <CmdbSourcePreflightPanel v-if="isParsed && source && artifact" :source="source" />
       <section v-if="isParsed && mappingDraft && source && artifact" class="asset-import-section">
         <h3>4. 标准 15 列字段映射与数据预览</h3>
         <p class="field-help">请为每个平台标准字段指定对应的源列或选择“不映射（留空）”。其中“备注”为必映射字段，同一源列不可重复绑定；未绑定的其余源列请勾选“忽略源列”以确认跳过。</p>

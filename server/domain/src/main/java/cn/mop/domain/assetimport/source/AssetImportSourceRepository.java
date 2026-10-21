@@ -2,6 +2,9 @@ package cn.mop.domain.assetimport.source;
 
 import cn.mop.domain.DomainException;
 import java.util.Map;
+import java.util.Set;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 
 /** Durable source/parse/mapping staging only. This port never imports assets or reserves quota. */
 public interface AssetImportSourceRepository {
@@ -19,6 +22,14 @@ public interface AssetImportSourceRepository {
     Map<String,Object> saveMapping(Access access,String sourceId,MappingRequest mapping);
     /** Owner-only metadata/raw artifact reads, authorized and projected from one read-only RR snapshot. */
     Map<String,Object> source(Access access,String sourceId);
+    /** Internal snapshot only: raw source and exact current-tenant asset-name matches share one RR transaction.
+     * Matching is observational; it never reserves a name or authorizes import. Raw names are not a wire DTO. */
+    record AssetNameSnapshot(Map<String,Object> source,Set<String> existingNames) {
+        public AssetNameSnapshot { source=Collections.unmodifiableMap(new LinkedHashMap<>(source));existingNames=Set.copyOf(existingNames); }
+    }
+    default AssetNameSnapshot assetNameSnapshot(Access access,String sourceId) {
+        throw new DomainException(503,"UPSTREAM_UNAVAILABLE","当前存储不支持一致性资产名称检查");
+    }
     Map<String,Object> operation(Access access,String operationId);
     boolean ready();
     /** Only this project's import jobs; no ticket/photo outbox is claimed. */

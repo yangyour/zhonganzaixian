@@ -1,0 +1,74 @@
+{
+  "result": "PASS",
+  "successful_read_rows_unchanged": true,
+  "source_version_and_hash_bound": true,
+  "original_values_returned": false,
+  "asset_writes": false,
+  "store_integration": "NOT_RUN_MEMORY_TEST_DOUBLE",
+  "parser_integration": "REAL_IN_PROCESS_NOT_ISOLATED_WORKER",
+  "cases": [
+    {
+      "case": "cmdb_source_owner",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store",
+      "referrer_policy": "no-referrer"
+    },
+    {
+      "case": "cmdb_source_nonowner",
+      "actor": "padmin",
+      "status": 404,
+      "expected": 404,
+      "code": "OBJECT_NOT_FOUND",
+      "cache_control": "no-store",
+      "referrer_policy": "no-referrer"
+    },
+    {
+      "case": "cmdb_source_readonly_viewer",
+      "actor": "viewerA",
+      "status": 403,
+      "expected": 403,
+      "code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store",
+      "referrer_policy": "no-referrer"
+    },
+    {
+      "case": "cmdb_source_anonymous",
+      "actor": "anonymous",
+      "status": 401,
+      "expected": 401,
+      "code": "SESSION_EXPIRED",
+      "cache_control": "no-store",
+      "referrer_policy": null
+    },
+    {
+      "case": "cmdb_source_query_override",
+      "actor": "msp",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store",
+      "referrer_policy": "no-referrer"
+    },
+    {
+      "case": "cmdb_source_no_write",
+      "actor": "msp",
+      "status": 405,
+      "expected": 405,
+      "code": "METHOD_NOT_ALLOWED",
+      "cache_control": "no-store",
+      "referrer_policy": null
+    },
+    {
+      "case": "cmdb_source_foreign_tenant",
+      "actor": "msp",
+      "status": 404,
+      "expected": 404,
+      "code": "OBJECT_NOT_FOUND",
+      "cache_control": "no-store",
+      "referrer_policy": "no-referrer"
+    }
+  ]
+}

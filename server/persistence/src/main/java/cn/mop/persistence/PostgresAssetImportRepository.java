@@ -94,6 +94,31 @@ public final class PostgresAssetImportRepository implements AssetImportSourceRep
         }catch(SQLException failure){throw unavailable();}
     }
     @Override public Map<String,Object> source(Access access,String sourceId){if(!uuid(sourceId))throw missing();return read(access,c->sourceDto(c,sourceRow(c,access,sourceId,false)));}
+    @Override public AssetNameSnapshot assetNameSnapshot(Access access,String sourceId){
+        if(!uuid(sourceId))throw missing();
+        return read(access,connection->{
+            // Recheck the capability in the same snapshot as the owner-bound artifact and tenant assets.
+            authorize(connection,access,true,false);
+            Source source=sourceRow(connection,access,sourceId,false);
+            Map<String,Object> dto=sourceDto(connection,source);
+            if(!"PARSED".equals(source.parse()))throw new DomainException(409,"IMPORT_PARSE_REQUIRED","请先完成当前来源的工作表选择与解析");
+            @SuppressWarnings("unchecked") Map<String,Object> stored=(Map<String,Object>)dto.get("parsed_artifact");
+            if(stored==null)throw unavailable();
+            ParsedArtifact parsed=parsedArtifact(stored);
+            Set<String> names=new LinkedHashSet<>();
+            for(var row:parsed.rows())for(var cell:row.cells())
+                if(cell.columnIndex()==0&&cell.kind()!=ParsedArtifact.CellKind.ERROR&&cell.kind()!=ParsedArtifact.CellKind.BLANK&&cell.lexical()!=null&&!cell.lexical().isEmpty())names.add(cell.lexical());
+            Set<String> existing=new HashSet<>();
+            if(!names.isEmpty()){
+                java.sql.Array values=connection.createArrayOf("varchar",names.toArray(String[]::new));
+                try(PreparedStatement statement=connection.prepareStatement("SELECT name FROM public.mop_asset WHERE tenant_id=?::uuid AND name=ANY(?)")){
+                    statement.setString(1,access.tenantId());statement.setArray(2,values);
+                    try(ResultSet rows=statement.executeQuery()){while(rows.next())existing.add(rows.getString("name"));}
+                }finally{values.free();}
+            }
+            return new AssetNameSnapshot(dto,existing);
+        });
+    }
     @Override public Map<String,Object> operation(Access access,String operationId){
         if(!uuid(operationId))throw missing();return read(access,connection->{
             try(PreparedStatement statement=prepare(connection,"SELECT o.* FROM public.mop_asset_import_operation o JOIN public.mop_asset_import_source s ON s.tenant_id=o.tenant_id AND s.id=o.source_id AND s.created_by=o.created_by WHERE o.tenant_id=?::uuid AND o.id=?::uuid AND o.created_by=?::uuid",access.tenantId(),operationId,access.actorId());ResultSet rows=statement.executeQuery()){

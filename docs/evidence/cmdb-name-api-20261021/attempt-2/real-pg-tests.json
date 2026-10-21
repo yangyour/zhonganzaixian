@@ -1,0 +1,121 @@
+{
+  "exit": 0,
+  "expected": {
+    "PostgresAssetImportIntegrationTest": 21
+  },
+  "results": {
+    "PostgresAssetImportIntegrationTest": {
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "cases": [
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "verifiedStoreParseAndRepeatedMappingKeepRawDataAndImmutableHistory()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "revocationDuringObjectIoCannotCommitReady()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "currentPermissionVersionIsRecheckedForWritesReplayAndWorkerBeforeAnyExternalIo()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "expiredParseLeaseRejectsOldArtifactAfterCurrentWorkerCompletes()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "staleVersionsHashAndPendingReparseFailWithoutMutatingSource()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "interruptedParserResultRemainsLeasedWithoutSuccessAuditAndRecoversUnderNewLease()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "revocationDuringParseCannotCommitArtifactOrMapping()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "permissionChangeDuringRawReadPreventsParserExecution()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "upstreamOutageAfterFiveFailuresStillRetriesSameJobAndNaturallyRecovers()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "successfulPutWithoutActualReadbackCannotBecomeReadyAndIntegrityConflictIsTerminal()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "expiredLeaseIsReclaimedAndOldTokenCannotOverwriteCurrentCompletion()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "assetNamesUseCurrentTenantExactRawStringsAndReturnSameSourceVersion()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "rollbackAfterAcceptanceCannotLeaveSourceJobOperationAuditOrReplay()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "sourceAndOperationsAreCreatorOnlyAndReadForeignPhotoOrRandomIdsAs404()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "runtimeCannotRewriteOriginalBytesOwnerHashArtifactMappingOrDeleteHistory()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "acceptanceOriginalBytesOperationJobAuditAndReplayCommitOnceAndSurviveRepositoryRestart()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "assetNameSnapshotCannotReadOtherOwnerOrTenant()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "parserFormatResourceRejectionIsTerminalButInternalFailureRetries()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "databaseRejectsWrongRawDigestSizeOrShadowStoreOperationAndCrossArtifactPointers()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "assetNameSnapshotDoesNotSilentlyCheckUnparsedSource()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportIntegrationTest",
+      "test": "commandAndJobScopesAreBoundedAndRestoredOnNestedRollback()",
+      "passed": true
+    }
+  ]
+}

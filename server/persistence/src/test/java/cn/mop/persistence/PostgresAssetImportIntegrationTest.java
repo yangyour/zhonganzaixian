@@ -189,4 +189,22 @@ class PostgresAssetImportIntegrationTest {
         }
         assertTrue(repository.ready());assertEquals(1,count("mop_asset_import_artifact","source_id",parse.source()));assertEquals(1,count("mop_asset_import_mapping","source_id",parse.source()));
     }
+
+    @Test void assetNamesUseCurrentTenantExactRawStringsAndReturnSameSourceVersion()throws Exception{
+        String name;try(Connection c=pool.getConnection();PreparedStatement st=c.prepareStatement("SELECT name FROM public.mop_asset WHERE tenant_id=?::uuid ORDER BY id LIMIT 1")){st.setString(1,TENANT);try(ResultSet rows=st.executeQuery()){assertTrue(rows.next());name=rows.getString(1);}}
+        Accepted accepted=accept(UUID.randomUUID().toString());Store store=new Store();ready(accepted,store);Accepted parsed=parse(accepted);
+        final String existing=name;
+        AssetImportParser custom=(path,selection)->new ParsedArtifact(ParsedArtifact.State.PARSED,ImportFormat.CSV,List.of(new ParsedArtifact.SheetInfo(0,"CSV",false)),0,1,ParsedArtifact.DateEpoch.NOT_APPLICABLE,ParsedArtifact.columns(List.of("名称")),List.of(
+            new ParsedArtifact.SourceRow(1,2,2L,2L,List.of(new ParsedArtifact.SourceCell(0,ParsedArtifact.CellKind.TEXT,existing,existing,null,null))),
+            new ParsedArtifact.SourceRow(2,3,3L,3L,List.of(new ParsedArtifact.SourceCell(0,ParsedArtifact.CellKind.TEXT," "+existing," "+existing,null,null)))),"synthetic-name-snapshot",ImportLimits.RESOURCE_POLICY_VERSION);
+        assertTrue(repository.processNext("import-test-name-snapshot",store,custom,Set.of(parsed.source())));
+        var before=source(parsed);var snapshot=repository.assetNameSnapshot(access(),parsed.source());assertEquals(Set.of(existing),snapshot.existingNames());assertEquals(before,snapshot.source());assertEquals(before,source(parsed));
+    }
+    @Test void assetNameSnapshotCannotReadOtherOwnerOrTenant(){
+        Accepted accepted=accept(UUID.randomUUID().toString());
+        assertEquals(404,assertThrows(DomainException.class,()->repository.assetNameSnapshot(access(admin,TENANT),accepted.source())).status);
+        assertEquals(403,assertThrows(DomainException.class,()->repository.assetNameSnapshot(access(other,OTHER),accepted.source())).status);
+        assertEquals(401,assertThrows(DomainException.class,()->repository.assetNameSnapshot(new AssetImportSourceRepository.Access(actor,TENANT,access().permissionVersion()+1,"stale-name-check"),accepted.source())).status);
+    }
+    @Test void assetNameSnapshotDoesNotSilentlyCheckUnparsedSource(){Accepted accepted=accept(UUID.randomUUID().toString());assertEquals(409,assertThrows(DomainException.class,()->repository.assetNameSnapshot(access(),accepted.source())).status);}
 }

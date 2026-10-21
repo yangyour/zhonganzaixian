@@ -5,4 +5,15 @@ export function addCmdbSourcePreflightContract(contract){
  contract.components.schemas.CmdbSourcePreflight=object({tenant_id:uuid,source_id:uuid,source_version:integer(1,9007199254740991),parse_hash:{type:'string',pattern:'^[0-9a-f]{64}$'},catalog_version:{const:'customer-cmdb-v1-20261021'},scope:{const:'SOURCE_DICTIONARY_ONLY'},status:{enum:['ERROR','CONFIG_PENDING']},records:integer(1,500),error_rows:integer(0,500),warning_rows:integer(0,500),findings:{type:'array',maxItems:50000,items:object({record:integer(1,1000000000),source_row:integer(1,1000000000),column:integer(0,32),level:{enum:['ERROR','WARNING']},code:{enum:codes},message:{type:'string',minLength:1,maxLength:300}})},database_checks:{const:'NOT_RUN'},can_import:{const:false},asset_mutations:{const:false},production_approved:{const:false}});
  contract.components.schemas.CmdbSourcePreflightResult=object({data:ref('CmdbSourcePreflight'),trace_id:{type:'string'}});
  contract.paths['/assets/import-sources/{id}/cmdb-preflight']={get:{operationId:'checkDurableCmdbImportSource',summary:'只读检查当前创建者的已解析来源与客户33列字典，不执行数据库校验或入库',parameters:[{name:'id',in:'path',required:true,schema:uuid}],'x-mop-capabilities':['assets:write'],'x-mop-read-only':true,responses:{200:{description:'来源版本/解析摘要绑定的字典校验',content:{'application/json':{schema:ref('CmdbSourcePreflightResult')}}},...Object.fromEntries([400,401,403,404,409,422,503].map(code=>[code,{description:'来源、权限或输入不满足检查条件',content:{'application/json':{schema:ref('Error')}}}]))}}};
+ const names=structuredClone(contract.components.schemas.CmdbSourcePreflight);
+ names.properties.scope={const:'SOURCE_DICTIONARY_AND_ASSET_NAMES'};
+ names.properties.database_checks={const:'EXACT_ASSET_NAMES_ONLY'};
+ names.properties.findings.items.properties.code.enum.push('EXISTING_ASSET_NAME');
+ contract.components.schemas.CmdbAssetNameCheck=names;
+ contract.components.schemas.CmdbAssetNameCheckResult=object({data:ref('CmdbAssetNameCheck'),trace_id:{type:'string'}});
+ const path=structuredClone(contract.paths['/assets/import-sources/{id}/cmdb-preflight']);
+ path.get.operationId='checkDurableCmdbAssetNames';
+ path.get.summary='同一只读快照检查来源字典及当前租户已有资产名称原文，不预留名称、不导入；站点负责人映射、IP策略与配额仍未执行';
+ path.get.responses[200]={description:'来源版本/解析摘要绑定的字典及精确名称检查，非导入批准',content:{'application/json':{schema:ref('CmdbAssetNameCheckResult')}}};
+ contract.paths['/assets/import-sources/{id}/cmdb-name-check']=path;
 }

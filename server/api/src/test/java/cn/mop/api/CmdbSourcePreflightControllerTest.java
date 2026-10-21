@@ -40,4 +40,15 @@ class CmdbSourcePreflightControllerTest {
   if(Boolean.getBoolean("mop.exportCmdbSourceFixture"))java.nio.file.Files.writeString(p,mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actual)+"\n");
   assertEquals(actual,mapper.readTree(java.nio.file.Files.readString(p)));
  }
+
+ Map<?,?> names(){return (Map<?,?>)((Map<?,?>)controller.names(ID,request(),new MockHttpServletResponse())).get("data");}
+ void snapshot(Set<String> existing){when(sources.assetNameSnapshot(any(),eq(ID))).thenReturn(new AssetImportSourceRepository.AssetNameSnapshot(source,existing));}
+ @Test void databaseNamesUsesOnlyAtomicSnapshotAndRedactsExistingNames(){snapshot(Set.of("Synthetic"));var r=names();assertEquals("ERROR",r.get("status"));assertEquals(1,r.get("error_rows"));assertEquals("EXACT_ASSET_NAMES_ONLY",r.get("database_checks"));assertEquals("SOURCE_DICTIONARY_AND_ASSET_NAMES",r.get("scope"));assertEquals(false,r.get("can_import"));assertFalse(r.toString().contains("Synthetic"));verify(sources,never()).source(any(),any());verify(sources).assetNameSnapshot(argThat(a->a.tenantId().equals(TENANT)&&a.actorId().equals(USER)&&a.permissionVersion()==7),eq(ID));}
+ @Test void noCollisionStillDoesNotApproveImport(){snapshot(Set.of());var r=names();assertEquals("CONFIG_PENDING",r.get("status"));assertEquals(false,r.get("production_approved"));assertEquals(false,r.get("asset_mutations"));}
+ @Test void unexpectedNameOutsideSourceFailsClosed(){snapshot(Set.of("foreign-data"));assertEquals(503,assertThrows(DomainException.class,this::names).status);}
+ @Test void databaseLookupFailureCannotReturnDictionaryOnlySuccess(){when(sources.assetNameSnapshot(any(),eq(ID))).thenThrow(new DomainException(503,"UPSTREAM_UNAVAILABLE","unavailable"));assertEquals(503,assertThrows(DomainException.class,this::names).status);verify(sources,never()).source(any(),any());}
+ @Test void databaseSnapshotUnparsedAndWrongHeadersFail(){snapshot(Set.of());source.put("parse_status","PENDING");snapshot(Set.of());assertEquals(409,assertThrows(DomainException.class,this::names).status);setup();((Map<String,Object>)((List<?>)stored.get("columns")).get(0)).put("header","wrong");snapshot(Set.of());assertEquals(422,assertThrows(DomainException.class,this::names).status);}
+ @Test void databaseNamesCannotBeClientOverridden(){var r=request();r.addParameter("names","Synthetic");assertEquals(400,assertThrows(DomainException.class,()->controller.names(ID,r,new MockHttpServletResponse())).status);verifyNoInteractions(sources);}
+ @Test void databaseNamesRechecksAccessBeforeStorage(){when(platform.membership(USER,TENANT)).thenReturn(Optional.of(new Membership(USER,TENANT,"viewer",7,true)));assertEquals(403,assertThrows(DomainException.class,this::names).status);verifyNoInteractions(sources);}
+ @Test void databaseNamesNoStore(){snapshot(Set.of());var response=new MockHttpServletResponse();controller.names(ID,request(),response);assertEquals("no-store",response.getHeader("Cache-Control"));assertEquals("no-referrer",response.getHeader("Referrer-Policy"));}
 }

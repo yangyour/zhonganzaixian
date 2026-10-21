@@ -1,0 +1,1406 @@
+{
+  "scope": "DISPOSABLE_SYNTHETIC_ONLY",
+  "source": {
+    "id": "202143ee-c740-469b-81a5-cce7d51cc548",
+    "tenant_id": "55000000-0000-4000-8000-000000000001",
+    "created_by": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+    "purpose": "asset_import_source",
+    "original_name": "synthetic-cmdb.csv",
+    "declared_format": "CSV",
+    "sha256": "992d1f7201e45e40eb0b3dc2ceb3503cce047c313cca8cb8736cbfb4f920c452",
+    "storage_status": "READY",
+    "parse_status": "PARSED",
+    "store_operation_id": "81848905-2764-4974-9746-f16125974569",
+    "parse_operation_id": "a305e839-a7d5-4676-96a8-86d13fe6930d",
+    "latest_artifact_id": "d6943618-b143-4721-8057-a5a58c8922e0",
+    "latest_mapping_id": null,
+    "version": 4,
+    "size_bytes": 685,
+    "created_at": "2026-10-21T13:17:35.872Z",
+    "updated_at": "2026-10-21T13:17:36.083Z",
+    "parsed_artifact": {
+      "rows": [
+        {
+          "cells": [
+            {
+              "kind": "TEXT",
+              "display": "虚构设备 14",
+              "lexical": "虚构设备 14",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 0
+            },
+            {
+              "kind": "TEXT",
+              "display": "SW",
+              "lexical": "SW",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 1
+            },
+            {
+              "kind": "TEXT",
+              "display": "192.0.2.1",
+              "lexical": "192.0.2.1",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 2
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 3
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 4
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 5
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 6
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 7
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 8
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 9
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 10
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 11
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 12
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 13
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 14
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 15
+            },
+            {
+              "kind": "TEXT",
+              "display": "sw_core",
+              "lexical": "sw_core",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 16
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 17
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 18
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 19
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 20
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 21
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 22
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 23
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 24
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 25
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 26
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 27
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 28
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 29
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 30
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 31
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 32
+            }
+          ],
+          "physical_end_line": 2,
+          "source_row_number": 2,
+          "physical_start_line": 2,
+          "logical_record_number": 2
+        },
+        {
+          "cells": [
+            {
+              "kind": "TEXT",
+              "display": " 虚构设备 14",
+              "lexical": " 虚构设备 14",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 0
+            },
+            {
+              "kind": "TEXT",
+              "display": "SW",
+              "lexical": "SW",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 1
+            },
+            {
+              "kind": "TEXT",
+              "display": "192.0.2.2",
+              "lexical": "192.0.2.2",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 2
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 3
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 4
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 5
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 6
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 7
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 8
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 9
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 10
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 11
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 12
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 13
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 14
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 15
+            },
+            {
+              "kind": "TEXT",
+              "display": "sw_core",
+              "lexical": "sw_core",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 16
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 17
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 18
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 19
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 20
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 21
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 22
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 23
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 24
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 25
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 26
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 27
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 28
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 29
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 30
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 31
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 32
+            }
+          ],
+          "physical_end_line": 3,
+          "source_row_number": 3,
+          "physical_start_line": 3,
+          "logical_record_number": 3
+        },
+        {
+          "cells": [
+            {
+              "kind": "TEXT",
+              "display": "SYNTHETIC_FOREIGN_ONLY",
+              "lexical": "SYNTHETIC_FOREIGN_ONLY",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 0
+            },
+            {
+              "kind": "TEXT",
+              "display": "SW",
+              "lexical": "SW",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 1
+            },
+            {
+              "kind": "TEXT",
+              "display": "192.0.2.3",
+              "lexical": "192.0.2.3",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 2
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 3
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 4
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 5
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 6
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 7
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 8
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 9
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 10
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 11
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 12
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 13
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 14
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 15
+            },
+            {
+              "kind": "TEXT",
+              "display": "sw_core",
+              "lexical": "sw_core",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 16
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 17
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 18
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 19
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 20
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 21
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 22
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 23
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 24
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 25
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 26
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 27
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 28
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 29
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 30
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 31
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 32
+            }
+          ],
+          "physical_end_line": 4,
+          "source_row_number": 4,
+          "physical_start_line": 4,
+          "logical_record_number": 4
+        },
+        {
+          "cells": [
+            {
+              "kind": "TEXT",
+              "display": "SYNTHETIC_UNMATCHED_2e21b2a6-f97a-4f81-8993-96cbb58e6bf1",
+              "lexical": "SYNTHETIC_UNMATCHED_2e21b2a6-f97a-4f81-8993-96cbb58e6bf1",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 0
+            },
+            {
+              "kind": "TEXT",
+              "display": "SW",
+              "lexical": "SW",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 1
+            },
+            {
+              "kind": "TEXT",
+              "display": "192.0.2.4",
+              "lexical": "192.0.2.4",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 2
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 3
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 4
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 5
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 6
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 7
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 8
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 9
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 10
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 11
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 12
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 13
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 14
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 15
+            },
+            {
+              "kind": "TEXT",
+              "display": "sw_core",
+              "lexical": "sw_core",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 16
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 17
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 18
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 19
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 20
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 21
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 22
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 23
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 24
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 25
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 26
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 27
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 28
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 29
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 30
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 31
+            },
+            {
+              "kind": "TEXT",
+              "display": "",
+              "lexical": "",
+              "format_code": null,
+              "style_index": null,
+              "column_index": 32
+            }
+          ],
+          "physical_end_line": 5,
+          "source_row_number": 5,
+          "physical_start_line": 5,
+          "logical_record_number": 5
+        }
+      ],
+      "state": "PARSED",
+      "sheets": [
+        {
+          "name": "CSV",
+          "index": 0,
+          "hidden": false
+        }
+      ],
+      "columns": [
+        {
+          "index": 0,
+          "header": "设备名称*",
+          "target_suggestions": []
+        },
+        {
+          "index": 1,
+          "header": "设备类型*",
+          "target_suggestions": []
+        },
+        {
+          "index": 2,
+          "header": "IP 或域名*",
+          "target_suggestions": []
+        },
+        {
+          "index": 3,
+          "header": "品牌",
+          "target_suggestions": [
+            "BRAND"
+          ]
+        },
+        {
+          "index": 4,
+          "header": "型号",
+          "target_suggestions": [
+            "MODEL"
+          ]
+        },
+        {
+          "index": 5,
+          "header": "序列号",
+          "target_suggestions": [
+            "SERIAL_NUMBER"
+          ]
+        },
+        {
+          "index": 6,
+          "header": "站点",
+          "target_suggestions": [
+            "SITE"
+          ]
+        },
+        {
+          "index": 7,
+          "header": "位置",
+          "target_suggestions": [
+            "LOCATION"
+          ]
+        },
+        {
+          "index": 8,
+          "header": "负责人",
+          "target_suggestions": [
+            "OWNER"
+          ]
+        },
+        {
+          "index": 9,
+          "header": "所属业务",
+          "target_suggestions": [
+            "BUSINESS"
+          ]
+        },
+        {
+          "index": 10,
+          "header": "采购日期",
+          "target_suggestions": [
+            "PURCHASE_DATE"
+          ]
+        },
+        {
+          "index": 11,
+          "header": "维保到期日",
+          "target_suggestions": [
+            "WARRANTY_EXPIRY"
+          ]
+        },
+        {
+          "index": 12,
+          "header": "超期服役日期",
+          "target_suggestions": [
+            "OVERDUE_SERVICE_DATE"
+          ]
+        },
+        {
+          "index": 13,
+          "header": "采集方式",
+          "target_suggestions": [
+            "COLLECTION_METHOD"
+          ]
+        },
+        {
+          "index": 14,
+          "header": "备注",
+          "target_suggestions": [
+            "NOTE"
+          ]
+        },
+        {
+          "index": 15,
+          "header": "资产编号",
+          "target_suggestions": []
+        },
+        {
+          "index": 16,
+          "header": "子类型",
+          "target_suggestions": []
+        },
+        {
+          "index": 17,
+          "header": "维保起始日",
+          "target_suggestions": []
+        },
+        {
+          "index": 18,
+          "header": "维保供应商",
+          "target_suggestions": []
+        },
+        {
+          "index": 19,
+          "header": "机房",
+          "target_suggestions": []
+        },
+        {
+          "index": 20,
+          "header": "机柜号",
+          "target_suggestions": []
+        },
+        {
+          "index": 21,
+          "header": "U位",
+          "target_suggestions": []
+        },
+        {
+          "index": 22,
+          "header": "路由协议",
+          "target_suggestions": []
+        },
+        {
+          "index": 23,
+          "header": "端口数",
+          "target_suggestions": []
+        },
+        {
+          "index": 24,
+          "header": "堆叠组",
+          "target_suggestions": []
+        },
+        {
+          "index": 25,
+          "header": "OS类型",
+          "target_suggestions": []
+        },
+        {
+          "index": 26,
+          "header": "BMC地址",
+          "target_suggestions": []
+        },
+        {
+          "index": 27,
+          "header": "集群标识",
+          "target_suggestions": []
+        },
+        {
+          "index": 28,
+          "header": "桌面数",
+          "target_suggestions": []
+        },
+        {
+          "index": 29,
+          "header": "存储形态",
+          "target_suggestions": []
+        },
+        {
+          "index": 30,
+          "header": "AP归属AC",
+          "target_suggestions": []
+        },
+        {
+          "index": 31,
+          "header": "宿主设备",
+          "target_suggestions": []
+        },
+        {
+          "index": 32,
+          "header": "标签",
+          "target_suggestions": []
+        }
+      ],
+      "date_epoch": "NOT_APPLICABLE",
+      "header_row": 1,
+      "parser_version": "poi-5.5.1-csv-1.14.1-parser-v1",
+      "detected_format": "CSV",
+      "selected_sheet_index": 0,
+      "resource_policy_version": "asset-import-technical-v1",
+      "id": "d6943618-b143-4721-8057-a5a58c8922e0",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "source_id": "202143ee-c740-469b-81a5-cce7d51cc548",
+      "operation_id": "a305e839-a7d5-4676-96a8-86d13fe6930d",
+      "parse_hash": "5cffd8dc12ffb20c31830c2dce1cb50d4c813e60478b5a9a00f6dd44ea64f7d5",
+      "source_sha256": "992d1f7201e45e40eb0b3dc2ceb3503cce047c313cca8cb8736cbfb4f920c452",
+      "schema_version": "contract-m3-6-standard15-v1",
+      "selection": {
+        "encoding": "UTF-8",
+        "delimiter": ",",
+        "header_row": 1,
+        "sheet_index": null,
+        "declared_format": "CSV"
+      },
+      "created_at": "2026-10-21T13:17:36.081Z"
+    },
+    "mapping": null,
+    "business_status": "CONFIG_PENDING",
+    "can_import": false,
+    "question_ids": [
+      "Q20",
+      "Q31"
+    ],
+    "effective_rule_versions": null,
+    "quota_reservation": null,
+    "scan_status": "UNSCANNED",
+    "production_approval": "UNVERIFIED",
+    "retention_until": null
+  },
+  "dictionary": {
+    "tenant_id": "55000000-0000-4000-8000-000000000001",
+    "source_id": "202143ee-c740-469b-81a5-cce7d51cc548",
+    "source_version": 4,
+    "parse_hash": "5cffd8dc12ffb20c31830c2dce1cb50d4c813e60478b5a9a00f6dd44ea64f7d5",
+    "catalog_version": "customer-cmdb-v1-20261021",
+    "scope": "SOURCE_DICTIONARY_ONLY",
+    "status": "CONFIG_PENDING",
+    "records": 4,
+    "error_rows": 0,
+    "warning_rows": 1,
+    "findings": [
+      {
+        "record": 3,
+        "source_row": 3,
+        "column": 0,
+        "level": "WARNING",
+        "code": "WHITESPACE",
+        "message": "首尾空白保留，未自动规范化。"
+      }
+    ],
+    "database_checks": "NOT_RUN",
+    "can_import": false,
+    "asset_mutations": false,
+    "production_approved": false
+  },
+  "name_check": {
+    "tenant_id": "55000000-0000-4000-8000-000000000001",
+    "source_id": "202143ee-c740-469b-81a5-cce7d51cc548",
+    "source_version": 4,
+    "parse_hash": "5cffd8dc12ffb20c31830c2dce1cb50d4c813e60478b5a9a00f6dd44ea64f7d5",
+    "catalog_version": "customer-cmdb-v1-20261021",
+    "scope": "SOURCE_DICTIONARY_AND_ASSET_NAMES",
+    "status": "ERROR",
+    "records": 4,
+    "error_rows": 1,
+    "warning_rows": 1,
+    "findings": [
+      {
+        "record": 2,
+        "source_row": 2,
+        "column": 0,
+        "level": "ERROR",
+        "code": "EXISTING_ASSET_NAME",
+        "message": "当前租户已存在相同原文的资产名称；未合并、覆盖或预留名称。"
+      },
+      {
+        "record": 3,
+        "source_row": 3,
+        "column": 0,
+        "level": "WARNING",
+        "code": "WHITESPACE",
+        "message": "首尾空白保留，未自动规范化。"
+      }
+    ],
+    "database_checks": "EXACT_ASSET_NAMES_ONLY",
+    "can_import": false,
+    "asset_mutations": false,
+    "production_approved": false
+  }
+}

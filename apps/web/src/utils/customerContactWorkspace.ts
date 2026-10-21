@@ -71,6 +71,7 @@ export function createContactWorkspace(client: Pick<ApiClient, 'request'>, notif
   const turn = ++epoch, context = { ...scope }, controller = new AbortController(); abort = controller; state = { ...state, busy: 'read', error: null, ...(kind === 'list' ? { page: null, selected: null, history: null, query, view, paged: next } : kind === 'detail' ? { selected: null, history: null } : { history: null }) }; emit()
   try { const params = new URLSearchParams({ page_size: '15' }); let path: string
    if (kind === 'list') { params.set('name_query', query); params.set('view', view); if (before) { params.set('before_created_at', before.time); params.set('before_id', before.id) } path = '/contacts?' + params } else if (kind === 'history') { if (historyBefore) params.set('before_version', String(historyBefore)); path = '/contacts/' + id + '/history?' + params } else path = '/contacts/' + id
+   if (turn !== epoch || disposed || controller.signal.aborted) return false
    const raw = await client.request<unknown>(path, { signal: controller.signal }); if (turn !== epoch || disposed || controller.signal.aborted) return false
    if (kind === 'list') state.page = readContactPage(raw, context, view, before)
    else if (kind === 'history') state.history = readContactHistory(raw, context, id!, historyBefore)
@@ -81,7 +82,7 @@ export function createContactWorkspace(client: Pick<ApiClient, 'request'>, notif
  async function send(attempt: Attempt, retry: boolean) {
   if (!scope?.canWrite || disposed || state.busy) return false
   const turn = ++epoch, context = { ...scope }, controller = new AbortController(); abort = controller; state = { ...state, busy: 'write', attempt: { ...attempt, state: 'uncertain' }, page: null, selected: null, history: null, error: null }; emit()
-  try { const payload = readContactPayload(JSON.parse(attempt.payload), attempt.action), raw = await client.request<unknown>(attempt.path, { method: attempt.method, body: payload, idempotencyKey: attempt.key, signal: controller.signal }); if (turn !== epoch || disposed || controller.signal.aborted) return false
+  try { if (turn !== epoch || disposed || controller.signal.aborted) return false; const payload = readContactPayload(JSON.parse(attempt.payload), attempt.action), raw = await client.request<unknown>(attempt.path, { method: attempt.method, body: payload, idempotencyKey: attempt.key, signal: controller.signal }); if (turn !== epoch || disposed || controller.signal.aborted) return false
    const row = readCustomerContact(raw, context), base = attempt.baseline, expectedFacts = attempt.action === 'ARCHIVE' ? { ...contactFacts(base!), enabled: false } : readContactFacts(Object.fromEntries(factKeys.map(k => [k, payload[k as keyof ContactPayload]])))
    if (row.version !== payload.expected_version + 1 || row.action !== attempt.action || row.recorded_by !== context.actorId || !equal(contactFacts(row), expectedFacts) || (base ? row.id !== base.id || row.created_by !== base.created_by || row.created_at !== base.created_at : row.created_by !== context.actorId)) throw bad()
    state = { ...state, receipt: row, attempt: { ...attempt, state: 'accepted' } }; return true
@@ -89,11 +90,12 @@ export function createContactWorkspace(client: Pick<ApiClient, 'request'>, notif
  }
  async function submit(action: ContactAction, input: unknown, baseline: unknown = null) {
   if (!scope?.canWrite || disposed || state.busy || state.attempt) return false
+  const turn = epoch
   try { const payload = readContactPayload(input, action), base = baseline === null ? null : readCustomerContact(baseline, scope); if (action === 'CREATE' ? base !== null : !base || payload.expected_version !== base.version || base.archived !== (action === 'RESTORE')) throw bad()
-   const key = newKey(); if (typeof key !== 'string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(key)) throw bad()
+   const key = newKey(); if (turn !== epoch || disposed || !scope?.canWrite || state.busy || state.attempt) return false; if (typeof key !== 'string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(key)) throw bad()
    const path = action === 'CREATE' ? '/contacts' : '/contacts/' + base!.id + (action === 'ARCHIVE' ? '/archive' : action === 'RESTORE' ? '/restore' : '')
    return send({ path, method: action === 'UPDATE' ? 'PATCH' : 'POST', action, key, payload: JSON.stringify(payload), baseline: base, state: 'uncertain' }, false)
-  } catch (error) { state.error = error; emit(); return false }
+  } catch (error) { if (turn === epoch && !disposed) { state.error = error; emit() } return false }
  }
  emit(); return { reset, state: snapshot, unresolved, list: (query = '', view: ContactView = 'CURRENT', next = false) => read('list', query, view, next), select: (id: string) => read('detail', state.query, state.view, false, id), history: (id: string, next = false) => read('history', state.query, state.view, next, id), submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), begin: () => { if (!scope?.canWrite || disposed || state.busy || unresolved()) return false; state = { ...state, receipt: null, attempt: null, error: null }; emit(); return true }, dispose: () => { disposed = true; reset(null) } }
 }

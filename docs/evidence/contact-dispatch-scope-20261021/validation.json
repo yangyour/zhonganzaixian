@@ -1,0 +1,35 @@
+{
+  "result": "PASS_REPRODUCED_AND_FIXED_SCOPE_REENTRANCY",
+  "new_tests": 26,
+  "before_fix_initial_24_cases": {
+    "failed": 18,
+    "passed": 6
+  },
+  "focused_initial_24_plus_existing": 82,
+  "vitest": {
+    "files_passed": 237,
+    "tests_passed": 3664
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 140,
+    "bootstrap_gzip_bytes": 179967,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "88a58f4c8487e72eb3f468427159b42e603bbe79506d1b308766bb28472e75de",
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/utils/customerContactWorkspace.ts": "ebb22e838fcf0d128e63eb8b0e71904f920d373454554df9cda673e76ea45608",
+    "apps/web/src/utils/contactImportWorkspace.ts": "e7afb842a7a15b7047f595f87ea9fb0633e33b80205a4d2dc5541349bdc7f726",
+    "apps/web/src/utils/contactImportPreviewWorkspace.ts": "3f0a809141e01a08b51f3fc4103923b1c2d0615dc31b8419d3fbcaed5612985d",
+    "apps/web/tests/contactDispatchScope.test.ts": "55d93de80fd3741d623b12075defc4a3c7dfddaa89e60b96d7d2db44d036d8ea"
+  },
+  "api_contract_changed": false,
+  "api_or_database_executed": false,
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0
+}

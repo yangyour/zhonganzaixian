@@ -63,20 +63,21 @@ export function createContactImportWorkspace(client: Pick<ApiClient, 'request'>,
   if (next && !before) return false
   if (id !== undefined && !uuid.test(id)) { state.selected = null; state.error = bad(); emit(); return false }
   const turn = ++epoch, context = { ...scope }, controller = new AbortController(); abort = controller; state = { ...state, busy: 'read', selected: null, ...(id ? {} : { page: null, paged: next }), error: null }; emit()
-  try { const query = new URLSearchParams({ page_size: '15' }); if (before) { query.set('before_created_at', before.time); query.set('before_id', before.id) } const raw = await client.request<unknown>(id ? '/contact-imports/' + id : '/contact-imports?' + query, { signal: controller.signal }); if (turn !== epoch || disposed || controller.signal.aborted) return false
+  try { if (turn !== epoch || disposed || controller.signal.aborted) return false; const query = new URLSearchParams({ page_size: '15' }); if (before) { query.set('before_created_at', before.time); query.set('before_id', before.id) } const raw = await client.request<unknown>(id ? '/contact-imports/' + id : '/contact-imports?' + query, { signal: controller.signal }); if (turn !== epoch || disposed || controller.signal.aborted) return false
    if (id) { const job = readContactImportJob(raw, context, id); if (state.receipt?.operation_id === id && state.attempt && job.row_count !== JSON.parse(state.attempt.payload).rows.length) throw bad(); remember(job); state.selected = job } else { const page = readContactImportPage(raw, context, before); page.items.forEach(remember); state.page = page } return true
   } catch (error) { if (turn === epoch && !disposed && !isCancelled(error)) state.error = error; return false } finally { if (turn === epoch && !disposed) { state.busy = null; abort = null; emit() } }
  }
  async function send(attempt: Attempt, retry: boolean) {
   if (!scope || disposed || state.busy) return false
   const turn = ++epoch, controller = new AbortController(); abort = controller; state = { ...state, page: null, selected: null, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
-  try { const raw = await client.request<unknown>('/contact-imports', { method: 'POST', body: JSON.parse(attempt.payload), idempotencyKey: attempt.key, signal: controller.signal }); if (turn !== epoch || disposed || controller.signal.aborted) return false
+  try { if (turn !== epoch || disposed || controller.signal.aborted) return false; const raw = await client.request<unknown>('/contact-imports', { method: 'POST', body: JSON.parse(attempt.payload), idempotencyKey: attempt.key, signal: controller.signal }); if (turn !== epoch || disposed || controller.signal.aborted) return false
    if (!exact(raw, ['operation_id', 'status']) || typeof raw.operation_id !== 'string' || !uuid.test(raw.operation_id) || raw.status !== 'PENDING') throw bad(); state.receipt = copy(raw) as unknown as ContactImportReceipt; state.attempt = { ...attempt, state: 'accepted' }; return true
   } catch (error) { if (turn === epoch && !disposed) { state.error = error; state.attempt = { ...attempt, state: writeFailureUncertain(retry, error) ? 'uncertain' : 'rejected' } } return false } finally { if (turn === epoch && !disposed) { state.busy = null; abort = null; emit() } }
  }
  async function submit(text: string, acknowledge: boolean) {
   if (!scope || disposed || state.busy || state.attempt) return false
-  try { const input = contactImportInput(text, acknowledge), key = newKey(); if (typeof key !== 'string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(key)) throw bad(); return send({ payload: JSON.stringify(input), key, state: 'uncertain' }, false) } catch (error) { state.error = error; emit(); return false }
+  const turn = epoch
+  try { const input = contactImportInput(text, acknowledge), key = newKey(); if (turn !== epoch || disposed || !scope || state.busy || state.attempt) return false; if (typeof key !== 'string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(key)) throw bad(); return send({ payload: JSON.stringify(input), key, state: 'uncertain' }, false) } catch (error) { if (turn === epoch && !disposed) { state.error = error; emit() } return false }
  }
  emit(); return { reset, state: snapshot, unresolved, submit, list: (next = false) => read(undefined, next), select: (id: string) => read(id), retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), begin: () => { if (!scope || disposed || state.busy || unresolved()) return false; state = { ...state, receipt: null, attempt: null, error: null }; emit(); return true }, dispose: () => { disposed = true; reset(null) } }
 }

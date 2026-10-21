@@ -30,3 +30,40 @@ it('renders the readonly reference and unresolved warning rather than an apply a
  expect(host.querySelectorAll('select option')).toHaveLength(10)
  expect(Array.from(host.querySelectorAll('button')).some(b=>/发布|应用|导入/.test(b.textContent??''))).toBe(false)
 })
+
+it('suppresses duplicate loads and cancel prevents a late response from reopening',async()=>{
+ let resolve!:(x:unknown)=>void
+ const request=vi.spyOn(api,'request').mockImplementation(()=>new Promise(r=>{resolve=r}))
+ mount();const pending=state.load();await state.load();expect(request).toHaveBeenCalledTimes(1)
+ state.clear();resolve(fixture.data);await pending
+ expect(state.value).toBeNull();expect(state.busy).toBe(false);expect(state.expanded).toBe(false)
+})
+it('search ignores surrounding whitespace and unknown keywords show no results',async()=>{
+ vi.spyOn(api,'request').mockResolvedValue(fixture.data);mount();await state.load()
+ state.search=' PRIMARY_IP ';expect(state.attributes).toHaveLength(1)
+ state.search='不存在的属性';expect(state.attributes).toHaveLength(0)
+})
+function mountRendered(){
+ host=document.createElement('div');document.body.append(host);app=createApp(Panel)
+ app.component('el-button',{template:'<button type="button"><slot /></button>'})
+ state=(app.mount(host).$ as any).setupState
+}
+it('exposes named keyboard scroll regions, captions and column headers',async()=>{
+ vi.spyOn(api,'request').mockResolvedValue(fixture.data);mountRendered();(host.querySelector('button') as HTMLButtonElement).click();await settle()
+ expect(host.querySelectorAll('[role="region"][tabindex="0"]')).toHaveLength(2)
+ expect(host.querySelectorAll('caption')).toHaveLength(2)
+ expect(host.querySelectorAll('th:not([scope="col"])')).toHaveLength(0)
+ expect(host.querySelector('button')?.getAttribute('aria-expanded')).toBe('true')
+ expect(document.getElementById(host.querySelector('button')!.getAttribute('aria-controls')!)).not.toBeNull()
+})
+it('empty search has an actionable reset and collapse returns focus',async()=>{
+ vi.spyOn(api,'request').mockResolvedValue(fixture.data);mountRendered();await state.load();await settle()
+ const input=host.querySelector('input')!;input.value='no_such_attribute';input.dispatchEvent(new Event('input',{bubbles:true}));await settle()
+ expect(host.textContent).toContain('没有匹配的属性')
+ const buttons=()=>Array.from(host.querySelectorAll('button'))
+ buttons().find(b=>b.textContent==='清除属性搜索')!.click();await settle();expect(input.value).toBe('')
+ buttons().find(b=>b.textContent==='收起字典')!.click();await settle()
+ expect(host.querySelector('table')).toBeNull();expect(document.activeElement).toBe(host.querySelector('button'))
+ expect(host.querySelector('button')!.getAttribute('aria-expanded')).toBe('false')
+ expect(host.querySelector('button')!.hasAttribute('aria-controls')).toBe(false)
+})

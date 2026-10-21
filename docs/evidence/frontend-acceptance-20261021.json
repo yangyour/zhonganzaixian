@@ -1,0 +1,24 @@
+{
+  "base_commit": "3017f584fbad2047e54a76a3a24cfec37d7dfb7b",
+  "scope": "CMDB_REFERENCE_INTERACTION_AND_FRONTEND_GATE",
+  "web_tests": {
+    "passed": 2534,
+    "files": 181
+  },
+  "focused_component_tests": 11,
+  "typecheck": "PASS",
+  "production_build": "PASS",
+  "static_release_policy": "PASS",
+  "browser_scripts_discovered": 7,
+  "browser_execution": "NOT_RUN",
+  "axe_execution": "NOT_RUN",
+  "browser_blocker": "Chromium process singleton socket prohibited; escalated execution environment failed before launch",
+  "api_responses_in_browser_suite": "SYNTHETIC_MOCK_ONLY",
+  "runtime_api_changes": false,
+  "migrations": 0,
+  "production_approved": false,
+  "sources": [
+    "https://www.w3.org/TR/WCAG22/",
+    "https://playwright.dev/docs/accessibility-testing"
+  ]
+}

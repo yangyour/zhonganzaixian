@@ -78,13 +78,15 @@ export function createApprovalWorkspace(client:Pick<ApiClient,'request'>,changed
  }
  function submit(action:ApprovalAction,note:string|null){
   if(!context?.canWrite||!state.target||!state.baseline||!state.current||disposed||state.busy||state.attempt)return Promise.resolve(false)
+  const generation=epoch,originalTarget=structuredClone(state.target),originalBaseline=structuredClone(state.baseline)
   try{
    // Refresh never advances a prepared CAS baseline. A newer read requires explicit preparation again.
    if(state.current.version!==state.baseline.version||!state.current.allowed_actions.includes(action)||!state.baseline.allowed_actions.includes(action))throw approvalBad()
-   const command=readApprovalCommand({expected_version:state.baseline.version,action,note}),key=newKey()
+   const command=readApprovalCommand({expected_version:originalBaseline.version,action,note}),key=newKey()
+   if(generation!==epoch||disposed||!context?.canWrite||state.busy||state.attempt||!state.target||!state.baseline||!state.current)return Promise.resolve(false)
    if(typeof key!=='string'||!/^[A-Za-z0-9._:-]{1,128}$/.test(key))throw approvalBad()
-   return send({path:path(state.target)+'/actions',payload:JSON.stringify(command),key,baseline:structuredClone(state.baseline),state:'uncertain'},false)
-  }catch(error){state.error=error;emit();return Promise.resolve(false)}
+   return send({path:path(originalTarget)+'/actions',payload:JSON.stringify(command),key,baseline:originalBaseline,state:'uncertain'},false)
+  }catch(error){if(generation===epoch&&!disposed){state.error=error;emit()}return Promise.resolve(false)}
  }
  function cancelRead(){if(disposed||state.busy!=='read')return false;epoch++;abort?.abort();abort=null;readRetryable=lastRead!==null;state={...state,busy:null,error:null};emit();return true}
  emit();return{reset,pin,prepare,cancelRead,canRetryRead:()=>!disposed&&readRetryable&&lastRead!==null&&!state.busy,retryRead:()=>readRetryable&&lastRead?readRequest(structuredClone(lastRead)):Promise.resolve(false),submit,unresolved,state:snapshot,refresh:()=>read(false),history:(next=false)=>read(true,next),retry:()=>state.attempt?.state==='uncertain'?send(state.attempt,true):Promise.resolve(false),dispose:()=>{disposed=true;reset(null)}}

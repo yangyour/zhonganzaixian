@@ -90,13 +90,14 @@ export function createInspectionWorkspace(client: Pick<ApiClient, 'request'>, ch
   }
   async function submit(action: InspectionAction, input: unknown, baseline: unknown = null) {
     if (!context?.canWrite || disposed || state.busy || state.attempt) return false
+    const generation = epoch
     try {
       const payload = readInspectionPayload(input, action), base = baseline === null ? null : readInspectionDetailShape(baseline, context)
       if (action === 'CREATE' ? base !== null : !base || payload.expected_version !== base.version || base.archived !== (action === 'RESTORE')) throw inspectionBad()
-      const key = newKey(); if (typeof key !== 'string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(key)) throw inspectionBad()
+      const key = newKey(); if (generation !== epoch || disposed || !context?.canWrite || state.busy || state.attempt) return false; if (typeof key !== 'string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(key)) throw inspectionBad()
       const path = action === 'CREATE' ? '/inspection-templates' : '/inspection-templates/' + base!.id + (action === 'ARCHIVE' ? '/archive' : action === 'RESTORE' ? '/restore' : '')
       return send({ path, method: action === 'UPDATE' ? 'PATCH' : 'POST', action, key, payload: JSON.stringify(payload), baseline: base, state: 'uncertain' }, false)
-    } catch (error) { state.error = error; emit(); return false }
+    } catch (error) { if (generation === epoch && !disposed) { state.error = error; emit() } return false }
   }
   emit()
   function cancelRead(){if(disposed||state.busy!=='read')return false;epoch++;abort?.abort();abort=null;readRetryable=lastRead!==null;state={...state,busy:null,error:null};emit();return true}

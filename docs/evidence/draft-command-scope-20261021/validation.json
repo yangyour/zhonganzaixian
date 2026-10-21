@@ -1,0 +1,37 @@
+{
+  "result": "PASS_REPRODUCED_AND_FIXED_COMMAND_SCOPE_REENTRANCY",
+  "new_tests": 20,
+  "before_fix": {
+    "failed": 16,
+    "passed": 4
+  },
+  "focused_tests_passed": 142,
+  "vitest": {
+    "files_passed": 242,
+    "tests_passed": 3794
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 141,
+    "bootstrap_gzip_bytes": 179984,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "00e0ffb0b7a7f5f55520b6f2d05a65fe3c3915519accde7e7fb44db3ee27b014",
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/utils/inspectionTemplateWorkspace.ts": "44d660029fb013c7bc135a5170841cca0cd540a8c994e5bb3f9c2f72d38139e4",
+    "apps/web/src/utils/inspectionWorksheetWorkspace.ts": "fd5e69db401423bf2a57bec0176a0177f0b4e65e23b7348ac688003b00013f35",
+    "apps/web/src/utils/inspectionSourceCollectionWorkspace.ts": "31318e842210cad81cca79fcb86b77fd5eefa023e417670a297645943d66649e",
+    "apps/web/src/utils/inspectionQuarterlyReportWorkspace.ts": "684d91986dc1c83dc78e1955e90234b6560a9a787d254643028e0a5557eed2a7",
+    "apps/web/src/utils/changeNoticeApprovalWorkspace.ts": "b04d190a424e374336ba84e584b4f770e8891f93b696dd20628bdc8870dd05c8",
+    "apps/web/tests/draftCommandScope.test.ts": "497f0917b44f9de5eb492d397a1e31f388cb4b7fb7548ff87bad663c55735290"
+  },
+  "api_contract_changed": false,
+  "api_or_database_executed": false,
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0
+}

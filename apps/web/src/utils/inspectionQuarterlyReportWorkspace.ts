@@ -61,7 +61,8 @@ export function createReportWorkspace(client:Pick<ApiClient,'request'>,changed:(
   }
   async function submit(input:unknown){
     if(!context?.canWrite||disposed||state.busy||state.attempt)return false
-    try{const payload=readReportPayload(input),key=newKey();if(typeof key!=='string'||! /^[A-Za-z0-9._:-]{1,128}$/.test(key))throw reportBad();return send({payload:JSON.stringify(payload),key,state:'uncertain'},false)}catch(error){state.error=error;emit();return false}
+    const generation=epoch
+    try{const payload=readReportPayload(input),key=newKey();if(generation!==epoch||disposed||!context?.canWrite||state.busy||state.attempt)return false;if(typeof key!=='string'||! /^[A-Za-z0-9._:-]{1,128}$/.test(key))throw reportBad();return send({payload:JSON.stringify(payload),key,state:'uncertain'},false)}catch(error){if(generation===epoch&&!disposed){state.error=error;emit()}return false}
   }
   function cancelRead(){if(disposed||state.busy!=='read')return false;epoch++;abort?.abort();abort=null;readRetryable=lastRead!==null;state={...state,busy:null,error:null};emit();return true}
   emit();return {reset,cancelRead,canRetryRead:()=>!disposed&&readRetryable&&lastRead!==null&&!state.busy,retryRead:()=>readRetryable&&lastRead?readRequest(structuredClone(lastRead)):Promise.resolve(false),state:snapshot,unresolved,list:(next=false)=>read('list',next),select:(id:string)=>read('detail',false,id),submit,retry:()=>state.attempt?.state==='uncertain'?send(state.attempt,true):Promise.resolve(false),begin:()=>{if(!context?.canWrite||disposed||state.busy||unresolved())return false;lastRead=null;readRetryable=false;state={...state,attempt:null,receipt:null,error:null};emit();return true},dispose:()=>{if(disposed)return;disposed=true;reset(null)}}

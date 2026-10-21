@@ -1,0 +1,46 @@
+{
+  "result": "PASS",
+  "scope": "LOOPBACK_VITE_HTTP_SMOKE_NOT_BROWSER_OR_API_ACCEPTANCE",
+  "host": "127.0.0.1",
+  "port": 28156,
+  "checks": [
+    {
+      "path": "/inspection-templates",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/utils/inspectionTemplateWorkspace.ts",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/utils/inspectionWorksheetWorkspace.ts",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/utils/inspectionSourceCollectionWorkspace.ts",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/utils/inspectionQuarterlyReportWorkspace.ts",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/utils/changeNoticeApprovalWorkspace.ts",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/components/ApiErrorNotice.vue",
+      "status": 200,
+      "expected_marker_present": true
+    }
+  ],
+  "vite_stopped": true,
+  "browser_js_executed": false,
+  "api_or_database_executed": false
+}

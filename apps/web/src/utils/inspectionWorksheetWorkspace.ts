@@ -101,14 +101,15 @@ export function createWorksheetWorkspace(client: Pick<ApiClient, 'request'>, cha
   }
   async function submit(action: WorksheetAction, input: unknown, baseline: unknown = null, creationSource: unknown = null) {
     if (!context?.canWrite || disposed || state.busy || state.attempt) return false
+    const generation = epoch
     try {
       const payload = readWorksheetPayload(input, action), base = baseline === null ? null : readWorksheetDetailShape(baseline, context), source = creationSource === null ? null : readWorksheetSourceShape(creationSource, context)
       if (action === 'CREATE' ? base !== null || !source || payload.asset_id !== source.asset.id || payload.template_id !== source.template.id || payload.template_version !== source.template.version : source !== null || !base || payload.expected_version !== base.version || base.archived !== (action === 'RESTORE')) throw worksheetBad()
       if (action !== 'ARCHIVE') { const keys = new Set((source?.template.items ?? base!.template_items).map(item => item.key)); if (payload.observations!.some(row => !keys.has(row.key))) throw worksheetBad() }
-      const key = newKey(); if (typeof key !== 'string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(key)) throw worksheetBad()
+      const key = newKey(); if (generation !== epoch || disposed || !context?.canWrite || state.busy || state.attempt) return false; if (typeof key !== 'string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(key)) throw worksheetBad()
       const path = action === 'CREATE' ? '/inspection-worksheets' : '/inspection-worksheets/' + base!.id + (action === 'ARCHIVE' ? '/archive' : action === 'RESTORE' ? '/restore' : '')
       return send({ path, method: action === 'UPDATE' ? 'PATCH' : 'POST', action, key, payload: JSON.stringify(payload), baseline: base, source, state: 'uncertain' }, false)
-    } catch (error) { state.error = error; emit(); return false }
+    } catch (error) { if (generation === epoch && !disposed) { state.error = error; emit() } return false }
   }
   emit()
   function cancelRead(){if(disposed||state.busy!=='read')return false;epoch++;abort?.abort();abort=null;readRetryable=lastRead!==null;state={...state,busy:null,error:null};emit();return true}

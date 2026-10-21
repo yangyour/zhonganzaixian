@@ -26,3 +26,7 @@ Q18供应商协议/端点/凭据/回执、Q14矩阵、接收人绑定、额度�
 44项隔离测试通过：危险URI、22类拒绝地址、混合DNS、空/失败/过多答案、单次解析与DNS固定、重定向/重试/代理关闭、不可变one-shot正文、头注入拒绝、响应脱敏、DNS有界等待及503 Retry-After头剥离。所有DNS由测试替身提供或只解析字面IP；未做公网请求、真实TLS服务端、供应商回执或生产网络验收。
 
 完整Maven verify通过：2260项执行、897项环境跳过，0失败/错误；52项Python检查及追踪一致性检查通过。无前端或HTTP契约修改，本步未重跑前端；M4-13和128项正式验收仍NOT_RUN。
+
+## 提交与合并
+
+提交 [a23646059cf666b5d4f9e3f95c1033ae222a4f36](https://github.com/yangyour/zhonganzaixian/commit/a23646059cf666b5d4f9e3f95c1033ae222a4f36) 的 [分支CI39531844648](https://github.com/yangyour/zhonganzaixian/actions/runs/39531844648)全部通过。2026-10-21 02:16 UTC以expected_sha保护快进main并读引用确认。未创建运行入口、凭据或真实发送；[主分支CI39532134615](https://github.com/yangyour/zhonganzaixian/actions/runs/39532134615)也已通过。

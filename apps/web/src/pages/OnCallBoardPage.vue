@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed,onUnmounted,ref,shallowRef,watch} from 'vue'
+import {computed,nextTick,onUnmounted,ref,shallowRef,watch} from 'vue'
 import {ElMessageBox} from 'element-plus'
 import {onBeforeRouteLeave} from 'vue-router'
 import {api} from '../api/client'
@@ -22,7 +22,8 @@ const canWriteInternal=computed(()=>Boolean(permitted.value&&can('ticket_notes:w
 const canWriteConfig=computed(()=>Boolean(permitted.value&&session.value?.user.role==='padmin'&&can('configurations:write')))
 
 const tab=ref<'queue'|'roster'|'policy'>('queue')
-const blocked=ref(false)
+const blocked=ref(false),refreshPaused=ref(false),readStatus=ref(''),refreshButton=ref<HTMLButtonElement|null>(null)
+let readTurn=0
 
 // Roster form
 const shiftDate=ref('')
@@ -50,7 +51,7 @@ const editUnansweredCount=ref<number|null>(null)
 const editStep2Wait=ref<number|null>(null)
 const editStep2Role=ref<TargetRole|null>(null)
 
-const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value,canWriteInternal.value,canWriteConfig.value]))
+const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,permitted.value,canWriteInternal.value,canWriteConfig.value]))
 const locked=computed(()=>!!state.value.busy||workspace.unresolved())
 
 function clearRoster(){shiftDate.value='';shiftCode.value='DAY';primaryUserId.value='';backupUserId.value='';rosterNote.value=''}
@@ -60,20 +61,25 @@ function clearPolicy(){preparedPolicy.value=null;editUnansweredCount.value=null;
 watch(editPolicyTier,clearPolicy,{flush:'sync'})
 const policyDirty=computed(()=>Boolean(preparedPolicy.value&&(editUnansweredCount.value!==preparedPolicy.value.unanswered_escalate_count||editStep2Wait.value!==preparedPolicy.value.steps[1]?.wait_minutes||editStep2Role.value!==preparedPolicy.value.steps[1]?.target_role)))
 function preparePolicy(){if(locked.value||policyDirty.value)return false;const current=state.value.board?.policies.find(p=>p.tier===editPolicyTier.value);if(!current||current.steps.length<2)return false;preparedPolicy.value=structuredClone(current);editUnansweredCount.value=current.unanswered_escalate_count;editStep2Wait.value=current.steps[1]!.wait_minutes;editStep2Role.value=current.steps[1]!.target_role;return true}
-async function discardPolicy(){const turn=context.value;if(policyDirty.value){try{await ElMessageBox.confirm('清除尚未保存的策略修改？已保存策略不受影响。','保留策略输入',{confirmButtonText:'清除修改',cancelButtonText:'继续编辑',type:'warning'})}catch{return false}}if(turn!==context.value)return false;clearPolicy();return true}
+async function discardPolicy(){if(locked.value)return false;const turn=context.value,draft=draftSnapshot();if(policyDirty.value){try{await ElMessageBox.confirm('清除尚未保存的策略修改？已保存策略不受影响。','保留策略输入',{confirmButtonText:'清除修改',cancelButtonText:'继续编辑',type:'warning'})}catch{return false}}if(turn!==context.value||draft!==draftSnapshot()||locked.value)return false;clearPolicy();return true}
 function clearDrafts(){clearRoster();clearHandoff();clearEscalation();clearPolicy();editPolicyTier.value='STANDARD';blocked.value=false}
 const dirty=computed(()=>Boolean(shiftDate.value||shiftCode.value!=='DAY'||primaryUserId.value||backupUserId.value||rosterNote.value||handoffRosterId.value||incomingUserId.value||handoffNote.value||escTicketId.value||escTier.value!=='STANDARD'||escStepOrder.value!==1||escTrigger.value!=='PHONE_UNANSWERED'||escUnansweredCount.value!==2||policyDirty.value))
 function clearConfirmed(path:string|undefined){if(path==='/oncall/rosters')clearRoster();if(path==='/oncall/handoffs')clearHandoff();if(path==='/oncall/escalations')clearEscalation();if(path==='/escalation-policies')clearPolicy()}
-async function recover(){if(await workspace.retry())clearConfirmed(state.value.receipt?.path)}
+function draftSnapshot(){return JSON.stringify([shiftDate.value,shiftCode.value,primaryUserId.value,backupUserId.value,rosterNote.value,handoffRosterId.value,incomingUserId.value,handoffNote.value,escTicketId.value,escTier.value,escStepOrder.value,escTrigger.value,escUnansweredCount.value,editPolicyTier.value,preparedPolicy.value,editUnansweredCount.value,editStep2Wait.value,editStep2Role.value])}
+async function recover(){const turn=context.value,draft=draftSnapshot();if(await workspace.retry()&&turn===context.value&&draft===draftSnapshot())clearConfirmed(state.value.receipt?.path)}
+async function refreshBoard(){if(locked.value)return false;const turn=++readTurn,key=context.value;readStatus.value='';const ok=await workspace.load();if(turn===readTurn&&key===context.value&&ok)readStatus.value='已读取当前看板快照；未提交排班、交接或升级。';return ok}
+async function cancelRead(){if(!workspace.cancelRead())return false;refreshPaused.value=true;const turn=++readTurn,key=context.value;readStatus.value='已取消读取并暂停自动刷新；迟到结果不会显示，已保存回执不受影响。';await nextTick();if(turn===readTurn&&key===context.value&&!refreshButton.value?.disabled)refreshButton.value?.focus();return true}
+function toggleRefresh(){refreshPaused.value=!refreshPaused.value;readStatus.value=refreshPaused.value?'自动刷新已暂停，可手动读取。':'已恢复30秒刷新；填写表单、操作未确认、读取失败或页面隐藏时仍会暂停。'}
 let refreshTimer:ReturnType<typeof setInterval>|null=null
 function clearRefreshTimer(){if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}}
 function startRefreshTimer(){
  clearRefreshTimer()
  if(!permitted.value)return
- refreshTimer=setInterval(()=>{if(permitted.value&&!locked.value&&!dirty.value&&!document.hidden&&!document.activeElement?.closest('form'))void workspace.load()},30000)
+ refreshTimer=setInterval(()=>{if(permitted.value&&!refreshPaused.value&&!state.value.error&&!locked.value&&!dirty.value&&!document.hidden&&!document.activeElement?.closest('form,.table-wrap,.proto-tabs'))void workspace.load()},30000)
 }
 
 watch(context,()=>{
+ readTurn++;readStatus.value=''
  const s=session.value
  tab.value='queue';clearDrafts()
  workspace.reset(permitted.value&&s?{
@@ -89,6 +95,7 @@ watch(context,()=>{
 },{immediate:true,flush:'sync'})
 
 async function submitRoster(){
+ const turn=context.value,draft=draftSnapshot()
  if(!shiftDate.value)return false
  const existing=state.value.board?.rosters.find(r=>r.shift_date===shiftDate.value&&r.shift_code===shiftCode.value)
  const ok=await workspace.submitRoster({
@@ -99,21 +106,23 @@ async function submitRoster(){
   backup_oncall_user_id:backupUserId.value.trim()||null,
   note:rosterNote.value.trim()||null
  })
- if(ok)clearRoster()
+ if(ok&&turn===context.value&&draft===draftSnapshot())clearRoster()
  return ok
 }
 
 async function submitHandoff(){
+ const turn=context.value,draft=draftSnapshot()
  const ok=await workspace.submitHandoff({
   roster_id:handoffRosterId.value.trim()||null,
   incoming_user_id:incomingUserId.value.trim(),
   note:handoffNote.value.trim()
  })
- if(ok)clearHandoff()
+ if(ok&&turn===context.value&&draft===draftSnapshot())clearHandoff()
  return ok
 }
 
 async function submitEscalation(){
+ const turn=context.value,draft=draftSnapshot()
  const ok=await workspace.submitEscalation({
   ticket_id:escTicketId.value.trim(),
   tier:escTier.value,
@@ -121,10 +130,11 @@ async function submitEscalation(){
   trigger_condition:escTrigger.value,
   unanswered_phone_count:escUnansweredCount.value
  })
- if(ok)clearEscalation();return ok
+ if(ok&&turn===context.value&&draft===draftSnapshot())clearEscalation();return ok
 }
 
 async function submitPolicyUpdate(){
+ const turn=context.value,draft=draftSnapshot()
  const current=preparedPolicy.value
  if(!current||current.tier!==editPolicyTier.value||typeof editUnansweredCount.value!=='number'||typeof editStep2Wait.value!=='number'||!editStep2Role.value)return false
  const expected=current.persisted?current.version:0
@@ -135,19 +145,19 @@ async function submitPolicyUpdate(){
   unanswered_escalate_count:editUnansweredCount.value,
   steps:baseSteps
  })
- if(ok)clearPolicy();return ok
+ if(ok&&turn===context.value&&draft===draftSnapshot())clearPolicy();return ok
 }
 
-async function mayLeave(){if(workspace.unresolved()){blocked.value=true;return false}if(!dirty.value)return true;const turn=context.value;try{await ElMessageBox.confirm('离开将丢弃尚未保存的排班、交接或升级输入；已保存记录不受影响。','保留未保存输入',{confirmButtonText:'丢弃并离开',cancelButtonText:'继续编辑',type:'warning'});return turn===context.value}catch{return false}}
+async function mayLeave(){if(workspace.unresolved()){blocked.value=true;return false}if(!dirty.value)return true;const turn=context.value,draft=draftSnapshot();try{await ElMessageBox.confirm('离开将丢弃尚未保存的排班、交接或升级输入；已保存记录不受影响。','保留未保存输入',{confirmButtonText:'丢弃并离开',cancelButtonText:'继续编辑',type:'warning'});return turn===context.value&&draft===draftSnapshot()&&!workspace.unresolved()}catch{return false}}
 onBeforeRouteLeave(mayLeave)
 const unregister=contextTransitionGuards.register(mayLeave)
 function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()||dirty.value){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
 onUnmounted(()=>{clearRefreshTimer();unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
-defineExpose({state,workspace,mayLeave,dirty,shiftDate,primaryUserId,backupUserId,rosterNote,handoffRosterId,incomingUserId,handoffNote,escTicketId,editStep2Wait,submitRoster,preparedPolicy,preparePolicy,submitPolicyUpdate,editPolicyTier,editUnansweredCount,editStep2Role})
+defineExpose({state,workspace,refreshPaused,refreshBoard,cancelRead,toggleRefresh,discardPolicy,mayLeave,dirty,shiftDate,primaryUserId,backupUserId,rosterNote,handoffRosterId,incomingUserId,handoffNote,escTicketId,editStep2Wait,submitRoster,preparedPolicy,preparePolicy,submitPolicyUpdate,editPolicyTier,editUnansweredCount,editStep2Role})
 </script>
 <template>
- <section class="oncall-board">
+ <section class="oncall-board" :aria-busy="!!state.busy">
   <div class="page-heading proto-page-head">
    <div>
     <h1>值班看板与升级链管理 <span class="proto-badge">{{ session?.tenant.name }}</span></h1>
@@ -158,7 +168,7 @@ defineExpose({state,workspace,mayLeave,dirty,shiftDate,primaryUserId,backupUserI
   <p class="panel" v-if="!permitted">当前身份无权访问内部值班看板，或正在切换租户。</p>
   <template v-else>
    <p class="proto-scope-note">
-    本看板每 30s 自动刷新工单 SLA 倒计时队列，交接班固定于每日 18:00 固化未确认、进行中、待复核工单计数（M5-12）。电话未接听升级以实际策略和显式执行记录为准，短信仅登记待网关意图，不代表已经发送或送达（M5-13）；详细排班轮换细则与重呼叫间隔保持待客户确认（CONFIG_PENDING_Q15）。
+    本看板默认每30秒刷新工单SLA快照，可暂停；交接台账标注18:00口径，只有显式登记后才保存对应计数，本页不会自动执行交接（M5-12）。电话未接听升级以实际策略和显式执行记录为准，短信仅登记待网关意图，不代表已经发送或送达（M5-13）；详细排班轮换细则与重呼叫间隔保持待客户确认（CONFIG_PENDING_Q15）。
    </p>
    <p v-if="dirty" role="status">存在未保存输入，自动刷新已暂停；离开前会提醒。</p>
    <p v-if="state.receipt" role="status">原操作回执已核对：{{state.receipt.identity}} · {{displayTime(state.receipt.recordedAt)}}。后续回读失败不表示原操作未保存。</p>
@@ -202,26 +212,31 @@ defineExpose({state,workspace,mayLeave,dirty,shiftDate,primaryUserId,backupUserI
       <button type="button" :class="{active:tab==='roster'}" :aria-pressed="tab==='roster'" :disabled="locked" @click="tab='roster'">当班排班与 18:00 交接班</button>
       <button type="button" :class="{active:tab==='policy'}" :aria-pressed="tab==='policy'" :disabled="locked" @click="tab='policy'">四套升级策略配置</button>
      </div>
-     <button type="button" :disabled="locked" @click="workspace.load()">立即刷新 (30s)</button>
+     <button ref="refreshButton" type="button" :disabled="locked" @click="refreshBoard">{{state.readFailed?'重试读取看板':'立即刷新'}}</button>
+     <button type="button" :aria-pressed="refreshPaused" @click="toggleRefresh">{{refreshPaused?'恢复自动刷新':'暂停自动刷新'}}</button>
+     <button v-if="state.busy==='read'" type="button" @click="cancelRead">取消读取</button>
     </div>
 
     <ApiErrorNotice :error="state.error" />
+    <p v-if="readStatus" role="status" aria-live="polite">{{readStatus}}</p>
+    <p v-if="state.readFailed" role="status">看板读取尚未成功，自动刷新已暂停；请重试读取。不能据此判断队列为空。</p>
+    <p v-if="state.board" class="proto-scope-note">快照时间：{{displayTime(state.board.observed_at)}}。倒计时为该次快照值，并非连续计时；当前队列最多显示25条，不代表全部在途工单。</p>
     <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">值班或升级操作提交结果尚未确认，请点击重试。</p>
     <button v-if="state.attempt&&!state.busy" type="button" @click="recover">重试上次提交</button>
     <p v-if="state.busy" role="status" aria-live="polite">{{ state.busy==='write'?'正在提交值班/升级记录…':'正在同步值班看板…' }}</p>
 
     <template v-if="tab==='queue'">
-     <div class="table-wrap" v-if="state.board?.queue.length">
-      <table class="proto-table">
+     <div class="table-wrap" tabindex="0" role="region" aria-label="倒计时队列，可横向滚动" v-if="state.board?.queue.length">
+      <table class="proto-table"><caption>倒计时队列</caption>
        <thead>
         <tr>
-         <th>工单 ID</th>
-         <th>优先级 / 档位</th>
-         <th>状态</th>
-         <th>SLA 倒计时</th>
-         <th>超时进度</th>
-         <th>当前升级步</th>
-         <th>下一升级目标</th>
+         <th scope="col">工单 ID</th>
+         <th scope="col">优先级 / 档位</th>
+         <th scope="col">状态</th>
+         <th scope="col">SLA 倒计时</th>
+         <th scope="col">超时进度</th>
+         <th scope="col">当前升级步</th>
+         <th scope="col">下一升级目标</th>
         </tr>
        </thead>
        <tbody>
@@ -237,7 +252,7 @@ defineExpose({state,workspace,mayLeave,dirty,shiftDate,primaryUserId,backupUserI
        </tbody>
       </table>
      </div>
-     <p v-else class="empty">当前租户暂无在途工单。</p>
+     <p v-else-if="state.board&&!state.busy&&!state.error" class="empty">当前看板快照未返回在途工单。</p>
 
      <form v-if="canWriteInternal" class="action-form" @submit.prevent="submitEscalation">
       <h2>登记升级执行 / 电话未接听升级（M5-12 / M5-13）</h2>
@@ -271,18 +286,18 @@ defineExpose({state,workspace,mayLeave,dirty,shiftDate,primaryUserId,backupUserI
       <button type="submit" class="primary" :disabled="locked||!escTicketId.trim()">执行升级并记录短信告知</button>
      </form>
 
-     <div class="table-wrap" v-if="state.board?.step_runs.length">
+     <div class="table-wrap" tabindex="0" role="region" aria-label="升级执行与短信意图流水，可横向滚动" v-if="state.board?.step_runs.length">
       <h3>最近升级执行与短信告知流水</h3>
-      <table class="proto-table">
+      <table class="proto-table"><caption>升级执行与短信意图流水</caption>
        <thead>
         <tr>
-         <th>记录时间</th>
-         <th>工单 ID</th>
-         <th>档位 / 策略版本</th>
-         <th>触发条件</th>
-         <th>未接听次数</th>
-         <th>升级结果</th>
-         <th>短信告知状态</th>
+         <th scope="col">记录时间</th>
+         <th scope="col">工单 ID</th>
+         <th scope="col">档位 / 策略版本</th>
+         <th scope="col">触发条件</th>
+         <th scope="col">未接听次数</th>
+         <th scope="col">升级结果</th>
+         <th scope="col">短信告知状态</th>
         </tr>
        </thead>
        <tbody>
@@ -345,17 +360,17 @@ defineExpose({state,workspace,mayLeave,dirty,shiftDate,primaryUserId,backupUserI
       </form>
      </div>
 
-     <div class="table-wrap" v-if="state.board?.rosters.length">
+     <div class="table-wrap" tabindex="0" role="region" aria-label="排班记录，可横向滚动" v-if="state.board?.rosters.length">
       <h3>当班主备排班列表</h3>
-      <table class="proto-table">
+      <table class="proto-table"><caption>排班记录</caption>
        <thead>
         <tr>
-         <th>日期 / 班次</th>
-         <th>交接时刻</th>
-         <th>主值班人</th>
-         <th>备值班人</th>
-         <th>版本</th>
-         <th>策略状态</th>
+         <th scope="col">日期 / 班次</th>
+         <th scope="col">交接时刻</th>
+         <th scope="col">主值班人</th>
+         <th scope="col">备值班人</th>
+         <th scope="col">版本</th>
+         <th scope="col">策略状态</th>
         </tr>
        </thead>
        <tbody>
@@ -371,17 +386,17 @@ defineExpose({state,workspace,mayLeave,dirty,shiftDate,primaryUserId,backupUserI
       </table>
      </div>
 
-     <div class="table-wrap" v-if="state.board?.handoffs.length">
+     <div class="table-wrap" tabindex="0" role="region" aria-label="交接记录，可横向滚动" v-if="state.board?.handoffs.length">
       <h3>18:00 交接班只追加历史台账</h3>
-      <table class="proto-table">
+      <table class="proto-table"><caption>交接记录</caption>
        <thead>
         <tr>
-         <th>交接时间</th>
-         <th>交班人 → 接班人</th>
-         <th>未确认</th>
-         <th>进行中</th>
-         <th>待复核</th>
-         <th>交接摘要</th>
+         <th scope="col">交接时间</th>
+         <th scope="col">交班人 → 接班人</th>
+         <th scope="col">未确认</th>
+         <th scope="col">进行中</th>
+         <th scope="col">待复核</th>
+         <th scope="col">交接摘要</th>
         </tr>
        </thead>
        <tbody>
@@ -399,15 +414,15 @@ defineExpose({state,workspace,mayLeave,dirty,shiftDate,primaryUserId,backupUserI
     </template>
 
     <template v-else>
-     <div class="table-wrap" v-if="state.board?.policies.length">
-      <table class="proto-table">
+     <div class="table-wrap" tabindex="0" role="region" aria-label="升级策略，可横向滚动" v-if="state.board?.policies.length">
+      <table class="proto-table"><caption>升级策略</caption>
        <thead>
         <tr>
-         <th>升级链档位</th>
-         <th>版本</th>
-         <th>未接听升级阈值</th>
-         <th>重呼叫间隔</th>
-         <th>升级步骤明细</th>
+         <th scope="col">升级链档位</th>
+         <th scope="col">版本</th>
+         <th scope="col">未接听升级阈值</th>
+         <th scope="col">重呼叫间隔</th>
+         <th scope="col">升级步骤明细</th>
         </tr>
        </thead>
        <tbody>
@@ -470,6 +485,8 @@ defineExpose({state,workspace,mayLeave,dirty,shiftDate,primaryUserId,backupUserI
 .form-grid label{display:grid;gap:6px;font-weight:600}
 .form-grid label.full{grid-column:1/-1}
 .table-wrap{max-width:100%;overflow:auto}
+.table-wrap:focus-visible,button:focus-visible,.back:focus-visible{outline:3px solid #2563eb;outline-offset:3px}
+caption{text-align:left;font-weight:700;padding:8px 0}
 .step-pill{display:inline-block;margin:2px 6px 2px 0;padding:2px 8px;border-radius:12px;background:#eef2ff;font-size:12px}
 .danger{color:#b91c1c;font-weight:700}
 button,input,select,textarea,.back{min-height:44px}

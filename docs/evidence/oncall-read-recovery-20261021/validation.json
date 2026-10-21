@@ -1,0 +1,31 @@
+{
+  "result": "PASS_LOCAL_LOGIC_DOM_BUILD_HTTP",
+  "new_tests": 24,
+  "vitest": {
+    "files_passed": 230,
+    "tests_passed": 3476
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 140,
+    "bootstrap_gzip_bytes": 179978,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "c035a784a88d6cdf995526aa54ae596f9072f1f0fc89273277db31926e64d648",
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/pages/OnCallBoardPage.vue": "403547d01f49e6b1c5730c096190283b85064f43ccd5901d18608601cd6ea3ba",
+    "apps/web/src/utils/onCallBoard.ts": "e447b55cddbd35df9360c931f7396c21ed3ef87a2e6bd2660a008eeae7857fea",
+    "apps/web/tests/onCallBoard.test.ts": "5b64177ea3962a2c4dcee78d21182ad1811ad3fee0683ea8005563e374d9ac75",
+    "apps/web/tests/onCallBoardPage.test.ts": "9d12ef50842b16f2541c1041c29f3b5f081afb73a32e3a6655134e76248b8177"
+  },
+  "api_contract_changed": false,
+  "database_changed": false,
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "actual_viewports": "NOT_RUN",
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0
+}

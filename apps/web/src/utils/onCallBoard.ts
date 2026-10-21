@@ -112,14 +112,14 @@ type WriteAttempt={path:string;method:'POST'|'PATCH';key:string;body:Record<stri
 
 export interface OnCallReceipt {path:string;identity:string;version:number|null;recordedAt:string}
 export interface OnCallBoardState {
- board:OnCallBoardPayload|null;receipt:OnCallReceipt|null;busy:'read'|'write'|null;error:unknown;attempt:WriteAttempt|null
+ board:OnCallBoardPayload|null;receipt:OnCallReceipt|null;readFailed:boolean;busy:'read'|'write'|null;error:unknown;attempt:WriteAttempt|null
 }
 export interface SlaReportState {
  report:SlaReportPayload|null;detail:SlaServiceDetailPayload|null;receipt:SlaMonthlyResultRecord|null;
  busy:'read'|'write'|null;error:unknown;attempt:WriteAttempt|null
 }
 
-export const emptyOnCallBoardState=():OnCallBoardState=>({board:null,receipt:null,busy:null,error:null,attempt:null})
+export const emptyOnCallBoardState=():OnCallBoardState=>({board:null,receipt:null,readFailed:false,busy:null,error:null,attempt:null})
 export const emptySlaReportState=():SlaReportState=>({report:null,detail:null,receipt:null,busy:null,error:null,attempt:null})
 
 export const shiftCodeLabels:Record<ShiftCode,string>={DAY:'白班（09:00-18:00）',NIGHT:'夜班（18:00-次日09:00）',FULL_DAY:'全天值班（24h）'}
@@ -270,29 +270,33 @@ export function createOnCallBoardWorkspace(client:{request<T>(path:string,option
  async function load(){
   if(disposed||!context||state.busy||state.attempt)return false
   const turn=++epoch,scope={...context},controller=new AbortController();abort=controller
-  state={...state,board:null,busy:'read',error:null};emit()
+  state={...state,board:null,busy:'read',error:null,readFailed:false};emit()
   try{
+   if(disposed||turn!==epoch||controller.signal.aborted)return false
    const raw=await client.request('/oncall/board?page_size=25',{signal:controller.signal})
    if(disposed||turn!==epoch)return false
    const board=readOnCallBoard(raw,scope)
-   abort=null;state={...state,board,busy:null,error:null};emit()
-   return true
+   abort=null;state={...state,board,busy:null,error:null,readFailed:false};emit()
+   return !disposed&&turn===epoch
   }catch(error){
    if(disposed||turn!==epoch)return false
-   abort=null;state={...state,busy:null,error};emit()
+   abort=null;state={...state,busy:null,error,readFailed:true};emit()
    return false
   }
  }
  async function send(original:WriteAttempt,retry=false){
-  const attempt=structuredClone(original)
+  if(disposed||!context||state.busy||(original.path==='/escalation-policies'?!context.canWriteConfig:!context.canWriteInternal))return false
+  const activeContext=context,attempt=structuredClone(original)
   const turn=++epoch,scope=context?{...context}:null
-  state={...state,busy:'write',error:null,receipt:null,attempt};emit()
+  state={...state,busy:'write',error:null,readFailed:false,receipt:null,attempt};emit()
   try{
+   if(disposed||turn!==epoch||context!==activeContext||(attempt.path==='/escalation-policies'?!context?.canWriteConfig:!context?.canWriteInternal))return false
    const raw=await client.request(attempt.path,{method:attempt.method,idempotencyKey:attempt.key,body:structuredClone(attempt.body)})
    if(disposed||turn!==epoch||!scope)return false
    const receipt=readOnCallReceipt(raw,scope,attempt)
    state={...state,board:null,receipt,busy:null,error:null,attempt:null};emit()
-   const reloadTurn=epoch+1;await load();return !disposed&&epoch===reloadTurn
+   if(disposed||turn!==epoch||context!==activeContext)return false
+   await load();return !disposed&&context===activeContext&&state.receipt?.path===receipt.path&&state.receipt?.identity===receipt.identity
   }catch(error){
    if(disposed||turn!==epoch)return false
    const keep=writeFailureUncertain(retry,error)
@@ -300,28 +304,34 @@ export function createOnCallBoardWorkspace(client:{request<T>(path:string,option
    return false
   }
  }
+ function commandKey(){const generation=epoch,key=newKey();if(generation!==epoch||disposed||!context)throw new Error('ONCALL_CONTEXT_CHANGED');if(typeof key!=='string'||!/^[A-Za-z0-9._:-]{1,128}$/.test(key))throw invalid();return key}
+ async function prepareWrite(path:string,method:'POST'|'PATCH',body:Record<string,unknown>){
+  const generation=epoch
+  try{const key=commandKey();if(generation!==epoch||disposed||!context)return false;return send({path,method,key,body})}catch(error){if(generation===epoch&&!disposed){state.error=error;state.readFailed=false;emit()}return false}
+ }
  async function submitRoster(input:{expected_version:number;shift_date:string;shift_code:ShiftCode;primary_oncall_user_id:string;backup_oncall_user_id:string|null;note:string|null}){
   if(disposed||!context||!context.canWriteInternal||state.busy||state.attempt)return false
-  return send({path:'/oncall/rosters',method:'POST',key:newKey(),body:{...input}})
+  return prepareWrite('/oncall/rosters','POST',structuredClone(input))
  }
  async function submitHandoff(input:{roster_id:string|null;incoming_user_id:string;note:string}){
   if(disposed||!context||!context.canWriteInternal||state.busy||state.attempt)return false
-  return send({path:'/oncall/handoffs',method:'POST',key:newKey(),body:{...input}})
+  return prepareWrite('/oncall/handoffs','POST',structuredClone(input))
  }
  async function submitEscalation(input:{ticket_id:string;tier:PolicyTierCode;step_order:number;trigger_condition:TriggerCondition;unanswered_phone_count:number}){
   if(disposed||!context||!context.canWriteInternal||state.busy||state.attempt)return false
-  return send({path:'/oncall/escalations',method:'POST',key:newKey(),body:{...input}})
+  return prepareWrite('/oncall/escalations','POST',structuredClone(input))
  }
  async function submitPolicyUpdate(input:{tier:PolicyTierCode;expected_version:number;unanswered_escalate_count:number;steps:EscalationStep[]}){
   if(disposed||!context||!context.canWriteConfig||state.busy||state.attempt)return false
-  return send({path:'/escalation-policies',method:'PATCH',key:newKey(),body:{...input}})
+  return prepareWrite('/escalation-policies','PATCH',structuredClone(input))
  }
  async function retry(){
   if(disposed||!context||state.busy||!state.attempt)return false
   return send(state.attempt,true)
  }
+ function cancelRead(){if(disposed||state.busy!=='read')return false;epoch++;abort?.abort();abort=null;state={...state,busy:null,error:null,readFailed:false};emit();return true}
  return{
-  state:snapshot,reset,load,submitRoster,submitHandoff,submitEscalation,submitPolicyUpdate,retry,
+  state:snapshot,reset,load,submitRoster,submitHandoff,submitEscalation,submitPolicyUpdate,retry,cancelRead,
   unresolved:()=>Boolean(state.busy==='write'||state.attempt),
   dispose(){disposed=true;epoch++;abort?.abort();abort=null}
  }

@@ -390,8 +390,12 @@ export function createSlaReportWorkspace(client:{request<T>(path:string,options?
   const period=String(state.attempt.body.report_month)
   return send(state.attempt,period,true)
  }
+ function cancelRead(){
+  if(disposed||state.busy!=='read')return false
+  epoch++;abort?.abort();abort=null;state={...state,busy:null,error:null};emit();return true
+ }
  return{
-  state:snapshot,reset,load,loadServiceDetail,submitMonthlyResult,retry,
+  state:snapshot,reset,load,loadServiceDetail,submitMonthlyResult,retry,cancelRead,
   unresolved:()=>Boolean(state.busy==='write'||state.attempt),
   dispose(){disposed=true;epoch++;abort?.abort();abort=null}
  }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed,onUnmounted,ref,shallowRef,watch} from 'vue'
+import {computed,nextTick,onUnmounted,ref,shallowRef,watch} from 'vue'
 import {onBeforeRouteLeave} from 'vue-router'
 import {api} from '../api/client'
 import {can,contextGeneration,session,switchingTenant} from '../stores/session'
@@ -22,12 +22,14 @@ const canWriteConfig=computed(()=>Boolean(permitted.value&&session.value?.user.r
 const periodInput=ref('')
 const freezeSnapshot=ref(false)
 watch(periodInput,()=>{freezeSnapshot.value=false},{flush:'sync'})
-const blocked=ref(false)
+const blocked=ref(false),readStatus=ref(''),queryButton=ref<HTMLButtonElement|null>(null),detailHeading=ref<HTMLElement|null>(null)
+let readTurn=0,readOrigin:HTMLButtonElement|null=null
 
-const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value,canWriteInternal.value,canWriteConfig.value]))
+const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,permitted.value,canWriteInternal.value,canWriteConfig.value]))
 const locked=computed(()=>!!state.value.busy||workspace.unresolved())
 
 watch(context,()=>{
+ readTurn++;readOrigin=null;readStatus.value='';blocked.value=false
  const s=session.value
  workspace.reset(permitted.value&&s?{
   tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,
@@ -36,8 +38,31 @@ watch(context,()=>{
  periodInput.value='';freezeSnapshot.value=false
 },{immediate:true,flush:'sync'})
 
+async function queryReport(){
+ if(locked.value)return false
+ const turn=++readTurn,key=context.value;readOrigin=queryButton.value;readStatus.value=''
+ const ok=await workspace.load(periodInput.value)
+ if(turn!==readTurn||key!==context.value)return false
+ if(ok)readStatus.value='已读取 '+state.value.report?.period+' 月报；未保存或冻结快照。'
+ return ok
+}
+async function readDetail(serviceId:string,event:Event){
+ const report=state.value.report;if(!report||locked.value)return false
+ const turn=++readTurn,key=context.value;readOrigin=event.currentTarget instanceof HTMLButtonElement?event.currentTarget:null;readStatus.value=''
+ const ok=await workspace.loadServiceDetail(report.period,serviceId)
+ if(turn!==readTurn||key!==context.value)return false
+ if(ok){readStatus.value='已读取服务区间解释；未保存或冻结快照。';await nextTick();if(turn===readTurn&&key===context.value)detailHeading.value?.focus()}
+ return ok
+}
+async function cancelRead(){
+ if(!workspace.cancelRead())return false
+ const turn=++readTurn,key=context.value,origin=readOrigin;readStatus.value='已取消读取，迟到结果不会显示；不会取消或撤销已保存快照。'
+ await nextTick();if(turn===readTurn&&key===context.value&&origin?.isConnected&&!origin.disabled)origin.focus()
+ return true
+}
 async function submitMonthlyEvaluation(){
  if(!state.value.report||periodInput.value!==state.value.report.period)return false
+ readTurn++;readStatus.value='';readOrigin=queryButton.value
  const existing=state.value.report.monthly_result
  const ok=await workspace.submitMonthlyResult({
   report_month:periodInput.value,
@@ -47,13 +72,15 @@ async function submitMonthlyEvaluation(){
  if(ok)freezeSnapshot.value=false
 }
 
+async function retryMonthly(){readTurn++;readStatus.value='';readOrigin=queryButton.value;return workspace.retry()}
+
 function mayLeave(){if(workspace.unresolved()){blocked.value=true;return false}return true}
 onBeforeRouteLeave(mayLeave)
 const unregister=contextTransitionGuards.register(mayLeave)
 function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
-onUnmounted(()=>{unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
-defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyEvaluation})
+onUnmounted(()=>{readTurn++;readOrigin=null;unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
+defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyEvaluation,queryReport,readDetail,cancelRead,readStatus})
 </script>
 <template>
  <section class="sla-reports">
@@ -71,11 +98,11 @@ defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyE
    </p>
 
    <div class="proto-toolbar">
-    <form class="period-bar" @submit.prevent="workspace.load(periodInput)">
+    <form class="period-bar" @submit.prevent="queryReport">
      <label>统计月份
       <input type="month" v-model="periodInput" :disabled="locked" required />
      </label>
-     <button type="submit" :disabled="locked">查询月报</button>
+     <button ref="queryButton" type="submit" :disabled="locked">查询月报</button>
     </form>
    </div>
 
@@ -83,8 +110,10 @@ defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyE
    <p v-if="state.report&&periodInput!==state.report.period" role="status">月份输入已改变。当前显示仍为 {{state.report.period}}，请先查询新月份；不能跨期保存。</p>
    <p v-if="state.receipt" role="status">已核对原保存回执：{{state.receipt.report_month}} · v{{state.receipt.version}} · {{state.receipt.frozen?'已冻结':'未冻结'}}。回读失败不代表保存失败，不自动重复提交。</p>
    <ApiErrorNotice :error="state.error" />
+   <p v-if="readStatus" role="status">{{readStatus}}</p>
+   <button v-if="state.busy==='read'" type="button" @click="cancelRead">取消读取月报或明细</button>
    <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">月度 SLA 快照提交结果尚未确认，请点击重试。</p>
-   <button v-if="state.attempt&&!state.busy" type="button" @click="workspace.retry()">重试提交月度快照</button>
+   <button v-if="state.attempt&&!state.busy" type="button" @click="retryMonthly">重试提交月度快照</button>
    <p v-if="state.busy" role="status" aria-live="polite">{{ state.busy==='write'?'正在保存/冻结月度 SLA 快照…':'正在计算 SLA 月报…' }}</p>
 
    <template v-if="state.report">
@@ -118,7 +147,7 @@ defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyE
 
     <div class="proto-panel workspace">
      <h2>服务节点可用性与区间明细（M5-9 / M5-10）</h2>
-     <div class="table-wrap">
+     <div class="table-wrap" tabindex="0" role="region" aria-label="SLA 数据表，可横向滚动">
       <table class="proto-table">
        <thead>
         <tr>
@@ -144,7 +173,7 @@ defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyE
          <td>{{ formatDurationSec(svc.mtta.p50_sec) }} / {{ formatDurationSec(svc.mttr.p50_sec) }}</td>
          <td>{{ serviceStatusLabels[svc.status] }}</td>
          <td>
-          <button type="button" :disabled="locked" @click="workspace.loadServiceDetail(state.report.period,svc.service_id)">
+          <button type="button" :disabled="locked" @click="readDetail(svc.service_id,$event)">
            查看区间解释
           </button>
          </td>
@@ -154,8 +183,8 @@ defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyE
      </div>
 
      <div v-if="state.detail" class="detail-box">
-      <h3>{{ state.detail.service.service_name }} · 可读时间区间解释（{{ state.detail.period }}）</h3>
-      <div class="table-wrap">
+      <h3 ref="detailHeading" tabindex="-1">{{ state.detail.service.service_name }} · 可读时间区间解释（{{ state.detail.period }}）</h3>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="SLA 数据表，可横向滚动">
        <table class="proto-table">
         <thead>
          <tr>
@@ -215,7 +244,7 @@ defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyE
       </div>
      </div>
 
-     <div class="table-wrap" v-if="state.report.live_monthly_evaluation.items.length">
+     <div class="table-wrap" tabindex="0" role="region" aria-label="逐工单 SLA 明细，可横向滚动" v-if="state.report.live_monthly_evaluation.items.length">
       <h3>本月逐工单 SLA 达标与原因明细</h3>
       <table class="proto-table">
        <thead>
@@ -257,7 +286,7 @@ defineExpose({state,workspace,mayLeave,periodInput,freezeSnapshot,submitMonthlyE
 .freeze-form{display:grid;gap:10px;margin-top:8px}
 .checkbox-label{display:flex;align-items:center;gap:8px;font-weight:600}
 .detail-box{display:grid;gap:10px;padding:12px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc}
-.table-wrap{max-width:100%;overflow:auto}
+.table-wrap{max-width:100%;overflow:auto}.table-wrap:focus-visible,h3[tabindex]:focus-visible{outline:3px solid #176bb5;outline-offset:3px}
 button,input,select,.back{min-height:44px}
 @media(max-width:760px){
  .eval-grid{grid-template-columns:1fr}

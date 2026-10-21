@@ -1,0 +1,32 @@
+{
+  "base_commit": "e7420b96f5e6159d9f2116788e05cda7dfca6788",
+  "scope": "FRONTEND_READ_RECOVERY_ONLY",
+  "result": "PASS_UNIT_DOM_BUILD_STATIC",
+  "web_tests": 3181,
+  "web_files": 216,
+  "new_tests": 8,
+  "focused_tests": 43,
+  "contract_tests": 173,
+  "build_id": "146c8f08050ddf878971b3d6ea394b2e8c6b04ad30ee9fb718850005dd2e69a4",
+  "bootstrap_gzip_bytes": 179752,
+  "api_version": "0.76.0_UNCHANGED",
+  "backend_and_migrations_changed": false,
+  "actual_http_reexecuted": false,
+  "post_cancel_supported": false,
+  "unknown_write_original_request_retained": true,
+  "confirmed_receipt_retained_on_cancelled_readback": true,
+  "account_version_clears_private_data": true,
+  "focus_validation": "VUE_DOM_NOT_BROWSER",
+  "browser_scripts_discovered": 51,
+  "browser_and_axe": "NOT_RUN",
+  "formal_acceptance": {
+    "total": 128,
+    "NOT_RUN": 128
+  },
+  "source_sha256": {
+    "apps/web/src/utils/onCallBoard.ts": "f15f12388ab72b5bb4e0cbcd2e97841dc14e66f2bee60ff27b677b85beedb8d4",
+    "apps/web/src/pages/SlaReportsPage.vue": "449bc1a7c5d7a7d1c04490d2808aaa1f119341cc0e88005a05c26412b69f608d",
+    "apps/web/tests/slaReportRecovery.test.ts": "1354d5fbc53ebd692289f7b313959e6b210f4fec4f5b911e716106de23676396",
+    "apps/web/tests/slaReportsPage.test.ts": "e2daee5079f83ed7ed0b5bb6edf63aa598faae4838832f8f99a8a532305b44ca"
+  }
+}

@@ -151,7 +151,29 @@ class PostgresOnCallEscalationIntegrationTest {
     }
 
     @Test void slaReportMonthlyResultFreezeAndImmutabilityGuards_M5_9_M5_10_M5_19() {
+        // This test must work alone on a fresh database, regardless of JUnit method order.
+        // A synthetic tier is an explicit test fixture, never a production default or approved fee.
+        var tiers = new PostgresServiceTierRepository(pool, platform);
+        var tierAccess = new cn.mop.domain.sla.ServiceTierRepository.Access(TENANT, padmin, padminVersion, UUID.randomUUID().toString());
+        if (tiers.current(tierAccess).isEmpty()) {
+            var tierCommand = new cn.mop.domain.sla.ServiceTierRepository.Command(0L, Tier.STANDARD,
+                cn.mop.domain.sla.ServiceTierRepository.EffectiveMode.IMMEDIATE,
+                null, null, null, "SYNTHETIC_MONTHLY_TEST_TIER_NO_APPROVED_FEE");
+            platform.idempotentAuthorized(padmin, TENANT, "POST /integration/monthly-fixture/service-tier",
+                UUID.randomUUID().toString(), "7".repeat(64), padminVersion,
+                () -> tiers.authorizeWrite(tierAccess), () -> tiers.applyChange(tierAccess, tierCommand, null));
+        }
+        String ticketId = registerAndOpenTicket();
         var mspAcc = ocAccess(msp, mspVersion);
+        platform.idempotentAuthorized(msp, TENANT, "POST /integration/monthly-fixture/handoff",
+            UUID.randomUUID().toString(), "5".repeat(64), mspVersion,
+            () -> oncall.authorizeWrite(mspAcc),
+            () -> oncall.recordHandoff(mspAcc, new HandoffCommand(null, padmin, "SYNTHETIC_MONTHLY_TEST_HANDOFF")));
+        platform.idempotentAuthorized(msp, TENANT, "POST /integration/monthly-fixture/escalation",
+            UUID.randomUUID().toString(), "6".repeat(64), mspVersion,
+            () -> oncall.authorizeWrite(mspAcc),
+            () -> oncall.triggerEscalation(mspAcc, new EscalationTriggerCommand(ticketId,
+                PolicyTier.STANDARD, 1, TriggerCondition.COUNTDOWN_ZERO, 0)));
         String currentPeriod = YearMonth.now(ZoneId.of("Asia/Shanghai")).toString();
         SlaReportView report = oncall.slaReport(mspAcc, currentPeriod);
         assertEquals(TENANT, report.tenantId());

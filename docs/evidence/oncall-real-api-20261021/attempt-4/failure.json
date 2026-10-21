@@ -1,0 +1,6 @@
+{
+  "stage": "business_and_http",
+  "error_type": "AssertionError",
+  "detail": "Production frontend workspaces rejected actual HTTP receipts",
+  "production_approved": false
+}

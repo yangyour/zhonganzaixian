@@ -72,7 +72,7 @@ const boardPayload=(patch:Record<string,unknown>={})=>({
   sms_notice_status:'INTENT_RECORDED_PENDING_GATEWAY',sms_notice_summary:'电话连续2次未接听自动升级并登记短信记录',
   recorded_by:actor,recorded_at:at
  }],
- auto_refresh_sec:15,handoff_local_time:'18:00',roster_policy_status:'CONFIG_PENDING_Q15',
+ auto_refresh_sec:30,handoff_local_time:'18:00',roster_policy_status:'CONFIG_PENDING_Q15',
  observed_at:at,source:'postgresql',...patch
 })
 
@@ -122,10 +122,10 @@ const reportPayload=(patch:Record<string,unknown>={})=>({
 describe('on-call board, 18:00 handoff, escalation policies and SLA monthly reports',()=>{
  it('validates on-call board payload and rejects invalid handoff time or self-handoff',()=>{
   const parsed=readOnCallBoard(boardPayload(),padminScope)
-  expect(parsed.auto_refresh_sec).toBe(15)
+  expect(parsed.auto_refresh_sec).toBe(30)
   expect(parsed.handoff_local_time).toBe('18:00')
   expect(parsed.roster_policy_status).toBe('CONFIG_PENDING_Q15')
-  expect(()=>readOnCallBoard(boardPayload({auto_refresh_sec:30}),padminScope)).toThrow()
+  expect(()=>readOnCallBoard(boardPayload({auto_refresh_sec:15}),padminScope)).toThrow()
   expect(()=>readOnCallBoard(boardPayload({handoff_local_time:'09:00'}),padminScope)).toThrow()
  })
 

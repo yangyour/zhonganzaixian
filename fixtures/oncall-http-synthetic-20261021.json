@@ -1,0 +1,2172 @@
+{
+  "contexts": {
+    "msp": {
+      "tenantId": "55000000-0000-4000-8000-000000000001",
+      "actorId": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+      "permissionVersion": 1,
+      "canWriteInternal": true,
+      "canWriteConfig": false
+    },
+    "padmin": {
+      "tenantId": "55000000-0000-4000-8000-000000000001",
+      "actorId": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+      "permissionVersion": 3,
+      "canWriteInternal": true,
+      "canWriteConfig": true
+    }
+  },
+  "board": {
+    "tenant_id": "55000000-0000-4000-8000-000000000001",
+    "kpis": {
+      "unacknowledged_count": 3,
+      "critical_count": 3,
+      "in_progress_count": 0,
+      "pending_review_count": 0,
+      "recovered_today_count": 0,
+      "mtta_p50_sec": null,
+      "mtta_target_sec": 300
+    },
+    "queue": [
+      {
+        "ticket_id": "48ef201e-ff50-42c1-b0a9-ec2d30bfd631",
+        "priority": "P1",
+        "state": "OPEN",
+        "tier_snapshot": "STANDARD",
+        "assignee_user_id": null,
+        "created_at": "2026-10-21T09:18:32.194Z",
+        "response_due_at": "2026-10-21T09:28:32.194Z",
+        "recovery_due_at": "2026-10-21T11:18:32.194Z",
+        "countdown_remaining_sec": 593,
+        "countdown_progress_pct": 0.01,
+        "breached": false,
+        "current_escalation_step": 2,
+        "next_escalation_step": 3,
+        "next_escalation_target_role": "SERVICE_MANAGER"
+      },
+      {
+        "ticket_id": "a51daf49-8f89-4a13-9889-3e74394bc4ea",
+        "priority": "P1",
+        "state": "OPEN",
+        "tier_snapshot": "STANDARD",
+        "assignee_user_id": null,
+        "created_at": "2026-10-21T09:18:31.731Z",
+        "response_due_at": "2026-10-21T09:28:31.731Z",
+        "recovery_due_at": "2026-10-21T11:18:31.731Z",
+        "countdown_remaining_sec": 592,
+        "countdown_progress_pct": 0.0117,
+        "breached": false,
+        "current_escalation_step": 2,
+        "next_escalation_step": 3,
+        "next_escalation_target_role": "SERVICE_MANAGER"
+      },
+      {
+        "ticket_id": "0baa0334-f13d-4338-b2d6-fd31827100f0",
+        "priority": "P1",
+        "state": "OPEN",
+        "tier_snapshot": "STANDARD",
+        "assignee_user_id": null,
+        "created_at": "2026-10-21T09:18:30.072Z",
+        "response_due_at": "2026-10-21T09:28:30.072Z",
+        "recovery_due_at": "2026-10-21T11:18:30.072Z",
+        "countdown_remaining_sec": 590,
+        "countdown_progress_pct": 0.015,
+        "breached": false,
+        "current_escalation_step": 2,
+        "next_escalation_step": 3,
+        "next_escalation_target_role": "SERVICE_MANAGER"
+      }
+    ],
+    "rosters": [
+      {
+        "id": "67c8bc66-ab83-46e4-968c-77ec463b2d87",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "version": 1,
+        "shift_date": "2026-10-22",
+        "shift_code": "DAY",
+        "handoff_local_time": "18:00",
+        "primary_oncall_user_id": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "backup_oncall_user_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "note": "SYNTHETIC_HTTP_ONLY",
+        "roster_policy_status": "CONFIG_PENDING_Q15",
+        "updated_by": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "updated_at": "2026-10-21T09:18:38.946Z"
+      },
+      {
+        "id": "5defb2d9-559e-46d2-b3c0-7d9b200bcc35",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "version": 1,
+        "shift_date": "2026-10-18",
+        "shift_code": "DAY",
+        "handoff_local_time": "18:00",
+        "primary_oncall_user_id": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "backup_oncall_user_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "note": "SYNTHETIC_D16_DAY_ROSTER",
+        "roster_policy_status": "CONFIG_PENDING_Q15",
+        "updated_by": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "updated_at": "2026-10-21T09:18:32.245Z"
+      }
+    ],
+    "handoffs": [
+      {
+        "id": "1c91163e-b120-4572-8a87-5225988366ad",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "roster_id": "67c8bc66-ab83-46e4-968c-77ec463b2d87",
+        "outgoing_user_id": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "incoming_user_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "handoff_local_time": "18:00",
+        "unacknowledged_count": 3,
+        "in_progress_count": 0,
+        "pending_review_count": 0,
+        "note": "SYNTHETIC_HTTP_HANDOFF",
+        "handed_off_at": "2026-10-21T09:18:39.002Z"
+      },
+      {
+        "id": "7f80b215-2dfa-4279-88c2-7016c2548b9d",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "roster_id": "5defb2d9-559e-46d2-b3c0-7d9b200bcc35",
+        "outgoing_user_id": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "incoming_user_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "handoff_local_time": "18:00",
+        "unacknowledged_count": 3,
+        "in_progress_count": 0,
+        "pending_review_count": 0,
+        "note": "SYNTHETIC_D16_1800_HANDOFF",
+        "handed_off_at": "2026-10-21T09:18:32.276Z"
+      },
+      {
+        "id": "60b31451-cedb-4d5d-b14c-79a033cf36ff",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "roster_id": null,
+        "outgoing_user_id": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "incoming_user_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "handoff_local_time": "18:00",
+        "unacknowledged_count": 2,
+        "in_progress_count": 0,
+        "pending_review_count": 0,
+        "note": "SYNTHETIC_MONTHLY_TEST_HANDOFF",
+        "handed_off_at": "2026-10-21T09:18:31.978Z"
+      },
+      {
+        "id": "c8d2b79f-e814-4227-8f42-e8fe30a6ec55",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "roster_id": null,
+        "outgoing_user_id": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "incoming_user_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "handoff_local_time": "18:00",
+        "unacknowledged_count": 1,
+        "in_progress_count": 0,
+        "pending_review_count": 0,
+        "note": "SYNTHETIC_MONTHLY_TEST_HANDOFF",
+        "handed_off_at": "2026-10-21T09:18:30.196Z"
+      }
+    ],
+    "policies": [
+      {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "tier": "BASIC",
+        "version": 0,
+        "unanswered_escalate_count": 2,
+        "unanswered_retry_interval_sec": null,
+        "steps": [
+          {
+            "step_order": 1,
+            "trigger_condition": "IMMEDIATE",
+            "wait_minutes": 0,
+            "target_role": "L1_ONCALL"
+          },
+          {
+            "step_order": 2,
+            "trigger_condition": "UNACKNOWLEDGED",
+            "wait_minutes": 15,
+            "target_role": "L2_ONCALL"
+          },
+          {
+            "step_order": 3,
+            "trigger_condition": "UNACKNOWLEDGED",
+            "wait_minutes": 30,
+            "target_role": "CUSTOMER_ADMIN"
+          },
+          {
+            "step_order": 4,
+            "trigger_condition": "UNRESOLVED",
+            "wait_minutes": 60,
+            "target_role": "SERVICE_MANAGER"
+          }
+        ],
+        "policy_status": "CONFIG_PENDING_Q15",
+        "updated_by": null,
+        "updated_at": "2026-10-21T09:18:39.155Z",
+        "persisted": false
+      },
+      {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "tier": "STANDARD",
+        "version": 3,
+        "unanswered_escalate_count": 3,
+        "unanswered_retry_interval_sec": null,
+        "steps": [
+          {
+            "step_order": 1,
+            "trigger_condition": "IMMEDIATE",
+            "wait_minutes": 0,
+            "target_role": "L1_ONCALL"
+          },
+          {
+            "step_order": 2,
+            "trigger_condition": "UNACKNOWLEDGED",
+            "wait_minutes": 15,
+            "target_role": "DUTY_LEAD"
+          },
+          {
+            "step_order": 3,
+            "trigger_condition": "UNRESOLVED",
+            "wait_minutes": 120,
+            "target_role": "SERVICE_MANAGER"
+          }
+        ],
+        "policy_status": "CONFIG_PENDING_Q15",
+        "updated_by": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "updated_at": "2026-10-21T09:18:38.976Z",
+        "persisted": true
+      },
+      {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "tier": "ADVANCED",
+        "version": 0,
+        "unanswered_escalate_count": 2,
+        "unanswered_retry_interval_sec": null,
+        "steps": [
+          {
+            "step_order": 1,
+            "trigger_condition": "IMMEDIATE",
+            "wait_minutes": 0,
+            "target_role": "L1_ONCALL"
+          },
+          {
+            "step_order": 2,
+            "trigger_condition": "UNACKNOWLEDGED",
+            "wait_minutes": 30,
+            "target_role": "DUTY_LEAD"
+          },
+          {
+            "step_order": 3,
+            "trigger_condition": "UNRESOLVED",
+            "wait_minutes": 120,
+            "target_role": "SERVICE_MANAGER"
+          }
+        ],
+        "policy_status": "CONFIG_PENDING_Q15",
+        "updated_by": null,
+        "updated_at": "2026-10-21T09:18:39.155Z",
+        "persisted": false
+      },
+      {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "tier": "FALLBACK",
+        "version": 0,
+        "unanswered_escalate_count": 2,
+        "unanswered_retry_interval_sec": null,
+        "steps": [
+          {
+            "step_order": 1,
+            "trigger_condition": "IMMEDIATE",
+            "wait_minutes": 0,
+            "target_role": "L1_ONCALL"
+          },
+          {
+            "step_order": 2,
+            "trigger_condition": "UNACKNOWLEDGED",
+            "wait_minutes": 15,
+            "target_role": "L2_ONCALL"
+          },
+          {
+            "step_order": 3,
+            "trigger_condition": "UNACKNOWLEDGED",
+            "wait_minutes": 30,
+            "target_role": "CUSTOMER_ADMIN"
+          },
+          {
+            "step_order": 4,
+            "trigger_condition": "UNRESOLVED",
+            "wait_minutes": 60,
+            "target_role": "SERVICE_MANAGER"
+          }
+        ],
+        "policy_status": "CONFIG_PENDING_Q15",
+        "updated_by": null,
+        "updated_at": "2026-10-21T09:18:39.155Z",
+        "persisted": false
+      }
+    ],
+    "step_runs": [
+      {
+        "id": "2a06e040-c6e7-40b9-a950-1694fff34bee",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "ticket_id": "48ef201e-ff50-42c1-b0a9-ec2d30bfd631",
+        "tier": "STANDARD",
+        "policy_version": 3,
+        "step_order": 1,
+        "trigger_condition": "PHONE_UNANSWERED",
+        "wait_minutes": 0,
+        "target_role": "L1_ONCALL",
+        "unanswered_phone_count": 3,
+        "escalated_to_step": 2,
+        "escalated_target_role": "DUTY_LEAD",
+        "sms_notice_status": "INTENT_RECORDED_PENDING_GATEWAY",
+        "sms_notice_summary": "电话连续3次未接听，已自动升级至步骤2(DUTY_LEAD)并登记短信告知记录（外部短信网关待配置）",
+        "recorded_by": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "recorded_at": "2026-10-21T09:18:39.035Z"
+      },
+      {
+        "id": "2438781a-86c8-4e05-9b8b-1787ceb074aa",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "ticket_id": "48ef201e-ff50-42c1-b0a9-ec2d30bfd631",
+        "tier": "STANDARD",
+        "policy_version": 2,
+        "step_order": 1,
+        "trigger_condition": "PHONE_UNANSWERED",
+        "wait_minutes": 0,
+        "target_role": "L1_ONCALL",
+        "unanswered_phone_count": 2,
+        "escalated_to_step": 2,
+        "escalated_target_role": "DUTY_LEAD",
+        "sms_notice_status": "INTENT_RECORDED_PENDING_GATEWAY",
+        "sms_notice_summary": "电话连续2次未接听，已自动升级至步骤2(DUTY_LEAD)并登记短信告知记录（外部短信网关待配置）",
+        "recorded_by": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "recorded_at": "2026-10-21T09:18:32.374Z"
+      },
+      {
+        "id": "6e5983ec-4802-4d58-af91-89c54b5dfec6",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "ticket_id": "48ef201e-ff50-42c1-b0a9-ec2d30bfd631",
+        "tier": "STANDARD",
+        "policy_version": 2,
+        "step_order": 1,
+        "trigger_condition": "PHONE_UNANSWERED",
+        "wait_minutes": 0,
+        "target_role": "L1_ONCALL",
+        "unanswered_phone_count": 1,
+        "escalated_to_step": null,
+        "escalated_target_role": null,
+        "sms_notice_status": "NOT_REQUIRED",
+        "sms_notice_summary": null,
+        "recorded_by": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "recorded_at": "2026-10-21T09:18:32.361Z"
+      },
+      {
+        "id": "52a59144-3fc3-402a-ad3c-56fa32095cdc",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "ticket_id": "48ef201e-ff50-42c1-b0a9-ec2d30bfd631",
+        "tier": "STANDARD",
+        "policy_version": 1,
+        "step_order": 1,
+        "trigger_condition": "COUNTDOWN_ZERO",
+        "wait_minutes": 0,
+        "target_role": "L1_ONCALL",
+        "unanswered_phone_count": 0,
+        "escalated_to_step": 2,
+        "escalated_target_role": "SERVICE_MANAGER",
+        "sms_notice_status": "NOT_REQUIRED",
+        "sms_notice_summary": null,
+        "recorded_by": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "recorded_at": "2026-10-21T09:18:32.299Z"
+      },
+      {
+        "id": "0c63ed25-791e-488d-8f7e-cbe8f405d293",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "ticket_id": "a51daf49-8f89-4a13-9889-3e74394bc4ea",
+        "tier": "STANDARD",
+        "policy_version": 1,
+        "step_order": 1,
+        "trigger_condition": "COUNTDOWN_ZERO",
+        "wait_minutes": 0,
+        "target_role": "L1_ONCALL",
+        "unanswered_phone_count": 0,
+        "escalated_to_step": 2,
+        "escalated_target_role": "SERVICE_MANAGER",
+        "sms_notice_status": "NOT_REQUIRED",
+        "sms_notice_summary": null,
+        "recorded_by": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "recorded_at": "2026-10-21T09:18:32.010Z"
+      },
+      {
+        "id": "f238db01-dc4c-426e-829e-f9662ff9aaf8",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "ticket_id": "0baa0334-f13d-4338-b2d6-fd31827100f0",
+        "tier": "STANDARD",
+        "policy_version": 1,
+        "step_order": 1,
+        "trigger_condition": "COUNTDOWN_ZERO",
+        "wait_minutes": 0,
+        "target_role": "L1_ONCALL",
+        "unanswered_phone_count": 0,
+        "escalated_to_step": 2,
+        "escalated_target_role": "SERVICE_MANAGER",
+        "sms_notice_status": "NOT_REQUIRED",
+        "sms_notice_summary": null,
+        "recorded_by": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "recorded_at": "2026-10-21T09:18:30.228Z"
+      }
+    ],
+    "auto_refresh_sec": 30,
+    "handoff_local_time": "18:00",
+    "roster_policy_status": "CONFIG_PENDING_Q15",
+    "observed_at": "2026-10-21T09:18:39.155Z",
+    "source": "postgresql"
+  },
+  "exchanges": [
+    {
+      "kind": "roster",
+      "actor": "msp",
+      "path": "/oncall/rosters",
+      "method": "POST",
+      "body": {
+        "expected_version": 0,
+        "shift_date": "2026-10-22",
+        "shift_code": "DAY",
+        "primary_oncall_user_id": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "backup_oncall_user_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "note": "SYNTHETIC_HTTP_ONLY"
+      },
+      "response": {
+        "id": "67c8bc66-ab83-46e4-968c-77ec463b2d87",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "version": 1,
+        "shift_date": "2026-10-22",
+        "shift_code": "DAY",
+        "handoff_local_time": "18:00",
+        "primary_oncall_user_id": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "backup_oncall_user_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "note": "SYNTHETIC_HTTP_ONLY",
+        "roster_policy_status": "CONFIG_PENDING_Q15",
+        "updated_by": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "updated_at": "2026-10-21T09:18:38.946Z"
+      }
+    },
+    {
+      "kind": "policy",
+      "actor": "padmin",
+      "path": "/escalation-policies",
+      "method": "PATCH",
+      "body": {
+        "tier": "STANDARD",
+        "expected_version": 2,
+        "unanswered_escalate_count": 3,
+        "steps": [
+          {
+            "step_order": 1,
+            "trigger_condition": "IMMEDIATE",
+            "wait_minutes": 0,
+            "target_role": "L1_ONCALL"
+          },
+          {
+            "step_order": 2,
+            "trigger_condition": "UNACKNOWLEDGED",
+            "wait_minutes": 15,
+            "target_role": "DUTY_LEAD"
+          },
+          {
+            "step_order": 3,
+            "trigger_condition": "UNRESOLVED",
+            "wait_minutes": 120,
+            "target_role": "SERVICE_MANAGER"
+          }
+        ]
+      },
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "tier": "STANDARD",
+        "version": 3,
+        "unanswered_escalate_count": 3,
+        "unanswered_retry_interval_sec": null,
+        "steps": [
+          {
+            "step_order": 1,
+            "trigger_condition": "IMMEDIATE",
+            "wait_minutes": 0,
+            "target_role": "L1_ONCALL"
+          },
+          {
+            "step_order": 2,
+            "trigger_condition": "UNACKNOWLEDGED",
+            "wait_minutes": 15,
+            "target_role": "DUTY_LEAD"
+          },
+          {
+            "step_order": 3,
+            "trigger_condition": "UNRESOLVED",
+            "wait_minutes": 120,
+            "target_role": "SERVICE_MANAGER"
+          }
+        ],
+        "policy_status": "CONFIG_PENDING_Q15",
+        "updated_by": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "updated_at": "2026-10-21T09:18:38.976Z",
+        "persisted": true
+      }
+    },
+    {
+      "kind": "handoff",
+      "actor": "msp",
+      "path": "/oncall/handoffs",
+      "method": "POST",
+      "body": {
+        "roster_id": "67c8bc66-ab83-46e4-968c-77ec463b2d87",
+        "incoming_user_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "note": "SYNTHETIC_HTTP_HANDOFF"
+      },
+      "response": {
+        "id": "1c91163e-b120-4572-8a87-5225988366ad",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "roster_id": "67c8bc66-ab83-46e4-968c-77ec463b2d87",
+        "outgoing_user_id": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "incoming_user_id": "133c0b3e-ab7d-d109-9572-32b92cb5883e",
+        "handoff_local_time": "18:00",
+        "unacknowledged_count": 3,
+        "in_progress_count": 0,
+        "pending_review_count": 0,
+        "note": "SYNTHETIC_HTTP_HANDOFF",
+        "handed_off_at": "2026-10-21T09:18:39.002Z"
+      }
+    },
+    {
+      "kind": "escalation",
+      "actor": "msp",
+      "path": "/oncall/escalations",
+      "method": "POST",
+      "body": {
+        "ticket_id": "48ef201e-ff50-42c1-b0a9-ec2d30bfd631",
+        "tier": "STANDARD",
+        "step_order": 1,
+        "trigger_condition": "PHONE_UNANSWERED",
+        "unanswered_phone_count": 3
+      },
+      "response": {
+        "id": "2a06e040-c6e7-40b9-a950-1694fff34bee",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "ticket_id": "48ef201e-ff50-42c1-b0a9-ec2d30bfd631",
+        "tier": "STANDARD",
+        "policy_version": 3,
+        "step_order": 1,
+        "trigger_condition": "PHONE_UNANSWERED",
+        "wait_minutes": 0,
+        "target_role": "L1_ONCALL",
+        "unanswered_phone_count": 3,
+        "escalated_to_step": 2,
+        "escalated_target_role": "DUTY_LEAD",
+        "sms_notice_status": "INTENT_RECORDED_PENDING_GATEWAY",
+        "sms_notice_summary": "电话连续3次未接听，已自动升级至步骤2(DUTY_LEAD)并登记短信告知记录（外部短信网关待配置）",
+        "recorded_by": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "recorded_at": "2026-10-21T09:18:39.035Z"
+      }
+    }
+  ],
+  "monthly": {
+    "before": {
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "period": "1999-01",
+      "current_tier": "STANDARD",
+      "target_availability_pct": null,
+      "kpis": {
+        "mean_verified_availability_pct": null,
+        "unavailable_union_total_sec": 0,
+        "mtta": {
+          "sample_count": 0,
+          "unrecovered_count": 0,
+          "mean_sec": null,
+          "p50_sec": null,
+          "p95_sec": null
+        },
+        "mttr": {
+          "sample_count": 0,
+          "unrecovered_count": 0,
+          "mean_sec": null,
+          "p50_sec": null,
+          "p95_sec": null
+        },
+        "unrecovered_total_count": 0,
+        "unknown_interval_total_sec": 48211200
+      },
+      "services": [
+        {
+          "service_id": "ASSET_028a8298-0893-f976-3da5-80fc618926c0",
+          "service_name": "虚构设备 14",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_1a83b738-4653-eb93-9ee6-3010dd829bcf",
+          "service_name": "虚构设备 11",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_1ee0d0ee-7ff5-665d-e94c-19c74cb92195",
+          "service_name": "虚构设备 09",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_43eaaddf-aeec-98bf-a295-f8cd4932a439",
+          "service_name": "虚构设备 17",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_471b3ff3-304a-1f80-1314-990e5b8d2373",
+          "service_name": "虚构设备 01",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_4ea45648-e146-ee88-e2c8-f16e395a6950",
+          "service_name": "虚构设备 12",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_56f208c0-6130-0241-36c9-1ab3dfcb3ea6",
+          "service_name": "虚构设备 05",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_5d5b9cee-947a-4dda-ca9a-a7c9e971f74e",
+          "service_name": "虚构设备 04",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_618e3723-88d9-0e93-ac41-ab201f93bca2",
+          "service_name": "虚构设备 18",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_6d038393-66b2-f259-4d05-558b1c0f5cee",
+          "service_name": "虚构设备 13",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_7f3da505-ca69-fc4d-077b-2347dc2b647d",
+          "service_name": "虚构设备 15",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_9d181951-3f86-bb2d-d6d6-7cfa37d5b5e8",
+          "service_name": "虚构设备 03",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_a4c401c5-1164-04b0-7202-1f14cad9ec15",
+          "service_name": "虚构设备 02",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_bcdd58f3-3e23-00bf-8e85-7d2e08cec91e",
+          "service_name": "虚构设备 08",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_c6464d6c-bca6-6897-50ee-59870c3b5c24",
+          "service_name": "虚构设备 10",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_c93a14e2-5634-14ee-247c-72ba4ffec72e",
+          "service_name": "虚构设备 06",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_cbb51948-8fd6-6e61-1c08-b53851aedfe3",
+          "service_name": "虚构设备 16",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_d5d0367e-cb4b-cafe-9d52-21bb6b89ae38",
+          "service_name": "虚构设备 07",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        }
+      ],
+      "monthly_result": null,
+      "live_monthly_evaluation": {
+        "tier_snapshot": "STANDARD",
+        "total_ticket_count": 0,
+        "applicable_count": 0,
+        "met_count": 0,
+        "not_met_count": 0,
+        "unresolved_count": 0,
+        "not_applicable_count": 0,
+        "achievement_numerator": null,
+        "achievement_denominator": null,
+        "achievement_rate_pct": null,
+        "compensation_ratio": 0.2,
+        "monthly_fee_fen": null,
+        "compensation_amount_fen": null,
+        "compensation_status": "CONFIG_PENDING_Q26",
+        "candidate_fixed_ratio_fen": null,
+        "candidate_shortfall_weighted_fen": null,
+        "formula_version": "customer-20261020-availability-v2",
+        "items": []
+      },
+      "formula_version": "customer-20261020-availability-v2",
+      "timezone": "Asia/Shanghai",
+      "observed_at": "2026-10-21T09:18:39.082Z",
+      "source": "postgresql"
+    },
+    "body": {
+      "report_month": "1999-01",
+      "expected_version": 0,
+      "freeze": true
+    },
+    "response": {
+      "id": "afd74ec3-da48-4633-be60-c9aa7397bb46",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "report_month": "1999-01",
+      "version": 1,
+      "tier_snapshot": "STANDARD",
+      "total_ticket_count": 0,
+      "applicable_count": 0,
+      "met_count": 0,
+      "not_met_count": 0,
+      "unresolved_count": 0,
+      "not_applicable_count": 0,
+      "achievement_numerator": null,
+      "achievement_denominator": null,
+      "achievement_rate_pct": null,
+      "compensation_ratio": 0.2,
+      "monthly_fee_fen": null,
+      "compensation_amount_fen": null,
+      "compensation_status": "CONFIG_PENDING_Q26",
+      "candidate_fixed_ratio_fen": null,
+      "candidate_shortfall_weighted_fen": null,
+      "formula_version": "customer-20261020-availability-v2",
+      "items": [],
+      "frozen": true,
+      "frozen_at": "2026-10-21T09:18:39.112Z",
+      "evaluated_by": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+      "evaluated_at": "2026-10-21T09:18:39.112Z"
+    },
+    "after": {
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "period": "1999-01",
+      "current_tier": "STANDARD",
+      "target_availability_pct": null,
+      "kpis": {
+        "mean_verified_availability_pct": null,
+        "unavailable_union_total_sec": 0,
+        "mtta": {
+          "sample_count": 0,
+          "unrecovered_count": 0,
+          "mean_sec": null,
+          "p50_sec": null,
+          "p95_sec": null
+        },
+        "mttr": {
+          "sample_count": 0,
+          "unrecovered_count": 0,
+          "mean_sec": null,
+          "p50_sec": null,
+          "p95_sec": null
+        },
+        "unrecovered_total_count": 0,
+        "unknown_interval_total_sec": 48211200
+      },
+      "services": [
+        {
+          "service_id": "ASSET_028a8298-0893-f976-3da5-80fc618926c0",
+          "service_name": "虚构设备 14",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_1a83b738-4653-eb93-9ee6-3010dd829bcf",
+          "service_name": "虚构设备 11",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_1ee0d0ee-7ff5-665d-e94c-19c74cb92195",
+          "service_name": "虚构设备 09",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_43eaaddf-aeec-98bf-a295-f8cd4932a439",
+          "service_name": "虚构设备 17",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_471b3ff3-304a-1f80-1314-990e5b8d2373",
+          "service_name": "虚构设备 01",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_4ea45648-e146-ee88-e2c8-f16e395a6950",
+          "service_name": "虚构设备 12",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_56f208c0-6130-0241-36c9-1ab3dfcb3ea6",
+          "service_name": "虚构设备 05",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_5d5b9cee-947a-4dda-ca9a-a7c9e971f74e",
+          "service_name": "虚构设备 04",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_618e3723-88d9-0e93-ac41-ab201f93bca2",
+          "service_name": "虚构设备 18",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_6d038393-66b2-f259-4d05-558b1c0f5cee",
+          "service_name": "虚构设备 13",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_7f3da505-ca69-fc4d-077b-2347dc2b647d",
+          "service_name": "虚构设备 15",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_9d181951-3f86-bb2d-d6d6-7cfa37d5b5e8",
+          "service_name": "虚构设备 03",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_a4c401c5-1164-04b0-7202-1f14cad9ec15",
+          "service_name": "虚构设备 02",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_bcdd58f3-3e23-00bf-8e85-7d2e08cec91e",
+          "service_name": "虚构设备 08",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_c6464d6c-bca6-6897-50ee-59870c3b5c24",
+          "service_name": "虚构设备 10",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_c93a14e2-5634-14ee-247c-72ba4ffec72e",
+          "service_name": "虚构设备 06",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_cbb51948-8fd6-6e61-1c08-b53851aedfe3",
+          "service_name": "虚构设备 16",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        },
+        {
+          "service_id": "ASSET_d5d0367e-cb4b-cafe-9d52-21bb6b89ae38",
+          "service_name": "虚构设备 07",
+          "target_pct": null,
+          "agreed_service_sec": 2678400,
+          "approved_exclusion_sec": 0,
+          "effective_service_sec": 0,
+          "unavailable_union_sec": 0,
+          "unknown_interval_sec": 2678400,
+          "known_available_sec": 0,
+          "verified_availability_pct": null,
+          "upper_bound_availability_pct": null,
+          "incident_count": 0,
+          "mtta": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "mttr": {
+            "sample_count": 0,
+            "unrecovered_count": 0,
+            "mean_sec": null,
+            "p50_sec": null,
+            "p95_sec": null
+          },
+          "unrecovered_count": 0,
+          "status": "INSUFFICIENT_SAMPLES",
+          "unknown_policy_status": "UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR",
+          "interval_details": [
+            {
+              "kind": "UNKNOWN_DATA_GAP",
+              "start": "1998-12-31T16:00:00Z",
+              "end": "1999-01-31T16:00:00Z",
+              "duration_sec": 2678400,
+              "explanation": "无数据/未知区间（不默认视为可用，同时从可用率分子和分母剔除）"
+            }
+          ]
+        }
+      ],
+      "monthly_result": {
+        "id": "afd74ec3-da48-4633-be60-c9aa7397bb46",
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "report_month": "1999-01",
+        "version": 1,
+        "tier_snapshot": "STANDARD",
+        "total_ticket_count": 0,
+        "applicable_count": 0,
+        "met_count": 0,
+        "not_met_count": 0,
+        "unresolved_count": 0,
+        "not_applicable_count": 0,
+        "achievement_numerator": null,
+        "achievement_denominator": null,
+        "achievement_rate_pct": null,
+        "compensation_ratio": 0.2,
+        "monthly_fee_fen": null,
+        "compensation_amount_fen": null,
+        "compensation_status": "CONFIG_PENDING_Q26",
+        "candidate_fixed_ratio_fen": null,
+        "candidate_shortfall_weighted_fen": null,
+        "formula_version": "customer-20261020-availability-v2",
+        "items": [],
+        "frozen": true,
+        "frozen_at": "2026-10-21T09:18:39.112Z",
+        "evaluated_by": "af857e54-c0ca-6856-f31b-8e98ff5414d6",
+        "evaluated_at": "2026-10-21T09:18:39.112Z"
+      },
+      "live_monthly_evaluation": {
+        "tier_snapshot": "STANDARD",
+        "total_ticket_count": 0,
+        "applicable_count": 0,
+        "met_count": 0,
+        "not_met_count": 0,
+        "unresolved_count": 0,
+        "not_applicable_count": 0,
+        "achievement_numerator": null,
+        "achievement_denominator": null,
+        "achievement_rate_pct": null,
+        "compensation_ratio": 0.2,
+        "monthly_fee_fen": null,
+        "compensation_amount_fen": null,
+        "compensation_status": "CONFIG_PENDING_Q26",
+        "candidate_fixed_ratio_fen": null,
+        "candidate_shortfall_weighted_fen": null,
+        "formula_version": "customer-20261020-availability-v2",
+        "items": []
+      },
+      "formula_version": "customer-20261020-availability-v2",
+      "timezone": "Asia/Shanghai",
+      "observed_at": "2026-10-21T09:18:39.132Z",
+      "source": "postgresql"
+    }
+  }
+}

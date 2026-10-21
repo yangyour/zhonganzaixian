@@ -48,7 +48,7 @@ export interface EscalationStepRun {
 export interface OnCallBoardPayload {
  tenant_id:string;kpis:OnCallBoardKpis;queue:OnCallQueueItem[];rosters:OnCallRosterEntry[];
  handoffs:OnCallHandoffEntry[];policies:EscalationPolicy[];step_runs:EscalationStepRun[];
- auto_refresh_sec:15;handoff_local_time:'18:00';roster_policy_status:'CONFIG_PENDING_Q15';
+ auto_refresh_sec:30;handoff_local_time:'18:00';roster_policy_status:'CONFIG_PENDING_Q15';
  observed_at:string;source:'postgresql'
 }
 
@@ -166,7 +166,7 @@ const isTargetRole=(v:unknown):v is TargetRole=>['L1_ONCALL','L2_ONCALL','DUTY_L
 
 export function readOnCallBoard(raw:unknown,scope:OnCallContext):OnCallBoardPayload{
  if(!validContext(scope)||!exportExact(raw,['tenant_id','kpis','queue','rosters','handoffs','policies','step_runs','auto_refresh_sec','handoff_local_time','roster_policy_status','observed_at','source']))throw invalid()
- if(raw.tenant_id!==scope.tenantId||raw.auto_refresh_sec!==15||raw.handoff_local_time!=='18:00'||raw.roster_policy_status!=='CONFIG_PENDING_Q15'||raw.source!=='postgresql')throw invalid()
+ if(raw.tenant_id!==scope.tenantId||raw.auto_refresh_sec!==30||raw.handoff_local_time!=='18:00'||raw.roster_policy_status!=='CONFIG_PENDING_Q15'||raw.source!=='postgresql')throw invalid()
  exportTime(raw.observed_at)
  if(!exportExact(raw.kpis,['unacknowledged_count','critical_count','in_progress_count','pending_review_count','recovered_today_count','mtta_p50_sec','mtta_target_sec']))throw invalid()
  if(!Array.isArray(raw.queue)||!Array.isArray(raw.rosters)||!Array.isArray(raw.handoffs)||!Array.isArray(raw.policies)||!Array.isArray(raw.step_runs))throw invalid()

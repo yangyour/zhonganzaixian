@@ -1,0 +1,9 @@
+{
+  "exit": 0,
+  "cases": [
+    {
+      "name": "slaReportMonthlyResultFreezeAndImmutabilityGuards_M5_9_M5_10_M5_19()",
+      "passed": true
+    }
+  ]
+}

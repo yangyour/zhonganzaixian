@@ -1,0 +1,34 @@
+{
+  "base_commit": "b66f8d6ad4f1c405e5b63dc281ebfdd3c5e93e80",
+  "api_contract": "0.70.0",
+  "result": "PASS",
+  "attempts_preserved": 5,
+  "final_real_pg_tests": 4,
+  "final_http_checks": 27,
+  "production_ts_actual_http_receipt_cases": 5,
+  "transport_scope": "CAPTURE_REPLAY_NOT_LIVE_FRONTEND_TRANSPORT",
+  "web_tests": 2641,
+  "contract_tests": 161,
+  "python_tests": 111,
+  "java_verify": {
+    "tests": 3779,
+    "skipped": 996,
+    "failures": 0,
+    "errors": 0,
+    "executed": 2783
+  },
+  "typecheck_build_static_gates": "PASS",
+  "build_id": "fe7f73eecc99a83e041d210ed1887e5235987e6972b01626f0296d72f99aadc5",
+  "browser_axe": "NOT_RUN",
+  "migrations": "UNCHANGED_V1_V45",
+  "all_temporary_environments_cleaned": true,
+  "source_sha256": {
+    "server/persistence/src/test/java/cn/mop/persistence/PostgresOnCallEscalationIntegrationTest.java": "d9031fffac51493483bde64c4736d5d1567748f6743282ac18b7f03dd710896c",
+    "apps/web/src/utils/onCallBoard.ts": "32aa1bdf3f16e46539ddbb6b4780ffe95714bffb9b902b529bd8f2d44565cbb3",
+    "apps/web/src/pages/OnCallBoardPage.vue": "83280a21475596089b42d583549996598f5af9d46e31f164bb9d5abfe2d8767a",
+    "apps/web/tests/onCallActualHttp.test.ts": "d917b419e467227d0980ba0bca170f61d5950697c7f75c9c480547b67ab115eb",
+    "fixtures/oncall-http-synthetic-20261021.json": "91739a1fc96feab7b0ded7afad8e69582a856d3bea1523a54dbd29d8ac4db494",
+    "contracts/local-api.openapi.json": "e246c4d75c193c4f01eed25b2e06c7d075b85466b92bc26f617ac3a25f3b5006",
+    "tools/oncall-escalation-contract.mjs": "9cbfa806b0b115d83aeb2aa04540e0a6704b832e23140fb450e5e900991a48f6"
+  }
+}

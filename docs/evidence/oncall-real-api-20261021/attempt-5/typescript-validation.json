@@ -1,0 +1,8 @@
+{
+  "result": "PASS",
+  "oncall_command_receipts": 4,
+  "monthly_command_receipts": 1,
+  "scope": "ACTUAL_HTTP_PAYLOAD_REPLAY_PRODUCTION_TYPESCRIPT_WORKSPACES",
+  "browser": false,
+  "transport": "RECORDED_HTTP_NOT_LIVE_FRONTEND_TRANSPORT"
+}

@@ -248,8 +248,8 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.69.0');
-  assert.equal(contract.info.version, '0.69.0');
+  assert.equal(contract.info.version, '0.70.0');
+  assert.equal(contract.info.version, '0.70.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -944,7 +944,7 @@ test('补充SLA口径只能绑定明确发布版本，不接收策略或身份�
 
 test('SLA提醒记录不等于路由或送达，读取无业务写入',()=>{const p=contract.paths['/tickets/{ticketId}/sla/reminders'];assert.equal(p.get['x-mop-read-only'],true);assert.equal(p.post,undefined);const s=contract.components.schemas.TicketSlaReminder;assert.equal(s.properties.notification_status.const,'NOT_ROUTED');assert.equal(s.properties.delivered.const,false);assert.deepEqual(s.properties.progress.enum,[0.5,0.8,1]);});
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.69.0');
+  assert.equal(contract.info.version, '0.70.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/workflow/sla'].get;
@@ -1008,7 +1008,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.69.0');
+  assert.equal(contract.info.version, '0.70.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1057,7 +1057,7 @@ test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26�
       sms_notice_status: 'INTENT_RECORDED_PENDING_GATEWAY', sms_notice_summary: '电话连续2次未接听自动升级并登记短信记录',
       recorded_by: id('2'), recorded_at: '2026-10-18T10:05:00Z',
     }],
-    auto_refresh_sec: 15, handoff_local_time: '18:00', roster_policy_status: 'CONFIG_PENDING_Q15',
+    auto_refresh_sec: 30, handoff_local_time: '18:00', roster_policy_status: 'CONFIG_PENDING_Q15',
     observed_at: '2026-10-18T10:05:00Z', source: 'postgresql',
   };
   assert.ok(validates('OnCallBoardResult', { data: board, trace_id: 'synthetic' }));
@@ -1315,4 +1315,14 @@ test('monitoring registration history has explicit new and legacy origins, with 
  for(const action of ['MONITORING_REGISTER','LEGACY_MONITORING_REGISTER'])assert.equal(ajv.compile(history)({action,actor_id:'64000000-0000-4000-8000-000000000001',occurred_at:'2026-10-21T00:00:00Z',version:1}),true)
  assert.equal(ajv.compile(history)({action:'AUTO_CREATE_FROM_MONITORING_EVENT'}),false)
  assert.equal(ajv.compile(contract.components.schemas.TicketRegistration.properties.contact_phone)(''),true)
+});
+
+test('actual isolated on-call HTTP responses match 30-second schema and original receipt contracts', () => {
+  const captured = read('../fixtures/oncall-http-synthetic-20261021.json');
+  assert.ok(validates('OnCallBoardResult', { data: captured.board, trace_id: 'synthetic-actual-http' }));
+  assert.equal(validates('OnCallBoardResult', { data: { ...captured.board, auto_refresh_sec: 15 }, trace_id: 'synthetic' }), false);
+  const names = { roster: 'OnCallRosterResult', handoff: 'OnCallHandoffResult', policy: 'EscalationPolicyResult', escalation: 'EscalationStepRunResult' };
+  for (const exchange of captured.exchanges) assert.ok(validates(names[exchange.kind], { data: exchange.response, trace_id: 'synthetic-actual-http' }), exchange.kind);
+  assert.ok(validates('SlaMonthlyResultEnvelope', { data: captured.monthly.response, trace_id: 'synthetic-actual-http' }));
+  assert.ok(validates('SlaReportResult', { data: captured.monthly.after, trace_id: 'synthetic-actual-http' }));
 });

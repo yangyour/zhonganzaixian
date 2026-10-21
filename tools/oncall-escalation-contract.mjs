@@ -257,7 +257,7 @@ export function addOnCallEscalationContract(contract) {
       handoffs: { type: 'array', maxItems: 100, items: ref('OnCallHandoffEntry') },
       policies: { type: 'array', maxItems: 8, items: ref('EscalationPolicy') },
       step_runs: { type: 'array', maxItems: 100, items: ref('EscalationStepRun') },
-      auto_refresh_sec: { const: 15 },
+      auto_refresh_sec: { const: 30 },
       handoff_local_time: { const: '18:00' },
       roster_policy_status: { const: 'CONFIG_PENDING_Q15' },
       observed_at: time,
@@ -315,7 +315,7 @@ export function addOnCallEscalationContract(contract) {
   })
 
   contract.paths['/oncall/board'] = {
-    get: base('getOnCallBoard', '读取值班看板6项KPI、15s自动刷新工单倒计时队列、18:00交接班台账与升级链配置（M5-12/M5-13）', ref('OnCallBoardResult'), {
+    get: base('getOnCallBoard', '读取值班看板6项KPI、30s自动刷新工单倒计时队列、18:00交接班台账与升级链配置（M5-12/M5-13）', ref('OnCallBoardResult'), {
       parameters: [{ name: 'page_size', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } }],
       'x-mop-roles': ['msp', 'padmin'],
       'x-mop-capability': 'tickets:read',
@@ -350,7 +350,7 @@ export function addOnCallEscalationContract(contract) {
     }),
   }
   contract.paths['/oncall/escalations'] = {
-    post: base('triggerOnCallEscalation', '触发倒计时归零或电话连续2次未接听自动升级并登记短信告知记录（M5-12/M5-13）', ref('EscalationStepRunResult'), {
+    post: base('triggerOnCallEscalation', '按当前策略处理倒计时或未接听升级，短信仅登记待网关意图，不代表送达（M5-12/M5-13）', ref('EscalationStepRunResult'), {
       parameters: writeHeaders,
       requestBody: { required: true, content: { 'application/json': { schema: ref('EscalationTriggerInput') } } },
       'x-mop-roles': ['msp', 'padmin'],

@@ -70,7 +70,7 @@ function clearRefreshTimer(){if(refreshTimer){clearInterval(refreshTimer);refres
 function startRefreshTimer(){
  clearRefreshTimer()
  if(!permitted.value)return
- refreshTimer=setInterval(()=>{if(permitted.value&&!locked.value&&!dirty.value&&!document.hidden&&!document.activeElement?.closest('form'))void workspace.load()},15000)
+ refreshTimer=setInterval(()=>{if(permitted.value&&!locked.value&&!dirty.value&&!document.hidden&&!document.activeElement?.closest('form'))void workspace.load()},30000)
 }
 
 watch(context,()=>{
@@ -151,14 +151,14 @@ defineExpose({state,workspace,mayLeave,dirty,shiftDate,primaryUserId,backupUserI
   <div class="page-heading proto-page-head">
    <div>
     <h1>值班看板与升级链管理 <span class="proto-badge">{{ session?.tenant.name }}</span></h1>
-    <p>15s 自动刷新值班队列、18:00 交接班只追加台账及四套可配置升级链（M5-12 / M5-13）。</p>
+    <p>30s 自动刷新值班队列、18:00 交接班只追加台账及四套可配置升级链（M5-12 / M5-13）。</p>
    </div>
    <RouterLink to="/sla-reports" class="back">SLA 月报与赔付</RouterLink>
   </div>
   <p class="panel" v-if="!permitted">当前身份无权访问内部值班看板，或正在切换租户。</p>
   <template v-else>
    <p class="proto-scope-note">
-    本看板每 15s 自动刷新工单 SLA 倒计时队列，交接班固定于每日 18:00 固化未确认、进行中、待复核工单计数（M5-12）。电话未接听升级以实际策略和显式执行记录为准，短信仅登记待网关意图，不代表已经发送或送达（M5-13）；详细排班轮换细则与重呼叫间隔保持待客户确认（CONFIG_PENDING_Q15）。
+    本看板每 30s 自动刷新工单 SLA 倒计时队列，交接班固定于每日 18:00 固化未确认、进行中、待复核工单计数（M5-12）。电话未接听升级以实际策略和显式执行记录为准，短信仅登记待网关意图，不代表已经发送或送达（M5-13）；详细排班轮换细则与重呼叫间隔保持待客户确认（CONFIG_PENDING_Q15）。
    </p>
    <p v-if="dirty" role="status">存在未保存输入，自动刷新已暂停；离开前会提醒。</p>
    <p v-if="state.receipt" role="status">原操作回执已核对：{{state.receipt.identity}} · {{displayTime(state.receipt.recordedAt)}}。后续回读失败不表示原操作未保存。</p>
@@ -202,7 +202,7 @@ defineExpose({state,workspace,mayLeave,dirty,shiftDate,primaryUserId,backupUserI
       <button type="button" :class="{active:tab==='roster'}" :aria-pressed="tab==='roster'" :disabled="locked" @click="tab='roster'">当班排班与 18:00 交接班</button>
       <button type="button" :class="{active:tab==='policy'}" :aria-pressed="tab==='policy'" :disabled="locked" @click="tab='policy'">四套升级策略配置</button>
      </div>
-     <button type="button" :disabled="locked" @click="workspace.load()">立即刷新 (15s)</button>
+     <button type="button" :disabled="locked" @click="workspace.load()">立即刷新 (30s)</button>
     </div>
 
     <ApiErrorNotice :error="state.error" />

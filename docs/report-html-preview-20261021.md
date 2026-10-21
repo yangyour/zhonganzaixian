@@ -25,3 +25,5 @@
 详见 evidence/report-html-preview-20261021/validation.json。纯渲染、真实 Vue/jsdom 交互、捕获 Java 控制器夹具经生产读取器到 HTML 的验证分别记录。夹具回放不是本批新增真实 HTTP 联调。
 
 真实 Chromium/axe/视觉/辅助技术验收 NOT_RUN：当前浏览器启动受进程 socket 权限限制，云浏览器不能连接执行环境 loopback。未绕过权限，未冒充全站 WCAG 2.2 AA 已达标。正式合同 128 TC 状态不因此改变。
+
+后续补充：[受保护 PDF 草稿预览](report-pdf-preview-20261021.md)已完成本地功能回归；它不是上述尚缺的正式PDF批准、发布与交付链路。

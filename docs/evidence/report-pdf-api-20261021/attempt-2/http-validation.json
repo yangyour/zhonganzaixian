@@ -1,0 +1,112 @@
+{
+  "result": "FAILED",
+  "scope": "LOOPBACK_SYNTHETIC_PDF_ONLY",
+  "checks": [
+    {
+      "case": "padmin_csrf",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_login",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_switch_2",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "disabled_font_config",
+      "actor": "padmin",
+      "status": 503,
+      "expected": 503,
+      "content_type": "application/json",
+      "cache_control": "no-store",
+      "error_code": "REPORT_PDF_UNCONFIGURED",
+      "error_message": "PDF 草稿字体或摘要配置未就绪；请使用 HTML 草稿预览，不会生成替代文件"
+    },
+    {
+      "case": "padmin_csrf",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_login",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_switch_2",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_csrf",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_login",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_switch_2",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "fresh_report_detail",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "bound_pdf_download",
+      "actor": "padmin",
+      "status": 503,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store",
+      "error_code": "REPORT_PDF_RENDER_FAILED",
+      "error_message": "PDF 草稿的字体或版面不能完整呈现当前内容；未生成残缺文件，可使用 HTML 预览"
+    }
+  ],
+  "provider_sends": false,
+  "report_publication": false,
+  "api_stopped": true,
+  "safe_renderer_diagnostics": [
+    "event_id=org.apache.fop.fonts.FontEventProducer.glyphNotAvailable severity=EventSeverity:WARN"
+  ]
+}

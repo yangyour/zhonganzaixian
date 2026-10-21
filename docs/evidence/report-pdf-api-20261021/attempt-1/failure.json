@@ -1,0 +1,6 @@
+{
+  "stage": "business_and_http",
+  "error_type": "AssertionError",
+  "detail": "('bound_pdf_download', 503, 200)",
+  "production_approved": false
+}

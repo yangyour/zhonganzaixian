@@ -1,0 +1,96 @@
+{
+  "exit": 0,
+  "expected": {
+    "PostgresInspectionQuarterlyReportIntegrationTest": 16
+  },
+  "results": {
+    "PostgresInspectionQuarterlyReportIntegrationTest": {
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "cases": [
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "unknownExpectedSourceHashConflictsWithoutWrites()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "nonAdminAndStaleMembershipCannotCreateOrRead()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "snapshotAndAuditReceiptCommitAtomicallyAndFreshRepositoryRendersSameDocument()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "currentAuthorizationPrecedesOriginalReceiptReplay()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "metadataListDoesNotLoadFrozenBodies()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "databaseRejectsChangedSourceHashPeriodFingerprintAndFalsePublication()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "crossTenantCollectionAndReportAndMissingObjectAre404()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "corruptedFrozenOutputFailsClosedWithNoLiveFallback()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "verifierRejectsSameCountWeakenedChecksAndRestoresSessionSettings()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "laterWorksheetAndTemplateChangesCannotReplaceFrozenReport()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "runtimeCannotUpdateDeleteOrTruncateSnapshot()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "structureAndRuntimeAclMatchCandidate()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "metadataPaginationAndReadsDoNotWrite()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "unprotectedWritesAndNestedReadsAreRejected()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "callerFailureRollsBackSnapshotAuditAndReceipt()",
+      "passed": true
+    },
+    {
+      "class": "PostgresInspectionQuarterlyReportIntegrationTest",
+      "test": "sameKeyConcurrentConnectionsProduceOneSnapshot()",
+      "passed": true
+    }
+  ]
+}

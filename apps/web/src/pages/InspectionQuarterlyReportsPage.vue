@@ -10,6 +10,7 @@ import {createReportWorkspace,emptyReportState} from '../utils/inspectionQuarter
 import {createSourceCollectionWorkspace,emptySourceCollectionState} from '../utils/inspectionSourceCollectionWorkspace'
 import {inspectionUuid} from '../utils/inspectionTemplates'
 import {readReportPayload,pendingReportConfiguration,type ReportContext,type ReportConfiguration} from '../utils/inspectionQuarterlyReports'
+import {fetchReportPdf,downloadReportPdf} from '../utils/inspectionReportPdf'
 import {renderReportPreview,downloadReportPreview} from '../utils/inspectionReportPreview'
 import {readReportDetail} from '../utils/inspectionQuarterlyReports'
 import {displayTime} from '../utils/display'
@@ -21,17 +22,18 @@ const sourceState=shallowRef(emptySourceCollectionState()),sourceReader=createSo
 const label=ref(''),year=ref(''),quarter=ref(''),sourceId=ref(''),configuration=ref(pendingReportConfiguration()),validation=ref(''),rowPage=ref(0),expanded=ref(''),sourceExpanded=ref('')
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&session.value.user.role==='padmin'&&can('inspection_quarterly_reports:read')&&!switchingTenant.value))
 const writable=computed(()=>permitted.value&&can('inspection_quarterly_reports:write')&&can('inspection_source_collections:read'))
-const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value,writable.value]))
+const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,permitted.value,writable.value]))
 function context():ReportContext|null{const s=session.value;return s&&permitted.value?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true,canWrite:writable.value}:null}
-const previewButton=ref<HTMLButtonElement|null>(null)
+const previewButton=ref<HTMLButtonElement|null>(null),pdfButton=ref<HTMLButtonElement|null>(null),previewMode=ref<'html'|'pdf'>('html')
 const previewBusy=ref(false),previewError=ref(''),previewStatus=ref('')
 let previewAbort:AbortController|null=null,previewTurn=0
 function cancelPreview(){previewTurn++;previewAbort?.abort();previewAbort=null;previewBusy.value=false;previewError.value='';previewStatus.value=''}
 watch(()=>[contextKey.value,state.value.selected?.id,state.value.selected?.document_sha256],cancelPreview,{flush:'sync'})
-async function cancelPreviewByUser(){cancelPreview();previewStatus.value='已取消，本次未发起下载。';await nextTick();previewButton.value?.focus()}
+async function cancelPreviewByUser(){if(!previewBusy.value)return;cancelPreview();const turn=previewTurn,key=contextKey.value;previewStatus.value='已取消，本次未发起下载。';await nextTick();if(turn!==previewTurn||key!==contextKey.value)return;(previewMode.value==='pdf'?pdfButton:previewButton).value?.focus()}
 async function downloadPreview(){
  const selected=state.value.selected,scope=context()
  if(!selected||!scope||previewBusy.value||state.value.busy)return false
+ previewMode.value='html'
  const id=selected.id,expectedHash=selected.document_sha256,turn=++previewTurn,controller=new AbortController();previewAbort=controller;previewBusy.value=true;previewError.value='';previewStatus.value=''
  const current=()=>turn===previewTurn&&!controller.signal.aborted&&permitted.value&&state.value.selected?.id===id&&state.value.selected.document_sha256===expectedHash
  try{
@@ -41,6 +43,14 @@ async function downloadPreview(){
   const html=renderReportPreview(verified);if(!current())return false
   downloadReportPreview(html,id);previewStatus.value='已发起 HTML 草稿下载，请检查浏览器下载记录；不代表正式发布或文件已保存。';return true
  }catch(error){if(current())previewError.value=error instanceof Error?error.message:'预览生成失败，请手动重试';return false}
+ finally{if(turn===previewTurn){previewBusy.value=false;previewAbort=null}}
+}
+async function downloadPdfPreview(){
+ const selected=state.value.selected,scope=context();if(!selected||!scope||previewBusy.value||state.value.busy)return false
+ previewMode.value='pdf';const id=selected.id,hash=selected.document_sha256,key=contextKey.value,turn=++previewTurn,controller=new AbortController();previewAbort=controller;previewBusy.value=true;previewError.value='';previewStatus.value=''
+ const current=()=>turn===previewTurn&&!controller.signal.aborted&&key===contextKey.value&&permitted.value&&state.value.selected?.id===id&&state.value.selected.document_sha256===hash
+ try{const file=await fetchReportPdf({id,tenantId:scope.tenantId,documentHash:hash,signal:controller.signal,active:current,onUnauthorized:()=>api.onUnauthorized()});if(!current())return false;downloadReportPdf(file);previewStatus.value=`已发起 ${file.pages} 页 PDF 草稿下载，请检查浏览器记录；不代表已保存、批准或发布。`;return true}
+ catch(error){if(current())previewError.value=error instanceof Error?error.message:'PDF 草稿未下载，请手动重试或使用 HTML 预览';return false}
  finally{if(turn===previewTurn){previewBusy.value=false;previewAbort=null}}
 }
 const locked=computed(()=>!writable.value||Boolean(state.value.busy)||Boolean(state.value.attempt)||Boolean(sourceState.value.busy))
@@ -67,7 +77,7 @@ onBeforeRouteLeave(mayLeave);const unregister=contextTransitionGuards.register(m
 function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()||dirty.value){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
 onUnmounted(()=>{cancelPreview();unregister();workspace.dispose();sourceReader.dispose();window.removeEventListener('beforeunload',beforeUnload)})
-defineExpose({downloadPreview,cancelPreview,previewBusy,previewError,previewStatus,state,sourceState,label,year,quarter,sourceId,configuration,validation,save,retry,begin,unlockRejected,readSource,payload,select,browse,hasUnresolved:workspace.unresolved})
+defineExpose({downloadPreview,downloadPdfPreview,cancelPreview,previewBusy,previewError,previewStatus,state,sourceState,label,year,quarter,sourceId,configuration,validation,save,retry,begin,unlockRejected,readSource,payload,select,browse,hasUnresolved:workspace.unresolved})
 </script>
 <template>
 <section class="quarterly-report-page">
@@ -81,7 +91,7 @@ defineExpose({downloadPreview,cancelPreview,previewBusy,previewError,previewStat
  <section v-if="state.attempt" class="panel original-request" aria-live="polite"><h2>固定原请求</h2><p v-if="state.attempt.state==='uncertain'">结果未知。仅重放相同请求和幂等键；列表和详情读取不能确认本次写入，重试拒绝也不能证明之前没有保存。</p><p v-else-if="state.attempt.state==='accepted'">原保存回执已核对，元数据不代表完整冻结正文已核对。</p><p v-else>原请求已拒绝，原输入保留；解锁后手动修改，不自动更换来源。</p><div class="actions"><button v-if="state.attempt.state==='uncertain'" :disabled="Boolean(state.busy)" @click="retry">恢复原请求</button><button v-if="state.attempt.state==='rejected'" :disabled="Boolean(state.busy)" @click="unlockRejected">保留输入并解锁</button><button v-if="state.receipt" :disabled="Boolean(state.busy)" @click="select(state.receipt.id)">回读已保存冻结报告</button><button v-if="state.attempt.state==='accepted'&&writable" :disabled="Boolean(state.busy)" @click="begin">新建另一份季度草稿</button></div></section>
  <section class="panel report-list"><div class="heading-row"><h2>已保存季度草稿 · 仅元数据</h2><button :disabled="Boolean(state.busy)" @click="browse()">刷新列表</button></div><p>刷新不提交新报告，不解除未知写入，不重新汇总当前来源。</p><p v-if="!state.page" class="empty-panel">{{ state.busy==='read'?'正在读取，数量未知':state.error?'读取失败，旧列表不作成功结果':'尚未读取' }}</p><template v-else><div class="table-scroll" tabindex="0" role="region" aria-label="季度报告列表，可横向滚动"><table><thead><tr><th>报告标签</th><th>期次</th><th>记录时间</th><th>状态</th><th>操作</th></tr></thead><tbody><tr v-for="r in state.page.items" :key="r.id"><td>{{r.label}}<small class="hash">{{r.id}}</small></td><td>{{r.year}} Q{{r.quarter}}</td><td>{{displayTime(r.recorded_at)}}</td><td>DRAFT · 未发布<small>正文未读取</small></td><td><button :disabled="Boolean(state.busy)" @click="select(r.id)">读取冻结报告</button></td></tr></tbody></table></div><p v-if="!state.page.items.length">当前页没有报告，不代表没有资产或巡检完成。</p><div class="actions"><button v-if="state.paged" :disabled="Boolean(state.busy)" @click="browse()">返回第一页</button><button :disabled="Boolean(state.busy)||!state.page.has_more" @click="browse(true)">下一页</button></div></template></section>
  <section v-if="state.selected" class="panel report-detail"><h2>{{state.selected.label}} · {{state.selected.year}} Q{{state.selected.quarter}}</h2><p>冻结文档、来源、模板、执行单与报告输入摘要已核对。以下为已保存输出；没有重读当前头部或重算历史。</p><p class="warning">DRAFT · 配置未批准 · 不可发布 · 未发布 · 来源人工自述未核验 · 租户总资产未知</p>
-  <div class="actions"><button ref="previewButton" :disabled="previewBusy||Boolean(state.busy)" @click="downloadPreview">下载 HTML 草稿预览</button><button v-if="previewBusy" @click="cancelPreviewByUser">取消预览下载</button></div><p>下载前重新验证权限及冻结内容。文件含租户数据，请妥善保存；离线副本无法随权限撤销而收回。仅导出全部资产输出与摘要，不含完整来源原文和附件，不是正式 PDF。</p><p v-if="previewBusy" role="status">正在重新核对并生成预览…</p><p v-if="previewStatus" role="status">{{previewStatus}}</p><p v-if="previewError" role="alert">{{previewError}}</p>
+  <div class="actions"><button ref="previewButton" :disabled="previewBusy||Boolean(state.busy)" @click="downloadPreview">下载 HTML 草稿预览</button><button ref="pdfButton" :disabled="previewBusy||Boolean(state.busy)" @click="downloadPdfPreview">下载 PDF 草稿预览</button><button v-if="previewBusy" @click="cancelPreviewByUser">取消预览下载</button></div><p>下载前重新验证权限及冻结内容。文件含租户数据，请妥善保存；离线副本无法随权限撤销而收回。仅预览全部资产输出与摘要，不含完整来源原文和附件。PDF 同样是未批准草稿，并非正式报告；需配置匹配摘要的本地字体，缺字或版面异常会拒绝生成。PDF 技术上限为 200 页、200,000 文字字符与 8 MiB，未通过 PDF/UA 或屏幕阅读器验收。</p><p v-if="previewBusy" role="status">正在重新核对并生成预览…</p><p v-if="previewStatus" role="status">{{previewStatus}}</p><p v-if="previewError" role="alert">{{previewError}}</p>
   <details open><summary>冻结配置与来源</summary><dl class="facts"><div v-for="(v,k) in state.selected.frozen_document.configuration" :key="k"><dt>{{k}}</dt><dd>{{v===null?'未配置（null）':v}}</dd></div></dl><p class="hash">来源集合：{{state.selected.source_collection_id}}</p><p class="hash">来源文档 SHA256：{{state.selected.source_document_sha256}}</p><p class="hash">来源清单 SHA256：{{state.selected.source_manifest_sha256}}</p><p class="hash">报告输入 SHA256：{{state.selected.report_sha256}}</p><p class="hash">冻结文档 SHA256：{{state.selected.document_sha256}}</p></details>
   <h3>已选来源汇总（非租户覆盖率）</h3><dl class="facts"><div><dt>捕获资产</dt><dd>{{state.selected.frozen_document.output.summary.capturedAssets}}</dd></div><div><dt>选定资产</dt><dd>{{state.selected.frozen_document.output.summary.selectedAssets}}</dd></div><div><dt>待解决选取</dt><dd>{{state.selected.frozen_document.output.summary.unresolvedAssets}}</dd></div><div><dt>检查项</dt><dd>{{state.selected.frozen_document.output.summary.totalItems}}</dd></div><div><dt>正常</dt><dd>{{state.selected.frozen_document.output.summary.normal}}</dd></div><div><dt>建议关注</dt><dd>{{state.selected.frozen_document.output.summary.attention}}</dd></div><div><dt>需处理</dt><dd>{{state.selected.frozen_document.output.summary.requiresAction}}</dd></div><div><dt>未填写</dt><dd>{{state.selected.frozen_document.output.summary.unanswered}}</dd></div></dl>
   <h3>待解决事项</h3><ul><li v-for="r in state.selected.frozen_document.output.pending_reasons" :key="r">{{r}}</li></ul>

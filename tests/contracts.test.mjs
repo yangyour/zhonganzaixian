@@ -248,8 +248,8 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.75.0');
-  assert.equal(contract.info.version, '0.75.0');
+  assert.equal(contract.info.version, '0.76.0');
+  assert.equal(contract.info.version, '0.76.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -944,7 +944,7 @@ test('补充SLA口径只能绑定明确发布版本，不接收策略或身份�
 
 test('SLA提醒记录不等于路由或送达，读取无业务写入',()=>{const p=contract.paths['/tickets/{ticketId}/sla/reminders'];assert.equal(p.get['x-mop-read-only'],true);assert.equal(p.post,undefined);const s=contract.components.schemas.TicketSlaReminder;assert.equal(s.properties.notification_status.const,'NOT_ROUTED');assert.equal(s.properties.delivered.const,false);assert.deepEqual(s.properties.progress.enum,[0.5,0.8,1]);});
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.75.0');
+  assert.equal(contract.info.version, '0.76.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/workflow/sla'].get;
@@ -1008,7 +1008,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.75.0');
+  assert.equal(contract.info.version, '0.76.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1387,3 +1387,8 @@ test('owner source listing preserves upload route and validates actual 20+3 meta
  for(const patch of [{can_import:true},{scope:'ALL'},{object_key:'secret'}])assert.equal(validate({data:{...capture.first,...patch},trace_id:'synthetic'}),false)
  const item={...capture.first.items[0],parsed_artifact:{}};assert.equal(validate({data:{...capture.first,items:[item],next_cursor:null},trace_id:'synthetic'}),false)
 });
+test('PDF draft download requires a strong frozen hash and keeps binary and JSON failures distinct',()=>{
+ const route=contract.paths['/inspection-quarterly-reports/{id}/preview.pdf'];assert.ok(route.get);assert.equal(route.post,undefined);assert.equal(route.get.requestBody,undefined);assert.equal(route.get['x-mop-read-only'],true);assert.deepEqual(route.get['x-mop-capabilities'],['inspection_quarterly_reports:read'])
+ const match=route.get.parameters.find(p=>p.name==='If-Match');assert.equal(match.required,true);assert.equal(ajv.compile(match.schema)('"'+'a'.repeat(64)+'"'),true);for(const bad of ['*','a'.repeat(64),'W/"'+'a'.repeat(64)+'"'])assert.equal(ajv.compile(match.schema)(bad),false)
+ assert.ok(route.get.responses[200].content['application/pdf']);for(const status of [401,403,412,413,428,503])assert.ok(route.get.responses[status].content['application/json']);assert.equal(route.get.responses[200].headers['X-MOP-Preview-Status'].schema.const,'DRAFT')
+})

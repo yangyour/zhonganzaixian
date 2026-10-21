@@ -1,0 +1,105 @@
+{
+  "result": "FAILED",
+  "scope": "LOOPBACK_SYNTHETIC_PDF_ONLY",
+  "checks": [
+    {
+      "case": "padmin_csrf",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_login",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_switch_2",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "disabled_font_config",
+      "actor": "padmin",
+      "status": 503,
+      "expected": 503,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_csrf",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_login",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_switch_2",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_csrf",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_login",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "msp_switch_2",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "fresh_report_detail",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "bound_pdf_download",
+      "actor": "padmin",
+      "status": 503,
+      "expected": 200,
+      "content_type": "application/json",
+      "cache_control": "no-store"
+    }
+  ],
+  "provider_sends": false,
+  "report_publication": false,
+  "api_stopped": true
+}

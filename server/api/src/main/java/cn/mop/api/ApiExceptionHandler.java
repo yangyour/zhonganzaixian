@@ -18,12 +18,12 @@ public class ApiExceptionHandler {
     @ExceptionHandler(DomainException.class)
     ResponseEntity<Map<String,Object>> domain(DomainException exception,HttpServletRequest request){
         audit(request,exception.code);
-        return ResponseEntity.status(exception.status).body(ApiResponse.failure(exception.code,exception.getMessage(),exception.details,request));
+        return ResponseEntity.status(exception.status).contentType(org.springframework.http.MediaType.APPLICATION_JSON).body(ApiResponse.failure(exception.code,exception.getMessage(),exception.details,request));
     }
     @ExceptionHandler({HttpMessageNotReadableException.class,org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class})
-    ResponseEntity<Map<String,Object>> invalid(Exception exception,HttpServletRequest request){audit(request,"VALIDATION_ERROR");return ResponseEntity.badRequest().body(ApiResponse.failure("VALIDATION_ERROR","请求必须为合法 JSON 和约定字段类型",List.of(),request));}
+    ResponseEntity<Map<String,Object>> invalid(Exception exception,HttpServletRequest request){audit(request,"VALIDATION_ERROR");return ResponseEntity.badRequest().contentType(org.springframework.http.MediaType.APPLICATION_JSON).body(ApiResponse.failure("VALIDATION_ERROR","请求必须为合法 JSON 和约定字段类型",List.of(),request));}
     @ExceptionHandler({org.springframework.web.multipart.MultipartException.class,org.springframework.web.multipart.support.MissingServletRequestPartException.class})
-    ResponseEntity<Map<String,Object>> multipart(Exception exception,HttpServletRequest request){audit(request,"VALIDATION_ERROR");String message=ApiResponse.route(request).equals("/api/v1/assets/import-sources")?"multipart 格式无效、字段缺失或导入原文件超过20971520 bytes":"multipart 格式无效、字段缺失或照片超过5000000 bytes";return ResponseEntity.badRequest().body(ApiResponse.failure("VALIDATION_ERROR",message,List.of(),request));}
+    ResponseEntity<Map<String,Object>> multipart(Exception exception,HttpServletRequest request){audit(request,"VALIDATION_ERROR");String message=ApiResponse.route(request).equals("/api/v1/assets/import-sources")?"multipart 格式无效、字段缺失或导入原文件超过20971520 bytes":"multipart 格式无效、字段缺失或照片超过5000000 bytes";return ResponseEntity.badRequest().contentType(org.springframework.http.MediaType.APPLICATION_JSON).body(ApiResponse.failure("VALIDATION_ERROR",message,List.of(),request));}
     @ExceptionHandler(Exception.class)
     ResponseEntity<Map<String,Object>> fallback(Exception exception,HttpServletRequest request){
         int status=exception instanceof org.springframework.web.ErrorResponse error?error.getStatusCode().value():500;
@@ -31,7 +31,7 @@ public class ApiExceptionHandler {
         String message=status>=500?"内部错误，请按trace_id定位":"请求路径、方法或格式不符合接口约定";
         audit(request,code);
         if(status>=500)log.error("API internal failure trace_id={} exception_type={}",ApiResponse.trace(request),exception.getClass().getName());
-        return ResponseEntity.status(status).body(ApiResponse.failure(code,message,List.of(),request));
+        return ResponseEntity.status(status).contentType(org.springframework.http.MediaType.APPLICATION_JSON).body(ApiResponse.failure(code,message,List.of(),request));
     }
     private void audit(HttpServletRequest request,String code){
         String actor=request.getUserPrincipal()==null?null:request.getUserPrincipal().getName();

@@ -37,13 +37,14 @@ public final class InspectionQuarterlyReportController {
         var rows=reports.list(a,size+1,before,id);if(rows==null||rows.size()>size+1)throw unavailable();for(var row:rows)requireSummary(row,a,null);boolean more=rows.size()>size;var items=rows.subList(0,Math.min(size,rows.size()));Summary last=more?items.get(items.size()-1):null;
         return success(map("tenant_id",a.tenantId(),"items",items.stream().map(InspectionQuarterlyReportController::summaryDto).toList(),"has_more",more,"next_before_recorded_at",last==null?null:last.recordedAt().toString(),"next_before_id",last==null?null:last.id(),"page_size_limit",20,"scope","CURRENT_TENANT_PADMIN","source","postgresql"),request);
     }
-    @GetMapping("/{id}") Object get(@PathVariable String id,HttpServletRequest request){
+    @GetMapping("/{id}") Object get(@PathVariable String id,HttpServletRequest request){return success(detail(id,request),request);}
+    Map<String,Object> detail(String id,HttpServletRequest request){
         Access a=access(request,false);query(request,Set.of());String record=uuid(id);Stored stored=reports.get(a,record);if(stored==null)throw unavailable();Summary row=requireSummary(stored.summary(),a,record);
         if(stored.frozenDocument()==null)throw unavailable();byte[] bytes=stored.frozenDocument().getBytes(java.nio.charset.StandardCharsets.UTF_8);
         String verified=InspectionQuarterlyReportDocumentCodec.decode(bytes,UUID.fromString(a.tenantId()),row.sourceCollectionId(),row.sourceDocumentSha256(),row.sourceManifestSha256(),row.reportSha256(),row.documentSha256(),row.year(),row.quarter());
         var result=summaryDto(row);result.put("projection","FROZEN_INPUT_OUTPUT");result.put("document_integrity","VERIFIED_SERVER_SIDE");
         try{result.put("frozen_document",new ObjectMapper().readTree(verified));}catch(Exception failure){throw unavailable();}
-        return success(result,request);
+        return result;
     }
     static Map<String,Object> summaryDto(Summary row){return map("id",row.id(),"tenant_id",row.tenantId(),"created_by",row.createdBy(),"recorded_at",row.recordedAt().toString(),"version",row.version(),"label",row.label(),"source_collection_id",row.sourceCollectionId(),"source_document_sha256",row.sourceDocumentSha256(),"source_manifest_sha256",row.sourceManifestSha256(),"year",row.year(),"quarter",row.quarter(),"report_sha256",row.reportSha256(),"document_format",InspectionQuarterlyReportDocumentCodec.FORMAT,"document_sha256",row.documentSha256(),"projection","METADATA_ONLY","configuration_source","REQUEST_DRAFT_NOT_APPROVED","scope","CURRENT_TENANT_PADMIN","source","postgresql","generation_status","DRAFT","report_publishable",false,"report_published",false,"evidence_access_granted",false,"tenant_asset_population",null);}
     private static int integer(JsonNode n){if(n==null||!n.isIntegralNumber()||!n.canConvertToInt())throw invalid();return n.intValue();}

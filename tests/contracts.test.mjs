@@ -210,7 +210,7 @@ test('operation区分报障门禁与真实文件状态，终态不得伪造', ()
   assert.equal(validates('OperationResult', envelope(registration)), true);
   assert.equal(validates('OperationResult', envelope({ ...registration, status: 'SUCCEEDED' })), false);
   assert.equal(contract.components.schemas.TicketRegistration.properties.version.minimum, 1);
-  assert.deepEqual(contract.components.schemas.TicketRegistration.properties.history.items.properties.action.enum, ['REGISTER', 'ADD_ATTACHMENTS']);
+  assert.deepEqual(contract.components.schemas.TicketRegistration.properties.history.items.properties.action.enum, ['REGISTER', 'MONITORING_REGISTER', 'LEGACY_MONITORING_REGISTER', 'ADD_ATTACHMENTS']);
 });
 
 test('就绪成功不能把已启用但缺schema或存储的照片能力写成READY', () => {
@@ -248,8 +248,8 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.68.0');
-  assert.equal(contract.info.version, '0.68.0');
+  assert.equal(contract.info.version, '0.69.0');
+  assert.equal(contract.info.version, '0.69.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -944,7 +944,7 @@ test('补充SLA口径只能绑定明确发布版本，不接收策略或身份�
 
 test('SLA提醒记录不等于路由或送达，读取无业务写入',()=>{const p=contract.paths['/tickets/{ticketId}/sla/reminders'];assert.equal(p.get['x-mop-read-only'],true);assert.equal(p.post,undefined);const s=contract.components.schemas.TicketSlaReminder;assert.equal(s.properties.notification_status.const,'NOT_ROUTED');assert.equal(s.properties.delivered.const,false);assert.deepEqual(s.properties.progress.enum,[0.5,0.8,1]);});
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.68.0');
+  assert.equal(contract.info.version, '0.69.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/workflow/sla'].get;
@@ -1008,7 +1008,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.68.0');
+  assert.equal(contract.info.version, '0.69.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1308,4 +1308,11 @@ test('CMDB durable-source preflight matches Java wire output and cannot authoriz
  const route=contract.paths['/assets/import-sources/{id}/cmdb-preflight'];assert.ok(route.get);assert.equal(route.post,undefined);assert.equal(route.get['x-mop-read-only'],true);
  const fixture=read('../fixtures/cmdb-source-preflight-controller.json');assert.equal(validates('CmdbSourcePreflightResult',fixture),true);
  for(const patch of [{can_import:true},{database_checks:'PASS'},{asset_mutations:true},{production_approved:true}])assert.equal(validates('CmdbSourcePreflightResult',{...fixture,data:{...fixture.data,...patch}}),false);
+});
+
+test('monitoring registration history has explicit new and legacy origins, with unknown contact allowed',()=>{
+ const history=contract.components.schemas.TicketRegistration.properties.history.items
+ for(const action of ['MONITORING_REGISTER','LEGACY_MONITORING_REGISTER'])assert.equal(ajv.compile(history)({action,actor_id:'64000000-0000-4000-8000-000000000001',occurred_at:'2026-10-21T00:00:00Z',version:1}),true)
+ assert.equal(ajv.compile(history)({action:'AUTO_CREATE_FROM_MONITORING_EVENT'}),false)
+ assert.equal(ajv.compile(contract.components.schemas.TicketRegistration.properties.contact_phone)(''),true)
 });

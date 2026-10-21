@@ -274,11 +274,24 @@ public final class PostgresPlatformRepository implements PlatformRepository {
         for(String key:List.of("id","tenant_id","receipt_no","title","description","source","category","impact_scope","urgency","asset_id","asset_name","reporter_id","contact_name","contact_phone","contact_binding_status","registration_status","state","external_id","external_state","sync_state","authority_source","authority_status","priority","operation_id"))result.put(key,rows.getString(key));
         result.put("response_due_at",instant(rows,"response_due_at"));result.put("recovery_due_at",instant(rows,"recovery_due_at"));result.put("version",rows.getLong("version"));result.put("created_at",instant(rows,"created_at").toString());result.put("updated_at",instant(rows,"updated_at").toString());
         List<Map<String,Object>> history=new ArrayList<>();
-        try(PreparedStatement statement=connection.prepareStatement("SELECT payload FROM public.mop_ticket_history WHERE tenant_id::text=? AND ticket_id::text=? AND version<=? ORDER BY version")){
-            statement.setString(1,rows.getString("tenant_id"));statement.setString(2,rows.getString("id"));statement.setLong(3,rows.getLong("version"));try(ResultSet events=statement.executeQuery()){while(events.next())history.add(mapper.convertValue(json(events.getString(1)),LinkedHashMap.class));}
+        try(PreparedStatement statement=connection.prepareStatement("SELECT payload,version FROM public.mop_ticket_history WHERE tenant_id::text=? AND ticket_id::text=? AND version<=? ORDER BY version")){
+            statement.setString(1,rows.getString("tenant_id"));statement.setString(2,rows.getString("id"));statement.setLong(3,rows.getLong("version"));try(ResultSet events=statement.executeQuery()){while(events.next()){
+                Map<String,Object> raw=mapper.convertValue(json(events.getString(1)),LinkedHashMap.class);
+                Map<String,Object> projected=registrationHistoryProjection(raw,events.getLong("version"),result);
+                history.add(projected);
+                if(raw.keySet().equals(Set.of("action")) && "AUTO_CREATE_FROM_MONITORING_EVENT".equals(raw.get("action")) && "LEGACY_MONITORING_REGISTER".equals(projected.get("action")) && "13800138000".equals(result.get("contact_phone")))result.put("contact_phone","");
+            }}
         }result.put("history",history);List<Map<String,Object>> attachments=new ArrayList<>();
         if(photoSchemaPresent(connection))try(PreparedStatement statement=connection.prepareStatement("SELECT * FROM public.mop_file WHERE tenant_id::text=? AND ticket_id::text=? ORDER BY created_at,id")){statement.setString(1,rows.getString("tenant_id"));statement.setString(2,rows.getString("id"));try(ResultSet files=statement.executeQuery()){while(files.next())attachments.add(fileProjection(files));}}
         result.put("attachments",attachments);return result;
+    }
+    /** Recognize only the exact historical producer shape; derive missing read fields from stored ticket facts, never rewrite history. */
+    static Map<String,Object> registrationHistoryProjection(Map<String,Object> payload,long historyVersion,Map<String,Object> ticket){
+        if(historyVersion==1 && payload.keySet().equals(Set.of("action")) && "AUTO_CREATE_FROM_MONITORING_EVENT".equals(payload.get("action"))
+            && "customer_report".equals(ticket.get("source")) && ticket.get("receipt_no") instanceof String receipt && receipt.startsWith("EVT-")
+            && ticket.get("reporter_id") instanceof String && ticket.get("created_at") instanceof String)
+            return new LinkedHashMap<>(Map.of("action","LEGACY_MONITORING_REGISTER","actor_id",ticket.get("reporter_id"),"occurred_at",ticket.get("created_at"),"version",1L));
+        return new LinkedHashMap<>(payload);
     }
     @Override public List<Map<String,Object>> tickets(String tenant,String actor,String category,String urgency,String query,Instant afterCreated,String afterId,int limit){
         Membership membership=ticketAccess(tenant,actor);if(limit<1||limit>101||(afterCreated==null)!=(afterId==null))throw new DomainException(400,"VALIDATION_ERROR","工单分页参数无效");
@@ -296,8 +309,15 @@ public final class PostgresPlatformRepository implements PlatformRepository {
     private Map<String,Object> operationProjection(ResultSet rows)throws SQLException {
         Map<String,Object> result=new LinkedHashMap<>();
         for(String key:List.of("id","tenant_id","kind","status","step","result_ref"))result.put(key,rows.getString(key));
-        result.put("progress",null);String error=rows.getString("error");result.put("error",error==null?null:mapper.convertValue(json(error),LinkedHashMap.class));
+        result.put("progress",null);String error=rows.getString("error");Map<String,Object> errorValue=error==null?null:mapper.convertValue(json(error),LinkedHashMap.class);
+        result.put("error",registrationOperationErrorProjection(errorValue,rows.getString("kind"),rows.getString("status"),rows.getString("step")));
         result.put("created_at",instant(rows,"created_at").toString());result.put("updated_at",instant(rows,"updated_at").toString());return result;
+    }
+    static Map<String,Object> registrationOperationErrorProjection(Map<String,Object> error,String kind,String status,String step){
+        if(error!=null && error.keySet().equals(Set.of("code")) && "CONFIG_PENDING".equals(error.get("code"))
+            && "CUSTOMER_REPORT_REGISTRATION".equals(kind) && "PENDING".equals(status) && "AWAITING_TICKET_CONFIGURATION".equals(step))
+            return new LinkedHashMap<>(Map.of("code","CONFIG_PENDING","message","登记已保存，规则仍待配置；该历史记录未提供完整阻塞项","retryable",false,"question_ids",List.of()));
+        return error==null?null:new LinkedHashMap<>(error);
     }
     @Override public Optional<Map<String,Object>> operation(String tenant,String actor,String id){return inTransaction(()->{
         Membership membership=ticketAccess(tenant,actor);

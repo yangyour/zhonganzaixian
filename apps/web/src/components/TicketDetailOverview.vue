@@ -6,7 +6,7 @@ import { can, contextGeneration, session, switchingTenant } from '../stores/sess
 import { createInternalNoteWorkspace, emptyNoteState, type NoteState } from '../utils/internalNoteWorkspace'
 import { createTicketCommentWorkspace, emptyCommentState, type CommentState } from '../utils/ticketCommentWorkspace'
 import { createWorklogWorkspace, emptyWorklogState, type WorklogState } from '../utils/worklogWorkspace'
-import { ticketActivities, maskedContact, ticketDetailText } from '../utils/ticketDetailPresentation'
+import { ticketActivities, maskedContact, ticketDetailText, ticketRegistrationOrigin } from '../utils/ticketDetailPresentation'
 import { formatWorklogDuration, summarizeWorklogPage, worklogKindLabels } from '../utils/worklogPageSummary'
 import { displayTime } from '../utils/display'
 import { impactScopeLabel, urgencyLabel } from '../utils/ticket'
@@ -28,6 +28,7 @@ const permitted = computed(() => Boolean(session.value && !switchingTenant.value
 const canNotes = computed(() => permitted.value && ['msp', 'padmin'].includes(session.value?.user.role || '') && can('ticket_notes:read_internal'))
 const canComments = computed(() => permitted.value && can('ticket_comments:read'))
 const canWorklogs = computed(() => permitted.value && !customer.value && can('worklogs:read_own'))
+const registrationOrigin = computed(() => ticketRegistrationOrigin(props.ticket))
 const showPhone = ref(false), downloadError = ref('')
 const scopeKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, permitted.value, canNotes.value, canComments.value, canWorklogs.value, props.ticket.id, props.ticket.version]))
 function resetReaders() {
@@ -88,12 +89,12 @@ const stages = ['工单发起', '工单受理', '原因定位', '解决方案', 
             <div><dt>工单标题</dt><dd>{{ ticket.title }}</dd></div>
             <div><dt>告警编号</dt><dd class="ticket-muted">暂未提供</dd></div>
             <div><dt>客户名称</dt><dd>{{ session?.tenant.name }}</dd></div>
-            <div><dt>渠道名称</dt><dd class="ticket-muted">人工登记</dd></div>
-            <div><dt>客户联系人</dt><dd>{{ ticket.contact_name }}</dd></div>
-            <div><dt>客户联系方式</dt><dd class="ticket-contact">{{ showPhone ? ticket.contact_phone : maskedContact(ticket.contact_phone) }}<button type="button" :aria-pressed="showPhone" @click="showPhone = !showPhone">{{ showPhone ? '隐藏' : '显示' }}</button></dd></div>
+            <div><dt>渠道名称</dt><dd class="ticket-muted">{{ registrationOrigin }}</dd></div>
+            <div><dt>登记联系人</dt><dd>{{ ticket.contact_name }}</dd></div>
+            <div><dt>客户联系方式</dt><dd class="ticket-contact">{{ !ticket.contact_phone.trim() ? '未提供' : showPhone ? ticket.contact_phone : maskedContact(ticket.contact_phone) }}<button v-if="ticket.contact_phone.trim()" type="button" :aria-pressed="showPhone" @click="showPhone = !showPhone">{{ showPhone ? '隐藏' : '显示' }}</button></dd></div>
             <div><dt>关联设备</dt><dd>{{ ticket.asset_name || (ticket.asset_id ? '已关联（名称暂未提供）' : '未关联') }}</dd></div>
             <div><dt>问题类型</dt><dd><span class="ticket-category">{{ ticket.category }}</span></dd></div>
-            <div><dt>业务影响</dt><dd><span :class="['ticket-impact', { urgent: ticket.urgency === 'urgent' }]">{{ impactScopeLabel[ticket.impact_scope] }}</span><small>{{ urgencyLabel[ticket.urgency] }} · 人工登记</small></dd></div>
+            <div><dt>业务影响</dt><dd><span :class="['ticket-impact', { urgent: ticket.urgency === 'urgent' }]">{{ impactScopeLabel[ticket.impact_scope] }}</span><small>{{ urgencyLabel[ticket.urgency] }} · {{ registrationOrigin }}</small></dd></div>
             <div><dt>优先级 / SLA</dt><dd class="ticket-muted">暂未提供</dd></div>
             <div class="ticket-description-field"><dt>问题描述</dt><dd><p>{{ ticket.description }}</p></dd></div>
           </dl>

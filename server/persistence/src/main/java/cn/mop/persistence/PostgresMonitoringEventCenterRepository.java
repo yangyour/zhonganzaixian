@@ -286,6 +286,9 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
             || existing.get().status() == AutoTicketStatus.QUARANTINED_MANUAL_REQUIRED)) {
             return;
         }
+        // Further raw signals must not spend a scheduled retry budget before its durable deadline.
+        if (existing.isPresent() && existing.get().status() == AutoTicketStatus.RETRY_SCHEDULED
+            && existing.get().nextRetryAt() != null && existing.get().nextRetryAt().isAfter(now)) return;
         int prevAttempts = existing.map(AutoTicketAttempt::attemptCount).orElse(0);
         AutoTicketPlan plan = MonitoringEventPipeline.evaluateAutoTicketAttempt(
             severity, suppressionState, prevAttempts, simulateFailure, now
@@ -534,6 +537,60 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
         }
     }
 
+    /** Due registration attempts for one explicitly configured tenant; this is not a global queue or provider sender. */
+    public List<AutoTicketAttempt> dueRegistrationRetries(Access a, int limit) {
+        if (limit < 1 || limit > 25) throw new DomainException(400, "VALIDATION_ERROR", "重试批次必须在1至25之间");
+        return read(a, "ticket_notes:write_internal", true, c -> {
+            var result = new ArrayList<AutoTicketAttempt>();
+            try (var s = statement(c, ATTEMPT_SELECT + " WHERE tenant_id=?::uuid AND status='RETRY_SCHEDULED' AND next_retry_at<=statement_timestamp() ORDER BY next_retry_at,id LIMIT ?")) {
+                s.setString(1, a.tenantId()); s.setInt(2, limit);
+                try (var rows = s.executeQuery()) { while (rows.next()) result.add(mapAttempt(rows)); }
+            }
+            return List.copyOf(result);
+        });
+    }
+
+    /** Must run in the existing authorized/idempotent transaction. Rechecks deadline and live event under its row lock. */
+    public AutoTicketAttempt retryRegistration(Access a, String attemptId, long expectedVersion) {
+        if (attemptId == null || expectedVersion < 1) throw invalid();
+        Connection c = platform.idempotentCommandConnection();
+        try {
+            member(c, a, "ticket_notes:write_internal", true, true);
+            AutoTicketAttempt initial = findAutoTicketAttemptById(c, a.tenantId(), attemptId).orElseThrow(() -> new DomainException(404,"RESOURCE_NOT_FOUND","当前租户下不存在该建单记录"));
+            // Ingestion updates the event before its attempt. Keep the same row-lock order.
+            try (var s = statement(c, "SELECT id FROM public.mop_monitoring_event WHERE tenant_id=?::uuid AND id=?::uuid FOR UPDATE")) {
+                s.setString(1, a.tenantId()); s.setString(2, initial.eventId());
+                try (var rows = s.executeQuery()) { if (!rows.next()) throw unavailable(); }
+            }
+            AutoTicketAttempt current = findAutoTicketAttemptById(c, a.tenantId(), attemptId).orElseThrow(PostgresMonitoringEventCenterRepository::unavailable);
+            if (current.version() != expectedVersion) throw new DomainException(409,"VERSION_CONFLICT","自动建单记录已变化，请重新读取");
+            Instant now = now(c);
+            if (current.status() != AutoTicketStatus.RETRY_SCHEDULED || current.nextRetryAt() == null || current.nextRetryAt().isAfter(now))
+                throw new DomainException(409,"AUTOTICKET_NOT_DUE","该记录当前不满足到期重试条件");
+            EventSummary event = findEvent(c, a.tenantId(), current.eventId()).orElseThrow(PostgresMonitoringEventCenterRepository::unavailable);
+            if (current.ticketId() != null || event.ticketId() != null) throw new DomainException(409,"AUTOTICKET_ALREADY_LINKED","事件已有工单关联，停止自动补建并等待核验");
+            String stopStatus = null, stopReason = null;
+            boolean currentlySuppressed = findActiveMaintenanceWindow(c,a.tenantId(),event.assetId(),now).isPresent()
+                || findActiveUpstreamProblemAsset(c,a.tenantId(),event.assetId()) != null
+                || event.flapSilencedUntil() != null && event.flapSilencedUntil().isAfter(now);
+            if (currentlySuppressed || event.monitorState() != MonitorState.PROBLEM || event.handlingState() == HandlingState.RESOLVED || event.handlingState() == HandlingState.CLOSED || event.suppressionState() != SuppressionState.NONE) {
+                stopStatus = "SUPPRESSED_SKIPPED"; stopReason = "到期复核时事件已恢复、已处理或处于抑制状态，不再自动登记工单";
+            } else if (current.attemptCount() >= current.maxRetries()) {
+                stopStatus = "QUARANTINED_MANUAL_REQUIRED"; stopReason = "建单尝试已达上限，等待人工复核";
+            }
+            if (stopStatus != null) {
+                try (var s = statement(c, "UPDATE public.mop_autoticket_attempt SET version=version+1,status=?,next_retry_at=NULL,last_error=?,updated_by=?::uuid,updated_at=? WHERE tenant_id=?::uuid AND id=?::uuid AND version=?")) {
+                    s.setString(1, stopStatus); s.setString(2, stopReason); s.setString(3,a.actorId()); instant(s,4,now);s.setString(5,a.tenantId());s.setString(6,attemptId);s.setLong(7,current.version());
+                    if(s.executeUpdate()!=1)throw new DomainException(409,"VERSION_CONFLICT","到期建单记录已变化，本次事务未提交");
+                }
+            } else {
+                processAutoTicketForEvent(c,a,event.id(),event.assetId(),requireAssetName(c,a.tenantId(),event.assetId()),event.ruleCode(),event.ruleName(),event.severity(),event.suppressionState(),false,now);
+            }
+            platform.audit(a.actorId(),a.tenantId(),"monitoring.autoticket.registration_retry","autoticket_attempt",attemptId,"SUCCEEDED",stopStatus==null?"REGISTRATION_ONLY_Q14_OUTBOX_REMAINS_BLOCKED":stopStatus,a.traceId());
+            return findAutoTicketAttemptById(c,a.tenantId(),attemptId).orElseThrow(PostgresMonitoringEventCenterRepository::unavailable);
+        } catch (SQLException e) { throw unavailable(); }
+    }
+
     @Override
     public AutoTicketAttempt manualCreateAutoTicket(Access a, ManualAutoTicketCommand cmd) {
         if (cmd == null) throw invalid();
@@ -582,7 +639,7 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
     private String insertAutoCreatedTicket(Connection c, String tenant, String actor, String assetId, String assetName, String title, String description, Instant now) throws SQLException {
         String ticketId = UUID.randomUUID().toString();
         String opId = UUID.randomUUID().toString();
-        try (var s = statement(c, "INSERT INTO public.mop_ticket(id,tenant_id,receipt_no,title,description,source,category,impact_scope,urgency,asset_id,asset_name,reporter_id,contact_name,contact_phone,operation_id,created_at,updated_at) VALUES(?::uuid,?::uuid,?,?,?,'customer_report','设备异常','partial_area','urgent',?::uuid,?,?::uuid,'监控事件自动建单','13800138000',?::uuid,?,?)")) {
+        try (var s = statement(c, "INSERT INTO public.mop_ticket(id,tenant_id,receipt_no,title,description,source,category,impact_scope,urgency,asset_id,asset_name,reporter_id,contact_name,contact_phone,operation_id,created_at,updated_at) VALUES(?::uuid,?::uuid,?,?,?,'customer_report','设备异常','partial_area','urgent',?::uuid,?,?::uuid,'系统监控事件（未绑定客户联系人）','',?::uuid,?,?)")) {
             s.setString(1, ticketId);
             s.setString(2, tenant);
             s.setString(3, "EVT-" + ticketId.substring(0, 18));
@@ -596,12 +653,14 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
             instant(s, 11, now);
             s.executeUpdate();
         }
-        try (var s = statement(c, "INSERT INTO public.mop_ticket_history(tenant_id,ticket_id,version,payload) VALUES(?::uuid,?::uuid,1,'{\"action\":\"AUTO_CREATE_FROM_MONITORING_EVENT\"}'::jsonb)")) {
+        try (var s = statement(c, "INSERT INTO public.mop_ticket_history(tenant_id,ticket_id,version,payload) VALUES(?::uuid,?::uuid,1,jsonb_build_object('action','MONITORING_REGISTER','actor_id',?::text,'occurred_at',?::text,'version',1))")) {
             s.setString(1, tenant);
             s.setString(2, ticketId);
+            s.setString(3, actor);
+            s.setString(4, now.toString());
             s.executeUpdate();
         }
-        try (var s = statement(c, "INSERT INTO public.mop_operation(id,tenant_id,ticket_id,kind,result_ref,error,created_at,updated_at) VALUES(?::uuid,?::uuid,?::uuid,'CUSTOMER_REPORT_REGISTRATION',?,'{\"code\":\"CONFIG_PENDING\"}'::jsonb,?,?)")) {
+        try (var s = statement(c, "INSERT INTO public.mop_operation(id,tenant_id,ticket_id,kind,result_ref,error,created_at,updated_at) VALUES(?::uuid,?::uuid,?::uuid,'CUSTOMER_REPORT_REGISTRATION',?,'{\"code\":\"CONFIG_PENDING\",\"message\":\"监控事件登记已保存，正式工单与通知规则待配置\",\"retryable\":false,\"question_ids\":[\"Q14\"]}'::jsonb,?,?)")) {
             s.setString(1, opId);
             s.setString(2, tenant);
             s.setString(3, ticketId);

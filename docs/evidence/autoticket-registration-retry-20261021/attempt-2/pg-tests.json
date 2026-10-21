@@ -1,0 +1,71 @@
+{
+  "exit": 0,
+  "cases": [
+    {
+      "class": "cn.mop.persistence.PostgresMonitoringEventCenterIntegrationTest",
+      "name": "longProblemKeepsIdentityAndLateRecoveryClosesTheSameSignalOnly()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresAutoTicketRetryIntegrationTest",
+      "name": "futureDeadlineAndRepeatedSignalsCannotSpendBudgetThenDueRetryCreatesOnce()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresMonitoringEventCenterIntegrationTest",
+      "name": "deduplicationTimesFiveFlapSilenceAndPendingReviewLifecycle_M4_7_M4_8_M4_11()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresAutoTicketRetryIntegrationTest",
+      "name": "twoConcurrentProcessorsCreateExactlyOneRegistration()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresAutoTicketCasIntegrationTest",
+      "name": "concurrentAutomaticRetryAndManualCreationHaveOneDurableTicket()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresAutoTicketRetryIntegrationTest",
+      "name": "stalePermissionAndCrossTenantCannotClaimAttempt()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresAutoTicketRetryIntegrationTest",
+      "name": "generatedRegistrationHasCompleteHistoryAndNoInventedContact()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresAutoTicketRetryIntegrationTest",
+      "name": "maintenanceAddedAfterInitialFailureIsRecheckedBeforeRegistration()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresMonitoringEventCenterIntegrationTest",
+      "name": "maintenanceExclusionCannotBeSelfApprovedAndEndingStopsTheInterval()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresAutoTicketRetryIntegrationTest",
+      "name": "recoveredEventIsSkippedAtExecutionTime()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresAutoTicketCasIntegrationTest",
+      "name": "missingEventTicketLinkUpdateRollsBackAllTicketAndEventChanges()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresAutoTicketCasIntegrationTest",
+      "name": "missingAttemptVersionUpdateRollsBackAllTicketAndEventChanges()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresMonitoringEventCenterIntegrationTest",
+      "name": "maintenanceWindowSlaExclusionQuarantineBindAndAutoTicketFiveRetries_M4_10_M4_14_M5_4()",
+      "passed": true
+    }
+  ],
+  "expected": 13
+}

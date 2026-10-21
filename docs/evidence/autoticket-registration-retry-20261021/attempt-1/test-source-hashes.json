@@ -1,0 +1,5 @@
+{
+  "server/persistence/src/test/java/cn/mop/persistence/PostgresAutoTicketCasIntegrationTest.java": "1dbb00cd67e8a3df9acd0195fd80d823e2ceb27f211db52309526b5f3aa8ca30",
+  "server/persistence/src/test/java/cn/mop/persistence/PostgresMonitoringEventCenterIntegrationTest.java": "ab2fc52f5095a5772e0ce918d7d2257c9d58c12a1cc528944270ea7bbb1a82c3",
+  "server/persistence/src/test/java/cn/mop/persistence/PostgresAutoTicketRetryIntegrationTest.java": "b699e17f02997079f20eb83fe2cece6e0b0ddd648e71a8359f49cd24d9aad807"
+}

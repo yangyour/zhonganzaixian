@@ -1,0 +1,34 @@
+{
+  "base_commit": "371bf2cb1a4dfdfe21981dcc8a403888b634ce18",
+  "scope": "REGISTRATION_RETRY_NOT_FORMAL_WORKFLOW_OR_PROVIDER_DELIVERY",
+  "api_version": "0.69.0",
+  "backend": {
+    "tests": 3779,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 996,
+    "executed": 2783
+  },
+  "web_tests": 2571,
+  "contracts": 160,
+  "python_tests": 111,
+  "frontend_typecheck_build_and_static_gates": "PASS",
+  "real_pg_tests": 13,
+  "standalone_worker_processes": 3,
+  "actual_http_checks": 9,
+  "production_ts_reader_actual_http_cases": 3,
+  "browser_and_axe": "NOT_RUN",
+  "continuous_mode_soak": "NOT_RUN",
+  "mid_commit_process_kill": "NOT_RUN",
+  "sql_changes": false,
+  "provider_sends": false,
+  "production_approved": false,
+  "cleanup": {
+    "loopback_only": true,
+    "provider_sends": false,
+    "temporary_credentials_only": true,
+    "postgresql_stopped": true,
+    "temporary_database_and_credentials_removed": true,
+    "result": "PASS"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "loopback_only": true,
+  "provider_sends": false,
+  "temporary_credentials_only": true,
+  "postgresql_stopped": true,
+  "temporary_database_and_credentials_removed": true,
+  "result": "PASS"
+}

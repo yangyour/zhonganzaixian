@@ -1,0 +1,94 @@
+{
+  "scope": "REAL_LOOPBACK_API_SYNTHETIC_IDENTITIES",
+  "checks": [
+    {
+      "case": "anonymous_ticket",
+      "actor": "anonymous",
+      "status": 401,
+      "expected": 401,
+      "code": "SESSION_EXPIRED",
+      "cache_control": "no-store",
+      "referrer_policy": null
+    },
+    {
+      "case": "msp_csrf",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store",
+      "referrer_policy": null
+    },
+    {
+      "case": "msp_login",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store",
+      "referrer_policy": null
+    },
+    {
+      "case": "msp_switch_1",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store",
+      "referrer_policy": null
+    },
+    {
+      "case": "new_monitoring_ticket",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store",
+      "referrer_policy": null
+    },
+    {
+      "case": "legacy_monitoring_ticket",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store",
+      "referrer_policy": null
+    },
+    {
+      "case": "customer_control_ticket",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store",
+      "referrer_policy": null
+    },
+    {
+      "case": "legacy_operation",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store",
+      "referrer_policy": null
+    },
+    {
+      "case": "new_operation",
+      "actor": "msp",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store",
+      "referrer_policy": null
+    }
+  ],
+  "asset_writes": false,
+  "provider_sends": false,
+  "result": "PASS",
+  "read_rows_unchanged": true,
+  "legacy_raw_unchanged": true,
+  "customer_control_contact_preserved": true,
+  "unknown_contact_is_blank": true,
+  "api_stopped": true
+}

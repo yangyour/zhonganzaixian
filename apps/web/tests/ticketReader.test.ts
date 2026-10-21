@@ -25,3 +25,9 @@ describe('registered ticket page projection', () => {
   it('rejects incorrect limits, fixtures and nonboolean pagination', () => { for (const patch of [{ page_size_limit: 1000 },{ source: 'fixture' },{ page_size_limit_kind: 'business_limit' },{ has_more: 'false' },{ extra: true }]) expect(() => readTicketPage({ ...page(), ...patch }, context, 15)).toThrow(); expect(() => readTicketPage(page(), context, 11)).toThrow() })
   it('detaches all rows from source mutation', () => { const original = page(); const copy = readTicketPage(original, context, 15); original.items[0]!.history[0]!.actor_id = id(99); expect(copy.items[0]!.history[0]!.actor_id).toBe(id(2)) })
 })
+
+it.each(['MONITORING_REGISTER','LEGACY_MONITORING_REGISTER'] as const)('accepts complete %s history but not an incomplete legacy payload',action=>{
+ const value=ticket();value.contact_phone='';value.history[0]!.action=action
+ expect(readRegisteredTicket(value,context).contact_phone).toBe('')
+ expect(()=>readRegisteredTicket({...value,history:[{action:'AUTO_CREATE_FROM_MONITORING_EVENT'}]},context)).toThrow()
+})

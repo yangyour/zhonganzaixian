@@ -231,6 +231,10 @@ function switchWindow(w: FunnelWindow) {
           <li v-for="a in state.workspace.autoticket_attempts" :key="a.id">
             事件 {{ a.event_id }} · 重试 {{ a.attempt_count }}/{{ a.max_retries }} ({{ a.backoff_schedule_sec }}s)
             · 状态：<strong>{{ a.status }}</strong> · 映射策略：{{ a.mapping_policy_status }}
+            <p v-if="a.next_retry_at" class="field-help">计划最早重试（UTC）：<time :datetime="a.next_retry_at">{{ a.next_retry_at }}</time>。是否执行取决于 Worker 配置及到期时的权限、告警和抑制状态检查。</p>
+            <p v-else class="field-help">当前记录没有安排自动重试时间。</p>
+            <p v-if="a.last_error" class="field-help">最近处理说明：{{ a.last_error }}</p>
+            <p v-if="a.status === 'SUCCEEDED' || a.status === 'MANUAL_CREATED'" class="field-help">登记已保存，不等于正式工单流程已启动或外部通知已送达。</p>
             <template v-if="canWrite && (a.status === 'QUARANTINED_MANUAL_REQUIRED' || a.status === 'RETRY_SCHEDULED')">
               <label :for="`manual-ticket-reason-${a.id}`">人工补建原因（最多492个字符）</label>
               <textarea :id="`manual-ticket-reason-${a.id}`" v-model="manualTicketReasons[a.id]" :disabled="locked" />

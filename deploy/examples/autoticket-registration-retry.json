@@ -1,0 +1,14 @@
+{
+  "enabled": false,
+  "scope": "REGISTRATION_ONLY",
+  "profile": "remote_test",
+  "database_connection_reference": null,
+  "tenant_id": null,
+  "actor_id": null,
+  "mode": null,
+  "batch_size": null,
+  "poll_millis": null,
+  "workflow_activation": false,
+  "provider_sends": false,
+  "production_approved": false
+}

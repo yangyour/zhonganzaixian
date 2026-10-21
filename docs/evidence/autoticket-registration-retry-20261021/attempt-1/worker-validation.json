@@ -1,0 +1,39 @@
+{
+  "result": "PASS",
+  "due_before": 3,
+  "processes": [
+    {
+      "run": 1,
+      "exit": 0,
+      "handled": 3
+    },
+    {
+      "run": 2,
+      "exit": 0,
+      "handled": 0
+    }
+  ],
+  "target_attempt": {
+    "status": "SUCCEEDED",
+    "attempt_count": 2,
+    "has_ticket": true,
+    "no_next_retry": true,
+    "same_ticket": true
+  },
+  "changed_tables": [
+    "mop_audit",
+    "mop_autoticket_attempt",
+    "mop_idempotency",
+    "mop_monitoring_event",
+    "mop_operation",
+    "mop_outbox",
+    "mop_ticket",
+    "mop_ticket_history"
+  ],
+  "workflow_and_notification_tables_unchanged": true,
+  "unauthorized_exit": 1,
+  "unauthorized_rows_unchanged": true,
+  "provider_sends": false,
+  "worker_processes_exited": true,
+  "scope": "REGISTRATION_ONLY"
+}

@@ -216,6 +216,8 @@ class PostgresMonitoringEventCenterIntegrationTest {
         String retryRule = "SYNTH_RETRY_" + UUID.randomUUID().toString().substring(0, 6).toUpperCase(Locale.ROOT);
         EventSummary retryEvent = null;
         for (int attempt = 1; attempt <= 5; attempt++) {
+            // Advance only this disposable fixture's durable deadline; do not bypass runtime backoff.
+            if (retryEvent != null) PostgresAutoTicketCasIntegrationTest.forceDue(retryEvent.id());
             final int n = attempt;
             retryEvent = (EventSummary) platform.idempotentAuthorized(
                 msp, TENANT, "POST /integration/events/retry/" + retryRule + "/" + n, UUID.randomUUID().toString(), "5".repeat(64), mspVersion,

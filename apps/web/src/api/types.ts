@@ -99,7 +99,7 @@ export interface RegisteredTicket {
   external_id: null; external_state: null; sync_state: 'NOT_APPLICABLE'; authority_source: 'MOP'; authority_status: 'RULES_PENDING'
   priority: null; response_due_at: null; recovery_due_at: null; operation_id: string; version: number
   created_at: string; updated_at: string; attachments: ReportPhoto[]
-  history: { action: 'REGISTER' | 'ADD_ATTACHMENTS'; actor_id: string; occurred_at: string; version: number }[]
+  history: { action: 'REGISTER' | 'MONITORING_REGISTER' | 'LEGACY_MONITORING_REGISTER' | 'ADD_ATTACHMENTS'; actor_id: string; occurred_at: string; version: number }[]
 }
 export interface TicketPage {
   items: RegisteredTicket[]; next_cursor: string | null; has_more: boolean; source: 'postgresql'

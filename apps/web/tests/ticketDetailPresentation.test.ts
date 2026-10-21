@@ -40,3 +40,10 @@ it('keeps an unread or unauthorized worklog scope distinct from an empty loaded 
   expect(exportRows([])).toContain('本页累计：本页无记录')
   expect(exportRows([row({ elapsed_millis: 0 })])).toContain('本页累计：0 小时 0 分 0 秒')
 })
+
+it('shows an absent contact as unknown and monitoring history as monitoring, not a photo action',()=>{
+ const record=ticket();record.contact_phone='';record.history[0]!.action='MONITORING_REGISTER'
+ expect(maskedContact(record.contact_phone)).toBe('未提供')
+ const events=ticketActivities(record,[],[],id(2));expect(events[0]!.title).toContain('监控事件登记');expect(events[0]!.title).not.toContain('照片')
+ record.history[0]!.action='LEGACY_MONITORING_REGISTER';expect(ticketActivities(record,[],[],id(2))[0]!.title).toContain('兼容投影')
+})

@@ -178,3 +178,10 @@ it('manual creation CAS conflict preserves entered reason and never upgrades or 
  expect(posts[0]![1]?.body).toEqual({expected_version:attempt.version,reason})
  expect(request).toHaveBeenCalledTimes(2)
 })
+
+it('shows stored retry deadlines as plans rather than promising execution or delivery',async()=>{
+ const {data}=ready();mount();await settle()
+ for(const attempt of data.autoticket_attempts.filter(a=>a.next_retry_at))expect(host.querySelector(`time[datetime="${attempt.next_retry_at}"]`)).not.toBeNull()
+ expect(host.textContent).toContain('是否执行取决于 Worker 配置')
+ expect(host.textContent).toContain('登记已保存，不等于正式工单流程已启动或外部通知已送达')
+})

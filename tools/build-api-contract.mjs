@@ -342,7 +342,7 @@ const ticketRegistration = object({
   authority_source: { const: 'MOP' }, authority_status: { const: 'RULES_PENDING' }, priority: { type: 'null' }, response_due_at: { type: 'null' }, recovery_due_at: { type: 'null' },
   operation_id: uuid, version: positiveVersion, created_at: dateTime, updated_at: dateTime,
   attachments: { type: 'array', maxItems: 3, items: ref('ReportPhoto') },
-  history: { type: 'array', items: object({ action: { type: 'string', enum: ['REGISTER', 'ADD_ATTACHMENTS'] }, actor_id: uuid, occurred_at: dateTime, version: positiveVersion }) },
+  history: { type: 'array', items: object({ action: { type: 'string', enum: ['REGISTER', 'MONITORING_REGISTER', 'LEGACY_MONITORING_REGISTER', 'ADD_ATTACHMENTS'] }, actor_id: uuid, occurred_at: dateTime, version: positiveVersion }) },
 });
 // Defensive consumer checks, not new server fields or a replacement for authorization.
 ticketRegistration['x-mop-browser-read-validation'] = {
@@ -951,7 +951,7 @@ addChangeNoticeApprovalContract(contract);
 addInspectionQuarterlyReportContract(contract);
 addCmdbTypeCatalogContract(contract);
 addCmdbSourcePreflightContract(contract);
-contract.info.version = '0.68.0';
+contract.info.version = '0.69.0';
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

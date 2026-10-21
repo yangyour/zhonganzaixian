@@ -80,3 +80,10 @@ it('does not accept another user’s worklogs into either the table or totals', 
   expect(state.summary).toBeNull(); expect(state.exportReady).toBe(false)
   expect(state.worklogs.error.code).toBe('INVALID_WORKLOG_RESPONSE')
 })
+
+it('renders monitoring registration origin and no reveal button for an absent contact',async()=>{
+ props.ticket.contact_phone='';props.ticket.history[0]!.action='MONITORING_REGISTER'
+ host=document.createElement('div');document.body.append(host);app=createApp(TicketDetailOverview,props);app.mount(host);await settle()
+ const contact=host.querySelector('.ticket-contact')!;expect(contact.textContent).toContain('未提供');expect(contact.querySelector('button')).toBeNull()
+ expect(host.textContent).toContain('监控事件登记')
+})

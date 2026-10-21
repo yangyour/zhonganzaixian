@@ -26,7 +26,7 @@ class PostgresAutoTicketCasIntegrationTest {
   for(int iteration=0;iteration<3;iteration++){
    String rule="SYNTH_RACE_"+UUID.randomUUID().toString().substring(0,8).toUpperCase(Locale.ROOT);Instant now=Instant.now().minusSeconds(30);
    var seed=(EventSummary)platform.idempotentAuthorized(actor,tenant,"POST /integration/race/seed/"+rule,UUID.randomUUID().toString(),"a".repeat(64),version,()->events.authorizeWrite(access),()->events.ingestEvent(access,new IngestEventCommand(asset,rule,"SYNTHETIC RACE",Severity.DISASTER,MonitorState.PROBLEM,rule+"-seed",now,true)));
-   var attempt=events.eventDetail(access,seed.id()).autoTicketAttempt().orElseThrow();var latch=new java.util.concurrent.CountDownLatch(1);var executor=java.util.concurrent.Executors.newFixedThreadPool(2);
+   forceDue(seed.id());var attempt=events.eventDetail(access,seed.id()).autoTicketAttempt().orElseThrow();var latch=new java.util.concurrent.CountDownLatch(1);var executor=java.util.concurrent.Executors.newFixedThreadPool(2);
    try{
     var automatic=executor.submit(()->{latch.await();try{platform.idempotentAuthorized(actor,tenant,"POST /integration/race/auto/"+rule,UUID.randomUUID().toString(),"b".repeat(64),version,()->events.authorizeWrite(access),()->events.ingestEvent(access,new IngestEventCommand(asset,rule,"SYNTHETIC RACE",Severity.DISASTER,MonitorState.PROBLEM,rule+"-retry",now.plusSeconds(1),false)));return 200;}catch(DomainException e){return e.status;}});
     var manual=executor.submit(()->{latch.await();try{platform.idempotentAuthorized(actor,tenant,"POST /integration/race/manual/"+rule,UUID.randomUUID().toString(),"c".repeat(64),version,()->events.authorizeWrite(access),()->events.manualCreateAutoTicket(access,new ManualAutoTicketCommand(attempt.id(),attempt.version(),"SYNTHETIC_CONCURRENT_REVIEW")));return 200;}catch(DomainException e){return e.status;}});
@@ -44,6 +44,7 @@ class PostgresAutoTicketCasIntegrationTest {
   String rule="SYNTH_CAS_"+UUID.randomUUID().toString().substring(0,8).toUpperCase(Locale.ROOT);Instant now=Instant.now().minusSeconds(60);
   var initial=(EventSummary)normal.idempotentAuthorized(actor,tenant,"POST /integration/cas/seed/"+rule,UUID.randomUUID().toString(),"a".repeat(64),version,()->events.authorizeWrite(access),()->events.ingestEvent(access,new IngestEventCommand(asset,rule,"SYNTHETIC CAS",Severity.DISASTER,MonitorState.PROBLEM,rule+"-seed",now,true)));
   assertEquals(AutoTicketStatus.RETRY_SCHEDULED,events.eventDetail(access,initial.id()).autoTicketAttempt().orElseThrow().status());
+  forceDue(initial.id());
   var hits=new AtomicInteger();
   DataSource injected=(DataSource)Proxy.newProxyInstance(DataSource.class.getClassLoader(),new Class[]{DataSource.class},(proxy,method,args)->{
    if(!method.getName().equals("getConnection"))return invoke(pool,method,args);
@@ -63,6 +64,10 @@ class PostgresAutoTicketCasIntegrationTest {
   var observed=failure;
   assertAll(()->assertEquals(1,hits.get(),"exactly one controlled CAS miss"),()->assertNotNull(observed,"CAS miss must not be reported as successful creation"),()->assertEquals(before,snapshot(),"ticket/history/outbox/event/attempt/audit/idempotency changes must all roll back"));
   assertEquals(409,observed.status);assertEquals("VERSION_CONFLICT",observed.code);
+ }
+ static void forceDue(String eventId)throws SQLException{
+  // Isolated fixture clock movement only, without changing server/system time.
+  try(var c=PostgresMonitoringEventCenterIntegrationTest.pool.getConnection();var s=c.prepareStatement("UPDATE public.mop_autoticket_attempt SET version=version+1,next_retry_at=clock_timestamp()-interval '1 second',updated_at=clock_timestamp() WHERE tenant_id=?::uuid AND event_id=?::uuid AND status='RETRY_SCHEDULED'")){s.setString(1,PostgresMonitoringEventCenterIntegrationTest.TENANT);s.setString(2,eventId);assertEquals(1,s.executeUpdate());}
  }
  static Map<String,String> snapshot()throws SQLException{
   var result=new LinkedHashMap<String,String>();try(var c=PostgresMonitoringEventCenterIntegrationTest.pool.getConnection()){

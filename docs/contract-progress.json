@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 63,
-  "rows_without_progress_notes": 65,
+  "rows_with_progress_notes": 64,
+  "rows_without_progress_notes": 64,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -44,7 +44,7 @@
     },
     "M5": {
       "requirements": 21,
-      "rows_with_progress_notes": 13,
+      "rows_with_progress_notes": 14,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 21
       }
@@ -769,8 +769,10 @@
       "id": "M5-4",
       "title": "告警自动建单与规则配置",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/autoticket-registration-retry-20261021.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1495,6 +1497,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "64db3036fb1a25a4dece620621d31ae0b676d2b3ba6b05b0af18b6f74a5f46cf"
+    "doc/development/07_合同逐项开发追踪.md": "8ca59c619d92df24a04f83ea0c311ff4a9ace751ccd52e87a84575b7a2aa9fa3"
   }
 }

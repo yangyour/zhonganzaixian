@@ -43,6 +43,8 @@ jobs:
         run: |
           python3 -m unittest discover -s tools -p test_contract_progress.py -v
           python3 tools/contract_progress.py --check
+      - name: Verify notification dependency template remains inactive
+        run: python3 -m unittest discover -s tools -p test_notification_dependency_template.py -v
       - name: Verify tracked-source export guards on a native symlink-capable filesystem
         run: python3 -m unittest discover -s tools -p test_export_source_recovery.py -v
 

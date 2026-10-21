@@ -1,0 +1,32 @@
+{
+  "result": "PASS_LOCAL_READ_RECOVERY_AND_PARENT_CHILD_GUARDS",
+  "new_tests": 19,
+  "focused_tests_passed": 78,
+  "vitest": {
+    "files_passed": 243,
+    "tests_passed": 3813
+  },
+  "node_contract_tests_passed": 173,
+  "api_contract_check": "PASS_UNCHANGED",
+  "typecheck": "PASS",
+  "production_build": {
+    "build_id": "b8740093e5326cdf9e10caa6b73a948b02554327d2997e2ad8a72de9ebb1c878",
+    "file_count": 141,
+    "bootstrap_gzip_bytes": 179992,
+    "bootstrap_css_gzip_bytes": 62537,
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/utils/assetExportWorkspace.ts": "bdd6e8f0fbf8a3585e8a6fa4128fcf40acdf31bdff56992586f3e0020f727edc",
+    "apps/web/src/pages/AssetExportJobsPage.vue": "334e6b9c0a46229d27cc73bbf2e98d9c28e02b93b2243199b5e3d0ca7b9ed043",
+    "apps/web/src/components/AssetExportPublicationPanel.vue": "13ed8e1c4154ecdc88e905650e3f235b9eab12468bee1908eb02837925e1b7d5",
+    "apps/web/tests/assetExportReadRecovery.test.ts": "dc785d9485bf1d9ea7ceabf88da70af82724b89887bbfe2cfe66679b219de933",
+    "apps/web/tests/assetExportJobsPage.test.ts": "28ddfec0b07b13799ed8809fb8e4c84979e0db9ddb045788ff8c01391291651f"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "api_or_database_executed": false,
+  "backend_changed": false,
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0
+}

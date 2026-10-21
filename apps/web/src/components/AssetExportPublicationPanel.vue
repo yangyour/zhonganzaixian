@@ -9,7 +9,7 @@ import {contextTransitionGuards} from '../utils/contextTransitionGuard'
 import {createExportPublicationWorkspace,emptyPublicationState} from '../utils/assetExportPublication'
 import {displayTime} from '../utils/display'
 import ApiErrorNotice from './ApiErrorNotice.vue'
-const props=defineProps<{jobId:string;jobVersion?:number}>()
+const props=defineProps<{jobId:string;jobVersion?:number;parentBusy?:boolean}>()
 const emit=defineEmits<{changed:[]}>()
 const state=shallowRef(emptyPublicationState()),confirming=ref(false)
 const workspace=createExportPublicationWorkspace(api,s=>state.value=s)
@@ -17,10 +17,11 @@ let disposed=false
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&can('assets:read')&&['padmin','msp'].includes(session.value.user.role)&&!switchingTenant.value))
 const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,props.jobId,permitted.value]))
 function syncProgress(){if(!disposed&&!state.value.attempt&&state.value.current&&props.jobVersion!==undefined&&state.value.current.version!==props.jobVersion)emit('changed')}
-async function refresh(){if(await workspace.read())syncProgress()}
-async function recover(){if(await workspace.retry())syncProgress()}
+async function refresh(){if(props.parentBusy)return;if(await workspace.read())syncProgress()}
+async function recover(){if(props.parentBusy)return;if(await workspace.retry())syncProgress()}
 watch(context,()=>{const s=session.value;confirming.value=false;workspace.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true}:null,props.jobId);if(permitted.value)void refresh()},{immediate:true,flush:'sync'})
-async function publish(){if(!permitted.value||state.value.busy||state.value.attempt||confirming.value)return;const turn=context.value;confirming.value=true;let success=false;try{await ElMessageBox.confirm('发布后可取得15分钟有效的下载链接。确认发布这份已准备好的台账文件？','发布台账文件',{confirmButtonText:'确认发布',cancelButtonText:'取消',type:'warning'});if(!disposed&&turn===context.value&&permitted.value)success=await workspace.publish()}catch{}finally{if(!disposed&&turn===context.value){confirming.value=false;if(success)syncProgress()}}}
+async function publish(){if(props.parentBusy||!permitted.value||state.value.busy||state.value.attempt||confirming.value)return;const turn=context.value;confirming.value=true;let success=false;try{await ElMessageBox.confirm('发布后可取得15分钟有效的下载链接。确认发布这份已准备好的台账文件？','发布台账文件',{confirmButtonText:'确认发布',cancelButtonText:'取消',type:'warning'});if(!disposed&&turn===context.value&&permitted.value&&!props.parentBusy)success=await workspace.publish()}catch{}finally{if(!disposed&&turn===context.value){confirming.value=false;if(success)syncProgress()}}}
+async function grant(){if(props.parentBusy||confirming.value)return;await workspace.grant()}
 function mayLeave(){if(workspace.unresolved()||confirming.value){ElMessage.warning('发布或下载授权结果尚未确认，请先恢复原请求');return false}return true}
 onBeforeRouteLeave(mayLeave);const unregister=contextTransitionGuards.register(mayLeave)
 function beforeUnload(e:BeforeUnloadEvent){if(workspace.unresolved()){e.preventDefault();e.returnValue=''}}
@@ -35,18 +36,18 @@ defineExpose({unresolved:()=>workspace.unresolved()||confirming.value,mayLeave})
   <ApiErrorNotice :error="state.error" />
   <p v-if="state.busy" role="status">正在处理，请稍候…</p>
   <p v-if="state.attempt&&!state.busy" role="alert">上一次请求结果未确认，请点击下方按钮重试。</p>
-  <button v-if="state.attempt&&!state.busy" type="button" @click="recover">重试提交</button>
+  <button v-if="state.attempt&&!state.busy" :disabled="parentBusy" type="button" @click="recover">重试提交</button>
   <template v-if="state.current">
    <p v-if="!state.current.publication_enabled">当前环境尚未启用文件发布。</p>
    <p v-else-if="!state.current.prepared">文件还未准备好，请稍后刷新。</p>
    <p v-else-if="state.current.status==='PUBLISHED'">文件已发布，可申请下载链接。{{state.current.row_count}} 行 · {{state.current.size_bytes}} 字节</p>
    <p v-else>文件已准备好，尚未发布。{{state.current.row_count}} 行 · {{state.current.size_bytes}} 字节</p>
    <div class="actions">
-    <button v-if="state.current.publication_enabled&&state.current.prepared&&state.current.status==='NOT_PUBLISHED'" type="button" :disabled="state.busy||!!state.attempt||confirming" @click="publish">发布导出文件</button>
-    <button v-if="state.current.download_grant_available" type="button" :disabled="state.busy||!!state.attempt||confirming" @click="workspace.grant()">获取下载链接</button>
+    <button v-if="state.current.publication_enabled&&state.current.prepared&&state.current.status==='NOT_PUBLISHED'" type="button" :disabled="parentBusy||state.busy||!!state.attempt||confirming" @click="publish">发布导出文件</button>
+    <button v-if="state.current.download_grant_available" type="button" :disabled="parentBusy||state.busy||!!state.attempt||confirming" @click="grant">获取下载链接</button>
    </div>
   </template>
-  <button type="button" :disabled="state.busy||confirming" @click="refresh">刷新发布状态</button>
+  <button type="button" :disabled="parentBusy||state.busy||confirming" @click="refresh">刷新发布状态</button>
   <p v-if="state.grant" class="download"><a :href="state.grant.content_url" referrerpolicy="no-referrer">下载台账 XLSX</a><br />有效至 {{displayTime(state.grant.expires_at)}}。过期后可重新申请链接。</p>
   <RouterLink to="/my-export-messages">查看我的导出消息</RouterLink>
   <p class="hint">文件不会自动下载。启用导出消息后，发布结果会保存到本人收件箱。</p>

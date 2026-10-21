@@ -9,6 +9,7 @@ import {contextTransitionGuards} from '../utils/contextTransitionGuard'
 import {createAssetExportWorkspace,emptyAssetExportState,type AssetExportState} from '../utils/assetExportWorkspace'
 import {assetExportInput,type AssetExportFilters} from '../utils/assetExportJobs'
 import {displayTime} from '../utils/display'
+import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import AssetExportPublicationPanel from '../components/AssetExportPublicationPanel.vue'
 const publicationPanel=ref<InstanceType<typeof AssetExportPublicationPanel>|null>(null)
@@ -16,7 +17,7 @@ const fresh=()=>({type:'',status:'',siteAny:true,site:'',queryAny:true,query:''}
 const form=reactive(fresh()),acknowledge=ref(false),dirty=ref(false),confirming=ref(false),validation=ref('')
 const state=shallowRef<AssetExportState>(emptyAssetExportState()),workspace=createAssetExportWorkspace(api,s=>{state.value=s})
 let disposed=false
-const autoRefresh=ref(true),formOpen=ref(false)
+const autoRefresh=ref(true),formOpen=ref(false),readScope=ref(0)
 let preparationTimer:ReturnType<typeof setInterval>|undefined
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&['padmin','msp'].includes(session.value.user.role)&&can('assets:read')&&!switchingTenant.value))
 const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value]))
@@ -29,17 +30,19 @@ function change(key:keyof typeof form,value:string|boolean){if(disposed||!permit
 function inputValue(event:Event){return(event.target as HTMLInputElement).value}
 function checked(event:Event){return(event.target as HTMLInputElement).checked}
 function changeAck(value:boolean){if(disposed||!permitted.value||locked.value)return false;acknowledge.value=value;return true}
-watch(contextKey,()=>{Object.assign(form,fresh());acknowledge.value=false;dirty.value=false;confirming.value=false;validation.value='';const s=session.value;workspace.reset(!disposed&&permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true}:null);if(permitted.value&&!disposed)void workspace.list()},{immediate:true,flush:'sync'})
+watch(contextKey,()=>{readScope.value++;Object.assign(form,fresh());acknowledge.value=false;dirty.value=false;confirming.value=false;validation.value='';const s=session.value;workspace.reset(!disposed&&permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true}:null);if(permitted.value&&!disposed)void workspace.list()},{immediate:true,flush:'sync'})
 async function readAccepted(){const receipt=state.value.receipt;if(!disposed&&permitted.value&&receipt)await workspace.select(receipt.job_id)}
-async function submit(){if(disposed||!permitted.value||locked.value||!acknowledge.value)return false;validation.value='';try{assetExportInput(filters())}catch{validation.value='筛选未通过：请核对类型、状态和文本长度；没有受理';return false}const accepted=await workspace.submit(filters());if(accepted)await readAccepted();return accepted}
-async function retry(){if(disposed||!permitted.value||busy.value)return false;const accepted=await workspace.retry();if(accepted)await readAccepted();return accepted}
+async function submit(){if(disposed||!permitted.value||locked.value||!acknowledge.value||publicationPanel.value&&!publicationPanel.value.mayLeave())return false;validation.value='';try{assetExportInput(filters())}catch{validation.value='筛选未通过：请核对类型、状态和文本长度；没有受理';return false}const accepted=await workspace.submit(filters());if(accepted)await readAccepted();return accepted}
+async function retry(){if(disposed||!permitted.value||busy.value||publicationPanel.value&&!publicationPanel.value.mayLeave())return false;const accepted=await workspace.retry();if(accepted)await readAccepted();return accepted}
 function pollPreparation(){const current=state.value.selected;if(disposed||!permitted.value||document.hidden||!autoRefresh.value||busy.value||workspace.unresolved()||publicationPanel.value?.unresolved()||!current||current.prepared!==null||!['QUEUED','RUNNING'].includes(current.status))return;void workspace.refreshSelected()}
 onMounted(()=>{preparationTimer=setInterval(pollPreparation,2000);document.addEventListener('visibilitychange',pollPreparation)})
-async function browse(next=false){if(disposed||!permitted.value||busy.value)return false;return workspace.list(next)}
+async function browse(next=false){if(disposed||!permitted.value||busy.value||publicationPanel.value&&!publicationPanel.value.mayLeave())return false;return workspace.list(next)}
+function cancelRead(){if(publicationPanel.value&&!publicationPanel.value.mayLeave())return false;const cancelled=workspace.cancelRead();if(cancelled)autoRefresh.value=false;return cancelled}
+async function retryRead(){if(disposed||!permitted.value||busy.value||publicationPanel.value&&!publicationPanel.value.mayLeave())return false;return workspace.retryRead()}
 async function select(id:string){if(disposed||!permitted.value||busy.value||publicationPanel.value&&!publicationPanel.value.mayLeave())return false;return workspace.select(id)}
 async function discard(){if(publicationPanel.value&&!publicationPanel.value.mayLeave())return false;if(workspace.unresolved()){ElMessage.warning('原请求正在提交或结果未知，必须先用原请求恢复；普通刷新不能确认');return false}if(confirming.value)return false;if(!dirty.value&&!state.value.attempt)return true;const turn=contextKey.value;confirming.value=true;try{await ElMessageBox.confirm('已受理作业会保留在服务器；继续将清除本页筛选草稿与原收据显示，确认继续？','离开当前准备请求',{confirmButtonText:'清除并继续',cancelButtonText:'留在本页',type:'warning'});return!disposed&&turn===contextKey.value&&!workspace.unresolved()}catch{return false}finally{if(!disposed&&turn===contextKey.value)confirming.value=false}}
-async function beginNew(){const turn=contextKey.value;if(disposed||!permitted.value||busy.value||!await discard()||turn!==contextKey.value||!workspace.begin())return false;Object.assign(form,fresh());acknowledge.value=false;dirty.value=false;validation.value='';return true}
-function unlockRejected(){if(disposed||!permitted.value||busy.value||state.value.attempt?.state!=='rejected'||!workspace.begin())return false;acknowledge.value=false;dirty.value=true;return true}
+async function beginNew(){const turn=contextKey.value;if(disposed||!permitted.value||busy.value||!await discard()||turn!==contextKey.value||!workspace.begin())return false;readScope.value++;Object.assign(form,fresh());acknowledge.value=false;dirty.value=false;validation.value='';return true}
+function unlockRejected(){if(disposed||!permitted.value||busy.value||state.value.attempt?.state!=='rejected'||!workspace.begin())return false;readScope.value++;acknowledge.value=false;dirty.value=true;return true}
 onBeforeRouteLeave(discard);const unregister=contextTransitionGuards.register(discard)
 function beforeUnload(event:BeforeUnloadEvent){if(dirty.value||state.value.attempt||workspace.unresolved()){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
@@ -47,7 +50,7 @@ onUnmounted(()=>{disposed=true;if(preparationTimer!==undefined)clearInterval(pre
 const statusText=(s:string)=>({QUEUED:'排队等待生成',RUNNING:'正在生成导出文件',RECONCILING_STORAGE:'正在核对存储状态',SUCCEEDED:'库内结果记为成功，存储尚未复核',FAILED:'作业执行未完成，可查看错误原因'}[s]??'未知阶段')
 const valueText=(v:string|null)=>v===null?'不限':v===''?'明确空字符串':v
 const errorText=(s:string)=>({AUTHORIZATION_CHANGED:'原受理授权已变化',SOURCE_UNAVAILABLE:'来源不可用',INPUT_LIMIT:'输入超过技术边界',ENCODING_FAILED:'文件编码失败',CONFIRMED_STORAGE_REJECTION:'存储已明确拒绝'}[s]??'未知错误')
-defineExpose({form,state,acknowledge,locked,autoRefresh,pollPreparation,filters,change,changeAck,submit,retry,browse,select,beginNew,unlockRejected,discard,hasUnresolved:workspace.unresolved})
+defineExpose({form,state,acknowledge,locked,autoRefresh,pollPreparation,filters,change,changeAck,submit,retry,browse,select,beginNew,unlockRejected,discard,cancelRead,retryRead,hasUnresolved:workspace.unresolved})
 </script>
 <template>
  <section class="export-page"><div class="page-heading proto-page-head"><div><h1>资产台账导出 <span class="proto-badge">{{ session?.tenant.name }}</span></h1><p>创建资产台账导出任务、跟踪后台文件生成进度并管理下载发布</p></div><button v-if="permitted" class="export-create" type="button" @click="formOpen=true">新建导出请求</button></div>
@@ -69,6 +72,8 @@ defineExpose({form,state,acknowledge,locked,autoRefresh,pollPreparation,filters,
    <p v-if="validation" role="alert" class="warning">{{validation}}</p><div class="actions"><button type="submit" :disabled="locked||!acknowledge">提交导出申请</button><button type="button" :disabled="busy||workspace.unresolved()" @click="beginNew">重置条件</button></div>
   </form>
   </details>
+  <ReadRecoveryActions :busy="state.busy" :can-retry="!confirming&&workspace.canRetryRead()" :scope-key="contextKey+':'+readScope" label="导出作业" :cancel="cancelRead" :retry="retryRead" />
+  <p v-if="!autoRefresh" class="hint">准备进度自动刷新已暂停；手动重试读取不会恢复自动刷新，也不会取消后台导出任务。</p>
   <ApiErrorNotice :error="state.error" />
   <section v-if="state.attempt" class="panel original-request"><h2>本次提交状态与受理回执</h2><p>状态：{{state.attempt.state==='uncertain'?'结果未知，请先通过重试确认提交结果':state.attempt.state==='accepted'?'已收到后台受理回执':'请求未通过校验，可解锁后修改筛选条件'}}</p><p v-if="originalFilters">类型：{{valueText(originalFilters.type)}} · 状态：{{valueText(originalFilters.status)}}</p><p v-if="originalFilters">站点：{{valueText(originalFilters.site_id)}} · 检索文本：{{valueText(originalFilters.query)}}</p><p>刷新列表不会重复触发导出任务；若提交结果未知，请点击下方按钮使用原请求参数重试。</p>
    <button v-if="state.attempt.state==='uncertain'" type="button" :disabled="busy" @click="retry">重试提交</button><button v-if="state.attempt.state==='rejected'" type="button" :disabled="busy" @click="unlockRejected">返回修改筛选</button>
@@ -76,7 +81,7 @@ defineExpose({form,state,acknowledge,locked,autoRefresh,pollPreparation,filters,
   </section>
   <section v-if="state.selected" class="panel current-export" :aria-busy="state.busy==='read'"><h2>导出进度与文件发布</h2><label class="check"><input v-model="autoRefresh" type="checkbox" aria-label="自动刷新准备进度" />自动刷新准备进度</label><p class="hint">开启后每 2 秒自动同步未完成任务的后台处理进度（页面切至后台或任务完成后自动停止轮询）。</p><h3>{{statusText(state.selected.status)}}</h3><p>{{state.selected.id}} · v{{state.selected.version}} · 已调度执行 {{state.selected.attempts}} 次</p><p>更新时间 {{displayTime(state.selected.updated_at)}}（Asia/Shanghai）</p><p>类型：{{valueText(state.selected.filters.type)}} · 状态：{{valueText(state.selected.filters.status)}}</p><p>站点：{{valueText(state.selected.filters.site_id)}} · 检索文本：{{valueText(state.selected.filters.query)}}</p>
    <p v-if="!state.selected.prepared" class="no-preparation">文件尚未生成完毕，行数与文件大小未知</p><div v-else class="prepared-descriptor"><h3>已生成的文件信息</h3><p>{{state.selected.prepared.row_count}} 行{{state.selected.prepared.row_count===0?'（明确空结果）':''}} · {{state.selected.prepared.size_bytes}} 字节</p><p>生成时间 {{displayTime(state.selected.prepared.generated_at)}}（Asia/Shanghai）</p><small>文件SHA256 {{state.selected.prepared.file_sha256}}</small><small>筛选SHA256 {{state.selected.prepared.selection_sha256}}</small></div>
-   <p v-if="state.selected.error_code" class="warning" role="alert">{{errorText(state.selected.error_code)}}（历史请求参数与文件摘要已保留）</p><AssetExportPublicationPanel :key="state.selected.id+':'+state.selected.version" ref="publicationPanel" :job-id="state.selected.id" :job-version="state.selected.version" @changed="select(state.selected!.id)" />
+   <p v-if="state.selected.error_code" class="warning" role="alert">{{errorText(state.selected.error_code)}}（历史请求参数与文件摘要已保留）</p><AssetExportPublicationPanel :key="state.selected.id+':'+state.selected.version" ref="publicationPanel" :job-id="state.selected.id" :job-version="state.selected.version" :parent-busy="busy" @changed="select(state.selected!.id)" />
   </section>
  </template></section>
 </template>

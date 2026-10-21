@@ -1,0 +1,14 @@
+{
+  "purpose": "dependency_shape_only_not_a_runtime_publication",
+  "event_pull_enabled": false,
+  "production_approved": false,
+  "resource_pool_id": null,
+  "approved_source_connection_reference": null,
+  "existing_read_credential_reference": null,
+  "verified_object_mapping_reference": null,
+  "durable_watermark_repository_reference": null,
+  "failed_payload_store_reference": null,
+  "runtime_publications": {"event.review_transition_policy": null},
+  "fixed_registry_keys": ["event.compensation_interval_sec", "event.compensation_lookback_sec", "event.failed_payload_retention_hours"],
+  "notes": "Checklist only. Do not paste endpoints, tokens or payloads. Values must be resolved and authorized server-side. A decoded page does not commit a watermark, authenticate a source, prove complete history or authorize event handling, automatic tickets or notification sends."
+}

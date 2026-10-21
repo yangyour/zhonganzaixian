@@ -19,7 +19,7 @@ public final class ZabbixReadClient {
         ReadFailure(String reason){super("Zabbix read unavailable: "+reason);this.reason=reason;}
     }
     public static final int MAX_BYTES=2*1024*1024;
-    private static final Set<String> METHODS=Set.of("host.get","item.get","history.get");
+    private static final Set<String> METHODS=Set.of("host.get","item.get","history.get","event.get");
     private final URI endpoint;
     private final String token;
     private final HttpClient client;

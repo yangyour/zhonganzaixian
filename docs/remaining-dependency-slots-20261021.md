@@ -51,3 +51,5 @@
 [V49版本登记与运行完成事务](backup-version-registration-20261021.md)已实现核心和隔离验证；登记授权、采集完成证明及装配仍为null，已有原对象验证依赖须真实实现。不把历史登记视作当前对象健康，不启用设备、保留删除或自动失败工单。
 
 [备份版本分页查询](backup-version-inventory-20261021.md)已有独立授权仓储核心及隔离验证，备份依赖引用现为29项null；新增列表授权不继承草稿权限，服务装配、下载/解密与真实权限适配仍待。
+
+[回执逐条追加日志格式](delivery-receipt-journal-20261021.md)可独立验证原命令和有序历史，尚非数据库仓库。已有receipt_history_repository_reference、receipt_journal_authorizer_reference、receipt_provider_correlation_reference、receipt_callback_authenticator_reference等引用继续null；操作者/权限版本仅记录，不作为授权或验签证明。

@@ -1,0 +1,45 @@
+{
+  "result": "PASS_BOUNDED_APPEND_ONLY_DELIVERY_JOURNAL_REPRESENTATION",
+  "new_java_tests": 15,
+  "new_python_tests": 3,
+  "java_full_verify": {
+    "tests": 4067,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1022,
+    "executed": 3045
+  },
+  "python_tests_passed": 134,
+  "node_contract_tests_passed": 173,
+  "contract_and_progress_checks": "PASS_UNCHANGED_128_FORMAL_TC_NOT_RUN",
+  "independent_vector": {
+    "bytes": 1314,
+    "head_sha256": "3b0182a68996ff286bfa94d7361053b5c809d1677615df76e2e4e4a201d3eb08",
+    "reference": "Python standard library struct/uuid compared byte-for-byte by Java"
+  },
+  "bounded_history_regression": {
+    "entries": 201,
+    "per_receipt_entry_size_constant": true
+  },
+  "database_persisted": false,
+  "ddl_changed": false,
+  "api_or_frontend_changed": false,
+  "provider_receipt_verified": false,
+  "automatic_send_enabled": false,
+  "provider_calls": 0,
+  "frontend_rerun": false,
+  "previous_frontend_baseline": {
+    "tests": 3966,
+    "build_id": "a4037fa506537d6b3329c6fd1003f6500af85f99cd6fc9a0f08c9ea1660d2a83"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "formal_acceptance_passes_added": 0,
+  "api_jar_sha256": "48693c8bd745bec31202ac6b013357ec53c10e265c1ed33520764d0fbf685620",
+  "source_sha256": {
+    "server/persistence/src/main/java/cn/mop/persistence/DeliveryReceiptJournal.java": "87a45ff390972e7af310d16a17d3a5f0fc07c0265c18a5b1d522a2ef07c0d877",
+    "server/api/src/test/java/cn/mop/persistence/DeliveryReceiptJournalTest.java": "705cf1f39935a2ca7c0d58d67a93833e598a88c45538e8883eb5013309f4df82",
+    "tools/delivery_journal_vector.py": "95e7eab5d1217cb731d9c2922affe4683e65b9fbc906b50733daa4e610870c4e",
+    "tools/test_delivery_journal_vector.py": "fa0ac817cd3a12f7c00b3b017ebb08b8ab829c334622bf8d70f8684375b13cd0",
+    "fixtures/delivery-receipt-journal-vector-20261021.json": "8194a4952f60e9ef6b1139e21d1e6ebdc328f40c6cdaff9dbc118389beed47a7"
+  }
+}

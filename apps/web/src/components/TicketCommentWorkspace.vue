@@ -8,6 +8,7 @@ import type { RegisteredTicket } from '../api/types'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createTicketCommentWorkspace, emptyCommentState, validateTicketCommentText, type CommentState } from '../utils/ticketCommentWorkspace'
 import { displayTime } from '../utils/display'
+import ReadRecoveryActions from './ReadRecoveryActions.vue'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 const props = defineProps<{ modelValue: boolean; ticket: RegisteredTicket | null; guardedByParent?: boolean }>()
@@ -51,7 +52,7 @@ async function canLeave(action='离开页面、切换租户或退出') {
 onBeforeRouteLeave(() => props.guardedByParent ? true : canLeave())
 const unregisterContextGuard = contextTransitionGuards.register(() => props.guardedByParent ? true : canLeave(),inputSnapshot)
 onUnmounted(() => { disposed=true; unregisterContextGuard(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
-defineExpose({ hasUnresolved: workspace.unresolved, canLeave, inputSnapshot })
+defineExpose({ hasUnresolved: workspace.unresolved, canLeave, inputSnapshot, cancelRead:workspace.cancelRead, retryRead:workspace.retryRead })
 </script>
 
 <template>
@@ -61,6 +62,7 @@ defineExpose({ hasUnresolved: workspace.unresolved, canLeave, inputSnapshot })
     <el-empty v-if="!permitted" description="当前身份或租户没有客户沟通评论权限" />
     <template v-else>
       <div class="ticket-comment-actions"><el-button :loading="state.busy === 'read'" :disabled="state.busy === 'write'" @click="workspace.refresh()">刷新列表</el-button><el-button :disabled="Boolean(state.busy) || !state.page?.has_more" @click="workspace.refresh(true)">下一页</el-button><span>{{ state.paged ? '后续页' : '第 1 页' }} · 每页 15 条</span></div>
+      <ReadRecoveryActions :busy="state.busy" :can-retry="workspace.canRetryRead()" :scope-key="contextKey" label="客户沟通" :cancel="workspace.cancelRead" :retry="workspace.retryRead" />
       <ApiErrorNotice :error="state.error" />
       <el-alert v-if="state.attempt?.state === 'uncertain'" type="warning" :closable="false" title="提交结果待确认：已保留并锁定原请求。刷新仅查看当前列表，不能确认原请求；请使用“重试提交”恢复完全相同的原请求。" />
       <el-button v-if="state.attempt?.state === 'uncertain'" type="warning" :disabled="Boolean(state.busy) || !writable" @click="retryOriginal">重试提交</el-button>

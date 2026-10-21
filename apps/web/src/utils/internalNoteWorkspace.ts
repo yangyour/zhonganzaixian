@@ -1,6 +1,6 @@
 import { createRequestId, digestSha256 } from './browserCrypto'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
-import { ApiError, isCancelled, type ApiClient } from '../api/client'
+import { ApiError, isCancelled, StaleRequestError, type ApiClient } from '../api/client'
 import { worklogInstant } from './worklogWorkspace'
 
 export interface InternalNote { id: string; tenant_id: string; ticket_id: string; actor_id: string; observed_ticket_version: number; text: string; text_sha256: string; created_at: string; visibility: 'INTERNAL'; record_source: 'MANUAL_INTERNAL_NOTE'; verification_status: 'SELF_REPORTED'; source: 'postgresql'; immutable: true; ticket_state_changed: false; sla_changed: false }
@@ -35,35 +35,38 @@ async function readPage(value: unknown, scope: NoteContext, parentVersion: numbe
   return copy({ ...value, items }) as unknown as NotePage
 }
 export const emptyNoteState = (): NoteState => ({ page: null, parentVersion: null, receipt: null, attempt: null, busy: null, error: null, paged: false })
+interface ReadTarget { next:boolean; boundary:{time:string;id:string}|null }
 export function createInternalNoteWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: NoteState) => void, newKey: () => string = () => createRequestId()) {
-  let scope: NoteContext | null = null, state = emptyNoteState(), epoch = 0, controller: AbortController | undefined
-  const emit = () => changed(detachedWorkspaceState(state)), path = () => `/tickets/${scope!.ticketId}/internal-notes`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
-  function reset(next: NoteContext | null) { controller?.abort(); ++epoch; const valid = next && [next.tenantId, next.ticketId, next.actorId].every(id => uuid.test(id)) && version(next.permissionVersion) && typeof next.canWrite === 'boolean'; scope = valid ? { ...next! } : null; state = emptyNoteState(); if (next && !valid) state.error = invalid(); emit() }
-  async function refresh(next = false) {
-    if (!scope || state.busy === 'write' || next && (state.busy || !state.page?.has_more)) return false
-    const context = { ...scope }, boundary = next ? { time: state.page!.next_before_created_at!, id: state.page!.next_before_id! } : null, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort
+  let scope: NoteContext | null = null, state = emptyNoteState(), epoch = 0, disposed = false, lastRead: ReadTarget | null = null, controller: AbortController | undefined
+  const emit = () => changed(detachedWorkspaceState(state)), path = (context: NoteContext) => `/tickets/${context.ticketId}/internal-notes`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
+  function reset(next: NoteContext | null) { controller?.abort(); controller=undefined; ++epoch; lastRead=null; const valid = !disposed && next && [next.tenantId, next.ticketId, next.actorId].every(id => uuid.test(id)) && version(next.permissionVersion) && typeof next.canWrite === 'boolean'; scope = valid ? { ...next! } : null; state = emptyNoteState(); if (next && !valid && !disposed) state.error = invalid(); emit() }
+  async function refresh(next = false, recovery?: ReadTarget) {
+    if (!scope || disposed || state.busy === 'write' || next && !recovery && (state.busy || !state.page?.has_more)) return false
+    const context = { ...scope }, boundary = recovery ? recovery.boundary : next ? { time: state.page!.next_before_created_at!, id: state.page!.next_before_id! } : null, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort
     const query = '?page_size=15' + (boundary ? '&before_created_at=' + encodeURIComponent(boundary.time) + '&before_id=' + boundary.id : '')
-    state = { ...state, page: null, parentVersion: null, busy: 'read', error: null, paged: next }; emit()
+    lastRead=structuredClone({next,boundary});state = { ...state, page: null, parentVersion: null, busy: 'read', error: null, paged: next }; emit()
     try {
-      const [parent, raw] = await Promise.all([client.request<unknown>(`/tickets/${context.ticketId}`, { signal: abort.signal }), client.request<unknown>(path() + query, { signal: abort.signal })])
+      const request=(url:string)=>turn!==epoch||disposed||abort.signal.aborted?Promise.reject(new StaleRequestError()):client.request<unknown>(url,{signal:abort.signal})
+      const [parent, raw] = await Promise.all([request(`/tickets/${context.ticketId}`), request(path(context) + query)])
       if (turn !== epoch || abort.signal.aborted) return false
       if (!object(parent) || parent.id !== context.ticketId || parent.tenant_id !== context.tenantId || !version(parent.version) || state.receipt && parent.version < state.receipt.observed_ticket_version) throw invalid()
       const page = await readPage(raw, context, parent.version, boundary)
       if (turn !== epoch || abort.signal.aborted) return false
       if (state.receipt) { const known = page.items.find(v => v.id === state.receipt!.id); if (!next && !page.has_more && !known || known && Object.keys(known).some(key => known[key as keyof InternalNote] !== state.receipt![key as keyof InternalNote])) throw invalid() }
-      state = { ...state, page, parentVersion: parent.version }; return true
+      state = { ...state, page, parentVersion: parent.version }; lastRead=null;return true
     } catch (error) { if (turn === epoch && !isCancelled(error)) state = { ...state, error }; return false }
     finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
   async function send(attempt: Attempt, retry = false) {
-    if (!scope?.canWrite || state.busy) return false
-    const context = { ...scope }, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort; state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
+    if (!scope?.canWrite || disposed || state.busy) return false
+    lastRead=null;const context = { ...scope }, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort; state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
     try {
       const body = JSON.parse(attempt.payload) as { expected_ticket_version: number; text: string }
-      const receipt = await readInternalNote(await client.request<unknown>(path(), { method: 'POST', body, idempotencyKey: attempt.key, signal: abort.signal }), context)
+      if(turn!==epoch||disposed||abort.signal.aborted)return false
+      const receipt = await readInternalNote(await client.request<unknown>(path(context), { method: 'POST', body, idempotencyKey: attempt.key, signal: abort.signal }), context)
       if (turn !== epoch || abort.signal.aborted) return false
       if (receipt.actor_id !== context.actorId || receipt.observed_ticket_version !== body.expected_ticket_version || receipt.text !== body.text) throw invalid()
-      state = { ...state, receipt, attempt: { ...attempt, state: 'accepted' }, busy: null }; emit(); await refresh(); return true
+      state = { ...state, receipt, attempt: { ...attempt, state: 'accepted' }, busy: null }; emit(); if(turn===epoch&&!disposed&&!abort.signal.aborted)await refresh(); return true
     } catch (error) {
       if (turn !== epoch) return false
       const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
@@ -71,8 +74,13 @@ export function createInternalNoteWorkspace(client: Pick<ApiClient, 'request'>, 
     } finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
   async function submit(text: string, expectedParentVersion: number) {
-    if (!scope?.canWrite || state.busy || unresolved() || !state.parentVersion || state.parentVersion !== expectedParentVersion) return false
-    validateInternalNoteText(text); return send({ key: newKey(), payload: JSON.stringify({ expected_ticket_version: expectedParentVersion, text }), state: 'uncertain' })
+    if (!scope?.canWrite || disposed || state.busy || unresolved() || !state.parentVersion || state.parentVersion !== expectedParentVersion) return false
+    validateInternalNoteText(text);const turn=epoch
+    try{const key=newKey();if(turn!==epoch||disposed||!scope?.canWrite||state.busy||unresolved())return false;if(typeof key!=='string'||!/^[A-Za-z0-9._:-]{1,128}$/.test(key))throw Error('INVALID_KEY');return send({key,payload:JSON.stringify({expected_ticket_version:expectedParentVersion,text}),state:'uncertain'})}
+    catch{if(turn===epoch&&!disposed){state={...state,error:new ApiError(0,'REQUEST_ID_UNAVAILABLE','无法生成有效请求标识；没有发送文字保存请求，请稍后重试','—')};emit()}return false}
   }
-  emit(); return { reset, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => detachedWorkspaceState(state) }
+  function canRetryRead(){return !!scope&&!disposed&&!state.busy&&lastRead!==null}
+  function cancelRead(){if(disposed||state.busy!=='read')return false;++epoch;controller?.abort();controller=undefined;state={...state,busy:null,error:null};emit();return true}
+  async function retryRead(){if(!canRetryRead()||!lastRead)return false;const target=structuredClone(lastRead);return refresh(target.next,target)}
+  emit(); return { reset, refresh:(next=false)=>refresh(next), cancelRead, retryRead, canRetryRead, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => { disposed=true;reset(null) }, state: () => detachedWorkspaceState(state) }
 }

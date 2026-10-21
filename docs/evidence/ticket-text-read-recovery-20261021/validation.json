@@ -1,0 +1,61 @@
+{
+  "result": "PASS_ORIGINAL_TICKET_TEXT_READ_RECOVERY",
+  "new_tests": 38,
+  "new_test_layers": {
+    "workspace": 32,
+    "real_drawer_dom": 6
+  },
+  "focused_tests_passed": 108,
+  "vitest": {
+    "files_passed": 248,
+    "tests_passed": 3938
+  },
+  "node_contract_tests_passed": 173,
+  "api_contract_check": "PASS_UNCHANGED",
+  "contract_progress_check": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "typecheck": "PASS",
+  "production_build": {
+    "build_id": "6372bdbbc64ac44db8749326b47af0def000b699e2d9873fe6df763ca7b8dbf9",
+    "file_count": 141,
+    "bootstrap_gzip_bytes": 180060,
+    "bootstrap_css_gzip_bytes": 62537,
+    "scope": "static-artifacts-only"
+  },
+  "initial_failures": [
+    {
+      "kind": "wrong_working_directory",
+      "source_written": false,
+      "fixed": "explicit workdir"
+    },
+    {
+      "kind": "DOM_selector_scope",
+      "tests_failed": 6,
+      "fixed": "scope to actual drawer instead of record section"
+    },
+    {
+      "kind": "test_implicit_any",
+      "errors": 2,
+      "fixed": "explicit callback types"
+    }
+  ],
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "browser_specs_discovered_previously": 74,
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_customer_or_internal_text_writes": 0,
+  "formal_acceptance_passes_added": 0,
+  "source_sha256": {
+    "apps/web/src/utils/internalNoteWorkspace.ts": "aa5761266f1d0097a18f4c871114f011486741c31ae9847eb28cc41500e1f100",
+    "apps/web/src/utils/ticketCommentWorkspace.ts": "88f595432867103b2e2f68693166a731321fb0f0c96a796d5dfaafa79bafb3ea",
+    "apps/web/src/components/InternalNoteWorkspace.vue": "d6b86bd5894d7da129f2f6e9e2c6cead35ebadd8ca1c34b5988beeffe7c01309",
+    "apps/web/src/components/TicketCommentWorkspace.vue": "9e7371dfba61b341b6dad9a2cda2f559dbaf1294f1be0bbf74eef16d686fd27d",
+    "apps/web/tests/internalNoteWorkspace.test.ts": "cde1bdd078814a9ebe144498568713201de2542ec6f7cc898da3adb067ac911f",
+    "apps/web/tests/ticketCommentWorkspace.test.ts": "f901e0c7477b84c82dac74e09fbde3c79c545c75feae5cc2ce507ab8c07027ea",
+    "apps/web/tests/ticketEditorDraftProtection.test.ts": "8cf1f3cf1a7591800624f0b14abd3c7f803788d8bfe8bcbb8d0991f7de227312"
+  }
+}

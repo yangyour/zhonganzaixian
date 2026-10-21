@@ -54,18 +54,19 @@ export interface InspectionSourceReadState { target: InspectionSourceTarget|null
 export const emptyInspectionSourceReadState=():InspectionSourceReadState=>({target:null,data:null,busy:false,error:null})
 /** Separate read state: never acknowledges, edits or retries a worksheet mutation. */
 export function createInspectionSourceReader(client:Pick<ApiClient,'request'>,changed:(value:InspectionSourceReadState)=>void){
-  let context:WorksheetContext|null=null,state=emptyInspectionSourceReadState(),epoch=0,abort:AbortController|null=null,disposed=false
+  let context:WorksheetContext|null=null,state=emptyInspectionSourceReadState(),epoch=0,abort:AbortController|null=null,disposed=false,readRetryable=false
   const snapshot=()=>detachedReadState(state),emit=()=>changed(snapshot())
-  function reset(next:WorksheetContext|null){abort?.abort();abort=null;++epoch;context=!disposed&&validInspectionContext(next)?{...next}:null;state=emptyInspectionSourceReadState();emit()}
+  function reset(next:WorksheetContext|null){readRetryable=false;abort?.abort();abort=null;++epoch;context=!disposed&&validInspectionContext(next)?{...next}:null;state=emptyInspectionSourceReadState();emit()}
   async function load(selected:InspectionSourceTarget){
     if(!context||disposed)return false
-    abort?.abort();abort=null;const turn=++epoch,scope={...context};state=emptyInspectionSourceReadState()
+    readRetryable=false;abort?.abort();abort=null;const turn=++epoch,scope={...context};state=emptyInspectionSourceReadState()
     let wanted:InspectionSourceTarget;try{wanted=target(selected)}catch(error){state.error=error;emit();return false}
     const controller=new AbortController();abort=controller;state={target:wanted,data:null,busy:true,error:null};emit()
-    try{const raw=await client.request('/inspection-worksheets/'+wanted.worksheetId+'/revisions/'+wanted.version,{signal:controller.signal});if(turn!==epoch||disposed||controller.signal.aborted)return false
+    try{if(turn!==epoch||disposed||controller.signal.aborted)return false;const raw=await client.request('/inspection-worksheets/'+wanted.worksheetId+'/revisions/'+wanted.version,{signal:controller.signal});if(turn!==epoch||disposed||controller.signal.aborted)return false
       const data=await readInspectionSourceRevision(raw,scope,wanted);if(turn!==epoch||disposed||controller.signal.aborted)return false;state.data=data;return true
-    }catch(error){if(turn===epoch&&!disposed&&!isCancelled(error))state.error=error;return false}
+    }catch(error){if(turn===epoch&&!disposed&&!isCancelled(error)){state.error=error;readRetryable=true}return false}
     finally{if(turn===epoch&&!disposed){state.busy=false;abort=null;emit()}}
   }
-  return {reset,load,state:snapshot,dispose(){if(disposed)return;disposed=true;reset(null)}}
+  function cancelRead(){if(disposed||!state.busy)return false;++epoch;abort?.abort();abort=null;readRetryable=state.target!==null;state={...state,data:null,busy:false,error:null};emit();return true}
+  return {cancelRead,canRetryRead:()=>!disposed&&readRetryable&&state.target!==null&&!state.busy,retryRead:()=>readRetryable&&state.target?load({...state.target}):Promise.resolve(false),reset,load,state:snapshot,dispose(){if(disposed)return;disposed=true;reset(null)}}
 }

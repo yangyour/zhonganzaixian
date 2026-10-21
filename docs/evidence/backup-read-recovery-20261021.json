@@ -1,0 +1,38 @@
+{
+  "base_commit": "8284eae902ff28e13107ab9295290d6375f1f791",
+  "result": "PASS_UNIT_DOM_BUILD_STATIC",
+  "web_tests": 3204,
+  "web_files": 216,
+  "new_tests": 10,
+  "focused_tests": 69,
+  "contract_tests": 173,
+  "build_id": "0905e648cf1cfc1dcc95b38ebae99444d137d40a1c6fbadf71d99f4b6fc801b3",
+  "bootstrap_gzip_bytes": 179743,
+  "backend_or_api_changed": false,
+  "actual_http_reexecuted": false,
+  "read_retry_scope": [
+    "LIST_CURSOR",
+    "PLAN_ID",
+    "HISTORY_BEFORE_VERSION"
+  ],
+  "write_cancel_supported": false,
+  "unknown_original_request_retained": true,
+  "unsaved_input_preserved": true,
+  "cross_scope_late_focus": "IGNORED_DOM",
+  "device_connections": 0,
+  "created_backup_runs": 0,
+  "browser_scripts_discovered": 51,
+  "browser_and_axe": "NOT_RUN",
+  "formal_acceptance": {
+    "total": 128,
+    "NOT_RUN": 128
+  },
+  "source_sha256": {
+    "apps/web/src/utils/backupPlanWorkspace.ts": "9b3f2efb67906635d0609094d56e4a2cfcb25bf73d49594f8419e105dd444b3e",
+    "apps/web/src/pages/BackupPlanDraftsPage.vue": "68f5071b0ccba3b70e8a5a8c23b7af7040db2f4558a0f06a0334b4318a1dfb54",
+    "apps/web/src/components/BackupSchedulePreview.vue": "c2b197e20b778fa5de026cabac3cd4c8ccac7d305427e046a2cca3fc80e2cfce",
+    "apps/web/tests/backupPlanWorkspace.test.ts": "80a7ff2789002b01bc7f8193d0556f623281b8e8525e71001c78460cb868cfb1",
+    "apps/web/tests/backupPlanDraftsPage.test.ts": "5b1ab24791102a168595bc1c5d8c547d7431429e694c871a9ee730198b2906bc",
+    "apps/web/tests/backupSchedulePreviewPanel.test.ts": "7ff7d286715839af7fe940dccf932289d95f9f27f7dfd65cf07ec488900d9391"
+  }
+}

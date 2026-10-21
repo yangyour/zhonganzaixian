@@ -10,7 +10,7 @@ const date=ref(''),busy=ref(false),error=shallowRef<unknown>(null),result=shallo
 const allowed=computed(()=>session.value?.mode==='remote_test'&&session.value.user.role==='padmin'&&session.value.tenant.id===props.plan.tenant_id&&can('backup_plan_drafts:read')&&!switchingTenant.value)
 let epoch=0,abort:AbortController|null=null,alive=true
 function reset(){++epoch;abort?.abort();abort=null;busy.value=false;error.value=null;result.value=null}
-async function cancel(){reset();await nextTick();input.value?.focus()}
+async function cancel(){reset();const turn=epoch;await nextTick();if(alive&&turn===epoch&&allowed.value)input.value?.focus()}
 async function load(){
  if(!alive||!allowed.value||busy.value||!validPreviewDate(date.value))return
  reset();const turn=epoch,controller=new AbortController(),plan={...props.plan},requested=date.value;abort=controller;busy.value=true
@@ -18,7 +18,7 @@ async function load(){
  catch(cause){if(alive&&turn===epoch&&!isCancelled(cause))error.value=cause}
  finally{if(alive&&turn===epoch){busy.value=false;abort=null}}
 }
-watch(()=>[contextGeneration.value,session.value?.user.id,session.value?.tenant.id,session.value?.permission_version,session.value?.user.role,allowed.value,props.plan.id,props.plan.version,props.plan.daily_local_time,props.plan.archived,props.plan.requested_enabled],()=>{reset();date.value=''},{flush:'sync'})
+watch(()=>[contextGeneration.value,session.value?.user.id,session.value?.tenant.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,allowed.value,props.plan.id,props.plan.version,props.plan.daily_local_time,props.plan.archived,props.plan.requested_enabled],()=>{reset();date.value=''},{flush:'sync'})
 watch(date,reset,{flush:'sync'})
 onUnmounted(()=>{alive=false;reset()})
 </script>

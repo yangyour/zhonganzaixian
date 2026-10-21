@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed,onUnmounted,reactive,ref,shallowRef,watch} from 'vue'
+import {computed,nextTick,onUnmounted,reactive,ref,shallowRef,watch} from 'vue'
 import {onBeforeRouteLeave} from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import { feedback as ElMessage } from '../utils/feedback'
@@ -19,13 +19,15 @@ const form=reactive({name:'',dailyLocalTime:'02:00',credentialRef:'',intent:'',n
 const targets=ref<{id:string;name:string|null}[]>([]),targetPage=ref(0),targetRows=computed(()=>targets.value.slice(targetPage.value*10,targetPage.value*10+10))
 const assetQuery=ref(''),assetApplied=ref(''),assets=shallowRef<WorksheetAssetChoices|null>(null),checkedAssets=ref<string[]>([]),assetError=shallowRef<unknown>(null),assetBusy=ref(false)
 let assetEpoch=0,assetAbort:AbortController|null=null,disposed=false
-const pageQuery=ref('')
+const pageQuery=ref(''),readStatus=ref(''),readNotice=ref<HTMLElement|null>(null)
+let readTurn=0
 const state=shallowRef<BackupPlanState>(emptyBackupPlanState()),workspace=createBackupPlanWorkspace(api,s=>{state.value=s})
+watch(()=>state.value.busy,value=>{if(value==='write'){readTurn++;readStatus.value=''}},{flush:'sync'})
 const displayedRows=computed(()=>{const rows=state.value.page?.items??[],query=pageQuery.value.trim().toLocaleLowerCase();return query?rows.filter(r=>[r.name,r.id].join(' ').toLocaleLowerCase().includes(query)):rows})
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&session.value.user.role==='padmin'&&can('backup_plan_drafts:read')&&!switchingTenant.value))
 const writable=computed(()=>permitted.value&&can('backup_plan_drafts:write')),canChooseAssets=computed(()=>writable.value&&can('assets:read'))
 const locked=computed(()=>!writable.value||Boolean(state.value.busy)||Boolean(state.value.attempt)||assetBusy.value)
-const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value,writable.value,canChooseAssets.value]))
+const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,permitted.value,writable.value,canChooseAssets.value]))
 function context():BackupPlanContext|null{const s=session.value;return s&&permitted.value?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true,canWrite:writable.value}:null}
 function payload(){return{expected_version:baseline.value?.version??0,name:form.name,target_asset_ids:targets.value.map(t=>t.id),daily_local_time:form.dailyLocalTime,credential_ref:form.credentialRef===''?null:form.credentialRef.toLowerCase(),requested_enabled:form.intent===''?null:form.intent==='YES',note:form.note}}
 const unsaved=computed(()=>mode.value!==null&&state.value.attempt?.state!=='accepted'&&(state.value.attempt?.state==='rejected'||JSON.stringify(payload())!==initial.value||assetQuery.value!==''||checkedAssets.value.length>0))
@@ -33,7 +35,7 @@ const newerVersion=computed(()=>baseline.value&&state.value.selected?.id===basel
 const currentStep=computed(()=>state.value.attempt?.state==='accepted'?3:mode.value&&targets.value.length?2:1)
 function clearAssets(){assetAbort?.abort();assetAbort=null;++assetEpoch;assetBusy.value=false;assets.value=null;checkedAssets.value=[];assetError.value=null;assetQuery.value='';assetApplied.value=''}
 function clearEditor(){mode.value=null;baseline.value=null;initial.value='';validation.value='';targets.value=[];targetPage.value=0;expandedVersion.value=null;Object.assign(form,{name:'',dailyLocalTime:'02:00',credentialRef:'',intent:'',note:null});clearAssets()}
-watch(contextKey,()=>{workspace.reset(disposed?null:context());clearEditor();lookupId.value='';pageQuery.value='';if(permitted.value&&!disposed)void workspace.list()},{immediate:true,flush:'sync'})
+watch(contextKey,()=>{readTurn++;readStatus.value='';workspace.reset(disposed?null:context());clearEditor();lookupId.value='';pageQuery.value='';if(permitted.value&&!disposed)void workspace.list()},{immediate:true,flush:'sync'})
 watch(assetQuery,()=>{assetAbort?.abort();assetAbort=null;++assetEpoch;assetBusy.value=false;assets.value=null;checkedAssets.value=[];assetError.value=null},{flush:'sync'})
 async function discard(){if(!unsaved.value)return true;try{await ElMessageBox.confirm('将替换尚未成功保存的计划输入和候选选择；不会自动合并到新版本。是否继续？','保留未保存输入',{confirmButtonText:'确认替换',cancelButtonText:'保留输入',type:'warning'});return true}catch{return false}}
 function canPrepare(){if(disposed||!writable.value||state.value.busy||assetBusy.value)return false;if(workspace.unresolved()){ElMessage.warning('原请求结果未知，请按原请求重试，不能替换命令');return false}return true}
@@ -52,9 +54,11 @@ function addChecked(){if(locked.value||!mode.value||!canChooseAssets.value||!ass
 function removeTarget(index:number){if(locked.value||!Number.isInteger(index)||index<0||index>=targets.value.length)return false;targets.value.splice(index,1);targetPage.value=Math.min(targetPage.value,Math.max(0,Math.ceil(targets.value.length/10)-1));return true}
 function moveTarget(index:number,offset:-1|1){if(locked.value||!Number.isInteger(index)||index<0||index>=targets.value.length||index+offset<0||index+offset>=targets.value.length)return false;const target=targets.value.splice(index,1)[0]!;targets.value.splice(index+offset,0,target);targetPage.value=Math.floor((index+offset)/10);return true}
 function setNoteKnown(known:boolean){if(locked.value)return;form.note=known?form.note??'':null}
-async function browse(next=false){validation.value='';expandedVersion.value=null;return workspace.list(next)}
-async function select(id:string){validation.value='';expandedVersion.value=null;return workspace.select(id)}
-async function history(id:string,next=false){validation.value='';expandedVersion.value=null;return workspace.history(id,next)}
+async function browse(next=false){readTurn++;readStatus.value='';validation.value='';expandedVersion.value=null;return workspace.list(next)}
+async function select(id:string){readTurn++;readStatus.value='';validation.value='';expandedVersion.value=null;return workspace.select(id)}
+async function history(id:string,next=false){readTurn++;readStatus.value='';validation.value='';expandedVersion.value=null;return workspace.history(id,next)}
+async function retryRead(){readTurn++;readStatus.value='';expandedVersion.value=null;return workspace.retryRead()}
+async function cancelRead(){if(!workspace.cancelRead())return false;const turn=++readTurn,key=contextKey.value;readStatus.value='已取消读取；可重试同一页或同一版本历史，原写入结果与未保存输入不变。';await nextTick();if(!disposed&&turn===readTurn&&key===contextKey.value)readNotice.value?.focus();return true}
 async function lookup(){const id=lookupId.value.toLowerCase();if(!backupPlanUuid(id)){validation.value='请填写完整计划UUID；不会自动选择第一条';return false}return select(id)}
 async function save(){if(disposed||locked.value||!mode.value)return false;validation.value='';const turn=contextKey.value;const success=await workspace.submit(mode.value,payload(),baseline.value);if(disposed||turn!==contextKey.value)return false;if(success)ElMessage.success('原请求收据已确认，草稿仍未启用');else if(!state.value.attempt)validation.value='请填写名称、明确目标、HH:mm时间和启用意向；凭据仅可填UUID引用，不能填密码或密钥。未发送新请求';return success}
 async function retry(){const turn=contextKey.value;const success=await workspace.retry();if(success&&!disposed&&turn===contextKey.value)ElMessage.success('已恢复原请求收据，没有重复创建或修订');return success}
@@ -70,7 +74,7 @@ onBeforeRouteLeave(mayLeave);const unregister=contextTransitionGuards.register(m
 function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()||unsaved.value){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
 onUnmounted(()=>{disposed=true;unregister();workspace.dispose();clearEditor();window.removeEventListener('beforeunload',beforeUnload)})
-defineExpose({prepareCreate,prepareFrom,loadAssets,addChecked,removeTarget,moveTarget,setNoteKnown,browse,select,history,save,retry,lifecycle,unlockRejected,closeEditor,payload,form,targets,assetQuery,checkedAssets,assets,state,hasUnresolved:workspace.unresolved})
+defineExpose({cancelRead,retryRead,readStatus,prepareCreate,prepareFrom,loadAssets,addChecked,removeTarget,moveTarget,setNoteKnown,browse,select,history,save,retry,lifecycle,unlockRejected,closeEditor,payload,form,targets,assetQuery,checkedAssets,assets,state,hasUnresolved:workspace.unresolved})
 </script>
 <template>
  <section class="backup-plan-page">
@@ -80,7 +84,7 @@ defineExpose({prepareCreate,prepareFrom,loadAssets,addChecked,removeTarget,moveT
   <template v-else>
 <div class="feature-summary"><article><span>本页备份计划</span><strong>{{ state.page?.items.length ?? '—' }}</strong><small>当前已读取记录，非总体数量</small></article><article><span>本页未归档</span><strong>{{ state.page ? state.page.items.filter(row => !row.archived).length : '—' }}</strong><small>仅记录状态，不表示批准或生效</small></article><article><span>当前所选版本</span><strong>{{ state.selected ? 'v'+state.selected.version : '—' }}</strong><small>按明确版本读取</small></article><article><span>缺少凭据引用</span><strong>{{ state.page ? state.page.items.filter(row => row.credential_ref === null).length : '—' }}</strong><small>仅本页；有引用也不表示验证通过</small></article></div>
    <details class="boundary-details"><summary>草稿准备与原请求确认说明</summary><ol class="plan-steps" aria-label="备份计划草稿步骤"><li :aria-current="currentStep===1?'step':undefined"><strong>① 明确目标</strong><span>手动勾选当前租户设备</span></li><li :aria-current="currentStep===2?'step':undefined"><strong>② 填写提案</strong><span>时间与意向，不代表启用</span></li><li :aria-current="currentStep===3?'step':undefined"><strong>③ 确认原收据</strong><span>结果未知只重试原请求</span></li></ol></details>
-   <ApiErrorNotice :error="state.error" />
+   <ApiErrorNotice :error="state.error" /><p v-if="readStatus" ref="readNotice" tabindex="-1" role="status">{{readStatus}}</p><button v-if="state.busy==='read'" type="button" @click="cancelRead">取消读取草稿</button><button v-if="workspace.canRetryRead()" type="button" @click="retryRead">重试原草稿读取</button>
    <section v-if="state.attempt" class="panel original-request" aria-live="polite"><h2>原请求 · {{actions[state.attempt.action]}}</h2><p v-if="state.attempt.state==='uncertain'">结果未知：可能已经提交。输入与原key/body已锁定，刷新列表不会重复提交请求</p><p v-else-if="state.attempt.state==='accepted'">已确认原请求收据；这不是当前最新状态，也不表示计划已启用</p><p v-else>本次请求已明确拒绝。原输入保留，版本不自动合并</p><div class="actions"><button v-if="state.attempt.state==='uncertain'" type="button" :disabled="Boolean(state.busy)||!writable" @click="retry">重试提交</button><button v-if="state.attempt.state==='rejected'&&writable" type="button" :disabled="Boolean(state.busy)" @click="unlockRejected">保留输入并解锁修正</button><button v-if="state.attempt.baseline" type="button" :disabled="Boolean(state.busy)" @click="select(state.attempt.baseline.id)">查看原记录</button></div></section>
 
    <section v-if="state.receipt" class="panel receipt-panel"><h2>原请求确认收据 · v{{state.receipt.version}}</h2><p>{{state.receipt.name}} · {{state.receipt.archived?'已归档':'未启用草稿'}} · 不是当前最新状态</p><details><summary>查看原收据提案</summary><BackupPlanFacts :value="state.receipt" /></details></section>

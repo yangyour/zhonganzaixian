@@ -9,15 +9,17 @@ import {contextTransitionGuards} from '../utils/contextTransitionGuard'
 import {createOwnPreferenceWorkspace,emptyOwnPreferenceState,type OwnPreferenceState} from '../utils/ownPreferenceWorkspace'
 import {ownPreferenceChannels,ownPreferenceDefinition,readOwnPreferencePayload,type OwnPreferenceChannel,type OwnPreferenceDefinition,type OwnPreferenceSnapshot} from '../utils/ownNotificationPreferences'
 import {displayTime} from '../utils/display'
+import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import OwnPreferenceFacts from '../components/OwnPreferenceFacts.vue'
 const fresh=()=>({level:'',channelsMode:'unknown',channels:[] as OwnPreferenceChannel[],quietMode:'absent',start:'',end:''})
 const form=reactive(fresh()),editing=ref(false),dirty=ref(false),acknowledge=ref(false),confirming=ref(false),validation=ref(''),expanded=ref<number|null>(null)
 const baseline=shallowRef<OwnPreferenceSnapshot|null>(null),state=shallowRef<OwnPreferenceState>(emptyOwnPreferenceState()),workspace=createOwnPreferenceWorkspace(api,s=>{state.value=s})
+const readScope=ref(0)
 let disposed=false
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&['viewer','tadmin','msp','padmin'].includes(session.value.user.role)&&can('notification_preferences:read_own')&&!switchingTenant.value))
 const writable=computed(()=>permitted.value&&can('notification_preferences:write_own'))
-const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value,writable.value]))
+const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,permitted.value,writable.value]))
 const busy=computed(()=>Boolean(state.value.busy)||confirming.value),locked=computed(()=>busy.value||state.value.attempt!==null||!editing.value||!writable.value)
 const currentPreference=computed(()=>state.value.current?.current??null)
 const quietSummary=computed(()=>{const q=currentPreference.value?.requested_quiet_window;return q?.enabled===true?`${q.start} — ${q.end}`:q?.enabled===false?'明确关闭':'未指定'})
@@ -31,20 +33,21 @@ function change(key:'level'|'channelsMode'|'quietMode'|'start'|'end',value:strin
 function toggleChannel(channel:OwnPreferenceChannel,selected:boolean){if(disposed||locked.value||form.channelsMode!=='explicit'||!ownPreferenceChannels.includes(channel))return false;const values=new Set(form.channels);if(selected)values.add(channel);else values.delete(channel);form.channels=[...values].sort();changed();return true}
 function changeAck(value:boolean){if(disposed||locked.value)return false;acknowledge.value=value;return true}
 const value=(e:Event)=>(e.target as HTMLInputElement).value,checked=(e:Event)=>(e.target as HTMLInputElement).checked
-watch(contextKey,()=>{Object.assign(form,fresh());editing.value=false;dirty.value=false;acknowledge.value=false;confirming.value=false;validation.value='';expanded.value=null;baseline.value=null;const s=session.value;workspace.reset(!disposed&&permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true,canWrite:writable.value}:null);if(!disposed&&permitted.value)void workspace.load()},{immediate:true,flush:'sync'})
+watch(contextKey,()=>{readScope.value++;Object.assign(form,fresh());editing.value=false;dirty.value=false;acknowledge.value=false;confirming.value=false;validation.value='';expanded.value=null;baseline.value=null;const s=session.value;workspace.reset(!disposed&&permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true,canWrite:writable.value}:null);if(!disposed&&permitted.value)void workspace.load()},{immediate:true,flush:'sync'})
 watch(()=>state.value.history,()=>{if(!state.value.history?.items.some(r=>r.version===expanded.value))expanded.value=null})
 async function refresh(){if(disposed||!permitted.value||busy.value)return false;return workspace.load()}
+async function retryRead(){if(disposed||!permitted.value||busy.value)return false;return workspace.retryRead()}
 async function loadHistory(next=false){const id=historyId.value;if(disposed||!permitted.value||busy.value||!id)return false;return workspace.history(id,next)}
 async function discard(){if(workspace.unresolved()){ElMessage.warning('原保存请求正在提交或结果未知，请先恢复完全相同的原请求；刷新不能确认原结果');return false}if(confirming.value)return false;if(!dirty.value&&!state.value.attempt)return true;const turn=contextKey.value;confirming.value=true;try{await ElMessageBox.confirm('继续会清除本页未保存编辑和原收据显示；服务器已保存的请求及历史仍保留，确认继续？','离开本人偏好编辑',{confirmButtonText:'清除并继续',cancelButtonText:'留在本页',type:'warning'});return!disposed&&turn===contextKey.value&&!workspace.unresolved()}catch{return false}finally{if(!disposed&&turn===contextKey.value)confirming.value=false}}
-async function startEditing(){if(disposed||!writable.value||busy.value||!state.value.current)return false;const turn=contextKey.value,candidate=structuredClone(state.value.current);if(!await discard()||disposed||turn!==contextKey.value||!workspace.begin())return false;baseline.value=candidate.current;applyDefinition(candidate.current?ownPreferenceDefinition(candidate.current):{requested_level:null,requested_channels:null,requested_quiet_window:null});editing.value=true;dirty.value=false;acknowledge.value=false;validation.value='';return true}
+async function startEditing(){if(disposed||!writable.value||busy.value||!state.value.current)return false;const turn=contextKey.value,candidate=structuredClone(state.value.current);if(!await discard()||disposed||turn!==contextKey.value||!workspace.begin())return false;readScope.value++;baseline.value=candidate.current;applyDefinition(candidate.current?ownPreferenceDefinition(candidate.current):{requested_level:null,requested_channels:null,requested_quiet_window:null});editing.value=true;dirty.value=false;acknowledge.value=false;validation.value='';return true}
 async function submit(){if(disposed||locked.value||!acknowledge.value)return false;if(state.value.current&&(baseline.value?state.value.current.current?.version!==baseline.value.version:state.value.current.exists)){validation.value='独立回读的当前版本已变化，请以当前版本重新开始编辑；未发送保存请求';return false}const action=baseline.value?'UPDATE':'CREATE';let input;try{input=readOwnPreferencePayload({expected_version:baseline.value?.version??0,intent:'SAVE_REQUEST_DRAFT_ONLY',...definition()},action)}catch{validation.value='请求未保存：请核对等级、唯一渠道和两个不同的HH:mm静音边界';return false}validation.value='';return workspace.submit(action,input,baseline.value)}
 async function retry(){if(disposed||!writable.value||busy.value)return false;return workspace.retry()}
-function unlockRejected(){if(disposed||!writable.value||busy.value||state.value.attempt?.state!=='rejected'||!workspace.begin())return false;acknowledge.value=false;dirty.value=true;return true}
+function unlockRejected(){if(disposed||!writable.value||busy.value||state.value.attempt?.state!=='rejected'||!workspace.begin())return false;readScope.value++;acknowledge.value=false;dirty.value=true;return true}
 function expand(version:number){if(!state.value.history?.items.some(r=>r.version===version))return;expanded.value=expanded.value===version?null:version}
 onBeforeRouteLeave(discard);const unregister=contextTransitionGuards.register(discard)
 function beforeUnload(event:BeforeUnloadEvent){if(dirty.value||state.value.attempt||workspace.unresolved()){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload);onUnmounted(()=>{disposed=true;unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
-defineExpose({form,state,baseline,editing,dirty,acknowledge,locked,change,toggleChannel,changeAck,definition,refresh,startEditing,submit,retry,unlockRejected,loadHistory,expand,discard,hasUnresolved:workspace.unresolved})
+defineExpose({form,state,baseline,editing,dirty,acknowledge,locked,change,toggleChannel,changeAck,definition,refresh,startEditing,submit,retry,unlockRejected,loadHistory,expand,discard,cancelRead:workspace.cancelRead,retryRead,hasUnresolved:workspace.unresolved})
 </script>
 <template>
  <section class="own-preference-page"><div class="page-heading proto-page-head"><div><h1>个人通知偏好设置 <span class="proto-badge">{{ session?.tenant.name }}</span></h1><p>配置个人告警接收等级、通知渠道与免打扰时段偏好 · 修订记录可追溯</p></div></div>
@@ -69,7 +72,8 @@ defineExpose({form,state,baseline,editing,dirty,acknowledge,locked,change,toggle
    <label class="check acknowledge"><input type="checkbox" aria-label="确认仅保存本人请求" :checked="acknowledge" @change="changeAck(checked($event))" />我已核对所填偏好，理解当前仅保存个人偏好草稿，待平台通知策略启用后联动生效</label></fieldset>
    <p v-if="validation" role="alert" class="warning">{{validation}}</p><button type="submit" :disabled="locked||!acknowledge">保存本人请求草稿</button>
   </form>
-  <ApiErrorNotice :error="state.error" />
+  <ReadRecoveryActions :busy="state.busy" :can-retry="!confirming&&workspace.canRetryRead()" :scope-key="contextKey+':'+readScope" label="本人偏好" :cancel="workspace.cancelRead" :retry="retryRead" />
+ <ApiErrorNotice :error="state.error" />
   <section v-if="state.attempt" class="panel original-preference"><h2>保存请求状态与回执</h2><p>状态：{{state.attempt.state==='uncertain'?'结果未知，请先重试确认保存结果':state.attempt.state==='accepted'?'已收到原保存回执':'本次提交未通过，尚未确认保存'}}</p><p v-if="originalPayload">期望基线版本 v{{originalPayload.expected_version}} · 仅保存草稿</p><p>若请求状态未明，请点击下方按钮重试原请求。</p><button v-if="state.attempt.state==='uncertain'" type="button" :disabled="busy||!writable" @click="retry">重试完全相同原请求</button><button v-if="state.attempt.state==='rejected'" type="button" :disabled="busy||!writable" @click="unlockRejected">返回修改原草稿</button><p v-if="state.attempt.state==='rejected'">若遇到版本冲突，请先刷新当前记录并以最新版本重新编辑。</p>
    <div v-if="state.receipt" class="original-receipt"><h3>原保存回执 v{{state.receipt.version}}</h3><p>{{displayTime(state.receipt.updated_at)}}（Asia/Shanghai）</p><OwnPreferenceFacts :value="state.receipt" /></div>
   </section>

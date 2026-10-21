@@ -1,0 +1,31 @@
+{
+  "result": "PASS_OWN_PREFERENCE_READ_RECOVERY_ONLY",
+  "new_tests": 15,
+  "focused_tests_passed": 61,
+  "vitest": {
+    "files_passed": 245,
+    "tests_passed": 3846
+  },
+  "node_contract_tests_passed": 173,
+  "api_contract_check": "PASS_UNCHANGED",
+  "typecheck": "PASS",
+  "production_build": {
+    "build_id": "c82bb283bf167f6b18e7ca8f770cd9d398b0eaf323c74a75c8e49a7061889caf",
+    "file_count": 141,
+    "bootstrap_gzip_bytes": 179966,
+    "bootstrap_css_gzip_bytes": 62537,
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/utils/ownPreferenceWorkspace.ts": "260523199e36111bfe153decb4950670db1ece753cf760f27cd0baf1b878929c",
+    "apps/web/src/pages/OwnNotificationPreferencesPage.vue": "fdcde66341f8b6577a420a4ad065030f3801d099e39e4328f59356295d79ada1",
+    "apps/web/tests/ownPreferenceReadRecovery.test.ts": "0b0fffca5a9fa4561abbdfa3310d1c4e64666c5a1f69b230794bbef8aacd08b7",
+    "apps/web/tests/ownNotificationPreferencesPage.test.ts": "420fd0209cc34027483f0cc2e78aa0ff389a00475d669f2223e96fa7596354d7"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0
+}

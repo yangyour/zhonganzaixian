@@ -1,0 +1,35 @@
+{
+  "base_commit": "9c283c9bab762f98d4f43180febe6836d0b9395a",
+  "result": "PASS_DOM_HTTP_BUILD",
+  "web_tests": 2862,
+  "web_files": 202,
+  "new_dom_tests": 16,
+  "new_actual_http_reader_tests": 4,
+  "contract_tests": 167,
+  "actual_http_checks": 17,
+  "synthetic_accounts_seeded": 60,
+  "eligible_accounts": 58,
+  "page_sizes_verified": [
+    50,
+    8
+  ],
+  "actual_response_vectors": 4,
+  "successful_account_reads_table_fingerprints_unchanged": 105,
+  "rejected_reads_non_audit_tables_unchanged": true,
+  "api_stopped": true,
+  "temporary_database_and_credentials_removed": true,
+  "real_provider_messages_sent": 0,
+  "real_bindings_changed": 0,
+  "build_id": "18e782f7a1328fc3a3e79b52af10c7c36362d523b7cb785c76c4a9ba7f6e5a7d",
+  "typecheck_build_static": "PASS",
+  "browser_axe": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "formal_tc_not_run": 128,
+  "java_suite": "NOT_RERUN_UNCHANGED_API",
+  "migrations": "V1_V45_UNCHANGED_FRESH_APPLY_AND_REPEAT_VERIFIED",
+  "source_sha256": {
+    "apps/web/src/pages/EmailPage.vue": "051862140369bfa631df569f49d74fd14f8e6d1084b698bcaa49e2d8204b6fa3",
+    "apps/web/src/pages/WeComPage.vue": "071003a145923ec87052f6a138747954f5fa89bd6291aa122aaf84ba3574f77d",
+    "apps/web/tests/channelPages.test.ts": "beed3b480c3772abc15514bb8589f181c0604765e4f6278c6983df6a90c4001c",
+    "fixtures/channel-accounts-http-synthetic-20261021.json": "fdff9afb9991aa643b237e5b5e608c1fb92746b1b11b36eae9bb1d9cba58386b"
+  }
+}

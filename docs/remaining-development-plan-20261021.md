@@ -66,3 +66,5 @@
 [备份设备协调租约状态](backup-device-lease-core-20261021.md)已补过期拒绝、owner/fence/version门禁及结构恢复；[追加式数据库协调](backup-device-journal-20261021.md)已补事务、原请求重放和同设备并发互斥，并完成隔离库验证；真实授权/停止核查、物理 fencing、运行任务存储、归档与 Worker 仍待，未连接设备。
 
 [变更报备草稿与候选设备读取恢复](change-notice-read-recovery-20261021.md)已补：原游标/历史边界重试、独立只读取消、未知写入/已选目标保护及账号版本清理；[明确修订审批的独立读取恢复](change-approval-read-recovery-20261021.md)亦已补，保留合法有限审批历史并阻止同步撤权后的旧 GET 派发；不代表正式审批生效或设备执行。
+
+[SLA 月报数值/明细完整性及派发前授权检查](sla-payload-integrity-20261021.md)已补，异常载荷不补零、不沿用旧结果，撤权回调后不发旧 GET/POST；不改变赔付口径，也不替代对账审批或真实业务验收。

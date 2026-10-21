@@ -1,0 +1,34 @@
+{
+  "scope": "CLIENT_PAYLOAD_AND_DISPATCH_GUARDS_NOT_BUSINESS_FORMULA_CHANGE",
+  "new_tests": 53,
+  "vitest": {
+    "passed": 3355,
+    "files": 223,
+    "failed": 0
+  },
+  "contract_tests_passed": 173,
+  "api_contract": "PASS_UNCHANGED_0.76",
+  "build_id": "392ad53ba0974285f1fac1871fe479493cc3651f70e9afe6138f72dafc1079ae",
+  "browser": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "formal_acceptance": "128_NOT_RUN",
+  "backend_code_changed": false,
+  "actual_java_controller_fixture_compatibility": "PASS_CAPTURED_SYNTHETIC_RESPONSE_NOT_NEW_API_CALL",
+  "source_sha256": {
+    "apps/web/src/utils/slaPayloadIntegrity.ts": "064b957a9fa6ba23e16cc74d23fd7a7991a47e8b5c801ca0972a4ae854c98973",
+    "apps/web/src/utils/onCallBoard.ts": "85fa12f62c965249a300842501c2b4b3dc78f733a6ea2b6ee30c88437cdbe74f",
+    "apps/web/tests/slaPayloadIntegrity.test.ts": "3867e4e46b39cec3eed838b91682d73332c2336a07c3eb2c58ab597ce1adccfc",
+    "apps/web/tests/slaReportsPage.test.ts": "49b9e6a0cfade52f894f72c5f4f7131a959e6a18d8ac6d347b037dcb80350055"
+  },
+  "earlier_failures": [
+    {
+      "stage": "typecheck",
+      "cause": "TypeScript did not preserve narrowing after arrow never helper. Changed to a never-returning function declaration, no type assertion or any weakening."
+    },
+    {
+      "stage": "first_full_vitest",
+      "passed": 3353,
+      "failed": 2,
+      "cause": "New DOM assertions needed real ElAlert registration to render error title. Registered the actual component in test harness, then reran full suite."
+    }
+  ]
+}

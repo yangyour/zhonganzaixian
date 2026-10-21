@@ -1,8 +1,9 @@
 import {ApiError,type RequestOptions} from '../api/client'
 import {createRequestId} from './browserCrypto'
-import {exportExact,exportInteger,exportTime,exportUuid} from './assetExportJobs'
+import {exportExact,exportInteger,exportTime,exportUuid,exportEquals} from './assetExportJobs'
 import {writeFailureUncertain} from './writeFailure'
 import type {ServiceTierCode} from './serviceTiers'
+import {validateSlaService,validateSlaKpis,validateSlaIntervals,validateSlaJudgments,validateSlaMonthlyNumbers,validSlaServiceIdentity,validSlaPercentage} from './slaPayloadIntegrity'
 
 /** On-Call Board, 18:00 Shift Handoff, Configurable Escalation Chain & SLA Monthly Reports (D16 / V36: M5-9, M5-10, M5-12, M5-13, M5-19). */
 export type ShiftCode='DAY'|'NIGHT'|'FULL_DAY'
@@ -189,6 +190,7 @@ export function readOnCallBoard(raw:unknown,scope:OnCallContext):OnCallBoardPayl
 }
 
 function validateMonthlyEvaluation(raw:Record<string,unknown>){
+ validateSlaMonthlyNumbers(raw)
  if((raw.tier_snapshot!==null&&!isTier(raw.tier_snapshot))||raw.compensation_amount_fen!==null||raw.compensation_status!=='CONFIG_PENDING_Q26'||!['customer-20261020-availability-v2','contract-m5-9-m5-19-v1'].includes(raw.formula_version as string)||!Array.isArray(raw.items))throw invalid()
  if(raw.tier_snapshot===null?raw.compensation_ratio!==null:![0.1,0.2,0.3].includes(raw.compensation_ratio as number))throw invalid()
 }
@@ -205,14 +207,12 @@ export function readSlaMonthlyRecord(raw:unknown,scope:OnCallContext,period:stri
 }
 
 export function readSlaReport(raw:unknown,scope:OnCallContext,expectedPeriod:string):SlaReportPayload{
- if(!validContext(scope)||!exportExact(raw,['tenant_id','period','current_tier','target_availability_pct','kpis','services','monthly_result','live_monthly_evaluation','formula_version','timezone','observed_at','source']))throw invalid()
+ if(!validSlaMonth(expectedPeriod)||!validContext(scope)||!exportExact(raw,['tenant_id','period','current_tier','target_availability_pct','kpis','services','monthly_result','live_monthly_evaluation','formula_version','timezone','observed_at','source']))throw invalid()
  if(raw.tenant_id!==scope.tenantId||raw.period!==expectedPeriod||(raw.current_tier!==null&&!isTier(raw.current_tier))||raw.formula_version!=='customer-20261020-availability-v2'||raw.timezone!=='Asia/Shanghai'||raw.source!=='postgresql')throw invalid()
  exportTime(raw.observed_at)
  if(!Array.isArray(raw.services)||raw.services.length>1000)throw invalid()
- for(const s of raw.services){
-  if(!exportExact(s,['service_id','service_name','target_pct','agreed_service_sec','approved_exclusion_sec','effective_service_sec','unavailable_union_sec','unknown_interval_sec','known_available_sec','verified_availability_pct','upper_bound_availability_pct','incident_count','mtta','mttr','unrecovered_count','status','unknown_policy_status','interval_details']))throw invalid()
-  if((s.unknown_interval_sec as number)>0&&s.unknown_policy_status!=='UNKNOWN_EXCLUDED_FROM_NUMERATOR_AND_DENOMINATOR')throw invalid()
- }
+ validateSlaKpis(raw.kpis);if(!validSlaPercentage(raw.target_availability_pct))throw invalid()
+ const services=new Set<string>();for(const service of raw.services){validateSlaService(service);const id=(service as Record<string,unknown>).service_id as string;if(services.has(id))throw invalid();services.add(id)}
  if(!exportExact(raw.live_monthly_evaluation,['tier_snapshot','total_ticket_count','applicable_count','met_count','not_met_count','unresolved_count','not_applicable_count','achievement_numerator','achievement_denominator','achievement_rate_pct','compensation_ratio','monthly_fee_fen','compensation_amount_fen','compensation_status','candidate_fixed_ratio_fen','candidate_shortfall_weighted_fen','formula_version','items']))throw invalid()
  validateMonthlyEvaluation(raw.live_monthly_evaluation)
  if(raw.monthly_result!==null)readSlaMonthlyRecord(raw.monthly_result,scope,expectedPeriod)
@@ -220,11 +220,12 @@ export function readSlaReport(raw:unknown,scope:OnCallContext,expectedPeriod:str
 }
 
 export function readSlaServiceDetail(raw:unknown,scope:OnCallContext,expectedPeriod:string,expectedServiceId:string):SlaServiceDetailPayload{
- if(!validContext(scope)||!exportExact(raw,['tenant_id','period','service','interval_details','ticket_judgments','formula_version','timezone','observed_at','source']))throw invalid()
+ if(!validSlaMonth(expectedPeriod)||!validSlaServiceIdentity(expectedServiceId)||!validContext(scope)||!exportExact(raw,['tenant_id','period','service','interval_details','ticket_judgments','formula_version','timezone','observed_at','source']))throw invalid()
  if(raw.tenant_id!==scope.tenantId||raw.period!==expectedPeriod||raw.formula_version!=='customer-20261020-availability-v2'||raw.timezone!=='Asia/Shanghai'||raw.source!=='postgresql')throw invalid()
  exportTime(raw.observed_at)
  const svc=raw.service as Record<string,unknown>
- if(!svc||svc.service_id!==expectedServiceId||!Array.isArray(raw.interval_details)||!Array.isArray(raw.ticket_judgments))throw invalid()
+ validateSlaService(svc);validateSlaIntervals(raw.interval_details);validateSlaJudgments(raw.ticket_judgments)
+ if(svc.service_id!==expectedServiceId||!exportEquals(svc.interval_details,raw.interval_details))throw invalid()
  return structuredClone(raw) as unknown as SlaServiceDetailPayload
 }
 
@@ -335,6 +336,7 @@ export function createSlaReportWorkspace(client:{request<T>(path:string,options?
   const turn=++epoch,scope={...context},controller=new AbortController();abort=controller
   state={...state,report:null,detail:null,busy:'read',error:null};emit()
   try{
+   if(disposed||turn!==epoch||controller.signal.aborted)return false
    const raw=await client.request(`/sla/reports?period=${encodeURIComponent(period)}`,{signal:controller.signal})
    if(disposed||turn!==epoch)return false
    const report=readSlaReport(raw,scope,period)
@@ -347,10 +349,11 @@ export function createSlaReportWorkspace(client:{request<T>(path:string,options?
   }
  }
  async function loadServiceDetail(period:string,serviceId:string){
-  if(disposed||!context||state.busy||state.attempt)return false
+  if(disposed||!context||state.busy||state.attempt||!validSlaMonth(period)||!validSlaServiceIdentity(serviceId))return false
   const turn=++epoch,scope={...context},controller=new AbortController();abort=controller
   state={...state,detail:null,busy:'read',error:null};emit()
   try{
+   if(disposed||turn!==epoch||controller.signal.aborted)return false
    const raw=await client.request(`/sla/reports/${encodeURIComponent(serviceId)}/details?period=${encodeURIComponent(period)}`,{signal:controller.signal})
    if(disposed||turn!==epoch)return false
    const detail=readSlaServiceDetail(raw,scope,period,serviceId)
@@ -363,10 +366,12 @@ export function createSlaReportWorkspace(client:{request<T>(path:string,options?
   }
  }
  async function send(original:WriteAttempt,reloadPeriod:string,retry=false){
+  if(disposed||!context?.canWriteInternal||state.busy)return false
   const attempt=structuredClone(original)
   const turn=++epoch,scope=context?{...context}:null
   state={...state,busy:'write',error:null,receipt:null,attempt};emit()
   try{
+   if(disposed||turn!==epoch||!scope||!context?.canWriteInternal)return false
    const raw=await client.request(attempt.path,{method:attempt.method,idempotencyKey:attempt.key,body:structuredClone(attempt.body)})
    if(disposed||turn!==epoch||!scope)return false
    const receipt=readSlaMonthlyRecord(raw,scope,reloadPeriod)
@@ -383,7 +388,7 @@ export function createSlaReportWorkspace(client:{request<T>(path:string,options?
  async function submitMonthlyResult(input:{report_month:string;expected_version:number;freeze:boolean}){
   if(disposed||!context||!context.canWriteInternal||state.busy||state.attempt)return false
   if(!state.report||!validSlaMonth(input.report_month)||input.report_month!==state.report.period||state.report.monthly_result?.frozen||input.expected_version!==(state.report.monthly_result?.version??0)||!exportInteger(input.expected_version,0,Number.MAX_SAFE_INTEGER-1)||typeof input.freeze!=='boolean'){state.error=invalid();emit();return false}
-  try{const key=newKey();if(typeof key!=='string'||!/^[A-Za-z0-9._:-]{1,128}$/.test(key))throw invalid();return send({path:'/sla/monthly-results',method:'POST',key,body:{...input}},input.report_month)}catch(error){state.error=error;emit();return false}
+  try{const generation=epoch,key=newKey();if(generation!==epoch||disposed||!context?.canWriteInternal)return false;if(typeof key!=='string'||!/^[A-Za-z0-9._:-]{1,128}$/.test(key))throw invalid();return send({path:'/sla/monthly-results',method:'POST',key,body:{...input}},input.report_month)}catch(error){state.error=error;emit();return false}
  }
  async function retry(){
   if(disposed||!context||state.busy||!state.attempt)return false

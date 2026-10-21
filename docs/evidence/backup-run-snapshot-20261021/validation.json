@@ -1,0 +1,30 @@
+{
+  "scope": "PURE_STATE_AND_CANONICAL_PAYLOAD_NOT_DURABLE_RUN_REPOSITORY",
+  "new_tests": 23,
+  "java": {
+    "tests": 3947,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1014,
+    "executed": 2933
+  },
+  "contract_tests_passed": 173,
+  "python_tests_passed": 121,
+  "api_contract": "PASS_UNCHANGED_0.76",
+  "v1_through_v46_unchanged": true,
+  "new_database_migrations": false,
+  "http_or_database_integration_this_increment": "NOT_APPLICABLE_NO_RUNTIME_WIRING",
+  "device_execution": false,
+  "automatic_ticketing": false,
+  "frontend_changed": false,
+  "browser": "NOT_RUN",
+  "formal_acceptance": "128_NOT_RUN",
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/backup/BackupRunState.java": "3cacf4b6be3094da53a68dc8c711a9d27ac2e99741a4b9adaa7c9e8a806c9cb0",
+    "server/persistence/src/main/java/cn/mop/persistence/BackupRunSnapshotCodec.java": "c279459360cc90b39f043d9162bce66516bc38b984c446f0e2776a4a61b24491",
+    "server/api/src/test/java/cn/mop/domain/backup/BackupRunSnapshotTest.java": "9ca121e17a5da4a726189ab4fb0240408f3447b210e356dcccefdbd667d58a71",
+    "server/api/src/test/java/cn/mop/persistence/BackupRunSnapshotCodecTest.java": "69fe6a4bbdc14e847055e851cbf8344155c07bd9e9f33c6401c34d57ded2128f"
+  },
+  "initial_failure": "Two Java test compound var declarations failed compilation; split declarations and reran without relaxing validation.",
+  "codec_module": "mop-persistence; no dependency on broad external adapters"
+}

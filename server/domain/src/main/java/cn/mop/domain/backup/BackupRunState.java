@@ -28,6 +28,26 @@ public final class BackupRunState {
             if(storedVersion!=null&&(storedVersion.persistedAt().isBefore(startedAt)||storedVersion.persistedAt().isAfter(finishedAt)))throw invalid();
         }
     }
+    /** Structural snapshot only. Does not prove stored-object verification, a lease or complete journal history. */
+    public record Snapshot(UUID tenantId,UUID assetId,Instant queuedAt,long version,List<Attempt> attempts) {
+        public Snapshot {if(attempts==null||attempts.size()>MAX_ATTEMPTS||attempts.stream().anyMatch(Objects::isNull))throw invalid();attempts=List.copyOf(attempts);}
+    }
+    public Snapshot snapshot(){return new Snapshot(tenantId,assetId,queuedAt,version,attempts);}
+    public static BackupRunState rehydrate(Snapshot snapshot){
+        if(snapshot==null||snapshot.tenantId()==null||snapshot.assetId()==null||snapshot.version()<0||snapshot.version()>MAX_VERSION)throw invalid();
+        instant(snapshot.queuedAt());List<Attempt> rows=snapshot.attempts();if(rows.size()>MAX_ATTEMPTS)throw invalid();
+        if(rows.isEmpty()){if(snapshot.version()!=0)throw invalid();return queued(snapshot.tenantId(),snapshot.assetId(),snapshot.queuedAt());}
+        for(int i=0;i<rows.size();i++){
+            Attempt a=rows.get(i);if(a.number()!=i+1||a.startedAt().isBefore(snapshot.queuedAt()))throw invalid();
+            if(a.outcome()==Outcome.RUNNING&&!a.observedAt().equals(a.startedAt()))throw invalid();
+            if(i>0){Attempt prior=rows.get(i-1);if(prior.outcome()!=Outcome.FAILED||a.startedAt().isBefore(plusDelay(prior.finishedAt())))throw invalid();}
+            if(a.storedVersion()!=null&&(!snapshot.tenantId().equals(a.storedVersion().tenantId())||!snapshot.assetId().equals(a.storedVersion().assetId())))throw invalid();
+        }
+        Attempt last=rows.get(rows.size()-1);long minimum=2L*rows.size()-(last.outcome()==Outcome.RUNNING?1:0);
+        if(snapshot.version()<minimum||rows.size()==1&&last.outcome()==Outcome.RUNNING&&snapshot.version()!=1)throw invalid();
+        if(last.outcome()==Outcome.FAILED&&rows.size()<MAX_ATTEMPTS)plusDelay(last.finishedAt());
+        return new BackupRunState(snapshot.tenantId(),snapshot.assetId(),snapshot.queuedAt(),snapshot.version(),rows);
+    }
     private final UUID tenantId,assetId;
     private final Instant queuedAt;
     private final long version;

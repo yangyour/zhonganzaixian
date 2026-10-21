@@ -28,3 +28,5 @@ run派生状态QUEUED→RUNNING→RETRY_WAIT→SUCCEEDED/FAILED；attempt单独�
 ## 2026-10-21 数据库协调增量
 
 [设备协调事务与验收](backup-device-journal-20261021.md)已补，V46 追加式日志及仓储在隔离 PostgreSQL 验证通过。该日志不是备份执行记录，不证明远端停止，过期不能接管；真实授权/停止核查适配器、任务 Worker、KMS/归档等仍待接入。
+
+[运行快照恢复与规范载荷](backup-run-snapshot-20261021.md)新增严格重建及 runId/租户/设备绑定的有界编码，未知结果恢复后仍阻断重试；实际运行事件仓储与 Worker 继续开发，编码器不是数据库持久化证明。

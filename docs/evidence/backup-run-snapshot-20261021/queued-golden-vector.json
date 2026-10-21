@@ -1,0 +1,8 @@
+{
+  "format": "MOP_BACKUP_RUN_SNAPSHOT_V1",
+  "source": "Independent Python struct big-endian ASCII modified-UTF-compatible golden vector",
+  "synthetic": true,
+  "bytes": 162,
+  "base64": "ABpNT1BfQkFDS1VQX1JVTl9TTkFQU0hPVF9WMQAkNzUwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMDAxACQ3NTAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwMDIAJDc1MDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMwAAAaFbwfQAAAAAAAAAAAAAAAAA",
+  "sha256": "3c1123f1a2715e839a69f0711ba57b32a4c55b34ccde4bc0a9e8b9159a4400f6"
+}

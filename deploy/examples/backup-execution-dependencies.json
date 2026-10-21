@@ -23,7 +23,7 @@
     "backup.noise_filter": null,
     "backup.change_window": null
   },
-  "notes": "Unresolved dependency references only. Do not paste passwords, private keys, executable commands or provider endpoints. This file does not publish a plan, trust a host key, authorize SSH, create a run, grant storage access, approve retention deletion or send notifications. Calendar preview is not next execution time.",
+  "notes": "Unresolved dependency references only. Do not paste passwords, private keys, executable commands or provider endpoints. This file does not publish a plan, trust a host key, authorize SSH, create a run, grant storage access, approve retention deletion or send notifications. Calendar preview is not next execution time. Version enumeration requires separate current asset-wide and per-version read authorization; neither registration nor enumeration authorizes download.",
   "schema_version": 1,
   "question_ids": [
     "Q10",
@@ -52,5 +52,6 @@
   "encrypted_staging_capacity_and_retention_reference": null,
   "backup_version_registration_authorizer_reference": null,
   "backup_collection_completion_evidence_verifier_reference": null,
-  "backup_version_registration_binding_reference": null
+  "backup_version_registration_binding_reference": null,
+  "backup_version_inventory_authorizer_reference": null
 }

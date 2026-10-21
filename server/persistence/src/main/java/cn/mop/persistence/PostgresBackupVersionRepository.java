@@ -27,6 +27,19 @@ public final class PostgresBackupVersionRepository {
   public boolean retentionVerified(){return false;}public boolean recoveryVerified(){return false;}
  }
  public record Receipt(Registration registration,boolean replay){}
+ public static final int MAX_INVENTORY_PAGE_SIZE=50;
+ public record InventoryScope(UUID tenantId,UUID assetId){public InventoryScope{if(tenantId==null||assetId==null)throw invalid();}}
+ /** Separate asset-wide enumeration authority, not draft editing or permission to download. Hold revocation locks; no external IO. */
+ @FunctionalInterface public interface InventoryAuthorizer{void authorize(Connection connection,Access access,InventoryScope scope)throws SQLException;}
+ public record InventoryCursor(InventoryScope scope,Instant registeredAt,UUID versionId){public InventoryCursor{if(scope==null||versionId==null||registeredAt==null||registeredAt.getNano()%1_000_000!=0||registeredAt.isBefore(Instant.parse("0001-01-01T00:00:00Z"))||registeredAt.isAfter(Instant.parse("9999-12-31T23:59:59.999Z")))throw invalid();}}
+ /** Historical database registration only. Deliberately excludes KMS, storage, lease, proof and trace references. */
+ public record InventoryItem(UUID versionId,UUID assetId,UUID runId,int attemptNumber,long completedRunVersion,Instant objectObservedAt,Instant registeredAt,String encryptedSha256,int encryptedBytes){
+  public boolean registrationAndRunCompletionRecorded(){return true;}public boolean currentObjectHealthVerified(){return false;}
+  public boolean downloadAuthorized(){return false;}public boolean deviceExecutionAuthorized(){return false;}
+  public boolean retentionVerified(){return false;}public boolean recoveryVerified(){return false;}
+ }
+ public record InventoryPage(List<InventoryItem> items,boolean hasMore,InventoryCursor nextBefore){public InventoryPage{items=List.copyOf(items);}}
+
  private record Command(Access access,Scope scope,UUID id,long runVersion,long archiveVersion,LeaseClaim lease,String objectReference,String executionReference,String trace){}
  private record Prepared(Candidate candidate,Registration existing){}
  private record RunView(BackupRunState state,UUID command,String action,String reference,LeaseClaim lease,long leaseEventVersion,Instant observedAt){}
@@ -94,6 +107,33 @@ public final class PostgresBackupVersionRepository {
    q.setObject(1,s.tenantId());q.setObject(2,s.versionId());q.setObject(3,s.assetId());q.setObject(4,s.runId());q.setInt(5,s.attemptNumber());q.setObject(6,input.id());q.setString(7,hash);q.setLong(8,input.runVersion());q.setLong(9,input.runVersion()+1);q.setLong(10,input.archiveVersion());q.setString(11,original.encryptedSha256());q.setInt(12,original.encryptedBytes());q.setString(13,original.keyReference());q.setString(14,original.archiveVerificationReference());q.setString(15,input.objectReference());q.setString(16,input.executionReference());q.setObject(17,input.lease().requestId());q.setString(18,input.lease().owner());q.setLong(19,input.lease().fencingToken());q.setObject(20,original.objectObservedAt().atOffset(ZoneOffset.UTC));q.setObject(21,input.access().actorId());q.setString(22,input.trace());try(var r=q.executeQuery()){if(!r.next())throw unavailable();Registration row=row(r);if(!row.candidate().equals(original)||!row.commandHash().equals(hash))throw unavailable();return row;}
   }
  }
+ /** Bounded keyset inventory under explicit asset-wide plus per-version authorization, in one owned transaction.
+  * Asset lock serializes registration for this page only. Pages are not a frozen inventory or a storage health check. */
+ public InventoryPage inventory(Access access,InventoryScope inventoryScope,InventoryCursor before,int limit,InventoryAuthorizer inventoryAuthorizer){
+  if(access==null||inventoryScope==null||inventoryAuthorizer==null||limit<1||limit>MAX_INVENTORY_PAGE_SIZE)throw invalid();
+  if(!access.tenantId().equals(inventoryScope.tenantId())||before!=null&&!before.scope().equals(inventoryScope))throw new DomainException(404,"BACKUP_VERSION_NOT_FOUND","当前范围未找到版本登记");
+  try(Connection c=source.getConnection()){
+   c.setAutoCommit(false);c.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+   try{
+    try(var statement=c.createStatement()){statement.execute("SET LOCAL lock_timeout='5s'");statement.execute("SET LOCAL statement_timeout='10s'");}
+    authorizeInventory(c,access,inventoryScope,inventoryAuthorizer);lockAsset(c,inventoryScope.tenantId(),inventoryScope.assetId());
+    String sql="SELECT * FROM public.mop_backup_version_registration WHERE tenant_id=? AND asset_id=?"+(before==null?"":" AND (registered_at,version_id)<(?,?)")+" ORDER BY registered_at DESC,version_id DESC LIMIT ?";
+    var rows=new ArrayList<Registration>();
+    try(var q=query(c,sql)){q.setObject(1,inventoryScope.tenantId());q.setObject(2,inventoryScope.assetId());int index=3;if(before!=null){q.setObject(index++,before.registeredAt().atOffset(ZoneOffset.UTC));q.setObject(index++,before.versionId());}q.setInt(index,limit+1);try(var r=q.executeQuery()){while(r.next())rows.add(row(r));}}
+    var items=new ArrayList<InventoryItem>();
+    for(Registration registration:rows){Candidate original=registration.candidate();Scope scope=original.scope();if(!scope.tenantId().equals(inventoryScope.tenantId())||!scope.assetId().equals(inventoryScope.assetId()))throw inventoryUnavailable();authorize(c,access,scope,Operation.READ);verifyRegistration(c,registration);
+     if(items.size()<limit)items.add(new InventoryItem(scope.versionId(),scope.assetId(),scope.runId(),scope.attemptNumber(),registration.completedRunVersion(),original.objectObservedAt(),registration.registeredAt(),original.encryptedSha256(),original.encryptedBytes()));
+    }
+    // Even a zero-row result and the look-ahead row require enumeration authority; no partial result on a veto.
+    authorizeInventory(c,access,inventoryScope,inventoryAuthorizer);boolean more=rows.size()>limit;InventoryItem last=items.isEmpty()?null:items.get(items.size()-1);InventoryCursor next=more?new InventoryCursor(inventoryScope,last.registeredAt(),last.versionId()):null;
+    c.commit();return new InventoryPage(items,more,next);
+   }catch(SQLException|RuntimeException rejected){try{c.rollback();}catch(SQLException ignored){}throw rejected;}
+  }catch(SQLException rejected){throw inventoryUnavailable();}catch(DomainException rejected){if(rejected.status==403||rejected.status==404)throw rejected;throw inventoryUnavailable();}catch(RuntimeException rejected){throw inventoryUnavailable();}
+ }
+ private static void authorizeInventory(Connection c,Access access,InventoryScope scope,InventoryAuthorizer authorizer)throws SQLException{
+  try{authorizer.authorize(c,access,scope);}catch(DomainException rejected){if(rejected.status==403||rejected.status==404)throw new DomainException(rejected.status,"BACKUP_VERSION_INVENTORY_ACCESS_DENIED","当前设备的版本列表未获独立授权");throw inventoryUnavailable();}catch(RuntimeException rejected){throw inventoryUnavailable();}
+ }
+ private static DomainException inventoryUnavailable(){return new DomainException(503,"BACKUP_VERSION_INVENTORY_UNAVAILABLE","版本登记列表或完成关联未能核对；没有授予下载或执行权限");}
  private Registration find(Connection c,Scope s)throws SQLException{try(var q=query(c,"SELECT * FROM public.mop_backup_version_registration WHERE tenant_id=? AND version_id=? AND asset_id=? AND run_id=? AND attempt_number=?")){q.setObject(1,s.tenantId());q.setObject(2,s.versionId());q.setObject(3,s.assetId());q.setObject(4,s.runId());q.setInt(5,s.attemptNumber());try(var r=q.executeQuery()){return r.next()?row(r):null;}}}
  private Registration row(ResultSet r)throws SQLException{
   try{
@@ -112,7 +152,8 @@ public final class PostgresBackupVersionRepository {
  private interface Work<T>{T run(Connection c)throws SQLException;}
  private <T>T transaction(Access a,Scope s,Operation operation,Work<T> work){try(Connection c=source.getConnection()){c.setAutoCommit(false);c.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);try{try(var q=c.createStatement()){q.execute("SET LOCAL lock_timeout='5s'");q.execute("SET LOCAL statement_timeout='10s'");}authorize(c,a,s,operation);lockAsset(c,s);T result=work.run(c);c.commit();return result;}catch(SQLException|RuntimeException rejected){try{c.rollback();}catch(SQLException ignored){}throw rejected;}}catch(SQLException rejected){if("23505".equals(rejected.getSQLState())||"23514".equals(rejected.getSQLState()))throw conflict();if("23503".equals(rejected.getSQLState()))throw new DomainException(404,"BACKUP_VERSION_REFERENCE_NOT_FOUND","当前登记引用不可见");throw unavailable();}}
  private void authorize(Connection c,Access a,Scope s,Operation operation)throws SQLException{try{authorizer.authorize(c,a,s,operation);}catch(DomainException rejected){if(rejected.status==403||rejected.status==404)throw new DomainException(rejected.status,"BACKUP_VERSION_ACCESS_DENIED","当前范围的版本登记或读取未获授权");throw unavailable();}catch(RuntimeException rejected){throw unavailable();}}
- private static void lockAsset(Connection c,Scope s)throws SQLException{try(var q=query(c,"SELECT id FROM public.mop_asset WHERE tenant_id=? AND id=? FOR UPDATE")){q.setObject(1,s.tenantId());q.setObject(2,s.assetId());try(var r=q.executeQuery()){if(!r.next())throw new DomainException(404,"ASSET_NOT_FOUND","当前范围未找到设备");}}}
+ private static void lockAsset(Connection c,Scope s)throws SQLException{lockAsset(c,s.tenantId(),s.assetId());}
+ private static void lockAsset(Connection c,UUID tenant,UUID asset)throws SQLException{try(var q=query(c,"SELECT id FROM public.mop_asset WHERE tenant_id=? AND id=? FOR UPDATE")){q.setObject(1,tenant);q.setObject(2,asset);try(var r=q.executeQuery()){if(!r.next())throw new DomainException(404,"ASSET_NOT_FOUND","当前范围未找到设备");}}}
  private static PreparedStatement query(Connection c,String sql)throws SQLException{var q=c.prepareStatement(sql);q.setQueryTimeout(12);return q;}
  private static Instant instant(ResultSet r,String key)throws SQLException{var value=r.getObject(key,OffsetDateTime.class);if(value==null)throw unavailable();Instant at=value.toInstant();if(at.getNano()%1000000!=0||at.isBefore(Instant.parse("0001-01-01T00:00:00Z"))||at.isAfter(Instant.parse("9999-12-31T23:59:59.999Z")))throw unavailable();return at;}
  private static boolean reference(String value){return value!=null&&value.matches("sha256:[0-9a-f]{64}");}

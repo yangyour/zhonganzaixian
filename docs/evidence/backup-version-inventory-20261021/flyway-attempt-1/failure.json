@@ -1,0 +1,6 @@
+{
+  "stage": "repository_checks",
+  "error_type": "FileNotFoundError",
+  "detail": "REDACTED",
+  "production_approved": false
+}

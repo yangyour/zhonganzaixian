@@ -44,4 +44,11 @@ class DependencyTemplateCheckTest(unittest.TestCase):
         for key in ['backup_archive_access_authorizer_reference','approved_immutable_bucket_governance_reference']:
             self.assertIn(key,d);self.assertIsNone(d[key])
         self.assertFalse(d['backup_execution_enabled']);self.assertFalse(d['production_approved'])
+    def test_backup_inventory_authorizer_is_explicit_unconfigured_and_never_download_grant(self):
+        d=json.loads((ROOT/'deploy/examples/backup-execution-dependencies.json').read_text())
+        self.assertIn('backup_version_inventory_authorizer_reference',d)
+        self.assertIsNone(d['backup_version_inventory_authorizer_reference'])
+        self.assertFalse(d['backup_execution_enabled'])
+        self.assertIn('neither registration nor enumeration authorizes download',d['notes'])
+
 if __name__=='__main__': unittest.main()

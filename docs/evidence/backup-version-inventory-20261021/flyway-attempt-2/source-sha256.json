@@ -1,0 +1,7 @@
+{
+  "server/persistence/src/main/java/cn/mop/persistence/PostgresBackupVersionRepository.java": "8ed3ab584f28c49ab9c80c3141e9f71739c70ad62bce062f5002fa9fdf18bde3",
+  "server/persistence/src/main/java/cn/mop/persistence/BackupVersionSchemaVerifier.java": "8c4c7c019b70b5ea969a556962375393648cc8ccf2d34ca943097365a5ebeb06",
+  "server/persistence/src/main/java/cn/mop/persistence/TestSchemaMigration.java": "33d2fbb75cdc0235284c1de10e44144e8356d27313543a1a992517b7b68bd850",
+  "server/api/src/test/java/cn/mop/persistence/BackupVersionInventoryPostgresTest.java": "d7d8a5f8c2ee7d2ccb7e438861144553e0f717501282317886306e55004f603b",
+  "server/persistence/src/main/resources/db/migration/V49__atomic_backup_version_registration.sql": "67e196ea9e9b6a9586fbae9cf47a040f34bf975e02033793a8d96fc0d60dbf60"
+}

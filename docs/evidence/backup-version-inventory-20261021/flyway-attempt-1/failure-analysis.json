@@ -1,0 +1,10 @@
+{
+  "failure_stage": "AFTER_ALL_DATABASE_CHECKS_WHILE_WRITING_SOURCE_HASH_METADATA",
+  "cause": "Harness named V49__durable_backup_version_registration.sql instead of actual frozen V49__atomic_backup_version_registration.sql",
+  "legacy_registration_checks_passed": 56,
+  "inventory_checks_passed": 41,
+  "schema_checks_passed": 9,
+  "original_run_result": "FAILED_NOT_PROMOTED_TO_PASS",
+  "database_stopped_and_temporary_credentials_removed": true,
+  "action": "Correct harness filename and rerun full independent disposable validation as attempt 2"
+}

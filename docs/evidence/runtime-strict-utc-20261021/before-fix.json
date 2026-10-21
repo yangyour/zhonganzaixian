@@ -1,0 +1,38 @@
+{
+  "base_commit": "4da39f0ad20e9e420c7e7efdbcd33c251637551a",
+  "source_sha256": "2400ce5501d7d0c8b0fb2fe6145eff8cc82d52dd8692125abacf61934df1d73e",
+  "tests": 7,
+  "failures": 3,
+  "errors": 0,
+  "cases": [
+    {
+      "name": "rejectsMidnightTwentyFourInsteadOfMovingToNextDay",
+      "passed": false
+    },
+    {
+      "name": "rejectsImpossibleDatesAndUnapprovedPrecision",
+      "passed": true
+    },
+    {
+      "name": "expiryUsesTheSameStrictClock",
+      "passed": false
+    },
+    {
+      "name": "validExplicitExpiryPreservesMillisecondInstant",
+      "passed": true
+    },
+    {
+      "name": "validLeapDayAndBoundaryInstantsReachRepositoryWithoutTimeShift",
+      "passed": true
+    },
+    {
+      "name": "immediateActivationStillRequiresExplicitNullTime",
+      "passed": true
+    },
+    {
+      "name": "rejectsLeapSecondInsteadOfMovingToPreviousSecond",
+      "passed": false
+    }
+  ],
+  "scope": "ISOLATED_CONTROLLER_MOCK_REPOSITORY_NOT_REAL_PUBLICATION"
+}

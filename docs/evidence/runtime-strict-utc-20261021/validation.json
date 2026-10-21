@@ -1,0 +1,35 @@
+{
+  "base_commit": "4da39f0ad20e9e420c7e7efdbcd33c251637551a",
+  "result": "PASS",
+  "api_contract": "UNCHANGED_0.71.0",
+  "migrations": "UNCHANGED_V1_V45",
+  "before_fix": {
+    "tests": 7,
+    "failures": 3
+  },
+  "after_fix": {
+    "tests": 7,
+    "failures": 0
+  },
+  "java_verify": {
+    "tests": 3795,
+    "executed": 2799,
+    "skipped": 996,
+    "failures": 0,
+    "errors": 0
+  },
+  "contracts": 165,
+  "python": 113,
+  "frontend": "UNCHANGED_NOT_RERUN_THIS_BATCH",
+  "actual_http_checks": 25,
+  "invalid_time_http_rejections": 8,
+  "configuration_publications_created": 0,
+  "idempotency_receipts_created": 0,
+  "temporary_environments_cleaned": true,
+  "browser_axe": "NOT_RUN",
+  "formal_tc_not_run": 128,
+  "source_sha256": {
+    "server/api/src/main/java/cn/mop/api/RuntimeConfigurationController.java": "f6104cea575ebbdf3382d428d292a7aa027208f9640274d183705a72112eb861",
+    "server/api/src/test/java/cn/mop/api/RuntimeConfigurationTimeTest.java": "50e01683f223c2a1f4e1777585c26111bf4b783cbbc1ab1e29098e9460921257"
+  }
+}

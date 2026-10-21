@@ -1,0 +1,49 @@
+{
+  "cases": [
+    {
+      "field": "effective_at",
+      "value": "2099-10-22T24:00:00Z",
+      "expected_status": 400
+    },
+    {
+      "field": "effective_at",
+      "value": "2099-10-22T23:59:60Z",
+      "expected_status": 400
+    },
+    {
+      "field": "effective_at",
+      "value": "2099-02-30T08:00:00Z",
+      "expected_status": 400
+    },
+    {
+      "field": "effective_at",
+      "value": "0000-01-01T00:00:00Z",
+      "expected_status": 400
+    },
+    {
+      "field": "effective_at",
+      "value": "2099-10-22T08:00:00.1234Z",
+      "expected_status": 400
+    },
+    {
+      "field": "effective_at",
+      "value": "2099-10-22T08:00:00+08:00",
+      "expected_status": 400
+    },
+    {
+      "field": "expires_at",
+      "value": "2099-10-23T24:00:00Z",
+      "expected_status": 400
+    },
+    {
+      "field": "expires_at",
+      "value": "2099-10-23T23:59:60Z",
+      "expected_status": 400
+    }
+  ],
+  "changed_tables": [
+    "mop_audit"
+  ],
+  "configuration_publications_created": 0,
+  "idempotency_receipts_created": 0
+}

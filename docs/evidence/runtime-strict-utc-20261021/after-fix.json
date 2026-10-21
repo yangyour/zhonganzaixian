@@ -1,0 +1,37 @@
+{
+  "tests": 7,
+  "failures": 0,
+  "errors": 0,
+  "source_sha256": "f6104cea575ebbdf3382d428d292a7aa027208f9640274d183705a72112eb861",
+  "cases": [
+    {
+      "name": "rejectsMidnightTwentyFourInsteadOfMovingToNextDay",
+      "passed": true
+    },
+    {
+      "name": "rejectsImpossibleDatesAndUnapprovedPrecision",
+      "passed": true
+    },
+    {
+      "name": "expiryUsesTheSameStrictClock",
+      "passed": true
+    },
+    {
+      "name": "validExplicitExpiryPreservesMillisecondInstant",
+      "passed": true
+    },
+    {
+      "name": "validLeapDayAndBoundaryInstantsReachRepositoryWithoutTimeShift",
+      "passed": true
+    },
+    {
+      "name": "immediateActivationStillRequiresExplicitNullTime",
+      "passed": true
+    },
+    {
+      "name": "rejectsLeapSecondInsteadOfMovingToPreviousSecond",
+      "passed": true
+    }
+  ],
+  "scope": "ISOLATED_CONTROLLER_MOCK_REPOSITORY_NOT_REAL_PUBLICATION"
+}

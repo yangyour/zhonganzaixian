@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.*;
 import java.security.MessageDigest;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.*;
 import static cn.mop.api.ApiResponse.*;
 
@@ -42,7 +43,7 @@ public class RuntimeConfigurationController {
     private static String text(JsonNode b,String k,int n){return ConfigurationRevisionController.text(b,k,n);}
     private static long version(JsonNode b,String k,int min){var v=b.get(k);if(v==null||!v.isIntegralNumber()||!v.canConvertToLong()||v.longValue()<min||v.longValue()>9007199254740990L)throw invalid(k+"版本无效");return v.longValue();}
     private static String nullableUuid(JsonNode b,String k){var v=b.get(k);if(v==null)throw invalid(k+"缺失");if(v.isNull())return null;if(!v.isTextual()||!v.asText().matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))throw invalid(k+"标识无效");return v.asText();}
-    private static Instant time(JsonNode b,String k){var v=b.get(k);if(v==null)throw invalid(k+"缺失");if(v.isNull())return null;try{if(!v.isTextual()||!v.asText().matches("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,3})?Z"))throw invalid("时间格式无效");Instant t=Instant.parse(v.asText());if(t.isBefore(Instant.parse("0001-01-01T00:00:00Z"))||t.isAfter(Instant.parse("9999-12-31T23:59:59.999Z")))throw invalid("时间范围无效");return t;}catch(RuntimeException e){throw invalid(k+"须为明确UTC时间，最多毫秒");}}
+    private static Instant time(JsonNode b,String k){var v=b.get(k);if(v==null)throw invalid(k+"缺失");if(v.isNull())return null;try{if(!v.isTextual()||!v.asText().matches("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,3})?Z"))throw invalid("时间格式无效");Instant t=OffsetDateTime.parse(v.asText()).toInstant();if(t.isBefore(Instant.parse("0001-01-01T00:00:00Z"))||t.isAfter(Instant.parse("9999-12-31T23:59:59.999Z")))throw invalid("时间范围无效");return t;}catch(RuntimeException e){throw invalid(k+"须为明确UTC时间，最多毫秒");}}
     private String hash(JsonNode b){try{return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(mapper.writeValueAsBytes(sorted(b))));}catch(Exception e){throw new IllegalStateException(e);}}
     private JsonNode sorted(JsonNode n){if(n.isObject()){var o=mapper.createObjectNode();TreeSet<String> keys=new TreeSet<>();n.fieldNames().forEachRemaining(keys::add);keys.forEach(k->o.set(k,sorted(n.get(k))));return o;}if(n.isArray()){var a=mapper.createArrayNode();n.forEach(v->a.add(sorted(v)));return a;}return n;}
     private static void noQuery(HttpServletRequest r){if(!r.getParameterMap().isEmpty())throw invalid("不接受额外查询参数");}

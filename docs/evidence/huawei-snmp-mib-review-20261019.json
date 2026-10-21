@@ -1,0 +1,402 @@
+{
+  "recorded_at": "2026-10-19T07:46:35.112234+00:00",
+  "source_directory": "../doc/doc/华为S5731-MIB库-V200R022",
+  "source_kind": "community mirror as declared by supplied README; not official version-locked distribution",
+  "huawei_file_count": 35,
+  "standard_file_count": 30,
+  "mib_compilation": "NOT_RUN",
+  "device_model_verified": false,
+  "device_firmware_verified": false,
+  "candidate_effective": false,
+  "source_files": [
+    {
+      "path": "huawei/HUAWEI-AAA-MIB",
+      "sha256": "ddb098d6e090dab2291a5d41666c6fdde6b5a90f424dc8a90e46018053c348e7",
+      "bytes": 629235
+    },
+    {
+      "path": "huawei/HUAWEI-ACL-MIB",
+      "sha256": "ab69ab78f117d189d38dd732ea88ce08ef817443b8e838d4b608a89947f2f369",
+      "bytes": 200900
+    },
+    {
+      "path": "huawei/HUAWEI-BASE-TRAP-MIB",
+      "sha256": "90d0ac2436307b139688ba5a10c643feda5956d014daca4c9609ce13e4e58f20",
+      "bytes": 93995
+    },
+    {
+      "path": "huawei/HUAWEI-CPU-MIB",
+      "sha256": "2447541502716aacb1f7df8bd2bec3f80850f5c5c693940294a035ede7e2819d",
+      "bytes": 9177
+    },
+    {
+      "path": "huawei/HUAWEI-DEVICE-EXT-MIB",
+      "sha256": "d1e20a21359eab94702af7c16ff97c9fa1d793df17c702aa180c98d6d3afd9e5",
+      "bytes": 4799
+    },
+    {
+      "path": "huawei/HUAWEI-DEVICE-MIB",
+      "sha256": "8ca7d23e10e2b815777c4f9fef5485c83df2ba4f522b1d1724a1731b0158542e",
+      "bytes": 433308
+    },
+    {
+      "path": "huawei/HUAWEI-DHCP-SNOOPING-MIB",
+      "sha256": "b63fac0fdd63184a2f68c108d10814bbaa05f01c45ec51b1b748190097d135b5",
+      "bytes": 83186
+    },
+    {
+      "path": "huawei/HUAWEI-ENTITY-EXTENT-MIB",
+      "sha256": "ebadc333257701692bfc1b956bf3202c3e921065eb365278b7b5f166b9ef270e",
+      "bytes": 291707
+    },
+    {
+      "path": "huawei/HUAWEI-ENTITY-TRAP-MIB",
+      "sha256": "d784a26ae610aab4f8afe164161cc3c6c255e05abe60e3b3d3b742f5ce63af35",
+      "bytes": 249347
+    },
+    {
+      "path": "huawei/HUAWEI-ENVIRONMENT-MIB",
+      "sha256": "e414081ed540f2c3d22c1abf4e6ca1e5ac868d1bd070c8e83303fd2625f76e85",
+      "bytes": 172692
+    },
+    {
+      "path": "huawei/HUAWEI-ERRORDOWN-MIB",
+      "sha256": "7c7243b83a6e2f139ef684c163468a409505b893891d50223d20b6fd77276925",
+      "bytes": 3912
+    },
+    {
+      "path": "huawei/HUAWEI-ETHARP-MIB",
+      "sha256": "1fc534a8c7d6d906349086c419196750d5f12fab9856752d34f62df86cfffc9f",
+      "bytes": 117473
+    },
+    {
+      "path": "huawei/HUAWEI-FLASH-MAN-MIB",
+      "sha256": "95b52364bdd9f02daf92553ed61fc7039604245288d7083b2fa78f0e88d1b125",
+      "bytes": 65566
+    },
+    {
+      "path": "huawei/HUAWEI-IF-EXT-MIB",
+      "sha256": "687c2982aecc6ef212f8ae754affd8572ccdd7b5a4375199f07428c3782f2f6d",
+      "bytes": 305243
+    },
+    {
+      "path": "huawei/HUAWEI-L2IF-MIB",
+      "sha256": "1f3547bbc24ad6e99e34abd5177a719aec5a4d3ba46552d780788350f39b7b5e",
+      "bytes": 58049
+    },
+    {
+      "path": "huawei/HUAWEI-L2VLAN-MIB",
+      "sha256": "72b1e2879382501ff8ae1510978c74593bbadbcb690d3054602b00817fa18574",
+      "bytes": 180615
+    },
+    {
+      "path": "huawei/HUAWEI-LLDP-MIB",
+      "sha256": "2ad9488a3e1d078193959a0400e702e1a185f3f5f754de4820603d5dece1bbe8",
+      "bytes": 37604
+    },
+    {
+      "path": "huawei/HUAWEI-LOOPDETECT-MIB",
+      "sha256": "8d6a533c8db6c36ca2e732a8360f8ad3da74307bd90cc543250be09b323a4500",
+      "bytes": 23245
+    },
+    {
+      "path": "huawei/HUAWEI-MAC-AUTHEN-MIB",
+      "sha256": "e3e8c7ad84f6eeb17104a21711068d5940947125913562cef24a7579a57c4d19",
+      "bytes": 13452
+    },
+    {
+      "path": "huawei/HUAWEI-MEMORY-MIB",
+      "sha256": "98fe4fc0f32cbfa8105e950e26aa711d9998bd53e126a232c9a088ff8edd9e14",
+      "bytes": 9929
+    },
+    {
+      "path": "huawei/HUAWEI-MIB",
+      "sha256": "ba362a1de240b708958ddc0e9818e16a22bacb3d8686900c87b4ad6ea167e723",
+      "bytes": 379014
+    },
+    {
+      "path": "huawei/HUAWEI-MODULE-INFO-MIB",
+      "sha256": "014431ddb5de9fd7fba4b2300f88ccbfb4f3adb8bfd0feda76a4771d6b74f274",
+      "bytes": 6447
+    },
+    {
+      "path": "huawei/HUAWEI-MSTP-MIB",
+      "sha256": "6b02f1c7ef981514042b77fe0d374ca2635bced3979890c3266b0bcf945b65c8",
+      "bytes": 174641
+    },
+    {
+      "path": "huawei/HUAWEI-NDB-MIB",
+      "sha256": "8753a7db8637ada226bbf810edb527d4a784c18b54f9c539ef4e895a12c35a32",
+      "bytes": 6011
+    },
+    {
+      "path": "huawei/HUAWEI-NTP-MIB",
+      "sha256": "7c9c2cf3d04d2d6877393ce3204f583cdacae86fc9e093a2be563791ee4733e8",
+      "bytes": 120706
+    },
+    {
+      "path": "huawei/HUAWEI-POE-MIB",
+      "sha256": "6322c29767d0e60a4367850f260882c7dd01e1bbdb91a776a2373e82ff02d16e",
+      "bytes": 40812
+    },
+    {
+      "path": "huawei/HUAWEI-PORT-MIB",
+      "sha256": "e970e90c01c0a228d3cbc27e0081181c493a47aa28a947d4735fef425ca6bc4a",
+      "bytes": 438671
+    },
+    {
+      "path": "huawei/HUAWEI-POWER-MIB",
+      "sha256": "ab4f02b2309c5fa8108f3cfd9e4fdcc76335d2b082aa7eea747c76b76cb18a6e",
+      "bytes": 149556
+    },
+    {
+      "path": "huawei/HUAWEI-RM-EXT-MIB",
+      "sha256": "6ef019e0a01670691924d115085ae94d8aea1569f5014ca9ff827398e09a02eb",
+      "bytes": 102762
+    },
+    {
+      "path": "huawei/HUAWEI-SECURITY-MIB",
+      "sha256": "3a4ecac8912e232c5868d4cd42173ee0d6247d625a1c9d55440afa60938ccdd8",
+      "bytes": 126288
+    },
+    {
+      "path": "huawei/HUAWEI-SNMP-EXT-MIB",
+      "sha256": "b718fab8fdb9beab51652f75d8d25101c8c4f9bc0b6a8047b9e835a97bb0d714",
+      "bytes": 12044
+    },
+    {
+      "path": "huawei/HUAWEI-STACK-MIB",
+      "sha256": "4950835ded45b3f645a14531fe602eb168858f4b939cab5721fd5b542b1f4f34",
+      "bytes": 119498
+    },
+    {
+      "path": "huawei/HUAWEI-SYSLOG-MIB",
+      "sha256": "af8a25b20556697eda497596020e2e810ed556b70812706ff2ec0689b5894899",
+      "bytes": 13283
+    },
+    {
+      "path": "huawei/HUAWEI-TASK-MIB",
+      "sha256": "c970cf717841ac97ebb043af7d34c0e43941eeaa0c2d7ca2c9bef9b76ade289f",
+      "bytes": 12972
+    },
+    {
+      "path": "huawei/HUAWEI-TC-MIB",
+      "sha256": "57f2e1750c35fa48cd96138517adabfc5f4b7f4c66859428af4d799ac9c96f95",
+      "bytes": 2497559
+    },
+    {
+      "path": "standard/BRIDGE-MIB",
+      "sha256": "1e18de882086fca7be165e367d3b8e141379f5181fcaa3af0efe63f6710440da",
+      "bytes": 50948
+    },
+    {
+      "path": "standard/ENTITY-MIB",
+      "sha256": "e56b77653a23171405dbae2431ed3f411dbe311e6ce1222cfd4cffd29dfe2e0c",
+      "bytes": 65951
+    },
+    {
+      "path": "standard/ENTITY-SENSOR-MIB",
+      "sha256": "3ca987418ef2875b785725ac197be52730d5b4225b8a6961ad3983cbb5640be3",
+      "bytes": 16248
+    },
+    {
+      "path": "standard/EtherLike-MIB",
+      "sha256": "5873ed55dd3fa77fd26d4d22997290fe3a76769afe79489e4a44b63df5cfdfc3",
+      "bytes": 84492
+    },
+    {
+      "path": "standard/HCNUM-TC",
+      "sha256": "c8d21522e37294169277cab9a9e6e0dae85ce2a106af3e64429ece8f35b6835c",
+      "bytes": 4660
+    },
+    {
+      "path": "standard/HOST-RESOURCES-MIB",
+      "sha256": "0406b893dcfacc370a1ae04ccfe6ffdecb15f93e3377a1a5ded2bbde5d944165",
+      "bytes": 52544
+    },
+    {
+      "path": "standard/IANA-RTPROTO-MIB",
+      "sha256": "8848bde6c0141fa6b63a16bc78b6484a15b66b55c80d1c76f8c3cff453b98b87",
+      "bytes": 4098
+    },
+    {
+      "path": "standard/IANAifType-MIB",
+      "sha256": "1bb1a2e5938abfd21ed019ff0c9cec71d2e2387b266737a37fe9516307b7afd8",
+      "bytes": 37634
+    },
+    {
+      "path": "standard/IF-MIB",
+      "sha256": "a41d2d0414bd6e1b3249257d0d035ea11554624c525b830f6910195b72b0c297",
+      "bytes": 71691
+    },
+    {
+      "path": "standard/INET-ADDRESS-MIB",
+      "sha256": "2cec7722aa39eb8facf105b26e93d0bce4ca9f097638c094b0a4f247c86843dc",
+      "bytes": 16782
+    },
+    {
+      "path": "standard/IP-FORWARD-MIB",
+      "sha256": "6b55a19e712c0012cd2ac9813c5cddb10c93fdfa01e2e87c2c2fe14c41bd2a04",
+      "bytes": 46286
+    },
+    {
+      "path": "standard/IP-MIB",
+      "sha256": "6a6ec284b2de6f21a4d090927dba474a131c777d1c0b5a80a57fe21a7dd4a3d3",
+      "bytes": 185667
+    },
+    {
+      "path": "standard/LLDP-MIB",
+      "sha256": "f0dac7bac08b6d632d2f2363aba8acf106ee7cf83c15f14823489390c31d6769",
+      "bytes": 76945
+    },
+    {
+      "path": "standard/Q-BRIDGE-MIB",
+      "sha256": "7c89bcd1830251189afd6b326650f2b6eb2f31c4a04c3f82d45453bd2c194fbb",
+      "bytes": 84133
+    },
+    {
+      "path": "standard/RFC1213-MIB",
+      "sha256": "b21ec8c8f5a3169a07a54ad1f023e2fa56e6c38f43459a6e6029131f315a0f5f",
+      "bytes": 79667
+    },
+    {
+      "path": "standard/RMON-MIB",
+      "sha256": "dcb729079c88a3aa5e8bb4ab2890c388337794e0da95c6867bb69e45ff30c936",
+      "bytes": 147822
+    },
+    {
+      "path": "standard/SNMP-COMMUNITY-MIB",
+      "sha256": "6a675a628f8eb8b69071a9c1aa8f9dc0649176dac031a075d34397eddee40f03",
+      "bytes": 18711
+    },
+    {
+      "path": "standard/SNMP-FRAMEWORK-MIB",
+      "sha256": "0b61ecae73be7eb8e7983f16ab8387f19574b671b9d53967e4058fb73ef7bcbb",
+      "bytes": 22342
+    },
+    {
+      "path": "standard/SNMP-MPD-MIB",
+      "sha256": "a0c422e1b95ae118af3501047fa0cade5d0e546a0e4cbb428a9910883f971834",
+      "bytes": 5496
+    },
+    {
+      "path": "standard/SNMP-NOTIFICATION-MIB",
+      "sha256": "d077b79cf60c1496a29c76b16ca95c0077e301bb3409a06c6b91d237bb294e59",
+      "bytes": 20014
+    },
+    {
+      "path": "standard/SNMP-PROXY-MIB",
+      "sha256": "e32347542654e4c3f02832ba137ccb093d6f723cfc4c1dfd0ec11482c8fa6404",
+      "bytes": 9106
+    },
+    {
+      "path": "standard/SNMP-TARGET-MIB",
+      "sha256": "58551454d6f89f7d63a240505fee761550e7dc21ff4d3a77f6544066e58c5ff5",
+      "bytes": 22769
+    },
+    {
+      "path": "standard/SNMP-USER-BASED-SM-MIB",
+      "sha256": "018e45be2956eae9129e3d93d183e37ef34c079dbe02557956606d2402dc75be",
+      "bytes": 39201
+    },
+    {
+      "path": "standard/SNMP-VIEW-BASED-ACM-MIB",
+      "sha256": "602ad67a3074135a6be3666059263db64d257dd655f827b138f7ba8a36eb2f54",
+      "bytes": 34162
+    },
+    {
+      "path": "standard/SNMPv2-CONF",
+      "sha256": "b3e90ba682e10c76f6de90e65a0013143f0ec531b0ed546b2b8aa5ad5c0001eb",
+      "bytes": 8263
+    },
+    {
+      "path": "standard/SNMPv2-MIB",
+      "sha256": "b4f8ef130f580b86d2b6bc890564e46100785f589431df76954e878a7b166e11",
+      "bytes": 29305
+    },
+    {
+      "path": "standard/SNMPv2-SMI",
+      "sha256": "ece2355fc8b6140af702f86d77bd3f7398d80375fc6278c3e30ff3a31b53e0b7",
+      "bytes": 8924
+    },
+    {
+      "path": "standard/SNMPv2-TC",
+      "sha256": "c1379575e6a0ad25b2d7da68294153c1fd79750827376f2aa6323d072d73f0b8",
+      "bytes": 38034
+    },
+    {
+      "path": "standard/TCP-MIB",
+      "sha256": "513be8f929389f20c6e203598e4b2a4e9b85a45fe6d4b816445bc143eeb2f6c6",
+      "bytes": 28564
+    },
+    {
+      "path": "standard/UDP-MIB",
+      "sha256": "cb2ca5e2dfef1b0b8828918e3424af6f9120c654cf10ab882e288f04cc6db374",
+      "bytes": 20882
+    }
+  ],
+  "candidate_objects": [
+    {
+      "object": "hwEntityCpuUsage",
+      "oid": "1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5",
+      "source": "huawei/HUAWEI-ENTITY-EXTENT-MIB",
+      "line": 895,
+      "syntax": "Integer32 (0..100)",
+      "description": "This object indicates the CPU usage of an entity. Generally, the overall CPU usage of the entity is calculated, without considering the number of CPUs on the entity.",
+      "verification": "local numeric OID comment plus assignment leaf; not MIB compilation or device support"
+    },
+    {
+      "object": "hwEntityMemUsage",
+      "oid": "1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7",
+      "source": "huawei/HUAWEI-ENTITY-EXTENT-MIB",
+      "line": 915,
+      "syntax": "Integer32 (0..100)",
+      "description": "This object indicates the memory usage of an entity, that is, the percentage of the memory that has been used.",
+      "verification": "local numeric OID comment plus assignment leaf; not MIB compilation or device support"
+    },
+    {
+      "object": "hwEntityUpTime",
+      "oid": "1.3.6.1.4.1.2011.5.25.31.1.1.1.1.10",
+      "source": "huawei/HUAWEI-ENTITY-EXTENT-MIB",
+      "line": 946,
+      "syntax": "Integer32",
+      "description": "This object indicates the total duration when an entity is in the UP state.",
+      "verification": "local numeric OID comment plus assignment leaf; not MIB compilation or device support"
+    },
+    {
+      "object": "hwEntityOpticalRxPower",
+      "oid": "1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8",
+      "source": "huawei/HUAWEI-ENTITY-EXTENT-MIB",
+      "line": 2070,
+      "syntax": "Integer32",
+      "description": "This object indicates the receive optical power of an optical module. Unit: dBm. the value is expanded 100 times, so the real value should be reduced 100 times.",
+      "verification": "local numeric OID comment plus assignment leaf; not MIB compilation or device support"
+    },
+    {
+      "object": "hwEntityOpticalTxPower",
+      "oid": "1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9",
+      "source": "huawei/HUAWEI-ENTITY-EXTENT-MIB",
+      "line": 2080,
+      "syntax": "Integer32",
+      "description": "This object indicates the transmit optical power of an optical module. Unit: dBm. the value is expanded 100 times, so the real value should be reduced 100 times.",
+      "verification": "local numeric OID comment plus assignment leaf; not MIB compilation or device support"
+    },
+    {
+      "object": "ifHCInOctets",
+      "oid": "1.3.6.1.2.1.31.1.1.1.6",
+      "source": "standard/IF-MIB",
+      "syntax": "Counter64",
+      "source_unit": "bytes",
+      "verification": "local IF-MIB assignment chain from mib-2; not device support"
+    },
+    {
+      "object": "ifHCOutOctets",
+      "oid": "1.3.6.1.2.1.31.1.1.1.10",
+      "source": "standard/IF-MIB",
+      "syntax": "Counter64",
+      "source_unit": "bytes",
+      "verification": "local IF-MIB assignment chain from mib-2; not device support"
+    }
+  ],
+  "candidate_sha256": "7f33c2f709b5d25ce5b001a287193841003a8657e5b3617cf1f6e7f51b92691f"
+}

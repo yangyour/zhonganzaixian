@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-18",
+  "environment": "designated_remote_test_over_project_ssh_tunnel",
+  "database": "mop_test",
+  "postgres_version": "17.9",
+  "migration_status": {
+    "from": "V34",
+    "applied": ["V35"],
+    "successful_migration_count": 35,
+    "duplicate_migrations": 0,
+    "read_only_recheck": "SERVICE_TIERS_APPLIED"
+  },
+  "v35_sha256": "f8bf2639d6ebb467a0d515147307ceb2e13c425b2337cbad69c88eee91330ed0",
+  "integration_tests": {
+    "PostgresServiceTierIntegrationTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "m2_10_three_in_flight_tickets_immutable_after_tier_changes": true,
+      "m5_8_frozen_tier_distinct_from_current_tenant_tier": true,
+      "m5_18_threshold_tasks_50_80_100_persisted": true,
+      "m5_20_append_only_change_history_verified": true,
+      "db_guards_reject_unpaired_mutation_and_history_update": true,
+      "rbac_msp_and_viewer_write_rejected_403": true
+    }
+  },
+  "unit_and_controller_tests": {
+    "TestSchemaMigrationTest": {"tests": 41, "failures": 0, "errors": 0},
+    "TicketSlaClockBoundaryTest": {"tests": 20, "failures": 0, "errors": 0},
+    "ServiceTierControllerTest": {"tests": 5, "failures": 0, "errors": 0},
+    "TicketWorkflowControllerTest": {"tests": 12, "failures": 0, "errors": 0},
+    "api_java_suite": {"tests": 1871, "failures": 0, "errors": 0, "skipped": 35}
+  },
+  "web_validation": {
+    "test_files": 157,
+    "tests": 2210,
+    "failures": 0,
+    "typecheck": "PASSED",
+    "build": {
+      "status": "PASSED",
+      "files": 111,
+      "build_id": "7b3ddfb4a5f5c59f38cf53d999a4ef69e9aaa14359d002c1693771569d636268"
+    }
+  },
+  "contract_tests": {
+    "tests": 136,
+    "failures": 0,
+    "errors": 0,
+    "api_contract_version": "0.55.0"
+  },
+  "synthetic_data": true,
+  "pending_customer_rules_preserved": ["Q05", "Q08", "Q15", "Q16", "Q26", "Q27"],
+  "production_approved": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "credentials_output": false
+}

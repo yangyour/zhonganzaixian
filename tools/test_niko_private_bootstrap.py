@@ -93,10 +93,41 @@ class MigrationManifestParityTest(unittest.TestCase):
   import re
   actual={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/'server/persistence/src/main/resources/db/migration').glob('*.sql')}
   for entrypoint in ['deploy/migration-policy.ps1','tools/niko-test/run-migration.py']:
-   text=(ROOT/entrypoint).read_text();names=re.findall(r"frozen-[a-z-]+\.json",text);self.assertEqual(len(names),len(set(names)));expected={}
+   text=(ROOT/entrypoint).read_text();names=re.findall(r"(?:frozen|candidate)-[a-z-]+\.json",text);self.assertEqual(len(names),len(set(names)));expected={}
    for name in names:
     values=json.loads((ROOT/'tools/niko-test'/name).read_text())['sha256'];self.assertTrue(set(values).isdisjoint(expected));expected.update(values)
-   self.assertEqual(actual,expected);self.assertEqual(set(range(1,37)),{int(name.split('__')[0][1:]) for name in expected})
+   self.assertEqual(actual,expected);self.assertEqual(set(range(1,46)),{int(name.split('__')[0][1:]) for name in expected})
+   if entrypoint.endswith('.ps1'):
+    # Manifest parity alone misses a stale runtime upper bound or expected count.
+    maximum=re.findall(r'\$version -gt ([0-9]+)',text)
+    count=re.findall(r'\$expected\.Count -ne ([0-9]+)',text)
+    self.assertEqual([str(max(int(name.split('__')[0][1:]) for name in expected))],maximum)
+    self.assertEqual([str(len(expected))],count)
+ def test_source_and_compiled_resource_mismatch_fails_before_private_config(self):
+  import shutil
+  for case in ['extra_compiled','missing_source','modified_compiled']:
+   with self.subTest(case=case),tempfile.TemporaryDirectory() as directory:
+    root=Path(directory);manifest_dir=root/'tools/niko-test';manifest_dir.mkdir(parents=True)
+    for source in list((ROOT/'tools/niko-test').glob('frozen-*.json'))+list((ROOT/'tools/niko-test').glob('candidate-*.json')):shutil.copyfile(source,manifest_dir/source.name)
+    source_dir=root/'server/persistence/src/main/resources/db/migration'
+    compiled_dir=root/'server/persistence/target/classes/db/migration'
+    shutil.copytree(ROOT/'server/persistence/src/main/resources/db/migration',source_dir)
+    shutil.copytree(source_dir,compiled_dir)
+    sample='V37__monitoring_events_noise_funnel_and_maintenance_windows.sql'
+    if case=='extra_compiled':(compiled_dir/'V99__unreviewed.sql').write_text('SELECT 1;')
+    elif case=='missing_source':(source_dir/sample).unlink()
+    else:(compiled_dir/sample).write_text('SELECT 1;')
+    result=subprocess.run([sys.executable,str(ROOT/'tools/niko-test/run-migration.py'),'--check'],cwd=root,capture_output=True,text=True)
+    self.assertNotEqual(0,result.returncode)
+    self.assertIn('no database action',result.stderr)
+    self.assertNotIn('runtime.json',result.stderr)
+    self.assertFalse((root/'.local').exists())
+ def test_upstream_wecom_v38_and_translated_approval_v40_are_independently_pinned(self):
+  expected={'V38__wecom_bindings_deliveries_and_login_state.sql':'32dc38c2dab0ad385f79e9e7c886c456c06664f8b740c496a8af7bf2d9e9c0fb','V39__email_bindings_and_delivery_ledger.sql':'3d1b4cd557b6c367b2a36e9f49a2154d8a925a8afe249c103cd59373f32a6dea','V40__immutable_change_notice_approval_events.sql':'a24085a280ff822da932904c20cb3189fd813ef1d6ddc2f5458723ba48025756'}
+  for name,digest in expected.items():self.assertEqual(digest,hashlib.sha256((ROOT/'server/persistence/src/main/resources/db/migration'/name).read_bytes()).hexdigest())
+  self.assertFalse((ROOT/'server/persistence/src/main/resources/db/migration/V38__immutable_change_notice_approval_events.sql').exists())
+  policy=(ROOT/'deploy/migration-policy.ps1').read_text()
+  for mode in ['wecom-integration','email-integration','change-notice-approval']:self.assertIn("'"+mode+"' = '--apply-"+mode+"'",policy)
  def test_python_admitted_modes_exactly_match_java_cli_features(self):
   import ast,re
   tree=ast.parse((ROOT/'tools/niko-test/run-migration.py').read_text())
@@ -106,7 +137,7 @@ class MigrationManifestParityTest(unittest.TestCase):
   expected=set(re.findall(r'"(--apply-[a-z-]+)"\.equals\(args\[0\]\)',java))|{'--check','--initialize-new-niko-database'}
   self.assertEqual(len(modes),len(set(modes)));self.assertEqual(expected,set(modes))
  def test_identity_modes_are_admitted_before_frozen_resource_checks(self):
-  for mode in ['--apply-project-identity','--apply-identity-compatibility','--apply-raw-monitoring-events','--apply-monitoring-quarantine','--apply-export-inbox','--apply-runtime-configuration','--apply-ticket-lifecycle','--apply-ticket-autoclose','--apply-ticket-sla-policy','--apply-sla-reminders']:
+  for mode in ['--apply-project-identity','--apply-identity-compatibility','--apply-raw-monitoring-events','--apply-monitoring-quarantine','--apply-export-inbox','--apply-runtime-configuration','--apply-ticket-workflow','--apply-notification-intents','--apply-service-tiers','--apply-oncall-escalation','--apply-monitoring-event-center','--apply-change-notice-approval','--apply-inspection-quarterly-reports','--apply-ticket-lifecycle','--apply-ticket-autoclose','--apply-ticket-sla-policy','--apply-sla-reminders']:
    with self.subTest(mode=mode),tempfile.TemporaryDirectory() as d:
     result=subprocess.run([sys.executable,str(ROOT/'tools/niko-test/run-migration.py'),mode],cwd=d,capture_output=True,text=True)
     self.assertNotEqual(0,result.returncode)
@@ -160,4 +191,3 @@ class MigrationManifestParityTest(unittest.TestCase):
   windows=(ROOT/'deploy/migrate-test-schema.ps1').read_text();self.assertIn('NotificationPreferenceSchemaVerifier.class',windows);self.assertIn('(Get-Item -LiteralPath $notificationPreferenceVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $notificationPreferenceVerifierSource).LastWriteTimeUtc',windows)
 
 if __name__=='__main__':unittest.main()
-

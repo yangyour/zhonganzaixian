@@ -1,0 +1,56 @@
+{
+  "environment": "lan-test-20261008",
+  "steps": [
+    {
+      "mode": "--check",
+      "exit_code": 0,
+      "summary": "MOP_SCHEMA status=TICKET_WORKFLOW_APPLIED mode=READ_ONLY_CHECK migrations_executed=0"
+    },
+    {
+      "mode": "--apply-ticket-workflow",
+      "exit_code": 0,
+      "summary": "MOP_SCHEMA status=TICKET_WORKFLOW_APPLIED mode=APPLY_TICKET_WORKFLOW migrations_executed=0"
+    },
+    {
+      "mode": "--apply-notification-intents",
+      "exit_code": 0,
+      "summary": "MOP_SCHEMA status=NOTIFICATION_INTENTS_APPLIED mode=APPLY_NOTIFICATION_INTENTS migrations_executed=1"
+    },
+    {
+      "mode": "--apply-service-tiers",
+      "exit_code": 0,
+      "summary": "MOP_SCHEMA status=SERVICE_TIERS_APPLIED mode=APPLY_SERVICE_TIERS migrations_executed=1"
+    },
+    {
+      "mode": "--apply-oncall-escalation",
+      "exit_code": 0,
+      "summary": "MOP_SCHEMA status=ONCALL_ESCALATION_APPLIED mode=APPLY_ONCALL_ESCALATION migrations_executed=1"
+    },
+    {
+      "mode": "--apply-monitoring-event-center",
+      "exit_code": 0,
+      "summary": "MOP_SCHEMA status=MONITORING_EVENT_CENTER_APPLIED mode=APPLY_MONITORING_EVENT_CENTER migrations_executed=1"
+    },
+    {
+      "mode": "--apply-wecom-integration",
+      "exit_code": 0,
+      "summary": "MOP_SCHEMA status=WECOM_INTEGRATION_APPLIED mode=APPLY_WECOM_INTEGRATION migrations_executed=1"
+    },
+    {
+      "mode": "--apply-wecom-integration",
+      "exit_code": 0,
+      "summary": "MOP_SCHEMA status=WECOM_INTEGRATION_APPLIED mode=APPLY_WECOM_INTEGRATION migrations_executed=0"
+    },
+    {
+      "mode": "--check",
+      "exit_code": 0,
+      "summary": "MOP_SCHEMA status=WECOM_INTEGRATION_APPLIED mode=READ_ONLY_CHECK migrations_executed=0"
+    }
+  ],
+  "postgresql_version": "17.9",
+  "pre_migration_backup": "local Git-ignored PGDMP created; restore not exercised",
+  "initial_v33_attempt": "CLI timeout after application; independent check confirmed V33, repeat executed 0",
+  "v38_sha256": "32dc38c2dab0ad385f79e9e7c886c456c06664f8b740c496a8af7bf2d9e9c0fb",
+  "application_startup_migrations": 0,
+  "component_services_restarted": false
+}

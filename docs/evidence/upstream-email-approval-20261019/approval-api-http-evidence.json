@@ -1,0 +1,525 @@
+{
+  "environment": "dot-upstream-b72c3cf-fresh-pg",
+  "api_jar_sha256": "699c5423958d9de6ce0d0c564ba2650ddb9b1b2c1bfe4d587ee56bcaaa3c43c3",
+  "real_postgresql": true,
+  "project_local_auth": true,
+  "external_services_configured": false,
+  "checks": [
+    {
+      "path": "/health/live",
+      "status": 200,
+      "body": {
+        "data": {
+          "status": "UP",
+          "mode": "remote_test",
+          "source": "postgresql"
+        },
+        "trace_id": "306f5070-6f2c-416f-819f-a4457581de75"
+      }
+    },
+    {
+      "path": "/health/ready",
+      "status": 200,
+      "body": {
+        "data": {
+          "status": "READY_REMOTE_TEST",
+          "ready": true,
+          "mode": "remote_test",
+          "source": "postgresql",
+          "durable": true,
+          "production_ready": false,
+          "runtime_configurations": {
+            "schema_access_ready": true,
+            "scope": "CURRENT_TENANT",
+            "customer_confirmation_status": "UNVERIFIED"
+          },
+          "export_publication": {
+            "enabled": false,
+            "ready": false,
+            "configured": false,
+            "provider": null,
+            "reasons": [
+              "EXPORT_PUBLICATION_DISABLED"
+            ]
+          },
+          "export_inbox": {
+            "enabled": false,
+            "ready": false,
+            "reasons": [
+              "EXPORT_INBOX_DISABLED"
+            ],
+            "external_delivery": false
+          },
+          "own_notification_preferences": {
+            "schema_access_ready": true,
+            "configuration_status": "CONFIG_PENDING",
+            "effective": false,
+            "receiver_binding_status": "NOT_VERIFIED",
+            "notification_dispatched": false
+          },
+          "asset_exports": {
+            "schema_access_ready": true,
+            "mode": "PREPARE_ONLY_NO_PUBLICATION",
+            "worker_liveness": null,
+            "publication_status": "NOT_IMPLEMENTED",
+            "download_allowed": false
+          },
+          "change_notice_approvals": {
+            "schema_access_ready": true,
+            "record_source": "REVISION_REVIEW_ONLY",
+            "effective": false,
+            "device_execution_allowed": false,
+            "alert_suppression_allowed": false
+          },
+          "change_notice_drafts": {
+            "schema_access_ready": true,
+            "approval_status": null,
+            "automatic_p3_decision": null,
+            "approval_workflow_status": "CONFIG_PENDING",
+            "matching_policy_status": "CONFIG_PENDING",
+            "effective": false,
+            "device_execution_allowed": false,
+            "alert_suppression_allowed": false
+          },
+          "backup_plan_drafts": {
+            "schema_access_ready": true,
+            "effective": false,
+            "device_execution_allowed": false,
+            "credential_verification": "NOT_VERIFIED",
+            "scheduler_running": null
+          },
+          "inspection_source_collections": {
+            "schema_access_ready": true,
+            "verification_status": "SELF_REPORTED_UNVERIFIED",
+            "generation_status": "CONFIG_PENDING",
+            "formal_report_generatable": false,
+            "report_published": false
+          },
+          "inspection_worksheets": {
+            "schema_access_ready": true,
+            "verification_status": "SELF_REPORTED_UNVERIFIED",
+            "evidence_binding_status": "NOT_IMPLEMENTED",
+            "publication_status": "NOT_IMPLEMENTED",
+            "report_published": false,
+            "active_scan_performed": false
+          },
+          "inspection_templates": {
+            "schema_access_ready": true,
+            "approval_status": "UNVERIFIED",
+            "publication_status": "NOT_IMPLEMENTED",
+            "report_published": false,
+            "active_scan_performed": false
+          },
+          "contact_imports": {
+            "schema_access_ready": true,
+            "worker_liveness": null,
+            "notification_dispatched": false,
+            "identity_binding_created": false
+          },
+          "customer_contacts": {
+            "schema_access_ready": true,
+            "notification_dispatched": false,
+            "channel_verification": "NOT_VERIFIED",
+            "identity_binding_created": false
+          },
+          "capacity_scenarios": {
+            "schema_access_ready": true,
+            "effective": false,
+            "measurement_verified": false,
+            "poc_executed": false
+          },
+          "manual_recovery": {
+            "schema_access_ready": true,
+            "source": "HUMAN_CONFIRMATION",
+            "monitoring_recovery_applicable": false,
+            "ticket_state_changed": false,
+            "sla_changed": false
+          },
+          "manual_incidents": {
+            "schema_access_ready": true,
+            "source_state": "MANUAL",
+            "registration_status": "REGISTERED_ONLY",
+            "monitoring_recovery_applicable": false,
+            "ticket_automatically_created": false
+          },
+          "working_calendars": {
+            "schema_access_ready": true,
+            "effective": false,
+            "customer_confirmation": "UNVERIFIED"
+          },
+          "photos": {
+            "enabled": false,
+            "ready": false,
+            "policy_ready": false,
+            "schema_ready": false,
+            "storage_ready": false,
+            "policy_source": "PENDING",
+            "reasons": [
+              "PHOTO_NOT_CONFIGURED"
+            ]
+          },
+          "asset_imports": {
+            "enabled": false,
+            "ready": false,
+            "policy_ready": false,
+            "schema_ready": false,
+            "storage_ready": false,
+            "worker_activity": "NOT_PROBED",
+            "business_status": "CONFIG_PENDING",
+            "can_import": false,
+            "reasons": [
+              "ASSET_IMPORT_NOT_CONFIGURED"
+            ]
+          },
+          "asset_reads": {
+            "unicode_search_ready": true,
+            "pagination": "BOUNDED_POSTGRESQL_KEYSET"
+          },
+          "ticket_comments": {
+            "schema_access_ready": true,
+            "visibility": "REPORTER_AND_INTERNAL",
+            "internal_identity_exposed": false,
+            "itsm_applied": false
+          },
+          "internal_notes": {
+            "schema_access_ready": true,
+            "visibility": "INTERNAL",
+            "ticket_state_changed": false,
+            "sla_changed": false
+          },
+          "asset_manual_metadata": {
+            "schema_access_ready": true,
+            "scope": "INTERNAL_MANUAL_DRAFT",
+            "monitoring_applied": false,
+            "cmdb_applied": false
+          },
+          "worklogs": {
+            "ready": true,
+            "schema_access_ready": true,
+            "financial_status": "CONFIG_PENDING"
+          },
+          "asset_dependencies": {
+            "ready": true,
+            "schema_access_ready": true,
+            "configuration_status": "CONFIG_PENDING",
+            "monitoring_applied": false,
+            "effective_rules": null
+          }
+        },
+        "trace_id": "b2506db8-7bac-4b68-b14b-3299c34fed56"
+      }
+    },
+    {
+      "path": "/auth/options",
+      "status": 200,
+      "body": {
+        "data": {
+          "mode": "remote_test",
+          "identity_source": "project_local",
+          "local_enabled": true,
+          "sso_enabled": false,
+          "login_url": null,
+          "local_login_url": "/api/v1/auth/local/login",
+          "csrf_url": "/api/v1/auth/csrf",
+          "sso_protocol": "OIDC",
+          "wecom_enabled": false,
+          "wecom_start_url": null
+        },
+        "trace_id": "ca9dee9c-5b7c-4897-9ea2-b22050cf1f84"
+      }
+    },
+    {
+      "path": "/session",
+      "case": "unauthenticated",
+      "status": 401
+    },
+    {
+      "path": "/auth/local/login",
+      "case": "valid_ephemeral_synthetic_account",
+      "status": 200
+    },
+    {
+      "path": "/session",
+      "case": "authenticated",
+      "status": 200
+    },
+    {
+      "path": "/identity/policy",
+      "case": "authenticated",
+      "status": 200
+    },
+    {
+      "path": "/assets",
+      "case": "authenticated",
+      "status": 200
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/assets",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/1/approval",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 403,
+      "expected_status": 403,
+      "error_code": "CSRF_INVALID"
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 409,
+      "expected_status": 409,
+      "error_code": "VERSION_CONFLICT"
+    },
+    {
+      "path": "/configurations/change_notice.approver_policy/revisions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/configuration-revisions/6509fcc1-b0bf-4546-86f3-0e082b840cd8/submit",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/configuration-revisions/6509fcc1-b0bf-4546-86f3-0e082b840cd8/review",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/runtime-configurations/change_notice.approver_policy",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/runtime-configurations/change_notice.approver_policy/releases",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/1/approval",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 403,
+      "expected_status": 403,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/1/approval/history?page_size=10",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/1/approval/history?page_size=10&before_version=3",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/session/tenant",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/1/approval",
+      "method": "GET",
+      "status": 404,
+      "expected_status": 404,
+      "error_code": "OBJECT_NOT_FOUND"
+    },
+    {
+      "path": "/session/tenant",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0",
+      "method": "PATCH",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/1/approval",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/fb21ac21-ec5f-4e1d-ab08-17c93b5cabe0/revisions/2/approval",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/74b5698e-8fc1-428c-b491-623be1835214/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/74b5698e-8fc1-428c-b491-623be1835214/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 400,
+      "expected_status": 400,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "path": "/change-notice-drafts/74b5698e-8fc1-428c-b491-623be1835214/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/65a18389-0a68-4948-9928-a4dd092cbd91/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/65a18389-0a68-4948-9928-a4dd092cbd91/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    }
+  ],
+  "identity_bootstrap": {
+    "inserted": 6,
+    "verified_existing": 0,
+    "passwords_output": false
+  },
+  "approval_flow": {
+    "source": "real_http_and_postgresql",
+    "two_person_policy": "created_reviewed_published_via_http",
+    "approved": true,
+    "rejected": true,
+    "withdrawn": true,
+    "csrf_rejection": true,
+    "self_review_rejection": true,
+    "cas_conflict": true,
+    "idempotent_replay": true,
+    "cross_tenant_404": true,
+    "history_pagination": true,
+    "new_revision_resets_review": true,
+    "all_execution_flags_false": true,
+    "external_notifications_sent": false
+  },
+  "result": "PASS",
+  "api_cleanup": "complete"
+}

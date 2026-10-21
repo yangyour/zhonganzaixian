@@ -1,0 +1,23 @@
+{
+  "scope": "D10 durable approval storage candidate; not API/UI/runtime activation",
+  "environment": "dot cloud worktree; no PostgreSQL exercised in this record",
+  "command": "mvn -o -s /tmp/dot-tools/maven-curl-settings.xml -B -pl server/persistence -am -Dtest=ChangeNoticeApprovalStorageContractTest,PostgresChangeNoticeApprovalIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false test",
+  "compile": "PASS exact Maven dependencies, JDK17",
+  "isolated_tests": {
+    "passed": 7,
+    "failed": 0
+  },
+  "real_postgresql": "NOT EXERCISED BY THIS ISOLATED COMMAND: integration gate absent; see separate real-PostgreSQL evidence",
+  "migration": {
+    "version": 38,
+    "status": "FROZEN_APPLIED_BY_SEPARATE_AUTHORIZED_PG_RUN",
+    "sha256": "a24085a280ff822da932904c20cb3189fd813ef1d6ddc2f5458723ba48025756"
+  },
+  "frozen_v1_v37": "unchanged",
+  "limitations": [
+    "No HTTP/UI wiring",
+    "No notice runtime activation",
+    "No customer approval invented",
+    "No external device execution"
+  ]
+}

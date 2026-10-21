@@ -1,0 +1,224 @@
+[
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "databaseRejectsChangedSourceHashPeriodFingerprintAndFalsePublication",
+    "result": "PASS",
+    "seconds": 0.228
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "unprotectedWritesAndNestedReadsAreRejected",
+    "result": "PASS",
+    "seconds": 0.055
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "metadataListDoesNotLoadFrozenBodies",
+    "result": "PASS",
+    "seconds": 0.082
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "laterWorksheetAndTemplateChangesCannotReplaceFrozenReport",
+    "result": "PASS",
+    "seconds": 0.153
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "corruptedFrozenOutputFailsClosedWithNoLiveFallback",
+    "result": "PASS",
+    "seconds": 0.068
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "currentAuthorizationPrecedesOriginalReceiptReplay",
+    "result": "PASS",
+    "seconds": 0.05
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "snapshotAndAuditReceiptCommitAtomicallyAndFreshRepositoryRendersSameDocument",
+    "result": "PASS",
+    "seconds": 0.079
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "nonAdminAndStaleMembershipCannotCreateOrRead",
+    "result": "PASS",
+    "seconds": 0.044
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "crossTenantCollectionAndReportAndMissingObjectAre404",
+    "result": "PASS",
+    "seconds": 0.045
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "verifierRejectsSameCountWeakenedChecksAndRestoresSessionSettings",
+    "result": "PASS",
+    "seconds": 0.088
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "metadataPaginationAndReadsDoNotWrite",
+    "result": "PASS",
+    "seconds": 0.07
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "callerFailureRollsBackSnapshotAuditAndReceipt",
+    "result": "PASS",
+    "seconds": 0.033
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "sameKeyConcurrentConnectionsProduceOneSnapshot",
+    "result": "PASS",
+    "seconds": 0.061
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "unknownExpectedSourceHashConflictsWithoutWrites",
+    "result": "PASS",
+    "seconds": 0.026
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "runtimeCannotUpdateDeleteOrTruncateSnapshot",
+    "result": "PASS",
+    "seconds": 0.032
+  },
+  {
+    "suite": "PostgresInspectionQuarterlyReportIntegrationTest",
+    "name": "structureAndRuntimeAclMatchCandidate",
+    "result": "PASS",
+    "seconds": 0.021
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "databaseReplacesCallerBackdateAndFutureWithAuthoritativeReviewTime",
+    "result": "PASS",
+    "seconds": 0.082
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "replayAndCasAreProtected",
+    "result": "PASS",
+    "seconds": 0.041
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "unprotectedWritesAreRejected",
+    "result": "PASS",
+    "seconds": 0.01
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "failedCallerRollsBackEventAuditAndReceipt",
+    "result": "PASS",
+    "seconds": 0.02
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "viewNeverOffersActionsForArchivedOrSupersededRevision",
+    "result": "PASS",
+    "seconds": 0.021
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "malformedPolicyBlocksRepositoryAndDirectSql",
+    "result": "PASS",
+    "seconds": 0.063
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "expiredNewestReleaseDoesNotResurrectOlderAuthority",
+    "result": "PASS",
+    "seconds": 2.066
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "verifierRejectsSameCountWeakenedCheckAndRollbackRestoresSchema",
+    "result": "PASS",
+    "seconds": 0.034
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "changedOrArchivedHeadBlocksStaleApprovalAndDirectSql",
+    "result": "PASS",
+    "seconds": 0.06
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "draftEditWinsAgainstWaitingReview",
+    "result": "PASS",
+    "seconds": 0.179
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "sqlRuntimeCannotRewriteDeleteOrForgeBinding",
+    "result": "PASS",
+    "seconds": 0.021
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "viewFailsClosedForMissingCurrentPolicy",
+    "result": "PASS",
+    "seconds": 0.044
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "scheduledOnlyPolicyDoesNotRestoreDisabledAuthority",
+    "result": "PASS",
+    "seconds": 0.06
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "membershipRevocationWinsAgainstWaitingReview",
+    "result": "PASS",
+    "seconds": 0.17
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "disabledPolicyBlocksReviewAndReceiptReplay",
+    "result": "PASS",
+    "seconds": 0.043
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "policyDisableWinsAgainstWaitingReview",
+    "result": "PASS",
+    "seconds": 0.191
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "selfReviewOtherApplicantAndStaleMembershipAreRejected",
+    "result": "PASS",
+    "seconds": 0.021
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "viewDerivesCurrentActionsAndDoesNotAppendAuditOrReceipts",
+    "result": "PASS",
+    "seconds": 0.036
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "exactRevisionApprovalSurvivesRepositoryRecreationWithoutActivating",
+    "result": "PASS",
+    "seconds": 0.034
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "serverDefaultTimestampIsMillisecondAlignedAndNeverRoundsIntoFuture",
+    "result": "PASS",
+    "seconds": 0.042
+  },
+  {
+    "suite": "PostgresChangeNoticeApprovalIntegrationTest",
+    "name": "concurrentDifferentKeysWithSameExpectedVersionHaveOneWinner",
+    "result": "PASS",
+    "seconds": 0.018
+  }
+]

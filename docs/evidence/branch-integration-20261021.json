@@ -1,0 +1,74 @@
+{
+  "observed_at_utc": "2026-10-21T04:42:00Z",
+  "scope": "LOCAL_SOURCE_INTEGRATION_NOT_PRODUCTION_ACCEPTANCE",
+  "main_parent": "cca35c19c768cc82e053389fc756a6659730d672",
+  "source_parent": "4b126e98d4c4237193a058d68bc4d3cbcc9ef92a",
+  "backend": {
+    "result": "PASS",
+    "tests": 3721,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 983,
+    "executed": 2738
+  },
+  "web": {
+    "test_files": 179,
+    "tests": 2515,
+    "result": "PASS",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "static_release_and_policy_checks": "PASS"
+  },
+  "contracts": {
+    "tests": 156,
+    "result": "PASS",
+    "openapi_version": "0.66.0",
+    "generator_consistency": "PASS"
+  },
+  "python": {
+    "tests": 96,
+    "result": "PASS"
+  },
+  "frozen_migrations": {
+    "versions": "V1-V41",
+    "count": 41,
+    "original_git_blob_hashes_unchanged": true
+  },
+  "new_migrations": {
+    "versions": "V42-V45",
+    "executed": false,
+    "syntax_parse": "PASS",
+    "sql_statements": 70,
+    "plpgsql_functions": 12,
+    "database_concurrency_acl_and_row_effects": "NOT_RUN"
+  },
+  "preview": {
+    "result": "HTTP_200",
+    "html_bytes": 854,
+    "browser_interaction": "NOT_RUN",
+    "process_stopped": true
+  },
+  "api_startup": {
+    "result": "BLOCKED_FAIL_CLOSED",
+    "exit_code": 1,
+    "missing_setting": "SPRING_DATASOURCE_URL",
+    "all_three_datasource_settings_missing": true
+  },
+  "postgresql": {
+    "status": "NOT_RUN",
+    "reason": "No postgres/initdb/docker executable or datasource settings available"
+  },
+  "powershell": {
+    "status": "NOT_RUN",
+    "reason": "pwsh executable unavailable"
+  },
+  "cloud_ci": {
+    "result": "NOT_RUN",
+    "reason": "Cloud validation removed upstream; local verification requested"
+  },
+  "provider_sends": false,
+  "production_approved": false,
+  "formal_acceptance": {
+    "NOT_RUN": 128
+  }
+}

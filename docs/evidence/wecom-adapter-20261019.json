@@ -1,0 +1,25 @@
+{
+  "observed_at": "2026-10-19T06:15:12.718866+00:00",
+  "environment": "local-development-with-designated-lan-ssh-egress",
+  "provider": "WECHAT_WORK",
+  "unit_tests": {
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "live_probe": {
+    "application_verified": true,
+    "agent_id": 1000017,
+    "application_closed": false,
+    "member_verified": true,
+    "member_status": 1,
+    "message_sent": false,
+    "status": "SUCCEEDED"
+  },
+  "local_direct_provider_error": 60020,
+  "ssh_proxy": "fixed qyapi.weixin.qq.com:443 via pinned designated LAN SSH",
+  "tls_validation": "ENABLED",
+  "messages_sent": 0,
+  "full_d11_acceptance": "NOT_COMPLETED"
+}

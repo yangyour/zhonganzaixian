@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-20",
+  "api_version": "0.65.0",
+  "java": {
+    "discovered": 3439,
+    "executed": 2456,
+    "skipped": 983,
+    "failures": 0,
+    "errors": 0
+  },
+  "web": {
+    "full_tests_passed": 2444,
+    "files": 171,
+    "final_targeted_tests_passed": 22,
+    "typecheck": "PASSED",
+    "production_build": "PASSED",
+    "main_chunk_kb": 503.65
+  },
+  "contracts": {
+    "tests_passed": 150,
+    "generated_consistency": "PASSED",
+    "actual_java_controller_fixture": "fixtures/customer-sla-controller.json"
+  },
+  "designated_pg": {
+    "environment": "lan-test-20261008",
+    "postgresql_version": "17.9",
+    "schema_version": 39,
+    "final_combined_cases_passed": 6,
+    "skipped": 0,
+    "migrations": 0,
+    "scope": "REAL_RESTRICTED_PROJECT_ACCOUNT_WITH_SYNTHETIC_RECORDS",
+    "runner": "tools/verify-customer-policy.py"
+  },
+  "sources": {
+    "received_date": "2026-10-20",
+    "sources": [
+      {
+        "name": "告警恢复规则与SLA工单流程口径规范.docx",
+        "sha256": "adcb5fb9b9bc0423cb4013fbe710c3b916606c1c55c055927d8dcd376bfd403c",
+        "bytes": 105999,
+        "extraction": "document-1.json"
+      },
+      {
+        "name": "运维托管平台_监控项清单_V1.2(1).docx",
+        "sha256": "c00bbfd53adc5f949e25b09645927fb1bf6e6e2f529d7f68c68f99df9660488c",
+        "bytes": 154955,
+        "extraction": "document-2.json"
+      }
+    ]
+  },
+  "sql_files_changed": false,
+  "external_messages_sent": 0,
+  "deployment": "NOT_RUN",
+  "remaining": [
+    "Raw sampling coverage adapter",
+    "Hysteresis and recovery observation window confirmation",
+    "Recurring incidents and reopening linkage",
+    "Durable automatic ticket retry and formal monitor-source ticket creation",
+    "P2 automatic provider delivery",
+    "Billing month tier snapshot, trial period and settlement approval"
+  ],
+  "candidate_runtime_release": false
+}

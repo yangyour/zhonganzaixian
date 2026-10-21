@@ -84,7 +84,7 @@ async function endSession() {
         <HorizontalModuleNavigation v-model:mobile-open="mobileNavigationOpen" :collapsed="sidebarCollapsed" />
         <div class="topbar-controls">
           <div class="identity"><span class="avatar">{{ session.user.display_name.slice(0, 1) }}</span><div><strong>{{ session.user.display_name }}</strong><small>{{ roleLabel[session.user.role] }}</small></div></div>
-          <el-button v-if="['project_local','oidc'].includes(session.identity_source)" text class="account-button" @click="router.push('/account')">我的账号</el-button>
+          <el-button v-if="['project_local','oidc','wecom'].includes(session.identity_source)" text class="account-button" @click="router.push('/account')">我的账号</el-button>
           <el-button text :loading="leaving" @click="endSession">退出</el-button>
         </div>
       </header>
@@ -100,7 +100,7 @@ async function endSession() {
             <el-option v-for="tenant in session.allowed_tenants" :key="tenant.id" :label="tenant.name" :value="tenant.id" />
           </el-select>
           <span v-else class="tenant-name">{{ session.tenant.name }}</span>
-          <span class="environment-label"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '测试环境 · 非生产' : '测试夹具模式 · 非联调环境' }}</span>
+          <span class="environment-label"><span class="environment-indicator" />{{ session.mode === 'remote_test' ? '测试环境' : '本地演示模式' }}</span>
           </div>
         </div>
       </div>

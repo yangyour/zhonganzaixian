@@ -27,6 +27,7 @@ public final class PostgresRuntimeConfigurationRepository implements RuntimeConf
     @Override public Map<String,Object> read(Access a,String key){return read(a,c->current(c,a,key));}
     @Override public Map<String,Object> monitoringRefresh(Access a){return read(a,"assets:read",c->current(c,a,"monitor.page_refresh_sec"));}
     @Override public List<Map<String,Object>> capacityInputs(Access a){return read(a,"capacity:estimate",c->{Instant observed=now(c);List<Map<String,Object>> result=new ArrayList<>();for(String key:CAPACITY_KEYS)result.add(current(c,a,key,observed));return result;});}
+    @Override public List<Map<String,Object>> ticketInputs(Access a){return read(a,"ticket_notes:write_internal",c->{Instant observed=now(c);List<Map<String,Object>> result=new ArrayList<>();for(String key:TICKET_KEYS)result.add(current(c,a,key,observed));return result;});}
     private Map<String,Object> current(Connection c,Access a,String key)throws SQLException{return current(c,a,key,now(c));}
     private Map<String,Object> current(Connection c,Access a,String key,Instant now)throws SQLException{registry(c,key);long latest=latest(c,a.tenantId(),key);Map<String,Object> selected=null;
         try(var s=c.prepareStatement(SELECT+" AND effective_at<=? ORDER BY version DESC LIMIT 1")){s.setString(1,a.tenantId());s.setString(2,key);s.setObject(3,OffsetDateTime.ofInstant(now,ZoneOffset.UTC));try(var r=s.executeQuery()){if(r.next())selected=dto(r);}}

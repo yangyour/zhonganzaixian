@@ -135,7 +135,7 @@ test('所有业务写接口明确要求幂等及CSRF，remote_test不存在fixtu
       if (!['post', 'put', 'patch', 'delete'].includes(method)) continue;
       const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons', '/contacts/import-preview', '/monitoring/threshold-diagnostics', '/runtime-configurations/{key}/validate'].includes(path);
       if (readonlyPreview) assert.equal(operation['x-mop-read-only'], true);
-      for (const name of readonlyPreview || path === '/auth/local/login' ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
+      for (const name of readonlyPreview || ['/auth/local/login','/auth/wecom/start'].includes(path) ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
         assert.ok(operation.parameters.some((p) => p.in === 'header' && p.name === name && p.required), `${method} ${path} ${name}`);
       }
     }
@@ -217,9 +217,12 @@ test('就绪成功不能把已启用但缺schema或存储的照片能力写成RE
   const photos = { enabled: true, ready: true, policy_ready: true, schema_ready: true, storage_ready: true, policy_source: 'USER_DEVELOPMENT_DIRECTION', reasons: [] };
   const data = { own_notification_preferences:{schema_access_ready:true,configuration_status:"CONFIG_PENDING",effective:false,receiver_binding_status:"NOT_VERIFIED",notification_dispatched:false}, asset_exports:{schema_access_ready:true,mode:"PREPARE_ONLY_NO_PUBLICATION",worker_liveness:null,publication_status:"NOT_IMPLEMENTED",download_allowed:false}, change_notice_drafts: {schema_access_ready:true,approval_status:null,automatic_p3_decision:null,approval_workflow_status:"CONFIG_PENDING",matching_policy_status:"CONFIG_PENDING",effective:false,device_execution_allowed:false,alert_suppression_allowed:false}, backup_plan_drafts: {schema_access_ready:true,effective:false,device_execution_allowed:false,credential_verification:"NOT_VERIFIED",scheduler_running:null}, inspection_source_collections: { schema_access_ready: true, verification_status: 'SELF_REPORTED_UNVERIFIED', generation_status: 'CONFIG_PENDING', formal_report_generatable: false, report_published: false }, inspection_worksheets: { schema_access_ready: true, verification_status: 'SELF_REPORTED_UNVERIFIED', evidence_binding_status: 'NOT_IMPLEMENTED', publication_status: 'NOT_IMPLEMENTED', report_published: false, active_scan_performed: false }, contact_imports: { schema_access_ready: true, worker_liveness: null, notification_dispatched: false, identity_binding_created: false }, inspection_templates: { schema_access_ready: true, approval_status: 'UNVERIFIED', publication_status: 'NOT_IMPLEMENTED', report_published: false, active_scan_performed: false }, customer_contacts: { schema_access_ready: true, notification_dispatched: false, channel_verification: 'NOT_VERIFIED', identity_binding_created: false }, status: 'READY_REMOTE_TEST', ready: true, mode: 'remote_test', source: 'postgresql', durable: true, production_ready: false, capacity_scenarios: { schema_access_ready: true, effective: false, measurement_verified: false, poc_executed: false }, working_calendars: { schema_access_ready: true, effective: false, customer_confirmation: 'UNVERIFIED' }, manual_incidents: { schema_access_ready: true, source_state: 'MANUAL', registration_status: 'REGISTERED_ONLY', monitoring_recovery_applicable: false, ticket_automatically_created: false }, manual_recovery: { schema_access_ready: true, source: 'HUMAN_CONFIRMATION', monitoring_recovery_applicable: false, ticket_state_changed: false, sla_changed: false }, photos, asset_reads: { unicode_search_ready: true, pagination: 'BOUNDED_POSTGRESQL_KEYSET' }, ticket_comments: { schema_access_ready: true, visibility: 'REPORTER_AND_INTERNAL', internal_identity_exposed: false, itsm_applied: false }, internal_notes: { schema_access_ready: true, visibility: 'INTERNAL', ticket_state_changed: false, sla_changed: false }, asset_manual_metadata: { schema_access_ready: true, scope: 'INTERNAL_MANUAL_DRAFT', monitoring_applied: false, cmdb_applied: false }, worklogs: { ready: true, schema_access_ready: true, financial_status: 'CONFIG_PENDING' }, asset_dependencies: { ready: true, schema_access_ready: true, configuration_status: 'CONFIG_PENDING', monitoring_applied: false, effective_rules: null }, asset_imports: { enabled: false, ready: false, policy_ready: false, schema_ready: false, storage_ready: false, worker_activity: 'NOT_PROBED', business_status: 'CONFIG_PENDING', can_import: false, reasons: ['ASSET_IMPORT_NOT_CONFIGURED'] } };
   data.runtime_configurations = { schema_access_ready: true, scope: 'CURRENT_TENANT', customer_confirmation_status: 'UNVERIFIED' };
+  data.inspection_quarterly_reports = { schema_access_ready:true, configuration_source:'REQUEST_DRAFT_NOT_APPROVED', generation_status:'DRAFT', report_published:false, report_publishable:false, evidence_access_granted:false };
+  data.change_notice_approvals = { schema_access_ready: true, record_source: 'REVISION_REVIEW_ONLY', effective: false, device_execution_allowed: false, alert_suppression_allowed: false };
   assert.equal(validates('ReadinessResult', { data, trace_id: 'MOP-FAKE-readiness' }), true);
   for (const key of ['policy_ready', 'schema_ready', 'storage_ready']) assert.equal(validates('ReadinessResult', { data: { ...data, photos: { ...photos, [key]: false } }, trace_id: 'MOP-FAKE-readiness' }), false);
   assert.equal(validates('ReadinessResult', { data: { ...data, production_ready: true }, trace_id: 'MOP-FAKE-readiness' }), false);
+  assert.equal(validates('ReadinessResult', { data: { ...data, change_notice_approvals: { ...data.change_notice_approvals, effective: true } }, trace_id: 'MOP-FAKE-readiness' }), false);
 });
 
 const importColumns = ['NAME', 'TYPE', 'ADDRESS', 'BRAND', 'MODEL', 'SERIAL_NUMBER', 'SITE', 'LOCATION', 'OWNER', 'BUSINESS', 'PURCHASE_DATE', 'WARRANTY_EXPIRY', 'OVERDUE_SERVICE_DATE', 'COLLECTION_METHOD', 'NOTE'];
@@ -245,7 +248,8 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.57.0');
+  assert.equal(contract.info.version, '0.66.0');
+  assert.equal(contract.info.version, '0.66.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -591,7 +595,7 @@ test('日期列表只读分页绑定三字段游标和当前服务端参考日',
 test('全局搜索固定5/4/3/3分组且未接入来源不是空集或零计数', () => {
   const supported = (kind, limit, scope, fields) => ({ kind, status: 'AVAILABLE', limit, returned: 0, has_more: false, items: [], source_scope: scope, matched_fields: fields, reason: null });
   const unsupported = (kind, limit) => ({ kind, status: 'NOT_IMPLEMENTED', limit, returned: null, has_more: null, items: null, source_scope: null, matched_fields: null, reason: 'SOURCE_NOT_IMPLEMENTED' });
-  const value = { query: 'Ä%_', tenant_id: id('1'), observed_at: timestamp, scope: 'CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH', coverage: 'PARTIAL', coverage_reason: 'EVENT_AND_AUTOMATION_SOURCES_NOT_IMPLEMENTED', query_semantics: 'LITERAL_UNICODE_CASE_INSENSITIVE', snapshot_consistency: 'ONE_READONLY_TRANSACTION', source: 'postgresql_supported_groups', notification_bell_status: 'NOT_IMPLEMENTED', groups: [supported('assets', 5, 'CURRENT_TENANT', ['name']), unsupported('events', 4), supported('tickets', 3, 'OWN_REPORT_REGISTRATIONS', ['title', 'receipt_no']), unsupported('automation_scripts', 3)] };
+  const value = { query: 'Ä%_', tenant_id: id('1'), observed_at: timestamp, scope: 'CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH', coverage: 'PARTIAL', coverage_reason: 'AUTOMATION_SOURCE_NOT_IMPLEMENTED_AND_EVENT_NOT_AUTHORIZED', query_semantics: 'LITERAL_UNICODE_CASE_INSENSITIVE', snapshot_consistency: 'ONE_READONLY_TRANSACTION', source: 'postgresql_supported_groups', notification_bell_status: 'NOT_IMPLEMENTED', groups: [supported('assets', 5, 'CURRENT_TENANT', ['name']), { ...unsupported('events', 4), status: 'NOT_AUTHORIZED', reason: 'INTERNAL_EVENT_READ_REQUIRED' }, supported('tickets', 3, 'OWN_REPORT_REGISTRATIONS', ['title', 'receipt_no']), unsupported('automation_scripts', 3)] };
   assert.equal(validates('GroupedSearch', value), true);
   for (const patch of [{ coverage: 'COMPLETE' }, { notification_bell_status: 'READY' }, { groups: value.groups.slice(0, 3) }, { query: '' }]) assert.equal(validates('GroupedSearch', { ...value, ...patch }), false);
   for (const patch of [{ items: [] }, { returned: 0 }, { has_more: false }]) { const copy = structuredClone(value); Object.assign(copy.groups[1], patch); assert.equal(validates('GroupedSearch', copy), false); }
@@ -939,3 +943,348 @@ test('SLA服务端投影包含未知口径而不声称通知送达',()=>{const p
 test('补充SLA口径只能绑定明确发布版本，不接收策略或身份覆盖',()=>{const op=contract.paths['/tickets/{ticketId}/sla/policy-binding'].post;assert.ok(op.parameters.some(x=>x.name==='X-CSRF-Token'));const schema=op.requestBody.content['application/json'].schema;assert.equal(schema.additionalProperties,false);assert.deepEqual(Object.keys(schema.properties),['expected_lifecycle_version','release_id','release_version']);assert.equal(contract.components.schemas.TicketSlaPolicyBindingResult.properties.data.properties.production_approved.const,false);});
 
 test('SLA提醒记录不等于路由或送达，读取无业务写入',()=>{const p=contract.paths['/tickets/{ticketId}/sla/reminders'];assert.equal(p.get['x-mop-read-only'],true);assert.equal(p.post,undefined);const s=contract.components.schemas.TicketSlaReminder;assert.equal(s.properties.notification_status.const,'NOT_ROUTED');assert.equal(s.properties.delivered.const,false);assert.deepEqual(s.properties.progress.enum,[0.5,0.8,1]);});
+test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
+  assert.equal(contract.info.version, '0.66.0');
+  const tierGet = contract.paths['/service-tiers'].get;
+  const tierPost = contract.paths['/service-tiers/changes'].post;
+  const slaGet = contract.paths['/tickets/{id}/workflow/sla'].get;
+  assert.deepEqual(tierGet['x-mop-roles'], ['msp', 'padmin']);
+  assert.equal(tierGet['x-mop-capability'], 'sla_scenarios:read');
+  assert.deepEqual(tierPost['x-mop-roles'], ['padmin']);
+  assert.equal(tierPost['x-mop-capability'], 'configurations:write');
+  assert.equal(slaGet['x-mop-capability'], 'tickets:read');
+
+  const snap = {
+    tenant_id: id('1'), version: 2, tier: 'ADVANCED', availability_target: 99.99,
+    contract_device_count: 120, billing_cycle: 'MONTHLY', monthly_fee_fen: 2500000,
+    effective_mode: 'IMMEDIATE', effective_from: '2026-10-18T08:00:00Z',
+    updated_by: id('2'), updated_at: '2026-10-18T08:00:00Z', customer_approval_status: 'UNVERIFIED',
+  };
+  assert.ok(validates('ServiceTierSnapshot', snap));
+  assert.equal(validates('ServiceTierSnapshot', { ...snap, customer_approval_status: 'APPROVED' }), false);
+
+  const change = {
+    id: id('9'), tenant_id: id('1'), version: 2, previous_version: 1,
+    from_tier: 'STANDARD', to_tier: 'ADVANCED', availability_target: 99.99,
+    contract_device_count: 120, billing_cycle: 'MONTHLY', monthly_fee_fen: 2500000,
+    effective_mode: 'IMMEDIATE', effective_from: '2026-10-18T08:00:00Z',
+    reason: 'SYNTHETIC_TIER_UPGRADE', approved_by: id('2'), changed_at: '2026-10-18T08:00:00Z',
+    customer_approval_status: 'UNVERIFIED',
+  };
+  assert.ok(validates('ServiceTierChange', change));
+  assert.ok(validates('ServiceTierPageResult', {
+    data: {
+      tenant_id: id('1'), current: snap, items: [change], has_more: false, next_before_version: null,
+      observed_at: '2026-10-18T08:00:01Z', customer_approval_status: 'UNVERIFIED',
+      in_flight_ticket_retroactive: false, source: 'postgresql',
+    },
+    trace_id: 'synthetic',
+  }));
+  assert.equal(validates('ServiceTierPageResult', {
+    data: {
+      tenant_id: id('1'), current: snap, items: [change], has_more: false, next_before_version: null,
+      observed_at: '2026-10-18T08:00:01Z', customer_approval_status: 'UNVERIFIED',
+      in_flight_ticket_retroactive: true, source: 'postgresql',
+    },
+    trace_id: 'synthetic',
+  }), false);
+
+  const clock = {
+    name: 'RESPONSE', due_at: '2026-10-18T08:10:00Z', completed_at: '2026-10-18T08:04:00Z',
+    paused: false, breached: false, status: 'MET', missing_reason: null,
+    thresholds: { p50_at: '2026-10-18T08:05:00Z', p80_at: '2026-10-18T08:08:00Z', p100_at: '2026-10-18T08:10:00Z' },
+    working_windows_count: 0,
+  };
+  const sla = {
+    ticket_id: id('7'), tenant_id: id('1'), receipt_no: 'MOP-20261018-0001', registration_created_at: '2026-10-18T08:00:00Z',
+    workflow_version: 3, state: 'RESOLVED', priority: 'P1', frozen_service_tier: 'STANDARD', current_tenant_service_tier: 'ADVANCED',
+    tier_changed_since_open: true, response_clock: clock,
+    recovery_clock: { ...clock, name: 'RECOVERY', due_at: '2026-10-18T10:00:00Z', completed_at: '2026-10-18T09:00:00Z', paused: true, status: 'PAUSED_FOR_CUSTOMER_CONFIRM' },
+    clock_tasks: [{ clock_key: 'response:50', kind: 'SLA', due_at: '2026-10-18T08:05:00Z', outcome: 'EMITTED', completed_at: '2026-10-18T08:05:01Z' }],
+    sla_missing: {}, sla_references: [], reopen_count: 0, reopen_policy_status: 'NOT_REOPENED',
+    metric_version: 'SLA_CLOCK_V2', observed_at: '2026-10-18T09:10:00Z', source: 'postgresql',
+  };
+  assert.ok(validates('TicketSlaInspectionResult', { data: sla, trace_id: 'synthetic' }));
+});
+
+test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
+  assert.equal(contract.info.version, '0.66.0');
+  assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
+  assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
+  assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
+  assert.equal(contract.paths['/escalation-policies'].patch['x-mop-capability'], 'configurations:write');
+  assert.equal(contract.paths['/oncall/escalations'].post['x-mop-capability'], 'ticket_notes:write_internal');
+  assert.equal(contract.paths['/sla/reports'].get['x-mop-capability'], 'sla_scenarios:read');
+  assert.equal(contract.paths['/sla/monthly-results'].post['x-mop-capability'], 'ticket_notes:write_internal');
+
+  const board = {
+    tenant_id: id('1'),
+    kpis: {
+      unacknowledged_count: 2, critical_count: 1, in_progress_count: 3,
+      pending_review_count: 1, recovered_today_count: 4, mtta_p50_sec: 210, mtta_target_sec: 900,
+    },
+    queue: [{
+      ticket_id: id('7'), priority: 'P1', state: 'OPEN', tier_snapshot: 'STANDARD',
+      assignee_user_id: id('2'), created_at: '2026-10-18T10:00:00Z',
+      response_due_at: '2026-10-18T10:10:00Z', recovery_due_at: '2026-10-18T12:00:00Z',
+      countdown_remaining_sec: 300, countdown_progress_pct: 0.5, breached: false,
+      current_escalation_step: 1, next_escalation_step: 2, next_escalation_target_role: 'L2_ONCALL',
+    }],
+    rosters: [{
+      id: id('3'), tenant_id: id('1'), version: 1, shift_date: '2026-10-18', shift_code: 'DAY',
+      handoff_local_time: '18:00', primary_oncall_user_id: id('2'), backup_oncall_user_id: id('4'),
+      note: 'SYNTHETIC_DAY_ROSTER', roster_policy_status: 'CONFIG_PENDING_Q15',
+      updated_by: id('2'), updated_at: '2026-10-18T08:00:00Z',
+    }],
+    handoffs: [{
+      id: id('5'), tenant_id: id('1'), roster_id: id('3'), outgoing_user_id: id('2'), incoming_user_id: id('4'),
+      handoff_local_time: '18:00', unacknowledged_count: 2, in_progress_count: 3, pending_review_count: 1,
+      note: 'SYNTHETIC_HANDOFF', handed_off_at: '2026-10-18T10:00:00Z',
+    }],
+    policies: [{
+      tenant_id: id('1'), tier: 'STANDARD', version: 1, unanswered_escalate_count: 2,
+      unanswered_retry_interval_sec: null,
+      steps: [
+        { step_order: 1, trigger_condition: 'IMMEDIATE', wait_minutes: 0, target_role: 'L1_ONCALL' },
+        { step_order: 2, trigger_condition: 'UNACKNOWLEDGED', wait_minutes: 15, target_role: 'L2_ONCALL' },
+      ],
+      policy_status: 'CONFIG_PENDING_Q15', updated_by: id('2'), updated_at: '2026-10-18T08:00:00Z', persisted: true,
+    }],
+    step_runs: [{
+      id: id('6'), tenant_id: id('1'), ticket_id: id('7'), tier: 'STANDARD', policy_version: 1,
+      step_order: 1, trigger_condition: 'PHONE_UNANSWERED', wait_minutes: 0, target_role: 'L1_ONCALL',
+      unanswered_phone_count: 2, escalated_to_step: 2, escalated_target_role: 'L2_ONCALL',
+      sms_notice_status: 'INTENT_RECORDED_PENDING_GATEWAY', sms_notice_summary: '电话连续2次未接听自动升级并登记短信记录',
+      recorded_by: id('2'), recorded_at: '2026-10-18T10:05:00Z',
+    }],
+    auto_refresh_sec: 15, handoff_local_time: '18:00', roster_policy_status: 'CONFIG_PENDING_Q15',
+    observed_at: '2026-10-18T10:05:00Z', source: 'postgresql',
+  };
+  assert.ok(validates('OnCallBoardResult', { data: board, trace_id: 'synthetic' }));
+  assert.equal(validates('OnCallBoardResult', { data: { ...board, handoff_local_time: '09:00' }, trace_id: 'synthetic' }), false);
+
+  const latency = { sample_count: 3, unrecovered_count: 0, mean_sec: 180, p50_sec: 180, p95_sec: 240 };
+  const evalObj = {
+    tier_snapshot: 'STANDARD', total_ticket_count: 10, applicable_count: 8, met_count: 6,
+    not_met_count: 2, unresolved_count: 1, not_applicable_count: 1,
+    achievement_numerator: 6, achievement_denominator: 8, achievement_rate_pct: 75,
+    compensation_ratio: 0.2, monthly_fee_fen: 2000000, compensation_amount_fen: null,
+    compensation_status: 'CONFIG_PENDING_Q26', candidate_fixed_ratio_fen: 400000,
+    candidate_shortfall_weighted_fen: 100000,
+    formula_version: 'customer-20261020-availability-v2', items: [],
+  };
+  assert.ok(validates('SlaMonthlyEvaluation', evalObj));
+  assert.equal(validates('SlaMonthlyEvaluation', { ...evalObj, compensation_amount_fen: 400000 }), false);
+  assert.ok(validates('SlaLatencyStats', latency));
+});
+
+test('变更报备审批契约绑定修订并保留未生效边界', () => {
+  const base = '/change-notice-drafts/{id}/revisions/{draft_revision}/approval';
+  assert.ok(contract.paths[base].get);
+  assert.ok(contract.paths[base + '/history'].get);
+  const action = contract.paths[base + '/actions'].post;
+  assert.equal(action['x-mop-idempotent-replay-reauthorization'], true);
+  assert.equal(action['x-mop-review-policy'], 'change_notice.approver_policy');
+  const snapshot = contract.components.schemas.ChangeNoticeApprovalSnapshot;
+  assert.equal(snapshot.properties.effective.const, false);
+  assert.equal(snapshot.properties.device_execution_allowed.const, false);
+  assert.equal(snapshot.properties.alert_suppression_allowed.const, false);
+  assert.ok(snapshot.required.includes('allowed_actions'));
+  const input = contract.components.schemas.ChangeNoticeApprovalAction;
+  assert.equal(input.additionalProperties, false);
+  assert.equal(validates('ChangeNoticeApprovalAction', { expected_version: 2, action: 'REJECT', note: null }), false);
+  assert.equal(validates('ChangeNoticeApprovalAction', { expected_version: 2, action: 'APPROVE', note: null }), true);
+  assert.equal(validates('ChangeNoticeApprovalAction', { expected_version: 2, action: 'APPROVE', note: null, actor_id: 'fake' }), false);
+});
+
+test('customer SLA contract accepts the actual Java controller availability and detail payloads',()=>{
+  const actual=read('../fixtures/customer-sla-controller.json');
+  assert.equal(validates('SlaReportResult',{data:actual.report,trace_id:'synthetic-customer-sla'}),true);
+  assert.equal(validates('SlaServiceDetailResult',{data:actual.detail,trace_id:'synthetic-customer-sla'}),true);
+  const historical=structuredClone(actual.report);
+  historical.monthly_result.formula_version='contract-m5-9-m5-19-v1';
+  assert.equal(validates('SlaReportResult',{data:historical,trace_id:'synthetic-historical-sla'}),true);
+});
+
+test('D09 report draft contract requires explicit frozen source and nullable unapproved configuration',()=>{
+  const configuration={revision:null,time_zone:null,duplicate_rule:null,archived_rule:null,metric_version:null,report_template_version:null};
+  const input={expected_version:0,label:'SYNTHETIC_DRAFT',source_collection_id:id('1'),expected_source_document_sha256:'a'.repeat(64),expected_source_manifest_sha256:'b'.repeat(64),year:2026,quarter:4,configuration};
+  assert.equal(validates('InspectionQuarterlyReportCreate',input),true);
+  for(const patch of [{summary:{}},{tenant_id:id('2')},{quarter:5},{expected_version:1},{configuration:{...configuration,duplicate_rule:'GUESS_LATEST'}},{configuration:{}}])assert.equal(validates('InspectionQuarterlyReportCreate',{...input,...patch}),false);
+  const post=contract.paths['/inspection-quarterly-reports'].post;
+  assert.deepEqual(post['x-mop-roles'],['padmin']);assert.equal(post['x-mop-capability'],'inspection_quarterly_reports:write');assert.equal(post['x-mop-idempotent-replay-reauthorization'],true);
+  assert.equal(contract.components.schemas.InspectionQuarterlyReportDetail.properties.projection.const,'FROZEN_INPUT_OUTPUT');
+  assert.equal(contract.components.schemas.InspectionQuarterlyReportFrozenDocument.properties.output.properties.report_published.const,false);
+});
+
+test('D09 Java-produced frozen details match the exact full input/output contract',()=>{
+  for(const name of ['pending','selected']){
+    const value=read(`../fixtures/inspection-quarterly-report/${name}.json`);
+    assert.equal(validates('InspectionQuarterlyReportDetailResult',value),true,JSON.stringify(ajv.getSchema('urn:mop:actual-api#/components/schemas/InspectionQuarterlyReportDetailResult').errors));
+    assert.equal(createHash('sha256').update(JSON.stringify(value.data.frozen_document),'utf8').digest('hex'),value.data.document_sha256);
+    const forged=structuredClone(value);forged.data.frozen_document.output.report_published=true;assert.equal(validates('InspectionQuarterlyReportDetailResult',forged),false);
+  }
+});
+
+test('D15 actual MVC fixture envelopes and write exchanges validate against published routes', () => {
+  const fixture = read('../fixtures/monitoring-event-center-controller.json');
+  const check = (schema, value, label) => {
+    assert.equal(validates(schema, value), true, `${label}: ${JSON.stringify(ajv.getSchema(`urn:mop:actual-api#/components/schemas/${schema}`).errors)}`);
+  };
+  check('MonitoringEventWorkspaceResult', fixture.workspace, 'workspace');
+  check('MonitoringEventDetailResult', fixture.detail, 'detail');
+  check('MonitoringNoiseFunnelResult', fixture.noise_funnel, 'noise funnel');
+  assert.ok(fixture.exchanges.length >= 9, 'all actual read/write routes need a controller-produced exchange');
+  const matched = new Set();
+  for (const exchange of fixture.exchanges) {
+    const path = new URL(exchange.path, 'https://synthetic.invalid').pathname.replace(/^\/api\/v1/, '').replace(/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(?=\/|$)/g, '/{id}');
+    const method = exchange.method.toLowerCase();
+    const operation = contract.paths[path]?.[method];
+    assert.ok(operation, `fixture ${exchange.name}: ${method} ${path} missing from contract`);
+    assert.equal(operation.responses[200].content['application/json'].schema.$ref, `#/components/schemas/${exchange.response_schema}`);
+    check(exchange.response_schema, exchange.response, exchange.name);
+    if (method === 'post') {
+      assert.equal(operation.requestBody.content['application/json'].schema.$ref, `#/components/schemas/${exchange.request_schema}`);
+      check(exchange.request_schema, exchange.request, exchange.name + ' request');
+      assert.equal(operation['x-mop-idempotent-replay-reauthorization'], true);
+      assert.deepEqual(operation.parameters.filter(x => x.in === 'header').map(x => x.name), ['Idempotency-Key', 'X-CSRF-Token']);
+    }
+    matched.add(`${method} ${path}`);
+  }
+  for (const route of ['get /events', 'get /events/{id}', 'get /events/noise-funnel', 'post /events/ingest', 'post /events/{id}/transitions', 'post /maintenance-windows', 'post /maintenance-windows/{id}/actions', 'post /monitoring/quarantine/{id}/decisions', 'post /autoticket-attempts/{id}/manual-create']) assert.ok(matched.has(route), route);
+});
+
+test('D15 workspace has the actual eight fields and no invented global policy statuses', () => {
+  const fixture = read('../fixtures/monitoring-event-center-controller.json');
+  const fields = ['tenant_id', 'events', 'noise_funnel', 'maintenance_windows', 'quarantine_items', 'autoticket_attempts', 'observed_at', 'source'];
+  assert.deepEqual(Object.keys(fixture.workspace.data).sort(), [...fields].sort());
+  assert.deepEqual([...contract.components.schemas.MonitoringEventWorkspaceResult.properties.data.required].sort(), [...fields].sort());
+  for (const key of ['review_policy_status', 'mapping_policy_status']) {
+    const bad = structuredClone(fixture.workspace); bad.data[key] = 'CONFIG_PENDING';
+    assert.equal(validates('MonitoringEventWorkspaceResult', bad), false);
+  }
+  for (const key of fields) {
+    const bad = structuredClone(fixture.workspace); delete bad.data[key];
+    assert.equal(validates('MonitoringEventWorkspaceResult', bad), false, key);
+  }
+  assert.equal(contract.paths['/events'].post, undefined);
+  assert.equal(contract.paths['/events/{id}/actions'], undefined);
+  assert.equal(contract.paths['/monitoring-quarantine/{id}/decisions'], undefined);
+  const size = contract.paths['/events'].get.parameters.find(x => x.name === 'page_size').schema;
+  assert.deepEqual(size, { type: 'integer', minimum: 1, maximum: 50, default: 25 });
+  assert.equal(contract.components.schemas.MonitoringEventDetailResult.properties.data.properties.members.maxItems, undefined);
+  assert.equal(contract.components.schemas.MonitoringEventDetailResult.properties.data.properties.noise_records.maxItems, undefined);
+});
+
+test('D15 all production domain enums and exact notification labels are accepted without legacy invented states', () => {
+  const fixture = read('../fixtures/monitoring-event-center-controller.json');
+  const summary = contract.components.schemas.MonitoringEventSummary.properties;
+  const pairs = [[summary.severity.enum, fixture.enums.severity], [summary.monitor_state.enum, fixture.enums.monitor_state], [summary.handling_state.enum, fixture.enums.handling_state], [summary.suppression_state.enum, fixture.enums.suppression_state], [summary.notification_empty_state.enum, fixture.enums.notification_empty_state], [contract.components.schemas.MonitoringNoiseRecord.properties.layer.enum, fixture.enums.noise_layer], [contract.components.schemas.AutoTicketAttemptEntry.properties.status.enum, fixture.enums.autoticket_status]];
+  for (const [declared, actual] of pairs) assert.deepEqual([...declared].sort(), [...actual].sort());
+  for (const event of fixture.workspace.data.events) assert.equal(validates('MonitoringEventSummary', event), true);
+  const event = fixture.workspace.data.events[0];
+  for (const patch of [{ notification_empty_state: 'RECOVERED_within_2MIN_CANCELLED' }, { notification_empty_state: 'SILENCED_NO_NOTIFICATION' }, { notification_empty_state: 'BELOW_SUBSCRIPTION_LEVEL_UNSENT' }, { notification_empty_state_label: '符合外发条件（按已启用渠道投递）' }, { review_policy_status: 'CONFIRMED' }, { root_cause_note: 'x'.repeat(501) }, { rule_name: 'x'.repeat(129) }]) assert.equal(validates('MonitoringEventSummary', { ...event, ...patch }), false);
+  const anotherLabel = fixture.workspace.data.events.find(x => x.notification_empty_state !== event.notification_empty_state).notification_empty_state_label;
+  assert.equal(validates('MonitoringEventSummary', { ...event, notification_empty_state_label: anotherLabel }), false, 'enum membership alone cannot validate a mismatched label');
+  const attempt = fixture.workspace.data.autoticket_attempts[0];
+  for (const patch of [{ status: 'CREATED' }, { status: 'NOT_REQUIRED' }, { mapped_priority: 'P4' }, { attempt_count: 0 }, { attempt_count: 7 }, { mapping_policy_status: 'CONFIRMED' }]) assert.equal(validates('AutoTicketAttemptEntry', { ...attempt, ...patch }), false);
+  assert.ok(fixture.workspace.data.autoticket_attempts.some(x => x.mapped_priority === null));
+});
+
+test('D15 request actions and exact fields follow controller/domain boundaries', () => {
+  const fixture = read('../fixtures/monitoring-event-center-controller.json');
+  const request = schema => fixture.exchanges.find(x => x.request_schema === schema).request;
+  const ingest = request('MonitoringIngestEventInput');
+  assert.deepEqual(Object.keys(ingest).sort(), ['asset_id', 'rule_code', 'rule_name', 'severity', 'source_phase', 'source_event_id', 'occurred_at', 'simulate_autoticket_failure'].sort());
+  assert.equal(validates('MonitoringIngestEventInput', { ...ingest, occurred_at: null }), true);
+  for (const patch of [{ simulate_autoticket_failure: 1 }, { simulate_autoticket_failures: 1 }, { subscription_min_severity: 'HIGH' }, { flap_flip_count_in_10m: 3 }, { rule_name: 'x'.repeat(129) }, { source_event_id: 'x'.repeat(257) }, { source_phase: 'RECOVERY' }]) assert.equal(validates('MonitoringIngestEventInput', { ...ingest, ...patch }), false);
+  const transition = request('MonitoringTransitionEventInput');
+  for (const action of ['ACKNOWLEDGE', 'START', 'MARK_PENDING_REVIEW', 'RESOLVE', 'CLOSE']) assert.equal(validates('MonitoringTransitionEventInput', { ...transition, action, root_cause_note: 'synthetic root cause and verified repair' }), true);
+  assert.equal(validates('MonitoringTransitionEventInput', { ...transition, action: 'START_PROGRESS' }), false);
+  const supplementaryRootCause = '😀😀x';
+  assert.equal(supplementaryRootCause.length, 5, 'RESOLVE minimum follows Java UTF-16 units');
+  assert.equal([...supplementaryRootCause].length, 3, 'JSON Schema length counts Unicode code points');
+  assert.equal(validates('MonitoringTransitionEventInput', { ...transition, action: 'RESOLVE', root_cause_note: supplementaryRootCause }), false);
+  assert.equal(validates('MonitoringTransitionEventInput', { ...transition, action: 'RESOLVE', root_cause_note: '字'.repeat(20) }), true);
+  assert.match(contract.components.schemas.MonitoringTransitionEventInput.description, /20个Unicode/);
+  for (const expected_version of [0, -1, 1.5, '1', 9007199254740992]) assert.equal(validates('MonitoringTransitionEventInput', { ...transition, expected_version }), false);
+  assert.equal(validates('MonitoringTransitionEventInput', { ...transition, expected_version: 9007199254740991 }), true);
+  const create = request('CreateMaintenanceWindowInput');
+  for (const silence_mode of ['SUPPRESS_NOTIFY', 'PAUSE_COLLECTION']) assert.equal(validates('CreateMaintenanceWindowInput', { ...create, silence_mode }), true);
+  for (const patch of [{ asset_id: null }, { name: 'x'.repeat(129) }, { silence_mode: 'SILENCE_ALL_EXCEPT_DISASTER' }]) assert.equal(validates('CreateMaintenanceWindowInput', { ...create, ...patch }), false);
+  const update = request('UpdateMaintenanceWindowInput');
+  for (const action of ['EXTEND', 'END', 'CONFIRM_SLA_EXCLUSION']) assert.equal(validates('UpdateMaintenanceWindowInput', { ...update, action, new_ends_at: '2026-10-19T14:00:00Z' }), true);
+  for (const action of ['END_EARLY', 'CANCEL']) assert.equal(validates('UpdateMaintenanceWindowInput', { ...update, action }), false);
+  assert.equal(validates('UpdateMaintenanceWindowInput', { ...update, action: 'EXTEND', new_ends_at: null }), false);
+  assert.deepEqual(contract.paths['/maintenance-windows/{id}/actions'].post['x-mop-action-authorization'].CONFIRM_SLA_EXCLUSION, { roles: ['padmin'], capability: 'configurations:write' });
+  const decision = request('MonitoringQuarantineDecisionInput');
+  assert.equal(validates('MonitoringQuarantineDecisionInput', { ...decision, decision: 'BIND_ASSET', bound_asset_id: id('2') }), true);
+  assert.equal(validates('MonitoringQuarantineDecisionInput', { ...decision, decision: 'DISCARD', bound_asset_id: null }), true);
+  for (const patch of [{ decision: 'BOUND' }, { decision: 'DISCARDED' }, { decision: 'BIND_ASSET', bound_asset_id: null }, { decision: 'DISCARD', bound_asset_id: id('2') }]) assert.equal(validates('MonitoringQuarantineDecisionInput', { ...decision, ...patch }), false);
+});
+
+
+test('D15 manual-ticket reason reserves the actual persistence prefix without narrowing unrelated notes', () => {
+  const fixture = read('../fixtures/monitoring-event-center-controller.json');
+  const request = schema => fixture.exchanges.find(x => x.request_schema === schema).request;
+  const manual = request('ManualAutoTicketInput');
+  const prefix = '人工补建成功: ';
+  assert.equal([...prefix].length, 8);
+  assert.equal(contract.components.schemas.ManualAutoTicketInput.properties.reason.maxLength, 492);
+  for (const character of ['x', '根', '😀']) {
+    const safe = character.repeat(492);
+    assert.equal([...safe].length, 492);
+    assert.equal([...(prefix + safe)].length, 500);
+    assert.equal(validates('ManualAutoTicketInput', { ...manual, reason: safe }), true);
+    for (const count of [493, 500, 501]) assert.equal(validates('ManualAutoTicketInput', { ...manual, reason: character.repeat(count) }), false, `${character} × ${count}`);
+  }
+  assert.equal(validates('ManualAutoTicketInput', { ...manual, reason: '' }), false);
+  for (const [schema, field] of [['CreateMaintenanceWindowInput', 'reason'], ['MonitoringQuarantineDecisionInput', 'reason'], ['MonitoringTransitionEventInput', 'root_cause_note']]) {
+    const input = request(schema);
+    assert.equal(validates(schema, { ...input, [field]: '😀'.repeat(500) }), true, schema);
+    assert.equal(validates(schema, { ...input, [field]: '😀'.repeat(501) }), false, schema);
+  }
+  const attempt = fixture.exchanges.find(x => x.request_schema === 'ManualAutoTicketInput').response.data;
+  assert.equal(validates('AutoTicketAttemptEntry', { ...attempt, last_error: prefix + '😀'.repeat(492) }), true);
+  assert.equal(validates('AutoTicketAttemptEntry', { ...attempt, last_error: prefix + '😀'.repeat(493) }), false);
+});
+
+test('真实控制器全局搜索夹具覆盖角色、数量、合法状态并保持事件最小投影', () => {
+  const fixture = read('../fixtures/global-search-controller.json');
+  assert.equal(fixture.fixture_kind, 'SYNTHETIC_PRODUCTION_CONTROLLER_JSON');
+  assert.equal(fixture.database_evidence, false);
+  const storedText = fixture.exchanges.find(e => e.name === 'stored_rule_control_text').response.data.groups[1].items[0];
+  assert.equal(storedText.rule_name, 'Link\nDown'); assert.equal(storedText.rule_code, 'LINK\tRULE');
+  const observedSeverity = new Set(), observedMonitor = new Set(), observedHandling = new Set();
+  for (const example of fixture.exchanges) {
+    assert.equal(validates(example.response_schema, example.response), true, example.name);
+    const group = example.response.data.groups[1];
+    for (const event of group.items ?? []) {
+      observedSeverity.add(event.severity); observedMonitor.add(event.monitor_state); observedHandling.add(event.handling_state);
+      assert.equal(validates('SearchEventHit', event), true);
+      for (const key of ['root_cause_note', 'updated_by', 'fingerprint', 'raw_payload', 'management_ip', 'quarantine_id', 'asset_id', 'ticket_id', 'description']) {
+        assert.equal(validates('SearchEventHit', { ...event, [key]: 'private' }), false, key);
+      }
+      for (const patch of [{ resource_kind: 'ASSET_RECORD' }, { occurrence_count: 0 }, { version: 0 }, { severity: 'OK' }, { monitor_state: 'NORMAL' }, { handling_state: 'OPEN' }, { rule_code: 'x'.repeat(65) }, { rule_name: 'x'.repeat(129) }, { last_occurred_at: 'not-a-time' }]) assert.equal(validates('SearchEventHit', { ...event, ...patch }), false);
+    }
+  }
+  assert.deepEqual([...observedSeverity].sort(), ['AVERAGE', 'DISASTER', 'HIGH', 'INFO', 'WARNING']);
+  assert.deepEqual([...observedMonitor].sort(), ['PROBLEM', 'RECOVERED']);
+  assert.deepEqual([...observedHandling].sort(), ['ACKNOWLEDGED', 'CLOSED', 'IN_PROGRESS', 'NEW', 'PENDING_REVIEW', 'RESOLVED']);
+});
+test('事件搜索可见性、覆盖原因、报障范围一致，拒绝伪造空集、溢出和旧占位状态', () => {
+  const fixture = read('../fixtures/global-search-controller.json');
+  const internal = fixture.exchanges.find(e => e.name === 'role_msp').response.data;
+  const customer = fixture.exchanges.find(e => e.name === 'role_viewer').response.data;
+  for (const value of [internal, customer]) {
+    const mismatch = structuredClone(value); mismatch.coverage_reason = value === internal ? customer.coverage_reason : internal.coverage_reason;
+    assert.equal(validates('GroupedSearch', mismatch), false);
+    const old = structuredClone(value); old.groups[1].status = 'NOT_IMPLEMENTED'; assert.equal(validates('GroupedSearch', old), false);
+  }
+  for (const patch of [{ items: [] }, { returned: 0 }, { has_more: false }, { source_scope: 'CURRENT_TENANT_INTERNAL' }]) {
+    const mutated = structuredClone(customer); Object.assign(mutated.groups[1], patch); assert.equal(validates('GroupedSearch', mutated), false);
+  }
+  for (const patch of [{ has_more: true }, { returned: 4 }, { matched_fields: ['root_cause_note'] }, { limit: 5 }]) {
+    const mutated = structuredClone(internal); Object.assign(mutated.groups[1], patch); assert.equal(validates('GroupedSearch', mutated), false);
+  }
+});

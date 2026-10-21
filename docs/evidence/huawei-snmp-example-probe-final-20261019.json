@@ -1,0 +1,52 @@
+{
+  "environment": "lan-test-20261008",
+  "target": "192.168.1.2",
+  "source_sha256": "e93e62a9b60f9e7ebdf1baa8bcd43359d88a578b8b1c0d3a9f219f5b5b4f5527",
+  "protocol": "SNMP_V2C",
+  "credential_reference": "deploy/private/huawei-snmp.json",
+  "read_only": true,
+  "credentials_output": false,
+  "resource_writes": 0,
+  "monitoring_ready": false,
+  "persistent_collection": "NOT_CONFIGURED",
+  "formal_contract_acceptance": "NOT_RUN",
+  "vantage_points": {
+    "test_server": {
+      "target": "192.168.1.2",
+      "port": 161,
+      "version": "2c",
+      "identity": {
+        "status": "UDP_PORT_UNREACHABLE",
+        "os_errno": 111,
+        "values": [],
+        "elapsed_ms": 1,
+        "received_at": "2026-10-19T07:47:33.032164+00:00"
+      },
+      "columns": [],
+      "read_only": true,
+      "resource_writes": 0,
+      "monitoring_ready": false,
+      "persistent_collection": "NOT_CONFIGURED",
+      "assessment": "UDP_PORT_UNREACHABLE"
+    },
+    "zabbix_network_namespace": {
+      "target": "192.168.1.2",
+      "port": 161,
+      "version": "2c",
+      "identity": {
+        "status": "UDP_PORT_UNREACHABLE",
+        "os_errno": 111,
+        "values": [],
+        "elapsed_ms": 1,
+        "received_at": "2026-10-19T07:47:33.343794+00:00"
+      },
+      "columns": [],
+      "read_only": true,
+      "resource_writes": 0,
+      "monitoring_ready": false,
+      "persistent_collection": "NOT_CONFIGURED",
+      "assessment": "UDP_PORT_UNREACHABLE"
+    }
+  },
+  "execution_context": "host Python UDP diagnostic; second probe in existing Zabbix network namespace; not Zabbix item execution"
+}

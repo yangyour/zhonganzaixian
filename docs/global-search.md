@@ -1,5 +1,23 @@
 # 全局分组搜索边界
 
+## 2026-10-19 API0.63 监控事件搜索切片
+
+M1-8 / M1-D04 将既有 V37 `mop_monitoring_event` 接入 GET /api/v1/search。无新增迁移或权限授予，V1–V41 SQL 保持字节冻结；API/Worker 不执行迁移。本轮只在 dot 自有云端编译和隔离验证，不操作用户电脑或原服务器。下文“事件未接入”是历史边界。
+
+- 搜索词保持原文、不 trim，规则名称和代码仅做 PostgreSQL 根 ICU lower + strpos 字面子串匹配；`%`、`_`、引号均不是通配或 SQL。只按当前会话租户查询，不查根因、更新者、原始载荷、指纹、IP 或隔离区数据。
+- 资产/事件/报障/脚本固定 5/4/3/3。事件按 `last_occurred_at DESC, id DESC` 取 5 条哨兵，最多返回 4 条和 has_more；不返回推断总量，不局限于事件中心首页 25 条。
+- 活跃 user/成员、权限版本及有效 `search:read`、`assets:read`、`tickets:read` 在同一个 REPEATABLE READ 只读事务内复核，所有分组来自同一事务快照。事件还要求 msp/padmin，与现有 GET /events/{id} 内部权限一致；不扩大角色上限或自定义角色权限。
+- msp/padmin 事件组 AVAILABLE；viewer/tadmin 事件组 NOT_AUTHORIZED，reason=INTERNAL_EVENT_READ_REQUIRED，items/returned/has_more/source_scope/matched_fields 均为 null，资产与本人报障登记照常返回。
+- EventHit 仅含 id、tenant_id、rule_code、rule_name、version、severity、monitor_state、handling_state、occurrence_count、last_occurred_at、resource_kind=MONITORING_EVENT。合法的恢复和处理状态保留原值，不从严重级推断健康或处置结论。
+- coverage 仍为 PARTIAL；内部原因为 AUTOMATION_SOURCE_NOT_IMPLEMENTED，客户原因为 AUTOMATION_SOURCE_NOT_IMPLEMENTED_AND_EVENT_NOT_AUTHORIZED。脚本及铃铛仍 NOT_IMPLEMENTED；搜索不写审计成功记录、事件、受理回执或通知，不执行自动建单或外部派发。
+
+`fixtures/global-search-controller.json` 由真实 GlobalSearchController + MVC + 生产 remote_test 安全过滤器序列化生成，仓储输入为明确标识的合成投影；它是前后端共享线格式，不是数据库或真实采集证据。正常 Java 测试只比较、不覆盖；仅显式 `-Dmop.globalSearchFixtures=write` 更新。新增真实 PostgreSQL 测试由 `MOP_RUN_EVENT_GLOBAL_SEARCH_TESTS=true` 门控，编译或跳过不表示已运行。
+
+离线九模块 Java 3428 项，其中执行 2449、门控跳过 979，失败/错误 0；搜索针对性 33 项含 13 项真实 MVC/过滤器检查。149 项 Node 契约及生成一致性检查通过，API 路径仅 /search 变化，新增 SearchEventHit 并更新 GroupedSearch。23 项新增真实 PG 测试已编译，尚未在此离线记录中执行。见 [离线证据](evidence/event-global-search-offline-20261019.json)。
+
+本切片不是完整 M1-8、自动化来源、铃铛、生产授权矩阵或大规模检索性能验收。离线测试、真实 PG/HTTP 与浏览器视觉按各自实际运行证据记录，不混为完成。
+
+
 ## 2026-10-15 键盘与弹窗验收优化
 
 当前入口改为 Ctrl+K / Command+K，裸 `/` 不再全局触发。组合键避开编辑区、输入法及其他模态窗口；按钮提供可见提示和 aria-keyshortcuts。复用 Element Plus 焦点机制，移除打开动画前的抢焦点，取消后恢复入口。搜索弹窗挂到 body，避免页头叠层遮挡；长结果内部滚动，标题与关闭按钮保持在视口内。

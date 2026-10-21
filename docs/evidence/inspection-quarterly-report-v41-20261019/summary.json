@@ -1,0 +1,70 @@
+{
+  "result": "PASS",
+  "environment": "dot-own-cloud-disposable-loopback",
+  "date": "2026-10-19",
+  "postgresql": "17.9",
+  "icu": "76.1",
+  "source_commit": "0a8c584fe7c716f31f69b01df28bb84493a6fffc",
+  "api_jar_sha256": "a294db91ce0dcf4d39b61f4b6e801c13b0b3c13c39bc4bdfa614fcee56153910",
+  "prior40_match_published": true,
+  "source_classes_jar_migrations_identical": true,
+  "snapshot_files_after_run_unchanged": 1756,
+  "v41_sql_sha256": "54b9bd1d0995a248191e8f8f7dafe35fafd7d4ec15699a2ca8a49a7a025c7aa2",
+  "first_actual_apply_at_utc": "2026-10-19T10:45:33.711883+00:00",
+  "first_attempt": "first-attempt-summary.json: 15 report PG passed, one JDBC DateStyle setup error; 21 approval PG passed; HTTP not run; SQL applied and frozen",
+  "test_only_fix_commit": "0a8c584fe7c716f31f69b01df28bb84493a6fffc",
+  "fresh_rerun_apply_at_utc": "2026-10-19T10:50:25.069237+00:00",
+  "fresh_rerun_migrations": [
+    1,
+    0,
+    0
+  ],
+  "post_schema_drift_tests_check_migrations": 0,
+  "existing_tables_compared": 95,
+  "unrelated_existing_tables_unchanged": 92,
+  "intentional_changes": {
+    "capability_limits_added": 2,
+    "builtin_padmin_roles_updated": 2,
+    "padmin_membership_epochs_advanced": 4,
+    "other_role_or_membership_fields_unchanged": true
+  },
+  "unexpected_changes": [],
+  "real_pg_tests": {
+    "PostgresInspectionQuarterlyReportIntegrationTest": {
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "PostgresChangeNoticeApprovalIntegrationTest": {
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "approval_http_checks": 43,
+  "quarterly_report_http_checks": 90,
+  "http_total_checks": 133,
+  "lifecycle": {
+    "api_stopped": true,
+    "postgresql_stopped": true,
+    "temporary_database_and_credentials_removed": true,
+    "email_enabled": false,
+    "wecom_enabled": false,
+    "inherited_provider_secrets_stripped": true,
+    "original_server_contacted": false,
+    "external_messages_sent": false
+  },
+  "boundaries": {
+    "report_status": "DRAFT",
+    "configuration_source": "REQUEST_DRAFT_NOT_APPROVED",
+    "report_publishable": false,
+    "report_published": false,
+    "evidence_access_granted": false,
+    "browser_visual_verification": "NOT_RUN",
+    "oss_pdf_publication": "NOT_RUN",
+    "customer_production_acceptance": "NOT_CLAIMED",
+    "all_128_contract_items_complete": false
+  }
+}

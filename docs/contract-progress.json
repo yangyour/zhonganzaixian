@@ -2,8 +2,8 @@
   "schema_version": 1,
   "scope": "EXTRACTED_CONTRACT_AND_TRACKER_DECLARATIONS_ONLY",
   "requirement_count": 128,
-  "rows_with_progress_notes": 61,
-  "rows_without_progress_notes": 67,
+  "rows_with_progress_notes": 63,
+  "rows_without_progress_notes": 65,
   "declared_acceptance_status_counts": {
     "NOT_RUN": 128
   },
@@ -44,7 +44,7 @@
     },
     "M5": {
       "requirements": 21,
-      "rows_with_progress_notes": 12,
+      "rows_with_progress_notes": 13,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 21
       }
@@ -65,7 +65,7 @@
     },
     "M8": {
       "requirements": 12,
-      "rows_with_progress_notes": 3,
+      "rows_with_progress_notes": 4,
       "declared_acceptance_status_counts": {
         "NOT_RUN": 12
       }
@@ -602,6 +602,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/customer-policy-optimization-20261020.md",
         "docs/evidence/niko-monitoring-storage-coordinator-20261007.json",
         "docs/monitoring-storage-coordinator.md"
       ],
@@ -632,6 +633,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/customer-policy-optimization-20261020.md",
         "docs/event-handling-state-20261021.md"
       ],
       "external_references_unchecked": 0,
@@ -816,8 +818,10 @@
       "id": "M5-9",
       "title": "SLA报表",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/customer-policy-optimization-20261020.md"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -918,6 +922,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/customer-policy-optimization-20261020.md",
         "docs/sla-compliance-scenarios.md"
       ],
       "external_references_unchecked": 0,
@@ -1024,6 +1029,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/change-notice-approval-flow.md",
         "docs/change-notice-drafts.md",
         "docs/evidence/niko-change-notice-api-20261004.json",
         "docs/evidence/niko-change-notice-client-20261004.json",
@@ -1131,8 +1137,13 @@
       "id": "M8-1",
       "title": "通知渠道对接",
       "contract_scope": "合同内一期",
-      "has_progress_note": false,
-      "local_references": [],
+      "has_progress_note": true,
+      "local_references": [
+        "docs/email-integration-20261019.md",
+        "docs/evidence/email-http-ui-20261019.json",
+        "docs/evidence/email-live-20261019.json",
+        "docs/evidence/email-persistence-20261019.json"
+      ],
       "external_references_unchecked": 0,
       "declared_acceptance_status": "NOT_RUN"
     },
@@ -1479,6 +1490,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "86f3daa47bad6e17ee452c1d3dd98ed567851deabc093e443ea85ff13f29f52c"
+    "doc/development/07_合同逐项开发追踪.md": "596127c2081a9e56d24e04f75c1eb51dce9eb79eb059b81eb116e1fc848e642b"
   }
 }

@@ -1,0 +1,524 @@
+{
+  "environment": "dot-report-v41-fresh-pg",
+  "postgresql": "17.9 ICU76.1",
+  "sql_sha256": "54b9bd1d0995a248191e8f8f7dafe35fafd7d4ec15699a2ca8a49a7a025c7aa2",
+  "migration_results": [
+    {
+      "mode": "--apply-inspection-quarterly-reports",
+      "exit": 0,
+      "summary": "MOP_SCHEMA status=INSPECTION_QUARTERLY_REPORTS_APPLIED mode=APPLY_INSPECTION_QUARTERLY_REPORTS migrations_executed=1 baseline=V1_V40_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "mode": "--apply-inspection-quarterly-reports",
+      "exit": 0,
+      "summary": "MOP_SCHEMA status=INSPECTION_QUARTERLY_REPORTS_APPLIED mode=APPLY_INSPECTION_QUARTERLY_REPORTS migrations_executed=0 baseline=V1_V40_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    },
+    {
+      "mode": "--check",
+      "exit": 0,
+      "summary": "MOP_SCHEMA status=INSPECTION_QUARTERLY_REPORTS_APPLIED mode=READ_ONLY_CHECK migrations_executed=0 baseline=V1_V40_VALIDATED photos=STRUCTURE_ACL_VERIFIED asset_imports=STRUCTURE_ACL_VERIFIED asset_dependencies=DRAFT_STRUCTURE_ACL_VERIFIED worklogs=MANUAL_STRUCTURE_ACL_VERIFIED asset_metadata=MANUAL_DRAFT_STRUCTURE_ACL_VERIFIED internal_notes=IMMUTABLE_INTERNAL_STRUCTURE_ACL_VERIFIED ticket_comments=IMMUTABLE_REPORTER_COMMENT_STRUCTURE_ACL_VERIFIED working_calendars=UNPUBLISHED_DRAFT_STRUCTURE_ACL_VERIFIED manual_incidents=IMMUTABLE_MANUAL_REGISTRATION_STRUCTURE_ACL_VERIFIED manual_recoveries=IMMUTABLE_HUMAN_CONFIRMATION_STRUCTURE_ACL_VERIFIED manual_warranty=ADDITIVE_FIELDS_LEGACY_GUARD_VERIFIED capacity_scenarios=IMMUTABLE_UNVERIFIED_DRAFT_STRUCTURE_ACL_VERIFIED customer_contacts=SELF_REPORTED_REVISION_GUARD_STRUCTURE_ACL_VERIFIED contact_imports=DURABLE_JOB_GENERATED_GUARD_FIXED_STRUCTURE_ACL_VERIFIED asset_exports=STRUCTURE_ONLY_NOT_STORE_VERIFIED inspection_templates=UNPUBLISHED_STRUCTURE_ONLY inspection_worksheets=MANUAL_DRAFT_STRUCTURE_ONLY inspection_source_collections=IMMUTABLE_SOURCE_ONLY_NOT_REPORT change_notice_drafts=UNREVIEWED_DRAFT_ONLY_NO_APPROVAL backup_plan_drafts=UNPUBLISHED_DRAFT_ONLY_NO_EXECUTION notification_preferences=OWNER_REQUEST_DRAFT_ONLY_NO_DISPATCH raw_monitoring_events=IMMUTABLE_STORAGE_ONLY_UNVERIFIED_SOURCE monitoring_quarantine=HELD_UNVERIFIED_NO_DISPATCH"
+    }
+  ],
+  "existing_tables_compared": 95,
+  "unchanged_existing_tables": 92,
+  "intentional_changed_tables": [
+    "mop_membership",
+    "mop_project_role",
+    "mop_role_capability_limit"
+  ],
+  "intentional_capability_additions": [
+    [
+      "padmin",
+      "inspection_quarterly_reports:read"
+    ],
+    [
+      "padmin",
+      "inspection_quarterly_reports:write"
+    ]
+  ],
+  "builtin_padmin_roles_changed": 2,
+  "padmin_membership_epochs_advanced": 4,
+  "unexpected_changes": [],
+  "new_tables": [
+    "mop_inspection_quarterly_report"
+  ],
+  "before": {
+    "mop_asset": "36|a757f125cd043f967d985f4daa0afb22",
+    "mop_asset_dependency_edge": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_dependency_graph": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_dependency_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_export_attempt": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_export_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_import_artifact": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_import_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_import_mapping": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_import_operation": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_import_source": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_manual_details": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_manual_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_audit": "3|ae75a29ba1891a915a70040adeee2087",
+    "mop_autoticket_attempt": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_backup_plan_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_backup_plan_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_backup_plan_target": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_capacity_scenario_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_change_notice_approval_event": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_change_notice_asset": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_change_notice_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_change_notice_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_configuration": "186|67a735be0337b140f1b567b1d6044080",
+    "mop_configuration_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_configuration_revision_history": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_contact_import_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_contact_import_result": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_contact_tenant_guard": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_customer_contact": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_customer_contact_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_email_binding": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_email_delivery": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_escalation_policy": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_escalation_step_run": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_event_noise_record": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_export_inbox": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_external_identity_binding": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_file": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_file_grant": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_idempotency": "3|b1f696959092155e51c497356d9c0545",
+    "mop_identity_policy": "1|401ce09ac6b62520c0ac7c71f0ac0912",
+    "mop_identity_security": "6|d90b77668b82d19a171ed02b6679efc7",
+    "mop_inspection_source_collection": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_inspection_source_collection_item": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_inspection_template": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_inspection_template_item": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_inspection_template_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_inspection_worksheet": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_inspection_worksheet_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_local_account": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_local_password_history": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_maintenance_window": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_manual_incident_registration": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_manual_recovery_confirmation": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_member_role_assignment": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_membership": "9|92a618c906363fbd1670935da6a8f75c",
+    "mop_monitoring_event": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_monitoring_event_member": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_monitoring_quarantine": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_monitoring_quarantine_decision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_notification_intent": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_notification_message": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_notification_preference_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_notification_preference_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_oncall_handoff": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_oncall_roster": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_operation": "3|bd14cb356529889c7be0df60903a5060",
+    "mop_outbox": "3|e487a6dde1fa0f21008a92aadd5a5dbd",
+    "mop_photo_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_project_role": "8|e425e57600cf8810c7ccb2732777be06",
+    "mop_raw_monitoring_event": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_role_capability_limit": "81|081883a67226bb6991d5ad32daafc8f9",
+    "mop_runtime_configuration_release": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_service_tier": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_service_tier_change": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_site": "2|0714d9dc424a7ecb55e54997e29b80d6",
+    "mop_sla_monthly_result": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_tenant": "2|2c45f7c3371de540a3108a08322644ab",
+    "mop_ticket": "3|221e2acf0d471b8e8e7a96d1a724edcb",
+    "mop_ticket_comment": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_ticket_history": "3|1bba6030f2c12e785322ed2f6ef46afb",
+    "mop_ticket_internal_note": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_ticket_workflow_clock": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_ticket_workflow_clock_receipt": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_ticket_workflow_event": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_ticket_workflow_outbox": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_user": "6|a5c4843bdcee280d30cc5daf7b0c098e",
+    "mop_wecom_binding": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_wecom_delivery": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_wecom_login_state": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_working_calendar_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_working_calendar_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_worklog": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_worklog_revision": "0|d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "after": {
+    "mop_asset": "36|a757f125cd043f967d985f4daa0afb22",
+    "mop_asset_dependency_edge": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_dependency_graph": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_dependency_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_export_attempt": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_export_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_import_artifact": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_import_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_import_mapping": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_import_operation": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_import_source": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_manual_details": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_asset_manual_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_audit": "3|ae75a29ba1891a915a70040adeee2087",
+    "mop_autoticket_attempt": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_backup_plan_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_backup_plan_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_backup_plan_target": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_capacity_scenario_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_change_notice_approval_event": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_change_notice_asset": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_change_notice_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_change_notice_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_configuration": "186|67a735be0337b140f1b567b1d6044080",
+    "mop_configuration_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_configuration_revision_history": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_contact_import_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_contact_import_result": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_contact_tenant_guard": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_customer_contact": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_customer_contact_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_email_binding": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_email_delivery": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_escalation_policy": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_escalation_step_run": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_event_noise_record": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_export_inbox": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_external_identity_binding": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_file": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_file_grant": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_idempotency": "3|b1f696959092155e51c497356d9c0545",
+    "mop_identity_policy": "1|401ce09ac6b62520c0ac7c71f0ac0912",
+    "mop_identity_security": "6|d90b77668b82d19a171ed02b6679efc7",
+    "mop_inspection_quarterly_report": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_inspection_source_collection": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_inspection_source_collection_item": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_inspection_template": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_inspection_template_item": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_inspection_template_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_inspection_worksheet": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_inspection_worksheet_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_local_account": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_local_password_history": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_maintenance_window": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_manual_incident_registration": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_manual_recovery_confirmation": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_member_role_assignment": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_membership": "9|769d8463d7006cc6e52a1c75ad6e7810",
+    "mop_monitoring_event": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_monitoring_event_member": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_monitoring_quarantine": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_monitoring_quarantine_decision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_notification_intent": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_notification_message": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_notification_preference_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_notification_preference_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_oncall_handoff": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_oncall_roster": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_operation": "3|bd14cb356529889c7be0df60903a5060",
+    "mop_outbox": "3|e487a6dde1fa0f21008a92aadd5a5dbd",
+    "mop_photo_job": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_project_role": "8|a83df1f7b674ea610b59b33d8533a41b",
+    "mop_raw_monitoring_event": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_role_capability_limit": "83|3e940af1fa4721b0f3b5ac9988763272",
+    "mop_runtime_configuration_release": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_service_tier": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_service_tier_change": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_site": "2|0714d9dc424a7ecb55e54997e29b80d6",
+    "mop_sla_monthly_result": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_tenant": "2|2c45f7c3371de540a3108a08322644ab",
+    "mop_ticket": "3|221e2acf0d471b8e8e7a96d1a724edcb",
+    "mop_ticket_comment": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_ticket_history": "3|1bba6030f2c12e785322ed2f6ef46afb",
+    "mop_ticket_internal_note": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_ticket_workflow_clock": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_ticket_workflow_clock_receipt": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_ticket_workflow_event": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_ticket_workflow_outbox": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_user": "6|a5c4843bdcee280d30cc5daf7b0c098e",
+    "mop_wecom_binding": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_wecom_delivery": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_wecom_login_state": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_working_calendar_draft": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_working_calendar_revision": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_worklog": "0|d41d8cd98f00b204e9800998ecf8427e",
+    "mop_worklog_revision": "0|d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "constraint_definitions": {
+    "mop_inspection_quarterly_report_year_check": "CHECK (((year >= 1) AND (year <= 9998)))",
+    "mop_inspection_quarterly_report_label_check": "CHECK (((char_length(btrim((label)::text)) > 0) AND ((label)::text !~ '[\u0001-\u001f\u007f-\u009f]'::text)))",
+    "mop_inspection_quarterly_report_quarter_check": "CHECK (((quarter >= 1) AND (quarter <= 4)))",
+    "mop_inspection_quarterly_report_version_check": "CHECK ((version = 1))",
+    "mop_inspection_quarterly_report_document_check": "CHECK (((octet_length(document) >= 1) AND (octet_length(document) <= 41943040)))",
+    "mop_inspection_quarterly_report_recorded_at_check": "CHECK (((recorded_at >= '0001-01-01 00:00:00+00'::timestamp with time zone) AND (recorded_at <= '9999-12-31 23:59:59.999+00'::timestamp with time zone)))",
+    "mop_inspection_quarterly_report_report_sha256_check": "CHECK (((report_sha256)::text ~ '^[0-9a-f]{64}$'::text))",
+    "mop_inspection_quarterly_report_document_format_check": "CHECK (((document_format)::text = 'MOP_INSPECTION_QUARTERLY_DOCUMENT_V1'::text))",
+    "mop_inspection_quarterly_report_report_published_check": "CHECK ((NOT report_published))",
+    "mop_inspection_quarterly_report_generation_status_check": "CHECK (((generation_status)::text = 'DRAFT'::text))",
+    "mop_inspection_quarterly_report_report_publishable_check": "CHECK ((NOT report_publishable))",
+    "mop_inspection_quarterly_report_configuration_source_check": "CHECK (((configuration_source)::text = 'REQUEST_DRAFT_NOT_APPROVED'::text))",
+    "mop_inspection_quarterly_report_source_document_sha256_check": "CHECK (((source_document_sha256)::text ~ '^[0-9a-f]{64}$'::text))",
+    "mop_inspection_quarterly_report_source_manifest_sha256_check": "CHECK (((source_manifest_sha256)::text ~ '^[0-9a-f]{64}$'::text))",
+    "mop_inspection_quarterly_report_evidence_access_granted_check": "CHECK ((NOT evidence_access_granted))"
+  },
+  "constraint_sha256": {
+    "mop_inspection_quarterly_report_year_check": "183fd395056513d32cfe35e4a964caafa2c7da60c1b83242269af64ec71d990c",
+    "mop_inspection_quarterly_report_label_check": "088821050686a1897982aa6bf9937259cbb3aa58b88a3618fdecb2a63576f9e1",
+    "mop_inspection_quarterly_report_quarter_check": "d273ade36f407ff3aab2f5638aa44ded01b22c3cd008862c5c05b329da3b34b4",
+    "mop_inspection_quarterly_report_version_check": "825b9ee5370012ffc0fe68ccbd7a5f671f6a64eb27b5a4ed268f95bcf37fcb1c",
+    "mop_inspection_quarterly_report_document_check": "7387444c95b575612763d929f32d3c9ad2594c7cd2038decd3ddda4d89726da0",
+    "mop_inspection_quarterly_report_recorded_at_check": "03e64fe781185389b309b9483affb45e644aa7a948a2bd2684f56445e24d92e4",
+    "mop_inspection_quarterly_report_report_sha256_check": "0e2544ab2784d3a7270e31106202093a98a7d0e490bc73264fb0622028824b98",
+    "mop_inspection_quarterly_report_document_format_check": "8ea5134252016eeb2a54ea2d0767e949964538764011b51df761d0b026d7610f",
+    "mop_inspection_quarterly_report_report_published_check": "63592836885d86d1f4fe1cbd036f8d6cbf0711867068a2912dd29054f54b5171",
+    "mop_inspection_quarterly_report_generation_status_check": "1a496116f93485e0f0b1f975bd0cea84d4bcce41b488f65fc07e6835590fee0b",
+    "mop_inspection_quarterly_report_report_publishable_check": "f658ff4ffe4c28d694074155db41ea3d8c85aa6e8ec546d3d172e5facbb86868",
+    "mop_inspection_quarterly_report_configuration_source_check": "0bf134a78c0b69d23b954158c60b6b673d7229200a9f24638b38c17ea1fade85",
+    "mop_inspection_quarterly_report_source_document_sha256_check": "5b1ae61fc975b34dc5e3016f9fccd29d8edab88555c5e6e69f8fcf8ee05c2bd6",
+    "mop_inspection_quarterly_report_source_manifest_sha256_check": "971f18e2f96b815ee73d4386f327204d59c284a0fb7afcb8b4c04664a823df7d",
+    "mop_inspection_quarterly_report_evidence_access_granted_check": "380d9cc999484ee907ac703e09abaf3c74cf8cbd6cebeb02461b4c40ac5ad4c6"
+  },
+  "generated_hash_expression": "encode(sha256(document), 'hex'::text)",
+  "generated_hash_expression_sha256": "1a1153bc90898e4d44bad1a43e4fc77801e63eeeccd0d49c8913d2d06a12b365",
+  "flyway_history": [
+    {
+      "script": "V1__remote_test_platform.sql",
+      "success": true,
+      "version": "1",
+      "checksum": -1484181377
+    },
+    {
+      "script": "V2__tenant_configuration_revisions.sql",
+      "success": true,
+      "version": "2",
+      "checksum": 1161094071
+    },
+    {
+      "script": "V3__configuration_review_test_identity.sql",
+      "success": true,
+      "version": "3",
+      "checksum": -1273598682
+    },
+    {
+      "script": "V4__durable_customer_report_registration.sql",
+      "success": true,
+      "version": "4",
+      "checksum": 1369050258
+    },
+    {
+      "script": "V5__durable_report_photos.sql",
+      "success": true,
+      "version": "5",
+      "checksum": 1887903094
+    },
+    {
+      "script": "V6__asset_import_sources_and_mapping.sql",
+      "success": true,
+      "version": "6",
+      "checksum": -636230002
+    },
+    {
+      "script": "V7__asset_dependency_draft_revisions.sql",
+      "success": true,
+      "version": "7",
+      "checksum": -545292092
+    },
+    {
+      "script": "V8__manual_worklog_revisions.sql",
+      "success": true,
+      "version": "8",
+      "checksum": 1211360336
+    },
+    {
+      "script": "V9__manual_asset_metadata_revisions.sql",
+      "success": true,
+      "version": "9",
+      "checksum": -340432871
+    },
+    {
+      "script": "V10__immutable_internal_ticket_notes.sql",
+      "success": true,
+      "version": "10",
+      "checksum": -896663071
+    },
+    {
+      "script": "V11__immutable_ticket_comments.sql",
+      "success": true,
+      "version": "11",
+      "checksum": -1655668462
+    },
+    {
+      "script": "V12__unpublished_working_calendar_drafts.sql",
+      "success": true,
+      "version": "12",
+      "checksum": -2068183288
+    },
+    {
+      "script": "V13__immutable_manual_incident_registrations.sql",
+      "success": true,
+      "version": "13",
+      "checksum": 1030816869
+    },
+    {
+      "script": "V14__immutable_manual_recovery_confirmations.sql",
+      "success": true,
+      "version": "14",
+      "checksum": -30124348
+    },
+    {
+      "script": "V15__manual_warranty_details.sql",
+      "success": true,
+      "version": "15",
+      "checksum": 836542553
+    },
+    {
+      "script": "V16__immutable_capacity_scenario_drafts.sql",
+      "success": true,
+      "version": "16",
+      "checksum": 1367595086
+    },
+    {
+      "script": "V17__customer_contact_revisions.sql",
+      "success": true,
+      "version": "17",
+      "checksum": 2031946591
+    },
+    {
+      "script": "V18__durable_contact_import_jobs.sql",
+      "success": true,
+      "version": "18",
+      "checksum": -1130281417
+    },
+    {
+      "script": "V19__contact_import_generated_hash_guard.sql",
+      "success": true,
+      "version": "19",
+      "checksum": -268577672
+    },
+    {
+      "script": "V20__durable_asset_export_jobs.sql",
+      "success": true,
+      "version": "20",
+      "checksum": -319450001
+    },
+    {
+      "script": "V21__inspection_template_revisions.sql",
+      "success": true,
+      "version": "21",
+      "checksum": 951051044
+    },
+    {
+      "script": "V22__manual_inspection_worksheet_drafts.sql",
+      "success": true,
+      "version": "22",
+      "checksum": -650061710
+    },
+    {
+      "script": "V23__immutable_inspection_source_collections.sql",
+      "success": true,
+      "version": "23",
+      "checksum": 1321810212
+    },
+    {
+      "script": "V24__unpublished_backup_plan_drafts.sql",
+      "success": true,
+      "version": "24",
+      "checksum": -424372040
+    },
+    {
+      "script": "V25__unreviewed_change_notice_drafts.sql",
+      "success": true,
+      "version": "25",
+      "checksum": 552033867
+    },
+    {
+      "script": "V26__own_notification_preference_drafts.sql",
+      "success": true,
+      "version": "26",
+      "checksum": -324766275
+    },
+    {
+      "script": "V27__project_identity_and_roles.sql",
+      "success": true,
+      "version": "27",
+      "checksum": 511191109
+    },
+    {
+      "script": "V28__identity_inventory_and_password_formats.sql",
+      "success": true,
+      "version": "28",
+      "checksum": 1559449245
+    },
+    {
+      "script": "V29__immutable_raw_monitoring_events.sql",
+      "success": true,
+      "version": "29",
+      "checksum": -1977882733
+    },
+    {
+      "script": "V30__immutable_monitoring_quarantine.sql",
+      "success": true,
+      "version": "30",
+      "checksum": 2028775275
+    },
+    {
+      "script": "V31__own_export_inbox.sql",
+      "success": true,
+      "version": "31",
+      "checksum": -486321876
+    },
+    {
+      "script": "V32__runtime_configuration_publications.sql",
+      "success": true,
+      "version": "32",
+      "checksum": -606158601
+    },
+    {
+      "script": "V33__ticket_lifecycle_and_durable_clocks.sql",
+      "success": true,
+      "version": "33",
+      "checksum": -2063474061
+    },
+    {
+      "script": "V34__ticket_notification_intents.sql",
+      "success": true,
+      "version": "34",
+      "checksum": -1167997960
+    },
+    {
+      "script": "V35__service_tiers_and_change_history.sql",
+      "success": true,
+      "version": "35",
+      "checksum": -1509422434
+    },
+    {
+      "script": "V36__oncall_escalation_and_sla_monthly_results.sql",
+      "success": true,
+      "version": "36",
+      "checksum": -131315136
+    },
+    {
+      "script": "V37__monitoring_events_noise_funnel_and_maintenance_windows.sql",
+      "success": true,
+      "version": "37",
+      "checksum": 125697472
+    },
+    {
+      "script": "V38__wecom_bindings_deliveries_and_login_state.sql",
+      "success": true,
+      "version": "38",
+      "checksum": 845758090
+    },
+    {
+      "script": "V39__email_bindings_and_delivery_ledger.sql",
+      "success": true,
+      "version": "39",
+      "checksum": -373908053
+    },
+    {
+      "script": "V40__immutable_change_notice_approval_events.sql",
+      "success": true,
+      "version": "40",
+      "checksum": 14806533
+    },
+    {
+      "script": "V41__immutable_inspection_quarterly_reports.sql",
+      "success": true,
+      "version": "41",
+      "checksum": 1456236875
+    }
+  ]
+}

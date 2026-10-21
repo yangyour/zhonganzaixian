@@ -1,0 +1,21 @@
+{
+  "checks": [
+    {
+      "target": "local_api",
+      "http_status": 200,
+      "ready": true,
+      "server": null
+    },
+    {
+      "target": "existing_published_site",
+      "http_status": 200,
+      "ready": true,
+      "server": "nginx/1.31.6"
+    }
+  ],
+  "published_application_replaced": false,
+  "local_api_retained": true,
+  "local_frontend_retained": true,
+  "ssh_tunnel_retained": true,
+  "real_scan_login": "DEFERRED_BY_USER"
+}

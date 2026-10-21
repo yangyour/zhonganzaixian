@@ -15,7 +15,7 @@ final class PostgresTicketSlaPolicyBindings {
         JsonNode opening=decode(e.openingSnapshotJson());String frozen=policy(opening.path("sla_opening").path("configuration_inputs").path(KEY).path("value"));
         if(frozen!=null)return result(e,"OPENING_FROZEN",null,null,frozen,null,"opening:"+opening.path("configuration_release_ref").asText(),null);
         if(!opening.path("sla_opening").isObject())return result(e,"CONFIG_PENDING",null,null,null,null,null,"OPENING_SNAPSHOT_MISSING");
-        if(!schemaPresent(c))return result(e,"CONFIG_PENDING",null,null,null,null,null,"V35_REQUIRED");
+        if(!schemaPresent(c))return result(e,"CONFIG_PENDING",null,null,null,null,null,"V44_REQUIRED");
         try(var s=statement(c,"SELECT b.*,r.value_json,r.tenant_id AS release_tenant,r.configuration_key,r.version AS source_version FROM public.mop_ticket_sla_policy_binding b JOIN public.mop_runtime_configuration_release r ON r.id=b.release_id WHERE b.tenant_id=?::uuid AND b.ticket_id=?::uuid")){
             s.setString(1,a.tenantId());s.setString(2,e.ticketId());try(var r=s.executeQuery()){
                 if(r.next()){

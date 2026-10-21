@@ -1,0 +1,91 @@
+{
+  "observed_at": "2026-10-19T07:29:26.811277+00:00",
+  "source_commit": "34a183e3571adfd9eb7861ec382918f45a802e10",
+  "deployment_safeguards": {
+    "passed": 17,
+    "failed": 0,
+    "external_components_used": false
+  },
+  "contracts": {
+    "passed": 138,
+    "failed": 0
+  },
+  "web": {
+    "files": 160,
+    "passed": 2224,
+    "failed": 0
+  },
+  "java": {
+    "module_counts": [
+      {
+        "reported": 1018,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 865
+      },
+      {
+        "reported": 1929,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 35
+      },
+      {
+        "reported": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "reported": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "reported": 49,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 13
+      },
+      {
+        "reported": 29,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "reported": 3102,
+    "executed": 2189,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 913,
+    "scope": "Maven package; opt-in component tests remain skipped; isolated historical fixtures do not constitute live integration"
+  },
+  "build": {
+    "maven_package": "PASSED",
+    "web_typecheck_and_build": "PASSED",
+    "manifest_check": "PASSED",
+    "candidate_api_real_dependencies": "PASSED",
+    "nginx_syntax": "PASSED"
+  },
+  "http": {
+    "passed": 53,
+    "failed": 0,
+    "messages_sent": 0
+  },
+  "first_attempt": {
+    "source_commit": "44e2c58",
+    "status": "STOPPED_BEFORE_SWITCH",
+    "reason": "global pending-message guard included another synthetic application",
+    "application_containers_unchanged": true,
+    "resolution": "guard now matches tenant/corp/agent scope used by the delivery worker; no historical data changed"
+  },
+  "rollback": {
+    "isolated_failure_path_tests": "PASSED",
+    "live_restore_drill": "NOT_RUN"
+  },
+  "wecom_real_scan_callback": "DEFERRED_BY_USER",
+  "https_certificate": "PREVIOUSLY_OBSERVED_EXPIRED_UNCHANGED",
+  "formal_contract_acceptance": "NOT_COMPLETED",
+  "credentials_recorded": false
+}

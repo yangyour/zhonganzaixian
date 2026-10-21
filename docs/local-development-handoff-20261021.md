@@ -23,3 +23,7 @@
 ## 并发 main 更新保护
 
 合并前 main 更新到 642afcaaad000b86d9cdfbfd2245897b1fea3cdb，删除 Cloud validation 及其专用 Maven 安装检查。本次保留该删除及 ci-validation.md 更新，不恢复云端工作流。原 54 项 Python 证据对应删除前；当前本地重新执行剩余检查。
+
+## 后续整合
+
+历史分叉的逐项解决方案和验证边界见 [分支整合记录](branch-integration-20261021.md)。新候选不代表数据库已迁移或正式验收完成。

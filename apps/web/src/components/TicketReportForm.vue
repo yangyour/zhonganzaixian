@@ -75,12 +75,12 @@ watch(() => props.modelValue, value => {
 watch(contextKey, () => { reset(); open.value = false }, { flush: 'sync' })
 async function canLeave() {
   if (disposed || confirming.value) return false
-  if (hasUnresolved()) { ElMessage.warning('报障登记或照片尚未处理完，请先回读、使用原请求重试或移除可撤回的本地照片，再离开页面、切换租户或退出'); return false }
+  if (hasUnresolved()) { ElMessage.warning('当前还有未完成的故障申报或待处理的现场照片，请先完成核对或移除本地照片后再离开'); return false }
   if (!dirty.value) return true
   const turn = contextKey.value, snapshot = formSnapshot.value
   confirming.value = true
   try {
-    await ElMessageBox.confirm('离开将清除尚未保存的报障输入，是否继续？', '报障输入尚未保存', { confirmButtonText: '放弃输入并继续', cancelButtonText: '继续编辑', type: 'warning' })
+    await ElMessageBox.confirm('离开将清除尚未保存的故障申报内容，是否继续？', '内容尚未保存', { confirmButtonText: '放弃并离开', cancelButtonText: '继续编辑', type: 'warning' })
     // Do not reset here: another route/context guard or the transition itself may still refuse.
     return !disposed && turn === contextKey.value && snapshot === formSnapshot.value && !hasUnresolved()
   } catch { return false }
@@ -142,7 +142,7 @@ async function submitReport() {
   try {
     const result = await api.request<CustomerReportAcceptance>('/tickets', { method: 'POST', body: currentAttempt.body, idempotencyKey: currentAttempt.key, signal: controller.signal })
     if (generation !== writeGeneration) return
-    if (!result || result.status !== 'PENDING' || !isTicketUuid(result.operation_id)) throw new ApiError(200, 'INVALID_RESPONSE', '提交响应无法确认，请保留原填写内容并使用原请求重试', '—')
+    if (!result || result.status !== 'PENDING' || !isTicketUuid(result.operation_id)) throw new ApiError(200, 'INVALID_RESPONSE', '暂未收到有效的受理回执，系统已保留填写内容，请点击重试提交', '—')
     currentAttempt.state = 'accepted'; acceptedOperationId.value = result.operation_id.toLowerCase()
     emit('accepted', acceptedOperationId.value)
     await readRegistration()
@@ -158,10 +158,10 @@ async function submitReport() {
 
 <template>
   <el-dialog v-model="open" title="故障申报登记" width="650px" class="responsive-dialog ticket-report-dialog" :close-on-click-modal="!busy && !uncertain" :close-on-press-escape="!busy" :show-close="!busy" destroy-on-close>
-    <p class="ticket-form-intro">申报人：当前登录账号（所属租户：{{ session?.tenant.name }}）。当前已完成故障受理入库配置；工单分派流转与 SLA 考核计时将在 ITSM 流程启用后自动关联。</p>
+    <p class="ticket-form-intro">当前申报租户：<strong>{{ session?.tenant.name }}</strong>。提交后将立即生成故障受理记录，后续工单分派流转与 SLA 考核计时将在 ITSM 流程启用后自动关联。</p>
     <el-alert v-if="acceptedOperationId" type="info" :closable="false" show-icon title="故障申报已受理，系统正在生成正式工单，可点击下方按钮刷新处理进度。" />
     <el-alert v-else-if="uncertain" type="warning" :closable="false" show-icon title="提交结果待确认：系统已锁定当前填写内容，请先刷新列表核对是否已生效，或点击“重试提交”继续处理。" />
-    <ApiErrorNotice :error="submitError" pending-message="系统已锁定当前填写内容，登记结果以服务端回读为准。" />
+    <ApiErrorNotice :error="submitError" pending-message="系统已保留当前填写内容，请刷新或重试以确认受理结果。" />
     <ApiErrorNotice :error="operationError" />
     <div v-if="operation" class="ticket-operation-summary"><strong>已受理入库 · 待关联 ITSM 流程</strong><p>{{ operation.error.message }}</p><p>关联配置项：{{ operation.error.question_ids.join(' / ') }}</p><p>受理时间：{{ displayTime(operation.created_at) }}</p></div>
     <el-form :disabled="locked" label-position="top" class="dialog-form ticket-report-form" @submit.prevent="submitReport">
@@ -190,7 +190,7 @@ async function submitReport() {
 :deep(.ticket-report-dialog>.el-dialog__body :is(input,textarea,select,button,[tabindex])){scroll-margin-block:16px}
 :deep(.ticket-report-dialog>.el-dialog__footer){border-top:1px solid var(--el-border-color-lighter);margin-top:16px;padding-top:16px}
 :deep(.ticket-report-dialog .el-dialog__footer .el-button){max-width:100%;height:auto;white-space:normal}
-.ticket-form-intro{font-size:12px;color:#61718a}
+.ticket-form-intro{margin:0 0 14px;padding:10px 14px;background:#f6f9fc;border:1px solid #e5edf5;border-radius:6px;font-size:12px;line-height:1.65;color:#4e6178}
 :deep(.ticket-report-dialog .api-error){margin-top:16px}
 .ticket-contact-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .ticket-choice-group{display:flex;flex-wrap:wrap;gap:0 18px}

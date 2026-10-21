@@ -10,7 +10,7 @@ class TicketLifecycleMigrationTest {
         TicketLifecycleSchemaVerifier.resource();
         var mode=TestSchemaMigration.requestedMode(new String[]{"--apply-ticket-lifecycle"});
         assertEquals(TestSchemaMigration.Mode.APPLY_TICKET_LIFECYCLE,mode);
-        assertTrue(TestSchemaMigration.shouldMigrate(mode,TestSchemaMigration.Plan.RUNTIME_CONFIGURATION_APPLIED));
+        assertTrue(TestSchemaMigration.shouldMigrate(mode,TestSchemaMigration.Plan.INSPECTION_QUARTERLY_REPORTS_APPLIED));
         assertFalse(TestSchemaMigration.shouldMigrate(mode,TestSchemaMigration.Plan.TICKET_LIFECYCLE_APPLIED));
         assertFalse(TestSchemaMigration.shouldMigrate(TestSchemaMigration.Mode.READ_ONLY_CHECK,TestSchemaMigration.Plan.TICKET_LIFECYCLE_APPLIED));
         assertThrows(IllegalStateException.class,()->TestSchemaMigration.shouldMigrate(mode,TestSchemaMigration.Plan.EXPORT_INBOX_APPLIED));

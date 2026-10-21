@@ -18,7 +18,7 @@ watch(permitted,()=>{selectedDimension.value='all';searchText.value=''})
 </script>
 <template>
  <section class="capability-catalog-page admin-prototype">
-  <div class="page-heading"><div><span class="eyebrow">Q09 / TECHNICAL REVIEW</span><h1>系统能力与权限目录</h1><p>展示平台预置的 4 类基础角色、5 大业务资源维度与权限点映射基线</p></div><div class="catalog-actions non-print"><el-button :loading="state.busy" @click="reader.refresh()">重新读取</el-button><el-button :disabled="!state.current||state.busy" @click="printReview">打印核对页</el-button></div></div>
+  <div class="page-heading"><div><h1>系统能力与权限目录</h1><p>展示平台预置的 4 类基础角色、5 大业务资源维度与权限点映射基线</p></div><div class="catalog-actions non-print"><el-button :loading="state.busy" @click="reader.refresh()">刷新目录</el-button><el-button :disabled="!state.current||state.busy" @click="printReview">打印核对页</el-button></div></div>
   <el-alert title="系统内置权限点目录（只读核对视图）" type="info" :closable="false">本页展示平台代码登记的功能权限点与基础角色映射关系，仅供权限基线核对。实际人员授权与角色分配请在“用户与成员”或“角色与权限”中管理。</el-alert>
   <ApiErrorNotice :error="state.error"/>
   <el-skeleton v-if="state.busy" :rows="6" animated/>

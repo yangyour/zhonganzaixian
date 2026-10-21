@@ -4,7 +4,7 @@ import java.security.MessageDigest;
 import java.util.*;
 import static cn.mop.persistence.TestSchemaMigration.*;
 final class TicketSlaPolicyBindingSchemaVerifier {
-    static final String SCRIPT="V35__ticket_sla_policy_bindings.sql";
+    static final String SCRIPT="V44__ticket_sla_policy_bindings.sql";
     static final String SHA256="f249f843c35eb547da719036db3f35d0168f89cb971a85ddf084191a3c632600";
     static void resource()throws Exception{try(var in=TicketSlaPolicyBindingSchemaVerifier.class.getResourceAsStream("/db/migration/"+SCRIPT)){if(in==null||!SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(in.readAllBytes()))))throw new IllegalStateException("Unreviewed SLA policy binding migration");}}
     static void verify(Connection c)throws SQLException{

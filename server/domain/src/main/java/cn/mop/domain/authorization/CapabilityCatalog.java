@@ -30,6 +30,8 @@ public final class CapabilityCatalog {
         define(definitions,"change_notice_drafts:write","维护未审核报备草稿（不批准或抑制告警）","TEMPLATES_AUTOMATION");
         define(definitions,"backup_plan_drafts:read","读取未生效备份计划草稿及历史","TEMPLATES_AUTOMATION");
         define(definitions,"backup_plan_drafts:write","维护未生效备份计划草稿（不启用或执行设备命令）","TEMPLATES_AUTOMATION");
+        define(definitions,"inspection_quarterly_reports:read","读取不可变季度报告草稿（非正式发布）","TEMPLATES_AUTOMATION");
+        define(definitions,"inspection_quarterly_reports:write","生成绑定明确来源和未批准配置的季度报告草稿","TEMPLATES_AUTOMATION");
         define(definitions,"inspection_source_collections:read","读取不可变巡检来源草稿（非正式报告）","TEMPLATES_AUTOMATION");
         define(definitions,"inspection_source_collections:write","保存明确修订来源草稿（不生成或发布报告）","TEMPLATES_AUTOMATION");
         define(definitions,"inspection_worksheets:read","读取人工巡检执行单草稿","TEMPLATES_AUTOMATION");

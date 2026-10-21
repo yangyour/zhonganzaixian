@@ -15,6 +15,8 @@ public interface RuntimeConfigurationRepository {
     /** Bounded capacity inputs read with capacity permission in one database snapshot and at one instant. */
     List<String> CAPACITY_KEYS = List.of("monitor.sample_interval_sec", "retention.history_days", "retention.trend_days", "capacity.bytes_per_value", "capacity.trend_ratio", "capacity.headroom", "capacity.proxy_outage_sec");
     List<Map<String,Object>> capacityInputs(Access access);
+    List<String> TICKET_KEYS=List.of("itsm.local_authority_mode","sla.p1_response_min","sla.p1_recover_min","sla.p2_response_min","sla.p2_recover_min","sla.p3_response_min","sla.advanced_p3_recover_min","sla.tenant_work_calendar","sla.basic_standard_p3_next_day","ticket.customer_confirm_timeout_hours");
+    default List<Map<String,Object>> ticketInputs(Access access){throw new cn.mop.domain.DomainException(503,"UPSTREAM_UNAVAILABLE","工单运行配置不可用");}
     List<Map<String,Object>> history(Access access, String key, long beforeVersion);
     Map<String,Object> release(Access access, String key, String id);
     void authorizeCommand(Access access, String key);

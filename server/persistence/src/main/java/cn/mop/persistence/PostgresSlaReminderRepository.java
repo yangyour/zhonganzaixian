@@ -55,7 +55,7 @@ public final class PostgresSlaReminderRepository {
         }
         var payload=mapper.createObjectNode().put("clock",key.clock().name()).put("progress",key.threshold()).put("lifecycle_version",claim.version()).put("configuration_reference",state.clock().configurationReference()).put("observed_at",observed.toString()).put("escalation_required",key.threshold().compareTo(BigDecimal.ONE)==0);
         if(state.policyReference()==null)payload.putNull("policy_reference");else payload.put("policy_reference",state.policyReference());
-        try(var s=statement(c,"INSERT INTO public.mop_notification_intent(id,tenant_id,ticket_id,kind,event_key,payload,created_at) VALUES(?::uuid,?::uuid,?::uuid,'SLA_PROGRESS',?,?::jsonb,?)")){
+        try(var s=statement(c,"INSERT INTO public.mop_sla_notification_intent(id,tenant_id,ticket_id,kind,event_key,payload,created_at) VALUES(?::uuid,?::uuid,?::uuid,'SLA_PROGRESS',?,?::jsonb,?)")){
             s.setString(1,intent);s.setString(2,claim.tenant());s.setString(3,claim.ticket());s.setString(4,"sla:"+claim.ticket()+":"+key.clock().name()+":"+key.threshold().toPlainString());s.setString(5,payload.toString());s.setObject(6,utc(observed));s.executeUpdate();
         }return true;
     }

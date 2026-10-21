@@ -1,0 +1,10 @@
+{
+  "status": "CANDIDATE_NOT_APPLIED",
+  "description": "V42-V45 integrate unexecuted revision candidates after frozen workflow V1-V41. Original candidate bytes archived; no history repair or automatic status conversion.",
+  "sha256": {
+    "V42__ticket_lifecycle_revisions.sql": "01923cef9be16d7445b8aa4ada7ee564ad0210a21bad59edca17eb48e9a908e9",
+    "V43__ticket_autoclose_jobs.sql": "0b3bf01db63bcae757c4b80ba9f10979c342ae95dd339121ce91a979553e47e4",
+    "V44__ticket_sla_policy_bindings.sql": "f249f843c35eb547da719036db3f35d0168f89cb971a85ddf084191a3c632600",
+    "V45__sla_reminder_intents.sql": "d9626559c8a74299a703a094689e3dcf153cc54ec139a685d2cad1c7ebbd7507"
+  }
+}

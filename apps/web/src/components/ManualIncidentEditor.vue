@@ -25,7 +25,7 @@ async function retry() { if (await writer.retry()) await submitted() }
 async function adopt() { if (writer.unresolved() || state.value.busy) return; const generation = contextKey.value; if (!await writer.refreshAsset() || !state.value.lastAssetRead) return; const latest = state.value.lastAssetRead; try { await ElMessageBox.confirm(`确认采用资产“${latest.name}”的v${latest.version}作为新基准？当前标题与级别保持不变，之后仍需明确提交。`, '核对关联资产最新版本', { confirmButtonText: '采用此基准', cancelButtonText: '保持原基准', type: 'warning' }); if (generation === contextKey.value && permitted.value) writer.adoptLatestAsset(latest) } catch { /* Keep original baseline and all input. */ } }
 const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, permitted.value]))
 watch(contextKey, () => { const s = session.value; writer.reset(permitted.value && s ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version } : null); form.title = ''; form.severity = ''; query.value = ''; validation.value = '' }, { immediate: true, flush: 'sync' })
-async function mayLeave() { if (writer.unresolved()) { ElMessage.warning('登记结果尚未确认，请先使用完全相同的原请求重试'); return false } return confirmDiscard() }
+async function mayLeave() { if (writer.unresolved()) { ElMessage.warning('登记结果尚未确认，请先点击重试提交'); return false } return confirmDiscard() }
 onBeforeRouteLeave(mayLeave)
 const unregisterContextGuard = contextTransitionGuards.register(mayLeave)
 function beforeUnload(event: BeforeUnloadEvent) { if (writer.unresolved() || hasDraft.value) { event.preventDefault(); event.returnValue = '' } }
@@ -39,9 +39,9 @@ defineExpose({ prepare, hasUnresolved: writer.unresolved })
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前授权已失效，原范围输入已清除" />
     <template v-else>
       <ApiErrorNotice :error="state.error" />
-      <el-alert v-if="state.attempt?.state === 'uncertain'" type="warning" :closable="false" title="提交结果待确认：系统已锁定当前填写内容、关联资产版本与幂等标识，请点击“使用完全相同原请求重试”继续处理。" />
+      <el-alert v-if="state.attempt?.state === 'uncertain'" type="warning" :closable="false" title="提交结果待确认：系统已锁定当前填写内容与关联资产版本，请点击“重试提交”继续处理。" />
       <el-alert v-if="state.attempt?.state === 'rejected'" type="warning" :closable="false" title="提交未通过，表单内容已保留。请核对关联资产版本并采用最新基准后重新提交。" />
-      <div class="manual-actions"><el-button v-if="state.asset" :disabled="Boolean(state.busy)" @click="writer.refreshAsset()">刷新关联资产</el-button><el-button v-if="state.attempt?.state === 'uncertain'" type="warning" :disabled="Boolean(state.busy)" @click="retry">使用完全相同原请求重试</el-button><el-button v-if="state.editing && state.asset && !writer.unresolved()" :disabled="Boolean(state.busy)" @click="adopt">采用最新资产版本</el-button></div>
+      <div class="manual-actions"><el-button v-if="state.asset" :disabled="Boolean(state.busy)" @click="writer.refreshAsset()">刷新关联资产</el-button><el-button v-if="state.attempt?.state === 'uncertain'" type="warning" :disabled="Boolean(state.busy)" @click="retry">重试提交</el-button><el-button v-if="state.editing && state.asset && !writer.unresolved()" :disabled="Boolean(state.busy)" @click="adopt">采用最新资产版本</el-button></div>
       <p v-if="state.asset">当前关联资产：{{ state.asset.name }} · v{{ state.asset.version }}<small class="manual-asset-id">{{ state.asset.id }}</small></p>
       <p v-if="state.lastAssetRead">最新读取版本：{{ state.lastAssetRead.name }} · v{{ state.lastAssetRead.version }}（刷新不会自动替换已选版本基准）</p>
       <el-alert v-if="state.asset && state.lastAssetRead && state.asset.version !== state.lastAssetRead.version" type="warning" :closable="false" title="检测到关联资产版本已更新，请先点击“采用最新资产版本”确认后再提交。" />
@@ -53,11 +53,11 @@ defineExpose({ prepare, hasUnresolved: writer.unresolved })
         <h3>关联资产（当前租户）</h3><p class="field-help">支持按资产名称或管理地址检索，选择后将锁定当前资产版本快照。</p>
         <div class="manual-asset-search"><el-input v-model="query" :disabled="locked" aria-label="手工登记关联资产搜索" placeholder="输入资产名称或管理地址检索" /><el-button :disabled="locked || query.length > 100" @click="writer.search(query)">查询资产</el-button><el-button :disabled="locked || !state.nextAssetCursor || query !== state.assetSearch" @click="writer.search(query, true)">下一页</el-button></div>
         <p v-if="!state.choices" class="field-help">候选资产尚未成功读取，不能视为没有可选资产</p><p v-else-if="!state.choices.length">当前条件下无匹配资产</p>
-        <div class="manual-asset-options"><button v-for="item in state.choices || []" :key="item.id" type="button" :disabled="locked" :aria-pressed="state.asset?.id === item.id" @click="writer.choose(item.id)"><strong>{{ item.name }}</strong><span>v{{ item.version }} · 点击关联并核对版本</span><small>{{ item.id }}</small></button></div>
+        <div class="manual-asset-options"><button v-for="item in state.choices || []" :key="item.id" type="button" :disabled="locked" :aria-pressed="state.asset?.id === item.id" @click="writer.choose(item.id)"><strong>{{ item.name }}</strong><span>v{{ item.version }} · 点击选择此资产</span><small>{{ item.id }}</small></button></div>
         <p v-if="validation" role="alert" class="manual-validation">{{ validation }}</p><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.asset || !state.lastAssetRead">提交手工登记</el-button>
       </el-form>
     </template>
-    <template #footer><el-button @click="open = false">暂时收起，保留本页内容</el-button><p class="field-help">收起窗口不会中断已发起的提交请求；切换租户或会话失效将清空未提交草稿。</p></template>
+    <template #footer><el-button @click="open = false">暂时收起</el-button><p class="field-help">收起窗口不会中断已发起的提交请求；切换租户或会话失效将清空未提交草稿。</p></template>
   </el-drawer>
 </template>
 <style>

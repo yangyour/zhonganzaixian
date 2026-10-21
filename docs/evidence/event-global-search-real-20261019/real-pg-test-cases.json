@@ -1,0 +1,194 @@
+[
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "actualEventSelectIsReadOnlyRepeatableReadAndBoundedToFiveRows()",
+    "time_seconds": "0.008",
+    "passed": true
+  },
+  {
+    "class": "PostgresGlobalSearchIntegrationTest",
+    "name": "matchingForeignKeywordsNeverLeakOtherTenantObjects()",
+    "time_seconds": "0.032",
+    "passed": true
+  },
+  {
+    "class": "PostgresGlobalSearchIntegrationTest",
+    "name": "unicodeRootLowerAndWildcardsAreLiteral()",
+    "time_seconds": "0.024",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "unicodeCaseFoldingMatchesBothRuleNameAndRuleCode()",
+    "time_seconds": "0.022",
+    "passed": true
+  },
+  {
+    "class": "PostgresGlobalSearchIntegrationTest",
+    "name": "customerAndTenantAdminOnlyFindOwnReports()",
+    "time_seconds": "0.034",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "percentUnderscoreAndApostropheAreLiteralInBothSearchFields()",
+    "time_seconds": "0.02",
+    "passed": true
+  },
+  {
+    "class": "PostgresGlobalSearchIntegrationTest",
+    "name": "newestRegisteredAssetsAreOrderedDeterministically()",
+    "time_seconds": "0.016",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "searchHitOutsideLatestTwentyFiveStillHasDirectAuthorizedDetail()",
+    "time_seconds": "0.055",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "inactiveUserRejectsEvenAnOtherwiseCurrentActiveMembership()",
+    "time_seconds": "0.016",
+    "passed": true
+  },
+  {
+    "class": "PostgresGlobalSearchIntegrationTest",
+    "name": "contractCapsAndOverflowReflectBoundedRealRows()",
+    "time_seconds": "0.1",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "exactlyFourMatchesDoesNotClaimOverflow()",
+    "time_seconds": "0.007",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "evenAnAdministratorWithBothMembershipsCannotMixTenants()",
+    "time_seconds": "0.011",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "eachRequiredEffectiveCapabilityIsEnforcedForCustomInternalRoles()",
+    "time_seconds": "0.074",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "customerRolesKeepAssetsAndOwnTicketsButNeverReadTheEventTable()",
+    "time_seconds": "0.047",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "staleVersionsUnknownActorsAndMissingMembershipFailBeforeEventReads()",
+    "time_seconds": "0.004",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "authorizationAssetsTicketsAndEventsShareOneRealDatabaseSnapshot()",
+    "time_seconds": "0.051",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "allLegalSeverityAndHandlingValuesAndBothMonitorStatesRoundTrip()",
+    "time_seconds": "0.02",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "revokedMembershipRejectsStaleAndCurrentVersions()",
+    "time_seconds": "0.004",
+    "passed": true
+  },
+  {
+    "class": "PostgresGlobalSearchIntegrationTest",
+    "name": "projectionContainsNoIpContactsDescriptionsOrInternalActorFields()",
+    "time_seconds": "0.038",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "nonBlankQueriesKeepLeadingAndTrailingSpaces()",
+    "time_seconds": "0.012",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "privateFieldsAndRawPayloadDoNotBecomeSearchableOrAppearInProjection()",
+    "time_seconds": "0.104",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "disabledCustomRoleCannotFallBackToItsBuiltinRole()",
+    "time_seconds": "0.019",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "eventOrderingUsesLastOccurrenceRatherThanInsertionOrUpdateOrder()",
+    "time_seconds": "0.009",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "fifthAndFurtherMatchesSetOverflowWithoutExposingMoreThanFour()",
+    "time_seconds": "0.021",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "zeroMatchesIsAnAuthorizedEmptyEventGroup()",
+    "time_seconds": "0.002",
+    "passed": true
+  },
+  {
+    "class": "PostgresGlobalSearchIntegrationTest",
+    "name": "emptyLocalMatchIsNotAnErrorAndSearchDoesNotWriteAuditOrAssets()",
+    "time_seconds": "0.03",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "searchesDoNotChangeAuditReceiptsInboxOrAnyEventRecord()",
+    "time_seconds": "0.082",
+    "passed": true
+  },
+  {
+    "class": "PostgresGlobalSearchIntegrationTest",
+    "name": "staleMembershipAndWrongScopeRejectBeforeReturningAnyGroup()",
+    "time_seconds": "0.004",
+    "passed": true
+  },
+  {
+    "class": "PostgresGlobalSearchIntegrationTest",
+    "name": "receiptSearchIsSupportedButDescriptionsAreNotQueried()",
+    "time_seconds": "0.188",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "concurrentCustomGrantRevocationAffectsTheNextSnapshotWithoutSplittingTheCurrentOne()",
+    "time_seconds": "0.048",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "equalTimestampsUseDescendingPostgresUuidOrderAcrossTheSignedBoundary()",
+    "time_seconds": "0.024",
+    "passed": true
+  },
+  {
+    "class": "PostgresEventGlobalSearchIntegrationTest",
+    "name": "oneMatchingNameOrCodeReturnsTheSameEventOnlyOnce()",
+    "time_seconds": "0.013",
+    "passed": true
+  }
+]

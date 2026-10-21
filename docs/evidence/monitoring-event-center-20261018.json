@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-18",
+  "environment": "designated_remote_test_over_project_ssh_tunnel",
+  "database": "mop_test",
+  "postgres_version": "17.9",
+  "migration_status": {
+    "from": "V36",
+    "applied": ["V37"],
+    "successful_migration_count": 37,
+    "duplicate_migrations": 0,
+    "read_only_recheck": "MONITORING_EVENT_CENTER_APPLIED"
+  },
+  "v37_sha256": "f6f9cc88bcbc4dcbaf1a76a849aa78ed2cf7af91e7fd9b5c80dbde4d9b9ab351",
+  "integration_tests": {
+    "PostgresMonitoringEventCenterIntegrationTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "m4_7_five_minute_deduplication_x5_and_drawer_members": true,
+      "m4_8_dependency_suppression_and_flap_silence_30m": true,
+      "m4_9_orthogonal_monitor_and_handling_states_and_first_ack_at_immutability": true,
+      "m4_10_maintenance_window_sla_exclusion_requires_platform_admin_confirmation": true,
+      "m4_11_noise_funnel_6_layers_24h_7d_30d": true,
+      "m4_14_three_notification_empty_state_labels": true,
+      "m1_2_quarantine_append_only_bind_or_discard_decisions": true,
+      "m5_4_auto_ticket_retry_exhaustion_and_manual_create_recovery": true
+    }
+  },
+  "unit_and_controller_tests": {
+    "TestSchemaMigrationTest": {"tests": 41, "failures": 0, "errors": 0},
+    "MonitoringEventPipelineTest": {"tests": 5, "failures": 0, "errors": 0},
+    "MonitoringEventCenterControllerTest": {"tests": 2, "failures": 0, "errors": 0}
+  },
+  "web_validation": {
+    "test_files": 159,
+    "tests": 2218,
+    "failures": 0,
+    "typecheck": "PASSED",
+    "build": {
+      "status": "PASSED",
+      "files": 119,
+      "build_id": "c5ced6ed20e9a635d942af00013fc42d5784fc04ff32b92314c05b530d696a66"
+    }
+  },
+  "contract_tests": {
+    "tests": 138,
+    "failures": 0,
+    "openapi_version": "0.57.0"
+  },
+  "pending_business_gates_preserved": {
+    "Q14": "CONFIG_PENDING_Q14 (event severity to ticket priority mapping and subscription matrix pending customer confirmation)",
+    "Q20": "CONFIG_PENDING (published dependency rules pending customer confirmation; draft topology edges evaluated explicitly)",
+    "Q29": "CONFIG_PENDING_Q29 (incident review threshold pending customer confirmation)"
+  }
+}

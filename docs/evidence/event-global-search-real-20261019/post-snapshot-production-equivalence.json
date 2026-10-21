@@ -1,0 +1,13 @@
+{
+  "integration_at_packaging": {
+    "commit": "806e5133eb35db842f7ff24343a05aaf02ba1560",
+    "production_source_resource_files_compared": 435,
+    "changed_production_source_resource_files": []
+  },
+  "backend_test_followup": {
+    "commit": "32c28e805685443c6612c8729c4d6af4f95a3dc6",
+    "production_source_resource_files_compared": 435,
+    "changed_production_source_resource_files": [],
+    "api_jar_sha256": "db33d6d1d368a1d652847794e6f7fcc13b55ea48e8b8b9bf15c5bafb9fdcb803"
+  }
+}

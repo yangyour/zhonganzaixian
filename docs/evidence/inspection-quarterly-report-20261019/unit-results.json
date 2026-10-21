@@ -1,0 +1,27 @@
+{
+  "environment": "dot-own-cloud-worktree",
+  "date": "2026-10-19",
+  "scope": "D09 quarterly draft report storage",
+  "build": "PASS",
+  "unit_suites": {
+    "InspectionQuarterlyReportDocumentCodecTest": 11,
+    "InspectionSourceDocumentCodecTest": 19
+  },
+  "unit_passed": 30,
+  "unit_failed": 0,
+  "pg_suite_compiled": "PostgresInspectionQuarterlyReportIntegrationTest",
+  "pg_tests_skipped": 15,
+  "postgres": "NOT_RUN_PENDING_PARENT_REVIEW_AND_PERMISSION_REGISTRATION",
+  "migration": "CANDIDATE_NOT_APPLIED",
+  "migration_sha256": "8ccc3c997ff66ca2c549bd68a2ef546ed43b8cfef2df1f782a97898ddf790e72",
+  "http": "NOT_RUN",
+  "ui": "NOT_RUN",
+  "customer_approval": false,
+  "production_acceptance": false,
+  "full_persistence_reactor": {
+    "tests_discovered": 1066,
+    "passed": 171,
+    "skipped": 895,
+    "failed": 0
+  }
+}

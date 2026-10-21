@@ -1,0 +1,41 @@
+{
+  "environment": "dot-own-cloud-isolated-worktree",
+  "date": "2026-10-19",
+  "base": "512f2bce21d238e11769a21ae80c1034a4b92115",
+  "scope": "D09 backend and UI on upstream WeCom V38, Email V39, approval V40 lineage; report V41 candidate; API 0.61.0",
+  "java_reactor": {
+    "suites": 283,
+    "tests": 3285,
+    "passed": 2329,
+    "skipped": 956,
+    "failures": 0,
+    "errors": 0
+  },
+  "contract_tests": {
+    "passed": 143,
+    "failed": 0,
+    "includes_email_contract_tests": true
+  },
+  "python_migration_policy_tests": {
+    "passed": 34,
+    "failed": 0
+  },
+  "web_tests": {
+    "files": 168,
+    "passed": 2300,
+    "failed": 0
+  },
+  "web_typecheck": "PASS",
+  "web_build_release_and_policy_checks": "PASS",
+  "package_build": "PASS",
+  "powershell_policy_tests": "NOT_RUN_PWSH_UNAVAILABLE",
+  "postgres_report_tests": "NOT_RUN_PENDING_REVIEW",
+  "real_http_report_tests": "NOT_RUN_PENDING_REVIEW",
+  "browser_visual": "NOT_RUN",
+  "migration_status": "UNAPPLIED_CANDIDATE",
+  "migration_sha256": "54b9bd1d0995a248191e8f8f7dafe35fafd7d4ec15699a2ca8a49a7a025c7aa2",
+  "prior_migrations_preserved_byte_for_byte": 40,
+  "schema_definition_capture": "Independent rollback-only DDL probe; see check-definition-probe.json. Not report migration execution.",
+  "customer_approval": false,
+  "production_acceptance": false
+}

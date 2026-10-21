@@ -1,0 +1,11 @@
+{
+  "status": "APPLIED_FROZEN_DOT_CLOUD_ONLY",
+  "sha256": {
+    "V41__immutable_inspection_quarterly_reports.sql": "54b9bd1d0995a248191e8f8f7dafe35fafd7d4ec15699a2ca8a49a7a025c7aa2"
+  },
+  "first_applied_at_utc": "2026-10-19T10:45:33.711883+00:00",
+  "last_verified_at_utc": "2026-10-19T10:50:25.069237+00:00",
+  "evidence": "docs/evidence/inspection-quarterly-report-v41-20261019/summary.json",
+  "filename_retained_for_launcher_compatibility": true,
+  "original_server_applied": false
+}

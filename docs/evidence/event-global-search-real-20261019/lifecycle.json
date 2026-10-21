@@ -1,0 +1,12 @@
+{
+  "started_at_utc": "2026-10-19T11:27:28.362234+00:00",
+  "environment": "dot-event-search-fresh-pg",
+  "loopback_only": true,
+  "inherited_provider_settings_stripped": true,
+  "email_enabled": false,
+  "wecom_enabled": false,
+  "validation_exit": 0,
+  "postgresql_stopped": true,
+  "temporary_database_and_credentials_removed": true,
+  "finished_at_utc": "2026-10-19T11:28:44.481398+00:00"
+}

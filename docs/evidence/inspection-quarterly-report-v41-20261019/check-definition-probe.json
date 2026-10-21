@@ -1,0 +1,50 @@
+{
+  "generated_column": {
+    "generated_expression": "encode(sha256(document), 'hex'::text)",
+    "generated_expression_sha256": "1a1153bc90898e4d44bad1a43e4fc77801e63eeeccd0d49c8913d2d06a12b365"
+  },
+  "kind": "ROLLBACK_ONLY_DDL_DEFINITION_PROBE_NOT_MIGRATION",
+  "candidate_sha256": "54b9bd1d0995a248191e8f8f7dafe35fafd7d4ec15699a2ca8a49a7a025c7aa2",
+  "applied_migration": false,
+  "report_tests_run": false,
+  "session_timezone": "UTC",
+  "session_datestyle": "ISO, MDY",
+  "definitions": {
+    "mop_inspection_quarterly_report_year_check": "CHECK (((year >= 1) AND (year <= 9998)))",
+    "mop_inspection_quarterly_report_label_check": "CHECK (((char_length(btrim((label)::text)) > 0) AND ((label)::text !~ '[\u0001-\u001f\u007f-\u009f]'::text)))",
+    "mop_inspection_quarterly_report_quarter_check": "CHECK (((quarter >= 1) AND (quarter <= 4)))",
+    "mop_inspection_quarterly_report_version_check": "CHECK ((version = 1))",
+    "mop_inspection_quarterly_report_document_check": "CHECK (((octet_length(document) >= 1) AND (octet_length(document) <= 41943040)))",
+    "mop_inspection_quarterly_report_recorded_at_check": "CHECK (((recorded_at >= '0001-01-01 00:00:00+00'::timestamp with time zone) AND (recorded_at <= '9999-12-31 23:59:59.999+00'::timestamp with time zone)))",
+    "mop_inspection_quarterly_report_report_sha256_check": "CHECK (((report_sha256)::text ~ '^[0-9a-f]{64}$'::text))",
+    "mop_inspection_quarterly_report_document_format_check": "CHECK (((document_format)::text = 'MOP_INSPECTION_QUARTERLY_DOCUMENT_V1'::text))",
+    "mop_inspection_quarterly_report_report_published_check": "CHECK ((NOT report_published))",
+    "mop_inspection_quarterly_report_generation_status_check": "CHECK (((generation_status)::text = 'DRAFT'::text))",
+    "mop_inspection_quarterly_report_report_publishable_check": "CHECK ((NOT report_publishable))",
+    "mop_inspection_quarterly_report_configuration_source_check": "CHECK (((configuration_source)::text = 'REQUEST_DRAFT_NOT_APPROVED'::text))",
+    "mop_inspection_quarterly_report_source_document_sha256_check": "CHECK (((source_document_sha256)::text ~ '^[0-9a-f]{64}$'::text))",
+    "mop_inspection_quarterly_report_source_manifest_sha256_check": "CHECK (((source_manifest_sha256)::text ~ '^[0-9a-f]{64}$'::text))",
+    "mop_inspection_quarterly_report_evidence_access_granted_check": "CHECK ((NOT evidence_access_granted))"
+  },
+  "sha256_utf8_pg_get_constraintdef": {
+    "mop_inspection_quarterly_report_year_check": "183fd395056513d32cfe35e4a964caafa2c7da60c1b83242269af64ec71d990c",
+    "mop_inspection_quarterly_report_label_check": "088821050686a1897982aa6bf9937259cbb3aa58b88a3618fdecb2a63576f9e1",
+    "mop_inspection_quarterly_report_quarter_check": "d273ade36f407ff3aab2f5638aa44ded01b22c3cd008862c5c05b329da3b34b4",
+    "mop_inspection_quarterly_report_version_check": "825b9ee5370012ffc0fe68ccbd7a5f671f6a64eb27b5a4ed268f95bcf37fcb1c",
+    "mop_inspection_quarterly_report_document_check": "7387444c95b575612763d929f32d3c9ad2594c7cd2038decd3ddda4d89726da0",
+    "mop_inspection_quarterly_report_recorded_at_check": "03e64fe781185389b309b9483affb45e644aa7a948a2bd2684f56445e24d92e4",
+    "mop_inspection_quarterly_report_report_sha256_check": "0e2544ab2784d3a7270e31106202093a98a7d0e490bc73264fb0622028824b98",
+    "mop_inspection_quarterly_report_document_format_check": "8ea5134252016eeb2a54ea2d0767e949964538764011b51df761d0b026d7610f",
+    "mop_inspection_quarterly_report_report_published_check": "63592836885d86d1f4fe1cbd036f8d6cbf0711867068a2912dd29054f54b5171",
+    "mop_inspection_quarterly_report_generation_status_check": "1a496116f93485e0f0b1f975bd0cea84d4bcce41b488f65fc07e6835590fee0b",
+    "mop_inspection_quarterly_report_report_publishable_check": "f658ff4ffe4c28d694074155db41ea3d8c85aa6e8ec546d3d172e5facbb86868",
+    "mop_inspection_quarterly_report_configuration_source_check": "0bf134a78c0b69d23b954158c60b6b673d7229200a9f24638b38c17ea1fade85",
+    "mop_inspection_quarterly_report_source_document_sha256_check": "5b1ae61fc975b34dc5e3016f9fccd29d8edab88555c5e6e69f8fcf8ee05c2bd6",
+    "mop_inspection_quarterly_report_source_manifest_sha256_check": "971f18e2f96b815ee73d4386f327204d59c284a0fb7afcb8b4c04664a823df7d",
+    "mop_inspection_quarterly_report_evidence_access_granted_check": "380d9cc999484ee907ac703e09abaf3c74cf8cbd6cebeb02461b4c40ac5ad4c6"
+  },
+  "rollback_confirmed": true,
+  "report_table_absent_after": true,
+  "all_prior_table_fingerprints_unchanged": true,
+  "tables_compared": 96
+}

@@ -19,8 +19,9 @@ public final class ProjectIdentitySchemaVerifier {
     static final String COMPATIBILITY_SHA256="5554e23a3aabfe489ae6b9258293d0f33dda0bcc7da19c60bdb873fb16b77ad7";
     static void compatibilityResource()throws Exception{try(var in=ProjectIdentitySchemaVerifier.class.getResourceAsStream("/db/migration/V28__identity_inventory_and_password_formats.sql")){if(in==null||!COMPATIBILITY_SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(in.readAllBytes()))))throw new IllegalStateException("Unreviewed identity compatibility SQL");}}
     static void resource()throws Exception{try(var in=ProjectIdentitySchemaVerifier.class.getResourceAsStream("/db/migration/V27__project_identity_and_roles.sql")){if(in==null||!SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(in.readAllBytes()))))throw new IllegalStateException("Unreviewed project identity SQL");}}
-    public static void verify(Connection c)throws SQLException{verify(c,true);}
-    static void verify(Connection c,boolean inventoryCapability)throws SQLException{
+    public static void verify(Connection c)throws SQLException{verify(c,true,true);}
+    static void verify(Connection c,boolean inventoryCapability)throws SQLException{verify(c,inventoryCapability,false);}
+    static void verify(Connection c,boolean inventoryCapability,boolean quarterlyReports)throws SQLException{
         requireTrue(c,"SELECT current_database()='mop_test'");
         for(String table:List.of("mop_identity_security","mop_local_account","mop_local_password_history","mop_identity_policy","mop_role_capability_limit","mop_project_role","mop_member_role_assignment","mop_external_identity_binding")){
             requireTrue(c,"SELECT to_regclass('public.'||?) IS NOT NULL AND has_table_privilege('mop_test_runtime','public.'||?,'SELECT')",table,table);
@@ -32,9 +33,17 @@ public final class ProjectIdentitySchemaVerifier {
         boolean lifecycleCapability;try(var q=c.createStatement();var rows=q.executeQuery("SELECT to_regclass('public.mop_ticket_lifecycle_revision') IS NOT NULL")){rows.next();lifecycleCapability=rows.getBoolean(1);}
         for(String role:List.of("viewer","tadmin","msp","padmin")){
             var actual=new TreeSet<String>();try(var q=c.prepareStatement("SELECT capability FROM public.mop_role_capability_limit WHERE base_role=?")){q.setString(1,role);try(var r=q.executeQuery()){while(r.next())actual.add(r.getString(1));}}
-            var expected=new TreeSet<>(cn.mop.domain.Capabilities.forRole(role));if(!inventoryCapability)expected.remove("tenants:read_inventory");if(!lifecycleCapability){expected.remove("tickets:lifecycle_write");expected.remove("tickets:customer_decide");}
+            var expected=new TreeSet<>(expectedCapabilities(role,inventoryCapability,quarterlyReports));if(lifecycleCapability){for(String capability:cn.mop.domain.Capabilities.forRole(role))if(capability.equals("tickets:lifecycle_write")||capability.equals("tickets:customer_decide"))expected.add(capability);}
             if(!actual.equals(expected))throw new IllegalStateException("Role capability limit differs from reviewed code");
         }
         requireTrue(c,"SELECT NOT EXISTS(SELECT 1 FROM public.mop_tenant t WHERE (SELECT count(*) FROM public.mop_project_role r WHERE r.tenant_id=t.id AND r.builtin)<>4)");
     }
+    static Set<String> expectedCapabilities(String role,boolean inventoryCapability,boolean quarterlyReports){
+        var expected=new TreeSet<>(cn.mop.domain.Capabilities.forRole(role));
+        if(!inventoryCapability)expected.remove("tenants:read_inventory");
+        if(!quarterlyReports){expected.remove("inspection_quarterly_reports:read");expected.remove("inspection_quarterly_reports:write");}
+        expected.remove("tickets:lifecycle_write");expected.remove("tickets:customer_decide");
+        return Collections.unmodifiableSet(expected);
+    }
+
 }

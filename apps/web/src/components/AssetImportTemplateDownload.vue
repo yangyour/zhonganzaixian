@@ -28,10 +28,15 @@ onUnmounted(() => { controller?.abort(); ++generation; for (const url of urls) U
 </script>
 <template>
   <section class="asset-template-download">
-    <el-button :disabled="!permitted" :loading="busy" @click="download">下载标准15列空模板</el-button>
-    <p class="field-help">包含平台标准 15 列资产台账表头，填写导入数据时请确保“备注”列完整填写。</p>
-    <p v-if="saved" role="status" class="field-help">标准模板完整性校验通过（SHA-256），已开始浏览器下载。</p>
+    <div class="template-download-row">
+      <div class="template-download-info">
+        <strong>标准 15 列导入模板</strong>
+        <p class="field-help">包含平台标准 15 列资产台账表头，填写导入数据时请确保“备注”列完整填写。</p>
+      </div>
+      <el-button :disabled="!permitted" :loading="busy" @click="download">下载标准 15 列空模板</el-button>
+    </div>
+    <p v-if="saved" role="status" class="template-download-success">标准模板完整性校验通过（SHA-256），已开始浏览器下载。</p>
     <ApiErrorNotice :error="error" />
   </section>
 </template>
-<style>.asset-template-download{margin:12px 0 18px}.asset-template-download .el-button{min-height:40px}@media(max-width:600px){.asset-template-download .el-button{min-height:44px;white-space:normal;height:auto}}</style>
+<style>.asset-template-download{margin:12px 0 18px;padding:12px 16px;background:#f8fafc;border:1px solid #e4ebf3;border-radius:8px}.template-download-row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.template-download-info strong{display:block;font-size:13px;color:#2b3e54;margin-bottom:2px}.template-download-info .field-help{margin:0}.template-download-success{margin:8px 0 0;font-size:12px;color:#166534}.asset-template-download .el-button{min-height:40px}@media(max-width:600px){.asset-template-download .el-button{min-height:44px;white-space:normal;height:auto;width:100%}}</style>

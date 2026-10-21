@@ -1,5 +1,51 @@
 # MOP 实施状态
 
+## 2026-10-20 客户SLA口径优化
+
+API0.65接入监控t2恢复钟和同依据提醒，修正逐资产可用率、未知分子分母排除/90%覆盖门槛、跨月区间、维护排除、自审拦截、未配置null及固定比例补偿候选。修复SLA页面与实际API版本/枚举漂移，并以Java实际响应联验前端和契约。2456实际Java/983跳过、2444Web、150契约及三项指定PG专项最终通过；无迁移、外部发送和测试站发布。原始采样覆盖/观察窗、自动建单重试及财务批准继续明确保留，见[实施边界与证据](customer-policy-optimization-20261020.md)。
+
+## 2026-10-20 客户最新口径归档
+
+API0.64已修正长期故障恢复关联、来源重复/乱序处理、20字人工复核和关联事件未复核时的关单保护。111项Java、116项Web、149项契约及4项指定PG场景最终通过；采集观察窗验真、外部发送、自动建单重试及测试站发布仍独立保留。见[实施与测试](customer-policy-optimization-20261020.md)。
+
+已归档告警恢复/SLA规范及监控清单V1.2的原件、SHA256和可重复提取结果，核对17类234个唯一监控编号及12/132/226+8档位数量。用户明确恢复t2停钟（观察窗后确认）和P2立即通知/建单。需求差异与未确认项见[来源对照](../doc/customer/2026-10-20/README.md)，功能优化与真实证据见[实施记录](customer-policy-optimization-20261020.md)。目录归档不表示234项已采集或合同全部完成。
+
+## 2026-10-19 D11邮件通道接入与JiangFaMing收件绑定
+
+邮件管理页面、SMTP465严格TLS客户端、当前租户明确收件绑定、固定测试受理、本人站内通知明确转发及一次尝试耐久台账已实现，API契约0.59.0。指定LAN PG17.9已独立应用V39一次、重复/只读0次，92张既有业务表摘要保持；6项真实PG、26项邮件隔离、全量Java2221实际执行/919跳过、Web2228、契约140、部署保护20及生产构建通过。实际Java SMTP认证及页面连接检查通过，按用户明确选择绑定JiangFaMing且启用；桌面/手机及实际权限拒绝检查均留证。测试站API/Web已更新至804a3d8，服务器出口SMTP及25项实际HTTP通过，14服务运行，其余12项生命周期不变，0启动迁移，本机验证进程已停止。尚未发送邮件，实际投递/正式回执与完整D11、128项验收分别保留NOT_RUN，自动业务通知关闭。见[运行与验收记录](email-integration-20261019.md)。
+
+## 2026-10-19 华为 S5731 MIB 核对及 SNMP 只读诊断
+
+按用户提供的本地 MIB 和明确授权的文档示例，对 192.168.1.2 从指定服务器及既有 Zabbix 网络命名空间完成只读 SNMP v2c 诊断；两处均 `UDP_PORT_UNREACHABLE`，未读到身份、固件或资源首值，详细采集仍阻塞，不能标 DONE。新增固定目标诊断工具，核对 65 份 MIB 的来源指纹并复用现有解析器准备七项未发布候选；修正 uptime 秒单位及光功率 0.01 缩放，保留索引/无效值/速率等实际接入缺口。55 Python（新增20）和46 Java（新增5）隔离测试通过；原14服务/PG17.9 V38不变，没有 API 契约、迁移、部署、Zabbix 对象或设备配置变更。见[联调与边界](huawei-snmp-integration-20261019.md)。
+
+## 2026-10-19 测试站统一更新与可重复运维流程
+
+已交付 `tools/update-lan-test-server.py` 和[操作手册](test-environment-update.md)，覆盖当前上游分支fast-forward、完整测试/构建、不可变工件及SQL字节检查、项目归属/部署锁、候选真实就绪、仅应用切换、部分失败自动回退和活动事务显式恢复。17项隔离保护通过；真实运行已将7项应用更新至 `34a183e`，14服务就绪、V38历史不变、7基础组件生命周期不变。企业微信登录/人工通知按用户选择启用，自动业务通知关闭；IP及业务域名53项HTTP检查通过，本次消息发送0次。Java2189实际执行/913跳过、Web2224及契约138分别记录，不将跳过测试或本次发布计为完整合同验收。见[执行与留证](test-environment-update-20261019.md)。
+
+## 2026-10-18 D15监控事件中心、去重归并(×N)、降噪漏斗、维护窗口SLA双确认、隔离区处置与自动建单补偿真实验证
+
+在指定远程测试库（PG17.9 `mop_test`）经项目SSH隧道追加V37（`mop_monitoring_event`、`mop_monitoring_event_member`、`mop_event_noise_record`、`mop_maintenance_window`、`mop_monitoring_quarantine_decision`、`mop_autoticket_attempt`及只追加/不可变守卫），一次应用（`migrations_executed=1`）、重复应用（`migrations_executed=0`）与只读结构权限核验（`MONITORING_EVENT_CENTER_APPLIED`）通过。新增`MonitoringEventPipeline`、`MonitoringEventCenterRepository`、PostgreSQL仓储`PostgresMonitoringEventCenterRepository`、API控制器`MonitoringEventCenterController`（API0.57.0：`GET/POST /api/v1/events`、`GET /api/v1/events/{id}`、`POST /api/v1/events/{id}/actions`、`GET /api/v1/events/noise-funnel`、`POST /api/v1/maintenance-windows`、`POST /api/v1/maintenance-windows/{id}/actions`、`POST /api/v1/monitoring-quarantine/{id}/decisions`、`POST /api/v1/autoticket-attempts/{id}/manual-create`）及前端`MonitoringEventsPage.vue`（`/monitoring-events`）。覆盖M1-2/M4-7..M4-11/M4-14/M5-4核心要求：真实PG集成测试`PostgresMonitoringEventCenterIntegrationTest`（2项）验证5分钟同指纹去重合并（`occurrence_count=5`及抽屉5条原始成员）、10分钟闪断≥3次静默30分钟、拓扑依赖抑制、监控状态（`PROBLEM/RECOVERED`）与人工处理状态（`NEW/ACKNOWLEDGED/IN_PROGRESS/RESOLVED/CLOSED`）正交独立且首次确认时间`first_ack_at`固化不可篡改、2分钟内自愈取消通知及三类通知空状态文案、维护窗口SLA排除须平台管理员二次确认后才计入排除时长、V30隔离区追加式人工绑定资产回灌或丢弃决策、自动建单指数退避（30s/120s/600s×3）连续5次失败转人工补建工单；Q14与Q29未确认前保持`CONFIG_PENDING_Q14`与`CONFIG_PENDING_Q29`。迁移策略41项、领域与控制器7项、契约138项、前端159文件/2218项及生产构建通过。证据见[monitoring-event-center-20261018.json](evidence/monitoring-event-center-20261018.json)。
+
+## 2026-10-18 D16值班看板/交接班、可配置升级链与SLA报表/月度冻结核算真实验证
+
+在指定远程测试库（PG17.9 `mop_test`）经项目SSH隧道追加V36（`mop_oncall_roster`、`mop_oncall_handoff`、`mop_escalation_policy`、`mop_escalation_step_run`、`mop_sla_monthly_result`及只追加/冻结守卫），一次应用（`migrations_executed=1`）、重复应用（`migrations_executed=0`）与只读结构权限核验通过。新增`OnCallEscalationRepository`、`SlaAvailabilityAndCompensation`、PostgreSQL仓储`PostgresOnCallEscalationRepository`、API控制器`OnCallEscalationController`（API0.56.0：`GET /api/v1/oncall/board`、`POST /api/v1/oncall/rosters`、`POST /api/v1/oncall/handoffs`、`PATCH /api/v1/escalation-policies`、`POST /api/v1/oncall/escalations`、`GET /api/v1/sla/reports`、`GET /api/v1/sla/reports/{serviceId}/details`、`POST /api/v1/sla/monthly-results`）及前端`OnCallBoardPage.vue`、`SlaReportsPage.vue`。覆盖M5-9/M5-10/M5-12/M5-13/M5-19核心要求：真实PG集成测试`PostgresOnCallEscalationIntegrationTest`（2项）验证值班排班CAS、只追加交接班三项在途工单快照、平台管理员调整升级链后电话连续2次未接自动升级至值班主管并记录待短信网关告知意图、SLA月度快照冻结后禁止覆盖（409 `MONTHLY_RESULT_FROZEN`）及未知采集区间独立隔离；Q15与Q26未确认前显式标记`CONFIG_PENDING_Q15`与`CONFIG_PENDING_Q26`（`compensation_amount_fen`保持`null`，同步展示候选A固定比例与候选B缺口比例参考值）。迁移策略41项、API全量1875项、契约137项、前端158文件/2216项及生产构建通过。证据见[oncall-escalation-and-sla-reports-20261018.json](evidence/oncall-escalation-and-sla-reports-20261018.json)。
+
+## 2026-10-18 D16服务档位快照、只追加变更台账与工单冻结SLA时钟真实验证
+
+在指定远程测试库（PG17.9 `mop_test`）经项目SSH隧道追加V35（`mop_service_tier`、`mop_service_tier_change`及头部/变更同步触发器与不可变守卫），一次应用（`migrations_executed=1`）、重复应用（`migrations_executed=0`）与只读结构权限核验通过。新增`ServiceTierRepository`、`TicketSlaClockEvaluation`、API控制器（API0.55.0：`GET /api/v1/service-tiers`、`POST /api/v1/service-tiers/changes`、`GET /api/v1/tickets/{id}/sla`及开单租户档位回退）和前端`ServiceTiersPage.vue`。覆盖M2-10/M5-8/M5-18/M5-20核心要求：20项跨工作日/节假日/夜间/暂停/次日口径/档位变更边界用例通过；真实PG集成测试`PostgresServiceTierIntegrationTest`（2项）验证3张在途工单（OPEN/ACCEPTED/RESOLVED）在租户档位从BASIC变更为STANDARD及ADVANCED后，原冻结SLA截止时间与50%/80%/100%提醒阈值保持不变，变更历史只追加且禁止直接UPDATE/DELETE或单表独立写入；重开策略（Q27）与基础/标准档P3次日口径（Q08）未确认前显式标记待确认，不硬编码默认值。迁移策略41项、API全量1871项、契约136项、前端157文件/2210项及生产构建通过。SLA月报/补偿（Q26）、值班看板与升级链（Q15）及128项正式合同验收仍待继续；证据见[service-tiers-and-sla-clocks-20261018.json](evidence/service-tiers-and-sla-clocks-20261018.json)。
+
+## 2026-10-18 D07/D11/D16工单通知意图与站内消息持久化及真实验证
+
+在指定远程测试库（PG17.9 `mop_test`）经项目SSH隧道追加V34（`mop_notification_intent`、`mop_notification_message`及来源/人数/接收人资格/首次已读守卫），一次应用（`migrations_executed=1`）、重复应用（`migrations_executed=0`）与只读结构权限核验通过。新增`TicketNotificationPlanner`、持久化中继与读取/首次已读接口（API0.54.0：`/api/v1/my/notifications`、`POST /api/v1/my/notifications/{id}/read`、`/api/v1/notification-intents`）及前端`TicketNotificationsPage.vue`。未确认的Q09/Q15接收人规则保留`pending_reasons`（如`Q15_ONCALL_QUEUE_RECIPIENTS`、`Q15_ESCALATION_CHAIN`、`Q09_SERVICE_MANAGER_ROLE`），外部渠道保持`NOT_CONFIGURED`（`Q14_CHANNEL_MATRIX`、`Q18_PROVIDER_CREDENTIALS`），客户消息屏蔽内部处理人。真实PG测试`PostgresTicketNotificationIntegrationTest`（2项）与`PostgresTicketWorkflowIntegrationTest`（2项）通过；迁移策略41项、通知规划/控制器17项、API全量1845项、契约135项、前端156文件/2204项及生产构建通过。外部企微/短信/语音/邮件派发、测试站发布切换与128项正式合同验收仍NOT_RUN；证据见[ticket-notification-intents-20261018.json](evidence/ticket-notification-intents-20261018.json)。
+
+## 2026-10-18 D07工单持久化与真实测试环境验证
+
+在指定远程测试库通过项目SSH隧道按冻结顺序应用V29—V33，V33新增只追加工单处理事件、outbox和耐久时钟任务，V33一次应用/重复0次/只读结构权限核验通过。D07真实PG测试完成2项：完整处理链、客户投影、版本冲突、跨租户404、事件与outbox同事务；单元/控制器/配置策略共58项通过，完整API测试1828项通过，Web类型检查、生产构建和135项契约测试通过。企业微信外部送达、API/Web发布切换和完整合同验收仍未完成；证据见[ticket-workflow-integration-20261018.json](evidence/ticket-workflow-integration-20261018.json)与[ticket-workflow-final-validation-20261018.json](evidence/ticket-workflow-final-validation-20261018.json)。
+
+## 2026-10-18 Notion接续与D07状态/SLA核心
+
+已读取用户更新的Notion总索引及十个子页，核对与现有合同/安全/冻结迁移的差异。新增工单状态转换、转派冻结、客户确认/72小时重开和工作时长SLA节点核心，34项隔离Java检查通过；指定LAN SSH/HTTP协议读取失败，PG/HTTP/UI及完整合同仍NOT_RUN。持久层和页面继续实现，不能将纯核心当作正式闭环完成。见[接续台账与证据](notion-development-20261018.md)。
+
 ## 2026-10-15 容量估算接入7项已发布配置
 
 API0.52固定范围/同快照读取7项容量参数，页面核对后导入并使用真实估算接口；修正字节/比例/倍率共用说明的校验，倍率1.2精确转0.2。2182前端、21相关Java、8指定PG、135契约及67次真实HTTP/浏览器验证通过；测试值已全部禁用。已按01391a7发布测试站并完成公开入口复查，其他12个服务未变、ready=true、production_ready=false；不将配置或容量估算等同完整其他业务。见[实施及证据](configurable-development-20261015.md)。

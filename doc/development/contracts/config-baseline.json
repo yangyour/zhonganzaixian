@@ -3285,6 +3285,24 @@
       "notes": "尚未确认；不能以null或false推定客户放弃功能。",
       "contract_value_kind": "pending_customer_decision",
       "source_registry_section": "5"
+    },
+    {
+      "key": "change_notice.approver_policy",
+      "description": "报备修订审批人；必须为当前有效租户成员且不能审批本人申请",
+      "type": "object",
+      "scope": "租户",
+      "unit": null,
+      "value": null,
+      "decision_status": "pending",
+      "source": "D10/Q09",
+      "question_ids": [
+        "Q09"
+      ],
+      "activation_gate": "显式审核发布后仅用于内部报备修订审批，不授予执行或生产批准",
+      "notes": "格式为reviewer_user_ids非空UUID数组，无默认角色或审批人",
+      "allowed_range": "1至1000个唯一用户UUID",
+      "contract_value_kind": "pending_customer_decision",
+      "source_registry_section": "5"
     }
   ]
 }

@@ -1,0 +1,20 @@
+{
+  "implementation_checkpoint": "212c8d15d5462e00d86b468759e278b5f0a9f36d",
+  "api_version": "0.63.0",
+  "java": {"discovered": 3428, "passed": 2449, "skipped": 979, "failures": 0, "errors": 0, "verify_package": "PASSED"},
+  "contract_email_tests": 149,
+  "contract_generation_check": "PASSED",
+  "web": {"files": 171, "passed": 2442, "typecheck": "PASSED", "build": "PASSED", "release_policy": "PASSED"},
+  "real_postgresql_tests": 32,
+  "actual_http_checks": 72,
+  "real_validation_evidence": "event-global-search-real-20261019/",
+  "tested_api_jar_sha256": "db33d6d1d368a1d652847794e6f7fcc13b55ea48e8b8b9bf15c5bafb9fdcb803",
+  "final_package_sha256": "de1217ae9a83676265b61d03c4034ab81c840a61a620a6ea9a1ecbcb6a3caeab",
+  "recursive_jar_payload_comparison": {"entries": 35895, "different_paths_or_bytes": [], "method": "Compare SHA-256 by complete entry path recursively through nested jars; archive bytes are not claimed identical"},
+  "controller_fixture_sha256": "e5c9c7245edad7932383c2b1acd90385b4d8477b4a596f203d3c5e4d1bf0fd28",
+  "migrations_v1_v41": "UNCHANGED",
+  "browser_visual": "NOT_RUN",
+  "original_server_deployment": "NOT_RUN",
+  "external_provider_messages": 0,
+  "production_scale_performance": "NOT_RUN"
+}

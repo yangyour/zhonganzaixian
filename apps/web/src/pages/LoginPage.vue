@@ -8,6 +8,7 @@ import type { AuthOptions, Session } from '../api/types'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import loginBackground from '../assets/login-infrastructure-20261015.webp'
 import { sessionExpired, loginReturnPath } from '../stores/session'
+import { safeWeComAuthorizationUrl } from '../utils/wecom'
 import { loginDestination } from '../utils/loginDestination'
 const router = useRouter()
 const route = useRoute(), options = ref<AuthOptions | null>(null), loading = ref(true), submitting = ref(false), error = ref<unknown>(null)
@@ -15,9 +16,9 @@ const username = ref(''), password = ref(''), help = ref(false), controller = ne
 const usernameInput = ref<InputInstance | null>(null), passwordInput = ref<InputInstance | null>(null), errorNotice = ref<HTMLElement | null>(null)
 const usernameError = ref(''), passwordError = ref(''), passwordVisible = ref(false), capsLock = ref(false)
 const backgroundFailed = ref(false)
-const loginMethod = ref<'local' | 'unified' | null>(null)
+const loginMethod = ref<'local' | 'unified' | 'wecom' | null>(null)
 const passwordDescription = computed(() => [passwordError.value ? 'login-password-error' : '', capsLock.value ? 'login-caps-lock' : ''].filter(Boolean).join(' ') || undefined)
-const oidcFailure = computed(() => route.query.auth_error ? '统一认证登录未完成，请重试或使用项目账号。' : '')
+const oidcFailure = computed(() => route.query.auth_error === 'WECOM_IDENTITY_NOT_BOUND' ? '此企业微信成员尚未绑定平台账号，请联系管理员。' : route.query.auth_error ? '外部身份登录未完成，请重试或使用项目账号。' : '')
 const connectionError = computed(() => error.value instanceof ApiError && error.value.code === 'NETWORK_ERROR')
 const errorTitle = computed(() => connectionError.value ? options.value ? '暂时无法确认登录结果' : '登录服务暂时无法连接' : undefined)
 const errorGuidance = computed(() => connectionError.value ? options.value ? '请检查网络连接后重试登录。' : '请检查网络，或稍后点击“重新连接”。' : '')
@@ -40,7 +41,7 @@ onMounted(loadOptions)
 async function localLogin() {
   if (submitting.value || loading.value || !options.value?.local_enabled || controller.signal.aborted) return
   error.value = null
-  usernameError.value = username.value.trim() ? '' : '请输入账号，不能只填写空格。'
+  usernameError.value = username.value.trim() ? '' : '请输入登录账号。'
   passwordError.value = password.value ? '' : '请输入密码。'
   if (usernameError.value || passwordError.value) {
     await nextTick()
@@ -70,6 +71,20 @@ async function localLogin() {
     if (focusAfterFailure === 'password') passwordInput.value?.select()
   }
 }
+async function wecomLogin() {
+  if (submitting.value || loading.value || !options.value?.wecom_enabled || controller.signal.aborted) return
+  submitting.value = true; loginMethod.value = 'wecom'; error.value = null
+  try {
+    const csrf = await api.request<{csrf_token:string}>('/auth/csrf', {signal:controller.signal})
+    if (controller.signal.aborted) return
+    api.setCsrfToken(csrf.csrf_token)
+    const result = await api.request<{authorization_url:string}>('/auth/wecom/start', {method:'POST',body:{mode:/wxwork/i.test(navigator.userAgent)?'work':'web'},signal:controller.signal})
+    if (controller.signal.aborted) return
+    if (!safeWeComAuthorizationUrl(result.authorization_url)) throw new ApiError(200,'INVALID_RESPONSE','企业微信登录地址未通过校验','—')
+    window.location.assign(result.authorization_url)
+  } catch(cause) { if (!controller.signal.aborted && !isCancelled(cause)) error.value = cause }
+  finally { submitting.value=false;loginMethod.value=null }
+}
 function unifiedLogin() {
   if (submitting.value || loading.value || controller.signal.aborted) return
   const path = options.value?.login_url
@@ -89,8 +104,8 @@ function updateCapsLock(event: KeyboardEvent | Event) {
     <main class="login-main">
     <section class="login-card" aria-labelledby="login-title">
       <div class="login-card-heading"><h1 id="login-title">{{ options?.local_enabled ? '账号登录' : '登录' }}</h1><span v-if="options?.mode === 'remote_test'" class="login-environment">测试环境</span></div>
-      <p class="login-progress" role="status">{{ loading ? '正在连接登录服务…' : submitting ? loginMethod === 'unified' ? '正在打开统一认证页面，请稍候。' : '正在核对账号信息，请稍候。' : '' }}</p>
-      <el-alert v-if="sessionExpired" class="page-note" role="status" title="登录状态已失效，请重新登录。登录后请先核对刚才未确认的提交结果。" type="warning" :closable="false" show-icon />
+      <p class="login-progress" role="status">{{ loading ? '正在连接登录服务…' : submitting ? loginMethod === 'unified' ? '正在跳转至统一身份认证，请稍候…' : '正在验证登录信息，请稍候…' : '' }}</p>
+      <el-alert v-if="sessionExpired" class="page-note" role="status" title="登录状态已过期，请重新登录。若此前有正在提交的操作，登录后请先核对结果。" type="warning" :closable="false" show-icon />
       <el-alert v-if="oidcFailure" :title="oidcFailure" type="error" :closable="false" show-icon class="page-note" />
       <div v-if="error" ref="errorNotice" class="login-error" tabindex="-1" aria-label="登录未完成">
         <ApiErrorNotice :error="error" :title="errorTitle" :guidance="errorGuidance"><el-button v-if="!options" size="small" :loading="loading" @click="loadOptions">重新连接</el-button></ApiErrorNotice>
@@ -114,6 +129,7 @@ function updateCapsLock(event: KeyboardEvent | Event) {
         <el-alert v-if="help" id="login-password-help" class="login-help" title="请联系项目管理员重置密码。" type="info" :closable="false" show-icon />
         <el-button native-type="submit" type="primary" size="large" :loading="loginMethod === 'local'" :disabled="submitting" class="login-submit">{{ loginMethod === 'local' ? '正在登录…' : '登录' }}</el-button>
       </el-form>
+      <el-button v-if="options?.wecom_enabled" size="large" :loading="loginMethod === 'wecom'" :disabled="submitting" class="login-submit" @click="wecomLogin">使用企业微信登录</el-button>
       <el-divider v-if="options?.local_enabled && options.sso_enabled && options.login_url" class="login-alternative">或</el-divider>
       <el-button v-if="options?.sso_enabled && options.login_url" size="large" :loading="loginMethod === 'unified'" :disabled="submitting" class="login-submit" @click="unifiedLogin">{{ loginMethod === 'unified' ? '正在前往统一认证…' : '使用统一身份认证' }}</el-button>
       <el-button v-else-if="!options?.local_enabled && options?.login_url" type="primary" size="large" :loading="loginMethod === 'unified'" :disabled="submitting" class="login-submit" @click="unifiedLogin">{{ loginMethod === 'unified' ? '正在前往统一认证…' : '使用统一身份认证' }}</el-button>

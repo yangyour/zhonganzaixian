@@ -1,0 +1,39 @@
+{
+  "scope": "dot cloud isolated integration; no upstream servers or live WeCom actions",
+  "upstream": "e739027375d1e47d003285898a88123203d16c16",
+  "implementation_checkpoint": "504d57b3da29242a22e50c9fb6286ef4682a9d52",
+  "java_reactor": {
+    "tests": 3196,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 934
+  },
+  "java_note": "2262 executed; 934 environment-gated integration cases skipped. Fresh PostgreSQL and HTTP validation is separate, not claimed here. Initial default Mockito self-attach run failed at environment initialization; successful rerun used explicit installed Mockito javaagent.",
+  "java_command": "mvn -o -s /tmp/dot-tools/maven-curl-settings.xml -Dmaven.repo.local=/tmp/dot-tools/m2 -DargLine=-javaagent:/tmp/dot-tools/m2/org/mockito/mockito-core/5.17.0/mockito-core-5.17.0.jar test",
+  "python_bootstrap": {
+    "tests": 34,
+    "failures": 0
+  },
+  "node_contracts": {
+    "tests": 140,
+    "failures": 0
+  },
+  "web": {
+    "test_files": 164,
+    "tests": 2250,
+    "failures": 0,
+    "typecheck": "PASSED",
+    "production_build": "PASSED",
+    "release_policy": "PASSED"
+  },
+  "powershell_runtime": "NOT_RUN; pwsh unavailable; migration manifests independently tested by Python",
+  "preservation": {
+    "upstream_v1_v38": "BYTE_IDENTICAL",
+    "historical_approval_evidence": "BYTE_IDENTICAL",
+    "our_d11_runtime": "EXCLUDED",
+    "upstream_wecom_runtime": "UNCHANGED",
+    "old_disposable_approval_database": "REMOVED; never reused",
+    "new_v39_applied": "NOT_CLAIMED_BY_THIS_EVIDENCE"
+  },
+  "api_version": "0.59.0"
+}

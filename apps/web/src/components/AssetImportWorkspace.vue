@@ -38,13 +38,13 @@ function updateHeader(value: string | number) { selection.value.headerRow = valu
 watch(() => [open.value, contextGeneration.value, session.value], () => { if (open.value && !policy.value) void workspace.loadPolicy() }, { immediate: true })
 watch(permitted, value => { if (!value) open.value = false })
 async function mayLeave() {
-  if (hasUnresolved.value) { ElMessage.warning('来源请求结果尚未确认；请先回读或使用原请求重试，再离开资产页面。'); return false }
+  if (hasUnresolved.value) { ElMessage.warning('导入请求状态待确认，请先刷新状态或重试后再离开页面。'); return false }
   if (!unsaved.value) return true
   if (disposed || confirming) return false
   const scope = contextKey(), input = inputKey(), original = file.value
   confirming = true
   try {
-    await ElMessageBox.confirm('离开将清除本页选中的原文件、解析选择和未保存映射；已受理的服务器来源仍保留。', '尚未完成的来源输入', { type: 'warning', confirmButtonText: '舍弃本页输入并继续', cancelButtonText: '保留输入' })
+    await ElMessageBox.confirm('离开将清除当前选中的源文件、解析配置和未保存的字段映射；服务端已受理的记录仍会保留。', '尚未完成的来源输入', { type: 'warning', confirmButtonText: '舍弃并离开', cancelButtonText: '继续编辑' })
     // Approval is not cleanup: a later navigation/context guard may still refuse departure.
     return !disposed && !hasUnresolved.value && scope === contextKey() && input === inputKey() && original === file.value
   } catch { return false } finally { confirming = false }
@@ -63,39 +63,39 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
     <el-steps class="asset-import-steps" :active="stage" simple aria-label="资产来源处理阶段"><el-step title="上传源文件"/><el-step title="配置解析"/><el-step title="表头预览"/><el-step title="字段映射"/><el-step title="待策略入库"/></el-steps>
     <el-skeleton v-if="policyLoading" :rows="3" animated aria-label="读取来源技术政策" />
     <ApiErrorNotice :error="policyError"><el-button size="small" :disabled="policyLoading" @click="workspace.loadPolicy">重新读取解析规范</el-button></ApiErrorNotice>
-    <el-empty v-if="!permitted" description="当前身份没有资产来源技术处理权限" />
+    <el-empty v-if="!permitted" description="当前账号无资产批量导入权限" />
     <template v-else>
       <section class="asset-import-section">
         <h3>1. 源文件上传与受理</h3>
-        <p v-if="policy" class="field-help">支持 CSV / XLSX 格式文件：单文件大小上限 {{ (policy.max_source_bytes / 1024 / 1024).toLocaleString() }} MiB，最多支持 {{ policy.max_data_rows }} 数据行、{{ policy.max_source_columns }} 源列及 {{ policy.max_sheets }} 个工作表。</p>
+        <p v-if="policy" class="field-help tabular-nums">支持 CSV / XLSX 格式文件：单文件大小上限 {{ (policy.max_source_bytes / 1024 / 1024).toLocaleString() }} MiB，最多支持 {{ policy.max_data_rows }} 数据行、{{ policy.max_source_columns }} 源列及 {{ policy.max_sheets }} 个工作表。</p>
         <p class="field-help">上传后系统将对源文件计算 SHA-256 摘要并执行结构合法性校验。</p>
-        <input type="file" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" :disabled="!policy || Boolean(busy || uploadAttempt || source)" aria-label="选择资产导入文件" @change="chooseFile">
+        <input type="file" class="asset-import-file-input" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" :disabled="!policy || Boolean(busy || uploadAttempt || source)" aria-label="选择资产导入文件" @change="chooseFile">
         <p v-if="selectionMessage" class="import-error">{{ selectionMessage }}</p>
-        <p v-if="file" class="mono">{{ file.name }} · {{ file.size.toLocaleString() }} bytes · 格式 {{ format }}</p>
+        <p v-if="file" class="mono tabular-nums">{{ file.name }} · {{ file.size.toLocaleString() }} bytes · 格式 {{ format }}</p>
         <el-empty v-else-if="policy" :image-size="60" description="请选择待导入的 CSV 或 XLSX 文件" />
         <div class="asset-import-actions">
-          <el-button type="primary" :loading="busy === 'upload'" :disabled="!policy || !file || Boolean(busy || source) || Boolean(uploadAttempt && uploadAttempt.state !== 'UNCERTAIN')" @click="workspace.upload">{{ uploadAttempt?.state === 'UNCERTAIN' ? '原文件与原请求重试' : '上传并受理源文件' }}</el-button>
+          <el-button type="primary" :loading="busy === 'upload'" :disabled="!policy || !file || Boolean(busy || source) || Boolean(uploadAttempt && uploadAttempt.state !== 'UNCERTAIN')" @click="workspace.upload">{{ uploadAttempt?.state === 'UNCERTAIN' ? '重试上传源文件' : '上传并受理源文件' }}</el-button>
           <el-button v-if="file" :disabled="!canReset" @click="workspace.reset">重新选择文件</el-button>
         </div>
         <ApiErrorNotice :error="uploadError" />
-        <p v-if="uploadAttempt?.state === 'UNCERTAIN'" class="import-error">上传状态待确认：已锁定当前文件与请求参数，请点击“原文件与原请求重试”继续处理。</p>
-        <p v-if="uploadAttempt?.state === 'ACCEPTED'" class="field-help">源文件已受理，正在完成后台存储校验，请点击“回读操作与来源”刷新状态。</p>
+        <p v-if="uploadAttempt?.state === 'UNCERTAIN'" class="import-error">上传状态待确认：已锁定当前文件与请求参数，请点击“重试上传源文件”继续处理。</p>
+        <p v-if="uploadAttempt?.state === 'ACCEPTED'" class="field-help">源文件已受理，正在完成后台存储校验，请点击“刷新处理进度”查看状态。</p>
         <p v-if="uploadAttempt?.state === 'REJECTED' || uploadAttempt?.state === 'CONFLICT'" class="import-error">源文件上传未通过校验，请核对上方提示后点击“重新选择文件”。</p>
       </section>
 
       <section v-if="source || operation || uploadAttempt?.sourceId" class="asset-import-section">
         <h3>2. 存储状态与解析配置</h3>
-        <p v-if="source">存储状态：{{ source.storage_status }} · 解析状态：{{ source.parse_status }} · 来源版本 v{{ source.version }}</p>
+        <p v-if="source" class="tabular-nums">存储状态：{{ source.storage_status }} · 解析状态：{{ source.parse_status }} · 来源版本 v{{ source.version }}</p>
         <p v-if="source" class="mono">来源编号 {{ source.id }}<br>SHA-256 {{ source.sha256 }}</p>
         <p v-if="operation" class="field-help">{{ operation.kind }}：{{ operation.status }} / {{ operation.step }}<template v-if="operation.error"> · {{ operation.error.message }}</template></p>
-        <div class="asset-import-actions"><el-button :loading="busy === 'read'" :disabled="Boolean(busy)" @click="workspace.refresh">回读操作与来源</el-button><span v-if="hasUnresolved" class="field-help">当前存在待确认请求，请先完成核对或重试后再切换文件。</span></div>
+        <div class="asset-import-actions"><el-button :loading="busy === 'read'" :disabled="Boolean(busy)" @click="workspace.refresh">刷新处理进度</el-button><span v-if="hasUnresolved" class="field-help">当前存在待确认请求，请先完成核对或重试后再切换文件。</span></div>
         <ApiErrorNotice :error="error" />
-        <el-alert v-if="source?.storage_status === 'PENDING'" type="info" :closable="false" title="源文件正在写入受控存储，请稍后点击“回读操作与来源”刷新进度。" />
+        <el-alert v-if="source?.storage_status === 'PENDING'" type="info" :closable="false" title="源文件正在写入受控存储，请稍后点击“刷新处理进度”查看最新状态。" />
         <el-alert v-if="source?.storage_status === 'FAILED'" type="error" :closable="false" title="源文件存储失败，请查看操作详情中的错误说明。" />
         <el-alert v-if="source?.parse_status === 'FAILED'" type="error" :closable="false" title="源文件解析未通过（为保障数据准确性，包含计算公式的 XLSX 单元格将被安全拦截，请转为纯文本数值后重新上传）。" />
         <template v-if="source?.storage_status === 'READY' && !source.mapping">
           <el-button v-if="format === 'XLSX' && !artifact" :loading="busy === 'parse'" :disabled="selectionLocked" @click="workspace.parse(true)">读取工作表目录</el-button>
-          <p v-if="format === 'XLSX'" class="field-help">先读取工作表目录，再明确选择目标工作表与表头所在行。</p>
+          <p v-if="format === 'XLSX'" class="field-help">先读取工作表目录，再选择目标工作表与表头所在行。</p>
           <el-form label-position="top" class="asset-import-selection" :disabled="selectionLocked">
             <el-form-item v-if="format === 'CSV'" label="CSV 字符编码"><el-select v-model="selection.encoding" placeholder="请选择字符编码" aria-label="CSV编码"><el-option v-for="value in policy?.csv_encodings || []" :key="value" :label="value" :value="value"/></el-select></el-form-item>
             <el-form-item v-if="format === 'CSV'" label="字段分隔符"><el-select v-model="selection.delimiter" placeholder="请选择分隔符" aria-label="CSV分隔符"><el-option label="逗号 (,)" value=","/><el-option label="分号 (;)" value=";"/><el-option label="制表符 (TAB)" :value="'\t'"/></el-select></el-form-item>
@@ -103,20 +103,20 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
             <el-form-item label="表头行号（从 1 开始）"><el-input type="number" :model-value="selection.headerRow ?? ''" :min="1" :max="policy?.max_header_row" placeholder="请输入表头行号" aria-label="表头行" @update:model-value="updateHeader"/></el-form-item>
           </el-form>
           <p v-for="(message, field) in fields" :key="field" class="import-error">{{ message }}</p>
-          <el-button type="primary" :loading="busy === 'parse'" :disabled="Boolean(busy) || parseAttempt?.state === 'ACCEPTED' || parseAttempt?.state === 'CONFLICT' || source.parse_status === 'PENDING' || format === 'XLSX' && !artifact" @click="workspace.parse()">{{ parseAttempt?.state === 'UNCERTAIN' ? '原解析参数与原请求重试' : '执行文件解析' }}</el-button>
+          <el-button type="primary" :loading="busy === 'parse'" :disabled="Boolean(busy) || parseAttempt?.state === 'ACCEPTED' || parseAttempt?.state === 'CONFLICT' || source.parse_status === 'PENDING' || format === 'XLSX' && !artifact" @click="workspace.parse()">{{ parseAttempt?.state === 'UNCERTAIN' ? '重试文件解析' : '执行文件解析' }}</el-button>
           <ApiErrorNotice :error="parseError" />
-          <p v-if="parseAttempt?.state === 'UNCERTAIN'" class="import-error">解析请求状态待确认：已锁定当前解析参数与版本，请点击“原解析参数与原请求重试”。</p>
-          <p v-if="parseAttempt?.state === 'ACCEPTED'" class="field-help">解析任务已受理，请点击“回读操作与来源”获取解析结果。</p>
+          <p v-if="parseAttempt?.state === 'UNCERTAIN'" class="import-error">解析请求状态待确认：已锁定当前解析参数与版本，请点击“重试文件解析”继续处理。</p>
+          <p v-if="parseAttempt?.state === 'ACCEPTED'" class="field-help">解析任务已受理，请点击“刷新处理进度”获取解析结果。</p>
         </template>
       </section>
 
       <section v-if="conflict" class="asset-import-section">
-        <el-alert type="warning" :closable="false" title="检测到版本冲突：请先回读最新来源记录并核对请求参数差异后，再准备新请求。" />
-        <p>原请求基准版本 v{{ conflict.attempt.body.expected_version }} · 当前最新版本 v{{ source?.version }}</p>
+        <el-alert type="warning" :closable="false" title="检测到版本冲突：请先刷新最新来源记录并核对请求参数差异后，再准备新请求。" />
+        <p class="tabular-nums">请求基准版本 v{{ conflict.attempt.body.expected_version }} · 当前最新版本 v{{ source?.version }}</p>
         <p class="mono">来源编号 {{ conflict.attempt.sourceId }} · 操作编号 {{ conflict.attempt.operationId ?? '不适用' }} · 回执标识 {{ conflict.attempt.receiptId ?? '未返回' }}</p>
         <p v-if="source?.parsed_artifact" class="mono">当前解析摘要 {{ source.parsed_artifact.parse_hash }}</p>
-        <details><summary>展开查看锁定的原请求参数</summary><pre class="asset-import-request">{{ JSON.stringify(conflict.attempt.body, null, 2) }}</pre></details>
-        <div class="asset-import-actions"><el-button :disabled="Boolean(busy)" @click="workspace.refresh">回读当前版本</el-button><el-button :disabled="Boolean(busy) || !conflict.attempt.compared" @click="workspace.reviseConflict(conflict.kind)">已比较，准备新请求</el-button></div>
+        <details><summary>查看锁定的请求参数</summary><pre class="asset-import-request">{{ JSON.stringify(conflict.attempt.body, null, 2) }}</pre></details>
+        <div class="asset-import-actions"><el-button :disabled="Boolean(busy)" @click="workspace.refresh">刷新当前版本</el-button><el-button :disabled="Boolean(busy) || !conflict.attempt.compared" @click="workspace.reviseConflict(conflict.kind)">已核对差异，重新配置</el-button></div>
       </section>
 
       <section v-if="artifact" class="asset-import-section">
@@ -147,15 +147,15 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
         <el-checkbox-group v-model="mappingDraft.ignored" :disabled="mappingLocked"><el-checkbox v-for="column in artifact.columns" :key="column.index" :value="column.index" :disabled="Object.values(mappingDraft.targets).includes(column.index)">忽略源列 {{ column.index }}：{{ column.header ?? '无表头' }}</el-checkbox></el-checkbox-group>
         <p v-for="(message, field) in fields" :key="field" class="import-error">{{ message }}</p>
         <ApiErrorNotice :error="mappingError" />
-        <p v-if="mappingAttempt?.state === 'UNCERTAIN'" class="import-error">映射保存状态待确认：已锁定当前映射配置，请点击“原映射与原请求重试”。</p>
-        <p v-if="mappingAttempt?.state === 'ACCEPTED'" class="field-help">映射保存请求已受理，请点击“回读操作与来源”确认最新状态。</p>
-        <el-button type="primary" :loading="busy === 'mapping'" :disabled="Boolean(busy || source.mapping) || mappingAttempt?.state === 'ACCEPTED' || mappingAttempt?.state === 'CONFLICT'" @click="workspace.saveMapping">{{ mappingAttempt?.state === 'UNCERTAIN' ? '原映射与原请求重试' : '保存15列映射' }}</el-button>
+        <p v-if="mappingAttempt?.state === 'UNCERTAIN'" class="import-error">映射保存状态待确认：已锁定当前映射配置，请点击“重试保存映射”继续处理。</p>
+        <p v-if="mappingAttempt?.state === 'ACCEPTED'" class="field-help">映射保存请求已受理，请点击“刷新处理进度”确认最新状态。</p>
+        <el-button type="primary" :loading="busy === 'mapping'" :disabled="Boolean(busy || source.mapping) || mappingAttempt?.state === 'ACCEPTED' || mappingAttempt?.state === 'CONFLICT'" @click="workspace.saveMapping">{{ mappingAttempt?.state === 'UNCERTAIN' ? '重试保存映射' : '保存 15 列映射' }}</el-button>
         <el-alert v-if="source.mapping && mappingAttempt?.state === 'COMPLETE'" type="success" :closable="false" :title="`字段映射已保存（版本 v${source.mapping.version} · 待入库校验策略启用）`" />
         <p v-if="source.mapping" class="mono">解析摘要 {{ source.mapping.source_parse_hash }}<br>预览摘要 {{ source.mapping.preview_hash }}</p>
-        <p class="field-help">共解析出 {{ artifact.rows.length }} 行数据记录（下方展示前 10 行原始单元格解析预览）。</p>
+        <p class="field-help tabular-nums">共解析出 {{ artifact.rows.length }} 行数据记录（下方展示前 10 行原始单元格解析预览）。</p>
         <el-empty v-if="!artifact.rows.length" :image-size="60" description="解析结果中无数据行" />
         <AppTable v-else :rows="artifact.rows.slice(0, 10)" row-key="logical_record_number">
-          <el-table-column label="逻辑行 / 源行号" min-width="130"><template #default="{ row }">{{ row.logical_record_number }} / {{ row.source_row_number }}<span class="cell-sub">文件行 {{ row.physical_start_line ?? '—' }} 至 {{ row.physical_end_line ?? '—' }}</span></template></el-table-column>
+          <el-table-column label="逻辑行 / 源行号" min-width="130"><template #default="{ row }"><span class="tabular-nums">{{ row.logical_record_number }} / {{ row.source_row_number }}</span><span class="cell-sub tabular-nums">文件行 {{ row.physical_start_line ?? '—' }} 至 {{ row.physical_end_line ?? '—' }}</span></template></el-table-column>
           <el-table-column label="原始单元格内容" min-width="480"><template #default="{ row }"><span v-for="cell in row.cells" :key="cell.column_index" class="asset-import-cell"><b>列 {{ cell.column_index }}</b> [{{ cell.kind }}] 文本={{ cell.lexical === null ? '空' : cell.lexical }} · 显示={{ cell.display === null ? '空' : cell.display }}<template v-if="cell.format_code"> · 格式={{ cell.format_code }}</template></span></template></el-table-column>
         </AppTable>
       </section>
@@ -166,6 +166,6 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
 </template>
 
 <style>
-.asset-import-drawer{max-width:100vw}.asset-import-steps{margin:16px 0}.asset-import-section{margin:18px 0;padding-top:12px;border-top:1px solid #e4eaf2}.asset-import-section h3{font-size:15px;margin:0 0 10px}.asset-import-section p{overflow-wrap:anywhere}.asset-import-selection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}.asset-import-selection .el-form-item{margin-bottom:0}.asset-import-mapping-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.asset-import-map-row{display:grid;grid-template-columns:minmax(120px,1fr) minmax(170px,1.4fr);gap:8px;align-items:center;font-size:12px}.asset-import-map-row label{overflow-wrap:anywhere}.asset-import-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}.import-error{color:#9b3b1b;font-size:12px;overflow-wrap:anywhere}.asset-import-cell{display:block;margin:3px 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px}.asset-import-cell b{display:inline-block;min-width:20px}.asset-import-request{font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f7fb;padding:10px}.asset-import-drawer .el-checkbox{display:flex;margin:7px 0;white-space:normal;height:auto}.asset-import-drawer .el-checkbox__label{white-space:normal;overflow-wrap:anywhere}.asset-import-drawer .el-alert{margin:10px 0}
+.asset-import-drawer{max-width:100vw}.tabular-nums{font-variant-numeric:tabular-nums}.asset-import-steps{margin:16px 0}.asset-import-section{margin:18px 0;padding-top:14px;border-top:1px solid #e4eaf2}.asset-import-section h3{font-size:15px;margin:0 0 10px}.asset-import-section p{overflow-wrap:anywhere}.asset-import-file-input{display:block;width:100%;box-sizing:border-box;padding:10px 12px;margin:8px 0;border:1px dashed #b8c7d9;border-radius:8px;background:#f8fafc;cursor:pointer;transition:border-color .15s,background-color .15s}.asset-import-file-input:hover:not(:disabled){border-color:#2563eb;background:#f0f6ff}.asset-import-file-input:disabled{cursor:not-allowed;opacity:.65}.asset-import-selection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}.asset-import-selection .el-form-item{margin-bottom:0}.asset-import-mapping-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.asset-import-map-row{display:grid;grid-template-columns:minmax(120px,1fr) minmax(170px,1.4fr);gap:8px;align-items:center;font-size:12px;padding:8px 10px;background:#f8fafc;border:1px solid #edf2f7;border-radius:6px}.asset-import-map-row label{overflow-wrap:anywhere;font-weight:500;color:#334155}.asset-import-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}.import-error{color:#9b3b1b;font-size:12px;overflow-wrap:anywhere}.asset-import-cell{display:block;margin:3px 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px}.asset-import-cell b{display:inline-block;min-width:20px}.asset-import-request{font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f7fb;padding:10px;border-radius:6px}.asset-import-drawer .el-checkbox{display:flex;margin:7px 0;white-space:normal;height:auto}.asset-import-drawer .el-checkbox__label{white-space:normal;overflow-wrap:anywhere}.asset-import-drawer .el-alert{margin:10px 0}
 @media(max-width:760px){.asset-import-selection,.asset-import-mapping-grid{grid-template-columns:minmax(0,1fr)}.asset-import-map-row{grid-template-columns:minmax(100px,1fr) minmax(145px,1.4fr)}.asset-import-drawer .el-button{min-height:44px;height:auto;white-space:normal}.asset-import-steps{padding:10px 12px;flex-direction:column;align-items:stretch;gap:6px}.asset-import-steps .el-step.is-simple{flex:none!important;max-width:none!important;width:100%;min-height:44px}.asset-import-steps .el-step.is-simple .el-step__main{justify-content:flex-start}.asset-import-steps .el-step.is-simple .el-step__title{max-width:none;font-size:14px;line-height:1.5;word-break:normal;overflow-wrap:normal}.asset-import-steps .el-step.is-simple .el-step__arrow{display:none}.asset-import-drawer .el-checkbox{min-height:44px;align-items:center}.asset-import-drawer .el-select__wrapper{min-height:44px}}
 </style>

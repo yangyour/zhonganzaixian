@@ -4,7 +4,7 @@ import java.security.MessageDigest;
 import java.util.*;
 import static cn.mop.persistence.TestSchemaMigration.*;
 final class TicketAutoCloseSchemaVerifier {
-    static final String SCRIPT="V34__ticket_autoclose_jobs.sql";
+    static final String SCRIPT="V43__ticket_autoclose_jobs.sql";
     static final String SHA256="0b3bf01db63bcae757c4b80ba9f10979c342ae95dd339121ce91a979553e47e4";
     static void resource()throws Exception{try(var in=TicketAutoCloseSchemaVerifier.class.getResourceAsStream("/db/migration/"+SCRIPT)){if(in==null||!SHA256.equals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(in.readAllBytes()))))throw new IllegalStateException("Unreviewed auto-close migration");}}
     static void verify(Connection c)throws SQLException{

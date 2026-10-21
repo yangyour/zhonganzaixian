@@ -1,0 +1,7 @@
+{
+  "closed_loopback_ports": {
+    "25433": 111,
+    "28081": 111
+  },
+  "remaining_temporary_database_or_classpath_directories": []
+}

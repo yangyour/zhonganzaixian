@@ -1,0 +1,1375 @@
+{
+  "fixture_kind" : "SYNTHETIC_PRODUCTION_CONTROLLER_JSON",
+  "database_evidence" : false,
+  "query" : "合成 Ä%_' ",
+  "exchanges" : [ {
+    "name" : "role_msp",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "AVAILABLE",
+          "limit" : 4,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000100",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_0",
+            "rule_name" : "合成 Ä%_' 规则 0",
+            "version" : 1,
+            "severity" : "INFO",
+            "monitor_state" : "PROBLEM",
+            "handling_state" : "NEW",
+            "occurrence_count" : 1,
+            "last_occurred_at" : "2026-10-19T11:00:00.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "rule_name", "rule_code" ],
+          "reason" : null
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "role_padmin",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "AVAILABLE",
+          "limit" : 4,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000100",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_0",
+            "rule_name" : "合成 Ä%_' 规则 0",
+            "version" : 1,
+            "severity" : "INFO",
+            "monitor_state" : "PROBLEM",
+            "handling_state" : "NEW",
+            "occurrence_count" : 1,
+            "last_occurred_at" : "2026-10-19T11:00:00.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "rule_name", "rule_code" ],
+          "reason" : null
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "role_viewer",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED_AND_EVENT_NOT_AUTHORIZED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "NOT_AUTHORIZED",
+          "limit" : 4,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "INTERNAL_EVENT_READ_REQUIRED"
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "OWN_REPORT_REGISTRATIONS",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "role_tadmin",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED_AND_EVENT_NOT_AUTHORIZED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "NOT_AUTHORIZED",
+          "limit" : 4,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "INTERNAL_EVENT_READ_REQUIRED"
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "OWN_REPORT_REGISTRATIONS",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "events_0",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "AVAILABLE",
+          "limit" : 4,
+          "returned" : 0,
+          "has_more" : false,
+          "items" : [ ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "rule_name", "rule_code" ],
+          "reason" : null
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "events_1",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "AVAILABLE",
+          "limit" : 4,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000100",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_0",
+            "rule_name" : "合成 Ä%_' 规则 0",
+            "version" : 1,
+            "severity" : "INFO",
+            "monitor_state" : "PROBLEM",
+            "handling_state" : "NEW",
+            "occurrence_count" : 1,
+            "last_occurred_at" : "2026-10-19T11:00:00.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "rule_name", "rule_code" ],
+          "reason" : null
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "events_4",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "AVAILABLE",
+          "limit" : 4,
+          "returned" : 4,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000100",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_0",
+            "rule_name" : "合成 Ä%_' 规则 0",
+            "version" : 1,
+            "severity" : "INFO",
+            "monitor_state" : "PROBLEM",
+            "handling_state" : "NEW",
+            "occurrence_count" : 1,
+            "last_occurred_at" : "2026-10-19T11:00:00.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          }, {
+            "id" : "65000000-0000-4000-8000-000000000101",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_1",
+            "rule_name" : "合成 Ä%_' 规则 1",
+            "version" : 2,
+            "severity" : "WARNING",
+            "monitor_state" : "RECOVERED",
+            "handling_state" : "ACKNOWLEDGED",
+            "occurrence_count" : 2,
+            "last_occurred_at" : "2026-10-19T10:59:59.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          }, {
+            "id" : "65000000-0000-4000-8000-000000000102",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_2",
+            "rule_name" : "合成 Ä%_' 规则 2",
+            "version" : 3,
+            "severity" : "AVERAGE",
+            "monitor_state" : "PROBLEM",
+            "handling_state" : "IN_PROGRESS",
+            "occurrence_count" : 3,
+            "last_occurred_at" : "2026-10-19T10:59:58.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          }, {
+            "id" : "65000000-0000-4000-8000-000000000103",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_3",
+            "rule_name" : "合成 Ä%_' 规则 3",
+            "version" : 4,
+            "severity" : "HIGH",
+            "monitor_state" : "RECOVERED",
+            "handling_state" : "PENDING_REVIEW",
+            "occurrence_count" : 4,
+            "last_occurred_at" : "2026-10-19T10:59:57.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "rule_name", "rule_code" ],
+          "reason" : null
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "events_overflow",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "AVAILABLE",
+          "limit" : 4,
+          "returned" : 4,
+          "has_more" : true,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000100",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_0",
+            "rule_name" : "合成 Ä%_' 规则 0",
+            "version" : 1,
+            "severity" : "INFO",
+            "monitor_state" : "PROBLEM",
+            "handling_state" : "NEW",
+            "occurrence_count" : 1,
+            "last_occurred_at" : "2026-10-19T11:00:00.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          }, {
+            "id" : "65000000-0000-4000-8000-000000000101",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_1",
+            "rule_name" : "合成 Ä%_' 规则 1",
+            "version" : 2,
+            "severity" : "WARNING",
+            "monitor_state" : "RECOVERED",
+            "handling_state" : "ACKNOWLEDGED",
+            "occurrence_count" : 2,
+            "last_occurred_at" : "2026-10-19T10:59:59.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          }, {
+            "id" : "65000000-0000-4000-8000-000000000102",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_2",
+            "rule_name" : "合成 Ä%_' 规则 2",
+            "version" : 3,
+            "severity" : "AVERAGE",
+            "monitor_state" : "PROBLEM",
+            "handling_state" : "IN_PROGRESS",
+            "occurrence_count" : 3,
+            "last_occurred_at" : "2026-10-19T10:59:58.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          }, {
+            "id" : "65000000-0000-4000-8000-000000000103",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_3",
+            "rule_name" : "合成 Ä%_' 规则 3",
+            "version" : 4,
+            "severity" : "HIGH",
+            "monitor_state" : "RECOVERED",
+            "handling_state" : "PENDING_REVIEW",
+            "occurrence_count" : 4,
+            "last_occurred_at" : "2026-10-19T10:59:57.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "rule_name", "rule_code" ],
+          "reason" : null
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "stored_rule_control_text",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "Link",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 0,
+          "has_more" : false,
+          "items" : [ ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "AVAILABLE",
+          "limit" : 4,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000160",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "LINK\tRULE",
+            "rule_name" : "Link\nDown",
+            "version" : 1,
+            "severity" : "WARNING",
+            "monitor_state" : "PROBLEM",
+            "handling_state" : "NEW",
+            "occurrence_count" : 1,
+            "last_occurred_at" : "2026-10-19T11:00:00.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "rule_name", "rule_code" ],
+          "reason" : null
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 0,
+          "has_more" : false,
+          "items" : [ ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "state_new",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "AVAILABLE",
+          "limit" : 4,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000100",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_0",
+            "rule_name" : "合成 Ä%_' 规则 0",
+            "version" : 1,
+            "severity" : "INFO",
+            "monitor_state" : "PROBLEM",
+            "handling_state" : "NEW",
+            "occurrence_count" : 1,
+            "last_occurred_at" : "2026-10-19T11:00:00.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "rule_name", "rule_code" ],
+          "reason" : null
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "state_acknowledged",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "AVAILABLE",
+          "limit" : 4,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000101",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_1",
+            "rule_name" : "合成 Ä%_' 规则 1",
+            "version" : 2,
+            "severity" : "WARNING",
+            "monitor_state" : "RECOVERED",
+            "handling_state" : "ACKNOWLEDGED",
+            "occurrence_count" : 2,
+            "last_occurred_at" : "2026-10-19T10:59:59.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "rule_name", "rule_code" ],
+          "reason" : null
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "state_in_progress",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "AVAILABLE",
+          "limit" : 4,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000102",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_2",
+            "rule_name" : "合成 Ä%_' 规则 2",
+            "version" : 3,
+            "severity" : "AVERAGE",
+            "monitor_state" : "PROBLEM",
+            "handling_state" : "IN_PROGRESS",
+            "occurrence_count" : 3,
+            "last_occurred_at" : "2026-10-19T10:59:58.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "rule_name", "rule_code" ],
+          "reason" : null
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "state_pending_review",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "AVAILABLE",
+          "limit" : 4,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000103",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_3",
+            "rule_name" : "合成 Ä%_' 规则 3",
+            "version" : 4,
+            "severity" : "HIGH",
+            "monitor_state" : "RECOVERED",
+            "handling_state" : "PENDING_REVIEW",
+            "occurrence_count" : 4,
+            "last_occurred_at" : "2026-10-19T10:59:57.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "rule_name", "rule_code" ],
+          "reason" : null
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "state_resolved",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "AVAILABLE",
+          "limit" : 4,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000104",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_4",
+            "rule_name" : "合成 Ä%_' 规则 4",
+            "version" : 5,
+            "severity" : "DISASTER",
+            "monitor_state" : "PROBLEM",
+            "handling_state" : "RESOLVED",
+            "occurrence_count" : 5,
+            "last_occurred_at" : "2026-10-19T10:59:56.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "rule_name", "rule_code" ],
+          "reason" : null
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  }, {
+    "name" : "state_closed",
+    "method" : "GET",
+    "path" : "/api/v1/search",
+    "response_schema" : "GroupedSearchResult",
+    "response" : {
+      "trace_id" : "65000000-0000-4000-8000-000000000003",
+      "data" : {
+        "query" : "合成 Ä%_' ",
+        "tenant_id" : "65000000-0000-4000-8000-000000000001",
+        "observed_at" : "2026-10-19T11:00:00.123Z",
+        "scope" : "CURRENT_TENANT_AUTHORIZED_GROUPED_SEARCH",
+        "coverage" : "PARTIAL",
+        "coverage_reason" : "AUTOMATION_SOURCE_NOT_IMPLEMENTED",
+        "query_semantics" : "LITERAL_UNICODE_CASE_INSENSITIVE",
+        "snapshot_consistency" : "ONE_READONLY_TRANSACTION",
+        "source" : "postgresql_supported_groups",
+        "notification_bell_status" : "NOT_IMPLEMENTED",
+        "groups" : [ {
+          "kind" : "assets",
+          "status" : "AVAILABLE",
+          "limit" : 5,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000010",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "name" : "合成资产",
+            "type" : "router",
+            "record_source" : "manual",
+            "version" : 1,
+            "resource_kind" : "ASSET_RECORD"
+          } ],
+          "source_scope" : "CURRENT_TENANT",
+          "matched_fields" : [ "name" ],
+          "reason" : null
+        }, {
+          "kind" : "events",
+          "status" : "AVAILABLE",
+          "limit" : 4,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000105",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "rule_code" : "SYNTHETIC_5",
+            "rule_name" : "合成 Ä%_' 规则 5",
+            "version" : 6,
+            "severity" : "INFO",
+            "monitor_state" : "RECOVERED",
+            "handling_state" : "CLOSED",
+            "occurrence_count" : 6,
+            "last_occurred_at" : "2026-10-19T10:59:55.123Z",
+            "resource_kind" : "MONITORING_EVENT"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "rule_name", "rule_code" ],
+          "reason" : null
+        }, {
+          "kind" : "tickets",
+          "status" : "AVAILABLE",
+          "limit" : 3,
+          "returned" : 1,
+          "has_more" : false,
+          "items" : [ {
+            "id" : "65000000-0000-4000-8000-000000000011",
+            "tenant_id" : "65000000-0000-4000-8000-000000000001",
+            "title" : "合成报障登记",
+            "receipt_no" : "SYNTHETIC-RECEIPT",
+            "record_source" : "customer_report",
+            "registration_status" : "REGISTERED",
+            "version" : 1,
+            "resource_kind" : "CUSTOMER_REPORT_REGISTRATION"
+          } ],
+          "source_scope" : "CURRENT_TENANT_INTERNAL",
+          "matched_fields" : [ "title", "receipt_no" ],
+          "reason" : null
+        }, {
+          "kind" : "automation_scripts",
+          "status" : "NOT_IMPLEMENTED",
+          "limit" : 3,
+          "returned" : null,
+          "has_more" : null,
+          "items" : null,
+          "source_scope" : null,
+          "matched_fields" : null,
+          "reason" : "SOURCE_NOT_IMPLEMENTED"
+        } ]
+      }
+    }
+  } ]
+}

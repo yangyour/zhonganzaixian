@@ -1,0 +1,19 @@
+{
+  "implementation_checkpoint": "191c7f0",
+  "api_version": "0.62.0",
+  "scope": "Own-cloud event-center frontend and contract alignment; unchanged production backend and SQL",
+  "java": {"discovered": 3388, "passed": 2432, "skipped": 956, "failures": 0, "errors": 0, "verify_and_package": "PASSED"},
+  "new_mock_mvc_checks": 103,
+  "controller_fixture_exchanges": 18,
+  "fixture_sha256": "0bf5d18782322ba5ace664e5520587e494a5d305ac4e309f53d703be71e09104",
+  "web": {"files": 169, "passed": 2382, "focused_event_center": 84, "typecheck": "PASSED", "build": "PASSED", "release_policy": "PASSED"},
+  "contract_email_tests": 147,
+  "contract_generation_check": "PASSED",
+  "powershell_migration_policy_checks": 262,
+  "database_operations": 0,
+  "production_java_and_v1_v41": "UNCHANGED",
+  "browser_visual": "NOT_RUN",
+  "live_database_or_provider_integration": "NOT_RUN_FOR_THIS_SLICE",
+  "deployment": "NOT_RUN",
+  "remaining_product_gaps": ["maintenance creation controls", "event detail noise-record rendering"]
+}

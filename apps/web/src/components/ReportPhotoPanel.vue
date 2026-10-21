@@ -27,7 +27,7 @@ function select(event: Event) {
 <template>
   <section class="report-photo-panel" aria-label="报障照片">
     <h3>现场照片附件 <small>{{ existing.length + unboundCount }} / 3</small></h3>
-    <p class="field-help">支持 JPEG / PNG 格式，单张上限 5 MB（5,000,000 字节），最多关联 3 张现场原图照片。可先提交故障申报，后续再补充上传照片。</p>
+    <p class="field-help">支持 JPEG / PNG 格式，单张不超过 5 MB（5,000,000 字节），最多可上传 3 张现场照片。支持先提交工单再补充上传照片。</p>
     <ApiErrorNotice :error="queue.policyError.value"><el-button size="small" :loading="queue.policyLoading.value" @click="queue.loadPolicy">重新加载上传配置</el-button></ApiErrorNotice>
     <p v-if="selectionMessage" class="photo-input-error" role="alert">{{ selectionMessage }}</p>
     <div v-if="selectable" class="photo-select-actions">
@@ -48,9 +48,9 @@ function select(event: Event) {
       <div class="photo-row-actions">
         <el-button v-if="!row.operationId" :loading="row.uploading" :disabled="disabled || appender?.busy.value || appender?.uncertain.value" @click="queue.upload(row.uid)">{{ row.status === 'UNCERTAIN' ? '重试上传' : '上传原图' }}</el-button>
         <el-button v-else :loading="row.reading" :disabled="disabled" @click="queue.refresh(row.uid)">刷新上传状态</el-button>
-        <el-button :disabled="disabled || !queue.canRemove(row.uid) || appender?.busy.value || appender?.uncertain.value" @click="queue.remove(row.uid)">移除本地选择</el-button>
+        <el-button :disabled="disabled || !queue.canRemove(row.uid) || appender?.busy.value || appender?.uncertain.value" @click="queue.remove(row.uid)">移除照片</el-button>
       </div>
-      <p v-if="!queue.canRemove(row.uid) && !row.uploading && !row.reading" class="field-help">{{ row.status === 'UNCERTAIN' ? '提交结果待确认：系统已锁定当前文件与请求参数，请点击“重试上传”确认结果后再移除。' : '图片已受理，请先刷新至上传完成或处理失败，再移除本地选择。' }}</p>
+      <p v-if="!queue.canRemove(row.uid) && !row.uploading && !row.reading" class="field-help">{{ row.status === 'UNCERTAIN' ? '提交结果待确认：系统已锁定当前文件与请求参数，请点击“重试上传”确认结果后再移除。' : '照片正在处理中，请先刷新上传状态确认结果后再移除。' }}</p>
       <ApiErrorNotice :error="row.error" pending-message="原文件仍保留在本页面；已受理图片可点击刷新上传状态核对进度。" />
     </div>
     <template v-if="appender && appender.permitted.value">
@@ -68,20 +68,22 @@ function select(event: Event) {
 .report-photo-panel h3{font-size:15px}
 .report-photo-panel h3 small{font-weight:400;color:#61718a}
 .photo-select-actions,.photo-row-actions,.photo-append-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.photo-file-label{position:relative;display:inline-flex;align-items:center;padding:8px 15px;min-height:36px;box-sizing:border-box;border:1px solid #cdd9e8;border-radius:4px;font-size:13px;cursor:pointer;color:#23436a}
+.photo-file-label{position:relative;display:inline-flex;align-items:center;padding:8px 15px;min-height:36px;box-sizing:border-box;border:1px solid #cdd9e8;border-radius:4px;background:#fff;font-size:13px;cursor:pointer;color:#23436a;transition:background-color .15s,border-color .15s,color .15s}
+.photo-file-label:not(.is-disabled):hover{background:#f3f8ff;border-color:#9ec2f6;color:#1d4ed8}
 .photo-file-label input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
 .photo-file-label:focus-within{outline:2px solid #409eff;outline-offset:2px}
 .photo-file-label.is-disabled{opacity:.55;cursor:default}
-.photo-row{margin-top:14px;padding:12px;border:1px solid #e4eaf2;border-radius:5px;display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px}
+.photo-row{margin-top:14px;padding:12px;border:1px solid #e4eaf2;border-radius:6px;background:#fafbfd;display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px}
 .photo-row-summary{min-width:0;overflow-wrap:anywhere;font-size:12px}
 .photo-row-summary strong,.photo-row-summary span{display:block}
 .photo-row-summary span{margin-top:6px;color:#61718a}
 .photo-row-summary p{margin:6px 0}
-.photo-local-preview{width:72px;height:72px;object-fit:cover;border-radius:4px}
+.photo-local-preview{width:72px;height:72px;object-fit:cover;border-radius:4px;border:1px solid #e4eaf2}
 .photo-row-actions,.photo-row :deep(.api-error),.photo-original-preview{grid-column:1/-1}
 .photo-existing-row{grid-template-columns:minmax(0,1fr)}
-.photo-original-preview{width:100%;max-height:420px;object-fit:contain;background:#f4f7fb}
-.photo-download{font-size:13px}
+.photo-original-preview{width:100%;max-height:420px;object-fit:contain;background:#f4f7fb;border-radius:4px}
+.photo-download{font-size:13px;color:#2563eb;text-decoration:none;padding:4px 8px;border-radius:4px}
+.photo-download:hover{background:#eef5ff;text-decoration:underline}
 .photo-input-error{font-size:12px;color:#9b3b1b;overflow-wrap:anywhere}
 .photo-append-actions{margin-top:12px}
 .report-photo-panel :deep(.el-button+.el-button){margin-left:0}

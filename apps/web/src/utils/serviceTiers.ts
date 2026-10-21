@@ -1,0 +1,205 @@
+import {ApiError,type RequestOptions} from '../api/client'
+import {createRequestId} from './browserCrypto'
+import {exportExact,exportInteger,exportTime,exportUuid} from './assetExportJobs'
+import {writeFailureUncertain} from './writeFailure'
+
+/** Tenant service tier snapshot, append-only change ledger, and ticket SLA clock inspection (D16 / V35). */
+export type ServiceTierCode='BASIC'|'STANDARD'|'ADVANCED'
+export type EffectiveMode='IMMEDIATE'|'NEXT_MONTH_FIRST_DAY'
+export type BillingCycle='MONTHLY'|'QUARTERLY'|'YEARLY'
+export interface ServiceTierSnapshot {
+ tenant_id:string;version:number;tier:ServiceTierCode;availability_target:number|null;
+ contract_device_count:number|null;billing_cycle:BillingCycle|null;monthly_fee_fen:number|null;
+ effective_mode:EffectiveMode;effective_from:string;updated_by:string;updated_at:string;
+ customer_approval_status:'UNVERIFIED'
+}
+export interface ServiceTierChange {
+ id:string;tenant_id:string;version:number;previous_version:number|null;
+ from_tier:ServiceTierCode|null;to_tier:ServiceTierCode;availability_target:number|null;
+ contract_device_count:number|null;billing_cycle:BillingCycle|null;monthly_fee_fen:number|null;
+ effective_mode:EffectiveMode;effective_from:string;reason:string;approved_by:string;changed_at:string;
+ customer_approval_status:'UNVERIFIED'
+}
+export interface ServiceTierPage {
+ tenant_id:string;current:ServiceTierSnapshot|null;items:ServiceTierChange[];
+ has_more:boolean;next_before_version:number|null;observed_at:string;
+ customer_approval_status:'UNVERIFIED';in_flight_ticket_retroactive:false;source:'postgresql'
+}
+export interface ServiceTierChangeInput {
+ to_tier:ServiceTierCode;effective_mode:EffectiveMode;
+ contract_device_count:number|null;billing_cycle:BillingCycle|null;monthly_fee_fen:number|null;reason:string
+}
+export interface TicketSlaClockStatus {
+ name:'RESPONSE'|'RECOVERY';due_at:string|null;completed_at:string|null;
+ paused:boolean;breached:boolean|null;
+ status:'PENDING_CONFIG'|'RUNNING'|'PAUSED_FOR_CUSTOMER_CONFIRM'|'MET'|'BREACHED'|'CANCELLED';
+ missing_reason:string|null;
+ thresholds:{p50_at:string|null;p80_at:string|null;p100_at:string|null};
+ working_windows_count:number
+}
+export interface TicketSlaInspection {
+ ticket_id:string;tenant_id:string;receipt_no:string;registration_created_at:string;
+ workflow_version:number;state:string|null;priority:'P1'|'P2'|'P3'|null;
+ frozen_service_tier:ServiceTierCode|null;current_tenant_service_tier:ServiceTierCode|null;
+ tier_changed_since_open:boolean;
+ response_clock:TicketSlaClockStatus|null;recovery_clock:TicketSlaClockStatus|null;
+ clock_tasks:{clock_key:string;kind:string;due_at:string;outcome:string|null;completed_at:string|null}[];
+ sla_missing:Record<string,string>;sla_references:unknown[];
+ reopen_count:number;reopen_policy_status:'NOT_REOPENED'|'PENDING_Q27';
+ metric_version:'SLA_CLOCK_V2';observed_at:string;source:'postgresql'
+}
+export interface ServiceTierContext {tenantId:string;actorId:string;permissionVersion:number;canWrite:boolean}
+type Attempt={key:string;body:ServiceTierChangeInput&{expected_version:number}}
+export interface ServiceTierState {
+ page:ServiceTierPage|null;busy:'read'|'write'|null;error:unknown;attempt:Attempt|null;
+ slaInspection:TicketSlaInspection|null;slaBusy:boolean;slaError:unknown
+}
+export const emptyServiceTierState=():ServiceTierState=>({
+ page:null,busy:null,error:null,attempt:null,slaInspection:null,slaBusy:false,slaError:null
+})
+export const TIER_PAGE_SIZE=25
+export const tierLabels:Record<ServiceTierCode,string>={BASIC:'基础版（5×8 工作日历）',STANDARD:'标准版（7×24 全天）',ADVANCED:'高级版（7×24 高优保障）'}
+export const effectiveModeLabels:Record<EffectiveMode,string>={IMMEDIATE:'立即生效',NEXT_MONTH_FIRST_DAY:'次月 1 日 00:00 生效'}
+export const billingCycleLabels:Record<BillingCycle,string>={MONTHLY:'按月',QUARTERLY:'按季',YEARLY:'按年'}
+export const clockStatusLabels:Record<TicketSlaClockStatus['status'],string>={
+ PENDING_CONFIG:'待配置（规则未发布）',RUNNING:'计时中',PAUSED_FOR_CUSTOMER_CONFIRM:'已暂停（待客户确认）',
+ MET:'已达标',BREACHED:'已超时违规',CANCELLED:'已撤销'
+}
+
+const invalid=()=>new ApiError(0,'INVALID_SERVICE_TIER_PAYLOAD','服务档位或SLA时钟数据未通过完整性校验，请刷新核对','—')
+const isTier=(v:unknown):v is ServiceTierCode=>v==='BASIC'||v==='STANDARD'||v==='ADVANCED'
+const isMode=(v:unknown):v is EffectiveMode=>v==='IMMEDIATE'||v==='NEXT_MONTH_FIRST_DAY'
+const isCycle=(v:unknown):v is BillingCycle=>v==='MONTHLY'||v==='QUARTERLY'||v==='YEARLY'
+const validTarget=(v:unknown)=>v===null||typeof v==='number'&&Number.isFinite(v)&&v>0&&v<=100
+const validContext=(c:ServiceTierContext|null):c is ServiceTierContext=>
+ Boolean(c&&exportUuid(c.tenantId)&&exportUuid(c.actorId)&&exportInteger(c.permissionVersion,1)&&typeof c.canWrite==='boolean')
+
+export function readServiceTierSnapshot(raw:unknown,tenantId:string):ServiceTierSnapshot{
+ if(!exportExact(raw,['tenant_id','version','tier','availability_target','contract_device_count','billing_cycle','monthly_fee_fen','effective_mode','effective_from','updated_by','updated_at','customer_approval_status']))throw invalid()
+ if(raw.tenant_id!==tenantId||!exportInteger(raw.version,1)||!isTier(raw.tier)||!validTarget(raw.availability_target))throw invalid()
+ if(!(raw.contract_device_count===null||exportInteger(raw.contract_device_count,0,1000000)))throw invalid()
+ if(!(raw.billing_cycle===null||isCycle(raw.billing_cycle))||!(raw.monthly_fee_fen===null||exportInteger(raw.monthly_fee_fen,0)))throw invalid()
+ if(!isMode(raw.effective_mode)||!exportUuid(raw.updated_by)||raw.customer_approval_status!=='UNVERIFIED')throw invalid()
+ exportTime(raw.effective_from);exportTime(raw.updated_at)
+ return structuredClone(raw) as unknown as ServiceTierSnapshot
+}
+
+export function readServiceTierPage(value:unknown,scope:ServiceTierContext,beforeVersion?:number):ServiceTierPage{
+ if(!validContext(scope)||!exportExact(value,['tenant_id','current','items','has_more','next_before_version','observed_at','customer_approval_status','in_flight_ticket_retroactive','source']))throw invalid()
+ if(value.tenant_id!==scope.tenantId||!Array.isArray(value.items)||value.items.length>TIER_PAGE_SIZE||typeof value.has_more!=='boolean'||value.customer_approval_status!=='UNVERIFIED'||value.in_flight_ticket_retroactive!==false||value.source!=='postgresql')throw invalid()
+ exportTime(value.observed_at)
+ const current=value.current===null?null:readServiceTierSnapshot(value.current,scope.tenantId)
+ let prevVersion=beforeVersion
+ const seen=new Set<string>()
+ for(const item of value.items){
+  if(!exportExact(item,['id','tenant_id','version','previous_version','from_tier','to_tier','availability_target','contract_device_count','billing_cycle','monthly_fee_fen','effective_mode','effective_from','reason','approved_by','changed_at','customer_approval_status']))throw invalid()
+  if(!exportUuid(item.id)||seen.has(item.id)||item.tenant_id!==scope.tenantId||!exportInteger(item.version,1))throw invalid()
+  if(item.version===1&&(item.previous_version!==null||item.from_tier!==null))throw invalid()
+  if(item.version>1&&(item.previous_version!==item.version-1||!isTier(item.from_tier)))throw invalid()
+  if(!isTier(item.to_tier)||!validTarget(item.availability_target)||!(item.contract_device_count===null||exportInteger(item.contract_device_count,0,1000000)))throw invalid()
+  if(!(item.billing_cycle===null||isCycle(item.billing_cycle))||!(item.monthly_fee_fen===null||exportInteger(item.monthly_fee_fen,0)))throw invalid()
+  if(!isMode(item.effective_mode)||typeof item.reason!=='string'||!item.reason.trim()||[...item.reason].length>1000||!exportUuid(item.approved_by)||item.customer_approval_status!=='UNVERIFIED')throw invalid()
+  exportTime(item.effective_from);exportTime(item.changed_at)
+  if(prevVersion!==undefined&&item.version>=prevVersion)throw invalid()
+  prevVersion=item.version;seen.add(item.id)
+ }
+ if(value.has_more){
+  const last=value.items.at(-1)
+  if(value.items.length!==TIER_PAGE_SIZE||!last||value.next_before_version!==last.version)throw invalid()
+ }else if(value.next_before_version!==null)throw invalid()
+ if(current===null&&value.items.length>0)throw invalid()
+ return {
+  ...(structuredClone(value) as unknown as ServiceTierPage),
+  current
+ }
+}
+
+function readClock(raw:unknown,expectedName:'RESPONSE'|'RECOVERY'):TicketSlaClockStatus{
+ if(!exportExact(raw,['name','due_at','completed_at','paused','breached','status','missing_reason','thresholds','working_windows_count']))throw invalid()
+ if(raw.name!==expectedName||typeof raw.paused!=='boolean'||(raw.breached!==null&&typeof raw.breached!=='boolean')||!['PENDING_CONFIG','RUNNING','PAUSED_FOR_CUSTOMER_CONFIRM','MET','BREACHED','CANCELLED'].includes(raw.status as string))throw invalid()
+ if(!(raw.due_at===null||exportTime(raw.due_at)>=0)||!(raw.completed_at===null||exportTime(raw.completed_at)>=0)||!(raw.missing_reason===null||typeof raw.missing_reason==='string'))throw invalid()
+ if(!exportExact(raw.thresholds,['p50_at','p80_at','p100_at'])||!exportInteger(raw.working_windows_count,0,1000))throw invalid()
+ for(const k of ['p50_at','p80_at','p100_at'] as const){const v=raw.thresholds[k];if(!(v===null||exportTime(v)>=0))throw invalid()}
+ return structuredClone(raw) as unknown as TicketSlaClockStatus
+}
+
+export function readTicketSlaInspection(value:unknown,scope:ServiceTierContext,expectedTicketId:string):TicketSlaInspection{
+ if(!validContext(scope)||!exportExact(value,['ticket_id','tenant_id','receipt_no','registration_created_at','workflow_version','state','priority','frozen_service_tier','current_tenant_service_tier','tier_changed_since_open','response_clock','recovery_clock','clock_tasks','sla_missing','sla_references','reopen_count','reopen_policy_status','metric_version','observed_at','source']))throw invalid()
+ if(value.ticket_id!==expectedTicketId||value.tenant_id!==scope.tenantId||typeof value.receipt_no!=='string'||!value.receipt_no.trim()||!exportInteger(value.workflow_version,0)||typeof value.tier_changed_since_open!=='boolean'||!exportInteger(value.reopen_count,0)||!['NOT_REOPENED','PENDING_Q27'].includes(value.reopen_policy_status as string)||value.metric_version!=='SLA_CLOCK_V2'||value.source!=='postgresql')throw invalid()
+ exportTime(value.registration_created_at);exportTime(value.observed_at)
+ if(value.workflow_version===0){
+  if(value.frozen_service_tier!==null||value.response_clock!==null||value.recovery_clock!==null||value.tier_changed_since_open!==false)throw invalid()
+ }else{
+  if(!isTier(value.frozen_service_tier)||value.response_clock===null||value.recovery_clock===null)throw invalid()
+  readClock(value.response_clock,'RESPONSE');readClock(value.recovery_clock,'RECOVERY')
+  const expectedChanged=value.current_tenant_service_tier!==null&&value.current_tenant_service_tier!==value.frozen_service_tier
+  if(value.tier_changed_since_open!==expectedChanged)throw invalid()
+ }
+ if((value.reopen_count>0)!==(value.reopen_policy_status==='PENDING_Q27'))throw invalid()
+ return structuredClone(value) as unknown as TicketSlaInspection
+}
+
+export function createServiceTierWorkspace(client:{request<T>(path:string,options?:RequestOptions):Promise<T>},changed:(s:ServiceTierState)=>void,newKey=createRequestId){
+ let state=emptyServiceTierState(),context:ServiceTierContext|null=null,epoch=0,slaEpoch=0,abort:AbortController|null=null,disposed=false
+ const snapshot=()=>({...structuredClone({...state,error:null,slaError:null}),error:state.error,slaError:state.slaError}),emit=()=>changed(snapshot())
+ function reset(next:ServiceTierContext|null){epoch++;slaEpoch++;abort?.abort();abort=null;context=!disposed&&validContext(next)?{...next}:null;state=emptyServiceTierState();emit()}
+ async function load(next=false){
+  if(disposed||!context||state.busy||state.attempt)return false
+  const before=next&&state.page?.has_more?state.page.next_before_version??undefined:undefined
+  if(next&&before===undefined)return false
+  const turn=++epoch,scope={...context},controller=new AbortController();abort=controller
+  state={...state,page:null,busy:'read',error:null};emit()
+  try{
+   const q=new URLSearchParams({page_size:String(TIER_PAGE_SIZE)});if(before!==undefined)q.set('before_version',String(before))
+   const raw=await client.request<unknown>('/service-tiers?'+q,{signal:controller.signal})
+   if(disposed||turn!==epoch||controller.signal.aborted)return false
+   state.page=readServiceTierPage(raw,scope,before);return true
+  }catch(error){if(!disposed&&turn===epoch)state.error=error;return false}finally{if(!disposed&&turn===epoch){state.busy=null;abort=null;emit()}}
+ }
+ async function send(attempt:Attempt,retry=false){
+  if(disposed||!context?.canWrite||state.busy)return false
+  const turn=++epoch,scope={...context},controller=new AbortController();abort=controller
+  state={...state,busy:'write',error:null,attempt:structuredClone(attempt)};emit()
+  try{
+   const raw=await client.request<unknown>('/service-tiers/changes',{method:'POST',body:structuredClone(attempt.body),idempotencyKey:attempt.key,signal:controller.signal})
+   if(disposed||turn!==epoch||controller.signal.aborted)return false
+   const updated=readServiceTierSnapshot(raw,scope.tenantId)
+   if(updated.version!==attempt.body.expected_version+1)throw invalid()
+   state.attempt=null;state.busy=null;abort=null;emit()
+   await load(false)
+   return true
+  }catch(error){
+   if(!disposed&&turn===epoch){state.error=error;if(!writeFailureUncertain(retry,error))state.attempt=null}
+   return false
+  }finally{if(!disposed&&turn===epoch){state.busy=null;abort=null;emit()}}
+ }
+ function submitChange(input:ServiceTierChangeInput){
+  if(disposed||!context?.canWrite||state.busy||state.attempt||!state.page)return Promise.resolve(false)
+  const expected=state.page.current?.version??0
+  const reason=input.reason.trim()
+  if(!isTier(input.to_tier)||!isMode(input.effective_mode)||!reason||[...reason].length>1000)return Promise.resolve(false)
+  try{
+   const key=newKey();if(!/^[A-Za-z0-9._:-]{1,128}$/.test(key))throw invalid()
+   return send({key,body:{...structuredClone(input),reason,expected_version:expected}})
+  }catch(error){state.error=error;emit();return Promise.resolve(false)}
+ }
+ async function inspectTicketSla(ticketId:string){
+  const trimmed=ticketId.trim()
+  if(disposed||!context||state.slaBusy||!exportUuid(trimmed))return false
+  const turn=++slaEpoch,scope={...context}
+  state={...state,slaBusy:true,slaError:null,slaInspection:null};emit()
+  try{
+   const raw=await client.request<unknown>(`/tickets/${trimmed}/workflow/sla`)
+   if(disposed||turn!==slaEpoch)return false
+   state.slaInspection=readTicketSlaInspection(raw,scope,trimmed);return true
+  }catch(error){if(!disposed&&turn===slaEpoch)state.slaError=error;return false}finally{if(!disposed&&turn===slaEpoch){state.slaBusy=false;emit()}}
+ }
+ emit()
+ return{
+  reset,load,submitChange,inspectTicketSla,
+  retry:()=>state.attempt?send(structuredClone(state.attempt),true):Promise.resolve(false),
+  unresolved:()=>state.attempt!==null,
+  state:snapshot,
+  dispose:()=>{disposed=true;reset(null)}
+ }
+}

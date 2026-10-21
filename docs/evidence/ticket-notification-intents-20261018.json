@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-18",
+  "environment": "designated_remote_test_over_project_ssh_tunnel",
+  "database": "mop_test",
+  "postgres_version": "17.9",
+  "migration_status": {
+    "from": "V33",
+    "applied": ["V34"],
+    "successful_migration_count": 34,
+    "duplicate_migrations": 0,
+    "read_only_recheck": "NOTIFICATION_INTENTS_APPLIED"
+  },
+  "v34_sha256": "7951a0abb91fd94ae6ba3a1b5769e32780b23b08720e2bd17851c64f256cdb51",
+  "integration_tests": {
+    "PostgresTicketNotificationIntegrationTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "outbox_relay_idempotent": true,
+      "partial_recipient_pending_reasons_recorded": ["Q15_ONCALL_QUEUE_RECIPIENTS"],
+      "external_dispatch_not_configured": ["Q14_CHANNEL_MATRIX", "Q18_PROVIDER_CREDENTIALS"],
+      "customer_message_redacts_internal_assignee": true,
+      "first_read_only_and_stale_version_409": true,
+      "cross_tenant_and_stranger_404": true,
+      "db_guards_reject_forged_or_mutated_rows": true
+    },
+    "PostgresTicketWorkflowIntegrationTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "unit_and_controller_tests": {
+    "TestSchemaMigrationTest": {"tests": 41, "failures": 0, "errors": 0},
+    "TicketNotificationPlannerTest": {"tests": 9, "failures": 0, "errors": 0},
+    "TicketNotificationControllerTest": {"tests": 8, "failures": 0, "errors": 0},
+    "api_java_suite": {"tests": 1845, "failures": 0, "errors": 0, "skipped": 35}
+  },
+  "web_validation": {
+    "test_files": 156,
+    "tests": 2204,
+    "failures": 0,
+    "typecheck": "PASSED",
+    "build": {
+      "status": "PASSED",
+      "files": 109,
+      "build_id": "53d969b959eb40fb6534b73afbf3ced3b4ad75b5a07fbe406ddff7942244817b"
+    }
+  },
+  "contract_tests": {
+    "tests": 135,
+    "failures": 0,
+    "errors": 0,
+    "api_contract_version": "0.54.0"
+  },
+  "synthetic_data": true,
+  "external_wecom_delivery": "NOT_RUN",
+  "external_sms_voice_email_delivery": "NOT_RUN",
+  "production_approved": false,
+  "formal_contract_acceptance": "NOT_RUN",
+  "credentials_output": false
+}

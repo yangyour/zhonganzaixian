@@ -26,7 +26,7 @@ defineExpose({ change: workspace.change, preview: workspace.preview, clearInput,
 </script>
 <template>
  <section class="preview-page admin-prototype">
-  <div class="page-heading"><div><span class="eyebrow">CONTACT FORMAT PREVIEW</span><h1>联系人导入格式预览</h1><p>在线校验批量导入 JSON 数据结构与字段格式 · 仅作诊断预览，不直接写入数据库</p></div><router-link to="/customer-contacts">返回联系人</router-link></div>
+  <div class="page-heading"><div><h1>联系人导入格式预览</h1><p>在线校验批量导入 JSON 数据结构与字段格式 · 仅作诊断预览，不直接写入数据库</p></div><router-link to="/customer-contacts">返回联系人</router-link></div>
   <el-alert type="warning" :closable="false" title="本页仅执行字段格式预检，不直接执行导入入库">支持校验标准 JSON 数据结构与字段合法性；如需正式提交批量导入任务，请前往“批量新建与作业”页面操作。</el-alert>
   <nav class="admin-tabs" aria-label="联系人工作区"><router-link to="/customer-contacts">联系人列表</router-link><router-link to="/contact-imports">批量新建与作业</router-link><span class="active">导入格式预览</span></nav>
   <ol class="admin-stepbar"><li class="active"><strong>01 粘贴 JSON 数据</strong><small>包含完整 8 个标准字段</small></li><li :class="{active: !!state.result}"><strong>02 服务端格式诊断</strong><small>逐行校验与重复行提示</small></li><li><strong>03 正式批量导入</strong><small>前往批量新建页面提交</small></li></ol>
@@ -37,7 +37,7 @@ defineExpose({ change: workspace.change, preview: workspace.preview, clearInput,
     <details><summary>查看标准 JSON 格式示例</summary><pre>{{ example }}</pre><p>支持角色：REPORTER、DECISION_MAKER、TECHNICAL_CONTACT；级别偏好：P1–P4 数组（null 表示未指定，[] 表示空集合）；免打扰配置：null 或完整 enabled/start/end（Asia/Shanghai 时区）。</p></details>
     <el-input type="textarea" :rows="14" :model-value="state.text" aria-label="联系人预览原始JSON" placeholder="请粘贴待校验的联系人 JSON 数据（请勿填入密码、Token 或密钥）" @update:model-value="workspace.change($event)" />
     <p class="preview-help">支持最大 512KiB、5 层嵌套；修改文本后自动清空上一次诊断结果。</p>
-    <div class="preview-actions"><el-button type="primary" :disabled="state.busy || !state.text" :loading="state.busy" @click="workspace.preview()">只读检查格式</el-button><el-button :disabled="!state.text" @click="clearInput">清除输入与结果</el-button></div>
+    <div class="preview-actions"><el-button type="primary" :disabled="state.busy || !state.text" :loading="state.busy" @click="workspace.preview()">校验数据格式</el-button><el-button :disabled="!state.text" @click="clearInput">清空内容</el-button></div>
    </div></section>
    <ApiErrorNotice :error="state.error" />
    <section v-if="state.result" class="preview-results" aria-live="polite">

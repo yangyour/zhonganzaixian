@@ -1,0 +1,1391 @@
+{
+  "environment": "dot-report-v41-fresh-pg",
+  "api_jar_sha256": "a294db91ce0dcf4d39b61f4b6e801c13b0b3c13c39bc4bdfa614fcee56153910",
+  "real_postgresql": true,
+  "project_local_auth": true,
+  "external_services_configured": false,
+  "checks": [
+    {
+      "path": "/health/live",
+      "status": 200,
+      "body": {
+        "data": {
+          "status": "UP",
+          "mode": "remote_test",
+          "source": "postgresql"
+        },
+        "trace_id": "947fd5e2-4b8e-4744-8b4a-395e7cb12140"
+      }
+    },
+    {
+      "path": "/health/ready",
+      "status": 200,
+      "body": {
+        "data": {
+          "status": "READY_REMOTE_TEST",
+          "ready": true,
+          "mode": "remote_test",
+          "source": "postgresql",
+          "durable": true,
+          "production_ready": false,
+          "runtime_configurations": {
+            "schema_access_ready": true,
+            "scope": "CURRENT_TENANT",
+            "customer_confirmation_status": "UNVERIFIED"
+          },
+          "export_publication": {
+            "enabled": false,
+            "ready": false,
+            "configured": false,
+            "provider": null,
+            "reasons": [
+              "EXPORT_PUBLICATION_DISABLED"
+            ]
+          },
+          "export_inbox": {
+            "enabled": false,
+            "ready": false,
+            "reasons": [
+              "EXPORT_INBOX_DISABLED"
+            ],
+            "external_delivery": false
+          },
+          "own_notification_preferences": {
+            "schema_access_ready": true,
+            "configuration_status": "CONFIG_PENDING",
+            "effective": false,
+            "receiver_binding_status": "NOT_VERIFIED",
+            "notification_dispatched": false
+          },
+          "asset_exports": {
+            "schema_access_ready": true,
+            "mode": "PREPARE_ONLY_NO_PUBLICATION",
+            "worker_liveness": null,
+            "publication_status": "NOT_IMPLEMENTED",
+            "download_allowed": false
+          },
+          "inspection_quarterly_reports": {
+            "schema_access_ready": true,
+            "configuration_source": "REQUEST_DRAFT_NOT_APPROVED",
+            "generation_status": "DRAFT",
+            "report_published": false,
+            "report_publishable": false,
+            "evidence_access_granted": false
+          },
+          "change_notice_approvals": {
+            "schema_access_ready": true,
+            "record_source": "REVISION_REVIEW_ONLY",
+            "effective": false,
+            "device_execution_allowed": false,
+            "alert_suppression_allowed": false
+          },
+          "change_notice_drafts": {
+            "schema_access_ready": true,
+            "approval_status": null,
+            "automatic_p3_decision": null,
+            "approval_workflow_status": "CONFIG_PENDING",
+            "matching_policy_status": "CONFIG_PENDING",
+            "effective": false,
+            "device_execution_allowed": false,
+            "alert_suppression_allowed": false
+          },
+          "backup_plan_drafts": {
+            "schema_access_ready": true,
+            "effective": false,
+            "device_execution_allowed": false,
+            "credential_verification": "NOT_VERIFIED",
+            "scheduler_running": null
+          },
+          "inspection_source_collections": {
+            "schema_access_ready": true,
+            "verification_status": "SELF_REPORTED_UNVERIFIED",
+            "generation_status": "CONFIG_PENDING",
+            "formal_report_generatable": false,
+            "report_published": false
+          },
+          "inspection_worksheets": {
+            "schema_access_ready": true,
+            "verification_status": "SELF_REPORTED_UNVERIFIED",
+            "evidence_binding_status": "NOT_IMPLEMENTED",
+            "publication_status": "NOT_IMPLEMENTED",
+            "report_published": false,
+            "active_scan_performed": false
+          },
+          "inspection_templates": {
+            "schema_access_ready": true,
+            "approval_status": "UNVERIFIED",
+            "publication_status": "NOT_IMPLEMENTED",
+            "report_published": false,
+            "active_scan_performed": false
+          },
+          "contact_imports": {
+            "schema_access_ready": true,
+            "worker_liveness": null,
+            "notification_dispatched": false,
+            "identity_binding_created": false
+          },
+          "customer_contacts": {
+            "schema_access_ready": true,
+            "notification_dispatched": false,
+            "channel_verification": "NOT_VERIFIED",
+            "identity_binding_created": false
+          },
+          "capacity_scenarios": {
+            "schema_access_ready": true,
+            "effective": false,
+            "measurement_verified": false,
+            "poc_executed": false
+          },
+          "manual_recovery": {
+            "schema_access_ready": true,
+            "source": "HUMAN_CONFIRMATION",
+            "monitoring_recovery_applicable": false,
+            "ticket_state_changed": false,
+            "sla_changed": false
+          },
+          "manual_incidents": {
+            "schema_access_ready": true,
+            "source_state": "MANUAL",
+            "registration_status": "REGISTERED_ONLY",
+            "monitoring_recovery_applicable": false,
+            "ticket_automatically_created": false
+          },
+          "working_calendars": {
+            "schema_access_ready": true,
+            "effective": false,
+            "customer_confirmation": "UNVERIFIED"
+          },
+          "photos": {
+            "enabled": false,
+            "ready": false,
+            "policy_ready": false,
+            "schema_ready": false,
+            "storage_ready": false,
+            "policy_source": "PENDING",
+            "reasons": [
+              "PHOTO_NOT_CONFIGURED"
+            ]
+          },
+          "asset_imports": {
+            "enabled": false,
+            "ready": false,
+            "policy_ready": false,
+            "schema_ready": false,
+            "storage_ready": false,
+            "worker_activity": "NOT_PROBED",
+            "business_status": "CONFIG_PENDING",
+            "can_import": false,
+            "reasons": [
+              "ASSET_IMPORT_NOT_CONFIGURED"
+            ]
+          },
+          "asset_reads": {
+            "unicode_search_ready": true,
+            "pagination": "BOUNDED_POSTGRESQL_KEYSET"
+          },
+          "ticket_comments": {
+            "schema_access_ready": true,
+            "visibility": "REPORTER_AND_INTERNAL",
+            "internal_identity_exposed": false,
+            "itsm_applied": false
+          },
+          "internal_notes": {
+            "schema_access_ready": true,
+            "visibility": "INTERNAL",
+            "ticket_state_changed": false,
+            "sla_changed": false
+          },
+          "asset_manual_metadata": {
+            "schema_access_ready": true,
+            "scope": "INTERNAL_MANUAL_DRAFT",
+            "monitoring_applied": false,
+            "cmdb_applied": false
+          },
+          "worklogs": {
+            "ready": true,
+            "schema_access_ready": true,
+            "financial_status": "CONFIG_PENDING"
+          },
+          "asset_dependencies": {
+            "ready": true,
+            "schema_access_ready": true,
+            "configuration_status": "CONFIG_PENDING",
+            "monitoring_applied": false,
+            "effective_rules": null
+          }
+        },
+        "trace_id": "ef0b31b9-1590-4b2b-9bdb-96acd7c0cc5f"
+      }
+    },
+    {
+      "path": "/auth/options",
+      "status": 200,
+      "body": {
+        "data": {
+          "mode": "remote_test",
+          "identity_source": "project_local",
+          "local_enabled": true,
+          "sso_enabled": false,
+          "login_url": null,
+          "local_login_url": "/api/v1/auth/local/login",
+          "csrf_url": "/api/v1/auth/csrf",
+          "sso_protocol": "OIDC",
+          "wecom_enabled": false,
+          "wecom_start_url": null
+        },
+        "trace_id": "63567650-25ee-46c6-bc9c-16678b6906e1"
+      }
+    },
+    {
+      "path": "/session",
+      "case": "unauthenticated",
+      "status": 401
+    },
+    {
+      "path": "/auth/local/login",
+      "case": "valid_ephemeral_synthetic_account",
+      "status": 200
+    },
+    {
+      "path": "/session",
+      "case": "authenticated",
+      "status": 200
+    },
+    {
+      "path": "/identity/policy",
+      "case": "authenticated",
+      "status": 200
+    },
+    {
+      "path": "/assets",
+      "case": "authenticated",
+      "status": 200
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/auth/local/login",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/assets",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/1/approval",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 403,
+      "expected_status": 403,
+      "error_code": "CSRF_INVALID"
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 409,
+      "expected_status": 409,
+      "error_code": "VERSION_CONFLICT"
+    },
+    {
+      "path": "/configurations/change_notice.approver_policy/revisions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/configuration-revisions/0058aad8-49fb-403d-9670-d136a799c868/submit",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/configuration-revisions/0058aad8-49fb-403d-9670-d136a799c868/review",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/runtime-configurations/change_notice.approver_policy",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/runtime-configurations/change_notice.approver_policy/releases",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/1/approval",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 403,
+      "expected_status": 403,
+      "error_code": "ACTION_FORBIDDEN"
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/1/approval/history?page_size=10",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/1/approval/history?page_size=10&before_version=3",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/session/tenant",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/1/approval",
+      "method": "GET",
+      "status": 404,
+      "expected_status": 404,
+      "error_code": "OBJECT_NOT_FOUND"
+    },
+    {
+      "path": "/session/tenant",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099",
+      "method": "PATCH",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/1/approval",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/18efd2ea-b1e4-4005-a130-c0e1acaab099/revisions/2/approval",
+      "method": "GET",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/01827563-260d-4f2a-81c2-2616c40b8a42/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/01827563-260d-4f2a-81c2-2616c40b8a42/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 400,
+      "expected_status": 400,
+      "error_code": "VALIDATION_ERROR"
+    },
+    {
+      "path": "/change-notice-drafts/01827563-260d-4f2a-81c2-2616c40b8a42/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/2b0e3c5e-a732-497a-a407-57662b53bee4/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    },
+    {
+      "path": "/change-notice-drafts/2b0e3c5e-a732-497a-a407-57662b53bee4/revisions/1/approval/actions",
+      "method": "POST",
+      "status": 200,
+      "expected_status": 200,
+      "error_code": null
+    }
+  ],
+  "identity_bootstrap": {
+    "inserted": 6,
+    "verified_existing": 0,
+    "passwords_output": false
+  },
+  "approval_flow": {
+    "source": "real_http_and_postgresql",
+    "two_person_policy": "created_reviewed_published_via_http",
+    "approved": true,
+    "rejected": true,
+    "withdrawn": true,
+    "csrf_rejection": true,
+    "self_review_rejection": true,
+    "cas_conflict": true,
+    "idempotent_replay": true,
+    "cross_tenant_404": true,
+    "history_pagination": true,
+    "new_revision_resets_review": true,
+    "all_execution_flags_false": true,
+    "external_notifications_sent": false
+  },
+  "approval_http_check_count": 43,
+  "report_http": {
+    "checks": [
+      {
+        "case": "anonymous_list",
+        "actor": "anonymous",
+        "path": "/inspection-quarterly-reports",
+        "method": "GET",
+        "status": 401,
+        "expected_status": 401,
+        "error_code": "SESSION_EXPIRED"
+      },
+      {
+        "case": "padmin_csrf",
+        "actor": "padmin",
+        "path": "/auth/csrf",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "padmin_login",
+        "actor": "padmin",
+        "path": "/auth/local/login",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "reviewer_csrf",
+        "actor": "reviewer",
+        "path": "/auth/csrf",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "reviewer_login",
+        "actor": "reviewer",
+        "path": "/auth/local/login",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "source_create",
+        "actor": "padmin",
+        "path": "/inspection-source-collections",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "source_read",
+        "actor": "padmin",
+        "path": "/inspection-source-collections/8b9806a6-31c8-4212-a71b-ab446a51197c",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "report_create",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "report_replay",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "canonical_key_order_replay",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "idempotency_payload_conflict",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 409,
+        "expected_status": 409,
+        "error_code": "IDEMPOTENCY_CONFLICT"
+      },
+      {
+        "case": "frozen_detail",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports/2b30e112-15ea-4bd3-b92a-2e765cc9b46f",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "metadata_list",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports?page_size=10",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "paired_cursor_list",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports?page_size=10&before_recorded_at=2026-10-19T10%3A50%3A50.444Z&before_id=2b30e112-15ea-4bd3-b92a-2e765cc9b46f",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "source_document_hash_mismatch",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 409,
+        "expected_status": 409,
+        "error_code": "INSPECTION_REPORT_SOURCE_HASH_CONFLICT"
+      },
+      {
+        "case": "source_manifest_hash_mismatch",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 409,
+        "expected_status": 409,
+        "error_code": "INSPECTION_REPORT_SOURCE_HASH_CONFLICT"
+      },
+      {
+        "case": "missing_source",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 404,
+        "expected_status": 404,
+        "error_code": "OBJECT_NOT_FOUND"
+      },
+      {
+        "case": "csrf_missing",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "CSRF_INVALID"
+      },
+      {
+        "case": "idempotency_key_missing",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "nonzero_version",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "invalid_quarter",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "noninteger_year",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "null_configuration_object",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "missing_configuration_field",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "missing_configuration_key",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "invalid_time_zone",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "invalid_selection_rule",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "client_publication_override",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "client_tenant_override",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "duplicate_json_key",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "trailing_json",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "null_json",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "oversize_body",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 413,
+        "expected_status": 413,
+        "error_code": "INSPECTION_SOURCE_TECHNICAL_LIMIT"
+      },
+      {
+        "case": "invalid_page_size",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports?page_size=11",
+        "method": "GET",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "duplicate_query",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports?page_size=10&page_size=15",
+        "method": "GET",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "unpaired_cursor",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports?before_id=2b30e112-15ea-4bd3-b92a-2e765cc9b46f",
+        "method": "GET",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "unknown_query",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports?year=2026",
+        "method": "GET",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "invalid_cursor",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports?before_id=invalid&before_recorded_at=2026-10-19T00%3A00%3A00Z",
+        "method": "GET",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "detail_query_rejected",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports/2b30e112-15ea-4bd3-b92a-2e765cc9b46f?year=2026",
+        "method": "GET",
+        "status": 400,
+        "expected_status": 400,
+        "error_code": "VALIDATION_ERROR"
+      },
+      {
+        "case": "missing_report",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports/3a794879-bb2a-4269-a82b-e9362a3b4c41",
+        "method": "GET",
+        "status": 404,
+        "expected_status": 404,
+        "error_code": "OBJECT_NOT_FOUND"
+      },
+      {
+        "case": "msp_csrf",
+        "actor": "msp",
+        "path": "/auth/csrf",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "msp_login",
+        "actor": "msp",
+        "path": "/auth/local/login",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "msp_denied_list",
+        "actor": "msp",
+        "path": "/inspection-quarterly-reports",
+        "method": "GET",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "msp_denied_read",
+        "actor": "msp",
+        "path": "/inspection-quarterly-reports/2b30e112-15ea-4bd3-b92a-2e765cc9b46f",
+        "method": "GET",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "msp_denied_create",
+        "actor": "msp",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "tadmin_csrf",
+        "actor": "tadmin",
+        "path": "/auth/csrf",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "tadmin_login",
+        "actor": "tadmin",
+        "path": "/auth/local/login",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "tadmin_denied_list",
+        "actor": "tadmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "GET",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "tadmin_denied_read",
+        "actor": "tadmin",
+        "path": "/inspection-quarterly-reports/2b30e112-15ea-4bd3-b92a-2e765cc9b46f",
+        "method": "GET",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "tadmin_denied_create",
+        "actor": "tadmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "viewerA_csrf",
+        "actor": "viewerA",
+        "path": "/auth/csrf",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "viewerA_login",
+        "actor": "viewerA",
+        "path": "/auth/local/login",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "viewerA_denied_list",
+        "actor": "viewerA",
+        "path": "/inspection-quarterly-reports",
+        "method": "GET",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "viewerA_denied_read",
+        "actor": "viewerA",
+        "path": "/inspection-quarterly-reports/2b30e112-15ea-4bd3-b92a-2e765cc9b46f",
+        "method": "GET",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "viewerA_denied_create",
+        "actor": "viewerA",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "viewerB_csrf",
+        "actor": "viewerB",
+        "path": "/auth/csrf",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "viewerB_login",
+        "actor": "viewerB",
+        "path": "/auth/local/login",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "viewerB_denied_list",
+        "actor": "viewerB",
+        "path": "/inspection-quarterly-reports",
+        "method": "GET",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "viewerB_denied_read",
+        "actor": "viewerB",
+        "path": "/inspection-quarterly-reports/2b30e112-15ea-4bd3-b92a-2e765cc9b46f",
+        "method": "GET",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "viewerB_denied_create",
+        "actor": "viewerB",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "reviewer_create",
+        "actor": "reviewer",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "reviewer_replay",
+        "actor": "reviewer",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "switch_other_tenant",
+        "actor": "padmin",
+        "path": "/session/tenant",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "foreign_report_404",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports/2b30e112-15ea-4bd3-b92a-2e765cc9b46f",
+        "method": "GET",
+        "status": 404,
+        "expected_status": 404,
+        "error_code": "OBJECT_NOT_FOUND"
+      },
+      {
+        "case": "foreign_source_create_404",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 404,
+        "expected_status": 404,
+        "error_code": "OBJECT_NOT_FOUND"
+      },
+      {
+        "case": "foreign_list_scope",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports?page_size=20",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "foreign_source_create",
+        "actor": "padmin",
+        "path": "/inspection-source-collections",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "foreign_report_create",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "restore_original_tenant",
+        "actor": "padmin",
+        "path": "/session/tenant",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "reverse_foreign_report_404",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports/1e07a82e-d856-47e1-8193-00ab68ef16ef",
+        "method": "GET",
+        "status": 404,
+        "expected_status": 404,
+        "error_code": "OBJECT_NOT_FOUND"
+      },
+      {
+        "case": "reverse_foreign_source_404",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 404,
+        "expected_status": 404,
+        "error_code": "OBJECT_NOT_FOUND"
+      },
+      {
+        "case": "configured_report_create",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "configured_report_detail",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports/d27c6ba5-a73c-4481-a2b3-e2c53605d1e3",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "original_frozen_detail_unchanged",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports/2b30e112-15ea-4bd3-b92a-2e765cc9b46f",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "identity_role_inventory",
+        "actor": "padmin",
+        "path": "/identity/roles",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "identity_reviewer_membership",
+        "actor": "padmin",
+        "path": "/identity/users/531ed5c5-3142-334e-00f5-f160879c9f7b/memberships",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "create_restricted_role",
+        "actor": "padmin",
+        "path": "/identity/roles",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "revoke_source_read",
+        "actor": "padmin",
+        "path": "/identity/users/531ed5c5-3142-334e-00f5-f160879c9f7b/memberships/55000000-0000-4000-8000-000000000001",
+        "method": "PUT",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "source_read_revoked_before_replay",
+        "actor": "reviewer",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "read_still_allowed_without_source_read",
+        "actor": "reviewer",
+        "path": "/inspection-quarterly-reports/075501c5-7ba3-443c-ae90-328bb976d80c",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "source_read_revoked_session",
+        "actor": "reviewer",
+        "path": "/session",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "revoke_report_write",
+        "actor": "padmin",
+        "path": "/identity/roles/bc65cf9b-1065-4ca7-8048-6e696c94bea7",
+        "method": "PATCH",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "report_write_revoked_before_replay",
+        "actor": "reviewer",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 403,
+        "expected_status": 403,
+        "error_code": "ACTION_FORBIDDEN"
+      },
+      {
+        "case": "report_write_revoked_session",
+        "actor": "reviewer",
+        "path": "/session",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "restore_membership_read",
+        "actor": "padmin",
+        "path": "/identity/users/531ed5c5-3142-334e-00f5-f160879c9f7b/memberships",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "restore_original_role",
+        "actor": "padmin",
+        "path": "/identity/users/531ed5c5-3142-334e-00f5-f160879c9f7b/memberships/55000000-0000-4000-8000-000000000001",
+        "method": "PUT",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "restored_permissions",
+        "actor": "reviewer",
+        "path": "/session",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "replay_after_restoration",
+        "actor": "reviewer",
+        "path": "/inspection-quarterly-reports",
+        "method": "POST",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "final_frozen_detail_unchanged",
+        "actor": "padmin",
+        "path": "/inspection-quarterly-reports/2b30e112-15ea-4bd3-b92a-2e765cc9b46f",
+        "method": "GET",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      },
+      {
+        "case": "disable_unused_synthetic_role",
+        "actor": "padmin",
+        "path": "/identity/roles/bc65cf9b-1065-4ca7-8048-6e696c94bea7",
+        "method": "PATCH",
+        "status": 200,
+        "expected_status": 200,
+        "error_code": null
+      }
+    ],
+    "quarterly_report_flow": {
+      "source": "real_http_and_postgresql",
+      "http_checks": 90,
+      "status_counts": {
+        "200": 44,
+        "400": 20,
+        "401": 1,
+        "403": 15,
+        "404": 6,
+        "409": 3,
+        "413": 1
+      },
+      "created_source_collections": 2,
+      "created_reports": 4,
+      "explicit_empty_selection_not_population": true,
+      "create_read_metadata_list_and_cursor": true,
+      "source_document_and_manifest_hash_conflicts": true,
+      "independent_source_manifest_report_document_hashes": true,
+      "null_configuration_preserved": true,
+      "explicit_configuration_preserved": true,
+      "frozen_detail_repeated_identically": true,
+      "worksheet_mutation_immutability": "covered_separately_by_real_postgresql_tests",
+      "idempotent_original_and_canonical_key_order_replay": true,
+      "idempotency_payload_conflict": true,
+      "current_source_read_before_replay": true,
+      "current_report_write_before_replay": true,
+      "permission_revocation_via_real_identity_http": true,
+      "reviewer_effective_permissions_restored": true,
+      "reviewer_original_assignment_was_implicit": true,
+      "synthetic_custom_role_disabled": true,
+      "cross_tenant_404_both_directions": true,
+      "non_admin_roles_403": [
+        "msp",
+        "tadmin",
+        "viewerA",
+        "viewerB"
+      ],
+      "anonymous_401": true,
+      "csrf_403": true,
+      "invalid_input_and_body_limits": true,
+      "all_publication_and_evidence_flags_false": true,
+      "external_notifications_sent": false
+    }
+  },
+  "result": "PASS",
+  "api_cleanup": "complete"
+}

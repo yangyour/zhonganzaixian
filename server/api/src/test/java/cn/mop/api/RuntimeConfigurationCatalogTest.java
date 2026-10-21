@@ -6,7 +6,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 class RuntimeConfigurationCatalogTest {
  final ObjectMapper mapper=new ObjectMapper();final RuntimeConfigurationCatalog catalog=new RuntimeConfigurationCatalog(mapper);
- @Test void everyRegisteredQuestionIsConfigurableWithoutInventingPendingValues(){var defs=catalog.definitions();assertEquals(185,defs.size());Set<String> questions=new HashSet<>();for(var d:defs){questions.addAll((List<String>)d.get("question_ids"));assertEquals(64,d.get("definition_hash").toString().length());if("pending_customer_decision".equals(d.get("contract_value_kind")))assertNull(d.get("registered_value"));}assertEquals(31,questions.size());}
+ @Test void everyRegisteredQuestionIsConfigurableWithoutInventingPendingValues(){var defs=catalog.definitions();assertEquals(186,defs.size());Set<String> questions=new HashSet<>();for(var d:defs){questions.addAll((List<String>)d.get("question_ids"));assertEquals(64,d.get("definition_hash").toString().length());if("pending_customer_decision".equals(d.get("contract_value_kind")))assertNull(d.get("registered_value"));}assertEquals(31,questions.size());}
  @Test void fixedConstraintsRemainReadOnly(){assertEquals(false,catalog.definition("business.timezone").get("editable"));assertEquals(true,catalog.definition("remote.idle_timeout_sec").get("editable"));}
  @Test void validatesKnownNumericalBoundsAndPreservesExplicitZero(){assertDoesNotThrow(()->catalog.validate("availability.min_coverage_ratio",mapper.valueToTree(0)));for(Object value:List.of(-0.1,1.1,"0.5"))assertThrows(DomainException.class,()->catalog.validate("availability.min_coverage_ratio",mapper.valueToTree(value)));assertThrows(DomainException.class,()->catalog.validate("tenant.worker_concurrency",mapper.valueToTree(0)));}
  @Test void validatesExplicitEnumerationAndWallClockTime(){for(int n:List.of(30,60,120,300))assertDoesNotThrow(()->catalog.validate("monitor.sample_interval_sec",mapper.valueToTree(n)));assertThrows(DomainException.class,()->catalog.validate("monitor.sample_interval_sec",mapper.valueToTree(90)));for(String value:List.of("24:00","12:60","9:30"))assertThrows(DomainException.class,()->catalog.validate("backup.default_local_time",mapper.valueToTree(value)));assertDoesNotThrow(()->catalog.validate("backup.default_local_time",mapper.valueToTree("23:59")));}
@@ -15,4 +15,12 @@ class RuntimeConfigurationCatalogTest {
  @Test void unknownKeysAndRootNullNeverBecomeAUsableValue(){assertThrows(DomainException.class,()->catalog.entry("invented"));assertThrows(DomainException.class,()->catalog.validate("remote.idle_timeout_sec",mapper.nullNode()));}
  @Test void definitionHashUsesCanonicalOrderingIndependentOfMapperMapOrder(){var sorted=new RuntimeConfigurationCatalog(new ObjectMapper().enable(com.fasterxml.jackson.databind.SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS));for(var d:catalog.definitions())assertEquals(catalog.hash(d.get("key").toString()),sorted.hash(d.get("key").toString()));}
  @Test void unsafeIntegersCannotPublishRoundedBrowserValues(){assertThrows(DomainException.class,()->catalog.validate("remote.idle_timeout_sec",mapper.valueToTree(9007199254740992L)));assertThrows(DomainException.class,()->catalog.validate("scope.extensions",mapper.valueToTree(Map.of("amount",9007199254740992L))));}
+ @Test void approvalPolicyRemainsNullUntilExplicitlyConfigured(){var d=catalog.definition("change_notice.approver_policy");assertNull(d.get("registered_value"));assertEquals(List.of("Q09"),d.get("question_ids"));assertEquals(false,catalog.schema("change_notice.approver_policy").get("additionalProperties"));}
+ @Test void approvalPolicyRequiresCanonicalUniqueExplicitReviewerIds()throws Exception{
+  String id="00000000-0000-0000-0000-000000000001";
+  assertDoesNotThrow(()->catalog.validate("change_notice.approver_policy",mapper.valueToTree(Map.of("reviewer_user_ids",List.of(id)))));
+  for(Object bad:List.of(Map.of(),Map.of("reviewer_user_ids",List.of()),Map.of("reviewer_user_ids",List.of(id,id)),Map.of("reviewer_user_ids",List.of("padmin")),Map.of("reviewer_user_ids",List.of(12)),Map.of("reviewer_user_ids",List.of(id),"all_admins",true)))
+   assertThrows(DomainException.class,()->catalog.validate("change_notice.approver_policy",mapper.valueToTree(bad)));
+ }
+
 }

@@ -1,5 +1,7 @@
 # 未发布厂商 OID 映射候选
 
+2026-10-19补充用户提供本地华为 MIB 的[七项未发布候选](../deploy/device-snmp/huawei-s5731-v200r022-candidate.yaml)。已通过实际解析器/精确换算测试，但设备 SNMP 两处 UDP161 被拒，型号/固件/指标均未现场核验；effective/sourceVerified仍false。该格式没有实体选择、索引关联、无效值过滤和计数器差分，不能直接激活或作为 Zabbix 导入模板。来源、单位修正与实际阻塞见[联调记录](huawei-snmp-integration-20261019.md)。下文“仅虚构样本”的测试范围是原2026-10-06切片，不代表本次厂商资料尚未提供。
+
 M4-19 / Q20 允许先实现 YAML 格式与加载校验。此切片只读取调用方传入的 UTF-8 字节，返回不可变候选，不打开文件目录、不连接设备、没有监控热加载、API、SNMP、发布或回滚执行。`effective()` 与 `sourceVerified()` 恒为 false；解析成功不证明 OID 真实存在或品牌、型号、固件兼容。
 
 ## 候选格式 v1

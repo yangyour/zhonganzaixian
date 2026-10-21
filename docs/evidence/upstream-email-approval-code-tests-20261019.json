@@ -1,0 +1,153 @@
+{
+  "base": "b72c3cff2f030812926f4dee9944262a47205d7d",
+  "scope": "isolated cloud code tests; no migration or live providers",
+  "java_reactor": {
+    "tests": 3229,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 940
+  },
+  "relevant_suites": [
+    {
+      "suite": "cn.mop.persistence.ChangeNoticeApprovalStorageContractTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.persistence.TestSchemaMigrationTest",
+      "tests": 44,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresWeComIntegrationTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresEmailIntegrationTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6
+    },
+    {
+      "suite": "cn.mop.persistence.PostgresChangeNoticeApprovalIntegrationTest",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 21
+    },
+    {
+      "suite": "cn.mop.api.ChangeNoticeApprovalControllerTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.api.ChangeNoticeApprovalReadinessTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.api.EmailServiceTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.api.ChangeNoticeApprovalTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.adapters.WeComClientTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.api.WeComControllerTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.api.ChangeNoticeApprovalHttpSecurityTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.api.InspectionQuarterlyReportTest",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.api.EmailControllerTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "cn.mop.api.WeComServiceTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "python_bootstrap": {
+    "tests": 34,
+    "failures": 0
+  },
+  "contract_tests": {
+    "tests": 142,
+    "failures": 0
+  },
+  "web": {
+    "tests": 2254,
+    "failures": 0,
+    "typecheck": "PASSED",
+    "production_build": "PASSED",
+    "release_and_security_policy": "PASSED"
+  },
+  "preservation": {
+    "upstream_v1_v39_sql": "BYTE_IDENTICAL",
+    "historical_evidence_from_1dcf742": "BYTE_IDENTICAL",
+    "all_existing_api_paths": "UNCHANGED",
+    "wecom_email_schema": "UNCHANGED",
+    "only_changed_existing_schema": "ReadinessResult additive approval component"
+  },
+  "migration": {
+    "upstream_v39": "email",
+    "approval_candidate": "V40",
+    "approval_sha256": "a24085a280ff822da932904c20cb3189fd813ef1d6ddc2f5458723ba48025756",
+    "d09_reserved": "V41; not included",
+    "applied_in_this_run": false
+  },
+  "api": "0.60.0",
+  "notes": [
+    "First offline build stopped due to newly introduced upstream spring-boot-starter-mail dependency absent in local cache; official Maven dependency fetch resolved it. Full reactor passed with installed explicit Mockito javaagent.",
+    "Environment-gated integration suites skipped here; fresh PostgreSQL and HTTP validation requires independent run.",
+    "PowerShell runtime unavailable; Python checks verify migration manifest parity.",
+    "No emails, WeCom submission, QR login or original server operations."
+  ]
+}

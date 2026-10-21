@@ -1,0 +1,63 @@
+{
+  "verified_at_utc": "2026-10-19T06:55:44.945828+00:00",
+  "environment": "dot-disposable-pg-20261019",
+  "postgresql": "17.9",
+  "icu": "76.1",
+  "frozen_v38": {
+    "sha256": "a24085a280ff822da932904c20cb3189fd813ef1d6ddc2f5458723ba48025756",
+    "applied_at_utc": "2026-10-19T06:44:28.980258+00:00",
+    "environment": "dot-disposable-pg-20261019"
+  },
+  "migration": {
+    "first": 1,
+    "repeat": 0,
+    "read_only": 0,
+    "preexisting_tables_unchanged": 89,
+    "fingerprint_exclusions": [
+      "flyway_schema_history",
+      "expected new mop_configuration key change_notice.approver_policy"
+    ],
+    "new_configuration_key": "change_notice.approver_policy",
+    "configuration_value": null,
+    "configuration_decision_status": "pending",
+    "new_table": "mop_change_notice_approval_event"
+  },
+  "pg_tests": {
+    "total": 21,
+    "passed": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "http": {
+    "checks": 43,
+    "result": "PASS",
+    "api_jar_sha256": "8d9973db3ed3320fa6b2dd32d64ceb69409d5a78c9d475724a01065db84ee8c3",
+    "readiness_approval_schema": true,
+    "source": "real_http_and_postgresql",
+    "two_person_policy": "created_reviewed_published_via_http",
+    "approved": true,
+    "rejected": true,
+    "withdrawn": true,
+    "csrf_rejection": true,
+    "self_review_rejection": true,
+    "cas_conflict": true,
+    "idempotent_replay": true,
+    "cross_tenant_404": true,
+    "history_pagination": true,
+    "new_revision_resets_review": true,
+    "all_execution_flags_false": true,
+    "external_notifications_sent": false
+  },
+  "boundaries": {
+    "production_ready": false,
+    "customer_approval_claimed": false,
+    "real_external_notifications_sent": false,
+    "original_servers_touched": false,
+    "device_execution": false,
+    "alert_suppression": false,
+    "effective": false
+  },
+  "cleanup": "API and PostgreSQL stopped; ephemeral credentials and database removed",
+  "diagnostic_correction": "CHECK-tamper test uses JDBC-supported alternate DateStyle ISO,DMY; exact CHECK rejection and restoration assertions retained. No production SQL changed."
+}

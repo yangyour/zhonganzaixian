@@ -31,7 +31,7 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
             c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);c.setAutoCommit(false);
             try{authorize(c,a,ticket,null);T value=work.run(c);c.commit();return value;}
             catch(SQLException|RuntimeException e){c.rollback();throw e;}
-        }catch(SQLException e){throw unavailable();}
+        }catch(SQLException e){WorkflowAuthorityConflict.rejectIfConflict(e);throw unavailable();}
     }
     @Override public Optional<SlaEntry> sla(Access a,String ticket){
         uuid(ticket);return read(a,ticket,c->projectSla(c,a,ticket));
@@ -63,9 +63,9 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
     @Override public ReminderPage reminders(Access a,String ticket){
         uuid(ticket);return read(a,ticket,c->{
             Entry current=latest(c,a,ticket).orElseThrow(PostgresTicketLifecycleRepository::missing);
-            try(var s=c.createStatement();var r=s.executeQuery("SELECT to_regclass('public.mop_ticket_sla_reminder') IS NOT NULL")){r.next();if(!r.getBoolean(1))throw new DomainException(422,"CONFIG_PENDING","提醒队列结构尚未应用",List.of(Map.of("reason","V36_REQUIRED")));}
+            try(var s=c.createStatement();var r=s.executeQuery("SELECT to_regclass('public.mop_ticket_sla_reminder') IS NOT NULL")){r.next();if(!r.getBoolean(1))throw new DomainException(422,"CONFIG_PENDING","提醒队列结构尚未应用",List.of(Map.of("reason","V45_REQUIRED")));}
             var items=new ArrayList<Reminder>();
-            try(var s=c.prepareStatement("SELECT r.*,i.ticket_id AS intent_ticket,i.kind,i.created_at AS intent_created_at FROM public.mop_ticket_sla_reminder r LEFT JOIN public.mop_notification_intent i ON i.id=r.intent_id AND i.tenant_id=r.tenant_id WHERE r.tenant_id=?::uuid AND r.ticket_id=?::uuid ORDER BY CASE r.clock WHEN 'RESPONSE' THEN 0 ELSE 1 END,r.progress LIMIT 7")){
+            try(var s=c.prepareStatement("SELECT r.*,i.ticket_id AS intent_ticket,i.kind,i.created_at AS intent_created_at FROM public.mop_ticket_sla_reminder r LEFT JOIN public.mop_sla_notification_intent i ON i.id=r.intent_id AND i.tenant_id=r.tenant_id WHERE r.tenant_id=?::uuid AND r.ticket_id=?::uuid ORDER BY CASE r.clock WHEN 'RESPONSE' THEN 0 ELSE 1 END,r.progress LIMIT 7")){
                 s.setQueryTimeout(10);s.setString(1,a.tenantId());s.setString(2,ticket);try(var rows=s.executeQuery()){
                     while(rows.next()){
                         if(!ticket.equals(rows.getString("intent_ticket"))||!"SLA_PROGRESS".equals(rows.getString("kind"))||rows.getLong("lifecycle_version")>current.snapshot().version()||!instant(rows,"observed_at").equals(instant(rows,"intent_created_at")))throw unavailable();
@@ -118,7 +118,7 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
     @Override public void authorizeCurrentAccess(Access a,String ticket,boolean customer){
         requireEnabled();Connection c=platform.idempotentCommandConnection();
         try{authorize(c,a,ticket,customer?"tickets:customer_decide":"tickets:lifecycle_write");}
-        catch(SQLException e){throw unavailable();}
+        catch(SQLException e){WorkflowAuthorityConflict.rejectIfConflict(e);throw unavailable();}
     }
     @Override public Entry startConfigured(Access a,String ticket,String priority){
         requireEnabled();uuid(ticket);Connection c=platform.idempotentCommandConnection();
@@ -153,7 +153,7 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
             var snapshot=new TicketLifecycle.Snapshot(a.tenantId(),TicketLifecycle.State.NEW,1,0,openedAt,null,null,null,null,plan.responseDue(),plan.recoveryDue());
             var result=new Entry(ticket,snapshot,null,List.of(),plan.json());append(c,a,result,"CREATE",null);
             platform.audit(a.actorId(),a.tenantId(),"ticket.lifecycle.create","ticket",ticket,"SUCCEEDED","TEST_PUBLISHED_CONFIGURATION_OPENING",a.traceId());return result;
-        }catch(SQLException|java.io.IOException e){throw unavailable();}
+        }catch(SQLException|java.io.IOException e){WorkflowAuthorityConflict.rejectIfConflict(e);throw unavailable();}
     }
     @Override public Entry start(Access a,String ticket,String json,Instant responseDue,Instant recoveryDue){
         requireEnabled();Connection c=platform.idempotentCommandConnection();
@@ -178,7 +178,7 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
             append(c,a,result,"CREATE",null);
             platform.audit(a.actorId(),a.tenantId(),"ticket.lifecycle.create","ticket",ticket,"SUCCEEDED","TEST_LIFECYCLE_OPENING_SNAPSHOT",a.traceId());
             return result;
-        }catch(SQLException e){throw unavailable();}
+        }catch(SQLException e){WorkflowAuthorityConflict.rejectIfConflict(e);throw unavailable();}
     }
     @Override public Entry act(Access a,String ticket,Action action){
         requireEnabled();if(action==null||action.action()==null)throw invalid();
@@ -216,7 +216,7 @@ public final class PostgresTicketLifecycleRepository implements TicketLifecycleR
             platform.audit(a.actorId(),a.tenantId(),"ticket.lifecycle."+action.action().name().toLowerCase(Locale.ROOT),
                     "ticket",ticket,"SUCCEEDED","LIFECYCLE_REVISION_NOTIFICATION_INTEGRATION_PENDING",a.traceId());
             return result;
-        }catch(SQLException e){throw unavailable();}
+        }catch(SQLException e){WorkflowAuthorityConflict.rejectIfConflict(e);throw unavailable();}
     }
     private Membership authorize(Connection c,Access a,String ticket,String capability)throws SQLException{
         if(a==null)throw new DomainException(401,"SESSION_EXPIRED","当前成员身份已失效");

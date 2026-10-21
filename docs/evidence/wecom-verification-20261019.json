@@ -1,0 +1,75 @@
+{
+  "observed_at": "2026-10-19T07:02:33.134435+00:00",
+  "environment": "local development / designated LAN PG17.9 V38 / designated LAN WeCom egress",
+  "api_contract_version": "0.58.0",
+  "java_full_module_summaries": [
+    "1017, Failures: 0, Errors: 0, Skipped: 864",
+    "1928, Failures: 0, Errors: 0, Skipped: 35"
+  ],
+  "wecom_final_isolated_tests": [
+    {
+      "class": "cn.mop.adapters.WeComClientTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "class": "cn.mop.api.WeComServiceTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "class": "cn.mop.api.WeComControllerTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "postgres_live": {
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "web_full_suite": {
+    "files": 160,
+    "passed": 2223,
+    "failed": 0
+  },
+  "web_followup_after_session_support": {
+    "files": 5,
+    "passed": 54,
+    "failed": 0,
+    "overlaps_full_suite": true
+  },
+  "contract_suite": {
+    "passed": 138,
+    "failed": 0
+  },
+  "build": "PASSED",
+  "ui": {
+    "desktop_width": 1440,
+    "mobile_width": 390,
+    "page_horizontal_overflow": false,
+    "current_application_delivery_rows": 1,
+    "provider_qr_page_verified": true,
+    "application_connection_button": "PASSED",
+    "test_message_dialog_cancel": "PASSED_NO_EXTRA_MESSAGE",
+    "new_padmin_local_login": "PASSED",
+    "real_oauth_callback": "DEFERRED_BY_USER",
+    "qr_regenerated_at_user_request": true,
+    "scan_test_skipped_at_latest_user_request": true
+  },
+  "messages": {
+    "live_send_count": 1,
+    "provider_status": "ACCEPTED",
+    "recipient_confirmation": "CONFIRMED_BY_USER_SCREENSHOT",
+    "automatic_delivered_receipt_observed": false
+  },
+  "production_deployment": false,
+  "full_d11_contract_acceptance": "NOT_COMPLETED"
+}

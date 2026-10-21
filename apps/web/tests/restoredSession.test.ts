@@ -4,6 +4,13 @@ import { forgetSession, session, refreshProjectSession, revalidateSessionAfterRe
 import type { Session } from '../src/api/types'
 const auth = (name: string): Session => ({ user: { id: 'synthetic-user', display_name: name, role: 'padmin' }, tenant: { id: 'synthetic-tenant', name: '合成测试' }, allowed_tenants: [], capabilities: ['assets:read'], csrf_token: 'synthetic-not-live', permission_version: 1, mode: 'remote_test', identity_source: 'project_local' })
 afterEach(() => { switchingTenant.value = false; forgetSession(); vi.restoreAllMocks() })
+it('revalidates WeCom sessions on restore using current project authorization', async () => {
+  session.value = { ...auth('wecom-before'), identity_source: 'wecom' }
+  const request = vi.spyOn(api, 'request').mockResolvedValue({ ...auth('wecom-fresh'), identity_source: 'wecom', permission_version: 2 })
+  await revalidateSessionAfterRestore()
+  expect(request).toHaveBeenCalledWith('/session'); expect(session.value?.permission_version).toBe(2)
+  expect(session.value?.identity_source).toBe('wecom')
+})
 it('issues a new session read after the pre-freeze response finishes', async () => {
   session.value = auth('before')
   let finish!: (value: Session) => void

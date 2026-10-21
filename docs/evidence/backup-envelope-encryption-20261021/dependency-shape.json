@@ -1,0 +1,118 @@
+{
+  "scope": "OFFLINE_EXAMPLE_SHAPE_NOT_RUNTIME_READINESS",
+  "shape_valid": true,
+  "ready": false,
+  "production_approved": false,
+  "external_connections_checked": false,
+  "modules": [
+    {
+      "module": "backup-execution",
+      "unresolved_reference_slots": 19,
+      "unpublished_runtime_slots": 8,
+      "fixed_registry_keys": [
+        "backup.min_retention_months",
+        "backup.failure_ticket_count",
+        "backup.drill_warning_days"
+      ],
+      "question_ids": [
+        "Q10",
+        "Q22",
+        "Q28"
+      ],
+      "ready": false,
+      "execution_authorized": false
+    },
+    {
+      "module": "monitoring-onboarding",
+      "unresolved_reference_slots": 10,
+      "unpublished_runtime_slots": 3,
+      "fixed_registry_keys": [],
+      "question_ids": [
+        "Q03",
+        "Q06",
+        "Q19",
+        "Q20",
+        "Q21",
+        "Q28"
+      ],
+      "ready": false,
+      "execution_authorized": false
+    },
+    {
+      "module": "remote-session",
+      "unresolved_reference_slots": 11,
+      "unpublished_runtime_slots": 10,
+      "fixed_registry_keys": [
+        "remote.approval_expiry_min",
+        "remote.engineer_concurrency",
+        "remote.authorization_remind_days",
+        "recording.hot_retention_months",
+        "operations.remote_rate_target"
+      ],
+      "question_ids": [
+        "Q01",
+        "Q03",
+        "Q09",
+        "Q10",
+        "Q28"
+      ],
+      "ready": false,
+      "execution_authorized": false
+    },
+    {
+      "module": "report-publication",
+      "unresolved_reference_slots": 10,
+      "unpublished_runtime_slots": 8,
+      "fixed_registry_keys": [
+        "report.contract_retention",
+        "report.monthly_generate_day",
+        "report.unread_remind_days",
+        "report.advice_max_count"
+      ],
+      "question_ids": [
+        "Q10",
+        "Q11",
+        "Q23",
+        "Q24",
+        "Q28"
+      ],
+      "ready": false,
+      "execution_authorized": false
+    },
+    {
+      "module": "operational-finance",
+      "unresolved_reference_slots": 10,
+      "unpublished_runtime_slots": 11,
+      "fixed_registry_keys": [
+        "operations.tenants_per_fte_reference"
+      ],
+      "question_ids": [
+        "Q23",
+        "Q26",
+        "Q30"
+      ],
+      "ready": false,
+      "execution_authorized": false
+    },
+    {
+      "module": "tenant-governance",
+      "unresolved_reference_slots": 11,
+      "unpublished_runtime_slots": 11,
+      "fixed_registry_keys": [
+        "tenant.name_unique",
+        "tenant.decision_contact_min",
+        "pool.review_share_ratio"
+      ],
+      "question_ids": [
+        "Q02",
+        "Q09",
+        "Q10",
+        "Q16",
+        "Q21",
+        "Q28"
+      ],
+      "ready": false,
+      "execution_authorized": false
+    }
+  ]
+}

@@ -34,4 +34,9 @@ class DependencyTemplateCheckTest(unittest.TestCase):
         with self.assertRaises(TemplateError):check_template('remote-session',d,self.settings)
         d=copy.deepcopy(self.base);del d['bastion_session_enabled']
         with self.assertRaises(TemplateError):check_template('remote-session',d,self.settings)
+    def test_backup_crypto_references_remain_unconfigured_and_not_execution_grants(self):
+        d=json.loads((ROOT/'deploy/examples/backup-execution-dependencies.json').read_text())
+        for key in ['approved_envelope_encryption_profile_reference','fresh_data_key_provider_reference','crypto_access_authorizer_reference','approved_kms_key_version_reference','backup_plaintext_size_limit_reference']:
+            self.assertIn(key,d);self.assertIsNone(d[key])
+        self.assertFalse(d['backup_execution_enabled']);self.assertFalse(check_template('backup-execution',d,self.settings)['ready'])
 if __name__=='__main__': unittest.main()

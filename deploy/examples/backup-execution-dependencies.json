@@ -38,5 +38,10 @@
   "device_coordination_policy_reference": null,
   "trusted_clock_and_journal_reference": null,
   "expired_execution_stop_verifier_reference": null,
-  "physical_fencing_or_stop_protocol_reference": null
+  "physical_fencing_or_stop_protocol_reference": null,
+  "approved_envelope_encryption_profile_reference": null,
+  "fresh_data_key_provider_reference": null,
+  "crypto_access_authorizer_reference": null,
+  "approved_kms_key_version_reference": null,
+  "backup_plaintext_size_limit_reference": null
 }

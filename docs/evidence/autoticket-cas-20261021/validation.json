@@ -1,0 +1,49 @@
+{
+  "base_commit": "5bbf945d4fb8b19307adb7846336e0390518d8ec",
+  "backend": {
+    "tests": 3764,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 990,
+    "executed": 2774
+  },
+  "before_fix_controlled_cas_tests": {
+    "tests": 2,
+    "failed": 2,
+    "failure_preserved": true
+  },
+  "after_fix_real_pg": {
+    "tests": 7,
+    "passed": 7,
+    "skipped": 0,
+    "controlled_zero_row_updates": 2,
+    "parallel_request_pairs": 3
+  },
+  "frontend_focused": {
+    "tests": 90,
+    "passed": 90,
+    "files": 2,
+    "new_regression": 1
+  },
+  "sql_changed": false,
+  "api_contract_changed": false,
+  "browser": "NOT_RUN",
+  "production_approved": false,
+  "before_cleanup": {
+    "loopback_only": true,
+    "provider_sends": false,
+    "temporary_credentials_only": true,
+    "postgresql_stopped": true,
+    "temporary_database_and_credentials_removed": true,
+    "result": "FAILED"
+  },
+  "after_cleanup": {
+    "loopback_only": true,
+    "provider_sends": false,
+    "temporary_credentials_only": true,
+    "postgresql_stopped": true,
+    "temporary_database_and_credentials_removed": true,
+    "result": "PASS"
+  },
+  "frontend_typecheck": "PASS"
+}

@@ -1,0 +1,4 @@
+{
+  "server/persistence/src/test/java/cn/mop/persistence/PostgresAutoTicketCasIntegrationTest.java": "6be6d335dc39647785952a424b88b35d8da5beb187ce7811ec81b5d6e16a8812",
+  "server/persistence/target/test-classes/cn/mop/persistence/PostgresAutoTicketCasIntegrationTest.class": "28f07da554cbc46d10d9499d4b44bf1746deb428c5db5ae852f8caf2cff9e880"
+}

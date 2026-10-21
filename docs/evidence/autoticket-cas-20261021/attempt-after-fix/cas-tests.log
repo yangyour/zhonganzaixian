@@ -1,0 +1,41 @@
+
+Thanks for using JUnit! Support its development at https://junit.org/sponsoring
+
+00:37:01.050 [main] INFO com.zaxxer.hikari.HikariDataSource -- HikariPool-1 - Starting...
+00:37:01.265 [main] INFO com.zaxxer.hikari.pool.HikariPool -- HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@22db8f4
+00:37:01.267 [main] INFO com.zaxxer.hikari.HikariDataSource -- HikariPool-1 - Start completed.
+00:37:01.707 [main] INFO com.zaxxer.hikari.HikariDataSource -- HikariPool-1 - Shutdown initiated...
+00:37:01.711 [main] INFO com.zaxxer.hikari.HikariDataSource -- HikariPool-1 - Shutdown completed.
+00:37:01.714 [main] INFO com.zaxxer.hikari.HikariDataSource -- HikariPool-2 - Starting...
+00:37:01.722 [main] INFO com.zaxxer.hikari.pool.HikariPool -- HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@72805168
+00:37:01.722 [main] INFO com.zaxxer.hikari.HikariDataSource -- HikariPool-2 - Start completed.
+00:37:02.053 [main] INFO com.zaxxer.hikari.HikariDataSource -- HikariPool-2 - Shutdown initiated...
+00:37:02.055 [main] INFO com.zaxxer.hikari.HikariDataSource -- HikariPool-2 - Shutdown completed.
+╷
+├─ JUnit Platform Suite ✔
+├─ JUnit Jupiter ✔
+│  ├─ PostgresAutoTicketCasIntegrationTest ✔
+│  │  ├─ missingEventTicketLinkUpdateRollsBackAllTicketAndEventChanges() ✔
+│  │  ├─ missingAttemptVersionUpdateRollsBackAllTicketAndEventChanges() ✔
+│  │  └─ concurrentAutomaticRetryAndManualCreationHaveOneDurableTicket() ✔
+│  └─ PostgresMonitoringEventCenterIntegrationTest ✔
+│     ├─ deduplicationTimesFiveFlapSilenceAndPendingReviewLifecycle_M4_7_M4_8_M4_11() ✔
+│     ├─ longProblemKeepsIdentityAndLateRecoveryClosesTheSameSignalOnly() ✔
+│     ├─ maintenanceWindowSlaExclusionQuarantineBindAndAutoTicketFiveRetries_M4_10_M4_14_... ✔
+│     └─ maintenanceExclusionCannotBeSelfApprovedAndEndingStopsTheInterval() ✔
+└─ JUnit Vintage ✔
+
+Test run finished after 1347 ms
+[         5 containers found      ]
+[         0 containers skipped    ]
+[         5 containers started    ]
+[         0 containers aborted    ]
+[         5 containers successful ]
+[         0 containers failed     ]
+[         7 tests found           ]
+[         0 tests skipped         ]
+[         7 tests started         ]
+[         0 tests aborted         ]
+[         7 tests successful      ]
+[         0 tests failed          ]
+

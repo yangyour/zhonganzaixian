@@ -1,0 +1,6 @@
+{
+  "stage": "business_and_http",
+  "error_type": "AssertionError",
+  "detail": "Controlled CAS tests failed",
+  "production_approved": false
+}

@@ -1,0 +1,86 @@
+
+Thanks for using JUnit! Support its development at https://junit.org/sponsoring
+
+00:33:09.691 [main] INFO com.zaxxer.hikari.HikariDataSource -- HikariPool-1 - Starting...
+00:33:09.897 [main] INFO com.zaxxer.hikari.pool.HikariPool -- HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@41c07648
+00:33:09.898 [main] INFO com.zaxxer.hikari.HikariDataSource -- HikariPool-1 - Start completed.
+00:33:10.200 [main] INFO com.zaxxer.hikari.HikariDataSource -- HikariPool-1 - Shutdown initiated...
+00:33:10.205 [main] INFO com.zaxxer.hikari.HikariDataSource -- HikariPool-1 - Shutdown completed.
+╷
+├─ JUnit Platform Suite ✔
+├─ JUnit Jupiter ✔
+│  └─ PostgresAutoTicketCasIntegrationTest ✔
+│     ├─ missingEventTicketLinkUpdateRollsBackAllTicketAndEventChanges() ✘ Multiple Failures (2 failures)
+│     │        	org.opentest4j.AssertionFailedError: CAS miss must not be reported as successful creation ==> expected: not <null>
+│     │        	org.opentest4j.AssertionFailedError: ticket/history/outbox/event/attempt/audit/idempotency changes must all roll back ==> expected: <{mop_ticket=0|d41d8cd98f00b204e9800998ecf8427e, mop_ticket_history=0|d41d8cd98f00b204e9800998ecf8427e, mop_operation=0|d41d8cd98f00b204e9800998ecf8427e, mop_outbox=0|d41d8cd98f00b204e9800998ecf8427e, mop_monitoring_event=1|8c43a2eb8f90afede8643c955dc1547b, mop_monitoring_event_member=1|9aba0a0cc6deec7bd3987f62b9d40f80, mop_event_noise_record=2|ce96752650c1c5336614c588ce2f9ad7, mop_autoticket_attempt=1|4df7d0a853a1cd2222039c344873bf19, mop_audit=1|d73fce4c5a2302db2ef37e9837ba2b2f, mop_idempotency=1|f37fe2963c216deff25f0721eea8d311}> but was: <{mop_ticket=1|00ee86e10737b52735767012da978b51, mop_ticket_history=1|7c3d1975dd022ece96fe86ec92a0e96c, mop_operation=1|f361e9306fa461d5a1bf9a16a10e0677, mop_outbox=1|c51f21471d6be0e506c96df6e0f91441, mop_monitoring_event=1|eb47a6d6fb85f5fd6b4ecf87619d369b, mop_monitoring_event_member=2|8fc2f540239b49432a35196cf348019d, mop_event_noise_record=4|b8a211ba71aa79834fc093d1f6326840, mop_autoticket_attempt=1|419c0640c77d9df68f5ce5b238c733e3, mop_audit=2|99b93cc2862d0fccbdae62c7e803f6fa, mop_idempotency=2|309b7bb97c77b3c9bbeebc523a260af7}>
+│     └─ missingAttemptVersionUpdateRollsBackAllTicketAndEventChanges() ✘ Multiple Failures (2 failures)
+│              	org.opentest4j.AssertionFailedError: CAS miss must not be reported as successful creation ==> expected: not <null>
+│              	org.opentest4j.AssertionFailedError: ticket/history/outbox/event/attempt/audit/idempotency changes must all roll back ==> expected: <{mop_ticket=1|00ee86e10737b52735767012da978b51, mop_ticket_history=1|7c3d1975dd022ece96fe86ec92a0e96c, mop_operation=1|f361e9306fa461d5a1bf9a16a10e0677, mop_outbox=1|c51f21471d6be0e506c96df6e0f91441, mop_monitoring_event=2|6680340a76548a651e32381b5526e5fa, mop_monitoring_event_member=3|5672dacd2cc0b6f6b0c15bbe415b5670, mop_event_noise_record=6|362e2189b114f2475516ce0904f2f273, mop_autoticket_attempt=2|9e5eba1b5d64e19c4b1f28f4fbccf339, mop_audit=3|fb262e01ce76f009633708e3acb4e140, mop_idempotency=3|866cc564ea301050c28526bc2bc350f9}> but was: <{mop_ticket=2|48c8ade6d8d254c0b3dd4da0b1e49adf, mop_ticket_history=2|b58636b0cfbab39ec1fd389b1b9eb764, mop_operation=2|06a74f1a3154f33c94cf3ab8b6db1cf6, mop_outbox=2|df4be3fbffc328ea479f99c7315c737f, mop_monitoring_event=2|4c81dfa5f3962d022fc40a6223fc390b, mop_monitoring_event_member=4|a988adbb02626578590c5ecd9ddbde95, mop_event_noise_record=8|2b08a674cd8571bbf2d170662e9f4efb, mop_autoticket_attempt=2|9e5eba1b5d64e19c4b1f28f4fbccf339, mop_audit=4|9feb2a3eb08dbd02c43be91b71788ef8, mop_idempotency=4|4ed7a339ea49ea92997d319122d515f0}>
+└─ JUnit Vintage ✔
+
+Failures (2):
+  JUnit Jupiter:PostgresAutoTicketCasIntegrationTest:missingEventTicketLinkUpdateRollsBackAllTicketAndEventChanges()
+    MethodSource [className = 'cn.mop.persistence.PostgresAutoTicketCasIntegrationTest', methodName = 'missingEventTicketLinkUpdateRollsBackAllTicketAndEventChanges', methodParameterTypes = '']
+    => org.opentest4j.MultipleFailuresError: Multiple Failures (2 failures)
+	org.opentest4j.AssertionFailedError: CAS miss must not be reported as successful creation ==> expected: not <null>
+	org.opentest4j.AssertionFailedError: ticket/history/outbox/event/attempt/audit/idempotency changes must all roll back ==> expected: <{mop_ticket=0|d41d8cd98f00b204e9800998ecf8427e, mop_ticket_history=0|d41d8cd98f00b204e9800998ecf8427e, mop_operation=0|d41d8cd98f00b204e9800998ecf8427e, mop_outbox=0|d41d8cd98f00b204e9800998ecf8427e, mop_monitoring_event=1|8c43a2eb8f90afede8643c955dc1547b, mop_monitoring_event_member=1|9aba0a0cc6deec7bd3987f62b9d40f80, mop_event_noise_record=2|ce96752650c1c5336614c588ce2f9ad7, mop_autoticket_attempt=1|4df7d0a853a1cd2222039c344873bf19, mop_audit=1|d73fce4c5a2302db2ef37e9837ba2b2f, mop_idempotency=1|f37fe2963c216deff25f0721eea8d311}> but was: <{mop_ticket=1|00ee86e10737b52735767012da978b51, mop_ticket_history=1|7c3d1975dd022ece96fe86ec92a0e96c, mop_operation=1|f361e9306fa461d5a1bf9a16a10e0677, mop_outbox=1|c51f21471d6be0e506c96df6e0f91441, mop_monitoring_event=1|eb47a6d6fb85f5fd6b4ecf87619d369b, mop_monitoring_event_member=2|8fc2f540239b49432a35196cf348019d, mop_event_noise_record=4|b8a211ba71aa79834fc093d1f6326840, mop_autoticket_attempt=1|419c0640c77d9df68f5ce5b238c733e3, mop_audit=2|99b93cc2862d0fccbdae62c7e803f6fa, mop_idempotency=2|309b7bb97c77b3c9bbeebc523a260af7}>
+       org.junit.jupiter.api.AssertAll.assertAll(AssertAll.java:80)
+       org.junit.jupiter.api.AssertAll.assertAll(AssertAll.java:44)
+       org.junit.jupiter.api.AssertAll.assertAll(AssertAll.java:38)
+       org.junit.jupiter.api.Assertions.assertAll(Assertions.java:2944)
+       cn.mop.persistence.PostgresAutoTicketCasIntegrationTest.check(PostgresAutoTicketCasIntegrationTest.java:47)
+       [...]
+       Suppressed: org.opentest4j.AssertionFailedError: CAS miss must not be reported as successful creation ==> expected: not <null>
+         org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+         org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+         org.junit.jupiter.api.AssertNotNull.failNull(AssertNotNull.java:49)
+         org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:35)
+         org.junit.jupiter.api.Assertions.assertNotNull(Assertions.java:312)
+         [...]
+       Suppressed: org.opentest4j.AssertionFailedError: ticket/history/outbox/event/attempt/audit/idempotency changes must all roll back ==> expected: <{mop_ticket=0|d41d8cd98f00b204e9800998ecf8427e, mop_ticket_history=0|d41d8cd98f00b204e9800998ecf8427e, mop_operation=0|d41d8cd98f00b204e9800998ecf8427e, mop_outbox=0|d41d8cd98f00b204e9800998ecf8427e, mop_monitoring_event=1|8c43a2eb8f90afede8643c955dc1547b, mop_monitoring_event_member=1|9aba0a0cc6deec7bd3987f62b9d40f80, mop_event_noise_record=2|ce96752650c1c5336614c588ce2f9ad7, mop_autoticket_attempt=1|4df7d0a853a1cd2222039c344873bf19, mop_audit=1|d73fce4c5a2302db2ef37e9837ba2b2f, mop_idempotency=1|f37fe2963c216deff25f0721eea8d311}> but was: <{mop_ticket=1|00ee86e10737b52735767012da978b51, mop_ticket_history=1|7c3d1975dd022ece96fe86ec92a0e96c, mop_operation=1|f361e9306fa461d5a1bf9a16a10e0677, mop_outbox=1|c51f21471d6be0e506c96df6e0f91441, mop_monitoring_event=1|eb47a6d6fb85f5fd6b4ecf87619d369b, mop_monitoring_event_member=2|8fc2f540239b49432a35196cf348019d, mop_event_noise_record=4|b8a211ba71aa79834fc093d1f6326840, mop_autoticket_attempt=1|419c0640c77d9df68f5ce5b238c733e3, mop_audit=2|99b93cc2862d0fccbdae62c7e803f6fa, mop_idempotency=2|309b7bb97c77b3c9bbeebc523a260af7}>
+         org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+         org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+         org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+         org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+         org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+         [...]
+  JUnit Jupiter:PostgresAutoTicketCasIntegrationTest:missingAttemptVersionUpdateRollsBackAllTicketAndEventChanges()
+    MethodSource [className = 'cn.mop.persistence.PostgresAutoTicketCasIntegrationTest', methodName = 'missingAttemptVersionUpdateRollsBackAllTicketAndEventChanges', methodParameterTypes = '']
+    => org.opentest4j.MultipleFailuresError: Multiple Failures (2 failures)
+	org.opentest4j.AssertionFailedError: CAS miss must not be reported as successful creation ==> expected: not <null>
+	org.opentest4j.AssertionFailedError: ticket/history/outbox/event/attempt/audit/idempotency changes must all roll back ==> expected: <{mop_ticket=1|00ee86e10737b52735767012da978b51, mop_ticket_history=1|7c3d1975dd022ece96fe86ec92a0e96c, mop_operation=1|f361e9306fa461d5a1bf9a16a10e0677, mop_outbox=1|c51f21471d6be0e506c96df6e0f91441, mop_monitoring_event=2|6680340a76548a651e32381b5526e5fa, mop_monitoring_event_member=3|5672dacd2cc0b6f6b0c15bbe415b5670, mop_event_noise_record=6|362e2189b114f2475516ce0904f2f273, mop_autoticket_attempt=2|9e5eba1b5d64e19c4b1f28f4fbccf339, mop_audit=3|fb262e01ce76f009633708e3acb4e140, mop_idempotency=3|866cc564ea301050c28526bc2bc350f9}> but was: <{mop_ticket=2|48c8ade6d8d254c0b3dd4da0b1e49adf, mop_ticket_history=2|b58636b0cfbab39ec1fd389b1b9eb764, mop_operation=2|06a74f1a3154f33c94cf3ab8b6db1cf6, mop_outbox=2|df4be3fbffc328ea479f99c7315c737f, mop_monitoring_event=2|4c81dfa5f3962d022fc40a6223fc390b, mop_monitoring_event_member=4|a988adbb02626578590c5ecd9ddbde95, mop_event_noise_record=8|2b08a674cd8571bbf2d170662e9f4efb, mop_autoticket_attempt=2|9e5eba1b5d64e19c4b1f28f4fbccf339, mop_audit=4|9feb2a3eb08dbd02c43be91b71788ef8, mop_idempotency=4|4ed7a339ea49ea92997d319122d515f0}>
+       org.junit.jupiter.api.AssertAll.assertAll(AssertAll.java:80)
+       org.junit.jupiter.api.AssertAll.assertAll(AssertAll.java:44)
+       org.junit.jupiter.api.AssertAll.assertAll(AssertAll.java:38)
+       org.junit.jupiter.api.Assertions.assertAll(Assertions.java:2944)
+       cn.mop.persistence.PostgresAutoTicketCasIntegrationTest.check(PostgresAutoTicketCasIntegrationTest.java:47)
+       [...]
+       Suppressed: org.opentest4j.AssertionFailedError: CAS miss must not be reported as successful creation ==> expected: not <null>
+         org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:152)
+         org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+         org.junit.jupiter.api.AssertNotNull.failNull(AssertNotNull.java:49)
+         org.junit.jupiter.api.AssertNotNull.assertNotNull(AssertNotNull.java:35)
+         org.junit.jupiter.api.Assertions.assertNotNull(Assertions.java:312)
+         [...]
+       Suppressed: org.opentest4j.AssertionFailedError: ticket/history/outbox/event/attempt/audit/idempotency changes must all roll back ==> expected: <{mop_ticket=1|00ee86e10737b52735767012da978b51, mop_ticket_history=1|7c3d1975dd022ece96fe86ec92a0e96c, mop_operation=1|f361e9306fa461d5a1bf9a16a10e0677, mop_outbox=1|c51f21471d6be0e506c96df6e0f91441, mop_monitoring_event=2|6680340a76548a651e32381b5526e5fa, mop_monitoring_event_member=3|5672dacd2cc0b6f6b0c15bbe415b5670, mop_event_noise_record=6|362e2189b114f2475516ce0904f2f273, mop_autoticket_attempt=2|9e5eba1b5d64e19c4b1f28f4fbccf339, mop_audit=3|fb262e01ce76f009633708e3acb4e140, mop_idempotency=3|866cc564ea301050c28526bc2bc350f9}> but was: <{mop_ticket=2|48c8ade6d8d254c0b3dd4da0b1e49adf, mop_ticket_history=2|b58636b0cfbab39ec1fd389b1b9eb764, mop_operation=2|06a74f1a3154f33c94cf3ab8b6db1cf6, mop_outbox=2|df4be3fbffc328ea479f99c7315c737f, mop_monitoring_event=2|4c81dfa5f3962d022fc40a6223fc390b, mop_monitoring_event_member=4|a988adbb02626578590c5ecd9ddbde95, mop_event_noise_record=8|2b08a674cd8571bbf2d170662e9f4efb, mop_autoticket_attempt=2|9e5eba1b5d64e19c4b1f28f4fbccf339, mop_audit=4|9feb2a3eb08dbd02c43be91b71788ef8, mop_idempotency=4|4ed7a339ea49ea92997d319122d515f0}>
+         org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+         org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+         org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+         org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+         org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1156)
+         [...]
+
+Test run finished after 866 ms
+[         4 containers found      ]
+[         0 containers skipped    ]
+[         4 containers started    ]
+[         0 containers aborted    ]
+[         4 containers successful ]
+[         0 containers failed     ]
+[         2 tests found           ]
+[         0 tests skipped         ]
+[         2 tests started         ]
+[         0 tests aborted         ]
+[         0 tests successful      ]
+[         2 tests failed          ]
+

@@ -1,0 +1,43 @@
+{
+  "exit": 0,
+  "cases": [
+    {
+      "class": "cn.mop.persistence.PostgresMonitoringEventCenterIntegrationTest",
+      "name": "longProblemKeepsIdentityAndLateRecoveryClosesTheSameSignalOnly()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresMonitoringEventCenterIntegrationTest",
+      "name": "deduplicationTimesFiveFlapSilenceAndPendingReviewLifecycle_M4_7_M4_8_M4_11()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresMonitoringEventCenterIntegrationTest",
+      "name": "maintenanceExclusionCannotBeSelfApprovedAndEndingStopsTheInterval()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresAutoTicketCasIntegrationTest",
+      "name": "missingEventTicketLinkUpdateRollsBackAllTicketAndEventChanges()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresAutoTicketCasIntegrationTest",
+      "name": "missingAttemptVersionUpdateRollsBackAllTicketAndEventChanges()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresAutoTicketCasIntegrationTest",
+      "name": "concurrentAutomaticRetryAndManualCreationHaveOneDurableTicket()",
+      "passed": true
+    },
+    {
+      "class": "cn.mop.persistence.PostgresMonitoringEventCenterIntegrationTest",
+      "name": "maintenanceWindowSlaExclusionQuarantineBindAndAutoTicketFiveRetries_M4_10_M4_14_M5_4()",
+      "passed": true
+    }
+  ],
+  "scope": "REAL_PG_TRANSACTION_WITH_CONTROLLED_JDBC_ZERO_ROW_UPDATE",
+  "real_concurrency": "THREE_PARALLEL_AUTOMATIC_AND_MANUAL_REQUEST_PAIRS",
+  "http": "NOT_RUN"
+}

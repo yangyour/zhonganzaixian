@@ -1,0 +1,16 @@
+{
+  "exit": 1,
+  "cases": [
+    {
+      "name": "missingEventTicketLinkUpdateRollsBackAllTicketAndEventChanges()",
+      "passed": false
+    },
+    {
+      "name": "missingAttemptVersionUpdateRollsBackAllTicketAndEventChanges()",
+      "passed": false
+    }
+  ],
+  "scope": "REAL_PG_TRANSACTION_WITH_CONTROLLED_JDBC_ZERO_ROW_UPDATE",
+  "real_concurrency": "NOT_RUN",
+  "http": "NOT_RUN"
+}

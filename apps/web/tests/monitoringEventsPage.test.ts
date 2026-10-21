@@ -166,3 +166,15 @@ describe('D15 page permissions and interrupted flows', () => {
     expect(signal.aborted).toBe(true); expect(await contextTransitionGuards.approve()).toBe(true)
   })
 })
+
+it('manual creation CAS conflict preserves entered reason and never upgrades or retries the request automatically',async()=>{
+ const {data,request}=ready(),attempt=data.autoticket_attempts.find(a=>['RETRY_SCHEDULED','QUARANTINED_MANUAL_REQUIRED'].includes(a.status))!
+ mount();await settle();const reason='已核验当前告警，需要人工补建并保留此说明'
+ await input(`manual-ticket-reason-${attempt.id}`,reason)
+ request.mockRejectedValueOnce(new ApiError(409,'VERSION_CONFLICT','自动建单尝试版本已变化，本次事务未提交','SYNTHETIC_CAS'))
+ buttons('人工补建工单').find(b=>!b.disabled)!.click();await settle()
+ expect((document.getElementById(`manual-ticket-reason-${attempt.id}`) as HTMLInputElement).value).toBe(reason)
+ const posts=request.mock.calls.filter(([,o])=>o?.method==='POST');expect(posts).toHaveLength(1)
+ expect(posts[0]![1]?.body).toEqual({expected_version:attempt.version,reason})
+ expect(request).toHaveBeenCalledTimes(2)
+})

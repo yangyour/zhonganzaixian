@@ -327,7 +327,7 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
                 s.setString(9, a.tenantId());
                 s.setString(10, existing.get().id());
                 s.setLong(11, existing.get().version());
-                s.executeUpdate();
+                if (s.executeUpdate() != 1) throw new DomainException(409, "VERSION_CONFLICT", "自动建单尝试版本已变化，本次事务未提交");
             }
         }
     }
@@ -631,7 +631,7 @@ public final class PostgresMonitoringEventCenterRepository implements Monitoring
             s.setString(5, tenant);
             s.setString(6, eventId);
             s.setLong(7, ev.version());
-            s.executeUpdate();
+            if (s.executeUpdate() != 1) throw new DomainException(409, "VERSION_CONFLICT", "监控事件关联版本已变化，本次事务未提交");
         }
     }
 

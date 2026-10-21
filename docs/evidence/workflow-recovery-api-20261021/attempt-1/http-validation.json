@@ -1,0 +1,349 @@
+{
+  "scope": "REAL_LOOPBACK_HTTP_SYNTHETIC_ACCOUNTS",
+  "checks": [
+    {
+      "case": "padmin_csrf",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_login",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_switch",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tadmin_csrf",
+      "actor": "tadmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tadmin_login",
+      "actor": "tadmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tadmin_switch",
+      "actor": "tadmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_csrf",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_login",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_switch",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "open_fixture_candidates",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "unrelated_customer_cannot_read_target",
+      "actor": "viewerA",
+      "status": 404,
+      "expected": 404,
+      "code": "OBJECT_NOT_FOUND",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "accept_before",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "accept_command",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "accept_same_key_replay",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "accept_independent_readback",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "start_before",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "start_command",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "start_same_key_replay",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "start_independent_readback",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "resolve_before",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "resolve_command",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "resolve_same_key_replay",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "resolve_independent_readback",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "unrelated_customer_cannot_confirm",
+      "actor": "viewerA",
+      "status": 404,
+      "expected": 404,
+      "code": "OBJECT_NOT_FOUND",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "close_before",
+      "actor": "tadmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "close_command",
+      "actor": "tadmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "close_same_key_replay",
+      "actor": "tadmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "close_independent_readback",
+      "actor": "tadmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "reopen_before",
+      "actor": "tadmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "reopen_command",
+      "actor": "tadmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "reopen_same_key_replay",
+      "actor": "tadmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "reopen_independent_readback",
+      "actor": "tadmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "reassign_before",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "reassign_command",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "reassign_same_key_replay",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "reassign_independent_readback",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "cancel_before",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "cancel_command",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "cancel_same_key_replay",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "cancel_independent_readback",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "stale_original_version",
+      "actor": "padmin",
+      "status": 409,
+      "expected": 409,
+      "code": "VERSION_CONFLICT",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "customer_internal_action_forbidden",
+      "actor": "viewerA",
+      "status": 403,
+      "expected": 403,
+      "code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store"
+    }
+  ],
+  "result": "PASS",
+  "provider_sends": false,
+  "synthetic_confirmed_commands": 7,
+  "same_key_replays_equal": true,
+  "real_customer_commands": 0,
+  "rejected_reads_non_audit_tables_unchanged": true,
+  "real_workflow_commands": 0,
+  "api_stopped": true
+}

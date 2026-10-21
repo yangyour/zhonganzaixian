@@ -1,0 +1,131 @@
+{
+  "scope": "REAL_LOOPBACK_HTTP_SYNTHETIC_ACCOUNTS",
+  "checks": [
+    {
+      "case": "anonymous_inventory",
+      "actor": "anonymous",
+      "status": 401,
+      "expected": 401,
+      "code": "SESSION_EXPIRED",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_csrf",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_login",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "padmin_switch",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_csrf",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_login",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewerA_switch",
+      "actor": "viewerA",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "viewer_inventory_forbidden",
+      "actor": "viewerA",
+      "status": 403,
+      "expected": 403,
+      "code": "ACTION_FORBIDDEN",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "inventory_first_page",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "inventory_next_page",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "repeat_same_page",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "target_membership_revoked_without_selected_tenant_version_change",
+      "actor": "padmin",
+      "status": 200,
+      "expected": 200,
+      "code": null,
+      "cache_control": "no-store"
+    },
+    {
+      "case": "tenant_query_override",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "invalid_boundary",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    },
+    {
+      "case": "invalid_page_size",
+      "actor": "padmin",
+      "status": 400,
+      "expected": 400,
+      "code": "VALIDATION_ERROR",
+      "cache_control": "no-store"
+    }
+  ],
+  "result": "PASS",
+  "provider_sends": false,
+  "successful_inventory_reads_fingerprints_unchanged": true,
+  "rejected_reads_non_audit_tables_unchanged": true,
+  "real_tenant_changes": 0,
+  "api_stopped": true
+}

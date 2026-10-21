@@ -7,7 +7,7 @@ export const tenantUnknownFields = ['isolation_mode','resource_pool','lifecycle_
 export interface TenantInventoryRow extends Record<typeof tenantUnknownFields[number], null> { id: string; name: string; created_at: string; registered_asset_count: string; registered_site_count: string; active_member_count: string }
 export interface TenantInventoryPage { context_tenant_id: string; items: TenantInventoryRow[]; has_more: boolean; next_after_id: string | null; source: 'postgresql'; scope: 'ACTIVE_PADMIN_MEMBERSHIPS_ONLY'; page_size_limit: 100; pagination_consistency: 'CURRENT_REQUEST_SNAPSHOT_ONLY'; count_basis: 'RECORDED_ROWS_NOT_MONITORED_OR_LICENSED_USAGE'; unknown_fields_policy: 'EXPLICIT_NULL_NO_INFERENCE'; new_tenant_creation_enabled: false }
 export interface TenantInventoryContext { tenantId: string; actorId: string; permissionVersion: number; role: string }
-export interface TenantInventoryState { page: TenantInventoryPage | null; busy: boolean; error: unknown; canPrevious: boolean; paged: boolean }
+export interface TenantInventoryState { page: TenantInventoryPage | null; busy: boolean; error: unknown; canPrevious: boolean; paged: boolean; canRetry: boolean }
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const object = (value: unknown): value is Record<string, unknown> => Boolean(value && typeof value === 'object' && !Array.isArray(value))
 const exact = (value: unknown, keys: string[]): value is Record<string, unknown> => object(value) && Object.keys(value).length === keys.length && keys.every(k => Object.hasOwn(value,k))
@@ -24,23 +24,23 @@ export function readTenantInventory(value: unknown, context: TenantInventoryCont
   if(value.has_more ? value.items.length!==15 || value.next_after_id!==previous : value.next_after_id!==null)throw bad()
   return structuredClone(value) as unknown as TenantInventoryPage
 }
-export const emptyTenantInventory = (): TenantInventoryState => ({page:null,busy:false,error:null,canPrevious:false,paged:false})
+export const emptyTenantInventory = (): TenantInventoryState => ({page:null,busy:false,error:null,canPrevious:false,paged:false,canRetry:false})
 export function createTenantInventoryReader(client: Pick<ApiClient,'request'>, changed: (state: TenantInventoryState)=>void) {
-  let context:TenantInventoryContext|null=null,state=emptyTenantInventory(),generation=0,controller:AbortController|undefined,boundary:string|null=null,history:(string|null)[]=[]
+  let context:TenantInventoryContext|null=null,state=emptyTenantInventory(),generation=0,controller:AbortController|undefined,boundary:string|null=null,history:(string|null)[]=[],pending:{after:string|null;past:(string|null)[]}|null=null,disposed=false
   const emit=()=>changed(detachedWorkspaceState(state))
-  function reset(next:TenantInventoryContext|null){controller?.abort();++generation;context=next&&uuid.test(next.tenantId)&&uuid.test(next.actorId)&&Number.isSafeInteger(next.permissionVersion)&&next.permissionVersion>0&&next.role==='padmin'?{...next}:null;boundary=null;history=[];state=emptyTenantInventory();if(next&&!context)state.error=new Error('当前成员无租户登记资源读取权限');emit()}
+  function reset(next:TenantInventoryContext|null){controller?.abort();++generation;context=!disposed&&next&&uuid.test(next.tenantId)&&uuid.test(next.actorId)&&Number.isSafeInteger(next.permissionVersion)&&next.permissionVersion>0&&next.role==='padmin'?{...next}:null;boundary=null;history=[];pending=null;state=emptyTenantInventory();if(next&&!context&&!disposed)state.error=new Error('当前成员无租户登记资源读取权限');emit()}
   async function load(after:string|null,past:(string|null)[]){
-    if(!context||state.busy)return false
+    if(disposed||!context||state.busy)return false
     const scope={...context},turn=++generation;controller?.abort();const abort=new AbortController();controller=abort
-    state={...state,page:null,busy:true,error:null};emit()
+    pending={after,past:[...past]};state={...state,page:null,busy:true,error:null,canRetry:false};emit()
     try {const params=new URLSearchParams({page_size:'15'});if(after!==null)params.set('after_id',after)
       const page=readTenantInventory(await client.request('/tenants/inventory?'+params,{signal:abort.signal}),scope,after)
       if(turn!==generation||abort.signal.aborted)return false
       boundary=after;history=[...past];state={...state,page,canPrevious:history.length>0,paged:after!==null};return true
-    }catch(error){if(turn===generation&&!isCancelled(error))state={...state,error};return false}
+    }catch(error){if(turn===generation&&!isCancelled(error))state={...state,error,canRetry:true};return false}
     finally{if(turn===generation){state={...state,busy:false};emit()}}
   }
-  emit();return {reset,refresh:()=>load(null,[]),next:()=>state.page?.has_more&&!state.busy?load(state.page.next_after_id,[...history,boundary]):Promise.resolve(false),previous:()=>history.length&&!state.busy?load(history.at(-1)!,history.slice(0,-1)):Promise.resolve(false),dispose:()=>reset(null),state:()=>detachedWorkspaceState(state)}
+  emit();return {reset,retry:()=>state.canRetry&&pending?load(pending.after,[...pending.past]):Promise.resolve(false),refresh:()=>load(null,[]),next:()=>state.page?.has_more&&!state.busy?load(state.page.next_after_id,[...history,boundary]):Promise.resolve(false),previous:()=>history.length&&!state.busy?load(history.at(-1)!,history.slice(0,-1)):Promise.resolve(false),dispose:()=>{disposed=true;reset(null)},state:()=>detachedWorkspaceState(state)}
 }
 export const tenantInventoryColumns=[
   {key:'name',label:'租户名称'},{key:'isolation',label:'隔离模式·资源池'},{key:'status',label:'状态'},

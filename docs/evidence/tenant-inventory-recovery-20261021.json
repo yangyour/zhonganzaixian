@@ -1,0 +1,40 @@
+{
+  "base_commit": "3194b1e1c36c0fe0f1ec4973dead850d9b56834f",
+  "result": "PASS_DOM_HTTP_BUILD",
+  "web_tests": 2968,
+  "web_files": 204,
+  "new_web_tests": 13,
+  "contract_tests": 169,
+  "actual_http_checks": 15,
+  "actual_http_vectors_replayed": 3,
+  "synthetic_added_tenants": 18,
+  "synthetic_added_authorized_tenants": 17,
+  "authorized_total_before_revocation": 19,
+  "verified_page_sizes": [
+    15,
+    4
+  ],
+  "remaining_second_page_after_target_revocation": 3,
+  "selected_tenant_permission_version_unchanged": true,
+  "successful_get_all_105_table_fingerprints_unchanged": true,
+  "rejected_get_non_audit_tables_unchanged": true,
+  "real_tenant_changes": 0,
+  "real_permissions_changed": 0,
+  "api_stopped": true,
+  "temporary_database_and_credentials_removed": true,
+  "typecheck_build_static": "PASS",
+  "build_id": "a4ade2afe24ed15f1ed4d2d8109a187b0155f1478c7c675387f8bc99345d421e",
+  "java_suite": "UNCHANGED_NOT_RERUN",
+  "api_version": "UNCHANGED_0.73.0",
+  "migrations": "V1_V45_UNCHANGED_FRESH_APPLY_AND_REPEAT_VERIFIED",
+  "browser_axe": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "live_frontend_transport": "NOT_RUN_CAPTURE_REPLAY_AND_DOM_ONLY",
+  "formal_tc_not_run": 128,
+  "source_sha256": {
+    "apps/web/src/pages/TenantInventoryPage.vue": "e2c4f764d95c83c3a3e30cc9880cf44d5b6ec105f6123af07bf62fa45218f1e3",
+    "apps/web/src/utils/tenantInventory.ts": "fc0200e60df668235c7e27fe81734ba0f8acb27a57ec1088ad65de1395068de2",
+    "apps/web/tests/tenantInventory.test.ts": "35e48583f1601d26e47426c60ead7c51c81e3eca079378f951693aedbf4fda9c",
+    "apps/web/tests/tenantInventoryPage.test.ts": "604fd7f6d58386076fed9a63d3a37b5168c43cb0c4221cc0e771af9c95f2fd04",
+    "fixtures/tenant-inventory-http-synthetic-20261021.json": "6d82acf7a7bb8a3464f12e631181e19a0a8b2235c296bacebd3078e3d783252b"
+  }
+}

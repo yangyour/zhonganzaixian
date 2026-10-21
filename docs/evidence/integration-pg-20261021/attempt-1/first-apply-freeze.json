@@ -1,0 +1,50 @@
+{
+  "observed_at_utc": "2026-10-21T05:15:15.783238+00:00",
+  "environment": "dot-disposable-pg17-11",
+  "database_removed_after_test": true,
+  "versions": [
+    42,
+    43,
+    44,
+    45
+  ],
+  "sha256": {
+    "V42__ticket_lifecycle_revisions.sql": "01923cef9be16d7445b8aa4ada7ee564ad0210a21bad59edca17eb48e9a908e9",
+    "V44__ticket_sla_policy_bindings.sql": "f249f843c35eb547da719036db3f35d0168f89cb971a85ddf084191a3c632600",
+    "V45__sla_reminder_intents.sql": "d9626559c8a74299a703a094689e3dcf153cc54ec139a685d2cad1c7ebbd7507",
+    "V43__ticket_autoclose_jobs.sql": "0b3bf01db63bcae757c4b80ba9f10979c342ae95dd339121ce91a979553e47e4"
+  },
+  "history_rows": [
+    {
+      "script": "V42__ticket_lifecycle_revisions.sql",
+      "success": true,
+      "version": "42",
+      "checksum": -956552339,
+      "installed_on": "2026-10-20T22:13:47.713138"
+    },
+    {
+      "script": "V43__ticket_autoclose_jobs.sql",
+      "success": true,
+      "version": "43",
+      "checksum": 2102398138,
+      "installed_on": "2026-10-20T22:13:52.074726"
+    },
+    {
+      "script": "V44__ticket_sla_policy_bindings.sql",
+      "success": true,
+      "version": "44",
+      "checksum": 1869511343,
+      "installed_on": "2026-10-20T22:13:56.834201"
+    },
+    {
+      "script": "V45__sla_reminder_intents.sql",
+      "success": true,
+      "version": "45",
+      "checksum": 1011894633,
+      "installed_on": "2026-10-20T22:14:01.431153"
+    }
+  ],
+  "installed_on_note": "Flyway installed_on is timestamp without time zone; stored values are retained verbatim and are not asserted to be UTC.",
+  "future_sql_changes_require_new_version": 46,
+  "business_concurrency_and_live_api": "NOT_RUN_IN_ATTEMPT_1"
+}

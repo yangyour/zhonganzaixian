@@ -40,7 +40,7 @@ manifest.update(json.loads((root/'tools/niko-test/frozen-email-migration.json').
 manifest.update(json.loads((root/'tools/niko-test/frozen-change-notice-approval-migration.json').read_text())['sha256'])
 # A pinned candidate is not evidence of an applied migration.
 manifest.update(json.loads((root/'tools/niko-test/candidate-inspection-quarterly-report-migration.json').read_text())['sha256'])
-manifest.update(json.loads((root/'tools/niko-test/candidate-revision-integration-migration.json').read_text())['sha256'])
+manifest.update(json.loads((root/'tools/niko-test/frozen-revision-integration-migration.json').read_text())['sha256'])
 for directory in ['server/persistence/src/main/resources/db/migration','server/persistence/target/classes/db/migration']:
  if {p.name for p in (root/directory).iterdir() if p.is_file()} != set(manifest):raise SystemExit('Migration resource set mismatch; no database action')
 for name,expected in manifest.items():

@@ -1333,6 +1333,7 @@
       "local_references": [
         "docs/inspection-templates.md",
         "docs/local-inspection-validation-20261004.md",
+        "docs/report-html-preview-20261021.md",
         "docs/test-server-acceptance-20261005.md"
       ],
       "external_references_unchecked": 0,
@@ -1497,6 +1498,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "8ca59c619d92df24a04f83ea0c311ff4a9ace751ccd52e87a84575b7a2aa9fa3"
+    "doc/development/07_合同逐项开发追踪.md": "e9e51b9795ba07b9e292f931ac2339fb4e1c82a5d9e8b4083f2cc66eb2064cdb"
   }
 }

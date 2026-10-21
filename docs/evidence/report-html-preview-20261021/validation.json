@@ -1,0 +1,24 @@
+{
+  "base_commit": "c25ee32e3017a6f0ca7737fe8787a3f8fa174d98",
+  "scope": "HTML_DRAFT_PREVIEW_ONLY",
+  "web_tests": {
+    "passed": 2584,
+    "files": 186
+  },
+  "new_tests": 13,
+  "typecheck": "PASS",
+  "build_and_static_gates": "PASS",
+  "build_id": "29bebe2c4eff785f806393d2625419ccba3d509d92adf7838fb32de7d76dcb1a",
+  "captured_java_controller_fixture_cases": 2,
+  "new_real_http": "NOT_RUN",
+  "browser_visual_axe": "NOT_RUN_ENVIRONMENT_BLOCKED",
+  "formal_pdf_publication": "NOT_IMPLEMENTED",
+  "migrations": "UNCHANGED_V1_V45",
+  "source_sha256": {
+    "apps/web/src/utils/inspectionReportPreview.ts": "ad2efeae41c4992997a6d5661a29e74a5628aa939ab03130759aaac4f896c330",
+    "apps/web/src/pages/InspectionQuarterlyReportsPage.vue": "65300c4c50d52f0a89288d14b7a723239de8abe0f39cbe32ef4a09b6b7f1bc91",
+    "apps/web/tests/inspectionReportPreview.test.ts": "27b0a11a82beda742ebe0a62337a32da8e1031b8bd8406704290c1607024c707",
+    "apps/web/tests/inspectionQuarterlyReportsPage.test.ts": "e5939b32c431dce9e4a064a3770a0c16293d138e2e959cd83cf8305ea68ab906"
+  },
+  "corrected_failure": "Initial typecheck rejected missing this type in a test spy; explicit HTMLAnchorElement annotation added and typecheck rerun."
+}

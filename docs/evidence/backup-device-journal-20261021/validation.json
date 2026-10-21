@@ -1,0 +1,22 @@
+{
+  "java": {
+    "tests": 3924,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1014,
+    "executed": 2910
+  },
+  "new_unit_tests": 10,
+  "new_opt_in_postgres_junit_test": "SKIPPED_IN_DEFAULT_MAVEN_RUN",
+  "jdbc_business_assertions": 33,
+  "catalog_and_tamper_checks": 7,
+  "jdbc_assertions_source": "Same business checks as opt-in test, run through standalone JDBC harness",
+  "python_tests": 121,
+  "contract_node_tests": 173,
+  "api_contract_check": "PASS_UNCHANGED_0.76",
+  "formal_acceptance": "128_NOT_RUN",
+  "browser": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "frontend_changed": false,
+  "production_device_execution": false,
+  "sql_sha256": "97d4dec874c03503326fbb609ea1708fa6601fd257fb664ca74cad7fa2032f98"
+}

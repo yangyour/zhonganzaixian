@@ -1,0 +1,95 @@
+{
+  "constraints": [
+    {
+      "name": "mop_backup_device_lease_event_action_check",
+      "type": "c",
+      "sha256": "57296efb2bac48aa12b1633a3d233841583a11ccd7461b51f62d6d2483cef5fb",
+      "definition": "CHECK (((action)::text = ANY ((ARRAY['ACQUIRE'::character varying, 'RENEW'::character varying, 'RELEASE'::character varying])::text[])))"
+    },
+    {
+      "name": "mop_backup_device_lease_event_check",
+      "type": "c",
+      "sha256": "19435cd15578bcd245bdb2b7f150723ebadd119cdb1ed42180a854aadf0d9029",
+      "definition": "CHECK (((acquired_at >= '0001-01-01 00:00:00+00'::timestamp with time zone) AND (lease_until <= '9999-12-31 23:59:59.999+00'::timestamp with time zone)))"
+    },
+    {
+      "name": "mop_backup_device_lease_event_check1",
+      "type": "c",
+      "sha256": "e8ab7e8b0af396a2e2f32fed68943cefd2e1e2bbe4d2a49a559e630d8a4bd7fd",
+      "definition": "CHECK (((observed_at >= acquired_at) AND (lease_until > observed_at)))"
+    },
+    {
+      "name": "mop_backup_device_lease_event_check2",
+      "type": "c",
+      "sha256": "c237163462f7e7cc5edbe0e694cd4c3cecb337fee60bb94b126e1b85539520b5",
+      "definition": "CHECK ((((action)::text = 'RELEASE'::text) = (released_at IS NOT NULL)))"
+    },
+    {
+      "name": "mop_backup_device_lease_event_check3",
+      "type": "c",
+      "sha256": "e64d4c0fe4b9870dd1387fea83d354b11054bdc26d0113b8da9f46b90158109f",
+      "definition": "CHECK (((((action)::text = 'RELEASE'::text) AND (released_at = observed_at) AND (release_confirmation_reference IS NOT NULL) AND ((release_confirmation_reference)::text ~ '^sha256:[0-9a-f]{64}$'::text)) OR (((action)::text <> 'RELEASE'::text) AND (released_at IS NULL) AND (release_confirmation_reference IS NULL))))"
+    },
+    {
+      "name": "mop_backup_device_lease_event_check4",
+      "type": "c",
+      "sha256": "2341f38bbd854915580887da2d09caadf1929d6854becf27451ceacaa98b7dc0",
+      "definition": "CHECK ((((released_at IS NULL) AND (fencing_token <= ((version + 1) / 2)) AND (lease_until = (observed_at + ((lease_millis)::double precision * '00:00:00.001'::interval)))) OR ((released_at IS NOT NULL) AND (fencing_token <= (version / 2)) AND (((lease_until - ((lease_millis)::double precision * '00:00:00.001'::interval)) >= acquired_at) AND ((lease_until - ((lease_millis)::double precision * '00:00:00.001'::interval)) <= released_at)))))"
+    },
+    {
+      "name": "mop_backup_device_lease_event_device_execution_authorized_check",
+      "type": "c",
+      "sha256": "d5e6bc5ed36e54306c3d17a2bca2398f6dbd343a8ad022a3a93c33e7af3a4cb8",
+      "definition": "CHECK ((NOT device_execution_authorized))"
+    },
+    {
+      "name": "mop_backup_device_lease_event_fencing_token_check",
+      "type": "c",
+      "sha256": "36593d24b189fba813f25b2d136ddf481795a4f4499b7b4192eb195a7b45cb04",
+      "definition": "CHECK (((fencing_token >= 1) AND (fencing_token <= '9007199254740991'::bigint)))"
+    },
+    {
+      "name": "mop_backup_device_lease_event_lease_millis_check",
+      "type": "c",
+      "sha256": "a7c58cb93e7b84d746515a2cafdbf9cef534b3348d739c54ce4e6dc3b788fcbb",
+      "definition": "CHECK (((lease_millis >= 1) AND (lease_millis <= 300000)))"
+    },
+    {
+      "name": "mop_backup_device_lease_event_pkey",
+      "type": "p",
+      "sha256": "381974ca50ac1e9da181a50174d0fb7df615e97384eb43e88da81ef3b0387ffc",
+      "definition": "PRIMARY KEY (tenant_id, asset_id, version)"
+    },
+    {
+      "name": "mop_backup_device_lease_event_record_source_check",
+      "type": "c",
+      "sha256": "50e4e5345aab28f80c6372e6d55ad166065bfa7436b5f1d0c065af4148956a0a",
+      "definition": "CHECK (((record_source)::text = 'INTERNAL_COORDINATION_JOURNAL'::text))"
+    },
+    {
+      "name": "mop_backup_device_lease_event_tenant_id_asset_id_fkey",
+      "type": "f",
+      "sha256": "402424bf77655e614f9f7e61bffc21fab99c463d5990e04d07c3bd440bf2b094",
+      "definition": "FOREIGN KEY (tenant_id, asset_id) REFERENCES mop_asset(tenant_id, id)"
+    },
+    {
+      "name": "mop_backup_device_lease_event_trace_id_check",
+      "type": "c",
+      "sha256": "f4b0fb98c5e3cc64ae24933ef1236fd9d362b4ade2c42a9f7139929a42917c45",
+      "definition": "CHECK (((length((trace_id)::text) > 0) AND ((trace_id)::text !~ '[^A-Za-z0-9._:-]'::text)))"
+    },
+    {
+      "name": "mop_backup_device_lease_event_version_check",
+      "type": "c",
+      "sha256": "4a4bc9e75509adf601102a047a571e173cc3b356c5b082db5c89ed303a6d3899",
+      "definition": "CHECK (((version >= 1) AND (version <= '9007199254740991'::bigint)))"
+    },
+    {
+      "name": "mop_backup_device_lease_event_worker_owner_check",
+      "type": "c",
+      "sha256": "d3c6a64b2441dcae211c76ec3cb6e229adcaf24d5101019aaa260cfa9a8455d0",
+      "definition": "CHECK (((length((worker_owner)::text) > 0) AND ((worker_owner)::text !~ '[^A-Za-z0-9._:-]'::text)))"
+    }
+  ],
+  "function_sha256": "a4635d0e12d4c11011cb10b27224a30a27bf01640b624a1649a5439f9f46b401"
+}

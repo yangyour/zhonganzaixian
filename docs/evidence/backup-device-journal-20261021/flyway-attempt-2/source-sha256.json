@@ -1,0 +1,6 @@
+{
+  "server/persistence/src/main/java/cn/mop/persistence/PostgresBackupDeviceLeaseRepository.java": "8ef15caa7d8db007c1fc97279d73eb14d66d8e66b6a0c15a57367645362a4b10",
+  "server/persistence/src/main/java/cn/mop/persistence/BackupDeviceLeaseSchemaVerifier.java": "dc6b7b6ef8f308287cad6ddcd18d9d3c4b778f2ea822931aaf2782bf1c9ec92f",
+  "server/persistence/src/main/java/cn/mop/persistence/TestSchemaMigration.java": "96e6f6cda861f6bebc919f578777474559eb519cf2d8a5e7c72e1ce8830291ed",
+  "server/persistence/src/main/resources/db/migration/V46__backup_device_coordination_journal.sql": "97d4dec874c03503326fbb609ea1708fa6601fd257fb664ca74cad7fa2032f98"
+}

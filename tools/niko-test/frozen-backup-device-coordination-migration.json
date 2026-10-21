@@ -1,0 +1,11 @@
+{
+  "status": "APPLIED_FROZEN_ISOLATED_PG17_11",
+  "description": "V46 successfully applied by Flyway to a disposable database. First post-apply verifier failed on an index query text[]/varchar[] cast; only Java verifier was corrected, SQL bytes remain frozen. Full successful revalidation evidence is recorded separately.",
+  "sha256": {
+    "V46__backup_device_coordination_journal.sql": "97d4dec874c03503326fbb609ea1708fa6601fd257fb664ca74cad7fa2032f98"
+  },
+  "function_body_sha256": {
+    "mop_backup_device_lease_insert_guard": "a4635d0e12d4c11011cb10b27224a30a27bf01640b624a1649a5439f9f46b401"
+  },
+  "first_apply_evidence": "docs/evidence/backup-device-journal-20261021/flyway-attempt-1/v46-application.json"
+}

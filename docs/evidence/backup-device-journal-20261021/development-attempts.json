@@ -1,0 +1,135 @@
+{
+  "exploratory-attempt-1": {
+    "preflight.log": "Traceback (most recent call last):\n  File \"/tmp/za-device-lease-harness/run.py\", line 6, in <module>\n    assert hashlib.sha256(jar.read_bytes()).hexdigest()==manifest['api_jar_sha256']\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+  },
+  "exploratory-attempt-2": {
+    "cleanup.json": {
+      "loopback_only": true,
+      "provider_sends": false,
+      "temporary_credentials_only": true,
+      "postgresql_stopped": true,
+      "temporary_database_and_credentials_removed": true,
+      "result": "PASS"
+    },
+    "summary.json": {
+      "result": "PASS",
+      "versions_applied_flyway": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45
+      ],
+      "candidate_v46_direct_sql": true,
+      "production_approved": false,
+      "device_execution": false
+    },
+    "repository-checks.log": "PASS acquire_database_clock_no_execution_authority\nPASS lost_response_acquire_replay_no_write\nPASS replay_payload_mismatch\nPASS held_request_blocks_new_owner\nPASS wrong_owner_denied\nPASS wrong_fence_denied\nPASS stale_version_denied\nPASS renew_advances_version_and_clock\nPASS mandatory_stop_verifier_denies_unproven_reference\nPASS failed_stop_verification_rollback_no_event\nPASS verified_synthetic_release\nPASS new_request_advances_fence\nPASS released_old_replays_do_not_release_or_reacquire_new_request\nPASS scoped_current_read_is_nonmutating\nPASS authorization_checked_before_replay\nPASS cross_tenant_denied\nPASS expiry_observed_as_reconciliation_required\nPASS expired_lease_blocks_takeover\nPASS expired_lease_cannot_release\nPASS expired_lease_cannot_renew\nPASS independent_connections_exactly_one_concurrent_acquisition\nPASS caller_supplied_timestamp_denied\nPASS missing_release_reference_denied\nPASS direct_sql_version_gap_denied\nPASS runtime_immutable_UPDATE\nPASS runtime_immutable_DELETE\nPASS runtime_immutable_TRUNCATE\nPASS read_rollback_no_event\nPASS independent_asset_unblocked\nTOTAL_PASS=29 SYNTHETIC_AUTHORIZATION_AND_STOP_ADAPTERS_ONLY=true NO_DEVICE_EXECUTION=true\n"
+  },
+  "flyway-attempt-1": {
+    "failure.json": {
+      "stage": "migration_V46",
+      "error_type": "AssertionError",
+      "detail": "migration_V46 verification failed",
+      "production_approved": false
+    },
+    "cleanup.json": {
+      "loopback_only": true,
+      "provider_sends": false,
+      "temporary_credentials_only": true,
+      "postgresql_stopped": true,
+      "temporary_database_and_credentials_removed": true,
+      "result": "FAILED"
+    }
+  },
+  "catalog-probe-1": {
+    "failure.json": {
+      "stage": "schema_tamper_checks",
+      "error_type": "AssertionError",
+      "detail": "schema checks failed",
+      "production_approved": false
+    },
+    "cleanup.json": {
+      "loopback_only": true,
+      "provider_sends": false,
+      "temporary_credentials_only": true,
+      "postgresql_stopped": true,
+      "temporary_database_and_credentials_removed": true,
+      "result": "FAILED"
+    },
+    "schema-checks.log": "Exception in thread \"main\" org.postgresql.util.PSQLException: ERROR: operator does not exist: text[] = character varying[]\n  Hint: No operator matches the given name and argument types. You might need to add explicit type casts.\n  Position: 316\n\tat org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2904)\n\tat org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2589)\n\tat org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:431)\n\tat org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:534)\n\tat org.postgresql.jdbc.PgStatement.execute(PgStatement.java:437)\n\tat org.postgresql.jdbc.PgPreparedStatement.executeWithFlags(PgPreparedStatement.java:196)\n\tat org.postgresql.jdbc.PgPreparedStatement.executeQuery(PgPreparedStatement.java:139)\n\tat cn.mop.persistence.TestSchemaMigration.requireTrue(TestSchemaMigration.java:651)\n\tat cn.mop.persistence.BackupDeviceLeaseSchemaVerifier.verify(BackupDeviceLeaseSchemaVerifier.java:24)\n\tat cn.mop.persistence.LeaseSchemaChecks.main(LeaseSchemaChecks.java:9)\n"
+  },
+  "catalog-probe-2": {
+    "failure.json": {
+      "stage": "schema_tamper_checks",
+      "error_type": "AssertionError",
+      "detail": "schema checks failed",
+      "production_approved": false
+    },
+    "cleanup.json": {
+      "loopback_only": true,
+      "provider_sends": false,
+      "temporary_credentials_only": true,
+      "postgresql_stopped": true,
+      "temporary_database_and_credentials_removed": true,
+      "result": "FAILED"
+    },
+    "schema-checks.log": "PASS catalog_original\nException in thread \"main\" org.postgresql.util.PSQLException: The server's DateStyle parameter was changed to SQL, DMY. The JDBC driver requires DateStyle to begin with ISO for correct operation.\n\tat org.postgresql.core.v3.QueryExecutorImpl.receiveParameterStatus(QueryExecutorImpl.java:3092)\n\tat org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2625)\n\tat org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:431)\n\tat org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:534)\n\tat org.postgresql.jdbc.PgStatement.execute(PgStatement.java:437)\n\tat org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:359)\n\tat org.postgresql.jdbc.PgStatement.executeCachedSql(PgStatement.java:344)\n\tat org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:320)\n\tat org.postgresql.jdbc.PgStatement.execute(PgStatement.java:315)\n\tat cn.mop.persistence.LeaseSchemaChecks.main(LeaseSchemaChecks.java:10)\n"
+  },
+  "catalog-probe-3": {
+    "cleanup.json": {
+      "loopback_only": true,
+      "provider_sends": false,
+      "temporary_credentials_only": true,
+      "postgresql_stopped": true,
+      "temporary_database_and_credentials_removed": true,
+      "result": "PASS"
+    },
+    "summary.json": {
+      "result": "PASS",
+      "catalog_probe_only": true,
+      "full_migration_validation": false
+    },
+    "schema-checks.log": "PASS catalog_original\nPASS timezone_independent_restores_session\nPASS tamper_rollback_3\nPASS tamper_rollback_4\nPASS tamper_rollback_5\nPASS tamper_rollback_6\nPASS tamper_rollback_7\nTOTAL_SCHEMA_PASS=7\n"
+  }
+}

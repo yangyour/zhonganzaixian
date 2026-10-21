@@ -1,0 +1,632 @@
+[
+  {
+    "version": 5,
+    "mode": "--apply-photos",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V5__durable_report_photos.sql",
+      "success": true,
+      "version": "5",
+      "checksum": 1887903094,
+      "installed_on": "2026-10-21T09:49:00.98723"
+    },
+    "status": "ASSET_IMPORTS_PENDING",
+    "migrations_executed": 1
+  },
+  {
+    "version": 6,
+    "mode": "--apply-asset-imports",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V6__asset_import_sources_and_mapping.sql",
+      "success": true,
+      "version": "6",
+      "checksum": -636230002,
+      "installed_on": "2026-10-21T09:49:02.458475"
+    },
+    "status": "ASSET_IMPORTS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 7,
+    "mode": "--apply-asset-dependencies",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V7__asset_dependency_draft_revisions.sql",
+      "success": true,
+      "version": "7",
+      "checksum": -545292092,
+      "installed_on": "2026-10-21T09:49:03.843293"
+    },
+    "status": "ASSET_DEPENDENCIES_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 8,
+    "mode": "--apply-worklogs",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V8__manual_worklog_revisions.sql",
+      "success": true,
+      "version": "8",
+      "checksum": 1211360336,
+      "installed_on": "2026-10-21T09:49:05.150784"
+    },
+    "status": "WORKLOGS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 9,
+    "mode": "--apply-asset-metadata",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V9__manual_asset_metadata_revisions.sql",
+      "success": true,
+      "version": "9",
+      "checksum": -340432871,
+      "installed_on": "2026-10-21T09:49:06.430886"
+    },
+    "status": "ASSET_METADATA_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 10,
+    "mode": "--apply-internal-notes",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V10__immutable_internal_ticket_notes.sql",
+      "success": true,
+      "version": "10",
+      "checksum": -896663071,
+      "installed_on": "2026-10-21T09:49:07.773681"
+    },
+    "status": "INTERNAL_NOTES_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 11,
+    "mode": "--apply-ticket-comments",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V11__immutable_ticket_comments.sql",
+      "success": true,
+      "version": "11",
+      "checksum": -1655668462,
+      "installed_on": "2026-10-21T09:49:09.032751"
+    },
+    "status": "TICKET_COMMENTS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 12,
+    "mode": "--apply-working-calendars",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V12__unpublished_working_calendar_drafts.sql",
+      "success": true,
+      "version": "12",
+      "checksum": -2068183288,
+      "installed_on": "2026-10-21T09:49:10.396833"
+    },
+    "status": "WORKING_CALENDARS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 13,
+    "mode": "--apply-manual-incidents",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V13__immutable_manual_incident_registrations.sql",
+      "success": true,
+      "version": "13",
+      "checksum": 1030816869,
+      "installed_on": "2026-10-21T09:49:11.837194"
+    },
+    "status": "MANUAL_INCIDENTS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 14,
+    "mode": "--apply-manual-recoveries",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V14__immutable_manual_recovery_confirmations.sql",
+      "success": true,
+      "version": "14",
+      "checksum": -30124348,
+      "installed_on": "2026-10-21T09:49:13.192604"
+    },
+    "status": "MANUAL_RECOVERIES_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 15,
+    "mode": "--apply-manual-warranty",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V15__manual_warranty_details.sql",
+      "success": true,
+      "version": "15",
+      "checksum": 836542553,
+      "installed_on": "2026-10-21T09:49:14.582997"
+    },
+    "status": "MANUAL_WARRANTY_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 16,
+    "mode": "--apply-capacity-scenarios",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V16__immutable_capacity_scenario_drafts.sql",
+      "success": true,
+      "version": "16",
+      "checksum": 1367595086,
+      "installed_on": "2026-10-21T09:49:15.907245"
+    },
+    "status": "CAPACITY_SCENARIOS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 17,
+    "mode": "--apply-customer-contacts",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V17__customer_contact_revisions.sql",
+      "success": true,
+      "version": "17",
+      "checksum": 2031946591,
+      "installed_on": "2026-10-21T09:49:17.33235"
+    },
+    "status": "CUSTOMER_CONTACTS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 18,
+    "mode": "--apply-contact-imports",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V18__durable_contact_import_jobs.sql",
+      "success": true,
+      "version": "18",
+      "checksum": -1130281417,
+      "installed_on": "2026-10-21T09:49:18.806986"
+    },
+    "status": "CONTACT_IMPORTS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 19,
+    "mode": "--apply-contact-import-fix",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V19__contact_import_generated_hash_guard.sql",
+      "success": true,
+      "version": "19",
+      "checksum": -268577672,
+      "installed_on": "2026-10-21T09:49:20.29317"
+    },
+    "status": "CONTACT_IMPORTS_FIXED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 20,
+    "mode": "--apply-asset-exports",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V20__durable_asset_export_jobs.sql",
+      "success": true,
+      "version": "20",
+      "checksum": -319450001,
+      "installed_on": "2026-10-21T09:49:21.787588"
+    },
+    "status": "ASSET_EXPORTS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 21,
+    "mode": "--apply-inspection-templates",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V21__inspection_template_revisions.sql",
+      "success": true,
+      "version": "21",
+      "checksum": 951051044,
+      "installed_on": "2026-10-21T09:49:23.325597"
+    },
+    "status": "INSPECTION_TEMPLATES_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 22,
+    "mode": "--apply-inspection-worksheets",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V22__manual_inspection_worksheet_drafts.sql",
+      "success": true,
+      "version": "22",
+      "checksum": -650061710,
+      "installed_on": "2026-10-21T09:49:24.989095"
+    },
+    "status": "INSPECTION_WORKSHEETS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 23,
+    "mode": "--apply-inspection-source-collections",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V23__immutable_inspection_source_collections.sql",
+      "success": true,
+      "version": "23",
+      "checksum": 1321810212,
+      "installed_on": "2026-10-21T09:49:26.579286"
+    },
+    "status": "INSPECTION_SOURCE_COLLECTIONS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 24,
+    "mode": "--apply-backup-plan-drafts",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V24__unpublished_backup_plan_drafts.sql",
+      "success": true,
+      "version": "24",
+      "checksum": -424372040,
+      "installed_on": "2026-10-21T09:49:28.081114"
+    },
+    "status": "BACKUP_PLAN_DRAFTS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 25,
+    "mode": "--apply-change-notice-drafts",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V25__unreviewed_change_notice_drafts.sql",
+      "success": true,
+      "version": "25",
+      "checksum": 552033867,
+      "installed_on": "2026-10-21T09:49:29.59731"
+    },
+    "status": "CHANGE_NOTICE_DRAFTS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 26,
+    "mode": "--apply-notification-preference-drafts",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V26__own_notification_preference_drafts.sql",
+      "success": true,
+      "version": "26",
+      "checksum": -324766275,
+      "installed_on": "2026-10-21T09:49:31.069149"
+    },
+    "status": "NOTIFICATION_PREFERENCE_DRAFTS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 27,
+    "mode": "--apply-project-identity",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V27__project_identity_and_roles.sql",
+      "success": true,
+      "version": "27",
+      "checksum": 511191109,
+      "installed_on": "2026-10-21T09:49:32.678983"
+    },
+    "status": "PROJECT_IDENTITY_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 28,
+    "mode": "--apply-identity-compatibility",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V28__identity_inventory_and_password_formats.sql",
+      "success": true,
+      "version": "28",
+      "checksum": 1559449245,
+      "installed_on": "2026-10-21T09:49:34.157934"
+    },
+    "status": "IDENTITY_COMPATIBILITY_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 29,
+    "mode": "--apply-raw-monitoring-events",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V29__immutable_raw_monitoring_events.sql",
+      "success": true,
+      "version": "29",
+      "checksum": -1977882733,
+      "installed_on": "2026-10-21T09:49:35.677862"
+    },
+    "status": "RAW_MONITORING_EVENTS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 30,
+    "mode": "--apply-monitoring-quarantine",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V30__immutable_monitoring_quarantine.sql",
+      "success": true,
+      "version": "30",
+      "checksum": 2028775275,
+      "installed_on": "2026-10-21T09:49:37.162796"
+    },
+    "status": "MONITORING_QUARANTINE_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 31,
+    "mode": "--apply-export-inbox",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V31__own_export_inbox.sql",
+      "success": true,
+      "version": "31",
+      "checksum": -486321876,
+      "installed_on": "2026-10-21T09:49:38.798351"
+    },
+    "status": "EXPORT_INBOX_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 32,
+    "mode": "--apply-runtime-configuration",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V32__runtime_configuration_publications.sql",
+      "success": true,
+      "version": "32",
+      "checksum": -606158601,
+      "installed_on": "2026-10-21T09:49:40.509348"
+    },
+    "status": "RUNTIME_CONFIGURATION_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 33,
+    "mode": "--apply-ticket-workflow",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V33__ticket_lifecycle_and_durable_clocks.sql",
+      "success": true,
+      "version": "33",
+      "checksum": -2063474061,
+      "installed_on": "2026-10-21T09:49:42.136709"
+    },
+    "status": "TICKET_WORKFLOW_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 34,
+    "mode": "--apply-notification-intents",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V34__ticket_notification_intents.sql",
+      "success": true,
+      "version": "34",
+      "checksum": -1167997960,
+      "installed_on": "2026-10-21T09:49:43.942231"
+    },
+    "status": "NOTIFICATION_INTENTS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 35,
+    "mode": "--apply-service-tiers",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V35__service_tiers_and_change_history.sql",
+      "success": true,
+      "version": "35",
+      "checksum": -1509422434,
+      "installed_on": "2026-10-21T09:49:45.727294"
+    },
+    "status": "SERVICE_TIERS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 36,
+    "mode": "--apply-oncall-escalation",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V36__oncall_escalation_and_sla_monthly_results.sql",
+      "success": true,
+      "version": "36",
+      "checksum": -131315136,
+      "installed_on": "2026-10-21T09:49:47.348817"
+    },
+    "status": "ONCALL_ESCALATION_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 37,
+    "mode": "--apply-monitoring-event-center",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V37__monitoring_events_noise_funnel_and_maintenance_windows.sql",
+      "success": true,
+      "version": "37",
+      "checksum": 125697472,
+      "installed_on": "2026-10-21T09:49:48.945099"
+    },
+    "status": "MONITORING_EVENT_CENTER_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 38,
+    "mode": "--apply-wecom-integration",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V38__wecom_bindings_deliveries_and_login_state.sql",
+      "success": true,
+      "version": "38",
+      "checksum": 845758090,
+      "installed_on": "2026-10-21T09:49:50.613657"
+    },
+    "status": "WECOM_INTEGRATION_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 39,
+    "mode": "--apply-email-integration",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V39__email_bindings_and_delivery_ledger.sql",
+      "success": true,
+      "version": "39",
+      "checksum": -373908053,
+      "installed_on": "2026-10-21T09:49:52.469121"
+    },
+    "status": "EMAIL_INTEGRATION_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 40,
+    "mode": "--apply-change-notice-approval",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V40__immutable_change_notice_approval_events.sql",
+      "success": true,
+      "version": "40",
+      "checksum": 14806533,
+      "installed_on": "2026-10-21T09:49:54.515686"
+    },
+    "status": "CHANGE_NOTICE_APPROVAL_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 41,
+    "mode": "--apply-inspection-quarterly-reports",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V41__immutable_inspection_quarterly_reports.sql",
+      "success": true,
+      "version": "41",
+      "checksum": 1456236875,
+      "installed_on": "2026-10-21T09:49:56.542074"
+    },
+    "status": "INSPECTION_QUARTERLY_REPORTS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 42,
+    "mode": "--apply-ticket-lifecycle",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V42__ticket_lifecycle_revisions.sql",
+      "success": true,
+      "version": "42",
+      "checksum": -956552339,
+      "installed_on": "2026-10-21T09:49:59.79284"
+    },
+    "status": "TICKET_LIFECYCLE_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 43,
+    "mode": "--apply-ticket-autoclose",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V43__ticket_autoclose_jobs.sql",
+      "success": true,
+      "version": "43",
+      "checksum": 2102398138,
+      "installed_on": "2026-10-21T09:50:05.341703"
+    },
+    "status": "TICKET_AUTOCLOSE_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 44,
+    "mode": "--apply-ticket-sla-policy",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V44__ticket_sla_policy_bindings.sql",
+      "success": true,
+      "version": "44",
+      "checksum": 1869511343,
+      "installed_on": "2026-10-21T09:50:10.432858"
+    },
+    "status": "TICKET_SLA_POLICY_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 45,
+    "mode": "--apply-sla-reminders",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V45__sla_reminder_intents.sql",
+      "success": true,
+      "version": "45",
+      "checksum": 1011894633,
+      "installed_on": "2026-10-21T09:50:14.791622"
+    },
+    "status": "SLA_REMINDERS_APPLIED",
+    "migrations_executed": 1
+  },
+  {
+    "version": 46,
+    "mode": "--apply-backup-device-coordination",
+    "exit": 0,
+    "safe_cli_error": "",
+    "last_history_entry": {
+      "script": "V46__backup_device_coordination_journal.sql",
+      "success": true,
+      "version": "46",
+      "checksum": -143003885,
+      "installed_on": "2026-10-21T09:50:19.167139"
+    },
+    "status": "BACKUP_DEVICE_COORDINATION_APPLIED",
+    "migrations_executed": 1
+  }
+]

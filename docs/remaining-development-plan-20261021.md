@@ -63,4 +63,4 @@
 
 [巡检模板、执行单、来源集合、季度报告的原读取恢复](inspection-read-recovery-20261021.md)已统一：原筛选/游标/历史边界保留，读取可取消，不以GET确认未知保存，不改变巡检真实性或报告发布边界。
 
-[备份设备协调租约状态](backup-device-lease-core-20261021.md)已补过期拒绝、owner/fence/version门禁及结构恢复；数据库CAS/互斥与核查适配仍待，未连接设备或启用Worker。
+[备份设备协调租约状态](backup-device-lease-core-20261021.md)已补过期拒绝、owner/fence/version门禁及结构恢复；[追加式数据库协调](backup-device-journal-20261021.md)已补事务、原请求重放和同设备并发互斥，并完成隔离库验证；真实授权/停止核查、物理 fencing、运行任务存储、归档与 Worker 仍待，未连接设备。

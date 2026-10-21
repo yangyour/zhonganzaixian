@@ -24,3 +24,7 @@ run派生状态QUEUED→RUNNING→RETRY_WAIT→SUCCEEDED/FAILED；attempt单独�
 
 
 后续补充：[设备协调租约状态与过期失联边界](backup-device-lease-core-20261021.md)已实现纯状态及结构恢复规则；实际数据库锁、Worker及设备停止核查尚未完成，不能把租约过期当作自动重领许可。
+
+## 2026-10-21 数据库协调增量
+
+[设备协调事务与验收](backup-device-journal-20261021.md)已补，V46 追加式日志及仓储在隔离 PostgreSQL 验证通过。该日志不是备份执行记录，不证明远端停止，过期不能接管；真实授权/停止核查适配器、任务 Worker、KMS/归档等仍待接入。

@@ -27,41 +27,43 @@ export function readExportGrant(value:unknown,p:Pick<ExportPublication,'job_id'|
 }
 interface Transport {request<T>(path:string,options?:RequestOptions):Promise<T>}
 type Kind='publication'|'content-grants'
-interface Attempt {kind:Kind;key:string;body:Record<string,unknown>;uncertain:boolean}
+interface Attempt {kind:Kind;key:string;body:Record<string,unknown>;baseline:ExportPublication;uncertain:boolean}
 export interface ExportPublicationState {current:ExportPublication|null;grant:ExportGrant|null;busy:boolean;attempt:Attempt|null;error:ApiError|null}
 export const emptyPublicationState=():ExportPublicationState=>({current:null,grant:null,busy:false,attempt:null,error:null})
 export function createExportPublicationWorkspace(transport:Transport,changed:(s:ExportPublicationState)=>void){
- let context:AssetExportContext|null=null,id:string|null=null,epoch=0,controller:AbortController|null=null,state=emptyPublicationState()
+ let context:AssetExportContext|null=null,id:string|null=null,epoch=0,disposed=false,controller:AbortController|null=null,state=emptyPublicationState()
  const emit=()=>changed({...state,current:state.current?structuredClone(state.current):null,grant:state.grant?structuredClone(state.grant):null,attempt:state.attempt?structuredClone(state.attempt):null})
- const active=()=>validExportContext(context)&&id!==null&&exportUuid(id)
+ const active=()=>!disposed&&validExportContext(context)&&id!==null&&exportUuid(id)
  const error=(e:unknown)=>e instanceof ApiError?e:new ApiError(0,'REQUEST_UNCONFIRMED','请求结果未确认，请使用原请求重试','—')
- function reset(c:AssetExportContext|null,job:string|null){epoch++;controller?.abort();context=c?{...c}:null;id=job;state=emptyPublicationState();emit()}
+ function reset(c:AssetExportContext|null,job:string|null){epoch++;controller?.abort();controller=null;context=!disposed&&c?{...c}:null;id=!disposed?job:null;state=emptyPublicationState();emit()}
  async function read(){
   if(!active()||state.busy)return false
-  const turn=epoch,c={...context!},job=id!;controller=new AbortController();state.busy=true;state.current=null;state.grant=null;state.error=null;emit()
-  try{const raw=await transport.request<unknown>(`/asset-export-jobs/${job}/publication`,{signal:controller.signal});if(turn!==epoch)return false;state.current=readExportPublication(raw,c,job);return true}
+  const turn=epoch,c={...context!},job=id!,requestController=new AbortController();controller=requestController;state.busy=true;state.current=null;state.grant=null;state.error=null;emit()
+  try{if(turn!==epoch||disposed||requestController.signal.aborted)return false;const raw=await transport.request<unknown>(`/asset-export-jobs/${job}/publication`,{signal:requestController.signal});if(turn!==epoch||disposed||requestController.signal.aborted)return false;state.current=readExportPublication(raw,c,job);return true}
   catch(e){if(turn===epoch)state.error=error(e);return false}
-  finally{if(turn===epoch){state.busy=false;emit()}}
+  finally{if(turn===epoch){state.busy=false;controller=null;emit()}}
  }
- async function perform(attempt:Attempt){
+ async function perform(input:Attempt){
   if(!active()||state.busy)return false
-  const turn=epoch,c={...context!},job=id!,previous=attempt.uncertain,p=state.current?structuredClone(state.current):null
-  controller=new AbortController();state.busy=true;state.attempt={...attempt,body:structuredClone(attempt.body),uncertain:true};state.error=null;state.grant=null;emit()
+  const attempt=structuredClone(input),turn=epoch,c={...context!},job=id!,previous=attempt.uncertain,p=attempt.baseline,requestController=new AbortController()
+  controller=requestController;state.busy=true;state.attempt={...attempt,body:structuredClone(attempt.body),uncertain:true};state.error=null;state.grant=null;emit()
   try{
-   const raw=await transport.request<unknown>(`/asset-export-jobs/${job}/${attempt.kind}`,{method:'POST',body:structuredClone(attempt.body),idempotencyKey:attempt.key,signal:controller.signal})
-   if(turn!==epoch)return false
-   if(attempt.kind==='publication'){const result=readExportPublication(raw,c,job);if(result.status!=='PUBLISHED'||result.file_sha256!==attempt.body.file_sha256||result.version!==Number(attempt.body.expected_version)+2||p&&(result.size_bytes!==p.size_bytes||result.row_count!==p.row_count))throw invalid();state.current=result}
+   if(turn!==epoch||disposed||requestController.signal.aborted)return false;readExportPublication(p,c,job)
+   const raw=await transport.request<unknown>(`/asset-export-jobs/${job}/${attempt.kind}`,{method:'POST',body:structuredClone(attempt.body),idempotencyKey:attempt.key,signal:requestController.signal})
+   if(turn!==epoch||disposed||requestController.signal.aborted)return false
+   if(attempt.kind==='publication'){const result=readExportPublication(raw,c,job);if(result.status!=='PUBLISHED'||result.file_sha256!==attempt.body.file_sha256||result.version!==Number(attempt.body.expected_version)+2||(result.size_bytes!==p.size_bytes||result.row_count!==p.row_count))throw invalid();state.current=result}
    else{if(!p)throw invalid();state.grant=readExportGrant(raw,p)}
    state.attempt=null;return true
   }catch(e){if(turn===epoch){state.error=error(e);if(writeFailureUncertain(previous,e)){state.attempt={...attempt,uncertain:true}}else state.attempt=null}return false}
-  finally{if(turn===epoch){state.busy=false;emit()}}
+  finally{if(turn===epoch){state.busy=false;controller=null;emit()}}
  }
  async function start(kind:Kind){
   if(!active()||state.busy||state.attempt||!state.current)return false
-  const p=state.current
+  const turn=epoch,p=structuredClone(state.current)
   if(!p.publication_enabled||kind==='publication'&&(!p.prepared||p.status!=='NOT_PUBLISHED')||kind==='content-grants'&&(!p.download_grant_available||p.status!=='PUBLISHED'))return false
   const body:Record<string,unknown>=kind==='publication'?{expected_version:p.version,file_sha256:p.file_sha256,action:'PUBLISH_PREPARED_FILE'}:{}
-  return perform({kind,key:createRequestId(),body,uncertain:false})
+  try{const key=createRequestId();if(turn!==epoch||!active()||state.busy||state.attempt)return false;if(typeof key!=='string'||key.length<1||key.length>128||/[^A-Za-z0-9._:-]/.test(key))throw invalid();return perform({kind,key,body,baseline:p,uncertain:false})}
+  catch{if(turn===epoch&&!disposed){state.error=new ApiError(0,'REQUEST_ID_UNAVAILABLE','无法生成有效请求标识；没有发送发布或下载授权请求，请稍后重试','—');emit()}return false}
  }
- return{reset,read,publish:()=>start('publication'),grant:()=>start('content-grants'),retry:()=>state.attempt?perform(structuredClone(state.attempt)):Promise.resolve(false),unresolved:()=>state.busy||state.attempt!==null,dispose:()=>reset(null,null)}
+ return{reset,read,publish:()=>start('publication'),grant:()=>start('content-grants'),retry:()=>state.attempt?perform(structuredClone(state.attempt)):Promise.resolve(false),unresolved:()=>state.busy||state.attempt!==null,dispose:()=>{disposed=true;reset(null,null)}}
 }

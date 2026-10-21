@@ -1,0 +1,35 @@
+{
+  "result": "PASS_REPRODUCED_AND_FIXED_ORIGINAL_FILE_RECOVERY",
+  "new_tests": 18,
+  "before_fix_initial_14": {
+    "failed": 13,
+    "passed": 1
+  },
+  "focused_tests_passed": 63,
+  "vitest": {
+    "files_passed": 244,
+    "tests_passed": 3831
+  },
+  "node_contract_tests_passed": 173,
+  "api_contract_check": "PASS_UNCHANGED",
+  "typecheck": "PASS",
+  "production_build": {
+    "build_id": "27d58e3f4d0c66f9f653fd726965657b09812c1248cc5e56d0b4db56af0f2c53",
+    "file_count": 141,
+    "bootstrap_gzip_bytes": 179967,
+    "bootstrap_css_gzip_bytes": 62537,
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/utils/assetExportPublication.ts": "be135057fd3c193f453c0a9a662ba8599f02fb19f2ab51f6543f2251bd5cf8d3",
+    "apps/web/tests/exportPublicationRecovery.test.ts": "ca069af6eafe6856a49cbae513017d7dfb694e637a821c27dd2d63cfe6154bc4",
+    "apps/web/tests/assetExportJobsPage.test.ts": "2ce024f414ac6ec719ce13ca26aea7197533fb291bb37efcb55419b21d518cf6"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_downloads": 0,
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0
+}

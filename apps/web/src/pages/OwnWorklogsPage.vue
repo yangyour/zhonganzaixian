@@ -7,14 +7,16 @@ import type {OwnWorklogContext,OwnWorklogFilters} from '../utils/ownWorklogBrows
 import type {WorklogKind} from '../utils/worklogWorkspace'
 import {displayTime} from '../utils/display'
 import { summarizeWorklogPage, formatWorklogDuration } from '../utils/worklogPageSummary'
+import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import OwnWorklogFacts from '../components/OwnWorklogFacts.vue'
 const labels:Record<WorklogKind,string>={REMOTE:'远程处理',ONSITE:'现场处理',INSPECTION:'巡检',COMMUTE:'通勤'}
 const form=reactive({ticket:'',kind:'',from:'',before:''}),dirty=ref(false),validation=ref(''),expanded=ref<number|null>(null)
+const readScope=ref(0)
 let resetting=false,disposed=false,draftEpoch=0
 const state=shallowRef<OwnWorklogBrowserState>(emptyOwnWorklogBrowserState()),reader=createOwnWorklogBrowser(api,s=>{state.value=s})
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&session.value.user.role==='msp'&&can('worklogs:read_own')&&!switchingTenant.value))
-const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value]))
+const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,permitted.value]))
 const pageSummary=computed(()=>summarizeWorklogPage(state.value.page?.items??null))
 const newerThanList=computed(()=>state.value.selected&&state.value.page?.items.some(v=>v.id===state.value.selected!.id&&v.version<state.value.selected!.version))
 function context():OwnWorklogContext|null{const s=session.value;return permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true}:null}
@@ -24,12 +26,13 @@ async function clearFilters(){if(!permitted.value||disposed)return false;Object.
 async function refresh(){if(dirty.value||!permitted.value)return false;validation.value='';expanded.value=null;return reader.refresh()}
 async function next(){if(dirty.value||!permitted.value)return false;expanded.value=null;return reader.next()}
 async function show(id:string){expanded.value=null;return reader.show(id)}
+async function retryRead(){if(disposed||!permitted.value)return false;const turn=draftEpoch,key=contextKey.value;validation.value='';expanded.value=null;const okay=await reader.retryRead();if(disposed||turn!==draftEpoch||key!==contextKey.value)return false;if(okay)dirty.value=false;return okay}
 async function moreHistory(){expanded.value=null;return reader.moreHistory()}
-function closeDetails(){expanded.value=null;return reader.closeDetails()}
-watch(()=>JSON.stringify(form),()=>{if(resetting||disposed)return;++draftEpoch;dirty.value=true;validation.value='';expanded.value=null;reader.invalidate()},{flush:'sync'})
-watch(contextKey,()=>{++draftEpoch;resetting=true;Object.assign(form,{ticket:'',kind:'',from:'',before:''});resetting=false;dirty.value=false;validation.value='';expanded.value=null;reader.reset(disposed?null:context());if(permitted.value&&!disposed)void apply()},{immediate:true,flush:'sync'})
+function closeDetails(){expanded.value=null;const closed=reader.closeDetails();if(closed)readScope.value++;return closed}
+watch(()=>JSON.stringify(form),()=>{if(resetting||disposed)return;++draftEpoch;readScope.value++;dirty.value=true;validation.value='';expanded.value=null;reader.invalidate()},{flush:'sync'})
+watch(contextKey,()=>{++draftEpoch;readScope.value++;resetting=true;Object.assign(form,{ticket:'',kind:'',from:'',before:''});resetting=false;dirty.value=false;validation.value='';expanded.value=null;reader.reset(disposed?null:context());if(permitted.value&&!disposed)void apply()},{immediate:true,flush:'sync'})
 onUnmounted(()=>{disposed=true;reader.dispose()})
-defineExpose({form,state,dirty,filters,apply,clearFilters,refresh,next,show,moreHistory,closeDetails})
+defineExpose({form,state,dirty,filters,apply,clearFilters,refresh,next,show,moreHistory,closeDetails,cancelRead:reader.cancelRead,retryRead})
 </script>
 <template>
  <section class="own-worklogs-page"><div class="page-heading proto-page-head"><div><h1>我的工时记录 <span class="proto-badge">{{ session?.tenant.name }}</span></h1><p>查询当前账号在本租户下登记的工单作业工时明细</p></div></div>
@@ -41,6 +44,7 @@ defineExpose({form,state,dirty,filters,apply,clearFilters,refresh,next,show,more
     <div class="filter-grid"><label>关联工单 ID（可选）<input v-model="form.ticket" aria-label="本人工时工单筛选" maxlength="36" placeholder="输入工单 UUID，留空表示不限" /></label><label>作业类型<select v-model="form.kind" aria-label="本人工时类型筛选"><option value="">全部类型</option><option v-for="(label,key) in labels" :key="key" :value="key">{{label}}</option></select></label><label>开始时间起（含）<input v-model="form.from" aria-label="本人工时开始下界" maxlength="35" placeholder="例如 2026-10-01T00:00:00+08:00" /></label><label>开始时间止（不含）<input v-model="form.before" aria-label="本人工时开始上界" maxlength="35" placeholder="需与起始时间同时填写，且晚于起始时间" /></label></div><details class="boundary-details"><summary>时间筛选口径说明</summary><p>留空默认查询本人全部历史工时。时间范围按“作业开始时刻”（前闭后开）匹配，跨界记录的完整时长不裁剪；查询结果统一按 Asia/Shanghai 时区展示。</p></details>
    <p v-if="dirty" class="query-dirty" aria-live="polite">条件已修改，旧结果已清除；请明确应用后读取</p><p v-if="validation" class="validation" role="alert">{{validation}}</p><div class="actions"><button type="submit" :disabled="Boolean(state.busy)">应用条件并读取</button><button type="button" :disabled="Boolean(state.busy)" @click="clearFilters">清除条件并读取</button><button type="button" :disabled="dirty||Boolean(state.busy)||!state.filters" @click="refresh">重新读取已应用条件</button></div>
   </form>
+  <ReadRecoveryActions :busy="state.busy?'read':null" :can-retry="reader.canRetryRead()" :scope-key="contextKey+':'+readScope" label="本人工时" :cancel="reader.cancelRead" :retry="retryRead" />
   <ApiErrorNotice :error="state.error" />
   <section class="panel own-results"><p v-if="!state.page" class="query-empty">{{state.busy==='list'?'正在读取，数量未知':dirty?'尚未应用新条件，数量未知':state.error?'读取未通过，数量未知':'尚未读取，数量未知'}}</p>
    <template v-else><details class="applied-filters boundary-details"><summary>当前生效筛选条件</summary><p>关联工单：{{state.page.filters.ticket_id??'不限'}} · 作业类型：{{state.page.filters.kind===null?'全部类型':labels[state.page.filters.kind]}}</p><p>开始时间范围 (UTC)：{{state.page.filters.started_from??'不限'}} → {{state.page.filters.started_before??'不限'}}（前闭后开）</p></details><p class="query-count">当前页共 {{state.page.items.length}} 条记录 · {{state.paged?'后续页':'第 1 页'}}（下方分类汇总仅统计当前页）</p>

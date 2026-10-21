@@ -1,0 +1,31 @@
+{
+  "result": "PASS_OWN_WORKLOG_GET_RECOVERY_ONLY",
+  "new_tests": 15,
+  "focused_tests_passed": 50,
+  "vitest": {
+    "files_passed": 246,
+    "tests_passed": 3861
+  },
+  "node_contract_tests_passed": 173,
+  "api_contract_check": "PASS_UNCHANGED",
+  "typecheck": "PASS",
+  "production_build": {
+    "build_id": "f2b7a63f89889e43dfe9b5a87baebd774253eb3cb8fe87619ad392b5c4ef1d43",
+    "file_count": 141,
+    "bootstrap_gzip_bytes": 179989,
+    "bootstrap_css_gzip_bytes": 62537,
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/utils/ownWorklogBrowser.ts": "588ae67bd2383888d1ca2bc5c2a34f22460455aa05bef976fe956c9d0c9307f2",
+    "apps/web/src/pages/OwnWorklogsPage.vue": "5fb1efffb46ed7eb7b22afa47ec73fc8c23b4b93dfafd9965ed681061c846131",
+    "apps/web/tests/ownWorklogReadRecovery.test.ts": "c72f0d9645fcf32e86d6d1b58555ee97fe5d83c86222770342bab422cba73c78",
+    "apps/web/tests/ownWorklogsPage.test.ts": "d612eecdc7efae1a8da63b0876ba69d147fba096e3f08e78295e9be6bbb1a8c8"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "worklog_writes": 0,
+  "formal_acceptance_passes_added": 0
+}

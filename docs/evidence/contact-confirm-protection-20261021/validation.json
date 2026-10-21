@@ -1,0 +1,36 @@
+{
+  "result": "PASS_SFC_AND_REAL_COMPONENT_JSDOM_BUILD_HTTP",
+  "new_tests": 22,
+  "new_sfc_memory_renderer_tests": 17,
+  "new_real_component_jsdom_tests": 5,
+  "vitest": {
+    "files_passed": 236,
+    "tests_passed": 3638
+  },
+  "focused_tests_passed": 56,
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 140,
+    "bootstrap_gzip_bytes": 179973,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "2aa2332f91c821c65c6a77516f04deefd692de740e5d5e55da93b6c903768e6c",
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/pages/CustomerContactsPage.vue": "bc962db5709b2bc2ae15536fea1c043af2cb012cf6c8543d5eb82a4ccad6d22b",
+    "apps/web/src/pages/ContactImportPreviewPage.vue": "e938ea3e821df8eadc602b83d9e9316de2de4a7027eb03a9ccfcb3d6b4a40b41",
+    "apps/web/src/pages/ContactImportsPage.vue": "6e09ce7da7c85d0ab36c14174a23af12430edca74242c27385e6e222d3042b4e",
+    "apps/web/tests/customerContactsPage.test.ts": "6ae47c04b2ef3536525489e0ac62f3d3e19dfde5ccb88c0e101bca946f799212",
+    "apps/web/tests/contactImportPreviewPage.test.ts": "0e3ddac190b2c7d6b54d6b87faca200a7548002d6a82a12be923fb6907ee161b",
+    "apps/web/tests/contactImportsPage.test.ts": "35ba816e4c999aa43e1987d9e4e6c87403230d3b543eabc85b5830b09b178ca1",
+    "apps/web/tests/contactPreviewConfirmationDom.test.ts": "2232e022b76638182b8a71835d2d669c6f2c2d1c036c960c09685caa1236388a"
+  },
+  "api_contract_changed": false,
+  "api_or_database_executed": false,
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0
+}

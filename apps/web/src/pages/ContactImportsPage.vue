@@ -17,7 +17,7 @@ const workspace = createContactImportWorkspace(api, value => { state.value = val
 const acknowledge = ref(false), confirming = ref(false), tracking = ref<string | null>(null)
 let timer: ReturnType<typeof setTimeout> | null = null, trackingEpoch = 0, disposed = false
 const permitted = computed(() => Boolean(session.value && ['padmin', 'tadmin'].includes(session.value.user.role) && can('contacts:read') && can('contacts:write') && !switchingTenant.value))
-const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.user.role, permitted.value]))
+const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.account_version, session.value?.user.role, permitted.value]))
 const busy = computed(() => state.value.busy !== null || previewState.value.busy || confirming.value)
 const locked = computed(() => busy.value || state.value.attempt !== null)
 const readyToSubmit = computed(() => permitted.value && !locked.value && previewState.value.result !== null && previewState.value.result.invalid_rows === 0 && (previewState.value.result.identical_rows === 0 || acknowledge.value))
@@ -36,12 +36,13 @@ async function retry() { if (!permitted.value || busy.value) return false; retur
 async function discard() {
  if (workspace.unresolved()) { ElMessage.warning('原请求结果未知或正在提交，请先用完全相同原请求恢复；普通刷新不能确认。强制会话失效会清空本页私有输入。'); return false }
  if (confirming.value) return false
- if (!previewState.value.text) return true
- const turn = contextKey.value
+ if (disposed) return false
+ const turn = contextKey.value, input = previewState.value.text, ack = acknowledge.value
+ if (!input) { await Promise.resolve(); return !disposed && turn === contextKey.value && input === previewState.value.text && ack === acknowledge.value && !workspace.unresolved() }
  confirming.value = true
- try { await ElMessageBox.confirm(state.value.receipt ? '已受理作业保留在服务器，可从“我的导入作业”回读。离开会清除本页原输入与回执显示，确认继续？' : '输入与格式预览尚未持久化，离开将清除；确认放弃？', '保留本页输入', { confirmButtonText: '清除并继续', cancelButtonText: '保留输入', type: 'warning' }); return turn === contextKey.value && !workspace.unresolved() } catch { return false } finally { if (turn === contextKey.value && !disposed) confirming.value = false }
+ try { await ElMessageBox.confirm(state.value.receipt ? '已受理作业保留在服务器，可从“我的导入作业”回读。离开会清除本页原输入与回执显示，确认继续？' : '输入与格式预览尚未持久化，离开将清除；确认放弃？', '保留本页输入', { confirmButtonText: '清除并继续', cancelButtonText: '保留输入', type: 'warning' }); return !disposed && turn === contextKey.value && input === previewState.value.text && ack === acknowledge.value && !workspace.unresolved() } catch { return false } finally { if (turn === contextKey.value && !disposed) confirming.value = false }
 }
-async function beginNew() { const turn = contextKey.value; if (!permitted.value || busy.value || !await discard() || turn !== contextKey.value) return false; if (!workspace.begin()) return false; stopTracking(); acknowledge.value = false; preview.change(''); return true }
+async function beginNew() { const turn = contextKey.value, input = previewState.value.text, ack = acknowledge.value; if (disposed || !permitted.value || busy.value || !await discard() || disposed || turn !== contextKey.value || input !== previewState.value.text || ack !== acknowledge.value) return false; if (!workspace.begin()) return false; stopTracking(); acknowledge.value = false; preview.change(''); return true }
 async function unlockRejected() { if (!permitted.value || busy.value || state.value.attempt?.state !== 'rejected') return false; return workspace.begin() }
 async function browse(next = false) { if (!permitted.value || busy.value) return false; stopTracking(); return workspace.list(next) }
 async function select(id: string) { if (!permitted.value || busy.value) return false; stopTracking(); return workspace.select(id) }

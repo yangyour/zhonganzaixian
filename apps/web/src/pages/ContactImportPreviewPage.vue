@@ -9,18 +9,19 @@ import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import { createContactPreviewWorkspace, type ContactPreviewState } from '../utils/contactImportPreviewWorkspace'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import CustomerContactFacts from '../components/CustomerContactFacts.vue'
+let disposed = false
 const state = shallowRef<ContactPreviewState>({ text: '', result: null, busy: false, error: null })
 const workspace = createContactPreviewWorkspace(api, value => { state.value = value })
 const permitted = computed(() => Boolean(session.value && ['padmin', 'tadmin'].includes(session.value.user.role) && can('contacts:read') && can('contacts:write') && !switchingTenant.value))
-const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.user.role, permitted.value]))
+const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.account_version, session.value?.user.role, permitted.value]))
 watch(contextKey, () => { const s = session.value; workspace.reset(s && permitted.value ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version, role: s.user.role, canRead: true, canWrite: true } : null) }, { immediate: true, flush: 'sync' })
-async function discard() { if (!state.value.text) return true; const turn = contextKey.value; try { await ElMessageBox.confirm('此页输入和预览只在当前页面内存中，离开后将清除；没有保存联系人或导入作业。确认放弃输入？', '保留预览输入', { confirmButtonText: '放弃并继续', cancelButtonText: '保留输入', type: 'warning' }); return turn === contextKey.value } catch { return false } }
-async function clearInput() { if (await discard()) workspace.change('') }
+async function discard() { const turn = contextKey.value, input = state.value.text; if (input) { try { await ElMessageBox.confirm('此页输入和预览只在当前页面内存中，离开后将清除；没有保存联系人或导入作业。确认放弃输入？', '保留预览输入', { confirmButtonText: '放弃并继续', cancelButtonText: '保留输入', type: 'warning' }) } catch { return false } } else await Promise.resolve(); return !disposed && turn === contextKey.value && input === state.value.text }
+async function clearInput() { const turn = contextKey.value, input = state.value.text; if (!await discard() || disposed || turn !== contextKey.value || input !== state.value.text) return false; workspace.change(''); return true }
 onBeforeRouteLeave(discard)
 const unregister = contextTransitionGuards.register(discard)
 function beforeUnload(event: BeforeUnloadEvent) { if (state.value.text) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
-onUnmounted(() => { unregister(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
+onUnmounted(() => { disposed = true; unregister(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
 const example = JSON.stringify({ rows: [{ name: '仅格式示例，请替换为明确资料', roles: ['REPORTER'], mobile: null, email: null, wecom_user_id: null, preferred_priorities: null, quiet_window: null, enabled: false }] }, null, 2)
 defineExpose({ change: workspace.change, preview: workspace.preview, clearInput, state })
 </script>

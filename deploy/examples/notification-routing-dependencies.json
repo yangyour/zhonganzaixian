@@ -16,12 +16,54 @@
   "approved_recipient_mapping_reference": null,
   "channel_and_budget_configuration_reference": null,
   "channels": {
-    "EMAIL": {"provider_adapter": null, "provider_credentials_reference": null, "approved_endpoint_reference": null, "receipt_verification_configuration_reference": null, "retry_budget_reference": null},
-    "SMS": {"provider_adapter": null, "provider_credentials_reference": null, "approved_endpoint_reference": null, "receipt_verification_configuration_reference": null, "retry_budget_reference": null},
-    "DINGTALK": {"provider_adapter": null, "provider_credentials_reference": null, "approved_endpoint_reference": null, "receipt_verification_configuration_reference": null, "retry_budget_reference": null},
-    "WECHAT_WORK": {"provider_adapter": null, "provider_credentials_reference": null, "approved_endpoint_reference": null, "receipt_verification_configuration_reference": null, "retry_budget_reference": null},
-    "WEBHOOK": {"provider_adapter": null, "provider_credentials_reference": null, "approved_endpoint_reference": null, "receipt_verification_configuration_reference": null, "retry_budget_reference": null},
-    "VOICE": {"provider_adapter": null, "provider_credentials_reference": null, "approved_endpoint_reference": null, "receipt_verification_configuration_reference": null, "retry_budget_reference": null}
+    "EMAIL": {
+      "provider_adapter": null,
+      "provider_credentials_reference": null,
+      "approved_endpoint_reference": null,
+      "receipt_verification_configuration_reference": null,
+      "retry_budget_reference": null
+    },
+    "SMS": {
+      "provider_adapter": null,
+      "provider_credentials_reference": null,
+      "approved_endpoint_reference": null,
+      "receipt_verification_configuration_reference": null,
+      "retry_budget_reference": null
+    },
+    "DINGTALK": {
+      "provider_adapter": null,
+      "provider_credentials_reference": null,
+      "approved_endpoint_reference": null,
+      "receipt_verification_configuration_reference": null,
+      "retry_budget_reference": null
+    },
+    "WECHAT_WORK": {
+      "provider_adapter": null,
+      "provider_credentials_reference": null,
+      "approved_endpoint_reference": null,
+      "receipt_verification_configuration_reference": null,
+      "retry_budget_reference": null
+    },
+    "WEBHOOK": {
+      "provider_adapter": null,
+      "provider_credentials_reference": null,
+      "approved_endpoint_reference": null,
+      "receipt_verification_configuration_reference": null,
+      "retry_budget_reference": null
+    },
+    "VOICE": {
+      "provider_adapter": null,
+      "provider_credentials_reference": null,
+      "approved_endpoint_reference": null,
+      "receipt_verification_configuration_reference": null,
+      "retry_budget_reference": null
+    }
   },
-  "notes": "Dependency checklist only. Null is unresolved, never disabled or unlimited. Do not paste secrets or recipient addresses. Values must come from separately authorized publications and verified bindings. This file neither activates routing nor authorizes provider calls or paid sends."
+  "notes": "Dependency checklist only. Null is unresolved, never disabled or unlimited. Do not paste secrets or recipient addresses. Values must come from separately authorized publications and verified bindings. This file neither activates routing nor authorizes provider calls or paid sends. Snapshot encoding neither verifies provider callbacks nor configures durable storage. Each dead-letter replay needs separate current authorization and published policy.",
+  "receipt_history_repository_reference": null,
+  "receipt_journal_authorizer_reference": null,
+  "receipt_provider_correlation_reference": null,
+  "receipt_callback_authenticator_reference": null,
+  "receipt_dead_letter_replay_policy_reference": null,
+  "receipt_retention_capacity_reference": null
 }

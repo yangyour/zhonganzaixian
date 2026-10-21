@@ -33,5 +33,13 @@ class NotificationDependencyTemplateTest(unittest.TestCase):
             self.assertEqual(set(fields), expected)
             self.assertTrue(all(v is None for v in fields.values()))
 
+    def test_receipt_persistence_and_authentication_bindings_remain_unconfigured(self):
+        keys = ('receipt_history_repository_reference', 'receipt_journal_authorizer_reference',
+                'receipt_provider_correlation_reference', 'receipt_callback_authenticator_reference',
+                'receipt_dead_letter_replay_policy_reference', 'receipt_retention_capacity_reference')
+        for key in keys:
+            self.assertIn(key, self.data)
+            self.assertIsNone(self.data[key])
+
 if __name__ == '__main__':
     unittest.main()

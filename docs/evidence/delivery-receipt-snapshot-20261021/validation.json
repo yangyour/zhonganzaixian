@@ -1,0 +1,46 @@
+{
+  "result": "PASS_PURE_CANONICAL_HISTORY_FOUNDATION_ONLY",
+  "java": {
+    "total": 4043,
+    "executed": 3022,
+    "skipped": 1021,
+    "failures": 0,
+    "errors": 0,
+    "new_tests": 16,
+    "focused_passed": 40
+  },
+  "python_tests_passed": 130,
+  "node_contract_tests_passed": 173,
+  "api_contract_check": "PASS_UNCHANGED",
+  "acceptance_index": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "completion_verified": false
+  },
+  "vector": {
+    "result": "PASS",
+    "scope": "INDEPENDENT_SYNTHETIC_VECTOR_ONLY",
+    "bytes": 426,
+    "sha256": "ea8ea4090467ea5c302d15f4766d4fa781490f1b842c567cfad76ba61e420d98",
+    "provider_calls": 0
+  },
+  "initial_compile": "FAILED_MISSING_FINAL_FIELD_ASSIGNMENT_FIXED_BEFORE_FINAL_VERIFY",
+  "database_or_http_started": false,
+  "ddl_changed": false,
+  "frontend_changed_or_rerun": false,
+  "provider_calls": 0,
+  "automatic_send_enabled": false,
+  "provider_receipt_verified": false,
+  "browser": "NOT_RUN_EXISTING_BLOCKER",
+  "durable_database_recovery": "NOT_IMPLEMENTED",
+  "source_sha256": {
+    "server/domain/src/main/java/cn/mop/domain/notification/DeliveryReceiptState.java": "380549c6bfa6802a56f9a6b2d048f15e26cf6f448120651a623991269ff4b4fe",
+    "server/persistence/src/main/java/cn/mop/persistence/DeliveryReceiptSnapshotCodec.java": "3e9df9f11d8665478ede84c61192f61fa2603055d991c1d940867f03058b4f07",
+    "server/api/src/test/java/cn/mop/persistence/DeliveryReceiptSnapshotCodecTest.java": "b77cd7f66e55f4dbdedbb66b5e1dde70442456f2723e78761c6095a5c6af48ca",
+    "tools/delivery_snapshot_vector.py": "58ffefbb9ebd48656e7fee9981ab0fbd9f2bc817ad3f6103b7df70703bef181e",
+    "tools/test_delivery_snapshot_vector.py": "6fbda7e06836ca30f275cffb3c2eb31ca35e4920badbb6771c2d9089529e02b1",
+    "fixtures/delivery-receipt-snapshot-vector-20261021.json": "3881c289151695cb844d7fb2b8d9cb8aa470cfdfe953eacdad900614f007c33f",
+    "deploy/examples/notification-routing-dependencies.json": "fd4c1098c4ec4a269e7a4158715146494e8639364041f2e6f8ec92a51cd0a864",
+    "tools/test_notification_dependency_template.py": "00f5246583002433123c31e6a65d01f59e42fbd6fc8068f28e4c51d1d33288c2"
+  }
+}

@@ -28,6 +28,18 @@ public final class DeliveryReceiptState {
             time(occurredAt);
         }
     }
+    /** Ordered observations are required for lossless persistence; receipt occurrence alone is not receipt time. */
+    public sealed interface Transition permits Started, DeadLettered, ReceiptRecorded { Instant observedAt(); }
+    public record Started(UUID requestId, Instant observedAt) implements Transition {
+        public Started { if (requestId == null) throw invalid(); time(observedAt); }
+    }
+    public record DeadLettered(Instant observedAt) implements Transition {
+        public DeadLettered { time(observedAt); }
+    }
+    public record ReceiptRecorded(Receipt receipt, Instant observedAt) implements Transition {
+        public ReceiptRecorded { if (receipt == null) throw invalid(); time(observedAt); }
+    }
+    private final List<Transition> transitions;
     private final UUID tenantId, deliveryId;
     private final Deduplication deduplication;
     private final Instant queuedAt, observedAt;
@@ -38,14 +50,15 @@ public final class DeliveryReceiptState {
 
     private DeliveryReceiptState(UUID tenantId, UUID deliveryId, Deduplication deduplication,
                                  Instant queuedAt, Instant observedAt, long version,
-                                 List<Attempt> attempts, List<Receipt> receipts, boolean deadLetter) {
+                                 List<Attempt> attempts, List<Receipt> receipts, boolean deadLetter, List<Transition> transitions) {
         this.tenantId = tenantId; this.deliveryId = deliveryId; this.deduplication = deduplication;
         this.queuedAt = queuedAt; this.observedAt = observedAt; this.version = version;
         this.attempts = List.copyOf(attempts); this.receipts = List.copyOf(receipts); this.deadLetter = deadLetter;
+        this.transitions = List.copyOf(transitions);
     }
     public static DeliveryReceiptState queued(UUID tenantId, UUID deliveryId, Deduplication key, Instant at) {
         if (tenantId == null || deliveryId == null || key == null) throw invalid(); time(at);
-        return new DeliveryReceiptState(tenantId, deliveryId, key, at, at, 0, List.of(), List.of(), false);
+        return new DeliveryReceiptState(tenantId, deliveryId, key, at, at, 0, List.of(), List.of(), false, List.of());
     }
     /** Records a planned request only; a caller must independently authorize and persist before sending. */
     public DeliveryReceiptState start(long expectedVersion, UUID requestId, Instant at) {
@@ -53,13 +66,13 @@ public final class DeliveryReceiptState {
         if (status() != Status.QUEUED && status() != Status.DEAD_LETTER) throw conflict();
         if (attempts.size() >= MAX_ATTEMPTS || attempts.stream().anyMatch(a -> a.requestId().equals(requestId))) throw conflict();
         var next = new ArrayList<>(attempts); next.add(new Attempt(requestId, at));
-        return copy(at, next, receipts, false);
+        return copy(at, next, receipts, false, new Started(requestId, at));
     }
     /** Explicit failed-attempt disposition; no guessed retry budget, time or SMS quota. */
     public DeliveryReceiptState deadLetter(long expectedVersion, Instant at) {
         change(expectedVersion, at);
         if (status() != Status.FAILED) throw conflict();
-        return copy(at, attempts, receipts, true);
+        return copy(at, attempts, receipts, true, new DeadLettered(at));
     }
     public DeliveryReceiptState record(long expectedVersion, Receipt receipt, Instant receivedAt) {
         if (receipt == null) throw invalid();
@@ -75,7 +88,7 @@ public final class DeliveryReceiptState {
         var attempt = attempts.stream().filter(a -> a.requestId().equals(receipt.requestId())).findFirst().orElseThrow(DeliveryReceiptState::invalid);
         if (receipt.occurredAt().isBefore(attempt.startedAt()) || receipt.occurredAt().isAfter(receivedAt) || receipts.size() >= MAX_RECEIPTS) throw invalid();
         var next = new ArrayList<>(receipts); next.add(receipt);
-        return copy(receivedAt, attempts, next, deadLetter);
+        return copy(receivedAt, attempts, next, deadLetter, new ReceiptRecorded(receipt, receivedAt));
     }
     public Status status() {
         if (receipts.stream().anyMatch(r -> r.status() == ReceiptStatus.DELIVERED)) return Status.DELIVERED;
@@ -97,6 +110,7 @@ public final class DeliveryReceiptState {
     public Instant queuedAt() { return queuedAt; }
     public Instant observedAt() { return observedAt; }
     public long version() { return version; }
+    public List<Transition> transitions() { return transitions; }
     public List<Attempt> attempts() { return attempts; }
     public List<Receipt> receipts() { return receipts; }
     public String scope() { return "EXPLICIT_RECEIPT_STATE_ONLY"; }
@@ -104,8 +118,9 @@ public final class DeliveryReceiptState {
     public boolean automaticSendEnabled() { return false; }
     public Object effectiveRetryBudget() { return null; }
     public Object effectiveSmsQuota() { return null; }
-    private DeliveryReceiptState copy(Instant at, List<Attempt> attempts, List<Receipt> receipts, boolean deadLetter) {
-        return new DeliveryReceiptState(tenantId, deliveryId, deduplication, queuedAt, at, version + 1, attempts, receipts, deadLetter);
+    private DeliveryReceiptState copy(Instant at, List<Attempt> attempts, List<Receipt> receipts, boolean deadLetter, Transition transition) {
+        var history = new ArrayList<>(transitions); history.add(transition);
+        return new DeliveryReceiptState(tenantId, deliveryId, deduplication, queuedAt, at, version + 1, attempts, receipts, deadLetter, history);
     }
     private void change(long expectedVersion, Instant at) {
         if (version != expectedVersion || version >= 9007199254740991L) throw new DomainException(409, "VERSION_CONFLICT", "Delivery version changed");

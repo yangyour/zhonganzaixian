@@ -57,3 +57,7 @@ qa/browser/dashboard-workflows.pw.ts增加6项：320/390/768/1440四视口状态
 ## 当前浏览器脚本与新增恢复切片汇总
 
 在上述历史记录之后，CMDB库内重名、导入来源恢复和[PDF草稿验收矩阵](report-pdf-browser-acceptance-20261021.md)已补；再加上CMDB问题CSV导出的2项规格，共53项/7文件可发现，全部仍NOT_RUN。SLA月报、通知、备份草稿的原页恢复/取消与[CMDB问题导出](cmdb-finding-export-20261021.md)分别保留DOM及构建证据，不计作浏览器通过。128项正式TC均未改标完成。
+
+## 独立我的待办脚本增量
+
+qa/browser/my-tasks.pw.ts新增6项四视口、键盘详情、固定负责人、axe、取消和撤权规格，现为59项/8文件可发现，全部实际浏览器执行仍NOT_RUN。28项新增单元/DOM/实际HTTP回放与21项真实后端HTTP检查单独留证，不计为浏览器或正式TC通过。

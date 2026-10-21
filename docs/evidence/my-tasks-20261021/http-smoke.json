@@ -1,0 +1,31 @@
+{
+  "result": "PASS",
+  "scope": "LOOPBACK_VITE_HTTP_SMOKE_NOT_BROWSER_OR_API_ACCEPTANCE",
+  "host": "127.0.0.1",
+  "port": 28139,
+  "checks": [
+    {
+      "path": "/my-tasks",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/pages/MyTasksPage.vue",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/utils/dashboardWorkflows.ts",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/qa/my-tasks.fixture.html",
+      "status": 200,
+      "expected_marker_present": true
+    }
+  ],
+  "vite_stopped": true,
+  "browser_js_executed": false,
+  "api_or_database_executed": false
+}

@@ -21,6 +21,7 @@ export const router = createRouter({
     { path: '/monitoring-events', name: 'monitoring-events', component: () => import('./pages/MonitoringEventsPage.vue'), meta: { title: '监控事件中心与降噪', group: '资源', roles: ['padmin','msp'], capability: 'tickets:read' } },
     { path: '/manual-incidents', name: 'manual-incidents', component: () => import('./pages/ManualIncidentsPage.vue'), meta: { title: '手工故障登记', group: '服务', capability: 'manual_incidents:read' } },
     { path: '/tickets', name: 'tickets', component: () => import('./pages/TicketsPage.vue'), meta: { title: '报障与受理', group: '服务', capability: 'tickets:read' } },
+    { path: '/my-tasks', name: 'my-tasks', component: () => import('./pages/MyTasksPage.vue'), meta: { title: '我的待办', group: '服务', roles: ['padmin','msp'], capability: 'tickets:read', capabilities: ['ticket_notes:write_internal'] } },
     { path: '/ticket-workflows', name: 'ticket-workflows', component: () => import('./pages/TicketWorkflowsPage.vue'), meta: { title: '工单处理', group: '服务', capability: 'tickets:read' } },
     { path: '/ticket-notifications', name: 'ticket-notifications', component: () => import('./pages/TicketNotificationsPage.vue'), meta: { title: '工单通知', group: '服务', capability: 'tickets:read' } },
     { path: '/my-notification-preferences', name: 'my-notification-preferences', component: () => import('./pages/OwnNotificationPreferencesPage.vue'), meta: { title: '通知偏好设置', group: '服务', capability: 'notification_preferences:read_own' } },

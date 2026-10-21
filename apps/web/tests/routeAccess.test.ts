@@ -55,3 +55,9 @@ describe('effective capability navigation', () => {
   })
 
 })
+
+describe('all-required capability gates',()=>{
+ const meta={capability:'tickets:read',capabilities:['ticket_notes:write_internal'],roles:['padmin','msp']}
+ it('requires the primary and every additional grant without deriving grants from role',()=>{expect(routeAllowed(meta,auth(['tickets:read']))).toBe(false);expect(routeAllowed(meta,auth(['ticket_notes:write_internal']))).toBe(false);expect(routeAllowed(meta,auth(['tickets:read','ticket_notes:write_internal']))).toBe(true);expect(routeAllowed(meta,auth(['tickets:read','ticket_notes:write_internal'],'viewer'))).toBe(false)})
+ it('rejects malformed or empty additional capability lists',()=>{for(const capabilities of [null,'tickets:read',[],[''],['tickets:read',1]])expect(routeAllowed({...meta,capabilities},auth(['tickets:read','ticket_notes:write_internal']))).toBe(false)})
+})

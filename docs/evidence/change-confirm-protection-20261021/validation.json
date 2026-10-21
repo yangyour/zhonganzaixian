@@ -1,0 +1,32 @@
+{
+  "result": "PASS_SYNTHETIC_PARENT_CHILD_DOM_BUILD_HTTP",
+  "new_tests": 16,
+  "vitest": {
+    "files_passed": 235,
+    "tests_passed": 3616
+  },
+  "focused_tests_passed": 62,
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 140,
+    "bootstrap_gzip_bytes": 179968,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "2cedf17a1d0489ccf799fe1f62c5862c499a4c7bb7570f08f7e0da4e6206c103",
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/pages/ChangeNoticeDraftsPage.vue": "9d88033f8b8c2185a46018463234c4d54324c65e05b6e54130c6d00d9e4d822d",
+    "apps/web/src/components/ChangeNoticeApprovalPanel.vue": "f7df5aa8bf7def0329e2449c71c087fed7e7d6bcbc548fc011f15ee670fb8c37",
+    "apps/web/tests/changeNoticeDraftsPage.test.ts": "cbf02db97312cb0a66d32d20eb2508a75a0c088bf0fba93de96abc49e796ad22",
+    "apps/web/tests/changeNoticeApprovalPanel.test.ts": "cebc4f54212a8aae9d1f5ffde2f26ee665f552e58d4c75189e1a9b6b29b184b4"
+  },
+  "real_parent_child_components": true,
+  "api_contract_changed": false,
+  "api_or_database_executed": false,
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0
+}

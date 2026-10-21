@@ -10,6 +10,7 @@ import ApiErrorNotice from './ApiErrorNotice.vue'
 import ReadRecoveryActions from './ReadRecoveryActions.vue'
 const props=defineProps<{candidate:ChangeNoticeDetail|null;context:ChangeNoticeContext|null;contextKey:string;blocked?:boolean}>()
 const state=shallowRef<ApprovalWorkspaceState>(emptyApprovalState()),note=ref(''),targetPage=ref(0)
+let disposed=false
 const workspace=createApprovalWorkspace(api,s=>{state.value=s})
 const labels:Record<ApprovalAction,string>={SUBMIT:'提交此修订审核',WITHDRAW:'撤回此修订',APPROVE:'批准此修订',REJECT:'驳回此修订'}
 const statuses:Record<ApprovalStatus,string>={DRAFT:'待提交',IN_REVIEW:'审核中',APPROVED:'已批准（未生效）',REJECTED:'已驳回',WITHDRAWN:'已撤回'}
@@ -20,22 +21,23 @@ const locked=computed(()=>Boolean(props.blocked)||!props.context?.canWrite||Bool
 const actions=computed(()=>state.value.baseline?.allowed_actions.filter(a=>state.value.current?.allowed_actions.includes(a))??[])
 const dirty=computed(()=>Boolean(state.value.baseline)&&state.value.attempt?.state!=='accepted'&&note.value!=='')
 watch(()=>props.contextKey,()=>{workspace.reset(props.context);note.value='';targetPage.value=0},{immediate:true,flush:'sync'})
-async function mayLeave(){if(workspace.unresolved())return false;if(!dirty.value)return true;try{await ElMessageBox.confirm('审批说明尚未保存，是否放弃本次输入？','保留审批输入',{confirmButtonText:'放弃输入',cancelButtonText:'保留输入',type:'warning'});return true}catch{return false}}
-async function pin(){if(!props.candidate||state.value.busy||workspace.unresolved())return false;const turn=props.contextKey,target=structuredClone(props.candidate);if(!await mayLeave()||turn!==props.contextKey)return false;note.value='';targetPage.value=0;return workspace.pin(target)}
+function inputSnapshot(){return JSON.stringify([state.value.target,state.value.baseline,note.value])}
+async function mayLeave(){if(disposed||workspace.unresolved())return false;const turn=props.contextKey,input=inputSnapshot();if(dirty.value){try{await ElMessageBox.confirm('审批说明尚未保存，是否放弃本次输入？','保留审批输入',{confirmButtonText:'放弃输入',cancelButtonText:'保留输入',type:'warning'})}catch{return false}}else await Promise.resolve();return !disposed&&turn===props.contextKey&&input===inputSnapshot()&&!workspace.unresolved()}
+async function pin(){if(disposed||props.blocked||!props.candidate||state.value.busy||workspace.unresolved())return false;const turn=props.contextKey,input=inputSnapshot(),candidateKey=JSON.stringify(props.candidate),target=structuredClone(props.candidate);if(!await mayLeave()||disposed||props.blocked||turn!==props.contextKey||input!==inputSnapshot()||candidateKey!==JSON.stringify(props.candidate)||state.value.busy||workspace.unresolved())return false;note.value='';targetPage.value=0;return workspace.pin(target)}
 function prepare(){if(props.blocked||!workspace.prepare())return false;return true}
 async function submit(action:ApprovalAction){
  if(locked.value||!actions.value.includes(action)||!state.value.baseline||!state.value.target)return false
  const turn=props.contextKey,base=state.value.baseline,target=state.value.target,input=note.value
  try{await ElMessageBox.confirm(`${labels[action]}：${target.id}，草稿修订 v${target.version}，审批版本 v${base.version}。只记录内部审核，不生效、不执行设备变更、不抑制告警。是否确认？`,'确认明确修订审批',{confirmButtonText:labels[action],cancelButtonText:'取消',type:'warning'})}catch{return false}
- if(turn!==props.contextKey||base.version!==state.value.baseline?.version||target.id!==state.value.target?.id||target.version!==state.value.target?.version||target.content_sha256!==state.value.target?.content_sha256||input!==note.value||locked.value)return false
+ if(disposed||turn!==props.contextKey||base.version!==state.value.baseline?.version||target.id!==state.value.target?.id||target.version!==state.value.target?.version||target.content_sha256!==state.value.target?.content_sha256||input!==note.value||locked.value)return false
  return workspace.submit(action,input===''?null:input)
 }
-onUnmounted(()=>workspace.dispose())
-defineExpose({pin,prepare,submit,mayLeave,unresolved:workspace.unresolved,hasUnsaved:()=>dirty.value,state,note,refresh:workspace.refresh,retry:workspace.retry})
+onUnmounted(()=>{disposed=true;workspace.dispose()})
+defineExpose({inputSnapshot,pin,prepare,submit,mayLeave,unresolved:workspace.unresolved,hasUnsaved:()=>dirty.value,state,note,refresh:workspace.refresh,retry:workspace.retry})
 </script>
 <template>
  <section class="approval-panel panel" aria-label="明确修订审批">
-  <div class="approval-actions"><h2>明确修订审批</h2><button type="button" :disabled="!candidate||Boolean(state.busy)||workspace.unresolved()" @click="pin">读取所选草稿修订的审批</button></div>
+  <div class="approval-actions"><h2>明确修订审批</h2><button type="button" :disabled="Boolean(blocked)||!candidate||Boolean(state.busy)||workspace.unresolved()" @click="pin">读取所选草稿修订的审批</button></div>
   <p>内部批准、运行生效和设备执行分别核验。本审批不执行设备变更，不启用窗口匹配、自动P3或告警抑制。</p>
   <p v-if="!candidate&&!state.target">先选择一条已保存草稿，再明确读取该修订的审批。</p>
   <p v-if="changedTarget" role="status">草稿选择已变化；这里仍固定在原草稿修订，未自动切换审批对象。</p>

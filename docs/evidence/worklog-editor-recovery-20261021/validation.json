@@ -1,0 +1,42 @@
+{
+  "result": "PASS_WORKLOG_EDITOR_ORIGINAL_READ_RECOVERY",
+  "new_tests": 28,
+  "new_test_layers": {
+    "workspace": 23,
+    "real_sfc_handlers_null_render": 3,
+    "real_drawer_dom": 2
+  },
+  "focused_tests_passed": 93,
+  "vitest": {
+    "files_passed": 248,
+    "tests_passed": 3966
+  },
+  "node_contract_tests_passed": 173,
+  "api_contract_check": "PASS_UNCHANGED",
+  "contract_progress_check": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "typecheck": "PASS",
+  "production_build": {
+    "build_id": "a4037fa506537d6b3329c6fd1003f6500af85f99cd6fc9a0f08c9ea1660d2a83",
+    "file_count": 141,
+    "bootstrap_gzip_bytes": 180714,
+    "bootstrap_css_gzip_bytes": 62537,
+    "scope": "static-artifacts-only"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_worklog_writes": 0,
+  "formal_acceptance_passes_added": 0,
+  "source_sha256": {
+    "apps/web/src/utils/worklogWorkspace.ts": "29338ca8413e74c67237fad64cea6fe6368217af97e8bdeea823b3e3b41be2ee",
+    "apps/web/src/components/WorklogWorkspace.vue": "edf900afcd3a18618dd5364602952c3f45d89f036a72b60904fd04a4e0d9bc98",
+    "apps/web/tests/worklogWorkspace.test.ts": "42e5e138504a320538b528cc46798accf278a5138298d25e183fa0c7b87c72dd",
+    "apps/web/tests/worklogWorkspaceComponent.test.ts": "b8e10be0b7b8636043ac834a4e1dabd886343b3f7cd814795b2aba7b633f6965",
+    "apps/web/tests/ticketEditorDraftProtection.test.ts": "71cd8f4f8d7d580a80087699ef14854295638843d43bb5964cf8e206797232b7"
+  }
+}

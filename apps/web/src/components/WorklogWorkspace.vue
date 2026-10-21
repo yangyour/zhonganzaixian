@@ -7,6 +7,7 @@ import { api } from '../api/client'
 import type { RegisteredTicket } from '../api/types'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createWorklogWorkspace, emptyWorklogState, validateWorklogInput, worklogInstant, type WorklogInput, type WorklogKind, type WorklogState } from '../utils/worklogWorkspace'
+import ReadRecoveryActions from './ReadRecoveryActions.vue'
 import ApiErrorNotice from './ApiErrorNotice.vue'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import AppTable from './AppTable.vue'
@@ -37,23 +38,23 @@ watch(open, value => { if (value && permitted.value && !state.value.page && !sta
 async function editSelected() {
   const selected = state.value.selected
   if (locked.value || !selected) return
-  const turn = contextKey.value
+  const turn = contextKey.value, snapshot=inputSnapshot()
   if (!await canLeave('替换当前工时输入') || turn !== contextKey.value || locked.value) return
   // Re-read before establishing the edit baseline; never change an unresolved original command.
   if (!await workspace.show(selected.id)) return
   const current = state.value.selected
-  if (disposed || turn !== contextKey.value || !current || current.id !== selected.id) return
+  if (disposed || turn !== contextKey.value || !current || current.id !== selected.id || snapshot!==inputSnapshot()) return
   kind.value = current.kind; startedAt.value = current.started_at; endedAt.value = current.ended_at; note.value = current.note ?? ''; editingId.value = current.id; editingVersion.value = current.version; validation.value = ''
   formBaseline.value = formSnapshot.value
 }
 async function save() {
   if (locked.value) return
-  const turn = contextKey.value
+  const turn = contextKey.value, snapshot=inputSnapshot()
   if (!state.value.parentVersion || editingId.value && (state.value.selected?.id !== editingId.value || state.value.selected?.version !== editingVersion.value)) { validation.value = '记录状态已变更，请先刷新列表并重新选择需修改的工时记录'; return }
-  try { const facts = input(); validateWorklogInput(facts); validation.value = ''; if (await workspace.submit(facts, editingId.value && editingVersion.value ? { id: editingId.value, version: editingVersion.value } : null) && !disposed && turn === contextKey.value) clearForm() }
-  catch (error) { if (!disposed && turn === contextKey.value) validation.value = error instanceof Error ? error.message : '请检查工时填写内容' }
+  try { const facts = input(); validateWorklogInput(facts); validation.value = ''; if (await workspace.submit(facts, editingId.value && editingVersion.value ? { id: editingId.value, version: editingVersion.value } : null) && !disposed && turn === contextKey.value && snapshot===inputSnapshot()) clearForm() }
+  catch (error) { if (!disposed && turn === contextKey.value && snapshot===inputSnapshot()) validation.value = error instanceof Error ? error.message : '请检查工时填写内容' }
 }
-async function retryOriginal() { const turn = contextKey.value; if (await workspace.retry() && !disposed && turn === contextKey.value) clearForm() }
+async function retryOriginal() { const turn = contextKey.value, originalForm=formSnapshot.value, originalId=editingId.value, originalVersion=editingVersion.value; if (await workspace.retry() && !disposed && turn === contextKey.value && originalForm===formSnapshot.value && originalId===editingId.value && originalVersion===editingVersion.value) clearForm() }
 async function canLeave(action = '离开本页、切换租户或退出') {
   if (disposed || confirming.value) return false
   if (workspace.unresolved()) { ElMessage.warning('工时提交结果尚未确认，请先完成重试核对后再切换工单或离开页面'); return false }
@@ -74,7 +75,7 @@ function inputSnapshot(){return JSON.stringify([contextKey.value,formSnapshot.va
 onBeforeRouteLeave(() => props.guardedByParent ? true : canLeave())
 const unregisterContextGuard = contextTransitionGuards.register(() => props.guardedByParent ? true : canLeave(),inputSnapshot)
 onUnmounted(() => { unregisterContextGuard(); disposed = true; workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
-defineExpose({ hasUnresolved: workspace.unresolved, canLeave, inputSnapshot })
+defineExpose({ hasUnresolved: workspace.unresolved, canLeave, inputSnapshot, cancelRead:workspace.cancelRead, retryRead:workspace.retryRead })
 </script>
 
 <template>
@@ -84,12 +85,14 @@ defineExpose({ hasUnresolved: workspace.unresolved, canLeave, inputSnapshot })
     <el-empty v-if="!permitted" description="当前身份或租户没有本人工时权限，请重新打开详情" />
     <template v-else>
       <div class="worklog-actions"><el-button :loading="state.busy === 'read'" :disabled="state.busy === 'write'" @click="workspace.refresh()">刷新列表</el-button><el-button :disabled="Boolean(state.busy) || !state.page?.has_more" @click="workspace.refresh(true)">下一页</el-button><span>{{ state.paged ? '后续页' : '第 1 页' }} · 每页 15 条 · 仅本人记录</span></div>
+      <ReadRecoveryActions :busy="state.busy" :can-retry="workspace.canRetryRead()" :scope-key="contextKey" label="工时" :cancel="workspace.cancelRead" :retry="workspace.retryRead" />
+      <p v-if="state.historyRestarted" role="status">记录版本已更新，历史已从最新版本重新读取，未沿用旧分页边界。</p>
       <ApiErrorNotice :error="state.error" />
-      <el-alert v-if="state.attempt?.state === 'uncertain'" type="warning" :closable="false" title="提交结果待确认：系统已锁定当前填写内容，请先刷新列表核对是否已生效，或点击“重试提交”继续处理。" />
+      <el-alert v-if="state.attempt?.state === 'uncertain'" type="warning" :closable="false" title="提交结果待确认：已保留并锁定原请求；刷新仅查看当前记录，不能确认原请求，请点击“重试提交”恢复完全相同的原请求。" />
       <el-button v-if="state.attempt?.state === 'uncertain'" type="warning" :disabled="Boolean(state.busy) || !writable" @click="retryOriginal">重试提交</el-button>
       <el-alert v-if="state.attempt?.state === 'rejected'" type="warning" :closable="false" title="本次提交未通过：请刷新列表并核对当前记录版本后再重新提交。" />
       <el-alert v-if="state.receipt" type="success" :closable="false" :title="`工时记录已保存（记录编号：${state.receipt.id} · v${state.receipt.version}）`" />
-      <AppTable :rows="state.page?.items || []" :loading="state.busy === 'read'" :empty-text="state.page ? '当前页暂无本人工时记录' : '正在读取工时记录…'">
+      <AppTable :rows="state.page?.items || []" :loading="state.busy === 'read'" :empty-text="state.page ? '当前页暂无本人工时记录' : state.busy==='read' ? '正在读取工时记录…' : state.error ? '工时读取未完成，请重试' : '尚未读取工时记录'">
         <el-table-column label="类型" min-width="100"><template #default="{ row }">{{ labels[row.kind as WorklogKind] }}</template></el-table-column>
         <el-table-column label="实际起止（UTC）" min-width="240"><template #default="{ row }"><span class="worklog-id">{{ row.started_at }}<br>{{ row.ended_at }}</span></template></el-table-column>
         <el-table-column label="作业时长（秒）" min-width="140"><template #default="{ row }">{{ row.elapsed_millis / 1000 }}</template></el-table-column>

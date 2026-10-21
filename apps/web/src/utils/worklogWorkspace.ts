@@ -1,6 +1,6 @@
 import { createRequestId } from './browserCrypto'
 import { detachedWorkspaceState } from './detachedWorkspaceState'
-import { ApiError, isCancelled, type ApiClient } from '../api/client'
+import { ApiError, isCancelled, StaleRequestError, type ApiClient } from '../api/client'
 
 export type WorklogKind = 'REMOTE' | 'ONSITE' | 'INSPECTION' | 'COMMUTE'
 export interface WorklogInput { kind: WorklogKind; started_at: string; ended_at: string; note: string | null }
@@ -11,7 +11,7 @@ export interface WorklogContext { tenantId: string; ticketId: string; actorId: s
 interface WorklogPage { items: WorklogEntry[]; has_more: boolean; next_before_created_at: string | null; next_before_id: string | null; source: 'postgresql'; scope: 'OWN'; page_size_limit: 100 }
 interface HistoryPage { items: WorklogRevision[]; has_more: boolean; next_before_version: number | null; source: 'postgresql'; scope: 'OWN'; page_size_limit: 100 }
 interface Attempt { path: string; method: 'POST' | 'PATCH'; key: string; payload: string; baseline: WorklogEntry | null; state: 'uncertain' | 'accepted' | 'rejected' }
-export interface WorklogState { page: WorklogPage | null; parentVersion: number | null; selected: WorklogEntry | null; history: HistoryPage | null; receipt: WorklogEntry | null; attempt: Attempt | null; busy: 'read' | 'write' | null; error: unknown; paged: boolean }
+export interface WorklogState { page: WorklogPage | null; parentVersion: number | null; selected: WorklogEntry | null; history: HistoryPage | null; receipt: WorklogEntry | null; attempt: Attempt | null; busy: 'read' | 'write' | null; error: unknown; paged: boolean; historyRestarted: boolean }
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const kinds = ['REMOTE', 'ONSITE', 'INSPECTION', 'COMMUTE']
 const copy = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
@@ -69,58 +69,68 @@ export function readWorklogHistory(value: unknown, scope: WorklogContext, select
   if (!value.items.length || (value.has_more ? value.items.length !== 15 || prior <= 1 || value.next_before_version !== prior : prior !== 1 || value.next_before_version !== null)) throw invalid()
   return copy(value) as unknown as HistoryPage
 }
-export const emptyWorklogState = (): WorklogState => ({ page: null, parentVersion: null, selected: null, history: null, receipt: null, attempt: null, busy: null, error: null, paged: false })
+export const emptyWorklogState = (): WorklogState => ({ page: null, parentVersion: null, selected: null, history: null, receipt: null, attempt: null, busy: null, error: null, paged: false, historyRestarted: false })
+type ReadTarget = {kind:'LIST';next:boolean;boundary:{time:string;id:string}|null}|{kind:'DETAIL';id:string;more:boolean;baseline:WorklogEntry|null;boundary:number|null;restarted:boolean}
 export function createWorklogWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: WorklogState) => void, newKey: () => string = () => createRequestId()) {
-  let scope: WorklogContext | null = null, state = emptyWorklogState(), epoch = 0, controller: AbortController | undefined
-  const emit = () => changed(detachedWorkspaceState(state)), path = () => `/tickets/${scope!.ticketId}/worklogs`
+  let scope: WorklogContext | null = null, state = emptyWorklogState(), epoch = 0, disposed=false, lastRead:ReadTarget|null=null, controller: AbortController | undefined
+  const emit = () => changed(detachedWorkspaceState(state)), path = (context:WorklogContext) => `/tickets/${context.ticketId}/worklogs`
   const unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
-  function reset(next: WorklogContext | null) { controller?.abort(); ++epoch; const valid = next && [next.tenantId, next.ticketId, next.actorId].every(id => uuid.test(id)) && safeVersion(next.permissionVersion) && typeof next.canWrite === 'boolean'; scope = valid ? { ...next! } : null; state = emptyWorklogState(); if (next && !valid) state.error = invalid(); emit() }
-  async function refresh(next = false) {
-    if (!scope || state.busy === 'write' || next && (!state.page?.has_more || state.busy)) return false
-    const page = state.page, current = ++epoch, context = { ...scope }; controller?.abort(); const abort = new AbortController(); controller = abort
-    let query = '?page_size=15'; if (next) query += `&before_created_at=${encodeURIComponent(page!.next_before_created_at!)}&before_id=${page!.next_before_id}`
-    state = { ...state, page: null, selected: null, history: null, parentVersion: null, busy: 'read', error: null, paged: next }; emit()
+  function reset(next: WorklogContext | null) { controller?.abort(); controller=undefined; ++epoch; lastRead=null; const valid = !disposed && next && [next.tenantId, next.ticketId, next.actorId].every(id => uuid.test(id)) && safeVersion(next.permissionVersion) && typeof next.canWrite === 'boolean'; scope = valid ? { ...next! } : null; state = emptyWorklogState(); if (next && !valid && !disposed) state.error = invalid(); emit() }
+  async function refresh(next = false, recovery?:Extract<ReadTarget,{kind:'LIST'}>) {
+    if (!scope || disposed || state.busy === 'write' || next && !recovery && (!state.page?.has_more || state.busy)) return false
+    const boundary=recovery?recovery.boundary:next?{time:state.page!.next_before_created_at!,id:state.page!.next_before_id!}:null, current = ++epoch, context = { ...scope }; controller?.abort(); const abort = new AbortController(); controller = abort
+    let query = '?page_size=15'; if (boundary) query += `&before_created_at=${encodeURIComponent(boundary.time)}&before_id=${boundary.id}`
+    lastRead=structuredClone({kind:'LIST',next,boundary});state = { ...state, page: null, selected: null, history: null, historyRestarted:false, parentVersion: null, busy: 'read', error: null, paged: next }; emit()
     try {
-      const [parent, raw] = await Promise.all([client.request<unknown>(`/tickets/${context.ticketId}`, { signal: abort.signal }), client.request<unknown>(path() + query, { signal: abort.signal })])
+      const request=(url:string)=>current!==epoch||disposed||abort.signal.aborted?Promise.reject(new StaleRequestError()):client.request<unknown>(url,{signal:abort.signal})
+      const [parent, raw] = await Promise.all([request(`/tickets/${context.ticketId}`), request(path(context) + query)])
       if (current !== epoch || abort.signal.aborted) return false
       if (!object(parent) || parent.id !== context.ticketId || parent.tenant_id !== context.tenantId || !safeVersion(parent.version)) throw invalid()
       const result = readWorklogPage(raw, context)
-      if (next && result.items.some(item => worklogInstant(item.created_at) > worklogInstant(page!.next_before_created_at) || worklogInstant(item.created_at) === worklogInstant(page!.next_before_created_at) && item.id >= page!.next_before_id!)) throw invalid()
+      if (boundary && result.items.some(item => worklogInstant(item.created_at) > worklogInstant(boundary.time) || worklogInstant(item.created_at) === worklogInstant(boundary.time) && item.id >= boundary.id)) throw invalid()
       if (state.receipt) {
         const known = result.items.find(item => item.id === state.receipt!.id)
         if (!next && !result.has_more && !known || known && (known.version < state.receipt.version || known.version === state.receipt.version && Object.keys(known).some(key => known[key as keyof WorklogEntry] !== state.receipt![key as keyof WorklogEntry]))) throw invalid()
       }
-      state = { ...state, parentVersion: parent.version, page: result }; return true
+      state = { ...state, parentVersion: parent.version, page: result }; lastRead=null;return true
     } catch (error) { if (current === epoch && !isCancelled(error)) state = { ...state, error }; return false }
     finally { if (current === epoch) { state = { ...state, busy: null }; emit() } }
   }
-  async function show(id: string, moreHistory = false) {
-    if (!scope || state.busy || !uuid.test(id) || moreHistory && (!state.history?.has_more || state.selected?.id !== id)) return false
-    const context = { ...scope }, current = ++epoch, previous = state.selected, before = moreHistory ? state.history!.next_before_version : null; controller?.abort(); const abort = new AbortController(); controller = abort
-    state = { ...state, selected: null, history: null, busy: 'read', error: null }; emit()
+  async function show(id: string, moreHistory = false, recovery?:Extract<ReadTarget,{kind:'DETAIL'}>) {
+    if (!scope || disposed || state.busy || !uuid.test(id) || moreHistory && !recovery && (!state.history?.has_more || state.selected?.id !== id)) return false
+    const context = { ...scope }, current = ++epoch, previous = recovery ? recovery.baseline : state.selected?.id===id?state.selected:state.page?.items.find(row=>row.id===id)??null, before = recovery ? recovery.boundary : moreHistory ? state.history!.next_before_version : null; controller?.abort(); const abort = new AbortController(); controller = abort
+    lastRead=structuredClone({kind:'DETAIL',id,more:moreHistory,baseline:previous,boundary:before,restarted:recovery?.restarted??false})
+    state = { ...state, selected: null, history: null, historyRestarted:false, busy: 'read', error: null }; emit()
     try {
-      const selected = readWorklog(await client.request<unknown>(path() + '/' + id, { signal: abort.signal }), context)
+      if(current!==epoch||disposed||abort.signal.aborted)return false
+      const raw=await client.request<unknown>(path(context) + '/' + id, { signal: abort.signal })
       if (current !== epoch || abort.signal.aborted) return false
-      if (selected.id !== id || previous?.id === id && selected.version < previous.version || state.receipt?.id === id && selected.version < state.receipt.version) throw invalid()
-      // If another editor changed the latest record, restart history rather than mixing old boundaries.
+      const selected=readWorklog(raw,context)
+      const confirms=(known:WorklogEntry)=>selected.version>=known.version&&selected.created_at===known.created_at&&worklogInstant(selected.updated_at)>=worklogInstant(known.updated_at)&&(selected.version!==known.version||Object.keys(selected).every(key=>selected[key as keyof WorklogEntry]===known[key as keyof WorklogEntry]))
+      if (selected.id !== id || previous && !confirms(previous) || state.receipt?.id === id && !confirms(state.receipt)) throw invalid()
+      // Pin the newly observed version BEFORE history, so a failed second GET cannot permit rollback.
       const boundary = moreHistory && previous?.version === selected.version ? before : null
-      const history = readWorklogHistory(await client.request<unknown>(path() + '/' + id + '/history?page_size=15' + (boundary ? '&before_version=' + boundary : ''), { signal: abort.signal }), context, selected, boundary)
+      const restarted=Boolean(recovery?.restarted||moreHistory&&boundary===null)
+      lastRead=structuredClone({kind:'DETAIL',id,more:moreHistory,baseline:selected,boundary,restarted})
+      const historyRaw=await client.request<unknown>(path(context) + '/' + id + '/history?page_size=15' + (boundary ? '&before_version=' + boundary : ''), { signal: abort.signal })
       if (current !== epoch || abort.signal.aborted) return false
-      state = { ...state, selected, history }; return true
+      const history=readWorklogHistory(historyRaw,context,selected,boundary)
+      state = { ...state, selected, history, historyRestarted:restarted };lastRead=null; return true
     } catch (error) { if (current === epoch && !isCancelled(error)) state = { ...state, error }; return false }
     finally { if (current === epoch) { state = { ...state, busy: null }; emit() } }
   }
   async function send(attempt: Attempt, retry = false) {
-    if (!scope?.canWrite || state.busy) return false
-    const context = { ...scope }, current = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort
+    if (!scope?.canWrite || disposed || state.busy) return false
+    lastRead=null;const context = { ...scope }, current = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort
     state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
     try {
       const body = JSON.parse(attempt.payload) as WorklogInput & { expected_version?: number; expected_ticket_version?: number }
+      if(current!==epoch||disposed||abort.signal.aborted)return false
       const raw = await client.request<unknown>(attempt.path, { method: attempt.method, body, idempotencyKey: attempt.key, signal: abort.signal })
       if (current !== epoch || abort.signal.aborted) return false
       const receipt = readWorklog(raw, context)
       if (receipt.version !== (attempt.baseline ? attempt.baseline.version + 1 : 1) || attempt.baseline && (receipt.id !== attempt.baseline.id || receipt.created_at !== attempt.baseline.created_at) || receipt.kind !== body.kind || receipt.note !== body.note || worklogInstant(receipt.started_at) !== worklogInstant(body.started_at) || worklogInstant(receipt.ended_at) !== worklogInstant(body.ended_at)) throw invalid()
-      state = { ...state, receipt, selected: receipt, history: null, busy: null, attempt: { ...attempt, state: 'accepted' } }; emit(); await refresh(); return true
+      state = { ...state, receipt, selected: receipt, history: null, busy: null, attempt: { ...attempt, state: 'accepted' } }; emit(); if(current===epoch&&!disposed&&!abort.signal.aborted)await refresh(); return true
     } catch (error) {
       if (current !== epoch) return false
       const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
@@ -128,13 +138,18 @@ export function createWorklogWorkspace(client: Pick<ApiClient, 'request'>, chang
     } finally { if (current === epoch) { state = { ...state, busy: null }; emit() } }
   }
   async function submit(input: WorklogInput, edit: { id: string; version: number } | null = null) {
-    if (!scope?.canWrite || state.busy || unresolved() || !state.parentVersion || edit && (!state.selected || state.selected.id !== edit.id || state.selected.version !== edit.version)) return false
+    if (!scope?.canWrite || disposed || state.busy || unresolved() || !state.parentVersion || edit && (!state.selected || state.selected.id !== edit.id || state.selected.version !== edit.version)) return false
     validateWorklogInput(input)
     const baseline = edit ? copy(state.selected!) : null, version = baseline?.version ?? state.parentVersion
     if (version >= Number.MAX_SAFE_INTEGER) throw inputInvalid()
     const payload = JSON.stringify({ [edit ? 'expected_version' : 'expected_ticket_version']: version, ...copy(input) })
-    return send({ path: path() + (baseline ? '/' + baseline.id : ''), method: edit ? 'PATCH' : 'POST', key: newKey(), payload, baseline, state: 'uncertain' })
+    const current=epoch,target=path(scope)+(baseline?'/'+baseline.id:'')
+    try {const key=newKey();if(current!==epoch||disposed||!scope?.canWrite||state.busy||unresolved())return false;if(typeof key!=='string'||!/^[A-Za-z0-9._:-]{1,128}$/.test(key))throw Error('INVALID_KEY');return send({path:target,method:edit?'PATCH':'POST',key,payload,baseline,state:'uncertain'})}
+    catch {if(current===epoch&&!disposed){state={...state,error:new ApiError(0,'REQUEST_ID_UNAVAILABLE','无法生成有效请求标识；没有发送工时保存请求，请稍后重试','—')};emit()}return false}
   }
+  function canRetryRead(){return !!scope&&!disposed&&!state.busy&&lastRead!==null}
+  function cancelRead(){if(disposed||state.busy!=='read')return false;++epoch;controller?.abort();controller=undefined;state={...state,busy:null,error:null};emit();return true}
+  async function retryRead(){if(!canRetryRead()||!lastRead)return false;const target=structuredClone(lastRead);return target.kind==='LIST'?refresh(target.next,target):show(target.id,target.more,target)}
   emit()
-  return { reset, refresh, show, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => detachedWorkspaceState(state) }
+  return { reset, refresh:(next=false)=>refresh(next), show:(id:string,moreHistory=false)=>show(id,moreHistory), cancelRead, retryRead, canRetryRead, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => {disposed=true;reset(null)}, state: () => detachedWorkspaceState(state) }
 }

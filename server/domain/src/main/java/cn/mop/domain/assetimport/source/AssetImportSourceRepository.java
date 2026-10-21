@@ -30,6 +30,10 @@ public interface AssetImportSourceRepository {
     default AssetNameSnapshot assetNameSnapshot(Access access,String sourceId) {
         throw new DomainException(503,"UPSTREAM_UNAVAILABLE","当前存储不支持一致性资产名称检查");
     }
+    /** Owner-only keyset page of source metadata, without raw cells or object storage locations. */
+    default Map<String,Object> listSources(Access access,int limit,String cursor) {
+        throw new DomainException(503,"UPSTREAM_UNAVAILABLE","当前存储不支持来源记录列表");
+    }
     Map<String,Object> operation(Access access,String operationId);
     boolean ready();
     /** Only this project's import jobs; no ticket/photo outbox is claimed. */

@@ -1,0 +1,5 @@
+{
+  "exit": 0,
+  "store_adapter": "ISOLATED_MEMORY_TEST_DOUBLE",
+  "parser": "REAL_IMPORT_FILE_PARSER"
+}

@@ -1,0 +1,8 @@
+{
+  "store_adapter": "ISOLATED_MEMORY_TEST_DOUBLE",
+  "parser": "REAL_IMPORT_FILE_PARSER",
+  "source_id": "972959c0-464c-43c2-b597-20115ad22435",
+  "source_version": 4,
+  "asset_writes": false,
+  "parse_hash": "d1bb7594aa12f05271867697225a5e959ce5c0ba8c42929dbed82681ed6bc669"
+}

@@ -444,6 +444,8 @@ importSource.allOf = [
 ];
 importSource['x-mop-binding-checks'] = ['仅当前授权租户且created_by为当前actor可读取', 'RR一致快照内读取来源、当前artifact与当前mapping；缺投影返回503', 'READY只表示原始bytes存储成功；PARSED只表示技术解析成功；映射保存仍CONFIG_PENDING/can_import=false', '再次请求解析会清空当前artifact/mapping引用；历史artifact/mapping保留', '所有失败保持明确状态；不回退内存仓储或fixture'];
 importSource['x-mop-client-readback'] = ['来源身份/原文件摘要/单调版本及资源政策校验全部通过后，清除不匹配当前store_operation_id/parse_operation_id或result_artifact_id绑定的旧显示操作', '历史请求、幂等键、原参数与映射收据不因普通刷新而改写；不自动GET新操作或POST'];
+const importSourceListItem = object({id:uuid,original_name:{type:'string',minLength:1,maxLength:200},declared_format:{enum:['CSV','XLSX']},size_bytes:{type:'integer',minimum:1,maximum:20971520},version:{type:'integer',minimum:1,maximum:9007199254740991},storage_status:{enum:['PENDING','READY','FAILED']},parse_status:{enum:['NOT_REQUESTED','PENDING','PARSED','SELECTION_REQUIRED','FAILED']},mapping_saved:{type:'boolean'},created_at:dateTime,updated_at:dateTime});
+const importSourceListResult = object({data:object({tenant_id:uuid,created_by:uuid,scope:{const:'CREATOR_ONLY'},items:{type:'array',maxItems:50,items:importSourceListItem},next_cursor:nullableUuid,can_import:{const:false}}),trace_id:string});
 const importOperation = object({ id: uuid, tenant_id: uuid, source_id: uuid, created_by: uuid, kind: { type: 'string', enum: ['STORE_RAW', 'PARSE'] }, status: { type: 'string', enum: ['PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED'] }, step: { type: 'string', enum: ['QUEUED', 'STORING', 'PARSING', 'RETRY_WAIT', 'STORED', 'PARSED', 'SELECTION_REQUIRED', 'AUTHORIZATION_REVOKED', 'STORAGE_CONFLICT', 'PARSE_INVALID'] }, result_artifact_id: nullableUuid, result_ref: { type: 'string', pattern: `^/api/v1/assets/import-sources/${uuidPattern}$` }, error: { anyOf: [{ type: 'null' }, object({ code: { type: 'string', enum: ['UPSTREAM_UNAVAILABLE', 'ACTION_FORBIDDEN', 'FILE_INTEGRITY_CONFLICT', 'IMPORT_SOURCE_INVALID'] }, message: string, retryable: { type: 'boolean' }, question_ids: { const: [] } })] }, created_at: dateTime, updated_at: dateTime });
 importOperation.allOf = [{ oneOf: [
   { properties: { step: { const: 'QUEUED' }, status: { const: 'PENDING' }, error: { type: 'null' }, result_artifact_id: { type: 'null' } } },
@@ -515,7 +517,7 @@ const contract = {
         }, content: { [templateSpec.media_type]: { schema: { type: 'string', format: 'binary', 'x-mop-size-bytes': templateSpec.size_bytes, 'x-mop-sha256': templateSpec.sha256 } } } }, ...errors },
     } },
     '/assets/import-policy': { get: action('getAssetImportPolicy', '读取CSV/XLSX来源技术政策与合同15列；不批准最终导入规则', ref('AssetImportPolicyResult'), importAccess) },
-    '/assets/import-sources': { post: { ...mutation('acceptAssetImportSource', '耐久受理原始CSV/XLSX来源；不是导入资产', ref('AssetImportSourceUpload'), ref('AssetImportAccepted'), { ...importAccess, parameters: headers }), requestBody: { required: true, content: { 'multipart/form-data': { schema: ref('AssetImportSourceUpload') } } }, responses: importAcceptanceResponses } },
+    '/assets/import-sources': { get:action('listOwnedAssetImportSources','当前租户创建者的来源元数据游标列表；不返回原始单元格、摘要或对象路径',importSourceListResult,{...importAccess,parameters:[{name:'limit',in:'query',schema:{type:'integer',minimum:1,maximum:50,default:20}},{name:'cursor',in:'query',schema:uuid}],'x-mop-read-only':true}), post: { ...mutation('acceptAssetImportSource', '耐久受理原始CSV/XLSX来源；不是导入资产', ref('AssetImportSourceUpload'), ref('AssetImportAccepted'), { ...importAccess, parameters: headers }), requestBody: { required: true, content: { 'multipart/form-data': { schema: ref('AssetImportSourceUpload') } } }, responses: importAcceptanceResponses } },
     '/assets/import-sources/{id}': { get: action('getAssetImportSource', '当前租户创建者读取来源及一致快照的解析artifact/mapping；跨范围统一404', ref('AssetImportSourceResult'), { ...importAccess, parameters: [pathId] }) },
     '/assets/import-sources/{id}/parses': { post: { ...mutation('parseAssetImportSource', 'CAS受理明确解析选择；XLSX缺sheet/header只读取目录，公式拒绝', ref('AssetImportParseRequest'), ref('AssetImportAccepted'), { ...importAccess, parameters: [pathId, ...headers] }), responses: importAcceptanceResponses } },
     '/assets/import-sources/{id}/mappings': { post: mutation('saveAssetImportMapping', 'CAS保存15列映射与原始预览hash；业务预检NOT_RUN，资产写入与配额未运行', ref('AssetImportMappingRequest'), ref('AssetImportSourceResult'), { ...importAccess, parameters: [pathId, ...headers] }) },
@@ -959,7 +961,7 @@ addInspectionQuarterlyReportContract(contract);
 addCmdbTypeCatalogContract(contract);
 addCmdbSourcePreflightContract(contract);
 addObservationWindowContract(contract);
-contract.info.version = '0.74.0';
+contract.info.version = '0.75.0';
 const serialized = JSON.stringify(contract, null, 2) + '\n';
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8') !== serialized) throw new Error('local-api.openapi.json 与生成器不一致；先运行 node tools/build-api-contract.mjs');

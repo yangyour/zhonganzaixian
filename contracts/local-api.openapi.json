@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "MOP 共享测试环境 API",
-    "version": "0.74.0",
+    "version": "0.75.0",
     "description": "本地接续开发使用已批准测试环境的PostgreSQL、Keycloak及已选OSS或既有MinIO；已启用的照片能力纳入实际就绪检查，缺策略/schema/存储返回503。配置诊断只读取当前授权租户的一致PG元数据，不返回原值或资料正文；定义、发布与客户核验来源尚未接入，生效值仍null。内部审核不形成客户确认。报障202只代表耐久登记，正式状态/优先级/SLA仍为null。照片202需原图/file/job/operation/审计/重放结果同事务；READY表示存储完成，仍UNSCANNED、生产UNVERIFIED、保留null。未绑定照片仅上传人可见，内部只读查询须已有当前租户登记绑定或属于本人。资产来源新增CSV/XLSX原文件受理、显式解析、15列原始映射与creator-only回读代码契约；仍CONFIG_PENDING/can_import=false，有效规则版本与配额null。原始存储、技术解析、映射保存各自独立，不代表实际资产导入；新增应用链路须独立验证。资产依赖新增完整租户图的持久化草稿CAS/防环/幂等回读，不发布监控抑制规则，Q20有效规则仍null。fixture身份入口在remote_test不可调用。 默认项目本地账号和数据库角色授权；OIDC为可选显式issuer/sub接入。用户暂不设置的密码策略保持null。"
   },
   "servers": [
@@ -2579,6 +2579,291 @@
       }
     },
     "/assets/import-sources": {
+      "get": {
+        "operationId": "listOwnedAssetImportSources",
+        "summary": "当前租户创建者的来源元数据游标列表；不返回原始单元格、摘要或对象路径",
+        "x-mop-capability": "assets:write",
+        "x-mop-roles": [
+          "padmin",
+          "msp",
+          "tadmin"
+        ],
+        "x-mop-creator-only": true,
+        "x-mop-permission-version-recheck": true,
+        "x-mop-reject-unknown-query-keys": true,
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "x-mop-read-only": true,
+        "responses": {
+          "200": {
+            "description": "共享测试环境事务完成或查询成功；不代表真实监控纳管或生产验收",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "tenant_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "created_by": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "scope": {
+                          "const": "CREATOR_ONLY"
+                        },
+                        "items": {
+                          "type": "array",
+                          "maxItems": 50,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "original_name": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 200
+                              },
+                              "declared_format": {
+                                "enum": [
+                                  "CSV",
+                                  "XLSX"
+                                ]
+                              },
+                              "size_bytes": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 20971520
+                              },
+                              "version": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 9007199254740991
+                              },
+                              "storage_status": {
+                                "enum": [
+                                  "PENDING",
+                                  "READY",
+                                  "FAILED"
+                                ]
+                              },
+                              "parse_status": {
+                                "enum": [
+                                  "NOT_REQUESTED",
+                                  "PENDING",
+                                  "PARSED",
+                                  "SELECTION_REQUIRED",
+                                  "FAILED"
+                                ]
+                              },
+                              "mapping_saved": {
+                                "type": "boolean"
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "original_name",
+                              "declared_format",
+                              "size_bytes",
+                              "version",
+                              "storage_status",
+                              "parse_status",
+                              "mapping_saved",
+                              "created_at",
+                              "updated_at"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "next_cursor": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "uuid"
+                        },
+                        "can_import": {
+                          "const": false
+                        }
+                      },
+                      "required": [
+                        "tenant_id",
+                        "created_by",
+                        "scope",
+                        "items",
+                        "next_cursor",
+                        "can_import"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "trace_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "trace_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数或未知字段错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "会话失效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "动作权限或CSRF错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "对象不存在或不可见",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "方法不允许",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "版本或幂等冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "技术资源上限，未截断执行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "内容类型不支持",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "状态禁止或CONFIG_PENDING",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "配额限制",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "内部错误；按trace_id排查",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "依赖未就绪",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "operationId": "acceptAssetImportSource",
         "summary": "耐久受理原始CSV/XLSX来源；不是导入资产",

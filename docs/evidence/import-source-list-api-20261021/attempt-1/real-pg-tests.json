@@ -1,0 +1,41 @@
+{
+  "exit": 0,
+  "expected": {
+    "PostgresAssetImportSourceListIntegrationTest": 5
+  },
+  "results": {
+    "PostgresAssetImportSourceListIntegrationTest": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "cases": [
+    {
+      "class": "PostgresAssetImportSourceListIntegrationTest",
+      "test": "insertingANewerSourceDoesNotRepeatThePreviousPage()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportSourceListIntegrationTest",
+      "test": "keysetPagesKeepOwnerScopeAndNeverIncludeRawContent()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportSourceListIntegrationTest",
+      "test": "badBoundsAndMissingCursorFailClosed()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportSourceListIntegrationTest",
+      "test": "otherOwnerCursorCannotBeUsed()",
+      "passed": true
+    },
+    {
+      "class": "PostgresAssetImportSourceListIntegrationTest",
+      "test": "freshPermissionAndMembershipVersionAreRequired()",
+      "passed": true
+    }
+  ]
+}

@@ -80,3 +80,10 @@ it('a stale discard answer cannot approve a changed selection or forced context'
   const permission = contextTransitionGuards.approve(); await settle(); contextGeneration.value++; finish('confirm')
   expect(await permission).toBe(false); expect(state.file).toBeNull()
 })
+it('reopened source without a local File still protects unsubmitted mapping on departure',async()=>{
+ const fixture=await import('../../../fixtures/import-source-list-http-synthetic-20261021.json');const source=structuredClone(fixture.source);source.tenant_id=auth.tenant.id;source.created_by=auth.user.id;source.parsed_artifact.tenant_id=auth.tenant.id
+ vi.mocked(api.request).mockImplementation(async path=>{if(path==='/session')return structuredClone(auth);if(path==='/assets/import-policy')return policy;if(path==='/assets/import-sources/'+source.id)return source;throw new Error('UNEXPECTED_SYNTHETIC_READ')})
+ const router=await mount();expect(await state.workspace.resume(source.id)).toBe(true);expect(state.file).toBeNull();expect(state.unsaved).toBe(true);expect(unloadPrevented()).toBe(true)
+ mocks.confirm.mockRejectedValue('cancel');expect(isNavigationFailure(await router.push('/other'))).toBe(true);expect(state.source.id).toBe(source.id);expect(await contextTransitionGuards.approve()).toBe(false)
+ mocks.confirm.mockResolvedValue('confirm');await router.push('/other');expect(unloadPrevented()).toBe(false)
+})

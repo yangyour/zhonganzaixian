@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.*;
 import com.fasterxml.jackson.core.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +50,17 @@ public final class AssetImportController {
             return sources.acceptSource(access,file.getSubmittedFileName(),format,original);
         });
         return ResponseEntity.status(202).body(success(result,request));
+    }
+
+    @GetMapping("/assets/import-sources") Object list(HttpServletRequest request,HttpServletResponse response){
+        response.setHeader("Cache-Control","no-store");response.setHeader("Referrer-Policy","no-referrer");
+        var access=access(request);
+        for(var entry:request.getParameterMap().entrySet())if(!Set.of("limit","cursor").contains(entry.getKey())||entry.getValue().length!=1)throw invalid("来源列表仅接受单个 limit 和 cursor，不接受租户或创建者覆盖");
+        String raw=request.getParameter("limit"),cursor=request.getParameter("cursor");
+        if(raw!=null&&!raw.matches("[1-9][0-9]?"))throw invalid("limit 必须为 1 至 50 的整数");
+        int limit=raw==null?20:Integer.parseInt(raw);if(limit>50)throw invalid("limit 必须为 1 至 50 的整数");
+        if(cursor!=null&&!cursor.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))throw invalid("cursor 必须为来源列表返回的记录编号");
+        return success(sources.listSources(access,limit,cursor),request);
     }
 
     @GetMapping("/assets/import-sources/{id}") Object source(@PathVariable String id,HttpServletRequest request){

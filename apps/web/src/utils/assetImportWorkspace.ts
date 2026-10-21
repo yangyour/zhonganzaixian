@@ -19,7 +19,8 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
   const file = shallowRef<File | null>(null), format = ref<AssetImportFormat | null>(null), source = shallowRef<AssetImportSource | null>(null), operation = shallowRef<AssetImportOperation | null>(null)
   const policy = shallowRef<AssetImportPolicy | null>(null), policyLoading = ref(false), policyError = ref<unknown>(null)
   const error = ref<unknown>(null), uploadError = ref<unknown>(null), parseError = ref<unknown>(null), mappingError = ref<unknown>(null)
-  const busy = ref<'upload' | 'parse' | 'mapping' | 'read' | null>(null), selectionMessage = ref(''), fields = ref<Record<string, string>>({})
+  const resumeError = ref<unknown>(null)
+  const busy = ref<'upload' | 'parse' | 'mapping' | 'read' | 'resume' | null>(null), selectionMessage = ref(''), fields = ref<Record<string, string>>({})
   const uploadAttempt = ref<UploadAttempt | null>(null), parseAttempt = ref<ParseAttempt | null>(null), mappingAttempt = ref<MappingAttempt | null>(null)
   const selection = ref<{ encoding: string | null; delimiter: string | null; sheetIndex: number | null; headerRow: number | null }>({ encoding: null, delimiter: null, sheetIndex: null, headerRow: null })
   const mappingDraft = ref<AssetImportMappingDraft | null>(null)
@@ -40,7 +41,7 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
   function clear() {
     controller?.abort(); policyController?.abort(); ++epoch; busy.value = null; policyLoading.value = false
     file.value = null; format.value = null; source.value = null; operation.value = null; mappingDraft.value = null; policy.value = null
-    uploadAttempt.value = null; parseAttempt.value = null; mappingAttempt.value = null; error.value = null; uploadError.value = null; parseError.value = null; mappingError.value = null; policyError.value = null
+    uploadAttempt.value = null; parseAttempt.value = null; mappingAttempt.value = null; error.value = null; uploadError.value = null; parseError.value = null; mappingError.value = null; policyError.value = null; resumeError.value = null
     selectionMessage.value = ''; fields.value = {}; selection.value = { encoding: null, delimiter: null, sheetIndex: null, headerRow: null }
   }
   function reset() { if (disposed.value || !permitted.value || !canReset.value) return false; const savedPolicy = policy.value; clear(); policy.value = savedPolicy; return true }
@@ -63,11 +64,27 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
     } catch (cause) { if (!isCancelled(cause) && expected === epoch) policyError.value = cause }
     finally { if (expected === epoch) policyLoading.value = false }
   }
+  const canResume=computed(()=>permitted.value&&!!policy.value&&!busy.value&&!file.value&&!source.value&&!hasUnresolved.value)
+  async function resume(id:string){
+    if(!canResume.value)return false
+    resumeError.value=null
+    if(!importUuid(id)){resumeError.value=new ApiError(400,'VALIDATION_ERROR','请选择有效的来源记录','—');return false}
+    const request=begin('resume')
+    try{
+      const result=await client.request<AssetImportSource>(`/assets/import-sources/${id}`,{signal:request.signal});alive(request.expected)
+      acceptSource(result,id,request.context);format.value=result.declared_format
+      const old=result.parsed_artifact?.selection
+      if(old)selection.value={encoding:old.encoding,delimiter:old.delimiter,sheetIndex:old.sheet_index,headerRow:old.header_row}
+      return true
+    }catch(cause){if(request.expected===epoch&&!isCancelled(cause))resumeError.value=cause;return false}
+    finally{if(request.expected===epoch)busy.value=null}
+  }
+  function cancelResume(){if(busy.value!=='resume')return;controller?.abort();++epoch;busy.value=null;resumeError.value=null}
   function chooseFile(selected: File) {
     if (busy.value || uploadAttempt.value || source.value || !permitted.value || !policy.value) return false
     const extension = /\.xlsx$/i.test(selected.name) ? 'XLSX' : /\.csv$/i.test(selected.name) ? 'CSV' : null
     if (!extension || !policy.value.allowed_formats.includes(extension) || selected.size < 1 || selected.size > policy.value.max_source_bytes || [...selected.name].length > 200 || /[\\/\u0000-\u001f\u007f]/.test(selected.name)) { selectionMessage.value = '请选择名称有效的非空CSV或XLSX，原文件技术上限为20MiB'; return false }
-    file.value = selected; format.value = extension; selectionMessage.value = ''; return true
+    file.value = selected; format.value = extension; selectionMessage.value = ''; resumeError.value = null; return true
   }
   function acceptSource(result: AssetImportSource, id: string, readContext: ImportReadContext) {
     validateAssetImportSource(result, readContext, id, original(), source.value)
@@ -233,5 +250,5 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
     () => session.value?.user.role, () => session.value?.permission_version, () => session.value?.account_version, permitted], clear, { flush: 'sync' })
   function dispose() { stop(); disposed.value = true; clear() }
   return { file: readonly(file), format: readonly(format), source: readonly(source), artifact: readonly(artifact), operation: readonly(operation), policy: readonly(policy), policyLoading: readonly(policyLoading), policyError, permitted, busy: readonly(busy), error, uploadError, parseError, mappingError, selectionMessage, fields, selection, mappingDraft,
-    uploadAttempt: readonly(uploadAttempt), parseAttempt: readonly(parseAttempt), mappingAttempt: readonly(mappingAttempt), hasUnresolved, canReset, isParsed, selectionLocked, mappingLocked, chooseFile, upload, parse, saveMapping, refresh, reviseConflict, loadPolicy, reset, dispose }
+    uploadAttempt: readonly(uploadAttempt), parseAttempt: readonly(parseAttempt), mappingAttempt: readonly(mappingAttempt), hasUnresolved, canReset, canResume, resumeError, resume, cancelResume, isParsed, selectionLocked, mappingLocked, chooseFile, upload, parse, saveMapping, refresh, reviseConflict, loadPolicy, reset, dispose }
 }

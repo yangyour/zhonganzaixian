@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ElMessageBox, ElTableColumn } from 'element-plus'
 import AssetImportTemplateDownload from './AssetImportTemplateDownload.vue'
+import AssetImportSourcesPanel from './AssetImportSourcesPanel.vue'
 import AssetImportRawPreview from './AssetImportRawPreview.vue'
 import CmdbSourcePreflightPanel from './CmdbSourcePreflightPanel.vue'
-import { computed, onUnmounted, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { feedback as ElMessage } from '../utils/feedback'
 import type { AssetImportTarget } from '../api/assetImportTypes'
@@ -22,9 +23,11 @@ const { file, format, source, artifact, operation, policy, policyLoading, policy
   uploadAttempt, parseAttempt, mappingAttempt, hasUnresolved, canReset, isParsed, selectionLocked, mappingLocked } = workspace
 const unaddressed = computed(() => artifact.value && mappingDraft.value ? assetImportUnaddressedColumns(artifact.value.columns, mappingDraft.value) : [])
 const conflict = computed(() => parseAttempt.value?.state === 'CONFLICT' ? { kind: 'parse' as const, attempt: parseAttempt.value } : mappingAttempt.value?.state === 'CONFLICT' ? { kind: 'mapping' as const, attempt: mappingAttempt.value } : null)
-const stage = computed(() => source.value?.mapping ? 4 : isParsed.value ? 3 : source.value?.parse_status === 'SELECTION_REQUIRED' || parseAttempt.value?.state === 'ACCEPTED' ? 2 : source.value?.storage_status === 'READY' ? 1 : 0)
-const unsaved = computed(() => Boolean(file.value && !source.value?.mapping))
+const stage = computed(() => source.value?.mapping ? 4 : isParsed.value ? 3 : ['SELECTION_REQUIRED','PENDING'].includes(source.value?.parse_status||'') || parseAttempt.value?.state === 'ACCEPTED' ? 2 : source.value?.storage_status === 'READY' ? 1 : 0)
+const unsaved = computed(() => Boolean((file.value || source.value) && !source.value?.mapping))
+const sourceSummary=ref<HTMLElement>()
 let disposed = false, confirming = false
+async function openExisting(id:string){const origin=document.activeElement as HTMLElement|null,scope=contextKey();const opened=await workspace.resume(id);await nextTick();if(disposed||scope!==contextKey())return;if(opened)sourceSummary.value?.focus();else if(origin?.isConnected)origin.focus()}
 const contextKey = () => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.user.role, session.value?.permission_version, session.value?.account_version, permitted.value])
 const inputKey = () => JSON.stringify([source.value?.id, source.value?.version, selection.value, mappingDraft.value])
 function chooseFile(event: Event) {
@@ -67,6 +70,9 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
     <ApiErrorNotice :error="policyError"><el-button size="small" :disabled="policyLoading" @click="workspace.loadPolicy">重新读取解析规范</el-button></ApiErrorNotice>
     <el-empty v-if="!permitted" description="当前账号无资产批量导入权限" />
     <template v-else>
+      <AssetImportSourcesPanel :can-open="workspace.canResume.value" @select="openExisting" />
+      <p v-if="busy==='resume'" role="status">正在重新打开已有来源，不会重新上传…<el-button @click="workspace.cancelResume">取消打开来源</el-button></p>
+      <ApiErrorNotice :error="workspace.resumeError.value" />
       <section class="asset-import-section">
         <h3>1. 源文件上传与受理</h3>
         <p v-if="policy" class="field-help tabular-nums">支持 CSV / XLSX 格式文件：单文件大小上限 {{ (policy.max_source_bytes / 1024 / 1024).toLocaleString() }} MiB，最多支持 {{ policy.max_data_rows }} 数据行、{{ policy.max_source_columns }} 源列及 {{ policy.max_sheets }} 个工作表。</p>
@@ -74,10 +80,11 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
         <input type="file" class="asset-import-file-input" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" :disabled="!policy || Boolean(busy || uploadAttempt || source)" aria-label="选择资产导入文件" @change="chooseFile">
         <p v-if="selectionMessage" class="import-error">{{ selectionMessage }}</p>
         <p v-if="file" class="mono tabular-nums">{{ file.name }} · {{ file.size.toLocaleString() }} bytes · 格式 {{ format }}</p>
+        <p v-else-if="source" class="field-help">已重新打开 {{source.original_name}}（{{source.size_bytes}} bytes）。原文件保留在服务端，此处未选择或重新上传本地文件；关闭当前来源不会取消后台任务或删除记录。</p>
         <el-empty v-else-if="policy" :image-size="60" description="请选择待导入的 CSV 或 XLSX 文件" />
         <div class="asset-import-actions">
           <el-button type="primary" :loading="busy === 'upload'" :disabled="!policy || !file || Boolean(busy || source) || Boolean(uploadAttempt && uploadAttempt.state !== 'UNCERTAIN')" @click="workspace.upload">{{ uploadAttempt?.state === 'UNCERTAIN' ? '重试上传源文件' : '上传并受理源文件' }}</el-button>
-          <el-button v-if="file" :disabled="!canReset" @click="workspace.reset">重新选择文件</el-button>
+          <el-button v-if="file||source" :disabled="!canReset" @click="workspace.reset">{{file?'重新选择文件':'关闭当前来源'}}</el-button>
         </div>
         <ApiErrorNotice :error="uploadError" />
         <p v-if="uploadAttempt?.state === 'UNCERTAIN'" class="import-error">上传状态待确认：已锁定当前文件与请求参数，请点击“重试上传源文件”继续处理。</p>
@@ -87,7 +94,7 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
 
       <section v-if="source || operation || uploadAttempt?.sourceId" class="asset-import-section">
         <h3>2. 存储状态与解析配置</h3>
-        <p v-if="source" class="tabular-nums">存储状态：{{ source.storage_status }} · 解析状态：{{ source.parse_status }} · 来源版本 v{{ source.version }}</p>
+        <p v-if="source" ref="sourceSummary" tabindex="-1" role="status" class="tabular-nums">存储状态：{{ source.storage_status }} · 解析状态：{{ source.parse_status }} · 来源版本 v{{ source.version }}</p>
         <p v-if="source" class="mono">来源编号 {{ source.id }}<br>SHA-256 {{ source.sha256 }}</p>
         <p v-if="operation" class="field-help">{{ operation.kind }}：{{ operation.status }} / {{ operation.step }}<template v-if="operation.error"> · {{ operation.error.message }}</template></p>
         <div class="asset-import-actions"><el-button :loading="busy === 'read'" :disabled="Boolean(busy)" @click="workspace.refresh">刷新处理进度</el-button><span v-if="hasUnresolved" class="field-help">当前存在待确认请求，请先完成核对或重试后再切换文件。</span></div>
@@ -168,6 +175,6 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
 </template>
 
 <style>
-.asset-import-drawer{max-width:100vw}.tabular-nums{font-variant-numeric:tabular-nums}.asset-import-steps{margin:16px 0}.asset-import-section{margin:18px 0;padding-top:14px;border-top:1px solid #e4eaf2}.asset-import-section h3{font-size:15px;margin:0 0 10px}.asset-import-section p{overflow-wrap:anywhere}.asset-import-file-input{display:block;width:100%;box-sizing:border-box;padding:10px 12px;margin:8px 0;border:1px dashed #b8c7d9;border-radius:8px;background:#f8fafc;cursor:pointer;transition:border-color .15s,background-color .15s}.asset-import-file-input:hover:not(:disabled){border-color:#2563eb;background:#f0f6ff}.asset-import-file-input:disabled{cursor:not-allowed;opacity:.65}.asset-import-selection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}.asset-import-selection .el-form-item{margin-bottom:0}.asset-import-mapping-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.asset-import-map-row{display:grid;grid-template-columns:minmax(120px,1fr) minmax(170px,1.4fr);gap:8px;align-items:center;font-size:12px;padding:8px 10px;background:#f8fafc;border:1px solid #edf2f7;border-radius:6px}.asset-import-map-row label{overflow-wrap:anywhere;font-weight:500;color:#334155}.asset-import-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}.import-error{color:#9b3b1b;font-size:12px;overflow-wrap:anywhere}.asset-import-cell{display:block;margin:3px 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px}.asset-import-cell b{display:inline-block;min-width:20px}.asset-import-request{font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f7fb;padding:10px;border-radius:6px}.asset-import-drawer .el-checkbox{display:flex;margin:7px 0;white-space:normal;height:auto}.asset-import-drawer .el-checkbox__label{white-space:normal;overflow-wrap:anywhere}.asset-import-drawer .el-alert{margin:10px 0}.asset-import-drawer .el-button{min-height:44px;height:auto;white-space:normal}
+.asset-import-drawer{max-width:100vw}.tabular-nums{font-variant-numeric:tabular-nums}.asset-import-steps{margin:16px 0}.asset-import-section{margin:18px 0;padding-top:14px;border-top:1px solid #e4eaf2}.asset-import-section h3{font-size:15px;margin:0 0 10px}.asset-import-section p{overflow-wrap:anywhere}.asset-import-file-input{display:block;width:100%;box-sizing:border-box;padding:10px 12px;margin:8px 0;border:1px dashed #b8c7d9;border-radius:8px;background:#f8fafc;cursor:pointer;transition:border-color .15s,background-color .15s}.asset-import-file-input:hover:not(:disabled){border-color:#2563eb;background:#f0f6ff}.asset-import-file-input:disabled{cursor:not-allowed;opacity:.65}.asset-import-selection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}.asset-import-selection .el-form-item{margin-bottom:0}.asset-import-mapping-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.asset-import-map-row{display:grid;grid-template-columns:minmax(120px,1fr) minmax(170px,1.4fr);gap:8px;align-items:center;font-size:12px;padding:8px 10px;background:#f8fafc;border:1px solid #edf2f7;border-radius:6px}.asset-import-map-row label{overflow-wrap:anywhere;font-weight:500;color:#334155}.asset-import-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}.import-error{color:#9b3b1b;font-size:12px;overflow-wrap:anywhere}.asset-import-cell{display:block;margin:3px 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px}.asset-import-cell b{display:inline-block;min-width:20px}.asset-import-request{font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f7fb;padding:10px;border-radius:6px}.asset-import-drawer .el-checkbox{display:flex;margin:7px 0;white-space:normal;height:auto}.asset-import-drawer .el-checkbox__label{white-space:normal;overflow-wrap:anywhere}.asset-import-drawer .el-alert{margin:10px 0}.asset-import-drawer [tabindex="-1"]:focus-visible{outline:3px solid #175cd3;outline-offset:2px}.asset-import-drawer .el-button{min-height:44px;height:auto;white-space:normal}
 @media(max-width:760px){.asset-import-selection,.asset-import-mapping-grid{grid-template-columns:minmax(0,1fr)}.asset-import-map-row{grid-template-columns:minmax(100px,1fr) minmax(145px,1.4fr)}.asset-import-drawer .el-button{min-height:44px;height:auto;white-space:normal}.asset-import-steps{padding:10px 12px;flex-direction:column;align-items:stretch;gap:6px}.asset-import-steps .el-step.is-simple{flex:none!important;max-width:none!important;width:100%;min-height:44px}.asset-import-steps .el-step.is-simple .el-step__main{justify-content:flex-start}.asset-import-steps .el-step.is-simple .el-step__title{max-width:none;font-size:14px;line-height:1.5;word-break:normal;overflow-wrap:normal}.asset-import-steps .el-step.is-simple .el-step__arrow{display:none}.asset-import-drawer .el-checkbox{min-height:44px;align-items:center}.asset-import-drawer .el-select__wrapper{min-height:44px}}
 </style>

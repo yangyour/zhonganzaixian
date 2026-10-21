@@ -94,6 +94,26 @@ public final class PostgresAssetImportRepository implements AssetImportSourceRep
         }catch(SQLException failure){throw unavailable();}
     }
     @Override public Map<String,Object> source(Access access,String sourceId){if(!uuid(sourceId))throw missing();return read(access,c->sourceDto(c,sourceRow(c,access,sourceId,false)));}
+    @Override public Map<String,Object> listSources(Access access,int limit,String cursor){
+        if(limit<1||limit>50)throw invalid();if(cursor!=null&&!uuid(cursor))throw missing();
+        return read(access,connection->{
+            authorize(connection,access,true,false);
+            if(cursor!=null)sourceRow(connection,access,cursor,false);
+            String query="SELECT s.* FROM public.mop_asset_import_source s WHERE s.tenant_id=?::uuid AND s.created_by=?::uuid"+(cursor==null?"":" AND (s.created_at,s.id)<(SELECT a.created_at,a.id FROM public.mop_asset_import_source a WHERE a.tenant_id=?::uuid AND a.created_by=?::uuid AND a.id=?::uuid)")+" ORDER BY s.created_at DESC,s.id DESC LIMIT ?";
+            List<Object> args=new ArrayList<>(List.of(access.tenantId(),access.actorId()));
+            if(cursor!=null)args.addAll(List.of(access.tenantId(),access.actorId(),cursor));args.add(limit+1);
+            var items=new ArrayList<Map<String,Object>>();String next=null;
+            try(PreparedStatement statement=prepare(connection,query,args.toArray());ResultSet rows=statement.executeQuery()){
+                while(rows.next()){
+                    if(items.size()==limit){next=(String)items.get(items.size()-1).get("id");break;}
+                    var item=new LinkedHashMap<String,Object>();
+                    for(String field:List.of("id","original_name","declared_format","storage_status","parse_status"))item.put(field,rows.getString(field));
+                    item.put("size_bytes",rows.getLong("size_bytes"));item.put("version",rows.getLong("version"));item.put("mapping_saved",rows.getString("latest_mapping_id")!=null);times(item,rows);items.add(item);
+                }
+            }
+            var result=new LinkedHashMap<String,Object>();result.put("tenant_id",access.tenantId());result.put("created_by",access.actorId());result.put("scope","CREATOR_ONLY");result.put("items",items);result.put("next_cursor",next);result.put("can_import",false);return result;
+        });
+    }
     @Override public AssetNameSnapshot assetNameSnapshot(Access access,String sourceId){
         if(!uuid(sourceId))throw missing();
         return read(access,connection->{

@@ -17,6 +17,7 @@ export function validateAssetImportSource(source: AssetImportSource, context: Im
     || source.business_status !== 'CONFIG_PENDING' || source.can_import !== false || source.effective_rule_versions !== null || source.quota_reservation !== null
     || source.retention_until !== null || source.scan_status !== 'UNSCANNED' || source.production_approval !== 'UNVERIFIED'
     || !Array.isArray(source.question_ids) || source.question_ids.length !== 2 || !source.question_ids.includes('Q20') || !source.question_ids.includes('Q31')) fail()
+  if (typeof source.original_name!=='string'||!source.original_name||[...source.original_name].length>200||/[\\/\u0000-\u001f\u007f]/.test(source.original_name)) fail()
   if (!isUtcInstant(source.created_at) || !utcNotBefore(source.updated_at,source.created_at)) fail()
   if (source.parse_status !== 'NOT_REQUESTED' && source.storage_status !== 'READY') fail()
   if (['NOT_REQUESTED','PENDING','FAILED'].includes(source.parse_status) && (source.latest_artifact_id !== null || source.latest_mapping_id !== null || source.parsed_artifact !== null || source.mapping !== null)) fail()

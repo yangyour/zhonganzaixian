@@ -14,12 +14,12 @@ const internal=computed(()=>['padmin','msp'].includes(session.value?.user.role??
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&can('tickets:read')&&!switchingTenant.value))
 const ledgerAllowed=computed(()=>permitted.value&&internal.value&&can('ticket_notes:read_internal'))
 const tab=ref<'mine'|'ledger'>('mine')
-const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,ledgerAllowed.value,permitted.value]))
+const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,ledgerAllowed.value,permitted.value]))
 const locked=computed(()=>!!state.value.busy||workspace.unresolved())
 watch(context,()=>{const s=session.value;tab.value='mine';workspace.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,internal:internal.value}:null);if(permitted.value)void workspace.list(false)},{immediate:true,flush:'sync'})
 function openLedger(){if(!ledgerAllowed.value||locked.value)return;tab.value='ledger';if(!state.value.intents)void workspace.intents()}
-async function recover(){if(await workspace.retry())await workspace.list()}
-async function markRead(id:string){if(await workspace.mark(id))await workspace.list()}
+async function recover(){const key=context.value;if(await workspace.retry()&&key===context.value)await workspace.list()}
+async function markRead(id:string){const key=context.value;if(await workspace.mark(id)&&key===context.value)await workspace.list()}
 const blocked=ref(false)
 function mayLeave(){if(workspace.unresolved()){blocked.value=true;return false}return true}
 onBeforeRouteLeave(mayLeave);const unregister=contextTransitionGuards.register(mayLeave)
@@ -46,6 +46,7 @@ defineExpose({state,workspace,mayLeave,openLedger,markRead,recover,tab})
     </div>
     <template v-if="tab==='mine'">
      <ApiErrorNotice :error="state.error" />
+     <button v-if="state.error&&!state.page&&!state.attempt&&!state.busy" type="button" @click="workspace.retryRead()">重试原通知页</button>
      <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">标记已读结果尚未确认，请点击下方按钮重试。</p><button v-if="state.attempt&&!state.busy" type="button" @click="recover">重试标记已读</button>
      <p v-if="state.receipt" role="status">已读状态已记录：{{ displayTime(state.receipt.read_at) }}。</p>
      <p v-if="state.busy" role="status" aria-live="polite">{{ state.busy==='write'?'正在记录已读状态…':'正在读取通知…' }}</p>
@@ -59,7 +60,7 @@ defineExpose({state,workspace,mayLeave,openLedger,markRead,recover,tab})
         <p class="body">{{ m.body }}</p>
         <WeComNotificationAction :message-id="m.id"/>
         <EmailNotificationAction :message-id="m.id"/>
-        <div class="meta"><span>{{ displayTime(m.created_at) }}</span><span>{{ m.read_at?`已读于 ${displayTime(m.read_at)}`:'未读' }}</span><RouterLink :to="{path:'/ticket-workflows',query:{ticket:m.ticket_id}}">查看工单</RouterLink><button v-if="!m.read_at" type="button" :disabled="locked" @click="markRead(m.id)">标记已读</button></div>
+        <div class="meta"><span>{{ displayTime(m.created_at) }}</span><span>{{ m.read_at?`已读于 ${displayTime(m.read_at)}`:'未读' }}</span><RouterLink :to="{path:'/ticket-workflows',query:{ticket_id:m.ticket_id}}">查看工单</RouterLink><button v-if="!m.read_at" type="button" :disabled="locked" @click="markRead(m.id)">标记已读</button></div>
        </li>
       </ul>
       <button type="button" :disabled="locked" @click="workspace.list(state.unreadOnly)">返回第一页</button>
@@ -69,6 +70,7 @@ defineExpose({state,workspace,mayLeave,openLedger,markRead,recover,tab})
     <template v-else-if="ledgerAllowed">
      <p class="proto-scope-note">每条工单处理事件生成一条通知派发记录。“待确认规则”表示接收对象依赖尚未配置的值班、升级或角色规则，系统不会自动指定默认接收人。</p>
      <ApiErrorNotice :error="state.intentError" />
+     <button v-if="state.intentError&&!state.intents&&!state.intentBusy" type="button" @click="workspace.retryIntents()">重试原台账页</button>
      <p v-if="state.intentBusy" role="status">正在读取通知派发记录…</p>
      <div v-if="state.intents" class="proto-table-wrap" tabindex="0" role="region" aria-label="通知派发台账，可横向滚动"><table class="proto-table"><thead><tr><th>工单</th><th>事件</th><th>优先级</th><th>接收对象</th><th>待确认事项</th><th>外部渠道</th><th>生成时间</th></tr></thead><tbody>
       <tr v-for="i in state.intents.items" :key="i.id"><td>{{ i.receipt_no }}</td><td>{{ eventLabel(i.event_type) }}</td><td>{{ i.priority ?? '—' }}</td><td>{{ i.recipient_status==='COMPLETE'?`已生成 ${i.recipient_count} 条`:i.recipient_status==='PARTIAL'?`部分生成 ${i.recipient_count} 条`:'待确认规则' }}</td><td><span v-if="!i.pending_reasons.length">—</span><span v-for="r in i.pending_reasons" :key="r" class="reason">{{ pendingReasonLabels[r] ?? r }}</span></td><td><span v-for="b in i.external_blockers" :key="b" class="reason">{{ blockerLabels[b] ?? b }}</span></td><td>{{ displayTime(i.created_at) }}</td></tr>

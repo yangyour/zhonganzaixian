@@ -57,12 +57,18 @@ export function readIntentPage(value:unknown,before?:Cursor):NotificationIntentP
 
 export function createNotificationWorkspace(client:{request<T>(path:string,options?:RequestOptions):Promise<T>},changed:(s:NotificationState)=>void,newKey=createRequestId){
  let state=emptyNotificationState(),context:NotificationContext|null=null,epoch=0,abort:AbortController|null=null,disposed=false,intentEpoch=0,intentAbort:AbortController|null=null
+ let lastRead:{unreadOnly:boolean;before:Cursor|undefined}|null=null,lastIntent:{before:Cursor|undefined}|null=null
  const snapshot=()=>({...structuredClone({...state,error:null,intentError:null}),error:state.error,intentError:state.intentError}),emit=()=>changed(snapshot())
- function reset(next:NotificationContext|null){epoch++;intentEpoch++;intentAbort?.abort();intentAbort=null;abort?.abort();abort=null;context=!disposed&&validContext(next)?{...next}:null;state=emptyNotificationState();emit()}
+ function reset(next:NotificationContext|null){lastRead=null;lastIntent=null;epoch++;intentEpoch++;intentAbort?.abort();intentAbort=null;abort?.abort();abort=null;context=!disposed&&validContext(next)?{...next}:null;state=emptyNotificationState();emit()}
  async function list(unreadOnly=state.unreadOnly,next=false){
   if(disposed||!context||state.busy||state.attempt)return false
   const before=next&&state.page?.has_more?{time:state.page.next_before_created_at!,id:state.page.next_before_id!}:undefined
   if(next&&!before)return false
+  return readList(unreadOnly,before)
+ }
+ async function readList(unreadOnly:boolean,before?:Cursor){
+  if(disposed||!context||state.busy||state.attempt)return false
+  lastRead={unreadOnly,before:before?{...before}:undefined}
   const turn=++epoch,scope={...context},controller=new AbortController();abort=controller
   state={...state,page:null,busy:'read',error:null,unreadOnly};emit()
   try{
@@ -88,12 +94,17 @@ export function createNotificationWorkspace(client:{request<T>(path:string,optio
  function mark(id:string){
   if(disposed||!context||state.busy||state.attempt||!state.page)return Promise.resolve(false)
   const m=state.page.items.find(x=>x.id===id);if(!m||m.version!==0)return Promise.resolve(false)
-  try{const key=newKey();if(!/^[A-Za-z0-9._:-]{1,128}$/.test(key))throw invalid();return send({id,key,body:{expected_version:0}})}catch(error){state.error=error;emit();return Promise.resolve(false)}
+  try{const key=newKey();if(typeof key!=='string'||!/^[A-Za-z0-9._:-]{1,128}$/.test(key))throw invalid();return send({id,key,body:{expected_version:0}})}catch(error){state.error=error;emit();return Promise.resolve(false)}
  }
  async function intents(next=false){
   if(disposed||!context?.internal||state.intentBusy)return false
   const before=next&&state.intents?.has_more?{time:state.intents.next_before_created_at!,id:state.intents.next_before_id!}:undefined
   if(next&&!before)return false
+  return readIntents(before)
+ }
+ async function readIntents(before?:Cursor){
+  if(disposed||!context?.internal||state.intentBusy)return false
+  lastIntent={before:before?{...before}:undefined}
   const turn=++intentEpoch,controller=new AbortController();intentAbort=controller;state={...state,intents:null,intentBusy:true,intentError:null};emit()
   try{
    const query=new URLSearchParams({page_size:'25'});if(before){query.set('before_created_at',before.time);query.set('before_id',before.id)}
@@ -103,5 +114,5 @@ export function createNotificationWorkspace(client:{request<T>(path:string,optio
   }catch(error){if(!disposed&&turn===intentEpoch)state.intentError=error;return false}finally{if(!disposed&&turn===intentEpoch){state.intentBusy=false;intentAbort=null;emit()}}
  }
  emit()
- return{reset,list,mark,intents,retry:()=>state.attempt?send(structuredClone(state.attempt),true):Promise.resolve(false),unresolved:()=>state.attempt!==null,state:snapshot,dispose:()=>{disposed=true;reset(null)}}
+ return{reset,list,mark,intents,retryRead:()=>lastRead?readList(lastRead.unreadOnly,lastRead.before):Promise.resolve(false),retryIntents:()=>lastIntent?readIntents(lastIntent.before):Promise.resolve(false),retry:()=>state.attempt?send(structuredClone(state.attempt),true):Promise.resolve(false),unresolved:()=>state.attempt!==null,state:snapshot,dispose:()=>{disposed=true;reset(null)}}
 }

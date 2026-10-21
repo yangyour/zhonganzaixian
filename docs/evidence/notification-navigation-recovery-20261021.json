@@ -1,0 +1,30 @@
+{
+  "base_commit": "9e6d69d714e1b25814a04cdfae201992f033620d",
+  "result": "PASS_UNIT_DOM_BUILD_STATIC",
+  "web_tests": 3194,
+  "web_files": 216,
+  "new_tests": 13,
+  "focused_tests": 28,
+  "contract_tests": 173,
+  "build_id": "c21dc025295281bd4c6962ca3fc88022df1771eba58ae9fe9aafd80145e6463f",
+  "bootstrap_gzip_bytes": 179730,
+  "backend_or_api_changed": false,
+  "actual_http_reexecuted": false,
+  "workflow_query_parameter": "ticket_id",
+  "separate_original_query_retries": "OWN_NOTIFICATION_AND_INTERNAL_LEDGER",
+  "unknown_write_bypass": false,
+  "scope_reset_clears_cursors": true,
+  "real_external_sends": 0,
+  "browser_scripts_discovered": 51,
+  "browser_and_axe": "NOT_RUN",
+  "formal_acceptance": {
+    "total": 128,
+    "NOT_RUN": 128
+  },
+  "source_sha256": {
+    "apps/web/src/utils/ticketNotifications.ts": "fc694f44baed754d09544f09ae45698c0629ae6089e341b610298f1e58177b2d",
+    "apps/web/src/pages/TicketNotificationsPage.vue": "04014ba18fa65bcf16d21d08b61aee59fa0017f7fd349441b65a3a9cf527db3a",
+    "apps/web/tests/ticketNotifications.test.ts": "4717f91e2dc88df5a6b4a9479b2ccf1734fc3cd16c126c3fe5d57c23bfe3c976",
+    "apps/web/tests/ticketNotificationsPage.test.ts": "31e841d215a1e84f48bb0e68bccf4c30def941c5c99a03175b3d56c40cdf051e"
+  }
+}

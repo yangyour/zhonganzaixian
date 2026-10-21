@@ -418,6 +418,7 @@
       "contract_scope": "合同内一期",
       "has_progress_note": true,
       "local_references": [
+        "docs/cmdb-import-preflight-20261021.md",
         "docs/customer-cmdb-dictionary-20261021.md",
         "docs/evidence/dot-import-refresh-20261002.json",
         "docs/evidence/dot-import-template-download-20261002.json",
@@ -1493,6 +1494,6 @@
   ],
   "source_sha256": {
     "doc/development/evidence/contract_requirements.json": "02fb1ca6e5391f65c7cbf729416b50aa70ddedecbbc4aa3ff5b465154043e30b",
-    "doc/development/07_合同逐项开发追踪.md": "f6edf5d9dc632e558092887d27dba901c59d4437c5f358c1c15fccff9d0d1bea"
+    "doc/development/07_合同逐项开发追踪.md": "0e3c18238976db99d74d3d816c3dedc5cf821e69b65f15b83b868e069bff624d"
   }
 }

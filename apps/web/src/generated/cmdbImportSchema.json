@@ -1,0 +1,172 @@
+{
+  "catalog_version": "customer-cmdb-v1-20261021",
+  "catalog_hash": "f0816e44f53a33888c6514378bbd17332b5e0ae35d20512156dc79ba7fbb3108",
+  "source_blob": "e603591f8621136da5662cf2f57f7ba518fc7328",
+  "columns": [
+    {
+      "position": 0,
+      "letter": "A",
+      "label": "设备名称*"
+    },
+    {
+      "position": 1,
+      "letter": "B",
+      "label": "设备类型*"
+    },
+    {
+      "position": 2,
+      "letter": "C",
+      "label": "IP 或域名*"
+    },
+    {
+      "position": 3,
+      "letter": "D",
+      "label": "品牌"
+    },
+    {
+      "position": 4,
+      "letter": "E",
+      "label": "型号"
+    },
+    {
+      "position": 5,
+      "letter": "F",
+      "label": "序列号"
+    },
+    {
+      "position": 6,
+      "letter": "G",
+      "label": "站点"
+    },
+    {
+      "position": 7,
+      "letter": "H",
+      "label": "位置"
+    },
+    {
+      "position": 8,
+      "letter": "I",
+      "label": "负责人"
+    },
+    {
+      "position": 9,
+      "letter": "J",
+      "label": "所属业务"
+    },
+    {
+      "position": 10,
+      "letter": "K",
+      "label": "采购日期"
+    },
+    {
+      "position": 11,
+      "letter": "L",
+      "label": "维保到期日"
+    },
+    {
+      "position": 12,
+      "letter": "M",
+      "label": "超期服役日期"
+    },
+    {
+      "position": 13,
+      "letter": "N",
+      "label": "采集方式"
+    },
+    {
+      "position": 14,
+      "letter": "O",
+      "label": "备注"
+    },
+    {
+      "position": 15,
+      "letter": "P",
+      "label": "资产编号"
+    },
+    {
+      "position": 16,
+      "letter": "Q",
+      "label": "子类型"
+    },
+    {
+      "position": 17,
+      "letter": "R",
+      "label": "维保起始日"
+    },
+    {
+      "position": 18,
+      "letter": "S",
+      "label": "维保供应商"
+    },
+    {
+      "position": 19,
+      "letter": "T",
+      "label": "机房"
+    },
+    {
+      "position": 20,
+      "letter": "U",
+      "label": "机柜号"
+    },
+    {
+      "position": 21,
+      "letter": "V",
+      "label": "U位"
+    },
+    {
+      "position": 22,
+      "letter": "W",
+      "label": "路由协议"
+    },
+    {
+      "position": 23,
+      "letter": "X",
+      "label": "端口数"
+    },
+    {
+      "position": 24,
+      "letter": "Y",
+      "label": "堆叠组"
+    },
+    {
+      "position": 25,
+      "letter": "Z",
+      "label": "OS类型"
+    },
+    {
+      "position": 26,
+      "letter": "AA",
+      "label": "BMC地址"
+    },
+    {
+      "position": 27,
+      "letter": "AB",
+      "label": "集群标识"
+    },
+    {
+      "position": 28,
+      "letter": "AC",
+      "label": "桌面数"
+    },
+    {
+      "position": 29,
+      "letter": "AD",
+      "label": "存储形态"
+    },
+    {
+      "position": 30,
+      "letter": "AE",
+      "label": "AP归属AC"
+    },
+    {
+      "position": 31,
+      "letter": "AF",
+      "label": "宿主设备"
+    },
+    {
+      "position": 32,
+      "letter": "AG",
+      "label": "标签"
+    }
+  ]
+}

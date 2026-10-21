@@ -4,6 +4,7 @@ import { api,isCancelled } from '../api/client'
 import { can,contextGeneration,session,switchingTenant } from '../stores/session'
 import { cmdbIssueLabels,readCmdbTypeCatalog,type CmdbTypeCatalog } from '../utils/cmdbTypeCatalog'
 import ApiErrorNotice from './ApiErrorNotice.vue'
+import CmdbImportPreflightPanel from './CmdbImportPreflightPanel.vue'
 const panelId=useId()
 const readButton=ref<{ $el:HTMLButtonElement }>()
 async function collapse(){clear();await nextTick();readButton.value?.$el.focus()}
@@ -40,6 +41,7 @@ onUnmounted(clear)
     <div class="catalog-dimensions"><section v-for="dimension in value.state_dimensions" :key="dimension.field"><h4>{{dimensionLabels[dimension.field]}}</h4><p>{{dimension.values.map(v=>v.label).join(' / ')}}</p></section></div>
     <p>四个状态维度独立；未知不是正常，维护不等于停用。</p>
     <details><summary>查看 {{value.attributes.length}} 个属性定义</summary><label class="catalog-filter">搜索属性 <input v-model="search" type="search" maxlength="64" placeholder="字段名、中文名或属性组"></label><p role="status" aria-live="polite">匹配 {{attributes.length}} 项</p><p v-if="!attributes.length">没有匹配的属性，请尝试其他关键词。</p><el-button v-if="search" @click="search=''">清除属性搜索</el-button><div class="catalog-table" tabindex="0" role="region" aria-label="CMDB 属性列表，可滚动查看"><table><caption>属性定义（不含资产实际值）</caption><thead><tr><th scope="col">字段</th><th scope="col">名称 / 分组</th><th scope="col">类型</th><th scope="col">来源必填说明</th><th scope="col">来源行</th></tr></thead><tbody><tr v-for="item in attributes" :key="item.code"><td>{{item.code}}<small v-if="item.derived">来源标注：派生只读</small></td><td>{{item.label}}<small>{{item.group}}</small></td><td>{{item.data_type}}</td><td>{{item.required_note}}</td><td>{{item.source_row}}</td></tr></tbody></table></div></details>
+    <CmdbImportPreflightPanel v-if="can('assets:write')" :catalog="value" />
    </template>
   </div>
  </section>

@@ -1,0 +1,22 @@
+{
+  "base_commit": "850e2cd9aa3256498208cff041bfd148f3427240",
+  "scope": "LOCAL_BROWSER_CSV_PREFLIGHT_NOT_DATABASE_IMPORT",
+  "web_tests": 2554,
+  "web_test_files": 183,
+  "new_logic_tests": 14,
+  "new_component_tests": 6,
+  "python_tests": 110,
+  "metadata_source_check": "PASS",
+  "typecheck": "PASS",
+  "build": "PASS",
+  "static_policy": "PASS",
+  "browser_scripts_discovered": 8,
+  "browser_execution": "NOT_RUN_ENVIRONMENT_SOCKET_RESTRICTION",
+  "axe": "NOT_RUN",
+  "can_import": false,
+  "database_checks": "NOT_RUN",
+  "file_uploads": 0,
+  "backend_changes": false,
+  "sql_changes": false,
+  "production_approved": false
+}

@@ -55,3 +55,21 @@ test('revocation clears visible catalog immediately',async({page})=>{
  await page.getByRole('button',{name:'查看 CMDB 类型字典'}).click();await expect(page.getByRole('table').first()).toBeVisible()
  await page.getByRole('button',{name:'模拟撤销权限'}).click();await expect(page.locator('.cmdb-catalog')).toHaveCount(0)
 })
+
+test('33-column local preflight locates invalid rows without uploading the file',async({page})=>{
+ const columns=JSON.parse(readFileSync(new URL('../../src/generated/cmdbImportSchema.json',import.meta.url),'utf8')).columns
+ const row=Array<string>(33).fill('');row[0]='合成 CSV 设备';row[1]='SW';row[2]='192.0.2.1';row[16]='fw_adc'
+ let catalogReads=0;const writes:string[]=[]
+ page.on('request',r=>{if(!['GET','HEAD'].includes(r.method()))writes.push(r.url())})
+ await page.route(endpoint,route=>{catalogReads++;return route.fulfill({json:fixture})})
+ await page.goto(url);await page.getByRole('button',{name:'查看 CMDB 类型字典'}).click()
+ const input=page.getByLabel('选择待检查的 CSV')
+ await input.setInputFiles({name:'synthetic.csv',mimeType:'text/csv',buffer:Buffer.from(columns.map((c:{label:string})=>c.label).join(',')+'\r\n'+row.join(','))})
+ await expect(page.getByText('子类型与主类型不匹配。')).toBeVisible()
+ await page.getByRole('button',{name:'查看第 2 条记录，子类型'}).click()
+ await expect(page.getByRole('region',{name:'第 2 条记录原值'})).toBeFocused()
+ await expect(page.getByText('合成 CSV 设备',{exact:true})).toBeVisible()
+ expect(writes).toEqual([]);expect(catalogReads).toBe(1)
+ await page.getByRole('button',{name:'清除本地预检'}).click()
+ await expect(page.getByText('合成 CSV 设备',{exact:true})).toHaveCount(0)
+})

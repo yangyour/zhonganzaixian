@@ -18,7 +18,7 @@ const permitted = computed(() => Boolean(session.value?.user.role === 'padmin' &
 const writable = computed(() => permitted.value && can('capacity_scenarios:write'))
 const locked = computed(() => !writable.value || Boolean(state.value.busy) || Boolean(state.value.attempt))
 const hasDraft = computed(() => inputSnapshot.value !== null && state.value.attempt === null)
-const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, permitted.value, writable.value]))
+const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version,session.value?.account_version, permitted.value, writable.value]))
 function clearForm() { inputSnapshot.value = null; Object.assign(form, { label: '', note: '', includeReference: false, reference: '', title: '', sha256: '' }); validation.value = ''; query.value = '' }
 watch(contextKey, () => { const s = session.value; workspace.reset(s && permitted.value ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version, role: s.user.role, canRead: true, canWrite: writable.value } : null); clearForm() }, { immediate: true, flush: 'sync' })
 async function confirmDiscard() { if (!hasDraft.value) return true; try { await ElMessageBox.confirm('将替换尚未提交的方案名称、说明和固定输入，是否继续？', '保留未提交方案', { confirmButtonText: '确认继续', cancelButtonText: '保留当前内容', type: 'warning' }); return true } catch { return false } }

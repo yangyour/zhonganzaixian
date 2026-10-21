@@ -1,0 +1,23 @@
+{
+  "scope": "EXPLICIT_SOLID_COLOR_PAIRS_ONLY_NOT_RENDERED_PAGE_OR_THEME_AUDIT",
+  "pairs": [
+    {
+      "foreground": "#526176",
+      "background": "#ffffff",
+      "contrast_ratio": 6.3058,
+      "normal_text_threshold": 4.5
+    },
+    {
+      "foreground": "#526176",
+      "background": "#f4f8fe",
+      "contrast_ratio": 5.9169,
+      "normal_text_threshold": 4.5
+    },
+    {
+      "foreground": "#755213",
+      "background": "#fff8e9",
+      "contrast_ratio": 6.6793,
+      "normal_text_threshold": 4.5
+    }
+  ]
+}

@@ -22,3 +22,9 @@ describe('immutable capacity scenarios', () => {
  it('a denied retry cannot prove an earlier lost write did not commit', async () => { let count=0; const h=setup(()=>{ if(++count===1)throw new TypeError('lost'); throw new ApiError(403,'ACTION_FORBIDDEN','denied','trace') }); expect(await h.workspace.submit(input())).toBe(false); const original=h.workspace.state().attempt; expect(await h.workspace.retry()).toBe(false); expect(h.workspace.unresolved()).toBe(true); expect(h.workspace.state().attempt).toEqual(original); expect(h.workspace.begin()).toBe(false) })
 
 })
+
+describe('scenario pre-dispatch authorization boundaries',()=>{
+ it('read and write callbacks can revoke without dispatching the old request',async()=>{for(const write of [true,false]){const request=vi.fn();let w:ReturnType<typeof createScenarioWorkspace>;w=createScenarioWorkspace({request} as unknown as Pick<ApiClient,'request'>,s=>{if(s.busy)w.reset(null)},()=> 'fixed');w.reset(scope);expect(await (write?w.submit(input()):w.list())).toBe(false);expect(request).not.toHaveBeenCalled();expect(w.state().receipt).toBeNull();expect(w.state().attempt).toBeNull()}})
+ it('request-id generation cannot move a prepared write into a replacement scope',async()=>{const request=vi.fn();let w:ReturnType<typeof createScenarioWorkspace>;w=createScenarioWorkspace({request} as unknown as Pick<ApiClient,'request'>,()=>{},()=>{w.reset({...scope,tenantId:scope.actorId});return 'fixed'});w.reset(scope);expect(await w.submit(input())).toBe(false);expect(request).not.toHaveBeenCalled()})
+ it('a disposed workspace cannot be reactivated with a late reset',async()=>{const h=setup();h.workspace.dispose();h.workspace.reset(scope);expect(await h.workspace.list()).toBe(false);expect(await h.workspace.submit(input())).toBe(false);expect(h.request).not.toHaveBeenCalled()})
+})

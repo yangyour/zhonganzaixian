@@ -73,7 +73,21 @@ export function createCapacityWorkspace(client: Pick<ApiClient, 'request'>, noti
     state: snapshot,
     reset(scope: CapacityContext | null) { clear(); context = !disposed && scope?.role === 'padmin' && scope.canEstimate === true && uuid.test(scope.tenantId) && uuid.test(scope.actorId) && Number.isSafeInteger(scope.permissionVersion) && scope.permissionVersion > 0 ? { ...scope } : null; state.input = emptyCapacityInput(); emit() },
     change(input: unknown) { if (disposed) return; clear(); state.input = copy(input); emit() },
-    async calculate() { if (disposed || !context || state.busy) return false; clear(); const turn = generation, scope = { ...context }; controller = new AbortController(); state.busy = true; emit(); try { const input = readCapacityInput(state.input); const value = await client.request('/capacity/estimates', { method: 'POST', body: input, signal: controller.signal }); if (turn !== generation || disposed) return false; state.result = readCapacityResult(value, scope, input); return true } catch (error) { if (turn === generation && !disposed && !isCancelled(error)) state.error = error; return false } finally { if (turn === generation && !disposed) { state.busy = false; controller = null; emit() } } },
+    cancel() { if (disposed) return; clear(); emit() },
+    async calculate() {
+      if (disposed || !context || state.busy) return false
+      clear(); const turn = generation, scope = { ...context }, abort = new AbortController(); controller = abort
+      const current = () => turn === generation && !disposed && !abort.signal.aborted
+      try {
+        const input = readCapacityInput(state.input)
+        state.busy = true; emit()
+        if (!current()) return false
+        const value = await client.request('/capacity/estimates', { method: 'POST', body: input, signal: abort.signal })
+        if (!current()) return false
+        state.result = readCapacityResult(value, scope, input); return true
+      } catch (error) { if (current() && !isCancelled(error)) state.error = error; return false }
+      finally { if (current()) { state.busy = false; controller = null; emit() } }
+    },
     dispose() { clear(); disposed = true; context = null; state.input = emptyCapacityInput(); emit() },
   }
 }

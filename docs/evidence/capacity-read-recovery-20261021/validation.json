@@ -1,0 +1,33 @@
+{
+  "scope": "EXPLICIT_CAPACITY_UI_RECOVERY_NOT_MEASURED_CAPACITY",
+  "new_tests": 20,
+  "vitest": {
+    "passed": 3399,
+    "files": 225,
+    "failed": 0
+  },
+  "contract_tests_passed": 173,
+  "api_contract": "PASS_UNCHANGED_0.76",
+  "build_id": "b3dc1b5f6a868652445213586d22aff778153e16e290e0399080a9233e4b5721",
+  "browser_matrix": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "formal_acceptance": "128_NOT_RUN",
+  "backend_changed_in_this_slice": false,
+  "source_sha256": {
+    "apps/web/src/utils/capacityEstimateWorkspace.ts": "26ab1749eb14565d24dcc7b322502173b60da8a128b1ac746af7f09f74528693",
+    "apps/web/src/utils/capacityGrowthWorkspace.ts": "46ac168bce70fa44a4628ac841e47cad75ac600f9bd362accde3c6e0be66cc7c",
+    "apps/web/src/utils/capacityScenarioWorkspace.ts": "dd09e77565eef2eca6e62c02ad1b01397b73f1deda32dec6097a71b5247ab9be",
+    "apps/web/src/pages/CapacityEstimatePage.vue": "fa17363fb37eddc01d3235408901ea829c09f8174e4353e49d7881564372512d",
+    "apps/web/src/components/CapacityGrowthPanel.vue": "4a2f4286a79aecfa6c9ce378d61155c08d6110048dd6422052eca5487287091e",
+    "apps/web/src/components/CapacityRuntimeInputsPanel.vue": "9d29bee616ce7e56e1d463f1517dd8e393f7248ce91b899fe669ee305ecb1102",
+    "apps/web/src/components/CapacityScenarioPanel.vue": "519497ceac5d42a9c1147cd54b3c1da676cf68cc141b527aa9c209a698c5596d",
+    "apps/web/tests/capacityEstimateWorkspace.test.ts": "26c75e70629594ee335e1c966863f6553bb9aaf6f1e165abdf66d3e53a478e0b",
+    "apps/web/tests/capacityGrowthWorkspace.test.ts": "d56a6010fa5498d6682498562003d353be85c6be09273e403e2b06800d09e4bf",
+    "apps/web/tests/capacityScenarioWorkspace.test.ts": "f73ba5b9220f0bcfefe66f763d618d471a4c60a3956e8e7a7a8564fb8d7d31b3",
+    "apps/web/tests/capacityRuntimePanel.test.ts": "eb8e1f6a3d0211522b205b2ec550c752d18c7b59cfc1c9fcdc77f6103a5cf278",
+    "apps/web/tests/capacityUsability.test.ts": "ab97740771e9667cfb936457fb195a04273767f1645c8d9f5bcc55b29c3c9de4"
+  },
+  "early_typecheck_failures": [
+    "account_version incorrectly accessed under user; corrected to existing Session.account_version without changing API shape",
+    "Element MessageBoxData intersection required a test-only awaited-return-type assertion; production unchanged"
+  ]
+}

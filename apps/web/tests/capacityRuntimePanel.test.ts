@@ -56,3 +56,6 @@ it('renders the replacement warning and both byte inputs before the explicit imp
  expect(apply).not.toHaveBeenCalled()
 })
 
+
+it('account-version change clears capacity inputs even if permission version is unchanged',async()=>{mount(Page as typeof Panel);state.draft.inputs.hosts='0';session.value={...structuredClone(auth),account_version:2};await settle();expect(state.draft.inputs.hosts).toBe('');expect(state.importedAt).toBeNull()})
+it('account-version change aborts runtime-input read and excludes the late snapshot',async()=>{let finish!:(v:unknown)=>void;let signal:AbortSignal|undefined;vi.spyOn(api,'request').mockImplementation((_p,o)=>{signal=o?.signal;return new Promise(r=>finish=r)});mount();const pending=state.load();session.value={...structuredClone(auth),account_version:2};await settle();expect(signal?.aborted).toBe(true);finish(fixture());await pending;expect(state.snapshot).toBeNull();state.apply();expect(apply).not.toHaveBeenCalled()})

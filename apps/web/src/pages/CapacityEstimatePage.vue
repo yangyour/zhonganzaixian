@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
+import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 import { api } from '../api/client'
 import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { createCapacityWorkspace, emptyCapacityInput, type CapacityState, type CapacityOutputs } from '../utils/capacityEstimateWorkspace'
@@ -21,29 +24,47 @@ const outputs: { key: keyof CapacityOutputs; label: string; unit: string }[] = [
 const draft = reactive({ inputs: Object.fromEntries(fields.map(f => [f.key, ''])) as Record<typeof fields[number]['key'], string>, model: Object.fromEntries(modelFields.map(f => [f.key, ''])) as Record<typeof modelFields[number]['key'], string>, proxy_buffer: Object.fromEntries(bufferFields.map(f => [f.key, ''])) as Record<typeof bufferFields[number]['key'], string>, includeBuffer: false })
 const state = shallowRef<CapacityState>({ input: emptyCapacityInput(), result: null, busy: false, error: null })
 const workspace = createCapacityWorkspace(api, value => { state.value = value })
-const importedAt = ref<string | null>(null)
+const importedAt = ref<string | null>(null), capacityRoot = ref<HTMLElement | null>(null), discarding = ref(false)
+let disposed = false
 const permitted = computed(() => session.value?.user.role === 'padmin' && can('capacity:estimate') && !switchingTenant.value)
 const nullable = (v: string) => v === '' ? null : v
 const days = (v: string) => v === '' ? null : /^(0|[1-9][0-9]{0,9})$/.test(v) ? Number(v) : v
 function input() { return { inputs: Object.fromEntries(fields.map(f => [f.key, ['history_days', 'trend_days'].includes(f.key) ? days(draft.inputs[f.key]) : nullable(draft.inputs[f.key])])), model: Object.fromEntries(modelFields.map(f => [f.key, nullable(draft.model[f.key])])), proxy_buffer: draft.includeBuffer ? Object.fromEntries(bufferFields.map(f => [f.key, nullable(draft.proxy_buffer[f.key])])) : null } }
 function clearDraft() { for (const f of fields) draft.inputs[f.key] = ''; for (const f of modelFields) draft.model[f.key] = ''; for (const f of bufferFields) draft.proxy_buffer[f.key] = ''; draft.includeBuffer = false; workspace.change(input()) }
-const authorizationKey = computed(() => JSON.stringify([session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, contextGeneration.value, permitted.value]))
+const authorizationKey = computed(() => JSON.stringify([session.value?.tenant.id, session.value?.user.id, session.value?.permission_version,session.value?.account_version, contextGeneration.value, permitted.value]))
 watch(authorizationKey, () => { const s = session.value; workspace.reset(s && permitted.value ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version, role: s.user.role, canEstimate: true } : null); clearDraft(); importedAt.value = null }, { immediate: true, flush: 'sync' })
 watch(draft, () => { workspace.change(input()); importedAt.value = null }, { deep: true, flush: 'sync' })
 function importRuntime(values: ReturnType<typeof capacityImportedValues>, checkedAt: string) { if (!permitted.value) return; Object.assign(draft.inputs, values.inputs); Object.assign(draft.proxy_buffer, values.buffer); workspace.change(input()); importedAt.value = checkedAt }
 async function calculate() { if (!permitted.value || state.value.busy) return; workspace.change(input()); await workspace.calculate() }
-onBeforeUnmount(() => workspace.dispose())
+const hasDraft = computed(() => draft.includeBuffer || [...Object.values(draft.inputs), ...Object.values(draft.model), ...Object.values(draft.proxy_buffer)].some(value => value !== ''))
+async function mayDiscard() {
+  if (discarding.value) return false
+  if (!hasDraft.value) return true
+  const scope = authorizationKey.value, before = JSON.stringify(draft); discarding.value = true
+  try { await ElMessageBox.confirm('当前容量参数仅在本页保留，计算结果不代表已保存方案。继续会丢弃本页输入，确认继续？', '保留容量输入', { confirmButtonText: '丢弃并继续', cancelButtonText: '保留输入', type: 'warning' }); return !disposed && scope === authorizationKey.value && before === JSON.stringify(draft) }
+  catch { return false }
+  finally { if (!disposed) discarding.value = false }
+}
+async function focusInput() { await nextTick(); capacityRoot.value?.querySelector<HTMLInputElement>('input[aria-label="主机数"]')?.focus() }
+async function resetDraft() { const scope = authorizationKey.value; if (await mayDiscard() && !disposed && permitted.value && scope === authorizationKey.value) { clearDraft(); await focusInput() } }
+async function cancelCalculation() { workspace.cancel(); await focusInput() }
+onBeforeRouteLeave(mayDiscard)
+const unregister = contextTransitionGuards.register(mayDiscard)
+function beforeUnload(event: BeforeUnloadEvent) { if (hasDraft.value) { event.preventDefault(); event.returnValue = '' } }
+window.addEventListener('beforeunload', beforeUnload)
+onBeforeUnmount(() => { disposed = true; unregister(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
 const missingLabels: Record<string, string> = Object.fromEntries([...fields.map(f => [f.key, f.label]), ...modelFields.map(f => ['model.' + f.key, f.label]), ['inputs', '容量输入组'], ['model', '模型参数组']])
 const bufferMissing: Record<string, string> = Object.fromEntries([...bufferFields.map(f => [f.key, f.label]), ['proxy_buffer', '尚未启用Proxy缓冲输入']])
 </script>
 <template>
   <CapacityScenarioPanel ref="scenarios" :calculation="input()" />
-  <section class="capacity-page">
+  <section ref="capacityRoot" class="capacity-page">
     <div class="page-heading"><div><h1>容量与 Proxy 缓冲评估</h1><p>按有效监控项、采样频率和保留周期测算存储与吞吐规模 · 模型估算供容量规划参考</p></div><div class="capacity-actions"><el-button v-if="can('capacity_scenarios:read')" @click="scenarios?.browse()">已保存方案</el-button><el-button v-if="can('capacity_scenarios:write')" type="primary" @click="scenarios?.prepare()">保存为容量方案</el-button></div></div>
     <el-empty v-if="!permitted" description="当前身份没有平台容量估算权限" />
     <template v-else>
       <div class="feature-summary"><article><span>平均 NVPS</span><strong>{{ state.result?.outputs?.nvps ?? '—' }}</strong><small>值 / 秒 · 模型估算值</small></article><article><span>单节点容量</span><strong>{{ state.result?.outputs?.single_node_bytes ?? '—' }}</strong><small>bytes · 历史 + 趋势 + 余量</small></article><article><span>有效监控项</span><strong>{{ state.result?.outputs?.total_items ?? '—' }}</strong><small>数量未知时不按零处理</small></article><article><span>模型状态</span><strong class="summary-status">{{ state.result?.status === 'ESTIMATED' ? '已估算' : '待明确' }}</strong><small>供容量规划参考</small></article></div>
-      <ApiErrorNotice :error="state.error" />
+      <ApiErrorNotice :error="state.error" :retrying="state.busy" retry-label="以当前输入重新估算" @retry="calculate" />
+      <p role="status">{{ state.busy ? '正在核对当前输入…' : state.error ? '估算未完成，输入已保留，可修改后重试。' : state.result ? '本次只读估算已完成，未自动保存方案。' : '尚无估算结果，输入不会自动提交。' }}</p>
       <CapacityRuntimeInputsPanel :current="{inputs:draft.inputs,buffer:draft.proxy_buffer}" @apply="importRuntime" />
       <p v-if="importedAt" role="status" class="capacity-help">已填入 {{importedAt}} 读取的参数快照。修改任意输入后按修改后的显式参数计算。</p>
       <div class="capacity-layout">
@@ -51,7 +72,7 @@ const bufferMissing: Record<string, string> = Object.fromEntries([...bufferField
           <el-form label-position="top" @submit.prevent="calculate">
             <section class="capacity-input-section"><div class="panel-heading"><h2>可调整的容量模型</h2><span>未确认项请留空</span></div><div class="capacity-fields"><el-form-item v-for="field in fields" :key="field.key" :label="field.label"><el-input v-model="draft.inputs[field.key]" :aria-label="field.label" inputmode="decimal" placeholder="未定请留空，0 请填 0" /><span class="field-help">{{ field.help }}</span></el-form-item></div>
               <div class="model-section"><h3>模型系数</h3><div class="model-fields"><el-form-item v-for="field in modelFields" :key="field.key" :label="field.label"><el-input v-model="draft.model[field.key]" :aria-label="field.label" placeholder="未定请留空" /><span class="field-help">{{ field.help }}</span></el-form-item></div></div>
-              <div class="capacity-actions"><el-button type="primary" native-type="submit" :loading="state.busy" :disabled="state.busy">开始估算</el-button><el-button @click="clearDraft">重置参数</el-button><span class="capacity-help">修改输入即清除旧结果，不自动计算</span></div>
+              <div class="capacity-actions"><el-button type="primary" native-type="submit" :loading="state.busy" :disabled="state.busy">开始估算</el-button><el-button v-if="state.busy" @click="cancelCalculation">取消本次估算</el-button><el-button :disabled="discarding" @click="resetDraft">重置参数</el-button><span class="capacity-help">修改输入即清除旧结果，不自动计算</span></div>
             </section>
             <section class="capacity-input-section"><div class="panel-heading"><h2>Proxy 缓冲测算</h2><el-checkbox v-model="draft.includeBuffer" aria-label="明确启用Proxy缓冲输入">启用独立缓冲计算输入</el-checkbox></div><p class="capacity-help">站点 NVPS × 最长断网秒数 × 每值空间 × 余量倍率；倍率直接相乘。</p><div v-if="draft.includeBuffer" class="capacity-fields"><el-form-item v-for="field in bufferFields" :key="field.key" :label="field.label"><el-input v-model="draft.proxy_buffer[field.key]" :aria-label="field.label" inputmode="decimal" placeholder="未定请留空" /><span class="field-help">{{ field.help }}</span></el-form-item></div><p v-else class="capacity-empty-inline">尚未启用独立缓冲参数（不自动沿用主模型参数）。</p></section>
           </el-form>
@@ -60,7 +81,7 @@ const bufferMissing: Record<string, string> = Object.fromEntries([...bufferField
         <aside class="capacity-side">
           <section class="capacity-results" aria-live="polite"><div class="panel-heading"><h2>{{ state.result ? (state.result.status === 'ESTIMATED' ? '容量模型估算结果' : '容量输入尚不完整') : '估算结果' }}</h2><span>未压缩模型</span></div>
             <template v-if="state.result"><p class="capacity-help">公式 {{ state.result.formula_version }} · 模型标签 {{ state.result.model_version ?? '未指定' }} · 精度 DECIMAL128，最终一次舍入</p><p v-if="state.result.missing_inputs.length" class="missing-inputs">待明确：{{ state.result.missing_inputs.map(k => missingLabels[k] || k).join('、') }}</p><div class="capacity-output-grid"><article v-for="field in outputs" :key="field.key"><h3>{{ field.label }}</h3><strong>{{ state.result.outputs?.[field.key] ?? '待测算' }}</strong><small>{{ field.unit }}</small></article></div><h3>Proxy缓冲：{{ state.result.proxy_buffer.status === 'ESTIMATED' ? '已完成估算' : '参数未完整' }}</h3><p v-if="state.result.proxy_buffer.missing_inputs.length" class="capacity-help">待明确：{{ state.result.proxy_buffer.missing_inputs.map(k => bufferMissing[k] || k).join('、') }}</p><p class="capacity-buffer-value">{{ state.result.proxy_buffer.estimated_bytes ?? '待测算' }} <small>bytes</small></p><el-alert v-if="state.result.proxy_buffer.margin_factor_below_one" type="warning" :closable="false" title="缓冲余量倍率小于 1，计算结果低于基础缓冲需求，请核对输入倍率。" /></template>
-            <div v-else class="estimate-empty"><span>∑</span><h3>等待录入模型参数</h3><p>填写左侧参数并点击“开始估算”后，在此展示各项容量估算结果。</p><small>留空参数保持待确认状态，不预填默认演示系数</small></div>
+            <div v-else class="estimate-empty"><span aria-hidden="true">∑</span><h3>等待录入模型参数</h3><p>填写左侧参数并点击“开始估算”后，在此展示各项容量估算结果。</p><small>留空参数保持待确认状态，不预填默认演示系数</small></div>
           </section>
           <section class="capacity-input-section formula-card"><div class="panel-heading"><h2>计算依据</h2></div><dl><dt>平均 NVPS</dt><dd>主机数 × 有效监控项 ÷ 采样间隔</dd><dt>历史空间</dt><dd>NVPS × 86,400 × 历史天数 × 每值空间</dd><dt>趋势空间</dt><dd>总监控项 × 趋势比例 × 24 × 趋势天数 × 趋势行空间</dd><dt>单节点空间</dt><dd>（历史 + 趋势）×（1 + 额外余量比例）</dd></dl></section>
           <section class="capacity-input-section"><div class="panel-heading"><h2>本次模型输入核对</h2><span>{{ state.result ? '服务端回读' : '等待计算' }}</span></div><p v-if="!state.result" class="capacity-empty-inline">输入参数并执行估算后，可在此核对本次计算所采用的模型系数。</p><dl v-else class="capacity-model-readback"><div><dt>模型版本</dt><dd>{{ state.result.model_version ?? '未填写' }}</dd></div><div><dt>每条趋势空间</dt><dd>{{ state.result.input.model?.bytes_per_trend_row ?? '未填写' }} bytes</dd></div><div><dt>单池 NVPS 上限输入</dt><dd>{{ state.result.input.model?.pool_nvps_limit ?? '未填写' }}</dd></div><div><dt>主模型未完整字段</dt><dd>{{ state.result.missing_inputs.length }} 项</dd></div></dl><p class="capacity-empty-inline">以上为本次模型输入快照；实际数据库落盘体积、压缩比及实测资源池吞吐需结合压测结果核定。</p></section>
@@ -71,8 +92,9 @@ const bufferMissing: Record<string, string> = Object.fromEntries([...bufferField
   </section>
 </template>
 <style scoped>
-.capacity-page{min-width:0}.capacity-layout{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(320px,1fr);gap:14px;align-items:start;margin-top:14px}.capacity-main,.capacity-side{min-width:0}.capacity-input-section,.capacity-results{padding:18px;border:1px solid #e2e9f2;border-radius:6px;background:#fff;margin-bottom:14px;overflow-wrap:anywhere}.capacity-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 14px}.model-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.capacity-fields .el-form-item,.model-fields .el-form-item{min-width:0;margin-bottom:16px}.field-help{display:block;font-size:11px;color:#8995a5;line-height:1.5;margin-top:5px}.capacity-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.capacity-actions .el-button+.el-button{margin-left:0}.capacity-help,.capacity-empty-inline,.capacity-boundaries{font-size:12px;color:#6a798c;line-height:1.7}.capacity-empty-inline{padding:20px 4px;text-align:center}.model-section{border-top:1px solid #edf1f6;padding-top:12px;margin-top:3px}.model-section h3{font-size:13px;margin:0 0 12px}.capacity-output-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.capacity-output-grid article{padding:13px;border:1px solid #dfeafa;border-radius:5px;background:#f4f8fe;min-width:0}.capacity-output-grid h3{font-size:11px;color:#6d7e96;margin:0 0 6px;font-weight:500}.capacity-output-grid strong{font-size:19px;color:#3467a6;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.capacity-output-grid small{display:block;font-size:10px;color:#8995a5;margin-top:4px}.capacity-results>h3{font-size:13px;margin-top:18px}.capacity-buffer-value{font-size:24px;color:#3467a6}.capacity-buffer-value small{font-size:12px;color:#7b8799}.estimate-empty{padding:44px 14px;text-align:center;color:#8696ac;font-size:12px;line-height:1.7}.estimate-empty>span{display:block;font-size:40px;color:#c1d1e6}.estimate-empty h3{font-size:14px;color:#546b89;font-weight:500}.formula-card dl{font-size:12px;line-height:1.8}.formula-card dt{color:#3e526d;font-weight:500;margin-top:9px}.formula-card dd{margin:0;color:#7c889a}.missing-inputs{padding:10px;background:#fff8e9;color:#9b712b;font-size:12px;line-height:1.6}.summary-status{font-size:20px!important}
+.capacity-page{min-width:0}.capacity-layout{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(320px,1fr);gap:14px;align-items:start;margin-top:14px}.capacity-main,.capacity-side{min-width:0}.capacity-input-section,.capacity-results{padding:18px;border:1px solid #e2e9f2;border-radius:6px;background:#fff;margin-bottom:14px;overflow-wrap:anywhere}.capacity-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 14px}.model-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.capacity-fields .el-form-item,.model-fields .el-form-item{min-width:0;margin-bottom:16px}.field-help{display:block;font-size:12px;color:#526176;line-height:1.5;margin-top:5px}.capacity-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.capacity-actions .el-button+.el-button{margin-left:0}.capacity-help,.capacity-empty-inline,.capacity-boundaries{font-size:12px;color:#526176;line-height:1.7}.capacity-empty-inline{padding:20px 4px;text-align:center}.model-section{border-top:1px solid #edf1f6;padding-top:12px;margin-top:3px}.model-section h3{font-size:13px;margin:0 0 12px}.capacity-output-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.capacity-output-grid article{padding:13px;border:1px solid #dfeafa;border-radius:5px;background:#f4f8fe;min-width:0}.capacity-output-grid h3{font-size:11px;color:#526176;margin:0 0 6px;font-weight:500}.capacity-output-grid strong{font-size:19px;color:#3467a6;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.capacity-output-grid small{display:block;font-size:10px;color:#526176;margin-top:4px}.capacity-results>h3{font-size:13px;margin-top:18px}.capacity-buffer-value{font-size:24px;color:#3467a6}.capacity-buffer-value small{font-size:12px;color:#526176}.estimate-empty{padding:44px 14px;text-align:center;color:#526176;font-size:12px;line-height:1.7}.estimate-empty>span{display:block;font-size:40px;color:#c1d1e6}.estimate-empty h3{font-size:14px;color:#546b89;font-weight:500}.formula-card dl{font-size:12px;line-height:1.8}.formula-card dt{color:#3e526d;font-weight:500;margin-top:9px}.formula-card dd{margin:0;color:#526176}.missing-inputs{padding:10px;background:#fff8e9;color:#755213;font-size:12px;line-height:1.6}.summary-status{font-size:20px!important}
 .capacity-model-readback{font-size:13px}.capacity-model-readback>div{display:flex;gap:16px;justify-content:space-between;border-bottom:1px solid #e3eaf2;padding:12px 0}.capacity-model-readback dt{color:#60758b}.capacity-model-readback dd{margin:0;overflow-wrap:anywhere;min-width:0;text-align:right}
 @media(max-width:1300px){.capacity-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.model-fields{grid-template-columns:1fr}.model-fields .el-form-item{margin-bottom:4px}}@media(max-width:900px){.capacity-layout{grid-template-columns:1fr}.capacity-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.capacity-results{grid-column:1/-1}.capacity-output-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:600px){.capacity-fields,.capacity-side{grid-template-columns:1fr}.capacity-output-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.capacity-input-section,.capacity-results{padding:14px}.capacity-actions .el-button{min-height:44px}}
+ .capacity-page :deep(.el-button){min-height:44px}.capacity-page :deep(:focus-visible){outline:3px solid #176bb5;outline-offset:3px}
 </style>
 

@@ -8,7 +8,7 @@ const emit=defineEmits<{ apply:[values:ReturnType<typeof capacityImportedValues>
 const props=defineProps<{current?:CapacityImportDraft}>()
 const snapshot=shallowRef<CapacityRuntimeInputs|null>(null),error=shallowRef<unknown>(null),busy=ref(false),now=ref(performance.now()),loaded=ref(0)
 let epoch=0,abort:AbortController|null=null,alive=true
-const scopeKey=computed(()=>JSON.stringify([session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,session.value?.capabilities.includes('capacity:estimate'),contextGeneration.value,switchingTenant.value]))
+const scopeKey=computed(()=>JSON.stringify([session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,session.value?.capabilities.includes('capacity:estimate'),contextGeneration.value,switchingTenant.value]))
 function clear(){epoch++;abort?.abort();abort=null;snapshot.value=null;error.value=null;busy.value=false}
 watch(scopeKey,clear,{immediate:true,flush:'sync'})
 const fresh=computed(()=>{const p=snapshot.value,elapsed=now.value-loaded.value;if(!p||elapsed>90000||elapsed<0)return false;return p.items.every(i=>i.status!=='ACTIVE'||!i.expires_at||Date.parse(i.expires_at)>Date.parse(p.checked_at)+elapsed)})

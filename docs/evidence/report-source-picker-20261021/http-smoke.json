@@ -1,0 +1,41 @@
+{
+  "result": "PASS",
+  "scope": "LOOPBACK_VITE_HTTP_SMOKE_NOT_BROWSER_OR_API_ACCEPTANCE",
+  "host": "127.0.0.1",
+  "port": 28154,
+  "checks": [
+    {
+      "path": "/inspection-source-collections",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/inspection-quarterly-reports",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/pages/InspectionQuarterlyReportsPage.vue",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/utils/inspectionSourceCollectionWorkspace.ts",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/components/ReadRecoveryActions.vue",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/components/ApiErrorNotice.vue",
+      "status": 200,
+      "expected_marker_present": true
+    }
+  ],
+  "vite_stopped": true,
+  "browser_js_executed": false,
+  "api_or_database_executed": false
+}

@@ -1,0 +1,35 @@
+{
+  "scope": "LOCAL_WORKSPACE_AND_NATIVE_DOM_NOT_BROWSER_ACCEPTANCE",
+  "new_tests": 15,
+  "vitest": {
+    "passed": 3292,
+    "files": 222,
+    "failed": 0
+  },
+  "focused_initial_before_label_test": {
+    "passed": 70,
+    "files": 3
+  },
+  "contract_tests_passed": 173,
+  "api_contract": "PASS_UNCHANGED_0.76",
+  "production_build_id": "5bfa63e9702c4f6e8855b291a8fddfc82e673485578b7040d6c5a01a16ab6363",
+  "browser": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "formal_acceptance": "128_NOT_RUN",
+  "backend_api_or_database_tested_this_increment": false,
+  "backend_code_changed": false,
+  "source_sha256": {
+    "apps/web/src/utils/changeNoticeWorkspace.ts": "ae5f048b8227c8876fd39b946ff101f196b448efd06b9e498265708a7dbfdc48",
+    "apps/web/src/pages/ChangeNoticeDraftsPage.vue": "c471fde2dce91ed8b445bb2ec04b1a5abf9381478b52c2a60fafa94c19547e41",
+    "apps/web/src/components/ReadRecoveryActions.vue": "a614da574ad5ed09bdcb4192e86d1210f6c79d7218284b52b4ee8095317b256c",
+    "apps/web/tests/changeNoticeReadRecovery.test.ts": "60836ccf61d1cc1376a3019d7b515965303eda21ec1e0cfdaa7d8f8d385d3692",
+    "apps/web/tests/changeNoticeDraftsPage.test.ts": "02f2aedaa6219ccac35e9689b8a376ec5429102032f44cb24d176c7e0e113829",
+    "apps/web/tests/readRecoveryActions.test.ts": "1c9d5bd2e8109a1bc1f7cc15dc49280d9471c994a231c98a61fbc8110a37446e"
+  },
+  "first_http_smoke_failure": {
+    "result": "FAILED",
+    "cause": "Test expected /src/main.ts but actual HTML entry is /src/bootstrap.ts",
+    "functional_defect_claimed": false,
+    "server_stopped": true,
+    "followup": "Correct actual entry marker, restore assertion, rerun all four checks successfully; diagnostic JSON with unconditional flags is not acceptance evidence"
+  }
+}

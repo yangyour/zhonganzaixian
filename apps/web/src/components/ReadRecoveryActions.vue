@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {nextTick,onUnmounted,ref,watch} from 'vue'
-const props=defineProps<{busy:'read'|'write'|null;canRetry:boolean;scopeKey:string;cancel:()=>boolean;retry:()=>Promise<boolean>}>()
+const props=defineProps<{busy:'read'|'write'|null;canRetry:boolean;scopeKey:string;label?:string;cancel:()=>boolean;retry:()=>Promise<boolean>}>()
 const status=ref(''),notice=ref<HTMLElement|null>(null);let epoch=0,alive=true,retryPending=false
 watch(()=>[props.scopeKey,props.busy],([key,busy],[oldKey])=>{if(key!==oldKey||busy==='write'||busy==='read'&&!retryPending){epoch++;status.value='';retryPending=false}},{flush:'sync'})
 async function cancel(){if(!alive||props.busy!=='read'||!props.cancel())return;retryPending=false;const turn=++epoch;status.value='已取消读取；原写入请求与未保存输入不变，可手动重试原读取。';await nextTick();if(alive&&turn===epoch)notice.value?.focus()}
@@ -9,7 +9,7 @@ async function retry(){if(!alive||props.busy||!props.canRetry||retryPending)retu
 
 onUnmounted(()=>{alive=false;epoch++})
 </script>
-<template><div v-if="busy==='read'||canRetry||status" class="read-recovery"><button v-if="busy==='read'" type="button" @click="cancel">取消当前读取</button><button v-if="canRetry&&!busy" type="button" @click="retry">重试原读取</button><p v-if="canRetry&&!busy">按原查询条件、页游标或历史版本边界重试，不采用尚未提交的新筛选；不会重发保存操作。</p><p v-if="status" ref="notice" tabindex="-1" role="status">{{status}}</p></div></template>
+<template><div v-if="busy==='read'||canRetry||status" class="read-recovery" role="group" :aria-label="label?label+'读取恢复':'读取恢复'"><button v-if="busy==='read'" type="button" @click="cancel">{{label?'取消'+label+'读取':'取消当前读取'}}</button><button v-if="canRetry&&!busy" type="button" @click="retry">{{label?'重试原'+label+'读取':'重试原读取'}}</button><p v-if="canRetry&&!busy">按原查询条件、页游标或历史版本边界重试，不采用尚未提交的新筛选；不会重发保存操作。</p><p v-if="status" ref="notice" tabindex="-1" role="status">{{status}}</p></div></template>
 <style scoped>
 .read-recovery{margin:12px 0;min-width:0}.read-recovery button{min-height:44px;padding:8px 12px;border:1px solid #8194ac;border-radius:4px;background:#fff;color:#24384b;font:inherit;cursor:pointer}.read-recovery p{line-height:1.7;overflow-wrap:anywhere}.read-recovery :focus-visible{outline:3px solid #176bb5;outline-offset:3px}
 </style>

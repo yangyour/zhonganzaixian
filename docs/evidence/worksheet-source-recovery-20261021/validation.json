@@ -1,0 +1,29 @@
+{
+  "result": "PASS_SOURCE_READ_CANCEL_RETRY_JSDOM_BUILD_HTTP",
+  "new_tests": 11,
+  "vitest": {
+    "files_passed": 238,
+    "tests_passed": 3722
+  },
+  "focused_tests_passed_before_final_copy_style_change": 54,
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 140,
+    "bootstrap_gzip_bytes": 179949,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "6caa59afd2b9696287bfd5669b59e348df3c9d54519087a59cf1e8ac4bb42da4",
+    "scope": "static-artifacts-only"
+  },
+  "source_sha256": {
+    "apps/web/src/pages/InspectionWorksheetsPage.vue": "b69bb8c34aab8a8925db0f6e702ec5619df70be23ccb919912398997c545f881",
+    "apps/web/tests/inspectionWorksheetsPage.test.ts": "937fbfd804b2b8032edf87209d317559f4ec168fc3d6956e6de31ef48918dae5"
+  },
+  "api_contract_changed": false,
+  "api_or_database_executed": false,
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "production_provider_sends": false,
+  "formal_acceptance_passes_added": 0
+}

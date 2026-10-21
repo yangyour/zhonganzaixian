@@ -48,3 +48,5 @@ P3日期目标若没有时长进度口径，保持CONFIG_PENDING，不凭空推�
 ## 远端提交与合并
 
 40个文件已提交为 [0d2b7b1c877597d76a87d8793a3149ea9f58e829](https://github.com/yangyour/zhonganzaixian/commit/0d2b7b1c877597d76a87d8793a3149ea9f58e829)。[分支CI 39528980253](https://github.com/yangyour/zhonganzaixian/actions/runs/39528980253)全部通过；2026-10-21 01:47 UTC以expected_sha保护快进主分支，并读取main验证为该提交。主分支CI另行跟进。本次仍未执行V36真实数据库迁移或供应商发送。
+
+[主分支CI 39529373511](https://github.com/yangyour/zhonganzaixian/actions/runs/39529373511)也已全部通过，合并后的构建检查闭环。

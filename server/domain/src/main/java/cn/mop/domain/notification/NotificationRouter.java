@@ -10,6 +10,8 @@ import cn.mop.domain.notification.OwnNotificationPreferenceDraft.LevelPreference
 public final class NotificationRouter {
     private NotificationRouter() {}
     public enum Priority { P1, P2, P3, P4 }
+    /** Supported algorithm only; Q14 must explicitly publish this choice before it is usable. */
+    public enum Precedence { MATRIX_THEN_PREFERENCE_WITH_P1_QUIET_BYPASS }
     public enum Outcome { PLANNED, CONFIG_PENDING, FILTERED_LEVEL, FILTERED_CHANNEL, QUIET, DUPLICATE, RESULT_UNKNOWN }
     public record Event(UUID tenantId, UUID poolId, UUID eventId, Priority priority, String phase, Instant occurredAt) {
         public Event {
@@ -27,7 +29,7 @@ public final class NotificationRouter {
         }
     }
     public record Matrix(UUID tenantId, String publication, Priority priority, Set<Channel> channels,
-                         Duration aggregateWait, Duration dedupeWindow) {
+                         Duration aggregateWait, Duration dedupeWindow, Precedence precedence) {
         public Matrix {
             Objects.requireNonNull(tenantId);
             channels = channels == null ? null : Set.copyOf(channels);
@@ -71,7 +73,7 @@ public final class NotificationRouter {
                     !receiver.equals(p.key().receiverId()) || !event.phase().equals(p.key().stage()) || p.initiatedAt().isAfter(at)) throw invalid();
         }
         if (event.priority() == null || matrix == null || !present(matrix.publication()) || matrix.priority() != event.priority() ||
-                matrix.channels() == null || matrix.aggregateWait() == null || matrix.dedupeWindow() == null ||
+                matrix.channels() == null || matrix.precedence() == null || matrix.aggregateWait() == null || matrix.dedupeWindow() == null ||
                 preference == null || !present(preference.publication()) || preference.level() == null || preference.channels() == null ||
                 bindings == null || history == null) return new Plan(Outcome.CONFIG_PENDING, List.of());
         // An explicitly empty matrix is a published record-only policy, not an inferred default.

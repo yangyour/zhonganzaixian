@@ -1,0 +1,23 @@
+{
+  "base_commit": "227194493d120280e12a272871f4097e4ab96ca9",
+  "result": "PASS",
+  "web_tests": 2748,
+  "web_files": 199,
+  "new_web_cases": 8,
+  "contract_tests": 165,
+  "typecheck_build_static": "PASS",
+  "build_id": "408685b0d19256d72efc9949ec17ab00704b7b866f074f66eb177dd16a87306b",
+  "test_layer": "SYNTHETIC_DTO_NATIVE_DOM_NOT_BROWSER",
+  "actual_monitoring_provider": "NOT_RUN_NO_PROVIDER_CALLS",
+  "backend": "UNCHANGED_NOT_RERUN_THIS_BATCH",
+  "api_contract": "UNCHANGED_0.71.0",
+  "migrations": "UNCHANGED_V1_V45",
+  "browser_axe": "NOT_RUN",
+  "formal_tc_not_run": 128,
+  "source_sha256": {
+    "apps/web/src/components/MonitoringHistoryTable.vue": "cf8a2811bf154bc5014ea356700f2f86436f1809eebf494c32e29284a830e0a1",
+    "apps/web/src/pages/NetworkMonitoringPage.vue": "5456ed167f41b601a76ba0095bf81c420eda6743bc2b1c37f0a828bc78e2830b",
+    "apps/web/tests/monitoringHistoryTable.test.ts": "1dc89e2078eb1ed3630a89e51b7eb09f1f118b1111abfc7f3fc0d8b06e3474df",
+    "apps/web/tests/networkMonitoringPage.test.ts": "74d879ea20ec77126fa25c9c98d7b9666aa3a73b15e52289f3b091366ddff1ac"
+  }
+}

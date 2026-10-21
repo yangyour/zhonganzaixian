@@ -21,6 +21,6 @@
 
 - [运行配置目录、日期与编辑保护](runtime-form-recovery-20261021.md)
 - [后端严格UTC拒绝](runtime-strict-utc-20261021.md)
-- [监控暂停刷新与身份隔离](monitoring-refresh-control-20261021.md)
+- [监控暂停刷新与身份隔离](monitoring-refresh-control-20261021.md)，以及[可分页采样数值表](monitoring-history-table-20261021.md)
 
 这些是已有链路的可用性修复，不把未实现的外部执行、数据聚合或正式验收改标为完成。

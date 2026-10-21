@@ -3,6 +3,7 @@ import {computed,onMounted,onUnmounted,ref,watch} from 'vue'
 import {api,isCancelled} from '../api/client'
 import {useMonitoringRefreshPolicy,refreshPermissionRejected} from '../utils/monitoringRefreshPolicy'
 import {can,session,switchingTenant,contextGeneration} from '../stores/session'
+import MonitoringHistoryTable from '../components/MonitoringHistoryTable.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import {historySegments,readHistory,readResourceHistory,readResources,readSnapshot,sampleText,type Metric,type HistoryMetric,type ResourceMetric,type ResourceHistory,type ResourceSnapshot,type NetworkHistory,type NetworkSnapshot} from '../utils/networkMonitoring'
 const snapshot=ref<NetworkSnapshot|null>(null),history=ref<NetworkHistory|ResourceHistory|null>(null)
@@ -105,6 +106,7 @@ function resourceReason(id:string){const v=resources.value[id]?.data;if(!v)retur
         <ApiErrorNotice v-if="historyError" :error="historyError" @retry="loadHistory" />
         <template v-if="history">
           <p class="history-caption">共 {{history.points.length}} 个采样点 · {{time(history.from)}} — {{time(history.to)}} · 单位：{{history.unit||'状态值 (0/1)'}}</p>
+          <MonitoringHistoryTable :history="history" />
           <p v-if="history.source==='SANGFOR_AF_API'" class="history-caption">注：防火墙资源指标采用采集端接收时刻记录。</p>
           <p v-if="!history.points.length" class="network-empty">该时间窗口尚无采样记录。</p>
           <svg v-else class="history-chart" viewBox="0 0 720 180" role="img" :aria-label="`${metric}历史采样，空窗不连线`"><path d="M16 20V154H704" stroke="#cedbe8" fill="none"/><g v-for="(segment,i) in segments" :key="i"><polyline :points="segment.line" fill="none" stroke="#1667b9" stroke-width="2"/><circle v-for="(p,j) in segment.dots" :key="j" :cx="p.x" :cy="p.y" r="2.5" fill="#1667b9"/></g></svg>

@@ -1,0 +1,35 @@
+{
+  "scope": "CUSTOMER_CMDB_SOURCE_AND_CLASSIFICATION_ONLY",
+  "source_catalog_version": "customer-cmdb-v1-20261021",
+  "primary_types": 9,
+  "subtypes": 16,
+  "attributes": 95,
+  "unresolved_source_issues": 4,
+  "new_java_tests": 9,
+  "new_python_tests": 10,
+  "backend": {
+    "tests": 3730,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 983,
+    "executed": 2747
+  },
+  "backend_build": "PASS",
+  "python": {
+    "tests": 106,
+    "result": "PASS"
+  },
+  "contracts": {
+    "tests": 156,
+    "result": "PASS"
+  },
+  "frontend": "UNCHANGED_NOT_RERUN",
+  "database": "NOT_REQUIRED_FOR_THIS_READ_ONLY_SOURCE_SLICE",
+  "api_ui": "NOT_IMPLEMENTED_IN_THIS_SLICE",
+  "runtime_publication": false,
+  "asset_changes": false,
+  "account_or_role_changes": false,
+  "provider_sends": false,
+  "production_approved": false,
+  "formal_acceptance": "NOT_RUN"
+}

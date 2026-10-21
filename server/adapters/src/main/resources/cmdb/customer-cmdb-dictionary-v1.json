@@ -1,0 +1,4829 @@
+{
+  "schema_version": 1,
+  "catalog_version": "customer-cmdb-v1-20261021",
+  "scope": "CUSTOMER_SOURCE_CATALOG_NOT_RUNTIME_PUBLICATION",
+  "source": {
+    "path": "doc/customer/2026-10-21/运维托管平台_CMDB_CI类型与属性字典_V1.0.xlsx",
+    "git_blob_sha": "e603591f8621136da5662cf2f57f7ba518fc7328",
+    "sha256": "49ff9b1e6890ca992d95fe3502082e108dcb554abc238c269d014393b4f44624",
+    "sheets": 14
+  },
+  "activated": false,
+  "production_approved": false,
+  "primary_types": [
+    {
+      "code": "SW",
+      "label": "交换机",
+      "declared_subtypes": "sw_core、sw_access",
+      "source": {
+        "sheet": "01_CI类型_L1主类型",
+        "row": 2
+      }
+    },
+    {
+      "code": "RT",
+      "label": "路由器与出口网关",
+      "declared_subtypes": "rt_gateway",
+      "source": {
+        "sheet": "01_CI类型_L1主类型",
+        "row": 3
+      }
+    },
+    {
+      "code": "FW",
+      "label": "安全与网关设备",
+      "declared_subtypes": "fw_ngfw、fw_ips、fw_audit、fw_adc",
+      "source": {
+        "sheet": "01_CI类型_L1主类型",
+        "row": 4
+      }
+    },
+    {
+      "code": "WL",
+      "label": "无线设备",
+      "declared_subtypes": "wl_ac、wl_ap",
+      "source": {
+        "sheet": "01_CI类型_L1主类型",
+        "row": 5
+      }
+    },
+    {
+      "code": "SV",
+      "label": "服务器",
+      "declared_subtypes": "sv_physical、sv_vm",
+      "source": {
+        "sheet": "01_CI类型_L1主类型",
+        "row": 6
+      }
+    },
+    {
+      "code": "HC",
+      "label": "超融合平台",
+      "declared_subtypes": "hc_node",
+      "source": {
+        "sheet": "01_CI类型_L1主类型",
+        "row": 7
+      }
+    },
+    {
+      "code": "VD",
+      "label": "桌面云平台",
+      "declared_subtypes": "vd_host",
+      "source": {
+        "sheet": "01_CI类型_L1主类型",
+        "row": 8
+      }
+    },
+    {
+      "code": "ST",
+      "label": "存储设备（集中式）",
+      "declared_subtypes": "st_san、st_nas",
+      "source": {
+        "sheet": "01_CI类型_L1主类型",
+        "row": 9
+      }
+    },
+    {
+      "code": "DS",
+      "label": "分布式存储",
+      "declared_subtypes": "ds_node",
+      "source": {
+        "sheet": "01_CI类型_L1主类型",
+        "row": 10
+      }
+    }
+  ],
+  "subtypes": [
+    {
+      "code": "sw_core",
+      "label": "核心／汇聚交换机",
+      "parent": "SW",
+      "monitoring_type_note": "核心／汇聚交换机",
+      "monitoring_groups_note": "GE、IF、NW、RT、CM、EN",
+      "excluded_groups_note": "SV、SR、BA、FW、WL、HS、HC、VD、ST、DS",
+      "billing_weight": "1",
+      "backup_plan_note": "是",
+      "inspection_template_note": "交换机巡检模板",
+      "configuration_backup_note": "是（SSH）",
+      "priority_tags_note": "核心节点、上联",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 2
+      }
+    },
+    {
+      "code": "sw_access",
+      "label": "接入交换机",
+      "parent": "SW",
+      "monitoring_type_note": "接入交换机",
+      "monitoring_groups_note": "GE、IF、CM、EN",
+      "excluded_groups_note": "NW、RT、SV、SR、BA、FW、WL、HS、HC、VD、ST、DS",
+      "billing_weight": "1",
+      "backup_plan_note": "是",
+      "inspection_template_note": "交换机巡检模板",
+      "configuration_backup_note": "是（SSH）",
+      "priority_tags_note": "",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 3
+      }
+    },
+    {
+      "code": "rt_gateway",
+      "label": "路由器／出口网关",
+      "parent": "RT",
+      "monitoring_type_note": "路由器／出口网关",
+      "monitoring_groups_note": "GE、IF、NW、RT、CM",
+      "excluded_groups_note": "SV、SR、WL、HS、HC、VD、ST、DS",
+      "billing_weight": "1",
+      "backup_plan_note": "是",
+      "inspection_template_note": "路由器巡检模板",
+      "configuration_backup_note": "是（SSH）",
+      "priority_tags_note": "出口",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 4
+      }
+    },
+    {
+      "code": "fw_ngfw",
+      "label": "防火墙／安全网关",
+      "parent": "FW",
+      "monitoring_type_note": "防火墙／安全网关",
+      "monitoring_groups_note": "GE、IF、FW、NW、RT、CM",
+      "excluded_groups_note": "WL、SV、SR、HS、HC、VD、ST、DS",
+      "billing_weight": "1",
+      "backup_plan_note": "是",
+      "inspection_template_note": "防火墙巡检模板",
+      "configuration_backup_note": "是（SSH）",
+      "priority_tags_note": "出口、核心节点",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 5
+      }
+    },
+    {
+      "code": "fw_ips",
+      "label": "IPS／IDS／WAF",
+      "parent": "FW",
+      "monitoring_type_note": "IPS／IDS／WAF",
+      "monitoring_groups_note": "GE、IF、FW、CM",
+      "excluded_groups_note": "其余全部",
+      "billing_weight": "1",
+      "backup_plan_note": "是",
+      "inspection_template_note": "安全设备通用模板",
+      "configuration_backup_note": "是（SSH）",
+      "priority_tags_note": "",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 6
+      }
+    },
+    {
+      "code": "fw_audit",
+      "label": "上网行为管理／审计",
+      "parent": "FW",
+      "monitoring_type_note": "上网行为管理／审计",
+      "monitoring_groups_note": "GE、FW、CM",
+      "excluded_groups_note": "其余全部",
+      "billing_weight": "1",
+      "backup_plan_note": "是",
+      "inspection_template_note": "安全设备通用模板",
+      "configuration_backup_note": "是（SSH）",
+      "priority_tags_note": "",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 7
+      }
+    },
+    {
+      "code": "fw_adc",
+      "label": "负载均衡／应用交付",
+      "parent": "FW",
+      "monitoring_type_note": "监控清单未单列，按 GE、IF、NW、RT 处理",
+      "monitoring_groups_note": "GE、IF、NW、RT、CM",
+      "excluded_groups_note": "存储与虚拟化类全部",
+      "billing_weight": "1",
+      "backup_plan_note": "是",
+      "inspection_template_note": "安全设备通用模板",
+      "configuration_backup_note": "是（SSH）",
+      "priority_tags_note": "核心节点",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 8
+      }
+    },
+    {
+      "code": "wl_ac",
+      "label": "无线 AC 控制器",
+      "parent": "WL",
+      "monitoring_type_note": "无线 AC 控制器",
+      "monitoring_groups_note": "GE、WL、IF、CM",
+      "excluded_groups_note": "NW、RT、SV、SR、BA、FW、HS、HC、VD、ST、DS",
+      "billing_weight": "1",
+      "backup_plan_note": "是",
+      "inspection_template_note": "无线控制器模板",
+      "configuration_backup_note": "是（SSH／API）",
+      "priority_tags_note": "核心节点",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 9
+      }
+    },
+    {
+      "code": "wl_ap",
+      "label": "无线 AP",
+      "parent": "WL",
+      "monitoring_type_note": "无线 AP",
+      "monitoring_groups_note": "WL、GE",
+      "excluded_groups_note": "IF、NW、RT、SV、SR、FW、HS、HC、VD、ST、DS",
+      "billing_weight": "0.2",
+      "backup_plan_note": "否（配置随 AC）",
+      "inspection_template_note": "AP巡检模板",
+      "configuration_backup_note": "否",
+      "priority_tags_note": "",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 10
+      }
+    },
+    {
+      "code": "sv_physical",
+      "label": "通用物理服务器",
+      "parent": "SV",
+      "monitoring_type_note": "通用物理服务器",
+      "monitoring_groups_note": "GE、HS、SV、SR、BA、CM",
+      "excluded_groups_note": "IF、NW、RT、WL、FW、HC、VD、ST、DS",
+      "billing_weight": "1",
+      "backup_plan_note": "否",
+      "inspection_template_note": "服务器巡检模板",
+      "configuration_backup_note": "否（OS 配置比对）",
+      "priority_tags_note": "",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 11
+      }
+    },
+    {
+      "code": "sv_vm",
+      "label": "虚拟机",
+      "parent": "SV",
+      "monitoring_type_note": "虚拟机",
+      "monitoring_groups_note": "SV、SR、BA、HC",
+      "excluded_groups_note": "GE、IF、NW、RT、WL、FW、HS、VD、ST、DS",
+      "billing_weight": "0",
+      "backup_plan_note": "否",
+      "inspection_template_note": "不单独巡检（随宿主）",
+      "configuration_backup_note": "否",
+      "priority_tags_note": "",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 12
+      }
+    },
+    {
+      "code": "hc_node",
+      "label": "超融合节点",
+      "parent": "HC",
+      "monitoring_type_note": "超融合服务器",
+      "monitoring_groups_note": "GE、IF、HS、HC、SV、CM、BA",
+      "excluded_groups_note": "NW、RT、WL、FW、SR、VD、ST、DS",
+      "billing_weight": "1",
+      "backup_plan_note": "否",
+      "inspection_template_note": "超融合巡检模板",
+      "configuration_backup_note": "否",
+      "priority_tags_note": "核心节点",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 13
+      }
+    },
+    {
+      "code": "vd_host",
+      "label": "桌面云服务器",
+      "parent": "VD",
+      "monitoring_type_note": "桌面云服务器",
+      "monitoring_groups_note": "GE、HS、HC、VD、SV、SR、BA、CM",
+      "excluded_groups_note": "NW、RT、WL、FW、ST、DS",
+      "billing_weight": "1",
+      "backup_plan_note": "否",
+      "inspection_template_note": "桌面云巡检模板",
+      "configuration_backup_note": "否",
+      "priority_tags_note": "核心节点",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 14
+      }
+    },
+    {
+      "code": "st_san",
+      "label": "集中式存储 SAN",
+      "parent": "ST",
+      "monitoring_type_note": "存储服务器（SAN／NAS）",
+      "monitoring_groups_note": "GE、HS、ST、SV、CM",
+      "excluded_groups_note": "IF、NW、RT、WL、FW、SR、HC、VD、DS",
+      "billing_weight": "1",
+      "backup_plan_note": "否",
+      "inspection_template_note": "存储巡检模板",
+      "configuration_backup_note": "否",
+      "priority_tags_note": "核心节点",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 15
+      }
+    },
+    {
+      "code": "st_nas",
+      "label": "集中式存储 NAS",
+      "parent": "ST",
+      "monitoring_type_note": "存储服务器（SAN／NAS）",
+      "monitoring_groups_note": "GE、HS、ST、SV、CM",
+      "excluded_groups_note": "IF、NW、RT、WL、FW、SR、HC、VD、DS",
+      "billing_weight": "1",
+      "backup_plan_note": "否",
+      "inspection_template_note": "存储巡检模板",
+      "configuration_backup_note": "否",
+      "priority_tags_note": "",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 16
+      }
+    },
+    {
+      "code": "ds_node",
+      "label": "分布式存储节点",
+      "parent": "DS",
+      "monitoring_type_note": "分布式存储服务器",
+      "monitoring_groups_note": "GE、HS、DS、SV、CM",
+      "excluded_groups_note": "IF、NW、RT、WL、FW、SR、HC、VD、ST",
+      "billing_weight": "1",
+      "backup_plan_note": "否",
+      "inspection_template_note": "分布式存储巡检模板",
+      "configuration_backup_note": "否",
+      "priority_tags_note": "核心节点",
+      "source": {
+        "sheet": "02_CI类型_L2子类型",
+        "row": 17
+      }
+    }
+  ],
+  "attributes": [
+    {
+      "group": "核心标识",
+      "code": "ci_id",
+      "label": "CI 主键",
+      "data_type": "string(26)",
+      "required_note": "是",
+      "uniqueness_note": "全局",
+      "value_source_note": "系统生成",
+      "validation_note": "ULID，不可变，退役不回收",
+      "description": "全平台唯一标识，业务编码变更不影响历史引用",
+      "derived_read_only_note": "是",
+      "spec_field": "—",
+      "ledger_field": "资产编号（CMDB ID）",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 2
+      }
+    },
+    {
+      "group": "核心标识",
+      "code": "asset_no",
+      "label": "资产编号",
+      "data_type": "string(32)",
+      "required_note": "是",
+      "uniqueness_note": "租户内",
+      "value_source_note": "系统按规则生成",
+      "validation_note": "格式 {租户}-{类型}-{站点}-{5位}；仅可手改一次",
+      "description": "可打印二维码贴签，扫码直达详情",
+      "derived_read_only_note": "否",
+      "spec_field": "—",
+      "ledger_field": "资产编号（CMDB ID）",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 3
+      }
+    },
+    {
+      "group": "核心标识",
+      "code": "device_name",
+      "label": "设备名称",
+      "data_type": "string(64)",
+      "required_note": "是",
+      "uniqueness_note": "租户内",
+      "value_source_note": "建档录入",
+      "validation_note": "中文、字母、数字、短横线、下划线；不含空格与斜杠",
+      "description": "导入模板必填项，重名报错并提示行号",
+      "derived_read_only_note": "否",
+      "spec_field": "name",
+      "ledger_field": "—",
+      "import_field": "设备名称*",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 4
+      }
+    },
+    {
+      "group": "核心标识",
+      "code": "device_type",
+      "label": "设备类型（L1）",
+      "data_type": "enum(9)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "建档下拉",
+      "validation_note": "必须在 9 类枚举内，无\"其他\"",
+      "description": "决定属性模板与默认 L2",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "设备类型*",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 5
+      }
+    },
+    {
+      "group": "核心标识",
+      "code": "device_subtype",
+      "label": "设备子类型（L2）",
+      "data_type": "enum(15)",
+      "required_note": "进入服务前必填",
+      "uniqueness_note": "—",
+      "value_source_note": "接入向导确认",
+      "validation_note": "必须属于所选 L1",
+      "description": "决定监控分组、巡检模板、备份方式",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 6
+      }
+    },
+    {
+      "group": "核心标识",
+      "code": "primary_ip",
+      "label": "管理 IP 或域名",
+      "data_type": "string(64)",
+      "required_note": "是",
+      "uniqueness_note": "租户内",
+      "value_source_note": "建档录入",
+      "validation_note": "IPv4／IPv6／域名；同租户内不得重复",
+      "description": "不作跨租户唯一键（SOW）",
+      "derived_read_only_note": "否",
+      "spec_field": "ip",
+      "ledger_field": "—",
+      "import_field": "IP 或域名*",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 7
+      }
+    },
+    {
+      "group": "核心标识",
+      "code": "site_id",
+      "label": "站点",
+      "data_type": "ref(SITE)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "建档选择",
+      "validation_note": "必须属于本租户",
+      "description": "资产编号站点段来源；告警分组与影响范围依据",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "站点",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 8
+      }
+    },
+    {
+      "group": "核心标识",
+      "code": "owner_id",
+      "label": "负责人",
+      "data_type": "ref(PERSON)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "建档选择",
+      "validation_note": "必须是本租户成员，否则置空并提示",
+      "description": "告警分派与维保提醒接收人",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "负责人",
+      "import_field": "负责人",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 9
+      }
+    },
+    {
+      "group": "核心标识",
+      "code": "lifecycle_state",
+      "label": "生命周期状态",
+      "data_type": "enum(8)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "系统初始化",
+      "validation_note": "见 07_状态机",
+      "description": "决定是否计费、是否参与 SLA",
+      "derived_read_only_note": "是",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 10
+      }
+    },
+    {
+      "group": "核心标识",
+      "code": "tenant_id",
+      "label": "租户",
+      "data_type": "ref(TENANT)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "上下文注入",
+      "validation_note": "不可编辑；所有查询强制注入",
+      "description": "六层隔离的对象层与数据层基础",
+      "derived_read_only_note": "否",
+      "spec_field": "tenant_id",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 11
+      }
+    },
+    {
+      "group": "核心标识",
+      "code": "collect_method",
+      "label": "采集方式",
+      "data_type": "enum(5)",
+      "required_note": "进入服务前必填",
+      "uniqueness_note": "—",
+      "value_source_note": "接入向导",
+      "validation_note": "Agent2 主动／被动、SNMPv3、HTTP、Sender",
+      "description": "决定采集链路与凭据类型",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "缺失",
+      "import_field": "采集方式",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 12
+      }
+    },
+    {
+      "group": "核心标识",
+      "code": "service_id",
+      "label": "SLA 服务",
+      "data_type": "ref(SERVICE)",
+      "required_note": "进入服务前必填",
+      "uniqueness_note": "—",
+      "value_source_note": "接入向导第 5 步",
+      "validation_note": "必须属于本租户服务树",
+      "description": "未映射则不进可用率统计，只在资产列表可见",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 13
+      }
+    },
+    {
+      "group": "硬件与固件",
+      "code": "hostname",
+      "label": "主机名",
+      "data_type": "string(64)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "实采回填",
+      "validation_note": "与实采不一致标 drifted，不自动覆盖",
+      "description": "sysName 实采值",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 14
+      }
+    },
+    {
+      "group": "硬件与固件",
+      "code": "serial_no",
+      "label": "序列号",
+      "data_type": "string(64)",
+      "required_note": "网络与服务器类必填",
+      "uniqueness_note": "租户内",
+      "value_source_note": "建档录入／实采核验",
+      "validation_note": "同租户重复提示\"疑似重复建档\"",
+      "description": "GE-15 序列号与资产一致性比对",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "序列号",
+      "import_field": "序列号",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 15
+      }
+    },
+    {
+      "group": "硬件与固件",
+      "code": "vendor",
+      "label": "品牌",
+      "data_type": "string(32)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "建档选择",
+      "validation_note": "取自品牌字典；无字典项提示\"仅提供可用性监控\"",
+      "description": "OID 映射优先级依据",
+      "derived_read_only_note": "否",
+      "spec_field": "vendor",
+      "ledger_field": "—",
+      "import_field": "品牌",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 16
+      }
+    },
+    {
+      "group": "硬件与固件",
+      "code": "model",
+      "label": "型号",
+      "data_type": "string(64)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "自由文本，建议与厂商官网一致",
+      "description": "备件与固件核查依据",
+      "derived_read_only_note": "否",
+      "spec_field": "model",
+      "ledger_field": "型号",
+      "import_field": "型号",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 17
+      }
+    },
+    {
+      "group": "硬件与固件",
+      "code": "firmware_version",
+      "label": "固件／OS 版本",
+      "data_type": "string(32)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "实采回填",
+      "validation_note": "与台账不符标 drifted",
+      "description": "GE-12 固件版本核查",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 18
+      }
+    },
+    {
+      "group": "硬件与固件",
+      "code": "hardware_spec",
+      "label": "硬件规格概要",
+      "data_type": "json",
+      "required_note": "服务器类必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入／实采",
+      "validation_note": "CPU 核数、内存 GB、磁盘总量",
+      "description": "容量规划与超配判断依据",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 19
+      }
+    },
+    {
+      "group": "硬件与固件",
+      "code": "port_count",
+      "label": "物理端口数",
+      "data_type": "int",
+      "required_note": "网络类必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入／实采",
+      "validation_note": "与 IF 类监控项展开数比对",
+      "description": "影响范围推算的终端数估算依据",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 20
+      }
+    },
+    {
+      "group": "位置与归属",
+      "code": "location_id",
+      "label": "机房／机柜",
+      "data_type": "ref(LOCATION)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档选择",
+      "validation_note": "location.site_id 必须等于 device.site_id",
+      "description": "U 位管理与现场巡检路径",
+      "derived_read_only_note": "否",
+      "spec_field": "location",
+      "ledger_field": "机房机柜位置",
+      "import_field": "位置",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 21
+      }
+    },
+    {
+      "group": "位置与归属",
+      "code": "rack_no",
+      "label": "机柜号",
+      "data_type": "string(16)",
+      "required_note": "否",
+      "uniqueness_note": "机柜内",
+      "value_source_note": "建档录入",
+      "validation_note": "同机柜同 U 位不得重复占用",
+      "description": "现场定位",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "机房机柜位置",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 22
+      }
+    },
+    {
+      "group": "位置与归属",
+      "code": "rack_unit",
+      "label": "U 位",
+      "data_type": "string(16)",
+      "required_note": "否",
+      "uniqueness_note": "机柜内",
+      "value_source_note": "建档录入",
+      "validation_note": "格式 1U~42U 或 10-12U",
+      "description": "现场定位",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "机房机柜位置",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 23
+      }
+    },
+    {
+      "group": "位置与归属",
+      "code": "biz_app_id",
+      "label": "所属业务系统",
+      "data_type": "ref(BIZAPP)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档选择",
+      "validation_note": "必须属于本租户",
+      "description": "影响范围推算与月报业务视角",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "所属业务",
+      "import_field": "所属业务",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 24
+      }
+    },
+    {
+      "group": "位置与归属",
+      "code": "department",
+      "label": "使用部门",
+      "data_type": "string(64)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "自由文本",
+      "description": "成本分摊参考",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 25
+      }
+    },
+    {
+      "group": "财务与维保",
+      "code": "purchase_date",
+      "label": "采购日期",
+      "data_type": "date",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "不晚于当前日期；不晚于维保起始日",
+      "description": "EOL 与折旧计算基准",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "采购日期",
+      "import_field": "采购日期",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 26
+      }
+    },
+    {
+      "group": "财务与维保",
+      "code": "maint_start",
+      "label": "维保起始日",
+      "data_type": "date",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "不晚于维保到期日",
+      "description": "维保状态判定",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "维保起始日",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 27
+      }
+    },
+    {
+      "group": "财务与维保",
+      "code": "maint_expire",
+      "label": "维保到期日",
+      "data_type": "date",
+      "required_note": "硬件类必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入／合同",
+      "validation_note": "触发 GE-14：到期前 90 天生成 P4 隐患",
+      "description": "到期前 30/7 天推送提醒",
+      "derived_read_only_note": "否",
+      "spec_field": "maint_expire",
+      "ledger_field": "维保到期日",
+      "import_field": "维保到期日",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 28
+      }
+    },
+    {
+      "group": "财务与维保",
+      "code": "maint_vendor",
+      "label": "维保供应商",
+      "data_type": "string(64)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "可为第三方，与厂商不同",
+      "description": "故障时备件路径",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "维保供应商",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 29
+      }
+    },
+    {
+      "group": "财务与维保",
+      "code": "eol_date",
+      "label": "超期服役日期",
+      "data_type": "date",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "不早于采购日期；触发 GE-13",
+      "description": "与维保到期是两个概念：EOL=厂家不支持的时点",
+      "derived_read_only_note": "否",
+      "spec_field": "eol_date",
+      "ledger_field": "超期服役日期",
+      "import_field": "超期服役日期",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 30
+      }
+    },
+    {
+      "group": "财务与维保",
+      "code": "warranty_type",
+      "label": "维保类型",
+      "data_type": "enum",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档选择",
+      "validation_note": "原厂／第三方／无维保／过保",
+      "description": "决定故障处置路径与成本",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 31
+      }
+    },
+    {
+      "group": "采集与接入",
+      "code": "alt_ips",
+      "label": "附加地址",
+      "data_type": "string(256)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "逗号分隔，逐个格式校验",
+      "description": "带外地址、业务地址、VIP",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 32
+      }
+    },
+    {
+      "group": "采集与接入",
+      "code": "proxy_id",
+      "label": "采集代理",
+      "data_type": "ref(PROXY)",
+      "required_note": "进入服务前必填",
+      "uniqueness_note": "—",
+      "value_source_note": "接入向导",
+      "validation_note": "必须属于同站点或允许跨站的 Group",
+      "description": "采集链路与故障转移",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 33
+      }
+    },
+    {
+      "group": "采集与接入",
+      "code": "credential_ref",
+      "label": "凭据引用",
+      "data_type": "string(64)",
+      "required_note": "进入服务前必填",
+      "uniqueness_note": "—",
+      "value_source_note": "系统生成",
+      "validation_note": "仅存引用，明文在密钥库（AES-256）",
+      "description": "不得出现在接口、日志、报告、导出",
+      "derived_read_only_note": "否",
+      "spec_field": "credential_ref",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 34
+      }
+    },
+    {
+      "group": "采集与接入",
+      "code": "template_group",
+      "label": "模板分组",
+      "data_type": "string(64)",
+      "required_note": "进入服务前必填",
+      "uniqueness_note": "—",
+      "value_source_note": "接入向导第 3 步",
+      "validation_note": "必须是已发布模板",
+      "description": "决定监控项展开",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 35
+      }
+    },
+    {
+      "group": "采集与接入",
+      "code": "sample_interval",
+      "label": "采样周期",
+      "data_type": "enum(4)",
+      "required_note": "进入服务前必填",
+      "uniqueness_note": "—",
+      "value_source_note": "接入向导",
+      "validation_note": "30／60／120／300 秒；受档位约束",
+      "description": "基础 300／标准 60／高级 30",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 36
+      }
+    },
+    {
+      "group": "采集与接入",
+      "code": "last_collect_at",
+      "label": "最近采集时间",
+      "data_type": "datetime",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "系统写入",
+      "validation_note": "由监控侧回写，只读",
+      "description": "超 30 分钟无数据判 unknown",
+      "derived_read_only_note": "是",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 37
+      }
+    },
+    {
+      "group": "状态",
+      "code": "sync_state",
+      "label": "采集同步状态",
+      "data_type": "enum(4)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "系统计算",
+      "validation_note": "已同步／同步中／同步失败／配置漂移",
+      "description": "与生命周期态正交，不是同一维度",
+      "derived_read_only_note": "是",
+      "spec_field": "缺失",
+      "ledger_field": "CMDB 同步状态",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 38
+      }
+    },
+    {
+      "group": "状态",
+      "code": "health_state",
+      "label": "运行健康状态",
+      "data_type": "enum(4)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "监控侧派生",
+      "validation_note": "取活动事件最高严重级；无数据为 unknown",
+      "description": "未知不等于正常，单独计入 KPI 卡",
+      "derived_read_only_note": "是",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 39
+      }
+    },
+    {
+      "group": "状态",
+      "code": "last_sync_at",
+      "label": "最近同步时间",
+      "data_type": "datetime",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "系统写入",
+      "validation_note": "只读",
+      "description": "对账与漂移时长计算",
+      "derived_read_only_note": "是",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 40
+      }
+    },
+    {
+      "group": "状态",
+      "code": "decommission_date",
+      "label": "退役日期",
+      "data_type": "date",
+      "required_note": "退役时必填",
+      "uniqueness_note": "—",
+      "value_source_note": "人工录入",
+      "validation_note": "不早于上线日期",
+      "description": "数据保留期起算点",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 41
+      }
+    },
+    {
+      "group": "状态",
+      "code": "replaced_by_ci",
+      "label": "替代设备",
+      "data_type": "ref(DEVICE)",
+      "required_note": "迁移时必填",
+      "uniqueness_note": "—",
+      "value_source_note": "人工选择",
+      "validation_note": "必须同类型、同租户",
+      "description": "M3-11 迁移保留原资产 ID 的对应关系",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 42
+      }
+    },
+    {
+      "group": "计费",
+      "code": "billable",
+      "label": "是否计费",
+      "data_type": "enum(3)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "规则派生",
+      "validation_note": "计入／不计入／加购",
+      "description": "不允许手填，避免争议",
+      "derived_read_only_note": "是",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 43
+      }
+    },
+    {
+      "group": "计费",
+      "code": "billing_weight",
+      "label": "计费系数",
+      "data_type": "decimal(3,1)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "按 L2 查表",
+      "validation_note": "见 09_计费折算",
+      "description": "AP 0.2、虚机 0、其余 1.0",
+      "derived_read_only_note": "是",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 44
+      }
+    },
+    {
+      "group": "计费",
+      "code": "billing_units",
+      "label": "折算台数",
+      "data_type": "decimal(6,2)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "规则派生",
+      "validation_note": "AP 按 ceil(台数/5) 分组取整",
+      "description": "契约台数清点依据",
+      "derived_read_only_note": "是",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 45
+      }
+    },
+    {
+      "group": "计费",
+      "code": "ap_billing_mode",
+      "label": "AP 计费模式",
+      "data_type": "enum(2)",
+      "required_note": "无线类必填",
+      "uniqueness_note": "租户级",
+      "value_source_note": "合同约定",
+      "validation_note": "by_ap（5 折 1）／by_ac（AP 不另计）",
+      "description": "切换需重签补充协议",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 46
+      }
+    },
+    {
+      "group": "计费",
+      "code": "contract_id",
+      "label": "服务合同",
+      "data_type": "ref(CONTRACT)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "系统关联",
+      "validation_note": "必须为生效中合同",
+      "description": "跳档比对与台账快照归属",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 47
+      }
+    },
+    {
+      "group": "安全与合规",
+      "code": "is_core",
+      "label": "是否核心节点",
+      "data_type": "bool",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "由标签或安全域推导",
+      "validation_note": "标签含核心节点／上联／出口时为真",
+      "description": "告警等级自动上浮一级；不作授权依据",
+      "derived_read_only_note": "是",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 48
+      }
+    },
+    {
+      "group": "安全与合规",
+      "code": "security_zone",
+      "label": "安全域",
+      "data_type": "enum",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档选择",
+      "validation_note": "互联网区／DMZ／内网核心／内网接入／生产区／办公区",
+      "description": "等保与区域划分",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 49
+      }
+    },
+    {
+      "group": "安全与合规",
+      "code": "compliance_tag",
+      "label": "合规标记",
+      "data_type": "string(128)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "等保级别、行业监管要求",
+      "description": "巡检报告合规章节",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 50
+      }
+    },
+    {
+      "group": "安全与合规",
+      "code": "log_retention",
+      "label": "日志保留天数",
+      "data_type": "int",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "按合同",
+      "validation_note": "默认 180 天，高级档可延长",
+      "description": "审计与合规取证",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 51
+      }
+    },
+    {
+      "group": "通用扩展",
+      "code": "tags",
+      "label": "标签",
+      "data_type": "string(256)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "逗号分隔；仅用于路由与检索",
+      "description": "不作授权依据（M3-4 硬规则）",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "标签",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 52
+      }
+    },
+    {
+      "group": "通用扩展",
+      "code": "source",
+      "label": "数据来源",
+      "data_type": "enum(4)",
+      "required_note": "是",
+      "uniqueness_note": "—",
+      "value_source_note": "系统写入",
+      "validation_note": "手工／Excel／CMDB同步／Agent注册",
+      "description": "来源决定字段 SoT 优先级",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 53
+      }
+    },
+    {
+      "group": "通用扩展",
+      "code": "external_id",
+      "label": "外部系统 ID",
+      "data_type": "string(64)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "同步写入",
+      "validation_note": "与外部 CMDB 的映射键",
+      "description": "幂等去重依据",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 54
+      }
+    },
+    {
+      "group": "通用扩展",
+      "code": "discovery_source",
+      "label": "发现方式",
+      "data_type": "enum",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "系统写入",
+      "validation_note": "手工／导入／同步／自动注册（预留）",
+      "description": "本期不做网络扫描，字段预留",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 55
+      }
+    },
+    {
+      "group": "通用扩展",
+      "code": "first_seen_at",
+      "label": "首次出现时间",
+      "data_type": "datetime",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "系统写入",
+      "validation_note": "只读",
+      "description": "待认领区排序依据",
+      "derived_read_only_note": "是",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 56
+      }
+    },
+    {
+      "group": "通用扩展",
+      "code": "note",
+      "label": "备注",
+      "data_type": "string(512)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "自由文本",
+      "description": "导入模板第 15 列",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "备注",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 57
+      }
+    },
+    {
+      "group": "通用扩展",
+      "code": "config_backup_at",
+      "label": "最近备份时间",
+      "data_type": "datetime",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "M6 回写",
+      "validation_note": "只读",
+      "description": "仅网络类有值",
+      "derived_read_only_note": "是",
+      "spec_field": "config_backup_at",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 58
+      }
+    },
+    {
+      "group": "通用扩展",
+      "code": "config_backup_ok",
+      "label": "恢复演练结果",
+      "data_type": "bool",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "M6 回写",
+      "validation_note": "只读",
+      "description": "高级档半年一次演练",
+      "derived_read_only_note": "是",
+      "spec_field": "config_backup_ok",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 59
+      }
+    },
+    {
+      "group": "类型扩展-网络",
+      "code": "routing_protocol",
+      "label": "路由协议",
+      "data_type": "enum",
+      "required_note": "网络类必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "静态／OSPF／BGP／ISIS／混合",
+      "description": "决定 RT-01/02 是否启用",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 60
+      }
+    },
+    {
+      "group": "类型扩展-网络",
+      "code": "nat_enabled",
+      "label": "启用 NAT",
+      "data_type": "bool",
+      "required_note": "出口类必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "是／否",
+      "description": "决定 RT-05 NAT 池耗尽监控是否启用",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 61
+      }
+    },
+    {
+      "group": "类型扩展-网络",
+      "code": "stack_group",
+      "label": "堆叠组标识",
+      "data_type": "string(32)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "同组成员须同站点、同型号",
+      "description": "GE-10 堆叠状态与计费按物理台数",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 62
+      }
+    },
+    {
+      "group": "类型扩展-网络",
+      "code": "redundancy_mode",
+      "label": "冗余模式",
+      "data_type": "enum",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "无冗余／双电源／双主控／双机热备／集群",
+      "description": "决定降级告警等级（冗余件故障降一级）",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 63
+      }
+    },
+    {
+      "group": "类型扩展-无线",
+      "code": "ac_ci_id",
+      "label": "归属 AC",
+      "data_type": "ref(DEVICE)",
+      "required_note": "AP必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档选择",
+      "validation_note": "必须是同站点 wl_ac",
+      "description": "AP 归属关系与按 AC 计费",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 64
+      }
+    },
+    {
+      "group": "类型扩展-无线",
+      "code": "ap_managed_count",
+      "label": "AP 纳管数",
+      "data_type": "int",
+      "required_note": "AC必填",
+      "uniqueness_note": "—",
+      "value_source_note": "实采回填",
+      "validation_note": "与名下 AP 实际数量比对",
+      "description": "License 授权核查（GE-18）",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 65
+      }
+    },
+    {
+      "group": "类型扩展-服务器",
+      "code": "os_type",
+      "label": "操作系统类型",
+      "data_type": "enum",
+      "required_note": "服务器类必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "Linux／Windows／其他",
+      "description": "决定 SV 类监控项子集",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 66
+      }
+    },
+    {
+      "group": "类型扩展-服务器",
+      "code": "os_version",
+      "label": "操作系统版本",
+      "data_type": "string(32)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "实采回填",
+      "validation_note": "只读优先",
+      "description": "版本合规与漏洞核查",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 67
+      }
+    },
+    {
+      "group": "类型扩展-服务器",
+      "code": "cpu_cores",
+      "label": "CPU 核数",
+      "data_type": "int",
+      "required_note": "服务器类必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入／实采",
+      "validation_note": "正整数",
+      "description": "容量规划",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 68
+      }
+    },
+    {
+      "group": "类型扩展-服务器",
+      "code": "mem_gb",
+      "label": "内存 GB",
+      "data_type": "int",
+      "required_note": "服务器类必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入／实采",
+      "validation_note": "正整数",
+      "description": "容量规划",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 69
+      }
+    },
+    {
+      "group": "类型扩展-服务器",
+      "code": "disk_total_gb",
+      "label": "磁盘总量 GB",
+      "data_type": "int",
+      "required_note": "服务器类必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入／实采",
+      "validation_note": "正整数",
+      "description": "容量规划",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 70
+      }
+    },
+    {
+      "group": "类型扩展-服务器",
+      "code": "raid_level",
+      "label": "RAID 级别",
+      "data_type": "enum",
+      "required_note": "服务器类必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "RAID0/1/5/6/10/50/60/无",
+      "description": "HS-02 RAID 状态判定的冗余基线",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 71
+      }
+    },
+    {
+      "group": "类型扩展-服务器",
+      "code": "bmc_ip",
+      "label": "带外管理地址",
+      "data_type": "string(64)",
+      "required_note": "否",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "与 primary_ip 不同网段",
+      "description": "为空则 HS 类整组不支持",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 72
+      }
+    },
+    {
+      "group": "类型扩展-服务器",
+      "code": "bond_mode",
+      "label": "网卡 Bond 模式",
+      "data_type": "enum",
+      "required_note": "服务器类必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "主备／LACP／轮询／单网卡",
+      "description": "HS-05 冗余判定",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 73
+      }
+    },
+    {
+      "group": "类型扩展-虚机",
+      "code": "host_ci_id",
+      "label": "宿主设备",
+      "data_type": "ref(DEVICE)",
+      "required_note": "虚机必填",
+      "uniqueness_note": "—",
+      "value_source_note": "接入向导",
+      "validation_note": "须为 hc_node 或 sv_physical，同租户",
+      "description": "虚机不套 HS 类，硬件由宿主承载",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 74
+      }
+    },
+    {
+      "group": "类型扩展-虚机",
+      "code": "vcpu",
+      "label": "vCPU 数",
+      "data_type": "int",
+      "required_note": "虚机必填",
+      "uniqueness_note": "—",
+      "value_source_note": "实采",
+      "validation_note": "正整数",
+      "description": "资源超配分析",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 75
+      }
+    },
+    {
+      "group": "类型扩展-虚机",
+      "code": "vmem_gb",
+      "label": "虚拟内存 GB",
+      "data_type": "int",
+      "required_note": "虚机必填",
+      "uniqueness_note": "—",
+      "value_source_note": "实采",
+      "validation_note": "正整数",
+      "description": "资源超配分析",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 76
+      }
+    },
+    {
+      "group": "类型扩展-虚机",
+      "code": "vdisk_gb",
+      "label": "虚拟磁盘 GB",
+      "data_type": "int",
+      "required_note": "虚机必填",
+      "uniqueness_note": "—",
+      "value_source_note": "实采",
+      "validation_note": "正整数",
+      "description": "存储容量归集",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 77
+      }
+    },
+    {
+      "group": "类型扩展-虚机",
+      "code": "guest_agent_installed",
+      "label": "已装 Guest Agent",
+      "data_type": "bool",
+      "required_note": "虚机必填",
+      "uniqueness_note": "—",
+      "value_source_note": "实采",
+      "validation_note": "是／否",
+      "description": "否：HC-11/13 不可实现，只能外部探活",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 78
+      }
+    },
+    {
+      "group": "类型扩展-超融合",
+      "code": "cluster_ci_id",
+      "label": "所属集群",
+      "data_type": "ref(DEVICE)",
+      "required_note": "超融合必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档选择",
+      "validation_note": "同租户、同站点（跨站需显式标记）",
+      "description": "HC 集群级监控项依赖",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 79
+      }
+    },
+    {
+      "group": "类型扩展-超融合",
+      "code": "node_role",
+      "label": "节点角色",
+      "data_type": "enum",
+      "required_note": "超融合必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "管理／计算／存储／融合",
+      "description": "集群健康与仲裁判定",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 80
+      }
+    },
+    {
+      "group": "类型扩展-超融合",
+      "code": "cluster_node_count",
+      "label": "集群节点数",
+      "data_type": "int",
+      "required_note": "超融合必填",
+      "uniqueness_note": "—",
+      "value_source_note": "实采",
+      "validation_note": "正整数",
+      "description": "仲裁与副本策略校验",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 81
+      }
+    },
+    {
+      "group": "类型扩展-超融合",
+      "code": "virt_platform",
+      "label": "虚拟化平台",
+      "data_type": "enum",
+      "required_note": "超融合必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "VMware／Hyper-V／KVM／厂商自研",
+      "description": "决定 HC 类采集方式（API 差异）",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 82
+      }
+    },
+    {
+      "group": "类型扩展-超融合",
+      "code": "storage_pool_total_gb",
+      "label": "存储池总量 GB",
+      "data_type": "int",
+      "required_note": "超融合必填",
+      "uniqueness_note": "—",
+      "value_source_note": "实采",
+      "validation_note": "正整数",
+      "description": "HC-03 容量使用率基线",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 83
+      }
+    },
+    {
+      "group": "类型扩展-桌面云",
+      "code": "desktop_count",
+      "label": "桌面数",
+      "data_type": "int",
+      "required_note": "桌面云必填",
+      "uniqueness_note": "—",
+      "value_source_note": "实采",
+      "validation_note": "正整数",
+      "description": "容量与授权核查（VD-01/08）",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 84
+      }
+    },
+    {
+      "group": "类型扩展-桌面云",
+      "code": "desktop_pool_count",
+      "label": "桌面池数",
+      "data_type": "int",
+      "required_note": "桌面云必填",
+      "uniqueness_note": "—",
+      "value_source_note": "实采",
+      "validation_note": "正整数",
+      "description": "池余量监控",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 85
+      }
+    },
+    {
+      "group": "类型扩展-桌面云",
+      "code": "broker_type",
+      "label": "连接代理类型",
+      "data_type": "string(32)",
+      "required_note": "桌面云必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "厂商与产品名",
+      "description": "VD-14 采集方式依据",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 86
+      }
+    },
+    {
+      "group": "类型扩展-桌面云",
+      "code": "hypervisor_ci_id",
+      "label": "底层虚拟化集群",
+      "data_type": "ref(DEVICE)",
+      "required_note": "桌面云必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档选择",
+      "validation_note": "须为 hc_node 集群",
+      "description": "底层存储与计算归属",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 87
+      }
+    },
+    {
+      "group": "类型扩展-存储",
+      "code": "storage_form",
+      "label": "存储形态",
+      "data_type": "enum",
+      "required_note": "存储必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "SAN／NAS",
+      "description": "决定 L2 是 st_san 还是 st_nas",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 88
+      }
+    },
+    {
+      "group": "类型扩展-存储",
+      "code": "controller_count",
+      "label": "控制器数",
+      "data_type": "int",
+      "required_note": "存储必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "1／2／多控",
+      "description": "ST-01 双控状态判定基线",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 89
+      }
+    },
+    {
+      "group": "类型扩展-存储",
+      "code": "raw_capacity_tb",
+      "label": "裸容量 TB",
+      "data_type": "decimal",
+      "required_note": "存储必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "正数",
+      "description": "容量规划与扩容预测",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 90
+      }
+    },
+    {
+      "group": "类型扩展-存储",
+      "code": "lun_count",
+      "label": "LUN／卷数",
+      "data_type": "int",
+      "required_note": "存储必填",
+      "uniqueness_note": "—",
+      "value_source_note": "实采",
+      "validation_note": "正整数",
+      "description": "ST-05/06 卷状态监控范围",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 91
+      }
+    },
+    {
+      "group": "类型扩展-存储",
+      "code": "fc_port_count",
+      "label": "FC 端口数",
+      "data_type": "int",
+      "required_note": "SAN必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "正整数",
+      "description": "ST-11 多路径冗余判定",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 92
+      }
+    },
+    {
+      "group": "类型扩展-分布式",
+      "code": "cluster_id",
+      "label": "集群标识",
+      "data_type": "string(32)",
+      "required_note": "分布式必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "同集群节点同值",
+      "description": "DS 集群级监控项依赖",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "扩展列",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 93
+      }
+    },
+    {
+      "group": "类型扩展-分布式",
+      "code": "osd_count",
+      "label": "OSD 数",
+      "data_type": "int",
+      "required_note": "分布式必填",
+      "uniqueness_note": "—",
+      "value_source_note": "实采",
+      "validation_note": "正整数",
+      "description": "DS-04 OSD 状态与雪崩判定",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 94
+      }
+    },
+    {
+      "group": "类型扩展-分布式",
+      "code": "mon_count",
+      "label": "MON 数",
+      "data_type": "int",
+      "required_note": "分布式必填",
+      "uniqueness_note": "—",
+      "value_source_note": "实采",
+      "validation_note": "正整数，建议 3 或 5",
+      "description": "DS-01 仲裁判定",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 95
+      }
+    },
+    {
+      "group": "类型扩展-分布式",
+      "code": "replica_policy",
+      "label": "副本策略",
+      "data_type": "string(32)",
+      "required_note": "分布式必填",
+      "uniqueness_note": "—",
+      "value_source_note": "建档录入",
+      "validation_note": "副本数／纠删码",
+      "description": "DS-06 副本健康度基线",
+      "derived_read_only_note": "否",
+      "spec_field": "缺失",
+      "ledger_field": "—",
+      "import_field": "—",
+      "source": {
+        "sheet": "04_属性字典",
+        "row": 96
+      }
+    }
+  ],
+  "enum_values": [
+    {
+      "field": "device_type",
+      "enum_name": "设备类型 L1",
+      "code": "SW",
+      "label": "交换机",
+      "constraint_note": "建档必填",
+      "description": "无\"其他\"",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 2
+      }
+    },
+    {
+      "field": "device_type",
+      "enum_name": "设备类型 L1",
+      "code": "RT",
+      "label": "路由器与出口网关",
+      "constraint_note": "建档必填",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 3
+      }
+    },
+    {
+      "field": "device_type",
+      "enum_name": "设备类型 L1",
+      "code": "FW",
+      "label": "安全与网关设备",
+      "constraint_note": "建档必填",
+      "description": "含 IPS／审计／负载均衡",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 4
+      }
+    },
+    {
+      "field": "device_type",
+      "enum_name": "设备类型 L1",
+      "code": "WL",
+      "label": "无线设备",
+      "constraint_note": "建档必填",
+      "description": "AC 与 AP 同属此类",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 5
+      }
+    },
+    {
+      "field": "device_type",
+      "enum_name": "设备类型 L1",
+      "code": "SV",
+      "label": "服务器",
+      "constraint_note": "建档必填",
+      "description": "含虚拟机",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 6
+      }
+    },
+    {
+      "field": "device_type",
+      "enum_name": "设备类型 L1",
+      "code": "HC",
+      "label": "超融合平台",
+      "constraint_note": "建档必填",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 7
+      }
+    },
+    {
+      "field": "device_type",
+      "enum_name": "设备类型 L1",
+      "code": "VD",
+      "label": "桌面云平台",
+      "constraint_note": "建档必填",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 8
+      }
+    },
+    {
+      "field": "device_type",
+      "enum_name": "设备类型 L1",
+      "code": "ST",
+      "label": "存储设备（集中式）",
+      "constraint_note": "建档必填",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 9
+      }
+    },
+    {
+      "field": "device_type",
+      "enum_name": "设备类型 L1",
+      "code": "DS",
+      "label": "分布式存储",
+      "constraint_note": "建档必填",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 10
+      }
+    },
+    {
+      "field": "lifecycle_state",
+      "enum_name": "生命周期状态",
+      "code": "planned",
+      "label": "规划中",
+      "constraint_note": "初始值之一",
+      "description": "不计费",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 11
+      }
+    },
+    {
+      "field": "lifecycle_state",
+      "enum_name": "生命周期状态",
+      "code": "procured",
+      "label": "已采购在库",
+      "constraint_note": "—",
+      "description": "不计费",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 12
+      }
+    },
+    {
+      "field": "lifecycle_state",
+      "enum_name": "生命周期状态",
+      "code": "onboarding",
+      "label": "接入中",
+      "constraint_note": "新建默认",
+      "description": "不计费",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 13
+      }
+    },
+    {
+      "field": "lifecycle_state",
+      "enum_name": "生命周期状态",
+      "code": "in_service",
+      "label": "在用",
+      "constraint_note": "—",
+      "description": "计费起点",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 14
+      }
+    },
+    {
+      "field": "lifecycle_state",
+      "enum_name": "生命周期状态",
+      "code": "maintenance",
+      "label": "维护中",
+      "constraint_note": "—",
+      "description": "仍计费",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 15
+      }
+    },
+    {
+      "field": "lifecycle_state",
+      "enum_name": "生命周期状态",
+      "code": "suspended",
+      "label": "停用",
+      "constraint_note": "—",
+      "description": "不计费",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 16
+      }
+    },
+    {
+      "field": "lifecycle_state",
+      "enum_name": "生命周期状态",
+      "code": "retired",
+      "label": "已退役",
+      "constraint_note": "—",
+      "description": "不计费，历史保留",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 17
+      }
+    },
+    {
+      "field": "lifecycle_state",
+      "enum_name": "生命周期状态",
+      "code": "disposed",
+      "label": "已报废",
+      "constraint_note": "终态",
+      "description": "数据已清理",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 18
+      }
+    },
+    {
+      "field": "sync_state",
+      "enum_name": "采集同步状态",
+      "code": "synced",
+      "label": "已同步",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 19
+      }
+    },
+    {
+      "field": "sync_state",
+      "enum_name": "采集同步状态",
+      "code": "syncing",
+      "label": "同步中",
+      "constraint_note": "—",
+      "description": "异步范式：202+operation_id",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 20
+      }
+    },
+    {
+      "field": "sync_state",
+      "enum_name": "采集同步状态",
+      "code": "failed",
+      "label": "同步失败",
+      "constraint_note": "—",
+      "description": "超时 5 分钟判定",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 21
+      }
+    },
+    {
+      "field": "sync_state",
+      "enum_name": "采集同步状态",
+      "code": "drifted",
+      "label": "配置漂移",
+      "constraint_note": "—",
+      "description": "期望摘要 ≠ 实际摘要",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 22
+      }
+    },
+    {
+      "field": "health_state",
+      "enum_name": "运行健康状态",
+      "code": "normal",
+      "label": "正常",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 23
+      }
+    },
+    {
+      "field": "health_state",
+      "enum_name": "运行健康状态",
+      "code": "problem",
+      "label": "有问题",
+      "constraint_note": "—",
+      "description": "取活动事件最高级",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 24
+      }
+    },
+    {
+      "field": "health_state",
+      "enum_name": "运行健康状态",
+      "code": "unknown",
+      "label": "未知",
+      "constraint_note": "—",
+      "description": "数据缺失≠正常",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 25
+      }
+    },
+    {
+      "field": "health_state",
+      "enum_name": "运行健康状态",
+      "code": "maintenance",
+      "label": "维护中",
+      "constraint_note": "—",
+      "description": "通知抑制、SLA 排除",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 26
+      }
+    },
+    {
+      "field": "collect_method",
+      "enum_name": "采集方式",
+      "code": "agent_active",
+      "label": "Agent2 主动",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 27
+      }
+    },
+    {
+      "field": "collect_method",
+      "enum_name": "采集方式",
+      "code": "agent_passive",
+      "label": "Agent2 被动",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 28
+      }
+    },
+    {
+      "field": "collect_method",
+      "enum_name": "采集方式",
+      "code": "snmpv3",
+      "label": "SNMPv3",
+      "constraint_note": "—",
+      "description": "网络设备主路径",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 29
+      }
+    },
+    {
+      "field": "collect_method",
+      "enum_name": "采集方式",
+      "code": "http",
+      "label": "HTTP／Web 场景",
+      "constraint_note": "—",
+      "description": "业务拨测",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 30
+      }
+    },
+    {
+      "field": "collect_method",
+      "enum_name": "采集方式",
+      "code": "sender",
+      "label": "Sender／Trapper",
+      "constraint_note": "—",
+      "description": "受控上报",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 31
+      }
+    },
+    {
+      "field": "sample_interval",
+      "enum_name": "采样周期",
+      "code": "30",
+      "label": "30 秒",
+      "constraint_note": "高级档核心指标",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 32
+      }
+    },
+    {
+      "field": "sample_interval",
+      "enum_name": "采样周期",
+      "code": "60",
+      "label": "60 秒",
+      "constraint_note": "标准档默认",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 33
+      }
+    },
+    {
+      "field": "sample_interval",
+      "enum_name": "采样周期",
+      "code": "120",
+      "label": "120 秒",
+      "constraint_note": "可选",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 34
+      }
+    },
+    {
+      "field": "sample_interval",
+      "enum_name": "采样周期",
+      "code": "300",
+      "label": "300 秒",
+      "constraint_note": "基础档默认",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 35
+      }
+    },
+    {
+      "field": "billable",
+      "enum_name": "是否计费",
+      "code": "yes",
+      "label": "计入",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 36
+      }
+    },
+    {
+      "field": "billable",
+      "enum_name": "是否计费",
+      "code": "no",
+      "label": "不计入",
+      "constraint_note": "—",
+      "description": "虚机／终端／Proxy 默认",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 37
+      }
+    },
+    {
+      "field": "billable",
+      "enum_name": "是否计费",
+      "code": "addon",
+      "label": "加购",
+      "constraint_note": "—",
+      "description": "虚机 ¥30／终端 ¥80 每月每台",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 38
+      }
+    },
+    {
+      "field": "ap_billing_mode",
+      "enum_name": "AP 计费模式",
+      "code": "by_ap",
+      "label": "按 AP（5 折 1）",
+      "constraint_note": "建议默认",
+      "description": "ceil(台数/5)",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 39
+      }
+    },
+    {
+      "field": "ap_billing_mode",
+      "enum_name": "AP 计费模式",
+      "code": "by_ac",
+      "label": "按 AC（AP 不另计）",
+      "constraint_note": "—",
+      "description": "需合同约定",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 40
+      }
+    },
+    {
+      "field": "redundancy_mode",
+      "enum_name": "冗余模式",
+      "code": "none",
+      "label": "无冗余",
+      "constraint_note": "—",
+      "description": "故障即业务中断",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 41
+      }
+    },
+    {
+      "field": "redundancy_mode",
+      "enum_name": "冗余模式",
+      "code": "dual_power",
+      "label": "双电源",
+      "constraint_note": "—",
+      "description": "单电源故障降一级",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 42
+      }
+    },
+    {
+      "field": "redundancy_mode",
+      "enum_name": "冗余模式",
+      "code": "dual_ctrl",
+      "label": "双主控／双控制器",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 43
+      }
+    },
+    {
+      "field": "redundancy_mode",
+      "enum_name": "冗余模式",
+      "code": "ha_pair",
+      "label": "双机热备",
+      "constraint_note": "—",
+      "description": "HA 分裂为 P1",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 44
+      }
+    },
+    {
+      "field": "redundancy_mode",
+      "enum_name": "冗余模式",
+      "code": "cluster",
+      "label": "集群",
+      "constraint_note": "—",
+      "description": "仲裁与脑裂风险",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 45
+      }
+    },
+    {
+      "field": "storage_form",
+      "enum_name": "存储形态",
+      "code": "san",
+      "label": "SAN",
+      "constraint_note": "—",
+      "description": "FC／iSCSI",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 46
+      }
+    },
+    {
+      "field": "storage_form",
+      "enum_name": "存储形态",
+      "code": "nas",
+      "label": "NAS",
+      "constraint_note": "—",
+      "description": "NFS／SMB",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 47
+      }
+    },
+    {
+      "field": "node_role",
+      "enum_name": "超融合节点角色",
+      "code": "mgmt",
+      "label": "管理节点",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 48
+      }
+    },
+    {
+      "field": "node_role",
+      "enum_name": "超融合节点角色",
+      "code": "compute",
+      "label": "计算节点",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 49
+      }
+    },
+    {
+      "field": "node_role",
+      "enum_name": "超融合节点角色",
+      "code": "storage",
+      "label": "存储节点",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 50
+      }
+    },
+    {
+      "field": "node_role",
+      "enum_name": "超融合节点角色",
+      "code": "hyper",
+      "label": "融合节点",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 51
+      }
+    },
+    {
+      "field": "routing_protocol",
+      "enum_name": "路由协议",
+      "code": "static",
+      "label": "静态路由",
+      "constraint_note": "—",
+      "description": "RT-01/02 不启用",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 52
+      }
+    },
+    {
+      "field": "routing_protocol",
+      "enum_name": "路由协议",
+      "code": "ospf",
+      "label": "OSPF",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 53
+      }
+    },
+    {
+      "field": "routing_protocol",
+      "enum_name": "路由协议",
+      "code": "bgp",
+      "label": "BGP",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 54
+      }
+    },
+    {
+      "field": "routing_protocol",
+      "enum_name": "路由协议",
+      "code": "isis",
+      "label": "IS-IS",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 55
+      }
+    },
+    {
+      "field": "routing_protocol",
+      "enum_name": "路由协议",
+      "code": "mixed",
+      "label": "混合",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 56
+      }
+    },
+    {
+      "field": "security_zone",
+      "enum_name": "安全域",
+      "code": "internet",
+      "label": "互联网区",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 57
+      }
+    },
+    {
+      "field": "security_zone",
+      "enum_name": "安全域",
+      "code": "dmz",
+      "label": "DMZ",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 58
+      }
+    },
+    {
+      "field": "security_zone",
+      "enum_name": "安全域",
+      "code": "core",
+      "label": "内网核心",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 59
+      }
+    },
+    {
+      "field": "security_zone",
+      "enum_name": "安全域",
+      "code": "access",
+      "label": "内网接入",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 60
+      }
+    },
+    {
+      "field": "security_zone",
+      "enum_name": "安全域",
+      "code": "prod",
+      "label": "生产区",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 61
+      }
+    },
+    {
+      "field": "security_zone",
+      "enum_name": "安全域",
+      "code": "office",
+      "label": "办公区",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 62
+      }
+    },
+    {
+      "field": "source",
+      "enum_name": "数据来源",
+      "code": "manual",
+      "label": "手工登记",
+      "constraint_note": "—",
+      "description": "M3-12",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 63
+      }
+    },
+    {
+      "field": "source",
+      "enum_name": "数据来源",
+      "code": "excel",
+      "label": "Excel 批量导入",
+      "constraint_note": "—",
+      "description": "M3-6",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 64
+      }
+    },
+    {
+      "field": "source",
+      "enum_name": "数据来源",
+      "code": "cmdb_sync",
+      "label": "CMDB 同步",
+      "constraint_note": "—",
+      "description": "M3-12",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 65
+      }
+    },
+    {
+      "field": "source",
+      "enum_name": "数据来源",
+      "code": "agent_register",
+      "label": "Agent 自动注册",
+      "constraint_note": "—",
+      "description": "M3-4 待认领区",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 66
+      }
+    },
+    {
+      "field": "os_type",
+      "enum_name": "操作系统类型",
+      "code": "linux",
+      "label": "Linux",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 67
+      }
+    },
+    {
+      "field": "os_type",
+      "enum_name": "操作系统类型",
+      "code": "windows",
+      "label": "Windows",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 68
+      }
+    },
+    {
+      "field": "os_type",
+      "enum_name": "操作系统类型",
+      "code": "other",
+      "label": "其他",
+      "constraint_note": "—",
+      "description": "需填 os_version",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 69
+      }
+    },
+    {
+      "field": "bond_mode",
+      "enum_name": "网卡 Bond 模式",
+      "code": "active_backup",
+      "label": "主备",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 70
+      }
+    },
+    {
+      "field": "bond_mode",
+      "enum_name": "网卡 Bond 模式",
+      "code": "lacp",
+      "label": "LACP",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 71
+      }
+    },
+    {
+      "field": "bond_mode",
+      "enum_name": "网卡 Bond 模式",
+      "code": "round_robin",
+      "label": "轮询",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 72
+      }
+    },
+    {
+      "field": "bond_mode",
+      "enum_name": "网卡 Bond 模式",
+      "code": "single",
+      "label": "单网卡",
+      "constraint_note": "—",
+      "description": "HS-05 直接告警",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 73
+      }
+    },
+    {
+      "field": "warranty_type",
+      "enum_name": "维保类型",
+      "code": "oem",
+      "label": "原厂维保",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 74
+      }
+    },
+    {
+      "field": "warranty_type",
+      "enum_name": "维保类型",
+      "code": "third_party",
+      "label": "第三方维保",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 75
+      }
+    },
+    {
+      "field": "warranty_type",
+      "enum_name": "维保类型",
+      "code": "none",
+      "label": "无维保",
+      "constraint_note": "—",
+      "description": "",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 76
+      }
+    },
+    {
+      "field": "warranty_type",
+      "enum_name": "维保类型",
+      "code": "expired",
+      "label": "已过保",
+      "constraint_note": "—",
+      "description": "巡检报告风险项",
+      "source": {
+        "sheet": "05_枚举字典",
+        "row": 77
+      }
+    }
+  ],
+  "relation_types": [
+    {
+      "code": "connects_to",
+      "label": "网络级联",
+      "direction_note": "上联 → 下联",
+      "cardinality_note": "N:N（按端口）",
+      "constraint_note": "有向无环",
+      "suppression_note": "是",
+      "requirement": "M3-9 网络级联",
+      "description": "上游 PROBLEM 时下游告警抑制通知与建单，事件完整记录",
+      "source": {
+        "sheet": "06_关系类型字典",
+        "row": 2
+      }
+    },
+    {
+      "code": "powered_by",
+      "label": "供电依赖",
+      "direction_note": "设备 → UPS／PDU",
+      "cardinality_note": "N:1",
+      "constraint_note": "有向无环",
+      "suppression_note": "是",
+      "requirement": "M3-9 供电",
+      "description": "UPS 故障时下挂设备可能同时失电，抑制避免批量告警",
+      "source": {
+        "sheet": "06_关系类型字典",
+        "row": 3
+      }
+    },
+    {
+      "code": "depends_on",
+      "label": "服务依赖",
+      "direction_note": "应用 → 设备",
+      "cardinality_note": "N:N",
+      "constraint_note": "有向无环",
+      "suppression_note": "是",
+      "requirement": "M3-9 服务依赖",
+      "description": "应用故障但设备正常时，反向定位承载设备",
+      "source": {
+        "sheet": "06_关系类型字典",
+        "row": 4
+      }
+    },
+    {
+      "code": "hosted_on",
+      "label": "宿主承载",
+      "direction_note": "虚机 → 宿主机／集群",
+      "cardinality_note": "N:1",
+      "constraint_note": "有向无环",
+      "suppression_note": "否",
+      "requirement": "§5.1 虚机不套 HS",
+      "description": "用于影响分析：宿主故障时其下所有虚机受影响",
+      "source": {
+        "sheet": "06_关系类型字典",
+        "row": 5
+      }
+    },
+    {
+      "code": "member_of",
+      "label": "集群成员",
+      "direction_note": "节点／AP → 集群／AC",
+      "cardinality_note": "N:1",
+      "constraint_note": "成员须同站点",
+      "suppression_note": "否",
+      "requirement": "GE-10、WL-01",
+      "description": "堆叠成员与 AP 归属；计费按物理台数",
+      "source": {
+        "sheet": "06_关系类型字典",
+        "row": 6
+      }
+    },
+    {
+      "code": "redundant_with",
+      "label": "冗余对",
+      "direction_note": "设备 ↔ 设备",
+      "cardinality_note": "1:1 或 N:N",
+      "constraint_note": "必须双向",
+      "suppression_note": "否",
+      "requirement": "HS-05、ST-01、FW HA",
+      "description": "冗余件故障降级为警告，不直接 P1",
+      "source": {
+        "sheet": "06_关系类型字典",
+        "row": 7
+      }
+    },
+    {
+      "code": "located_in",
+      "label": "位置归属",
+      "direction_note": "设备 → 机柜／站点",
+      "cardinality_note": "N:1",
+      "constraint_note": "站点必须一致",
+      "suppression_note": "否",
+      "requirement": "M3-5",
+      "description": "U 位唯一占用校验",
+      "source": {
+        "sheet": "06_关系类型字典",
+        "row": 9
+      }
+    },
+    {
+      "code": "backs_up",
+      "label": "配置备份",
+      "direction_note": "设备 → 备份库",
+      "cardinality_note": "1:N",
+      "constraint_note": "仅网络类",
+      "suppression_note": "否",
+      "requirement": "M6",
+      "description": "服务器不建 SSH 备份计划",
+      "source": {
+        "sheet": "06_关系类型字典",
+        "row": 10
+      }
+    },
+    {
+      "code": "replaced_by",
+      "label": "替代迁移",
+      "direction_note": "旧设备 → 新设备",
+      "cardinality_note": "1:1",
+      "constraint_note": "同类型同租户",
+      "suppression_note": "否",
+      "requirement": "M3-11",
+      "description": "迁移保留原资产 ID 的对应关系",
+      "source": {
+        "sheet": "06_关系类型字典",
+        "row": 11
+      }
+    }
+  ],
+  "lifecycle_states": [
+    {
+      "code": "planned",
+      "label": "规划中",
+      "meaning": "已列入采购计划但未到货",
+      "actions_note": "编辑、删除",
+      "billing_note": "不计",
+      "next_condition_note": "到货验收",
+      "description": "—",
+      "source": {
+        "sheet": "07_状态机",
+        "row": 2
+      }
+    },
+    {
+      "code": "procured",
+      "label": "已采购在库",
+      "meaning": "已到货未上线",
+      "actions_note": "编辑、报废",
+      "billing_note": "不计",
+      "next_condition_note": "开始接入向导",
+      "description": "价格矩阵：在库备机不计",
+      "source": {
+        "sheet": "07_状态机",
+        "row": 3
+      }
+    },
+    {
+      "code": "onboarding",
+      "label": "接入中",
+      "meaning": "5 步向导进行中",
+      "actions_note": "编辑、中止",
+      "billing_note": "不计",
+      "next_condition_note": "首值验证通过 + 进入服务",
+      "description": "12 项核心属性必须齐全",
+      "source": {
+        "sheet": "07_状态机",
+        "row": 4
+      }
+    },
+    {
+      "code": "in_service",
+      "label": "在用",
+      "meaning": "正常纳管",
+      "actions_note": "维护、停用、迁移、退役",
+      "billing_note": "计",
+      "next_condition_note": "审批通过 / 停止采集",
+      "description": "计费起点",
+      "source": {
+        "sheet": "07_状态机",
+        "row": 5
+      }
+    },
+    {
+      "code": "maintenance",
+      "label": "维护中",
+      "meaning": "长期计划性维护（需审批）",
+      "actions_note": "结束维护、退役",
+      "billing_note": "计",
+      "next_condition_note": "维护期结束",
+      "description": "与临时维护窗口不同，后者不改变生命周期态",
+      "source": {
+        "sheet": "07_状态机",
+        "row": 6
+      }
+    },
+    {
+      "code": "suspended",
+      "label": "停用",
+      "meaning": "停止采集与告警，保留历史",
+      "actions_note": "恢复、退役",
+      "billing_note": "不计",
+      "next_condition_note": "恢复",
+      "description": "需回读确认采集已停止",
+      "source": {
+        "sheet": "07_状态机",
+        "row": 7
+      }
+    },
+    {
+      "code": "retired",
+      "label": "已退役",
+      "meaning": "历史只读，关系已清理",
+      "actions_note": "查看、导出",
+      "billing_note": "不计",
+      "next_condition_note": "保留期满",
+      "description": "入向关系必须逐一处理",
+      "source": {
+        "sheet": "07_状态机",
+        "row": 8
+      }
+    },
+    {
+      "code": "disposed",
+      "label": "已报废",
+      "meaning": "数据已按约定清理",
+      "actions_note": "仅审计可查",
+      "billing_note": "不计",
+      "next_condition_note": "终态",
+      "description": "不可恢复",
+      "source": {
+        "sheet": "07_状态机",
+        "row": 9
+      }
+    }
+  ],
+  "import_columns": {
+    "A": "设备名称*",
+    "B": "设备类型*",
+    "C": "IP 或域名*",
+    "D": "品牌",
+    "E": "型号",
+    "F": "序列号",
+    "G": "站点",
+    "H": "位置",
+    "I": "负责人",
+    "J": "所属业务",
+    "K": "采购日期",
+    "L": "维保到期日",
+    "M": "超期服役日期",
+    "N": "采集方式",
+    "O": "备注",
+    "P": "资产编号",
+    "Q": "子类型",
+    "R": "维保起始日",
+    "S": "维保供应商",
+    "T": "机房",
+    "U": "机柜号",
+    "V": "U位",
+    "W": "路由协议",
+    "X": "端口数",
+    "Y": "堆叠组",
+    "Z": "OS类型",
+    "AA": "BMC地址",
+    "AB": "集群标识",
+    "AC": "桌面数",
+    "AD": "存储形态",
+    "AE": "AP归属AC",
+    "AF": "宿主设备",
+    "AG": "标签"
+  },
+  "source_sections": {
+    "03_关联域CI": [
+      {
+        "row": 1,
+        "cells": {
+          "A": "代码",
+          "B": "类型",
+          "C": "主键字段",
+          "D": "关键属性",
+          "E": "与设备关系",
+          "F": "产品依据",
+          "G": "设计说明"
+        }
+      },
+      {
+        "row": 2,
+        "cells": {
+          "A": "TENANT",
+          "B": "租户",
+          "C": "tenant_id",
+          "D": "档位、契约设备数、隔离模式、计费周期",
+          "E": "设备 1:N",
+          "F": "规格书 §3.1",
+          "G": "不存客户名称与行业，通过 tenant_id 引用 CRM 客户"
+        }
+      },
+      {
+        "row": 3,
+        "cells": {
+          "A": "SITE",
+          "B": "站点",
+          "C": "site_id",
+          "D": "地址、出口 IP、服务时段、Proxy 绑定、站点码",
+          "E": "设备 N:1",
+          "F": "M3-4、SOW 资产接入",
+          "G": "资产编号第二段来自站点码"
+        }
+      },
+      {
+        "row": 4,
+        "cells": {
+          "A": "LOCATION",
+          "B": "机房／机柜",
+          "C": "location_id",
+          "D": "机房、机柜号、U 位、供电回路",
+          "E": "设备 N:1",
+          "F": "M3-5 机房机柜位置",
+          "G": "U 位占用需唯一校验"
+        }
+      },
+      {
+        "row": 5,
+        "cells": {
+          "A": "SERVICE",
+          "B": "SLA 服务",
+          "C": "service_id",
+          "D": "服务名、目标可用率、服务时段、父服务",
+          "E": "设备 N:N",
+          "F": "M5-9 服务树 11 列",
+          "G": "可用率的统计单元，设备未映射则不进服务树"
+        }
+      },
+      {
+        "row": 6,
+        "cells": {
+          "A": "BIZAPP",
+          "B": "业务系统",
+          "C": "biz_app_id",
+          "D": "名称、负责人、关键等级",
+          "E": "设备 N:N",
+          "F": "M3-4 所属业务",
+          "G": "影响范围推算的业务侧出口"
+        }
+      },
+      {
+        "row": 7,
+        "cells": {
+          "A": "PROXY",
+          "B": "采集代理",
+          "C": "proxy_id",
+          "D": "proxy_id、站点、Group 故障转移组",
+          "E": "设备 N:1",
+          "F": "M3-4 步骤 2",
+          "G": "不计入契约台数"
+        }
+      },
+      {
+        "row": 8,
+        "cells": {
+          "A": "CONTRACT",
+          "B": "服务合同",
+          "C": "contract_id",
+          "D": "档位、契约设备数、起止日、AP 计费模式",
+          "E": "租户 1:N",
+          "F": "价格矩阵 §1.2",
+          "G": "跳档比对的基准"
+        }
+      }
+    ],
+    "06_关系类型字典": [
+      {
+        "row": 1,
+        "cells": {
+          "A": "关系代码",
+          "B": "关系名称",
+          "C": "方向",
+          "D": "基数",
+          "E": "约束",
+          "F": "参与告警抑制",
+          "G": "产品依据",
+          "H": "语义说明"
+        }
+      },
+      {
+        "row": 2,
+        "cells": {
+          "A": "connects_to",
+          "B": "网络级联",
+          "C": "上联 → 下联",
+          "D": "N:N（按端口）",
+          "E": "有向无环",
+          "F": "是",
+          "G": "M3-9 网络级联",
+          "H": "上游 PROBLEM 时下游告警抑制通知与建单，事件完整记录"
+        }
+      },
+      {
+        "row": 3,
+        "cells": {
+          "A": "powered_by",
+          "B": "供电依赖",
+          "C": "设备 → UPS／PDU",
+          "D": "N:1",
+          "E": "有向无环",
+          "F": "是",
+          "G": "M3-9 供电",
+          "H": "UPS 故障时下挂设备可能同时失电，抑制避免批量告警"
+        }
+      },
+      {
+        "row": 4,
+        "cells": {
+          "A": "depends_on",
+          "B": "服务依赖",
+          "C": "应用 → 设备",
+          "D": "N:N",
+          "E": "有向无环",
+          "F": "是",
+          "G": "M3-9 服务依赖",
+          "H": "应用故障但设备正常时，反向定位承载设备"
+        }
+      },
+      {
+        "row": 5,
+        "cells": {
+          "A": "hosted_on",
+          "B": "宿主承载",
+          "C": "虚机 → 宿主机／集群",
+          "D": "N:1",
+          "E": "有向无环",
+          "F": "否",
+          "G": "§5.1 虚机不套 HS",
+          "H": "用于影响分析：宿主故障时其下所有虚机受影响"
+        }
+      },
+      {
+        "row": 6,
+        "cells": {
+          "A": "member_of",
+          "B": "集群成员",
+          "C": "节点／AP → 集群／AC",
+          "D": "N:1",
+          "E": "成员须同站点",
+          "F": "否",
+          "G": "GE-10、WL-01",
+          "H": "堆叠成员与 AP 归属；计费按物理台数"
+        }
+      },
+      {
+        "row": 7,
+        "cells": {
+          "A": "redundant_with",
+          "B": "冗余对",
+          "C": "设备 ↔ 设备",
+          "D": "1:1 或 N:N",
+          "E": "必须双向",
+          "F": "否",
+          "G": "HS-05、ST-01、FW HA",
+          "H": "冗余件故障降级为警告，不直接 P1"
+        }
+      },
+      {
+        "row": 8,
+        "cells": {
+          "A": "serves",
+          "B": "服务归属",
+          "C": "设备 → SLA 服务",
+          "D": "N:N",
+          "E": "同租户",
+          "F": "否",
+          "G": "M5-9 服务树",
+          "H": "可用率的统计单元；未映射不进服务树"
+        }
+      },
+      {
+        "row": 9,
+        "cells": {
+          "A": "located_in",
+          "B": "位置归属",
+          "C": "设备 → 机柜／站点",
+          "D": "N:1",
+          "E": "站点必须一致",
+          "F": "否",
+          "G": "M3-5",
+          "H": "U 位唯一占用校验"
+        }
+      },
+      {
+        "row": 10,
+        "cells": {
+          "A": "backs_up",
+          "B": "配置备份",
+          "C": "设备 → 备份库",
+          "D": "1:N",
+          "E": "仅网络类",
+          "F": "否",
+          "G": "M6",
+          "H": "服务器不建 SSH 备份计划"
+        }
+      },
+      {
+        "row": 11,
+        "cells": {
+          "A": "replaced_by",
+          "B": "替代迁移",
+          "C": "旧设备 → 新设备",
+          "D": "1:1",
+          "E": "同类型同租户",
+          "F": "否",
+          "G": "M3-11",
+          "H": "迁移保留原资产 ID 的对应关系"
+        }
+      },
+      {
+        "row": 13,
+        "cells": {
+          "A": "抑制三态的精确语义（开发不得自行解释）："
+        }
+      },
+      {
+        "row": 16,
+        "cells": {
+          "A": "上游状态",
+          "B": "下游状态",
+          "C": "通知",
+          "D": "自动建单",
+          "E": "事件记录",
+          "F": "SLA 计入"
+        }
+      },
+      {
+        "row": 17,
+        "cells": {
+          "A": "上游 PROBLEM",
+          "B": "下游 PROBLEM",
+          "C": "抑制",
+          "D": "抑制",
+          "E": "完整记录，标 suppressed_by",
+          "F": "计入未知区间，不计入可用时间"
+        }
+      },
+      {
+        "row": 18,
+        "cells": {
+          "A": "上游 PROBLEM",
+          "B": "下游 RECOVERED",
+          "C": "不适用",
+          "D": "不适用",
+          "E": "记录",
+          "F": "正常"
+        }
+      },
+      {
+        "row": 19,
+        "cells": {
+          "A": "上游 RECOVERED",
+          "B": "下游仍 PROBLEM",
+          "C": "补发",
+          "D": "补建",
+          "E": "更新 suppressed_by 为已解除",
+          "F": "从补发时刻起正常计时"
+        }
+      }
+    ],
+    "07_状态机": [
+      {
+        "row": 1,
+        "cells": {
+          "A": "状态代码",
+          "B": "状态名",
+          "C": "含义",
+          "D": "可执行动作",
+          "E": "是否计费",
+          "F": "进入下一态条件",
+          "G": "说明"
+        }
+      },
+      {
+        "row": 2,
+        "cells": {
+          "A": "planned",
+          "B": "规划中",
+          "C": "已列入采购计划但未到货",
+          "D": "编辑、删除",
+          "E": "不计",
+          "F": "到货验收",
+          "G": "—"
+        }
+      },
+      {
+        "row": 3,
+        "cells": {
+          "A": "procured",
+          "B": "已采购在库",
+          "C": "已到货未上线",
+          "D": "编辑、报废",
+          "E": "不计",
+          "F": "开始接入向导",
+          "G": "价格矩阵：在库备机不计"
+        }
+      },
+      {
+        "row": 4,
+        "cells": {
+          "A": "onboarding",
+          "B": "接入中",
+          "C": "5 步向导进行中",
+          "D": "编辑、中止",
+          "E": "不计",
+          "F": "首值验证通过 + 进入服务",
+          "G": "12 项核心属性必须齐全"
+        }
+      },
+      {
+        "row": 5,
+        "cells": {
+          "A": "in_service",
+          "B": "在用",
+          "C": "正常纳管",
+          "D": "维护、停用、迁移、退役",
+          "E": "计",
+          "F": "审批通过 / 停止采集",
+          "G": "计费起点"
+        }
+      },
+      {
+        "row": 6,
+        "cells": {
+          "A": "maintenance",
+          "B": "维护中",
+          "C": "长期计划性维护（需审批）",
+          "D": "结束维护、退役",
+          "E": "计",
+          "F": "维护期结束",
+          "G": "与临时维护窗口不同，后者不改变生命周期态"
+        }
+      },
+      {
+        "row": 7,
+        "cells": {
+          "A": "suspended",
+          "B": "停用",
+          "C": "停止采集与告警，保留历史",
+          "D": "恢复、退役",
+          "E": "不计",
+          "F": "恢复",
+          "G": "需回读确认采集已停止"
+        }
+      },
+      {
+        "row": 8,
+        "cells": {
+          "A": "retired",
+          "B": "已退役",
+          "C": "历史只读，关系已清理",
+          "D": "查看、导出",
+          "E": "不计",
+          "F": "保留期满",
+          "G": "入向关系必须逐一处理"
+        }
+      },
+      {
+        "row": 9,
+        "cells": {
+          "A": "disposed",
+          "B": "已报废",
+          "C": "数据已按约定清理",
+          "D": "仅审计可查",
+          "E": "不计",
+          "F": "终态",
+          "G": "不可恢复"
+        }
+      },
+      {
+        "row": 11,
+        "cells": {
+          "A": "状态迁移闸门（不满足即阻止，并列出缺项）："
+        }
+      },
+      {
+        "row": 14,
+        "cells": {
+          "A": "迁移",
+          "B": "硬闸门",
+          "C": "不满足时"
+        }
+      },
+      {
+        "row": 15,
+        "cells": {
+          "A": "procured → onboarding",
+          "B": "12 项核心属性齐全",
+          "C": "阻止，列出缺失字段"
+        }
+      },
+      {
+        "row": 16,
+        "cells": {
+          "A": "onboarding → in_service",
+          "B": "5 步向导全通过 + L2 已确认 + service_id 已映射",
+          "C": "阻止，不允许跳过"
+        }
+      },
+      {
+        "row": 17,
+        "cells": {
+          "A": "in_service → maintenance",
+          "B": "维护单已审批 + 起止时间 + 影响范围说明",
+          "C": "阻止"
+        }
+      },
+      {
+        "row": 18,
+        "cells": {
+          "A": "in_service → suspended",
+          "B": "停止采集回读确认（202 + operation_id）",
+          "C": "显示同步中，不得提前宣布成功"
+        }
+      },
+      {
+        "row": 19,
+        "cells": {
+          "A": "任意 → retired",
+          "B": "入向关系已清理 + 无未关闭事件与工单",
+          "C": "阻止，列出待办清单"
+        }
+      },
+      {
+        "row": 20,
+        "cells": {
+          "A": "retired → disposed",
+          "B": "保留期已满 + 合同已终止或已交接",
+          "C": "阻止"
+        }
+      },
+      {
+        "row": 22,
+        "cells": {
+          "A": "四个正交维度：生命周期态（lifecycle_state）／采集同步态（sync_state）／运行健康态（health_state）／计费态（billable）。压成一个字段会导致\"未知当成正常\"\"维护当成故障\"\"停用仍计费\"。"
+        }
+      }
+    ],
+    "08_三处字段映射": [
+      {
+        "row": 1,
+        "cells": {
+          "A": "统一字段",
+          "B": "规格书 §3.2 device 表",
+          "C": "M3-5 台账字段",
+          "D": "M3-6 导入模板 15 列",
+          "E": "处理方式",
+          "F": "状态"
+        }
+      },
+      {
+        "row": 2,
+        "cells": {
+          "A": "ci_id",
+          "B": "未定义",
+          "C": "资产编号（CMDB ID）",
+          "D": "无",
+          "E": "统一为 ci_id；asset_no 作为可读编号",
+          "F": "补齐"
+        }
+      },
+      {
+        "row": 3,
+        "cells": {
+          "A": "device_name",
+          "B": "name",
+          "C": "无",
+          "D": "设备名称*",
+          "E": "统一",
+          "F": "已有"
+        }
+      },
+      {
+        "row": 4,
+        "cells": {
+          "A": "device_type",
+          "B": "缺失",
+          "C": "无",
+          "D": "设备类型*（9 类）",
+          "E": "补齐为必填，最关键缺口",
+          "F": "补齐"
+        }
+      },
+      {
+        "row": 5,
+        "cells": {
+          "A": "device_subtype",
+          "B": "缺失",
+          "C": "无",
+          "D": "无",
+          "E": "新增，接入向导确认",
+          "F": "新增"
+        }
+      },
+      {
+        "row": 6,
+        "cells": {
+          "A": "primary_ip",
+          "B": "ip",
+          "C": "无",
+          "D": "IP 或域名*",
+          "E": "统一",
+          "F": "已有"
+        }
+      },
+      {
+        "row": 7,
+        "cells": {
+          "A": "vendor",
+          "B": "vendor",
+          "C": "无",
+          "D": "品牌",
+          "E": "统一",
+          "F": "已有"
+        }
+      },
+      {
+        "row": 8,
+        "cells": {
+          "A": "model",
+          "B": "model",
+          "C": "型号",
+          "D": "型号",
+          "E": "统一",
+          "F": "已有"
+        }
+      },
+      {
+        "row": 9,
+        "cells": {
+          "A": "serial_no",
+          "B": "缺失",
+          "C": "序列号",
+          "D": "序列号",
+          "E": "补齐",
+          "F": "补齐"
+        }
+      },
+      {
+        "row": 10,
+        "cells": {
+          "A": "site_id",
+          "B": "缺失",
+          "C": "无",
+          "D": "站点",
+          "E": "补齐并设为必填",
+          "F": "补齐"
+        }
+      },
+      {
+        "row": 11,
+        "cells": {
+          "A": "location_id",
+          "B": "location",
+          "C": "机房机柜位置",
+          "D": "位置",
+          "E": "统一为 ref",
+          "F": "统一"
+        }
+      },
+      {
+        "row": 12,
+        "cells": {
+          "A": "owner_id",
+          "B": "缺失",
+          "C": "负责人",
+          "D": "负责人",
+          "E": "补齐并设为必填",
+          "F": "补齐"
+        }
+      },
+      {
+        "row": 13,
+        "cells": {
+          "A": "biz_app_id",
+          "B": "无",
+          "C": "所属业务",
+          "D": "所属业务",
+          "E": "统一为 ref",
+          "F": "统一"
+        }
+      },
+      {
+        "row": 14,
+        "cells": {
+          "A": "purchase_date",
+          "B": "无",
+          "C": "采购日期",
+          "D": "采购日期",
+          "E": "统一",
+          "F": "已有"
+        }
+      },
+      {
+        "row": 15,
+        "cells": {
+          "A": "maint_start",
+          "B": "无",
+          "C": "维保起始日",
+          "D": "无",
+          "E": "补入扩展列",
+          "F": "补齐"
+        }
+      },
+      {
+        "row": 16,
+        "cells": {
+          "A": "maint_expire",
+          "B": "maint_expire",
+          "C": "维保到期日",
+          "D": "维保到期日",
+          "E": "统一",
+          "F": "已有"
+        }
+      },
+      {
+        "row": 17,
+        "cells": {
+          "A": "maint_vendor",
+          "B": "无",
+          "C": "维保供应商",
+          "D": "无",
+          "E": "补入扩展列",
+          "F": "补齐"
+        }
+      },
+      {
+        "row": 18,
+        "cells": {
+          "A": "eol_date",
+          "B": "eol_date",
+          "C": "超期服役日期",
+          "D": "超期服役日期",
+          "E": "统一",
+          "F": "已有"
+        }
+      },
+      {
+        "row": 19,
+        "cells": {
+          "A": "collect_method",
+          "B": "无",
+          "C": "缺失",
+          "D": "采集方式",
+          "E": "补入台账字段",
+          "F": "补齐"
+        }
+      },
+      {
+        "row": 20,
+        "cells": {
+          "A": "credential_ref",
+          "B": "credential_ref",
+          "C": "无",
+          "D": "无",
+          "E": "只存引用，不进导入导出",
+          "F": "已有"
+        }
+      },
+      {
+        "row": 21,
+        "cells": {
+          "A": "config_backup_at",
+          "B": "config_backup_at",
+          "C": "无",
+          "D": "无",
+          "E": "由 M6 写回，只读",
+          "F": "已有"
+        }
+      },
+      {
+        "row": 22,
+        "cells": {
+          "A": "config_backup_ok",
+          "B": "config_backup_ok",
+          "C": "无",
+          "D": "无",
+          "E": "由 M6 写回，只读",
+          "F": "已有"
+        }
+      },
+      {
+        "row": 23,
+        "cells": {
+          "A": "sync_state",
+          "B": "无",
+          "C": "CMDB 同步状态",
+          "D": "无",
+          "E": "统一为 sync_state",
+          "F": "已有"
+        }
+      },
+      {
+        "row": 24,
+        "cells": {
+          "A": "tags",
+          "B": "无",
+          "C": "标签",
+          "D": "无",
+          "E": "统一",
+          "F": "已有"
+        }
+      },
+      {
+        "row": 25,
+        "cells": {
+          "A": "note",
+          "B": "无",
+          "C": "无",
+          "D": "备注",
+          "E": "保留为第 15 列",
+          "F": "已有"
+        }
+      },
+      {
+        "row": 27,
+        "cells": {
+          "A": "说明：M3-6 的 15 列已写入验收标准（\"含 3 类错误的 50 行台账错误行 100% 拦截\"），不得改列。新增字段以第 16 列起的可选扩展列追加，未提供时取默认值。"
+        }
+      }
+    ],
+    "09_计费折算": [
+      {
+        "row": 1,
+        "cells": {
+          "A": "L2／对象",
+          "B": "名称",
+          "C": "计费系数",
+          "D": "折算规则",
+          "E": "契约台数",
+          "F": "依据"
+        }
+      },
+      {
+        "row": 2,
+        "cells": {
+          "A": "sw_core / sw_access",
+          "B": "交换机",
+          "C": "1",
+          "D": "1 台 = 1 台；堆叠按物理台数",
+          "E": "计入",
+          "F": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 3,
+        "cells": {
+          "A": "rt_gateway",
+          "B": "路由器／出口网关",
+          "C": "1",
+          "D": "1 台 = 1 台；含 VPN 网关",
+          "E": "计入",
+          "F": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 4,
+        "cells": {
+          "A": "fw_ngfw / fw_ips / fw_audit / fw_adc",
+          "B": "安全设备",
+          "C": "1",
+          "D": "1 台 = 1 台；含负载均衡",
+          "E": "计入",
+          "F": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 5,
+        "cells": {
+          "A": "wl_ac",
+          "B": "无线 AC",
+          "C": "1",
+          "D": "1 台 = 1 台",
+          "E": "计入",
+          "F": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 6,
+        "cells": {
+          "A": "wl_ap",
+          "B": "无线 AP",
+          "C": "0.2",
+          "D": "每 5 台折 1 台，不足 5 台按 1 台；按月 ceil(台数/5)",
+          "E": "计入（可按 AC 计则不另计）",
+          "F": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 7,
+        "cells": {
+          "A": "sv_physical",
+          "B": "物理服务器",
+          "C": "1",
+          "D": "仅当纳入监控与配置备份时计入",
+          "E": "计入",
+          "F": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 8,
+        "cells": {
+          "A": "hc_node",
+          "B": "超融合节点",
+          "C": "1",
+          "D": "1 节点 = 1 台",
+          "E": "计入",
+          "F": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 9,
+        "cells": {
+          "A": "vd_host",
+          "B": "桌面云宿主机",
+          "C": "1",
+          "D": "1 台 = 1 台",
+          "E": "计入",
+          "F": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 10,
+        "cells": {
+          "A": "st_san / st_nas",
+          "B": "集中式存储",
+          "C": "1",
+          "D": "1 台 = 1 台",
+          "E": "计入",
+          "F": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 11,
+        "cells": {
+          "A": "ds_node",
+          "B": "分布式存储节点",
+          "C": "1",
+          "D": "1 节点 = 1 台",
+          "E": "计入",
+          "F": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 12,
+        "cells": {
+          "A": "sv_vm",
+          "B": "虚拟机",
+          "C": "0",
+          "D": "宿主机计入，虚机默认不计；单独监控按 ¥30/月/台加购",
+          "E": "不计入",
+          "F": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 13,
+        "cells": {
+          "A": "PROXY",
+          "B": "采集代理／出口探针",
+          "C": "0",
+          "D": "属交付工具，非客户资产",
+          "E": "不计入",
+          "F": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 14,
+        "cells": {
+          "A": "EDGE",
+          "B": "边界外终端（PC／打印机／摄像头等）",
+          "C": "0",
+          "D": "默认不计；纳入托管按 ¥80/月/台加购",
+          "E": "不计入",
+          "F": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 16,
+        "cells": {
+          "A": "计费台数 = Σ 各对象 billable_units；AP 按 ceil(AP 台数 / 5) 分组取整，不逐台四舍五入。"
+        }
+      },
+      {
+        "row": 17,
+        "cells": {
+          "A": "跳档规则：月清点差异 ≤5% 仅记录；5%~20% 可加购暂不跳区间；超过 20% 强制调整区间。"
+        }
+      },
+      {
+        "row": 18,
+        "cells": {
+          "A": "计费起点：in_service 生效时刻（建档验收单签字日与首值验证通过日取较晚者）；备机在库不计，上线计 1 台、当月按半月。"
+        }
+      }
+    ],
+    "10_下游映射": [
+      {
+        "row": 1,
+        "cells": {
+          "A": "下游能力",
+          "B": "依赖的 CMDB 字段",
+          "C": "映射规则",
+          "D": "缺字段的后果",
+          "E": "产品依据"
+        }
+      },
+      {
+        "row": 2,
+        "cells": {
+          "A": "监控分组套用",
+          "B": "device_subtype",
+          "C": "14 类 → 16 个监控分组",
+          "D": "缺 L2 则套用全量 234 项",
+          "E": "监控项清单 §5.1"
+        }
+      },
+      {
+        "row": 3,
+        "cells": {
+          "A": "采集模板",
+          "B": "device_subtype + vendor",
+          "C": "类型 + 品牌 → 模板分组",
+          "D": "品牌无 OID 映射时只能做可用性监控",
+          "E": "M3-4 步骤 3"
+        }
+      },
+      {
+        "row": 4,
+        "cells": {
+          "A": "告警等级上浮",
+          "B": "is_core",
+          "C": "标签含核心节点／上联／出口则上浮一级",
+          "D": "核心设备按接入级处理，响应超时",
+          "E": "监控清单硬规则 3"
+        }
+      },
+      {
+        "row": 5,
+        "cells": {
+          "A": "告警抑制",
+          "B": "connects_to / powered_by / depends_on",
+          "C": "上游 PROBLEM 抑制下游",
+          "D": "级联告警风暴",
+          "E": "M3-9、M4-9"
+        }
+      },
+      {
+        "row": 6,
+        "cells": {
+          "A": "影响范围",
+          "B": "connects_to 闭包 + port_count",
+          "C": "2 跳内推算设备与终端数",
+          "D": "告警无影响面，优先级靠猜",
+          "E": "监控清单硬规则 3"
+        }
+      },
+      {
+        "row": 7,
+        "cells": {
+          "A": "SLA 服务树",
+          "B": "service_id",
+          "C": "设备挂服务，服务挂父服务",
+          "D": "可用率只能按租户平均",
+          "E": "M5-9"
+        }
+      },
+      {
+        "row": 8,
+        "cells": {
+          "A": "巡检模板",
+          "B": "device_subtype",
+          "C": "路由器／交换机／防火墙／AP 各一套",
+          "D": "巡检项与设备不符",
+          "E": "M9-7"
+        }
+      },
+      {
+        "row": 9,
+        "cells": {
+          "A": "配置备份",
+          "B": "device_subtype + collect_method",
+          "C": "仅网络类走 SSH 拉配置",
+          "D": "给服务器建备份计划必然失败",
+          "E": "M6-1"
+        }
+      },
+      {
+        "row": 10,
+        "cells": {
+          "A": "Runbook 适用",
+          "B": "device_subtype",
+          "C": "按适用资产类型过滤",
+          "D": "在错误设备上执行修复脚本",
+          "E": "M4 自动化"
+        }
+      },
+      {
+        "row": 11,
+        "cells": {
+          "A": "计费台数",
+          "B": "device_subtype + billable + ap_billing_mode",
+          "C": "查 09 表折算",
+          "D": "签约台数与实际漂移",
+          "E": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 12,
+        "cells": {
+          "A": "月报与体检",
+          "B": "maint_expire / eol_date / serial_no",
+          "C": "隐患清单与风险清单",
+          "D": "报告缺超期服役与维保到期章节",
+          "E": "M9"
+        }
+      },
+      {
+        "row": 13,
+        "cells": {
+          "A": "客户门户",
+          "B": "device_name / health_state / site_id",
+          "C": "只读展示",
+          "D": "门户无内容",
+          "E": "M8"
+        }
+      }
+    ],
+    "12_质量校验规则": [
+      {
+        "row": 1,
+        "cells": {
+          "A": "级别",
+          "B": "规则",
+          "C": "触发条件",
+          "D": "导入时表现",
+          "E": "是否阻断",
+          "F": "提示内容"
+        }
+      },
+      {
+        "row": 2,
+        "cells": {
+          "A": "错误",
+          "B": "必填缺失",
+          "C": "12 项核心属性任一为空",
+          "D": "该行不导入",
+          "E": "是",
+          "F": "提示具体缺失字段名"
+        }
+      },
+      {
+        "row": 3,
+        "cells": {
+          "A": "错误",
+          "B": "IP 格式非法",
+          "C": "不符合 IPv4／IPv6／域名格式",
+          "D": "该行不导入",
+          "E": "是",
+          "F": "提示原值与期望格式"
+        }
+      },
+      {
+        "row": 4,
+        "cells": {
+          "A": "错误",
+          "B": "设备名重复",
+          "C": "同租户内 device_name 相同",
+          "D": "该行不导入",
+          "E": "是",
+          "F": "提示\"与第 N 行重复\""
+        }
+      },
+      {
+        "row": 5,
+        "cells": {
+          "A": "错误",
+          "B": "IP 冲突",
+          "C": "同租户内 primary_ip 相同",
+          "D": "该行不导入",
+          "E": "是",
+          "F": "提示已有设备名"
+        }
+      },
+      {
+        "row": 6,
+        "cells": {
+          "A": "错误",
+          "B": "类型越界",
+          "C": "device_type 不在 9 类枚举内",
+          "D": "整批拒绝",
+          "E": "是",
+          "F": "无\"其他\"兜底"
+        }
+      },
+      {
+        "row": 7,
+        "cells": {
+          "A": "错误",
+          "B": "子类型不匹配",
+          "C": "device_subtype 不属于 device_type",
+          "D": "该行不导入",
+          "E": "是",
+          "F": "列出合法子类型"
+        }
+      },
+      {
+        "row": 8,
+        "cells": {
+          "A": "错误",
+          "B": "站点机柜不一致",
+          "C": "location.site_id ≠ device.site_id",
+          "D": "该行不导入",
+          "E": "是",
+          "F": "提示两个站点值"
+        }
+      },
+      {
+        "row": 9,
+        "cells": {
+          "A": "错误",
+          "B": "AP 缺归属",
+          "C": "wl_ap 无 ac_ci_id 或 AC 不同站点",
+          "D": "该行不导入",
+          "E": "是",
+          "F": "提示需先建 AC"
+        }
+      },
+      {
+        "row": 10,
+        "cells": {
+          "A": "错误",
+          "B": "虚机缺宿主",
+          "C": "sv_vm 无 host_ci_id 或宿主类型非法",
+          "D": "该行不导入",
+          "E": "是",
+          "F": "宿主须为 hc_node 或 sv_physical"
+        }
+      },
+      {
+        "row": 11,
+        "cells": {
+          "A": "错误",
+          "B": "跨租户引用",
+          "C": "site／owner／service 不属于本租户",
+          "D": "整批拒绝",
+          "E": "是",
+          "F": "隔离红线"
+        }
+      },
+      {
+        "row": 12,
+        "cells": {
+          "A": "警告",
+          "B": "负责人非成员",
+          "C": "owner_id 不在本租户成员列表",
+          "D": "导入后置空",
+          "E": "否",
+          "F": "提示补邀成员"
+        }
+      },
+      {
+        "row": 13,
+        "cells": {
+          "A": "警告",
+          "B": "品牌无 OID 映射",
+          "C": "brand 不在已适配品牌字典",
+          "D": "导入后保留",
+          "E": "否",
+          "F": "提示仅提供可用性监控"
+        }
+      },
+      {
+        "row": 14,
+        "cells": {
+          "A": "警告",
+          "B": "日期格式非法",
+          "C": "日期列无法解析",
+          "D": "导入后置空",
+          "E": "否",
+          "F": "提示原值"
+        }
+      },
+      {
+        "row": 15,
+        "cells": {
+          "A": "警告",
+          "B": "序列号疑似重复",
+          "C": "同租户 serial_no 重复",
+          "D": "导入后保留",
+          "E": "否",
+          "F": "提示疑似重复建档，标记待核"
+        }
+      },
+      {
+        "row": 16,
+        "cells": {
+          "A": "警告",
+          "B": "维保已过期",
+          "C": "maint_expire 早于今日",
+          "D": "导入后保留",
+          "E": "否",
+          "F": "自动进入隐患清单"
+        }
+      },
+      {
+        "row": 17,
+        "cells": {
+          "A": "提示",
+          "B": "IP 与站点网段不符",
+          "C": "按站点网段配置校验",
+          "D": "正常导入",
+          "E": "否",
+          "F": "仅提示"
+        }
+      },
+      {
+        "row": 18,
+        "cells": {
+          "A": "提示",
+          "B": "型号与端口数异常",
+          "C": "port_count 与型号规格差异超 50%",
+          "D": "正常导入",
+          "E": "否",
+          "F": "仅提示"
+        }
+      },
+      {
+        "row": 19,
+        "cells": {
+          "A": "提示",
+          "B": "采购晚于维保起始",
+          "C": "purchase_date > maint_start",
+          "D": "正常导入",
+          "E": "否",
+          "F": "仅提示"
+        }
+      }
+    ],
+    "13_验收清单": [
+      {
+        "row": 1,
+        "cells": {
+          "A": "#",
+          "B": "验收项",
+          "C": "判据",
+          "D": "依据"
+        }
+      },
+      {
+        "row": 2,
+        "cells": {
+          "A": "1",
+          "B": "9 类枚举完整",
+          "C": "建档下拉恰好 9 项，无\"其他\"；每项均有对应 L2",
+          "D": "功能清单 M3-4"
+        }
+      },
+      {
+        "row": 3,
+        "cells": {
+          "A": "2",
+          "B": "L2 映射正确",
+          "C": "15 个 L2 逐一映射到 14 个监控类型，无遗漏无重复",
+          "D": "监控清单 §5.1"
+        }
+      },
+      {
+        "row": 4,
+        "cells": {
+          "A": "3",
+          "B": "12 项核心必填",
+          "C": "任缺一项不能进入 onboarding 之后的状态",
+          "D": "本文档 §4.1"
+        }
+      },
+      {
+        "row": 5,
+        "cells": {
+          "A": "4",
+          "B": "四级标识生效",
+          "C": "ci_id 不可改；asset_no 可改一次且留痕；device_name 租户内唯一；IP 不作跨租户键",
+          "D": "SOW 资产唯一键"
+        }
+      },
+      {
+        "row": 6,
+        "cells": {
+          "A": "5",
+          "B": "三类抑制关系",
+          "C": "核心交换机 down + 20 台下联：0 条推送、20 条被抑制记录",
+          "D": "M3-9、M4-9"
+        }
+      },
+      {
+        "row": 7,
+        "cells": {
+          "A": "6",
+          "B": "补发补建",
+          "C": "上游恢复后下游仍 PROBLEM，通知与工单补发成功",
+          "D": "M3-9 第 3 点"
+        }
+      },
+      {
+        "row": 8,
+        "cells": {
+          "A": "7",
+          "B": "防环",
+          "C": "构造 A→B→A，拒绝保存并显示环路径",
+          "D": "M3-9 第 4 点"
+        }
+      },
+      {
+        "row": 9,
+        "cells": {
+          "A": "8",
+          "B": "状态机闸门",
+          "C": "每条迁移闸门不满足时均被阻止，且提示具体缺项",
+          "D": "本文档 §7.2"
+        }
+      },
+      {
+        "row": 10,
+        "cells": {
+          "A": "9",
+          "B": "异步范式",
+          "C": "停用／迁移／改模板返回 202 + operation_id，回读确认后落最终态",
+          "D": "M3-11、M6-1"
+        }
+      },
+      {
+        "row": 11,
+        "cells": {
+          "A": "10",
+          "B": "未知不为正常",
+          "C": "断开采集 30 分钟后 health_state=unknown，不计入可用率分子",
+          "D": "M3-1 KPI 卡"
+        }
+      },
+      {
+        "row": 12,
+        "cells": {
+          "A": "11",
+          "B": "计费折算",
+          "C": "8 台 AP 计 2 台；4 台 AP 计 1 台；300 台虚机计 0 台",
+          "D": "价格矩阵 §1.2"
+        }
+      },
+      {
+        "row": 13,
+        "cells": {
+          "A": "12",
+          "B": "备份类型边界",
+          "C": "服务器不会被自动纳入 SSH 备份计划",
+          "D": "M6-1"
+        }
+      },
+      {
+        "row": 14,
+        "cells": {
+          "A": "13",
+          "B": "导入兼容",
+          "C": "原 15 列模板照常导入；扩展列可选；500 行 ≤ 60 秒",
+          "D": "M3-6 验收标准"
+        }
+      },
+      {
+        "row": 15,
+        "cells": {
+          "A": "14",
+          "B": "隔离",
+          "C": "跨租户关系、跨租户查询、跨租户外键均被拒绝",
+          "D": "规格书 §6"
+        }
+      }
+    ]
+  },
+  "unresolved": [
+    {
+      "code": "L2_COUNT_CONFLICT",
+      "locations": [
+        {
+          "sheet": "02_CI类型_L2子类型",
+          "row": 18
+        },
+        {
+          "sheet": "04_属性字典",
+          "row": 6
+        }
+      ],
+      "declared": 15,
+      "observed": 16,
+      "resolution": null
+    },
+    {
+      "code": "MONITORING_TYPE_MAPPING_PENDING",
+      "subtype": "fw_adc",
+      "locations": [
+        {
+          "sheet": "02_CI类型_L2子类型",
+          "row": 8
+        }
+      ],
+      "resolution": null
+    },
+    {
+      "code": "IMPORT_COLLECTION_METHOD_CONFLICT",
+      "provided": "SSH",
+      "locations": [
+        {
+          "sheet": "11_导入模板",
+          "row": 3
+        }
+      ],
+      "allowed_codes": [
+        "agent_active",
+        "agent_passive",
+        "snmpv3",
+        "http",
+        "sender"
+      ],
+      "resolution": null
+    },
+    {
+      "code": "NOTE_REQUIREDNESS_CONFLICT",
+      "locations": [
+        {
+          "sheet": "04_属性字典",
+          "row": 57
+        }
+      ],
+      "existing_contract": "AssetImportSchema:NOTE always required",
+      "customer_dictionary": "note optional",
+      "resolution": null
+    }
+  ]
+}

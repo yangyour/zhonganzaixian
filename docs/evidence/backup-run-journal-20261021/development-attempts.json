@@ -1,0 +1,10 @@
+{
+  "candidate_catalog": "PASS_ROLLED_BACK_NOT_APPLIED",
+  "full_flyway": "V1_V47_PASS",
+  "early_python_parity": "FAILED_ON_UNREGISTERED_V47_IN_POWERSHELL_MANIFEST_AND_STALE_VERSION_BOUND; corrected manifests/bounds and retested",
+  "powershell_duplicate_feature": "Caught during source inspection before any PowerShell execution; removed duplicate and added Python regression",
+  "latest_python_tests": 123,
+  "powershell_runtime": "NOT_RUN_NO_PWSH_AVAILABLE",
+  "migration_sql_rewritten_after_apply": false,
+  "real_retry_boundary": "PASS_ACTUAL_DATABASE_600_SECONDS_NO_CLOCK_OR_HISTORY_MUTATION"
+}

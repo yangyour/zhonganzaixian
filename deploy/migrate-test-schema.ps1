@@ -17,6 +17,12 @@ if (-not (Test-Path -LiteralPath $cliClass) -or -not (Test-Path -LiteralPath $do
 if ((Get-Item -LiteralPath $cliClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $cliSource).LastWriteTimeUtc) {
     throw '迁移 CLI 构建早于源码；拒绝使用旧入口。'
 }
+$backupDeviceLeaseVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/BackupDeviceLeaseSchemaVerifier.java'
+$backupDeviceLeaseVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/BackupDeviceLeaseSchemaVerifier.class'
+if (-not (Test-Path -LiteralPath $backupDeviceLeaseVerifierClass) -or (Get-Item -LiteralPath $backupDeviceLeaseVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $backupDeviceLeaseVerifierSource).LastWriteTimeUtc) { throw '备份结构核验器缺失或早于源码；先重新编译。' }
+$backupRunVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/BackupRunSchemaVerifier.java'
+$backupRunVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/BackupRunSchemaVerifier.class'
+if (-not (Test-Path -LiteralPath $backupRunVerifierClass) -or (Get-Item -LiteralPath $backupRunVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $backupRunVerifierSource).LastWriteTimeUtc) { throw '备份结构核验器缺失或早于源码；先重新编译。' }
 $ticketLifecycleVerifierSource = Join-Path $projectRoot 'server/persistence/src/main/java/cn/mop/persistence/TicketLifecycleSchemaVerifier.java'
 $ticketLifecycleVerifierClass = Join-Path $persistenceClasses 'cn/mop/persistence/TicketLifecycleSchemaVerifier.class'
 if (-not (Test-Path -LiteralPath $ticketLifecycleVerifierClass) -or (Get-Item -LiteralPath $ticketLifecycleVerifierClass).LastWriteTimeUtc -lt (Get-Item -LiteralPath $ticketLifecycleVerifierSource).LastWriteTimeUtc) { throw '工单生命周期结构核验器缺失或早于源码；先重新编译。' }

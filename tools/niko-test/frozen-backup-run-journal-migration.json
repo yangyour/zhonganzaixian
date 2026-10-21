@@ -1,0 +1,11 @@
+{
+  "status": "APPLIED_FROZEN_ISOLATED_PG17_11",
+  "description": "V47 successfully applied by Flyway to a disposable PostgreSQL 17.11 database. SQL bytes are immutable; actual retry-boundary checks are recorded separately.",
+  "sha256": {
+    "V47__backup_run_event_journal.sql": "5ca80f0715369d45b3a7606fb411e962576a15d9f49b8921a70a2c1d0af12f0c"
+  },
+  "function_body_sha256": {
+    "mop_backup_run_event_guard": "e71a226915afda207d19aaa84011cc2fa012238c01a76bf979e2727334b20621"
+  },
+  "first_apply_evidence": "docs/evidence/backup-run-journal-20261021/flyway-attempt-1/v47-application.json"
+}

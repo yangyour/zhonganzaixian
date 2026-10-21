@@ -1,0 +1,131 @@
+{
+  "indexes": [
+    "CREATE UNIQUE INDEX mop_backup_run_event_pkey ON public.mop_backup_run_event USING btree (tenant_id, run_id, version)",
+    "CREATE UNIQUE INDEX mop_backup_run_event_tenant_id_run_id_command_id_key ON public.mop_backup_run_event USING btree (tenant_id, run_id, command_id)",
+    "CREATE UNIQUE INDEX mop_backup_attempt_lease_once ON public.mop_backup_run_event USING btree (tenant_id, asset_id, lease_request_id) WHERE ((action)::text = 'START'::text)",
+    "CREATE INDEX mop_backup_run_asset_history ON public.mop_backup_run_event USING btree (tenant_id, asset_id, run_id, version DESC)"
+  ],
+  "constraints": [
+    {
+      "name": "mop_backup_run_event_action_check",
+      "type": "c",
+      "sha256": "3993b88f033c837b8ff2ebe14325a76a5db8a21b1cb4ae1803a8cf929356d4a1",
+      "definition": "CHECK (((action)::text = ANY ((ARRAY['QUEUE'::character varying, 'START'::character varying, 'MARK_UNKNOWN'::character varying, 'SUCCEED'::character varying, 'FAIL'::character varying])::text[])))"
+    },
+    {
+      "name": "mop_backup_run_event_attempt_number_check",
+      "type": "c",
+      "sha256": "8654aab92f1b9074088b500103fd8af528dda639be5644564a485f40d14583d4",
+      "definition": "CHECK (((attempt_number >= 0) AND (attempt_number <= 3)))"
+    },
+    {
+      "name": "mop_backup_run_event_check",
+      "type": "c",
+      "sha256": "62e07acd351517fd75d0cc099c14a11a739810bf1ceedf93f9689e1e93d6ede7",
+      "definition": "CHECK ((((snapshot_sha256)::text ~ '^[0-9a-f]{64}$'::text) AND (encode(sha256(snapshot), 'hex'::text) = (snapshot_sha256)::text)))"
+    },
+    {
+      "name": "mop_backup_run_event_check1",
+      "type": "c",
+      "sha256": "d3058646e40eba769c78d4ff2dddd61d2d268f0c2d5b9b88743c573ef3e4ee66",
+      "definition": "CHECK (((queued_at >= '0001-01-01 00:00:00+00'::timestamp with time zone) AND (queued_at <= observed_at) AND (observed_at <= '9999-12-31 23:59:59.999+00'::timestamp with time zone)))"
+    },
+    {
+      "name": "mop_backup_run_event_check2",
+      "type": "c",
+      "sha256": "ccf8d7792a02adc47abec7c1292df350056ca78b78464f032c964e07febda606",
+      "definition": "CHECK (((((action)::text = 'QUEUE'::text) AND ((state)::text = 'QUEUED'::text) AND (version = 0) AND (attempt_number = 0) AND (queued_at = observed_at)) OR (((action)::text = ANY ((ARRAY['START'::character varying, 'MARK_UNKNOWN'::character varying])::text[])) AND ((state)::text = 'RUNNING'::text) AND (version >= 1) AND ((attempt_number >= 1) AND (attempt_number <= 3))) OR (((action)::text = 'SUCCEED'::text) AND ((state)::text = 'SUCCEEDED'::text) AND (version >= 2) AND ((attempt_number >= 1) AND (attempt_number <= 3))) OR (((action)::text = 'FAIL'::text) AND (version >= 2) AND ((((state)::text = 'RETRY_WAIT'::text) AND ((attempt_number >= 1) AND (attempt_number <= 2))) OR (((state)::text = 'FAILED'::text) AND (attempt_number = 3))))))"
+    },
+    {
+      "name": "mop_backup_run_event_check3",
+      "type": "c",
+      "sha256": "957bd20baddc2dfcf58cd5cb23bb639a1f6cc4698fdc31ded49b5dd512bc4224",
+      "definition": "CHECK (((((action)::text = 'QUEUE'::text) AND (lease_request_id IS NULL) AND (lease_event_version IS NULL) AND (lease_owner IS NULL) AND (fencing_token IS NULL)) OR (((action)::text <> 'QUEUE'::text) AND (lease_request_id IS NOT NULL) AND (lease_event_version IS NOT NULL) AND ((lease_event_version >= 1) AND (lease_event_version <= '9007199254740991'::bigint)) AND (lease_owner IS NOT NULL) AND (length((lease_owner)::text) > 0) AND ((lease_owner)::text !~ '[^A-Za-z0-9._:-]'::text) AND (fencing_token IS NOT NULL) AND ((fencing_token >= 1) AND (fencing_token <= '9007199254740991'::bigint)))))"
+    },
+    {
+      "name": "mop_backup_run_event_check4",
+      "type": "c",
+      "sha256": "034f3dbd1d1263f769d993643ae001796505c38a9b01d4a8df28729250ed153f",
+      "definition": "CHECK (((((action)::text = ANY ((ARRAY['SUCCEED'::character varying, 'FAIL'::character varying])::text[])) AND (verification_reference IS NOT NULL) AND ((verification_reference)::text ~ '^sha256:[0-9a-f]{64}$'::text)) OR (((action)::text <> ALL ((ARRAY['SUCCEED'::character varying, 'FAIL'::character varying])::text[])) AND (verification_reference IS NULL))))"
+    },
+    {
+      "name": "mop_backup_run_event_check5",
+      "type": "c",
+      "sha256": "85e61e2e5bf4254c8737d5d536f8ccc9af72452e7c2408c80408093f69bba67e",
+      "definition": "CHECK ((((octet_length(snapshot) >= 162) AND (octet_length(snapshot) <= 4096)) AND ((attempt_number = 0) = (octet_length(snapshot) = 162))))"
+    },
+    {
+      "name": "mop_backup_run_event_check6",
+      "type": "c",
+      "sha256": "24f85eddd794466813e6ef68f1196770e80d31a00d91058f4a190a4cb693deb1",
+      "definition": "CHECK (((SUBSTRING(snapshot FROM 1 FOR 28) = decode('001a4d4f505f4241434b55505f52554e5f534e415053484f545f5631'::text, 'hex'::text)) AND (SUBSTRING(snapshot FROM 29 FOR 38) = (decode('0024'::text, 'hex'::text) || convert_to((run_id)::text, 'UTF8'::name))) AND (SUBSTRING(snapshot FROM 67 FOR 38) = (decode('0024'::text, 'hex'::text) || convert_to((tenant_id)::text, 'UTF8'::name))) AND (SUBSTRING(snapshot FROM 105 FOR 38) = (decode('0024'::text, 'hex'::text) || convert_to((asset_id)::text, 'UTF8'::name))) AND (SUBSTRING(snapshot FROM 143 FOR 8) = int8send(((EXTRACT(epoch FROM queued_at) * (1000)::numeric))::bigint)) AND (SUBSTRING(snapshot FROM 151 FOR 8) = int8send(version)) AND (SUBSTRING(snapshot FROM 159 FOR 4) = int4send(attempt_number))))"
+    },
+    {
+      "name": "mop_backup_run_event_command_sha256_check",
+      "type": "c",
+      "sha256": "ba235625a1ad8d49af48b47a355c308c92dcaab6b61905a1e976630e384abdf5",
+      "definition": "CHECK (((command_sha256)::text ~ '^[0-9a-f]{64}$'::text))"
+    },
+    {
+      "name": "mop_backup_run_event_device_execution_authorized_check",
+      "type": "c",
+      "sha256": "d5e6bc5ed36e54306c3d17a2bca2398f6dbd343a8ad022a3a93c33e7af3a4cb8",
+      "definition": "CHECK ((NOT device_execution_authorized))"
+    },
+    {
+      "name": "mop_backup_run_event_pkey",
+      "type": "p",
+      "sha256": "e59dc7419e7ff01895a2568025f8ca5991a97a10ca062db41ac5f04e380f87c5",
+      "definition": "PRIMARY KEY (tenant_id, run_id, version)"
+    },
+    {
+      "name": "mop_backup_run_event_record_source_check",
+      "type": "c",
+      "sha256": "43e942515c1cf14db076476b6a665d2cd07a62f8dd8a5ab4565bc40f798e005b",
+      "definition": "CHECK (((record_source)::text = 'INTERNAL_BACKUP_RUN_JOURNAL'::text))"
+    },
+    {
+      "name": "mop_backup_run_event_snapshot_format_check",
+      "type": "c",
+      "sha256": "463f7679882a0842dba8b50a6913fd468e9afe55e9a65c9a114d6272857a74df",
+      "definition": "CHECK (((snapshot_format)::text = 'MOP_BACKUP_RUN_SNAPSHOT_V1'::text))"
+    },
+    {
+      "name": "mop_backup_run_event_state_check",
+      "type": "c",
+      "sha256": "db0f6f40f7ee0e0a34bc6c3aa40d784acb0973ba06e5e3f68db53c3ceb7a53d5",
+      "definition": "CHECK (((state)::text = ANY ((ARRAY['QUEUED'::character varying, 'RUNNING'::character varying, 'RETRY_WAIT'::character varying, 'SUCCEEDED'::character varying, 'FAILED'::character varying])::text[])))"
+    },
+    {
+      "name": "mop_backup_run_event_tenant_id_asset_id_fkey",
+      "type": "f",
+      "sha256": "402424bf77655e614f9f7e61bffc21fab99c463d5990e04d07c3bd440bf2b094",
+      "definition": "FOREIGN KEY (tenant_id, asset_id) REFERENCES mop_asset(tenant_id, id)"
+    },
+    {
+      "name": "mop_backup_run_event_tenant_id_asset_id_lease_event_versio_fkey",
+      "type": "f",
+      "sha256": "2ac8f1a7b574b9c5b4d4e440f1988d0b653ec87c5381799e1aaf178c9f9d78f6",
+      "definition": "FOREIGN KEY (tenant_id, asset_id, lease_event_version) REFERENCES mop_backup_device_lease_event(tenant_id, asset_id, version)"
+    },
+    {
+      "name": "mop_backup_run_event_tenant_id_run_id_command_id_key",
+      "type": "u",
+      "sha256": "78a698259ea93b5a93647bf8652f422e7f52b871a9a3a7a26c460c953830f12d",
+      "definition": "UNIQUE (tenant_id, run_id, command_id)"
+    },
+    {
+      "name": "mop_backup_run_event_trace_id_check",
+      "type": "c",
+      "sha256": "f4b0fb98c5e3cc64ae24933ef1236fd9d362b4ade2c42a9f7139929a42917c45",
+      "definition": "CHECK (((length((trace_id)::text) > 0) AND ((trace_id)::text !~ '[^A-Za-z0-9._:-]'::text)))"
+    },
+    {
+      "name": "mop_backup_run_event_version_check",
+      "type": "c",
+      "sha256": "c32bff184723672b0b4e28a45f2045192fb38ae0d237e648a826b3a50f03ceab",
+      "definition": "CHECK (((version >= 0) AND (version <= '9007199254740991'::bigint)))"
+    }
+  ],
+  "function_sha256": "e71a226915afda207d19aaa84011cc2fa012238c01a76bf979e2727334b20621"
+}

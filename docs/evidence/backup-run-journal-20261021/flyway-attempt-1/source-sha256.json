@@ -1,0 +1,6 @@
+{
+  "server/persistence/src/main/java/cn/mop/persistence/PostgresBackupRunRepository.java": "bc3d78071e5eaba6ef5b0c51af4d3d4da07b2a3b1e24e5e554e1e67a0c3df6e6",
+  "server/persistence/src/main/java/cn/mop/persistence/BackupRunSchemaVerifier.java": "83d048ae513a906a4c11e07074acc6bffb5ead82ac996433a4e2fe66ed51cfee",
+  "server/persistence/src/main/java/cn/mop/persistence/TestSchemaMigration.java": "1fd0b730a0f7409eaef183bc4a68226e11a0ec5bd507372647c1056e199f5b58",
+  "server/persistence/src/main/resources/db/migration/V46__backup_device_coordination_journal.sql": "97d4dec874c03503326fbb609ea1708fa6601fd257fb664ca74cad7fa2032f98"
+}

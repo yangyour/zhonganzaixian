@@ -30,3 +30,7 @@ run派生状态QUEUED→RUNNING→RETRY_WAIT→SUCCEEDED/FAILED；attempt单独�
 [设备协调事务与验收](backup-device-journal-20261021.md)已补，V46 追加式日志及仓储在隔离 PostgreSQL 验证通过。该日志不是备份执行记录，不证明远端停止，过期不能接管；真实授权/停止核查适配器、任务 Worker、KMS/归档等仍待接入。
 
 [运行快照恢复与规范载荷](backup-run-snapshot-20261021.md)新增严格重建及 runId/租户/设备绑定的有界编码，未知结果恢复后仍阻断重试；实际运行事件仓储与 Worker 继续开发，编码器不是数据库持久化证明。
+
+## 2026-10-21 运行事件持久化增量
+
+[运行追加日志与仓储](backup-run-journal-20261021.md)新增 V47 与 PostgresBackupRunRepository，补充数据库 CAS/幂等及当前租约绑定，保留未知结果和十分钟重试边界。上文纯模型历史边界不代表本次尚无仓储；真实授权、对象核查、Worker和设备执行仍未完成。

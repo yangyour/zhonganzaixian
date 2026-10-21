@@ -1,0 +1,22 @@
+package cn.mop.persistence;
+import cn.mop.domain.DomainException;
+import cn.mop.domain.backup.BackupRunState.*;
+import org.junit.jupiter.api.Test;
+import javax.sql.DataSource;
+import java.sql.*;import java.time.*;import java.util.UUID;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+class BackupRunRepositoryBoundaryTest {
+ final UUID tenant=UUID.randomUUID(),asset=UUID.randomUUID(),run=UUID.randomUUID(),command=UUID.randomUUID();
+ final DataSource source=mock(DataSource.class);
+ final PostgresBackupRunRepository.LeaseClaim lease=new PostgresBackupRunRepository.LeaseClaim(UUID.randomUUID(),"worker",1);
+ PostgresBackupRunRepository repo(){return new PostgresBackupRunRepository(source,(c,t,a,r)->{},(c,r,s,l)->{},(c,r,s,o,f,v,e)->{});}
+ @Test void requiredAdaptersCannotDefaultToAllow(){assertThrows(NullPointerException.class,()->new PostgresBackupRunRepository(null,(c,t,a,r)->{},(c,r,s,l)->{},(c,r,s,o,f,v,e)->{}));assertThrows(NullPointerException.class,()->new PostgresBackupRunRepository(source,null,(c,r,s,l)->{},(c,r,s,o,f,v,e)->{}));assertThrows(NullPointerException.class,()->new PostgresBackupRunRepository(source,(c,t,a,r)->{},null,(c,r,s,o,f,v,e)->{}));assertThrows(NullPointerException.class,()->new PostgresBackupRunRepository(source,(c,t,a,r)->{},(c,r,s,l)->{},null));verifyNoInteractions(source);}
+ @Test void queueNeedsCompleteIdentityAndSafeTrace(){assertThrows(DomainException.class,()->repo().queue(null,asset,run,command,"trace"));assertThrows(DomainException.class,()->repo().queue(tenant,asset,run,null,"trace"));for(String trace:new String[]{null,"","bad\n","x".repeat(129)})assertThrows(DomainException.class,()->repo().queue(tenant,asset,run,command,trace));verifyNoInteractions(source);}
+ @Test void startNeedsLeaseAndSafeVersion(){for(long version:new long[]{-1,9007199254740992L})assertThrows(DomainException.class,()->repo().start(tenant,asset,run,command,version,lease,"trace"));assertThrows(DomainException.class,()->repo().start(tenant,asset,run,command,0,null,"trace"));verifyNoInteractions(source);}
+ @Test void leaseIdentifiersAndBindingAreStrict(){assertThrows(DomainException.class,()->new PostgresBackupRunRepository.LeaseClaim(null,"worker",1));assertThrows(DomainException.class,()->new PostgresBackupRunRepository.LeaseClaim(command,"worker\n",1));assertThrows(DomainException.class,()->new PostgresBackupRunRepository.LeaseClaim(command,"worker",0));assertThrows(DomainException.class,()->new PostgresBackupRunRepository.LeaseBinding(lease,0));assertThrows(DomainException.class,()->new PostgresBackupRunRepository.LeaseBinding(null,1));verifyNoInteractions(source);}
+ @Test void completionNeedsEvidenceAndOutcomeBeforeConnection(){for(String ref:new String[]{null,"","sha256:"+"A".repeat(64),"sha256:"+"a".repeat(64)+"\n"})assertThrows(DomainException.class,()->repo().fail(tenant,asset,run,command,1,lease,Failure.READ_TIMEOUT,ref,"trace"));assertThrows(DomainException.class,()->repo().fail(tenant,asset,run,command,1,lease,null,"sha256:"+"a".repeat(64),"trace"));assertThrows(DomainException.class,()->repo().succeed(tenant,asset,run,command,1,lease,null,"sha256:"+"a".repeat(64),"trace"));verifyNoInteractions(source);}
+ @Test void invalidReadDoesNotAccessDatabase(){assertThrows(DomainException.class,()->repo().current(tenant,asset,null));verifyNoInteractions(source);}
+ @Test void connectionFailureIsSanitized()throws Exception{when(source.getConnection()).thenThrow(new SQLException("password=never-expose SQL private","08006"));var e=assertThrows(DomainException.class,()->repo().current(tenant,asset,run));assertEquals(503,e.status);assertFalse(e.getMessage().contains("never-expose"));assertNull(e.getCause());}
+ @Test void authorizationIsBeforeAnyReplayOrJournalRead()throws Exception{var c=mock(Connection.class);var statement=mock(Statement.class);when(source.getConnection()).thenReturn(c);when(c.createStatement()).thenReturn(statement);var denied=new PostgresBackupRunRepository(source,(conn,t,a,r)->{assertSame(c,conn);throw new DomainException(403,"DENIED","denied");},(conn,r,s,l)->fail("must not verify start"),(conn,r,s,o,f,v,e)->fail("must not verify completion"));assertEquals(403,assertThrows(DomainException.class,()->denied.queue(tenant,asset,run,command,"trace")).status);verify(c).rollback();verify(c,never()).prepareStatement(anyString());verify(c,never()).commit();verify(c).close();}
+}

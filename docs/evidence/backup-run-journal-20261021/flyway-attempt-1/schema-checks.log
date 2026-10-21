@@ -1,0 +1,8 @@
+PASS catalog_original
+PASS timezone_independent_restores_session
+PASS tamper_rollback_3
+PASS tamper_rollback_4
+PASS tamper_rollback_5
+PASS tamper_rollback_6
+PASS tamper_rollback_7
+TOTAL_SCHEMA_PASS=7

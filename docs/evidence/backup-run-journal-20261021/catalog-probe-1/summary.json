@@ -1,0 +1,6 @@
+{
+  "result": "PASS",
+  "catalog_probe_only": true,
+  "all_ddl_rolled_back": true,
+  "full_migration_validation": false
+}

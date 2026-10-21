@@ -1,3 +1,4 @@
+import {isUtcInstant,utcNotBefore} from './utcInstant'
 import { ApiError } from '../api/client'
 import type { AssetImportOperation, AssetImportOperationKind, AssetImportSource } from '../api/assetImportTypes'
 import { assetImportTargets, buildAssetImportMappingRequest } from './assetImportMapping'
@@ -16,17 +17,22 @@ export function validateAssetImportSource(source: AssetImportSource, context: Im
     || source.business_status !== 'CONFIG_PENDING' || source.can_import !== false || source.effective_rule_versions !== null || source.quota_reservation !== null
     || source.retention_until !== null || source.scan_status !== 'UNSCANNED' || source.production_approval !== 'UNVERIFIED'
     || !Array.isArray(source.question_ids) || source.question_ids.length !== 2 || !source.question_ids.includes('Q20') || !source.question_ids.includes('Q31')) fail()
+  if (!isUtcInstant(source.created_at) || !utcNotBefore(source.updated_at,source.created_at)) fail()
+  if (source.parse_status !== 'NOT_REQUESTED' && source.storage_status !== 'READY') fail()
+  if (['NOT_REQUESTED','PENDING','FAILED'].includes(source.parse_status) && (source.latest_artifact_id !== null || source.latest_mapping_id !== null || source.parsed_artifact !== null || source.mapping !== null)) fail()
+  if ((source.parse_status === 'NOT_REQUESTED') !== (source.parse_operation_id === null)) fail()
   if (original && (source.original_name !== original.name || source.size_bytes !== original.size || source.declared_format !== original.format || original.sha256 && source.sha256 !== original.sha256)) fail()
   if (previous && (source.version < previous.version || source.sha256 !== previous.sha256 || source.store_operation_id !== previous.store_operation_id)) fail()
   const artifact = source.parsed_artifact
   if (artifact) {
+    if (!isUtcInstant(artifact.created_at)) fail()
     if (!importUuid(artifact.id) || artifact.id !== source.latest_artifact_id || artifact.tenant_id !== source.tenant_id || artifact.source_id !== source.id || !importUuid(artifact.operation_id)
       || !hash(artifact.parse_hash) || artifact.source_sha256 !== source.sha256 || artifact.detected_format !== source.declared_format || artifact.selection?.declared_format !== source.declared_format
       || !['PARSED', 'SELECTION_REQUIRED'].includes(artifact.state) || !Array.isArray(artifact.sheets) || !artifact.sheets.length || artifact.sheets.length > 32
       || !Array.isArray(artifact.columns) || artifact.columns.length > 64 || !Array.isArray(artifact.rows) || artifact.rows.length > 500
       || typeof artifact.parser_version !== 'string' || !artifact.parser_version || typeof artifact.resource_policy_version !== 'string' || !artifact.resource_policy_version || typeof artifact.schema_version !== 'string' || !artifact.schema_version) fail()
     if (source.declared_format === 'CSV' ? artifact.date_epoch !== 'NOT_APPLICABLE' : !['WINDOWS_1900', 'MAC_1904'].includes(artifact.date_epoch)) fail()
-    const sheets = new Set<number>(), columns = new Set<number>(), rows = new Set<number>()
+    const sheets = new Set<number>(), columns = new Set<number>(), rows = new Set<number>(), sourceRows = new Set<number>()
     for (const sheet of artifact.sheets) {
       if (!integer(sheet.index, 0, 31) || sheets.has(sheet.index) || typeof sheet.name !== 'string' || typeof sheet.hidden !== 'boolean') fail()
       sheets.add(sheet.index)
@@ -37,11 +43,11 @@ export function validateAssetImportSource(source: AssetImportSource, context: Im
       columns.add(column.index)
     }
     if (artifact.state === 'SELECTION_REQUIRED' && (artifact.columns.length || artifact.rows.length)) fail()
-    if (artifact.state === 'PARSED' && (!columns.size || !sheets.has(artifact.selected_sheet_index!) || !integer(artifact.header_row, 1, 20_000)
+    if (artifact.state === 'PARSED' && (!artifact.rows.length || !columns.size || !sheets.has(artifact.selected_sheet_index!) || !integer(artifact.header_row, 1, 20_000)
       || artifact.header_row !== artifact.selection.header_row || source.declared_format === 'XLSX' && artifact.selected_sheet_index !== artifact.selection.sheet_index)) fail()
     for (const row of artifact.rows) {
-      if (!integer(row.logical_record_number, 1, Number.MAX_SAFE_INTEGER) || rows.has(row.logical_record_number) || !integer(row.source_row_number, 1, 20_000) || !Array.isArray(row.cells)) fail()
-      rows.add(row.logical_record_number); const cells = new Set<number>()
+      if (!integer(row.logical_record_number, 1, Number.MAX_SAFE_INTEGER) || rows.has(row.logical_record_number) || !integer(row.source_row_number, 1, 20_000) || sourceRows.has(row.source_row_number) || row.source_row_number <= artifact.header_row! || !Array.isArray(row.cells)) fail()
+      rows.add(row.logical_record_number); sourceRows.add(row.source_row_number); const cells = new Set<number>()
       if (row.physical_start_line !== null && !integer(row.physical_start_line, 1, Number.MAX_SAFE_INTEGER) || row.physical_end_line !== null && (!integer(row.physical_end_line, 1, Number.MAX_SAFE_INTEGER) || row.physical_start_line !== null && row.physical_end_line < row.physical_start_line)) fail()
       for (const cell of row.cells) {
         if (!columns.has(cell.column_index) || cells.has(cell.column_index) || !['TEXT', 'NUMERIC', 'BOOLEAN', 'ERROR', 'ISO_DATE', 'BLANK'].includes(cell.kind)
@@ -54,6 +60,7 @@ export function validateAssetImportSource(source: AssetImportSource, context: Im
   } else if (source.latest_artifact_id !== null || ['PARSED', 'SELECTION_REQUIRED'].includes(source.parse_status)) fail()
   const mapping = source.mapping
   if (mapping) {
+    if (!isUtcInstant(mapping.created_at)) fail()
     if (!artifact || artifact.state !== 'PARSED' || !importUuid(mapping.id) || mapping.id !== source.latest_mapping_id || mapping.tenant_id !== source.tenant_id || mapping.source_id !== source.id
       || mapping.artifact_id !== artifact.id || mapping.source_parse_hash !== artifact.parse_hash || !hash(mapping.preview_hash) || mapping.schema_version !== artifact.schema_version
       || !integer(mapping.version, 1, Number.MAX_SAFE_INTEGER) || mapping.precheck_status !== 'NOT_RUN' || !Array.isArray(mapping.mapped_raw_rows) || mapping.mapped_raw_rows.length !== artifact.rows.length) fail()
@@ -78,5 +85,13 @@ export function validateAssetImportOperation(operation: AssetImportOperation, co
   if (!operation || operation.id !== id || !importUuid(id) || operation.source_id !== sourceId || operation.tenant_id !== context.tenantId || operation.created_by !== context.actorId || operation.kind !== kind
     || !['PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED'].includes(operation.status) || operation.result_ref !== `/api/v1/assets/import-sources/${sourceId}`
     || operation.result_artifact_id !== null && !importUuid(operation.result_artifact_id)) fail()
+  if (!isUtcInstant(operation.created_at) || !utcNotBefore(operation.updated_at,operation.created_at)) fail()
+  const issue=operation.error, empty=issue===null, noArtifact=operation.result_artifact_id===null
+  if (!empty && (!issue || typeof issue!=='object' || Array.isArray(issue) || typeof issue.code!=='string' || !issue.code || typeof issue.message!=='string' || !issue.message || typeof issue.retryable!=='boolean' || !Array.isArray(issue.question_ids) || issue.question_ids.some(v=>typeof v!=='string'||!v))) fail()
+  const valid=operation.status==='PENDING' && noArtifact && (operation.step==='QUEUED' && empty || operation.step==='RETRY_WAIT' && !empty && issue!.retryable)
+    || operation.status==='RUNNING' && noArtifact && empty && operation.step===(kind==='STORE_RAW'?'STORING':'PARSING')
+    || operation.status==='SUCCEEDED' && empty && (kind==='STORE_RAW'?operation.step==='STORED'&&noArtifact:['PARSED','SELECTION_REQUIRED'].includes(operation.step)&&!noArtifact)
+    || operation.status==='FAILED' && noArtifact && !empty && !issue!.retryable && ['AUTHORIZATION_REVOKED','STORAGE_CONFLICT','PARSE_INVALID'].includes(operation.step)
+  if (!valid) fail()
   return operation
 }

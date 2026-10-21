@@ -2,7 +2,7 @@ import { createRequestId, digestSha256 } from './browserCrypto'
 import { computed, readonly, ref, shallowRef, watch } from 'vue'
 import { api, ApiError, isCancelled, StaleRequestError } from '../api/client'
 import type { AssetImportAcceptance, AssetImportFormat, AssetImportMappingRequest, AssetImportOperation, AssetImportParseRequest, AssetImportPolicy, AssetImportSource } from '../api/assetImportTypes'
-import { can, contextGeneration, session } from '../stores/session'
+import { can, contextGeneration, session, switchingTenant } from '../stores/session'
 import { assetImportTargets, AssetImportInputError, buildAssetImportMappingRequest, buildAssetImportParseSelection, createAssetImportMappingDraft, type AssetImportMappingDraft } from './assetImportMapping'
 import { importUuid, validateAssetImportOperation, validateAssetImportSource, type ImportReadContext } from './assetImportReadback'
 
@@ -10,9 +10,9 @@ type AttemptState = 'UNCERTAIN' | 'ACCEPTED' | 'COMPLETE' | 'REJECTED' | 'CONFLI
 interface Attempt { key: string; state: AttemptState; sourceId: string | null; operationId: string | null; compared: boolean; receiptId?: string | null }
 interface UploadAttempt extends Attempt { file: File; format: AssetImportFormat; sha256?: string }
 interface ParseAttempt extends Attempt { sourceId: string; body: AssetImportParseRequest }
-interface MappingAttempt extends Attempt { sourceId: string; body: AssetImportMappingRequest; committedArtifactId?: string; committedSourceVersion?: number }
+interface MappingAttempt extends Attempt { sourceId: string; body: AssetImportMappingRequest; committedArtifactId?: string; committedSourceVersion?: number; expectedArtifactId: string }
 const unresolved = (attempt: Attempt | null) => attempt?.state === 'UNCERTAIN' || attempt?.state === 'ACCEPTED'
-const failureState = (cause: unknown): AttemptState => cause instanceof ApiError && cause.status === 409 ? 'CONFLICT' : cause instanceof ApiError && cause.status >= 400 && cause.status < 500 ? 'REJECTED' : 'UNCERTAIN'
+const failureState = (cause: unknown): AttemptState => cause instanceof ApiError && cause.status === 409 ? 'CONFLICT' : cause instanceof ApiError && [400,401,403,404,413,415,422].includes(cause.status) ? 'REJECTED' : 'UNCERTAIN'
 
 /** Only browser state is held here. Every successful stage is confirmed from the owner-scoped API. */
 export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> = api, options: { intervalMs?: number; maxAttempts?: number } = {}) {
@@ -23,8 +23,9 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
   const uploadAttempt = ref<UploadAttempt | null>(null), parseAttempt = ref<ParseAttempt | null>(null), mappingAttempt = ref<MappingAttempt | null>(null)
   const selection = ref<{ encoding: string | null; delimiter: string | null; sheetIndex: number | null; headerRow: number | null }>({ encoding: null, delimiter: null, sheetIndex: null, headerRow: null })
   const mappingDraft = ref<AssetImportMappingDraft | null>(null)
+  const disposed = ref(false)
   let controller: AbortController | undefined, policyController: AbortController | undefined, epoch = 0
-  const permitted = computed(() => can('assets:write') && ['padmin', 'msp', 'tadmin'].includes(session.value?.user.role || ''))
+  const permitted = computed(() => !disposed.value && !switchingTenant.value && session.value?.mode === 'remote_test' && can('assets:write') && ['padmin', 'msp', 'tadmin'].includes(session.value?.user.role || ''))
   const hasUnresolved = computed(() => Boolean(busy.value || unresolved(uploadAttempt.value) || unresolved(parseAttempt.value) || unresolved(mappingAttempt.value)))
   const hasConflict = computed(() => parseAttempt.value?.state === 'CONFLICT' || mappingAttempt.value?.state === 'CONFLICT')
   const canReset = computed(() => !hasUnresolved.value)
@@ -34,7 +35,7 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
   const mappingLocked = computed(() => Boolean(busy.value || hasConflict.value || unresolved(mappingAttempt.value) || source.value?.mapping))
   const context = (): ImportReadContext => ({ tenantId: session.value?.tenant.id || '', actorId: session.value?.user.id || '' })
   const original = () => file.value && format.value ? { name: file.value.name, size: file.value.size, format: format.value, sha256: uploadAttempt.value?.sha256 } : undefined
-  const alive = (expected: number) => { if (expected !== epoch || controller?.signal.aborted) throw new StaleRequestError() }
+  const alive = (expected: number) => { if (disposed.value || expected !== epoch || controller?.signal.aborted) throw new StaleRequestError() }
   function begin(kind: NonNullable<typeof busy.value>) { controller?.abort(); controller = new AbortController(); busy.value = kind; error.value = null; return { expected: epoch, signal: controller.signal, context: context() } }
   function clear() {
     controller?.abort(); policyController?.abort(); ++epoch; busy.value = null; policyLoading.value = false
@@ -42,10 +43,10 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
     uploadAttempt.value = null; parseAttempt.value = null; mappingAttempt.value = null; error.value = null; uploadError.value = null; parseError.value = null; mappingError.value = null; policyError.value = null
     selectionMessage.value = ''; fields.value = {}; selection.value = { encoding: null, delimiter: null, sheetIndex: null, headerRow: null }
   }
-  function reset() { if (!canReset.value) return false; const savedPolicy = policy.value; clear(); policy.value = savedPolicy; return true }
+  function reset() { if (disposed.value || !permitted.value || !canReset.value) return false; const savedPolicy = policy.value; clear(); policy.value = savedPolicy; return true }
   async function loadPolicy() {
-    if (!permitted.value || policyLoading.value) return
-    const expected = epoch, request = new AbortController(); policyController?.abort(); policyController = request; policyLoading.value = true; policyError.value = null
+    if (!permitted.value || policyLoading.value || busy.value) return
+    const expected = epoch, request = new AbortController(); policyController?.abort(); policyController = request; policyLoading.value = true; policyError.value = null; policy.value = null
     try {
       const result = await client.request<AssetImportPolicy>('/assets/import-policy', { signal: request.signal })
       if (expected !== epoch || request.signal.aborted) return
@@ -172,7 +173,7 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
   }
   function sameMapping(result: AssetImportSource, attempt: MappingAttempt) {
     const saved = result.mapping
-    return Boolean(saved && (!attempt.receiptId || saved.id === attempt.receiptId) && (!attempt.committedArtifactId || saved.artifact_id === attempt.committedArtifactId)
+    return Boolean(saved && saved.artifact_id === attempt.expectedArtifactId && (!attempt.receiptId || saved.id === attempt.receiptId) && (!attempt.committedArtifactId || saved.artifact_id === attempt.committedArtifactId)
       && saved.source_parse_hash === attempt.body.source_parse_hash && Object.keys(attempt.body.target_source_columns).every(key => saved.target_source_columns[key as keyof typeof saved.target_source_columns] === attempt.body.target_source_columns[key as keyof typeof saved.target_source_columns])
       && JSON.stringify([...saved.ignored_source_columns].sort((a, b) => a - b)) === JSON.stringify(attempt.body.ignored_source_columns))
   }
@@ -193,14 +194,14 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
     const retry = mappingAttempt.value?.state === 'UNCERTAIN'
     let attempt = retry ? mappingAttempt.value : null
     if (!attempt) {
-      try { const body = buildAssetImportMappingRequest(source.value.version, artifact.value.parse_hash, artifact.value.columns, mappingDraft.value); attempt = { sourceId: source.value.id, body, key: createRequestId(), state: 'UNCERTAIN', operationId: null, compared: false }; mappingAttempt.value = attempt; fields.value = {} }
+      try { const body = buildAssetImportMappingRequest(source.value.version, artifact.value.parse_hash, artifact.value.columns, mappingDraft.value); attempt = { sourceId: source.value.id, expectedArtifactId: artifact.value.id, body, key: createRequestId(), state: 'UNCERTAIN', operationId: null, compared: false }; mappingAttempt.value = attempt; fields.value = {} }
       catch (cause) { if (cause instanceof AssetImportInputError) fields.value = cause.fields; else mappingError.value = cause; return }
     }
     const request = begin('mapping'); mappingError.value = null
     try {
       const result = await client.request<AssetImportSource>(`/assets/import-sources/${attempt.sourceId}/mappings`, { method: 'POST', body: attempt.body, idempotencyKey: attempt.key, signal: request.signal }); alive(request.expected)
       validateAssetImportSource(result, request.context, attempt.sourceId, original(), source.value)
-      if (!sameMapping(result, attempt)) throw new ApiError(200, 'INVALID_IMPORT_READBACK', '映射响应与原请求不一致；保留原请求', '—')
+      if (result.version !== attempt.body.expected_version + 1 || !sameMapping(result, attempt)) throw new ApiError(200, 'INVALID_IMPORT_READBACK', '映射响应与原请求不一致；保留原请求', '—')
       attempt.receiptId = result.mapping!.id; attempt.committedArtifactId = result.mapping!.artifact_id; attempt.committedSourceVersion = result.version
       attempt.state = 'ACCEPTED'; await readMapping(attempt, request)
     } catch (cause) { if (!isCancelled(cause) && request.expected === epoch) { if (attempt.state === 'UNCERTAIN' && !retry) attempt.state = failureState(cause); mappingError.value = cause } }
@@ -223,14 +224,14 @@ export function createAssetImportWorkspace(client: Pick<typeof api, 'request'> =
   }
   function reviseConflict(kind: 'parse' | 'mapping') {
     const attempt = kind === 'parse' ? parseAttempt : mappingAttempt
-    if (busy.value || attempt.value?.state !== 'CONFLICT' || !attempt.value.compared) return false
+    if (!permitted.value || busy.value || attempt.value?.state !== 'CONFLICT' || !attempt.value.compared) return false
     attempt.value = null; fields.value = {}; return true
   }
   // A navigation refresh replaces the session object even when its authority is unchanged.
   // Keep original File/key/body state unless a scope or effective access value actually changes.
   const stop = watch([contextGeneration, () => session.value?.tenant.id, () => session.value?.user.id,
     () => session.value?.user.role, () => session.value?.permission_version, () => session.value?.account_version, permitted], clear, { flush: 'sync' })
-  function dispose() { stop(); clear() }
+  function dispose() { stop(); disposed.value = true; clear() }
   return { file: readonly(file), format: readonly(format), source: readonly(source), artifact: readonly(artifact), operation: readonly(operation), policy: readonly(policy), policyLoading: readonly(policyLoading), policyError, permitted, busy: readonly(busy), error, uploadError, parseError, mappingError, selectionMessage, fields, selection, mappingDraft,
     uploadAttempt: readonly(uploadAttempt), parseAttempt: readonly(parseAttempt), mappingAttempt: readonly(mappingAttempt), hasUnresolved, canReset, isParsed, selectionLocked, mappingLocked, chooseFile, upload, parse, saveMapping, refresh, reviseConflict, loadPolicy, reset, dispose }
 }

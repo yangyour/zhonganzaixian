@@ -14,3 +14,7 @@ it('actual result cannot be reused after source-version/hash changes or as dicti
  expect(()=>readCmdbSourcePreflight(capture.name_check,{...source,version:source.version+1},true)).toThrow()
  expect(()=>readCmdbSourcePreflight(capture.name_check,{...source,parsed_artifact:{...source.parsed_artifact!,parse_hash:'f'.repeat(64)}},true)).toThrow()
 })
+it('actual PostgreSQL source snapshot satisfies the strengthened import reader',async()=>{
+ const {validateAssetImportSource}=await import('../src/utils/assetImportReadback')
+ expect(validateAssetImportSource(source,{tenantId:source.tenant_id,actorId:source.created_by},source.id)).toBe(source)
+})

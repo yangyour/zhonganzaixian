@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ElMessageBox, ElTableColumn } from 'element-plus'
 import AssetImportTemplateDownload from './AssetImportTemplateDownload.vue'
+import AssetImportRawPreview from './AssetImportRawPreview.vue'
 import CmdbSourcePreflightPanel from './CmdbSourcePreflightPanel.vue'
 import { computed, onUnmounted, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
@@ -59,7 +60,7 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
 
 <template>
   <el-drawer v-model="open" title="资产台账批量导入" size="940px" class="asset-import-drawer" :close-on-click-modal="false">
-    <el-alert type="info" :closable="false" title="上传资产台账源文件、配置表头解析参数并完成 15 列标准字段映射（正式批量入库待配置项 Q20 / Q31 策略启用后开放）。" />
+    <el-alert type="info" :closable="false" title="本工作区仅暂存源文件、解析和保存旧 15 列映射，正式批量入库尚未开放。客户 33 列字典校验独立进行，不自动转换为旧模板。" />
     <AssetImportTemplateDownload />
     <el-steps class="asset-import-steps" :active="stage" simple aria-label="资产来源处理阶段"><el-step title="上传源文件"/><el-step title="配置解析"/><el-step title="表头预览"/><el-step title="字段映射"/><el-step title="待策略入库"/></el-steps>
     <el-skeleton v-if="policyLoading" :rows="3" animated aria-label="读取来源技术政策" />
@@ -154,20 +155,19 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
         <el-button type="primary" :loading="busy === 'mapping'" :disabled="Boolean(busy || source.mapping) || mappingAttempt?.state === 'ACCEPTED' || mappingAttempt?.state === 'CONFLICT'" @click="workspace.saveMapping">{{ mappingAttempt?.state === 'UNCERTAIN' ? '重试保存映射' : '保存 15 列映射' }}</el-button>
         <el-alert v-if="source.mapping && mappingAttempt?.state === 'COMPLETE'" type="success" :closable="false" :title="`字段映射已保存（版本 v${source.mapping.version} · 待入库校验策略启用）`" />
         <p v-if="source.mapping" class="mono">解析摘要 {{ source.mapping.source_parse_hash }}<br>预览摘要 {{ source.mapping.preview_hash }}</p>
-        <p class="field-help tabular-nums">共解析出 {{ artifact.rows.length }} 行数据记录（下方展示前 10 行原始单元格解析预览）。</p>
-        <el-empty v-if="!artifact.rows.length" :image-size="60" description="解析结果中无数据行" />
-        <AppTable v-else :rows="artifact.rows.slice(0, 10)" row-key="logical_record_number">
-          <el-table-column label="逻辑行 / 源行号" min-width="130"><template #default="{ row }"><span class="tabular-nums">{{ row.logical_record_number }} / {{ row.source_row_number }}</span><span class="cell-sub tabular-nums">文件行 {{ row.physical_start_line ?? '—' }} 至 {{ row.physical_end_line ?? '—' }}</span></template></el-table-column>
-          <el-table-column label="原始单元格内容" min-width="480"><template #default="{ row }"><span v-for="cell in row.cells" :key="cell.column_index" class="asset-import-cell"><b>列 {{ cell.column_index }}</b> [{{ cell.kind }}] 文本={{ cell.lexical === null ? '空' : cell.lexical }} · 显示={{ cell.display === null ? '空' : cell.display }}<template v-if="cell.format_code"> · 格式={{ cell.format_code }}</template></span></template></el-table-column>
-        </AppTable>
+        <AssetImportRawPreview :artifact="artifact" />
       </section>
 
-      <section v-if="source" class="asset-import-section"><h3>5. 批量入库策略状态</h3><el-alert type="info" :closable="false" title="批量入库校验策略待启用（关联配置项 Q20 / Q31）"/><p class="field-help">当前已完成源文件归档、表头解析与字段映射保存；待资产查重合并与配额校验规则（Q20 / Q31）确认启用后开放正式批量入库。</p></section>
+      <section v-if="source" class="asset-import-section"><h3>5. 批量入库策略状态</h3>
+        <el-alert type="info" :closable="false" title="正式批量入库未开放，不代表仅启用配置即可完成"/>
+        <ul aria-label="当前来源实际完成情况"><li>源文件归档：{{source.storage_status==='READY'?'已完成校验':source.storage_status==='FAILED'?'失败':'处理中'}}</li><li>表头与数据解析：{{isParsed?'已解析':source.parse_status==='FAILED'?'失败':source.parse_status==='SELECTION_REQUIRED'?'待选择工作表与表头':'尚未完成'}}</li><li>旧 15 列映射：{{source.mapping?'已保存':'尚未保存'}}</li></ul>
+        <p class="field-help">仍需完成引用与地址策略、配额及事务入库链路，并核验 Q20 / Q31 等未确认规则。本工作区不执行正式资产入库；来源检查或映射保存都不是导入批准。</p>
+      </section>
     </template>
   </el-drawer>
 </template>
 
 <style>
-.asset-import-drawer{max-width:100vw}.tabular-nums{font-variant-numeric:tabular-nums}.asset-import-steps{margin:16px 0}.asset-import-section{margin:18px 0;padding-top:14px;border-top:1px solid #e4eaf2}.asset-import-section h3{font-size:15px;margin:0 0 10px}.asset-import-section p{overflow-wrap:anywhere}.asset-import-file-input{display:block;width:100%;box-sizing:border-box;padding:10px 12px;margin:8px 0;border:1px dashed #b8c7d9;border-radius:8px;background:#f8fafc;cursor:pointer;transition:border-color .15s,background-color .15s}.asset-import-file-input:hover:not(:disabled){border-color:#2563eb;background:#f0f6ff}.asset-import-file-input:disabled{cursor:not-allowed;opacity:.65}.asset-import-selection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}.asset-import-selection .el-form-item{margin-bottom:0}.asset-import-mapping-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.asset-import-map-row{display:grid;grid-template-columns:minmax(120px,1fr) minmax(170px,1.4fr);gap:8px;align-items:center;font-size:12px;padding:8px 10px;background:#f8fafc;border:1px solid #edf2f7;border-radius:6px}.asset-import-map-row label{overflow-wrap:anywhere;font-weight:500;color:#334155}.asset-import-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}.import-error{color:#9b3b1b;font-size:12px;overflow-wrap:anywhere}.asset-import-cell{display:block;margin:3px 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px}.asset-import-cell b{display:inline-block;min-width:20px}.asset-import-request{font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f7fb;padding:10px;border-radius:6px}.asset-import-drawer .el-checkbox{display:flex;margin:7px 0;white-space:normal;height:auto}.asset-import-drawer .el-checkbox__label{white-space:normal;overflow-wrap:anywhere}.asset-import-drawer .el-alert{margin:10px 0}
+.asset-import-drawer{max-width:100vw}.tabular-nums{font-variant-numeric:tabular-nums}.asset-import-steps{margin:16px 0}.asset-import-section{margin:18px 0;padding-top:14px;border-top:1px solid #e4eaf2}.asset-import-section h3{font-size:15px;margin:0 0 10px}.asset-import-section p{overflow-wrap:anywhere}.asset-import-file-input{display:block;width:100%;box-sizing:border-box;padding:10px 12px;margin:8px 0;border:1px dashed #b8c7d9;border-radius:8px;background:#f8fafc;cursor:pointer;transition:border-color .15s,background-color .15s}.asset-import-file-input:hover:not(:disabled){border-color:#2563eb;background:#f0f6ff}.asset-import-file-input:disabled{cursor:not-allowed;opacity:.65}.asset-import-selection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}.asset-import-selection .el-form-item{margin-bottom:0}.asset-import-mapping-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.asset-import-map-row{display:grid;grid-template-columns:minmax(120px,1fr) minmax(170px,1.4fr);gap:8px;align-items:center;font-size:12px;padding:8px 10px;background:#f8fafc;border:1px solid #edf2f7;border-radius:6px}.asset-import-map-row label{overflow-wrap:anywhere;font-weight:500;color:#334155}.asset-import-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}.import-error{color:#9b3b1b;font-size:12px;overflow-wrap:anywhere}.asset-import-cell{display:block;margin:3px 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px}.asset-import-cell b{display:inline-block;min-width:20px}.asset-import-request{font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f7fb;padding:10px;border-radius:6px}.asset-import-drawer .el-checkbox{display:flex;margin:7px 0;white-space:normal;height:auto}.asset-import-drawer .el-checkbox__label{white-space:normal;overflow-wrap:anywhere}.asset-import-drawer .el-alert{margin:10px 0}.asset-import-drawer .el-button{min-height:44px;height:auto;white-space:normal}
 @media(max-width:760px){.asset-import-selection,.asset-import-mapping-grid{grid-template-columns:minmax(0,1fr)}.asset-import-map-row{grid-template-columns:minmax(100px,1fr) minmax(145px,1.4fr)}.asset-import-drawer .el-button{min-height:44px;height:auto;white-space:normal}.asset-import-steps{padding:10px 12px;flex-direction:column;align-items:stretch;gap:6px}.asset-import-steps .el-step.is-simple{flex:none!important;max-width:none!important;width:100%;min-height:44px}.asset-import-steps .el-step.is-simple .el-step__main{justify-content:flex-start}.asset-import-steps .el-step.is-simple .el-step__title{max-width:none;font-size:14px;line-height:1.5;word-break:normal;overflow-wrap:normal}.asset-import-steps .el-step.is-simple .el-step__arrow{display:none}.asset-import-drawer .el-checkbox{min-height:44px;align-items:center}.asset-import-drawer .el-select__wrapper{min-height:44px}}
 </style>

@@ -1,0 +1,40 @@
+{
+  "base_commit": "f08151fc7d899e8d51b220b2d2b900809240fbeb",
+  "result": "PASS_UNIT_DOM_CAPTURE_REPLAY_BUILD",
+  "web_tests": 3107,
+  "web_files": 211,
+  "new_web_tests": 29,
+  "contract_tests": 171,
+  "typecheck_build_static": "PASS",
+  "build_id": "e8bd974dc01aac08a3ade7e747a4b249aea660cdfb8981aa3a0dd46f16e8c218",
+  "bootstrap_gzip_bytes": 179738,
+  "all_rows_preview": "51_SYNTHETIC_ROWS_25_25_1_PAGINATION",
+  "preview_xss_text_escaped": true,
+  "preview_focus_and_source_reset": "PASS_DOM",
+  "stage_status_tests": 4,
+  "actual_prior_http_source_validated": 1,
+  "java_suite": "UNCHANGED_NOT_RERUN",
+  "python_suite": "UNCHANGED_NOT_RERUN",
+  "new_pg_http_run": "NOT_RUN_FRONTEND_ONLY_EXISTING_CAPTURE_REUSED",
+  "api_version": "UNCHANGED_0.74.0",
+  "migrations": "V1_V45_UNCHANGED_HASH_VERIFIED",
+  "browser_scripts_discovered_previous_phase": 38,
+  "browser_axe": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "formal_tc_not_run": 128,
+  "real_customer_mutations": 0,
+  "provider_sends": 0,
+  "initial_failures": [
+    "XLSX_SYNTHETIC_DATA_ROW_EQUAL_HEADER_FIXED_TO_FOLLOW_HEADER",
+    "TEST_NONEXISTENT_MOCK_MODE_FIXED_TO_DEFINED_LOCAL_FIXTURE"
+  ],
+  "source_sha256": {
+    "apps/web/src/components/AssetImportWorkspace.vue": "25ca6af881f2b617a26b5eb6a5fdc54b6da202045720b0e06050fa1f207fd9b5",
+    "apps/web/src/components/AssetImportRawPreview.vue": "c75ddb1560325643e6ca00523d6d53097dd1fedb7337f10a2abd933c01d81de9",
+    "apps/web/src/utils/assetImportWorkspace.ts": "e4dc7a97d8ac476b8e75c6eb52c42012a10c00be851e3f88c6cfd1700a7e6135",
+    "apps/web/src/utils/assetImportReadback.ts": "e6ea2cc1530ffee7e20304de033d2084753645ba0740eb306099f3bfadc711fe",
+    "apps/web/tests/assetImportWorkspace.test.ts": "17c368be9686f959d0c167d8012b6dc9125b2068a498c9114e807cdb49913c99",
+    "apps/web/tests/assetImportRawPreview.test.ts": "8bad071096e96e17a6ae41fbdb4231e138e61b08c374a8cd0296aa0f45785c94",
+    "apps/web/tests/assetImportStageStatus.test.ts": "1c621105284f868ca8243642900eb9a18bcba9067c97f6d405908d7be0e42204",
+    "apps/web/tests/cmdbNameHttp.test.ts": "cfc3e6b9ea860ecc93c090a5e8a29d1996d77cc2f0d0320f14e6288f85b0ef06"
+  }
+}

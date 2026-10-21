@@ -1,0 +1,13 @@
+// @vitest-environment jsdom
+import {afterEach,it,expect} from 'vitest'
+import {createApp,h,shallowRef,nextTick,type App} from 'vue'
+import Preview from '../src/components/AssetImportRawPreview.vue'
+import type {AssetImportParsedArtifact} from '../src/api/assetImportTypes'
+import capture from '../../../fixtures/cmdb-name-http-synthetic-20261021.json'
+let app:App|undefined,host:HTMLElement
+async function settle(){for(let i=0;i<4;i++){await Promise.resolve();await nextTick()}}
+function mount(count:number){const base=structuredClone(capture.source.parsed_artifact) as unknown as AssetImportParsedArtifact;base.rows=Array.from({length:count},(_,i)=>({...structuredClone(base.rows[0]!),logical_record_number:i+2,source_row_number:i+2,cells:[{column_index:0,kind:'TEXT',lexical:i===26?'<img src=x onerror=alert(1)>':'SYNTHETIC_ROW_'+i,display:null,style_index:null,format_code:null}]}));const artifact=shallowRef(base);host=document.createElement('div');document.body.append(host);app=createApp({render:()=>h(Preview,{artifact:artifact.value})});app.component('el-button',{template:'<button><slot /></button>'});app.mount(host);return artifact}
+afterEach(()=>{app?.unmount();host?.remove()})
+it('allows all 51 rows with 25-row pages and focuses the page summary',async()=>{mount(51);expect(host.querySelectorAll('tbody tr')).toHaveLength(25);expect(host.textContent).not.toContain('SYNTHETIC_ROW_50');(host.querySelectorAll('button')[1] as HTMLButtonElement).click();await settle();expect(host.querySelectorAll('tbody tr')).toHaveLength(25);expect(document.activeElement).toBe(host.querySelector('[role="status"]'));expect(host.querySelector('img')).toBeNull();expect(host.textContent).toContain('<img src=x onerror=alert(1)>');(host.querySelectorAll('button')[1] as HTMLButtonElement).click();await settle();expect(host.querySelectorAll('tbody tr')).toHaveLength(1);expect(host.textContent).toContain('SYNTHETIC_ROW_50');expect((host.querySelectorAll('button')[1] as HTMLButtonElement).disabled).toBe(true)})
+it('new source snapshot resets preview page and does not retain prior rows',async()=>{const source=mount(51);(host.querySelectorAll('button')[1] as HTMLButtonElement).click();await settle();source.value={...source.value,parse_hash:'c'.repeat(64),rows:source.value.rows.slice(0,1)};await settle();expect(host.textContent).toContain('第 1 / 1 页');expect(host.querySelectorAll('tbody tr')).toHaveLength(1);expect(host.querySelector('nav')).toBeNull()})
+it('empty preview is explicit rather than a successful import claim',()=>{mount(0);expect(host.textContent).toContain('没有数据记录');expect(host.textContent).toContain('不执行公式或导入');expect(host.querySelector('table')).toBeNull()})

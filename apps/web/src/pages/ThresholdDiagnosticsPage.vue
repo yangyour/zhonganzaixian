@@ -38,6 +38,7 @@ defineExpose({ change, analyze, clearInput, state })
 <template>
  <section class="threshold-page">
   <div class="page-heading"><div><h1>告警阈值规则诊断</h1><p>校验告警触发与恢复阈值的单调方向、区间包含关系及持续时长 · 仅作规则逻辑诊断，不修改生产监控配置</p></div><router-link to="/configurations">返回配置提案</router-link></div>
+  <p v-if="permitted"><router-link class="observation-entry" to="/observation-window-diagnostics">继续核对显式采样观察窗</router-link>（独立只读诊断，不确认真实恢复）</p>
   <p class="threshold-notice">当前输入的候选规则仅用于页面逻辑校验，未保存至服务端且不会直接下发至生产监控。</p><details class="boundary-details"><summary>客户确认与数学检查边界</summary><el-alert type="warning" :closable="false" title="阈值冲突原样保留提示，系统不会自动改写数值或反转比较符">系统不会从合同候选中自动填充默认阈值，亦不会自动翻转恢复比较方向。CONSISTENT 仅代表数学区间逻辑一致；客户确认项（Q06）、指标物理量纲范围、实时采样窗口与生产发布状态需独立核验。</el-alert></details>
   <el-empty v-if="!permitted" description="仅当前平台配置管理员可以诊断共享阈值候选" />
   <template v-else>
@@ -87,4 +88,5 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere}
 .threshold-page :deep(textarea){font-family:monospace;font-size:12px;line-height:1.7;background:#fafcff}
 @media(max-width:1050px){.threshold-layout{grid-template-columns:1fr}.threshold-side{grid-row:1}.threshold-layout :deep(textarea){max-height:230px}}
 @media(max-width:700px){.threshold-panel{padding:14px}.condition-grid,.relations{grid-template-columns:1fr}.relations dd{margin-bottom:8px}.threshold-page .el-button{min-height:44px}.page-heading{align-items:flex-start;gap:12px;flex-direction:column}}
+.observation-entry{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;padding:8px 12px;border:1px solid #8293a6;border-radius:4px;color:#185695;text-decoration:underline}.observation-entry:focus-visible{outline:3px solid #176bb5;outline-offset:3px}
 </style>

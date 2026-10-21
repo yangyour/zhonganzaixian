@@ -33,6 +33,7 @@ export const router = createRouter({
     { path: '/sla-reports', name: 'sla-reports', component: () => import('./pages/SlaReportsPage.vue'), meta: { title: 'SLA月报与赔付', group: '服务', roles: ['padmin','msp'], capability: 'sla_scenarios:read' } },
     { path: '/runtime-configurations', name: 'runtime-configurations', component: () => import('./pages/RuntimeConfigurationsPage.vue'), meta: { title: '运行配置与发布', group: '管理', role: 'padmin', capability: 'configurations:read' } },
     { path: '/configurations', name: 'configurations', component: () => import('./pages/ConfigurationsPage.vue'), meta: { title: '配置项登记', group: '管理', capability: 'configurations:read' } },
+    { path: '/observation-window-diagnostics', name: 'observation-window-diagnostics', component: () => import('./pages/ObservationWindowDiagnosticsPage.vue'), meta: { title: '采样观察窗诊断', group: '管理', role: 'padmin', capability: 'configurations:read' } },
     { path: '/threshold-diagnostics', name: 'threshold-diagnostics', component: () => import('./pages/ThresholdDiagnosticsPage.vue'), meta: { title: '告警阈值诊断', group: '管理', capability: 'configurations:read' } },
     { path: '/contact-imports', name: 'contact-imports', component: () => import('./pages/ContactImportsPage.vue'), meta: { title: '联系人批量导入', group: '管理', capability: 'contacts:write' } },
     { path: '/contact-import-preview', name: 'contact-import-preview', component: () => import('./pages/ContactImportPreviewPage.vue'), meta: { title: '联系人导入格式预览', group: '管理', capability: 'contacts:write' } },

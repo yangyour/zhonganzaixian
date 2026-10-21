@@ -39,3 +39,9 @@
 qa/browser/operations.pw.ts 增加10个浏览器用例：近期事件与季度草稿的320/390/768/1440回流和axe检查、事件详情键盘跳转、HTML下载内容和新读取、取消后焦点恢复。合成入口 qa/operations.fixture.html 仅开发服务器使用，不是产品路由，不替代真实后端鉴权。
 
 当前 npm run test:browser -- --list 能发现19个测试（原9 + 新10）；仅证明加载/发现，不代表执行通过。新脚本类型检查通过。运行环境浏览器限制尚未解除，实际执行仍 NOT_RUN。不得将测试数量计入已通过浏览器检查或合同TC。
+
+## 2026-10-21 观察窗诊断脚本
+
+qa/browser/observation-window.pw.ts增加7项，覆盖四视口键盘/回流/axe、取消后焦点与迟到响应、权限撤销和离开确认。合成入口为qa/observation-window.fixture.html，只有开发模式可运行，API响应由测试拦截。
+
+当前共26项脚本可发现，仍不是26项已执行通过；真实浏览器/axe继续NOT_RUN。对应原生DOM和读取器测试独立记录，不混淆证据层次。

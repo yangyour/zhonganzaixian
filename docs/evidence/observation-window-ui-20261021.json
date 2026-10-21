@@ -1,0 +1,32 @@
+{
+  "base_commit": "b69a54eed5510e7af8c12fce2817b107146291bc",
+  "result": "PASS_UNIT_DOM_BUILD",
+  "web_tests": 2815,
+  "web_files": 201,
+  "new_web_tests": 67,
+  "actual_http_vectors_replayed": 15,
+  "contract_tests": 167,
+  "typecheck_build_static": "PASS",
+  "build_id": "33aa6da347ff0e1d4eca4afe8651687061a1c8cdba177ebe11fb037b7635ab08",
+  "qa_entry_absent_from_production_dist": true,
+  "browser_scripts_discovered": 26,
+  "new_browser_scripts": 7,
+  "browser_axe_execution": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "live_frontend_transport": "NOT_RUN_CAPTURE_REPLAY_AND_DOM_ONLY",
+  "backend_api": "UNCHANGED_0.72.0_NOT_RERUN_THIS_UI_BATCH",
+  "migrations": "UNCHANGED_V1_V45",
+  "formal_tc_not_run": 128,
+  "source_sha256": {
+    "apps/web/src/utils/observationWindowWorkspace.ts": "0e642db11f67d74ab9a9e98cd99c01e591e6e0e9e0640cfcf8ea78b22fdd6d48",
+    "apps/web/src/pages/ObservationWindowDiagnosticsPage.vue": "fe8fab4918130ffb94c69d70a52fc45b8ba913225a77b7c5b0ed1bd81a296b72",
+    "apps/web/src/router.ts": "b5c34c7a03aef82696b4eabd038f421e40dff662487da4ca5f77101bf797b4a1",
+    "apps/web/src/components/NavigationIcon.vue": "e18e207fde5911e0862ddf19131f5e04237fae52bf243ba24940685507194658",
+    "apps/web/src/utils/navigationModules.ts": "c0ef7c250a5785cac01d7542cc5a7ef4159c737b7562779ce193444bec73ed74",
+    "apps/web/src/pages/ThresholdDiagnosticsPage.vue": "a7c790c7bf4cf1ec240ddf21e98ac92406a6c1e76b9cd21992c9a8855736b496",
+    "apps/web/tests/observationWindowWorkspace.test.ts": "e6a5d322a5f17db2a37b86823aafd26a0787d1471f49af9ee716ad774f3ecfbc",
+    "apps/web/tests/observationWindowPage.test.ts": "f22afb3434d51417daba4401c2e16ce142b0e4d1a6752083ff8f08de4f687ae4",
+    "apps/web/qa/observation-window.fixture.html": "9087c80f73de2bb8ba0a4fda9c384e47336abe99eae95cc95c2db4255e703c4f",
+    "apps/web/qa/observation-window.fixture.ts": "5be57513f66a81a67be65fda688fe1f75f13fca1ef1cbfb7a1f3546fc27ed627",
+    "apps/web/qa/browser/observation-window.pw.ts": "2931e2d04bd8d1189af3f5762e76764bd1dd82e395b1cc75181b31118b155636"
+  }
+}

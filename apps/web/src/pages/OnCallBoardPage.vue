@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {computed,onUnmounted,ref,shallowRef,watch} from 'vue'
+import {ElMessageBox} from 'element-plus'
 import {onBeforeRouteLeave} from 'vue-router'
 import {api} from '../api/client'
 import {can,contextGeneration,session,switchingTenant} from '../stores/session'
@@ -7,7 +8,7 @@ import {contextTransitionGuards} from '../utils/contextTransitionGuard'
 import {
  createOnCallBoardWorkspace,emptyOnCallBoardState,formatCountdown,formatDurationSec,
  policyTierLabels,shiftCodeLabels,targetRoleLabels,triggerConditionLabels,
- type EscalationStep,type OnCallBoardState,type PolicyTierCode,type ShiftCode,type TargetRole,type TriggerCondition
+ type EscalationStep,type EscalationPolicy,type OnCallBoardState,type PolicyTierCode,type ShiftCode,type TargetRole,type TriggerCondition
 } from '../utils/onCallBoard'
 import {tierLabels} from '../utils/serviceTiers'
 import {displayTime} from '../utils/display'
@@ -24,7 +25,7 @@ const tab=ref<'queue'|'roster'|'policy'>('queue')
 const blocked=ref(false)
 
 // Roster form
-const shiftDate=ref('2026-10-18')
+const shiftDate=ref('')
 const shiftCode=ref<ShiftCode>('DAY')
 const primaryUserId=ref('')
 const backupUserId=ref('')
@@ -44,24 +45,37 @@ const escUnansweredCount=ref(2)
 
 // Policy editor form
 const editPolicyTier=ref<PolicyTierCode>('STANDARD')
-const editUnansweredCount=ref(2)
-const editStep2Wait=ref(15)
-const editStep2Role=ref<TargetRole>('L2_ONCALL')
+const preparedPolicy=shallowRef<EscalationPolicy|null>(null)
+const editUnansweredCount=ref<number|null>(null)
+const editStep2Wait=ref<number|null>(null)
+const editStep2Role=ref<TargetRole|null>(null)
 
-const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,permitted.value,canWriteInternal.value,canWriteConfig.value]))
+const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value,canWriteInternal.value,canWriteConfig.value]))
 const locked=computed(()=>!!state.value.busy||workspace.unresolved())
 
+function clearRoster(){shiftDate.value='';shiftCode.value='DAY';primaryUserId.value='';backupUserId.value='';rosterNote.value=''}
+function clearHandoff(){handoffRosterId.value='';incomingUserId.value='';handoffNote.value=''}
+function clearEscalation(){escTicketId.value='';escTier.value='STANDARD';escStepOrder.value=1;escTrigger.value='PHONE_UNANSWERED';escUnansweredCount.value=2}
+function clearPolicy(){preparedPolicy.value=null;editUnansweredCount.value=null;editStep2Wait.value=null;editStep2Role.value=null}
+watch(editPolicyTier,clearPolicy,{flush:'sync'})
+const policyDirty=computed(()=>Boolean(preparedPolicy.value&&(editUnansweredCount.value!==preparedPolicy.value.unanswered_escalate_count||editStep2Wait.value!==preparedPolicy.value.steps[1]?.wait_minutes||editStep2Role.value!==preparedPolicy.value.steps[1]?.target_role)))
+function preparePolicy(){if(locked.value||policyDirty.value)return false;const current=state.value.board?.policies.find(p=>p.tier===editPolicyTier.value);if(!current||current.steps.length<2)return false;preparedPolicy.value=structuredClone(current);editUnansweredCount.value=current.unanswered_escalate_count;editStep2Wait.value=current.steps[1]!.wait_minutes;editStep2Role.value=current.steps[1]!.target_role;return true}
+async function discardPolicy(){const turn=context.value;if(policyDirty.value){try{await ElMessageBox.confirm('清除尚未保存的策略修改？已保存策略不受影响。','保留策略输入',{confirmButtonText:'清除修改',cancelButtonText:'继续编辑',type:'warning'})}catch{return false}}if(turn!==context.value)return false;clearPolicy();return true}
+function clearDrafts(){clearRoster();clearHandoff();clearEscalation();clearPolicy();editPolicyTier.value='STANDARD';blocked.value=false}
+const dirty=computed(()=>Boolean(shiftDate.value||shiftCode.value!=='DAY'||primaryUserId.value||backupUserId.value||rosterNote.value||handoffRosterId.value||incomingUserId.value||handoffNote.value||escTicketId.value||escTier.value!=='STANDARD'||escStepOrder.value!==1||escTrigger.value!=='PHONE_UNANSWERED'||escUnansweredCount.value!==2||policyDirty.value))
+function clearConfirmed(path:string|undefined){if(path==='/oncall/rosters')clearRoster();if(path==='/oncall/handoffs')clearHandoff();if(path==='/oncall/escalations')clearEscalation();if(path==='/escalation-policies')clearPolicy()}
+async function recover(){if(await workspace.retry())clearConfirmed(state.value.receipt?.path)}
 let refreshTimer:ReturnType<typeof setInterval>|null=null
 function clearRefreshTimer(){if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null}}
 function startRefreshTimer(){
  clearRefreshTimer()
  if(!permitted.value)return
- refreshTimer=setInterval(()=>{if(permitted.value&&!locked.value)void workspace.load()},15000)
+ refreshTimer=setInterval(()=>{if(permitted.value&&!locked.value&&!dirty.value&&!document.hidden&&!document.activeElement?.closest('form'))void workspace.load()},15000)
 }
 
 watch(context,()=>{
  const s=session.value
- tab.value='queue'
+ tab.value='queue';clearDrafts()
  workspace.reset(permitted.value&&s?{
   tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,
   canWriteInternal:canWriteInternal.value,canWriteConfig:canWriteConfig.value
@@ -75,6 +89,7 @@ watch(context,()=>{
 },{immediate:true,flush:'sync'})
 
 async function submitRoster(){
+ if(!shiftDate.value)return false
  const existing=state.value.board?.rosters.find(r=>r.shift_date===shiftDate.value&&r.shift_code===shiftCode.value)
  const ok=await workspace.submitRoster({
   expected_version:existing?.version??0,
@@ -84,7 +99,8 @@ async function submitRoster(){
   backup_oncall_user_id:backupUserId.value.trim()||null,
   note:rosterNote.value.trim()||null
  })
- if(ok)rosterNote.value=''
+ if(ok)clearRoster()
+ return ok
 }
 
 async function submitHandoff(){
@@ -93,39 +109,42 @@ async function submitHandoff(){
   incoming_user_id:incomingUserId.value.trim(),
   note:handoffNote.value.trim()
  })
- if(ok)handoffNote.value=''
+ if(ok)clearHandoff()
+ return ok
 }
 
 async function submitEscalation(){
- await workspace.submitEscalation({
+ const ok=await workspace.submitEscalation({
   ticket_id:escTicketId.value.trim(),
   tier:escTier.value,
   step_order:escStepOrder.value,
   trigger_condition:escTrigger.value,
   unanswered_phone_count:escUnansweredCount.value
  })
+ if(ok)clearEscalation();return ok
 }
 
 async function submitPolicyUpdate(){
- const current=state.value.board?.policies.find(p=>p.tier===editPolicyTier.value)
- const expected=current?.persisted?current.version:0
- const baseSteps:EscalationStep[]=current?.steps.length?current.steps.map((s,idx)=>idx===1?{...s,wait_minutes:editStep2Wait.value,target_role:editStep2Role.value}:{...s}):[
-  {step_order:1,trigger_condition:'IMMEDIATE',wait_minutes:0,target_role:'L1_ONCALL'},
-  {step_order:2,trigger_condition:'UNACKNOWLEDGED',wait_minutes:editStep2Wait.value,target_role:editStep2Role.value}
- ]
- await workspace.submitPolicyUpdate({
+ const current=preparedPolicy.value
+ if(!current||current.tier!==editPolicyTier.value||typeof editUnansweredCount.value!=='number'||typeof editStep2Wait.value!=='number'||!editStep2Role.value)return false
+ const expected=current.persisted?current.version:0
+ const baseSteps:EscalationStep[]=current.steps.map((s,idx)=>idx===1?{...s,wait_minutes:editStep2Wait.value!,target_role:editStep2Role.value!}:{...s})
+ const ok=await workspace.submitPolicyUpdate({
   tier:editPolicyTier.value,
   expected_version:expected,
   unanswered_escalate_count:editUnansweredCount.value,
   steps:baseSteps
  })
+ if(ok)clearPolicy();return ok
 }
 
-function mayLeave(){if(workspace.unresolved()){blocked.value=true;return false}return true}
+async function mayLeave(){if(workspace.unresolved()){blocked.value=true;return false}if(!dirty.value)return true;const turn=context.value;try{await ElMessageBox.confirm('离开将丢弃尚未保存的排班、交接或升级输入；已保存记录不受影响。','保留未保存输入',{confirmButtonText:'丢弃并离开',cancelButtonText:'继续编辑',type:'warning'});return turn===context.value}catch{return false}}
 onBeforeRouteLeave(mayLeave)
 const unregister=contextTransitionGuards.register(mayLeave)
-onUnmounted(()=>{clearRefreshTimer();unregister();workspace.dispose()})
-defineExpose({state,workspace,mayLeave})
+function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()||dirty.value){event.preventDefault();event.returnValue=''}}
+window.addEventListener('beforeunload',beforeUnload)
+onUnmounted(()=>{clearRefreshTimer();unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
+defineExpose({state,workspace,mayLeave,dirty,shiftDate,primaryUserId,backupUserId,rosterNote,handoffRosterId,incomingUserId,handoffNote,escTicketId,editStep2Wait,submitRoster,preparedPolicy,preparePolicy,submitPolicyUpdate,editPolicyTier,editUnansweredCount,editStep2Role})
 </script>
 <template>
  <section class="oncall-board">
@@ -139,8 +158,10 @@ defineExpose({state,workspace,mayLeave})
   <p class="panel" v-if="!permitted">当前身份无权访问内部值班看板，或正在切换租户。</p>
   <template v-else>
    <p class="proto-scope-note">
-    本看板每 15s 自动刷新工单 SLA 倒计时队列，交接班固定于每日 18:00 固化未确认、进行中、待复核工单计数（M5-12）。电话连续 2 次未接听将自动升级至下一级并登记短信告知记录（M5-13）；详细排班轮换细则与重呼叫间隔保持待客户确认（CONFIG_PENDING_Q15）。
+    本看板每 15s 自动刷新工单 SLA 倒计时队列，交接班固定于每日 18:00 固化未确认、进行中、待复核工单计数（M5-12）。电话未接听升级以实际策略和显式执行记录为准，短信仅登记待网关意图，不代表已经发送或送达（M5-13）；详细排班轮换细则与重呼叫间隔保持待客户确认（CONFIG_PENDING_Q15）。
    </p>
+   <p v-if="dirty" role="status">存在未保存输入，自动刷新已暂停；离开前会提醒。</p>
+   <p v-if="state.receipt" role="status">原操作回执已核对：{{state.receipt.identity}} · {{displayTime(state.receipt.recordedAt)}}。后续回读失败不表示原操作未保存。</p>
    <div class="proto-kpis" v-if="state.board">
     <div>
      <span>待确认告警/工单</span>
@@ -186,7 +207,7 @@ defineExpose({state,workspace,mayLeave})
 
     <ApiErrorNotice :error="state.error" />
     <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">值班或升级操作提交结果尚未确认，请点击重试。</p>
-    <button v-if="state.attempt&&!state.busy" type="button" @click="workspace.retry()">重试上次提交</button>
+    <button v-if="state.attempt&&!state.busy" type="button" @click="recover">重试上次提交</button>
     <p v-if="state.busy" role="status" aria-live="polite">{{ state.busy==='write'?'正在提交值班/升级记录…':'正在同步值班看板…' }}</p>
 
     <template v-if="tab==='queue'">
@@ -409,21 +430,22 @@ defineExpose({state,workspace,mayLeave})
       <h2>调整档位升级链参数（padmin 专属，M5-13）</h2>
       <div class="form-grid">
        <label>目标档位
-        <select v-model="editPolicyTier" :disabled="locked">
+        <select v-model="editPolicyTier" :disabled="locked||policyDirty">
          <option value="BASIC">基础版升级链</option>
          <option value="STANDARD">标准版升级链</option>
          <option value="ADVANCED">高级版升级链</option>
          <option value="FALLBACK">未配置档位兜底链</option>
         </select>
        </label>
+       <button type="button" :disabled="locked||policyDirty" @click="preparePolicy">载入当前策略版本</button><button type="button" :disabled="locked" @click="discardPolicy">清除策略输入</button><p>{{preparedPolicy?`已锁定源版本 v${preparedPolicy.version}，刷新不自动替换此版本`:'尚未载入策略；先选档位并读取当前版本，缺少第2步时不擅自新增步骤。'}}</p>
        <label>电话连续未接听升级次数
-        <input type="number" min="1" max="10" v-model.number="editUnansweredCount" :disabled="locked" />
+        <input type="number" min="1" max="10" v-model.number="editUnansweredCount" :disabled="locked||!preparedPolicy" />
        </label>
        <label>第 2 步等待分钟数
-        <input type="number" min="0" max="10080" v-model.number="editStep2Wait" :disabled="locked" />
+        <input type="number" min="0" max="10080" v-model.number="editStep2Wait" :disabled="locked||!preparedPolicy" />
        </label>
        <label>第 2 步升级目标角色
-        <select v-model="editStep2Role" :disabled="locked">
+        <select v-model="editStep2Role" :disabled="locked||!preparedPolicy"><option :value="null">尚未载入</option><option value="L1_ONCALL">一线值班工程师</option>
          <option value="L2_ONCALL">二线值班专家</option>
          <option value="DUTY_LEAD">值班主管</option>
          <option value="SERVICE_MANAGER">服务经理</option>
@@ -432,7 +454,7 @@ defineExpose({state,workspace,mayLeave})
         </select>
        </label>
       </div>
-      <button type="submit" class="primary" :disabled="locked">保存升级策略链</button>
+      <button type="submit" class="primary" :disabled="locked||!preparedPolicy">保存升级策略链</button>
      </form>
     </template>
    </div>

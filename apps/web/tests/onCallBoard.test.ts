@@ -150,7 +150,7 @@ describe('on-call board, 18:00 handoff, escalation policies and SLA monthly repo
   request
    .mockResolvedValueOnce(boardPayload())
    .mockRejectedValueOnce(new ApiError(503,'UPSTREAM_UNAVAILABLE','timeout','t'))
-   .mockResolvedValueOnce({id:handoffId})
+   .mockResolvedValueOnce({...boardPayload().handoffs[0],note:'18:00 HANDOFF'})
    .mockResolvedValueOnce(boardPayload())
   await w.load()
   expect(await w.submitHandoff({roster_id:rosterId,incoming_user_id:incoming,note:'18:00 HANDOFF'})).toBe(false)
@@ -172,6 +172,7 @@ describe('on-call board, 18:00 handoff, escalation policies and SLA monthly repo
    steps:[{step_order:1,trigger_condition:'IMMEDIATE',wait_minutes:0,target_role:'L1_ONCALL'}]
   })).toBe(false)
   w.reset(padminScope)
+  request.mockResolvedValueOnce({...boardPayload().policies[0],version:2,steps:[{step_order:1,trigger_condition:'IMMEDIATE',wait_minutes:0,target_role:'L1_ONCALL'}]})
   expect(await w.submitPolicyUpdate({
    tier:'STANDARD',expected_version:1,unanswered_escalate_count:2,
    steps:[{step_order:1,trigger_condition:'IMMEDIATE',wait_minutes:0,target_role:'L1_ONCALL'}]
@@ -217,3 +218,15 @@ describe('on-call board, 18:00 handoff, escalation policies and SLA monthly repo
   expect(slaPage).not.toContain('v-html')
  })
 })
+
+const commands=[
+ {name:'roster',run:(w:ReturnType<typeof createOnCallBoardWorkspace>)=>w.submitRoster({expected_version:0,shift_date:'2026-10-18',shift_code:'DAY',primary_oncall_user_id:actor,backup_oncall_user_id:incoming,note:'SYNTHETIC_ROSTER'}),receipt:()=>boardPayload().rosters[0]!},
+ {name:'handoff',run:(w:ReturnType<typeof createOnCallBoardWorkspace>)=>w.submitHandoff({roster_id:rosterId,incoming_user_id:incoming,note:'SYNTHETIC_1800_HANDOFF'}),receipt:()=>boardPayload().handoffs[0]!},
+ {name:'escalation',run:(w:ReturnType<typeof createOnCallBoardWorkspace>)=>w.submitEscalation({ticket_id:ticket,tier:'STANDARD',step_order:1,trigger_condition:'PHONE_UNANSWERED',unanswered_phone_count:2}),receipt:()=>boardPayload().step_runs[0]!},
+ {name:'policy',run:(w:ReturnType<typeof createOnCallBoardWorkspace>)=>w.submitPolicyUpdate({tier:'STANDARD',expected_version:0,unanswered_escalate_count:2,steps:boardPayload().policies[0]!.steps as any}),receipt:()=>boardPayload().policies[0]!},
+]
+it.each(commands)('$name validates original full receipt and retains it when readback fails',async c=>{const request=vi.fn().mockResolvedValueOnce(c.receipt()).mockRejectedValueOnce(new ApiError(503,'UPSTREAM_UNAVAILABLE','lost','t'));const w=createOnCallBoardWorkspace({request},()=>{},()=> 'stable-command');w.reset(padminScope);expect(await c.run(w)).toBe(true);expect(w.state().receipt).not.toBeNull();expect(w.state().board).toBeNull();expect(w.unresolved()).toBe(false);expect(await w.retry()).toBe(false)})
+it.each(commands)('$name rejects wrong-tenant or partial success without changing original retry identity',async c=>{const request=vi.fn().mockResolvedValueOnce({...c.receipt(),tenant_id:'55000000-0000-4000-8000-000000000999'}).mockResolvedValueOnce({id:'wrong'}).mockResolvedValueOnce(c.receipt()).mockResolvedValueOnce(boardPayload());const key=vi.fn(()=> 'stable-command'),w=createOnCallBoardWorkspace({request},()=>{},key);w.reset(padminScope);expect(await c.run(w)).toBe(false);expect(w.unresolved()).toBe(true);expect(await w.retry()).toBe(false);expect(w.unresolved()).toBe(true);expect(await w.retry()).toBe(true);expect(key).toHaveBeenCalledTimes(1);expect(request.mock.calls[0]![1].body).toEqual(request.mock.calls[2]![1].body);expect(request.mock.calls[0]![1].idempotencyKey).toBe(request.mock.calls[2]![1].idempotencyKey)})
+it('board refresh failure removes old successful counts',async()=>{const request=vi.fn().mockResolvedValueOnce(boardPayload()).mockRejectedValueOnce(new Error('offline')),w=createOnCallBoardWorkspace({request},()=>{});w.reset(mspScope);await w.load();expect(w.state().board).not.toBeNull();await w.load();expect(w.state().board).toBeNull()})
+it('on-call transport cannot mutate the original request retained for recovery',async()=>{const request=vi.fn().mockImplementationOnce(async(_p,o)=>{o.body.note='transport mutation';throw new TypeError('lost')}),w=createOnCallBoardWorkspace({request},()=>{},()=> 'stable-command');w.reset(mspScope);await commands[1]!.run(w);expect(w.state().attempt!.body.note).toBe('SYNTHETIC_1800_HANDOFF')})
+it('scope reset during confirmed-write readback cannot report success into a new form',async()=>{let finish!:(v:unknown)=>void;const request=vi.fn().mockResolvedValueOnce(boardPayload().handoffs[0]).mockImplementationOnce(()=>new Promise(r=>finish=r)),w=createOnCallBoardWorkspace({request},()=>{},()=> 'stable-command');w.reset(mspScope);const pending=commands[1]!.run(w);await vi.waitFor(()=>expect(request).toHaveBeenCalledTimes(2));w.reset(null);finish(boardPayload());expect(await pending).toBe(false);expect(w.state().receipt).toBeNull()})

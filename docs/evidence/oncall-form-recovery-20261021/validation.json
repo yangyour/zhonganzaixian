@@ -1,0 +1,22 @@
+{
+  "base_commit": "156ff447547211b59764e2917ceb0364fb5dbd67",
+  "scope": "ONCALL_FORM_CONTEXT_AND_ORIGINAL_RECEIPTS",
+  "web_tests": {
+    "passed": 2635,
+    "files": 191
+  },
+  "new_tests": 16,
+  "typecheck": "PASS",
+  "build_static_gates": "PASS",
+  "build_id": "4ad1997904d581684a4b46ec6c602d6285a0a7604f5148b4e7c396092611df31",
+  "browser_visual_axe": "NOT_RUN_ENVIRONMENT_BLOCKED",
+  "new_real_http": "NOT_RUN",
+  "backend_and_migrations": "UNCHANGED",
+  "source_sha256": {
+    "apps/web/src/utils/onCallBoard.ts": "47217084474acf764780478fabafb887b7cec683b899360bd2f3b71bc36a3e0a",
+    "apps/web/src/pages/OnCallBoardPage.vue": "3c7ce719ad19e0493f7d69a466a00fd00c62b9c8751d0136b80dde910f3ace55",
+    "apps/web/tests/onCallBoard.test.ts": "526586b08db62f7fc1ed64437e8d99bfe2c960c837941bbbf5b6949b020a179f",
+    "apps/web/tests/onCallBoardPage.test.ts": "06c56ef5136e2d514c58fb93e08f7b02ff97181d0a59196617abd8273c7703f9",
+    "apps/web/tests/slaReportRecovery.test.ts": "5609c9c42ffe0e3d44710b712f03e0e9be9430aa1ce6fd8ddb6d283b660c001f"
+  }
+}

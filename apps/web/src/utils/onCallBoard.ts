@@ -109,15 +109,16 @@ export interface SlaServiceDetailPayload {
 export interface OnCallContext {tenantId:string;actorId:string;permissionVersion:number;canWriteInternal:boolean;canWriteConfig:boolean}
 type WriteAttempt={path:string;method:'POST'|'PATCH';key:string;body:Record<string,unknown>}
 
+export interface OnCallReceipt {path:string;identity:string;version:number|null;recordedAt:string}
 export interface OnCallBoardState {
- board:OnCallBoardPayload|null;busy:'read'|'write'|null;error:unknown;attempt:WriteAttempt|null
+ board:OnCallBoardPayload|null;receipt:OnCallReceipt|null;busy:'read'|'write'|null;error:unknown;attempt:WriteAttempt|null
 }
 export interface SlaReportState {
  report:SlaReportPayload|null;detail:SlaServiceDetailPayload|null;receipt:SlaMonthlyResultRecord|null;
  busy:'read'|'write'|null;error:unknown;attempt:WriteAttempt|null
 }
 
-export const emptyOnCallBoardState=():OnCallBoardState=>({board:null,busy:null,error:null,attempt:null})
+export const emptyOnCallBoardState=():OnCallBoardState=>({board:null,receipt:null,busy:null,error:null,attempt:null})
 export const emptySlaReportState=():SlaReportState=>({report:null,detail:null,receipt:null,busy:null,error:null,attempt:null})
 
 export const shiftCodeLabels:Record<ShiftCode,string>={DAY:'白班（09:00-18:00）',NIGHT:'夜班（18:00-次日09:00）',FULL_DAY:'全天值班（24h）'}
@@ -227,6 +228,40 @@ export function readSlaServiceDetail(raw:unknown,scope:OnCallContext,expectedPer
  return structuredClone(raw) as unknown as SlaServiceDetailPayload
 }
 
+function readOnCallReceipt(raw:unknown,scope:OnCallContext,attempt:WriteAttempt):OnCallReceipt {
+ const b=attempt.body,r=raw as Record<string,unknown>
+ const check=(keys:string[])=>{if(!exportExact(raw,keys)||r.tenant_id!==scope.tenantId)throw invalid()}
+ const same=(keys:string[])=>{if(keys.some(k=>r[k]!==b[k]))throw invalid()}
+ const stamp=(key:string)=>{exportTime(r[key]);return r[key] as string}
+ const identity=()=>{if(!exportUuid(r.id))throw invalid();return r.id as string}
+ if(attempt.path==='/oncall/rosters'){
+  check(['id','tenant_id','version','shift_date','shift_code','handoff_local_time','primary_oncall_user_id','backup_oncall_user_id','note','roster_policy_status','updated_by','updated_at'])
+  same(['shift_date','shift_code','primary_oncall_user_id','backup_oncall_user_id','note'])
+  if(!exportInteger(r.version,1)||r.version!==Number(b.expected_version)+1||r.updated_by!==scope.actorId||r.handoff_local_time!=='18:00'||r.roster_policy_status!=='CONFIG_PENDING_Q15')throw invalid()
+  return {path:attempt.path,identity:identity(),version:r.version as number,recordedAt:stamp('updated_at')}
+ }
+ if(attempt.path==='/oncall/handoffs'){
+  check(['id','tenant_id','roster_id','outgoing_user_id','incoming_user_id','handoff_local_time','unacknowledged_count','in_progress_count','pending_review_count','note','handed_off_at'])
+  same(['roster_id','incoming_user_id','note'])
+  if(r.outgoing_user_id!==scope.actorId||r.outgoing_user_id===r.incoming_user_id||r.handoff_local_time!=='18:00'||!['unacknowledged_count','in_progress_count','pending_review_count'].every(k=>exportInteger(r[k])))throw invalid()
+  return {path:attempt.path,identity:identity(),version:null,recordedAt:stamp('handed_off_at')}
+ }
+ if(attempt.path==='/escalation-policies'){
+  check(['tenant_id','tier','version','unanswered_escalate_count','unanswered_retry_interval_sec','steps','policy_status','updated_by','updated_at','persisted'])
+  same(['tier','unanswered_escalate_count'])
+  const requested=b.steps as EscalationStep[]
+  if(!exportInteger(r.version,1)||r.version!==Number(b.expected_version)+1||r.updated_by!==scope.actorId||r.persisted!==true||r.unanswered_retry_interval_sec!==null||r.policy_status!=='CONFIG_PENDING_Q15'||!Array.isArray(r.steps)||r.steps.length!==requested.length||r.steps.some((step,i)=>!exportExact(step,['step_order','trigger_condition','wait_minutes','target_role'])||Object.keys(step).some(k=>step[k]!==requested[i]![k as keyof EscalationStep])))throw invalid()
+  return {path:attempt.path,identity:String(r.tier),version:r.version as number,recordedAt:stamp('updated_at')}
+ }
+ if(attempt.path==='/oncall/escalations'){
+  check(['id','tenant_id','ticket_id','tier','policy_version','step_order','trigger_condition','wait_minutes','target_role','unanswered_phone_count','escalated_to_step','escalated_target_role','sms_notice_status','sms_notice_summary','recorded_by','recorded_at'])
+  same(['ticket_id','tier','step_order','trigger_condition','unanswered_phone_count'])
+  if(r.recorded_by!==scope.actorId||!exportInteger(r.policy_version)||!exportInteger(r.wait_minutes,0,10080)||!isTargetRole(r.target_role)||r.escalated_to_step!==null&&!exportInteger(r.escalated_to_step,1,8)||r.escalated_target_role!==null&&!isTargetRole(r.escalated_target_role)||!['NOT_REQUIRED','INTENT_RECORDED_PENDING_GATEWAY'].includes(r.sms_notice_status as string)||r.sms_notice_summary!==null&&typeof r.sms_notice_summary!=='string')throw invalid()
+  return {path:attempt.path,identity:identity(),version:null,recordedAt:stamp('recorded_at')}
+ }
+ throw invalid()
+}
+
 export function createOnCallBoardWorkspace(client:{request<T>(path:string,options?:RequestOptions):Promise<T>},changed:(s:OnCallBoardState)=>void,newKey=createRequestId){
  let state=emptyOnCallBoardState(),context:OnCallContext|null=null,epoch=0,abort:AbortController|null=null,disposed=false
  const snapshot=()=>({...structuredClone({...state,error:null}),error:state.error}),emit=()=>changed(snapshot())
@@ -234,7 +269,7 @@ export function createOnCallBoardWorkspace(client:{request<T>(path:string,option
  async function load(){
   if(disposed||!context||state.busy||state.attempt)return false
   const turn=++epoch,scope={...context},controller=new AbortController();abort=controller
-  state={...state,busy:'read',error:null};emit()
+  state={...state,board:null,busy:'read',error:null};emit()
   try{
    const raw=await client.request('/oncall/board?page_size=25',{signal:controller.signal})
    if(disposed||turn!==epoch)return false
@@ -247,14 +282,16 @@ export function createOnCallBoardWorkspace(client:{request<T>(path:string,option
    return false
   }
  }
- async function send(attempt:WriteAttempt,retry=false){
+ async function send(original:WriteAttempt,retry=false){
+  const attempt=structuredClone(original)
   const turn=++epoch,scope=context?{...context}:null
-  state={...state,busy:'write',error:null,attempt};emit()
+  state={...state,busy:'write',error:null,receipt:null,attempt};emit()
   try{
-   await client.request(attempt.path,{method:attempt.method,idempotencyKey:attempt.key,body:attempt.body})
+   const raw=await client.request(attempt.path,{method:attempt.method,idempotencyKey:attempt.key,body:structuredClone(attempt.body)})
    if(disposed||turn!==epoch||!scope)return false
-   state={...state,busy:null,error:null,attempt:null};emit()
-   return await load()
+   const receipt=readOnCallReceipt(raw,scope,attempt)
+   state={...state,board:null,receipt,busy:null,error:null,attempt:null};emit()
+   const reloadTurn=epoch+1;await load();return !disposed&&epoch===reloadTurn
   }catch(error){
    if(disposed||turn!==epoch)return false
    const keep=writeFailureUncertain(retry,error)
@@ -335,7 +372,7 @@ export function createSlaReportWorkspace(client:{request<T>(path:string,options?
    const receipt=readSlaMonthlyRecord(raw,scope,reloadPeriod)
    if(receipt.evaluated_by!==scope.actorId||receipt.version!==Number(attempt.body.expected_version)+1||receipt.frozen!==attempt.body.freeze)throw invalid()
    state={...state,busy:null,error:null,report:null,detail:null,receipt,attempt:null};emit()
-   await load(reloadPeriod);return true
+   const reloadTurn=epoch+1;await load(reloadPeriod);return !disposed&&epoch===reloadTurn
   }catch(error){
    if(disposed||turn!==epoch)return false
    const keep=writeFailureUncertain(retry,error)

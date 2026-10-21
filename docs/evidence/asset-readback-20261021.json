@@ -1,0 +1,33 @@
+{
+  "base_commit": "d47048579498f9c05f3347e120e28513af2eacc6",
+  "result": "PASS_DOM_HTTP_BUILD",
+  "web_tests": 2955,
+  "web_files": 204,
+  "new_web_tests": 39,
+  "contract_tests": 169,
+  "actual_http_checks": 17,
+  "actual_http_vectors_replayed": 5,
+  "successful_get_all_105_table_fingerprints_unchanged": true,
+  "rejected_get_non_audit_tables_unchanged": true,
+  "real_asset_writes": 0,
+  "provider_calls": 0,
+  "api_stopped": true,
+  "temporary_database_and_credentials_removed": true,
+  "typecheck_build_static": "PASS",
+  "build_id": "b249b7415abd74f440bb9dbb4781238bf7713ffd713659ab2283714649b8ff0c",
+  "java_suite": "UNCHANGED_NOT_RERUN",
+  "api_version": "UNCHANGED_0.73.0",
+  "migrations": "V1_V45_UNCHANGED_FRESH_APPLY_AND_REPEAT_VERIFIED",
+  "browser_axe": "NOT_RUN_EXISTING_ENVIRONMENT_LIMITATION",
+  "live_frontend_transport": "NOT_RUN_CAPTURE_REPLAY_AND_DOM_ONLY",
+  "formal_tc_not_run": 128,
+  "source_sha256": {
+    "apps/web/src/App.vue": "40c4519b40c5093668de9d6b0d8bd35b600bc0b2a95bf2c041b1b5b244045089",
+    "apps/web/src/pages/AssetsPage.vue": "40538aa2263760ec8875d62e156ff9fa7cfa93ef6864cf8f6425a6f5a7bb5ac4",
+    "apps/web/src/utils/assetReadback.ts": "d26da75ee1c69bb0974de29cdd109c4d0a1e5bf253b3f37ba8b3aa6079a45cbe",
+    "apps/web/tests/assetReadback.test.ts": "64c5eb1e1c2f846d046e157c33d87dda4dc4171555010df1502d75167ceca264",
+    "apps/web/tests/assetsPageFeedback.test.ts": "1f2970fcbd38964f014b88ebeb141e673eaec7ad851af9ceb2a8475bd878881b",
+    "apps/web/tests/listSearchInteractions.test.ts": "69160e536f1bd22d24c122048ba83d9da1cce65ab1ce667069597c309fcd2312",
+    "fixtures/asset-readback-http-synthetic-20261021.json": "8f3e5993b2c3c1f77a03b0dc3b339df381c54fa666641c7c3d37e600af94144e"
+  }
+}

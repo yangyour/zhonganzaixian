@@ -112,7 +112,7 @@ async function endSession() {
         <div v-if="switchingTenant" class="switching-panel"><el-skeleton :rows="5" animated /><p>正在切换租户，请稍候…</p></div>
         <router-view v-else :key="pageKey" />
       </main>
-      <footer class="app-footer">MOP 运维托管平台 <span>系统服务运行正常 · 租户数据隔离与权限校验已启用</span></footer>
+      <footer class="app-footer">MOP 运维托管平台 <span>数据与操作结果以当前授权接口的实际回读为准</span></footer>
     </div>
   </div>
   </el-config-provider>

@@ -36,12 +36,12 @@ const auth: Session = {
   mode: 'remote_test', identity_source: 'synthetic-unit-only',
 }
 const asset: Asset = {
-  id: 'unit-asset', tenant_id: auth.tenant.id, name: '合成测试设备', type: 'switch',
+  id: '79000000-0000-4000-8000-000000000001', tenant_id: auth.tenant.id, name: '合成测试设备', type: 'switch',
   management_ip: '192.0.2.1', site_id: 'unit-site', status: 'unknown', lifecycle_status: 'DRAFT',
   source: 'test_seed', sampled_at: null, unknown_reason: '合成单元测试数据，未采集',
   version: 1, created_at: '2026-10-08T00:00:00Z', updated_at: '2026-10-08T00:00:00Z',
 }
-const assetPage = (items = [asset], more = false): AssetPage => ({ items, next_cursor: more ? 'unit-next' : null, has_more: more })
+const assetPage = (items = [asset], more = false): AssetPage & Record<string,unknown> => ({ items, next_cursor: more ? 'unit-next' : null, has_more: more,source:'postgresql',page_size_limit:100,page_size_limit_kind:'test_technical_limit' })
 const cases = [
   { path: '/assets', component: AssetsPage, label: '搜索资产', form: 'form.asset-toolbar', emptyButton: '清空筛选，查看全部资产', page: (empty = false, more = false) => assetPage(empty ? [] : [asset], more) },
   { path: '/tickets', component: TicketsPage, label: '搜索报障登记', form: 'form.ticket-filter-form', emptyButton: '清空筛选，查看全部工单', page: (empty = false, more = false) => ticketPage(empty ? [] : more ? Array.from({ length: 15 }, (_, index) => ticket(10 + index)) : [ticket()], more) },

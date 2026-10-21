@@ -5,7 +5,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { feedback as ElMessage } from '../utils/feedback'
 import { api, isCancelled } from '../api/client'
 import type { Asset, AssetPage } from '../api/types'
-import { can, contextGeneration, session } from '../stores/session'
+import { can, contextGeneration, session, switchingTenant } from '../stores/session'
+import {readAssetList,readAssetSnapshot} from '../utils/assetReadback'
 import { assetTypes, displayTime, typeLabel, sourceLabel } from '../utils/display'
 import AppTable from '../components/AppTable.vue'
 import AppliedFilters from '../components/AppliedFilters.vue'
@@ -68,7 +69,9 @@ const loading = ref(false)
 const loaded = ref(false)
 const error = ref<unknown>(null)
 const listController = ref<AbortController>()
-let listGeneration = 0
+let listGeneration = 0, disposed = false
+const readScope=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,session.value?.mode,can('assets:read'),can('assets:write'),switchingTenant.value]))
+const readable=()=>!disposed&&!switchingTenant.value&&!!session.value&&can('assets:read')
 const signature = computed(() => JSON.stringify(['q', 'status', 'type', 'site_id', 'cursor', 'page_size'].map(queryString)))
 watch(signature, () => {
   syncFilterDraft(filters, appliedFilters.value, previousAppliedFilters)
@@ -77,14 +80,17 @@ watch(signature, () => {
 }, { immediate: true })
 async function loadAssets() {
   listController.value?.abort(); const controller = new AbortController(); listController.value = controller
-  const generation = ++listGeneration
+  const generation = ++listGeneration, owner=readScope.value, scope=session.value
   loading.value = true; loaded.value = false; error.value = null; rows.value = []; nextCursor.value = null; hasMore.value = false
+  if(!readable()||!scope){loading.value=false;return}
+  const requestedSize=pageSize.value
   const params = new URLSearchParams({ page_size: String(pageSize.value) })
   for (const key of ['q', 'status', 'type', 'site_id', 'cursor']) if (queryString(key)) params.set(key, queryString(key))
   try {
     const page = await api.request<AssetPage>(`/assets?${params}`, { signal: controller.signal })
-    if (generation !== listGeneration) return
-    rows.value = page.items; nextCursor.value = page.next_cursor; hasMore.value = page.has_more; loaded.value = true
+    if (generation !== listGeneration||owner!==readScope.value||!readable()) return
+    const verified=readAssetList(page,scope.tenant.id,requestedSize,scope.mode)
+    rows.value = verified.items; nextCursor.value = verified.next_cursor; hasMore.value = verified.has_more; loaded.value = true
   } catch (cause) { if (!isCancelled(cause) && generation === listGeneration) error.value = cause }
   finally { if (generation === listGeneration) loading.value = false }
 }
@@ -121,22 +127,23 @@ let detailController: AbortController | undefined
 let detailGeneration = 0
 watch(() => queryString('asset_id'), id => { void loadDetail(id) }, { immediate: true })
 async function loadDetail(id: string) {
-  detailController?.abort(); detailController = new AbortController(); const generation = ++detailGeneration
+  detailController?.abort(); detailController = new AbortController(); const generation = ++detailGeneration, owner=readScope.value, scope=session.value
   asset.value = null; detailClock.value = null; detailError.value = null; onboarding.value = false
-  if (!id) { detailLoading.value = false; return }
+  if (!id||!readable()||!scope) { detailLoading.value = false; return }
   detailLoading.value = true
-  try { const result = await api.requestWithClock<Asset>(`/assets/${encodeURIComponent(id)}`, { signal: detailController.signal }); if (generation === detailGeneration) { detailClock.value = result.clock; asset.value = result.data } }
+  try { const result = await api.requestWithClock<Asset>(`/assets/${encodeURIComponent(id)}`, { signal: detailController.signal }); if (generation === detailGeneration&&owner===readScope.value&&readable()) { const verified=readAssetSnapshot(result.data,scope.tenant.id,id);detailClock.value = result.clock; asset.value = verified } }
   catch (cause) { if (!isCancelled(cause) && generation === detailGeneration) detailError.value = cause }
   finally { if (generation === detailGeneration) detailLoading.value = false }
 }
 function refreshDetail() { void loadDetail(queryString('asset_id')) }
 function openDetail(id: string) { void router.replace({ query: { ...route.query, asset_id: id } }) }
 async function requestOnboarding() {
-  if (!asset.value) return
+  if (!asset.value||!readable()||!can('assets:write')||onboarding.value) return
+  const owner=readScope.value,id=asset.value.id,turn=detailGeneration
   onboarding.value = true; detailError.value = null
-  try { await api.request(`/assets/${encodeURIComponent(asset.value.id)}/onboarding`, { method: 'POST', body: { expected_version: asset.value.version }, signal: detailController?.signal }); await loadDetail(queryString('asset_id')) }
-  catch (cause) { if (!isCancelled(cause)) detailError.value = cause }
-  finally { onboarding.value = false }
+  try { await api.request(`/assets/${encodeURIComponent(asset.value.id)}/onboarding`, { method: 'POST', body: { expected_version: asset.value.version }, signal: detailController?.signal }); if(owner===readScope.value&&turn===detailGeneration&&queryString('asset_id')===id&&readable())await loadDetail(id) }
+  catch (cause) { if (!isCancelled(cause)&&owner===readScope.value&&turn===detailGeneration&&readable()) detailError.value = cause }
+  finally { if(owner===readScope.value&&turn===detailGeneration)onboarding.value = false }
 }
 
 const createOpen = ref(false)
@@ -178,7 +185,7 @@ const importAllowed = computed(() => ['padmin', 'msp', 'tadmin'].includes(sessio
 const availableSites = computed(() => [...new Set(rows.value.filter(item => item.tenant_id === session.value?.tenant.id).map(item => item.site_id))])
 function openCreate() { createOpen.value = true }
 async function beforeCloseCreate(done: () => void) { if (!createPanel.value || await createPanel.value.canLeave()) done() }
-const creationScope = () => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version])
+const creationScope = () => readScope.value
 async function createdAsset(created: Asset) {
   if (created.tenant_id !== session.value?.tenant.id) return
   const scope = creationScope()
@@ -189,11 +196,18 @@ async function createdAsset(created: Asset) {
     if (scope === creationScope()) await loadAssets()
   } catch (cause) { if (!isCancelled(cause) && scope === creationScope()) error.value = cause }
 }
-onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
+watch(readScope,()=>{
+ listGeneration++;detailGeneration++;listController.value?.abort();detailController?.abort();rows.value=[];loaded.value=false;loading.value=false;error.value=null;nextCursor.value=null;hasMore.value=false;cursorHistory.value=[]
+ asset.value=null;detailClock.value=null;detailError.value=null;detailLoading.value=false;onboarding.value=false;detailTab.value='overview';Object.assign(filters,appliedFilters.value);previousAppliedFilters={...appliedFilters.value}
+ createOpen.value=false;dependencyOpen.value=false;dependencyAsset.value=null;metadataOpen.value=false;metadataAsset.value=null;warrantyOpen.value=false;warrantyAsset.value=null;metadataQueryOpen.value=false;dateQueryOpen.value=false;importOpen.value=false
+ if(readable()){void loadAssets();void loadDetail(queryString('asset_id'))}
+},{flush:'sync'})
+onUnmounted(() => { disposed=true;listGeneration++;detailGeneration++;listController.value?.abort(); detailController?.abort() })
 </script>
 <template>
-  <section class="assets-prototype-page">
-    <div v-show="!detailOpen" class="asset-list-workspace">
+  <section class="assets-prototype-page" :aria-busy="loading||detailLoading">
+    <p v-if="!readable()" role="status">当前没有资产读取权限，或正在切换租户；原范围数据已清除。</p>
+    <div v-if="readable()" v-show="!detailOpen" class="asset-list-workspace">
     <div class="page-heading"><div class="asset-page-title"><div class="title-with-context"><h1>资产管理</h1><span class="context-badge">{{ session?.tenant.name }}</span><small class="tabular-nums">当前页 {{ loading || error || !loaded ? '—' : rows.length }} 台设备</small></div><details class="boundary-details"><summary>统计口径说明</summary><p>展示当前租户授权范围内的资产台账与实时监控状态；上方指标仅统计当前页记录，未采集指标标注为待采集。</p></details></div><div class="assets-heading-actions"><div class="asset-view-switch" aria-label="资产显示方式"><button type="button" :class="{ active: assetView === 'list' }" :aria-pressed="assetView === 'list'" @click="assetView = 'list'"><List />列表</button><button type="button" :class="{ active: assetView === 'grid' }" :aria-pressed="assetView === 'grid'" @click="assetView = 'grid'"><Grid />蜂巢</button></div><el-button v-if="exportAllowed" :icon="Download" @click="router.push('/asset-export-jobs')">导出</el-button><PermissionGate capability="assets:write"><el-button v-if="importAllowed" :icon="Upload" @click="importOpen = true">导入</el-button><el-button type="primary" :icon="Plus" @click="openCreate">创建资产草稿</el-button></PermissionGate></div></div>
     <div class="scope-card feature-summary assets-kpis" aria-label="当前页资产统计"><div v-for="metric in pageMetrics" :key="metric.label" :class="metric.tone"><span class="small-label">{{ metric.label }}</span><strong class="tabular-nums">{{ loading || error || !loaded ? '—' : metric.value }}</strong><small>{{ loading || error || !loaded ? '等待当前页数据' : metric.detail }}</small></div></div>
     <div class="panel">
@@ -223,7 +237,7 @@ onUnmounted(() => { listController.value?.abort(); detailController?.abort() })
       <div class="table-footer"><span class="tabular-nums">当前租户授权资产 · 本页 {{ loading || error || !loaded ? '—' : rows.length }} 条</span><div class="cursor-pagination"><el-select :model-value="pageSize" :disabled="loading" aria-label="每页条数" @change="resizePage"><el-option v-for="size in pageSizes" :key="size" :label="`${size} 条 / 页`" :value="size" /></el-select><el-button v-if="queryString('cursor') && !cursorHistory.length" :disabled="loading" @click="firstPage">返回首页</el-button><el-button v-else :disabled="loading || !cursorHistory.length" @click="previousPage">上一页</el-button><el-button :disabled="loading || !hasMore" @click="nextPage">下一页</el-button></div></div>
     </div>
     </div>
-    <section v-if="detailOpen" class="asset-detail-workspace asset-drawer" aria-label="资产详情">
+    <section v-if="detailOpen&&readable()" class="asset-detail-workspace asset-drawer" aria-label="资产详情">
       <div class="asset-detail-top"><el-button :icon="ArrowLeft" text @click="detailOpen = false">返回资产列表</el-button><span>资产管理 / 资产详情</span><el-button :icon="Refresh" :loading="detailLoading" @click="refreshDetail">刷新详情</el-button></div>
       <ApiErrorNotice :error="detailError" />
       <el-skeleton v-if="detailLoading" :rows="8" animated />

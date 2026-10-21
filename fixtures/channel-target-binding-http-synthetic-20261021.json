@@ -1,0 +1,65 @@
+{
+  "captures": [
+    {
+      "case": "email_beyond_200",
+      "channel": "email",
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "user_id": "1b2c1842-5d7e-878d-0da6-ee133e8ef311",
+        "sender": "target-lookup@example.test",
+        "binding": {
+          "id": "19bcb9ad-edba-46f6-bf46-bf3bbdd430dd",
+          "user_id": "1b2c1842-5d7e-878d-0da6-ee133e8ef311",
+          "display_name": "Synthetic target 201",
+          "email": "synthetic-201@example.test",
+          "active": true,
+          "version": 1,
+          "updated_at": "2026-10-21T11:53:33.421Z"
+        },
+        "source": "postgresql"
+      }
+    },
+    {
+      "case": "email_unbound",
+      "channel": "email",
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "user_id": "cfad17b4-bf33-d1b7-e1b1-ead65a9508fe",
+        "sender": "target-lookup@example.test",
+        "binding": null,
+        "source": "postgresql"
+      }
+    },
+    {
+      "case": "wecom_beyond_200",
+      "channel": "wecom",
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "user_id": "1b2c1842-5d7e-878d-0da6-ee133e8ef311",
+        "corp_id": "wwsynthetic12345678",
+        "binding": {
+          "id": "6b6a757d-73cf-4ca1-8623-69010c75c609",
+          "user_id": "1b2c1842-5d7e-878d-0da6-ee133e8ef311",
+          "display_name": "Synthetic target 201",
+          "wecom_user_id": "synthetic_201",
+          "active": true,
+          "version": 1,
+          "verified_at": "2026-10-21T00:03:21Z",
+          "updated_at": "2026-10-21T11:53:33.461Z"
+        },
+        "source": "postgresql"
+      }
+    },
+    {
+      "case": "wecom_unbound",
+      "channel": "wecom",
+      "response": {
+        "tenant_id": "55000000-0000-4000-8000-000000000001",
+        "user_id": "cfad17b4-bf33-d1b7-e1b1-ead65a9508fe",
+        "corp_id": "wwsynthetic12345678",
+        "binding": null,
+        "source": "postgresql"
+      }
+    }
+  ]
+}

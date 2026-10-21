@@ -5,6 +5,8 @@ export function addEmailContract(contract) {
  const binding=obj({id:uuid,user_id:uuid,email,active:bool,version:{type:'integer',minimum:1,maximum:9007199254740991},updated_at:time})
  const delivery=obj({id:uuid,tenant_id:uuid,actor_id:uuid,source_message_id:nullable(uuid),sender:email,recipient:email,kind:{enum:['TEST','NOTIFICATION']},status:{enum:['QUEUED','PROCESSING','ACCEPTED','FAILED','UNKNOWN','CANCELLED']},version:{enum:[0,1,2]},message_id:nullable(str),error_code:nullable(str),smtp_code:nullable({type:'integer',minimum:200,maximum:599}),created_at:time,started_at:nullable(time),finished_at:nullable(time)})
  Object.assign(contract.components.schemas,{
+  TargetEmailBindingResult:envelope(obj({tenant_id:uuid,user_id:uuid,sender:email,binding:nullable({...binding,properties:{...binding.properties,display_name:str},required:[...binding.required,'display_name']}),source:{const:'postgresql'}})),
+
   EmailDelivery:delivery,EmailDeliveryResult:envelope(delivery),EmailDeliveryPageResult:envelope(obj({items:{type:'array',items:delivery,maxItems:100},source:{const:'postgresql'}})),
   EmailBindingResult:envelope(binding),EmailBindingPageResult:envelope(obj({items:{type:'array',items:{...binding,properties:{...binding.properties,display_name:str},required:[...binding.required,'display_name']},maxItems:200},source:{const:'postgresql'}})),
   OwnEmailBindingResult:envelope(obj({tenant_id:uuid,owner_id:uuid,binding:nullable(obj({id:uuid,email,active:bool,version:{type:'integer',minimum:1}})),source:{const:'postgresql'}})),
@@ -18,7 +20,7 @@ export function addEmailContract(contract) {
  contract.paths['/email/status']={get:{...base('getEmailStatus','读取当前租户邮件通道状态与脱敏检查结果','EmailStatusResult'),'x-mop-capability':'users:read'}}
  contract.paths['/email/check']={post:{...write('checkEmailConnection','检查实际SMTP加密认证和持久化依赖；不发送邮件',obj({}),'EmailCheckResult'),'x-mop-capability':'users:write'}}
  contract.paths['/email/bindings']={get:{...base('listEmailBindings','读取管理员明确配置的本租户收件地址','EmailBindingPageResult'),'x-mop-capability':'users:read'}}
- contract.paths['/email/bindings/{userId}']={put:{...write('setEmailBinding','按版本绑定或停用白名单收件地址；该绑定不是邮箱归属验证','EmailBindingInput','EmailBindingResult',200,[path('userId')]),'x-mop-capability':'users:write','x-mop-user-global-scope-required':true}}
+ contract.paths['/email/bindings/{userId}']={get:{...base('getTargetEmailBinding','读取指定本租户账号的精确绑定版本；不依赖200条列表，不调用供应商','TargetEmailBindingResult'),parameters:[path('userId')],'x-mop-capability':'users:read'},put:{...write('setEmailBinding','按版本绑定或停用白名单收件地址；该绑定不是邮箱归属验证','EmailBindingInput','EmailBindingResult',200,[path('userId')]),'x-mop-capability':'users:write','x-mop-user-global-scope-required':true}}
  contract.paths['/my/email-binding']={get:{...base('getOwnEmailBinding','读取当前本人邮箱绑定；未配置返回null','OwnEmailBindingResult'),'x-mop-capability':'tickets:read'}}
  contract.paths['/email/test-messages']={post:{...write('enqueueEmailTest','向服务端固定测试收件人发送固定测试内容；先耐久入队','EmailEnqueueInput','EmailDeliveryResult',202),'x-mop-capability':'users:write'}}
  contract.paths['/my/notifications/{id}/email']={post:{...write('enqueueOwnEmailNotification','明确转发本站本人通知到本人绑定邮箱；来源与绑定永久去重','EmailEnqueueInput','EmailDeliveryResult',202,[path('id')]),'x-mop-capability':'tickets:read'}}

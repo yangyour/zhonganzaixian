@@ -27,6 +27,9 @@ public final class WeComController {
             var checked=service.check();platform.audit(a.actorId(),a.tenantId(),"wecom.application.check","wecom_application",null,Boolean.TRUE.equals(checked.get("ready"))?"SUCCEEDED":"FAILED","REDACTED_PROVIDER_CHECK",a.traceId());return checked;});return success(result,r);
     }
     @GetMapping("/wecom/bindings") Object bindings(HttpServletRequest r){Access a=access(r,"users:read");noQuery(r);return success(map("items",repository.bindings(a,service.corp()),"source","postgresql"),r);}
+    @GetMapping("/wecom/bindings/{userId}") Object targetBinding(@PathVariable String userId,HttpServletRequest r){
+        Access a=access(r,"users:read");noQuery(r);return success(map("tenant_id",a.tenantId(),"user_id",userId,"corp_id",service.corp(),"binding",repository.targetBinding(a,userId,service.corp()),"source","postgresql"),r);
+    }
     @PutMapping(value="/wecom/bindings/{userId}",consumes=MediaType.APPLICATION_JSON_VALUE) Object bind(@PathVariable String userId,HttpServletRequest r){
         Access a=access(r,"users:write");var n=body(r,Set.of("expected_version","wecom_user_id","active"));long version=version(n);String member=text(n,"wecom_user_id",64);if(!n.get("active").isBoolean())throw invalid();boolean active=n.get("active").booleanValue();
         // Resolve target scope before provider I/O, including on idempotent replays.

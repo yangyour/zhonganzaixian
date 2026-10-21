@@ -31,4 +31,14 @@ class WeComControllerTest {
         var response=new MockHttpServletResponse();controller.callback(r,response);assertEquals("/assets",response.getRedirectedUrl());
         var ordered=inOrder(sessions,platform);ordered.verify(sessions).establishProjectSession(argThat(auth->auth.getName().equals(actor)&&auth.getPrincipal() instanceof WeComController.WeComPrincipal p&&p.securityVersion()==9&&p.identitySource().equals("wecom")),eq(20),eq(r),eq(response));ordered.verify(platform).audit(eq(actor),eq(tenant),eq("wecom.login"),eq("session"),isNull(),eq("SUCCEEDED"),anyString(),anyString());
     }
+
+    @Test void exactTargetReadUsesCurrentTenantAndConfiguredChannelWithoutWrites(){
+        var r=request("/wecom/bindings/"+actor,"");r.setMethod("GET");r.removeHeader("Idempotency-Key");controller.targetBinding(actor,r);
+        verify(repository).targetBinding(argThat(a->a.tenantId().equals(tenant)&&a.actorId().equals(actor)&&a.permissionVersion()==3),eq(actor),eq("wwsynthetic12345678"));
+        verify(platform,never()).idempotentAuthorized(any(),any(),any(),any(),any(),anyLong(),any(),any());
+    }
+    @Test void exactTargetReadRejectsQueryOverrideBeforeRepository(){var r=request("/wecom/bindings/"+actor,"");r.setQueryString("tenant_id=other");assertEquals(400,assertThrows(DomainException.class,()->controller.targetBinding(actor,r)).status);verifyNoInteractions(repository);}
+    @Test void exactTargetReadRejectsForeignTenantBeforeRepository(){var r=request("/wecom/bindings/"+actor,"");r.getSession().setAttribute("mop.tenant_id","55000000-0000-4000-8000-000000000002");assertEquals(404,assertThrows(DomainException.class,()->controller.targetBinding(actor,r)).status);verifyNoInteractions(repository);}
+    @Test void exactTargetReadRequiresReadCapability(){when(platform.membership(actor,tenant)).thenReturn(Optional.of(new Membership(actor,tenant,"viewer",3,true)));assertEquals(403,assertThrows(DomainException.class,()->controller.targetBinding(actor,request("/wecom/bindings/"+actor,""))).status);verifyNoInteractions(repository);}
+    @Test void exactTargetReadRequiresAuthenticatedSession(){var r=request("/wecom/bindings/"+actor,"");r.setUserPrincipal(null);assertEquals(401,assertThrows(DomainException.class,()->controller.targetBinding(actor,r)).status);verifyNoInteractions(repository);}
 }

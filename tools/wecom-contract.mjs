@@ -9,6 +9,7 @@ export function addWeComContract(contract) {
   const bindingRead={...binding,properties:{...binding.properties,display_name:str},required:[...binding.required,'display_name']}
   const check={type:'object',properties:{ready:bool,reason:nullable(str),application_name:str,provider_code:nullable({type:'integer'}),checked_at:time},required:['ready','reason'],additionalProperties:false}
   Object.assign(contract.components.schemas,{
+    TargetWeComBindingResult:envelope(obj({tenant_id:uuid,user_id:uuid,corp_id:str,binding:nullable(bindingRead),source:{const:'postgresql'}})),
     WeComDelivery:delivery,WeComDeliveryResult:envelope(delivery),WeComDeliveryPageResult:envelope(obj({items:{type:'array',items:delivery,maxItems:100},source:{const:'postgresql'}})),
     WeComBindingResult:envelope(binding),WeComBindingPageResult:envelope(obj({items:{type:'array',items:bindingRead,maxItems:200},source:{const:'postgresql'}})),
     WeComCheckResult:envelope(check),
@@ -25,7 +26,7 @@ export function addWeComContract(contract) {
   contract.paths['/wecom/status']={get:{...base('getWeComStatus','读取本租户企业微信配置状态与脱敏检查结果','WeComStatusResult'),'x-mop-capability':'users:read'}}
   contract.paths['/wecom/check']={post:{...write('checkWeComApplication','检查真实应用与持久化依赖，记录脱敏审计',obj({}),'WeComCheckResult'),'x-mop-capability':'users:write'}}
   contract.paths['/wecom/bindings']={get:{...base('listWeComBindings','读取本租户显式账号绑定','WeComBindingPageResult'),'x-mop-capability':'users:read'}}
-  contract.paths['/wecom/bindings/{userId}']={put:{...write('setWeComBinding','核验成员后显式绑定或停用；停用推进认证版本撤销会话','WeComBindingInput','WeComBindingResult',200,[path('userId')]),'x-mop-capability':'users:write','x-mop-cross-tenant':'404','x-mop-user-global-scope-required':true}}
+  contract.paths['/wecom/bindings/{userId}']={get:{...base('getTargetWeComBinding','读取指定本租户账号的精确绑定版本；不依赖200条列表，不调用供应商','TargetWeComBindingResult'),parameters:[path('userId')],'x-mop-capability':'users:read'},put:{...write('setWeComBinding','核验成员后显式绑定或停用；停用推进认证版本撤销会话','WeComBindingInput','WeComBindingResult',200,[path('userId')]),'x-mop-capability':'users:write','x-mop-cross-tenant':'404','x-mop-user-global-scope-required':true}}
   contract.paths['/wecom/test-messages']={post:{...write('enqueueWeComTest','受理一条向服务端明确配置成员发送的固定测试消息；耐久入队不等于送达','WeComEnqueueInput','WeComDeliveryResult',202),'x-mop-capability':'users:write'}}
   contract.paths['/my/notifications/{id}/wecom']={post:{...write('enqueueOwnWeComNotification','将本人站内通知发送给本人已绑定成员；来源与绑定组合永久去重','WeComEnqueueInput','WeComDeliveryResult',202,[path('id')]),'x-mop-capability':'tickets:read','x-mop-cross-tenant':'404'}}
   contract.paths['/wecom/deliveries']={get:{...base('listWeComDeliveries','本人发送记录；拥有users:read者可读当前租户台账','WeComDeliveryPageResult'),'x-mop-capability':'tickets:read'}}

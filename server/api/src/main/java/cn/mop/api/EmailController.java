@@ -26,6 +26,9 @@ public final class EmailController {
     }
     @GetMapping("/email/bindings") Object bindings(HttpServletRequest r){Access a=access(r,"users:read");noQuery(r);return success(map("items",repository.bindings(a,service.sender()),"source","postgresql"),r);}
     @GetMapping("/my/email-binding") Object ownBinding(HttpServletRequest r){Access a=access(r,"tickets:read");noQuery(r);return success(map("tenant_id",a.tenantId(),"owner_id",a.actorId(),"binding",repository.ownBinding(a,service.sender()),"source","postgresql"),r);}
+    @GetMapping("/email/bindings/{userId}") Object targetBinding(@PathVariable String userId,HttpServletRequest r){
+        Access a=access(r,"users:read");noQuery(r);return success(map("tenant_id",a.tenantId(),"user_id",userId,"sender",service.sender(),"binding",repository.targetBinding(a,userId,service.sender()),"source","postgresql"),r);
+    }
     @PutMapping(value="/email/bindings/{userId}",consumes=MediaType.APPLICATION_JSON_VALUE) Object bind(@PathVariable String userId,HttpServletRequest r){
         Access a=access(r,"users:write");var n=body(r,Set.of("expected_version","email","active"));long expected=version(n);
         if(!n.path("email").isTextual()||!n.path("active").isBoolean())throw invalid();

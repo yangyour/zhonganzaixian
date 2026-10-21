@@ -23,4 +23,14 @@ class EmailControllerTest {
     @Test void disabledDispatchDoesNotEnqueue(){doThrow(new DomainException(503,"EMAIL_DISPATCH_DISABLED","disabled")).when(service).requireDispatch();assertEquals(503,assertThrows(DomainException.class,()->controller.test(request("/email/test-messages","{\"expected_version\":0}"),new MockHttpServletResponse())).status);verify(repository,never()).enqueueTest(any(),anyString(),anyString(),anyString(),anyString());}
     @Test void ownNotificationUsesCurrentActorAndOnlySourceId(){var r=request("/my/notifications/"+actor+"/email","{\"expected_version\":0}");var response=new MockHttpServletResponse();controller.notification(actor,r,response);assertEquals(202,response.getStatus());verify(repository).authorizeSend(argThat(a->a.actorId().equals(actor)),eq(actor));verify(repository).enqueueNotification(any(),eq("sender@example.test"),eq(actor));}
     @Test void queryOverridesAreRejected(){var r=request("/email/check","{}");r.setQueryString("tenant_id=other");assertEquals(400,assertThrows(DomainException.class,()->controller.check(r)).status);verify(service,never()).check();}
+
+    @Test void exactTargetReadUsesCurrentTenantAndConfiguredChannelWithoutWrites(){
+        var r=request("/email/bindings/"+actor,"");r.setMethod("GET");r.removeHeader("Idempotency-Key");controller.targetBinding(actor,r);
+        verify(repository).targetBinding(argThat(a->a.tenantId().equals(tenant)&&a.actorId().equals(actor)&&a.permissionVersion()==3),eq(actor),eq("sender@example.test"));
+        verify(platform,never()).idempotentAuthorized(any(),any(),any(),any(),any(),anyLong(),any(),any());
+    }
+    @Test void exactTargetReadRejectsQueryOverrideBeforeRepository(){var r=request("/email/bindings/"+actor,"");r.setQueryString("tenant_id=other");assertEquals(400,assertThrows(DomainException.class,()->controller.targetBinding(actor,r)).status);verifyNoInteractions(repository);}
+    @Test void exactTargetReadRejectsForeignTenantBeforeRepository(){var r=request("/email/bindings/"+actor,"");r.getSession().setAttribute("mop.tenant_id","55000000-0000-4000-8000-000000000002");assertEquals(404,assertThrows(DomainException.class,()->controller.targetBinding(actor,r)).status);verifyNoInteractions(repository);}
+    @Test void exactTargetReadRequiresReadCapability(){when(platform.membership(actor,tenant)).thenReturn(Optional.of(new Membership(actor,tenant,"viewer",3,true)));assertEquals(403,assertThrows(DomainException.class,()->controller.targetBinding(actor,request("/email/bindings/"+actor,""))).status);verifyNoInteractions(repository);}
+    @Test void exactTargetReadRequiresAuthenticatedSession(){var r=request("/email/bindings/"+actor,"");r.setUserPrincipal(null);assertEquals(401,assertThrows(DomainException.class,()->controller.targetBinding(actor,r)).status);verifyNoInteractions(repository);}
 }

@@ -1,0 +1,43 @@
+{
+  "exit": 0,
+  "cases": [
+    {
+      "name": "otherTenantTargetReturnsNotFoundInsteadOfFalseUnbound()",
+      "passed": true
+    },
+    {
+      "name": "emailReadsBeyondTwoHundredWithoutListInference()",
+      "passed": true
+    },
+    {
+      "name": "knownMemberWithoutBindingReturnsExplicitNull()",
+      "passed": true
+    },
+    {
+      "name": "wecomReadsBeyondTwoHundredWithoutListInference()",
+      "passed": true
+    },
+    {
+      "name": "senderAndCorpScopeDoNotLeakAnotherConfiguration()",
+      "passed": true
+    },
+    {
+      "name": "malformedTargetIsRejected()",
+      "passed": true
+    },
+    {
+      "name": "viewerCannotReadAdministrativeTargetBinding()",
+      "passed": true
+    },
+    {
+      "name": "stalePermissionVersionCannotRead()",
+      "passed": true
+    },
+    {
+      "name": "unknownTargetReturnsNotFound()",
+      "passed": true
+    }
+  ],
+  "expected": 9,
+  "diagnostics": []
+}

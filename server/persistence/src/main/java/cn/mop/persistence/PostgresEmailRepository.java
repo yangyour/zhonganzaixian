@@ -20,6 +20,15 @@ public final class PostgresEmailRepository {
     public Map<String,Object> ownBinding(Access a,String sender) {
         return read(c->{ authorize(c,a,"tickets:read"); var values=rows(c,"SELECT id,email,active,version FROM public.mop_email_binding WHERE tenant_id=?::uuid AND user_id=?::uuid AND sender=?",a.tenantId(),a.actorId(),sender); return values.isEmpty()?null:values.get(0); });
     }
+    /** Exact target lookup, independent of the bounded overview list. No provider access or writes. */
+    public Map<String,Object> targetBinding(Access a,String user,String sender) {
+        String target=uuid(user);
+        return read(c->{authorize(c,a,"users:read");
+            one(c,"SELECT user_id FROM public.mop_membership WHERE tenant_id=?::uuid AND user_id=?::uuid",a.tenantId(),target);
+            var values=rows(c,"SELECT b.id,b.user_id,u.display_name,b.email,b.active,b.version,b.updated_at FROM public.mop_email_binding b JOIN public.mop_user u ON u.id=b.user_id WHERE b.tenant_id=?::uuid AND b.user_id=?::uuid AND b.sender=?",a.tenantId(),target,sender);
+            return values.isEmpty()?null:values.get(0);
+        });
+    }
     public void authorizeBinding(Access a,String user) { sql(platform.idempotentCommandConnection(),c->{bindingScope(c,a,user);return null;}); }
     private void bindingScope(Connection c,Access a,String user)throws SQLException {
         authorize(c,a,"users:write"); one(c,"SELECT user_id FROM public.mop_membership WHERE tenant_id=?::uuid AND user_id=?::uuid AND active",a.tenantId(),uuid(user));

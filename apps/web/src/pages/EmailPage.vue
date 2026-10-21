@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import '../styles/adminPrototype.css'
-import {computed,nextTick,onMounted,onUnmounted,ref,watch} from 'vue'
+import {computed,nextTick,onMounted,onUnmounted,ref,shallowRef,watch} from 'vue'
 import {ElMessageBox} from 'element-plus'
 import {api,ApiError,isCancelled} from '../api/client'
 import {can,session,contextGeneration,switchingTenant} from '../stores/session'
+import {createTargetBindingWorkspace,emptyTargetBindingState,type TargetBindingState} from '../utils/channelTargetBinding'
 import {useIdentityEditor} from '../utils/useIdentityEditor'
 import {readUserPage,type UserPage} from '../utils/projectIdentity'
 import {emailStatusLabels,emailErrorLabels,type EmailStatus,type EmailBinding,type EmailDelivery} from '../utils/email'
@@ -14,10 +15,12 @@ const status=ref<EmailStatus|null>(null),bindings=ref<EmailBinding[]>([]),delive
 const loading=ref(false),error=ref<unknown>(null),userId=ref(''),email=ref('')
 const accountSearchInput=ref<HTMLInputElement|null>(null)
 const accountQuery=ref(''),appliedAccountQuery=ref(''),accountPage=ref(1)
+const targetBinding=shallowRef<TargetBindingState>(emptyTargetBindingState())
+const targetWorkspace=createTargetBindingWorkspace(api,value=>{targetBinding.value=value})
 const scope=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,session.value?.mode,can('users:read'),can('users:write'),can('tickets:read'),switchingTenant.value]))
 let epoch=0,disposed=false,controller:AbortController|null=null
 const readable=()=>!disposed&&!switchingTenant.value&&!!session.value&&can('users:read')
-function clearFacts(){status.value=null;bindings.value=[];deliveries.value=[];users.value=null}
+function clearFacts(){targetWorkspace.reset();status.value=null;bindings.value=[];deliveries.value=[];users.value=null}
 async function load(){
  clearFacts()
  const turn=++epoch,owner=scope.value;controller?.abort();controller=new AbortController();error.value=null;loading.value=false
@@ -31,9 +34,15 @@ async function load(){
 }
 const editor=useIdentityEditor(load),command=editor.command,message=editor.message
 const locked=computed(()=>!readable()||!status.value||!users.value||loading.value||editor.busy()||!can('users:write'))
-function clear(){accountQuery.value='';appliedAccountQuery.value='';accountPage.value=1;epoch++;controller?.abort();status.value=null;bindings.value=[];deliveries.value=[];users.value=null;userId.value='';email.value='';error.value=null;loading.value=false;editor.clear()}
+const bindingLocked=computed(()=>locked.value||targetBinding.value.busy||!targetBinding.value.ready||targetBinding.value.context?.userId!==userId.value)
+async function readSelectedBinding(){
+ if(!readable()||loading.value||editor.busy()||!status.value||!users.value?.items.some(user=>user.id===userId.value&&user.active&&user.member_active))return false
+ return targetWorkspace.load({kind:'email',tenantId:session.value!.tenant.id,userId:userId.value,channelIdentity:status.value.sender})
+}
+watch(userId,()=>{targetWorkspace.reset();if(userId.value)void readSelectedBinding()},{flush:'sync'})
+function clear(){targetWorkspace.reset();accountQuery.value='';appliedAccountQuery.value='';accountPage.value=1;epoch++;controller?.abort();status.value=null;bindings.value=[];deliveries.value=[];users.value=null;userId.value='';email.value='';error.value=null;loading.value=false;editor.clear()}
 watch([userId,email],()=>{editor.dirty.value=!!userId.value||!!email.value},{flush:'sync'})
-watch(scope,()=>{clear();if(readable())void load()},{flush:'sync'});onMounted(load);onUnmounted(()=>{disposed=true;clear()})
+watch(scope,()=>{clear();if(readable())void load()},{flush:'sync'});onMounted(load);onUnmounted(()=>{disposed=true;clear();targetWorkspace.dispose()})
 async function refresh(){const owner=scope.value;if(editor.busy()||!await editor.leave()||owner!==scope.value||disposed)return;userId.value='';email.value='';editor.clear();await load()}
 async function browseAccounts(nextPage:number,search=false){
  const owner=scope.value,query=search?accountQuery.value.trim():appliedAccountQuery.value
@@ -47,7 +56,14 @@ async function test(){
  const owner=scope.value,recipient=status.value.test_recipient;try{await ElMessageBox.confirm(`将向 ${status.value.test_recipient} 发送一封“【MOP 联调测试】邮件通道验证”。`,'发送测试邮件',{confirmButtonText:'发送',cancelButtonText:'取消'})}catch{return}
  if(owner===scope.value&&!locked.value&&!editor.dirty.value&&status.value?.dispatch_enabled&&status.value.test_recipient===recipient)await editor.save('/email/test-messages','POST',{expected_version:0})
 }
-async function bind(){if(locked.value||!userId.value||!email.value||!users.value?.items.some(user=>user.id===userId.value&&user.active&&user.member_active)||!status.value?.allowed_recipients.includes(email.value))return;const old=bindings.value.find(row=>row.user_id===userId.value);const owner=scope.value,selected=userId.value,value=email.value;const saved=await editor.save(`/email/bindings/${userId.value}`,'PUT',{expected_version:old?.version??0,email:email.value,active:true});if(saved&&owner===scope.value&&selected===userId.value&&value===email.value){userId.value='';email.value='';editor.dirty.value=false}}
+async function bind(){if(bindingLocked.value||!userId.value||!email.value||!users.value?.items.some(user=>user.id===userId.value&&user.active&&user.member_active)||!status.value?.allowed_recipients.includes(email.value))return;const old=targetBinding.value.binding;const owner=scope.value,selected=userId.value,value=email.value;const saved=await editor.save(`/email/bindings/${userId.value}`,'PUT',{expected_version:old?.version??0,email:email.value,active:true});if(saved&&owner===scope.value&&selected===userId.value&&value===email.value){userId.value='';email.value='';editor.dirty.value=false}}
+async function disableSelected(){
+ const b=targetBinding.value.binding,owner=scope.value,selected=userId.value,draft=email.value
+ if(bindingLocked.value||!b?.active||!('email' in b))return
+ try{await ElMessageBox.confirm('将停用所选账号的现有绑定，并放弃本页未保存的绑定编辑。','停用所选账号绑定',{confirmButtonText:'确认停用',cancelButtonText:'取消',type:'warning'})}catch{return}
+ if(owner!==scope.value||bindingLocked.value||userId.value!==selected||email.value!==draft||targetBinding.value.binding?.id!==b.id||targetBinding.value.binding.version!==b.version)return
+ userId.value='';email.value='';editor.clear();await editor.save(`/email/bindings/${selected}`,'PUT',{expected_version:b.version,email:b.email,active:false})
+}
 async function disable(row:EmailBinding){if(!locked.value&&!editor.dirty.value)await editor.save(`/email/bindings/${row.user_id}`,'PUT',{expected_version:row.version,email:row.email,active:false})}
 </script>
 <template><section :aria-busy="loading" class="identity-page admin-prototype email-page">
@@ -68,7 +84,16 @@ async function disable(row:EmailBinding){if(!locked.value&&!editor.dirty.value)a
    <form class="account-search" @submit.prevent="browseAccounts(1,true)"><label>搜索平台账号<input ref="accountSearchInput" v-model="accountQuery" aria-label="搜索平台账号" maxlength="100" :disabled="loading||editor.busy()" /></label><el-button native-type="submit" :disabled="loading||editor.busy()">搜索账号</el-button></form>
    <div class="account-pages" aria-label="账号选项分页"><el-button :disabled="loading||editor.busy()||accountPage<=1" @click="browseAccounts(accountPage-1)">上一页账号</el-button><span role="status">账号选项第 {{accountPage}} 页，本页 {{users?.items.length??0}} 个{{users?.has_more?'，还有下一页':''}}</span><el-button :disabled="loading||editor.busy()||accountPage>=10000||!users?.has_more" @click="browseAccounts(accountPage+1)">下一页账号</el-button></div>
    <p v-if="users&&!users.items.length">当前搜索或页面没有可选的启用账号。可更改搜索，或返回上一页。</p>
-   <form class="email-bind" @submit.prevent="bind"><label>平台账号<el-select v-model="userId" aria-label="邮件绑定的平台账号" :disabled="locked" filterable><el-option v-for="user in users?.items" :key="user.id" :value="user.id" :label="`${user.display_name}（${user.username??user.id}）`"/></el-select></label><label>收件地址<el-select v-model="email" aria-label="绑定的收件邮箱" :disabled="locked"><el-option v-for="address in status.allowed_recipients" :key="address" :value="address" :label="address"/></el-select></label><el-button native-type="submit" type="primary" :disabled="locked||!userId||!email">保存绑定</el-button></form>
+   <div v-if="userId" class="target-binding-status" :aria-busy="targetBinding.busy">
+    <p v-if="targetBinding.busy" role="status">正在读取所选账号的精确绑定与版本…</p>
+    <p v-else-if="targetBinding.ready" role="status">{{targetBinding.binding?'已读取所选账号的绑定，版本 '+targetBinding.binding.version+'；'+(targetBinding.binding.active?'当前已启用。':'当前已停用。'):'已明确读取：所选账号在当前通道尚未绑定。'}}</p>
+    <p v-else role="status">所选账号绑定尚未确认，不能保存。读取失败不代表未绑定。</p>
+    <ApiErrorNotice v-if="targetBinding.error" :error="targetBinding.error" />
+    <el-button v-if="targetBinding.ready&&targetBinding.binding?.active" :disabled="bindingLocked" @click="disableSelected">停用所选账号绑定</el-button>
+    <el-button :disabled="loading||editor.busy()||targetBinding.busy" @click="readSelectedBinding">重新读取所选账号绑定</el-button>
+   </div>
+   <p v-if="targetBinding.ready&&targetBinding.binding&&'email' in targetBinding.binding">当前绑定的收件地址：{{targetBinding.binding.email}}</p>
+   <form class="email-bind" @submit.prevent="bind"><label>平台账号<el-select v-model="userId" aria-label="邮件绑定的平台账号" :disabled="locked" filterable><el-option v-for="user in users?.items" :key="user.id" :value="user.id" :label="`${user.display_name}（${user.username??user.id}）`"/></el-select></label><label>收件地址<el-select v-model="email" aria-label="绑定的收件邮箱" :disabled="locked"><el-option v-for="address in status.allowed_recipients" :key="address" :value="address" :label="address"/></el-select></label><el-button native-type="submit" type="primary" :disabled="bindingLocked||!userId||!email">保存绑定</el-button></form>
    <div class="admin-table-scroll" tabindex="0" role="region" aria-label="邮件账号绑定，可横向滚动"><table class="admin-table"><caption>邮件账号绑定</caption><thead><tr><th scope="col">平台用户</th><th scope="col">收件地址</th><th scope="col">状态</th><th scope="col">操作</th></tr></thead><tbody><tr v-for="row in bindings" :key="row.id"><td>{{row.display_name??row.user_id}}</td><td>{{row.email}}</td><td>{{row.active?'已绑定':'已停用'}}</td><td><el-button v-if="row.active" :disabled="locked||editor.dirty.value" @click="disable(row)">停用绑定</el-button></td></tr><tr v-if="!bindings.length"><td colspan="4">尚无收件地址绑定。</td></tr></tbody></table></div>
   </section>
   <p v-if="!can('tickets:read')">当前没有读取发送记录的权限；账号绑定与连接配置仍可按已有权限操作。</p>
@@ -77,4 +102,4 @@ async function disable(row:EmailBinding){if(!locked.value&&!editor.dirty.value)a
   </section>
  </template>
 </section></template>
-<style scoped>.email-page{display:grid;gap:18px;min-width:0}.email-actions,.email-bind{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin:16px}.email-bind label{display:grid;gap:8px;min-width:220px;flex:1}.email-page .admin-card>p{margin:14px 16px}.email-page dd,.email-actions span{overflow-wrap:anywhere}.email-page .admin-table{min-width:680px}@media(max-width:600px){.email-bind{display:grid}.email-bind label{min-width:0}.email-actions>*{min-height:44px}}.email-page :deep(.el-button),.email-page :deep(.el-input__wrapper),.email-page :deep(.el-select__wrapper){min-height:44px}.email-page .admin-table-scroll:focus-visible{outline:2px solid #2563eb;outline-offset:2px}.account-search,.account-pages{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:16px}.account-search label{display:grid;gap:6px;min-width:0}.account-search input{min-height:44px;max-width:100%;box-sizing:border-box}.email-page{min-width:0}</style>
+<style scoped>.email-page{display:grid;gap:18px;min-width:0}.email-actions,.email-bind{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin:16px}.email-bind label{display:grid;gap:8px;min-width:220px;flex:1}.email-page .admin-card>p{margin:14px 16px}.email-page dd,.email-actions span{overflow-wrap:anywhere}.email-page .admin-table{min-width:680px}@media(max-width:600px){.email-bind{display:grid}.email-bind label{min-width:0}.email-actions>*{min-height:44px}}.email-page :deep(.el-button),.email-page :deep(.el-input__wrapper),.email-page :deep(.el-select__wrapper){min-height:44px}.email-page .admin-table-scroll:focus-visible{outline:2px solid #2563eb;outline-offset:2px}.account-search,.account-pages{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:16px}.account-search label{display:grid;gap:6px;min-width:0}.account-search input{min-height:44px;max-width:100%;box-sizing:border-box}.email-page{min-width:0}.target-binding-status{margin:16px;overflow-wrap:anywhere}</style>

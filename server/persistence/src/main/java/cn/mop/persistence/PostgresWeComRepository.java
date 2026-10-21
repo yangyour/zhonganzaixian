@@ -18,6 +18,15 @@ public final class PostgresWeComRepository {
     public List<Map<String,Object>> bindings(Access a, String corp) {
         return read(c->{authorize(c,a,"users:read");return rows(c,"SELECT b.id,b.user_id,u.display_name,b.wecom_user_id,b.active,b.version,b.verified_at,b.updated_at FROM public.mop_wecom_binding b JOIN public.mop_user u ON u.id=b.user_id WHERE b.tenant_id=?::uuid AND b.corp_id=? ORDER BY b.created_at,b.id LIMIT 200",a.tenantId(),corp);});
     }
+    /** Exact target lookup, independent of the bounded overview list. No provider access or writes. */
+    public Map<String,Object> targetBinding(Access a,String user,String corp) {
+        String target=uuid(user);
+        return read(c->{authorize(c,a,"users:read");
+            one(c,"SELECT user_id FROM public.mop_membership WHERE tenant_id=?::uuid AND user_id=?::uuid",a.tenantId(),target);
+            var values=rows(c,"SELECT b.id,b.user_id,u.display_name,b.wecom_user_id,b.active,b.version,b.verified_at,b.updated_at FROM public.mop_wecom_binding b JOIN public.mop_user u ON u.id=b.user_id WHERE b.tenant_id=?::uuid AND b.user_id=?::uuid AND b.corp_id=?",a.tenantId(),target,corp);
+            return values.isEmpty()?null:values.get(0);
+        });
+    }
     public void authorizeBinding(Access a, String user) {
         Connection c=platform.idempotentCommandConnection(); sql(c,db->{bindingScope(db,a,user);return null;});
     }

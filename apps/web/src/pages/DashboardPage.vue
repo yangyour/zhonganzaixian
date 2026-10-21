@@ -8,6 +8,7 @@ import {displayTime} from '../utils/display'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import LiveMonitoringPanel from '../components/LiveMonitoringPanel.vue'
 import DashboardEventsPanel from '../components/DashboardEventsPanel.vue'
+import DashboardWorkflowsPanel from '../components/DashboardWorkflowsPanel.vue'
 import DashboardReportsPanel from '../components/DashboardReportsPanel.vue'
 
 const state=shallowRef<DashboardState>(emptyDashboardState()),autoRefresh=ref(true)
@@ -16,8 +17,8 @@ const workspace=createDashboardWorkspace(api,next=>{state.value=next})
 let disposed=false,timer:ReturnType<typeof setInterval>|null=null
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&['viewer','tadmin','msp','padmin'].includes(session.value.user.role)&&can('dashboard:read')&&!switchingTenant.value))
 const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value]))
-const kpis=[{id:'ASSET_ONLINE_RATE',title:'资产在线率',hint:'正常、未知与总数均待采集'},{id:'CURRENT_PROBLEMS',title:'当前问题数',hint:'事件源待接入，缺失数据不计为零告警'},{id:'MONTH_SERVICE_AVAILABILITY',title:'本月服务可用率',hint:'按当月1日 00:00（北京时间）起统计'},{id:'PENDING_TICKETS',title:'待处理工单',hint:'工单流转与 SLA 超时口径待接入'},{id:'MTTA_24H',title:'最近24小时 MTTA',hint:'待接入告警事件与响应确认时间'},{id:'DELIVERY_RATE_24H',title:'最近24小时送达率',hint:'受理不等于送达，通道回执待接入'}]
-const panels=[{id:'ALERT_TREND',title:'告警趋势',hint:'告警事件源待接入，暂无趋势曲线数据'},{id:'SERVICE_HEALTH',title:'服务健康概览',hint:'服务健康区间样本待接入，暂未判定状态'},{id:'FAULT_TIMELINE',title:'最近24小时故障时间轴',hint:'最多展示 8 条记录；故障区间数据待采集'},{id:'RECENT_EVENTS',title:'近期事件指标口径',hint:'授权运营角色的最近7条实际事件见上方；统一运营指标接口尚未接入'},{id:'PENDING_TICKETS',title:'待处理工单列表',hint:'最多展示 5 条；待接入正式工单流转状态'},{id:'RESOURCE_TOP5',title:'资源使用 Top5',hint:'全量资产排行待接入，已绑定设备排行见上方监控面板'}]
+const kpis=[{id:'ASSET_ONLINE_RATE',title:'资产在线率',hint:'正常、未知与总数均待采集'},{id:'CURRENT_PROBLEMS',title:'当前问题数',hint:'事件源待接入，缺失数据不计为零告警'},{id:'MONTH_SERVICE_AVAILABILITY',title:'本月服务可用率',hint:'按当月1日 00:00（北京时间）起统计'},{id:'PENDING_TICKETS',title:'待处理工单',hint:'已激活工作流见下方；全租户待办与SLA超时口径待接入'},{id:'MTTA_24H',title:'最近24小时 MTTA',hint:'待接入告警事件与响应确认时间'},{id:'DELIVERY_RATE_24H',title:'最近24小时送达率',hint:'受理不等于送达，通道回执待接入'}]
+const panels=[{id:'ALERT_TREND',title:'告警趋势',hint:'告警事件源待接入，暂无趋势曲线数据'},{id:'SERVICE_HEALTH',title:'服务健康概览',hint:'服务健康区间样本待接入，暂未判定状态'},{id:'FAULT_TIMELINE',title:'最近24小时故障时间轴',hint:'最多展示 8 条记录；故障区间数据待采集'},{id:'RECENT_EVENTS',title:'近期事件指标口径',hint:'授权运营角色的最近7条实际事件见上方；统一运营指标接口尚未接入'},{id:'PENDING_TICKETS',title:'待处理工单统一口径',hint:'分状态真实工作流见上方；统一待办总量口径仍待确认'},{id:'RESOURCE_TOP5',title:'资源使用 Top5',hint:'全量资产排行待接入，已绑定设备排行见上方监控面板'}]
 const noDataText=computed(()=>state.value.busy?'正在读取授权状态…':state.value.error?'读取失败，未显示旧投影':state.value.current?'未知':'尚未读取')
 watch(contextKey,()=>{const current=session.value;workspace.reset(!disposed&&permitted.value&&current?{tenantId:current.tenant.id,actorId:current.user.id,permissionVersion:current.permission_version,role:current.user.role,canRead:true}:null);if(!disposed&&permitted.value)void workspace.load()},{immediate:true,flush:'sync'})
 async function refresh(){if(disposed||!permitted.value)return false;return workspace.load()}
@@ -38,6 +39,7 @@ defineExpose({state,autoRefresh,refresh,changeWindow})
    <LiveMonitoringPanel v-if="can('assets:read')" :auto-refresh="autoRefresh" />
    <DashboardEventsPanel />
    <DashboardReportsPanel v-if="can('tickets:read')" />
+   <DashboardWorkflowsPanel v-if="can('tickets:read')" />
    <details class="formal-dashboard-status"><summary>全量运营指标与接入状态</summary><div class="dashboard-header-actions"><label class="dashboard-range-select">统计周期 <select aria-label="告警趋势范围" :value="state.window" @change="chooseWindow"><option value="HOURS_24">最近24小时</option><option value="DAYS_7">最近7天</option><option value="DAYS_30">最近30天</option></select></label><div class="dashboard-ranges" aria-label="告警趋势快捷范围"><button v-for="range in [{id:'HOURS_24',label:'24小时'},{id:'DAYS_7',label:'7天'},{id:'DAYS_30',label:'30天'}]" :key="range.id" type="button" :aria-pressed="state.window===range.id" :class="{active:state.window===range.id}" :disabled="!permitted||state.busy" @click="changeWindow(range.id)">{{range.label}}</button></div><div class="dashboard-controls"><button type="button" :disabled="state.busy||!permitted" @click="refresh">{{state.busy?'读取中…':'刷新视图'}}</button></div></div><p>分项指标待接入：统一指标接口的告警统计、工单流转、服务可用性区间与通知回执暂未接入；实际近期事件见上方授权面板；已绑定设备的实时采样见上方监控面板。</p>
    <ApiErrorNotice :error="state.error" :retrying="state.busy" @retry="refresh" />
    <div class="dashboard-kpis" aria-label="六项固定运营指标">

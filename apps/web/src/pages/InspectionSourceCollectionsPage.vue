@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
 import {computed,onUnmounted,ref,shallowRef,watch} from 'vue'
 import {onBeforeRouteLeave} from 'vue-router'
 import { ElMessageBox } from 'element-plus'
@@ -19,7 +20,7 @@ const pickerGeneration=ref(0),candidateDirty=ref(false)
 const label=ref(''),sources=shallowRef<InspectionSourceRevision[]>([]),allowEmpty=ref(false),validation=ref(''),adding=ref(false),sourcePage=ref(0),expanded=ref('')
 const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&session.value.user.role==='padmin'&&can('inspection_source_collections:read')&&!switchingTenant.value)),writable=computed(()=>permitted.value&&can('inspection_source_collections:write')),canChoose=computed(()=>writable.value&&can('inspection_worksheets:read'))
 const locked=computed(()=>!writable.value||Boolean(state.value.busy)||Boolean(state.value.attempt)||adding.value),selectedKeys=computed(()=>sources.value.map(s=>s.worksheet_id+'/'+s.version)),diagnostics=computed(()=>sourceCollectionDiagnostics(sources.value))
-const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value,writable.value,canChoose.value]))
+const contextKey=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,permitted.value,writable.value,canChoose.value]))
 function context():SourceCollectionContext|null{const s=session.value;return s&&permitted.value?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true,canWrite:writable.value}:null}
 const dirty=computed(()=>state.value.attempt?.state!=='accepted'&&(candidateDirty.value||label.value!==''||sources.value.length>0||allowEmpty.value||state.value.attempt?.state==='rejected'))
 const detailSources=computed(()=>state.value.selected?.sources.slice(sourcePage.value*10,sourcePage.value*10+10)??[])
@@ -50,7 +51,7 @@ defineExpose({state,label,sources,allowEmpty,validation,payload,addSource,remove
   <p v-if="!permitted" class="empty-panel">当前身份没有真实测试环境来源集合读取权限</p>
   <template v-else><div class="feature-summary"><article><span>本页来源集合</span><strong>{{ state.page?.items.length ?? '—' }}</strong><small>当前已读取草稿，非报告总量</small></article><article><span>正在选择来源</span><strong>{{ sources.length }}</strong><small>明确执行单修订</small></article><article><span>涉及已选资产</span><strong>{{ diagnostics.distinct_selected_assets }}</strong><small>非租户库存数量</small></article><article><span>本页已存来源修订</span><strong>{{ state.page ? state.page.items.reduce((sum,row) => sum + row.source_count,0) : '—' }}</strong><small>逐集合累加，非报告或去重来源数</small></article></div>
    <details class="boundary-details"><summary>来源选择与保存说明</summary><ol class="steps" aria-label="来源集合操作步骤"><li>1 · 指定修订并核对</li><li>2 · 明确加入与检查</li><li>3 · 保存原请求 / 单独回读</li></ol></details>
-   <ApiErrorNotice :error="state.error" /><p v-if="state.busy||adding" role="status">{{ state.busy==='write'?'正在提交请求，请稍候…':'正在加载数据…' }}</p>
+   <ApiErrorNotice :error="state.error" /><ReadRecoveryActions :busy="state.busy" :can-retry="workspace.canRetryRead()" :scope-key="contextKey" :cancel="workspace.cancelRead" :retry="workspace.retryRead" /><p v-if="state.busy||adding" role="status">{{ state.busy==='write'?'正在提交请求，请稍候…':'正在加载数据…' }}</p>
    <section v-if="state.attempt" class="panel original-request" aria-live="polite"><h2>固定原保存请求</h2><p v-if="state.attempt.state==='uncertain'">结果未知。普通列表和详情即使看见集合，也不能确认这次原请求；拒绝重放不能证明之前没有写入。</p><p v-else-if="state.attempt.state==='accepted'">原保存回执已核对。它只含元数据，完整来源正文需单独读取和核对。</p><p v-else>原请求明确拒绝或派发前未通过校验。标签和来源选择保留，不自动替换。</p><div class="actions"><button v-if="state.attempt.state==='uncertain'" type="button" :disabled="Boolean(state.busy)" @click="retry">重试提交</button><button v-if="state.attempt.state==='rejected'" type="button" :disabled="Boolean(state.busy)" @click="unlockRejected">保留输入并解锁</button><button v-if="state.receipt" type="button" :disabled="Boolean(state.busy)" @click="select(state.receipt.id)">回读这份集合正文</button><button v-if="state.attempt.state==='accepted'&&writable" type="button" :disabled="Boolean(state.busy)" @click="begin">新建另一份集合</button></div></section>
 
    <section v-if="state.receipt" class="panel receipt-panel"><h2>原保存回执 · 仅元数据</h2><p>{{ state.receipt.label }} · 明确来源 {{ state.receipt.source_count }} 个 · 版本1</p><p class="id">{{ state.receipt.id }}</p><p class="hint">已确认保存原请求，尚不能据此宣称已核对完整正文或完成正式报告。</p></section>

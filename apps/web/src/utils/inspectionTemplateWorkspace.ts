@@ -14,15 +14,23 @@ const same = (a: unknown, b: unknown): boolean => {
 }
 export function createInspectionWorkspace(client: Pick<ApiClient, 'request'>, changed: (value: InspectionState) => void, newKey: () => string = () => createRequestId()) {
   let context: InspectionContext | null = null, state = emptyInspectionState(), epoch = 0, abort: AbortController | null = null, disposed = false
+  type ReadRequest={kind:'list'|'detail'|'history';query:string;deviceType:string;view:InspectionView;next:boolean;id?:string;before?:{time:string;id:string};historyBefore?:number}
+  let lastRead:ReadRequest|null=null,readRetryable=false
   const snapshot = () => detachedWorkspaceState(state), emit = () => changed(snapshot()), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
-  function reset(next: InspectionContext | null) { abort?.abort(); abort = null; ++epoch; context = !disposed && validInspectionContext(next) ? { ...next } : null; state = emptyInspectionState(); emit() }
+  function reset(next: InspectionContext | null) {lastRead=null;readRetryable=false;abort?.abort(); abort = null; ++epoch; context = !disposed && validInspectionContext(next) ? { ...next } : null; state = emptyInspectionState(); emit() }
   async function read(kind: 'list' | 'detail' | 'history', query: string, deviceType: string, view: InspectionView, next: boolean, id?: string) {
     if (!context || disposed || state.busy) return false
     const before = kind === 'list' && next && state.page?.has_more && query === state.query && deviceType === state.deviceType && view === state.view ? { time: state.page.next_before_created_at!, id: state.page.next_before_id! } : undefined
     const historyBefore = kind === 'history' && next && state.history !== null && state.history.template_id === id && state.history.has_more ? state.history.next_before_version! : undefined
     if (next && !(kind === 'list' ? before : historyBefore)) return false
+    return readRequest({kind,query,deviceType,view,next,id,before,historyBefore})
+  }
+  async function readRequest(request:ReadRequest){
+    if(!context||disposed||state.busy)return false
+    const {kind,query,deviceType,view,next,id,before,historyBefore}=request;lastRead=null;readRetryable=false
     const cleared = kind === 'list' ? { page: null, selected: null, history: null } : kind === 'detail' ? { selected: null, history: null } : { history: null }
     if (!['CURRENT','ARCHIVED','ALL'].includes(view) || !validInspectionText(query, 200, false, false, false) || typeof deviceType !== 'string' || deviceType !== '' && !/^[a-z][a-z0-9_-]{0,63}$/.test(deviceType) || kind !== 'list' && !inspectionUuid(id)) { state = { ...state, ...cleared, error: inspectionBad() }; emit(); return false }
+    lastRead=structuredClone(request)
     const turn = ++epoch, scope = { ...context }, controller = new AbortController(); abort = controller
     state = { ...state, ...cleared, busy: 'read', error: null, ...(kind === 'list' ? { query, deviceType, view, paged: next } : {}) }; emit()
     try {
@@ -30,6 +38,7 @@ export function createInspectionWorkspace(client: Pick<ApiClient, 'request'>, ch
       if (kind === 'list') { params.set('name_query', query); params.set('view', view); if (deviceType) params.set('device_type', deviceType); if (before) { params.set('before_created_at', before.time); params.set('before_id', before.id) } path = '/inspection-templates?' + params }
       else if (kind === 'history') { if (historyBefore) params.set('before_version', String(historyBefore)); path = '/inspection-templates/' + id + '/history?' + params }
       else path = '/inspection-templates/' + id
+      if(turn!==epoch||disposed||controller.signal.aborted)return false
       const raw = await client.request<unknown>(path, { signal: controller.signal })
       if (turn !== epoch || disposed || controller.signal.aborted) return false
       if (kind === 'list') {
@@ -51,12 +60,13 @@ export function createInspectionWorkspace(client: Pick<ApiClient, 'request'>, ch
         state.selected = row
       }
       return true
-    } catch (error) { if (turn === epoch && !disposed && !isCancelled(error)) state.error = error; return false }
+    } catch (error) { if (turn === epoch && !disposed && !isCancelled(error)){state.error = error;readRetryable=true} return false }
     finally { if (turn === epoch && !disposed) { state.busy = null; abort = null; emit() } }
   }
   async function send(input: InspectionAttempt, retry: boolean) {
     if (!context?.canWrite || disposed || state.busy) return false
     // Private copy before the first await; getter/callback/transport mutations cannot change this command.
+    lastRead=null;readRetryable=false
     const attempt = structuredClone(input), turn = ++epoch, scope = { ...context }, controller = new AbortController(); abort = controller
     let dispatched = false
     state = { ...state, busy: 'write', attempt: { ...attempt, state: 'uncertain' }, page: null, selected: null, history: null, error: null }; emit()
@@ -89,5 +99,6 @@ export function createInspectionWorkspace(client: Pick<ApiClient, 'request'>, ch
     } catch (error) { state.error = error; emit(); return false }
   }
   emit()
-  return { reset, state: snapshot, unresolved, list: (query = '', deviceType = '', view: InspectionView = 'CURRENT', next = false) => read('list', query, deviceType, view, next), select: (id: string) => read('detail', state.query, state.deviceType, state.view, false, id), history: (id: string, next = false) => read('history', state.query, state.deviceType, state.view, next, id), submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), begin: () => { if (!context?.canWrite || disposed || state.busy || unresolved()) return false; state = { ...state, receipt: null, attempt: null, error: null }; emit(); return true }, dispose: () => { disposed = true; reset(null) } }
+  function cancelRead(){if(disposed||state.busy!=='read')return false;epoch++;abort?.abort();abort=null;readRetryable=lastRead!==null;state={...state,busy:null,error:null};emit();return true}
+  return { reset,cancelRead,canRetryRead:()=>!disposed&&readRetryable&&lastRead!==null&&!state.busy,retryRead:()=>readRetryable&&lastRead?readRequest(structuredClone(lastRead)):Promise.resolve(false), state: snapshot, unresolved, list: (query = '', deviceType = '', view: InspectionView = 'CURRENT', next = false) => read('list', query, deviceType, view, next), select: (id: string) => read('detail', state.query, state.deviceType, state.view, false, id), history: (id: string, next = false) => read('history', state.query, state.deviceType, state.view, next, id), submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), begin: () => { if (!context?.canWrite || disposed || state.busy || unresolved()) return false; lastRead=null;readRetryable=false;state = { ...state, receipt: null, attempt: null, error: null }; emit(); return true }, dispose: () => { disposed = true; reset(null) } }
 }

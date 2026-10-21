@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
 import { computed, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
@@ -22,7 +23,7 @@ const state = shallowRef<InspectionState>(emptyInspectionState()), workspace = c
 const permitted = computed(() => Boolean(session.value?.user.role === 'padmin' && can('inspection_templates:read') && !switchingTenant.value))
 const writable = computed(() => permitted.value && can('inspection_templates:write'))
 const locked = computed(() => !writable.value || Boolean(state.value.busy) || Boolean(state.value.attempt))
-const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.user.role, permitted.value, writable.value]))
+const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.account_version, session.value?.user.role, permitted.value, writable.value]))
 function payload() { return { expected_version: baseline.value?.version ?? 0, device_type: form.device_type, name: form.name, items: form.items.map(({ key, section, label, instruction }) => ({ key, section, label, instruction })) } }
 const unsaved = computed(() => mode.value !== null && state.value.attempt?.state !== 'accepted' && (state.value.attempt?.state === 'rejected' || JSON.stringify(payload()) !== initial.value))
 const nextList = computed(() => state.value.page?.has_more && query.value === state.value.query && deviceType.value === state.value.deviceType && view.value === state.value.view && !state.value.busy)
@@ -62,7 +63,7 @@ defineExpose({ prepareCreate, prepareFrom, browse, select, history, save, retry,
   <template v-else>
 <div class="feature-summary"><article><span>本页巡检模板</span><strong>{{ state.page?.items.length ?? '—' }}</strong><small>当前已读取记录，非总体数量</small></article><article><span>本页未归档</span><strong>{{ state.page ? state.page.items.filter(row => !row.archived).length : '—' }}</strong><small>仅记录状态，不表示批准或生效</small></article><article><span>当前所选版本</span><strong>{{ state.selected ? 'v'+state.selected.version : '—' }}</strong><small>按明确版本读取</small></article><article><span>本页检查项合计</span><strong>{{ state.page ? state.page.items.reduce((sum,row) => sum + row.item_count,0) : '—' }}</strong><small>逐模板累加，非已执行检查数</small></article></div>
    <section v-if="state.attempt" class="panel request-status" aria-live="polite"><h2>固定原请求：{{ actions[state.attempt.action] }}</h2><p v-if="state.attempt.state === 'uncertain'">结果尚未确认。即使重试被拒绝，也不能证明之前没写入；普通刷新不能代替原收据确认。</p><p v-else-if="state.attempt.state === 'accepted'">原请求收据已确认。它可能早于当前版本，请另行回读当前模板。</p><p v-else>本次请求已明确拒绝或发送前校验未通过。保留输入，不自动改版本或覆盖。</p><div class="actions"><button v-if="state.attempt.state === 'uncertain'" type="button" :disabled="Boolean(state.busy)" @click="retry">重试提交</button><button v-if="state.attempt.state === 'rejected'" type="button" :disabled="Boolean(state.busy)" @click="unlockRejected">保留输入并解锁</button><button v-if="state.receipt" type="button" :disabled="Boolean(state.busy)" @click="select(state.receipt.id)">回读当前模板</button></div></section>
-   <ApiErrorNotice :error="state.error" />
+   <ApiErrorNotice :error="state.error" /><ReadRecoveryActions :busy="state.busy" :can-retry="workspace.canRetryRead()" :scope-key="contextKey" :cancel="workspace.cancelRead" :retry="workspace.retryRead" />
    <p v-if="state.busy" class="loading-note" role="status">{{ state.busy === 'write' ? '正在核对并提交固定请求…' : '正在读取并核对范围与内容摘要…' }}</p>
 
    <section v-if="state.receipt" class="panel receipt-panel"><h2>原请求确认收据 · v{{ state.receipt.version }}</h2><p>{{ state.receipt.name }} · {{ actions[state.receipt.action] }} · {{ state.receipt.archived ? '已归档' : '未发布候选' }}</p><details><summary>展开原收据定义（不是当前状态）</summary><InspectionTemplateFacts :value="state.receipt" /></details></section>

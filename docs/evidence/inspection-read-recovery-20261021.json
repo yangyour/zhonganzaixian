@@ -1,0 +1,54 @@
+{
+  "base_commit": "46fb502cb246e0b1630809280e48e55ab91745a2",
+  "result": "PASS_UNIT_DOM_BUILD_STATIC",
+  "web_tests": 3277,
+  "web_files": 221,
+  "new_tests": 38,
+  "contract_tests": 173,
+  "build_id": "10045d875588041e0f29280730b16bb6403bcf5c5e02a1e4c9f278b205e37311",
+  "bootstrap_gzip_bytes": 179797,
+  "workspaces": [
+    "inspectionTemplateWorkspace",
+    "inspectionWorksheetWorkspace",
+    "inspectionSourceCollectionWorkspace",
+    "inspectionQuarterlyReportWorkspace"
+  ],
+  "read_intent_preserved": [
+    "APPLIED_FILTERS",
+    "VIEW",
+    "CREATED_OR_RECORDED_TIME_AND_ID_CURSOR",
+    "DETAIL_ID",
+    "HISTORY_BEFORE_VERSION"
+  ],
+  "write_cancel_supported": false,
+  "read_acknowledges_unknown_write": false,
+  "unknown_original_command_and_key_retained": true,
+  "shared_control_scope_and_focus": "PASS_DOM",
+  "context_revoke_before_dispatch": "NO_GET_FOR_ALL_FOUR",
+  "backend_api_or_sql_changed": false,
+  "actual_business_http_reexecuted": false,
+  "browser_scripts_discovered": 53,
+  "browser_and_axe": "NOT_RUN",
+  "formal_acceptance": {
+    "total": 128,
+    "NOT_RUN": 128
+  },
+  "prior_failure": "Test adapter array inferred incompatible intersection of template/worksheet fixture types; explicit common test interface added without loosening production types",
+  "source_sha256": {
+    "apps/web/src/utils/inspectionTemplateWorkspace.ts": "a7db75b23e33eb15e6925eed2e056109176556ab31a8a3e2482acb6bab2902e7",
+    "apps/web/src/utils/inspectionWorksheetWorkspace.ts": "ccbfb4c3bd1bbee504f57c6d61ffd78a535ef7b36ab65b1ec2d0c3a0874da06c",
+    "apps/web/src/utils/inspectionSourceCollectionWorkspace.ts": "bd05b13fbe5eeb0e9a166a76c2e12897c7095b16d3b2347ce4ad4b93737071c3",
+    "apps/web/src/utils/inspectionQuarterlyReportWorkspace.ts": "d55cb6289564a13f35a9db7dcccf486b726fb5ccea66f2315c71469ef7dce2c4",
+    "apps/web/src/pages/InspectionTemplatesPage.vue": "287d5af8d164ceabd16e0c492c1acb83bba9090370b1ba8b03a72b56f5477dc1",
+    "apps/web/src/pages/InspectionWorksheetsPage.vue": "a0e9506a83eddb1d66c533cfecc288686efc2c859cad21d15840737b5e3685c4",
+    "apps/web/src/pages/InspectionSourceCollectionsPage.vue": "26b70176d8ffc0e57aae093f8f347df214dbbd84532eb1a9549fb3bfb197ff4a",
+    "apps/web/src/pages/InspectionQuarterlyReportsPage.vue": "0cde24d9b0866ae84068434ac9f68979b918785e6743ec992c88b8239e1328e9",
+    "apps/web/src/components/ReadRecoveryActions.vue": "ab851ff3859d5e1802ba2f7953c8caceff54cff74e4e82bde366675dbdaf9b01",
+    "apps/web/tests/inspectionReadRecovery.test.ts": "c0e4ccde44bc45ac1106527017a6a67199cc0d50255902d4c075a9832229c460",
+    "apps/web/tests/readRecoveryActions.test.ts": "d9fc7824c328a896888b8ed1bfc0efdb6bf5eb953be7318afc56593b27443561",
+    "apps/web/tests/inspectionTemplatesPage.test.ts": "431a199b53e1793eb5fe1e7393a1d80e3dd551e9e0750a4e853b167d4715bf23",
+    "apps/web/tests/inspectionWorksheetsPage.test.ts": "0b2f25101e6936c688cf0dc5fe42581055a09160e0bfdd174214e85e7e9f6354",
+    "apps/web/tests/inspectionSourceCollectionsPage.test.ts": "661c5f519bbf976de67a755912e7b15292624f8ca8580bfc803ee695507a05fe",
+    "apps/web/tests/inspectionQuarterlyReportsPage.test.ts": "567f2393679b2dd26150826d0fc3b4d9f7581f8fb05e4934251c805d9c184252"
+  }
+}

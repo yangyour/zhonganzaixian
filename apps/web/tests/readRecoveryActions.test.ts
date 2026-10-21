@@ -1,0 +1,12 @@
+// @vitest-environment jsdom
+import {it,expect,vi,afterEach} from 'vitest'
+import {createApp,h,reactive,nextTick,type App} from 'vue'
+import Panel from '../src/components/ReadRecoveryActions.vue'
+let app:App|undefined,host:HTMLElement
+async function settle(){for(let i=0;i<8;i++){await Promise.resolve();await nextTick()}}
+async function mount(props:any){host=document.createElement('div');document.body.append(host);app=createApp({render:()=>h(Panel,props)});app.mount(host);await settle()}
+afterEach(()=>{app?.unmount();app=undefined;host?.remove();vi.restoreAllMocks()})
+it('write mode never offers read cancellation or retries',async()=>{const cancel=vi.fn(),retry=vi.fn();await mount({busy:'write',canRetry:true,scopeKey:'A',cancel,retry});expect(host.querySelectorAll('button')).toHaveLength(0);expect(cancel).not.toHaveBeenCalled();expect(retry).not.toHaveBeenCalled()})
+it('cancel does not steal focus after scope changed before next tick',async()=>{const props=reactive({busy:'read' as 'read'|null,canRetry:false,scopeKey:'A',cancel:()=>{props.busy=null;props.canRetry=true;return true},retry:async()=>false});await mount(props);host.querySelector('button')!.click();props.scopeKey='B';await settle();expect(host.textContent).not.toContain('已取消读取');expect(document.activeElement?.getAttribute('role')).not.toBe('status')})
+it('duplicate retry clicks invoke one pending operation and scope change hides late success',async()=>{let done!:(v:boolean)=>void;const retry=vi.fn(()=>new Promise<boolean>(r=>done=r)),props=reactive({busy:null,canRetry:true,scopeKey:'A',cancel:()=>false,retry});await mount(props);const button=host.querySelector('button')!;button.click();button.click();expect(retry).toHaveBeenCalledOnce();props.scopeKey='B';await settle();done(true);await settle();expect(host.textContent).not.toContain('原读取已完成')})
+it('own busy transition still allows accurate read completion notice',async()=>{let done!:(v:boolean)=>void;const props=reactive({busy:null as 'read'|null,canRetry:true,scopeKey:'A',cancel:()=>false,retry:()=>{props.busy='read';return new Promise<boolean>(r=>done=r)}});await mount(props);host.querySelector('button')!.click();await settle();props.busy=null;props.canRetry=false;done(true);await settle();expect(host.textContent).toContain('原读取已完成');expect(host.textContent).toContain('不代表发布或执行')})

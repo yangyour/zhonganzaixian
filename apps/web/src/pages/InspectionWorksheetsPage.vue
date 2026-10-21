@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
 import { computed, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
@@ -29,7 +30,7 @@ const writable = computed(()=>permitted.value && can('inspection_worksheets:writ
 const canChooseSource = computed(()=>writable.value && can('assets:read') && can('inspection_templates:read'))
 const locked = computed(()=>!writable.value || Boolean(state.value.busy) || sourcesBusy.value || Boolean(state.value.attempt))
 const sourcesLocked = computed(()=>!canChooseSource.value || Boolean(state.value.busy) || sourcesBusy.value || workspace.unresolved())
-const contextKey = computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value,writable.value,canChooseSource.value]))
+const contextKey = computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,permitted.value,writable.value,canChooseSource.value]))
 function context(): WorksheetContext | null { const s=session.value;return s&&permitted.value?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,role:s.user.role,canRead:true,canWrite:writable.value}:null }
 function payload(){return {expected_version:baseline.value?.version??0,...(mode.value==='CREATE'?{asset_id:creationSource.value?.asset.id,template_id:creationSource.value?.template.id,template_version:creationSource.value?.template.version}:{}),observations:worksheetEditorObservations(form.rows),reported_performed_at:form.timeKnown?form.timeText:null}}
 const unsaved = computed(()=>mode.value!==null && state.value.attempt?.state!=='accepted' && (state.value.attempt?.state==='rejected' || JSON.stringify(payload())!==initial.value))
@@ -70,7 +71,7 @@ defineExpose({loadAssets,loadTemplates,prepareCreate,prepareFrom,browse,select,h
   <template v-else>
 <div class="feature-summary"><article><span>本页巡检执行单</span><strong>{{ state.page?.items.length ?? '—' }}</strong><small>当前已读取记录，非总体数量</small></article><article><span>本页未归档</span><strong>{{ state.page ? state.page.items.filter(row => !row.archived).length : '—' }}</strong><small>仅记录状态，不表示批准或生效</small></article><article><span>当前所选版本</span><strong>{{ state.selected ? 'v'+state.selected.version : '—' }}</strong><small>按明确版本读取</small></article><article><span>本页未答检查项</span><strong>{{ state.page ? state.page.items.reduce((sum,row) => sum + row.summary.unanswered,0) : '—' }}</strong><small>逐执行单累加，未填写不算正常</small></article></div>
    <section v-if="state.attempt" class="panel request-status" aria-live="polite"><h2>固定原请求：{{ actions[state.attempt.action] }}</h2><p v-if="state.attempt.state==='uncertain'">结果尚未确认。后续拒绝也不能证明之前没写入；普通刷新不能代替原收据确认。</p><p v-else-if="state.attempt.state==='accepted'">原请求收据已确认。它可能早于当前版本，请另行回读当前执行单。</p><p v-else>本次请求明确拒绝或派发前校验失败；输入和版本保持，不自动覆盖。</p><div class="actions"><button v-if="state.attempt.state==='uncertain'" type="button" :disabled="Boolean(state.busy)" @click="retry">重试提交</button><button v-if="state.attempt.state==='rejected'" type="button" :disabled="Boolean(state.busy)" @click="unlockRejected">保留输入并解锁</button><button v-if="state.receipt" type="button" :disabled="Boolean(state.busy)" @click="select(state.receipt.id)">回读当前执行单</button></div></section>
-   <ApiErrorNotice :error="state.error" /><ApiErrorNotice :error="sourceError" /><p v-if="state.busy||sourcesBusy" class="hint" role="status">{{ state.busy==='write'?'正在提交请求…':'正在加载数据…' }}</p>
+   <ApiErrorNotice :error="state.error" /><ReadRecoveryActions :busy="state.busy" :can-retry="workspace.canRetryRead()" :scope-key="contextKey" :cancel="workspace.cancelRead" :retry="workspace.retryRead" /><ApiErrorNotice :error="sourceError" /><p v-if="state.busy||sourcesBusy" class="hint" role="status">{{ state.busy==='write'?'正在提交请求…':'正在加载数据…' }}</p>
 
 
    <p v-if="validation&&!mode" class="warning" role="alert">{{ validation }}</p>

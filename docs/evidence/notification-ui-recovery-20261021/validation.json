@@ -1,0 +1,22 @@
+{
+  "base_commit": "f98180d4543922e79fce3e9190ba51b16cc34ee8",
+  "scope": "NOTIFICATION_UI_CONTEXT_AND_READBACK",
+  "web_tests": {
+    "passed": 2603,
+    "files": 188
+  },
+  "new_component_tests": 6,
+  "focused_tests": 15,
+  "typecheck": "PASS",
+  "build_static_gates": "PASS",
+  "build_id": "0a45dac0fa997fb430df0a3b663f35cdc83a77640a8865719c6025dcd2f23785",
+  "browser_visual_axe": "NOT_RUN_ENVIRONMENT_BLOCKED",
+  "new_real_http": "NOT_RUN",
+  "backend_and_migrations": "UNCHANGED",
+  "source_sha256": {
+    "apps/web/src/utils/ticketNotifications.ts": "d055482fd763d17a4f09c28031a619244a582678d2db937cc7d50f859523e7e4",
+    "apps/web/src/pages/TicketNotificationsPage.vue": "b1730e250409a769bbfef0e3dcfb3e2cc3358feb741cf5e4317457c33b2b2464",
+    "apps/web/tests/ticketNotifications.test.ts": "3f9eac9f38b5b20edfe4a157842ed1b0aaebf44d48c7cebd9a61a19d7496262e",
+    "apps/web/tests/ticketNotificationsPage.test.ts": "3474050276255a394b56969ef04baa09e6e3aa47cdc8da0cb2ca7aaa155b343b"
+  }
+}

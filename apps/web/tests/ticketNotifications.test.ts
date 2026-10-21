@@ -38,7 +38,7 @@ describe('ticket in-app notifications',()=>{
   const x=setup();x.request.mockResolvedValueOnce(page()).mockRejectedValueOnce(new ApiError(503,'UPSTREAM_UNAVAILABLE','unknown','t')).mockResolvedValueOnce({id,version:1,read_at:observed})
   await x.w.list(false);expect(await x.w.mark(id)).toBe(false);expect(x.w.unresolved()).toBe(true);expect(await x.w.list()).toBe(false);expect(await x.w.retry()).toBe(true)
   const posts=x.request.mock.calls.filter(c=>c[1]?.method==='POST');expect(posts.map(c=>[c[0],c[1].body,c[1].idempotencyKey])).toEqual(Array(2).fill([`/my/notifications/${id}/read`,{expected_version:0},'synthetic-notification-read']))
-  expect(x.w.state().page?.items[0]?.read_at).toBe(observed);expect(x.key).toHaveBeenCalledTimes(1)
+  expect(x.w.state().page).toBeNull();expect(x.key).toHaveBeenCalledTimes(1)
  })
  it('confirmed rejection clears the pending command; failures never invent empty pages',async()=>{
   const x=setup();x.request.mockResolvedValueOnce(page()).mockRejectedValueOnce(new ApiError(409,'VERSION_CONFLICT','changed','t'));await x.w.list(false);await x.w.mark(id);expect(x.w.unresolved()).toBe(false);expect(x.w.state().receipt).toBeNull()
@@ -47,7 +47,7 @@ describe('ticket in-app notifications',()=>{
  it('customers cannot load the internal ledger; context switch aborts stale reads',async()=>{
   const x=setup();expect(await x.w.intents()).toBe(false);expect(x.request).not.toHaveBeenCalled()
   let resolveRead!:(v:unknown)=>void;x.request.mockReturnValue(new Promise(r=>{resolveRead=r}));const pending=x.w.list(false);const signal=x.request.mock.calls[0]![1].signal;x.w.reset(null);resolveRead(page());expect(await pending).toBe(false);expect(signal.aborted).toBe(true);expect(x.w.state().page).toBeNull()
-  const y=setup(internal);y.request.mockResolvedValue(intents());expect(await y.w.intents()).toBe(true);expect(y.request).toHaveBeenCalledWith('/notification-intents?page_size=25')
+  const y=setup(internal);y.request.mockResolvedValue(intents());expect(await y.w.intents()).toBe(true);expect(y.request).toHaveBeenCalledWith('/notification-intents?page_size=25',{signal:expect.any(AbortSignal)})
  })
  it('route, menu and page separate explicit WeCom delivery from automatic channel policy',()=>{
   const router=readFileSync(resolve('src/router.ts'),'utf8'),nav=readFileSync(resolve('src/utils/navigationModules.ts'),'utf8'),source=readFileSync(resolve('src/pages/TicketNotificationsPage.vue'),'utf8')

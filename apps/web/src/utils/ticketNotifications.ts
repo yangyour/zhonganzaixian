@@ -56,9 +56,9 @@ export function readIntentPage(value:unknown,before?:Cursor):NotificationIntentP
 }
 
 export function createNotificationWorkspace(client:{request<T>(path:string,options?:RequestOptions):Promise<T>},changed:(s:NotificationState)=>void,newKey=createRequestId){
- let state=emptyNotificationState(),context:NotificationContext|null=null,epoch=0,abort:AbortController|null=null,disposed=false,intentEpoch=0
+ let state=emptyNotificationState(),context:NotificationContext|null=null,epoch=0,abort:AbortController|null=null,disposed=false,intentEpoch=0,intentAbort:AbortController|null=null
  const snapshot=()=>({...structuredClone({...state,error:null,intentError:null}),error:state.error,intentError:state.intentError}),emit=()=>changed(snapshot())
- function reset(next:NotificationContext|null){epoch++;intentEpoch++;abort?.abort();abort=null;context=!disposed&&validContext(next)?{...next}:null;state=emptyNotificationState();emit()}
+ function reset(next:NotificationContext|null){epoch++;intentEpoch++;intentAbort?.abort();intentAbort=null;abort?.abort();abort=null;context=!disposed&&validContext(next)?{...next}:null;state=emptyNotificationState();emit()}
  async function list(unreadOnly=state.unreadOnly,next=false){
   if(disposed||!context||state.busy||state.attempt)return false
   const before=next&&state.page?.has_more?{time:state.page.next_before_created_at!,id:state.page.next_before_id!}:undefined
@@ -80,7 +80,8 @@ export function createNotificationWorkspace(client:{request<T>(path:string,optio
    if(disposed||turn!==epoch||controller.signal.aborted)return false
    if(!exportExact(raw,['id','version','read_at'])||raw.id!==attempt.id||raw.version!==1)throw invalid();exportTime(raw.read_at)
    state.receipt=structuredClone(raw) as unknown as NotificationReceipt;state.attempt=null
-   if(state.page)state.page={...state.page,items:state.page.items.map(m=>m.id===attempt.id?{...m,version:1,read_at:raw.read_at as string}:m)}
+   // A write receipt is not a fresh unread-count/list snapshot; force an explicit server read.
+   state.page=null
    return true
   }catch(error){if(!disposed&&turn===epoch){state.error=error;if(!writeFailureUncertain(retry,error))state.attempt=null}return false}finally{if(!disposed&&turn===epoch){state.busy=null;abort=null;emit()}}
  }
@@ -93,13 +94,13 @@ export function createNotificationWorkspace(client:{request<T>(path:string,optio
   if(disposed||!context?.internal||state.intentBusy)return false
   const before=next&&state.intents?.has_more?{time:state.intents.next_before_created_at!,id:state.intents.next_before_id!}:undefined
   if(next&&!before)return false
-  const turn=++intentEpoch;state={...state,intentBusy:true,intentError:null};emit()
+  const turn=++intentEpoch,controller=new AbortController();intentAbort=controller;state={...state,intents:null,intentBusy:true,intentError:null};emit()
   try{
    const query=new URLSearchParams({page_size:'25'});if(before){query.set('before_created_at',before.time);query.set('before_id',before.id)}
-   const raw=await client.request<unknown>('/notification-intents?'+query)
-   if(disposed||turn!==intentEpoch)return false
+   const raw=await client.request<unknown>('/notification-intents?'+query,{signal:controller.signal})
+   if(disposed||turn!==intentEpoch||controller.signal.aborted)return false
    state.intents=readIntentPage(raw,before);return true
-  }catch(error){if(!disposed&&turn===intentEpoch)state.intentError=error;return false}finally{if(!disposed&&turn===intentEpoch){state.intentBusy=false;emit()}}
+  }catch(error){if(!disposed&&turn===intentEpoch)state.intentError=error;return false}finally{if(!disposed&&turn===intentEpoch){state.intentBusy=false;intentAbort=null;emit()}}
  }
  emit()
  return{reset,list,mark,intents,retry:()=>state.attempt?send(structuredClone(state.attempt),true):Promise.resolve(false),unresolved:()=>state.attempt!==null,state:snapshot,dispose:()=>{disposed=true;reset(null)}}

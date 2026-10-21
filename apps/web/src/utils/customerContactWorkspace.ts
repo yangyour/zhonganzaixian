@@ -60,14 +60,23 @@ export function readContactHistory(v: unknown, scope: ContactContext, id: string
 export const emptyContactState = (): ContactState => ({ page: null, selected: null, history: null, receipt: null, attempt: null, query: '', view: 'CURRENT', paged: false, busy: null, error: null })
 export function createContactWorkspace(client: Pick<ApiClient, 'request'>, notify: (state: ContactState) => void, newKey: () => string = () => createRequestId()) {
  let scope: ContactContext | null = null, state = emptyContactState(), epoch = 0, abort: AbortController | null = null, disposed = false
+ type ReadRequest = { kind: 'list' | 'detail' | 'history'; query: string; view: ContactView; next: boolean; id?: string; before?: { time: string; id: string }; historyBefore?: number }
+ let lastRead: ReadRequest | null = null, readRetryable = false
  const snapshot = () => ({ ...copy({ ...state, error: null }), error: state.error }), emit = () => notify(snapshot()), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
- function reset(context: ContactContext | null) { abort?.abort(); abort = null; ++epoch; scope = !disposed && context && ['padmin', 'tadmin'].includes(context.role) && context.canRead === true && typeof context.canWrite === 'boolean' && typeof context.tenantId === 'string' && typeof context.actorId === 'string' && uuid.test(context.tenantId) && uuid.test(context.actorId) && safeVersion(context.permissionVersion) ? { ...context } : null; state = emptyContactState(); emit() }
+ function reset(context: ContactContext | null) { lastRead = null; readRetryable = false; abort?.abort(); abort = null; ++epoch; scope = !disposed && context && ['padmin', 'tadmin'].includes(context.role) && context.canRead === true && typeof context.canWrite === 'boolean' && typeof context.tenantId === 'string' && typeof context.actorId === 'string' && uuid.test(context.tenantId) && uuid.test(context.actorId) && safeVersion(context.permissionVersion) ? { ...context } : null; state = emptyContactState(); emit() }
  async function read(kind: 'list' | 'detail' | 'history', query: string, view: ContactView, next: boolean, id?: string) {
   if (!scope || disposed || state.busy) return false
   const before = kind === 'list' && next && state.page?.has_more && query === state.query && view === state.view ? { time: state.page.next_before_created_at!, id: state.page.next_before_id! } : undefined
   const historyBefore = kind === 'history' && next && state.history !== null && state.history.contact_id === id && state.history.has_more ? state.history.next_before_version! : undefined
   if (next && !(kind === 'list' ? before : historyBefore)) return false
+  lastRead = null; readRetryable = false
   if (!['CURRENT', 'ARCHIVED', 'ALL'].includes(view) || typeof query !== 'string' || Array.from(query).length > 200 || /[\u0000-\u001f\u007f-\u009f]/.test(query) || Array.from(query).some(c => c.length === 1 && /[\ud800-\udfff]/.test(c)) || kind !== 'list' && (!id || !uuid.test(id))) { state = { ...state, error: bad(), ...(kind === 'list' ? { page: null, selected: null, history: null } : kind === 'detail' ? { selected: null, history: null } : { history: null }) }; emit(); return false }
+  return readRequest({kind, query, view, next, id, before, historyBefore})
+ }
+ async function readRequest(request: ReadRequest) {
+  if (!scope || disposed || state.busy) return false
+  const {kind, query, view, next, id, before, historyBefore} = request
+  lastRead = copy(request); readRetryable = false
   const turn = ++epoch, context = { ...scope }, controller = new AbortController(); abort = controller; state = { ...state, busy: 'read', error: null, ...(kind === 'list' ? { page: null, selected: null, history: null, query, view, paged: next } : kind === 'detail' ? { selected: null, history: null } : { history: null }) }; emit()
   try { const params = new URLSearchParams({ page_size: '15' }); let path: string
    if (kind === 'list') { params.set('name_query', query); params.set('view', view); if (before) { params.set('before_created_at', before.time); params.set('before_id', before.id) } path = '/contacts?' + params } else if (kind === 'history') { if (historyBefore) params.set('before_version', String(historyBefore)); path = '/contacts/' + id + '/history?' + params } else path = '/contacts/' + id
@@ -77,10 +86,11 @@ export function createContactWorkspace(client: Pick<ApiClient, 'request'>, notif
    else if (kind === 'history') state.history = readContactHistory(raw, context, id!, historyBefore)
    else { const row = readCustomerContact(raw, context); if (row.id !== id || state.receipt?.id === id && (row.version < state.receipt.version || row.version === state.receipt.version && !equal(row, state.receipt))) throw bad(); state.selected = row }
    return true
-  } catch (error) { if (turn === epoch && !disposed && !isCancelled(error)) state.error = error; return false } finally { if (turn === epoch && !disposed) { state.busy = null; abort = null; emit() } }
+  } catch (error) { if (turn === epoch && !disposed && !isCancelled(error)) { state.error = error; readRetryable = true } return false } finally { if (turn === epoch && !disposed) { state.busy = null; abort = null; emit() } }
  }
  async function send(attempt: Attempt, retry: boolean) {
   if (!scope?.canWrite || disposed || state.busy) return false
+  lastRead = null; readRetryable = false
   const turn = ++epoch, context = { ...scope }, controller = new AbortController(); abort = controller; state = { ...state, busy: 'write', attempt: { ...attempt, state: 'uncertain' }, page: null, selected: null, history: null, error: null }; emit()
   try { if (turn !== epoch || disposed || controller.signal.aborted) return false; const payload = readContactPayload(JSON.parse(attempt.payload), attempt.action), raw = await client.request<unknown>(attempt.path, { method: attempt.method, body: payload, idempotencyKey: attempt.key, signal: controller.signal }); if (turn !== epoch || disposed || controller.signal.aborted) return false
    const row = readCustomerContact(raw, context), base = attempt.baseline, expectedFacts = attempt.action === 'ARCHIVE' ? { ...contactFacts(base!), enabled: false } : readContactFacts(Object.fromEntries(factKeys.map(k => [k, payload[k as keyof ContactPayload]])))
@@ -97,5 +107,6 @@ export function createContactWorkspace(client: Pick<ApiClient, 'request'>, notif
    return send({ path, method: action === 'UPDATE' ? 'PATCH' : 'POST', action, key, payload: JSON.stringify(payload), baseline: base, state: 'uncertain' }, false)
   } catch (error) { if (turn === epoch && !disposed) { state.error = error; emit() } return false }
  }
- emit(); return { reset, state: snapshot, unresolved, list: (query = '', view: ContactView = 'CURRENT', next = false) => read('list', query, view, next), select: (id: string) => read('detail', state.query, state.view, false, id), history: (id: string, next = false) => read('history', state.query, state.view, next, id), submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), begin: () => { if (!scope?.canWrite || disposed || state.busy || unresolved()) return false; state = { ...state, receipt: null, attempt: null, error: null }; emit(); return true }, dispose: () => { disposed = true; reset(null) } }
+ function cancelRead() { if (disposed || state.busy !== 'read') return false; ++epoch; abort?.abort(); abort = null; readRetryable = lastRead !== null; state = {...state, busy: null, error: null}; emit(); return true }
+ emit(); return { cancelRead, canRetryRead: () => !disposed && readRetryable && lastRead !== null && !state.busy, retryRead: () => readRetryable && lastRead ? readRequest(copy(lastRead)) : Promise.resolve(false), reset, state: snapshot, unresolved, list: (query = '', view: ContactView = 'CURRENT', next = false) => read('list', query, view, next), select: (id: string) => read('detail', state.query, state.view, false, id), history: (id: string, next = false) => read('history', state.query, state.view, next, id), submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), begin: () => { if (!scope?.canWrite || disposed || state.busy || unresolved()) return false; lastRead = null; readRetryable = false; state = { ...state, receipt: null, attempt: null, error: null }; emit(); return true }, dispose: () => { disposed = true; reset(null) } }
 }

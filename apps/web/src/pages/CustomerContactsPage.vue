@@ -12,7 +12,9 @@ import { contactActionLabels, contactRoleLabels } from '../utils/customerContact
 import { displayTime } from '../utils/display'
 import CustomerContactFacts from '../components/CustomerContactFacts.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
 let disposed = false
+const readScope = ref(0)
 const query = ref(''), view = ref<ContactView>('CURRENT'), validation = ref('')
 const mode = ref<'CREATE' | 'UPDATE' | 'RESTORE' | null>(null), baseline = shallowRef<CustomerContact | null>(null), initial = ref('')
 const form = reactive({ name: '', roles: [] as ContactRole[], mobile: '', email: '', wecom: '', prioritiesKnown: false, priorities: [] as ContactPriority[], quietMode: 'not_provided', quietStart: '', quietEnd: '', enabled: null as boolean | null })
@@ -26,7 +28,7 @@ function quiet() { switch (form.quietMode) { case 'not_provided': return null; c
 function payload() { return { expected_version: baseline.value?.version ?? 0, name: form.name, roles: [...form.roles], mobile: nullable(form.mobile), email: nullable(form.email), wecom_user_id: nullable(form.wecom), preferred_priorities: form.prioritiesKnown ? [...form.priorities] : null, quiet_window: quiet(), enabled: form.enabled } }
 const unsaved = computed(() => mode.value !== null && state.value.attempt?.state !== 'accepted' && (state.value.attempt?.state === 'rejected' || JSON.stringify(payload()) !== initial.value))
 const nextList = computed(() => state.value.page?.has_more && query.value === state.value.query && view.value === state.value.view && !state.value.busy)
-function clearEditor() { mode.value = null; baseline.value = null; initial.value = ''; validation.value = ''; Object.assign(form, { name: '', roles: [], mobile: '', email: '', wecom: '', prioritiesKnown: false, priorities: [], quietMode: 'not_provided', quietStart: '', quietEnd: '', enabled: null }) }
+function clearEditor() { readScope.value++; mode.value = null; baseline.value = null; initial.value = ''; validation.value = ''; Object.assign(form, { name: '', roles: [], mobile: '', email: '', wecom: '', prioritiesKnown: false, priorities: [], quietMode: 'not_provided', quietStart: '', quietEnd: '', enabled: null }) }
 watch(contextKey, () => { const s = session.value; workspace.reset(s && permitted.value ? { tenantId: s.tenant.id, actorId: s.user.id, permissionVersion: s.permission_version, role: s.user.role, canRead: true, canWrite: writable.value } : null); clearEditor(); query.value = ''; view.value = 'CURRENT'; if (permitted.value) void workspace.list('', 'CURRENT') }, { immediate: true, flush: 'sync' })
 function editorSnapshot() { return JSON.stringify([mode.value, baseline.value, initial.value, form, payload()]) }
 async function discard() { const turn = contextKey.value, input = editorSnapshot(); if (unsaved.value) { try { await ElMessageBox.confirm('将替换尚未成功保存的联系人输入，不会自动合并到较新版本。确认继续？', '保留未保存输入', { confirmButtonText: '确认替换', cancelButtonText: '保留输入', type: 'warning' }); } catch { return false } } else await Promise.resolve(); return !disposed && turn === contextKey.value && input === editorSnapshot() && !workspace.unresolved() }
@@ -65,7 +67,7 @@ defineExpose({ prepareCreate, prepareFrom, browse, hasUnresolved: workspace.unre
     <div class="contact-actions"><el-button v-if="state.attempt.state === 'uncertain'" type="primary" :disabled="Boolean(state.busy) || !writable" @click="retry">重试提交</el-button><el-button v-if="state.attempt.state === 'rejected' && mode" :disabled="Boolean(state.busy) || !writable" @click="unlockRejected">保留输入并解锁</el-button></div>
     <details><summary>查看请求参数明细</summary><p>{{ state.attempt.method }} {{ state.attempt.path }}</p><p class="contact-long">幂等键：{{ state.attempt.key }}</p><pre>{{ state.attempt.payload }}</pre></details>
    </section>
-   <ApiErrorNotice :error="state.error" />
+   <ApiErrorNotice :error="state.error" /><ReadRecoveryActions :busy="state.busy" :can-retry="workspace.canRetryRead()" :scope-key="contextKey+':'+readScope" :cancel="workspace.cancelRead" :retry="workspace.retryRead" label="联系人" />
    <el-alert v-if="validation" type="warning" :closable="false" :title="validation" />
    <section class="contact-section admin-contact-list">
     <div class="contact-query admin-toolbar">
@@ -73,8 +75,10 @@ defineExpose({ prepareCreate, prepareFrom, browse, hasUnresolved: workspace.unre
      <el-select v-model="view" aria-label="联系人记录视图" :disabled="state.busy === 'write'"><el-option value="CURRENT" label="未归档（含停用）" /><el-option value="ARCHIVED" label="已归档" /><el-option value="ALL" label="全部记录" /></el-select>
      <el-button :disabled="Boolean(state.busy)" @click="browse(false)">刷新列表</el-button><el-button :disabled="!nextList" @click="browse(true)">下一页</el-button>
     </div>
-    <p class="contact-help">当前筛选：{{ state.query || '全部姓名' }} / {{ state.view }} · 每页 15 条记录。</p>
-    <p v-if="state.busy === 'read'" role="status">正在加载联系人列表…</p>
+    <p v-if="query!==state.query||view!==state.view" role="status" class="contact-help">输入的筛选尚未应用；原读取重试仍使用已提交的查询条件。</p>
+    <p v-if="!state.page&&state.busy!=='read'" class="contact-help">尚未取得联系人列表，数量未知；读取失败或取消不代表没有联系人。</p>
+    <p class="contact-help">当前查询条件：{{ state.query || '全部姓名' }} / {{ state.view }} · 每页 15 条记录。</p>
+    <p v-if="state.busy === 'read'" role="status">正在读取联系人记录，数量与结果待确认…</p>
     <div v-if="state.page" class="table-scroll" role="region" tabindex="0" aria-label="联系人列表，可横向滚动"><table class="contact-table admin-table"><thead><tr><th scope="col">姓名 / 版本</th><th scope="col">联系角色</th><th scope="col">状态</th><th scope="col">联系方式</th><th scope="col">操作</th></tr></thead><tbody><tr v-for="row in state.page.items" :key="row.id"><td><div class="admin-member"><span class="admin-avatar" aria-hidden="true">{{ row.name.slice(0, 1) }}</span><div><strong class="verbatim">{{ row.name }}</strong><small>v{{ row.version }} · {{ displayTime(row.updated_at) }}</small></div></div></td><td>{{ row.roles.map(r => contactRoleLabels[r]).join('、') }}</td><td>{{ row.archived ? '已归档' : row.enabled ? '已启用' : '已停用' }}</td><td>{{ row.mobile ?? '手机号未提供' }}<br>{{ row.email ?? '邮箱未提供' }}</td><td><div class="contact-actions admin-row-actions"><el-button :disabled="Boolean(state.busy)" data-action="select" :data-contact-id="row.id" @click="select(row.id)">查看</el-button><el-button v-if="writable" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="prepareFrom(row)">{{ row.archived ? '恢复' : '编辑' }}</el-button><el-button v-if="writable && !row.archived" :disabled="Boolean(state.busy) || workspace.unresolved()" @click="archiveContact(row)">归档停用</el-button></div></td></tr></tbody></table><el-empty v-if="state.page.items.length === 0" description="当前筛选条件下暂无联系人记录" /></div>
    </section>
    <section v-if="mode" class="contact-section admin-editor-panel">

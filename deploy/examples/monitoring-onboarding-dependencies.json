@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "purpose": "dependency_shape_only_not_a_runtime_publication",
+  "question_ids": [
+    "Q03",
+    "Q06",
+    "Q19",
+    "Q20",
+    "Q21",
+    "Q28"
+  ],
+  "device_onboarding_enabled": false,
+  "production_approved": false,
+  "tenant_id": null,
+  "approved_device_inventory_reference": null,
+  "verified_tenant_asset_mapping_reference": null,
+  "published_template_and_oid_reference": null,
+  "vendor_compatibility_verification_reference": null,
+  "existing_monitoring_connection_reference": null,
+  "existing_read_credential_binding_reference": null,
+  "verified_tls_trust_reference": null,
+  "polling_scope_authorization_reference": null,
+  "recovery_observation_policy_reference": null,
+  "first_value_readback_evidence_reference": null,
+  "runtime_publications": {
+    "monitor.sample_interval_sec": null,
+    "monitor.threshold_matrix": null,
+    "monitor.health_heartbeat_sec": null
+  },
+  "fixed_registry_keys": [],
+  "notes": "Unresolved reference slots only; not consumed by runtime. No credentials, private keys, endpoints, grants, configuration publication, provider calls, customer delivery, billing, deletion or production approval are established by this file. Fixed constraints remain in the contract registry and are not editable slots."
+}

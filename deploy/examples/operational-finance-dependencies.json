@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "purpose": "dependency_shape_only_not_a_runtime_publication",
+  "question_ids": [
+    "Q23",
+    "Q26",
+    "Q30"
+  ],
+  "official_financial_output_enabled": false,
+  "billing_submission_enabled": false,
+  "production_approved": false,
+  "tenant_id": null,
+  "approved_cost_formula_reference": null,
+  "labor_cost_source_reference": null,
+  "system_allocation_basis_reference": null,
+  "traffic_cost_source_reference": null,
+  "actual_worklog_snapshot_reference": null,
+  "fte_source_and_calendar_reference": null,
+  "salary_reference_source_reference": null,
+  "approved_metering_definition_reference": null,
+  "customer_financial_review_reference": null,
+  "runtime_publications": {
+    "finance.labor_rate": null,
+    "finance.system_allocation": null,
+    "finance.traffic_cost": null,
+    "finance.fte_rule": null,
+    "finance.salary_reference": null,
+    "worklog.missing_default_minutes": null,
+    "metering.coverage": null,
+    "metering.active_tenant_definition": null,
+    "sla.compensation_ratio": null,
+    "sla.compensation_formula": null,
+    "sla.rounding": null
+  },
+  "fixed_registry_keys": [
+    "operations.tenants_per_fte_reference"
+  ],
+  "notes": "Unresolved reference slots only; not consumed by runtime. No credentials, private keys, endpoints, grants, configuration publication, provider calls, customer delivery, billing, deletion or production approval are established by this file. Fixed constraints remain in the contract registry and are not editable slots.",
+  "approved_sla_compensation_policy_reference": null
+}

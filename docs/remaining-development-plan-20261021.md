@@ -24,3 +24,5 @@
 - [监控暂停刷新与身份隔离](monitoring-refresh-control-20261021.md)，以及[可分页采样数值表](monitoring-history-table-20261021.md)
 
 这些是已有链路的可用性修复，不把未实现的外部执行、数据聚合或正式验收改标为完成。
+
+[剩余依赖槽位及仍需开发代码的区分](remaining-dependency-slots-20261021.md)。离线模板校验通过不代表运行准备或合同完成。

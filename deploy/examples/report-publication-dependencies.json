@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "purpose": "dependency_shape_only_not_a_runtime_publication",
+  "question_ids": [
+    "Q10",
+    "Q11",
+    "Q23",
+    "Q24",
+    "Q28"
+  ],
+  "formal_publication_enabled": false,
+  "client_delivery_enabled": false,
+  "production_approved": false,
+  "tenant_id": null,
+  "metric_source_snapshot_reference": null,
+  "approved_regeneration_policy_reference": null,
+  "service_manager_review_reference": null,
+  "customer_copy_approval_reference": null,
+  "font_and_brand_license_reference": null,
+  "renderer_verification_reference": null,
+  "encrypted_artifact_storage_reference": null,
+  "recipient_authorization_reference": null,
+  "delivery_channel_approval_reference": null,
+  "first_read_receipt_policy_reference": null,
+  "runtime_publications": {
+    "reports.version_policy": null,
+    "reports.template": null,
+    "reports.copy": null,
+    "reports.generate_local_time": null,
+    "reports.cutoff": null,
+    "healthcheck.weights_and_scoring": null,
+    "scope.annual_review": null,
+    "security.attachment_policy": null
+  },
+  "fixed_registry_keys": [
+    "report.contract_retention",
+    "report.monthly_generate_day",
+    "report.unread_remind_days",
+    "report.advice_max_count"
+  ],
+  "notes": "Unresolved reference slots only; not consumed by runtime. No credentials, private keys, endpoints, grants, configuration publication, provider calls, customer delivery, billing, deletion or production approval are established by this file. Fixed constraints remain in the contract registry and are not editable slots."
+}

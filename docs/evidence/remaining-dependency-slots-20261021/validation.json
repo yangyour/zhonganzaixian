@@ -1,0 +1,24 @@
+{
+  "base_commit": "d57982a9c9dcaa4e348e9792eb0cbd1a11a7ed9b",
+  "result": "PASS_OFFLINE_SHAPE_ONLY",
+  "new_templates": 5,
+  "corrected_templates": 1,
+  "python_tests": 120,
+  "new_python_tests": 7,
+  "contract_tests": 165,
+  "runtime_ready": false,
+  "external_connections_checked": false,
+  "configuration_publications_created": 0,
+  "frontend_backend": "UNCHANGED_NOT_RERUN_THIS_BATCH",
+  "formal_tc_not_run": 128,
+  "source_sha256": {
+    "deploy/examples/backup-execution-dependencies.json": "441f7549c6896d6099ce3be6e5904eddd0cc3d228783170dc231883a5006859c",
+    "deploy/examples/monitoring-onboarding-dependencies.json": "389e61a27c465ca2f3efd07606016e49c33a655612d5a1f6ff27fa2083ea29a2",
+    "deploy/examples/remote-session-dependencies.json": "b3f591c0c0e31df18dbe9dac9557ceda3124377dd31bed83ed76535bc0f4efe9",
+    "deploy/examples/report-publication-dependencies.json": "a14de46ac1cbf263a9493a6828c05bdbd12c8bbec7b32c14491cb63e997da112",
+    "deploy/examples/operational-finance-dependencies.json": "268ba9055c4df338927efd5e178dde733f539009b643de7cc4e8280c880f5584",
+    "deploy/examples/tenant-governance-dependencies.json": "e0af90c7765203f1fcffeddcbd7f860e77cb1a711cb568e2ad770373bdbc3909",
+    "tools/dependency_template_check.py": "b2ee301897a085e2042a896b994521c0cf7ceb6fb458d8c993d1d67b49def683",
+    "tools/test_dependency_template_check.py": "1bc3acf0f4f01f522347101b7914fa52a13143b9e6f044e1d44e0c9afc6f3b5c"
+  }
+}

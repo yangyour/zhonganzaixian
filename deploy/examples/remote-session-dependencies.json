@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "purpose": "dependency_shape_only_not_a_runtime_publication",
+  "question_ids": [
+    "Q01",
+    "Q03",
+    "Q09",
+    "Q10",
+    "Q28"
+  ],
+  "bastion_session_enabled": false,
+  "production_approved": false,
+  "tenant_id": null,
+  "route_confirmation_reference": null,
+  "product_license_verification_reference": null,
+  "device_authorization_reference": null,
+  "dual_reviewer_policy_reference": null,
+  "readonly_approval_exception_reference": null,
+  "existing_bastion_connection_reference": null,
+  "existing_credential_binding_reference": null,
+  "recording_storage_binding_reference": null,
+  "recording_integrity_verification_reference": null,
+  "command_interception_verification_reference": null,
+  "session_termination_verification_reference": null,
+  "runtime_publications": {
+    "remote.default_session_min": null,
+    "remote.bastion_baseline": null,
+    "remote.approver_policy": null,
+    "remote.idle_timeout_sec": null,
+    "remote.extension_policy": null,
+    "remote.high_risk_confirmation_policy": null,
+    "recording.readonly_enabled": null,
+    "recording.customer_access_approval": null,
+    "retention.recording_total_months": null,
+    "security.kms_ca": null
+  },
+  "fixed_registry_keys": [
+    "remote.approval_expiry_min",
+    "remote.engineer_concurrency",
+    "remote.authorization_remind_days",
+    "recording.hot_retention_months",
+    "operations.remote_rate_target"
+  ],
+  "notes": "Unresolved reference slots only; not consumed by runtime. No credentials, private keys, endpoints, grants, configuration publication, provider calls, customer delivery, billing, deletion or production approval are established by this file. Fixed constraints remain in the contract registry and are not editable slots."
+}

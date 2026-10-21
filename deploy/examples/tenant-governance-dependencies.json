@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "purpose": "dependency_shape_only_not_a_runtime_publication",
+  "question_ids": [
+    "Q02",
+    "Q09",
+    "Q10",
+    "Q16",
+    "Q21",
+    "Q28"
+  ],
+  "tenant_provisioning_enabled": false,
+  "retention_deletion_enabled": false,
+  "production_approved": false,
+  "tenant_id": null,
+  "pilot_tenant_approval_reference": null,
+  "decision_contact_verification_reference": null,
+  "administrator_assignment_approval_reference": null,
+  "database_isolation_decision_reference": null,
+  "resource_pool_capacity_verification_reference": null,
+  "atomic_quota_reservation_reference": null,
+  "provisioning_compensation_policy_reference": null,
+  "retention_inventory_reference": null,
+  "retention_legal_hold_reference": null,
+  "deletion_approval_reference": null,
+  "restore_drill_evidence_reference": null,
+  "runtime_publications": {
+    "tenant.worker_concurrency": null,
+    "tenant.contract_device_quota": null,
+    "tenant.item_quota": null,
+    "tenant.nvps_quota": null,
+    "tenant.plan": null,
+    "tenant.isolation": null,
+    "tenant.pool": null,
+    "pool.review_share_duration_sec": null,
+    "retention.contract_end_policy": null,
+    "retention.history_days": null,
+    "retention.trend_days": null
+  },
+  "fixed_registry_keys": [
+    "tenant.name_unique",
+    "tenant.decision_contact_min",
+    "pool.review_share_ratio"
+  ],
+  "notes": "Unresolved reference slots only; not consumed by runtime. No credentials, private keys, endpoints, grants, configuration publication, provider calls, customer delivery, billing, deletion or production approval are established by this file. Fixed constraints remain in the contract registry and are not editable slots."
+}

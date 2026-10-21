@@ -18,12 +18,21 @@
     "backup.retry_count": null,
     "backup.retry_interval_min": null,
     "backup.recent_version_count": null,
-    "backup.min_retention_months": null,
-    "backup.failure_ticket_count": null,
     "backup.failure_count_semantics": null,
     "backup.commands": null,
     "backup.noise_filter": null,
     "backup.change_window": null
   },
-  "notes": "Unresolved dependency references only. Do not paste passwords, private keys, executable commands or provider endpoints. This file does not publish a plan, trust a host key, authorize SSH, create a run, grant storage access, approve retention deletion or send notifications. Calendar preview is not next execution time."
+  "notes": "Unresolved dependency references only. Do not paste passwords, private keys, executable commands or provider endpoints. This file does not publish a plan, trust a host key, authorize SSH, create a run, grant storage access, approve retention deletion or send notifications. Calendar preview is not next execution time.",
+  "schema_version": 1,
+  "question_ids": [
+    "Q10",
+    "Q22",
+    "Q28"
+  ],
+  "fixed_registry_keys": [
+    "backup.min_retention_months",
+    "backup.failure_ticket_count",
+    "backup.drill_warning_days"
+  ]
 }

@@ -68,5 +68,19 @@
     "last_verified_live_version": 50
   },
   "formal_contract_acceptance": "NOT_RUN",
-  "credentials_recorded": false
+  "credentials_recorded": false,
+  "validated_web_fix_commit": "ddc0eaaf103288cd700fc01ce5d90846449cf011",
+  "additional_main_monitoring_presets": {
+    "source_commit": "93226bdf011cf97e2b3c5dec4099a647c3e425f7",
+    "python_tests_passed": 37,
+    "runtime": "Python 3.11 -X utf8",
+    "scope": "isolated validation and synthetic loopback HTTP/TCP only; no remote device probes or applied provider configuration",
+    "first_attempt": "GBK locale decoding failed before test import; rerun with explicit UTF-8 mode passed",
+    "release_files": [
+      "config/monitoring/presets.v1.json",
+      "tools/monitoring_presets.py",
+      "deploy/examples/monitoring/targets.disabled.json"
+    ],
+    "example_targets_enabled": false
+  }
 }

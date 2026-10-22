@@ -21,3 +21,5 @@
 浏览器内容来自显式SYNTHETIC夹具，属于真实浏览器的合成组件验证，不能冒充真实API联调或全站WCAG符合性。当前证据不代表服务器已运行新CSS、设备采集/外部通知成功或128项正式合同验收完成。
 
 证据：[结构化验证](evidence/redeploy-20261022/validation.json)、[320px](evidence/redeploy-20261022/compact-events-320.png)、[1440px](evidence/redeploy-20261022/compact-events-1440.png)。完整日志和候选工件保存在本机Git忽略的`.local/test-deployment/`；密码、token及完整配置不入Git。
+
+补充：归档前主干新增 93226bd 监控预设目录与单次探测工具，已正常合入；Python 3.11首次因GBK默认编码在导入前失败，显式UTF-8模式重跑37项测试通过。其回环HTTP/TCP均为合成验证，未探测真实设备；候选发布同时准备预设JSON、标准库CLI及全部禁用示例三个文件，不自动绑定模板、启用采集或写入供应商配置。后端与Web运行源码不受该提交影响。

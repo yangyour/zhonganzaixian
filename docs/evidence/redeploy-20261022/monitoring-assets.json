@@ -1,0 +1,15 @@
+{
+  "verified_at": "2026-10-22T11:48:37.350826+00:00",
+  "release": "/opt/mop-lan-test/releases/20261022T114531Z-603337b58db7-fb588e",
+  "source_commit": "603337b58db73165b3bd0a58094d68d5d4b387bb",
+  "validation": {
+    "valid": true,
+    "target_count": 13,
+    "configuration_sha256": "3c37a16bfd2c615e44265488d23c41f1f1da3a3d2abe36e6a7037bd20d8242f2",
+    "network_accessed": false
+  },
+  "catalog_count": 13,
+  "provider_configurations_applied": false,
+  "remote_device_probes": 0,
+  "credentials_output": false
+}

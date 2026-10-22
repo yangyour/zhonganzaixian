@@ -1,9 +1,9 @@
 {
   "verified_at": "2026-10-22T11:41:14.882699+00:00",
   "source_base": "74396c3012889a6f92eb2fe0c9d37440f8bb45e4",
-  "status": "BUILD_VERIFIED_DEPLOYMENT_BLOCKED_SSH",
-  "deployment_completed": false,
-  "server_application_changes": 0,
+  "status": "PASSED",
+  "deployment_completed": true,
+  "server_application_changes": 7,
   "migrations_executed": 0,
   "deployment_tests_passed": 20,
   "contract_tests_passed": 170,
@@ -49,17 +49,8 @@
     "configured_vpn_route": "10.8.0.0/24",
     "route_observation": "No explicit route to test LAN; default route selected FlClash TUN",
     "global_proxy_or_vpn_changes": false,
-    "credentials_sent_to_alternate_host": false
-  },
-  "existing_public_site": {
-    "origin": "http://mop.all-online.com.cn",
-    "ready_http_status": 200,
-    "ready": true,
-    "mode": "remote_test",
-    "durable": true,
-    "production_ready": false,
-    "web_build_id": "ac36b1d590b3253d964df4a327ec65059ca60ab3597e9c8d3aba3299c851a9e6",
-    "manifest_http_status": 200
+    "credentials_sent_to_alternate_host": false,
+    "status": "RESTORED_PINNED_SSH_AND_OWNER_VERIFIED"
   },
   "schema": {
     "source_and_packaged_versions": "V1-V50",
@@ -82,5 +73,30 @@
       "deploy/examples/monitoring/targets.disabled.json"
     ],
     "example_targets_enabled": false
+  },
+  "published_source_commit": "603337b58db73165b3bd0a58094d68d5d4b387bb",
+  "restored_by_user": true,
+  "deployment_verified_at": "2026-10-22T11:47:24.000182+00:00",
+  "real_http_checks": 195,
+  "public_static_files_verified": 143,
+  "real_authenticated_browser_cases": 4,
+  "jiangfaming_login_http_status": 200,
+  "private_base_configuration_unchanged": true,
+  "protected_container_lifecycle_unchanged": true,
+  "public_site_before": {
+    "origin": "http://mop.all-online.com.cn",
+    "ready_http_status": 200,
+    "ready": true,
+    "mode": "remote_test",
+    "durable": true,
+    "production_ready": false,
+    "web_build_id": "ac36b1d590b3253d964df4a327ec65059ca60ab3597e9c8d3aba3299c851a9e6",
+    "manifest_http_status": 200
+  },
+  "existing_public_site": {
+    "origin": "http://mop.all-online.com.cn",
+    "ready": true,
+    "web_build_id": "7f4037f36d92941b28991d6e38f8f0b0c264bae81d0efdda1f65e60dc68e45f1",
+    "production_ready": false
   }
 }

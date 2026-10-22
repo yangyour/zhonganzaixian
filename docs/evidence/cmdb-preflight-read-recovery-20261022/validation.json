@@ -1,0 +1,59 @@
+{
+  "status": "PASS_LOCAL_REGRESSION_WITH_BROWSER_NOT_RUN",
+  "new_java_tests": 8,
+  "new_vue_dom_tests": 9,
+  "java_original": {
+    "tests": 26,
+    "failed": 8
+  },
+  "java_focused": {
+    "tests": 26,
+    "passed": 26
+  },
+  "vue_original_first_regressions": {
+    "tests": 20,
+    "failed": 7
+  },
+  "vue_focused_final": {
+    "tests": 22,
+    "passed": 22
+  },
+  "maven_verify": {
+    "tests": 4132,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1032,
+    "executed": 3100
+  },
+  "vitest": {
+    "files": 272,
+    "tests": 4545,
+    "failures": 0
+  },
+  "node_contract_tests": 178,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180737,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "a20417c1a9411a98523159caaeaa9935a76c721974227109924694b4e25a317e",
+    "scope": "static-artifacts-only"
+  },
+  "browser": {
+    "specifications": 105,
+    "files": 12,
+    "actual_execution": "NOT_RUN"
+  },
+  "formal_contract_tc": "128_NOT_RUN",
+  "sql_changed": false,
+  "api_success_schema_changed": false,
+  "real_account_permission_or_import_changes": 0,
+  "api_jar_sha256": "f0af6416143d935d18c68093440cbf7b01307a703e8e861b9db456f7548c3997",
+  "source_sha256": {
+    "apps/web/src/components/CmdbSourcePreflightPanel.vue": "b5bc71c50a8e456e192a028302e62974b48b69fa27521ab380f2fc43e56ab00e",
+    "apps/web/tests/cmdbSourcePreflightPanel.test.ts": "b8675a91c94a3b3b7c3d53c7bfebfa0ab35389475fed16dd11d783a93959e698",
+    "server/api/src/main/java/cn/mop/api/CmdbSourcePreflightController.java": "d2e0ff32fc02d4f8178a2a37eee08b34897a5498e7ba519a78312adfeb412e97",
+    "server/api/src/test/java/cn/mop/api/CmdbSourcePreflightControllerTest.java": "0e64d05c51267d23cd58829d395ce9102dcd0fc8e2afa0fbe751c1232d381394"
+  }
+}

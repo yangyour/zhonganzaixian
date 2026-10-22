@@ -26,7 +26,7 @@ public final class CmdbSourcePreflightController {
   if(request.getUserPrincipal()==null||request.getSession(false)==null)throw expired();
   String actor=request.getUserPrincipal().getName();Object scope=request.getSession(false).getAttribute("mop.tenant_id");if(!(scope instanceof String tenant))throw expired();
   Membership member=platform.membership(actor,tenant).orElseThrow(CmdbSourcePreflightController::expired);
-  if(!member.active()||member.permissionVersion()<1||!actor.equals(member.userId())||!tenant.equals(member.tenantId()))throw expired();
+  if(!member.active()||member.permissionVersion()<1||member.permissionVersion()>9007199254740991L||!actor.equals(member.userId())||!tenant.equals(member.tenantId()))throw expired();
   if(!member.capabilities().contains("assets:write"))throw new DomainException(403,"ACTION_FORBIDDEN","当前成员没有导入来源检查权限");
   if(request.getQueryString()!=null||!request.getParameterMap().isEmpty())throw new DomainException(400,"VALIDATION_ERROR","预检不接受客户端规则、租户或单元格覆盖");
   if(id==null||!id.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))throw new DomainException(404,"NOT_FOUND","来源不存在或不可访问");
@@ -56,6 +56,10 @@ public final class CmdbSourcePreflightController {
    result=new CmdbSourcePreflight.Result(errors>0?"ERROR":"CONFIG_PENDING",result.records(),errors,result.warningRows(),combined);
    findings.clear();for(var f:combined)findings.add(map("record",f.record(),"source_row",f.sourceRow(),"column",f.column(),"level",f.level(),"code",f.code(),"message",f.message()));
   }
+  // Never publish a completed diagnostic after the originating session or effective grants changed.
+  if(request.getUserPrincipal()==null||!actor.equals(request.getUserPrincipal().getName())||request.getSession(false)==null||!tenant.equals(request.getSession(false).getAttribute("mop.tenant_id")))throw expired();
+  Membership latest=platform.membership(actor,tenant).orElseThrow(CmdbSourcePreflightController::expired);
+  if(!member.equals(latest))throw expired();
   return success(map("tenant_id",tenant,"source_id",id,"source_version",source.path("version").asLong(),"parse_hash",stored.path("parse_hash").asText(),"catalog_version",CustomerCmdbDictionary.VERSION,"scope",database?"SOURCE_DICTIONARY_AND_ASSET_NAMES":"SOURCE_DICTIONARY_ONLY","status",result.status(),"records",result.records(),"error_rows",result.errorRows(),"warning_rows",result.warningRows(),"findings",findings,"database_checks",database?"EXACT_ASSET_NAMES_ONLY":"NOT_RUN","can_import",false,"asset_mutations",false,"production_approved",false),request);
  }
  private static boolean uuid(String value){return value.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");}

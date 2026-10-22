@@ -1,0 +1,58 @@
+{
+  "result": "PASS_IDENTITY_FIXED_READ_RECOVERY",
+  "new_tests": 24,
+  "new_test_layers": {
+    "real_vue_dom_and_handlers": 24
+  },
+  "focused_tests_passed": 68,
+  "vitest": {
+    "files_passed": 257,
+    "tests_passed": 4229
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180746,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "3834d6cb1c12726130af172e42cfb8b2cd59b96e86bc0cb682f4a67ee78b5e95",
+    "scope": "static-artifacts-only"
+  },
+  "initial_failures": [
+    {
+      "duplicate_retry_dispatch": 3,
+      "passed_before_fix": 20,
+      "fixed": "Separate recovery epoch and pre-await retry mutex."
+    },
+    {
+      "discard_confirmation_focus_target": 1,
+      "skipped": 23,
+      "fixed": "Keep original retry DOM while confirmation is pending; separate visible target from dispatch permission."
+    }
+  ],
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "browser_specs": {
+    "tests": 86,
+    "files": 10,
+    "status": "DISCOVERED_NOT_EXECUTED"
+  },
+  "axe": "NOT_RUN",
+  "modal": "EXPLICIT_STUB_NOT_BROWSER_ACCEPTANCE",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_account_password_or_permission_changes": 0,
+  "formal_acceptance_passes_added": 0,
+  "source_sha256": {
+    "apps/web/src/pages/IdentityRolesPage.vue": "4332c0f8a0ccc4fd9e97cc25fade26b87493dcf04184f5a880a19b3643da23e1",
+    "apps/web/src/pages/AccountPage.vue": "a5181713e5a3d0c3fd6bf33016f37c73ef6309283902a61778e32f13ab20adbc",
+    "apps/web/src/pages/IdentitySettingsPage.vue": "3eeccb1e4a919a4b7f7c74b3f6eb7ec3c4e583e77fe7fe6d10726e1aaeaffe5f",
+    "apps/web/tests/identityReadRecovery.test.ts": "ee4d66dcc79fcb1a3bad2577843cf0d030e92c0524292e6112cdfaa0b76ccb5f"
+  }
+}

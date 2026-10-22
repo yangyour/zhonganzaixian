@@ -1,0 +1,38 @@
+(node:6) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @mop/web@0.1.0 test
+> vitest run tests/identityReadRecovery.test.ts -t role retry remains
+
+(node:19) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.11 /workspace/scratch/390b70bf66c8/zhonganzaixian-integrated/apps/web
+
+(node:37) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ tests/identityReadRecovery.test.ts (24 tests | 1 failed | 23 skipped) 65ms
+   × role retry remains mounted while discard confirmation is pending so cancellation has a live focus target 64ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/identityReadRecovery.test.ts > role retry remains mounted while discard confirmation is pending so cancellation has a live focus target
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/identityReadRecovery.test.ts:35:566
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 23 skipped (24)
+   Start at  18:57:54
+   Duration  1.44s (transform 492ms, setup 0ms, import 985ms, tests 65ms, environment 274ms)
+

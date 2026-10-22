@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import '../styles/adminPrototype.css'
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { api, isCancelled } from '../api/client'
 import { can, session, contextGeneration, switchingTenant } from '../stores/session'
 import { baseRoleLabels, readRolePage, type BaseRole, type ProjectRole, type RolePage } from '../utils/projectIdentity'
 import { useIdentityEditor } from '../utils/useIdentityEditor'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
 import IdentityCommandNotice from '../components/IdentityCommandNotice.vue'
 const data = ref<RolePage | null>(null), error = ref<unknown>(null), loading = ref(false), selected = ref<ProjectRole | null>(null), opened = ref(false)
 let controller: AbortController | null = null, readGeneration = 0, disposed = false
@@ -13,8 +14,16 @@ const form = reactive({ name: '', description: '', base_role: 'viewer' as BaseRo
 const editor = useIdentityEditor(load, {snapshot:inputSnapshot,preserveUnknown:true}), command = editor.command, message = editor.message
 const available = computed(() => data.value?.permission_catalog.entries.filter(x => x.declared_by_role[form.base_role]) ?? [])
 const scope = computed(() => JSON.stringify([session.value?.user.id, session.value?.user.role, session.value?.tenant.id, session.value?.permission_version, session.value?.account_version, [...(session.value?.capabilities ?? [])].sort(), contextGeneration.value, switchingTenant.value]))
+let recoveryEpoch=0
+const retrying=ref(false),retryable=ref(false),pageHeading=ref<HTMLElement|null>(null),readFeedback=ref<HTMLElement|null>(null)
+function showReadRetry(){return !disposed&&!loading.value&&retryable.value&&!['sending','uncertain'].includes(command.value.state)&&can('roles:read')&&!switchingTenant.value}
+function canRetryRead(){return showReadRetry()&&!retrying.value&&!editor.busy()}
+function cancelRead(){if(disposed||!loading.value)return false;readGeneration++;controller?.abort();controller=null;loading.value=false;error.value=null;return true}
+async function retryRead(){if(!canRetryRead())return false;const turn=++recoveryEpoch;retrying.value=true;try{return await refresh()}finally{if(turn===recoveryEpoch)retrying.value=false}}
+async function focusRead(owner:string,ok:boolean){if(!ok&&!error.value)return;await nextTick();if(disposed||owner!==scope.value||loading.value)return;(error.value?readFeedback.value:pageHeading.value)?.focus()}
 function inputSnapshot(){return JSON.stringify([scope.value,opened.value,selected.value,form])}
 function clearView() {
+  recoveryEpoch++;retrying.value=false;retryable.value=false
   readGeneration++; controller?.abort(); controller = null
   data.value = null; selected.value = null; opened.value = false; loading.value = false; error.value = null
   Object.assign(form, { name: '', description: '', base_role: 'viewer', enabled: true, permissions: [] })
@@ -23,23 +32,24 @@ function clearView() {
 watch(scope, clearView, { flush: 'sync' })
 onUnmounted(() => { disposed = true; clearView() })
 async function load() {
+  recoveryEpoch++;retrying.value=false;retryable.value=false
   const turn = ++readGeneration, owner = scope.value, tenant = session.value?.tenant.id
   controller?.abort(); controller = null; data.value = null; selected.value = null; opened.value = false; error.value = null; loading.value = false
   if (disposed || switchingTenant.value || !tenant || !can('roles:read')) return false
   const current = () => !disposed && turn === readGeneration && owner === scope.value && can('roles:read') && !switchingTenant.value
-  const request = new AbortController(); controller = request; loading.value = true
+  const request = new AbortController(); controller = request; loading.value = true;retryable.value=true
   try {
     const raw = await api.request('/identity/roles', { signal: request.signal })
     if (!current()) return false
-    data.value = readRolePage(raw, tenant); return true
+    data.value = readRolePage(raw, tenant);retryable.value=false; return true
   } catch (e) { if (current() && !isCancelled(e)) error.value = e; return false }
   finally { if (turn === readGeneration) { controller = null; loading.value = false } }
 }
 onMounted(load)
 async function refresh() {
   const owner = scope.value, before=inputSnapshot()
-  if (editor.busy() || !await editor.leave() || owner !== scope.value || before!==inputSnapshot()) return
-  editor.clear(); await load()
+  if (editor.busy() || !await editor.leave() || owner !== scope.value || before!==inputSnapshot()) return false
+  editor.clear(); const ok=await load();await focusRead(owner,ok);return ok
 }
 async function edit(role?: ProjectRole, copy = false) {
   const owner = scope.value, before=inputSnapshot()
@@ -57,10 +67,10 @@ async function save() { if (!opened.value || !can('roles:write') || !can('roles:
 async function closeEditor() { const owner = scope.value, before=inputSnapshot(); if (editor.busy() || !await editor.leave() || owner !== scope.value || before!==inputSnapshot()) return; editor.clear(); opened.value = false; selected.value = null }
 </script>
 <template>
-  <section class="identity-page admin-prototype" v-loading="loading">
-    <div class="page-heading"><div><h1>角色与权限</h1><p>管理系统内置角色与自定义角色权限配置，权限变更实时同步至关联成员。</p></div><div class="heading-actions"><el-button v-if="can('roles:read')" :disabled="editor.busy() || switchingTenant" @click="refresh">刷新角色列表</el-button><el-button v-if="can('roles:write')" type="primary" :disabled="editor.busy()" @click="edit()">新建角色</el-button></div></div>
+  <section class="identity-page admin-prototype" :aria-busy="loading">
+    <div class="page-heading"><div><h1 ref="pageHeading" tabindex="-1">角色与权限</h1><p>管理系统内置角色与自定义角色权限配置，权限变更实时同步至关联成员。</p></div><div class="heading-actions"><el-button v-if="can('roles:read')" :disabled="editor.busy() || switchingTenant" @click="refresh">刷新角色列表</el-button><el-button v-if="can('roles:write')" type="primary" :disabled="editor.busy()" @click="edit()">新建角色</el-button></div></div>
     <p v-if="!can('roles:read')" class="admin-empty">当前账号无角色查看权限。</p>
-    <ApiErrorNotice :error="error"><el-button @click="refresh">重试</el-button></ApiErrorNotice><IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />
+    <ReadRecoveryActions :busy="loading?'read':null" :can-retry="showReadRetry()" :scope-key="scope" label="角色列表" :cancel="cancelRead" :retry="retryRead" /><p v-if="loading" role="status">正在读取角色列表…</p><div ref="readFeedback" tabindex="-1" role="group" aria-label="角色列表读取结果"><ApiErrorNotice :error="error" /></div><IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />
     <div class="admin-stats" v-if="data"><div class="admin-stat"><span>角色总数</span><strong>{{ data.items.length }}</strong><small>当前授权租户角色</small></div><div class="admin-stat"><span>启用角色</span><strong>{{ data.items.filter(r => r.enabled).length }}</strong><small>成员授权可选角色</small></div><div class="admin-stat"><span>内置角色</span><strong>{{ data.items.filter(r => r.builtin).length }}</strong><small>系统预置权限基线</small></div><div class="admin-stat"><span>能力目录</span><strong>{{ data.permission_catalog.entries.length }}</strong><small>按基础角色划分授权范围</small></div></div>
     <section class="admin-card"><div class="admin-card-head"><h2>角色矩阵</h2><span class="muted">{{ session?.tenant.name }} · 按基础业务类别授权</span></div><div class="admin-table-scroll"><table class="admin-table"><thead><tr><th>角色 / 说明</th><th>基础类别</th><th>权限</th><th>成员</th><th>状态</th><th>操作</th></tr></thead><tbody><tr v-for="role in data?.items" :key="role.id"><td><strong>{{ role.name }}</strong><small>{{ role.description || '未填写说明' }}</small></td><td>{{ baseRoleLabels[role.base_role] }}<small v-if="role.builtin">系统内置</small></td><td>{{ role.permissions.length }} 项</td><td>{{ role.assigned_members }} 位</td><td><el-tag :type="role.enabled ? 'success' : 'info'">{{ role.enabled ? '启用' : '停用' }}</el-tag></td><td><div class="admin-row-actions"><el-button @click="edit(role)">{{ can('roles:write') && !role.builtin ? '查看 / 编辑' : '查看权限' }}</el-button><el-button v-if="can('roles:write')" @click="edit(role, true)">复制为新角色</el-button></div></td></tr></tbody></table><p v-if="data && !data.items.length" class="admin-empty">当前租户暂无角色记录。</p></div></section>
     <form v-form-feedback v-if="opened" class="identity-card identity-form admin-editor-panel" @submit.prevent="save" @input="editor.dirty.value = true" @change="editor.dirty.value = true">
@@ -72,6 +82,8 @@ async function closeEditor() { const owner = scope.value, before=inputSnapshot()
   </section>
 </template>
 <style scoped>
+.identity-page :focus-visible{outline:3px solid #176bb5;outline-offset:3px}
+
 .heading-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .admin-editor-title h2{min-width:0;overflow-wrap:anywhere}.admin-editor-title>.el-button{flex-shrink:0}
 @media(max-width:650px){.admin-prototype.identity-page .admin-editor-panel{inset:0;width:100%;height:100dvh;max-height:100dvh;padding:0 16px 20px;z-index:1000}.admin-prototype.identity-page .admin-editor-title{top:0;margin-bottom:16px;padding:14px 0;min-height:72px}.admin-prototype.identity-page .admin-editor-title>.el-button{min-height:44px;min-width:88px;margin-left:0}}

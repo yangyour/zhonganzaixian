@@ -143,3 +143,5 @@ qa/browser/my-tasks.pw.ts新增6项四视口、键盘详情、固定负责人、
 [站内通知外部发送与原回执恢复](notification-channel-recovery-20261021.md)补完整回执校验、原GET取消重试及父子列表防卸载门禁；响应式未知提交与两个通道分别跟踪，不把受理当送达，不装配V50 Worker。
 
 [通知发送浏览器验收矩阵](notification-channel-browser-acceptance-20261021.md)新增12项四视口、键盘、axe与恢复规格；现共86项/10文件可发现，实际执行全部仍NOT_RUN，不能计为浏览器或正式TC通过。
+
+[角色、本人账号和安全设置读取恢复](identity-read-recovery-20261021.md)补可达取消、原GET恢复、页标题/错误/取消焦点及恢复互斥；确认时保留原按钮节点，不发布半份策略，不清未知写入。

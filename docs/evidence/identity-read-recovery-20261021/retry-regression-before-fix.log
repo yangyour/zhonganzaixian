@@ -1,0 +1,55 @@
+(node:6) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @mop/web@0.1.0 test
+> vitest run tests/identityReadRecovery.test.ts
+
+(node:19) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.11 /workspace/scratch/390b70bf66c8/zhonganzaixian-integrated/apps/web
+
+(node:37) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ tests/identityReadRecovery.test.ts (23 tests | 3 failed) 556ms
+     × repeated original-retry handlers dispatch just one replacement read 14ms
+     × repeated original-retry handlers dispatch just one replacement read 11ms
+     × repeated original-retry handlers dispatch just one replacement read 13ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/identityReadRecovery.test.ts > 角色列表 read recovery > repeated original-retry handlers dispatch just one replacement read
+ FAIL  tests/identityReadRecovery.test.ts > 安全设置 read recovery > repeated original-retry handlers dispatch just one replacement read
+AssertionError: expected [ …(3) ] to have a length of 2 but got 3
+
+- Expected
++ Received
+
+- 2
++ 3
+
+ ❯ tests/identityReadRecovery.test.ts:29:349
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/identityReadRecovery.test.ts > 本人账号 read recovery > repeated original-retry handlers dispatch just one replacement read
+AssertionError: expected [ [ '/account', { …(1) } ], …(2) ] to have a length of 2 but got 3
+
+- Expected
++ Received
+
+- 2
++ 3
+
+ ❯ tests/identityReadRecovery.test.ts:29:349
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 20 passed (23)
+   Start at  18:56:36
+   Duration  2.06s (transform 487ms, setup 0ms, import 1.08s, tests 556ms, environment 292ms)
+

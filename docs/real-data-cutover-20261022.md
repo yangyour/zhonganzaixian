@@ -64,3 +64,5 @@ JiangFaMing 的账号、密码、权限、企微绑定和邮箱绑定保持。�
 `tools/acceptance/runtime.mjs` 已在发送请求前阻止向当前实际数据租户或未知租户写入合成业务；登录/切换结果不明时清除旧授权缓存。不得恢复旧测试账号、借用 JiangFaMing 凭据或使用数据库测试重新污染此租户。后续写入验收必须使用明确隔离的命名空间；纯计算单元夹具可保留。正式规则、厂商采集及未实现的统计口径继续保持原门禁，本次不表示全部 128 项合同验收完成。
 
 本次没有改变业务 API 契约，没有发送邮件/企微，没有修改设备配置，没有安装或重启组件。证据：[清理](evidence/real-data-cutover-20261022/cleanup.json)、[接口](evidence/real-data-cutover-20261022/http.json)、[浏览器](evidence/real-data-cutover-20261022/browser.json)、[组件](evidence/real-data-cutover-20261022/components.json)、[汇总](evidence/real-data-cutover-20261022/summary.json)。
+
+提交前远端新增 `4ca52c8` 监控接入诊断功能，采用普通合并完整保留。唯一冲突是 AGENTS.md 首部，双方新增约束均保留；合并后 176 项契约及范围检查通过。该上游代码没有在本次数据维护中部署，不能据此将其接口功能标为测试站已上线。

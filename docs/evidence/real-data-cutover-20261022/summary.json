@@ -15,6 +15,7 @@
   "audit_chain_rows_verified": 1252,
   "pure_cleanup_tests": 8,
   "contract_and_scope_tests": 175,
+  "after_merging_upstream_4ca52c8_contract_and_scope_tests": 176,
   "acceptance_write_guard_tests": 5,
   "postcheck_remaining_synthetic_candidates": 0,
   "postcheck_remaining_updates": 0,

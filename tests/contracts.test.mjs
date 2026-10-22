@@ -133,7 +133,7 @@ test('所有业务写接口明确要求幂等及CSRF，remote_test不存在fixtu
   for (const [path, methods] of Object.entries(contract.paths)) {
     for (const [method, operation] of Object.entries(methods)) {
       if (!['post', 'put', 'patch', 'delete'].includes(method)) continue;
-      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons', '/contacts/import-preview', '/monitoring/threshold-diagnostics', '/monitoring/observation-window-diagnostics', '/runtime-configurations/{key}/validate'].includes(path);
+      const readonlyPreview = method === 'post' && ['/working-calendars/{id}/preview', '/sla/compliance-scenarios', '/capacity/estimates', '/operations/explicit-comparisons', '/contacts/import-preview', '/monitoring/threshold-diagnostics', '/monitoring/observation-window-diagnostics', '/runtime-configurations/{key}/validate', '/monitoring-onboarding/registered-targets/{id}/test'].includes(path);
       if (readonlyPreview) assert.equal(operation['x-mop-read-only'], true);
       for (const name of readonlyPreview || ['/auth/local/login','/auth/wecom/start'].includes(path) ? ['X-CSRF-Token'] : ['Idempotency-Key', 'X-CSRF-Token']) {
         assert.ok(operation.parameters.some((p) => p.in === 'header' && p.name === name && p.required), `${method} ${path} ${name}`);
@@ -248,8 +248,8 @@ const importSource = {
 };
 
 test('V0.17保留来源接口creator-only、CSRF/幂等与上传解析202边界', () => {
-  assert.equal(contract.info.version, '0.77.0');
-  assert.equal(contract.info.version, '0.77.0');
+  assert.equal(contract.info.version, '0.78.0');
+  assert.equal(contract.info.version, '0.78.0');
   const routes = { '/assets/import-policy': 'get', '/assets/import-sources': 'post', '/assets/import-sources/{id}': 'get', '/assets/import-sources/{id}/parses': 'post', '/assets/import-sources/{id}/mappings': 'post', '/asset-import-operations/{id}': 'get' };
   for (const [path, method] of Object.entries(routes)) {
     const operation = contract.paths[path][method];
@@ -944,7 +944,7 @@ test('补充SLA口径只能绑定明确发布版本，不接收策略或身份�
 
 test('SLA提醒记录不等于路由或送达，读取无业务写入',()=>{const p=contract.paths['/tickets/{ticketId}/sla/reminders'];assert.equal(p.get['x-mop-read-only'],true);assert.equal(p.post,undefined);const s=contract.components.schemas.TicketSlaReminder;assert.equal(s.properties.notification_status.const,'NOT_ROUTED');assert.equal(s.properties.delivered.const,false);assert.deepEqual(s.properties.progress.enum,[0.5,0.8,1]);});
 test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2-10/M5-8/M5-18/M5-20契约', () => {
-  assert.equal(contract.info.version, '0.77.0');
+  assert.equal(contract.info.version, '0.78.0');
   const tierGet = contract.paths['/service-tiers'].get;
   const tierPost = contract.paths['/service-tiers/changes'].post;
   const slaGet = contract.paths['/tickets/{id}/workflow/sla'].get;
@@ -1008,7 +1008,7 @@ test('服务档位快照、只追加变更台账与工单SLA冻结时钟符合M2
 });
 
 test('值班看板、18:00交接班、升级链与SLA月报契约保持Q15/Q26待确认约束（M5-9/M5-10/M5-12/M5-13/M5-19）', () => {
-  assert.equal(contract.info.version, '0.77.0');
+  assert.equal(contract.info.version, '0.78.0');
   assert.equal(contract.paths['/oncall/board'].get['x-mop-capability'], 'tickets:read');
   assert.equal(contract.paths['/oncall/rosters'].post['x-mop-capability'], 'ticket_notes:write_internal');
   assert.equal(contract.paths['/oncall/handoffs'].post['x-mop-capability'], 'ticket_notes:write_internal');
@@ -1392,3 +1392,12 @@ test('PDF draft download requires a strong frozen hash and keeps binary and JSON
  const match=route.get.parameters.find(p=>p.name==='If-Match');assert.equal(match.required,true);assert.equal(ajv.compile(match.schema)('"'+'a'.repeat(64)+'"'),true);for(const bad of ['*','a'.repeat(64),'W/"'+'a'.repeat(64)+'"'])assert.equal(ajv.compile(match.schema)(bad),false)
  assert.ok(route.get.responses[200].content['application/pdf']);for(const status of [401,403,412,413,428,503])assert.ok(route.get.responses[status].content['application/json']);assert.equal(route.get.responses[200].headers['X-MOP-Preview-Status'].schema.const,'DRAFT')
 })
+
+test('登记监控测试只接受配置摘要并保留CSRF、权限复核和单次含义',()=>{
+ const op=contract.paths['/monitoring-onboarding/registered-targets/{id}/test'].post;
+ assert.deepEqual(op['x-mop-capabilities'],['assets:read','configurations:read','configurations:write']);assert.equal(op['x-mop-csrf-required'],true);assert.equal(op['x-mop-arbitrary-destination-accepted'],false);assert.equal(op['x-mop-current-membership-recheck'],true);
+ const schema=op.requestBody.content['application/json'].schema,validate=ajv.compile(schema);assert.equal(validate({configuration_sha256:'a'.repeat(64)}),true);assert.equal(validate({configuration_sha256:'a'.repeat(64),endpoint:'http://192.0.2.1:1/'}),false);
+ const report={target_id:id('1'),configuration_sha256:'a'.repeat(64),probe_status:'FAILED',continuous_collection_verified:false,device_identity_verified:false,health_verified:false,sample_count:null,matched_metrics:[],reason:'CONNECTION_FAILED'};
+ assert.equal(validates('MonitoringRegisteredProbeReport',report),true);for(const patch of [{health_verified:true},{continuous_collection_verified:true},{password:'secret'},{probe_status:'HEALTHY'}])assert.equal(validates('MonitoringRegisteredProbeReport',{...report,...patch}),false);
+ for(const status of ['400','401','403','404','409','429','503'])assert.equal(op.responses[status].content['application/json'].schema.$ref,'#/components/schemas/Error');
+});

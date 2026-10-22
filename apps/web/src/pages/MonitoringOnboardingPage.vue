@@ -7,6 +7,7 @@ import {api,isCancelled} from '../api/client'
 import {session,can,contextGeneration,switchingTenant} from '../stores/session'
 import {contextTransitionGuards} from '../utils/contextTransitionGuard'
 import {buildMonitoringConfig,emptyMonitoringDraft,monitoringPresets,monitoringTestCommand,monitoringConfigDigest,readProbeReport,monitoringIpv4,type ProbeReport} from '../utils/monitoringOnboarding'
+import RegisteredMonitoringTargets from '../components/RegisteredMonitoringTargets.vue'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 const draft=reactive(emptyMonitoringDraft()),targetId=ref(createRequestId()),baseline=ref(''),notice=ref(''),validation=ref(''),assetError=ref<unknown>(null),assetName=ref(''),assetIp=ref(''),busy=ref(false),importing=ref(false),report=ref<ProbeReport|null>(null),confirming=ref(false),heading=ref<HTMLElement|null>(null)
 const permitted=computed(()=>session.value?.mode==='remote_test'&&can('assets:read')&&can('configurations:read')&&!switchingTenant.value)
@@ -38,6 +39,7 @@ const reportLabel=computed(()=>report.value?({NOT_RUN:'尚未执行',FAILED:'单
 <section class="monitoring-onboarding"><h1 ref="heading" tabindex="-1" class="page-title-sr">监控接入配置</h1>
 <p v-if="!permitted" role="status">当前缺少资产读取或配置读取权限，或正在切换租户。</p>
 <template v-else>
+<RegisteredMonitoringTargets />
 <form class="ws-card onboarding-form" @submit.prevent="validate">
 <div class="form-grid"><label>监控场景<select v-model="draft.presetId" aria-label="监控场景"><optgroup v-for="scenario in [...new Set(monitoringPresets.map(p=>p.scenario))]" :key="scenario" :label="scenario"><option v-for="p in monitoringPresets.filter(p=>p.scenario===scenario)" :key="p.id" :value="p.id">{{p.title}}</option></optgroup></select></label><label>资产 ID<input v-model="draft.assetId" aria-label="资产 ID" maxlength="36" autocomplete="off" required /></label></div>
 <div class="actions"><button type="button" :disabled="busy||draft.assetId.length!==36" @click="readAsset">读取资产信息</button><button v-if="busy" type="button" @click="cancelAsset">取消读取</button><span v-if="assetName">{{assetName}} · {{assetIp}}</span><button v-if="assetIp" type="button" @click="useAssetIp">使用资产 IP</button><a :href="preset.source_url" target="_blank" rel="noopener noreferrer">查看预设来源</a></div><ApiErrorNotice :error="assetError" @retry="readAsset" />

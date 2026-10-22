@@ -1,0 +1,91 @@
+{
+  "status": "PASS_UNIT_DOM_LOCAL_SYNTHETIC_HTTP_AND_PACKAGE",
+  "base_main": "36b91a12e8a3275c4dfa9b1ce5ce7721cca65542",
+  "backend": {
+    "tests": 4233,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1042,
+    "executed": 3191
+  },
+  "new_backend_tests": 37,
+  "new_actual_loopback_http_tcp_tests": 6,
+  "new_security_chain_tests": 5,
+  "frontend": {
+    "files": 294,
+    "tests": 4894,
+    "new_tests": 25
+  },
+  "node_contracts": 180,
+  "api_version": "0.78.0",
+  "browser": {
+    "discovered": 152,
+    "files": 15,
+    "new_cases": 4,
+    "executed": false,
+    "axe": "NOT_RUN",
+    "screenshots": "NOT_RUN"
+  },
+  "build": {
+    "status": "PASSED",
+    "files": 145,
+    "bootstrap_gzip_bytes": 180543,
+    "bootstrap_css_gzip_bytes": 66323,
+    "build_id": "aaa79049d5ec320b969111e6781b01ec3b27894896655c0c6be2be177369f308",
+    "scope": "static-artifacts-only"
+  },
+  "package": {
+    "shared_catalog_matches": true,
+    "controller_present": true,
+    "test_classes_absent": true,
+    "jar_sha256": "4cc569b83eea5fbf399be1e4be7c73646ecbe783d3197a096c3917354b88922c"
+  },
+  "server_test_default_enabled": false,
+  "one_shot_only": true,
+  "continuous_collection_verified": false,
+  "real_device_integration": "NOT_RUN",
+  "deployment": false,
+  "sql_migrations": false,
+  "existing_style_layers_changed": false,
+  "formal_contract_cases": 128,
+  "formal_contract_status": "NOT_RUN",
+  "static_preview": {
+    "scope": "LOCAL_STATIC_PREVIEW_ONLY_NOT_BROWSER_OR_BACKEND",
+    "routes": [
+      {
+        "path": "/",
+        "status": 200,
+        "matches_app_shell": true
+      },
+      {
+        "path": "/dashboard",
+        "status": 200,
+        "matches_app_shell": true
+      },
+      {
+        "path": "/monitoring-events",
+        "status": 200,
+        "matches_app_shell": true
+      },
+      {
+        "path": "/assets",
+        "status": 200,
+        "matches_app_shell": true
+      },
+      {
+        "path": "/monitoring-onboarding",
+        "status": 200,
+        "matches_app_shell": true
+      }
+    ],
+    "files_checked": 146,
+    "all_hashes_match": true,
+    "preview_stopped": true
+  },
+  "preserved_upstream_files": 63,
+  "merged_overlaps": [
+    "AGENTS.md",
+    "apps/web/src/pages/MonitoringOnboardingPage.vue",
+    "docs/frontend-acceptance-standard.md"
+  ]
+}

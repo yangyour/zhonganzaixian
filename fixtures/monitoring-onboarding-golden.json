@@ -1,0 +1,262 @@
+[
+  {
+    "config": {
+      "version": 1,
+      "targets": [
+        {
+          "id": "79000000-0000-4000-8000-000000000001",
+          "tenant_id": "55000000-0000-4000-8000-000000000001",
+          "asset_id": "78000000-0000-4000-8000-000000000001",
+          "preset_id": "linux-node",
+          "enabled": false,
+          "endpoint": "http://192.0.2.10:9100/metrics",
+          "target": null,
+          "auth_profile": null,
+          "interval_seconds": null,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "sha256": "171da80173bd59063143743a483a605edfc84e0c9ebbf2f552885aa9014886dc"
+  },
+  {
+    "config": {
+      "version": 1,
+      "targets": [
+        {
+          "id": "79000000-0000-4000-8000-000000000002",
+          "tenant_id": "55000000-0000-4000-8000-000000000001",
+          "asset_id": "78000000-0000-4000-8000-000000000002",
+          "preset_id": "windows-exporter",
+          "enabled": false,
+          "endpoint": "http://192.0.2.10:9182/metrics",
+          "target": null,
+          "auth_profile": null,
+          "interval_seconds": null,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "sha256": "850d607bdfff2afc4c86fba0295943b49e5b8ea3ddc8929899c762cf0631c5b6"
+  },
+  {
+    "config": {
+      "version": 1,
+      "targets": [
+        {
+          "id": "79000000-0000-4000-8000-000000000003",
+          "tenant_id": "55000000-0000-4000-8000-000000000001",
+          "asset_id": "78000000-0000-4000-8000-000000000003",
+          "preset_id": "network-snmp",
+          "enabled": false,
+          "endpoint": "http://192.0.2.10:9116/snmp",
+          "target": "192.0.2.20",
+          "auth_profile": "replace_with_configured_snmp_profile",
+          "interval_seconds": null,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "sha256": "818e4e083e7ab3d2c348f0bfd01c7be69b7c48596097abfbe517d86d0e917f95"
+  },
+  {
+    "config": {
+      "version": 1,
+      "targets": [
+        {
+          "id": "79000000-0000-4000-8000-000000000004",
+          "tenant_id": "55000000-0000-4000-8000-000000000001",
+          "asset_id": "78000000-0000-4000-8000-000000000004",
+          "preset_id": "http-service",
+          "enabled": false,
+          "endpoint": "http://192.0.2.10:9115/probe",
+          "target": "https://192.0.2.20:443/",
+          "auth_profile": null,
+          "interval_seconds": null,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "sha256": "837191902108fbb23dca99ec2d5613b81d4087b34bdb620dbb56f3239539be38"
+  },
+  {
+    "config": {
+      "version": 1,
+      "targets": [
+        {
+          "id": "79000000-0000-4000-8000-000000000005",
+          "tenant_id": "55000000-0000-4000-8000-000000000001",
+          "asset_id": "78000000-0000-4000-8000-000000000005",
+          "preset_id": "tcp-service",
+          "enabled": false,
+          "endpoint": "http://192.0.2.10:9115/probe",
+          "target": "192.0.2.20:443",
+          "auth_profile": null,
+          "interval_seconds": null,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "sha256": "a224fa4e9888950f9978cd05c8547283e7cb166f0fc2a4408028edeaf6ebf1f7"
+  },
+  {
+    "config": {
+      "version": 1,
+      "targets": [
+        {
+          "id": "79000000-0000-4000-8000-000000000006",
+          "tenant_id": "55000000-0000-4000-8000-000000000001",
+          "asset_id": "78000000-0000-4000-8000-000000000006",
+          "preset_id": "icmp-device",
+          "enabled": false,
+          "endpoint": "http://192.0.2.10:9115/probe",
+          "target": "192.0.2.20",
+          "auth_profile": null,
+          "interval_seconds": null,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "sha256": "f4736650c6d6b524fbd95da78a549f5ea515e89647b64b0fa32a27693e579502"
+  },
+  {
+    "config": {
+      "version": 1,
+      "targets": [
+        {
+          "id": "79000000-0000-4000-8000-000000000007",
+          "tenant_id": "55000000-0000-4000-8000-000000000001",
+          "asset_id": "78000000-0000-4000-8000-000000000007",
+          "preset_id": "postgresql",
+          "enabled": false,
+          "endpoint": "http://192.0.2.10:9187/metrics",
+          "target": null,
+          "auth_profile": null,
+          "interval_seconds": null,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "sha256": "66374313ea06ff26ece61c4e199552f18194188cba76650c0f4a0779cd401f4c"
+  },
+  {
+    "config": {
+      "version": 1,
+      "targets": [
+        {
+          "id": "79000000-0000-4000-8000-000000000008",
+          "tenant_id": "55000000-0000-4000-8000-000000000001",
+          "asset_id": "78000000-0000-4000-8000-000000000008",
+          "preset_id": "mysql",
+          "enabled": false,
+          "endpoint": "http://192.0.2.10:9104/metrics",
+          "target": null,
+          "auth_profile": null,
+          "interval_seconds": null,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "sha256": "3765e64154934b8b11cc7ec49bf5c00df676c74a0d84015d8401f7f8ae0f78e6"
+  },
+  {
+    "config": {
+      "version": 1,
+      "targets": [
+        {
+          "id": "79000000-0000-4000-8000-000000000009",
+          "tenant_id": "55000000-0000-4000-8000-000000000001",
+          "asset_id": "78000000-0000-4000-8000-000000000009",
+          "preset_id": "redis",
+          "enabled": false,
+          "endpoint": "http://192.0.2.10:9121/metrics",
+          "target": null,
+          "auth_profile": null,
+          "interval_seconds": null,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "sha256": "c00b188d62008e1c80d7f810496ed7edc20b903445f90a2729a06d66444cdb73"
+  },
+  {
+    "config": {
+      "version": 1,
+      "targets": [
+        {
+          "id": "79000000-0000-4000-8000-000000000010",
+          "tenant_id": "55000000-0000-4000-8000-000000000001",
+          "asset_id": "78000000-0000-4000-8000-000000000010",
+          "preset_id": "containers",
+          "enabled": false,
+          "endpoint": "http://192.0.2.10:8080/metrics",
+          "target": null,
+          "auth_profile": null,
+          "interval_seconds": null,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "sha256": "feab7c0b8bbba58fbf5d7e4c35a6c73b46c6fb0d0ca5971e08893df81086dab2"
+  },
+  {
+    "config": {
+      "version": 1,
+      "targets": [
+        {
+          "id": "79000000-0000-4000-8000-000000000011",
+          "tenant_id": "55000000-0000-4000-8000-000000000001",
+          "asset_id": "78000000-0000-4000-8000-000000000011",
+          "preset_id": "zabbix-linux",
+          "enabled": false,
+          "endpoint": "tcp://192.0.2.10:10050",
+          "target": null,
+          "auth_profile": null,
+          "interval_seconds": null,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "sha256": "2952ceae2d66039bba92531ded881958618ef39b57bde7d692e9d19a4e8b43b1"
+  },
+  {
+    "config": {
+      "version": 1,
+      "targets": [
+        {
+          "id": "79000000-0000-4000-8000-000000000012",
+          "tenant_id": "55000000-0000-4000-8000-000000000001",
+          "asset_id": "78000000-0000-4000-8000-000000000012",
+          "preset_id": "zabbix-windows",
+          "enabled": false,
+          "endpoint": "tcp://192.0.2.10:10050",
+          "target": null,
+          "auth_profile": null,
+          "interval_seconds": null,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "sha256": "af895f8a3952c68e6083398fc9dd6cc73a3408d5d0afaed31865239d097e331f"
+  },
+  {
+    "config": {
+      "version": 1,
+      "targets": [
+        {
+          "id": "79000000-0000-4000-8000-000000000013",
+          "tenant_id": "55000000-0000-4000-8000-000000000001",
+          "asset_id": "78000000-0000-4000-8000-000000000013",
+          "preset_id": "zabbix-snmp",
+          "enabled": false,
+          "endpoint": "udp://192.0.2.10:161",
+          "target": null,
+          "auth_profile": null,
+          "interval_seconds": null,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "sha256": "f2eaa9411e80372b5e439d7aab2d372978dc84e85b3135ba36c255eb6f898853"
+  }
+]

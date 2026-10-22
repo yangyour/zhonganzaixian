@@ -1,0 +1,161 @@
+{
+  "version": 1,
+  "targets": [
+    {
+      "id": "79000000-0000-4000-8000-000000000001",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "asset_id": "78000000-0000-4000-8000-000000000001",
+      "preset_id": "linux-node",
+      "enabled": false,
+      "endpoint": "http://192.0.2.10:9100/metrics",
+      "target": null,
+      "auth_profile": null,
+      "interval_seconds": null,
+      "timeout_seconds": 5
+    },
+    {
+      "id": "79000000-0000-4000-8000-000000000002",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "asset_id": "78000000-0000-4000-8000-000000000002",
+      "preset_id": "windows-exporter",
+      "enabled": false,
+      "endpoint": "http://192.0.2.10:9182/metrics",
+      "target": null,
+      "auth_profile": null,
+      "interval_seconds": null,
+      "timeout_seconds": 5
+    },
+    {
+      "id": "79000000-0000-4000-8000-000000000003",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "asset_id": "78000000-0000-4000-8000-000000000003",
+      "preset_id": "network-snmp",
+      "enabled": false,
+      "endpoint": "http://192.0.2.10:9116/snmp",
+      "target": "192.0.2.20",
+      "auth_profile": "replace_with_configured_snmp_profile",
+      "interval_seconds": null,
+      "timeout_seconds": 5
+    },
+    {
+      "id": "79000000-0000-4000-8000-000000000004",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "asset_id": "78000000-0000-4000-8000-000000000004",
+      "preset_id": "http-service",
+      "enabled": false,
+      "endpoint": "http://192.0.2.10:9115/probe",
+      "target": "https://192.0.2.20:443/",
+      "auth_profile": null,
+      "interval_seconds": null,
+      "timeout_seconds": 5
+    },
+    {
+      "id": "79000000-0000-4000-8000-000000000005",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "asset_id": "78000000-0000-4000-8000-000000000005",
+      "preset_id": "tcp-service",
+      "enabled": false,
+      "endpoint": "http://192.0.2.10:9115/probe",
+      "target": "192.0.2.20:443",
+      "auth_profile": null,
+      "interval_seconds": null,
+      "timeout_seconds": 5
+    },
+    {
+      "id": "79000000-0000-4000-8000-000000000006",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "asset_id": "78000000-0000-4000-8000-000000000006",
+      "preset_id": "icmp-device",
+      "enabled": false,
+      "endpoint": "http://192.0.2.10:9115/probe",
+      "target": "192.0.2.20",
+      "auth_profile": null,
+      "interval_seconds": null,
+      "timeout_seconds": 5
+    },
+    {
+      "id": "79000000-0000-4000-8000-000000000007",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "asset_id": "78000000-0000-4000-8000-000000000007",
+      "preset_id": "postgresql",
+      "enabled": false,
+      "endpoint": "http://192.0.2.10:9187/metrics",
+      "target": null,
+      "auth_profile": null,
+      "interval_seconds": null,
+      "timeout_seconds": 5
+    },
+    {
+      "id": "79000000-0000-4000-8000-000000000008",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "asset_id": "78000000-0000-4000-8000-000000000008",
+      "preset_id": "mysql",
+      "enabled": false,
+      "endpoint": "http://192.0.2.10:9104/metrics",
+      "target": null,
+      "auth_profile": null,
+      "interval_seconds": null,
+      "timeout_seconds": 5
+    },
+    {
+      "id": "79000000-0000-4000-8000-000000000009",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "asset_id": "78000000-0000-4000-8000-000000000009",
+      "preset_id": "redis",
+      "enabled": false,
+      "endpoint": "http://192.0.2.10:9121/metrics",
+      "target": null,
+      "auth_profile": null,
+      "interval_seconds": null,
+      "timeout_seconds": 5
+    },
+    {
+      "id": "79000000-0000-4000-8000-000000000010",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "asset_id": "78000000-0000-4000-8000-000000000010",
+      "preset_id": "containers",
+      "enabled": false,
+      "endpoint": "http://192.0.2.10:8080/metrics",
+      "target": null,
+      "auth_profile": null,
+      "interval_seconds": null,
+      "timeout_seconds": 5
+    },
+    {
+      "id": "79000000-0000-4000-8000-000000000011",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "asset_id": "78000000-0000-4000-8000-000000000011",
+      "preset_id": "zabbix-linux",
+      "enabled": false,
+      "endpoint": "tcp://192.0.2.10:10050",
+      "target": null,
+      "auth_profile": null,
+      "interval_seconds": null,
+      "timeout_seconds": 5
+    },
+    {
+      "id": "79000000-0000-4000-8000-000000000012",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "asset_id": "78000000-0000-4000-8000-000000000012",
+      "preset_id": "zabbix-windows",
+      "enabled": false,
+      "endpoint": "tcp://192.0.2.10:10050",
+      "target": null,
+      "auth_profile": null,
+      "interval_seconds": null,
+      "timeout_seconds": 5
+    },
+    {
+      "id": "79000000-0000-4000-8000-000000000013",
+      "tenant_id": "55000000-0000-4000-8000-000000000001",
+      "asset_id": "78000000-0000-4000-8000-000000000013",
+      "preset_id": "zabbix-snmp",
+      "enabled": false,
+      "endpoint": "udp://192.0.2.10:161",
+      "target": null,
+      "auth_profile": null,
+      "interval_seconds": null,
+      "timeout_seconds": 5
+    }
+  ]
+}

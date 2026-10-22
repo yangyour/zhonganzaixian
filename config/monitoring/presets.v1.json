@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "reviewed_at": "2026-10-22",
+  "presets": [
+    {
+      "id": "linux-node",
+      "title": "Linux 主机",
+      "scenario": "服务器",
+      "engine": "prometheus",
+      "test_kind": "metrics",
+      "suggested_port": 9100,
+      "path": "/metrics",
+      "required_any_metrics": [
+        "node_cpu_seconds_total"
+      ],
+      "source_url": "https://prometheus.io/docs/guides/node-exporter/"
+    },
+    {
+      "id": "windows-exporter",
+      "title": "Windows 主机",
+      "scenario": "服务器",
+      "engine": "prometheus",
+      "test_kind": "metrics",
+      "suggested_port": 9182,
+      "path": "/metrics",
+      "required_any_metrics": [
+        "windows_cpu_time_total"
+      ],
+      "source_url": "https://github.com/prometheus-community/windows_exporter"
+    },
+    {
+      "id": "network-snmp",
+      "title": "交换机 / 路由器接口",
+      "scenario": "网络设备",
+      "engine": "prometheus",
+      "test_kind": "snmp",
+      "suggested_port": 9116,
+      "path": "/snmp",
+      "required_any_metrics": [
+        "ifHCInOctets",
+        "ifInOctets"
+      ],
+      "source_url": "https://github.com/prometheus/snmp_exporter",
+      "module": "if_mib"
+    },
+    {
+      "id": "http-service",
+      "title": "HTTP / HTTPS 服务",
+      "scenario": "业务服务",
+      "engine": "prometheus",
+      "test_kind": "blackbox",
+      "suggested_port": 9115,
+      "path": "/probe",
+      "required_any_metrics": [
+        "probe_success"
+      ],
+      "source_url": "https://prometheus.io/docs/guides/multi-target-exporter/",
+      "module": "mop_http",
+      "success_metric": "probe_success"
+    },
+    {
+      "id": "tcp-service",
+      "title": "TCP 端口",
+      "scenario": "业务服务",
+      "engine": "prometheus",
+      "test_kind": "blackbox",
+      "suggested_port": 9115,
+      "path": "/probe",
+      "required_any_metrics": [
+        "probe_success"
+      ],
+      "source_url": "https://github.com/prometheus/blackbox_exporter",
+      "module": "mop_tcp",
+      "success_metric": "probe_success"
+    },
+    {
+      "id": "icmp-device",
+      "title": "ICMP 连通性",
+      "scenario": "网络设备",
+      "engine": "prometheus",
+      "test_kind": "blackbox",
+      "suggested_port": 9115,
+      "path": "/probe",
+      "required_any_metrics": [
+        "probe_success"
+      ],
+      "source_url": "https://github.com/prometheus/blackbox_exporter",
+      "module": "mop_icmp",
+      "success_metric": "probe_success"
+    },
+    {
+      "id": "postgresql",
+      "title": "PostgreSQL 数据库",
+      "scenario": "数据库",
+      "engine": "prometheus",
+      "test_kind": "metrics",
+      "suggested_port": 9187,
+      "path": "/metrics",
+      "required_any_metrics": [
+        "pg_up"
+      ],
+      "source_url": "https://github.com/prometheus-community/postgres_exporter",
+      "success_metric": "pg_up"
+    },
+    {
+      "id": "mysql",
+      "title": "MySQL 数据库",
+      "scenario": "数据库",
+      "engine": "prometheus",
+      "test_kind": "metrics",
+      "suggested_port": 9104,
+      "path": "/metrics",
+      "required_any_metrics": [
+        "mysql_up"
+      ],
+      "source_url": "https://github.com/prometheus/mysqld_exporter",
+      "success_metric": "mysql_up"
+    },
+    {
+      "id": "redis",
+      "title": "Redis 服务",
+      "scenario": "数据库",
+      "engine": "prometheus",
+      "test_kind": "metrics",
+      "suggested_port": 9121,
+      "path": "/metrics",
+      "required_any_metrics": [
+        "redis_up"
+      ],
+      "source_url": "https://github.com/oliver006/redis_exporter",
+      "success_metric": "redis_up"
+    },
+    {
+      "id": "containers",
+      "title": "容器资源（cAdvisor）",
+      "scenario": "容器",
+      "engine": "prometheus",
+      "test_kind": "metrics",
+      "suggested_port": 8080,
+      "path": "/metrics",
+      "required_any_metrics": [
+        "container_last_seen"
+      ],
+      "source_url": "https://prometheus.io/docs/guides/cadvisor/"
+    },
+    {
+      "id": "zabbix-linux",
+      "title": "Linux / Zabbix agent",
+      "scenario": "服务器",
+      "engine": "zabbix",
+      "test_kind": "tcp",
+      "suggested_port": 10050,
+      "path": null,
+      "required_any_metrics": [],
+      "source_url": "https://www.zabbix.com/integrations/linux",
+      "template": "Linux by Zabbix agent"
+    },
+    {
+      "id": "zabbix-windows",
+      "title": "Windows / Zabbix agent",
+      "scenario": "服务器",
+      "engine": "zabbix",
+      "test_kind": "tcp",
+      "suggested_port": 10050,
+      "path": null,
+      "required_any_metrics": [],
+      "source_url": "https://www.zabbix.com/integrations/windows",
+      "template": "Windows by Zabbix agent"
+    },
+    {
+      "id": "zabbix-snmp",
+      "title": "网络设备 / Zabbix SNMP",
+      "scenario": "网络设备",
+      "engine": "zabbix",
+      "test_kind": "configuration_only",
+      "suggested_port": 161,
+      "path": null,
+      "required_any_metrics": [],
+      "source_url": "https://www.zabbix.com/documentation/7.0/en/manual/config/templates_out_of_the_box",
+      "template": "Network Generic Device by SNMP"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "status": "PASS_CONFIG_AND_LOCAL_SYNTHETIC_PROBES",
+  "presets": 13,
+  "focused_test_methods": 37,
+  "local_http_tcp_test_methods": 10,
+  "all_python_tests": 174,
+  "node_contract_tests": 179,
+  "network_default": "DENY_UNLESS_EXACT_ENDPOINT_AND_DOWNSTREAM_ALLOWLIST",
+  "vendor_services": "NOT_RUN",
+  "promtool": "NOT_RUN_NOT_INSTALLED",
+  "browser": "NOT_RUN_NOT_APPLICABLE_TO_CLI_SLICE",
+  "deployment": false,
+  "migration": false,
+  "continuous_collection_verified": false,
+  "formal_acceptance_changed": false
+}

@@ -20,6 +20,9 @@ class Configuration(unittest.TestCase):
     def test_all_catalog_presets_have_disabled_valid_examples(self):
         self.assertEqual(len(m.PRESETS),13);self.assertEqual(len(m.validate(EXAMPLE)['targets']),13)
         self.assertTrue(all(not t['enabled'] and t['interval_seconds'] is None for t in EXAMPLE['targets']))
+    def test_shared_browser_golden_configurations_and_hashes(self):
+        for row in m.load_json(m.ROOT/'fixtures/monitoring-onboarding-golden.json'):
+            self.assertEqual(m.fingerprint(row['config']),row['sha256'])
     def test_no_network_during_validation_and_render(self):
         with patch('socket.create_connection',side_effect=AssertionError('network')):
             m.validate(EXAMPLE);out=m.render(EXAMPLE)

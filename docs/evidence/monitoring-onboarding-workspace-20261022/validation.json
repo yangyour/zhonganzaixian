@@ -1,0 +1,33 @@
+{
+  "status": "PASS_LOGIC_DOM_AND_BUILD_ONLY",
+  "base_main": "7a0ac88581ce528b19b2534bfba265ccf8ab5e5e",
+  "preserved_upstream_ui": "74396c3012889a6f92eb2fe0c9d37440f8bb45e4",
+  "new_frontend_tests": 53,
+  "frontend_files": 292,
+  "frontend_tests": 4869,
+  "python_tests": 175,
+  "cross_language_golden_profiles": 13,
+  "build": {
+    "status": "PASSED",
+    "files": 145,
+    "bootstrap_gzip_bytes": 180545,
+    "bootstrap_css_gzip_bytes": 66186,
+    "build_id": "5da42f3c7682b2268ff3249fa15514402b5b60767ba4b3cbd79421e87f79cc24",
+    "scope": "static-artifacts-only"
+  },
+  "browser": {
+    "discovered": 146,
+    "files": 15,
+    "new_cases": 7,
+    "executed": false,
+    "axe": "NOT_RUN",
+    "screenshots": "NOT_RUN"
+  },
+  "server_one_click_probe": false,
+  "automatic_deployment": false,
+  "persistent_registration": false,
+  "continuous_collection_verified": false,
+  "migration": false,
+  "formal_acceptance_changed": false,
+  "preserved_upstream_followup_files": 19
+}

@@ -1,0 +1,352 @@
+[
+  {
+    "version": "1",
+    "script": "V1__remote_test_platform.sql",
+    "checksum": -1484181377,
+    "installed_on": "2026-10-22T00:30:19.546334",
+    "success": true
+  },
+  {
+    "version": "2",
+    "script": "V2__tenant_configuration_revisions.sql",
+    "checksum": 1161094071,
+    "installed_on": "2026-10-22T00:30:19.546334",
+    "success": true
+  },
+  {
+    "version": "3",
+    "script": "V3__configuration_review_test_identity.sql",
+    "checksum": -1273598682,
+    "installed_on": "2026-10-22T00:30:19.546334",
+    "success": true
+  },
+  {
+    "version": "4",
+    "script": "V4__durable_customer_report_registration.sql",
+    "checksum": 1369050258,
+    "installed_on": "2026-10-22T00:30:19.546334",
+    "success": true
+  },
+  {
+    "version": "5",
+    "script": "V5__durable_report_photos.sql",
+    "checksum": 1887903094,
+    "installed_on": "2026-10-22T00:30:20.87129",
+    "success": true
+  },
+  {
+    "version": "6",
+    "script": "V6__asset_import_sources_and_mapping.sql",
+    "checksum": -636230002,
+    "installed_on": "2026-10-22T00:30:22.300674",
+    "success": true
+  },
+  {
+    "version": "7",
+    "script": "V7__asset_dependency_draft_revisions.sql",
+    "checksum": -545292092,
+    "installed_on": "2026-10-22T00:30:23.933378",
+    "success": true
+  },
+  {
+    "version": "8",
+    "script": "V8__manual_worklog_revisions.sql",
+    "checksum": 1211360336,
+    "installed_on": "2026-10-22T00:30:25.410614",
+    "success": true
+  },
+  {
+    "version": "9",
+    "script": "V9__manual_asset_metadata_revisions.sql",
+    "checksum": -340432871,
+    "installed_on": "2026-10-22T00:30:26.902698",
+    "success": true
+  },
+  {
+    "version": "10",
+    "script": "V10__immutable_internal_ticket_notes.sql",
+    "checksum": -896663071,
+    "installed_on": "2026-10-22T00:30:28.494656",
+    "success": true
+  },
+  {
+    "version": "11",
+    "script": "V11__immutable_ticket_comments.sql",
+    "checksum": -1655668462,
+    "installed_on": "2026-10-22T00:30:29.999043",
+    "success": true
+  },
+  {
+    "version": "12",
+    "script": "V12__unpublished_working_calendar_drafts.sql",
+    "checksum": -2068183288,
+    "installed_on": "2026-10-22T00:30:31.360064",
+    "success": true
+  },
+  {
+    "version": "13",
+    "script": "V13__immutable_manual_incident_registrations.sql",
+    "checksum": 1030816869,
+    "installed_on": "2026-10-22T00:30:32.857427",
+    "success": true
+  },
+  {
+    "version": "14",
+    "script": "V14__immutable_manual_recovery_confirmations.sql",
+    "checksum": -30124348,
+    "installed_on": "2026-10-22T00:30:34.280615",
+    "success": true
+  },
+  {
+    "version": "15",
+    "script": "V15__manual_warranty_details.sql",
+    "checksum": 836542553,
+    "installed_on": "2026-10-22T00:30:35.730275",
+    "success": true
+  },
+  {
+    "version": "16",
+    "script": "V16__immutable_capacity_scenario_drafts.sql",
+    "checksum": 1367595086,
+    "installed_on": "2026-10-22T00:30:37.52416",
+    "success": true
+  },
+  {
+    "version": "17",
+    "script": "V17__customer_contact_revisions.sql",
+    "checksum": 2031946591,
+    "installed_on": "2026-10-22T00:30:39.042292",
+    "success": true
+  },
+  {
+    "version": "18",
+    "script": "V18__durable_contact_import_jobs.sql",
+    "checksum": -1130281417,
+    "installed_on": "2026-10-22T00:30:40.64502",
+    "success": true
+  },
+  {
+    "version": "19",
+    "script": "V19__contact_import_generated_hash_guard.sql",
+    "checksum": -268577672,
+    "installed_on": "2026-10-22T00:30:42.231443",
+    "success": true
+  },
+  {
+    "version": "20",
+    "script": "V20__durable_asset_export_jobs.sql",
+    "checksum": -319450001,
+    "installed_on": "2026-10-22T00:30:43.75396",
+    "success": true
+  },
+  {
+    "version": "21",
+    "script": "V21__inspection_template_revisions.sql",
+    "checksum": 951051044,
+    "installed_on": "2026-10-22T00:30:45.195408",
+    "success": true
+  },
+  {
+    "version": "22",
+    "script": "V22__manual_inspection_worksheet_drafts.sql",
+    "checksum": -650061710,
+    "installed_on": "2026-10-22T00:30:46.716462",
+    "success": true
+  },
+  {
+    "version": "23",
+    "script": "V23__immutable_inspection_source_collections.sql",
+    "checksum": 1321810212,
+    "installed_on": "2026-10-22T00:30:48.29958",
+    "success": true
+  },
+  {
+    "version": "24",
+    "script": "V24__unpublished_backup_plan_drafts.sql",
+    "checksum": -424372040,
+    "installed_on": "2026-10-22T00:30:49.817851",
+    "success": true
+  },
+  {
+    "version": "25",
+    "script": "V25__unreviewed_change_notice_drafts.sql",
+    "checksum": 552033867,
+    "installed_on": "2026-10-22T00:30:51.34222",
+    "success": true
+  },
+  {
+    "version": "26",
+    "script": "V26__own_notification_preference_drafts.sql",
+    "checksum": -324766275,
+    "installed_on": "2026-10-22T00:30:53.011144",
+    "success": true
+  },
+  {
+    "version": "27",
+    "script": "V27__project_identity_and_roles.sql",
+    "checksum": 511191109,
+    "installed_on": "2026-10-22T00:30:54.594378",
+    "success": true
+  },
+  {
+    "version": "28",
+    "script": "V28__identity_inventory_and_password_formats.sql",
+    "checksum": 1559449245,
+    "installed_on": "2026-10-22T00:30:56.377758",
+    "success": true
+  },
+  {
+    "version": "29",
+    "script": "V29__immutable_raw_monitoring_events.sql",
+    "checksum": -1977882733,
+    "installed_on": "2026-10-22T00:30:58.271729",
+    "success": true
+  },
+  {
+    "version": "30",
+    "script": "V30__immutable_monitoring_quarantine.sql",
+    "checksum": 2028775275,
+    "installed_on": "2026-10-22T00:30:59.862235",
+    "success": true
+  },
+  {
+    "version": "31",
+    "script": "V31__own_export_inbox.sql",
+    "checksum": -486321876,
+    "installed_on": "2026-10-22T00:31:01.386799",
+    "success": true
+  },
+  {
+    "version": "32",
+    "script": "V32__runtime_configuration_publications.sql",
+    "checksum": -606158601,
+    "installed_on": "2026-10-22T00:31:02.989221",
+    "success": true
+  },
+  {
+    "version": "33",
+    "script": "V33__ticket_lifecycle_and_durable_clocks.sql",
+    "checksum": -2063474061,
+    "installed_on": "2026-10-22T00:31:04.550119",
+    "success": true
+  },
+  {
+    "version": "34",
+    "script": "V34__ticket_notification_intents.sql",
+    "checksum": -1167997960,
+    "installed_on": "2026-10-22T00:31:06.199155",
+    "success": true
+  },
+  {
+    "version": "35",
+    "script": "V35__service_tiers_and_change_history.sql",
+    "checksum": -1509422434,
+    "installed_on": "2026-10-22T00:31:07.94428",
+    "success": true
+  },
+  {
+    "version": "36",
+    "script": "V36__oncall_escalation_and_sla_monthly_results.sql",
+    "checksum": -131315136,
+    "installed_on": "2026-10-22T00:31:09.637044",
+    "success": true
+  },
+  {
+    "version": "37",
+    "script": "V37__monitoring_events_noise_funnel_and_maintenance_windows.sql",
+    "checksum": 125697472,
+    "installed_on": "2026-10-22T00:31:11.278456",
+    "success": true
+  },
+  {
+    "version": "38",
+    "script": "V38__wecom_bindings_deliveries_and_login_state.sql",
+    "checksum": 845758090,
+    "installed_on": "2026-10-22T00:31:13.001353",
+    "success": true
+  },
+  {
+    "version": "39",
+    "script": "V39__email_bindings_and_delivery_ledger.sql",
+    "checksum": -373908053,
+    "installed_on": "2026-10-22T00:31:14.770207",
+    "success": true
+  },
+  {
+    "version": "40",
+    "script": "V40__immutable_change_notice_approval_events.sql",
+    "checksum": 14806533,
+    "installed_on": "2026-10-22T00:31:16.422221",
+    "success": true
+  },
+  {
+    "version": "41",
+    "script": "V41__immutable_inspection_quarterly_reports.sql",
+    "checksum": 1456236875,
+    "installed_on": "2026-10-22T00:31:18.14997",
+    "success": true
+  },
+  {
+    "version": "42",
+    "script": "V42__ticket_lifecycle_revisions.sql",
+    "checksum": -956552339,
+    "installed_on": "2026-10-22T00:31:19.913042",
+    "success": true
+  },
+  {
+    "version": "43",
+    "script": "V43__ticket_autoclose_jobs.sql",
+    "checksum": 2102398138,
+    "installed_on": "2026-10-22T00:31:21.575857",
+    "success": true
+  },
+  {
+    "version": "44",
+    "script": "V44__ticket_sla_policy_bindings.sql",
+    "checksum": 1869511343,
+    "installed_on": "2026-10-22T00:31:23.329843",
+    "success": true
+  },
+  {
+    "version": "45",
+    "script": "V45__sla_reminder_intents.sql",
+    "checksum": 1011894633,
+    "installed_on": "2026-10-22T00:31:25.102016",
+    "success": true
+  },
+  {
+    "version": "46",
+    "script": "V46__backup_device_coordination_journal.sql",
+    "checksum": -143003885,
+    "installed_on": "2026-10-22T00:31:26.884603",
+    "success": true
+  },
+  {
+    "version": "47",
+    "script": "V47__backup_run_event_journal.sql",
+    "checksum": 829577921,
+    "installed_on": "2026-10-22T00:31:28.818605",
+    "success": true
+  },
+  {
+    "version": "48",
+    "script": "V48__durable_backup_archive_staging.sql",
+    "checksum": 2106091134,
+    "installed_on": "2026-10-22T00:31:30.698865",
+    "success": true
+  },
+  {
+    "version": "49",
+    "script": "V49__atomic_backup_version_registration.sql",
+    "checksum": -655264389,
+    "installed_on": "2026-10-22T00:31:32.63186",
+    "success": true
+  },
+  {
+    "version": "50",
+    "script": "V50__delivery_receipt_journal.sql",
+    "checksum": -1248651202,
+    "installed_on": "2026-10-22T00:31:34.503527",
+    "success": true
+  }
+]

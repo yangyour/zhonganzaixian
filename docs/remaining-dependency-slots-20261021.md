@@ -65,3 +65,5 @@
 ## 2026-10-22 归档单次消费者
 
 [原信封归档单次消费者](backup-archive-dispatch-consumer-20261022.md)已有显式执行与只读核查恢复代码，archive_dispatch_consumer_binding_reference仍null；31项引用槽均空，执行/生产批准false。绑定引用不是授权证明，真实Authority/原对象核验/KMS/存储、调度与版本登记消费者仍需分别装配验证。
+
+[原命令版本登记消费者](backup-version-dispatch-consumer-20261022.md)补显式绑定/独立授权、先读原登记、精确原命令登记及未知回执恢复；21项逻辑+4项实际PG/JCE验证，登记/运行完成同事务。未自动装配调度，真实采集/对象证明与队列发现仍待，32个依赖引用保持null。

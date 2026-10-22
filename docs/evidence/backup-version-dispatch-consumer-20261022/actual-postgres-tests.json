@@ -1,0 +1,27 @@
+{
+  "status": "ACTUALLY_EXECUTED_IN_DISPOSABLE_POSTGRES",
+  "counts": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "cases": [
+    {
+      "name": "actualRegistrationCompletesOnlyOriginalRunAndSubsequentInvocationIsReadOnly",
+      "seconds": "0.231"
+    },
+    {
+      "name": "deniedCollectionProofLeavesRegistrationAndRunUnchangedThenSameOriginalCanResume",
+      "seconds": "0.073"
+    },
+    {
+      "name": "committedRegistrationLostReplyRecoversByReadingOriginalWithoutSecondProofOrPut",
+      "seconds": "0.062"
+    },
+    {
+      "name": "revocationBeforeReturnSuppressesResultButDoesNotInventRollbackOrRepeatRegistration",
+      "seconds": "0.049"
+    }
+  ]
+}

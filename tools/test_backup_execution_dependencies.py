@@ -53,4 +53,11 @@ class BackupExecutionDependenciesTest(unittest.TestCase):
         self.assertIsNone(d['archive_staging_authorizer_reference'])
         self.assertIsNone(d['archive_original_object_verifier_reference'])
         self.assertIs(d['backup_execution_enabled'],False)
+    def test_version_consumer_binding_does_not_enable_runtime_or_replace_proofs(self):
+        d=json.loads((ROOT/'deploy/examples/backup-execution-dependencies.json').read_text())
+        for key in ['version_registration_consumer_binding_reference','backup_version_registration_binding_reference','backup_version_registration_authorizer_reference','backup_collection_completion_evidence_verifier_reference','archive_original_object_verifier_reference']:
+            self.assertIn(key,d)
+            self.assertIsNone(d[key])
+        self.assertIs(d['backup_execution_enabled'],False)
+        self.assertIs(d['production_approved'],False)
 if __name__=='__main__': unittest.main()

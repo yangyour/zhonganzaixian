@@ -1,0 +1,56 @@
+{
+  "status": "PASS_EXPLICIT_ORIGINAL_VERSION_REGISTRATION_CONSUMER",
+  "new_logic_tests": 21,
+  "new_actual_postgres_tests": 4,
+  "new_python_tests": 1,
+  "default_maven": {
+    "tests": 4196,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1042,
+    "executed": 3154
+  },
+  "actual_postgres": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "python_tests": 137,
+  "node_contract_tests": 179,
+  "package": {
+    "worker_jar_sha256": "092e11c504e7e3d68c238ef8ba0ef948b02b6b1bf2b076b7c47cec986375d64b",
+    "consumer_class_present": true,
+    "synthetic_test_classes_absent": true
+  },
+  "api_contract_check": "PASS",
+  "formal_contract_tc": "128_NOT_RUN_65_PROGRESS_NOTES_NOT_COMPLETION",
+  "frozen_sql_files": 50,
+  "sql_modified": false,
+  "dependency_references": {
+    "count": 32,
+    "all_null": true,
+    "execution_enabled": false,
+    "production_approved": false
+  },
+  "frontend": "UNCHANGED_THIS_SLICE_PREVIOUSLY_VERIFIED_4766_TESTS",
+  "browser": "135_SPECIFICATIONS_13_FILES_ACTUAL_NOT_RUN",
+  "production_device_kms_storage_accounts_used": false,
+  "assembly": "EXPLICIT_CONSTRUCTOR_ONLY_NO_SPRING_BEAN_SCHEDULER_OR_DISCOVERY",
+  "source_sha256": {
+    "server/worker/src/main/java/cn/mop/worker/backup/BackupVersionRegistrationDispatch.java": "3a0d8837e983dc11c1a61d0bdaa87b852a1471cd51950a70e0f4cc545dabf096",
+    "server/worker/src/test/java/cn/mop/worker/backup/BackupVersionRegistrationDispatchTest.java": "eab308148ede13a644eab983d8c5cdf449af0890881f50e370519a085dbb56a5",
+    "server/worker/src/test/java/cn/mop/worker/backup/BackupVersionRegistrationDispatchPostgresTest.java": "82f3dd0f33ea1891a0c0727dd0425e7f317a452b78249d3978d495f4f52b40ec",
+    "deploy/examples/backup-execution-dependencies.json": "506859575b4d0f02f6eefed192a880f42c51f24d21f0bd6fd0da80bb50616f46",
+    "tools/test_backup_execution_dependencies.py": "29dfaad410afec895e4cb0b260fc109409854d45153cc8ecec3b7cfd3b4ffbdc"
+  },
+  "main_rebase": {
+    "validated_code_base": "5c50cd2110c36f35094e2a6742903d097e9a5a83",
+    "preserved_incoming_main": "9fce9c8faa2ca2a7a4ac8b95150531e536a22dd2",
+    "incoming_commits": 2,
+    "incoming_files": 11,
+    "incoming_changes": "DEPLOYMENT_DOCUMENTATION_AND_AGENTS_RECORD_ONLY_NO_PRODUCT_CODE_OR_SQL",
+    "overlapping_paths": [],
+    "deployment_claims": "EXISTING_REPOSITORY_RECORDS_NOT_EXECUTED_OR_REVALIDATED_IN_THIS_SLICE"
+  }
+}

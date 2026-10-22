@@ -1,0 +1,54 @@
+{
+  "result": "PASS_SERVICE_TIER_AND_SLA_READ_RECOVERY",
+  "new_tests": 18,
+  "new_test_layers": {
+    "page_dom": 8,
+    "workspace": 10
+  },
+  "focused_tests_passed": 72,
+  "vitest": {
+    "files_passed": 265,
+    "tests_passed": 4339
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180740,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "846ed85e5b651269b35e95bb01da9dd3aab559a8ce664654808cae72cd114783",
+    "scope": "static-artifacts-only"
+  },
+  "browser_specs": {
+    "tests": 86,
+    "files": 10,
+    "status": "DISCOVERED_NOT_EXECUTED"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "initial_existing_suite": {
+    "passed": 53,
+    "failed": 1,
+    "reason": "New-tenant null fixture incorrectly reused same authorized scope after known version; corrected to reset account context before loading new initial state"
+  },
+  "backend_or_ddl_changed": false,
+  "real_fee_tier_account_or_ticket_changes": 0,
+  "remaining_validation": [
+    "Full SLA payload field consistency",
+    "Real browser and formal business acceptance"
+  ],
+  "source_sha256": {
+    "apps/web/src/pages/ServiceTiersPage.vue": "9cb1dcdb0f8a516b7cc165d15a66dd61406c06f9ee3ba737b52a510a8e61bf3c",
+    "apps/web/src/utils/serviceTiers.ts": "4eaf634abf75d0673f61422138c6116b8e43a315f671c63407fb917130590f11",
+    "apps/web/tests/serviceTiersPage.test.ts": "9c403ac653781c152507914efbd4bb55fd8599ab64b53f23d7746d580a68f37a",
+    "apps/web/tests/serviceTierReadRecovery.test.ts": "e2c1d2cd2047fb107d7846f1ad95d383b2e0eb830800295d5ab7752e4b1c4ef2",
+    "apps/web/tests/serviceTierReadRecoveryDom.test.ts": "b5478d1a237eaba5f95971003dc77a01457aca991361ec25a8910c56cb8e7acc"
+  }
+}

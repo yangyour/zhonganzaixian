@@ -1,4 +1,4 @@
-import {ApiError,type RequestOptions} from '../api/client'
+import {ApiError,isCancelled,type RequestOptions} from '../api/client'
 import {createRequestId} from './browserCrypto'
 import {exportExact,exportInteger,exportTime,exportUuid} from './assetExportJobs'
 import {writeFailureUncertain} from './writeFailure'
@@ -52,10 +52,11 @@ export interface ServiceTierContext {tenantId:string;actorId:string;permissionVe
 type Attempt={key:string;body:ServiceTierChangeInput&{expected_version:number}}
 export interface ServiceTierState {
  page:ServiceTierPage|null;receipt:ServiceTierSnapshot|null;busy:'read'|'write'|null;error:unknown;attempt:Attempt|null;
+ readTarget:{before:number|null}|null;slaReadTarget:string|null;
  slaInspection:TicketSlaInspection|null;slaBusy:boolean;slaError:unknown
 }
 export const emptyServiceTierState=():ServiceTierState=>({
- page:null,receipt:null,busy:null,error:null,attempt:null,slaInspection:null,slaBusy:false,slaError:null
+ page:null,receipt:null,busy:null,error:null,attempt:null,readTarget:null,slaReadTarget:null,slaInspection:null,slaBusy:false,slaError:null
 })
 export const TIER_PAGE_SIZE=25
 export const tierLabels:Record<ServiceTierCode,string>={BASIC:'基础版（5×8 工作日历）',STANDARD:'标准版（7×24 全天）',ADVANCED:'高级版（7×24 高优保障）'}
@@ -149,22 +150,30 @@ export function parseOptionalTierInteger(raw:unknown,max:number):number|null {
 }
 
 export function createServiceTierWorkspace(client:{request<T>(path:string,options?:RequestOptions):Promise<T>},changed:(s:ServiceTierState)=>void,newKey=createRequestId){
- let state=emptyServiceTierState(),context:ServiceTierContext|null=null,epoch=0,slaEpoch=0,abort:AbortController|null=null,slaAbort:AbortController|null=null,disposed=false
+ let state=emptyServiceTierState(),context:ServiceTierContext|null=null,epoch=0,slaEpoch=0,abort:AbortController|null=null,slaAbort:AbortController|null=null,disposed=false,knownTierVersion=0
+ let knownSla:{ticketId:string;version:number}|null=null
  const snapshot=()=>({...structuredClone({...state,error:null,slaError:null}),error:state.error,slaError:state.slaError}),emit=()=>changed(snapshot())
- function reset(next:ServiceTierContext|null){epoch++;slaEpoch++;abort?.abort();abort=null;slaAbort?.abort();slaAbort=null;context=!disposed&&validContext(next)?{...next}:null;state=emptyServiceTierState();emit()}
+ function reset(next:ServiceTierContext|null){knownTierVersion=0;knownSla=null;epoch++;slaEpoch++;abort?.abort();abort=null;slaAbort?.abort();slaAbort=null;context=!disposed&&validContext(next)?{...next}:null;state=emptyServiceTierState();emit()}
  async function load(next=false){
   if(disposed||!context||state.busy||state.attempt)return false
   const before=next&&state.page?.has_more?state.page.next_before_version??undefined:undefined
   if(next&&before===undefined)return false
+  return readLedger(before??null)
+ }
+ async function readLedger(original:number|null){
+  if(disposed||!context||state.busy||state.attempt)return false
+  const before=original??undefined
   const turn=++epoch,scope={...context},controller=new AbortController();abort=controller
-  state={...state,page:null,busy:'read',error:null};emit()
+  state={...state,page:null,busy:'read',error:null,readTarget:{before:original}};emit()
   try{
    if(disposed||turn!==epoch||controller.signal.aborted)return false
    const q=new URLSearchParams({page_size:String(TIER_PAGE_SIZE)});if(before!==undefined)q.set('before_version',String(before))
    const raw=await client.request<unknown>('/service-tiers?'+q,{signal:controller.signal})
    if(disposed||turn!==epoch||controller.signal.aborted)return false
-   state.page=readServiceTierPage(raw,scope,before);return true
-  }catch(error){if(!disposed&&turn===epoch)state.error=error;return false}finally{if(!disposed&&turn===epoch){state.busy=null;abort=null;emit()}}
+   const result=readServiceTierPage(raw,scope,before),version=result.current?.version??0
+   if(version<knownTierVersion)throw invalid()
+   knownTierVersion=version;state.page=result;state.readTarget=null;return true
+  }catch(error){if(!disposed&&turn===epoch&&!isCancelled(error))state.error=error;return false}finally{if(!disposed&&turn===epoch){state.busy=null;abort=null;emit()}}
  }
  async function send(attempt:Attempt,retry=false){
   if(disposed||!context?.canWrite||state.busy)return false
@@ -176,7 +185,7 @@ export function createServiceTierWorkspace(client:{request<T>(path:string,option
    if(disposed||turn!==epoch||controller.signal.aborted)return false
    const updated=readServiceTierSnapshot(raw,scope.tenantId)
    if(updated.version!==attempt.body.expected_version+1||updated.updated_by!==scope.actorId||updated.tier!==attempt.body.to_tier||updated.effective_mode!==attempt.body.effective_mode||updated.contract_device_count!==attempt.body.contract_device_count||updated.billing_cycle!==attempt.body.billing_cycle||updated.monthly_fee_fen!==attempt.body.monthly_fee_fen)throw invalid()
-   state.attempt=null;state.busy=null;state.page=null;state.receipt=updated;abort=null;emit()
+   knownTierVersion=Math.max(knownTierVersion,updated.version);state.readTarget=null;state.attempt=null;state.busy=null;state.page=null;state.receipt=updated;abort=null;emit()
    if(disposed||turn!==epoch||controller.signal.aborted)return false
    const reloadTurn=epoch+1;await load(false)
    return !disposed&&epoch===reloadTurn
@@ -205,17 +214,25 @@ export function createServiceTierWorkspace(client:{request<T>(path:string,option
   const trimmed=ticketId.trim()
   if(disposed||!context||state.slaBusy||!exportUuid(trimmed))return false
   const turn=++slaEpoch,scope={...context},controller=new AbortController();slaAbort=controller
-  state={...state,slaBusy:true,slaError:null,slaInspection:null};emit()
+  state={...state,slaBusy:true,slaError:null,slaInspection:null,slaReadTarget:trimmed};emit()
   try{
    if(disposed||turn!==slaEpoch||controller.signal.aborted)return false
    const raw=await client.request<unknown>(`/tickets/${trimmed}/workflow/sla`,{signal:controller.signal})
    if(disposed||turn!==slaEpoch||controller.signal.aborted)return false
-   state.slaInspection=readTicketSlaInspection(raw,scope,trimmed);return true
-  }catch(error){if(!disposed&&turn===slaEpoch)state.slaError=error;return false}finally{if(!disposed&&turn===slaEpoch){state.slaBusy=false;slaAbort=null;emit()}}
+   const result=readTicketSlaInspection(raw,scope,trimmed)
+   if(knownSla?.ticketId===trimmed&&result.workflow_version<knownSla.version)throw invalid()
+   knownSla={ticketId:trimmed,version:result.workflow_version};state.slaInspection=result;state.slaReadTarget=null;return true
+  }catch(error){if(!disposed&&turn===slaEpoch&&!isCancelled(error))state.slaError=error;return false}finally{if(!disposed&&turn===slaEpoch){state.slaBusy=false;slaAbort=null;emit()}}
  }
+ function cancelRead(){if(disposed||state.busy!=='read')return false;epoch++;abort?.abort();abort=null;state.busy=null;state.error=null;emit();return true}
+ function cancelSlaRead(){if(disposed||!state.slaBusy)return false;slaEpoch++;slaAbort?.abort();slaAbort=null;state.slaBusy=false;state.slaError=null;emit();return true}
+ const canRetryRead=()=>!disposed&&!!context&&!state.busy&&!state.attempt&&state.readTarget!==null
+ const canRetrySlaRead=()=>!disposed&&!!context&&!state.slaBusy&&state.slaReadTarget!==null
  emit()
  return{
-  reset,load,submitChange,inspectTicketSla,
+  reset,load,submitChange,inspectTicketSla,cancelRead,cancelSlaRead,canRetryRead,canRetrySlaRead,
+  retryRead:()=>canRetryRead()?readLedger(state.readTarget!.before):Promise.resolve(false),
+  retrySlaRead:()=>canRetrySlaRead()?inspectTicketSla(state.slaReadTarget!):Promise.resolve(false),
   retry:()=>state.attempt?send(structuredClone(state.attempt),true):Promise.resolve(false),
   unresolved:()=>state.attempt!==null,
   state:snapshot,

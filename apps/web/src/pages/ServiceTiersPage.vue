@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed,getCurrentInstance,onUnmounted,ref,shallowRef,watch} from 'vue'
+import {computed,getCurrentInstance,nextTick,onUnmounted,ref,shallowRef,watch} from 'vue'
 import {ElMessageBox} from 'element-plus'
 import {onBeforeRouteLeave,type Router} from 'vue-router'
 import {api} from '../api/client'
@@ -11,6 +11,8 @@ import {
 } from '../utils/serviceTiers'
 import {displayTime} from '../utils/display'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
+import ReadRecoveryActions from '../components/ReadRecoveryActions.vue'
+import {exportUuid} from '../utils/assetExportJobs'
 
 const state=shallowRef<ServiceTierState>(emptyServiceTierState())
 const workspace=createServiceTierWorkspace(api,s=>{state.value=s})
@@ -25,6 +27,8 @@ const billingCycle=ref<BillingCycle|''>('')
 const monthlyFeeFen=ref<string>('')
 const reason=ref('')
 const ticketIdInput=ref('')
+const ledgerHeading=ref<HTMLElement|null>(null),ledgerFeedback=ref<HTMLElement|null>(null),slaHeading=ref<HTMLElement|null>(null),slaFeedback=ref<HTMLElement|null>(null),ticketInput=ref<HTMLInputElement|null>(null),slaValidation=ref('')
+let ledgerFocusEpoch=0,slaFocusEpoch=0
 const blocked=ref(false),confirming=ref(false)
 let disposed=false,confirmationEpoch=0,savedInput:string|null=null,routeEpoch=0,removeResolve:(()=>void)|undefined
 const router=getCurrentInstance()?.appContext.config.globalProperties.$router as Router|undefined
@@ -58,12 +62,29 @@ function finishSave(ok:boolean,owner:string){if(!ok||disposed||owner!==context.v
 async function recover(){if(confirming.value||disposed)return false;const owner=context.value;return finishSave(await workspace.retry(),owner)}
 watch(context,()=>{
  const s=session.value
- confirmationEpoch++;confirming.value=false;clearRouteApproval()
+ confirmationEpoch++;ledgerFocusEpoch++;slaFocusEpoch++;slaValidation.value='';confirming.value=false;clearRouteApproval()
  tab.value='ledger';clearForm();ticketIdInput.value='';blocked.value=false
  workspace.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,canWrite:canWrite.value}:null)
- if(permitted.value)void workspace.load(false)
+ if(permitted.value)void readLedger()
 },{immediate:true,flush:'sync'})
 
+async function readLedger(next=false,retry=false){
+ if(confirming.value||disposed)return false
+ const owner=context.value,turn=++ledgerFocusEpoch,active=document.activeElement
+ const ok=await(retry?workspace.retryRead():workspace.load(next))
+ if(disposed||turn!==ledgerFocusEpoch||owner!==context.value||!ok&&!state.value.error)return ok
+ await nextTick();if(!disposed&&turn===ledgerFocusEpoch&&owner===context.value&&(document.activeElement===active||document.activeElement===document.body))(ok?ledgerHeading.value:ledgerFeedback.value)?.focus();return ok
+}
+function cancelLedger(){ledgerFocusEpoch++;return workspace.cancelRead()}
+async function readSla(retry=false){
+ if(confirming.value||disposed)return false
+ if(!retry&&!exportUuid(ticketIdInput.value.trim())){slaValidation.value='请输入完整有效的工单 UUID，不会按错误输入发送请求。';await nextTick();ticketInput.value?.focus();return false}
+ slaValidation.value='';const owner=context.value,turn=++slaFocusEpoch,active=document.activeElement
+ const ok=await(retry?workspace.retrySlaRead():workspace.inspectTicketSla(ticketIdInput.value))
+ if(disposed||turn!==slaFocusEpoch||owner!==context.value||!ok&&!state.value.slaError)return ok
+ await nextTick();if(!disposed&&turn===slaFocusEpoch&&owner===context.value&&(document.activeElement===active||document.activeElement===document.body))(ok?slaHeading.value:slaFeedback.value)?.focus();return ok
+}
+function cancelSla(){slaFocusEpoch++;return workspace.cancelSlaRead()}
 async function submitChange(){
  if(formLocked.value||!toTier.value||!effectiveMode.value||preparedVersion.value===null)return false
  validation.value=''
@@ -82,13 +103,13 @@ const unregister=contextTransitionGuards.register(mayLeave,approvalSnapshot)
 function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()||dirty.value){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
 onUnmounted(()=>{disposed=true;confirmationEpoch++;confirming.value=false;clearRouteApproval();removeAfter?.();removeError?.();savedInput=null;unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
-defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,preparedVersion,validation,dirty,toTier,effectiveMode,deviceCount,billingCycle,monthlyFeeFen,reason,ticketIdInput})
+defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,readLedger,readSla,cancelLedger,cancelSla,preparedVersion,validation,dirty,toTier,effectiveMode,deviceCount,billingCycle,monthlyFeeFen,reason,ticketIdInput})
 </script>
 <template>
  <section class="service-tiers">
   <div class="page-heading proto-page-head">
    <div>
-    <h1>服务档位与 SLA 时钟台账 <span class="proto-badge">{{ session?.tenant.name }}</span></h1>
+    <h1 ref="ledgerHeading" tabindex="-1">服务档位与 SLA 时钟台账 <span class="proto-badge">{{ session?.tenant.name }}</span></h1>
     <p>管理当前租户服务档位配置与变更台账，并核验在途工单的开单冻结 SLA 时钟（M2-10 / M5-8 / M5-18 / M5-20）。</p>
    </div>
    <RouterLink to="/sla-scenarios" class="back">SLA 场景测算</RouterLink>
@@ -127,11 +148,11 @@ defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,prepar
       <button type="button" :class="{active:tab==='ledger'}" :aria-pressed="tab==='ledger'" :disabled="locked" @click="tab='ledger'">档位快照与变更历史</button>
       <button type="button" :class="{active:tab==='sla'}" :aria-pressed="tab==='sla'" :disabled="locked" @click="tab='sla'">工单 SLA 冻结时钟核验</button>
      </div>
-     <button v-if="tab==='ledger'" type="button" :disabled="locked" @click="workspace.load(false)">刷新</button>
+     <button v-if="tab==='ledger'" type="button" :disabled="locked" @click="readLedger()">刷新</button>
     </div>
 
     <template v-if="tab==='ledger'">
-     <ApiErrorNotice :error="state.error" />
+     <ReadRecoveryActions :busy="state.busy" :can-retry="!confirming&&workspace.canRetryRead()" :scope-key="context" label="服务档位台账" :cancel="cancelLedger" :retry="()=>readLedger(false,true)" /><div ref="ledgerFeedback" tabindex="-1" role="group" aria-label="服务档位读取结果"><ApiErrorNotice :error="state.error" /></div>
      <p v-if="state.attempt||blocked&&workspace.unresolved()" role="alert">服务档位变更提交结果尚未确认，请点击下方按钮重试。</p>
      <button v-if="state.attempt&&!state.busy" type="button" @click="recover">重试提交变更</button>
      <p v-if="state.busy" role="status" aria-live="polite">{{ state.busy==='write'?'正在提交服务档位变更…':'正在读取服务档位台账…' }}</p>
@@ -179,9 +200,9 @@ defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,prepar
 
      <template v-if="state.page">
       <div class="proto-table-wrap" tabindex="0" role="region" aria-label="服务档位变更历史，可横向滚动">
-       <table class="proto-table">
+       <table class="proto-table"><caption>当前读取范围的服务档位变更记录</caption>
         <thead>
-         <tr><th>版本</th><th>原档位 → 新档位</th><th>可用性目标</th><th>生效方式 / 时间</th><th>合同设备数 / 周期</th><th>变更原因</th><th>记录时间</th></tr>
+         <tr><th scope="col">版本</th><th scope="col">原档位 → 新档位</th><th scope="col">可用性目标</th><th scope="col">生效方式 / 时间</th><th scope="col">合同设备数 / 周期</th><th scope="col">变更原因</th><th scope="col">记录时间</th></tr>
         </thead>
         <tbody>
          <tr v-for="c in state.page.items" :key="c.id">
@@ -197,21 +218,21 @@ defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,prepar
        </table>
        <p v-if="!state.page.items.length" class="panel">当前租户尚无服务档位变更记录。</p>
       </div>
-      <button type="button" :disabled="locked" @click="workspace.load(false)">返回第一页</button>
-      <button type="button" :disabled="locked||!state.page.has_more" @click="workspace.load(true)">下一页</button>
+      <button type="button" :disabled="locked" @click="readLedger()">返回第一页</button>
+      <button type="button" :disabled="locked||!state.page.has_more" @click="readLedger(true)">下一页</button>
      </template>
     </template>
 
     <template v-else>
-     <ApiErrorNotice :error="state.slaError" />
-     <form class="sla-search" @submit.prevent="workspace.inspectTicketSla(ticketIdInput)">
+     <ReadRecoveryActions :busy="state.slaBusy?'read':null" :can-retry="!confirming&&workspace.canRetrySlaRead()" :scope-key="context" label="工单 SLA" :cancel="cancelSla" :retry="()=>readSla(true)" /><div ref="slaFeedback" tabindex="-1" role="group" aria-label="工单 SLA 读取结果"><ApiErrorNotice :error="state.slaError" /></div><p v-if="slaValidation" role="alert">{{slaValidation}}</p>
+     <form class="sla-search" @submit.prevent="readSla()">
       <label>工单 ID（UUID）
-       <input v-model="ticketIdInput" type="text" placeholder="输入工单 UUID 核验开单冻结 SLA 时钟" />
+       <input ref="ticketInput" v-model="ticketIdInput" type="text" placeholder="输入工单 UUID 核验开单冻结 SLA 时钟" />
       </label>
       <button type="submit" class="tier-submit-btn" :disabled="state.slaBusy||!ticketIdInput.trim()">核验 SLA 时钟</button>
      </form>
      <p v-if="state.slaBusy" role="status">正在读取工单 SLA 时钟…</p>
-     <div v-if="state.slaInspection" class="sla-detail">
+     <div v-if="state.slaInspection" class="sla-detail"><h2 ref="slaHeading" tabindex="-1">原工单 SLA 核验结果</h2>
       <p>
        工单号：<strong>{{ state.slaInspection.receipt_no }}</strong> ·
        状态：<strong>{{ state.slaInspection.state ?? '未建立正式流程' }}</strong> ·
@@ -221,9 +242,9 @@ defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,prepar
        开单后档位是否变更：<strong>{{ state.slaInspection.tier_changed_since_open ? '是（在途工单截止时间保持不变）' : '否' }}</strong>
       </p>
       <div v-if="state.slaInspection.response_clock && state.slaInspection.recovery_clock" class="proto-table-wrap">
-       <table class="proto-table">
+       <table class="proto-table"><caption>当前读取范围的服务档位变更记录</caption>
         <thead>
-         <tr><th>时钟</th><th>状态</th><th>截止时间</th><th>完成时间</th><th>50% 提醒</th><th>80% 提醒</th><th>100% 超时</th></tr>
+         <tr><th scope="col">时钟</th><th scope="col">状态</th><th scope="col">截止时间</th><th scope="col">完成时间</th><th scope="col">50% 提醒</th><th scope="col">80% 提醒</th><th scope="col">100% 超时</th></tr>
         </thead>
         <tbody>
          <tr v-for="clock in [state.slaInspection.response_clock, state.slaInspection.recovery_clock]" :key="clock.name">
@@ -248,5 +269,6 @@ defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,prepar
  </section>
 </template>
 <style scoped>
-.service-tiers{min-width:0}.service-tiers .panel{padding:20px;margin:16px 0}.workspace{margin-top:12px}.workspace>p,.workspace>button{margin:12px 18px;font-size:12px}.service-tiers .proto-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0 18px}.service-tiers button,.back{display:inline-flex;align-items:center;min-height:32px;padding:6px 12px;font-size:12px;border:1px solid #cbd7e5;border-radius:4px;background:#fff;color:#245a85;font-family:inherit;cursor:pointer;text-decoration:none;transition:background-color .15s,border-color .15s,color .15s}.service-tiers button:not(:disabled):hover,.back:hover{border-color:#94b8e8;background:#f4f8ff;color:#1d4ed8}.service-tiers button.tier-submit-btn{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:500}.service-tiers button.tier-submit-btn:not(:disabled):hover{background:#1d4ed8;border-color:#1d4ed8;color:#fff}.service-tiers button:disabled{opacity:.5;cursor:not-allowed}.service-tiers .proto-tabs{display:flex;gap:24px}.service-tiers .proto-tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;min-height:48px;padding:0 4px;background:none;color:#5f6b78}.service-tiers .proto-tabs button:not(:disabled):hover{background:none;color:#1f5fc8}.service-tiers .proto-tabs button.active{border-bottom-color:#2d79f6;color:#1f5fc8;font-weight:600}.tier-form,.sla-search,.sla-detail{margin:16px 18px;padding:16px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc}.tier-form h2{margin:0 0 12px;font-size:14px;color:#1e293b}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px}.form-grid label,.sla-search label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:#334155}.form-grid label.wide{grid-column:1/-1}.form-grid input,.form-grid select,.sla-search input{min-height:34px;padding:4px 10px;border:1px solid #cbd7e5;border-radius:4px;background:#fff;font-size:12px;transition:border-color .15s,box-shadow .15s}.form-grid input:focus,.form-grid select:focus,.sla-search input:focus{outline:none;border-color:#2d79f6;box-shadow:0 0 0 2px rgba(45,121,246,.12)}.sla-search{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}.sla-search label{flex:1;min-width:260px}.metric-footer{margin-top:10px;font-size:12px;color:#64748b}
+.service-tiers :focus-visible{outline:3px solid #176bb5;outline-offset:3px}.service-tiers{min-width:0}.service-tiers .panel{padding:20px;margin:16px 0}.workspace{margin-top:12px}.workspace>p,.workspace>button{margin:12px 18px;font-size:12px}.service-tiers .proto-toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:0 18px}.service-tiers button,.back{display:inline-flex;align-items:center;min-height:44px;padding:6px 12px;font-size:12px;border:1px solid #cbd7e5;border-radius:4px;background:#fff;color:#245a85;font-family:inherit;cursor:pointer;text-decoration:none;transition:background-color .15s,border-color .15s,color .15s}.service-tiers button:not(:disabled):hover,.back:hover{border-color:#94b8e8;background:#f4f8ff;color:#1d4ed8}.service-tiers button.tier-submit-btn{background:#2563eb;border-color:#2563eb;color:#fff;font-weight:500}.service-tiers button.tier-submit-btn:not(:disabled):hover{background:#1d4ed8;border-color:#1d4ed8;color:#fff}.service-tiers button:disabled{opacity:.5;cursor:not-allowed}.service-tiers .proto-tabs{display:flex;flex-wrap:wrap;gap:12px}.service-tiers .proto-tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;min-height:48px;padding:0 4px;background:none;color:#5f6b78}.service-tiers .proto-tabs button:not(:disabled):hover{background:none;color:#1f5fc8}.service-tiers .proto-tabs button.active{border-bottom-color:#2d79f6;color:#1f5fc8;font-weight:600}.tier-form,.sla-search,.sla-detail{margin:16px 18px;padding:16px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc}.tier-form h2{margin:0 0 12px;font-size:14px;color:#1e293b}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px;margin-bottom:14px}.form-grid label,.sla-search label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:#334155}.form-grid label.wide{grid-column:1/-1}.form-grid input,.form-grid select,.sla-search input{min-height:44px;padding:4px 10px;border:1px solid #cbd7e5;border-radius:4px;background:#fff;font-size:12px;transition:border-color .15s,box-shadow .15s}.form-grid input:focus,.form-grid select:focus,.sla-search input:focus{outline:none;border-color:#2d79f6;box-shadow:0 0 0 2px rgba(45,121,246,.12)}.sla-search{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}.sla-search label{flex:1;min-width:min(260px,100%)}.metric-footer{margin-top:10px;font-size:12px;color:#64748b}
+.service-tiers .form-grid input:focus-visible,.service-tiers .form-grid select:focus-visible,.service-tiers .sla-search input:focus-visible{outline:3px solid #176bb5;outline-offset:3px}
 </style>

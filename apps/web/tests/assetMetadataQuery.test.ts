@@ -1,10 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { ApiError, type ApiClient } from '../src/api/client'
 import { createMetadataQuery, emptyMetadataQueryState, normalizeMetadataFilters, type MetadataFilters, type MetadataQueryState } from '../src/utils/assetMetadataQuery'
-const id = (n: number) => `55000000-0000-4000-8000-${n.toString(16).padStart(12, '0')}`
-const scope = { tenantId: id(1), actorId: id(2), permissionVersion: 1 }
-const row = (n = 20) => ({ asset: { id: id(n), tenant_id: scope.tenantId, name: '虚构资产', type: 'router', management_ip: '192.0.2.1', site_id: 'site-a', source: 'manual', status: 'unknown', lifecycle_status: 'DRAFT', sampled_at: null, unknown_reason: 'NOT_ONBOARDED', availability: 'UNKNOWN', sync_state: 'PENDING_ONBOARDING', version: 1, created_at: '2026-10-02T00:00:00Z', updated_at: '2026-10-02T00:00:00Z' }, metadata: null, metadata_version: null, recorded_by: null, recorded_at: null, can_edit: true, edit_blockers: [], scope: 'INTERNAL_MANUAL_DRAFT', verification_status: null, source: 'postgresql', monitoring_applied: false, cmdb_applied: false, management_ip_change_status: 'CONFIG_PENDING' })
-const page = (items = [row()], filters: MetadataFilters = {}, more = false) => ({ items, filters, has_more: more, next_before_created_at: more ? items.at(-1)!.asset.created_at : null, next_before_id: more ? items.at(-1)!.asset.id : null, source: 'postgresql', scope: 'CURRENT_TENANT_INTERNAL_MANUAL_SOURCE', page_size_limit: 100, pagination_consistency: 'CURRENT_REQUEST_SNAPSHOT_ONLY', unknown_semantics: 'EXPLICIT_NULL_NO_INFERENCE' })
+import { id,scope,row,page } from './fixtures/assetMetadataQuery'
 type Options = Parameters<ApiClient['request']>[1]
 function harness(handler: (url: string, options: Options) => unknown | Promise<unknown>) {
   let state: MetadataQueryState = emptyMetadataQueryState()

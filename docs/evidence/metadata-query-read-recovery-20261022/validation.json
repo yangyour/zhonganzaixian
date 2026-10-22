@@ -1,0 +1,45 @@
+{
+  "status": "PASS_METADATA_QUERY_ORIGINAL_READ_RECOVERY",
+  "new_tests": 20,
+  "new_logic_tests": 10,
+  "new_dom_tests": 10,
+  "original_logic_run": {
+    "failed": 10,
+    "passed": 0
+  },
+  "focused": {
+    "files": 3,
+    "tests": 38,
+    "failures": 0
+  },
+  "vitest": {
+    "files": 286,
+    "tests": 4739,
+    "failures": 0
+  },
+  "node_contract_tests": 179,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180738,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "3ca4bd3ab27ec13d719cc14513caed44d04a902326c2fae44247ca33ff4049ce",
+    "scope": "static-artifacts-only"
+  },
+  "preserved_failure": "Initial typecheck rejected Element Plus DefaultRow for typed selection gate; bound table columns explicitly to MetadataCurrent and reran focused compiler/DOM tests and full build",
+  "test_boundary": "Actual Vue/Element Plus controls; drawer/table shells controlled, selection checked through component method/event; no browser acceptance",
+  "http_smoke": "4_DISTINCT_LOOPBACK_VITE_RESOURCES_PASS_AND_STOPPED",
+  "browser": "105_SPECIFICATIONS_12_FILES_ACTUAL_NOT_RUN",
+  "formal_contract_tc": "128_NOT_RUN",
+  "backend_sql_or_real_account_changed": false,
+  "remaining": "Date query original recovery and full account scope",
+  "source_sha256": {
+    "apps/web/src/utils/assetMetadataQuery.ts": "615be3a79ee0a3a3e36839c7493dcfacf28055c14b6b6444f856c65cd79c737b",
+    "apps/web/src/components/AssetMetadataQuery.vue": "3d7379afbe20f6d5d4c4835f46a4886b46aa18a56d8191430fca3ee0e892d321",
+    "apps/web/tests/assetMetadataQuery.test.ts": "aea6695d2a1ae6ac7f21598945d38dd5de7fc4569ef59ae99a32549678b63a20",
+    "apps/web/tests/fixtures/assetMetadataQuery.ts": "a90dddc192b6e004f677178bf0203c16c4033ea2f00ba3645ebd200293afef9d",
+    "apps/web/tests/assetMetadataQueryRecovery.test.ts": "42df7a1ebb1e7ac29b6205456dc09443e8f478fd81c13b41e742b6bd14fd0f8b",
+    "apps/web/tests/assetMetadataQueryRecoveryPanel.test.ts": "dd91674dfb51fb2db8ba33b11d7f218fe84f26161e0e40bf5d270032865fd7d0"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "status": "PASS_DATE_QUERY_ORIGINAL_READ_RECOVERY",
+  "new_tests": 21,
+  "new_logic_tests": 11,
+  "new_dom_tests": 10,
+  "original_first_10_logic_run": {
+    "failed": 8,
+    "passed": 2
+  },
+  "additional_case": "Exposed diagnostic mutation cannot bypass private reference-day-changed recovery gate",
+  "focused": {
+    "files": 3,
+    "tests": 37,
+    "failures": 0
+  },
+  "vitest": {
+    "files": 288,
+    "tests": 4760,
+    "failures": 0
+  },
+  "node_contract_tests": 179,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180737,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "ac36b1d590b3253d964df4a327ec65059ca60ab3597e9c8d3aba3299c851a9e6",
+    "scope": "static-artifacts-only"
+  },
+  "test_boundary": "Actual Vue/Element Plus controls; drawer/table shells controlled, selection checked through component method/event; no browser acceptance",
+  "http_smoke": "4_DISTINCT_LOOPBACK_VITE_RESOURCES_PASS_AND_STOPPED",
+  "browser": "105_SPECIFICATIONS_12_FILES_ACTUAL_NOT_RUN",
+  "formal_contract_tc": "128_NOT_RUN",
+  "backend_sql_or_real_account_changed": false,
+  "source_sha256": {
+    "apps/web/src/utils/assetDateQuery.ts": "300cba8809bc941374bdffe2006205fa9acb9d41ef4bf058310e234fe600ba7c",
+    "apps/web/src/components/AssetDateQuery.vue": "c43d7095b9316059951c38bf85a62a4aed1ee37d73ddab04b80e6f9d06d5b388",
+    "apps/web/tests/assetDateQuery.test.ts": "fd5c3ed18be3262d77795be67263f381e4e2b193ac933fb80957984612f21511",
+    "apps/web/tests/fixtures/assetDateQuery.ts": "a5e1252a54f710410220902feb8d5bb3925986ad6f8fa59858b5164ad18c29fd",
+    "apps/web/tests/assetDateQueryRecovery.test.ts": "151b855c4b8247a34b3484133b455f5c31d350742b0d06f83a5f659f06b8f748",
+    "apps/web/tests/assetDateQueryRecoveryPanel.test.ts": "be6f99e401ead2513efda6a3ba3ab6e38fee67f1f3659f66641dc737d8ce43f8"
+  }
+}

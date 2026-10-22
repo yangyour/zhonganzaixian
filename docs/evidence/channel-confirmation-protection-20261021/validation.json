@@ -1,0 +1,50 @@
+{
+  "result": "PASS_CHANNEL_BINDING_AND_SEND_CONFIRMATION_PROTECTION",
+  "new_tests": 22,
+  "new_test_layers": {
+    "real_vue_page_dom_and_handlers": 22
+  },
+  "focused_tests_passed": 123,
+  "vitest": {
+    "files_passed": 253,
+    "tests_passed": 4132
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "production_build": {
+    "status": "PASSED",
+    "files": 141,
+    "bootstrap_gzip_bytes": 180721,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "e27b0eb5002d665068e38645380502285a43db67e7c5eb9a8e86a59aab2a1d6b",
+    "scope": "static-artifacts-only"
+  },
+  "initial_failures": [
+    {
+      "initial_test_driver": "Awaiting the duplicate unresolved modal caused timeouts; corrected to assert concurrent modal count."
+    },
+    {
+      "original_source_reproduced": 4,
+      "skipped_unrelated": 71,
+      "fixed": "Complete input snapshot and single pending confirmation epoch."
+    }
+  ],
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "modal": "EXPLICIT_STUB_NOT_BROWSER_ACCEPTANCE",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_messages_or_binding_changes": 0,
+  "formal_acceptance_passes_added": 0,
+  "source_sha256": {
+    "apps/web/src/pages/EmailPage.vue": "7267e86382f02fd9cc91ad5a0c6c633563c9f4f57d0f3d94af1935ae9836a3a4",
+    "apps/web/src/pages/WeComPage.vue": "a9accf3e6a68cfdc6a4e7dc9705a1ce9d435d4e1c848142652e690eeb41355db",
+    "apps/web/tests/channelPages.test.ts": "138680678ac3eb1b28be8cee54ab6933c0d95271ff60aaa06b57c1a83d1a81f2"
+  }
+}

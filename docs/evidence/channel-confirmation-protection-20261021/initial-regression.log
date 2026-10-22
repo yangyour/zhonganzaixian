@@ -1,0 +1,62 @@
+(node:6) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @mop/web@0.1.0 test
+> vitest run tests/channelPages.test.ts
+
+(node:19) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.11 /workspace/scratch/390b70bf66c8/zhonganzaixian-integrated/apps/web
+
+(node:37) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ tests/channelPages.test.ts (61 tests | 4 failed) 2848ms
+     × does not discard new binding text typed during refresh confirmation 93ms
+     × opens only one test-send confirmation while the first is pending 44ms
+     × does not discard new binding text typed during refresh confirmation 58ms
+     × opens only one test-send confirmation while the first is pending 30ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/channelPages.test.ts > email complete confirmation input > does not discard new binding text typed during refresh confirmation
+ FAIL  tests/channelPages.test.ts > wecom complete confirmation input > does not discard new binding text typed during refresh confirmation
+AssertionError: expected '' to be 'newer draft' // Object.is equality
+
+- Expected
++ Received
+
+- newer draft
+
+ ❯ tests/channelPages.test.ts:52:500
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/channelPages.test.ts > email complete confirmation input > opens only one test-send confirmation while the first is pending
+ FAIL  tests/channelPages.test.ts > wecom complete confirmation input > opens only one test-send confirmation while the first is pending
+AssertionError: expected "Mock" to be called 1 times, but got 2 times
+ ❯ tests/channelPages.test.ts:55:417
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 57 passed (61)
+   Start at  18:20:55
+   Duration  4.37s (transform 520ms, setup 0ms, import 1.04s, tests 2.85s, environment 347ms)
+
+wer draft
+
+ ❯ tests/channelPages.test.ts:52:500
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 57 passed (61)
+   Start at  18:20:43
+   Duration  14.52s (transform 574ms, setup 0ms, import 1.15s, tests 12.93s, environment 293ms)
+

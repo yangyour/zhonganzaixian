@@ -17,8 +17,9 @@ const accountSearchInput=ref<HTMLInputElement|null>(null)
 const accountQuery=ref(''),appliedAccountQuery=ref(''),accountPage=ref(1)
 const targetBinding=shallowRef<TargetBindingState>(emptyTargetBindingState())
 const targetWorkspace=createTargetBindingWorkspace(api,value=>{targetBinding.value=value})
-const scope=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,session.value?.mode,can('users:read'),can('users:write'),can('tickets:read'),switchingTenant.value]))
-let epoch=0,disposed=false,controller:AbortController|null=null
+const scope=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,session.value?.mode,can('users:read'),can('users:write'),can('tickets:read'),switchingTenant.value]))
+let epoch=0,disposed=false,controller:AbortController|null=null,confirmationEpoch=0
+const confirming=ref(false)
 const readable=()=>!disposed&&!switchingTenant.value&&!!session.value&&can('users:read')
 function clearFacts(){targetWorkspace.reset();status.value=null;bindings.value=[];deliveries.value=[];users.value=null}
 async function load(){
@@ -32,8 +33,9 @@ async function load(){
   status.value=s;bindings.value=b.items;deliveries.value=d.items;users.value=userPage;return true
  }catch(cause){if(turn===epoch){controller?.abort();if(!isCancelled(cause))error.value=cause}return false}finally{if(turn===epoch){loading.value=false;controller=null}}
 }
-const editor=useIdentityEditor(load),command=editor.command,message=editor.message
-const locked=computed(()=>!readable()||!status.value||!users.value||loading.value||editor.busy()||!can('users:write'))
+function inputSnapshot(){return JSON.stringify([scope.value,userId.value,memberId.value,accountQuery.value,appliedAccountQuery.value,accountPage.value,status.value,targetBinding.value.binding])}
+const editor=useIdentityEditor(load,{snapshot:inputSnapshot,preserveUnknown:true}),command=editor.command,message=editor.message
+const locked=computed(()=>confirming.value||!readable()||!status.value||!users.value||loading.value||editor.busy()||!can('users:write'))
 const memberInvalid=computed(()=>!!memberId.value&&(!/^[A-Za-z0-9_.@-]{1,64}$/.test(memberId.value)||memberId.value.toLowerCase()==='@all'))
 const memberMismatch=computed(()=>{const b=targetBinding.value.binding;return !!memberId.value&&!!b&&'wecom_user_id' in b&&b.wecom_user_id.toLowerCase()!==memberId.value.toLowerCase()})
 const bindingLocked=computed(()=>locked.value||targetBinding.value.busy||!targetBinding.value.ready||targetBinding.value.context?.userId!==userId.value)
@@ -42,27 +44,34 @@ async function readSelectedBinding(){
  return targetWorkspace.load({kind:'wecom',tenantId:session.value!.tenant.id,userId:userId.value,channelIdentity:status.value.corp_id})
 }
 watch(userId,()=>{targetWorkspace.reset();if(userId.value)void readSelectedBinding()},{flush:'sync'})
-function clear(){targetWorkspace.reset();accountQuery.value='';appliedAccountQuery.value='';accountPage.value=1;epoch++;controller?.abort();status.value=null;bindings.value=[];deliveries.value=[];users.value=null;userId.value='';memberId.value='';error.value=null;loading.value=false;editor.clear()}
+function clear(){confirmationEpoch++;confirming.value=false;targetWorkspace.reset();accountQuery.value='';appliedAccountQuery.value='';accountPage.value=1;epoch++;controller?.abort();status.value=null;bindings.value=[];deliveries.value=[];users.value=null;userId.value='';memberId.value='';error.value=null;loading.value=false;editor.clear()}
 watch([userId,memberId],()=>{editor.dirty.value=!!userId.value||!!memberId.value},{flush:'sync'})
 watch(scope,()=>{clear();if(readable())void load()},{flush:'sync'});onMounted(load);onUnmounted(()=>{disposed=true;clear();targetWorkspace.dispose()})
-async function refresh(){const owner=scope.value;if(editor.busy()||!await editor.leave()||owner!==scope.value||disposed)return;userId.value='';memberId.value='';editor.clear();await load()}
+async function refresh(){const owner=scope.value,before=inputSnapshot();if(editor.busy()||!await editor.leave()||owner!==scope.value||disposed||before!==inputSnapshot())return;userId.value='';memberId.value='';editor.clear();await load()}
 async function browseAccounts(nextPage:number,search=false){
- const owner=scope.value,query=search?accountQuery.value.trim():appliedAccountQuery.value
+ const owner=scope.value,before=inputSnapshot(),query=search?accountQuery.value.trim():appliedAccountQuery.value
  if(!readable()||loading.value||editor.busy()||!Number.isSafeInteger(nextPage)||nextPage<1||nextPage>10000||query.length>100||(!search&&nextPage>accountPage.value&&!users.value?.has_more))return
- if(!await editor.leave()||owner!==scope.value||disposed||loading.value||editor.busy())return
+ if(!await editor.leave()||owner!==scope.value||disposed||loading.value||editor.busy()||before!==inputSnapshot())return
  userId.value='';memberId.value='';editor.clear();accountPage.value=nextPage;appliedAccountQuery.value=query;accountQuery.value=query;const ok=await load();if(ok&&owner===scope.value&&!disposed){await nextTick();if(owner===scope.value&&!disposed)accountSearchInput.value?.focus()}
 }
 async function check(){if(!locked.value&&!editor.dirty.value)await editor.save('/wecom/check','POST',{})}
-async function test(){if(locked.value||editor.dirty.value||!status.value?.dispatch_enabled||!status.value.test_user_id)return;const owner=scope.value,recipient=status.value.test_user_id;try{await ElMessageBox.confirm(`将向 ${status.value.test_user_id} 发送“【MOP 联调测试】企业微信应用消息通道验证，无需处理”。`,'发送测试消息',{confirmButtonText:'发送',cancelButtonText:'取消'})}catch{return}if(owner===scope.value&&!locked.value&&!editor.dirty.value&&status.value?.dispatch_enabled&&status.value.test_user_id===recipient)await editor.save('/wecom/test-messages','POST',{expected_version:0})}
+async function test(){
+ if(locked.value||editor.dirty.value||!status.value?.dispatch_enabled||!status.value.test_user_id)return
+ const owner=scope.value,before=inputSnapshot(),turn=++confirmationEpoch;confirming.value=true
+ try{await ElMessageBox.confirm(`将向 ${status.value.test_user_id} 发送“【MOP 联调测试】企业微信应用消息通道验证，无需处理”。`,'发送测试消息',{confirmButtonText:'发送',cancelButtonText:'取消'})}catch{return}finally{if(turn===confirmationEpoch)confirming.value=false}
+ if(turn!==confirmationEpoch||owner!==scope.value||before!==inputSnapshot()||locked.value||editor.dirty.value||!status.value?.dispatch_enabled)return
+ await editor.save('/wecom/test-messages','POST',{expected_version:0})
+}
 async function bind(){if(bindingLocked.value||memberInvalid.value||memberMismatch.value||!userId.value||!memberId.value||!users.value?.items.some(user=>user.id===userId.value&&user.active&&user.member_active))return;const old=targetBinding.value.binding;if(old&&'wecom_user_id' in old&&old.wecom_user_id.toLowerCase()!==memberId.value.toLowerCase())return;const owner=scope.value,selected=userId.value,value=memberId.value;const saved=await editor.save(`/wecom/bindings/${userId.value}`,'PUT',{expected_version:old?.version??0,wecom_user_id:memberId.value,active:true});if(saved&&owner===scope.value&&selected===userId.value&&value===memberId.value){userId.value='';memberId.value='';editor.dirty.value=false}}
 async function disableSelected(){
  const b=targetBinding.value.binding,owner=scope.value,selected=userId.value,draft=memberId.value
  if(bindingLocked.value||!b?.active||!('wecom_user_id' in b))return
- try{await ElMessageBox.confirm('将停用所选账号的现有绑定，并放弃本页未保存的绑定编辑。企业微信既有登录会话也会失效。','停用所选账号绑定',{confirmButtonText:'确认停用',cancelButtonText:'取消',type:'warning'})}catch{return}
- if(owner!==scope.value||bindingLocked.value||userId.value!==selected||memberId.value!==draft||targetBinding.value.binding?.id!==b.id||targetBinding.value.binding.version!==b.version)return
+ const before=inputSnapshot(),turn=++confirmationEpoch;confirming.value=true
+ try{await ElMessageBox.confirm('将停用所选账号的现有绑定，并放弃本页未保存的绑定编辑。企业微信既有登录会话也会失效。','停用所选账号绑定',{confirmButtonText:'确认停用',cancelButtonText:'取消',type:'warning'})}catch{return}finally{if(turn===confirmationEpoch)confirming.value=false}
+ if(turn!==confirmationEpoch||before!==inputSnapshot()||owner!==scope.value||bindingLocked.value||userId.value!==selected||memberId.value!==draft||targetBinding.value.binding?.id!==b.id||targetBinding.value.binding.version!==b.version)return
  userId.value='';memberId.value='';editor.clear();await editor.save(`/wecom/bindings/${selected}`,'PUT',{expected_version:b.version,wecom_user_id:b.wecom_user_id,active:false})
 }
-async function disable(row:WeComBinding){if(locked.value||editor.dirty.value)return;await editor.save(`/wecom/bindings/${row.user_id}`,'PUT',{expected_version:row.version,wecom_user_id:row.wecom_user_id,active:false})}
+async function disable(row:WeComBinding){if(!bindings.value.some(item=>item===row)||!row.active)return;if(locked.value||editor.dirty.value)return;await editor.save(`/wecom/bindings/${row.user_id}`,'PUT',{expected_version:row.version,wecom_user_id:row.wecom_user_id,active:false})}
 </script>
 <template><section :aria-busy="loading" class="identity-page admin-prototype wecom-page">
  <div class="page-heading"><div><h1>企业微信</h1><p>检查应用连接，管理成员与平台账号的绑定，查看消息发送记录。</p></div><el-button :disabled="editor.busy()||loading||switchingTenant" @click="refresh">刷新</el-button></div>

@@ -17,8 +17,9 @@ const accountSearchInput=ref<HTMLInputElement|null>(null)
 const accountQuery=ref(''),appliedAccountQuery=ref(''),accountPage=ref(1)
 const targetBinding=shallowRef<TargetBindingState>(emptyTargetBindingState())
 const targetWorkspace=createTargetBindingWorkspace(api,value=>{targetBinding.value=value})
-const scope=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,session.value?.mode,can('users:read'),can('users:write'),can('tickets:read'),switchingTenant.value]))
-let epoch=0,disposed=false,controller:AbortController|null=null
+const scope=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,session.value?.mode,can('users:read'),can('users:write'),can('tickets:read'),switchingTenant.value]))
+let epoch=0,disposed=false,controller:AbortController|null=null,confirmationEpoch=0
+const confirming=ref(false)
 const readable=()=>!disposed&&!switchingTenant.value&&!!session.value&&can('users:read')
 function clearFacts(){targetWorkspace.reset();status.value=null;bindings.value=[];deliveries.value=[];users.value=null}
 async function load(){
@@ -32,39 +33,43 @@ async function load(){
   status.value=s;bindings.value=b.items;deliveries.value=d.items;users.value=userPage;return true
  }catch(cause){if(turn===epoch){controller?.abort();if(!isCancelled(cause))error.value=cause}return false}finally{if(turn===epoch){loading.value=false;controller=null}}
 }
-const editor=useIdentityEditor(load),command=editor.command,message=editor.message
-const locked=computed(()=>!readable()||!status.value||!users.value||loading.value||editor.busy()||!can('users:write'))
+function inputSnapshot(){return JSON.stringify([scope.value,userId.value,email.value,accountQuery.value,appliedAccountQuery.value,accountPage.value,status.value,targetBinding.value.binding])}
+const editor=useIdentityEditor(load,{snapshot:inputSnapshot,preserveUnknown:true}),command=editor.command,message=editor.message
+const locked=computed(()=>confirming.value||!readable()||!status.value||!users.value||loading.value||editor.busy()||!can('users:write'))
 const bindingLocked=computed(()=>locked.value||targetBinding.value.busy||!targetBinding.value.ready||targetBinding.value.context?.userId!==userId.value)
 async function readSelectedBinding(){
  if(!readable()||loading.value||editor.busy()||!status.value||!users.value?.items.some(user=>user.id===userId.value&&user.active&&user.member_active))return false
  return targetWorkspace.load({kind:'email',tenantId:session.value!.tenant.id,userId:userId.value,channelIdentity:status.value.sender})
 }
 watch(userId,()=>{targetWorkspace.reset();if(userId.value)void readSelectedBinding()},{flush:'sync'})
-function clear(){targetWorkspace.reset();accountQuery.value='';appliedAccountQuery.value='';accountPage.value=1;epoch++;controller?.abort();status.value=null;bindings.value=[];deliveries.value=[];users.value=null;userId.value='';email.value='';error.value=null;loading.value=false;editor.clear()}
+function clear(){confirmationEpoch++;confirming.value=false;targetWorkspace.reset();accountQuery.value='';appliedAccountQuery.value='';accountPage.value=1;epoch++;controller?.abort();status.value=null;bindings.value=[];deliveries.value=[];users.value=null;userId.value='';email.value='';error.value=null;loading.value=false;editor.clear()}
 watch([userId,email],()=>{editor.dirty.value=!!userId.value||!!email.value},{flush:'sync'})
 watch(scope,()=>{clear();if(readable())void load()},{flush:'sync'});onMounted(load);onUnmounted(()=>{disposed=true;clear();targetWorkspace.dispose()})
-async function refresh(){const owner=scope.value;if(editor.busy()||!await editor.leave()||owner!==scope.value||disposed)return;userId.value='';email.value='';editor.clear();await load()}
+async function refresh(){const owner=scope.value,before=inputSnapshot();if(editor.busy()||!await editor.leave()||owner!==scope.value||disposed||before!==inputSnapshot())return;userId.value='';email.value='';editor.clear();await load()}
 async function browseAccounts(nextPage:number,search=false){
- const owner=scope.value,query=search?accountQuery.value.trim():appliedAccountQuery.value
+ const owner=scope.value,before=inputSnapshot(),query=search?accountQuery.value.trim():appliedAccountQuery.value
  if(!readable()||loading.value||editor.busy()||!Number.isSafeInteger(nextPage)||nextPage<1||nextPage>10000||query.length>100||(!search&&nextPage>accountPage.value&&!users.value?.has_more))return
- if(!await editor.leave()||owner!==scope.value||disposed||loading.value||editor.busy())return
+ if(!await editor.leave()||owner!==scope.value||disposed||loading.value||editor.busy()||before!==inputSnapshot())return
  userId.value='';email.value='';editor.clear();accountPage.value=nextPage;appliedAccountQuery.value=query;accountQuery.value=query;const ok=await load();if(ok&&owner===scope.value&&!disposed){await nextTick();if(owner===scope.value&&!disposed)accountSearchInput.value?.focus()}
 }
 async function check(){if(!locked.value&&!editor.dirty.value)await editor.save('/email/check','POST',{})}
 async function test(){
- if(locked.value||editor.dirty.value||!status.value?.dispatch_enabled)return
- const owner=scope.value,recipient=status.value.test_recipient;try{await ElMessageBox.confirm(`将向 ${status.value.test_recipient} 发送一封“【MOP 联调测试】邮件通道验证”。`,'发送测试邮件',{confirmButtonText:'发送',cancelButtonText:'取消'})}catch{return}
- if(owner===scope.value&&!locked.value&&!editor.dirty.value&&status.value?.dispatch_enabled&&status.value.test_recipient===recipient)await editor.save('/email/test-messages','POST',{expected_version:0})
+ if(locked.value||editor.dirty.value||!status.value?.dispatch_enabled||!status.value.test_recipient)return
+ const owner=scope.value,before=inputSnapshot(),turn=++confirmationEpoch;confirming.value=true
+ try{await ElMessageBox.confirm(`将向 ${status.value.test_recipient} 发送一封“【MOP 联调测试】邮件通道验证”。`,'发送测试邮件',{confirmButtonText:'发送',cancelButtonText:'取消'})}catch{return}finally{if(turn===confirmationEpoch)confirming.value=false}
+ if(turn!==confirmationEpoch||owner!==scope.value||before!==inputSnapshot()||locked.value||editor.dirty.value||!status.value?.dispatch_enabled)return
+ await editor.save('/email/test-messages','POST',{expected_version:0})
 }
 async function bind(){if(bindingLocked.value||!userId.value||!email.value||!users.value?.items.some(user=>user.id===userId.value&&user.active&&user.member_active)||!status.value?.allowed_recipients.includes(email.value))return;const old=targetBinding.value.binding;const owner=scope.value,selected=userId.value,value=email.value;const saved=await editor.save(`/email/bindings/${userId.value}`,'PUT',{expected_version:old?.version??0,email:email.value,active:true});if(saved&&owner===scope.value&&selected===userId.value&&value===email.value){userId.value='';email.value='';editor.dirty.value=false}}
 async function disableSelected(){
  const b=targetBinding.value.binding,owner=scope.value,selected=userId.value,draft=email.value
  if(bindingLocked.value||!b?.active||!('email' in b))return
- try{await ElMessageBox.confirm('将停用所选账号的现有绑定，并放弃本页未保存的绑定编辑。','停用所选账号绑定',{confirmButtonText:'确认停用',cancelButtonText:'取消',type:'warning'})}catch{return}
- if(owner!==scope.value||bindingLocked.value||userId.value!==selected||email.value!==draft||targetBinding.value.binding?.id!==b.id||targetBinding.value.binding.version!==b.version)return
+ const before=inputSnapshot(),turn=++confirmationEpoch;confirming.value=true
+ try{await ElMessageBox.confirm('将停用所选账号的现有绑定，并放弃本页未保存的绑定编辑。','停用所选账号绑定',{confirmButtonText:'确认停用',cancelButtonText:'取消',type:'warning'})}catch{return}finally{if(turn===confirmationEpoch)confirming.value=false}
+ if(turn!==confirmationEpoch||before!==inputSnapshot()||owner!==scope.value||bindingLocked.value||userId.value!==selected||email.value!==draft||targetBinding.value.binding?.id!==b.id||targetBinding.value.binding.version!==b.version)return
  userId.value='';email.value='';editor.clear();await editor.save(`/email/bindings/${selected}`,'PUT',{expected_version:b.version,email:b.email,active:false})
 }
-async function disable(row:EmailBinding){if(!locked.value&&!editor.dirty.value)await editor.save(`/email/bindings/${row.user_id}`,'PUT',{expected_version:row.version,email:row.email,active:false})}
+async function disable(row:EmailBinding){if(!bindings.value.some(item=>item===row)||!row.active)return;if(!locked.value&&!editor.dirty.value)await editor.save(`/email/bindings/${row.user_id}`,'PUT',{expected_version:row.version,email:row.email,active:false})}
 </script>
 <template><section :aria-busy="loading" class="identity-page admin-prototype email-page">
  <div class="page-heading"><div><h1>邮件通知</h1><p>检查发件连接，配置收件地址，查看邮件发送记录。</p></div><el-button :disabled="editor.busy()||loading||switchingTenant" @click="refresh">刷新</el-button></div>

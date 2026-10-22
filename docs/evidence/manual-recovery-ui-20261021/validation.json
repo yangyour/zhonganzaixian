@@ -1,0 +1,43 @@
+{
+  "result": "PASS_MANUAL_RECOVERY_READ_AND_DRAFT_PROTECTION",
+  "new_tests": 29,
+  "new_test_layers": {
+    "workspace": 16,
+    "real_sfc_router_null_render": 11,
+    "real_drawer_native_dom": 2
+  },
+  "focused_tests_passed": 52,
+  "vitest": {
+    "files_passed": 249,
+    "tests_passed": 3995
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "production_build": {
+    "build_id": "f0ee59df7681e68168db930be8408d658c16d8ea347b3581b28a3f54311746b5",
+    "file_count": 141,
+    "bootstrap_gzip_bytes": 180733,
+    "bootstrap_css_gzip_bytes": 62537,
+    "scope": "static-artifacts-only"
+  },
+  "modal_confirmation": "EXPLICITLY_STUBBED_NOT_BROWSER_QA",
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_recovery_confirmations": 0,
+  "monitoring_or_ticket_state_changes": 0,
+  "formal_acceptance_passes_added": 0,
+  "source_sha256": {
+    "apps/web/src/utils/manualRecoveryWorkspace.ts": "2f23a0184aacf584f4f459723f9beb3a61ab39de38d82163231bc36bdf7dfbff",
+    "apps/web/src/components/ManualRecoveryPanel.vue": "d98efe6daeba9e2c4991d1ac6f7951729ea46869d6bffaa3d07c890439e1aedc",
+    "apps/web/tests/manualRecoveryWorkspace.test.ts": "398e7c88a72d5711a03f17be2b063bf8ff87f0580432962b1e000ff6ba9ba61d",
+    "apps/web/tests/manualRecoveryPanel.test.ts": "f16b8c2a35e2b0e3fc53952188786a0b262ba914c8f8a4ca33866665a7e3a8b3"
+  }
+}

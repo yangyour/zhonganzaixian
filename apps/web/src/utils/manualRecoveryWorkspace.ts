@@ -4,6 +4,7 @@ import { ApiError, isCancelled, type ApiClient } from '../api/client'
 import { readManualIncident, type ManualIncidentContext, type ManualIncidentEntry } from './manualIncidentReader'
 import { internalNoteHash, validateInternalNoteText } from './internalNoteWorkspace'
 import { worklogInstant } from './worklogWorkspace'
+export interface ManualRecoveryContext extends ManualIncidentContext { canWrite:boolean }
 export interface HumanRecoveryConfirmation { id: string; tenant_id: string; incident_id: string; confirmed_by: string; note: string; note_sha256: string; reported_recovered_at: string | null; recorded_at: string; manual_recovery_status: 'HUMAN_CONFIRMED'; verification_status: 'SELF_REPORTED'; record_source: 'MANUAL_RECOVERY_CONFIRMATION'; monitor_state: null; disposition_state: null; monitoring_recovery_applicable: false; ticket_state_changed: false; sla_changed: false; immutable: true }
 export interface ManualRecoveryCurrent { incident_id: string; tenant_id: string; version: 0 | 1; manual_recovery_status: 'NOT_CONFIRMED' | 'HUMAN_CONFIRMED'; confirmation: HumanRecoveryConfirmation | null; source: 'postgresql'; scope: 'CURRENT_TENANT_INTERNAL_HUMAN_CONFIRMATION' }
 interface Attempt { parentId: string; payload: string; key: string; state: 'uncertain' | 'accepted' | 'rejected' }
@@ -32,35 +33,41 @@ function sameCurrent(a: ManualRecoveryCurrent, b: ManualRecoveryCurrent) {
 }
 export const emptyManualRecoveryState = (): ManualRecoveryState => ({ parent: null, current: null, receipt: null, attempt: null, busy: null, error: null })
 export function createManualRecoveryWorkspace(client: Pick<ApiClient, 'request'>, changed: (value: ManualRecoveryState) => void, newKey: () => string = () => createRequestId()) {
-  let context: ManualIncidentContext | null = null, state = emptyManualRecoveryState(), epoch = 0, abort: AbortController | undefined, lastKnown: ManualRecoveryCurrent | null = null
+  let context: ManualRecoveryContext | null = null, state = emptyManualRecoveryState(), epoch = 0, disposed=false, lastRead:string|null=null, abort: AbortController | undefined, lastKnown: ManualRecoveryCurrent | null = null
   const emit = () => changed(detachedWorkspaceState(state)), unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
-  function reset(next: ManualIncidentContext | null) { abort?.abort(); ++epoch; const valid = next && uuid.test(next.actorId) && uuid.test(next.tenantId) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion > 0; context = valid ? { ...next! } : null; state = emptyManualRecoveryState(); lastKnown = null; if (next && !valid) state.error = bad(); emit() }
-  function begin(parent: ManualIncidentEntry) { if (!context || state.busy || unresolved()) return false; const value = readManualIncident(parent, context); if (state.parent?.id !== value.id) lastKnown = null; state = { ...emptyManualRecoveryState(), parent: value }; emit(); return true }
+  function reset(next: ManualRecoveryContext | null) { abort?.abort(); abort=undefined; ++epoch; lastRead=null; const valid = !disposed && next && typeof next.canWrite==='boolean' && uuid.test(next.actorId) && uuid.test(next.tenantId) && Number.isSafeInteger(next.permissionVersion) && next.permissionVersion > 0; context = valid ? { ...next! } : null; state = emptyManualRecoveryState(); lastKnown = null; if (next && !valid && !disposed) state.error = bad(); emit() }
+  function begin(parent: ManualIncidentEntry) { if (!context || disposed || state.busy || unresolved()) return false; const value = readManualIncident(parent, context);++epoch;lastRead=null; if (state.parent?.id !== value.id) lastKnown = null; state = { ...emptyManualRecoveryState(), parent: value }; emit(); return true }
   async function refresh() {
-    if (!context || !state.parent || state.busy) return false
-    const scope = { ...context }, parent = state.parent.id, known = state.receipt || lastKnown, turn = ++epoch, controller = new AbortController(); abort?.abort(); abort = controller; state = { ...state, busy: 'read', current: null, error: null }; emit()
-    try { const value = await readManualRecovery(await client.request<unknown>('/manual-incidents/' + parent + '/recovery', { signal: controller.signal }), scope, parent); if (turn !== epoch || controller.signal.aborted) return false; if (known?.version === 1 && !sameCurrent(known, value)) throw bad(); lastKnown = value; state = { ...state, current: value }; return true }
+    if (!context || disposed || !state.parent || state.busy) return false
+    const scope = { ...context }, parent = state.parent.id, known = state.receipt || lastKnown, turn = ++epoch, controller = new AbortController(); abort?.abort(); abort = controller; lastRead=parent;state = { ...state, busy: 'read', current: null, error: null }; emit()
+    try { if(turn!==epoch||disposed||controller.signal.aborted)return false;const value = await readManualRecovery(await client.request<unknown>('/manual-incidents/' + parent + '/recovery', { signal: controller.signal }), scope, parent); if (turn !== epoch || controller.signal.aborted) return false; if (known?.version === 1 && !sameCurrent(known, value)) throw bad(); lastKnown = value; state = { ...state, current: value };lastRead=null; return true }
     catch (error) { if (turn === epoch && !isCancelled(error)) state = { ...state, current: null, error }; return false }
     finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
   async function send(attempt: Attempt, retry = false) {
-    if (!context || state.busy || state.parent?.id !== attempt.parentId) return false
-    const scope = { ...context }, turn = ++epoch, controller = new AbortController(); abort?.abort(); abort = controller; state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
+    if (!context?.canWrite || disposed || state.busy || state.parent?.id !== attempt.parentId) return false
+    lastRead=null;const scope = { ...context }, turn = ++epoch, controller = new AbortController(); abort?.abort(); abort = controller; state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
     try {
       const payload = JSON.parse(attempt.payload) as { expected_version: 0; note: string; reported_recovered_at: string | null }
+      if(turn!==epoch||disposed||controller.signal.aborted)return false
       const raw = await client.request<unknown>('/manual-incidents/' + attempt.parentId + '/recovery', { method: 'POST', body: payload, idempotencyKey: attempt.key, signal: controller.signal }); if (turn !== epoch || controller.signal.aborted) return false
       const value = await readManualRecovery(raw, scope, attempt.parentId); if (turn !== epoch || controller.signal.aborted) return false
       const evidence = value.confirmation
       if (value.version !== 1 || !evidence || evidence.confirmed_by !== scope.actorId || evidence.note !== payload.note || (payload.reported_recovered_at === null ? evidence.reported_recovered_at !== null : evidence.reported_recovered_at === null || date(evidence.reported_recovered_at) !== worklogInstant(payload.reported_recovered_at))) throw bad()
-      lastKnown = value; state = { ...state, receipt: value, current: value, attempt: { ...attempt, state: 'accepted' }, busy: null }; emit(); await refresh(); return true
+      lastKnown = value; state = { ...state, receipt: value, current: value, attempt: { ...attempt, state: 'accepted' }, busy: null }; emit(); if(turn===epoch&&!disposed&&!controller.signal.aborted)await refresh(); return true
     } catch (error) { if (turn !== epoch) return false; const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_'); state = { ...state, current: null, error, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } }; return false }
     finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
   }
   function submit(note: string, reportedRecoveredAt: string | null) {
-    if (!context || !state.parent || !state.current || state.busy || state.attempt) return Promise.resolve(false)
+    if (!context?.canWrite || disposed || !state.parent || !state.current || state.busy || state.attempt) return Promise.resolve(false)
     if (state.current.version !== 0) { state = { ...state, error: new ApiError(409, 'MANUAL_RECOVERY_ALREADY_CONFIRMED', '已有独立人工确认，不能创建第二份或覆盖原证据', '—') }; emit(); return Promise.resolve(false) }
     validateInternalNoteText(note); const time = reportedRecoveredAt === null ? null : new Date(worklogInstant(reportedRecoveredAt)).toISOString()
-    return send({ parentId: state.parent.id, payload: JSON.stringify({ expected_version: 0, note, reported_recovered_at: time }), key: newKey(), state: 'uncertain' })
+    const turn=epoch,parentId=state.parent.id,payload=JSON.stringify({expected_version:0,note,reported_recovered_at:time})
+    try{const key=newKey();if(turn!==epoch||disposed||!context?.canWrite||state.busy||state.attempt||state.parent?.id!==parentId)return Promise.resolve(false);if(typeof key!=='string'||!/^[A-Za-z0-9._:-]{1,128}$/.test(key))throw Error('INVALID_KEY');return send({parentId,payload,key,state:'uncertain'})}
+    catch{if(turn===epoch&&!disposed){state={...state,error:new ApiError(0,'REQUEST_ID_UNAVAILABLE','无法生成有效请求标识；没有发送人工恢复确认，请稍后重试','—')};emit()}return Promise.resolve(false)}
   }
-  emit(); return { reset, begin, refresh, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => detachedWorkspaceState(state), dispose: () => reset(null) }
+  function canRetryRead(){return !!context&&!disposed&&!state.busy&&lastRead!==null&&lastRead===state.parent?.id}
+  function cancelRead(){if(disposed||state.busy!=='read')return false;++epoch;abort?.abort();abort=undefined;state={...state,busy:null,error:null};emit();return true}
+  async function retryRead(){return canRetryRead()?refresh():false}
+  emit(); return { reset, begin, refresh, cancelRead, retryRead, canRetryRead, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, state: () => detachedWorkspaceState(state), dispose: () => {disposed=true;reset(null)} }
 }

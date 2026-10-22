@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-22",
+  "browser": "155.0.4283.62",
+  "environment": "local updated UI with designated LAN API",
+  "source_base": "621a5de",
+  "cases": [
+    {
+      "width": 320,
+      "topRight": true,
+      "buttonWidth": 44,
+      "buttonHeight": 44,
+      "overflow": false,
+      "clickOpen": true,
+      "shortcutOpen": true,
+      "escapeReturnFocus": true
+    },
+    {
+      "width": 390,
+      "topRight": true,
+      "buttonWidth": 44,
+      "buttonHeight": 44,
+      "overflow": false,
+      "clickOpen": true,
+      "shortcutOpen": true,
+      "escapeReturnFocus": true
+    },
+    {
+      "width": 768,
+      "topRight": true,
+      "buttonWidth": 64,
+      "buttonHeight": 32,
+      "overflow": false,
+      "clickOpen": true,
+      "shortcutOpen": true,
+      "escapeReturnFocus": true
+    },
+    {
+      "width": 1440,
+      "topRight": true,
+      "buttonWidth": 144.453125,
+      "buttonHeight": 32,
+      "overflow": false,
+      "clickOpen": true,
+      "shortcutOpen": true,
+      "escapeReturnFocus": true
+    }
+  ],
+  "searchResults": {
+    "groupCount": 3,
+    "assetHits": 5
+  },
+  "pageErrors": [],
+  "businessWrites": 0
+}

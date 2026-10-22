@@ -9,6 +9,14 @@
 .horizontal-shell .brand small { margin-top: 2px; font-size: 10px; color: #75869b; }
 .horizontal-shell .topbar-controls { flex: 0 0 auto; min-width: 0; flex-wrap: nowrap; gap: 8px; border-left: 1px solid #edf1f7; padding-left: 14px; }
 .horizontal-shell .topbar-controls .el-button { padding-inline: 8px; min-height: 32px; margin: 0; font-size: 12px; white-space: nowrap; }
+.horizontal-shell .topbar-controls .global-search-trigger {
+  flex-shrink: 0; border: 1px solid #dce7f5; background: #f7faff; color: #425a76;
+}
+.horizontal-shell .topbar-controls .global-search-trigger .search-trigger-hint { display: none; }
+.horizontal-shell .topbar-controls .global-search-trigger kbd { font-size: 10px; }
+@media (max-width: 1250px) {
+  .horizontal-shell .topbar-controls .global-search-trigger kbd { display: none; }
+}
 .horizontal-shell .identity { gap: 8px; }
 .horizontal-shell .identity strong { max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
 .horizontal-shell .identity small { font-size: 10px; }
@@ -71,6 +79,9 @@
   .horizontal-shell .topbar .brand { min-height: 0; }.horizontal-shell .brand small { font-size: 10px; }.horizontal-shell .brand strong { font-size: 14px; }
   .horizontal-shell .topbar-controls { width: auto; padding: 0; justify-content: flex-end; border: 0; gap: 4px; }
   .horizontal-shell .topbar-controls > .el-button { min-height: 44px; padding-inline: 8px; font-size: 12px; }
+  .horizontal-shell .topbar-controls .global-search-trigger { width: 44px; min-width: 44px; padding: 0; }
+  .horizontal-shell .topbar-controls .global-search-trigger .search-trigger-label { display: none; }
+  .horizontal-shell .topbar-controls .global-search-trigger .search-trigger-icon { width: 18px; height: 18px; margin: 0; }
   .module-navigation { grid-column: 1 / -1; grid-row: 2; margin-inline: -4px; border-top: 1px solid #f0f4f9; }
   .primary-nav-link { min-height: 44px; padding-inline: 12px; font-size: 12px; }.module-icon { width: 19px; height: 19px; }
   .workspace-sidebar { display: none; }.desktop-sidebar-toggle { display: none; }.mobile-sidebar-toggle { display: grid; width: 44px; height: 44px; }

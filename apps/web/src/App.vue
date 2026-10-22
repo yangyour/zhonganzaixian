@@ -87,6 +87,7 @@ async function endSession() {
         <a class="brand" :href="router.resolve({ name: homeRoute }).href" @click="navigateFromLink($event, () => router.push({ name: homeRoute }))"><span class="brand-mark">M</span><span><strong>MOP 运维托管</strong><small>网络设备管理平台</small></span></a>
         <HorizontalModuleNavigation v-model:mobile-open="mobileNavigationOpen" :collapsed="sidebarCollapsed" />
         <div class="topbar-controls">
+          <GlobalSearch v-if="can('search:read')" />
           <div class="identity"><span class="avatar">{{ session.user.display_name.slice(0, 1) }}</span><div><strong>{{ session.user.display_name }}</strong><small>{{ roleLabel[session.user.role] }}</small></div></div>
           <el-button v-if="['project_local','oidc','wecom'].includes(session.identity_source)" text class="account-button" @click="router.push('/account')">我的账号</el-button>
           <el-button text :loading="leaving" @click="endSession">退出</el-button>
@@ -98,7 +99,6 @@ async function endSession() {
           <button type="button" class="sidebar-toggle desktop-sidebar-toggle" :aria-label="sidebarCollapsed ? '展开功能菜单' : '收起功能菜单'" :aria-expanded="!sidebarCollapsed" aria-controls="workspace-sidebar" @click="sidebarCollapsed = !sidebarCollapsed"><component :is="sidebarCollapsed ? Expand : Fold" /></button>
           <button type="button" class="sidebar-toggle mobile-sidebar-toggle" aria-label="打开功能菜单" aria-haspopup="dialog" aria-controls="mobile-navigation-panel" :aria-expanded="mobileNavigationOpen" @click="mobileNavigationOpen = true"><Menu /></button>
           <el-breadcrumb separator="/"><el-breadcrumb-item>{{ route.meta.group }}</el-breadcrumb-item><el-breadcrumb-item>{{ route.meta.title }}</el-breadcrumb-item></el-breadcrumb>
-          <GlobalSearch v-if="can('search:read')" />
           <div class="context-controls">
           <el-select v-if="maySwitchTenant" :model-value="session.tenant.id" :disabled="switchingTenant || tenantTransition" class="tenant-select" aria-label="切换租户" @change="changeTenant">
             <el-option v-for="tenant in session.allowed_tenants" :key="tenant.id" :label="displayTenantName(tenant.name)" :value="tenant.id" />

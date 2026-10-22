@@ -35,7 +35,7 @@ async function importReport(event:Event){const input=event.target as HTMLInputEl
 const reportLabel=computed(()=>report.value?({NOT_RUN:'尚未执行',FAILED:'单次测试失败',TCP_REACHABLE_PROTOCOL_UNVERIFIED:'TCP 可连接，协议与采样未核验',SAMPLE_VERIFIED_ONCE:'单次样本格式核验通过'})[report.value.probe_status]:'')
 </script>
 <template>
-<section class="monitoring-onboarding"><header class="compact-page-toolbar"><h1 ref="heading" tabindex="-1" class="page-title-sr">监控接入配置</h1><button type="button" :disabled="!permitted||confirming" @click="clear">清空配置</button></header>
+<section class="monitoring-onboarding"><h1 ref="heading" tabindex="-1" class="page-title-sr">监控接入配置</h1>
 <p v-if="!permitted" role="status">当前缺少资产读取或配置读取权限，或正在切换租户。</p>
 <template v-else>
 <form class="ws-card onboarding-form" @submit.prevent="validate">
@@ -45,7 +45,7 @@ const reportLabel=computed(()=>report.value?({NOT_RUN:'尚未执行',FAILED:'单
 <template v-if="['blackbox','snmp'].includes(preset.test_kind)"><label>下游目标 IPv4<input v-model="draft.targetHost" aria-label="下游目标 IPv4" maxlength="15" required /></label><label v-if="['http-service','tcp-service'].includes(preset.id)">下游端口<input v-model="draft.targetPort" aria-label="下游端口" inputmode="numeric" maxlength="5" required /></label><label v-if="preset.id==='http-service'">下游 HTTP 协议<select v-model="draft.targetScheme" aria-label="下游 HTTP 协议"><option value="http">HTTP</option><option value="https">HTTPS（验证证书）</option></select></label><label v-if="preset.id==='http-service'">HTTP 路径<input v-model="draft.httpPath" aria-label="HTTP 路径" maxlength="200" required /></label><label v-if="preset.test_kind==='snmp'">SNMP 认证配置名<input v-model="draft.authProfile" aria-label="SNMP 认证配置名" maxlength="64" autocomplete="off" placeholder="采集侧已有配置名，不填密码" required /></label></template>
 <label>采集周期（秒，可留空）<input v-model="draft.interval" aria-label="采集周期" inputmode="numeric" maxlength="4" /></label><label class="check"><input v-model="draft.enabled" type="checkbox" aria-label="输出启用配置" />在导出配置中启用此目标</label></div>
 <p class="inline-boundary">当前只生成接入配置，不会修改现有监控或自动部署。{{preset.engine==='zabbix'?'Zabbix 模板ID、组及安全配置仍需在实际实例核对。':'设备和数据库凭据只在采集端管理，不填写到此页面。'}}</p>
-<div class="actions"><button type="submit">校验配置</button><button type="button" :disabled="!config" @click="download">下载接入配置</button></div>
+<div class="actions content-toolbar"><button type="submit">校验配置</button><button type="button" :disabled="!config" @click="download">下载接入配置</button><div class="content-actions"><button type="button" :disabled="!permitted||confirming" @click="clear">清空配置</button></div></div>
 </form>
 <p v-if="validation" role="alert">{{validation}}</p><p v-if="notice" role="status">{{notice}}</p>
 <section v-if="config" class="ws-card probe-workflow"><h2>连接测试</h2><p>在能访问目标的采集机运行下方命令，将 JSON 输出保存后导入；导入报告只核对其与当前配置一致，报告来源未独立核验。</p><label>测试命令<textarea readonly aria-label="测试命令" :value="command" rows="3" /></label><label>导入测试报告 JSON<input type="file" accept="application/json,.json" aria-label="导入测试报告" :disabled="importing" @change="importReport" /></label><p v-if="importing" role="status">正在核对报告…</p><div v-if="report" class="probe-result" role="status"><strong>{{reportLabel}}</strong><p v-if="report.reason">原因：{{report.reason}}</p><p v-if="report.sample_count!==null">样本 {{report.sample_count}} 条 · 匹配指标 {{report.matched_metrics.join('、')}}</p><p>未证明设备身份、持续采集或业务健康。</p></div><details><summary>查看配置 JSON</summary><pre>{{JSON.stringify(config,null,2)}}</pre></details></section>

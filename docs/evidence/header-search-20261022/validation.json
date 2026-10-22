@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-22",
+  "source_base": "621a5de",
+  "scope": "header search relocation and upstream onboarding toolbar alignment",
+  "unit": {
+    "files": 292,
+    "passed": 4869,
+    "failed": 0
+  },
+  "focused_tests": 189,
+  "browser_onboarding": {
+    "passed": 7,
+    "failed": 0,
+    "synthetic": true
+  },
+  "browser_search": {
+    "passed": 4,
+    "widths": [
+      320,
+      390,
+      768,
+      1440
+    ],
+    "live_designated_api": true,
+    "business_writes": 0
+  },
+  "build": {
+    "status": "PASSED",
+    "files": 145,
+    "build_id": "c5652ec31b1726e7816ce858fb6e2a572e086d9e980c5547fb811805f967bac9"
+  },
+  "test_site_deployed": false,
+  "migration_count": 0
+}

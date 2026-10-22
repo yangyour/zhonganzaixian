@@ -1,0 +1,66 @@
+{
+  "status": "PASS_ACTUAL_HTTP_POSTGRES_AND_FRONTEND_DTO_REPLAY_BROWSER_NOT_RUN",
+  "new_gated_java_tests": 1,
+  "actual_http_statuses": [
+    401,
+    200,
+    503,
+    200,
+    200,
+    200,
+    200,
+    400,
+    400,
+    403,
+    403,
+    404
+  ],
+  "actual_postgresql_test_executed": true,
+  "positive_get_all_table_fingerprints_unchanged": 111,
+  "entire_lifecycle_unrelated_business_tables_unchanged": 103,
+  "additional_object_or_completion_verifier_calls_during_reads": 0,
+  "new_frontend_tests": 4,
+  "new_node_contract_tests": 1,
+  "vitest": {
+    "files": 272,
+    "tests": 4549,
+    "failures": 0
+  },
+  "node_contract_tests": 179,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180737,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "a20417c1a9411a98523159caaeaa9935a76c721974227109924694b4e25a317e",
+    "scope": "static-artifacts-only"
+  },
+  "default_maven_verify": {
+    "tests": 4171,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1038,
+    "executed": 3133
+  },
+  "actual_test_default_gate": "SKIPPED_WITHOUT_EXPLICIT_ISOLATED_ENVIRONMENT",
+  "api_jar_excludes_test_session_controller": true,
+  "api_jar_sha256": "f0af6416143d935d18c68093440cbf7b01307a703e8e861b9db456f7548c3997",
+  "real_provider_kms_or_device_calls": 0,
+  "production_login_or_independent_grants_verified": false,
+  "sql_changed": false,
+  "cleanup": {
+    "http_stopped": true,
+    "postgres_stopped": true,
+    "temporary_database_and_credentials_removed": true
+  },
+  "browser": "105_SPECIFICATIONS_12_FILES_ACTUAL_NOT_RUN",
+  "formal_contract_tc": "128_NOT_RUN",
+  "source_sha256": {
+    "server/api/src/test/java/cn/mop/persistence/BackupVersionInventoryHttpPostgresTest.java": "a09f4cc1b3fce5c89f9bda282bb6fa70cdeaab3605023b7608ca95129f72cc80",
+    "fixtures/backup-version-inventory-http-postgres-synthetic-20261022.json": "d8ac7054ab5867fe6a8481d9ad64d02b705f730e216fb508f684d57aaa699d35",
+    "apps/web/tests/backupVersionInventory.test.ts": "7e1af0574dc3c0f73c9b4c2b99a3c2f9d7ad5a36f117ee9eab58fd381bc94121",
+    "apps/web/tests/backupVersionInventoryPanel.test.ts": "b5272b18b5da4234992fcecb72d852c8bb7db00085d92b6766d8db98aa002589",
+    "tests/backup-version-inventory-contract.test.mjs": "288df250aeae3b3fbc33477de919da84429ad380ab2142117e627bfb4616f58d"
+  }
+}

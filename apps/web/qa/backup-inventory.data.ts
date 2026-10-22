@@ -1,0 +1,7 @@
+// SYNTHETIC_BROWSER_ONLY: metadata examples, not an actual backup or permission grant.
+import type { BackupInventoryPage, BackupInventoryItem } from '../src/utils/backupVersionInventory'
+export const id = (n: number) => `72000000-0000-4000-8000-${String(n).padStart(12,'0')}`
+export const scope = { tenantId: id(1), assetId: id(2), actorId: id(3), permissionVersion: 8 }
+const flags = { current_object_health_verified: false, download_authorized: false, device_execution_authorized: false, retention_verified: false, recovery_verified: false } as const
+export const item = (n = 30): BackupInventoryItem => ({ ...flags, version_id: id(n), asset_id: scope.assetId, run_id: id(4), attempt_number: 1, completed_run_version: 2, object_observed_at: '2026-10-21T10:00:00Z', registered_at: '2026-10-21T10:01:00.100Z', encrypted_sha256: 'a'.repeat(64), encrypted_bytes: 247, registration_and_run_completion_recorded: true })
+export function page(more = false): BackupInventoryPage { const items = more ? Array.from({length:15},(_,i)=>item(30-i)) : [item()]; return { ...flags, tenant_id: scope.tenantId, asset_id: scope.assetId, actor_id: scope.actorId, accepted_permission_version: 8, items, has_more: more, next_before_registered_at: more ? items.at(-1)!.registered_at : null, next_before_version_id: more ? items.at(-1)!.version_id : null, page_size: 15, page_size_limit: 50, total_count: null, scope: 'CURRENT_AUTHORIZED_TENANT_ASSET', snapshot_scope: 'SINGLE_READ_PAGE_NOT_GLOBAL_SNAPSHOT', source: 'postgresql', object_storage_accessed: false } }

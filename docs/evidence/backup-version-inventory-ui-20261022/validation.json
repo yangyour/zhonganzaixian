@@ -1,0 +1,64 @@
+{
+  "result": "PASS_LOGIC_DOM_BUILD_WITH_BROWSER_NOT_RUN",
+  "new_tests": 90,
+  "layers": {
+    "reader_and_payload": 69,
+    "vue_dom": 21
+  },
+  "vitest": {
+    "files": 271,
+    "tests": 4515,
+    "failures": 0
+  },
+  "node_contract_tests": 178,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180723,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "8220e4e827ae6853fda234606caac3b6c8e5d990b1e58ffdcac7b97e31e9e548",
+    "scope": "static-artifacts-only"
+  },
+  "browser": {
+    "specifications": 105,
+    "files": 12,
+    "new_specs": 8,
+    "actual_execution": "NOT_RUN",
+    "axe": "NOT_RUN",
+    "screenshots": "NOT_RUN"
+  },
+  "formal_contract_tests": {
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "http_smoke": "FOUR_LOOPBACK_VITE_RESOURCES_PASS_SERVICE_STOPPED_NOT_API_OR_BROWSER",
+  "production_binding": "UNCHANGED_NULL_INDEPENDENT_AUTHORIZERS_REQUIRED",
+  "sql_changed": false,
+  "object_storage_or_device_execution": false,
+  "real_account_or_permission_changes": 0,
+  "first_failures": [
+    "reader assertion compared fresh AbortSignal identity, fixed URL comparison: 68 pass/1 fail -> 69 pass",
+    "Vite source comment marker stripped by transformation, fixed semantic field marker: 4 checks pass"
+  ],
+  "source_sha256": {
+    "apps/web/src/utils/backupVersionInventory.ts": "f034d50a41f26d664b0e255cdf5fc171ac68174455017ba39d51d9ffcbfcd435",
+    "apps/web/src/components/BackupVersionInventoryPanel.vue": "1620c481cb7a135d929a18f8bea32f2a0506dc059a774a4bc0d01de190282e81",
+    "apps/web/src/pages/AssetsPage.vue": "ab582c682e32093697c20add146eeb7381ff54f09dffcf50ad33a99f1d491aa6",
+    "apps/web/tests/backupVersionInventory.test.ts": "b800094011a8c8e889df71100ec12fe79685b29218adafabce72480b0d367aaf",
+    "apps/web/tests/backupVersionInventoryPanel.test.ts": "1e3b7c13fe4a0601f43e10ab0500b786019f61faca4dc031fa3ad1b7504aab7e",
+    "apps/web/qa/backup-inventory.data.ts": "53d13fa985437464b78381cf8b7e3704914ccbafe814d9e538b5857fde896262",
+    "apps/web/qa/backup-inventory.fixture.html": "0b50b5be60c862e6e3d6f1308542314cf96bc5fc23babe4c60f6dd82c8a8a35d",
+    "apps/web/qa/backup-inventory.fixture.ts": "ff2df0bdedcc013428c3dac0fe6a3d60fd292a512d513aa0dac3d4d2d01a2fcb",
+    "apps/web/qa/browser/backup-inventory.pw.ts": "b1afd435bae1ce7181f7ceb5c43ec1f95fc6cd204116e9c9e1b5c5995e423bcd"
+  },
+  "commands": [
+    "npm --prefix apps/web test",
+    "npm --prefix apps/web run typecheck",
+    "npm --prefix apps/web run build",
+    "node --test tests/*.test.mjs",
+    "node tools/build-api-contract.mjs --check",
+    "python tools/contract_progress.py --check",
+    "npm --prefix apps/web run test:browser -- --list"
+  ]
+}

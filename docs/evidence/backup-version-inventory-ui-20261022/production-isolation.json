@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "text_files_checked": 140,
+  "synthetic_entry_markers_absent": [
+    "Synthetic backup inventory browser entry",
+    "模拟账号版本变化",
+    "备份版本合成验收"
+  ],
+  "hits": []
+}

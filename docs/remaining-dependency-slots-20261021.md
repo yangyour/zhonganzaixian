@@ -57,3 +57,7 @@
 [V50回执日志仓库](delivery-receipt-postgres-20261021.md)已有显式构造实现；生产receipt_history_repository_reference和receipt_journal_authorizer_reference仍未配置。仓库要求注入操作授权及可信原请求/回执前置核验，合成测试回调不得移作默认允许；签名回执入口、供应商映射、Worker和真实发送许可仍独立待完成。
 
 [备份版本只读 HTTP 边界](backup-version-inventory-api-20261021.md)接独立授权仓储及安全元数据投影，未装配明确503；增加只读仓储工厂、实际回环HTTP合成验证，真实授权适配及资产详情前端仍待，不开放下载/解密/设备执行。
+
+## 2026-10-22 资产备份只读前端接线
+
+已具备资产详情面板、原页分页恢复、取消及独立授权错误提示。backup_version_inventory_binding_reference 与独立授权引用仍为 null，实际授权适配/锁边界须显式装配；前端 assets:read 可见不授予备份枚举。前端未配置提示不代表此依赖已完成，浏览器/生产联调仍待。

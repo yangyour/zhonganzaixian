@@ -1,0 +1,645 @@
+{
+  "version": 1,
+  "scope": "DEMO_PREPARATION_ONLY",
+  "reference_api_version": "0.81.0",
+  "source_sha256": {
+    "apps/web/src/router.ts": "4b2ec126995aad03d296b1a095ad19c6342b67fce315682476dfb330f51dc640",
+    "server/domain/src/main/java/cn/mop/domain/Capabilities.java": "6f97ea30fd15e067db3eb6fe72d55c2dedf12a07b5e09678164384c04b366d1f",
+    "contracts/local-api.openapi.json": "59a2b6fb3a58f11adddea67fa69eaca1e2babe3124ff4e14daae42b993ad04d9"
+  },
+  "protected_tenant_ids": [
+    "55000000-0000-4000-8000-000000000001",
+    "55000000-0000-4000-8000-000000000002"
+  ],
+  "features": [
+    {
+      "path": "/account",
+      "title": "我的账号",
+      "required_capabilities": [],
+      "allowed_roles": [],
+      "scenarios": [
+        "演示账号资料与会话",
+        "本人密码修改的受控流程"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/identity/users",
+      "title": "用户与成员授权",
+      "required_capabilities": [
+        "users:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "单一演示入口的成员关系",
+        "停用与权限变化后的访问拒绝"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/identity/roles",
+      "title": "角色与权限",
+      "required_capabilities": [
+        "roles:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "四类业务角色的权限对照",
+        "权限不足与角色授权边界"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/wecom",
+      "title": "企业微信",
+      "required_capabilities": [
+        "users:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "未绑定渠道",
+        "隔离模拟通知，不联系真实人员"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/email",
+      "title": "邮件通知",
+      "required_capabilities": [
+        "users:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "未配置邮件来源",
+        "演示收件人，不发送真实邮件"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/identity/settings",
+      "title": "身份认证设置",
+      "required_capabilities": [
+        "roles:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "身份策略读取",
+        "全局策略权限不足，不授权真实租户"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/dashboard",
+      "title": "运营总览",
+      "required_capabilities": [
+        "dashboard:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "由演示台账和工单派生总览",
+        "缺少来源时保留未知"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/assets",
+      "title": "资产管理",
+      "required_capabilities": [
+        "assets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "多设备类型台账",
+        "过滤与分页",
+        "登记草稿与未接入"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/monitoring-onboarding",
+      "title": "监控接入配置",
+      "required_capabilities": [
+        "configurations:read",
+        "assets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "13类预设准备",
+        "同设备多服务",
+        "缺失依赖与验证失败"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/network-monitoring",
+      "title": "基础网络监控",
+      "required_capabilities": [
+        "assets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "正常与失败的隔离模拟采样",
+        "无数据与过期",
+        "来源断开"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/monitoring-events",
+      "title": "监控事件中心与降噪",
+      "required_capabilities": [
+        "tickets:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "问题与恢复事件",
+        "维护窗与重复事件",
+        "处理状态变化"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/manual-incidents",
+      "title": "手工故障登记",
+      "required_capabilities": [
+        "manual_incidents:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "演示手工故障登记",
+        "不同严重程度",
+        "恢复待确认"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/tickets",
+      "title": "报障与受理",
+      "required_capabilities": [
+        "tickets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "客户报障",
+        "内部人工登记",
+        "不同处理阶段"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/my-tasks",
+      "title": "我的待办",
+      "required_capabilities": [
+        "tickets:read",
+        "ticket_notes:write_internal"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "分派给演示工程师",
+        "待处理与已处理",
+        "无权领取"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/ticket-workflows",
+      "title": "工单处理",
+      "required_capabilities": [
+        "tickets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "受理与分派",
+        "处理与客户确认",
+        "版本冲突"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/ticket-notifications",
+      "title": "工单通知",
+      "required_capabilities": [
+        "tickets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "通知意图",
+        "未配置渠道",
+        "模拟失败，不冒充真实送达"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/my-notification-preferences",
+      "title": "通知偏好设置",
+      "required_capabilities": [
+        "notification_preferences:read_own"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "偏好草稿",
+        "静默窗口请求",
+        "未生效状态"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/my-export-messages",
+      "title": "我的导出消息",
+      "required_capabilities": [
+        "assets:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "导出消息未读与已读",
+        "过期链接",
+        "仅本人可见"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/asset-export-jobs",
+      "title": "台账导出",
+      "required_capabilities": [
+        "assets:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "按筛选条件准备导出",
+        "准备失败",
+        "未发布与已发布"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/my-worklogs",
+      "title": "我的工时记录",
+      "required_capabilities": [
+        "worklogs:read_own"
+      ],
+      "allowed_roles": [
+        "msp"
+      ],
+      "scenarios": [
+        "远程与现场工时",
+        "编辑冲突",
+        "仅本人可写"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/sla-scenarios",
+      "title": "SLA 场景测算",
+      "required_capabilities": [
+        "sla_scenarios:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "明确假设的SLA测算",
+        "参数缺失",
+        "客户规则未确认"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/service-tiers",
+      "title": "服务档位与SLA台账",
+      "required_capabilities": [
+        "sla_scenarios:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "服务档位候选",
+        "工单快照",
+        "变更历史"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/oncall-board",
+      "title": "值班看板与升级链",
+      "required_capabilities": [
+        "tickets:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "值班安排候选",
+        "升级链缺失",
+        "交接班待确认"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/sla-reports",
+      "title": "SLA月报与赔付",
+      "required_capabilities": [
+        "sla_scenarios:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "演示月报输入",
+        "赔付口径未确认",
+        "空数据与不完整数据"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/runtime-configurations",
+      "title": "运行配置与发布",
+      "required_capabilities": [
+        "configurations:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "配置草稿与发布门禁",
+        "参数缺失",
+        "版本冲突"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/configurations",
+      "title": "配置项登记",
+      "required_capabilities": [
+        "configurations:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "186项原始登记",
+        "已知与待确认值",
+        "不覆盖合同固定约束"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/observation-window-diagnostics",
+      "title": "采样观察窗诊断",
+      "required_capabilities": [
+        "configurations:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "样本充足与缺失",
+        "过期样本",
+        "明确观察窗口"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/threshold-diagnostics",
+      "title": "告警阈值诊断",
+      "required_capabilities": [
+        "configurations:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "明确阈值输入",
+        "未确认业务阈值",
+        "无值不补零"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/contact-imports",
+      "title": "联系人批量导入",
+      "required_capabilities": [
+        "contacts:write"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "正确CSV候选",
+        "重复与无效字段",
+        "解析失败与取消"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/contact-import-preview",
+      "title": "联系人导入格式预览",
+      "required_capabilities": [
+        "contacts:write"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "格式预览",
+        "字段映射",
+        "错误行定位"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/inspection-templates",
+      "title": "巡检模板管理",
+      "required_capabilities": [
+        "inspection_templates:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "设备类型巡检模板",
+        "多个检查项",
+        "草稿与修订"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "title": "备份计划草稿",
+      "required_capabilities": [
+        "backup_plan_drafts:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "停用的备份计划草稿",
+        "缺少凭据引用",
+        "不执行真实设备备份"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/change-notice-drafts",
+      "title": "变更报备草稿",
+      "required_capabilities": [
+        "change_notice_drafts:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "演示变更窗口",
+        "关联资产",
+        "审批与生效分离"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/inspection-quarterly-reports",
+      "title": "季度巡检报告草稿",
+      "required_capabilities": [
+        "inspection_quarterly_reports:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "季度草稿",
+        "来源不完整",
+        "未发布报告"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/inspection-source-collections",
+      "title": "巡检来源集合",
+      "required_capabilities": [
+        "inspection_source_collections:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "明确来源集合",
+        "重复或无效来源",
+        "来源与实际核验分离"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/inspection-worksheets",
+      "title": "人工巡检工单",
+      "required_capabilities": [
+        "inspection_worksheets:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "人工检查项结果",
+        "未完成检查项",
+        "修订冲突"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/customer-contacts",
+      "title": "客户联系人",
+      "required_capabilities": [
+        "contacts:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "报障人与决策人",
+        "无真实联系方式",
+        "归档与恢复"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/operational-comparison",
+      "title": "经营与人力测算",
+      "required_capabilities": [
+        "operations:compare_explicit"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "明确演示成本假设",
+        "缺少参数",
+        "不同方案对比"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/capacity-estimates",
+      "title": "容量与缓冲评估",
+      "required_capabilities": [
+        "capacity:estimate"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "明确演示容量输入",
+        "缓冲与保留期变化",
+        "缺少运行参数"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/capability-catalog",
+      "title": "系统能力目录",
+      "required_capabilities": [
+        "configurations:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "已实现与依赖待补",
+        "能力范围说明",
+        "不宣称合同验收完成"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/tenant-inventory",
+      "title": "租户资源台账",
+      "required_capabilities": [
+        "tenants:read_inventory"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "仅演示范围资源",
+        "不同角色可见性",
+        "真实租户不可见"
+      ],
+      "acceptance_status": "NOT_RUN"
+    },
+    {
+      "path": "/audit",
+      "title": "审计日志",
+      "required_capabilities": [
+        "audit:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "真实发生的演示初始化操作",
+        "权限拒绝记录",
+        "不伪造历史操作"
+      ],
+      "acceptance_status": "NOT_RUN"
+    }
+  ],
+  "global_operation_constraints": [
+    {
+      "operation_id": "setProjectIdentityPolicy",
+      "reason": "Requires roles:write in every database tenant; scenario memberships alone do not provide this permission. Never grant access to real tenants for a demo."
+    }
+  ],
+  "activation_status": "NOT_APPROVED_NOT_APPLIED"
+}

@@ -1,0 +1,2164 @@
+{
+  "version": 1,
+  "status": "PREPARATION_ONLY",
+  "deployment_mode": "dedicated",
+  "namespace_id": "79000000-0000-4000-8000-000000000090",
+  "username": "demo",
+  "anchor_time": "2026-10-22T12:00:00Z",
+  "catalog_sha256": "9dc65208f85b300d423bb5ea386f1a1ac56bb5699e4041184335b60f43adff76",
+  "source_sha256": {
+    "apps/web/src/router.ts": "4b2ec126995aad03d296b1a095ad19c6342b67fce315682476dfb330f51dc640",
+    "server/domain/src/main/java/cn/mop/domain/Capabilities.java": "6f97ea30fd15e067db3eb6fe72d55c2dedf12a07b5e09678164384c04b366d1f",
+    "contracts/local-api.openapi.json": "59a2b6fb3a58f11adddea67fa69eaca1e2babe3124ff4e14daae42b993ad04d9"
+  },
+  "contexts": [
+    {
+      "key": "padmin",
+      "tenant_id": "653d53a6-0200-52e4-ae5c-f219094d3657",
+      "name": "演示·管理",
+      "base_role": "padmin",
+      "proposed_permissions": [
+        "tenants:read_inventory",
+        "users:read",
+        "users:write",
+        "roles:read",
+        "roles:write",
+        "dashboard:read",
+        "notification_preferences:read_own",
+        "notification_preferences:write_own",
+        "change_notice_drafts:read",
+        "change_notice_drafts:write",
+        "backup_plan_drafts:read",
+        "backup_plan_drafts:write",
+        "inspection_source_collections:read",
+        "inspection_source_collections:write",
+        "inspection_worksheets:read",
+        "inspection_worksheets:write",
+        "inspection_templates:read",
+        "inspection_templates:write",
+        "contacts:read",
+        "contacts:write",
+        "operations:compare_explicit",
+        "capacity_scenarios:read",
+        "capacity_scenarios:write",
+        "capacity:estimate",
+        "search:read",
+        "assets:read",
+        "assets:write",
+        "configurations:read",
+        "configurations:write",
+        "audit:read",
+        "tickets:read",
+        "tickets:lifecycle_write",
+        "ticket_comments:read",
+        "ticket_comments:write",
+        "ticket_notes:read_internal",
+        "ticket_notes:write_internal",
+        "manual_incidents:read",
+        "manual_incidents:write",
+        "manual_recovery:read",
+        "manual_recovery:confirm",
+        "sla_scenarios:read",
+        "asset_dates:read",
+        "inspection_quarterly_reports:read",
+        "inspection_quarterly_reports:write"
+      ],
+      "active": false,
+      "binding_verified": false
+    },
+    {
+      "key": "msp",
+      "tenant_id": "01537e91-fa8d-575c-8465-6daf44b5b0d8",
+      "name": "演示·工程师",
+      "base_role": "msp",
+      "proposed_permissions": [
+        "dashboard:read",
+        "notification_preferences:read_own",
+        "notification_preferences:write_own",
+        "search:read",
+        "assets:read",
+        "assets:write",
+        "tickets:read",
+        "tickets:lifecycle_write",
+        "ticket_comments:read",
+        "ticket_comments:write",
+        "worklogs:read_own",
+        "worklogs:write_own",
+        "ticket_notes:read_internal",
+        "ticket_notes:write_internal",
+        "manual_incidents:read",
+        "manual_incidents:write",
+        "manual_recovery:read",
+        "manual_recovery:confirm",
+        "sla_scenarios:read",
+        "asset_dates:read"
+      ],
+      "active": false,
+      "binding_verified": false
+    },
+    {
+      "key": "tadmin",
+      "tenant_id": "53f22df7-eb89-53c1-a8b7-16c65dc8de37",
+      "name": "演示·客户",
+      "base_role": "tadmin",
+      "proposed_permissions": [
+        "dashboard:read",
+        "notification_preferences:read_own",
+        "notification_preferences:write_own",
+        "contacts:read",
+        "contacts:write",
+        "search:read",
+        "assets:read",
+        "assets:write",
+        "tickets:read",
+        "tickets:customer_decide",
+        "ticket_comments:read",
+        "ticket_comments:write",
+        "tickets:report"
+      ],
+      "active": false,
+      "binding_verified": false
+    }
+  ],
+  "features": [
+    {
+      "path": "/account",
+      "title": "我的账号",
+      "required_capabilities": [],
+      "allowed_roles": [],
+      "scenarios": [
+        "演示账号资料与会话",
+        "本人密码修改的受控流程"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp",
+        "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/identity/users",
+      "title": "用户与成员授权",
+      "required_capabilities": [
+        "users:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "单一演示入口的成员关系",
+        "停用与权限变化后的访问拒绝"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/identity/roles",
+      "title": "角色与权限",
+      "required_capabilities": [
+        "roles:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "四类业务角色的权限对照",
+        "权限不足与角色授权边界"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/wecom",
+      "title": "企业微信",
+      "required_capabilities": [
+        "users:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "未绑定渠道",
+        "隔离模拟通知，不联系真实人员"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/email",
+      "title": "邮件通知",
+      "required_capabilities": [
+        "users:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "未配置邮件来源",
+        "演示收件人，不发送真实邮件"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/identity/settings",
+      "title": "身份认证设置",
+      "required_capabilities": [
+        "roles:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "身份策略读取",
+        "全局策略权限不足，不授权真实租户"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/dashboard",
+      "title": "运营总览",
+      "required_capabilities": [
+        "dashboard:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "由演示台账和工单派生总览",
+        "缺少来源时保留未知"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp",
+        "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/assets",
+      "title": "资产管理",
+      "required_capabilities": [
+        "assets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "多设备类型台账",
+        "过滤与分页",
+        "登记草稿与未接入"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp",
+        "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/monitoring-onboarding",
+      "title": "监控接入配置",
+      "required_capabilities": [
+        "configurations:read",
+        "assets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "13类预设准备",
+        "同设备多服务",
+        "缺失依赖与验证失败"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/network-monitoring",
+      "title": "基础网络监控",
+      "required_capabilities": [
+        "assets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "正常与失败的隔离模拟采样",
+        "无数据与过期",
+        "来源断开"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp",
+        "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/monitoring-events",
+      "title": "监控事件中心与降噪",
+      "required_capabilities": [
+        "tickets:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "问题与恢复事件",
+        "维护窗与重复事件",
+        "处理状态变化"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/manual-incidents",
+      "title": "手工故障登记",
+      "required_capabilities": [
+        "manual_incidents:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "演示手工故障登记",
+        "不同严重程度",
+        "恢复待确认"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/tickets",
+      "title": "报障与受理",
+      "required_capabilities": [
+        "tickets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "客户报障",
+        "内部人工登记",
+        "不同处理阶段"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp",
+        "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/my-tasks",
+      "title": "我的待办",
+      "required_capabilities": [
+        "tickets:read",
+        "ticket_notes:write_internal"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "分派给演示工程师",
+        "待处理与已处理",
+        "无权领取"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/ticket-workflows",
+      "title": "工单处理",
+      "required_capabilities": [
+        "tickets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "受理与分派",
+        "处理与客户确认",
+        "版本冲突"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp",
+        "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/ticket-notifications",
+      "title": "工单通知",
+      "required_capabilities": [
+        "tickets:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "通知意图",
+        "未配置渠道",
+        "模拟失败，不冒充真实送达"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp",
+        "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/my-notification-preferences",
+      "title": "通知偏好设置",
+      "required_capabilities": [
+        "notification_preferences:read_own"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "偏好草稿",
+        "静默窗口请求",
+        "未生效状态"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp",
+        "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/my-export-messages",
+      "title": "我的导出消息",
+      "required_capabilities": [
+        "assets:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "导出消息未读与已读",
+        "过期链接",
+        "仅本人可见"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/asset-export-jobs",
+      "title": "台账导出",
+      "required_capabilities": [
+        "assets:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "按筛选条件准备导出",
+        "准备失败",
+        "未发布与已发布"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/my-worklogs",
+      "title": "我的工时记录",
+      "required_capabilities": [
+        "worklogs:read_own"
+      ],
+      "allowed_roles": [
+        "msp"
+      ],
+      "scenarios": [
+        "远程与现场工时",
+        "编辑冲突",
+        "仅本人可写"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "msp"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/sla-scenarios",
+      "title": "SLA 场景测算",
+      "required_capabilities": [
+        "sla_scenarios:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "明确假设的SLA测算",
+        "参数缺失",
+        "客户规则未确认"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/service-tiers",
+      "title": "服务档位与SLA台账",
+      "required_capabilities": [
+        "sla_scenarios:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "服务档位候选",
+        "工单快照",
+        "变更历史"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/oncall-board",
+      "title": "值班看板与升级链",
+      "required_capabilities": [
+        "tickets:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "值班安排候选",
+        "升级链缺失",
+        "交接班待确认"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/sla-reports",
+      "title": "SLA月报与赔付",
+      "required_capabilities": [
+        "sla_scenarios:read"
+      ],
+      "allowed_roles": [
+        "padmin",
+        "msp"
+      ],
+      "scenarios": [
+        "演示月报输入",
+        "赔付口径未确认",
+        "空数据与不完整数据"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "msp"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/runtime-configurations",
+      "title": "运行配置与发布",
+      "required_capabilities": [
+        "configurations:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "配置草稿与发布门禁",
+        "参数缺失",
+        "版本冲突"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/configurations",
+      "title": "配置项登记",
+      "required_capabilities": [
+        "configurations:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "186项原始登记",
+        "已知与待确认值",
+        "不覆盖合同固定约束"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/observation-window-diagnostics",
+      "title": "采样观察窗诊断",
+      "required_capabilities": [
+        "configurations:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "样本充足与缺失",
+        "过期样本",
+        "明确观察窗口"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/threshold-diagnostics",
+      "title": "告警阈值诊断",
+      "required_capabilities": [
+        "configurations:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "明确阈值输入",
+        "未确认业务阈值",
+        "无值不补零"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/contact-imports",
+      "title": "联系人批量导入",
+      "required_capabilities": [
+        "contacts:write"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "正确CSV候选",
+        "重复与无效字段",
+        "解析失败与取消"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/contact-import-preview",
+      "title": "联系人导入格式预览",
+      "required_capabilities": [
+        "contacts:write"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "格式预览",
+        "字段映射",
+        "错误行定位"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/inspection-templates",
+      "title": "巡检模板管理",
+      "required_capabilities": [
+        "inspection_templates:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "设备类型巡检模板",
+        "多个检查项",
+        "草稿与修订"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/backup-plan-drafts",
+      "title": "备份计划草稿",
+      "required_capabilities": [
+        "backup_plan_drafts:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "停用的备份计划草稿",
+        "缺少凭据引用",
+        "不执行真实设备备份"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/change-notice-drafts",
+      "title": "变更报备草稿",
+      "required_capabilities": [
+        "change_notice_drafts:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "演示变更窗口",
+        "关联资产",
+        "审批与生效分离"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/inspection-quarterly-reports",
+      "title": "季度巡检报告草稿",
+      "required_capabilities": [
+        "inspection_quarterly_reports:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "季度草稿",
+        "来源不完整",
+        "未发布报告"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/inspection-source-collections",
+      "title": "巡检来源集合",
+      "required_capabilities": [
+        "inspection_source_collections:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "明确来源集合",
+        "重复或无效来源",
+        "来源与实际核验分离"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/inspection-worksheets",
+      "title": "人工巡检工单",
+      "required_capabilities": [
+        "inspection_worksheets:read"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "人工检查项结果",
+        "未完成检查项",
+        "修订冲突"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/customer-contacts",
+      "title": "客户联系人",
+      "required_capabilities": [
+        "contacts:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "报障人与决策人",
+        "无真实联系方式",
+        "归档与恢复"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin",
+        "tadmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/operational-comparison",
+      "title": "经营与人力测算",
+      "required_capabilities": [
+        "operations:compare_explicit"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "明确演示成本假设",
+        "缺少参数",
+        "不同方案对比"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/capacity-estimates",
+      "title": "容量与缓冲评估",
+      "required_capabilities": [
+        "capacity:estimate"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "明确演示容量输入",
+        "缓冲与保留期变化",
+        "缺少运行参数"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/capability-catalog",
+      "title": "系统能力目录",
+      "required_capabilities": [
+        "configurations:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "已实现与依赖待补",
+        "能力范围说明",
+        "不宣称合同验收完成"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/tenant-inventory",
+      "title": "租户资源台账",
+      "required_capabilities": [
+        "tenants:read_inventory"
+      ],
+      "allowed_roles": [
+        "padmin"
+      ],
+      "scenarios": [
+        "仅演示范围资源",
+        "不同角色可见性",
+        "真实租户不可见"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    },
+    {
+      "path": "/audit",
+      "title": "审计日志",
+      "required_capabilities": [
+        "audit:read"
+      ],
+      "allowed_roles": [],
+      "scenarios": [
+        "真实发生的演示初始化操作",
+        "权限拒绝记录",
+        "不伪造历史操作"
+      ],
+      "acceptance_status": "NOT_RUN",
+      "proposed_contexts": [
+        "padmin"
+      ],
+      "data_initialized": false,
+      "interaction_verified": false
+    }
+  ],
+  "entities": [
+    {
+      "key": "padmin:site",
+      "id": "7fbacb73-896c-504f-923c-ba5c645514b3",
+      "kind": "site",
+      "tenant_id": "653d53a6-0200-52e4-ae5c-f219094d3657",
+      "created": false
+    },
+    {
+      "key": "padmin:asset:router",
+      "id": "920ef68f-21c2-593a-a5b3-3962229cfe44",
+      "kind": "asset",
+      "tenant_id": "653d53a6-0200-52e4-ae5c-f219094d3657",
+      "created": false
+    },
+    {
+      "key": "padmin:asset:switch",
+      "id": "f7327606-666a-5d78-acd6-5c4e136ef6a0",
+      "kind": "asset",
+      "tenant_id": "653d53a6-0200-52e4-ae5c-f219094d3657",
+      "created": false
+    },
+    {
+      "key": "padmin:asset:firewall",
+      "id": "4c754da8-8a64-56d1-b8a0-ea271804ac22",
+      "kind": "asset",
+      "tenant_id": "653d53a6-0200-52e4-ae5c-f219094d3657",
+      "created": false
+    },
+    {
+      "key": "padmin:asset:wireless",
+      "id": "adfd2259-facb-59cd-9938-102d1643760d",
+      "kind": "asset",
+      "tenant_id": "653d53a6-0200-52e4-ae5c-f219094d3657",
+      "created": false
+    },
+    {
+      "key": "padmin:asset:controller",
+      "id": "9264741f-3394-5e5b-bae1-d35d4d52235b",
+      "kind": "asset",
+      "tenant_id": "653d53a6-0200-52e4-ae5c-f219094d3657",
+      "created": false
+    },
+    {
+      "key": "padmin:asset:linux",
+      "id": "bea4abdd-d5b0-5415-9abe-6e53d6b5f3dc",
+      "kind": "asset",
+      "tenant_id": "653d53a6-0200-52e4-ae5c-f219094d3657",
+      "created": false
+    },
+    {
+      "key": "padmin:asset:windows",
+      "id": "a059ec34-8d58-5ab1-b134-d1f0408b759d",
+      "kind": "asset",
+      "tenant_id": "653d53a6-0200-52e4-ae5c-f219094d3657",
+      "created": false
+    },
+    {
+      "key": "padmin:asset:database",
+      "id": "a7e458b9-7e51-55b8-9670-33169c6f033d",
+      "kind": "asset",
+      "tenant_id": "653d53a6-0200-52e4-ae5c-f219094d3657",
+      "created": false
+    },
+    {
+      "key": "padmin:ticket",
+      "id": "bbd8b2f9-3747-5d8b-9835-388b02f89656",
+      "kind": "ticket",
+      "tenant_id": "653d53a6-0200-52e4-ae5c-f219094d3657",
+      "created": false
+    },
+    {
+      "key": "msp:site",
+      "id": "6d18ad4b-70dc-53ff-9bf8-3ff47f471740",
+      "kind": "site",
+      "tenant_id": "01537e91-fa8d-575c-8465-6daf44b5b0d8",
+      "created": false
+    },
+    {
+      "key": "msp:asset:router",
+      "id": "561edd94-c07c-5caa-a16e-3062d9db5d83",
+      "kind": "asset",
+      "tenant_id": "01537e91-fa8d-575c-8465-6daf44b5b0d8",
+      "created": false
+    },
+    {
+      "key": "msp:asset:switch",
+      "id": "09118a4d-e40a-53b0-a645-f3acfd112df2",
+      "kind": "asset",
+      "tenant_id": "01537e91-fa8d-575c-8465-6daf44b5b0d8",
+      "created": false
+    },
+    {
+      "key": "msp:asset:firewall",
+      "id": "8d8b031d-7bcd-52ef-ae80-f30f419d9bbf",
+      "kind": "asset",
+      "tenant_id": "01537e91-fa8d-575c-8465-6daf44b5b0d8",
+      "created": false
+    },
+    {
+      "key": "msp:asset:wireless",
+      "id": "6479e3d4-b50e-5645-81be-c1f5cb2f3e9b",
+      "kind": "asset",
+      "tenant_id": "01537e91-fa8d-575c-8465-6daf44b5b0d8",
+      "created": false
+    },
+    {
+      "key": "msp:asset:controller",
+      "id": "5c6a2290-259c-59b7-be51-34093d99be36",
+      "kind": "asset",
+      "tenant_id": "01537e91-fa8d-575c-8465-6daf44b5b0d8",
+      "created": false
+    },
+    {
+      "key": "msp:asset:linux",
+      "id": "34fadbda-5648-51da-8ae4-59a8c758d453",
+      "kind": "asset",
+      "tenant_id": "01537e91-fa8d-575c-8465-6daf44b5b0d8",
+      "created": false
+    },
+    {
+      "key": "msp:asset:windows",
+      "id": "3a264d4d-2134-56db-bd8d-bac2bb493d93",
+      "kind": "asset",
+      "tenant_id": "01537e91-fa8d-575c-8465-6daf44b5b0d8",
+      "created": false
+    },
+    {
+      "key": "msp:asset:database",
+      "id": "4d216369-87fc-5a3f-9659-b61a2da20a73",
+      "kind": "asset",
+      "tenant_id": "01537e91-fa8d-575c-8465-6daf44b5b0d8",
+      "created": false
+    },
+    {
+      "key": "msp:ticket",
+      "id": "56d541cb-d76e-5423-bf99-63cb7ed8414e",
+      "kind": "ticket",
+      "tenant_id": "01537e91-fa8d-575c-8465-6daf44b5b0d8",
+      "created": false
+    },
+    {
+      "key": "tadmin:site",
+      "id": "07bb83e7-1773-5160-a202-24a57f0f23cd",
+      "kind": "site",
+      "tenant_id": "53f22df7-eb89-53c1-a8b7-16c65dc8de37",
+      "created": false
+    },
+    {
+      "key": "tadmin:asset:router",
+      "id": "2405cab9-0763-5178-b028-8b42a1d26f02",
+      "kind": "asset",
+      "tenant_id": "53f22df7-eb89-53c1-a8b7-16c65dc8de37",
+      "created": false
+    },
+    {
+      "key": "tadmin:asset:switch",
+      "id": "70f29f4e-28fb-519d-96d6-4d6898d3742d",
+      "kind": "asset",
+      "tenant_id": "53f22df7-eb89-53c1-a8b7-16c65dc8de37",
+      "created": false
+    },
+    {
+      "key": "tadmin:asset:firewall",
+      "id": "eca95a74-a24d-51bd-ad80-547520dbd0e4",
+      "kind": "asset",
+      "tenant_id": "53f22df7-eb89-53c1-a8b7-16c65dc8de37",
+      "created": false
+    },
+    {
+      "key": "tadmin:asset:wireless",
+      "id": "b4e00203-bcf2-588a-a170-e7008b5a4706",
+      "kind": "asset",
+      "tenant_id": "53f22df7-eb89-53c1-a8b7-16c65dc8de37",
+      "created": false
+    },
+    {
+      "key": "tadmin:asset:controller",
+      "id": "45d7610e-480e-53fd-bba8-9c13859ee197",
+      "kind": "asset",
+      "tenant_id": "53f22df7-eb89-53c1-a8b7-16c65dc8de37",
+      "created": false
+    },
+    {
+      "key": "tadmin:asset:linux",
+      "id": "2ec3db41-8b17-5f90-92fa-45e89af79a64",
+      "kind": "asset",
+      "tenant_id": "53f22df7-eb89-53c1-a8b7-16c65dc8de37",
+      "created": false
+    },
+    {
+      "key": "tadmin:asset:windows",
+      "id": "2d379b9b-8f56-523d-8d0f-dc92233d91d2",
+      "kind": "asset",
+      "tenant_id": "53f22df7-eb89-53c1-a8b7-16c65dc8de37",
+      "created": false
+    },
+    {
+      "key": "tadmin:asset:database",
+      "id": "dca1487b-9fdc-54ff-8dae-4ae7fd2d01bf",
+      "kind": "asset",
+      "tenant_id": "53f22df7-eb89-53c1-a8b7-16c65dc8de37",
+      "created": false
+    },
+    {
+      "key": "tadmin:ticket",
+      "id": "28a7d152-7d3a-5699-8fa4-2937efdc83c2",
+      "kind": "ticket",
+      "tenant_id": "53f22df7-eb89-53c1-a8b7-16c65dc8de37",
+      "created": false
+    }
+  ],
+  "request_fixtures": [
+    {
+      "key": "padmin:asset:router",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 路由器",
+        "type": "router",
+        "management_ip": "192.0.2.10",
+        "site_id": "7fbacb73-896c-504f-923c-ba5c645514b3"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "padmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:asset:switch",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 交换机",
+        "type": "switch",
+        "management_ip": "192.0.2.11",
+        "site_id": "7fbacb73-896c-504f-923c-ba5c645514b3"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "padmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:asset:firewall",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 防火墙",
+        "type": "firewall",
+        "management_ip": "192.0.2.12",
+        "site_id": "7fbacb73-896c-504f-923c-ba5c645514b3"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "padmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:asset:wireless",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 无线接入点",
+        "type": "ap",
+        "management_ip": "192.0.2.13",
+        "site_id": "7fbacb73-896c-504f-923c-ba5c645514b3"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "padmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:asset:controller",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 无线控制器",
+        "type": "wireless_controller",
+        "management_ip": "192.0.2.14",
+        "site_id": "7fbacb73-896c-504f-923c-ba5c645514b3"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "padmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:asset:linux",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] Linux服务器",
+        "type": "other",
+        "management_ip": "192.0.2.15",
+        "site_id": "7fbacb73-896c-504f-923c-ba5c645514b3"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "padmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:asset:windows",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] Windows服务器",
+        "type": "other",
+        "management_ip": "192.0.2.16",
+        "site_id": "7fbacb73-896c-504f-923c-ba5c645514b3"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "padmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:asset:database",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 数据库服务",
+        "type": "other",
+        "management_ip": "192.0.2.17",
+        "site_id": "7fbacb73-896c-504f-923c-ba5c645514b3"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "padmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:contact:1",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/contacts",
+      "body": {
+        "expected_version": 0,
+        "name": "[DEMO] REPORTER",
+        "roles": [
+          "REPORTER"
+        ],
+        "mobile": null,
+        "email": "demo-1@example.invalid",
+        "wecom_user_id": null,
+        "preferred_priorities": null,
+        "quiet_window": null,
+        "enabled": true
+      },
+      "bindings": [],
+      "preconditions": [
+        "OUTBOUND_DELIVERY_MUST_REMAIN_DISABLED"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:contact:2",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/contacts",
+      "body": {
+        "expected_version": 0,
+        "name": "[DEMO] DECISION_MAKER",
+        "roles": [
+          "DECISION_MAKER"
+        ],
+        "mobile": null,
+        "email": "demo-2@example.invalid",
+        "wecom_user_id": null,
+        "preferred_priorities": null,
+        "quiet_window": null,
+        "enabled": true
+      },
+      "bindings": [],
+      "preconditions": [
+        "OUTBOUND_DELIVERY_MUST_REMAIN_DISABLED"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:contact:3",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/contacts",
+      "body": {
+        "expected_version": 0,
+        "name": "[DEMO] TECHNICAL_CONTACT",
+        "roles": [
+          "TECHNICAL_CONTACT"
+        ],
+        "mobile": null,
+        "email": "demo-3@example.invalid",
+        "wecom_user_id": null,
+        "preferred_priorities": null,
+        "quiet_window": null,
+        "enabled": true
+      },
+      "bindings": [],
+      "preconditions": [
+        "OUTBOUND_DELIVERY_MUST_REMAIN_DISABLED"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:ticket",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/tickets",
+      "body": {
+        "title": "[DEMO] 隔离场景报障",
+        "description": "仅供演示的虚构场景，不代表真实业务故障。",
+        "source": "manual",
+        "asset_id": "920ef68f-21c2-593a-a5b3-3962229cfe44"
+      },
+      "bindings": [
+        {
+          "pointer": "/asset_id",
+          "entity_key": "padmin:asset:router"
+        }
+      ],
+      "preconditions": [
+        "NO_REAL_NOTIFICATION_PROVIDER"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:preference",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/my/notification-preferences",
+      "body": {
+        "expected_version": 0,
+        "intent": "SAVE_REQUEST_DRAFT_ONLY",
+        "requested_level": "P1_P2",
+        "requested_channels": [
+          "EMAIL"
+        ],
+        "requested_quiet_window": null
+      },
+      "bindings": [],
+      "preconditions": [],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "msp:asset:router",
+      "context": "msp",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 路由器",
+        "type": "router",
+        "management_ip": "192.0.2.10",
+        "site_id": "6d18ad4b-70dc-53ff-9bf8-3ff47f471740"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "msp:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "msp:asset:switch",
+      "context": "msp",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 交换机",
+        "type": "switch",
+        "management_ip": "192.0.2.11",
+        "site_id": "6d18ad4b-70dc-53ff-9bf8-3ff47f471740"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "msp:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "msp:asset:firewall",
+      "context": "msp",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 防火墙",
+        "type": "firewall",
+        "management_ip": "192.0.2.12",
+        "site_id": "6d18ad4b-70dc-53ff-9bf8-3ff47f471740"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "msp:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "msp:asset:wireless",
+      "context": "msp",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 无线接入点",
+        "type": "ap",
+        "management_ip": "192.0.2.13",
+        "site_id": "6d18ad4b-70dc-53ff-9bf8-3ff47f471740"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "msp:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "msp:asset:controller",
+      "context": "msp",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 无线控制器",
+        "type": "wireless_controller",
+        "management_ip": "192.0.2.14",
+        "site_id": "6d18ad4b-70dc-53ff-9bf8-3ff47f471740"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "msp:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "msp:asset:linux",
+      "context": "msp",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] Linux服务器",
+        "type": "other",
+        "management_ip": "192.0.2.15",
+        "site_id": "6d18ad4b-70dc-53ff-9bf8-3ff47f471740"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "msp:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "msp:asset:windows",
+      "context": "msp",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] Windows服务器",
+        "type": "other",
+        "management_ip": "192.0.2.16",
+        "site_id": "6d18ad4b-70dc-53ff-9bf8-3ff47f471740"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "msp:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "msp:asset:database",
+      "context": "msp",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 数据库服务",
+        "type": "other",
+        "management_ip": "192.0.2.17",
+        "site_id": "6d18ad4b-70dc-53ff-9bf8-3ff47f471740"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "msp:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "msp:ticket",
+      "context": "msp",
+      "method": "POST",
+      "path": "/tickets",
+      "body": {
+        "title": "[DEMO] 隔离场景报障",
+        "description": "仅供演示的虚构场景，不代表真实业务故障。",
+        "source": "manual",
+        "asset_id": "561edd94-c07c-5caa-a16e-3062d9db5d83"
+      },
+      "bindings": [
+        {
+          "pointer": "/asset_id",
+          "entity_key": "msp:asset:router"
+        }
+      ],
+      "preconditions": [
+        "NO_REAL_NOTIFICATION_PROVIDER"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "msp:preference",
+      "context": "msp",
+      "method": "POST",
+      "path": "/my/notification-preferences",
+      "body": {
+        "expected_version": 0,
+        "intent": "SAVE_REQUEST_DRAFT_ONLY",
+        "requested_level": "P1_P2",
+        "requested_channels": [
+          "EMAIL"
+        ],
+        "requested_quiet_window": null
+      },
+      "bindings": [],
+      "preconditions": [],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "tadmin:asset:router",
+      "context": "tadmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 路由器",
+        "type": "router",
+        "management_ip": "192.0.2.10",
+        "site_id": "07bb83e7-1773-5160-a202-24a57f0f23cd"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "tadmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "tadmin:asset:switch",
+      "context": "tadmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 交换机",
+        "type": "switch",
+        "management_ip": "192.0.2.11",
+        "site_id": "07bb83e7-1773-5160-a202-24a57f0f23cd"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "tadmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "tadmin:asset:firewall",
+      "context": "tadmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 防火墙",
+        "type": "firewall",
+        "management_ip": "192.0.2.12",
+        "site_id": "07bb83e7-1773-5160-a202-24a57f0f23cd"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "tadmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "tadmin:asset:wireless",
+      "context": "tadmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 无线接入点",
+        "type": "ap",
+        "management_ip": "192.0.2.13",
+        "site_id": "07bb83e7-1773-5160-a202-24a57f0f23cd"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "tadmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "tadmin:asset:controller",
+      "context": "tadmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 无线控制器",
+        "type": "wireless_controller",
+        "management_ip": "192.0.2.14",
+        "site_id": "07bb83e7-1773-5160-a202-24a57f0f23cd"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "tadmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "tadmin:asset:linux",
+      "context": "tadmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] Linux服务器",
+        "type": "other",
+        "management_ip": "192.0.2.15",
+        "site_id": "07bb83e7-1773-5160-a202-24a57f0f23cd"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "tadmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "tadmin:asset:windows",
+      "context": "tadmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] Windows服务器",
+        "type": "other",
+        "management_ip": "192.0.2.16",
+        "site_id": "07bb83e7-1773-5160-a202-24a57f0f23cd"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "tadmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "tadmin:asset:database",
+      "context": "tadmin",
+      "method": "POST",
+      "path": "/assets",
+      "body": {
+        "name": "[DEMO] 数据库服务",
+        "type": "other",
+        "management_ip": "192.0.2.17",
+        "site_id": "07bb83e7-1773-5160-a202-24a57f0f23cd"
+      },
+      "bindings": [
+        {
+          "pointer": "/site_id",
+          "entity_key": "tadmin:site"
+        }
+      ],
+      "preconditions": [
+        "SITE_MUST_EXIST_IN_SCENARIO_TENANT"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "tadmin:contact:1",
+      "context": "tadmin",
+      "method": "POST",
+      "path": "/contacts",
+      "body": {
+        "expected_version": 0,
+        "name": "[DEMO] REPORTER",
+        "roles": [
+          "REPORTER"
+        ],
+        "mobile": null,
+        "email": "demo-1@example.invalid",
+        "wecom_user_id": null,
+        "preferred_priorities": null,
+        "quiet_window": null,
+        "enabled": true
+      },
+      "bindings": [],
+      "preconditions": [
+        "OUTBOUND_DELIVERY_MUST_REMAIN_DISABLED"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "tadmin:contact:2",
+      "context": "tadmin",
+      "method": "POST",
+      "path": "/contacts",
+      "body": {
+        "expected_version": 0,
+        "name": "[DEMO] DECISION_MAKER",
+        "roles": [
+          "DECISION_MAKER"
+        ],
+        "mobile": null,
+        "email": "demo-2@example.invalid",
+        "wecom_user_id": null,
+        "preferred_priorities": null,
+        "quiet_window": null,
+        "enabled": true
+      },
+      "bindings": [],
+      "preconditions": [
+        "OUTBOUND_DELIVERY_MUST_REMAIN_DISABLED"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "tadmin:contact:3",
+      "context": "tadmin",
+      "method": "POST",
+      "path": "/contacts",
+      "body": {
+        "expected_version": 0,
+        "name": "[DEMO] TECHNICAL_CONTACT",
+        "roles": [
+          "TECHNICAL_CONTACT"
+        ],
+        "mobile": null,
+        "email": "demo-3@example.invalid",
+        "wecom_user_id": null,
+        "preferred_priorities": null,
+        "quiet_window": null,
+        "enabled": true
+      },
+      "bindings": [],
+      "preconditions": [
+        "OUTBOUND_DELIVERY_MUST_REMAIN_DISABLED"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "tadmin:ticket",
+      "context": "tadmin",
+      "method": "POST",
+      "path": "/tickets",
+      "body": {
+        "title": "[DEMO] 隔离场景报障",
+        "description": "仅供演示的虚构场景，不代表真实业务故障。",
+        "source": "customer_report",
+        "asset_id": "2405cab9-0763-5178-b028-8b42a1d26f02",
+        "category": "网络不通",
+        "impact_scope": "individual",
+        "contact_name": "[DEMO] 联系人",
+        "contact_phone": "DEMO-NO-CALL",
+        "urgency": "normal",
+        "attachment_ids": []
+      },
+      "bindings": [
+        {
+          "pointer": "/asset_id",
+          "entity_key": "tadmin:asset:router"
+        }
+      ],
+      "preconditions": [
+        "NO_REAL_NOTIFICATION_PROVIDER"
+      ],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "tadmin:preference",
+      "context": "tadmin",
+      "method": "POST",
+      "path": "/my/notification-preferences",
+      "body": {
+        "expected_version": 0,
+        "intent": "SAVE_REQUEST_DRAFT_ONLY",
+        "requested_level": "P1_P2",
+        "requested_channels": [
+          "EMAIL"
+        ],
+        "requested_quiet_window": null
+      },
+      "bindings": [],
+      "preconditions": [],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:inspection-template",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/inspection-templates",
+      "body": {
+        "expected_version": 0,
+        "device_type": "switch",
+        "name": "[DEMO] 交换机巡检草稿",
+        "items": [
+          {
+            "key": "ports",
+            "section": "[DEMO] 接口",
+            "label": "记录接口状态",
+            "instruction": "仅演示，不读取真实设备。"
+          },
+          {
+            "key": "backup",
+            "section": "[DEMO] 备份",
+            "label": "检查备份记录",
+            "instruction": null
+          }
+        ]
+      },
+      "bindings": [],
+      "preconditions": [],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:backup",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/backup-plan-drafts",
+      "body": {
+        "expected_version": 0,
+        "name": "[DEMO] 停用备份计划",
+        "target_asset_ids": [
+          "f7327606-666a-5d78-acd6-5c4e136ef6a0"
+        ],
+        "daily_local_time": "02:00",
+        "credential_ref": null,
+        "requested_enabled": false,
+        "note": "仅演示计划，不连接或操作真实设备。"
+      },
+      "bindings": [
+        {
+          "pointer": "/target_asset_ids/0",
+          "entity_key": "padmin:asset:switch"
+        }
+      ],
+      "preconditions": [],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "padmin:change",
+      "context": "padmin",
+      "method": "POST",
+      "path": "/change-notice-drafts",
+      "body": {
+        "expected_version": 0,
+        "change_summary": "[DEMO] 隔离演示维护窗口",
+        "asset_ids": [
+          "f7327606-666a-5d78-acd6-5c4e136ef6a0"
+        ],
+        "planned_start_at": "2026-10-23T12:00:00Z",
+        "planned_end_at": "2026-10-23T13:00:00Z",
+        "ticket_id": null
+      },
+      "bindings": [
+        {
+          "pointer": "/asset_ids/0",
+          "entity_key": "padmin:asset:switch"
+        }
+      ],
+      "preconditions": [],
+      "executed": false,
+      "references_verified": false
+    },
+    {
+      "key": "msp:worklog",
+      "context": "msp",
+      "method": "POST",
+      "path": "/tickets/{ticketId}/worklogs",
+      "body": {
+        "expected_ticket_version": 1,
+        "kind": "REMOTE",
+        "started_at": "2026-10-22T11:00:00Z",
+        "ended_at": "2026-10-22T12:00:00Z",
+        "note": "[DEMO] 虚构工时，不用于实际结算。"
+      },
+      "bindings": [
+        {
+          "pointer": "path:ticketId",
+          "entity_key": "msp:ticket"
+        }
+      ],
+      "preconditions": [
+        "TICKET_MUST_BE_ASSIGNED_TO_SCENARIO_ENGINEER",
+        "CURRENT_TICKET_VERSION_REQUIRED"
+      ],
+      "executed": false,
+      "references_verified": false
+    }
+  ],
+  "coverage": {
+    "pages_declared": 42,
+    "capability_union_count": 48,
+    "pages_accepted": 0,
+    "all_functions_ready": false
+  },
+  "account_created": false,
+  "credentials_created": false,
+  "permissions_granted": false,
+  "business_data_written": false,
+  "outbound_enabled": false,
+  "global_operation_constraints": [
+    {
+      "operation_id": "setProjectIdentityPolicy",
+      "reason": "Requires roles:write in every database tenant; scenario memberships alone do not provide this permission. Never grant access to real tenants for a demo."
+    }
+  ],
+  "blockers": [
+    "DEPLOYMENT_DESTINATION_NOT_CONFIRMED",
+    "ACCOUNT_CREATION_AND_GRANTS_NOT_APPROVED",
+    "ROLE_SCENARIO_MODEL_NOT_CONFIRMED",
+    "RUNTIME_REFERENCES_NOT_VERIFIED",
+    "ADVANCED_SCENARIOS_NOT_INITIALIZED",
+    "GLOBAL_POLICY_SCOPE_UNRESOLVED"
+  ],
+  "plan_sha256": "f5a8a45bab5b0a1ee5b9c839f7949dedb10dd9598e2b4709e814ad58d9c192bf"
+}

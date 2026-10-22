@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ElTableColumn, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { computed, nextTick, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { feedback as ElMessage } from '../utils/feedback'
@@ -11,7 +11,7 @@ import ApiErrorNotice from './ApiErrorNotice.vue'
 import ReadRecoveryActions from './ReadRecoveryActions.vue'
 import { readAssetList } from '../utils/assetReadback'
 import { contextTransitionGuards } from '../utils/contextTransitionGuard'
-import AppTable from './AppTable.vue'
+import DependencyEdgeTable from './DependencyEdgeTable.vue'
 
 const props = defineProps<{ modelValue: boolean; asset: Asset | null }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
@@ -97,7 +97,7 @@ async function save() {
   try { if (await workspace.submit(edge) && !disposed && owner === contextKey.value) clearSubmitted(original) }
   catch { if (!disposed && owner === contextKey.value) validation.value = '请检查输入内容：依赖类型不超过 64 字符、抑制范围不超过 128 字符，且不含控制字符' }
 }
-function label(id: string) { return id === props.asset?.id ? props.asset.name : options.value.find(item => item.id === id)?.name || id }
+const candidateLabels = computed(() => Object.fromEntries(options.value.map(item => [item.id,item.name])))
 const hasDraft = computed(() => Boolean(selected.value || direction.value || proposedType.value || proposedScope.value || proposedEnabled.value !== 'unknown'))
 function inputSnapshot() { return JSON.stringify([contextKey.value,formSnapshot(),state.value.draft,options.value,searchAttempt.value,state.value.attempt?.key,state.value.attempt?.state,workspace.unresolved()]) }
 async function confirmDiscard() {
@@ -161,12 +161,7 @@ defineExpose({ hasUnresolved: workspace.unresolved, hasDraft, canLeave, canRepla
       <template v-if="state.draft">
         <p v-if="state.draft.version === 0" class="field-help">当前租户暂未登记设备依赖关系草稿。</p>
         <p class="field-help">流向说明：上游设备 → 下游设备。下方展示与当前设备直接关联的依赖边，提交时基于租户完整拓扑图版本校验。</p>
-        <AppTable :rows="visibleEdges" :loading="false" empty-text="当前设备暂无已登记的依赖关系草稿">
-          <el-table-column label="上游 → 下游" min-width="240"><template #default="{ row }"><span class="dependency-node">{{ label(row.parent_id) }}</span> <span class="dependency-arrow">→</span> <span class="dependency-node">{{ label(row.child_id) }}</span></template></el-table-column>
-          <el-table-column label="建议类型" min-width="110"><template #default="{ row }">{{ row.proposed_type ?? '待确认' }}</template></el-table-column>
-          <el-table-column label="建议抑制范围" min-width="140"><template #default="{ row }">{{ row.proposed_suppression_scope ?? '待确认' }}</template></el-table-column>
-          <el-table-column label="建议启用状态" min-width="150"><template #default="{ row }">{{ row.proposed_enabled === null ? '待确认' : row.proposed_enabled ? '建议启用' : '建议停用' }}</template></el-table-column>
-        </AppTable>
+        <DependencyEdgeTable :edges="visibleEdges" :asset-id="asset?.id || ''" :asset-name="asset?.name || ''" :labels="candidateLabels" :scope-key="contextKey" :graph-version="state.draft.version" />
       </template>
       <section v-if="writable" class="dependency-form">
         <h3>新增依赖关系草稿</h3>

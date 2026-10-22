@@ -1,10 +1,9 @@
 // @vitest-environment jsdom
-// Actual Vue/Element Plus controls; drawer and graph-table shells stubbed, not browser acceptance.
+// Actual Vue/Element Plus controls and native dependency table; drawer shell stubbed, not browser acceptance.
 import {createApp,h,nextTick,shallowRef,ref,type App,type Slots} from 'vue'
 import {afterEach,it,expect,vi} from 'vitest'
 import ElementPlus from 'element-plus'
 vi.mock('vue-router',()=>({onBeforeRouteLeave:vi.fn(),useRouter:()=>({beforeResolve:()=>()=>{},afterEach:()=>()=>{},onError:()=>()=>{}})}))
-vi.mock('../src/components/AppTable.vue',()=>({default:{render:()=>null}}))
 import Panel from '../src/components/AssetDependencyWorkspace.vue'
 import {api} from '../src/api/client'
 import {session,switchingTenant} from '../src/stores/session'
@@ -33,3 +32,4 @@ it('accepted save does not clear later raw input during readback',async()=>{let 
 it('account replacement clears draft and cancels pending candidate search',async()=>{const p=deferred();const request=vi.spyOn(api,'request').mockImplementation(async url=>url.startsWith('/assets?')?p.promise:draft() as any);await mount();vm.query='old account';vm.proposedType='private';await click('查询设备');const signal=request.mock.calls.find(([url])=>url.startsWith('/assets?'))![1]!.signal!;session.value={...session.value!,account_version:2};await settle();expect(signal.aborted).toBe(true);expect(vm.query).toBe('');expect(vm.proposedType).toBe('');p.resolve(page());await settle();expect(vm.options).toEqual([])})
 it('unmount aborts pending graph and prevents revival',async()=>{const p=deferred();const request=vi.spyOn(api,'request').mockReturnValue(p.promise);await mount();app!.unmount();app=undefined;expect(request.mock.calls[0]![1]!.signal!.aborted).toBe(true);p.resolve(draft());await settle();expect(host.textContent).toBe('')})
 it('candidate completion does not steal externally moved focus',async()=>{const p=deferred();vi.spyOn(api,'request').mockImplementation(async url=>url.startsWith('/assets?')?p.promise:draft() as any);await mount();await click('查询设备');const other=document.createElement('button');document.body.append(other);other.focus();p.resolve(page());await settle();expect(document.activeElement).toBe(other);other.remove()})
+it('integrated graph pages only related edges without new requests or changing the edit draft',async()=>{const related=Array.from({length:26},(_,i)=>edge(a,`55000000-0000-4000-8000-${(100+i).toString(16).padStart(12,'0')}`)),graph=draft(27,[...related,edge(b,c)]);const request=vi.spyOn(api,'request').mockResolvedValue(graph as any);await mount();vm.proposedType='unsaved';expect(vm.state.draft.proposed_edges).toHaveLength(27);expect(host.querySelectorAll('tbody tr')).toHaveLength(25);expect(host.textContent).toContain('当前设备关联 26 条');expect(host.textContent).toContain('租户草稿共 27 条');const before=request.mock.calls.length;await click('下一页');expect(host.querySelectorAll('tbody tr')).toHaveLength(1);expect(host.textContent).toContain(related[25]!.child_id);expect(vm.proposedType).toBe('unsaved');expect(vm.state.draft.proposed_edges).toHaveLength(27);expect(request).toHaveBeenCalledTimes(before)})

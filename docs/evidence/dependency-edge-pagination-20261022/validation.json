@@ -1,0 +1,45 @@
+{
+  "status": "PASS_DEPENDENCY_EDGE_LOCAL_PAGINATION",
+  "new_tests": 17,
+  "new_native_table_dom_tests": 16,
+  "new_workspace_integration_tests": 1,
+  "dynamic_generic_test_count_change": -1,
+  "dynamic_generic_test_reason": "Workspace no longer contains el-table-column, so source-discovered Element Plus column-binding check no longer applies; generic test unchanged",
+  "focused_final": {
+    "files": 3,
+    "tests": 36,
+    "failures": 0
+  },
+  "vitest": {
+    "files": 284,
+    "tests": 4719,
+    "failures": 0
+  },
+  "node_contract_tests": 179,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180742,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "7662af4ac9cf49a7c4bf8dbe4f2afb1bb61d08ef336bd42f953a46c1b7ca1250",
+    "scope": "static-artifacts-only"
+  },
+  "test_boundary": "Actual native table/buttons and Vue; integrated workspace drawer stubbed. 10000-edge synthetic DOM is not production performance or browser acceptance",
+  "page_size": 25,
+  "synthetic_large_graph": {
+    "edges": 10000,
+    "pages": 400,
+    "max_rendered_rows": 25
+  },
+  "http_smoke": "4_DISTINCT_LOOPBACK_VITE_RESOURCES_PASS_AND_STOPPED",
+  "browser": "105_SPECIFICATIONS_12_FILES_ACTUAL_NOT_RUN",
+  "formal_contract_tc": "128_NOT_RUN",
+  "backend_sql_or_real_account_changed": false,
+  "source_sha256": {
+    "apps/web/src/components/DependencyEdgeTable.vue": "ffa43a3d193cb45c475508d58615733cc917588478caa9302966b79fdbe62811",
+    "apps/web/src/components/AssetDependencyWorkspace.vue": "131353dda68acbbdd05ab053325a49be46e4d22c0ac2146464e126d9e93735e1",
+    "apps/web/tests/dependencyEdgeTable.test.ts": "7282f710cf741cabc80e05ba5ede03e94745b12d8f93264250cd3e55f6779444",
+    "apps/web/tests/assetDependencyRecoveryPanel.test.ts": "f45932559522480d9dd47340807d1afe1688e1d839109f6a720c44e010482539"
+  }
+}

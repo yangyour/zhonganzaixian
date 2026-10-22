@@ -1,0 +1,70 @@
+(node:9) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @mop/web@0.1.0 test
+> vitest run tests/identityRoleScope.test.ts
+
+(node:22) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.11 /workspace/scratch/390b70bf66c8/zhonganzaixian-integrated/apps/web
+
+(node:40) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | tests/identityRoleScope.test.ts > does not discard newer role text typed while refresh confirmation waits
+[Vue warn]: Failed to resolve directive: form-feedback 
+  at <IdentityRolesPage>
+
+stderr | tests/identityRoleScope.test.ts > does not discard newer role text typed while refresh confirmation waits
+[Vue warn]: Failed to resolve directive: form-feedback 
+  at <IdentityRolesPage>
+
+stderr | tests/identityRoleScope.test.ts > does not discard newer role text typed while refresh confirmation waits
+[Vue warn]: Failed to resolve directive: form-feedback 
+  at <IdentityRolesPage>
+
+stderr | tests/identityRoleScope.test.ts > does not discard newer role text typed while refresh confirmation waits
+[Vue warn]: Failed to resolve directive: form-feedback 
+  at <IdentityRolesPage>
+
+stderr | tests/identityRoleScope.test.ts > does not discard newer role text typed while refresh confirmation waits
+[Vue warn]: Failed to resolve directive: form-feedback 
+  at <IdentityRolesPage>
+
+stderr | tests/identityRoleScope.test.ts > does not discard newer role text typed while refresh confirmation waits
+[Vue warn]: Failed to resolve directive: form-feedback 
+  at <IdentityRolesPage>
+
+stderr | tests/identityRoleScope.test.ts > does not discard newer role text typed while refresh confirmation waits
+[Vue warn]: Failed to resolve directive: form-feedback 
+  at <IdentityRolesPage>
+
+stderr | tests/identityRoleScope.test.ts > does not discard newer role text typed while refresh confirmation waits
+[Vue warn]: Failed to resolve directive: form-feedback 
+  at <IdentityRolesPage>
+
+ ❯ tests/identityRoleScope.test.ts (9 tests | 1 failed) 159ms
+   × does not discard newer role text typed while refresh confirmation waits 25ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/identityRoleScope.test.ts > does not discard newer role text typed while refresh confirmation waits
+AssertionError: expected undefined to be 'newer draft' // Object.is equality
+
+- Expected:
+"newer draft"
+
++ Received:
+undefined
+
+ ❯ tests/identityRoleScope.test.ts:37:621
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+   Start at  18:06:41
+   Duration  1.68s (transform 470ms, setup 0ms, import 1.04s, tests 159ms, environment 326ms)
+

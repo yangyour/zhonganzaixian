@@ -1,0 +1,53 @@
+{
+  "result": "PASS_ROLE_EDITOR_INPUT_CONFIRMATION",
+  "new_tests": 17,
+  "new_test_layers": {
+    "role_native_dom": 8,
+    "editor_real_memory_router": 9
+  },
+  "focused_tests_passed": 35,
+  "vitest": {
+    "files_passed": 253,
+    "tests_passed": 4087
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "production_build": {
+    "status": "PASSED",
+    "files": 141,
+    "bootstrap_gzip_bytes": 180726,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "c37e7c7f8cb74ccbdb326b81efd5c0a1b50fecf107ea376bfac0763ce92f523e",
+    "scope": "static-artifacts-only"
+  },
+  "initial_failures": [
+    {
+      "new_input_lost_after_modal": 1,
+      "passed_before_fix": 8,
+      "fixed": "Recheck complete input before replacement and after asynchronous confirmation."
+    },
+    {
+      "typecheck": "ASYNC_NARROWING_AND_TEST_MODAL_RETURN_TYPE",
+      "fixed": "Use complete snapshot equality; explicit modal-only stub return assertion."
+    }
+  ],
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "modal": "EXPLICIT_STUB_NOT_BROWSER_ACCEPTANCE",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_authorization_changes": 0,
+  "formal_acceptance_passes_added": 0,
+  "source_sha256": {
+    "apps/web/src/utils/useIdentityEditor.ts": "df22ab74515ffe9cd0b4d33201422a7ebd7ac386eeece6d25061d39f2efc9553",
+    "apps/web/src/pages/IdentityRolesPage.vue": "324bc3eddd15309e930955edd966c58fc58952deb8f7d483de28fc2e0f1cb84b",
+    "apps/web/tests/identityRoleScope.test.ts": "4a316c700481e5e2d6211a91e9262343ab8c9e3f5824f74b0cce06f6a51ade1d",
+    "apps/web/tests/identityEditorConfirmation.test.ts": "82b1935847706f72338e6f3c27a6b9777a1c4f5f7994d97690dde879efd2e667"
+  }
+}

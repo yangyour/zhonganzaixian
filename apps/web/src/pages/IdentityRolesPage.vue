@@ -10,9 +10,10 @@ import IdentityCommandNotice from '../components/IdentityCommandNotice.vue'
 const data = ref<RolePage | null>(null), error = ref<unknown>(null), loading = ref(false), selected = ref<ProjectRole | null>(null), opened = ref(false)
 let controller: AbortController | null = null, readGeneration = 0, disposed = false
 const form = reactive({ name: '', description: '', base_role: 'viewer' as BaseRole, enabled: true, permissions: [] as string[] })
-const editor = useIdentityEditor(load), command = editor.command, message = editor.message
+const editor = useIdentityEditor(load, {snapshot:inputSnapshot,preserveUnknown:true}), command = editor.command, message = editor.message
 const available = computed(() => data.value?.permission_catalog.entries.filter(x => x.declared_by_role[form.base_role]) ?? [])
 const scope = computed(() => JSON.stringify([session.value?.user.id, session.value?.user.role, session.value?.tenant.id, session.value?.permission_version, session.value?.account_version, [...(session.value?.capabilities ?? [])].sort(), contextGeneration.value, switchingTenant.value]))
+function inputSnapshot(){return JSON.stringify([scope.value,opened.value,selected.value,form])}
 function clearView() {
   readGeneration++; controller?.abort(); controller = null
   data.value = null; selected.value = null; opened.value = false; loading.value = false; error.value = null
@@ -36,13 +37,16 @@ async function load() {
 }
 onMounted(load)
 async function refresh() {
-  const owner = scope.value
-  if (editor.busy() || !await editor.leave() || owner !== scope.value) return
+  const owner = scope.value, before=inputSnapshot()
+  if (editor.busy() || !await editor.leave() || owner !== scope.value || before!==inputSnapshot()) return
   editor.clear(); await load()
 }
 async function edit(role?: ProjectRole, copy = false) {
-  const owner = scope.value
-  if (editor.busy() || !can('roles:read') || switchingTenant.value || !await editor.leave() || owner !== scope.value) return
+  const owner = scope.value, before=inputSnapshot()
+  if(role&&!data.value?.items.some(item=>item===role))return
+  const target=role?JSON.stringify(role):null
+  if (editor.busy() || !can('roles:read') || switchingTenant.value || !await editor.leave() || owner !== scope.value || before!==inputSnapshot()) return
+  if(role&&(!data.value?.items.some(item=>item===role)||JSON.stringify(role)!==target))return
   if ((!role || copy) && !can('roles:write')) return
   editor.clear(); selected.value = role && !copy ? role : null
   Object.assign(form, { name: role ? role.name + (copy ? ' 副本' : '') : '', description: role?.description ?? '', base_role: role?.base_role ?? 'viewer', enabled: role?.enabled ?? true, permissions: [...(role?.permissions ?? [])] })
@@ -50,7 +54,7 @@ async function edit(role?: ProjectRole, copy = false) {
 }
 function category() { form.permissions = []; editor.dirty.value = true }
 async function save() { if (!opened.value || !can('roles:write') || !can('roles:read') || switchingTenant.value || selected.value?.builtin) return; const role = selected.value; if (await editor.save(role ? `/identity/roles/${role.id}` : '/identity/roles', role ? 'PATCH' : 'POST', { expected_version: role?.version ?? 0, name: form.name, description: form.description || null, base_role: form.base_role, enabled: form.enabled, permissions: [...form.permissions] })) opened.value = false }
-async function closeEditor() { const owner = scope.value; if (editor.busy() || !await editor.leave() || owner !== scope.value) return; editor.clear(); opened.value = false; selected.value = null }
+async function closeEditor() { const owner = scope.value, before=inputSnapshot(); if (editor.busy() || !await editor.leave() || owner !== scope.value || before!==inputSnapshot()) return; editor.clear(); opened.value = false; selected.value = null }
 </script>
 <template>
   <section class="identity-page admin-prototype" v-loading="loading">

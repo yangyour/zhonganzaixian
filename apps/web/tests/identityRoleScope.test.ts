@@ -33,3 +33,27 @@ it('does not reopen a draft when permission changes while discard confirmation i
  button('复制为新角色').click();await settle();session.value={...auth,capabilities:['roles:read'],permission_version:2};confirm.resolve('confirm');await settle()
  expect(host.querySelector('form')).toBeNull();expect(host.textContent).not.toContain('合成未保存')
 })
+it('does not discard newer role text typed while refresh confirmation waits',async()=>{
+ const request=vi.spyOn(api,'request').mockResolvedValue(data());await mount();button('查看 / 编辑').click();await settle();const input=host.querySelector('form input') as HTMLInputElement;input.value='original draft';input.dispatchEvent(new Event('input',{bubbles:true}));await settle();const confirm=deferred();vi.spyOn(ElMessageBox,'confirm').mockImplementation(()=>confirm.promise as never);button('刷新角色列表').click();await settle();input.value='newer draft';input.dispatchEvent(new Event('input',{bubbles:true}));confirm.resolve('confirm');await settle();expect(host.querySelector<HTMLInputElement>('form input')?.value).toBe('newer draft');expect(request).toHaveBeenCalledTimes(1)
+})
+it('cancelled discard keeps role text and dispatches no list refresh',async()=>{
+ const request=vi.spyOn(api,'request').mockResolvedValue(data());await mount();button('查看 / 编辑').click();await settle();const input=host.querySelector('form input') as HTMLInputElement;input.value='keep me';input.dispatchEvent(new Event('input',{bubbles:true}));vi.spyOn(ElMessageBox,'confirm').mockRejectedValue('cancel');button('刷新角色列表').click();await settle();expect(host.querySelector<HTMLInputElement>('form input')?.value).toBe('keep me');expect(request).toHaveBeenCalledTimes(1)
+})
+it('unchanged confirmed draft can be replaced by the requested role copy',async()=>{
+ vi.spyOn(api,'request').mockResolvedValue(data());await mount();button('查看 / 编辑').click();await settle();const input=host.querySelector('form input') as HTMLInputElement;input.value='discard me';input.dispatchEvent(new Event('input',{bubbles:true}));vi.spyOn(ElMessageBox,'confirm').mockResolvedValue('confirm' as never);button('复制为新角色').click();await settle();expect(host.querySelector<HTMLInputElement>('form input')?.value).toBe('合成旧角色 副本')
+})
+it('confirmation locks duplicate modal requests and saves before any transport',async()=>{
+ const request=vi.spyOn(api,'request').mockResolvedValue(data());await mount();button('查看 / 编辑').click();await settle();const state=(app as any)._instance.setupState;state.form.name='pending';state.editor.dirty.value=true;const wait=deferred();const confirm=vi.spyOn(ElMessageBox,'confirm').mockImplementation(()=>wait.promise as never);const first=state.refresh();await settle();expect(host.querySelector<HTMLFieldSetElement>('form fieldset')?.disabled).toBe(true);await state.closeEditor();await state.save();expect(confirm).toHaveBeenCalledTimes(1);expect(request).toHaveBeenCalledTimes(1);wait.resolve('confirm');await first;expect(request).toHaveBeenCalledTimes(2)
+})
+it('unknown role submission cannot be discarded by route or context confirmation',async()=>{
+ const request=vi.spyOn(api,'request').mockResolvedValue(data());await mount();button('查看 / 编辑').click();await settle();const state=(app as any)._instance.setupState;state.form.name='unknown original';request.mockRejectedValueOnce(Error('lost response'));await state.save();expect(state.command.state).toBe('uncertain');const key=state.command.key;const confirm=vi.spyOn(ElMessageBox,'confirm').mockResolvedValue('confirm' as never);expect(await state.editor.leave()).toBe(false);expect(confirm).not.toHaveBeenCalled();expect(state.command.key).toBe(key);expect(state.form.name).toBe('unknown original');expect(state.opened).toBe(true)
+})
+it('a stale role row cannot reopen an editor after the list has been replaced',async()=>{
+ vi.spyOn(api,'request').mockResolvedValue(data());await mount();const state=(app as any)._instance.setupState,old=state.data.items[0];await state.refresh();await state.edit(old);expect(state.opened).toBe(false)
+})
+it('a candidate role mutated while discard waits cannot be copied using old approval',async()=>{
+ vi.spyOn(api,'request').mockResolvedValue(data());await mount();button('查看 / 编辑').click();await settle();const state=(app as any)._instance.setupState;state.form.name='original draft';state.editor.dirty.value=true;const candidate=state.data.items[0];const wait=deferred();vi.spyOn(ElMessageBox,'confirm').mockImplementation(()=>wait.promise as never);const pending=state.edit(candidate,true);candidate.name='changed source';wait.resolve('confirm');await pending;expect(state.form.name).toBe('original draft');expect(state.selected.id).toBe(candidate.id)
+})
+it('a clean editor is not replaced if new input arrives during the leave microtask',async()=>{
+ vi.spyOn(api,'request').mockResolvedValue(data());await mount();button('查看 / 编辑').click();await settle();const state=(app as any)._instance.setupState;expect(state.editor.dirty.value).toBe(false);const pending=state.refresh();state.form.name='arrived after clean check';state.editor.dirty.value=true;await pending;expect(state.form.name).toBe('arrived after clean check');expect(state.opened).toBe(true)
+})

@@ -1,0 +1,59 @@
+{
+  "result": "PASS_SERVICE_TIER_SLA_PAYLOAD_INTEGRITY",
+  "new_tests": 60,
+  "new_test_layers": {
+    "payload_semantics": 58,
+    "page_dom": 2
+  },
+  "focused_tests_passed": 132,
+  "vitest": {
+    "files_passed": 266,
+    "tests_passed": 4399
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS_FINAL",
+  "initial_typecheck_failures": [
+    "unknown threshold object narrowed outside callback",
+    "parameterized test callback inferred return type",
+    "explicit unknown callback block missing return; added explicit undefined"
+  ],
+  "api_contract_check": "PASS_UNCHANGED",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180729,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "d987748acbb7b87ce2f386c4ee2d5de624e07a6747843917c76ef0b2d38f010f",
+    "scope": "static-artifacts-only"
+  },
+  "browser_specs": {
+    "tests": 86,
+    "files": 10,
+    "status": "DISCOVERED_NOT_EXECUTED"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "baseline_regression": {
+    "passed": 8,
+    "failed": 50,
+    "scope": "58 new payload cases against prior reader"
+  },
+  "fixture_updates": "Synthetic deadlines now have positive window counts and observation follows completion; actual HTTP capture unchanged",
+  "historical_real_http_fixture": "PASS_REPLAY_NOT_NEW_SERVICE_RUN",
+  "backend_or_ddl_changed": false,
+  "real_fee_tier_account_or_ticket_changes": 0,
+  "source_sha256": {
+    "apps/web/src/pages/ServiceTiersPage.vue": "52b490ced63740ac40e0fab830a073ec16113949cf8ad593f15ad62f71f410e5",
+    "apps/web/src/utils/serviceTiers.ts": "fa11d1409e861d6c1f5329f20751add3ba70b4447a4ab6893e9e612f795a60e9",
+    "apps/web/tests/serviceTiers.test.ts": "a483c05123863c769773f5603673d695bcf64308029d94194e2ffbeb9ca042d6",
+    "apps/web/tests/serviceTierDispatch.test.ts": "268a307283ca4ec457cd8deef8ce99eb653dbb53619bd3aece19843cdd885cc5",
+    "apps/web/tests/serviceTierReadRecovery.test.ts": "b31cdd5996f1fb60f0bc191088cc67bd78cce2e60babaf9f1641fe38831e1d61",
+    "apps/web/tests/serviceTierReadRecoveryDom.test.ts": "121a389250ef763b49e220f2c04f5e14d3f711fe3498f069a94d6a17b42bdc2b",
+    "apps/web/tests/serviceTierPayloadIntegrity.test.ts": "880329189462b4b657333d273b48bc43b90cef590d5e868c9f4087bf43a942b6"
+  }
+}

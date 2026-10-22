@@ -68,6 +68,7 @@ export const clockStatusLabels:Record<TicketSlaClockStatus['status'],string>={
 }
 
 const invalid=()=>new ApiError(0,'INVALID_SERVICE_TIER_PAYLOAD','服务档位或SLA时钟数据未通过完整性校验，请刷新核对','—')
+const tierTime=(value:unknown):bigint=>{try{return exportTime(value)}catch{throw invalid()}}
 const isTier=(v:unknown):v is ServiceTierCode=>v==='BASIC'||v==='STANDARD'||v==='ADVANCED'
 const isMode=(v:unknown):v is EffectiveMode=>v==='IMMEDIATE'||v==='NEXT_MONTH_FIRST_DAY'
 const isCycle=(v:unknown):v is BillingCycle=>v==='MONTHLY'||v==='QUARTERLY'||v==='YEARLY'
@@ -81,14 +82,14 @@ export function readServiceTierSnapshot(raw:unknown,tenantId:string):ServiceTier
  if(!(raw.contract_device_count===null||exportInteger(raw.contract_device_count,0,1000000)))throw invalid()
  if(!(raw.billing_cycle===null||isCycle(raw.billing_cycle))||!(raw.monthly_fee_fen===null||exportInteger(raw.monthly_fee_fen,0)))throw invalid()
  if(!isMode(raw.effective_mode)||!exportUuid(raw.updated_by)||raw.customer_approval_status!=='UNVERIFIED')throw invalid()
- exportTime(raw.effective_from);exportTime(raw.updated_at)
+ tierTime(raw.effective_from);tierTime(raw.updated_at)
  return structuredClone(raw) as unknown as ServiceTierSnapshot
 }
 
 export function readServiceTierPage(value:unknown,scope:ServiceTierContext,beforeVersion?:number):ServiceTierPage{
  if(!validContext(scope)||!exportExact(value,['tenant_id','current','items','has_more','next_before_version','observed_at','customer_approval_status','in_flight_ticket_retroactive','source']))throw invalid()
  if(value.tenant_id!==scope.tenantId||!Array.isArray(value.items)||value.items.length>TIER_PAGE_SIZE||typeof value.has_more!=='boolean'||value.customer_approval_status!=='UNVERIFIED'||value.in_flight_ticket_retroactive!==false||value.source!=='postgresql')throw invalid()
- exportTime(value.observed_at)
+ tierTime(value.observed_at)
  const current=value.current===null?null:readServiceTierSnapshot(value.current,scope.tenantId)
  let prevVersion=beforeVersion
  const seen=new Set<string>()
@@ -100,7 +101,7 @@ export function readServiceTierPage(value:unknown,scope:ServiceTierContext,befor
   if(!isTier(item.to_tier)||!validTarget(item.availability_target)||!(item.contract_device_count===null||exportInteger(item.contract_device_count,0,1000000)))throw invalid()
   if(!(item.billing_cycle===null||isCycle(item.billing_cycle))||!(item.monthly_fee_fen===null||exportInteger(item.monthly_fee_fen,0)))throw invalid()
   if(!isMode(item.effective_mode)||typeof item.reason!=='string'||!item.reason.trim()||[...item.reason].length>1000||!exportUuid(item.approved_by)||item.customer_approval_status!=='UNVERIFIED')throw invalid()
-  exportTime(item.effective_from);exportTime(item.changed_at)
+  tierTime(item.effective_from);tierTime(item.changed_at)
   if(prevVersion!==undefined&&item.version>=prevVersion)throw invalid()
   prevVersion=item.version;seen.add(item.id)
  }
@@ -115,24 +116,57 @@ export function readServiceTierPage(value:unknown,scope:ServiceTierContext,befor
  }
 }
 
-function readClock(raw:unknown,expectedName:'RESPONSE'|'RECOVERY'):TicketSlaClockStatus{
+function readClock(raw:unknown,expectedName:'RESPONSE'|'RECOVERY',registered:bigint,observed:bigint):TicketSlaClockStatus{
  if(!exportExact(raw,['name','due_at','completed_at','paused','breached','status','missing_reason','thresholds','working_windows_count']))throw invalid()
  if(raw.name!==expectedName||typeof raw.paused!=='boolean'||(raw.breached!==null&&typeof raw.breached!=='boolean')||!['PENDING_CONFIG','RUNNING','PAUSED_FOR_CUSTOMER_CONFIRM','MET','BREACHED','CANCELLED'].includes(raw.status as string))throw invalid()
- if(!(raw.due_at===null||exportTime(raw.due_at)>=0)||!(raw.completed_at===null||exportTime(raw.completed_at)>=0)||!(raw.missing_reason===null||typeof raw.missing_reason==='string'))throw invalid()
+ if(!(raw.due_at===null||tierTime(raw.due_at)>=0)||!(raw.completed_at===null||tierTime(raw.completed_at)>=0)||!(raw.missing_reason===null||typeof raw.missing_reason==='string'))throw invalid()
  if(!exportExact(raw.thresholds,['p50_at','p80_at','p100_at'])||!exportInteger(raw.working_windows_count,0,1000))throw invalid()
- for(const k of ['p50_at','p80_at','p100_at'] as const){const v=raw.thresholds[k];if(!(v===null||exportTime(v)>=0))throw invalid()}
+ for(const k of ['p50_at','p80_at','p100_at'] as const){const v=raw.thresholds[k];if(!(v===null||tierTime(v)>=0))throw invalid()}
+ const due=raw.due_at===null?null:tierTime(raw.due_at),completed=raw.completed_at===null?null:tierTime(raw.completed_at)
+ if(due!==null&&due<registered||completed!==null&&(completed<registered||completed>observed)||typeof raw.missing_reason==='string'&&!raw.missing_reason.trim())throw invalid()
+ const rawThresholds=raw.thresholds
+ const thresholds=['p50_at','p80_at','p100_at'].map(k=>rawThresholds[k]===null?null:tierTime(rawThresholds[k]))
+ if(due===null){if(raw.working_windows_count!==0||thresholds.some(t=>t!==null)||!['PENDING_CONFIG','CANCELLED'].includes(raw.status as string))throw invalid()}
+ else if(raw.working_windows_count===0||thresholds.some(t=>t===null)||thresholds[0]!<registered||thresholds[0]!>thresholds[1]!||thresholds[1]!>thresholds[2]!||thresholds[2]!==due)throw invalid()
+ if(expectedName==='RESPONSE'&&raw.paused)throw invalid()
+ switch(raw.status){
+  case 'PENDING_CONFIG':if(due!==null||raw.breached!==null||typeof raw.missing_reason!=='string'||!raw.missing_reason.trim())throw invalid();break
+  case 'CANCELLED':if(raw.breached!==null||raw.paused)throw invalid();break
+  case 'BREACHED':if(due===null||raw.breached!==true||(completed??observed)<=due)throw invalid();break
+  case 'RUNNING':if(due===null||raw.breached!==false||raw.paused||completed!==null||observed>due)throw invalid();break
+  case 'MET':if(due===null||raw.breached!==false||completed!==null&&completed>due)throw invalid();break
+  case 'PAUSED_FOR_CUSTOMER_CONFIRM':if(expectedName!=='RECOVERY'||due===null||raw.breached!==false||!raw.paused||completed!==null&&completed>due)throw invalid();break
+ }
  return structuredClone(raw) as unknown as TicketSlaClockStatus
 }
 
 export function readTicketSlaInspection(value:unknown,scope:ServiceTierContext,expectedTicketId:string):TicketSlaInspection{
  if(!validContext(scope)||!exportExact(value,['ticket_id','tenant_id','receipt_no','registration_created_at','workflow_version','state','priority','frozen_service_tier','current_tenant_service_tier','tier_changed_since_open','response_clock','recovery_clock','clock_tasks','sla_missing','sla_references','reopen_count','reopen_policy_status','metric_version','observed_at','source']))throw invalid()
  if(value.ticket_id!==expectedTicketId||value.tenant_id!==scope.tenantId||typeof value.receipt_no!=='string'||!value.receipt_no.trim()||!exportInteger(value.workflow_version,0)||typeof value.tier_changed_since_open!=='boolean'||!exportInteger(value.reopen_count,0)||!['NOT_REOPENED','PENDING_Q27'].includes(value.reopen_policy_status as string)||value.metric_version!=='SLA_CLOCK_V2'||value.source!=='postgresql')throw invalid()
- exportTime(value.registration_created_at);exportTime(value.observed_at)
+ const registered=tierTime(value.registration_created_at),observed=tierTime(value.observed_at)
+ if(observed<registered||value.current_tenant_service_tier!==null&&!isTier(value.current_tenant_service_tier)||!Array.isArray(value.clock_tasks)||!Array.isArray(value.sla_references)||!value.sla_missing||typeof value.sla_missing!=='object'||Array.isArray(value.sla_missing))throw invalid()
+ if(Object.entries(value.sla_missing).some(([k,v])=>!k.trim()||typeof v!=='string'||!v.trim()))throw invalid()
+ const seenTasks=new Set<string>()
+ let previousTask:{due:bigint;key:string}|null=null
+ for(const task of value.clock_tasks){
+  if(!exportExact(task,['clock_key','kind','due_at','outcome','completed_at'])||typeof task.clock_key!=='string'||!task.clock_key||task.clock_key.length>80||seenTasks.has(task.clock_key)||!['SLA','CONFIRMATION_REMINDER','AUTO_CLOSE'].includes(task.kind as string)||task.outcome!==null&&!['EMITTED','OBSOLETE','AUTO_CLOSED'].includes(task.outcome as string)||(task.outcome===null)!==(task.completed_at===null))throw invalid()
+  const key=task.clock_key,due=tierTime(task.due_at),completed=task.completed_at===null?null:tierTime(task.completed_at)
+  if(due<registered||completed!==null&&(completed<due||completed>observed)||previousTask&&(due<previousTask.due||due===previousTask.due&&key<=previousTask.key))throw invalid()
+  if(task.kind==='SLA'&&!/^(response|recovery):(50|80|100)$/.test(key)||task.kind==='CONFIRMATION_REMINDER'&&!/^confirmation:[0-9]+$/.test(key)||task.kind==='AUTO_CLOSE'&&!/^auto_close:[0-9]+$/.test(key)||task.outcome==='AUTO_CLOSED'&&task.kind!=='AUTO_CLOSE'||task.outcome==='EMITTED'&&task.kind==='AUTO_CLOSE')throw invalid()
+  seenTasks.add(key);previousTask={due,key}
+ }
+ for(const source of value.sla_references){
+  if(!exportExact(source,['key','release_id','version','definition_hash','source'])||typeof source.key!=='string'||!source.key.trim()||typeof source.definition_hash!=='string'||!/^[0-9a-f]{64}$/.test(source.definition_hash))throw invalid()
+  if(source.source==='CONTRACT_DEFAULT'){if(source.release_id!==null||source.version!==0)throw invalid()}
+  else if(source.source==='RUNTIME_RELEASE'){if(typeof source.release_id!=='string'||!source.release_id.trim()||!exportInteger(source.version,1))throw invalid()}
+  else throw invalid()
+ }
  if(value.workflow_version===0){
-  if(value.frozen_service_tier!==null||value.response_clock!==null||value.recovery_clock!==null||value.tier_changed_since_open!==false)throw invalid()
+  if(value.state!==null||value.priority!==null||value.frozen_service_tier!==null||value.response_clock!==null||value.recovery_clock!==null||value.tier_changed_since_open!==false||value.reopen_count!==0||value.clock_tasks.length||value.sla_references.length||Object.keys(value.sla_missing).length)throw invalid()
  }else{
-  if(!isTier(value.frozen_service_tier)||value.response_clock===null||value.recovery_clock===null)throw invalid()
-  readClock(value.response_clock,'RESPONSE');readClock(value.recovery_clock,'RECOVERY')
+  if(!['OPEN','ACCEPTED','IN_PROGRESS','RESOLVED','CLOSED','CANCELLED'].includes(value.state as string)||!['P1','P2','P3'].includes(value.priority as string)||!isTier(value.frozen_service_tier)||value.response_clock===null||value.recovery_clock===null)throw invalid()
+  const response=readClock(value.response_clock,'RESPONSE',registered,observed),recovery=readClock(value.recovery_clock,'RECOVERY',registered,observed)
+  if(value.state==='CANCELLED'&&recovery.status!=='CANCELLED'||value.state!=='CANCELLED'&&(response.status==='CANCELLED'||recovery.status==='CANCELLED'))throw invalid()
   const expectedChanged=value.current_tenant_service_tier!==null&&value.current_tenant_service_tier!==value.frozen_service_tier
   if(value.tier_changed_since_open!==expectedChanged)throw invalid()
  }

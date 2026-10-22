@@ -9,7 +9,7 @@ import {
 const tenant='55000000-0000-4000-8000-000000000001',actor='55000000-0000-4000-8000-000000000011',changeId='55000000-0000-4000-8000-000000000099',ticket='55000000-0000-4000-8000-000000000077'
 const padminScope:ServiceTierContext={tenantId:tenant,actorId:actor,permissionVersion:4,canWrite:true}
 const mspScope:ServiceTierContext={...padminScope,canWrite:false}
-const at='2026-10-18T08:00:00Z',observed='2026-10-18T08:00:05Z'
+const at='2026-10-18T08:00:00Z',observed='2026-10-18T10:00:05Z'
 
 const snapshot=(patch:Record<string,unknown>={})=>({
  tenant_id:tenant,version:2,tier:'ADVANCED',availability_target:99.99,
@@ -37,13 +37,13 @@ const slaPayload=(patch:Record<string,unknown>={})=>({
   name:'RESPONSE',due_at:'2026-10-18T08:10:00Z',completed_at:'2026-10-18T08:04:00Z',
   paused:false,breached:false,status:'MET',missing_reason:null,
   thresholds:{p50_at:'2026-10-18T08:05:00Z',p80_at:'2026-10-18T08:08:00Z',p100_at:'2026-10-18T08:10:00Z'},
-  working_windows_count:0
+  working_windows_count:1
  },
  recovery_clock:{
   name:'RECOVERY',due_at:'2026-10-18T10:00:00Z',completed_at:'2026-10-18T09:00:00Z',
   paused:true,breached:false,status:'PAUSED_FOR_CUSTOMER_CONFIRM',missing_reason:null,
   thresholds:{p50_at:'2026-10-18T09:00:00Z',p80_at:'2026-10-18T09:36:00Z',p100_at:'2026-10-18T10:00:00Z'},
-  working_windows_count:0
+  working_windows_count:1
  },
  clock_tasks:[{clock_key:'response:50',kind:'SLA',due_at:'2026-10-18T08:05:00Z',outcome:'EMITTED',completed_at:'2026-10-18T08:05:01Z'}],
  sla_missing:{},sla_references:[],reopen_count:0,reopen_policy_status:'NOT_REOPENED',

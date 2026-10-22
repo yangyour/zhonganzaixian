@@ -241,8 +241,8 @@ defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,readLe
        当前租户档位：<strong>{{ state.slaInspection.current_tenant_service_tier ? tierLabels[state.slaInspection.current_tenant_service_tier] : '未登记' }}</strong> ·
        开单后档位是否变更：<strong>{{ state.slaInspection.tier_changed_since_open ? '是（在途工单截止时间保持不变）' : '否' }}</strong>
       </p>
-      <div v-if="state.slaInspection.response_clock && state.slaInspection.recovery_clock" class="proto-table-wrap">
-       <table class="proto-table"><caption>当前读取范围的服务档位变更记录</caption>
+      <div v-if="state.slaInspection.response_clock && state.slaInspection.recovery_clock" class="proto-table-wrap" tabindex="0" role="region" aria-label="原工单 SLA 时钟，可横向滚动">
+       <table class="proto-table"><caption>原工单响应与恢复 SLA 时钟</caption>
         <thead>
          <tr><th scope="col">时钟</th><th scope="col">状态</th><th scope="col">截止时间</th><th scope="col">完成时间</th><th scope="col">50% 提醒</th><th scope="col">80% 提醒</th><th scope="col">100% 超时</th></tr>
         </thead>

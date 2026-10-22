@@ -21,7 +21,7 @@ function input(label:string,value:string){const el=host.querySelector<HTMLInputE
 beforeEach(()=>{vi.stubGlobal('crypto',webcrypto);session.value=structuredClone(auth);switchingTenant.value=false;mocks.confirm.mockReset().mockResolvedValue(true)})
 afterEach(()=>{app?.unmount();app=undefined;host?.remove();session.value=null;vi.restoreAllMocks();vi.unstubAllGlobals()})
 
-const ticket='55000000-0000-4000-8000-000000000077',observed='2026-10-18T08:00:05Z'
+const ticket='55000000-0000-4000-8000-000000000077',observed='2026-10-18T10:00:05Z'
 const slaPayload=(patch:Record<string,unknown>={})=>({
  ticket_id:ticket,tenant_id:tenant,receipt_no:'MOP-20261018-0001',registration_created_at:at,
  workflow_version:3,state:'RESOLVED',priority:'P1',frozen_service_tier:'STANDARD',current_tenant_service_tier:'ADVANCED',
@@ -30,13 +30,13 @@ const slaPayload=(patch:Record<string,unknown>={})=>({
   name:'RESPONSE',due_at:'2026-10-18T08:10:00Z',completed_at:'2026-10-18T08:04:00Z',
   paused:false,breached:false,status:'MET',missing_reason:null,
   thresholds:{p50_at:'2026-10-18T08:05:00Z',p80_at:'2026-10-18T08:08:00Z',p100_at:'2026-10-18T08:10:00Z'},
-  working_windows_count:0
+  working_windows_count:1
  },
  recovery_clock:{
   name:'RECOVERY',due_at:'2026-10-18T10:00:00Z',completed_at:'2026-10-18T09:00:00Z',
   paused:true,breached:false,status:'PAUSED_FOR_CUSTOMER_CONFIRM',missing_reason:null,
   thresholds:{p50_at:'2026-10-18T09:00:00Z',p80_at:'2026-10-18T09:36:00Z',p100_at:'2026-10-18T10:00:00Z'},
-  working_windows_count:0
+  working_windows_count:1
  },
  clock_tasks:[{clock_key:'response:50',kind:'SLA',due_at:'2026-10-18T08:05:00Z',outcome:'EMITTED',completed_at:'2026-10-18T08:05:01Z'}],
  sla_missing:{},sla_references:[],reopen_count:0,reopen_policy_status:'NOT_REOPENED',
@@ -53,3 +53,6 @@ it('cancel SLA retains typed text and returns focus to cancellation status',asyn
 it('a voluntary focus movement is not stolen by completed SLA read',async()=>{const wait=deferred();vi.spyOn(api,'request').mockResolvedValueOnce(page()).mockReturnValueOnce(wait.promise as any);await mount();await slaTab();vm.ticketIdInput=ticket;const pending=vm.readSla();await settle();const input=host.querySelector<HTMLInputElement>('.sla-search input')!;input.focus();wait.resolve(slaPayload());expect(await pending).toBe(true);expect(document.activeElement).toBe(input)})
 it('account switch clears both recovery targets and rejects late original read',async()=>{const wait=deferred();vi.spyOn(api,'request').mockResolvedValueOnce(page()).mockReturnValueOnce(wait.promise as any).mockResolvedValue(page());await mount();await slaTab();vm.ticketIdInput=ticket;const pending=vm.readSla();session.value={...structuredClone(auth),account_version:2};await settle();wait.resolve(slaPayload());expect(await pending).toBe(false);expect(vm.state.slaReadTarget).toBeNull();expect(vm.ticketIdInput).toBe('');expect(await vm.readSla(true)).toBe(false)})
 it('ledger table has a caption, scoped headers and named keyboard scroll region',async()=>{vi.spyOn(api,'request').mockResolvedValue(page());await mount();const region=host.querySelector('[aria-label="服务档位变更历史，可横向滚动"]');expect(region?.getAttribute('tabindex')).toBe('0');expect(region?.querySelector('caption')?.textContent).toContain('当前读取范围');expect(region?.querySelectorAll('th[scope="col"]')).toHaveLength(7)})
+
+it('malformed SLA task payload replaces no result and returns a recoverable error',async()=>{const bad={...slaPayload(),clock_tasks:[{...slaPayload().clock_tasks[0],outcome:'DELIVERED'}]};const req=vi.spyOn(api,'request').mockResolvedValueOnce(page()).mockResolvedValueOnce(slaPayload()).mockResolvedValueOnce(bad).mockResolvedValueOnce(slaPayload());await mount();await slaTab();vm.ticketIdInput=ticket;expect(await vm.readSla()).toBe(true);expect(await vm.readSla()).toBe(false);expect(vm.state.slaInspection).toBeNull();expect(host.querySelector('.sla-detail')).toBeNull();expect(document.activeElement).toBe(host.querySelector('[aria-label="工单 SLA 读取结果"]'));expect(await vm.readSla(true)).toBe(true);expect(req.mock.calls.every(c=>!c[1]?.method)).toBe(true)})
+it('SLA clocks have their own accurate caption and keyboard scroll region',async()=>{vi.spyOn(api,'request').mockResolvedValueOnce(page()).mockResolvedValueOnce(slaPayload());await mount();await slaTab();vm.ticketIdInput=ticket;await vm.readSla();const region=host.querySelector('[aria-label="原工单 SLA 时钟，可横向滚动"]');expect(region?.getAttribute('tabindex')).toBe('0');expect(region?.querySelector('caption')?.textContent).toBe('原工单响应与恢复 SLA 时钟');expect(region?.querySelectorAll('th[scope="col"]')).toHaveLength(7)})

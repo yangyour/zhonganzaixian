@@ -174,5 +174,8 @@
     "failures": 0,
     "errors": 0,
     "skipped": 1038
-  }
+  },
+  "post_release_pulled_commit": "5c50cd2110c36f35094e2a6742903d097e9a5a83",
+  "post_release_changes_only_acceptance_fixtures_tests_and_docs": true,
+  "post_release_runtime_source_unchanged": true
 }

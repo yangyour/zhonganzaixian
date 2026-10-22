@@ -22,6 +22,8 @@ import { Fold, Expand, Menu } from '@element-plus/icons-vue'
 import './styles/prototype.css'
 import './styles/functional-prototype.css'
 import './styles/compact-workspaces.css'
+import './styles/workspace.css'
+import './styles/controls.css'
 import { displayTenantName } from './utils/displayTenantName'
 const route = useRoute()
 const router = useRouter()
@@ -113,7 +115,6 @@ async function endSession() {
         <div v-if="switchingTenant" class="switching-panel"><el-skeleton :rows="5" animated /><p>正在切换租户，请稍候…</p></div>
         <router-view v-else :key="pageKey" />
       </main>
-      <footer class="app-footer">MOP 运维托管平台 <span>数据与操作结果以当前授权接口的实际回读为准</span></footer>
     </div>
   </div>
   </el-config-provider>

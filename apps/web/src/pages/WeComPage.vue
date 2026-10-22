@@ -88,7 +88,7 @@ async function disable(row:WeComBinding){if(!bindings.value.some(item=>item===ro
    <div class="wecom-actions"><el-button :disabled="locked||editor.dirty.value" @click="check">检查应用连接</el-button><el-button :disabled="locked||editor.dirty.value||!status.dispatch_enabled||!status.test_user_id" @click="test">发送测试消息</el-button></div>
   </section>
   <section class="admin-card"><div class="admin-card-head"><h2>成员与平台账号</h2><span>登录后使用平台账号已有权限</span></div>
-   <p>新成员需先创建平台账号，再确认企业微信 UserID。停用绑定后，该账号的既有登录会话也会失效。</p>
+   
    <form class="account-search" @submit.prevent="browseAccounts(1,true)"><label>搜索平台账号<input ref="accountSearchInput" v-model="accountQuery" aria-label="搜索平台账号" maxlength="100" :disabled="loading||editor.busy()" /></label><el-button native-type="submit" :disabled="loading||editor.busy()">搜索账号</el-button></form>
    <div class="account-pages" aria-label="账号选项分页"><el-button :disabled="loading||editor.busy()||accountPage<=1" @click="browseAccounts(accountPage-1)">上一页账号</el-button><span role="status">账号选项第 {{accountPage}} 页，本页 {{users?.items.length??0}} 个{{users?.has_more?'，还有下一页':''}}</span><el-button :disabled="loading||editor.busy()||accountPage>=10000||!users?.has_more" @click="browseAccounts(accountPage+1)">下一页账号</el-button></div>
    <p v-if="users&&!users.items.length">当前搜索或页面没有可选的启用账号。可更改搜索，或返回上一页。</p>

@@ -49,7 +49,7 @@ defineExpose({ canLeave })
 <template>
   <section v-if="scope" class="lifecycle-panel" aria-label="工单生命周期">
     <header><h3>工单流转</h3><el-button :disabled="locked" @click="workspace.refresh()">刷新状态</el-button></header>
-    <p class="notice">测试流程：SLA 状态由服务端读回；提醒发送及升级 Worker 尚未接入，不代表生产批准或月度考核完成。</p>
+    
     <ApiErrorNotice v-if="state.error" :error="state.error"><p v-if="missingConfiguration.length">需补全或重新发布的配置：{{ missingConfiguration.join('、') }}。请由有权限的管理员核对配置内容及生效状态。</p></ApiErrorNotice>
     <p v-if="state.busy === 'read'" role="status">正在读取当前状态与解决方案…</p>
     <p v-else-if="state.loaded && !state.snapshot" role="status">此登记尚未创建生命周期。需有服务端生效配置及开单权限；本页不会推断档位、优先级或截止时间。</p>

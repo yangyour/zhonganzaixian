@@ -31,14 +31,37 @@ const suppression={NONE:'无抑制',FLAP_SILENCED:'抖动静默',DEPENDENCY_SUPP
 </script>
 <template>
 <section v-if="permitted" class="dashboard-events" aria-labelledby="dashboard-events-title" :aria-busy="busy">
- <header><div><h2 id="dashboard-events-title">近期监控事件</h2></div><div class="actions"><button :disabled="busy" @click="load">{{busy?'读取中…':'刷新近期事件'}}</button><router-link to="/monitoring-events">进入事件中心</router-link></div></header>
+ <header class="de-head"><h2 id="dashboard-events-title">近期监控事件</h2><div class="actions"><button type="button" :disabled="busy" @click="load">{{busy?'读取中…':'刷新近期事件'}}</button><router-link to="/monitoring-events">事件中心</router-link></div></header>
  <ApiErrorNotice :error="error" :retrying="busy" @retry="load" />
- <p v-if="!events" role="status">{{busy?'正在读取近期事件…':error?'事件读取失败，未沿用旧列表。':'尚未读取事件。'}}</p>
- <template v-else><p role="status">已读取 {{events.length}} 条近期记录 · 数据库观察时间：{{displayTime(observed)}}。此处手动刷新，不代表实时推送。</p><p v-if="!events.length">当前查询没有事件记录，不代表全量设备健康或采集完整。</p>
- <ol v-else class="events"><li v-for="event in events" :key="event.id"><h3><router-link :to="{path:'/monitoring-events',query:{event_id:event.id}}">{{event.rule_name}} · 查看事件详情</router-link></h3><dl><div><dt>严重程度</dt><dd>{{severity[event.severity]}}</dd></div><div><dt>监控状态</dt><dd>{{event.monitor_state==='PROBLEM'?'异常':'已恢复'}}</dd></div><div><dt>人工处理</dt><dd>{{handling[event.handling_state]}}</dd></div><div><dt>通知抑制</dt><dd>{{suppression[event.suppression_state]}}</dd></div><div><dt>合并出现次数</dt><dd>{{event.occurrence_count}}</dd></div><div><dt>最近发生</dt><dd>{{displayTime(event.last_occurred_at)}}</dd></div></dl><p class="id">资产 ID：{{event.asset_id}}</p><p>{{event.notification_empty_state_label}}。派发资格不代表已发送或送达。</p></li></ol></template>
- <p>列表数量不是当前问题总数；监控恢复不等于人工结单。SLA、全租户告警趋势和正式运营指标独立验收。</p>
+ <p v-if="!events" role="status" class="de-state">{{busy?'正在读取近期事件…':error?'事件读取失败，未沿用旧列表。':'尚未读取事件。'}}</p>
+ <template v-else>
+  <p role="status" class="de-meta">已读取 {{events.length}} 条近期记录 · {{displayTime(observed)}}</p>
+  <p v-if="!events.length" class="de-state">当前查询没有事件记录（不代表全量设备健康）。</p>
+  <ol v-else class="events"><li v-for="event in events" :key="event.id" :class="'sev-'+event.severity.toLowerCase()"><span class="sev">{{severity[event.severity]}}</span><div class="ev-body"><h3><router-link :to="{path:'/monitoring-events',query:{event_id:event.id}}" :aria-label="event.rule_name+'，查看事件详情'">{{event.rule_name}}</router-link></h3><p><span :class="event.monitor_state==='PROBLEM'?'st-problem':'st-ok'">{{event.monitor_state==='PROBLEM'?'异常':'已恢复'}}</span> · {{handling[event.handling_state]}}<template v-if="event.suppression_state!=='NONE'"> · {{suppression[event.suppression_state]}}</template> · {{event.occurrence_count}} 次</p></div><time :datetime="event.last_occurred_at">{{displayTime(event.last_occurred_at)}}</time></li></ol>
+ </template>
 </section>
 </template>
 <style scoped>
-.dashboard-events{min-width:0;padding:20px;border:1px solid #cbd5e1;background:#fff;border-radius:8px;margin:16px 0;color:#24374a}.dashboard-events header,.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.dashboard-events h2{font-size:18px;margin:0}.dashboard-events h3{font-size:16px}.dashboard-events p{font-size:13px;line-height:1.7;overflow-wrap:anywhere}.dashboard-events button,.dashboard-events a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;padding:8px 12px;color:#185695;background:white;border:1px solid #8293a6;border-radius:4px;font:inherit;text-decoration:underline;overflow-wrap:anywhere}.dashboard-events button{cursor:pointer;text-decoration:none}.dashboard-events button:disabled{opacity:.6;cursor:default}.dashboard-events :focus-visible{outline:3px solid #176bb5;outline-offset:3px}.events{padding-left:24px}.events li{padding:12px 0;border-top:1px solid #cbd5e1}.events dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.events dt{font-size:12px;font-weight:bold}.events dd{margin:4px 0;overflow-wrap:anywhere}.id{font-family:monospace}@media(max-width:760px){.dashboard-events{padding:14px}.events dl{grid-template-columns:1fr}.events{padding-left:18px}}
+.dashboard-events{min-width:0;padding:16px 18px;border:1px solid #e3e9f2;background:#fff;border-radius:10px;color:#24374a}
+.de-head,.actions{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.dashboard-events h2{font-size:15px;font-weight:600;margin:0;color:#0f172a}
+.actions button,.actions a{display:inline-flex;align-items:center;min-height:32px;box-sizing:border-box;padding:0 12px;color:#1d4ed8;background:#fff;border:1px solid #d5deea;border-radius:6px;font:inherit;font-size:13px;text-decoration:none;cursor:pointer}
+.actions button:hover:not(:disabled),.actions a:hover{background:#eff6ff;border-color:#93c5fd}
+.actions button:disabled{opacity:.6;cursor:default}
+.dashboard-events :focus-visible{outline:2px solid #2563eb;outline-offset:2px}
+.de-meta{margin:8px 0 4px;font-size:12px;color:#64748b;font-variant-numeric:tabular-nums}
+.de-state{margin:12px 0 0;padding:20px;border-radius:8px;background:#f8fafc;color:#475569;font-size:13px;text-align:center}
+.events{list-style:none;margin:4px 0 0;padding:0}
+.events li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #eef2f7}
+.events li:first-child{border-top:0}
+.sev{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:600;background:#f1f5f9;color:#475569}
+.sev-disaster .sev{background:#fee2e2;color:#991b1b}.sev-high .sev{background:#ffedd5;color:#9a3412}.sev-average .sev{background:#fef3c7;color:#92400e}.sev-warning .sev{background:#fef9c3;color:#854d0e}.sev-info .sev{background:#e0f2fe;color:#075985}
+.ev-body{min-width:0}
+.events h3{margin:0;font-size:14px;font-weight:600;line-height:1.4}
+.events h3 a{color:#0f172a;text-decoration:none;overflow-wrap:anywhere}
+.events h3 a:hover{color:#1d4ed8;text-decoration:underline}
+.ev-body p{margin:2px 0 0;font-size:12px;color:#64748b}
+.st-problem{color:#b91c1c;font-weight:600}.st-ok{color:#15803d;font-weight:600}
+.events time{font-size:12px;color:#64748b;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:760px){.dashboard-events{padding:14px}.actions button,.actions a{min-height:44px}.events li{grid-template-columns:auto minmax(0,1fr)}.events time{grid-column:2}.events h3 a{display:inline-block;min-height:24px}}
 </style>

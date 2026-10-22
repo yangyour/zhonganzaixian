@@ -53,7 +53,7 @@ defineExpose({ prepare, hasUnresolved: writer.unresolved })
 </script>
 <template>
   <el-drawer v-model="open" title="维护工作日历草稿（未生效）" size="860px" class="calendar-editor" :close-on-click-modal="false">
-    <el-alert type="warning" :closable="false" title="仅保存当前租户未生效草稿。客户确认、正式SLA、工作周和节假日不会自动补全。时间必须显式带时区及秒，最多毫秒；固定显示时区Asia/Shanghai。" />
+    <p class="overlay-note">仅保存未生效草稿；时间须带时区及秒（最多毫秒），显示时区 Asia/Shanghai</p>
     <el-alert v-if="!permitted" type="warning" :closable="false" title="当前配置维护权限已失效，原范围编辑内容已清除" />
     <template v-else>
       <p v-if="state.baseline" class="calendar-id">固定编辑基准：{{ state.baseline.id }} · v{{ state.baseline.version }}。只读刷新不会替换此基准或未发送内容</p><p v-else-if="state.editing">明确创建新草稿；不继承任何默认工作时段</p>
@@ -76,7 +76,7 @@ defineExpose({ prepare, hasUnresolved: writer.unresolved })
         <p v-if="validation" role="alert" class="calendar-error">{{ validation }}</p><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked">保存日历草稿</el-button>
       </el-form>
     </template>
-    <template #footer><el-button @click="open = false">暂时收起，保留本页编辑</el-button><p class="field-help">收起不撤销已发送请求。未确认结果必须使用原请求处理，不自动写入</p></template>
+    <template #footer><el-button @click="open = false">暂时收起，保留本页编辑</el-button></template>
   </el-drawer>
 </template>
 <style>

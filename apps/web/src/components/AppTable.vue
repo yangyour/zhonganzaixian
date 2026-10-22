@@ -65,8 +65,8 @@ onBeforeUnmount(() => { disposed = true; observer?.disconnect(); viewport?.remov
 </template>
 <style scoped>
 .table-loading-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.table-scroll-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px;background:#f8fafc;border-bottom:1px solid #e3ebf5;color:#52667d;font-size:12px;line-height:1.7}
-.table-scroll-tools>span{min-width:0}.table-scroll-tools small{font-size:11px;margin-left:12px;color:#64758a}
-.table-scroll-buttons{display:flex;gap:6px;flex-shrink:0}.table-scroll-buttons .el-button{margin:0;min-width:34px;min-height:32px;padding:7px}
-@media(max-width:760px){.table-scroll-tools{padding:8px 12px}.table-scroll-tools small{display:none}.table-scroll-buttons .el-button{min-width:44px;min-height:44px}}
+.table-scroll-tools{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:6px 12px;background:#fff;color:#52667d;font-size:12px;line-height:1.6}
+.table-scroll-tools>span{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.table-scroll-buttons{display:flex;gap:6px;flex-shrink:0}.table-scroll-buttons .el-button{margin:0;min-width:30px;min-height:28px;height:28px;padding:5px;border-radius:6px}
+@media(max-width:760px){.table-scroll-tools{padding:6px 12px}.table-scroll-buttons .el-button{min-width:44px;min-height:44px}}
 </style>

@@ -30,24 +30,22 @@ defineExpose({ change: workspace.change, preview: workspace.preview, clearInput,
 </script>
 <template>
  <section class="preview-page admin-prototype">
-  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">联系人导入格式预览</h1></div><router-link to="/customer-contacts">返回联系人</router-link></div>
-  <p class="inline-boundary">本页仅执行字段格式预检，不直接执行导入入库</p>
+  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">联系人导入格式预览</h1></div></div>
+  
   <nav class="admin-tabs" aria-label="联系人工作区"><router-link to="/customer-contacts">联系人列表</router-link><router-link to="/contact-imports">批量新建与作业</router-link><span class="active">导入格式预览</span></nav>
-  <ol class="admin-stepbar"><li class="active"><strong>01 粘贴 JSON 数据</strong><small>包含完整 8 个标准字段</small></li><li :class="{active: !!state.result}"><strong>02 服务端格式诊断</strong><small>逐行校验与重复行提示</small></li><li><strong>03 正式批量导入</strong><small>前往批量新建页面提交</small></li></ol>
   <el-empty v-if="!permitted" description="当前身份没有联系人预览权限" />
   <template v-else>
    <section class="preview-input admin-card">
-    <div class="admin-card-head"><h2>待校验 JSON 数据</h2><span class="muted">格式诊断 · 不保存</span></div><div class="admin-card-body"><p>根对象须包含 <code>rows</code> 数组（单次上限 1–100 条）。每条记录需提供姓名、角色、手机、邮箱、企微 UserID、级别偏好、静音配置、启用状态共 8 个字段（选填项显式填 <code>null</code>）。</p>
-    <details><summary>查看标准 JSON 格式示例</summary><pre>{{ example }}</pre><p>支持角色：REPORTER、DECISION_MAKER、TECHNICAL_CONTACT；级别偏好：P1–P4 数组（null 表示未指定，[] 表示空集合）；免打扰配置：null 或完整 enabled/start/end（Asia/Shanghai 时区）。</p></details>
+    <div class="admin-card-head"><h2>待校验 JSON 数据</h2><span class="muted">1–100 行 · ≤512KiB · 仅诊断不保存</span></div><div class="admin-card-body">
+    <details><summary>JSON 格式示例</summary><p>根对象含 <code>rows</code> 数组，每行 8 个字段（姓名、角色、手机、邮箱、企微 UserID、级别偏好、静音配置、启用状态），选填项填 <code>null</code>，最多 5 层嵌套。</p><pre>{{ example }}</pre><p>支持角色：REPORTER、DECISION_MAKER、TECHNICAL_CONTACT；级别偏好：P1–P4 数组（null 表示未指定，[] 表示空集合）；免打扰配置：null 或完整 enabled/start/end（Asia/Shanghai 时区）。</p></details>
     <el-input type="textarea" :rows="14" :model-value="state.text" aria-label="联系人预览原始JSON" placeholder="请粘贴待校验的联系人 JSON 数据（请勿填入密码、Token 或密钥）" @update:model-value="workspace.change($event)" />
-    <p class="preview-help">支持最大 512KiB、5 层嵌套；修改文本后自动清空上一次诊断结果。</p>
     <div class="preview-actions"><el-button type="primary" :disabled="state.busy || !state.text" :loading="state.busy" @click="workspace.preview()">校验数据格式</el-button><el-button :disabled="!state.text" @click="clearInput">清空内容</el-button></div>
    </div></section>
-   <ApiErrorNotice :error="state.error" /><ReadRecoveryActions :busy="state.busy?'read':null" :can-retry="workspace.canRetryRead()" :scope-key="contextKey+':'+previewScope" :cancel="workspace.cancelRead" :retry="workspace.retryRead" label="格式预览" /><p class="preview-help">取消只停止等待本次只读格式诊断；本页不受理或撤销导入作业。</p>
+   <ApiErrorNotice :error="state.error" /><ReadRecoveryActions :busy="state.busy?'read':null" :can-retry="workspace.canRetryRead()" :scope-key="contextKey+':'+previewScope" :cancel="workspace.cancelRead" :retry="workspace.retryRead" label="格式预览" />
    <section v-if="state.result" class="preview-results" aria-live="polite">
-    <h2>服务端格式诊断结果</h2><div class="compact-result-summary"><div class="admin-stat"><span>格式通过</span><strong>{{ state.result.valid_rows }}</strong><small>字段符合规范</small></div><div class="admin-stat"><span>字段错误</span><strong>{{ state.result.invalid_rows }}</strong><small>请按行号修正</small></div><div class="admin-stat"><span>重复行提示</span><strong>{{ state.result.identical_rows }}</strong><small>字段完全相同</small></div><div class="admin-stat"><span>入库状态</span><strong>仅预览</strong><small>未执行数据写入</small></div></div><p class="preview-help">以下按原始行号展示校验结果；重复行仅作提示，导入时不会自动跳过或覆盖。</p>
-    <ol class="preview-rows"><li v-for="row in state.result.rows" :key="row.row_number"><h3>第{{ row.row_number }}行：{{ row.status === 'FORMAT_VALID' ? '格式通过' : '字段格式错误' }}</h3><p v-if="row.status === 'INVALID'">请核对该行 8 个标准字段是否完整，以及角色、手机号、邮箱、启用状态与免打扰时段格式是否合法。</p><p v-if="row.identical_to_row !== null" class="duplicate-warning">该行字段与第{{ row.identical_to_row }}行完全相同，请核对是否需要保留。</p><details v-if="row.contact"><summary>查看本行解析预览</summary><CustomerContactFacts :facts="row.contact" /></details></li></ol>
-    <p class="inline-boundary">本页预览结果不直接入库</p><p><router-link to="/contact-imports">前往批量新建与作业页面</router-link></p>
+    <h2>服务端格式诊断结果</h2><div class="compact-result-summary"><div class="admin-stat"><span>格式通过</span><strong>{{ state.result.valid_rows }}</strong><small>字段符合规范</small></div><div class="admin-stat"><span>字段错误</span><strong>{{ state.result.invalid_rows }}</strong><small>请按行号修正</small></div><div class="admin-stat"><span>重复行提示</span><strong>{{ state.result.identical_rows }}</strong><small>字段完全相同</small></div><div class="admin-stat"><span>入库状态</span><strong>仅预览</strong><small>未执行数据写入</small></div></div>
+    <ol class="preview-rows"><li v-for="row in state.result.rows" :key="row.row_number"><h3>第{{ row.row_number }}行：{{ row.status === 'FORMAT_VALID' ? '格式通过' : '字段格式错误' }}</h3><p v-if="row.status === 'INVALID'">请核对字段是否完整、格式是否合法。</p><p v-if="row.identical_to_row !== null" class="duplicate-warning">该行字段与第{{ row.identical_to_row }}行完全相同，请核对是否需要保留。</p><details v-if="row.contact"><summary>查看本行解析预览</summary><CustomerContactFacts :facts="row.contact" /></details></li></ol>
+    <p><router-link to="/contact-imports">前往批量新建与作业页面</router-link></p>
    </section>
   </template>
  </section>

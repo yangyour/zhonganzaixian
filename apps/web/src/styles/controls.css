@@ -1,0 +1,263 @@
+/* Unified control layer: buttons, form fields, labels, dialogs, drawers and message boxes.
+   Applies to page content and to teleported overlays. The app header, module tabs, the
+   sidebar and the mobile navigation drawer keep navigation.css. Imported last.
+   Sizes: 32px controls with a pointer on wide screens; 44px touch targets on narrow or
+   coarse-pointer screens (docs/frontend-acceptance-standard.md §9). */
+:root {
+  --ctl-h: 32px;
+  --ctl-h-sm: 28px;
+  --ctl-radius: 6px;
+  --ctl-font: 13px;
+  --ctl-border: #d3dbe6;
+  --ctl-border-hover: #a3bde3;
+  --ctl-text: #33465c;
+  --ctl-label: #42566e;
+  --ctl-muted: #6a7b90;
+  --ctl-placeholder: #7d8da1;
+  --ctl-disabled-bg: #f5f7fa;
+  --ctl-disabled-border: #e3e8ef;
+  --ctl-disabled-text: #8996a7;
+  --ctl-hover-bg: #f4f8ff;
+  --ctl-primary: #2165c5;
+  --ctl-primary-hover: #1957ae;
+  --ctl-danger: #b43746;
+  --ctl-ring: 0 0 0 3px rgba(33, 101, 197, .14);
+  --ctl-divider: #edf1f7;
+  --ctl-title: #1c2a3b;
+}
+@media (max-width: 760px), (pointer: coarse) {
+  :root { --ctl-h: 44px; --ctl-h-sm: 44px; }
+}
+
+/* Element Plus variables inside content and overlays */
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog, .el-message-box) {
+  --el-border-color: var(--ctl-border);
+  --el-border-color-hover: var(--ctl-border-hover);
+  --el-input-border-color: var(--ctl-border);
+  --el-input-hover-border-color: var(--ctl-border-hover);
+  --el-input-focus-border-color: var(--ctl-primary);
+  --el-input-placeholder-color: var(--ctl-placeholder);
+  --el-input-text-color: var(--ctl-text);
+  --el-input-border-radius: var(--ctl-radius);
+  --el-border-radius-base: var(--ctl-radius);
+  --el-text-color-placeholder: var(--ctl-placeholder);
+  --el-disabled-bg-color: var(--ctl-disabled-bg);
+  --el-disabled-border-color: var(--ctl-disabled-border);
+}
+
+/* ---------- Buttons ---------- */
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog, .el-message-box) .el-button:not(.is-text):not(.is-link) {
+  height: auto; min-height: var(--ctl-h); padding-top: 5px; padding-bottom: 5px;
+  font-size: var(--ctl-font); font-weight: 400; line-height: 20px; border-radius: var(--ctl-radius);
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog, .el-message-box) .el-button--small:not(.is-text):not(.is-link) {
+  min-height: var(--ctl-h-sm); padding-top: 3px; padding-bottom: 3px; font-size: 12px;
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog, .el-message-box) .el-button:not(.el-button--primary):not(.el-button--success):not(.el-button--warning):not(.el-button--danger):not(.el-button--info):not(.is-text):not(.is-link) {
+  --el-button-bg-color: #fff;
+  --el-button-border-color: var(--ctl-border);
+  --el-button-text-color: var(--ctl-text);
+  --el-button-hover-bg-color: var(--ctl-hover-bg);
+  --el-button-hover-border-color: var(--ctl-border-hover);
+  --el-button-hover-text-color: var(--ctl-primary);
+  --el-button-active-bg-color: #eaf1fc;
+  --el-button-active-border-color: var(--ctl-primary);
+  --el-button-active-text-color: var(--ctl-primary);
+  --el-button-disabled-bg-color: var(--ctl-disabled-bg);
+  --el-button-disabled-border-color: var(--ctl-disabled-border);
+  --el-button-disabled-text-color: var(--ctl-disabled-text);
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog, .el-message-box) .el-button--primary:not(.is-plain):not(.is-text):not(.is-link) {
+  --el-button-bg-color: var(--ctl-primary); --el-button-border-color: var(--ctl-primary);
+  --el-button-hover-bg-color: var(--ctl-primary-hover); --el-button-hover-border-color: var(--ctl-primary-hover);
+  --el-button-active-bg-color: #174f9c; --el-button-active-border-color: #174f9c;
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog, .el-message-box) .el-button:is(.is-text, .is-link) {
+  min-height: 28px; font-size: var(--ctl-font);
+}
+
+/* Native buttons share the Element Plus default look. Context variants (tabs, chips,
+   view switches, inline links) keep their more specific rules.
+   Custom link/card/tab buttons are excluded so their own styles apply. */
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) button:not([class*="el-"]):where(:not([role="tab"]):not(.tenant-name, .proto-link, .resource-inline-link, .history-toggle, .filter-chip, .calendar-item, .asset-tile, .manual-row, .sidebar-toggle, .mobile-sidebar-toggle, .desktop-sidebar-toggle):not(:is(.scenario-list, .manual-asset-options, .ticket-breadcrumb, .ticket-contact, .feature-tabs, .proto-tabs, .runtime-keys, .message-list .actions, .meta) button)) {
+  min-height: var(--ctl-h); padding: 5px 14px; border: 1px solid var(--ctl-border); border-radius: var(--ctl-radius);
+  background: #fff; color: var(--ctl-text); font-size: var(--ctl-font); font-weight: 400; line-height: 20px;
+  cursor: pointer; transition: background-color .15s ease-out, border-color .15s ease-out, color .15s ease-out;
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) button:not([class*="el-"]):where(:not([role="tab"]):not(.tenant-name, .proto-link, .resource-inline-link, .history-toggle, .filter-chip, .calendar-item, .asset-tile, .manual-row, .sidebar-toggle, .mobile-sidebar-toggle, .desktop-sidebar-toggle):not(:is(.scenario-list, .manual-asset-options, .ticket-breadcrumb, .ticket-contact, .feature-tabs, .proto-tabs, .runtime-keys, .message-list .actions, .meta) button)):hover:not(:disabled) {
+  border-color: var(--ctl-border-hover); background: var(--ctl-hover-bg); color: var(--ctl-primary);
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) button:not([class*="el-"]):where(:not([role="tab"]):not(.tenant-name, .proto-link, .resource-inline-link, .history-toggle, .filter-chip, .calendar-item, .asset-tile, .manual-row, .sidebar-toggle, .mobile-sidebar-toggle, .desktop-sidebar-toggle):not(:is(.scenario-list, .manual-asset-options, .ticket-breadcrumb, .ticket-contact, .feature-tabs, .proto-tabs, .runtime-keys, .message-list .actions, .meta) button)):disabled {
+  border-color: var(--ctl-disabled-border); background: var(--ctl-disabled-bg); color: var(--ctl-disabled-text); cursor: not-allowed;
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) button:is(.primary, .primary-button, .tier-submit-btn, .submit-create, .export-create):not([class*="el-"]),
+#main-content .export-page button[type="submit"]:not([class*="el-"]) {
+  border-color: var(--ctl-primary); background: var(--ctl-primary); color: #fff;
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) button:is(.primary, .primary-button, .tier-submit-btn, .submit-create, .export-create):not([class*="el-"]):hover:not(:disabled),
+#main-content .export-page button[type="submit"]:not([class*="el-"]):hover:not(:disabled) {
+  border-color: var(--ctl-primary-hover); background: var(--ctl-primary-hover); color: #fff;
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) button:is(.primary, .primary-button, .tier-submit-btn, .submit-create, .export-create):not([class*="el-"]):disabled,
+#main-content .export-page button[type="submit"]:not([class*="el-"]):disabled {
+  border-color: var(--el-color-primary-light-5, #93bbfa); background: var(--el-color-primary-light-5, #93bbfa); color: #fff;
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) button.ws-link:not([class*="el-"]) {
+  min-height: 28px; padding: 2px 4px; border: 0; background: transparent; color: var(--ctl-primary);
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) button.ws-link:not([class*="el-"]):hover:not(:disabled) {
+  background: #eff6ff; text-decoration: underline; text-underline-offset: 3px;
+}
+
+/* ---------- Form fields ---------- */
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog, .el-message-box) :is(.el-input, .el-select, .el-textarea, .el-select__wrapper) {
+  --el-input-height: var(--ctl-h); font-size: var(--ctl-font);
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog, .el-message-box) :is(.el-input__wrapper, .el-select__wrapper) {
+  min-height: var(--ctl-h); border-radius: var(--ctl-radius); font-size: var(--ctl-font);
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog, .el-message-box) .el-input--small {
+  --el-input-height: var(--ctl-h-sm);
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog, .el-message-box) .el-textarea__inner {
+  padding: 6px 10px; border-radius: var(--ctl-radius); font-size: var(--ctl-font); line-height: 1.6; color: var(--ctl-text);
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) :is(input, select, textarea):not([class*="el-"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="color"]) {
+  padding: 5px 10px; border: 1px solid var(--ctl-border); border-radius: var(--ctl-radius);
+  background: #fff; color: var(--ctl-text); font-size: var(--ctl-font); font-weight: 400; line-height: 20px;
+  transition: border-color .15s ease-out, box-shadow .15s ease-out;
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) :is(input, select):not([class*="el-"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="color"]) {
+  min-height: var(--ctl-h); height: var(--ctl-h);
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) select:not([class*="el-"]) { padding-block: 0; padding-inline: 8px; }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) textarea:not([class*="el-"]) { padding-block: 6px; line-height: 1.6; }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) :is(input, select, textarea):not([class*="el-"]):not([type="checkbox"]):not([type="radio"]):hover:not(:disabled):not(:focus) {
+  border-color: var(--ctl-border-hover);
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) :is(input, select, textarea):not([class*="el-"]):not([type="checkbox"]):not([type="radio"]):focus {
+  border-color: var(--ctl-primary); box-shadow: var(--ctl-ring);
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) :is(input, select, textarea):not([class*="el-"]):disabled {
+  background: var(--ctl-disabled-bg); border-color: var(--ctl-disabled-border); color: var(--ctl-disabled-text); cursor: not-allowed;
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) :is(input, textarea):not([class*="el-"])::placeholder { color: var(--ctl-placeholder); }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) :is(input[type="checkbox"], input[type="radio"]):not([class*="el-"]) {
+  width: 16px; height: 16px; accent-color: var(--ctl-primary);
+}
+
+/* Labels: native wrapping labels and Element Plus form items read the same */
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) label:not([class*="el-"]):has(> :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea)) {
+  color: var(--ctl-label); font-size: var(--ctl-font); font-weight: 500; line-height: 20px;
+}
+:where(#main-content, .el-drawer, .el-dialog) .el-form-item { margin-bottom: 16px; }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) .el-form-item__label {
+  color: var(--ctl-label); font-size: var(--ctl-font); font-weight: 500; line-height: 20px;
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) .el-form--label-top .el-form-item__label { height: auto; margin-bottom: 6px; padding: 0; }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) .el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label::before { color: var(--ctl-danger); }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) .el-checkbox__label,
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) .el-radio__label { color: var(--ctl-text); font-size: var(--ctl-font); }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) :is(.field-help, .form-help, .hint) { color: var(--ctl-muted); font-size: 12px; line-height: 1.6; }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) .el-form-item__content > .field-help { display: block; width: 100%; margin-top: 4px; }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) :is(h2, h3) > small { margin-left: 6px; color: var(--ctl-muted); font-size: 12px; font-weight: 400; }
+:where(#main-content, .el-drawer, .el-dialog) fieldset { min-width: 0; border-color: var(--ws-border, #e3e9f2); border-radius: 8px; }
+:where(#main-content, .el-drawer, .el-dialog) legend { padding: 0 6px; color: var(--ctl-title); font-size: var(--ctl-font); font-weight: 600; }
+
+/* Simple step bars */
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) .el-steps--simple { padding: 10px 16px; border-radius: 8px; background: #f6f8fb; }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) .el-step.is-simple .el-step__title { font-size: var(--ctl-font); line-height: 20px; white-space: nowrap; }
+
+/* File pickers */
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) input[type="file"] { max-width: 100%; color: var(--ctl-muted); font-size: var(--ctl-font); }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) input[type="file"]::file-selector-button {
+  min-height: var(--ctl-h); margin-right: 10px; padding: 5px 14px; border: 1px solid var(--ctl-border); border-radius: var(--ctl-radius);
+  background: #fff; color: var(--ctl-text); font: inherit; font-size: var(--ctl-font); cursor: pointer;
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) input[type="file"]:hover:not(:disabled)::file-selector-button { border-color: var(--ctl-border-hover); background: var(--ctl-hover-bg); color: var(--ctl-primary); }
+
+/* Short rule notes inside overlays (security, format, visibility) */
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog) .overlay-note { margin: 0 0 12px; color: var(--ctl-muted); font-size: 12px; line-height: 1.6; }
+
+/* Page-header navigation links read as secondary buttons */
+.prototype-shell #main-content .compact-page-toolbar a:not(.el-button):not(.feature-tabs a):not(.proto-tabs a) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: var(--ctl-h); padding: 5px 14px;
+  border: 1px solid var(--ctl-border); border-radius: var(--ctl-radius); background: #fff; color: var(--ctl-text);
+  font-size: var(--ctl-font); font-weight: 400; line-height: 20px; text-decoration: none; white-space: nowrap;
+}
+.prototype-shell #main-content .compact-page-toolbar a:not(.el-button):not(.feature-tabs a):not(.proto-tabs a):hover { border-color: var(--ctl-border-hover); background: var(--ctl-hover-bg); color: var(--ctl-primary); }
+
+/* ---------- Drawers ---------- */
+.el-drawer:not(.mobile-navigation-drawer) { --el-drawer-padding-primary: 20px; box-shadow: -8px 0 32px rgba(16, 42, 84, .14); }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer):not(.ticket-detail-drawer)) > .el-drawer__header {
+  display: flex; align-items: center; gap: 12px; min-height: 56px; margin: 0; padding: 12px 12px 12px 20px;
+  border-bottom: 1px solid var(--ctl-divider); background: #fff; color: var(--ctl-title);
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer):not(.ticket-detail-drawer)) > .el-drawer__header .el-drawer__title {
+  font-size: 16px; font-weight: 600; line-height: 24px; color: var(--ctl-title);
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer)) > .el-drawer__header .el-drawer__close-btn {
+  display: grid; place-items: center; width: var(--ctl-h); height: var(--ctl-h); min-width: 0; min-height: 0; margin: 0;
+  border-radius: var(--ctl-radius); color: var(--ctl-muted); font-size: 16px;
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer)) > .el-drawer__header .el-drawer__close-btn:hover { background: #f1f5fa; color: var(--ctl-title); }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer):not(.ticket-detail-drawer)) > .el-drawer__body { padding: 20px; }
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer):not(.ticket-detail-drawer)) > .el-drawer__footer {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px;
+  padding: 12px 20px; border-top: 1px solid var(--ctl-divider); background: #fff;
+}
+:is(#main-content, .el-drawer:not(.mobile-navigation-drawer)) > .el-drawer__footer .el-button { margin: 0; }
+
+/* ---------- Dialogs ---------- */
+:is(#main-content, .el-dialog).el-dialog {
+  --el-dialog-padding-primary: 0; padding: 0; border-radius: 12px; overflow: hidden;
+  box-shadow: 0 16px 48px rgba(16, 42, 84, .18);
+}
+:is(#main-content, .el-dialog) > .el-dialog__header {
+  position: relative; margin: 0; padding: 16px 56px 14px 20px; border-bottom: 1px solid var(--ctl-divider); font-weight: 600;
+}
+:is(#main-content, .el-dialog) > .el-dialog__header .el-dialog__title { font-size: 16px; font-weight: 600; line-height: 24px; color: var(--ctl-title); }
+:is(#main-content, .el-dialog) > .el-dialog__header .el-dialog__headerbtn {
+  top: 10px; right: 10px; display: grid; place-items: center; width: var(--ctl-h); height: var(--ctl-h);
+  min-width: 0; min-height: 0; border-radius: var(--ctl-radius);
+}
+:is(#main-content, .el-dialog) > .el-dialog__header .el-dialog__headerbtn:hover { background: #f1f5fa; }
+:is(#main-content, .el-dialog) > .el-dialog__body { padding: 20px; color: var(--ctl-text); font-size: var(--ctl-font); }
+:is(#main-content, .el-dialog) > .el-dialog__footer {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px;
+  padding: 12px 20px; border-top: 1px solid var(--ctl-divider); background: #fafbfd;
+}
+:is(#main-content, .el-dialog) > .el-dialog__footer .el-button { margin: 0; }
+
+/* ---------- Message boxes (confirmations) ---------- */
+.el-message-box {
+  --el-messagebox-padding-primary: 0; padding: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 16px 48px rgba(16, 42, 84, .18);
+}
+.el-message-box > .el-message-box__header { padding: 16px 56px 12px 20px; }
+.el-message-box .el-message-box__title { font-size: 16px; font-weight: 600; line-height: 24px; color: var(--ctl-title); }
+.el-message-box .el-message-box__headerbtn { top: 10px; right: 10px; width: var(--ctl-h); height: var(--ctl-h); border-radius: var(--ctl-radius); }
+.el-message-box > .el-message-box__content { padding: 0 20px 16px; color: var(--ctl-text); font-size: 14px; }
+.el-message-box > .el-message-box__btns {
+  display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--ctl-divider); background: #fafbfd;
+}
+.el-message-box > .el-message-box__btns .el-button { margin: 0; }
+
+@media (max-width: 760px) {
+  :is(#main-content, .el-drawer:not(.mobile-navigation-drawer):not(.ticket-detail-drawer)) > .el-drawer__body { padding: 14px; }
+  :is(#main-content, .el-drawer:not(.mobile-navigation-drawer):not(.ticket-detail-drawer)) > :is(.el-drawer__header, .el-drawer__footer) { padding-inline: 14px; }
+  :is(#main-content, .el-dialog).el-dialog { padding: 0; }
+  :is(#main-content, .el-dialog) > :is(.el-dialog__header, .el-dialog__body, .el-dialog__footer) { padding-inline: 14px; }
+  :is(#main-content, .el-dialog) > .el-dialog__header { padding-right: 60px; }
+  :is(#main-content, .el-drawer:not(.mobile-navigation-drawer), .el-dialog, .el-message-box) :is(.el-dialog__footer, .el-drawer__footer, .el-message-box__btns) .el-button { flex: 1 1 auto; }
+}
+
+/* Table captions: consistent left-aligned title above data tables */
+:where(#main-content, .el-drawer, .el-dialog) caption{caption-side:top;text-align:left;font-size:13px;font-weight:600;color:#1f2d3d;padding:10px 10px 8px}
+
+/* 窄屏下行内筛选表单堆叠时，标签统一左对齐 */
+@media (max-width: 767px) {
+  :where(#main-content, .el-drawer, .el-dialog) .el-form--inline .el-form-item__label {
+    justify-content: flex-start;
+    text-align: left;
+  }
+}

@@ -40,7 +40,7 @@ const ageText = computed(() => {
   <section class="sample-freshness" aria-label="采样与读取时间">
     <h3>采样时效与读取基准</h3>
     <dl><div><dt>服务端响应时间（UTC）</dt><dd data-testid="response-date">{{ responseDate }}</dd></div><div><dt>原始采样时间（UTC）</dt><dd data-testid="sample-date">{{ sampleDate }}</dd></div><div><dt>样本时效估算</dt><dd data-testid="sample-age">{{ ageText }}</dd></div></dl>
-    <p class="sample-freshness-note">注：刷新仅读取服务端最新已存记录，不触发设备即时重采；样本时效估算仅供运维参考，不作为 SLA 判定依据。</p>
+    <p class="sample-freshness-note">刷新仅读取已存记录，不触发设备即时重采。</p>
   </section>
 </template>
 <style scoped>

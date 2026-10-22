@@ -36,8 +36,7 @@ const guidance = computed(() => problem.value?.code === 'BACKUP_VERSION_INVENTOR
 </script>
 <template>
   <section v-if="permitted" ref="root" class="backup-inventory detail-section" :aria-labelledby="headingId" :aria-busy="state.busy">
-    <h3 :id="headingId" ref="heading" tabindex="-1">已登记备份版本</h3>
-    <p>只读查询当前资产经独立授权的版本登记记录。登记及运行完成不等于当前对象健康、可下载或可恢复；此处不访问对象存储，不解密，不执行设备命令。</p>
+    <h3 :id="headingId" ref="heading" tabindex="-1">已登记备份版本 <small class="inventory-note">只读 · 不访问对象存储</small></h3>
     <div class="inventory-actions">
       <button type="button" :disabled="state.busy" @click="read(reader.first)">{{ state.target ? '从首页重新读取' : '读取已登记版本' }}</button>
       <button v-if="state.busy" type="button" @click="cancel">取消读取</button>
@@ -55,7 +54,7 @@ const guidance = computed(() => problem.value?.code === 'BACKUP_VERSION_INVENTOR
           <tbody><tr v-for="item in state.current.items" :key="item.version_id"><th scope="row">{{ item.version_id }}</th><td><time :datetime="item.registered_at">{{ item.registered_at }}</time><br /><time :datetime="item.object_observed_at">{{ item.object_observed_at }}</time></td><td>{{ item.run_id }}<br />尝试 {{ item.attempt_number }} · 完成运行版本 {{ item.completed_run_version }}</td><td>{{ item.encrypted_bytes }} 字节<br /><span>{{ item.encrypted_sha256 }}</span></td></tr></tbody>
         </table>
       </div>
-      <p>当前对象健康、下载授权、设备执行授权、保留策略与恢复验证均未确认。不能将本列表作为可恢复性证明。</p>
+      <p>不能将本列表作为可恢复性证明。</p>
     </section>
   </section>
 </template>

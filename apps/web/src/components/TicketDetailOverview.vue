@@ -135,9 +135,9 @@ const stages = ['工单发起', '工单受理', '原因定位', '解决方案', 
       </div>
     </div>
     <TicketLifecyclePanel ref="lifecyclePanel" :ticket="ticket" :refresh-key="refreshKey" />
-    <footer class="ticket-overview-bottom"><span>登记凭证与生命周期分别展示；流转状态以“工单流转”读回为准，外部同步与 SLA 考核尚未完成接线。</span><div class="ticket-overview-actions"><el-button disabled title="挂起状态与SLA暂停规则尚未接入">挂起</el-button><el-button disabled title="协助申请与分派规则尚未接入">申请协助</el-button><el-button v-if="canNotes && can('ticket_notes:write_internal')" type="primary" @click="emit('notes')">新增处理记录</el-button><el-button v-else-if="canComments && can('ticket_comments:write')" type="primary" @click="emit('comments')">追加沟通记录</el-button><el-button @click="closeOverview">返回列表</el-button></div></footer>
+    <footer class="ticket-overview-bottom"><div class="ticket-overview-actions"><el-button disabled title="挂起状态与SLA暂停规则尚未接入">挂起</el-button><el-button disabled title="协助申请与分派规则尚未接入">申请协助</el-button><el-button v-if="canNotes && can('ticket_notes:write_internal')" type="primary" @click="emit('notes')">新增处理记录</el-button><el-button v-else-if="canComments && can('ticket_comments:write')" type="primary" @click="emit('comments')">追加沟通记录</el-button><el-button @click="closeOverview">返回列表</el-button></div></footer>
     <section class="ticket-detail-card ticket-supporting-card"><details><summary>报障照片与登记凭证 <span>查看附件、登记操作与记录标识</span></summary><div class="ticket-supporting-content"><slot /></div></details></section>
-    <p class="ticket-record-explanation">登记凭证与生命周期分别展示；流转状态以“工单流转”读回为准，外部同步与 SLA 考核尚未完成接线。</p>
+    
     <p v-if="canNotes" class="ticket-record-explanation">新增处理记录保存为仅内部可见的备注；需要客户查看的内容请使用“客户沟通”。</p>
   </div>
   <p v-else role="status">当前身份或租户无法查看此工单，请返回列表重新查询。</p>

@@ -37,24 +37,22 @@ defineExpose({ change, analyze, clearInput, state })
 </script>
 <template>
  <section class="threshold-page">
-  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">告警阈值规则诊断</h1></div><router-link to="/configurations">返回配置提案</router-link></div>
-  <p v-if="permitted"><router-link class="observation-entry" to="/observation-window-diagnostics">继续核对显式采样观察窗</router-link>（独立只读诊断，不确认真实恢复）</p>
-  <p class="threshold-notice">当前输入的候选规则仅用于页面逻辑校验，未保存至服务端且不会直接下发至生产监控。</p><details class="boundary-details"><summary>客户确认与数学检查边界</summary><p class="inline-boundary">阈值冲突原样保留提示，系统不会自动改写数值或反转比较符</p></details>
+  <div class="compact-page-toolbar page-heading"><div><h1 class="page-title-sr">告警阈值规则诊断</h1></div><div class="toolbar-links"><router-link v-if="permitted" class="observation-entry" to="/observation-window-diagnostics">采样观察窗诊断</router-link><router-link to="/configurations">返回配置提案</router-link></div></div>
   <el-empty v-if="!permitted" description="仅当前平台配置管理员可以诊断共享阈值候选" />
   <template v-else>
    
    <ApiErrorNotice :error="state.error" />
-   <div class="threshold-layout"><div class="threshold-main"><section v-if="!state.result" class="threshold-panel threshold-empty"><div class="panel-heading"><h2>阈值条件预览</h2><span>待诊断</span></div><div class="condition-grid"><section class="condition"><h4>警告条件</h4><strong>—</strong><p>比较符、阈值与单位待明确</p></section><section class="condition"><h4>严重条件</h4><strong>—</strong><p>比较符、阈值与单位待明确</p></section><section class="condition"><h4>恢复条件</h4><strong>—</strong><p>比较符、阈值与单位待明确</p></section></div><div class="diagnostic-empty"><span>⌘</span><h3>等待输入候选规则</h3><p>在右侧填写候选 JSON 并发起诊断，此处将展示告警条件、冲突项与区间关系校验结果。</p><small>按实际输入原样校验，不预填默认阈值或自动反转比较符</small></div></section><section v-if="state.result" class="threshold-panel" aria-live="polite"><h2>{{ statusLabel }}</h2><p>诊断版本 {{ state.result.analysis_version }} · 数据来源为本次录入候选，不代表当前生产生效规则。</p>
-    <ul class="issues"><li v-for="issue in state.result.issues" :key="issue.code"><strong>{{ issue.kind === 'CONFLICT' ? '冲突' : '未定' }}：</strong>{{ issueLabels[issue.code] }} <span class="help">{{ issue.code }}</span></li></ul><p v-if="state.result.issues.length === 0">当前候选条件未发现数学区间冲突（设备适用性与生产发布需结合客户确认基线另行核验）。</p>
+   <div class="threshold-layout"><div class="threshold-main"><section v-if="!state.result" class="threshold-panel threshold-empty"><div class="panel-heading"><h2>诊断结果</h2></div><div class="diagnostic-empty"><span aria-hidden="true">⌘</span><h3>尚未诊断</h3><p>在右侧粘贴候选 JSON 后开始诊断</p></div></section><section v-if="state.result" class="threshold-panel" aria-live="polite"><h2>{{ statusLabel }}</h2><p class="help">诊断版本 {{ state.result.analysis_version }} · 本次录入候选</p>
+    <ul class="issues"><li v-for="issue in state.result.issues" :key="issue.code"><strong>{{ issue.kind === 'CONFLICT' ? '冲突' : '未定' }}：</strong>{{ issueLabels[issue.code] }} <span class="help">{{ issue.code }}</span></li></ul><p v-if="state.result.issues.length === 0">未发现数学区间冲突。</p>
     <h3>原输入回显</h3><p>异常方向：{{ state.result.inputs.direction === 'HIGH_IS_BAD' ? '高值异常' : state.result.inputs.direction === 'LOW_IS_BAD' ? '低值异常' : '未确认' }}</p>
     <div class="condition-grid"><section v-for="item in conditions" :key="item.name" class="condition"><h4>{{ item.name }}条件</h4><p>{{ operator(item.value?.comparison) }} {{ item.value?.threshold ?? '阈值未确认' }}</p><p>单位：{{ item.value?.unit ?? '未确认' }}</p></section></div>
     <p>触发持续时长：{{ state.result.inputs.trigger_hold_seconds === null ? '未确认' : state.result.inputs.trigger_hold_seconds + ' 秒' }}；恢复持续时长：{{ state.result.inputs.recovery_hold_seconds === null ? '未确认' : state.result.inputs.recovery_hold_seconds + ' 秒' }}</p>
     <h3>精确关系检查</h3><dl class="relations"><dt>比较符方向一致</dt><dd>{{ booleanText(state.result.direction_consistent) }}</dd><dt>严重条件比警告更严格</dt><dd>{{ booleanText(state.result.critical_strict_subset_of_warning) }}</dd><dt>恢复与警告存在交集</dt><dd>{{ booleanText(state.result.recovery_overlaps_warning) }}</dd><dt>恢复与严重存在交集</dt><dd>{{ booleanText(state.result.recovery_overlaps_critical) }}</dd><dt>两个持续时长均非负</dt><dd>{{ booleanText(state.result.durations_nonnegative) }}</dd></dl>
-    <p class="inline-boundary">未保存、未应用，仍不可发布</p>
-   </section></div><aside class="threshold-side"><section class="threshold-panel"><div class="panel-heading"><h2>候选阈值输入</h2><span>JSON 格式</span></div><details class="boundary-details"><summary>输入格式与字段说明</summary><p>需包含完整六个根字段（未定项请填 null）。warning / critical / recovery 为 null 或包含完整 comparison / threshold / unit 三字段；阈值与秒数采用十进制字符串以保留完整精度。</p></details>
-    <details><summary>查看标准 JSON 结构示例（仅供参考，不会自动填入）</summary><pre>{{ example }}</pre><p>direction 可选 HIGH_IS_BAD / LOW_IS_BAD / null；comparison 可选 GT（&gt;）、GE（≥）、LT（&lt;）、LE（≤）或 null。单位按字面一致性核对，不自动执行跨单位换算。</p></details>
+    
+   </section></div><aside class="threshold-side"><section class="threshold-panel"><div class="panel-heading"><h2>候选阈值输入</h2><span>仅校验，不会直接下发至生产监控</span></div>
+    <details><summary>JSON 结构示例</summary><pre>{{ example }}</pre><p>direction 可选 HIGH_IS_BAD / LOW_IS_BAD / null；comparison 可选 GT（&gt;）、GE（≥）、LT（&lt;）、LE（≤）或 null。单位按字面一致性核对，不自动执行跨单位换算。</p></details>
     <el-input type="textarea" :rows="16" :model-value="state.text" :disabled="discarding" aria-label="阈值候选原始JSON" placeholder="请粘贴阈值候选 JSON（未确认项保持 null；请勿填写密码、Token 或密钥）" @update:model-value="change($event)" />
-    <p class="help">支持最大 16KiB、3 层嵌套、256 个 JSON Token；十进制字符串最多 40 位整数 / 40 位小数。修改输入后将自动清空旧诊断结果。</p>
+    <p class="help">≤16KiB · 3 层嵌套 · 256 个 Token · 小数最多 40 位整数 / 40 位小数</p>
     <div class="threshold-actions"><el-button type="primary" :disabled="state.busy || discarding || !state.text" :loading="state.busy" @click="analyze">开始诊断</el-button><el-button :disabled="discarding || !state.text" @click="clearInput">清除输入与结果</el-button></div>
    </section></aside></div>
   </template>
@@ -88,5 +86,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere}
 .threshold-page :deep(textarea){font-family:monospace;font-size:12px;line-height:1.7;background:#fafcff}
 @media(max-width:1050px){.threshold-layout{grid-template-columns:1fr}.threshold-side{grid-row:1}.threshold-layout :deep(textarea){max-height:230px}}
 @media(max-width:700px){.threshold-panel{padding:14px}.condition-grid,.relations{grid-template-columns:1fr}.relations dd{margin-bottom:8px}.threshold-page .el-button{min-height:44px}.page-heading{align-items:flex-start;gap:12px;flex-direction:column}}
-.observation-entry{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;padding:8px 12px;border:1px solid #8293a6;border-radius:4px;color:#185695;text-decoration:underline}.observation-entry:focus-visible{outline:3px solid #176bb5;outline-offset:3px}
+.observation-entry:focus-visible{outline:3px solid #176bb5;outline-offset:3px}
+.toolbar-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.toolbar-links a{display:inline-flex;align-items:center;min-height:32px;box-sizing:border-box;padding:4px 12px;border:1px solid #c4cfdc;border-radius:6px;background:#fff;color:#185695;text-decoration:none;font-size:13px}.toolbar-links a:hover{border-color:#1f6fd1}
+.threshold-panel>.panel-heading{margin:-18px -18px 14px;border-radius:6px 6px 0 0}@media(max-width:700px){.toolbar-links a{min-height:44px}.threshold-panel>.panel-heading{margin:-14px -14px 12px}}
 </style>

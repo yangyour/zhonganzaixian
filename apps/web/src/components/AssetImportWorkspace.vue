@@ -63,7 +63,6 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
 
 <template>
   <el-drawer v-model="open" title="资产台账批量导入" size="940px" class="asset-import-drawer" :close-on-click-modal="false">
-    <el-alert type="info" :closable="false" title="本工作区仅暂存源文件、解析和保存旧 15 列映射，正式批量入库尚未开放。客户 33 列字典校验独立进行，不自动转换为旧模板。" />
     <AssetImportTemplateDownload />
     <el-steps class="asset-import-steps" :active="stage" simple aria-label="资产来源处理阶段"><el-step title="上传源文件"/><el-step title="配置解析"/><el-step title="表头预览"/><el-step title="字段映射"/><el-step title="待策略入库"/></el-steps>
     <el-skeleton v-if="policyLoading" :rows="3" animated aria-label="读取来源技术政策" />
@@ -76,7 +75,7 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
       <section class="asset-import-section">
         <h3>1. 源文件上传与受理</h3>
         <p v-if="policy" class="field-help tabular-nums">支持 CSV / XLSX 格式文件：单文件大小上限 {{ (policy.max_source_bytes / 1024 / 1024).toLocaleString() }} MiB，最多支持 {{ policy.max_data_rows }} 数据行、{{ policy.max_source_columns }} 源列及 {{ policy.max_sheets }} 个工作表。</p>
-        <p class="field-help">上传后系统将对源文件计算 SHA-256 摘要并执行结构合法性校验。</p>
+        
         <input type="file" class="asset-import-file-input" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" :disabled="!policy || Boolean(busy || uploadAttempt || source)" aria-label="选择资产导入文件" @change="chooseFile">
         <p v-if="selectionMessage" class="import-error">{{ selectionMessage }}</p>
         <p v-if="file" class="mono tabular-nums">{{ file.name }} · {{ file.size.toLocaleString() }} bytes · 格式 {{ format }}</p>
@@ -142,7 +141,7 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
       <CmdbSourcePreflightPanel v-if="isParsed && source && artifact" :source="source" />
       <section v-if="isParsed && mappingDraft && source && artifact" class="asset-import-section">
         <h3>4. 标准 15 列字段映射与数据预览</h3>
-        <p class="field-help">请为每个平台标准字段指定对应的源列或选择“不映射（留空）”。其中“备注”为必映射字段，同一源列不可重复绑定；未绑定的其余源列请勾选“忽略源列”以确认跳过。</p>
+        <p class="field-help">为每个标准字段选择源列或“不映射”；“备注”必映射，同一源列不可重复绑定，其余源列请勾选“忽略源列”。</p>
         <div class="asset-import-mapping-grid">
           <div v-for="target in assetImportTargets" :key="target.code" class="asset-import-map-row">
             <label>{{ target.label }} <span class="mono">{{ target.code }}</span></label>
@@ -166,9 +165,8 @@ onUnmounted(() => { disposed = true; unregisterContextGuard(); window.removeEven
       </section>
 
       <section v-if="source" class="asset-import-section"><h3>5. 批量入库策略状态</h3>
-        <el-alert type="info" :closable="false" title="正式批量入库未开放，不代表仅启用配置即可完成"/>
         <ul aria-label="当前来源实际完成情况"><li>源文件归档：{{source.storage_status==='READY'?'已完成校验':source.storage_status==='FAILED'?'失败':'处理中'}}</li><li>表头与数据解析：{{isParsed?'已解析':source.parse_status==='FAILED'?'失败':source.parse_status==='SELECTION_REQUIRED'?'待选择工作表与表头':'尚未完成'}}</li><li>旧 15 列映射：{{source.mapping?'已保存':'尚未保存'}}</li></ul>
-        <p class="field-help">仍需完成引用与地址策略、配额及事务入库链路，并核验 Q20 / Q31 等未确认规则。本工作区不执行正式资产入库；来源检查或映射保存都不是导入批准。</p>
+        <p class="field-help">正式批量入库未开放：仍需完成引用与地址策略、配额及事务入库链路；本工作区不执行正式资产入库。</p>
       </section>
     </template>
   </el-drawer>

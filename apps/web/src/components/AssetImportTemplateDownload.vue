@@ -31,7 +31,7 @@ onUnmounted(() => { controller?.abort(); ++generation; for (const url of urls) U
     <div class="template-download-row">
       <div class="template-download-info">
         <strong>标准 15 列导入模板</strong>
-        <p class="field-help">包含平台标准 15 列资产台账表头，填写导入数据时请确保“备注”列完整填写。</p>
+        <p class="field-help">标准 15 列表头，“备注”列必填。</p>
       </div>
       <el-button :disabled="!permitted" :loading="busy" @click="download">下载标准 15 列空模板</el-button>
     </div>

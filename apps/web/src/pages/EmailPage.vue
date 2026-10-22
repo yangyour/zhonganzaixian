@@ -85,7 +85,7 @@ async function disable(row:EmailBinding){if(!bindings.value.some(item=>item===ro
    <div class="email-actions"><el-button :disabled="locked||editor.dirty.value" @click="check">检查邮件连接</el-button><el-button :disabled="locked||editor.dirty.value||!status.dispatch_enabled" @click="test">发送测试邮件</el-button><span>测试收件人：{{status.test_recipient}}</span></div>
   </section>
   <section class="admin-card"><div class="admin-card-head"><h2>平台账号收件地址</h2><span>由管理员明确绑定</span></div>
-   <p>请确认地址归属后绑定。用户可以将自己的站内通知发到已绑定邮箱。收件地址需列入服务端允许范围。</p>
+   
    <form class="account-search" @submit.prevent="browseAccounts(1,true)"><label>搜索平台账号<input ref="accountSearchInput" v-model="accountQuery" aria-label="搜索平台账号" maxlength="100" :disabled="loading||editor.busy()" /></label><el-button native-type="submit" :disabled="loading||editor.busy()">搜索账号</el-button></form>
    <div class="account-pages" aria-label="账号选项分页"><el-button :disabled="loading||editor.busy()||accountPage<=1" @click="browseAccounts(accountPage-1)">上一页账号</el-button><span role="status">账号选项第 {{accountPage}} 页，本页 {{users?.items.length??0}} 个{{users?.has_more?'，还有下一页':''}}</span><el-button :disabled="loading||editor.busy()||accountPage>=10000||!users?.has_more" @click="browseAccounts(accountPage+1)">下一页账号</el-button></div>
    <p v-if="users&&!users.items.length">当前搜索或页面没有可选的启用账号。可更改搜索，或返回上一页。</p>

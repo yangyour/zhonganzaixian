@@ -8,7 +8,7 @@ defineProps<{ value: InspectionDetail | InspectionRevision }>()
   <dl><div><dt>设备类型标识</dt><dd>{{ value.device_type }}</dd></div><div><dt>版本 / 检查项</dt><dd>v{{ value.version }} · {{ value.item_count }} 项</dd></div><div><dt>记录时间</dt><dd>{{ displayTime(value.recorded_at) }}</dd></div><div><dt>审批与发布状态</dt><dd>待审批 / 未发布</dd></div></dl>
   <p class="inspection-hash">内容 SHA256：{{ value.content_sha256 }}</p>
   <ol class="inspection-read-items"><li v-for="item in value.items" :key="item.key"><div><strong>{{ item.label }}</strong><span>{{ item.section }} · {{ item.key }}</span></div><p>{{ item.instruction === null ? '说明未填写' : item.instruction === '' ? '无说明（置空）' : item.instruction }}</p></li></ol>
-  <p class="inspection-note">当前为模板版本快照，仅作为巡检填报基准，不直接生成巡检结论。</p>
+  
  </div>
 </template>
 <style scoped>

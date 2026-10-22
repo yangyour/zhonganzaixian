@@ -300,7 +300,7 @@ defineExpose({state,workspace,members,loadMembers,cancelMembers,openWorkflow,ref
     <template v-else-if="tab==='roster'">
      <section v-if="canWriteInternal" class="member-tools" aria-label="内部候选人员" :aria-busy="members.busy">
       <h2>排班与接班人员选择</h2>
-      <p>候选来自当前租户的活跃内部工单处理人员；接口最多返回100人，超限报错而不截断。未出现不代表人员不存在或无排班资格，可按已知UUID填写，保存时重新核验。</p>
+      <p>候选为当前租户活跃处理人员（最多 100 人）；未列出时可按 UUID 填写。</p>
       <button ref="memberButton" type="button" :disabled="locked||members.busy" @click="loadMembers">{{members.error?'重试读取内部候选人员':'读取内部候选人员'}}</button>
       <button v-if="members.busy" type="button" @click="cancelMembers">取消候选读取</button>
       <p v-if="members.busy" role="status">正在读取候选人员；可以继续填写UUID，未自动选择人员。</p>
@@ -465,7 +465,7 @@ defineExpose({state,workspace,members,loadMembers,cancelMembers,openWorkflow,ref
 <style scoped>
 .oncall-board{display:grid;gap:16px}
 .workspace{display:grid;gap:16px}
-.member-tools{border:1px solid #8495aa;padding:12px;border-radius:5px}.member-tools p{line-height:1.6;overflow-wrap:anywhere}.member-tools button{margin-right:8px}
+.member-tools{border:1px solid #dce4ee;padding:12px;border-radius:5px}.member-tools p{line-height:1.6;overflow-wrap:anywhere}.member-tools button{margin-right:8px}
 .action-form{display:grid;gap:12px;padding:16px;border:1px solid var(--border,#d0d7de);border-radius:8px;background:var(--surface-subtle,#f8fafc)}
 .split-forms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
@@ -474,7 +474,7 @@ defineExpose({state,workspace,members,loadMembers,cancelMembers,openWorkflow,ref
 .table-wrap{max-width:100%;overflow:auto}
 .table-wrap:focus-visible,button:focus-visible,.back:focus-visible,.workflow-link:focus-visible{outline:3px solid #2563eb;outline-offset:3px}
 .workflow-link{display:inline-flex;flex-direction:column;justify-content:center;gap:4px;min-height:44px;min-width:44px;color:#164e91;text-decoration:underline;overflow-wrap:anywhere}
-caption{text-align:left;font-weight:700;padding:8px 0}
+caption{text-align:left;font-weight:600;font-size:13px;color:#1f2d3d;padding:12px 10px 8px}
 .step-pill{display:inline-block;margin:2px 6px 2px 0;padding:2px 8px;border-radius:12px;background:#eef2ff;font-size:12px}
 .danger{color:#b91c1c;font-weight:700}
 button,input,select,textarea,.back{min-height:44px}

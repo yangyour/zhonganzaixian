@@ -58,7 +58,7 @@ defineExpose({ hasUnresolved: workspace.unresolved, canLeave, inputSnapshot, can
 <template>
   <el-drawer v-model="open" title="客户沟通记录（报障人及授权工程师可见）" size="820px" class="ticket-comment-drawer" :close-on-click-modal="false">
     <p v-if="ticket && permitted"><strong>{{ ticket.title }}</strong><span class="ticket-comment-id">{{ ticket.receipt_no }} · {{ ticket.id }}</span></p>
-    <el-alert type="info" :closable="false" title="本栏评论对报障人及当前租户授权工程师公开，保存后作为正式沟通记录留存（不可编辑或删除）。请勿复制内部备注或填写密码、密钥信息。" />
+    <p class="overlay-note">保存后不可编辑或删除；请勿复制内部备注或填写密码、密钥信息</p>
     <el-empty v-if="!permitted" description="当前身份或租户没有客户沟通评论权限" />
     <template v-else>
       <div class="ticket-comment-actions"><el-button :loading="state.busy === 'read'" :disabled="state.busy === 'write'" @click="workspace.refresh()">刷新列表</el-button><el-button :disabled="Boolean(state.busy) || !state.page?.has_more" @click="workspace.refresh(true)">下一页</el-button><span>{{ state.paged ? '后续页' : '第 1 页' }} · 每页 15 条</span></div>

@@ -146,7 +146,6 @@ defineExpose({ hasUnresolved: workspace.unresolved, hasDraft, canLeave, canRepla
 
 <template>
   <el-drawer v-model="open" title="资产依赖关系草稿" size="900px" class="asset-dependency-drawer" :close-on-click-modal="false">
-    <el-alert type="info" :closable="false" title="维护当前设备的上下游拓扑依赖草稿；告警收敛抑制与影响传导策略将在配置项 Q20 启用后生效。" />
     <div v-if="asset" class="dependency-asset-banner"><strong>{{ asset.name }}</strong><span class="dependency-id mono">{{ asset.id }}</span></div>
     <el-empty v-if="!permitted" description="当前资产不在有效租户上下文中，请重新打开资产详情" />
     <template v-else>
@@ -160,12 +159,12 @@ defineExpose({ hasUnresolved: workspace.unresolved, hasDraft, canLeave, canRepla
       <el-skeleton v-if="state.busy === 'read'" :rows="3" animated />
       <template v-if="state.draft">
         <p v-if="state.draft.version === 0" class="field-help">当前租户暂未登记设备依赖关系草稿。</p>
-        <p class="field-help">流向说明：上游设备 → 下游设备。下方展示与当前设备直接关联的依赖边，提交时基于租户完整拓扑图版本校验。</p>
+        <p class="field-help">上游设备 → 下游设备</p>
         <DependencyEdgeTable :edges="visibleEdges" :asset-id="asset?.id || ''" :asset-name="asset?.name || ''" :labels="candidateLabels" :scope-key="contextKey" :graph-version="state.draft.version" />
       </template>
       <section v-if="writable" class="dependency-form">
         <h3>新增依赖关系草稿</h3>
-        <p class="field-help">新增依赖边采用追加方式保存，系统自动校验并拦截自环、跨租户引用与有向环路。</p>
+        
         <el-form label-position="top" @submit.prevent="save">
           <el-form-item label="查找关联设备"><div class="dependency-search"><el-input v-model="query" aria-label="依赖设备搜索" :disabled="locked || optionsLoading" placeholder="输入设备名称或管理 IP" @keydown.enter.prevent="searchAssets" /><el-button :disabled="locked" :loading="optionsLoading" @click="searchAssets">查询设备</el-button></div></el-form-item>
           <ReadRecoveryActions :busy="optionsLoading ? 'read' : null" :can-retry="canRetrySearch" :scope-key="contextKey" label="关联设备" :cancel="cancelSearch" :retry="retrySearch" />
@@ -183,7 +182,7 @@ defineExpose({ hasUnresolved: workspace.unresolved, hasDraft, canLeave, canRepla
       </section>
       <p v-else class="field-help">当前账号仅具查看权限，不可新增或修改依赖草稿。</p>
     </template>
-    <template #footer><el-button @click="open = false">收起面板</el-button><span class="field-help">收起面板保留未保存输入，也不会中断正在执行的请求；待确认状态将保留在当前会话中。</span></template>
+    <template #footer><el-button @click="open = false">收起面板</el-button></template>
   </el-drawer>
 </template>
 

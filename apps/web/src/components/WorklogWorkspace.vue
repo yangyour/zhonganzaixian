@@ -81,7 +81,6 @@ defineExpose({ hasUnresolved: workspace.unresolved, canLeave, inputSnapshot, can
 <template>
   <el-drawer v-model="open" title="本人工时填报与记录" size="900px" class="worklog-drawer" :close-on-click-modal="false">
     <p v-if="ticket"><strong>{{ ticket.title }}</strong><span class="worklog-id">{{ ticket.receipt_no }} · {{ ticket.id }}</span></p>
-    <el-alert type="info" :closable="false" title="记录工程师实际作业起止时间（跨日记录按原始时段保存，不自动拆分；计费核算以商务结算规则为准）。" />
     <el-empty v-if="!permitted" description="当前身份或租户没有本人工时权限，请重新打开详情" />
     <template v-else>
       <div class="worklog-actions"><el-button :loading="state.busy === 'read'" :disabled="state.busy === 'write'" @click="workspace.refresh()">刷新列表</el-button><el-button :disabled="Boolean(state.busy) || !state.page?.has_more" @click="workspace.refresh(true)">下一页</el-button><span>{{ state.paged ? '后续页' : '第 1 页' }} · 每页 15 条 · 仅本人记录</span></div>

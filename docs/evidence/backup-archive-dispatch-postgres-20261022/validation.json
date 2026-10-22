@@ -1,0 +1,47 @@
+{
+  "status": "PASS_ACTUAL_DISPOSABLE_POSTGRES_SYNTHETIC_EXTERNAL_ADAPTERS",
+  "actual_postgresql_tests": {
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "default_maven_verify": {
+    "tests": 4170,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1037,
+    "executed": 3133
+  },
+  "default_gate": "5_NEW_TESTS_SKIPPED_WITHOUT_EXPLICIT_DISPOSABLE_ENVIRONMENT",
+  "existing_sql_resources_unchanged": 50,
+  "migrations": {
+    "initial_baseline": 4,
+    "independent_feature_steps": 46,
+    "duplicate_apply": 0,
+    "read_only_check_before": 0,
+    "read_only_check_after": 0
+  },
+  "mop_business_tables": 110,
+  "unrelated_tables_unchanged": 105,
+  "expected_changed_tables": [
+    "mop_asset",
+    "mop_backup_device_lease_event",
+    "mop_backup_run_event",
+    "mop_backup_archive_submission",
+    "mop_backup_archive_event"
+  ],
+  "cleanup": {
+    "server_stopped": true,
+    "temporary_database_and_credentials_removed": true
+  },
+  "worker_jar_excludes_test_class": true,
+  "worker_jar_sha256": "aead0887fc4dd09d9a7bf6afd2ab43a5fa829c722ee8459eff066010f97f1d29",
+  "test_source_sha256": "c42014b544fc720a26541fe5bada5809db53de7bf6e22bbf5de2459eb607d010",
+  "preserved_failure": "Initial test compilation referenced package-private schema verifiers. Replaced with explicit independent CLI verification plus 50-entry gate; no product visibility or SQL change.",
+  "evidence_provenance": "Actual test counts saved during lifecycle from Surefire XML before subsequent default verify replaced it with skipped results. Names listed from source, no individual timing claim.",
+  "real_device_kms_oss_calls": 0,
+  "production_authorization": "NOT_VERIFIED_SYNTHETIC_CALLBACKS_ONLY",
+  "browser": "105_SPECIFICATIONS_12_FILES_ACTUAL_NOT_RUN",
+  "formal_contract_tc": "128_NOT_RUN"
+}

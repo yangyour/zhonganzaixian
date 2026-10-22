@@ -1,0 +1,23 @@
+{
+  "index_url": "https://deb.debian.org/debian/dists/trixie/main/binary-amd64/Packages.xz",
+  "packages": [
+    {
+      "package": "libpq5",
+      "version": "17.11-0+deb13u1",
+      "sha256": "20a4c9ef58b4baf90deda67cfb2cc062871c062830dddc234d28f5ac7931b86b",
+      "url": "https://deb.debian.org/debian/pool/main/p/postgresql-17/libpq5_17.11-0+deb13u1_amd64.deb"
+    },
+    {
+      "package": "postgresql-17",
+      "version": "17.11-0+deb13u1",
+      "sha256": "d2ce1ddffafa783f9acda4c92c86fc21e8288bff3782d739294f14fa797d7886",
+      "url": "https://deb.debian.org/debian/pool/main/p/postgresql-17/postgresql-17_17.11-0+deb13u1_amd64.deb"
+    },
+    {
+      "package": "postgresql-client-17",
+      "version": "17.11-0+deb13u1",
+      "sha256": "9d8558f8dd57c8e92e218a20698383575d53742ca3f9e7c2b7fe5f246d5216ae",
+      "url": "https://deb.debian.org/debian/pool/main/p/postgresql-17/postgresql-client-17_17.11-0+deb13u1_amd64.deb"
+    }
+  ]
+}

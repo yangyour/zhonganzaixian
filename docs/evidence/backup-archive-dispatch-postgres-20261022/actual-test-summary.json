@@ -1,0 +1,16 @@
+{
+  "actual_run_summary": {
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "source_declared_test_names": [
+    "actualJournalOriginalWriterAndVerificationCommitWithoutRunCompletion",
+    "committedPutWithLostReplyRecoversAcrossNewConsumerWithoutSecondPut",
+    "existingDispatchWithNoObservedObjectNeverAuthorizesNewPut",
+    "concurrentConsumerDuringBlockedPutCanOnlyReconcileAndNeverDuplicatesStore",
+    "revokedAuthorityAfterClaimBlocksWriteAndCannotPretendNoDispatch"
+  ],
+  "source": "Counts captured from actual Surefire XML by lifecycle harness before default gated rerun; names from the five declared test methods. No individual timing claim."
+}

@@ -32,3 +32,7 @@ deploy/examples/backup-execution-dependencies.json 新增 archive_dispatch_consu
 - 前端生产代码未变；浏览器105项/12文件仅可发现、实际NOT_RUN；128正式合同TC仍NOT_RUN。
 
 证据位于 docs/evidence/backup-archive-dispatch-consumer-20261022/。没有将消费者类存在等同于生产Worker运行或端到端备份成功。
+
+## 后续实际数据库验证
+
+[2026-10-22实库组合验证](backup-archive-dispatch-postgres-20261022.md)新增5项真实PG/JCE消费者检查，验证原命令恢复、并发仅一次PUT和撤权。此增量不改变本节合成KMS/存储/授权、未启用调度与未登记版本的边界；旧33项纯逻辑/适配器测试不重新改称实库测试。

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ElTableColumn } from 'element-plus'
+import { ElTableColumn, ElMessageBox } from 'element-plus'
 import { computed, nextTick, onUnmounted, ref, shallowRef, watch } from 'vue'
-import { onBeforeRouteLeave } from 'vue-router'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { feedback as ElMessage } from '../utils/feedback'
 import { api, ApiError, isCancelled } from '../api/client'
 import type { Asset } from '../api/types'
@@ -16,6 +16,8 @@ import AppTable from './AppTable.vue'
 const props = defineProps<{ modelValue: boolean; asset: Asset | null }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
 const open = computed({ get: () => props.modelValue, set: value => emit('update:modelValue', value) })
+let confirmEpoch = 0
+const confirming = ref(false)
 let disposed = false, focusEpoch = 0, submittedSnapshot: string | null = null
 const readError = ref<HTMLElement>(), graphHeading = ref<HTMLElement>(), searchError = ref<HTMLElement>(), searchNotice = ref<HTMLElement>()
 const state = shallowRef<DependencyState>(emptyDependencyState())
@@ -23,7 +25,7 @@ const workspace = createDependencyWorkspace(api, value => { state.value = value 
 const permitted = computed(() => Boolean(session.value && props.asset?.tenant_id === session.value.tenant.id && can('assets:read') && !switchingTenant.value))
 const writable = computed(() => permitted.value && can('assets:write'))
 const unresolved = computed(() => state.value.busy === 'write' || state.value.attempt?.state === 'uncertain')
-const locked = computed(() => !writable.value || !state.value.draft || Boolean(state.value.busy) || unresolved.value)
+const locked = computed(() => !writable.value || !state.value.draft || Boolean(state.value.busy) || unresolved.value || confirming.value)
 const visibleEdges = computed(() => state.value.draft?.proposed_edges.filter(edge => edge.parent_id === props.asset?.id || edge.child_id === props.asset?.id) || [])
 const query = ref(''), options = ref<Asset[]>([]), optionsLoading = ref(false), optionsError = ref<unknown>(null), moreOptions = ref(false)
 const searchAttempt = ref<string | null>(null), searchCancelled = ref(false), searchCompleted = ref(false)
@@ -32,7 +34,7 @@ let searchController: AbortController | undefined, searchGeneration = 0
 const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.account_version, session.value?.user.role, session.value?.mode, session.value?.capabilities, permitted.value, writable.value, props.asset?.tenant_id, props.asset?.id]))
 function clearForm() { selected.value = ''; direction.value = ''; proposedType.value = ''; proposedScope.value = ''; proposedEnabled.value = 'unknown'; validation.value = '' }
 watch(contextKey, () => {
-  focusEpoch++; submittedSnapshot = null; searchAttempt.value = null; searchCancelled.value = false; searchCompleted.value = false; searchController?.abort(); ++searchGeneration; options.value = []; optionsLoading.value = false; optionsError.value = null; moreOptions.value = false; query.value = ''; clearForm()
+  focusEpoch++; confirmEpoch++; confirming.value = false; submittedSnapshot = null; searchAttempt.value = null; searchCancelled.value = false; searchCompleted.value = false; searchController?.abort(); ++searchGeneration; options.value = []; optionsLoading.value = false; optionsError.value = null; moreOptions.value = false; query.value = ''; clearForm()
   const current = session.value
   workspace.reset(permitted.value && current && props.asset ? { tenantId: current.tenant.id, assetId: props.asset.id, actorId: current.user.id, permissionVersion: current.permission_version, canWrite: writable.value } : null)
   if (open.value && permitted.value) void loadGraph()
@@ -87,7 +89,7 @@ async function retryOriginal() {
   clearSubmitted(original); return true
 }
 async function save() {
-  if (locked.value || !props.asset) return
+  if (locked.value || optionsLoading.value || !props.asset) return
   if (!options.value.some(item => item.id === selected.value)) { validation.value = '请先查询并选择当前租户的另一台设备'; return }
   if (!['upstream', 'downstream'].includes(direction.value)) { validation.value = '请选择上下游依赖方向'; return }
   const edge: ProposedDependency = { parent_id: direction.value === 'upstream' ? selected.value : props.asset.id, child_id: direction.value === 'upstream' ? props.asset.id : selected.value, proposed_type: proposedType.value.trim() || null, proposed_suppression_scope: proposedScope.value.trim() || null, proposed_enabled: proposedEnabled.value === 'unknown' ? null : proposedEnabled.value === 'true' }
@@ -96,12 +98,50 @@ async function save() {
   catch { if (!disposed && owner === contextKey.value) validation.value = '请检查输入内容：依赖类型不超过 64 字符、抑制范围不超过 128 字符，且不含控制字符' }
 }
 function label(id: string) { return id === props.asset?.id ? props.asset.name : options.value.find(item => item.id === id)?.name || id }
-function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved()) { event.preventDefault(); event.returnValue = '' } }
+const hasDraft = computed(() => Boolean(selected.value || direction.value || proposedType.value || proposedScope.value || proposedEnabled.value !== 'unknown'))
+function inputSnapshot() { return JSON.stringify([contextKey.value,formSnapshot(),state.value.draft,options.value,searchAttempt.value,state.value.attempt?.key,state.value.attempt?.state,workspace.unresolved()]) }
+async function confirmDiscard() {
+  if (disposed || confirming.value) return false
+  if (workspace.unresolved()) { ElMessage.warning('依赖关系草稿保存状态待确认，不能放弃原请求'); return false }
+  if (!hasDraft.value) return true
+  const before = inputSnapshot(), owner = contextKey.value, turn = ++confirmEpoch; confirming.value = true
+  try {
+    await ElMessageBox.confirm('将放弃尚未保存的依赖关系草稿输入，是否继续？','保留依赖关系草稿',{type:'warning',confirmButtonText:'放弃未保存输入',cancelButtonText:'继续编辑'})
+    return !disposed && turn === confirmEpoch && owner === contextKey.value && before === inputSnapshot() && !workspace.unresolved()
+  } catch { return false }
+  finally { if (!disposed && turn === confirmEpoch && owner === contextKey.value) confirming.value = false }
+}
+async function cancelEdit() {
+  if (disposed || !writable.value || state.value.busy || unresolved.value || confirming.value || optionsLoading.value) return false
+  const before = inputSnapshot(), owner = contextKey.value
+  if (!await confirmDiscard() || disposed || owner !== contextKey.value || before !== inputSnapshot() || workspace.unresolved()) return false
+  clearForm(); submittedSnapshot = null; return true
+}
+async function canLeave() {
+  if (disposed) return false
+  if (workspace.unresolved()) { ElMessage.warning('依赖关系草稿保存状态待确认，请先完成原请求重试，再离开、切换租户或退出'); return false }
+  return confirmDiscard()
+}
+async function canReplace(target: Asset) {
+  if (disposed || !session.value || switchingTenant.value || !can('assets:read') || target?.tenant_id !== session.value.tenant.id || typeof target.id !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(target.id)) return false
+  if (target.id === props.asset?.id) return true
+  const before = inputSnapshot(), owner = contextKey.value, selected = JSON.stringify(target)
+  return await canLeave() && !disposed && owner === contextKey.value && before === inputSnapshot() && selected === JSON.stringify(target) && !workspace.unresolved()
+}
+function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved() || hasDraft.value) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
-onBeforeRouteLeave(() => { if (!workspace.unresolved()) return true; ElMessage.warning('依赖关系保存状态待确认，请先完成重试后再离开页面'); return false })
-const unregisterContextGuard = contextTransitionGuards.register(() => { if (!workspace.unresolved()) return true; ElMessage.warning('资产依赖保存状态待确认，请先完成重试再切换租户或退出'); return false })
-onUnmounted(() => { disposed = true; focusEpoch++; unregisterContextGuard(); searchController?.abort(); ++searchGeneration; workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
-defineExpose({ hasUnresolved: workspace.unresolved, cancelRead: workspace.cancelRead, retryRead: retryGraph })
+const router = useRouter(); let routeEpoch = 0, removeResolve: (() => void) | undefined
+function clearRouteApproval() { removeResolve?.(); removeResolve = undefined; routeEpoch++ }
+async function canLeaveRoute() {
+  clearRouteApproval(); const turn = routeEpoch, before = inputSnapshot()
+  if (!await canLeave() || disposed || turn !== routeEpoch || before !== inputSnapshot()) return false
+  removeResolve = router.beforeResolve(() => !disposed && turn === routeEpoch && before === inputSnapshot() && !workspace.unresolved()); return true
+}
+onBeforeRouteLeave(canLeaveRoute)
+const removeAfterRoute = router.afterEach(clearRouteApproval), removeRouteError = router.onError(clearRouteApproval)
+const unregisterContextGuard = contextTransitionGuards.register(canLeave,inputSnapshot)
+onUnmounted(() => { disposed = true; focusEpoch++; confirmEpoch++; clearRouteApproval(); removeAfterRoute(); removeRouteError(); unregisterContextGuard(); searchController?.abort(); ++searchGeneration; workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
+defineExpose({ hasUnresolved: workspace.unresolved, hasDraft, canLeave, canReplace, inputSnapshot, cancelRead: workspace.cancelRead, retryRead: retryGraph })
 </script>
 
 <template>
@@ -143,12 +183,12 @@ defineExpose({ hasUnresolved: workspace.unresolved, cancelRead: workspace.cancel
           <el-form-item label="建议抑制范围（选填，最多 128 字符）"><el-input v-model="proposedScope" :disabled="locked" placeholder="如：downstream-reachability" aria-label="建议抑制范围" /></el-form-item>
           <el-form-item label="建议启用策略"><el-select v-model="proposedEnabled" :disabled="locked" aria-label="建议启用"><el-option label="暂不指定（待确认）" value="unknown" /><el-option label="建议启用（待策略生效）" value="true" /><el-option label="建议停用（待策略生效）" value="false" /></el-select></el-form-item>
           <p v-if="validation" role="alert" class="dependency-validation">{{ validation }}</p>
-          <el-button type="primary" native-type="submit" :disabled="locked || optionsLoading" :loading="state.busy === 'write'">保存依赖草稿</el-button>
+          <div class="dependency-actions"><el-button type="primary" native-type="submit" :disabled="locked || optionsLoading" :loading="state.busy === 'write'">保存依赖草稿</el-button><el-button :disabled="!writable || Boolean(state.busy) || unresolved || confirming || optionsLoading || !hasDraft" @click="cancelEdit">清空未保存输入</el-button></div>
         </el-form>
       </section>
       <p v-else class="field-help">当前账号仅具查看权限，不可新增或修改依赖草稿。</p>
     </template>
-    <template #footer><el-button @click="open = false">收起面板</el-button><span class="field-help">收起面板不会中断正在执行的请求；待确认状态将保留在当前会话中。</span></template>
+    <template #footer><el-button @click="open = false">收起面板</el-button><span class="field-help">收起面板保留未保存输入，也不会中断正在执行的请求；待确认状态将保留在当前会话中。</span></template>
   </el-drawer>
 </template>
 

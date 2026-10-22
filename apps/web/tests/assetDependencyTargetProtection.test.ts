@@ -1,0 +1,36 @@
+// @vitest-environment jsdom
+// Real parent AssetsPage and dependency child; unrelated workspaces and drawer shell are stubbed.
+import {createApp,h,nextTick,type App,type Slots} from 'vue'
+import {createRouter,createMemoryHistory,RouterView,type Router} from 'vue-router'
+import {afterEach,beforeEach,it,expect,vi} from 'vitest'
+import ElementPlus,{ElMessageBox} from 'element-plus'
+vi.mock('../src/components/AppTable.vue',()=>({default:{render:()=>null}}))
+vi.mock('../src/components/AssetImportWorkspace.vue',()=>({default:{render:()=>null}}))
+vi.mock('../src/components/AssetDateQuery.vue',()=>({default:{render:()=>null}}))
+vi.mock('../src/components/AssetMetadataQuery.vue',()=>({default:{render:()=>null}}))
+vi.mock('../src/components/AssetMetadataWorkspace.vue',()=>({default:{methods:{hasUnresolved:()=>false},render:()=>null}}))
+vi.mock('../src/components/ManualWarrantyWorkspace.vue',()=>({default:{methods:{hasUnresolved:()=>false},render:()=>null}}))
+vi.mock('../src/components/AssetDraftCreatePanel.vue',()=>({default:{render:()=>null}}))
+vi.mock('../src/components/LiveMonitoringPanel.vue',()=>({default:{render:()=>null}}))
+vi.mock('../src/components/AssetDateAssessmentPanel.vue',()=>({default:{render:()=>null}}))
+import Page from '../src/pages/AssetsPage.vue'
+import {api} from '../src/api/client'
+import {session,switchingTenant,contextGeneration} from '../src/stores/session'
+import type {Asset,Session} from '../src/api/types'
+import {context,draft} from './fixtures/assetDependency'
+import {current,id} from './fixtures/assetMetadata'
+let app:App|undefined,host:HTMLElement,page:any,editor:any,router:Router
+const a={...current().asset,id:context.assetId,tenant_id:context.tenantId} as Asset,b={...a,id:id(9),name:'second asset'} as Asset
+async function settle(){for(let i=0;i<16;i++){await Promise.resolve();await nextTick()}}
+async function mount(){router=createRouter({history:createMemoryHistory(),routes:[{path:'/assets',component:Page}]});await router.push('/assets');host=document.createElement('div');document.body.append(host);app=createApp({render:()=>h(RouterView,null,{default:({Component}:any)=>h(Component,{ref:(v:any)=>{if(v)page=v.$.setupState}})})}).use(router).use(ElementPlus);app.component('el-drawer',{setup(_p:unknown,{slots}:{slots:Slots}){return()=>h('section',[slots.default?.(),slots.footer?.()])}});app.mount(host);await router.isReady();await settle();page.asset=structuredClone(a);expect(await page.openDependencies()).toBe(true);await settle();editor=page.dependencyPanel.$.setupState;editor.proposedType='original unsaved';await settle()}
+beforeEach(()=>{contextGeneration.value=0;switchingTenant.value=false;session.value={user:{id:context.actorId,display_name:'Synthetic',role:'msp'},tenant:{id:context.tenantId,name:'Synthetic'},allowed_tenants:[],capabilities:['assets:read','assets:write'],permission_version:1,account_version:1,csrf_token:'SYNTHETIC',mode:'remote_test',identity_source:'synthetic-unit-only'} as Session;vi.spyOn(ElMessageBox,'confirm').mockResolvedValue('confirm' as Awaited<ReturnType<typeof ElMessageBox.confirm>>);vi.spyOn(api,'request').mockImplementation(async(url,o)=>{if(o?.method)throw Error('unconfirmed synthetic write');if(url.includes('/dependencies'))return {...draft(),asset_id:url.includes(b.id)?b.id:a.id} as any;if(url.startsWith('/assets?'))return {items:[a,b],has_more:false,next_cursor:null,source:'postgresql',page_size_limit:100,page_size_limit_kind:'test_technical_limit'} as any;if(url.startsWith('/assets/'))return a as any;throw Error('unexpected synthetic path')});vi.stubGlobal('ResizeObserver',class{observe(){}unobserve(){}disconnect(){}})})
+afterEach(()=>{app?.unmount();app=undefined;host?.remove();session.value=null;vi.restoreAllMocks();vi.unstubAllGlobals()})
+const deferred=()=>{let resolve!:(v:any)=>void;const promise=new Promise(r=>resolve=r);return{promise,resolve}}
+it('parent does not replace the editor when discard is declined',async()=>{await mount();page.asset=structuredClone(b);vi.mocked(ElMessageBox.confirm).mockRejectedValueOnce('cancel');expect(await page.openDependencies()).toBe(false);expect(page.dependencyAsset.id).toBe(a.id);expect(editor.proposedType).toBe('original unsaved')})
+it('confirmed replacement adopts only the selected target and clears old scope',async()=>{await mount();page.asset=structuredClone(b);expect(await page.openDependencies()).toBe(true);await settle();expect(page.dependencyAsset.id).toBe(b.id);expect(editor.proposedType).toBe('');expect(editor.state.draft.asset_id).toBe(b.id)})
+it('selection changed while modal was open invalidates the old target approval',async()=>{await mount();const wait=deferred();vi.mocked(ElMessageBox.confirm).mockImplementationOnce(()=>wait.promise as any);page.asset=structuredClone(b);const pending=page.openDependencies();page.asset={...b,id:id(10)};wait.resolve('confirm');expect(await pending).toBe(false);expect(page.dependencyAsset.id).toBe(a.id);expect(editor.proposedType).toBe('original unsaved')})
+it('parent performs a final input check after child approval returns',async()=>{await mount();page.asset=structuredClone(b);vi.spyOn(page.dependencyPanel,'canReplace').mockImplementation(async()=>{editor.proposedType='late after child approval';return true});expect(await page.openDependencies()).toBe(false);expect(page.dependencyAsset.id).toBe(a.id);expect(editor.proposedType).toBe('late after child approval')})
+it('unknown original save blocks a different asset without a discard prompt',async()=>{await mount();editor.proposedType='';editor.options=[b];editor.selected=b.id;editor.direction='downstream';await editor.save();expect(editor.workspace.unresolved()).toBe(true);page.asset=structuredClone(b);expect(await page.openDependencies()).toBe(false);expect(ElMessageBox.confirm).not.toHaveBeenCalled();expect(page.dependencyAsset.id).toBe(a.id);expect(editor.state.attempt.state).toBe('uncertain')})
+it('account replacement during target approval prevents old target adoption',async()=>{await mount();page.asset=structuredClone(b);const wait=deferred();vi.mocked(ElMessageBox.confirm).mockImplementationOnce(()=>wait.promise as any);const pending=page.openDependencies();session.value={...session.value!,account_version:2};await settle();wait.resolve('confirm');expect(await pending).toBe(false);expect(page.dependencyAsset?.id).not.toBe(b.id);expect(editor.proposedType).toBe('')})
+it('newer same-asset open supersedes an older pending different-asset approval',async()=>{await mount();page.asset=structuredClone(b);const wait=deferred();vi.mocked(ElMessageBox.confirm).mockImplementationOnce(()=>wait.promise as any);const old=page.openDependencies();page.asset=structuredClone(a);expect(await page.openDependencies()).toBe(true);page.asset=structuredClone(b);wait.resolve('confirm');expect(await old).toBe(false);expect(page.dependencyAsset.id).toBe(a.id);expect(editor.proposedType).toBe('original unsaved')})
+it('same asset reopen preserves unsubmitted dependency fields without confirmation',async()=>{await mount();page.asset=structuredClone(a);expect(await page.openDependencies()).toBe(true);await settle();expect(editor.proposedType).toBe('original unsaved');expect(ElMessageBox.confirm).not.toHaveBeenCalled();expect(page.dependencyAsset.id).toBe(a.id)})

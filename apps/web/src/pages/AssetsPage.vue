@@ -151,10 +151,15 @@ const createOpen = ref(false)
 const createPanel = ref<InstanceType<typeof AssetDraftCreatePanel> | null>(null)
 const dependencyOpen = ref(false), dependencyAsset = ref<Asset | null>(null)
 const dependencyPanel = ref<InstanceType<typeof AssetDependencyWorkspace> | null>(null)
-function openDependencies() {
-  if (!asset.value) return
-  if (dependencyPanel.value?.hasUnresolved() && dependencyAsset.value?.id !== asset.value.id) { ElMessage.warning('另一台设备的依赖关系正在确认保存结果，请先返回原设备处理'); return }
-  dependencyAsset.value = asset.value; dependencyOpen.value = true
+let dependencySelectionEpoch = 0
+async function openDependencies() {
+  const turn = ++dependencySelectionEpoch, selected = asset.value
+  if (!selected || !readable()) return false
+  if (dependencyPanel.value?.hasUnresolved() && dependencyAsset.value?.id !== selected.id) { ElMessage.warning('另一台设备的依赖关系正在确认保存结果，请先返回原设备处理'); return false }
+  const owner = readScope.value, target = JSON.stringify(selected), editor = dependencyPanel.value, before = editor?.inputSnapshot()
+  if (editor && !await editor.canReplace(selected)) return false
+  if (turn !== dependencySelectionEpoch || owner !== readScope.value || !readable() || editor !== dependencyPanel.value || before !== editor?.inputSnapshot() || target !== JSON.stringify(selected) || target !== JSON.stringify(asset.value)) return false
+  dependencyAsset.value = selected; dependencyOpen.value = true; return true
 }
 const metadataQueryOpen = ref(false), dateQueryOpen = ref(false)
 const metadataOpen = ref(false), metadataAsset = ref<Asset | null>(null)

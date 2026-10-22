@@ -3,7 +3,7 @@
 import {createApp,h,nextTick,shallowRef,ref,type App,type Slots} from 'vue'
 import {afterEach,it,expect,vi} from 'vitest'
 import ElementPlus from 'element-plus'
-vi.mock('vue-router',()=>({onBeforeRouteLeave:vi.fn()}))
+vi.mock('vue-router',()=>({onBeforeRouteLeave:vi.fn(),useRouter:()=>({beforeResolve:()=>()=>{},afterEach:()=>()=>{},onError:()=>()=>{}})}))
 vi.mock('../src/components/AppTable.vue',()=>({default:{render:()=>null}}))
 import Panel from '../src/components/AssetDependencyWorkspace.vue'
 import {api} from '../src/api/client'

@@ -1,0 +1,44 @@
+{
+  "status": "PASS_DEPENDENCY_DRAFT_CONFIRMATION_AND_SELECTION_PROTECTION",
+  "new_tests": 23,
+  "new_editor_memory_router_tests": 15,
+  "new_parent_child_tests": 8,
+  "original_editor_run": {
+    "failed": 15,
+    "passed": 0
+  },
+  "vitest": {
+    "files": 283,
+    "tests": 4703,
+    "failures": 0
+  },
+  "focused_final": {
+    "files": 4,
+    "tests": 45,
+    "failures": 0
+  },
+  "node_contract_tests": 179,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180746,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "d8498365b94fcfe08f42ff3f8114c14a07bcb89eea5bfaac6f2f32f4c4969232",
+    "scope": "static-artifacts-only"
+  },
+  "preserved_build_correction": "First build included duplicated confirmation title; source title corrected and final build rerun; final JS checked to exclude duplicate title",
+  "test_boundary": "Actual Vue parent-child and memory router; confirmation results, drawer/table shells and unrelated workspaces test-controlled",
+  "http_smoke": "4_DISTINCT_LOOPBACK_VITE_RESOURCES_PASS_AND_STOPPED",
+  "browser": "105_SPECIFICATIONS_12_FILES_ACTUAL_NOT_RUN",
+  "formal_contract_tc": "128_NOT_RUN",
+  "backend_sql_or_real_account_changed": false,
+  "remaining": "Large dependency graph segmented display and actual browser acceptance",
+  "source_sha256": {
+    "apps/web/src/components/AssetDependencyWorkspace.vue": "6b872e39fc495cc673c2e216bcec100a884e9c1d35017ba9ec7b530902a0ecd8",
+    "apps/web/src/pages/AssetsPage.vue": "c542d365a14fba1a33d0fa12e71c010caa5aa60b760d8aeae72e61fbac02d096",
+    "apps/web/tests/assetDependencyConfirmation.test.ts": "05b392f872f3bca4cb21ad3fb0f254d16a2b35c42f0b45e61c4763ec1755cc03",
+    "apps/web/tests/assetDependencyTargetProtection.test.ts": "bbe308bccc996312f578e8b748e52d1003704f9c0110215c8c74c3263ea1ee02",
+    "apps/web/tests/assetDependencyRecoveryPanel.test.ts": "207213899dfa5b357bfa0fb7f8e992022393498826792d906411802edfd44444"
+  }
+}

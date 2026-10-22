@@ -1,0 +1,38 @@
+// @vitest-environment jsdom
+// Real Vue and memory router; confirmation result and drawer/table shells controlled.
+import {createApp,defineComponent,h,nextTick,shallowRef,type App,type Slots} from 'vue'
+import {createRouter,createMemoryHistory,RouterView,isNavigationFailure,type Router} from 'vue-router'
+import {afterEach,beforeEach,it,expect,vi} from 'vitest'
+import ElementPlus,{ElMessageBox} from 'element-plus'
+vi.mock('../src/components/AppTable.vue',()=>({default:{render:()=>null}}))
+import Panel from '../src/components/AssetDependencyWorkspace.vue'
+import {api} from '../src/api/client'
+import {session,switchingTenant} from '../src/stores/session'
+import {contextTransitionGuards} from '../src/utils/contextTransitionGuard'
+import type {Asset,Session} from '../src/api/types'
+import {a,b,context,draft} from './fixtures/assetDependency'
+import {current} from './fixtures/assetMetadata'
+let app:App|undefined,host:HTMLElement,vm:any,router:Router
+const asset={...current().asset,id:a,tenant_id:context.tenantId} as Asset,selected=shallowRef(asset)
+const auth:Session={user:{id:context.actorId,display_name:'Synthetic',role:'msp'},tenant:{id:context.tenantId,name:'Synthetic'},allowed_tenants:[],capabilities:['assets:read','assets:write'],permission_version:1,account_version:1,csrf_token:'SYNTHETIC',mode:'remote_test',identity_source:'synthetic-unit-only'}
+async function settle(){for(let i=0;i<14;i++){await Promise.resolve();await nextTick()}}
+async function mount(){selected.value=asset;const Route=defineComponent({setup(){return()=>h(Panel,{modelValue:true,asset:selected.value,ref:(v:any)=>{if(v)vm=v.$.setupState}})}});router=createRouter({history:createMemoryHistory(),routes:[{path:'/dependency',component:Route},{path:'/other',component:defineComponent({render:()=>h('p','other')})}]});await router.push('/dependency');host=document.createElement('div');document.body.append(host);app=createApp({render:()=>h(RouterView)}).use(router).use(ElementPlus);app.component('el-drawer',{setup(_p:unknown,{slots}:{slots:Slots}){return()=>h('section',[slots.default?.(),slots.footer?.()])}});app.mount(host);await router.isReady();await settle()}
+const deferred=()=>{let resolve!:(v:any)=>void;const promise=new Promise(r=>resolve=r);return{promise,resolve}}
+beforeEach(()=>{session.value=structuredClone(auth);switchingTenant.value=false;vi.spyOn(ElMessageBox,'confirm').mockResolvedValue('confirm' as Awaited<ReturnType<typeof ElMessageBox.confirm>>);vi.spyOn(api,'request').mockImplementation(async()=>draft() as any)})
+afterEach(()=>{app?.unmount();app=undefined;host?.remove();session.value=null;vi.restoreAllMocks()})
+async function dirty(){await mount();vm.proposedType=' raw draft ';await settle()}
+it('empty editor and search-only filter leave without confirmation',async()=>{await mount();vm.query='filter only';expect(vm.hasDraft).toBe(false);expect(await vm.canLeave()).toBe(true);expect(ElMessageBox.confirm).not.toHaveBeenCalled()})
+it('raw invalid input is protected and declining clear retains all fields',async()=>{await dirty();vm.proposedScope=' \n ';vi.mocked(ElMessageBox.confirm).mockRejectedValueOnce('cancel');expect(await vm.cancelEdit()).toBe(false);expect(vm.proposedType).toBe(' raw draft ');expect(vm.proposedScope).toBe(' \n ')})
+it('late changed input invalidates clear decision',async()=>{await dirty();const p=deferred();vi.mocked(ElMessageBox.confirm).mockImplementationOnce(()=>p.promise as any);const pending=vm.cancelEdit();vm.proposedEnabled='true';p.resolve('confirm');expect(await pending).toBe(false);expect(vm.proposedType).toBe(' raw draft ');expect(vm.proposedEnabled).toBe('true')})
+it('explicit clear resets business draft but retains search filter',async()=>{await dirty();vm.query='retained search';expect(await vm.cancelEdit()).toBe(true);expect(vm.hasDraft).toBe(false);expect(vm.query).toBe('retained search')})
+it('failed read does not make existing draft impossible to discard explicitly',async()=>{await dirty();vi.mocked(api.request).mockRejectedValueOnce(Error('offline'));await vm.loadGraph();expect(vm.state.draft).toBeNull();expect(await vm.cancelEdit()).toBe(true);expect(vm.hasDraft).toBe(false)})
+it('same asset reopening preserves input without a prompt',async()=>{await dirty();expect(await vm.canReplace(asset)).toBe(true);expect(ElMessageBox.confirm).not.toHaveBeenCalled();vi.mocked(ElMessageBox.confirm).mockRejectedValueOnce('cancel');expect(await vm.canReplace({...asset,id:b})).toBe(false)})
+it('mutable replacement target invalidates prior approval',async()=>{await dirty();const target={...asset,id:b},p=deferred();vi.mocked(ElMessageBox.confirm).mockImplementationOnce(()=>p.promise as any);const pending=vm.canReplace(target);target.name='changed';p.resolve('confirm');expect(await pending).toBe(false)})
+it('single-flight confirmation blocks save and repeated clear',async()=>{await dirty();const p=deferred();vi.mocked(ElMessageBox.confirm).mockImplementationOnce(()=>p.promise as any);const first=vm.cancelEdit();expect(await vm.cancelEdit()).toBe(false);await vm.save();expect(vi.mocked(api.request).mock.calls.filter(([,o])=>o?.method)).toHaveLength(0);expect(ElMessageBox.confirm).toHaveBeenCalledTimes(1);p.resolve('confirm');expect(await first).toBe(true)})
+it('later route guard cannot change input after original approval',async()=>{await dirty();const remove=router.beforeResolve(()=>{vm.proposedScope='late field';return true});expect(isNavigationFailure(await router.push('/other'))).toBe(true);expect(router.currentRoute.value.path).toBe('/dependency');remove();expect(await router.push('/other')).toBeUndefined()})
+it('later context guard cannot modify raw query after approval',async()=>{await dirty();const remove=contextTransitionGuards.register(()=>{vm.query='late search';return true});try{expect(await contextTransitionGuards.approve()).toBe(false)}finally{remove()}})
+it('beforeunload protects unsent dependency fields',async()=>{await dirty();const event=new Event('beforeunload',{cancelable:true});window.dispatchEvent(event);expect(event.defaultPrevented).toBe(true)})
+it('unknown original POST cannot be discarded or navigated away',async()=>{await dirty();vm.proposedType='';vm.options=[{...asset,id:b}];vm.selected=b;vm.direction='downstream';vi.mocked(api.request).mockRejectedValueOnce(Error('lost'));await vm.save();expect(vm.workspace.unresolved()).toBe(true);expect(await vm.cancelEdit()).toBe(false);expect(await vm.canReplace({...asset,id:b})).toBe(false);expect(isNavigationFailure(await router.push('/other'))).toBe(true);expect(ElMessageBox.confirm).not.toHaveBeenCalled()})
+it('old account confirmation cannot clear new account input or unlock its modal',async()=>{await dirty();const first=deferred(),second=deferred();vi.mocked(ElMessageBox.confirm).mockImplementationOnce(()=>first.promise as any).mockImplementationOnce(()=>second.promise as any);const old=vm.cancelEdit();session.value={...structuredClone(auth),account_version:2};await settle();vm.proposedType='new account';const newer=vm.cancelEdit();first.resolve('confirm');expect(await old).toBe(false);expect(vm.confirming).toBe(true);second.resolve('confirm');expect(await newer).toBe(true)})
+it('unmount invalidates pending approval',async()=>{await dirty();const p=deferred();vi.mocked(ElMessageBox.confirm).mockImplementationOnce(()=>p.promise as any);const pending=vm.cancelEdit();app!.unmount();app=undefined;p.resolve('confirm');expect(await pending).toBe(false)})
+it('read-only valid asset remains viewable without write permission',async()=>{await mount();session.value={...session.value!,capabilities:['assets:read']};await settle();expect(await vm.canReplace({...asset,id:b})).toBe(true);expect(vm.writable).toBe(false)})

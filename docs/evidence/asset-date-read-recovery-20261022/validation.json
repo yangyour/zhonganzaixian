@@ -1,0 +1,45 @@
+{
+  "result": "PASS_READ_RECOVERY_DOM_BUILD_BROWSER_NOT_RUN",
+  "new_tests": 21,
+  "new_reader_regressions": 6,
+  "new_vue_dom_tests": 15,
+  "old_implementation_regression": {
+    "passed": 14,
+    "failed": 6
+  },
+  "focused_tests": 35,
+  "vitest": {
+    "files": 272,
+    "passed": 4536
+  },
+  "node_contract_tests": 178,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180736,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "2345b2d9574ca5a14195116fac7b3e9f659150818c18a6892e222e8bfc06983b",
+    "scope": "static-artifacts-only"
+  },
+  "browser": {
+    "discovered": 105,
+    "files": 12,
+    "executed": "NOT_RUN"
+  },
+  "formal_contract_tc": "128_NOT_RUN",
+  "http_smoke": "FOUR_VITE_RESOURCES_PASS_AND_STOPPED",
+  "sql_or_backend_changed": false,
+  "real_messages_or_tickets_created": 0,
+  "preserved_failures": [
+    "6 regression cases failed on original implementation",
+    "test mock empty tuple type assertion corrected",
+    "two HTTP200 marker assertions assumed main.ts instead of existing bootstrap.ts"
+  ],
+  "source_sha256": {
+    "apps/web/src/utils/assetDateReader.ts": "64794fe710e2263ede368ae65be097d950c71225f83df91fe1c1c74419e117dd",
+    "apps/web/src/components/AssetDateAssessmentPanel.vue": "dcc51252a784402fbb94e5029f959a2690f7b7636220ca41a1399f98af637b6e",
+    "apps/web/tests/assetDateReader.test.ts": "a40c2ce22f9497aea7f5379a25cd94c09f62bc067697789828851109ab8cc5ba",
+    "apps/web/tests/assetDateAssessmentPanel.test.ts": "52ae0a9797abb010c666a393e0f72bb5473182cb5b00fcfb59b3808d1d2b455d"
+  }
+}

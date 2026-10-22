@@ -1,0 +1,14 @@
+{
+  "result": "FAILED",
+  "scope": "LOOPBACK_VITE_HTTP_SMOKE_NOT_BROWSER_OR_API_ACCEPTANCE",
+  "checks": [
+    {
+      "path": "/assets",
+      "status": 200,
+      "expected_marker_present": false
+    }
+  ],
+  "vite_stopped": true,
+  "browser_js_executed": false,
+  "api_or_database_executed": false
+}

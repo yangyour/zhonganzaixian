@@ -3,7 +3,7 @@ import { worklogInstant } from './worklogWorkspace'
 export interface RecordedDateResult { recorded_date: string | null; days_until: number | null; position: 'UNKNOWN' | 'PAST_DATE' | 'DUE_TODAY' | 'WITHIN_30_DAYS' | 'FUTURE_DATE'; within_7_days: boolean | null; within_30_days: boolean | null; within_90_days: boolean | null; in_reference_quarter: boolean | null }
 export interface AssetDateAssessment { asset_id: string; tenant_id: string; asset_version: number; metadata_version: number | null; observed_at: string; as_of_date: string; timezone: 'Asia/Shanghai'; policy_version: 'contract-m3-10-date-v1'; scope: 'RECORDED_DATE_ASSESSMENT_ONLY'; source: 'postgresql'; recorded_dates_source: 'MANUAL_ASSET_METADATA'; verification_status: 'SELF_REPORTED' | null; coverage_verified: false; warranty_expiry: RecordedDateResult; overdue_service_date: RecordedDateResult; warranty_start: null; warranty_provider: null; hazard_lookup_status: 'NOT_IMPLEMENTED'; notification_lookup_status: 'NOT_IMPLEMENTED'; actions_this_request: { hazard_creation: 'NOT_REQUESTED'; notification: 'NOT_REQUESTED'; asset_updated: false } }
 export interface AssetDateContext { assetId: string; tenantId: string; actorId: string; permissionVersion: number; minimumAssetVersion: number }
-export interface AssetDateState { current: AssetDateAssessment | null; busy: boolean; error: unknown }
+export interface AssetDateState { current: AssetDateAssessment | null; busy: boolean; error: unknown; attempted: boolean; cancelled: boolean }
 const exact = (v: unknown, keys: string[]): v is Record<string, unknown> => Boolean(v && typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === keys.length && keys.every(k => Object.hasOwn(v, k)))
 const copy = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
@@ -37,19 +37,25 @@ export function readAssetDateAssessment(v: unknown, scope: AssetDateContext): As
 }
 export function createAssetDateReader(client: Pick<ApiClient,'request'>, notify: (state: AssetDateState) => void) {
   let scope: AssetDateContext | null = null, generation = 0, controller: AbortController | null = null, disposed = false
-  let state: AssetDateState = { current: null, busy: false, error: null }
+  const empty = (): AssetDateState => ({ current: null, busy: false, error: null, attempted: false, cancelled: false })
+  let state = empty()
   const snapshot = () => ({ ...state, current: state.current ? copy(state.current) : null }); const emit = () => notify(snapshot())
-  const clear = () => { generation++; controller?.abort(); controller = null; state = { current: null, busy: false, error: null } }
+  const abort = () => { generation++; controller?.abort(); controller = null }
+  async function refresh() {
+    if (disposed || !scope || state.busy) return false
+    abort(); const current = generation, context = { ...scope }, pending = new AbortController(); controller = pending
+    state = { ...empty(), busy: true, attempted: true }; emit()
+    if (current !== generation || disposed || pending.signal.aborted) return false
+    try { const raw = await client.request(`/assets/${context.assetId}/manual-metadata/date-assessment`,{ signal: pending.signal }); if (current !== generation || disposed) return false; state.current = readAssetDateAssessment(raw,context); scope = { ...context, minimumAssetVersion: state.current.asset_version }; return true }
+    catch (error) { if (current === generation && !disposed) { if (isCancelled(error)) state.cancelled = true; else state.error = error }; return false }
+    finally { if (current === generation && !disposed) { state.busy = false; controller = null; emit() } }
+  }
   return {
     state: snapshot,
-    reset(value: AssetDateContext | null) { clear(); scope = !disposed && value && uuid.test(value.assetId) && uuid.test(value.tenantId) && uuid.test(value.actorId) && positive(value.permissionVersion) && positive(value.minimumAssetVersion) ? { ...value } : null; emit() },
-    async refresh() {
-      if (disposed || !scope || state.busy) return false
-      clear(); const current = generation, context = { ...scope }; controller = new AbortController(); state.busy = true; emit()
-      try { const raw = await client.request(`/assets/${context.assetId}/manual-metadata/date-assessment`,{ signal: controller.signal }); if (current !== generation || disposed) return false; state.current = readAssetDateAssessment(raw,context); scope = { ...context, minimumAssetVersion: state.current.asset_version }; return true }
-      catch (error) { if (current === generation && !disposed && !isCancelled(error)) state.error = error; return false }
-      finally { if (current === generation && !disposed) { state.busy = false; controller = null; emit() } }
-    },
-    dispose() { clear(); scope = null; disposed = true; emit() },
+    reset(value: AssetDateContext | null) { abort(); state = empty(); scope = !disposed && value && uuid.test(value.assetId) && uuid.test(value.tenantId) && uuid.test(value.actorId) && positive(value.permissionVersion) && positive(value.minimumAssetVersion) ? { ...value } : null; emit() },
+    refresh,
+    retry() { return state.attempted ? refresh() : Promise.resolve(false) },
+    cancel() { if (!state.busy) return false; abort(); state = { ...empty(), attempted: true, cancelled: true }; emit(); return true },
+    dispose() { abort(); state = empty(); scope = null; disposed = true; emit() },
   }
 }

@@ -118,3 +118,12 @@ it('a caller getter that clears the intent prevents cloning from resuming under 
 it('preparation errors never overwrite a nested request started by an idle notification',async()=>{
  const request=vi.fn().mockResolvedValue(receipt);let nested:Promise<boolean>|undefined,react=true;let editor:ReturnType<typeof createIdentityCommand>;editor=createIdentityCommand({request} as unknown as Pick<ApiClient,'request'>,v=>{if(v.state==='idle'&&react){react=false;nested=editor.submit(`/identity/users/${id}/password`,'POST',reset)}},()=> 'key');expect(await editor.submit('/identity/roles','POST',{bad:()=>{}})).toBe(false);expect(await nested).toBe(true);expect(request).toHaveBeenCalledTimes(1)
 })
+it('scoped result validation failure remains uncertain and never publishes an accepted receipt',async()=>{
+ const request=vi.fn().mockResolvedValue(receipt),notify=vi.fn();const editor=createIdentityCommand({request} as unknown as Pick<ApiClient,'request'>,notify,()=> 'key',()=>{throw new ApiError(200,'INVALID_SCOPE','invalid receipt','—')});expect(await editor.submit(`/identity/users/${id}/password`,'POST',reset)).toBe(false);expect(notify.mock.calls.at(-1)![0].state).toBe('uncertain');expect(notify.mock.calls.at(-1)![0].result).toBeNull();editor.dispose()
+})
+it('receipt snapshots are detached from transport and notification consumers',async()=>{
+ const raw={...receipt},request=vi.fn().mockResolvedValue(raw),notify=vi.fn();const editor=createIdentityCommand({request} as unknown as Pick<ApiClient,'request'>,notify,()=> 'key');expect(await editor.submit(`/identity/users/${id}/password`,'POST',reset)).toBe(true);const result=notify.mock.calls.at(-1)![0].result;raw.user_id='changed transport';expect(result.user_id).toBe(id);expect(result).not.toBe(raw)
+})
+it('a scoped validation callback that disposes the command cannot publish its old result',async()=>{
+ const request=vi.fn().mockResolvedValue(receipt),notify=vi.fn();let editor:ReturnType<typeof createIdentityCommand>;editor=createIdentityCommand({request} as unknown as Pick<ApiClient,'request'>,notify,()=> 'key',()=>editor.dispose());expect(await editor.submit(`/identity/users/${id}/password`,'POST',reset)).toBe(false);expect(notify.mock.calls.at(-1)![0].state).toBe('idle');expect(notify.mock.calls.at(-1)![0].result).toBeNull()
+})

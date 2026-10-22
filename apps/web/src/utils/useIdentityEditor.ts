@@ -5,7 +5,7 @@ import { api } from '../api/client'
 import { contextTransitionGuards } from './contextTransitionGuard'
 import { createIdentityCommand, type IdentityCommand } from './projectIdentity'
 
-export function useIdentityEditor(reload: () => Promise<boolean | 'redirected'>, options: { snapshot?: () => string; preserveUnknown?: boolean } = {}) {
+export function useIdentityEditor(reload: () => Promise<boolean | 'redirected'>, options: { snapshot?: () => string; preserveUnknown?: boolean; validateResult?: (path:string,body:unknown,result:unknown)=>void } = {}) {
   const command = shallowRef<IdentityCommand>({ state: 'idle', path: null, method: null, key: null, body: null, result: null, error: null })
   const dirty = ref(false), message = ref(''), readbackFailed = ref(false), reading = ref(false)
   let disposed = false, epoch = 0
@@ -14,7 +14,7 @@ export function useIdentityEditor(reload: () => Promise<boolean | 'redirected'>,
   let routeEpoch=0, removeResolve:(()=>void)|undefined
   const clearRouteApproval=()=>{routeEpoch++;removeResolve?.();removeResolve=undefined}
   const inputSnapshot=()=>JSON.stringify([epoch,dirty.value,command.value.state,options.snapshot?.()])
-  const writer = createIdentityCommand(api, value => { command.value = value })
+  const writer = createIdentityCommand(api, value => { command.value = value }, undefined, options.validateResult)
   async function leave() {
     if (disposed || confirming.value || reading.value || command.value.state === 'sending') return false
     if (options.preserveUnknown && writer.unresolved()) { message.value='原操作结果尚未确认，请先使用原请求恢复；不会丢弃重试凭据。'; return false }
@@ -47,5 +47,5 @@ export function useIdentityEditor(reload: () => Promise<boolean | 'redirected'>,
     message.value = result === true ? '操作已保存，最新记录已回读。' : result === 'redirected' ? '操作已保存，请重新登录。' : '操作已保存，但最新记录尚未确认；请重新读取，不要重复提交。'
     return ok
   }
-  return { command, dirty, message, readbackFailed, leave, busy: () => confirming.value || writer.unresolved() || reading.value, async save(path: string, method: string, body: unknown) { if (disposed || confirming.value || reading.value) return false; const turn = epoch, before=options.snapshot?.(); message.value = ''; readbackFailed.value = false; return accepted(await writer.submit(path, method, body), turn, before) }, async retry() { if (disposed || confirming.value || reading.value) return false; const turn = epoch, before=options.snapshot?.(); return accepted(await writer.retry(), turn, before) }, clear() { epoch++; confirming.value=false; clearRouteApproval(); writer.clear(); dirty.value = false; reading.value = false; readbackFailed.value = false; message.value = '' } }
+  return { command, dirty, message, readbackFailed, leave, busy: () => confirming.value || ['sending','uncertain'].includes(command.value.state) || reading.value, async save(path: string, method: string, body: unknown) { if (disposed || confirming.value || reading.value) return false; const turn = epoch, before=options.snapshot?.(); message.value = ''; readbackFailed.value = false; return accepted(await writer.submit(path, method, body), turn, before) }, async retry() { if (disposed || confirming.value || reading.value) return false; const turn = epoch, before=options.snapshot?.(); return accepted(await writer.retry(), turn, before) }, clear() { epoch++; confirming.value=false; clearRouteApproval(); writer.clear(); dirty.value = false; reading.value = false; readbackFailed.value = false; message.value = '' } }
 }

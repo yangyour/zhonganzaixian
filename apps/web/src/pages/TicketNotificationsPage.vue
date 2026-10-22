@@ -8,6 +8,7 @@ import {blockerLabels,createNotificationWorkspace,emptyNotificationState,eventLa
 import {displayTime} from '../utils/display'
 import ApiErrorNotice from '../components/ApiErrorNotice.vue'
 import WeComNotificationAction from '../components/WeComNotificationAction.vue'
+import type {ChannelActivity} from '../utils/notificationDelivery'
 import EmailNotificationAction from '../components/EmailNotificationAction.vue'
 const state=shallowRef<NotificationState>(emptyNotificationState()),workspace=createNotificationWorkspace(api,s=>{state.value=s})
 const internal=computed(()=>['padmin','msp'].includes(session.value?.user.role??''))
@@ -15,18 +16,22 @@ const permitted=computed(()=>Boolean(session.value?.mode==='remote_test'&&can('t
 const ledgerAllowed=computed(()=>permitted.value&&internal.value&&can('ticket_notes:read_internal'))
 const tab=ref<'mine'|'ledger'>('mine')
 const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,session.value?.user.role,ledgerAllowed.value,permitted.value]))
-const locked=computed(()=>!!state.value.busy||workspace.unresolved())
-watch(context,()=>{const s=session.value;tab.value='mine';workspace.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,internal:internal.value}:null);if(permitted.value)void workspace.list(false)},{immediate:true,flush:'sync'})
+const childPending=ref(new Set<string>())
+function trackChannel(value:ChannelActivity){if(value.scopeKey!==context.value)return;const next=new Set(childPending.value),key=value.channel+':'+value.messageId;if(value.blocked)next.add(key);else next.delete(key);childPending.value=next}
+const locked=computed(()=>!!state.value.busy||workspace.unresolved()||childPending.value.size>0)
+function list(unread=state.value.unreadOnly,next=false){if(locked.value)return false;tab.value='mine';return workspace.list(unread,next)}
+function refresh(){if(childPending.value.size)return false;return tab.value==='mine'?list():workspace.intents()}
+watch(context,()=>{childPending.value=new Set();const s=session.value;tab.value='mine';workspace.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,internal:internal.value}:null);if(permitted.value)void workspace.list(false)},{immediate:true,flush:'sync'})
 function openLedger(){if(!ledgerAllowed.value||locked.value)return;tab.value='ledger';if(!state.value.intents)void workspace.intents()}
 async function recover(){const key=context.value;if(await workspace.retry()&&key===context.value)await workspace.list()}
-async function markRead(id:string){const key=context.value;if(await workspace.mark(id)&&key===context.value)await workspace.list()}
+async function markRead(id:string){if(locked.value)return;const key=context.value;if(await workspace.mark(id)&&key===context.value)await workspace.list()}
 const blocked=ref(false)
-function mayLeave(){if(workspace.unresolved()){blocked.value=true;return false}return true}
+function mayLeave(){if(workspace.unresolved()||childPending.value.size){blocked.value=true;return false}return true}
 onBeforeRouteLeave(mayLeave);const unregister=contextTransitionGuards.register(mayLeave)
-function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()){event.preventDefault();event.returnValue=''}}
+function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()||childPending.value.size){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
 onUnmounted(()=>{unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
-defineExpose({state,workspace,mayLeave,openLedger,markRead,recover,tab})
+defineExpose({state,workspace,mayLeave,openLedger,markRead,recover,tab,list,refresh,trackChannel,childPending,context})
 </script>
 <template>
  <section class="notifications">
@@ -38,12 +43,13 @@ defineExpose({state,workspace,mayLeave,openLedger,markRead,recover,tab})
    <div class="proto-panel workspace">
     <div class="proto-toolbar">
      <div class="proto-tabs" aria-label="通知视图">
-      <button type="button" :class="{active:tab==='mine'&&!state.unreadOnly}" :aria-pressed="tab==='mine'&&!state.unreadOnly" :disabled="locked" @click="tab='mine';workspace.list(false)">全部通知</button>
-      <button type="button" :class="{active:tab==='mine'&&state.unreadOnly}" :aria-pressed="tab==='mine'&&state.unreadOnly" :disabled="locked" @click="tab='mine';workspace.list(true)">未读通知</button>
+      <button type="button" :class="{active:tab==='mine'&&!state.unreadOnly}" :aria-pressed="tab==='mine'&&!state.unreadOnly" :disabled="locked" @click="list(false)">全部通知</button>
+      <button type="button" :class="{active:tab==='mine'&&state.unreadOnly}" :aria-pressed="tab==='mine'&&state.unreadOnly" :disabled="locked" @click="list(true)">未读通知</button>
       <button v-if="ledgerAllowed" type="button" :class="{active:tab==='ledger'}" :aria-pressed="tab==='ledger'" :disabled="locked" @click="openLedger">通知派发台账</button>
      </div>
-     <button type="button" :disabled="tab==='mine'?locked:state.intentBusy" @click="tab==='mine'?workspace.list():workspace.intents()">刷新</button>
+     <button type="button" :disabled="locked||state.intentBusy" @click="refresh">刷新</button>
     </div>
+    <p v-if="childPending.size" role="status">外部通道操作仍在确认、读取或等待原请求结果，请先处理该操作；刷新列表和切换视图暂不可用。</p>
     <template v-if="tab==='mine'">
      <ApiErrorNotice :error="state.error" />
      <button v-if="state.error&&!state.page&&!state.attempt&&!state.busy" type="button" @click="workspace.retryRead()">重试原通知页</button>
@@ -55,16 +61,16 @@ defineExpose({state,workspace,mayLeave,openLedger,markRead,recover,tab})
       <p>更新于 {{ displayTime(state.page.observed_at) }}</p>
       <p v-if="!state.page.items.length" class="panel">{{ state.unreadOnly?'当前没有未读通知。':'当前没有工单通知。' }}</p>
       <ul v-else class="message-list">
-       <li v-for="m in state.page.items" :key="m.id" :class="{unread:!m.read_at}">
+       <li v-for="m in state.page.items" :key="context+':'+m.id" :class="{unread:!m.read_at}">
         <div class="message-head"><span class="proto-badge">{{ eventLabel(m.event_type) }}</span><strong>{{ m.title }}</strong></div>
         <p class="body">{{ m.body }}</p>
-        <WeComNotificationAction :message-id="m.id"/>
-        <EmailNotificationAction :message-id="m.id"/>
+        <WeComNotificationAction :message-id="m.id" :owner-scope="context" :parent-busy="!!state.busy||workspace.unresolved()" @activity="trackChannel"/>
+        <EmailNotificationAction :message-id="m.id" :owner-scope="context" :parent-busy="!!state.busy||workspace.unresolved()" @activity="trackChannel"/>
         <div class="meta"><span>{{ displayTime(m.created_at) }}</span><span>{{ m.read_at?`已读于 ${displayTime(m.read_at)}`:'未读' }}</span><RouterLink :to="{path:'/ticket-workflows',query:{ticket_id:m.ticket_id}}">查看工单</RouterLink><button v-if="!m.read_at" type="button" :disabled="locked" @click="markRead(m.id)">标记已读</button></div>
        </li>
       </ul>
-      <button type="button" :disabled="locked" @click="workspace.list(state.unreadOnly)">返回第一页</button>
-      <button type="button" :disabled="locked||!state.page.has_more" @click="workspace.list(state.unreadOnly,true)">下一页</button>
+      <button type="button" :disabled="locked" @click="list(state.unreadOnly)">返回第一页</button>
+      <button type="button" :disabled="locked||!state.page.has_more" @click="list(state.unreadOnly,true)">下一页</button>
      </template>
     </template>
     <template v-else-if="ledgerAllowed">

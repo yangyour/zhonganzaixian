@@ -1,0 +1,39 @@
+{
+  "result": "PASS",
+  "scope": "LOOPBACK_VITE_HTTP_SMOKE_NOT_BROWSER_OR_API_ACCEPTANCE",
+  "checks": [
+    {
+      "path": "/ticket-notifications",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/pages/TicketNotificationsPage.vue",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/components/EmailNotificationAction.vue",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/components/WeComNotificationAction.vue",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/components/NotificationChannelAction.vue",
+      "status": 200,
+      "expected_marker_present": true
+    },
+    {
+      "path": "/src/utils/notificationDelivery.ts",
+      "status": 200,
+      "expected_marker_present": true
+    }
+  ],
+  "vite_stopped": true,
+  "browser_js_executed": false,
+  "api_or_database_executed": false
+}

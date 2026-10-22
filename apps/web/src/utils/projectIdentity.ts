@@ -59,9 +59,9 @@ export function readRolePage(raw: unknown, tenant: string): RolePage {
 export type IdentityCommandState = 'idle' | 'sending' | 'uncertain' | 'rejected' | 'accepted'
 export interface IdentityCommand { state: IdentityCommandState; path: string | null; method: string | null; key: string | null; body: unknown; result: unknown; error: unknown }
 /** Password-bearing original commands stay only in component memory, never in display state or storage. */
-export function createIdentityCommand(client: Pick<ApiClient, 'request'>, notify: (value: IdentityCommand) => void, keyFactory = createRequestId) {
+export function createIdentityCommand(client: Pick<ApiClient, 'request'>, notify: (value: IdentityCommand) => void, keyFactory = createRequestId, validateResult?: (path:string,body:unknown,result:unknown)=>void) {
   let value: IdentityCommand = { state: 'idle', path: null, method: null, key: null, body: null, result: null, error: null }, generation = 0, disposed = false, controller: AbortController | null = null
-  const emit = () => notify({ ...value, body: null })
+  const emit = () => notify({ ...value, body: null, result:value.result===null?null:structuredClone(value.result) })
   const clear = () => { generation++; controller?.abort(); controller = null; value = { state: 'idle', path: null, method: null, key: null, body: null, result: null, error: null }; emit() }
   async function run() {
     if (disposed || !value.path || !value.method || !value.key || value.state === 'sending') return false
@@ -71,9 +71,11 @@ export function createIdentityCommand(client: Pick<ApiClient, 'request'>, notify
     value.state = 'sending'; value.error = null; emit()
     try {
       if (disposed || turn !== generation) return false
-      const result = await client.request(command.path, { method: command.method, body: command.body, idempotencyKey: command.key, signal })
+      const result = structuredClone(await client.request(command.path, { method: command.method, body: command.body, idempotencyKey: command.key, signal }))
       if (disposed || turn !== generation) return false
       validateIdentityWrite(command.path, command.body, result)
+      validateResult?.(command.path,command.body,result)
+      if(disposed||turn!==generation)return false
       value.result = result; value.state = 'accepted'; value.body = null; return true
     } catch (error) {
       if (disposed || turn !== generation) return false

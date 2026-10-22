@@ -1,0 +1,63 @@
+{
+  "result": "PASS_NOTIFICATION_CHANNEL_ORIGINAL_RECEIPT_AND_PARENT_PROTECTION",
+  "new_tests": 73,
+  "new_test_layers": {
+    "reader_protocol": 36,
+    "channel_component_dom": 28,
+    "full_parent_child_dom": 6,
+    "identity_result_validation": 3
+  },
+  "focused_tests_passed": 106,
+  "vitest": {
+    "files_passed": 256,
+    "tests_passed": 4205
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "production_build": {
+    "status": "PASSED",
+    "files": 141,
+    "bootstrap_gzip_bytes": 180732,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "40feec3c0eef52cb17ac5ab34b6568fd12e36250fd4477493f59144f61e9e470",
+    "scope": "static-artifacts-only"
+  },
+  "initial_failures": [
+    {
+      "parent_blocker": 2,
+      "passed_before_fix": 100,
+      "fixed": "Busy state now observes reactive command state, not only private writer state."
+    },
+    {
+      "typecheck": "WRAPPER_IMPORT_ASYNC_NARROWING_AND_MOCK_TYPES",
+      "fixed": "Separate type import, accepted-state predicate and explicit MockInstance/Mock signatures."
+    }
+  ],
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "modal": "EXPLICIT_STUB_NOT_BROWSER_ACCEPTANCE",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_messages_or_authorization_changes": 0,
+  "formal_acceptance_passes_added": 0,
+  "source_sha256": {
+    "apps/web/src/utils/notificationDelivery.ts": "38fd461e9a034ded3e06b363514202ddbd1aee4e7c1e88e5f6b0be464846892c",
+    "apps/web/src/utils/projectIdentity.ts": "46eb9ed06f2e7103ca2059ebcefc6313bb201326d48ecc6e9e1923c96f6af887",
+    "apps/web/src/utils/useIdentityEditor.ts": "6d34a4a60b4fb800cac01a95a781d04add20ded4f441c28def42228e65833af0",
+    "apps/web/src/components/NotificationChannelAction.vue": "f923dc622e5efe8637b9252eeecb170da652a97ff7bdfa21eaf1266060778b91",
+    "apps/web/src/components/EmailNotificationAction.vue": "7e48cb54791f56d9f7886534a848c1fa17ad3396689be1f771be8a3df6a1fabc",
+    "apps/web/src/components/WeComNotificationAction.vue": "27b86391799a4209dce6d45033841719b0053d0d1af0ab6cc40fbcc8fbc21ae0",
+    "apps/web/src/pages/TicketNotificationsPage.vue": "4ccb298a4c942b271dca0a07f5354c7fcf5cf3531784e52009f56119ee5288aa",
+    "apps/web/tests/helpers/notificationDeliveryFixture.ts": "5eb3532f10d7c2823ce06681881615b0be22559d4d9ccc6d5e047dc74f0a8088",
+    "apps/web/tests/notificationDelivery.test.ts": "5d2f6ed70889601a53d63140d58f5befe6e237bb7e0a21650bb314ee1a4744ab",
+    "apps/web/tests/notificationChannelAction.test.ts": "f00f678187f807954825ea504e09fbacc104ceaadce49dc0b83ec8f1f1e5e2e8",
+    "apps/web/tests/notificationChannelParent.test.ts": "349836bce96b41c9946dbc6b0283ffc6b75a5efa5cd326b9ba1809f7e7a9799b",
+    "apps/web/tests/projectIdentity.test.ts": "2a0a87b8fc4f75c6dc5c5213e6d9c7a57782f42ea3625818fa733eb495050f62"
+  }
+}

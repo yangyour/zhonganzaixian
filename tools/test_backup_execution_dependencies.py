@@ -46,4 +46,11 @@ class BackupExecutionDependenciesTest(unittest.TestCase):
         self.assertIsNone(d['backup_version_inventory_binding_reference'])
         self.assertIsNone(d['backup_version_inventory_authorizer_reference'])
         self.assertIs(d['backup_execution_enabled'],False)
+    def test_archive_dispatch_consumer_binding_stays_unconfigured(self):
+        d=json.loads((ROOT/'deploy/examples/backup-execution-dependencies.json').read_text())
+        self.assertIn('archive_dispatch_consumer_binding_reference',d)
+        self.assertIsNone(d['archive_dispatch_consumer_binding_reference'])
+        self.assertIsNone(d['archive_staging_authorizer_reference'])
+        self.assertIsNone(d['archive_original_object_verifier_reference'])
+        self.assertIs(d['backup_execution_enabled'],False)
 if __name__=='__main__': unittest.main()

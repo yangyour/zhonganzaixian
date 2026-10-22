@@ -1,0 +1,72 @@
+package cn.mop.worker.backup;
+
+import cn.mop.domain.DomainException;
+import cn.mop.domain.backup.BackupArchivePayload;
+import cn.mop.domain.backup.BackupArchivePayload.Scope;
+import cn.mop.persistence.PostgresBackupArchiveRepository.*;
+import cn.mop.adapters.backup.BackupEnvelopeEncryption;
+import org.junit.jupiter.api.*;
+import java.time.Instant;
+import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static cn.mop.worker.backup.BackupArchiveDispatch.*;
+
+class BackupArchiveDispatchTest {
+ static UUID id(int n){return UUID.fromString("74000000-0000-4000-8000-"+String.format("%012d",n));}
+ final Access access=new Access(id(1),id(2),7);
+ final Scope scope=new Scope(id(1),id(3),id(4),1,id(5));
+ final Dispatch dispatch=new Dispatch(id(6),"synthetic-owner");
+ final Command command=new Command(access,scope,0,dispatch,id(7),id(8),id(9),"sha256:"+"a".repeat(64),"synthetic-trace");
+ final Binding enabled=new Binding(true,"backup-archive-dispatch:synthetic-only");
+ final Instant now=Instant.parse("2026-10-22T00:00:00Z");
+ final List<Step> checks=new ArrayList<>();
+ final List<String> actions=new ArrayList<>();
+ Source source;FakeJournal journal;int writes;BackupArchivePayload written;boolean failWrite;Step denied;
+ @BeforeEach void setup(){
+  var s=new BackupEnvelopeEncryption.Scope(scope.tenantId(),scope.assetId(),scope.runId(),scope.attemptNumber(),scope.versionId());
+  var envelope=new BackupEnvelopeEncryption.Envelope(s,"kms-key-ref:synthetic",new byte[]{1},new byte[12],new byte[16]);
+  source=new Source(BackupArchivePayload.parse(envelope.encoded(),envelope.sha256()),id(10),"b".repeat(64),2,id(2),now);
+  journal=new FakeJournal();
+ }
+ Event event(long v,Action action,Phase phase,Dispatch d,long count,UUID cmd,String evidence){return new Event(v,cmd,"c".repeat(64),action,phase,d,count,evidence,id(2),now.plusMillis(v));}
+ Receipt receipt(Event event){return new Receipt(source,event,false);}
+ final class FakeJournal implements Journal {
+  Receipt current=receipt(event(0,Action.STAGE,Phase.STAGED,null,0,id(10),null));
+  boolean missing,failCurrent,failStart,commitStartThenFail,replayStart,failVerify,commitVerifyThenFail,failMark,wrongStartSource,wrongVerifySource;
+  public Optional<Receipt> current(Access a,Scope s){actions.add("read");if(failCurrent)throw new RuntimeException("private fault");return missing?Optional.empty():Optional.of(current);}
+  public Receipt start(Command c,long v){actions.add("start:"+v);if(failStart)throw new RuntimeException("private start fault");current=receipt(event(v+1,Action.START_STORE,Phase.STORE_STARTED,c.dispatch(),current.event().dispatchCount()+1,c.startCommand(),null));if(commitStartThenFail)throw new RuntimeException("private commit ambiguity");if(replayStart)return new Receipt(source,current.event(),true);if(wrongStartSource)return new Receipt(new Source(source.payload(),id(99),source.submissionHash(),2,id(2),now),current.event(),false);return current;}
+  public Receipt uncertain(Command c,long v){actions.add("mark:"+v);if(failMark||current.event().version()!=v)throw new RuntimeException("private marker fault");current=receipt(event(v+1,Action.MARK_UNCONFIRMED,Phase.VERIFY_REQUIRED,c.dispatch(),current.event().dispatchCount(),c.unconfirmedCommand(),null));return current;}
+  public Receipt verify(Command c,long v){actions.add("verify:"+v);if(failVerify)throw new RuntimeException("private object absent or unreadable");if(current.event().version()!=v)throw new RuntimeException("CAS");current=receipt(event(v+1,Action.VERIFY_OBJECT,Phase.VERIFIED,current.event().dispatch(),current.event().dispatchCount(),c.verifyCommand(),c.evidenceReference()));if(commitVerifyThenFail)throw new RuntimeException("private verification ambiguity");if(wrongVerifySource)return new Receipt(new Source(source.payload(),id(99),source.submissionHash(),2,id(2),now),current.event(),false);return current;}
+ }
+ BackupArchiveDispatch consumer(){return consumer(enabled);}
+ BackupArchiveDispatch consumer(Binding b){return new BackupArchiveDispatch(b,(binding,a,s,step)->{checks.add(step);if(step==denied)throw new DomainException(403,"DENIED","synthetic denial");},journal,(a,p)->{actions.add("store");writes++;written=p;if(failWrite)throw new RuntimeException("private endpoint and key fault");});}
+ @Test void disabledPerformsNoReadAuthorizationOrWrite(){var result=consumer(new Binding(false,null)).once(command);assertEquals(Status.DISABLED,result.status());assertTrue(actions.isEmpty());assertTrue(checks.isEmpty());assertEquals(0,writes);}
+ @Test void stagesOnceWritesOriginalAndRecordsIndependentVerification(){var result=consumer().once(command);assertEquals(Status.ARCHIVE_VERIFICATION_RECORDED,result.status());assertEquals(2L,result.archiveEventVersion());assertTrue(result.storeMethodInvokedThisCall());assertEquals(List.of("read","start:0","store","verify:1"),actions);assertEquals(List.of(Step.READ,Step.START_STORE,Step.STORE_ORIGINAL,Step.RECONCILE_ORIGINAL,Step.RETURN_RESULT),checks);assertArrayEquals(source.payload().bytes(),written.bytes());assertEquals(source.payload().sha256(),written.sha256());}
+ @Test void recordedArchiveNeverClaimsVersionRunHealthRetentionOrRecovery(){var r=consumer().once(command);assertFalse(r.versionRegistered());assertFalse(r.backupRunCompleted());assertFalse(r.currentObjectHealthVerified());assertFalse(r.deviceExecutionAuthorized());assertFalse(r.retentionVerified());assertFalse(r.recoveryVerified());}
+ @Test void existingVerifiedReturnsHistoricalRecordWithoutObjectAccess(){journal.current=receipt(event(2,Action.VERIFY_OBJECT,Phase.VERIFIED,dispatch,1,command.verifyCommand(),command.evidenceReference()));var r=consumer().once(command);assertEquals(Status.ARCHIVE_VERIFICATION_RECORDED,r.status());assertFalse(r.storeMethodInvokedThisCall());assertEquals(List.of("read"),actions);}
+ @Test void startedOriginalOnlyReconciles(){journal.current=receipt(event(1,Action.START_STORE,Phase.STORE_STARTED,dispatch,1,command.startCommand(),null));assertEquals(Status.ARCHIVE_VERIFICATION_RECORDED,consumer().once(command).status());assertEquals(List.of("read","verify:1"),actions);assertEquals(0,writes);}
+ @Test void unconfirmedOriginalOnlyReconciles(){journal.current=receipt(event(2,Action.MARK_UNCONFIRMED,Phase.VERIFY_REQUIRED,dispatch,1,command.unconfirmedCommand(),null));assertEquals(Status.ARCHIVE_VERIFICATION_RECORDED,consumer().once(command).status());assertEquals(List.of("read","verify:2"),actions);assertEquals(0,writes);}
+ @Test void historicalStartReplayCannotAuthorizeAnotherStore(){journal.replayStart=true;assertEquals(Status.RECONCILIATION_REQUIRED,consumer().once(command).status());assertEquals(List.of("read","start:0"),actions);assertEquals(0,writes);}
+ @Test void lostStartReceiptDoesNotDispatchAndNextAttemptOnlyReadsOriginal(){journal.commitStartThenFail=true;var c=consumer();assertEquals(Status.RECONCILIATION_REQUIRED,c.once(command).status());assertEquals(0,writes);journal.commitStartThenFail=false;assertEquals(Status.ARCHIVE_VERIFICATION_RECORDED,c.once(command).status());assertEquals(0,writes);assertEquals(List.of("read","start:0","read","verify:1"),actions);}
+ @Test void failedStartWithoutCommitDoesNotAssumeSafeToRetryPut(){journal.failStart=true;assertEquals(Status.RECONCILIATION_REQUIRED,consumer().once(command).status());assertEquals(0,writes);}
+ @Test void failedStoreMarksUnconfirmedAndRetryNeverRepeatsWrite(){failWrite=true;var c=consumer();assertEquals(Status.RECONCILIATION_REQUIRED,c.once(command).status());assertEquals(Phase.VERIFY_REQUIRED,journal.current.event().phase());failWrite=false;assertEquals(Status.ARCHIVE_VERIFICATION_RECORDED,c.once(command).status());assertEquals(1,writes);assertEquals(List.of("read","start:0","store","mark:1","read","verify:2"),actions);}
+ @Test void failedMarkerCannotCauseAutomaticStoreRetry(){failWrite=true;journal.failMark=true;var c=consumer();assertEquals(Status.RECONCILIATION_REQUIRED,c.once(command).status());assertEquals(Phase.STORE_STARTED,journal.current.event().phase());failWrite=false;journal.failMark=false;assertEquals(Status.ARCHIVE_VERIFICATION_RECORDED,c.once(command).status());assertEquals(1,writes);}
+ @Test void objectNotFoundAfterStartIsNotProofOfNoDispatch(){journal.current=receipt(event(1,Action.START_STORE,Phase.STORE_STARTED,dispatch,1,command.startCommand(),null));journal.failVerify=true;assertEquals(Status.RECONCILIATION_REQUIRED,consumer().once(command).status());assertEquals(Phase.VERIFY_REQUIRED,journal.current.event().phase());assertEquals(0,writes);}
+ @Test void repeatedUnconfirmedReconcileFailureDoesNotAppendRepeatedMarkers(){journal.current=receipt(event(2,Action.MARK_UNCONFIRMED,Phase.VERIFY_REQUIRED,dispatch,1,command.unconfirmedCommand(),null));journal.failVerify=true;assertEquals(Status.RECONCILIATION_REQUIRED,consumer().once(command).status());assertEquals(List.of("read","verify:2"),actions);}
+ @Test void lostVerificationReceiptIsRecoveredWithoutPutOrFalseNoDispatch(){journal.commitVerifyThenFail=true;var c=consumer();assertEquals(Status.RECONCILIATION_REQUIRED,c.once(command).status());assertEquals(Phase.VERIFIED,journal.current.event().phase());journal.commitVerifyThenFail=false;assertEquals(Status.ARCHIVE_VERIFICATION_RECORDED,c.once(command).status());assertEquals(1,writes);}
+ @Test void mismatchedDispatchOwnerCannotReconcileAnotherConsumersWork(){journal.current=receipt(event(1,Action.START_STORE,Phase.STORE_STARTED,new Dispatch(dispatch.id(),"other-owner"),1,command.startCommand(),null));assertEquals(409,assertThrows(DomainException.class,()->consumer().once(command)).status);assertEquals(List.of("read"),actions);}
+ @Test void mismatchedDispatchIdCannotReconcileAnotherConsumersWork(){journal.current=receipt(event(1,Action.START_STORE,Phase.STORE_STARTED,new Dispatch(id(99),dispatch.owner()),1,command.startCommand(),null));assertThrows(DomainException.class,()->consumer().once(command));assertEquals(List.of("read"),actions);}
+ @Test void stagedVersionDriftCannotStart(){journal.current=receipt(event(2,Action.CONFIRM_NO_DISPATCH,Phase.STAGED,dispatch,1,id(99),command.evidenceReference()));assertThrows(DomainException.class,()->consumer().once(command));assertEquals(List.of("read"),actions);}
+ @Test void currentFailureAndMissingAreNotEmptySuccess(){journal.failCurrent=true;assertThrows(RuntimeException.class,()->consumer().once(command));journal.failCurrent=false;journal.missing=true;assertEquals(404,assertThrows(DomainException.class,()->consumer().once(command)).status);assertEquals(0,writes);}
+ @Test void currentHistoricalReplayIsNotCurrentAuthority(){journal.current=new Receipt(source,journal.current.event(),true);assertThrows(DomainException.class,()->consumer().once(command));assertEquals(List.of("read"),actions);}
+ @Test void currentMalformedVerifiedClaimIsRejected(){journal.current=receipt(event(2,Action.START_STORE,Phase.VERIFIED,dispatch,1,command.startCommand(),null));assertThrows(DomainException.class,()->consumer().once(command));assertEquals(List.of("read"),actions);}
+ @Test void originalSourceReplacementBeforeStoreIsRejected(){journal.wrongStartSource=true;assertThrows(DomainException.class,()->consumer().once(command));assertEquals(0,writes);}
+ @Test void originalSourceReplacementOnVerificationCannotClaimSuccess(){journal.wrongVerifySource=true;assertEquals(Status.RECONCILIATION_REQUIRED,consumer().once(command).status());}
+ @Test void authorizationDeniedBeforeReadOrStartPreventsExternalWrite(){for(var step:List.of(Step.READ,Step.START_STORE)){denied=step;assertThrows(DomainException.class,()->consumer().once(command));assertEquals(0,writes);}}
+ @Test void authorizationDeniedAfterClaimSuppressesStoreAndKeepsUnconfirmed(){denied=Step.STORE_ORIGINAL;var r=consumer().once(command);assertEquals(Status.RECONCILIATION_REQUIRED,r.status());assertFalse(r.storeMethodInvokedThisCall());assertEquals(0,writes);}
+ @Test void authorizationDeniedBeforeReconcilePreventsProofAndNoBlindPut(){journal.current=receipt(event(1,Action.START_STORE,Phase.STORE_STARTED,dispatch,1,command.startCommand(),null));denied=Step.RECONCILE_ORIGINAL;assertEquals(Status.RECONCILIATION_REQUIRED,consumer().once(command).status());assertEquals(List.of("read"),actions);}
+ @Test void authorizationDeniedBeforeReturnSuppressesTheResult(){denied=Step.RETURN_RESULT;assertThrows(DomainException.class,()->consumer().once(command));assertEquals(1,writes);}
+ @Test void explicitBindingReferenceIsRequiredAndCannotBeAUrl(){assertThrows(DomainException.class,()->new Binding(true,null));assertThrows(DomainException.class,()->new Binding(true,"https://example.invalid"));assertThrows(DomainException.class,()->new Binding(false,"secret-value"));}
+ @Test void commandIdentifiersMustBeDistinctAndReferencesCredentialFree(){assertThrows(DomainException.class,()->new Command(access,scope,0,dispatch,id(7),id(7),id(9),command.evidenceReference(),"trace"));assertThrows(DomainException.class,()->new Command(access,scope,0,dispatch,id(7),id(8),id(9),"https://example.invalid","trace"));assertThrows(DomainException.class,()->new Command(access,scope,-1,dispatch,id(7),id(8),id(9),command.evidenceReference(),"trace"));}
+ @Test void crossTenantCommandFailsBeforeAnyPort(){assertThrows(DomainException.class,()->new Command(new Access(id(99),id(2),7),scope,0,dispatch,id(7),id(8),id(9),command.evidenceReference(),"trace"));assertTrue(actions.isEmpty());}
+}

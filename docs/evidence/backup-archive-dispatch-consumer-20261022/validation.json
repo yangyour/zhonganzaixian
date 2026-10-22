@@ -1,0 +1,42 @@
+{
+  "result": "PASS_EXPLICIT_SINGLE_COMMAND_WITH_PRODUCTION_BINDING_DISABLED",
+  "new_java_tests": 33,
+  "new_python_tests": 1,
+  "java_test_layers": {
+    "synthetic_journal_state_and_authority": 29,
+    "real_JCE_with_synthetic_storage_and_keys": 4
+  },
+  "maven_verify": {
+    "tests": 4165,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1032,
+    "executed": 3133
+  },
+  "python_tests": 136,
+  "node_contract_tests": 178,
+  "frontend_changed": false,
+  "prior_frontend_baseline": {
+    "files": 272,
+    "tests": 4545,
+    "commit": "d24896ba1061baa3a1bfddd9711aa7a1d2baa777"
+  },
+  "browser": "105_SPECIFICATIONS_12_FILES_ACTUAL_NOT_RUN",
+  "formal_contract_tc": "128_NOT_RUN",
+  "production_worker_jar_sha256": "aead0887fc4dd09d9a7bf6afd2ab43a5fa829c722ee8459eff066010f97f1d29",
+  "production_jar_contains_consumer": true,
+  "production_jar_excludes_test_classes": true,
+  "auto_wiring_or_schedule_added": false,
+  "new_sql_or_postgresql_integration": false,
+  "real_object_storage_kms_or_device_calls": 0,
+  "dependency_reference_slots_null": 31,
+  "execution_enabled": false,
+  "version_registration_or_run_completion": false,
+  "source_sha256": {
+    "server/worker/src/main/java/cn/mop/worker/backup/BackupArchiveDispatch.java": "990ad03dd9a2afa04c7c0656fee0f87c898d3765afab17434e8b9636ce2c1f51",
+    "server/worker/src/test/java/cn/mop/worker/backup/BackupArchiveDispatchTest.java": "76a163356114cdc760cf9957f5f68904fd4ab5cfeae222cc861602b3c64542a7",
+    "server/worker/src/test/java/cn/mop/worker/backup/BackupArchiveDispatchCryptoTest.java": "cd96cac997d9499559107dd6e90c1463fd689489c48605d9210c318342baef5b",
+    "deploy/examples/backup-execution-dependencies.json": "2ee53b49b961e6c928b49a1506ef9188ba46a2e3259476c732a25e9976b2997a",
+    "tools/test_backup_execution_dependencies.py": "a040f5afc2ab01f92269144d9a1b1b153ab9568a2a90d712dd999e529de8d411"
+  }
+}

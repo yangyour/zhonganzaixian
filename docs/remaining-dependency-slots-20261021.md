@@ -61,3 +61,7 @@
 ## 2026-10-22 资产备份只读前端接线
 
 已具备资产详情面板、原页分页恢复、取消及独立授权错误提示。backup_version_inventory_binding_reference 与独立授权引用仍为 null，实际授权适配/锁边界须显式装配；前端 assets:read 可见不授予备份枚举。前端未配置提示不代表此依赖已完成，浏览器/生产联调仍待。
+
+## 2026-10-22 归档单次消费者
+
+[原信封归档单次消费者](backup-archive-dispatch-consumer-20261022.md)已有显式执行与只读核查恢复代码，archive_dispatch_consumer_binding_reference仍null；31项引用槽均空，执行/生产批准false。绑定引用不是授权证明，真实Authority/原对象核验/KMS/存储、调度与版本登记消费者仍需分别装配验证。

@@ -1,0 +1,41 @@
+{
+  "status": "PASS_METADATA_READ_RECOVERY_WITH_DRAFT_CONFIRMATION_NEXT",
+  "new_tests": 29,
+  "new_reader_tests": 19,
+  "new_vue_dom_tests": 10,
+  "old_implementation_first_regression_run": {
+    "tests": 41,
+    "passed": 28,
+    "failed": 13
+  },
+  "vitest": {
+    "files": 273,
+    "tests": 4578,
+    "failures": 0
+  },
+  "node_contract_tests": 179,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180732,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "b5588803ffaee33df8f40b75e53b14493d78f10331596ffae82b5674d3e5d1af",
+    "scope": "static-artifacts-only"
+  },
+  "first_build_failure": "Two implicit any parameters in test drawer shell; added Slots type and rebuilt",
+  "component_test_boundary": "Actual Vue and ElementPlus controls; drawer shell stubbed, not modal/browser acceptance",
+  "http_smoke": "4_REAL_LOOPBACK_VITE_RESOURCES_PASS_AND_STOPPED",
+  "browser": "105_SPECIFICATIONS_12_FILES_ACTUAL_NOT_RUN",
+  "formal_contract_tc": "128_NOT_RUN",
+  "backend_or_sql_changed": false,
+  "production_permissions_or_defaults_changed": false,
+  "pending": "Full unsaved draft confirmation for re-edit, asset replacement and navigation",
+  "source_sha256": {
+    "apps/web/src/utils/assetMetadataWorkspace.ts": "8cae028056643f9480df1975322c7b1c2bf4dd60a55a7b8fb137e2b19923ebd1",
+    "apps/web/src/components/AssetMetadataWorkspace.vue": "8b33ab2f1e9fc5ab71d2c5455a9eca4c0d900bd2e060f68806d6ac6abe2bf1da",
+    "apps/web/tests/assetMetadataWorkspace.test.ts": "34016c393c9573f67704b26ffbeeca82fd9d6354ccf9b3a19fb2176d8f0073b5",
+    "apps/web/tests/fixtures/assetMetadata.ts": "f6e8da9d1b176bb6bf136e1b4a7a7785b9159e069d67f62e74798f9ed3ea9841",
+    "apps/web/tests/assetMetadataRecoveryPanel.test.ts": "f59b3d148f3f2588e81beb3e9d0314fd71c4e5df27be034840ab4aef5bfc875c"
+  }
+}

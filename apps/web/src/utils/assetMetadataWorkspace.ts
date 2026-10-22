@@ -13,7 +13,8 @@ export interface MetadataHistory { items: MetadataRevision[]; has_more: boolean;
 export interface MetadataReferences { sites: { id: string; label: string }[]; owners: { id: string; label: string }[]; sites_truncated: boolean; owners_truncated: boolean; query: string; limit_per_kind: 100; scope: 'CURRENT_TENANT_ACTIVE_REFERENCES'; source: 'postgresql'; reference_validation: 'RECHECKED_ON_WRITE'; default_owner_id: null }
 export interface MetadataContext { tenantId: string; assetId: string; actorId: string; permissionVersion: number; canWrite: boolean }
 interface Attempt { key: string; payload: string; baseline: MetadataCurrent; state: 'uncertain' | 'accepted' | 'rejected' }
-export interface MetadataState { current: MetadataCurrent | null; history: MetadataHistory | null; references: MetadataReferences | null; receipt: MetadataCurrent | null; attempt: Attempt | null; busy: 'read' | 'write' | null; error: unknown }
+export type MetadataReadTarget = { kind: 'current-history'; beforeVersion: number | null } | { kind: 'references'; query: string }
+export interface MetadataState { readTarget: MetadataReadTarget | null; cancelledRead: boolean; current: MetadataCurrent | null; history: MetadataHistory | null; references: MetadataReferences | null; receipt: MetadataCurrent | null; attempt: Attempt | null; busy: 'read' | 'write' | null; error: unknown }
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const types = ['router', 'switch', 'firewall', 'ap', 'wireless_controller', 'other']
 const inputKeys = ['name', 'type', 'site_id', 'brand', 'model', 'serial_number', 'location', 'owner_id', 'business_description', 'purchase_date', 'warranty_expiry', 'overdue_service_date', 'collection_method_note', 'note']
@@ -82,53 +83,91 @@ function readReferences(value: unknown, query: string): MetadataReferences {
   for (const kind of ['sites', 'owners'] as const) { const list = value[kind] as unknown[]; if (list.length > 100 || value[kind + '_truncated'] && list.length !== 100 || new Set(list.map(v => object(v) ? v.id : null)).size !== list.length) throw invalid(); for (const item of list) if (!exact(item, ['id', 'label']) || !text(item.id, kind === 'sites' ? 64 : 36) || kind === 'owners' && !uuid.test(item.id) || !text(item.label, 100)) throw invalid() }
   return clone(value) as unknown as MetadataReferences
 }
-export const emptyMetadataState = (): MetadataState => ({ current: null, history: null, references: null, receipt: null, attempt: null, busy: null, error: null })
+export const emptyMetadataState = (): MetadataState => ({ current: null, history: null, references: null, receipt: null, attempt: null, busy: null, error: null, readTarget: null, cancelledRead: false })
 export function createMetadataWorkspace(client: Pick<ApiClient, 'request'>, changed: (state: MetadataState) => void, newKey: () => string = () => createRequestId()) {
-  let context: MetadataContext | null = null, state = emptyMetadataState(), epoch = 0, controller: AbortController | undefined
-  const emit = () => changed(detachedWorkspaceState(state)), path = () => `/assets/${context!.assetId}/manual-metadata`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
-  function reset(next: MetadataContext | null) { controller?.abort(); ++epoch; const valid = next && [next.tenantId, next.assetId, next.actorId].every(id => uuid.test(id)) && version(next.permissionVersion) && typeof next.canWrite === 'boolean'; context = valid ? { ...next! } : null; state = emptyMetadataState(); if (next && !valid) state.error = invalid(); emit() }
-  async function refresh(moreHistory = false) {
-    if (!context || state.busy === 'write' || moreHistory && (state.busy || !state.history?.has_more)) return false
-    const scope = { ...context }, previous = state.current, before = moreHistory ? state.history!.next_before_version : null, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort
-    state = { ...state, current: null, history: null, busy: 'read', error: null }; emit()
-    try {
-      const current = readMetadataCurrent(await client.request<unknown>(path(), { signal: abort.signal }), scope)
-      if (turn !== epoch || abort.signal.aborted) return false
-      if (previous && current.asset.version < previous.asset.version || state.receipt && current.asset.version < state.receipt.asset.version) throw invalid()
-      for (const known of [previous, state.receipt]) if (known && current.asset.version === known.asset.version && (current.metadata_version !== known.metadata_version || current.asset.management_ip !== known.asset.management_ip || current.metadata && known.metadata && inputKeys.some(key => current.metadata![key as keyof MetadataInput] !== known.metadata![key as keyof MetadataInput]))) throw invalid()
-      const boundary = moreHistory && previous?.asset.version === current.asset.version ? before : null
-      const history = readMetadataHistory(await client.request<unknown>(path() + '/history?page_size=15' + (boundary ? '&before_version=' + boundary : ''), { signal: abort.signal }), scope, current, boundary)
-      if (turn !== epoch || abort.signal.aborted) return false
-      state = { ...state, current, history }; return true
-    } catch (error) { if (turn === epoch && !isCancelled(error)) state = { ...state, error }; return false }
-    finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
+  let context: MetadataContext | null = null, state = emptyMetadataState(), epoch = 0, controller: AbortController | undefined, disposed = false
+  let highest: MetadataCurrent | null = null
+  const emit = () => changed(detachedWorkspaceState(state)), path = (scope: MetadataContext) => `/assets/${scope.assetId}/manual-metadata`, unresolved = () => state.busy === 'write' || state.attempt?.state === 'uncertain'
+  function reset(next: MetadataContext | null) {
+    controller?.abort(); controller = undefined; ++epoch; highest = null
+    const valid = !disposed && next && [next.tenantId, next.assetId, next.actorId].every(id => uuid.test(id)) && version(next.permissionVersion) && typeof next.canWrite === 'boolean'
+    context = valid ? { ...next! } : null; state = emptyMetadataState(); if (!disposed && next && !valid) state.error = invalid(); emit()
   }
-  async function references(query = '') {
-    if (!context || state.busy || Array.from(query).length > 100 || /[\u0000-\u001f\u007f-\u009f]/.test(query)) return false
-    const turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort; state = { ...state, references: null, busy: 'read', error: null }; emit()
-    try { const refs = readReferences(await client.request<unknown>(path() + '/references?q=' + encodeURIComponent(query), { signal: abort.signal }), query); if (turn !== epoch || abort.signal.aborted) return false; state = { ...state, references: refs }; return true }
-    catch (error) { if (turn === epoch && !isCancelled(error)) state = { ...state, error }; return false }
-    finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
+  function remember(value: MetadataCurrent) {
+    for (const known of [highest, state.receipt]) {
+      if (!known) continue
+      if (value.asset.version < known.asset.version || value.asset.created_at !== known.asset.created_at || known.metadata_version !== null && (value.metadata_version === null || value.metadata_version < known.metadata_version)) throw invalid()
+      if (value.asset.version === known.asset.version && (value.metadata_version !== known.metadata_version || value.asset.management_ip !== known.asset.management_ip || value.asset.created_at !== known.asset.created_at || ['name','type','site_id'].some(key => value.asset[key as 'name'|'type'|'site_id'] !== known.asset[key as 'name'|'type'|'site_id']) || value.metadata && known.metadata && inputKeys.some(key => value.metadata![key as keyof MetadataInput] !== known.metadata![key as keyof MetadataInput]))) throw invalid()
+    }
+    highest = clone(value)
+  }
+  async function read(target: MetadataReadTarget) {
+    if (disposed || !context || state.busy) return false
+    const scope = context, original = clone(target), turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort
+    state = { ...state, ...(original.kind === 'current-history' ? { current: null, history: null } : { references: null }), readTarget: original, cancelledRead: false, busy: 'read', error: null }; emit()
+    if (disposed || turn !== epoch || abort.signal.aborted || context !== scope) return false
+    try {
+      if (original.kind === 'references') {
+        const refs = readReferences(await client.request<unknown>(path(scope) + '/references?q=' + encodeURIComponent(original.query), { signal: abort.signal }), original.query)
+        if (disposed || turn !== epoch || abort.signal.aborted || context !== scope) return false
+        state = { ...state, references: refs }; return true
+      }
+      const raw = await client.request<unknown>(path(scope), { signal: abort.signal })
+      if (disposed || turn !== epoch || abort.signal.aborted || context !== scope) return false
+      const current = readMetadataCurrent(raw, scope); remember(current)
+      const boundary = original.beforeVersion
+      const history = readMetadataHistory(await client.request<unknown>(path(scope) + '/history?page_size=15' + (boundary !== null ? '&before_version=' + boundary : ''), { signal: abort.signal }), scope, current, boundary)
+      if (disposed || turn !== epoch || abort.signal.aborted || context !== scope) return false
+      state = { ...state, current, history }; return true
+    } catch (error) { if (!disposed && turn === epoch) state = { ...state, ...(isCancelled(error) ? { cancelledRead: true } : { error }) }; return false }
+    finally { if (!disposed && turn === epoch) { controller = undefined; state = { ...state, busy: null }; emit() } }
+  }
+  function refresh(moreHistory = false) {
+    if (disposed || !context || state.busy || moreHistory && !state.history?.has_more) return Promise.resolve(false)
+    return read({ kind: 'current-history', beforeVersion: moreHistory ? state.history!.next_before_version : null })
+  }
+  function references(query = '') {
+    if (disposed || !context || state.busy || Array.from(query).length > 100 || /[\u0000-\u001f\u007f-\u009f]/.test(query)) return Promise.resolve(false)
+    return read({ kind: 'references', query })
+  }
+  const canRetryRead = () => !disposed && !!context && !!state.readTarget && !state.busy && !!(state.error || state.cancelledRead)
+  function retryRead() { return canRetryRead() ? read(clone(state.readTarget!)) : Promise.resolve(false) }
+  function cancelRead() {
+    if (disposed || state.busy !== 'read') return false
+    ++epoch; controller?.abort(); controller = undefined
+    state = { ...state, ...(state.readTarget?.kind === 'current-history' ? { current: null, history: null } : { references: null }), busy: null, error: null, cancelledRead: true }; emit(); return true
   }
   async function send(attempt: Attempt, retry = false) {
-    if (!context?.canWrite || state.busy) return false
-    const scope = { ...context }, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort; state = { ...state, busy: 'write', error: null, attempt: { ...attempt, state: 'uncertain' } }; emit()
+    if (disposed || !context?.canWrite || state.busy) return false
+    const scope = context, turn = ++epoch; controller?.abort(); const abort = new AbortController(); controller = abort
+    state = { ...state, busy: 'write', error: null, readTarget: null, cancelledRead: false, attempt: { ...attempt, state: 'uncertain' } }; emit()
+    if (disposed || turn !== epoch || abort.signal.aborted || context !== scope) return false
     try {
       const body = JSON.parse(attempt.payload) as MetadataInput & { expected_version: number }
-      const receipt = readMetadataCurrent(await client.request<unknown>(path(), { method: 'PATCH', body, idempotencyKey: attempt.key, signal: abort.signal }), scope)
-      if (turn !== epoch || abort.signal.aborted) return false
+      const raw = await client.request<unknown>(path(scope), { method: 'PATCH', body, idempotencyKey: attempt.key, signal: abort.signal })
+      if (disposed || turn !== epoch || abort.signal.aborted || context !== scope) return false
+      const receipt = readMetadataCurrent(raw, scope)
       if (receipt.asset.version !== body.expected_version + 1 || receipt.metadata_version !== receipt.asset.version || !receipt.metadata || inputKeys.some(key => receipt.metadata![key as keyof MetadataInput] !== body[key as keyof MetadataInput]) || receipt.recorded_by !== scope.actorId || receipt.asset.management_ip !== attempt.baseline.asset.management_ip || receipt.asset.created_at !== attempt.baseline.asset.created_at || !receipt.can_edit) throw invalid()
-      state = { ...state, receipt, current: receipt, history: null, busy: null, attempt: { ...attempt, state: 'accepted' } }; emit(); await refresh(); return true
+      // An old valid command receipt may precede a newer current read; retain it as a receipt, never lower the current floor.
+      if (!highest || receipt.asset.version >= highest.asset.version) remember(receipt)
+      state = { ...state, receipt, current: highest && highest.asset.version > receipt.asset.version ? null : receipt, history: null, busy: null, attempt: { ...attempt, state: 'accepted' } }; emit()
+      if (disposed || turn !== epoch || context !== scope) return false
+      await refresh(); return !disposed && context === scope
     } catch (error) {
-      if (turn !== epoch) return false
+      if (disposed || turn !== epoch || context !== scope) return false
       const uncertain = retry || isCancelled(error) || !(error instanceof ApiError) || error.status === 0 || error.status >= 500 || error.code.startsWith('INVALID_')
       state = { ...state, current: null, history: null, error, attempt: { ...attempt, state: uncertain ? 'uncertain' : 'rejected' } }; return false
-    } finally { if (turn === epoch) { state = { ...state, busy: null }; emit() } }
+    } finally { if (!disposed && turn === epoch) { controller = undefined; state = { ...state, busy: null }; emit() } }
   }
   async function submit(input: MetadataInput, expectedVersion: number) {
-    if (!context?.canWrite || state.busy || unresolved() || !state.current?.can_edit || state.current.asset.version !== expectedVersion) return false
+    if (disposed || !context?.canWrite || state.busy || unresolved() || !state.current?.can_edit || state.current.asset.version !== expectedVersion) return false
     validateMetadataInput(input); if (expectedVersion >= Number.MAX_SAFE_INTEGER) throw inputInvalid()
-    return send({ key: newKey(), payload: JSON.stringify({ expected_version: expectedVersion, ...clone(input) }), baseline: clone(state.current), state: 'uncertain' })
+    const scope = context, turn = epoch, payload = JSON.stringify({ expected_version: expectedVersion, ...clone(input) }), baseline = clone(state.current)
+    let key: string
+    try { key = newKey(); if (typeof key !== 'string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(key)) throw new Error() }
+    catch { if (!disposed && turn === epoch && context === scope) { state = { ...state, readTarget: null, cancelledRead: false, error: new ApiError(0,'METADATA_PREPARATION_FAILED','保存请求尚未发送，请重试准备；原输入保留','—') }; emit() }; return false }
+    if (disposed || turn !== epoch || context !== scope || state.busy || unresolved()) return false
+    return send({ key, payload, baseline, state: 'uncertain' })
   }
-  emit(); return { reset, refresh, references, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => reset(null), state: () => detachedWorkspaceState(state) }
+  emit(); return { reset, refresh, references, retryRead, cancelRead, canRetryRead, submit, retry: () => state.attempt?.state === 'uncertain' ? send(state.attempt, true) : Promise.resolve(false), unresolved, dispose: () => { disposed = true; reset(null) }, state: () => detachedWorkspaceState(state) }
 }

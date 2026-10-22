@@ -171,3 +171,5 @@ qa/browser/my-tasks.pw.ts新增6项四视口、键盘详情、固定负责人、
 [CMDB 来源检查恢复](cmdb-preflight-read-recovery-20261022.md)新增9项DOM恢复/分页/同步范围回归及8项服务端返回前授权回归，区分检查失败、取消及成功有限诊断；分页不静默截断，原检查重试不变更类型或来源。真实浏览器仍NOT_RUN。
 
 [备份版本实际HTTP/PG载荷回放](backup-version-inventory-http-postgres-20261022.md)把真实服务返回的默认页、成对游标及授权空页接入严格读取器、Vue DOM和OpenAPI回放。真实HTTP12请求、前端回放、实际浏览器NOT_RUN三层分别留证，不把回放当作浏览器联调。
+
+[资产扩展资料读取恢复](asset-metadata-read-recovery-20261022.md)新增29项读取器与Vue DOM检查，保留原游标/查询和未知保存，保存后的新输入不被旧回执清空。drawer使用测试外壳，不能宣称真实弹窗或浏览器验收通过。

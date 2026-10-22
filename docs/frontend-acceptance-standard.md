@@ -173,3 +173,5 @@ qa/browser/my-tasks.pw.ts新增6项四视口、键盘详情、固定负责人、
 [备份版本实际HTTP/PG载荷回放](backup-version-inventory-http-postgres-20261022.md)把真实服务返回的默认页、成对游标及授权空页接入严格读取器、Vue DOM和OpenAPI回放。真实HTTP12请求、前端回放、实际浏览器NOT_RUN三层分别留证，不把回放当作浏览器联调。
 
 [资产扩展资料读取恢复](asset-metadata-read-recovery-20261022.md)新增29项读取器与Vue DOM检查，保留原游标/查询和未知保存，保存后的新输入不被旧回执清空。drawer使用测试外壳，不能宣称真实弹窗或浏览器验收通过。
+
+[资产资料完整草稿确认](asset-metadata-draft-protection-20261022.md)新增25项真实Vue/父子/内存路由检查，覆盖晚守卫变更、对话框期间新输入和后发选择；只在基准与输入仍相同才执行原决定。确认返回与drawer外壳受测试控制，实际模态焦点/浏览器/屏幕阅读器仍NOT_RUN。

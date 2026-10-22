@@ -169,17 +169,18 @@ function openWarranty() {
 }
 function warrantySaved() { void loadAssets(); if (queryString('asset_id') === warrantyAsset.value?.id) void loadDetail(queryString('asset_id')) }
 const metadataAllowed = computed(() => ['msp', 'padmin'].includes(session.value?.user.role || ''))
-function openMetadata() {
-  if (warrantyPanel.value?.hasUnresolved()) { ElMessage.warning('设备维保档案保存状态待确认，请先处理当前提交'); return }
-  if (!asset.value) return
-  if (metadataPanel.value?.hasUnresolved() && metadataAsset.value?.id !== asset.value.id) { ElMessage.warning('另一台设备的扩展资料保存状态待确认，请先返回原设备处理'); return }
-  metadataAsset.value = asset.value; metadataOpen.value = true
+let metadataSelectionEpoch = 0
+async function replaceMetadataTarget(selected: Asset, fromQuery: boolean) {
+  const selectionTurn = ++metadataSelectionEpoch
+  if (warrantyPanel.value?.hasUnresolved()) { ElMessage.warning('设备维保档案保存状态待确认，请先处理当前提交'); return false }
+  if (!readable() || !can('assets:write') || !metadataAllowed.value) return false
+  const owner = readScope.value, target = JSON.stringify(selected), editor = metadataPanel.value, before = editor?.inputSnapshot(), queryWasOpen = metadataQueryOpen.value
+  if (editor && !await editor.canReplace(selected)) return false
+  if (selectionTurn !== metadataSelectionEpoch || owner !== readScope.value || !readable() || !can('assets:write') || !metadataAllowed.value || editor !== metadataPanel.value || before !== editor?.inputSnapshot() || target !== JSON.stringify(selected) || fromQuery && queryWasOpen !== metadataQueryOpen.value || !fromQuery && target !== JSON.stringify(asset.value)) return false
+  metadataAsset.value = selected; metadataOpen.value = true; if (fromQuery) metadataQueryOpen.value = false; return true
 }
-function openQueryMetadata(selected: Asset) {
-  if (warrantyPanel.value?.hasUnresolved()) { ElMessage.warning('设备维保档案保存状态待确认，请先处理当前提交'); return }
-  if (metadataPanel.value?.hasUnresolved() && metadataAsset.value?.id !== selected.id) { ElMessage.warning('另一台设备的扩展资料保存状态待确认，请先返回原设备处理'); return }
-  metadataAsset.value = selected; metadataOpen.value = true; metadataQueryOpen.value = false
-}
+async function openMetadata() { return asset.value ? replaceMetadataTarget(asset.value,false) : false }
+async function openQueryMetadata(selected: Asset) { return replaceMetadataTarget(selected,true) }
 function metadataSaved() { void loadAssets(); if (queryString('asset_id') === metadataAsset.value?.id) void loadDetail(queryString('asset_id')) }
 const importOpen = ref(false)
 const importAllowed = computed(() => ['padmin', 'msp', 'tadmin'].includes(session.value?.user.role || ''))

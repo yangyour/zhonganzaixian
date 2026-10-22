@@ -1,0 +1,54 @@
+{
+  "status": "PASS_METADATA_COMPLETE_DRAFT_AND_SELECTION_PROTECTION",
+  "new_tests": 25,
+  "new_editor_and_memory_router_tests": 16,
+  "new_parent_child_tests": 9,
+  "original_editor_regressions": {
+    "failed": 16,
+    "passed": 0
+  },
+  "late_selection_race_before_fix": {
+    "tests": 9,
+    "failed": 1,
+    "passed": 8
+  },
+  "focused_with_existing_guard_and_read_tests": {
+    "files": 4,
+    "tests": 46,
+    "failures": 0
+  },
+  "vitest": {
+    "files": 275,
+    "tests": 4603,
+    "failures": 0
+  },
+  "node_contract_tests": 179,
+  "typecheck": "PASS",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180730,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "dada04dcca71fef8d91a35087efb924cdcb5d164b062b92d999be973d8b66479",
+    "scope": "static-artifacts-only"
+  },
+  "preserved_failures": [
+    "Unrelated warranty stub lacked exposed hasUnresolved;8 parent tests initially failed before fixture correction",
+    "Confirmation mock return typed to Awaited library method result",
+    "First full suite4601pass/1fail: legacy source regex did not accept snapshot callback; retained deny/disposal checks and supported inputSnapshot",
+    "Old selection approval could override a newer same-asset open; reproduced and fixed selection epoch"
+  ],
+  "test_boundary": "Actual Vue parent-child and memory router; modal decisions/drawer shell/unrelated workspaces test-controlled",
+  "http_smoke": "4_DISTINCT_LOOPBACK_VITE_RESOURCES_PASS_AND_STOPPED",
+  "browser": "105_SPECIFICATIONS_12_FILES_ACTUAL_NOT_RUN",
+  "formal_contract_tc": "128_NOT_RUN",
+  "backend_sql_or_real_account_changed": false,
+  "source_sha256": {
+    "apps/web/src/components/AssetMetadataWorkspace.vue": "cf80e154aceeae69af59b1071c9bc0b15f5f4172960609121c06671b4c95994a",
+    "apps/web/src/pages/AssetsPage.vue": "a0c40129c859f915cc59b57a69f24061445e572e5b213a53f405b712a02bb49b",
+    "apps/web/tests/assetMetadataConfirmation.test.ts": "0e5555c39bb5fa7ca6e9656e1807a6bb62cd34c338c1b86ce1f26e216a78fdec",
+    "apps/web/tests/assetMetadataTargetProtection.test.ts": "de99a125d2e207fb595bb06928552a7b34eb008d0230f1e4245ca88bee94e1e5",
+    "apps/web/tests/assetMetadataRecoveryPanel.test.ts": "096122ae85535912a3095da467de51560bfa54aedad0c241f26a1890fbaea952",
+    "apps/web/tests/writePanelContextGuards.test.ts": "de45528af606ca462f39087313dc154f5fe2236f83c313b8b1904d7d865d911d"
+  }
+}

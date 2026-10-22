@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onUnmounted, reactive, ref, shallowRef, watch } from 'vue'
-import { onBeforeRouteLeave } from 'vue-router'
+import { onBeforeRouteLeave, useRouter } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
 import { feedback as ElMessage } from '../utils/feedback'
 import { api } from '../api/client'
 import type { Asset, AssetType } from '../api/types'
@@ -13,25 +14,31 @@ import { contextTransitionGuards } from '../utils/contextTransitionGuard'
 const props = defineProps<{ modelValue: boolean; asset: Asset | null }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean]; saved: [] }>()
 const open = computed({ get: () => props.modelValue, set: value => emit('update:modelValue', value) })
-let disposed = false, focusEpoch = 0
+let disposed = false, focusEpoch = 0, confirmEpoch = 0
+const confirming = ref(false)
 const readNotice = ref<HTMLElement>(), readError = ref<HTMLElement>(), currentHeading = ref<HTMLElement>(), historyHeading = ref<HTMLElement>()
 const state = shallowRef<MetadataState>(emptyMetadataState())
 const workspace = createMetadataWorkspace(api, value => { state.value = value })
 const permitted = computed(() => Boolean(session.value && props.asset?.tenant_id === session.value.tenant.id && ['msp', 'padmin'].includes(session.value.user.role) && can('assets:write') && !switchingTenant.value))
 const unresolved = computed(() => state.value.busy === 'write' || state.value.attempt?.state === 'uncertain')
-const locked = computed(() => !permitted.value || Boolean(state.value.busy) || unresolved.value)
+const locked = computed(() => !permitted.value || Boolean(state.value.busy) || unresolved.value || confirming.value)
+const initialForm = ref('')
 const baseline = ref<number | null>(null), validation = ref(''), referenceQuery = ref('')
 const form = reactive<Record<keyof MetadataInput, string>>({ name: '', type: '', site_id: '', brand: '', model: '', serial_number: '', location: '', owner_id: '', business_description: '', purchase_date: '', warranty_expiry: '', overdue_service_date: '', collection_method_note: '', note: '' })
 const optionalText = [{ key: 'brand', label: '品牌', max: 100 }, { key: 'model', label: '型号', max: 100 }, { key: 'serial_number', label: '序列号', max: 128 }, { key: 'location', label: '位置', max: 200 }, { key: 'business_description', label: '所属业务说明', max: 200 }, { key: 'collection_method_note', label: '采集方式说明', max: 100 }] as const
 const dateFields = [{ key: 'purchase_date', label: '采购日期' }, { key: 'warranty_expiry', label: '维保到期日' }, { key: 'overdue_service_date', label: '超期服役日期' }] as const
 const blockers: Record<string, string> = { MANUAL_DRAFT_REQUIRED: '仅支持维护尚未接入监控的手工台账草稿', MONITORING_STATE_NOT_PRISTINE: '该资产已存在实时监控采样状态，不支持通过草稿模式覆盖', MANUAL_METADATA_CORE_DRIFT: '核心台账字段与上一版扩展资料不一致，请先核查数据来源' }
-function clearForm() { for (const key of Object.keys(form) as (keyof MetadataInput)[]) form[key] = ''; baseline.value = null; validation.value = '' }
+const hasDraft = computed(() => baseline.value !== null && JSON.stringify(form) !== initialForm.value)
+const staleBaseline = computed(() => baseline.value !== null && (Boolean(state.value.current && state.value.current.asset.version !== baseline.value) || Boolean(props.asset && props.asset.version > baseline.value)))
+function formSnapshot() { return JSON.stringify([baseline.value,form,initialForm.value]) }
+function inputSnapshot() { return JSON.stringify([contextKey.value,formSnapshot(),referenceQuery.value,state.value.current,state.value.attempt?.key,state.value.attempt?.state,workspace.unresolved()]) }
+function clearForm() { initialForm.value = ''; for (const key of Object.keys(form) as (keyof MetadataInput)[]) form[key] = ''; baseline.value = null; validation.value = '' }
 function input(): MetadataInput {
   const nullable = (key: keyof MetadataInput) => form[key] === '' ? null : form[key]
   return { name: form.name, type: form.type as AssetType, site_id: form.site_id, brand: nullable('brand'), model: nullable('model'), serial_number: nullable('serial_number'), location: nullable('location'), owner_id: nullable('owner_id'), business_description: nullable('business_description'), purchase_date: nullable('purchase_date'), warranty_expiry: nullable('warranty_expiry'), overdue_service_date: nullable('overdue_service_date'), collection_method_note: nullable('collection_method_note'), note: form.note }
 }
 const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.account_version, session.value?.user.role, session.value?.mode, session.value?.capabilities, permitted.value, props.asset?.tenant_id, props.asset?.id]))
-watch(contextKey, () => { focusEpoch++; clearForm(); referenceQuery.value = ''; const s = session.value; workspace.reset(permitted.value && s && props.asset ? { tenantId: s.tenant.id, assetId: props.asset.id, actorId: s.user.id, permissionVersion: s.permission_version, canWrite: true } : null); if (open.value && permitted.value) void load() }, { immediate: true, flush: 'sync' })
+watch(contextKey, () => { focusEpoch++; confirmEpoch++; confirming.value=false; clearForm(); referenceQuery.value = ''; const s = session.value; workspace.reset(permitted.value && s && props.asset ? { tenantId: s.tenant.id, assetId: props.asset.id, actorId: s.user.id, permissionVersion: s.permission_version, canWrite: true } : null); if (open.value && permitted.value) void load() }, { immediate: true, flush: 'sync' })
 watch(open, value => { if (value && permitted.value && !state.value.current && !state.value.busy) void load() })
 async function withReadFocus(action: () => Promise<boolean>) {
   if (disposed || state.value.busy) return false
@@ -49,13 +56,47 @@ const retryRead = () => withReadFocus(workspace.retryRead)
 const searchReferences = () => withReadFocus(() => workspace.references(referenceQuery.value))
 const earlierHistory = () => withReadFocus(() => workspace.refresh(true))
 const readMessage = computed(() => state.value.busy === 'read' ? '正在读取资料、修订历史或候选项，可以取消。' : state.value.cancelledRead ? '读取已取消；原输入与保存请求保持不变。' : state.value.error ? '读取或保存未完成，请查看错误及恢复方式。' : state.value.readTarget?.kind === 'references' && state.value.references ? `已读取候选项，原查询：${state.value.references.query || '空关键词'}。` : state.value.current ? `当前档案 v${state.value.current.asset.version}，本页修订 ${state.value.history?.items.length ?? 0} 条。` : '尚未读取资料。')
+async function confirmDiscard() {
+  if (disposed || confirming.value) return false
+  if (workspace.unresolved()) { ElMessage.warning('扩展资料保存状态待确认，不能放弃原请求'); return false }
+  if (!hasDraft.value) return true
+  const before = inputSnapshot(), owner = contextKey.value, turn = ++confirmEpoch; confirming.value = true
+  try {
+    await ElMessageBox.confirm('将放弃尚未保存的资产扩展资料输入，是否继续？','保留资产资料草稿',{type:'warning',confirmButtonText:'放弃未保存输入',cancelButtonText:'继续编辑'})
+    return !disposed && turn === confirmEpoch && owner === contextKey.value && before === inputSnapshot() && !workspace.unresolved()
+  } catch { return false }
+  finally { if (!disposed && turn === confirmEpoch && owner === contextKey.value) confirming.value = false }
+}
 async function beginEdit() {
-  if (locked.value || !await workspace.refresh() || !state.value.current?.can_edit) return
-  const current = state.value.current; clearForm()
+  if (disposed || locked.value) return false
+  const owner = contextKey.value, before = inputSnapshot(), originalForm = formSnapshot()
+  if (!await confirmDiscard() || disposed || owner !== contextKey.value || before !== inputSnapshot() || locked.value) return false
+  if (!await workspace.refresh() || disposed || owner !== contextKey.value || originalForm !== formSnapshot() || !state.value.current?.can_edit) return false
+  const current = state.value.current
+  if (props.asset && current.asset.version < props.asset.version) { validation.value = '档案回读版本低于当前资产台账，请刷新核对后再编辑'; return false }
+  clearForm()
   if (current.metadata) for (const key of Object.keys(form) as (keyof MetadataInput)[]) form[key] = current.metadata[key] ?? ''
   else { form.name = current.asset.name; form.type = current.asset.type; form.site_id = current.asset.site_id }
-  baseline.value = current.asset.version
+  baseline.value = current.asset.version; initialForm.value = JSON.stringify(form)
   if (!state.value.references) await workspace.references()
+  return !disposed && owner === contextKey.value
+}
+async function cancelEdit() {
+  if (disposed || locked.value) return false
+  const before = inputSnapshot(), owner = contextKey.value
+  if (!await confirmDiscard() || disposed || owner !== contextKey.value || before !== inputSnapshot() || workspace.unresolved()) return false
+  clearForm(); return true
+}
+async function canLeave() {
+  if (disposed) return false
+  if (workspace.unresolved()) { ElMessage.warning('资产资料保存状态待确认，请先完成原请求重试，再离开、切换租户或退出'); return false }
+  return confirmDiscard()
+}
+async function canReplace(target: Asset) {
+  if (disposed || !session.value || switchingTenant.value || !can('assets:write') || !['msp','padmin'].includes(session.value.user.role) || target?.tenant_id !== session.value.tenant.id || typeof target.id !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(target.id)) return false
+  if (target.id === props.asset?.id) return true
+  const before = inputSnapshot(), owner = contextKey.value, selected = JSON.stringify(target)
+  return await canLeave() && !disposed && owner === contextKey.value && before === inputSnapshot() && selected === JSON.stringify(target) && !workspace.unresolved()
 }
 function clearSubmitted(payload: MetadataInput & { expected_version: number }) {
   if (baseline.value === payload.expected_version && (Object.keys(form) as (keyof MetadataInput)[]).every(key => form[key] === (payload[key] ?? ''))) clearForm()
@@ -63,7 +104,7 @@ function clearSubmitted(payload: MetadataInput & { expected_version: number }) {
 }
 async function save() {
   if (locked.value || baseline.value === null) return
-  if (state.value.current?.asset.version !== baseline.value) { validation.value = '资产版本已更新，请重新点击“基于当前版本编辑”核对后再提交'; return }
+  if (!state.value.current || staleBaseline.value) { validation.value = '资产当前版本尚未核对或已变化，请先刷新并重新准备编辑'; return }
   const owner = contextKey.value
   try { const facts = input(), expected = baseline.value; validateMetadataInput(facts); validation.value = ''; if (await workspace.submit(facts, expected) && !disposed && owner === contextKey.value) { clearSubmitted({ ...facts, expected_version: expected }); emit('saved') } }
   catch (error) { if (!disposed && owner === contextKey.value) validation.value = error instanceof Error ? error.message : '请检查资料字段' }
@@ -74,12 +115,20 @@ async function retryOriginal() {
   const payload = JSON.parse(attempt.payload) as MetadataInput & { expected_version: number }
   if (await workspace.retry() && !disposed && owner === contextKey.value) { clearSubmitted(payload); emit('saved') }
 }
-function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved()) { event.preventDefault(); event.returnValue = '' } }
+function beforeUnload(event: BeforeUnloadEvent) { if (workspace.unresolved() || hasDraft.value) { event.preventDefault(); event.returnValue = '' } }
 window.addEventListener('beforeunload', beforeUnload)
-onBeforeRouteLeave(() => { if (!workspace.unresolved()) return true; ElMessage.warning('扩展资料保存状态待确认，请先完成重试后再离开页面'); return false })
-const unregisterContextGuard = contextTransitionGuards.register(() => { if (!workspace.unresolved()) return true; ElMessage.warning('资产资料保存状态待确认，请先完成重试再切换租户或退出'); return false })
-onUnmounted(() => { disposed = true; focusEpoch++; unregisterContextGuard(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
-defineExpose({ hasUnresolved: workspace.unresolved, cancelRead: workspace.cancelRead, retryRead })
+const router = useRouter(); let routeEpoch = 0, removeResolve: (() => void) | undefined
+function clearRouteApproval() { removeResolve?.(); removeResolve = undefined; routeEpoch++ }
+async function canLeaveRoute() {
+  clearRouteApproval(); const turn = routeEpoch, before = inputSnapshot()
+  if (!await canLeave() || disposed || turn !== routeEpoch || before !== inputSnapshot()) return false
+  removeResolve = router.beforeResolve(() => !disposed && turn === routeEpoch && before === inputSnapshot() && !workspace.unresolved()); return true
+}
+onBeforeRouteLeave(canLeaveRoute)
+const removeAfterRoute = router.afterEach(clearRouteApproval), removeRouteError = router.onError(clearRouteApproval)
+const unregisterContextGuard = contextTransitionGuards.register(canLeave,inputSnapshot)
+onUnmounted(() => { disposed = true; focusEpoch++; confirmEpoch++; clearRouteApproval(); removeAfterRoute(); removeRouteError(); unregisterContextGuard(); workspace.dispose(); window.removeEventListener('beforeunload', beforeUnload) })
+defineExpose({ hasUnresolved: workspace.unresolved, hasDraft, canLeave, canReplace, inputSnapshot, cancelRead: workspace.cancelRead, retryRead })
 </script>
 
 <template>
@@ -105,7 +154,7 @@ defineExpose({ hasUnresolved: workspace.unresolved, cancelRead: workspace.cancel
         <el-button type="primary" plain :disabled="locked || !state.current.can_edit" @click="beginEdit">基于当前版本编辑</el-button>
       </section>
       <section v-if="baseline !== null" class="metadata-section">
-        <h3 class="tabular-nums">编辑草稿（基准版本 v{{ baseline }}）</h3><el-alert v-if="state.current && state.current.asset.version !== baseline" type="warning" :closable="false" title="检测到资产档案已更新，当前表单已暂停提交；请点击“基于当前版本编辑”重新加载最新基准。" />
+        <h3 class="tabular-nums">编辑草稿（基准版本 v{{ baseline }}）</h3><el-alert v-if="staleBaseline" type="warning" :closable="false" title="检测到资产档案已更新，当前表单已暂停提交；请点击“基于当前版本编辑”重新加载最新基准。" />
         <div class="metadata-actions"><el-input v-model="referenceQuery" :disabled="locked" aria-label="站点与负责人搜索" placeholder="搜索当前租户站点或活跃负责人" @keyup.enter="searchReferences" /><el-button :disabled="locked" @click="searchReferences">搜索可选项</el-button></div>
         <p v-if="state.references" class="field-help">当前候选结果对应查询：{{ state.references.query || '空关键词' }}，不是尚未提交的新搜索文字。</p><p class="field-help">单次加载最多 100 项可选站点与负责人；提交保存时将自动校验所选站点及负责人的有效性。</p><el-alert v-if="state.references?.sites_truncated || state.references?.owners_truncated" type="warning" :closable="false" title="候选项超过 100 条，请输入关键词缩小检索范围。" />
         <el-form label-position="top" @submit.prevent="save">
@@ -119,12 +168,12 @@ defineExpose({ hasUnresolved: workspace.unresolved, cancelRead: workspace.cancel
           </div>
           <p class="field-help">日期请按 YYYY-MM-DD 格式填写；采集方式说明仅记录接入方式描述，请勿填入登录密码、SNMP 团体字或私钥等敏感凭据。</p>
           <el-form-item label="维护备注（必填，最多 2000 字符）"><el-input v-model="form.note" type="textarea" :rows="3" :disabled="locked" placeholder="记录本次资料维护原因或核查说明" aria-label="资料维护备注" /></el-form-item>
-          <p v-if="validation" role="alert" class="metadata-validation">{{ validation }}</p><div class="metadata-actions"><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.current?.can_edit || state.current.asset.version !== baseline">保存资料修订</el-button><el-button :disabled="locked" @click="clearForm">取消编辑</el-button></div>
+          <p v-if="validation" role="alert" class="metadata-validation">{{ validation }}</p><div class="metadata-actions"><el-button type="primary" native-type="submit" :loading="state.busy === 'write'" :disabled="locked || !state.current?.can_edit || staleBaseline">保存资料修订</el-button><el-button :disabled="locked" @click="cancelEdit">取消编辑</el-button></div>
         </el-form>
       </section>
       <section v-if="state.history" class="metadata-section"><h3 ref="historyHeading" tabindex="-1">资料修订历史</h3><p class="field-help">展示当前已加载的扩展资料修订记录（每页 15 条，按修订版本倒序排列）。</p><el-empty v-if="!state.history.items.length" description="暂无资料修订历史" /><details v-for="revision in state.history.items" :key="revision.asset_version" class="metadata-history"><summary class="tabular-nums">资料修订 v{{ revision.asset_version }} · {{ revision.recorded_at }}</summary><p class="metadata-id">操作者 {{ revision.actor_id }}</p><p>{{ revision.before.asset.name }} → {{ revision.metadata.name }}；{{ typeLabel(revision.before.asset.type) }} → {{ typeLabel(revision.metadata.type) }}</p><p>站点 {{ revision.before.asset.site_id }} → {{ revision.metadata.site_id }}；管理 IP 保持 {{ revision.management_ip }}</p><dl class="metadata-facts"><template v-for="field in [...optionalText, ...dateFields, { key: 'owner_id' as const, label: '负责人ID' }, { key: 'note' as const, label: '维护备注' }]" :key="field.key"><dt>{{ field.label }}</dt><dd>{{ revision.before.metadata?.[field.key] ?? '未填写' }} → {{ revision.metadata[field.key] ?? '未填写' }}</dd></template></dl></details><el-button :disabled="Boolean(state.busy) || !state.history.has_more" @click="earlierHistory">加载更早修订记录</el-button></section>
     </template>
-    <template #footer><el-button @click="open = false">收起面板</el-button><span class="field-help">收起面板不会中断正在执行的请求；待确认状态将保留在当前会话中</span></template>
+    <template #footer><el-button @click="open = false">收起面板</el-button><span class="field-help">收起仅隐藏面板，草稿与待确认请求仍保留；离开页面或更换资产时会核对未保存输入</span></template>
   </el-drawer>
 </template>
 

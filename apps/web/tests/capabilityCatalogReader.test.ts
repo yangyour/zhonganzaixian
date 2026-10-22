@@ -27,3 +27,34 @@ describe('technical capability catalog reader',()=>{
  it('snapshot mutation cannot alter retained declaration data',async()=>{const {reader}=setup();await reader.refresh();reader.state().current!.entries[0]!.declared_by_role.viewer=false;expect(reader.state().current!.entries[0]!.declared_by_role.viewer).toBe(true)})
  it('page labels code declaration instead of resource allow and scopes printable review',()=>{const source=readFileSync(new URL('../src/pages/CapabilityCatalogPage.vue',import.meta.url),'utf8');for(const text of ['系统内置权限点目录（只读核对视图）','实际人员授权与角色分配请在“用户与成员”或“角色与权限”中管理','已声明','未声明','角色鉴权状态：','打印核对页','body:has(.capability-catalog-page)','table-header-group',"flush:'sync'"])expect(source).toContain(text);expect(readFileSync('src/utils/navigationModules.ts','utf8')).toContain("'capability-catalog'");expect(readFileSync(new URL('../src/router.ts',import.meta.url),'utf8')).toContain("name: 'capability-catalog'")})
 })
+
+it('does not dispatch an old read if the loading notification resets its scope',async()=>{
+ const client={request:vi.fn(async()=>fixture())} as unknown as Pick<ApiClient,'request'>
+ let reader:ReturnType<typeof createCapabilityCatalogReader>
+ reader=createCapabilityCatalogReader(client,state=>{if(state.busy)reader.reset(null)})
+ reader.reset(context);expect(await reader.refresh()).toBe(false);expect(client.request).not.toHaveBeenCalled();expect(reader.state().error).toBeNull()
+})
+it('does not borrow a replacement read controller after a loading notification reenters',async()=>{
+ const client={request:vi.fn(async()=>fixture())} as unknown as Pick<ApiClient,'request'>
+ let reader:ReturnType<typeof createCapabilityCatalogReader>,replace=true,replacement:Promise<boolean>|undefined
+ reader=createCapabilityCatalogReader(client,state=>{if(state.busy&&replace){replace=false;reader.reset({...context,permissionVersion:8});replacement=reader.refresh()}})
+ reader.reset(context);expect(await reader.refresh()).toBe(false);expect(await replacement).toBe(true);expect(client.request).toHaveBeenCalledTimes(1)
+})
+it('cancel aborts the fixed GET and ignores a late result, retry reads only the same endpoint',async()=>{
+ let release!:(v:unknown)=>void;const {reader,client}=setup(()=>new Promise(r=>release=r));const pending=reader.refresh();const signal=vi.mocked(client.request).mock.calls[0]![1]!.signal!;expect(reader.cancelRead()).toBe(true);expect(signal.aborted).toBe(true);expect(reader.canRetryRead()).toBe(true);release(fixture());expect(await pending).toBe(false);expect(reader.state().current).toBeNull();vi.mocked(client.request).mockResolvedValue(fixture());expect(await reader.retryRead()).toBe(true);expect(reader.canRetryRead()).toBe(false);expect(vi.mocked(client.request).mock.calls.every(c=>c[0]==='/authorization/capability-catalog'&&!c[1]?.method)).toBe(true)
+})
+it('failed reads remain retryable and concurrent recovery is refused',async()=>{
+ const {reader,client}=setup(()=>{throw Error('synthetic')});expect(await reader.refresh()).toBe(false);expect(reader.canRetryRead()).toBe(true);let release!:(v:unknown)=>void;vi.mocked(client.request).mockImplementation(()=>new Promise(r=>release=r));const pending=reader.retryRead();expect(await reader.retryRead()).toBe(false);release(fixture());expect(await pending).toBe(true);expect(reader.state().error).toBeNull()
+})
+it('scope changes and permanent disposal clear recovery targets',async()=>{
+ const {reader,client}=setup(()=>{throw Error('synthetic')});await reader.refresh();reader.reset({...context,permissionVersion:8});expect(reader.canRetryRead()).toBe(false);expect(await reader.retryRead()).toBe(false);await reader.refresh();reader.dispose();reader.reset(context);expect(reader.canRetryRead()).toBe(false);expect(reader.cancelRead()).toBe(false);expect(await reader.retryRead()).toBe(false);expect(client.request).toHaveBeenCalledTimes(2)
+})
+it('cancellation during asynchronous digest never publishes the validated old catalog',async()=>{
+ let release!:(v:ArrayBuffer)=>void;const spy=vi.spyOn(crypto.subtle,'digest').mockImplementation(()=>new Promise(r=>release=r));try{const {reader}=setup();const pending=reader.refresh();await vi.waitFor(()=>expect(spy).toHaveBeenCalled());expect(reader.cancelRead()).toBe(true);release(new Uint8Array(fixture().declaration_hash.match(/../g)!.map(v=>parseInt(v,16))).buffer);expect(await pending).toBe(false);expect(reader.state().current).toBeNull();expect(reader.canRetryRead()).toBe(true)}finally{spy.mockRestore()}
+})
+it('a loading notification can cancel without dispatching',async()=>{
+ const client={request:vi.fn(async()=>fixture())} as unknown as Pick<ApiClient,'request'>;let reader:ReturnType<typeof createCapabilityCatalogReader>;reader=createCapabilityCatalogReader(client,state=>{if(state.busy)reader.cancelRead()});reader.reset(context);expect(await reader.refresh()).toBe(false);expect(client.request).not.toHaveBeenCalled();expect(reader.canRetryRead()).toBe(true)
+})
+it('retains exactly the validated catalog snapshot while the asynchronous digest is pending',async()=>{
+ let release!:(v:ArrayBuffer)=>void;const spy=vi.spyOn(crypto.subtle,'digest').mockImplementation(()=>new Promise(r=>release=r));try{const raw=fixture(),hash=raw.declaration_hash,pending=readCapabilityCatalog(raw,context);await vi.waitFor(()=>expect(spy).toHaveBeenCalled());raw.entries[0]!.declared_by_role.viewer=false;raw.tenant_id=id(9);release(new Uint8Array(hash.match(/../g)!.map(v=>parseInt(v,16))).buffer);const result=await pending;expect(result.tenant_id).toBe(context.tenantId);expect(result.entries[0]!.declared_by_role.viewer).toBe(true)}finally{spy.mockRestore()}
+})

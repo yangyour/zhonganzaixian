@@ -1,0 +1,31 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> @mop/web@0.1.0 test
+> vitest run tests/capabilityCatalogReader.test.ts
+
+
+ RUN  v4.1.11 /workspace/scratch/390b70bf66c8/zhonganzaixian-integrated/apps/web
+
+ ❯ tests/capabilityCatalogReader.test.ts (16 tests | 1 failed) 88ms
+   × does not borrow a replacement read controller after a loading notification reenters 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/capabilityCatalogReader.test.ts > does not borrow a replacement read controller after a loading notification reenters
+AssertionError: expected "vi.fn()" to be called 1 times, but got 2 times
+ ❯ tests/capabilityCatalogReader.test.ts:41:127
+     39|  let reader:ReturnType<typeof createCapabilityCatalogReader>,replace=t…
+     40|  reader=createCapabilityCatalogReader(client,state=>{if(state.busy&&re…
+     41|  reader.reset(context);expect(await reader.refresh()).toBe(false);expe…
+       |                                                                                                                               ^
+     42| })
+     43|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 15 passed (16)
+   Start at  17:59:41
+   Duration  391ms (transform 113ms, setup 0ms, import 140ms, tests 88ms, environment 0ms)
+

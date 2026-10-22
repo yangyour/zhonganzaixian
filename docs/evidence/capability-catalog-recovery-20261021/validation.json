@@ -1,0 +1,61 @@
+{
+  "result": "PASS_CAPABILITY_CATALOG_READ_RECOVERY",
+  "new_tests": 14,
+  "new_test_layers": {
+    "reader": 8,
+    "real_vue_native_dom": 6
+  },
+  "focused_tests_passed": 28,
+  "vitest": {
+    "files_passed": 252,
+    "tests_passed": 4070
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "production_build": {
+    "status": "PASSED",
+    "files": 141,
+    "bootstrap_gzip_bytes": 180729,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "221cc4a3b9d28727dc4fed2d4daac9c41a29d52ac4027eecaf31daff6417ac38",
+    "scope": "static-artifacts-only"
+  },
+  "runtime": {
+    "node": "22.23.4",
+    "npm": "10.9.9"
+  },
+  "initial_failures": [
+    {
+      "dispatch_reentry": 1,
+      "passed_before_fix": 15,
+      "fixed": "Own AbortController and generation gate before dispatch."
+    },
+    {
+      "digest_mutable_response": 1,
+      "passed_before_fix": 21,
+      "fixed": "Return detached validated snapshot captured before digest wait."
+    },
+    {
+      "test_typecheck": 1,
+      "fixed": "Type request mock callback with Parameters<typeof api.request>."
+    }
+  ],
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_authorization_changes": 0,
+  "formal_acceptance_passes_added": 0,
+  "source_sha256": {
+    "apps/web/src/utils/capabilityCatalogReader.ts": "af93c5539f537ccc72b65dc56f03560054a36d5540817a1721ef05d07ce8ae80",
+    "apps/web/src/pages/CapabilityCatalogPage.vue": "a8378408eb9e4a536f4e75b2d78b50dd804cf59441dbe374045c4a5245042689",
+    "apps/web/tests/capabilityCatalogReader.test.ts": "832d263b1ee692047bd7b8de30ff8ee8aa2fe8f57376418d9fefbee52b2e7202",
+    "apps/web/tests/capabilityCatalogRecovery.test.ts": "3837e4d7620a3d5c035f7867ce0c28e26c983cba8d022fdc9821992d35484a0c"
+  }
+}

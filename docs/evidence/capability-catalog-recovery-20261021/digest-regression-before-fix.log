@@ -1,0 +1,30 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> @mop/web@0.1.0 test
+> vitest run tests/capabilityCatalogReader.test.ts
+
+
+ RUN  v4.1.11 /workspace/scratch/390b70bf66c8/zhonganzaixian-integrated/apps/web
+
+ ❯ tests/capabilityCatalogReader.test.ts (22 tests | 1 failed) 133ms
+   × retains exactly the validated catalog snapshot while the asynchronous digest is pending 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/capabilityCatalogReader.test.ts > retains exactly the validated catalog snapshot while the asynchronous digest is pending
+AssertionError: expected '62000000-0000-4000-8000-000000000009' to be '62000000-0000-4000-8000-000000000001' // Object.is equality
+
+Expected: "62000000-0000-4000-8000-000000000001"
+Received: "62000000-0000-4000-8000-000000000009"
+
+ ❯ tests/capabilityCatalogReader.test.ts:59:468
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 21 passed (22)
+   Start at  18:02:05
+   Duration  427ms (transform 90ms, setup 0ms, import 150ms, tests 133ms, environment 0ms)
+

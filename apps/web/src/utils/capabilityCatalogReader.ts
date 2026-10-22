@@ -21,11 +21,28 @@ export async function readCapabilityCatalog(v:unknown,scope:CatalogContext):Prom
  const entries:CatalogEntry[]=[];let previous='';let canonical='mop-capability-declarations-v1\nviewer|tadmin|msp|padmin\n'
  for(const entry of v.entries){if(!exact(entry,['id','label','dimension_ids','declared_by_role'])||!cap(entry.id)||entry.id<=previous||!text(entry.label)||!Array.isArray(entry.dimension_ids)||entry.dimension_ids.length<1||entry.dimension_ids.length>5||new Set(entry.dimension_ids).size!==entry.dimension_ids.length||entry.dimension_ids.some(id=>typeof id!=='string'||!catalogDimensionIds.includes(id as CatalogDimension['id']))||!exact(entry.declared_by_role,catalogRoleIds)||Object.values(entry.declared_by_role).some(value=>typeof value!=='boolean'))throw bad();previous=entry.id;const item=copy(entry) as unknown as CatalogEntry;entries.push(item);canonical+=item.id+'|'+item.dimension_ids.join(',')+'|'+catalogRoleIds.map(role=>item.declared_by_role[role]?'1':'0').join('')+'\n'}
  const labels=['资产与指标','告警与工单','模板与自动化','平台管理','成员管理'];v.dimensions.forEach((dimension,i)=>{if(!exact(dimension,['id','label','capability_ids'])||dimension.id!==catalogDimensionIds[i]||dimension.label!==labels[i]||JSON.stringify(dimension.capability_ids)!==JSON.stringify(entries.filter(e=>e.dimension_ids.includes(catalogDimensionIds[i]!)).map(e=>e.id)))throw bad()})
+ const verified=copy(v) as unknown as CapabilityCatalog
  const digest=Array.from(new Uint8Array(await digestSha256(new TextEncoder().encode(canonical))),n=>n.toString(16).padStart(2,'0')).join('');if(digest!==v.declaration_hash)throw bad()
- return copy(v) as unknown as CapabilityCatalog
+ return verified
 }
 export function createCapabilityCatalogReader(client:Pick<ApiClient,'request'>,notify:(state:CatalogState)=>void){
- let context:CatalogContext|null=null,generation=0,controller:AbortController|null=null,disposed=false;let state:CatalogState={current:null,busy:false,error:null}
+ let context:CatalogContext|null=null,generation=0,controller:AbortController|null=null,disposed=false,retryAvailable=false;let state:CatalogState={current:null,busy:false,error:null}
  const snapshot=()=>({...state,current:state.current?copy(state.current):null});const emit=()=>notify(snapshot());const clear=()=>{generation++;controller?.abort();controller=null;state={current:null,busy:false,error:null}}
- return {state:snapshot,reset(scope:CatalogContext|null){clear();context=!disposed&&scope&&scope.role==='padmin'&&uuid.test(scope.tenantId)&&uuid.test(scope.actorId)&&Number.isSafeInteger(scope.permissionVersion)&&scope.permissionVersion>0?{...scope}:null;emit()},async refresh(){if(!context||disposed||state.busy)return false;clear();const current=generation,scope={...context};controller=new AbortController();state.busy=true;emit();try{const raw=await client.request('/authorization/capability-catalog',{signal:controller.signal});if(current!==generation||disposed)return false;const value=await readCapabilityCatalog(raw,scope);if(current!==generation||disposed)return false;state.current=value;return true}catch(error){if(current===generation&&!disposed&&!isCancelled(error))state.error=error;return false}finally{if(current===generation&&!disposed){state.busy=false;controller=null;emit()}}},dispose(){clear();disposed=true;context=null;emit()}}
+ function reset(scope:CatalogContext|null){clear();retryAvailable=false;context=!disposed&&scope&&scope.role==='padmin'&&uuid.test(scope.tenantId)&&uuid.test(scope.actorId)&&Number.isSafeInteger(scope.permissionVersion)&&scope.permissionVersion>0?{...scope}:null;emit()}
+ async function refresh(){
+  if(!context||disposed||state.busy)return false
+  clear();const current=generation,scope={...context},active=new AbortController();controller=active;retryAvailable=true;state.busy=true;emit()
+  try{
+   if(current!==generation||disposed||active.signal.aborted)return false
+   const raw=await client.request('/authorization/capability-catalog',{signal:active.signal})
+   if(current!==generation||disposed||active.signal.aborted)return false
+   const value=await readCapabilityCatalog(raw,scope)
+   if(current!==generation||disposed||active.signal.aborted)return false
+   state.current=value;retryAvailable=false;return true
+  }catch(error){if(current===generation&&!disposed&&!isCancelled(error))state.error=error;return false}
+  finally{if(current===generation&&!disposed){state.busy=false;controller=null;emit()}}
+ }
+ function canRetryRead(){return !!context&&!disposed&&!state.busy&&retryAvailable}
+ function cancelRead(){if(disposed||!state.busy)return false;clear();emit();return true}
+ return {state:snapshot,reset,refresh,canRetryRead,cancelRead,retryRead:()=>canRetryRead()?refresh():Promise.resolve(false),dispose(){clear();disposed=true;context=null;retryAvailable=false;emit()}}
 }

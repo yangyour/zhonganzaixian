@@ -12,9 +12,9 @@ const state = shallowRef<ManualIncidentReadState>(emptyManualIncidentReadState()
 const reader = createManualIncidentReader(api, value => { state.value = value })
 const recoveryOpen = ref(false), recovery = ref<InstanceType<typeof ManualRecoveryPanel> | null>(null)
 const editorOpen = ref(false), editor = ref<InstanceType<typeof ManualIncidentEditor> | null>(null)
-async function afterSaved(value: ManualIncidentEntry) { if (permitted.value && await reader.list()) await reader.select(value.id) }
+async function afterSaved(value: ManualIncidentEntry) { const owner=contextKey.value;if(!permitted.value||value.tenant_id!==session.value?.tenant.id)return;if(await reader.list()&&owner===contextKey.value&&permitted.value&&value.tenant_id===session.value?.tenant.id)await reader.select(value.id) }
 const permitted = computed(() => Boolean(session.value && ['msp', 'padmin'].includes(session.value.user.role) && can('manual_incidents:read') && !switchingTenant.value))
-const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, permitted.value]))
+const contextKey = computed(() => JSON.stringify([contextGeneration.value, session.value?.tenant.id, session.value?.user.id, session.value?.permission_version, session.value?.account_version, session.value?.user.role, permitted.value]))
 watch(contextKey, () => { const current = session.value; reader.reset(permitted.value && current ? { tenantId: current.tenant.id, actorId: current.user.id, permissionVersion: current.permission_version } : null); if (permitted.value) void reader.list() }, { immediate: true, flush: 'sync' })
 onUnmounted(reader.dispose)
 </script>

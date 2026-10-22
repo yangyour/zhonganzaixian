@@ -1,0 +1,56 @@
+{
+  "result": "PASS_MANUAL_INCIDENT_ORIGINAL_READ_AND_EDITOR_PROTECTION",
+  "new_tests": 38,
+  "new_test_layers": {
+    "workspace": 21,
+    "editor_real_sfc_router_null_render": 13,
+    "real_drawer_native_dom": 2,
+    "parent_page_handlers": 2
+  },
+  "focused_tests_passed": 61,
+  "vitest": {
+    "files_passed": 250,
+    "tests_passed": 4033
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "production_build": {
+    "build_id": "5358cbdac11c6f4d90adc4d70fcec96be4a5f9d51c8e757582f8444673bf8899",
+    "file_count": 141,
+    "bootstrap_gzip_bytes": 180721,
+    "bootstrap_css_gzip_bytes": 62537,
+    "scope": "static-artifacts-only"
+  },
+  "initial_failures": [
+    {
+      "typecheck": 1,
+      "fixed": "Split CHOOSE and ASSET into separate discriminated union variants; no narrowing cast."
+    },
+    {
+      "candidate_name_regression": 1,
+      "passed_before_fix": 43,
+      "fixed": "Validate both original candidate and highest observed asset baseline; retain original candidate through retry."
+    }
+  ],
+  "modal_confirmation": "EXPLICITLY_STUBBED_NOT_BROWSER_QA",
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_manual_incident_writes": 0,
+  "automatic_monitoring_or_workflow_changes": 0,
+  "formal_acceptance_passes_added": 0,
+  "source_sha256": {
+    "apps/web/src/utils/manualIncidentWriter.ts": "ac9292215485ca08d2b8c913e6bfffcf3f785adea800f0917abc401b9860fc5b",
+    "apps/web/src/components/ManualIncidentEditor.vue": "f8abd7f1baf1d1ef974b7d812d9d4e9e928f869b98a14735e5132d68a375bac3",
+    "apps/web/src/pages/ManualIncidentsPage.vue": "50216dc15c11e0aba077a50f17b9b6b3ce5c5f27e64ca82ea31c3af684c01baa",
+    "apps/web/tests/manualIncidentWriter.test.ts": "20c14727f486caef17f0649ab44ce3c674d7d15ed936610c75cf06a245358ded",
+    "apps/web/tests/manualIncidentEditor.test.ts": "bc8772446332ec28ee51114a169a27eb60abcb2a82fb052344020623f4af15f0"
+  }
+}

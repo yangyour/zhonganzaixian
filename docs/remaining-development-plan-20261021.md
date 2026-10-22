@@ -164,3 +164,5 @@
 [邮件与企微完整输入确认](channel-confirmation-protection-20261021.md)补账号版本清理、单次确认epoch、完整通道/绑定事实复核及原行保护；未知写入保留，不触发真实消息或启用自动通知。
 
 [站内通知外部发送与原回执恢复](notification-channel-recovery-20261021.md)补完整回执校验、原GET取消重试及父子列表防卸载门禁；响应式未知提交与两个通道分别跟踪，不把受理当送达，不装配V50 Worker。
+
+[通知发送浏览器验收矩阵](notification-channel-browser-acceptance-20261021.md)新增12项四视口、键盘、axe与恢复规格；现共86项/10文件可发现，实际执行全部仍NOT_RUN，不能计为浏览器或正式TC通过。

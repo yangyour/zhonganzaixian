@@ -1,0 +1,55 @@
+{
+  "result": "PASS_BROWSER_SPEC_DISCOVERY_NOT_EXECUTION",
+  "new_browser_specs": 12,
+  "browser_spec_discovery": {
+    "files": 10,
+    "tests": 86,
+    "status": "PASS_DISCOVERY_ONLY"
+  },
+  "browser_execution": {
+    "status": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+    "passed": 0
+  },
+  "axe": "NOT_RUN",
+  "screenshots": "NOT_GENERATED",
+  "vitest": {
+    "files_passed": 256,
+    "tests_passed": 4205
+  },
+  "new_unit_tests": 0,
+  "existing_component_assertions": "NAMED_GROUP_ADDED",
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "production_build": {
+    "status": "PASSED",
+    "files": 141,
+    "bootstrap_gzip_bytes": 180727,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "c985f4b2bb1aa6a8af0cc19925e1fd908316956dc47c3a66d71179c5477dad50",
+    "scope": "static-artifacts-only"
+  },
+  "production_fixture_boundary": {
+    "status": "PASS",
+    "scope": "PRODUCTION_ARTIFACT_EXCLUDES_SYNTHETIC_NOTIFICATION_ENTRY",
+    "files_checked": 142,
+    "qa_paths_found": 0,
+    "synthetic_entry_markers_found": 0
+  },
+  "backend_or_ddl_changed": false,
+  "api_or_database_executed": false,
+  "real_messages_or_authorization_changes": 0,
+  "formal_acceptance_passes_added": 0,
+  "source_sha256": {
+    "apps/web/src/components/NotificationChannelAction.vue": "c78c3fdff7a4b8ce090322450020207d93fc52b87e8234cf7db49918a7086092",
+    "apps/web/tests/notificationChannelAction.test.ts": "bb59bbe97eab123770b8d671a6dc5eced46ca0ee3694ab202619dba91037da64",
+    "apps/web/qa/notification-channels.fixture.html": "f7c756e4c0aced6d75df151bb863458f7c5e625c29668cfe373cb6bc3d5cb81c",
+    "apps/web/qa/notification-channels.fixture.ts": "cd7f46af2016b1dea267d813672c7fc8ff74d08180daadfe0b7fa7653afb07a0",
+    "apps/web/qa/browser/notification-channels.pw.ts": "f9048b8b44d2da5752ff0154e722079d63381053de8f36e93c6cb29deae5c20c"
+  }
+}

@@ -40,9 +40,9 @@ async function send(){
 onBeforeUnmount(()=>{disposed=true;epoch++;reader.dispose();emit('activity',{scopeKey:props.ownerScope??'',channel:props.channel,messageId:props.messageId,blocked:false})})
 defineExpose({send,readback,refreshRead,editor,reader,state,confirming,blocked})
 </script>
-<template><div class="notification-channel-action" :aria-label="label+'通知发送与回执'">
+<template><div class="notification-channel-action" role="group" :aria-label="label+'通知发送与回执'">
  <button v-if="command.state!=='accepted'" type="button" :disabled="!permitted||blocked||parentBusy" @click="send">发送到我的{{channel==='email'?'邮箱':'企业微信'}}</button>
- <template v-else><p v-if="state.current" ref="notice" tabindex="-1" role="status">{{(channel==='email'?emailStatusLabels:wecomStatusLabels)[state.current.status]}}。通道受理不代表收件人已收到或已读。</p><p v-else ref="notice" tabindex="-1" role="status">原发送请求已受理，详情尚未读取确认；请读取原回执，不要重新发送。</p><button type="button" :disabled="!permitted||blocked||parentBusy" @click="refreshRead">刷新{{label}}回执</button></template>
+ <template v-else><p v-if="state.current" class="channel-receipt-status" ref="notice" tabindex="-1" role="status">{{(channel==='email'?emailStatusLabels:wecomStatusLabels)[state.current.status]}}。通道受理不代表收件人已收到或已读。</p><p v-else class="channel-receipt-status" ref="notice" tabindex="-1" role="status">原发送请求已受理，详情尚未读取确认；请读取原回执，不要重新发送。</p><button type="button" :disabled="!permitted||blocked||parentBusy" @click="refreshRead">刷新{{label}}回执</button></template>
  <ApiErrorNotice :error="state.error" />
  <ReadRecoveryActions :busy="state.busy?'read':null" :can-retry="reader.canRetryRead()" :scope-key="scopeKey" :label="label+'回执'" :cancel="reader.cancelRead" :retry="refreshRead" />
  <IdentityCommandNotice :command="command" :message="message" :readback-failed="editor.readbackFailed.value" @retry="editor.retry" />

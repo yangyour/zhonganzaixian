@@ -1,0 +1,52 @@
+{
+  "result": "PASS_SERVICE_TIER_CONFIRMATION_AND_DISPATCH_GUARDS",
+  "new_tests": 19,
+  "new_test_layers": {
+    "page_and_real_memory_router": 12,
+    "workspace_dispatch": 7
+  },
+  "focused_tests_passed": 54,
+  "vitest": {
+    "files_passed": 263,
+    "tests_passed": 4321
+  },
+  "node_contract_tests_passed": 173,
+  "typecheck": "PASS",
+  "api_contract_check": "PASS_UNCHANGED",
+  "production_build": {
+    "status": "PASSED",
+    "files": 142,
+    "bootstrap_gzip_bytes": 180740,
+    "bootstrap_css_gzip_bytes": 62537,
+    "build_id": "72fd82e39e441664a14cdb822eb385888b9adab0f9000891bfb89fdb805f9e3e",
+    "scope": "static-artifacts-only"
+  },
+  "browser_specs": {
+    "tests": 86,
+    "files": 10,
+    "status": "DISCOVERED_NOT_EXECUTED"
+  },
+  "browser": "NOT_RUN_EXISTING_SANDBOX_BLOCKER",
+  "axe": "NOT_RUN",
+  "formal_contract_progress": {
+    "requirements": 128,
+    "NOT_RUN": 128,
+    "progress_notes": 65
+  },
+  "baseline_regression": {
+    "passed": 2,
+    "failed": 17,
+    "scope": "19 new tests against previous page and workspace"
+  },
+  "backend_or_ddl_changed": false,
+  "real_fee_tier_account_or_ticket_changes": 0,
+  "remaining_in_page": [
+    "Independent ledger and SLA read cancellation and original-target recovery"
+  ],
+  "source_sha256": {
+    "apps/web/src/pages/ServiceTiersPage.vue": "d37c4c69ba0bfe952b3f8df5a40d803eee582f8bbeb4883fe2033afcd98356f6",
+    "apps/web/src/utils/serviceTiers.ts": "cee0a389b650446ad7035e57be28612b5430b4585bdefdbcc72ffd8dc9b341b8",
+    "apps/web/tests/serviceTierConfirmation.test.ts": "3ac944315bf693940f1657929a10c68a973edee10282e7967937b587d52ba72b",
+    "apps/web/tests/serviceTierDispatch.test.ts": "3cc5c3a64ec1752c3d2f0417ff971184dac9b0287da24e451ff51cf4d3d5b7ec"
+  }
+}

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {computed,onUnmounted,ref,shallowRef,watch} from 'vue'
+import {computed,getCurrentInstance,onUnmounted,ref,shallowRef,watch} from 'vue'
 import {ElMessageBox} from 'element-plus'
-import {onBeforeRouteLeave} from 'vue-router'
+import {onBeforeRouteLeave,type Router} from 'vue-router'
 import {api} from '../api/client'
 import {can,contextGeneration,session,switchingTenant} from '../stores/session'
 import {contextTransitionGuards} from '../utils/contextTransitionGuard'
@@ -25,22 +25,40 @@ const billingCycle=ref<BillingCycle|''>('')
 const monthlyFeeFen=ref<string>('')
 const reason=ref('')
 const ticketIdInput=ref('')
-const blocked=ref(false)
+const blocked=ref(false),confirming=ref(false)
+let disposed=false,confirmationEpoch=0,savedInput:string|null=null,routeEpoch=0,removeResolve:(()=>void)|undefined
+const router=getCurrentInstance()?.appContext.config.globalProperties.$router as Router|undefined
+const clearRouteApproval=()=>{routeEpoch++;removeResolve?.();removeResolve=undefined}
 
-const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.user.role,permitted.value,canWrite.value]))
-const locked=computed(()=>!!state.value.busy||workspace.unresolved())
+const context=computed(()=>JSON.stringify([contextGeneration.value,session.value?.tenant.id,session.value?.user.id,session.value?.permission_version,session.value?.account_version,[...(session.value?.capabilities??[])].sort(),session.value?.user.role,permitted.value,canWrite.value]))
+const locked=computed(()=>confirming.value||!!state.value.busy||workspace.unresolved())
 
 const preparedVersion=ref<number|null>(null),validation=ref(''),baseline=ref('')
 const formSignature=()=>JSON.stringify([toTier.value,effectiveMode.value,deviceCount.value,billingCycle.value,monthlyFeeFen.value,reason.value])
+const inputSnapshot=()=>JSON.stringify([context.value,preparedVersion.value,formSignature()])
+const approvalSnapshot=()=>JSON.stringify([inputSnapshot(),tab.value,ticketIdInput.value,state.value.page,state.value.receipt,state.value.attempt])
 const dirty=computed(()=>preparedVersion.value!==null&&formSignature()!==baseline.value)
 const formLocked=computed(()=>locked.value||preparedVersion.value===null)
 const sourceChanged=computed(()=>preparedVersion.value!==null&&state.value.page!==null&&preparedVersion.value!==(state.value.page.current?.version??0))
-function clearForm(){preparedVersion.value=null;toTier.value='';effectiveMode.value='';deviceCount.value='';billingCycle.value='';monthlyFeeFen.value='';reason.value='';validation.value='';baseline.value=formSignature()}
-async function confirmDiscard(){if(!dirty.value)return true;try{await ElMessageBox.confirm('丢弃尚未保存的档位、费用和变更原因？已保存记录不受影响。','保留档位输入',{confirmButtonText:'丢弃输入',cancelButtonText:'继续编辑',type:'warning'});return true}catch{return false}}
-async function prepareChange(){if(!canWrite.value||locked.value||!state.value.page)return false;const turn=context.value;if(!await confirmDiscard()||turn!==context.value||!state.value.page)return false;const current=state.value.page.current;preparedVersion.value=current?.version??0;toTier.value=current?.tier??'';effectiveMode.value=current?.effective_mode??'';deviceCount.value=current?.contract_device_count===null||!current?'':String(current.contract_device_count);billingCycle.value=current?.billing_cycle??'';monthlyFeeFen.value=current?.monthly_fee_fen===null||!current?'':String(current.monthly_fee_fen);reason.value='';validation.value='';baseline.value=formSignature();return true}
-async function recover(){if(await workspace.retry())clearForm()}
+function clearForm(){savedInput=null;preparedVersion.value=null;toTier.value='';effectiveMode.value='';deviceCount.value='';billingCycle.value='';monthlyFeeFen.value='';reason.value='';validation.value='';baseline.value=formSignature()}
+async function confirmDiscard(){
+ if(disposed||confirming.value||workspace.unresolved())return false
+ if(!dirty.value)return true
+ const before=approvalSnapshot(),turn=confirmationEpoch;confirming.value=true
+ try{await ElMessageBox.confirm('丢弃尚未保存的档位、费用和变更原因？已保存记录不受影响。','保留档位输入',{confirmButtonText:'丢弃输入',cancelButtonText:'继续编辑',type:'warning'});return !disposed&&turn===confirmationEpoch&&before===approvalSnapshot()&&!workspace.unresolved()}
+ catch{return false}finally{if(turn===confirmationEpoch)confirming.value=false}
+}
+async function prepareChange(){
+ if(!canWrite.value||locked.value||!state.value.page)return false
+ const before=approvalSnapshot(),current=state.value.page.current?structuredClone(state.value.page.current):null
+ if(!await confirmDiscard()||disposed||before!==approvalSnapshot()||!canWrite.value||locked.value||!state.value.page)return false
+ savedInput=null;preparedVersion.value=current?.version??0;toTier.value=current?.tier??'';effectiveMode.value=current?.effective_mode??'';deviceCount.value=current?.contract_device_count===null||!current?'':String(current.contract_device_count);billingCycle.value=current?.billing_cycle??'';monthlyFeeFen.value=current?.monthly_fee_fen===null||!current?'':String(current.monthly_fee_fen);reason.value='';validation.value='';baseline.value=formSignature();return true
+}
+function finishSave(ok:boolean,owner:string){if(!ok||disposed||owner!==context.value)return false;if(savedInput===inputSnapshot())clearForm();else validation.value='原操作已保存，当前输入已保留；请重新核对源版本后再提交。';return true}
+async function recover(){if(confirming.value||disposed)return false;const owner=context.value;return finishSave(await workspace.retry(),owner)}
 watch(context,()=>{
  const s=session.value
+ confirmationEpoch++;confirming.value=false;clearRouteApproval()
  tab.value='ledger';clearForm();ticketIdInput.value='';blocked.value=false
  workspace.reset(permitted.value&&s?{tenantId:s.tenant.id,actorId:s.user.id,permissionVersion:s.permission_version,canWrite:canWrite.value}:null)
  if(permitted.value)void workspace.load(false)
@@ -51,16 +69,19 @@ async function submitChange(){
  validation.value=''
  let devices:number|null,fee:number|null
  try{devices=parseOptionalTierInteger(deviceCount.value,1000000);fee=parseOptionalTierInteger(monthlyFeeFen.value,Number.MAX_SAFE_INTEGER-1)}catch(error){validation.value=error instanceof Error?error.message:'数字格式无效';return false}
+ const owner=context.value;savedInput=inputSnapshot()
  const ok=await workspace.submitChange({to_tier:toTier.value,effective_mode:effectiveMode.value,contract_device_count:devices,billing_cycle:billingCycle.value===''?null:billingCycle.value,monthly_fee_fen:fee,reason:reason.value},preparedVersion.value)
- if(ok)clearForm();return ok
+ return finishSave(ok,owner)
 }
 
-async function mayLeave(){if(workspace.unresolved()){blocked.value=true;return false}const turn=context.value;return await confirmDiscard()&&turn===context.value}
-onBeforeRouteLeave(mayLeave)
-const unregister=contextTransitionGuards.register(mayLeave)
+async function mayLeave(){if(workspace.unresolved()){blocked.value=true;return false}const before=approvalSnapshot();return await confirmDiscard()&&!disposed&&before===approvalSnapshot()}
+async function leaveRoute(){clearRouteApproval();const turn=routeEpoch,before=approvalSnapshot();if(!await mayLeave()||disposed||turn!==routeEpoch||before!==approvalSnapshot())return false;if(router)removeResolve=router.beforeResolve(()=>!disposed&&turn===routeEpoch&&before===approvalSnapshot()&&!workspace.unresolved());return true}
+onBeforeRouteLeave(leaveRoute)
+const removeAfter=router?.afterEach(clearRouteApproval),removeError=router?.onError(clearRouteApproval)
+const unregister=contextTransitionGuards.register(mayLeave,approvalSnapshot)
 function beforeUnload(event:BeforeUnloadEvent){if(workspace.unresolved()||dirty.value){event.preventDefault();event.returnValue=''}}
 window.addEventListener('beforeunload',beforeUnload)
-onUnmounted(()=>{unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
+onUnmounted(()=>{disposed=true;confirmationEpoch++;confirming.value=false;clearRouteApproval();removeAfter?.();removeError?.();savedInput=null;unregister();workspace.dispose();window.removeEventListener('beforeunload',beforeUnload)})
 defineExpose({state,workspace,mayLeave,prepareChange,submitChange,recover,preparedVersion,validation,dirty,toTier,effectiveMode,deviceCount,billingCycle,monthlyFeeFen,reason,ticketIdInput})
 </script>
 <template>
